@@ -1,106 +1,177 @@
-Return-Path: <kvm+bounces-65501-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65500-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289D8CACE31
-	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 11:33:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40552CACE30
+	for <lists+kvm@lfdr.de>; Mon, 08 Dec 2025 11:33:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 868C23015009
-	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 10:33:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4655530567BC
+	for <lists+kvm@lfdr.de>; Mon,  8 Dec 2025 10:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B473F310631;
-	Mon,  8 Dec 2025 10:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477EB310625;
+	Mon,  8 Dec 2025 10:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N2b9QPP5"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BfzC3Hxr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5EA2E611B;
-	Mon,  8 Dec 2025 10:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1B92DF125;
+	Mon,  8 Dec 2025 10:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765190019; cv=none; b=k4IW8uFbZJTeTSXKj8Y+Z1AkYrTqMkVDTjsulV1T/iPK1n/2RfJBnM8CrcCsZK2xic8wav9Dgam0eJ5C9WJ/YOgGT2T6dOETrepwFiSNTCkALXBG7XtZyCFHejh1ph/3i/6XGQ23D/2qD6u3mcKBhOqVp4mOxVm0yKwqdEUlUog=
+	t=1765189983; cv=none; b=U/Dhf28A03a0K5jy1aystdNRXYJjjnTFUplUx1JMRlk5lFUksxGJ6uY0lAJofzeRJ/nEX9JNsOcrzadvkF/b1alMSI5z1CPNZNXhPRk3q2VyYhcHb8lk/8gQgbBBIp+rag/fyPi2xJrX5VyUxnDgeIuEnlCXSMX3Ah89nFFsbPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765190019; c=relaxed/simple;
-	bh=c9l9ce6UYP/otnK59dV0eUb1DOzxB9nYVZ9wNE6XKIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aTs4mwNI7Aq8vOul9VbzL6VHxQPWmnLGoikSkRkFkmIm2DmdTD60xYvKj9LAfdHElW/ADcynligOYqrJe6axcHvF6BkhRpMgDiXVNq3VQkR3ihS4s0P1jT8ANoh5H2n0J7BREb4VicH2xQdCzaCwv/rA7Gg57GGmaVyefRBmtH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N2b9QPP5; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765190018; x=1796726018;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c9l9ce6UYP/otnK59dV0eUb1DOzxB9nYVZ9wNE6XKIc=;
-  b=N2b9QPP5YqlpnCLhIJtQTwujsmyOWSSR1CnnluzRQF4O+Plwp2S7wXml
-   15auyO2lrCA4hLAtaUNJ5xiUcBP+waROqp5n/Wm2gwZy65B/XuzRnXKlo
-   VVDZMtwAekKJTs7VLQX6a7+IBC2VzW30yjNA3EwWWG8Mv3fb5TV4bdyc/
-   bW1IDu2EbDy6Xegdds/nveINco5+EKQhuY39B/Vpz+N0yWTzIEaQ2aGjz
-   rJYoUFyTC9pWRfVEG5DNPw3SQZkWlK6ks4UiIbTn/GmWBhGxxOjrD39P3
-   z+AbsXuE4E/8Lizn8SOv4bDzW04qe83jpanT+s3bH6Zmtp5a/+45OGmGW
-   w==;
-X-CSE-ConnectionGUID: ksSslthDT56m4rTt1yTLSw==
-X-CSE-MsgGUID: rPckdfFeSv2hPDBpkKlqkA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="78594106"
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="78594106"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 02:33:37 -0800
-X-CSE-ConnectionGUID: e6nxTTSbT22YX5Eez07vfA==
-X-CSE-MsgGUID: fv/G4m+TT/m2CAbeXx+M8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="194957582"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa006.jf.intel.com with ESMTP; 08 Dec 2025 02:33:35 -0800
-Date: Mon, 8 Dec 2025 18:17:51 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: dan.j.williams@intel.com
-Cc: x86@kernel.org, dave.hansen@linux.intel.com, kas@kernel.org,
-	linux-kernel@vger.kernel.org, chao.gao@intel.com,
-	rick.p.edgecombe@intel.com, baolu.lu@linux.intel.com,
-	yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
-	adrian.hunter@intel.com
-Subject: Re: [PATCH 0/6] TDX: Stop metadata auto-generation, improve
- readability
-Message-ID: <aTalzz/eE9xFIwSN@yilunxu-OptiPlex-7050>
-References: <20251202050844.2520762-1-yilun.xu@linux.intel.com>
- <69353071424df_1e0210079@dwillia2-mobl4.notmuch>
+	s=arc-20240116; t=1765189983; c=relaxed/simple;
+	bh=ce+U8SbYQ+yLKTxPHO/Gmpsx/eFQDoVFLjOVXAiEEao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=by4PZbWbOkznG5PMlw8SEGK7aNVFD4UxK1vXSmeowllB52z75qQoUqkASdp3sfbKr46/Cw26xkSVcdO2Unij81O1WqegeCDzLpte75PjxaHjqf8E92cZ2C+5DIYm9bIRdUr7Da4SqNaSLB0W4hPhgIz44Zhf5W0ZPG/FvdpWtZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BfzC3Hxr; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B86b963010256;
+	Mon, 8 Dec 2025 10:32:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Je9IIy
+	qf3ckx1tk8Ni7hFzNEfi8CPmuUhAWbgT06pH4=; b=BfzC3HxrPobuhS53ACWdZB
+	PA9iEG/1aL4jT1TRuchKotrzCF9xodygooM1550WBnCL65pVF3xXiljw12UBVbLl
+	lT+rak8kiOOioJ9cqZfrJ/ccy+UBPtvzp/8HFNZqWKthsUB1XFwvk4QBgX+oR4l2
+	iEBYiqVoRUgRtZMs2uBsno0TintxSEi5vcwDUtb+JotU+Kwm1A/ocXKUSZWbktMh
+	g4tOQ0bTghEU6cY1PLDtxzsPSxo1B5+CtrYCtPidOz0X79/QvKd91QLKbspeRwQw
+	V9xQ4P1lQPcSB1CjW4dA4pcTwPESBW5+P72Bw0gAK7/ETwLMsX/bE32v4LqRlX8A
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4avc536st5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 10:32:35 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5B8ASQSK009105;
+	Mon, 8 Dec 2025 10:32:34 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4avc536ssv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 10:32:34 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B885xZo002034;
+	Mon, 8 Dec 2025 10:32:33 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aw11j4wwg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 10:32:33 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B8AWU3o38535608
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Dec 2025 10:32:30 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F3E72004B;
+	Mon,  8 Dec 2025 10:32:30 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 73E4420040;
+	Mon,  8 Dec 2025 10:32:28 +0000 (GMT)
+Received: from [9.111.22.193] (unknown [9.111.22.193])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Dec 2025 10:32:28 +0000 (GMT)
+Message-ID: <8f1c1b9e-2743-4326-9a6f-754885ae90f4@linux.ibm.com>
+Date: Mon, 8 Dec 2025 11:32:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69353071424df_1e0210079@dwillia2-mobl4.notmuch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: Remove subtle "struct kvm_stats_desc" pseudo-overlay
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+        Oliver Upton <oupton@kernel.org>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>
+References: <20251205232655.445294-1-seanjc@google.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20251205232655.445294-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA2MDAyMCBTYWx0ZWRfX/ZkvryR9rikx
+ RRIhLIzEwTDFULt3caOu8S6wy6ncgQsyLzn5JBuqe/16x7rRK7DPdjVge5xAJA2z7rL/tT1lyFd
+ YMh3EQIfgG8q57vyiiYdkyOyNbLFDPTLaENaDyuoNnPQpGHKZMal2jpHafVG+bQkdZsWG8NW7UX
+ AlT3nARl8qerz3haG9zUXE0cGXVKSMt5DkrhWZpn/VgzlCYydbpaoEhPc+m7bnrKQcjwj0amtRB
+ p7RTydIUxj8YhOmJYvTpU5HYiUaYpnHgR9Ox+9r7ValcFQxCBW7NuzkHf4WykCwt+6kvFjjjGAe
+ 9Yp1mHPJC81eNRrbuDPcX0SwdooPdv90XQw8GuaCLPA48Ihvfn3NN+/xRxSX0h0xvHQNlMFWFsC
+ kUNylzqzl1bbNR0XFFbgeDqefkUM1w==
+X-Authority-Analysis: v=2.4 cv=S/DUAYsP c=1 sm=1 tr=0 ts=6936a943 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8 a=W9euR_DFE7q28BTGJBMA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: QQLrcpyWW-8FcouxCOIdxqAKliO-gZxO
+X-Proofpoint-GUID: ADFjf-VsY2dJHYbJ59fyg02c4PSLuneX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-06_02,2025-12-04_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0 clxscore=1011 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2512060020
 
-On Sat, Dec 06, 2025 at 11:44:49PM -0800, dan.j.williams@intel.com wrote:
-> Xu Yilun wrote:
-> > Hi:
-> > 
-> > This addresses the common need [1][2] to stop auto-generating metadata
-> > reading code, improve readability, allowing us to manually edit and
-> > review metadata code in a comfortable way. TDX Connect needs to add more
-> > metadata fields based on this series, and I believe also for DPAMT and
-> > TDX Module runtime update.
+Am 06.12.25 um 00:26 schrieb Sean Christopherson:
+> Remove KVM's internal pseudo-overlay of kvm_stats_desc, which subtly
+> aliases the flexible name[] in the uAPI definition with a fixed-size array
+> of the same name.  The unusual embedded structure results in compiler
+> warnings due to -Wflex-array-member-not-at-end, and also necessitates an
+> extra level of dereferencing in KVM.  To avoid the "overlay", define the
+> uAPI structure to have a fixed-size name when building for the kernel.
 > 
-> While the writing is on the wall that the autogenerated metadata
-> infrastructure has become more trouble than it is worth, that work can
-> come after some of the backlog built on the old way has cleared out.
-> These in-flight sets of DPAMT, Module Update, and TDX PCIe Linux
-> Encryption can stay with what they started.
+> Opportunistically clean up the indentation for the stats macros, and
+> replace spaces with tabs.
 > 
-> I.e. let us not start injecting new dependencies into in-flight review.
+> No functional change intended.
+> 
+> Reported-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Closes: https://lore.kernel.org/all/aPfNKRpLfhmhYqfP@kspp
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Yes, I agree. One of the goal is to minimize the manual changes when a
-new metadata is to be added, so I expect minor work for the switching
-later.
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+[..]
 
-Thanks,
-Yilun
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -14,6 +14,10 @@
+>   #include <linux/ioctl.h>
+>   #include <asm/kvm.h>
+>   
+> +#ifdef __KERNEL__
+> +#include <linux/kvm_types.h>
+> +#endif
+> +
+>   #define KVM_API_VERSION 12
+>   
+>   /*
+> @@ -1579,7 +1583,11 @@ struct kvm_stats_desc {
+>   	__u16 size;
+>   	__u32 offset;
+>   	__u32 bucket_size;
+> +#ifdef __KERNEL__
+> +	char name[KVM_STATS_NAME_SIZE];
+> +#else
+>   	char name[];
+> +#endif
+>   };
+
+Not sure if we need a comment here or not. Maybe git blame is good enough.
 
