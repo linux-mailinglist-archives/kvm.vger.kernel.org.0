@@ -1,168 +1,240 @@
-Return-Path: <kvm+bounces-65520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50957CAE8FA
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 01:49:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C441FCAE979
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 02:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3C3D308ED02
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 00:48:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DE60630345AE
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 01:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0262367CE;
-	Tue,  9 Dec 2025 00:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D919F27464F;
+	Tue,  9 Dec 2025 01:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PmzyMfvZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tMiNyH77"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AD9218AAB
-	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 00:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5471226529A
+	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 01:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765241324; cv=none; b=Tgb3rMbdCJeGVVADfmoC3mk/XEsgV2wJfHOtstO9pkegj2+S5NrNokWRdSVdPGlIOzR51MfWuN4ulaUJZVCrOFzFZdLUcgsgaNHANykJavYGIxX2xvtRcukVOoh+LLd02qX5ulSgkpAiVSWEFBxT2clAChh65MrN6+ACbUVFbUk=
+	t=1765242750; cv=none; b=onX8XMonXUoZV60xrFJuW6qbTXsRC1LoWCJxvcAaKSlnpBwzGLA0ku3SCIOsSnPeGI8jQ5MWSqLqQVNh/i/U/WFlEVzDl+Hdj64x8lttDudhqMwynRbDC/en3ANxHxc0M2hDStndAMMGFnCVeUHibFmc72IaiMmcsyaAOHru4IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765241324; c=relaxed/simple;
-	bh=S3RFH80Xb4dwN71dMJF9zOdcMbXQRr/mxcin8aHHBKY=;
+	s=arc-20240116; t=1765242750; c=relaxed/simple;
+	bh=uxzxSh6XqqIsyFkEYWO9Wk6W+z2pNBZTbUCzcYNve+4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XG2A1oMEfsJXNOxQ8A4XY/cC3uOhFccuULWh5lQFk1rRlGkJEbq0/piIuQKBUHckbqmJE9zIeSM62QgIRzKdiB8b0+7aa6gWwDKoH4K2Wko1SM5VpzLS+vKuO2Wd1uxjxXxpKqG8VTN9h4Pg1iuV7RApEGBzAshxGX4On3yQBU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PmzyMfvZ; arc=none smtp.client-ip=95.215.58.183
+	 Content-Type:Content-Disposition:In-Reply-To; b=axjXewVXnekAnL8aoyAHaCCEzlkMEht5dubt8zHnny1iOYiuIG8/8dGaHG7DWC4xf/YREIN2Ulbh/tyJDO7qyXRZx07OugjBx2qQBwC/Ei+TIinNJTJJXLP200nplEy0VXszLsuR+WVbw2KMDr7SaibCDS5z1vfLYSkyNUo66Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tMiNyH77; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 9 Dec 2025 00:48:18 +0000
+Date: Tue, 9 Dec 2025 01:12:18 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765241308;
+	t=1765242746;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3U6blHyHC54iULT0QuHaYpTtaR4BR2LrdNCuPvUYiUU=;
-	b=PmzyMfvZhrGe+u74PrGfU0LwNMzpSfJoFASQceTZX9LZ4oXG/c5EyNQz0VIgpKj7/dHvjQ
-	OYmeG+rqpPFJpsdOI9dluraC9XWqZGpRH8hMXe2I7Lue+gQSXvC6BHaJv7ZKRMqCMhGhKU
-	vhl2yzbttUhlLX7VefuR2F+web5H/Kk=
+	bh=j+yk7GYYARc+z1aHYLAKaaIC27BnMabXFcj4H+AZ2f8=;
+	b=tMiNyH77s7Jn6Wm5/kWjGHx9mjE2mOgGimcJ1Ukg0JMtV0TTvpckbzuVnPeSzwbvUPZdJg
+	wxjmnc7KqIuPKMaUBGse2roL2ObeyehkC25ERQNTfq8jbEsznTGsss6UxZ8Vs8xOQglU5t
+	rczM6Gkeg+usub5lx3DeqYlokZNsl+E=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Zhang Yi Z <yi.z.zhang@linux.intel.com>, Xin Li <xin@zytor.com>
-Subject: Re: [PATCH v16 36/51] KVM: nSVM: Save/load CET Shadow Stack state
- to/from vmcb12/vmcb02
-Message-ID: <tamhy4gqijflouthniyre3w5r4ywjuzvlaeavvgyrfifozdi3g@zcd432svuw5i>
-References: <20250919223258.1604852-1-seanjc@google.com>
- <20250919223258.1604852-37-seanjc@google.com>
- <ngbxelfw4lvipsvnoykqo4sonuyjqhuyoh5yogvc6btqj4w6cr@y2jpmnyjphmc>
+To: Kevin Cheng <chengkev@google.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, jmattson@google.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: SVM: Don't allow L1 intercepts for instructions not
+ advertised
+Message-ID: <fe445lu6g3x5tq2dhz43apvy5tw66nt53kbbprg5t74josbtm5@rp5iogfmylnv>
+References: <20251205070630.4013452-1-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ngbxelfw4lvipsvnoykqo4sonuyjqhuyoh5yogvc6btqj4w6cr@y2jpmnyjphmc>
+In-Reply-To: <20251205070630.4013452-1-chengkev@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 28, 2025 at 10:23:02PM +0000, Yosry Ahmed wrote:
-> On Fri, Sep 19, 2025 at 03:32:43PM -0700, Sean Christopherson wrote:
-> > Transfer the three CET Shadow Stack VMCB fields (S_CET, ISST_ADDR, and
-> > SSP) on VMRUN, #VMEXIT, and loading nested state (saving nested state
-> > simply copies the entire save area).  SVM doesn't provide a way to
-> > disallow L1 from enabling Shadow Stacks for L2, i.e. KVM *must* provide
-> > nested support before advertising SHSTK to userspace.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 826473f2d7c7..a6443feab252 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -636,6 +636,14 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
-> >  		vmcb_mark_dirty(vmcb02, VMCB_DT);
-> >  	}
-> >  
-> > +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
-> > +	    (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_CET)))) {
-> > +		vmcb02->save.s_cet  = vmcb12->save.s_cet;
-> > +		vmcb02->save.isst_addr = vmcb12->save.isst_addr;
-> > +		vmcb02->save.ssp = vmcb12->save.ssp;
-> > +		vmcb_mark_dirty(vmcb02, VMCB_CET);
-> > +	}
-> > +
+On Fri, Dec 05, 2025 at 07:06:30AM +0000, Kevin Cheng wrote:
+> If a feature is not advertised in the guest's CPUID, prevent L1 from
+> intercepting the unsupported instructions by clearing the corresponding
+> intercept in KVM's cached vmcb12.
 > 
-> According to the APM, there are some consistency checks that should be
-> done on CET related fields in the VMCB12. Specifically from
-> "Canonicalization and Consistency Checks. " in 15.5.1 in the APM Volume
-> 2 (24593—Rev. 3.42—March 2024):
+> When an L2 guest executes an instruction that is not advertised to L1,
+> we expect a #UD exception to be injected by L0. However, the nested svm
+> exit handler first checks if the instruction intercept is set in vmcb12,
+> and if so, synthesizes an exit from L2 to L1 instead of a #UD exception.
+> If a feature is not advertised, the L1 intercept should be ignored.
 > 
-> • Any reserved bit is set in S_CET
-> • CR4.CET=1 when CR0.WP=0
-> • CR4.CET=1 and U_CET.SS=1 when EFLAGS.VM=1
-> • Any reserved bit set in U_CET (SEV-ES only):
->   - VMRUN results in VMEXIT(INVALID)
->   - VMEXIT forces reserved bits to 0
+> Calculate the nested intercept mask by checking all instructions that
+> can be intercepted and are controlled by a CPUID bit. Use this mask when
+> copying from the vmcb12 to KVM's cached vmcb12 to effectively ignore the
+> intercept on nested vm exit handling.
 > 
-> Most consistency checks are done in __nested_vmcb_check_save(), but it
-> only operates on the cached save area, which does not have everything
-> you need. You'll probably need to add the needed fields to the cached
-> save area, or move the consistency checks elsewhere.
-> 
-> Related to this, I am working on patches to copy everything we use from
-> vmcb12->save to the cache area to minimize directly accessing vmcb12
-> from the guest memory as much as possible. So I already intend to add
-> other fields to the cached save area.
-> 
-> There's also a couple of other missing consistency checks that I will
-> send patches for, which also need fields currently not in the cached
-> save area.
+> Another option is to handle ignoring the L1 intercepts in the nested vm
+> exit code path, but I've gone with modifying the cached vmcb12 to keep
+> it simpler.
 
-I don't really care that much, but I think this fell through the cracks.
+Basically instead of masking the intercept bits in
+__nested_copy_vmcb_control_to_cache(), we'd need to do it in both:
+- recalc_intercepts() (on copying from g->intercepts to c->intercepts).
+- vmcb12_is_intercept().
 
-Regarding the cached save area, the series I was talking about is
-already out [*], and I am preparing to send a newer version. It puts the
-fields used here in the cache, so it should be straightforward to add
-the consistency checks on top of it.
+The current approach has the advantage of applying to any future uses of
+the intercepts bits in the VMCB12 as well. The alternative approach has
+the advantage of not modifying the intercept bits in the cached VMCB12,
+which avoids any potential bugs in the future if we ever directly copy
+from the cached VMCB12 to L1's VMCB12.
 
-[*]https://lore.kernel.org/kvm/20251110222922.613224-1-yosry.ahmed@linux.dev/
+I think the latter is easier to test for, the new test case in KUTs [*]
+could just verify that the ignored intercept bits are not cleared in the
+VMCB.
+
+So I prefer the current approach (with the added testing).
+
+[*]https://lore.kernel.org/kvm/20251205081448.4062096-3-chengkev@google.com/
 
 > 
-> >  	kvm_set_rflags(vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
-> >  
-> >  	svm_set_efer(vcpu, svm->nested.save.efer);
-> > @@ -1044,6 +1052,12 @@ void svm_copy_vmrun_state(struct vmcb_save_area *to_save,
-> >  	to_save->rsp = from_save->rsp;
-> >  	to_save->rip = from_save->rip;
-> >  	to_save->cpl = 0;
-> > +
-> > +	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
-> > +		to_save->s_cet  = from_save->s_cet;
-> > +		to_save->isst_addr = from_save->isst_addr;
-> > +		to_save->ssp = from_save->ssp;
-> > +	}
-> >  }
-> >  
-> >  void svm_copy_vmloadsave_state(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
-> > @@ -1111,6 +1125,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> >  	vmcb12->save.dr6    = svm->vcpu.arch.dr6;
-> >  	vmcb12->save.cpl    = vmcb02->save.cpl;
-> >  
-> > +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK)) {
-> > +		vmcb12->save.s_cet	= vmcb02->save.s_cet;
-> > +		vmcb12->save.isst_addr	= vmcb02->save.isst_addr;
-> > +		vmcb12->save.ssp	= vmcb02->save.ssp;
-> > +	}
-> > +
-> >  	vmcb12->control.int_state         = vmcb02->control.int_state;
-> >  	vmcb12->control.exit_code         = vmcb02->control.exit_code;
-> >  	vmcb12->control.exit_code_hi      = vmcb02->control.exit_code_hi;
-> > -- 
-> > 2.51.0.470.ga7dc726c21-goog
-> > 
+> Signed-off-by: Kevin Cheng <chengkev@google.com>
+> ---
+>  arch/x86/kvm/svm/nested.c | 30 +++++++++++++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.c    |  2 ++
+>  arch/x86/kvm/svm/svm.h    | 14 ++++++++++++++
+>  3 files changed, 45 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index c81005b245222..f2ade24908b39 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -184,6 +184,33 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>  	}
+>  }
+> 
+> +/*
+> + * If a feature is not advertised to L1, set the mask bit for the corresponding
+> + * vmcb12 intercept.
+> + */
+> +void svm_recalc_nested_intercepts_mask(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	memset(svm->nested.nested_intercept_mask, 0,
+> +	       sizeof(svm->nested.nested_intercept_mask));
+> +
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP))
+> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_RDTSCP);
+> +
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SKINIT))
+> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_SKINIT);
+> +
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE))
+> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_XSETBV);
+> +
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_RDPRU))
+> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_RDPRU);
+> +
+> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_INVPCID))
+> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_INVPCID);
+> +}
+> +
+
+set_nested_intercept_mask() is only used here AFAICT, so maybe just
+define it as a static function above
+svm_recalc_nested_intercepts_mask()?
+
+>  /*
+>   * This array (and its actual size) holds the set of offsets (indexing by chunk
+>   * size) to process when merging vmcb12's MSRPM with vmcb01's MSRPM.  Note, the
+> @@ -408,10 +435,11 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+>  					 struct vmcb_ctrl_area_cached *to,
+>  					 struct vmcb_control_area *from)
+>  {
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+>  	unsigned int i;
+> 
+>  	for (i = 0; i < MAX_INTERCEPT; i++)
+> -		to->intercepts[i] = from->intercepts[i];
+> +		to->intercepts[i] = from->intercepts[i] & ~(svm->nested.nested_intercept_mask[i]);
+> 
+>  	to->iopm_base_pa        = from->iopm_base_pa;
+>  	to->msrpm_base_pa       = from->msrpm_base_pa;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index f56c2d895011c..dd02a076077d8 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1011,6 +1011,8 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
+>  			svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
+>  		}
+>  	}
+> +
+> +	svm_recalc_nested_intercepts_mask(vcpu);
+
+svm_recalc_nested_intercepts_mask() is also only used here, but I think
+there's a general preference to keep nested helpers defined in nested.c,
+even if not used there (e.g. nested_svm_check_permissions(),
+nested_svm_vmrun()). So I think leave that one as-is.
+
+>  }
+> 
+>  static void svm_recalc_intercepts(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 9e151dbdef25d..08779d78c0c27 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -217,6 +217,12 @@ struct svm_nested_state {
+>  	 * on its side.
+>  	 */
+>  	bool force_msr_bitmap_recalc;
+> +
+> +	/*
+> +	 * Reserved bitmask for instruction intercepts that should not be set
+> +	 * by L1 if the feature is not advertised to L1 in guest CPUID.
+> +	 */
+> +	u32 nested_intercept_mask[MAX_INTERCEPT];
+
+I think the naming of this member (and all the helper functions) should
+change to make it clear this is a bitmask of ignored intercepts. So
+maybe call this 'ignored_intercepts' (nested is implied by the struct)?
+
+Then we can do:
+
+s/set_nested_intercept_mask/set_nested_ignored_intercept/g
+s/svm_recalc_nested_intercepts_mask/svm_recalc_nested_ignored_intercepts/g
+
+..and any needed commentary updates.
+
+Otherwise, the code looks good to me.
+
+>  };
+> 
+>  struct vcpu_sev_es_state {
+> @@ -478,6 +484,12 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
+>  	recalc_intercepts(svm);
+>  }
+> 
+> +static inline void set_nested_intercept_mask(struct svm_nested_state *nested, u32 bit)
+> +{
+> +	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
+> +	__set_bit(bit, (unsigned long *)&nested->nested_intercept_mask);
+> +}
+> +
+>  static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
+>  {
+>  	struct vmcb *vmcb = svm->vmcb01.ptr;
+> @@ -746,6 +758,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+>  	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
+>  }
+> 
+> +void svm_recalc_nested_intercepts_mask(struct kvm_vcpu *vcpu);
+> +
+>  int __init nested_svm_init_msrpm_merge_offsets(void);
+> 
+>  int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
+> --
+> 2.52.0.223.gf5cc29aaa4-goog
+> 
 
