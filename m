@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-65589-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65590-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5203CB0DD1
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 19:42:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A74ECB0DF5
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 19:49:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 764E330AD6BD
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 18:42:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0492930DEE73
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 18:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C69302CD9;
-	Tue,  9 Dec 2025 18:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3249303A26;
+	Tue,  9 Dec 2025 18:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NtuwsvmS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sj81pXVJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CAE2E2DF4
-	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 18:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD462FBDF5
+	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 18:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765305744; cv=none; b=shNxV0AACbtTecUoI25Ev5b/vZfJjZq9Es6YZYLtoQ/La8qq+mu7vKcLr2Z2DwIX3qe/XdyMEGoJa5t9kLhzm9y0gLPFQOCKmewdwlRYL+lMINdUnt0AFvmcCJjPfL0NqfiGF/QnECkTBB1S6Lt5aoy65EhwRMc8nYU8vTxv8E0=
+	t=1765306186; cv=none; b=NPGrltbW4Da5/ZZsaAeoXY+C4GVwyl0N4t/UM6UrZ5ynGS0dVqfFbUZ1Jhj1nHkIGlml80SP1cCaruK5WT7cYGkTcpLGg5u+vtbm/qj/dGq6Fz7QtIJtmQHYABgSfoRV8izNlj7rYzyXVW2YMpLn5fSxTlBa87urTFK+p/8F36U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765305744; c=relaxed/simple;
-	bh=vMvsk3oUTASmZOfW6S7iQlTaxU1FZzX8m9pijyy/yi8=;
+	s=arc-20240116; t=1765306186; c=relaxed/simple;
+	bh=H7AEzQvg3xxmq4/QvwA/inMoUi6+qgBz75EP15Kh1vE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=l1wOmQwBr463wm32ZsDkzEs101hxsAL2g7H3NCLoJJFhIu2Jw0JOk2GObj5O8itHyJDZpzYYHJ5iCTmIN7rwE+lbmOFsw4b7qOAzykJkDU0I5G7K5tWJ9D4zlxiPqfRKrUa18AvFJJxw19JnmNs+ZCW8Nwr0Bm7wTd11g30ciOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NtuwsvmS; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=hYRZkGDTEUKShmCWH6aeOctEOE5G7x3cnb/yqJxCS16XicY5YOyeata0N/eDJYwJ1s8BGKSurfLFTB6s2tc5SlD/l0h6/BWHrh7wo9LnuTqMBSAcIyoCaIudMS+Uo3QAJoK3BmAYn0ws1Txl8YXT7Auo+eHZw6J97OyaIs6Vnck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sj81pXVJ; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b4933bc4aeso6027826b3a.2
-        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 10:42:22 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b9c91b814cso15363129b3a.2
+        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 10:49:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765305742; x=1765910542; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765306184; x=1765910984; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T9wtgZU3PD0RINuovlbS/4juWgq3hGIlsoGbD5fVH4s=;
-        b=NtuwsvmSCnXOumBFdNgTB73ZrGNcwnxOLSaEUaRn6XD/AJ63FrHbrZmnXKxfoenOGS
-         lf0pmpNgN06S8a64WVzxaYbY9AFHyoCY9DqheoYeII3ZHXfU2abTCqDjGX1mCQdZR8KG
-         r+Xo+rBnfHb7EkvFjAUc8hWIylxyhwPrOffRfK7XQVSv0uA0CQLyDWSZ3b6M8Zl53Q5w
-         0qs5tGo8+4g/NnpDMIVpLGEFd5BRSv+2gI2gCFzQfbiLSo6A5cmHorOA57mFIfTwyQ1E
-         6iQWTeCSeke8arbfm0f0NUza7ojMAAH3cPGTAGIF+PDIcr8yAfGrCPTVNn9/szucBKs0
-         Hi9Q==
+        bh=WcrjLCGc8k8E3gcSnmFKTYsG1dvjfc2izQ3DHrkDoZo=;
+        b=Sj81pXVJmm37iL04fCRMnlaf/LJK1vddLdlfjHbN9891FbVVnkE0HwFo+qKoxZDyei
+         3Pfr2VfHeAHtSGu5eW+eNAQYK5LWOXKCZ33WVCqlC9DuAPkc9huelN+97ws7unkJkkZl
+         U8z9bod+KU0ZsMUlFlq6eot40M4BkSbGTWMLIDMkgxQR5vXtS0cUm/9WipN1kh5/zvuD
+         S196EVKwyjx5DmkmuAFBbM+JIZKRcZS3K3MPL3/Z2q0qr40XVYYjbbRnpEsrb5Q8b9fs
+         F9WQlH1RYE91MHgtwV4vQVnhjIrLnpAie4Zg9fBXn0eRJhcGT8e8jXehX5Pa2NsMrAaA
+         /8Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765305742; x=1765910542;
+        d=1e100.net; s=20230601; t=1765306184; x=1765910984;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T9wtgZU3PD0RINuovlbS/4juWgq3hGIlsoGbD5fVH4s=;
-        b=VAvr76+woOMYtpXGJAm+R+zcVzSzXrr1c1z2LjldNuN+zlpMiO04+hfohA3pQA0hfX
-         fGbqOU7/pcIA2duUyjbVWdWXnuMLElzZxwvOk2VTKdZd2WXwy/xRImlujr9E+J6M7cML
-         aRKDfFq1F3f/+7VYYXhVFXBbHICnmTGIVDfNT+dTy3iAcFnEpSS4pr/YqBzvYHp6hxjk
-         xR340cUA+MaNqnjRVbJFAuRcpQ24MQZmCfZYJaRdOqBjgD0bWJFxGOivV2i1Q9IKZB7C
-         pRoeArpV9F0ldRlX4YUbhm/0nQMT0jRmkRCNen0etI5sIMa2/XTly+58xRkkY3/IaJiu
-         F6OA==
-X-Forwarded-Encrypted: i=1; AJvYcCXxCSlk4k7n6y2zepHXl4h/g8FFfPSwwClYg7hoVlamjEs9Ae9SgYgXhBxqr9e75Xzf20Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy89VJhtDmROlVt2SLMVkZlIfhOisJC60hF7z/MOpsD4Agj2U0m
-	gYlPgfUTUYgcJ92YKnWwlxrOl0JGLuxepuZH68O9vaNCG/qoo6KAB9hF4s1vhZQ5IP+AUczPNAK
-	z4ZeZWg==
-X-Google-Smtp-Source: AGHT+IG3+6tzSTh3tO8xfTSomzmQRRp+qWKw7IOCDl9RyfheDs5OTW6gt5YqHwnS2EMkpF+d1nUsSW/o8ds=
-X-Received: from pgct22.prod.google.com ([2002:a05:6a02:5296:b0:be5:9a9b:6b5d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:6a0c:b0:35e:8b76:c960
- with SMTP id adf61e73a8af0-36618164868mr12418789637.48.1765305742416; Tue, 09
- Dec 2025 10:42:22 -0800 (PST)
-Date: Tue, 9 Dec 2025 10:42:21 -0800
-In-Reply-To: <fg5ipm56ejqp7p2j2lo5i5ouktzqggo3663eu4tna74u6paxpg@lque35ixlzje>
+        bh=WcrjLCGc8k8E3gcSnmFKTYsG1dvjfc2izQ3DHrkDoZo=;
+        b=M2B+8wTV5GE+OY59q+bqvPgvzXSmwE3oAZTJZJvYtzOzec4WbYoyQRjtrfXHrR1CcV
+         f7xfWYilLq3O34O1sPv1FOLOOJA8RH/rcGVt8Z6cxcBoIuJfuD1i6I97Qi7rOd7O/m/x
+         QwEL5QSk6FIIYF1fCMAnyof7fwn1xWuyih44e5CYdRPohV6nVpPK7X/K8HKb5TmdpI43
+         sx0tfjaauHCE0X3w+DNFxsIRY60HpcmTqCVXSgovOyedWnYD1pAVtAmT1EunD0phm+xY
+         Xs/o7L3QB6uMWck/x/oPg3AvrFAqZdbJ0IoYUK97heOGKAevdPtxH6E0ibEWChQBK/vc
+         g5WA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+n1YmfLPNdMObD3WFa231SbOxEITrxCeT2uwFf24yL6tzKhmdN6QNiO+ldcDnXDZIKTM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpCaZ3QfnGp3XOa23u418qRDwQ5BCBbf9DPsFKlhcc/MaYgrfY
+	cwVkHsd0+qmG+M4vvT1j+oXTywA+WVMdHKjHBhl/jUrKNTSlENDtYHj1T4C0JWpXykL1SX+uY//
+	+YFgSQg==
+X-Google-Smtp-Source: AGHT+IEl5xQVOtfAL+zxUgNBdhkvTeJL6EGCv0+2w0lHUIzTLp1enbV9QhSHzHHuayLtrZNhKfZsCDdRTjY=
+X-Received: from pgbfq5.prod.google.com ([2002:a05:6a02:2985:b0:bd9:a349:94c1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a7:b0:35d:5d40:6d7b
+ with SMTP id adf61e73a8af0-36617edbb5amr12213431637.37.1765306183962; Tue, 09
+ Dec 2025 10:49:43 -0800 (PST)
+Date: Tue, 9 Dec 2025 10:49:42 -0800
+In-Reply-To: <nbkpibgkill4hyuphsju7id5v73lufmas5sammpj6umvhzd25t@y6dkgguq2cuy>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,53 +71,69 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
- <20251110222922.613224-5-yosry.ahmed@linux.dev> <aThN-xUbQeFSy_F7@google.com>
- <nyuyxccvnhscbo7qtlbsfl2fgxwood24nn4bvskhfqghgli3jo@xsv4zbdkolij>
- <aThp19OAXDoZlk3k@google.com> <fg5ipm56ejqp7p2j2lo5i5ouktzqggo3663eu4tna74u6paxpg@lque35ixlzje>
-Message-ID: <aThtjYG3OZTtdwUA@google.com>
-Subject: Re: [PATCH v2 04/13] KVM: nSVM: Fix consistency checks for NP_ENABLE
+ <20251110222922.613224-11-yosry.ahmed@linux.dev> <aThIQzni6fC1qdgj@google.com>
+ <nbkpibgkill4hyuphsju7id5v73lufmas5sammpj6umvhzd25t@y6dkgguq2cuy>
+Message-ID: <aThvRtPXzZBajwI3@google.com>
+Subject: Re: [PATCH v2 10/13] KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
 From: Sean Christopherson <seanjc@google.com>
 To: Yosry Ahmed <yosry.ahmed@linux.dev>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
 On Tue, Dec 09, 2025, Yosry Ahmed wrote:
-> On Tue, Dec 09, 2025 at 10:26:31AM -0800, Sean Christopherson wrote:
-> > On Tue, Dec 09, 2025, Yosry Ahmed wrote:
-> > > > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > > > > index f6fb70ddf7272..3e805a43ffcdb 100644
-> > > > > --- a/arch/x86/kvm/svm/svm.h
-> > > > > +++ b/arch/x86/kvm/svm/svm.h
-> > > > > @@ -552,7 +552,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
-> > > > >  
-> > > > >  static inline bool nested_npt_enabled(struct vcpu_svm *svm)
-> > > > >  {
-> > > > > -	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
-> > > > > +	return guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_NPT) &&
-> > > > > +		svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
-> > > > 
-> > > > I would rather rely on Kevin's patch to clear unsupported features.
-> > > 
-> > > Not sure how Kevin's patch is relevant here, could you please clarify?
+> On Tue, Dec 09, 2025 at 08:03:15AM -0800, Sean Christopherson wrote:
+> > On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > > +	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
+> > > +	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
+> > > +
+> > > +	if (!nested_vmcb_check_save(vcpu) ||
+> > > +	    !nested_vmcb_check_controls(vcpu)) {
+> > > +		vmcb12->control.exit_code    = SVM_EXIT_ERR;
+> > > +		vmcb12->control.exit_code_hi = 0;
+> > > +		vmcb12->control.exit_info_1  = 0;
+> > > +		vmcb12->control.exit_info_2  = 0;
+> > > +		ret = -1;
 > > 
-> > Doh, Kevin's patch only touches intercepts.  What I was trying to say is that I
-> > would rather sanitize the snapshot (the approach Kevin's patch takes with the
-> > intercepts), as opposed to guarding the accessor.  That way we can't have bugs
-> > where KVM checks svm->nested.ctl.nested_ctl directly and bypasses the caps check.
+> > I don't love shoving the consistency checks in here.  I get why you did it, but
+> > it's very surprising to see (and/or easy to miss) these consistency checks.  The
+> > caller also ends up quite wonky:
+> > 
+> > 	if (ret == -EINVAL) {
+> > 		kvm_inject_gp(vcpu, 0);
+> > 		return 1;
+> > 	} else if (ret) {
+> > 		return kvm_skip_emulated_instruction(vcpu);
+> > 	}
+> > 
+> > 	ret = kvm_skip_emulated_instruction(vcpu);
+> > 
+> > Ha!  And it's buggy.  __kvm_vcpu_map() can return -EFAULT if creating a host
+> > mapping fails.  Eww, and blindly using '-1' as the "failed a consistency check"
+> > is equally cross, as it relies on kvm_vcpu_map() not returning -EPERM in a very
+> > weird way.
 > 
-> I see, so clear SVM_NESTED_CTL_NP_ENABLE in
-> __nested_copy_vmcb_control_to_cache() instead.
+> I was trying to maintain the pre-existing behavior as much as possible,
+> and I think the existing code will handle -EFAULT from kvm_vcpu_map() in
+> the same way (skip the instruction and return).
 > 
-> If I drop the guest_cpu_cap_has() check here I will want to leave a
-> comment so that it's obvious to readers that SVM_NESTED_CTL_NP_ENABLE is
-> sanitized elsewhere if the guest cannot use NPTs. Alternatively, I can
-> just keep the guest_cpu_cap_has() check as documentation and a second
-> line of defense.
-> 
-> Any preferences?
+> I guess I shouldn't have assumed maintaining the existing behavior is
+> the right thing to do.
 
-Honestly, do nothing.  I want to solidify sanitizing the cache as standard behavior,
-at which point adding a comment implies that nested_npt_enabled() is somehow special,
-i.e. that it _doesn't_ follow the standard.
+Maintaining existing behavior is absolutely the right thing to do when moving
+code around.  It's just that sometimes touching code uncovers pre-existing issues,
+as is the case here.
+
+> It's honestly really hard to detangle the return values of different KVM
+> functions and what they mean. "return 1" here is not very meaningful,
+> and the return code from kvm_skip_emulated_instruction() is not
+> documented, so I don't really know what we're supposed to return here in
+> what cases. The error code are usually not interpreted until a few
+> layers higher up the callstack.
+
+LOL, welcome to KVM x86.  This has been a complaint since before I started working
+on KVM.  We're finally getting traction on that mess, but it's a _huge_ mess to
+sort out.
+
+https://lore.kernel.org/all/20251205074537.17072-1-jgross@suse.com
 
