@@ -1,249 +1,218 @@
-Return-Path: <kvm+bounces-65579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0454CB0C56
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 18:48:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B08F2CB0CBC
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 19:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7874A30A1831
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 17:48:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5826230FACD7
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 18:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEDB32E6A8;
-	Tue,  9 Dec 2025 17:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0AE22ED15F;
+	Tue,  9 Dec 2025 18:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+hXtKw3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ctLkl4XK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RM4jhQGM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2520B2BE7AB
-	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 17:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2448221FCA
+	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 18:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765302527; cv=none; b=paIPFEgsvSyI8yWjEF9DNQCXLOKPqqrqhgvzUoA8JVk8N+07m352dmrQBHqcmf4zl4Ig35lzN9aZ8qU5v1CtLwNb0So29GdUBapbpu7LrcJ67Kuby8gH50D/PgrioKHrMPKBdCB6/Twm9ZdRUMPbODXOgmj/uzo6w1Zl+wKGlhs=
+	t=1765303651; cv=none; b=bxZrodPUPuBFFe+l2IRZ2wQBoptn9v62xviVJwnIcvtSEeS15S8ZjpUWDKr/PI9lnBVbxe2pKCBleGg4ef6VYGggzFnLdJ1hZq+uCPq3yB75cYnn9uSC0Ugqu+GlraMVE/w6OSptSWYquuiNI+mFT4/n3Em+LJ7kC2yzM/72lXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765302527; c=relaxed/simple;
-	bh=K0ibrbryHWA8nhR7V2WWbJtZNyh1iYz3h92NfYNz0iw=;
+	s=arc-20240116; t=1765303651; c=relaxed/simple;
+	bh=O/V/wmgg718J8Hf157mPnUzZMNSaNpqFhCatWOXwsGA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DSnZMfWNXDANUEELgi676bBFb5uhybp6IOyqk/wzwCrYuif6eeFCHXrqwHACxZkIOsW/O+88xJ0YQui21tgWTdBDk/yspWHZyeuxpEo5ItKVdHOO8h9DoPKsf1uk1dUVNFzYfJXcLZPFb1JZl2cdQfr96qZODJZfbWzGhj3KYU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b+hXtKw3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ctLkl4XK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765302524;
+	 Content-Type:Content-Disposition:In-Reply-To; b=JPpwl7WrRuJSdiUS9GdZSDPTgUseBqly+GAd/nch2IhptMZaQqGJjFIL3KKMj5o0kN1gB+zXl9/Pcg6Y02zn3U9RyDtkTzfS+uJGTCWbi0CDmc0QdEa+HQMijwjZtjxVNNJN5MJ3wwyL/zX8utCUPUb7Qo7JwZm0Jsw6nBbDIz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RM4jhQGM; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 9 Dec 2025 18:07:19 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765303645;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Wds+RnykkG8gXthSZ5oxSbSivYlkrug9sYVYpvvQME=;
-	b=b+hXtKw3nqKglLSE3JzhVTlTzp2OQLp8inPknemmnAqab3GUpdirZtYIEXZZuN+ayQYfln
-	Kr0nqs2SD/TCYEAm1l7T8BwlOdTZ7aIZvKUEX/hQxT0uYRDHSz5nX4+DFS71QQITm53Gmf
-	nw5Ssy3DYUNpGD9+YivudNgZB2zkTAM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-402-wBG6WIH_PCaNKQog7Lx7WQ-1; Tue, 09 Dec 2025 12:48:40 -0500
-X-MC-Unique: wBG6WIH_PCaNKQog7Lx7WQ-1
-X-Mimecast-MFC-AGG-ID: wBG6WIH_PCaNKQog7Lx7WQ_1765302519
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42e2e448d01so4671457f8f.1
-        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 09:48:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765302519; x=1765907319; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Wds+RnykkG8gXthSZ5oxSbSivYlkrug9sYVYpvvQME=;
-        b=ctLkl4XKJU9ZyIm6pycQcwq14AjiKHFkKI5usYjX67OV5I/xQUu96t2sUFk73c8tp/
-         UlyFC4Mk10+1JI+2Qfq9p0dMjcm88s4mcHrC0OtdxIuCdIHe/MjVioevQv2vsMdJ4lIV
-         bvL6/qgYcsJuHicNSawiuDY6mc34Zw+VJotwNS7JRmTPYUEC2vXmBOtfdbgfQHMH0IWg
-         HY1+mhdOVOXRb14BwMlAt15ooROtszINDEpjjHpi5tyOb50LSxcOVsEzb8p0WiDv2n/4
-         N68c/fCuvcZsh3SVUUf1/R7lS5VSlg0vu/qZcLHjA7Lby+tBfEmE7yDljmjWf5/QPVy+
-         tOcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765302519; x=1765907319;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Wds+RnykkG8gXthSZ5oxSbSivYlkrug9sYVYpvvQME=;
-        b=QU6Hp8bDmvUV5Svt0WXVt9Jbc0dNgZlCmdeYBxKbJg6RBp97SOT/SsWQGzZNEmIK2K
-         kkUDgaimgVRt5g2/UJeAgg+abLu2FFAssmEdC1TIF6ht5kqdTai0cplIb33DEfSAaiwM
-         8IuOZ7ye2iu64LWWXcb57XA88uLVwH2VcFZS+7W2u7xWU7M9ZJgmGRpb/kOpeHJHexmh
-         XYaK+57eI1xEw/FsEZ+e2NmHpi0Tp1NYdwkaprbcmCgzJwRQzT+qGgbW/+BozTJDF5kh
-         o913qPaRfJKu08lQU/ln0NLZGh6OQeX9E7sBJggpHDsXx58ij73mcQHqlxE007alskN0
-         +KeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLNGBAFMo42JdtDYmEN251eMFyLlZ0ntpLoseD2GWmW3aqXMpRtkM3Vlj4qo5yOPKhKjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzErI7584hoZFclqz00FI6STs2iN/ii9xGMYhtXjjBjt0K5X7U6
-	VTzlp9TziWZn/bE2mRRMyqmzbLZIocUaGm0pFawlfx4CeCwqRsL+NlEZ5w8bSH4xFTjfnMPjy/x
-	UYvkMBqN3oRluPjfRrxFK83exr0ejqn7dsJn8t6CGy6Y3eJMDuZrwQQ==
-X-Gm-Gg: AY/fxX4Nuo6ySvlACB3LZIgVlz4Ktg9kViapt7e2b4El/2uxmBYCuy/ybau38eNjakm
-	wThhYt04rOgQvl5q1EZRHOCwOjRTZEOKWrtg4DZAswKvbenyqeyv8GiqLN8fXy6uuG5Fa0NCBN6
-	gGhGyJv+kl0cLtZ5bXip8EHe1stKXnWeMzwHC2XX0rW6nKcbaDZQCsL8I7q7exqRsMlyEB8WDIn
-	vwOz4VQkyrcnqv7/kpay0qB8dc4O0BanSvX5MvKN9aTfYD7BV0npkWapqs4+xLhjRxShcoZH+ce
-	chASTKhwkc34ve3vgo1zQaKetsOGFpYINozAyQKd/u80feqDZGtCW1yRknqBREzEMxZSvwD5uX1
-	J
-X-Received: by 2002:a05:6000:402a:b0:42c:a449:d6a5 with SMTP id ffacd0b85a97d-42f89f3d718mr11473076f8f.34.1765302519294;
-        Tue, 09 Dec 2025 09:48:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGNodAp4VRw+WDt0ClnkNSIgayKL8Y6tDD9ajoVtZAIm0NOGVQk4fbxwV5uQBvf9Fsn1fd/QA==
-X-Received: by 2002:a05:6000:402a:b0:42c:a449:d6a5 with SMTP id ffacd0b85a97d-42f89f3d718mr11473038f8f.34.1765302518521;
-        Tue, 09 Dec 2025 09:48:38 -0800 (PST)
-Received: from redhat.com ([80.230.34.255])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d331092sm33270787f8f.30.2025.12.09.09.48.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 09:48:37 -0800 (PST)
-Date: Tue, 9 Dec 2025 12:48:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-	oren@nvidia.com, aevdaev@nvidia.com, aaptel@nvidia.com
-Subject: Re: [PATCH v2 1/1] virtio: add driver_override support
-Message-ID: <20251209124819-mutt-send-email-mst@kernel.org>
-References: <20251208220908.9250-1-mgurtovoy@nvidia.com>
- <20251209113306-mutt-send-email-mst@kernel.org>
- <49a3aabb-eb28-4149-b845-1bc5afffb985@nvidia.com>
+	bh=Dtw2hz0t5mCUfsLqXAqarJnG0CFf11kQNlPUc9nejF8=;
+	b=RM4jhQGMPsR+RMjDnyC+UXf4Thcp1oYpuRMs6TRqhmEiJkE2cRhhmq0RYdmdNcfJfwBM5v
+	6/4b7AZvqAAMv7sbkD4idUrDovcoNB3vXlQjNBU+mL2mlIeZjIpCWv/9yxZReOZJfefxNn
+	vVJLnFazIhm7QMyBbtmnx790PIieJRg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 04/13] KVM: nSVM: Fix consistency checks for NP_ENABLE
+Message-ID: <nyuyxccvnhscbo7qtlbsfl2fgxwood24nn4bvskhfqghgli3jo@xsv4zbdkolij>
+References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
+ <20251110222922.613224-5-yosry.ahmed@linux.dev>
+ <aThN-xUbQeFSy_F7@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <49a3aabb-eb28-4149-b845-1bc5afffb985@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aThN-xUbQeFSy_F7@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 09, 2025 at 07:45:19PM +0200, Max Gurtovoy wrote:
-> 
-> On 09/12/2025 18:34, Michael S. Tsirkin wrote:
-> > On Tue, Dec 09, 2025 at 12:09:08AM +0200, Max Gurtovoy wrote:
-> > > Add support for the 'driver_override' attribute to Virtio devices. This
-> > > allows users to control which Virtio bus driver binds to a given Virtio
-> > > device.
-> > > 
-> > > If 'driver_override' is not set, the existing behavior is preserved and
-> > > devices will continue to auto-bind to the first matching Virtio bus
-> > > driver.
-> > oh, it's a device driver not the bus driver, actually.
-> 
-> Yes. I'll fix the commit message.
-> 
-> 
+On Tue, Dec 09, 2025 at 08:27:39AM -0800, Sean Christopherson wrote:
+> On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > KVM currenty fails a nested VMRUN and injects VMEXIT_INVALID (aka
+> > SVM_EXIT_ERR) if L1 sets NP_ENABLE and the host does not support NPTs.
+> > On first glance, it seems like the check should actually be for
+> > guest_cpu_cap_has(X86_FEATURE_NPT) instead, as it is possible for the
+> > host to support NPTs but the guest CPUID to not advertise it.
 > > 
-> > > Tested with virtio blk device (virtio core and pci drivers are loaded):
-> > > 
-> > >    $ modprobe my_virtio_blk
-> > > 
-> > >    # automatically unbind from virtio_blk driver and override + bind to
-> > >    # my_virtio_blk driver.
-> > >    $ driverctl -v -b virtio set-override virtio0 my_virtio_blk
-> > > 
-> > > In addition, driverctl saves the configuration persistently under
-> > > /etc/driverctl.d/.
-> > what is this "mydriver" though? what are valid examples that
-> > we want to support?
+> > However, the consistency check is not architectural to begin with. The
+> > APM does not mention VMEXIT_INVALID if NP_ENABLE is set on a processor
+> > that does not have X86_FEATURE_NPT. Hence, NP_ENABLE should be ignored
+> > if X86_FEATURE_NPT is not available for L1. Apart from the consistency
+> > check, this is currently the case because NP_ENABLE is actually copied
+> > from VMCB01 to VMCB02, not from VMCB12.
+> > 
+> > On the other hand, the APM does mention two other consistency checks for
+> > NP_ENABLE, both of which are missing (paraphrased):
+> > 
+> > In Volume #2, 15.25.3 (24593—Rev. 3.42—March 2024):
+> > 
+> >   If VMRUN is executed with hCR0.PG cleared to zero and NP_ENABLE set to
+> >   1, VMRUN terminates with #VMEXIT(VMEXIT_INVALID)
+> > 
+> > In Volume #2, 15.25.4 (24593—Rev. 3.42—March 2024):
+> > 
+> >   When VMRUN is executed with nested paging enabled (NP_ENABLE = 1), the
+> >   following conditions are considered illegal state combinations, in
+> >   addition to those mentioned in “Canonicalization and Consistency
+> >   Checks”:
+> >     • Any MBZ bit of nCR3 is set.
+> >     • Any G_PAT.PA field has an unsupported type encoding or any
+> >     reserved field in G_PAT has a nonzero value.
 > 
-> This is an example for a custom virtio block driver.
+> This should be three patches, one each for the new consistency checks, and one
+> to the made-up check.  Shortlogs like "Fix all the bugs" are strong hints that
+> a patch is doing too much.
+
+Ack, will split it.
+
 > 
-> It can be any custom virtio-XX driver (XX=FS/NET/..).
+> > Replace the existing consistency check with consistency checks on
+> > hCR0.PG and nCR3. Only perform the consistency checks if L1 has
+> > X86_FEATURE_NPT and NP_ENABLE is set in VMCB12. The G_PAT consistency
+> > check will be addressed separately.
+> > 
+> > As it is now possible for an L1 to run L2 with NP_ENABLE set but
+> > ignored, also check that L1 has X86_FEATURE_NPT in nested_npt_enabled().
+> > 
+> > Pass L1's CR0 to __nested_vmcb_check_controls(). In
+> > nested_vmcb_check_controls(), L1's CR0 is available through
+> > kvm_read_cr0(), as vcpu->arch.cr0 is not updated to L2's CR0 until later
+> > through nested_vmcb02_prepare_save() -> svm_set_cr0().
+> > 
+> > In svm_set_nested_state(), L1's CR0 is available in the captured save
+> > area, as svm_get_nested_state() captures L1's save area when running L2,
+> > and L1's CR0 is stashed in VMCB01 on nested VMRUN (in
+> > nested_svm_vmrun()).
+> > 
+> > Fixes: 4b16184c1cca ("KVM: SVM: Initialize Nested Nested MMU context on VMRUN")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 21 ++++++++++++++++-----
+> >  arch/x86/kvm/svm/svm.h    |  3 ++-
+> >  2 files changed, 18 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 74211c5c68026..87bcc5eff96e8 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -325,7 +325,8 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
+> >  }
+> >  
+> >  static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+> > -					 struct vmcb_ctrl_area_cached *control)
+> > +					 struct vmcb_ctrl_area_cached *control,
+> > +					 unsigned long l1_cr0)
+> >  {
+> >  	if (CC(!vmcb12_is_intercept(control, INTERCEPT_VMRUN)))
+> >  		return false;
+> > @@ -333,8 +334,12 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+> >  	if (CC(control->asid == 0))
+> >  		return false;
+> >  
+> > -	if (CC((control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) && !npt_enabled))
+> > -		return false;
+> > +	if (nested_npt_enabled(to_svm(vcpu))) {
+> > +		if (CC(!kvm_vcpu_is_legal_gpa(vcpu, control->nested_cr3)))
+> > +			return false;
+> > +		if (CC(!(l1_cr0 & X86_CR0_PG)))
+> > +			return false;
+> > +	}
+> >  
+> >  	if (CC(!nested_svm_check_bitmap_pa(vcpu, control->msrpm_base_pa,
+> >  					   MSRPM_SIZE)))
+> > @@ -400,7 +405,12 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
+> >  	struct vcpu_svm *svm = to_svm(vcpu);
+> >  	struct vmcb_ctrl_area_cached *ctl = &svm->nested.ctl;
+> >  
+> > -	return __nested_vmcb_check_controls(vcpu, ctl);
+> > +	/*
+> > +	 * Make sure we did not enter guest mode yet, in which case
+> 
+> No pronouns.
 
-Is "custom" a way to say "out of tree"?
+I thought that rule was for commit logs. There are plenty of 'we's in
+the KVM x86 code (and all x86 code for that matter) :P
 
-> > > Signed-off-by: Avraham Evdaev <aevdaev@nvidia.com>
-> > > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > ---
-> > > 
-> > > changes from v1:
-> > >   - use !strcmp() to compare strings (MST)
-> > >   - extend commit msg with example (MST)
-> > > 
-> > > ---
-> > >   drivers/virtio/virtio.c | 34 ++++++++++++++++++++++++++++++++++
-> > >   include/linux/virtio.h  |  4 ++++
-> > >   2 files changed, 38 insertions(+)
-> > > 
-> > > diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-> > > index a09eb4d62f82..993dc928be49 100644
-> > > --- a/drivers/virtio/virtio.c
-> > > +++ b/drivers/virtio/virtio.c
-> > > @@ -61,12 +61,41 @@ static ssize_t features_show(struct device *_d,
-> > >   }
-> > >   static DEVICE_ATTR_RO(features);
-> > > +static ssize_t driver_override_store(struct device *_d,
-> > > +				     struct device_attribute *attr,
-> > > +				     const char *buf, size_t count)
-> > > +{
-> > > +	struct virtio_device *dev = dev_to_virtio(_d);
-> > > +	int ret;
-> > > +
-> > > +	ret = driver_set_override(_d, &dev->driver_override, buf, count);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	return count;
-> > > +}
-> > > +
-> > > +static ssize_t driver_override_show(struct device *_d,
-> > > +				    struct device_attribute *attr, char *buf)
-> > > +{
-> > > +	struct virtio_device *dev = dev_to_virtio(_d);
-> > > +	ssize_t len;
-> > > +
-> > > +	device_lock(_d);
-> > > +	len = sysfs_emit(buf, "%s\n", dev->driver_override);
-> > > +	device_unlock(_d);
-> > > +
-> > > +	return len;
-> > > +}
-> > > +static DEVICE_ATTR_RW(driver_override);
-> > > +
-> > >   static struct attribute *virtio_dev_attrs[] = {
-> > >   	&dev_attr_device.attr,
-> > >   	&dev_attr_vendor.attr,
-> > >   	&dev_attr_status.attr,
-> > >   	&dev_attr_modalias.attr,
-> > >   	&dev_attr_features.attr,
-> > > +	&dev_attr_driver_override.attr,
-> > >   	NULL,
-> > >   };
-> > >   ATTRIBUTE_GROUPS(virtio_dev);
-> > > @@ -88,6 +117,10 @@ static int virtio_dev_match(struct device *_dv, const struct device_driver *_dr)
-> > >   	struct virtio_device *dev = dev_to_virtio(_dv);
-> > >   	const struct virtio_device_id *ids;
-> > > +	/* Check override first, and if set, only use the named driver */
-> > > +	if (dev->driver_override)
-> > > +		return !strcmp(dev->driver_override, _dr->name);
-> > > +
-> > >   	ids = drv_to_virtio(_dr)->id_table;
-> > >   	for (i = 0; ids[i].device; i++)
-> > >   		if (virtio_id_match(dev, &ids[i]))
-> > > @@ -582,6 +615,7 @@ void unregister_virtio_device(struct virtio_device *dev)
-> > >   {
-> > >   	int index = dev->index; /* save for after device release */
-> > > +	kfree(dev->driver_override);
-> > >   	device_unregister(&dev->dev);
-> > >   	virtio_debug_device_exit(dev);
-> > >   	ida_free(&virtio_index_ida, index);
-> > > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > > index db31fc6f4f1f..418bb490bdc6 100644
-> > > --- a/include/linux/virtio.h
-> > > +++ b/include/linux/virtio.h
-> > > @@ -138,6 +138,9 @@ struct virtio_admin_cmd {
-> > >    * @config_lock: protects configuration change reporting
-> > >    * @vqs_list_lock: protects @vqs.
-> > >    * @dev: underlying device.
-> > > + * @driver_override: driver name to force a match; do not set directly,
-> > > + *                   because core frees it; use driver_set_override() to
-> > > + *                   set or clear it.
-> > >    * @id: the device type identification (used to match it with a driver).
-> > >    * @config: the configuration ops for this device.
-> > >    * @vringh_config: configuration ops for host vrings.
-> > > @@ -158,6 +161,7 @@ struct virtio_device {
-> > >   	spinlock_t config_lock;
-> > >   	spinlock_t vqs_list_lock;
-> > >   	struct device dev;
-> > > +	const char *driver_override;
-> > >   	struct virtio_device_id id;
-> > >   	const struct virtio_config_ops *config;
-> > >   	const struct vringh_config_ops *vringh_config;
-> > > -- 
-> > > 2.18.1
+> 
+> > +	 * kvm_read_cr0() could return L2's CR0.
+> > +	 */
+> > +	WARN_ON_ONCE(is_guest_mode(vcpu));
+> > +	return __nested_vmcb_check_controls(vcpu, ctl, kvm_read_cr0(vcpu));
+> >  }
+> >  
+> >  static
+> > @@ -1831,7 +1841,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+> >  
+> >  	ret = -EINVAL;
+> >  	__nested_copy_vmcb_control_to_cache(vcpu, &ctl_cached, ctl);
+> > -	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached))
+> > +	/* 'save' contains L1 state saved from before VMRUN */
+> > +	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached, save->cr0))
+> >  		goto out_free;
+> >  
+> >  	/*
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index f6fb70ddf7272..3e805a43ffcdb 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -552,7 +552,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
+> >  
+> >  static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+> >  {
+> > -	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+> > +	return guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_NPT) &&
+> > +		svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+> 
+> I would rather rely on Kevin's patch to clear unsupported features.
 
+Not sure how Kevin's patch is relevant here, could you please clarify?
+
+This is to account for removing the artifical consistency check. It's
+now possible to have SVM_NESTED_CTL_NP_ENABLE set and ignored, so we
+need to also check that the guest can actually use NPTs here.
+
+> 
+> >  }
+> >  
+> >  static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
+> > -- 
+> > 2.51.2.1041.gc1ab5b90ca-goog
+> > 
 
