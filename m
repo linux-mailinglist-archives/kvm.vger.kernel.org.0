@@ -1,240 +1,230 @@
-Return-Path: <kvm+bounces-65521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C441FCAE979
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 02:14:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09D13CAEA16
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 02:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE60630345AE
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 01:12:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C6933005F01
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 01:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D919F27464F;
-	Tue,  9 Dec 2025 01:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7E32ED159;
+	Tue,  9 Dec 2025 01:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tMiNyH77"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AnhjOYFF"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5471226529A
-	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 01:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B650A1917CD
+	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 01:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765242750; cv=none; b=onX8XMonXUoZV60xrFJuW6qbTXsRC1LoWCJxvcAaKSlnpBwzGLA0ku3SCIOsSnPeGI8jQ5MWSqLqQVNh/i/U/WFlEVzDl+Hdj64x8lttDudhqMwynRbDC/en3ANxHxc0M2hDStndAMMGFnCVeUHibFmc72IaiMmcsyaAOHru4IM=
+	t=1765243918; cv=none; b=tZbjz0RPtAUFu9aCAXfRXEhUpilxqnEH9jEn7LvPmoPR33xoW3OHpZ5XsGm/kOdM54JtfxzFlKpEO1DCv4Yf/t8LjsJD90Lsih6EaSB6wzp9jE/iIuAVjnmb4Qc3pQRe0SaTwG/tYAgyIraiTv3VTKQucElbfqLlgHNnA+HTkOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765242750; c=relaxed/simple;
-	bh=uxzxSh6XqqIsyFkEYWO9Wk6W+z2pNBZTbUCzcYNve+4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=axjXewVXnekAnL8aoyAHaCCEzlkMEht5dubt8zHnny1iOYiuIG8/8dGaHG7DWC4xf/YREIN2Ulbh/tyJDO7qyXRZx07OugjBx2qQBwC/Ei+TIinNJTJJXLP200nplEy0VXszLsuR+WVbw2KMDr7SaibCDS5z1vfLYSkyNUo66Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tMiNyH77; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 9 Dec 2025 01:12:18 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765242746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j+yk7GYYARc+z1aHYLAKaaIC27BnMabXFcj4H+AZ2f8=;
-	b=tMiNyH77s7Jn6Wm5/kWjGHx9mjE2mOgGimcJ1Ukg0JMtV0TTvpckbzuVnPeSzwbvUPZdJg
-	wxjmnc7KqIuPKMaUBGse2roL2ObeyehkC25ERQNTfq8jbEsznTGsss6UxZ8Vs8xOQglU5t
-	rczM6Gkeg+usub5lx3DeqYlokZNsl+E=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Kevin Cheng <chengkev@google.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, jmattson@google.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: SVM: Don't allow L1 intercepts for instructions not
- advertised
-Message-ID: <fe445lu6g3x5tq2dhz43apvy5tw66nt53kbbprg5t74josbtm5@rp5iogfmylnv>
-References: <20251205070630.4013452-1-chengkev@google.com>
+	s=arc-20240116; t=1765243918; c=relaxed/simple;
+	bh=I5Eo6y9JZCbfnyb5eB/KEXkAHO6973BnaJC902dwVRk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KkmWI7Od1SJatI17d8SoM2HPKepSHHLRWd23KluMenoZTelAnJgR/Ej3IXTbWmuZfcm1ESXDaGUKy2pStjuKZCXmpSqdxxWuyHj1ol7mkH2ZzIcMtcDjHDCaDmGfv8AeUtrn6uAWdQkQv2XfVQBpiGao54pgIjdRl4wuYcg8py8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AnhjOYFF; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-9372164d768so4188051241.0
+        for <kvm@vger.kernel.org>; Mon, 08 Dec 2025 17:31:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765243916; x=1765848716; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LKix0qHh96BRpRM/3yIQmMxnNptVZvOEd+SrV6ktyqU=;
+        b=AnhjOYFFQX2EkBY6KdyNbf4UTLK2lv2jTQT1mpnqJxx80ZoFdN8xyWtqhTlMiKZcnz
+         l9xugInrwEsePzI69HsymU8WMBpNZbC7opZMUSu1Q4P+JvcP3ufDxlulSIrnwirkdiPt
+         f9NipS/YZFy8Iy1gnfG51RKaswuWHohqLsXHA0QWWJa3jGZaTzSeoABKrYAOXxDo9x+n
+         jITf/oHeI6P/uqOBJyU8g+3VQL9KK/OSWoz9hn89kr6+eMCEFst+ol2OE17uCkFUk35l
+         15+U2gU25GDN3XODDrp98+pR5WZ8pSfREdQLZaqvygI5Yb5D1iOLmjcvWT9Ey7I9ndUz
+         Ou4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765243916; x=1765848716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LKix0qHh96BRpRM/3yIQmMxnNptVZvOEd+SrV6ktyqU=;
+        b=S37b4jmxztf3rMgSoz5845tmcaqIkZ40IOXWgDAvTSscef6vhG2/IlRqrI2w4OHqxS
+         9KjQmKc5g2fA4TnschSvx/SQvx8WEwVaVgzv5dSQAyycpBC2Prz9bUs7pQ0MuZLv/vdB
+         y4nKQYVFXV2qevnv+kuodHd4WBvY+qBXyMOaHX3G8F1wpXfKko1fW9Mx9PU+AfQBcJuK
+         sOck3UvYtMiSE5WOVPpdAIkefVje4vU1Eqeq7zIMaeLVBlkB+6jyCzG+mEmMY7zvpfbT
+         c9lXzNyezQ3ILctbN5MvqbRpnpgIfuzq9ugTk34QjlYD+Uuub9Vohzy9NaXFYA7LcEYP
+         lj+w==
+X-Gm-Message-State: AOJu0Yw8sd2viA5M2VDhEGyYnSPZZki8fAD/y/oJjqAtjFSg9zJGuCvc
+	koXKP7M2UtyBlI0zd7QSQ1M+A7WdYZ8Q8bdEZP/Xxc/6FQ2Rm+7TikBHJslxo3Knq/lekPw/fe9
+	zCD6pfWSyb8GCq/MWWT+7KGR+PFh5P6F6vvMz3ciI
+X-Gm-Gg: ASbGncviLEpATv1jjkuELEGfs0x9ONoXVBoN970M9NkV7P5ypJZf+UK1D6j7i8303OB
+	5tewoZbqTSbKwZN6f1WSPXctzcrsyqWsd1fGt3tvpgfnyxD9u+H2tTWBI2ttRbX8+Gtz/bZQq0z
+	6bpPvJHeM95YT6Hzfs3aUJdqDQMTX4fJ5oXezxmyReh6PdwgORS6lciB7tlGl0EyV62fF94zwb0
+	PbjCMZvEJCDk/52IklfG1kpNBZDCEloIm8cYtgC1Ezbdrq0Qb3MG/egLxSU0MnlxeDUnL2FRQsk
+	O4NF
+X-Google-Smtp-Source: AGHT+IG1N/n5+TEnM4vQSs/nskduvcB6yY/9WryzD2qHBxgASv9btbU7IRV+4mDFhnZLVnR+up9bdN64Fob0ldtYpFg=
+X-Received: by 2002:a05:6102:ccd:b0:5d6:85a:229f with SMTP id
+ ada2fe7eead31-5e55e4d15c1mr510084137.15.1765243915415; Mon, 08 Dec 2025
+ 17:31:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251205070630.4013452-1-chengkev@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20251205081448.4062096-1-chengkev@google.com> <20251205081448.4062096-2-chengkev@google.com>
+In-Reply-To: <20251205081448.4062096-2-chengkev@google.com>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Mon, 8 Dec 2025 17:31:18 -0800
+X-Gm-Features: AQt7F2qva2yMReFyXIbJEwwM9uVj5u1py1dQQ3jRcs2p_eURjI3OEgBrGVAJnT4
+Message-ID: <CAJD7tkbU1Q0j+kwu8DXHMxSKPNBaN+zm9wCA_tHEg9kkJqiArw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86/svm: Add missing svm intercepts
+To: Kevin Cheng <chengkev@google.com>
+Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, thuth@redhat.com, 
+	pbonzini@redhat.com, seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 05, 2025 at 07:06:30AM +0000, Kevin Cheng wrote:
-> If a feature is not advertised in the guest's CPUID, prevent L1 from
-> intercepting the unsupported instructions by clearing the corresponding
-> intercept in KVM's cached vmcb12.
-> 
-> When an L2 guest executes an instruction that is not advertised to L1,
-> we expect a #UD exception to be injected by L0. However, the nested svm
-> exit handler first checks if the instruction intercept is set in vmcb12,
-> and if so, synthesizes an exit from L2 to L1 instead of a #UD exception.
-> If a feature is not advertised, the L1 intercept should be ignored.
-> 
-> Calculate the nested intercept mask by checking all instructions that
-> can be intercepted and are controlled by a CPUID bit. Use this mask when
-> copying from the vmcb12 to KVM's cached vmcb12 to effectively ignore the
-> intercept on nested vm exit handling.
-> 
-> Another option is to handle ignoring the L1 intercepts in the nested vm
-> exit code path, but I've gone with modifying the cached vmcb12 to keep
-> it simpler.
-
-Basically instead of masking the intercept bits in
-__nested_copy_vmcb_control_to_cache(), we'd need to do it in both:
-- recalc_intercepts() (on copying from g->intercepts to c->intercepts).
-- vmcb12_is_intercept().
-
-The current approach has the advantage of applying to any future uses of
-the intercepts bits in the VMCB12 as well. The alternative approach has
-the advantage of not modifying the intercept bits in the cached VMCB12,
-which avoids any potential bugs in the future if we ever directly copy
-from the cached VMCB12 to L1's VMCB12.
-
-I think the latter is easier to test for, the new test case in KUTs [*]
-could just verify that the ignored intercept bits are not cleared in the
-VMCB.
-
-So I prefer the current approach (with the added testing).
-
-[*]https://lore.kernel.org/kvm/20251205081448.4062096-3-chengkev@google.com/
-
-> 
+On Fri, Dec 5, 2025 at 12:14=E2=80=AFAM Kevin Cheng <chengkev@google.com> w=
+rote:
+>
+> Some intercepts are missing from the KUT svm testing. Add all missing
+> intercepts and reorganize the svm intercept definition/setting/clearing.
+>
 > Signed-off-by: Kevin Cheng <chengkev@google.com>
-> ---
->  arch/x86/kvm/svm/nested.c | 30 +++++++++++++++++++++++++++++-
->  arch/x86/kvm/svm/svm.c    |  2 ++
->  arch/x86/kvm/svm/svm.h    | 14 ++++++++++++++
->  3 files changed, 45 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index c81005b245222..f2ade24908b39 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -184,6 +184,33 @@ void recalc_intercepts(struct vcpu_svm *svm)
->  	}
->  }
-> 
-> +/*
-> + * If a feature is not advertised to L1, set the mask bit for the corresponding
-> + * vmcb12 intercept.
-> + */
-> +void svm_recalc_nested_intercepts_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	memset(svm->nested.nested_intercept_mask, 0,
-> +	       sizeof(svm->nested.nested_intercept_mask));
-> +
-> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_RDTSCP))
-> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_RDTSCP);
-> +
-> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_SKINIT))
-> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_SKINIT);
-> +
-> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE))
-> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_XSETBV);
-> +
-> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_RDPRU))
-> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_RDPRU);
-> +
-> +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_INVPCID))
-> +		set_nested_intercept_mask(&svm->nested, INTERCEPT_INVPCID);
-> +}
-> +
 
-set_nested_intercept_mask() is only used here AFAICT, so maybe just
-define it as a static function above
-svm_recalc_nested_intercepts_mask()?
+Nice cleanup!
 
->  /*
->   * This array (and its actual size) holds the set of offsets (indexing by chunk
->   * size) to process when merging vmcb12's MSRPM with vmcb01's MSRPM.  Note, the
-> @@ -408,10 +435,11 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
->  					 struct vmcb_ctrl_area_cached *to,
->  					 struct vmcb_control_area *from)
->  {
-> +	struct vcpu_svm *svm = to_svm(vcpu);
->  	unsigned int i;
-> 
->  	for (i = 0; i < MAX_INTERCEPT; i++)
-> -		to->intercepts[i] = from->intercepts[i];
-> +		to->intercepts[i] = from->intercepts[i] & ~(svm->nested.nested_intercept_mask[i]);
-> 
->  	to->iopm_base_pa        = from->iopm_base_pa;
->  	to->msrpm_base_pa       = from->msrpm_base_pa;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f56c2d895011c..dd02a076077d8 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1011,6 +1011,8 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
->  			svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
->  		}
->  	}
-> +
-> +	svm_recalc_nested_intercepts_mask(vcpu);
-
-svm_recalc_nested_intercepts_mask() is also only used here, but I think
-there's a general preference to keep nested helpers defined in nested.c,
-even if not used there (e.g. nested_svm_check_permissions(),
-nested_svm_vmrun()). So I think leave that one as-is.
-
->  }
-> 
->  static void svm_recalc_intercepts(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 9e151dbdef25d..08779d78c0c27 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -217,6 +217,12 @@ struct svm_nested_state {
->  	 * on its side.
->  	 */
->  	bool force_msr_bitmap_recalc;
-> +
-> +	/*
-> +	 * Reserved bitmask for instruction intercepts that should not be set
-> +	 * by L1 if the feature is not advertised to L1 in guest CPUID.
-> +	 */
-> +	u32 nested_intercept_mask[MAX_INTERCEPT];
-
-I think the naming of this member (and all the helper functions) should
-change to make it clear this is a bitmask of ignored intercepts. So
-maybe call this 'ignored_intercepts' (nested is implied by the struct)?
-
-Then we can do:
-
-s/set_nested_intercept_mask/set_nested_ignored_intercept/g
-s/svm_recalc_nested_intercepts_mask/svm_recalc_nested_ignored_intercepts/g
-
-..and any needed commentary updates.
-
-Otherwise, the code looks good to me.
-
+[..]
+> @@ -69,13 +128,8 @@ enum {
 >  };
-> 
->  struct vcpu_sev_es_state {
-> @@ -478,6 +484,12 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
->  	recalc_intercepts(svm);
->  }
-> 
-> +static inline void set_nested_intercept_mask(struct svm_nested_state *nested, u32 bit)
-> +{
-> +	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
-> +	__set_bit(bit, (unsigned long *)&nested->nested_intercept_mask);
-> +}
-> +
->  static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
+>
+>  struct __attribute__ ((__packed__)) vmcb_control_area {
+> -       u16 intercept_cr_read;
+> -       u16 intercept_cr_write;
+> -       u16 intercept_dr_read;
+> -       u16 intercept_dr_write;
+> -       u32 intercept_exceptions;
+> -       u64 intercept;
+> -       u8 reserved_1[40];
+> +       u32 intercept[MAX_INTERCEPT];
+> +       u8 reserved_1[36];
+
+Maybe do "u32 reserved_1[15 - MAX_INTERCEPT];" like the KVM definition?
+
+>         u16 pause_filter_thresh;
+>         u16 pause_filter_count;
+>         u64 iopm_base_pa;
+[..]                            \
+> @@ -2574,7 +2573,7 @@ static void test_dr(void)
+>   */
+>  static void test_msrpm_iopm_bitmap_addrs(void)
 >  {
->  	struct vmcb *vmcb = svm->vmcb01.ptr;
-> @@ -746,6 +758,8 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
->  	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
+> -       u64 saved_intercept =3D vmcb->control.intercept;
+> +       u32 saved_intercept =3D vmcb->control.intercept[INTERCEPT_WORD3];
+
+I think hardcoding save/restore for the relevant intercept word here
+is a bit fragile (and leaks the abstraction). If the test is extended
+to update more intercepts that are not in INTERCEPT_WORD3, it can
+easily be missed.
+
+How about introducing helpers to save/restore all intercepts and using
+them here (and in svm_vmload_vmsave() below)? We can define the array
+on the stack in the test and pass it to the helpers.
+
+Something like this (untested):
+
+static void test_msrpm_iopm_bitmap_addrs(void)
+{
+       u32 saved_intercepts[MAX_INTERCEPT];
+
+       save_intercepts(vmcb, saved_intercepts);
+       ...
+       restore_intercepts(vmcb, saved_intercepts);
+}
+
+
+>         u64 addr_beyond_limit =3D 1ull << cpuid_maxphyaddr();
+>         u64 addr =3D virt_to_phys(msr_bitmap) & (~((1ull << 12) - 1));
+>
+> @@ -2615,7 +2614,7 @@ static void test_msrpm_iopm_bitmap_addrs(void)
+>         TEST_BITMAP_ADDR(saved_intercept, INTERCEPT_IOIO_PROT, addr,
+>                          SVM_EXIT_VMMCALL, "IOPM");
+>
+> -       vmcb->control.intercept =3D saved_intercept;
+> +       vmcb->control.intercept[INTERCEPT_WORD3] =3D saved_intercept;
 >  }
-> 
-> +void svm_recalc_nested_intercepts_mask(struct kvm_vcpu *vcpu);
-> +
->  int __init nested_svm_init_msrpm_merge_offsets(void);
-> 
->  int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
-> --
-> 2.52.0.223.gf5cc29aaa4-goog
-> 
+>
+>  /*
+> @@ -2811,7 +2810,7 @@ static void vmload_vmsave_guest_main(struct svm_tes=
+t *test)
+>
+>  static void svm_vmload_vmsave(void)
+>  {
+> -       u32 intercept_saved =3D vmcb->control.intercept;
+> +       u32 intercept_saved =3D vmcb->control.intercept[INTERCEPT_WORD4];
+>
+>         test_set_guest(vmload_vmsave_guest_main);
+>
+> @@ -2819,8 +2818,8 @@ static void svm_vmload_vmsave(void)
+>          * Disabling intercept for VMLOAD and VMSAVE doesn't cause
+>          * respective #VMEXIT to host
+>          */
+> -       vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_VMLOAD);
+> -       vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_VMSAVE);
+> +       vmcb_clear_intercept(INTERCEPT_VMLOAD);
+> +       vmcb_clear_intercept(INTERCEPT_VMSAVE);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMMCALL, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
+> @@ -2829,39 +2828,39 @@ static void svm_vmload_vmsave(void)
+>          * Enabling intercept for VMLOAD and VMSAVE causes respective
+>          * #VMEXIT to host
+>          */
+> -       vmcb->control.intercept |=3D (1ULL << INTERCEPT_VMLOAD);
+> +       vmcb_set_intercept(INTERCEPT_VMLOAD);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMLOAD, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMLOAD #VMEXIT");
+> -       vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_VMLOAD);
+> -       vmcb->control.intercept |=3D (1ULL << INTERCEPT_VMSAVE);
+> +       vmcb_clear_intercept(INTERCEPT_VMLOAD);
+> +       vmcb_set_intercept(INTERCEPT_VMSAVE);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMSAVE, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMSAVE #VMEXIT");
+> -       vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_VMSAVE);
+> +       vmcb_clear_intercept(INTERCEPT_VMSAVE);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMMCALL, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
+>
+> -       vmcb->control.intercept |=3D (1ULL << INTERCEPT_VMLOAD);
+> +       vmcb_set_intercept(INTERCEPT_VMLOAD);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMLOAD, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMLOAD #VMEXIT");
+> -       vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_VMLOAD);
+> +       vmcb_clear_intercept(INTERCEPT_VMLOAD);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMMCALL, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
+>
+> -       vmcb->control.intercept |=3D (1ULL << INTERCEPT_VMSAVE);
+> +       vmcb_set_intercept(INTERCEPT_VMSAVE);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMSAVE, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMSAVE #VMEXIT");
+> -       vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_VMSAVE);
+> +       vmcb_clear_intercept(INTERCEPT_VMSAVE);
+>         svm_vmrun();
+>         report(vmcb->control.exit_code =3D=3D SVM_EXIT_VMMCALL, "Test "
+>                "VMLOAD/VMSAVE intercept: Expected VMMCALL #VMEXIT");
+>
+> -       vmcb->control.intercept =3D intercept_saved;
+> +       vmcb->control.intercept[INTERCEPT_WORD4] =3D intercept_saved;
+>  }
+>
+[..]
 
