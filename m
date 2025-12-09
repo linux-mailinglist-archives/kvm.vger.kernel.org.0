@@ -1,240 +1,403 @@
-Return-Path: <kvm+bounces-65557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22047CB098C
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 17:37:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465E4CB0A55
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 17:55:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 12C2A304F8FC
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 16:35:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39EB130D03E5
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 16:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2748032ED3A;
-	Tue,  9 Dec 2025 16:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B316B329E48;
+	Tue,  9 Dec 2025 16:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FWCGjC7k";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7rYfjBA"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TPfq5K47"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010024.outbound.protection.outlook.com [52.101.46.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B56432E6B8
-	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 16:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765298101; cv=none; b=ZAW4k8ooEDe5AsPO41XSnfs6IoN5DZKDV86kUvuuJVk9kdiDnXB+leDWJVNiQTrXddWj+KrdQAyzcCyfDqZsmJjfpALqgqHdNGKBKgMakHmSi0roEn/oEj/lA5yE8lqgfnaaICwDph8i342KFXaCltyT+TruqwZI4ezZkgIXJOE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765298101; c=relaxed/simple;
-	bh=lnyXcCQY8wxYUiz9C+WbQVRN8NAJ6h19E/JrUdRefVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aeson0GRZVK0w3q6QTLIY0cb+LQbE7jkHKSAgDytngp9EUqa0wlBLwMvnn4QKsm4C42bVOZxoosB/eUGh2tdMYdl+6J9WPGPL6Le6EVkJskl3r8VvpHghemGIzhDEcmXM0CrtDoUOU3oIsRgqv4sltnJ58q8jSncsqkpFJbrqkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FWCGjC7k; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=A7rYfjBA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765298097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r9JfjndmoaJNvNI6sbMSfg1Y02u1WJwsC5WsyytU640=;
-	b=FWCGjC7kUGnCivpHx9u12ShI36Xv7lgQAKC5OePY2oTJQ0oJnXPkl+5TskknAIxJTF/Aj0
-	iXO4pxdVzP2C+sLexxMj88oMNgv+FqZvskYqo8HGaKWjdxk3TNGDQLrVzKe8m5NI4kCKKF
-	FvVkUytkMN8WPg6BttqMG78lMhmWf8w=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-YLVauhhRNQSR3z0QrNL5lg-1; Tue, 09 Dec 2025 11:34:55 -0500
-X-MC-Unique: YLVauhhRNQSR3z0QrNL5lg-1
-X-Mimecast-MFC-AGG-ID: YLVauhhRNQSR3z0QrNL5lg_1765298095
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4779d8fd4ecso26426775e9.1
-        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 08:34:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765298094; x=1765902894; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r9JfjndmoaJNvNI6sbMSfg1Y02u1WJwsC5WsyytU640=;
-        b=A7rYfjBAZbMY7MLtg3dVrKjdiV9nGjYFv2vM3j7v82Vld6N3CGoztk0wGFriBh6O9T
-         zTtl/2+Ke4ELFO/0KfyT+UbZgQ+f4EMKQIj9iZR5mDs9VPMp6Y0ULy+mfn/6aCCJ/L/J
-         cXpQbONl+JL6GOM8iWVXhIwViEiOaJRW6YG+6wx0R3YtUV2nOffF06N8LCXnVzcTOdTP
-         LENtVtpMEBOxd/GH+O04zbA2ydDPlpJQ+e8Ss8SSki9bfNp4SYgQ/94tl7GJQ9VpUlxI
-         JTCxBOkcUpOkwor2BCyHPADBVrYioAcymPvouOamiuWpKzFxG3rVN/B35T8r/dUpOoJk
-         NZWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765298094; x=1765902894;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r9JfjndmoaJNvNI6sbMSfg1Y02u1WJwsC5WsyytU640=;
-        b=bNRuHVLTSmb+lPpHO1Mv9qKWftN8F3ByK3GDzK+2ZTzLTWx9wo4dXlPZKIfO4dhrIB
-         F/+kOrouz6gUHJeSrcVFg7InLsshvMzZaDX5NorLgWUSCvTQs2cgO6YF9pAgLxtGT5a+
-         cjCkuix4Z/xk5I6YsV0GVk80LE2/I2Cw1XN7COGP5I96E1+oopwbzNwCOhpRYWREPQF/
-         BqbrKU7Bjg6bdExorktLr/ch4h8a7ZRD8/+S5dpPuWGBqUS/K094lp9TKlJwsa3bDbVu
-         9NrwGQxBJoao8NDKAFbnDYy12WkVOxY/mpWdsmcxSgDqcbMBDxiYDeDUicRebKtfMoTH
-         RUVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJdnHbV+5dFg0VXL6tqYXlI7CE61biYw1O5Kx3pEmJsOvbSv74aCTy26VrMflzDHVRNJE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzuBIMHJ5eLZzjaOMcxvirYsXI/66XHMBZKEfvNge7FqLJlN6J
-	D7fYwT7bZfnGV3gHWATw3WgeQioTfsgXry4pwI1HhXvapi9esnFqnenZG4G5dUA7PMbdR2dQtol
-	pp95b7v/AmIbtcn8uZ1NKcuXc5En8pWMksCYAOqFhOhyrOlpIR2iN3h6Vw2nifA==
-X-Gm-Gg: ASbGncuRZchFlyBvR8ajamu4EzJeyzoDQVWbvcwcT6Ppk6g8wGCJfJt03KpqP0Ila6t
-	4hjboAUM6rnh5YKFvSnE4ItMOfq3KnjdofFjls7nxWBQaGSPL9nq+N5xDfKtyhgPCTL4xlKPdh1
-	6S+SsiZXUU61GETFRyBYQMxOzIbPhHn3LLPBIhallfvW2D0tjQJILkSTAthqN/+oMf+Ux1D+8Cx
-	EaduYhpChHArFePWTHzmju8KLbxm0QfKtFLOpC4H16x1WcbYBvz2pW7mHDemOePGuw7QjKeqCVC
-	baVbRlo/JoGfOLfglgYWAxJN0a63V3gOQlPXEIOXPMWplatCt2ocFe36TcaLj4TAGRAhh+9L4re
-	k
-X-Received: by 2002:a05:600c:c297:b0:477:9cec:c83e with SMTP id 5b1f17b1804b1-47a7f90f366mr18557915e9.1.1765298094380;
-        Tue, 09 Dec 2025 08:34:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMTQnY4WUopYEq62Lme08UXaCxVEXwK+s04m0yfRFAAPpJeSRLjIyzdawPMvHmUE0u+t16GA==
-X-Received: by 2002:a05:600c:c297:b0:477:9cec:c83e with SMTP id 5b1f17b1804b1-47a7f90f366mr18557655e9.1.1765298093947;
-        Tue, 09 Dec 2025 08:34:53 -0800 (PST)
-Received: from redhat.com ([80.230.34.255])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a7d632cebsm48499025e9.7.2025.12.09.08.34.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 08:34:53 -0800 (PST)
-Date: Tue, 9 Dec 2025 11:34:50 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-	oren@nvidia.com, aevdaev@nvidia.com, aaptel@nvidia.com
-Subject: Re: [PATCH v2 1/1] virtio: add driver_override support
-Message-ID: <20251209113306-mutt-send-email-mst@kernel.org>
-References: <20251208220908.9250-1-mgurtovoy@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B46D3002A9;
+	Tue,  9 Dec 2025 16:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765299077; cv=fail; b=sdtzpWkG+r4VqY53xzWS2CHEes1Pb6X2gImVqRkxYwVvvz40FBy6ZFpiMY4zOQtB3W31lehDL5xLr4UMLqxgM9eHz88s0j74JAMgH9o/PxskrIXjSTyQple8GXEtq/lj/E2DKepVewnhegPHVpeEvrUfLb1ULOK2VG13L2+XTS0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765299077; c=relaxed/simple;
+	bh=AfAzTeu6iNy9tjIDjznwfXD8TNOA2U/q41oPtZjOGb4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BMdXxBpRS/RvqMWigw3N9DSOiJiJnEkxWzxaCP5hdu4BaamAPTQCQmbvqfJ3Xixi86bmHnGxNeR+JUm/bK2JUak40hT2iJUy/8UTvrsVx568a4xgUjx4YgM1UVfvSPxXtYChNzcLkE/p0qjCpJ2ulhe4QahTGNe3AOC8xvgiHkc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TPfq5K47; arc=fail smtp.client-ip=52.101.46.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hwvBSpGgGJ43eercVcvFI/SLhc7KX3DEt0nbXVzcLiIQkNa59c+Mmm8nSSK/7rJy9ErBKz9GGY+kNXVvF/JVTDWLTqyegsaJZTWEP1h/4iW2iPoYdfoCpYzy4Y4qipI04nFtbM7JQcy4gH33y0sJF5mExjMQC7fpbYwEKdq5kr7d6EP5W3GaK+/b6gk9cb1KAhAlI3ron8/UdSmpsAqq1IOvKhy+05F55w8kL05amLiEOlW3QrxCJse1/u8wL3gvvCsr3YmwXn9vQhRr/widGrq7tsLGJmGnY6OqS6EfXXv7y4iRBodWxXKiW8kFSdnmFDDVarEFMBATyJDar8cbNw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8Mw1TK5/oMatiaEH/ZlEwqJlS9n3e/6ZoovjG0JuzVU=;
+ b=FwbG9shkDoRB2tv6L3hAGzoyJUpNRNFxklUVgqrc7t/dadD1E2KM3bZy1xk9I/rkztoJjicO7szRbYOui+37yNdvn2ml2LVUc4RF2HkcsS3DjIBQNWAlXCpiBLu4uXQYRbbnJZd3JyTcH5uHtD7tR2mvJDNFr2PWeHyxw/W44p9gurwbQOSSpS/u5u+PZhyGzewHcOwzpu8MQPNadAedhh2I7qbLFmRUQzW5EQP/1QrCywpRy/QtYfbLG4DSQaWoJ3pEmt3dAx16Ek2K27/LJHqbvV+bsR6UJN48b03sCXVWPPe3ijAxlBD3+eFS6EMRV9pMqm8Piuc+4/8Rh/7X8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8Mw1TK5/oMatiaEH/ZlEwqJlS9n3e/6ZoovjG0JuzVU=;
+ b=TPfq5K47cAUpNyMDtDMXnnHrHDP0fNd7korOR0TizDCWu0my/DL5eJqB0oFNpFVF5L1JrZ/BtCdcTsg+LjagyRPnan2q3ST7FvUr+Q4EQLZgnPlweOoq69eMmid8e147URJY9XQixeXaV2ZnI20Ckx1Pn/6OF6fd2TteXevO3OkmYmLFnkPcyyAbXK2jhMjT7lge3ry9H8wJU1CdOrwYvdYucrPikryN6TgStpWHenjqJyf8Bc8Zw6TCVj/+fthkFuC6AJl033FQzjuCGWUTRHdqXvSjIIOcxxqdByKPWTQ40sqtnqABSj4E9j613TBc0WzJuZc2EGJxvSbo/a6AJQ==
+Received: from SJ0PR03CA0259.namprd03.prod.outlook.com (2603:10b6:a03:3a0::24)
+ by MW6PR12MB8957.namprd12.prod.outlook.com (2603:10b6:303:23a::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Tue, 9 Dec
+ 2025 16:51:10 +0000
+Received: from SJ1PEPF00002316.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0:cafe::ff) by SJ0PR03CA0259.outlook.office365.com
+ (2603:10b6:a03:3a0::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.14 via Frontend Transport; Tue,
+ 9 Dec 2025 16:51:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00002316.mail.protection.outlook.com (10.167.242.170) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.8 via Frontend Transport; Tue, 9 Dec 2025 16:51:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 9 Dec
+ 2025 08:50:49 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 9 Dec
+ 2025 08:50:48 -0800
+Received: from nvidia-4028GR-scsim.nvidia.com (10.127.8.11) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 9 Dec 2025 08:50:41 -0800
+From: <mhonap@nvidia.com>
+To: <aniketa@nvidia.com>, <ankita@nvidia.com>, <alwilliamson@nvidia.com>,
+	<vsethi@nvidia.com>, <jgg@nvidia.com>, <mochs@nvidia.com>,
+	<skolothumtho@nvidia.com>, <alejandro.lucero-palau@amd.com>,
+	<dave@stgolabs.net>, <jonathan.cameron@huawei.com>, <dave.jiang@intel.com>,
+	<alison.schofield@intel.com>, <vishal.l.verma@intel.com>,
+	<ira.weiny@intel.com>, <dan.j.williams@intel.com>, <jgg@ziepe.ca>,
+	<yishaih@nvidia.com>, <kevin.tian@intel.com>
+CC: <cjia@nvidia.com>, <kwankhede@nvidia.com>, <targupta@nvidia.com>,
+	<zhiw@nvidia.com>, <kjaju@nvidia.com>, <linux-kernel@vger.kernel.org>,
+	<linux-cxl@vger.kernel.org>, <kvm@vger.kernel.org>, <mhonap@nvidia.com>
+Subject: [RFC v2 00/15] vfio: introduce vfio-cxl to support CXL type-2 accelerator passthrough                                                                                                                                                                                                                                                                                                                                        Hello all,
+Date: Tue, 9 Dec 2025 22:20:04 +0530
+Message-ID: <20251209165019.2643142-1-mhonap@nvidia.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251208220908.9250-1-mgurtovoy@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002316:EE_|MW6PR12MB8957:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54d5ed00-dfc1-44b1-9336-08de37432794
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ImVqiqwEQNei2LO4jQMthtz7BEtDB641XEhGIeaPWs/RotRmc85e6h3mtT1m?=
+ =?us-ascii?Q?T7vGI9X7/m7gKKBZHZtVQnhOshfPBjHpBACJDxxkWlxrDAbIVRk/I2l7DsjI?=
+ =?us-ascii?Q?sdVchhU7vGJtN5Nnys/hv8NJkmWpbhIjn5XYF6FkZfLksgTMr0M6pzGmzLOR?=
+ =?us-ascii?Q?9aWKv8eU6d4F6PMvSkeZerl04z2LDjyn/aUtkKIvX3tukZixGr+su470S4K/?=
+ =?us-ascii?Q?0qPjw7AEszOXtaOkyEVZnlDYAX22tY6BGSRXirAcBOd0FQ2LG1mWgQDlSP37?=
+ =?us-ascii?Q?8yqh/3oRc4QueW6s3bWpwy5+OhfRsAcitq3OwJgFS3HsXh9/4BaLhMmcpxY3?=
+ =?us-ascii?Q?lBm/1CY0VJbwelv5xrBuU8IADGG30Te+2HJ9+Kj+LxVSfv603ded4o8HyW/g?=
+ =?us-ascii?Q?q/hNQwQGfIh4GCYOASAV12yRxBD5ncJsgeudleBLmSbeKpg7TtnAOszQZyj+?=
+ =?us-ascii?Q?6yUIRuS3CUV5zXw1MeUug+U6KwyppVH5/c9iXeTXL9yE0kUiZvLx2aQv3gIw?=
+ =?us-ascii?Q?qR5vfOMYQX2qX6CJYotazYlfZ4kAacZL/TuhB8qsTvU7e/PTOtAWswBcqjbQ?=
+ =?us-ascii?Q?f8yKwjktMdQzMilXDNIuonyQ7q1utXKiBS4FGpqIAB56IWYbFsAcuDyfcULL?=
+ =?us-ascii?Q?IfPifNSzW9KBYJen/LY2DUSjnIP2b3wOUZQCwG/1MAeKABwHKXNfx5IxujjF?=
+ =?us-ascii?Q?7DaIhjMrl/k++lrfOv+C+jDW5t7U1sB5MTE9+Uaqlt5ZYzFr9et8/pXzfIUJ?=
+ =?us-ascii?Q?oaMTebteq3VoO+ueecgLt1lrVgeCNNsapDjv9RG2Vb6OtMxS8RJDI+pUkmtB?=
+ =?us-ascii?Q?LKCZ5ctHiWrMFmlrjCWZBWmoK2GnqJQ5if7KuZr3SyxFHwTONQ8YQ1ZukapW?=
+ =?us-ascii?Q?uhUPp18FjLdRV29WL/9KDRa/1ak0VSNjFOxAYAzUSNNqZhvLTHu5iQu88ozC?=
+ =?us-ascii?Q?p00NlHNtjB2RYyqxnBTokukiLnHM6ODzC5lQLNTnRGbCUG4QL2MsmZ5Jj7HD?=
+ =?us-ascii?Q?8UGZd03tEUbLunD4fgIpxUOR1f9Qrtx31xWDRzs91Tz+MoXpJ3Qkyx/dS/aU?=
+ =?us-ascii?Q?5CeVhKnFU8B5eRaTks4GQcmmNVECQYSVWffPXQKM4SiXFUDQHCz3NDmZkigs?=
+ =?us-ascii?Q?omLtb6EWkfAmbW1oWpcALwEDOD4r51ORyaWQA3/EHknSCKKTN+M5QyveJFaF?=
+ =?us-ascii?Q?PWuVVHZQ1uLuAiQdSJY7Y1vfQvWx/xmLnFSuwwAr0sY5bwk3PoMayi/XF4LQ?=
+ =?us-ascii?Q?a3S8yCOspIPpLv7Vp2gh6aPJL5YJjBWHOFdcs5XROtPKMzI7jWHk8P0NI0ZQ?=
+ =?us-ascii?Q?JBQKF3pVxwGg5hyc1+kURkIwu8uZJ0rAj3EE0VwRuyvX1xBfzMoNxKcw8mPP?=
+ =?us-ascii?Q?yR3JlaYooe7/YYVt1EhM7SlUzLogPwY83AliFWXeL2hvX6yJKE3Pd0/dbSDw?=
+ =?us-ascii?Q?C85BfjHb1ijyBAHMlkIVbDNC8J4OEzp83McbWuk3/24gdxzR2f6yQK817LeW?=
+ =?us-ascii?Q?k9tfvxXsApwIyFF8VoNjAhURUvPmFfUPfnzudaetjT1D5KMFsLm4OFdROTLW?=
+ =?us-ascii?Q?YIdkBekGRzw4CjWJ0Cf3g5KBXOmVGr3bWdBHhmsp?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2025 16:51:09.9291
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54d5ed00-dfc1-44b1-9336-08de37432794
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002316.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8957
 
-On Tue, Dec 09, 2025 at 12:09:08AM +0200, Max Gurtovoy wrote:
-> Add support for the 'driver_override' attribute to Virtio devices. This
-> allows users to control which Virtio bus driver binds to a given Virtio
-> device.
-> 
-> If 'driver_override' is not set, the existing behavior is preserved and
-> devices will continue to auto-bind to the first matching Virtio bus
-> driver.
+From: Manish Honap <mhonap@nvidia.com>
 
-oh, it's a device driver not the bus driver, actually.
+This is the re-spin of VFIO-CXL patches which Zhi had sent earlier[1] and
+rebased to Alejandro's patch series[3] v20 for "CXL type-2 device support".
 
-> Tested with virtio blk device (virtio core and pci drivers are loaded):
-> 
->   $ modprobe my_virtio_blk
-> 
->   # automatically unbind from virtio_blk driver and override + bind to
->   # my_virtio_blk driver.
->   $ driverctl -v -b virtio set-override virtio0 my_virtio_blk
-> 
-> In addition, driverctl saves the configuration persistently under
-> /etc/driverctl.d/.
+Current patchset only modifies the RFC V1 sent by Zhi in accordance
+with the CXL type-2 device support currently in upstream review. In
+the next version, I will reorganize the patch series to first create
+VFIO variant driver for QEMU CXL accelerator emulated device and
+incrementally implement the features for ease of review.
+This will create a logical separation between code which is required
+in VFIO-CXL-CORE, CXL-CORE and in variant driver. This will also help
+for review to understand the delta between CXL specific initialization
+as compared to standard PCI.
 
-what is this "mydriver" though? what are valid examples that
-we want to support? 
+V2 changes:
+===========
 
-> 
-> Signed-off-by: Avraham Evdaev <aevdaev@nvidia.com>
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> ---
-> 
-> changes from v1:
->  - use !strcmp() to compare strings (MST)
->  - extend commit msg with example (MST)
-> 
-> ---
->  drivers/virtio/virtio.c | 34 ++++++++++++++++++++++++++++++++++
->  include/linux/virtio.h  |  4 ++++
->  2 files changed, 38 insertions(+)
-> 
-> diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
-> index a09eb4d62f82..993dc928be49 100644
-> --- a/drivers/virtio/virtio.c
-> +++ b/drivers/virtio/virtio.c
-> @@ -61,12 +61,41 @@ static ssize_t features_show(struct device *_d,
->  }
->  static DEVICE_ATTR_RO(features);
->  
-> +static ssize_t driver_override_store(struct device *_d,
-> +				     struct device_attribute *attr,
-> +				     const char *buf, size_t count)
-> +{
-> +	struct virtio_device *dev = dev_to_virtio(_d);
-> +	int ret;
-> +
-> +	ret = driver_set_override(_d, &dev->driver_override, buf, count);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return count;
-> +}
-> +
-> +static ssize_t driver_override_show(struct device *_d,
-> +				    struct device_attribute *attr, char *buf)
-> +{
-> +	struct virtio_device *dev = dev_to_virtio(_d);
-> +	ssize_t len;
-> +
-> +	device_lock(_d);
-> +	len = sysfs_emit(buf, "%s\n", dev->driver_override);
-> +	device_unlock(_d);
-> +
-> +	return len;
-> +}
-> +static DEVICE_ATTR_RW(driver_override);
-> +
->  static struct attribute *virtio_dev_attrs[] = {
->  	&dev_attr_device.attr,
->  	&dev_attr_vendor.attr,
->  	&dev_attr_status.attr,
->  	&dev_attr_modalias.attr,
->  	&dev_attr_features.attr,
-> +	&dev_attr_driver_override.attr,
->  	NULL,
->  };
->  ATTRIBUTE_GROUPS(virtio_dev);
-> @@ -88,6 +117,10 @@ static int virtio_dev_match(struct device *_dv, const struct device_driver *_dr)
->  	struct virtio_device *dev = dev_to_virtio(_dv);
->  	const struct virtio_device_id *ids;
->  
-> +	/* Check override first, and if set, only use the named driver */
-> +	if (dev->driver_override)
-> +		return !strcmp(dev->driver_override, _dr->name);
-> +
->  	ids = drv_to_virtio(_dr)->id_table;
->  	for (i = 0; ids[i].device; i++)
->  		if (virtio_id_match(dev, &ids[i]))
-> @@ -582,6 +615,7 @@ void unregister_virtio_device(struct virtio_device *dev)
->  {
->  	int index = dev->index; /* save for after device release */
->  
-> +	kfree(dev->driver_override);
->  	device_unregister(&dev->dev);
->  	virtio_debug_device_exit(dev);
->  	ida_free(&virtio_index_ida, index);
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index db31fc6f4f1f..418bb490bdc6 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -138,6 +138,9 @@ struct virtio_admin_cmd {
->   * @config_lock: protects configuration change reporting
->   * @vqs_list_lock: protects @vqs.
->   * @dev: underlying device.
-> + * @driver_override: driver name to force a match; do not set directly,
-> + *                   because core frees it; use driver_set_override() to
-> + *                   set or clear it.
->   * @id: the device type identification (used to match it with a driver).
->   * @config: the configuration ops for this device.
->   * @vringh_config: configuration ops for host vrings.
-> @@ -158,6 +161,7 @@ struct virtio_device {
->  	spinlock_t config_lock;
->  	spinlock_t vqs_list_lock;
->  	struct device dev;
-> +	const char *driver_override;
->  	struct virtio_device_id id;
->  	const struct virtio_config_ops *config;
->  	const struct vringh_config_ops *vringh_config;
-> -- 
-> 2.18.1
+- Address all the comments from Alex on RFC V1.
+
+- Besides addressing Alex comments, this series also solves the leftovers:
+	- Introduce an emulation framework.
+	- Proper CXL DVSEC configuration emulation.
+	- Proper CXL MMIO BAR emmulation.
+	- Re-use PCI mmap ops in vfio-pci for CXL region.
+	- Introduce sparse map for CXL MMIO BAR.
+	- Big-little endian considerations.
+	- Correct teardown path. (which is missing due to the previous CXL
+	  type 2 patches doesn't have it.)
+
+- Refine the APIs and architecture of VFIO CXL.
+	- Configurable params for HW.
+	- Pre-commited CXL region.
+	- PCI DOE registers passthrough. (For CDAT)
+	- Media ready support. (SFC doesn't need this)
+
+- Introduce new changes for the CXL core.
+	- Teardown path of CXL memdev.
+	- Committed regions.
+	- Media ready for CXL type-2 device.
+
+- Update the sample driver with latest VFIO-CXL APIs.
+
+Patchwise description:
+=====================
+
+PATCH 1-5: Expose the necessary routines required by vfio-cxl.
+
+PATCH 6: Introduce the preludes of vfio-cxl, including CXL device
+initialization, CXL region creation as directed in patch v20 for vfio
+type-2 device initialization.
+
+PATCH 7: Expose the CXL region to the userspace.
+
+PATCH 8: Add logic to discover precommitted CXL region.
+
+PATCH 9: Introduce vfio-cxl read/write routines.
+
+PATCH 10: Prepare to emulate the HDM decoder registers.
+
+PATCH 11: Emulate the HDM decoder registers.
+
+PATCH 12: Emulate CXL configuration space.
+
+PATCH 13: Tweak vfio-cxl to be aware of working on a CXL device.
+
+PATCH 14: An example variant driver to demonstrate the usage of
+vfio-cxl-core from the perspective of the VFIO variant driver.
+
+PATCH 15: NULL pointer dereference fixes found out during testing.
+
+Background:
+===========
+
+Compute Express Link (CXL) is an open standard interconnect built upon
+industrial PCI layers to enhance the performance and efficiency of data
+centers by enabling high-speed, low-latency communication between CPUs
+and various types of devices such as accelerators, memory.
+
+It supports three key protocols: CXL.io as the control protocol, CXL.cache
+as the cache-coherent host-device data transfer protocol, and CXL.mem as
+memory expansion protocol. CXL Type 2 devices leverage the three protocols
+to seamlessly integrate with host CPUs, providing a unified and efficient
+interface for high-speed data transfer and memory sharing. This integration
+is crucial for heterogeneous computing environments where accelerators,
+such as GPUs, and other specialized processors, are used to handle
+intensive workloads.
+
+Goal:
+=====
+
+Although CXL is built upon the PCI layers, passing a CXL type-2 device can
+be different than PCI devices according to CXL specification[4]:
+
+- CXL type-2 device initialization. CXL type-2 device requires an
+additional initialization sequence besides the PCI device initialization.
+CXL type-2 device initialization can be pretty complicated due to its
+hierarchy of register interfaces. Thus, a standard CXL type-2 driver
+initialization sequence provided by the kernel CXL core is used.
+
+- Create a CXL region and map it to the VM. A mapping between HPA and DPA
+(Device PA) needs to be created to access the device memory directly. HDM
+decoders in the CXL topology need to be configured level by level to
+manage the mapping. After the region is created, it needs to be mapped to
+GPA in the virtual HDM decoders configured by the VM.
+
+- CXL reset. The CXL device reset is different from the PCI device reset.
+A CXL reset sequence is introduced by the CXL spec.
+
+- Emulating CXL DVSECs. CXL spec defines a set of DVSECs registers in the
+configuration for device enumeration and device control. (E.g. if a device
+is capable of CXL.mem CXL.cache, enable/disable capability) They are owned
+by the kernel CXL core, and the VM can not modify them.
+
+- Emulate CXL MMIO registers. CXL spec defines a set of CXL MMIO registers
+that can sit in a PCI BAR. The location of register groups sit in the PCI
+BAR is indicated by the register locator in the CXL DVSECs. They are also
+owned by the kernel CXL core. Some of them need to be emulated.
+
+Design:
+=======
+
+To achieve the purpose above, the vfio-cxl-core is introduced to host the
+common routines that variant driver requires for device passthrough.
+Similar with the vfio-pci-core, the vfio-cxl-core provides common
+routines of vfio_device_ops for the variant driver to hook and perform the
+CXL routines behind it.
+
+Besides, several extra APIs are introduced for the variant driver to
+provide the necessary information the kernel CXL core to initialize
+the CXL device. E.g., Device DPA.
+
+CXL is built upon the PCI layers but with differences. Thus, the
+vfio-pci-core is aimed to be re-used as much as possible with the
+awareness of operating on a CXL device.
+
+A new VFIO device region is introduced to expose the CXL region to the
+userspace. A new CXL VFIO device cap has also been introduced to convey
+the necessary CXL device information to the userspace.
+
+Test:
+=====
+
+To test the patches and hack around, a virtual passthrough with nested
+virtualization approach is used.
+
+The host QEMU[5] emulates a CXL type-2 accel device based on Ira's patches
+with the changes to emulate HDM decoders.
+
+While running the vfio-cxl in the L1 guest, an example VFIO variant
+driver is used to attach with the QEMU CXL access device.
+
+The L2 guest can be booted via the QEMU with the vfio-cxl support in the
+VFIOStub.
+
+In the L2 guest, a dummy CXL device driver is provided to attach to the
+virtual pass-through device.
+
+The dummy CXL type-2 device driver can successfully be loaded with the
+kernel cxl core type2 support, create CXL region by requesting the CXL
+core to allocate HPA and DPA and configure the HDM decoders.
+
+To make sure everyone can test the patches, the kernel config of L1 and
+L2 are provided in the repos, the required kernel command params and
+qemu command line can be found from the demonstration video[6]
+
+Repos:
+======
+
+QEMU host:
+https://github.com/zhiwang-nvidia/qemu/tree/zhi/vfio-cxl-qemu-host
+L1 Kernel:
+https://github.com/mhonap-nvidia/vfio-cxl-l1-kernel-rfc-v2/tree/vfio-cxl-l1-kernel-rfc-v2
+L1 QEMU:
+https://github.com/zhiwang-nvidia/qemu/tree/zhi/vfio-cxl-qemu-l1-rfc
+L2 Kernel:
+https://github.com/zhiwang-nvidia/linux/tree/zhi/vfio-cxl-l2
+
+
+Feedback expected:
+==================
+
+- Architecture level between vfio-pci-core and vfio-cxl-core.
+- Variant driver requirements from more hardware vendors.
+- vfio-cxl-core UABI to QEMU.
+
+Applying patches:
+=================
+
+This patchset should be applied on the tree with base commit v6.18-rc2
+along with patches from [2] and [3].
+
+[1] https://lore.kernel.org/all/20240920223446.1908673-1-zhiw@nvidia.com/
+[2] https://patchew.org/QEMU/20230517-rfc-type2-dev-v1-0-6eb2e470981b@intel.com/
+[3] https://lore.kernel.org/linux-cxl/20251110153657.2706192-1-alejandro.lucero-palau@amd.com/
+[4] https://computeexpresslink.org/cxl-specification/
+[5] https://lore.kernel.org/linux-cxl/20251104170305.4163840-1-terry.bowman@amd.com/
+[6] https://youtu.be/zlk_ecX9bxs?si=hc8P58AdhGXff3Q7
+
+Manish Honap (15):
+  cxl: factor out cxl_await_range_active() and cxl_media_ready()
+  cxl: introduce cxl_get_hdm_reg_info()
+  cxl: introduce cxl_find_comp_reglock_offset()
+  cxl: introduce devm_cxl_del_memdev()
+  cxl: introduce cxl_get_committed_regions()
+  vfio/cxl: introduce vfio-cxl core preludes
+  vfio/cxl: expose CXL region to the userspace via a new VFIO device
+    region
+  vfio/cxl: discover precommitted CXL region
+  vfio/cxl: introduce vfio_cxl_core_{read, write}()
+  vfio/cxl: introduce the register emulation framework
+  vfio/cxl: introduce the emulation of HDM registers
+  vfio/cxl: introduce the emulation of CXL configuration space
+  vfio/pci: introduce CXL device awareness
+  vfio/cxl: VFIO variant driver for QEMU CXL accel device
+  cxl: NULL checks for CXL memory devices
+
+ drivers/cxl/core/memdev.c             |   8 +-
+ drivers/cxl/core/pci.c                |  46 +-
+ drivers/cxl/core/pci_drv.c            |   3 +-
+ drivers/cxl/core/region.c             |  73 +++
+ drivers/cxl/core/regs.c               |  22 +
+ drivers/cxl/cxlmem.h                  |   3 +-
+ drivers/cxl/mem.c                     |   3 +
+ drivers/vfio/pci/Kconfig              |  13 +
+ drivers/vfio/pci/Makefile             |   5 +
+ drivers/vfio/pci/cxl-accel/Kconfig    |   9 +
+ drivers/vfio/pci/cxl-accel/Makefile   |   4 +
+ drivers/vfio/pci/cxl-accel/main.c     | 143 +++++
+ drivers/vfio/pci/vfio_cxl_core.c      | 695 +++++++++++++++++++++++
+ drivers/vfio/pci/vfio_cxl_core_emu.c  | 778 ++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_cxl_core_priv.h |  17 +
+ drivers/vfio/pci/vfio_pci_core.c      |  41 +-
+ drivers/vfio/pci/vfio_pci_rdwr.c      |  11 +-
+ include/cxl/cxl.h                     |   9 +
+ include/linux/vfio_pci_core.h         |  96 ++++
+ include/uapi/linux/vfio.h             |  14 +
+ tools/testing/cxl/Kbuild              |   3 +-
+ tools/testing/cxl/test/mock.c         |  21 +-
+ 22 files changed, 1992 insertions(+), 25 deletions(-)
+ create mode 100644 drivers/vfio/pci/cxl-accel/Kconfig
+ create mode 100644 drivers/vfio/pci/cxl-accel/Makefile
+ create mode 100644 drivers/vfio/pci/cxl-accel/main.c
+ create mode 100644 drivers/vfio/pci/vfio_cxl_core.c
+ create mode 100644 drivers/vfio/pci/vfio_cxl_core_emu.c
+ create mode 100644 drivers/vfio/pci/vfio_cxl_core_priv.h
+
+--
+2.25.1
 
 
