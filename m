@@ -1,131 +1,237 @@
-Return-Path: <kvm+bounces-65584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65585-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4F9CB0D71
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 19:28:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4172ACB0D8C
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 19:31:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 721AD3046EDF
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 18:26:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A4A930AEC89
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 18:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BDA2FFDFF;
-	Tue,  9 Dec 2025 18:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BFB302769;
+	Tue,  9 Dec 2025 18:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hH2Fyrz5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JVUcUajF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3792E7653
-	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 18:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E61E22A7E4
+	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 18:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765304795; cv=none; b=HYlGp6EoIk+XhTXGuwiiH78edQMnfA3u7YoEyB5dftNXp9zmv7N1Dcrhl3VwzOC0Edt6m5wmtruEItUDsSnelMpNVJHfFNEI8OCH971uNYIapw4Fn11MJ1EP33dquWNMaCkjc443PW0l9QLYOvzUZIn5qK/Ncxs3JG75uPwztzA=
+	t=1765305051; cv=none; b=nPuVe76CfyUtlRwpw+PNKefleQMGeoZ9gY3YFTCkhUrS/9tuOBWcQRo1zBvugbEr0EStjw/VqdLKNFL3ArC9Zqkrm0HRGeYd0ZYL2TxUJFkel3bPwtiKjpbC/HYwzSUifK9Yi4w+B3z+vBQyLixogG83+kJ6yJWNZNgUxSuj4WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765304795; c=relaxed/simple;
-	bh=nl3prqAPdUFLhr/YxSYqMVw69tQOJIma2pVVbrbh130=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XnaFoN6etjITdnG55XFNj/Xk66rGc6DR+UkA3idqWmbxuvmxCR1Q/N/jEbke71ttYGn34n9P7nG0+o1K2WRfQhrXhkPnC1kPKmETWrPl++esnX3hrStCeC/qpKwmSKM9H9hbbWptu238ose2b0cD0GPksZs008o2o7BR+zlghKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hH2Fyrz5; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3436d81a532so10676200a91.3
-        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 10:26:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765304793; x=1765909593; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=chxjnCbu+CsaovuIX/QetPvLM5FaBl5fhlMK8A/Bgj8=;
-        b=hH2Fyrz5z+s/kERuijL2B+DrQNFFRL+XPHrzTUkpEfHW16VsEdFFfgAo1k9QVx/XBc
-         r6F9jLZ0lqxEc4za6v7f++A2Bpvo+kZUQ+p5WdwXv+4TBrPchdyaPp+knG74qV6no3O1
-         xWrwq+zbzIqTsbZafB9OGw9BfQiRjIKABpnTS7UfhHkaTjKQRE0kejS1mJLdchRFoCpV
-         IddUT0NjW0+biGt1gbTE32jVwuOJJ+HDXaTX/xRbFQGIYb4dh1v+8VqBftJ68dsGrbSg
-         ZjFd1XFAheBgdapX9RVfGVNpnJ1YIi+wOnqcopePZC+kiJMUhqDJNAoPGu/IXoD76xa/
-         uZQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765304793; x=1765909593;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=chxjnCbu+CsaovuIX/QetPvLM5FaBl5fhlMK8A/Bgj8=;
-        b=qclzApj18XnV/viVXBz+qQ6x52xEPJdjl7kZyEYY/ETH3loeNX+Ljmu5l75FwU+Zs7
-         ZpFBX5hwHdkBE0DXaQO81JPhbL61G2TJckDc5EIoUej/DcqiRZQO3we9jYkN+/Obz28d
-         UxjkoYsO82GNIOMzTs8SuHCP4B6MYwX5AJy8yQGCSTXczN2l3BdU44E74AujNjyy1/Qz
-         YVLdgl8zWOzPUo3wS/OIS2S5pWTrtE6pKjJMb28vuiMBOa6stgXsqseKYAvYlHlGSG6a
-         7w31s5PsHbj0x3IZ783h3ebc/a4RWvVqRc8vxtdEPa0gCAnecNU0VBusKaIBB4ga71f5
-         GAvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWk5pJoYJ35CsVP3XGjuFaW9D2FKaXMObXGeLV6r1rNf0saLAJ6TRCECUlDN9BnBgpgyDg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNn91wQhU8WyDWwHfFeE4cZm0VTxSAlLAJRmjhBeHiqHrbi+JS
-	yg6PAPPOKlbJLdDFAKZvH9fXgvLEkDJprNJS0FNk6cFUHzWZFP7y7Ml3ulpHW7dhlNOlYMKlCZ9
-	f0zEkYw==
-X-Google-Smtp-Source: AGHT+IF9g3LPB+mmZ2YRjktllEedA1cuQ/18L7dOKJUqmYm9rjvLuinrRy1wx3pD8/5+tBZORwXl/VRl79k=
-X-Received: from pjsa5.prod.google.com ([2002:a17:90a:be05:b0:33b:bb95:de6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d92:b0:33b:d74b:179
- with SMTP id 98e67ed59e1d1-349a25cee1emr8372293a91.27.1765304792940; Tue, 09
- Dec 2025 10:26:32 -0800 (PST)
-Date: Tue, 9 Dec 2025 10:26:31 -0800
-In-Reply-To: <nyuyxccvnhscbo7qtlbsfl2fgxwood24nn4bvskhfqghgli3jo@xsv4zbdkolij>
+	s=arc-20240116; t=1765305051; c=relaxed/simple;
+	bh=ELcCeqNSanuh9kly2ucbHxCwfAiB4mTozToLAcVbZXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ef8jgDTJIy4uJuN9CDyu5THpyMzrAJvsNYzkHvkgqhzsnFLAbS3fdoIyZVV94PVekCpU9o2m9TNENYvwpSZIZaqjmYsOWnEts7CucbUwgJb68Y84gQdNRj7EmNHRHerEiSUrW0Ues4myZR4Qw8LnsZ7bewZcNWIQBXCPGx17dQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JVUcUajF; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 9 Dec 2025 18:30:38 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765305044;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WfAciga+kri66jet59ZYwk12YmGg2Lz8ksBXvJ1baR4=;
+	b=JVUcUajFBMMe465qeaDfrqcp1k6c9ZBjmGxLV8wg4LGp0T3vG6SP1JlpuxoA70qmqj6miQ
+	yYblUHgdJyqO1tiFRdr67p9lLmH4ahSA7OxpX7f7UgzVNmdX9mmzWjFFYILCEEvZ3PzYAk
+	FPZgji+0JpDvQ1r5L4DkgwNsTnmHGtU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 11/13] KVM: nSVM: Simplify nested_svm_vmrun()
+Message-ID: <ttlhqevbe7rq5ns4vyk6e2dtlflbrkcfdabwr63jfnszshhiqs@z7ixbtq6zsla>
+References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
+ <20251110222922.613224-12-yosry.ahmed@linux.dev>
+ <aThKPT9ItrrDZdSd@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
- <20251110222922.613224-5-yosry.ahmed@linux.dev> <aThN-xUbQeFSy_F7@google.com> <nyuyxccvnhscbo7qtlbsfl2fgxwood24nn4bvskhfqghgli3jo@xsv4zbdkolij>
-Message-ID: <aThp19OAXDoZlk3k@google.com>
-Subject: Re: [PATCH v2 04/13] KVM: nSVM: Fix consistency checks for NP_ENABLE
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aThKPT9ItrrDZdSd@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 09, 2025, Yosry Ahmed wrote:
-> On Tue, Dec 09, 2025 at 08:27:39AM -0800, Sean Christopherson wrote:
-> > On Mon, Nov 10, 2025, Yosry Ahmed wrote:
-> > > @@ -400,7 +405,12 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
-> > >  	struct vcpu_svm *svm = to_svm(vcpu);
-> > >  	struct vmcb_ctrl_area_cached *ctl = &svm->nested.ctl;
-> > >  
-> > > -	return __nested_vmcb_check_controls(vcpu, ctl);
-> > > +	/*
-> > > +	 * Make sure we did not enter guest mode yet, in which case
+On Tue, Dec 09, 2025 at 08:11:41AM -0800, Sean Christopherson wrote:
+> On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > Call nested_svm_merge_msrpm() from enter_svm_guest_mode() if called from
+> > the VMRUN path, instead of making the call in nested_svm_vmrun(). This
+> > simplifies the flow of nested_svm_vmrun() and removes all jumps to
+> > cleanup labels.
 > > 
-> > No pronouns.
-> 
-> I thought that rule was for commit logs. 
-
-In KVM x86, it's a rule everywhere.  Pronouns often add ambiguity, and it's much
-easier to have a hard "no pronouns" rule than to try and enforce an inherently
-subjective "is this ambiguous or not" rule.
-
-> There are plenty of 'we's in the KVM x86 code (and all x86 code for that
-> matter) :P
-
-Ya, KVM is an 18+ year old code base.  There's also a ton of bare "unsigned" usage,
-and other things that are frowned upon and/or flagged by checkpatch.  I'm all for
-cleaning things up when touching the code, but I'm staunchly against "tree"-wide
-cleanups just to make checkpatch happy, and so there's quite a few historical
-violations of the current "rules".
-
-> > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> > > index f6fb70ddf7272..3e805a43ffcdb 100644
-> > > --- a/arch/x86/kvm/svm/svm.h
-> > > +++ b/arch/x86/kvm/svm/svm.h
-> > > @@ -552,7 +552,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
-> > >  
-> > >  static inline bool nested_npt_enabled(struct vcpu_svm *svm)
-> > >  {
-> > > -	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
-> > > +	return guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_NPT) &&
-> > > +		svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 28 +++++++++++++---------------
+> >  1 file changed, 13 insertions(+), 15 deletions(-)
 > > 
-> > I would rather rely on Kevin's patch to clear unsupported features.
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index a48668c36a191..89830380cebc5 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -1020,6 +1020,9 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
+> >  
+> >  	nested_svm_hv_update_vm_vp_ids(vcpu);
+> >  
+> > +	if (from_vmrun && !nested_svm_merge_msrpm(vcpu))
 > 
-> Not sure how Kevin's patch is relevant here, could you please clarify?
+> This is silly, just do:
 
-Doh, Kevin's patch only touches intercepts.  What I was trying to say is that I
-would rather sanitize the snapshot (the approach Kevin's patch takes with the
-intercepts), as opposed to guarding the accessor.  That way we can't have bugs
-where KVM checks svm->nested.ctl.nested_ctl directly and bypasses the caps check.
+Ack. Any objections to just dropping from_vmrun and moving
+kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES) to svm_leave_smm()? I
+like the consistency of completely relying on from_vmrun or not at all
+:P
+
+> 
+> 	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, true) ||
+> 	    nested_svm_merge_msrpm(vcpu)) {
+> 		svm->nested.nested_run_pending = 0;
+> 		svm->nmi_l1_to_l2 = false;
+> 		svm->soft_int_injected = false;
+> 
+> 		svm->vmcb->control.exit_code    = SVM_EXIT_ERR;
+> 		svm->vmcb->control.exit_code_hi = -1u;
+> 		svm->vmcb->control.exit_info_1  = 0;
+> 		svm->vmcb->control.exit_info_2  = 0;
+> 
+> 		nested_svm_vmexit(svm);
+> 	}
+> 
+> > +		return -1;
+> 
+> Please stop returning -1, use a proper -errno.
+
+Ack.
+
+> 
+> > +
+> >  	return 0;
+> >  }
+> >  
+> > @@ -1105,23 +1108,18 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+> >  
+> >  	svm->nested.nested_run_pending = 1;
+> >  
+> > -	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, true))
+> > -		goto out_exit_err;
+> > -
+> > -	if (nested_svm_merge_msrpm(vcpu))
+> > -		return ret;
+> > -
+> > -out_exit_err:
+> > -	svm->nested.nested_run_pending = 0;
+> > -	svm->nmi_l1_to_l2 = false;
+> > -	svm->soft_int_injected = false;
+> > +	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, true)) {
+> > +		svm->nested.nested_run_pending = 0;
+> > +		svm->nmi_l1_to_l2 = false;
+> > +		svm->soft_int_injected = false;
+> >  
+> > -	svm->vmcb->control.exit_code    = SVM_EXIT_ERR;
+> > -	svm->vmcb->control.exit_code_hi = 0;
+> > -	svm->vmcb->control.exit_info_1  = 0;
+> > -	svm->vmcb->control.exit_info_2  = 0;
+> > +		svm->vmcb->control.exit_code    = SVM_EXIT_ERR;
+> > +		svm->vmcb->control.exit_code_hi = 0;
+> > +		svm->vmcb->control.exit_info_1  = 0;
+> > +		svm->vmcb->control.exit_info_2  = 0;
+> >  
+> > -	nested_svm_vmexit(svm);
+> > +		nested_svm_vmexit(svm);
+> 
+> Note, there's a pre-existing bug in nested_svm_vmexit().  Lovely, and it's a
+> user-triggerable WARN_ON() (and not even a WARN_ON_ONCE() at that).
+> 
+> If nested_svm_vmexit() fails to map vmcb12, it (unbelievably stupidly) injects a
+> #GP and hopes for the best.  Oh FFS, it also has the asinine -EINVAL "logic".
+> Anyways, it injects #GP (maybe), and bails early, which leaves
+> KVM_REQ_GET_NESTED_STATE_PAGES set.  KVM will then process that on the next
+> vcpu_enter_guest() and trip the WARN_ON() in svm_get_nested_state_pages().
+> 
+> Something like this to clean up the mess:
+
+Will add a patch, thanks for catching this!
+
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index d4c872843a9d..96f8009a0d45 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -1018,9 +1018,6 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
+>  
+>         nested_svm_hv_update_vm_vp_ids(vcpu);
+>  
+> -       if (from_vmrun && !nested_svm_merge_msrpm(vcpu))
+> -               return -1;
+> -
+>         return 0;
+>  }
+>  
+> @@ -1094,7 +1091,8 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+>  
+>         svm->nested.nested_run_pending = 1;
+>  
+> -       if (enter_svm_guest_mode(vcpu, vmcb12_gpa, true)) {
+> +       if (enter_svm_guest_mode(vcpu, vmcb12_gpa, true) ||
+> +           nested_svm_merge_msrpm(vcpu)) {
+>                 svm->nested.nested_run_pending = 0;
+>                 svm->nmi_l1_to_l2 = false;
+>                 svm->soft_int_injected = false;
+> @@ -1158,24 +1156,16 @@ void svm_copy_vmloadsave_state(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
+>  int nested_svm_vmexit(struct vcpu_svm *svm)
+>  {
+>         struct kvm_vcpu *vcpu = &svm->vcpu;
+> +       gpa_t vmcb12_gpa = svm->nested.vmcb12_gpa;
+>         struct vmcb *vmcb01 = svm->vmcb01.ptr;
+>         struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
+>         struct vmcb *vmcb12;
+>         struct kvm_host_map map;
+> -       int rc;
+> -
+> -       rc = kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.vmcb12_gpa), &map);
+> -       if (rc) {
+> -               if (rc == -EINVAL)
+> -                       kvm_inject_gp(vcpu, 0);
+> -               return 1;
+> -       }
+>  
+>         vmcb12 = map.hva;
+>  
+>         /* Exit Guest-Mode */
+>         leave_guest_mode(vcpu);
+> -       svm->nested.vmcb12_gpa = 0;
+>         WARN_ON_ONCE(svm->nested.nested_run_pending);
+>  
+>         kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
+> @@ -1183,6 +1173,13 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>         /* in case we halted in L2 */
+>         kvm_set_mp_state(vcpu, KVM_MP_STATE_RUNNABLE);
+>  
+> +       svm->nested.vmcb12_gpa = 0;
+> +
+> +       if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
+> +               kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+> +               return 1;
+> +       }
+> +
+>         /* Give the current vmcb to the guest */
+>  
+>         vmcb12->save.es     = vmcb02->save.es;
+> @@ -1973,7 +1970,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>  
+>  static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>  {
+> -       if (WARN_ON(!is_guest_mode(vcpu)))
+> +       if (WARN_ON_ONCE(!is_guest_mode(vcpu)))
+>                 return true;
+>  
+>         if (!vcpu->arch.pdptrs_from_userspace &&
+> 
 
