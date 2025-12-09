@@ -1,196 +1,241 @@
-Return-Path: <kvm+bounces-65549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6900CAF31D
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 08:47:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 057C8CB002C
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 14:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47F07303CF75
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 07:46:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D38A3022181
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 13:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0759327B335;
-	Tue,  9 Dec 2025 07:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C7E331A7E;
+	Tue,  9 Dec 2025 13:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YTu0h0Js"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aAuKquFS";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCi5HFGP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D25816DEB1;
-	Tue,  9 Dec 2025 07:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765266409; cv=fail; b=CI9CTBdlDSjNPluqeji2K5JIp+ur3qz3ScgOnpMP7+81ItnSvKqsRhHrZk9bND1pDN9Mmixa/qmM8GwuceVWC0XrTXqX4+vF3VnN27wK/oZds8K4A8S8yfM/ogEcTPRnEpCSvQsLYnOdrzT1R4UATCArwJBpiOvLvJL9wMppbs4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765266409; c=relaxed/simple;
-	bh=HWzXRKn5+sMwCWe43DwYg/+wQQaKvzpyKmqd0zsfZao=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=q8P8UuyrYRH1uMe4bPy82QQyo4ZyCCupxj6gp/QZBy+pQyh8OQp+4pihQTNrNjsnIpztIL1tFKunT0/zcbA+Oeu+nS/gqrjn+TdLriAmnF9TSpHZpNbiXAHjGGddAQQDsjzP2IgqQyXt0as71ep5R8fnxaAR/TZF+w+FCLwVI3Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YTu0h0Js; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765266408; x=1796802408;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=HWzXRKn5+sMwCWe43DwYg/+wQQaKvzpyKmqd0zsfZao=;
-  b=YTu0h0JsJuyznJvs0RusqIb1FMcJchQi909ypQydJNBkTq4JQT/XlrUJ
-   hvXpFL2JJFeTGxtV9qoJXmqxQha69b5MfUeeiu251AxVN2f0g0rUmGCzr
-   wFYR4zhTg/QqnjimvViz251uHYAZy7+cJLVBwZLpFP/HA4C76f0XQddKB
-   6o2YF8+TO7MpptiIjkfdmRm0G94jzC9iRROAcIpCA5JGkJ2O5xUjKZO4c
-   zgn+FlnHOgb9YRXHt9NpeQ3XKD0qnaRU5nInPXhIAXXph+dB2ejoZBUi0
-   IvddFuhkD3BTgyd4Q/Qqobeci2AWi9s8VgnMKCmmDxNot59Hos6zj10rd
-   g==;
-X-CSE-ConnectionGUID: UhimuDT9QDqCsgh3Y6/jRw==
-X-CSE-MsgGUID: ZlOtGGeNQYWnhW7VqmpRNQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="66942090"
-X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="scan'208";a="66942090"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 23:46:47 -0800
-X-CSE-ConnectionGUID: v+Q5ubMzR0maHT8j0soMMA==
-X-CSE-MsgGUID: Z4CFglOvQVe6kgfnHu3lBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="scan'208";a="200598965"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 23:46:46 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 8 Dec 2025 23:46:45 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 8 Dec 2025 23:46:45 -0800
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.18) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 8 Dec 2025 23:46:45 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gUJroIHpMwDq8Y1qKfBRhd5kYPWE3yHVO5cCa9PzRHJq9exGPOtslVNPzdiagR8XxADd8hzuwqIWY2JBiYvFpQmIQRDObNOAzMFkurNpV8UBL7GWiXIymqYHjhoFMoFNtLqZHAxmKzLM0OkD3KYTMRgY35UQEA5vXTmuaPSBm33xIvfTxOfBKpsyPdCKVYr0sxaI+DjHA4re0t98gGgSiA1gJXt0DkviVjMHhUWuhv1kfaOVea/Z0120DDHkX8SBtzwollf+8n7zW11hL7JS8BIzeaL9JJ+pyZiqocoZ1XI4kjU+X+VXNXdkrxAwDi3stYaTWCRbtXu2sZ8NhGKxNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gxnq3Uh9eE4ljUQgsTNJ3l4GsYz27orYSSoR6l55jDg=;
- b=E9SgTPRbZtqAqekbSXvXQstHdm90Bt1OHxCVNoR8G8OfgEs/Lf39BmF6p3KuSOj5C+JNIqKGYoaV/kJG+7q65vnPhdc1U4UVERd0HVfK/GwpCTJ6ViC2wdGfrhQ11xijLZ9HuxabBMPoMX5RSeDPXQRQDzXZpDcCXYQU81IodTTu7qqWUaSzhgMldNa5UWBCW0Xije4YhnKLm4CC6NzbcVdxnd8q5BPbg2rjCoKwIGu2yPhPwQdSmujlXlu+NHOfx40c5tHCUi4kJ6m/7HwnYSxGf+sEaaNW78uX3QaaX3UeLtPK93rX1cMzLVN0eJfZ2Zswqsibgub87Wbgl5/CNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by DS7PR11MB6269.namprd11.prod.outlook.com (2603:10b6:8:97::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Tue, 9 Dec
- 2025 07:46:37 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::fdc2:40ba:101d:40bf%6]) with mapi id 15.20.9388.013; Tue, 9 Dec 2025
- 07:46:37 +0000
-Date: Tue, 9 Dec 2025 15:46:27 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>, <kvm@vger.kernel.org>, Dan Williams
-	<dan.j.williams@intel.com>
-Subject: Re: [PATCH v2 1/7] KVM: x86: Move kvm_rebooting to x86
-Message-ID: <aTfT05N++/hVWMyz@intel.com>
-References: <20251206011054.494190-1-seanjc@google.com>
- <20251206011054.494190-2-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251206011054.494190-2-seanjc@google.com>
-X-ClientProxiedBy: SGAP274CA0019.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::31)
- To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8BE331A61
+	for <kvm@vger.kernel.org>; Tue,  9 Dec 2025 13:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765285563; cv=none; b=K1Mbr4ZAhf/OZEQ44T1av14fNVS/mM0qj3pAlqzvmEyKEzyjIpbnj+IzfEq5pUHCkXk00QQPftcUqYf6BeQXsSSSHCU2M6s/oXeLaSs/gSe17qPZEowMlnvScTl9KXNucrIVFLfwywfMuRAEIaZpzxwCeoTo9wNuqukxZRopATI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765285563; c=relaxed/simple;
+	bh=8OpYSPc6f7O8KOMZoMzcw+MLAH+EZekjJDAjQynD8mQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kM4SJvYMDZQMy0LySwp4p+fK2mfjeLw6F0icBOnha9jOQRjVTxV77ptHY3sAYyUrAx/mi0jAg4ACai74XixVp6/E8TdjS7OKukfAxMrIvAH8reQkpz0ZzwRSftXNNqO9zf3a/LCu0W5iB5JtXh7h+MuyLWZbEKcKhBYj7HFaCyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aAuKquFS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LCi5HFGP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765285559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C7bt9DIhoeZ6jD2VdZvxOLbQYfNsQNZi6wdwI6g+uRA=;
+	b=aAuKquFSznDBlYW64+YRxrVpjtx1H6MlUK0/gojFXzC5q0YF4rr2eIt+KQslQmCdNolJNz
+	ILYByigZYfME70FFZgZB+RJxhdxsSUbWSp2GmVDc+G7Lf/UkB6MwSj5sDGxYag6w76AngH
+	nFT2nkDrAM91S6AKyYzd2+jiymnLFTw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-407-lvyQgW0LMFSKMP2VI-Y2-g-1; Tue, 09 Dec 2025 08:05:55 -0500
+X-MC-Unique: lvyQgW0LMFSKMP2VI-Y2-g-1
+X-Mimecast-MFC-AGG-ID: lvyQgW0LMFSKMP2VI-Y2-g_1765285554
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477a0ddd1d4so32567495e9.0
+        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 05:05:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765285554; x=1765890354; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C7bt9DIhoeZ6jD2VdZvxOLbQYfNsQNZi6wdwI6g+uRA=;
+        b=LCi5HFGP4mMudbYx5DhGs7rzLdnMbK1o+k8SosTdQc5PM5g9VdnO+f2QKrsz3N7yxY
+         jb/iMV5fSHuLCivLkavWbDh8m/tJUuXPuwUCHv8bEc/5KlEl9zCJwdAmmRmP6ylVyDlZ
+         miLRZ9PWu1ldk0xw70QGuV5cGhf+7E3lFfMTSiOiZ6Th/2R/5jekURdkNSq6ztwoqrqO
+         xb/lmtIX0N9xfUSBC2sF1mwYk26OGOSHhGyuCpmOXXr5PIFG7TkT+VXb+et6kdXf/Aal
+         XtOOGZOllHCchSwR1AKY949MCZaqX2W299b+SlvVE3j3KeJ3ZhI1kHnAHsF7bQlPoGZt
+         vmyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765285554; x=1765890354;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C7bt9DIhoeZ6jD2VdZvxOLbQYfNsQNZi6wdwI6g+uRA=;
+        b=moiYOdBdAQwV/GYC9ovAF4o052wcnfxif6Bft0fyJepMVtz7tbyOSMVKngp5Wj3tZg
+         tMn/4+S2EAPqJtSRbn/BEF2RiTS8Nibaz7H2uP6fATNMA5KsEgA/C6vEQ5jINt2RXuHf
+         cWWmlX1sm4IvtCN10U481fU5BpKUj0VEPMwO8cAqKinsorrv/gSAOild8wu7/BJMQGgG
+         Fse+4fV3Q0BdGIrFN/bQNY8WXlYXlgBTp411CKsatd+FUymgzpm0RYeOjAjparSFdGKE
+         nRGhN256JgcLbBOEYemgz+/sD2izNWRJQe3rrr4SEOKR1yMa/f/5FRnH7G2qlmCj4f1h
+         QOhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV54H0bVQ4QvLYxvyEVMRWYR0YfOvlNtBV0hJaX2BD642fl2/8wSTgH53dI2T51aFUYnwI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf651fU/9IpTo3kVpjapEuAvEsBHhdPpKv2AnLMj1cPm1cFO+E
+	d1Qq3mlsRT0PEx7GwZwWcQqeMOT/iFuFV8HI/UxMXo22GvABplVbUxugvcegXJehKQtpRkDzNcD
+	lalhhSJP8bpmnZQXkzdDrRSHO1ch6evwBkqJhQkZBgZ1B6VqKFn2MGg==
+X-Gm-Gg: ASbGncsyWWW2Nwfvs8STRCAuOtkh/4AEJKxMf3l0VvrEoPlqq/dqEehWe8KJhlVoihL
+	BHCUUdS3Y3sIbNgc1xk6rNrEypTBLZGfwmYUr96skZ6gla1S0CfWLdp/Wu73DT80n2gkcVaoFt1
+	hKBQ1+7s5WjF8TWmxsBdU6JtbVc5TgvMToXu8TJPgm+jv3VPsWw3XHEaU6HEEaFFML5URYEqOBe
+	TXRHz9HVsrZSwcmhSbkr+jI0tFYUKoe/R8aZMTeyldb+1ybJSbLRcs0qR7bbonNw5/DrVFoarRE
+	A9mdBKbPzvoGKzWol+4uOdjygz73tfH2sAakJiCQF9J5OP1zaZA694Qe/+njKnNzrYP29Ne/Usv
+	8XZrfnbWWCCbSPt5HkXQjEhSJBO9vKzr7iQ==
+X-Received: by 2002:a05:600c:1c1b:b0:477:b734:8c53 with SMTP id 5b1f17b1804b1-47939dfa09fmr106050935e9.12.1765285554110;
+        Tue, 09 Dec 2025 05:05:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHuQABtiUkLD+rMxYkpHCMPJ0jWGiDwWoX4yNSI50FHhHBBQ+qu1qOfQtW9LU1ZqHfufP6qYw==
+X-Received: by 2002:a05:600c:1c1b:b0:477:b734:8c53 with SMTP id 5b1f17b1804b1-47939dfa09fmr106050485e9.12.1765285553476;
+        Tue, 09 Dec 2025 05:05:53 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-38-228.inter.net.il. [80.230.38.228])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a7d357820sm17802735e9.2.2025.12.09.05.05.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Dec 2025 05:05:52 -0800 (PST)
+Date: Tue, 9 Dec 2025 08:05:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/vsock: improve RCU read sections around
+ vhost_vsock_get()
+Message-ID: <20251209080528-mutt-send-email-mst@kernel.org>
+References: <20251126133826.142496-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DS7PR11MB6269:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1b43779-a696-437f-e7f9-08de36f71549
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?8jpBsHDcqHkgbACF7YLScz1zpY7+VqpcBRmOEu/+8FwFeUYNmDHjcpVs3A9R?=
- =?us-ascii?Q?H+uOo2d7uGfL6M3f4fkTSWJkedmBDlmKsMm5MPhzt69pxB3Q9v/unXUJoH41?=
- =?us-ascii?Q?4bDsRgEDtca5csIqmOJZuEDbmyVgBY9GurNCIZetISfOIWymDS+TqtBbTtTH?=
- =?us-ascii?Q?JS373XU867vp5nb1KNURLjuQcl9cb79H2qQPduB+/M3kb4d6gro7kVqR+Dci?=
- =?us-ascii?Q?uEPu2FrqFj7Wn3T+mIBoLoxnpvnCcZtPYGmKC1pUlS2jxQaCDGE6uaXIoAdf?=
- =?us-ascii?Q?l27/2KYkCJEBDOMMAFz4xeDHuSwspM0luAVIIUWsKnrXcFKxpC2W9dI0S3PT?=
- =?us-ascii?Q?YoXQRCEN0sO/3g+BS5qUEkCTTh77Dzl3hvKa4gDKSB7k8NkrqSdcEOj/j8fV?=
- =?us-ascii?Q?aObSJrz3sX0JYYs0CHxpkiGESLZLDNDLRk1LPKXfqr8d4gQzOawRwCQGwueF?=
- =?us-ascii?Q?ZcmwXH1qqs2JDrI6DkkPpbW6/98BeY11N6ydgco/3SOWtc7iLCImOJ0SL4Yg?=
- =?us-ascii?Q?M6cy4vrYlU1XtXHNONqPmc/VyRZVIZFkj6/aQXNAZyMvv7TsiZV8rZYz6mUG?=
- =?us-ascii?Q?nItJT43cM1ciHwrVl3wGREwz/SaXvDTXJ2f15HE0Pp1bVxJXLWk7L5j6SUUs?=
- =?us-ascii?Q?5vS2ouADPSy6btAC2nz9ykK4obdZLHiX3gcF/4aSwl6Cu9GQMn3Eefhf6N50?=
- =?us-ascii?Q?XlOxHy81FtORJZ9PY858IjwRpQSfm3M9ar8SPi/pphP2v/xuvFfetKS387VM?=
- =?us-ascii?Q?huZGVCH6l+14ml0JgD21OxC6DmYcV8BlbCzfPnzZonKJAlQBCc7XenYiH4BR?=
- =?us-ascii?Q?04K4Tstj1F9efuOqWPila/RRAMXasZcrkxt9G+otMYELPwAG3wpmtMh9EgEn?=
- =?us-ascii?Q?ARWcVrxfhJOsLRnPYcOsNmhH9yzUBde9g4VV3lEdPHN6geUN16buutf5G4mb?=
- =?us-ascii?Q?nIZOkt2oyZgWkd5Dyia0OzQvw/WYuaF3vpi0+RPm8IoP7uY4oPRSRqnLqzy0?=
- =?us-ascii?Q?SBQTji7W8i32jh6W89aLMQP66m5msJvtI3FFAZMKGWdKG1jx7jGd+lbMPM8f?=
- =?us-ascii?Q?amI32jUbxVYmCxmoRwwvhdPRHKuqqgqERI+rjVsht2TstH8JdE0TMZVjzO2Q?=
- =?us-ascii?Q?kTaWtaUpTHrW3C2dtYJeCwIZ806KHeYAlwwGgZ6ip6+JMkZ2p1hYxOy6lT+K?=
- =?us-ascii?Q?nRJe6oKNJv0D4Rm/N7CAVcEedvFX1xPxSa1jf80B1KlMAiSsh5EPiZGxA62U?=
- =?us-ascii?Q?oKMmCrSLu2xU34S/+hsfwpO/TJhchyWjLfxgIhYEF7MAZapZ4tknVKIwNMzt?=
- =?us-ascii?Q?C9pn+7GcigwbmxfTZpBK6Cg3rTEReQzkWyxMX0VoB3dkUW+1zWUB5LUhANCh?=
- =?us-ascii?Q?QXYv0IavdVsG/kxdjfQvHPQjjf7WafdAs4Bj80Xi1qmAV7OS0jRUMh7jWLZl?=
- =?us-ascii?Q?SKixtZhKKtMxarpslgSzEW0pDmIyZBl6?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mPR+4LFQnsAAzXcoEb+ZN3WeLeCh9gCnbegqebygIHUCdP2ODAAolMnv1Cfr?=
- =?us-ascii?Q?IB0+VgDva2isLh8bYeyTkTqu3adtLBnZvUt23Big0uAGuQdNwk9IJO85U1fL?=
- =?us-ascii?Q?K+z72Az7/vgfCeS61lhMHldM2GqdgpEWBtXRPq04GEgzGNb4cIz/V2p5bUkP?=
- =?us-ascii?Q?PH9P/ezP+zA5gVCxm0lMBcb9DS5y5ATHS4QUXxGV9oeAROuAUdBcuxZyof/H?=
- =?us-ascii?Q?E0STrEa4AGeMbVKKIFSh6uWCe4DWo1PRkA6U6Jlij8Yc4CPIzc6EtaDsanoM?=
- =?us-ascii?Q?0Cs6/6gQatN3CIsXo/EmHCAFz2QxyFq1lOOzwhh8j5OEnDn/k2APx2W+RhPA?=
- =?us-ascii?Q?cqnuNYYoScsDutc5oW4vtVFHSKoBlTbCCaMA/5HmmjaSDl+MeDsoH+EGnHVu?=
- =?us-ascii?Q?cLS70iwUPD4UjpuitKjYbAjtNK5Wfckis+r1Km8v36V9gfKOB5x3Jc7yrLo7?=
- =?us-ascii?Q?aA2xjjjjq7oLYZm4hTAFUzbUHA7QudkNZiXp6P9pEPiy8xJXboYhXbu1df3B?=
- =?us-ascii?Q?mBPdMMP4mLTK9HvOU1X3sUvY0+wT0clKCbaTN80NBSfOfi46+XjhxBbrHe5R?=
- =?us-ascii?Q?MOS1H25DaMZbA+c9hCgBxblY6qhoz2vq7xvud/YRus1m9zlqyrKquBppeQjn?=
- =?us-ascii?Q?plM6cWR0PN0fEGQlHGUJ04HxULsdBhUd+dT6w826oGFRCMybHF+WPaTqitR6?=
- =?us-ascii?Q?7LlfbLL9JEhg+hVzJtru1vsayT6hcYIXFhnHJWGMYnb5wKfJNdaW5xTVSwp2?=
- =?us-ascii?Q?ODd0tnEXFN4/xEVn80i++vwRrUcVj9CYEGKxXfPOX+6aIhdezpQqYSE2UwR9?=
- =?us-ascii?Q?CSQwZDUK0/F+wQ7WGEUvfzqwm8j0z+TxRbgU45MrohdRVmrlunt+TqBw33iT?=
- =?us-ascii?Q?qCJlnz6b1xqXQLgVzvobiIIDFgPD0KQiz/Z+kG6I/dZXsC0aHOXBHOrSnEzE?=
- =?us-ascii?Q?x4R++iSiVokyLoxod5O2j9vu6trHDvuMtb/bP/VVFb3iNgt4WNJa8Tx+Cwjn?=
- =?us-ascii?Q?YUR1up5wrUIqeYHJauDiEoS5Kj+ApqMxqzFpRNPR2Wn4KVBof2+F4zouk7FA?=
- =?us-ascii?Q?ObvgOS8Omvx2Pa08b69vZOC/yU3UZ+rEjhd16t1oYw87ypG3erfyUM7Ax+c6?=
- =?us-ascii?Q?yta0t6MAnmGl9jA49yxvenp0BOrOskNc3Rhg8VX/yfOMxbkpEiWlileStq2k?=
- =?us-ascii?Q?TpvPt9RP3sggU/hGs1j/LM6u8YmDjupOx3We2cdrWPLYCjNCCul3mENG+6jk?=
- =?us-ascii?Q?v2s0j/5IjYQ3IdWTjfrgaen9AEcpNUkj0rzLkgzCedpWCJpfYA64KzhpRirG?=
- =?us-ascii?Q?Z3QWGNwwQX1t5+LA7GhvFEBwNNyF/FwnixwjYstU0BqzJLFytBPueRMZHHCK?=
- =?us-ascii?Q?A0ubiBdIMFuONXmNA5F1ceDxHWR7+Y2phYQL0NB772jVGWINCfPzElLg7YVx?=
- =?us-ascii?Q?doZ7H6dPSgt6ko2ulNzuy/hxdTZl+ncbVcZmhJE921JiikL2wpoaFdZ+apHo?=
- =?us-ascii?Q?73X4ZD6GiBwDF7ar6DMYsATlBLlBGLoWepbxHuLwUOzuf1oAoj5SVhajUoAB?=
- =?us-ascii?Q?RyRHWBmXS8AOTlo2Y6Dep1PCQMX49pMB5O8AtyRl?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1b43779-a696-437f-e7f9-08de36f71549
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2025 07:46:37.7324
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jJs90yhXS529G75gI8BnEz03CwmxJDbx0f+uWFZQ5+aL1kBQUA7w+W7Yu51NTPcxeZFQCYJRpaBuiFEs3OBx/g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6269
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126133826.142496-1-sgarzare@redhat.com>
 
-On Fri, Dec 05, 2025 at 05:10:48PM -0800, Sean Christopherson wrote:
->Move kvm_rebooting, which is only read by x86, to KVM x86 so that it can
->be moved again to core x86 code.  Add a "shutdown" arch hook to facilate
->setting the flag in KVM x86.
->
->Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Wed, Nov 26, 2025 at 02:38:26PM +0100, Stefano Garzarella wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> vhost_vsock_get() uses hash_for_each_possible_rcu() to find the
+> `vhost_vsock` associated with the `guest_cid`. hash_for_each_possible_rcu()
+> should only be called within an RCU read section, as mentioned in the
+> following comment in include/linux/rculist.h:
+> 
+> /**
+>  * hlist_for_each_entry_rcu - iterate over rcu list of given type
+>  * @pos:	the type * to use as a loop cursor.
+>  * @head:	the head for your list.
+>  * @member:	the name of the hlist_node within the struct.
+>  * @cond:	optional lockdep expression if called from non-RCU protection.
+>  *
+>  * This list-traversal primitive may safely run concurrently with
+>  * the _rcu list-mutation primitives such as hlist_add_head_rcu()
+>  * as long as the traversal is guarded by rcu_read_lock().
+>  */
+> 
+> Currently, all calls to vhost_vsock_get() are between rcu_read_lock()
+> and rcu_read_unlock() except for calls in vhost_vsock_set_cid() and
+> vhost_vsock_reset_orphans(). In both cases, the current code is safe,
+> but we can make improvements to make it more robust.
+> 
+> About vhost_vsock_set_cid(), when building the kernel with
+> CONFIG_PROVE_RCU_LIST enabled, we get the following RCU warning when the
+> user space issues `ioctl(dev, VHOST_VSOCK_SET_GUEST_CID, ...)` :
+> 
+>   WARNING: suspicious RCU usage
+>   6.18.0-rc7 #62 Not tainted
+>   -----------------------------
+>   drivers/vhost/vsock.c:74 RCU-list traversed in non-reader section!!
+> 
+>   other info that might help us debug this:
+> 
+>   rcu_scheduler_active = 2, debug_locks = 1
+>   1 lock held by rpc-libvirtd/3443:
+>    #0: ffffffffc05032a8 (vhost_vsock_mutex){+.+.}-{4:4}, at: vhost_vsock_dev_ioctl+0x2ff/0x530 [vhost_vsock]
+> 
+>   stack backtrace:
+>   CPU: 2 UID: 0 PID: 3443 Comm: rpc-libvirtd Not tainted 6.18.0-rc7 #62 PREEMPT(none)
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-7.fc42 06/10/2025
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x75/0xb0
+>    dump_stack+0x14/0x1a
+>    lockdep_rcu_suspicious.cold+0x4e/0x97
+>    vhost_vsock_get+0x8f/0xa0 [vhost_vsock]
+>    vhost_vsock_dev_ioctl+0x307/0x530 [vhost_vsock]
+>    __x64_sys_ioctl+0x4f2/0xa00
+>    x64_sys_call+0xed0/0x1da0
+>    do_syscall_64+0x73/0xfa0
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>    ...
+>    </TASK>
+> 
+> This is not a real problem, because the vhost_vsock_get() caller, i.e.
+> vhost_vsock_set_cid(), holds the `vhost_vsock_mutex` used by the hash
+> table writers. Anyway, to prevent that warning, add lockdep_is_held()
+> condition to hash_for_each_possible_rcu() to verify that either the
+> caller is in an RCU read section or `vhost_vsock_mutex` is held when
+> CONFIG_PROVE_RCU_LIST is enabled; and also clarify the comment for
+> vhost_vsock_get() to better describe the locking requirements and the
+> scope of the returned pointer validity.
+> 
+> About vhost_vsock_reset_orphans(), currently this function is only
+> called via vsock_for_each_connected_socket(), which holds the
+> `vsock_table_lock` spinlock (which is also an RCU read-side critical
+> section). However, add an explicit RCU read lock there to make the code
+> more robust and explicit about the RCU requirements, and to prevent
+> issues if the calling context changes in the future or if
+> vhost_vsock_reset_orphans() is called from other contexts.
+> 
+> Fixes: 834e772c8db0 ("vhost/vsock: fix use-after-free in network stack callers")
+> Cc: stefanha@redhat.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Reviewed-by: Chao Gao <chao.gao@intel.com>
+
+queued, thanks!
+
+> ---
+>  drivers/vhost/vsock.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index ae01457ea2cd..78cc66fbb3dd 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -64,14 +64,15 @@ static u32 vhost_transport_get_local_cid(void)
+>  	return VHOST_VSOCK_DEFAULT_HOST_CID;
+>  }
+>  
+> -/* Callers that dereference the return value must hold vhost_vsock_mutex or the
+> - * RCU read lock.
+> +/* Callers must be in an RCU read section or hold the vhost_vsock_mutex.
+> + * The return value can only be dereferenced while within the section.
+>   */
+>  static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
+>  {
+>  	struct vhost_vsock *vsock;
+>  
+> -	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid) {
+> +	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid,
+> +				   lockdep_is_held(&vhost_vsock_mutex)) {
+>  		u32 other_cid = vsock->guest_cid;
+>  
+>  		/* Skip instances that have no CID yet */
+> @@ -707,9 +708,15 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
+>  	 * executing.
+>  	 */
+>  
+> +	rcu_read_lock();
+> +
+>  	/* If the peer is still valid, no need to reset connection */
+> -	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
+> +	if (vhost_vsock_get(vsk->remote_addr.svm_cid)) {
+> +		rcu_read_unlock();
+>  		return;
+> +	}
+> +
+> +	rcu_read_unlock();
+>  
+>  	/* If the close timeout is pending, let it expire.  This avoids races
+>  	 * with the timeout callback.
+> -- 
+> 2.51.1
+
 
