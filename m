@@ -1,320 +1,274 @@
-Return-Path: <kvm+bounces-65543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E39CAEF7B
-	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 06:49:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0A93CAF0BB
+	for <lists+kvm@lfdr.de>; Tue, 09 Dec 2025 07:36:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2738F3024BE3
-	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 05:49:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12B6C305BC4C
+	for <lists+kvm@lfdr.de>; Tue,  9 Dec 2025 06:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B3031ED91;
-	Tue,  9 Dec 2025 05:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54C326B2AD;
+	Tue,  9 Dec 2025 06:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a7ACpsA1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qz5XTvzl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000D031ED7D;
-	Tue,  9 Dec 2025 05:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765259346; cv=fail; b=XZO4o8HuOomIr1vk0RzHSCoSVwKmiN0hrQ3KAJn817boes2SD/WFQ4iebNgAg6nXiMoRo822zoOilRR5XxAbZ5KfIXiKgEWPQLYDbjPjvtqqH1NNZTMoUMYCaiflwLxSqe43NjQBVx/zL5iGLYc+P3lD4xCD3KHQJEvMyzWXeCQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765259346; c=relaxed/simple;
-	bh=j4/NDTMhzQuX3e0fCAuTn86I0ve6cNqGh/kQIxyIWSI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=HpCrR2qDj45+0iOSj4OEalizb7ymyxQm0raABOv42WTd/PWG/SVE1Mjs1uRY/9txzh3xesgsUVnBD7fJJ7At5Q7+FHD6X4wjgvyG9qWHh3OHMRfO1APqUli9GeQ9yreQpNKid5aJNEKXYOGpchsGz7QTYBnJpjObQjriGhvQRzo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a7ACpsA1; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBA123D7F7;
+	Tue,  9 Dec 2025 06:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765261891; cv=none; b=cBqK2NyNVMlez5J4ycvtnEJcSf6+ow65g00D+3mATYh179+bE4nNUn+XYoM1V/mMU722mu9bDwsmPV+jxJ4Ah447yJWd+vxWgW3o+5PS/n0K+bCeIkwvACofJ8HC+nzyCncu1PX894WerHa0UMJ7+e9hQt+fiE+5n204qOQVcGY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765261891; c=relaxed/simple;
+	bh=3I2+FsbZXr1WnlAwsLrRK4zLjlcjjzCN2ZRMQ8uYaWE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=csUSJQq83t0cUgootLRoVFx2NPCVYkHKtOn0WfblofsC78PfIJkisrl26reQR2Ti9XuAyGa05LQajdRfRYeKZ1fE33VkLO757TuPYFv1tMT1dKq98LUnP9ESDHQBl4EdIbCGAgBHtzTFauE7D8xkSBt8w9A5rxqy6412liciaGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qz5XTvzl; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765259345; x=1796795345;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=j4/NDTMhzQuX3e0fCAuTn86I0ve6cNqGh/kQIxyIWSI=;
-  b=a7ACpsA1SeKj5YoKKDYOeso0qprQ22HJtfGD2tYdrRuTm/iR1i6D7XZF
-   6B5X/COD73A0+eUxZpLrv4BKrtYcPZXCAJyfbPCFW638ZrqwFtwliW0Mp
-   1ZODkAz3xBHFEUXJ1jfhdl6uY7Ve2X4/0jFUwOJLqDpOho7Ef4aldGCFF
-   KG3Sq06xiFY15SM9Ntq405qePFNd9zh7knlk9m+l0HUxkAkIDSQ80hCq8
-   KSU36irXnROqat7arvTBGn78yvkWmt5EuqPQU7jie2BmvAmWR/Ldrh5mD
-   faD/u+uYTzJv/79Yb+Kku/i+bI1UYzGoktdq/qbuqgvAEDyoflGgrSmhv
+  t=1765261888; x=1796797888;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=3I2+FsbZXr1WnlAwsLrRK4zLjlcjjzCN2ZRMQ8uYaWE=;
+  b=Qz5XTvzlod2viSVUR3nXbwVu2qtYZr4iJHqqpqMY9tQcwNx4j3Lrk15D
+   YAHn8ESHKTaPb+kj14UVcC4Q+SDNDw4UV8uGyKBYnebien9RXo9JIv4wL
+   BUpXTkPofdb8m0luAkkVnylyo4yjsybpLxPQnqU3HUKwHMVA1pei5kR9j
+   vRqJmZ2siX6/WOxOg9zqibLhFaCBP0/+LnRDc4E9Q60d2kVwmXv9vjKKW
+   xtRi+08G4ky0ohoebpY0N47P065msgJFGYRMEwTCDKEc2CpkZQh4rNS24
+   kUxAkmvck9n88QTMzphuRNGf31Fv09sjB4OBV4qgnydqU9lgXI7xtmjMb
    g==;
-X-CSE-ConnectionGUID: yY/nzqukTyePU51QUsC14w==
-X-CSE-MsgGUID: ekWYTeG/SnGo+Nr3RD9l8Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="67290470"
+X-CSE-ConnectionGUID: ttyxH3HLRDS2A+51g7bMHQ==
+X-CSE-MsgGUID: R3exEsBNScefUjTRRs4UIQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="84621508"
 X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="scan'208";a="67290470"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 21:49:04 -0800
-X-CSE-ConnectionGUID: 0+Ly5cvkRDWmacf3bs2uOQ==
-X-CSE-MsgGUID: ujNc6lHFTFGUQWk9oMndSA==
+   d="scan'208";a="84621508"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 22:31:28 -0800
+X-CSE-ConnectionGUID: E0aTtjOiTQelMO5dDdd7mA==
+X-CSE-MsgGUID: 9WXsel9CRiO4rC94VpUqXQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="scan'208";a="200609639"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 21:49:04 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 8 Dec 2025 21:49:02 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 8 Dec 2025 21:49:02 -0800
-Received: from CH5PR02CU005.outbound.protection.outlook.com (40.107.200.46) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 8 Dec 2025 21:49:02 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=chSwprdc/L21/ZyrSqny+E2hwz4b4YbvQegYcbkI6KI5++bQvv+6IM5DaJJcaLcCDx0LuAB5GSqJieILtagrA7434xx1Iy2RBwemqCmJUtREaCungP/2/HjzYLpTu/VvWG5W+M8NQwjOob60P4CC95uqIaXpbaRRB/oKGuU6TsbsKFlwWJ/GkBoqrWOlYTtXE94X8tdKxR3TgaVNXfWVLjpG1Kt8nyI6oV/ve8euQbuahzmdbTNqaAMNO4r/ja6argoCqfORxiUKRiiZlNBkb/RI6PIGI88aXAfjWnkOCTFDk+VOHYRzFL2PEht0UPa9hyCV7KAIl4DajLN3f8quUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JXLMyawvm/+12EjmlyJ+qnRCCZctu8PW7aM02Xgre/s=;
- b=LSTk05hSjpk5qskv+DaBJSxDIqwWfgC6v5EC1Eridyy01HlxO9AMr/4SHZlgy0IWzMGBcxSjRNrLyPPidnXrxh2HVofqR5UdWQZBweOVLtBwmbbZ6txJvhPF8cCbqTwRhx/dUTa8IpKikUFIrrIqVWXJQdzrAdFQn8To7GZcT2SH6pWIbz7JOXv8CArAZZuODrz1NOnMqEKfd5Kofh8OS8JjYTfv/wSksFFl3ShIkBYQv/XjUct27FKXDV4R1K0AFa4vWUMxjqcijAW/zY/hsJeE77EQ8Ai5hfkgS+td64d6iBYxO0bccPRgO9NeUliu7xEl/FqsUSOF/q+ZRKJloQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by BY1PR11MB7984.namprd11.prod.outlook.com (2603:10b6:a03:531::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Tue, 9 Dec
- 2025 05:49:00 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::fdc2:40ba:101d:40bf%6]) with mapi id 15.20.9388.013; Tue, 9 Dec 2025
- 05:49:00 +0000
-Date: Tue, 9 Dec 2025 13:48:51 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>, <kvm@vger.kernel.org>, Dan Williams
-	<dan.j.williams@intel.com>
-Subject: Re: [PATCH v2 2/7] KVM: x86: Extract VMXON and EFER.SVME enablement
- to kernel
-Message-ID: <aTe4QyE3h8LHOAMb@intel.com>
-References: <20251206011054.494190-1-seanjc@google.com>
- <20251206011054.494190-3-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251206011054.494190-3-seanjc@google.com>
-X-ClientProxiedBy: TP0P295CA0043.TWNP295.PROD.OUTLOOK.COM
- (2603:1096:910:4::18) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+   d="scan'208";a="196601217"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.12]) ([10.124.240.12])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 22:31:20 -0800
+Message-ID: <8365c5ca-637d-4bef-a404-eb2166d384f5@linux.intel.com>
+Date: Tue, 9 Dec 2025 14:31:17 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|BY1PR11MB7984:EE_
-X-MS-Office365-Filtering-Correlation-Id: f6c0e914-daa3-4c7e-e0af-08de36e6a6d9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?mGSPI9/1KsjdiDBSgVSVYRz7WIIP+MAKh6VkHDOjGO4pioK9yqZ6RIw6TlU/?=
- =?us-ascii?Q?1HTm5G5W64Oe0HY5BMbTLduV4KC+7yA/V9icKqSZrXHj2KGWMlaMxo8Hc76I?=
- =?us-ascii?Q?ncIlJ4rcwWxnoRDPARGg9SNMxdL5DL6kKdOH58xY8TDmkWiqJg9lbI3zgbj+?=
- =?us-ascii?Q?mK9/yx0fQi/6NEjtNgpZAUkSBtM9JpWWKjhkOyWdHl+/9LeltBhRaXLhtFa+?=
- =?us-ascii?Q?p4ntRkNoeAJph0AUMH8mJhBf6s5D0qpM9Bn3GuHtwEwtB9QM2Op0p1GCyTkT?=
- =?us-ascii?Q?nbEUg4IB1kePqq/RBx4BCMVcBuosTkCtIUbzPMQJMRmdumJYj7nUzE1fGGgi?=
- =?us-ascii?Q?1U/U7nvmC/kmN4X6oHJ8/KPMSl17EzZ4l0x+2vhjs1jBL7Y6yZxIJx0+HsQJ?=
- =?us-ascii?Q?FEb4GxBOjjmsw8hMZrKGB4XjZa+SU+PPv6SXJ8O+XPSYqkXj3iF+ozUsXlLZ?=
- =?us-ascii?Q?lh3TOE4KbRwQ7WKzTs+fCIqdBbabDuFy9YwrCyOcwuckwtF402Rw7jJKC0os?=
- =?us-ascii?Q?wzVEWDUEE5EThIne1JlNLBsF9i1ADIbxSmxQVbZhFfsFHR5J7tN7drutI9hI?=
- =?us-ascii?Q?7LeHm04PSLnNp0TP2mr/1+hDeL024lqL1jtjr7R/YgFBV9mhLDNkd31TMqJN?=
- =?us-ascii?Q?H12foRVKGfByDE+xhwnWwjr5gIYPWNEvx0MPaU1kYWvZFNf9R0IqFSkwAafO?=
- =?us-ascii?Q?b5+G4yxSwNyLwlafPp6qiS8JxcoEGF8aCE0QxxE7PCgEPTyc0ZYe8Ba7zm00?=
- =?us-ascii?Q?7z4mKPepXqLGJv2rNJC5Py9KtTwkC2pfgfnuAWp/+tNB8o2zM2tkhD6n0zh+?=
- =?us-ascii?Q?axnmjAvlJBNvCqpxq6g7H24wYzh21m4D4zJ1PmwIMnsFOklJ8OgmMLgFlWRj?=
- =?us-ascii?Q?2fge3U1w/G2JDRIu5/3beTwsF4SJ97I2QdzAv0vfGZQK7ON63lKBmsK6UlcN?=
- =?us-ascii?Q?xqS8dKLA5rc/4msFfrFAU9dnnir7JJmlg3EIU2K9znLNhnEXHAo1BBFebhyA?=
- =?us-ascii?Q?ghNX/iBYnQJg5srsdjVSHNQp9Y0H/bL4cR/ILwyYvG6QmxGLfWBhYgs0LPdb?=
- =?us-ascii?Q?htDSSljdEvfgIEu8yMrUqgcOj2KKSgeEdL4sKerW4juQ+eQ2h0l21zGPtalW?=
- =?us-ascii?Q?UXnF6ol9PDg2MiuHCpFRf4T2WqKW8pwCgagAKatmMRzOxSSy+8fHlnjJmHKY?=
- =?us-ascii?Q?uyVrsmSN335Ef0ytxpxwurRfUVDEoqdVJd92ZXxxfQToUOWEvGaY4SQTvH55?=
- =?us-ascii?Q?yZX8qgNx+OVSRNq/BvivnX9kxkGZ+IzU0SPMiQqpSIpTBWIjh3TOzXuFujvc?=
- =?us-ascii?Q?s0yh4GfKSOS4sakfNdJOyDG56uLl0cnAXDU4q/uZAPDdEVdnMopS6AHCUf3S?=
- =?us-ascii?Q?tWCJT+kzAKXe9ENdl/8zESBTFds/vPIJADSI11edPRAik/mjlrT8uuxqCkIg?=
- =?us-ascii?Q?9BcpVNYABkyyt62EGdaTvzHPF/05C8Fn?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?G3cK8w5zCqS4yYrq3O9nKF6oZ5aSF8yZZJUTIOdqgaUuVE3RPpf2inDtsJx8?=
- =?us-ascii?Q?lltEYZWVfiBc21t0u2KjAAj0oKSLahr6x8HFgid2AE4wETuyJQjgHnls9cOe?=
- =?us-ascii?Q?bWW7AkN7S6bj2uOesPsCeq2RWJEaDbAhnONZ83ZtdcnjEJWeYcwZga8Vu/xV?=
- =?us-ascii?Q?UkzsCCmFM94De94OQQKsa0Ds3RJ7aI6n5eoyCE3n1J8ONxIcpUpZFvqLvtJX?=
- =?us-ascii?Q?cPEwPknMWvbHnxE71wc+ZayWKqdCId2OqSKGmhVyZSmtCTT9dYNUXK8BmxRc?=
- =?us-ascii?Q?zfa63EG60CbtcHa1R0nqePX8XjXnm+qkdLh6GDk02EoTUIl9n14dsl7Rkgtv?=
- =?us-ascii?Q?uNhUqiJqW+YP10Q8nAQdowPPPhD5pQ0sahkbtv14C0S07aOLPbA5QVjnXdYO?=
- =?us-ascii?Q?INMR6BBh1NtsncFLTeTGVz4+70KPOdsyAhk41Joie4hUxiAQEUHKgVZa9bf/?=
- =?us-ascii?Q?GrSXO288gxDzI1WBa7sYbtlX/LE61Z8aJRDhUn+wCgerHTTGGeV51dDIdCix?=
- =?us-ascii?Q?tEbJRDMGM6lYnx9p7HvOBYJ+rGbLbJ8S/UHsmkcCPLLngJ95h5egmFW0MwIH?=
- =?us-ascii?Q?UblUSDPkjtr+74bmoI6D6PzkvTdUao0jAMScyKz6aOQTfbuM4cRznCg1FYGG?=
- =?us-ascii?Q?vPPKWjwo5o12/+PnDiE1swjqCd0wr9GD6LD/4TS4sUJ1LkVkj1gPzcNZLXNE?=
- =?us-ascii?Q?dw+TJZ4yOXJ1ZlzAx1Y3TNnuHtATLNrDjDeDknU9i/ERjgk7JfoUir04u/ea?=
- =?us-ascii?Q?ld4NTEKnvKYkGRKZLfjKa8kuey1zILGTw5rMLlogeX0AmwNP3qM8i8+wNQm2?=
- =?us-ascii?Q?2ZIRNfC1QR0Uy319mGELHO4UllIDfdhnr/GJa62aHPaJLWaT9f+SuER/8qV2?=
- =?us-ascii?Q?eGG2VPM+GUshFop1Mo1xJuVu6MPpK+nCzAcuN2c6LX8in6aWwZST2MkS/YP6?=
- =?us-ascii?Q?iyaaRolb+lcjuGeg7P4ZjmTLdYx3iN3Vodp7sBsxg6/T6c8sWeqfq0CpLqzB?=
- =?us-ascii?Q?w2tU1XsD6HiZWUamFPHqe4oXErN0rJN8tGxvWwLbBa/fZQr+srJLpbw/SOvn?=
- =?us-ascii?Q?ZgAcRdcelwGWtkGYf1k6Y5PDKlTjNuT/Nw1KtEG0C/pPQOiH3CvlYs8y+t/N?=
- =?us-ascii?Q?EvFIJ52XyrCyZ40dIN/wk1LGWy9izpcBpFS2+r6k339WrfPX2aGqocx7pAv0?=
- =?us-ascii?Q?FGu74An/ynrlZ6EdtBxleQybrQGiJDipi9rHNqF2bPGM1Kb7u6F2EpXrirLU?=
- =?us-ascii?Q?IeRWuclqNJerjvobMyh6Lk/PNNdpPiICmtFECvsq0yaA7yhl0fNUU+53Ebqe?=
- =?us-ascii?Q?0gw9VVdphRmbsBV+zgXQrWyPTds1VfYP2cF/eIBrxK5hdmR0zZdhUPrgn2MD?=
- =?us-ascii?Q?Tk+biHrMgXBhrexJ9x6qUp9w2MBo/MFuJGU8PN99c8tkEhDLLFrcc9BW0lrB?=
- =?us-ascii?Q?wwoYKqdHpa5n5cafSYhOhjHI6ugdXR2zbG7HCYfh5afvOHM4LhvIHvRBtOEA?=
- =?us-ascii?Q?kuxFJRGdtUgLPZbZuGWaSI8RgOtR4XCndJD04e2dGcEsw0QiEiuA0fAMpUrW?=
- =?us-ascii?Q?xFWZSVKzKGK+sJZ6NceBqkUVIUa+7JeOISu8AYwv?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6c0e914-daa3-4c7e-e0af-08de36e6a6d9
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2025 05:49:00.4584
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L/qCoMoEX+GTVc44etaaL167qJGjz1JLGoS3HpDcW4awR25/6QSBn6XTVtbt4iFlaOS9dUmMhjLeFBhndzh6Eg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB7984
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 44/44] KVM: VMX: Add mediated PMU support for CPUs
+ without "save perf global ctrl"
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
+ Sandipan Das <sandipan.das@amd.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
+References: <20251206001720.468579-1-seanjc@google.com>
+ <20251206001720.468579-45-seanjc@google.com>
+ <ee30ed9c-6377-4d14-b930-f0e2c809df7c@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <ee30ed9c-6377-4d14-b930-f0e2c809df7c@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->--- /dev/null
->+++ b/arch/x86/include/asm/virt.h
->@@ -0,0 +1,26 @@
->+/* SPDX-License-Identifier: GPL-2.0-only */
->+#ifndef _ASM_X86_VIRT_H
->+#define _ASM_X86_VIRT_H
->+
->+#include <asm/reboot.h>
 
-asm/reboot.h isn't used.
+On 12/8/2025 5:39 PM, Mi, Dapeng wrote:
+> On 12/6/2025 8:17 AM, Sean Christopherson wrote:
+>> Extend mediated PMU support for Intel CPUs without support for saving
+>> PERF_GLOBAL_CONTROL into the guest VMCS field on VM-Exit, e.g. for Skylake
+>> and its derivatives, as well as Icelake.  While supporting CPUs without
+>> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL isn't completely trivial, it's not that
+>> complex either.  And not supporting such CPUs would mean not supporting 7+
+>> years of Intel CPUs released in the past 10 years.
+>>
+>> On VM-Exit, immediately propagate the saved PERF_GLOBAL_CTRL to the VMCS
+>> as well as KVM's software cache so that KVM doesn't need to add full EXREG
+>> tracking of PERF_GLOBAL_CTRL.  In practice, the vast majority of VM-Exits
+>> won't trigger software writes to guest PERF_GLOBAL_CTRL, so deferring the
+>> VMWRITE to the next VM-Enter would only delay the inevitable without
+>> batching/avoiding VMWRITEs.
+>>
+>> Note!  Take care to refresh VM_EXIT_MSR_STORE_COUNT on nested VM-Exit, as
+>> it's unfortunately possible that KVM could recalculate MSR intercepts
+>> while L2 is active, e.g. if userspace loads nested state and _then_ sets
+>> PERF_CAPABILITIES.  Eating the VMWRITE on every nested VM-Exit is
+>> unfortunate, but that's a pre-existing problem and can/should be solved
+>> separately, e.g. modifying the number of auto-load entries while L2 is
+>> active is also uncommon on modern CPUs.
+>>
+>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>> ---
+>>  arch/x86/kvm/vmx/nested.c    |  6 ++++-
+>>  arch/x86/kvm/vmx/pmu_intel.c |  7 -----
+>>  arch/x86/kvm/vmx/vmx.c       | 52 ++++++++++++++++++++++++++++++++----
+>>  3 files changed, 52 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 614b789ecf16..1ee1edc8419d 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -5142,7 +5142,11 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+>>  
+>>  	kvm_nested_vmexit_handle_ibrs(vcpu);
+>>  
+>> -	/* Update any VMCS fields that might have changed while L2 ran */
+>> +	/*
+>> +	 * Update any VMCS fields that might have changed while vmcs02 was the
+>> +	 * active VMCS.  The tracking is per-vCPU, not per-VMCS.
+>> +	 */
+>> +	vmcs_write32(VM_EXIT_MSR_STORE_COUNT, vmx->msr_autostore.nr);
+>>  	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
+>>  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
+>>  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index 55249fa4db95..27eb76e6b6a0 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -777,13 +777,6 @@ static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_
+>>  	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl()))
+>>  		return false;
+>>  
+>> -	/*
+>> -	 * KVM doesn't yet support mediated PMU on CPUs without support for
+>> -	 * saving PERF_GLOBAL_CTRL via a dedicated VMCS field.
+>> -	 */
+>> -	if (!cpu_has_save_perf_global_ctrl())
+>> -		return false;
+>> -
+>>  	return true;
+>>  }
+>>  
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 6a17cb90eaf4..ba1262c3e3ff 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -1204,6 +1204,17 @@ static bool update_transition_efer(struct vcpu_vmx *vmx)
+>>  	return true;
+>>  }
+>>  
+>> +static void vmx_add_autostore_msr(struct vcpu_vmx *vmx, u32 msr)
+>> +{
+>> +	vmx_add_auto_msr(&vmx->msr_autostore, msr, 0, VM_EXIT_MSR_STORE_COUNT,
+>> +			 vmx->vcpu.kvm);
+>> +}
+>> +
+>> +static void vmx_remove_autostore_msr(struct vcpu_vmx *vmx, u32 msr)
+>> +{
+>> +	vmx_remove_auto_msr(&vmx->msr_autostore, msr, VM_EXIT_MSR_STORE_COUNT);
+>> +}
+>> +
+>>  #ifdef CONFIG_X86_32
+>>  /*
+>>   * On 32-bit kernels, VM exits still load the FS and GS bases from the
+>> @@ -4225,6 +4236,8 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
+>>  
+>>  static void vmx_recalc_pmu_msr_intercepts(struct kvm_vcpu *vcpu)
+>>  {
+>> +	u64 vm_exit_controls_bits = VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+>> +				    VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
+>>  	bool has_mediated_pmu = kvm_vcpu_has_mediated_pmu(vcpu);
+>>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> @@ -4234,12 +4247,19 @@ static void vmx_recalc_pmu_msr_intercepts(struct kvm_vcpu *vcpu)
+>>  	if (!enable_mediated_pmu)
+>>  		return;
+>>  
+>> +	if (!cpu_has_save_perf_global_ctrl()) {
+>> +		vm_exit_controls_bits &= ~VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
+>> +
+>> +		if (has_mediated_pmu)
+>> +			vmx_add_autostore_msr(vmx, MSR_CORE_PERF_GLOBAL_CTRL);
+>> +		else
+>> +			vmx_remove_autostore_msr(vmx, MSR_CORE_PERF_GLOBAL_CTRL);
+>> +	}
+>> +
+>>  	vm_entry_controls_changebit(vmx, VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
+>>  				    has_mediated_pmu);
+>>  
+>> -	vm_exit_controls_changebit(vmx, VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
+>> -					VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
+>> -				   has_mediated_pmu);
+>> +	vm_exit_controls_changebit(vmx, vm_exit_controls_bits, has_mediated_pmu);
+>>  
+>>  	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+>>  		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i,
+>> @@ -7346,6 +7366,29 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+>>  					      msrs[i].host);
+>>  }
+>>  
+>> +static void vmx_refresh_guest_perf_global_control(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> +
+>> +	if (msr_write_intercepted(vmx, MSR_CORE_PERF_GLOBAL_CTRL))
+>> +		return;
+>> +
+>> +	if (!cpu_has_save_perf_global_ctrl()) {
+>> +		int slot = vmx_find_loadstore_msr_slot(&vmx->msr_autostore,
+>> +						       MSR_CORE_PERF_GLOBAL_CTRL);
+>> +
+>> +		if (WARN_ON_ONCE(slot < 0))
+>> +			return;
+>> +
+>> +		pmu->global_ctrl = vmx->msr_autostore.val[slot].value;
+>> +		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, pmu->global_ctrl);
+>> +		return;
+>> +	}
+>> +
+>> +	pmu->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
+>> +}
+>> +
+>>  static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit)
+>>  {
+>>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> @@ -7631,8 +7674,7 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
+>>  
+>>  	vmx->loaded_vmcs->launched = 1;
+>>  
+>> -	if (!msr_write_intercepted(vmx, MSR_CORE_PERF_GLOBAL_CTRL))
+>> -		vcpu_to_pmu(vcpu)->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
+>> +	vmx_refresh_guest_perf_global_control(vcpu);
+>>  
+>>  	vmx_recover_nmi_blocking(vmx);
+>>  	vmx_complete_interrupts(vmx);
+> The change looks good to me, but I still have no bandwidth to test the code
+> on Ice lake, I would go back after I finish the tests. Thanks.
 
->+
->+typedef void (cpu_emergency_virt_cb)(void);
->+
->+#if IS_ENABLED(CONFIG_KVM_X86)
->+extern bool virt_rebooting;
->+
->+void __init x86_virt_init(void);
->+
->+int x86_virt_get_cpu(int feat);
->+void x86_virt_put_cpu(int feat);
->+
->+int x86_virt_emergency_disable_virtualization_cpu(void);
->+
->+void x86_virt_register_emergency_callback(cpu_emergency_virt_cb *callback);
->+void x86_virt_unregister_emergency_callback(cpu_emergency_virt_cb *callback);
->+#else
->+static __always_inline void x86_virt_init(void) {}
+Tested below test cases on Skylake and Sapphire Rapids servers for both
+mediated vPMU and Perf based emulated vPMU, no issue is found. Thanks.
 
-Why does this need to be "__always_inline" rather than just "inline"?
+Kselftests: pmu_counters_test/pmu_event_filter_test/vmx_pmu_caps_test
 
-> static void emergency_reboot_disable_virtualization(void)
-> {
-> 	local_irq_disable();
->@@ -587,16 +543,11 @@ static void emergency_reboot_disable_virtualization(void)
-> 	 * We can't take any locks and we may be on an inconsistent state, so
-> 	 * use NMIs as IPIs to tell the other CPUs to disable VMX/SVM and halt.
-> 	 *
->-	 * Do the NMI shootdown even if virtualization is off on _this_ CPU, as
->-	 * other CPUs may have virtualization enabled.
->+	 * Safely force _this_ CPU out of VMX/SVM operation, and if necessary,
->+	 * blast NMIs to force other CPUs out of VMX/SVM as well.k
+KVM-unit-tests: pmu/pmu_lbr/pmu_pebs
 
-								 ^ stray "k".
+Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-I don't understand the "if necessary" part. My understanding is this code
-issues NMIs if CPUs support VMX or SVM. If so, I think the code snippet below
-would be more readable:
+Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-	if (cpu_feature_enabled(X86_FEATURE_VMX) ||
-	    cpu_feature_enabled(X86_FEATURE_SVM)) {
-		x86_virt_emergency_disable_virtualization_cpu();
-		nmi_shootdown_cpus_on_restart();
-	}
 
-Then x86_virt_emergency_disable_virtualization_cpu() wouldn't need to return
-anything. And readers wouldn't need to trace down the function to understand
-when NMIs are "necessary" and when they are not.
-
-> 	 */
->-	if (rcu_access_pointer(cpu_emergency_virt_callback)) {
->-		/* Safely force _this_ CPU out of VMX/SVM operation. */
->-		cpu_emergency_disable_virtualization();
->-
->-		/* Disable VMX/SVM and halt on other CPUs. */
->+	if (!x86_virt_emergency_disable_virtualization_cpu())
-> 		nmi_shootdown_cpus_on_restart();
->-	}
-> }
-
-<snip>
-
->+#define x86_virt_call(fn)				\
->+({							\
->+	int __r;					\
->+							\
->+	if (IS_ENABLED(CONFIG_KVM_INTEL) &&		\
->+	    cpu_feature_enabled(X86_FEATURE_VMX))	\
->+		__r = x86_vmx_##fn();			\
->+	else if (IS_ENABLED(CONFIG_KVM_AMD) &&		\
->+		 cpu_feature_enabled(X86_FEATURE_SVM))	\
->+		__r = x86_svm_##fn();			\
->+	else						\
->+		__r = -EOPNOTSUPP;			\
->+							\
->+	__r;						\
->+})
->+
->+int x86_virt_get_cpu(int feat)
->+{
->+	int r;
->+
->+	if (!x86_virt_feature || x86_virt_feature != feat)
->+		return -EOPNOTSUPP;
->+
->+	if (this_cpu_inc_return(virtualization_nr_users) > 1)
->+		return 0;
-
-Should we assert that preemption is disabled? Calling this API when preemption
-is enabled is wrong.
-
-Maybe use __this_cpu_inc_return(), which already verifies preemption status.
-
-<snip>
-
->+int x86_virt_emergency_disable_virtualization_cpu(void)
->+{
->+	if (!x86_virt_feature)
->+		return -EOPNOTSUPP;
->+
->+	/*
->+	 * IRQs must be disabled as virtualization is enabled in hardware via
->+	 * function call IPIs, i.e. IRQs need to be disabled to guarantee
->+	 * virtualization stays disabled.
->+	 */
->+	lockdep_assert_irqs_disabled();
->+
->+	/*
->+	 * Do the NMI shootdown even if virtualization is off on _this_ CPU, as
->+	 * other CPUs may have virtualization enabled.
->+	 *
->+	 * TODO: Track whether or not virtualization might be enabled on other
->+	 *	 CPUs?  May not be worth avoiding the NMI shootdown...
->+	 */
-
-This comment is misplaced. NMIs are issued by the caller.
-
->+	(void)x86_virt_call(emergency_disable_virtualization_cpu);
->+	return 0;
->+}
+>
+>
 
