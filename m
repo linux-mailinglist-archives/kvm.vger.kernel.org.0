@@ -1,160 +1,105 @@
-Return-Path: <kvm+bounces-65641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C4ACB1995
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 02:31:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 621D5CB19BC
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 02:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 561A830ACE88
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 01:31:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1CED83023143
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 01:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5978313B584;
-	Wed, 10 Dec 2025 01:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RDcQYWSf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2275422A4E9;
+	Wed, 10 Dec 2025 01:38:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46D621348
-	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 01:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C861FBC8C;
+	Wed, 10 Dec 2025 01:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765330270; cv=none; b=b7aG3P/8N4fW/t21e2wYdB6WKWBhayy8ObbR+A6IbMTIUlY/YVbzxDXnzlZgzYLGyacIrf0oIUDgubCMHkBnY5chVQwnVqjmVDE/rUZJJTwb9D8EGNIXgP8gtX4M7IxcYvV2Y+NmRxEMJXr6wcK2qrocoKIQInD0tp9SO+7jiL4=
+	t=1765330737; cv=none; b=BVIDtYQJ4Sol5op2JlzORKypMPA3FTPcjcy1atfmSa0CEpwlbNHHksPx1a+o4zY2D+jA9V1ahyusuuCelk8cfFfuWe+MTSqTGfKwUmPo305YH7UXhruW6gM4M7fcIXpsZB5RsYFKJ23c17X+c33IcBHNSE6eG+RIRN4gBkIWNkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765330270; c=relaxed/simple;
-	bh=Mz4duiLLOCuTkZoXLIiKLsuzgdGwTO/UITCx+NF6Vks=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iFKsXyknO5r6+cHn1jdXKOYQLuRBbXQccy8RVgwoj+YCxqYfx5YwoZm5YEjsruvrDvLdlCsAgoOpMx5GQhbI1MDngao8FGNC9OfoUSRcx5qJlPGutJNgf8Yzyj9pOCCSPwavykhoBTR4peNugPrqqd/tfymoIR7SapYlCOscdN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RDcQYWSf; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2980343d9d1so63885ad.1
-        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 17:31:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765330268; x=1765935068; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Irk9fv4Q2mcS2kxJhDraOCY7fgGZVB2P6dCuM+yvEZM=;
-        b=RDcQYWSfd+VRtNQW3vCvBUxJ2Ap2r7df2vk6l/owuFA7DEECNUbRHJr8zx+IY8bq1P
-         nTEEtE2tD5j78cgKZuaJb6fOfqlUC38ms9clhvjravWzTj4mBscSNF1r8yttVWjU+iGg
-         usD02Lya+XgClJT0Kh8CQuTtWGod5cys6ldIXafXZ6Dyd3oeB80Nj7hH8V/DFthoBy15
-         hksFqhtIdK1ftFEKgChZ43dfqwqBM7W80d4hN+YCCaqzCG1QngflSN4oFFLlvhXLvKiU
-         TUEiE1mcvMLb/HyzMp23ISOFj5menAcdX8kIzXrNq/xAhevXqYljjfEsyod3lVUP0n/I
-         90Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765330268; x=1765935068;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Irk9fv4Q2mcS2kxJhDraOCY7fgGZVB2P6dCuM+yvEZM=;
-        b=IE5w4oQbsMVnS07PxHEdFI7kL7ULsyWcxEUfpcYAIC9FUBn3FlawhQbch9/zVe5wnI
-         0qubZBXDKe35ZYfmn5NBPnkFPWKW3OjRfHPYz00aySWtRsB+lr/ZvWn6BWBH0F1kZ+Kd
-         g+7jpy9+TvD0efIcx2SHhGDk2KKBiUu9WrVDkmqDKeBe1ZYk+EusUEVUxte9A/TEMLGg
-         BZX9GF2WN0EOxNAgeojRKUKN5h68jTcSKHKRD4rdicrjbvl4k/65/LGV6dIqg72cyjsx
-         yIZ4+1qOnsnpGfYWYlKkouZ9M/c0yKxOKm9rysn5/WrM1Itr1v//Jm1ZOfJx7730mLlc
-         y1AA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGdK07/AMjBFK/YqtG08tadBM+eweuGX/oM/FMNlOWcx73S/hp5JmBvSqXdyWtElgGlaA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysiDAEa6bkfholjqcBWuR+cQOEMMBZvcD2SyZzKyUAWjFgBF2F
-	UEOBWw2aE34GcuI6+PJgriU7QIlhCyTtL32iIP7MikOr27tZ/mcDCVj7fheIlhI/fJ25TOViNUa
-	hckTAkNKNQA+6bnT9vcGGU+XXa3fx2mgizqbYZlx1
-X-Gm-Gg: ASbGncvOMPE++zqVecHPXWnZRSW8H+Nwx62DXQ5GKYDEgoRRPR/n4qcUXneBr97afzA
-	zCdHMK5xxCy5ak2ZGzlFvXHdJ5liPm3TIhcsvziakYWwu6uxAPYBsjfUlDsAGeQaFDfZPMU5jnH
-	LTiSmTV5d8150u89/Y5LP6KqgogKcFALNnL4DDP1VsvllUUtqoH3POq9vduq/QEnrA4BLp2riu4
-	u+uN9A9/yAgMP2wW8XQRzymjUj9fkWE9TvOvSSUclB5blLUMr11MAo1X2Q+YluqrcYq85UIOszI
-	ABLZZsyKbQDd5tViSfWjQOFTew==
-X-Google-Smtp-Source: AGHT+IEXSESfKg2H/d/T2jQGj1KKKqp/LxvlOlAwGVnAV3NhgtKbCFFCTKcDjo+wHeUD1zSJMEuloFAMt74Rnxr5ZAs=
-X-Received: by 2002:a05:7022:305:b0:11a:2020:aca7 with SMTP id
- a92af1059eb24-11f28e640aamr79429c88.2.1765330267539; Tue, 09 Dec 2025
- 17:31:07 -0800 (PST)
+	s=arc-20240116; t=1765330737; c=relaxed/simple;
+	bh=mW/oCegFkS5JO20NVxMb1WA+su3p2YksHjarrgW3EvQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qQuOkNaPGyJj/70qspYVdychXc9R0761w66L3ffR7Y+KIayBBAiAFvwB0e0fleHziGIyQi2edPJOQyBzGE8+XfjmhdSpW1gHUgADK6BN9zqpve/AKAFXbzNb/ki9JNE0+8+QK/13w3D4YQxOVG9urOMkjeJKEQSHIMnmd3KB/rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8CxqdEpzzhpt90sAA--.31867S3;
+	Wed, 10 Dec 2025 09:38:49 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxrcEbzzhpyKJHAQ--.31721S3;
+	Wed, 10 Dec 2025 09:38:38 +0800 (CST)
+Subject: Re: [PATCH v3 10/10] crypto: virtio: Add ecb aes algo support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Gonglei <arei.gonglei@huawei.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=c3=a9rez?=
+ <eperezma@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
+ linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20251209022258.4183415-1-maobibo@loongson.cn>
+ <20251209022258.4183415-11-maobibo@loongson.cn>
+ <20251209232524.GE54030@quark>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <4ac7b5b9-d819-62b5-1425-0e0b07762120@loongson.cn>
+Date: Wed, 10 Dec 2025 09:36:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250807093950.4395-1-yan.y.zhao@intel.com> <20250807094202.4481-1-yan.y.zhao@intel.com>
- <CAGtprH8zEKcyx_i7PRWd-fXWeuc+sDw7rMr1=zpgkbT-sfS6YA@mail.gmail.com> <aTjKV/hAEO4odtDQ@yzhao56-desk.sh.intel.com>
-In-Reply-To: <aTjKV/hAEO4odtDQ@yzhao56-desk.sh.intel.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Tue, 9 Dec 2025 17:30:54 -0800
-X-Gm-Features: AQt7F2ot4bhp0JL5RYqg1dGnxsqrLSKG0y6jAFKGTRpr7eMWJGUda_-f-arqaR4
-Message-ID: <CAGtprH9foQx=XLXXMqYnga27jWjCSkqj5QHVnAM_Akv7CLNmbw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 03/23] x86/tdx: Enhance tdh_phymem_page_wbinvd_hkid()
- to invalidate huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	dave.hansen@intel.com, kas@kernel.org, tabba@google.com, 
-	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
-	david@redhat.com, vbabka@suse.cz, thomas.lendacky@amd.com, pgonda@google.com, 
-	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
-	ira.weiny@intel.com, isaku.yamahata@intel.com, xiaoyao.li@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20251209232524.GE54030@quark>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxrcEbzzhpyKJHAQ--.31721S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7JFyfCw13CrWUGF18tFWrZwc_yoW3GFX_ur
+	WkJws8u3yUZw1qqayrtF4FvrZ8Ww1UAF1rJwsrXr47K3ykJFs8XrsxurZ7u3Way3yrCr12
+	9rs5XF1Dur1IkosvyTuYvTs0mTUanT9S1TB71UUUUjJqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbDAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4j6F4UM28EF7xvwVC2z280aVCY1x0267AKxVW8
+	JVW8Jr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
+	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCF
+	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
+	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
+	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
+	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF
+	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07joc_-UUUUU=
 
-On Tue, Dec 9, 2025 at 5:20=E2=80=AFPM Yan Zhao <yan.y.zhao@intel.com> wrot=
-e:
->
-> On Tue, Dec 09, 2025 at 05:14:22PM -0800, Vishal Annapurve wrote:
-> > On Thu, Aug 7, 2025 at 2:42=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> =
-wrote:
-> > >
-> > > index 0a2b183899d8..8eaf8431c5f1 100644
-> > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > @@ -1694,6 +1694,7 @@ static int tdx_sept_drop_private_spte(struct kv=
-m *kvm, gfn_t gfn,
-> > >  {
-> > >         int tdx_level =3D pg_level_to_tdx_sept_level(level);
-> > >         struct kvm_tdx *kvm_tdx =3D to_kvm_tdx(kvm);
-> > > +       struct folio *folio =3D page_folio(page);
-> > >         gpa_t gpa =3D gfn_to_gpa(gfn);
-> > >         u64 err, entry, level_state;
-> > >
-> > > @@ -1728,8 +1729,9 @@ static int tdx_sept_drop_private_spte(struct kv=
-m *kvm, gfn_t gfn,
-> > >                 return -EIO;
-> > >         }
-> > >
-> > > -       err =3D tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, page)=
-;
-> > > -
-> > > +       err =3D tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, folio=
-,
-> > > +                                         folio_page_idx(folio, page)=
-,
-> > > +                                         KVM_PAGES_PER_HPAGE(level))=
-;
-> >
-> > This code seems to assume that folio_order() always matches the level
-> > at which it is mapped in the EPT entries.
-> I don't think so.
-> Please check the implemenation of tdh_phymem_page_wbinvd_hkid() [1].
-> Only npages=3DKVM_PAGES_PER_HPAGE(level) will be invalidated, while npage=
-s
-> <=3D folio_nr_pages(folio).
 
-Is the gfn passed to tdx_sept_drop_private_spte() always huge page
-aligned if mapping is at huge page granularity?
 
-If gfn/pfn is not aligned then when folio is split to 4K, page_folio()
-will return the same page and folio_order and folio_page_idx() will be
-zero. This can cause tdh_phymem_page_wbinvd_hkid() to return failure.
+On 2025/12/10 上午7:25, Eric Biggers wrote:
+> On Tue, Dec 09, 2025 at 10:22:58AM +0800, Bibo Mao wrote:
+>> ECB AES also is added here, its ivsize is zero and name is different
+>> compared with CBC AES algo.
+> 
+> What is the use case for this feature?Currently qemu builtin backend and openssl afalg only support CBC AES, 
+it depends on modified qemu and openssl to test this.
 
-If the expectation is that page_folio() will always point to a head
-page for given hugepage granularity mapping then that logic will not
-work correctly IMO.
+Maybe this patch adding ECB AES algo can be skipped now, it is just an 
+example, the final target is to add SM4 cipher. currently virtio crypto 
+has some problems such as:
+1. there is RCU timeout issue with multiple AIO openssl processes
+2. session number is limited with 256 so it is hard for actual use.
 
->
-> [1] https://lore.kernel.org/all/20250807094202.4481-1-yan.y.zhao@intel.co=
-m/
->
-> > IIUC guest_memfd can decide
-> > to split folios to 4K for the complete huge folio before zapping the
-> > hugepage EPT mappings. I think it's better to just round the pfn to
-> > the hugepage address based on the level they were mapped at instead of
-> > relying on the folio order.
+I want to solve these issues one by one.
+
+Regards
+Bibo Mao
+> 
+> - Eric
+> 
+
 
