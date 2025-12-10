@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-65676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E2C6CB3BDB
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 19:17:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86841CB3BE4
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 19:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 310C73195A85
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 18:14:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 99FF431DDB19
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 18:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3797329375;
-	Wed, 10 Dec 2025 18:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96950329398;
+	Wed, 10 Dec 2025 18:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xXi10Tcp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnqvUF1p"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907E7328B42
-	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 18:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B389D32937E
+	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 18:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765390468; cv=none; b=Tk++4LOhPR5XPSjnqwLI5LXAbL4AocPI4aMz5LTilzhOwJrYaZ3btQ5DUpYtikOv1sXc2S5HYJH8T5oz3dey3YLafDof/+6OyOwANHoj4NwULif1TKIBqU7X55/bQrWmBcLVhFlw7MDr9XnP/SdPzo98DtQCTdxYErgBBxE/lys=
+	t=1765390470; cv=none; b=XlKoDbkkc/+XM5cBe7DCFGVnUhsRoOrftzDWUw0CHi6Ze3UlC4uGSkTJe9a05TxHybG8A20/lQtlFcZtuqNeNTBEJnYpjJHsQxxFyl1AM/IVTwZ2BnLrCLbO1rv7kmMaZKjVzWut32prPAZx92YX+COU59BKIksU9Cs+ALcyYlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765390468; c=relaxed/simple;
-	bh=pwlFgeh1zV9BNL0tvm8yEEyE54pw7ioKi1EzIbT/3Hk=;
+	s=arc-20240116; t=1765390470; c=relaxed/simple;
+	bh=an2Zn6RpDfaa/xhfmBAktY0KXvX4xDoqrCBPSIi9TNE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MI3MKYUoNa0pt8cz8+EJ9hPG+d2xME6g+LPTPJivXVtEU1NuR1KWrpv2mDqlLHwOJ8xmkVqjV3EFhVPmUJK/DsaFK5Wnc9Oqf4I7xeIMBXGiuMTjJAgesMZZG3f6zM5FMfb2ObYZH53gzfvmwIDWGcW60wLh4E/4kpvnNKvjh3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xXi10Tcp; arc=none smtp.client-ip=209.85.161.74
+	 To:Cc:Content-Type; b=saQnLJ9hQBhN7Jh+r7dC1hBONO8d2zyCKc2Efw4KmdKptHoN8RA2uR82EyhUSm8zpk0pLNX/QFFUruTI6XJLRM62N0mec3G5jJFRmx/DroUU5wtiATj7qm5Ly8PMCazFpe4A1uC3MDOKaON4RmA53da/VoASwddG/trcHeH+OoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnqvUF1p; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-657490e060dso92776eaf.3
-        for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 10:14:26 -0800 (PST)
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-656b3efc41aso130417eaf.3
+        for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 10:14:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1765390466; x=1765995266; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4gUwEMI4CPC8nG6DpXhg5Tl6v8j6U1PzBCdzq7Inos8=;
-        b=xXi10TcpFHB83Uay3V25poivP7UPmNooomxicHJjAhe2BuMMNRc1vjRKVtXGbVoScU
-         HQTJvEj9hd4+T9toWvOi3EBM7gpP6toIIe5N0YDEL3mu0AKcP+oQF1Ot3nH0JA06zbcR
-         7ZPzlGJU0otoqDgYSfLu8tEqrSPK6Nrkr4UjZjaqs8ReBZjYUaVHutQqYxz7TJgaSnJf
-         wP8zAZzcIlwaoVpmyUqlcxRS3ZFmjaBKAcqPs9nA8Vf7VA9e9LsYcHmbIxzEomYYEDpA
-         OBgmj01JC25kfBskcmXdnOef8OoOPFajBy4Ra+W8nq5+Z9CMnkxxis926DH6NbwFYjzt
-         6EZA==
+        bh=Xvj1DeRBj73MVA6K+8aEadH2MXzDd0NTh71ZLBFvl/I=;
+        b=jnqvUF1pCsusvV8Qdt0wcLdADk2o9X/Kvt6z3XNN4xpTTBxJxZ7yi8BZE5BBm75F3y
+         JRIEzb8KYTdJUPt/RfEuQKXsjB73A/SBJaDIdsk83Dz+Jna5EPBJbnffwmJiggRmxaTC
+         rK1ILZ7Qu7LRVjUp3nVuAMJ6aL/SUhZxpHiopsStRf7TE25uh00YNc4ObD6qXqXRVrzN
+         giVbciPx73o/wgoRgeyB7m71MKEmT+JyPHaZ79QzoHDvV1I8GC0Vtq3VSzMA5Y/VTpZ3
+         wFBpwzo9nNBOB5k9fe7TewKS4a7DakTwQSBpOpRZqDQA6+E+AY+X43of9MDhCYHO/cc0
+         mcvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1765390466; x=1765995266;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4gUwEMI4CPC8nG6DpXhg5Tl6v8j6U1PzBCdzq7Inos8=;
-        b=Iw72I3I5qXeohGgCybCmYX8P5dagHNzXppYGiO1KMoDLTp9weopZqMKQSREUFtHFXX
-         rsuFhutcmQxz6dQqXu4sUCbz8padB2CKu+eeRYRFQny1GbiBfuFg9meqf61qmJ+toAhg
-         frAZqprvuBOKLeEEHetdVWClaXUSuKxclgSeJj5I2b2RIGaJYomJfPyFhC6MeDZGmufL
-         HexXqTe5CnBQst4IgorEeGF+0WSwfYi73rsV1SGOclyhJTjIMGkcY+YNLDDpCB6TR7t8
-         P38X88OAv18/PDPbNk7dOySQH3EvLneCBOyfgnk967ACc7DywsoZr2AftBt6tPj+Hpub
-         efOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWH2/pjNF4LtSa7NsB3WKN7sPsSVtVvn0E+6rUWjKBCG9KOR66UE1B4QO+Tp6bYkOj7w9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyE8eYv4NxsU2zJpZ6xf49YwL3FN9S9hoQ83NWy64W2NlchApcL
-	OgwARj0iU9qFWUJG9BRh1LM3U62DqAgH0JNoK7CStnXzSLXcHp8fgPRuJhw/Y9JobIh4NYX7478
-	JskojUgmVvg==
-X-Google-Smtp-Source: AGHT+IHG44j9+i0T0oJH5qztj8QDLXfbSZEMuigfmk9lH3MjDr9iEI8CBWmAD9bZ6oOzQ/GYCPP3dTlLaWN7
-X-Received: from iomw16.prod.google.com ([2002:a5e:d610:0:b0:949:68d:8b40])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:f008:b0:65b:257b:a885
- with SMTP id 006d021491bc7-65b2ac3ec9fmr2171394eaf.25.1765390465579; Wed, 10
- Dec 2025 10:14:25 -0800 (PST)
-Date: Wed, 10 Dec 2025 18:14:16 +0000
+        bh=Xvj1DeRBj73MVA6K+8aEadH2MXzDd0NTh71ZLBFvl/I=;
+        b=SF7DTWQ+XUECKo6RL2ARq1s0F4H48fwd1pwU3+ET4Uu8B8Wcgu+9ivxOVkEo2qdt+w
+         GCzTGEa47nQy89HO/qvey6C+VmPmzOnmhFrYy3A30XfDXbaA6hffblo9MspQZe2eIsQ/
+         qt7gGH3teDGwR+AYyF4JcZuJH+QfVJnia7JeFEc2pOhNPjocw7zagg3q1rLyqFGkfqNU
+         C35OEj+e72hxxrg7naC0KOmoQaQSPeSIvdZU83ryQM4MpNvKewnClSwkaH2nB78SuRai
+         RGOvw92Oc7ET+GsvdVno6kjuXZBT5hZupFNLjCxIc6NOvB+s7PmPYzJ3iy0BePaSfZDW
+         qbGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXywY5JH3dLwNtaeLQPEHtB9yKl0FK430TxcGKVG5wMJIr92gm/iN+fVdAjDEm4+JKdUlM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzicHXGAjE03PnvpZ/Xojeuvh2sND0TgPMr2LhMUHampzTRS1wm
+	Zxed1fRQFGLN7S0m/FMljGJyLbdDDhXg5SDGqgLKUUNQjSLXG2YISXawdOKKhy7/BKNHrILxntU
+	Woyu9PFSPJA==
+X-Google-Smtp-Source: AGHT+IEidK7dxGFWEkxN+dDoCoKZUv8ekllLT6ISbeM5jutX6QSt//SlyN74EilCTF+wBTlNjbu2z0HHTlKR
+X-Received: from ilbbs17.prod.google.com ([2002:a05:6e02:2411:b0:434:972f:bf8f])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:f48:b0:659:9a49:8f8a
+ with SMTP id 006d021491bc7-65b2ad07bccmr1902553eaf.79.1765390466476; Wed, 10
+ Dec 2025 10:14:26 -0800 (PST)
+Date: Wed, 10 Dec 2025 18:14:17 +0000
 In-Reply-To: <20251210181417.3677674-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,8 +72,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251210181417.3677674-1-rananta@google.com>
 X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251210181417.3677674-6-rananta@google.com>
-Subject: [PATCH v2 5/6] vfio: selftests: Add helper to set/override a vf_token
+Message-ID: <20251210181417.3677674-7-rananta@google.com>
+Subject: [PATCH v2 6/6] vfio: selftests: Add tests to validate SR-IOV UAPI
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>, 
 	Alex Williamson <alex.williamson@redhat.com>
@@ -81,75 +81,253 @@ Cc: Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kern
 	Raghavendra Rao Ananta <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a helper function, vfio_device_set_vf_token(), to set or override a
-vf_token. Not only at init, but a vf_token can also be set via the
-VFIO_DEVICE_FEATURE ioctl, by setting the
-VFIO_DEVICE_FEATURE_PCI_VF_TOKEN flag. Hence, add an API to utilize this
-functionality from the test code. The subsequent commit will use this to
-test the functionality of this method to set the vf_token.
+Add a selfttest, vfio_pci_sriov_uapi_test.c, to validate the
+SR-IOV UAPI, including the following cases, iterating over
+all the IOMMU modes currently supported:
+ - Setting correct/incorrect/NULL tokens during device init.
+ - Close the PF device immediately after setting the token.
+ - Change/override the PF's token after device init.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../lib/include/libvfio/vfio_pci_device.h     |  2 ++
- .../selftests/vfio/lib/vfio_pci_device.c      | 34 +++++++++++++++++++
- 2 files changed, 36 insertions(+)
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../selftests/vfio/vfio_pci_sriov_uapi_test.c | 215 ++++++++++++++++++
+ 2 files changed, 216 insertions(+)
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
 
-diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-index 6186ca463ca6e..b370aa6a74d0b 100644
---- a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-+++ b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-@@ -129,4 +129,6 @@ void vfio_container_set_iommu(struct vfio_pci_device *device);
- void vfio_pci_iommufd_cdev_open(struct vfio_pci_device *device, const char *bdf);
- int __vfio_device_bind_iommufd(int device_fd, int iommufd, const char *vf_token);
+diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+index 3c796ca99a509..f00a63902fbfb 100644
+--- a/tools/testing/selftests/vfio/Makefile
++++ b/tools/testing/selftests/vfio/Makefile
+@@ -4,6 +4,7 @@ TEST_GEN_PROGS += vfio_iommufd_setup_test
+ TEST_GEN_PROGS += vfio_pci_device_test
+ TEST_GEN_PROGS += vfio_pci_device_init_perf_test
+ TEST_GEN_PROGS += vfio_pci_driver_test
++TEST_GEN_PROGS += vfio_pci_sriov_uapi_test
  
-+void vfio_device_set_vf_token(int fd, const char *vf_token);
+ TEST_FILES += scripts/cleanup.sh
+ TEST_FILES += scripts/lib.sh
+diff --git a/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+new file mode 100644
+index 0000000000000..4c2951d6e049c
+--- /dev/null
++++ b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+@@ -0,0 +1,215 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <fcntl.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <sys/ioctl.h>
++#include <linux/limits.h>
 +
- #endif /* SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_VFIO_PCI_DEVICE_H */
-diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-index 208da2704d9e2..7725ecc62b024 100644
---- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-+++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-@@ -109,6 +109,40 @@ static void vfio_pci_irq_get(struct vfio_pci_device *device, u32 index,
- 	ioctl_assert(device->fd, VFIO_DEVICE_GET_IRQ_INFO, irq_info);
- }
- 
-+static int vfio_device_feature_ioctl(int fd, u32 flags, void *data,
-+				     size_t data_size)
++#include <libvfio.h>
++
++#include "../kselftest_harness.h"
++
++#define UUID_1 "52ac9bff-3a88-4fbd-901a-0d767c3b6c97"
++#define UUID_2 "88594674-90a0-47a9-aea8-9d9b352ac08a"
++
++static const char *pf_dev_bdf;
++
++static int test_vfio_pci_container_setup(struct vfio_pci_device *device,
++					 const char *bdf,
++					 const char *vf_token)
 +{
-+	u8 buffer[sizeof(struct vfio_device_feature) + data_size] = {};
-+	struct vfio_device_feature *feature = (void *)buffer;
++	vfio_pci_group_setup(device, bdf);
++	vfio_container_set_iommu(device);
++	__vfio_pci_group_get_device_fd(device, bdf, vf_token);
 +
-+	memcpy(feature->data, data, data_size);
-+
-+	feature->argsz = sizeof(buffer);
-+	feature->flags = flags;
-+
-+	return ioctl(fd, VFIO_DEVICE_FEATURE, feature);
++	/* The device fd will be -1 in case of mismatched tokens */
++	return (device->fd < 0);
 +}
 +
-+static void vfio_device_feature_set(int fd, u16 feature, void *data, size_t data_size)
++static int test_vfio_pci_iommufd_setup(struct vfio_pci_device *device,
++				       const char *bdf, const char *vf_token)
 +{
-+	u32 flags = VFIO_DEVICE_FEATURE_SET | feature;
++	vfio_pci_iommufd_cdev_open(device, bdf);
++	return __vfio_device_bind_iommufd(device->fd,
++					  device->iommu->iommufd, vf_token);
++}
++
++static struct vfio_pci_device *test_vfio_pci_device_init(const char *bdf,
++							 struct iommu *iommu,
++							 const char *vf_token,
++							 int *out_ret)
++{
++	struct vfio_pci_device *device;
++
++	device = calloc(1, sizeof(*device));
++	VFIO_ASSERT_NOT_NULL(device);
++
++	device->iommu = iommu;
++	device->bdf = bdf;
++
++	if (iommu->mode->container_path)
++		*out_ret = test_vfio_pci_container_setup(device, bdf, vf_token);
++	else
++		*out_ret = test_vfio_pci_iommufd_setup(device, bdf, vf_token);
++
++	return device;
++}
++
++static void test_vfio_pci_device_cleanup(struct vfio_pci_device *device)
++{
++	if (device->fd > 0)
++		VFIO_ASSERT_EQ(close(device->fd), 0);
++
++	if (device->group_fd)
++		VFIO_ASSERT_EQ(close(device->group_fd), 0);
++
++	free(device);
++}
++
++FIXTURE(vfio_pci_sriov_uapi_test) {
++	char vf_dev_bdf[16];
++	char vf_driver[32];
++	bool sriov_drivers_autoprobe;
++};
++
++FIXTURE_SETUP(vfio_pci_sriov_uapi_test)
++{
++	int nr_vfs;
 +	int ret;
 +
-+	ret = vfio_device_feature_ioctl(fd, flags, data, data_size);
-+	VFIO_ASSERT_EQ(ret, 0, "Failed to set feature %u\n", feature);
++	nr_vfs = sysfs_get_sriov_totalvfs(pf_dev_bdf);
++	if (nr_vfs < 0)
++		SKIP(return, "SR-IOV may not be supported by the device\n");
++
++	nr_vfs = sysfs_get_sriov_numvfs(pf_dev_bdf);
++	if (nr_vfs != 0)
++		SKIP(return, "SR-IOV already configured for the PF\n");
++
++	self->sriov_drivers_autoprobe =
++		sysfs_get_sriov_drivers_autoprobe(pf_dev_bdf);
++	if (self->sriov_drivers_autoprobe)
++		sysfs_set_sriov_drivers_autoprobe(pf_dev_bdf, 0);
++
++	/* Export only one VF for testing */
++	sysfs_set_sriov_numvfs(pf_dev_bdf, 1);
++
++	sysfs_get_sriov_vf_bdf(pf_dev_bdf, 0, self->vf_dev_bdf);
++	if (sysfs_get_driver(self->vf_dev_bdf, self->vf_driver) == 0)
++		sysfs_unbind_driver(self->vf_dev_bdf, self->vf_driver);
++	sysfs_bind_driver(self->vf_dev_bdf, "vfio-pci");
 +}
 +
-+void vfio_device_set_vf_token(int fd, const char *vf_token)
++FIXTURE_TEARDOWN(vfio_pci_sriov_uapi_test)
 +{
-+	uuid_t token_uuid = {0};
-+
-+	VFIO_ASSERT_NOT_NULL(vf_token, "vf_token is NULL");
-+	VFIO_ASSERT_EQ(uuid_parse(vf_token, token_uuid), 0);
-+
-+	vfio_device_feature_set(fd, VFIO_DEVICE_FEATURE_PCI_VF_TOKEN,
-+				token_uuid, sizeof(uuid_t));
++	sysfs_unbind_driver(self->vf_dev_bdf, "vfio-pci");
++	sysfs_bind_driver(self->vf_dev_bdf, self->vf_driver);
++	sysfs_set_sriov_numvfs(pf_dev_bdf, 0);
++	sysfs_set_sriov_drivers_autoprobe(pf_dev_bdf,
++					  self->sriov_drivers_autoprobe);
 +}
 +
- static void vfio_pci_region_get(struct vfio_pci_device *device, int index,
- 				struct vfio_region_info *info)
- {
++FIXTURE_VARIANT(vfio_pci_sriov_uapi_test) {
++	const char *iommu_mode;
++	char *vf_token;
++};
++
++#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode, _name, _vf_token)		\
++FIXTURE_VARIANT_ADD(vfio_pci_sriov_uapi_test, _iommu_mode ## _ ## _name) {	\
++	.iommu_mode = #_iommu_mode,						\
++	.vf_token = (_vf_token),						\
++}
++
++FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(same_uuid, UUID_1);
++FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(diff_uuid, UUID_2);
++FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(null_uuid, NULL);
++
++/*
++ * PF's token is always set with UUID_1 and VF's token is rotated with
++ * various tokens (including UUID_1 and NULL).
++ * This asserts if the VF device is successfully created for a match
++ * in the token or actually fails during a mismatch.
++ */
++#define ASSERT_VF_CREATION(_ret) do {					\
++	if (!variant->vf_token || strcmp(UUID_1, variant->vf_token)) {	\
++		ASSERT_NE((_ret), 0);					\
++	} else {							\
++		ASSERT_EQ((_ret), 0);					\
++	}								\
++} while (0)
++
++/*
++ * Validate if the UAPI handles correctly and incorrectly set token on the VF.
++ */
++TEST_F(vfio_pci_sriov_uapi_test, init_token_match)
++{
++	struct vfio_pci_device *pf_device;
++	struct vfio_pci_device *vf_device;
++	struct iommu *iommu;
++	int ret;
++
++	iommu = iommu_init(variant->iommu_mode);
++	pf_device = test_vfio_pci_device_init(pf_dev_bdf, iommu, UUID_1, &ret);
++	vf_device = test_vfio_pci_device_init(self->vf_dev_bdf, iommu,
++					      variant->vf_token, &ret);
++
++	ASSERT_VF_CREATION(ret);
++
++	test_vfio_pci_device_cleanup(vf_device);
++	test_vfio_pci_device_cleanup(pf_device);
++	iommu_cleanup(iommu);
++}
++
++/*
++ * After setting a token on the PF, validate if the VF can still set the
++ * expected token.
++ */
++TEST_F(vfio_pci_sriov_uapi_test, pf_early_close)
++{
++	struct vfio_pci_device *pf_device;
++	struct vfio_pci_device *vf_device;
++	struct iommu *iommu;
++	int ret;
++
++	iommu = iommu_init(variant->iommu_mode);
++	pf_device = test_vfio_pci_device_init(pf_dev_bdf, iommu, UUID_1, &ret);
++	test_vfio_pci_device_cleanup(pf_device);
++
++	vf_device = test_vfio_pci_device_init(self->vf_dev_bdf, iommu,
++					      variant->vf_token, &ret);
++
++	ASSERT_VF_CREATION(ret);
++
++	test_vfio_pci_device_cleanup(vf_device);
++	iommu_cleanup(iommu);
++}
++
++/*
++ * After PF device init, override the existing token and validate if the newly
++ * set token is the one that's active.
++ */
++TEST_F(vfio_pci_sriov_uapi_test, override_token)
++{
++	struct vfio_pci_device *pf_device;
++	struct vfio_pci_device *vf_device;
++	struct iommu *iommu;
++	int ret;
++
++	iommu = iommu_init(variant->iommu_mode);
++	pf_device = test_vfio_pci_device_init(pf_dev_bdf, iommu, UUID_2, &ret);
++	vfio_device_set_vf_token(pf_device->fd, UUID_1);
++
++	vf_device = test_vfio_pci_device_init(self->vf_dev_bdf, iommu,
++					      variant->vf_token, &ret);
++
++	ASSERT_VF_CREATION(ret);
++
++	test_vfio_pci_device_cleanup(vf_device);
++	test_vfio_pci_device_cleanup(pf_device);
++	iommu_cleanup(iommu);
++}
++
++int main(int argc, char *argv[])
++{
++	pf_dev_bdf = vfio_selftests_get_bdf(&argc, argv);
++	return test_harness_run(argc, argv);
++}
 -- 
 2.52.0.239.gd5f0c6e74e-goog
 
