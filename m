@@ -1,224 +1,283 @@
-Return-Path: <kvm+bounces-65683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C33E8CB3FCD
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 21:45:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C9ECB433E
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 00:06:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1BA85301BC9D
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 20:45:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 44806308CB54
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 23:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92693019B2;
-	Wed, 10 Dec 2025 20:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED2D25A334;
+	Wed, 10 Dec 2025 23:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Op3lmwBJ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zhr1JmDt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w7FCgQTP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852911E492D
-	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 20:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517F9221543
+	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 23:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765399525; cv=none; b=fNOM0Luv8Zg3s6V6COLIayjfGw8sKC3WREony5azDBcvCz6qfbZuXvagDYiXNtieetoPwO1Q12SxJkjjcRmoR4OBpPeKuOoBS0jDNY85C4DrxbkfVGbeB7js3wP+g1Q6BuK/s/egL89hjnaP7kefPtsYV0uUboPsMffLtZhz3Xc=
+	t=1765407958; cv=none; b=qq8I3J3zLyK40zcj7F1kybQUb0EUOmTC7EcIOpU9a3CWIq5vGPBKxpe8E+apcPr67YqFaBoQ+KgLIIGgMCf9sOzrFF1+AH+YGARTrrmiUnUxYhbn+2xRX/wGqChKF1TlxDLS/myWIB7xjRaGeUvVy1M65JcK0Hg1zeWXEP3yNZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765399525; c=relaxed/simple;
-	bh=erN3LFsrewv9M2WhBDnOEPbfNdtL2RO7z/u4FW6ywvc=;
+	s=arc-20240116; t=1765407958; c=relaxed/simple;
+	bh=QkERJ7C837hqkhXEcC+QtN+6+4Cny30yICljk8H30/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KUDOhxpsl8U26c0guATHyjjb/pyAPPAruzeYy8q+Bo4QgU89RpFb2y9vnjpCXjUnWDWTHgnJh8QM4d7DfbmwIZhYhKyla/+44UbR92tCuDXXNg4vdMqYvHAeyNcQO4gHqsbVW6zgQ0xZK//GR+vFFJQKQDfbfI0P+SDj/5r+jMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Op3lmwBJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zhr1JmDt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765399522;
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuG5udgnPH9V+dp1BCn39aj6cJd0NA2+B3OW7keC8WjkQWgXjwpJx2KtutzLjgbHD/0RtbQ1Kpr+maZ6XCi8Nyx+mrX3cDqW+QC/LXoLXhaTcun1+L2OUsXkpVtR+Injsetp7sVaqyytCwlcONZxjkk//n9vlp6hKV2j/jCLC+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w7FCgQTP; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 10 Dec 2025 23:05:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765407944;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MdaxxiCV8H2eHhp9NcagGoogiR+1MMFcEmWlgLwt4lY=;
-	b=Op3lmwBJ8ExNOnAaEWGKVboEGOuoLIBoQEcPXSB1xQBm166dXb+nYyJGmIJq+kVmJXUON4
-	Iu1qBkDxrNq82GMk4rZqsKlpLmlrjolf2QK9SyrOqiIQuaHD4bS0Lnb88GsdQXfqbtzEMu
-	9hUCPYE1suwc6FXYksx2Rx1LsS/kcvk=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-527-j_YzGKfwOMmIIqn6an0rjw-1; Wed, 10 Dec 2025 15:43:46 -0500
-X-MC-Unique: j_YzGKfwOMmIIqn6an0rjw-1
-X-Mimecast-MFC-AGG-ID: j_YzGKfwOMmIIqn6an0rjw_1765399426
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-880441e0f93so6782226d6.1
-        for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 12:43:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765399426; x=1766004226; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MdaxxiCV8H2eHhp9NcagGoogiR+1MMFcEmWlgLwt4lY=;
-        b=Zhr1JmDtXXxa1wzkd9qt+4YquyhKEy79vPyO5KLiOS8c29a8IxNAYYaGgCvM65w/LB
-         ukRBv+ACK/nfJq4CgB4qYXfe353Irasw8qyU4uY8k+Tqa4hMd269DnHgh0bDx4JLx6YA
-         LXEEpKMkpPN8KSyPRCkOA4tjb+hiI8les8Ac67lZeJhtoVbr/9REzg4UJa0WTYFfgX8g
-         kjArwSNcOMU9SGlK8AOlaD0HUBx2AkXeGaUmOU5NLa7Pudg7BBte61OFWW/u6cTCHy36
-         M493DrzSaVcBb4tM21fWR/tihGwsJlXgLUFW2n6YVACud2XWHsBfZiAAmTtMuO9UOUXG
-         rGKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765399426; x=1766004226;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MdaxxiCV8H2eHhp9NcagGoogiR+1MMFcEmWlgLwt4lY=;
-        b=LtNX7J4C//390mIkAu1wcz1L8+ul/K1iVyGuzXAkCn0qUx7SabpV3EbEaYJgsyeyXy
-         VLIIg3GbFdY2ZUnd5E8UTu7IH1GrMSo2SKM8scHcSYFvh+I/ZdjiLOdUHh3lCwRHAU2d
-         f5F+T3vs8oEVRSUWq7/cF/4u4ZR/5vHAut5MIggOYLS8TWVHEwr77iOpjTgE/3ybGlqH
-         /F+kMIbck4ZMY4I9uHlT6R8uu8bo40pmo4lDV2TEyFdJzGctUk08RRntMoTdnHVE+J/m
-         JohQpPuBLKce1LtAZ1dUaVJL3qQzXwlgwaSNpIUHTxbT04aks9TKWMPJbCgpXR3vzhpD
-         Q/zg==
-X-Gm-Message-State: AOJu0Yy7YEbSwUSEIhB0MS7NUKs0p0FuBiUz8WUJeqnESfnUd5pmvcq6
-	lo0KS1FgCCjwnPHJCGDu4SRZ6B9RzQwYaPgEOldyt/FP51e69T5wuUPeu3PLkJFrUltwPZ4ckbR
-	4pKYt9VUW4lbbQSxtuYhPWjDRvvN0tVGAsJZk5DEib5miqCHJ0AnUBA==
-X-Gm-Gg: AY/fxX4yqD9FC8JVULjT3MqkgI7KPuwHxmfd5cClt8RaRvKd4VMC5PvUCrh3QWNJJMo
-	VJb5MRXaFZpTsmz/IPph2GaHS+VADbvF8bls4p/lABtHDsxzWIdAPTgh9L2CIbENHrawrgUrGaf
-	d9+k1DYkSwot9tcQWx8inKoS++Nmbg4FngxBMHZCE4APJU/HUnIlivkO7/rB8rCfFGCpy1VPot+
-	BZpxx7QC80A0lg3fiuBPC1BzTYni0rmlJYYii/KiUNaka0JD/sRKFd40c1BfGbLia+jbya+FRoQ
-	lWXQHf42BMGXSprzO+ScykGzKGHNecksbKvJf2M6xKgLAzJ1jq+dFhlP5BpbMwGe+zTiLyNXJ98
-	MYj8=
-X-Received: by 2002:a05:6214:21e1:b0:880:51f0:5ba0 with SMTP id 6a1803df08f44-8886f2c85efmr12874416d6.26.1765399425702;
-        Wed, 10 Dec 2025 12:43:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEMlXnfPx1nwXlxZMeogmX6e8U0uMByKwt0vnr5JltJxNMWxHqIgAvaalVCu7oIuo0OaauRzQ==
-X-Received: by 2002:a05:6214:21e1:b0:880:51f0:5ba0 with SMTP id 6a1803df08f44-8886f2c85efmr12873866d6.26.1765399425121;
-        Wed, 10 Dec 2025 12:43:45 -0800 (PST)
-Received: from x1.local ([142.188.210.156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8886ef30441sm6054106d6.56.2025.12.10.12.43.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 12:43:44 -0800 (PST)
-Date: Wed, 10 Dec 2025 15:43:43 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Nico Pache <npache@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Alex Mastro <amastro@fb.com>, David Hildenbrand <david@redhat.com>,
-	Alex Williamson <alex@shazbot.org>, Zhi Wang <zhiw@nvidia.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 4/4] vfio-pci: Best-effort huge pfnmaps with
- !MAP_FIXED mappings
-Message-ID: <aTnbf_dtwOo_gaVM@x1.local>
-References: <20251204151003.171039-1-peterx@redhat.com>
- <20251204151003.171039-5-peterx@redhat.com>
- <aTWqvfYHWWMgKHPQ@nvidia.com>
+	bh=DvmecZOMo9VR6I86so2wsLMdzEw4B5LXRWHy/ajKBcc=;
+	b=w7FCgQTPCD5KHUJr+ZkNH7vyVJzAYSosnPQXISZoi5CgKgSmGkdUcwEEON09uTjNBVb8JX
+	PB/gRhlYwsoTPfFC8iFiYK2m20gKPqsb6wneyabLzUlgGjY8EPZCz7tnooQIIbplRLCSo7
+	Ir+1fOxP7+7BLCtgzFzD8ZdfsNWfGmg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 10/13] KVM: nSVM: Restrict mapping VMCB12 on nested
+ VMRUN
+Message-ID: <2rmpnqjnyhew3tektl3ndmukbfgs4zrytsaxdgec2i3tggneuk@gphhqbrqevan>
+References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
+ <20251110222922.613224-11-yosry.ahmed@linux.dev>
+ <aThIQzni6fC1qdgj@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aTWqvfYHWWMgKHPQ@nvidia.com>
+In-Reply-To: <aThIQzni6fC1qdgj@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, Dec 07, 2025 at 12:26:37PM -0400, Jason Gunthorpe wrote:
-> On Thu, Dec 04, 2025 at 10:10:03AM -0500, Peter Xu wrote:
+On Tue, Dec 09, 2025 at 08:03:15AM -0800, Sean Christopherson wrote:
+> On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > All accesses to the VMCB12 in the guest memory are limited to
+> > nested_svm_vmrun(). However, the VMCB12 remains mapped until the end of
+> > the function execution. Unmapping right after the consistency checks is
+> > possible, but it becomes easy-ish to introduce bugs where 'vmcb12' is
+> > used after being unmapped.
+> > 
+> > Move all accesses to the VMCB12 into a new helper,
+> > nested_svm_vmrun_read_vmcb12(),  that maps the VMCB12,
+> > caches the needed fields, performs consistency checks, and unmaps it.
+> > This limits the scope of the VMCB12 mapping appropriately. It also
+> > slightly simplifies the cleanup path of nested_svm_vmrun().
+> > 
+> > nested_svm_vmrun_read_vmcb12() returns -1 if the consistency checks
+> > fail, maintaining the current behavior of skipping the instructions and
+> > unmapping the VMCB12 (although in the opposite order).
+> > 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 59 ++++++++++++++++++++++-----------------
+> >  1 file changed, 34 insertions(+), 25 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index ddcd545ec1c3c..a48668c36a191 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -1023,12 +1023,39 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
+> >  	return 0;
+> >  }
+> >  
+> > +static int nested_svm_vmrun_read_vmcb12(struct kvm_vcpu *vcpu, u64 vmcb12_gpa)
 > 
-> > +/*
-> > + * Hint function for mmap() about the size of mapping to be carried out.
-> > + * This helps to enable huge pfnmaps as much as possible on BAR mappings.
-> > + *
-> > + * This function does the minimum check on mmap() parameters to make the
-> > + * hint valid only. The majority of mmap() sanity check will be done later
-> > + * in mmap().
-> > + */
-> > +int vfio_pci_core_get_mapping_order(struct vfio_device *device,
-> > +				    unsigned long pgoff, size_t len)
+> "read_vmcb12"() sounds like a generic helper to read a specific field.  And if
+> the name is more specific, then I think we can drop the "vmrun" scoping.  To
+> aligh with similar functions in VMX and __nested_copy_vmcb_save_to_cache(), how
+> about nested_svm_copy_vmcb12_to_cache()?
+> 
 > > +{
-> > +	struct vfio_pci_core_device *vdev =
-> > +	    container_of(device, struct vfio_pci_core_device, vdev);
-> > +	struct pci_dev *pdev = vdev->pdev;
-> > +	unsigned int index = pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
-> > +	unsigned long req_start;
-> > +	size_t phys_len;
+> > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > +	struct kvm_host_map map;
+> > +	struct vmcb *vmcb12;
+> > +	int ret;
 > > +
-> > +	/* Currently, only bars 0-5 supports huge pfnmap */
-> > +	if (index >= VFIO_PCI_ROM_REGION_INDEX)
-> > +		return 0;
+> > +	ret = kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
+> > +	if (ret)
+> > +		return ret;
 > > +
-> > +	/*
-> > +	 * NOTE: we're keeping things simple as of now, assuming the
-> > +	 * physical address of BARs (aka, pci_resource_start(pdev, index))
-> > +	 * should always be aligned with pgoff in vfio-pci's address space.
-> > +	 */
-> > +	req_start = (pgoff << PAGE_SHIFT) & ((1UL << VFIO_PCI_OFFSET_SHIFT) - 1);
-> > +	phys_len = PAGE_ALIGN(pci_resource_len(pdev, index));
+> > +	vmcb12 = map.hva;
 > > +
-> > +	/*
-> > +	 * If this happens, it will probably fail mmap() later.. mapping
-> > +	 * hint isn't important anymore.
-> > +	 */
-> > +	if (req_start >= phys_len)
-> > +		return 0;
+> > +	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
+> > +	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
 > > +
-> > +	phys_len = MIN(phys_len - req_start, len);
-> > +
-> > +	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PUD_PFNMAP) && phys_len >= PUD_SIZE)
-> > +		return PUD_ORDER;
-> > +
-> > +	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PMD_PFNMAP) && phys_len >= PMD_SIZE)
-> > +		return PMD_ORDER;
-> > +
+> > +	if (!nested_vmcb_check_save(vcpu) ||
+> > +	    !nested_vmcb_check_controls(vcpu)) {
+> > +		vmcb12->control.exit_code    = SVM_EXIT_ERR;
+> > +		vmcb12->control.exit_code_hi = 0;
+> > +		vmcb12->control.exit_info_1  = 0;
+> > +		vmcb12->control.exit_info_2  = 0;
+> > +		ret = -1;
 > 
-> This seems a bit weird, the vma length is already known, it is len,
-> why do we go to all this trouble to recalculate len in terms of phys?
+> I don't love shoving the consistency checks in here.  I get why you did it, but
+> it's very surprising to see (and/or easy to miss) these consistency checks.  The
+> caller also ends up quite wonky:
 > 
-> If the length is wrong the mmap will fail, so there is no issue with
-> returning a larger order here.
+> 	if (ret == -EINVAL) {
+> 		kvm_inject_gp(vcpu, 0);
+> 		return 1;
+> 	} else if (ret) {
+> 		return kvm_skip_emulated_instruction(vcpu);
+> 	}
 > 
-> I feel this should just return the order based on pci_resource_len()?
-
-IIUC there's a trivial difference when partial of a huge bar is mapped.
-
-Example: 1G bar, map range (pgoff=2M, size=1G-2M).
-
-If we return bar size order, we'd say 1G, however then it means we'll do
-the alignment with 1G. __thp_get_unmapped_area() will think it's not
-proper, because:
-
-	loff_t off_end = off + len;
-	loff_t off_align = round_up(off, size);
-
-	if (off_end <= off_align || (off_end - off_align) < size)
-		return 0;
-
-Here what we really want is to map (2M, 1G-2M) with 2M huge, not 1G, nor
-4K.
-
+> 	ret = kvm_skip_emulated_instruction(vcpu);
 > 
-> And shouldn't the mm be the one aligning it to what the arch can do
-> not drives?
+> Ha!  And it's buggy.  __kvm_vcpu_map() can return -EFAULT if creating a host
+> mapping fails.  Eww, and blindly using '-1' as the "failed a consistency check"
+> is equally cross, as it relies on kvm_vcpu_map() not returning -EPERM in a very
+> weird way.
+> 
+> Ugh, and there's also this nastiness in nested_vmcb_check_controls():
+> 
+> 	 * Make sure we did not enter guest mode yet, in which case
+> 	 * kvm_read_cr0() could return L2's CR0.
+> 	 */
+> 	WARN_ON_ONCE(is_guest_mode(vcpu));
+> 	return __nested_vmcb_check_controls(vcpu, ctl, kvm_read_cr0(vcpu));
+> 
+> nested_vmcb_check_save() and nested_vmcb_check_controls() really shouldn't exist.
+> They just make it harder to see what KVM is checking in the "normal" flow.
+> 
+> Aha!  And I'm fairly certain there are at least two pre-existing bugs due to KVM
+> doing "early" consistency checks in nested_svm_vmrun().
+> 
+>   1. KVM doesn't clear GIF on the early #VMEXIT.  In classic APM fashion, nothing
+>      _requires_ GIF=0 before VMRUN:
+> 
+>         It is assumed that VMM software cleared GIF some time before executing
+>         the VMRUN instruction, to ensure an atomic state switch.
+> 
+>      And so VMRUN with GIF=1 that hits an "early" consistency check #VMEXIT would
+>      incorrectly leave GIF=1.
+> 
+> 
+>   2. svm_leave_smm() is missing consistency checks on the newly loaded guest state,
+>      because the checks aren't performed by enter_svm_guest_mode().  I don't see
+>      anything that would prevent vmcb12 from being modified by the guest bewteen
+>      SMI and RSM.
+> 
+> Moving the consistency checks into enter_svm_guest_mode() would solve all three
+> (four?) problems.  And as a bonus, nested_svm_copy_vmcb12_to_cache() can use
+> kvm_vcpu_map_readonly().
+> 
+> Compile tested only, but I think we can end up with delta like so:
+> 
+> ---
+>  arch/x86/kvm/svm/nested.c | 67 ++++++++++++---------------------------
+>  1 file changed, 20 insertions(+), 47 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 7c86987fdaca..8a0df6c535b5 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -372,9 +372,9 @@ static bool nested_svm_check_event_inj(struct kvm_vcpu *vcpu, u32 event_inj)
+>  	return true;
+>  }
+>  
+> -static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+> -					 struct vmcb_ctrl_area_cached *control,
+> -					 unsigned long l1_cr0)
+> +static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+> +				       struct vmcb_ctrl_area_cached *control,
+> +				       unsigned long l1_cr0)
+>  {
+>  	if (CC(!vmcb12_is_intercept(control, INTERCEPT_VMRUN)))
+>  		return false;
+> @@ -408,8 +408,8 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+>  }
+>  
+>  /* Common checks that apply to both L1 and L2 state.  */
+> -static bool __nested_vmcb_check_save(struct kvm_vcpu *vcpu,
+> -				     struct vmcb_save_area_cached *save)
+> +static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu,
+> +				   struct vmcb_save_area_cached *save)
+>  {
+>  	if (CC(!(save->efer & EFER_SVME)))
+>  		return false;
+> @@ -448,27 +448,6 @@ static bool __nested_vmcb_check_save(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> -static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu)
+> -{
+> -	struct vcpu_svm *svm = to_svm(vcpu);
+> -	struct vmcb_save_area_cached *save = &svm->nested.save;
+> -
+> -	return __nested_vmcb_check_save(vcpu, save);
+> -}
+> -
+> -static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
+> -{
+> -	struct vcpu_svm *svm = to_svm(vcpu);
+> -	struct vmcb_ctrl_area_cached *ctl = &svm->nested.ctl;
+> -
+> -	/*
+> -	 * Make sure we did not enter guest mode yet, in which case
+> -	 * kvm_read_cr0() could return L2's CR0.
+> -	 */
+> -	WARN_ON_ONCE(is_guest_mode(vcpu));
+> -	return __nested_vmcb_check_controls(vcpu, ctl, kvm_read_cr0(vcpu));
+> -}
+> -
+>  static
+>  void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+>  					 struct vmcb_ctrl_area_cached *to,
+> @@ -1004,6 +983,12 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
+>  	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+>  
+>  	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+> +
+> +	if (!nested_vmcb_check_save(vcpu, &svm->nested.save) ||
+> +	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl,
+> +					svm->vmcb01.ptr->save.cr0))
+> +		return -EINVAL;
+> +
+>  	nested_vmcb02_prepare_control(svm, save->rip, save->cs.base);
+>  	nested_vmcb02_prepare_save(svm);
+>  
 
-Note that here checking CONFIG_ARCH_SUPPORTS_P*D_PFNMAP is a vfio behavior,
-pairing with the huge_fault() of vfio-pci driver.  It implies if vfio-pci's
-huge pfnmap is enabled or not.  If it's not enabled, we don't need to
-report larger orders here.
+Unfortunately this doesn't work, it breaks the newly introduced
+nested_invalid_cr3_test. The problem is that we bail before we fully
+initialize VMCB02, then nested_svm_vmrun() calls nested_svm_vmexit(),
+which restores state from VMCB02 to VMCB12.
 
-Said that, this is still a valid point, that core mm should likely also
-check against the configs when the kernel was built, though it should not
-check against CONFIG_ARCH_SUPPORTS_PMD_PFNMAP.. Instead, it should check
-HAVE_ARCH_TRANSPARENT_HUGEPAGE*.
+The test first tries to run L2 with a messed up CR3, which fails but
+corrupts VMCB12 due to the above, then the second nested entry is
+screwed.
 
-But then... I really want to avoid adding more dependencies to THPs in core
-mm on pfnmaps.  I used to decouple THP and huge mappings, that series
-wasn't going anywhere, but adding these checks will add more dependencies..
+There are two fixes, the easy one is just move the consistency checks
+after nested_vmcb02_prepare_control() and nested_vmcb02_prepare_save()
+(like the existing failure mode of nested_svm_load_cr3()). This works,
+but the code doesn't make a lot of sense because we use VMCB12 to create
+VMCB02 and THEN check that VMCB12 is valid.
 
-Shall I keep it simple to leave it to drivers, until we have something more
-solid (I think we need HAVE_ARCH_HUGE_P*D_LEAVES here)?
+The alternative is unfortunately a lot more involved. We only do a
+partial restore or a "fast #VMEXIT" for failed VMRUNs. We'd need to:
 
-Even with that config ready, drivers should always still do proper check on
-its own (drivers need to support huge pfnmaps here first before reporting
-high orders).  So what I can add into core mm to check arch support would
-only be an extra layer of safety net, not much real help but burn some cpu
-cycles, IMHO...
+1) Move nested_svm_load_cr3() above nested_vmcb02_prepare_control(),
+   which needs moving nested_svm_init_mmu_context() out of
+   nested_vmcb02_prepare_control() to remain before
+   nested_svm_load_cr3().
 
-Thanks,
+   This makes sure a failed nested VMRUN always needs a "fast #VMEXIT"
 
--- 
-Peter Xu
+2) Figure out which parts of nested_svm_vmexit() are needed in the
+   failed VMRUN case. We need to at least switch the VMCB, propagate the
+   error code, and do some cleanups. We can split this out into the
+   "fast #VMEXIT" path, and use it for failed VMRUNs.
 
+Let me know which way you prefer.
 
