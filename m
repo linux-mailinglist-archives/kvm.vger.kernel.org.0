@@ -1,199 +1,129 @@
-Return-Path: <kvm+bounces-65637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0310CB1946
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 02:09:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B9CFCB1955
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 02:14:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A4813015E12
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 01:09:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9680F302CCBB
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 01:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C4122128B;
-	Wed, 10 Dec 2025 01:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C10922128B;
+	Wed, 10 Dec 2025 01:14:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oevo+BJi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CXP4MlHO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379EB2153D8;
-	Wed, 10 Dec 2025 01:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212ED21A92F
+	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 01:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765328945; cv=none; b=nlmKYQeKxXc5oKDRpGXic0LiOm11tqSpgw3qWFR16qAo+GHASQffiGKmTMxrgLTqCEU0WyFcnVxpe4Tkr3/7dF4kuH7gbtD+JTHq1tAEuo2fjekZTq+6iwODjJzg8CNTtpSHQn0WiSDpVwhfT3zXEYVoHpVfKHT2FwXOADe5jxM=
+	t=1765329277; cv=none; b=gb8LR5hql4HWo919M7iPRXNAei6mGWYHK73mjGcP6NcMAx8/sBkJb8sQytqX5LU0wcQ1Cy11qUtHCoaME1a8sjhbdV16BN7djOeZpIwYSaB2SWiJXezkWMS7GR6EmoTKJoN4nHQtvLpYPO1snglLGm6XFutpP9YJfNTOvQBZVb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765328945; c=relaxed/simple;
-	bh=7Sw6PITpzapkD99/tAnwNI3D6Ucw9JU8bsiOsehlJts=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pAN3drOj1/1rDrXTLRWa5X9nCpl1dic7/COmEmaIMHIbPDNlNK321uL6D9deIj3wSDAxiy3xMSoEVtufd1Pa2RHAX602T8e4W+U/91ee3jxiQt9cjQOu/JOvLWibIldkCQlwmQyQ2f1QfI1mJRQggrokq7mCcQHpHtj4AGembHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oevo+BJi; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765328943; x=1796864943;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7Sw6PITpzapkD99/tAnwNI3D6Ucw9JU8bsiOsehlJts=;
-  b=Oevo+BJiqpvQMUoRJM5hp4O2KdQgYEHYW90HTJ+FUTCqhV+OFrksovyi
-   lPTXxNJgOJI8ahA7H8sq2EnTl7dq6IuBjnY4iEXBRkYUMisgqdsEmqKpK
-   A/uSce8HsUC9I5sDv+3emnId7YMOdXr9HkQ3yrLtbw6cDIZvwpcaF+bJn
-   NkPzpWldT8011xQs7IfyMeD2Dp3SVnAJE1O5WlJttV90Dz5bv+AplzQz/
-   b6t++/7z5miGAz8yZvb2yTJocfB0A1wvfDpRyt/rf6yc2EMxJpFjxqgEB
-   +Pul5NNqydPqjGxWUZ0+t88pY4tvm9L+kcSdZ8w2d/aRRFDeSLbAj8OEP
-   g==;
-X-CSE-ConnectionGUID: 1znDVrjwS5i1agx3fvuqgA==
-X-CSE-MsgGUID: 48WqWwhnQk6DjmUYq9mwbQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11637"; a="67190219"
-X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
-   d="scan'208";a="67190219"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 17:09:02 -0800
-X-CSE-ConnectionGUID: 21iGYDOORw+11NIMlPnpaw==
-X-CSE-MsgGUID: WFDJ3r6bSDGlQ9mRnDj7FQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
-   d="scan'208";a="200862410"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.12]) ([10.124.240.12])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 17:08:54 -0800
-Message-ID: <fad66209-6dc1-4067-87df-9aa1105e3017@linux.intel.com>
-Date: Wed, 10 Dec 2025 09:08:52 +0800
+	s=arc-20240116; t=1765329277; c=relaxed/simple;
+	bh=dLQRgEDj0Vy2eLTA3JA8PCdSfYhHFQFPfH1YQridppw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Eic+cF8r+IMYOfvhWoZReaPRrJjn62I6QMlhq/hskwMGy4sjN1XhYq+2HuMKXRKX9SQeUp1Ormgap3J/YXL32KBbMTy6kLym2aM2AvwXYr7mGslVd1m3W48NsL0oIds54DzqWMwnUvEG8Q4CXDGIeGZxUlzTI1HTzkkmnRdtRG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CXP4MlHO; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29e7ec26e3dso92285ad.0
+        for <kvm@vger.kernel.org>; Tue, 09 Dec 2025 17:14:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765329275; x=1765934075; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FSQVT2VXJxmQcI5luIYdnADTgyF/2rvwCBSOX6th+kI=;
+        b=CXP4MlHOVWrnqW1PPbLmZan/WpklQJF/3xhvCqSkrMYO2HU84h+iCL8rZy6Eb7XXxp
+         2T5jtEFsAVp9Cp/x/ezazCvFsiqaVfyoo5TLzNAkbL0NVK/VNOvxmEvSk9rzoAvqUo6a
+         jIQqVvfo27nASCXvBS3NKLC6D+U0bPkMJBZv4YwAMX1GpDM9J+6qIjVsHQKHusudGef4
+         yqmRhqDfdyETXir/Ig9S0ezgraY7WjBgb0QcejUOxNgy2rh/Jr1fCLP/cSJjKvk/jNc+
+         7VREAGXxe8Ykpry3GL0rqgUp/zxXAkc7EUtS/C7H0/+h9iBCtrzBH9yibn2q1axH6RpR
+         SsxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765329275; x=1765934075;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FSQVT2VXJxmQcI5luIYdnADTgyF/2rvwCBSOX6th+kI=;
+        b=IxF20IASHUATXxX6zOn6v9D3m07acaj70uU+FEzVhsiOhuLt3iGOs/dD8Muth6jCeE
+         3Qyc70Ox7L//GEZx8JFjf/xkWGLlvSI+ZWPUE61pjLsQpinyNMuvxblFEHH5YZhdWp2l
+         j/K8SjG4K7TUtVtNqk5yyovlcrlPkLHz7YAnwP7cONkY4WXTZ+B6AumiDco31561guH6
+         oWns/kqhyDlM3sF9XRAdJyHrJGGW4sQ68URDPkHrGuyN4glOnxsmw47GdWP3kLrjaCa4
+         1B86jMB2363xyQQHWzRH82DinTHHGJk0N4081KIfUsP4DhoMzWMngcczxklNKnhQMpUj
+         ySQA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0jaFOj0Gh01A0/yXmTqE9iMIJme9d9uNGnTZZWgePkt/8gKvo3U0NXZqb7M5XwI3lowE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdC+251AHlEBafItqWL0YqfJE9zRdLmYd+tNHd+h5FEGYStDIC
+	nUTL/URKvVafhrXmfSy7J4SAcueRcAyY0pTS1KB8sFUvu5dy6nySCfxFj8x7sYUiCgG8cIgH7ft
+	Sq6i8pqKH9Jfe5+lP5YCSVRChTJKk2KhDO4LKkZD/
+X-Gm-Gg: ASbGncuOa0wJQqru6qLYhNp8r7cipncNWDy/U2TJ4fHjoq1fOhVVPOhAjaJTJ998oBH
+	I/8atxvlJkOg6zaCdYiidS+oJWFU4rHoJzvvnIWG+Ti97d4uCy9stlWijDX+zPeVtwCLej/Glg+
+	Gnf15FAHwGLOsK2sUCviqAJrEyk6Q81SqwVLGgP3Qr93yhCkiz1wS69VxO/J1kGhOmwsTUV6lIK
+	KzR082KJj3m9jDDuu+mcYFCqT1WkcjeFnHnXQGosnT9eU9jDotEY+nBf11GpSD/4JPHjJM2hB95
+	us/N0YJLzlAJjVDP+p51RpLsqA==
+X-Google-Smtp-Source: AGHT+IFopKRKZjpKnrTUqMRN/xWm6VHYLazcqoktYRhRySpaeCnm+aDmHI9Mx3XpMzLoisyqEENVW3tiTAwNL3/7AMQ=
+X-Received: by 2002:a05:7022:305:b0:11a:2020:aca7 with SMTP id
+ a92af1059eb24-11f28e640aamr77483c88.2.1765329274903; Tue, 09 Dec 2025
+ 17:14:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 37/44] KVM: VMX: Dedup code for removing MSR from
- VMCS's auto-load list
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
- Sandipan Das <sandipan.das@amd.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-38-seanjc@google.com>
- <2440b9bf-a2a1-4f66-94b2-71f47d62f3db@linux.intel.com>
- <aTheSQb9fhXmZKw6@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aTheSQb9fhXmZKw6@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250807093950.4395-1-yan.y.zhao@intel.com> <20250807094202.4481-1-yan.y.zhao@intel.com>
+In-Reply-To: <20250807094202.4481-1-yan.y.zhao@intel.com>
+From: Vishal Annapurve <vannapurve@google.com>
+Date: Tue, 9 Dec 2025 17:14:22 -0800
+X-Gm-Features: AQt7F2pL-QbeL9wB48jfU4g42XYUdUsacZRiQCMvv8pJyI3vjfcz9WY4Ec_Y8CI
+Message-ID: <CAGtprH8zEKcyx_i7PRWd-fXWeuc+sDw7rMr1=zpgkbT-sfS6YA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 03/23] x86/tdx: Enhance tdh_phymem_page_wbinvd_hkid()
+ to invalidate huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	dave.hansen@intel.com, kas@kernel.org, tabba@google.com, 
+	ackerleytng@google.com, quic_eberman@quicinc.com, michael.roth@amd.com, 
+	david@redhat.com, vbabka@suse.cz, thomas.lendacky@amd.com, pgonda@google.com, 
+	zhiquan1.li@intel.com, fan.du@intel.com, jun.miao@intel.com, 
+	ira.weiny@intel.com, isaku.yamahata@intel.com, xiaoyao.li@intel.com, 
+	binbin.wu@linux.intel.com, chao.p.peng@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 12/10/2025 1:37 AM, Sean Christopherson wrote:
-> On Mon, Dec 08, 2025, Dapeng Mi wrote:
->> On 12/6/2025 8:17 AM, Sean Christopherson wrote:
->>> Add a helper to remove an MSR from an auto-{load,store} list to dedup the
->>> msr_autoload code, and in anticipation of adding similar functionality for
->>> msr_autostore.
->>>
->>> No functional change intended.
->>>
->>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>> ---
->>>  arch/x86/kvm/vmx/vmx.c | 31 ++++++++++++++++---------------
->>>  1 file changed, 16 insertions(+), 15 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>> index 52bcb817cc15..a51f66d1b201 100644
->>> --- a/arch/x86/kvm/vmx/vmx.c
->>> +++ b/arch/x86/kvm/vmx/vmx.c
->>> @@ -1040,9 +1040,22 @@ static int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr)
->>>  	return -ENOENT;
->>>  }
->>>  
->>> +static void vmx_remove_auto_msr(struct vmx_msrs *m, u32 msr,
->>> +				unsigned long vmcs_count_field)
->>> +{
->>> +	int i;
->>> +
->>> +	i = vmx_find_loadstore_msr_slot(m, msr);
->>> +	if (i < 0)
->>> +		return;
->>> +
->>> +	--m->nr;
->>> +	m->val[i] = m->val[m->nr];
->> Sometimes the order of MSR writing does matter, e.g., PERF_GLOBAL_CTRL MSR
->> should be written at last after all PMU MSR writing.
-> Hmm, no.  _If_ KVM were writing event selectors using the auto-load lists, then
-> KVM would need to bookend the event selector MSRs with PERF_GLOBAL_CTRL=0 and
-> PERF_GLOBAL_CTRL=<new context (guest vs. host)>.  E.g. so that guest PMC counts
-> aren't polluted with host events, and vice versa.
+On Thu, Aug 7, 2025 at 2:42=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.com> wrot=
+e:
 >
-> As things stand today, the only other MSRs are PEBS and the DS area configuration
-> stuff, and kinda to my earlier point, KVM pre-zeroes MSR_IA32_PEBS_ENABLE as part
-> of add_atomic_switch_msr() to ensure a quiescent period before VM-Enter.
+> index 0a2b183899d8..8eaf8431c5f1 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -1694,6 +1694,7 @@ static int tdx_sept_drop_private_spte(struct kvm *k=
+vm, gfn_t gfn,
+>  {
+>         int tdx_level =3D pg_level_to_tdx_sept_level(level);
+>         struct kvm_tdx *kvm_tdx =3D to_kvm_tdx(kvm);
+> +       struct folio *folio =3D page_folio(page);
+>         gpa_t gpa =3D gfn_to_gpa(gfn);
+>         u64 err, entry, level_state;
 >
-> Heh, and writing PERF_GLOBAL_CTRL last for that sequence might actually be
-> problematic.  E.g. load host PEBS with guest PERF_GLOBAL_CTRL active.
+> @@ -1728,8 +1729,9 @@ static int tdx_sept_drop_private_spte(struct kvm *k=
+vm, gfn_t gfn,
+>                 return -EIO;
+>         }
 >
-> Anyways, I agree that this might be brittle, but this is all pre-existing behavior
-> so I don't want to tackle that here unless it's absolutely necessary.
+> -       err =3D tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, page);
+> -
+> +       err =3D tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, folio,
+> +                                         folio_page_idx(folio, page),
+> +                                         KVM_PAGES_PER_HPAGE(level));
 
-Yeah, this won't cause any real issue for current code. 
-
-
->
-> Or wait, by "writing" do you mean "writing MSRs to memory", as opposed to "writing
-> values to MSRs"?  Regardless, I think my answer is the same: this isn't a problem
-> today, so I'd prefer to not shuffle the ordering unless it's absolutely necessary.
-
-Actually both. As SDM suggests, current any manipulation for PMU MSRs, the
-below order should be followed.
-
-- disable all PMU counters by writing PERF_GLOBAL_CTRL to 0.
-
-- manipulate PMU MSRs.
-
-- Enable the needed PMU counters by writing PERF_GLOBAL_CTRL.
-
-So there is a implicit order on the MSR writing in fact. 
-
-For KVM, if MSR auto-load list feature is used to automatically restore the
-host/guest MSRs, KVM needs to follow the above order to fill the MSR
-auto-load list and then expect these MSRs are written by VMX in the
-designed order.
-
-But since it won't cause any real issue now, it's fine for me to handle it
-until there is a real necessity.
-
-
->
->> So directly moving the last MSR entry into cleared one could break the MSR
->> writing sequence and may cause issue in theory.
->>
->> I know this won't really cause issue since currently vPMU won't use the MSR
->> auto-load feature to save any PMU MSR, but it's still unsafe for future uses. 
->>
->> I'm not sure if it's worthy to do the strict MSR entry shift right now.
->>
->> Perhaps we could add a message to warn users at least.
-> Hmm, yeah, but I'm not entirely sure where/how best to document this.  Because
-> it's not just that vmx_remove_auto_msr() arbitrarily maniuplates the order, e.g.
-> multiple calls to vmx_add_auto_msr() aren't guaranteed to provide ordering because
-> one or more MSRs may already be in the list.  And the "special" MSRs that can be
-> switched via dedicated VMCS fields further muddy the waters.
->
-> So I'm tempted to not add a comment to the helpers, or even the struct fields,
-> because unfortunately it's largely a "Here be dragons!" type warning. :-/
-
-I see. Thanks.
-
-
+This code seems to assume that folio_order() always matches the level
+at which it is mapped in the EPT entries. IIUC guest_memfd can decide
+to split folios to 4K for the complete huge folio before zapping the
+hugepage EPT mappings. I think it's better to just round the pfn to
+the hugepage address based on the level they were mapped at instead of
+relying on the folio order.
 
