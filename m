@@ -1,166 +1,165 @@
-Return-Path: <kvm+bounces-65669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F9EBCB3A4E
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 18:37:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F0BCB3BBF
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 19:15:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 114C430C27D1
-	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 17:36:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7F043074749
+	for <lists+kvm@lfdr.de>; Wed, 10 Dec 2025 18:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BF7329E48;
-	Wed, 10 Dec 2025 17:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80EF32862D;
+	Wed, 10 Dec 2025 18:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cN4+VWQ5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hh+o5Lwv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC68329390;
-	Wed, 10 Dec 2025 17:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C4532692A
+	for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 18:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765387834; cv=none; b=JL1ng1MruykxGVWSQqz2dJNrJDfMLeJovDCJrbYeGoZ3jOK6abyNhw5o4U/szO9XaPbJ3emHD+vG49SQDCB2sAVqEtXqZT0Uo8AvhBydajxPpTxZAVqB/aKqwltJ3nMYOdJXAhfew2b7CxpD0MxPoHeBSx40j1V8pjD9dzM3yl8=
+	t=1765390463; cv=none; b=H0ymoBtGu5TevUHo6ZAuSgJVCZ5YjAZ6POeZw5iF8YQPHKFbDyP9L8ebA1BGG7hhz4qGnAl3dhKd3h48PJXd46oijhYIFhYA39DrPGUp1i0bT9q61JEsCAXMUx0cVGpjHEAielcwSC0quRTAt+yf34rZMoNgBPUiI+HUruq6zbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765387834; c=relaxed/simple;
-	bh=iGSMpz04w1pT5imROni6zGKAJvnyidKOwCelMQ5/JEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bwlJ9hBvOzIpSwymIiM9bjNenRxMV8osG5OdomRndSsB25HNnRFD6KAlSTn8EcslqFV+dir7Ve17yCF8Ti8AbbcXrFeXIf0/Y852QrdrzTedFnuoLD/B0rkKlqW9oQSwSam+zV4zX8cnXvP4QRxdy3z/hTIenSRWGnic7LRWts8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cN4+VWQ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 968ECC19422;
-	Wed, 10 Dec 2025 17:30:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765387833;
-	bh=iGSMpz04w1pT5imROni6zGKAJvnyidKOwCelMQ5/JEE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cN4+VWQ5vXNaiCRn3F7lZJoCuzk2W1TRBj4QsVTqfyJ8IChFjyo3mjP2UdAsi7dcg
-	 /Lg0LawE37PYE2hPxvJ7+mT9G57ACOu4OA4SDBAR+ovD0N99X3Xvi31G3Z+A1BtqS8
-	 Wo5plDhlj7d+lrOIBVZJLwM/LmraazVzX8uWhoBRrq1k1Te/nhl9J3T6C8ChYIGVeM
-	 K0m1H/iGAinlabT6+J6zK5v5OmCvYb/C6b41+Yta67qK2zTqqKSUMZ+l3dwG6Qv6sA
-	 /VDgLkTo4jess+eWsPkfStjvawHsGJaoFaj3aeEXiEH3Wsz2lVCMw1AJ7PsjMIGIvN
-	 Wenct/2ZN59Ow==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vTO1H-0000000BnnB-3Huj;
-	Wed, 10 Dec 2025 17:30:31 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: [PATCH v2 6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
-Date: Wed, 10 Dec 2025 17:30:24 +0000
-Message-ID: <20251210173024.561160-7-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251210173024.561160-1-maz@kernel.org>
-References: <20251210173024.561160-1-maz@kernel.org>
+	s=arc-20240116; t=1765390463; c=relaxed/simple;
+	bh=Gwtk7/V1IbgkADTY4UZ3AYMrnSlS5Y2RNs6HXegXqUk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kSrWAjaAyo/cj/euHcrqhvodqrJnzV7aMOVQL04WgeYS7kDGWdhcuGJGpQwegecHYnUfpZBV7S/bqX09IDxAxDaT3yqOLj8r3/5+YXxURvV0n1WcC3ODPicugFVHEFnYFPdIeJQZDqHswuINynFhHrFKtpbaAFAY6OABNOhYt5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hh+o5Lwv; arc=none smtp.client-ip=209.85.210.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7c72ccd60f5so359544a34.0
+        for <kvm@vger.kernel.org>; Wed, 10 Dec 2025 10:14:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765390461; x=1765995261; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gJPs3sxzYCDJFdqc+QHt5C/KgqWsA0f2Jj2OdmWtv1o=;
+        b=Hh+o5LwvtZWyx3kp/DjgS3a7/t8HWdXgdWIDfiiK+gu71UtgadbmzdNeldX6fOvyNz
+         XjUWorL2kyv3Sbx0tX4uPmJXHh9sz2uMDdqsWzRqdssZ47Miflb9msIPTt+VdHsSHUQJ
+         NWywPmqkxPsCvWjAjvwxK0wN5fK8isbWJ0OMoLOdrBCGPfTAUw79EXu9PD5T1csRcKg/
+         xK6/ICMqa1ROBhMuij2lY/i9f+Dfl4Y6A+BwgnywPBhNaw/10iZVQnWOmNYo0ktex1A8
+         YaUqien7Uf6r1dvhpHq27crDb5mcMs1l8NtB3YjP37AyRLI9A8tKSQEiu70qnE9N8mlh
+         D69A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765390461; x=1765995261;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gJPs3sxzYCDJFdqc+QHt5C/KgqWsA0f2Jj2OdmWtv1o=;
+        b=dS8c54OQuvfL7VMyn6uvp5LnM/wKhlGvtBrPFdal3cUoDCpJMebkxu7RR+TQ+jf8hQ
+         9jcxxtAxd13scenDKD5hcbQHRS8SqkcsFtghm7j1J3xbxwojwj8jRpyhUZB/awlijhvr
+         jBiuemaD0AVMRw9jbFSzYYwdnIMaWY+2In6VwjuSjKesK/HM+d84YVi+2gW7Ds65zE43
+         UxsAoYqU19njHsXsVBvuhHZgzsFKe/FIbhPWXfGKWREFuVM0lUYryHaUdjy+Gx8AOVFf
+         3+AUIq0qo4TR9BIWoEHGh1ZPtZd85BIzfHXWE54lHBuS9lDeIb3FrPUnU6EV3w9ERwbm
+         AYkg==
+X-Forwarded-Encrypted: i=1; AJvYcCXorstNWGs+o2GOU6mubgzG4UIZRgoz1v5NfXhQF0KB7MZVjKOP/ymtU1izcWlRLCdotDg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQt+iKAuGjUWdL+uwZbhBGl2DC3YtsBEl3fPXKCIg8W26e9xUO
+	pc/9VxmZVAYw88pPwShabyzINMjaeACdOgzsvQAOkrEb4WeNOozdullst6TkKTL0dfXBmawUTLN
+	1zTf+x5CYNA==
+X-Google-Smtp-Source: AGHT+IFnk3aW3f+FPOvxHQLOPw+dndUuJC5iBNWTkzUAdTVvuwF8AuDQUDNG6dQkKTcWgdDwENf5daJzC0W1
+X-Received: from ilbbt5.prod.google.com ([2002:a05:6e02:2485:b0:42e:7be2:3ade])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:1846:b0:659:9a49:9044
+ with SMTP id 006d021491bc7-65b2abf4186mr1680543eaf.15.1765390460842; Wed, 10
+ Dec 2025 10:14:20 -0800 (PST)
+Date: Wed, 10 Dec 2025 18:14:11 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251210181417.3677674-1-rananta@google.com>
+Subject: [PATCH v2 0/6] vfio: selftest: Add SR-IOV UAPI test
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>, 
+	Alex Williamson <alex.williamson@redhat.com>
+Cc: Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Now that we potentially have two bits to deal with when setting
-execution permissions, make sure we correctly handle them when both
-when building the page tables and when reading back from them.
+Hello,
 
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_pgtable.h | 12 +++---------
- arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++++---
- 2 files changed, 24 insertions(+), 12 deletions(-)
+This series adds a vfio selftest, vfio_pci_sriov_uapi_test.c, to get some
+coverage on SR-IOV UAPI handling. Specifically, it includes the
+following cases that iterates over all the iommu modes:
+ - Setting correct/incorrect/NULL tokens during device init.
+ - Close the PF device immediately after setting the token.
+ - Change/override the PF's token after device init.
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index be68b89692065..095e6b73740a6 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -87,15 +87,9 @@ typedef u64 kvm_pte_t;
- 
- #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
- 
--#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
--#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
--#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
--
--#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
--	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
--			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
--			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
--			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-+#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-+#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-+#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
- 
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
- 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index e0bd6a0172729..97c0835d25590 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -342,6 +342,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- 	if (!(prot & KVM_PGTABLE_PROT_R))
- 		return -EINVAL;
- 
-+	if (!cpus_have_final_cap(ARM64_KVM_HVHE))
-+		prot &= ~KVM_PGTABLE_PROT_UX;
-+
- 	if (prot & KVM_PGTABLE_PROT_X) {
- 		if (prot & KVM_PGTABLE_PROT_W)
- 			return -EINVAL;
-@@ -351,8 +354,16 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- 
- 		if (system_supports_bti_kernel())
- 			attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
-+	}
-+
-+	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-+		if (!(prot & KVM_PGTABLE_PROT_PX))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S1_PXN;
-+		if (!(prot & KVM_PGTABLE_PROT_UX))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S1_UXN;
- 	} else {
--		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-+		if (!(prot & KVM_PGTABLE_PROT_PX))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
- 	}
- 
- 	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-@@ -373,8 +384,15 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
- 	if (!kvm_pte_valid(pte))
- 		return prot;
- 
--	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
--		prot |= KVM_PGTABLE_PROT_X;
-+	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-+		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_PXN))
-+			prot |= KVM_PGTABLE_PROT_PX;
-+		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_UXN))
-+			prot |= KVM_PGTABLE_PROT_UX;
-+	} else {
-+		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
-+			prot |= KVM_PGTABLE_PROT_PX;
-+	}
- 
- 	ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S1_AP, pte);
- 	if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RO)
--- 
-2.47.3
+The test takes care of creating/setting up the VF device, and hence, it
+can be executed like any other test, simply by passing the PF's BDF to
+run.sh. For example,
+
+$ ./scripts/setup.sh 0000:16:00.1
+$ ./scripts/run.sh ./vfio_pci_sriov_uapi_test
+
+TAP version 13
+1..45
+Starting 45 tests from 15 test cases.
+  RUN  vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match
+    OK vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match
+ok 1 vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match
+  RUN vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.pf_early_close
+   OK vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.pf_early_close
+ok 2 vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.pf_early_close
+  RUN vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.override_token
+   OK vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.override_token
+[...]
+  RUN vfio_pci_sriov_uapi_test.iommufd_null_uuid.override_token ...
+   OK vfio_pci_sriov_uapi_test.iommufd_null_uuid.override_token
+ok 45 vfio_pci_sriov_uapi_test.iommufd_null_uuid.override_token
+PASSED: 45 / 45 tests passed.
+
+Thank you.
+Raghavendra
+
+v2: Suggestions by David Matlack (thank you)
+ - Introduce snprintf_assert() to check against content trucation.
+ - Introduce a new sysfs library to handle all the common vfio/pci sysfs
+   operations.
+ - Rename vfio_pci_container_get_device_fd() to
+   vfio_pci_group_get_device_fd().
+ - Use a fixed size 'arg' array instead of dynamic allocation in
+   __vfio_pci_group_get_device_fd().
+ - Exclude vfio_pci_device_init() to accept the 'vf_token' arg.
+ - Move the vfio_pci_sriov_uapi_test.c global variable to the FIXTURE()
+   struct or as TEST_F() local variables.
+ - test_vfio_pci_container_setup() returns 'int' to indicate status.
+ - Skip the test if nr_vfs != 0.
+ - Explicitly set "sriov_drivers_autoprobe" for the PF.
+ - Make sure to bind the VF device to the "vfio-pci" driver.
+ - Cleanup the things done by FIXTURE_SETUP() in FIXTURE_TEARDOWN().
+
+v1: https://lore.kernel.org/all/20251104003536.3601931-1-rananta@google.com/
+
+Raghavendra Rao Ananta (6):
+  vfio: selftests: Introduce snprintf_assert()
+  vfio: selftests: Introduce a sysfs lib
+  vfio: selftests: Extend container/iommufd setup for passing vf_token
+  vfio: selftests: Export more vfio_pci functions
+  vfio: selftests: Add helper to set/override a vf_token
+  vfio: selftests: Add tests to validate SR-IOV UAPI
+
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../selftests/vfio/lib/include/libvfio.h      |   1 +
+ .../vfio/lib/include/libvfio/assert.h         |   5 +
+ .../vfio/lib/include/libvfio/sysfs.h          |  16 ++
+ .../lib/include/libvfio/vfio_pci_device.h     |   9 +
+ tools/testing/selftests/vfio/lib/libvfio.mk   |   5 +-
+ tools/testing/selftests/vfio/lib/sysfs.c      | 151 ++++++++++++
+ .../selftests/vfio/lib/vfio_pci_device.c      | 135 ++++++++---
+ .../selftests/vfio/vfio_dma_mapping_test.c    |   6 +-
+ .../selftests/vfio/vfio_pci_device_test.c     |  21 +-
+ .../selftests/vfio/vfio_pci_sriov_uapi_test.c | 215 ++++++++++++++++++
+ 11 files changed, 515 insertions(+), 50 deletions(-)
+ create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
+ create mode 100644 tools/testing/selftests/vfio/lib/sysfs.c
+ create mode 100644 tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+
+
+base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
+--
+2.52.0.239.gd5f0c6e74e-goog
 
 
