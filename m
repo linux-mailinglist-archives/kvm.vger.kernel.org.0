@@ -1,107 +1,118 @@
-Return-Path: <kvm+bounces-65755-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65756-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AABE7CB58FC
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 11:51:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63FDCB5951
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 12:00:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AD2EB301D593
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 10:51:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F803302BA92
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 10:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB1B7306B3C;
-	Thu, 11 Dec 2025 10:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8EE2DAFB5;
+	Thu, 11 Dec 2025 10:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qzWNnb3v"
+	dkim=pass (2048-bit key) header.d=josie.lol header.i=@josie.lol header.b="XCUQAbdw"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-108-mta93.mxroute.com (mail-108-mta93.mxroute.com [136.175.108.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEA74317D;
-	Thu, 11 Dec 2025 10:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD08306B09
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 10:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.175.108.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765450267; cv=none; b=eB7GfH9vZBxyKPW2lAFlJMsiYotwq3scCK2LEHgmdhwGccaJCtx7es29uzz/yM4iYVlgE4R8tmUftfeaDmrBKPE5u+76wDnPtrfHTG00JuMT11P99uXO3RcpHczkpxIBDGe+MlGB8JBwadqtIGTzKIixkTkqLjZhEE/Px9w1P+o=
+	t=1765450777; cv=none; b=TRqS7zK/V4Rde1HH3xjer1c3LNEDsf7ZpFkarvOIDV3ld4K+kXaUOLnOOo8zEjVH6DUFZ59ep3pTzkDeq4tT+BTkVKASwayYnTmZVDBqGu7meoUA9Hf/aqxCPda9Eek+ZSFfTAdOsK0UWqolq1kGsw0ppyhs4u4y1yYHevqoZ9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765450267; c=relaxed/simple;
-	bh=GWygM3x7+hqXAz+c7Pscc3NwAUM7JoNWjc70ap7XnOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mjtsyjIQ+Y2sM6r8bKamOzPHX6V3is9EKOuSiQeE3hdMw6cE0llxGhDS9hjphS65oVY3wPySDPGubdRPNv22Yp8cniw+oYp+su+Bq9LQE+RzB3wNDH3M4kID41axh7568iS7F9FaX6EuwjfIF4YS6tp2nbP4hkQ0XV8SV8qjlaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qzWNnb3v; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=TtlbzqbRLXFDNB23fI071mEx9a4si+wr83gFgHx75fk=; b=qzWNnb3vDUtOmby/6rRXEF7QKT
-	GS9yh3t/Pf9pYR2EDfORT1wdcR3e3IyHexNzLc4euHhiRpxqbWbIlFjjAt8H5n7UfNT5CZFEOo2d5
-	CII+rHjVrVpvl5ITy4At0zBf93ruwAHWb7Nb6+6NERA4SWagpZ8AqjV1WBYQ0KdhcIxxvW6imMUvi
-	tJcy5Shpzyg9Yz70sUtvPvehf5nrJ1Yv5rVxbCQ97KEd/adqKyi5631aBfZR88bW0o66aAhQZUHk6
-	QmcR89EwwrwvT0UB/hlRYMSKhNgi4sfeZMyiGEM3+IO82nnBK1KNYqMrt5d/tNjXBq9xPKld2FvBd
-	QNxpB4QA==;
-Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vTeG3-0000000E8Ht-3Ghx;
-	Thu, 11 Dec 2025 10:50:51 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 6402730301A; Thu, 11 Dec 2025 11:50:50 +0100 (CET)
-Date: Thu, 11 Dec 2025 11:50:50 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: Re: [PATCH v6 6/9] x86/vmscape: Use static_call() for predictor flush
-Message-ID: <20251211105050.GB3707891@noisy.programming.kicks-ass.net>
-References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
- <20251201-vmscape-bhb-v6-6-d610dd515714@linux.intel.com>
+	s=arc-20240116; t=1765450777; c=relaxed/simple;
+	bh=dN8E80CdySwxsmhwuXZgg5f6wG9/5RIPBVfpk10OCZQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cwsyqF+Uly9TJuVIWcDjgTTm8uGaKUfPpt+kIhixlKR1c2pFeBlMvcAisB9sYe16ROuoqffbU9SPHFkNw9B2MbiLAqL1yvusR+sbcC3Tm/3lwwR8ItatdBa5wC7q2MKwwBfhcXMUk4VLS4nDl35E+5o/dt3ycQrjJ9IMU+EvqG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=josie.lol; spf=pass smtp.mailfrom=josie.lol; dkim=pass (2048-bit key) header.d=josie.lol header.i=@josie.lol header.b=XCUQAbdw; arc=none smtp.client-ip=136.175.108.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=josie.lol
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=josie.lol
+Received: from filter006.mxroute.com ([136.175.111.3] filter006.mxroute.com)
+ (Authenticated sender: mN4UYu2MZsgR)
+ by mail-108-mta93.mxroute.com (ZoneMTA) with ESMTPSA id 19b0d0c2b8b0004eea.009
+ for <kvm@vger.kernel.org>
+ (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+ Thu, 11 Dec 2025 10:54:20 +0000
+X-Zone-Loop: d6fa21e5994d94388415b23781e25041617713ae896e
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=josie.lol;
+	s=x; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Date:
+	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID; bh=ha5pCxRKxayQ8qBstOBlp614/GriMM6unQD08kdlSYk=; b=XCUQAb
+	dwArKb76gxz2P8fNcZwW7oihkwH7CNrr3in5qiE8O2OFiMgewFhw7cRHnMdVbIWjeaUDhcpgihbc8
+	lADyNPKG5hx2aJfoZZRAMJfKQ388QJA8lYeIdH4iID7v7loQ1YPbvricSskGG6xZfvU6cxYCncuP0
+	40HyphE4bx676NzpiaYAu+3+QNYITEjreOGxzG9PIeg20Nn10KnQDBkx4WR9uQppR+L8kC6S3HT0h
+	BG0MlmE27Re8o62iuaY4B897tMGoO8XL/Z7gzXF3/cvWABHWTyLntlvePYRHt/PY8c77WacLYPQJg
+	z3AdPjf6n0CyYA+tCxH6AQWITkUA==;
+From: Josephine Pfeiffer <hi@josie.lol>
+To: frankja@linux.ibm.com
+Cc: agordeev@linux.ibm.com,
+	borntraeger@linux.ibm.com,
+	david@kernel.org,
+	gor@linux.ibm.com,
+	hca@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	svens@linux.ibm.com
+Subject: Re: [PATCH] KVM: s390: Implement CHECK_STOP support and fix GET_MP_STATE
+Date: Thu, 11 Dec 2025 11:54:12 +0100
+Message-ID: <20251211105412.207458-1-hi@josie.lol>
+In-Reply-To: <fd5ad2be-f15f-425f-b8ef-087dc639024d@linux.ibm.com>
+References: <fd5ad2be-f15f-425f-b8ef-087dc639024d@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251201-vmscape-bhb-v6-6-d610dd515714@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Id: hi@josie.lol
 
-On Mon, Dec 01, 2025 at 10:20:14PM -0800, Pawan Gupta wrote:
-> Adding more mitigation options at exit-to-userspace for VMSCAPE would
-> usually require a series of checks to decide which mitigation to use. In
-> this case, the mitigation is done by calling a function, which is decided
-> at boot. So, adding more feature flags and multiple checks can be avoided
-> by using static_call() to the mitigating function.
-> 
-> Replace the flag-based mitigation selector with a static_call(). This also
-> frees the existing X86_FEATURE_IBPB_EXIT_TO_USER.
-> 
-> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> ---
->  arch/x86/Kconfig                     | 1 +
->  arch/x86/include/asm/cpufeatures.h   | 2 +-
->  arch/x86/include/asm/entry-common.h  | 7 +++----
->  arch/x86/include/asm/nospec-branch.h | 3 +++
->  arch/x86/kernel/cpu/bugs.c           | 5 ++++-
->  arch/x86/kvm/x86.c                   | 2 +-
->  6 files changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index fa3b616af03a2d50eaf5f922bc8cd4e08a284045..066f62f15e67e85fda0f3fd66acabad9a9794ff8 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -2706,6 +2706,7 @@ config MITIGATION_TSA
->  config MITIGATION_VMSCAPE
->  	bool "Mitigate VMSCAPE"
->  	depends on KVM
-> +	select HAVE_STATIC_CALL
+On Tue, 25 Nov 2025 19:10:43 +0100, Janosch Frank wrote:
+> On 11/20/25 19:28, Josephine Pfeiffer wrote:
+> > The use cases I see are:
+> >
+> > 1. API completeness: The state was added to the UAPI 11 years ago but never
+> >     implemented. Userspace cannot use a documented API feature.
+>
+> I'd rather have stubs which properly fence than code that's never tested
+> since we don't use it.
+>
+> Since this never worked it might make sense to remove it since future
+> users will need to check for this "feature" anyway before using it.
 
-That can't be right.
+That's a fair point. If you think there's no real use case, removing the dead 
+API is cleaner than implementing unused code.
+
+> > 2. Fault injection testing: Administrators testing failover/monitoring for
+> >     hardware failures could programmatically put a CPU into CHECK_STOP to
+> >     verify their procedures work.
+>
+> How would that work?
+> What can we gain from putting a CPU into checkstop?
+> How would QEMU would use this?
+>
+> Checkstop is not an error communication medium, that's the machine check
+> interrupt. If you want to inject faults then use the machine check
+> interface.
+>
+> If you want to crash the guest, then panic it or just stop cpus.
+
+You're right - machine check interrupts are the correct mechanism for fault
+injection. I was conflating the error state with error signaling.
+
+I'll withdraw this patch and can send a cleanup patch instead to remove
+KVM_MP_STATE_CHECK_STOP from the documentation. Would that be useful?
+
+If so, should I also remove KVM_MP_STATE_LOAD from the docs while I'm at it? It has
+the same "not supported yet" comment from the original 2014 commit [1].
+
+Thanks,
+Josephine
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6352e4d2dd9a
 
