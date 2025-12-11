@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-65709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69352CB4CFE
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:51:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050CCCB4D07
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:51:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 27CC7300162B
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B0B1430019DF
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCB42C0297;
-	Thu, 11 Dec 2025 05:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67A32C0F7B;
+	Thu, 11 Dec 2025 05:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PmBjxG4v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cneyof7Y"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5E22BEC42
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE9A2C033C
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765431867; cv=none; b=B668kG60kI9H06t6LY2YBD12fmJz2cbqULR+5E7YsNgctMCOrK6bCietNchgTo5VN92CKxSrsis0DX+n7udRy+GANag9wrYIwIae91urGgqh8c5GARFk4WbnVhV4dfDmcJiKVEh0DUy3vl2gFXdIo2aPdSG2XYz0MZjBQoI6jnM=
+	t=1765431871; cv=none; b=eaEOalpDAFUExG8WReBa9AkrrCHfkNGb3HqkICuNU74ghfOfHbwVli/oUvuUIS61hoIQCDbfxmmT3kxu/+V+DANDakLCMIdxnKJkuRrmWIFte9Ge3fC9xbW4E61PVmipjMuXc4ktNfCuJ37r5636wS/Ot1xF5o7lmcHZRd+MTQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765431867; c=relaxed/simple;
-	bh=H43GacNZ74LpZvq1iBt7jAREOYz4e8zAxG+jaXrh3os=;
+	s=arc-20240116; t=1765431871; c=relaxed/simple;
+	bh=+ZmFX9Wa38QCyJDA999eLfSD8lk8eMMUymD4mrIN4hM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OkYl8pWDnqnbJ0ugBj4PiAP11jO+GOD5ODWDHLHWIOMf+GGpsxs7b59L+dxf60Sty4+vCS+eqvrGJ0Ypo6cA2+H9NP/l1dCfxbE7rpsHRfm7gncU2JIJVLmlbXW9QT+epPUgycCNu2V3tmRzKlXL9DDbhnkgZH8EZZRk3RhJtFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PmBjxG4v; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=S7Su5dIOdP4un/so0g3hIsDU0l/hmhVU03r3yUw/F15qowPSgLx43/19Q7CXz6EMn9KuZ88wmHJCKNgfTWw3w0N7fJ1So+sELByHvJPm89eYDVzmPkwmnvUycq88LM15uYyZeo0ub3+zWHMyU6rWFp1RGxizuAzwQ+33CAjJMnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cneyof7Y; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765431866; x=1796967866;
+  t=1765431870; x=1796967870;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=H43GacNZ74LpZvq1iBt7jAREOYz4e8zAxG+jaXrh3os=;
-  b=PmBjxG4vtCu3/IjHX1AwhVB1/hSHg3oipq/Pr2f5SYVL+YS70wQy/8V8
-   BGM1gXwKKGp0LH9ujbPdfOjhIRz+mIvw34PDj0LsL3cmnQDKSl8alNNTG
-   YkieA/sjR+ZPetV27huZuPkWx6h/pmnlvNmANvrydd1QahH3heuwdcGhp
-   JQvn2RWjRF+fqo+/BKOysq81jkcl7pAf+XF51parfoYrTV18MBYwxGBgp
-   W7vfUPexzgAf1JvKvMTN9nu4+3IvdF67i11pnKAgvVaEyMOqdHThnjuRY
-   qXiBHWarqPoFF22nRWh1USKQf3LPcQ+Tc7j4d9HLbbaTquz8pSvuxo4fJ
+  bh=+ZmFX9Wa38QCyJDA999eLfSD8lk8eMMUymD4mrIN4hM=;
+  b=Cneyof7YFZtFTTdTWgkOZnm4YlrkITuxp4j76vaZn7S3bDjFbCQJXp4j
+   C6AKOgELxEhGgxlf1oYVr7FpwFLoOwITRW/wPGyWHAaaYPC4Pz8vuk3E3
+   E8tSYF/modQHewa+OUY5BPHJgxZMpMpSyITgaJey/eFnvnD+Uc89hImZX
+   2Grbr9/7zjv1rATGKMjrN5GDZ/0Ca/BMfwy7Iw2aJzh+Eni6aKc6erwHZ
+   uz1cthvx2iNNB/v7+dnoep2q5RarJ1dBXW3s2p84XvpCfqULga76SN80r
+   oSORDaDWMuoApJagzPNNYqQSQmJn84h87Ojqm8dbBG3GTPgFcXOGEeqU8
    w==;
-X-CSE-ConnectionGUID: sGEPcEZJSwmj744qIsCDlg==
-X-CSE-MsgGUID: Hkm4fsOqTEmk1sEvkxdMNg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409951"
+X-CSE-ConnectionGUID: oXQizk9CRouDSLy4XsmCtQ==
+X-CSE-MsgGUID: TEKRyGXcSxqz+P0R0bKTHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409964"
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="66409951"
+   d="scan'208";a="66409964"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:25 -0800
-X-CSE-ConnectionGUID: Fml8hIaRRhG2ftMfKKQcAQ==
-X-CSE-MsgGUID: XfpiWL36QduylJDRnqf97A==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:29 -0800
+X-CSE-ConnectionGUID: TS62/0xTR5a67qTvb29dgA==
+X-CSE-MsgGUID: MGBlX1B5Q6qEzhBLIXLPYg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="227366193"
+   d="scan'208";a="227366216"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:22 -0800
+  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:25 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -71,10 +71,11 @@ Cc: qemu-devel@nongnu.org,
 	Xiaoyao Li <xiaoyao.li@intel.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 16/22] i386/cpu: Migrate MSR_IA32_PL0_SSP for FRED and CET-SHSTK
-Date: Thu, 11 Dec 2025 14:07:55 +0800
-Message-Id: <20251211060801.3600039-17-zhao1.liu@intel.com>
+	Zhao Liu <zhao1.liu@intel.com>,
+	Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH v5 17/22] i386/machine: Add vmstate for cet-shstk and cet-ibt
+Date: Thu, 11 Dec 2025 14:07:56 +0800
+Message-Id: <20251211060801.3600039-18-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251211060801.3600039-1-zhao1.liu@intel.com>
 References: <20251211060801.3600039-1-zhao1.liu@intel.com>
@@ -86,67 +87,94 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Xin Li (Intel)" <xin@zytor.com>
+From: Yang Weijiang <weijiang.yang@intel.com>
 
-Both FRED and CET-SHSTK need MSR_IA32_PL0_SSP, so add the vmstate for
-this MSR.
-
-When CET-SHSTK is not supported, MSR_IA32_PL0_SSP keeps accessible, but
-its value doesn't take effect. Therefore, treat this vmstate as a
-subsection rather than a fix for the previous FRED vmstate.
+Add vmstates for cet-shstk and cet-ibt
 
 Tested-by: Farrah Chen <farrah.chen@intel.com>
-Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+Co-developed-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes Since v4:
- - Check if pl0_ssp is used instead of checking CPUIDs.
-
 Changes Since v3:
- - New commit.
+ - Rename vmstate_ss to vmstate_shstk.
+ - Split pl0_ssp into a seperate vmstate in another patch.
+
+Changes Since v2:
+ - Split a subsection "vmstate_ss" since shstk is user-configurable.
 ---
- target/i386/machine.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ target/i386/machine.c | 52 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
 diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 45b7cea80aa7..bf13f7f0f66e 100644
+index bf13f7f0f66e..57a968c30db3 100644
 --- a/target/i386/machine.c
 +++ b/target/i386/machine.c
-@@ -1668,6 +1668,28 @@ static const VMStateDescription vmstate_triple_fault = {
+@@ -1690,6 +1690,57 @@ static const VMStateDescription vmstate_pl0_ssp = {
      }
  };
  
-+static bool pl0_ssp_needed(void *opaque)
++static bool shstk_needed(void *opaque)
 +{
 +    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
 +
-+    /*
-+     * CPUID_7_1_EAX_FRED and CPUID_7_0_ECX_CET_SHSTK are checked because
-+     * if all of these bits are zero and the MSR will not be settable.
-+     */
-+    return !!(cpu->env.pl0_ssp);
++    return !!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK);
 +}
 +
-+static const VMStateDescription vmstate_pl0_ssp = {
-+    .name = "cpu/msr_pl0_ssp",
++static const VMStateDescription vmstate_shstk = {
++    .name = "cpu/cet_shstk",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .needed = pl0_ssp_needed,
-+    .fields = (const VMStateField[]) {
-+        VMSTATE_UINT64(env.pl0_ssp, X86CPU),
++    .needed = shstk_needed,
++    .fields = (VMStateField[]) {
++        /* pl0_ssp has been covered by vmstate_pl0_ssp. */
++        VMSTATE_UINT64(env.pl1_ssp, X86CPU),
++        VMSTATE_UINT64(env.pl2_ssp, X86CPU),
++        VMSTATE_UINT64(env.pl3_ssp, X86CPU),
++#ifdef TARGET_X86_64
++        VMSTATE_UINT64(env.int_ssp_table, X86CPU),
++#endif
++        VMSTATE_UINT64(env.guest_ssp, X86CPU),
 +        VMSTATE_END_OF_LIST()
 +    }
++};
++
++static bool cet_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return !!((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) ||
++              (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT));
++}
++
++static const VMStateDescription vmstate_cet = {
++    .name = "cpu/cet",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = cet_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.u_cet, X86CPU),
++        VMSTATE_UINT64(env.s_cet, X86CPU),
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * const []) {
++        &vmstate_shstk,
++        NULL,
++    },
 +};
 +
  const VMStateDescription vmstate_x86_cpu = {
      .name = "cpu",
      .version_id = 12,
-@@ -1817,6 +1839,7 @@ const VMStateDescription vmstate_x86_cpu = {
- #endif
+@@ -1840,6 +1891,7 @@ const VMStateDescription vmstate_x86_cpu = {
          &vmstate_arch_lbr,
          &vmstate_triple_fault,
-+        &vmstate_pl0_ssp,
+         &vmstate_pl0_ssp,
++        &vmstate_cet,
          NULL
      }
  };
