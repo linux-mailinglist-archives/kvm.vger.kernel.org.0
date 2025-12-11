@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-65708-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65709-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B8D3CB4D02
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:51:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69352CB4CFE
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8D4893001827
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 27CC7300162B
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463C82BE7C3;
-	Thu, 11 Dec 2025 05:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCB42C0297;
+	Thu, 11 Dec 2025 05:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UUTnyGRG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PmBjxG4v"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A522BE62E
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5E22BEC42
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765431863; cv=none; b=I4AlL8M/lftEa7JAcshZA/HjASpAMqLKQwMD/LlWmpxHBV8dGIMVIOcXSpQtGY34SWx175+XNUr9qiedaEYurpF0Z1XxWvtKCtoQ42lO3ht53OVOqfw0TTA05ogRfgl3XcZYjoVU4EuYyDhWpkqS0jMCvLP+yc16+E2WJCF74OE=
+	t=1765431867; cv=none; b=B668kG60kI9H06t6LY2YBD12fmJz2cbqULR+5E7YsNgctMCOrK6bCietNchgTo5VN92CKxSrsis0DX+n7udRy+GANag9wrYIwIae91urGgqh8c5GARFk4WbnVhV4dfDmcJiKVEh0DUy3vl2gFXdIo2aPdSG2XYz0MZjBQoI6jnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765431863; c=relaxed/simple;
-	bh=x0PXAqnx+JyOHSOJTK7j77gOmPTGVLtFdsCoGZuQvp8=;
+	s=arc-20240116; t=1765431867; c=relaxed/simple;
+	bh=H43GacNZ74LpZvq1iBt7jAREOYz4e8zAxG+jaXrh3os=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ePKIdrt1e7wI0K2MryeSMA79AkAV37KHZYPcY/T7eVSW+xK2EyYVY/WOae/u6tI6jD7+66+lq18vX61UCHQW3JORjPQYRXprS0cBpu+Px6Lp0Lt0r5u8JldDdAM9fW30Nkf7X5qQwyMlXoZ5uyI14r5R4FQTla1PTGEmTO7r054=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UUTnyGRG; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=OkYl8pWDnqnbJ0ugBj4PiAP11jO+GOD5ODWDHLHWIOMf+GGpsxs7b59L+dxf60Sty4+vCS+eqvrGJ0Ypo6cA2+H9NP/l1dCfxbE7rpsHRfm7gncU2JIJVLmlbXW9QT+epPUgycCNu2V3tmRzKlXL9DDbhnkgZH8EZZRk3RhJtFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PmBjxG4v; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765431862; x=1796967862;
+  t=1765431866; x=1796967866;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=x0PXAqnx+JyOHSOJTK7j77gOmPTGVLtFdsCoGZuQvp8=;
-  b=UUTnyGRGvmY70rdCg452NNWNpNW0QFH5gSYX/M4NN5lV0HYvZK+/KO4E
-   df7ynd+IdqGecZS3rCs2RZY/QOL5cu+NbSdkoKP054CwPS2b1cHQOd7J6
-   lAFRghT+iIIYRRJZ1dV0kTbcpDktOOX/1WFWchth5VO1LYUBNK2IADhby
-   ODOorq4tAp+265GML3YrRTDNUqaqoIuaPY5bOmMTCWwD3lDjffxfU2ZcU
-   kK3Zo0ZJUuGJXPMVpTdDifODsAM3fB2sIp0xzhRzPKOzp1gY+SWE9bnIg
-   m0PV6sUEekX+2GFss1+jw9ZLdsSJraRNd6uwUDf7PPdTP/42iaHyZGdNo
-   A==;
-X-CSE-ConnectionGUID: dGbLPIIiQm27aZaLunBDDg==
-X-CSE-MsgGUID: NzsL1z9lTLm1avD1wGaqPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409943"
+  bh=H43GacNZ74LpZvq1iBt7jAREOYz4e8zAxG+jaXrh3os=;
+  b=PmBjxG4vtCu3/IjHX1AwhVB1/hSHg3oipq/Pr2f5SYVL+YS70wQy/8V8
+   BGM1gXwKKGp0LH9ujbPdfOjhIRz+mIvw34PDj0LsL3cmnQDKSl8alNNTG
+   YkieA/sjR+ZPetV27huZuPkWx6h/pmnlvNmANvrydd1QahH3heuwdcGhp
+   JQvn2RWjRF+fqo+/BKOysq81jkcl7pAf+XF51parfoYrTV18MBYwxGBgp
+   W7vfUPexzgAf1JvKvMTN9nu4+3IvdF67i11pnKAgvVaEyMOqdHThnjuRY
+   qXiBHWarqPoFF22nRWh1USKQf3LPcQ+Tc7j4d9HLbbaTquz8pSvuxo4fJ
+   w==;
+X-CSE-ConnectionGUID: sGEPcEZJSwmj744qIsCDlg==
+X-CSE-MsgGUID: Hkm4fsOqTEmk1sEvkxdMNg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409951"
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="66409943"
+   d="scan'208";a="66409951"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:22 -0800
-X-CSE-ConnectionGUID: cj8B2o9eQB+/BzxTAyCSjg==
-X-CSE-MsgGUID: aBTCTJaRSy2pG/QtWwlXYQ==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:25 -0800
+X-CSE-ConnectionGUID: Fml8hIaRRhG2ftMfKKQcAQ==
+X-CSE-MsgGUID: XfpiWL36QduylJDRnqf97A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="227366179"
+   d="scan'208";a="227366193"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:18 -0800
+  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:22 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -71,11 +71,10 @@ Cc: qemu-devel@nongnu.org,
 	Xiaoyao Li <xiaoyao.li@intel.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v5 15/22] i386/kvm: Add save/restore support for KVM_REG_GUEST_SSP
-Date: Thu, 11 Dec 2025 14:07:54 +0800
-Message-Id: <20251211060801.3600039-16-zhao1.liu@intel.com>
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v5 16/22] i386/cpu: Migrate MSR_IA32_PL0_SSP for FRED and CET-SHSTK
+Date: Thu, 11 Dec 2025 14:07:55 +0800
+Message-Id: <20251211060801.3600039-17-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251211060801.3600039-1-zhao1.liu@intel.com>
 References: <20251211060801.3600039-1-zhao1.liu@intel.com>
@@ -87,117 +86,70 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yang Weijiang <weijiang.yang@intel.com>
+From: "Xin Li (Intel)" <xin@zytor.com>
 
-CET provides a new architectural register, shadow stack pointer (SSP),
-which cannot be directly encoded as a source, destination or memory
-operand in instructions. But Intel VMCS & VMCB provide fields to
-save/load guest & host's ssp.
+Both FRED and CET-SHSTK need MSR_IA32_PL0_SSP, so add the vmstate for
+this MSR.
 
-It's necessary to save & restore Guest's ssp before & after migration.
-To support this, KVM implements Guest's SSP as a special KVM internal
-register - KVM_REG_GUEST_SSP, and allows QEMU to save & load it via
-KVM_GET_ONE_REG/KVM_SET_ONE_REG.
-
-Cache KVM_REG_GUEST_SSP in X86CPUState.
+When CET-SHSTK is not supported, MSR_IA32_PL0_SSP keeps accessible, but
+its value doesn't take effect. Therefore, treat this vmstate as a
+subsection rather than a fix for the previous FRED vmstate.
 
 Tested-by: Farrah Chen <farrah.chen@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Co-developed-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- target/i386/cpu.h     |  3 ++-
- target/i386/kvm/kvm.c | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+), 1 deletion(-)
+Changes Since v4:
+ - Check if pl0_ssp is used instead of checking CPUIDs.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 37cc218bf3a5..458775daaa3e 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1979,7 +1979,7 @@ typedef struct CPUArchState {
-     uint64_t fred_config;
- #endif
+Changes Since v3:
+ - New commit.
+---
+ target/i386/machine.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 45b7cea80aa7..bf13f7f0f66e 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -1668,6 +1668,28 @@ static const VMStateDescription vmstate_triple_fault = {
+     }
+ };
  
--    /* CET MSRs */
-+    /* CET MSRs and register */
-     uint64_t u_cet;
-     uint64_t s_cet;
-     uint64_t pl0_ssp; /* also used for FRED */
-@@ -1989,6 +1989,7 @@ typedef struct CPUArchState {
- #ifdef TARGET_X86_64
-     uint64_t int_ssp_table;
- #endif
-+    uint64_t guest_ssp;
- 
-     uint64_t tsc_adjust;
-     uint64_t tsc_deadline;
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 4eb58ca19d79..1ebe20f7fb57 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4292,6 +4292,35 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-     return kvm_buf_set_msrs(cpu);
- }
- 
-+static int kvm_put_kvm_regs(X86CPU *cpu)
++static bool pl0_ssp_needed(void *opaque)
 +{
-+    CPUX86State *env = &cpu->env;
-+    int ret;
++    X86CPU *cpu = opaque;
 +
-+    if ((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK)) {
-+        ret = kvm_set_one_reg(CPU(cpu), KVM_X86_REG_KVM(KVM_REG_GUEST_SSP),
-+                              &env->guest_ssp);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
-+    return 0;
++    /*
++     * CPUID_7_1_EAX_FRED and CPUID_7_0_ECX_CET_SHSTK are checked because
++     * if all of these bits are zero and the MSR will not be settable.
++     */
++    return !!(cpu->env.pl0_ssp);
 +}
 +
-+static int kvm_get_kvm_regs(X86CPU *cpu)
-+{
-+    CPUX86State *env = &cpu->env;
-+    int ret;
++static const VMStateDescription vmstate_pl0_ssp = {
++    .name = "cpu/msr_pl0_ssp",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = pl0_ssp_needed,
++    .fields = (const VMStateField[]) {
++        VMSTATE_UINT64(env.pl0_ssp, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
 +
-+    if ((env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK)) {
-+        ret = kvm_get_one_reg(CPU(cpu), KVM_X86_REG_KVM(KVM_REG_GUEST_SSP),
-+                              &env->guest_ssp);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
-+    return 0;
-+}
- 
- static int kvm_get_xsave(X86CPU *cpu)
- {
-@@ -5445,6 +5474,11 @@ int kvm_arch_put_registers(CPUState *cpu, KvmPutState level, Error **errp)
-         error_setg_errno(errp, -ret, "Failed to set MSRs");
-         return ret;
+ const VMStateDescription vmstate_x86_cpu = {
+     .name = "cpu",
+     .version_id = 12,
+@@ -1817,6 +1839,7 @@ const VMStateDescription vmstate_x86_cpu = {
+ #endif
+         &vmstate_arch_lbr,
+         &vmstate_triple_fault,
++        &vmstate_pl0_ssp,
+         NULL
      }
-+    ret = kvm_put_kvm_regs(x86_cpu);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to set KVM type registers");
-+        return ret;
-+    }
-     ret = kvm_put_vcpu_events(x86_cpu, level);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Failed to set vCPU events");
-@@ -5517,6 +5551,11 @@ int kvm_arch_get_registers(CPUState *cs, Error **errp)
-         error_setg_errno(errp, -ret, "Failed to get MSRs");
-         goto out;
-     }
-+    ret = kvm_get_kvm_regs(cpu);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Failed to get KVM type registers");
-+        goto out;
-+    }
-     ret = kvm_get_apic(cpu);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Failed to get APIC");
+ };
 -- 
 2.34.1
 
