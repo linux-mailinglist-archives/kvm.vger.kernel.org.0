@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-65704-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65705-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC45CB4CFB
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:51:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C55ACB4D13
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:52:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D55A300E01C
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3DF953014AF0
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF3229B77E;
-	Thu, 11 Dec 2025 05:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52312299A81;
+	Thu, 11 Dec 2025 05:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KXKLPKHS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LZDLo2ej"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4835C288C0E
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78801288C20
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765431846; cv=none; b=Vh+oA6JItpVHhj9Tm0N7o0VZQQaMSP1jqvW+2FJOF4MbuYGvHoWQM0hgVVMcl9GuAsPNEd5ikrVVYoGGorj+ad1GyDi4JqRPn0ILJ9u/YkWsbAc7o/0u/lA8LZaVejQlEsOBkhHzveCi/jHLXbMriDVn8Co+X39UpV6NC4BaE9o=
+	t=1765431851; cv=none; b=F298a/QQXZQr5HGlbc0kGc29eEsNaOcXNVAjMqy6p8uUUl5GicKvG1bvapN7rVWbCbPl3AzEsmojEXKI6dPoZzB+Nztr2EmLC7r7IfzOeTyiXHR2PCPMcRV5yQonBJSIvTT7/ngbGXLAk97RjLcfYyJ83F2M4XLcStUJsX3r+EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765431846; c=relaxed/simple;
-	bh=ei4jy82TLUyU3gpgqSjMGkn3ky3SGOs5VuaVHpOYPJ4=;
+	s=arc-20240116; t=1765431851; c=relaxed/simple;
+	bh=XBfZRaZRr3MF7syASa2Eo8ym4g4biHCF5wgZ3TpjGi4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GunxkILuhMhrN89fyNRW+6SN9bww1KKk8ElCHJsDv65tuYXxgQu1wd/GMq4s8r6a+MCQ/AkFv6k0GBzefptWActghKOdqyvFPQgchez3N9jtja4K61RqYWIbcmLLDZEY725b/C2/Oo5DmeASjuK1QGy8KpkDcsyS1QcHquOc38M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=fail smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KXKLPKHS; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=GEGNs086RGBEH6PXtqqAgAKGpujF3XxrhkUIrPKV4HgcosXTqGL5e2r9NXFK4lxQUJ/JeV3vvVTnn3QyltiImI4YIvCYWcz51OT9wPCQAeN0LKuvCBFUJ7RSaPFJIeP7ox0oD9XG+BlAtYDQ1hf4X51NEwkl84cijT9RV35hWzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=fail smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LZDLo2ej; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765431845; x=1796967845;
+  t=1765431849; x=1796967849;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ei4jy82TLUyU3gpgqSjMGkn3ky3SGOs5VuaVHpOYPJ4=;
-  b=KXKLPKHSl0PXOugYnP3vve6Osv46bCiZWRMNAu3wOigNTPPWSR/yASWl
-   TMRuI89psLhSLqwcJH/p0F7f6TY/Npl07wxIQMrS4B1Zmvk0YxWIzHGoX
-   3W+dIcxk4CtF5Zq3Gq7OeciWBsuIZXlu6YDz7s8w+c04CIg4KGPRnQRe4
-   OkCojaW7udbK8p+o0/TstIv91r4Nm9fhqRbXRzJuNcJoNh3yy9s4AZh2V
-   FdrVjLBdKYn7NeWquS4PJqCqpusURIHVzwXGkOueWJY9gXDudpOlPO/Wp
-   I0Nehpmse1h54iDG6eFGXjPTu45iJcF5hcR3OrnOLDEnugGD8KswlQR4J
-   g==;
-X-CSE-ConnectionGUID: jKgyPuqqQKm79ssvE8X85g==
-X-CSE-MsgGUID: hPz6PQpISyC60ZS5xZNG+Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409908"
+  bh=XBfZRaZRr3MF7syASa2Eo8ym4g4biHCF5wgZ3TpjGi4=;
+  b=LZDLo2ejv1uGSwjqn2u6CUSKirBuZVX1U1XUTRew9EYstaTi3pmkTfjV
+   MgVYFww2hlJW74L0pEEON0JlQL+/cS4heYwzCs1pcQSARR416MhLUEnVB
+   oDSGSEbpWN/1nGS6GXAz/Q5LFNOqO4dnQ8CdSFCR+ZUS7ML3bzCnR+6IV
+   8sfOEygbS/bUmw7PhuTiHLCL/RxbpCQN8/7eZ5YLVTsgB6EEqjBjaIvAR
+   3QAmFSkSxG2iAapOKDww2cQCfLTVA5oC9ebYGrnaN8Pe4r0WQwA6hHbZc
+   +xPbBqCa3+rxvDsELPBNKQvotJAh5VMazMjBWE3h8FHBjSdyl+BFge8dS
+   w==;
+X-CSE-ConnectionGUID: 18VprwUDRimXspQiGXAmtg==
+X-CSE-MsgGUID: 5Opxs76pQr6sGHbIIPEJqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409915"
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="66409908"
+   d="scan'208";a="66409915"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:04 -0800
-X-CSE-ConnectionGUID: 8+jLiWf2TQGhwHoZq1oL4Q==
-X-CSE-MsgGUID: 6XziEBl/SISQy6TNmNeizQ==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:08 -0800
+X-CSE-ConnectionGUID: zOZVpKb9Q+u3AvIjrui/zQ==
+X-CSE-MsgGUID: /Wl5Veo2RUiIE03N9MjU7g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="227366122"
+   d="scan'208";a="227366130"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:00 -0800
+  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:04 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -71,11 +71,10 @@ Cc: qemu-devel@nongnu.org,
 	Xiaoyao Li <xiaoyao.li@intel.com>,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH v5 11/22] i386/cpu: Enable xsave support for CET states
-Date: Thu, 11 Dec 2025 14:07:50 +0800
-Message-Id: <20251211060801.3600039-12-zhao1.liu@intel.com>
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v5 12/22] i386/cpu: Add CET support in CR4
+Date: Thu, 11 Dec 2025 14:07:51 +0800
+Message-Id: <20251211060801.3600039-13-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251211060801.3600039-1-zhao1.liu@intel.com>
 References: <20251211060801.3600039-1-zhao1.liu@intel.com>
@@ -87,143 +86,76 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yang Weijiang <weijiang.yang@intel.com>
-
-Add CET_U/S bits in xstate area and report support in xstate
-feature mask.
-MSR_XSS[bit 11] corresponds to CET user mode states.
-MSR_XSS[bit 12] corresponds to CET supervisor mode states.
-
-CET Shadow Stack(SHSTK) and Indirect Branch Tracking(IBT) features
-are enumerated via CPUID.(EAX=07H,ECX=0H):ECX[7] and EDX[20]
-respectively, two features share the same state bits in XSS, so
-if either of the features is enabled, set CET_U and CET_S bits
-together.
+CR4.CET bit (bit 23) is as master enable for CET.
+Check and adjust CR4.CET bit based on CET CPUIDs.
 
 Tested-by: Farrah Chen <farrah.chen@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Co-developed-by: Chao Gao <chao.gao@intel.com>
-Signed-off-by: Chao Gao <chao.gao@intel.com>
-Co-developed-by: Zhao Liu <zhao1.liu@intel.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes Since v2:
- - Rename XSavesCETU/XSavesCETS to XSaveCETU/XSaveCETS.
- - Refine the comments.
- - Drop ".offset = 0" and its comment.
- - Re-describe xstate dependencies via features array.
- - Drop "cet-u" & "cet-s" enumeration from FEAT_XSAVE_XSS_LO's
-   feat_name array sicne currently xsave doesn't use named features.
+Changes Since v3:
+ - Reorder CR4_RESERVED_MASK.
 ---
- target/i386/cpu.c | 14 ++++++++++++++
- target/i386/cpu.h | 26 +++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 1 deletion(-)
+ target/i386/cpu.h    |  9 +++++++--
+ target/i386/helper.c | 12 ++++++++++++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d2a89c03caec..4d29e784061c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2078,6 +2078,20 @@ ExtSaveArea x86_ext_save_areas[XSAVE_STATE_AREA_COUNT] = {
-             { FEAT_7_0_ECX,         CPUID_7_0_ECX_PKU },
-         },
-     },
-+    [XSTATE_CET_U_BIT] = {
-+        .size = sizeof(XSaveCETU),
-+        .features = {
-+            { FEAT_7_0_ECX,         CPUID_7_0_ECX_CET_SHSTK },
-+            { FEAT_7_0_EDX,         CPUID_7_0_EDX_CET_IBT },
-+        },
-+    },
-+    [XSTATE_CET_S_BIT] = {
-+        .size = sizeof(XSaveCETS),
-+        .features = {
-+            { FEAT_7_0_ECX,         CPUID_7_0_ECX_CET_SHSTK },
-+            { FEAT_7_0_EDX,         CPUID_7_0_EDX_CET_IBT },
-+        },
-+    },
-     [XSTATE_ARCH_LBR_BIT] = {
-         .size = sizeof(XSaveArchLBR),
-         .features = {
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 3d74afc5a8e7..bc3296a3c6f0 100644
+index bc3296a3c6f0..a1ff2ceb0c38 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -589,6 +589,8 @@ typedef enum X86Seg {
- #define XSTATE_Hi16_ZMM_BIT             7
- #define XSTATE_PT_BIT                   8
- #define XSTATE_PKRU_BIT                 9
-+#define XSTATE_CET_U_BIT                11
-+#define XSTATE_CET_S_BIT                12
- #define XSTATE_ARCH_LBR_BIT             15
- #define XSTATE_XTILE_CFG_BIT            17
- #define XSTATE_XTILE_DATA_BIT           18
-@@ -603,6 +605,8 @@ typedef enum X86Seg {
- #define XSTATE_Hi16_ZMM_MASK            (1ULL << XSTATE_Hi16_ZMM_BIT)
- #define XSTATE_PT_MASK                  (1ULL << XSTATE_PT_BIT)
- #define XSTATE_PKRU_MASK                (1ULL << XSTATE_PKRU_BIT)
-+#define XSTATE_CET_U_MASK               (1ULL << XSTATE_CET_U_BIT)
-+#define XSTATE_CET_S_MASK               (1ULL << XSTATE_CET_S_BIT)
- #define XSTATE_ARCH_LBR_MASK            (1ULL << XSTATE_ARCH_LBR_BIT)
- #define XSTATE_XTILE_CFG_MASK           (1ULL << XSTATE_XTILE_CFG_BIT)
- #define XSTATE_XTILE_DATA_MASK          (1ULL << XSTATE_XTILE_DATA_BIT)
-@@ -625,7 +629,8 @@ typedef enum X86Seg {
-                                  XSTATE_XTILE_CFG_MASK | XSTATE_XTILE_DATA_MASK)
+@@ -257,6 +257,7 @@ typedef enum X86Seg {
+ #define CR4_SMEP_MASK   (1U << 20)
+ #define CR4_SMAP_MASK   (1U << 21)
+ #define CR4_PKE_MASK   (1U << 22)
++#define CR4_CET_MASK   (1U << 23)
+ #define CR4_PKS_MASK   (1U << 24)
+ #define CR4_LAM_SUP_MASK (1U << 28)
  
- /* CPUID feature bits available in XSS */
--#define CPUID_XSTATE_XSS_MASK    (XSTATE_ARCH_LBR_MASK)
-+#define CPUID_XSTATE_XSS_MASK   (XSTATE_ARCH_LBR_MASK | XSTATE_CET_U_MASK | \
-+                                 XSTATE_CET_S_MASK)
+@@ -273,8 +274,8 @@ typedef enum X86Seg {
+                 | CR4_OSFXSR_MASK | CR4_OSXMMEXCPT_MASK | CR4_UMIP_MASK \
+                 | CR4_LA57_MASK \
+                 | CR4_FSGSBASE_MASK | CR4_PCIDE_MASK | CR4_OSXSAVE_MASK \
+-                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK \
+-                | CR4_LAM_SUP_MASK | CR4_FRED_MASK))
++                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_CET_MASK \
++                | CR4_PKS_MASK | CR4_LAM_SUP_MASK | CR4_FRED_MASK))
  
- #define CPUID_XSTATE_MASK       (CPUID_XSTATE_XCR0_MASK | CPUID_XSTATE_XSS_MASK)
+ #define DR6_BD          (1 << 13)
+ #define DR6_BS          (1 << 14)
+@@ -2948,6 +2949,10 @@ static inline uint64_t cr4_reserved_bits(CPUX86State *env)
+     if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_FRED)) {
+         reserved_bits |= CR4_FRED_MASK;
+     }
++    if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) &&
++        !(env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT)) {
++        reserved_bits |= CR4_CET_MASK;
++    }
+     return reserved_bits;
+ }
  
-@@ -904,6 +909,8 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
- #define CPUID_7_0_ECX_WAITPKG           (1U << 5)
- /* Additional AVX-512 Vector Byte Manipulation Instruction */
- #define CPUID_7_0_ECX_AVX512_VBMI2      (1U << 6)
-+/* Control-flow enforcement technology: shadow stack */
-+#define CPUID_7_0_ECX_CET_SHSTK         (1U << 7)
- /* Galois Field New Instructions */
- #define CPUID_7_0_ECX_GFNI              (1U << 8)
- /* Vector AES Instructions */
-@@ -951,6 +958,8 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
- #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
- /* Architectural LBRs */
- #define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
-+/* Control-flow enforcement technology: indirect branch tracking */
-+#define CPUID_7_0_EDX_CET_IBT           (1U << 20)
- /* AMX_BF16 instruction */
- #define CPUID_7_0_EDX_AMX_BF16          (1U << 22)
- /* AVX512_FP16 instruction */
-@@ -1737,6 +1746,19 @@ typedef struct XSavePKRU {
-     uint32_t padding;
- } XSavePKRU;
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 72b2e195a31e..3f179c6c11f8 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -232,6 +232,18 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+         new_cr4 &= ~CR4_LAM_SUP_MASK;
+     }
  
-+/* Ext. save area 11: CET_U state */
-+typedef struct XSaveCETU {
-+    uint64_t u_cet;
-+    uint64_t pl3_ssp;
-+} XSaveCETU;
++    /*
++     * In fact, "CR4.CET can be set only if CR0.WP is set, and it must be
++     * clear before CR0.WP can be cleared". However, here we only check
++     * CR4.CET based on the supported CPUID CET bit, without checking the
++     * dependency on CR4.WP - the latter need to be determined by the
++     * underlying accelerators.
++     */
++    if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) &&
++        !(env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT)) {
++        new_cr4 &= ~CR4_CET_MASK;
++    }
 +
-+/* Ext. save area 12: CET_S state */
-+typedef struct XSaveCETS {
-+    uint64_t pl0_ssp;
-+    uint64_t pl1_ssp;
-+    uint64_t pl2_ssp;
-+} XSaveCETS;
-+
- /* Ext. save area 15: Arch LBR state */
- typedef struct XSaveArchLBR {
-     uint64_t lbr_ctl;
-@@ -1764,6 +1786,8 @@ QEMU_BUILD_BUG_ON(sizeof(XSaveOpmask) != 0x40);
- QEMU_BUILD_BUG_ON(sizeof(XSaveZMM_Hi256) != 0x200);
- QEMU_BUILD_BUG_ON(sizeof(XSaveHi16_ZMM) != 0x400);
- QEMU_BUILD_BUG_ON(sizeof(XSavePKRU) != 0x8);
-+QEMU_BUILD_BUG_ON(sizeof(XSaveCETU) != 0x10);
-+QEMU_BUILD_BUG_ON(sizeof(XSaveCETS) != 0x18);
- QEMU_BUILD_BUG_ON(sizeof(XSaveArchLBR) != 0x328);
- QEMU_BUILD_BUG_ON(sizeof(XSaveXTILECFG) != 0x40);
- QEMU_BUILD_BUG_ON(sizeof(XSaveXTILEDATA) != 0x2000);
+     env->cr[4] = new_cr4;
+     env->hflags = hflags;
+ 
 -- 
 2.34.1
 
