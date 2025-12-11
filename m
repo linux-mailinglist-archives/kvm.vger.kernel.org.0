@@ -1,395 +1,158 @@
-Return-Path: <kvm+bounces-65774-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65775-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81789CB6293
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 15:14:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EDABCB635B
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 15:37:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7CA6330014F8
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 14:14:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D68B8301FA50
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 14:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0502D29AA;
-	Thu, 11 Dec 2025 14:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45CC314D02;
+	Thu, 11 Dec 2025 14:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qmFfHlUW"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZHvPl494"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35D22D1319
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 14:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765462442; cv=pass; b=j/Ftk7b6a+t9DkV/u+3RxSsde/tNF5F0DTMISF96C11Cor2s4sCDtk6YCeLDct4oWA8EGCLfhlBu0MChvpQdg/cOhkUsosm0r89WVvjDnJ18EaM/cA+eY1FOlY26c+kwZTUa/Pn1cNkVe4+yUXUpN/OGNQV7/hJRdJjC7K7/uoI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765462442; c=relaxed/simple;
-	bh=HOmO7w9wX12Y3tO2vwswa40uELHQ7sGeubZv38Za8VA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OrCJd+W1rBbGemrt2o9JkxUfO4TpxXLpjz2QiMzvz81DTLd/29iCuE3sZvADJN+U472qIgFXRwE58BILlwl306kiV9cZ3zDblfqAHxCrtpsEJA0KUmyUPnd4c8rq1SfaPemhUfNnkBO7M2lGtUbaHFyH3+HD8kIT5iqwvmgf6KU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qmFfHlUW; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ee147baf7bso424601cf.1
-        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 06:14:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765462440; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OzGUYq87T4o8XoQf7x85WzIzFErVgsfPuZ1MYLQAHUgNTYMGxJ/2PP2d92Pj8bKMbu
-         e14elHMk7FspvJ4iNHfIAoItOFblSZZZQkrjBgbq1YRvB2pe7vl9TkKd5AB2Lr7MVW1X
-         cLC/4Z1FA7jAmUeiTgw3kEzO3BjXTITBNQ7V3IEESjqvHdVHa6gazfiCpTkTBkMtwC47
-         Sgx4N86TFYsm61k8WW201rAqu2ldPQWhTi1p0V3d1Ngpg8p8VBNuxZ9VCzjimsqPA3Xz
-         cRHwWtTLFKKSnESrpxDRPk7/9MO5qWIU5GeepjY3PAg8ABvsCuZ+yZouX4JeLUAPr18b
-         cyrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=DbriQ0SkVMvNN6P53laWKo2APdvbpd18INbzHTP59Xc=;
-        fh=UTDbe4simY4XBkJgOac4yLIh3W7Tr70M4QV9HLh5B3U=;
-        b=XvZSwTh8qQh0TzWnxwPb8grmw2jESMA6JkS+KesuicNNKML8AWRJnf7haD+djuw1v6
-         x0afr8qjeVFor3wR6L81mvU5kPKptbf5IdBhNBP9aYqYFDKR4YZB8THq2w8+L3uF+D0W
-         gBMERMsi6l52qqyBYETp5ib0uvlJnEYjVkzx47u6eBKy3c75ptgNjMRiwLAbnUzp5T4E
-         IDTsTOmgLjmwcO8sa0GFBtodKnlW7f2JU/IryALmsQ6uK5rMlJPZDPRcTYL3eTm6zGLS
-         U5BytJfxGkmBqXVH6BHxER7Mmmq08I8VU4IOne8QC8P7RFA34tO8fnkDeKybuCOnZaqD
-         QVRA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD1841C71
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 14:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765463195; cv=none; b=Bd5dSyzJuD9jwv8UMbpinc1oG4RbJyQ0TkLZsHe8waE3hXJLN1SNgC8rBTt2AIydVuti+X5FxpHyp7C3qFmeFs+R96F3WsqnsAtMUFNNi53xCbtIcPYcgxEldUbldJgAPWXxDudXjBg/Ju0374xm3bD0wcyyXfJHj1ZIuM983wI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765463195; c=relaxed/simple;
+	bh=pH0grjH31CDI3N9u5IT0YdRprtooMUrejJx2wBJ99CY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nzu2PM0xC3/hTCBusDyC/ZqWofbu823sztU9kieoOnTX+0BtUCEcDrZNnyc1ygBLCzHOkZudAZmAgUR1jcrsK/CRVEE5V4NLETGxH02lXy6hxf0eykJ1pkRBt0cgV6Nh1IcbQI+0YpedQpd22hSsgBqQgAY49oaqc7hbxleKlZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZHvPl494; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6492e7925d2so178700a12.3
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 06:26:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765462440; x=1766067240; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DbriQ0SkVMvNN6P53laWKo2APdvbpd18INbzHTP59Xc=;
-        b=qmFfHlUWvr+aqqg3oPSDOng2K/TOycwi5dkHvEMDFVFgy/y92A6fb6hae9mNgr2+Qj
-         cQgZMhaWA2G3J6UWVyn3zNt8Ke62H1HRE0t/DoTVFrirtKH7fOmDcGwv/kaOh8INzDB0
-         JlQgS7NbACPY10LbTvym/7BiVnf6XqxWNAv/r4/iEhZn37ExehBSuSlEYBI38Lu+HKTs
-         vHui7E14fpNsXbmcnJRbfcsNLrDjCnNdtoWztFJv16o1fxTpBVNgV5HYFDvwXAZoBgJ2
-         g2DKRiJg4O/M+gmAoGJeaCECztR4mFTqj4Ay9LbYnTAWWtWHrPIJtJjJIvGPoM7EK7Rq
-         2Ryw==
+        d=suse.com; s=google; t=1765463190; x=1766067990; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=N/jL1YSbYaIBBIOERYl8YB7U7TlF2NInjFoc/failig=;
+        b=ZHvPl494NpQVwUboTKnIKyHHkx2NX9g8iapVDrXl9LZ7rnbBRidzLx6w310bg7Xzk3
+         2jD5ADgo7y62wuH72Ws92vDUP53AmWX6QhjqlUD3KQctKau3xN5NxO+rTInsXEWD/EMJ
+         xwJCxbLU3SdwSI4O8nQKC/GFzcsvNY9DzJyTi7QNvelGgfdnVIXYYXPt9OW7AJc0y46A
+         K4Tvf4uhyCE+i69zIURWI2HfwmgW1YfiQ/8hwaUN3wyv67iYRKC4DK/0diny7oje7Ps/
+         BkTuMSJTGMSyRJWQpmlRLame1hf/vUZ58UMCvIKSoB7QCWHvyvtmT5KkOk/ICqDy9YV1
+         22KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765462440; x=1766067240;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1765463190; x=1766067990;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DbriQ0SkVMvNN6P53laWKo2APdvbpd18INbzHTP59Xc=;
-        b=Ej4VkxE5FbZznr3xO06F28NWaHXRNy0Ezv6WvBHZ998Qkc+2INszrfsS0dx57hzv5f
-         cpKiJCUnnIG3MLgYnsxnpo84a0CTk7C/h+SKxyL50loQCjX7JPC5VLjLhHWehGXDH5T7
-         gLU8V2JKqNl9Wtu6EQUDA8xGJt3Dnqq+HzT1l+r9dcsa519Wmn0xn6+FISGIqoVn79Kn
-         PHk+ZYLuEZA9SHDeuT1vuRP7us0gZDwAlgM8OKC2J0+Eofrc619Kf7lVlw2Ehd5I2/II
-         ki3FSrbEfVkCoZt16ZsAQcNKxDPS+rWQ7tQfxR9FUOyIwXMhzBK3kpjNWEZiEmFTkRDN
-         XTEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDTPseOZAs4bkjvVsHUguPfn4tkF3mXgzVD+OJD7OW7tHTirOqzjTGB/BGtaVgzro1Ecc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/RSycTQhILscAKKXGeMJUFLbXwIY/oa8sOiSmhKJ0NH1PmAbl
-	lwSWNQiAUAVtiX+Scv3O+dyzcMUOgfQ74E0jhJ3QZS0xESVn2WM4pc7CEOPlgY/Af/TiHLF85QJ
-	8eELwu+ZwjtMYw44aX7btjXL+2v08a4e7yuRXPjes
-X-Gm-Gg: AY/fxX4sFTGVgW+DEFtukgYKkqvTREqPSwzhdKmOiiw0VXzYgcnE/0cHfdvstspCnGg
-	7RGsYg/zsTuHB344IE06FOkjcNL5LCITJ2jM2/f0ms9D2Z5otN4i9XX9Q9GhpJ1egZAeaFu7f+n
-	KsOwA/FEnOeq2Q4+/h+dbPXDBBot+ZKrW4ib7AYtuJjZAsY0aA02WiyrLeOPG4jigXQ8mey0Lkn
-	iEQa66xzogv5crFCd3OH5GzOVH1JTbcpdY3ywD3s+n+GwfjnKsTRhkWoFLMiiYA+XD4O25b
-X-Google-Smtp-Source: AGHT+IHsR5PweMeVDYCfFKFjDQpdQaAflU2RyEDDm5BFseo6Sjuat6mmlH3xwySmJNO3hwq7ZAvO0aIfX0lj5pQvCmM=
-X-Received: by 2002:a05:622a:2a18:b0:4f1:bee9:f24a with SMTP id
- d75a77b69052e-4f1bee9f407mr9010731cf.0.1765462439165; Thu, 11 Dec 2025
- 06:13:59 -0800 (PST)
+        bh=N/jL1YSbYaIBBIOERYl8YB7U7TlF2NInjFoc/failig=;
+        b=oTVZyxIUS4RB+JWnMviXlB0e6wUtKmHyyMXnNASX0HhVgZHjURx0DKl8LM1FlF+qcM
+         5CxBxEpI4Xw+nsn1akSEjpqODSBEsqQ7GlDN4hY5rjTrU4HUN8IBf7HjYQItwNGwFSzz
+         kweISAaTkFmKWU0FtvX2lpkr5qJjUjBZqjEVWKsbn9FUBjCF4Pjfs4rud1sH4Bx8DvhD
+         dGxEMJkfhm9VBY8e7vLJUXmMvnUt3HMN9mZGeDRU6s5uMQrDKAVKkAIQF2ziG5NKbPEg
+         sSP6dWkVdiNT/n5kFXGLxK/t6ZNh/hHFRSk2OdefdckV0svFlbclysJvo+7TsjT2w4mO
+         XWCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmFmotP9cspR3tlNYBiWRxqQ1ZMGww5HQxODpvPTG2a4XTn45egKYscCW3B7+dn9m6uJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXP/r8ARzpWwrDClJZ0ZFLuXcb04+wcJG1ANIZIHLFJ5AaAnr2
+	zcR6AdxrrpW1F98BI0enxN6Jo+pVoJdC2pffzwuH/UhbFvItCqnZlgDfdt/Z2REwy1o=
+X-Gm-Gg: AY/fxX4AHG1285haabXU0D2eNjLXyByHVr70kP5UohF9YMdKDivAuU+6rpbw91rWh4Y
+	+m11aTSHWBLyQfquofdcbaQGgtkoq/ZEI/Pqtg4QBzoQXyE28DiVtfQY0OAlz5qZtiouCZ/w18y
+	GFl6Jrp2cEZ9fn571jAuI6F5ajRCqeUj3hAj2FKBEJ5f7NtorY1l+l3YcGZtJXO7Yp4KqmBJlZr
+	u+VJfRdM3qMjaWLW6g9n8Y+kaxFQpp4Xbl2ZYYVyb4B+H6frGFQjEjsLOrEc22cqKrq0h2K1jI4
+	HNANmf92YIO890LQy1j7i2i/Nd3YNdTC+Fk3HUhBEcdSmXfXJUuxM6PQZhP9KE5KW+58cR0JAjc
+	va+q8qekaJWkcuA/7xGf5Jvku1r1ezDm9E3EviEk4MDHoyUxcBbK7BEwAMqserUqmSLKm1FBbSr
+	BW/SA9AAVYgc+dyg==
+X-Google-Smtp-Source: AGHT+IFjunigvCBwBHyJuyPaWGpfLjBO6a462hMeuzqJr+xkLEjwHBjrDvPLtvW5SmaHr++ZkKdXUw==
+X-Received: by 2002:a05:6402:280f:b0:649:838b:61fc with SMTP id 4fb4d7f45d1cf-649838b651amr2401934a12.22.1765463189997;
+        Thu, 11 Dec 2025 06:26:29 -0800 (PST)
+Received: from [192.168.0.20] ([212.21.133.30])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6498210de23sm2703371a12.28.2025.12.11.06.26.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Dec 2025 06:26:29 -0800 (PST)
+Message-ID: <fbe2eaba-811c-465e-9d99-20d0f0fd3d97@suse.com>
+Date: Thu, 11 Dec 2025 16:26:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251210173024.561160-1-maz@kernel.org> <20251210173024.561160-4-maz@kernel.org>
-In-Reply-To: <20251210173024.561160-4-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 11 Dec 2025 14:13:22 +0000
-X-Gm-Features: AQt7F2rr9PtjIIiHtnFsFtlWwu7AuIjaSq1NTTsgICgihl-4XDKmWFGJmdfGQpU
-Message-ID: <CA+EHjTyJFZttD4jTH=q_T28BwMR2CDdYSyH7G-WTQvULyjy-Tw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] arm64: Convert VTCR_EL2 to sysreg infratructure
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Sascha Bischoff <Sascha.Bischoff@arm.com>, Quentin Perret <qperret@google.com>, 
-	Sebastian Ene <sebastianene@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 7/9] x86/vmscape: Deploy BHB clearing mitigation
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, x86@kernel.org,
+ David Kaplan <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson
+ <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>
+References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
+ <20251201-vmscape-bhb-v6-7-d610dd515714@linux.intel.com>
+From: Nikolay Borisov <nik.borisov@suse.com>
+Content-Language: en-US
+Autocrypt: addr=nik.borisov@suse.com; keydata=
+ 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
+In-Reply-To: <20251201-vmscape-bhb-v6-7-d610dd515714@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
-
-In subject: infratructure -> infrastructure
 
 
-On Wed, 10 Dec 2025 at 17:30, Marc Zyngier <maz@kernel.org> wrote:
->
-> Our definition of VTCR_EL2 is both partial (tons of fields are
-> missing) and totally inconsistent (some constants are shifted,
-> some are not). They are also expressed in terms of TCR, which is
-> rather inconvenient.
->
-> Replace the ad-hoc definitions with the the generated version.
+On 2.12.25 г. 8:20 ч., Pawan Gupta wrote:
+> IBPB mitigation for VMSCAPE is an overkill on CPUs that are only affected
+> by the BHI variant of VMSCAPE. On such CPUs, eIBRS already provides
+> indirect branch isolation between guest and host userspace. However, branch
+> history from guest may also influence the indirect branches in host
+> userspace.
+> 
+> To mitigate the BHI aspect, use clear_bhb_loop().
+> 
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 
-Duplicate "the"
-
-> This results in a bunch of additional changes to make the code
-> with the unshifted nature of generated enumerations.
->
-> The register data was extracted from the BSD licenced AARCHMRS
-> (AARCHMRS_OPENSOURCE_A_profile_FAT-2025-09_ASL0).
->
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-After checking the bits against the spec, and with the nits above:
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-/fuad
-
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 52 +++++++----------------------
->  arch/arm64/include/asm/sysreg.h  |  1 -
->  arch/arm64/kvm/hyp/pgtable.c     |  8 ++---
->  arch/arm64/kvm/nested.c          |  8 ++---
->  arch/arm64/tools/sysreg          | 57 ++++++++++++++++++++++++++++++++
->  5 files changed, 76 insertions(+), 50 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index e500600e4b9b8..dfdbd2b65db9e 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -124,37 +124,7 @@
->  #define TCR_EL2_MASK   (TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
->                          TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
->
-> -/* VTCR_EL2 Registers bits */
-> -#define VTCR_EL2_DS            TCR_EL2_DS
-> -#define VTCR_EL2_RES1          (1U << 31)
-> -#define VTCR_EL2_HD            (1 << 22)
-> -#define VTCR_EL2_HA            (1 << 21)
-> -#define VTCR_EL2_PS_SHIFT      TCR_EL2_PS_SHIFT
-> -#define VTCR_EL2_PS_MASK       TCR_EL2_PS_MASK
-> -#define VTCR_EL2_TG0_MASK      TCR_TG0_MASK
-> -#define VTCR_EL2_TG0_4K                TCR_TG0_4K
-> -#define VTCR_EL2_TG0_16K       TCR_TG0_16K
-> -#define VTCR_EL2_TG0_64K       TCR_TG0_64K
-> -#define VTCR_EL2_SH0_MASK      TCR_SH0_MASK
-> -#define VTCR_EL2_SH0_INNER     TCR_SH0_INNER
-> -#define VTCR_EL2_ORGN0_MASK    TCR_ORGN0_MASK
-> -#define VTCR_EL2_ORGN0_WBWA    TCR_ORGN0_WBWA
-> -#define VTCR_EL2_IRGN0_MASK    TCR_IRGN0_MASK
-> -#define VTCR_EL2_IRGN0_WBWA    TCR_IRGN0_WBWA
-> -#define VTCR_EL2_SL0_SHIFT     6
-> -#define VTCR_EL2_SL0_MASK      (3 << VTCR_EL2_SL0_SHIFT)
-> -#define VTCR_EL2_T0SZ_MASK     0x3f
-> -#define VTCR_EL2_VS_SHIFT      19
-> -#define VTCR_EL2_VS_8BIT       (0 << VTCR_EL2_VS_SHIFT)
-> -#define VTCR_EL2_VS_16BIT      (1 << VTCR_EL2_VS_SHIFT)
-> -
-> -#define VTCR_EL2_T0SZ(x)       TCR_T0SZ(x)
-> -
->  /*
-> - * We configure the Stage-2 page tables to always restrict the IPA space to be
-> - * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
-> - * not known to exist and will break with this configuration.
-> - *
->   * The VTCR_EL2 is configured per VM and is initialised in kvm_init_stage2_mmu.
->   *
->   * Note that when using 4K pages, we concatenate two first level page tables
-> @@ -162,9 +132,6 @@
->   *
->   */
->
-> -#define VTCR_EL2_COMMON_BITS   (VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
-> -                                VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
-> -
->  /*
->   * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
->   * Interestingly, it depends on the page size.
-> @@ -196,30 +163,35 @@
->   */
->  #ifdef CONFIG_ARM64_64K_PAGES
->
-> -#define VTCR_EL2_TGRAN                 VTCR_EL2_TG0_64K
-> +#define VTCR_EL2_TGRAN                 64K
->  #define VTCR_EL2_TGRAN_SL0_BASE                3UL
->
->  #elif defined(CONFIG_ARM64_16K_PAGES)
->
-> -#define VTCR_EL2_TGRAN                 VTCR_EL2_TG0_16K
-> +#define VTCR_EL2_TGRAN                 16K
->  #define VTCR_EL2_TGRAN_SL0_BASE                3UL
->
->  #else  /* 4K */
->
-> -#define VTCR_EL2_TGRAN                 VTCR_EL2_TG0_4K
-> +#define VTCR_EL2_TGRAN                 4K
->  #define VTCR_EL2_TGRAN_SL0_BASE                2UL
->
->  #endif
->
->  #define VTCR_EL2_LVLS_TO_SL0(levels)   \
-> -       ((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
-> +       FIELD_PREP(VTCR_EL2_SL0, (VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))))
->  #define VTCR_EL2_SL0_TO_LVLS(sl0)      \
->         ((sl0) + 4 - VTCR_EL2_TGRAN_SL0_BASE)
->  #define VTCR_EL2_LVLS(vtcr)            \
-> -       VTCR_EL2_SL0_TO_LVLS(((vtcr) & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT)
-> +       VTCR_EL2_SL0_TO_LVLS(FIELD_GET(VTCR_EL2_SL0, (vtcr)))
-> +
-> +#define VTCR_EL2_FLAGS (SYS_FIELD_PREP_ENUM(VTCR_EL2, SH0, INNER)          | \
-> +                        SYS_FIELD_PREP_ENUM(VTCR_EL2, ORGN0, WBWA)         | \
-> +                        SYS_FIELD_PREP_ENUM(VTCR_EL2, IRGN0, WBWA)         | \
-> +                        SYS_FIELD_PREP_ENUM(VTCR_EL2, TG0, VTCR_EL2_TGRAN) | \
-> +                        VTCR_EL2_RES1)
->
-> -#define VTCR_EL2_FLAGS                 (VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
-> -#define VTCR_EL2_IPA(vtcr)             (64 - ((vtcr) & VTCR_EL2_T0SZ_MASK))
-> +#define VTCR_EL2_IPA(vtcr)             (64 - FIELD_GET(VTCR_EL2_T0SZ, (vtcr)))
->
->  /*
->   * ARM VMSAv8-64 defines an algorithm for finding the translation table
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index c231d2a3e5159..acad7a7621b9e 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -516,7 +516,6 @@
->  #define SYS_TTBR1_EL2                  sys_reg(3, 4, 2, 0, 1)
->  #define SYS_TCR_EL2                    sys_reg(3, 4, 2, 0, 2)
->  #define SYS_VTTBR_EL2                  sys_reg(3, 4, 2, 1, 0)
-> -#define SYS_VTCR_EL2                   sys_reg(3, 4, 2, 1, 2)
->
->  #define SYS_HAFGRTR_EL2                        sys_reg(3, 4, 3, 1, 6)
->  #define SYS_SPSR_EL2                   sys_reg(3, 4, 4, 0, 0)
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 947ac1a951a5b..e0bd6a0172729 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -583,8 +583,8 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
->         u64 vtcr = VTCR_EL2_FLAGS;
->         s8 lvls;
->
-> -       vtcr |= kvm_get_parange(mmfr0) << VTCR_EL2_PS_SHIFT;
-> -       vtcr |= VTCR_EL2_T0SZ(phys_shift);
-> +       vtcr |= FIELD_PREP(VTCR_EL2_PS, kvm_get_parange(mmfr0));
-> +       vtcr |= FIELD_PREP(VTCR_EL2_T0SZ, (UL(64) - phys_shift));
->         /*
->          * Use a minimum 2 level page table to prevent splitting
->          * host PMD huge pages at stage2.
-> @@ -624,9 +624,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
->                 vtcr |= VTCR_EL2_DS;
->
->         /* Set the vmid bits */
-> -       vtcr |= (get_vmid_bits(mmfr1) == 16) ?
-> -               VTCR_EL2_VS_16BIT :
-> -               VTCR_EL2_VS_8BIT;
-> +       vtcr |= (get_vmid_bits(mmfr1) == 16) ? VTCR_EL2_VS : 0;
->
->         return vtcr;
->  }
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 911fc99ed99d9..e1ef8930c97b3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -377,7 +377,7 @@ static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
->  {
->         wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
->
-> -       switch (vtcr & VTCR_EL2_TG0_MASK) {
-> +       switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
->         case VTCR_EL2_TG0_4K:
->                 wi->pgshift = 12;        break;
->         case VTCR_EL2_TG0_16K:
-> @@ -513,7 +513,7 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
->
->         lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
->
-> -       switch (vtcr & VTCR_EL2_TG0_MASK) {
-> +       switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
->         case VTCR_EL2_TG0_4K:
->                 ttl = (TLBI_TTL_TG_4K << 2);
->                 break;
-> @@ -530,7 +530,7 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
->
->  again:
->         /* Iteratively compute the block sizes for a particular granule size */
-> -       switch (vtcr & VTCR_EL2_TG0_MASK) {
-> +       switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
->         case VTCR_EL2_TG0_4K:
->                 if      (sz < SZ_4K)    sz = SZ_4K;
->                 else if (sz < SZ_2M)    sz = SZ_2M;
-> @@ -593,7 +593,7 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
->
->         if (!max_size) {
->                 /* Compute the maximum extent of the invalidation */
-> -               switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
-> +               switch (FIELD_GET(VTCR_EL2_TG0_MASK, mmu->tlb_vtcr)) {
->                 case VTCR_EL2_TG0_4K:
->                         max_size = SZ_1G;
->                         break;
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 9d388f87d9a13..6f43b2ae5993b 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -4400,6 +4400,63 @@ Field    56:12   BADDR
->  Res0   11:0
->  EndSysreg
->
-> +Sysreg VTCR_EL2        3       4       2       1       2
-> +Res0   63:46
-> +Field  45      HDBSS
-> +Field  44      HAFT
-> +Res0   43:42
-> +Field  41      TL0
-> +Field  40      GCSH
-> +Res0   39
-> +Field  38      D128
-> +Field  37      S2POE
-> +Field  36      S2PIE
-> +Field  35      TL1
-> +Field  34      AssuredOnly
-> +Field  33      SL2
-> +Field  32      DS
-> +Res1   31
-> +Field  30      NSA
-> +Field  29      NSW
-> +Field  28      HWU62
-> +Field  27      HWU61
-> +Field  26      HWU60
-> +Field  25      HWU59
-> +Res0   24:23
-> +Field  22      HD
-> +Field  21      HA
-> +Res0   20
-> +Enum   19      VS
-> +       0b0     8BIT
-> +       0b1     16BIT
-> +EndEnum
-> +Field  18:16   PS
-> +Enum   15:14   TG0
-> +       0b00    4K
-> +       0b01    64K
-> +       0b10    16K
-> +EndEnum
-> +Enum   13:12   SH0
-> +       0b00    NONE
-> +       0b01    OUTER
-> +       0b11    INNER
-> +EndEnum
-> +Enum   11:10   ORGN0
-> +       0b00    NC
-> +       0b01    WBWA
-> +       0b10    WT
-> +       0b11    WBnWA
-> +EndEnum
-> +Enum   9:8     IRGN0
-> +       0b00    NC
-> +       0b01    WBWA
-> +       0b10    WT
-> +       0b11    WBnWA
-> +EndEnum
-> +Field  7:6     SL0
-> +Field  5:0     T0SZ
-> +EndSysreg
-> +
->  Sysreg GCSCR_EL2       3       4       2       5       0
->  Fields GCSCR_ELx
->  EndSysreg
-> --
-> 2.47.3
->
+Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 
