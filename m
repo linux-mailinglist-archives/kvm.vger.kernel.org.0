@@ -1,169 +1,136 @@
-Return-Path: <kvm+bounces-65786-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E27CB676B
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 17:29:36 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A60CCB6723
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 17:22:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 90EBB305D7AA
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 16:26:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5EC703002520
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 16:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D08316918;
-	Thu, 11 Dec 2025 16:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCACF3148B1;
+	Thu, 11 Dec 2025 16:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOsdhLFf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e640muRJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952D0316905;
-	Thu, 11 Dec 2025 16:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A484E278E5D
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 16:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765470083; cv=none; b=ohKHvj22dVn3u/MzDAhTFRTaawEhsf4R1L02dEet00A6JkQniZwERAtU2Zpgs4YvjhprfLZKQJ9gUR+LTywr1hP46R6D0Pa+CIYCNxXrrSPJ6ir7rKLu3EV0f+DbpZAdw3tJGyloOIivcWYVx1xlMhAtzh9858HkoWbFUwMgm+g=
+	t=1765470138; cv=none; b=M4A3AzOgAlN4+iXFC39Hb4z8kCRoG6uEfwYy5dGsQURmXteylsXI/KUNXjdwEYXYtBzawj3IGs2rhdmDASSsocy3uSAPcMOrfxXpQvDXZ9E7QKgveExSAJ+dz9Z2LAj8qjZrH5rFLUR0xl95O/4XOxhYAX6RmdH0tXxesvBZTAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765470083; c=relaxed/simple;
-	bh=y8xi0690kj7eN8efJPQZwJp2vdnwY7JF6oRnrBCl3Ok=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F2ddtNHPXKpUaxdCtS4FAP7B7la1lWj8stHyrKJfBwrhgeqlE1qQ0MtybtMbUXL5uO9mB5veTNB0tjx2H+cxCBF5J2wfS5utC7Ylfx4fFZvv1ROZvUmHDz0qQRONLTLQCeJvTczp1xo2O7a0OV2pkJq3FPR6QLyiZeoK6u4gf40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOsdhLFf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CCEC4CEF7;
-	Thu, 11 Dec 2025 16:21:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765470083;
-	bh=y8xi0690kj7eN8efJPQZwJp2vdnwY7JF6oRnrBCl3Ok=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AOsdhLFfM0i6K1tw759EzzvDKigMReMknnQ51pDwJTgL8vBmFHWja9Q1+Uk9RIOPE
-	 5xl1eB1PtkjWQS2i0ypbyQBvnyN5ZPy8CnJzODJAbPji1lPskRWzs0PSHrTRyvTTle
-	 y+JFqp7GHHfJs4KigManI3RpjfVZfTkqpyf0DAW108oU+K9cVeItCMV8SkPJl0dTjl
-	 XEoHWVFE+9ShjGwm1Zj4TkFRsiBk/7Pew6oTh2objlQh20mf7G7c7BmnZH3gSMA4t/
-	 dfsBzcAbwoo58r94H3b8XDTfBBXg9/ouIFkoTEyt6oFc6ZYz6sEu2RpJfXovIrnUfl
-	 Ge32hZzbSNCxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vTjPs-0000000C2ld-3FmR;
-	Thu, 11 Dec 2025 16:21:20 +0000
-Date: Thu, 11 Dec 2025 16:21:20 +0000
-Message-ID: <86tsxxng5b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
-In-Reply-To: <20251211151810.GA867614@e124191.cambridge.arm.com>
-References: <20251210173024.561160-1-maz@kernel.org>
-	<20251210173024.561160-7-maz@kernel.org>
-	<20251211151810.GA867614@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765470138; c=relaxed/simple;
+	bh=AVBpNeQYjs+NT4n83hvwVghqzCFaq0io8le1Mkf64JA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RsZZIT7UjUa4UHy9sJje9WpAx3XTyIfy7d/xTqSffwL/rkGGZLQZtg5Ht9xhDYrL7YTH+6LEZK1cdckspjba5W8eL3Uzr7uGbboauAYaNsOzVfnWvHndz6pdM2AnIkCnyuc+CaPtKvNs+vyYVKdIPg5CrEv47fg1gqio3QnDNn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e640muRJ; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29848363458so4309405ad.2
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 08:22:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765470136; x=1766074936; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gbznK5gDAlYZkkIu8L5egA3M/d4oKKfYrWTkNbjwXso=;
+        b=e640muRJce+N7yJVB/LrEjddGbdCRbOsvI9Rrvy6jcH1i1VZo8k5Y8y7sAVTuuuseC
+         9/gK/G7gIgL/+72pbK0ItbE7phQG+9vCWLHooPLa9ZQ0FEMjExjrUr7q0kxv3bmfuQRL
+         z78uvK7ZRHxB2VhX+EgT+1czZrFU34qHhqmBN/dzHOYD5KEmyGKcmY8xC+63CYyMLZ4p
+         GK64ixaQIrE6drARlwQ1SwfpMYhC2a0F8KLqFl/l96BubmowRYWKujKDN06W00e8jw7b
+         trna30dzqoQDP85BJXwIP+dzxeH1P8p2VLuugv7oW1AJzdP88WfDbSCFoTG77R98e9v4
+         J3nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765470136; x=1766074936;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gbznK5gDAlYZkkIu8L5egA3M/d4oKKfYrWTkNbjwXso=;
+        b=pKcXNBAXBddiZfURqXGcLmYDn7cYHaPHsDIpNdHli/ZzsVe5W8tzbndMAUTStRnBw4
+         bDnTuKewx5IvHjPwAhOSrG9f38bpwl02HF9PznG9S6uP+qWPnc6PtK0zq6hh7trpwtN/
+         +O7FVnk0tMgIf6sxHD6kVsX57YooB69K14bK1SAPa5B9iYtd7JGa5UJTZMz38qZqJ8Lr
+         poHKyN9SNse3CXqsqcZva3PdAF40Vo6IULCijWPJt9vGOM+ziGADIvKEk1zGg5wuomqg
+         THUEVeBt/oUqSH0CpbfafAu5nPlM/hD9y1vpQqNIzP86BVbenFQYKtFK7VvVjLGpSpfM
+         VihA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHEG7ukOXfd7myGbfIgg2upnaxfcyex6fONHrSfwOoBUF7fwOfqX/5DqXCTj3bu7C1bMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysTeLKnjl9+EXmRN6VnjHHzGklUKhjAJkY/thEckKLhpLKQqM7
+	oq4cfm5Y9a4NGED5FgeiC4BxA0+Pznbm5lI3i3myd/nhLT0HORoYD7zgjtwU35DgOsSfaOr18jz
+	Bt/GGqA==
+X-Google-Smtp-Source: AGHT+IHI7ROMcRsrNQzPom6/VYzonXyvisOL0S8wsTs9tzRFtEIEK/B9lkVJMuoCc8kWSzEhtQWgCIjH2dc=
+X-Received: from plou4.prod.google.com ([2002:a17:903:1ae4:b0:29d:5afa:2d9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:904:b0:29e:fd60:2cf1
+ with SMTP id d9443c01a7336-29efd6034a3mr15656765ad.21.1765470136002; Thu, 11
+ Dec 2025 08:22:16 -0800 (PST)
+Date: Thu, 11 Dec 2025 08:22:14 -0800
+In-Reply-To: <20251211022935.2049039-1-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20251211022935.2049039-1-xiaoyao.li@intel.com>
+Message-ID: <aTrvtszjqUFu4Svk@google.com>
+Subject: Re: [PATCH] KVM: x86: Don't read guest CR3 in async pf flow when
+ guest state is protected
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 11 Dec 2025 15:18:51 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Thu, Dec 11, 2025, Xiaoyao Li wrote:
+> ---
+> For AMD SEV-ES and SNP cases, the guest state is also protected. But
+> unlike TDX, reading guest CR3 doesn't cause issue since CR3 is always
+> marked available for svm vCPUs. It always gets the initial value 0,
+> set by kvm_vcpu_reset(). Whether to update vcpu->arch.regs_avail to
+> reflect the correct value for SEV-ES and SNP is another topic.
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> Question,
-> 
-> On Wed, Dec 10, 2025 at 05:30:24PM +0000, Marc Zyngier wrote:
-> > Now that we potentially have two bits to deal with when setting
-> > execution permissions, make sure we correctly handle them when both
-> > when building the page tables and when reading back from them.
-> > 
-> > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 12 +++---------
-> >  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++++---
-> >  2 files changed, 24 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index be68b89692065..095e6b73740a6 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -87,15 +87,9 @@ typedef u64 kvm_pte_t;
-> >  
-> >  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
-> >  
-> > -#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > -#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > -#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> > -
-> > -#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
-> > -	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
-> > -			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
-> > -			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
-> > -			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> >  
-> >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index e0bd6a0172729..97c0835d25590 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -342,6 +342,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
-> >  	if (!(prot & KVM_PGTABLE_PROT_R))
-> >  		return -EINVAL;
-> >  
-> > +	if (!cpus_have_final_cap(ARM64_KVM_HVHE))
-> > +		prot &= ~KVM_PGTABLE_PROT_UX;
-> 
-> Trying to understand this part. We don't consider KVM_PGTABLE_PROT_UX below
-> when !HVHE, and we don't set it in kvm_pgtable_hyp_pte_prot() when !HVHE
-> either, so can it ever actually be set?
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 667d66cf76d5..03be521df6b9 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4521,7 +4521,8 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
+>  	arch.gfn = fault->gfn;
+>  	arch.error_code = fault->error_code;
+>  	arch.direct_map = vcpu->arch.mmu->root_role.direct;
+> -	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+> +	arch.cr3 = vcpu->arch.guest_state_protected ? 0 :
+> +		   kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+>  
+>  	return kvm_setup_async_pf(vcpu, fault->addr,
+>  				  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
+> @@ -4543,7 +4544,8 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  		return;
+>  
+>  	if (!vcpu->arch.mmu->root_role.direct &&
+> -	      work->arch.cr3 != kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu))
+> +	    (vcpu->arch.guest_state_protected ||
+> +	     work->arch.cr3 != kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu)))
+>  		return;
 
-Because KVM_PGTABLE_PROT_X, which is directly passed by the high-level
-code, is defined as such:
+Protected guests aren't compatible with shadow paging, so I'd rather key off the
+direct MMU role.  '0' is also a legal address; INVALID_GPA would be better.
 
-	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
-						  KVM_PGTABLE_PROT_UX,
-
-We *could* make that value dependent on HVHE, but since that's in an
-enum, it is pretty ugly to do (not impossible though).
-
-But it is in the following code that this becomes useful...
-
->
-> Otherwise LGTM!
-> 
-> Thanks,
-> Joey
-> 
-> > +
-> >  	if (prot & KVM_PGTABLE_PROT_X) {
-> >  		if (prot & KVM_PGTABLE_PROT_W)
-> >  			return -EINVAL;
-
-... here. If you were passed UX (and only that), and that you're
-!HVHE, you won't have execution at all, and can allow writes.
-
-Does that make sense?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02c450686b4a..446bf2716d08 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4521,7 +4521,10 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
+        arch.gfn = fault->gfn;
+        arch.error_code = fault->error_code;
+        arch.direct_map = vcpu->arch.mmu->root_role.direct;
+-       arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
++       if (arch.direct_map)
++               arch.cr3 = INVALID_GPA;
++       else
++               arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+ 
+        return kvm_setup_async_pf(vcpu, fault->addr,
+                                  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
 
