@@ -1,206 +1,349 @@
-Return-Path: <kvm+bounces-65780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF45CB6415
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 15:52:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B91CB6418
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 15:52:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 849D630319BF
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 14:52:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41F05301397D
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 14:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32A5C2DCC08;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6E92E54A2;
 	Thu, 11 Dec 2025 14:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oe3IU0G0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWq1+xD3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUFLAw5K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9F7291C33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41482C1595
 	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 14:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765464725; cv=pass; b=T3CwuHTU+VOq/z5MhObK8fNjT12mzxcGDWKsPDGA6dzvvXs6QQVNytmy/ikdnmSUKVYgH0NdJ4xkKXLjjSuBR+Ps9aPp8e1i9zPrzFEyjAd46w23eK6oYh9COwtPoroaStSiuK/+IxoyHck1a9KqIls7T+dsVtUeJvPQb9xcq4w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765464725; cv=none; b=Z5m7HTRt5M9kSI0D6B1nvlxTGunppLfYVxqsBc74vegkEKtzpjn2eR9AKvUvFqK47Aul5/pUxmhNNXEXGabN3GF/WXynACdEGfIRGWqnHQtdrQTEZS+wBaA8HRtnuAje7oW4coU7tqlH+/6Ko2Ek81fgqudLUC/7pCSX5S1StXs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765464725; c=relaxed/simple;
-	bh=wAMwNSRawWZ1QoE1+8GigGIznpCapxk6QfzLASpXrww=;
+	bh=Y83a+pWqa9SCSVS9irqS7Ysh9P+/KOUgBQg17r98qAk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NY8GJlIyH15OTPXWQjVtfYnsyqpV7C8y0irTfPbmmPjfe28UFtvgg+ryfQqMVfdDx5h44Jgr2YYQ35ZHfKuoqE39RZaW7rkytiXf61phmHa2bsbstCX7i60bfgxIFtewkr9pvzjRKCUMbP5UPk1gX+nicTQMVSdqs7T517hIORw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oe3IU0G0; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ee147baf7bso445051cf.1
-        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 06:52:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765464722; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PFhm3RCUM+bseo0Fw81+V9VD+dCyq1VEoU3xEkxFvBCusrjxtmbaslp4bk4VU59tQx
-         bR+8/x+Wnn/ekb4pYZqRuFsHFkaiZ0Ma+Gi7enmwohuEXOf2xKFLIfs2gkzxX1ANTCrr
-         9zB7o2jMOc9Ae1UNQ8Ma8Hwm9cYuMXyEyyjfYj137jqKNFpRj+mxu6nVs/qy/R5DO72R
-         3JKudIGYlufoYVOm4/6LuKndDX14piHgb472JptW6UGtOHQgrZFEmWly7JEzP0m+6k1P
-         hkbxTP53HXj3I3H7r8o0CUytqpi89WWynM9e5n1LykgLuRB5o1cPxgplZjo3hPD46jWx
-         uRMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=yWMX1jyjXeIgNw1WZzMJikLtB4FVJ9nrhVzaVMwg74Q=;
-        fh=1z5FKgs6grzOavcaHPjl6simHPTzRRl81M7Vj5gi274=;
-        b=gBOjYRBjm+dZTW19RshxA3zPZxEMmZPj7kXrGKILvV4yvnfu7Scntk+I2mnWD5REvO
-         mZOOFMl/MwF0+LD8+Nqe32j/Xkjg7Rj5ZHRn3q2A2t+aLJUpDlug/4+B3WEgjRkbpT7T
-         PFXi+a7/U4nKOsNi3hkiXYhhp323luKlivVn7QqMLSVY1K3BmW0vG8OYxhtpjhRm0zzX
-         Ce3ZSeDn0WOYoypmU0w0CmsqUXulpJuaWUc3hr0JHypWIAdw5s6WB3A5y5uVlbvlN8Hv
-         kaEgKNHknzqhhk5ePhQfyTPvQ2/4qVC2gnbTeXeTwHdgE3tdP2PaTXkV6J68cZ5hbeuC
-         jJWw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	 To:Cc:Content-Type; b=EyX4QmvtPKU/QdolkD7BL30G8B3W0vsHyLBtMX1/mk7b73E8Wq0GV3Ca537Sca2LibqO6DJfvPHlsn4sb4sWuWNPFvRp4mqsGxoIYd9jQQT3Pa8pUOZCRtdpy1ao1eBsk93FugAh82fZDHN55KvLjAR0pPATsFVskaka6Qqovpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OWq1+xD3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GUFLAw5K; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765464722;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mqQHq8ZjuioMTjqSleVpkDQkArjekNzO2+JyD4evAlo=;
+	b=OWq1+xD3I5ja8EJWJMooZhE3YJYMdZxBUxON5yEPKb7mtguXY/9F38ef6Lcer4yJJ2Yu8J
+	c0qXy8vU44+6We3L2vICPAuXxolojNlaqNHiAnYEepDMXsSmD36CnDVUt5n9StaLk7qSuc
+	SHHX0SQyMTzM+7qv9AykRGsA8mQYnrE=
+Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com
+ [74.125.224.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-snnSeS6kNwOtdDx9ymQiNQ-1; Thu, 11 Dec 2025 09:52:01 -0500
+X-MC-Unique: snnSeS6kNwOtdDx9ymQiNQ-1
+X-Mimecast-MFC-AGG-ID: snnSeS6kNwOtdDx9ymQiNQ_1765464721
+Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-6447a801fbaso371116d50.2
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 06:52:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765464722; x=1766069522; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWMX1jyjXeIgNw1WZzMJikLtB4FVJ9nrhVzaVMwg74Q=;
-        b=oe3IU0G0THGY342xpxd8B581CajJ/CQedxyyTwZmX9iyexrnI7D+xh86FGfUGxwduW
-         3ABw72/H1paGKeCtlSxP2uWtu2xXBB3McBKAYJ/4A/SU/8WNfmGANWgDgRttekBSpulP
-         Lkrl+U34ZTZnzlQT094MQSe6i6/78P+2Uqq6bSOJUoSGq1CZFO2niKta/VXaOShHg3tU
-         HRxWXD1SvLU4eoHHMSkpIG2e+DVtB2DxNmuAi9OZ5a2F3GTYm59VFqO9f7EdECUfXboF
-         rZYem+ljbpu/XieXrzmj8XUJZvcawBnBn+5enH8NZJDv+S4KDKg+gCV/8ckRgvbA/TfE
-         UdFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765464722; x=1766069522;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1765464719; x=1766069519; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yWMX1jyjXeIgNw1WZzMJikLtB4FVJ9nrhVzaVMwg74Q=;
-        b=oCKbVw96cYo3F9nIOw98Q0ZHoFqMdPJPuwgwVkjBesWPu6h1wFbiNoW8k1OWbikjLP
-         xd+WQXoULe5LE1U57YoRAUinLxnAGDfl4WVS7nrwKIP5Wq+9swUTnkchdpO6y+FH8h4b
-         9LtzG/ViYHwjtnfFMOTuyFdhq4QAW/rfR98CSCj8hh88O7ATdjYSBLMMVs1FrECvYA7q
-         r/faPgCDU2Hn+8Gpv8MlOZNtDbPMAi4HhnI/jcVuGzPKr8L2TyT2Gt/RaBie+q0sAArc
-         ZLjpxOaTX2vr/bkgOOm8eDvNy1aHNL0dDAHoOBYvJLGoKeiXdf8r4pqOfugKb36eSFZy
-         S3wA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4sS747rHk/DFP/GqS+P+WuK3cDUa80zoXxE/65YaeaI/1hAuRnwgo1al9mw9VaO43u08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyitGyTbokfUsDfU/EPN3fBbbTztTSz7eeob/gFoIHiI+Kux+S3
-	jYTf5iFiEDk2MME/yVFN/NZ5BnAZd46HKAiX6xE3MII6L9rSMiRUHG70wASZjT2PwXFrK+YP0i5
-	BRxKxTZ55klzYqdvnRfDhZSDh9DmJrYDf+vx4MM+4
-X-Gm-Gg: AY/fxX4/8cI+KYV/POBglcFTDZ3zt3j2gf8gXFU6RDsvcYnicZnJqxduQ2yeKNFAF8w
-	RPv5uMsP7WEDu+7yMkK/9v1ocREb7xhvBbOLutdGV1S89AYP6eXK2VDhJg7A/NL8psOS/Z29gOw
-	vWap6lOi1M7E7b+a9drnu48Y16HvciyjeiX0Zmr+EvDmDUZ+e1e8FHPFFkhUgm/dYjagH0uskiB
-	s9ryP5twoOKBw8UG0yAKiYS+1sHb1CewxwbxiI3k6s6nho1R9U5ROWAsT2p7kVprneXwo95
-X-Google-Smtp-Source: AGHT+IFQKP5fapGPHx5ImO6c09xm7GohUJLdBZ1CUTPePaNGb2mNfszOTXSYC0I42sptlzmkcKe68l3xaix/F5ByaNg=
-X-Received: by 2002:a05:622a:1995:b0:4b2:ecb6:e6dd with SMTP id
- d75a77b69052e-4f1bed26845mr9697741cf.1.1765464722271; Thu, 11 Dec 2025
- 06:52:02 -0800 (PST)
+        bh=mqQHq8ZjuioMTjqSleVpkDQkArjekNzO2+JyD4evAlo=;
+        b=GUFLAw5KZ9sG2TqpixXaPztIkFpo+vZpuNbHxCXK/kMuHHiqCFRxRMnEPZR1l414/n
+         Kq++qNnKpiQNY3Cpf72AcpugUJaVN6k01LyOUyx7RfyczJ0sCLILb9M2Kvu5jks44sM6
+         mACPTvjQZW6I2eFCk1etnT2bpI7tS46OZ9Pu2XmnYLqu36cxk6YBwtsjMn8RngnRPebk
+         DidrLXMOeTo2FXKyWozXe3alYGJVrnJLqIZ33DGKD/iW79ggSU23856nG708FwULNNXL
+         z8i+3eT8erlWIXV5QDQKdZhX2+wFyenQcz84z14ZHX/FtcYWsHsal3KwRJG5BsW9yYcK
+         aVtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765464719; x=1766069519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mqQHq8ZjuioMTjqSleVpkDQkArjekNzO2+JyD4evAlo=;
+        b=rvxnacj/DwODbZnAAhdta/oeBDp/mmAQkmjYev9hBrXaHnYPbGBZkwmJl2WJiwR+fK
+         gH1AS6ri/pMkSOSXuqYa2muVeWv4WXRQP8P/pAjlxop+Pz6pxNGkVjfv1Boo/M7k9E4P
+         nNcgIi8+ERIYDOROPXgVEzSHzhANxIdeIWsN+OC2OWvdejPlRKsgTKoBF4GOWgkj7RKH
+         ccN0T/Hne4S1PKNDw5SXPZJ196sfIwzLsVJLXeuRw7KJNqU33hvy9Qklt70WMAL4a2iL
+         VkyGJGG0tp+/D2me7j8bRcPOZGiQJ6nhat8T/RnVw7GsKMliLQreUaSsjH3fmJDd11u5
+         v4mA==
+X-Forwarded-Encrypted: i=1; AJvYcCX4VeFULtWiDz3MvZEeV/duCUtc+Y50WLS16Dzn9gxX9KBaoJmeE/HiFHxdZeO0d5FzGi0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoONidCf/nrONYP/AXnwhn2Ic3FCkUO9qu1teLCeAcxJpWXQ86
+	U+Hr9W9vg+dvWfXJbLSQPeijIU7QjzPlgrWkkUpVZT/1lf8cC6zwliDVhzCjXwPFBv0QlKLuYS4
+	n2M7X/y348yPAAR4uwESafNAqn07cJiqpxYkWrvI745yjZGOinwGoXQIoE9aGkSVNlG9YCIWTeF
+	Eu6ReR50PIaDRO/mySBm8lk2heqZ6Cs1s12CYBIBU=
+X-Gm-Gg: AY/fxX6zff56/gXu1qyiTn/H08kOQjh+eu+QrFMHZlbKUF2VVBwafjhzjnmGYtcop59
+	qSQkg2hZ1UJglfk90VKNUODyZ288uz2UC1i04dA7QxvNe6PTXfmLJFtJPiNUa8NSNef0mZdRH2K
+	adFZg19Hvlm3ojbj816iMvOmfpcDR1ZEsc224kjsf9XW4UT7GdQ7smDVmSFJTgLRx1
+X-Received: by 2002:a05:690e:1554:10b0:644:60d9:7513 with SMTP id 956f58d0204a3-6446eb45126mr4104570d50.87.1765464719083;
+        Thu, 11 Dec 2025 06:51:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEY7OAW7Iub7HfRjaep9Kwv7mbXKF7yavtvtMRDPzW/n4pEQVQlq5rllhznb0aWYw7dtPa2cqUkhRqHR2sVM1o=
+X-Received: by 2002:a05:690e:1554:10b0:644:60d9:7513 with SMTP id
+ 956f58d0204a3-6446eb45126mr4104543d50.87.1765464718465; Thu, 11 Dec 2025
+ 06:51:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251210173024.561160-1-maz@kernel.org> <20251210173024.561160-7-maz@kernel.org>
-In-Reply-To: <20251210173024.561160-7-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 11 Dec 2025 14:51:25 +0000
-X-Gm-Features: AQt7F2o1Eo4xEzZ0xMgWpr24G9qnYMnYlv-SMNtZ7eV3yobp_YNt8tudLckw7Mw
-Message-ID: <CA+EHjTwi3S-BVYQWf6_TAyd4fi18Ng3G3HkxKh2MB8PrE_32Uw@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Sascha Bischoff <Sascha.Bischoff@arm.com>, Quentin Perret <qperret@google.com>, 
-	Sebastian Ene <sebastianene@google.com>
+References: <20251211125104.375020-1-mlbnkm1@gmail.com> <20251211080251-mutt-send-email-mst@kernel.org>
+ <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi> <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
+In-Reply-To: <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 11 Dec 2025 15:51:46 +0100
+X-Gm-Features: AQt7F2pDNg-PqY51BpbMRcRuX5BRNC1ZpaReUag8SYMVebNfY7-W-s69lHtB17E
+Message-ID: <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
+Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+To: Melbin Mathew Antony <mlbnkm1@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 10 Dec 2025 at 17:30, Marc Zyngier <maz@kernel.org> wrote:
+On Thu, 11 Dec 2025 at 15:44, Melbin Mathew Antony <mlbnkm1@gmail.com> wrot=
+e:
 >
-> Now that we potentially have two bits to deal with when setting
-> execution permissions, make sure we correctly handle them when both
-> when building the page tables and when reading back from them.
+> Hi Stefano, Michael,
 >
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Thanks for the feedback and for pointing out the s64 issue in
+> virtio_transport_get_credit() and the vsock_test regression.
+>
+> I can take this up and send a small series:
+>
+>   1/2 =E2=80=93 vsock/virtio: cap TX credit to local buffer size
+>         - use a helper to bound peer_buf_alloc by buf_alloc
+>         - compute available credit in s64 like has_space(), and clamp
+>           negative values to zero before applying the caller=E2=80=99s cr=
+edit
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+IMO they should be fixed in 2 different patches.
 
-/fuad
+I think we can easily reuse virtio_transport_has_space() in
+virtio_transport_get_credit().
 
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 12 +++---------
->  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++++---
->  2 files changed, 24 insertions(+), 12 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index be68b89692065..095e6b73740a6 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -87,15 +87,9 @@ typedef u64 kvm_pte_t;
+>   2/2 =E2=80=93 vsock/test: fix seqpacket message bounds test
+>         - include your vsock_test.c change so the seqpacket bounds test
+>           keeps working with the corrected TX credit handling
 >
->  #define KVM_PTE_LEAF_ATTR_HI_SW                GENMASK(58, 55)
+> I=E2=80=99ll roll these into a [PATCH net v4 0/2] series and send it out =
+shortly.
+
+Please, wait a bit also for other maintainers comments.
+See https://www.kernel.org/doc/html/latest/process/submitting-patches.html#=
+don-t-get-discouraged-or-impatient
+
+So, to recap I'd do the following:
+Patch 1: fix virtio_transport_get_credit() maybe using
+virtio_transport_has_space() to calculate the space
+Patch 2: (this one) cap TX credit to local buffer size
+Patch 3: vsock/test: fix seqpacket message bounds test
+Patch 4 (if you have time): add a new test for TX credit on stream socket
+
+Stefano
+
 >
-> -#define __KVM_PTE_LEAF_ATTR_HI_S1_XN   BIT(54)
-> -#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN  BIT(54)
-> -#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN  BIT(53)
-> -
-> -#define KVM_PTE_LEAF_ATTR_HI_S1_XN                                     \
-> -       ({ cpus_have_final_cap(ARM64_KVM_HVHE) ?                        \
-> -                       (__KVM_PTE_LEAF_ATTR_HI_S1_UXN |                \
-> -                        __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :               \
-> -                       __KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_XN     BIT(54)
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_UXN    BIT(54)
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_PXN    BIT(53)
+> Thanks again for all the guidance,
+> Melbin
 >
->  #define KVM_PTE_LEAF_ATTR_HI_S2_XN     GENMASK(54, 53)
 >
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index e0bd6a0172729..97c0835d25590 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -342,6 +342,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
->         if (!(prot & KVM_PGTABLE_PROT_R))
->                 return -EINVAL;
+> On Thu, Dec 11, 2025 at 1:57=E2=80=AFPM Stefano Garzarella <sgarzare@redh=
+at.com> wrote:
+> >
+> > On Thu, Dec 11, 2025 at 08:05:11AM -0500, Michael S. Tsirkin wrote:
+> > >On Thu, Dec 11, 2025 at 01:51:04PM +0100, Melbin K Mathew wrote:
+> > >> The virtio vsock transport currently derives its TX credit directly =
+from
+> > >> peer_buf_alloc, which is populated from the remote endpoint's
+> > >> SO_VM_SOCKETS_BUFFER_SIZE value.
+> > >>
+> > >> On the host side, this means the amount of data we are willing to qu=
+eue
+> > >> for a given connection is scaled purely by a peer-chosen value, rath=
+er
+> > >> than by the host's own vsock buffer configuration. A guest that
+> > >> advertises a very large buffer and reads slowly can cause the host t=
+o
+> > >> allocate a correspondingly large amount of sk_buff memory for that
+> > >> connection.
+> > >>
+> > >> In practice, a malicious guest can:
+> > >>
+> > >>   - set a large AF_VSOCK buffer size (e.g. 2 GiB) with
+> > >>     SO_VM_SOCKETS_BUFFER_MAX_SIZE / SO_VM_SOCKETS_BUFFER_SIZE, and
+> > >>
+> > >>   - open multiple connections to a host vsock service that sends dat=
+a
+> > >>     while the guest drains slowly.
+> > >>
+> > >> On an unconstrained host this can drive Slab/SUnreclaim into the ten=
+s of
+> > >> GiB range, causing allocation failures and OOM kills in unrelated ho=
+st
+> > >> processes while the offending VM remains running.
+> > >>
+> > >> On non-virtio transports and compatibility:
+> > >>
+> > >>   - VMCI uses the AF_VSOCK buffer knobs to size its queue pairs per
+> > >>     socket based on the local vsk->buffer_* values; the remote side
+> > >>     can=E2=80=99t enlarge those queues beyond what the local endpoin=
+t
+> > >>     configured.
+> > >>
+> > >>   - Hyper-V=E2=80=99s vsock transport uses fixed-size VMBus ring buf=
+fers and
+> > >>     an MTU bound; there is no peer-controlled credit field comparabl=
+e
+> > >>     to peer_buf_alloc, and the remote endpoint can=E2=80=99t drive i=
+n-flight
+> > >>     kernel memory above those ring sizes.
+> > >>
+> > >>   - The loopback path reuses virtio_transport_common.c, so it
+> > >>     naturally follows the same semantics as the virtio transport.
+> > >>
+> > >> Make virtio-vsock consistent with that model by intersecting the pee=
+r=E2=80=99s
+> > >> advertised receive window with the local vsock buffer size when
+> > >> computing TX credit. We introduce a small helper and use it in
+> > >> virtio_transport_get_credit(), virtio_transport_has_space() and
+> > >> virtio_transport_seqpacket_enqueue(), so that:
+> > >>
+> > >>     effective_tx_window =3D min(peer_buf_alloc, buf_alloc)
+> > >>
+> > >> This prevents a remote endpoint from forcing us to queue more data t=
+han
+> > >> our own configuration allows, while preserving the existing credit
+> > >> semantics and keeping virtio-vsock compatible with the other transpo=
+rts.
+> > >>
+> > >> On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+> > >> 32 guest vsock connections advertising 2 GiB each and reading slowly
+> > >> drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
+> > >> recovered after killing the QEMU process.
+> > >>
+> > >> With this patch applied, rerunning the same PoC yields:
+> > >>
+> > >>   Before:
+> > >>     MemFree:        ~61.6 GiB
+> > >>     MemAvailable:   ~62.3 GiB
+> > >>     Slab:           ~142 MiB
+> > >>     SUnreclaim:     ~117 MiB
+> > >>
+> > >>   After 32 high-credit connections:
+> > >>     MemFree:        ~61.5 GiB
+> > >>     MemAvailable:   ~62.3 GiB
+> > >>     Slab:           ~178 MiB
+> > >>     SUnreclaim:     ~152 MiB
+> > >>
+> > >> i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
+> > >> guest remains responsive.
+> > >>
+> > >> Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
+> > >> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+> > >> Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
+> > >> ---
+> > >>  net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++=
+---
+> > >>  1 file changed, 24 insertions(+), 3 deletions(-)
+> > >>
+> > >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock=
+/virtio_transport_common.c
+> > >> index dcc8a1d58..02eeb96dd 100644
+> > >> --- a/net/vmw_vsock/virtio_transport_common.c
+> > >> +++ b/net/vmw_vsock/virtio_transport_common.c
+> > >> @@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct s=
+k_buff *skb, bool consume)
+> > >>  }
+> > >>  EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+> > >>
+> > >> +/* Return the effective peer buffer size for TX credit computation.
+> > >> + *
+> > >> + * The peer advertises its receive buffer via peer_buf_alloc, but w=
+e
+> > >> + * cap that to our local buf_alloc (derived from
+> > >> + * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size=
+)
+> > >> + * so that a remote endpoint cannot force us to queue more data tha=
+n
+> > >> + * our own configuration allows.
+> > >> + */
+> > >> +static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *=
+vvs)
+> > >> +{
+> > >> +    return min(vvs->peer_buf_alloc, vvs->buf_alloc);
+> > >> +}
+> > >> +
+> > >>  u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 =
+credit)
+> > >>  {
+> > >>      u32 ret;
+> > >> @@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vs=
+ock_sock *vvs, u32 credit)
+> > >>              return 0;
+> > >>
+> > >>      spin_lock_bh(&vvs->tx_lock);
+> > >> -    ret =3D vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt)=
+;
+> > >> +    ret =3D virtio_transport_tx_buf_alloc(vvs) -
+> > >> +            (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> > >>      if (ret > credit)
+> > >>              ret =3D credit;
+> > >>      vvs->tx_cnt +=3D ret;
+> > >> @@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_=
+sock *vsk,
+> > >>
+> > >>      spin_lock_bh(&vvs->tx_lock);
+> > >>
+> > >> -    if (len > vvs->peer_buf_alloc) {
+> > >> +    if (len > virtio_transport_tx_buf_alloc(vvs)) {
+> > >>              spin_unlock_bh(&vvs->tx_lock);
+> > >>              return -EMSGSIZE;
+> > >>      }
+> > >> @@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vso=
+ck_sock *vsk)
+> > >>      struct virtio_vsock_sock *vvs =3D vsk->trans;
+> > >>      s64 bytes;
+> > >>
+> > >> -    bytes =3D (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_f=
+wd_cnt);
+> > >> +    bytes =3D (s64)virtio_transport_tx_buf_alloc(vvs) -
+> > >> +            (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> > >>      if (bytes < 0)
+> > >>              bytes =3D 0;
+> > >>
+> > >
+> > >Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> > >
+> > >Looking at this, why is one place casting to s64 the other is not?
+> >
+> > Yeah, I pointed out that too in previous interactions. IMO we should fi=
+x
+> > virtio_transport_get_credit() since the peer can reduce `peer_buf_alloc=
+`
+> > so it will overflow. Fortunately, we are limited by the credit requeste=
+d
+> > by the caller, but we are still sending stuff when we shouldn't be.
+> >
+> > @Melbin let me know if you will fix it, otherwise I can do that, but I'=
+d
+> > like to do in a single series (multiple patches), since they depends on
+> > each other.
+> >
+> > So if you prefer, I can pickup this patch and post a series with this +
+> > the other fix + the fix on the test I posted on the v2.
+> >
+> > Stefano
+> >
 >
-> +       if (!cpus_have_final_cap(ARM64_KVM_HVHE))
-> +               prot &= ~KVM_PGTABLE_PROT_UX;
-> +
->         if (prot & KVM_PGTABLE_PROT_X) {
->                 if (prot & KVM_PGTABLE_PROT_W)
->                         return -EINVAL;
-> @@ -351,8 +354,16 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
->
->                 if (system_supports_bti_kernel())
->                         attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
-> +       }
-> +
-> +       if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-> +               if (!(prot & KVM_PGTABLE_PROT_PX))
-> +                       attr |= KVM_PTE_LEAF_ATTR_HI_S1_PXN;
-> +               if (!(prot & KVM_PGTABLE_PROT_UX))
-> +                       attr |= KVM_PTE_LEAF_ATTR_HI_S1_UXN;
->         } else {
-> -               attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-> +               if (!(prot & KVM_PGTABLE_PROT_PX))
-> +                       attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
->         }
->
->         attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-> @@ -373,8 +384,15 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
->         if (!kvm_pte_valid(pte))
->                 return prot;
->
-> -       if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
-> -               prot |= KVM_PGTABLE_PROT_X;
-> +       if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-> +               if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_PXN))
-> +                       prot |= KVM_PGTABLE_PROT_PX;
-> +               if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_UXN))
-> +                       prot |= KVM_PGTABLE_PROT_UX;
-> +       } else {
-> +               if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
-> +                       prot |= KVM_PGTABLE_PROT_PX;
-> +       }
->
->         ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S1_AP, pte);
->         if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RO)
-> --
-> 2.47.3
->
+
 
