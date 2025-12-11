@@ -1,285 +1,107 @@
-Return-Path: <kvm+bounces-65754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E0BCB586B
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 11:32:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AABE7CB58FC
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 11:51:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B77E4301D67D
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 10:32:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AD2EB301D593
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 10:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4061303A3A;
-	Thu, 11 Dec 2025 10:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB1B7306B3C;
+	Thu, 11 Dec 2025 10:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBiNUFP2"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qzWNnb3v"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1272D8DA4
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 10:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEA74317D;
+	Thu, 11 Dec 2025 10:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765449129; cv=none; b=RTVA3GN4I8QiA0514ZpIimevYPBhfMs/FvwzgTSzHX4KOGffwyKpX5kaXn28dQUk5aUQZQlVSBF65qZXPgRI52bYGY/0dKG83P+DH2gtrMmU+uyv9bxjvi6SI+aELC5iTnxJO370wdfPwsDDxPr/SgdMio5UcV0w+34V/MPM+cM=
+	t=1765450267; cv=none; b=eB7GfH9vZBxyKPW2lAFlJMsiYotwq3scCK2LEHgmdhwGccaJCtx7es29uzz/yM4iYVlgE4R8tmUftfeaDmrBKPE5u+76wDnPtrfHTG00JuMT11P99uXO3RcpHczkpxIBDGe+MlGB8JBwadqtIGTzKIixkTkqLjZhEE/Px9w1P+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765449129; c=relaxed/simple;
-	bh=G3rCKdudT6NtWUagNnmaDsq7+d5yFm9atLfBfiW1Cnw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Eq5YWB6XX96/614Y5NRiNW4XvH1FKLlIXusiAwwdFkHdtrGEba847lGuF5Cczpi1WYbwyw8ut9Exk4Eh8fDQ3jz5DqXykLVJLWxkk4vlMMPDOf9at/1FYyBRxavrGhShLtXNv1LwdQ0H7oHdYgQDIlXGzHt5hdpKzZt3ZJeksV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dBiNUFP2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765449125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HiqwH+EbrOicd1rdvR0ZlaJPF+L0oee3OxmFWoyqXNY=;
-	b=dBiNUFP2EkaO6bL0qqL5kpydYbONGIY6RAQ5HubbSKCLPAPRhBO/yE7CumBsli4+WuRk0R
-	IDx7L5OwfZ16A90n7NjiXDGz3iw1t+nqc1GLNt8uFb55/i0JmvdiimD10T5Ql8iMy3zBV8
-	3H4xrG0hcHb14s4Ci2eq4qfy+acbrS8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-203-F9NmniNwPsarQBtvqBKzvQ-1; Thu,
- 11 Dec 2025 05:32:02 -0500
-X-MC-Unique: F9NmniNwPsarQBtvqBKzvQ-1
-X-Mimecast-MFC-AGG-ID: F9NmniNwPsarQBtvqBKzvQ_1765449120
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5EE0319560B2;
-	Thu, 11 Dec 2025 10:32:00 +0000 (UTC)
-Received: from osteffen-laptop.redhat.com (unknown [10.45.225.89])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 532051800451;
-	Thu, 11 Dec 2025 10:31:54 +0000 (UTC)
-From: Oliver Steffen <osteffen@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Joerg Roedel <joerg.roedel@amd.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	kvm@vger.kernel.org,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Luigi Leonardi <leonardi@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Ani Sinha <anisinha@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Oliver Steffen <osteffen@redhat.com>
-Subject: [PATCH v2 3/3] igvm: Fill MADT IGVM parameter field
-Date: Thu, 11 Dec 2025 11:31:36 +0100
-Message-ID: <20251211103136.1578463-4-osteffen@redhat.com>
-In-Reply-To: <20251211103136.1578463-1-osteffen@redhat.com>
-References: <20251211103136.1578463-1-osteffen@redhat.com>
+	s=arc-20240116; t=1765450267; c=relaxed/simple;
+	bh=GWygM3x7+hqXAz+c7Pscc3NwAUM7JoNWjc70ap7XnOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mjtsyjIQ+Y2sM6r8bKamOzPHX6V3is9EKOuSiQeE3hdMw6cE0llxGhDS9hjphS65oVY3wPySDPGubdRPNv22Yp8cniw+oYp+su+Bq9LQE+RzB3wNDH3M4kID41axh7568iS7F9FaX6EuwjfIF4YS6tp2nbP4hkQ0XV8SV8qjlaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qzWNnb3v; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=TtlbzqbRLXFDNB23fI071mEx9a4si+wr83gFgHx75fk=; b=qzWNnb3vDUtOmby/6rRXEF7QKT
+	GS9yh3t/Pf9pYR2EDfORT1wdcR3e3IyHexNzLc4euHhiRpxqbWbIlFjjAt8H5n7UfNT5CZFEOo2d5
+	CII+rHjVrVpvl5ITy4At0zBf93ruwAHWb7Nb6+6NERA4SWagpZ8AqjV1WBYQ0KdhcIxxvW6imMUvi
+	tJcy5Shpzyg9Yz70sUtvPvehf5nrJ1Yv5rVxbCQ97KEd/adqKyi5631aBfZR88bW0o66aAhQZUHk6
+	QmcR89EwwrwvT0UB/hlRYMSKhNgi4sfeZMyiGEM3+IO82nnBK1KNYqMrt5d/tNjXBq9xPKld2FvBd
+	QNxpB4QA==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vTeG3-0000000E8Ht-3Ghx;
+	Thu, 11 Dec 2025 10:50:51 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 6402730301A; Thu, 11 Dec 2025 11:50:50 +0100 (CET)
+Date: Thu, 11 Dec 2025 11:50:50 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH v6 6/9] x86/vmscape: Use static_call() for predictor flush
+Message-ID: <20251211105050.GB3707891@noisy.programming.kicks-ass.net>
+References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
+ <20251201-vmscape-bhb-v6-6-d610dd515714@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251201-vmscape-bhb-v6-6-d610dd515714@linux.intel.com>
 
-Use the new acpi_build_madt_standalone() function to fill the MADT
-parameter field.
+On Mon, Dec 01, 2025 at 10:20:14PM -0800, Pawan Gupta wrote:
+> Adding more mitigation options at exit-to-userspace for VMSCAPE would
+> usually require a series of checks to decide which mitigation to use. In
+> this case, the mitigation is done by calling a function, which is decided
+> at boot. So, adding more feature flags and multiple checks can be avoided
+> by using static_call() to the mitigating function.
+> 
+> Replace the flag-based mitigation selector with a static_call(). This also
+> frees the existing X86_FEATURE_IBPB_EXIT_TO_USER.
+> 
+> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> ---
+>  arch/x86/Kconfig                     | 1 +
+>  arch/x86/include/asm/cpufeatures.h   | 2 +-
+>  arch/x86/include/asm/entry-common.h  | 7 +++----
+>  arch/x86/include/asm/nospec-branch.h | 3 +++
+>  arch/x86/kernel/cpu/bugs.c           | 5 ++++-
+>  arch/x86/kvm/x86.c                   | 2 +-
+>  6 files changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index fa3b616af03a2d50eaf5f922bc8cd4e08a284045..066f62f15e67e85fda0f3fd66acabad9a9794ff8 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -2706,6 +2706,7 @@ config MITIGATION_TSA
+>  config MITIGATION_VMSCAPE
+>  	bool "Mitigate VMSCAPE"
+>  	depends on KVM
+> +	select HAVE_STATIC_CALL
 
-The IGVM parameter can be consumed by Coconut SVSM [1], instead of
-relying on the fw_cfg interface, which has caused problems before due to
-unexpected access [2,3]. Using IGVM parameters is the default way for
-Coconut SVSM; switching over would allow removing specialized code paths
-for QEMU in Coconut.
-
-In any case OVMF, which runs after SVSM has already been initialized,
-will continue reading all ACPI tables via fw_cfg and provide fixed up
-ACPI data to the OS as before.
-
-Generating the MADT twice (here and during ACPI table building)
-seems acceptable, since there is no infrastructure to obtain the MADT
-out of the ACPI table memory area.
-
-[1] https://github.com/coconut-svsm/svsm/pull/858
-[2] https://gitlab.com/qemu-project/qemu/-/issues/2882
-[3] https://github.com/coconut-svsm/svsm/issues/646
-
-Signed-off-by: Oliver Steffen <osteffen@redhat.com>
----
- backends/igvm-cfg.c       |  8 +++++++-
- backends/igvm.c           | 37 ++++++++++++++++++++++++++++++++++++-
- include/system/igvm-cfg.h |  5 ++++-
- include/system/igvm.h     |  2 +-
- target/i386/sev.c         |  5 +++--
- 5 files changed, 51 insertions(+), 6 deletions(-)
-
-diff --git a/backends/igvm-cfg.c b/backends/igvm-cfg.c
-index c1b45401f4..0a77f7b7a1 100644
---- a/backends/igvm-cfg.c
-+++ b/backends/igvm-cfg.c
-@@ -17,6 +17,7 @@
- #include "qom/object_interfaces.h"
- #include "hw/qdev-core.h"
- #include "hw/boards.h"
-+#include "hw/i386/acpi-build.h"
- 
- #include "trace.h"
- 
-@@ -48,10 +49,15 @@ static void igvm_reset_hold(Object *obj, ResetType type)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-     IgvmCfg *igvm = IGVM_CFG(obj);
-+    GArray *madt = NULL;
- 
-     trace_igvm_reset_hold(type);
- 
--    qigvm_process_file(igvm, ms->cgs, false, &error_fatal);
-+    madt = acpi_build_madt_standalone(ms);
-+
-+    qigvm_process_file(igvm, ms->cgs, false, madt, &error_fatal);
-+
-+    g_array_free(madt, true);
- }
- 
- static void igvm_reset_exit(Object *obj, ResetType type)
-diff --git a/backends/igvm.c b/backends/igvm.c
-index a350c890cc..7e56b19b0a 100644
---- a/backends/igvm.c
-+++ b/backends/igvm.c
-@@ -93,6 +93,7 @@ typedef struct QIgvm {
-     unsigned region_start_index;
-     unsigned region_last_index;
-     unsigned region_page_count;
-+    GArray *madt;
- } QIgvm;
- 
- static int qigvm_directive_page_data(QIgvm *ctx, const uint8_t *header_data,
-@@ -120,6 +121,8 @@ static int qigvm_directive_snp_id_block(QIgvm *ctx, const uint8_t *header_data,
- static int qigvm_initialization_guest_policy(QIgvm *ctx,
-                                        const uint8_t *header_data,
-                                        Error **errp);
-+static int qigvm_initialization_madt(QIgvm *ctx,
-+                                     const uint8_t *header_data, Error **errp);
- 
- struct QIGVMHandler {
-     uint32_t type;
-@@ -148,6 +151,8 @@ static struct QIGVMHandler handlers[] = {
-       qigvm_directive_snp_id_block },
-     { IGVM_VHT_GUEST_POLICY, IGVM_HEADER_SECTION_INITIALIZATION,
-       qigvm_initialization_guest_policy },
-+    { IGVM_VHT_MADT, IGVM_HEADER_SECTION_DIRECTIVE,
-+      qigvm_initialization_madt },
- };
- 
- static int qigvm_handler(QIgvm *ctx, uint32_t type, Error **errp)
-@@ -764,6 +769,34 @@ static int qigvm_initialization_guest_policy(QIgvm *ctx,
-     return 0;
- }
- 
-+static int qigvm_initialization_madt(QIgvm *ctx,
-+                                     const uint8_t *header_data, Error **errp)
-+{
-+    const IGVM_VHS_PARAMETER *param = (const IGVM_VHS_PARAMETER *)header_data;
-+    QIgvmParameterData *param_entry;
-+
-+    if (ctx->madt == NULL) {
-+        return 0;
-+    }
-+
-+    /* Find the parameter area that should hold the device tree */
-+    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
-+    {
-+        if (param_entry->index == param->parameter_area_index) {
-+
-+            if (ctx->madt->len > param_entry->size) {
-+                error_setg(
-+                    errp,
-+                    "IGVM: MADT size exceeds parameter area defined in IGVM file");
-+                return -1;
-+            }
-+            memcpy(param_entry->data, ctx->madt->data, ctx->madt->len);
-+            break;
-+        }
-+    }
-+    return 0;
-+}
-+
- static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **errp)
- {
-     int32_t header_count;
-@@ -892,7 +925,7 @@ IgvmHandle qigvm_file_init(char *filename, Error **errp)
- }
- 
- int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
--                       bool onlyVpContext, Error **errp)
-+                       bool onlyVpContext, GArray *madt, Error **errp)
- {
-     int32_t header_count;
-     QIgvmParameterData *parameter;
-@@ -915,6 +948,8 @@ int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
-     ctx.cgs = cgs;
-     ctx.cgsc = cgs ? CONFIDENTIAL_GUEST_SUPPORT_GET_CLASS(cgs) : NULL;
- 
-+    ctx.madt = madt;
-+
-     /*
-      * Check that the IGVM file provides configuration for the current
-      * platform
-diff --git a/include/system/igvm-cfg.h b/include/system/igvm-cfg.h
-index 7dc48677fd..d5138f745c 100644
---- a/include/system/igvm-cfg.h
-+++ b/include/system/igvm-cfg.h
-@@ -40,10 +40,13 @@ typedef struct IgvmCfgClass {
-      * in the IGVM file will be processed, allowing information about the
-      * CPU state to be determined before processing the entire file.
-      *
-+     * @madt: Optional ACPI MADT data to pass to the guest via the IGVM_VHT_MADT
-+     *       parameter. Only relevant if onlyVpContext is false.
-+     *
-      * Returns 0 for ok and -1 on error.
-      */
-     int (*process)(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
--                   bool onlyVpContext, Error **errp);
-+                   bool onlyVpContext, GArray *madt, Error **errp);
- 
- } IgvmCfgClass;
- 
-diff --git a/include/system/igvm.h b/include/system/igvm.h
-index ec2538daa0..f2e580e4ee 100644
---- a/include/system/igvm.h
-+++ b/include/system/igvm.h
-@@ -18,7 +18,7 @@
- 
- IgvmHandle qigvm_file_init(char *filename, Error **errp);
- int qigvm_process_file(IgvmCfg *igvm, ConfidentialGuestSupport *cgs,
--                      bool onlyVpContext, Error **errp);
-+                      bool onlyVpContext, GArray *madt, Error **errp);
- 
- /* x86 native */
- int qigvm_x86_get_mem_map_entry(int index,
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index fd2dada013..55fd20510a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -1888,11 +1888,12 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-          * we need to pre-process it here to extract sev_features in order to
-          * provide it to KVM_SEV_INIT2. Each cgs_* function that is called by
-          * the IGVM processor detects this pre-process by observing the state
--         * as SEV_STATE_UNINIT.
-+         * as SEV_STATE_UNINIT. The IGVM file is only read here, no MADT data
-+         * needs to be supplied.
-          */
-         if (x86machine->igvm) {
-             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
--                    ->process(x86machine->igvm, machine->cgs, true, errp) ==
-+                    ->process(x86machine->igvm, machine->cgs, true, NULL, errp) ==
-                 -1) {
-                 return -1;
-             }
--- 
-2.52.0
-
+That can't be right.
 
