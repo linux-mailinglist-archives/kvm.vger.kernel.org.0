@@ -1,144 +1,301 @@
-Return-Path: <kvm+bounces-65742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A778CB5205
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 09:38:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF34CB5288
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 09:46:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7BF403019E1F
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 08:38:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DBCC3019851
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 08:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C24F2E03F2;
-	Thu, 11 Dec 2025 08:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27092F12DA;
+	Thu, 11 Dec 2025 08:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ulqw3Hi7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8yMaTg/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xj7rKgZM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C8A259CBF
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 08:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDF02EB86D
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 08:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765442299; cv=none; b=kkgcz1ZC2C1I3OltbQHZynW/0LXWHFGu3W8BDSLrxpFZhJJiFtgru0XixSm5OIvHf9KEinkMvXbj4hXZHI7/HofU6Y0Q3MdDgWttuezwIIXQ8Sci301dTaAeQuPhubZm16EOmyA0sKa5kzX2PfwtOWTjv5mLsiO3L5+iGBTV5js=
+	t=1765442785; cv=none; b=hbVpq3424/mpVefOV308NkGwCd3e+QWo4UqArAVOhBzS88/1KcCg77ldT6fg6gR/mSvy0y5NBbx9yiExgX/sRV1G+FW/fH1hP7VMOsAkMi4Mz+BO2M0ARMOW0qGPbUfRIvCjxDj71EkL4BKrE/Sl2Yns6fQt2kk8YZNJ4NoFOTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765442299; c=relaxed/simple;
-	bh=rqOciKOGlRMnIs2IsSG8/n7lvAuH5dsUqS/rCEgD3Pk=;
+	s=arc-20240116; t=1765442785; c=relaxed/simple;
+	bh=uIpoGVRTv19i3po+DT5gycevN7FEPLnYE4n3/Yw5FCE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8G7O+fyAbN7pzDTy0H7IDmWe0a6G6/ITFZC90UoQPdwIUmbKspXSizab6XVN0De8fMxTpydMDTKIClwQGZzpZmUl15kdL0SdMT7aPgoJUDbEjlubn4HxreHYuN15X0ZlRHZ4A1b3yRkiQJpgqRCRuqouTf3+ZQ79ej/WrVKYG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ulqw3Hi7; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so7157785e9.2
-        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 00:38:16 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mbfTroVMJOhxDJxWFnSkxOpkbfn4WnF2Qky+bV+1wh4Fhr6Y1Qh1kJKQ7A8jMewQha9rsFoNmAH5RFrKmGTZTcjAk3NsOQxnT4o79AIE4AWzjocuXbKq4lRZslzOPfeWVbtLn+AbaER5XlJB3xe/oqxUDABRA8ofl74bur9ms0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y8yMaTg/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xj7rKgZM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765442782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TPUMXRO/jw+TRLjOlgLwUQu+W4zj0DlSLRqa6k2iv2I=;
+	b=Y8yMaTg/NlxJet3tiHJeFRUk/MPxbtumsGbJGO+15Ng+PSO+gFN2nu2Wp0LQMC7nvN4BCO
+	BKwCSYW2678mglO10Hn07FFXjOIz6elajm2bySfPBDZb7nuCmamftHalFtBA0Awft+wXtw
+	Le9e7HnoIgwoXYJ2rjYmLgxkgpEFWkE=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-359-lSP6SSYUP1GgaOfqKab65Q-1; Thu, 11 Dec 2025 03:46:19 -0500
+X-MC-Unique: lSP6SSYUP1GgaOfqKab65Q-1
+X-Mimecast-MFC-AGG-ID: lSP6SSYUP1GgaOfqKab65Q_1765442778
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b79fddf8e75so70826666b.3
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 00:46:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765442295; x=1766047095; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1765442778; x=1766047578; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Sg8nQv6XwVOonN2RpR1c8Sf1QdNCd4fo1IwTQexW1A=;
-        b=Ulqw3Hi7BLzoFD1xv/GnBP/sLeZAV+7h8oqYU7E2Uh29DdEy8B7CJkWiyo5Tg0+2bX
-         AJnzxvfY9vOyUlZSViaeqypZnDZDuhic85bTHY2b1ZM8tN2l3Wthzh4worzEqd9R/N+5
-         h3FcDOecBXAFBOfO5oQhzzcdB6DHtN9KcP1o4820t25MdIuMv6bdo3DTkWa2sk57nvH/
-         UBRws0Dd15/SywfH1fmvDAYZoeodJdfzC6i2ZZlwbNl+dpHXs6MKNJXobr5Wb1CbpYJm
-         IaYkIG38UL+nnQdhF0k7w4tYubx9aQ1HTw+XU1P3AduF6YXRP1vfoATeahCXfa6fxNNs
-         VglQ==
+        bh=TPUMXRO/jw+TRLjOlgLwUQu+W4zj0DlSLRqa6k2iv2I=;
+        b=Xj7rKgZMD0CyVvPvHgQJ9x0uD+2XOsSeVAZyIlrZh14jQ0l6Gpp98K7U/v56gA7ZnE
+         fg1JtdklWxtnT4K5wAzKhnWa1qveryzQv5kTOcx9tUZzHQeK/6x7IfRuJIZ0xW8QFYxN
+         wB2hg85XPSyvNeryLOqJ7k1zKor+y8kzBxXbPExSXlcdp62UAtt/5UfT5mslO15+Y7DN
+         ZUkZk+sFEKiT+FbNzj0TIrVNrKfSCVcUYb2EK2hRy4z6nNjx2OjUAQoHgVyU9Ewz5TAR
+         ZkCkEAwJr0/p7I3l0lQjCvgBXcLQfrTNW80HOoBWon7hO/RRpBoBhGa2DEz234RGq2SH
+         AB5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765442295; x=1766047095;
+        d=1e100.net; s=20230601; t=1765442778; x=1766047578;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3Sg8nQv6XwVOonN2RpR1c8Sf1QdNCd4fo1IwTQexW1A=;
-        b=MdG8PJMJDJ/GcXUaJojV/wOUg/hWlc27WqQEzxSK+Y85A3RRK1MiZlzCIYCE/2u9bD
-         x9E9dv3D8tFTksIVs2Tigiw7m6WV6MeIEDAjBeys0X6x5Sb3U+syUWnz7unaKNtO6dD8
-         wmrF1mlOZSEZt6uKzx88gwqzXhMBBNASsVYsS0XZxkaq2Ah/4CmH2HPJw1pXnlqiaoX8
-         +Y2WIXZwalctR6DUKrgJbocyRfQmkhmEmp9g09rb5nDHhGOkBVsU1F7+Fp0BNwlb8XjL
-         HZhCOViMk9QFs2VnM1HCUmNnPYtSjK9F74aeaTk1LHfAaCT5ZIRsVyqkkOyPMTgauwCZ
-         3fng==
-X-Forwarded-Encrypted: i=1; AJvYcCUG5RV2e3in3w5yc+Wdx3QcnfjwdEIAwPWaxe6sHITkjAW37aDj95YoC8ZaGnxpggdTlcY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyV8sIta5RdkF+qGrZsrR8z7TVjjmhWewicOqfIh1i21cTtJaQ9
-	QaEZf/icyk/SfGsweMZCsFwB6IJlsgKJ29BLVSWBKS+c/cCqcJMFLplAeCqmoSJOCRc=
-X-Gm-Gg: AY/fxX7yLEcCMzYCrLJSEuoSHBbIKIiwf7urIIkHdJrkyNVAMBo/mdoFfVFs5z75Hcg
-	eKCzbSshh+A1L6gTKk2uDOktEtpdw/1agE9TuxN18A+yr42A2GVKEm++ORC2i888R2Nzd27juzZ
-	jPEDqsw1hC54//dhsLRpG1wAaIGs8sc4YgwuC+VEATwBoR6x9sZkgSuOq7NiHQsVF+xFtOhDD7Y
-	shDEcWcV9RGEvG3ho3HyjdAhHe4ywvx+ppT1mpuc8gPsGKOTKpjhMmvy80E2vQHXIw4X81gyKhv
-	dFdAxT4AvkjE1J7Bex5z7fYIDxRP6iS0IIk1cQPzn9lce+x2TG1cODUVkMs6ElxaYsF2FXFjWTO
-	3j+167cqY9wRMXCPoUQXhkqEiibxsXbI0Pp8TW2obeMwGpoKj+ihJzA5J3XK25ZGW5rUqpfTWx2
-	Efu61mrSXsJXdgHrJi
-X-Google-Smtp-Source: AGHT+IGSsWe5a0d99Xs6fnmOMLI4LBdo2k+QjtiypzD0IVANglEDUotcgPQFMk6WXuHYX1bSUfn69A==
-X-Received: by 2002:a05:600c:c165:b0:477:6e02:54a5 with SMTP id 5b1f17b1804b1-47a8378cdf5mr49788055e9.18.1765442295248;
-        Thu, 11 Dec 2025 00:38:15 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a89f74284sm22968035e9.9.2025.12.11.00.38.14
+        bh=TPUMXRO/jw+TRLjOlgLwUQu+W4zj0DlSLRqa6k2iv2I=;
+        b=cltP2lhLPBGdi70HAKumBdSaPVcM5+cAPRQ2ouvHjH04hRZCpeCQQqn2Urf9BzPaRg
+         wW1MNF1M2h8sbx0uGBChDGDBsx8YD8li4wmqTJPDpO06ioMBVm4EnWpM1QnO6W9YwEPZ
+         WOzQ48uPnj6UmhIBelyvZ78oUJZs+vqTkLRDejqSM8QMqCFcHGUYzL9sPPBAwoyA3zeU
+         bgOAyFRm4p4k6YM8qwPyZLnLhYqj7is6IYZCzoQSi0YSQT9OTnm4w2oqFg1EZ8Ut79AN
+         YWpklTwWjRHRW3mAbgfzz0rjgnWftnGdsPqHZfj35BeUwWGNrwlOVE7n+m8+0kSi/cZ5
+         lPVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMnAnv8nf0BCGl1sE4FfecQPyKS8oqAksL1cAMRL4lYJaFPIyyYQ1r7w/0ivQ8FDYoYBk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcbgKpEz6Lim+8gwqfCOPCv1YthlMW0PKNPCtcStCGV0xozJ2Z
+	XWDpZCAjtHzKtIzQReaByusq6Qu7JAaABLwBSdWNZ2QchjO9sZt0WpkCmi4lyDDtLKF/o/aiU5p
+	81JJlju6WFVgF2lP7598rHvO93yoINE9U/qOxAVwzNUNiI7bIaf9AIw==
+X-Gm-Gg: AY/fxX40eYvRfWqkdNWFRAHBH+o/YCQV0FWJqo6sCU4dhZuTH1td2aAxK09PDa5V0V5
+	XtW0EyYNuZlp+qqxCY2RSzsPHvPfhEx/BWoJMS3JNVFpcoqIvlNqwsQO22ZelVmLw7K1LgSpqNa
+	uNmjWedsApdPUGpko3WOWu6qx2RwiikRvcxbDbDsDyvV2EgIYKdqOtbgpUv/avd6MM57nVgx5Ny
+	+HrD7c00RhSffrTYcU8nP/8qtfGETf5YWYldsGjSnj4J7lEOR4mdlTaMh2uY8hvuFrQn2EUu0dz
+	iJdgqF+gAwFhymVJ539cjs5bztreIpl6Fdm1MPMXGj2DEQLdC2HBHZ6d3Wxg/969jyP6MHsPbeC
+	A/jbWfY37xcC0omBHTM4D4SNvdyUtARpVlhs4fZwWg1Tywua3ruGM7kZyAUsg1w==
+X-Received: by 2002:a17:906:c148:b0:b6d:573d:bbc5 with SMTP id a640c23a62f3a-b7ce83c410cmr560153166b.37.1765442777996;
+        Thu, 11 Dec 2025 00:46:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGqgLL+tnOEFfhd7vsF3bDWS7giZs3MPN6uzgFnyKJZQJYkZQCQwhm1877AgMDHElkxPd0I7w==
+X-Received: by 2002:a17:906:c148:b0:b6d:573d:bbc5 with SMTP id a640c23a62f3a-b7ce83c410cmr560149666b.37.1765442777364;
+        Thu, 11 Dec 2025 00:46:17 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa5c9d22sm206613966b.61.2025.12.11.00.46.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 00:38:14 -0800 (PST)
-Date: Thu, 11 Dec 2025 11:38:10 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] vsock/virtio: Fix error code in
- virtio_transport_recv_listen()
-Message-ID: <aTqC8rhgHmxC5fAQ@stanley.mountain>
-References: <aTp2q-K4xNwiDQSW@stanley.mountain>
- <xz4ukol5bvxmk2ctrjtvpyncipntjlf4bdr7kjdam2ig5gf7ho@vuuwwu7asj7i>
+        Thu, 11 Dec 2025 00:46:16 -0800 (PST)
+Date: Thu, 11 Dec 2025 09:46:11 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Oliver Steffen <osteffen@redhat.com>
+Cc: qemu-devel@nongnu.org, Joerg Roedel <joerg.roedel@amd.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, 
+	Richard Henderson <richard.henderson@linaro.org>, Zhao Liu <zhao1.liu@intel.com>, 
+	Eduardo Habkost <eduardo@habkost.net>, Ani Sinha <anisinha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Luigi Leonardi <leonardi@redhat.com>, 
+	Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH 3/3] igvm: Fill MADT IGVM parameter field
+Message-ID: <26ptyaovy6mlbvuzri4v2ea3xhyvdc5elqsau34upvswarrbop@bhtzvxpb5aad>
+References: <20251211081517.1546957-1-osteffen@redhat.com>
+ <20251211081517.1546957-4-osteffen@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <xz4ukol5bvxmk2ctrjtvpyncipntjlf4bdr7kjdam2ig5gf7ho@vuuwwu7asj7i>
+In-Reply-To: <20251211081517.1546957-4-osteffen@redhat.com>
 
-On Thu, Dec 11, 2025 at 09:30:06AM +0100, Stefano Garzarella wrote:
-> On Thu, Dec 11, 2025 at 10:45:47AM +0300, Dan Carpenter wrote:
-> > Return a negative error code if the transport doesn't match.  Don't
-> > return success.
-> > 
-> > Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > ---
-> > From static analysis.  Not tested.
-> > 
-> > net/vmw_vsock/virtio_transport_common.c | 2 +-
-> > 1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index dcc8a1d5851e..77fbc6c541bf 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -1550,7 +1550,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
-> > 		release_sock(child);
-> > 		virtio_transport_reset_no_sock(t, skb);
-> > 		sock_put(child);
-> > -		return ret;
-> > +		return ret ?: -EINVAL;
-> 
-> Thanks for this fix. I think we have a similar issue also in
-> net/vmw_vsock/vmci_transport.c introduced by the same commit.
-> In net/vmw_vsock/hyperv_transport.c we have a similar pattern, but the
-> calling function return void, so no issue there.
-> 
-> Do you mind to fix also that one?
+On Thu, Dec 11, 2025 at 09:15:17AM +0100, Oliver Steffen wrote:
+>Use the new acpi_build_madt_standalone() function to fill the MADT
+>parameter field.
 
-Sure.  I will resend a v2.
+The cover letter will not usually be part of the git history, so IMO it 
+is better to include also here the information that you have rightly 
+written there, explaining why we are adding this change.
 
-The check doesn't catch that one because the != comparison is
-hidden inside the vmci_check_transport() call.  So I would have missed
-it.  Thanks for catching it.
+>
+>Signed-off-by: Oliver Steffen <osteffen@redhat.com>
+>---
+> backends/igvm-cfg.c       |  8 +++++++-
+> backends/igvm.c           | 37 ++++++++++++++++++++++++++++++++++++-
+> include/system/igvm-cfg.h |  4 ++--
+> include/system/igvm.h     |  2 +-
+> target/i386/sev.c         |  2 +-
+> 5 files changed, 47 insertions(+), 6 deletions(-)
+>
+>diff --git a/backends/igvm-cfg.c b/backends/igvm-cfg.c
+>index c1b45401f4..0a77f7b7a1 100644
+>--- a/backends/igvm-cfg.c
+>+++ b/backends/igvm-cfg.c
+>@@ -17,6 +17,7 @@
+> #include "qom/object_interfaces.h"
+> #include "hw/qdev-core.h"
+> #include "hw/boards.h"
+>+#include "hw/i386/acpi-build.h"
+>
+> #include "trace.h"
+>
+>@@ -48,10 +49,15 @@ static void igvm_reset_hold(Object *obj, ResetType type)
+> {
+>     MachineState *ms = MACHINE(qdev_get_machine());
+>     IgvmCfg *igvm = IGVM_CFG(obj);
+>+    GArray *madt = NULL;
+>
+>     trace_igvm_reset_hold(type);
+>
+>-    qigvm_process_file(igvm, ms->cgs, false, &error_fatal);
+>+    madt = acpi_build_madt_standalone(ms);
+>+
+>+    qigvm_process_file(igvm, ms->cgs, false, madt, &error_fatal);
+>+
+>+    g_array_free(madt, true);
+> }
+>
+> static void igvm_reset_exit(Object *obj, ResetType type)
+>diff --git a/backends/igvm.c b/backends/igvm.c
+>index a350c890cc..7e56b19b0a 100644
+>--- a/backends/igvm.c
+>+++ b/backends/igvm.c
+>@@ -93,6 +93,7 @@ typedef struct QIgvm {
+>     unsigned region_start_index;
+>     unsigned region_last_index;
+>     unsigned region_page_count;
+>+    GArray *madt;
+> } QIgvm;
+>
+> static int qigvm_directive_page_data(QIgvm *ctx, const uint8_t *header_data,
+>@@ -120,6 +121,8 @@ static int qigvm_directive_snp_id_block(QIgvm *ctx, const uint8_t *header_data,
+> static int qigvm_initialization_guest_policy(QIgvm *ctx,
+>                                        const uint8_t *header_data,
+>                                        Error **errp);
+>+static int qigvm_initialization_madt(QIgvm *ctx,
+>+                                     const uint8_t *header_data, Error **errp);
+>
+> struct QIGVMHandler {
+>     uint32_t type;
+>@@ -148,6 +151,8 @@ static struct QIGVMHandler handlers[] = {
+>       qigvm_directive_snp_id_block },
+>     { IGVM_VHT_GUEST_POLICY, IGVM_HEADER_SECTION_INITIALIZATION,
+>       qigvm_initialization_guest_policy },
+>+    { IGVM_VHT_MADT, IGVM_HEADER_SECTION_DIRECTIVE,
+>+      qigvm_initialization_madt },
+> };
+>
+> static int qigvm_handler(QIgvm *ctx, uint32_t type, Error **errp)
+>@@ -764,6 +769,34 @@ static int qigvm_initialization_guest_policy(QIgvm *ctx,
+>     return 0;
+> }
+>
+>+static int qigvm_initialization_madt(QIgvm *ctx,
+>+                                     const uint8_t *header_data, Error **errp)
+>+{
+>+    const IGVM_VHS_PARAMETER *param = (const IGVM_VHS_PARAMETER *)header_data;
+>+    QIgvmParameterData *param_entry;
+>+
+>+    if (ctx->madt == NULL) {
+>+        return 0;
+>+    }
+>+
+>+    /* Find the parameter area that should hold the device tree */
+>+    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
+>+    {
+>+        if (param_entry->index == param->parameter_area_index) {
+>+
+>+            if (ctx->madt->len > param_entry->size) {
+>+                error_setg(
+>+                    errp,
+>+                    "IGVM: MADT size exceeds parameter area defined in IGVM file");
+>+                return -1;
+>+            }
+>+            memcpy(param_entry->data, ctx->madt->data, ctx->madt->len);
+>+            break;
+>+        }
+>+    }
+>+    return 0;
+>+}
+>+
+> static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **errp)
+> {
+>     int32_t header_count;
+>@@ -892,7 +925,7 @@ IgvmHandle qigvm_file_init(char *filename, Error **errp)
+> }
+>
+> int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
+>-                       bool onlyVpContext, Error **errp)
+>+                       bool onlyVpContext, GArray *madt, Error **errp)
+> {
+>     int32_t header_count;
+>     QIgvmParameterData *parameter;
+>@@ -915,6 +948,8 @@ int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
+>     ctx.cgs = cgs;
+>     ctx.cgsc = cgs ? CONFIDENTIAL_GUEST_SUPPORT_GET_CLASS(cgs) : NULL;
+>
+>+    ctx.madt = madt;
+>+
+>     /*
+>      * Check that the IGVM file provides configuration for the current
+>      * platform
+>diff --git a/include/system/igvm-cfg.h b/include/system/igvm-cfg.h
+>index 7dc48677fd..1a04302beb 100644
+>--- a/include/system/igvm-cfg.h
+>+++ b/include/system/igvm-cfg.h
+>@@ -42,8 +42,8 @@ typedef struct IgvmCfgClass {
+>      *
+>      * Returns 0 for ok and -1 on error.
+>      */
 
-regards,
-dan carpenter
+Should we update the documentation of this function now that we have a 
+new parameter, also explaining that it's optional.
 
+>-    int (*process)(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
+>-                   bool onlyVpContext, Error **errp);
+>+    int (*process)(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
+>+                   bool onlyVpContext, GArray *madt, Error **errp);
+>
+> } IgvmCfgClass;
+>
+>diff --git a/include/system/igvm.h b/include/system/igvm.h
+>index ec2538daa0..f2e580e4ee 100644
+>--- a/include/system/igvm.h
+>+++ b/include/system/igvm.h
+>@@ -18,7 +18,7 @@
+>
+> IgvmHandle qigvm_file_init(char *filename, Error **errp);
+> int qigvm_process_file(IgvmCfg *igvm, ConfidentialGuestSupport *cgs,
+>-                      bool onlyVpContext, Error **errp);
+>+                      bool onlyVpContext, GArray *madt, Error **errp);
+>
+> /* x86 native */
+> int qigvm_x86_get_mem_map_entry(int index,
+>diff --git a/target/i386/sev.c b/target/i386/sev.c
+>index fd2dada013..ffeb9f52a2 100644
+>--- a/target/i386/sev.c
+>+++ b/target/i386/sev.c
+>@@ -1892,7 +1892,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>          */
+>         if (x86machine->igvm) {
+>             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
+>-                    ->process(x86machine->igvm, machine->cgs, true, errp) ==
+>+                    ->process(x86machine->igvm, machine->cgs, true, NULL, errp) ==
+
+Why here we don't need to pass it?
+
+Thanks,
+Stefano
+
+>                 -1) {
+>                 return -1;
+>             }
+>-- 
+>2.52.0
+>
 
 
