@@ -1,152 +1,139 @@
-Return-Path: <kvm+bounces-65750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA66CB5791
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 11:13:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8843CB5862
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 11:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A08A30221B4
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 10:11:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A0AE301894F
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 10:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E039E2FF644;
-	Thu, 11 Dec 2025 10:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6811D2FD7DA;
+	Thu, 11 Dec 2025 10:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VPnGn7YB";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pdIECG6N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aEVFNzyi"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553E223FC41
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 10:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83C817DFE7
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 10:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765447882; cv=none; b=mlj/oXwFyqrLm0IBkzHYqdNDkkUltAR+eBsW3JJdOs7LzR9B8gAtHTFBWDXjFaAdZETMtFWNSk8AIIK94jXLzTOqgIaUbMNPOFkp467H7B6Qex6D79wm56ZtZBrgrMMalG5PPeB5MPa53pYeY5XwYJil3freTGjdgyJkRcT3XAg=
+	t=1765449110; cv=none; b=u1+znNIKi79Csp/IfdU9mhMvdr6/fXVqHjzJ5+phHIvVhIxWWJCGX+AA1qEopcU4vMiO2WJzUqBedASpU9S25Pf9r3GBeqrLZ2e5j2v1Y7aNOdcZSaiY5K6/SatZlfgplqOHTHydLtf5f6Ko51eAFedyCsJE6tJQPksn6I61Djc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765447882; c=relaxed/simple;
-	bh=ieDEbKeIqGNM64mAYdwK4wgf7i2Wc2yIXAJzv0glOFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uopIZPK8byuec/lXUYTNPpHjLUF2LGUzSKlT89YchltG7iigiCTUwzBkAleKHfM0x+0N/aNelqVgVruKSBLyhwCWkSekHrwVqvL/uz7lAnnBYcBE9NuLT0NkVSYUUMuGBZN8UtwqIzywdKL1wndKFoSts4OSLJuGoii9jIgxFDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VPnGn7YB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pdIECG6N; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1765449110; c=relaxed/simple;
+	bh=E8M+QYnXZ5Wl8disqTPcYOlRqBdhE8pAHQbqZWzITOc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HmS8RG9PF6lTUof03/zBghFosiUTaATfytWt03k1B8gp4dG97YWe3/208IDx0DWyfx9Sy8+gC2RGCUME+i1bVjO2AT2vYf0MZ/oKsP3EIVP6BD+YBpMZeqNaJ6VxLd9mFoJrOGulFTG2OsUrU8KRTjMqOkz0gquT1DutDgUxg3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aEVFNzyi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765447879;
+	s=mimecast20190719; t=1765449107;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nmgh047vTXzbL2NzUqcQqn0ZNP7gmgaU+Yt4vREzk4M=;
-	b=VPnGn7YBqM/iGs959Y8T3ZLc2Ezc0c/qtVJ0I+AHwhSbrFMOQ8Y20sJs3lHVtaIdU9wNe8
-	E3XwH1B56weeuhoqXf+cWsPpul1oQ32qcHkutVyu8+aiXkJX7n7XbOq+23OJYe0FdnsK7w
-	8rFiK01RXfHYhpaAQvVy3Oolmb/Wc70=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-jHWy_XTFNm29Shkrrbh35g-1; Thu, 11 Dec 2025 05:11:16 -0500
-X-MC-Unique: jHWy_XTFNm29Shkrrbh35g-1
-X-Mimecast-MFC-AGG-ID: jHWy_XTFNm29Shkrrbh35g_1765447875
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-649839c5653so781807a12.1
-        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 02:11:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765447875; x=1766052675; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Nmgh047vTXzbL2NzUqcQqn0ZNP7gmgaU+Yt4vREzk4M=;
-        b=pdIECG6NThk4w5PMDhBJEa/GSse2btpYHPwQFmbh+wjn8ya7erDoZEcyCUe6lcoxik
-         0+fZK3rjMz/KSUvq11KfEdNZdsfzCheadYtPQVbXDTqF1U/8YbWF4FSw5Ol3gx1uRxeq
-         wp+vOaORVZ1Fepecqsn6950S6fVVkmQCGGFLyIcvN69aTHgjJkKqwru77fyOxbVuOv5R
-         V5luiqeoOuit0k4b37BRrDn6l9RlYWc6jDrmiJaBph7Z/9KKwHxfC3DKv1OTQoKkVMUK
-         yhdBnTykk1sr2/b6gztky+DO/A5sNGH7UCe2YUSKuJqqPCnpa3driCQzqP0lmxvcAiXp
-         VZUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765447875; x=1766052675;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nmgh047vTXzbL2NzUqcQqn0ZNP7gmgaU+Yt4vREzk4M=;
-        b=gKmDe1q3aKGgT57Xb4PYLnoWtrOAXq6p50rQ7cEix9hG7s23OKBFKTmAHlyuPi5ali
-         ikDOvy6jSpKOjNdpxB98XDbOfUjkTbnZzLqlsZkh2f7PyJOnyomKYQh21b6UNzr/a7O2
-         8QiljLrxwCapfS0yzzyZXmfg91flO9CezFBUv0E55v4vbzwE1sKwnyXUJ3nLBLTa4OsD
-         YzFWiyjLKtNtBhu4dWt4R7fhUnGvi2CJfTGsGZMo5XQZ0crrxZH48Cmg6+UPUzSY7JDF
-         ugrczSa7cfk+GaKQIRVYDKlEOoDIjLyCpD5wIzCzIohheTAlXZBthFxPpYQTANDLuGav
-         OwkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgwMBqzzFtHwOAKoFZJsa244omMHHiomzft/+q0N5NH1/tYocVMuTJ4R8AZLUXA9AlhDw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyucriAJgMtmE9JKvjV+f3A8Njov7Rqo7twfe1L+DUCNmS6abYe
-	mTVGXeMgVdCGVwOTkdGGpqdAp8QISSdThXBD/LDOGekEHxCFD3hGEWJQ6DtVMGIA3lBnZLWSqRh
-	1/uLdOMcwJp4hjDqK3J5YlavcDtEmuP8knz7N919q8ODfLH0sTSUVjA==
-X-Gm-Gg: AY/fxX45z6mdJd3RT/gTwbl+1C0Dq6twIDnNUUZMLin9X0qdIq0kBw5rb0j7IEfLu4y
-	Da95LzWDutrwQyr3MkwOHry8tU2Gjin1X9u9hNHnWudfHn4lZssjOfIYmuUGnEZEUkqhwVaqh0h
-	b7LDIRW3jG+LyFacZ2AwAtIIXMwVFIwlDCNB8g9M4DWEXuGCpt8O6WJeUAsJ0VY41Y0GjBAaIGJ
-	DXM8nRFyEipiAHQV+2xfKOA3RhiCwHXQEGqOmv0j9Xfl2jqaKHoy4GQCWzd1B1GcabS5NwWF/GX
-	8sVYLt4WLyvi1ibi+fqp0R2vBlpTF6Rj+sNt9EeeC+zJdCxdoOwV+EzqYga/MmjrMRGZbks7yey
-	bewKmwpiuh8ZcM3IzhD0GI/tq1r+NXJ8odHQ73/xUVoTD53irIeEcB3hPFduq5g==
-X-Received: by 2002:a05:6402:3806:b0:640:cc76:ae35 with SMTP id 4fb4d7f45d1cf-6496cc16e8dmr4273814a12.21.1765447875199;
-        Thu, 11 Dec 2025 02:11:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEL9F2BGjWMptuXWE8ym5gN2gmqMqswdja2gDOQYxkXSnuOw6kLl/3ko+o6V7ALLN+WLcMTvQ==
-X-Received: by 2002:a05:6402:3806:b0:640:cc76:ae35 with SMTP id 4fb4d7f45d1cf-6496cc16e8dmr4273786a12.21.1765447874682;
-        Thu, 11 Dec 2025 02:11:14 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6498210de23sm2068573a12.28.2025.12.11.02.11.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 02:11:13 -0800 (PST)
-Date: Thu, 11 Dec 2025 11:11:08 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Oliver Steffen <osteffen@redhat.com>
-Cc: qemu-devel@nongnu.org, Joerg Roedel <joerg.roedel@amd.com>, 
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, 
-	Richard Henderson <richard.henderson@linaro.org>, Zhao Liu <zhao1.liu@intel.com>, 
-	Eduardo Habkost <eduardo@habkost.net>, Ani Sinha <anisinha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Luigi Leonardi <leonardi@redhat.com>, 
-	Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH 3/3] igvm: Fill MADT IGVM parameter field
-Message-ID: <qlgmkqwjoupf63drmvrfv3qslp3wvrvphgiafnuluayfjtlj3m@vkecklsigqju>
-References: <20251211081517.1546957-1-osteffen@redhat.com>
- <20251211081517.1546957-4-osteffen@redhat.com>
- <26ptyaovy6mlbvuzri4v2ea3xhyvdc5elqsau34upvswarrbop@bhtzvxpb5aad>
- <CA+bRGFqnT=Es1GE6w4U2edaJXpDaSV1bhZ89vcaP5TDfFU8a+Q@mail.gmail.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CNu7aYtpnZTgEr/pYDepnXkeEryWF/o9NrGGdONhRYM=;
+	b=aEVFNzyihoLErGIYaNl0cYG72kT2rQcT5qNrzsSl1j5nn68bubwlQfAwaEzQ/Hv11Xr3N7
+	hyyIt7+0a/U3mKt8da0H5FkoVqcIpHQU+jiGEBKoPcWcaojwk2bjVwirsMLN+XUwJ1bwkb
+	/0SsZTlQWxxtq/mQmCOEJHMSZlea5IU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-222-ZiSs3Q7RMBKfJBrdM_Hhig-1; Thu,
+ 11 Dec 2025 05:31:44 -0500
+X-MC-Unique: ZiSs3Q7RMBKfJBrdM_Hhig-1
+X-Mimecast-MFC-AGG-ID: ZiSs3Q7RMBKfJBrdM_Hhig_1765449103
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19ABD18001E4;
+	Thu, 11 Dec 2025 10:31:43 +0000 (UTC)
+Received: from osteffen-laptop.redhat.com (unknown [10.45.225.89])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B30111800451;
+	Thu, 11 Dec 2025 10:31:37 +0000 (UTC)
+From: Oliver Steffen <osteffen@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Joerg Roedel <joerg.roedel@amd.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	kvm@vger.kernel.org,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Luigi Leonardi <leonardi@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Ani Sinha <anisinha@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Oliver Steffen <osteffen@redhat.com>
+Subject: [PATCH v2 0/3] igvm: Supply MADT via IGVM parameter
+Date: Thu, 11 Dec 2025 11:31:33 +0100
+Message-ID: <20251211103136.1578463-1-osteffen@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+bRGFqnT=Es1GE6w4U2edaJXpDaSV1bhZ89vcaP5TDfFU8a+Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, Dec 11, 2025 at 10:24:35AM +0100, Oliver Steffen wrote:
->On Thu, Dec 11, 2025 at 9:46 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->> On Thu, Dec 11, 2025 at 09:15:17AM +0100, Oliver Steffen wrote:
+When launching using an IGVM file, supply a copy of the MADT (part of the ACPI
+tables) via an IGVM parameter (IGVM_VHY_MADT) to the guest, in addition to the
+regular fw_cfg mechanism.
 
-[...]
+The IGVM parameter can be consumed by Coconut SVSM [1], instead of relying on
+the fw_cfg interface, which has caused problems before due to unexpected access
+[2,3]. Using IGVM parameters is the default way for Coconut SVSM; switching
+over would allow removing specialized code paths for QEMU in Coconut.
 
->> >diff --git a/target/i386/sev.c b/target/i386/sev.c
->> >index fd2dada013..ffeb9f52a2 100644
->> >--- a/target/i386/sev.c
->> >+++ b/target/i386/sev.c
->> >@@ -1892,7 +1892,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->> >          */
->> >         if (x86machine->igvm) {
->> >             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
->> >-                    ->process(x86machine->igvm, machine->cgs, true, errp) ==
->> >+                    ->process(x86machine->igvm, machine->cgs, true, NULL, errp) ==
->>
->> Why here we don't need to pass it?
->
->Here we only read the IGVM to figure out the initial vcpu configuration
->(the `onlyVpContext` parameter is true) to initialize kvm,
->The actual IGVM processing is done later.
+In any case OVMF, which runs after SVSM has already been initialized, will
+continue reading all ACPI tables via fw_cfg and provide fixed up ACPI data to
+the OS as before.
 
-okay, I see, thanks!
+This series makes ACPI table building more generic by making the BIOS linker
+optional. This allows the MADT to be generated outside of the ACPI build
+context. A new function (acpi_build_madt_standalone()) is added for that. With
+that, the IGVM MADT parameter field can be filled with the MADT data during
+processing of the IGVM file.
 
->Should I mention in the comment above why madt is NULL here ?
+Generating the MADT twice (IGVM processing and ACPI table building) seems
+acceptable, since there is no infrastructure to obtain the MADT out of the ACPI
+table memory area during IGVM processing.
 
-Yes, please :-)
+[1] https://github.com/coconut-svsm/svsm/pull/858
+[2] https://gitlab.com/qemu-project/qemu/-/issues/2882
+[3] https://github.com/coconut-svsm/svsm/issues/646
 
-Stefano
+v2:
+- Provide more context in the message of the main commit
+- Document the madt parameter of IgvmCfgClass::process()
+- Document why no MADT data is provided the the process call in sev.c
+
+Based-On: <20251118122133.1695767-1-kraxel@redhat.com>
+Signed-off-by: Oliver Steffen <osteffen@redhat.com>
+
+Oliver Steffen (3):
+  hw/acpi: Make BIOS linker optional
+  hw/acpi: Add standalone function to build MADT
+  igvm: Fill MADT IGVM parameter field
+
+ backends/igvm-cfg.c       |  8 +++++++-
+ backends/igvm.c           | 37 ++++++++++++++++++++++++++++++++++++-
+ hw/acpi/aml-build.c       |  7 +++++--
+ hw/i386/acpi-build.c      |  8 ++++++++
+ hw/i386/acpi-build.h      |  2 ++
+ include/system/igvm-cfg.h |  5 ++++-
+ include/system/igvm.h     |  2 +-
+ target/i386/sev.c         |  5 +++--
+ 8 files changed, 66 insertions(+), 8 deletions(-)
+
+-- 
+2.52.0
 
 
