@@ -1,359 +1,310 @@
-Return-Path: <kvm+bounces-65764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65765-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6822CB5F3A
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 13:55:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED3F8CB5F92
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 14:06:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 078443003102
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 12:55:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBE90305738A
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 13:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0552F290E;
-	Thu, 11 Dec 2025 12:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2C931283C;
+	Thu, 11 Dec 2025 13:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZGgfy0I";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eh60qQl9"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="xHbr3R2W"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804943126D5
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 12:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A362234973;
+	Thu, 11 Dec 2025 13:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765457734; cv=none; b=gmBk6f3BNwvQzVNj+m7fwLdXQtgpeO/Gk0H7F+Df5Af2sbAA8hXj1TwkQxnuUp8YfVs0Os4WuSwe+w+Sll67TTiDkBchvqXxF31c47S/mYOuJXmKJkZuwRMsTulD/KhzS2wiGiT4exKDHDW6c0bDT9gdCK58swsHOzQjRVYi2dw=
+	t=1765458169; cv=none; b=p3bUUih9ThP/r4sDBLWB3ntA4fVK53eMk+XZHGs8k8BsgPZMA5JSg3Buv2Z0q8p58dfWdbU4nTidDzdcbGWNRZT8No8HvzXL5tNtYgkQRi0rpp5xuvbkiqtS4T8/dGyresInobGtCGUo0jf5uot4VflIG+Z9pqQS4SfSbKps1I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765457734; c=relaxed/simple;
-	bh=GBLapbLKXBRGhmi3VzSpdfUo6M+SRluFuLYf0fhNOzI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f75XT9UhkZ2r6HWEvgY4LrF0ASRxrHpFZzF7fLMpL2bTIjuwT4xaeFAy/X8fUy5ampR2RNRzoKPuSF4C6u/bY1eEOszwmcym23J32wMwtEIdWogwHQssWBZ5PkPbVPEG3xV9JJEr/zaZqiTb4HpxrucYKIBG2ZqnwMQRkP6xQVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aZGgfy0I; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eh60qQl9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765457731;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/U3/mIIeh6oyj7R9BdLHvhs0yBtnDcHOXobfBr2NkWQ=;
-	b=aZGgfy0IMaYM28ir8vSF+nXkgITffyBtlp4c7tEId5XgH34FhWUj1hso8m9kWT7zMVhPmW
-	WZ/QSuNOQk9nfDUJrvQOxRQqyXktwXMAH6SD6sIC4aBQF8W3Sl+oGmBZLkl/fZvHSvhCjs
-	JyzrOFTy47gCZCH72k72ADYR6vJYZkM=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-iis1vxnqOfa6UaemT7TDhg-1; Thu, 11 Dec 2025 07:55:25 -0500
-X-MC-Unique: iis1vxnqOfa6UaemT7TDhg-1
-X-Mimecast-MFC-AGG-ID: iis1vxnqOfa6UaemT7TDhg_1765457724
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-297df52c960so822685ad.1
-        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 04:55:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765457724; x=1766062524; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/U3/mIIeh6oyj7R9BdLHvhs0yBtnDcHOXobfBr2NkWQ=;
-        b=Eh60qQl9d8B6+sESkeOXajUzkrUYX75S9x8YRnfa2vpOCmzwUgeooL019+LndoaibR
-         7IQ/Wg3fV9nXNKWaYzpbts6v1SeYotp/d+QQeDr+EEg6foT+JjICFvX95U+GDVe31w2g
-         LSJl+XphWl+/wnxrLBh8W7hoZ8E/gEinO7ZVV33HkcN6M0IsvvtazMsmxzRkEGgqQ5Ys
-         mxvLLxjxWIJW8kYhLucDvFReDrcfDClA9yY0vGRmpFF5XtvzSjd3oUpYT3K8eQbADk4a
-         DlRXe8+7I4HrWfDi9C6WtAGpI5r/Zft3+9Yvbu+fuNfTLyAWH4lZZv+NkuRYw+tuoul7
-         thWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765457724; x=1766062524;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/U3/mIIeh6oyj7R9BdLHvhs0yBtnDcHOXobfBr2NkWQ=;
-        b=grvCRDzbSWT0pLE8ZrYjsW1+PAUUgf6I4EGae2ua3wmsrbuknN9F9/j1VSwQCSH03h
-         CsOOaA0GdxJNzeSj3+vKCrBxWiRIgCQ1oc43THxdF5D+F+I9Vv5olEtw/0wl+mlaw77l
-         pQYJGmAv+KW9KTSnEL/jerekNAf6qPa7yFHUpmAD+o015Rpzl9ht+o7FeeyXHJPRiZQC
-         OkfYXGMmEaLhKVACIBxwSNixCPEcIBNuYPxq7WkaXYPDgin+EP0I1B+Z17PbzO2i1+vm
-         5azyDdGRsR1cBIgZq8sf0ggzobJpj7JRO0gI3Fd2ElMwyypYxSe4h8HlKWcQ5uQI4ZO6
-         yS7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXUyO4BcO+c7zx4E+KaDn9Xl1KszuZ1SfmHAK0OY1KCVxW4+MbtEI5fh59r0FDQpIVePjM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7FTRh5IwkRB2hXPv/emY8Gp27CyABhd4wJdhNRkBS+6+7/VEr
-	NKjrH1tdx0uC3hdFW/3o4ZlMaKZbc2UKjUa0OxOI/UlplhWI0Wp55DW2BAxU6N4JdkmWSnldJXu
-	HOD/PtZAf1btbVQ/lsDDWdFJRpKHg9oinfmj5ERfV0H1hCIE7OLJp0Av9Jyz700CV+ZCWHolui8
-	zjG+TA2sQktCh4MYI/IR90gEIdAiA5
-X-Gm-Gg: AY/fxX6pmKlB+eGlukm4GeZUWkfWZ3QciGiItjBe6Dzt8loaim/Dv+oF7KodMPAcHuy
-	rI/lX32YfAe+lQf8XWrxVmsYqUadijaqHVLkXCetGVPF4+YE1C7s1V7j7TlGMrgfdY6yfi7BDGB
-	X0sGIP/+elvIFFVcj2oQ2alzcScqUuvcELkZHkhr+97qbZlK5URgc239G6iz+q4U09
-X-Received: by 2002:a17:902:e884:b0:295:6122:5c42 with SMTP id d9443c01a7336-29ec231b394mr60323495ad.24.1765457724358;
-        Thu, 11 Dec 2025 04:55:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEKrUwXdtxOoTMBu1hJiIk5hrSkflSXqA/00cWHE0pi1/DVYyeztZ61eYy+lFh4s6sAmcADzgtP6/HmaQ0F6IA=
-X-Received: by 2002:a17:902:e884:b0:295:6122:5c42 with SMTP id
- d9443c01a7336-29ec231b394mr60323315ad.24.1765457723923; Thu, 11 Dec 2025
- 04:55:23 -0800 (PST)
+	s=arc-20240116; t=1765458169; c=relaxed/simple;
+	bh=wMqefMX8Mc38mruoomh45hwibeRJ0H2QBBT3xydpibQ=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=uUhn0S0fghcuJpDyimhuNFl7j6gFRyCKtTjOtOZS4/XTDB1+Tk5gwvKwQYvCxuTguW3BL+CEuambGw5yZUPJ5Kj5hHGVv1mRhAbdnHVgMCBDQ4BD3BnR+wVXCj845f7Eo3JvqlDPGxsoFhNMg6JVEZm6PvgAQrPUY1/ypgMJgPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=xHbr3R2W; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yXjDj2LopgEdejBPveRLTL1bCofz4US84PT1q1wUrQg=;
+	b=xHbr3R2WIFp5oR9Nco7g8uQM7yu4h8Y+nnBWfQSXyrUxZxY18Qw54d2p1AsZz3jxGzQ4smao0
+	Zufh6YL+19aoxIC2d0F0j8hIcQYrDe0NKCEwe1hsGqQ+OwBnstutzZsIFz65/ezT/vDsDImfl1I
+	7irz7iJCvnjq1YPX3iwjrnI=
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dRt3k0kTVz12LCr;
+	Thu, 11 Dec 2025 21:00:18 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2E13418047B;
+	Thu, 11 Dec 2025 21:02:35 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 11 Dec 2025 21:02:33 +0800
+Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
+To: Jiaqi Yan <jiaqiyan@google.com>
+CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <duenwen@google.com>,
+	<rananta@google.com>, <jthoughton@google.com>, <vsethi@nvidia.com>,
+	<jgg@nvidia.com>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <pbonzini@redhat.com>,
+	<corbet@lwn.net>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251013185903.1372553-1-jiaqiyan@google.com>
+ <20251013185903.1372553-3-jiaqiyan@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
+Date: Thu, 11 Dec 2025 21:02:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251210150019.48458-1-mlbnkm1@gmail.com> <ctubihgjn65za4hbmanhkzg7psr6kmj3jeqfj5sfxnnxjjvrsy@l6644u74vrn6>
- <CAGxU2F6TMP7tOo=DONL9CJUW921NXyx9T65y_Ai5pbzh1LAQaA@mail.gmail.com>
-In-Reply-To: <CAGxU2F6TMP7tOo=DONL9CJUW921NXyx9T65y_Ai5pbzh1LAQaA@mail.gmail.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 11 Dec 2025 13:55:12 +0100
-X-Gm-Features: AQt7F2oc1BVBAdK92iMl4jOy7fPeE1y7G4q5UMwstrOZRfr8mNpcaD9xZswoaek
-Message-ID: <CAGxU2F6RkU-6id5Z9wBFKPfmws9CJ00mnBQgCYZasLshLnYn=w@mail.gmail.com>
-Subject: Re: [PATCH] vsock/virtio: cap TX credit to local buffer size
-To: Melbin K Mathew <mlbnkm1@gmail.com>
-Cc: stefanha@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20251013185903.1372553-3-jiaqiyan@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On Thu, 11 Dec 2025 at 11:08, Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Thu, 11 Dec 2025 at 10:10, Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >
-> > On Wed, Dec 10, 2025 at 04:00:19PM +0100, Melbin K Mathew wrote:
-> > >The virtio vsock transport currently derives its TX credit directly
-> > >from peer_buf_alloc, which is set from the remote endpoint's
-> > >SO_VM_SOCKETS_BUFFER_SIZE value.
-> >
-> > Why removing the target tree [net] from the tags?
-> >
-> > Also this is a v2, so the tags should have been [PATCH net v2], please
-> > check it in next versions, more info:
-> >
-> > https://www.kernel.org/doc/html/latest/process/submitting-patches.html#subject-line
-> >
-> > >
-> > >On the host side this means that the amount of data we are willing to
-> > >queue for a connection is scaled by a guest-chosen buffer size,
-> > >rather than the host's own vsock configuration. A malicious guest can
-> > >advertise a large buffer and read slowly, causing the host to allocate
-> > >a correspondingly large amount of sk_buff memory.
-> > >
-> > >Introduce a small helper, virtio_transport_peer_buf_alloc(), that
-> > >returns min(peer_buf_alloc, buf_alloc), and use it wherever we consume
-> > >peer_buf_alloc:
-> > >
-> > >  - virtio_transport_get_credit()
-> > >  - virtio_transport_has_space()
-> > >  - virtio_transport_seqpacket_enqueue()
-> > >
-> > >This ensures the effective TX window is bounded by both the peer's
-> > >advertised buffer and our own buf_alloc (already clamped to
-> > >buffer_max_size via SO_VM_SOCKETS_BUFFER_MAX_SIZE), so a remote guest
-> > >cannot force the host to queue more data than allowed by the host's
-> > >own vsock settings.
-> > >
-> > >On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
-> > >32 guest vsock connections advertising 2 GiB each and reading slowly
-> > >drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
-> > >recovered after killing the QEMU process.
-> > >
-> > >With this patch applied, rerunning the same PoC yields:
-> > >
-> > >  Before:
-> > >    MemFree:        ~61.6 GiB
-> > >    MemAvailable:   ~62.3 GiB
-> > >    Slab:           ~142 MiB
-> > >    SUnreclaim:     ~117 MiB
-> > >
-> > >  After 32 high-credit connections:
-> > >    MemFree:        ~61.5 GiB
-> > >    MemAvailable:   ~62.3 GiB
-> > >    Slab:           ~178 MiB
-> > >    SUnreclaim:     ~152 MiB
-> > >
-> > >i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
-> > >guest remains responsive.
-> >
-> > I think we should include here a summary of what you replied to Michael
-> > about other transports.
-> >
-> > I can't find your reply in the archive, but I mean the reply to
-> > https://lore.kernel.org/netdev/20251210084318-mutt-send-email-mst@kernel.org/
-> >
-> > >
-> > >Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
-> > >Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-> > >Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
-> > >---
-> > > net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++---
-> > > 1 file changed, 24 insertions(+), 3 deletions(-)
-> > >
-> > >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > >index dcc8a1d58..02eeb96dd 100644
-> > >--- a/net/vmw_vsock/virtio_transport_common.c
-> > >+++ b/net/vmw_vsock/virtio_transport_common.c
-> > >@@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
-> > > }
-> > > EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
-> > >
-> > >+/*
-> > >+ * Return the effective peer buffer size for TX credit computation.
-> >
-> > nit: block comment in this file doesn't leave empty line, so I'd follow
-> > it:
-> >
-> > @@ -491,8 +491,7 @@ void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
-> >   }
-> >   EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
-> >
-> > -/*
-> > - * Return the effective peer buffer size for TX credit computation.
-> > +/* Return the effective peer buffer size for TX credit computation.
-> >    *
-> >    * The peer advertises its receive buffer via peer_buf_alloc, but we
-> >    * cap that to our local buf_alloc (derived from
-> >
-> > >+ *
-> > >+ * The peer advertises its receive buffer via peer_buf_alloc, but we
-> > >+ * cap that to our local buf_alloc (derived from
-> > >+ * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size)
-> > >+ * so that a remote endpoint cannot force us to queue more data than
-> > >+ * our own configuration allows.
-> > >+ */
-> > >+static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
-> > >+{
-> > >+      u32 peer  = vvs->peer_buf_alloc;
-> > >+      u32 local = vvs->buf_alloc;
-> > >+
-> > >+      if (peer > local)
-> > >+              return local;
-> > >+      return peer;
-> > >+}
-> > >+
-> >
-> > I think here Michael was suggesting this:
-> >
-> > @@ -502,12 +502,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
-> >    */
-> >   static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
-> >   {
-> > -       u32 peer  = vvs->peer_buf_alloc;
-> > -       u32 local = vvs->buf_alloc;
-> > -
-> > -       if (peer > local)
-> > -               return local;
-> > -       return peer;
-> > +       return min(vvs->peer_buf_alloc, vvs->buf_alloc);
-> >   }
-> >
-> >
-> > > u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> > > {
-> > >       u32 ret;
-> > >@@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> > >               return 0;
-> > >
-> > >       spin_lock_bh(&vvs->tx_lock);
-> > >-      ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> > >+      ret = virtio_transport_tx_buf_alloc(vvs) -
-> > >+            (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> > >       if (ret > credit)
-> > >               ret = credit;
-> > >       vvs->tx_cnt += ret;
-> > >@@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
-> > >
-> > >       spin_lock_bh(&vvs->tx_lock);
-> > >
-> > >-      if (len > vvs->peer_buf_alloc) {
-> > >+      if (len > virtio_transport_tx_buf_alloc(vvs)) {
-> > >               spin_unlock_bh(&vvs->tx_lock);
-> > >               return -EMSGSIZE;
-> > >       }
-> > >@@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
-> > >       struct virtio_vsock_sock *vvs = vsk->trans;
-> > >       s64 bytes;
-> > >
-> > >-      bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> > >+      bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
-> > >+            (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> >
-> > nit: please align this:
-> >
-> > @@ -903,7 +898,7 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
-> >          s64 bytes;
-> >
-> >          bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
-> > -             (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> > +               (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> >          if (bytes < 0)
-> >                  bytes = 0;
-> >
-> >
-> > Just minor things, but the patch LGTM, thanks!
->
-> I just noticed that vsock_test are now failing because one peer (client)
-> try to send more than TX buffer while the RX is waiting for the whole
-> data.
->
-> This should fix the test:
->
-> From b69ca1fd3d544345b02cedfbeb362493950a87c1 Mon Sep 17 00:00:00 2001
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> Date: Thu, 11 Dec 2025 10:55:06 +0100
-> Subject: [PATCH 1/1] vsock/test: fix seqpacket message bounds test
->
-> From: Stefano Garzarella <sgarzare@redhat.com>
->
-> The test requires the sender (client) to send all messages before waking
-> up the receiver (server).
-> Since virtio-vsock had a bug and did not respect the size of the TX
-> buffer, this test worked, but now that we have fixed the bug, it hangs
-> because the sender fills the TX buffer before waking up the receiver.
->
-> Set the buffer size in the sender (client) as well, as we already do for
-> the receiver (server).
->
-> Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  tools/testing/vsock/vsock_test.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> index 9e1250790f33..af6665ed19d5 100644
-> --- a/tools/testing/vsock/vsock_test.c
-> +++ b/tools/testing/vsock/vsock_test.c
-> @@ -351,6 +351,7 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
->
->  static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->  {
-> +       unsigned long long sock_buf_size;
->         unsigned long curr_hash;
->         size_t max_msg_size;
->         int page_size;
-> @@ -363,6 +364,16 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->                 exit(EXIT_FAILURE);
->         }
->
-> +       sock_buf_size = SOCK_BUF_SIZE;
+Hi Jiaqi,
+
+I had run into several problems when testing it on different servers. I
+haven't figured them out yet but post it early for discussion.
+
+On 2025/10/14 2:59, Jiaqi Yan wrote:
+> Test how KVM handles guest SEA when APEI is unable to claim it, and
+> KVM_CAP_ARM_SEA_TO_USER is enabled.
+> 
+> The behavior is triggered by consuming recoverable memory error (UER)
+> injected via EINJ. The test asserts two major things:
+> 1. KVM returns to userspace with KVM_EXIT_ARM_SEA exit reason, and
+>    has provided expected fault information, e.g. esr, flags, gva, gpa.
+> 2. Userspace is able to handle KVM_EXIT_ARM_SEA by injecting SEA to
+>    guest and KVM injects expected SEA into the VCPU.
+> 
+> Tested on a data center server running Siryn AmpereOne processor
+> that has RAS support.
+> 
+> Several things to notice before attempting to run this selftest:
+> - The test relies on EINJ support in both firmware and kernel to
+>   inject UER. Otherwise the test will be skipped.
+> - The under-test platform's APEI should be unable to claim the SEA.
+>   Otherwise the test will be skipped.
+> - Some platform doesn't support notrigger in EINJ, which may cause
+>   APEI and GHES to offline the memory before guest can consume
+>   injected UER, and making test unable to trigger SEA.
+> 
+> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+
+[...]
+
+> +static void inject_uer(uint64_t paddr)
+> +{
+> +	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1)
+> +		ksft_test_result_skip("EINJ table no available in firmware");
+
+Missing '\n'.
+
+We should return early (to actually skip the test) if the file can not
+be accessed, right?
+
 > +
-> +       setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
-> +                           sock_buf_size,
-> +                           "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
+> +	if (access(EINJ_ETYPE, R_OK | W_OK) == -1)
+> +		ksft_test_result_skip("EINJ module probably not loaded?");
 > +
-> +       setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-> +                           sock_buf_size,
-> +                           "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
+> +	write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
+> +	write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
+> +	write_einj_entry(EINJ_ADDR, paddr);
+> +	write_einj_entry(EINJ_MASK, ~0x0UL);
+> +	write_einj_entry(EINJ_NOTRIGGER, 1);
+> +	write_einj_entry(EINJ_DOIT, 1);
+> +}
 > +
->         /* Wait, until receiver sets buffer size. */
->         control_expectln("SRVREADY");
->
-> --
-> 2.52.0
->
-> Please add that patch to a series (e.g. v3) which includes your patch,
-> and that fix for the test.
+> +/*
+> + * When host APEI successfully claims the SEA caused by guest_code, kernel
+> + * will send SIGBUS signal with BUS_MCEERR_AR to test thread.
+> + *
+> + * We set up this SIGBUS handler to skip the test for that case.
+> + */
+> +static void sigbus_signal_handler(int sig, siginfo_t *si, void *v)
+> +{
+> +	ksft_print_msg("SIGBUS (%d) received, dumping siginfo...\n", sig);
+> +	ksft_print_msg("si_signo=%d, si_errno=%d, si_code=%d, si_addr=%p\n",
+> +		       si->si_signo, si->si_errno, si->si_code, si->si_addr);
+> +	if (si->si_code == BUS_MCEERR_AR)
+> +		ksft_test_result_skip("SEA is claimed by host APEI\n");
+> +	else
+> +		ksft_test_result_fail("Exit with signal unhandled\n");
+> +
+> +	exit(0);
+> +}
+> +
+> +static void setup_sigbus_handler(void)
+> +{
+> +	struct sigaction act;
+> +
+> +	memset(&act, 0, sizeof(act));
+> +	sigemptyset(&act.sa_mask);
+> +	act.sa_sigaction = sigbus_signal_handler;
+> +	act.sa_flags = SA_SIGINFO;
+> +	TEST_ASSERT(sigaction(SIGBUS, &act, NULL) == 0,
+> +		    "Failed to setup SIGBUS handler");
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	uint64_t guest_data;
+> +
+> +	/* Consumes error will cause a SEA. */
+> +	guest_data = *(uint64_t *)EINJ_GVA;
+> +
+> +	GUEST_FAIL("Poison not protected by SEA: gva=%#lx, guest_data=%#lx\n",
+> +		   EINJ_GVA, guest_data);
+> +}
+> +
+> +static void expect_sea_handler(struct ex_regs *regs)
+> +{
+> +	u64 esr = read_sysreg(esr_el1);
+> +	u64 far = read_sysreg(far_el1);
+> +	bool expect_far_invalid = far_invalid;
+> +
+> +	GUEST_PRINTF("Handling Guest SEA\n");
+> +	GUEST_PRINTF("ESR_EL1=%#lx, FAR_EL1=%#lx\n", esr, far);
+> +
+> +	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
+> +	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
+> +
+> +	if (expect_far_invalid) {
+> +		GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, ESR_ELx_FnV);
 
-I saw you sent v3 without this, never mind, I'll post it directly.
+I hit this ASSERT with:
 
-Stefano
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
+einj_hpa=0x202841234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x202841234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
+# Memory UER EINJected
+# Dump kvm_run info about KVM_EXIT_ARM_SEA
+# kvm_run.arm_sea: esr=0x92000610, flags=0
+# kvm_run.arm_sea: gva=0, gpa=0
+# From guest: Handling Guest SEA
+# From guest: ESR_EL1=0x96000010, FAR_EL1=0xaaaadf254828
+# Guest aborted!
+==== Test Assertion Failure ====
+  arm64/sea_to_user.c:172: esr & ESR_ELx_FnV == ESR_ELx_FnV
+  pid=38112 tid=38112 errno=4 - Interrupted system call
+     1	0x0000000000402f9b: run_vm at sea_to_user.c:246
+     2	0x0000000000402467: main at sea_to_user.c:330
+     3	0x0000ffff8e22b03f: ?? ??:0
+     4	0x0000ffff8e22b117: ?? ??:0
+     5	0x00000000004026ef: _start at ??:?
+  0x0 != 0x400 (esr & ESR_ELx_FnV != ESR_ELx_FnV)
 
->
-> Maybe we can also add a new test to check exactly the problem you're
-> fixing, to avoid regressions.
->
-> Thanks,
-> Stefano
+It seems that KVM doesn't emulate FnV when injecting an abort.
 
+> +		GUEST_PRINTF("Guest observed garbage value in FAR\n");
+> +	} else {
+> +		GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, 0);
+> +		GUEST_ASSERT_EQ(far, EINJ_GVA);
+> +	}
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void vcpu_inject_sea(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_vcpu_events events = {};
+> +
+> +	events.exception.ext_dabt_pending = true;
+> +	vcpu_events_set(vcpu, &events);
+> +}
+> +
+> +static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+> +{
+> +	struct ucall uc;
+> +	bool guest_done = false;
+> +	struct kvm_run *run = vcpu->run;
+> +	u64 esr;
+> +
+> +	/* Resume the vCPU after error injection to consume the error. */
+> +	vcpu_run(vcpu);
+> +
+> +	ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
+> +		       exit_reason_str(run->exit_reason));
+> +	ksft_print_msg("kvm_run.arm_sea: esr=%#llx, flags=%#llx\n",
+> +		       run->arm_sea.esr, run->arm_sea.flags);
+> +	ksft_print_msg("kvm_run.arm_sea: gva=%#llx, gpa=%#llx\n",
+> +		       run->arm_sea.gva, run->arm_sea.gpa);
+> +
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
+
+I can also hit this ASSERT with:
+
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
+einj_hpa=0x2841234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
+# Memory UER EINJected
+# Dump kvm_run info about KVM_EXIT_MMIO
+# kvm_run.arm_sea: esr=0xffff90ba0040, flags=0x691000
+# kvm_run.arm_sea: gva=0x100000008, gpa=0
+==== Test Assertion Failure ====
+  arm64/sea_to_user.c:207: exit_reason == (41)
+  pid=38023 tid=38023 errno=4 - Interrupted system call
+     1	0x0000000000402d1b: run_vm at sea_to_user.c:207
+     2	0x0000000000402467: main at sea_to_user.c:330
+     3	0x0000ffff9122b03f: ?? ??:0
+     4	0x0000ffff9122b117: ?? ??:0
+     5	0x00000000004026ef: _start at ??:?
+  Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
+
+Not sure what's wrong it..
+
+> +
+> +	esr = run->arm_sea.esr;
+> +	TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
+> +	TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
+> +	TEST_ASSERT_EQ(ESR_ELx_ISS2(esr), 0);
+> +	TEST_ASSERT_EQ((esr & ESR_ELx_INST_SYNDROME), 0);
+> +	TEST_ASSERT_EQ(esr & ESR_ELx_VNCR, 0);
+> +
+> +	if (!(esr & ESR_ELx_FnV)) {
+> +		ksft_print_msg("Expect gva to match given FnV bit is 0\n");
+> +		TEST_ASSERT_EQ(run->arm_sea.gva, EINJ_GVA);
+> +	}
+> +
+> +	if (run->arm_sea.flags & KVM_EXIT_ARM_SEA_FLAG_GPA_VALID) {
+> +		ksft_print_msg("Expect gpa to match given KVM_EXIT_ARM_SEA_FLAG_GPA_VALID is set\n");
+> +		TEST_ASSERT_EQ(run->arm_sea.gpa, einj_gpa & PAGE_ADDR_MASK);
+> +	}
+> +
+> +	far_invalid = esr & ESR_ELx_FnV;
+
+Missing sync_global_to_guest()?
+
+Thanks,
+Zenghui
 
