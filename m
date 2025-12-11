@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-65705-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65706-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C55ACB4D13
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:52:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D14E5CB4CFF
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 06:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DF953014AF0
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75545300EE42
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 05:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52312299A81;
-	Thu, 11 Dec 2025 05:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B411129D26D;
+	Thu, 11 Dec 2025 05:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LZDLo2ej"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LfBvhv9t"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78801288C20
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851EA299928
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 05:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765431851; cv=none; b=F298a/QQXZQr5HGlbc0kGc29eEsNaOcXNVAjMqy6p8uUUl5GicKvG1bvapN7rVWbCbPl3AzEsmojEXKI6dPoZzB+Nztr2EmLC7r7IfzOeTyiXHR2PCPMcRV5yQonBJSIvTT7/ngbGXLAk97RjLcfYyJ83F2M4XLcStUJsX3r+EU=
+	t=1765431855; cv=none; b=KxW/H6sQesO44amUz9GyyNRgtmHS9AtEhtGv4sy8slGSnmjbSee6aTHGMb8E0u/4SJsC3KrJbOCplTX+Hp4egPc9pCpW65JFmchd/VMMdTh+UYbx2ruGoBRIfhYG/VId7PlPYWjx0z8cBzKi0fRFkLdtSrArLqDWTVlal0lgtM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765431851; c=relaxed/simple;
-	bh=XBfZRaZRr3MF7syASa2Eo8ym4g4biHCF5wgZ3TpjGi4=;
+	s=arc-20240116; t=1765431855; c=relaxed/simple;
+	bh=MoFwaE7HCu9hCP09pscNetCaYn3cG1uOpKDAv/wkIAM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GEGNs086RGBEH6PXtqqAgAKGpujF3XxrhkUIrPKV4HgcosXTqGL5e2r9NXFK4lxQUJ/JeV3vvVTnn3QyltiImI4YIvCYWcz51OT9wPCQAeN0LKuvCBFUJ7RSaPFJIeP7ox0oD9XG+BlAtYDQ1hf4X51NEwkl84cijT9RV35hWzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=fail smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LZDLo2ej; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=QowGBge0F33CBHByoFkJhjYItB5lHoPK9GlSceDBmuttzaQ7BH0HDE5ut6ekYULFOthyfoQmlE52U/1hQRRx7qvWDy08PyMcBOSvccz/RauGXf2Z8fcfqDYIFckKaE4OwXaqlWltBSA3Vu34IhTwbgsB9ZjkXNpmAR1s3VZArUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LfBvhv9t; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765431849; x=1796967849;
+  t=1765431854; x=1796967854;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XBfZRaZRr3MF7syASa2Eo8ym4g4biHCF5wgZ3TpjGi4=;
-  b=LZDLo2ejv1uGSwjqn2u6CUSKirBuZVX1U1XUTRew9EYstaTi3pmkTfjV
-   MgVYFww2hlJW74L0pEEON0JlQL+/cS4heYwzCs1pcQSARR416MhLUEnVB
-   oDSGSEbpWN/1nGS6GXAz/Q5LFNOqO4dnQ8CdSFCR+ZUS7ML3bzCnR+6IV
-   8sfOEygbS/bUmw7PhuTiHLCL/RxbpCQN8/7eZ5YLVTsgB6EEqjBjaIvAR
-   3QAmFSkSxG2iAapOKDww2cQCfLTVA5oC9ebYGrnaN8Pe4r0WQwA6hHbZc
-   +xPbBqCa3+rxvDsELPBNKQvotJAh5VMazMjBWE3h8FHBjSdyl+BFge8dS
+  bh=MoFwaE7HCu9hCP09pscNetCaYn3cG1uOpKDAv/wkIAM=;
+  b=LfBvhv9td1zupmBJEzZNN3OWzksJhQj+O2fM1UzNeBnmQjeqfLLvkF3t
+   KuhEkfWHgbbw4+eCE/iqMguURfiZAIfuJeK0k29fuwapIUvKBSKFle2ad
+   tqxnnrWIuqv767YyVp79Y7G0mvDUuWaylxr8xdBkkjEccZEGrZZ0Mk+/U
+   rNQL+BY7D5JjJfbqPIvyoZR08EPNlVAcxWOoCqcOIzE/cLoQTInjQAFxG
+   ODUK3O6NVhooEt0DbeBmYimzhs5cO9t7jajoTEcHUiu9U8icdNekwIFO8
+   vAlzviqrTcvKZnvLq9h6iXrTDTC3TeNJb1CLFs22e/g6FowK+jNVfB13n
    w==;
-X-CSE-ConnectionGUID: 18VprwUDRimXspQiGXAmtg==
-X-CSE-MsgGUID: 5Opxs76pQr6sGHbIIPEJqw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409915"
+X-CSE-ConnectionGUID: z+tQGdwOT0idVGJRk3F10g==
+X-CSE-MsgGUID: hShRorFORGSmyeS8j7MEVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="66409925"
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="66409915"
+   d="scan'208";a="66409925"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:08 -0800
-X-CSE-ConnectionGUID: zOZVpKb9Q+u3AvIjrui/zQ==
-X-CSE-MsgGUID: /Wl5Veo2RUiIE03N9MjU7g==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 21:44:14 -0800
+X-CSE-ConnectionGUID: SviPlzvqQHKVfZiY+MWIxA==
+X-CSE-MsgGUID: tDQ4DGX+RY2hBQ0RgCnhHw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="227366130"
+   d="scan'208";a="227366140"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:04 -0800
+  by orviesa002.jf.intel.com with ESMTP; 10 Dec 2025 21:44:08 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -72,9 +72,9 @@ Cc: qemu-devel@nongnu.org,
 	Chenyi Qiang <chenyi.qiang@intel.com>,
 	Farrah Chen <farrah.chen@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v5 12/22] i386/cpu: Add CET support in CR4
-Date: Thu, 11 Dec 2025 14:07:51 +0800
-Message-Id: <20251211060801.3600039-13-zhao1.liu@intel.com>
+Subject: [PATCH v5 13/22] i386/cpu: Save/restore SSP0 MSR for FRED
+Date: Thu, 11 Dec 2025 14:07:52 +0800
+Message-Id: <20251211060801.3600039-14-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251211060801.3600039-1-zhao1.liu@intel.com>
 References: <20251211060801.3600039-1-zhao1.liu@intel.com>
@@ -86,76 +86,91 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-CR4.CET bit (bit 23) is as master enable for CET.
-Check and adjust CR4.CET bit based on CET CPUIDs.
+From: "Xin Li (Intel)" <xin@zytor.com>
+
+Both FRED and CET shadow stack define the MSR MSR_IA32_PL0_SSP (aka
+MSR_IA32_FRED_SSP0 in FRED spec).
+
+MSR_IA32_PL0_SSP is a FRED SSP MSR, so that if a processor doesn't
+support CET shadow stack, FRED transitions won't use MSR_IA32_PL0_SSP,
+but this MSR would still be accessible using MSR-access instructions
+(e.g., RDMSR, WRMSR).
+
+Therefore, save/restore SSP0 MSR for FRED.
 
 Tested-by: Farrah Chen <farrah.chen@intel.com>
+Signed-off-by: Xin Li (Intel) <xin@zytor.com>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
 Changes Since v3:
- - Reorder CR4_RESERVED_MASK.
+ - New commit.
 ---
- target/i386/cpu.h    |  9 +++++++--
- target/i386/helper.c | 12 ++++++++++++
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ target/i386/cpu.h     |  6 ++++++
+ target/i386/kvm/kvm.c | 13 +++++++++++++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index bc3296a3c6f0..a1ff2ceb0c38 100644
+index a1ff2ceb0c38..84e5cf0ab0c1 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -257,6 +257,7 @@ typedef enum X86Seg {
- #define CR4_SMEP_MASK   (1U << 20)
- #define CR4_SMAP_MASK   (1U << 21)
- #define CR4_PKE_MASK   (1U << 22)
-+#define CR4_CET_MASK   (1U << 23)
- #define CR4_PKS_MASK   (1U << 24)
- #define CR4_LAM_SUP_MASK (1U << 28)
+@@ -554,6 +554,9 @@ typedef enum X86Seg {
+ #define MSR_IA32_FRED_SSP3              0x000001d3       /* Stack level 3 shadow stack pointer in ring 0 */
+ #define MSR_IA32_FRED_CONFIG            0x000001d4       /* FRED Entrypoint and interrupt stack level */
  
-@@ -273,8 +274,8 @@ typedef enum X86Seg {
-                 | CR4_OSFXSR_MASK | CR4_OSXMMEXCPT_MASK | CR4_UMIP_MASK \
-                 | CR4_LA57_MASK \
-                 | CR4_FSGSBASE_MASK | CR4_PCIDE_MASK | CR4_OSXSAVE_MASK \
--                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_PKS_MASK \
--                | CR4_LAM_SUP_MASK | CR4_FRED_MASK))
-+                | CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_PKE_MASK | CR4_CET_MASK \
-+                | CR4_PKS_MASK | CR4_LAM_SUP_MASK | CR4_FRED_MASK))
- 
- #define DR6_BD          (1 << 13)
- #define DR6_BS          (1 << 14)
-@@ -2948,6 +2949,10 @@ static inline uint64_t cr4_reserved_bits(CPUX86State *env)
-     if (!(env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_FRED)) {
-         reserved_bits |= CR4_FRED_MASK;
-     }
-+    if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) &&
-+        !(env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT)) {
-+        reserved_bits |= CR4_CET_MASK;
-+    }
-     return reserved_bits;
- }
- 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 72b2e195a31e..3f179c6c11f8 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -232,6 +232,18 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
-         new_cr4 &= ~CR4_LAM_SUP_MASK;
-     }
- 
-+    /*
-+     * In fact, "CR4.CET can be set only if CR0.WP is set, and it must be
-+     * clear before CR0.WP can be cleared". However, here we only check
-+     * CR4.CET based on the supported CPUID CET bit, without checking the
-+     * dependency on CR4.WP - the latter need to be determined by the
-+     * underlying accelerators.
-+     */
-+    if (!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_CET_SHSTK) &&
-+        !(env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_CET_IBT)) {
-+        new_cr4 &= ~CR4_CET_MASK;
-+    }
++/* FRED and CET MSR */
++#define MSR_IA32_PL0_SSP                0x000006a4       /* ring-0 shadow stack pointer (aka MSR_IA32_FRED_SSP0 for FRED) */
 +
-     env->cr[4] = new_cr4;
-     env->hflags = hflags;
+ #define MSR_IA32_BNDCFGS                0x00000d90
+ #define MSR_IA32_XSS                    0x00000da0
+ #define MSR_IA32_UMWAIT_CONTROL         0xe1
+@@ -1970,6 +1973,9 @@ typedef struct CPUArchState {
+     uint64_t fred_config;
+ #endif
  
++    /* MSR used for both FRED and CET (SHSTK) */
++    uint64_t pl0_ssp;
++
+     uint64_t tsc_adjust;
+     uint64_t tsc_deadline;
+     uint64_t tsc_aux;
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 60c798113823..00fead0827ed 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -4008,6 +4008,11 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
+             kvm_msr_entry_add(cpu, MSR_IA32_FRED_SSP2, env->fred_ssp2);
+             kvm_msr_entry_add(cpu, MSR_IA32_FRED_SSP3, env->fred_ssp3);
+             kvm_msr_entry_add(cpu, MSR_IA32_FRED_CONFIG, env->fred_config);
++            /*
++             * Aka MSR_IA32_FRED_SSP0. This MSR is accessible even if
++             * CET shadow stack is not supported.
++             */
++            kvm_msr_entry_add(cpu, MSR_IA32_PL0_SSP, env->pl0_ssp);
+         }
+     }
+ #endif
+@@ -4495,6 +4500,11 @@ static int kvm_get_msrs(X86CPU *cpu)
+             kvm_msr_entry_add(cpu, MSR_IA32_FRED_SSP2, 0);
+             kvm_msr_entry_add(cpu, MSR_IA32_FRED_SSP3, 0);
+             kvm_msr_entry_add(cpu, MSR_IA32_FRED_CONFIG, 0);
++            /*
++             * Aka MSR_IA32_FRED_SSP0. This MSR is accessible even if
++             * CET shadow stack is not supported.
++             */
++            kvm_msr_entry_add(cpu, MSR_IA32_PL0_SSP, 0);
+         }
+     }
+ #endif
+@@ -4746,6 +4756,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_IA32_FRED_CONFIG:
+             env->fred_config = msrs[i].data;
+             break;
++        case MSR_IA32_PL0_SSP: /* aka MSR_IA32_FRED_SSP0 */
++            env->pl0_ssp = msrs[i].data;
++            break;
+ #endif
+         case MSR_IA32_TSC:
+             env->tsc = msrs[i].data;
 -- 
 2.34.1
 
