@@ -1,103 +1,190 @@
-Return-Path: <kvm+bounces-65759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644E3CB59F5
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 12:18:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF222CB5C45
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 13:14:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75E58301143F
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 11:18:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2C9963027CD7
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 12:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C3A3081B8;
-	Thu, 11 Dec 2025 11:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A302C30C631;
+	Thu, 11 Dec 2025 12:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N1Q/dmBI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGdQTiNM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="U627fN8R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B8729C351
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 11:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AF626B08F
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 12:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765451894; cv=none; b=bc0YHcqZwm8Vyq4KCXmHIA8d+l3ZdLoduRpLT/dkfIKkKjxk1g5eYyBBB5sfyBXYtJ40PULeM93uXI13lAMSi9osq25pe+ePHlPXV65FiMcY5V8t/5jzcOt8882OPiywJatpdPxGPysV2QxRnmdrywg2waJLNKwSNo5Vct7X8TA=
+	t=1765455235; cv=none; b=iPkhc8tD2Ql1u1o24H/ZivaFb6Q0TlovH9Osh4V4M+5UwkfWDgryPSeZM8uY+murEklT6DIe3/9nt9+TXDEQuAOmnOVTCggUJ3JZCSlCTVzulZEWG0iJAAMbIrlxicyATokTljgXAX/w3ppFKZsQMcKqIAg+eEe/88pFLYnUJII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765451894; c=relaxed/simple;
-	bh=/PavwmTPXgf2RFgfCgkbjsWUgrq8AQllM7S/czmU9N0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kI2fnWkfq0KE0aSLkDuZztmlXpWJLKwErsRFv2GZeg5STu/+zJraSKJlh/icG3I1SJ3wd/koxS2xXiH+8nLlsqaGBrK3g8vysckPvC+fhcDsQGWJCeuLebPqk6UShH3qvO3D1fZgXiL0DOj/iBxJk3vCzHOvNBhlxSgi8MmUN9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N1Q/dmBI; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765451893; x=1796987893;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/PavwmTPXgf2RFgfCgkbjsWUgrq8AQllM7S/czmU9N0=;
-  b=N1Q/dmBIlx/VApiCXEFj2K3rLJ3CnTHSHPk5dMXcDw5TUrF6uOrRYZju
-   9+Wd/D+9XXmvEyAyp/DkRjhJX4/tX6zzblICCxnFvMlW/Riu5p4JmOK32
-   q/4RQZp4RiqWGtZq/KpQHfVUx+Kz8hVz5pe3XE1OcOUtDf+0Qeu4C/N8l
-   c6L7phRtzkyJnj6tj7g+/NruKaJZyp1zFOVjPg1OL2JvHI2W10b57xlzv
-   VCHtwrAKSU70ytzzQG4pFVK1DCrqB/Tit0wLGZxw6S4Fawik+ZrQhZk6w
-   lSdGSboxMY5Ps6ksI7tPoOmf3/E6OYt/OSFwjVOITZlNAcVVCkEkSHq4C
-   g==;
-X-CSE-ConnectionGUID: bXH4foZmQG+Gr8qxM5/F8w==
-X-CSE-MsgGUID: 4c1cIsa9RV+GhUt6hahJkQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="78135215"
-X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="78135215"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 03:18:12 -0800
-X-CSE-ConnectionGUID: n7oOztxsS0C0JqrUfAh9tQ==
-X-CSE-MsgGUID: yNbwLSB4TqaHeCzHM6soxQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="196384546"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa007.fm.intel.com with ESMTP; 11 Dec 2025 03:18:10 -0800
-Date: Thu, 11 Dec 2025 19:42:56 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Peter Xu <peterx@redhat.com>, Fabiano Rosas <farosas@suse.de>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org,
-	"Chang S . Bae" <chang.seok.bae@intel.com>,
-	Zide Chen <zide.chen@intel.com>, Xudong Hao <xudong.hao@intel.com>
-Subject: Re: [PATCH v2 0/9] i386/cpu: Support APX for KVM
-Message-ID: <aTquQJkiwKmuqCG2@intel.com>
-References: <20251211070942.3612547-1-zhao1.liu@intel.com>
- <16e0fc49-0cdf-4e54-b692-5f58e18c747b@redhat.com>
- <aTqMBtkOxx6mZhn+@intel.com>
- <df96afb2-f99c-48ae-81be-ccadf0fc3496@redhat.com>
+	s=arc-20240116; t=1765455235; c=relaxed/simple;
+	bh=NmXsFcOAnwvAj3nF3NXaNW5KEmc2rJaXjSECcaYGufU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cOi0cds6nQdUu1QpxyvEVt/rnaavzf0oS/HX+TlOHr7Py1kr9UK+VbLoUcaD9qa4trv3dinTnd7jrU4JyaRVuzmX1boaNbddy7TlumfrizAauEg/tUfK16wnprE//K0iZvGMGiUUbIhrBwiRYJVQkUYve+VTViBPEyiBiZM1bL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGdQTiNM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=U627fN8R; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765455231;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yI1OvrvfSngspZxo1DNPDpXA2hckf2JskikJ/uhiwUg=;
+	b=YGdQTiNMAqF2azsd4QhNVw9KLqD9dOCXhC0gs58AM0a/s1wbfeFfdD8+5dmBPtctKHrn58
+	CJKlKfR8WgnAxJxP1dI9GYBCMLWDgdDn6Pu+rf0yDFP+TQXYC97HRqMxYKh+V6hqT8vnrY
+	0bAIVC8cruzXqMtKx663DNWPbgJYZeQ=
+Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com
+ [74.125.224.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-QNeQK2MyNWSm4fe2bohTmA-1; Thu, 11 Dec 2025 07:13:50 -0500
+X-MC-Unique: QNeQK2MyNWSm4fe2bohTmA-1
+X-Mimecast-MFC-AGG-ID: QNeQK2MyNWSm4fe2bohTmA_1765455230
+Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-63e0c5c5faeso4208d50.0
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 04:13:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765455230; x=1766060030; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yI1OvrvfSngspZxo1DNPDpXA2hckf2JskikJ/uhiwUg=;
+        b=U627fN8Rq8ss29TvTw/+YnNBfwfpHmbqPKBDotgx6yiQaF0xZFsqfNUIO6DxsJebNQ
+         avnq79toQJxfcBORgg3eJtWx3do+Qb5DDDvJC2DxHljJJjP0R965A5t123YbRhx2flW6
+         kEWhgWFA+FV1RuQwSi2KpN2THREq1SGnpgxkYFNniMXspqQQZHYDQja8rNnKVymMTfaT
+         DIRg2H7Lt0mJJPA0wl5hXz6wCkZMk72byQKWEjUw88+tvUzHs58mVjWWPrfdaPwZxsrd
+         byElqcBcQD1j9/8lBIfz2wrAMglV0IIJM9MIngvnmqiNIXgMU/QDBOGbmdi84ku8KmEh
+         6npQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765455230; x=1766060030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yI1OvrvfSngspZxo1DNPDpXA2hckf2JskikJ/uhiwUg=;
+        b=KbsBUEz3zGrLBRhwhxMtxMNj5y5E251TGyR1BrS+UqghxDhL61t9cPCrHr3+GzlyxH
+         RAqh8zPzNSP/rlDFp34Y6TrLNeSn+vAb0cptqn56VbJL7bErRN+4UQ89ZAm9AXTNz6WX
+         Q1dQeLac5loVyj8Badg4j7xgQMPhDl9W1sQgP+7IPT1gtedBdFrzow790joZhLQJrNEJ
+         NhylseNWIdL8SWvDR/ObFxArDmaF5mXwHXI9l7Qn44NbsY+w9lLh+J62InbfMxixuwEP
+         cMQ8c/H2H54kXLyl4H/PUd+jV19cGiACvpq6lzJuKkJEPqdTiXRu6qiGrhtiuUwgnnyO
+         E7dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbNgNg00DeoMuJBpF1KBqCDTqAKvrNrEAKxelEzgC867jI3vP+EdEUxpAeBAUdN4uvKBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywiEyBCXgqV54kK66mFtVyjsJn6Ukejg/nWAQIcJOIblJHEs7Y
+	BbsRRdQd3P8lsVkOezc33CSJjyWFC/ZMioH9lNoR3vhXi1RdlBZJ4G9qaVfYs4u/qv0LIq1uBDQ
+	p3+O9R3noYhBvvmtWBru5oPZD0gJLuEWtdAG2fcBHAGD678Mc++cLLoICqosuiB0nltU2jMIwVc
+	+Vc7WaqldlFUWDWZX2g3EJZpyIu0LX
+X-Gm-Gg: AY/fxX4AvjYlmPiQeURZWfJ8FN6XG6ShtZU6qNrP8U8m3t2jt0R/sd/aW1JIfG+aNEh
+	E3Q/HjEH3N2aqRj3TtNLr2IsqGssZqaGDoIvcbFs84G/8ztGMmCnlaptjNORGMTScee4cj1yiU7
+	+TraS+wLh8hTsmuVS8J+XSVzPkwkNwgp1o9+rytHs3HqItWAf4i6JUqaST0PVK7QCwVfZyiEUtV
+	C+dNkeUFCjiUgZonK90Hc/41Q==
+X-Received: by 2002:a53:accc:0:10b0:642:11db:f5f9 with SMTP id 956f58d0204a3-6446eb00d22mr4040238d50.55.1765455230058;
+        Thu, 11 Dec 2025 04:13:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHROJjsbzOIVv+kYTD9ro8JG+iZdkU/42JNWuiGSczA/9oE2vX2Q9tF+kKEIbWEYXmMVuuS5GDxWugGb4B3XmQ=
+X-Received: by 2002:a53:accc:0:10b0:642:11db:f5f9 with SMTP id
+ 956f58d0204a3-6446eb00d22mr4040218d50.55.1765455229744; Thu, 11 Dec 2025
+ 04:13:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df96afb2-f99c-48ae-81be-ccadf0fc3496@redhat.com>
+References: <20251211103136.1578463-1-osteffen@redhat.com> <20251211103136.1578463-4-osteffen@redhat.com>
+ <h4256m67shwdq4aouxpqadb2zozhq2f5dfeo74c5jnet5f26kz@a3av5xjfyfow> <wcqcwrshe6nmz3lb5bz2ucdydwgsfxlxbua5jfaly677zsgy4h@dy3nypkedwhi>
+In-Reply-To: <wcqcwrshe6nmz3lb5bz2ucdydwgsfxlxbua5jfaly677zsgy4h@dy3nypkedwhi>
+From: Oliver Steffen <osteffen@redhat.com>
+Date: Thu, 11 Dec 2025 13:13:38 +0100
+X-Gm-Features: AQt7F2qze9RyAeRjOZHPPw_9vU0S84kiY_7xf7UE5IW_lvYtbV8Jd7QVLXvgO0M
+Message-ID: <CA+bRGFo=bxbKPCkG6cWY9RH501F8NF4yxZk_hu6Vqi6NkFLK_Q@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] igvm: Fill MADT IGVM parameter field
+To: Luigi Leonardi <leonardi@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, 
+	Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Joerg Roedel <joerg.roedel@amd.com>, kvm@vger.kernel.org, Zhao Liu <zhao1.liu@intel.com>, 
+	Eduardo Habkost <eduardo@habkost.net>, Marcelo Tosatti <mtosatti@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Ani Sinha <anisinha@redhat.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> No problem, I have done a quick pass with "sed" on the patches and reapplied
-> them.  I do ask you to respin the Diamond Rapids series though, on top of
-> the for-upstream tag of https://gitlab.com/bonzini/qemu (currently going
-> through CI).
-> 
-> Applied for 11.0!
+On Thu, Dec 11, 2025 at 12:30=E2=80=AFPM Luigi Leonardi <leonardi@redhat.co=
+m> wrote:
+>
+> Hi,
+>
+> On Thu, Dec 11, 2025 at 12:15:59PM +0100, Gerd Hoffmann wrote:
+> >  Hi,
+> >
+> >> +static int qigvm_initialization_madt(QIgvm *ctx,
+> >> +                                     const uint8_t *header_data, Erro=
+r **errp)
+> >> +{
+> >> +    const IGVM_VHS_PARAMETER *param =3D (const IGVM_VHS_PARAMETER *)h=
+eader_data;
+> >> +    QIgvmParameterData *param_entry;
+> >> +
+> >> +    if (ctx->madt =3D=3D NULL) {
+> >> +        return 0;
+> >> +    }
+> >> +
+> >> +    /* Find the parameter area that should hold the device tree */
+> >
+> >cut+paste error in the comment.
 
-Thank you!
+Will do.
 
-BTW, could you please have a look at this clean up on outdated SPR
-comments:
+> >
+> >> +    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
+> >> +    {
+> >> +        if (param_entry->index =3D=3D param->parameter_area_index) {
+> >
+> >Hmm, that is a pattern repeated a number of times already in the igvm
+> >code.  Should we factor that out into a helper function?
+>
+> +1
 
-https://lore.kernel.org/qemu-devel/20251118080837.837505-1-zhao1.liu@intel.com/
+Will do.
 
-I feel it's better to clear SPR comments before DMR touches AMX.
+>
+> >
+> >>  static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **e=
+rrp)
+> >>  {
+> >>      int32_t header_count;
+> >> @@ -892,7 +925,7 @@ IgvmHandle qigvm_file_init(char *filename, Error *=
+*errp)
+> >>  }
+> >>
+> >>  int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
+> >> -                       bool onlyVpContext, Error **errp)
+> >> +                       bool onlyVpContext, GArray *madt, Error **errp=
+)
+> >
+> >I'd like to see less parameters for this function, not more.
+> >
+> >I think sensible options here are:
+> >
+> >  (a) store the madt pointer in IgvmCfg, or
+> >  (b) pass MachineState instead of ConfidentialGuestSupport, so
+> >      we can use the MachineState here to generate the madt.
+> >
+> >Luigi, any opinion?  I think device tree support will need access to
+> >MachineState too, and I think both madt and dt should take the same
+> >approach here.
+>
+> I have a slight preference over MachineState as it's more generic and we
+> don't need to add more fields in IgvmCfg for new features.
+>
+Passing in MachineState would be easy, but do we really want to add machine
+related logic (building of ACPI tables, and later maybe device trees)
+into the igvm backend?
 
-Thanks,
-Zhao
+> Luigi
+>
 
 
