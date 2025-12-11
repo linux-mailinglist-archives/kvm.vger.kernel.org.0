@@ -1,257 +1,152 @@
-Return-Path: <kvm+bounces-65740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24E2CB5171
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 09:21:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5F83CB51CE
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 09:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 279D1304A11D
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 08:15:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7A153016999
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 08:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A96298CC4;
-	Thu, 11 Dec 2025 08:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774FD1A23AC;
+	Thu, 11 Dec 2025 08:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFXwj8aU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHiJIiDd";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fc+tieC6"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B9A1684A4
-	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 08:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF8328467C
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 08:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765440951; cv=none; b=XCrXMUgFAsO2caCwQ0Ml21Eao5ll9Tl+TKF1GUOnNYqLXn8zrGhRX05nJDX119ZEbM1xow5BTH+wZFcYJb2ZEUIyN0Spviw9kQ+ODqYBAdWm1lJAMEFhHQIoi8wOH2sqZ/Xyt/iQTgoWQoRPMvXXFPpqzTjFiFY4cfsKKqPeY+A=
+	t=1765441820; cv=none; b=SbwNlBWuRhUPetm72mS8ST5zMX56fC8oL8XC5JL8DYVwozO90b8LgQejxi67FMDJCpN8EfjqTqvXW/MT6MG19JI/SX6S8rRjCXHhJ5QwR6VWBzz2dkoq7t3uyMg3uuYSHiU1GWml3nKYLHhNqJVjXd3yDVB4LKt4U4PixFC/CQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765440951; c=relaxed/simple;
-	bh=GxiGl5EaOvhmq4C6Ug+90JcXzNHBTkkGA/JaLHsKnTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JUgJr5FgTYH5Q+JohcJfiyzCPcKOyy42d25K6cfZNJHqbky9w9friwR0P96nJa3F79QXCMGXuIeAsOn9MhSJS+mIoYvzoka0QIvkl8+jcofxXA6NHBUgK0NtsaUn/KZI2QDt7WEpvTIZaAQW0Scn/bQPDn5fWmHj8GQI9scIGfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CFXwj8aU; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1765441820; c=relaxed/simple;
+	bh=vx2flSiC2ZzOI6DHmbaRJhsf8cDKzOr34NF/08N2QWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uGwAa8f1JUEDJ6RLEEprsWKwrKHMhgDvYcODiKB6R488cAyc580Wu6qE/uNGXaNTgDUEOODZCh0P5pVFXYkRzXIKLIVjOgF02YfQHWLcZQMnyKF7X4usluCNZvafqEF8tKNGFeQk4N3mov3hlAYBm3G+wnunr/pyNqmRUNhs8VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EHiJIiDd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fc+tieC6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765440947;
+	s=mimecast20190719; t=1765441816;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VUw6KhdDlkAILHY2E/DfsZms1XeBroforyfbqStERgI=;
-	b=CFXwj8aUE33/DGfkErHxTfwZ9bVrmscyNr8wS44Irn+E42Hh3c/OjF/sptElWPsQc8sL0g
-	GCK4bEaAuxoRC+p4mccNElsPiWqx2OHB2aKjh/Rlh1yGVIWOzPqIhcGj4XIcWU/QwNfKwF
-	lIZzwyifsl43HLlH8UxCix/tVyLfKT4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-HB2UMXwlPLeRFmHgfOYjcA-1; Thu,
- 11 Dec 2025 03:15:43 -0500
-X-MC-Unique: HB2UMXwlPLeRFmHgfOYjcA-1
-X-Mimecast-MFC-AGG-ID: HB2UMXwlPLeRFmHgfOYjcA_1765440942
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F8B31956054;
-	Thu, 11 Dec 2025 08:15:42 +0000 (UTC)
-Received: from osteffen-laptop.redhat.com (unknown [10.45.225.89])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9310930001A2;
-	Thu, 11 Dec 2025 08:15:36 +0000 (UTC)
-From: Oliver Steffen <osteffen@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Joerg Roedel <joerg.roedel@amd.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	kvm@vger.kernel.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Ani Sinha <anisinha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Luigi Leonardi <leonardi@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Oliver Steffen <osteffen@redhat.com>
-Subject: [PATCH 3/3] igvm: Fill MADT IGVM parameter field
-Date: Thu, 11 Dec 2025 09:15:17 +0100
-Message-ID: <20251211081517.1546957-4-osteffen@redhat.com>
-In-Reply-To: <20251211081517.1546957-1-osteffen@redhat.com>
-References: <20251211081517.1546957-1-osteffen@redhat.com>
+	bh=3idtZY7mSmwvuTMlPGQ2Fz6MYA6aCNvj4wJ0sTbDzCg=;
+	b=EHiJIiDdHyvOSAmmcGX3t5foQ8vZrG5kgY926VSPQ2ABvUO+4k8JTjWdKddnf3+CjeTrlr
+	jLhiMGmPN/49YjiqHaHTHdleFTPUyCa7I/Z7a0Amhk90ZNJm0wZMFJFAPYIYRcbH4tZVdS
+	0p7zlcB7uIJkKpTKgy6T25FKUSxDQ1k=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-50-gNpUxmNDO6q_jlOvLmt_AA-1; Thu, 11 Dec 2025 03:30:14 -0500
+X-MC-Unique: gNpUxmNDO6q_jlOvLmt_AA-1
+X-Mimecast-MFC-AGG-ID: gNpUxmNDO6q_jlOvLmt_AA_1765441814
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-6460725c6a9so920092a12.3
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 00:30:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765441814; x=1766046614; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3idtZY7mSmwvuTMlPGQ2Fz6MYA6aCNvj4wJ0sTbDzCg=;
+        b=fc+tieC6P1z/rzyYPxLlVmEYMkUXnQAMEKDI9pDDyBUSDUiGFcJQplFZupXzqtFUzE
+         +Nn2BxymCc5bkjrzdHcPZURYKv11aexFu4/MIiH3at1MLvL8JeOhlyNim158q9gSNsPl
+         JvzS7yUZwfwJhhf2DMd67xHHQX/zT4dZXCwtgqpLBj2B5NfYLGvQD8nxwdEsP9se8Wm7
+         1BHiZyorGTdLMg1bLRkQ0hcKGDUCupXmkaqPRO3qWbNB2nHh2Qkay9H9cR+fliKY0AGs
+         NAKwXyAN4/dVubSks5KGltoheIDnsZmNLvkzGknua0WFY34Ct/0zs8h3VGxx3QxX2wXt
+         vd/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765441814; x=1766046614;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3idtZY7mSmwvuTMlPGQ2Fz6MYA6aCNvj4wJ0sTbDzCg=;
+        b=gnFlNKtBeVxzDVavR5IiyRrn1Ay/amyOtc/+7VI7RTh2sMYBR+c9X1JPvgvaBfXIhr
+         3lKUBTB2wUvwH6ufIMevD3H5FsH795midM6SeL1Qkgrn9wYXRjyxYm0/lZTThYz+Ym86
+         7DfXUVG1Xeaev/ilkMUcfTjtaGupi93KmBbNKAfi0saAZUe1HpRlxj3K1cj+N8eR2Clf
+         gHk3V0PJrXxQwn72ktJ93qLGhookDozXWpCc0AYDsZ4M3gnYNudVlT7RZBkvmD6N4IX7
+         kuOMqYGi9zzNdeH/2tQlbJ26Ds6VHk/D8ysgTOoz+bZVtQF/UcvHnm3me723WkkorXLy
+         Q4Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCWn5gVCZOqgus2AkUglXfaahcL5bY2YTRlzHXoAv2KUs3M6QEC4kwB8OU12JLdVE4yl+Nk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2WEpx8ujqtwnAYd2v2kGgO309Pg9YYyJBsJVn23aH5hVyd10X
+	tL6Zndh4Zv/kmBjGAHPKdIFjeP7bs3RMpE0Ld+R/B7xfH9gwMqd5YhP3FNlb3JGnokCFesEAuj0
+	GzMn8ANp3LSkn/i99nu9LLrFz0IP+4B7Rcg6lzvkwLQu0QM9dHP4aEQ==
+X-Gm-Gg: AY/fxX7a7IYzsufSmTd/F26eLT50qzzuWY+lpMiKiS+p0ipZGeO+RrAM5duWvF9P4vF
+	PCSIEl41EzHORjM/VtViKkuAdN7d1VTNEd4fcJuY5X+piUA/FCgBKgQojDsI+phYqhQZz5Sh7da
+	rJ50WC90D/SJvHE7A5wB/5zHkjHtPyfJytUgYyZcHmhFEo5+0gPJvE375sYF2e6HjsWcI6UR5mb
+	qBCKbgx8ByA5VHHsLOIi7r3kBxTs8Lg5jf/G/Cuswo9Ryyc8kHauEhd2dezf1owykApSKWz02pk
+	VaW1S5RCah88uufjlWXD3wdFiABqnIPv6lvbaVGSdH8M5buPB2m/QOiayFjVZoTik8PilRJh1Du
+	57xxfKkQsfPKY9akR0EbPc7tu9rZxlBL5qyY99a9qDXm0eil6nlfuZROdMAPpZw==
+X-Received: by 2002:a05:6402:2786:b0:645:1078:22aa with SMTP id 4fb4d7f45d1cf-6496cbbc23cmr4596718a12.19.1765441813634;
+        Thu, 11 Dec 2025 00:30:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGuwQjT4UHTBmwDXqoTBxPbsneTQexl6Aw6I9Srmcye45B0nUYzXfaqL0GoFMZfWMLEuTvP7A==
+X-Received: by 2002:a05:6402:2786:b0:645:1078:22aa with SMTP id 4fb4d7f45d1cf-6496cbbc23cmr4596676a12.19.1765441813080;
+        Thu, 11 Dec 2025 00:30:13 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6498204fbb3sm1831786a12.8.2025.12.11.00.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Dec 2025 00:30:12 -0800 (PST)
+Date: Thu, 11 Dec 2025 09:30:06 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] vsock/virtio: Fix error code in
+ virtio_transport_recv_listen()
+Message-ID: <xz4ukol5bvxmk2ctrjtvpyncipntjlf4bdr7kjdam2ig5gf7ho@vuuwwu7asj7i>
+References: <aTp2q-K4xNwiDQSW@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aTp2q-K4xNwiDQSW@stanley.mountain>
 
-Use the new acpi_build_madt_standalone() function to fill the MADT
-parameter field.
+On Thu, Dec 11, 2025 at 10:45:47AM +0300, Dan Carpenter wrote:
+>Return a negative error code if the transport doesn't match.  Don't
+>return success.
+>
+>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+>---
+>From static analysis.  Not tested.
+>
+> net/vmw_vsock/virtio_transport_common.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index dcc8a1d5851e..77fbc6c541bf 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1550,7 +1550,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+> 		release_sock(child);
+> 		virtio_transport_reset_no_sock(t, skb);
+> 		sock_put(child);
+>-		return ret;
+>+		return ret ?: -EINVAL;
 
-Signed-off-by: Oliver Steffen <osteffen@redhat.com>
----
- backends/igvm-cfg.c       |  8 +++++++-
- backends/igvm.c           | 37 ++++++++++++++++++++++++++++++++++++-
- include/system/igvm-cfg.h |  4 ++--
- include/system/igvm.h     |  2 +-
- target/i386/sev.c         |  2 +-
- 5 files changed, 47 insertions(+), 6 deletions(-)
+Thanks for this fix. I think we have a similar issue also in 
+net/vmw_vsock/vmci_transport.c introduced by the same commit.
+In net/vmw_vsock/hyperv_transport.c we have a similar pattern, but the 
+calling function return void, so no issue there.
 
-diff --git a/backends/igvm-cfg.c b/backends/igvm-cfg.c
-index c1b45401f4..0a77f7b7a1 100644
---- a/backends/igvm-cfg.c
-+++ b/backends/igvm-cfg.c
-@@ -17,6 +17,7 @@
- #include "qom/object_interfaces.h"
- #include "hw/qdev-core.h"
- #include "hw/boards.h"
-+#include "hw/i386/acpi-build.h"
- 
- #include "trace.h"
- 
-@@ -48,10 +49,15 @@ static void igvm_reset_hold(Object *obj, ResetType type)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-     IgvmCfg *igvm = IGVM_CFG(obj);
-+    GArray *madt = NULL;
- 
-     trace_igvm_reset_hold(type);
- 
--    qigvm_process_file(igvm, ms->cgs, false, &error_fatal);
-+    madt = acpi_build_madt_standalone(ms);
-+
-+    qigvm_process_file(igvm, ms->cgs, false, madt, &error_fatal);
-+
-+    g_array_free(madt, true);
- }
- 
- static void igvm_reset_exit(Object *obj, ResetType type)
-diff --git a/backends/igvm.c b/backends/igvm.c
-index a350c890cc..7e56b19b0a 100644
---- a/backends/igvm.c
-+++ b/backends/igvm.c
-@@ -93,6 +93,7 @@ typedef struct QIgvm {
-     unsigned region_start_index;
-     unsigned region_last_index;
-     unsigned region_page_count;
-+    GArray *madt;
- } QIgvm;
- 
- static int qigvm_directive_page_data(QIgvm *ctx, const uint8_t *header_data,
-@@ -120,6 +121,8 @@ static int qigvm_directive_snp_id_block(QIgvm *ctx, const uint8_t *header_data,
- static int qigvm_initialization_guest_policy(QIgvm *ctx,
-                                        const uint8_t *header_data,
-                                        Error **errp);
-+static int qigvm_initialization_madt(QIgvm *ctx,
-+                                     const uint8_t *header_data, Error **errp);
- 
- struct QIGVMHandler {
-     uint32_t type;
-@@ -148,6 +151,8 @@ static struct QIGVMHandler handlers[] = {
-       qigvm_directive_snp_id_block },
-     { IGVM_VHT_GUEST_POLICY, IGVM_HEADER_SECTION_INITIALIZATION,
-       qigvm_initialization_guest_policy },
-+    { IGVM_VHT_MADT, IGVM_HEADER_SECTION_DIRECTIVE,
-+      qigvm_initialization_madt },
- };
- 
- static int qigvm_handler(QIgvm *ctx, uint32_t type, Error **errp)
-@@ -764,6 +769,34 @@ static int qigvm_initialization_guest_policy(QIgvm *ctx,
-     return 0;
- }
- 
-+static int qigvm_initialization_madt(QIgvm *ctx,
-+                                     const uint8_t *header_data, Error **errp)
-+{
-+    const IGVM_VHS_PARAMETER *param = (const IGVM_VHS_PARAMETER *)header_data;
-+    QIgvmParameterData *param_entry;
-+
-+    if (ctx->madt == NULL) {
-+        return 0;
-+    }
-+
-+    /* Find the parameter area that should hold the device tree */
-+    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
-+    {
-+        if (param_entry->index == param->parameter_area_index) {
-+
-+            if (ctx->madt->len > param_entry->size) {
-+                error_setg(
-+                    errp,
-+                    "IGVM: MADT size exceeds parameter area defined in IGVM file");
-+                return -1;
-+            }
-+            memcpy(param_entry->data, ctx->madt->data, ctx->madt->len);
-+            break;
-+        }
-+    }
-+    return 0;
-+}
-+
- static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **errp)
- {
-     int32_t header_count;
-@@ -892,7 +925,7 @@ IgvmHandle qigvm_file_init(char *filename, Error **errp)
- }
- 
- int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
--                       bool onlyVpContext, Error **errp)
-+                       bool onlyVpContext, GArray *madt, Error **errp)
- {
-     int32_t header_count;
-     QIgvmParameterData *parameter;
-@@ -915,6 +948,8 @@ int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
-     ctx.cgs = cgs;
-     ctx.cgsc = cgs ? CONFIDENTIAL_GUEST_SUPPORT_GET_CLASS(cgs) : NULL;
- 
-+    ctx.madt = madt;
-+
-     /*
-      * Check that the IGVM file provides configuration for the current
-      * platform
-diff --git a/include/system/igvm-cfg.h b/include/system/igvm-cfg.h
-index 7dc48677fd..1a04302beb 100644
---- a/include/system/igvm-cfg.h
-+++ b/include/system/igvm-cfg.h
-@@ -42,8 +42,8 @@ typedef struct IgvmCfgClass {
-      *
-      * Returns 0 for ok and -1 on error.
-      */
--    int (*process)(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
--                   bool onlyVpContext, Error **errp);
-+    int (*process)(IgvmCfg *cfg, ConfidentialGuestSupport *cgs, 
-+                   bool onlyVpContext, GArray *madt, Error **errp);
- 
- } IgvmCfgClass;
- 
-diff --git a/include/system/igvm.h b/include/system/igvm.h
-index ec2538daa0..f2e580e4ee 100644
---- a/include/system/igvm.h
-+++ b/include/system/igvm.h
-@@ -18,7 +18,7 @@
- 
- IgvmHandle qigvm_file_init(char *filename, Error **errp);
- int qigvm_process_file(IgvmCfg *igvm, ConfidentialGuestSupport *cgs,
--                      bool onlyVpContext, Error **errp);
-+                      bool onlyVpContext, GArray *madt, Error **errp);
- 
- /* x86 native */
- int qigvm_x86_get_mem_map_entry(int index,
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index fd2dada013..ffeb9f52a2 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -1892,7 +1892,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-          */
-         if (x86machine->igvm) {
-             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
--                    ->process(x86machine->igvm, machine->cgs, true, errp) ==
-+                    ->process(x86machine->igvm, machine->cgs, true, NULL, errp) ==
-                 -1) {
-                 return -1;
-             }
--- 
-2.52.0
+Do you mind to fix also that one?
+
+Sending a v2 to fix both or another patch just for that it's fine by me,
+so:
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 
