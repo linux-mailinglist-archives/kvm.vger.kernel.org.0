@@ -1,121 +1,259 @@
-Return-Path: <kvm+bounces-65794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C35CCB6EB4
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 19:38:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4823CB6F72
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 20:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 95964302D2B1
-	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 18:37:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B4603032FDD
+	for <lists+kvm@lfdr.de>; Thu, 11 Dec 2025 18:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C67B2798E6;
-	Thu, 11 Dec 2025 18:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474A8319619;
+	Thu, 11 Dec 2025 18:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="FfCYuedE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L0vK13EG"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.199.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4A13161A6;
-	Thu, 11 Dec 2025 18:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.199.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD58E283FC5
+	for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 18:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765478224; cv=none; b=XvLG1Oa5FL5Sj7ur4Z+kJ2/m77j/8PZUbZXW77VPo1mlRjeLr1giIfdHJ7deoxCQ5+p6BkHOLDG8LLrQzjwdkk/nQ+XQp6vqbqu+1WumvJUmKhW3u3TRgSVV7+IfQp6PRfLUgxqbdFs42A5ZObl8FTCkptuW3Doe+1wnC5aueRE=
+	t=1765479591; cv=none; b=DWvnwZpaZQi9oAtJO5jbrgvM/M8h+IOILepBXxWGpd9pWy7+EIlzDqh9ZEPNSacINjgYtTYjpaHJbR1KPmHCv1T9XgYz/AtC0giZQxG6ih0mDCE7tV6sK8KOpEJ7C+PJbolb/EHi2EhBfnGwlOITDRbQq8ZHzhLQr+9dfr9KRXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765478224; c=relaxed/simple;
-	bh=BLZDrpTLctOjJeBQ7kE6MzOtoDaCfVtSLHJPEeFgVwM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OTpVvp+Q+JerW9gvXxQLYq6BlE6rYQhek5R2gUDxGffMUkaHjl4iCVB7iHIlsbdWx+1z+gFBMc1BBEqA0a4oH8qGnTOGVw8oH4Ikvs3gng2JQRWM7aF2NB5n+wAaoVJQATPT7+Dre0StBc0CCBlGTO5iqj53HStKYElCgKfWY/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=FfCYuedE; arc=none smtp.client-ip=18.199.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1765479591; c=relaxed/simple;
+	bh=BovM0o+QyCWcHoAbIi88TceAQzr30hZ05Wc+ZD2Zv7Y=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sg3VfrdpE8jfZ7ixgnP6zJFeBRm5Ox3nOqhwaFsJPH2mahUxqX6Xjin3PK/kYE+jWqVZINcr9PeRRuUJEwAL/p4RO3HxlZaACD6Hb3v6dMC51YlGxhbPr+ZGVLoyfvloSKsTBqRopZvsVfPl69OO+7hZ4MIFS3jwWP6QnG0BFeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L0vK13EG; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-297ddb3c707so3756215ad.2
+        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 10:59:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1765478220; x=1797014220;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BLZDrpTLctOjJeBQ7kE6MzOtoDaCfVtSLHJPEeFgVwM=;
-  b=FfCYuedERb3ocuEALDgRbCIYCN+VX+2oy+PvrjdgQQVzz93pTqkV5UBA
-   cqJuS9Js/I72aqL0VdyzfLo+y1o5xAyqcbAqrI+Bwr9qSRecsP0rCAcPY
-   CVY/Pni4vbvU8jO3JM0fCiwTgwiDyP6XzsuyeYRMCQ7FsDS/ohcoqjJJt
-   no5Ai9Dpu6l654hbw/+FOAGULviheXNG33iOdrl5UVqSOpchTONUV3ESA
-   VtC21yuY+N/G/nKR3NSsVFEnG37pEnh/9spPQMmV3XEdChVvRkmHp0ud8
-   aoeEIpzBbtS1eeR5A5GVnumpHwdmvg1qZX4xKqYZxSwBTGY6IAaQOdTFi
-   g==;
-X-CSE-ConnectionGUID: SHdbm8raRsiy5x2EVMJI/g==
-X-CSE-MsgGUID: 2+mG77+STLatB1e2eVkzXg==
-X-IronPort-AV: E=Sophos;i="6.21,141,1763424000"; 
-   d="scan'208";a="6480546"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 18:36:40 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:31663]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.7.166:2525] with esmtp (Farcaster)
- id 74c1f423-9f86-49eb-b782-e2459c470737; Thu, 11 Dec 2025 18:36:40 +0000 (UTC)
-X-Farcaster-Flow-ID: 74c1f423-9f86-49eb-b782-e2459c470737
-Received: from EX19D003EUB001.ant.amazon.com (10.252.51.97) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 11 Dec 2025 18:36:32 +0000
-Received: from u5934974a1cdd59.ant.amazon.com (10.146.13.111) by
- EX19D003EUB001.ant.amazon.com (10.252.51.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 11 Dec 2025 18:36:23 +0000
-From: Fernand Sieber <sieberf@amazon.com>
-To: <peterz@infradead.org>
-CC: <abusse@amazon.de>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<dwmw@amazon.co.uk>, <hborghor@amazon.de>, <hpa@zytor.com>,
-	<jschoenh@amazon.de>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<mingo@redhat.com>, <nh-open-source@amazon.com>, <nsaenz@amazon.com>,
-	<pbonzini@redhat.com>, <seanjc@google.com>, <sieberf@amazon.com>,
-	<stable@vger.kernel.org>, <tglx@linutronix.de>, <x86@kernel.org>
-Subject: [PATCH v2] perf/x86/intel: Do not enable BTS for guests
-Date: Thu, 11 Dec 2025 20:36:04 +0200
-Message-ID: <20251211183604.868641-1-sieberf@amazon.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251210111655.GB3911114@noisy.programming.kicks-ass.net>
-References: <20251210111655.GB3911114@noisy.programming.kicks-ass.net>
+        d=google.com; s=20230601; t=1765479589; x=1766084389; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VdN8NAO7eD861tYknpGT7rKlcQ4OtscBRzixxIDE0Y8=;
+        b=L0vK13EGZLQs1Bc+lOBZTcItM3wEkNpbZSNJJXi9RbqNMOeN091KKSbpZPoBg/BVsT
+         uGKz4RGLgZfaU/XQkHjR0yXDuL6w0VJ0zxS/meIrhia5O0DnS1OfMEUbZWNpJ70Kkep9
+         eH715JWQFxnoEF7AOg5dQXYRtUvDcUaPVtaKs91FgbpWXLhsbjJgmuWMNz8XkwU+0t0A
+         H3gSI1H9ieKx9fxFT6dFdv2H5MXv1pbt8/OQ6Zf+V0gP8OD+6CMNBha6LEDPtxZqbfgX
+         +Cx5FN4+GBqa4VWNLuEA7igbqPa1Zd5VSIeTO1cE1foof7X86Q8SqxByMqT7m9RYTwjp
+         7GCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765479589; x=1766084389;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VdN8NAO7eD861tYknpGT7rKlcQ4OtscBRzixxIDE0Y8=;
+        b=lyp+uD2XO/GcnLcEqtcImOS+7Ac1C7ftZ/6SAUBFSlVX527mGNwfeiypZ7WSXx/N8S
+         ORPD28UmkAISyxGSajoi1PbR5jpuYddvX4INNBMxLVJ/i7HthLpnutgOoUFEEkaYv7ZA
+         89rd8LK7FwXUgb2fiylhhlkTLWsDkvmUATCCT28RsExS5KZYP0Xmk2fV0qMRpeEZ9iUF
+         Z3AmuaiT1A4SSpQQNVY0iInvDOIU8q9vB0X7Js2ZrXJNT7puKPK0/6To5Jbt6UisYXnS
+         K8YtavAsv0pst/S44pyUSw9tAYdwerJSESx7qhBr4e+dt/triQJq0YJBGzuQwizVh0T6
+         cU6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUgfBKbkkrS1uN3X/qlVPD5kEaJRW46k/nvDX+Zx01QupUJ7b3SPejPk3WE5SU7cLD5Ihg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjAPJU/YP+z+JV0df+94CEvWe4Xvc+mVEPCM9UWUgnh9fpxzQh
+	wkXIkgiex4ebl3Ah7dtMKYl+P1SD8Taz7EYi6oop8OaZYa3TpNrIho8jt85UthqVzqZvByfcbLo
+	rT+QjTg==
+X-Google-Smtp-Source: AGHT+IH2U5ytdiPfKvE1BzIEqn2u6/ksPDJS6vknajJueRcfSEUy1H/tlRKs+DLwt79jmJbnxifs7s3T2dE=
+X-Received: from plry15.prod.google.com ([2002:a17:902:b48f:b0:297:e887:3f69])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:fa7:b0:298:58ae:f91a
+ with SMTP id d9443c01a7336-29ec280db55mr74958565ad.57.1765479589077; Thu, 11
+ Dec 2025 10:59:49 -0800 (PST)
+Date: Thu, 11 Dec 2025 10:59:47 -0800
+In-Reply-To: <20251211110024.1409489-1-khushit.shah@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
- EX19D003EUB001.ant.amazon.com (10.252.51.97)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Mime-Version: 1.0
+References: <20251211110024.1409489-1-khushit.shah@nutanix.com>
+Message-ID: <aTsUo9Fc6uu2A7rs@google.com>
+Subject: Re: [PATCH v4] KVM: x86: Add x2APIC "features" to control EOI
+ broadcast suppression
+From: Sean Christopherson <seanjc@google.com>
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: pbonzini@redhat.com, kai.huang@intel.com, mingo@redhat.com, x86@kernel.org, 
+	bp@alien8.de, hpa@zytor.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, dave.hansen@linux.intel.com, tglx@linutronix.de, 
+	jon@nutanix.com, shaju.abraham@nutanix.com, dwmw2@infradead.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-QnkgZGVmYXVsdCB3aGVuIHVzZXJzIHByb2dyYW0gcGVyZiB0byBzYW1wbGUgYnJhbmNoIGluc3Ry
-dWN0aW9ucwooUEVSRl9DT1VOVF9IV19CUkFOQ0hfSU5TVFJVQ1RJT05TKSB3aXRoIGEgc2FtcGxl
-IHBlcmlvZCBvZiAxLCBwZXJmCmludGVycHJldHMgdGhpcyBhcyBhIHNwZWNpYWwgY2FzZSBhbmQg
-ZW5hYmxlcyBCVFMgKEJyYW5jaCBUcmFjZSBTdG9yZSkKYXMgYW4gb3B0aW1pemF0aW9uIHRvIGF2
-b2lkIHRha2luZyBhbiBpbnRlcnJ1cHQgb24gZXZlcnkgYnJhbmNoLgoKU2luY2UgQlRTIGRvZXNu
-J3QgdmlydHVhbGl6ZSwgdGhpcyBvcHRpbWl6YXRpb24gZG9lc24ndCBtYWtlIHNlbnNlIHdoZW4K
-dGhlIHJlcXVlc3Qgb3JpZ2luYXRlcyBmcm9tIGEgZ3Vlc3QuIEFkZCBhbiBhZGRpdGlvbmFsIGNo
-ZWNrIHRoYXQKcHJldmVudHMgdGhpcyBvcHRpbWl6YXRpb24gZm9yIHZpcnR1YWxpemVkIGV2ZW50
-cyAoZXhjbHVkZV9ob3N0KS4KClJlcG9ydGVkLWJ5OiBKYW4gSC4gU2Now7ZuaGVyciA8anNjaG9l
-bmhAYW1hem9uLmRlPgpTdWdnZXN0ZWQtYnk6IFBldGVyIFppamxzdHJhIDxwZXRlcnpAaW5mcmFk
-ZWFkLm9yZz4KU2lnbmVkLW9mZi1ieTogRmVybmFuZCBTaWViZXIgPHNpZWJlcmZAYW1hem9uLmNv
-bT4KLS0tCiBhcmNoL3g4Ni9ldmVudHMvcGVyZl9ldmVudC5oIHwgMTMgKysrKysrKysrKystLQog
-MSBmaWxlIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0t
-Z2l0IGEvYXJjaC94ODYvZXZlbnRzL3BlcmZfZXZlbnQuaCBiL2FyY2gveDg2L2V2ZW50cy9wZXJm
-X2V2ZW50LmgKaW5kZXggMzE2MWVjMGEzNDE2Li5mMmUyZDliMDMzNjcgMTAwNjQ0Ci0tLSBhL2Fy
-Y2gveDg2L2V2ZW50cy9wZXJmX2V2ZW50LmgKKysrIGIvYXJjaC94ODYvZXZlbnRzL3BlcmZfZXZl
-bnQuaApAQCAtMTU3NCwxMyArMTU3NCwyMiBAQCBzdGF0aWMgaW5saW5lIGJvb2wgaW50ZWxfcG11
-X2hhc19idHNfcGVyaW9kKHN0cnVjdCBwZXJmX2V2ZW50ICpldmVudCwgdTY0IHBlcmlvZAogCXN0
-cnVjdCBod19wZXJmX2V2ZW50ICpod2MgPSAmZXZlbnQtPmh3OwogCXVuc2lnbmVkIGludCBod19l
-dmVudCwgYnRzX2V2ZW50OwogCi0JaWYgKGV2ZW50LT5hdHRyLmZyZXEpCisJLyoKKwkgKiBPbmx5
-IHVzZSBCVFMgZm9yIGZpeGVkIHJhdGUgcGVyaW9kPT0xIGV2ZW50cy4KKwkgKi8KKwlpZiAoZXZl
-bnQtPmF0dHIuZnJlcSB8fCBwZXJpb2QgIT0gMSkKKwkJcmV0dXJuIGZhbHNlOworCisJLyoKKwkg
-KiBCVFMgZG9lc24ndCB2aXJ0dWFsaXplLgorCSAqLworCWlmIChldmVudC0+YXR0ci5leGNsdWRl
-X2hvc3QpCiAJCXJldHVybiBmYWxzZTsKIAogCWh3X2V2ZW50ID0gaHdjLT5jb25maWcgJiBJTlRF
-TF9BUkNIX0VWRU5UX01BU0s7CiAJYnRzX2V2ZW50ID0geDg2X3BtdS5ldmVudF9tYXAoUEVSRl9D
-T1VOVF9IV19CUkFOQ0hfSU5TVFJVQ1RJT05TKTsKIAotCXJldHVybiBod19ldmVudCA9PSBidHNf
-ZXZlbnQgJiYgcGVyaW9kID09IDE7CisJcmV0dXJuIGh3X2V2ZW50ID09IGJ0c19ldmVudDsKIH0K
-IAogc3RhdGljIGlubGluZSBib29sIGludGVsX3BtdV9oYXNfYnRzKHN0cnVjdCBwZXJmX2V2ZW50
-ICpldmVudCkKLS0gCjIuNDMuMAoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRyZSAoU291dGgg
-QWZyaWNhKSAoUHJvcHJpZXRhcnkpIExpbWl0ZWQKMjkgR29nb3NvYSBTdHJlZXQsIE9ic2VydmF0
-b3J5LCBDYXBlIFRvd24sIFdlc3Rlcm4gQ2FwZSwgNzkyNSwgU291dGggQWZyaWNhClJlZ2lzdHJh
-dGlvbiBOdW1iZXI6IDIwMDQgLyAwMzQ0NjMgLyAwNwo=
+A bunch of nits, but I'll fix them up when applying, assuming on one else has
+feedback.
+
+On Thu, Dec 11, 2025, Khushit Shah wrote:
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 48598d017d6f..4a6d94dc7a2a 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1229,6 +1229,12 @@ enum kvm_irqchip_mode {
+>  	KVM_IRQCHIP_SPLIT,        /* created with KVM_CAP_SPLIT_IRQCHIP */
+>  };
+>  
+> +enum kvm_suppress_eoi_broadcast_mode {
+> +	KVM_SUPPRESS_EOI_BROADCAST_QUIRKED, /* Legacy behavior */
+> +	KVM_SUPPRESS_EOI_BROADCAST_ENABLED, /* Enable Suppress EOI broadcast */
+> +	KVM_SUPPRESS_EOI_BROADCAST_DISABLED /* Disable Suppress EOI broadcast */
+> +};
+> +
+>  struct kvm_x86_msr_filter {
+>  	u8 count;
+>  	bool default_allow:1;
+> @@ -1480,6 +1486,7 @@ struct kvm_arch {
+>  
+>  	bool x2apic_format;
+>  	bool x2apic_broadcast_quirk_disabled;
+> +	enum kvm_suppress_eoi_broadcast_mode suppress_eoi_broadcast_mode;
+
+For brevity, I vote for eoi_broadcast_mode here, i.e.:
+
+	enum kvm_suppress_eoi_broadcast_mode eoi_broadcast_mode;
+
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 0ae7f913d782..1ef0bd3eff1e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -105,6 +105,34 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
+>  		apic_test_vector(vector, apic->regs + APIC_IRR);
+>  }
+>  
+> +static inline bool kvm_lapic_advertise_suppress_eoi_broadcast(struct kvm *kvm)
+
+Formletter...
+
+Do not use "inline" for functions that are visible only to the local compilation
+unit.  "inline" is just a hint, and modern compilers are smart enough to inline
+functions when appropriate without a hint.
+
+A longer explanation/rant here: https://lore.kernel.org/all/ZAdfX+S323JVWNZC@google.com
+
+> +{
+> +	/*
+> +	 * Advertise Suppress EOI broadcast support to the guest unless the VMM
+> +	 * explicitly disabled it.
+> +	 *
+> +	 * Historically, KVM advertised this capability even though it did not
+> +	 * actually suppress EOIs.
+> +	 */
+> +	return kvm->arch.suppress_eoi_broadcast_mode !=
+> +			KVM_SUPPRESS_EOI_BROADCAST_DISABLED;
+
+With a shorter field name, this can more comfortably be:
+
+	return kvm->arch.eoi_broadcast_mode != KVM_SUPPRESS_EOI_BROADCAST_DISABLED;
+
+> +}
+> +
+> +static inline bool kvm_lapic_ignore_suppress_eoi_broadcast(struct kvm *kvm)
+> +{
+> +	/*
+> +	 * Returns true if KVM should ignore the suppress EOI broadcast bit set by
+> +	 * the guest and broadcast EOIs anyway.
+> +	 *
+> +	 * Only returns false when the VMM explicitly enabled Suppress EOI
+> +	 * broadcast. If disabled by VMM, the bit should be ignored as it is not
+> +	 * supported. Legacy behavior was to ignore the bit and broadcast EOIs
+> +	 * anyway.
+> +	 */
+> +	return kvm->arch.suppress_eoi_broadcast_mode !=
+> +			KVM_SUPPRESS_EOI_BROADCAST_ENABLED;
+
+And then...
+
+	return kvm->arch.eoi_broadcast_mode != KVM_SUPPRESS_EOI_BROADCAST_ENABLED;
+
+> +}
+> +
+>  __read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
+>  EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_has_noapic_vcpu);
+>  
+> @@ -562,6 +590,7 @@ void kvm_apic_set_version(struct kvm_vcpu *vcpu)
+>  	 * IOAPIC.
+>  	 */
+>  	if (guest_cpu_cap_has(vcpu, X86_FEATURE_X2APIC) &&
+> +		kvm_lapic_advertise_suppress_eoi_broadcast(vcpu->kvm) &&
+
+Align indentation.
+
+>  	    !ioapic_in_kernel(vcpu->kvm))
+>  		v |= APIC_LVR_DIRECTED_EOI;
+>  	kvm_lapic_set_reg(apic, APIC_LVR, v);
+> @@ -1517,6 +1546,17 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
+>  
+>  	/* Request a KVM exit to inform the userspace IOAPIC. */
+>  	if (irqchip_split(apic->vcpu->kvm)) {
+> +		/*
+> +		 * Don't exit to userspace if the guest has enabled Directed
+> +		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
+> +		 * APIC doesn't broadcast EOIs (the guest must EOI the target
+> +		 * I/O APIC(s) directly).  Ignore the suppression if userspace
+> +		 * has NOT explicitly enabled Suppress EOI broadcast.
+> +		 */
+> +		if ((kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI) &&
+> +		     !kvm_lapic_ignore_suppress_eoi_broadcast(apic->vcpu->kvm))
+> +			return;
+> +
+>  		apic->vcpu->arch.pending_ioapic_eoi = vector;
+>  		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
+>  		return;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c9c2aa6f4705..81b40fdb5f5f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -121,8 +121,11 @@ static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+>  
+>  #define KVM_CAP_PMU_VALID_MASK KVM_PMU_CAP_DISABLE
+>  
+> -#define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+> -                                    KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+> +#define KVM_X2APIC_API_VALID_FLAGS	\
+> +	(KVM_X2APIC_API_USE_32BIT_IDS |	\
+> +	KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK |	\
+> +	KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST |	\
+> +	KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
+
+Unless someone feels strongly, I think I'd prefer to keep the existing style, e.g.
+
+#define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS |		\
+				    KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK |	\
+				    KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST |	\
+				    KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)
+
+>  
+>  static void update_cr8_intercept(struct kvm_vcpu *vcpu);
+>  static void process_nmi(struct kvm_vcpu *vcpu);
+> @@ -6777,12 +6780,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = -EINVAL;
+>  		if (cap->args[0] & ~KVM_X2APIC_API_VALID_FLAGS)
+>  			break;
+> +		if ((cap->args[0] & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST) &&
+> +		    (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST))
+> +			break;
+> +		if (!irqchip_split(kvm) &&
+> +		    ((cap->args[0] & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST) ||
+> +		     (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)))
+> +			break;
+
+Again, unless someone feels strongly, I'd prefer to have some newlines here, i.e.
+
+		r = -EINVAL;
+		if (cap->args[0] & ~KVM_X2APIC_API_VALID_FLAGS)
+			break;
+
+		if ((cap->args[0] & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST) &&
+		    (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST))
+			break;
+
+		if (!irqchip_split(kvm) &&
+		    ((cap->args[0] & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST) ||
+		     (cap->args[0] & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST)))
+			break;
+
+		if (cap->args[0] & KVM_X2APIC_API_USE_32BIT_IDS)
 
 
