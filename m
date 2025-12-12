@@ -1,395 +1,140 @@
-Return-Path: <kvm+bounces-65825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E819ECB8CD5
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 13:29:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89BA5CB8EFE
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 15:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C988A30B917E
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 12:27:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2AD263077306
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 14:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1B231814F;
-	Fri, 12 Dec 2025 12:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23EA52773C3;
+	Fri, 12 Dec 2025 14:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTBz9cs1";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lEGzlNF5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LDlf3TRG"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E0C30FF1D
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 12:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237734A3E;
+	Fri, 12 Dec 2025 14:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765542427; cv=none; b=Xb44/4wmZa9PpDnF/7KX28BSydAJ7n4bQ2rfXxapdAKfT/RPafTjefjoY+JDftso71sFxh5alMViWGrrVAtfn75s8dDWMHlYWEuKy2sBWtxJ+uE/+SqGFFSwhEVVItFW1UhtFWvwGSSFY6Ss4FgT6cRXqq4TVWhjt054/JXLIJA=
+	t=1765548093; cv=none; b=E+9IpA9y+0fQ/yREUdU4Wy7xuXKEsHMxFpJ7w9/wEn37v1K2flCE4WOA4500BsUOGxYXQBmiPDcH52L1FhBzkK0cx14S5S2IiGMziWXAMpG/szfbe5eWgYdhweMgY4uOHvge0WHxOfNZLXsAGD4DAqRQ/hQtp1HhjhLpmXDHqtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765542427; c=relaxed/simple;
-	bh=arpZlHgTP/Q2XHdUgjjUMg9eCk7R5xCuBgD64udECtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IjCDLBmTYRMLd8VLIL2tIFeiOEYMhWhHXjZtnCLWo1kWvPqqZBmMJov+E/yEHt8QctSw52G3hh6xzbyqMHZ9pthZnNwqFRCrrqm/AANsixn7qSFA/dZEBjfR44jyNcYYm2TceUChpBAW7te6uLjbVbuQyyp1NHzH6SPXP4n/9Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTBz9cs1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lEGzlNF5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765542424;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
-	b=HTBz9cs1qTuhx+d4AiohJI3TB/i8ihZYVd9Lpz3iGmDXzoJy5e4eJH+F6d8q6x7NR+8VD8
-	4nGbSpN8S0Y0NbFK5WiK/TeFC6EdC0K56m1YbymRFLiahgarOVZEXTYJye7p0sZVIwgDZt
-	+yZRFj47tQcVwBFFctEhcpbGzZ2Uql0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-319-fy2Ri8qCM2yPxqolb215Ow-1; Fri, 12 Dec 2025 07:27:02 -0500
-X-MC-Unique: fy2Ri8qCM2yPxqolb215Ow-1
-X-Mimecast-MFC-AGG-ID: fy2Ri8qCM2yPxqolb215Ow_1765542421
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b79f6dcde96so338462766b.2
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 04:27:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765542421; x=1766147221; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
-        b=lEGzlNF5cayoMdKbULUEBdVlSfh9P/IGjoOhuJq/slfWpsCyZBbLfsvFFssmGFpzas
-         YUGAtM6xikqYbPaGImxgUcfJqp2GYIxKo9h0GN+/+c8U9dpQSYXV4oRKUFnZ6mTAs/GQ
-         sqMYM5aViyzqJfxWQG5ywetrpedgxoVkoUYhx820uvfDyZ2cCmRdTk/ZoO4+gDFPB1hS
-         m3NzjLpU3Qd3cDFgirXTJYIMZ9M4IZPlsEBDIrLOlvfNDsrNWj7cNWrL/KcqHAXmo8LV
-         SEfHWscvSj965wIEavYSQFFPRZF6SOeYgm3GtAV1B+RTMm9tQT6jGQSzIKUVtYxOlOS0
-         5sTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765542421; x=1766147221;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
-        b=tA3q1KXEvks2bRWs9R5v15lpDhP7tKU1stczVRsT4ELdiQobAb+6UrFcTKgW8hSFuk
-         OhOimTxTP1uZEs/rCRZpRzx+c6H1Gle7UbVgoMiSB1w0TwjPxXNe/WjjxL6N3H+X2bKX
-         WnhZwehI46/oi2Y7zj5xlypb9M7sl3QINv1jE+VnaD2e2N0GP0tXy1Fcn/JQGipn7ANu
-         B2HRaA+r9rXb+/2J/uPIPZVdrAfmu0Wg2b14AoSHoHDz9qCU3a2IQDaYdI5ivoAcvEBY
-         mEV+AkRsNGTc6Q5ZfUdg74mZ17sJjNtXrVBegusPng7T0jXp3nTtBEXhge6/f9YhrBiH
-         2mUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMfxiqvYo2GK7GGaBXtTH1l4NlozUMPfCQyCGeCV1QbSmNqhsFp0XMqZCMPbEAhPANimc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMd/0c5lvgJQWZeSA1UFAcIVoNWbKk6yiVFYQyJC5v2B11RV3y
-	OCt2Wn/axXeshrmHJqwOlsk+2sY9um5rKtBs7bGBK8GwjCcfqCbkNhyGyWKfBJWcIuoNDL0imMw
-	eNs1EfjMtim1GcqvxIdMOUnrA0D76gEU3oUBz4MtZ1mppZh199ZirXQ==
-X-Gm-Gg: AY/fxX5jDmIbwTO1bItFpkv5vICxAr28MInNysUnQxg4J8vXko4d5Z9mXFG+Jt0tDwO
-	6/kW0dcymLBX7dD1ZAXP3VZPnwAhU9L6hPQdMs4UmLgJ1tUPnxoBaWZd0unlaQUvfUWrkIeRtbZ
-	CcSMF/IU1lqeOqPiyp4SttNFOyiTSNU3QV09oppzcvZBioKzRpcdYxGpcMGe8ZcFWcJVwhC4CbX
-	gKr8Q+y9Sh3qXogt7UiE3cdQTgSw0YDtr71titHSigwBykn4BM2Agqa8tNI29R6RO2fapws0y3Y
-	u7TzacXZw8ZQsfstQaROWlHw3NZ63YDCsyBxGxLxww7pL+dfxIyUegMcUqHX2Ljn/VEhn4eMpJA
-	r4Ur/s2RfXpDyXoYcx03tEEcv2S61vzzcN5vKHpenlsv2tK6bCz7nWZczpxNccQ==
-X-Received: by 2002:a17:907:7f23:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b7d23d0519emr166950666b.57.1765542421339;
-        Fri, 12 Dec 2025 04:27:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHJ8k95XyEgRKLOlMYKPgD8ZmrsPj3lizzCfh8rKYc1FUcJTIMFHxjLZLBoQTYJNZQdaPwGmw==
-X-Received: by 2002:a17:907:7f23:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b7d23d0519emr166946666b.57.1765542420793;
-        Fri, 12 Dec 2025 04:27:00 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cf9f38778sm570646266b.0.2025.12.12.04.26.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 04:27:00 -0800 (PST)
-Date: Fri, 12 Dec 2025 13:26:44 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Melbin K Mathew <mlbnkm1@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
-Message-ID: <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
-References: <20251211125104.375020-1-mlbnkm1@gmail.com>
- <20251211080251-mutt-send-email-mst@kernel.org>
- <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
- <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
- <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
- <CAMKc4jDLdcGsL5_d+4CP6n-57s-R0vzrX2M7Ni=1GeCB1cxVYA@mail.gmail.com>
- <bwmol6raorw233ryb3dleh4meaui5vbe7no53boixckl3wgclz@s6grefw5dqen>
- <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
+	s=arc-20240116; t=1765548093; c=relaxed/simple;
+	bh=KyT//ya6ekujeogcywDmXm9hXco8vl51HP4W8cm1u1c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bSbTmblgd+HTBQtMT+cJdsvm6CvqlVBhei4QRjmD47pmiNKlfYwLXvpJ3vNW+o59Z/d4nmH1eO2faRxWL4thLFFZej9EvoNdOpzHnrP7c/APEztB1aHWMbiubAfXpLMq0INNv4AZpHfKSIN+3lEYKBoeVKDisWsOZOScSC+7mP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LDlf3TRG; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765548091; x=1797084091;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KyT//ya6ekujeogcywDmXm9hXco8vl51HP4W8cm1u1c=;
+  b=LDlf3TRGF8DpejziaupeG2MMMFD6V9HW3/yOW6P0rB9wKfj8diWcxRSV
+   0NFPve9F8TQrq4DXLU0exwDi7i+Z2P0B39DSpotiRwKjTm60bbshHyWg3
+   bCw1Auyrg2RwjdK3qEJAdt1p9qO7+338nJbRW/OUeVr4sAM4ddcrpS8q/
+   leb6PD3MP3gd6dJTbrp5Nd5yjciyfCzjPAHcnAv8D6AoRRX51ZBtj3K0h
+   raEn4Zyt4ItUYbtAawRr5FfCnpLnPQhGaJ+eBh6ApDrjpn/e+CMbXYniT
+   rNvtmlNtZ0u1TTnqQNdywHFuaw3pO+Uxk8Q+l1xjjWcQ7WGUPTbVbxcUM
+   Q==;
+X-CSE-ConnectionGUID: oBkWtDBQTxuSpaajjQJrXQ==
+X-CSE-MsgGUID: tu0Ks7VVQbysSyg5Pkpdng==
+X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67708945"
+X-IronPort-AV: E=Sophos;i="6.21,143,1763452800"; 
+   d="scan'208";a="67708945"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 06:01:30 -0800
+X-CSE-ConnectionGUID: TULZOOkYSm+ElqOze/+1qA==
+X-CSE-MsgGUID: AnhuXa3KQuSCy4Lcj0G3Kg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,143,1763452800"; 
+   d="scan'208";a="196849410"
+Received: from lxy-clx-4s.sh.intel.com ([10.239.48.22])
+  by orviesa009.jf.intel.com with ESMTP; 12 Dec 2025 06:01:29 -0800
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	xiaoyao.li@intel.com,
+	farrah.chen@intel.com
+Subject: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf while the MMU is direct
+Date: Fri, 12 Dec 2025 21:50:51 +0800
+Message-ID: <20251212135051.2155280-1-xiaoyao.li@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
 
-On Fri, Dec 12, 2025 at 11:40:03AM +0000, Melbin K Mathew wrote:
->
->
->On 12/12/2025 10:40, Stefano Garzarella wrote:
->>On Fri, Dec 12, 2025 at 09:56:28AM +0000, Melbin Mathew Antony wrote:
->>>Hi Stefano, Michael,
->>>
->>>Thanks for the suggestions and guidance.
->>
->>You're welcome, but please avoid top-posting in the future:
->>https://www.kernel.org/doc/html/latest/process/submitting- 
->>patches.html#use-trimmed-interleaved-replies-in-email-discussions
->>
->Sure. Thanks
->>>
->>>I’ve drafted a 4-part series based on the recap. I’ve included the
->>>four diffs below for discussion. Can wait for comments, iterate, and
->>>then send the patch series in a few days.
->>>
->>>---
->>>
->>>Patch 1/4 — vsock/virtio: make get_credit() s64-safe and clamp negatives
->>>
->>>virtio_transport_get_credit() was doing unsigned arithmetic; if the
->>>peer shrinks its window, the subtraction can underflow and look like
->>>“lots of credit”. This makes it compute “space” in s64 and clamp < 0
->>>to 0.
->>>
->>>diff --git a/net/vmw_vsock/virtio_transport_common.c
->>>b/net/vmw_vsock/virtio_transport_common.c
->>>--- a/net/vmw_vsock/virtio_transport_common.c
->>>+++ b/net/vmw_vsock/virtio_transport_common.c
->>>@@ -494,16 +494,23 @@ 
->>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
->>>credit)
->>>{
->>>+ s64 bytes;
->>> u32 ret;
->>>
->>> if (!credit)
->>> return 0;
->>>
->>> spin_lock_bh(&vvs->tx_lock);
->>>- ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->>>- if (ret > credit)
->>>- ret = credit;
->>>+ bytes = (s64)vvs->peer_buf_alloc -
->>
->>Why not just calling virtio_transport_has_space()?
->virtio_transport_has_space() takes struct vsock_sock *, while 
->virtio_transport_get_credit() takes struct virtio_vsock_sock *, so I 
->cannot directly call has_space() from get_credit() without changing 
->signatures.
->
->Would you be OK if I factor the common “space” calculation into a 
->small helper that operates on struct virtio_vsock_sock * and is used 
->by both paths? Something like:
+Don't read guest CR3 in kvm_arch_setup_async_pf() if the MMU is direct
+and use INVALID_GPA instead.
 
-Why not just change the signature of virtio_transport_has_space()?
+When KVM tries to perform the host-only async page fault for the shared
+memory of TDX guests, the following WARNING is triggered:
 
-Thanks,
-Stefano
+  WARNING: CPU: 1 PID: 90922 at arch/x86/kvm/vmx/main.c:483 vt_cache_reg+0x16/0x20
+  Call Trace:
+  __kvm_mmu_faultin_pfn
+  kvm_mmu_faultin_pfn
+  kvm_tdp_page_fault
+  kvm_mmu_do_page_fault
+  kvm_mmu_page_fault
+  tdx_handle_ept_violation
 
->
->/* Must be called with vvs->tx_lock held. Returns >= 0. */
->static s64 virtio_transport_tx_space(struct virtio_vsock_sock *vvs)
->{
->	s64 bytes;
->
->	bytes = (s64)vvs->peer_buf_alloc -
->		((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->	if (bytes < 0)
->		bytes = 0;
->
->	return bytes;
->}
->
->Then:
->
->get_credit() would do bytes = virtio_transport_tx_space(vvs); ret = 
->min_t(u32, credit, (u32)bytes);
->
->has_space() would use the same helper after obtaining vvs = vsk->trans;
->
->Does that match what you had in mind, or would you prefer a different 
->factoring?
->
->>
->>>+ ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->>>+ if (bytes < 0)
->>>+ bytes = 0;
->>>+
->>>+ ret = min_t(u32, credit, (u32)bytes);
->>> vvs->tx_cnt += ret;
->>> vvs->bytes_unsent += ret;
->>> spin_unlock_bh(&vvs->tx_lock);
->>>
->>> return ret;
->>>}
->>>
->>>
->>>---
->>>
->>>Patch 2/4 — vsock/virtio: cap TX window by local buffer (helper + use
->>>everywhere in TX path)
->>>
->>>Cap the effective advertised window to min(peer_buf_alloc, buf_alloc)
->>>and use it consistently in TX paths (get_credit, has_space,
->>>seqpacket_enqueue).
->>>
->>>diff --git a/net/vmw_vsock/virtio_transport_common.c
->>>b/net/vmw_vsock/virtio_transport_common.c
->>>--- a/net/vmw_vsock/virtio_transport_common.c
->>>+++ b/net/vmw_vsock/virtio_transport_common.c
->>>@@ -491,6 +491,16 @@ void virtio_transport_consume_skb_sent(struct
->>>sk_buff *skb, bool consume)
->>>}
->>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->>>+/* Return the effective peer buffer size for TX credit computation.
->>>+ *
->>>+ * The peer advertises its receive buffer via peer_buf_alloc, but 
->>>we cap it
->>>+ * to our local buf_alloc (derived from SO_VM_SOCKETS_BUFFER_SIZE and
->>>+ * already clamped to buffer_max_size).
->>>+ */
->>>+static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
->>>+{
->>>+ return min(vvs->peer_buf_alloc, vvs->buf_alloc);
->>>+}
->>>
->>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
->>>credit)
->>>{
->>> s64 bytes;
->>>@@ -502,7 +512,8 @@ u32 virtio_transport_get_credit(struct
->>>virtio_vsock_sock *vvs, u32 credit)
->>> return 0;
->>>
->>> spin_lock_bh(&vvs->tx_lock);
->>>- bytes = (s64)vvs->peer_buf_alloc -
->>>+ bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
->>> ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->>> if (bytes < 0)
->>> bytes = 0;
->>>@@ -834,7 +845,7 @@ virtio_transport_seqpacket_enqueue(struct 
->>>vsock_sock *vsk,
->>> spin_lock_bh(&vvs->tx_lock);
->>>
->>>- if (len > vvs->peer_buf_alloc) {
->>>+ if (len > virtio_transport_tx_buf_alloc(vvs)) {
->>> spin_unlock_bh(&vvs->tx_lock);
->>> return -EMSGSIZE;
->>> }
->>>@@ -884,7 +895,8 @@ static s64 virtio_transport_has_space(struct
->>>vsock_sock *vsk)
->>> struct virtio_vsock_sock *vvs = vsk->trans;
->>> s64 bytes;
->>>
->>>- bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->>>+ bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
->>>+ ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->>> if (bytes < 0)
->>> bytes = 0;
->>>
->>> return bytes;
->>>}
->>>
->>>
->>>---
->>>
->>>Patch 3/4 — vsock/test: fix seqpacket msg bounds test (set client 
->>>buf too)
->>
->>Please just include in the series the patch I sent to you.
->>
->Thanks. I'll use your vsock_test.c patch as-is for 3/4
->>>
->>>After fixing TX credit bounds, the client can fill its TX window and
->>>block before it wakes the server. Setting the buffer on the client
->>>makes the test deterministic again.
->>>
->>>diff --git a/tools/testing/vsock/vsock_test.c 
->>>b/tools/testing/vsock/ vsock_test.c
->>>--- a/tools/testing/vsock/vsock_test.c
->>>+++ b/tools/testing/vsock/vsock_test.c
->>>@@ -353,6 +353,7 @@ static void test_stream_msg_peek_server(const
->>>struct test_opts *opts)
->>>
->>>static void test_seqpacket_msg_bounds_client(const struct 
->>>test_opts *opts)
->>>{
->>>+ unsigned long long sock_buf_size;
->>> unsigned long curr_hash;
->>> size_t max_msg_size;
->>> int page_size;
->>>@@ -366,6 +367,18 @@ static void
->>>test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->>> exit(EXIT_FAILURE);
->>> }
->>>
->>>+ sock_buf_size = SOCK_BUF_SIZE;
->>>+
->>>+ setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
->>>+    sock_buf_size,
->>>+    "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
->>>+
->>>+ setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
->>>+    sock_buf_size,
->>>+    "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
->>>+
->>> /* Wait, until receiver sets buffer size. */
->>> control_expectln("SRVREADY");
->>>
->>>
->>>---
->>>
->>>Patch 4/4 — vsock/test: add stream TX credit bounds regression test
->>>
->>>This directly guards the original failure mode for stream sockets: if
->>>the peer advertises a large window but the sender’s local policy is
->>>small, the sender must stall quickly (hit EAGAIN in nonblocking mode)
->>>rather than queueing megabytes.
->>
->>Yeah, using nonblocking mode LGTM!
->>
->>>
->>>diff --git a/tools/testing/vsock/vsock_test.c 
->>>b/tools/testing/vsock/ vsock_test.c
->>>--- a/tools/testing/vsock/vsock_test.c
->>>+++ b/tools/testing/vsock/vsock_test.c
->>>@@ -349,6 +349,7 @@
->>>#define SOCK_BUF_SIZE (2 * 1024 * 1024)
->>>+#define SMALL_SOCK_BUF_SIZE (64 * 1024ULL)
->>>#define MAX_MSG_PAGES 4
->>>
->>>/* Insert new test functions after test_stream_msg_peek_server, before
->>> * test_seqpacket_msg_bounds_client (around line 352) */
->>>
->>>+static void test_stream_tx_credit_bounds_client(const struct 
->>>test_opts *opts)
->>>+{
->>>+ ... /* full function as provided */
->>>+}
->>>+
->>>+static void test_stream_tx_credit_bounds_server(const struct 
->>>test_opts *opts)
->>>+{
->>>+ ... /* full function as provided */
->>>+}
->>>
->>>@@ -2224,6 +2305,10 @@
->>> .run_client = test_stream_msg_peek_client,
->>> .run_server = test_stream_msg_peek_server,
->>> },
->>>+ {
->>>+ .name = "SOCK_STREAM TX credit bounds",
->>>+ .run_client = test_stream_tx_credit_bounds_client,
->>>+ .run_server = test_stream_tx_credit_bounds_server,
->>>+ },
->>
->>Please put it at the bottom. Tests are skipped by index, so we don't 
->>want to change index of old tests.
->>
->>Please fix your editor, those diffs are hard to read without tabs/spaces.
->seems like some issue with my email client. Hope it is okay now
->>
->>Thanks,
->>Stefano
->>
->
+This WARNING is triggered when calling kvm_mmu_get_guest_pgd() to cache
+the guest CR3 in kvm_arch_setup_async_pf() for later use in
+kvm_arch_async_page_ready() to determine if it's possible to fix the
+page fault in the current vCPU context to save one VM exit. However, when
+guest state is protected, KVM cannot read the guest CR3.
+
+Since protected guests aren't compatible with shadow paging, i.e, they
+must use direct MMU, avoid calling kvm_mmu_get_guest_pgd() to read guest
+CR3 when the MMU is direct and use INVALID_GPA instead.
+
+Note that for protected guests mmu->root_role.direct is always true, so
+that kvm_mmu_get_guest_pgd() in kvm_arch_async_page_ready() won't be
+reached.
+
+Reported-by: Farrah Chen <farrah.chen@intel.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+---
+Changes in v2:
+- Use arch.direct_map to key off the reading of guest CR3;
+- drop the handling in kvm_arch_async_page_ready() since the read CR3
+  operation cannot be reached for direct MMU (protected guests);
+---
+ arch/x86/kvm/mmu/mmu.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 667d66cf76d5..257835185f90 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4521,7 +4521,10 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
+ 	arch.gfn = fault->gfn;
+ 	arch.error_code = fault->error_code;
+ 	arch.direct_map = vcpu->arch.mmu->root_role.direct;
+-	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
++	if (arch.direct_map)
++		arch.cr3 = INVALID_GPA;
++	else
++		arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+ 
+ 	return kvm_setup_async_pf(vcpu, fault->addr,
+ 				  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
+
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+-- 
+2.43.0
 
 
