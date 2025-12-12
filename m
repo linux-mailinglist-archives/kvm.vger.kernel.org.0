@@ -1,129 +1,145 @@
-Return-Path: <kvm+bounces-65882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F99CB97B7
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 18:53:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2805CB982B
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 19:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ECEBF3016264
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 17:53:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EBAAF3095E6C
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 18:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855392F5318;
-	Fri, 12 Dec 2025 17:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD99F2F6195;
+	Fri, 12 Dec 2025 18:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NhCOYK9m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I06dKC75"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E022F3C03
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 17:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9447B29D26D
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 18:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765562003; cv=none; b=EjaO3c9w8H01XJoXQ236YXhisvKwwLOAO7quRvjP4GQhg7JEG5laHHKysgrVMhFMbO5HRe7TzNfNhIYBPWextCEaRZ/l57HgJEStjkLZAeBBXqRznoV1dChSSexq/CcEX/EcnQ5SfM+Q1b4oSjCM69QaBkaZMXr37mCYUhSEEAs=
+	t=1765562496; cv=none; b=Dt14Hxg1O86lIb+QiOZJP5G6x0lyhqPGSC9Lz3Aekef9Pi8pB+VeHK0cCboqn1SaFq9QoYV/M1cubVuH+rlx11m9AWv+2gC7larrQhS9aRLG8h09dhyGZiKPnCTiru8RQygFwzN8SwXMtbC3r+r22FLnIdlhqYAH9idlyboXyrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765562003; c=relaxed/simple;
-	bh=SBY5iBtKi33UI4o709keo90W1kQlSEb3hKaGV2YCfAI=;
+	s=arc-20240116; t=1765562496; c=relaxed/simple;
+	bh=ZoEjubOAjdQ0I4mKDTjbIEIjvzHhGG3QwAQog6ErYcc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=djSvImGHO3pgOv00XieOYCGwHjb3cH1ZNo/E7P4VBsyPWv1ViE+dcX8wMqmcD49OEP+ERBXE2OkmbEHK7L/n3HweWBOFKIEFfFsCbFswqIKwGch+Sh+8rPZyxuBFS1l/PAg7Zxn+mveJewvYuRyLDTxcX6wvHbY84fPlBwh3JwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NhCOYK9m; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=ZT7pwqzegFzPSi0cng9r6qeHvKe5jLz54KyMCN/Oq3LVKnLTR/44EsyEI8sOyV9Ws6lxGYzUCnDvEJkmKhOXIqHwJaiu0HnP16gkDC0R8Aj9DkCPryZA/dtcna27b+NBqRJV9JVWqvU/3eUvtawWd16xDEAJbSdio/e2WEryTF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I06dKC75; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-341616a6fb7so1549725a91.0
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 09:53:22 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-be8c77ecc63so1937832a12.2
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 10:01:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765562002; x=1766166802; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765562494; x=1766167294; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V2Cj0aGGug40IgYm+TDWR1qUdjJrq2iLmar2qhOggec=;
-        b=NhCOYK9mgxYKyTyhPO7ytGBIgLnVtZMtPxsYAMzR0F6JhY+39BOSDKZXS10Q/NyJpX
-         xWB2YkFlaW073tjPY9Bsm8hRmX3hOddz60B/jTeaFdO9cvBrhICPKLc+yOgWlBkf+imv
-         Uyn8Jq7ZTyZ7xGrFY5VHESzywke8VZ9Kq//33lc1vt1+htEQOejm/zzZYV6LYEgBXeOB
-         +15AnezbOZ15TgRiN6QKHDlw61gD8NwoBroOCrk4povDLy01WXaEo7Ew+QkSWrYtPbgT
-         u4tX4HXnrwkVkVghCv2RZLb3Y8BiVecGImZfaFVHm0UXxGflAIi4BlTs6A0jtmRjB0OT
-         jEPA==
+        bh=Bo9Rm1dXUYD7l80/8yzy6VKuYdJBg7Dl5IR6XCJePgM=;
+        b=I06dKC75/2bOc5blkuZ+GDpnfBG6qxKOfW9yiqhPG/orBDpHzTi43UNZdV2MXNJX/O
+         exLf4rjIH0K5/+tWDlBvlXLfvA7Z+UBm2t2josfNW6KEc+kxxPSMNAJYvj3FgYsHFX8o
+         8CjNo9XBa2sksSCRnHE/Pm2AXkRpJUyfRQXQ02tGOcvp6gOjev5AkUn2jYRUhdpkBGoL
+         +n0WFq5mIGYNwlA3BhDtxpSOMnV0432ZseCcTa0hDnoAP7+Ct6+0qVjizpoCwIffVJQ+
+         gMT5m1Os4GCUlxRbvCjaPlwualfK6KbXgSPllqvMOnpdUV+AMX0MIKUB0X7JhxJr7xfE
+         kHLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765562002; x=1766166802;
+        d=1e100.net; s=20230601; t=1765562494; x=1766167294;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V2Cj0aGGug40IgYm+TDWR1qUdjJrq2iLmar2qhOggec=;
-        b=oTyU3OMLVM1VhXKrI0yaEglyTH15gv75QHxEkTxacF8w+5pCocpysTypbU3uQ5CkjT
-         qvg14k4YS7n+IQCYeZkRqliKDoFSJUbnJ6JiK5quwj6AgTbU8Do3A0cpyfDl2csna13i
-         hTpGnulgaQhlfndhR4rY2oK291hQ5ofj5L2kFZuvVFXakfiUcX9wX48E4wLwSyjpqiYC
-         4DOhqwryx662DNqkZHtpADMUZXxB9ikOYotT5qpxXQK4kpjM2/mCIK28BN2Ka7f+AIbE
-         6IprFGVnoiVYbzNurvtcimuDWV/R2UWOxAzAkx8FLOg0PY7m0EeYtpPnFO9QjpkMW/AL
-         vvUA==
-X-Gm-Message-State: AOJu0Yw2/fho2BSWgg6q3gUI2qPB5UCUzIDq5Dn7Xia7DnuRt1xSnJD9
-	H7s2lm1f3LwkzDSGiGSejmQb0ZCGEmsfi6dM31bueUFZso/puiMQhuK4WzkCAH6eEwJ5uOur63H
-	/OBTqyA==
-X-Google-Smtp-Source: AGHT+IE+fRP2zd2rUtse8AQMH2CveeUHlAeg8i9qQSHKAEZVSRaAflZLwfBqY+Fzjr3Dzfq/m276ap32cng=
-X-Received: from pjbqe8.prod.google.com ([2002:a17:90b:4f88:b0:349:3867:ccc1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2b46:b0:340:b501:7b7d
- with SMTP id 98e67ed59e1d1-34abd7bf548mr2551895a91.14.1765562001624; Fri, 12
- Dec 2025 09:53:21 -0800 (PST)
-Date: Fri, 12 Dec 2025 09:53:20 -0800
-In-Reply-To: <20251212094647.GA65305@k08j02272.eu95sqa>
+        bh=Bo9Rm1dXUYD7l80/8yzy6VKuYdJBg7Dl5IR6XCJePgM=;
+        b=RWHr5wMBNcWwbqYewVcjSw6oP07vG0FJRV7tuqwWTNFPf9KHeIrI/UStjkMCrIgeZp
+         dEGsRKrWiXp2VfZr62Qzv/mdoYr8eaPaqPgZY1Yv9NCD5x+Amxq18AeU9RjKbinsuZ8q
+         cu2pB55nLqYxVmyritgfk9MA6dQ9GxZvID+VcIadzmj+usesyuFijg7rmttmuu4vpaVb
+         cU3eiku9Hds3uzmcDZ0YN3QhPUC5OI+Y8QGQevejfel1U2SEVOwwC/Y2hY7/Ct6G4hLC
+         JpNchlKk8qADToDHbgo5vU5POKnUt904I3+QyHybNDHvhRrEfbb/M18W+DAnPsoM/zru
+         kkAw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+mN7e48aSgLcBawrIqfn0HBNpgRiKY0b8KiSbvjUbeVNghPg0WO9afCVVPweB42g84jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzumeGnA83Wu+coqkR2C7324ElAWrPPtVfUdPvGMWVUvRAjfgmk
+	sWdyyeNFZ7KitV2XEkwPXVwBuHzQI9NIpeBJVs/pwN3KEzJZbsdVq8u6iYpxgV5cVsL2dc94CMZ
+	ewcmbTw==
+X-Google-Smtp-Source: AGHT+IG/4+97J2DvkIN9CYSSrtj45Rtx9GE13lZ9oDwNJ9qEfvU5HujDnh8hzt5x4oEkihpsJs4cN5QoWWM=
+X-Received: from pgcu129.prod.google.com ([2002:a63:7987:0:b0:c0d:af51:bbb5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7350:b0:366:14ac:e1df
+ with SMTP id adf61e73a8af0-369b05bee25mr3197541637.69.1765562493663; Fri, 12
+ Dec 2025 10:01:33 -0800 (PST)
+Date: Fri, 12 Dec 2025 10:01:32 -0800
+In-Reply-To: <aTuLC/gNucl9o+Y+@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1757416809.git.houwenlong.hwl@antgroup.com>
- <45cbc005e14ea2a4b9ec803a91af63e364aeb71a.1757416809.git.houwenlong.hwl@antgroup.com>
- <aTMdLPvT3gywUY6F@google.com> <20251211140520.GC42509@k08j02272.eu95sqa>
- <aTr9Kx9PjLuV9bi1@google.com> <20251212094647.GA65305@k08j02272.eu95sqa>
-Message-ID: <aTxWkDfknBCK6Iiv@google.com>
-Subject: Re: [PATCH 4/7] KVM: x86: Consolidate KVM_GUESTDBG_SINGLESTEP check
- into the kvm_inject_emulated_db()
+References: <20251205231913.441872-1-seanjc@google.com> <20251205231913.441872-4-seanjc@google.com>
+ <aTuLC/gNucl9o+Y+@intel.com>
+Message-ID: <aTxYfJLKu6yC_5hj@google.com>
+Subject: Re: [PATCH v3 03/10] KVM: selftests: Add a test to verify APICv
+ updates (while L2 is active)
 From: Sean Christopherson <seanjc@google.com>
-To: Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc: kvm@vger.kernel.org, Lai Jiangshan <jiangshan.ljs@antgroup.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Dongli Zhang <dongli.zhang@oracle.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Dec 12, 2025, Hou Wenlong wrote:
-> On Thu, Dec 11, 2025 at 09:19:39AM -0800, Sean Christopherson wrote:
-> > On Thu, Dec 11, 2025, Hou Wenlong wrote:
-> > +static noinline unsigned long singlestep_with_code_db(void)
-> > +{
-> > +	unsigned long start;
-> > +
-> > +	asm volatile (
-> > +		"lea 1f(%%rip), %0\n\t"
-> > +		"mov %0, %%dr2\n\t"
-> > +		"mov $" xstr(DR7_FIXED_1 | DR7_EXECUTE_DRx(2) | DR7_GLOBAL_ENABLE_DR2) ", %0\n\t"
-> > +		"mov %0, %%dr7\n\t"
-> > +		"pushf\n\t"
-> > +		"pop %%rax\n\t"
-> > +		"or $(1<<8),%%rax\n\t"
-> > +		"push %%rax\n\t"
-> > +		"popf\n\t"
-> > +		"and $~(1<<8),%%rax\n\t"
-> In my previous understanding, I thought there would be two #DBs
-> generated at the instruction boundary. First, the single-step trap #DB
-> would be handled, and then, when resuming to start the new instruction,
-> it would check for the code breakpoint and generate a code fault #DB.
-> However, it turns out that the check for the code breakpoint happened
-> before the instruction boundary. 
+On Fri, Dec 12, 2025, Chao Gao wrote:
+> On Fri, Dec 05, 2025 at 03:19:06PM -0800, Sean Christopherson wrote:
+> >+static void bad_ipi_handler(struct ex_regs *regs)
+> >+{
+> >+	TEST_FAIL("Received \"bad\" IPI; ICR MMIO write should have been ignored");
+> 
+> is it ok to use TEST_FAIL() in guest code?
 
-Yeah, that's what I was trying to explain by describing code breakpoint as fault-like.
+Doh.  Good point.  It'll definitely generate a failure, but not a very helpful one.
 
-> I also see in the kernel hardware breakpoint handler that it notes that code
-> breakpoints and single-step can be detected together. Is this due to
-> instruction prefetch?
+> >+static void l2_vmcall(void)
+> >+{
+> >+	/*
+> >+	 * Exit to L1.  Assume all registers may be clobbered as selftests's
+> >+	 * VM-Enter code doesn't preserve L2 GPRs.
+> >+	 */
+> >+	asm volatile("push %%rbp\n\t"
+> >+		     "push %%r15\n\t"
+> >+		     "push %%r14\n\t"
+> >+		     "push %%r13\n\t"
+> >+		     "push %%r12\n\t"
+> >+		     "push %%rbx\n\t"
+> >+		     "push %%rdx\n\t"
+> >+		     "push %%rdi\n\t"
+> >+		     "vmcall\n\t"
+> >+		     "pop %%rdi\n\t"
+> >+		     "pop %%rdx\n\t"
+> >+		     "pop %%rbx\n\t"
+> >+		     "pop %%r12\n\t"
+> >+		     "pop %%r13\n\t"
+> >+		     "pop %%r14\n\t"
+> >+		     "pop %%r15\n\t"
+> >+		     "pop %%rbp\n\t"
+> >+		::: "rax", "rcx", "rdx", "rsi", "rdx", "r8", "r9", "r10", "r11", "memory");
+> >+}
+> 
+> There's already a vmcall() helper in vmx.h. Why add a new one?
 
-Nope, it's just how #DBs work, everything pending gets smushed together.  Note,
-data #DBs can also be coincident.  E.g. it's entirely possible that you could
-observe a code breakpoint, a data breakpoint, and a single-step breakpoint in a
-single #DB.
+Oh, nice, I somehow missed that.
 
-> If we want to emulate the hardware behavior in the emulator, does that
-> mean we need to check for code breakpoints in kvm_vcpu_do_single_step()
-> and set the DR_TRAP_BITS along with the DR6_BS bit?
+> >+int main(int argc, char *argv[])
+> >+{
+> >+	vm_vaddr_t vmx_pages_gva;
+> >+	struct vmx_pages *vmx;
+> >+	struct kvm_vcpu *vcpu;
+> >+	struct kvm_vm *vm;
+> >+	struct ucall uc;
+> >+
+> >+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
+> >+
+> >+	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
+> >+
+> >+	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
+> >+	prepare_virtualize_apic_accesses(vmx, vm);
+> >+	vcpu_args_set(vcpu, 2, vmx_pages_gva);
+> 
+> s/2/1
+> 
+> only one argument here.
 
-Hmm, ya, I think so?  I don't think the CPU will fetch and merge the imminent
-code #DB with the injected single-step #DB.
+Gah.  Thank you!
 
