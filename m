@@ -1,53 +1,48 @@
-Return-Path: <kvm+bounces-65879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A4FCB934F
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 17:01:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEAECB937F
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 17:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C4573046385
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 16:00:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F9943048D47
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 16:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF8D2B9A4;
-	Fri, 12 Dec 2025 16:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0E123AB90;
+	Fri, 12 Dec 2025 16:03:49 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5213B8D6B
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 16:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA461B81D3
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 16:03:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765555254; cv=none; b=mAW5hQCbhGUyb+y4FXmbkq24sfGUxonVaba5VHBew8CDqmKDfiNrW2lrkodTsjEbAQgVwGB16/rjKs61Wxe4uDd1aE2OZvhcF05javkWfdPAJ95is2CW45kpR3UylgSmtKmkESkRGgiKV58ImFN0Z3A4fWXTGBexsBGZhm65sbg=
+	t=1765555429; cv=none; b=DCc+WqG00IxkrwACQNdmw5XOrJ1lZiHRY6s4mUZA48/wVgVttTOnpAVcm2ltlDGiaiWiPQTH6VxxKjrRYODpVfu2g2nS0p2Zfk8AL19GvCpyczeec7Yz6fSgv4RErMrzTuruZqhJtEq+v5HpdopkOmMwL0MCSt+ACb9hYZbXz/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765555254; c=relaxed/simple;
-	bh=rdqGi02n6ox/C9X9JPwzpP1tYajoZ2f2ODncGJC4HD8=;
+	s=arc-20240116; t=1765555429; c=relaxed/simple;
+	bh=jAG6A7MU2Z/a421RMls9L1+fU9pciFIy+oqVfVXYQh0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j1HF1fu2ihzLvdZg9ZWkktMP/9nCYsHBUQethSIp5XXkLZ2Ecvmgt33x050d1Ief2yOYqhHsUnvODguvgfYIQgYyFcJwtS+wKR1RmjXjzBlsxlUNH8qmlrAxZhacFBOyE7IS2nBr2U+0Id5tphmA019fbyjpBGGznftKmRzWyZc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=SFtK8/Zye+kzlDhuT6ezSiZbOCjnNSOHlEg3cg82W7eLLMabaSU0wTGdGtt63Oof81OfH4OF0owvap88s9q+rqumzUrM0EcK8wpHuOwY0EF1BEvX/4/Eff5yD9knKHrb4qXkPKdC2w86KDUBcGDqNUPZv6hcLM3+vCC2iOnAAA8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAD7D1063;
-	Fri, 12 Dec 2025 08:00:42 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CA9A1575;
+	Fri, 12 Dec 2025 08:03:39 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1FEBA3F762;
-	Fri, 12 Dec 2025 08:00:47 -0800 (PST)
-Date: Fri, 12 Dec 2025 16:00:42 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 665643F762;
+	Fri, 12 Dec 2025 08:03:45 -0800 (PST)
+Date: Fri, 12 Dec 2025 16:03:40 +0000
 From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1
- mappings
-Message-ID: <20251212160042.GA978851@e124191.cambridge.arm.com>
-References: <20251210173024.561160-1-maz@kernel.org>
- <20251210173024.561160-7-maz@kernel.org>
- <20251211151810.GA867614@e124191.cambridge.arm.com>
- <86tsxxng5b.wl-maz@kernel.org>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
+	maz@kernel.org, kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v4 11/11] arm64: add EL2 environment
+ variable
+Message-ID: <20251212160340.GA978993@e124191.cambridge.arm.com>
+References: <20251204142338.132483-1-joey.gouly@arm.com>
+ <20251204142338.132483-12-joey.gouly@arm.com>
+ <20251204-203dfc57adef00b4f6fdf910@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,101 +51,65 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86tsxxng5b.wl-maz@kernel.org>
+In-Reply-To: <20251204-203dfc57adef00b4f6fdf910@orel>
 
-On Thu, Dec 11, 2025 at 04:21:20PM +0000, Marc Zyngier wrote:
-> On Thu, 11 Dec 2025 15:18:51 +0000,
-> Joey Gouly <joey.gouly@arm.com> wrote:
+On Thu, Dec 04, 2025 at 11:17:24AM -0600, Andrew Jones wrote:
+> On Thu, Dec 04, 2025 at 02:23:38PM +0000, Joey Gouly wrote:
+> > This variable when set to y/Y will cause QEMU/kvmtool to start at EL2.
 > > 
-> > Question,
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > Acked-by: Marc Zyngier <maz@kernel.org>
+> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > ---
+> >  arm/run | 7 +++++++
+> >  1 file changed, 7 insertions(+)
 > > 
-> > On Wed, Dec 10, 2025 at 05:30:24PM +0000, Marc Zyngier wrote:
-> > > Now that we potentially have two bits to deal with when setting
-> > > execution permissions, make sure we correctly handle them when both
-> > > when building the page tables and when reading back from them.
-> > > 
-> > > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_pgtable.h | 12 +++---------
-> > >  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++++---
-> > >  2 files changed, 24 insertions(+), 12 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > > index be68b89692065..095e6b73740a6 100644
-> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > > @@ -87,15 +87,9 @@ typedef u64 kvm_pte_t;
-> > >  
-> > >  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
-> > >  
-> > > -#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > > -#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > > -#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> > > -
-> > > -#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
-> > > -	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
-> > > -			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
-> > > -			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
-> > > -			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-> > > +#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > > +#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > > +#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> > >  
-> > >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
-> > >  
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > index e0bd6a0172729..97c0835d25590 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > @@ -342,6 +342,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
-> > >  	if (!(prot & KVM_PGTABLE_PROT_R))
-> > >  		return -EINVAL;
-> > >  
-> > > +	if (!cpus_have_final_cap(ARM64_KVM_HVHE))
-> > > +		prot &= ~KVM_PGTABLE_PROT_UX;
+> > diff --git a/arm/run b/arm/run
+> > index 858333fc..dd641772 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -59,6 +59,10 @@ function arch_run_qemu()
+> >  		M+=",highmem=off"
+> >  	fi
+> >  
+> > +	if [ "$EL2" = "Y" ] || [ "$EL2" = "y" ]; then
+> 
+> I wanted to keep '1' and also add 'y' and 'Y'. We already allow those
+> three (and only those three) in other places, see errata().
+
+Couldn't find the errata() part, but I changed it to:
+
+	if [ "$EL2" == "1" ] || [ "$EL2" = "Y" ] || [ "$EL2" = "y" ];
+
+
+I also used test_exception_prep() like suggested in the other e-mail.
+
+I will send out a next version next week, although I am aware it's very close
+to holiday/vacation season!
+
+Thanks,
+Joey
+> 
+> Thanks,
+> drew
+> 
+> > +		M+=",virtualization=on"
+> > +	fi
+> > +
+> >  	if ! $qemu $M -device '?' | grep -q virtconsole; then
+> >  		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
+> >  		exit 2
+> > @@ -116,6 +120,9 @@ function arch_run_kvmtool()
+> >  	fi
+> >  
+> >  	command="$(timeout_cmd) $kvmtool run"
+> > +	if [ "$EL2" = "Y" ] || [ "$EL2" = "y" ]; then
+> > +		command+=" --nested"
+> > +	fi
+> >  	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
+> >  		run_test_status $command --kernel "$@" --aarch32
+> >  	else
+> > -- 
+> > 2.25.1
 > > 
-> > Trying to understand this part. We don't consider KVM_PGTABLE_PROT_UX below
-> > when !HVHE, and we don't set it in kvm_pgtable_hyp_pte_prot() when !HVHE
-> > either, so can it ever actually be set?
-> 
-> Because KVM_PGTABLE_PROT_X, which is directly passed by the high-level
-> code, is defined as such:
-> 
-> 	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
-> 						  KVM_PGTABLE_PROT_UX,
-> 
-
-This was the main missing part!
-
-> We *could* make that value dependent on HVHE, but since that's in an
-> enum, it is pretty ugly to do (not impossible though).
-> 
-> But it is in the following code that this becomes useful...
-> 
-> >
-> > Otherwise LGTM!
-> > 
-> > Thanks,
-> > Joey
-> > 
-> > > +
-> > >  	if (prot & KVM_PGTABLE_PROT_X) {
-> > >  		if (prot & KVM_PGTABLE_PROT_W)
-> > >  			return -EINVAL;
-> 
-> ... here. If you were passed UX (and only that), and that you're
-> !HVHE, you won't have execution at all, and can allow writes.
-> 
-> Does that make sense?
-
-Yes, thanks!
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
 
