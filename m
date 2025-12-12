@@ -1,192 +1,103 @@
-Return-Path: <kvm+bounces-65888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31AA1CB99B8
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 19:57:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D50CDCB9A1E
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 20:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2893307F8C6
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 18:56:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 232923092414
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 19:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AC230B508;
-	Fri, 12 Dec 2025 18:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAD630B519;
+	Fri, 12 Dec 2025 19:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WEsrs0hF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JmmYAWCd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0071F309EEC
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 18:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2403430B508
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 19:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765565815; cv=none; b=WLiPt7f4Bc+vbER+fV/PcZiC6c0BbB5Ybj7YdIjM9fOPep+BZ6a5xMRKQMOsT93EzurqE/lD5hO+5VT7Bq6+bduSESckJ+/L7ek5zm5sl1CnqzUeBvpOmOKDBaWtZIxWdUoCv7WdaoNqbzUtxX/hXX2dGYK2hs+8c2xuUwxnsPs=
+	t=1765567325; cv=none; b=dBaX8zcePCIus9GW66QoAARHu3KA0uQumFClwLhnCePP+sB58otEd6Ix8oOAocyqiSFhIiE9WqXFpQN9wFX5dUagxjPJBYmTRgGt1J2YrUZSVzAtf7NQj7WFAetHwdAL3F2Xlj5Mt/5I188poeYEDU8SP2d4xP54UCbUYJsbLR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765565815; c=relaxed/simple;
-	bh=xYXxNc2AV3h7rbgZpayWXOomVpFD7awP3QlK1Lm5d0M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gqOK9LSPpHbNEsul41au56AsnZWsdH32IlmqFJNQB315gf9WdGE0fBpPkM8MQF0tA7/pjhIJipiy0BLjMeKHPpqwdMZ07IKkul4tZ6Q/Qv0xhufU5Xg4oNBEjWB44LS61gz9C3FPRbFoTXmroIlW9PKqqTfTdjKRs+ctz+TzkLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WEsrs0hF; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1765567325; c=relaxed/simple;
+	bh=d3xY+Tt5F2lAixFNz0erCGqfYwIxB2/c8x9QCfBSFMk=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=MEuA2w8QV1b/15kb/Z7yTJJr348BLLENSVosbHF7lX9k7LyG2xizyNR8j2iAHggUraZvXRFlXd1miRaijhLgRS7r+GZ5q5mmEcXkavuEzjHJ9cuHlA8wk/zubb+LafiNAH/dyEfcxkKILeXz07sF4Il+joL6JXV4R/5tJz4gz2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JmmYAWCd; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34abd303b4aso2818434a91.1
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 10:56:53 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-65744e10b91so1251062eaf.0
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 11:22:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765565813; x=1766170613; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mFwoukDCJ0i1Yt2vaHXPrXSJCcZgdjE7zAPQ1w0zwTo=;
-        b=WEsrs0hFAItGEZ+O6KLL+so9cvt0+9rhmfZ67ElnUnIZ3W8gqwYECT3HsXkrS6KSXV
-         qvIGOeLcz6fFGBPciIZQmQ7/YkMHz9PJhZir1GYkV+N4lu1E1Jd6kZgiii/NxdFM2U3h
-         IHzrIPVMu7nkyv6Z9BnzD5mXKM92qKGvWA8OZw/tLkm5etF+ptRyAaY73ay+uhFKHxO+
-         QlnlBKXs9nBKaNW29TdEWeycnGFimsiduiHAH2KCeS1C5dTTgsZ0tR31DJwgE7F8NHPo
-         gW+oKNWhSPnVP414hUAgks9v8quPJdXvr7IcTE0V6aZ0OA1oWTjh682vGOwCtEYUbF08
-         OhQg==
+        d=google.com; s=20230601; t=1765567323; x=1766172123; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=d3xY+Tt5F2lAixFNz0erCGqfYwIxB2/c8x9QCfBSFMk=;
+        b=JmmYAWCdFQD6/8IWEfycH1cp3NlAxj6pn4RMlvFzYLY+ifb+sgZpxAaXHaD36odD2J
+         QahRxKnOdovz0UUzEezQO1nJZOUBXpaFUM+Ts1sL86RoOpnvjcUJJABUXB9l+F9un/ao
+         TB/PoJw2zL0H9tZLNpLoUE/Q8fLic5Mu3FrWxGtpjZKa4sdwMHECCsXsb9ZT46lwJEuz
+         5YxZLRcup96IBF5wt0UVghZs3zH5ewumbdC69rUCH6kynavZlvLbTN87bUr3859zYMZY
+         yvmXz2ZV5uD9i1yDn08zAPuIG0X2s9JAD1OCOmfHNXEBtx2L6vYZx+eOVWJGZ7xF2kFv
+         GjlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765565813; x=1766170613;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mFwoukDCJ0i1Yt2vaHXPrXSJCcZgdjE7zAPQ1w0zwTo=;
-        b=rFvu0BbHjULgJjwNBGDbDfGHdvybtFvxCWxLkrryjNdhDxZ4AZ3YWh2bp4Po0/Tgnr
-         BBZ1LrD8AOBp2dB/+jjlXMIF3oPK/sgZi8+eAwDPTWVo4DxuTh2kk5SH3lO3qJBBhLX8
-         c9fmY44PAMn55un4LjWszjedhM32Zk9X3sgDq4bFuJxtTmJlFyZ7ZuJ+T67I9dsfRc1f
-         oZ6m0dcaY8U/DLAa6wMKkLJi5QkW7cmYiyo48ESQO9wdswtKFb/5M2Jhv3I7dwM1OQki
-         MAcE/63WRXRDMSijgHhy7RuDZmnFp6/iA4LUOp11lnOzWxynsAXrf76Al64VexM6nnxh
-         q/BA==
-X-Forwarded-Encrypted: i=1; AJvYcCWmhjvoT3WMHYbrWEszk508N7P2ZDow7LzqFTIxWKsurWc8DIiSxo/UvSOoClBozn7+ehM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMiqljojiWz8c9NMEFlBZP91QdFmO9TA1qxoqd/q44VB+/ahZy
-	bhaibbtUjWtxGZ64OPSqYUHffQuDO7H5Tw2EKtlta+xlJ6BZULRfQjoCSufshY3YvEFvrVGgcNv
-	fZzoswg==
-X-Google-Smtp-Source: AGHT+IFAEi7fFkbRvgT/6RcbxzALSy/ReWD7zmWx1G02iRXYNeE26LiRDzb2r0XLIAu6l30uM6JLKfwuS3g=
-X-Received: from pjbcl17.prod.google.com ([2002:a17:90a:f691:b0:33b:5907:81cb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5288:b0:343:5f43:933e
- with SMTP id 98e67ed59e1d1-34abd78fcaemr2987040a91.19.1765565813345; Fri, 12
- Dec 2025 10:56:53 -0800 (PST)
-Date: Fri, 12 Dec 2025 10:56:51 -0800
-In-Reply-To: <aTfKeNMIiF8NCRlO@intel.com>
+        d=1e100.net; s=20230601; t=1765567323; x=1766172123;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d3xY+Tt5F2lAixFNz0erCGqfYwIxB2/c8x9QCfBSFMk=;
+        b=wb/cjd1yxbao/TV9DD78DAzC0QUggjxGh/IjfQTo07oQeW00bec+Bv8Ref1qkbW/Ua
+         5swkhwEAj3oApgWJpCzcWJL402SZm0oU/TOnockHL+wa5GmgU4gjMEnTJ9WoWjYWH6dL
+         EUj6mHIjhgPXQA+r7pBzckBtPC5eMWpG/JGrNS0xpgzjZx9EeSXuKzdcfmxt78iFewjh
+         7VyL/h2nl0/rXKYS5sxbT6fGQtxbHAvfCzJTxLYw/QdoJVj8AgNZQSkqopsVOIEb4n3r
+         P+Pms/J8ahxgf2lkB1hIcJNwBlo/RP4tsfIG1ThqVF3Ou0xCyacRpvgXYMk6Mk8Y1AzS
+         6snw==
+X-Gm-Message-State: AOJu0Yz+BI3K2JixZ5WuUYbojlElIpEGYJ/XwKSbTAVN6a+1xGovRR/J
+	o6Bd5Iec5rkGseQj40LbgyIHbfs9YYvNf0v/SUwnZnWLli836M9lMSV92T8bGM1/PxR19FzfCx+
+	EtVJCQrJXjLgeH4E7KX6xScjYLA==
+X-Google-Smtp-Source: AGHT+IHUbVv4Jy2gEZEkXkuyNos7MiNpoCrDqCxYPzir5lZi9qw+P8UnFJM3AYzANnUq+aZp9M70/ycADG43mzjJoA==
+X-Received: from ilbeb21.prod.google.com ([2002:a05:6e02:4615:b0:438:317f:a956])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6820:290e:b0:659:9a49:90d4 with SMTP id 006d021491bc7-65b4523a33dmr1491761eaf.83.1765567323163;
+ Fri, 12 Dec 2025 11:22:03 -0800 (PST)
+Date: Fri, 12 Dec 2025 19:22:02 +0000
+In-Reply-To: <d3e946ec-787a-424a-9a7a-f04aeb490ba6@arm.com> (message from
+ Suzuki K Poulose on Wed, 10 Dec 2025 10:54:10 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251206011054.494190-1-seanjc@google.com> <20251206011054.494190-4-seanjc@google.com>
- <aTfKeNMIiF8NCRlO@intel.com>
-Message-ID: <aTxlc4u5VfW8sE-2@google.com>
-Subject: Re: [PATCH v2 3/7] KVM: x86/tdx: Do VMXON and TDX-Module
- initialization during subsys init
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Dan Williams <dan.j.williams@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Message-ID: <gsnt7bur4iat.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 01/24] arm64: cpufeature: Add cpucap for HPMN0
+From: Colton Lewis <coltonlewis@google.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, 
+	shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Tue, Dec 09, 2025, Chao Gao wrote:
-> On Fri, Dec 05, 2025 at 05:10:50PM -0800, Sean Christopherson wrote:
-> > static int __init __tdx_bringup(void)
-> > {
-> > 	const struct tdx_sys_info_td_conf *td_conf;
-> >@@ -3417,34 +3362,18 @@ static int __init __tdx_bringup(void)
-> > 		}
-> > 	}
-> > 
-> >-	/*
-> >-	 * Enabling TDX requires enabling hardware virtualization first,
-> >-	 * as making SEAMCALLs requires CPU being in post-VMXON state.
-> >-	 */
-> >-	r = kvm_enable_virtualization();
-> >-	if (r)
-> >-		return r;
-> >-
-> >-	cpus_read_lock();
-> >-	r = __do_tdx_bringup();
-> >-	cpus_read_unlock();
-> >-
-> >-	if (r)
-> >-		goto tdx_bringup_err;
-> >-
-> >-	r = -EINVAL;
-> > 	/* Get TDX global information for later use */
-> > 	tdx_sysinfo = tdx_get_sysinfo();
-> >-	if (WARN_ON_ONCE(!tdx_sysinfo))
-> >-		goto get_sysinfo_err;
-> >+	if (!tdx_sysinfo)
-> >+		return -EINVAL;
-> 
-> ...
-> 
-> >-	/*
-> >-	 * Ideally KVM should probe whether TDX module has been loaded
-> >-	 * first and then try to bring it up.  But TDX needs to use SEAMCALL
-> >-	 * to probe whether the module is loaded (there is no CPUID or MSR
-> >-	 * for that), and making SEAMCALL requires enabling virtualization
-> >-	 * first, just like the rest steps of bringing up TDX module.
-> >-	 *
-> >-	 * So, for simplicity do everything in __tdx_bringup(); the first
-> >-	 * SEAMCALL will return -ENODEV when the module is not loaded.  The
-> >-	 * only complication is having to make sure that initialization
-> >-	 * SEAMCALLs don't return TDX_SEAMCALL_VMFAILINVALID in other
-> >-	 * cases.
-> >-	 */
-> > 	r = __tdx_bringup();
-> >-	if (r) {
-> >-		/*
-> >-		 * Disable TDX only but don't fail to load module if the TDX
-> >-		 * module could not be loaded.  No need to print message saying
-> >-		 * "module is not loaded" because it was printed when the first
-> >-		 * SEAMCALL failed.  Don't bother unwinding the S-EPT hooks or
-> >-		 * vm_size, as kvm_x86_ops have already been finalized (and are
-> >-		 * intentionally not exported).  The S-EPT code is unreachable,
-> >-		 * and allocating a few more bytes per VM in a should-be-rare
-> >-		 * failure scenario is a non-issue.
-> >-		 */
-> >-		if (r == -ENODEV)
-> >-			goto success_disable_tdx;
-> 
-> Previously, loading kvm-intel.ko (with tdx=1) would succeed even if there was
-> no TDX module loaded by BIOS. IIUC, the behavior changes here; the lack of TDX
-> module becomes fatal and kvm-intel.ko loading would fail.
-> 
-> Is this intentional?
+Suzuki K Poulose <suzuki.poulose@arm.com> writes:
 
-Nope, definitely not intentional.  I think this as fixup?
+> On 09/12/2025 20:50, Colton Lewis wrote:
+>> Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
+>> counters reserved for the guest.
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index d0161dc3d184..4e0372f12e6d 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -3365,7 +3365,7 @@ static int __init __tdx_bringup(void)
-        /* Get TDX global information for later use */
-        tdx_sysinfo = tdx_get_sysinfo();
-        if (!tdx_sysinfo)
--               return -EINVAL;
-+               return -ENODEV;
- 
-        /* Check TDX module and KVM capabilities */
-        if (!tdx_get_supported_attrs(&tdx_sysinfo->td_conf) ||
-@@ -3470,8 +3470,20 @@ int __init tdx_bringup(void)
-        }
- 
-        r = __tdx_bringup();
--       if (r)
--               enable_tdx = 0;
-+       if (r) {
-+               /*
-+                * Disable TDX only but don't fail to load module if the TDX
-+                * module could not be loaded.  No need to print message saying
-+                * "module is not loaded" because it was printed when the first
-+                * SEAMCALL failed.  Don't bother unwinding the S-EPT hooks or
-+                * vm_size, as kvm_x86_ops have already been finalized (and are
-+                * intentionally not exported).  The S-EPT code is unreachable,
-+                * and allocating a few more bytes per VM in a should-be-rare
-+                * failure scenario is a non-issue.
-+                */
-+               if (r == -ENODEV)
-+                       goto success_disable_tdx;
-+       }
- 
-        return r;
+>> This required changing HPMN0 to an UnsignedEnum in tools/sysreg
+>> because otherwise not all the appropriate macros are generated to add
+>> it to arm64_cpu_capabilities_arm64_features.
+
+>> Acked-by: Mark Rutland <mark.rutland@arm.com>
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+Thanks Suzuki!
 
