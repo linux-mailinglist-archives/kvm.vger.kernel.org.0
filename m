@@ -1,396 +1,206 @@
-Return-Path: <kvm+bounces-65806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30BADCB7954
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 02:54:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A45BCB79D8
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 03:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D2113041136
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 01:53:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3AC383049B0A
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 02:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65C826F280;
-	Fri, 12 Dec 2025 01:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A3D279795;
+	Fri, 12 Dec 2025 02:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QaxuaJ6F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GVWKU+4l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F52826A1B9
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 01:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765504422; cv=pass; b=OL0jSoZ+53OxVZpr6yLXeynVpC+fXbJNXNbOX8OasY0sk+lneHnjQd14plcsTQagEzVmMQDYgO2BMspPwTLSXGTiFI8GnLilHp5epdTUcjZXoq52dyb7Bb8IZNOySo0ZJmyvIQkxLub6SbvtbmtgJNpy5E1mRVyu//39CD6JyOc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765504422; c=relaxed/simple;
-	bh=CtnrD2J63dCxI3UoL3AtPmDSp/FjRGF6ovFEvF9WcKc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oeTkzmpQAE2E7kDiDKe6iHyQObnbq6t3EeNZ6QNS9z0AC8GIM4W2cE22P/WrxF6Ais6DMZUn8BS70XUasVXpgCJkxgZsErR0TBYbC0fVA8TwuOLZF1vXTEi/gWJzklmYcSJWGA00HzzYwIm0vW036Nx87OIUj6RxMwUXyBI6jWw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QaxuaJ6F; arc=pass smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47a815c43baso96955e9.1
-        for <kvm@vger.kernel.org>; Thu, 11 Dec 2025 17:53:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765504418; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Dt1fyp55MV5wiCx4Q5pvgmU/NCcGkOWxXpdlnHZhcHtqfK/6KHxLDtK1ejigmooV/x
-         scmv2rFMNGGcurd/g5bjWauL7+bgb0t4/VA9xKsqJU9UmYJgzkQFrDGfGeBQZfluNGo/
-         IBBa+tgy3/FqIK7uT6i43M+qEneCvUeNMMExUfQqNM3zEgvksaWXSOluWosXtOTd+85j
-         +5DHW6/dC8SdVOFu8qH2IqgM3++bOaqaD82xTBIFkO3a0RUopDgp4emkGSToBl4MiStC
-         MtrOSSIZt58mcgy/FwhFSMrb/ezlll/Zfe/9XTiXdfJo7W8w1CzyeOaidi667avF2tGU
-         55qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Rd1kWl+e0QkfeVDmjwKDiRL6KWrbfO8Cm6aCDNo3pTc=;
-        fh=Qj5kcfQewv6DIXapzPgaRQFcGfBrnb6+/ES4hoEI7bA=;
-        b=jFWUqo4PEvKHBUbwDSzTDegobISgQfQzcyf6rNpmLJ3p62onB1cqSAnGCr1+SRDFGz
-         I54mAaKnwZJR2hSgM2LpHSatFixZFbZ6ubLek4TgXVt6Jv7P/fP6FWgz0y2VnGZacAnS
-         s71qVxqZIYMk0U+zAaYL1PnhrNNdo9/gDrr7R7IBhruG5MCut4eBZYMdyhdvIhrptB4P
-         LRqaM44fwChqe6s8EyviLmqnpAxXfCJDnIOzb7X9qBGvtcn2rzTzuKLCrxDs0Msa6EEV
-         Ba01NLrl137ix3shsXDXMM6rqVst1UijFYdg9W0oFG2V/nf12jGJArmeqJYvGacJV9gz
-         xbCg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765504418; x=1766109218; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rd1kWl+e0QkfeVDmjwKDiRL6KWrbfO8Cm6aCDNo3pTc=;
-        b=QaxuaJ6FY+mMHgyUMmOhGCr6Yy753r5bsyXEhR014PgVhSLNgPmtkCPCGtsAh+bd5L
-         6bPfi2j8hh80vsf4ZoqxN2SK2WOhCS80nJW8Sosk8IAl/a59bmYwILUiXSCEmkLeLPvA
-         o+xSmgZloqwcL11rprgIzZ8cWlr0bzXpJDQB22hSUSCeLSrp7s5Y+mxFR+Qb7hJY4nfl
-         Wxhp404brUG1OlaxOHpcyLdhabhtduIGCRNgJK2/3rty7UMHr+O7PhxicHWHd5PSO2Ij
-         9joSHArlEQXROdkHSw3VmGVtlOscRd2UM1f5PgcLITT50zkQaa6uEx4YkkckYVqaQSVF
-         i0Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765504418; x=1766109218;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Rd1kWl+e0QkfeVDmjwKDiRL6KWrbfO8Cm6aCDNo3pTc=;
-        b=WDRqYLB81cR4nMN4d8mnQxj3jn4Ju/L0dwuILZN2TV963WILNMopcoNzzSO8WHhPZe
-         23sVMlSPshVLuj7fIcDF7qvWk36l5awlqZI0zq3fIWaaKZGWMsI6R6mDv93CuVfSnN/i
-         IvsUfvgiuwxzynRCymDwedUVATm08qQad6eszO+oSeN0vsChFKovGcn0RzM4NxqTq7VV
-         u05bfnkIZgQlkg1nRxd+CL8CLGACTLaOdvCGc2ezDDvPJa8XQzJN6AzkV7keZ2Y/3mTp
-         6QwEOgql4T+Tav6Of2ybSSo6aK8OzfGi+pKZGut5DtDCEFWYxNEBfWS80m0b9ikMOmBR
-         5tfw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlG4qlJ3wMkqZnBFGGZgIPZ/nm6eBXJ5kGzVemmpoTqxNdnq+5ath5S9wiShQdLT8YPWY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUelVS7fpDR0Wrdv1xA0X+vB35jNvTVtmdguQZT03omC65Is7m
-	hPqFAjHyufyUHUNng4jZHtsS9+6wyS7GqqraAqApaZxOj9qbWMTTtEzVjOFRYN2durUIFAhxJpq
-	ygDIX9YokdLFmNMloXugSigioBWiPvc9ojhyiW3a1
-X-Gm-Gg: AY/fxX6woCoZVUU9MPy9AMnIlWC0VKik4BLK5fO6OM//WUQZjB9zoDsUcj4v+uAdlYc
-	MCxNidnu8uNRwGbUtOzEHWND5LxScjO0KPkdbG+tZZ5yIG5XmSijcRsGNYzYYrjUQ/ETTuXvKUT
-	e0F1n+IyVwL+XfTobAyzy3Rzqw6RnGAGNI1kdo1n1BhLgBUYOzCEjDUZ76sjDGDbyCOTKRscW9k
-	WwvVboKaTxJzOuobTVmbLnEsxh3/+GF11frBtARrmZYSqVEMaT7lcVNzT1GYJju2aQ7EZJ2NS6y
-	EvHHfvY0/oV9EhYj2I99WfioPNhJ
-X-Google-Smtp-Source: AGHT+IELyZ67Mh/WAPeTceCN8jbRYqNn7LfXokCBfkoubbVjvqqfzZOlYxJtEOZmuwbdnCZhp2hA4fTZEV/raHqViWM=
-X-Received: by 2002:a05:600d:3:b0:477:86fd:fb49 with SMTP id
- 5b1f17b1804b1-47a88c5c13dmr1386955e9.10.1765504417716; Thu, 11 Dec 2025
- 17:53:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0688428B3E7;
+	Fri, 12 Dec 2025 02:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765505172; cv=none; b=N7eUG7a4uib+SOvYEt7rPUI84a3R6o5TxvYySNeVUYTZX+aCEX+L2ZhcQRj/inDEDupODvuCa1qd7Wc7IB/0TsM9ofnA+v6ZYriIqQMmh4QUw+ygWiI0m3jKZLGWt4GHGu8gnAJs7FoI9kviLjSY4BawMRmvrOiLu26cVuLMpg0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765505172; c=relaxed/simple;
+	bh=zWYSYTi2Ehk5Tt/y3fdV2e1WlZ0xEil7gXV+7es5qx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L6Q3on9F5PX7ofzumsA1i/tDBf04VxdqytmFgm8u+jjskcQs+TyeHgZqEtPVKYwsteomoPcZnePj9YECvKkuuHeUE0YYt4NTAuZ9mGNaAsVO8i4XPh3IuLrp+lx9/6OMeOkh2hDfyA3WZsBp0Bq4APe1ewhFZinEYzENl7JFoto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GVWKU+4l; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765505170; x=1797041170;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zWYSYTi2Ehk5Tt/y3fdV2e1WlZ0xEil7gXV+7es5qx0=;
+  b=GVWKU+4lO9xgytUdtWCzjEmSbQgtWTdmq55K8WrHnoNGDKTWlWuAcCTn
+   K7uOJm6JEucSfB3Oo16Lmpe03l1N14I7zufpxk28NBKaHC6NqUxhK0snM
+   MvDrX9KqntUp/IIhR7UCBjtmANf/F6SMVFxLh13ohPCXJ/HaDu7rkLmBz
+   503CDO51xDSmzb9XrS16I/5cPpJF14OTK8H8ORuDxa1EmZsv6ELBW+lQb
+   TC27XtKcvbfl4m2zhmT6uiWZm4ghLntwQUzljD1USV2cEZVGvK2UVQJkE
+   Dqn/MTsePWcv26Jpc7JEZEKX+nQnTjGAFugfRUY56ZIJmJxagGiYbOLpg
+   g==;
+X-CSE-ConnectionGUID: zEFudGiNRxCgFDj+pPzw0Q==
+X-CSE-MsgGUID: LhAE9XZyT2K4dtkq0PT/wA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="67426620"
+X-IronPort-AV: E=Sophos;i="6.20,256,1758610800"; 
+   d="scan'208";a="67426620"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 18:06:09 -0800
+X-CSE-ConnectionGUID: N0HMPccjQ16B1lIH6itCpw==
+X-CSE-MsgGUID: +m5jObAeSVyE4l0jvy/4YQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,141,1763452800"; 
+   d="scan'208";a="197768043"
+Received: from ktian1-pkvm.sh.intel.com ([10.239.48.205])
+  by fmviesa010.fm.intel.com with ESMTP; 11 Dec 2025 18:06:06 -0800
+From: Kevin Tian <kevin.tian@intel.com>
+To: Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Ramesh Thomas <ramesh.thomas@intel.com>,
+	Yunxiang Li <Yunxiang.Li@amd.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Farrah Chen <farrah.chen@intel.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] vfio/pci: Disable qword access to the PCI ROM bar
+Date: Fri, 12 Dec 2025 02:09:41 +0000
+Message-ID: <20251212020941.338355-1-kevin.tian@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251013185903.1372553-1-jiaqiyan@google.com> <20251013185903.1372553-3-jiaqiyan@google.com>
- <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
-In-Reply-To: <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Thu, 11 Dec 2025 17:53:26 -0800
-X-Gm-Features: AQt7F2rTGmuQE0DHKTuWqG307odD2vjHJLASzh2BvequPFTSz6j2Q6CLsqIFn98
-Message-ID: <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
-To: Zenghui Yu <yuzenghui@huawei.com>, maz@kernel.org, oliver.upton@linux.dev
-Cc: duenwen@google.com, rananta@google.com, jthoughton@google.com, 
-	vsethi@nvidia.com, jgg@nvidia.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 11, 2025 at 5:02=E2=80=AFAM Zenghui Yu <yuzenghui@huawei.com> w=
-rote:
->
-> Hi Jiaqi,
->
-> I had run into several problems when testing it on different servers. I
-> haven't figured them out yet but post it early for discussion.
+Commit 2b938e3db335 ("vfio/pci: Enable iowrite64 and ioread64 for vfio
+pci") enables qword access to the PCI bar resources. However certain
+devices (e.g. Intel X710) are observed with problem upon qword accesses
+to the rom bar, e.g. triggering PCI aer errors.
 
-Thanks for testing, and I will be happy to work with you to improve
-this test code.
+Instead of trying to identify all broken devices, universally disable
+qword access to the rom bar i.e. going back to the old way which worked
+reliably for years.
 
->
-> On 2025/10/14 2:59, Jiaqi Yan wrote:
-> > Test how KVM handles guest SEA when APEI is unable to claim it, and
-> > KVM_CAP_ARM_SEA_TO_USER is enabled.
-> >
-> > The behavior is triggered by consuming recoverable memory error (UER)
-> > injected via EINJ. The test asserts two major things:
-> > 1. KVM returns to userspace with KVM_EXIT_ARM_SEA exit reason, and
-> >    has provided expected fault information, e.g. esr, flags, gva, gpa.
-> > 2. Userspace is able to handle KVM_EXIT_ARM_SEA by injecting SEA to
-> >    guest and KVM injects expected SEA into the VCPU.
-> >
-> > Tested on a data center server running Siryn AmpereOne processor
-> > that has RAS support.
-> >
-> > Several things to notice before attempting to run this selftest:
-> > - The test relies on EINJ support in both firmware and kernel to
-> >   inject UER. Otherwise the test will be skipped.
-> > - The under-test platform's APEI should be unable to claim the SEA.
-> >   Otherwise the test will be skipped.
-> > - Some platform doesn't support notrigger in EINJ, which may cause
-> >   APEI and GHES to offline the memory before guest can consume
-> >   injected UER, and making test unable to trigger SEA.
-> >
-> > Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
->
-> [...]
->
-> > +static void inject_uer(uint64_t paddr)
-> > +{
-> > +     if (access("/sys/firmware/acpi/tables/EINJ", R_OK) =3D=3D -1)
-> > +             ksft_test_result_skip("EINJ table no available in firmwar=
-e");
->
-> Missing '\n'.
+Reported-by: Farrah Chen <farrah.chen@intel.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220740
+Fixes: 2b938e3db335 ("vfio/pci: Enable iowrite64 and ioread64 for vfio pci")
+Cc: stable@vger.kernel.org
+Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+---
+ drivers/vfio/pci/nvgrace-gpu/main.c |  4 ++--
+ drivers/vfio/pci/vfio_pci_rdwr.c    | 19 +++++++++++++++----
+ include/linux/vfio_pci_core.h       |  2 +-
+ 3 files changed, 18 insertions(+), 7 deletions(-)
 
-Thanks.
+diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+index e346392b72f6..9b39184f76b7 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/main.c
++++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+@@ -491,7 +491,7 @@ nvgrace_gpu_map_and_read(struct nvgrace_gpu_pci_core_device *nvdev,
+ 		ret = vfio_pci_core_do_io_rw(&nvdev->core_device, false,
+ 					     nvdev->resmem.ioaddr,
+ 					     buf, offset, mem_count,
+-					     0, 0, false);
++					     0, 0, false, true);
+ 	}
+ 
+ 	return ret;
+@@ -609,7 +609,7 @@ nvgrace_gpu_map_and_write(struct nvgrace_gpu_pci_core_device *nvdev,
+ 		ret = vfio_pci_core_do_io_rw(&nvdev->core_device, false,
+ 					     nvdev->resmem.ioaddr,
+ 					     (char __user *)buf, pos, mem_count,
+-					     0, 0, true);
++					     0, 0, true, true);
+ 	}
+ 
+ 	return ret;
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index 6192788c8ba3..95dc7e04cb08 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -135,7 +135,7 @@ VFIO_IORDWR(64)
+ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+ 			       void __iomem *io, char __user *buf,
+ 			       loff_t off, size_t count, size_t x_start,
+-			       size_t x_end, bool iswrite)
++			       size_t x_end, bool iswrite, bool allow_qword)
+ {
+ 	ssize_t done = 0;
+ 	int ret;
+@@ -150,7 +150,7 @@ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+ 		else
+ 			fillable = 0;
+ 
+-		if (fillable >= 8 && !(off % 8)) {
++		if (allow_qword && fillable >= 8 && !(off % 8)) {
+ 			ret = vfio_pci_iordwr64(vdev, iswrite, test_mem,
+ 						io, buf, off, &filled);
+ 			if (ret)
+@@ -234,6 +234,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 	void __iomem *io;
+ 	struct resource *res = &vdev->pdev->resource[bar];
+ 	ssize_t done;
++	bool allow_qword = true;
+ 
+ 	if (pci_resource_start(pdev, bar))
+ 		end = pci_resource_len(pdev, bar);
+@@ -262,6 +263,16 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 		if (!io)
+ 			return -ENOMEM;
+ 		x_end = end;
++
++		/*
++		 * Certain devices (e.g. Intel X710) don't support qword
++		 * access to the ROM bar. Otherwise PCI AER errors might be
++		 * triggered.
++		 *
++		 * Disable qword access to the ROM bar universally, which
++		 * worked reliably for years before qword access is enabled.
++		 */
++		allow_qword = false;
+ 	} else {
+ 		int ret = vfio_pci_core_setup_barmap(vdev, bar);
+ 		if (ret) {
+@@ -278,7 +289,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 	}
+ 
+ 	done = vfio_pci_core_do_io_rw(vdev, res->flags & IORESOURCE_MEM, io, buf, pos,
+-				      count, x_start, x_end, iswrite);
++				      count, x_start, x_end, iswrite, allow_qword);
+ 
+ 	if (done >= 0)
+ 		*ppos += done;
+@@ -352,7 +363,7 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
+ 	 * to the memory enable bit in the command register.
+ 	 */
+ 	done = vfio_pci_core_do_io_rw(vdev, false, iomem, buf, off, count,
+-				      0, 0, iswrite);
++				      0, 0, iswrite, true);
+ 
+ 	vga_put(vdev->pdev, rsrc);
+ 
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index f541044e42a2..3a75b76eaed3 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -133,7 +133,7 @@ pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
+ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
+ 			       void __iomem *io, char __user *buf,
+ 			       loff_t off, size_t count, size_t x_start,
+-			       size_t x_end, bool iswrite);
++			       size_t x_end, bool iswrite, bool allow_qword);
+ bool vfio_pci_core_range_intersect_range(loff_t buf_start, size_t buf_cnt,
+ 					 loff_t reg_start, size_t reg_cnt,
+ 					 loff_t *buf_offset,
+-- 
+2.43.0
 
->
-> We should return early (to actually skip the test) if the file can not
-> be accessed, right?
-
-Oh you mean I missed exit(KSFT_SKIP), right? Agreed.
-
->
-> > +
-> > +     if (access(EINJ_ETYPE, R_OK | W_OK) =3D=3D -1)
-> > +             ksft_test_result_skip("EINJ module probably not loaded?")=
-;
-> > +
-> > +     write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
-> > +     write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
-> > +     write_einj_entry(EINJ_ADDR, paddr);
-> > +     write_einj_entry(EINJ_MASK, ~0x0UL);
-> > +     write_einj_entry(EINJ_NOTRIGGER, 1);
-> > +     write_einj_entry(EINJ_DOIT, 1);
-> > +}
-> > +
-> > +/*
-> > + * When host APEI successfully claims the SEA caused by guest_code, ke=
-rnel
-> > + * will send SIGBUS signal with BUS_MCEERR_AR to test thread.
-> > + *
-> > + * We set up this SIGBUS handler to skip the test for that case.
-> > + */
-> > +static void sigbus_signal_handler(int sig, siginfo_t *si, void *v)
-> > +{
-> > +     ksft_print_msg("SIGBUS (%d) received, dumping siginfo...\n", sig)=
-;
-> > +     ksft_print_msg("si_signo=3D%d, si_errno=3D%d, si_code=3D%d, si_ad=
-dr=3D%p\n",
-> > +                    si->si_signo, si->si_errno, si->si_code, si->si_ad=
-dr);
-> > +     if (si->si_code =3D=3D BUS_MCEERR_AR)
-> > +             ksft_test_result_skip("SEA is claimed by host APEI\n");
-> > +     else
-> > +             ksft_test_result_fail("Exit with signal unhandled\n");
-> > +
-> > +     exit(0);
-> > +}
-> > +
-> > +static void setup_sigbus_handler(void)
-> > +{
-> > +     struct sigaction act;
-> > +
-> > +     memset(&act, 0, sizeof(act));
-> > +     sigemptyset(&act.sa_mask);
-> > +     act.sa_sigaction =3D sigbus_signal_handler;
-> > +     act.sa_flags =3D SA_SIGINFO;
-> > +     TEST_ASSERT(sigaction(SIGBUS, &act, NULL) =3D=3D 0,
-> > +                 "Failed to setup SIGBUS handler");
-> > +}
-> > +
-> > +static void guest_code(void)
-> > +{
-> > +     uint64_t guest_data;
-> > +
-> > +     /* Consumes error will cause a SEA. */
-> > +     guest_data =3D *(uint64_t *)EINJ_GVA;
-> > +
-> > +     GUEST_FAIL("Poison not protected by SEA: gva=3D%#lx, guest_data=
-=3D%#lx\n",
-> > +                EINJ_GVA, guest_data);
-> > +}
-> > +
-> > +static void expect_sea_handler(struct ex_regs *regs)
-> > +{
-> > +     u64 esr =3D read_sysreg(esr_el1);
-> > +     u64 far =3D read_sysreg(far_el1);
-> > +     bool expect_far_invalid =3D far_invalid;
-> > +
-> > +     GUEST_PRINTF("Handling Guest SEA\n");
-> > +     GUEST_PRINTF("ESR_EL1=3D%#lx, FAR_EL1=3D%#lx\n", esr, far);
-> > +
-> > +     GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
-> > +     GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
-> > +
-> > +     if (expect_far_invalid) {
-> > +             GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, ESR_ELx_FnV);
->
-> I hit this ASSERT with:
->
-> # Mapped 0x40000 pages: gva=3D0x80000000 to gpa=3D0xff80000000
-> # Before EINJect: data=3D0xbaadcafe
-> # EINJ_GVA=3D0x81234bad, einj_gpa=3D0xff81234bad, einj_hva=3D0xffff41234b=
-ad,
-> einj_hpa=3D0x202841234bad
-> # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-> # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
-> # echo 0x202841234bad > /sys/kernel/debug/apei/einj/param1 - done
-> # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-> # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-> # echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
-> # Memory UER EINJected
-> # Dump kvm_run info about KVM_EXIT_ARM_SEA
-> # kvm_run.arm_sea: esr=3D0x92000610, flags=3D0
-> # kvm_run.arm_sea: gva=3D0, gpa=3D0
-> # From guest: Handling Guest SEA
-> # From guest: ESR_EL1=3D0x96000010, FAR_EL1=3D0xaaaadf254828
-> # Guest aborted!
-> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
->   arm64/sea_to_user.c:172: esr & ESR_ELx_FnV =3D=3D ESR_ELx_FnV
->   pid=3D38112 tid=3D38112 errno=3D4 - Interrupted system call
->      1  0x0000000000402f9b: run_vm at sea_to_user.c:246
->      2  0x0000000000402467: main at sea_to_user.c:330
->      3  0x0000ffff8e22b03f: ?? ??:0
->      4  0x0000ffff8e22b117: ?? ??:0
->      5  0x00000000004026ef: _start at ??:?
->   0x0 !=3D 0x400 (esr & ESR_ELx_FnV !=3D ESR_ELx_FnV)
->
-> It seems that KVM doesn't emulate FnV when injecting an abort.
-
-I believe so; this happened to me when I tested on an architecture
-that doesn't provide valid FAR. I tried to fix this in [1] in the
-past, but didn't get any traction and somehow escaped my attention...
-
-Oliver and Marc, what do you think about [1]? If it sounds like a
-valid fix, I can re-send it out as an individual patch.
-
-[1] https://lore.kernel.org/kvmarm/20250604050902.3944054-3-jiaqiyan@google=
-.com
-
-
->
-> > +             GUEST_PRINTF("Guest observed garbage value in FAR\n");
-> > +     } else {
-> > +             GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, 0);
-> > +             GUEST_ASSERT_EQ(far, EINJ_GVA);
-> > +     }
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +static void vcpu_inject_sea(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm_vcpu_events events =3D {};
-> > +
-> > +     events.exception.ext_dabt_pending =3D true;
-> > +     vcpu_events_set(vcpu, &events);
-> > +}
-> > +
-> > +static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct ucall uc;
-> > +     bool guest_done =3D false;
-> > +     struct kvm_run *run =3D vcpu->run;
-> > +     u64 esr;
-> > +
-> > +     /* Resume the vCPU after error injection to consume the error. */
-> > +     vcpu_run(vcpu);
-> > +
-> > +     ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
-> > +                    exit_reason_str(run->exit_reason));
-> > +     ksft_print_msg("kvm_run.arm_sea: esr=3D%#llx, flags=3D%#llx\n",
-> > +                    run->arm_sea.esr, run->arm_sea.flags);
-> > +     ksft_print_msg("kvm_run.arm_sea: gva=3D%#llx, gpa=3D%#llx\n",
-> > +                    run->arm_sea.gva, run->arm_sea.gpa);
-> > +
-> > +     TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
->
-> I can also hit this ASSERT with:
->
-> Random seed: 0x6b8b4567
-> # Mapped 0x40000 pages: gva=3D0x80000000 to gpa=3D0xff80000000
-> # Before EINJect: data=3D0xbaadcafe
-> # EINJ_GVA=3D0x81234bad, einj_gpa=3D0xff81234bad, einj_hva=3D0xffff41234b=
-ad,
-> einj_hpa=3D0x2841234bad
-> # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-> # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
-> # echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
-> # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-> # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-> # echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
-> # Memory UER EINJected
-> # Dump kvm_run info about KVM_EXIT_MMIO
-> # kvm_run.arm_sea: esr=3D0xffff90ba0040, flags=3D0x691000
-> # kvm_run.arm_sea: gva=3D0x100000008, gpa=3D0
-> =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
->   arm64/sea_to_user.c:207: exit_reason =3D=3D (41)
->   pid=3D38023 tid=3D38023 errno=3D4 - Interrupted system call
->      1  0x0000000000402d1b: run_vm at sea_to_user.c:207
->      2  0x0000000000402467: main at sea_to_user.c:330
->      3  0x0000ffff9122b03f: ?? ??:0
->      4  0x0000ffff9122b117: ?? ??:0
->      5  0x00000000004026ef: _start at ??:?
->   Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
->
-> Not sure what's wrong it..
-
-Does your test machine have SDEI or SCI enabled for host APEI? Do you
-see any kernel log from "Memory failure:" saying hugetlb page
-recovered, and recovered significant earlier than the KVM exit here.
-It maybe the kernel has already unmapped hugepage in response to SDEI
-or SCI before this test actually consumes memory error, so no SEA is
-actually triggered.
-
->
-> > +
-> > +     esr =3D run->arm_sea.esr;
-> > +     TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
-> > +     TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
-> > +     TEST_ASSERT_EQ(ESR_ELx_ISS2(esr), 0);
-> > +     TEST_ASSERT_EQ((esr & ESR_ELx_INST_SYNDROME), 0);
-> > +     TEST_ASSERT_EQ(esr & ESR_ELx_VNCR, 0);
-> > +
-> > +     if (!(esr & ESR_ELx_FnV)) {
-> > +             ksft_print_msg("Expect gva to match given FnV bit is 0\n"=
-);
-> > +             TEST_ASSERT_EQ(run->arm_sea.gva, EINJ_GVA);
-> > +     }
-> > +
-> > +     if (run->arm_sea.flags & KVM_EXIT_ARM_SEA_FLAG_GPA_VALID) {
-> > +             ksft_print_msg("Expect gpa to match given KVM_EXIT_ARM_SE=
-A_FLAG_GPA_VALID is set\n");
-> > +             TEST_ASSERT_EQ(run->arm_sea.gpa, einj_gpa & PAGE_ADDR_MAS=
-K);
-> > +     }
-> > +
-> > +     far_invalid =3D esr & ESR_ELx_FnV;
->
-> Missing sync_global_to_guest()?
-
-Ah, yes, and I can add sync_global_to_guest and get rid of
-expect_far_invalid in expect_sea_handler.
-
->
-> Thanks,
-> Zenghui
 
