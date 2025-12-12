@@ -1,72 +1,110 @@
-Return-Path: <kvm+bounces-65826-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89BA5CB8EFE
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 15:01:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DB29CB9073
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 16:05:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2AD263077306
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 14:01:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 016B83086950
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 15:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23EA52773C3;
-	Fri, 12 Dec 2025 14:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4022027979A;
+	Fri, 12 Dec 2025 15:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LDlf3TRG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ji+HjAkf";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sOF95aNe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237734A3E;
-	Fri, 12 Dec 2025 14:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74234285CB3
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 15:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765548093; cv=none; b=E+9IpA9y+0fQ/yREUdU4Wy7xuXKEsHMxFpJ7w9/wEn37v1K2flCE4WOA4500BsUOGxYXQBmiPDcH52L1FhBzkK0cx14S5S2IiGMziWXAMpG/szfbe5eWgYdhweMgY4uOHvge0WHxOfNZLXsAGD4DAqRQ/hQtp1HhjhLpmXDHqtw=
+	t=1765551875; cv=none; b=ZAvtkpU9p9BLtia2P04LiKK0AhBLQZxp1XgL/z43YBYHh1p6pLAKKaHfQ8hRanYWn3eLwxrCmE3PkTmoeMFWJwqlvgeJWGR7K6k7w8kp5oIfIA7aZIgpcZ78Bl29wQtIi7QPSTFdsrFb9s3wZRz0AoxC3aqSuTYtVcksY9qWshg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765548093; c=relaxed/simple;
-	bh=KyT//ya6ekujeogcywDmXm9hXco8vl51HP4W8cm1u1c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bSbTmblgd+HTBQtMT+cJdsvm6CvqlVBhei4QRjmD47pmiNKlfYwLXvpJ3vNW+o59Z/d4nmH1eO2faRxWL4thLFFZej9EvoNdOpzHnrP7c/APEztB1aHWMbiubAfXpLMq0INNv4AZpHfKSIN+3lEYKBoeVKDisWsOZOScSC+7mP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LDlf3TRG; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765548091; x=1797084091;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KyT//ya6ekujeogcywDmXm9hXco8vl51HP4W8cm1u1c=;
-  b=LDlf3TRGF8DpejziaupeG2MMMFD6V9HW3/yOW6P0rB9wKfj8diWcxRSV
-   0NFPve9F8TQrq4DXLU0exwDi7i+Z2P0B39DSpotiRwKjTm60bbshHyWg3
-   bCw1Auyrg2RwjdK3qEJAdt1p9qO7+338nJbRW/OUeVr4sAM4ddcrpS8q/
-   leb6PD3MP3gd6dJTbrp5Nd5yjciyfCzjPAHcnAv8D6AoRRX51ZBtj3K0h
-   raEn4Zyt4ItUYbtAawRr5FfCnpLnPQhGaJ+eBh6ApDrjpn/e+CMbXYniT
-   rNvtmlNtZ0u1TTnqQNdywHFuaw3pO+Uxk8Q+l1xjjWcQ7WGUPTbVbxcUM
-   Q==;
-X-CSE-ConnectionGUID: oBkWtDBQTxuSpaajjQJrXQ==
-X-CSE-MsgGUID: tu0Ks7VVQbysSyg5Pkpdng==
-X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67708945"
-X-IronPort-AV: E=Sophos;i="6.21,143,1763452800"; 
-   d="scan'208";a="67708945"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 06:01:30 -0800
-X-CSE-ConnectionGUID: TULZOOkYSm+ElqOze/+1qA==
-X-CSE-MsgGUID: AnhuXa3KQuSCy4Lcj0G3Kg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,143,1763452800"; 
-   d="scan'208";a="196849410"
-Received: from lxy-clx-4s.sh.intel.com ([10.239.48.22])
-  by orviesa009.jf.intel.com with ESMTP; 12 Dec 2025 06:01:29 -0800
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	xiaoyao.li@intel.com,
-	farrah.chen@intel.com
-Subject: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf while the MMU is direct
-Date: Fri, 12 Dec 2025 21:50:51 +0800
-Message-ID: <20251212135051.2155280-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1765551875; c=relaxed/simple;
+	bh=VB0ZpopcFUn7yJ690lRvNWdOpDXVVwAgkiwYBpSleUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o+yfGMtN6OtcDA67MBL58VrhvEuBQMubBuA92k+y4Pydg+6uR9woI9czE69z7eo+nYL6Xnaz/qxBU4+U7dHxmc5iP4SKaVXh9teeCSebbcjH6K5lOgJ1ZAheE/PsZzT+SAAjESIRc0A+HBaRWHt6xytSZJVnd9bh+CPRK3kqvWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ji+HjAkf; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sOF95aNe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765551869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d+6NaZj6uCcfjgVjpMn6N6VF0Wu9Lu6jAdnQUGrVPW0=;
+	b=Ji+HjAkf2TbFllsvAN1fy1HrMFlNxxRMdeoDQ8rQnZH8QsG33jPNGjnuy38db8WU6id9qT
+	UKmJMVfRwddkDlVTDHc/DX6QUdiB9kXjv8J0+TKSjs3/nhBOJjC1QiLWgs+YW+SqxZ5yzl
+	StseLyjj9gqt10jWWgjx9lZPZpWS4Us=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-306-5lKeoj__NemLjpb4TdbQZQ-1; Fri, 12 Dec 2025 10:04:27 -0500
+X-MC-Unique: 5lKeoj__NemLjpb4TdbQZQ-1
+X-Mimecast-MFC-AGG-ID: 5lKeoj__NemLjpb4TdbQZQ_1765551866
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2982b47ce35so15027685ad.2
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 07:04:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765551866; x=1766156666; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d+6NaZj6uCcfjgVjpMn6N6VF0Wu9Lu6jAdnQUGrVPW0=;
+        b=sOF95aNesvBL2IlhX0kZ5yy6tWjAPhSlAg7bg9zrgOwn7AmaI8FUjzy3/ZaIxIzWM/
+         oEQf7s5Hs7mv/vYJD1cXpHIp1h80k9+UUcIGwq/jXPxLC688tEz3JOKChZsXMh8tCpaH
+         ZKsWi68ZGGJJny2tD+3wghfUIj3O8gkw+oR1feq3Toc9u0SVv5lOp1kRiIyxi3rOcx+Q
+         s3ATQG0sxrk0BCeSxEYPrT+PFh40R+gnSwSJv467B5y7oZM0mmP7buAaewXYh4VihO0j
+         5Vsc9eWRFyPtjGMWMs7nGnjUS0HGNVYE2L9iB5cNxvUTlC5zJA+nDA4R0Wz0QMFvIubW
+         3v5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765551866; x=1766156666;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=d+6NaZj6uCcfjgVjpMn6N6VF0Wu9Lu6jAdnQUGrVPW0=;
+        b=hmlt3RVhK9yDBGWcuVjMS05TA4aI0s2PduGOcL38E61HsUAymOTePgCoqpuPFtfqs0
+         fnYwJHLwcy0+R/l+1eRioPf7yoHb3M3kfImf5+TUim6PxYWDNKfzoLBummj3jIGoGNYd
+         eZU6fBGyVJLTTwzLtiHMARDs/RJ9v1Z0Y8A74egE7qN/WfL+j1ZaxjwocOu05hHK8gZA
+         zQCnqtZuA26NpBoSlkB8XEbOpeNLq+neUGIgGPgzRE1prGlr/sJYlDy/JYcb6QMjniBN
+         6LrPs/uLjQ6EFS6g6wbIwFfmouuvx1O7Rqrj9gjRbQY1A3xghJW9zXH2av0MESA/jZVW
+         ZnTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrp/ptEND062BR3/dqud+ML0G3kc41piDKZYKOIoB0sXURJHt0VR5r0ffArK0epgOpvzU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx969oSzsj+I84kaai9qBqL0DBAfNhGWY0YjeBW3xhKXO3tn9xF
+	SGvuj80UwHKggSUj8o3u9GRuvcrzr7lN4ngKPH3TIozin1ccgfnPUuEaR0GFbSXkGBKGDq+Aunt
+	iDy2rDZ9KMIY2vBJGQ/uahYRb+LUtasP3x3OU0ojHX54sZ/fBiBYDxg==
+X-Gm-Gg: AY/fxX5fuuWVivzvk4di1m/GntyN4aoCC326lT5nHECIbV26Bp1tIORpInVxo9f0Ld7
+	pO2NAMyGcnvEndQacBnwLh2RT+rjSCD89Uy6LHk5gCcgFImiQ+IT6bgF/RVRyJNXIEVlvqgVkH/
+	/o3xJcz7GqvrdxiWx5KUDA5cxwvG+u/V+qAEmKczsi6qcWdvHq7w2HnDb5Q4ADeMkK5AA2Bz0tA
+	HP706PaSicd55NdYhWsnKaoTTZGGXKfmL9xiDYM72s9yX2K3yT6LTqwBe2iWRDwPcgbMG2NArty
+	k4IEPfP2or9Dta5OBeWCCD2lmPVELR1skdyBbuE7ZesvYQ6feHyZ/3xofxf68ptfEVi34s1twWP
+	Nv1ydaVT1jGWv83UTZUJ/x/3+lM9MD+KkdBCMM+PAjn0=
+X-Received: by 2002:a17:903:1251:b0:294:f6e2:cea1 with SMTP id d9443c01a7336-29f2403ae65mr20162725ad.38.1765551866239;
+        Fri, 12 Dec 2025 07:04:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEV1fQTYZ+clwq9ydcPTOFwaYkLMqAp/AA+rJcxVTgTzUunLMGJFAylqzmwqrNF009OwJdo4g==
+X-Received: by 2002:a17:903:1251:b0:294:f6e2:cea1 with SMTP id d9443c01a7336-29f2403ae65mr20162125ad.38.1765551865342;
+        Fri, 12 Dec 2025 07:04:25 -0800 (PST)
+Received: from rhel9-box.lan ([122.172.173.62])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29ee9d38ad1sm57046655ad.29.2025.12.12.07.04.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Dec 2025 07:04:25 -0800 (PST)
+From: Ani Sinha <anisinha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: vkuznets@redhat.com,
+	kraxel@redhat.com,
+	qemu-devel@nongnu.org,
+	Ani Sinha <anisinha@redhat.com>,
+	kvm@vger.kernel.org
+Subject: [PATCH v1 01/28] i386/kvm: avoid installing duplicate msr entries in msr_handlers
+Date: Fri, 12 Dec 2025 20:33:29 +0530
+Message-ID: <20251212150359.548787-2-anisinha@redhat.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20251212150359.548787-1-anisinha@redhat.com>
+References: <20251212150359.548787-1-anisinha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,66 +113,65 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Don't read guest CR3 in kvm_arch_setup_async_pf() if the MMU is direct
-and use INVALID_GPA instead.
+kvm_filter_msr() does not check if an msr entry is already present in the
+msr_handlers table and installs a new handler unconditionally. If the function
+is called again with the same MSR, it will result in duplicate entries in the
+table and multiple such calls will fill up the table needlessly. Fix that.
 
-When KVM tries to perform the host-only async page fault for the shared
-memory of TDX guests, the following WARNING is triggered:
-
-  WARNING: CPU: 1 PID: 90922 at arch/x86/kvm/vmx/main.c:483 vt_cache_reg+0x16/0x20
-  Call Trace:
-  __kvm_mmu_faultin_pfn
-  kvm_mmu_faultin_pfn
-  kvm_tdp_page_fault
-  kvm_mmu_do_page_fault
-  kvm_mmu_page_fault
-  tdx_handle_ept_violation
-
-This WARNING is triggered when calling kvm_mmu_get_guest_pgd() to cache
-the guest CR3 in kvm_arch_setup_async_pf() for later use in
-kvm_arch_async_page_ready() to determine if it's possible to fix the
-page fault in the current vCPU context to save one VM exit. However, when
-guest state is protected, KVM cannot read the guest CR3.
-
-Since protected guests aren't compatible with shadow paging, i.e, they
-must use direct MMU, avoid calling kvm_mmu_get_guest_pgd() to read guest
-CR3 when the MMU is direct and use INVALID_GPA instead.
-
-Note that for protected guests mmu->root_role.direct is always true, so
-that kvm_mmu_get_guest_pgd() in kvm_arch_async_page_ready() won't be
-reached.
-
-Reported-by: Farrah Chen <farrah.chen@intel.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
-Changes in v2:
-- Use arch.direct_map to key off the reading of guest CR3;
-- drop the handling in kvm_arch_async_page_ready() since the read CR3
-  operation cannot be reached for direct MMU (protected guests);
----
- arch/x86/kvm/mmu/mmu.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ target/i386/kvm/kvm.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 667d66cf76d5..257835185f90 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4521,7 +4521,10 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
- 	arch.gfn = fault->gfn;
- 	arch.error_code = fault->error_code;
- 	arch.direct_map = vcpu->arch.mmu->root_role.direct;
--	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
-+	if (arch.direct_map)
-+		arch.cr3 = INVALID_GPA;
-+	else
-+		arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 60c7981138..02819de625 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -5925,27 +5925,33 @@ static int kvm_install_msr_filters(KVMState *s)
+ static int kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
+                           QEMUWRMSRHandler *wrmsr)
+ {
+-    int i, ret;
++    int i, ret = 0;
  
- 	return kvm_setup_async_pf(vcpu, fault->addr,
- 				  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
-
-base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+     for (i = 0; i < ARRAY_SIZE(msr_handlers); i++) {
+-        if (!msr_handlers[i].msr) {
++        if (msr_handlers[i].msr == msr) {
++            break;
++        } else if (!msr_handlers[i].msr) {
+             msr_handlers[i] = (KVMMSRHandlers) {
+                 .msr = msr,
+                 .rdmsr = rdmsr,
+                 .wrmsr = wrmsr,
+             };
++            break;
++        }
++    }
+ 
+-            ret = kvm_install_msr_filters(s);
+-            if (ret) {
+-                msr_handlers[i] = (KVMMSRHandlers) { };
+-                return ret;
+-            }
++    if (i == ARRAY_SIZE(msr_handlers)) {
++        ret = -EINVAL;
++        goto end;
++    }
+ 
+-            return 0;
+-        }
++    ret = kvm_install_msr_filters(s);
++    if (ret) {
++        msr_handlers[i] = (KVMMSRHandlers) { };
+     }
+ 
+-    return -EINVAL;
++ end:
++    return ret;
+ }
+ 
+ static int kvm_handle_rdmsr(X86CPU *cpu, struct kvm_run *run)
 -- 
-2.43.0
+2.42.0
 
 
