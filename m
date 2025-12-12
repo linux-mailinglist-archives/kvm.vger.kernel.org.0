@@ -1,77 +1,78 @@
-Return-Path: <kvm+bounces-65899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65900-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFDCCB9EC7
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:26:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C76CECB9F52
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:37:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B905C30B1D95
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 22:25:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6077530A0FAA
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 22:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FD6291C33;
-	Fri, 12 Dec 2025 22:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A342D94AA;
+	Fri, 12 Dec 2025 22:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4AJ7w4St"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rTirMttk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B6526ED4C
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 22:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268AD2877E9
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 22:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765578347; cv=none; b=O5EURQDdKx5GXEtFOob8plyfhRRSbUhl+TRotPrmoCspXpVB5n92kmyAD3fjlR5YMY23mMsmqfxxvTOsVrpPAMaCA6wOhUq8bw4Z2ii3i+AnpEE24Xf8BxNPoLxrr/PvmvUWeJLlkgdZuGBb8V2SVtA/25AJMigbLPy0tJdJcE4=
+	t=1765579005; cv=none; b=WiDHCj898ZafUNQrvIPwpK3frCtKnRu4sa3D48QTFtGPoxv6WuSnLpxjBmH0oe6xwSeTHjYPhm8xCkTAH1hZLIdao7dWlUx7T9+0vu7+X10ttvWFEpeV9/dIaTp2EK/ODzlcjaEBjRWqqfnUWSMIp0gCAYopvmZ39cbOnco/tp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765578347; c=relaxed/simple;
-	bh=kbOpl9/EBS6WJQv34DS3/RORKeG4Tpro9hVI1b+Wo+Q=;
+	s=arc-20240116; t=1765579005; c=relaxed/simple;
+	bh=9mFmYvzmJytgvfdsMLBBujUvcXmuhikrBpixw/LzYIw=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=bPKqwl7h/K4nlCSliQ0ozC0l5PbHtxdlOnSPP3HLLKE0GbWHi0XWEPx1I3/SAwTcZKp+go6hzhY7lWgxFiLsVEno5kZwF6w/ifkiwUg5W4BeSORAJwXtnq6ss6UVfFxSee7AjiP00uyk7AQ/vmZWgY3agpHCb1YhjToRi6PSd8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4AJ7w4St; arc=none smtp.client-ip=209.85.161.74
+	 Content-Type; b=JFZkRARZ4cyFPwAimpqfbEPCHBezolQ99D6mYXTPWxHXixjXgmSdtyeWyJeXFz0IbgNAxbGFB1r2bDFxpSjOjHlzTi2HbOAo8MBbDa4QDQ9zF7B7z03wInm3G5BxLraDLh1xh0dtbdTKgCqI7JcEAv9d/mps9rk5yfh6Jb41GpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rTirMttk; arc=none smtp.client-ip=209.85.161.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-65b325457e5so1435966eaf.1
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 14:25:45 -0800 (PST)
+Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-65b342ac488so1410669eaf.0
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 14:36:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765578345; x=1766183145; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765579002; x=1766183802; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=kTtJNntNErDibGFF1qkwnsYLDpE8m9agPY4m5XiEmeI=;
-        b=4AJ7w4Stxn4zo4pMPqrbCVRQNLPO1IoxYFNjdYOIEhv/GaUdKFB5aPLyWzUZmClVBA
-         Movgeh+WEAiAcvYylPxGti1NOiF9oJ9TAY85B4Vj42dcTmafBIvwVxebcc7a2jCRaY+G
-         Uurdw5KNm7dVA4Yfh0m2pGPgdIoD+dcd/L2DlAghJ57t4WvmjZwTYuNo1akbwnFVQtiM
-         DeJcWsNiJh3Ju+JpAw7MRN5/xUtXF30gohcgNOEOhHwLYOow1m23qVddchK9+unhrlna
-         JxJ/nGLSLEIo+XilhFyO+u+9V9Q+sV5ueIjSuK7crWiz9X+SBPostV7bCk91W8SaHCvS
-         ImzQ==
+        bh=3V7ABHshgDafwAwYHEV+MXsyHyX7z1eKDaoAGOxARUw=;
+        b=rTirMttkQrnbaFs8ND7eaXf3Y2Qzag51ROsEATytlhkUOYEg/Jp8mKIz9cTYONj0hB
+         i4m7qIfpigLAIinGJTdN4t+ZnwXgUxq1zzjn/O//u69WOXNlJHXBAIpTZ/fnb/gNsSo8
+         9HT8A25JI+BaBZY2lgByhz7ypeTm9aT8uc7mMMblKOUSOv9HspK+KRLNal81or2lsrqR
+         Aia4/dwe8hA0uWoVuCgOR3pQ533UI8yXaexHHQ+m0sPZN14XefyjDfs1Qpvd9vXgis+m
+         ovz8xTFGLD+2DuNPINpgLKo8X2gK+IiKTIb6Q/WnVtbvp9QdVs75fxL8cnUE8OcNSP5D
+         9I4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765578345; x=1766183145;
+        d=1e100.net; s=20230601; t=1765579002; x=1766183802;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kTtJNntNErDibGFF1qkwnsYLDpE8m9agPY4m5XiEmeI=;
-        b=YDUP/b8FiLrMO61v5AgLuKn8cYLxkfMrBGYqCqRF+lSPj/n09/66joyTj05bohn3qJ
-         92Du3TIF8gHA2i26VQxCOUjuY/jy3LFlQms5z3DnibaqAoOYVuox+MjooMUK7fvKzht5
-         SFgt/Armu87xZYsyMYXyHfwyWpSiJErF3bE1wGhg1jfxbtBwS6wYHP6up5ZR69bW5h2l
-         wLmPkt5DyE5hflpEcjwP9Vj97aJHOTflLgAR6g4h5awwUn9WRR8D5XOGHOeEsRI9SATj
-         5JLnjzRVXOtjVU12Wx42JtV7eIQ1i7dyGIg2KLivoZ052cb6FUpkWDxborcQG6OU2PC1
-         TObQ==
-X-Gm-Message-State: AOJu0Yz/D111r/ukehVuNay4lea2CKixB1YFuKckyhSWMAfcmvvx0b+Y
-	ZjGzaqhhcVIF/NOwQeSp+mgWM7DbLxbjh7PhbcPK9xIwhRnppc9I3P2OxbopXX756PR/0b959/j
-	zhuoTifBiPo3or8ynAoGFKCo4rQ==
-X-Google-Smtp-Source: AGHT+IGhwhSlHWOdHiYNzV9FksIu24P3urR9RfAnI9PHJHO/oofMWeWBwj21tpDMdRbsZ5qCySgnl+QY1Z9IQMTNWA==
-X-Received: from ioyp8.prod.google.com ([2002:a05:6602:3048:b0:948:6160:f5b])
+        bh=3V7ABHshgDafwAwYHEV+MXsyHyX7z1eKDaoAGOxARUw=;
+        b=AYe94YluWf97afTTp5cJYtGiC0+k4w0TXNrBddPg1QcyMh/zN8Q2SVJbTHaBHm61Ff
+         KpvkJ4LSbzYPm8SxNstAE5MZHAW4fzq8t4Q/J8o1QpiVr5vl4OT9M2gFHL+hfYBiE26n
+         ZuANs/yT3zBJ01HFfe29bvXBYpaCxQxLmluiPZdczUqD97qrBALoPSt99gABFcadhhcw
+         WBdXj5k2DEX9l90MwyRabBY1jr4kRmChmhRkpRUM4iKfvuKyqbjIt3KwqkbclYVebX5l
+         ce5C3HWmG78VT25kuCO80n0U116UKqytAQmRNZG6gejfwCpOUwKrsrz5MiGRBhg08/9+
+         VZTQ==
+X-Gm-Message-State: AOJu0YxRpTX/LWzmxx0auCJpK+rVqoHXRY6W5JzysV1sM2fygYTKGivT
+	0GmskLwYnZk9ppslx3YFRkiLHX6PG8UlCQLDtZe27HXyaFOntSyU13V0qVsFdwdLNPYI9+brUdF
+	6RW/1lSuDnoqeT80PyxTltIY6uA==
+X-Google-Smtp-Source: AGHT+IHkZVgWFjBleB6izi/mYS6b4xrdOCdIwFPbm2svitIfX3LWxEQK52duuNdAGmZBwWfL5PIEmP5Eu+rxvNmu9A==
+X-Received: from ilbbl8.prod.google.com ([2002:a05:6e02:32c8:b0:434:972f:bf90])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:a05:b0:659:9a49:8e64 with SMTP id 006d021491bc7-65b45253071mr1578654eaf.52.1765578344930;
- Fri, 12 Dec 2025 14:25:44 -0800 (PST)
-Date: Fri, 12 Dec 2025 22:25:44 +0000
-In-Reply-To: <aTidfRwYLYwTfmK_@kernel.org> (message from Oliver Upton on Tue,
- 9 Dec 2025 14:06:53 -0800)
+ 2002:a05:6820:2223:b0:659:858f:f1d3 with SMTP id 006d021491bc7-65b44ff60f4mr1625746eaf.0.1765579002046;
+ Fri, 12 Dec 2025 14:36:42 -0800 (PST)
+Date: Fri, 12 Dec 2025 22:36:41 +0000
+In-Reply-To: <aTimpRFfr9wI9Hw5@kernel.org> (message from Oliver Upton on Tue,
+ 9 Dec 2025 14:45:57 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <gsntecoz2v87.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 19/24] KVM: arm64: Implement lazy PMU context swaps
+Message-ID: <gsntbjk32upy.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 20/24] perf: arm_pmuv3: Handle IRQs for Partitioned PMU
+ guest counters
 From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
@@ -86,135 +87,43 @@ Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
 Oliver Upton <oupton@kernel.org> writes:
 
-> On Tue, Dec 09, 2025 at 08:51:16PM +0000, Colton Lewis wrote:
->> +enum vcpu_pmu_register_access {
->> +	VCPU_PMU_ACCESS_UNSET,
->> +	VCPU_PMU_ACCESS_VIRTUAL,
->> +	VCPU_PMU_ACCESS_PHYSICAL,
->> +};
+> On Tue, Dec 09, 2025 at 08:51:17PM +0000, Colton Lewis wrote:
+>> Because ARM hardware is not yet capable of direct interrupt injection
 
-> This is confusing. Even when the guest is accessing registers directly
-> on the CPU I'd still call that "hardware assisted virtualization" and
-> not "physical".
+> PPI injection, it can do LPIs just fine.
 
-It was what I thought described the access pattern. Do you have another
-naming suggestion?
+Clarification noted. I will update the message.
 
->> +#endif /* _ASM_ARM64_KVM_TYPES_H */
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 0ab89c91e19cb..c2cf6b308ec60 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -34,7 +34,7 @@ static int cpu_has_spe(u64 dfr0)
->>    *  - Self-hosted Trace Filter controls (MDCR_EL2_TTRF)
->>    *  - Self-hosted Trace (MDCR_EL2_TTRF/MDCR_EL2_E2TB)
->>    */
->> -static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->> +void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
->>   {
->>   	int hpmn = kvm_pmu_hpmn(vcpu);
-
->> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h  
->> b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> index bde79ec1a1836..ea288a712bb5d 100644
->> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
->> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> @@ -963,6 +963,8 @@ static bool kvm_hyp_handle_pmu_regs(struct kvm_vcpu  
->> *vcpu)
->>   	if (ret)
->>   		__kvm_skip_instr(vcpu);
-
->> +	kvm_pmu_set_physical_access(vcpu);
->> +
->>   	return ret;
->>   }
-
->> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
->> index 8d0d6d1a0d851..c5767e2ebc651 100644
->> --- a/arch/arm64/kvm/pmu-direct.c
->> +++ b/arch/arm64/kvm/pmu-direct.c
->> @@ -73,6 +73,7 @@ bool kvm_vcpu_pmu_use_fgt(struct kvm_vcpu *vcpu)
->>   	u8 hpmn = vcpu->kvm->arch.nr_pmu_counters;
-
->>   	return kvm_vcpu_pmu_is_partitioned(vcpu) &&
->> +		vcpu->arch.pmu.access == VCPU_PMU_ACCESS_PHYSICAL &&
->>   		cpus_have_final_cap(ARM64_HAS_FGT) &&
->>   		(hpmn != 0 || cpus_have_final_cap(ARM64_HAS_HPMN0));
->>   }
->> @@ -92,6 +93,26 @@ u64 kvm_pmu_fgt2_bits(void)
->>   		| HDFGRTR2_EL2_nPMICNTR_EL0;
->>   }
-
->> +/**
->> + * kvm_pmu_set_physical_access()
->> + * @vcpu: Pointer to vcpu struct
->> + *
->> + * Reconfigure the guest for physical access of PMU hardware if
->> + * allowed. This means reconfiguring mdcr_el2 and loading the vCPU
->> + * state onto hardware.
->> + *
->> + */
->> +
->> +void kvm_pmu_set_physical_access(struct kvm_vcpu *vcpu)
->> +{
->> +	if (kvm_vcpu_pmu_is_partitioned(vcpu)
->> +	    && vcpu->arch.pmu.access == VCPU_PMU_ACCESS_VIRTUAL) {
->> +		vcpu->arch.pmu.access = VCPU_PMU_ACCESS_PHYSICAL;
->> +		kvm_arm_setup_mdcr_el2(vcpu);
->> +		kvm_pmu_load(vcpu);
->> +	}
-
-> It isn't immediately obvious how this guards against preemption.
-
-> Also, the general approach for these context-loading situations is to do
-> a full load/put on the vCPU rather than a directed load.
-
-Understood. Will fix.
-
->> +static void kvm_pmu_register_init(struct kvm_vcpu *vcpu)
->> +{
->> +	if (vcpu->arch.pmu.access == VCPU_PMU_ACCESS_UNSET)
->> +		vcpu->arch.pmu.access = VCPU_PMU_ACCESS_VIRTUAL;
-
-> This is confusing. The zero value of the enum should be consistent with
-> the "unloaded" state.
-
-That's the way I initially wrote it but it had a problem on a different
-kernel. I forget the exact issue, but I never saw the problem on
-upstream so I'm happy to go back to it.
-
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index f2ae761625a66..d73218706b834 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1197,6 +1197,8 @@ static bool access_pmu_evtyper(struct kvm_vcpu  
->> *vcpu, struct sys_reg_params *p,
->>   		p->regval = __vcpu_sys_reg(vcpu, reg);
+>> @@ -961,6 +964,12 @@ static irqreturn_t armv8pmu_handle_irq(struct  
+>> arm_pmu *cpu_pmu)
+>>   		 */
+>>   		perf_event_overflow(event, &data, regs);
 >>   	}
-
->> +	kvm_pmu_set_physical_access(vcpu);
 >> +
->>   	return true;
->>   }
-
->> @@ -1302,6 +1304,8 @@ static bool access_pmovs(struct kvm_vcpu *vcpu,  
->> struct sys_reg_params *p,
->>   		p->regval = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
->>   	}
-
->> +	kvm_pmu_set_physical_access(vcpu);
+>> +	govf = pmovsr & kvm_pmu_guest_counter_mask(cpu_pmu);
 >> +
->>   	return true;
->>   }
+>> +	if (kvm_pmu_is_partitioned(cpu_pmu) && govf)
+>> +		kvm_pmu_handle_guest_irq(govf);
+>> +
 
-> Aren't there a ton of other registers the guest may access before
-> these two? Having generic PMU register accessors would allow you to
-> manage residence of PMU registers from a single spot.
+> The state ownership of this whole interaction is very odd. I would much
+> rather that KVM have full ownership of the range of counters while the
+> guest is loaded. By that I mean the PMUv3 driver only clears overflows
+> on PMCs that it owns and KVM will do the same on the back of the IRQ.
 
-Yes but these are the only two that use the old trap handlers. I also
-call set_physical_access from my fast path handler that handles all the
-other registers when partitioned.
+If I'm understanding correctly this is a code location concern, because
+the host driver has to handle the interrupt in this function or a callee
+of this function.
 
-Agree on having some generic accessors which you mention in an earlier
-patch.
+I will do it that way. It would be duplicating a small amount of logic
+in kvm_pmu_handle_guest_irq() but I see your reasoning.
+
+> Similarly, KVM should be leaving the "guest" range of counters in a
+> non-overflow condition at vcpu_put().
+
+Noted from your comments on kvm_pmu_put()
+
+
+> Thanks,
+> Oliver
 
