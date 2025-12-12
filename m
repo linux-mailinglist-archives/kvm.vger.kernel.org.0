@@ -1,119 +1,142 @@
-Return-Path: <kvm+bounces-65885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E257CB9907
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 19:27:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA740CB9911
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 19:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6A4C730168D4
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 18:27:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1A5D0301841C
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 18:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDE130217D;
-	Fri, 12 Dec 2025 18:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A80B3090D7;
+	Fri, 12 Dec 2025 18:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AZwcHLoo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N8xEvMul"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE50730277E
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 18:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765564042; cv=pass; b=oalr9X5GHOJgbqtMjLZ72u97Bulyug8Wc7jPtHa0qaaViUrm0JwrEsSVKAAgS8zWN5JCxnxoVRFPCEqHGlnXttetIE3K9JvioAgUiy1DGaCG4vZe+U7OPWtDsy1owOJxkIH0OhbLVQC+B3/FuAp5yvY5qFW1S4LaqIjtI9P+vfw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765564042; c=relaxed/simple;
-	bh=ZYbD5s2BLbI8MeUy7NCfgvLkDOCx06XEvbFRg0yMOqw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W+oftm5WoBQ5oBiyU6XZQS/vgsWZmL1dFCYIpuocd1+uwZ0NFfa7Jv8zQjyCwMJ1L8ECYucIKWMSO4B/cgy8ZTRegIRvbB2CwiANqXhrIgwu548+aYPJfFqILI5XwAbNC/pMuOIuJgNCVrxc+uZtE9O65sIfphmyI6CPGepy33c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AZwcHLoo; arc=pass smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19799463
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 18:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765564347; cv=none; b=MvapmugMBovG2xFRp+AeOyBFFm1OJu4jpSrA3bxG/7y6ivp/+cdI55gtz5v3Jz2olmVZBrXg56RLJBB4WYV805aIWl4oCLGK7tPMnV5PfVATC5DZ2tHbqR99vx5Kf8y6A4zLTJogYyr2owgHPON08u39nzC5HwX15NKc9FHNa0U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765564347; c=relaxed/simple;
+	bh=sX0TzwrQtYiV3zBkNA0USI+pMzU83oS0G0UzV3jMIQY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=inahc0hhulLS1NHbV0S0FH5rMuaJZF2NPAbFaLM581pPHIBsOpOsoNlNvDESB3qfjEn0KKwZUDqKSivb7fyk3o4glPiZHALouK79EsGILrEpemajYXvy7RdDAirzby7xjFtVj+Xj6S1Jx5/Z0kT6bh7a69q/DrIdPUE/XiDX6vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N8xEvMul; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-29f02651fccso306975ad.0
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 10:27:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765564038; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PDs0ZwpnOnpGPdbghcUjq4JIFsqIYs2g65+wcy4plsouvyvZXN9DvGCq7bZ0qIpD9A
-         xQAuRKmrb0q4iQ/dWg60g3KBfc1ITiF+ZjIt0Fd1QhEr6qsqAk0jXlAGvyuVGaqJJHqW
-         Ns2iSkogH0IzZoquB9lcpfMbFNWEhE6DAKwqN0vFUgrBU94+VbJ+slc1HFrhktj3WDy6
-         m7mMEDe1nQXGtJNka1suAyY8IsF0jqs0i2Q/KKmXtfzK0Ig7zTowchAnWuBvl0bc3CrT
-         ySJcsuNQs5//9enz5X/BwTFaJtTEV1MWChKvUhj1UMf6nGUMQ4wdNG/LHW2xGUw/3Z42
-         niKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NkZghPK8viXbu56gCwsQwiQOoaB5CuA66D4U7p8VN5Y=;
-        fh=x3x9s72TxAsbTtBFeZi4M7MdoMcwgzWJzR9tRqeOCFI=;
-        b=U90AYNrqOagMRa+6ZdbAbuivUyoU3kGmY50sdGXC9qanMbGLtjfOe1KMQHOntbX8a0
-         dgjghQXdgMKHVQfki36sdEGhWmWdufuGFVtVw6F5B3yYsK9+oOX9tmRDTpLnwbBYOkE+
-         7z9ETqa40nB7y/l6D8OP4Rr5u7tSC+0sbX23fMDDaLNvoIqxBmNkA2zQ2ArFPQ+EOIks
-         cnZXhUKMfJ9OkF1s+xcdYe56Y+1XG2o35ECQBe3pWeOv8pVQ+8djkhIpt3EkF/RmhVWa
-         G4KQz1i+cDQvdbqSJOC1Pmg4JYMFwg04hSnVoHpfU/1hcUldS8z7HxYjzuS2LLrCvi+U
-         0QEw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34a907477b3so2638234a91.2
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 10:32:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765564038; x=1766168838; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NkZghPK8viXbu56gCwsQwiQOoaB5CuA66D4U7p8VN5Y=;
-        b=AZwcHLooUSE4vVuk4ym1gvy52xh6jlPpEPZ+NDjQWSleeKBQBsYw3ELoIf1r95CQAW
-         N/AIXfIIxEBGPutzTOSZ3qzJGi24vAH2sF0dgcJXG1V3fMhUeps7fnGF2PcU5CJEr/3+
-         VJ2EfVgPF8Wk/L8K+uuuUlUjPjovL5XvKvH+FhqU5j6Wl4RZH5iDa4sXaJNTbW5NVTzM
-         pwzwseHR0q2vng91N9zjjtL4iJfuASy2hBi7HNHWi1DayEVFlhhR1LZFBsWES/ZLxsMn
-         dXw36gSHR0DljZzhvsE27SoaW5fDv4Rk3G8zSdtACO5uJ6b6PcgLZ58KJaEZj53Rnec5
-         s6tA==
+        d=google.com; s=20230601; t=1765564345; x=1766169145; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/s9FeJOSMjA6/j6jq/9mb0CpNCTtxRCvkbabRq0HCM=;
+        b=N8xEvMul+napNTZR9feP/tTuE6n5zLQbw6Wuon9k5GFWJBvnguGY7UH6OMQagzIAx3
+         lgBkAbMOWkuq4OJEVHd9a4VKDpDH2kJDFARk7PWWPZ4EENyEaZMAm2S8+/wp0qWd7YT+
+         8meFe1K2fctJb2JoPkflB1SOzbQog87ZoqyR0ZysvS1QFSMfP3msr7rL5KEK1hLu/7cz
+         6OVzkQ2TNJ+kW0tKilG2ofm1ohRYgwb/QNKCNFdL/S9OW09H6ioupa31mbN++v49QtC6
+         jQpGDqX10Ab30CSsNGSpnkR+oHs7xKvz7QkA8ekUw9/pCIKC8kkTxF3BgcITEI6PKDjv
+         6LbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765564038; x=1766168838;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NkZghPK8viXbu56gCwsQwiQOoaB5CuA66D4U7p8VN5Y=;
-        b=qfRMkPiQdEiAZE6bclvn8wFSYfK+kICmK0T3afmUqFYHc2KSuwaEVBV+nbBiegmpyX
-         06cr3R46PQbHxQ9S8hh2pY8aZH7sHBWQTGG4kn6W6UAwf3uJGt9hrLaXivxqrO7iI1i6
-         ytJN1hEZu3eNUsHglPfBgU9ka9X2G8jfbtSXenUAN5jCjltj8p09pMwF0lznhWLTXVdE
-         Au5hW16RL2q6o1D2N36dwwQrPabxGorYczORPqceXmC3UtQR9Q1H6RlR8ClFNhCDD8Y+
-         sUFO2oXZ5kJ3NXqCo0PVtOh1EKmbBB8HOlyZ6XrRegDgovMJEb1z32cw5unTE/+b9B7V
-         Z8BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAUURQZgxANGxe/w5jjd0igBmfNp5l8X7GOyN+TkQZpeiaabF+s0uAXHRb7rkM8A7LXo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySBvR6aJREr9677RFjUV11YXQkdFUh3gB5NX7UPyzjyqtc0tEE
-	7F1/bcbtSA093qZ+52EXgGcyWRgVGa77fhSL392qCixr5ddnhDoDqe3LEFUwdctfO/hT31n2pOa
-	2D2FB+/BI9LPFaiB+dxnBNrNgTjHw0jw5eYyJC3Mf
-X-Gm-Gg: AY/fxX6TBlno0pbBeYRqZoA5zLwRbCblcL8zRWo8PDre/Rv9kg6bveFMJfhm3odL2L0
-	23rX8+kH8OeWB7wwPFUaQ4mldOkyVf2cFBsKlTWdHxREMa2oFcL/4CNviMz+0soND0Wgi2fa5F8
-	LR+m5yYJrK/B6PYgWayLp/rsdrlL9Iil17wIMGidbWrZ5bBXwPTbOpDD7bg/Ch0PepFFb6+9Ic0
-	3kZyMg+0MhbVLNnoNOcNOiMaP9Xi8KBtMb09NYgSFNZac80iaUu5IUhhcQ0WgcnttdG1dA=
-X-Google-Smtp-Source: AGHT+IE8vkwPdXd5YtqFuKi6cZTlNeajvmp5hBP5RLuopyFVJ/H4cQgnuZ3env0p2MnZTOT/iM3kr99Hf37iXbds288=
-X-Received: by 2002:a17:903:1b63:b0:298:45b1:6ef4 with SMTP id
- d9443c01a7336-2a09060d850mr42035ad.12.1765564037840; Fri, 12 Dec 2025
- 10:27:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765564345; x=1766169145;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T/s9FeJOSMjA6/j6jq/9mb0CpNCTtxRCvkbabRq0HCM=;
+        b=NjFAgRbyRYF0rginop3wo82+Lvcsjn4bMpP71DMRM0uZjTGYr9uJCh3auBoWg2mQF9
+         XjMUSpcCrcXXVwAzkUQ6DpsUFNNHNdeL2B0vbbB0e3tLDRBo7wRMTGZJKOZiBPrTN75/
+         kZ3XNfGQUTZ3t37G6XLtcq1rqLoTcNd55KEpAvkO3IQ312tz3Y/L+QQpDOWYoOoB1+fI
+         424QlTh+dZXTCWjJguszd77l++y51JKYCCheVrsUKhqHOIVLYhNkLXs3/EkcvCEXaBDz
+         ad5jkJnvE/jki17WdD71LZBUCtTYFnC2MYySqcrjHCbRtSFIlpSyp9DmxgePnCaR5y5A
+         WNag==
+X-Forwarded-Encrypted: i=1; AJvYcCV/Lu2LVme4Kb+ELk7UIlE7EknKMOaXgxXYAyeef/JyHv+Gqe854vYHf/8QvpHG1I1dFNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfeNN9v0xZyjZGcxqBUl+b8jg6jhQOHjgp8eAYhw+AApzBsKBS
+	2iTRoIONlRm2Ojks9r4GrdxJZHhJHCxTpzNOHPagPnA1sYe8KHf2ySAtuxLE2BQFgWOWxA/SPhx
+	eHqjDsw==
+X-Google-Smtp-Source: AGHT+IG9IYDkz8u1bbgxa6iFV/lfrltypfsubC45S38kfEVEj3Vh79p38ebTwcVynjMWyR/d6kxZi2LxQRI=
+X-Received: from pjbgn5.prod.google.com ([2002:a17:90a:c785:b0:34a:4a21:bc22])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:9988:b0:35d:5d40:6d78
+ with SMTP id adf61e73a8af0-369b69afd72mr2796296637.46.1765564345243; Fri, 12
+ Dec 2025 10:32:25 -0800 (PST)
+Date: Fri, 12 Dec 2025 10:32:23 -0800
+In-Reply-To: <pit2u5dpjpchsbz3pyujk62smysco5z37i3z3qosdscx6bddqj@i6fjafx5fxlz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251210181417.3677674-1-rananta@google.com> <20251210181417.3677674-3-rananta@google.com>
-In-Reply-To: <20251210181417.3677674-3-rananta@google.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 12 Dec 2025 10:27:06 -0800
-X-Gm-Features: AQt7F2paqjCW_yLgIBSgztw1AtJ7Iq40XTxchY-Yvj739u3-vqqR4aJT4su2flQ
-Message-ID: <CAJHc60x0bKioh1cgE_KXWjxnDYC3H06RJ_0ZCsgd0q6SbaS3jA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] vfio: selftests: Introduce a sysfs lib
-To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>, 
-	Alex Williamson <alex.williamson@redhat.com>
-Cc: Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
+ <20251110222922.613224-5-yosry.ahmed@linux.dev> <aThN-xUbQeFSy_F7@google.com>
+ <nyuyxccvnhscbo7qtlbsfl2fgxwood24nn4bvskhfqghgli3jo@xsv4zbdkolij>
+ <aThp19OAXDoZlk3k@google.com> <fg5ipm56ejqp7p2j2lo5i5ouktzqggo3663eu4tna74u6paxpg@lque35ixlzje>
+ <aThtjYG3OZTtdwUA@google.com> <pit2u5dpjpchsbz3pyujk62smysco5z37i3z3qosdscx6bddqj@i6fjafx5fxlz>
+Message-ID: <aTxftw3XcIrwyTzK@google.com>
+Subject: Re: [PATCH v2 04/13] KVM: nSVM: Fix consistency checks for NP_ENABLE
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 10, 2025 at 10:14=E2=80=AFAM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
-> +
-> +static int sysfs_get_device_val(const char *bdf, const char *file)
-> +{
-> +       sysfs_get_val("devices", bdf, file);
-This should be 'return sysfs_get_val("devices", bdf, file);' . I'll
-fix it in v3.
-> +}
+On Tue, Dec 09, 2025, Yosry Ahmed wrote:
+> On Tue, Dec 09, 2025 at 10:42:21AM -0800, Sean Christopherson wrote:
+> > On Tue, Dec 09, 2025, Yosry Ahmed wrote:
+> > > On Tue, Dec 09, 2025 at 10:26:31AM -0800, Sean Christopherson wrote:
+> > > > On Tue, Dec 09, 2025, Yosry Ahmed wrote:
+> > > > > > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > > > > > > index f6fb70ddf7272..3e805a43ffcdb 100644
+> > > > > > > --- a/arch/x86/kvm/svm/svm.h
+> > > > > > > +++ b/arch/x86/kvm/svm/svm.h
+> > > > > > > @@ -552,7 +552,8 @@ static inline bool gif_set(struct vcpu_svm *svm)
+> > > > > > >  
+> > > > > > >  static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+> > > > > > >  {
+> > > > > > > -	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+> > > > > > > +	return guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_NPT) &&
+> > > > > > > +		svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
+> > > > > > 
+> > > > > > I would rather rely on Kevin's patch to clear unsupported features.
+> > > > > 
+> > > > > Not sure how Kevin's patch is relevant here, could you please clarify?
+> > > > 
+> > > > Doh, Kevin's patch only touches intercepts.  What I was trying to say is that I
+> > > > would rather sanitize the snapshot (the approach Kevin's patch takes with the
+> > > > intercepts), as opposed to guarding the accessor.  That way we can't have bugs
+> > > > where KVM checks svm->nested.ctl.nested_ctl directly and bypasses the caps check.
+> > > 
+> > > I see, so clear SVM_NESTED_CTL_NP_ENABLE in
+> > > __nested_copy_vmcb_control_to_cache() instead.
+> > > 
+> > > If I drop the guest_cpu_cap_has() check here I will want to leave a
+> > > comment so that it's obvious to readers that SVM_NESTED_CTL_NP_ENABLE is
+> > > sanitized elsewhere if the guest cannot use NPTs. Alternatively, I can
+> > > just keep the guest_cpu_cap_has() check as documentation and a second
+> > > line of defense.
+> > > 
+> > > Any preferences?
+> > 
+> > Honestly, do nothing.  I want to solidify sanitizing the cache as standard behavior,
+> > at which point adding a comment implies that nested_npt_enabled() is somehow special,
+> > i.e. that it _doesn't_ follow the standard.
+> 
+> Does this apply to patch 12 as well? In that patch I int_vector,
+
+I <something>?
+
+> int_state, and event_inj when copying them to VMCB02 in
+> nested_vmcb02_prepare_control(). Mainly because
+> nested_vmcb02_prepare_control() already kinda filters what to copy from
+> VMCB12 (e.g. int_ctl), so it seemed like a better fit.
+> 
+> Do I keep that as-is, or do you prefer that I also sanitize these fields
+> when copying to the cache in nested_copy_vmcb_control_to_cache()?
+
+I don't think I follow.  What would the sanitization look like?  Note, I don't
+think we need to completely sanitize _every_ field.  The key fields are ones
+where KVM consumes and/or acts on the field.
 
