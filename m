@@ -1,142 +1,82 @@
-Return-Path: <kvm+bounces-65905-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22528CBA0C1
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 00:31:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4696CBA0D6
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 00:37:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6EF8C300F1A9
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:30:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D27C1301A95F
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B812DF13A;
-	Fri, 12 Dec 2025 23:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCD330F534;
+	Fri, 12 Dec 2025 23:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4OkbuOV/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKkZNzUD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5487D1E4BE
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 23:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040BA1E4BE;
+	Fri, 12 Dec 2025 23:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765582255; cv=none; b=F/GG5u2dOZydx4hZQyFlLw8Aqpdr/lkao9jsZ/GZswpXYlZm+G8zg0bkD+8egaV9b6cT2xm1vPbc+Trqo1QhYr6HWgXAMQ/E1bJA1eQMq/W/BqTPmNIqBL68nEZM5s4h0XK4s6AA/8OnYhipnH38kfhsuzgwoL8WyYGM0P18q24=
+	t=1765582644; cv=none; b=B5jYOScBfq8CcA0Vk9q9NIJCocyO/NjPf+bAXznm9vW0/890XzzcHDzuXJpe4FCzRfhtq7tdbzGlQ3w1tsEaixyAsE6Nt9JQH32Nd4G10zvVZzWePhRBEAYooIGae0u0Zyy+6Ptrn/DLhylTKBQqeQqk2GMW9xKs4ly0958Dano=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765582255; c=relaxed/simple;
-	bh=vRlNzepxx+5wdjlhRvJZqkLWzWtdMkj9WKyQgqEmQ04=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=vFqmMLvdo9PbPKlUpaI+gwo7pBJkIUwhvREJ1LemhaTUYe0RvzXcmT1NqCwXcCdlX9ga3lY/tpoaLJuzY70HpGFfYPaboHHw4sCMFCKHZEsmcdZSGF0OfkizhcQZfNrgBh+XfUyD5SXc4sNEs/zLlEMOOXuiPL0OOWGIkAXKvFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4OkbuOV/; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2958c80fcabso34519185ad.0
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 15:30:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765582253; x=1766187053; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YPUFnzvE1LGEB4EPZqcNEIbrRSKbBQjakqo88MsCIoE=;
-        b=4OkbuOV/pdi6IVoxafvCzMA1vnSGiSDxTWbSHyn56MdNx4ckCCKmv7PAGrD03Jykpw
-         b21dhloYAbIW7C4yBeNv6THcA/OpdCU89PUN8w7pLKIPAwL1qROxhd9uRBYP+Wj2jA+m
-         4CPEUDWLDJTuioikmdopSzl7047qVkajGhx0AUe6MYT0RRCqWvoDS5IyfHovoX352tWO
-         1Z9SVtR4KbKLQ5P5r9YeLb8YRrySyYznsezykbUOF1fOpV8dB/trjKJcbTYkqFGdbltj
-         54iGfl5rbjuqqHN8NGWc6GpC58psBkB8/ystzpj5Gd56VdZuoqj/Qcp4SboYkOh2vf3u
-         5FaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765582253; x=1766187053;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YPUFnzvE1LGEB4EPZqcNEIbrRSKbBQjakqo88MsCIoE=;
-        b=JDqW77nxwl/lW3OmBvxGBhz1r0sO6sT2VY6kjoqop9ePkvobp7HFTY8zdk8a27kytl
-         Yc925vU+iaWdLbiqE6ZKx4mcd/imd0ZbZjQhDM27UwDBxFIQ8VBnF03kAYLZm3SmRHp1
-         tPOjPXFvKjoPz2IGEttu71Op5hRaL7g58WW/2xoDVvH8PsZCcI8g3v0Bg0GF0faORo+a
-         wJF6OCCii1akXU2MkNiSq5hO5odCW2xfaRcuxaOj0nyiJ0wvXjLKxKlAL0PwJONJz/rL
-         YXgo14jTgZWOPOqxb1raXWk+2qJJzB/xOd3mEZdApMQxv9ETcCjV1Bhq98dhE7VJfil3
-         oeFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWP4OTiA9sZ9WgYVml8ecA1ZbjcA7yFMMS12ochUaHkeEj/5EqcfpWevuppJdY3K2QeBMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT3HLcdOK4YlfKvLnNChd7KQWoRNCxNRP0yazTjrrfOumCv1W+
-	M4BBF4nlEjBmBcSBae6b+7fqsMGihAlCngwuChXLKuX1ugNUOxtj+8YEsrGWJIkbE/mYPqLXczK
-	6FljIow==
-X-Google-Smtp-Source: AGHT+IGYc4JneoK0W3Ry4kHv+mU/5C5A2YvBBXCemPA8KOIIIESsSEA5ZqJLu3i859Z2kGVle0Eh7AiB9cA=
-X-Received: from plhk10.prod.google.com ([2002:a17:902:d58a:b0:29d:9b42:7557])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ef12:b0:29e:9c82:a925
- with SMTP id d9443c01a7336-29f23b1ecc1mr40903325ad.6.1765582253522; Fri, 12
- Dec 2025 15:30:53 -0800 (PST)
-Date: Fri, 12 Dec 2025 15:30:51 -0800
-In-Reply-To: <zozt7pbeqn4ekiyrkwjbesqv6sxf6seyskfbnhzz5do2an4zbl@q6pdskoiawvc>
+	s=arc-20240116; t=1765582644; c=relaxed/simple;
+	bh=RnNBth3zFPDybQ5SK+aP72ZOJeINc0ldHHmonazGgFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uFP/sQHwBvw9OTdI59G39AnOp+w/AO8Ngh4FCvKjCS3vDOxanXbgoGmcV+MVwxuMhwK3QvPJ+AbX9KHxySSj+6fz5sCc05eJ21ABiIxG5AWHA72+QfJy7Dgqo8i6SaZebAD1Ltcpnhosv+QkOUqna8zPb6DR3yd8TbVoBs3xNZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKkZNzUD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39AADC4CEF1;
+	Fri, 12 Dec 2025 23:37:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765582643;
+	bh=RnNBth3zFPDybQ5SK+aP72ZOJeINc0ldHHmonazGgFI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YKkZNzUDZ94nMV0srBwMYrpcOSCN8ky7WFO355LtaXbWTFwIC2yetK4Ql6FW5lPHm
+	 RvhNA7E+BdfsvN8wlp5/TA5wwTsA3HNM2TQuP/xaxRo6eDJZa2MwjGT9lIjnZBIZkT
+	 3xAjZ0feF6uARkNZmYyJq6zt34Kkx2dvKI6bKQt1Sl2zNura0xCaMLj0pM0NITZuyC
+	 /dJxCAVIqp6ccGb9UGPMUltiH/rovWz1+jnW2c0g6C6HL4UO/ZSfS7Qs5wPGrjYi7P
+	 L6fzkivQ1htpnx7W48o1Nkw/1IXWmVKHC7WJZ2fc3iYU7p/0zvD8ukmxvdLVYfcVea
+	 VW/gL3EI3r0DA==
+Date: Sat, 13 Dec 2025 08:37:17 +0900
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+ horms@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
+ syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
+ syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
+ xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v4] net: restore the iterator to its original
+ state when an error occurs
+Message-ID: <20251213083717.44fb78c4@kernel.org>
+In-Reply-To: <tencent_D6C4465761B77986C7B36FA368E97E23A805@qq.com>
+References: <tencent_D6C4465761B77986C7B36FA368E97E23A805@qq.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
- <20251110222922.613224-11-yosry.ahmed@linux.dev> <aThIQzni6fC1qdgj@google.com>
- <2rmpnqjnyhew3tektl3ndmukbfgs4zrytsaxdgec2i3tggneuk@gphhqbrqevan> <zozt7pbeqn4ekiyrkwjbesqv6sxf6seyskfbnhzz5do2an4zbl@q6pdskoiawvc>
-Message-ID: <aTylq0oDnhGY61PM@google.com>
-Subject: Re: [PATCH v2 10/13] KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 11, 2025, Yosry Ahmed wrote:
-> On Wed, Dec 10, 2025 at 11:05:44PM +0000, Yosry Ahmed wrote:
-> > On Tue, Dec 09, 2025 at 08:03:15AM -0800, Sean Christopherson wrote:
-> > > On Mon, Nov 10, 2025, Yosry Ahmed wrote:
-> > Unfortunately this doesn't work, it breaks the newly introduced
-> > nested_invalid_cr3_test. The problem is that we bail before we fully
-> > initialize VMCB02, then nested_svm_vmrun() calls nested_svm_vmexit(),
-> > which restores state from VMCB02 to VMCB12.
-> > 
-> > The test first tries to run L2 with a messed up CR3, which fails but
-> > corrupts VMCB12 due to the above, then the second nested entry is
-> > screwed.
-> > 
-> > There are two fixes, the easy one is just move the consistency checks
-> > after nested_vmcb02_prepare_control() and nested_vmcb02_prepare_save()
-> > (like the existing failure mode of nested_svm_load_cr3()). This works,
-> > but the code doesn't make a lot of sense because we use VMCB12 to create
-> > VMCB02 and THEN check that VMCB12 is valid.
-> > 
-> > The alternative is unfortunately a lot more involved. We only do a
-> > partial restore or a "fast #VMEXIT" for failed VMRUNs. We'd need to:
-> > 
-> > 1) Move nested_svm_load_cr3() above nested_vmcb02_prepare_control(),
-> >    which needs moving nested_svm_init_mmu_context() out of
-> >    nested_vmcb02_prepare_control() to remain before
-> >    nested_svm_load_cr3().
-> > 
-> >    This makes sure a failed nested VMRUN always needs a "fast #VMEXIT"
-> > 
-> > 2) Figure out which parts of nested_svm_vmexit() are needed in the
-> >    failed VMRUN case. We need to at least switch the VMCB, propagate the
-> >    error code, and do some cleanups. We can split this out into the
-> >    "fast #VMEXIT" path, and use it for failed VMRUNs.
-> > 
-> > Let me know which way you prefer.
-> 
-> I think I prefer (2), the code looks cleaner and I like having a
-> separate code path for VMRUN failures. Unless there are objections, I
-> will do that in the next version.
+On Thu, 11 Dec 2025 14:57:08 +0800 Edward Adam Davis wrote:
+> In zerocopy_fill_skb_from_iter(), if two copy operations are performed
+> and the first one succeeds while the second one fails, it returns a
+> failure but the count in iterator has already been decremented due to
+> the first successful copy. This ultimately affects the local variable
+> rest_len in virtio_transport_send_pkt_info(), causing the remaining
+> count in rest_len to be greater than the actual iterator count. As a
+> result, packet sending operations continue even when the iterator count
+> is zero, which further leads to skb->len being 0 and triggers the warning
+> reported by syzbot [1].
 
-With the caveat that I haven't seen the code, that has my vote too.  nVMX has a
-similar flow, and logically this is equivalent, at least to me.  We can probably
-even use similar terminology, e.g. vmrun_fail_vmexit instead of vmentry_fail_vmext.
-
-vmentry_fail_vmexit:
-	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
-
-	if (!from_vmentry)
-		return NVMX_VMENTRY_VMEXIT;
-
-	load_vmcs12_host_state(vcpu, vmcs12);
-	vmcs12->vm_exit_reason = exit_reason.full;
-	if (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx))
-		vmx->nested.need_vmcs12_to_shadow_sync = true;
-	return NVMX_VMENTRY_VMEXIT;
-
-
-
+Please address the feedback from previous revision and when you repost
+use net as the subject tag.
+-- 
+pw-bot: cr
 
