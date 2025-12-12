@@ -1,124 +1,183 @@
-Return-Path: <kvm+bounces-65817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65818-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA06FCB870D
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 10:23:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B85FCB887B
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 10:51:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 72915302A1E7
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 09:22:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 221B6304D4BC
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 09:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F4D30FF1E;
-	Fri, 12 Dec 2025 09:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4745315D27;
+	Fri, 12 Dec 2025 09:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eBZ7zu2o"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="GCrClX8B"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from out28-124.mail.aliyun.com (out28-124.mail.aliyun.com [115.124.28.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D665299952;
-	Fri, 12 Dec 2025 09:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FC0226CEB;
+	Fri, 12 Dec 2025 09:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765531332; cv=none; b=ERj9rAS4Jd8fqjnEbVqCDjwYbOEL4ZtPjumqA//vcUWLwTlSo9b5B0WRQsoaKXBkz8tc7cv5XZyCqT9obUO/eaerVVeA4zbRkq+TXcLdFvJiR8WaDySBSdM+C7OL8pmO2z1MnsK8zUYN2K4JdpbFavp02UqT4gBtvGVFAbbpqtc=
+	t=1765532821; cv=none; b=n/khL2I6X7o/MdnT6Ux5q8mtTKkUT0Oi7b0rl5XaKJuJA2fQmhH1uqlFkwQ4gH8eNbE3KVSPR83mPbPwE3agj04SGBkvWnrIgSZ1r3NatFJXVRoTJZSWiZa5OIsx2VtmfakU1hIJijc4S1aHSHmOHM4ts+aEsnlMBTiWtGE+NkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765531332; c=relaxed/simple;
-	bh=04tB4MdBbE3k8czrCSAhdUggbwlMaR9/T03/le8K7gY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=gMGYrgG+z0omjYDxbfUaLN64AUvVbiDh1tcUfBM6ttFwVR3tUpju8kAGDisIWTQrD4mhaKsITrefCwiTRRIRgyA1RMwTGL2lstvOe6b8SIQhyGwcMiVM0Q/Wg+qfUPFomBlyayrkt7YZp0sbfnAGLiHwEEz9wZVnw49P2jVbu30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eBZ7zu2o; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=z4vPaiUk9n/GpIxutnAk0NTSeMO9iODdip7MeYu98yA=;
-	b=eBZ7zu2ox8ryH+r6AugMOCYGdskTgvt4HVyTB0sNWJZuu6AwqpHtUJ674NWi8oVHhZqLLb8Fe
-	9+6XJ13bHSi7juapcNkdSCOlj5bwH+XCJogKs9+MppIMgyb9nZajKcNlh/7ZzT71idEJ7zWb7e1
-	gwacD2hwUuyP493g1H7y+vg=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dSP686k3Dzcb0J;
-	Fri, 12 Dec 2025 17:19:12 +0800 (CST)
-Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3634E180BD0;
-	Fri, 12 Dec 2025 17:21:57 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 12 Dec 2025 17:21:55 +0800
-Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
-To: Jiaqi Yan <jiaqiyan@google.com>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <duenwen@google.com>,
-	<rananta@google.com>, <jthoughton@google.com>, <vsethi@nvidia.com>,
-	<jgg@nvidia.com>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <pbonzini@redhat.com>,
-	<corbet@lwn.net>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-References: <20251013185903.1372553-1-jiaqiyan@google.com>
- <20251013185903.1372553-3-jiaqiyan@google.com>
- <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
- <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <dbcfb853-5853-5967-1bf9-76c6b3839717@huawei.com>
-Date: Fri, 12 Dec 2025 17:21:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1765532821; c=relaxed/simple;
+	bh=6ljWjY7QInJuwIP00LkKDNlaUhyiL5ghfGGqKB47JZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nFJBLbhu3rWcZJ4pTI4ZrmF4d6FVJ9NQB6rXFVRjD1kjqKkBfz2nQ4AU4qV1DMv6GHDVtWQGWSMRbwXSQRNcVkYbh5Ia/cpNQmT2NQHH8fULVWXRAISvf1gR2eCmdOx6OCCC7EwpKyLCvszXC7vRxfd780ijDbiIKcxGCgenq18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=GCrClX8B; arc=none smtp.client-ip=115.124.28.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=antgroup.com; s=default;
+	t=1765532808; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=j+NGea2KtRM7UvaPj4+WtGu8L5jh5rI5T/Jdabn7S04=;
+	b=GCrClX8BpgAhWDUlDtnawknNNjX7Vjf0vYJhBien1V+52Rygoekhuww0JcfMJe+svZoi6VhwmM5QgpnaxLyNVCPLZyH3WEX7vjuKlv2bCMnDDPW3pjdNWSwn+xehpRbyoVPuAd2/b5deXtltDiixN3qwRompuXbFx5rytLUSIYs=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.filx.95_1765532807 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Fri, 12 Dec 2025 17:46:47 +0800
+Date: Fri, 12 Dec 2025 17:46:47 +0800
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/7] KVM: x86: Consolidate KVM_GUESTDBG_SINGLESTEP check
+ into the kvm_inject_emulated_db()
+Message-ID: <20251212094647.GA65305@k08j02272.eu95sqa>
+References: <cover.1757416809.git.houwenlong.hwl@antgroup.com>
+ <45cbc005e14ea2a4b9ec803a91af63e364aeb71a.1757416809.git.houwenlong.hwl@antgroup.com>
+ <aTMdLPvT3gywUY6F@google.com>
+ <20251211140520.GC42509@k08j02272.eu95sqa>
+ <aTr9Kx9PjLuV9bi1@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk200017.china.huawei.com (7.202.194.83)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTr9Kx9PjLuV9bi1@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On 2025/12/12 9:53, Jiaqi Yan wrote:
-> On Thu, Dec 11, 2025 at 5:02 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
+On Thu, Dec 11, 2025 at 09:19:39AM -0800, Sean Christopherson wrote:
+> On Thu, Dec 11, 2025, Hou Wenlong wrote:
+> > On Fri, Dec 05, 2025 at 09:58:04AM -0800, Sean Christopherson wrote:
+> > > But I think the WARN will be subject to false positives.  KVM doesn't emulate data
+> > > #DBs, but it does emulate code #DBs, and fault-like code #DBs can be coincident
+> > > with trap-like single-step #DBs.  Ah, but kvm_vcpu_check_code_breakpoint() doesn't
+> > > account for RFLAGS.TF.  That should probably be addressed in this series, especially
+> > > since it's consolidating KVM_GUESTDBG_SINGLESTEP handling.
 > >
-> > I can also hit this ASSERT with:
-> >
-> > Random seed: 0x6b8b4567
-> > # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
-> > # Before EINJect: data=0xbaadcafe
-> > # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
-> > einj_hpa=0x2841234bad
-> > # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-> > # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
-> > # echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
-> > # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-> > # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-> > # echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
-> > # Memory UER EINJected
-> > # Dump kvm_run info about KVM_EXIT_MMIO
-> > # kvm_run.arm_sea: esr=0xffff90ba0040, flags=0x691000
-> > # kvm_run.arm_sea: gva=0x100000008, gpa=0
-> > ==== Test Assertion Failure ====
-> >   arm64/sea_to_user.c:207: exit_reason == (41)
-> >   pid=38023 tid=38023 errno=4 - Interrupted system call
-> >      1  0x0000000000402d1b: run_vm at sea_to_user.c:207
-> >      2  0x0000000000402467: main at sea_to_user.c:330
-> >      3  0x0000ffff9122b03f: ?? ??:0
-> >      4  0x0000ffff9122b117: ?? ??:0
-> >      5  0x00000000004026ef: _start at ??:?
-> >   Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
-> >
-> > Not sure what's wrong it..
+> > Sorry, I didn't follow it, how fault-like code #DBs can be coincident
+> > with trap-like single-step #DBs, could you provide an example?
 > 
-> Does your test machine have SDEI or SCI enabled for host APEI? Do you
-> see any kernel log from "Memory failure:" saying hugetlb page
-> recovered, and recovered significant earlier than the KVM exit here.
-> It maybe the kernel has already unmapped hugepage in response to SDEI
-> or SCI before this test actually consumes memory error, so no SEA is
-> actually triggered.
+> Ya, here's a KUT testcase that applies on top of
+> https://lore.kernel.org/all/20251126191736.907963-1-seanjc@google.com.
+>
+Thanks for your testcase; it really changed my perspective.
+ 
+> ---
+>  x86/debug.c | 43 +++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 39 insertions(+), 4 deletions(-)
+> 
+> diff --git a/x86/debug.c b/x86/debug.c
+> index 8177575c..313d854e 100644
+> --- a/x86/debug.c
+> +++ b/x86/debug.c
+> @@ -92,6 +92,7 @@ typedef unsigned long (*db_test_fn)(void);
+>  typedef void (*db_report_fn)(unsigned long, const char *);
+>  
+>  static unsigned long singlestep_with_movss_blocking_and_dr7_gd(void);
+> +static unsigned long singlestep_with_code_db(void);
+>  static unsigned long singlestep_with_sti_hlt(void);
+>  
+>  static void __run_single_step_db_test(db_test_fn test, db_report_fn report_fn)
+> @@ -106,11 +107,12 @@ static void __run_single_step_db_test(db_test_fn test, db_report_fn report_fn)
+>  	report_fn(start, "");
+>  
+>  	/*
+> -	 * MOV DR #GPs at CPL>0, don't try to run the DR7.GD test in usermode.
+> -	 * Likewise for HLT.
+> +	 * MOV DR #GPs at CPL>0, don't try to run the DR7.GD or code #DB tests
+> +	 * in usermode. Likewise for HLT.
+>  	 */
+> -	if (test == singlestep_with_movss_blocking_and_dr7_gd
+> -	    || test == singlestep_with_sti_hlt)
+> +	if (test == singlestep_with_movss_blocking_and_dr7_gd ||
+> +	    test == singlestep_with_code_db ||
+> +	    test == singlestep_with_sti_hlt)
+>  		return;
+>  
+>  	n = 0;
+> @@ -163,6 +165,38 @@ static noinline unsigned long singlestep_basic(void)
+>  	return start;
+>  }
+>  
+> +static void report_singlestep_with_code_db(unsigned long start, const char *usermode)
+> +{
+> +	report(n == 3 &&
+> +	       dr6[0] == (DR6_ACTIVE_LOW | DR6_BS | DR6_TRAP2) && db_addr[0] == start &&
+> +	       is_single_step_db(dr6[1]) && db_addr[1] == start + 1 &&
+> +	       is_single_step_db(dr6[2]) && db_addr[2] == start + 1 + 1,
+> +	       "%sSingle-step + code #DB test", usermode);
+> +}
+> +
+> +static noinline unsigned long singlestep_with_code_db(void)
+> +{
+> +	unsigned long start;
+> +
+> +	asm volatile (
+> +		"lea 1f(%%rip), %0\n\t"
+> +		"mov %0, %%dr2\n\t"
+> +		"mov $" xstr(DR7_FIXED_1 | DR7_EXECUTE_DRx(2) | DR7_GLOBAL_ENABLE_DR2) ", %0\n\t"
+> +		"mov %0, %%dr7\n\t"
+> +		"pushf\n\t"
+> +		"pop %%rax\n\t"
+> +		"or $(1<<8),%%rax\n\t"
+> +		"push %%rax\n\t"
+> +		"popf\n\t"
+> +		"and $~(1<<8),%%rax\n\t"
+In my previous understanding, I thought there would be two #DBs
+generated at the instruction boundary. First, the single-step trap #DB
+would be handled, and then, when resuming to start the new instruction,
+it would check for the code breakpoint and generate a code fault #DB.
+However, it turns out that the check for the code breakpoint happened
+before the instruction boundary. I also see in the kernel hardware
+breakpoint handler that it notes that code breakpoints and single-step
+can be detected together. Is this due to instruction prefetch?
 
-No kernel log was printed when I saw this failure.
+If we want to emulate the hardware behavior in the emulator, does that
+mean we need to check for code breakpoints in kvm_vcpu_do_single_step()
+and set the DR_TRAP_BITS along with the DR6_BS bit?
 
-Thanks,
-Zenghui
+Thanks!
+
+> +		"1:push %%rax\n\t"
+> +		"popf\n\t"
+> +		"lea 1b(%%rip), %0\n\t"
+> +		: "=r" (start) : : "rax"
+> +	);
+> +	return start;
+> +}
+> +
+>  static void report_singlestep_emulated_instructions(unsigned long start,
+>  						    const char *usermode)
+>  {
+> @@ -517,6 +551,7 @@ int main(int ac, char **av)
+>  	       n, db_addr[0], dr6[0]);
+>  
+>  	run_ss_db_test(singlestep_basic);
+> +	run_ss_db_test(singlestep_with_code_db);
+>  	run_ss_db_test(singlestep_emulated_instructions);
+>  	run_ss_db_test(singlestep_with_sti_blocking);
+>  	run_ss_db_test(singlestep_with_movss_blocking);
+> 
+> base-commit: 23071a886edbe303fb964c5c386750b0b458dbfb
+> --
 
