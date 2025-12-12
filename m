@@ -1,115 +1,158 @@
-Return-Path: <kvm+bounces-65880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCEAECB937F
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 17:04:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46DC6CB940B
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 17:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F9943048D47
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 16:03:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97BFB3010EF5
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 16:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0E123AB90;
-	Fri, 12 Dec 2025 16:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F981296BDA;
+	Fri, 12 Dec 2025 16:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tr/h20Kl"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA461B81D3
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 16:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF941288CA3;
+	Fri, 12 Dec 2025 16:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765555429; cv=none; b=DCc+WqG00IxkrwACQNdmw5XOrJ1lZiHRY6s4mUZA48/wVgVttTOnpAVcm2ltlDGiaiWiPQTH6VxxKjrRYODpVfu2g2nS0p2Zfk8AL19GvCpyczeec7Yz6fSgv4RErMrzTuruZqhJtEq+v5HpdopkOmMwL0MCSt+ACb9hYZbXz/c=
+	t=1765556649; cv=none; b=oN53ZfBnX03ZVZWo+Wqt7p1e9nIMQC/Ggv+qMS+no/6WoSfOe7vxbVUz/O1Wc3NHvX2UhnpXjNf67NYxhh0DPs09TO3hIbV1oi4O6xAXf6byKG3Ey10rs0yLZtb2vVvioEFN4wz4rWjJB+Ju/hbvxGIO3Me/SRoXlmapznNh/6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765555429; c=relaxed/simple;
-	bh=jAG6A7MU2Z/a421RMls9L1+fU9pciFIy+oqVfVXYQh0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SFtK8/Zye+kzlDhuT6ezSiZbOCjnNSOHlEg3cg82W7eLLMabaSU0wTGdGtt63Oof81OfH4OF0owvap88s9q+rqumzUrM0EcK8wpHuOwY0EF1BEvX/4/Eff5yD9knKHrb4qXkPKdC2w86KDUBcGDqNUPZv6hcLM3+vCC2iOnAAA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CA9A1575;
-	Fri, 12 Dec 2025 08:03:39 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 665643F762;
-	Fri, 12 Dec 2025 08:03:45 -0800 (PST)
-Date: Fri, 12 Dec 2025 16:03:40 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
-	maz@kernel.org, kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v4 11/11] arm64: add EL2 environment
- variable
-Message-ID: <20251212160340.GA978993@e124191.cambridge.arm.com>
-References: <20251204142338.132483-1-joey.gouly@arm.com>
- <20251204142338.132483-12-joey.gouly@arm.com>
- <20251204-203dfc57adef00b4f6fdf910@orel>
+	s=arc-20240116; t=1765556649; c=relaxed/simple;
+	bh=GdsBH8+ZvQAlqwjeL41Ytv9iQZSSG1XeBSd8y2Nuj3g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JB3sqwvanXoq8RvUF2IT6JZsVtyKQ9SS5p0uW3K1lAPY77h2Q3D1SKQgZbM34Z3LFWU8pwX1HD/kA0RBtDoOANOhAV5ZmhLxvaNViLTygun7zduqhmD4JwZu0UbQU6795/k0E5l8z2FcHfzYQN8BTKJJUed6XSFsawGxUyzJNSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tr/h20Kl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B85C4CEF1;
+	Fri, 12 Dec 2025 16:24:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765556649;
+	bh=GdsBH8+ZvQAlqwjeL41Ytv9iQZSSG1XeBSd8y2Nuj3g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tr/h20KlJjOfsOsPHUZWjCGxLvpm0XkUydGWD13NXIvpZVvh1VKNgG8il008IHDS5
+	 K1qfySkQU3i+Uddgkxg40cVb9NwqsrJ7TxhdFgSAvXsuGfrHaQLv4q6YBvN6vpCtpr
+	 xUPSLOmbmKENf9kW+uFRAusmSwWSdHbS975PKI4WjPnK738jlpJ80Mu508ONLrwmeF
+	 sR8OIlxe4LK/RDAWNtwQG+mjckeylT5XBlWRNxUfFwEqg3IvWhKkLiD7VghtzrSlk8
+	 szzyTNRyjXr+11LRM5ZkXXh9EXTj+kdW2WFe4RH2we4OJ/RBd/1nTilzFx3CUudNP9
+	 BgCZDQ4rr1jvg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vU5w6-0000000CHKQ-3OvS;
+	Fri, 12 Dec 2025 16:24:06 +0000
+Date: Fri, 12 Dec 2025 16:24:06 +0000
+Message-ID: <86o6o3oehl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 09/32] KVM: arm64: gic-v5: Compute GICv5 FGTs on vcpu load
+In-Reply-To: <20251212152215.675767-10-sascha.bischoff@arm.com>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+	<20251212152215.675767-10-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251204-203dfc57adef00b4f6fdf910@orel>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Dec 04, 2025 at 11:17:24AM -0600, Andrew Jones wrote:
-> On Thu, Dec 04, 2025 at 02:23:38PM +0000, Joey Gouly wrote:
-> > This variable when set to y/Y will cause QEMU/kvmtool to start at EL2.
-> > 
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > Acked-by: Marc Zyngier <maz@kernel.org>
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > ---
-> >  arm/run | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/arm/run b/arm/run
-> > index 858333fc..dd641772 100755
-> > --- a/arm/run
-> > +++ b/arm/run
-> > @@ -59,6 +59,10 @@ function arch_run_qemu()
-> >  		M+=",highmem=off"
-> >  	fi
-> >  
-> > +	if [ "$EL2" = "Y" ] || [ "$EL2" = "y" ]; then
+On Fri, 12 Dec 2025 15:22:38 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> I wanted to keep '1' and also add 'y' and 'Y'. We already allow those
-> three (and only those three) in other places, see errata().
+> Extend the existing FGT infrastructure to calculate and activate any
+> required GICv5 traps (ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, ICH_HFGITR_EL2)
+> before entering the guest, and restore the original ICH_HFGxTR_EL2
+> contents on the return path. This ensures that the host and guest
+> behaviour remains independent.
+> 
+> As of this change, none of the GICv5 instructions or register accesses
+> are being trapped, but this will change in subsequent commits as some
+> GICv5 system registers must always be trapped (ICC_IAFFIDR_EL1,
+> ICH_PPI_HMRx_EL1).
 
-Couldn't find the errata() part, but I changed it to:
+nit: 90% of this patch has nothing to do with computing the FGTs at
+load time. The gist of it is actually setting up the FGT
+infrastructure, and activate/deactivate aspect is actually very
+minor. You may want to reformulate the commit message to make that
+clearer (I don't think this needs splitting though).
 
-	if [ "$EL2" == "1" ] || [ "$EL2" = "Y" ] || [ "$EL2" = "y" ];
+[...]
 
+> @@ -1501,7 +1585,7 @@ static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
+>  void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> -		return;
+> +		goto skip_feat_fgt;
 
-I also used test_exception_prep() like suggested in the other e-mail.
+How can you have GICv5, but not FGTs? I don't think this is a valid
+construct as per the architecture:
 
-I will send out a next version next week, although I am aware it's very close
-to holiday/vacation season!
+	(FEAT_GCIE ==> v9Ap3)
+	(FEAT_FGT ==> v8Ap5)
+	(v9Ap3 ==> (v9Ap2 && v8Ap8))
+
+>  
+>  	__compute_fgt(vcpu, HFGRTR_EL2);
+>  	__compute_hfgwtr(vcpu);
+> @@ -1511,11 +1595,19 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+>  	__compute_fgt(vcpu, HAFGRTR_EL2);
+>  
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+> -		return;
+> +		goto skip_feat_fgt;
+
+Even FGT2 is expected, since v9.3 is congruent to v8.8:
+
+	(FEAT_FGT2 ==> v8Ap8)
+
+>  
+>  	__compute_fgt(vcpu, HFGRTR2_EL2);
+>  	__compute_fgt(vcpu, HFGWTR2_EL2);
+>  	__compute_fgt(vcpu, HFGITR2_EL2);
+>  	__compute_fgt(vcpu, HDFGRTR2_EL2);
+>  	__compute_fgt(vcpu, HDFGWTR2_EL2);
+> +
+> +skip_feat_fgt:
+> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
+> +		return;
+> +
+> +	__compute_fgt(vcpu, ICH_HFGRTR_EL2);
+> +	__compute_fgt(vcpu, ICH_HFGWTR_EL2);
+> +	__compute_fgt(vcpu, ICH_HFGITR_EL2);
+>  }
 
 Thanks,
-Joey
-> 
-> Thanks,
-> drew
-> 
-> > +		M+=",virtualization=on"
-> > +	fi
-> > +
-> >  	if ! $qemu $M -device '?' | grep -q virtconsole; then
-> >  		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
-> >  		exit 2
-> > @@ -116,6 +120,9 @@ function arch_run_kvmtool()
-> >  	fi
-> >  
-> >  	command="$(timeout_cmd) $kvmtool run"
-> > +	if [ "$EL2" = "Y" ] || [ "$EL2" = "y" ]; then
-> > +		command+=" --nested"
-> > +	fi
-> >  	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
-> >  		run_test_status $command --kernel "$@" --aarch32
-> >  	else
-> > -- 
-> > 2.25.1
-> > 
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
