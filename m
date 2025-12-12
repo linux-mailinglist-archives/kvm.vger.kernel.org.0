@@ -1,363 +1,135 @@
-Return-Path: <kvm+bounces-65901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80DC7CB9FA6
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:44:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79984CB9FE2
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:55:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2D77309F090
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 22:42:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 23CFE3017A54
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 22:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4B72DE70D;
-	Fri, 12 Dec 2025 22:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C3D30170B;
+	Fri, 12 Dec 2025 22:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jkFOBrfa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EREG08Bp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0569224249
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 22:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765579372; cv=pass; b=HtJgVFHIRaBvtfL6Zt+gHzytJeTE7CFh9kWwSIFG5sLsGfDerCBIV4GyOM7aZHFeGxw6rfo2GNz5Unz/att3kScBPMQ7oFjpbod8Sby3ECu3rnRGjL3CTutUmaiEyia8w6e4vqd+t3sWrHQCFgT111EB2E/1uplEADGI0Jzhl+4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765579372; c=relaxed/simple;
-	bh=YOqs0y1dcE5aW9PtDdEhj4UaUFEQubxbJwDSGVsK6mc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J4BjM46X0GkKQ45jbyzTYeSIl0icZYFsHRWUm3lsB17I/neWKlRMDLz+EL2DBEX4oUUJNiUKwbto44cTn0CM1MYqIQgRV8wXwmYVR/+6ySfPyVvnE/8lz4zoSaAhtJPl2UYfqjMGsrBlQdi8OKE1Ih+n96HeZq87nnjSTCg2YC8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jkFOBrfa; arc=pass smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055AD3FFD
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 22:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765580109; cv=none; b=LE9IbCXskgN32N2ogx0wQSoPfJ9b2TVIMytRaF4OlqT3aqmtdPMWUQxq81gLhZYjkVV0BEzgOM2gkCTugapXRn33ZdyFzic23Ne4w801jOKG7A8TeYdZNHCS85oKC94R1os2CQIf+VVruCunw0ErLBH1iDzjDQhTg2SUXJpa1g4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765580109; c=relaxed/simple;
+	bh=bIF6Bo2epqbYmITgIckR0PAV4EA02NE1jjQfw25p3QM=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=qtdxH8rTgaGQ9q3WY58E0ykaHAU8E8fxp6NUiOcxhMyvLwKIReZS9dlN0CgDIgCupKckseTN4TJ0f3kxjXOSo2YyCZbZhI3c2DHpKdbv3WRrR61Vv1u7pYpI1vQe/KCVy7s66YKXaR3jD1hMJ1K63l4JJqvmDkvCtam1EHpoJ80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EREG08Bp; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4779e2ac121so198385e9.1
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 14:42:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765579369; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NzMByvulLhJOkVoHhUUTw9mSn3Z3WVxXJr58Ma4fiNfph4/PHDiHvDdIEdC0uaG4T6
-         6D0ACLRysYL3w7jvE67ojDN+JiJEAuQRXgsH3Yn6WEryC/drtlu7kIXFQ0VO6zX9i4O+
-         r06pzU9IrNE2oWWBHIsAai6RBTWT/FqhlcaqF23cZpwKPeOQbPCrZ9R2cvHqcl0q8Qgw
-         HeHlcv1bdtY/tH20dIhy3Q+0d3g6t5k2gydJAz/1/XkadgyIpDEZOFIZS+9E77qPdCYz
-         pQjpRaZhqA2dFqniq4jAHDoodxN8Ek9epwdAXa0v/ngvKSs7jG5YloXBt9FlyknZjyaV
-         K1DA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GCLPUx88ZdHJmS22/LgzBzk06kvYjDGU5Iph4HFcUyk=;
-        fh=AfR2sBriLyqsuMuqpG8C6xZ1vOqqdCkqsCFdNSplAoI=;
-        b=NAECb7irW24eh7uHPv/shOF5fEe1E3WMiLW7/J5LbyqQtqRHFXgXXVxPN+hyzHKDpV
-         XfPlru/veqekR2fMEcxa1w4OJu8bVl+aKkpGhviJTPejZ11oNQmnbZV6nDQENJgU6qVC
-         Em3lka3++JP3TGEpcQoViHtj1KnRZFt9JNwWMgv2qGj1RBkLd1ZMQTz8cGtpacT0CPHg
-         XpeptT4d8GBaxUSbKraExf6+ypfD3fPgFTYrldexVV8dmjeoL7zu27e97BoatMLQ2NFo
-         PSEqz3nXUPscgZX5uCIIt+MUbbbaZZqPRp2k2vSDxYo6q4aNCher6ZnRSdFZcWJwSUR5
-         Nqjg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-65b325457e5so1453426eaf.1
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 14:55:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765579369; x=1766184169; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GCLPUx88ZdHJmS22/LgzBzk06kvYjDGU5Iph4HFcUyk=;
-        b=jkFOBrfaWg1+RgIZ0WUBN0/QPp9sk4JmqkjaQxaMY/ejTCHZEqksiF2kzdhI4g2VJo
-         z0RCtjTBmj4DX/DhHF43Aty4wnaJ+pWXgLfKjU9wd8Wv/rMcbRkhWdP6E8cJQJ8VDpa3
-         PtfasN95ZbEnv0thT4osg8XBfFMLttGdd+E9E9g1ecFwha6FXiOcW8pc+Yvx4vyCNu+I
-         Qegw3dmwQZe7p/Z/+GoXgN9N+FOSzJgfdq8Gaq/XTsiPWVsv+D2/xU5TRXYAwr8dT2fl
-         L0eQ7updJuBkfrtM+0aArNNpJG88nuZ4QG2iKCXhXcT9zcF275IG1KRofKyRkcoKB8Zb
-         BCVw==
+        d=google.com; s=20230601; t=1765580107; x=1766184907; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Gf9nzt/AIijA0v6SQzCygaqS4FyyvskIif7ML2SRzkU=;
+        b=EREG08BpDYUwlqkunNMgj89aVsu2u/3cqMutBwf/mxNlJc7m75YWxicoBReFcn4VX3
+         ELIqjdcHXYbmwBlJn92PhBx/2RTE6HgnR5to2q0vaLLA+BuOjRxMHSRGCQCG8Q5kEgZf
+         Ehii7IxEXPQ1TGn+Uu1HD6xZhDGSC5+keBq1DM23vhFrkwvZd+1kCs5O+n9gd3XLOXC8
+         2v5gv5tRYEEGPXdPcqgQZcovwIvEgMa/syG8KpC1+VBJg4MOC3Cdb8YjtEA9pgsaTDiO
+         RnbZ9KrraydttPIu9M2llTDE4C/vG3yQDR5PMcly/K3PbBLYqptCLbvY95QOtDZYERJ1
+         jUAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765579369; x=1766184169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GCLPUx88ZdHJmS22/LgzBzk06kvYjDGU5Iph4HFcUyk=;
-        b=OBm3yFQS6OOlhIz/rUpdQdG4oQcNGiUq2et+PQyHepLmWQsrMplRts8qOtjsb5D4nu
-         OEibCJHby2KxLWQ0348dLh/Z1XEvFe43IlaWaAmCnrarl4LI6/JE8QjUrL1C57s4BiYL
-         sDfHQQzh0nJtzSfet76BjFDMs3tB+ZrqNOw6c22w1iTVpZptlsNmqfBoInCYa7znxVds
-         uOg44vaLQs71F5Y3bN4NwUVip24up546dusthY5PqtK1IFBIaB9HJ3TpCYmx0sVzVTY+
-         fM2KTnAOJ7sFyhokV/k8GyWTqrr+H6Z0o/bhb5VukqCiMdpKvssRQSrcaoVxw0xzmi9U
-         2xQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVEPbCKjQYdEJj3W9nvWvxBXMX017aQ1M0CeY7YQsUJGAeHMdYjNVPoN6iWIk28qrFBNDA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypE1Zqu85NFqLc81skETkTKiWlVmwRzjmKGNFhBMgd/Xub8Fz/
-	0fB1LEn4f/FYnpuUz5JgB1AoU4l7sx6LjYpGM+v/P6lSxP+KTTSfnDPrTKVa/lsZ8hBYXL7uo4W
-	YtZXUw2+k2uQBp1dy9NF/Qpr9CmdCs+u9hUnAM1Wo
-X-Gm-Gg: AY/fxX6oNhLYbd/5BJHT5uuUt23YJlwOOkAbqwSWSHlcqw1BPLD4IvSN+cFYTH133kJ
-	cPPCjCJ6M4GtCSD+/2yKNZp4fYAF4k4BjUuEOE2hWA+aeFTQ6BZEMXSDdoO+jXvif7ow/eOlpFi
-	ybFMfdO9TsTZ6++uwSylyaVGClVawm5qE/JX+ZNRvb1haHewGmYZTOSbIFBVbqtpQJUUTuIEJey
-	ygH6WNPohqmY9f6lSMCNI1p2fQReO8xlF7PJWa/0wlld6kDUx0KtP0gBjrUiCNEWAWwqr7Zfyrg
-	n+jm2rDg/8TWpXodBr1JpVleCt9t
-X-Google-Smtp-Source: AGHT+IGycUDLgfiYo6g1zTqU/jgYJfkyvEbX43ygSbXNWZeJGMb236iTpZ88xPMSD0uFM0/wQUo7NV0Ahf4F4PzTuS8=
-X-Received: by 2002:a05:600c:83c4:b0:477:86fd:fb18 with SMTP id
- 5b1f17b1804b1-47a94869ebbmr337505e9.8.1765579369059; Fri, 12 Dec 2025
- 14:42:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765580107; x=1766184907;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gf9nzt/AIijA0v6SQzCygaqS4FyyvskIif7ML2SRzkU=;
+        b=gXVnBKo1Wh5MhMyUaTU6zSGCtYC6VM96fTAd6vzuFBD73GVp2xzRAx9Uvpzwn7d6eH
+         gxBcB4G3YQglKQndZSvoS/nWnk95a12EMNvFjf9gmXtHfsgMVlGjjEKLzKUq2mnQ6lba
+         xXeD6tSexpcbzFkzLb1ebJHB0GiPOwHzh0CVcbX6vG4j5J0MjQDq2pVehHQQbsDfkWFy
+         vwr9tUsUtfQCGwBs/Z8GKipOQ3BgY/Bez4WvdYjnYe7Hd7fcKHp3usv+8kxFeVdXCv2V
+         vSWg/OijJ2FTFh+Ul2yEpWxt5U2mj765Clic9TIqDwsVSfIubsHXzWsRpKX4acQJ5Dj9
+         RwEA==
+X-Gm-Message-State: AOJu0YyPPkvDRjk4N0byAkRfq4Ecu5pu4aTT1eVB2RwwUG6BZgDLVy1P
+	1vgKZeuV7jOetUfZQiTG5LLlmMG0e2TSpkJqiYKoWvK1wGFiowZ4h842bDeHupWb4EXGrTM68XZ
+	Ju0NhqZkGTW5y+9u7MNvp66TR9Q==
+X-Google-Smtp-Source: AGHT+IGW0I1EN/TmF7XRt1Ne1xEDcpx6Or2Kw9UCPmMzkWNCsmyBQjelpeiy18twJajc3tFWP5QaNlfD3CTKO6VqfQ==
+X-Received: from ilbbd1.prod.google.com ([2002:a05:6e02:3001:b0:438:1345:e9c3])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6820:162a:b0:65b:25e8:13f1 with SMTP id 006d021491bc7-65b4529af0dmr1939098eaf.73.1765580107018;
+ Fri, 12 Dec 2025 14:55:07 -0800 (PST)
+Date: Fri, 12 Dec 2025 22:55:06 +0000
+In-Reply-To: <aTioEWHu0ZbFCjR6@kernel.org> (message from Oliver Upton on Tue,
+ 9 Dec 2025 14:52:01 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251013185903.1372553-1-jiaqiyan@google.com> <20251013185903.1372553-3-jiaqiyan@google.com>
- <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com> <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
- <dbcfb853-5853-5967-1bf9-76c6b3839717@huawei.com>
-In-Reply-To: <dbcfb853-5853-5967-1bf9-76c6b3839717@huawei.com>
-From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Fri, 12 Dec 2025 14:42:37 -0800
-X-Gm-Features: AQt7F2rl2f5bneq6f6crNhZuIfA-M_NY1_crL-5oW0NtvHoqkZtXMaIozb_07o8
-Message-ID: <CACw3F51FQwCLe17E4VC5wtpnCyuBOMrchvoBYCcwTxPkuxD+fg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, duenwen@google.com, 
-	rananta@google.com, jthoughton@google.com, vsethi@nvidia.com, jgg@nvidia.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, 
-	will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Message-ID: <gsnt8qf72tv9.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 21/24] KVM: arm64: Inject recorded guest interrupts
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Fri, Dec 12, 2025 at 1:22=E2=80=AFAM Zenghui Yu <yuzenghui@huawei.com> w=
-rote:
->
-> On 2025/12/12 9:53, Jiaqi Yan wrote:
-> > On Thu, Dec 11, 2025 at 5:02=E2=80=AFAM Zenghui Yu <yuzenghui@huawei.co=
-m> wrote:
-> > >
-> > > I can also hit this ASSERT with:
-> > >
-> > > Random seed: 0x6b8b4567
-> > > # Mapped 0x40000 pages: gva=3D0x80000000 to gpa=3D0xff80000000
-> > > # Before EINJect: data=3D0xbaadcafe
-> > > # EINJ_GVA=3D0x81234bad, einj_gpa=3D0xff81234bad, einj_hva=3D0xffff41=
-234bad,
-> > > einj_hpa=3D0x2841234bad
-> > > # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-> > > # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
-> > > # echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
-> > > # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-> > > # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-> > > # echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
-> > > # Memory UER EINJected
-> > > # Dump kvm_run info about KVM_EXIT_MMIO
-> > > # kvm_run.arm_sea: esr=3D0xffff90ba0040, flags=3D0x691000
-> > > # kvm_run.arm_sea: gva=3D0x100000008, gpa=3D0
-> > > =3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
-> > >   arm64/sea_to_user.c:207: exit_reason =3D=3D (41)
-> > >   pid=3D38023 tid=3D38023 errno=3D4 - Interrupted system call
-> > >      1  0x0000000000402d1b: run_vm at sea_to_user.c:207
-> > >      2  0x0000000000402467: main at sea_to_user.c:330
-> > >      3  0x0000ffff9122b03f: ?? ??:0
-> > >      4  0x0000ffff9122b117: ?? ??:0
-> > >      5  0x00000000004026ef: _start at ??:?
-> > >   Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
-> > >
-> > > Not sure what's wrong it..
-> >
-> > Does your test machine have SDEI or SCI enabled for host APEI? Do you
-> > see any kernel log from "Memory failure:" saying hugetlb page
-> > recovered, and recovered significant earlier than the KVM exit here.
-> > It maybe the kernel has already unmapped hugepage in response to SDEI
-> > or SCI before this test actually consumes memory error, so no SEA is
-> > actually triggered.
->
-> No kernel log was printed when I saw this failure.
+Oliver Upton <oupton@kernel.org> writes:
 
-Hmm, and even no CPER logged by APEI/GHES? That makes me suspect the
-error wasn't injected successfully.
+> In no situation should KVM be injecting a "recorded" IRQ. The overflow
+> condition of the PMU is well defined in the architecture and we should
+> implement *exactly* that.
 
-In that case, I found a bug in sea_to_user.c: GUEST_FAIL is not
-handled by run_vm and results in unhandled MMIO.
+When I say "record" I just meant "updating the virtual overflow register
+to reflect an overflow".
 
-Here is a fix I tested on my side, with some other minor fixes. Do you
-mind trying it?
+Do you think I'm not implementing the condition correctly in
+kvm_pmu_part_overflow_status()?
 
-commit b96a92d1006fbe2752ba133eb76b0c45c9c54265
-Author: Jiaqi Yan <jiaqiyan@google.com>
-Date:   Fri Dec 12 22:27:53 2025 +0000
+> On Tue, Dec 09, 2025 at 08:51:18PM +0000, Colton Lewis wrote:
+>> +/**
+>> + * kvm_pmu_part_overflow_status() - Determine if any guest counters  
+>> have overflowed
+>> + * @vcpu: Ponter to struct kvm_vcpu
+>> + *
+>> + * Determine if any guest counters have overflowed and therefore an
+>> + * IRQ needs to be injected into the guest.
+>> + *
+>> + * Return: True if there was an overflow, false otherwise
+>> + */
+>> +bool kvm_pmu_part_overflow_status(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct arm_pmu *pmu = vcpu->kvm->arch.arm_pmu;
+>> +	u64 mask = kvm_pmu_guest_counter_mask(pmu);
+>> +	u64 pmovs = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+>> +	u64 pmint = read_pmintenset();
+>> +	u64 pmcr = read_pmcr();
 
-    KVM: selftests: Improve sea_to_user test
+> How do we know that the vPMU has been loaded on the CPU at this point?
 
-    Several improvments to the test for KVM_EXIT_ARM_SEA:
-    - refactor run_vm to catch GUEST_FAIL, instead of causing confusing
-    kvm exit with unhandled MMIO
-    - sync far_invalid to guest
-    - exit with KSFT_SKIP or KSFT_FAIL when should
+Because this is only called by kvm_pmu_update_state which is only called
+by kvm_pmu_update_state <- kvm_pmu_{flush,sync}_hwstate <-
+kvm_arch_vcpu_ioctl_run after a vcpu_load.
 
-    Change-Id: I8b735de3b669297f0638bea2d32a0b36211f7f5c
+>> +
+>> +	return (pmcr & ARMV8_PMU_PMCR_E) && (mask & pmovs & pmint);
+>> +}
 
-diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c
-b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-index 573dd790aeb8e..6fd3cd881b415 100644
---- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
-+++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-@@ -98,11 +98,15 @@ static void write_einj_entry(const char
-*einj_path, uint64_t val)
+> I'd rather reuse kvm_pmu_overflow_status(), relying on the accessors to
+> abstract away the implementation / location of the guest PMU context.
 
- static void inject_uer(uint64_t paddr)
- {
--       if (access("/sys/firmware/acpi/tables/EINJ", R_OK) =3D=3D -1)
--               ksft_test_result_skip("EINJ table no available in firmware"=
-);
-+       if (access("/sys/firmware/acpi/tables/EINJ", R_OK) =3D=3D -1) {
-+               ksft_test_result_skip("EINJ table not available in firmware=
-\n");
-+               exit(KSFT_SKIP);
-+       }
+Agreed on making some generic accessors.
 
--       if (access(EINJ_ETYPE, R_OK | W_OK) =3D=3D -1)
-+       if (access(EINJ_ETYPE, R_OK | W_OK) =3D=3D -1) {
-                ksft_test_result_skip("EINJ module probably not loaded?\n")=
-;
-+               exit(KSFT_SKIP);
-+       }
-
-        write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
-        write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
-@@ -123,12 +127,13 @@ static void sigbus_signal_handler(int sig,
-siginfo_t *si, void *v)
-        ksft_print_msg("SIGBUS (%d) received, dumping siginfo...\n", sig);
-        ksft_print_msg("si_signo=3D%d, si_errno=3D%d, si_code=3D%d, si_addr=
-=3D%p\n",
-                       si->si_signo, si->si_errno, si->si_code, si->si_addr=
-);
--       if (si->si_code =3D=3D BUS_MCEERR_AR)
-+       if (si->si_code =3D=3D BUS_MCEERR_AR) {
-                ksft_test_result_skip("SEA is claimed by host APEI\n");
--       else
-+               exit(KSFT_SKIP);
-+       } else {
-                ksft_test_result_fail("Exit with signal unhandled\n");
--
--       exit(0);
-+               exit(KSFT_FAIL);
-+       }
- }
-
- static void setup_sigbus_handler(void)
-@@ -158,7 +163,6 @@ static void expect_sea_handler(struct ex_regs *regs)
- {
-        u64 esr =3D read_sysreg(esr_el1);
-        u64 far =3D read_sysreg(far_el1);
--       bool expect_far_invalid =3D far_invalid;
-
-        GUEST_PRINTF("Handling Guest SEA\n");
-        GUEST_PRINTF("ESR_EL1=3D%#lx, FAR_EL1=3D%#lx\n", esr, far);
-@@ -166,7 +170,7 @@ static void expect_sea_handler(struct ex_regs *regs)
-        GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
-        GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
-
--       if (expect_far_invalid) {
-+       if (far_invalid) {
-                GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, ESR_ELx_FnV);
-                GUEST_PRINTF("Guest observed garbage value in FAR\n");
-        } else {
-@@ -185,25 +189,19 @@ static void vcpu_inject_sea(struct kvm_vcpu *vcpu)
-        vcpu_events_set(vcpu, &events);
- }
-
--static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+static void validate_kvm_exit_arm_sea(struct kvm_vm *vm, struct kvm_vcpu *=
-vcpu)
- {
--       struct ucall uc;
--       bool guest_done =3D false;
-        struct kvm_run *run =3D vcpu->run;
-        u64 esr;
-
--       /* Resume the vCPU after error injection to consume the error. */
--       vcpu_run(vcpu);
-+       TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
-
--       ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
--                      exit_reason_str(run->exit_reason));
-+       ksft_print_msg("Dumping kvm_run as arm_sea:\n");
-        ksft_print_msg("kvm_run.arm_sea: esr=3D%#llx, flags=3D%#llx\n",
-                       run->arm_sea.esr, run->arm_sea.flags);
-        ksft_print_msg("kvm_run.arm_sea: gva=3D%#llx, gpa=3D%#llx\n",
-                       run->arm_sea.gva, run->arm_sea.gpa);
-
--       TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
--
-        esr =3D run->arm_sea.esr;
-        TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
-        TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
-@@ -211,39 +209,48 @@ static void run_vm(struct kvm_vm *vm, struct
-kvm_vcpu *vcpu)
-        TEST_ASSERT_EQ((esr & ESR_ELx_INST_SYNDROME), 0);
-        TEST_ASSERT_EQ(esr & ESR_ELx_VNCR, 0);
-
--       if (!(esr & ESR_ELx_FnV)) {
--               ksft_print_msg("Expect gva to match given FnV bit is 0\n");
-+       far_invalid =3D esr & ESR_ELx_FnV;
-+       sync_global_to_guest(vm, far_invalid);
-+
-+       if (!far_invalid) {
-+               ksft_print_msg("Expect gva to match\n");
-                TEST_ASSERT_EQ(run->arm_sea.gva, EINJ_GVA);
-        }
-
-        if (run->arm_sea.flags & KVM_EXIT_ARM_SEA_FLAG_GPA_VALID) {
--               ksft_print_msg("Expect gpa to match given
-KVM_EXIT_ARM_SEA_FLAG_GPA_VALID is set\n");
-+               ksft_print_msg("Expect gpa to match\n");
-                TEST_ASSERT_EQ(run->arm_sea.gpa, einj_gpa & PAGE_ADDR_MASK)=
-;
-        }
-+}
-
--       far_invalid =3D esr & ESR_ELx_FnV;
--
--       /* Inject a SEA into guest and expect handled in SEA handler. */
--       vcpu_inject_sea(vcpu);
-+static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+{
-+       struct ucall uc;
-+       bool guest_done =3D false;
-
-        /* Expect the guest to reach GUEST_DONE gracefully. */
-        do {
-                vcpu_run(vcpu);
--               switch (get_ucall(vcpu, &uc)) {
--               case UCALL_PRINTF:
--                       ksft_print_msg("From guest: %s", uc.buffer);
--                       break;
--               case UCALL_DONE:
--                       ksft_print_msg("Guest done gracefully!\n");
--                       guest_done =3D 1;
--                       break;
--               case UCALL_ABORT:
--                       ksft_print_msg("Guest aborted!\n");
--                       guest_done =3D 1;
--                       REPORT_GUEST_ASSERT(uc);
--                       break;
--               default:
--                       TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
-+               if (vcpu->run->exit_reason =3D=3D KVM_EXIT_ARM_SEA) {
-+                       validate_kvm_exit_arm_sea(vm, vcpu);
-+                       vcpu_inject_sea(vcpu);
-+               } else {
-+                       switch (get_ucall(vcpu, &uc)) {
-+                       case UCALL_PRINTF:
-+                               ksft_print_msg("From guest: %s", uc.buffer)=
-;
-+                               break;
-+                       case UCALL_DONE:
-+                               ksft_print_msg("Guest done gracefully!\n");
-+                               guest_done =3D 1;
-+                               break;
-+                       case UCALL_ABORT:
-+                               ksft_print_msg("Guest aborted!\n");
-+                               guest_done =3D 1;
-+                               REPORT_GUEST_ASSERT(uc);
-+                               break;
-+                       default:
-+                               TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd=
-);
-+                       }
-                }
-        } while (!guest_done);
- }
-
->
 > Thanks,
-> Zenghui
+> Oliver
 
