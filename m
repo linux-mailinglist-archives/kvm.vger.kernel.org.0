@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-65904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FB5CBA0BE
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 00:23:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22528CBA0C1
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 00:31:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A997C30A0F82
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:23:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6EF8C300F1A9
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D4430DD32;
-	Fri, 12 Dec 2025 23:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B812DF13A;
+	Fri, 12 Dec 2025 23:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xOWvWB1E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4OkbuOV/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D3728B3E7
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 23:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5487D1E4BE
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 23:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765581811; cv=none; b=ZmNHU+IlRF7Ya4thE2qn0EPjCIrPf0Debljd8vu1WUZL4PgJMxyHe/1R6Jcdb4XCv8TisRX2WOnxZUeia+SittPDH8yHcN7XPRCkKlUN2ptIGLE5e32jnJ6W3cKp17VeUnFkW8uWiBbGNMpJ9Wrg5daSTa0vNjgVo9fmzUdaloc=
+	t=1765582255; cv=none; b=F/GG5u2dOZydx4hZQyFlLw8Aqpdr/lkao9jsZ/GZswpXYlZm+G8zg0bkD+8egaV9b6cT2xm1vPbc+Trqo1QhYr6HWgXAMQ/E1bJA1eQMq/W/BqTPmNIqBL68nEZM5s4h0XK4s6AA/8OnYhipnH38kfhsuzgwoL8WyYGM0P18q24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765581811; c=relaxed/simple;
-	bh=cPt4+L+Tq3/9sw/6eednpCP1IHSFDXysRe2eK8BwgsI=;
+	s=arc-20240116; t=1765582255; c=relaxed/simple;
+	bh=vRlNzepxx+5wdjlhRvJZqkLWzWtdMkj9WKyQgqEmQ04=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IkiBYpFQum6/Qq/3TwjJ4ABsVb+hEXzav8NMJHSZpK6cNhAL/6jbC9FsJ/QPTB53vx31ZM2dhs9kwUPLUOJNP5dGQ8V0+m5cBVtSGkDnhzoePpnF6od8u2RPsEpnqHbtPXKXIxec6yu1Dq3JYxamuVKWEfenICXVydfS1OQ1JI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xOWvWB1E; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=vFqmMLvdo9PbPKlUpaI+gwo7pBJkIUwhvREJ1LemhaTUYe0RvzXcmT1NqCwXcCdlX9ga3lY/tpoaLJuzY70HpGFfYPaboHHw4sCMFCKHZEsmcdZSGF0OfkizhcQZfNrgBh+XfUyD5SXc4sNEs/zLlEMOOXuiPL0OOWGIkAXKvFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4OkbuOV/; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34a1bca4c23so3091098a91.1
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 15:23:29 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2958c80fcabso34519185ad.0
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 15:30:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765581809; x=1766186609; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765582253; x=1766187053; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CUpMh+9ad9lwr4IxktuH344ueNrw88ySbZ9Im72lfmY=;
-        b=xOWvWB1Ef5xlPYpFDOF7oL+rub7Un79eLb/FRFqc02p0X2bM2c2Y9Bqwf7ioj6YzSW
-         kNRvuKD6YxARWgJjl0IZ2VnC9WrwoLxdwy1e0k2FCJny3hFyFlnLZdf9dX0+t7eliZAD
-         2PAQnA8BQZhxS5ixYWslFSesW4kOvC+Bh7i2g7n0pP47s0yUnIV4gshsLQHWtrN2Wba+
-         jFc0Rqn60aMX2CcJa0mns2x1LQ1a4xq5lIikv3BUipYdh8x47oL9rnPYstoe7+htO7zz
-         z9sM5l0+jGPJ2MPSX5xRr1R9V+q5WbE0R1WvpopKwN4iDGoTwIhw2GQp8NsaHEiYRPE/
-         xS8g==
+        bh=YPUFnzvE1LGEB4EPZqcNEIbrRSKbBQjakqo88MsCIoE=;
+        b=4OkbuOV/pdi6IVoxafvCzMA1vnSGiSDxTWbSHyn56MdNx4ckCCKmv7PAGrD03Jykpw
+         b21dhloYAbIW7C4yBeNv6THcA/OpdCU89PUN8w7pLKIPAwL1qROxhd9uRBYP+Wj2jA+m
+         4CPEUDWLDJTuioikmdopSzl7047qVkajGhx0AUe6MYT0RRCqWvoDS5IyfHovoX352tWO
+         1Z9SVtR4KbKLQ5P5r9YeLb8YRrySyYznsezykbUOF1fOpV8dB/trjKJcbTYkqFGdbltj
+         54iGfl5rbjuqqHN8NGWc6GpC58psBkB8/ystzpj5Gd56VdZuoqj/Qcp4SboYkOh2vf3u
+         5FaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765581809; x=1766186609;
+        d=1e100.net; s=20230601; t=1765582253; x=1766187053;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CUpMh+9ad9lwr4IxktuH344ueNrw88ySbZ9Im72lfmY=;
-        b=Qtt0GctMQs+XFa15/QHrzX5dAds7QtX0HDYdcm3tuj8oMgiSrjzKCpTWLI21iy9qRl
-         so8GlxyYoQHh5/heR/N30mq1MuASM+nT6Zu2xtOkP8fGSzQtmPfxLEvA5VgfVFCbGYMc
-         Cn9MzJXyE2nLjVQ5wmntijtNwxY6oHSqOt4NFcqVjv7h3zaQud1gVZMx/4laOQIFKl1B
-         NCoMLviHFVrH3LCFGMnX0CLDPvcAZQrd/TnDC8d9a30/j3YHlpsIB+9kc+sJGEFtDaY+
-         l5zNfYcDC3D1eOo7UsF2xLcJqp27MlyqWEPeWE+UNq8hyF2XH1wJNV6P/UGbNzFhBMnh
-         YAoA==
-X-Forwarded-Encrypted: i=1; AJvYcCVE05mkqnBAbaFDERU9LOGbzh4eNsO0a2UyhyYSVQwRpHnz0W1To7jhxFIo39eVpFRbtlA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLEWUKrX8kDsND9bIxca3OmIZsGdlyis+pYeuljaMwze8TQEpL
-	arZOzhvK5sthxIvdSPSiXHkBuwcH8u7K0FbZ2pueCK79i5I6jI2ZVzHQiA3QS1cnAkF/esPo/fu
-	9qh/2/Q==
-X-Google-Smtp-Source: AGHT+IG3yPm9vGZ7KMwHDEEE2ruJHkkhjABLyCAeBWQ0CBrS7ZQCejhqnXgbFqAD0l6LPHxJQFcjLe9oxg4=
-X-Received: from pjop3.prod.google.com ([2002:a17:90a:9303:b0:340:d583:8694])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfce:b0:340:bfcd:6af3
- with SMTP id 98e67ed59e1d1-34abd78748dmr3163169a91.33.1765581809034; Fri, 12
- Dec 2025 15:23:29 -0800 (PST)
-Date: Fri, 12 Dec 2025 15:23:27 -0800
-In-Reply-To: <rckoq7j5pbe7rkszw7d7kkcyjpjpmdwexyrlcw2hyf6cgzpohf@scxmalwv6buz>
+        bh=YPUFnzvE1LGEB4EPZqcNEIbrRSKbBQjakqo88MsCIoE=;
+        b=JDqW77nxwl/lW3OmBvxGBhz1r0sO6sT2VY6kjoqop9ePkvobp7HFTY8zdk8a27kytl
+         Yc925vU+iaWdLbiqE6ZKx4mcd/imd0ZbZjQhDM27UwDBxFIQ8VBnF03kAYLZm3SmRHp1
+         tPOjPXFvKjoPz2IGEttu71Op5hRaL7g58WW/2xoDVvH8PsZCcI8g3v0Bg0GF0faORo+a
+         wJF6OCCii1akXU2MkNiSq5hO5odCW2xfaRcuxaOj0nyiJ0wvXjLKxKlAL0PwJONJz/rL
+         YXgo14jTgZWOPOqxb1raXWk+2qJJzB/xOd3mEZdApMQxv9ETcCjV1Bhq98dhE7VJfil3
+         oeFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWP4OTiA9sZ9WgYVml8ecA1ZbjcA7yFMMS12ochUaHkeEj/5EqcfpWevuppJdY3K2QeBMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT3HLcdOK4YlfKvLnNChd7KQWoRNCxNRP0yazTjrrfOumCv1W+
+	M4BBF4nlEjBmBcSBae6b+7fqsMGihAlCngwuChXLKuX1ugNUOxtj+8YEsrGWJIkbE/mYPqLXczK
+	6FljIow==
+X-Google-Smtp-Source: AGHT+IGYc4JneoK0W3Ry4kHv+mU/5C5A2YvBBXCemPA8KOIIIESsSEA5ZqJLu3i859Z2kGVle0Eh7AiB9cA=
+X-Received: from plhk10.prod.google.com ([2002:a17:902:d58a:b0:29d:9b42:7557])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ef12:b0:29e:9c82:a925
+ with SMTP id d9443c01a7336-29f23b1ecc1mr40903325ad.6.1765582253522; Fri, 12
+ Dec 2025 15:30:53 -0800 (PST)
+Date: Fri, 12 Dec 2025 15:30:51 -0800
+In-Reply-To: <zozt7pbeqn4ekiyrkwjbesqv6sxf6seyskfbnhzz5do2an4zbl@q6pdskoiawvc>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,56 +71,72 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
- <20251110222922.613224-12-yosry.ahmed@linux.dev> <aThKPT9ItrrDZdSd@google.com>
- <ttlhqevbe7rq5ns4vyk6e2dtlflbrkcfdabwr63jfnszshhiqs@z7ixbtq6zsla>
- <aThz5p655rk8D1KS@google.com> <rckoq7j5pbe7rkszw7d7kkcyjpjpmdwexyrlcw2hyf6cgzpohf@scxmalwv6buz>
-Message-ID: <aTyj73ORMhIX-4-c@google.com>
-Subject: Re: [PATCH v2 11/13] KVM: nSVM: Simplify nested_svm_vmrun()
+ <20251110222922.613224-11-yosry.ahmed@linux.dev> <aThIQzni6fC1qdgj@google.com>
+ <2rmpnqjnyhew3tektl3ndmukbfgs4zrytsaxdgec2i3tggneuk@gphhqbrqevan> <zozt7pbeqn4ekiyrkwjbesqv6sxf6seyskfbnhzz5do2an4zbl@q6pdskoiawvc>
+Message-ID: <aTylq0oDnhGY61PM@google.com>
+Subject: Re: [PATCH v2 10/13] KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
 From: Sean Christopherson <seanjc@google.com>
 To: Yosry Ahmed <yosry.ahmed@linux.dev>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Dec 10, 2025, Yosry Ahmed wrote:
-> On Tue, Dec 09, 2025 at 11:09:26AM -0800, Sean Christopherson wrote:
-> > On Tue, Dec 09, 2025, Yosry Ahmed wrote:
-> > > On Tue, Dec 09, 2025 at 08:11:41AM -0800, Sean Christopherson wrote:
-> > > > On Mon, Nov 10, 2025, Yosry Ahmed wrote:
-> > > > > Call nested_svm_merge_msrpm() from enter_svm_guest_mode() if called from
-> > > > > the VMRUN path, instead of making the call in nested_svm_vmrun(). This
-> > > > > simplifies the flow of nested_svm_vmrun() and removes all jumps to
-> > > > > cleanup labels.
-> > > > > 
-> > > > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > > > ---
-> > > > >  arch/x86/kvm/svm/nested.c | 28 +++++++++++++---------------
-> > > > >  1 file changed, 13 insertions(+), 15 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > > > > index a48668c36a191..89830380cebc5 100644
-> > > > > --- a/arch/x86/kvm/svm/nested.c
-> > > > > +++ b/arch/x86/kvm/svm/nested.c
-> > > > > @@ -1020,6 +1020,9 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
-> > > > >  
-> > > > >  	nested_svm_hv_update_vm_vp_ids(vcpu);
-> > > > >  
-> > > > > +	if (from_vmrun && !nested_svm_merge_msrpm(vcpu))
-> > > > 
-> > > > This is silly, just do:
-> > > 
-> > > Ack. Any objections to just dropping from_vmrun and moving
-> > > kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES) to svm_leave_smm()? I
-> > > like the consistency of completely relying on from_vmrun or not at all
+On Thu, Dec 11, 2025, Yosry Ahmed wrote:
+> On Wed, Dec 10, 2025 at 11:05:44PM +0000, Yosry Ahmed wrote:
+> > On Tue, Dec 09, 2025 at 08:03:15AM -0800, Sean Christopherson wrote:
+> > > On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > Unfortunately this doesn't work, it breaks the newly introduced
+> > nested_invalid_cr3_test. The problem is that we bail before we fully
+> > initialize VMCB02, then nested_svm_vmrun() calls nested_svm_vmexit(),
+> > which restores state from VMCB02 to VMCB12.
 > > 
-> > Zero objections.  When I was initially going through this, I actually thought you
-> > were _adding_ the flag and was going to yell at you :-)
+> > The test first tries to run L2 with a messed up CR3, which fails but
+> > corrupts VMCB12 due to the above, then the second nested entry is
+> > screwed.
+> > 
+> > There are two fixes, the easy one is just move the consistency checks
+> > after nested_vmcb02_prepare_control() and nested_vmcb02_prepare_save()
+> > (like the existing failure mode of nested_svm_load_cr3()). This works,
+> > but the code doesn't make a lot of sense because we use VMCB12 to create
+> > VMCB02 and THEN check that VMCB12 is valid.
+> > 
+> > The alternative is unfortunately a lot more involved. We only do a
+> > partial restore or a "fast #VMEXIT" for failed VMRUNs. We'd need to:
+> > 
+> > 1) Move nested_svm_load_cr3() above nested_vmcb02_prepare_control(),
+> >    which needs moving nested_svm_init_mmu_context() out of
+> >    nested_vmcb02_prepare_control() to remain before
+> >    nested_svm_load_cr3().
+> > 
+> >    This makes sure a failed nested VMRUN always needs a "fast #VMEXIT"
+> > 
+> > 2) Figure out which parts of nested_svm_vmexit() are needed in the
+> >    failed VMRUN case. We need to at least switch the VMCB, propagate the
+> >    error code, and do some cleanups. We can split this out into the
+> >    "fast #VMEXIT" path, and use it for failed VMRUNs.
+> > 
+> > Let me know which way you prefer.
 > 
-> Ugh from_vmrun is also plumbed into nested_svm_load_cr3() as
-> reload_pdptrs. Apparently we shouldn't do that in the call path from
-> svm_leave_smm()? Anyway, seems like it'll be non-trivial to detangle (at
-> least for me, I have 0 understanding of SMM), so I will leave it as-is.
+> I think I prefer (2), the code looks cleaner and I like having a
+> separate code path for VMRUN failures. Unless there are objections, I
+> will do that in the next version.
 
-Agreed, there's enough refactoring going on as it is, no need to turn the
-snowball into an avalanche.
+With the caveat that I haven't seen the code, that has my vote too.  nVMX has a
+similar flow, and logically this is equivalent, at least to me.  We can probably
+even use similar terminology, e.g. vmrun_fail_vmexit instead of vmentry_fail_vmext.
+
+vmentry_fail_vmexit:
+	vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+
+	if (!from_vmentry)
+		return NVMX_VMENTRY_VMEXIT;
+
+	load_vmcs12_host_state(vcpu, vmcs12);
+	vmcs12->vm_exit_reason = exit_reason.full;
+	if (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx))
+		vmx->nested.need_vmcs12_to_shadow_sync = true;
+	return NVMX_VMENTRY_VMEXIT;
+
+
+
 
