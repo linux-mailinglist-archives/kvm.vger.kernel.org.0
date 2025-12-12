@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-65890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDF7ACB9C2D
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 21:27:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949A5CB9C4E
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 21:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0AC813003107
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 20:27:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BF5C5300B680
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 20:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957103126B8;
-	Fri, 12 Dec 2025 20:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626DA3126BE;
+	Fri, 12 Dec 2025 20:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vlENiZg0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EmiD+Q8F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3195D30BF6B
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 20:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DB730BBA3
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 20:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765571271; cv=none; b=kwgvceEIE9BffLxSQ8ww2kUxSiTYtYAoH+Cd0jB4gVUnXME0ZOPBiCMJEAWAE2p5eFdo+7Pbdav7g1VoYSmUyvPTTa4KuYIp44xNGlOlgQTRLdlPSVGWbTD7Gaie0GEIbAlPp576QuMXLUopEg2HExNLVc70bumMNNANHuuN31s=
+	t=1765571404; cv=none; b=mix2oz8ro65L6zo87QSIApXH+/FUxwC9XOB7enBca6J8h/piU3xYwUNGuWjhM9qOAB8ru3ZkGl2Uhla2pK5BL8T1ATY6fKI+0axOlQQo/tIao9ggINXn3TWbrepqj5qAkGOsOroDSWeRXl+KelF1MeYzr6bZqPqHV4OryW5feJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765571271; c=relaxed/simple;
-	bh=xi7nKKP19jWf1tsN8ro67KKFXkP+49bDKSOt9hT+rz0=;
+	s=arc-20240116; t=1765571404; c=relaxed/simple;
+	bh=ovPDDBDay26a3+eGDiFu4QvB1wANKfFVQsCpr8lljp0=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=WHgpgvyBiVB7RjL3/ZKiq9QFT2dFAQN2AbHnaWoKIL/6g5OxKoWd28Qa5W2yFb9PEVFmPwQRJeyAZhVnA6Q/oPH9OmViKvsHc37fUcviaqxqa15VS2PPYNmdPPAdRESaRK+FTzvnaVcNIhf3kuPq2jgpan8bANSqN0NFOJjv4BI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vlENiZg0; arc=none smtp.client-ip=209.85.167.202
+	 Content-Type; b=R27XVmWQTe2I8MuUI7lNcaq8WxdTOugCITDX0OeYZmRnuehWZXxGlxwFbn0aQUB9sgcRGXRZsyjCMQnVmOEtuDA2rhDQDwFB/iVFZ4do/j3+kFR+MelJllDMHt4iQzG5PPZUmFUtcaZL8G4+67HzeXYmYFI0XcoXk/ZlLI8CSwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EmiD+Q8F; arc=none smtp.client-ip=209.85.210.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-450be8a012cso2112707b6e.0
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 12:27:49 -0800 (PST)
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7c6d917f184so1321188a34.0
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 12:30:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765571268; x=1766176068; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765571401; x=1766176201; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=fzm/tsqAvW56TDo978ZmdNBfUInnyBjt6fplMac4YIM=;
-        b=vlENiZg0zDQdsEARe6eUZN7+/2n2qlBaaqKLosM9rU5da8OugtAYhEnIaCUskcvDyL
-         fx67tiArY/BZVHN7S7XxdB40gRRHMKINmuQfd8m8CBHuMCmjdquF4KgkYPRsYgMJqp+P
-         AerNUT9L7cUGN+XcWuJczw+nwSVOqe1NPxF5mmuDkpFcx/gMUDPpEQyD4RTaUk0rHpnj
-         xxZnENVMiHhVJOSr4lyEZc2GqNfUvaeyc3arNSyy+jkcEtRTqg7IGHUz4TmcYT4sChD+
-         NR4HmSBDN4/p9j5M4PUG/GiL9VLR7564LrelWsuE3fRVPtoeRKscHILoxsnrCXWrYJH0
-         jGBA==
+        bh=IMNyF6rnk7IasEWeVI8MWH21McRpJbckeB5bd8oSwWI=;
+        b=EmiD+Q8FMvn6GGdxf5U9UR6Uo4mYeMEpbyNqXHgWZoIr/EXJPqGo/aZavdgcT/7E0L
+         UNb6jMIa0VQqwRa3WicHt+3JuzyzLr2N/NvF95WLRMXXdAyd+vfowNW/OFUiVoHFozMi
+         kEBbZKmvzS1GsZ/tQupy5n6crYEbM7wpPZZZQDEdcHSqa2vq7uu2zRp7AXDBgKO9DDdP
+         uprEQJAfOY/b7cMjDfGktcGO0rIc2pOf+37AZUSZFFHxAdh201pq0aweHQsnozH3ZA4u
+         MZeRNZ04C8MYOi2mYpNktDk0HYssmG4aesuMnSOtDrdRfudIsUuACRsImO8UxhSK51HH
+         mz2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765571268; x=1766176068;
+        d=1e100.net; s=20230601; t=1765571401; x=1766176201;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fzm/tsqAvW56TDo978ZmdNBfUInnyBjt6fplMac4YIM=;
-        b=PJDMPPKb0uLhNUae0FJCK6Yr/pNBW3NWaQXAvJ7+rGgJ1zMBNYtXy6Bjpue3bpzfUB
-         jSr/IAIjVYmwyZ66rj4BbKM4eGou+IZixlAeXxJZSi2TaxvnUJRvUg+CIcar0iU+GeIs
-         hK+uU9bQWu+umIQuDCIPqMOW3irHoIUpP45cNRbwauJiJqJ8dbO2bkrP0S0TVYfPD010
-         3UDBtjPsToOr5Rg4MGCiZ/Tf6AwJxtHqk5uYGPzIJhM0Mu/uR/hMh/aqAIUD6OsC6+ce
-         2J+J2K/xzCk+nC2lKCFCfVzEOwVIynx2WP3RaCcbSd0lClr5SUdTqTm/XisQn+kv9JXy
-         qDuQ==
-X-Gm-Message-State: AOJu0YxK5qL/J8EwSw3BOI6wEKmx9Vm00w53vRpcfAzq2WquCu8KlbB8
-	Yq92p3iZH79TP4ya0j6WHzPKBMG2o1XnGHcZO3PNtkgM4D5RP30mOIpn3PadpaD7vRnpIpLodwt
-	Bwjj8xyzzE+qH23b7I/Sb76LxQg==
-X-Google-Smtp-Source: AGHT+IHtS4CSArf4CIQyXaQ3gTcwhHkWk1+dzcc15H4XApucHfZc+0GcjKfr0Sr/upH3+2NzDR6Jy4cUsIgV3mtOEg==
-X-Received: from oiks6-n2.prod.google.com ([2002:a05:6808:a606:20b0:450:c024:a4f7])
+        bh=IMNyF6rnk7IasEWeVI8MWH21McRpJbckeB5bd8oSwWI=;
+        b=cQvaFrhPBcpjDSMepzlZm80JJJtRhfQRjD6jM/2Nt1sldTqlfB79z9lHIuOB6GqMg7
+         qLvZ/B+q8Fx6FNqb/xni7x7o7ZqVg+UWDF3oWEqP3s9w2oFvd7MtL4D1mHiXh2odeoQh
+         MnY13QAuBIZkS/ln2mr5ztbn40gcticp0oQPxZXm29Y1NLwnSSpoW7sTlu97fRFlqttQ
+         3lKdhh8uutXBsXH8BsQRYIXO0R2/ljHs9hN7IQC2KvL/2SZT7ZGmfbf/lAym2pdjxExl
+         O37FHALBbA9naggsf1m51jbf3M7tTQ5loPCTPLYAbT8hIr9wxT53esCwm+uei7OmkE2k
+         780g==
+X-Gm-Message-State: AOJu0YwGuTtKTS/I+tRMiZxx5dLwe5E8RKjjRs527f6XcANIJNjfYjsu
+	ROe7NidUkKLCPI/+QJJX3dLIij0eSAHN841QqGiawfPlonWd2d7J6uWpY0ciU5u3fDbYJjUZ+h+
+	EHVDaev1pc0CbnPm43Yh/4a/J5w==
+X-Google-Smtp-Source: AGHT+IHCc2P1hnQfNfNIerRNuvTcLdQFAWD/TzzhCNvUPfhQTb3KYPRTL0VnqSzv7pNym78BlH1sW72DFgyhEDe6qA==
+X-Received: from ilbbn5.prod.google.com ([2002:a05:6e02:3385:b0:438:15d1:5e1c])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:4fd0:b0:44d:a0ec:d9a5 with SMTP id 5614622812f47-455ac822609mr1365623b6e.1.1765571268278;
- Fri, 12 Dec 2025 12:27:48 -0800 (PST)
-Date: Fri, 12 Dec 2025 20:27:47 +0000
-In-Reply-To: <202512110209.GjVZa9ti-lkp@intel.com> (message from kernel test
- robot on Thu, 11 Dec 2025 02:31:00 +0800)
+ 2002:a05:6820:178c:b0:659:9a49:90bf with SMTP id 006d021491bc7-65b451e95f7mr1599664eaf.62.1765571400768;
+ Fri, 12 Dec 2025 12:30:00 -0800 (PST)
+Date: Fri, 12 Dec 2025 20:29:59 +0000
+In-Reply-To: <202512110439.UXwb1Qh4-lkp@intel.com> (message from kernel test
+ robot on Thu, 11 Dec 2025 04:21:58 +0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <gsnt4ipv4f98.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 11/24] KVM: arm64: Writethrough trapped PMEVTYPER register
+Message-ID: <gsnt1pkz4f5k.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 09/24] perf: arm_pmuv3: Keep out of guest counter partition
 From: Colton Lewis <coltonlewis@google.com>
 To: kernel test robot <lkp@intel.com>
 Cc: kvm@vger.kernel.org, oe-kbuild-all@lists.linux.dev, pbonzini@redhat.com, 
@@ -89,80 +89,37 @@ kernel test robot <lkp@intel.com> writes:
 
 > Hi Colton,
 
-> kernel test robot noticed the following build errors:
+> kernel test robot noticed the following build warnings:
 
-> [auto build test ERROR on ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d]
+> [auto build test WARNING on ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d]
 
 > url:     
 > https://github.com/intel-lab-lkp/linux/commits/Colton-Lewis/arm64-cpufeature-Add-cpucap-for-HPMN0/20251210-055309
 > base:   ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
 > patch link:     
-> https://lore.kernel.org/r/20251209205121.1871534-12-coltonlewis%40google.com
-> patch subject: [PATCH v5 11/24] KVM: arm64: Writethrough trapped  
-> PMEVTYPER register
-> config: arm64-randconfig-001-20251210  
-> (https://download.01.org/0day-ci/archive/20251211/202512110209.GjVZa9ti-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 14.3.0
+> https://lore.kernel.org/r/20251209205121.1871534-10-coltonlewis%40google.com
+> patch subject: [PATCH v5 09/24] perf: arm_pmuv3: Keep out of guest  
+> counter partition
+> config: arm64-defconfig  
+> (https://download.01.org/0day-ci/archive/20251211/202512110439.UXwb1Qh4-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 15.1.0
 > reproduce (this is a W=1 build):  
-> (https://download.01.org/0day-ci/archive/20251211/202512110209.GjVZa9ti-lkp@intel.com/reproduce)
+> (https://download.01.org/0day-ci/archive/20251211/202512110439.UXwb1Qh4-lkp@intel.com/reproduce)
 
 > If you fix the issue in a separate patch/commit (i.e. not just a new  
 > version of
 > the same patch/commit), kindly add following tags
 > | Reported-by: kernel test robot <lkp@intel.com>
 > | Closes:  
-> https://lore.kernel.org/oe-kbuild-all/202512110209.GjVZa9ti-lkp@intel.com/
+> https://lore.kernel.org/oe-kbuild-all/202512110439.UXwb1Qh4-lkp@intel.com/
 
-> All errors (new ones prefixed by >>):
+> All warnings (new ones prefixed by >>):
 
->     arch/arm64/kvm/sys_regs.c: In function 'writethrough_pmevtyper':
->>> arch/arm64/kvm/sys_regs.c:1183:34: error: implicit declaration of  
->>> function 'kvm_pmu_event_mask'; did you mean 'kvm_pmu_evtyper_mask'?  
->>> [-Wimplicit-function-declaration]
->      1183 |                 eventsel = val & kvm_pmu_event_mask(vcpu->kvm);
->           |                                  ^~~~~~~~~~~~~~~~~~
->           |                                  kvm_pmu_evtyper_mask
+>>> Warning: arch/arm64/kvm/pmu-direct.c:75 function parameter 'pmu' not  
+>>> described in 'kvm_pmu_guest_counter_mask'
 
+Just a missing argument description in the comment. Fixed
 
-Caused by missing a stub definition for kvm_pmu_event_mask when
-reorganizing headers in patch 6: Reorganize PMU functions
-
-Fixed
-
-> vim +1183 arch/arm64/kvm/sys_regs.c
-
->    1168
->    1169	static bool writethrough_pmevtyper(struct kvm_vcpu *vcpu, struct  
-> sys_reg_params *p,
->    1170					   u64 reg, u64 idx)
->    1171	{
->    1172		u64 eventsel;
->    1173		u64 val = p->regval;
->    1174		u64 evtyper_set = ARMV8_PMU_EXCLUDE_EL0 |
->    1175			ARMV8_PMU_EXCLUDE_EL1;
->    1176		u64 evtyper_clr = ARMV8_PMU_INCLUDE_EL2;
->    1177
->    1178		__vcpu_assign_sys_reg(vcpu, reg, val);
->    1179
->    1180		if (idx == ARMV8_PMU_CYCLE_IDX)
->    1181			eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
->    1182		else
->> 1183			eventsel = val & kvm_pmu_event_mask(vcpu->kvm);
->    1184
->    1185		if (vcpu->kvm->arch.pmu_filter &&
->    1186		    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
->    1187			val |= evtyper_set;
->    1188
->    1189		val &= ~evtyper_clr;
->    1190
->    1191		if (idx == ARMV8_PMU_CYCLE_IDX)
->    1192			write_pmccfiltr(val);
->    1193		else
->    1194			write_pmevtypern(idx, val);
->    1195
->    1196		return true;
->    1197	}
->    1198
 
 > --
 > 0-DAY CI Kernel Test Service
