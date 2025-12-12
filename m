@@ -1,142 +1,126 @@
-Return-Path: <kvm+bounces-65903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65904-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECB5ECBA006
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:59:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FB5CBA0BE
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 00:23:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F6343073D57
-	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 22:59:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A997C30A0F82
+	for <lists+kvm@lfdr.de>; Fri, 12 Dec 2025 23:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5954E306B00;
-	Fri, 12 Dec 2025 22:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D4430DD32;
+	Fri, 12 Dec 2025 23:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jVYH8cYG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xOWvWB1E"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46472F531B
-	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 22:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D3728B3E7
+	for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 23:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765580345; cv=none; b=jxkYD8/d4sCeu0Qsxfl1J0eh0dw+VmGF2J1uxWZWhwstvoipC5QwqPPZ5M4DN/FqmrcK+J/F2hEJdH0QlQB9A/FuFNZn5U4wSsbUtiM4SNl/baXlDTVprmaTvDIro4ntNUz7J5KFv2afh2dRD5j4cP7J9jlDVvdOwPzfE8j7+lM=
+	t=1765581811; cv=none; b=ZmNHU+IlRF7Ya4thE2qn0EPjCIrPf0Debljd8vu1WUZL4PgJMxyHe/1R6Jcdb4XCv8TisRX2WOnxZUeia+SittPDH8yHcN7XPRCkKlUN2ptIGLE5e32jnJ6W3cKp17VeUnFkW8uWiBbGNMpJ9Wrg5daSTa0vNjgVo9fmzUdaloc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765580345; c=relaxed/simple;
-	bh=7bslInIBLJIoLn/9TutWUpr69eWhQhXaLvHEGWAesY0=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=i0yUMUNbQjCJL+71RB63OdZ/mtPU7tJgyQIj+W8XU4puwD40UGiFGvmtWLnPqh9v3ge+7eulXgd4j61x7ktwOm8mKgAlZUEeVc+DUBDOIdyxVjMqug0BBrQBG6lwEVm54xpK34zKGmKipJ8NUH0Imr7/VbexnXygT3NL6GYkEMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jVYH8cYG; arc=none smtp.client-ip=209.85.161.74
+	s=arc-20240116; t=1765581811; c=relaxed/simple;
+	bh=cPt4+L+Tq3/9sw/6eednpCP1IHSFDXysRe2eK8BwgsI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IkiBYpFQum6/Qq/3TwjJ4ABsVb+hEXzav8NMJHSZpK6cNhAL/6jbC9FsJ/QPTB53vx31ZM2dhs9kwUPLUOJNP5dGQ8V0+m5cBVtSGkDnhzoePpnF6od8u2RPsEpnqHbtPXKXIxec6yu1Dq3JYxamuVKWEfenICXVydfS1OQ1JI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xOWvWB1E; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-65b355a1abbso1579235eaf.2
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 14:59:03 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34a1bca4c23so3091098a91.1
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 15:23:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765580343; x=1766185143; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tBFcNzGChK01MBl7aRFxeqVQzmaQvoTyGJMrwZXP/1Q=;
-        b=jVYH8cYGDRhUhxifgajdZOsToCsIevvKQcPuHJqgeqiyM6J4bSKk0BbDSMvTeavxYF
-         46v35BE3mzyUckBVDyX+t6bFc8DQNE8G+5vaX9HSWEXgmXpuLsMilxVI5KQw7r1PUo0p
-         4+LO92YfEjdn8YqVDLcsrUATartyXsX/jv/3ZD6lOzAevAUxCE+EVLg7QWkenEan6MqD
-         9t4HbQyC7yg2YTsc7Kx2uww4W4M1PUdkSL33bN6hRwFbPnAzU5dNB3wCeu+7UftOKj4A
-         /YGInhe8GfSUS4xpKoTEb36c4TvW1doFr4iEHeC3nMEiTR0zqs7zcsAXaYloao3f7CPH
-         W6hA==
+        d=google.com; s=20230601; t=1765581809; x=1766186609; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CUpMh+9ad9lwr4IxktuH344ueNrw88ySbZ9Im72lfmY=;
+        b=xOWvWB1Ef5xlPYpFDOF7oL+rub7Un79eLb/FRFqc02p0X2bM2c2Y9Bqwf7ioj6YzSW
+         kNRvuKD6YxARWgJjl0IZ2VnC9WrwoLxdwy1e0k2FCJny3hFyFlnLZdf9dX0+t7eliZAD
+         2PAQnA8BQZhxS5ixYWslFSesW4kOvC+Bh7i2g7n0pP47s0yUnIV4gshsLQHWtrN2Wba+
+         jFc0Rqn60aMX2CcJa0mns2x1LQ1a4xq5lIikv3BUipYdh8x47oL9rnPYstoe7+htO7zz
+         z9sM5l0+jGPJ2MPSX5xRr1R9V+q5WbE0R1WvpopKwN4iDGoTwIhw2GQp8NsaHEiYRPE/
+         xS8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765580343; x=1766185143;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBFcNzGChK01MBl7aRFxeqVQzmaQvoTyGJMrwZXP/1Q=;
-        b=lgDd/IcceHaMiGYhtQRQJ3mk7AhfZiWWUyDujBNLZq/jDdLFaBX5/JQpJnwIwBNJ68
-         YMiM1JwpA4WDF0KHIsWY4Rfb7wxTmqiK4Gx4dJbgzAj3GUcWrHna/5n7YvBYuNNifGVh
-         CD8ihqxrOyfVVgtDRJcKf1peO/F27ZBmAcQG8EpSy9lQ4mj+aVadadTeMda/OIo+N1gd
-         +6k3rvlU5CusPqk4ckeHXeGylD39hyMOsg4BazFcYUgeqZG1fSBb0W385BuZ460U1mF/
-         HnA/nZVzdKrgBFxM5+HpgVm0UIskR3t6x+gPUvVQhJYTlBRaE9NUqrekxqzXP0PusLvJ
-         Q8+A==
-X-Gm-Message-State: AOJu0Yy+kncM9J9m9w3PqDGDHh5lrp3O+XP1jpYP/OW5KW/4wqeC9qjY
-	OC+WL6OwcqJcWSC0CLD+6YjvJPZeBjAZd0kMP33AngJT9dCNRE6RTjweqcRBfd35ZgFJDasNA6D
-	OBBRBWdapvfqti/Y4iISoCWZFZg==
-X-Google-Smtp-Source: AGHT+IErW9ttpylPAKTVb6sUEZwG4YGY35EKiSdiqsCWGntNWnLEEqDhx+071F1DfXt8IYeJCob+cCIIDVfcvHekjQ==
-X-Received: from ilbbc25.prod.google.com ([2002:a05:6e02:99:b0:434:972f:bf92])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:1886:b0:65b:35a2:7a8b with SMTP id 006d021491bc7-65b4523911emr1339446eaf.82.1765580342788;
- Fri, 12 Dec 2025 14:59:02 -0800 (PST)
-Date: Fri, 12 Dec 2025 22:59:01 +0000
-In-Reply-To: <aTipeb2fAmUtSzzX@kernel.org> (message from Oliver Upton on Tue,
- 9 Dec 2025 14:58:01 -0800)
+        d=1e100.net; s=20230601; t=1765581809; x=1766186609;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CUpMh+9ad9lwr4IxktuH344ueNrw88ySbZ9Im72lfmY=;
+        b=Qtt0GctMQs+XFa15/QHrzX5dAds7QtX0HDYdcm3tuj8oMgiSrjzKCpTWLI21iy9qRl
+         so8GlxyYoQHh5/heR/N30mq1MuASM+nT6Zu2xtOkP8fGSzQtmPfxLEvA5VgfVFCbGYMc
+         Cn9MzJXyE2nLjVQ5wmntijtNwxY6oHSqOt4NFcqVjv7h3zaQud1gVZMx/4laOQIFKl1B
+         NCoMLviHFVrH3LCFGMnX0CLDPvcAZQrd/TnDC8d9a30/j3YHlpsIB+9kc+sJGEFtDaY+
+         l5zNfYcDC3D1eOo7UsF2xLcJqp27MlyqWEPeWE+UNq8hyF2XH1wJNV6P/UGbNzFhBMnh
+         YAoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVE05mkqnBAbaFDERU9LOGbzh4eNsO0a2UyhyYSVQwRpHnz0W1To7jhxFIo39eVpFRbtlA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLEWUKrX8kDsND9bIxca3OmIZsGdlyis+pYeuljaMwze8TQEpL
+	arZOzhvK5sthxIvdSPSiXHkBuwcH8u7K0FbZ2pueCK79i5I6jI2ZVzHQiA3QS1cnAkF/esPo/fu
+	9qh/2/Q==
+X-Google-Smtp-Source: AGHT+IG3yPm9vGZ7KMwHDEEE2ruJHkkhjABLyCAeBWQ0CBrS7ZQCejhqnXgbFqAD0l6LPHxJQFcjLe9oxg4=
+X-Received: from pjop3.prod.google.com ([2002:a17:90a:9303:b0:340:d583:8694])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfce:b0:340:bfcd:6af3
+ with SMTP id 98e67ed59e1d1-34abd78748dmr3163169a91.33.1765581809034; Fri, 12
+ Dec 2025 15:23:29 -0800 (PST)
+Date: Fri, 12 Dec 2025 15:23:27 -0800
+In-Reply-To: <rckoq7j5pbe7rkszw7d7kkcyjpjpmdwexyrlcw2hyf6cgzpohf@scxmalwv6buz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <gsnt5xab2toq.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 22/24] KVM: arm64: Add KVM_CAP to partition the PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
+ <20251110222922.613224-12-yosry.ahmed@linux.dev> <aThKPT9ItrrDZdSd@google.com>
+ <ttlhqevbe7rq5ns4vyk6e2dtlflbrkcfdabwr63jfnszshhiqs@z7ixbtq6zsla>
+ <aThz5p655rk8D1KS@google.com> <rckoq7j5pbe7rkszw7d7kkcyjpjpmdwexyrlcw2hyf6cgzpohf@scxmalwv6buz>
+Message-ID: <aTyj73ORMhIX-4-c@google.com>
+Subject: Re: [PATCH v2 11/13] KVM: nSVM: Simplify nested_svm_vmrun()
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Oliver Upton <oupton@kernel.org> writes:
+On Wed, Dec 10, 2025, Yosry Ahmed wrote:
+> On Tue, Dec 09, 2025 at 11:09:26AM -0800, Sean Christopherson wrote:
+> > On Tue, Dec 09, 2025, Yosry Ahmed wrote:
+> > > On Tue, Dec 09, 2025 at 08:11:41AM -0800, Sean Christopherson wrote:
+> > > > On Mon, Nov 10, 2025, Yosry Ahmed wrote:
+> > > > > Call nested_svm_merge_msrpm() from enter_svm_guest_mode() if called from
+> > > > > the VMRUN path, instead of making the call in nested_svm_vmrun(). This
+> > > > > simplifies the flow of nested_svm_vmrun() and removes all jumps to
+> > > > > cleanup labels.
+> > > > > 
+> > > > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > > > > ---
+> > > > >  arch/x86/kvm/svm/nested.c | 28 +++++++++++++---------------
+> > > > >  1 file changed, 13 insertions(+), 15 deletions(-)
+> > > > > 
+> > > > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > > > > index a48668c36a191..89830380cebc5 100644
+> > > > > --- a/arch/x86/kvm/svm/nested.c
+> > > > > +++ b/arch/x86/kvm/svm/nested.c
+> > > > > @@ -1020,6 +1020,9 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
+> > > > >  
+> > > > >  	nested_svm_hv_update_vm_vp_ids(vcpu);
+> > > > >  
+> > > > > +	if (from_vmrun && !nested_svm_merge_msrpm(vcpu))
+> > > > 
+> > > > This is silly, just do:
+> > > 
+> > > Ack. Any objections to just dropping from_vmrun and moving
+> > > kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES) to svm_leave_smm()? I
+> > > like the consistency of completely relying on from_vmrun or not at all
+> > 
+> > Zero objections.  When I was initially going through this, I actually thought you
+> > were _adding_ the flag and was going to yell at you :-)
+> 
+> Ugh from_vmrun is also plumbed into nested_svm_load_cr3() as
+> reload_pdptrs. Apparently we shouldn't do that in the call path from
+> svm_leave_smm()? Anyway, seems like it'll be non-trivial to detangle (at
+> least for me, I have 0 understanding of SMM), so I will leave it as-is.
 
-> On Tue, Dec 09, 2025 at 08:51:19PM +0000, Colton Lewis wrote:
->> +
->> +7.245 KVM_CAP_ARM_PARTITION_PMU
->> +-------------------------------------
->> +
-
-> Why can't this be a vCPU attribute similar to the other vPMU controls?
-> Making the UAPI consistent will make it easier for userspace to reason
-> about it.
-
-I'm confused by the inconsistency of using a vCPU attribute for
-something we want to affect the whole VM.
-
-But I'll do a vCPU attribute if you want.
-
-> Better yet, we could make the UAPI such that userspace selects a PMU
-> implementation and the partitioned-ness of the PMU at the same time.
-
-Sounds good.
-
->> @@ -132,6 +134,16 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->>   		}
->>   		mutex_unlock(&kvm->lock);
->>   		break;
->> +	case KVM_CAP_ARM_PARTITION_PMU:
->> +		if (kvm->created_vcpus) {
->> +			r = -EBUSY;
->> +		} else if (!kvm_pmu_partition_ready()) {
->> +			r = -EPERM;
->> +		} else {
->> +			r = 0;
->> +			kvm_pmu_partition_enable(kvm, cap->args[0]);
->> +		}
->> +		break;
->>   	default:
->>   		break;
->>   	}
->> @@ -388,6 +400,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,  
->> long ext)
->>   	case KVM_CAP_ARM_PMU_V3:
->>   		r = kvm_supports_guest_pmuv3();
->>   		break;
->> +	case KVM_CAP_ARM_PARTITION_PMU:
->> +		r = kvm_pmu_partition_ready();
-
-> "ready" is very confusing in this context, as KVM will never be ready to
-> support the feature on a system w/o the prerequisites.
-
-That was a last minute addition. I'll change the name to something
-better.
-
-> Thanks,
-> Oliver
+Agreed, there's enough refactoring going on as it is, no need to turn the
+snowball into an avalanche.
 
