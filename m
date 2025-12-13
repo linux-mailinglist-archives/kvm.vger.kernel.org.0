@@ -1,185 +1,130 @@
-Return-Path: <kvm+bounces-65925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BF6CBA71F
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 09:07:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9BB6CBA931
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 13:39:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 251A73040753
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 08:05:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C73363022FCC
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 12:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD848296BB8;
-	Sat, 13 Dec 2025 08:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D778E2C0F6C;
+	Sat, 13 Dec 2025 12:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l/npXOiV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j4NJY0rb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1B6287503
-	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 08:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AF7281356
+	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 12:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765613120; cv=none; b=g9LwuiW1JnjPkuV9+V95ZhzDEuPKl7K1XPYVjUlqjxdMemIKfIqz18NHtRSs+UAxQWZaHHf1KedqcNfH1haWiEgNMD2SK5HpFtgWasdePYb++QVmKJAKhgAcIKMctPATvtykFgZXrtYVKXUNrXNDzViZ6sYGfbeunWsK7EsEi20=
+	t=1765629545; cv=none; b=X2efHzgDcNndSRSgtBWvTNY6K/+ckgo9FQ1Qhd7CFmOgazbssmzEneGs5uQQJXDMo4xQ2YKR+6dwVtofuZs8+aG5x+BXiyMVK9azDhjCz4sbeFVYJhwZAchdLdcQW9d3fLKlbVLJ6AUPzfpbZocSUUiAD5BER0a9YWjtKYLoKoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765613120; c=relaxed/simple;
-	bh=wol9oS19c9bBdlTBpPH9ntNcDtf/6ZWS5Gp4NfQ0SYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a4WJ6mJxE/9SKq/rD21WMBmK18OKZe4uqIrEvxXQFapKhY2pg3DBtCi8xnZdZbBdsRIeDmDyVeh6oijLs2/TrouXrZLllng0u/MkmY902M5DQgqlMTFa0M2kyVAKv/vRIDc+Qu7Fi8HZwCl+JJdxEVZyIrdKxWcltewj6uzE83U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l/npXOiV; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765613119; x=1797149119;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wol9oS19c9bBdlTBpPH9ntNcDtf/6ZWS5Gp4NfQ0SYg=;
-  b=l/npXOiV1GIxxZGUOGYye1tm2PJ96rOAu3f1wGqVSsdbqhkAZlmOhMqS
-   lhrFg+DVZdMFrvmNZAuiTLmi2eTZC0BMVMr8Iw4tw5pFtgIFs+L9BOIoK
-   11uedJ4H30Heskw2/EtVfMJbn0ck62IGvUunVv8TR3Tm4C4XYy3IuC8Bq
-   2FQCCa5mbUfssr/VIa+FsQGCao1t0hunY49nbrFqQX0YKzWOK16nQ+llu
-   q0iaZYvn+lg3qphJvxGokaDYx4FcX1ZM83EoKulhPfPQIuG6mYsfPoGB1
-   py403VN1a6iEtbBkceT5d803meJtn0wxSau7IuDXvnCBAEn/cU4XvFZZI
-   g==;
-X-CSE-ConnectionGUID: bp0p32rpTvWNLeE7tqWE/g==
-X-CSE-MsgGUID: 6lqvIohsSgWHfl1r9zt9UA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67675492"
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="67675492"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2025 00:05:19 -0800
-X-CSE-ConnectionGUID: +REegi4BSZ6Pyhok8jMjiA==
-X-CSE-MsgGUID: EDrkqM7KRneDKww23KbinA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="227937216"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 13 Dec 2025 00:05:15 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vUKcq-000000007H3-3MBs;
-	Sat, 13 Dec 2025 08:05:12 +0000
-Date: Sat, 13 Dec 2025 16:05:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Message-ID: <202512131539.zPrweF7e-lkp@intel.com>
-References: <20251212152215.675767-15-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1765629545; c=relaxed/simple;
+	bh=eInlOs4Mc9g2A0jeabtfZtp33M6zckPZAXDrEPuMPx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zv+gajDswEmLFIhYZY41zNOgP/Uo/kRtnEIilvqoOdBhLYvDACdONAKrCG6ty/879KER3dix1fKa141eFmJPm+bLXkk+ApX6Tfz73LJVYBXbWYpkwsGMfkvNKfwPSBoDljTmgWrpwIIeQfsTxsSaGKcV3ngwzigea+y0rIvPgio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j4NJY0rb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9962BC4CEFB
+	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 12:39:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765629544;
+	bh=eInlOs4Mc9g2A0jeabtfZtp33M6zckPZAXDrEPuMPx8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=j4NJY0rbhEFQxn7T756066+uHzz0peSc5DabxJkZa6TzPs9yHMifnPAtqWt5Cr7gg
+	 J0KTF+xaH9+72ZVvd/181p+qmeuxtgm6boD3KQzFxWAaHgdTj0SLiwRntKFaKhsP3u
+	 3OJEtYkfn32xImD+vagTDQC+YhQDUImoFZUzELsrOKkiwGW1Pvo3fGs43eZsThNVsI
+	 ZXYPnzN+t7U/N7gH0u2A9jyMT/9MlmBaCAD/vc617RXt7/XTyJiMu4HTIAJmWQB4qE
+	 98mlPmR4w1U5n+ovqVDPXw34h0Ncoji3ru+mleEh5rvlYqf6j/EbRwMQQ6HzCOra0B
+	 bDgQD5NSg0W2g==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b725ead5800so306860266b.1
+        for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 04:39:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU3WbeQNqF3C1yEzvIh/7Nf6xhd9UniEgk8sQPQ0PsnLGHp7PJcHp0MrqkCfgKjeAN3wxc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaE4u06H8AymPIGIHVadHuV337dz2+vzcepRq/be9isVpGVOCi
+	SyGdz6fmYiawvEZgV8lpT+ltGfkOyU2sQRPDMlgmDqIYhZ7BdAYfegUF6Jg5K4JhfqEK0i8RupC
+	Dxpce2FF43k5JpP+FpgNg1UtdcfqWYyQ=
+X-Google-Smtp-Source: AGHT+IFLHD47GPfOFl7SONUY6Bn1a0xVaJUAYI6wlPg8HerejJH0KhouJ62knw3R+Ax3v24rtXyR6XxOjCL0UKOxJWI=
+X-Received: by 2002:a17:907:1c1e:b0:b79:e887:e1b3 with SMTP id
+ a640c23a62f3a-b7d23c2a164mr567772666b.57.1765629543203; Sat, 13 Dec 2025
+ 04:39:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212152215.675767-15-sascha.bischoff@arm.com>
+References: <20251206064658.714100-1-gaosong@loongson.cn>
+In-Reply-To: <20251206064658.714100-1-gaosong@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sat, 13 Dec 2025 20:39:15 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5BZuZGu0jOBXr-Ed1uJYhS_d2NMhV22-7VGu_7J2D1fw@mail.gmail.com>
+X-Gm-Features: AQt7F2q3O0tm0DpSPLgoXtszYEE-VE9U0I2bc3zJclmShIzFQf9ofhyqqA_ZP8I
+Message-ID: <CAAhV-H5BZuZGu0jOBXr-Ed1uJYhS_d2NMhV22-7VGu_7J2D1fw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/4] LongArch: KVM: Add AVEC support irqchip in kernel
+To: Song Gao <gaosong@loongson.cn>
+Cc: maobibo@loongson.cn, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kernel@xen0n.name, linux-kernel@vger.kernel.org, lixianglai@loongson.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sascha,
+Hi, Song,
 
-kernel test robot noticed the following build errors:
+On Sat, Dec 6, 2025 at 3:11=E2=80=AFPM Song Gao <gaosong@loongson.cn> wrote=
+:
+>
+> Hi,
+>
+> This series adds AVEC-related macros, implements the DINTC in-kernel irqc=
+hip device,
+> enables irqfd to deliver MSI to DINTC, and supports injecting MSI interru=
+pts
+> to the target vCPU.
+>
+>
+> V3: Fix kvm_arch_set_irq_inatomic() missing dintc set msi.(patch3)
+>
+> V2:
+> https://patchew.org/linux/20251128091125.2720148-1-gaosong@loongson.cn/
+>
+> Thanks.
+> Song Gao
+>
+> Song Gao (4):
+>   LongArch: KVM: Add some maccros for AVEC
+The first patch has been merged.
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on next-20251212]
-[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next v6.18]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+For others, I prefer the AVEC/AVECINTC naming rather than DINTC, since
+the driver name and your cover letter both call it AVEC.
+But If you don't like AVEC or want to keep consistency with the user
+manual, please use DMSINTC because the IOCSR feature bit is called
+DMSI.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
-patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-config: arm64-randconfig-002-20251213 (https://download.01.org/0day-ci/archive/20251213/202512131539.zPrweF7e-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 1335a05ab8bc8339ce24be3a9da89d8c3f4e0571)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512131539.zPrweF7e-lkp@intel.com/reproduce)
+Huacai
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512131539.zPrweF7e-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/kernel/asm-offsets.c:16:
-   In file included from include/linux/kvm_host.h:45:
-   In file included from arch/arm64/include/asm/kvm_host.h:36:
->> include/kvm/arm_vgic.h:392:19: error: field has incomplete type 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                          ^
-   include/kvm/arm_vgic.h:392:9: note: forward declaration of 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                ^
-   1 error generated.
-   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1 shuffle=1891526797
-   make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1314: prepare0] Error 2 shuffle=1891526797
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:248: __sub-make] Error 2 shuffle=1891526797
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2 shuffle=1891526797
-   make: Target 'prepare' not remade because of errors.
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for CAN_DEV
-   Depends on [n]: NETDEVICES [=n] && CAN [=y]
-   Selected by [y]:
-   - CAN [=y] && NET [=y]
-
-
-vim +392 include/kvm/arm_vgic.h
-
-   360	
-   361	struct vgic_v5_cpu_if {
-   362		u64	vgic_apr;
-   363		u64	vgic_vmcr;
-   364	
-   365		/* PPI register state */
-   366		u64	vgic_ppi_hmr[2];
-   367		u64	vgic_ppi_dvir[2];
-   368		u64	vgic_ppi_priorityr[16];
-   369	
-   370		/* The pending state of the guest. This is merged with the exit state */
-   371		u64	vgic_ppi_pendr[2];
-   372	
-   373		/* The state flushed to the regs when entering the guest */
-   374		u64	vgic_ppi_activer_entry[2];
-   375		u64	vgic_ich_ppi_enabler_entry[2];
-   376		u64	vgic_ppi_pendr_entry[2];
-   377	
-   378		/* The saved state of the regs when leaving the guest */
-   379		u64	vgic_ppi_activer_exit[2];
-   380		u64	vgic_ich_ppi_enabler_exit[2];
-   381		u64	vgic_ppi_pendr_exit[2];
-   382	
-   383		/*
-   384		 * The ICSR is re-used across host and guest, and hence it needs to be
-   385		 * saved/restored. Only one copy is required as the host should block
-   386		 * preemption between executing GIC CDRCFG and acccessing the
-   387		 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
-   388		 * it is the hyp's responsibility to keep the state constistent.
-   389		 */
-   390		u64	vgic_icsr;
-   391	
- > 392		struct gicv5_vpe gicv5_vpe;
-   393	};
-   394	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>   LongArch: KVM: Add DINTC device support
+>   LongArch: KVM: Add irqfd set dintc msi
+>   LongArch: KVM: Add dintc inject msi to the dest vcpu
+>
+>  arch/loongarch/include/asm/irq.h       |   8 ++
+>  arch/loongarch/include/asm/kvm_dintc.h |  22 +++++
+>  arch/loongarch/include/asm/kvm_host.h  |   8 ++
+>  arch/loongarch/include/uapi/asm/kvm.h  |   4 +
+>  arch/loongarch/kvm/Makefile            |   1 +
+>  arch/loongarch/kvm/intc/dintc.c        | 116 +++++++++++++++++++++++++
+>  arch/loongarch/kvm/interrupt.c         |   1 +
+>  arch/loongarch/kvm/irqfd.c             |  45 ++++++++--
+>  arch/loongarch/kvm/main.c              |   5 ++
+>  arch/loongarch/kvm/vcpu.c              |  55 ++++++++++++
+>  drivers/irqchip/irq-loongarch-avec.c   |   5 +-
+>  include/uapi/linux/kvm.h               |   2 +
+>  12 files changed, 263 insertions(+), 9 deletions(-)
+>  create mode 100644 arch/loongarch/include/asm/kvm_dintc.h
+>  create mode 100644 arch/loongarch/kvm/intc/dintc.c
+>
+> --
+> 2.39.3
+>
+>
 
