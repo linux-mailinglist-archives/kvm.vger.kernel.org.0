@@ -1,130 +1,120 @@
-Return-Path: <kvm+bounces-65926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BB6CBA931
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 13:39:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E9FCBB0A9
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 16:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C73363022FCC
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 12:39:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D9983071955
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 15:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D778E2C0F6C;
-	Sat, 13 Dec 2025 12:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B268E25FA10;
+	Sat, 13 Dec 2025 15:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j4NJY0rb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TwoyYj/z"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AF7281356
-	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 12:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709EB26299
+	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 15:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765629545; cv=none; b=X2efHzgDcNndSRSgtBWvTNY6K/+ckgo9FQ1Qhd7CFmOgazbssmzEneGs5uQQJXDMo4xQ2YKR+6dwVtofuZs8+aG5x+BXiyMVK9azDhjCz4sbeFVYJhwZAchdLdcQW9d3fLKlbVLJ6AUPzfpbZocSUUiAD5BER0a9YWjtKYLoKoI=
+	t=1765638549; cv=none; b=ZHVCokSGMmmMS5VpoOLTmSUrX/UQRL+eY7lqp7xUWvSH7G/A1DchfWq58I6nhE7B7Y4Pt6jkCeQ7yrKvqrB7//MDkRCuEQ6tFepb5qqKfE2FsgtASMfGib7/DlhU4HzNmNPsUdhQTTzwjcfckoSxs7vZdPoBB3KrUGeSPmUJlOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765629545; c=relaxed/simple;
-	bh=eInlOs4Mc9g2A0jeabtfZtp33M6zckPZAXDrEPuMPx8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zv+gajDswEmLFIhYZY41zNOgP/Uo/kRtnEIilvqoOdBhLYvDACdONAKrCG6ty/879KER3dix1fKa141eFmJPm+bLXkk+ApX6Tfz73LJVYBXbWYpkwsGMfkvNKfwPSBoDljTmgWrpwIIeQfsTxsSaGKcV3ngwzigea+y0rIvPgio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j4NJY0rb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9962BC4CEFB
-	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 12:39:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765629544;
-	bh=eInlOs4Mc9g2A0jeabtfZtp33M6zckPZAXDrEPuMPx8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=j4NJY0rbhEFQxn7T756066+uHzz0peSc5DabxJkZa6TzPs9yHMifnPAtqWt5Cr7gg
-	 J0KTF+xaH9+72ZVvd/181p+qmeuxtgm6boD3KQzFxWAaHgdTj0SLiwRntKFaKhsP3u
-	 3OJEtYkfn32xImD+vagTDQC+YhQDUImoFZUzELsrOKkiwGW1Pvo3fGs43eZsThNVsI
-	 ZXYPnzN+t7U/N7gH0u2A9jyMT/9MlmBaCAD/vc617RXt7/XTyJiMu4HTIAJmWQB4qE
-	 98mlPmR4w1U5n+ovqVDPXw34h0Ncoji3ru+mleEh5rvlYqf6j/EbRwMQQ6HzCOra0B
-	 bDgQD5NSg0W2g==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b725ead5800so306860266b.1
-        for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 04:39:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU3WbeQNqF3C1yEzvIh/7Nf6xhd9UniEgk8sQPQ0PsnLGHp7PJcHp0MrqkCfgKjeAN3wxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaE4u06H8AymPIGIHVadHuV337dz2+vzcepRq/be9isVpGVOCi
-	SyGdz6fmYiawvEZgV8lpT+ltGfkOyU2sQRPDMlgmDqIYhZ7BdAYfegUF6Jg5K4JhfqEK0i8RupC
-	Dxpce2FF43k5JpP+FpgNg1UtdcfqWYyQ=
-X-Google-Smtp-Source: AGHT+IFLHD47GPfOFl7SONUY6Bn1a0xVaJUAYI6wlPg8HerejJH0KhouJ62knw3R+Ax3v24rtXyR6XxOjCL0UKOxJWI=
-X-Received: by 2002:a17:907:1c1e:b0:b79:e887:e1b3 with SMTP id
- a640c23a62f3a-b7d23c2a164mr567772666b.57.1765629543203; Sat, 13 Dec 2025
- 04:39:03 -0800 (PST)
+	s=arc-20240116; t=1765638549; c=relaxed/simple;
+	bh=GgtuIYUjGPK79CbZIX7+aBVNz8LYZ6rzxrVq8TeJkAU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B8Xs9TW2HiMBHz/0n815O43Rc//FeFv5epHTiNywBqMMO6UDHhMbiDiJBnT3G0YN48YWOa3KFeV06iRkJ6a2MvNknlEh26u8HeNLOPu0gFkCE2/NC5X9JByyxtQgSKOKAkvghUpf4hk5Z4eXKLzJATMc1sh8eMDWWDJm5Jv9t/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TwoyYj/z; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-29f30233d8aso16368035ad.0
+        for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 07:09:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765638547; x=1766243347; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LpiaxQ88oSu49YC1S31RLxm6uhn7aR359oZeGdfAIAE=;
+        b=TwoyYj/z+GRk965YGnei+0qd8tGJ5ZfbrV8dXgRci8iVE67TKxsshFb4AUiaCpnosQ
+         l0qc99+TMWnd2O9nNUqA1ik1azRncq3nYqhGlKYwQ60ptBPLVoBUv3Y4cZCqj94J+vDY
+         Rlm4XfMYIfuFHI0lJdtq53Sie1+WRg7GFHrkOKHOeafw2Y7lvvZ5MlyWpTZRDsHsmmSy
+         wtT+1F9XeO7hDfwODMTIsqqf/HT+I/ROTwQGpFgVRsIwcIWNkwjUqlI9AMrUYkcuTbcT
+         SKyjEbXTWuIvIgw7depGBqSATU4ledMtQJPH7MvyKzuMLE55NrpahCLsixEYoTaC4BTL
+         KXzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765638547; x=1766243347;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LpiaxQ88oSu49YC1S31RLxm6uhn7aR359oZeGdfAIAE=;
+        b=Y3PsSHVQ/WOpRLNDigidiyuQ798lWP7maHQmgu+NY6OHbd/CvM/fp0OdIwIQmVWvFr
+         QHjKSwQoxXAZiMAZBF6byFJ6opAnzsp+9XIiVXmhi4kjGgE+JC4k6ukJMaMjV0VKxWpy
+         e5vsBNlMlAgaMCPONuXhRPBi35vZ7CiD+d6cLxQ+cLg9ff2Zd+4VPR72CMjio01JXbIk
+         G4A05dZr10hrUIKGGnESz/BiURTrd+ntImJIwAlYAQ2S7F4mmN5Qn/dgb4/e1x3uyVaO
+         Y8IgtxEFuHUevjPUdWQbUgy5kCeArICVQTChV0s4yKrgF5SAcNBWIWSM2y/xSAdM9ytw
+         SzqA==
+X-Gm-Message-State: AOJu0YxJf1xEh/MWbkUJa/5GTYTALbJDJ/+hpTBMo74mVrq8X7Nvgtp9
+	0dWCnHcn7rSi8mg5YPCu3rnXBeouqAst2zNfUkYS9gKjBHFf2K++YbJjqBhGgVVFOxHR1Q==
+X-Gm-Gg: AY/fxX7DTqE7txmdTGIi1dHaz40TS0KP00X5Ocw4hps9aVdtXZg/VekxGENqlIMT1qM
+	g0xYZSFTl9XNedmhaykLUXczabJygAt2sEnUgZCs5emeZYd13aRhr4aFqTpwKKZ+9oz8lrJ3CRs
+	56JPwuMIn/sNnGbQdvTBAFmVgVboc8ksyuk14mWT++mYW8SFmUoWzhR4pCwH7cAb27T/xewk0e6
+	CYAAzm8dADhKGKuob2jDk2UVBb7Z5+HoW2BnqqlHJTiDdsQQ1XcBZP6TIVDTaOFaCz8F8RFLxyy
+	ZQk9L7h+VtI0nkh3cy3jDo664Iu5zT1vcy65HlravVR+eqMEvEo8rWi57W+TGhDBv2i50r9HZPK
+	997SUgOTZcGC/zEKYtGFV2lilLW1j2bXURVhpu3nL55+FxJu4HNi8zksHA+AwDxbCOlhA9Y+sHE
+	v+Mjo6XqR/r+LhhbL3kLiSuiHtUb0=
+X-Google-Smtp-Source: AGHT+IG0wSA/k6rR6FYauaioJj0C4bTfp7lKrMBL3Wv+JIXImMjZIDmkmFg1qZ34i3GgGlAAqw6vYw==
+X-Received: by 2002:a17:902:db04:b0:2a0:a8c3:5f0c with SMTP id d9443c01a7336-2a0a8c35fc4mr10070005ad.16.1765638547217;
+        Sat, 13 Dec 2025 07:09:07 -0800 (PST)
+Received: from JRT-PC.. ([111.94.32.24])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea016c6esm85494715ad.59.2025.12.13.07.09.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Dec 2025 07:09:06 -0800 (PST)
+From: James Raphael Tiovalen <jamestiotio@gmail.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: andrew.jones@linux.dev,
+	atishp@rivosinc.com,
+	James Raphael Tiovalen <jamestiotio@gmail.com>
+Subject: [kvm-unit-tests PATCH 0/4] riscv: sbi: Add support to test PMU extension
+Date: Sat, 13 Dec 2025 23:08:44 +0800
+Message-ID: <20251213150848.149729-1-jamestiotio@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251206064658.714100-1-gaosong@loongson.cn>
-In-Reply-To: <20251206064658.714100-1-gaosong@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sat, 13 Dec 2025 20:39:15 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5BZuZGu0jOBXr-Ed1uJYhS_d2NMhV22-7VGu_7J2D1fw@mail.gmail.com>
-X-Gm-Features: AQt7F2q3O0tm0DpSPLgoXtszYEE-VE9U0I2bc3zJclmShIzFQf9ofhyqqA_ZP8I
-Message-ID: <CAAhV-H5BZuZGu0jOBXr-Ed1uJYhS_d2NMhV22-7VGu_7J2D1fw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/4] LongArch: KVM: Add AVEC support irqchip in kernel
-To: Song Gao <gaosong@loongson.cn>
-Cc: maobibo@loongson.cn, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kernel@xen0n.name, linux-kernel@vger.kernel.org, lixianglai@loongson.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi, Song,
+This patch series adds support for testing most of the SBI PMU
+extension functions. The functions related to shared memory
+(FID #7 and #8) are not tested yet.
 
-On Sat, Dec 6, 2025 at 3:11=E2=80=AFPM Song Gao <gaosong@loongson.cn> wrote=
-:
->
-> Hi,
->
-> This series adds AVEC-related macros, implements the DINTC in-kernel irqc=
-hip device,
-> enables irqfd to deliver MSI to DINTC, and supports injecting MSI interru=
-pts
-> to the target vCPU.
->
->
-> V3: Fix kvm_arch_set_irq_inatomic() missing dintc set msi.(patch3)
->
-> V2:
-> https://patchew.org/linux/20251128091125.2720148-1-gaosong@loongson.cn/
->
-> Thanks.
-> Song Gao
->
-> Song Gao (4):
->   LongArch: KVM: Add some maccros for AVEC
-The first patch has been merged.
+The first 3 patches add the required support for SBI PMU and some
+helper functions, while the last patch adds the actual tests.
 
-For others, I prefer the AVEC/AVECINTC naming rather than DINTC, since
-the driver name and your cover letter both call it AVEC.
-But If you don't like AVEC or want to keep consistency with the user
-manual, please use DMSINTC because the IOCSR feature bit is called
-DMSI.
+James Raphael Tiovalen (4):
+  lib: riscv: Add SBI PMU CSRs and enums
+  lib: riscv: Add SBI PMU support
+  lib: riscv: Add SBI PMU helper functions
+  riscv: sbi: Add tests for PMU extension
 
-Huacai
+ riscv/Makefile      |   2 +
+ lib/riscv/asm/csr.h |  31 +++
+ lib/riscv/asm/pmu.h | 167 ++++++++++++++++
+ lib/riscv/asm/sbi.h | 104 ++++++++++
+ lib/riscv/pmu.c     | 169 ++++++++++++++++
+ lib/riscv/sbi.c     |  73 +++++++
+ riscv/sbi-tests.h   |   1 +
+ riscv/sbi-pmu.c     | 461 ++++++++++++++++++++++++++++++++++++++++++++
+ riscv/sbi.c         |   2 +
+ 9 files changed, 1010 insertions(+)
+ create mode 100644 lib/riscv/asm/pmu.h
+ create mode 100644 lib/riscv/pmu.c
+ create mode 100644 riscv/sbi-pmu.c
 
->   LongArch: KVM: Add DINTC device support
->   LongArch: KVM: Add irqfd set dintc msi
->   LongArch: KVM: Add dintc inject msi to the dest vcpu
->
->  arch/loongarch/include/asm/irq.h       |   8 ++
->  arch/loongarch/include/asm/kvm_dintc.h |  22 +++++
->  arch/loongarch/include/asm/kvm_host.h  |   8 ++
->  arch/loongarch/include/uapi/asm/kvm.h  |   4 +
->  arch/loongarch/kvm/Makefile            |   1 +
->  arch/loongarch/kvm/intc/dintc.c        | 116 +++++++++++++++++++++++++
->  arch/loongarch/kvm/interrupt.c         |   1 +
->  arch/loongarch/kvm/irqfd.c             |  45 ++++++++--
->  arch/loongarch/kvm/main.c              |   5 ++
->  arch/loongarch/kvm/vcpu.c              |  55 ++++++++++++
->  drivers/irqchip/irq-loongarch-avec.c   |   5 +-
->  include/uapi/linux/kvm.h               |   2 +
->  12 files changed, 263 insertions(+), 9 deletions(-)
->  create mode 100644 arch/loongarch/include/asm/kvm_dintc.h
->  create mode 100644 arch/loongarch/kvm/intc/dintc.c
->
-> --
-> 2.39.3
->
->
+--
+2.43.0
+
 
