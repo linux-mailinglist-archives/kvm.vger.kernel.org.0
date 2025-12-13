@@ -1,242 +1,120 @@
-Return-Path: <kvm+bounces-65914-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65915-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5D45CBA19F
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 01:15:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80F4CBA24C
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 02:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 53305301B5B1
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 00:15:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 999493019A45
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 01:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572F31A00F0;
-	Sat, 13 Dec 2025 00:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B21323D2B2;
+	Sat, 13 Dec 2025 01:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Of/hHykI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p+B/KZcx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C836C1A9FAF
-	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 00:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C16165F16
+	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 01:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765584899; cv=none; b=ZEdFgzlKKxOiD4xO1ThV1CRL7YwYp+eMH6qol8jyZiTscJDm2xmvxaEXExYCfjhDYTQhpFQR5iu+c0RvY5GYpf05t2VWOmyu1ojWiPZjnLBS4ww1aNJPtaMAl2Vd3992kZGbEVmo38PLQkFIYBAC4XGiqOLO3d1/+AoeakRlljw=
+	t=1765587716; cv=none; b=CCaXrY2Yd2Dy3FzK40wDGAnZCSWQQVoSFpM/kOEly++C+7CKuLqKsws57296A0xXfIuWlON8S0eFO5eCUbFWoI3qxpdMRatRbdeQxWwvN7pa82UsevxOGLM3/YiHYrlfn4se5l3GIgWl1jkYd9zF7Xte3SmAcBBOcA0cnnGoqCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765584899; c=relaxed/simple;
-	bh=g2C+HzJoFJ/Keba0BfTfrWJKHhFGqnaSsLiyLfePH7g=;
+	s=arc-20240116; t=1765587716; c=relaxed/simple;
+	bh=DDL1jfLW1hz4WUdMItB00xanr/nrgbg93FGLz6fdESY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=adf3U8HK486W3p94gdPp8EEYkb6Z/baanXl836b5+P4TRurye6Yd9yRTnILOeaaQc9zxDK7pv/nx2XHC4p4BfXdMeuuAWCimov7bc4Dzm05iLwt4T487Mt5iZqtiOHDUOVEfOyBaZPFs5kZk9Cms4dWITSa6tXicSYZdNk1rxyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcmorcos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Of/hHykI; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=u2SlPtT1IYxY8rhntqoZQocMj9MK49E1dEbB+ufIUgHkGw/qQg1/UuT3gC4ttU2565BO4vc5eOPzdFvtwgqFK+Y0AJrdSK6Unj5DiAGqbdlIFpM3TC7Buzh+sPlk1BMZ87cmTc3aHGaum2zBDD4ZR3y0Cy7YgH8VuTzZpGFnaOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p+B/KZcx; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcmorcos.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ac8137d45so1077065a91.3
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 16:14:57 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b8a12f0cb4so1982510b3a.3
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 17:01:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765584897; x=1766189697; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765587714; x=1766192514; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0/im7YjCCi+qgN9Vco+Ebkxox6sDC/emBzqJ0iO8yU=;
-        b=Of/hHykIJgG7mulCV8OUD3JJQHN22dL2OFUNdIoroqxdCLo8WFYW25ZFCudCHikI8a
-         9mdTEkjPzeXSL5aga4FykGj/oEgdQSgcS5iUuE36xZq4atH6HPVPKTHz2Eh102YvVfTw
-         H1KbFcPrmuWm6x1PeqyRChGV9zX0TF0lGF0xUWoXN/FQzFt6mr3hULNP8wttP8TKUSmk
-         /BGJ7TzwsO7DNn+JS45AemaDysIPxPaLD3lShxQ+g5RQ11qwPGlQtn0K7aI2fvinOBh/
-         hipUXwsujlEdFo/rVzDbiC0ByOb60jZtWeIHfdx2IDE6h27GpGAuQD8diGLK3GePuMt5
-         7Taw==
+        bh=qGmPxhRCLwLeoN0Jn2kJkVyLdCbAIGmH6gcp9ivIgYE=;
+        b=p+B/KZcxbspSphnRMGyLDTi2rYiuwCpZYWv6iVlqim+0ooxCwh33cc+ywX//WIFA/Z
+         s1MFgPD7wZfXSqQfLbkiwi1HzBNMjfziZZq7Onx0k8JNw8cp8yWZQjT/1h4mStwRGrGB
+         Y8+62GwzjNOP1AweliXeDzTgB9DuvlDFJd1DfAEvyiMC50qD7nEGnZwjv0iBI3J7ezv4
+         +BenYQrOYMuT1W+AeYAauEemQjYMMZ4UBI9UVGIosuIbQL7t2Pw9w+M+8tWb75voR+L4
+         I1W1Kww712Q389g12EAjYmahXLOn9SLnK8nMkePLnl4pDdesifkPuZ6rGtPyLnYs1h4+
+         egtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765584897; x=1766189697;
+        d=1e100.net; s=20230601; t=1765587714; x=1766192514;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0/im7YjCCi+qgN9Vco+Ebkxox6sDC/emBzqJ0iO8yU=;
-        b=oNVYxMGv/+OzivFQ/nsjOK8SqCPGWka1tVvmSq9eOpGxGPh6jqqdb5uHkQ8s4G/Zl8
-         FUvSbp/WtKwb5/kj0Y22aYFqE3UJyWe8zjFWQPxEp2Jg2zFQ3cZRrWqBiP2ZjqsLbLOF
-         WZUM72nH9g2jdzfZN3nUB4cZf8dkVDhD9CrZY/Ayh+0SlaKuAK63pRJzJDSQd31ABkFF
-         rgTcVbyyNkDFiJSuU2qSOKpOER7cbF5eaAutXNBS7JMkjXjpbT00KAy9cQ62EolI1WJM
-         wyorxigr9jqJXmuHH8gUJWadNv+mWNsBPg50Tl8+i6V6p519RY9OnBK+BwrZjS7sUdlH
-         zxbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWPH+ewqAp5bQQU4gb9bC3IPwY9ow2OnIXQJM0+1pmwL2zsVx3/t/NRk/VbJFmFB12q2YA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRq3gVBpuzrgKv9zWL5SOzuGBoRQrmro5YsSoXwM1kV4+1bYFI
-	od219oK8FL+IuuTeUsn5XeRhgzBV4/EdSYp1PoZ5FXz/6RmG8iVGfpHkWfGiuQVl2v1c8De/5R7
-	7b61r2Se5aJCTKX2erlN5Rw==
-X-Google-Smtp-Source: AGHT+IGP+nbj+TPXEpjND5WvAvwQyuoZEIuskWGCKNVI2224dHhTfkISQO4miX5JQWLAWdIhcNFv/TjfUJgNAbxi
-X-Received: from dlbcj13.prod.google.com ([2002:a05:7022:698d:b0:11a:51f9:d69])
- (user=marcmorcos job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7022:b886:b0:11d:ef84:6cff with SMTP id a92af1059eb24-11f34c56ff8mr2376497c88.37.1765584896801;
- Fri, 12 Dec 2025 16:14:56 -0800 (PST)
-Date: Sat, 13 Dec 2025 00:14:43 +0000
-In-Reply-To: <20251213001443.2041258-1-marcmorcos@google.com>
+        bh=qGmPxhRCLwLeoN0Jn2kJkVyLdCbAIGmH6gcp9ivIgYE=;
+        b=dHLY/oaQpszq4bItKHXvh/FnK0xZpZpWkE/WyZCJCxvZNLgWSZD3Gt90ux2NTxJBHD
+         J9ye5Q4Kbuy00hqimBO2UOyTZtnZ0PKmxYIpFyVcHcHzMrKNlSG/Y3r4emtwaZS+k8JH
+         cTxWumfRGMjem8d80I0PCAH19KkWpoxl8GtvPRPla9goqxzND6AnOmb+9fdG0L3N1ize
+         UUGnDhzdM3JUanOzJ0bWRwYi1Q2+/RhHs4x2SobQdl8hgM/4msXYdFAIT6u4XyWMxfFz
+         IfzYCpms0CRhX2zSPgl3EDl7+nBgx+ey5l+IfS5wJeonTuXn3uLUZTAcIw/IgWdcsrsM
+         FACw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLRVpooKGMo99o88qA4Ex3rZr/0oqZq9JRs7bHOtFDOViMK5NyTIy002847S/gLlNZelY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL1rGb4ZaqA5O6GuLmslV67yvugd8puO9ckNbJyeeF0i0lC1eT
+	Ycst7E1pBLJaePf48BhaQBPTnS+/Xjf9UdCeoACjNQ7n/TqreIqK7UZ50iZzG4+5VvP56PnMCU+
+	yp6t+dw==
+X-Google-Smtp-Source: AGHT+IFTcExGSp78Md5O2JVDKo++NOAxmErlpynuBmA+4Cwked1rlT56jHlkz3eG6VCW8GjJtn72VI/oKOI=
+X-Received: from pgtv2.prod.google.com ([2002:a63:b642:0:b0:bac:ef38:605c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7490:b0:35d:d477:a7db
+ with SMTP id adf61e73a8af0-369afbff895mr3381877637.56.1765587713879; Fri, 12
+ Dec 2025 17:01:53 -0800 (PST)
+Date: Fri, 12 Dec 2025 17:01:52 -0800
+In-Reply-To: <202512130717.aHH8rXSC-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251213001443.2041258-1-marcmorcos@google.com>
-X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251213001443.2041258-5-marcmorcos@google.com>
-Subject: [PATCH 4/4] apic: Make apicbase accesses atomic to fix data race
-From: Marc Morcos <marcmorcos@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, 
-	Eduardo Habkost <eduardo@habkost.net>, "Dr . David Alan Gilbert" <dave@treblig.org>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, 
-	Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, 
-	kvm@vger.kernel.org, Marc Morcos <marcmorcos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20251212135051.2155280-1-xiaoyao.li@intel.com> <202512130717.aHH8rXSC-lkp@intel.com>
+Message-ID: <aTy7AG2y1OwIXfqs@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf
+ while the MMU is direct
+From: Sean Christopherson <seanjc@google.com>
+To: kernel test robot <lkp@intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	oe-kbuild-all@lists.linux.dev, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, farrah.chen@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-A data race on APICCommonState->apicbase was detected by ThreadSanitizer.
+On Sat, Dec 13, 2025, kernel test robot wrote:
+> Hi Xiaoyao,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on 7d0a66e4bb9081d75c82ec4957c50034cb0ea449]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Xiaoyao-Li/KVM-x86-Don-t-read-guest-CR3-when-doing-async-pf-while-the-MMU-is-direct/20251212-220612
+> base:   7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+> patch link:    https://lore.kernel.org/r/20251212135051.2155280-1-xiaoyao.li%40intel.com
+> patch subject: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf while the MMU is direct
+> config: i386-buildonly-randconfig-002-20251213 (https://download.01.org/0day-ci/archive/20251213/202512130717.aHH8rXSC-lkp@intel.com/config)
+> compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512130717.aHH8rXSC-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202512130717.aHH8rXSC-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    In file included from include/linux/kvm_host.h:43,
+>                     from arch/x86/kvm/irq.h:15,
+>                     from arch/x86/kvm/mmu/mmu.c:19:
+>    arch/x86/kvm/mmu/mmu.c: In function 'kvm_arch_setup_async_pf':
+> >> include/linux/kvm_types.h:54:25: warning: conversion from 'long long unsigned int' to 'long unsigned int' changes value from '18446744073709551615' to '4294967295' [-Woverflow]
+>       54 | #define INVALID_GPA     (~(gpa_t)0)
+>          |                         ^
+>    arch/x86/kvm/mmu/mmu.c:4525:28: note: in expansion of macro 'INVALID_GPA'
+>     4525 |                 arch.cr3 = INVALID_GPA;
+>          |                            ^~~~~~~~~~~
 
-To resolve this race, direct accesses to s->apicbase are converted
-to use the appropriate qatomic_*__nocheck() atomic operations. This
-ensures that reads and writes are properly ordered and visible across threads.
-
-This patch depends on the previous commit changing the type of `apicbase`
-to `uint64_t`.
-
-The race was identified by the following TSAN report:
-
-==================
-WARNING: ThreadSanitizer: data race
-  Read of size 8 at ... by main thread:
-    #0 cpu_is_apic_enabled hw/intc/apic_common.c:75:15
-    ...
-    #15 main_loop_wait util/main-loop.c:600:5
-    ...
-
-  Previous write of size 8 at ... by thread T7 'CPU 0/KVM':
-    #0 kvm_apic_set_base hw/i386/kvm/apic.c:101:17
-    #1 cpu_set_apic_base hw/intc/apic_common.c:47:16
-    #2 kvm_arch_post_run target/i386/kvm/kvm.c:5621:5
-    #3 kvm_cpu_exec accel/kvm/kvm-all.c:3229:17
-    #4 kvm_vcpu_thread_fn accel/kvm/kvm-accel-ops.c:51:17
-    ...
-SUMMARY: ThreadSanitizer: data race hw/intc/apic_common.c:75:15 in cpu_is_apic_enabled
-==================
-
-Signed-off-by: Marc Morcos <marcmorcos@google.com>
----
- hw/i386/kvm/apic.c    | 12 ++++++++----
- hw/intc/apic_common.c | 20 ++++++++++++--------
- 2 files changed, 20 insertions(+), 12 deletions(-)
-
-diff --git a/hw/i386/kvm/apic.c b/hw/i386/kvm/apic.c
-index 82355f0463..b9b03c529f 100644
---- a/hw/i386/kvm/apic.c
-+++ b/hw/i386/kvm/apic.c
-@@ -34,9 +34,10 @@ static inline uint32_t kvm_apic_get_reg(struct kvm_lapic_state *kapic,
- static void kvm_put_apic_state(APICCommonState *s, struct kvm_lapic_state *kapic)
- {
-     int i;
-+    uint64_t apicbase = qatomic_read__nocheck(&s->apicbase);
- 
-     memset(kapic, 0, sizeof(*kapic));
--    if (kvm_has_x2apic_api() && s->apicbase & MSR_IA32_APICBASE_EXTD) {
-+    if (kvm_has_x2apic_api() && apicbase & MSR_IA32_APICBASE_EXTD) {
-         kvm_apic_set_reg(kapic, 0x2, s->initial_apic_id);
-     } else {
-         kvm_apic_set_reg(kapic, 0x2, s->id << 24);
-@@ -63,8 +64,9 @@ static void kvm_put_apic_state(APICCommonState *s, struct kvm_lapic_state *kapic
- void kvm_get_apic_state(APICCommonState *s, struct kvm_lapic_state *kapic)
- {
-     int i, v;
-+    uint64_t apicbase = qatomic_read__nocheck(&s->apicbase);
- 
--    if (kvm_has_x2apic_api() && s->apicbase & MSR_IA32_APICBASE_EXTD) {
-+    if (kvm_has_x2apic_api() && apicbase & MSR_IA32_APICBASE_EXTD) {
-         assert(kvm_apic_get_reg(kapic, 0x2) == s->initial_apic_id);
-     } else {
-         s->id = kvm_apic_get_reg(kapic, 0x2) >> 24;
-@@ -97,7 +99,7 @@ void kvm_get_apic_state(APICCommonState *s, struct kvm_lapic_state *kapic)
- 
- static int kvm_apic_set_base(APICCommonState *s, uint64_t val)
- {
--    s->apicbase = val;
-+    qatomic_set__nocheck(&s->apicbase, val);
-     return 0;
- }
- 
-@@ -140,12 +142,14 @@ static void kvm_apic_put(CPUState *cs, run_on_cpu_data data)
-     APICCommonState *s = data.host_ptr;
-     struct kvm_lapic_state kapic;
-     int ret;
-+    uint64_t apicbase;
- 
-     if (is_tdx_vm()) {
-         return;
-     }
- 
--    kvm_put_apicbase(s->cpu, s->apicbase);
-+    apicbase = qatomic_read__nocheck(&s->apicbase);
-+    kvm_put_apicbase(s->cpu, apicbase);
-     kvm_put_apic_state(s, &kapic);
- 
-     ret = kvm_vcpu_ioctl(CPU(s->cpu), KVM_SET_LAPIC, &kapic);
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index 1e9aba2e48..9e42189d8a 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -19,6 +19,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/atomic.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "qapi/error.h"
-@@ -52,8 +53,9 @@ int cpu_set_apic_base(APICCommonState *s, uint64_t val)
- uint64_t cpu_get_apic_base(APICCommonState *s)
- {
-     if (s) {
--        trace_cpu_get_apic_base((uint64_t)s->apicbase);
--        return s->apicbase;
-+        uint64_t apicbase = qatomic_read__nocheck(&s->apicbase);
-+        trace_cpu_get_apic_base(apicbase);
-+        return apicbase;
-     } else {
-         trace_cpu_get_apic_base(MSR_IA32_APICBASE_BSP);
-         return MSR_IA32_APICBASE_BSP;
-@@ -66,7 +68,7 @@ bool cpu_is_apic_enabled(APICCommonState *s)
-         return false;
-     }
- 
--    return s->apicbase & MSR_IA32_APICBASE_ENABLE;
-+    return qatomic_read__nocheck(&s->apicbase) & MSR_IA32_APICBASE_ENABLE;
- }
- 
- void cpu_set_apic_tpr(APICCommonState *s, uint8_t val)
-@@ -223,9 +225,9 @@ void apic_designate_bsp(APICCommonState *s, bool bsp)
-     }
- 
-     if (bsp) {
--        s->apicbase |= MSR_IA32_APICBASE_BSP;
-+        qatomic_fetch_or(&s->apicbase, MSR_IA32_APICBASE_BSP);
-     } else {
--        s->apicbase &= ~MSR_IA32_APICBASE_BSP;
-+        qatomic_fetch_and(&s->apicbase, ~MSR_IA32_APICBASE_BSP);
-     }
- }
- 
-@@ -235,8 +237,9 @@ static void apic_reset_common(DeviceState *dev)
-     APICCommonClass *info = APIC_COMMON_GET_CLASS(s);
-     uint64_t bsp;
- 
--    bsp = s->apicbase & MSR_IA32_APICBASE_BSP;
--    s->apicbase = APIC_DEFAULT_ADDRESS | bsp | MSR_IA32_APICBASE_ENABLE;
-+    bsp = qatomic_read__nocheck(&s->apicbase) & MSR_IA32_APICBASE_BSP;
-+    qatomic_set__nocheck(&s->apicbase,
-+                    APIC_DEFAULT_ADDRESS | bsp | MSR_IA32_APICBASE_ENABLE);
-     s->id = s->initial_apic_id;
- 
-     kvm_reset_irq_delivered();
-@@ -405,7 +408,8 @@ static void apic_common_get_id(Object *obj, Visitor *v, const char *name,
-     APICCommonState *s = APIC_COMMON(obj);
-     uint32_t value;
- 
--    value = s->apicbase & MSR_IA32_APICBASE_EXTD ? s->initial_apic_id : s->id;
-+    value = qatomic_read__nocheck(&s->apicbase) & MSR_IA32_APICBASE_EXTD ?
-+            s->initial_apic_id : s->id;
-     visit_type_uint32(v, name, &value, errp);
- }
- 
--- 
-2.52.0.239.gd5f0c6e74e-goog
-
+Well that's just annoying.  Can we kill 32-bit yet?  Anyways, just ignore this
+(unless it causes my KVM_WERROR=1 builds to fail, in which case I'll just add an
+explicit cast, but I think we can just ignore it).
 
