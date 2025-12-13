@@ -1,120 +1,127 @@
-Return-Path: <kvm+bounces-65915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80F4CBA24C
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 02:02:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E04CBA253
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 02:07:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 999493019A45
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 01:01:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E5B60300A6E5
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 01:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B21323D2B2;
-	Sat, 13 Dec 2025 01:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BAB23E358;
+	Sat, 13 Dec 2025 01:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p+B/KZcx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RdLbmk8S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C16165F16
-	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 01:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DD81F3B85
+	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 01:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765587716; cv=none; b=CCaXrY2Yd2Dy3FzK40wDGAnZCSWQQVoSFpM/kOEly++C+7CKuLqKsws57296A0xXfIuWlON8S0eFO5eCUbFWoI3qxpdMRatRbdeQxWwvN7pa82UsevxOGLM3/YiHYrlfn4se5l3GIgWl1jkYd9zF7Xte3SmAcBBOcA0cnnGoqCg=
+	t=1765588030; cv=none; b=RM4P8R57z3GiW3zSekm4DDNNu1o6oAECS+PZQdwME8TVB4xg0XR2cYUrqeD/bJvYg+PWQL74bcJVFskgkPO8rFknNp7WwBcZteBc2jTeNyMyKb+aj8l8QWbI4rCWGrFr6zKfluzZYZq1lR4HJzXkpmSiWGo1uSbDEZxDqx4uXtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765587716; c=relaxed/simple;
-	bh=DDL1jfLW1hz4WUdMItB00xanr/nrgbg93FGLz6fdESY=;
+	s=arc-20240116; t=1765588030; c=relaxed/simple;
+	bh=kmXLobmCXS3R8kh3ZgeIP8Mu5I1AXodDia4mNYvs8wE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u2SlPtT1IYxY8rhntqoZQocMj9MK49E1dEbB+ufIUgHkGw/qQg1/UuT3gC4ttU2565BO4vc5eOPzdFvtwgqFK+Y0AJrdSK6Unj5DiAGqbdlIFpM3TC7Buzh+sPlk1BMZ87cmTc3aHGaum2zBDD4ZR3y0Cy7YgH8VuTzZpGFnaOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p+B/KZcx; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=KyZBoYAlHBVOo56CTLhsyrYeHR6O8bMktaIyiwGuvNUcfcm6nh7Wx1XR7iRVk0nlm6y89yi4wQ0ZJ8MA/G6yMCLLbRnWv2EPfaRVy3atPA9xAEdtTrCNleiOb7GMETLp5yT2rdj6qSqV3/P1I+hHj4/TWishGPaT96OFW3E5njM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RdLbmk8S; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b8a12f0cb4so1982510b3a.3
-        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 17:01:54 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-299ddb0269eso22378125ad.0
+        for <kvm@vger.kernel.org>; Fri, 12 Dec 2025 17:07:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765587714; x=1766192514; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765588028; x=1766192828; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGmPxhRCLwLeoN0Jn2kJkVyLdCbAIGmH6gcp9ivIgYE=;
-        b=p+B/KZcxbspSphnRMGyLDTi2rYiuwCpZYWv6iVlqim+0ooxCwh33cc+ywX//WIFA/Z
-         s1MFgPD7wZfXSqQfLbkiwi1HzBNMjfziZZq7Onx0k8JNw8cp8yWZQjT/1h4mStwRGrGB
-         Y8+62GwzjNOP1AweliXeDzTgB9DuvlDFJd1DfAEvyiMC50qD7nEGnZwjv0iBI3J7ezv4
-         +BenYQrOYMuT1W+AeYAauEemQjYMMZ4UBI9UVGIosuIbQL7t2Pw9w+M+8tWb75voR+L4
-         I1W1Kww712Q389g12EAjYmahXLOn9SLnK8nMkePLnl4pDdesifkPuZ6rGtPyLnYs1h4+
-         egtw==
+        bh=9Hwyd1rimjLYvRaRvg8sNpXmW9eOFzclIP8X3X+ApI4=;
+        b=RdLbmk8SSxGLeaNBqn4s+OqC3O1/jHeJu6suMl3zVRt8zJtduKUDQa+CqlNYIw38Iz
+         ppiMD1FpTSXaP4E0OM8uQadbU+IKlkHQ/gauKm1GC1Zcvq65EUqSqTwE+xS5ins7DVX/
+         DhYMHb1PxVao2VCn31nVsCTUaf8HQZ5FTScXQfV3k1UrLxeQ8t2x2d9W6uOZ6dKFh+EL
+         5f1uNjXrs0pgZXRs/kel8G4e/sbHdPbz6zVhqLlby1gQU4a2R7g1R4kYms9dXQgRUV8E
+         9MShJQptl2dsENtCcHpQnFpIpkuIUXA1MW3XuScoQMVc17RE6QfokNV/WHsgd+6MuBRo
+         2Mcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765587714; x=1766192514;
+        d=1e100.net; s=20230601; t=1765588028; x=1766192828;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qGmPxhRCLwLeoN0Jn2kJkVyLdCbAIGmH6gcp9ivIgYE=;
-        b=dHLY/oaQpszq4bItKHXvh/FnK0xZpZpWkE/WyZCJCxvZNLgWSZD3Gt90ux2NTxJBHD
-         J9ye5Q4Kbuy00hqimBO2UOyTZtnZ0PKmxYIpFyVcHcHzMrKNlSG/Y3r4emtwaZS+k8JH
-         cTxWumfRGMjem8d80I0PCAH19KkWpoxl8GtvPRPla9goqxzND6AnOmb+9fdG0L3N1ize
-         UUGnDhzdM3JUanOzJ0bWRwYi1Q2+/RhHs4x2SobQdl8hgM/4msXYdFAIT6u4XyWMxfFz
-         IfzYCpms0CRhX2zSPgl3EDl7+nBgx+ey5l+IfS5wJeonTuXn3uLUZTAcIw/IgWdcsrsM
-         FACw==
-X-Forwarded-Encrypted: i=1; AJvYcCXLRVpooKGMo99o88qA4Ex3rZr/0oqZq9JRs7bHOtFDOViMK5NyTIy002847S/gLlNZelY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyL1rGb4ZaqA5O6GuLmslV67yvugd8puO9ckNbJyeeF0i0lC1eT
-	Ycst7E1pBLJaePf48BhaQBPTnS+/Xjf9UdCeoACjNQ7n/TqreIqK7UZ50iZzG4+5VvP56PnMCU+
-	yp6t+dw==
-X-Google-Smtp-Source: AGHT+IFTcExGSp78Md5O2JVDKo++NOAxmErlpynuBmA+4Cwked1rlT56jHlkz3eG6VCW8GjJtn72VI/oKOI=
-X-Received: from pgtv2.prod.google.com ([2002:a63:b642:0:b0:bac:ef38:605c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7490:b0:35d:d477:a7db
- with SMTP id adf61e73a8af0-369afbff895mr3381877637.56.1765587713879; Fri, 12
- Dec 2025 17:01:53 -0800 (PST)
-Date: Fri, 12 Dec 2025 17:01:52 -0800
-In-Reply-To: <202512130717.aHH8rXSC-lkp@intel.com>
+        bh=9Hwyd1rimjLYvRaRvg8sNpXmW9eOFzclIP8X3X+ApI4=;
+        b=EXpJWFagrX66IZCIhlwUA4SeAZevQW71dPa1Ul/lA5fryrbbYvQxlQW3XPTIcMfC29
+         KRn6Ut72nzAUwuic9BaOY57Qfho0R7g7Oo34JQ44X5nXX+ITR4zSq7QPBNNqtuLlvobx
+         raFa71NtpCQc/s5vUWWGW2KgWthfT0JrNB/OnIUN0xANcgBe4QsGorCMCgMuq1EgPpH3
+         Ao2ILTH3giZFqNt1//H4NaP7RX5hMVxll6H6brftzG4lnYOm2Sm/vnN5NulyKsgN0t+i
+         7cWlQc6DzblMlj8LeCrZpQT82StOCi/n5xPfzkPEmJib3agPgsKNW3mPD+fxre8mCK3m
+         UP0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUM9cuv9ALMjKKC3Xbp93kY5FAxvv81ZidlnqmGcLXrMLyX+tVyt5FrW+0XQ73ckkEOY/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAUgV/4tRPG+QFTrxQVST7WsPJBChypSVoENUMNZLo9zUPIYBy
+	b0gfgH8RV7ctuGN5LgzI1kFXgXIEbnrBfGbihg3jq2zJnK9oGtjsIrFrYh4LJNsugmxj7neqsy3
+	v40OFhg==
+X-Google-Smtp-Source: AGHT+IHCiEhmID2LaoVd+RXtq+vAyKTjDZ3vK41d/P6PUu3il4TQ94p4+XlM4I+BZqfDZdpsO3eNObnjorI=
+X-Received: from plcj20.prod.google.com ([2002:a17:902:f254:b0:2a0:81d1:64f4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a68:b0:274:3db8:e755
+ with SMTP id d9443c01a7336-29f2404b18emr31791315ad.30.1765588028118; Fri, 12
+ Dec 2025 17:07:08 -0800 (PST)
+Date: Fri, 12 Dec 2025 17:07:06 -0800
+In-Reply-To: <sjxsi4udjj6acl5sm6u7vqxrplo5oshwgaoor2wmm3iza5h5fj@cbnzxcmwliwy>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251212135051.2155280-1-xiaoyao.li@intel.com> <202512130717.aHH8rXSC-lkp@intel.com>
-Message-ID: <aTy7AG2y1OwIXfqs@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf
- while the MMU is direct
+References: <20251110222922.613224-1-yosry.ahmed@linux.dev>
+ <20251110222922.613224-5-yosry.ahmed@linux.dev> <aThN-xUbQeFSy_F7@google.com>
+ <nyuyxccvnhscbo7qtlbsfl2fgxwood24nn4bvskhfqghgli3jo@xsv4zbdkolij>
+ <aThp19OAXDoZlk3k@google.com> <fg5ipm56ejqp7p2j2lo5i5ouktzqggo3663eu4tna74u6paxpg@lque35ixlzje>
+ <aThtjYG3OZTtdwUA@google.com> <pit2u5dpjpchsbz3pyujk62smysco5z37i3z3qosdscx6bddqj@i6fjafx5fxlz>
+ <aTxftw3XcIrwyTzK@google.com> <sjxsi4udjj6acl5sm6u7vqxrplo5oshwgaoor2wmm3iza5h5fj@cbnzxcmwliwy>
+Message-ID: <aTy8OhCEcNjpkg_u@google.com>
+Subject: Re: [PATCH v2 04/13] KVM: nSVM: Fix consistency checks for NP_ENABLE
 From: Sean Christopherson <seanjc@google.com>
-To: kernel test robot <lkp@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	oe-kbuild-all@lists.linux.dev, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, farrah.chen@intel.com
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Dec 13, 2025, kernel test robot wrote:
-> Hi Xiaoyao,
+On Fri, Dec 12, 2025, Yosry Ahmed wrote:
+> On Fri, Dec 12, 2025 at 10:32:23AM -0800, Sean Christopherson wrote:
+> > On Tue, Dec 09, 2025, Yosry Ahmed wrote:
+> > > Do I keep that as-is, or do you prefer that I also sanitize these fields
+> > > when copying to the cache in nested_copy_vmcb_control_to_cache()?
+> > 
+> > I don't think I follow.  What would the sanitization look like?  Note, I don't
+> > think we need to completely sanitize _every_ field.  The key fields are ones
+> > where KVM consumes and/or acts on the field.
 > 
-> kernel test robot noticed the following build warnings:
+> Patch 12 currently sanitizes what is copied from VMCB12 to VMCB02 for
+> int_vector, int_state, and event_inj in nested_vmcb02_prepare_control():
 > 
-> [auto build test WARNING on 7d0a66e4bb9081d75c82ec4957c50034cb0ea449]
+> @@ -890,9 +893,9 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+>  		(svm->nested.ctl.int_ctl & int_ctl_vmcb12_bits) |
+>  		(vmcb01->control.int_ctl & int_ctl_vmcb01_bits);
 > 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Xiaoyao-Li/KVM-x86-Don-t-read-guest-CR3-when-doing-async-pf-while-the-MMU-is-direct/20251212-220612
-> base:   7d0a66e4bb9081d75c82ec4957c50034cb0ea449
-> patch link:    https://lore.kernel.org/r/20251212135051.2155280-1-xiaoyao.li%40intel.com
-> patch subject: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf while the MMU is direct
-> config: i386-buildonly-randconfig-002-20251213 (https://download.01.org/0day-ci/archive/20251213/202512130717.aHH8rXSC-lkp@intel.com/config)
-> compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512130717.aHH8rXSC-lkp@intel.com/reproduce)
+> -	vmcb02->control.int_vector          = svm->nested.ctl.int_vector;
+> -	vmcb02->control.int_state           = svm->nested.ctl.int_state;
+> -	vmcb02->control.event_inj           = svm->nested.ctl.event_inj;
+> +	vmcb02->control.int_vector          = svm->nested.ctl.int_vector & SVM_INT_VECTOR_MASK;
+> +	vmcb02->control.int_state           = svm->nested.ctl.int_state & SVM_INTERRUPT_SHADOW_MASK;
+> +	vmcb02->control.event_inj           = svm->nested.ctl.event_inj & ~SVM_EVTINJ_RESERVED_BITS;
+>  	vmcb02->control.event_inj_err       = svm->nested.ctl.event_inj_err;
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202512130717.aHH8rXSC-lkp@intel.com/
+> My question was: given this:
 > 
-> All warnings (new ones prefixed by >>):
+> > I want to solidify sanitizing the cache as standard behavior
 > 
->    In file included from include/linux/kvm_host.h:43,
->                     from arch/x86/kvm/irq.h:15,
->                     from arch/x86/kvm/mmu/mmu.c:19:
->    arch/x86/kvm/mmu/mmu.c: In function 'kvm_arch_setup_async_pf':
-> >> include/linux/kvm_types.h:54:25: warning: conversion from 'long long unsigned int' to 'long unsigned int' changes value from '18446744073709551615' to '4294967295' [-Woverflow]
->       54 | #define INVALID_GPA     (~(gpa_t)0)
->          |                         ^
->    arch/x86/kvm/mmu/mmu.c:4525:28: note: in expansion of macro 'INVALID_GPA'
->     4525 |                 arch.cr3 = INVALID_GPA;
->          |                            ^~~~~~~~~~~
+> Do you prefer that I move this sanitization when copying from L1's
+> VMCB12 to the cached VMCB12 in nested_copy_vmcb_control_to_cache()?
 
-Well that's just annoying.  Can we kill 32-bit yet?  Anyways, just ignore this
-(unless it causes my KVM_WERROR=1 builds to fail, in which case I'll just add an
-explicit cast, but I think we can just ignore it).
+Hmm, good question.  Probably?  If the main motivation for sanitizing is to
+guard against effectively exposing new features unintentionally via vmcs12, then
+it seems like the safest option is to ensure the "bad" bits are _never_ set in
+KVM-controlled state.
+
+> I initially made it part of nested_vmcb02_prepare_control() as it
+> already filters what to pick from the VMCB12 for some other related
+> fields like int_ctl based on what features are exposed to the guest.
 
