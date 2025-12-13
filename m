@@ -1,175 +1,323 @@
-Return-Path: <kvm+bounces-65923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65924-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A610CBA5CD
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 07:01:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C68CCBA6FE
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 09:01:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBF6630577CD
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 06:00:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1CD03052B1A
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 08:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2308C2773CC;
-	Sat, 13 Dec 2025 06:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E70285CAA;
+	Sat, 13 Dec 2025 08:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dZP5R5Xp"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="PD7k7SrW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="db5hIDJi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4D82236E5
-	for <kvm@vger.kernel.org>; Sat, 13 Dec 2025 06:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A930E1C84CB;
+	Sat, 13 Dec 2025 08:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765605612; cv=none; b=VQpnu3SE8J9SrtrYvmJhhGH26cFBryl0RsuvqT+26diDcQE/fvkq8bZ3379hhOeEgix0ATnQJ30s8oc4eNUfyN4DkuOMqeq+Zeyzpz8/WzAQK4FUMIwBR6iXsIl9kfn0Ec6OXEnFjrn5YOWPWEue0wNIlgFFB9/ApEiPviV3Bwk=
+	t=1765612816; cv=none; b=FlHltOoKypejv6brv5jrf1YRhKd1z2dp2+k1xKgUomtQC9nQKfgaH7/D3DZZCrj5LHhglQ8n+wEgg+59c7GFwd1shhFCIwlchuafI0vdo5OJVjyLcUrVuS5Pn9w2IQuWv5d5Io7aTGI91NbhjPcfpcGq+lTSU+DHLVzl0LgcJi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765605612; c=relaxed/simple;
-	bh=WL4zqdjhP4eWIgWVfNrlgI8rU89YTQc1eFsnk2DTuu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TWyHPCWSyUScBwNZhuJ79/uvXXfjN3WwbA/nBdjHFGnmCKhAVgKw7no+ObokrAnP9/zwpqD1qY8p1zCWB0i/x/j4zQXs2Tzx6Smop0SQ9Ydk5EGEsfDG9WuerKUCegpk6YDyopTbSONvRFIJB0O6KP9P5mGYmZAGGejEsjXkISg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dZP5R5Xp; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765605610; x=1797141610;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WL4zqdjhP4eWIgWVfNrlgI8rU89YTQc1eFsnk2DTuu0=;
-  b=dZP5R5Xp3Jor5zhHkb8NnoodLd1FvxA+d4XH/HveP1LdQCMkNy1DiQ46
-   wsJQZigOU9DcJiXgsjiKG/AyMY5qXlABxv/GmZ54UtMJtGyObE83DERfh
-   I/l0m4BjTVGaO9hwtSeq0D9FS/R4WXQ3eDlYuhJB8Sjq2BVlej6H1PVsq
-   C+eVS5uVmvBUdGEf+vJtvPDp+WGIQ3hLL/CfFDjyV8W6rNUBM3Z2wwuLT
-   P8bETZwMNbedxJCd/zf40WrRu9iKX0W91jyBXDt8OXmIXRfde9Lszuhai
-   oCUkQpTLZxtescg0RUEEblisk7JQACwrlNZRQiSf0wQJWa91J5/1tLE1V
-   w==;
-X-CSE-ConnectionGUID: wFgfVrIlRbKAHBkIIKIuiw==
-X-CSE-MsgGUID: efnl/ZOpTJimC+UEOe5fPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67479181"
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="67479181"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 22:00:09 -0800
-X-CSE-ConnectionGUID: 0dvZTn5IRXWGLU1cN3ZoGA==
-X-CSE-MsgGUID: S/O+NmewRDKE54hVKm53Sg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="201749910"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 12 Dec 2025 22:00:06 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vUIfj-0000000078T-1bmr;
-	Sat, 13 Dec 2025 06:00:03 +0000
-Date: Sat, 13 Dec 2025 13:59:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Message-ID: <202512131338.pYhd9ptc-lkp@intel.com>
-References: <20251212152215.675767-15-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1765612816; c=relaxed/simple;
+	bh=QfWovsD//pnp/uqN66/qw77t5D2F2+FkFk/S+xG/uf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iA31bYEcK6aq2xQk4RfheIHekYS19C8NJ+pT5GPcgFG79kggetyQBbKlMWycebZJAnoE5cPNzTkRgqWZXT8y2SV0YosN8FlsylhJcmJj5znswOncGuX8OCQvEuEnwUdu2GcmFd1aTDGwPrla2D+6SmIMsWI+zbcPiXnAnZ0Zca8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=PD7k7SrW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=db5hIDJi; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id 9E74EEC0571;
+	Sat, 13 Dec 2025 03:00:10 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Sat, 13 Dec 2025 03:00:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1765612810;
+	 x=1765699210; bh=4cKpV/fyfVbQhCD31q9uz0Vr0824m5w2xINKUH++CfU=; b=
+	PD7k7SrW+VLJLCwifJ5cLDKSHOPAtI3Nq6ft0mZE/r7pGm0YRIjjxRMUA//oqvUR
+	N2XYY8qETgbHaPH46U1og3bwYSjQt+tr7PmDmFhWtZYkR09XHl1s0vNyGhxNFUU9
+	fHWj6w7v9XvOJKYC9k5UHhUkFAPUwdrKN5KWHwPMBJmqskNuAMlord9myRNCV2bB
+	hcp/Kc4JF6Jj6JAr2w0xtmcMgAFeAddfk7DtGSI2weHhNekGkxxVZHp6lEdUoDeo
+	Fdd4RTw84fYPjeuidCq8QHKERicP5/B2+kVdRmTIfF8QyPRtlTcVM5KSJq+7HxbG
+	OduxX7EQqP97kOhI5tPaQQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1765612810; x=
+	1765699210; bh=4cKpV/fyfVbQhCD31q9uz0Vr0824m5w2xINKUH++CfU=; b=d
+	b5hIDJicNFH3b9OB0jJB2phHJ3qewHZuZCoujThWEntl1lDuDeAgS73te5jhO4EF
+	9Q/yOTYFtUIXtfJNNnZ1CP64XhMGEqWo6pCMRY+E1aPGOLcARoPBNxwkXBPV/zC6
+	ITN8RksTZFprefNBs+MxJp3vh74/q4k3Qbu/KzwqaIfXPFBDolTgqNGFKwwznyfS
+	uy/Ph95RTFkgBqKoh+k5KizLhDQKwB6XIn7KvAJXX7CHryeFE5F2MsUx2LnS4jkm
+	4iCZJOCN7Gd4n89Lt0UzuMTtNM6vPE+xDSf9wlO349ObeyP6C87a/iWIzX4hGv3R
+	SIyS1jdQqEZGGUMgMANqA==
+X-ME-Sender: <xms:CR09aZ0se5d3fy_spLds3LVWykP23hi5QJ_eccTKLMMaT2yakXNTEw>
+    <xme:CR09aZdYqUErkr3zt0uuDzHNmoy5bH0Q8A7iugKAOQG7ZGxHf98FfWT343M3rveIW
+    360q_eOPk2tYN3JGbXQ1UWkTEFSIKg2ezIkc3hg62vQbrJxBdnbUQ>
+X-ME-Received: <xmr:CR09aSag5YeKcHmQCnWMWnKF6g3erPdMltjQi4jA1YVdZW2pcNlqKwcl>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeftdehvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkjghfgggtgfesthejredttd
+    dtvdenucfhrhhomheptehlvgigucghihhllhhirghmshhonhcuoegrlhgvgiesshhhrgii
+    sghothdrohhrgheqnecuggftrfgrthhtvghrnhephedvtdeuveejudffjeefudfhueefje
+    dvtefgffdtieeiudfhjeejhffhfeeuvedunecuffhomhgrihhnpehkvghrnhgvlhdrohhr
+    ghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlh
+    gvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepudejpdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpth
+    htohepvhhsvghthhhisehnvhhiughirgdrtghomhdprhgtphhtthhopehjghhgsehnvhhi
+    ughirgdrtghomhdprhgtphhtthhopehmohgthhhssehnvhhiughirgdrtghomhdprhgtph
+    htthhopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhopehskhholhhothhhuhhmthhh
+    ohesnhhvihguihgrrdgtohhmpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhunh
+    gurghtihhonhdrohhrghdprhgtphhtthhopehlihhnmhhirghohhgvsehhuhgrfigvihdr
+    tghomhdprhgtphhtthhopehnrghordhhohhrihhguhgthhhisehgmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:CR09aWXS5_16LGB8Zv-_B0guUAGOluib79melqLDniY5OlYEwDI3jg>
+    <xmx:CR09adRYhMy-CWM-TT_seE_oFA2Bk7s7FFFGh988PjaW2-8cjwRW5A>
+    <xmx:CR09aTEUGmVjFZuiM6tjs9PJv1_a7j10QHjI_kTDcTnLLGmL0LeLNA>
+    <xmx:CR09aUdBYE-UU5jPFlusESAWcmhzir2Gv4JT7HUM7dfRQxq4KivpMA>
+    <xmx:Ch09aS6qUcggBsvuf3RJTQtwZHXzdMqLHkGhpRpB3Dqw8-TVvl6jGrgq>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 13 Dec 2025 03:00:05 -0500 (EST)
+Date: Sat, 13 Dec 2025 17:00:02 +0900
+From: Alex Williamson <alex@shazbot.org>
+To: <ankita@nvidia.com>
+Cc: <vsethi@nvidia.com>, <jgg@nvidia.com>, <mochs@nvidia.com>,
+ <jgg@ziepe.ca>, <skolothumtho@nvidia.com>, <akpm@linux-foundation.org>,
+ <linmiaohe@huawei.com>, <nao.horiguchi@gmail.com>, <cjia@nvidia.com>,
+ <zhiw@nvidia.com>, <kjaju@nvidia.com>, <yishaih@nvidia.com>,
+ <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: Re: [PATCH v2 3/3] vfio/nvgrace-gpu: register device memory for
+ poison handling
+Message-ID: <20251213170002.5babbf70.alex@shazbot.org>
+In-Reply-To: <20251213044708.3610-4-ankita@nvidia.com>
+References: <20251213044708.3610-1-ankita@nvidia.com>
+	<20251213044708.3610-4-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212152215.675767-15-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Sascha,
+On Sat, 13 Dec 2025 04:47:08 +0000
+<ankita@nvidia.com> wrote:
 
-kernel test robot noticed the following build errors:
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> The nvgrace-gpu module [1] maps the device memory to the user VA (Qemu)
+> without adding the memory to the kernel. The device memory pages are PFNMAP
+> and not backed by struct page. The module can thus utilize the MM's PFNMAP
+> memory_failure mechanism that handles ECC/poison on regions with no struct
+> pages.
+> 
+> The kernel MM code exposes register/unregister APIs allowing modules to
+> register the device memory for memory_failure handling. Make nvgrace-gpu
+> register the GPU memory with the MM on open.
+> 
+> The module registers its memory region, the address_space with the
+> kernel MM for ECC handling and implements a callback function to convert
+> the PFN to the file page offset. The callback functions checks if the
+> PFN belongs to the device memory region and is also contained in the
+> VMA range, an error is returned otherwise.
+> 
+> Link: https://lore.kernel.org/all/20240220115055.23546-1-ankita@nvidia.com/ [1]
+> 
+> Suggested-by: Alex Williamson <alex@shazbot.org>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/main.c | 116 +++++++++++++++++++++++++++-
+>  1 file changed, 112 insertions(+), 4 deletions(-)
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on next-20251212]
-[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next v6.18]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I'm not sure where Andrew stands with this series going into v6.19-rc
+via mm as an alternate fix to Linus' revert, but in case it's on the
+table for that to happen:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
-patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20251213/202512131338.pYhd9ptc-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512131338.pYhd9ptc-lkp@intel.com/reproduce)
+Reviewed-by: Alex Williamson <alex@shazbot.org>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512131338.pYhd9ptc-lkp@intel.com/
+Otherwise let's get some mm buy-in for the front of the series and
+maybe it should go in through vfio since nvgrace is the only user of
+these interfaces currently.  Thanks,
 
-All errors (new ones prefixed by >>):
+Alex
 
-   In file included from arch/arm64/include/asm/kvm_host.h:36,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:16:
->> include/kvm/arm_vgic.h:392:26: error: field 'gicv5_vpe' has incomplete type
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                          ^~~~~~~~~
-   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1
-   make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1314: prepare0] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:248: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+> 
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> index 84d142a47ec6..91b4a3a135cf 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/jiffies.h>
+>  #include <linux/pci-p2pdma.h>
+>  #include <linux/pm_runtime.h>
+> +#include <linux/memory-failure.h>
+>  
+>  /*
+>   * The device memory usable to the workloads running in the VM is cached
+> @@ -49,6 +50,7 @@ struct mem_region {
+>  		void *memaddr;
+>  		void __iomem *ioaddr;
+>  	};                      /* Base virtual address of the region */
+> +	struct pfn_address_space pfn_address_space;
+>  };
+>  
+>  struct nvgrace_gpu_pci_core_device {
+> @@ -88,6 +90,83 @@ nvgrace_gpu_memregion(int index,
+>  	return NULL;
+>  }
+>  
+> +static int pfn_memregion_offset(struct nvgrace_gpu_pci_core_device *nvdev,
+> +				unsigned int index,
+> +				unsigned long pfn,
+> +				pgoff_t *pfn_offset_in_region)
+> +{
+> +	struct mem_region *region;
+> +	unsigned long start_pfn, num_pages;
+> +
+> +	region = nvgrace_gpu_memregion(index, nvdev);
+> +	if (!region)
+> +		return -EINVAL;
+> +
+> +	start_pfn = PHYS_PFN(region->memphys);
+> +	num_pages = region->memlength >> PAGE_SHIFT;
+> +
+> +	if (pfn < start_pfn || pfn >= start_pfn + num_pages)
+> +		return -EFAULT;
+> +
+> +	*pfn_offset_in_region = pfn - start_pfn;
+> +
+> +	return 0;
+> +}
+> +
+> +static inline
+> +struct nvgrace_gpu_pci_core_device *vma_to_nvdev(struct vm_area_struct *vma);
+> +
+> +static int nvgrace_gpu_pfn_to_vma_pgoff(struct vm_area_struct *vma,
+> +					unsigned long pfn,
+> +					pgoff_t *pgoff)
+> +{
+> +	struct nvgrace_gpu_pci_core_device *nvdev;
+> +	unsigned int index =
+> +		vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+> +	pgoff_t vma_offset_in_region = vma->vm_pgoff &
+> +		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> +	pgoff_t pfn_offset_in_region;
+> +	int ret;
+> +
+> +	nvdev = vma_to_nvdev(vma);
+> +	if (!nvdev)
+> +		return -ENOENT;
+> +
+> +	ret = pfn_memregion_offset(nvdev, index, pfn, &pfn_offset_in_region);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Ensure PFN is not before VMA's start within the region */
+> +	if (pfn_offset_in_region < vma_offset_in_region)
+> +		return -EFAULT;
+> +
+> +	/* Calculate offset from VMA start */
+> +	*pgoff = vma->vm_pgoff +
+> +		 (pfn_offset_in_region - vma_offset_in_region);
+> +
+> +	return 0;
+> +}
+> +
+> +static int
+> +nvgrace_gpu_vfio_pci_register_pfn_range(struct vfio_device *core_vdev,
+> +					struct mem_region *region)
+> +{
+> +	int ret;
+> +	unsigned long pfn, nr_pages;
+> +
+> +	pfn = PHYS_PFN(region->memphys);
+> +	nr_pages = region->memlength >> PAGE_SHIFT;
+> +
+> +	region->pfn_address_space.node.start = pfn;
+> +	region->pfn_address_space.node.last = pfn + nr_pages - 1;
+> +	region->pfn_address_space.mapping = core_vdev->inode->i_mapping;
+> +	region->pfn_address_space.pfn_to_vma_pgoff = nvgrace_gpu_pfn_to_vma_pgoff;
+> +
+> +	ret = register_pfn_address_space(&region->pfn_address_space);
+> +
+> +	return ret;
+> +}
+> +
+>  static int nvgrace_gpu_open_device(struct vfio_device *core_vdev)
+>  {
+>  	struct vfio_pci_core_device *vdev =
+> @@ -114,14 +193,28 @@ static int nvgrace_gpu_open_device(struct vfio_device *core_vdev)
+>  	 * memory mapping.
+>  	 */
+>  	ret = vfio_pci_core_setup_barmap(vdev, 0);
+> -	if (ret) {
+> -		vfio_pci_core_disable(vdev);
+> -		return ret;
+> +	if (ret)
+> +		goto error_exit;
+> +
+> +	if (nvdev->resmem.memlength) {
+> +		ret = nvgrace_gpu_vfio_pci_register_pfn_range(core_vdev, &nvdev->resmem);
+> +		if (ret && ret != -EOPNOTSUPP)
+> +			goto error_exit;
+>  	}
+>  
+> -	vfio_pci_core_finish_enable(vdev);
+> +	ret = nvgrace_gpu_vfio_pci_register_pfn_range(core_vdev, &nvdev->usemem);
+> +	if (ret && ret != -EOPNOTSUPP)
+> +		goto register_mem_failed;
+>  
+> +	vfio_pci_core_finish_enable(vdev);
+>  	return 0;
+> +
+> +register_mem_failed:
+> +	if (nvdev->resmem.memlength)
+> +		unregister_pfn_address_space(&nvdev->resmem.pfn_address_space);
+> +error_exit:
+> +	vfio_pci_core_disable(vdev);
+> +	return ret;
+>  }
+>  
+>  static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
+> @@ -130,6 +223,11 @@ static void nvgrace_gpu_close_device(struct vfio_device *core_vdev)
+>  		container_of(core_vdev, struct nvgrace_gpu_pci_core_device,
+>  			     core_device.vdev);
+>  
+> +	if (nvdev->resmem.memlength)
+> +		unregister_pfn_address_space(&nvdev->resmem.pfn_address_space);
+> +
+> +	unregister_pfn_address_space(&nvdev->usemem.pfn_address_space);
+> +
+>  	/* Unmap the mapping to the device memory cached region */
+>  	if (nvdev->usemem.memaddr) {
+>  		memunmap(nvdev->usemem.memaddr);
+> @@ -247,6 +345,16 @@ static const struct vm_operations_struct nvgrace_gpu_vfio_pci_mmap_ops = {
+>  #endif
+>  };
+>  
+> +static inline
+> +struct nvgrace_gpu_pci_core_device *vma_to_nvdev(struct vm_area_struct *vma)
+> +{
+> +	/* Check if this VMA belongs to us */
+> +	if (vma->vm_ops != &nvgrace_gpu_vfio_pci_mmap_ops)
+> +		return NULL;
+> +
+> +	return vma->vm_private_data;
+> +}
+> +
+>  static int nvgrace_gpu_mmap(struct vfio_device *core_vdev,
+>  			    struct vm_area_struct *vma)
+>  {
 
-
-vim +/gicv5_vpe +392 include/kvm/arm_vgic.h
-
-   360	
-   361	struct vgic_v5_cpu_if {
-   362		u64	vgic_apr;
-   363		u64	vgic_vmcr;
-   364	
-   365		/* PPI register state */
-   366		u64	vgic_ppi_hmr[2];
-   367		u64	vgic_ppi_dvir[2];
-   368		u64	vgic_ppi_priorityr[16];
-   369	
-   370		/* The pending state of the guest. This is merged with the exit state */
-   371		u64	vgic_ppi_pendr[2];
-   372	
-   373		/* The state flushed to the regs when entering the guest */
-   374		u64	vgic_ppi_activer_entry[2];
-   375		u64	vgic_ich_ppi_enabler_entry[2];
-   376		u64	vgic_ppi_pendr_entry[2];
-   377	
-   378		/* The saved state of the regs when leaving the guest */
-   379		u64	vgic_ppi_activer_exit[2];
-   380		u64	vgic_ich_ppi_enabler_exit[2];
-   381		u64	vgic_ppi_pendr_exit[2];
-   382	
-   383		/*
-   384		 * The ICSR is re-used across host and guest, and hence it needs to be
-   385		 * saved/restored. Only one copy is required as the host should block
-   386		 * preemption between executing GIC CDRCFG and acccessing the
-   387		 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
-   388		 * it is the hyp's responsibility to keep the state constistent.
-   389		 */
-   390		u64	vgic_icsr;
-   391	
- > 392		struct gicv5_vpe gicv5_vpe;
-   393	};
-   394	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
