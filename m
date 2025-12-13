@@ -1,147 +1,209 @@
-Return-Path: <kvm+bounces-65917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62590CBA2A4
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 02:39:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E786CBA4C3
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 05:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F579300C35B
-	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 01:39:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4FB2630D709C
+	for <lists+kvm@lfdr.de>; Sat, 13 Dec 2025 04:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F660224AF7;
-	Sat, 13 Dec 2025 01:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4388A283FF0;
+	Sat, 13 Dec 2025 04:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ULiMihQI"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ljcUGYms"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010033.outbound.protection.outlook.com [40.93.198.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B001C15624B;
-	Sat, 13 Dec 2025 01:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765589994; cv=none; b=Xr1pTgnsvp22RkB5PPxQ3EnT+GX5pvDGR8GQ4YFpS2IM/tacE42IqHLiRy6GRQQR4K5WCHiydvAvUmD3YtSfUpt2wImFsqztx6DXvFRVsJAUJAkew6lkyNH4TBgFGN3nXgWLvOzhLEiPirbjU2w5LoyuLMUcyg8Ykufhs679GZw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765589994; c=relaxed/simple;
-	bh=nWStk/iImD1snrjk7kIUEv29s9EmkkHk9IJxnr2ZSvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ukPNi9MokdwsLfuwDJNksH7FRKcSslQNAj0nUl2L1BIA1MVBpFOz70MJnbWEybZTgGINq1oFwy2sMLvV8mM97ZtpXQk+73+kYOL9xb7806VqdcBTWl26N2I8K3mgH6Q6PcUVcK78OTZSNy747TrlokeOsJrarEtpe6ZN/2Z+sW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ULiMihQI; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765589992; x=1797125992;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nWStk/iImD1snrjk7kIUEv29s9EmkkHk9IJxnr2ZSvg=;
-  b=ULiMihQI1ONYh9izG5CYFAPPTkC38PAfOmOe5m5y8ddd4YDBn11fkGwW
-   b4tzqtjhlaYKk9grLVTKAzbX2OIeYvviehRZrxFyQ8wigNEmre8wl1xlY
-   IhCssW4RNCuTxPewdo9IZbH7gjS3NQPmAr2nZsBHqC7y5hcjZRZujI8QQ
-   6xC2LiWOrIWj43FGX3ZD+qNpXSpAD6eMsly8K/6k82Nzh2qWN+C2JZeKK
-   ffQjoqnc6ldgQmcOx6zm59MeeLIcBGHgjJPh4BUeL4+bVCx75uSkQkV2E
-   oxwzXkvfzvupy1isVH/dn5b+2Tzkd+oB0sEIxREpwjTfL6ht2o+H2dYa1
-   g==;
-X-CSE-ConnectionGUID: r5iLGx9gQQaXpj65TBed4Q==
-X-CSE-MsgGUID: eDFKov4cQrepTaqFiFAcnA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="85187716"
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="85187716"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 17:39:50 -0800
-X-CSE-ConnectionGUID: Ov68TNPZSY+c2vY3lTafwg==
-X-CSE-MsgGUID: TL28awDAT8GChFRsYUMNlg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="227888686"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 12 Dec 2025 17:39:47 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vUEbo-000000006tR-1QlY;
-	Sat, 13 Dec 2025 01:39:44 +0000
-Date: Sat, 13 Dec 2025 09:38:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xiaoyao.li@intel.com,
-	farrah.chen@intel.com
-Subject: Re: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf
- while the MMU is direct
-Message-ID: <202512130905.LJZI3LOt-lkp@intel.com>
-References: <20251212135051.2155280-1-xiaoyao.li@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9517A1E3DCD;
+	Sat, 13 Dec 2025 04:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.33
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765601247; cv=fail; b=XsSwOXIZvwelFUhMhhuiwTunJvsRLIcvp88RKqCwWjRVcCWUoZcbE73sbSROMoX8SPCTXtCzlKRXrunbel5+RntAw25MEEoLwqZUXmIVEJj3Vf9uhfDMG13s84j3WiozH4hkZXHYp8BPuPGJVj9VAiS1F+qb5qWWRq1xZ//BmrU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765601247; c=relaxed/simple;
+	bh=1TB5zGHZ0EGI8psm0Zl+EgNNnILwvC/4CU/1ueq6gfA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lb/AI25O3X0Vy3BeU7eAcj+ebMbRfITtppXG2tHHETry5GXcM1A4vofjTcHS0+3T9glOmD8MZvCk75pcfGRt4DHO1cNgzNeq49sqSFlIAEwdIQgYhXugVWTMxd2+ouQbj/PvOMka95fZKggCS8SA5wY70mDCLIlRlNBg2TYiHuA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ljcUGYms; arc=fail smtp.client-ip=40.93.198.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YyhgBNseKv7hW5CxXFz3C/aXfxyqWEFzCvitWmjSpk1HV5QEt2o02qWWdm8hUOQDbf3NP4R5MzRyjGfinsZweI5OuHhwXZHxUZ/1gQQQx1GSsMnDNa7Cxv6M+xZ3mJBd0P3pcOcx0876DtGVEOI8Xyu26Sr4HXxrnpxWSttbxbVu6AE35JochjaFvMwTyE+CB6H4xPmeJgnWPSwLtb9DJ4FQmYcrcUaHBnWjCo1LcxcmLujUGM7cpARSTRCNZ/5+GdoeKi8Fc6uxLFTliimxmT1PWYoGyjTawO9A1JzUAcYcevmUiNY5NXVZNeJ4Mc/vQfMdSVN//LNCbuc1pXzIQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5PBuHJOBLm0EQ8jCOVROU3hwKF4m4A4pbWtsE59rESU=;
+ b=Lt04uILp/zOrag4ehhjZCwfZ1tFMDUXy/yhPv1P8BS+rMIlzkynIF1LSnsUGfLv321Xk1lljPMHiJmvP2MeYYb7qQYu53Lm82bp7nMq9OuEK9czI6GMuQwQdFKOvKSw/mUkQnrp82jDeTNvQhhsuN5t9WWcROGGEYGuTX1u/vgv4LO0Xm3BbXZqyvp+5N1rYoufMgSJezffHHv+bK34mxyCiZpyBm2FnstV6TT5IElxRb8vlJYCBzA6L0HMM8SOWWR+wh9AYOrWPEzecZPmLT1V/osYlM7S7HRkC2DWmxlgYpGNXeJ/uFCi/MYep/PTnrMgWSK/PHhOBTNmj1RMMSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5PBuHJOBLm0EQ8jCOVROU3hwKF4m4A4pbWtsE59rESU=;
+ b=ljcUGYmsEq0L6bnrkY5dp+xc/6CcfFC8J2oDrsqawhRCoV4jbqtFDG7Rn9i7QTK9ihfeSZeUbGcjAt9pGfgggoDyFkDu+lZ6wlWTyXFlzMFnzTXZFGpL4YPxn/PiC/mfuLlm2yxvXi5IqP5METxngqScvEpSvgwudKvyZtqpKyBDvPrIjh/vlJLygdkD9hSACWFmzPLzV4NubLJonQTJ+DOrvKyNbfSAuLA8qDb3ty7+OklcpnUr8Q5qgtcHdogaQjI/5THGnAhXtBrwKmbU7KXXPZwhLeneUVKmAF5E+lW2iMS1fd/B7h0D/Ywj6Ej58AHdeLR+BEQCGP30GkIh1g==
+Received: from BN9P220CA0007.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:13e::12)
+ by CYYPR12MB8891.namprd12.prod.outlook.com (2603:10b6:930:c0::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.9; Sat, 13 Dec
+ 2025 04:47:18 +0000
+Received: from BN1PEPF00004685.namprd03.prod.outlook.com
+ (2603:10b6:408:13e:cafe::93) by BN9P220CA0007.outlook.office365.com
+ (2603:10b6:408:13e::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.10 via Frontend Transport; Sat,
+ 13 Dec 2025 04:47:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN1PEPF00004685.mail.protection.outlook.com (10.167.243.86) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9412.4 via Frontend Transport; Sat, 13 Dec 2025 04:47:18 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 12 Dec
+ 2025 20:47:09 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Fri, 12 Dec 2025 20:47:08 -0800
+Received: from localhost.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Fri, 12 Dec 2025 20:47:08 -0800
+From: <ankita@nvidia.com>
+To: <ankita@nvidia.com>, <vsethi@nvidia.com>, <jgg@nvidia.com>,
+	<mochs@nvidia.com>, <jgg@ziepe.ca>, <skolothumtho@nvidia.com>,
+	<alex@shazbot.org>, <akpm@linux-foundation.org>, <linmiaohe@huawei.com>,
+	<nao.horiguchi@gmail.com>
+CC: <cjia@nvidia.com>, <zhiw@nvidia.com>, <kjaju@nvidia.com>,
+	<yishaih@nvidia.com>, <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>
+Subject: [PATCH v2 0/3] mm: fixup pfnmap memory failure handling
+Date: Sat, 13 Dec 2025 04:47:05 +0000
+Message-ID: <20251213044708.3610-1-ankita@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212135051.2155280-1-xiaoyao.li@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004685:EE_|CYYPR12MB8891:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3dc3e01-f96b-4d96-5e1d-08de3a02b242
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?nRzjw/xu/4g0NQYm3of5l67o6A/IIAzVBfHqiIjTy9PvQEmbSfQrAIU5Oe+w?=
+ =?us-ascii?Q?n0ucOk0I0Jh98FZ1KfLfinGB0JA3G84WphgmoGkPhm2RfachDq/LanzwOWSH?=
+ =?us-ascii?Q?VxgrdA3pNmh0dzTLRLWU06uuudWhf1vcXe7TpA28FCYfFOS9B7SbV/8g3iE2?=
+ =?us-ascii?Q?PGnl9jAcBUc0bVnMYPUHjHRcLn46DsNairJM3iEgJBhqzoN0P3NGa3k/rLKU?=
+ =?us-ascii?Q?PBZ2s/K34Y51R8ZiM5PQ9Tdh6mvzsgneWUy+EGtJCAg+IOqK036pqsoNKutI?=
+ =?us-ascii?Q?sjAy9RdT8Clkbe1exlzakkwEBSc5E/ycjVHq1jnRF51pG4w5oCo0Fqlc/vPt?=
+ =?us-ascii?Q?9NVwiOwhZTPMuF4xr5EjR09sYbcfeh7FaDTVj8QLugACyFxrXPQqQH0dnXTc?=
+ =?us-ascii?Q?m4qq90LOBI9lyHvbZLCHpslFh0s/eM9LAiKF6M+myYLuS+PGdx0X2o4Yhv6/?=
+ =?us-ascii?Q?xKu3PMp89XZSn07xqQiVGT6H6QIbBiMYVZ3WFesTDstnt6ODrRmvpfSTJUxq?=
+ =?us-ascii?Q?/WOGmoEAhcajfzFTJwEitP3ce5uC/0AIbXcmz7L343LxazxGCIloO/zgCQYN?=
+ =?us-ascii?Q?jdXGiXGKEdiNNNp5lPu3H47eliDNmtGzocwP6dIGI9Pqlh7Iz+fL58ndhhCL?=
+ =?us-ascii?Q?I69j6hMKZiP9ImYmbOKEG8mWkrTP0y/9TGiIMFuDn8WuJzeQ8wzDk5hzc/z9?=
+ =?us-ascii?Q?ckjEzpxhQT8BdpbxHK6JMbLMns6H1B4HQg+U1uHM7fVrt8H/rwNf/ktAl8ZQ?=
+ =?us-ascii?Q?Ah/1ppKAWjQEc885fLcGFXoEeDkBxtB1I7jTBYCZLPM7hvCBG/Iw43OJmG6d?=
+ =?us-ascii?Q?RftXIBxVI7ZayTE987AXKrmWk1CYjUXw96/QTb9XzwYzRJUSioeYtI6UQF/9?=
+ =?us-ascii?Q?CQvcnDdVZfXmTn0B1lJ3O7Knc4TL4H2NCXWMQbXM5b8UpANiZypHvys4kUZe?=
+ =?us-ascii?Q?Yi6vLqefv0uFtASKag/MLFLU7pTcTgZhPn6ulhz+9bviIJLFvgwJjb3Q1QhI?=
+ =?us-ascii?Q?Ajeg9YV18H2BP9Ea8nHukZdPRUd4QqxCi6FHBlYNqU2OsX8redGh2rmagHv3?=
+ =?us-ascii?Q?xsT48PsNNgL5G2VWPegN1ibwdat8Hw7M088J1yrBPxcf8vSC8EGv+OjDFPcZ?=
+ =?us-ascii?Q?TQzOqvP96S5S803+SifVTTxClk9ZCqG8vtpsYjt5qWFFNHBK928NGOqCWaoO?=
+ =?us-ascii?Q?Z/RDWyO8tS4+FWqxwbXlQnU58q2oLE9uOfLlDu8UThb1R4EY7bSHb2CT0S1N?=
+ =?us-ascii?Q?IE01C0qxfhMoua0/nB39L8p/jMDrfNd5xJkCLnFf0ZZ6eTYS8qQRbUrcz+bW?=
+ =?us-ascii?Q?WzxZr9VZ4rrTK5J6kFZczjURvwDZFc/z9tfXkfeXii0YcP9Vs8Utx4FE4AJD?=
+ =?us-ascii?Q?UD+oW721O+eODQzh4VFpkJuC6N5BiJdt8StQSBMEgNHQCdLYnoOnXLqCaB0Q?=
+ =?us-ascii?Q?DN67/JyTgdp+BF3Wysy6oUdhCTf9ibKRDvM69NcglwhTwmAn4v8gbAloCCED?=
+ =?us-ascii?Q?lvszZSAGwAKbDEG4yJUu8ORnN6b/3rCLXoBWQW9EeiCWHfnAnIq+x2iY0KS7?=
+ =?us-ascii?Q?t2sOx/MJHIPBwK3E2OolVh1a/ChJGTe+GsJNoh5s?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2025 04:47:18.6575
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3dc3e01-f96b-4d96-5e1d-08de3a02b242
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004685.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8891
 
-Hi Xiaoyao,
+From: Ankit Agrawal <ankita@nvidia.com>
 
-kernel test robot noticed the following build warnings:
+It was noticed during 6.19 merge window that the patch series [1] to
+introduce memory failure handling for the PFNMAP memory is broken.
 
-[auto build test WARNING on 7d0a66e4bb9081d75c82ec4957c50034cb0ea449]
+The expected behaviour of the series is to allow a driver (such as
+nvgrace-gpu) to register its device memory with the mm. The mm would
+then handle the poison on that registered memory region.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Xiaoyao-Li/KVM-x86-Don-t-read-guest-CR3-when-doing-async-pf-while-the-MMU-is-direct/20251212-220612
-base:   7d0a66e4bb9081d75c82ec4957c50034cb0ea449
-patch link:    https://lore.kernel.org/r/20251212135051.2155280-1-xiaoyao.li%40intel.com
-patch subject: [PATCH v2] KVM: x86: Don't read guest CR3 when doing async pf while the MMU is direct
-config: i386-buildonly-randconfig-004-20251213 (https://download.01.org/0day-ci/archive/20251213/202512130905.LJZI3LOt-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512130905.LJZI3LOt-lkp@intel.com/reproduce)
+However, the following issues were identified in the patch series.
+1. Faulty use of PFN instead of mapping file page offset to derive
+the usermode process VA corresponding to the mapping to PFN.
+2. nvgrace-gpu code called the registration at mmap, exposing it
+to corruption. This may happen, when multiple mmap were called on the
+same BAR. This issue was also noticed by Linus Torvalds who reverted
+the patch [2].
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512130905.LJZI3LOt-lkp@intel.com/
+This patch series addresses those issues.
 
-All warnings (new ones prefixed by >>):
+Patch 1/3 fixes the first issue by translating PFN to page offset
+and using that information to send the SIGBUS to the mapping process.
+Patch 2/3 add stubs for CONFIG_MEMORY_FAILURE disabled.
+Patch 3/3 is a resend of the reverted change to register the device
+memory at the time of open instead of mmap.
 
->> arch/x86/kvm/mmu/mmu.c:4525:14: warning: implicit conversion from 'gpa_t' (aka 'unsigned long long') to 'unsigned long' changes value from 18446744073709551615 to 4294967295 [-Wconstant-conversion]
-    4525 |                 arch.cr3 = INVALID_GPA;
-         |                          ~ ^~~~~~~~~~~
-   include/linux/kvm_types.h:54:22: note: expanded from macro 'INVALID_GPA'
-      54 | #define INVALID_GPA     (~(gpa_t)0)
-         |                          ^~~~~~~~~
-   1 warning generated.
+Many thanks to Jason Gunthorpe (jgg@nvidia.com) and Alex Williamson
+(alex@shazbot.org) for identifying the issue and suggesting the fix.
+Thanks to Andrew Morton (akpm@linux-foundation.org) for picking up
+1/3 for mm-unstable. Requesting to consider the entire series in 6.19
+as 3/3 is a resend-with-fix of the only user that was reverted in the
+original series [2].
 
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for I2C_K1
-   Depends on [n]: I2C [=m] && HAS_IOMEM [=y] && (ARCH_SPACEMIT || COMPILE_TEST [=y]) && OF [=n]
-   Selected by [m]:
-   - MFD_SPACEMIT_P1 [=m] && HAS_IOMEM [=y] && (ARCH_SPACEMIT || COMPILE_TEST [=y]) && I2C [=m]
+Link: https://lore.kernel.org/all/20251102184434.2406-1-ankita@nvidia.com/ [1]
+Link: https://lore.kernel.org/all/20251102184434.2406-4-ankita@nvidia.com/ [2]
 
+Changelog:
+v2:
+* 1/3 added to the mm-unstable branch (Thanks Andrew Morton!)
+* Fixed return types in 3/3 based on Alex Williamson' suggestions.
+* s/u64/pgoff_t u64 for offsets in 3/3 (Thanks Alex Williamson)
+* Removed inine in pfn_memregion_offset in 3/3 (Thanks Alex Williamson)
+* No change in 1/3, 2/3.
 
-vim +4525 arch/x86/kvm/mmu/mmu.c
+Link:
+https://lore.kernel.org/all/20251211070603.338701-1-ankita@nvidia.com/ [v1]
 
-  4514	
-  4515	static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
-  4516					    struct kvm_page_fault *fault)
-  4517	{
-  4518		struct kvm_arch_async_pf arch;
-  4519	
-  4520		arch.token = alloc_apf_token(vcpu);
-  4521		arch.gfn = fault->gfn;
-  4522		arch.error_code = fault->error_code;
-  4523		arch.direct_map = vcpu->arch.mmu->root_role.direct;
-  4524		if (arch.direct_map)
-> 4525			arch.cr3 = INVALID_GPA;
-  4526		else
-  4527			arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
-  4528	
-  4529		return kvm_setup_async_pf(vcpu, fault->addr,
-  4530					  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
-  4531	}
-  4532	
+Ankit Agrawal (3):
+  mm: fixup pfnmap memory failure handling to use pgoff
+  mm: add stubs for PFNMAP memory failure registration functions
+  vfio/nvgrace-gpu: register device memory for poison handling
+
+ drivers/vfio/pci/nvgrace-gpu/main.c | 116 +++++++++++++++++++++++++++-
+ include/linux/memory-failure.h      |  15 +++-
+ mm/memory-failure.c                 |  29 ++++---
+ 3 files changed, 143 insertions(+), 17 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
 
