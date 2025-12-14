@@ -1,199 +1,85 @@
-Return-Path: <kvm+bounces-65946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BCB3CBBA61
-	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 12:29:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB9ECBBD44
+	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 17:08:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 443833011418
-	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 11:23:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F1E093008D52
+	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 16:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201E4313558;
-	Sun, 14 Dec 2025 11:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E642D8DD0;
+	Sun, 14 Dec 2025 16:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="EdZ+/KvM"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C5A313273;
-	Sun, 14 Dec 2025 11:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from m239-4.eu.mailgun.net (m239-4.eu.mailgun.net [185.250.239.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C73215F5C
+	for <kvm@vger.kernel.org>; Sun, 14 Dec 2025 16:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.250.239.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765711409; cv=none; b=lW28k9okXe0Gv7cGk1/iCoOPHrKK60Go3tef5t0GMOHTgJt2cYjJuVVMYt+po+CsZUAlPIazhQlMSI+Uvc1qQrtNpwZeAIcbf05n+beRvcrFoySA6jofEUPequ/PrCEWxs6MX0929jOlVzmEas8v9uxTdRphuKTVZZzvz4QLzk0=
+	t=1765728509; cv=none; b=ekPZCezK4vOfoAhwQB3KaCTCbMigcXFVRBl9NtwvGs9l/APJs7Nm/H7fj9V3j87Wv67WHZ7k6UuasiOg+NRehz+z9opLUx7PIT7QShUVSwGMt+GAFI3GAvaeu5mD+lpnNnN9m8iJV4Bvxz3/qUxzcnp7MzEvmLRHrKVJjyqlO7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765711409; c=relaxed/simple;
-	bh=lhB4tUhCCDLZA6yBYgCDqTgP+a9jFwXX5PcOcj+pjRA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=A1vGmC877EQ6xs+AYM1EiY1oycpDW+8Ma03bWCunzXuBcuhxWMUmE51gtUjomb7WuKNvyun5u8NdIkzIZMYcWKGyI61mPUkMzoS1eEyZkqxa1fz7g4fXf54COp2+ELVFQkvN6IxKWr8YnP6OKoqScwmrqEpjPluZ1kiTOlY0viM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49B1B16F3;
-	Sun, 14 Dec 2025 03:23:20 -0800 (PST)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 31B933F73B;
-	Sun, 14 Dec 2025 03:23:24 -0800 (PST)
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: catalin.marinas@arm.com,
-	will@kernel.org,
-	maz@kernel.org,
-	broonie@kernel.org,
-	oliver.upton@linux.dev,
-	miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com,
-	ardb@kernel.org,
-	suzuki.poulose@arm.com,
-	lpieralisi@kernel.org,
-	yangyicong@hisilicon.com,
-	scott@os.amperecomputing.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	mark.rutland@arm.com,
-	arnd@arndb.de
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
-Date: Sun, 14 Dec 2025 11:22:48 +0000
-Message-Id: <20251214112248.901769-10-yeoreum.yun@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251214112248.901769-1-yeoreum.yun@arm.com>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1765728509; c=relaxed/simple;
+	bh=fK/BTRikI2xhEAHLV2bpBVnY8SSazIduun6Pjgeu4uM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hy35EazKUB33JLzx7dh0f2qGnJvfbCzkH4L8oouTfk1xjmo7dHgjx+vh1Vc0+woYPtmj5zKfVr5bTCuu1+wxEwpNgy1holMabhaRmX5dC8sHfGJeJEq5SCX8UvGhLsQT1kROLUwhXxlS8PaedgZs5L16Ci98uPVShIp6HkmLJIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=EdZ+/KvM; arc=none smtp.client-ip=185.250.239.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1765728504; x=1765735704;
+ h=Content-Type: Cc: To: To: Subject: Subject: Message-ID: Date: From: From: MIME-Version: Sender: Sender;
+ bh=fK/BTRikI2xhEAHLV2bpBVnY8SSazIduun6Pjgeu4uM=;
+ b=EdZ+/KvMhzL7z4v2teOvfX1KVgkJvRGeiT5d1aEIfsyMniAfuQx746vahsRdBJTOIGN8gzQe0VlhhGMpr1VYcRFlI6ONeIaJnEdazMz4GB8CGSbeKXBh1em6klVBLmlEMnpMWG9iqvmqGdrPLDcFD2LuLdUKv5WrF6iSGOqAJBQDTqdG3QVu2eOamiVVi5hA1QY6ugNmEBUFhv0A1zfpxlFUgLrVfiO6Fj/umcB3NwvJrcUbaNJEIUT8hnJCOJei1olCCVcI/Np8jjVcXajnv+EydNg7ghyfvyBp91s6RqRBcdqbh0oCMG475HD5krE/Hj8k2+WKgpQZHIkOW9+GwQ==
+X-Mailgun-Sid: WyI1MzdiMyIsImt2bUB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46]) by
+ 9401ff797e0271f3a20f2953e6a798e9a7ec690c247c90fdb40cac3b55f22823 with SMTP id
+ 693ee0f8cd269e2d98dfa7a7 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Sun, 14 Dec 2025 16:08:24 GMT
+X-Mailgun-Sending-Ip: 185.250.239.4
+Sender: alessandro@0x65c.net
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-6420c08f886so2903598d50.3
+        for <kvm@vger.kernel.org>; Sun, 14 Dec 2025 08:08:24 -0800 (PST)
+X-Gm-Message-State: AOJu0YwfxtVD6JwsvJJbSKyrUEiekcwfup0S7IqL5WbltkXbPugg/hki
+	3QpxbkYnApd3iweu0z9UIgxf+QyDUYwm76Kj17s2DFkRwAs5/E10dMRWLxwvTk/PkP5rdcjw2y7
+	98sNqc6NILYKp0gaVKkNBzKbFnVbbj9o=
+X-Google-Smtp-Source: AGHT+IHnT73LLUwE+RFzx8jbgiB+Km5z1u/HRanoUGGPt2xHX6TGinIlEKqL584z0EIV6eNUVxkSbWtZW+NO8kgDr4w=
+X-Received: by 2002:a53:acc6:0:20b0:645:443d:10c3 with SMTP id
+ 956f58d0204a3-645555e8ea9mr4867166d50.27.1765728504093; Sun, 14 Dec 2025
+ 08:08:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Alessandro Ratti <alessandro@0x65c.net>
+Date: Sun, 14 Dec 2025 17:08:13 +0100
+X-Gmail-Original-Message-ID: <CAKiXHKdbs_+yFZGKkKYsHKwAwCZSTzeVdLJXk1amKzm7fGcPNg@mail.gmail.com>
+X-Gm-Features: AQt7F2ovrGFvYtz4HBIaGlPzBU9cjKfNVzlIhEv5C3FeUvzVtrf9EtbLB5dHXbA
+Message-ID: <CAKiXHKdbs_+yFZGKkKYsHKwAwCZSTzeVdLJXk1amKzm7fGcPNg@mail.gmail.com>
+Subject: Status of "Drop nested support for CPUs without NRIPS" patch
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Apply the FEAT_LSUI instruction to emulate the deprecated swpX
-instruction, so that toggling of the PSTATE.PAN bit can be removed when
-LSUI-related instructions are used.
+Hi,
 
-Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
----
- arch/arm64/kernel/armv8_deprecated.c | 77 +++++++++++++++++++++++++---
- 1 file changed, 71 insertions(+), 6 deletions(-)
+I was investigating the TODO in svm_check_intercept() about advertising
+NRIPS unconditionally, and found an old patch by Sean Christopherson
+(with Maciej S. Szmigiero's sign-off) that simply requires NRIPS for
+nested virtualization rather than trying to emulate it.
 
-diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
-index d15e35f1075c..b8e6d71f766d 100644
---- a/arch/arm64/kernel/armv8_deprecated.c
-+++ b/arch/arm64/kernel/armv8_deprecated.c
-@@ -13,6 +13,7 @@
- #include <linux/uaccess.h>
+Link: https://lore.kernel.org/kvm/f0302382cf45d7a9527b4aebbfe694bbcfa7aff5.1651440202.git.maciej.szmigiero@oracle.com/
 
- #include <asm/cpufeature.h>
-+#include <asm/lsui.h>
- #include <asm/insn.h>
- #include <asm/sysreg.h>
- #include <asm/system_misc.h>
-@@ -86,13 +87,77 @@ static unsigned int __maybe_unused aarch32_check_condition(u32 opcode, u32 psr)
-  *	   Rn  = address
-  */
+Is there a reason this approach wasn't taken? Was there pushback on
+dropping support for pre-2009 CPUs, or did it just fall through the
+cracks?
 
-+/* Arbitrary constant to ensure forward-progress of the loop */
-+#define __SWP_LOOPS	4
-+
-+#ifdef CONFIG_AS_HAS_LSUI
-+static __always_inline int
-+__lsui_user_swp_asm(unsigned int *data, unsigned int addr)
-+{
-+	int err = 0;
-+	unsigned int temp;
-+
-+	asm volatile("// __lsui_user_swp_asm\n"
-+	__LSUI_PREAMBLE
-+	"1:	swpt		%w1, %w2, [%3]\n"
-+	"	mov		%w1, %w2\n"
-+	"2:\n"
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-+	: "+r" (err), "+r" (*data), "=&r" (temp)
-+	: "r" ((unsigned long)addr)
-+	: "memory");
-+
-+	return err;
-+}
-+
-+static __always_inline int
-+__lsui_user_swpb_asm(unsigned int *data, unsigned int addr)
-+{
-+	u8 i, idx;
-+	int err = -EAGAIN;
-+	u64 __user *addr_al;
-+	u64 oldval;
-+	union {
-+		u64 var;
-+		u8 raw[sizeof(u64)];
-+	} newval, curval;
-+
-+	idx = addr & (sizeof(u64) - 1);
-+	addr_al = (u64 __user *)ALIGN_DOWN(addr, sizeof(u64));
-+
-+	for (i = 0; i < __SWP_LOOPS; i++) {
-+		if (get_user(oldval, addr_al))
-+			return -EFAULT;
-+
-+		curval.var = newval.var = oldval;
-+		newval.raw[idx] = *data;
-+
-+		asm volatile("// __lsui_user_swpb_asm\n"
-+		__LSUI_PREAMBLE
-+		"1: cast	%x2, %x3, %1\n"
-+		"2:\n"
-+		_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-+		: "+r" (err), "+Q" (*addr_al), "+r" (curval.var)
-+		: "r" (newval.var)
-+		: "memory");
-+
-+		if (curval.var == oldval) {
-+			err = 0;
-+			break;
-+		}
-+	}
-+
-+	if (!err)
-+		*data = curval.raw[idx];
-+
-+	return err;
-+}
-+#endif /* CONFIG_AS_HAS_LSUI */
-+
- /*
-  * Error-checking SWP macros implemented using ldxr{b}/stxr{b}
-  */
+If the approach is still acceptable, I'd be happy to refresh and test
+the patch.
 
--/* Arbitrary constant to ensure forward-progress of the LL/SC loop */
--#define __SWP_LL_SC_LOOPS	4
--
- #define LLSC_USER_SWPX(B)					\
- static __always_inline int					\
- __llsc_user_swp##B##_asm(unsigned int *data, unsigned int addr)	\
-@@ -117,7 +182,7 @@ __llsc_user_swp##B##_asm(unsigned int *data, unsigned int addr)	\
- 	_ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)			\
- 	: "=&r" (err), "+r" (*data), "=&r" (temp), "=&r" (temp2)\
- 	: "r" ((unsigned long)addr), "i" (-EAGAIN),		\
--	  "i" (__SWP_LL_SC_LOOPS)				\
-+	  "i" (__SWP_LOOPS)					\
- 	: "memory");						\
- 	uaccess_disable_privileged();				\
- 								\
-@@ -128,9 +193,9 @@ LLSC_USER_SWPX()
- LLSC_USER_SWPX(b)
-
- #define __user_swp_asm(data, addr) \
--	__llsc_user_swp_asm(data, addr)
-+	__lsui_llsc_body(user_swp_asm, data, addr)
- #define __user_swpb_asm(data, addr) \
--	__llsc_user_swpb_asm(data, addr)
-+	__lsui_llsc_body(user_swpb_asm, data, addr)
-
- /*
-  * Bit 22 of the instruction encoding distinguishes between
---
-LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
-
+Thanks,
+Alessandro
 
