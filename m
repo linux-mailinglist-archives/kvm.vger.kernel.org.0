@@ -1,121 +1,179 @@
-Return-Path: <kvm+bounces-65936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33EDCBB7D1
-	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 09:05:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C73CCBBA16
+	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 12:23:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9105A3004CCA
-	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 08:05:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B82E330038DF
+	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 11:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4EF2C0290;
-	Sun, 14 Dec 2025 08:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kty6VVwz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BE14313270;
+	Sun, 14 Dec 2025 11:23:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40FE2609CC;
-	Sun, 14 Dec 2025 08:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABC33128BA;
+	Sun, 14 Dec 2025 11:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765699517; cv=none; b=K3Ad1BPogopym3/to1czJhe8+AzlbH9x1f8oATk9aRsrcOR3jgGSkXkdroDT5H5+7fED2HTf5W5kj+YrEJhK5LfleyPe9+RTWecfmKozlq38/11WjADQrNIN7lX/Zc/kKb82W/+KuV1XQffHMaw+q9+uYsSjM7KgYPI494Jn+lU=
+	t=1765711384; cv=none; b=QSS1h3l1XBFRZMPnMaHsyt6ALhI6xZcETQpALxbHm8e/qOeff8gWy5xlVNuLmlHQqds6O1JumVewwYa1NG4TNh9AJY629l0hJzNaQfveYPLNOC0QODnQQnj4UON53pqnP9V+UitbA/vdn5l1zTbqkrxN/lGf3iJBoJ3vd+vM8Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765699517; c=relaxed/simple;
-	bh=ihizdAs5xDOev8/N37y8juDMqohuVvatea37UyTaRi8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=coAzTKlhyGaf9iurBjOf2YcFG1tIDZRAxvVQ5y0PIJRXEcTsHfT/j1znpNZ1lqfMyKBiIS4pKWxCy72vQpMJXZnMiOtc9aGvvGMs7gdQroeMfbqduoGwl8igRJYSnLTRpix5Q2VKvstKFeKyDyem3s+I6aJfM6vI0czfsQ3QyaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kty6VVwz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66711C4CEF1;
-	Sun, 14 Dec 2025 08:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765699517;
-	bh=ihizdAs5xDOev8/N37y8juDMqohuVvatea37UyTaRi8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kty6VVwzTJtdeGkn/OL/sk2f7Vfnpv82H2rJ71SoVx5wLW/jb8lxm2RuFqMqpcEHB
-	 9/ooTAhhdffBRwzl0rkjmLIVGEm8RBGaGHTqlxjBo6IhmNSozd/xIqpYfSV3HiEEuF
-	 r9Ae5LH2yKrVwPDJsSlCF5IKvD6QnlpE6J1sYr19zntuAY/UyUwqETaiphNCCl6Fg0
-	 OIfJqqcMaGaTZTfwoSpZdnCgyFEicpt76KiSaP7TH5N3yFXQRgkZp5SQtveJKUU8O8
-	 qy/urqiNHzU11rrcFzoWeK/Trun7TjKtaJPlRq9DNhHOtzui8DMkvIIYEGKRnYClqr
-	 1Dx2GzcDYarcA==
-Date: Sun, 14 Dec 2025 09:05:09 +0100
-From: Ingo Molnar <mingo@kernel.org>
-To: Juergen Gross <jgross@suse.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-block@vger.kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org, Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/5] x86: Cleanups around slow_down_io()
-Message-ID: <aT5vtaefuHwLVsqy@gmail.com>
-References: <20251126162018.5676-1-jgross@suse.com>
+	s=arc-20240116; t=1765711384; c=relaxed/simple;
+	bh=XDSDi5h/fuwj32uTomF9VLHfGU2PnEDhrbwKBeZtl6c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d105ySmGmu+UOkAfBZlkwLrBKXlWY4KTDG6eimAsSUa0X7u48N+x0qW2VdkAuQpzHed0XQdwnQJ3uNCci2YEwan9UBGK7R7v7a9u8QPNQ6bw4WiPAufyhBXWGlD/ONmGZwA3Muimxya8RC5c6WuTN0LfjYFr96UBk0Gax26SYDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED840497;
+	Sun, 14 Dec 2025 03:22:47 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D4FD73F73B;
+	Sun, 14 Dec 2025 03:22:51 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	maz@kernel.org,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	mark.rutland@arm.com,
+	arnd@arndb.de
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH v11 RESEND 0/9] support FEAT_LSUI
+Date: Sun, 14 Dec 2025 11:22:39 +0000
+Message-Id: <20251214112248.901769-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126162018.5676-1-jgross@suse.com>
+Content-Transfer-Encoding: 8bit
+
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
+
+This patchset support FEAT_LSUI and applies in futex atomic operation
+and user_swpX emulation where can replace from ldxr/st{l}xr
+pair implmentation with clearing PSTATE.PAN bit to correspondant
+load/store unprevileged atomic operation without clearing PSTATE.PAN bit.
+
+This patch based on v6.19-rc1
 
 
-* Juergen Gross <jgross@suse.com> wrote:
+Patch Sequences
+================
 
-> While looking at paravirt cleanups I stumbled over slow_down_io() and
-> the related REALLY_SLOW_IO define.
->
-> Especially REALLY_SLOW_IO is a mess, which is proven by 2 completely
-> wrong use cases.
->
-> Do several cleanups, resulting in a deletion of REALLY_SLOW_IO and the
-> io_delay() paravirt function hook.
->
-> Patches 2 and 3 are not changing any functionality, but maybe they
-> should? As the potential bug has been present for more than a decade
-> now, I went with just deleting the useless "#define REALLY_SLOW_IO".
-> The alternative would be to do something similar as in patch 5.
->
-> Juergen Gross (5):
->   x86/paravirt: Replace io_delay() hook with a bool
->   hwmon/lm78: Drop REALLY_SLOW_IO setting
->   hwmon/w83781d: Drop REALLY_SLOW_IO setting
->   block/floppy: Don't use REALLY_SLOW_IO for delays
->   x86/io: Remove REALLY_SLOW_IO handling
->
->  arch/x86/include/asm/floppy.h         | 27 ++++++++++++++++++++++-----
->  arch/x86/include/asm/io.h             | 12 +++++-------
->  arch/x86/include/asm/paravirt.h       | 11 +----------
->  arch/x86/include/asm/paravirt_types.h |  3 +--
->  arch/x86/kernel/cpu/vmware.c          |  2 +-
->  arch/x86/kernel/kvm.c                 |  8 +-------
->  arch/x86/kernel/paravirt.c            |  3 +--
->  arch/x86/xen/enlighten_pv.c           |  6 +-----
->  drivers/block/floppy.c                |  2 --
->  drivers/hwmon/lm78.c                  |  5 +++--
->  drivers/hwmon/w83781d.c               |  5 +++--
->  11 files changed, 39 insertions(+), 45 deletions(-)
+Patch #1 adds cpufeature for FEAT_LSUI
 
-I think we should get rid of *all* io_delay hacks, they might have been
-relevant in the days of i386 systems, but we don't even support i386
-CPUs anymore. Should it cause any regressions, it's easy to bisect to.
-There's been enough changes around all these facilities that the
-original timings are probably way off already, so we've just been
-cargo-cult porting these to newer kernels essentially.
+Patch #2-#3 expose FEAT_LSUI to guest
 
-Thanks,
+Patch #4 adds Kconfig for FEAT_LSUI
 
-	Ingo
+Patch #5-#6 support futex atomic-op with FEAT_LSUI
+
+Patch #7-#9 support user_swpX emulation with FEAT_LSUI
+
+
+Patch History
+==============
+from v10 to v11:
+  - rebase to v6.19-rc1
+  - use cast instruction to emulate deprecated swpb instruction
+  - https://lore.kernel.org/all/20251103163224.818353-1-yeoreum.yun@arm.com/
+
+from v9 to v10:
+  - apply FEAT_LSUI to user_swpX emulation.
+  - add test coverage for LSUI bit in ID_AA64ISAR3_EL1
+  - rebase to v6.18-rc4
+  - https://lore.kernel.org/all/20250922102244.2068414-1-yeoreum.yun@arm.com/
+
+from v8 to v9:
+  - refotoring __lsui_cmpxchg64()
+  - rebase to v6.17-rc7
+  - https://lore.kernel.org/all/20250917110838.917281-1-yeoreum.yun@arm.com/
+
+from v7 to v8:
+  - implements futex_atomic_eor() and futex_atomic_cmpxchg() with casalt
+    with C helper.
+  - Drop the small optimisation on ll/sc futex_atomic_set operation.
+  - modify some commit message.
+  - https://lore.kernel.org/all/20250816151929.197589-1-yeoreum.yun@arm.com/
+
+from v6 to v7:
+  - wrap FEAT_LSUI with CONFIG_AS_HAS_LSUI in cpufeature
+  - remove unnecessary addition of indentation.
+  - remove unnecessary mte_tco_enable()/disable() on LSUI operation.
+  - https://lore.kernel.org/all/20250811163635.1562145-1-yeoreum.yun@arm.com/
+
+from v5 to v6:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250722121956.1509403-1-yeoreum.yun@arm.com/
+
+from v4 to v5:
+  - remove futex_ll_sc.h futext_lsui and lsui.h and move them to futex.h
+  - reorganize the patches.
+  - https://lore.kernel.org/all/20250721083618.2743569-1-yeoreum.yun@arm.com/
+
+from v3 to v4:
+  - rebase to v6.16-rc7
+  - modify some patch's title.
+  - https://lore.kernel.org/all/20250617183635.1266015-1-yeoreum.yun@arm.com/
+
+from v2 to v3:
+  - expose FEAT_LUSI to guest
+  - add help section for LUSI Kconfig
+  - https://lore.kernel.org/all/20250611151154.46362-1-yeoreum.yun@arm.com/
+
+from v1 to v2:
+  - remove empty v9.6 menu entry
+  - locate HAS_LUSI in cpucaps in order
+  - https://lore.kernel.org/all/20250611104916.10636-1-yeoreum.yun@arm.com/
+
+
+Yeoreum Yun (9):
+  arm64: cpufeature: add FEAT_LSUI
+  KVM: arm64: expose FEAT_LSUI to guest
+  KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+  arm64: Kconfig: Detect toolchain support for LSUI
+  arm64: futex: refactor futex atomic operation
+  arm64: futex: support futex with FEAT_LSUI
+  arm64: separate common LSUI definitions into lsui.h
+  arm64: armv8_deprecated: convert user_swpX to inline function
+  arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
+
+ arch/arm64/Kconfig                            |   5 +
+ arch/arm64/include/asm/futex.h                | 291 +++++++++++++++---
+ arch/arm64/include/asm/lsui.h                 |  25 ++
+ arch/arm64/kernel/armv8_deprecated.c          | 111 +++++--
+ arch/arm64/kernel/cpufeature.c                |  10 +
+ arch/arm64/kvm/sys_regs.c                     |   3 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 +
+ 8 files changed, 381 insertions(+), 66 deletions(-)
+ create mode 100644 arch/arm64/include/asm/lsui.h
+
+
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+
 
