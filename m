@@ -1,85 +1,165 @@
-Return-Path: <kvm+bounces-65947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB9ECBBD44
-	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 17:08:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6BBCBBDEC
+	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 18:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F1E093008D52
-	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 16:08:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B7E3300BBBE
+	for <lists+kvm@lfdr.de>; Sun, 14 Dec 2025 17:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E642D8DD0;
-	Sun, 14 Dec 2025 16:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD9F2EBDFD;
+	Sun, 14 Dec 2025 17:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="EdZ+/KvM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZltDVv7Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from m239-4.eu.mailgun.net (m239-4.eu.mailgun.net [185.250.239.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C73215F5C
-	for <kvm@vger.kernel.org>; Sun, 14 Dec 2025 16:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.250.239.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0333BB4A;
+	Sun, 14 Dec 2025 17:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765728509; cv=none; b=ekPZCezK4vOfoAhwQB3KaCTCbMigcXFVRBl9NtwvGs9l/APJs7Nm/H7fj9V3j87Wv67WHZ7k6UuasiOg+NRehz+z9opLUx7PIT7QShUVSwGMt+GAFI3GAvaeu5mD+lpnNnN9m8iJV4Bvxz3/qUxzcnp7MzEvmLRHrKVJjyqlO7s=
+	t=1765732617; cv=none; b=eS4qWp9s0arLLCgs9I/1YhBE7lhJn2mavFnBn8SQVC4w0k7LzvFfhu24mPUK5aq8ZzFoLRX7aNepVwMNn3EintM226HkgI63fybP67K1BWLKdiIpcVfFpaFthxRRL9QziSjlmBkZno+77v1ZAwhSRerp/6I07SeGpVgEWpMdPac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765728509; c=relaxed/simple;
-	bh=fK/BTRikI2xhEAHLV2bpBVnY8SSazIduun6Pjgeu4uM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hy35EazKUB33JLzx7dh0f2qGnJvfbCzkH4L8oouTfk1xjmo7dHgjx+vh1Vc0+woYPtmj5zKfVr5bTCuu1+wxEwpNgy1holMabhaRmX5dC8sHfGJeJEq5SCX8UvGhLsQT1kROLUwhXxlS8PaedgZs5L16Ci98uPVShIp6HkmLJIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=EdZ+/KvM; arc=none smtp.client-ip=185.250.239.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1765728504; x=1765735704;
- h=Content-Type: Cc: To: To: Subject: Subject: Message-ID: Date: From: From: MIME-Version: Sender: Sender;
- bh=fK/BTRikI2xhEAHLV2bpBVnY8SSazIduun6Pjgeu4uM=;
- b=EdZ+/KvMhzL7z4v2teOvfX1KVgkJvRGeiT5d1aEIfsyMniAfuQx746vahsRdBJTOIGN8gzQe0VlhhGMpr1VYcRFlI6ONeIaJnEdazMz4GB8CGSbeKXBh1em6klVBLmlEMnpMWG9iqvmqGdrPLDcFD2LuLdUKv5WrF6iSGOqAJBQDTqdG3QVu2eOamiVVi5hA1QY6ugNmEBUFhv0A1zfpxlFUgLrVfiO6Fj/umcB3NwvJrcUbaNJEIUT8hnJCOJei1olCCVcI/Np8jjVcXajnv+EydNg7ghyfvyBp91s6RqRBcdqbh0oCMG475HD5krE/Hj8k2+WKgpQZHIkOW9+GwQ==
-X-Mailgun-Sid: WyI1MzdiMyIsImt2bUB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46]) by
- 9401ff797e0271f3a20f2953e6a798e9a7ec690c247c90fdb40cac3b55f22823 with SMTP id
- 693ee0f8cd269e2d98dfa7a7 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Sun, 14 Dec 2025 16:08:24 GMT
-X-Mailgun-Sending-Ip: 185.250.239.4
-Sender: alessandro@0x65c.net
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-6420c08f886so2903598d50.3
-        for <kvm@vger.kernel.org>; Sun, 14 Dec 2025 08:08:24 -0800 (PST)
-X-Gm-Message-State: AOJu0YwfxtVD6JwsvJJbSKyrUEiekcwfup0S7IqL5WbltkXbPugg/hki
-	3QpxbkYnApd3iweu0z9UIgxf+QyDUYwm76Kj17s2DFkRwAs5/E10dMRWLxwvTk/PkP5rdcjw2y7
-	98sNqc6NILYKp0gaVKkNBzKbFnVbbj9o=
-X-Google-Smtp-Source: AGHT+IHnT73LLUwE+RFzx8jbgiB+Km5z1u/HRanoUGGPt2xHX6TGinIlEKqL584z0EIV6eNUVxkSbWtZW+NO8kgDr4w=
-X-Received: by 2002:a53:acc6:0:20b0:645:443d:10c3 with SMTP id
- 956f58d0204a3-645555e8ea9mr4867166d50.27.1765728504093; Sun, 14 Dec 2025
- 08:08:24 -0800 (PST)
+	s=arc-20240116; t=1765732617; c=relaxed/simple;
+	bh=Hzo91lSZT73zV0+I+4XEn7kaMdDm0Z228rOw/nwbafM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Il3WTbRL9VI127X8NBM/Fm66cg50nH58TNX44qZm9Eq4mr+a8tFuuT8/CHCs9Ai83BdmraPG06h11+9sI+CgDueeSSOvqOGXNNMeF84dbcitqt9KVAvTapzpy8jShTBd6VHoUjD9oAnX/LZn1knm1FAvy8mzI/D3PqQ5+RaDrCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZltDVv7Y; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765732615; x=1797268615;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=Hzo91lSZT73zV0+I+4XEn7kaMdDm0Z228rOw/nwbafM=;
+  b=ZltDVv7YvnetjDflzAJUeG7XoL9pq8iyS15fzH/BPXv0GqFu07PGojcV
+   lhWriqOAlmdinY03jLvcNydUUVtSe9khTgJSx/d8MqotzgBDsFOSX6ixS
+   JPaAsR3mCXUl6iQRB/aEpDfmIVT9OEcM/mQUI9FmEAS9X4EhkMtLTzhgF
+   Ve1zcb1U9C52DUZ/f7wpSBfUMXpT0RBAvRRvcUJtaGnLjO8+UQakf7L4e
+   M7aCcYPWbqWDKnxqRRkWN5ugBcRy1tBFdqKvYT8yEB03pxKONvDHwHboJ
+   h7xVX9leU/tNydPf759azU7SmWxxk65ZGU4DYaJjeOxOZUIgKXfyV41BV
+   A==;
+X-CSE-ConnectionGUID: NES0l1vWSgGQLbzkSQ0LqQ==
+X-CSE-MsgGUID: Xrs8oOEGTmq/uwmJYAvVfA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11642"; a="66830871"
+X-IronPort-AV: E=Sophos;i="6.21,148,1763452800"; 
+   d="scan'208";a="66830871"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2025 09:16:55 -0800
+X-CSE-ConnectionGUID: nJMR+z2vQXOo1tryivcskw==
+X-CSE-MsgGUID: ygG6JGfwQzitWQyQgi9Slg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,148,1763452800"; 
+   d="scan'208";a="197532992"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2025 09:16:55 -0800
+Date: Sun, 14 Dec 2025 09:16:45 -0800
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Nikolay Borisov <nik.borisov@suse.com>
+Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>
+Subject: Re: [PATCH v6 2/9] x86/bhi: Make clear_bhb_loop() effective on newer
+ CPUs
+Message-ID: <20251214171645.nd4ripnkjf6ef3df@desk>
+References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
+ <20251201-vmscape-bhb-v6-2-d610dd515714@linux.intel.com>
+ <fdb0772c-96b8-4772-926d-0d25f7168554@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Alessandro Ratti <alessandro@0x65c.net>
-Date: Sun, 14 Dec 2025 17:08:13 +0100
-X-Gmail-Original-Message-ID: <CAKiXHKdbs_+yFZGKkKYsHKwAwCZSTzeVdLJXk1amKzm7fGcPNg@mail.gmail.com>
-X-Gm-Features: AQt7F2ovrGFvYtz4HBIaGlPzBU9cjKfNVzlIhEv5C3FeUvzVtrf9EtbLB5dHXbA
-Message-ID: <CAKiXHKdbs_+yFZGKkKYsHKwAwCZSTzeVdLJXk1amKzm7fGcPNg@mail.gmail.com>
-Subject: Status of "Drop nested support for CPUs without NRIPS" patch
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fdb0772c-96b8-4772-926d-0d25f7168554@suse.com>
 
-Hi,
+On Wed, Dec 10, 2025 at 02:31:31PM +0200, Nikolay Borisov wrote:
+> 
+> 
+> On 2.12.25 г. 8:19 ч., Pawan Gupta wrote:
+> > As a mitigation for BHI, clear_bhb_loop() executes branches that overwrites
+> > the Branch History Buffer (BHB). On Alder Lake and newer parts this
+> > sequence is not sufficient because it doesn't clear enough entries. This
+> > was not an issue because these CPUs have a hardware control (BHI_DIS_S)
+> > that mitigates BHI in kernel.
+> > 
+> > BHI variant of VMSCAPE requires isolating branch history between guests and
+> > userspace. Note that there is no equivalent hardware control for userspace.
+> > To effectively isolate branch history on newer CPUs, clear_bhb_loop()
+> > should execute sufficient number of branches to clear a larger BHB.
+> > 
+> > Dynamically set the loop count of clear_bhb_loop() such that it is
+> > effective on newer CPUs too. Use the hardware control enumeration
+> > X86_FEATURE_BHI_CTRL to select the appropriate loop count.
+> > 
+> > Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> > Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> 
+> nit: My RB tag is incorrect, while I did agree with Dave's suggestion to
+> have global variables for the loop counts I haven't' really seen the code so
+> I couldn't have given my RB on something which I haven't seen but did agree
+> with in principle.
 
-I was investigating the TODO in svm_check_intercept() about advertising
-NRIPS unconditionally, and found an old patch by Sean Christopherson
-(with Maciej S. Szmigiero's sign-off) that simply requires NRIPS for
-nested virtualization rather than trying to emulate it.
+The tag got applied from v4, but yes the patch got updated since:
 
-Link: https://lore.kernel.org/kvm/f0302382cf45d7a9527b4aebbfe694bbcfa7aff5.1651440202.git.maciej.szmigiero@oracle.com/
+https://lore.kernel.org/all/8b657ef2-d9a7-4424-987d-111beb477727@suse.com/
 
-Is there a reason this approach wasn't taken? Was there pushback on
-dropping support for pre-2009 CPUs, or did it just fall through the
-cracks?
+> Now that I have seen the code I'm willing to give my :
+> 
+> Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
 
-If the approach is still acceptable, I'd be happy to refresh and test
-the patch.
+Thanks.
 
-Thanks,
-Alessandro
+> > ---
+> >   arch/x86/entry/entry_64.S | 8 ++++++--
+> >   1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+> > index 886f86790b4467347031bc27d3d761d5cc286da1..9f6f4a7c5baf1fe4e3ab18b11e25e2fbcc77489d 100644
+> > --- a/arch/x86/entry/entry_64.S
+> > +++ b/arch/x86/entry/entry_64.S
+> > @@ -1536,7 +1536,11 @@ SYM_FUNC_START(clear_bhb_loop)
+> >   	ANNOTATE_NOENDBR
+> >   	push	%rbp
+> >   	mov	%rsp, %rbp
+> > -	movl	$5, %ecx
+> > +
+> > +	/* loop count differs based on BHI_CTRL, see Intel's BHI guidance */
+> > +	ALTERNATIVE "movl $5,  %ecx; movl $5, %edx",	\
+> > +		    "movl $12, %ecx; movl $7, %edx", X86_FEATURE_BHI_CTRL
+> 
+> nit: Just
+
+Will do:
+
+	/* Just loop count differs based on BHI_CTRL, see Intel's BHI guidance */
+
+> > +
+> >   	ANNOTATE_INTRA_FUNCTION_CALL
+> >   	call	1f
+> >   	jmp	5f
+> > @@ -1557,7 +1561,7 @@ SYM_FUNC_START(clear_bhb_loop)
+> >   	 * but some Clang versions (e.g. 18) don't like this.
+> >   	 */
+> >   	.skip 32 - 18, 0xcc
+> > -2:	movl	$5, %eax
+> > +2:	movl	%edx, %eax
+> >   3:	jmp	4f
+> >   	nop
+> >   4:	sub	$1, %eax
+> > 
+> 
 
