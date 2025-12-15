@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-65977-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65978-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1363ECBEC34
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:52:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AD27CBEB1D
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:38:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34B3D306EDA6
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:45:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 962AD300EDCA
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAFE334C3D;
-	Mon, 15 Dec 2025 15:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A7E337B86;
+	Mon, 15 Dec 2025 15:36:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KoEpEPc/"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GLODJRBA"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012015.outbound.protection.outlook.com [40.107.209.15])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010050.outbound.protection.outlook.com [52.101.56.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12AD331A61;
-	Mon, 15 Dec 2025 15:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3751B336EF4;
+	Mon, 15 Dec 2025 15:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765812980; cv=fail; b=qG4LE28g6UgG6EmPhhipOPid7UblcAJe4xoOyWzjFEtDsLzk+VYsOYZDufzS8pJAypiUvIy7yb1ojyohUrH6qVZoA+mzLhpK5LCYMuBhE+gCoFONQDnREVSLtq/VQRBzaWQ+sp/xFNl+ZbV2JxLCjBBUAvqlRyeMddomtl3Cl/4=
+	t=1765812995; cv=fail; b=A8x4UfLxSa5RPpMKwWfjS3wn//PqTv4hqnqp21iOMUepVhLC+SVabBmWmYvNVvVHBKS2j8OH9BcLEvajA3PiSVKR6rChHCvPgWvXdv6UfpICaEoanrFFRpd/nUI6n+Kh9Z7VIhr2W2J4s3+aUGFgLCrs42TJCYhFXmlcXmr4rxo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765812980; c=relaxed/simple;
-	bh=AILIxbKWQ/tFfweeGj1ejre3zjinOrU4PDhMs16gCn4=;
+	s=arc-20240116; t=1765812995; c=relaxed/simple;
+	bh=iAULoiCvl4T8KeLgcjXG30xwdtU6IpoiSbtll/VkyaA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UGtZXegah2vdPezm7APgi5OB8UEqepk9OMNDY361Ngu92fVZ9Y4DcV9DukEudtBnMQLXJHiY2TH3L3WkIMqa3bCXn0hLBMBD+Q1JhMcUs0D+JYQRX69x47bTW2owhhjfVG4YWK/pJzVlWmX9S+x56kor94zCl0MfUQ/3vtdfuj4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KoEpEPc/; arc=fail smtp.client-ip=40.107.209.15
+	 MIME-Version:Content-Type; b=BghEoiXEA2Z7br/FPqth1Qa+5xNNwpYHQM4kdg63nDOIkJiApObG3AGtSCK4soRHpMH0dbkfvFYrXaPpuCF+mXpNsHbGeTDjjYZKnh2j0eyIDw7OFp6g/BaadAZvfL4mMVHFpxCn9ZTKcsW5eQ9R/mv0gbZgcqpJ3JHT9zYuibk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GLODJRBA; arc=fail smtp.client-ip=52.101.56.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FFa93i8fdPIXVuwCO0LOzptcGWRDmvQXpwoStwlf7ifn4OHvyURuxamYmmdxx6d1tHVuFEb4iCUNqJBKt/cjbKHsev269f3A1EF+rImnQY6FhnWZgBaDz7SVLlKLvSR+EDvmHMzxVREwMBExmSxYPkDlrrUfuZaRsLmAiQQvMmmIs2SzseqM+fN5WuHa9y6e/VqRnAbGBbkRNSxrQ50HQL+pASeSf9VaiCOokj9sqR4Z1ghnm++YxKc+6UBWrGSxoFrlzRQYdoO7VcZfG0wmUu+QIEXwzTzHFlzm1ZPqBVrdkaArDT+xNXRiSKH64uzw42GwJWqPPvJHHJjEk1RQTQ==
+ b=wNjuBGC1K2fGVFchZMNQbCqH1O9GA1bVFdw+O/MPv2TGtyi3ct8pI0a9PNueOjTm+kqvnnWCtp05kG6BKIfxAXSYvvRGHI+rWters2dHPObyezMK8F47Lldjx6we0wzcAQVQEQELL9kDGdcQFOXrws/aHxDjeacjWvVzjCUa1dq49HqDFSZuf23BObzAHc2PM8fyZ7S+tE+ay664ljh/FxwuA5j49su4Ob6wKhFPYHGgo3BS5O/Yz+mT6jhDNVoDvTnL/m7Oz5lN14Oqk1+7bMmui9qeMjJUby08nWJ/gFoASiN9JFJs17la294JH1wScg8DkMWmO8TKW2l2Ro9arw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tXzS7537FlmFrd5HkmEyPgxcrq255cIDwZK1pbEPrEA=;
- b=TCw0HiahXUymAzfo67eDgrkBppM4mMB0nsO0dt91lnUGqOKmkjl+CqYauXWSQPTUSeC9Jn/9SpfJdkstpYERDE4Z9X74z8i2ePkrUS4OG/4dOepokUVYj3+9JOwU0Y+V6+jL/1gnOFaiWl18C28/p5va9YUhLFgxV1agn6TdY7uMTiV1dFLTL4YHI+jOHbs9C8A5oHpWMetyZqgtJqVOpFTnN4b6DLl0PNwaapghSsC/Ba9VjtTUWGGno51FhpT0GZidGB+Oh87ZlQQuDejdl2YFR1uGSIdOqW8rbkgImTD8lCWnPnGqSam2r6S8KeAL+fVZsIUNiV1Ht1cjDSR1zA==
+ bh=mHXLvpskxx0bRdQ0BUCSb1gmFjPsUkheEL7AmaZm+zo=;
+ b=FCYEiISZguDum4VsuPxg4kuxnv0LvyYJP1naFGZhkMcMWW/Si2v1cnsR0l08g3n24aUvTajV4H+5WbVK85R3iRGYq5GaeBqoDu76661WBzdreLOsnM4XquC7ZoIphfA38SDRdDPPzmOPEwJrZOdDqoUu0gptv7/I0pQdlZzMVH4wZjvU7gwel8yg6BKHmItpkKzPwpqmibnSxbfLXPrAMY710V9itay4e4eiDhDym2yhwEzXpTr8ZuTIFc8maiLmeKphCKJKoEKI6a6YbVdzevgPhL6gcBvj7srxBhogsrsZFYwpnEyKbaoXrAwTC7Y+MhToJcQQG8pGZ2dNCXYGGQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tXzS7537FlmFrd5HkmEyPgxcrq255cIDwZK1pbEPrEA=;
- b=KoEpEPc/BwEsaJhZEHE6+LoNRPpONCP4wDhlzc7yHekamFC/QzS6C1QuUYFQQcmBK8+zdfB1nYHaKfD0Qh87DiU9i5uvcxkaha0QZKLk7lGYtqD/TPF4NRWpucr5ifl6Ovha9Xf1fLVt3qP9QH+Ka3uSTqfL5WUwDnkiMvsisOY=
-Received: from SN1PR12CA0090.namprd12.prod.outlook.com (2603:10b6:802:21::25)
- by LV8PR12MB9692.namprd12.prod.outlook.com (2603:10b6:408:295::15) with
+ bh=mHXLvpskxx0bRdQ0BUCSb1gmFjPsUkheEL7AmaZm+zo=;
+ b=GLODJRBAh/WJ81otuHNjqaWiW0IfuROr5H+Pm9GHMLBiFOxBCT14w+yYmxYjJsezJBHOdv+zPA34Rhtm5f+UfNIqzoSdfnFpb+JwXcU4okyLgaG9Lcc+7Fe11vT+wj9JiEUyyH50jyPDrGDkaj3ZjairvRtWEkHwvFNVSSwihms=
+Received: from PH8P220CA0003.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:345::27)
+ by CY5PR12MB6552.namprd12.prod.outlook.com (2603:10b6:930:40::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
- 2025 15:36:08 +0000
-Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
- (2603:10b6:802:21:cafe::f5) by SN1PR12CA0090.outlook.office365.com
- (2603:10b6:802:21::25) with Microsoft SMTP Server (version=TLS1_3,
+ 2025 15:36:22 +0000
+Received: from SN1PEPF000252A0.namprd05.prod.outlook.com
+ (2603:10b6:510:345:cafe::89) by PH8P220CA0003.outlook.office365.com
+ (2603:10b6:510:345::27) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.13 via Frontend Transport; Mon,
- 15 Dec 2025 15:36:05 +0000
+ 15 Dec 2025 15:36:15 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -61,13 +61,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SN1PEPF000252A0.mail.protection.outlook.com (10.167.242.7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9434.6 via Frontend Transport; Mon, 15 Dec 2025 15:36:08 +0000
+ 15.20.9434.6 via Frontend Transport; Mon, 15 Dec 2025 15:36:22 +0000
 Received: from localhost (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 15 Dec
- 2025 09:36:00 -0600
+ 2025 09:36:21 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -76,9 +76,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ashish.kalra@amd.com>, <liam.merwick@oracle.com>, <david@redhat.com>,
 	<vannapurve@google.com>, <ackerleytng@google.com>, <aik@amd.com>,
 	<ira.weiny@intel.com>, <yan.y.zhao@intel.com>
-Subject: [PATCH v2 4/5] KVM: TDX: Document alignment requirements for KVM_TDX_INIT_MEM_REGION
-Date: Mon, 15 Dec 2025 09:34:10 -0600
-Message-ID: <20251215153411.3613928-5-michael.roth@amd.com>
+Subject: [PATCH v2 5/5] KVM: guest_memfd: GUP source pages prior to populating guest memory
+Date: Mon, 15 Dec 2025 09:34:11 -0600
+Message-ID: <20251215153411.3613928-6-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251215153411.3613928-1-michael.roth@amd.com>
 References: <20251215153411.3613928-1-michael.roth@amd.com>
@@ -94,77 +94,356 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|LV8PR12MB9692:EE_
-X-MS-Office365-Filtering-Correlation-Id: acc023cb-672d-4819-5cbb-08de3befab0c
+X-MS-TrafficTypeDiagnostic: SN1PEPF000252A0:EE_|CY5PR12MB6552:EE_
+X-MS-Office365-Filtering-Correlation-Id: bfb4c022-dcb2-48fe-39bb-08de3befb326
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|7416014|376014;
+	BCL:0;ARA:13230040|1800799024|82310400026|7416014|376014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?NC0AAmp2u+CVzGZBDBWgnLXNTu9w2tB2khjitGx9rC2JE3TCIxZtQD4/vf6O?=
- =?us-ascii?Q?WUFUzd8zBCjJLUB0nr7VMUZ/qey2uaafvOvvKcGy2QyvGqxVaGnlRd2Hycyi?=
- =?us-ascii?Q?hHARr0qb/sbPBvUbT/97cB1gpEO9oP6FBxAfbPI7T3nmdTnpIP6hSKR0+SDm?=
- =?us-ascii?Q?dkVwOAzrD8tAysCQRG8VBfYX9NPkB/cvuO1WCkoY/eEerSDu4euVZNqMKoQ6?=
- =?us-ascii?Q?4n36j8Cym4tUvsdTsf8mTIyL5oVk+Qz4hffGMLPgtP0Lx3ilUlODhu8hrd5P?=
- =?us-ascii?Q?FjKXdFs9Q9PWszZ4W6KG75/fcg1VlN03aUitw6uDAL/95XuvAis4bQ5lOfEE?=
- =?us-ascii?Q?cEugQdTXBJZ9cD+vBY27FUJZMYbR1oh56h1lHD0MI7dMNAAaxfhwadQg8OYI?=
- =?us-ascii?Q?Mmqkuclu0bSqKyaf9hmKMrYOwXciXWKiKsKPC1iModOqnzyTKprK1nDPV+rb?=
- =?us-ascii?Q?wLG5NNoJ9ftunfXFaNzOiJSetoxIAjojvk58Py5KsW6DQVIhGtI2b7MK4FgN?=
- =?us-ascii?Q?ep2nwiVDKTqdWxaBCZTphmEuK3PlAO5rX0oDx/fNOBFaR1IW+U/aaPxOJmje?=
- =?us-ascii?Q?WhwUnlkuetiUf2cjomJcgpxooh2Xe70UFJ7kfmMgTb94hpqvjVZXuFwE5aQZ?=
- =?us-ascii?Q?9LlpGxJVuyvTg3AM1epF8m+OgDUITPV0T10Tx1WHQVYLMbVm43Ul0B6BjfZi?=
- =?us-ascii?Q?Cu5mOy/5u7fcp4VRlIUU6jq7NrUlJCBbA/kEfUI6AtRKQYUVYuVLU3aW6OsY?=
- =?us-ascii?Q?qdaYGtXQvD52OgucHkH/V6qROHV8oHOkgfISwSFbUr6Iht+J1yBk/VZI1y7y?=
- =?us-ascii?Q?7eqh5jnJ9m3310LvR/UZ2mFCUwmYIR15VC2ehKPJH2BMETLEXp59hQaaAdX9?=
- =?us-ascii?Q?Ml5M1mkI/oY1rPHX7brUzwOdJ8MQL8kU29YbGNnqKSw8zy8ywz8+/Xvbp/ZD?=
- =?us-ascii?Q?j8O3ZrDp5CV/bJut6apYstbXybQ1K33ZUT2Uku61X4NZ/YS7a0si9sAZKGa1?=
- =?us-ascii?Q?odB8oSq0m9AN62EAXgdLisBTQCyih7dWQGd80FUmgxuaqoG0/Tfnjc4dGV4P?=
- =?us-ascii?Q?MT+VtanM5F3ANUUV+5oWwXRt2XyvVOHMJDiDkfIZtfkvkDe67WAXpAC6sKok?=
- =?us-ascii?Q?lpUdF0R/W4VVieC7IgAQRasVJDympioTuGrq7W30rCdIzaMPf7qhJHwCzU1B?=
- =?us-ascii?Q?Z8JxV4CU3BTYiYaZQfg9iJAUGZzzogbnWqniWwvwrEN47qEFfHwfZiMYZ9E/?=
- =?us-ascii?Q?CAANMOJWs7o6t1ARy+90yqc56yhh4o0tOxQZ2zdwao4VdV8GAzPDRuHEstnU?=
- =?us-ascii?Q?u6Yp4ih+N9U5ccanyYePPyi/7cLmiqV2NwHfiUDWjCzlmyIG5J55pc/HV2a9?=
- =?us-ascii?Q?HetKHt+rioKO9+DfKYvtoXNgDU+euU4Lb30SY93WRY9ymXq32dVYk6dwtq4J?=
- =?us-ascii?Q?9YG6rouqMA7jmoUzSqWQLfayhSTye4NYaqYy30w5dbuIRifDCkcmeFCLZ/1W?=
- =?us-ascii?Q?MFtaxUvNibcKl53TbRBlS1gX83cx7BIV8sQq2BIgftwMfkwMtxDcY09l7AGC?=
- =?us-ascii?Q?JFwjqI2aPjM74F0h6MI=3D?=
+	=?us-ascii?Q?ZKDEzTVxE7kBfkBWkswbp6mMEbXXENfKmkjzGW+m7elk9dOyT64UmXxksOPU?=
+ =?us-ascii?Q?pTC9C/T9b2pHEkh4jrT63AAfFgvI/9F//p4bPi+/Dk8welpkdrTVrCCMg1Mt?=
+ =?us-ascii?Q?Z8uyLDzoSFhbZj8z54qwb65U+3V2XzGeqQaKhYp6CX4QN5jehajGyh4mSi+1?=
+ =?us-ascii?Q?C6OK5wzjfhShQbbbgIZQN9zJTNT1B2MDr1xKen88Q0x8B4d17S1upQ7U36A6?=
+ =?us-ascii?Q?1AC+GUZVIbnongzEfLMXjHyX2uQBq2JMdkSwdPKTKBAytBBRfgmxowD70H9T?=
+ =?us-ascii?Q?MaTOuQ0JZ8xOK41lOOrsE6K/ks6ZVpj3mOlHEDAYhNghCC+V8eZhfmhKSPvY?=
+ =?us-ascii?Q?i7JlFqXskQlOvzthdcpVnILylhkXPL7wJu80E+aQS2HAiDsxLtPxl5PWKZC9?=
+ =?us-ascii?Q?ijoZDPV5Ix0QF13eFVRCQK6zlnw1FgXXEAxcc1ye49ly9XjFhjHxgrnh798k?=
+ =?us-ascii?Q?sQwNUNRerm612+gEvGV462koPm/NhQ5IIU3xpq7kChPc7HwsP7Zwc2ObLFvG?=
+ =?us-ascii?Q?U3bsHnvSsATkPpHxs6IJtFr73Mq1nYtyZaOvEGG5KBuh0qqPTaf2oN1SMVxW?=
+ =?us-ascii?Q?E0pcJ2LvudEgDKpvN4ldURFPcsndJmlOE2iuTJsfm4C7TbKPYya0DfNBzSPt?=
+ =?us-ascii?Q?8N+/RKw3J9j9FkcIALvQ7pOrZBfjM2uwf/msib8mluKV55HD5lXzRJqGz2kZ?=
+ =?us-ascii?Q?BNcyt00z4MV/mvI7Smf0ykWI8pdOhWbXRi7cVW3qK+56XUiO6QV4ZeRqu7O9?=
+ =?us-ascii?Q?EMrKQr4LKx3kG2+x3WS+w/b9kg/W0z5b/6ozl1SC2Wl4Ej6nToiHHV6HbBUv?=
+ =?us-ascii?Q?PgTDOzi/oKcf8WSVW+8iBytzV7iT/6LgVWyeLK43rsXuF3YRdh1DFUDAc3Ur?=
+ =?us-ascii?Q?CkVKkeGCH56Ltzjv4SOX6QodLE+aTGBGB8pqSbccP6QjetETKHwysu8cY/iO?=
+ =?us-ascii?Q?hERSkTHxFDZ/8Yc+VsvTukEbYWLEIGzJwXvWgwXj6AO+TCfGMY1lQadjFxSQ?=
+ =?us-ascii?Q?8ZB5d0kBWAOfPNInaaIbi9ShwXfiid3q+7li0llfJNrRm8Nu2lGMX5Hexqdy?=
+ =?us-ascii?Q?v+OlAuOQ0amjTZqhOrbv7JXBr+JxwIWrMMyfsdlCkEL0/pgNnzeWLVP5W415?=
+ =?us-ascii?Q?aW4bZIjl95YQ3ojU2xuJ0OrA38lz4aBKlwg44EzgQbegVR7g2881CiiX+Hr6?=
+ =?us-ascii?Q?U7HThuwgKWw97vbPk5xXRQ1dADRGYdLFosocPeMMThSpo8zMSzgUZM1cPfvV?=
+ =?us-ascii?Q?SkXPTsdAsPMz8nhqtIaj4MLq7+rRzWpxz175RqIw34mnE3FtOWPNh8rDG9f7?=
+ =?us-ascii?Q?IiUBzz0Rgk3x4xJ1P+UbIqNm0T3XES28wFzPfha+QXV5E9EGidr3QXx0sMnh?=
+ =?us-ascii?Q?NTSn0F08hRL2oXSeR7DWU/36XD6kezt60UF8w62xzLuLFAw+q+7XHiYxeSeW?=
+ =?us-ascii?Q?w2EOVNYdANgtrdF4J3hvbFP9LAzvFog5vAezJOR7Asfjs1gRMdsibx28mFTe?=
+ =?us-ascii?Q?S2IOrAR1DWID+d2B8mjXhMoIvD8gG3K7XRjaQB9bDxC7tJoTDEu3wrEa0V7q?=
+ =?us-ascii?Q?nJzpYMj6O1EAJCENN8U=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(376014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 15:36:08.5477
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 15:36:22.1407
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: acc023cb-672d-4819-5cbb-08de3befab0c
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfb4c022-dcb2-48fe-39bb-08de3befb326
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002529D.namprd05.prod.outlook.com
+	SN1PEPF000252A0.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9692
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6552
 
-Since it was never possible to use a non-PAGE_SIZE-aligned @source_addr,
-go ahead and document this as a requirement. This is in preparation for
-enforcing page-aligned @source_addr for all architectures in
-guest_memfd.
+Currently the post-populate callbacks handle copying source pages into
+private GPA ranges backed by guest_memfd, where kvm_gmem_populate()
+acquires the filemap invalidate lock, then calls a post-populate
+callback which may issue a get_user_pages() on the source pages prior to
+copying them into the private GPA (e.g. TDX).
 
+This will not be compatible with in-place conversion, where the
+userspace page fault path will attempt to acquire filemap invalidate
+lock while holding the mm->mmap_lock, leading to a potential ABBA
+deadlock[1].
+
+Address this by hoisting the GUP above the filemap invalidate lock so
+that these page faults path can be taken early, prior to acquiring the
+filemap invalidate lock.
+
+It's not currently clear whether this issue is reachable with the
+current implementation of guest_memfd, which doesn't support in-place
+conversion, however it does provide a consistent mechanism to provide
+stable source/target PFNs to callbacks rather than punting to
+vendor-specific code, which allows for more commonality across
+architectures, which may be worthwhile even without in-place conversion.
+
+As part of this change, also begin enforcing that the 'src' argument to
+kvm_gmem_populate() must be page-aligned, as this greatly reduces the
+complexity around how the post-populate callbacks are implemented, and
+since no current in-tree users support using a non-page-aligned 'src'
+argument.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Co-developed-by: Vishal Annapurve <vannapurve@google.com>
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- Documentation/virt/kvm/x86/intel-tdx.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/sev.c   | 32 ++++++++-------
+ arch/x86/kvm/vmx/tdx.c   | 15 +------
+ include/linux/kvm_host.h |  4 +-
+ virt/kvm/guest_memfd.c   | 84 +++++++++++++++++++++++++++-------------
+ 4 files changed, 77 insertions(+), 58 deletions(-)
 
-diff --git a/Documentation/virt/kvm/x86/intel-tdx.rst b/Documentation/virt/kvm/x86/intel-tdx.rst
-index 5efac62c92c7..6a222e9d0954 100644
---- a/Documentation/virt/kvm/x86/intel-tdx.rst
-+++ b/Documentation/virt/kvm/x86/intel-tdx.rst
-@@ -156,7 +156,7 @@ KVM_TDX_INIT_MEM_REGION
- :Returns: 0 on success, <0 on error
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 90c512ca24a9..11ae008aec8a 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2268,7 +2268,7 @@ struct sev_gmem_populate_args {
+ };
  
- Initialize @nr_pages TDX guest private memory starting from @gpa with userspace
--provided data from @source_addr.
-+provided data from @source_addr. @source_addr must be PAGE_SIZE-aligned.
+ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+-				  void __user *src, void *opaque)
++				  struct page *src_page, void *opaque)
+ {
+ 	struct sev_gmem_populate_args *sev_populate_args = opaque;
+ 	struct sev_data_snp_launch_update fw_args = {0};
+@@ -2277,7 +2277,7 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+ 	int level;
+ 	int ret;
  
- Note, before calling this sub command, memory attribute of the range
- [gpa, gpa + nr_pages] needs to be private.  Userspace can use
+-	if (WARN_ON_ONCE(sev_populate_args->type != KVM_SEV_SNP_PAGE_TYPE_ZERO && !src))
++	if (WARN_ON_ONCE(sev_populate_args->type != KVM_SEV_SNP_PAGE_TYPE_ZERO && !src_page))
+ 		return -EINVAL;
+ 
+ 	ret = snp_lookup_rmpentry((u64)pfn, &assigned, &level);
+@@ -2288,14 +2288,14 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+ 		goto out;
+ 	}
+ 
+-	if (src) {
+-		void *vaddr = kmap_local_pfn(pfn);
++	if (src_page) {
++		void *src_vaddr = kmap_local_pfn(page_to_pfn(src_page));
++		void *dst_vaddr = kmap_local_pfn(pfn);
+ 
+-		if (copy_from_user(vaddr, src, PAGE_SIZE)) {
+-			ret = -EFAULT;
+-			goto out;
+-		}
+-		kunmap_local(vaddr);
++		memcpy(dst_vaddr, src_vaddr, PAGE_SIZE);
++
++		kunmap_local(src_vaddr);
++		kunmap_local(dst_vaddr);
+ 	}
+ 
+ 	ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, PG_LEVEL_4K,
+@@ -2325,17 +2325,19 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+ 	if (ret && !snp_page_reclaim(kvm, pfn) &&
+ 	    sev_populate_args->type == KVM_SEV_SNP_PAGE_TYPE_CPUID &&
+ 	    sev_populate_args->fw_error == SEV_RET_INVALID_PARAM) {
+-		void *vaddr = kmap_local_pfn(pfn);
++		void *src_vaddr = kmap_local_pfn(page_to_pfn(src_page));
++		void *dst_vaddr = kmap_local_pfn(pfn);
+ 
+-		if (copy_to_user(src, vaddr, PAGE_SIZE))
+-			pr_debug("Failed to write CPUID page back to userspace\n");
++		memcpy(src_vaddr, dst_vaddr, PAGE_SIZE);
+ 
+-		kunmap_local(vaddr);
++		kunmap_local(src_vaddr);
++		kunmap_local(dst_vaddr);
+ 	}
+ 
+ out:
+-	pr_debug("%s: exiting with return code %d (fw_error %d)\n",
+-		 __func__, ret, sev_populate_args->fw_error);
++	if (ret)
++		pr_debug("%s: error updating GFN %llx, return code %d (fw_error %d)\n",
++			 __func__, gfn, ret, sev_populate_args->fw_error);
+ 	return ret;
+ }
+ 
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 4fb042ce8ed1..3eb597c0e79f 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -3118,34 +3118,21 @@ struct tdx_gmem_post_populate_arg {
+ };
+ 
+ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+-				  void __user *src, void *_arg)
++				  struct page *src_page, void *_arg)
+ {
+ 	struct tdx_gmem_post_populate_arg *arg = _arg;
+ 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+ 	u64 err, entry, level_state;
+ 	gpa_t gpa = gfn_to_gpa(gfn);
+-	struct page *src_page;
+ 	int ret, i;
+ 
+ 	if (KVM_BUG_ON(kvm_tdx->page_add_src, kvm))
+ 		return -EIO;
+ 
+-	/*
+-	 * Get the source page if it has been faulted in. Return failure if the
+-	 * source page has been swapped out or unmapped in primary memory.
+-	 */
+-	ret = get_user_pages_fast((unsigned long)src, 1, 0, &src_page);
+-	if (ret < 0)
+-		return ret;
+-	if (ret != 1)
+-		return -ENOMEM;
+-
+ 	kvm_tdx->page_add_src = src_page;
+ 	ret = kvm_tdp_mmu_map_private_pfn(arg->vcpu, gfn, pfn);
+ 	kvm_tdx->page_add_src = NULL;
+ 
+-	put_page(src_page);
+-
+ 	if (ret || !(arg->flags & KVM_TDX_MEASURE_MEMORY_REGION))
+ 		return ret;
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 1d0cee72e560..49c0cfe24fd8 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2566,7 +2566,7 @@ int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_ord
+  * @gfn: starting GFN to be populated
+  * @src: userspace-provided buffer containing data to copy into GFN range
+  *       (passed to @post_populate, and incremented on each iteration
+- *       if not NULL)
++ *       if not NULL). Must be page-aligned.
+  * @npages: number of pages to copy from userspace-buffer
+  * @post_populate: callback to issue for each gmem page that backs the GPA
+  *                 range
+@@ -2581,7 +2581,7 @@ int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_ord
+  * Returns the number of pages that were populated.
+  */
+ typedef int (*kvm_gmem_populate_cb)(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+-				    void __user *src, void *opaque);
++				    struct page *page, void *opaque);
+ 
+ long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, long npages,
+ 		       kvm_gmem_populate_cb post_populate, void *opaque);
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 8b1248f42aae..18ae59b92257 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -820,12 +820,48 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_gmem_get_pfn);
+ 
+ #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_POPULATE
++
++static long __kvm_gmem_populate(struct kvm *kvm, struct kvm_memory_slot *slot,
++				struct file *file, gfn_t gfn, struct page *src_page,
++				kvm_gmem_populate_cb post_populate, void *opaque)
++{
++	pgoff_t index = kvm_gmem_get_index(slot, gfn);
++	struct folio *folio;
++	kvm_pfn_t pfn;
++	int ret;
++
++	filemap_invalidate_lock(file->f_mapping);
++
++	folio = __kvm_gmem_get_pfn(file, slot, index, &pfn, NULL);
++	if (IS_ERR(folio)) {
++		ret = PTR_ERR(folio);
++		goto out_unlock;
++	}
++
++	folio_unlock(folio);
++
++	if (!kvm_range_has_memory_attributes(kvm, gfn, gfn + 1,
++					     KVM_MEMORY_ATTRIBUTE_PRIVATE,
++					     KVM_MEMORY_ATTRIBUTE_PRIVATE)) {
++		ret = -EINVAL;
++		goto out_put_folio;
++	}
++
++	ret = post_populate(kvm, gfn, pfn, src_page, opaque);
++	if (!ret)
++		folio_mark_uptodate(folio);
++
++out_put_folio:
++	folio_put(folio);
++out_unlock:
++	filemap_invalidate_unlock(file->f_mapping);
++	return ret;
++}
++
+ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long npages,
+ 		       kvm_gmem_populate_cb post_populate, void *opaque)
+ {
+ 	struct kvm_memory_slot *slot;
+-	void __user *p;
+-
+ 	int ret = 0;
+ 	long i;
+ 
+@@ -834,6 +870,9 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
+ 	if (WARN_ON_ONCE(npages <= 0))
+ 		return -EINVAL;
+ 
++	if (WARN_ON_ONCE(!PAGE_ALIGNED(src)))
++		return -EINVAL;
++
+ 	slot = gfn_to_memslot(kvm, start_gfn);
+ 	if (!kvm_slot_has_gmem(slot))
+ 		return -EINVAL;
+@@ -842,47 +881,38 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
+ 	if (!file)
+ 		return -EFAULT;
+ 
+-	filemap_invalidate_lock(file->f_mapping);
+-
+ 	npages = min_t(ulong, slot->npages - (start_gfn - slot->base_gfn), npages);
+ 	for (i = 0; i < npages; i++) {
+-		struct folio *folio;
+-		gfn_t gfn = start_gfn + i;
+-		pgoff_t index = kvm_gmem_get_index(slot, gfn);
+-		kvm_pfn_t pfn;
++		struct page *src_page = NULL;
++		void __user *p;
+ 
+ 		if (signal_pending(current)) {
+ 			ret = -EINTR;
+ 			break;
+ 		}
+ 
+-		folio = __kvm_gmem_get_pfn(file, slot, index, &pfn, NULL);
+-		if (IS_ERR(folio)) {
+-			ret = PTR_ERR(folio);
+-			break;
+-		}
++		p = src ? src + i * PAGE_SIZE : NULL;
+ 
+-		folio_unlock(folio);
++		if (p) {
++			ret = get_user_pages_fast((unsigned long)p, 1, 0, &src_page);
++			if (ret < 0)
++				break;
++			if (ret != 1) {
++				ret = -ENOMEM;
++				break;
++			}
++		}
+ 
+-		ret = -EINVAL;
+-		if (!kvm_range_has_memory_attributes(kvm, gfn, gfn + 1,
+-						     KVM_MEMORY_ATTRIBUTE_PRIVATE,
+-						     KVM_MEMORY_ATTRIBUTE_PRIVATE))
+-			goto put_folio_and_exit;
++		ret = __kvm_gmem_populate(kvm, slot, file, start_gfn + i, src_page,
++					  post_populate, opaque);
+ 
+-		p = src ? src + i * PAGE_SIZE : NULL;
+-		ret = post_populate(kvm, gfn, pfn, p, opaque);
+-		if (!ret)
+-			folio_mark_uptodate(folio);
++		if (src_page)
++			put_page(src_page);
+ 
+-put_folio_and_exit:
+-		folio_put(folio);
+ 		if (ret)
+ 			break;
+ 	}
+ 
+-	filemap_invalidate_unlock(file->f_mapping);
+-
+ 	return ret && !i ? ret : i;
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_gmem_populate);
 -- 
 2.25.1
 
