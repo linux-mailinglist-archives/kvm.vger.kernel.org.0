@@ -1,224 +1,250 @@
-Return-Path: <kvm+bounces-66040-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66041-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92639CBFDC4
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 22:00:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31542CBFDCE
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 22:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E84E830019E1
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 21:00:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7F34230012CE
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 21:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11CF2874ED;
-	Mon, 15 Dec 2025 21:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5F4328638;
+	Mon, 15 Dec 2025 21:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qxUKAmtH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MDpM+k4Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ADB82C11F1
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 21:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235C92C11F1
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 21:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765832437; cv=none; b=ABxsZUtA1FJoYyhWlfTsq/ONqONAhI+9clMTmcxM8tDCMqqHGrX6Gel0TbGyRa/96eXmvC+Qucifp9zayvrRqRjanKlQscqtkvQfABt/o1HB7XdwYh7/HUoe+I/731vc16jnoV2EyfvdXVQpNYy04xqpsw8xvY+XbrSb8qvMyDk=
+	t=1765832758; cv=none; b=GVi7axv70ZCHvaXCOAYCX80yaQJvFxsShH8qfYK31bUdpFziyfbjAbjT7eS7ogRYVyOKcX+C2mb2JPK+Pku5UbW5dhmH4abl9nJWKIx1K4rIg+Kfnt4TdFjJ0ZKzka5nFTC5K3gHT5ishWPsUBLDYiuTsfjLW1pHuCsZr/l6Lvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765832437; c=relaxed/simple;
-	bh=kw+x7GshWcJKswgx4fP6xZofUgTAm/XP2lu6G4c6xto=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rrmG+GOWYQNjbjL8CUh56pqW3GvT2snEUXzBDxnZd4wWqvuQXL1Yj+UIy7rBsaZsrQvBH1Yz+/h8Kv7s23la5uBwrSIuvBAb0bvzVHQJqVIF3SUDpQ9x0KLIkVUMmQT0QdFjKiOlWAqo0BmkuoOtAM54OrQwgZZc5MhTsYRJ8YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qxUKAmtH; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c704d5d15so3872245a91.1
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 13:00:33 -0800 (PST)
+	s=arc-20240116; t=1765832758; c=relaxed/simple;
+	bh=3waFsTUEVw9m2bfdOuyKT5etmvKUDZo85avd9L97d0c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TF583D+g9GiRgsVpY45q/Q1UZYr+cp8uq5ec6FffP9wGr4M4vso5FDmU9Jv7jbdNGgx7O8a1ueEmoz2GCNH1vRRoBcczSM6FnvYEHFBD/OPmra/SVhzl6WIe/efxluKS4f58w54U+6lJeuvW7uej6PEIWAA7GjbM5mstQ9UQdEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MDpM+k4Y; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fbc305552so1989994f8f.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 13:05:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765832433; x=1766437233; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5MnrlV0Tb9SM+anUDHFbl+f1LDdDfLOIm3X1Yix2fvA=;
-        b=qxUKAmtHSrqfz/JPRhIQqx3+qYzBuyIYvpbNXTj/xVZlmL2aCreioniA0KdTyrTaQb
-         0vWTMWUkNNdCTl3HNyAkJsvj51+1j+ldI0/O11U8apmj1sLNrTJawSs5pPZhkHIvXlxA
-         dOKB7YBLMhLYC6GigpXN+wp+SfV4ICCRUKbiPu/2y8YKiq1ioWJuHOBzPC0ADkn2avKa
-         Z0JjfVDY1L3rxScqobAUHlAzCmN0qZJGsuIFlueC8uFMJqP02SopBv1quJLj0MpYu5hF
-         T1RRI820oCbGnsRIrT+jB7MsYAlmgbLQCjJNXOCyMjXZwelJTiJvgVdxy+1KqsAdXO+Z
-         8PPA==
+        d=gmail.com; s=20230601; t=1765832755; x=1766437555; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k/VQiJ6U2PoviaJ84b4oZbGSbqseMWdNEopASU4Cces=;
+        b=MDpM+k4YZbmVpilSLoPanesnzv46LDfjw7qjH+R3mFqgACfrniBabJIqO7nxzxDfuL
+         4OLcIJlwznYGViX6olB0Q+Vi6JXfnIW6NITJwyyQD8ZmUf1rksVe0INgpGHc0KEfHIvs
+         BsQcPzfA8qx+OivzISkRKCuVILazYjKA6Uqw8GB41aw3osRBEsRdEiu+M92rD0nc8VLX
+         3QyKGtftnAIx6r3+zRApK6fxue8+9gypSCaY1k27kT0YxMGLFgpHj2proent74mwFCI2
+         SdtPE+fqPZFzjmhIFJZUvlRouwAE7l6Ejzu7GkU6vH4BpaQa90OmDvlpwe3Ld+5NHkQE
+         nIMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765832433; x=1766437233;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5MnrlV0Tb9SM+anUDHFbl+f1LDdDfLOIm3X1Yix2fvA=;
-        b=QO+ygvx3OPoKigPTR97YbKIyrsY2DpoqajEOyvXkdvThWCYbxGxWlrKx9/LEPGLer7
-         CBr69YSDAY7bbkmDUtjIrI8pesopvrlqzZhS4GGaccAidad3lDe/U+r4oLuofWfrWVNb
-         31WO/GxwdlQDLllkHzcXPHsGflVkACihQ1Z8w3RcqSC6v2SxxB1nvhyc9+AhO8yXMtTS
-         7XD2JZlI4b1qRNQly5goxLsQD9+x5EAfBJtMcGklYnUwpMketGygKxXKXECRsAAPVziA
-         saE88hFNjYYXJPK88qIMYt/YQT1ojGtUUyI3ulpe2hG9lqwik1JI/27fMgLv3MsM5ID3
-         VGig==
-X-Gm-Message-State: AOJu0YwzD+OL/hCGImv+n9rMPPlS2QeGt+zFFnxwh2XjuVAVGtCjcPBw
-	QehYNvxAwqVLIjtKaqXbFUPAJhFk7aPdX9XXyMLO8d/jqRSKQe521Kk8o3ouQ/v5LiE08nAjL4J
-	PEKvCSGFuxIOPGiPwN6xL4L2Pb5nnjzzYqFG5P2p/+BVM2VJIsZ9y2Ir8ZLSwJ6IGlSrQXcUAwf
-	BZphWp9RrM9B0b9QxC0LnXHO4/TQl+eWqxiaEGHuzFoa4=
-X-Google-Smtp-Source: AGHT+IHVZYg5aBULWI5KNDuQpiKyB0pxc3/0PJfdgzZe0jxBSozzKDuwN+L0OvV9j27tUhxS7GMTDxtfhgP5HA==
-X-Received: from pge9.prod.google.com ([2002:a05:6a02:2d09:b0:bc4:8a19:36d4])
- (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:914e:b0:34f:c83b:b3fa with SMTP id adf61e73a8af0-369afc01103mr11389602637.41.1765832433102;
- Mon, 15 Dec 2025 13:00:33 -0800 (PST)
-Date: Mon, 15 Dec 2025 21:00:26 +0000
-In-Reply-To: <20251215210026.2422155-1-chengkev@google.com>
+        d=1e100.net; s=20230601; t=1765832755; x=1766437555;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=k/VQiJ6U2PoviaJ84b4oZbGSbqseMWdNEopASU4Cces=;
+        b=tTllRVepzR6LdcOgS/Jok0vHXrbKlUqmvQmCbo1vji9JlhroSkEVzL8pyO105nIHzX
+         ZVF195SjYMg1CAqMAd1aWES8hzKOwT+1bIK3pdSlOYobAYFmWXBrnnJ7sTNzLWGYPuHi
+         +6bsVaEiU8ODu8kWdBhewupVg7twzhmhNbfa/jmtOQDQGRCr9gSISAjX8o/40NH5G8eY
+         65K9KcEoLnw6vBtB4f7fKvRUgdxnxRgI2QNl3VJaa7YxK9xAsyFMgkqAyrbQwtqwbPXB
+         Q+8tLmz74xT2iRQlCsoMPqz+fWw+WlvYkBH0YTvYqIMDKjAZI0OsQNmb68ilI8PzjwyA
+         DSpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUXiLjfnZPm9WMwSFFIV9YFlouzXrtKAP2XyhblUQBabpai2xPaBWue6hlWo950tTpeoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNAvHJBHORS1mPMdRE5EkFOkJK+g4Jb5fAiDrCCgUxblhPQ8/5
+	V9DMeuapTb25IuzYQPFGersgcHe/g8olkqNQRCSd7z34TX+DxlQgis3h
+X-Gm-Gg: AY/fxX5oW1WyWlBGcKTo8HMSCbIffwmmfuSHKEhfqlX3VfD3dZBmmlUaefF2pqWi/Xk
+	AvK4y19ygC0AIW29TefRtbhwGQhaka2nQL68c3T903EFwaSR8jUFM824bxwsGWR2yYDWTp0liuS
+	pfMq+G635lcInMr0z6MNcTUmFwcTUaZlWak0vexK12vtxj6jwq7yN5pgXlAxQZ36ISritNnb5MQ
+	/TAGuW3QW9gM1mTQm7+WvZbhsZKVJQ67q7P2QVnf0x+MCTlNjnu3sl8vo5V4i2iFD9lV9od6OM8
+	AaPrx/PUTKZsqvlhj0Wy0PYBQwTHb5ViJwis+SryhM5dmeWcfXGH/0AkSp/+ZFGUd8Kv3u/lmvC
+	KVnVhA+szaVM803vaLTgegQvEuf4CfCXQOouzXLEmvoEaQLK2JjajNxmbiJfgo2NjMdXl86BG7Q
+	aT2C81EIW/Dbp6CurhuHOF/yej+/VejG3JnjkFEZ9qjsBHeg2ggSfXUq8cjZB9aMU=
+X-Google-Smtp-Source: AGHT+IGbQSE2jechcjkJcIULXse77YsZC3S1gn46PwQPhkydxujDlM1wOE72uTLpNldTVJ86313oIw==
+X-Received: by 2002:adf:ff90:0:b0:42f:a8d6:865b with SMTP id ffacd0b85a97d-42fb44ca939mr10582387f8f.24.1765832755177;
+        Mon, 15 Dec 2025 13:05:55 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8a09fbesm31508262f8f.0.2025.12.15.13.05.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 13:05:54 -0800 (PST)
+Date: Mon, 15 Dec 2025 21:05:53 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org, David Kaplan
+ <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf
+ <jpoimboe@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang
+ <tao1.zhang@intel.com>
+Subject: Re: [PATCH v6 2/9] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+Message-ID: <20251215210553.5ab5b674@pumpkin>
+In-Reply-To: <20251215180136.sjtvt57autnrassg@desk>
+References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
+	<20251201-vmscape-bhb-v6-2-d610dd515714@linux.intel.com>
+	<fdb0772c-96b8-4772-926d-0d25f7168554@suse.com>
+	<20251210133542.3eff9c4a@pumpkin>
+	<20251214183827.4z6nrrol4vz2tc5w@desk>
+	<20251214190233.4b40fe20@pumpkin>
+	<20251215180136.sjtvt57autnrassg@desk>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251215210026.2422155-1-chengkev@google.com>
-X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251215210026.2422155-3-chengkev@google.com>
-Subject: [kvm-unit-tests PATCH v2 2/2] x86/svm: Add unsupported instruction
- intercept test
-From: Kevin Cheng <chengkev@google.com>
-To: kvm@vger.kernel.org
-Cc: yosryahmed@google.com, andrew.jones@linux.dev, thuth@redhat.com, 
-	pbonzini@redhat.com, seanjc@google.com, Kevin Cheng <chengkev@google.com>, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Add tests that expect a nested vm exit, due to an unsupported
-instruction, to be handled by L0 even if L1 intercepts are set for that
-instruction.
+On Mon, 15 Dec 2025 10:01:36 -0800
+Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
 
-The new test exercises bug fixed by:
-https://lore.kernel.org/all/20251205070630.4013452-1-chengkev@google.com/
+> On Sun, Dec 14, 2025 at 07:02:33PM +0000, David Laight wrote:
+> > On Sun, 14 Dec 2025 10:38:27 -0800
+> > Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
+> >  =20
+> > > On Wed, Dec 10, 2025 at 01:35:42PM +0000, David Laight wrote: =20
+> > > > On Wed, 10 Dec 2025 14:31:31 +0200
+> > > > Nikolay Borisov <nik.borisov@suse.com> wrote:
+> > > >    =20
+> > > > > On 2.12.25 =D0=B3. 8:19 =D1=87., Pawan Gupta wrote:   =20
+> > > > > > As a mitigation for BHI, clear_bhb_loop() executes branches tha=
+t overwrites
+> > > > > > the Branch History Buffer (BHB). On Alder Lake and newer parts =
+this
+> > > > > > sequence is not sufficient because it doesn't clear enough entr=
+ies. This
+> > > > > > was not an issue because these CPUs have a hardware control (BH=
+I_DIS_S)
+> > > > > > that mitigates BHI in kernel.
+> > > > > >=20
+> > > > > > BHI variant of VMSCAPE requires isolating branch history betwee=
+n guests and
+> > > > > > userspace. Note that there is no equivalent hardware control fo=
+r userspace.
+> > > > > > To effectively isolate branch history on newer CPUs, clear_bhb_=
+loop()
+> > > > > > should execute sufficient number of branches to clear a larger =
+BHB.
+> > > > > >=20
+> > > > > > Dynamically set the loop count of clear_bhb_loop() such that it=
+ is
+> > > > > > effective on newer CPUs too. Use the hardware control enumerati=
+on
+> > > > > > X86_FEATURE_BHI_CTRL to select the appropriate loop count.
+> > > > > >=20
+> > > > > > Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> > > > > > Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
+> > > > > > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com> =
+    =20
+> > > > >=20
+> > > > > nit: My RB tag is incorrect, while I did agree with Dave's sugges=
+tion to=20
+> > > > > have global variables for the loop counts I haven't' really seen =
+the=20
+> > > > > code so I couldn't have given my RB on something which I haven't =
+seen=20
+> > > > > but did agree with in principle.   =20
+> > > >=20
+> > > > I thought the plan was to use global variables rather than ALTERNAT=
+IVE.
+> > > > The performance of this code is dominated by the loop.   =20
+> > >=20
+> > > Using globals was much more involved, requiring changes in atleast 3 =
+files.
+> > > The current ALTERNATIVE approach is much simpler and avoids additional
+> > > handling to make sure that globals are set correctly for all mitigati=
+on
+> > > modes of BHI and VMSCAPE.
+> > >=20
+> > > [ BTW, I am travelling on a vacation and will be intermittently check=
+ing my
+> > >   emails. ]
+> > >  =20
+> > > > I also found this code in arch/x86/net/bpf_jit_comp.c:
+> > > > 	if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_LOOP)) {
+> > > > 		/* The clearing sequence clobbers eax and ecx. */
+> > > > 		EMIT1(0x50); /* push rax */
+> > > > 		EMIT1(0x51); /* push rcx */
+> > > > 		ip +=3D 2;
+> > > >=20
+> > > > 		func =3D (u8 *)clear_bhb_loop;
+> > > > 		ip +=3D x86_call_depth_emit_accounting(&prog, func, ip);
+> > > >=20
+> > > > 		if (emit_call(&prog, func, ip))
+> > > > 			return -EINVAL;
+> > > > 		EMIT1(0x59); /* pop rcx */
+> > > > 		EMIT1(0x58); /* pop rax */
+> > > > 	}
+> > > > which appears to assume that only rax and rcx are changed.
+> > > > Since all the counts are small, there is nothing stopping the code
+> > > > using the 8-bit registers %al, %ah, %cl and %ch.   =20
+> > >=20
+> > > Thanks for catching this. =20
+> >=20
+> > I was trying to find where it was called from.
+> > Failed to find the one on system call entry... =20
+>=20
+> The macro CLEAR_BRANCH_HISTORY calls clear_bhb_loop() at system call entr=
+y.
 
-Signed-off-by: Kevin Cheng <chengkev@google.com>
-Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- x86/svm.h         |  5 +++-
- x86/svm_tests.c   | 63 +++++++++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg |  9 ++++++-
- 3 files changed, 75 insertions(+), 2 deletions(-)
+I didn't look very hard :-)
 
-diff --git a/x86/svm.h b/x86/svm.h
-index c22c252fed001..e2158ab0622bb 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -406,7 +406,10 @@ struct __attribute__ ((__packed__)) vmcb {
- #define SVM_EXIT_MONITOR	0x08a
- #define SVM_EXIT_MWAIT		0x08b
- #define SVM_EXIT_MWAIT_COND	0x08c
--#define SVM_EXIT_NPF  		0x400
-+#define SVM_EXIT_XSETBV		0x08d
-+#define SVM_EXIT_RDPRU		0x08e
-+#define SVM_EXIT_INVPCID	0x0a2
-+#define SVM_EXIT_NPF		0x400
- 
- #define SVM_EXIT_ERR		-1
- 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index e732fb4eeea38..ec14f13c06d4b 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -3575,6 +3575,68 @@ static void svm_shutdown_intercept_test(void)
- 	report(vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown test passed");
- }
- 
-+static void insn_invpcid(struct svm_test *test)
-+{
-+	struct invpcid_desc desc = {0};
-+
-+	invpcid_safe(0, &desc);
-+}
-+
-+asm(
-+	"insn_rdtscp: rdtscp;ret\n\t"
-+	"insn_skinit: skinit;ret\n\t"
-+	"insn_xsetbv: xor %eax, %eax; xor %edx, %edx; xor %ecx, %ecx; xsetbv;ret\n\t"
-+	"insn_rdpru: xor %ecx, %ecx; rdpru;ret\n\t"
-+);
-+
-+extern void insn_rdtscp(struct svm_test *test);
-+extern void insn_skinit(struct svm_test *test);
-+extern void insn_xsetbv(struct svm_test *test);
-+extern void insn_rdpru(struct svm_test *test);
-+
-+struct insn_table {
-+	const char *name;
-+	u64 intercept;
-+	void (*insn_func)(struct svm_test *test);
-+	u32 reason;
-+};
-+
-+static struct insn_table insn_table[] = {
-+	{ "RDTSCP", INTERCEPT_RDTSCP, insn_rdtscp, SVM_EXIT_RDTSCP},
-+	{ "SKINIT", INTERCEPT_SKINIT, insn_skinit, SVM_EXIT_SKINIT},
-+	{ "XSETBV", INTERCEPT_XSETBV, insn_xsetbv, SVM_EXIT_XSETBV},
-+	{ "RDPRU", INTERCEPT_RDPRU, insn_rdpru, SVM_EXIT_RDPRU},
-+	{ "INVPCID", INTERCEPT_INVPCID, insn_invpcid, SVM_EXIT_INVPCID},
-+	{ NULL },
-+};
-+
-+/*
-+ * Test that L1 does not intercept instructions that are not advertised in
-+ * guest CPUID.
-+ */
-+static void svm_unsupported_instruction_intercept_test(void)
-+{
-+	u32 cur_insn;
-+	u32 exit_code;
-+
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + UD_VECTOR);
-+
-+	for (cur_insn = 0; insn_table[cur_insn].name != NULL; ++cur_insn) {
-+		test_set_guest(insn_table[cur_insn].insn_func);
-+		vmcb_set_intercept(insn_table[cur_insn].intercept);
-+		svm_vmrun();
-+		exit_code = vmcb->control.exit_code;
-+
-+		if (exit_code == SVM_EXIT_EXCP_BASE + UD_VECTOR)
-+			report_pass("UD Exception injected");
-+		else if (exit_code == insn_table[cur_insn].reason)
-+			report_fail("L1 should not intercept %s when instruction is not advertised in guest CPUID",
-+				    insn_table[cur_insn].name);
-+		else
-+			report_fail("Unknown exit reason, 0x%x", exit_code);
-+	}
-+}
-+
- struct svm_test svm_tests[] = {
- 	{ "null", default_supported, default_prepare,
- 	  default_prepare_gif_clear, null_test,
-@@ -3716,6 +3778,7 @@ struct svm_test svm_tests[] = {
- 	TEST(svm_tsc_scale_test),
- 	TEST(pause_filter_test),
- 	TEST(svm_shutdown_intercept_test),
-+	TEST(svm_unsupported_instruction_intercept_test),
- 	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
- };
- 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 522318d32bf68..5a2084e457167 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -253,11 +253,18 @@ arch = x86_64
- [svm]
- file = svm.flat
- smp = 2
--test_args = "-pause_filter_test"
-+test_args = "-pause_filter_test -svm_unsupported_instruction_intercept_test"
- qemu_params = -cpu max,+svm -m 4g
- arch = x86_64
- groups = svm
- 
-+[svm_unsupported_instruction_intercept_test]
-+file = svm.flat
-+test_args = "svm_unsupported_instruction_intercept_test"
-+qemu_params = -cpu max,+svm,-rdtscp,-xsave,-invpcid,-skinit
-+arch = x86_64
-+groups = svm
-+
- [svm_pause_filter]
- file = svm.flat
- test_args = pause_filter_test
--- 
-2.52.0.239.gd5f0c6e74e-goog
+>=20
+> > > > There are probably some schemes that only need one register.
+> > > > eg two separate ALTERNATIVE blocks.   =20
+> > >=20
+> > > Also, I think it is better to use a callee-saved register like rbx to=
+ avoid
+> > > callers having to save/restore registers. Something like below: =20
+> >=20
+> > I'm not sure.
+> > %ax is the return value so can be 'trashed' by a normal function call.
+> > But if the bpf code is saving %ax then it isn't expecting a normal call=
+. =20
+>=20
+> BHB clear sequence is executed at the end of the BPF JITted code, and %rax
+> is likely the return value of the BPF program. So, saving/restoring %rax
+> around the sequence makes sense to me.
+>=20
+> > OTOH if you are going to save the register in clear_bhb_loop you might
+> > as well use %ax to get the slightly shorter instructions for %al.
+> > (I think 'movb' comes out shorter - as if it really matters.) =20
+>=20
+> %rbx is a callee-saved register so it felt more intuitive to save/restore
+> it in clear_bhb_loop(). But, I can use %ax if you feel strongly.
+
+If you are going to save a register it might as well be %ax.
+Otherwise someone will wonder why you picked a different one.
+
+>=20
+> > Definitely worth a comment that it must save all resisters. =20
+>=20
+> Yes, will add a comment.
+>=20
+> > I also wonder if it needs to setup a stack frame? =20
+>=20
+> I don't know if thats necessary, objtool doesn't complain because
+> clear_bhb_loop() is marked STACK_FRAME_NON_STANDARD.
+
+In some senses it is a leaf functions - and the compiler doesn't create
+stack frames for those (by default).
+
+Provided objtool isn't confused by all the call instructions it probably
+doesn't matter.
+
+	David
+
+>=20
+> > Again, the code is so slow it won't matter.
+> >=20
+> > 	David =20
 
 
