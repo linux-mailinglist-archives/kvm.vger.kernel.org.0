@@ -1,259 +1,264 @@
-Return-Path: <kvm+bounces-65968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432F7CBE499
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:30:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16EA5CBE427
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:24:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60DED305F67A
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 14:25:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5A7330DF026
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 14:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E5F328613;
-	Mon, 15 Dec 2025 14:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B6A33BBA5;
+	Mon, 15 Dec 2025 14:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="efk6rJmQ";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="efk6rJmQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SyAaXabP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Km5bXhrt"
 X-Original-To: kvm@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011059.outbound.protection.outlook.com [52.101.70.59])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2A33126AC
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.59
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765808179; cv=fail; b=KqzTmVOGd0TVexpVSNDV0RpFAWWQcYcVQ90yJw3QD++YndFhxweoM3GTyZoSd1uQtFu5KwLvuCvuoFMN7M//oQx/OMzfQ/05d9ZvM9k8G/yIeUw1bCeUA2PksPBHOEL+CE+MG7yOwpYJ5ZQ+g4VWPLkMCFC9LCNlmClaA+aJA2c=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765808179; c=relaxed/simple;
-	bh=iq/OEAJwK/tiL4jZiA8DrSquKTgwlypSxFR9F4vh33M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=T4EazD4d/VobnZ+/jx/+zUEnWw5O5eNePUDEwC61bUcFdMWeJB7VO0hxEBtDmVcZSbUeAKNFUHDKmZFVww1SADLNFqjekFbhMOD507GDcxyGfQx9YPezPI0zDfn5t/6ATc9i0rLDff6r66EITBgvf0uO2YDjKhXzrWUKaKXg1Yk=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=efk6rJmQ; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=efk6rJmQ; arc=fail smtp.client-ip=52.101.70.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=h3Im0YvqwJ5hgc36w0FkfXI3INmNjhJv2DZ0UaSRvmMFQ6GTQvtSi91WbZLOGyBIRrzwEz83IQ092q/Jm11dovy0ikVlYgXqsZ9H6n5ZWFJWL7BIMuEhEoZ8nBeKBtLTTSdAhpHGOxnSVb6Gnux1ops0tKZ0eMMy095I1IaVlwVbmqc4NICEx8n58SY6m3mYsqSKD6+D+oLCWClQJttSvKGVr9ARYD1PSEX20oH/AB2hU1EQ4tTr19LygD6zSFVtU6HpWxI7QtBLW57U/ULXrDhwlbERbZKM5TMSvRO4icqz44MMndNq24Sk/rC3xxWFZZdIJ/Rl+sv/FhWqV77Kmw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iq/OEAJwK/tiL4jZiA8DrSquKTgwlypSxFR9F4vh33M=;
- b=v8jgz+94lP9S86hmeHMia8YIa4m5zXL3++Lg9bImY/pl43BWi9Phc+euKYi0kNgd7I1Q/H72x2/pHGv0+XwSGHg1ihHpAOUnILBc4EvlbZ9urC903IdI+zcNcz1ZoNfUwkZAhCPf6p6w/r+qIbH2xlb9gsFct90OyTWTwF4oxRj26Ev+ULDcY98le2LgiubfCtQFU6kdKKuXpXM+MQN0dIcd6OQkYyYU/t4XGrffdxR1a2M4Pc3mNjN9GamrgOxkrP0sjSqnmg+gQKaxVsDJHfmNdZboNMtSZKOGYvy6fRLgB1KEDnhZ3qbmR0R0/hJXfX45GWvXLcmXFEMvth/JMg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iq/OEAJwK/tiL4jZiA8DrSquKTgwlypSxFR9F4vh33M=;
- b=efk6rJmQq5OPFavSVmFdaySZTsbZfzQMGj2ZvS4W8m6Ix+hmG/QFlU0JkoJu0SXvZWIxeYYqyloQwWMX53avI5q0syQTSkwpLC/E7t5Yrd0M1WsIBohCa3gNIQXmJM2nELQoqM22EZCVVnFk5OK5efZaQjcYvQ1w0hQPETXfsO4=
-Received: from CWXP123CA0021.GBRP123.PROD.OUTLOOK.COM (2603:10a6:401:73::33)
- by GV2PR08MB11540.eurprd08.prod.outlook.com (2603:10a6:150:2c9::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
- 2025 14:16:06 +0000
-Received: from AMS1EPF00000044.eurprd04.prod.outlook.com
- (2603:10a6:401:73:cafe::20) by CWXP123CA0021.outlook.office365.com
- (2603:10a6:401:73::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.13 via Frontend Transport; Mon,
- 15 Dec 2025 14:16:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AMS1EPF00000044.mail.protection.outlook.com (10.167.16.41) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9434.6
- via Frontend Transport; Mon, 15 Dec 2025 14:16:06 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ehD59Mq3mnCQnO7p0Mg6dPifCLU94fkJ/c6b253XPoxqmksV0EWHiPybszYq7eiqm4rLsLDpbOccUwOOdFciNyyoU7VrfshGCE2BLjxppVbjWhDaFzuBi8EOaYYinYMYDNrSckj/gJqwVr6qPpKBuL9274OKSpSP+1V5uu4W14IiwhOhFjp5CoGVUCotgL95p1cGNdB3+G/0Ta1Os3fnSHeOtMpDYXKYS8ZGfH6AY1ZdWlUmepPefpgf7QIH62XcGJvRKKAzskrpSwtW6PUiHUQ/mVq/HAonE4PPGrmunEOPIhxIXmbf8RphnxIwNU9DbmGBPzTu0v7vxJ/Cz6ouZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iq/OEAJwK/tiL4jZiA8DrSquKTgwlypSxFR9F4vh33M=;
- b=moHt+kIziXW5eGy/bfiR+/QtdLh0KrSbW5oJCweC22QEPV6sZEZ/k5jp/aZL/tRYikXh7wHL15fdelkhCNnCiy/90ityFgyB9RfjGOXTRVxmCA56lQkbmwNckAZxvZAlOtK5rxCjTvR/P8cElMGisc9Ge53iYWxcBnvJqs9twH1KzwjSBp3wK5MteMrTEhuc/8V1UU2eG/y3gD6J1KSyH1fxnKZ3TB0U427dX8wFNHSZJ/9J/3WscEJP/TRkK8IdsGo7rgBc1YS2vFH1fb7bnhITwkCL1bPUDXxkpOAR9KNV6xPLOXkd18U4lcRFy4SrDoRExShez1jpojUTIwi58g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iq/OEAJwK/tiL4jZiA8DrSquKTgwlypSxFR9F4vh33M=;
- b=efk6rJmQq5OPFavSVmFdaySZTsbZfzQMGj2ZvS4W8m6Ix+hmG/QFlU0JkoJu0SXvZWIxeYYqyloQwWMX53avI5q0syQTSkwpLC/E7t5Yrd0M1WsIBohCa3gNIQXmJM2nELQoqM22EZCVVnFk5OK5efZaQjcYvQ1w0hQPETXfsO4=
-Received: from VI1PR08MB3871.eurprd08.prod.outlook.com (2603:10a6:803:b7::17)
- by VI0PR08MB11382.eurprd08.prod.outlook.com (2603:10a6:800:2fd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
- 2025 14:15:03 +0000
-Received: from VI1PR08MB3871.eurprd08.prod.outlook.com
- ([fe80::98c3:33df:8fd4:b704]) by VI1PR08MB3871.eurprd08.prod.outlook.com
- ([fe80::98c3:33df:8fd4:b704%4]) with mapi id 15.20.9412.011; Mon, 15 Dec 2025
- 14:15:03 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "maz@kernel.org" <maz@kernel.org>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, Timothy Hayes
-	<Timothy.Hayes@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, nd
-	<nd@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>
-Subject: Re: [PATCH 02/32] KVM: arm64: gic-v3: Switch vGIC-v3 to use generated
- ICH_VMCR_EL2
-Thread-Topic: [PATCH 02/32] KVM: arm64: gic-v3: Switch vGIC-v3 to use
- generated ICH_VMCR_EL2
-Thread-Index: AQHca3skmTnBmPvFJEucTVfSTrklLbUim3oAgAAn9wA=
-Date: Mon, 15 Dec 2025 14:15:03 +0000
-Message-ID: <ece413c8b70e30f39052fb29371e9a75c239ff9e.camel@arm.com>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	 <20251212152215.675767-3-sascha.bischoff@arm.com>
-	 <86ldj4nesf.wl-maz@kernel.org>
-In-Reply-To: <86ldj4nesf.wl-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	VI1PR08MB3871:EE_|VI0PR08MB11382:EE_|AMS1EPF00000044:EE_|GV2PR08MB11540:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6be11043-2bb5-4e4a-f63b-08de3be47cbb
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?VndsRzlqZmlCakNyaEtHNDE4UVR3S0xjLzRseEMzd2FOOHlqeWo4Q2czUCtt?=
- =?utf-8?B?MFkzYTVKVXV5T0JnblVKdkx0UDVWQ3BrRzBGTlEvWHoyMXc5a2s1cXNqSlRx?=
- =?utf-8?B?Z1Y1blNoUWppZEsyY056MEVEYkVYWXZaMDB5YVBycUhKeWtXQ2pwWWhRWHdH?=
- =?utf-8?B?dVdQT0ZKSWFoVHlpeXRkQTlmRm9oRDMrYXVMZzNxSmZOMHFWM0JtVVVhMTdp?=
- =?utf-8?B?N1BKeTZ3VTBVbjk2emYyOXBqYTRhNlVVdGRabHFYRDN3OGxsc1QrSGFzY0NL?=
- =?utf-8?B?bUIxTzJ6ZG0rRGp6Q2JIcDI0eUt0R0hXTEF0aHJIRnBlSm5zQ0lkVGIvekZD?=
- =?utf-8?B?L1orNklNeWM3N3N6NUUzR3JhdVhFRFMrWEtDMlBQTEdNSkNPOE0vdzZjNUZW?=
- =?utf-8?B?dmZaU3BiUjVZZkJPak1KNEliRFRDZERBTUp2dWk1MEQyZm5lRW10SGxzTytk?=
- =?utf-8?B?a2ZmcU8yaklFNmkvQ283MHVZK3lLeG5hcEUvTW94Z0lCQlBLbS9EU0xaT3Js?=
- =?utf-8?B?ODM0WDIyNTYxc1NaWTBOckd3YkgzcU1nK29kejVaNWNVK2t1Qi85RkNlRkpT?=
- =?utf-8?B?eHIya1JycDJlaEc1SFpiY0lkK2s4Y2FPNDN4ZkNrcG5XVllOemtyNjd0VlFj?=
- =?utf-8?B?WEd4N2MzSzRMRE5ib0R2ZmJFMzgrd3E5WW5DMDM1ekVUUFY5LzdlR0tKcG5h?=
- =?utf-8?B?cHBFd21Qc0lhT29JekIvY3ZCUmdRTVExS2R0SldNYWE5RzAvRXpJREVLeVY0?=
- =?utf-8?B?RGZmSEhEZkcyQVcxSjhwSTBOTGp4RU9hb1FxSHVkajNuQ1RWUVozdVNGcytu?=
- =?utf-8?B?d1l0ME1mN21vWk4vcVYyTkJNaWpBKzhMVEdvUWV2YzBRT3IzSXYyemF0VkZa?=
- =?utf-8?B?S2dHVXRYQ09wcWdBSE1VV2VsYzdoSnp3ZXE5UDV4QmdxZE0vbHJjcTBSUnJy?=
- =?utf-8?B?T2kzb3Z5VklUdmkrTTNXRU9oZkMzU3ltb0VFc3ROK1NqeHF0ZjVQaUZCeXht?=
- =?utf-8?B?bGdHWkJDenZjbFFibER0RmVLcTZNMC96QnhSYVZmYmM3SEpMYVlYajRpQkRF?=
- =?utf-8?B?M1o5VGJBd2JZUHNIbjJsLzVRa0FaQ0dEVFUrYUpPeks3YWwxWUd0RFNMTFBn?=
- =?utf-8?B?WFIxeW55c2xkZW5OOVNlcTh5SzE1WWVEWmd6ankxc2NObkg5Z1BJcCt5dHMz?=
- =?utf-8?B?aDlCelJ2azBDT05NYzZHZXdLdDhNSkRFNXRjeFU4YW1NYkZrQ0RoWGhIa1hv?=
- =?utf-8?B?Qm0ySW1nQnc4djAxZ1A5YWx6ajFZYTVMQzIrQ1JkSTFKWFBYRFNQRWw5Y2dl?=
- =?utf-8?B?QXRBNDZRSnNjend6N3FTMjBMOWRDaWRUcmlGRmZzbjg4c0ZwUjI5YlQzRmxJ?=
- =?utf-8?B?Ri9vWG12OStjSzJ6dU1BMU9GWVFYR0hvVUpucXMvMVo3MXNNWnNsQzhKT2pi?=
- =?utf-8?B?Y3pnVEJ5amZMeDNXN1F3NTA0aVV1VlE2MXFsTkExT2xBajBiYk5CU21Ed045?=
- =?utf-8?B?MVdVZUlxNDlpdkROMU8zL2N5bE1VOS9WRXJqYitOZ1RBZ1haWjREWHRvaC9a?=
- =?utf-8?B?akszWDhVTVI4QzRVMkxZSzEwY0FPbDZJVWZROXVZM2w0cU9WU1dEOWJwa2RX?=
- =?utf-8?B?a1Zzd2kvUzVzQVhEYWtkQ0pCQXowQ1AzNkIrNUpvZmY4cXBBWUh6SXk2OHBq?=
- =?utf-8?B?aXJyVDF4bGE0Nnh4WnhNUHFZdDB2cDJIMTFDbzFYQTlQem1KSnhtM3RvcFNM?=
- =?utf-8?B?R3kwaUFWM0RBQkh5OXpsRFBKWkdYOHlJZk1KQkJ0MlFxTWZUVEJ5enMyRTFD?=
- =?utf-8?B?VDJ4V0pZYTB0eVlZVlNnZVQ3Q3ZGc3dSTHdQdVZYSlpaaU9qQkJOWDRrQ0V6?=
- =?utf-8?B?bEM3SUhSTkdvMWFFaFo4UUxEd3Rab0RCZFdqdDB3MTVqWFREbmJaMkQyWm5U?=
- =?utf-8?B?ZGltaHMrWkx2RTI2REVlV3dBa0k1MGhidnZSSGlpSWpBVzA0WmRlMUx6RCtn?=
- =?utf-8?B?SlBQaFc2RmVCS2VxRWFNTXoxRjBMWTRaYm81cWZYR2NnY2dnaTVGa3hzcXla?=
- =?utf-8?Q?EUhziv?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR08MB3871.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D16DD501C42881479A1BD13DD1AEF7DE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5634E3B8D78
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765808137; cv=none; b=YvPsXN84yZ+UvdS+Gyrrt1Se1hawaVHMsPCIe0KJ5XVV5uY6geYtoAO7T7HzE8gdVwTbaqhXOAqn2iRWJw0jpaN3CLArWfNHpJhBCBEctOVCQEuQy7YPzwxNQZGProeLHqhFBlbuSx2iD37TiHjiPtcALtRThPkQrgSsXqa8K2M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765808137; c=relaxed/simple;
+	bh=XCaTRYYtdjBnDMmtW6LMz2eDeLZgPQs0Zj1KdxrUzfs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oLf6fSWHNFYb4Bg3Poef64of4lbXpZ7uptnKnB5WsHqAB8HRFlMGqG1xgLk9D+E2pNltB8dDVR4czibD/4UzZwRDe/6y9kx09kkhepHY8lcd6SoyaqAUSZR+fhc9tO42gRo3ECUf6jYEjKVx2N9TAPm5Qqjdj5P/PpkVv3KSodo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SyAaXabP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Km5bXhrt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765808134;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L49NIO1n5q1751W/k8gzxOpfDxRxrpcTIrbILgaPsTg=;
+	b=SyAaXabPOew/UPzAF/9JpNlLNz85XzGdgrkLONai9PtUh5eZApVGEp9AV4XQ8c9RB0w9mM
+	n7ymdzNq9umdUU5BK9+voxi5jg7YbE7L7aBQy1y7GvwtXOsscHjbzppIFb7wsee3Rb7kD7
+	fs4kXJPhh6IU1eAm39TjAvqwAqeQR+w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-PHhl2XCMMDKWSU03xldCZw-1; Mon, 15 Dec 2025 09:15:33 -0500
+X-MC-Unique: PHhl2XCMMDKWSU03xldCZw-1
+X-Mimecast-MFC-AGG-ID: PHhl2XCMMDKWSU03xldCZw_1765808132
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47a83800743so17182825e9.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 06:15:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765808132; x=1766412932; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=L49NIO1n5q1751W/k8gzxOpfDxRxrpcTIrbILgaPsTg=;
+        b=Km5bXhrtdN2KikWd5IIL/6aCY0asNiWVxdAlBBlZjrJb2H2uFyl9cjXpr7SIT1H6aN
+         kiVx7sThAasJcTGofSio393QL5u5TRIweCFugqMDVqMltC2m45BDMLKFlA7JUodU2JKJ
+         DNhNXMf1K9BAfTl4C8BrBQ4OdC0E1Ww0ye/vm0tJOLzgb0cM9DsYupvh3DX10ACJBkoy
+         VbZLSci7zcab5NE0LIsojyBPYlYOWXic1mTSDup4k/BCI7Laz2ijBKOYl5gsSPE6XcmV
+         oTJ4yRJXoQhcJN/Kq47oRp6Rjr65n4gsTKJLX/65ugJtOVCPtPb6VkmeKC4F+cvmCtBX
+         pV2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765808132; x=1766412932;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L49NIO1n5q1751W/k8gzxOpfDxRxrpcTIrbILgaPsTg=;
+        b=QPu5IxHd/vd5qUmh1C2OiLk6WJxNB/aj/BWxvO0MIwhKpEapFGjp3QFA42DoCqikEF
+         ygTiEsSf490tLD+ybJBteIBDXHcv6lFQ9zN6FHE6jkX0btmZBRmukBCU5UOCc/3phrLK
+         MRFNjz3/WVxYIGTYao+n0TSTIJvI75Yq0f/sReJ1g+PDSG+F+Fcj8zVh0ac4UFo5+bb1
+         WimHU0JqtTvv863mvZiE8x+/jXGN1zIOsEh1MxYPFmPZuUNiUxQ5spk0Fb3c/lB9V7X2
+         tj77ewY4YnR7tbgQPzBk7h0/ybWUq48Ff+9YKZGIUdV8YjRvFTWmS0LxFU6IYetGbTrC
+         5VZw==
+X-Forwarded-Encrypted: i=1; AJvYcCV82aCWis40w8yb52/J9z+bbTjMG2GBF4mimF6u9+Z6wyOQ1Iu5KQZKnXlVyQSmvMlCQIY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1gfONsoKbBKXwnjrMdIK0Fnj8D1GBGIiRbBeU0v2y2OW5bLZ2
+	LFKrRZ0Se9lD2xT6IIjx7gXl3Ff7901Su/+GttFvZ0oG/0FMa1wUq2rZGJq6AZNaIfchfYoF4pT
+	yybp1/DfylWLV4vXSZTHinVt5M/B8ErVIfM1zgA1xqs45/iaziWQ95w==
+X-Gm-Gg: AY/fxX4jWfQeqWemqkzXJ2L5iCKlNye34WzAZb7VAHRNqKDMUJMqmzIm6fiPAVmU+Bc
+	zES1Nt7O89JVsc0Mt5qjLwT02MUeWmwldxblN5Z1V3J+Y0GmJTsPYpnI+aZBlyQ6tvp2Lc7sj7A
+	dEOT/lrYcBNGBPBqquvpG9c7Od7oWEvOPohLhVDBPTVHMxRUGP+Me5LR8onIaJSx51HewxcmNuj
+	0njINoWGMV6+2xFbkC/LI64CSiM7VbNICOI6WjWI/ZI92WWit5hM+j/1lqgbjukAyT4IAL+4vrA
+	G1ryjn41xKatW38aZ6NSY83zTHUKmjCEg0jRAU5opOPlH/W6+iiSvr33pJYQPk7s2h/dA+Xwujm
+	sOmt7m6Pwc1qJdG4K
+X-Received: by 2002:a05:600c:c0d2:10b0:477:9cec:c83e with SMTP id 5b1f17b1804b1-47a89d9c2f9mr119399505e9.1.1765808132060;
+        Mon, 15 Dec 2025 06:15:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFnn39+IGc8T4gbIMiapFrAkLpdN3U9Oa1ixlw3v9TO5MUF+UqsPDl1fUxMRulxmuHP3h3NgA==
+X-Received: by 2002:a05:600c:c0d2:10b0:477:9cec:c83e with SMTP id 5b1f17b1804b1-47a89d9c2f9mr119399175e9.1.1765808131556;
+        Mon, 15 Dec 2025 06:15:31 -0800 (PST)
+Received: from sgarzare-redhat ([193.207.203.161])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f8e90f2sm186130175e9.13.2025.12.15.06.15.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 06:15:30 -0800 (PST)
+Date: Mon, 15 Dec 2025 15:15:22 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Melbin K Mathew <mlbnkm1@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, 
+	kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+Message-ID: <wssxyvbgq3a3icydzxsbj5bliqd67xreffaqqusfia2suxrjdk@gcke3jemvycx>
+References: <20251211125104.375020-1-mlbnkm1@gmail.com>
+ <20251211080251-mutt-send-email-mst@kernel.org>
+ <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
+ <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
+ <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
+ <CAMKc4jDLdcGsL5_d+4CP6n-57s-R0vzrX2M7Ni=1GeCB1cxVYA@mail.gmail.com>
+ <bwmol6raorw233ryb3dleh4meaui5vbe7no53boixckl3wgclz@s6grefw5dqen>
+ <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
+ <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
+ <24b9961d-7e0d-4239-97b3-39799524909f@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB11382
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AMS1EPF00000044.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	c68986cb-eb6a-4a2d-74c6-08de3be45701
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|35042699022|82310400026|1800799024|36860700013|14060799003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SWF5MnlsZmh3ZlYvWmo0TlRRbEZ5MUJGWCtUNzZWdmRrVGphYk5UMXpYRVdD?=
- =?utf-8?B?V3lCN3NmOEhZazBjbCtGZ21uU1lIakFET3hGUWpsZzg5MTJhTkxKR0hEVGRv?=
- =?utf-8?B?YzdxSW5tSUNFQmVXSUlzNkZ0c005cmFKNTdsSHMxRGY4eWo1U1hDK29YRUNa?=
- =?utf-8?B?eU8yVTI2NnAxSnJZNGZxNm9RSlNGL0pjWW9xNThlS0JHaTdVL3FDSklFeWxu?=
- =?utf-8?B?ZlltcWV2MmtjSEZQMXJhbEpoM1NSbDB5V0EzYWdlWCtGblgwRkdRUDErSnpS?=
- =?utf-8?B?N0l5M3VtV2RnWk1ZT0hDQVRldjAyRUdrYnFKMkE0b0VveFdBNklFSGV2ckRj?=
- =?utf-8?B?Z2ZuQWtpMGEwenlIWUl2dmczYWlyZ1M5Sm9pMWg2TnNOZnVEZU5EV1FZTVpH?=
- =?utf-8?B?ZEN2WXJoQUxMNnEyS242cnB3eVhBRWpNQTBCMUFJeWREV1FSSmpwUU9aUSty?=
- =?utf-8?B?OUNoWTRNTGF3Mk4rWmJJOTF6cUJZZG9kKzB6QTJIaSszaW1uRStBVmRVRXN6?=
- =?utf-8?B?L3N0WmxtSDRIbXlleFFYWlRqWEl2OWxkSTFmUTEySkdnUElub21xSzFncUw3?=
- =?utf-8?B?MjhnRTVrSVVOREJUUG5SR054WVpCRGZIdkFKZitycmdXbEtxQVhDM1FvSGVv?=
- =?utf-8?B?ZkMybGcvR01DUDM3ZzhHUnoxa2VWbkx1UXpqUmxnOE55M0pIVER6TUQ1T2pl?=
- =?utf-8?B?a2NxVHVmQmR6dzZuOUJ5c3JzcndKTWhXaVhxRitjNGZhV0dmNUZqaE8zL1dD?=
- =?utf-8?B?dm81N0pOS0c2QU9ybnY1ZzFZaTlTNEZHRkd6TFhZdGo3MVd2Z0pZZjVwalBT?=
- =?utf-8?B?OVJRQzFPNXk1TXJuR3pJbjBNQjg5SFFJZUNQV2ZBVTA2bmxtRFJqZFpWNUR6?=
- =?utf-8?B?T2pyWVR1NXllR1hmbmg2NkVnZ2xhL09CM05NVSs0UXVIVE9URDFyYlExclB3?=
- =?utf-8?B?Snh5N1JvN1dEeEhHRVVCWmtPTXJnbnlMRUVqNk00cldNd213aUVHcXo1NzUy?=
- =?utf-8?B?ZU1PZThaZEp2MEhGbm1rd1pVaXNHOEZreU1xck0xUWNFSSs3V1p6WVR3aVQ4?=
- =?utf-8?B?aklVVldhQVdPVW5La3lzdk01TXZFNUE1Yk1QT20xMjd4THpDb1pwcm5UTjVa?=
- =?utf-8?B?TW8wQWJUWjR3U2w5Rm9IRTlaQVlzVHZBQUN5VWE5d1RLYStOSXNPcmgrK2Fp?=
- =?utf-8?B?ZXNwZzdkV0dNd0xWbUxOaTZDYk9tTGcyRkNmTFg1b3hlY1F3dHlFQ2RUYXls?=
- =?utf-8?B?eE92K2pqUy9TUFJ3OStvOWcwdmVKZmdzQjFlVTZmQ01BL0RCZkhPeWR3aXhE?=
- =?utf-8?B?Rk5hcW5MYkViOVg3YUtiRXBUVEtOVUpmcnYwRzFBYlA5OElXQThZT3FuT0Qv?=
- =?utf-8?B?UnZ5VngyYW9GdWcxM2JtVWhuTTNRT0ZVRlpFOVpaU0VubEZBS1F4S2hOMytR?=
- =?utf-8?B?NzN3WjhrekE3a3NkeWhKb09zdWV0cnBuVVRYb2RMeS80cW1ZNXM5NWluVmI3?=
- =?utf-8?B?Q1BqM202UUVUWTJsNkRISUYvcnZpRkxkelpHRExOclhzZWxmeTNnekU5TSt4?=
- =?utf-8?B?SjBOYXVDeTJOZDQ3TUVVbUNIblZTWGxwTTRiUGgxZ2tDUDdXQS9iQjF0UWwr?=
- =?utf-8?B?dEFIZVlqbXh3VDFUUlVYaTZjYlJTRkdEcEtISUxIaUF6c09jTGxDWXJITC9Y?=
- =?utf-8?B?Q2taS3hFMDJ3N3Iwa0RsRURxeWpZWFE4S2hCVHFlZXBsamR1azlKTjZEWFht?=
- =?utf-8?B?c1MwQlVBeXo2NDNSTVJQZEhmUEFQL3h6eFVJNDFFdmg2enJ2ZHg5OFRReHBZ?=
- =?utf-8?B?UGNsdWZ4eHowbDNHRnErb0plZytDQ2pmeDAzM3lIZkRzMWJSZlhicHUwM2Zl?=
- =?utf-8?B?QnRVTGk5SkFHQ2NMRmo5c3RZZEtneUUvVDNUd3czRGIxTjJpZnF5UVZoY0tW?=
- =?utf-8?B?K21qeHQ0b2dIYXlqL2l1NU5QVGpMOTlnWGtqYlpVa2Q1dmFCUVZyMW9zUmdB?=
- =?utf-8?B?WCtjNm1aeU45b1BCYW5vL2RkbXlSSDh1emh6eW93bm5idE1aQVZqRnlqOC9L?=
- =?utf-8?B?ZEZzc2pNT2NZWForbU5CMGRZUzNzdWhkYUorcmMvb3lhTklZUjlNaXcvQXBh?=
- =?utf-8?Q?65Y8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(35042699022)(82310400026)(1800799024)(36860700013)(14060799003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 14:16:06.3477
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6be11043-2bb5-4e4a-f63b-08de3be47cbb
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF00000044.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB11540
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <24b9961d-7e0d-4239-97b3-39799524909f@gmail.com>
 
-T24gTW9uLCAyMDI1LTEyLTE1IGF0IDExOjUyICswMDAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6DQo+
-IE9uIEZyaSwgMTIgRGVjIDIwMjUgMTU6MjI6MzUgKzAwMDAsDQo+IFNhc2NoYSBCaXNjaG9mZiA8
-U2FzY2hhLkJpc2Nob2ZmQGFybS5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IEZyb206IFNhc2NoYSBC
-aXNjaG9mZiA8U2FzY2hhLkJpc2Nob2ZmQGFybS5jb20+DQo+ID4gDQo+ID4gwqAJLyogRU9JbW9k
-ZSA9PSAwLCBub3RoaW5nIHRvIGJlIGRvbmUgaGVyZSAqLw0KPiA+IC0JaWYgKCEodm1jciAmIElD
-SF9WTUNSX0VPSU1fTUFTSykpDQo+ID4gKwlpZiAoIUZJRUxEX0dFVChJQ0hfVk1DUl9FTDJfVkVP
-SU1fTUFTSywgdm1jcikpDQo+IA0KPiBuaXQ6IEZJRUxEX0dFVCgpIGRvZXNuJ3QgYnJpbmcgYW55
-dGhpbmcgaGVyZS4gU2ltaWxhciBjb21tZW50IGFwcGxpZXMNCj4gdG8gbW9zdCAnaWYgKHZhbCAm
-IE1BU0spJyBjb25zdHJ1Y3RzIHRoYXQgZ2V0IGNoYW5nZWQgaGVyZS4NCg0KSSd2ZSByZXZlcnRl
-ZCBhbGwgYmFyZSBpbnN0YW5jZXMgb2YgYHZhbCAmIE1BU0tgICh3aXRob3V0IHNoaWZ0cykgdG8N
-Cm5vdCB1c2UgRklFTERfR0VUKCkuIEFueXRoaW5nIHdpdGggYW4gYWRkaXRpb25hbCBzaGlmdCBJ
-J3ZlIGxlZnQgYXMgYQ0KRklFTERfR0VUKCkuDQrCoA0KPiA+IMKgc3RhdGljIHZvaWQgX192Z2lj
-X3YzX3JlYWRfaWdycGVuMChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHUzMg0KPiA+IHZtY3IsIGlu
-dCBydCkNCj4gPiDCoHsNCj4gPiAtCXZjcHVfc2V0X3JlZyh2Y3B1LCBydCwgISEodm1jciAmIElD
-SF9WTUNSX0VORzBfTUFTSykpOw0KPiA+ICsJdmNwdV9zZXRfcmVnKHZjcHUsIHJ0LA0KPiA+ICEh
-RklFTERfR0VUKElDSF9WTUNSX0VMMl9WRU5HMF9NQVNLLCB2bWNyKSk7DQo+IA0KPiBIZXJlLCAh
-ISBpcyBhY3R1YWxseSByZWFsbHkgc3VwZXJmbHVvdXMgYW5kIG1ha2VzIGl0IGhhcmRlciB0bw0K
-PiB1bmRlcnN0YW5kIHdoYXQgaXMgYmVpbmcgZG9uZS4gU2ltaWxhciB0aGluZyBmb3IgSVJHUEVO
-MS4NCg0KRHJvcHBlZCB0aG9zZSAhISBhcyBwYXJ0IG9mIHRoaXMgY2hhbmdlLg0KDQo+IEFwYXJ0
-IGZyb20gdGhlc2UgdHdvIHBvaW50cywgdGhpcyBsb29rcyBPSyB0byBtZS4NCj4gDQo+IFRoYW5r
-cywNCj4gDQo+IAlNLg0KDQpUaGFua3MsDQpTYXNjaGENCg0K
+On Sun, Dec 14, 2025 at 06:38:22AM +0000, Melbin K Mathew wrote:
+>
+>
+>On 12/12/2025 12:26, Stefano Garzarella wrote:
+>>On Fri, Dec 12, 2025 at 11:40:03AM +0000, Melbin K Mathew wrote:
+>>>
+>>>
+>>>On 12/12/2025 10:40, Stefano Garzarella wrote:
+>>>>On Fri, Dec 12, 2025 at 09:56:28AM +0000, Melbin Mathew Antony wrote:
+>>>>>Hi Stefano, Michael,
+>>>>>
+>>>>>Thanks for the suggestions and guidance.
+>>>>
+>>>>You're welcome, but please avoid top-posting in the future:
+>>>>https://www.kernel.org/doc/html/latest/process/submitting- 
+>>>>patches.html#use-trimmed-interleaved-replies-in-email-discussions
+>>>>
+>>>Sure. Thanks
+>>>>>
+>>>>>I’ve drafted a 4-part series based on the recap. I’ve included the
+>>>>>four diffs below for discussion. Can wait for comments, iterate, and
+>>>>>then send the patch series in a few days.
+>>>>>
+>>>>>---
+>>>>>
+>>>>>Patch 1/4 — vsock/virtio: make get_credit() s64-safe and clamp 
+>>>>>negatives
+>>>>>
+>>>>>virtio_transport_get_credit() was doing unsigned arithmetic; if the
+>>>>>peer shrinks its window, the subtraction can underflow and look like
+>>>>>“lots of credit”. This makes it compute “space” in s64 and clamp < 0
+>>>>>to 0.
+>>>>>
+>>>>>diff --git a/net/vmw_vsock/virtio_transport_common.c
+>>>>>b/net/vmw_vsock/virtio_transport_common.c
+>>>>>--- a/net/vmw_vsock/virtio_transport_common.c
+>>>>>+++ b/net/vmw_vsock/virtio_transport_common.c
+>>>>>@@ -494,16 +494,23 @@ 
+>>>>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>>>>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, 
+>>>>>u32 credit)
+>>>>>{
+>>>>>+ s64 bytes;
+>>>>> u32 ret;
+>>>>>
+>>>>> if (!credit)
+>>>>> return 0;
+>>>>>
+>>>>> spin_lock_bh(&vvs->tx_lock);
+>>>>>- ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>>>>- if (ret > credit)
+>>>>>- ret = credit;
+>>>>>+ bytes = (s64)vvs->peer_buf_alloc -
+>>>>
+>>>>Why not just calling virtio_transport_has_space()?
+>>>virtio_transport_has_space() takes struct vsock_sock *, while 
+>>>virtio_transport_get_credit() takes struct virtio_vsock_sock *, so 
+>>>I cannot directly call has_space() from get_credit() without 
+>>>changing signatures.
+>>>
+>>>Would you be OK if I factor the common “space” calculation into a 
+>>>small helper that operates on struct virtio_vsock_sock * and is 
+>>>used by both paths? Something like:
+>>
+>>Why not just change the signature of virtio_transport_has_space()?
+>Thanks, that is cleaner.
+>
+>For Patch 1 i'll change virtio_transport_has_space() to take
+>struct virtio_vsock_sock * and call it from both
+>virtio_transport_stream_has_space() and virtio_transport_get_credit().
+>
+>/*
+> * Return available peer buffer space for TX (>= 0).
+> *
+> * Use s64 arithmetic so that if the peer shrinks peer_buf_alloc while
+> * we have bytes in flight (tx_cnt - peer_fwd_cnt), the subtraction does
+> * not underflow into a large positive value as it would with u32.
+> *
+> * Must be called with vvs->tx_lock held.
+> */
+>static s64 virtio_transport_has_space(struct virtio_vsock_sock *vvs)
+>{
+>	s64 bytes;
+>
+>	bytes = (s64)vvs->peer_buf_alloc -
+>		((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+
+wait, why casting also the counters?
+they are supposed to wrap, so should be fine to avoid the cast there.
+
+Please, avoid too many changes in a single patch.
+
+>	if (bytes < 0)
+>		bytes = 0;
+>
+>	return bytes;
+>}
+>
+>s64 virtio_transport_stream_has_space(struct vsock_sock *vsk)
+>{
+>	struct virtio_vsock_sock *vvs = vsk->trans;
+>	s64 bytes;
+>
+>	spin_lock_bh(&vvs->tx_lock);
+>	bytes = virtio_transport_has_space(vvs);
+>	spin_unlock_bh(&vvs->tx_lock);
+>
+>	return bytes;
+>}
+>
+>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+>{
+>	u32 ret;
+>
+>	if (!credit)
+>		return 0;
+>
+>	spin_lock_bh(&vvs->tx_lock);
+>	ret = min_t(u32, credit, (u32)virtio_transport_has_space(vvs));
+
+min_t() is supposed to be use exactly to avoid to cast each member, so 
+why adding the cast to the value returned by 
+virtio_transport_has_space() ?
+
+>	vvs->tx_cnt += ret;
+>	vvs->bytes_unsent += ret;
+>	spin_unlock_bh(&vvs->tx_lock);
+>
+>	return ret;
+>}
+>
+>Does this look right?
+
+Pretty much yes, a part some comments, but I'd like to see the final 
+solution.
+
+Thanks,
+Stefano
+
 
