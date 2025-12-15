@@ -1,135 +1,154 @@
-Return-Path: <kvm+bounces-66006-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01AACBF8C4
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 20:30:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F4BCBF8AC
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 20:29:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 47AA2304E389
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 19:28:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7D27E3032FDA
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 19:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8B2333743;
-	Mon, 15 Dec 2025 19:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20DE332918;
+	Mon, 15 Dec 2025 19:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="i2g9Tky3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZyXFmDHQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757183242A5;
-	Mon, 15 Dec 2025 19:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399B6327790
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 19:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765826878; cv=none; b=CQfYADiZvDCIugT3X6+fLONIB1mZoH58m/cYQKXU2XUfmcMCQ3oPJH7Dhw9Ntb6Hmq4Bx3tB3UqmJCvue8qEFTK90UtqoYmW84N/2nZLPG6UBzXdh996ST5NZ+UREkL9x+caBKYKB3rUJGLZSpq03gWmDkQgbO930re0l8cIEWo=
+	t=1765826871; cv=none; b=Gj8VqYv5gOLD33bp9iNv0KtJYx4aAuaZ1UQfEqo+fwldadtMvCjVH8xBf3zsIgiJ+Nb+9jC6ojcOxhLbA7dgCNq7rMyo8/qOkYRILUgWHxgvKr5cGtfsqVRGBkFiY1Bx3UZYdFp6alTQfg0/jL2v3ZdzuF7KjFOA5hN1DjIUjj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765826878; c=relaxed/simple;
-	bh=xhfGb6ZycktLx6DtRtGPeWPXRKJb3uLgZoLIbraIZjw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Olpw54JY893nsVDZFSSHzG34PsfRnq+Hxd/3ubLhoqIn5XMmOD2i44UiYKQn7v0GvElHnsOfnkoQiNyYNtfPTtxzpXlbsFhmbQvRjPApdH8CCzr75BlU8SJRePPExCqgxYxFgpa0ERrZwzGDX3puRMsc/M1EzqWRQxIv4EgF8bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=i2g9Tky3; arc=none smtp.client-ip=91.218.175.186
+	s=arc-20240116; t=1765826871; c=relaxed/simple;
+	bh=hjitnraVC2kjbWNPdp7s+94AsN9SLQUX7HosMfkYnxY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DI9XlOQ2Ck7UD01loXal4NTMyzU9fkEjmpyr5c5eB7BHG71Bjvpa+6andmRDXO63HBybU//25K85pdIGCPb9/PlfAyrMrzUFk9Un7B6tStPdmLJHq721Ao/eVRgl6sIodtjFdiWZv16t40nD2aV2rmpmCotnBdfEoIX3Z0FbSKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZyXFmDHQ; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765826860;
+	t=1765826866;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tESTeWnloD3F0ybR0jqLCnFnlk32UlwI6uI9VspQVOg=;
-	b=i2g9Tky3vAVzaamIP74QGyCrf28qHb+FUKZlTry9Fg2wDOPH1MxABw9ljI1dgbbSCTl9Fi
-	SpUQzIE+pCZ1WPPV4vdkl54N8Zq4JqZixH5okk+mq/liLT64WG7QIKYAofy6fBOf2CYlWc
-	fW9L0cr7+KXu6hAy7eqSUEw/oGFbaAc=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x4RcMsavL8X9izNjBQA5DLXQXAwKz3oWlqtVxkHPLic=;
+	b=ZyXFmDHQ1wjsJocoRbbN7AdG0zqnNr6WcutyqRuFR5+Itxi4xEjvdEfqqs79b9gKpAhJiD
+	Tlh2oHEDJhZEmKFKgMM8Od4DJI8hga3tkCJHSU0T2fwdzHt3Z16LuERHA7QJjyxj9vfoH+
+	jmKiQpFHJ5AeeXC5tR7hajKAXxw9mfg=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	stable@vger.kernel.org
-Subject: [PATCH] KVM: SVM: Fix redundant updates of LBR MSR intercepts
-Date: Mon, 15 Dec 2025 19:26:54 +0000
-Message-ID: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: [PATCH v3 00/26] Nested SVM fixes, cleanups, and hardening
+Date: Mon, 15 Dec 2025 19:26:55 +0000
+Message-ID: <20251215192722.3654335-2-yosry.ahmed@linux.dev>
+In-Reply-To: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
+References: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-svm_update_lbrv() always updates LBR MSRs intercepts, even when they are
-already set correctly. This results in force_msr_bitmap_recalc always
-being set to true on every nested transition, essentially undoing the
-hyperv optimization in nested_svm_merge_msrpm().
+A group of semi-related fixes, cleanups, and hardening patches for nSVM.
+This series doubled in size between v2 and v3, but it's Sean's fault for
+finding more bugs that needed fixing.
 
-Fix it by keeping track of whether LBR MSRs are intercepted or not and
-only doing the update if needed, similar to x2avic_msrs_intercepted.
+The series is essentially a group of related mini-series stitched
+together for syntactic and semantic dependencies. The first 19 patches
+(except patch 3) are all optimistically CC'd to stable as they are fixes
+or refactoring leading up to bug fixes. Although I am not sure how much
+of that will actually apply to stable trees.
 
-Avoid using svm_test_msr_bitmap_*() to check the status of the
-intercepts, as an arbitrary MSR will need to be chosen as a
-representative of all LBR MSRs, and this could theoretically break if
-some of the MSRs intercepts are handled differently from the rest.
+Patches 1-3 here are v2 of the last 3 patches in in the LBRV fixes
+series [1]. The first 3 patches of [1] are already in kvm/master. The
+rest of this series is v2 of [2].
 
-Also, using svm_test_msr_bitmap_*() makes backports difficult as it was
-only recently introduced with no direct alternatives in older kernels.
+Patches 4-14 are fixes for failure handling in the nested VMRUN and
+#VMEXIT code paths, ending with a nice unified code path for handling
+VMRUN failures as suggested by Sean. Within this block, patches 7-12 are
+refactoring needed for patches 13-14.
 
-Fixes: fbe5e5f030c2 ("KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- arch/x86/kvm/svm/svm.c | 9 ++++++++-
- arch/x86/kvm/svm/svm.h | 1 +
- 2 files changed, 9 insertions(+), 1 deletion(-)
+Patches 15-19 are fixes for missing or made-up consistency checks.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 10c21e4c5406f..9d29b2e7e855d 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -705,7 +705,11 @@ void *svm_alloc_permissions_map(unsigned long size, gfp_t gfp_mask)
- 
- static void svm_recalc_lbr_msr_intercepts(struct kvm_vcpu *vcpu)
- {
--	bool intercept = !(to_svm(vcpu)->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK);
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	bool intercept = !(svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK);
-+
-+	if (intercept == svm->lbr_msrs_intercepted)
-+		return;
- 
- 	svm_set_intercept_for_msr(vcpu, MSR_IA32_LASTBRANCHFROMIP, MSR_TYPE_RW, intercept);
- 	svm_set_intercept_for_msr(vcpu, MSR_IA32_LASTBRANCHTOIP, MSR_TYPE_RW, intercept);
-@@ -714,6 +718,8 @@ static void svm_recalc_lbr_msr_intercepts(struct kvm_vcpu *vcpu)
- 
- 	if (sev_es_guest(vcpu->kvm))
- 		svm_set_intercept_for_msr(vcpu, MSR_IA32_DEBUGCTLMSR, MSR_TYPE_RW, intercept);
-+
-+	svm->lbr_msrs_intercepted = intercept;
- }
- 
- void svm_vcpu_free_msrpm(void *msrpm)
-@@ -1221,6 +1227,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
- 	}
- 
- 	svm->x2avic_msrs_intercepted = true;
-+	svm->lbr_msrs_intercepted = true;
- 
- 	svm->vmcb01.ptr = page_address(vmcb01_page);
- 	svm->vmcb01.pa = __sme_set(page_to_pfn(vmcb01_page) << PAGE_SHIFT);
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index c856d8e0f95e7..dd78e64023450 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -336,6 +336,7 @@ struct vcpu_svm {
- 	bool guest_state_loaded;
- 
- 	bool x2avic_msrs_intercepted;
-+	bool lbr_msrs_intercepted;
- 
- 	/* Guest GIF value, used when vGIF is not enabled */
- 	bool guest_gif;
+Patches 20-22 are renames and cleanups.
 
-base-commit: 8a4821412cf2c1429fffa07c012dd150f2edf78c
+Patches 23-26 add hardening to reading the VMCB12, caching all used
+fields in the save area to prevent theoritical TOC-TOU bugs, sanitizing
+used fields in the control area, and restricting accesses to the VMCB12
+through guest memory.
+
+v2 -> v3:
+- Dropped updating nested_npt_enabled() to check
+  guest_cpu_cap_has(X86_FEATURE_NPT), instead clear the NP_ENABLE bit in
+  the cached VMCB12 if the guest vCPU doesn't have X86_FEATURE_NPT.
+- Patches 4-14 are all new, mostly from reviews on v2.
+- The consistency checks were split into several patches, one per added
+  or removed consistency check.
+- Added a patch to cleanup definitions in svm.h as suggested by Sean,
+  separate from introducing new definitions.
+- Patch 'KVM: nSVM: Simplify nested_svm_vmrun()' was organically dropped
+  as the simplifications happened incrementally across other patches.
+- Patch 'KVM: nSVM: Sanitize control fields copied from VMCB12' was
+  reworked to do the sanitization when copying to the cached VMCB12 (as
+  opposed to when constructing the VMCB02).
+
+Yosry Ahmed (26):
+  KVM: SVM: Switch svm_copy_lbrs() to a macro
+  KVM: SVM: Add missing save/restore handling of LBR MSRs
+  KVM: selftests: Add a test for LBR save/restore (ft. nested)
+  KVM: nSVM: Always inject a #GP if mapping VMCB12 fails on nested VMRUN
+  KVM: nSVM: Triple fault if mapping VMCB12 fails on nested #VMEXIT
+  KVM: nSVM: Triple fault if restore host CR3 fails on nested #VMEXIT
+  KVM: nSVM: Drop nested_vmcb_check_{save/control}() wrappers
+  KVM: nSVM: Call enter_guest_mode() before switching to VMCB02
+  KVM: nSVM: Make nested_svm_merge_msrpm() return an errno
+  KVM: nSVM: Call nested_svm_merge_msrpm() from enter_svm_guest_mode()
+  KVM: nSVM: Call nested_svm_init_mmu_context() before switching to
+    VMCB02
+  KVM: nSVM: Refactor minimal #VMEXIT handling out of
+    nested_svm_vmexit()
+  KVM: nSVM: Unify handling of VMRUN failures with proper cleanup
+  KVM: nSVM: Clear EVENTINJ field in VMCB12 on nested #VMEXIT
+  KVM: nSVM: Drop the non-architectural consistency check for NP_ENABLE
+  KVM: nSVM: Add missing consistency check for nCR3 validity
+  KVM: nSVM: Add missing consistency check for hCR0.PG and NP_ENABLE
+  KVM: nSVM: Add missing consistency check for EFER, CR0, CR4, and CS
+  KVM: nSVM: Add missing consistency check for event_inj
+  KVM: SVM: Rename vmcb->nested_ctl to vmcb->misc_ctl
+  KVM: SVM: Rename vmcb->virt_ext to vmcb->misc_ctl2
+  KVM: SVM: Use BIT() and GENMASK() for definitions in svm.h
+  KVM: nSVM: Cache all used fields from VMCB12
+  KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
+  KVM: nSVM: Sanitize control fields copied from VMCB12
+  KVM: nSVM: Only copy NP_ENABLE from VMCB01's misc_ctl
+
+ arch/x86/include/asm/svm.h                    |  96 ++--
+ arch/x86/kvm/svm/nested.c                     | 536 +++++++++++-------
+ arch/x86/kvm/svm/sev.c                        |   4 +-
+ arch/x86/kvm/svm/svm.c                        |  68 +--
+ arch/x86/kvm/svm/svm.h                        |  51 +-
+ arch/x86/kvm/x86.c                            |   3 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/include/x86/processor.h     |   5 +
+ tools/testing/selftests/kvm/include/x86/svm.h |  14 +-
+ .../selftests/kvm/x86/svm_lbr_nested_state.c  | 155 +++++
+ 10 files changed, 631 insertions(+), 302 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
+
+base-commit: 58e10b63777d0aebee2cf4e6c67e1a83e7edbe0f
 -- 
-2.51.2.1041.gc1ab5b90ca-goog
+2.52.0.239.gd5f0c6e74e-goog
 
 
