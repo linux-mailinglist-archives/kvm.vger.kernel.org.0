@@ -1,79 +1,157 @@
-Return-Path: <kvm+bounces-65972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E86CBEB02
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:36:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BB34CBEC5B
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:55:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C0AAD302699B
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:34:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E75D3027DAB
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E875336EFB;
-	Mon, 15 Dec 2025 15:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3BBB30BBB7;
+	Mon, 15 Dec 2025 15:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Q/ZJRpNa";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3Urpfkig"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgTYehs+"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B552C3260;
-	Mon, 15 Dec 2025 15:34:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F0D2D73B2;
+	Mon, 15 Dec 2025 15:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765812875; cv=none; b=p22Cp6W+xnSKwtLv2BX5y743dJPfT8vUnKDvaWLMes2XGmEydj7MHHrZopT5d74dd9VPQJM7z/3+cl5lG2qFm10px4PngAED0jf/M6Nxm9zt1Q0h6pV5O9Zw/FJK6X8ARY4bDL1iRgeczcD1PnF4FpKIRxdDUnOBfkhfmkjKYe8=
+	t=1765813805; cv=none; b=FEdpi6MC9bxBW12Azt3/jdheh/+gns3y/kSnJdSODXEd6EdJsQCSb3ETP1ZdHwhVLeRnY6zY5gMDiAo65k8S0GUFl4r5NAGRoSMjSWAB5VwVgWLFYgGxRouBvvv3gyZDxiTUME84MS95kZc3JP7Fs1surkE4jOQEozd5llJG4jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765812875; c=relaxed/simple;
-	bh=6mcqi0t11lDbGbdYjLvQGUCFj03vrOZDiW1bccX/Ht0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NAa6bZHmNBeDAh9qLEAPzTxdNRuhiWalhEgkNLxfOkjCkWpsq5Oy494gMoDHL76rTaCpG+MCrH7//TdNxdgAiFLO2XFWFhF8YjY//kHSR6uEvChrKxgDcLXJtkYmlCE3WiSHS1VJPC7ZKZdyKcpDV981DOmHQ+NRFqnxppJtW0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Q/ZJRpNa; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3Urpfkig; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1765812868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6mcqi0t11lDbGbdYjLvQGUCFj03vrOZDiW1bccX/Ht0=;
-	b=Q/ZJRpNacj/OS2rFIE1atKIEhuiQZMp9bQnDXPYnZtoKFKfNhycMxS7mR5qRztOOaNBA0p
-	FCYnTdhaU06TiJvvveJdCNebTZ9ceHbqC4NGa4gsFIWPy+Y5PDStFPzofqsG2sdCJxu1fh
-	v0lCXD3oxMjDsO27OLU8xTTx8Z0ApR0J73FKUHmBq+1EK0kJwVvCR5o7QLdXQ87eo4n+Kp
-	+4jLsgK7heBFescra9wxRxw/dhsNCuyeYKKbOeH/lyqnEGThtdWWlujslLaQs68B2p/ksy
-	KtOjcdEh6cdSH3hvOTXfzMBqB3MbKSaQowvLPFCH/AziQ2b9bM+g5YAhb/eEyg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1765812868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6mcqi0t11lDbGbdYjLvQGUCFj03vrOZDiW1bccX/Ht0=;
-	b=3UrpfkigXFWRDAMfkUoesJG10bjHB4DyHpJiE2hDLwCSEyYb7LaYq4iQ0cBDJDjDgOw4kW
-	9U64RzSmCJgVbgBw==
-To: Song Gao <gaosong@loongson.cn>, maobibo@loongson.cn, chenhuacai@kernel.org
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] LongArch: KVM: Add some maccros for AVEC
-In-Reply-To: <20251128091125.2720148-2-gaosong@loongson.cn>
-References: <20251128091125.2720148-1-gaosong@loongson.cn>
- <20251128091125.2720148-2-gaosong@loongson.cn>
-Date: Mon, 15 Dec 2025 16:34:27 +0100
-Message-ID: <875xa7ep30.ffs@tglx>
+	s=arc-20240116; t=1765813805; c=relaxed/simple;
+	bh=6lXuSDV9n2orlCipXDqKPqEz8td46vUDn+RSqCKCvFE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a4Y2PiRJM5KZPt6fvZ3P1yxDGScqiTXNEtNzC51Pe83hZwvH+h4cS+A6b0YME2mis0wqNrXn9hucyeVhZqhhYcoRq48ZtRc1oIWZ7112lZupxkgAtHvqFFDq62KJP4AOKjuo1mJMTTHJuQOsCRn3z8i50mrjcEzQcu+o9xpjSuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DgTYehs+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B8E1C4CEF5;
+	Mon, 15 Dec 2025 15:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765813805;
+	bh=6lXuSDV9n2orlCipXDqKPqEz8td46vUDn+RSqCKCvFE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DgTYehs+enlChOQva9sp3QMiEhj361iK+nVkuPSwHOPJTdPc2HF8vtcufPbn6ewzf
+	 K0kl1TnmEh1h2AW6peaqXC78yPIi9GoHJU6VzzGSGh1xgFnOdenxdA9krxEgT+/K8d
+	 sd0tXie6Ln+4ou2Bljmq/J/eBipSlJFP/wtlnrLfKFCBWTDu5JsK2cSLULYI87DDGu
+	 HK3hi3sO1Ef+Y7m/K9+Xrxb2R4MpFSov8Y6G1kQhwbiDbvOg06pKEr/muzecN2SqFv
+	 qQq8Q6EcmC+rhR+lh+meIO0ajEV+sK+5W9mK4FRA8DYNvu/hEv4mLMP271GcqgS+In
+	 ITPxGdtQ0ksTQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vVApn-0000000CoVQ-0LU0;
+	Mon, 15 Dec 2025 15:50:03 +0000
+Date: Mon, 15 Dec 2025 15:50:02 +0000
+Message-ID: <86fr9boic5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 23/32] KVM: arm64: gic-v5: Bump arch timer for GICv5
+In-Reply-To: <20251212152215.675767-24-sascha.bischoff@arm.com>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+	<20251212152215.675767-24-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Nov 28 2025 at 17:11, Song Gao wrote:
+On Fri, 12 Dec 2025 15:22:43 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> Now that GICv5 has arrived, the arch timer requires some TLC to
+> address some of the key differences introduced with GICv5.
+> 
+> For PPIs on GICv5, the set_pending_state and queue_irq_unlock irq_ops
+> are used as AP lists are not required at all for GICv5. The arch timer
+> also introduces an irq_op - get_input_level. Extend the
+> arch-timer-provided irq_ops to include the two PPI ops for vgic_v5
+> guests.
+> 
+> When possible, DVI (Direct Virtual Interrupt) is set for PPIs when
+> using a vgic_v5, which directly inject the pending state in to the
+> guest. This means that the host never sees the interrupt for the guest
+> for these interrupts. This has two impacts.
+> 
+> * First of all, the kvm_cpu_has_pending_timer check is updated to
+>   explicitly check if the timers are expected to fire.
+> 
+> * Secondly, for mapped timers (which use DVI) they must be masked on
+>   the host prior to entering a GICv5 guest, and unmasked on the return
+>   path. This is handled in set_timer_irq_phys_masked.
+> 
+> The final, but rather important, change is that the architected PPIs
+> for the timers are made mandatory for a GICv5 guest. Attempts to set
+> them to anything else are actively rejected. Once a vgic_v5 is
+> initialised, the arch timer PPIs are also explicitly reinitialised to
+> ensure the correct GICv5-compatible PPIs are used - this also adds in
+> the GICv5 PPI type to the intid.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c     | 114 +++++++++++++++++++++++++++-----
+>  arch/arm64/kvm/vgic/vgic-init.c |   9 +++
+>  arch/arm64/kvm/vgic/vgic-v5.c   |   6 +-
+>  include/kvm/arm_arch_timer.h    |   7 +-
+>  include/kvm/arm_vgic.h          |   5 ++
+>  5 files changed, 119 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 6f033f6644219..b0a5a6c6bf8da 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -56,6 +56,17 @@ static struct irq_ops arch_timer_irq_ops = {
+>  	.get_input_level = kvm_arch_timer_get_input_level,
+>  };
+>  
+> +static struct irq_ops arch_timer_irq_ops_vgic_v5 = {
+> +	.get_input_level = kvm_arch_timer_get_input_level,
+> +	.set_pending_state = vgic_v5_ppi_set_pending_state,
+> +	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
+> +};
+> +
+> +static bool vgic_is_v5(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5;
+> +}
+> +
 
-> Add some maccros for AVEC interrupt controller, so the dintc can use
-> those maccros.
+Drive-by comment: you also have
 
-/maccros/macros/
+arch/arm64/kvm/vgic/vgic.h:static inline bool vgic_is_v5(struct kvm *kvm)
+include/kvm/arm_vgic.h:#define gic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
 
-Also your change log fails to mention that this updates the AVEC
-driver, which is a nice change but unrelated to $subject.
+At least two of them have to die.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
