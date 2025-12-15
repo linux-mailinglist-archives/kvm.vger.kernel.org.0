@@ -1,157 +1,124 @@
-Return-Path: <kvm+bounces-65979-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65980-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BB34CBEC5B
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:55:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A32CCBED0F
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:02:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E75D3027DAB
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:50:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1AAE03070142
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3BBB30BBB7;
-	Mon, 15 Dec 2025 15:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6068230BB88;
+	Mon, 15 Dec 2025 15:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgTYehs+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fQqzj/cB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F0D2D73B2;
-	Mon, 15 Dec 2025 15:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916B530F531
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 15:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765813805; cv=none; b=FEdpi6MC9bxBW12Azt3/jdheh/+gns3y/kSnJdSODXEd6EdJsQCSb3ETP1ZdHwhVLeRnY6zY5gMDiAo65k8S0GUFl4r5NAGRoSMjSWAB5VwVgWLFYgGxRouBvvv3gyZDxiTUME84MS95kZc3JP7Fs1surkE4jOQEozd5llJG4jQ=
+	t=1765814147; cv=none; b=RspjF+fhWfjiUG/EHS0ADQ4jmW1Ml0/PONsmPC6BQKt1OqP6XMADdozwx98fA4VPBDerSuT4RFWJ2wTvmErOf+27PQjIJ00t9sLaGkbewgJCjP/QlD33u/JwP5PFsvEnHfynyAEOX2c4eoR/Ci+NNRdLe6BjkDHHex6SzpzOZEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765813805; c=relaxed/simple;
-	bh=6lXuSDV9n2orlCipXDqKPqEz8td46vUDn+RSqCKCvFE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a4Y2PiRJM5KZPt6fvZ3P1yxDGScqiTXNEtNzC51Pe83hZwvH+h4cS+A6b0YME2mis0wqNrXn9hucyeVhZqhhYcoRq48ZtRc1oIWZ7112lZupxkgAtHvqFFDq62KJP4AOKjuo1mJMTTHJuQOsCRn3z8i50mrjcEzQcu+o9xpjSuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DgTYehs+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B8E1C4CEF5;
-	Mon, 15 Dec 2025 15:50:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765813805;
-	bh=6lXuSDV9n2orlCipXDqKPqEz8td46vUDn+RSqCKCvFE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DgTYehs+enlChOQva9sp3QMiEhj361iK+nVkuPSwHOPJTdPc2HF8vtcufPbn6ewzf
-	 K0kl1TnmEh1h2AW6peaqXC78yPIi9GoHJU6VzzGSGh1xgFnOdenxdA9krxEgT+/K8d
-	 sd0tXie6Ln+4ou2Bljmq/J/eBipSlJFP/wtlnrLfKFCBWTDu5JsK2cSLULYI87DDGu
-	 HK3hi3sO1Ef+Y7m/K9+Xrxb2R4MpFSov8Y6G1kQhwbiDbvOg06pKEr/muzecN2SqFv
-	 qQq8Q6EcmC+rhR+lh+meIO0ajEV+sK+5W9mK4FRA8DYNvu/hEv4mLMP271GcqgS+In
-	 ITPxGdtQ0ksTQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vVApn-0000000CoVQ-0LU0;
-	Mon, 15 Dec 2025 15:50:03 +0000
-Date: Mon, 15 Dec 2025 15:50:02 +0000
-Message-ID: <86fr9boic5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 23/32] KVM: arm64: gic-v5: Bump arch timer for GICv5
-In-Reply-To: <20251212152215.675767-24-sascha.bischoff@arm.com>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-24-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765814147; c=relaxed/simple;
+	bh=QLYTCjX2EZ84iw7nVlOSDJ86AmUekPGCFfsO1BJfBhI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R0HZkQDfaQZAo/3tn7PNMZsuz8kU5csl/dHF/nFhkN4c5BGNkCWPwn91mIdO2xGJq3+LC+rSYpbtkelXa2uah/P+PNpnOY0aPPL1ln6mmEMvFUqf8udl3MwgFVGi1kIj4yZtyX9cB+pPMpdGLed8GcTKMWjzXSOd7pFQL9wEy4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fQqzj/cB; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-430fb8d41acso508530f8f.1
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 07:55:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765814144; x=1766418944; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bw36UYHiJwTnMGEVt20djLkGP5pKUV/ucx4MipOtVRg=;
+        b=fQqzj/cBcSf/atyFBlbzgifsWOzxlMREZdGYiGtiUOcb31A121dTfAftKqvhjwjpCf
+         ZeCvFlTTqxZmuKLMKHNcFkjSZA0m3KPTBr+zRgmNXKLRsUaFthCevOuLpPinRXXSjPvi
+         +mlbQmukxhAztjo/zmQdlM5X6Bhc1490v+HqDJLQ2W7my19UOGTFxsNgd0VHfYqTnHmg
+         t5Gaq1cAuNC3dp9WAPebGHlHMuDdRQQ7lLXE1nN9FfpnlDkixk9/mrXUC2kqu/621M2t
+         IRbHL+cUHPQNi7kOkrbYhtix7E9pAP73J9qfACl0OONgf9UNwh1DjaMInPSSykpoF05m
+         SQZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765814144; x=1766418944;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bw36UYHiJwTnMGEVt20djLkGP5pKUV/ucx4MipOtVRg=;
+        b=c5i+QvnQ0AXvJVUKUFae/Wr00iCXE40qy80dSfN/ymLGRpRCNo93NluEzJzKFTf0jI
+         QBsDkFzxOmqTaBEGvSx7PLz88ATt1g/YyHXM5XDIY9cJSQJ1fP33NGfHcuZ6EXZ1jZEC
+         1QFV+2tntqQOzL7o7s0epOxqRuc7LoNjQsSrki7ISZOyKcfZBaefwCSO8og/XscdDcJ3
+         vqqbUpYsA3V2ryK7LMiTWHr5l76f32ZMbR1pF+ruRKzyNUntHplKocnD6JkRZMVIZnWL
+         lX1DDLRndfrEbOGWeKuVHb7IJs7SQScdJMoL0gPyrgjpxzpPyOMSFsGEPGF5Jg7lJ3It
+         QUQQ==
+X-Gm-Message-State: AOJu0YxB9zwAkOSKuTGxxbOuTLvMAgcvER8rG7AB1fa1T601NKYBK0JT
+	CmMf9snGZRr88s0Dt3Z/iPXSLt2C5trbMnF8AzlNeDXnvolfVZaob+z8/0B9W1KFiWuXXfbZpWq
+	KM9DVT3+yntQim/EVYhn7HNt1B/QgqPo1CPrzmKq2m9i0/dXC9pKBieQQP7hP1iVk3xfj+Zko4r
+	MUSYHIRuSMd0T5CJk4a4xOx6SO7G4=
+X-Google-Smtp-Source: AGHT+IG6+F6Un10L9/EjIC++FIOUIVfTuu7QmmdObJt5Z2W5GEqSeoJWiEHDWPn2o3uOCFFO3GyVjgiaTg==
+X-Received: from wrbee4.prod.google.com ([2002:a05:6000:2104:b0:42f:b38a:60db])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2303:b0:430:fd84:317a
+ with SMTP id ffacd0b85a97d-430fd843502mr3958203f8f.38.1765814143740; Mon, 15
+ Dec 2025 07:55:43 -0800 (PST)
+Date: Mon, 15 Dec 2025 15:55:37 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251215155542.3195173-1-tabba@google.com>
+Subject: [PATCH v1 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Cc: tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 12 Dec 2025 15:22:43 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> Now that GICv5 has arrived, the arch timer requires some TLC to
-> address some of the key differences introduced with GICv5.
-> 
-> For PPIs on GICv5, the set_pending_state and queue_irq_unlock irq_ops
-> are used as AP lists are not required at all for GICv5. The arch timer
-> also introduces an irq_op - get_input_level. Extend the
-> arch-timer-provided irq_ops to include the two PPI ops for vgic_v5
-> guests.
-> 
-> When possible, DVI (Direct Virtual Interrupt) is set for PPIs when
-> using a vgic_v5, which directly inject the pending state in to the
-> guest. This means that the host never sees the interrupt for the guest
-> for these interrupts. This has two impacts.
-> 
-> * First of all, the kvm_cpu_has_pending_timer check is updated to
->   explicitly check if the timers are expected to fire.
-> 
-> * Secondly, for mapped timers (which use DVI) they must be masked on
->   the host prior to entering a GICv5 guest, and unmasked on the return
->   path. This is handled in set_timer_irq_phys_masked.
-> 
-> The final, but rather important, change is that the architected PPIs
-> for the timers are made mandatory for a GICv5 guest. Attempts to set
-> them to anything else are actively rejected. Once a vgic_v5 is
-> initialised, the arch timer PPIs are also explicitly reinitialised to
-> ensure the correct GICv5-compatible PPIs are used - this also adds in
-> the GICv5 PPI type to the intid.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arch/arm64/kvm/arch_timer.c     | 114 +++++++++++++++++++++++++++-----
->  arch/arm64/kvm/vgic/vgic-init.c |   9 +++
->  arch/arm64/kvm/vgic/vgic-v5.c   |   6 +-
->  include/kvm/arm_arch_timer.h    |   7 +-
->  include/kvm/arm_vgic.h          |   5 ++
->  5 files changed, 119 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 6f033f6644219..b0a5a6c6bf8da 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -56,6 +56,17 @@ static struct irq_ops arch_timer_irq_ops = {
->  	.get_input_level = kvm_arch_timer_get_input_level,
->  };
->  
-> +static struct irq_ops arch_timer_irq_ops_vgic_v5 = {
-> +	.get_input_level = kvm_arch_timer_get_input_level,
-> +	.set_pending_state = vgic_v5_ppi_set_pending_state,
-> +	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
-> +};
-> +
-> +static bool vgic_is_v5(struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5;
-> +}
-> +
+This series tidies up a few things in the KVM selftests. It addresses an
+error in memory alignment, hardens the arm64 MMU configuration for
+selftests, and fixes minor documentation issues.
 
-Drive-by comment: you also have
+First, for arm64, the series explicitly disables translation table walks
+for the unused upper virtual address range (TTBR1). Since selftests run
+entirely in the lower range (TTBR0), leaving TTBR1 uninitialized but
+active could lead to unpredictable behavior if guest code accesses high
+addresses. We set EPD1 (and TBI1) to ensure such accesses
+deterministically generate translation faults.
 
-arch/arm64/kvm/vgic/vgic.h:static inline bool vgic_is_v5(struct kvm *kvm)
-include/kvm/arm_vgic.h:#define gic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
+Second, the series fixes the `page_align()` implementation in both arm64
+and riscv. The previous version incorrectly rounded up already-aligned
+addresses to the *next* page, potentially wasting memory or causing
+unexpected gaps. After fixing the logic in the arch-specific files, the
+function is moved to the common `kvm_util.h` header to eliminate code
+duplication.
 
-At least two of them have to die.
+Finally, a few comments and argument descriptions in `kvm_util` are
+updated to match the actual code implementation.
 
-	M.
+Based on Linux 6.19-rc1.
 
+Cheers,
+/fuad
+
+Fuad Tabba (5):
+  KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+  KVM: arm64: selftests: Fix incorrect rounding in page_align()
+  KVM: riscv: selftests: Fix incorrect rounding in page_align()
+  KVM: selftests: Move page_align() to shared header
+  KVM: selftests: Fix typos and stale comments in kvm_util
+
+ tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
+ tools/testing/selftests/kvm/include/kvm_util.h        | 9 +++++++--
+ tools/testing/selftests/kvm/lib/arm64/processor.c     | 7 ++-----
+ tools/testing/selftests/kvm/lib/kvm_util.c            | 2 +-
+ tools/testing/selftests/kvm/lib/riscv/processor.c     | 5 -----
+ 5 files changed, 14 insertions(+), 13 deletions(-)
+
+
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
 -- 
-Without deviation from the norm, progress is not possible.
+2.52.0.239.gd5f0c6e74e-goog
+
 
