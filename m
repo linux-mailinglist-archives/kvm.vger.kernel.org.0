@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-65992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDB9CBF270
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 18:09:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46C4DCBF2A3
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 18:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D9B730C1B4D
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:02:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D676304E57E
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D185341ACA;
-	Mon, 15 Dec 2025 16:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145CB341ADF;
+	Mon, 15 Dec 2025 16:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cTk66yW9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MbO/NS1e"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39DB34164B
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95214341076
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765817522; cv=none; b=M15hDvLSCk/tqHcxKId8He41CTjPRovbVgWllKZ9whFvxL4BGeLAhAeL8wKSm2Aarf0XRaL+y0qrFJ89fMAoXHQ4ZpLLNoAM4p5WNmJ6jkd6Paa3yJIf2bm3GOBsd1XhKlZJROy0AI6ZkDkVlb6uC3oadTCXsAbujBS0zAv8Tn4=
+	t=1765817523; cv=none; b=FT23FHVfxGSRnnd66x+Z/PgGzeYDSEv2jtXaC+6mRttWgVtItPqITEwze1RUFaVHtArb8RSFNtqW8qlSuDSgyKXQa+o4fM8zTvXORbJldkHL847OSFMilXydl5L9pc9q1vFIDKVBLbCt9SeI4cVbuJgC4WJ2XzYXFwFiQ+gBhmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765817522; c=relaxed/simple;
-	bh=RV/SRDs2NYKR4bNyg9iD41K74i8IniewHpHDgBIC6Q4=;
+	s=arc-20240116; t=1765817523; c=relaxed/simple;
+	bh=ayln4Fw+8UlRvvb+n2Kfq+LyehdpOH5myyhVGffmoAA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=filICBlont5uK7hMYuHklbP4M6fjnc6PnLwhgsql07wLnno9gvoYcpEzCJuuFU6Sm99fHSciKil1kyzAHAOly6Pz2E1FVFiOJX5a78sEDDnlepIYjRm0jj0Mg1lE8HM+wIgnvRcPCGQ3Yw3B4OxLgG+ly3pRtHIszaC7UgJuSjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cTk66yW9; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=CvQTKLZwJFiEQyQNRsxRSQtJNfL2g2T2vPrhezMr5h1brKWEGkO0DYPt2gjyoJqpNufKM0HKsXX+gCpRO4ncr+0DmG7LttCmpPzbguIe3hp7atTH71to3knjuMNgug4/u7zON1YNeJPhwvzmas/1JCl/c0EDc5okmd9pFOGj16I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MbO/NS1e; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4788112ec09so26841355e9.3
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:52:00 -0800 (PST)
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-477cf2230c8so35923115e9.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:52:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765817519; x=1766422319; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765817520; x=1766422320; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ozb3WNjr0r/hE1f6GMZd7Idc+wYYTjRgIGjeMMU1tjI=;
-        b=cTk66yW9JMT12Wx/qurgbYtBwsZwWNwJ5NsOyyUzFUcm/uTqw4tmOw3hVPEyTlTQ/y
-         PU6+sYpY7LkpxzM6zYnZqKsPfN/pfsgo/1BkFgkZA4NZ4tHhVZw8A3XkCobR827kgw8Y
-         o7vT6fRsovLPgeWTXUL0xSZLt3TejXnzYp0QciH41q868KALsl2yA23R7zI7Rq0UNduS
-         faefz+6XWVXMgV7armFHbqxM5RVslkqUnaUDfw6DZztmp1fDD5nbE1QKR2aVjPKtmwqQ
-         7rLU9+DqMnBdWWhAq5XQbnHQBd1b83k4Io4pbl1vXRKux+cgO1BLweH9BRuk75q+5Fpq
-         laCQ==
+        bh=VGTJpqAtjnaQAGGRy8gsotmE8IXAZ0B2ScsPjP/ESd0=;
+        b=MbO/NS1e8Qs8+CdPAEuqvg76eJMLmcRT7rsL1/T1q7f2/VlxZNErOFoTM8wtACYwYW
+         JCz7wYr6sUu4NvW+S2CWQSRyEGzRgoIOQLSRL2mcezvLu0u4CpW09cQw+7TOZo6ibHxi
+         ddKQyLq+0o0KX5zIIeeMSgYjhtWkvXqKbagkpJjGXJbecKkJtJNlq6igw3/TNOrst3ts
+         8XS4djG6vuEMrfF6FFUkjJ+UJxWWg4Oev+BfEnSRGVw2e8AdS4A8lBHTyGlTjY5Fw2dM
+         BrGtjv9R1R5SX0cev7UY8qEx6cHJ6eQR7oH/6RzfldtCJ5ajHYsLhHPFBigXP00/zWnq
+         iBlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765817519; x=1766422319;
+        d=1e100.net; s=20230601; t=1765817520; x=1766422320;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ozb3WNjr0r/hE1f6GMZd7Idc+wYYTjRgIGjeMMU1tjI=;
-        b=X5QTMgBpeqOawhJSmpKM0KddBhtbrNxp+OzJ2kwWgkdu3AF3eiVXofvt2P/Nhcu0MO
-         s6KCVPgpUHaVk73F67fRDwTNVj0l9Q1QGeK2nL5X4mbBG+yY6l6R7dFB5Bi1Lk/kvgLt
-         NCxYBGTUcY6VNgdTBYPpqDzJq6qQlMfHpPtbQLL7iLo3KYbXKeOile+hDWaRHathfCM6
-         Ky1XdPxj0zI8viBPNX0O6CFB/htqYINIxyHWbgSmR0U8KS44DJSUOrimtAN9aCay59ro
-         XyK+qZC7heme/bIrBmTPkgdHCv8JNwlokCu6PR+dm+gbZGc2lKuXDj8kUQU2qHg2VVEd
-         3Jdw==
-X-Gm-Message-State: AOJu0Yye5q/LM0906TBJ/uhR7wLqgeylUUcRkpOZAa8WcHJ5yTeJxTV+
-	ooqVehCQD9Gd7gAq9lDAzcseupK8i4ygQsCahzx8MIVRKCBFv1Ikm4zPdRg96lXNIi9moEkt2l5
-	/7YpRPjWP+I4XMuuyf8Y6OdThbJfHaGK3Kd04cytT4sdCdnPCbOw+Lad3S3YNkCbzcFmiGRokBA
-	2edj2G453zUpNM7pA/Mn5EE35fFGQ=
-X-Google-Smtp-Source: AGHT+IEXfGMQYTlXaZjDRjEyi8ps8t9i1lBXKwi2r5crX0EL+3ytnijgNklZSLLzPd74DIRXBqTJZjRKHA==
-X-Received: from wmbil2.prod.google.com ([2002:a05:600c:a582:b0:47a:7fdc:6925])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:35c9:b0:479:3046:6bb3
- with SMTP id 5b1f17b1804b1-47a8f906f07mr127619025e9.23.1765817519032; Mon, 15
+        bh=VGTJpqAtjnaQAGGRy8gsotmE8IXAZ0B2ScsPjP/ESd0=;
+        b=n/Ij3zEh4Xy84PYrooCWWGPsSgiX5bY1iOnfW9m5ifJn4krr+K/TVUd9zWNA6fsw/t
+         VLBT4htwD6iS358omTCjs0FCbXeun1TmL7BWIgIGD6ddjCKd9bt+zdcNCCY/c4NMk9rJ
+         ug+T3tGiRIQ9r24NVP5YWrSwDrPO3ZX81X8LvEwHmPPKNDi/tYESgndH6EQ7rH+QaWN/
+         2B45LFjjBYoj4NY08sfnOCueCcIG0HFEwXRaM6d6OMAurYzH8nG/pjEvcrrl5fLkZseV
+         FQtr+YvGK2EifANSQsbCqiftzDMGuJcuuKDgsKlsEW9F50zwBDOveD0TB35gbR3+Vid2
+         W4VQ==
+X-Gm-Message-State: AOJu0YynXIrswCPzpwcwvhuuGTvq9vUdLOuB2GPauyr6LBaLzO/mep4e
+	atyDaCZfgX9UV0MABuNREiikmpPDZq+NgHvkPJpOYQu5e7B8cktSdp80OG7sYWl3LZgN/thi2nA
+	K9DkzDoLrpCePDD8EAUhYtIZDWniJQMzq/XfsqEEJGCmQfbQkPzrA7XqcPnJhX3klxbIGafx8Lg
+	sI4v9PkkyHwsmG28C+CwI6Ngr5GyM=
+X-Google-Smtp-Source: AGHT+IHdmoXymTwmtDhUo4OPKD55NjfIa2ZaYkUMxOGs0DQTenx1wSRtOp2+NPGnkVJnbSiUoA2tLeeLYg==
+X-Received: from wmbgz10.prod.google.com ([2002:a05:600c:888a:b0:47a:8fa6:6a57])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4f89:b0:477:7a95:b971
+ with SMTP id 5b1f17b1804b1-47a8f90c5b0mr124657005e9.31.1765817519823; Mon, 15
  Dec 2025 08:51:59 -0800 (PST)
-Date: Mon, 15 Dec 2025 16:51:53 +0000
+Date: Mon, 15 Dec 2025 16:51:54 +0000
 In-Reply-To: <20251215165155.3451819-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,8 +72,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251215165155.3451819-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251215165155.3451819-4-tabba@google.com>
-Subject: [PATCH v2 3/5] KVM: riscv: selftests: Fix incorrect rounding in page_align()
+Message-ID: <20251215165155.3451819-5-tabba@google.com>
+Subject: [PATCH v2 4/5] KVM: selftests: Move page_align() to shared header
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -82,34 +82,66 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The implementation of `page_align()` in `processor.c` calculates
-alignment incorrectly for values that are already aligned. Specifically,
-`(v + vm->page_size) & ~(vm->page_size - 1)` aligns to the *next* page
-boundary even if `v` is already page-aligned, potentially wasting a page
-of memory.
+To avoid code duplication, move page_align() to the shared `kvm_util.h`
+header file.
 
-Fix the calculation to use standard alignment logic: `(v + vm->page_size
-- 1) & ~(vm->page_size - 1)`.
+No functional change intended.
 
-Fixes: 3e06cdf10520 ("KVM: selftests: Add initial support for RISC-V 64-bit")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- tools/testing/selftests/kvm/lib/riscv/processor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/include/kvm_util.h    | 5 +++++
+ tools/testing/selftests/kvm/lib/arm64/processor.c | 5 -----
+ tools/testing/selftests/kvm/lib/riscv/processor.c | 5 -----
+ 3 files changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 2eac7d4b59e9..d5e8747b5e69 100644
---- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -28,7 +28,7 @@ bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
- 
- static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
- {
--	return (v + vm->page_size) & ~(vm->page_size - 1);
-+	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 81f4355ff28a..dabbe4c3b93f 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -1258,6 +1258,11 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
+ 	return __vm_enable_cap(vm, KVM_CAP_VM_DISABLE_NX_HUGE_PAGES, 0);
  }
  
++static inline uint64_t page_align(struct kvm_vm *vm, uint64_t v)
++{
++	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
++}
++
+ /*
+  * Arch hook that is invoked via a constructor, i.e. before exeucting main(),
+  * to allow for arch-specific setup that is common to all tests, e.g. computing
+diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+index 607a4e462984..143632917766 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/processor.c
++++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+@@ -21,11 +21,6 @@
+ 
+ static vm_vaddr_t exception_handlers;
+ 
+-static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+-{
+-	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+-}
+-
+ static uint64_t pgd_index(struct kvm_vm *vm, vm_vaddr_t gva)
+ {
+ 	unsigned int shift = (vm->pgtable_levels - 1) * (vm->page_shift - 3) + vm->page_shift;
+diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
+index d5e8747b5e69..f8ff4bf938d9 100644
+--- a/tools/testing/selftests/kvm/lib/riscv/processor.c
++++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+@@ -26,11 +26,6 @@ bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
+ 	return !ret && !!value;
+ }
+ 
+-static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+-{
+-	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+-}
+-
  static uint64_t pte_addr(struct kvm_vm *vm, uint64_t entry)
+ {
+ 	return ((entry & PGTBL_PTE_ADDR_MASK) >> PGTBL_PTE_ADDR_SHIFT) <<
 -- 
 2.52.0.239.gd5f0c6e74e-goog
 
