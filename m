@@ -1,237 +1,299 @@
-Return-Path: <kvm+bounces-65965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED815CBE406
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:21:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ABE5CBE415
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E22D30C27DF
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 14:15:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E4E90305C825
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 14:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AC930EF75;
-	Mon, 15 Dec 2025 14:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4580933B6E5;
+	Mon, 15 Dec 2025 14:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aks/a/Eu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcPhzJ+i"
+	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="mEL9JlPx";
+	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="OeKpuuXr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail186-20.suw21.mandrillapp.com (mail186-20.suw21.mandrillapp.com [198.2.186.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD9930DD1C
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D5C33ADA0
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.2.186.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765807916; cv=none; b=M+P2XYyH3gy58OLAlgJ+Vwq/mlQ51iQ3XPconIcGcJbMOGaRdK9igQKfto9U1dmW2g6dneTtizLa14PH2C26ZYAD4D8WoaA4Uqb48OfdyfXgHBTG6gQ/l4KtGbPBo8DgTTvErP8AdIa0DEsOaSNkks8XhTCRsoKwZ6lZdCKX76c=
+	t=1765808073; cv=none; b=lm5nsc20qdMg+82c1QUaEXsw9/txUcaIn0Ls1TLXAj13uWSq5TpgklSNWKDfumwIjELIIeZDOe/5/FKO7L6eg2QPpZ2jzb/Q++V4Ej/Q9f+kx4ibwvkn/1TaGCxwZymKUAtqK0XIobDea0faxIgsOauMqpF1w1fNs5BJu8dQy3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765807916; c=relaxed/simple;
-	bh=9UhOxOYBAp/VSDR6aFOh9tRFhqEK+BtNWnc9VPwKxA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q9VBmK5fuSG2YxC2EUjFA5GPfCQ4E+8tiGFC5jRRQclKQaT/TTgxggsqx3ToSISep+/BYQNNpgcu0/FMl9Cfgkch60qs8U3NBUbCPhw9qWKnShPcjAyIROosR2Y9NpRI9ysNs5Qa6uOeV05FxWXN2RF0fo5tRoSpFsKDAm3EjfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aks/a/Eu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RcPhzJ+i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765807896;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J90UfQNlZ0RUz7+pu7rYaBkTu5UsQkqFR03KijVsXMk=;
-	b=aks/a/EuAbfXodykXmonP/nyeLXCtFj/PH90o7Eldb9nQdwjaBFXsKlaJ683qeU8decRlk
-	RhTi+kPZvONOkp7fUlBQ6aEIexRFMK3LXduiYJLsvzz1bZ9kqkcuF9ZtI6h04W2V4oPdcj
-	DSXol7Loerqhic4/NcJDrsiCVOyrMu8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-192-3z7hTyX1P0umMLq5zA4PbQ-1; Mon, 15 Dec 2025 09:11:35 -0500
-X-MC-Unique: 3z7hTyX1P0umMLq5zA4PbQ-1
-X-Mimecast-MFC-AGG-ID: 3z7hTyX1P0umMLq5zA4PbQ_1765807894
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430ffa9fd7fso414977f8f.0
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 06:11:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765807894; x=1766412694; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J90UfQNlZ0RUz7+pu7rYaBkTu5UsQkqFR03KijVsXMk=;
-        b=RcPhzJ+iqV7PU10/Q8vCnJRXHQ0FTPOu8UhazlwJh/691j6hBUMjC2rxA9aRWmumGx
-         sOtR0eIhwHnIt/kBb/99rSNIg8UFfpSI5vWyDadDqiRwOz2D6AcTvQVwKXu+EwQMOMaG
-         PUtUH5qEzkjy/jJyXqcaa4tv8PAZYgvocIAOPOpraIqXBc0lS3aKcx3X/5sfCUa2I78U
-         c11wy02izPFsMkzpUCoPhqVZLUp6TH+D5yEyI3+bviO3EB0vuHReo19fwhsezNf85Gnk
-         aa6M0huArKnms0C3w9jBUSXjlfQ6sNYYP2j/CfA71g/epmMM1+hXOWvopzEt+92gZ8o4
-         Q/dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765807894; x=1766412694;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J90UfQNlZ0RUz7+pu7rYaBkTu5UsQkqFR03KijVsXMk=;
-        b=A/mTkwk7zZmaTbG8ewxYofDPOdOjP9p6wqP9dhAu6/FijzpL1UVw1T7N4xCMhmDv23
-         JwL7EFwa7d3/WJGsSllO1XEyB++eMuOQxZym0dvtkC8qt0phkjPIJQYzjuC2cDtDOaEj
-         mhyGM2Ry0HiyS2qtKoKmWzTYiBvwvsOiQoWtQwZE0LGutJYfZhMd3Le9UHXOiSuRGzxe
-         J2LBifno28SEktadoFonuKs7ZHB1SWIxYhztGi4EpG8tvyrIzrH6eVWkMDVFz+InsC0+
-         GpZKtI1e6IpkpozO6+S05OspnAfvYP51+cg/+DoARSjFDRIqdSYQpMMEbQCFDF54Eqeo
-         JMVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3Wwmo+bsIC+DS68SYey3erk/yQzKaSpaqA7S7SWhd5WNlW07Gu9DZ6LulgmXPliD448Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxopQ3IcqmbA3f6Gmz0MFiyZ2iiIFPhVcj9j8fqlfBE2gXvqEAS
-	pu4e/lwo5nWuONZs79j3EF5SDTDICtretqXEgj29qP75Y5pD7EN4IgBgcRSQm/WPkxXD/d425TT
-	dH2VZDz87/5q3RW8qSQMnwtsNKHzT69l0eL2zxIKj/89itI31LWdong==
-X-Gm-Gg: AY/fxX4VSwr8FiPXK4AeeApv2TqjZ3aPvtxNVjPWGcKQgRTOEKExyb/kPzyiR8Nseee
-	zRpGAYkgnADHoTBtB77+lYbIVdppBH1fYKU2njcWPb0ZTL60WBoZ6+h2v3dDrKl7p9FH1TYKisy
-	SiwdurAvIqN1eczIbsfn9HAEw2oHxkF8/zBkV89nshtl7hXCDJQ+4peNyKRj7ab7zegouYMsoez
-	ZrRTUrx9i6SY0KFY0NWcYgsLj/DdQcr1Zt4Ca06YgANmHT6w9DJauTkPKfMHOYYn+tT5VfA2HgH
-	77khJY9p8JtihmhskDtXAoI7lPfCescTYR13JM2n5mReug/3lxQMXsJ4dSHH/QwFni4PjGKd3ru
-	VFloSgPv6oruWAETe
-X-Received: by 2002:a05:6000:2909:b0:42b:3b55:8929 with SMTP id ffacd0b85a97d-42fb44bb495mr11365680f8f.19.1765807894120;
-        Mon, 15 Dec 2025 06:11:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEjJ8SuWUiguDFoeMlrC0RUXN9FuGWx/+8j2dVxYD6YOL63XnaR5zt7GAKfr25wYST/+i8ycQ==
-X-Received: by 2002:a05:6000:2909:b0:42b:3b55:8929 with SMTP id ffacd0b85a97d-42fb44bb495mr11365608f8f.19.1765807893485;
-        Mon, 15 Dec 2025 06:11:33 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.203.161])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f984a268sm9673818f8f.1.2025.12.15.06.11.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 06:11:32 -0800 (PST)
-Date: Mon, 15 Dec 2025 15:11:22 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
-	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
- <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
- <aTw0F6lufR/nT7OY@devvm11784.nha0.facebook.com>
+	s=arc-20240116; t=1765808073; c=relaxed/simple;
+	bh=r4pR/WZWgxpWH4YZ0HxKYJaXnqglOE1l6sGyaVhvDZQ=;
+	h=From:Subject:To:Cc:Message-Id:Date:MIME-Version:Content-Type; b=gMmnEZ/Ofp0vE5425tdc3kFZQgHVm5+PT76OWXqZcXOEaZKZzp6DtRSB029bI78trL5/cA2/fY6cEvF4mCC1A3ZML90A3bs+axXsAZXvNPX5OhYb5GZHV+pOdI0uY4RxzWpA6rRVfGSNwZ2w4wVi6SuPzu1balSOoeIiHaOvh+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=mEL9JlPx; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=OeKpuuXr; arc=none smtp.client-ip=198.2.186.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vates.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
+	s=mte1; t=1765808070; x=1766078070;
+	bh=MQWFgBdoUX1kknCFzw0JsezB1mvx5zyVSGtfO5OP/iE=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=mEL9JlPx817lBSFVYTcnN5mP/HHbJKUBzdiibHdGvDqX+1U59tr4mN72VT0esMZBJ
+	 UKoPtLHhkpBS7Y+FhSzVWX/hGZE7Qk1KzOdyNPuYajz8o6qc3inY3UTf0wdSd0bB4P
+	 E3H2bToD9uKhPcueQzggxfPfs1Rz6B/vfz/V8DuYI0euRckMveZi7KM6Qq8SKGbhNF
+	 lr9yN+2Em+KpW29l0Ry9LhmLVKMsE6iQuyLqzGY31SV7Psk5P+4oib6FU2nbK2/Bcv
+	 al+2rhnM2Yq9Q+0f02XBXfy8qYWpRAyOYMUpLf4SELTxuQ/ngiK9lM6idZcQRGDaTP
+	 9cS5cHxTjf2sw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
+	t=1765808070; x=1766068570; i=thomas.courrege@vates.tech;
+	bh=MQWFgBdoUX1kknCFzw0JsezB1mvx5zyVSGtfO5OP/iE=;
+	h=From:Subject:To:Cc:Message-Id:Feedback-ID:Date:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:CC:Date:Subject:From;
+	b=OeKpuuXrgQdVn/tQZ237426N21Cdh5hvXhvfNomkZHlUGIhchbCah6tPZMLMhTVlX
+	 wbjXCn2ptHrzUwDB2cAFeD8/zlQYadvR4sneZypQ2QRFPvXlrUpfNd/NAQdZ1i13vY
+	 lFFMcHeT9kP5rfEJkoM+nxHf9zNK3xUeC6tc+24aoDiGUZoxhd6UaPvfJqNOni4gaA
+	 4czhixyHXLLnFo93ctLgz0EmR0jLFBA0B48DKTa/R2J4R59YVw6MDXpc4+1CH6TFiG
+	 ymz7ZseP51yMKDni5quaFtBfmFabBexZvL10ns15F/uXbfcKl8/YV9fhe7VfkDEEb7
+	 0FFye9Em6M4VQ==
+Received: from pmta10.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
+	by mail186-20.suw21.mandrillapp.com (Mailchimp) with ESMTP id 4dVMWV5bybzFCX5GX
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:14:30 +0000 (GMT)
+From: "Thomas Courrege" <thomas.courrege@vates.tech>
+Subject: =?utf-8?Q?[PATCH=20v3]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
+Received: from [37.26.189.201] by mandrillapp.com id 0784edf2bbc04cf6bec766be6a34f817; Mon, 15 Dec 2025 14:14:30 +0000
+X-Mailer: git-send-email 2.52.0
+X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
+X-Bm-Transport-Timestamp: 1765808068580
+To: ashish.kalra@amd.com, corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com, nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com, thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, "Thomas Courrege" <thomas.courrege@vates.tech>
+Message-Id: <20251215141417.2821412-1-thomas.courrege@vates.tech>
+X-Native-Encoded: 1
+X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.0784edf2bbc04cf6bec766be6a34f817?=
+X-Mandrill-User: md_30504962
+Feedback-ID: 30504962:30504962.20251215:md
+Date: Mon, 15 Dec 2025 14:14:30 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aTw0F6lufR/nT7OY@devvm11784.nha0.facebook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 12, 2025 at 07:26:15AM -0800, Bobby Eshleman wrote:
->On Tue, Dec 02, 2025 at 02:01:04PM -0800, Bobby Eshleman wrote:
->> On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
->> > On 12/2/25 6:56 PM, Bobby Eshleman wrote:
->> > > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
->> > >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
->> > >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
->> > >>>  		goto out;
->> > >>>  	}
->> > >>>
->> > >>> +	net = current->nsproxy->net_ns;
->> > >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
->> > >>> +
->> > >>> +	/* Store the mode of the namespace at the time of creation. If this
->> > >>> +	 * namespace later changes from "global" to "local", we want this vsock
->> > >>> +	 * to continue operating normally and not suddenly break. For that
->> > >>> +	 * reason, we save the mode here and later use it when performing
->> > >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
->> > >>> +	 */
->> > >>> +	vsock->net_mode = vsock_net_mode(net);
->> > >>
->> > >> I'm sorry for the very late feedback. I think that at very least the
->> > >> user-space needs a way to query if the given transport is in local or
->> > >> global mode, as AFAICS there is no way to tell that when socket creation
->> > >> races with mode change.
->> > >
->> > > Are you thinking something along the lines of sockopt?
->> >
->> > I'd like to see a way for the user-space to query the socket 'namespace
->> > mode'.
->> >
->> > sockopt could be an option; a possibly better one could be sock_diag. Or
->> > you could do both using dumping the info with a shared helper invoked by
->> > both code paths, alike what TCP is doing.
->> > >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
->> > >> may cross netns boundaris and connect to 'local' socket in other netns
->> > >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
->> > >> isolation.
->> > >
->> > > Local mode sockets are unable to communicate with local mode (and global
->> > > mode too) sockets that are in other namespaces. The key piece of code
->> > > for that is vsock_net_check_mode(), where if either modes is local the
->> > > namespaces must be the same.
->> >
->> > Sorry, I likely misread the large comment in patch 2:
->> >
->> > https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
->> >
->> > >> Have you considered instead a slightly different model, where the
->> > >> local/global model is set in stone at netns creation time - alike what
->> > >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
->> > >> inter-netns connectivity is explicitly granted by the admin (I guess
->> > >> you will need new transport operations for that)?
->> > >>
->> > >> /P
->> > >>
->> > >> [1] tcp allows using per-netns established socket lookup tables - as
->> > >> opposed to the default global lookup table (even if match always takes
->> > >> in account the netns obviously). The mentioned sysctl specify such
->> > >> configuration for the children namespaces, if any.
->> > >
->> > > I'll save this discussion if the above doesn't resolve your concerns.
->> > I still have some concern WRT the dynamic mode change after netns
->> > creation. I fear some 'unsolvable' (or very hard to solve) race I can't
->> > see now. A tcp_child_ehash_entries-like model will avoid completely the
->> > issue, but I understand it would be a significant change over the
->> > current status.
->> >
->> > "Luckily" the merge window is on us and we have some time to discuss. Do
->> > you have a specific use-case for the ability to change the netns 
->> > mode
->> > after creation?
->> >
->> > /P
->>
->> I don't think there is a hard requirement that the mode be change-able
->> after creation. Though I'd love to avoid such a big change... or at
->> least leave unchanged as much of what we've already reviewed as
->> possible.
->>
->> In the scheme of defining the mode at creation and following the
->> tcp_child_ehash_entries-ish model, what I'm imagining is:
->> - /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
->> - /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
->>   number of times
->>
->> - when a netns is created, the new netns mode is inherited from
->>   child_ns_mode, being assigned using something like:
->>
->> 	  net->vsock.ns_mode =
->> 		get_net_ns_by_pid(current->pid)->child_ns_mode
->>
->> - /proc/sys/net/vsock/ns_mode queries the current mode, returning
->>   "local" or "global", returning value of net->vsock.ns_mode
->> - /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
->>   reject writes
->>
->> Does that align with what you have in mind?
->
->Hey Paolo, I just wanted to sync up on this one. Does the above align
->with what you envision?
+Add support for retrieving the SEV-SNP attestation report via the
+SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+ioctl for SNP guests.
 
-Hi Bobby, AFAIK Paolo was at LPC, so there could be some delay.
+Signed-off-by: Thomas Courrege <thomas.courrege@vates.tech>
+---
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 27 +++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  9 +++
+ arch/x86/kvm/svm/sev.c                        | 60 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 ++++++++++
+ 5 files changed, 128 insertions(+)
 
-FYI I'll be off from Dec 25 to Jan 6, so if we want to do an RFC in the
-middle, I'll do my best to take a look before my time off.
-
-Thanks,
-Stefano
-
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 1ddb6a86ce7f..083ed487764e 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -572,6 +572,33 @@ Returns: 0 on success, -negative on error
+ See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+ details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+ 
++21. KVM_SEV_SNP_HV_REPORT_REQ
++-----------------------------
++
++The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
++SNP attestation report. This report is produced by the PSP using the
++HV-SIGNED key selected by the caller.
++
++The ``key_sel`` field indicates which key the platform will use to sign the
++report:
++  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
++  * ``1``: Sign with VCEK.
++  * ``2``: Sign with VLEK.
++  * Other values are reserved.
++
++Parameters (in): struct kvm_sev_snp_hv_report_req
++
++Returns:  0 on success, -negative on error
++
++::
++        struct kvm_sev_snp_hv_report_req {
++                __u64 report_uaddr;
++                __u64 report_len;
++                __u8 key_sel;
++                __u8 pad0[7];
++                __u64 pad1[4];
++        };
++
+ Device attribute API
+ ====================
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 7ceff6583652..464146bed784 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -743,6 +743,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_HV_REPORT_REQ,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
+ };
+ 
++struct kvm_sev_snp_hv_report_req {
++	__u64 report_uaddr;
++	__u64 report_len;
++	__u8 key_sel;
++	__u8 pad0[7];
++	__u64 pad1[4];
++};
++
+ struct kvm_sev_snp_launch_start {
+ 	__u64 policy;
+ 	__u8 gosvw[16];
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f59c65abe3cf..ba7a07d132ff 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2261,6 +2261,63 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
+ }
+ 
++static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
++	struct sev_data_snp_hv_report_req data;
++	struct kvm_sev_snp_hv_report_req params;
++	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
++	void __user *u_report;
++	void __user *u_params = u64_to_user_ptr(argp->data);
++	size_t rsp_size = sizeof(*report_rsp);
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++	if (copy_from_user(&params, u_params, sizeof(params)))
++		return -EFAULT;
++
++	if (params.report_len < rsp_size)
++		return -ENOSPC;
++
++	u_report = u64_to_user_ptr(params.report_uaddr);
++	if (!u_report)
++		return -EINVAL;
++
++	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!report_rsp)
++		return -ENOMEM;
++
++	data.len = sizeof(data);
++	data.key_sel = params.key_sel;
++	data.gctx_addr = __psp_pa(sev->snp_context);
++	data.hv_report_paddr = __psp_pa(report_rsp);
++
++	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
++				&argp->error);
++	if (ret)
++		goto e_free_rsp;
++
++	if (!report_rsp->status)
++		rsp_size += report_rsp->report_size;
++
++	if (params.report_len < rsp_size) {
++		rsp_size = sizeof(*report_rsp);
++		ret = -ENOSPC;
++	}
++
++	if (copy_to_user(u_report, report_rsp, rsp_size))
++		ret = -EFAULT;
++
++	params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
++	if (copy_to_user(u_params, &params, sizeof(params)))
++		ret = -EFAULT;
++
++e_free_rsp:
++	snp_free_firmware_page(report_rsp);
++	return ret;
++}
++
+ struct sev_gmem_populate_args {
+ 	__u8 type;
+ 	int sev_fd;
+@@ -2672,6 +2729,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_FINISH:
+ 		r = snp_launch_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_HV_REPORT_REQ:
++		r = sev_snp_hv_report_request(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 956ea609d0cc..5dd7c3f0d50d 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+ 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+ 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
++	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+ 	default:				return sev_tio_cmd_buffer_len(cmd);
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 69ffa4b4d1fa..c651a400d124 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -124,6 +124,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+ 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+ 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
++	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+ 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+ 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+ 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
++ *
++ * @len: length of the command buffer in bytes
++ * @key_sel: Selects which key to use for generating the signature.
++ * @gctx_addr: System physical address of guest context page
++ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
++ */
++struct sev_data_snp_hv_report_req {
++	u32 len;		/* In */
++	u32 key_sel	:2,	/* In */
++	    rsvd	:30;
++	u64 gctx_addr;		/* In */
++	u64 hv_report_paddr;	/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_msg_export_rsp
++ *
++ * @status: Status : 0h: Success. 16h: Invalid parameters.
++ * @report_size: Size in bytes of the attestation report
++ * @report: attestation report
++ */
++struct sev_data_snp_msg_report_rsp {
++	u32 status;			/* Out */
++	u32 report_size;		/* Out */
++	u8 rsvd[24];
++	u8 report[];
++} __packed;
++
+ /**
+  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+  *
+-- 
+2.52.0
 
