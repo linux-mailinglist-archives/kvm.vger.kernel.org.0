@@ -1,250 +1,269 @@
-Return-Path: <kvm+bounces-66041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31542CBFDCE
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 22:06:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BFCCBFFCA
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 22:42:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7F34230012CE
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 21:06:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 75C0B3002E85
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 21:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5F4328638;
-	Mon, 15 Dec 2025 21:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8725132C948;
+	Mon, 15 Dec 2025 21:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MDpM+k4Y"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F3q70JJ2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011026.outbound.protection.outlook.com [52.101.62.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235C92C11F1
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 21:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765832758; cv=none; b=GVi7axv70ZCHvaXCOAYCX80yaQJvFxsShH8qfYK31bUdpFziyfbjAbjT7eS7ogRYVyOKcX+C2mb2JPK+Pku5UbW5dhmH4abl9nJWKIx1K4rIg+Kfnt4TdFjJ0ZKzka5nFTC5K3gHT5ishWPsUBLDYiuTsfjLW1pHuCsZr/l6Lvo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765832758; c=relaxed/simple;
-	bh=3waFsTUEVw9m2bfdOuyKT5etmvKUDZo85avd9L97d0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TF583D+g9GiRgsVpY45q/Q1UZYr+cp8uq5ec6FffP9wGr4M4vso5FDmU9Jv7jbdNGgx7O8a1ueEmoz2GCNH1vRRoBcczSM6FnvYEHFBD/OPmra/SVhzl6WIe/efxluKS4f58w54U+6lJeuvW7uej6PEIWAA7GjbM5mstQ9UQdEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MDpM+k4Y; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fbc305552so1989994f8f.0
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 13:05:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765832755; x=1766437555; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k/VQiJ6U2PoviaJ84b4oZbGSbqseMWdNEopASU4Cces=;
-        b=MDpM+k4YZbmVpilSLoPanesnzv46LDfjw7qjH+R3mFqgACfrniBabJIqO7nxzxDfuL
-         4OLcIJlwznYGViX6olB0Q+Vi6JXfnIW6NITJwyyQD8ZmUf1rksVe0INgpGHc0KEfHIvs
-         BsQcPzfA8qx+OivzISkRKCuVILazYjKA6Uqw8GB41aw3osRBEsRdEiu+M92rD0nc8VLX
-         3QyKGtftnAIx6r3+zRApK6fxue8+9gypSCaY1k27kT0YxMGLFgpHj2proent74mwFCI2
-         SdtPE+fqPZFzjmhIFJZUvlRouwAE7l6Ejzu7GkU6vH4BpaQa90OmDvlpwe3Ld+5NHkQE
-         nIMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765832755; x=1766437555;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=k/VQiJ6U2PoviaJ84b4oZbGSbqseMWdNEopASU4Cces=;
-        b=tTllRVepzR6LdcOgS/Jok0vHXrbKlUqmvQmCbo1vji9JlhroSkEVzL8pyO105nIHzX
-         ZVF195SjYMg1CAqMAd1aWES8hzKOwT+1bIK3pdSlOYobAYFmWXBrnnJ7sTNzLWGYPuHi
-         +6bsVaEiU8ODu8kWdBhewupVg7twzhmhNbfa/jmtOQDQGRCr9gSISAjX8o/40NH5G8eY
-         65K9KcEoLnw6vBtB4f7fKvRUgdxnxRgI2QNl3VJaa7YxK9xAsyFMgkqAyrbQwtqwbPXB
-         Q+8tLmz74xT2iRQlCsoMPqz+fWw+WlvYkBH0YTvYqIMDKjAZI0OsQNmb68ilI8PzjwyA
-         DSpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUXiLjfnZPm9WMwSFFIV9YFlouzXrtKAP2XyhblUQBabpai2xPaBWue6hlWo950tTpeoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNAvHJBHORS1mPMdRE5EkFOkJK+g4Jb5fAiDrCCgUxblhPQ8/5
-	V9DMeuapTb25IuzYQPFGersgcHe/g8olkqNQRCSd7z34TX+DxlQgis3h
-X-Gm-Gg: AY/fxX5oW1WyWlBGcKTo8HMSCbIffwmmfuSHKEhfqlX3VfD3dZBmmlUaefF2pqWi/Xk
-	AvK4y19ygC0AIW29TefRtbhwGQhaka2nQL68c3T903EFwaSR8jUFM824bxwsGWR2yYDWTp0liuS
-	pfMq+G635lcInMr0z6MNcTUmFwcTUaZlWak0vexK12vtxj6jwq7yN5pgXlAxQZ36ISritNnb5MQ
-	/TAGuW3QW9gM1mTQm7+WvZbhsZKVJQ67q7P2QVnf0x+MCTlNjnu3sl8vo5V4i2iFD9lV9od6OM8
-	AaPrx/PUTKZsqvlhj0Wy0PYBQwTHb5ViJwis+SryhM5dmeWcfXGH/0AkSp/+ZFGUd8Kv3u/lmvC
-	KVnVhA+szaVM803vaLTgegQvEuf4CfCXQOouzXLEmvoEaQLK2JjajNxmbiJfgo2NjMdXl86BG7Q
-	aT2C81EIW/Dbp6CurhuHOF/yej+/VejG3JnjkFEZ9qjsBHeg2ggSfXUq8cjZB9aMU=
-X-Google-Smtp-Source: AGHT+IGbQSE2jechcjkJcIULXse77YsZC3S1gn46PwQPhkydxujDlM1wOE72uTLpNldTVJ86313oIw==
-X-Received: by 2002:adf:ff90:0:b0:42f:a8d6:865b with SMTP id ffacd0b85a97d-42fb44ca939mr10582387f8f.24.1765832755177;
-        Mon, 15 Dec 2025 13:05:55 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8a09fbesm31508262f8f.0.2025.12.15.13.05.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 13:05:54 -0800 (PST)
-Date: Mon, 15 Dec 2025 21:05:53 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: Nikolay Borisov <nik.borisov@suse.com>, x86@kernel.org, David Kaplan
- <david.kaplan@amd.com>, "H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf
- <jpoimboe@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang
- <tao1.zhang@intel.com>
-Subject: Re: [PATCH v6 2/9] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20251215210553.5ab5b674@pumpkin>
-In-Reply-To: <20251215180136.sjtvt57autnrassg@desk>
-References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
-	<20251201-vmscape-bhb-v6-2-d610dd515714@linux.intel.com>
-	<fdb0772c-96b8-4772-926d-0d25f7168554@suse.com>
-	<20251210133542.3eff9c4a@pumpkin>
-	<20251214183827.4z6nrrol4vz2tc5w@desk>
-	<20251214190233.4b40fe20@pumpkin>
-	<20251215180136.sjtvt57autnrassg@desk>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E134622068D;
+	Mon, 15 Dec 2025 21:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.26
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765834971; cv=fail; b=Jp/tARy5QhJFF2x2jIa47oaZlTlribO3v7PQRR+0R781axu3+8/tAzPtKXd7RoiUQ1F+zl6e+6r5M3KjvRAvftwm1zcCATcOCHaVIV2ZiWslK9e3ooAWNC47A0K4dmzEdtrE5kPypbuMYmQD2MqidbBwA6Z3OMIBiLbHBfffM2s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765834971; c=relaxed/simple;
+	bh=wA2BfokxgZyEZdh4dPBC9iNCVKA5sSCtolbZ9Jw5YUE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UQEuG8eYdSyLXNxJOHz1b7nCxcoZaQws9sXfdQgjWa+wAX/3Gy9RPxhGFvSsyvdCtqz4+Bhs5KkkBs7ihNVvfnwLnzVCROVQPVhoBFe0V9CLp0Xlafne0SRNshr3FttV1FvuTL05xB9EO/iO+cOFHOPRAP/uAGRHONm+iIrZ/uw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=F3q70JJ2; arc=fail smtp.client-ip=52.101.62.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qlwPD80IHAcnrUsT4YFeZbVV7STyAub1Vmyel3+gRX1tZFy68FZFWj5kduM1VKruByrjZ9FykhXiplSbf0cwUhHOaXC8isXwV2zaOVj2Nroat2tRmh2iwN5oyzv8etBykLtGAIQ8gUnDrwqSnAiKmQ+jzHmBHJ/p4PocOMUg+r3CcfAy3Clf4gUeR8OsWOYcptBHndmK6xtV11PzqvGD1PBJhNiviUhCz74IsKlJBfP/6BtxlE+ShrtOH/pLdr2cviWctuUUhtvXvsT8BYP1/pJYROWjLqP0A95Yj71jbaGJ+2IAfpITVchY5PYi/PBtQ91Mik0iZlymW4gW4GN/Sw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uAjy8p6VbFULROxO9IIXbaQz2U8xpLf6Y3fUl8Z0Ycs=;
+ b=IhafxHFD2hY5A0vBcMvjEd9EpdaOtJQMzxdCCScE8QTiOD3AIM7V0mQ4xjHW0ltGZI0QmPYDraYOOFpwHTj8goFkB7N85UamO8h0tsY2+ReSso96tRpPcinqJ8g1ILJimjD5bDl91nUAB1YxyZQBxhcLZPIEOlJQhyTVGvfABaZbrNV+M/+HyTZi7BS2a3yyy9GJ/6CxAy1eiKb3HQ8PXybdCo3nbcjVzS42qGk5Z18parjB9rebZvWO6/eGk4tEnC6K7UjgK4LN8l5YU6yaJI6vQxlZjx2aY8DfFhCK8O3hh6sOMwk72BagyQarLsfC9aJYgcB8dZsa5Vyolwm3ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=8bytes.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uAjy8p6VbFULROxO9IIXbaQz2U8xpLf6Y3fUl8Z0Ycs=;
+ b=F3q70JJ2J4XaK7RrFG+moATWFrBh/GwjaWVvEpAeaM8VNFv+Cj4rggaamQENmF6R6qE4uOGwZOP8ufnd2MK2bKfAxlfcax/4Ib01KATmf61hrQ5gRjADraLU33e67YQsqAuW+CQqTufxuWmDgOVKGVQ55BYE7RHwX2hYwjq+Pj/cyLd/L4lwfHLzx59Vy8QOIo15bWdFzY0qJdvx/33WUp8UdNd7WLRGJjupnn6vg81grafdRi979qv3AR9fagzT7/P4MDkpf6XAeIqmv+7P9A3U4n0PSIXTHJPOV9Of16Tna7ecyR5RtUh9oO7ztDlbZ9uzmjgPPTjGyVOsMQ9flQ==
+Received: from CH0PR03CA0377.namprd03.prod.outlook.com (2603:10b6:610:119::31)
+ by DS7PR12MB5719.namprd12.prod.outlook.com (2603:10b6:8:72::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
+ 2025 21:42:45 +0000
+Received: from CH1PEPF0000AD76.namprd04.prod.outlook.com
+ (2603:10b6:610:119:cafe::36) by CH0PR03CA0377.outlook.office365.com
+ (2603:10b6:610:119::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.13 via Frontend Transport; Mon,
+ 15 Dec 2025 21:42:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH1PEPF0000AD76.mail.protection.outlook.com (10.167.244.53) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9434.6 via Frontend Transport; Mon, 15 Dec 2025 21:42:44 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 15 Dec
+ 2025 13:42:28 -0800
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Mon, 15 Dec 2025 13:42:28 -0800
+Received: from Asurada-Nvidia.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Mon, 15 Dec 2025 13:42:27 -0800
+From: Nicolin Chen <nicolinc@nvidia.com>
+To: <joro@8bytes.org>
+CC: <will@kernel.org>, <robin.murphy@arm.com>, <afael@kernel.org>,
+	<lenb@kernel.org>, <bhelgaas@google.com>, <alex@shazbot.org>,
+	<jgg@nvidia.com>, <kevin.tian@intel.com>, <baolu.lu@linux.intel.com>,
+	<linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<patches@lists.linux.dev>, <pjaroszynski@nvidia.com>, <vsethi@nvidia.com>,
+	<helgaas@kernel.org>, <etzhao1900@gmail.com>
+Subject: [PATCH v8 0/5] Disable ATS via iommu during PCI resets
+Date: Mon, 15 Dec 2025 13:42:15 -0800
+Message-ID: <cover.1765834788.git.nicolinc@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD76:EE_|DS7PR12MB5719:EE_
+X-MS-Office365-Filtering-Correlation-Id: d8a796aa-f821-46e7-1baa-08de3c22e1dc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MrGXWA7L9jLTxZX4oz2MJEdDj+hTClZQ/wl0HoOS6FHQO7P4Ww3y8byrv9MS?=
+ =?us-ascii?Q?qj8RwOwV4UucanQGSZlwDtBBQ2kRoGJRSL4ZSSFGaAKmpjpme+C2UbfSpDgG?=
+ =?us-ascii?Q?jr3FepVINz9KhrqNhawsWo7Ha5q46yKna4sg/CEtaSmsbry0NZZSE1KStk0h?=
+ =?us-ascii?Q?Fqd0oFexXKOIuFTQbNHWOUoZb5pdA/fAqfIaMKOQXpruxUdYsd1tQAQXsAHv?=
+ =?us-ascii?Q?LhRf4fVQ6ziq5mHH3Kr9+TzW92rArHVA+p+oOcUI6tBlncNP7oiyHlCiEG6Q?=
+ =?us-ascii?Q?ZIhA2D1koJ3G7WiiA/FnUg/qoom+odcAAlVqD7h0TTuRXb0YjjSN0MV/X3Sh?=
+ =?us-ascii?Q?BeGAyWAu68ZieBHP3WGXFInfUSDfrZSJFbcg79eV7T+/tPzCVM0/SO4w/R3o?=
+ =?us-ascii?Q?J2KF60StjnYFgLE0ZxALnozFn0mhur+7l4fviTHv55ORID05RPZXCeRCi7Lx?=
+ =?us-ascii?Q?wsP4JWxARKfYlc9dSTn5jMZwc9L4hReQ5ZxUuEKOSYpt/zukkIKx/M1z5PRU?=
+ =?us-ascii?Q?p7DzSYcIMBMd92fxKOcECXAVYsAEZRx4ZL/2W2jsJnr39/N2ZxgQaKL8tM0J?=
+ =?us-ascii?Q?FIK7zPIUcx4YRvIZ8dlAOifij65ZN4Pok/SknkuQBQGa3fy080Ry9N70L8pC?=
+ =?us-ascii?Q?wK2konohCjHa0Hp+zc/P/91TD/RL+ILlwmxe5hpxpUFQanChyLlefwTCms42?=
+ =?us-ascii?Q?06uvDpX1NkZrzaHwgAzNgGXoYCDbzzGcB8WLK/cjdzp18Qao4/D1cVlQ+x2U?=
+ =?us-ascii?Q?DUqqPDvxIdkGFe22+v2vevibUsAL7EtURdnDln8GhAsGih0d1BFGc6A5o5yB?=
+ =?us-ascii?Q?+qS9YludOt8z4nOMTueIcKNMuIN3JxXBTZGpX1emqhELSzHV3CyPgmYfFxZa?=
+ =?us-ascii?Q?MC00niIw414bkC56yFh1o85sdziCUy8JCZ9DdI9MxlELLNeTYxKH84/v7dIY?=
+ =?us-ascii?Q?Iq/sF3sWxj/0gFwIHWq8nv4FKU6+9nPxAH+uy5GjfrD6+tPxhDSivsJsNVFu?=
+ =?us-ascii?Q?7Uop51YF7LNIzhmX/ee+J5L/jxZphP1//XDA2Ny3HfHixCdztXh6X9F8vOa/?=
+ =?us-ascii?Q?Vz1OrLA26cFPuaCuKM+XGObmv/T3PNHifzCXYLljwsl0NQbIwksK+jFqnT/W?=
+ =?us-ascii?Q?9HTEEXHOrbHfn6h1SgEZUJw9zwkjHVc79UtO8v40wsC5jqLPYNVy//h5hjlJ?=
+ =?us-ascii?Q?Cy5ZzLlLuNAYHaTmN+bT+qwGddS//TnNnBpdEnmAzd87O47/5aCAjSO+QTue?=
+ =?us-ascii?Q?dKNzir4f3FBP4ryJ5jjLIJReOD8KI8H8rkfscVcytrCw9JyqgFMeEw1Sh1SW?=
+ =?us-ascii?Q?ThrSmHnIX/ucsvH3Am35bLUNePaR/PPtwGkxFI30tT4GWRgPtTLQb1329QMb?=
+ =?us-ascii?Q?+gDrEvVai9+fhWx3zq1muI+CMQpGhRDOR9SShtjF9ETN0BOEB07aUwQ4o3hU?=
+ =?us-ascii?Q?fKehBdWK7E1Iay2PeEd6D0e35FnkTROUFJtrr87kABpaeUKGBRxsjiQMzdH+?=
+ =?us-ascii?Q?NK21bb79DXhgKsrsFNAYSuWvNqPx5W8NHTovFCXISkAl8tfVNq+U7e7nGwlv?=
+ =?us-ascii?Q?582Q9JfTEFy930xuHelHArokYLp8NfHKbrbPNnUl?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 21:42:44.7473
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8a796aa-f821-46e7-1baa-08de3c22e1dc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD76.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5719
 
-On Mon, 15 Dec 2025 10:01:36 -0800
-Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
+Hi all,
 
-> On Sun, Dec 14, 2025 at 07:02:33PM +0000, David Laight wrote:
-> > On Sun, 14 Dec 2025 10:38:27 -0800
-> > Pawan Gupta <pawan.kumar.gupta@linux.intel.com> wrote:
-> >  =20
-> > > On Wed, Dec 10, 2025 at 01:35:42PM +0000, David Laight wrote: =20
-> > > > On Wed, 10 Dec 2025 14:31:31 +0200
-> > > > Nikolay Borisov <nik.borisov@suse.com> wrote:
-> > > >    =20
-> > > > > On 2.12.25 =D0=B3. 8:19 =D1=87., Pawan Gupta wrote:   =20
-> > > > > > As a mitigation for BHI, clear_bhb_loop() executes branches tha=
-t overwrites
-> > > > > > the Branch History Buffer (BHB). On Alder Lake and newer parts =
-this
-> > > > > > sequence is not sufficient because it doesn't clear enough entr=
-ies. This
-> > > > > > was not an issue because these CPUs have a hardware control (BH=
-I_DIS_S)
-> > > > > > that mitigates BHI in kernel.
-> > > > > >=20
-> > > > > > BHI variant of VMSCAPE requires isolating branch history betwee=
-n guests and
-> > > > > > userspace. Note that there is no equivalent hardware control fo=
-r userspace.
-> > > > > > To effectively isolate branch history on newer CPUs, clear_bhb_=
-loop()
-> > > > > > should execute sufficient number of branches to clear a larger =
-BHB.
-> > > > > >=20
-> > > > > > Dynamically set the loop count of clear_bhb_loop() such that it=
- is
-> > > > > > effective on newer CPUs too. Use the hardware control enumerati=
-on
-> > > > > > X86_FEATURE_BHI_CTRL to select the appropriate loop count.
-> > > > > >=20
-> > > > > > Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-> > > > > > Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
-> > > > > > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com> =
-    =20
-> > > > >=20
-> > > > > nit: My RB tag is incorrect, while I did agree with Dave's sugges=
-tion to=20
-> > > > > have global variables for the loop counts I haven't' really seen =
-the=20
-> > > > > code so I couldn't have given my RB on something which I haven't =
-seen=20
-> > > > > but did agree with in principle.   =20
-> > > >=20
-> > > > I thought the plan was to use global variables rather than ALTERNAT=
-IVE.
-> > > > The performance of this code is dominated by the loop.   =20
-> > >=20
-> > > Using globals was much more involved, requiring changes in atleast 3 =
-files.
-> > > The current ALTERNATIVE approach is much simpler and avoids additional
-> > > handling to make sure that globals are set correctly for all mitigati=
-on
-> > > modes of BHI and VMSCAPE.
-> > >=20
-> > > [ BTW, I am travelling on a vacation and will be intermittently check=
-ing my
-> > >   emails. ]
-> > >  =20
-> > > > I also found this code in arch/x86/net/bpf_jit_comp.c:
-> > > > 	if (cpu_feature_enabled(X86_FEATURE_CLEAR_BHB_LOOP)) {
-> > > > 		/* The clearing sequence clobbers eax and ecx. */
-> > > > 		EMIT1(0x50); /* push rax */
-> > > > 		EMIT1(0x51); /* push rcx */
-> > > > 		ip +=3D 2;
-> > > >=20
-> > > > 		func =3D (u8 *)clear_bhb_loop;
-> > > > 		ip +=3D x86_call_depth_emit_accounting(&prog, func, ip);
-> > > >=20
-> > > > 		if (emit_call(&prog, func, ip))
-> > > > 			return -EINVAL;
-> > > > 		EMIT1(0x59); /* pop rcx */
-> > > > 		EMIT1(0x58); /* pop rax */
-> > > > 	}
-> > > > which appears to assume that only rax and rcx are changed.
-> > > > Since all the counts are small, there is nothing stopping the code
-> > > > using the 8-bit registers %al, %ah, %cl and %ch.   =20
-> > >=20
-> > > Thanks for catching this. =20
-> >=20
-> > I was trying to find where it was called from.
-> > Failed to find the one on system call entry... =20
->=20
-> The macro CLEAR_BRANCH_HISTORY calls clear_bhb_loop() at system call entr=
-y.
+PCIe permits a device to ignore ATS invalidation TLPs while processing a
+reset. This creates a problem visible to the OS where an ATS invalidation
+command will time out: e.g. an SVA domain will have no coordination with a
+reset event and can racily issue ATS invalidations to a resetting device.
 
-I didn't look very hard :-)
+The OS should do something to mitigate this as we do not want production
+systems to be reporting critical ATS failures, especially in a hypervisor
+environment. Broadly, OS could arrange to ignore the timeouts, block page
+table mutations to prevent invalidations, or disable and block ATS.
 
->=20
-> > > > There are probably some schemes that only need one register.
-> > > > eg two separate ALTERNATIVE blocks.   =20
-> > >=20
-> > > Also, I think it is better to use a callee-saved register like rbx to=
- avoid
-> > > callers having to save/restore registers. Something like below: =20
-> >=20
-> > I'm not sure.
-> > %ax is the return value so can be 'trashed' by a normal function call.
-> > But if the bpf code is saving %ax then it isn't expecting a normal call=
-. =20
->=20
-> BHB clear sequence is executed at the end of the BPF JITted code, and %rax
-> is likely the return value of the BPF program. So, saving/restoring %rax
-> around the sequence makes sense to me.
->=20
-> > OTOH if you are going to save the register in clear_bhb_loop you might
-> > as well use %ax to get the slightly shorter instructions for %al.
-> > (I think 'movb' comes out shorter - as if it really matters.) =20
->=20
-> %rbx is a callee-saved register so it felt more intuitive to save/restore
-> it in clear_bhb_loop(). But, I can use %ax if you feel strongly.
+The PCIe spec in sec 10.3.1 IMPLEMENTATION NOTE recommends to disable and
+block ATS before initiating a Function Level Reset. It also mentions that
+other reset methods could have the same vulnerability as well.
 
-If you are going to save a register it might as well be %ax.
-Otherwise someone will wonder why you picked a different one.
+Provide a callback from the PCI subsystem that will enclose the reset and
+have the iommu core temporarily change domains to group->blocking_domain,
+so IOMMU drivers would fence any incoming ATS queries, synchronously stop
+issuing new ATS invalidations, and wait for existing ATS invalidations to
+complete. Doing this can avoid any ATS invaliation timeouts.
 
->=20
-> > Definitely worth a comment that it must save all resisters. =20
->=20
-> Yes, will add a comment.
->=20
-> > I also wonder if it needs to setup a stack frame? =20
->=20
-> I don't know if thats necessary, objtool doesn't complain because
-> clear_bhb_loop() is marked STACK_FRAME_NON_STANDARD.
+When a device is resetting, any new domain attachment has to be rejected,
+until the reset is finished, to prevent ATS activity from being activated
+between the two callback functions. Introduce a new resetting_domain, and
+reject a concurrent __iommu_attach_device/set_group_pasid().
 
-In some senses it is a leaf functions - and the compiler doesn't create
-stack frames for those (by default).
+Finally, call these pci_dev_reset_iommu/done() functions in the PCI reset
+functions.
 
-Provided objtool isn't confused by all the call instructions it probably
-doesn't matter.
+This is on Github:
+https://github.com/nicolinc/iommufd/commits/iommu_dev_reset-v8
 
-	David
+Changelog
+v8
+ * Rebase on v6.19-rc1
+ * Add Tested-by from Dheeraj
+ * Add Reviewed-by from Jason
+ * [pci] Add Acked-by from Bjorn Helgaas
+v7
+ https://lore.kernel.org/all/cover.1763775108.git.nicolinc@nvidia.com/
+ * Rebase on Joerg's next tree
+ * Add Reviewed-by from Kevin
+ * [iommu] Fix inline functions when !CONFIG_IOMMU_API
+v6
+ https://lore.kernel.org/all/cover.1763512374.git.nicolinc@nvidia.com/
+ * Add Reviewed-by from Baolu and Kevin
+ * Revise inline comments, kdocs, commit messages, uAPI
+ * [iommu] s/iommu_dev_reset/pci_dev_reset_iommu/g for PCI exclusively
+ * [iommu] Disallow iommu group sibling devices to attach concurrently
+ * [pci] Drop unnecessary initializations to "ret" and "rc"
+ * [pci] Improve pci_err message unpon a prepare() failure
+ * [pci] Move pci_ats_supported() check inside the IOMMU callbacks
+ * [pci] Apply callbacks to pci_reset_bus_function() that was missed
+v5
+ https://lore.kernel.org/all/cover.1762835355.git.nicolinc@nvidia.com/
+ * Rebase on Joerg's next tree
+ * [iommu] Skip in shared iommu_group cases
+ * [iommu] Pass in default_domain to iommu_setup_dma_ops
+ * [iommu] Add kdocs to iommu_get_domain_for_dev_locked()
+ * [iommu] s/get_domain_for_dev_locked/driver_get_domain_for_dev
+ * [iommu] Replace per-gdev pending_reset with per-group resetting_domain
+v4
+ https://lore.kernel.org/all/cover.1756682135.git.nicolinc@nvidia.com/
+ * Add Reviewed-by from Baolu
+ * [iommu] Use guard(mutex)
+ * [iommu] Update kdocs for typos and revisings
+ * [iommu] Skip two corner cases (alias and SRIOV)
+ * [iommu] Rework attach_dev to pass in old domain pointer
+ * [iommu] Reject concurrent attach_dev/set_dev_pasid for compatibility
+           concern
+ * [smmuv3] Drop the old_domain depedency in its release_dev callback
+ * [pci] Add pci_reset_iommu_prepare/_done() wrappers checking ATS cap
+v3
+ https://lore.kernel.org/all/cover.1754952762.git.nicolinc@nvidia.com/
+ * Add Reviewed-by from Jason
+ * [iommu] Add a fast return in iommu_deferred_attach()
+ * [iommu] Update kdocs, inline comments, and commit logs
+ * [iommu] Use group->blocking_domain v.s. ops->blocked_domain
+ * [iommu] Drop require_direct, iommu_group_get(), and xa_lock()
+ * [iommu] Set the pending_reset flag after RID/PASID domain setups
+ * [iommu] Do not bypass PASID domains when RID domain is already the
+           blocking_domain
+ * [iommu] Add iommu_get_domain_for_dev_locked to correctly return the
+           blocking_domain
+v2
+ https://lore.kernel.org/all/cover.1751096303.git.nicolinc@nvidia.com/
+ * [iommu] Update kdocs, inline comments, and commit logs
+ * [iommu] Replace long-holding group->mutex with a pending_reset flag
+ * [pci] Abort reset routines if iommu_dev_reset_prepare() fails
+ * [pci] Apply the same vulnerability fix to other reset functions
+v1
+ https://lore.kernel.org/all/cover.1749494161.git.nicolinc@nvidia.com/
 
->=20
-> > Again, the code is so slow it won't matter.
-> >=20
-> > 	David =20
+Thanks
+Nicolin
+
+Nicolin Chen (5):
+  iommu: Lock group->mutex in iommu_deferred_attach()
+  iommu: Tidy domain for iommu_setup_dma_ops()
+  iommu: Add iommu_driver_get_domain_for_dev() helper
+  iommu: Introduce pci_dev_reset_iommu_prepare/done()
+  PCI: Suspend iommu function prior to resetting a device
+
+ drivers/iommu/dma-iommu.h                   |   5 +-
+ include/linux/iommu.h                       |  14 ++
+ include/uapi/linux/vfio.h                   |   4 +
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |   5 +-
+ drivers/iommu/dma-iommu.c                   |   4 +-
+ drivers/iommu/iommu.c                       | 220 +++++++++++++++++++-
+ drivers/pci/pci-acpi.c                      |  13 +-
+ drivers/pci/pci.c                           |  65 +++++-
+ drivers/pci/quirks.c                        |  19 +-
+ 9 files changed, 326 insertions(+), 23 deletions(-)
+
+-- 
+2.43.0
 
 
