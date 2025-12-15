@@ -1,235 +1,204 @@
-Return-Path: <kvm+bounces-65961-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65962-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BFD4CBDAB5
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 13:01:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F320CBDD83
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 13:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F0F3830D5548
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 11:53:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB60D308BD9F
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 12:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E7B22D4C3;
-	Mon, 15 Dec 2025 11:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E962288D5;
+	Mon, 15 Dec 2025 12:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecrITf35"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kCcfBPL4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-104.ptr.blmpb.com (sg-1-104.ptr.blmpb.com [118.26.132.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7D0316915;
-	Mon, 15 Dec 2025 11:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D393A244186
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 12:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765799523; cv=none; b=UfcEcFNgEA7vSQfe5wU0y5bR5hWRCZGecTZnwJD8nKaOjzRVdv0inOtrn1XW0no1xnBao1BfexMK24XrN5tWpQJMQFsefKt2PwUCg+SRQLRwadjp1BsOm2wClVNhAh8ihAq0R9KyYS1i2C/paEPxU/U9iauPnCUCjRZSxdOhMxk=
+	t=1765801860; cv=none; b=jblKUCjCzo1K4AJD7f8fcAuroD6dtHK5yIHjemtn3Ugfp+UAqmOaAEZ5VJAcgyALGh5EJtxo9R4gk43wYFkwHPXb/rEn9aPzbeAzhyJcCul75fIPRvhw25Q1HGEfMcnr14JvB0GGaYAxtUJmxd8IcyikfWuOf5gZh1hUqP+iOzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765799523; c=relaxed/simple;
-	bh=JnLOHFJSBCxTCbFcO3IwUKhfZyQvwK42bdXHq4zEKAU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YKPYdJnOpUKsMTmohdAoLNcpczxQgUdUFRGKnfmvv/PGvsr6kl4Z76SewlTkf3YNPy+NnwPjE22Hmfc6y5SMb2HgVbwUbnhcMYXoxoLOB9NUdiTX75TpA9ZSptBvm0oafVFi2SoetjakW1GTKZd4+13x45dBH90ZxYPQhBBVEIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecrITf35; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CA7CC4CEF5;
-	Mon, 15 Dec 2025 11:52:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765799523;
-	bh=JnLOHFJSBCxTCbFcO3IwUKhfZyQvwK42bdXHq4zEKAU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ecrITf35hlLUYBMQR+704mj6RKcWsVAQ+AXtBmyohBf25HQtOXMOpkSqtePUMlGb4
-	 +1/b5izSnh73C+EDjhuYl5DVRpC9LvfmcxsK/dExtREkLLRVNz3Zk3KcBblrgtlWNf
-	 gf6yClbgqUhb+xQ6l0HwffnukjDQAZq/WDKeMkgg8gWKWvRvOHXK44wQjSeIcyW+t/
-	 6oqaJxEr6E0dyV1K9/tFsOXG5lRa9qkuRFi27XlUXoBaXGZ5qIHjTBzwu/KQKz3Dtn
-	 XKpvb6P3jfT3KpUwjyHmPLW/Lz/fyWPOSCGCZtgY9zhI440oNUDY4wDMeMYdp06c0j
-	 /d3Cqe3PHaBpw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vV77R-0000000CkVl-0Dus;
-	Mon, 15 Dec 2025 11:52:01 +0000
-Date: Mon, 15 Dec 2025 11:52:00 +0000
-Message-ID: <86ldj4nesf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 02/32] KVM: arm64: gic-v3: Switch vGIC-v3 to use generated ICH_VMCR_EL2
-In-Reply-To: <20251212152215.675767-3-sascha.bischoff@arm.com>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-3-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765801860; c=relaxed/simple;
+	bh=CtmSsUdGiDNVvznJ2WsyK1fFQ9J7gt//EqBRl6RaMDI=;
+	h=Date:Message-Id:Mime-Version:To:Cc:From:Subject:Content-Type; b=JTZ/L4XFFDt05sZf2DpBjQEYdbkIud9MxSN158+P5Do9C6HBw0tz7wmGtSI9h/Ufjm/d4QROQGYU4VssMv7+i7VUdFGFqYXutuKVZDGwCXvTzE9iFoEgpL0ju2keW8MsN9SIJC6qMs/cre0FY+3KREq5AT5XXtcAbCjIVbU6dvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=kCcfBPL4; arc=none smtp.client-ip=118.26.132.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1765801845; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=EF/jQxSN1ZfIV9LwwDm6HRiygaKbtqG0Gae5olB1e30=;
+ b=kCcfBPL444cY439fV/xCKA2bnsMJ4CA7/JZeoMwomQSqZHF8oll7FVKr82x0wtcWOlrvik
+ YNdXMOf9U4qAkT/ccOrx/Q1W5dz3lhNGzCqF2rr0ZicoPryLi3K1hZv4J786ITtvjZWf1T
+ ngFno0acUUaMSOF4HevFN2jNqWXIbH3oJEBXZIvuKUwiQALprdg1TJCCLNM/mOsugZNyDh
+ fD4mk932S0U4mlBYONmGB75TQDvQ5qzDnUZXBzVml1R/tyaPphynjVuacrC4wUfNhglvkG
+ YwwTKTmy/aSfeuYD5VKypatrE8Iol6Okij2mhgywGQ+aDt0C7ewp0Y28Ep5PhA==
+Content-Transfer-Encoding: 7bit
+Date: Mon, 15 Dec 2025 20:30:29 +0800
+Message-Id: <20251215123029.2746-1-guojinhui.liam@bytedance.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Original-From: Jinhui Guo <guojinhui.liam@bytedance.com>
+To: <alex@shazbot.org>
+Cc: <guojinhui.liam@bytedance.com>, <kvm@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>
+From: "Jinhui Guo" <guojinhui.liam@bytedance.com>
+Subject: [RESEND PATCH] vfio/pci: Skip hot reset on Link-Down
+X-Mailer: git-send-email 2.17.1
+X-Lms-Return-Path: <lba+2693fff73+28616b+vger.kernel.org+guojinhui.liam@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
 
-On Fri, 12 Dec 2025 15:22:35 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-> 
-> The VGIC-v3 code relied on hand-written definitions for the
-> ICH_VMCR_EL2 register. This register, and the associated fields, is
-> now generated as part of the sysreg framework. Move to using the
-> generated definitions instead of the hand-written ones.
-> 
-> There are no functional changes as part of this change.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arch/arm64/include/asm/sysreg.h      | 21 ---------
->  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 64 ++++++++++++----------------
->  arch/arm64/kvm/vgic/vgic-v3-nested.c |  8 ++--
->  arch/arm64/kvm/vgic/vgic-v3.c        | 48 ++++++++++-----------
->  4 files changed, 54 insertions(+), 87 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 9df51accbb025..b3b8b8cd7bf1e 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -560,7 +560,6 @@
->  #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
->  #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
->  #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
-> -#define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
->  
->  #define __SYS__LR0_EL2(x)		sys_reg(3, 4, 12, 12, x)
->  #define SYS_ICH_LR0_EL2			__SYS__LR0_EL2(0)
-> @@ -988,26 +987,6 @@
->  #define ICH_LR_PRIORITY_SHIFT	48
->  #define ICH_LR_PRIORITY_MASK	(0xffULL << ICH_LR_PRIORITY_SHIFT)
->  
-> -/* ICH_VMCR_EL2 bit definitions */
-> -#define ICH_VMCR_ACK_CTL_SHIFT	2
-> -#define ICH_VMCR_ACK_CTL_MASK	(1 << ICH_VMCR_ACK_CTL_SHIFT)
-> -#define ICH_VMCR_FIQ_EN_SHIFT	3
-> -#define ICH_VMCR_FIQ_EN_MASK	(1 << ICH_VMCR_FIQ_EN_SHIFT)
-> -#define ICH_VMCR_CBPR_SHIFT	4
-> -#define ICH_VMCR_CBPR_MASK	(1 << ICH_VMCR_CBPR_SHIFT)
-> -#define ICH_VMCR_EOIM_SHIFT	9
-> -#define ICH_VMCR_EOIM_MASK	(1 << ICH_VMCR_EOIM_SHIFT)
-> -#define ICH_VMCR_BPR1_SHIFT	18
-> -#define ICH_VMCR_BPR1_MASK	(7 << ICH_VMCR_BPR1_SHIFT)
-> -#define ICH_VMCR_BPR0_SHIFT	21
-> -#define ICH_VMCR_BPR0_MASK	(7 << ICH_VMCR_BPR0_SHIFT)
-> -#define ICH_VMCR_PMR_SHIFT	24
-> -#define ICH_VMCR_PMR_MASK	(0xffUL << ICH_VMCR_PMR_SHIFT)
-> -#define ICH_VMCR_ENG0_SHIFT	0
-> -#define ICH_VMCR_ENG0_MASK	(1 << ICH_VMCR_ENG0_SHIFT)
-> -#define ICH_VMCR_ENG1_SHIFT	1
-> -#define ICH_VMCR_ENG1_MASK	(1 << ICH_VMCR_ENG1_SHIFT)
-> -
->  /*
->   * Permission Indirection Extension (PIE) permission encodings.
->   * Encodings with the _O suffix, have overlays applied (Permission Overlay Extension).
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index 0b670a033fd87..24a2074f3a8cf 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -569,11 +569,11 @@ static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
->  			continue;
->  
->  		/* Group-0 interrupt, but Group-0 disabled? */
-> -		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG0_MASK))
-> +		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_EL2_VENG0_MASK))
->  			continue;
->  
->  		/* Group-1 interrupt, but Group-1 disabled? */
-> -		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG1_MASK))
-> +		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_EL2_VENG1_MASK))
->  			continue;
->  
->  		/* Not the highest priority? */
-> @@ -646,19 +646,19 @@ static int __vgic_v3_get_highest_active_priority(void)
->  
->  static unsigned int __vgic_v3_get_bpr0(u32 vmcr)
->  {
-> -	return (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
-> +	return FIELD_GET(ICH_VMCR_EL2_VBPR0, vmcr);
->  }
->  
->  static unsigned int __vgic_v3_get_bpr1(u32 vmcr)
->  {
->  	unsigned int bpr;
->  
-> -	if (vmcr & ICH_VMCR_CBPR_MASK) {
-> +	if (vmcr & ICH_VMCR_EL2_VCBPR_MASK) {
->  		bpr = __vgic_v3_get_bpr0(vmcr);
->  		if (bpr < 7)
->  			bpr++;
->  	} else {
-> -		bpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
-> +		bpr = FIELD_GET(ICH_VMCR_EL2_VBPR1, vmcr);
->  	}
->  
->  	return bpr;
-> @@ -758,7 +758,7 @@ static void __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  	if (grp != !!(lr_val & ICH_LR_GROUP))
->  		goto spurious;
->  
-> -	pmr = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-> +	pmr = FIELD_GET(ICH_VMCR_EL2_VPMR, vmcr);
->  	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
->  	if (pmr <= lr_prio)
->  		goto spurious;
-> @@ -806,7 +806,7 @@ static int ___vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  	int lr;
->  
->  	/* EOImode == 0, nothing to be done here */
-> -	if (!(vmcr & ICH_VMCR_EOIM_MASK))
-> +	if (!FIELD_GET(ICH_VMCR_EL2_VEOIM_MASK, vmcr))
+On hot-pluggable ports, simultaneous surprise removal of multiple
+PCIe endpoints whether by pulling the card, powering it off, or
+dropping the link can trigger a system deadlock.
 
-nit: FIELD_GET() doesn't bring anything here. Similar comment applies
-to most 'if (val & MASK)' constructs that get changed here.
+Example: two PCIe endpoints are bound to vfio-pci and opened by
+the same process (fdA for device A, fdB for device B).
 
->  		return 1;
->  
->  	/* No deactivate to be performed on an LPI */
-> @@ -849,7 +849,7 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  	}
->  
->  	/* EOImode == 1 and not an LPI, nothing to be done here */
-> -	if ((vmcr & ICH_VMCR_EOIM_MASK) && !(vid >= VGIC_MIN_LPI))
-> +	if (FIELD_GET(ICH_VMCR_EL2_VEOIM_MASK, vmcr) && !(vid >= VGIC_MIN_LPI))
->  		return;
->  
->  	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
-> @@ -865,12 +865,12 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  
->  static void __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
->  {
-> -	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
-> +	vcpu_set_reg(vcpu, rt, !!FIELD_GET(ICH_VMCR_EL2_VENG0_MASK, vmcr));
+1. A PCIe-fault brings B's link down, then A's.
+2. The PCI core starts removing B:
+   - pciehp_unconfigure_device() takes pci_rescan_remove_lock
+   - vfio-pci's remove routine waits for fdB to be closed
+3. While B is stuck, the core removes A:
+   - pciehp_ist() takes the read side of reset_lock A
+   - It blocks on pci_rescan_remove_lock already held by B
+4. Killing the process closes fdA first (because it was opened first).
+   vfio_pci_core_close_device() tries to hot-reset A, so it needs
+   the write side of reset_lock A.
+5. The write request sleeps until the read lock from step 3 is
+   released, but that reader is itself waiting for B's lock
+   -> deadlock.
 
-Here, !! is actually really superfluous and makes it harder to
-understand what is being done. Similar thing for IRGPEN1.
+The stuck thread's backtrace is as follows:
+  /proc/1909/stack
+    [<0>] vfio_unregister_group_dev+0x99/0xf0 [vfio]
+    [<0>] vfio_pci_core_unregister_device+0x19/0xb0 [vfio_pci_core]
+    [<0>] vfio_pci_remove+0x15/0x20 [vfio_pci]
+    [<0>] pci_device_remove+0x3e/0xb0
+    [<0>] device_release_driver_internal+0x19b/0x200
+    [<0>] pci_stop_bus_device+0x6d/0x90
+    [<0>] pci_stop_and_remove_bus_device+0xe/0x20
+    [<0>] pciehp_unconfigure_device+0x8c/0x150
+    [<0>] pciehp_disable_slot+0x68/0x140
+    [<0>] pciehp_handle_presence_or_link_change+0x246/0x4c0
+    [<0>] pciehp_ist+0x244/0x280
+    [<0>] irq_thread_fn+0x1f/0x60
+    [<0>] irq_thread+0x1ac/0x290
+    [<0>] kthread+0xfa/0x240
+    [<0>] ret_from_fork+0x209/0x260
+    [<0>] ret_from_fork_asm+0x1a/0x30
+  /proc/1910/stack
+    [<0>] pciehp_unconfigure_device+0x43/0x150
+    [<0>] pciehp_disable_slot+0x68/0x140
+    [<0>] pciehp_handle_presence_or_link_change+0x246/0x4c0
+    [<0>] pciehp_ist+0x244/0x280
+    [<0>] irq_thread_fn+0x1f/0x60
+    [<0>] irq_thread+0x1ac/0x290
+    [<0>] kthread+0xfa/0x240
+    [<0>] ret_from_fork+0x209/0x260
+    [<0>] ret_from_fork_asm+0x1a/0x30
+  /proc/6765/stack
+    [<0>] pciehp_reset_slot+0x2c/0x70
+    [<0>] pci_reset_hotplug_slot+0x3e/0x60
+    [<0>] pci_reset_bus_function+0xcd/0x180
+    [<0>] cxl_reset_bus_function+0xc8/0x110
+    [<0>] __pci_reset_function_locked+0x4f/0xd0
+    [<0>] vfio_pci_core_disable+0x381/0x400 [vfio_pci_core]
+    [<0>] vfio_pci_core_close_device+0x63/0xd0 [vfio_pci_core]
+    [<0>] vfio_df_close+0x48/0x80 [vfio]
+    [<0>] vfio_df_group_close+0x32/0x70 [vfio]
+    [<0>] vfio_device_fops_release+0x1d/0x40 [vfio]
+    [<0>] __fput+0xe6/0x2b0
+    [<0>] task_work_run+0x58/0x90
+    [<0>] do_exit+0x29b/0xa80
+    [<0>] do_group_exit+0x2c/0x80
+    [<0>] get_signal+0x8f9/0x900
+    [<0>] arch_do_signal_or_restart+0x29/0x210
+    [<0>] exit_to_user_mode_loop+0x8e/0x4f0
+    [<0>] do_syscall_64+0x262/0x630
+    [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Apart from these two points, this looks OK to me.
+The deadlock blocks PCI operations (lspci, sysfs removal, unplug, etc.) and
+sends system load soaring as PCI-related work stalls, preventing the system
+from isolating the fault.
 
-Thanks,
+The ctrl->reset_lock was added by commit 5b3f7b7d062b ("PCI: pciehp:
+Avoid slot access during reset") to serialize threads that perform or
+observe a bus reset, including pciehp_ist() and pciehp_reset_slot().
 
-	M.
+When a PCIe device is surprise-removed (card pulled or link fault)
+and generates a link-down event, pciehp_ist() handles it first; only
+later, after the device has already vanished, does vfio_pci_core_disable()
+invoke pciehp_reset_slot() - because it must take ctrl->reset_lock.
+Thus the hot reset (FLR, slot, or bus) is performed after the device
+is gone, which is pointless.
 
+For surprise removal, the device state is set to
+pci_channel_io_perm_failure in pciehp_unconfigure_device(), indicating
+the device is already gone (disconnected).
+
+pciehp_ist()
+  pciehp_handle_presence_or_link_change()
+    pciehp_disable_slot()
+      remove_board()
+        pciehp_unconfigure_device(presence) {
+	  if (!presence)
+	      pci_walk_bus(parent, pci_dev_set_disconnected, NULL);
+	}
+
+Commit 39714fd73c6b ("PCI: Make pci_dev_is_disconnected() helper public for
+other drivers") adds pci_dev_is_disconnected() to let drivers check whether
+a device is gone.
+
+Fix the deadlock by using pci_dev_is_disconnected() in
+vfio_pci_core_disable() to detect a gone PCIe device and skip the hot
+reset.
+
+Signed-off-by: Jinhui Guo <guojinhui.liam@bytedance.com>
+---
+
+Hi, alex
+
+Sorry for the noise.
+I've just resent the patch to expand the commit message; no code changes.
+I hope the additional context helps the review.
+
+Best Regards,
+Jinhui
+
+ drivers/vfio/pci/vfio_pci_core.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 3a11e6f450f7..f42051552dd4 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -678,6 +678,16 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
+ 		if (!vdev->reset_works)
+ 			goto out;
+ 
++		/*
++		 * Skip hot reset on Link-Down. This avoids the reset_lock
++		 * deadlock in pciehp_reset_slot() when multiple PCIe devices
++		 * go down at the same time.
++		 */
++		if (pci_dev_is_disconnected(pdev)) {
++			vdev->needs_reset = false;
++			goto out;
++		}
++
+ 		pci_save_state(pdev);
+ 	}
+ 
 -- 
-Without deviation from the norm, progress is not possible.
+2.20.1
 
