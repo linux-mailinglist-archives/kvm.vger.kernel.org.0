@@ -1,100 +1,100 @@
-Return-Path: <kvm+bounces-65970-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65971-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4945ACBE682
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:52:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B14CBE707
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 15:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F68830249AB
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 14:51:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 643E33014DA5
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 14:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6261337102;
-	Mon, 15 Dec 2025 14:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FAB02C0F93;
+	Mon, 15 Dec 2025 14:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5TOH3/1";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="InIzFwdO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d9CUk2Jo";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="b2hu8zjn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0116E336EE0
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D343C2877E3
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 14:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765809839; cv=none; b=UOLgRF1aa65yu7ynkxjxG3EwO60UXeB86WJyKzwWAULaGP2kLiJzK4MlOFgLvxtFaWlK8cx5iEbKJR9TZR49ATjVUd8OKmDO1X7AieidjCeMM4jl7xITX98wgEZQRQ8V4LPQcVeX7iV6Z9NSaST4vcvPh1hnKgbzNahBdhNr2Rc=
+	t=1765810355; cv=none; b=XYMeg+iytg/avlvMOUJN2qIxixyUcrQDZ18M9kwhXs2IjCvBKG3F5bB45iAzvhZOMECI3K6oexZEQjlleRoqU6UlwYhfIkDuAISfzqVhsHg8N/2+Cl+1nzpmXbLMZzHXYbm8uw3LZvpAhDBPBKsnjG33fRHixmivT59g7+dvoO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765809839; c=relaxed/simple;
-	bh=RzdY0R6cG+aTzXVIrX1t6/9tOgEfYVhCd8vqifyXyO8=;
+	s=arc-20240116; t=1765810355; c=relaxed/simple;
+	bh=Y1gzUkvbkzAczpe9qs/qnyxMcUt4gusMCLAwKCwh8I0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HoOx7CLbm2U3k+e4MDuc3mm9XZTnkCfU+7Obyi3+Y0/4txAVlU9h8iNmlExRfbsVatXSP/fc8McUuNdva8BaA9kdeikw73XoNXY4b/2DTqgmWv1+RlprjcipKGBIGHgU/1MrKgFQSPgQ3ABLOKOrxGsem7Ct7HdmJXU4+rzCE00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M5TOH3/1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=InIzFwdO; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=XQfJ+2E+ZESdfUNnpTuU82A0y+lkx080rQeLw8ymSds5/H8KrPUGD70tddSWkicQQMADJSXLE+vi5U9N0e5i5vpbtIdUe1hEpth5k0kdcgy/TroM7iC+7is8hEC+JVDruhgW8gjkOvRR9gego9aj8VMcR9yTmMQipCKX4/cwz1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d9CUk2Jo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=b2hu8zjn; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765809836;
+	s=mimecast20190719; t=1765810352;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=KbmBVMaKs2SCvs0kY5sFfZiNDopO0kTBitZ0Y6fYXHo=;
-	b=M5TOH3/1ramwLoZvUsQiJR/DLc7FCax5QssRjeVCN4e6Vv/L5UL+CHafNf8w+Bsbz+OFE9
-	ph5h05Fj2J7sC/FSHlBCmnNjJos1qFFgPC/ffX1OVmChyqaY2GINVlwIzYDVY4199IDe9G
-	CfKXkuU0PVszjXLEO1B6TgihpYSpurE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zF8JgN4tWbVCAWjS2x+UG6gULrYPoT5c49LyU7Nv77s=;
+	b=d9CUk2Jo/ok5gs0BTzfaUnfPfgdOJXoibSODuPe4eACCa0OjLkqSL4OI7H+i/VIxX77R6S
+	IhVOGml3dnt3xT3egy42nIVPv81mESr7yEpfbiLutGHCk+hUONECi6W2wt2sm4bgysHUxw
+	VgXTi2xR3ySg3Anj/sDc6bpXhF8uVjQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-2-iPyIuc_fPPiX7safDmuyqA-1; Mon, 15 Dec 2025 09:43:55 -0500
-X-MC-Unique: iPyIuc_fPPiX7safDmuyqA-1
-X-Mimecast-MFC-AGG-ID: iPyIuc_fPPiX7safDmuyqA_1765809834
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430fc153d50so826936f8f.1
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 06:43:55 -0800 (PST)
+ us-mta-609-QyxzUixtMHWE9xeU07J3-Q-1; Mon, 15 Dec 2025 09:52:31 -0500
+X-MC-Unique: QyxzUixtMHWE9xeU07J3-Q-1
+X-Mimecast-MFC-AGG-ID: QyxzUixtMHWE9xeU07J3-Q_1765810350
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b73720562ceso362397066b.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 06:52:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765809834; x=1766414634; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1765810350; x=1766415150; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KbmBVMaKs2SCvs0kY5sFfZiNDopO0kTBitZ0Y6fYXHo=;
-        b=InIzFwdOzhJDv98tb/9tw3AJQTQzo6bgMtVB7v+85wAwjI+9zM3Ajzst4tZ0Ovb+bq
-         g8YuxHv58ti9ZdOHhqDnLyjYvl5gikgG6I5XgKOqXfSE2GyuBaP57GZHdMbj5aFsKoGu
-         NSVWAUDflLnle6hV2oHfSX7J0KF9/2rOCpETCtHYaA9RgDWFlpXPL4bhTA2Qx6sH3v1V
-         XlaP3CgHYUt8M7EYioC/nz4CdtDjCkXdlDQuWlRKjVfRy0sAsSdEn2Zr3jzdolt9W/uc
-         I1zRuTh5pbVTPupKEEz3R6l6egqu3tCDvhKyGhT2DKL5qfPP0RhOeMMsT59vieYD61TR
-         68Vg==
+        bh=zF8JgN4tWbVCAWjS2x+UG6gULrYPoT5c49LyU7Nv77s=;
+        b=b2hu8zjnuslfpOYGqQCPxaknyyFt+fllolx3Nx58qggOby0UN/yksO45cv9KWhwxTY
+         +oJNKFx7sB9yTN4GalvzOohKp8Lug7eSO3KqtGXEVs8VPSUYaR7IvPsscIRv3YtMJyrn
+         lxcdaM3BddCpEbjMWbj7zklZzvKkcFmBEVbjxk9nhux1/hthvOwbShS4rPIfCixq1TUp
+         wV86cOQS+YxtUMNXgbzDCQQEWIzwl9ADf8M48FpaS0JNVDXy09SyDgnNrI4L+SsPP0Hi
+         bjtNgNY0pfU4lSfEMOM2XyZdKfdTLPiCRsbUG9LVNkzfjZebWCb1iUa6bkOoBtR2H3af
+         PqMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765809834; x=1766414634;
+        d=1e100.net; s=20230601; t=1765810350; x=1766415150;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KbmBVMaKs2SCvs0kY5sFfZiNDopO0kTBitZ0Y6fYXHo=;
-        b=JKmdbhhKYBUpe+h2ZNgoizCsOgRQRt5GCarF+8mgohrI+5mzDNvJ52FgMHll5rMseV
-         L3+EFLomHmuR6fapkgQT+p1DwFYmJVJd+6jmz+4L7337qZQyxADDuBHYOhcJqopOWWKN
-         X43GmdLu03GceaKAf9pXCsH6JvUewkpY8UfF7lnYPJSTPZj3sYqt1PXIe6lqnEKtUlpw
-         45PjXy0BeiYJinQbLgtKVpMO/NvMVHJxrwaAPGJ5whlFhU85/jfCEWYQ1KVsIIXWRt8b
-         c6PH+B6fmnXoWE8EONMHbC0d+4VRs/b6GnNdusYeqZFRSeIRYimft3ilIr5Qt7PHHgkq
-         vL8A==
-X-Forwarded-Encrypted: i=1; AJvYcCV2diBINh1KMKIVARFHcHU2AAVRrRtQzWFfms7o4UFRKaMbVjU1H6Z7OVXCqElXSqVMQBg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrsGY58BXdyvH3tmsdbQRdGCBrcucx3ZEhwqTSJiA/BA7Dg6e6
-	6ipI0+559OUyOQ3eTRzdsAfT52/Mgq49BMjIhb+C1jRYM50ywARw+vW1LhyJeOW8uuihy1VdHQC
-	CuIaySlryeKu0qz+kALv/Q7qKmyHpQKTWBP/OBbdk9Sxx1qz+fwZDPA==
-X-Gm-Gg: AY/fxX5cRR0E9NnkDSZH/GaNtiHbh89HOn1X+Nh65NfoenduoohZfRKbhbv50ONsRMo
-	aFbmJsnALJtTU4VFeqPby49ciK5a7drPc3tnhpI1cGpWpopKldWuBQMpvmRcQwhxkO7oRinrWQ1
-	HHg923luza0WJf8qjLkXzMjr+cjNvNiqNFniy70QI15xh5m38R6r8CoFeZuQ125ex0panO6OyG6
-	3dlf3XQ0EZbG1jPyNbt/wzBRMByDwix3lTUcetPHxOiJ9Di+zMSRUom4Wn/ADmodmZw4Df9yrIH
-	N+8O+2mW40WatIxXOe5rPFFr5KA3XNxOXlqtczeTHIjmgf4n9sLvNIbCqYrkc7RPHCMDXJhSdP8
-	e+ZFJtn5+ZlTWbUBJmDGr68s17zAowWu+LWq9eEXiWz2FpYHkzyL+9WsWlIFVtxTXqruicOx4PP
-	IijRQCDFYApPREwK8=
-X-Received: by 2002:a05:6000:2003:b0:430:fdfc:7ddf with SMTP id ffacd0b85a97d-430fdfc7f3dmr3346994f8f.42.1765809834227;
-        Mon, 15 Dec 2025 06:43:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGE8z7d28O5QIYZWoRf+K+IW6v0b/UhSS4nFlmnvJmnnvSIBIqZMZaI0o6LAB3W1sR28YpbMw==
-X-Received: by 2002:a05:6000:2003:b0:430:fdfc:7ddf with SMTP id ffacd0b85a97d-430fdfc7f3dmr3346950f8f.42.1765809833591;
-        Mon, 15 Dec 2025 06:43:53 -0800 (PST)
+        bh=zF8JgN4tWbVCAWjS2x+UG6gULrYPoT5c49LyU7Nv77s=;
+        b=ftKQU+sX2ImPbLiOKauCzoWb82m+QxEUxm8MUZgY/1dIVSdRhOLKYFgr4d3BEhmCko
+         dhRmRsjvF8cywYuDUO0+rFlw3CLl+8hULwpP6D7PpaQpBPpLayoL22krIhdT+Y1p4Cx8
+         OUrhG5TrET5/WGmW3BX4/qKUnki+8bqljH7DixwH0rf6umzddPvBbJfebsdJXECu+C8g
+         z1RdQpdsv0R68pis8yAg9YjNbVPnRka4+yXMAhAuaANbxLM7CorTMIEeclA0d4rjE/dw
+         4oSc+ndcIILVnPGF42YmalGfqmlNFmo0++tSGcEADxowE+zYtJClXWh926nUtBOcOoeg
+         Ov4A==
+X-Forwarded-Encrypted: i=1; AJvYcCU1rn78rL170aKl2S8NukPUAfEIRPkouG7YbzAPDBA+fgjTKWJemxnR7VoPc5b3ES4cUP4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyU9IGnZvWsCxs+LrurbzEf4TlSBmpID8U0XLRIK6/zVIN+w8o9
+	brCKkhrfmftw6YFcGtm1mO31c+Y4jnrfK8vJFirAAjEwttu1XEaUKFEULBb0FrUfJX1TQdHeVsG
+	0GYbW+SmyVs3AVcKAVzdZg9MUZluKqHwCPJkIhZZs3DNcPf69vP/F3Q==
+X-Gm-Gg: AY/fxX7sAR0pjb4lMbm1VdVqeSlNpqqES/yp9oqdfB/zVAbNxZ93XpOZfFvYytOSKB7
+	cobE0rdYkZLPF15ss10yo95FX9b3qBeY7VVImsFIhPsyyCdTkUpRb+TByWXDWtri7YbXwRizVB2
+	/WRTSiDrm/vLiVYU9PrS34b2N1Ly96Pbsib7MvQwGMM/QApBVCLlZnKj2yysqob2owwtwBVP+oY
+	Ve3rS9MEXKOeh8wjGLdc/flV+lx6igdwhZ/Ttc2NJYwv3DtJRHBFaOVu/VYtjBdHgsqwXfKSzDt
+	CF2c6gD7am3yOnr9sfD1mmKKuTN1v7XCl11kJth+XG7pPfhBWEGJ4Sm2xoHAvr9hkErcb9BB7o8
+	o8AXpUR64owRo/pd/QqVCyGopzfWLSjr07cdlAARh/zvqKQwcACWOX0BFIZEoaHT8SvbIBceuOa
+	kYHd/3EfLdpKqj68w=
+X-Received: by 2002:a17:907:2d29:b0:b70:c190:62e1 with SMTP id a640c23a62f3a-b7d23ad635bmr1137591166b.35.1765810349948;
+        Mon, 15 Dec 2025 06:52:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHn8J0an9IDgB1tsnPyFoLwVTjx3kNnmLGSz0vmlk7BO5WUjHzTh7WRzivAGmyoQORHhuQEcw==
+X-Received: by 2002:a17:907:2d29:b0:b70:c190:62e1 with SMTP id a640c23a62f3a-b7d23ad635bmr1137588366b.35.1765810349548;
+        Mon, 15 Dec 2025 06:52:29 -0800 (PST)
 Received: from [192.168.10.48] ([151.95.145.106])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-430f6e78a7csm12109808f8f.34.2025.12.15.06.43.52
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b7cfa2ed80dsm1416551566b.16.2025.12.15.06.52.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Dec 2025 06:43:53 -0800 (PST)
-Message-ID: <159ced33-46e4-4b86-85e7-eda01406f768@redhat.com>
-Date: Mon, 15 Dec 2025 15:43:51 +0100
+        Mon, 15 Dec 2025 06:52:29 -0800 (PST)
+Message-ID: <b6f193d4-b780-439a-80eb-bb8b43acac4e@redhat.com>
+Date: Mon, 15 Dec 2025 15:52:27 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -102,7 +102,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] thread-pool: Fix thread race
+Subject: Re: [PATCH 3/4] qmp: Fix thread race
 To: Marc Morcos <marcmorcos@google.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Eduardo Habkost <eduardo@habkost.net>,
@@ -112,7 +112,7 @@ Cc: "Michael S . Tsirkin" <mst@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
  <mtosatti@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 References: <20251213001443.2041258-1-marcmorcos@google.com>
- <20251213001443.2041258-3-marcmorcos@google.com>
+ <20251213001443.2041258-4-marcmorcos@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -150,61 +150,59 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20251213001443.2041258-3-marcmorcos@google.com>
+In-Reply-To: <20251213001443.2041258-4-marcmorcos@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/13/25 01:14, Marc Morcos wrote:
->   
->           req->ret = ret;
-
-Better use qatomic_set here---will fix it myself, thanks!
-
-Paolo
-
-> -        /* Write ret before state.  */
-> -        smp_wmb();
-> -        req->state = THREAD_DONE;
-> +        /* _release to write ret before state.  */
-> +        qatomic_store_release(&req->state, THREAD_DONE);
->   
->           qemu_bh_schedule(pool->completion_bh);
->           qemu_mutex_lock(&pool->lock);
-> @@ -180,7 +184,8 @@ static void thread_pool_completion_bh(void *opaque)
->   
->   restart:
->       QLIST_FOREACH_SAFE(elem, &pool->head, all, next) {
-> -        if (elem->state != THREAD_DONE) {
-> +        /* _acquire to read state before ret.  */
-> +        if (qatomic_load_acquire(&elem->state) != THREAD_DONE) {
->               continue;
+> @@ -346,7 +347,15 @@ static void monitor_qapi_event_emit(QAPIEvent event, QDict *qdict)
 >           }
 >   
-> @@ -189,9 +194,6 @@ restart:
->           QLIST_REMOVE(elem, all);
->   
->           if (elem->common.cb) {
-> -            /* Read state before ret.  */
-> -            smp_rmb();
-> -
->               /* Schedule ourselves in case elem->common.cb() calls aio_poll() to
->                * wait for another request that completed at the same time.
->                */
-> @@ -223,12 +225,12 @@ static void thread_pool_cancel(BlockAIOCB *acb)
->       trace_thread_pool_cancel_aio(elem, elem->common.opaque);
->   
->       QEMU_LOCK_GUARD(&pool->lock);
-> -    if (elem->state == THREAD_QUEUED) {
-> +    if (qatomic_read(&elem->state) == THREAD_QUEUED) {
->           QTAILQ_REMOVE(&pool->request_list, elem, reqs);
->           qemu_bh_schedule(pool->completion_bh);
->   
-> -        elem->state = THREAD_DONE;
-> -        elem->ret = -ECANCELED;
-> +        qatomic_set(&elem->ret, -ECANCELED);
-> +        qatomic_store_release(&elem->state, THREAD_DONE);
+>           qmp_mon = container_of(mon, MonitorQMP, common);
+> -        if (qmp_mon->commands != &qmp_cap_negotiation_commands) {
+> +        do_send = false;
+> +
+> +        WITH_QEMU_LOCK_GUARD(&mon->mon_lock) {
+> +            if (qmp_mon->commands != &qmp_cap_negotiation_commands) {
+> +                do_send = true;
+> +            }
+> +        }
+> +
+> +        if (do_send) {
+>               qmp_send_response(qmp_mon, qdict);
+>           }
 >       }
->   
->   }
+
+We cannot use WITH_QEMU_LOCK_GUARD with "continue" or "break" inside, 
+but we can use QEMU_LOCK_GUARD:
+
+@@ -347,17 +346,13 @@ static void monitor_qapi_event_emit(QAPIEvent 
+event, QDict *qdict)
+          }
+
+          qmp_mon = container_of(mon, MonitorQMP, common);
+-        do_send = false;
+-
+-        WITH_QEMU_LOCK_GUARD(&mon->mon_lock) {
+-            if (qmp_mon->commands != &qmp_cap_negotiation_commands) {
+-                do_send = true;
++        {
++            QEMU_LOCK_GUARD(&mon->mon_lock);
++            if (qmp_mon->commands == &qmp_cap_negotiation_commands) {
++                continue;
+              }
+          }
+-
+-        if (do_send) {
+-            qmp_send_response(qmp_mon, qdict);
+-        }
++        qmp_send_response(qmp_mon, qdict);
+      }
+  }
+
+
+Let me know if this is okay for you!
+
+Paolo
 
 
