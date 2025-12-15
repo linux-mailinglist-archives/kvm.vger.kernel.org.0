@@ -1,345 +1,209 @@
-Return-Path: <kvm+bounces-65987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F14CBED24
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:05:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1DA3CBED9B
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3782330157EF
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:05:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE2A2302D2A2
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828F9334C04;
-	Mon, 15 Dec 2025 16:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C504B3126A2;
+	Mon, 15 Dec 2025 16:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNoWA50/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GnaR8ern"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D21532AAB1;
-	Mon, 15 Dec 2025 16:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0A430F92F
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765814707; cv=none; b=JeN4oD1kdEkZH7R3Sdc5YdKJXPLCOpqav6Tg4XTQNGX+N7UsAa+xwBtqqhkcl/QYQ7IrKIy5JlEqJ/dMpMzWDlM8nmNZGUv/dlJkserWuLgf1PAkOE3jLxGoYjzvvt04D0F1KIbwLXbI/m6YEX48VC9hBYQE7iY6Pl1LmN3gOd0=
+	t=1765814879; cv=none; b=KWRlQNGzN/cieZFVjQ1uTUgFajRHZCl3hJfX+w+fBrkze4kT+1clxJ5FtccAjnlHmV6/baC2CICLlD8urlsw6FtkS7lpSjUglwx/y7RBl+ijzdHYUrurp7wPB/KAbT2SE+pOcmurRn2h/8h2F10zpA1LyQ4wbSdpGlwT4NSixJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765814707; c=relaxed/simple;
-	bh=bkRUkk2Yd28DymjzRKsJIcSdDn9vDEUyQ62VF2+dGLk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TYnf6pwkChcw3rIHzYDYnpfK6u4wYlfvx4lBZ+eG4y2upPSduLU1BzDG1m00QG1EeYy/Bq82rOSbXJPKewTumd1SbBW9EIuiXAFwqa9vfhLYHaJLOoHbY3AXFYpg7osol24oPmZoMKINZqIxy36jUhgqhFCdCwj8n9UA7HhmOKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNoWA50/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE7ACC4CEF5;
-	Mon, 15 Dec 2025 16:05:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765814707;
-	bh=bkRUkk2Yd28DymjzRKsJIcSdDn9vDEUyQ62VF2+dGLk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XNoWA50/+Kj3ywDKjQhg1qz3I7wKxKoeemhIi7Iqi8febu/LP3D1fQP6UJ0NaQLt6
-	 q/5t1FZyfQ2bobMtnW5b3309NQFcKJvpO3cl6YBu16uRO4JvN7bNnjtGDw+EjPzV83
-	 OghlntbnhZN3oEXxZUwLUzLWckPngTI2ERfN6T8YfsrfbHGusrLmm7bvDE3N1InNRO
-	 hVFwEiGMNsJooc7sy6Y1yoYTahnyPAh2qPZrPc5fXfr5dke5n2AG/XHW9EfsIWU2q0
-	 y7+Oy1zP3brakqVbXoXFsrSfjvvz7pfBSsEM6iT9W8z3bfbQmX7AcX3gxm8weG4XjC
-	 MAaALmm/JYSKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vVB4K-0000000Cold-3DYt;
-	Mon, 15 Dec 2025 16:05:04 +0000
-Date: Mon, 15 Dec 2025 16:05:04 +0000
-Message-ID: <86ecovohn3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 07/32] KVM: arm64: gic: Introduce interrupt type helpers
-In-Reply-To: <86jyynooq3.wl-maz@kernel.org>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-8-sascha.bischoff@arm.com>
-	<86jyynooq3.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765814879; c=relaxed/simple;
+	bh=+4xe1iZfVRPBR4ECFQsnpb2jSdF83uH/G/fWPnC4mdc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IoKPplE7BO9ijnoXf91z2KY9iwwYrcGGAzanEaVjPCfWsUxr4wZK2abkF85Odtf1b9rt83rx0poEe+bPdWBwKJ9hrml+2afpDguaPfoU7+VSV92/OTMAEHYf4EhrRBpoqfqZFmpON/QBvIgcyyvOS7pmTsvsfJmQLOn/CtgQ0aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GnaR8ern; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c37b8dc4fso4742167a91.2
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:07:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765814877; x=1766419677; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nT6Hj9nZToaeawg9ZdYWdQ6jcdndGyE7PtkODE5scAk=;
+        b=GnaR8ernHoVjfegxesvr1+XeGDBfsWivbOlODB3zx+HlYo7OK6PD6O6ztReleFt4HD
+         ug9Nwg3o4VyuNW+7ghygms1cisk5hY+TXPSlCuvmT9lf6UOAiVRxlDdZ79msaxEUxSKQ
+         ARWGACG9gkE204yXkC/0bVtXcu+C4LxaINhDONYeiC2S9lzxFJSWYibfSBYW6QvJD1UF
+         H4KdR+xnFbo3gMgTvZNpj3JxADC2xxnU4qKe0dC69xHotEjqik9lVx89z8Q1DiTIw99f
+         tvA7FUbU5xiODcl20vzg8SmkdCNfPDBvEUvKE6gESplziES2w5JihrhCgXNhl4njtJGc
+         bzBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765814877; x=1766419677;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nT6Hj9nZToaeawg9ZdYWdQ6jcdndGyE7PtkODE5scAk=;
+        b=XWPLEhi1DbuqWcEQ2XHGW/briI6TAJOAK5nGxxyA5Ux6tkGuRUkp4JXSd2EESOLwuH
+         L2Jigv8itSwFAzJMchDAO1QT52WzyTJtUDQ/2hJRhfDXe243+ld/pjXDzZi4Wuu/en3N
+         t8DjYkPWbaEISzsURAtefnojmECqqeEqaV+Kw1/yJElcjENJ6WEr/NfoTIsrYwb5d8pU
+         r5sttdP0t1mXtyEz8xT8TQwqx79iiYBntTzK0vgB+1y5KFpsGOeCBdEJ5vAqzbCc2TWy
+         xERE+P6UzlEf+7rJkCLm371k/zfOO++59kUDV1aSof0Jb3QiTFI1qq6DTAbKu0fDsefy
+         aY9g==
+X-Forwarded-Encrypted: i=1; AJvYcCU7//HK6jx5FOT/OXh6aMbWUTNmsnI01t0I36LUpDqLjwCrVbuovVERCMMSdbCXfAaZlTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1r6RbTkFQ07G1Ol6r4JoOX/xXVg7dHLBmWk5ZfxImxdsx4OfL
+	VVm5QHTrLHRTLkBF63ZsqnPuOzQ4AUXgNt17JDJzHuv+c7F6/rxbDfXhi7rK+Xbqs/XnScmYY62
+	1WCj0nIutiuumaQ==
+X-Google-Smtp-Source: AGHT+IEqf//9eh5pdB+MFoAFUNCvM/jhTB4BDfBdBVN4ftUfCvlhVZnyPQH5a/T5bNthJjf0rFw3hN3JVZF3IA==
+X-Received: from pjbgn5.prod.google.com ([2002:a17:90a:c785:b0:34a:4a21:bc22])
+ (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:1dc6:b0:33e:1acc:1799 with SMTP id 98e67ed59e1d1-34abd6ccd82mr11243914a91.14.1765814876694;
+ Mon, 15 Dec 2025 08:07:56 -0800 (PST)
+Date: Mon, 15 Dec 2025 16:07:10 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251215160710.1768474-1-chengkev@google.com>
+Subject: [PATCH v2] KVM: SVM: Don't allow L1 intercepts for instructions not advertised
+From: Kevin Cheng <chengkev@google.com>
+To: seanjc@google.com, pbonzini@redhat.com
+Cc: jmattson@google.com, yosry.ahmed@linux.dev, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Kevin Cheng <chengkev@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Dec 2025 13:32:04 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> I'd rather you have something that denotes the non-GICv5-ness of the
-> implementation. irq_is_nv5_ppi()?
+If a feature is not advertised in the guest's CPUID, prevent L1 from
+intercepting the unsupported instructions by clearing the corresponding
+intercept in KVM's cached vmcb12.
 
-Actually, this is just as bad. I spent the past 30 minutes hacking on
-this, and came up with this hack (which compiles, but probably doesn't
-run). It is significantly more code, but I like that it treats all GIC
-implementations more or less the same way.
+When an L2 guest executes an instruction that is not advertised to L1,
+we expect a #UD exception to be injected by L0. However, the nested svm
+exit handler first checks if the instruction intercept is set in vmcb12,
+and if so, synthesizes an exit from L2 to L1 instead of a #UD exception.
+If a feature is not advertised, the L1 intercept should be ignored.
 
-It also clears the who [v]gic_is_v5() situation that made little
-sense.
+While creating KVM's cached vmcb12, sanitize the intercepts for
+instructions that are not advertised in the guest CPUID. This
+effectively ignores the L1 intercept on nested vm exit handling.
 
-Let me know what you think.
+Signed-off-by: Kevin Cheng <chengkev@google.com>
+---
+v1 -> v2:
+  - Removed nested_intercept_mask which was a bit mask for nested
+    intercepts to ignore.
+  - Now sanitizing intercepts every time cached vmcb12 is created
+  - New wrappers for vmcb set/clear intercept functions
+  - Added macro functions for vmcb12 intercept sanitizing
+  - All changes suggested by Sean. Thanks!
+  - https://lore.kernel.org/all/20251205070630.4013452-1-chengkev@google.com/
 
-	M.
+ arch/x86/kvm/svm/nested.c | 19 +++++++++++++++++++
+ arch/x86/kvm/svm/svm.h    | 35 +++++++++++++++++++++++++++--------
+ 2 files changed, 46 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index b0a5a6c6bf8da..c908d5ac4d678 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -62,11 +62,6 @@ static struct irq_ops arch_timer_irq_ops_vgic_v5 = {
- 	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
- };
- 
--static bool vgic_is_v5(struct kvm_vcpu *vcpu)
--{
--	return vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5;
--}
--
- static int nr_timers(struct kvm_vcpu *vcpu)
- {
- 	if (!vcpu_has_nv(vcpu))
-@@ -708,7 +703,7 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
- 
- 	phys_active |= ctx->irq.level;
- 
--	if (!vgic_is_v5(vcpu))
-+	if (!vgic_is_v5(vcpu->kvm))
- 		set_timer_irq_phys_active(ctx, phys_active);
- 	else
- 		set_timer_irq_phys_masked(ctx, true);
-@@ -760,7 +755,7 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return;
- 
--	ops = vgic_is_v5(vcpu) ? &arch_timer_irq_ops_vgic_v5 :
-+	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
- 				 &arch_timer_irq_ops;
- 
- 	/*
-@@ -905,7 +900,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 
- 	if (static_branch_likely(&has_gic_active_state)) {
- 		/* We don't do NV on GICv5, yet */
--		if (vcpu_has_nv(vcpu) && !vgic_is_v5(vcpu))
-+		if (vcpu_has_nv(vcpu) && !vgic_is_v5(vcpu->kvm))
- 			kvm_timer_vcpu_load_nested_switch(vcpu, &map);
- 
- 		kvm_timer_vcpu_load_gic(map.direct_vtimer);
-@@ -977,7 +972,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 		kvm_timer_blocking(vcpu);
- 
- 	/* Unmask again on GICV5 */
--	if (vgic_is_v5(vcpu)) {
-+	if (vgic_is_v5(vcpu->kvm)) {
- 		set_timer_irq_phys_masked(map.direct_vtimer, false);
- 
- 		if (map.direct_ptimer)
-@@ -1623,7 +1618,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
- 	}
- 
--	ops = vgic_is_v5(vcpu) ? &arch_timer_irq_ops_vgic_v5 :
-+	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
- 				 &arch_timer_irq_ops;
- 
- 	get_timer_map(vcpu, &map);
-@@ -1700,7 +1695,7 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	 * The PPIs for the Arch Timers arch architecturally defined for
- 	 * GICv5. Reject anything that changes them from the specified value.
- 	 */
--	if (vgic_is_v5(vcpu) && vcpu->kvm->arch.timer_data.ppi[idx] != irq) {
-+	if (vgic_is_v5(vcpu->kvm) && vcpu->kvm->arch.timer_data.ppi[idx] != irq) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index d74cc3543b9a4..19d8bf90f8f6c 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -225,7 +225,7 @@ bool vgic_v5_ppi_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 
- 	lockdep_assert_held(&irq->irq_lock);
- 
--	if (WARN_ON_ONCE(!irq_is_ppi_v5(irq->intid)))
-+	if (WARN_ON_ONCE(!__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid)))
- 		return false;
- 
- 	vcpu = irq->target_vcpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 62d7d4c5650e4..6d8e4cd661734 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -109,10 +109,10 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
- 	if (WARN_ON(!vcpu))
- 		return NULL;
- 
--	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
-+	if (vgic_is_v5(vcpu->kvm)) {
- 		u32 int_num = FIELD_GET(GICV5_HWIRQ_ID, intid);
- 
--		if (irq_is_ppi_v5(intid)) {
-+		if (__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, intid)) {
- 			int_num = array_index_nospec(int_num, VGIC_V5_NR_PRIVATE_IRQS);
- 			return &vcpu->arch.vgic_cpu.private_irqs[int_num];
- 		}
-@@ -600,15 +600,13 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	irq->hwintid = data->hwirq;
- 	irq->ops = ops;
- 
--	if (vgic_is_v5(vcpu->kvm)) {
--		/* Nothing for us to do */
--		if (!irq_is_ppi_v5(irq->intid))
--			return 0;
-+	if (vgic_is_v5(vcpu->kvm) &&
-+	    !__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid))
-+		return 0;
- 
--		if (FIELD_GET(GICV5_HWIRQ_ID, irq->intid) == irq->hwintid) {
--			if (!vgic_v5_set_ppi_dvi(vcpu, irq->hwintid, true))
--				irq->directly_injected = true;
--		}
-+	if (FIELD_GET(GICV5_HWIRQ_ID, irq->intid) == irq->hwintid) {
-+		if (!vgic_v5_set_ppi_dvi(vcpu, irq->hwintid, true))
-+			irq->directly_injected = true;
- 	}
- 
- 	return 0;
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 91969b3b80d04..d8a947a7eb941 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -500,11 +500,6 @@ static inline bool vgic_is_v3(struct kvm *kvm)
- 	return kvm_vgic_global_state.type == VGIC_V3 || vgic_is_v3_compat(kvm);
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index c81005b245222..5ffc12a315ec7 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -403,6 +403,19 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
+ 	return __nested_vmcb_check_controls(vcpu, ctl);
  }
- 
--static inline bool vgic_is_v5(struct kvm *kvm)
--{
--	return kvm_vgic_global_state.type == VGIC_V5 && !vgic_is_v3_compat(kvm);
--}
--
- bool system_supports_direct_sgis(void);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- bool vgic_supports_direct_sgis(struct kvm *kvm);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 6863e19d6eeb7..ae2897c539af7 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -36,22 +36,78 @@
- /* GICv5 constants */
- #define VGIC_V5_NR_PRIVATE_IRQS	128
- 
--#define irq_is_ppi_legacy(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
--#define irq_is_spi_legacy(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
--					(irq) <= VGIC_MAX_SPI)
--#define irq_is_lpi_legacy(irq) ((irq) > VGIC_MAX_SPI)
--
--#define irq_is_ppi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_PPI)
--#define irq_is_spi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_SPI)
--#define irq_is_lpi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_LPI)
--
--#define gic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
--
--#define irq_is_ppi(k, i) (gic_is_v5(k) ? irq_is_ppi_v5(i) : irq_is_ppi_legacy(i))
--#define irq_is_spi(k, i) (gic_is_v5(k) ? irq_is_spi_v5(i) : irq_is_spi_legacy(i))
--#define irq_is_lpi(k, i) (gic_is_v5(k) ? irq_is_lpi_v5(i) : irq_is_lpi_legacy(i))
--
--#define irq_is_private(k, i) (gic_is_v5(k) ? irq_is_ppi_v5(i) : i < VGIC_NR_PRIVATE_IRQS)
-+#define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) == (t))
-+
-+#define __irq_is_sgi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = false;					\
-+			break;						\
-+		default:						\
-+			__ret  = (i) < VGIC_NR_SGIS;			\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define __irq_is_ppi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = is_v5_type(GICV5_HWIRQ_TYPE_PPI, (i));	\
-+			break;						\
-+		default:						\
-+			__ret  = (i) >= VGIC_NR_SGIS;			\
-+			__ret &= (i) < VGIC_NR_PRIVATE_IRQS;		\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define __irq_is_spi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = is_v5_type(GICV5_HWIRQ_TYPE_SPI, (i));	\
-+			break;						\
-+		default:						\
-+			__ret  = (i) <= VGIC_MAX_SPI;			\
-+			__ret &= (i) >= VGIC_NR_PRIVATE_IRQS;		\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define __irq_is_lpi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = is_v5_type(GICV5_HWIRQ_TYPE_LPI, (i));	\
-+			break;						\
-+		default:						\
-+			__ret  = (i) >= 8192;				\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define irq_is_sgi(k, i) __irq_is_sgi((k)->arch.vgic.vgic_model, i)
-+#define irq_is_ppi(k, i) __irq_is_ppi((k)->arch.vgic.vgic_model, i)
-+#define irq_is_spi(k, i) __irq_is_spi((k)->arch.vgic.vgic_model, i)
-+#define irq_is_lpi(k, i) __irq_is_lpi((k)->arch.vgic.vgic_model, i)
-+
-+#define irq_is_private(k, i) (irq_is_ppi(k, i) || irq_is_sgi(k, i))
-+
-+#define vgic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
- 
- enum vgic_type {
- 	VGIC_V2,		/* Good ol' GICv2 */
 
--- 
-Without deviation from the norm, progress is not possible.
++/*
++ * If a feature is not advertised to L1, clear the corresponding vmcb12
++ * intercept.
++ */
++#define __nested_svm_sanitize_intercept(__vcpu, __control, fname, iname)	\
++do {										\
++	if (!guest_cpu_cap_has(__vcpu, X86_FEATURE_##fname))			\
++		vmcb12_clr_intercept(__control, INTERCEPT_##iname);		\
++} while (0)
++
++#define nested_svm_sanitize_intercept(__vcpu, __control, name)			\
++	__nested_svm_sanitize_intercept(__vcpu, __control, name, name)
++
+ static
+ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+ 					 struct vmcb_ctrl_area_cached *to,
+@@ -413,6 +426,12 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+ 	for (i = 0; i < MAX_INTERCEPT; i++)
+ 		to->intercepts[i] = from->intercepts[i];
+
++	__nested_svm_sanitize_intercept(vcpu, to, XSAVE, XSETBV);
++	nested_svm_sanitize_intercept(vcpu, to, INVPCID);
++	nested_svm_sanitize_intercept(vcpu, to, RDTSCP);
++	nested_svm_sanitize_intercept(vcpu, to, SKINIT);
++	nested_svm_sanitize_intercept(vcpu, to, RDPRU);
++
+ 	to->iopm_base_pa        = from->iopm_base_pa;
+ 	to->msrpm_base_pa       = from->msrpm_base_pa;
+ 	to->tsc_offset          = from->tsc_offset;
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 9e151dbdef25d..7a8c92c4de2fb 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -434,28 +434,47 @@ static __always_inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
+  */
+ #define SVM_REGS_LAZY_LOAD_SET	(1 << VCPU_EXREG_PDPTR)
+
+-static inline void vmcb_set_intercept(struct vmcb_control_area *control, u32 bit)
++static inline void __vmcb_set_intercept(unsigned long *intercepts, u32 bit)
+ {
+ 	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
+-	__set_bit(bit, (unsigned long *)&control->intercepts);
++	__set_bit(bit, intercepts);
+ }
+
+-static inline void vmcb_clr_intercept(struct vmcb_control_area *control, u32 bit)
++static inline void __vmcb_clr_intercept(unsigned long *intercepts, u32 bit)
+ {
+ 	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
+-	__clear_bit(bit, (unsigned long *)&control->intercepts);
++	__clear_bit(bit, intercepts);
+ }
+
+-static inline bool vmcb_is_intercept(struct vmcb_control_area *control, u32 bit)
++static inline bool __vmcb_is_intercept(unsigned long *intercepts, u32 bit)
+ {
+ 	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
+-	return test_bit(bit, (unsigned long *)&control->intercepts);
++	return test_bit(bit, intercepts);
++}
++
++static inline void vmcb_set_intercept(struct vmcb_control_area *control, u32 bit)
++{
++	__vmcb_set_intercept((unsigned long *)&control->intercepts, bit);
++}
++
++static inline void vmcb_clr_intercept(struct vmcb_control_area *control, u32 bit)
++{
++	__vmcb_clr_intercept((unsigned long *)&control->intercepts, bit);
++}
++
++static inline bool vmcb_is_intercept(struct vmcb_control_area *control, u32 bit)
++{
++	return __vmcb_is_intercept((unsigned long *)&control->intercepts, bit);
++}
++
++static inline void vmcb12_clr_intercept(struct vmcb_ctrl_area_cached *control, u32 bit)
++{
++	__vmcb_clr_intercept((unsigned long *)&control->intercepts, bit);
+ }
+
+ static inline bool vmcb12_is_intercept(struct vmcb_ctrl_area_cached *control, u32 bit)
+ {
+-	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
+-	return test_bit(bit, (unsigned long *)&control->intercepts);
++	return __vmcb_is_intercept((unsigned long *)&control->intercepts, bit);
+ }
+
+ static inline void set_exception_intercept(struct vcpu_svm *svm, u32 bit)
+--
+2.52.0.239.gd5f0c6e74e-goog
+
 
