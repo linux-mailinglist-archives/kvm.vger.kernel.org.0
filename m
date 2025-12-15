@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-65988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1DA3CBED9B
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:14:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 212BDCBF1FE
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 18:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE2A2302D2A2
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 16:08:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84063304842F
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C504B3126A2;
-	Mon, 15 Dec 2025 16:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58252341642;
+	Mon, 15 Dec 2025 16:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GnaR8ern"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FKGk2RqP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0A430F92F
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A2D341073
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765814879; cv=none; b=KWRlQNGzN/cieZFVjQ1uTUgFajRHZCl3hJfX+w+fBrkze4kT+1clxJ5FtccAjnlHmV6/baC2CICLlD8urlsw6FtkS7lpSjUglwx/y7RBl+ijzdHYUrurp7wPB/KAbT2SE+pOcmurRn2h/8h2F10zpA1LyQ4wbSdpGlwT4NSixJk=
+	t=1765817519; cv=none; b=aK08Oy10FAXNc4k7lYXE5S8csPTb5uqdNP6a5YNoLiaSY8+TuGjgwI+8y16dgQmNnnXbXXShXdt9i+8sJBgDVPqp69R0cGstaAlzL9OL5rsMl8CdI0qPi3WD2N0ou/VoEcqkt/JXj7Kkj59GM+fe62TUb8AegFcyConV7yxZIf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765814879; c=relaxed/simple;
-	bh=+4xe1iZfVRPBR4ECFQsnpb2jSdF83uH/G/fWPnC4mdc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IoKPplE7BO9ijnoXf91z2KY9iwwYrcGGAzanEaVjPCfWsUxr4wZK2abkF85Odtf1b9rt83rx0poEe+bPdWBwKJ9hrml+2afpDguaPfoU7+VSV92/OTMAEHYf4EhrRBpoqfqZFmpON/QBvIgcyyvOS7pmTsvsfJmQLOn/CtgQ0aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GnaR8ern; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1765817519; c=relaxed/simple;
+	bh=kU9NExtTi+tE1/KxnF4R8dBMbcDHnu2R/mzeJ9uVPQs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sdDtrKDHZnj2qbN3GuC0Lg18SViAFdwZWcYbfyLfp/v7WjgkjNvJu4L+kR05LXZ6B8gMj2PUNLDsxABr5727XHa9u/Cdh0IzJM81r5aIMm66Bo9Oee8gWY5SR5cj4xsdnfBF0Dri+J23LtGoTaZQYnx1lvtxBtJM0ijzPusHvvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FKGk2RqP; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c37b8dc4fso4742167a91.2
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:07:57 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-477c49f273fso43575435e9.3
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:51:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765814877; x=1766419677; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765817516; x=1766422316; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=nT6Hj9nZToaeawg9ZdYWdQ6jcdndGyE7PtkODE5scAk=;
-        b=GnaR8ernHoVjfegxesvr1+XeGDBfsWivbOlODB3zx+HlYo7OK6PD6O6ztReleFt4HD
-         ug9Nwg3o4VyuNW+7ghygms1cisk5hY+TXPSlCuvmT9lf6UOAiVRxlDdZ79msaxEUxSKQ
-         ARWGACG9gkE204yXkC/0bVtXcu+C4LxaINhDONYeiC2S9lzxFJSWYibfSBYW6QvJD1UF
-         H4KdR+xnFbo3gMgTvZNpj3JxADC2xxnU4qKe0dC69xHotEjqik9lVx89z8Q1DiTIw99f
-         tvA7FUbU5xiODcl20vzg8SmkdCNfPDBvEUvKE6gESplziES2w5JihrhCgXNhl4njtJGc
-         bzBQ==
+        bh=k4K0A7tw0piWVnb/7q48qsAOBuaPwaaJnbI388C3EIk=;
+        b=FKGk2RqPxZx2DRCPit+qjSg3sXkG93mnZYjXkdStQA0R6xQIzdLUTAfR2nt1KcfysL
+         DGkiGOqt9LC4iLI5HUQ0pwQ4y8bvcxCtAPrB9Q5Ht3nK2f5i3kxlL2cUHyOI2opsGorY
+         8gba7BjdwggyR69A+rcSPRiPgzWn+CfdMnojKcNz0kA6ZKYYclLB+WWo8LBbpBlJX7Zf
+         EHwtzAbMUfl0Mu9w6OBjgRCmWQzIElg04bZuGQesTE8X0Iz9xq1X8wihKAKxTta6lgMv
+         ltX3wEnml0/r4pFV6skAFndLS4PPH2j2450Vl4Mmmfxvmilg300IsblNIswZrfoxaDzB
+         JzCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765814877; x=1766419677;
+        d=1e100.net; s=20230601; t=1765817516; x=1766422316;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nT6Hj9nZToaeawg9ZdYWdQ6jcdndGyE7PtkODE5scAk=;
-        b=XWPLEhi1DbuqWcEQ2XHGW/briI6TAJOAK5nGxxyA5Ux6tkGuRUkp4JXSd2EESOLwuH
-         L2Jigv8itSwFAzJMchDAO1QT52WzyTJtUDQ/2hJRhfDXe243+ld/pjXDzZi4Wuu/en3N
-         t8DjYkPWbaEISzsURAtefnojmECqqeEqaV+Kw1/yJElcjENJ6WEr/NfoTIsrYwb5d8pU
-         r5sttdP0t1mXtyEz8xT8TQwqx79iiYBntTzK0vgB+1y5KFpsGOeCBdEJ5vAqzbCc2TWy
-         xERE+P6UzlEf+7rJkCLm371k/zfOO++59kUDV1aSof0Jb3QiTFI1qq6DTAbKu0fDsefy
-         aY9g==
-X-Forwarded-Encrypted: i=1; AJvYcCU7//HK6jx5FOT/OXh6aMbWUTNmsnI01t0I36LUpDqLjwCrVbuovVERCMMSdbCXfAaZlTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1r6RbTkFQ07G1Ol6r4JoOX/xXVg7dHLBmWk5ZfxImxdsx4OfL
-	VVm5QHTrLHRTLkBF63ZsqnPuOzQ4AUXgNt17JDJzHuv+c7F6/rxbDfXhi7rK+Xbqs/XnScmYY62
-	1WCj0nIutiuumaQ==
-X-Google-Smtp-Source: AGHT+IEqf//9eh5pdB+MFoAFUNCvM/jhTB4BDfBdBVN4ftUfCvlhVZnyPQH5a/T5bNthJjf0rFw3hN3JVZF3IA==
-X-Received: from pjbgn5.prod.google.com ([2002:a17:90a:c785:b0:34a:4a21:bc22])
- (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1dc6:b0:33e:1acc:1799 with SMTP id 98e67ed59e1d1-34abd6ccd82mr11243914a91.14.1765814876694;
- Mon, 15 Dec 2025 08:07:56 -0800 (PST)
-Date: Mon, 15 Dec 2025 16:07:10 +0000
+        bh=k4K0A7tw0piWVnb/7q48qsAOBuaPwaaJnbI388C3EIk=;
+        b=qJfKmQjljRegwqsG4QKV3houd+9Zc914KlbgC8zn50u7t7efHhVuVkI6nZN7P00xQ/
+         6YPWSLYap6/rBeDsPofOEfcpUC2RTmL9Fge6mBVL2wqZ+Y/ZyULuZdiWGmnK9z65pSPt
+         GWdLyMg2UV0GU82YSK6SxPrfpBxzjt1IGIkI+djIN7Cqjjkew8pH71ztsfieds1YbwyJ
+         gGRrtHXi8xxBECviAnr8xsHPL0UaoIHJSixaV9HZ18ACwR2IdK/qzYXk7A0//XHZU3Xb
+         Od/WJhnpg+/EdfSZdB1HPdrzwjVbks97lRYYhRlRwlrPkcDKGAygjaqwjy2YEwZmoVaJ
+         88+A==
+X-Gm-Message-State: AOJu0Yxe3UlwE7pvzjX5AFVqqzLdj6ggHrfr/EumrvAUKs2rdVvX6qS3
+	2OWe7+vxt3u1MfzpLrfTpLTXLnNnlKl2QnUHrdm1eX4djQaUd8tt0eI+lsjfUrFI86jYVjfEby3
+	z/RGOSv06E2mEeM+BibUVDPVgKUDas5RDoPzkfg7izMXaHYwpa4Yn/Wef/RdieMpEmkHT3yJbMg
+	P/M2HEIJ4m1Kh6QvoqpN1ALVpNgZQ=
+X-Google-Smtp-Source: AGHT+IGNq+OOelN0gNt5/INxptKwNuOhXBeg9PpZV5h/y2ooLGgWvT+8nQuHYF+Ar/8EPep76SDOriq1fw==
+X-Received: from wmpo6.prod.google.com ([2002:a05:600c:3386:b0:475:d804:bfd2])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:840f:b0:479:1a09:1c4a
+ with SMTP id 5b1f17b1804b1-47a96378c50mr93572455e9.31.1765817516238; Mon, 15
+ Dec 2025 08:51:56 -0800 (PST)
+Date: Mon, 15 Dec 2025 16:51:50 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,141 +69,66 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251215160710.1768474-1-chengkev@google.com>
-Subject: [PATCH v2] KVM: SVM: Don't allow L1 intercepts for instructions not advertised
-From: Kevin Cheng <chengkev@google.com>
-To: seanjc@google.com, pbonzini@redhat.com
-Cc: jmattson@google.com, yosry.ahmed@linux.dev, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kevin Cheng <chengkev@google.com>
+Message-ID: <20251215165155.3451819-1-tabba@google.com>
+Subject: [PATCH v2 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, 
+	pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-If a feature is not advertised in the guest's CPUID, prevent L1 from
-intercepting the unsupported instructions by clearing the corresponding
-intercept in KVM's cached vmcb12.
+v2:
+- Resend to correct partial To/Cc lists. The previous versions were
+  inadvertently sent to disjoint subsets of the maintainers and lists
+  (kvmarm vs kvm-riscv). Apologies for the noise and the duplicate
+  threads.
+- No code changes.
 
-When an L2 guest executes an instruction that is not advertised to L1,
-we expect a #UD exception to be injected by L0. However, the nested svm
-exit handler first checks if the instruction intercept is set in vmcb12,
-and if so, synthesizes an exit from L2 to L1 instead of a #UD exception.
-If a feature is not advertised, the L1 intercept should be ignored.
+This series tidies up a few things in the KVM selftests. It addresses an
+error in memory alignment, hardens the arm64 MMU configuration for
+selftests, and fixes minor documentation issues.
 
-While creating KVM's cached vmcb12, sanitize the intercepts for
-instructions that are not advertised in the guest CPUID. This
-effectively ignores the L1 intercept on nested vm exit handling.
+First, for arm64, the series explicitly disables translation table walks
+for the unused upper virtual address range (TTBR1). Since selftests run
+entirely in the lower range (TTBR0), leaving TTBR1 uninitialized but
+active could lead to unpredictable behavior if guest code accesses high
+addresses. We set EPD1 (and TBI1) to ensure such accesses
+deterministically generate translation faults.
 
-Signed-off-by: Kevin Cheng <chengkev@google.com>
----
-v1 -> v2:
-  - Removed nested_intercept_mask which was a bit mask for nested
-    intercepts to ignore.
-  - Now sanitizing intercepts every time cached vmcb12 is created
-  - New wrappers for vmcb set/clear intercept functions
-  - Added macro functions for vmcb12 intercept sanitizing
-  - All changes suggested by Sean. Thanks!
-  - https://lore.kernel.org/all/20251205070630.4013452-1-chengkev@google.com/
+Second, the series fixes the `page_align()` implementation in both arm64
+and riscv. The previous version incorrectly rounded up already-aligned
+addresses to the *next* page, potentially wasting memory or causing
+unexpected gaps. After fixing the logic in the arch-specific files, the
+function is moved to the common `kvm_util.h` header to eliminate code
+duplication.
 
- arch/x86/kvm/svm/nested.c | 19 +++++++++++++++++++
- arch/x86/kvm/svm/svm.h    | 35 +++++++++++++++++++++++++++--------
- 2 files changed, 46 insertions(+), 8 deletions(-)
+Finally, a few comments and argument descriptions in `kvm_util` are
+updated to match the actual code implementation.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index c81005b245222..5ffc12a315ec7 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -403,6 +403,19 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
- 	return __nested_vmcb_check_controls(vcpu, ctl);
- }
+Based on Linux 6.19-rc1.
 
-+/*
-+ * If a feature is not advertised to L1, clear the corresponding vmcb12
-+ * intercept.
-+ */
-+#define __nested_svm_sanitize_intercept(__vcpu, __control, fname, iname)	\
-+do {										\
-+	if (!guest_cpu_cap_has(__vcpu, X86_FEATURE_##fname))			\
-+		vmcb12_clr_intercept(__control, INTERCEPT_##iname);		\
-+} while (0)
-+
-+#define nested_svm_sanitize_intercept(__vcpu, __control, name)			\
-+	__nested_svm_sanitize_intercept(__vcpu, __control, name, name)
-+
- static
- void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 					 struct vmcb_ctrl_area_cached *to,
-@@ -413,6 +426,12 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 	for (i = 0; i < MAX_INTERCEPT; i++)
- 		to->intercepts[i] = from->intercepts[i];
+Cheers,
+/fuad
 
-+	__nested_svm_sanitize_intercept(vcpu, to, XSAVE, XSETBV);
-+	nested_svm_sanitize_intercept(vcpu, to, INVPCID);
-+	nested_svm_sanitize_intercept(vcpu, to, RDTSCP);
-+	nested_svm_sanitize_intercept(vcpu, to, SKINIT);
-+	nested_svm_sanitize_intercept(vcpu, to, RDPRU);
-+
- 	to->iopm_base_pa        = from->iopm_base_pa;
- 	to->msrpm_base_pa       = from->msrpm_base_pa;
- 	to->tsc_offset          = from->tsc_offset;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9e151dbdef25d..7a8c92c4de2fb 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -434,28 +434,47 @@ static __always_inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
-  */
- #define SVM_REGS_LAZY_LOAD_SET	(1 << VCPU_EXREG_PDPTR)
+Fuad Tabba (5):
+  KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+  KVM: arm64: selftests: Fix incorrect rounding in page_align()
+  KVM: riscv: selftests: Fix incorrect rounding in page_align()
+  KVM: selftests: Move page_align() to shared header
+  KVM: selftests: Fix typos and stale comments in kvm_util
 
--static inline void vmcb_set_intercept(struct vmcb_control_area *control, u32 bit)
-+static inline void __vmcb_set_intercept(unsigned long *intercepts, u32 bit)
- {
- 	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
--	__set_bit(bit, (unsigned long *)&control->intercepts);
-+	__set_bit(bit, intercepts);
- }
+ tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
+ tools/testing/selftests/kvm/include/kvm_util.h        | 9 +++++++--
+ tools/testing/selftests/kvm/lib/arm64/processor.c     | 7 ++-----
+ tools/testing/selftests/kvm/lib/kvm_util.c            | 2 +-
+ tools/testing/selftests/kvm/lib/riscv/processor.c     | 5 -----
+ 5 files changed, 14 insertions(+), 13 deletions(-)
 
--static inline void vmcb_clr_intercept(struct vmcb_control_area *control, u32 bit)
-+static inline void __vmcb_clr_intercept(unsigned long *intercepts, u32 bit)
- {
- 	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
--	__clear_bit(bit, (unsigned long *)&control->intercepts);
-+	__clear_bit(bit, intercepts);
- }
 
--static inline bool vmcb_is_intercept(struct vmcb_control_area *control, u32 bit)
-+static inline bool __vmcb_is_intercept(unsigned long *intercepts, u32 bit)
- {
- 	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
--	return test_bit(bit, (unsigned long *)&control->intercepts);
-+	return test_bit(bit, intercepts);
-+}
-+
-+static inline void vmcb_set_intercept(struct vmcb_control_area *control, u32 bit)
-+{
-+	__vmcb_set_intercept((unsigned long *)&control->intercepts, bit);
-+}
-+
-+static inline void vmcb_clr_intercept(struct vmcb_control_area *control, u32 bit)
-+{
-+	__vmcb_clr_intercept((unsigned long *)&control->intercepts, bit);
-+}
-+
-+static inline bool vmcb_is_intercept(struct vmcb_control_area *control, u32 bit)
-+{
-+	return __vmcb_is_intercept((unsigned long *)&control->intercepts, bit);
-+}
-+
-+static inline void vmcb12_clr_intercept(struct vmcb_ctrl_area_cached *control, u32 bit)
-+{
-+	__vmcb_clr_intercept((unsigned long *)&control->intercepts, bit);
- }
-
- static inline bool vmcb12_is_intercept(struct vmcb_ctrl_area_cached *control, u32 bit)
- {
--	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
--	return test_bit(bit, (unsigned long *)&control->intercepts);
-+	return __vmcb_is_intercept((unsigned long *)&control->intercepts, bit);
- }
-
- static inline void set_exception_intercept(struct vcpu_svm *svm, u32 bit)
---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+-- 
 2.52.0.239.gd5f0c6e74e-goog
 
 
