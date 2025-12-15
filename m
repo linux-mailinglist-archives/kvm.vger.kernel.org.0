@@ -1,76 +1,79 @@
-Return-Path: <kvm+bounces-65989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-65990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 212BDCBF1FE
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 18:07:40 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70592CBF16B
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 18:01:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84063304842F
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:00:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4554B300288B
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 17:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58252341642;
-	Mon, 15 Dec 2025 16:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83C2341661;
+	Mon, 15 Dec 2025 16:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FKGk2RqP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vpsWTE5q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A2D341073
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A62B341074
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765817519; cv=none; b=aK08Oy10FAXNc4k7lYXE5S8csPTb5uqdNP6a5YNoLiaSY8+TuGjgwI+8y16dgQmNnnXbXXShXdt9i+8sJBgDVPqp69R0cGstaAlzL9OL5rsMl8CdI0qPi3WD2N0ou/VoEcqkt/JXj7Kkj59GM+fe62TUb8AegFcyConV7yxZIf8=
+	t=1765817521; cv=none; b=d5iKaBcPDTwCtGCEBnIbvcEet4tUKA3Eq7qGQAoO9L1ZEl1uXiYY4dvBu4shhBuUf0wJNMqtOJFb/WrKlMmXZqaC6KMzJh/L3zTraHqpaYpt1Va2gc7SMYqkqo1Tkq8rySivS3bwt0FkZGJRTiqP5Nnb+QFKZGn0l7LopA0NClM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765817519; c=relaxed/simple;
-	bh=kU9NExtTi+tE1/KxnF4R8dBMbcDHnu2R/mzeJ9uVPQs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sdDtrKDHZnj2qbN3GuC0Lg18SViAFdwZWcYbfyLfp/v7WjgkjNvJu4L+kR05LXZ6B8gMj2PUNLDsxABr5727XHa9u/Cdh0IzJM81r5aIMm66Bo9Oee8gWY5SR5cj4xsdnfBF0Dri+J23LtGoTaZQYnx1lvtxBtJM0ijzPusHvvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FKGk2RqP; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1765817521; c=relaxed/simple;
+	bh=H+BYPeuC46/cZwkzUGpKRp4PEKTMr0g8kH+Bp2Om/eI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sdva1Ow/7zY0YdYDxVL47LPNhL8oDHvCYgeDGamWLQEjV8p+1mieK3w3NzdfdFNcgt0zp3LTbXapSQjHKsdn8ZMvKEA1VHTnDty7f5ug8jCtr9gcdct/3KwyVVG5TrW4UHmcJGVmuubzdqgWPkDjaybuq+t6NdlFvCGGmfg/tRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vpsWTE5q; arc=none smtp.client-ip=209.85.208.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-477c49f273fso43575435e9.3
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:51:57 -0800 (PST)
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-64969d8d4f2so5351543a12.1
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 08:51:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765817516; x=1766422316; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=k4K0A7tw0piWVnb/7q48qsAOBuaPwaaJnbI388C3EIk=;
-        b=FKGk2RqPxZx2DRCPit+qjSg3sXkG93mnZYjXkdStQA0R6xQIzdLUTAfR2nt1KcfysL
-         DGkiGOqt9LC4iLI5HUQ0pwQ4y8bvcxCtAPrB9Q5Ht3nK2f5i3kxlL2cUHyOI2opsGorY
-         8gba7BjdwggyR69A+rcSPRiPgzWn+CfdMnojKcNz0kA6ZKYYclLB+WWo8LBbpBlJX7Zf
-         EHwtzAbMUfl0Mu9w6OBjgRCmWQzIElg04bZuGQesTE8X0Iz9xq1X8wihKAKxTta6lgMv
-         ltX3wEnml0/r4pFV6skAFndLS4PPH2j2450Vl4Mmmfxvmilg300IsblNIswZrfoxaDzB
-         JzCA==
+        d=google.com; s=20230601; t=1765817517; x=1766422317; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rkHSL25koHVDTaMmCRcby8S1CrLCFqcfDXkn0dsUTFg=;
+        b=vpsWTE5qIGXjoKwxTKEuoBKCjSuzjeoBw1e43f7xkutPvnFhrltDJCTM+7L6VToad/
+         SJIppHe4VTZALh8jZjIu5UBQ5N6ki0LCrvIKIe58M1Vy39fKv7qr0XHGBKiOAAWyYCr7
+         V1XKIagV/S4WQFPhQ4LIn6K+ZchhzVQi/9+DpX0JzwP5eqIHD3989q4l4owASCWTmoXj
+         CTIYAmPdYb2iC3ISlKKchYXrjRijZgG8q6i+nbmoyv2DOaX2u72mFBQ9CMcYChX6it5w
+         m7uYiabUchpmuKp7DNXqZ8Oip9Pakqe09Wh848VW0GmHV3Grgo2vwWKphkiGUpEksf3H
+         YETw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765817516; x=1766422316;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k4K0A7tw0piWVnb/7q48qsAOBuaPwaaJnbI388C3EIk=;
-        b=qJfKmQjljRegwqsG4QKV3houd+9Zc914KlbgC8zn50u7t7efHhVuVkI6nZN7P00xQ/
-         6YPWSLYap6/rBeDsPofOEfcpUC2RTmL9Fge6mBVL2wqZ+Y/ZyULuZdiWGmnK9z65pSPt
-         GWdLyMg2UV0GU82YSK6SxPrfpBxzjt1IGIkI+djIN7Cqjjkew8pH71ztsfieds1YbwyJ
-         gGRrtHXi8xxBECviAnr8xsHPL0UaoIHJSixaV9HZ18ACwR2IdK/qzYXk7A0//XHZU3Xb
-         Od/WJhnpg+/EdfSZdB1HPdrzwjVbks97lRYYhRlRwlrPkcDKGAygjaqwjy2YEwZmoVaJ
-         88+A==
-X-Gm-Message-State: AOJu0Yxe3UlwE7pvzjX5AFVqqzLdj6ggHrfr/EumrvAUKs2rdVvX6qS3
-	2OWe7+vxt3u1MfzpLrfTpLTXLnNnlKl2QnUHrdm1eX4djQaUd8tt0eI+lsjfUrFI86jYVjfEby3
-	z/RGOSv06E2mEeM+BibUVDPVgKUDas5RDoPzkfg7izMXaHYwpa4Yn/Wef/RdieMpEmkHT3yJbMg
-	P/M2HEIJ4m1Kh6QvoqpN1ALVpNgZQ=
-X-Google-Smtp-Source: AGHT+IGNq+OOelN0gNt5/INxptKwNuOhXBeg9PpZV5h/y2ooLGgWvT+8nQuHYF+Ar/8EPep76SDOriq1fw==
-X-Received: from wmpo6.prod.google.com ([2002:a05:600c:3386:b0:475:d804:bfd2])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:840f:b0:479:1a09:1c4a
- with SMTP id 5b1f17b1804b1-47a96378c50mr93572455e9.31.1765817516238; Mon, 15
- Dec 2025 08:51:56 -0800 (PST)
-Date: Mon, 15 Dec 2025 16:51:50 +0000
+        d=1e100.net; s=20230601; t=1765817517; x=1766422317;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rkHSL25koHVDTaMmCRcby8S1CrLCFqcfDXkn0dsUTFg=;
+        b=kvrPWzuBqIRUb5Y510L8EruqA57kbq8d8IrOukjFz40zkws8oPB6YvoOizIrfCSDJu
+         gGgn9KCp3iZd9PHTWR40V+Xb7cRHAiK1c433DRziFIzKaj/cWNWCdSU3y1jVeH5pK7Yl
+         GnZsI/M5JbB+5jasE+Z45qNnSxhlk1YspCniLxJ/vCbCqErwyqKG8ZHJPV7LteXcWvO9
+         eYs37C7ktZljFdGUp4hkUqu98WLGvmLAFa2PqLmrLI4hBf45azw+FiirbYluAxN+U2yJ
+         4V403Z33IIcGh7EUNEKmavsYcc5NNfZaCnq0Iu1kifDRNSZ6z2sntzroZa/4IFesU4W6
+         H8cQ==
+X-Gm-Message-State: AOJu0YwGIiaHMag56OK9jatAtSuvhMVGQ+lzrO8w21WIfT65Dn3Sor3i
+	1Ofz9m7gD0XQ+hLV53JZeAYWh+bV3IUr4nRDZoD9ZlbavU+FWP9WiPPHF4rZJMm93iWm5VBAs2F
+	72KWuqKvE2ga6JplXzSMpwoF42qr+5TUJeERduyGiGs1Nr8NUOxnDDYXaksJrkKbHNtp3TNN0M5
+	Pt6sMayrRuOPFEkM83kqJOxY5vmME=
+X-Google-Smtp-Source: AGHT+IFrHxiEYHDjT58c4YVmrMD5eO1DrDlCmV6f5ukjJAbXvW2Vssi5+5Lw36DE9YHOiX+0KsCF3RMJMA==
+X-Received: from edbdk5.prod.google.com ([2002:a05:6402:1d85:b0:649:1567:4ee3])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:d08:b0:641:8a92:9334
+ with SMTP id 4fb4d7f45d1cf-6499b1301b7mr10482727a12.6.1765817517246; Mon, 15
+ Dec 2025 08:51:57 -0800 (PST)
+Date: Mon, 15 Dec 2025 16:51:51 +0000
+In-Reply-To: <20251215165155.3451819-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20251215165155.3451819-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251215165155.3451819-1-tabba@google.com>
-Subject: [PATCH v2 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+Message-ID: <20251215165155.3451819-2-tabba@google.com>
+Subject: [PATCH v2 1/5] KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -79,55 +82,66 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-v2:
-- Resend to correct partial To/Cc lists. The previous versions were
-  inadvertently sent to disjoint subsets of the maintainers and lists
-  (kvmarm vs kvm-riscv). Apologies for the noise and the duplicate
-  threads.
-- No code changes.
+KVM selftests map all guest code and data into the lower virtual address
+range (0x0000...) managed by TTBR0_EL1. The upper range (0xFFFF...)
+managed by TTBR1_EL1 is unused and uninitialized.
 
-This series tidies up a few things in the KVM selftests. It addresses an
-error in memory alignment, hardens the arm64 MMU configuration for
-selftests, and fixes minor documentation issues.
+If a guest accesses the upper range, the MMU attempts a translation
+table walk using uninitialized registers, leading to unpredictable
+behavior.
 
-First, for arm64, the series explicitly disables translation table walks
-for the unused upper virtual address range (TTBR1). Since selftests run
-entirely in the lower range (TTBR0), leaving TTBR1 uninitialized but
-active could lead to unpredictable behavior if guest code accesses high
-addresses. We set EPD1 (and TBI1) to ensure such accesses
-deterministically generate translation faults.
+Set `TCR_EL1.EPD1` to disable translation table walks for TTBR1_EL1,
+ensuring that any access to the upper range generates an immediate
+Translation Fault. Additionally, set `TCR_EL1.TBI1` (Top Byte Ignore) to
+ensure that tagged pointers in the upper range also deterministically
+trigger a Translation Fault via EPD1.
 
-Second, the series fixes the `page_align()` implementation in both arm64
-and riscv. The previous version incorrectly rounded up already-aligned
-addresses to the *next* page, potentially wasting memory or causing
-unexpected gaps. After fixing the logic in the arch-specific files, the
-function is moved to the common `kvm_util.h` header to eliminate code
-duplication.
+Define `TCR_EPD1_MASK`, `TCR_EPD1_SHIFT`, and `TCR_TBI1` in
+`processor.h` to support this configuration. These are based on their
+definitions in `arch/arm64/include/asm/pgtable-hwdef.h`.
 
-Finally, a few comments and argument descriptions in `kvm_util` are
-updated to match the actual code implementation.
-
-Based on Linux 6.19-rc1.
-
-Cheers,
-/fuad
-
-Fuad Tabba (5):
-  KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
-  KVM: arm64: selftests: Fix incorrect rounding in page_align()
-  KVM: riscv: selftests: Fix incorrect rounding in page_align()
-  KVM: selftests: Move page_align() to shared header
-  KVM: selftests: Fix typos and stale comments in kvm_util
-
+Suggested-by: Will Deacon <will@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
  tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
- tools/testing/selftests/kvm/include/kvm_util.h        | 9 +++++++--
- tools/testing/selftests/kvm/lib/arm64/processor.c     | 7 ++-----
- tools/testing/selftests/kvm/lib/kvm_util.c            | 2 +-
- tools/testing/selftests/kvm/lib/riscv/processor.c     | 5 -----
- 5 files changed, 14 insertions(+), 13 deletions(-)
+ tools/testing/selftests/kvm/lib/arm64/processor.c     | 2 ++
+ 2 files changed, 6 insertions(+)
 
-
-base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+index ff928716574d..ac97a1c436fc 100644
+--- a/tools/testing/selftests/kvm/include/arm64/processor.h
++++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+@@ -90,6 +90,9 @@
+ #define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
+ #define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
+ 
++#define TCR_EPD1_SHIFT		23
++#define TCR_EPD1_MASK		(UL(1) << TCR_EPD1_SHIFT)
++
+ #define TCR_IPS_SHIFT		32
+ #define TCR_IPS_MASK		(UL(7) << TCR_IPS_SHIFT)
+ #define TCR_IPS_52_BITS	(UL(6) << TCR_IPS_SHIFT)
+@@ -97,6 +100,7 @@
+ #define TCR_IPS_40_BITS	(UL(2) << TCR_IPS_SHIFT)
+ #define TCR_IPS_36_BITS	(UL(1) << TCR_IPS_SHIFT)
+ 
++#define TCR_TBI1		(UL(1) << 38)
+ #define TCR_HA			(UL(1) << 39)
+ #define TCR_DS			(UL(1) << 59)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+index d46e4b13b92c..5b379da8cb90 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/processor.c
++++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+@@ -384,6 +384,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+ 
+ 	tcr_el1 |= TCR_IRGN0_WBWA | TCR_ORGN0_WBWA | TCR_SH0_INNER;
+ 	tcr_el1 |= TCR_T0SZ(vm->va_bits);
++	tcr_el1 |= TCR_TBI1;
++	tcr_el1 |= TCR_EPD1_MASK;
+ 	if (use_lpa2_pte_format(vm))
+ 		tcr_el1 |= TCR_DS;
+ 
 -- 
 2.52.0.239.gd5f0c6e74e-goog
 
