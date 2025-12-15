@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-66012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA2CCBF8B2
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 20:29:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 701EDCBF8FD
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 20:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 71FC13019AE8
-	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 19:29:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6D89301EC7F
+	for <lists+kvm@lfdr.de>; Mon, 15 Dec 2025 19:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CB3334C06;
-	Mon, 15 Dec 2025 19:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC523385A8;
+	Mon, 15 Dec 2025 19:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GMKx6moV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wyqkGlid"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF7933345A
-	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 19:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E346337BAA
+	for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 19:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765826911; cv=none; b=TNIea/+wbaR20jVRLyMx23cVmS4yAN3uREFSdtcDaBI63jCDEEVmIhE8MHvWYvwtnbwHuZXWFmgKc7gPM0pC3X86EANDrUH9TOsWYFvHUN3fEDNqX1DmaWK+H+HTGJMvggiQSH57X4LU7TCqzg/yHt9zT0cpAFWKYVIbSvsDYDs=
+	t=1765826918; cv=none; b=aoqHY61gm7apVDykpAZcrjaSWF5rUO3pMBM+oiS+Soo3iEY7blFZ9yUOAsLfrvUmoQisxSh7m4LMV4BQN8aj96oaucT/a/kVGrL74hhe08SKeSQGYXW/BI3veUpiqSY1dNF/UusIgg8h5i+5zpPCEfcdiBrhbzlD3i2FeJbsh0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765826911; c=relaxed/simple;
-	bh=vOcm+47T6KpheAES74yOgji34PgyJiLal61tAZuEKqw=;
+	s=arc-20240116; t=1765826918; c=relaxed/simple;
+	bh=BUvQyWXuYEEYhxKhefZQGhzXIOloUBGKjN1sz2Ri48I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V7+8HwJ8/4X8Ms5UH0VQDU4XQHSNxe+OKvXO7ildf5LXaoew6KbDwQqzrF6hrl21bT6GL6IeLguhb/fISgHBtHA5ks2KSNqzwfbqMpuMM5YK37HXSx0d1LPqzVnAK1ZBZjgKj7vYYjGPqbLtWbuMrUx+qNwuuYIroN4EnU01sjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GMKx6moV; arc=none smtp.client-ip=91.218.175.170
+	 MIME-Version; b=B32BFAYBOOAMegJznDqDKGExc6av3PYXjD++LRD90Wn+77kOT5VQpZr4KWf/nf+3DU2ui/kgD6KbhOf0TysmYZxRETQPDzsHHgkC9sX5ubN+zPbljqtRINaMKEsA1F1FW2mgKpivJkVb9zhnI5bBlNQlJKvNS5P/99TLu1iGI94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wyqkGlid; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765826903;
+	t=1765826909;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3rc5GbRNOrygWJ26qSaiS4Pn8N9puvgMwv3QBVrAAu4=;
-	b=GMKx6moVM/ZlyiVvGpXHioFK6CSRlUaPfLyMzXrnOQVLJVf74j/0CdGcB79MyL8jCbOVhx
-	BJvnkgpL1YHrfohayOiK3oOSOYPE2rJi2OLIRr93jfN5yQ/NXFLaYGNKdLK/gf6AfGWoS0
-	ux5nYLCTHA7Yzc8YQDfuGLN0hwZvcwA=
+	bh=3cf8RFQ2S/w9aMyAhPvTtFAPK8oi2Ex0gGpKSV/SAR4=;
+	b=wyqkGlidVqfFRsFfg8F4Uh442B740IxEQZmmTRUVJ2PHksMrkI4HB0Gt7HiVVfzGKYvEHM
+	ZX6GQj+lV7b0e/9aAQibKvlsNjNpwasl6WG/YvFgR+EnIJl81EWmOTNkQCYRtQzUZSd0td
+	RR+BgKcBccd1rorYSp+uk4aLJyjaL6Q=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
@@ -47,9 +47,9 @@ Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 07/26] KVM: nSVM: Drop nested_vmcb_check_{save/control}() wrappers
-Date: Mon, 15 Dec 2025 19:27:02 +0000
-Message-ID: <20251215192722.3654335-9-yosry.ahmed@linux.dev>
+Subject: [PATCH v3 08/26] KVM: nSVM: Call enter_guest_mode() before switching to VMCB02
+Date: Mon, 15 Dec 2025 19:27:03 +0000
+Message-ID: <20251215192722.3654335-10-yosry.ahmed@linux.dev>
 In-Reply-To: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
 References: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -61,114 +61,50 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The wrappers provide little value and make it harder to see what KVM is
-checking in the normal flow. Drop them.
+In preparation for moving more changes that rely on is_guest_mode()
+before switching to VMCB02, move entering guest mode a bit earlier.
 
-Opportunistically fixup comments referring to the functions, adding '()'
-to make it clear it's a reference to a function.
+Nothing between the new callsite(s) and the old ones rely on
+is_guest_mode(), so this should be safe.
 
 No functional change intended.
 
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/kvm/svm/nested.c | 36 ++++++++++--------------------------
- 1 file changed, 10 insertions(+), 26 deletions(-)
+ arch/x86/kvm/svm/nested.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 9500dd87d7a0..512e377cfdec 100644
+index 512e377cfdec..384352365310 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -324,8 +324,8 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
- 	    kvm_vcpu_is_legal_gpa(vcpu, addr + size - 1);
- }
+@@ -709,9 +709,6 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
  
--static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
--					 struct vmcb_ctrl_area_cached *control)
-+static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
-+				       struct vmcb_ctrl_area_cached *control)
- {
- 	if (CC(!vmcb12_is_intercept(control, INTERCEPT_VMRUN)))
- 		return false;
-@@ -352,8 +352,8 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
- }
+ 	nested_svm_transition_tlb_flush(vcpu);
  
- /* Common checks that apply to both L1 and L2 state.  */
--static bool __nested_vmcb_check_save(struct kvm_vcpu *vcpu,
--				     struct vmcb_save_area_cached *save)
-+static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu,
-+				   struct vmcb_save_area_cached *save)
- {
- 	if (CC(!(save->efer & EFER_SVME)))
- 		return false;
-@@ -387,22 +387,6 @@ static bool __nested_vmcb_check_save(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
--static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_svm *svm = to_svm(vcpu);
--	struct vmcb_save_area_cached *save = &svm->nested.save;
+-	/* Enter Guest-Mode */
+-	enter_guest_mode(vcpu);
 -
--	return __nested_vmcb_check_save(vcpu, save);
--}
--
--static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu)
--{
--	struct vcpu_svm *svm = to_svm(vcpu);
--	struct vmcb_ctrl_area_cached *ctl = &svm->nested.ctl;
--
--	return __nested_vmcb_check_controls(vcpu, ctl);
--}
--
- static
- void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 					 struct vmcb_ctrl_area_cached *to,
-@@ -435,7 +419,7 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 	to->pause_filter_count  = from->pause_filter_count;
- 	to->pause_filter_thresh = from->pause_filter_thresh;
- 
--	/* Copy asid here because nested_vmcb_check_controls will check it.  */
-+	/* Copy asid here because nested_vmcb_check_controls() will check it */
- 	to->asid           = from->asid;
- 	to->msrpm_base_pa &= ~0x0fffULL;
- 	to->iopm_base_pa  &= ~0x0fffULL;
-@@ -981,8 +965,8 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- 	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
- 	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
- 
--	if (!nested_vmcb_check_save(vcpu) ||
--	    !nested_vmcb_check_controls(vcpu)) {
-+	if (!nested_vmcb_check_save(vcpu, &svm->nested.save) ||
-+	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
- 		vmcb12->control.exit_code    = SVM_EXIT_ERR;
- 		vmcb12->control.exit_code_hi = -1u;
- 		vmcb12->control.exit_info_1  = 0;
-@@ -1817,12 +1801,12 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 
- 	ret = -EINVAL;
- 	__nested_copy_vmcb_control_to_cache(vcpu, &ctl_cached, ctl);
--	if (!__nested_vmcb_check_controls(vcpu, &ctl_cached))
-+	if (!nested_vmcb_check_controls(vcpu, &ctl_cached))
- 		goto out_free;
- 
  	/*
- 	 * Processor state contains L2 state.  Check that it is
--	 * valid for guest mode (see nested_vmcb_check_save).
-+	 * valid for guest mode (see nested_vmcb_check_save()).
- 	 */
- 	cr0 = kvm_read_cr0(vcpu);
-         if (((cr0 & X86_CR0_CD) == 0) && (cr0 & X86_CR0_NW))
-@@ -1836,7 +1820,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	if (!(save->cr0 & X86_CR0_PG) ||
- 	    !(save->cr0 & X86_CR0_PE) ||
- 	    (save->rflags & X86_EFLAGS_VM) ||
--	    !__nested_vmcb_check_save(vcpu, &save_cached))
-+	    !nested_vmcb_check_save(vcpu, &save_cached))
- 		goto out_free;
+ 	 * Filled at exit: exit_code, exit_code_hi, exit_info_1, exit_info_2,
+ 	 * exit_int_info, exit_int_info_err, next_rip, insn_len, insn_bytes.
+@@ -899,6 +896,8 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
  
+ 	WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
+ 
++	enter_guest_mode(vcpu);
++
+ 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+ 
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+@@ -1846,6 +1845,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, save);
+ 	nested_copy_vmcb_control_to_cache(svm, ctl);
+ 
++	enter_guest_mode(vcpu);
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+ 	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
  
 -- 
 2.52.0.239.gd5f0c6e74e-goog
