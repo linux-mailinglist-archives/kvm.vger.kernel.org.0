@@ -1,166 +1,139 @@
-Return-Path: <kvm+bounces-66093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50349CC539D
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 22:36:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E46C5CC544C
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 22:53:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D7B8B30671D1
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 21:35:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B1ADF307A23B
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 21:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A51533C507;
-	Tue, 16 Dec 2025 21:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D36326D6B;
+	Tue, 16 Dec 2025 21:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GLO7rFC1"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="TaSruyIL"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE47D325709;
-	Tue, 16 Dec 2025 21:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95F533AD8D;
+	Tue, 16 Dec 2025 21:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765920918; cv=none; b=C9hDuUNQotABHJJvWQzbf/UaKl+cKSkMLuyedBw5yfgpkm7a6Iw1DHMrf1ftYskPl9cP0yWwTE+69t7g91gjFLFMOoFmeAr1DTPFvA+rq/7DXFrt4xovEldXyGzQ8x+JfWxKcBLYkItLFvpTpiwVk7itXYNaMH0HW1o66+SDUWE=
+	t=1765921904; cv=none; b=PLeqVu8MT0xn4likJR60ZIlJBZDCLQkqsd64AR4a/PqGk3w9AvcSWhKbkhfri7XHMjcUQDfQntWMbgc5wVfPBxKgFttmSL+/JG8Wy5YV7QSPLoK7y+a4EUtx3ep9k3GjCEG7sm2/Vl9ausUG6LguU5UEBTXIIDMtO4E6Atvz0Ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765920918; c=relaxed/simple;
-	bh=jwdZ16Bo48bauDgtwzIV0I0eFRkyS2UvhlUPaYmhbVQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jV3Xo4vtU6DTUqQ6fwfGN4PMG0lCBmWUUtp5WCPdJHuz9XAcTx4Qwaz/OE6KRQi+8EH3d5lfpBp1pjqSgE3yq84wu9kzFfcNvSLk89DwFXYzLZNRTb/XF7U57bLTrerC6SwYjHXcvLLMCU8trxP3DJOscgJHcJhkDvxhdQYRwmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GLO7rFC1; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 16 Dec 2025 21:34:57 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765920904;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZJRO2dQpGvZA59OENdKzmTC9Ddv5eSkJipIeZZu7aSo=;
-	b=GLO7rFC1u7cq5WSocQorwwNuYymwfV/1uC2GqLEktpoJ4VItTGUzz9ZmCZp5VJPoHKl59F
-	P5G7gOjT0Yy/T0px6RDe4Rz7jiCtLDIMNaw0eOUGJH3zrCAoWI20gfdPeSdLuSJDw8PCAf
-	tWLNzT1sBqcyuHiZuI87Deqj/m5HSOw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>, 
-	Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 24/26] KVM: nSVM: Restrict mapping VMCB12 on nested
- VMRUN
-Message-ID: <timpvklyyl5juo5ajjzuxwazc5w2t6ffcx7llnv6f2a5qzot3b@hnj3wqwtla6c>
-References: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
- <20251215192722.3654335-26-yosry.ahmed@linux.dev>
- <oims37p6hfw4d2ufyinvi44scy3rhmbvibsmi66cde4e4pnidb@ugwhcwtalghf>
+	s=arc-20240116; t=1765921904; c=relaxed/simple;
+	bh=98ggaTZvCYQrJE7EKpjojwh2LUANapTP62HYxPrNHsw=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=t5dN2F4Al9a4K54aFq4VrcvdQTxP2PZVafi0f6/8umBSBtvmTvSyzRGIgePIMSIAvCAVCJdC2oFsSLBs2JUGwLlEOZ3MkR1mhJPgQlUlurwR4GTUxvgPEuOE4ItTkWsXup+bwralx7a/YZe6IjDnLLYVabSHoMMwCw49HYyIuWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=TaSruyIL; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5BGLohdD2591914
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 16 Dec 2025 13:50:43 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5BGLohdD2591914
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025112201; t=1765921845;
+	bh=IUFjXMGEioy90PCRU6K4eEZsewA4J72rUYR0KWqV+PM=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=TaSruyIL5BsuQXNl77ikEHcqTR1fDc/rJVG9GGilNzbXMjAWLMi5zLkeAnIAug1+r
+	 Su/ah9a3Wgx0pu3LR0we0eDApaY8L/uZC28BGqjRZAvTkiWEJ87pqbp53NDubEKBmc
+	 G2Nlb4Bu15QyNTu7ZtHdHCV5hKeXr86jkQ674prA51A6dCUfANhW1Hsg5QmpearEVm
+	 kSTg37FHH2iRaLQ9ZpJ76YZa69FMDMyr7gujzLXDUstSm7PXe85dAgbUVevIepDrwN
+	 VkvaQfn0WxKIabhsLzFt4y2wKfCXTwj33MPECOh1RPxcmhVPcWl0HrC+VxhS+9q4G0
+	 a/7lubgc33EpQ==
+Date: Tue, 16 Dec 2025 13:50:42 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: David Laight <david.laight.linux@gmail.com>
+CC: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
+        Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-block@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ajay Kaher <ajay.kaher@broadcom.com>,
+        Alexey Makhalov <alexey.makhalov@broadcom.com>,
+        Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        xen-devel@lists.xenproject.org, Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>, Denis Efremov <efremov@linux.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5] x86: Cleanups around slow_down_io()
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20251216195912.0727cc0d@pumpkin>
+References: <20251126162018.5676-1-jgross@suse.com> <aT5vtaefuHwLVsqy@gmail.com> <bff8626d-161e-4470-9cbd-7bbda6852ec3@suse.com> <aUFjRDqbfWMsXvvS@gmail.com> <b969cff5-be11-4fd3-8356-95185ea5de4c@suse.com> <14EF14B1-8889-4037-8E7B-C8446299B1E9@zytor.com> <20251216195912.0727cc0d@pumpkin>
+Message-ID: <69AE77E6-4256-4B0B-970E-194B4C70B7AF@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <oims37p6hfw4d2ufyinvi44scy3rhmbvibsmi66cde4e4pnidb@ugwhcwtalghf>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 16, 2025 at 04:35:04PM +0000, Yosry Ahmed wrote:
-> On Mon, Dec 15, 2025 at 07:27:19PM +0000, Yosry Ahmed wrote:
-> > All accesses to the VMCB12 in the guest memory on nested VMRUN are
-> > limited to nested_svm_vmrun() and nested_svm_failed_vmrun(). However,
-> > the VMCB12 remains mapped throughout nested_svm_vmrun().  Mapping and
-> > unmapping around usages is possible, but it becomes easy-ish to
-> > introduce bugs where 'vmcb12' is used after being unmapped.
-> > 
-> > Move reading the VMCB12 and copying to cache from nested_svm_vmrun()
-> > into a new helper, nested_svm_copy_vmcb12_to_cache(),  that maps the
-> > VMCB12, caches the needed fields, and unmaps it. Use
-> > kvm_vcpu_map_readonly() as only reading the VMCB12 is needed.
-> > 
-> > Similarly, move mapping the VMCB12 on VMRUN failure into
-> > nested_svm_failed_vmrun(). Inject a triple fault if the mapping fails,
-> > similar to nested_svm_vmexit().
-> > 
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 55 ++++++++++++++++++++++++++++-----------
-> >  1 file changed, 40 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 48ba34d8b713..d33a2a27efe5 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1055,23 +1055,55 @@ static void __nested_svm_vmexit(struct vcpu_svm *svm, struct vmcb *vmcb12)
-> >  		kvm_queue_exception(vcpu, DB_VECTOR);
-> >  }
-> >  
-> > -static void nested_svm_failed_vmrun(struct vcpu_svm *svm, struct vmcb *vmcb12)
-> > +static void nested_svm_failed_vmrun(struct vcpu_svm *svm, u64 vmcb12_gpa)
-> >  {
-> > +	struct kvm_vcpu *vcpu = &svm->vcpu;
-> > +	struct kvm_host_map map;
-> > +	struct vmcb *vmcb12;
-> > +	int r;
-> > +
-> >  	WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
-> >  
-> 
-> Ugh I missed leave_guest_mode() here, which means guest state won't be
-> cleaned up properly and the triple fault won't be inject correctly if
-> unmap fails. I re-introduced the bug I fixed earlier in the series :')
-> 
-> Should probably add WARN_ON_ONCE(is_guest_mode()) in
-> __nested_svm_vmexit() since the caller is expected to
-> leave_guest_mode().
+On December 16, 2025 11:59:12 AM PST, David Laight <david=2Elaight=2Elinux@=
+gmail=2Ecom> wrote:
+>On Tue, 16 Dec 2025 07:32:09 -0800
+>"H=2E Peter Anvin" <hpa@zytor=2Ecom> wrote:
+>
+>> On December 16, 2025 5:55:54 AM PST, "J=C3=BCrgen Gro=C3=9F" <jgross@su=
+se=2Ecom> wrote:
+>> >On 16=2E12=2E25 14:48, Ingo Molnar wrote: =20
+>> >>=20
+>> >> * J=C3=BCrgen Gro=C3=9F <jgross@suse=2Ecom> wrote:
+>> >>  =20
+>> >>>> CPUs anymore=2E Should it cause any regressions, it's easy to bise=
+ct to=2E
+>> >>>> There's been enough changes around all these facilities that the
+>> >>>> original timings are probably way off already, so we've just been
+>> >>>> cargo-cult porting these to newer kernels essentially=2E =20
+>> >>>=20
+>> >>> Fine with me=2E
+>> >>>=20
+>> >>> Which path to removal of io_delay would you (and others) prefer?
+>> >>>=20
+>> >>> 1=2E Ripping it out immediately=2E =20
+>> >>=20
+>> >> I'd just rip it out immediately, and see who complains=2E :-) =20
+>> >
+>> >I figured this might be a little bit too evil=2E :-)
+>> >
+>> >I've just sent V2 defaulting to have no delay, so anyone hit by that
+>> >can still fix it by applying the "io_delay" boot parameter=2E
+>> >
+>> >I'll do the ripping out for kernel 6=2E21 (or whatever it will be call=
+ed)=2E
+>> >
+>> >
+>> >Juergen =20
+>>=20
+>> Ok, I'm going to veto ripping it out from the real-mode init code,
+>> because I actually know why it is there :) =2E=2E=2E
+>
+>Pray tell=2E
+>One thing I can think of is the delay allows time for a level-sensitive
+>IRQ line to de-assert before an ISR exits=2E
+>Or, maybe more obscure, to avoid back to back accesses to some register
+>breaking the 'inter-cycle recovery time' for the device=2E
+>That was a good way to 'break' the Zilog SCC and the 8259 interrupt
+>controller (eg on any reference board with a '286 cpu)=2E
+>
+>	David
+>
+>> and that code is pre-UEFI legacy these days anyway=2E
+>>=20
+>> Other places=2E=2E=2E I don't care :)
+>>=20
+>
+>
 
-Although none of the selftests or KUTs failed because of this, running
-them again now I noticed a couple of WARNs firing, which is reassuring
-because the problem is detectable. Namely:
-
-In nested_svm_vmexit(), the WARN introduced earlier in the series:
-
-	WARN_ON_ONCE(svm->vmcb != svm->nested.vmcb02.ptr);
-
-In vcpu_enter_guest():
-
-	/*
-	 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
-	 * update must kick and wait for all vCPUs before toggling the
-	 * per-VM state, and responding vCPUs must wait for the update
-	 * to complete before servicing KVM_REQ_APICV_UPDATE.
-	 */
-	WARN_ON_ONCE((kvm_vcpu_apicv_activated(vcpu) != kvm_vcpu_apicv_active(vcpu)) &&
-		     (kvm_get_apic_mode(vcpu) != LAPIC_MODE_DISABLED));
-
-
-Not sure why the latter fired, but probably due to is_guest_mode()
-returning the wrong thing in some code path.
-
-Anyway, with the following diff no WARNs are produced with the selftests
-or KUTs:
-
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 7af701e92c81..58e168e8c1ee 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1039,6 +1039,8 @@ static void __nested_svm_vmexit(struct vcpu_svm *svm, struct vmcb *vmcb12)
-        struct vmcb *vmcb01 = svm->vmcb01.ptr;
-        struct kvm_vcpu *vcpu = &svm->vcpu;
-
-+       WARN_ON_ONCE(is_guest_mode(vcpu));
-+
-        svm->nested.vmcb12_gpa = 0;
-        svm->nested.ctl.nested_cr3 = 0;
-
-@@ -1075,6 +1077,8 @@ static void nested_svm_failed_vmrun(struct vcpu_svm *svm, u64 vmcb12_gpa)
-
-        WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
-
-+       leave_guest_mode(vcpu);
-+
-        r = kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
-        if (r) {
-                kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-
-
-Sean, I will wait until you get a chance to look through the series, at
-which point let me know how you want to proceed. I assume it'll depend
-on whether or not other patches require a new version.
+A20 gate logic on some motherboards, especially=2E
 
