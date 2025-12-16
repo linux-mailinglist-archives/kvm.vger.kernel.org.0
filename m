@@ -1,107 +1,106 @@
-Return-Path: <kvm+bounces-66051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B59CC050F
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 01:12:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4E63CC052A
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 01:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2C95C3002EA3
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 00:12:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2C623007EDA
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 00:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8AD18BBAE;
-	Tue, 16 Dec 2025 00:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F47D1B6D1A;
+	Tue, 16 Dec 2025 00:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G4zLVULW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zvGZHoiR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADAB35965
-	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 00:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185153BB40
+	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 00:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765843937; cv=pass; b=fL8bQNaysJj5+zbKg7yAcd+54q4h0VfCYR4BGCKz+mLXl2ATbO8fuNp6bY2kKh1WjB/s6rrvVH5JCe2p53DFNzyd1wf/buTve3R6zAaiYakZiDTKoCiD8U5i709hckWpyGK+mSulldd92xNUNKPR4JkjznJJHVjQ39H+ii7QyA0=
+	t=1765844024; cv=pass; b=MVEJkd7hcqztnzfS3DSV8N3FMR7JRNpLvfl11FNmPX0uvpOSPORXl5Rm8oywOiXNlbx1ooTz70qFhj/Ou6tDniS9OVh7kR/Nm9tjz82r8TsBnapfogRSfzKBuE5QOb6UDm0DjfWdvznZ0dQd2LcWvmb5qgbHmpPNoy6kq5G2wRo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765843937; c=relaxed/simple;
-	bh=0tv+UfE9Cjf3pcT92AawqgfgMaTHbGpjLAJBio+41P4=;
+	s=arc-20240116; t=1765844024; c=relaxed/simple;
+	bh=HRbRCmq0SM7DaTEQJ8+c85iPZjE4VDGJxFWUVma8wJ0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LTbre5ZoCzKKi7dy1JOdkF2ts2fJclEADZJ9GQESVuMqiSOf48orWLicRaAHO/BAsWnp7k5u3oKUMsFqP/SeBi2uF8bgj5u/RigaY6GnYCzYhFXxqUgWhslabu6cf8RgZFdUmKqps1AccJ0u7YrEnzOm/dcGYkMYPChr+K3viaA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G4zLVULW; arc=pass smtp.client-ip=209.85.214.179
+	 To:Cc:Content-Type; b=MLGBL3CO8qYX1F7uzuhB5BHyLIxIFBoiU7bZTWxg9PuYjaGM+NToqeQnf0Fw8qWo1aSakqR0hYFBgauBT6cscBS8YhzMuNO6hxA27tKM/GvY48dv7bQwG38kUglEidfBrvKSCB3GAZ+DIj1itcAS79zqQ+ZKXspeL5YMdyfNdyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zvGZHoiR; arc=pass smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-29e7ec26e3dso46295ad.0
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:12:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765843935; cv=none;
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-29e7ec26e3dso46585ad.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:13:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765844022; cv=none;
         d=google.com; s=arc-20240605;
-        b=D2DMFexU7ORBLaGvo5ZyeMYR/lovb1jvGa1OSawXBNR/dwAP5jGmt9UzU06xFBeNVl
-         vRHzPDksdPYof02ZiAMQ1jDOdCfESzbKYxdKT2jodIGp3BJhzt4ONG8V1cVgqSxuLYCX
-         uovZCmkEeIsGkzYWzg3UPjJjxt79DNIA17J2NX3SOEYy6vSKuKvSnqHtjiPx03FMeifY
-         D7W6vIUZwtWf8LSw5msfpTyMNRHMnrydHBnSxjsIVpFJLT91V3J6dp6bR2/f4/GU9rFK
-         hP0fmXJRXgxlmqrtVKZ7O9+IOjuB3Bn3Cn3JSoi6v689SanbfBizSz6Qo953wq9d9BV1
-         pYng==
+        b=U1AlCG8Fg61Fu+YtqpxrrjiORWe0kLOpgTrk5REeKQODfDXifpjEvNYH+OhCgBja6A
+         3+z+urSddyi414GMkWvboWj3BNEOa33XXpVT5YxsGF+1iMfWvQVmNt7hYcPxxpmVY0nu
+         hTzZQweilIputsZ/3Eb1XFyKfWkrovOfygvIhgbbuTw2m2FdtNTZPWeWaGtYnzuM0lvJ
+         ZQX1FrI5vGW4YfAXE+g8/39khOEeUBiXCxLucqr6iI02wsGE3aZUyEIx20XNbgoNqe0I
+         GmQflM0OFxwEwYjvwMhR45vS8vVZ2CIXtvyxXG0cgfgRr1A9VyxFzNSaNexki/Ez0Zz3
+         VIPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=27wQsfuOXjJhJo74CLfXwuW+WvRgdLz0XpQKIZiK7fE=;
+        bh=dBvvdjAGagUjLVl9YfrF0CaB+uVsXDQGkPun9qqTA8c=;
         fh=f0Sa/Gk6aV+Q0XgvPyFCasN4iiurT6FrEyCiHiudOJM=;
-        b=U1tk89Ae85aqQFR4hhmEPw1esMp9+HjXdKR23kAdrIz8zYMtFBTSnj9Dp16lEJfpFW
-         PKmhEkbOjNMJQkMvZh1nZLS0hkFS0IrZ6nZrDhC3pddJIjJgy9HxH8DDjxqZKsduLgLp
-         blQTtwseTVNitY+iP0g9sW9m694WFgNURI97ozj7cHY7HyO51SlPCI6Ks7CDQ3Nw/8Dq
-         nvL9Yp73ji763wPIhPxlxo0QaoDtjiZM2CIaiouAY9Blz3opMqqvmMlLoFOsqCFZTMfd
-         6f0CjIPKFUAsJl5gURZ7jfriCWnjEuOCeMYKlzS8uiCNBge9jKcHNNFihZuxCqkic3RQ
-         jkuA==;
+        b=GGEEzv84W3js2A7EUXvi9SNbhyQhU+e7NACcbqvgCV4vA348z830IPNlIWnbnPk5bs
+         TBKyq1ccpATFuaYJ83I/xHcyamh/U+3vFto6Cr58xv5StYuLsYxG5wGcG/XLyE/dhUsu
+         SMx0hhHpEBhepMRKJSXOps0z8cs/kG2AQfr0r97UjZ5/agloxv96r2dOJp6c1XmlrgWi
+         B3Y2iZo9/CE5OTtaI6y5/ycmdwTIGR7vrcTiHnror9CsQTDkhbkcSNMP7MwloNhVtKiP
+         x/7qQcgxz1tFfKxTq7EEG8hEM1156DBwd8zuJBBvx016Tzp3YEtmDNB95qd6zHxp61F8
+         xK6Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765843935; x=1766448735; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765844022; x=1766448822; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=27wQsfuOXjJhJo74CLfXwuW+WvRgdLz0XpQKIZiK7fE=;
-        b=G4zLVULWz6iLuzrAuxGayEyfVdvvncGfLkD+yVkaGRNpNtsGvXPikTXOKzDV4TBNij
-         kpidn/WDY6inDXYSeYagliNZvo4cwyDX6xUtUGs5M/wa7W069peCWhX2h7n14KTEQef7
-         0jmRZlDlC7odR+yo9OWHDPjbRcKCK4Anx4ty6yAnxhURkreyhVwIJ/5P05fZ/SwVFmWL
-         tqYcOCo7GETfudj1VC6yxX8jZJ3qkxdnwQ/8f8pLYmzI3Q/zVYaAPta7uSI7P8r6wvTx
-         Th7Q/bip/P29pga85c3V15iC4ut7BbUXKkWlxCAtsTL4YB57pgA75Yt8iUJjyzMInSrJ
-         wErg==
+        bh=dBvvdjAGagUjLVl9YfrF0CaB+uVsXDQGkPun9qqTA8c=;
+        b=zvGZHoiRW2JIjO5DYG5ndNniQehvasMFMPVdeS+ghYDAUHgsk9UNY9t8YokCKF9Hz3
+         rYVV196dUQpqRMLtQYM/PNeuN34nvIsPY/n5Zx/zMwlPHadSQYJm3OOV/JxF1uTf4z/U
+         LsMFpdJVrmOeqejpfciTG0hwKiZPdMyLvuzRP+7NOVi5QKkBLDieLGjjSl5Xr+6CXXk3
+         cTyU/RwOkcL7sfG9fZVe6DFaf/fx5Ji1QZIAvJ+WcvdLnVwLxWeS0xsGL7Rj+YBwyspQ
+         QQzXGBctZqYPAi9Zi2evWQHUgWYVQOgsuU3ect09Rq2mSAoNU6d3GNCyQwhCeqUq8nqv
+         DluA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765843935; x=1766448735;
+        d=1e100.net; s=20230601; t=1765844022; x=1766448822;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=27wQsfuOXjJhJo74CLfXwuW+WvRgdLz0XpQKIZiK7fE=;
-        b=GdLTF9HPALTi+y5h7A1fIWSnLsRPZLdUq1Xa9gu8LleJ7iNmCZ6oPEO2h4suaOOiMG
-         RN1Y4h2hiBI6RzyB+aNQg7MrRwXEvZvo3S8CFFjWuRg9Md8IwriWBmvbbQNuJHpOSuaz
-         jMWWR+lMXf1LQcemKUybA7+pWdgEAgBzcqanT1dKmZVw2SSHjbYzkEQSV+Syu0C/Vrrj
-         7D8z5U5nbDGwvyRkoP+DfxIFWAirl6J+aFBL5aj+u5ZuUzkVxeIrt2lsD4sNF4a8114P
-         NQc4JXOvI0yJpJyhWFU36YaaN1kYDLSErRSPYbICCzzTOv+pU4/P9PV5JVub2UyVEWD/
-         CsLw==
-X-Gm-Message-State: AOJu0YzUoIg5I9R4EVlFE4h5V6zuVqcaXBOU+XZwv76wUHtcFJ8mBbsE
-	+v/h9f4Cco8UNSEku28rgg/5mkXP1RKgdkA+W45VL1mapjz+HthWszo0UWzCCwrm/f7GRXM1qy7
-	WmiyIlScD1VNW82ns0NGXk5PbDviq83rUMCHVi1g7
-X-Gm-Gg: AY/fxX7jKSr5LEZ/s7PG5QyjnrZU7AKrDbrLTRQ50GncwNpX6LpHJndJlj/JilogttZ
-	lp4vdZwKSky8WqrGgIwNFl0qVxXyukn2eagQP12a5VoiGRfsVJCy+qhjsIfHaG+xXeB/feiUM5i
-	Y/hFSZyITF/hWmrTayIRy7CpKDzRGcAJOgJQ1uyGiIihgfrBysrc3uN2CUHJU7N+NQeQ3NbxD85
-	8IWpPkhDJf5QQ8/QZkJPemwEWlb7V8o8+YMmzK3+Qv2XOj1/ptlZZbRv8xu4IiQsb+IXxg/2Fzi
-	WCnjHGFEd/y7W43oEhUXPZB1Ii6d
-X-Google-Smtp-Source: AGHT+IFYx2fqkqoq7nwgp8s1TBunZASqxOa+paDvYopFfRkFHpqotvWma1Omazh+JGGMYTXawA8rx1OS57mP9gGziPM=
-X-Received: by 2002:a05:7022:68a1:b0:120:5719:6249 with SMTP id
- a92af1059eb24-1205719637fmr3220c88.16.1765843934179; Mon, 15 Dec 2025
- 16:12:14 -0800 (PST)
+        bh=dBvvdjAGagUjLVl9YfrF0CaB+uVsXDQGkPun9qqTA8c=;
+        b=MR1p+EnznP/6sQXCfDbBZeNO7zl39dzS9IFfGwUSATsbTRM1Tbwv1+WcPQFkoiBAuq
+         N6UgCwpxtqfR9TTyoG3xSGsZXpiCRJY1iV7vYCMM5g5PogSyZXwhSjgQ7DOw7YfWkSMl
+         igGCaEgIL7DHZcgqOHeElOE1Buu/P7SmXpUf/gM/oxrMVvAdZ5B9tQFsmTTCYsJrrde9
+         ypBaTp/I+TZctqYcg/KNGtVLW8UUwmVPpDLxsm0f9wA5Q5Z62pyFmIbEXJfSd4r1yLWr
+         KHgCAkYfytzVSZwI4VfNuIfbhveikH4YsfWciyeV7tD0iBpk5R4ys+aPdpEAAqnX13pR
+         xt4w==
+X-Gm-Message-State: AOJu0YwIWEMWLOems8w5D8Q4+6qAr9e9ys61sWjBS2/VOeFxGv/eflqY
+	iBcgqBRvFRXeQiuiwMFmN/WR7BT14KG4NrshNAXGBZ+EomdAiRDQ4ye8tZprIBnbglZf/eYtZH0
+	Ia0pk2jPboTwBbmDzOrhK2CM95xMPbTgtLhEsaSAj
+X-Gm-Gg: AY/fxX5E8BqCYkuuDEj47/41we7yO8yWnA37/IiB5anVnDi0uCF+Nh4ly+Kd3KU91DB
+	nRWZYRbl0MDIHdouB+cXnrYqTcfhFdsjXKCkeGEQnZHw961Q6hIjt+quultjs5jBii0wV7znk5z
+	oG/C8YnX9U47NT7mgPZ9Lxy4sa92I0DbvlvnBJHgKsyI1anfCPGYU1sXcNYyAZ0q6E9dyyk+09I
+	u7O64lRdVYenN5Lle438gnq3Nui96NwPIk23dIr0nC/nsaa4F0mIknlMqDhDAPPfBaCDhQcm91K
+	4FtaVmq3PsssA5nTOQV2KbgE8IxM
+X-Google-Smtp-Source: AGHT+IFoirOvNMJpKn6tP51PRi96WA/WP8WHHlPJAFYlT/+WZt2BNZRZRHngFXZC5p9GdQCCqI5te5+CZ9A/FzrtBPg=
+X-Received: by 2002:a05:7022:ef14:b0:119:e56b:c1e3 with SMTP id
+ a92af1059eb24-12057217cb7mr94c88.14.1765844021847; Mon, 15 Dec 2025 16:13:41
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215153411.3613928-1-michael.roth@amd.com> <20251215153411.3613928-2-michael.roth@amd.com>
-In-Reply-To: <20251215153411.3613928-2-michael.roth@amd.com>
+References: <20251215153411.3613928-1-michael.roth@amd.com> <20251215153411.3613928-3-michael.roth@amd.com>
+In-Reply-To: <20251215153411.3613928-3-michael.roth@amd.com>
 From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 15 Dec 2025 16:12:00 -0800
-X-Gm-Features: AQt7F2ra9396Gr4eNuUU-K7XtTwtvJ-rm6VSQCRwWNTFPqW7whDLIsPPpRjnSlU
-Message-ID: <CAGtprH95s5wL1=rSSpG7Cmj5HhJOftwJY7CP27WE-qmq7hr+XA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/5] KVM: guest_memfd: Remove partial hugepage handling
- from kvm_gmem_populate()
+Date: Mon, 15 Dec 2025 16:13:29 -0800
+X-Gm-Features: AQt7F2r7bucqAHi7gjHHb4xeDTJY1rA6zwbPyLTqR3xjOn4AhUq7dG2mlIrjznA
+Message-ID: <CAGtprH_4K9TAH1DoeAW-UHTpMY2sNr8UUehoCPX_SKSQBNoERQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] KVM: guest_memfd: Remove preparation tracking
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
 	linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, pbonzini@redhat.com, 
@@ -114,57 +113,39 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Dec 15, 2025 at 7:35=E2=80=AFAM Michael Roth <michael.roth@amd.com>=
  wrote:
 >
-> kvm_gmem_populate(), and the associated post-populate callbacks, have
-> some limited support for dealing with guests backed by hugepages by
-> passing the order information along to each post-populate callback and
-> iterating through the pages passed to kvm_gmem_populate() in
-> hugepage-chunks.
+> guest_memfd currently uses the folio uptodate flag to track:
 >
-> However, guest_memfd doesn't yet support hugepages, and in most cases
-> additional changes in the kvm_gmem_populate() path would also be needed
-> to actually allow for this functionality.
+>   1) whether or not a page has been cleared before initial usage
+>   2) whether or not the architecture hooks have been issued to put the
+>      page in a private state as defined by the architecture
 >
-> This makes the existing code unecessarily complex, and makes changes
-> difficult to work through upstream due to theoretical impacts on
-> hugepage support that can't be considered properly without an actual
-> hugepage implementation to reference. So for now, remove what's there
-> so changes for things like in-place conversion can be
-> implemented/reviewed more efficiently.
+> In practice, 2) is only actually being tracked for SEV-SNP VMs, and
+> there do not seem to be any plans/reasons that would suggest this will
+> change in the future, so this additional tracking/complexity is not
+> really providing any general benefit to guest_memfd users. Future plans
+> around in-place conversion and hugepage support, where the per-folio
+> uptodate flag is planned to be used purely to track the initial clearing
+> of folios, whereas conversion operations could trigger multiple
+> transitions between 'prepared' and 'unprepared' and thus need separate
+> tracking, will make the burden of tracking this information within
+> guest_memfd even more complex, since preparation generally happens
+> during fault time, on the "read-side" of any global locks that might
+> protect state tracked by guest_memfd, and so may require more complex
+> locking schemes to allow for concurrent handling of page faults for
+> multiple vCPUs where the "preparedness" state tracked by guest_memfd
+> might need to be updated as part of handling the fault.
 >
-> Suggested-by: Vishal Annapurve <vannapurve@google.com>
-> Co-developed-by: Vishal Annapurve <vannapurve@google.com>
-> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> Instead of keeping this current/future complexity within guest_memfd for
+> what is essentially just SEV-SNP, just drop the tracking for 2) and have
+> the arch-specific preparation hooks get triggered unconditionally on
+> every fault so the arch-specific hooks can check the preparation state
+> directly and decide whether or not a folio still needs additional
+> preparation. In the case of SEV-SNP, the preparation state is already
+> checked again via the preparation hooks to avoid double-preparation, so
+> nothing extra needs to be done to update the handling of things there.
+>
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 
+Reviewed-By: Vishal Annapurve <vannapurve@google.com>
 Tested-By: Vishal Annapurve <vannapurve@google.com>
-
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index fdaea3422c30..9dafa44838fe 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -151,6 +151,15 @@ static struct folio *kvm_gmem_get_folio(struct inode=
- *inode, pgoff_t index)
->                                          mapping_gfp_mask(inode->i_mappin=
-g), policy);
->         mpol_cond_put(policy);
->
-> +       /*
-> +        * External interfaces like kvm_gmem_get_pfn() support dealing
-> +        * with hugepages to a degree, but internally, guest_memfd curren=
-tly
-> +        * assumes that all folios are order-0 and handling would need
-> +        * to be updated for anything otherwise (e.g. page-clearing
-> +        * operations).
-> +        */
-> +       WARN_ON_ONCE(folio_order(folio));
-
-I am not sure if this WARN_ON adds any value. i.e. The current code
-can't hit it. This note concerns future efforts to add hugepage
-support and could be omitted altogether from the current
-implementation.
-
-> +
->         return folio;
->  }
->
 
