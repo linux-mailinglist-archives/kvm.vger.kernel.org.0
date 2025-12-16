@@ -1,140 +1,182 @@
-Return-Path: <kvm+bounces-66056-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66057-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 548EECC0570
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 01:21:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB4BCC06CE
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 02:14:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F06E301765D
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 00:20:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5B61C3022FC0
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 01:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBDA23958D;
-	Tue, 16 Dec 2025 00:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD63244670;
+	Tue, 16 Dec 2025 01:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pn48TEFL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ari1B+D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7001821CC55
-	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 00:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB35A2040B6
+	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 01:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765844414; cv=pass; b=DAA5v+tOYjqDN5OIocAiCIzNpEOWxrimTJkviuUufT/PAikQ970vGOnG8l9ZIJ9lnYdKdacolhNBPIeEuXMV6jpI0oUI+EiJkqfDOzSmrIxGLEgIU7bexDTVa5jGO4zKrktQmm4MIUT7jJnhT5uKLo2errkIumWEZDPz2+P/FR0=
+	t=1765847667; cv=pass; b=GFDbqX0kMVxbwn1oZ4rrxVCHjhY8hrxx/OGsYeEi0m1N0tepySM1uL+gFdCUVsItaF9lWOFaw5Onjb7qSS6GiqhkYu1jjO9mOXetUptWhSx7h0a0lfPA9JNUT0RgnKDMEz7T06V1yEI73/NLOMa4ZeV8pCmk3tQGmL6C50rAcAw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765844414; c=relaxed/simple;
-	bh=klRRPxxRucOBsSf0NKoOGV1TNHKMWWUVg9IeOWd5Sg4=;
+	s=arc-20240116; t=1765847667; c=relaxed/simple;
+	bh=RYQZPJfFMxqkp+1nngNLsMaHBFm6+xCUj4KkP21+dYM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hHRAwi+RHBfefoTArOroTgQEpP9Mv/d7TE20QYHS//JUAkXSQOeEBLGIOdOZu7vs3WHRDJD/yXwPrYqh+2tMkXgh1YzDJLDM3qMa0Kq+mOBXcElQPEKxJPQ4/84S6dm6lTmqz1XTffbLyOZWxDsdGLNtUeyUS2cCdJHIH3ZBndQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pn48TEFL; arc=pass smtp.client-ip=209.85.214.179
+	 To:Cc:Content-Type; b=OCHi/BaYcJZLDG1Wz9wGmsJMErDEHQEO3a80tuPpFUGoaZlqtfdFk3VLfpWg074WoEa1JwwVHuWejuCexjkjQ5k72+gnHNZ07H9DLckweuPSUqKcKgY8zd1yEwEVibBJUBqZ/4WZdlrqHUTaS9za2vlhtM57cm+zQHsdyCh/aGw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ari1B+D; arc=pass smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a0d06cfa93so14055ad.1
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 16:20:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765844412; cv=none;
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ed67a143c5so152391cf.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 17:14:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765847663; cv=none;
         d=google.com; s=arc-20240605;
-        b=BSM+iZKYKd2B452qEyWg2UNpgg31QEsU/oP1oAOBVt5Tarpo9KVPB3C5qpelmbiD9a
-         VkALRuerkHwsT1WQFuhn32IMzDxNORjTwW1Z3Q667gNRu2+j1F1ERBjupF6gYagNcPYi
-         aLapm4yvPfESsNk6X7HzBX+K8nOBblUx6NJMRToU5P4Vnis4BOuWhOApitDwcy7bAJ/u
-         m5l47Zj7l9jM37F6JQY9WWPrXV6RHc+KAS6uA3LT2zWSdjh3YoNI9jS9qtiYO2Fydleo
-         SDOILVNrxaw65xrEs8uUqjfj+f9N5tS0JklIBa1lhxJpCQHK6Z7f33eNbYrKuBlN54PW
-         2LGQ==
+        b=MQ31HM6C3pzACgRDGepojpiKBWjxqbowp3wiUCCeFY4KQkSQ5Vcq7bGCuP3se9PiMq
+         BCilh4ekuAgZTSxV+PEPBZ5hhJ6B+7QWRJ1joD1Y7FmkgBtVG35XmPOJklzkmQAJHCWO
+         Jzmg+7EhHNqhT0CYd3i7K8NKeOCOowSTDdZPrHbZlylC/QJ+QC//b9sGRO+K2f3UIoSj
+         DfJTJUk+yrxFuLT/MqRoPhDquea/bunRGBLeEc1dyCtIWFttwC/AJUsrqOjTJ/EWBFMD
+         PfXbsCo2D/ObBvRHjku5pG+6JGl9tmZyZSxoMfcpQwzqpHdcmTCtNZyA+6T8PfrF4dtf
+         7YFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=I/xSO2loElEQu4qJwQAmc4hWblw65frcVfwyqUV19Yo=;
-        fh=f0Sa/Gk6aV+Q0XgvPyFCasN4iiurT6FrEyCiHiudOJM=;
-        b=Fbs8fwfXUbl8yrxTOzHxz/GxWhso4Bs3o74AnAYpRUWx3PrkoC5mkd6VExpujDOaqS
-         Vjq9M6s5s+wj8hzRFC+9+Wx2xlCFanxLgTUCJYOgh/kPAO9bY3ISfpWy3CDFr/T0QUUv
-         DrIhkuOErcbq2DEpO7/n81tcaVI4dPOBV7KMsy47n3vj1GMH5ZLyvhRq59dGJnNMTxOu
-         m1VXRJZilaQXZxILklADgX4Uqamt3c3KGf4VSlYXefWtk5KA8ehO4L++DVo8enLsj/OS
-         jOCjktOxgnhaEfKXJjI28v1oYx3Q9DJmM/4Jiqzgwwwbzt9HYqiAkadWltQuHG2G1skG
-         Dfhg==;
+        bh=nNRSgDqjGCHm0cCbv9mH9lJK6eTAVlNyMNzHMF8cYvc=;
+        fh=2hgtUdEJvhgc98mPkypp54v6FhYFPYlad9vqxHg8l4k=;
+        b=LqAvc0nhwMk/S2h1TA22h4Tw3HKsk1xLgvSCPM1X//fvfpsQYUEZNHQd5k73OCjHgv
+         IkAr1YKFngF/gMY6f78QaaojOyuV2Li7BaE5/xYTgYK8EVsHRY82YsCf2eVu4vBQboTh
+         HxcsSEqAgHq8i2dfBJlVyNbZpLzz46mc0lRa/lQ/V27w49R/bUKXSCzWd5kJ4sosVdHC
+         zhlGPC7nm07Asr1NOK/mWrr4toQ6B5QGOHD9CwGEZh6v3FMbTCoFs00rQPYQ8Z8xxJxR
+         cCijTCVV9x1kU3LWmPjmjnKoVgXVzMv6DZxVdK4gxx5nCLbXvQ0EbDVkb+eRL9JIt2b7
+         aJFw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765844412; x=1766449212; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765847663; x=1766452463; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I/xSO2loElEQu4qJwQAmc4hWblw65frcVfwyqUV19Yo=;
-        b=pn48TEFLSThmF9DTzsd9Iv9MSeYklUO/W+DPNtPJLKBPP4jp63qVIT2NWydyQ/F38U
-         nNpAPnLgp4Ay42qwgI55/9+gxN1rld/rsVI7XDL4x8oiWKfraqpuvBDjqhXd4kGw+9vu
-         fxgwe96Fi/9sVJeSbpNXyo8bymNQnNi2E6tQAFUSrFRvu8CiXnPugXkN54bGP9X8RIva
-         bqIvVJcQqAy46vzPIeniqcIob3jXW202w829ek8Ryy187n8Ffb8PoDycY7p7U0r1x/xc
-         PHDIcjfNC3oaCtNrEPPYP81HWBzE3+khOA8FVpPymRM2spTNgm5jRlKdFOKheKmII1Ul
-         z0Pw==
+        bh=nNRSgDqjGCHm0cCbv9mH9lJK6eTAVlNyMNzHMF8cYvc=;
+        b=3ari1B+DFeL77dgRqQXsmkwyt3RpD5yA/XqttCV8veBhDTk0MUnXiBVw2Ka7+3hlsv
+         VCY/3P8wYJlCxLpohyYwMLEQOPeSCAYbDV5tjZmS7qnzRhMkAlDsbSdeE3SuVy1fwIc8
+         lA5NHOCM5dN6iBptDP/Np5epV8nrLcRkPk066yRGIc4OhzyHlea71C5x+1oq2Wr9COyG
+         x3GNW9+tN8N8H8Ui056BJG3Ma/F/hiP9CP6YYrSqkgzIVtB+3vjiIIIhx90AKBiK3MT6
+         7bpDrHk0oYwU2KQ5XzO5+XNO9qeugqgUZPYQ/XQ0I+QVY+GmD9JYYC6zfLTXi4IAeeH2
+         Kw5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765844412; x=1766449212;
+        d=1e100.net; s=20230601; t=1765847663; x=1766452463;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=I/xSO2loElEQu4qJwQAmc4hWblw65frcVfwyqUV19Yo=;
-        b=mJsHaYAQAhgDiLp0UCeOUzYbIJpOKl9ikSFAD+u4ohPFZPaYM48n9OXtKIL3x1RBm5
-         tqbBdjam2b6+axsvFb3AFgCekeKAXQTP9hlHzdrT6AwQCpwuAlBF1TxKC5f4n0o1Ga5R
-         fW89NBAwsOzys8xnU0aArQGKvxndr0nxW7g/iLAbUdo3ToY38Nry1jv8x1wtdEdl2Xyi
-         00ADhDVSssPiv7J9njYugZeWb8z4lu7X2Y/K4Ot3WeYVpj3pu9OUukm+VXNjpo3zNDah
-         tInhRpqVnd6+4cLOkCq4MhzA0WldSurLO3dLxDPkyQujOjzA6ojNIaoXeuhjrAS0q2tK
-         1Tbw==
-X-Gm-Message-State: AOJu0YzE1+lIlODj7VneS/aJ2xN/+lbjT1nqZAGOEzznj28a2TFZ9z6Z
-	671/RmolQinY9VubUUiALAMjdmBw+5JLTrStcG08fgr7Pzd1CQBOWomOiU9FOacAQr4JvsfeQVS
-	EWQA6cHClkXvRdRWyBQOEDvi6hZE060+sOdofVpmPz6ikirGv68wiIwk/A+I=
-X-Gm-Gg: AY/fxX5c7bRixjk4mCz/Ags6iGBvYLAT0iN9s6Eq0Os1UU5uYxvd2acK+uYGBytssWT
-	+Li7iHKr5KReSgrF+4UV5VNXdyWM+qxSg27Dz7owNKTC/JgTUOGZmWsnW0t4MI9nVllHh3sv+OO
-	nTgx2LtWLfl4UYbWfSfXrNJdppJ0+2gTd4FtKTj1Z6w8Tdelxx9EssAB6Jfk1rRYp7b3P6YLpsO
-	lZLILUr8M2ssUSIQjnNtka3e4epgl7RoeU7wT9y9+EIGeiGr33bgWHqAu8l7XqwEevRHC4O7VTV
-	vqW0mJMTCWRlNPxl2x/j8U44BT+e
-X-Google-Smtp-Source: AGHT+IExDYh7puOwTqAoucyAbhg/dhJj/UlPMmB4InOhmz+VivF2pgRZLSSnb0+pKynoL6YupSskmHHY1LN9azC6BtE=
-X-Received: by 2002:a05:7022:4406:b0:11b:3bc:9ea0 with SMTP id
- a92af1059eb24-1205727676cmr408c88.6.1765844411980; Mon, 15 Dec 2025 16:20:11
- -0800 (PST)
+        bh=nNRSgDqjGCHm0cCbv9mH9lJK6eTAVlNyMNzHMF8cYvc=;
+        b=myOg9HEtTHbCRqnVvmRdjOOoZx6+UxMpRHacEN2K/V1qHCGU7GxL/3C8SUUaMpNiii
+         QkmvZcvzJEEMtnlKV77q8S7cWjuDtiYjUD2Epk9JgS5MtzNSqg1lxDlCL8dDYmnCACYb
+         pCo8sHw07ToJyaMYhPQdGM07pOLXqIwEK7goAAdV9MmrR2TSzkty2iacpihyeCjYUyuE
+         y3r56JGbyJSrjdJXkfWWHfL0VijUk8s/skpP13sa/lINKHseNFO9n7NmV5XiPWkYuEvw
+         6ySKyveKDbiY0MsLu3KgYTeeyYt6YMfr88MGrP/eQPQYJrb/z/8sqrZQjLRoRQ//QVO3
+         Hyug==
+X-Forwarded-Encrypted: i=1; AJvYcCUPBagQeCIxYYQKMacLx7EtglmxhAPCdGHWZtOfIDr31Pb5TPbrD8BBvB30KW7+9I2Iy+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRLC9jhx6N56sAAtlgH+VQX8HWnbR06IuBkrBw3oMb65rWp8mx
+	wffzLoUVjV2UDGDVChtabKLL26RDwTd4tQwBHT1NzXn2tuZO/rZ+tbBCLdWduYCkPKKc0dDt/sF
+	MJvYDEN0c1kEVqQayZlLup0x+ivLk39TH0WGTvtdf
+X-Gm-Gg: AY/fxX6zWCuKoIHZxwiZnK7JfnTuy/rkCNjR1iC/ElF0bTVa1L3Go4FSX1DKq6z5614
+	ml30WSgEUSGVkXOEJuIAmhMvkQu1bSCK2nm6h/LUiWhUyEJ4xpKGs4UTBgnNeKTZve//VN3492R
+	6LJs/Bg7QB13fgsRtUdm9wc7AvN62U7RLSdikZsdqjEKmKJLtGk8d5KpgSYM4X7PWf1Bqe+xj/T
+	namUitW0CeQXm1K3I5s5pBslD0+4KN2A2c4hEkMLJ9ea78WIPPqaOMukKPTyPBeESkMrgjgnqxz
+	KoJOV3lwSJUXUUttMKk1LpGoIQ==
+X-Google-Smtp-Source: AGHT+IHDK9Nx0ZJG9GA2+hWOGyWZ73qxIXF4H8RaWSuD2ofLYKrM3Tu07Foy0ZrKHXYTXOo9Ba7m6bZ0z05T+81FVJI=
+X-Received: by 2002:a05:622a:8a:b0:4f1:9c3f:2845 with SMTP id
+ d75a77b69052e-4f347f93f08mr1579311cf.9.1765847662514; Mon, 15 Dec 2025
+ 17:14:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215153411.3613928-1-michael.roth@amd.com> <20251215153411.3613928-5-michael.roth@amd.com>
-In-Reply-To: <20251215153411.3613928-5-michael.roth@amd.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 15 Dec 2025 16:19:58 -0800
-X-Gm-Features: AQt7F2pam8UulXqTs359SLpQ8QESA_W2EL2-JVHHwFHsPgJIIvSeUBgNcYPP6kk
-Message-ID: <CAGtprH-te9xrmVgUteAaW17BLuxfZWfu32G4Q+AdP4=DDrm27g@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] KVM: TDX: Document alignment requirements for KVM_TDX_INIT_MEM_REGION
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, pbonzini@redhat.com, 
-	seanjc@google.com, vbabka@suse.cz, ashish.kalra@amd.com, 
-	liam.merwick@oracle.com, david@redhat.com, ackerleytng@google.com, 
-	aik@amd.com, ira.weiny@intel.com, yan.y.zhao@intel.com
+References: <cover.1765834788.git.nicolinc@nvidia.com> <cb38f91526596f4efd0cd1cffa50b4c1b334f7a4.1765834788.git.nicolinc@nvidia.com>
+In-Reply-To: <cb38f91526596f4efd0cd1cffa50b4c1b334f7a4.1765834788.git.nicolinc@nvidia.com>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Mon, 15 Dec 2025 17:14:10 -0800
+X-Gm-Features: AQt7F2pGryc6oZ72KleXBeas9fEej802hxD59J2edZO4aLe2-OI0GRs2t7Q1jUY
+Message-ID: <CAAywjhSzKM_bEm_VbPZFffY9sR3-p==gbVppSL+555D1kPg_3Q@mail.gmail.com>
+Subject: Re: [PATCH v8 1/5] iommu: Lock group->mutex in iommu_deferred_attach()
+To: Nicolin Chen <nicolinc@nvidia.com>
+Cc: joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, afael@kernel.org, 
+	lenb@kernel.org, bhelgaas@google.com, alex@shazbot.org, jgg@nvidia.com, 
+	kevin.tian@intel.com, baolu.lu@linux.intel.com, 
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, 
+	linux-pci@vger.kernel.org, kvm@vger.kernel.org, patches@lists.linux.dev, 
+	pjaroszynski@nvidia.com, vsethi@nvidia.com, helgaas@kernel.org, 
+	etzhao1900@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 15, 2025 at 7:36=E2=80=AFAM Michael Roth <michael.roth@amd.com>=
- wrote:
+On Mon, Dec 15, 2025 at 1:42=E2=80=AFPM Nicolin Chen <nicolinc@nvidia.com> =
+wrote:
 >
-> Since it was never possible to use a non-PAGE_SIZE-aligned @source_addr,
-> go ahead and document this as a requirement. This is in preparation for
-> enforcing page-aligned @source_addr for all architectures in
-> guest_memfd.
+> The iommu_deferred_attach() function invokes __iommu_attach_device(), but
+> doesn't hold the group->mutex like other __iommu_attach_device() callers.
 >
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Though there is no pratical bug being triggered so far, it would be bette=
+r
+> to apply the same locking to this __iommu_attach_device(), since the IOMM=
+U
+> drivers nowaday are more aware of the group->mutex -- some of them use th=
+e
+> iommu_group_mutex_assert() function that could be potentially in the path
+> of an attach_dev callback function invoked by the __iommu_attach_device()=
+.
+>
+> Worth mentioning that the iommu_deferred_attach() will soon need to check
+> group->resetting_domain that must be locked also.
+>
+> Thus, grab the mutex to guard __iommu_attach_device() like other callers.
+>
+> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+> Tested-by: Dheeraj Kumar Srivastava <dheerajkumar.srivastava@amd.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 > ---
->  Documentation/virt/kvm/x86/intel-tdx.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/iommu/iommu.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
 >
-> diff --git a/Documentation/virt/kvm/x86/intel-tdx.rst b/Documentation/vir=
-t/kvm/x86/intel-tdx.rst
-> index 5efac62c92c7..6a222e9d0954 100644
-> --- a/Documentation/virt/kvm/x86/intel-tdx.rst
-> +++ b/Documentation/virt/kvm/x86/intel-tdx.rst
-> @@ -156,7 +156,7 @@ KVM_TDX_INIT_MEM_REGION
->  :Returns: 0 on success, <0 on error
+> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> index 2ca990dfbb88..170e522b5bda 100644
+> --- a/drivers/iommu/iommu.c
+> +++ b/drivers/iommu/iommu.c
+> @@ -2185,10 +2185,17 @@ EXPORT_SYMBOL_GPL(iommu_attach_device);
 >
->  Initialize @nr_pages TDX guest private memory starting from @gpa with us=
-erspace
-> -provided data from @source_addr.
-> +provided data from @source_addr. @source_addr must be PAGE_SIZE-aligned.
+>  int iommu_deferred_attach(struct device *dev, struct iommu_domain *domai=
+n)
+>  {
+> -       if (dev->iommu && dev->iommu->attach_deferred)
+> -               return __iommu_attach_device(domain, dev, NULL);
+> +       /*
+> +        * This is called on the dma mapping fast path so avoid locking. =
+This is
+> +        * racy, but we have an expectation that the driver will setup it=
+s DMAs
+> +        * inside probe while being single threaded to avoid racing.
+> +        */
+> +       if (!dev->iommu || !dev->iommu->attach_deferred)
+> +               return 0;
+>
+> -       return 0;
+> +       guard(mutex)(&dev->iommu_group->mutex);
+> +
+> +       return __iommu_attach_device(domain, dev, NULL);
+>  }
+>
+>  void iommu_detach_device(struct iommu_domain *domain, struct device *dev=
+)
+> --
+> 2.43.0
+>
+>
 
-Reviewed-By: Vishal Annapurve <vannapurve@google.com>
+Reviewed-by: Samiullah Khawaja <skhawaja@google.com>
 
