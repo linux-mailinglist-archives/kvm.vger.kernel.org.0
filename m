@@ -1,175 +1,161 @@
-Return-Path: <kvm+bounces-66078-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66080-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6B3BCC41C4
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 17:05:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A79E5CC4426
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 17:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77CCA305BFDF
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 16:01:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C86E43129F9A
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 16:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1453821D3CA;
-	Tue, 16 Dec 2025 16:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E0D30EF92;
+	Tue, 16 Dec 2025 16:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W5DKYl8t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FfQvTcpy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DF2BE5E
-	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 16:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8F22EFD9E
+	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 16:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765900867; cv=none; b=qcLX8rxuXYhQrIjop9I3Il8IlZQGMpI6/qfSZNUlfVpfa4HruPcdnSPr+7WNHJMYQLBFDHRvXh6M5/ZVVHwvidRDId4nY8T4uyQtzEt1WXdsLFmxKTAdTmqeGmQricM8vgOeyo7IK7x8lEP9GTlAG/Q/4X9/hKMic8MKpvTmFsI=
+	t=1765901880; cv=none; b=boMyG7xbtO7Knmd+dL+Lr0ZhHEk/utCRCJ4SZ+2ckNCRmQp297yarOQZI0QZ/pBCcvMntlD0HrSySyDExz7DcNIHHyh1eVN5fmIh/MMDdNQjcU2vF+nxPQdc4/UefAlVn2dQm5Y1T39kw1vfiTVwoMARUsWhMtE+6oWmG1rI+64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765900867; c=relaxed/simple;
-	bh=yNFnE3QRWlC1z1b1Pzzpu0pYl/KVYC+2f5/9GLoa/4w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RhFHI/S94jgZ8AwI0ttiTvG82ZNr138ZxfVfIoe8oTqWVMODW/oQbCsNhZSsnze0DLclngpKgDRSJXn3ug7goSnvK4w018pLISIysBhFtM57pjfzLvfQGMScIFJ2Oix+1SEjb97d5aQcvSag6xVyjokIpFp43pTKhf4wCx/uxsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W5DKYl8t; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1765901880; c=relaxed/simple;
+	bh=oDad10tBgsXtNCipQDkssrcR7fxfDa9VYoz3N7fHVIE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZpV0AiYONC+WBfJz6Y4OQ0IUqAQYZDddbN4ykT8GbKwoS0MuwFWFWpXcTvxLKH2Hk28jXN3z3hy/X8Lx8zTiaJgyIxXUUsgnJitjhcOHegQ7eR13562Ba5hplE/wf5IoePmhq703QKf1rL5DTMme5IjEzQfv6idzeMECiQdjRMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FfQvTcpy; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ab459c051so11539786a91.0
-        for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 08:01:05 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0a0bad5dfso62627535ad.0
+        for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 08:17:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765900865; x=1766505665; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ed0NKnHXDUx6y67ShmBXuv80GX62o6+xq78eUXQD85M=;
-        b=W5DKYl8tlV1YqJlX20UbYj5sbOZ3rtQsFDAAWEMDGiAJc/gvpmXmzCTNh09o7uRn8y
-         h13hCy1/lfk38zguFoV6CRQAodYP0Ft89Ecn/jB4tirNfcTZwsWkr0vMOc58UPZTF2iI
-         4sqLCHIJhTgulsUNCdjTDdiGGwiLyBE6vB2oYxOxn8j1RVePvaNuzjxVJHL4OgLo91Is
-         enxHbTx1xhuTP2myZOpnVumgHuFJ9bX504WxbQQtF/FKhgSgP8wmxZoCW0QE9NrOUWpi
-         Jy3ePjNgyJJ8EfrmcXDWpADtDXR19W38OFkE8zFtpcp0Xc2QT+9req7N03HHYS4RNMJv
-         S3sw==
+        d=google.com; s=20230601; t=1765901878; x=1766506678; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rtWUnpShPmQzTtydQTzJbAldqFRML+Ujl+KavI+WO84=;
+        b=FfQvTcpyAkAJ7Fx9tC4Dp9qEZ//vFmUJ/0blEbV4aItOGqc36kx3KwNlBHh9v5Mv2a
+         6bMc9tu4L4Erv7mEP+LlCrMw+diFTRypZ0/xj4iNJg3duVitnyryHuxtuuHWGg8xpaZB
+         yWPIBH8Zc1WOxuk2MF8NIb6X7hUULhPvGVWq8gdeVRjVhzcklcCV5yvdSc7pXbwBfBuF
+         /MxDJS2yta8G6qDabEdeSTtaWGil503py9u/3+jx33SwZhsgUHG8q2YyfC/fuVJCH9ho
+         CiUHLO7x6YAoxh9Xag7umtjdxTVe982xdJwvpMj2iATrLANDfgRyV43vVEhGs7jWvuCh
+         +8AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765900865; x=1766505665;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ed0NKnHXDUx6y67ShmBXuv80GX62o6+xq78eUXQD85M=;
-        b=BE/g80F2eFoQKPLbgjehE7ycnHLs8Qiae06+L/mrvR/MTkjAuhPHeLBgeGF5ZJSNPj
-         /3jkKCWqXQrOfCWAAFK3GCmbXt26tY7jguf1H47CyO+/8EGgYIw/naW+na/EsgB1DhRZ
-         SlaBo4XRtWBaQ+AwBdb2Dfe83jSpW3lCdj0ohH+gTIEc7Dm9h54jDC+T+ONXRovHiVBZ
-         dhMTf0pkJO5xLuX8k2WSMQQ1GmQMjGe+pJMAliLi1EgRxO5c496lAgm2UZptP1EWlXnI
-         fVVMmhkJwwLb/NI7T+JckzKaqxfyaI0JyFajvoqifbdSle9Ah1XWQmw7lDc7oRqA7t6e
-         q8TA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAEGOwPxyz1nW+51C8dyHrXlXPBoYR+geg0Ru9Pryy94IRdSlPs+SmqWn0mz5FPtEELEE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzryRNjOowXOEHBvxqCA5gUhlurE82XakvLQsstdW7jX2ecZQsE
-	+RJyrbsm77TC0CWWw07z/nefFdpwGdKHLd0T3P5IAQWRXBqFWP+qT2KghPiOaWX/IYzXQ9N+AQU
-	/VWx4ew==
-X-Google-Smtp-Source: AGHT+IHxGgJVMrExe1w1FALuUErnemaqW+x4EsczgP3V99F1HVfGLEgM+LG40KSurJS2g3VWhV/ZeVpDzeA=
-X-Received: from pjbqx13.prod.google.com ([2002:a17:90b:3e4d:b0:34c:811d:e3ca])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d450:b0:34c:f92a:ad05
- with SMTP id 98e67ed59e1d1-34cf92ac1ebmr161260a91.11.1765900864883; Tue, 16
- Dec 2025 08:01:04 -0800 (PST)
-Date: Tue, 16 Dec 2025 08:01:03 -0800
-In-Reply-To: <CAE6NW_ZwdpGN0F_8NVe77tgGPw7nO5Mi-t1455gGoLcUVpVbpw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1765901878; x=1766506678;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rtWUnpShPmQzTtydQTzJbAldqFRML+Ujl+KavI+WO84=;
+        b=DmR+ye3lWpp+NMVpMNcCRvXO58LCSq4KITvof/tYPk/JidIp7FVEQzmKm5mPYFOVhy
+         pfXsnKJSzIYxghVRxn6xM80edWCNPwfl5zAreVvczx+Z5iGLgbFcN3VM+z21dH+x3hU0
+         xjMdGtFuh11smE872CvAstazfEjmanbu+IjlUpYFzz4hbVufD0RkNs6VyijFLy21bp/8
+         YipGc8ykAmw0jBCuiakJ09LJ5w9DnkxqUcM8Y+EwjLrKEFk2CBHRiIWNsjycNF9vxLEp
+         ALf9pQU+/VsnYs/UVYfDGWekYXpXd+SX8Ud16dlomPL2eMar1y3jpB4/+ehm/bOEDkor
+         VRBw==
+X-Gm-Message-State: AOJu0YyYHlBUxr+qaXD9LJk7+j54jV0K4ow3huet7Oo0uulTbg+5HPD/
+	H6SfCd8c67nhqBcx3mKjKrNLDHJKidvZsVMAc0MJE+0VRmgF3kZz/+i9nBrmKcXzsFxXB+ttsl3
+	hPLRd8Q==
+X-Google-Smtp-Source: AGHT+IFIHdd5EBZw97/XxjgHRkRU72Rd47o3FMvs4D/9pReBVAObAAfwIFJkMxwjEPiuwoLnbiC2EuCaU68=
+X-Received: from plmn1.prod.google.com ([2002:a17:903:1881:b0:29f:2f99:afb9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c403:b0:29d:9db2:f833
+ with SMTP id d9443c01a7336-29f23b77308mr157629785ad.25.1765901878390; Tue, 16
+ Dec 2025 08:17:58 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 16 Dec 2025 08:17:54 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251205070630.4013452-1-chengkev@google.com> <aThT5d5WdMSszN9b@google.com>
- <CAE6NW_ZwdpGN0F_8NVe77tgGPw7nO5Mi-t1455gGoLcUVpVbpw@mail.gmail.com>
-Message-ID: <aUGCP_n74pzTKLY6@google.com>
-Subject: Re: [PATCH] KVM: SVM: Don't allow L1 intercepts for instructions not advertised
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251216161755.1775409-1-seanjc@google.com>
+Subject: [PATCH] KVM: nSVM: Remove a user-triggerable WARN on
+ nested_svm_load_cr3() succeeding
 From: Sean Christopherson <seanjc@google.com>
-To: Kevin Cheng <chengkev@google.com>
-Cc: pbonzini@redhat.com, jmattson@google.com, yosry.ahmed@linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Dec 13, 2025, Kevin Cheng wrote:
-> On Tue, Dec 9, 2025 at 11:52=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > On Fri, Dec 05, 2025, Kevin Cheng wrote:
-> > static
-> > void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
-> >                                          struct vmcb_ctrl_area_cached *=
-to,
-> >                                          struct vmcb_control_area *from=
-)
-> > {
-> >         unsigned int i;
-> >
-> >         for (i =3D 0; i < MAX_INTERCEPT; i++)
-> >                 to->intercepts[i] =3D from->intercepts[i];
-> >
-> >         nested_svm_sanitize_intercept(vcpu, to, RDTSCP);
-> >         nested_svm_sanitize_intercept(vcpu, to, SKINIT);
-> >         __nested_svm_sanitize_intercept(vcpu, to, XSAVE, XSETBV);
-> >         nested_svm_sanitize_intercept(vcpu, to, RDPRU);
-> >         nested_svm_sanitize_intercept(vcpu, to, INVPCID);
-> >
-> > Side topic, do we care about handling the case where userspace sets CPU=
-ID after
-> > stuffing guest state?  I'm very tempted to send a patch disallowing KVM=
-_SET_CPUID
-> > if is_guest_mode() is true, and hoping no one cares.
->=20
-> Hmm good point I haven't thought about that. Would it be better to
-> instead update the nested state in svm_vcpu_after_set_cpuid() if
-> KVM_SET_CPUID is executed when is_guest_mode() is true?
+Drop the WARN in svm_set_nested_state() on nested_svm_load_cr3() failing
+as it is trivially easy to trigger from userspace by modifying CPUID after
+loading CR3.  E.g. modifying the state restoration selftest like so:
 
-Allowing CPUID to change (or VMX feature MSRs) when the vCPU is in L2 creat=
-es a
-massive set of potential complications that would be all but impossible to =
-handle.
-E.g. if userspace clears features that are being used to run L2, then KVM c=
-ould
-end up with conflicting/nonsensical state for the vCPU.
+  --- tools/testing/selftests/kvm/x86/state_test.c
+  +++ tools/testing/selftests/kvm/x86/state_test.c
+  @@ -280,7 +280,16 @@ int main(int argc, char *argv[])
 
-Note, the same holds true for non-nested features, which is largely what le=
-d to
-63f5a1909f9e ("KVM: x86: Alert userspace that KVM_SET_CPUID{,2} after KVM_R=
-UN is
-broken") and feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RU=
-N").
+                 /* Restore state in a new VM.  */
+                  vcpu = vm_recreate_with_one_vcpu(vm);
+  -               vcpu_load_state(vcpu, state);
+  +
+  +               if (stage == 4) {
+  +                       state->sregs.cr3 = BIT(44);
+  +                       vcpu_load_state(vcpu, state);
+  +
+  +                       vcpu_set_cpuid_property(vcpu, X86_PROPERTY_MAX_PHY_ADDR, 36);
+  +                       __vcpu_nested_state_set(vcpu, &state->nested);
+  +               } else {
+  +                       vcpu_load_state(vcpu, state);
+  +               }
 
-> Also sorry if this is a dumb question, but in general if KVM_SET_CPUID
-> is disallowed, then how does userspace handle a failed IOCTL call?
+                  /*
+                   * Restore XSAVE state in a dummy vCPU, first without doing
 
-The VMM logs an error and exits.
+generates:
 
-> Do they just try again later or accept that the call has failed? Or is th=
-ere
-> an error code that signals that the vcpu is executing in guest mode and
-> should wait until not in guest mode to call the IOCTL?
+  WARNING: CPU: 30 PID: 938 at arch/x86/kvm/svm/nested.c:1877 svm_set_nested_state+0x34a/0x360 [kvm_amd]
+  Modules linked in: kvm_amd kvm irqbypass [last unloaded: kvm]
+  CPU: 30 UID: 1000 PID: 938 Comm: state_test Tainted: G        W           6.18.0-rc7-58e10b63777d-next-vm
+  Tainted: [W]=WARN
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:svm_set_nested_state+0x34a/0x360 [kvm_amd]
+  Call Trace:
+   <TASK>
+   kvm_arch_vcpu_ioctl+0xf33/0x1700 [kvm]
+   kvm_vcpu_ioctl+0x4e6/0x8f0 [kvm]
+   __x64_sys_ioctl+0x8f/0xd0
+   do_syscall_64+0x61/0xad0
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
 
-In practice, CPUID (and feature MSRs) are set very early on, when userspace=
- is
-creating vCPUs.  With one exception, any other approach simply can't work, =
-because
-as above CPUID can't be configured after the vCPU has run.  The only way fo=
-r the
-vCPU to be "running" L2 is if userspace stuffed guest state via KVM_SET_NES=
-TED_STATE,
-and actually changing CPUID after that point simply can't work (it'll "succ=
-eed",
-but KVM provides no guarantees as to the viability of the vCPU).
+Simply delete the WARN instead of trying to prevent userspace from shoving
+"illegal" state into CR3.  For better or worse, KVM's ABI allows userspace
+to set CPUID after SREGS, and vice versa, and KVM is very permissive when
+it comes to guest CPUID.  I.e. attempting to enforce the virtual CPU model
+when setting CPUID could break userspace.  Given that the WARN doesn't
+provide any meaningful protection for KVM or benefit for userspace, simply
+drop it even though the odds of breaking userspace are minuscule.
 
-The exception is that KVM allows setting _identical_ CPUID after KVM_RUN to
-support QEMU's vCPU hotplug implementation, which is what commit c6617c61e8=
-fe
-("KVM: x86: Partially allow KVM_SET_CPUID{,2} after KVM_RUN") is all about.
+Opportunistically delete a spurious newline.
 
-Trying to _completely_ protect userspace from itself is a fool's errand, as=
- KVM's
-granular set of ioctls for loading vCPU state and the subjectivity of what =
-is a
-"sane" vCPU model make it all but impossible to fully prevent userspace fro=
-m
-hurting itself without creating a maintenance nightmare.  But I can't think=
- of
-any scenario where it would be useful for userspace to set nested state, th=
-en go
-back and change the vCPU model.
+Fixes: b222b0b88162 ("KVM: nSVM: refactor the CR3 reload on migration")
+Cc: stable@vger.kernel.org
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/nested.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-I'll send a patch and see what happens.  Worst case scenario we break users=
-pace
-and get to learn about crazy VMM behavior :-)
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index ba0f11c68372..9be67040e94d 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1870,10 +1870,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	 * thus MMU might not be initialized correctly.
+ 	 * Set it again to fix this.
+ 	 */
+-
+ 	ret = nested_svm_load_cr3(&svm->vcpu, vcpu->arch.cr3,
+ 				  nested_npt_enabled(svm), false);
+-	if (WARN_ON_ONCE(ret))
++	if (ret)
+ 		goto out_free;
+ 
+ 	svm->nested.force_msr_bitmap_recalc = true;
+
+base-commit: 2111f7ca0e92dec60f0a3644ff3b164342af33c1
+-- 
+2.52.0.239.gd5f0c6e74e-goog
+
 
