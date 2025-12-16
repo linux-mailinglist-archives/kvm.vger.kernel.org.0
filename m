@@ -1,150 +1,118 @@
-Return-Path: <kvm+bounces-66084-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66085-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EE7CC4BB8
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 18:38:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5907CCC4CA2
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 19:01:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A18893035D39
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 17:36:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B098308F7A4
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 17:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A256F327C14;
-	Tue, 16 Dec 2025 17:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79686324703;
+	Tue, 16 Dec 2025 17:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GumWBLd4";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HaklLlg9"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hdTZSRCq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ED622B8C5
-	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 17:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDC12D5922;
+	Tue, 16 Dec 2025 17:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765906579; cv=none; b=a3Z2CVzL6sgy4vI0RbpKs5BUPdKi7YoZMzie+sJJMBTLO6oS5DNswW6IfYN1w2VmvZQofkbgdrbKwQEimHBe7X3XUnXrf0S8hknqqcfXKA3wcXJSkAlnK7qKAMIkpBucA2+RdkaHcPTW5DdopcbFxpBfy1b5S5/WtNuWP650OaY=
+	t=1765907976; cv=none; b=B62l5JB7cUMXkdx1ZGiQwJ7NoxfEy1CXkabLpE+viGcYByqZITpkt6/9zt2YmGCVzzjWyXTqvUPulmabAKVfLoO5+BnOLRi63UPGoQxIMil/9HT96seKw3AoREbzKuNTFpsDms7q+hgp7gI7EN4C4UzJQkJEXOHFIA7net2lUOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765906579; c=relaxed/simple;
-	bh=JZ1GxNJeSzcq+MlfYZbz6YFqFMtBkU/nA7q7A2H9Qnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ABWl4ZuQcLPZM8Yk2ndwWvtVaRGnf+miskb0UJCf6zj5EnBH9YvB7P6rYd+yYbzBDE+mB9u4pNNT/3GfrLn18HWUR2VJeZheWFZw/hmwR+ANpzxFUTWyov+31eJeBVDiSYoQJrX3VxwmrO7NMPRUowCfLmCf8pxOOQj/+Bia0is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GumWBLd4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HaklLlg9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765906577;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hsPacWIswoNkPxm/WEWv6XOaNR0HsYkw9lp2v40LAGM=;
-	b=GumWBLd4z2asNYH0kd6m/qpBaculq4LCb1WaJtYyBSPl+ENrh6ARELjUYIOZY7/ugpCMR1
-	SahaYaBHarQtbdWhk/o0/xY8TcyAs4zVaCDY7zUsWjqTTiXgkwYEHKfWHn7CmBQIsNb3pq
-	mxz6Jsj0aA2C0lXBJAlURVdIlR0qKnE=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-526-5cBAZH09NmqrBVb8QqYswg-1; Tue, 16 Dec 2025 12:36:15 -0500
-X-MC-Unique: 5cBAZH09NmqrBVb8QqYswg-1
-X-Mimecast-MFC-AGG-ID: 5cBAZH09NmqrBVb8QqYswg_1765906575
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8b51db8ebd9so1640282685a.2
-        for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 09:36:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765906575; x=1766511375; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hsPacWIswoNkPxm/WEWv6XOaNR0HsYkw9lp2v40LAGM=;
-        b=HaklLlg9aYa1SKOel+zBysa7lmPyjc/tTInK9YPWpjHgaGAxCBc7LsTygugXbTz1nd
-         WkjfRwr+vxCIp9eXQYUQw4R2zQ5YNXRUUmisvJbGEkucspjG1miNsSvBQ0p3i7957cuU
-         31x5OUJJG3Qe5hsvT3SRzJoKYVn0luFoSbDgA3WTc4l9ZnhmqnhYOmlXKGtw6b8Dm5mX
-         JQK5AcCpWPfTIfX8CzVgWEUV1Eme/ppaY1Oo/liwG0a4H78julH5YW/fOvvo+044M5o3
-         rWDNytxDuwpwts1L5imzW+l6XlXuoTt2ka4KGbWhocgtt1Edk4XZK8g1iIHMVl/4FEjR
-         vzbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765906575; x=1766511375;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hsPacWIswoNkPxm/WEWv6XOaNR0HsYkw9lp2v40LAGM=;
-        b=gxsFfUJiHL5paZY3N2BZZXSiPOdEB1a2F0IOfvicI/mb23dMO3of8lEyLRpjULY3Q2
-         CuNSn995iDjXMZcY0IWLNt1+uasLtjyOWQ+yJyyD9Km/Zp5yQpS3Ok+z0OIsc8pmTE6C
-         WESv5bP+nc6cZVAG06Ne+bPXKJ4dtPRuE0J2Z1/ipYBUjnMcjUSsrGIiSxp3qWCejPXi
-         bmzO5NS04bDThS21Y/kHNMq2F/bWHyBUkSDzRBsrWgRZIFZhnEw/GEgKtpzQ/NysA6ps
-         vhnVL6URYDGxjIEFnJXMhFGdk3BP8FiYsnGWvIRT/LnuMhr5WasRA33tc8kUx/tOgjYJ
-         Er2g==
-X-Gm-Message-State: AOJu0YzW+m0gnziu6P2EjmuJZsf5+uvTLKoZXj/jcDWVXqCALrhvJHKi
-	7Cq0s/Qtd1Adulm5Afgn7HIrZDyaBQpdmMHzROX5AsFJcR5vRVe29tmuv2m35HMPzpDcZgP1YE1
-	rkrUvK3udeWddoUPvGDdTaI9jAq9hrmcCHIvpSeOk1V056fBspX/N/Q==
-X-Gm-Gg: AY/fxX4jVk1KMaBidcn4YUxefR2koFyE0T73DJL5it80Z1/96P8Tnf1YVHVHOVJ3Lhx
-	BIeNsOW1JU+TTngpbwrrK1hFKUMTkttDAejeJ4Cu5ssVgVTPLXphVblgOgLxQ7VhDubaZHJvtrN
-	+JVI/cDgikEYJDEBIBqcMPSWsBXl9k090xI9waWVndDmuSYPkjgAy9dyUOoZxSbporSVFlweMgN
-	ZaN3/73b/cK2Hdy9OoMJXGm74LDiNYIawPK2aPuiTaL/Uf6ByW6ipQ6qe7WSmVDeKPMIvmTXwrv
-	7hf8hEGKbVl0TeBtxdBm1ulUOx2UmFGOnWePkolQYhVaW1Xt850MCzG56ePS6GonLvVNFeAxqOk
-	qPTc=
-X-Received: by 2002:a05:620a:448b:b0:8b2:f31f:ae20 with SMTP id af79cd13be357-8bb39adbbcemr2032248285a.24.1765906575341;
-        Tue, 16 Dec 2025 09:36:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGrrAnQyi8tUGXbUTgBDtrC2LqsXXW6sIsNBRadKPa5Jo0RMegb7ho96xN3vIijiKehMDr3nA==
-X-Received: by 2002:a05:620a:448b:b0:8b2:f31f:ae20 with SMTP id af79cd13be357-8bb39adbbcemr2032243185a.24.1765906574822;
-        Tue, 16 Dec 2025 09:36:14 -0800 (PST)
-Received: from x1.local ([142.188.210.156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8be30d8693fsm225390785a.18.2025.12.16.09.36.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 09:36:14 -0800 (PST)
-Date: Tue, 16 Dec 2025 12:36:13 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Nico Pache <npache@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Alex Mastro <amastro@fb.com>, David Hildenbrand <david@redhat.com>,
-	Alex Williamson <alex@shazbot.org>, Zhi Wang <zhiw@nvidia.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 2/4] mm: Add file_operations.get_mapping_order()
-Message-ID: <aUGYjfE7mlSUfL_3@x1.local>
-References: <20251204151003.171039-1-peterx@redhat.com>
- <20251204151003.171039-3-peterx@redhat.com>
- <aTWpjOhLOMOB2e74@nvidia.com>
- <aTnWphMGVwWl12FX@x1.local>
- <20251216144427.GF6079@nvidia.com>
- <aUF97-BQ8X45IDqE@x1.local>
- <20251216171944.GG6079@nvidia.com>
+	s=arc-20240116; t=1765907976; c=relaxed/simple;
+	bh=NpX2cYgamudQZSSttYEcw79K6PPsUN0dvIDSwahU1PU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T5HhIlDI5DxlZ2/Gf8X5yu9fJJhxfv5XBhmw0uQMrlUa5aPUrcsnbGowDAv6pRpKOg/0LKi7+8vHdUSrpW0Wctt+3i2uFmnXaYpx2wgvKH8WceArhfu4Xcs5/BESpod8HG7hTe9ZSO15Lf1QIwioLJENl44jsqwEfT6ewjwT2Ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hdTZSRCq; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BGBNYeu2375057;
+	Tue, 16 Dec 2025 09:59:24 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=uKA8UNZEdRzgO8gcqOTTkDa
+	DxtJPZsAsk0uuI7FmGKg=; b=hdTZSRCq0OKxvdt4E8Z7YOLcsNgZA33dX4Joah1
+	YdS2kSp/j19VbiXt79rzUl9dgBSwlcIEwxnxfGNtXGFrflTJNTQpbhKZGzIwrrGY
+	cfvf/NZQT13OLUn9WG07IaZta+kJHmf7w0JO0hnUUUxnTJkWFo6wce0vLNldIfB5
+	yL6X0dZXzslsLdeKG5YeqLoRdUgl0C9I4OHKnEOYWonl3oqlIKjjyeGbX7TC83wb
+	sBSrwjLRIgdZA77GXfB09ze7x3ETZ7O6ArwpcjPGZCb7ZR+99gQ9mR70Ttd4SEIH
+	mbU6qNZAiqzncWeQkUHRjtxvD5wnLNXYB/gW9p6bqK4KpqA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4b36gjruta-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Dec 2025 09:59:24 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 16 Dec 2025 09:59:36 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Tue, 16 Dec 2025 09:59:36 -0800
+Received: from 5810.marvell.com (unknown [10.29.45.105])
+	by maili.marvell.com (Postfix) with ESMTP id 836F55B692E;
+	Tue, 16 Dec 2025 09:59:19 -0800 (PST)
+From: Kommula Shiva Shankar <kshankar@marvell.com>
+To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>
+CC: <virtualization@lists.linux.dev>, <eperezma@redhat.com>,
+        <kvm@vger.kernel.org>, <jerinj@marvell.com>, <ndabilpuram@marvell.com>,
+        <schalla@marvell.com>
+Subject: [PATCH net-next ] vdpa: fix caching attributes of MMIO regions by setting them explicitly
+Date: Tue, 16 Dec 2025 23:29:18 +0530
+Message-ID: <20251216175918.544641-1-kshankar@marvell.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251216171944.GG6079@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=eckwvrEH c=1 sm=1 tr=0 ts=69419dfc cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
+ a=crWdm8P_I_FkJ7v9e20A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: ko9HbogPsc2fxcEwByVLM5SUTp5F3Y3c
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE2MDE1NCBTYWx0ZWRfXxmI7g2Jx9lEX
+ cvLZWtuvEuIcCw17/TpStlaGwGYxHKXP/yW+LPt4kCO+m7EQL4KfGmleWYs3gCsdY6H7piAJARG
+ r795ztlOS9YBs6SRjjKup+lxaEZnfCHYjlRH5pYNNPCXcLzzdaH1dVlZyv4fFx1D1wW6/tG9qzP
+ meHoF0T9cEuXYk8f56YVxmAz2wagpw99NaArDAnkjlXy1z5AVP7Sf3p44GXteoXVpu1PiKy3AD2
+ IoDfwe5BT3/EnSQHirQa9AwniTs6QgdymcEBA2LIcedw3e5AAOrScg1OKCgmlkI3MbpGuxUHzis
+ iE+NWRB6OdhStLKi/2cQBKZtxLr2jzTZvU8SInhHfa3t4OC9T83KnUXnuvGZTLwrwzkeblqsf61
+ +IHi9KoY2Zek3K16rMIxUZY1ztnTVg==
+X-Proofpoint-ORIG-GUID: ko9HbogPsc2fxcEwByVLM5SUTp5F3Y3c
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-16_02,2025-12-16_02,2025-10-01_01
 
-On Tue, Dec 16, 2025 at 01:19:44PM -0400, Jason Gunthorpe wrote:
-> On Tue, Dec 16, 2025 at 10:42:39AM -0500, Peter Xu wrote:
-> > Also see __thp_get_unmapped_area() processed such pgoff, it allocates VA
-> > with len_pad (not len), and pad the retval at last.
-> > 
-> > Please let me know if it didn't work like it, then it might be a bug.
-> 
-> It should all be documented then in the kdoc for the new ops, in this
-> kind of language that the resulting VA flows from pgoff
+Explicitly set non-cached caching attributes for MMIO regions.
+Default write-back mode can cause CPU to cache device memory,
+causing invalid reads and unpredictable behavior.
 
-IMHO that's one of the major benefits of this API, so that there's no need
-to mention impl details like this.
+Invalid read and write issues were observed on ARM64 when mapping the
+notification area to userspace via mmap.
 
-I thought that's also what you wanted as well.. as you're further
-suggesting to offload order adjustments to core mm, which I tend to agree.
+Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+---
+ drivers/vhost/vdpa.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Here the point is, the driver should only care about the size of mapping,
-nothing else like how exactly the alignments will be calculated, and how
-that interacts with pgoff.  The kernel mm manages that. It's done exactly
-like what anon thp does already when len is pmd aligned.
-
-Or maybe I misunderstood what you're suggesting to document?  If so, please
-let me know; some example would be greatly helpful.
-
-Thanks,
-
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 05a481e4c385..b0179e8567ab 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
+ 	if (vma->vm_end - vma->vm_start != notify.size)
+ 		return -ENOTSUPP;
+ 
++	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+ 	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+ 	vma->vm_ops = &vhost_vdpa_vm_ops;
+ 	return 0;
 -- 
-Peter Xu
+2.48.1
 
 
