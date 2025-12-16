@@ -1,118 +1,155 @@
-Return-Path: <kvm+bounces-66075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87495CC40B9
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 16:49:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89563CC4026
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 16:41:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A8D930D69FF
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 15:45:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE90D300EE66
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 15:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1C92DC34D;
-	Tue, 16 Dec 2025 15:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34605231A41;
+	Tue, 16 Dec 2025 15:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iPE0VLcT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GJLxC1Bd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E51D2C0F9A;
-	Tue, 16 Dec 2025 15:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74A634DB4A;
+	Tue, 16 Dec 2025 15:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765899225; cv=none; b=BMC/RY4TEMRkiVhy0ob4za9S6AZ5qzj/Q71HsdUWzPXKdAcjGa05O15XMVHuHgpurC8S04HfXrg4nY/24LY7w12LNE3G/bqHtYB/w2MZyejYuagzNyFvdpny2ms0oM7ht4lbSdKlPJwQNHENv/K6K7k6sGwUWqmIarVZEEXkAek=
+	t=1765899664; cv=none; b=dDJ4PjWLxf6gbXIfeeMmFZRXZVeEb5ndmQ8VBe6LK9KK6M1byAbAyKC5d5rAJ4giOLBUEosJlWO5uWFv4zK5xu7+lPlec5tTqWN4+/+xlR6P7qBpHYfI2P/V4b8oKEGxiWLmGabzRumh3HpwPW+xJ8n843gcremntAACSzZL0Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765899225; c=relaxed/simple;
-	bh=YwoMyqqb7FoPpi5NJyyaera2Ovv71yIWvzL6plb5cBY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=IEWrNCiTaXNiuUXBMO4xeHJcJToQ/UiLyBc1P/WUPfytbI2WSPkyBC6A/aHkPSb+2ofWDJf31yjbQGzWiJRPDyJ/3Kp0SIRIstDoPdSyCpDvekJFU0EwwDTZVYeaYF2dekZfdbZTqmo4hSYWW+qig2iHgeViEZwsGnw9dQy6Njo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iPE0VLcT; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5BGFWClL2179001
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 16 Dec 2025 07:32:13 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5BGFWClL2179001
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025112201; t=1765899134;
-	bh=YwoMyqqb7FoPpi5NJyyaera2Ovv71yIWvzL6plb5cBY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=iPE0VLcTgNWTSt5Tet9JM219GeC7iYNuOcfvkIUd5nEKG/cdvOJwPNBuC1E+DFzIi
-	 SHqu/oogV01S+Vdi/eeDP9MVA/VMd+IORcg8rzelWylaDU7RwlyiRxoXkzNUdlA+49
-	 9a2JqdulmrlQrzXpJXZcHiVRWtWWYGm4vTlgsvktLtFFJNi1LESdKBVzyuTMqbcRTd
-	 bM2x846MlS7boYnZ7dfj6rnowELPFA5PBJghox2dJ8Bq8DfbpSSEai1LJie29QbzBq
-	 ekqe/HtqGC1nCUgMXLOxWd2SgknFZP/ynGzpZ0XgkulTqNVUOmsDcdrJ8/SaabjQy9
-	 7VLOQi94US1rA==
-Date: Tue, 16 Dec 2025 07:32:09 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
-        Ingo Molnar <mingo@kernel.org>
-CC: linux-kernel@vger.kernel.org, x86@kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ajay Kaher <ajay.kaher@broadcom.com>,
-        Alexey Makhalov <alexey.makhalov@broadcom.com>,
-        Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        xen-devel@lists.xenproject.org, Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>, Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/5] x86: Cleanups around slow_down_io()
-User-Agent: K-9 Mail for Android
-In-Reply-To: <b969cff5-be11-4fd3-8356-95185ea5de4c@suse.com>
-References: <20251126162018.5676-1-jgross@suse.com> <aT5vtaefuHwLVsqy@gmail.com> <bff8626d-161e-4470-9cbd-7bbda6852ec3@suse.com> <aUFjRDqbfWMsXvvS@gmail.com> <b969cff5-be11-4fd3-8356-95185ea5de4c@suse.com>
-Message-ID: <14EF14B1-8889-4037-8E7B-C8446299B1E9@zytor.com>
+	s=arc-20240116; t=1765899664; c=relaxed/simple;
+	bh=ZLMXB9W9lGKzctTWJArW9FEZ3LPiAiwdNGpWwjugkkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j8cfA0GbJ25u/868T4oziym05e6AVvFNEf7zb0QyOvI0oOMin5gGiPazNyHV95VT026Z34Tpfn/y8Rgk7Bzz3oi4f8LcsmUOgw99g+144zLxVt4QeD9LuD6PDHsZJWVwOyNKTrTBE/L7BEEm6/W5VLg5rDn2DXBKIsAFXxBIDJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GJLxC1Bd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF21EC4CEF1;
+	Tue, 16 Dec 2025 15:40:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765899663;
+	bh=ZLMXB9W9lGKzctTWJArW9FEZ3LPiAiwdNGpWwjugkkY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GJLxC1Bdsgt8eAlutveLdrhP3wGs0rsN+YFRYXv3XvWreXRzKo9MdKq10ncAaofdc
+	 A8prOj31IGEMqg8RNNAOFM5+vSexABe4jHflH3sHPxkxNXBfRhVlTTpMGdfQ+K+2Lq
+	 xhcs3nRKv6ICR7xJ1uWb6QU1uoe3TF4aWqsky8iylhfTbDQNJEBRCud3Ybr+aOYEkC
+	 9igz92Awk8CYkiWBp/BNN4FArycWGjkn0W/ZtpfLyFB8bvYiQLD1p6I1S6KcRvNVqr
+	 5ocVq307FzTcutXEWDbg2+MsTC2t6LZciQ1WWq4Ar0V/Tj8PdsygbbHpDl+v/1ntcG
+	 lyTN57Ivr6oJg==
+Date: Tue, 16 Dec 2025 16:40:55 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 29/32] irqchip/gic-v5: Check if impl is virt capable
+Message-ID: <aUF9hwjBuUKA73U8@lpieralisi>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+ <20251212152215.675767-30-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212152215.675767-30-sascha.bischoff@arm.com>
 
-On December 16, 2025 5:55:54 AM PST, "J=C3=BCrgen Gro=C3=9F" <jgross@suse=
-=2Ecom> wrote:
->On 16=2E12=2E25 14:48, Ingo Molnar wrote:
->>=20
->> * J=C3=BCrgen Gro=C3=9F <jgross@suse=2Ecom> wrote:
->>=20
->>>> CPUs anymore=2E Should it cause any regressions, it's easy to bisect =
-to=2E
->>>> There's been enough changes around all these facilities that the
->>>> original timings are probably way off already, so we've just been
->>>> cargo-cult porting these to newer kernels essentially=2E
->>>=20
->>> Fine with me=2E
->>>=20
->>> Which path to removal of io_delay would you (and others) prefer?
->>>=20
->>> 1=2E Ripping it out immediately=2E
->>=20
->> I'd just rip it out immediately, and see who complains=2E :-)
->
->I figured this might be a little bit too evil=2E :-)
->
->I've just sent V2 defaulting to have no delay, so anyone hit by that
->can still fix it by applying the "io_delay" boot parameter=2E
->
->I'll do the ripping out for kernel 6=2E21 (or whatever it will be called)=
-=2E
->
->
->Juergen
+On Fri, Dec 12, 2025 at 03:22:45PM +0000, Sascha Bischoff wrote:
+> Now that there is support for creating a GICv5-based guest with KVM,
 
-Ok, I'm going to veto ripping it out from the real-mode init code, because=
- I actually know why it is there :) =2E=2E=2E and that code is pre-UEFI leg=
-acy these days anyway=2E
+The only comment I have is - as discussed, this patch is not really
+dependent on GICv5 KVM support - ie, if IRS_IDR0.VIRT == b0 there isn't
+a chance GIC v3 legacy support is implemented either, maybe it is worth
+clarifying that.
 
-Other places=2E=2E=2E I don't care :)
+Otherwise LGTM:
+
+Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
+
+> check that the hardware itself supports virtualisation, skipping the
+> setting of struct gic_kvm_info if not.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  drivers/irqchip/irq-gic-v5-irs.c   | 4 ++++
+>  drivers/irqchip/irq-gic-v5.c       | 5 +++++
+>  include/linux/irqchip/arm-gic-v5.h | 4 ++++
+>  3 files changed, 13 insertions(+)
+
+
+> 
+> diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
+> index ce2732d649a3e..eebf9f219ac8c 100644
+> --- a/drivers/irqchip/irq-gic-v5-irs.c
+> +++ b/drivers/irqchip/irq-gic-v5-irs.c
+> @@ -744,6 +744,10 @@ static int __init gicv5_irs_init(struct device_node *node)
+>  	 */
+>  	if (list_empty(&irs_nodes)) {
+>  
+> +		idr = irs_readl_relaxed(irs_data, GICV5_IRS_IDR0);
+> +		gicv5_global_data.virt_capable =
+> +			!!FIELD_GET(GICV5_IRS_IDR0_VIRT, idr);
+> +
+>  		idr = irs_readl_relaxed(irs_data, GICV5_IRS_IDR1);
+>  		irs_setup_pri_bits(idr);
+>  
+> diff --git a/drivers/irqchip/irq-gic-v5.c b/drivers/irqchip/irq-gic-v5.c
+> index 41ef286c4d781..f5b17a2557aa1 100644
+> --- a/drivers/irqchip/irq-gic-v5.c
+> +++ b/drivers/irqchip/irq-gic-v5.c
+> @@ -1064,6 +1064,11 @@ static struct gic_kvm_info gic_v5_kvm_info __initdata;
+>  
+>  static void __init gic_of_setup_kvm_info(struct device_node *node)
+>  {
+> +	if (!gicv5_global_data.virt_capable) {
+> +		pr_info("GIC implementation is not virtualization capable\n");
+> +		return;
+> +	}
+> +
+>  	gic_v5_kvm_info.type = GIC_V5;
+>  
+>  	/* GIC Virtual CPU interface maintenance interrupt */
+> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
+> index 9607b36f021ee..36f4c0e8ef8e9 100644
+> --- a/include/linux/irqchip/arm-gic-v5.h
+> +++ b/include/linux/irqchip/arm-gic-v5.h
+> @@ -45,6 +45,7 @@
+>  /*
+>   * IRS registers and tables structures
+>   */
+> +#define GICV5_IRS_IDR0			0x0000
+>  #define GICV5_IRS_IDR1			0x0004
+>  #define GICV5_IRS_IDR2			0x0008
+>  #define GICV5_IRS_IDR5			0x0014
+> @@ -65,6 +66,8 @@
+>  #define GICV5_IRS_IST_STATUSR		0x0194
+>  #define GICV5_IRS_MAP_L2_ISTR		0x01c0
+>  
+> +#define GICV5_IRS_IDR0_VIRT		BIT(6)
+> +
+>  #define GICV5_IRS_IDR1_PRIORITY_BITS	GENMASK(22, 20)
+>  #define GICV5_IRS_IDR1_IAFFID_BITS	GENMASK(19, 16)
+>  
+> @@ -280,6 +283,7 @@ struct gicv5_chip_data {
+>  	u8			cpuif_pri_bits;
+>  	u8			cpuif_id_bits;
+>  	u8			irs_pri_bits;
+> +	bool			virt_capable;
+>  	struct {
+>  		__le64 *l1ist_addr;
+>  		u32 l2_size;
+> -- 
+> 2.34.1
 
