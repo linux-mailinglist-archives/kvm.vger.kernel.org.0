@@ -1,94 +1,94 @@
-Return-Path: <kvm+bounces-66088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929F0CC5079
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 20:44:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1C0CC50C6
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 20:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6ECBF302E968
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 19:44:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C46A63040A71
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 19:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0694336ED1;
-	Tue, 16 Dec 2025 19:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4115B336ED1;
+	Tue, 16 Dec 2025 19:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bcZSVlso";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRDNHF16"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrBzeP/n";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPf+GToY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252B63358C0
-	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 19:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B9C30FF1E
+	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 19:58:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765914278; cv=none; b=tXiBTuoYx/84jW0m62ODSQ3esZQfWM1KzKPNTIW2bIBjocz9rcecDXuooRxP1njzaFVMcFPlvPZZFYHlKhpXiey/+1MYEROZWlIhTPqtZl7T6+3u0is2pSuMJMxiaJA/8wTPSAQ38RIE62E/Ol8ayvLcE/5qZR3p9zlHNmpRbZg=
+	t=1765915098; cv=none; b=h1Y3ofuucD9374E3HatC3hSjbC23eicWgm31R3feZvKtBw89byc0+OAESRII5kmT304X0JU/bl3hgdYJFc/6SAgVRlRt0DGg12bvyPKlJNlQlYjU0snSxkX6hjYSxKj6ip95FEW9nZshxnSsGmX+OkOsfoFMitlviHW1BFv9u94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765914278; c=relaxed/simple;
-	bh=6ifwb4jD2Yvr22/ylYYmmJ7+tU8lVupBVEbgDsUoIjM=;
+	s=arc-20240116; t=1765915098; c=relaxed/simple;
+	bh=aiS+VBXGWERVPlAx9SX3K5F+LrZjCmiJAM0YrLhOYYA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TJTRAH0ws8EHSONQ54naSy48t3bkmdnZc6IxK09LsFVCPH9v0Ys6Ys4OXbGUWod7Pz9i1X2HMh3AWXK9a6xph0Weo6pfqxT5Zi8F6aCRVhiCGEyXcbzd49rT6x4bPxM7ZSgk3S7sjt6NgKOCFVowDTYl2wShbXEYVsPxVfCc2sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bcZSVlso; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MRDNHF16; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=twdIxY+whI4PEmcpsu8TbYBaEtN9dlARP7kK4qPVRNcWOoINoSxzQn/vQRJs284UPqlZHH3XhmpkdxtIrDZ8pTNvG59IZWmf80FNvj9Xbr914mq+0AvyHoOzvQWymYYkul7Z02soMB3Bp3qkGsj/leq+B88PB3uxoC3Ygl58w4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MrBzeP/n; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XPf+GToY; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765914276;
+	s=mimecast20190719; t=1765915095;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OWZMfsrJ1GHpp0Gacc8vZFboQMCus5dZjsnuyY0r3Lc=;
-	b=bcZSVlsoZpn0OPVHaOaPSrjCaaz7LiV6/tgHQGLhpT+bMNxKD+8xE88gPxHrF/bVyfTYsN
-	1EhIOdmUsqT3n0I7MFmrQvfCNDkpglYGDMFItvBSMh6Kc4g7ziIxe0eAIFAyMs2q92aQzH
-	taCThUWY2hTpxZNiBLGopXKUHc53Vl8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WILoW472mfGqus7f3vqpilqOzoz0h+z/dztTyHfCBuA=;
+	b=MrBzeP/nhFY+eCzBU6K/by5rK/s4oY4EsSKSceHHcILXYeXzUghWObcCKoPJF8EnyZp0f/
+	bB4h6VsGQc4lxbKRKNEg1mX+Oynkuuc4vsD0J6c6OKI6A3QRUJsmIlgkpq1pWkb5jKnd0y
+	Y56BtPO+2h5D8kZ/dE/q6uvWExcivUE=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-Ec99qpNXPjeqAMk8OvIg2w-1; Tue, 16 Dec 2025 14:44:32 -0500
-X-MC-Unique: Ec99qpNXPjeqAMk8OvIg2w-1
-X-Mimecast-MFC-AGG-ID: Ec99qpNXPjeqAMk8OvIg2w_1765914272
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-88883a2cabbso158006156d6.0
-        for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 11:44:32 -0800 (PST)
+ us-mta-642-V7zDj9vmP-mO3YaX3wJKtw-1; Tue, 16 Dec 2025 14:58:14 -0500
+X-MC-Unique: V7zDj9vmP-mO3YaX3wJKtw-1
+X-Mimecast-MFC-AGG-ID: V7zDj9vmP-mO3YaX3wJKtw_1765915093
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-29efd658fadso143679815ad.0
+        for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 11:58:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765914272; x=1766519072; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1765915093; x=1766519893; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OWZMfsrJ1GHpp0Gacc8vZFboQMCus5dZjsnuyY0r3Lc=;
-        b=MRDNHF16pfU16aj2dNI5YNBzdZc3u50lYBLRQgXCF2EROCNVcVaH80PIeXYvQv1797
-         c7xhnxFj40v9HPlssmSrm84dTZFWPiX7FgUDoeCRpoTnOuS6a4xlSQbVXNajXyJrFfQJ
-         Z+jqMs/sOxx02bXGz60lVcUKW/1TYh6Voq57AETueEJWGIxzS++VhHuwlxvvzj6ugOHz
-         D/xNRVIHPutU9kbawlZSGeoHXTMTDZ04XwgGWIm4ehIBt6ZUzpEVrGU/32xo46hFMqIf
-         b4UL6BPjqKl9LWk5P2pq33u5eoh1SjQ1XlqInzE69RZ14ToztVgxMlJQRrETui4FxEXB
-         VtgQ==
+        bh=WILoW472mfGqus7f3vqpilqOzoz0h+z/dztTyHfCBuA=;
+        b=XPf+GToYNaVuW7gaQMoVikJ3kWDT/bxOkcOkPbvijWCAPrhKJH8tVYD7WG1+b3Y4Aj
+         NmPzsb0NSjk3wDnaoUy1oN/vUadNOuePACfN49IRDdjEMpel1f84jRhU1PwGQPx602yr
+         MQMxHFRV7uwln6Y99cGALnzUCtw7zLRc/0/9W68M+UKpXi9hwMKU/nFmXmT2GZJ1soew
+         UQLOq3c60cvJl5NBzObww47YAJowVwc52/smnlaDBirCNbpVz45iY16Uewa7tHTxuA66
+         BkfVXd2P5Qtm6xrn208rv45ydwBnAIH/ZgF8dxmA8jQ1doEsggv1s6MNAohDbug/XdR1
+         NWhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765914272; x=1766519072;
+        d=1e100.net; s=20230601; t=1765915093; x=1766519893;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OWZMfsrJ1GHpp0Gacc8vZFboQMCus5dZjsnuyY0r3Lc=;
-        b=BA6WcM+JXCytN/JK0nx4lsBEE+6wELMZ/u/bL5angmYPsoqv1KcCPRHMl6jxuGAjbK
-         c32JGFKIuP9Y0PDFlWqw6HbhH1wwRzrFbhQpJTPX17i8fIWLUGWUAwFdwVs6pmojoZqk
-         0r0SwBGeU6fPIPPdWidJJI9ScwDh+SAcLp7Q3fl3EGqB3Vty3wCqg9lOlkWLRcYcEIIo
-         Hhp9N/wd+FPJ7ZmKpUlcNSdN+3cOHMnFZlIzoED8vUsK/2yfYLV9gCVxCyAh+GPOT7JH
-         wndeHS3w+Yh/ztrfnEDbV1LFvM1D1AvtwDrg3A1KXHb12aSPtw/oDeXvUenKmEDJM49h
-         T8Wg==
-X-Gm-Message-State: AOJu0Yy/ZRI6IljTqdYXothL2Jch3UZY4nQ8cP/6RBf1+imCJij9bVgM
-	J6yOMTDtGmK/t7PFtgbkpfTdyK6gWE7zD3UXCPgnalSuPwY6LtpwXUXRtTwipCLTDPw9j63njde
-	xSv5sGE/NLKAjKgVvYWGTIyKwkYa+enUjTgbjlvDf1ONhRLs1JGOU5A==
-X-Gm-Gg: AY/fxX57DSx4NqHXL0ewRNEfyr0t3uWHVE30D35MCOnUICCTj29fseFEfjX6t/xdLWd
-	HiyY3vOVx9IGHbwkxHbTQdgCq9pgeS+38k79V2wrrRpzc6fxiDMV5Ne6BO2fjMfgMbpI7/3Rn8W
-	6NgOfxDOGYCPafqzewa/CNy68BhwHnvLnXNHNY5YWaj+3PoJKL9iBWXYq6CHWQ/FbdQiSFfd4e/
-	HvpOKChspK9Io2dfRNRoeD8P5nIoENtOBO0XP3EpnFln0V10kIBIIQEtF25zb+FsuzR0RFBOCv7
-	qM3sYvFH14cpyk/RwM7yUkwSmfa1Dirdg25Hhav2IEHbqXLX34SSVMCxL3SzE/gF5XS4ThfXIdz
-	s1sc=
-X-Received: by 2002:a05:622a:5911:b0:4ed:b4ae:f5bb with SMTP id d75a77b69052e-4f1d05fda57mr230282291cf.65.1765914272124;
-        Tue, 16 Dec 2025 11:44:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGrrpjRFCD1x1zKDvh6gBnxEwhK0Ukm+SrqYrMtn8W42xybAzgzISZS5MGyj4ryNBGs0WxcZA==
-X-Received: by 2002:a05:622a:5911:b0:4ed:b4ae:f5bb with SMTP id d75a77b69052e-4f1d05fda57mr230281951cf.65.1765914271709;
-        Tue, 16 Dec 2025 11:44:31 -0800 (PST)
+        bh=WILoW472mfGqus7f3vqpilqOzoz0h+z/dztTyHfCBuA=;
+        b=mhL2rJVIl+Qv/EHIMQaFyo/GyS2VQHL0Kwf3RCDHIpjV4OnSCjak/EKCdAsmFOuolX
+         mmZngvpV/IjpeoFYMHbwHCKjSg4dhlCALntAPEmCtcXpy8eUclJyxiKHkxm54D8VJ65a
+         bPDevn16hfe0f35ORdn+WoLpLLyPJGX7e17SNytIxHKljGRk50hS0BNftjZrwic2bcFN
+         v+ffuK2ke4KMqaROxuVTsPuYb1il2xnT+XDqUtTd483tI6oFPdKKk2dRLVdUAodXNPaW
+         XTGd/ZR6JA0a3lZL9T+0XDwk/I16CkvNNqYdNug2LtUSJgQnMhbgxnVexdYR0ngSQ2Y8
+         v77Q==
+X-Gm-Message-State: AOJu0Yxb2VcrTEWRmHv4Foe6iveVg7vMw3JYA6z2Vh1iEd3a5KQnaLF2
+	0SQWxNSQah20UfOUMp4kWimeF39m0/Saj7kUlVrA5qMhOkk761/EyBpVNyQ0RyOx760WNlPCnDi
+	9Raf1em93xD5LZVeNxXvAisQjVE97fe+6nXB1UfxvVjl3Shl1Soh8Bg==
+X-Gm-Gg: AY/fxX7MjIYibPtZU1KqpkUZ1O615WFjM9Cp/sjUar3DGIBik3iBDnhr+zbqBmqYk0j
+	noXIsXwr4eXyzg2sNGBsYtWJyXITYlYmiln3FqmoiEnzOm+NoURCEiYiUU4alRAsrdGqGQYxwUQ
+	oVqQYgqzgqi3t1K321UYj4/AzfKBA+M0ruaQBNOpyhJu72pDmlpNPLn25UPxYZmA736QgPz895g
+	GTpzwc0w/Vnb/7F0e3iWaiMppNgxbegxKJ0v4j5H0MJNAdWpqq67FbAHhwEoOP+9WcfJS97FQru
+	nafSOpixgYQQFzjR7kCvsBsQbTT3urXkF7xnK6U4THWVRcs/H5w+XYYiW4i2w2/9AKTER5BgtG6
+	pI0k=
+X-Received: by 2002:a17:903:3bad:b0:297:d45b:6d97 with SMTP id d9443c01a7336-29f23e3618emr164955905ad.14.1765915093043;
+        Tue, 16 Dec 2025 11:58:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHr2X5JE1VeyIh1e5EanKDeX9YYmMdGAHNX6spNNWVf22t0T9F/mXgE3FmtoXHqzC5TX7vXhg==
+X-Received: by 2002:a17:903:3bad:b0:297:d45b:6d97 with SMTP id d9443c01a7336-29f23e3618emr164955555ad.14.1765915092528;
+        Tue, 16 Dec 2025 11:58:12 -0800 (PST)
 Received: from x1.local ([142.188.210.156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f345902748sm23150411cf.0.2025.12.16.11.44.30
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a094398ed0sm110452725ad.27.2025.12.16.11.58.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 11:44:31 -0800 (PST)
-Date: Tue, 16 Dec 2025 14:44:29 -0500
+        Tue, 16 Dec 2025 11:58:11 -0800 (PST)
+Date: Tue, 16 Dec 2025 14:58:03 -0500
 From: Peter Xu <peterx@redhat.com>
 To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
@@ -99,17 +99,16 @@ Cc: kvm@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
 	Yi Liu <yi.l.liu@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
 	Kevin Tian <kevin.tian@intel.com>,
 	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 2/4] mm: Add file_operations.get_mapping_order()
-Message-ID: <aUG2ne_zMyR0eCLX@x1.local>
+Subject: Re: [PATCH v2 4/4] vfio-pci: Best-effort huge pfnmaps with
+ !MAP_FIXED mappings
+Message-ID: <aUG5y60q03RedLwv@x1.local>
 References: <20251204151003.171039-1-peterx@redhat.com>
- <20251204151003.171039-3-peterx@redhat.com>
- <aTWpjOhLOMOB2e74@nvidia.com>
- <aTnWphMGVwWl12FX@x1.local>
- <20251216144427.GF6079@nvidia.com>
- <aUF97-BQ8X45IDqE@x1.local>
- <20251216171944.GG6079@nvidia.com>
- <aUGYjfE7mlSUfL_3@x1.local>
- <20251216185850.GH6079@nvidia.com>
+ <20251204151003.171039-5-peterx@redhat.com>
+ <aTWqvfYHWWMgKHPQ@nvidia.com>
+ <aTnbf_dtwOo_gaVM@x1.local>
+ <20251216144224.GE6079@nvidia.com>
+ <aUGCPN2ngvWMG2Ta@x1.local>
+ <20251216190131.GI6079@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -118,71 +117,62 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251216185850.GH6079@nvidia.com>
+In-Reply-To: <20251216190131.GI6079@nvidia.com>
 
-On Tue, Dec 16, 2025 at 02:58:50PM -0400, Jason Gunthorpe wrote:
-> On Tue, Dec 16, 2025 at 12:36:13PM -0500, Peter Xu wrote:
-> > On Tue, Dec 16, 2025 at 01:19:44PM -0400, Jason Gunthorpe wrote:
-> > > On Tue, Dec 16, 2025 at 10:42:39AM -0500, Peter Xu wrote:
-> > > > Also see __thp_get_unmapped_area() processed such pgoff, it allocates VA
-> > > > with len_pad (not len), and pad the retval at last.
-> > > > 
-> > > > Please let me know if it didn't work like it, then it might be a bug.
-> > > 
-> > > It should all be documented then in the kdoc for the new ops, in this
-> > > kind of language that the resulting VA flows from pgoff
+On Tue, Dec 16, 2025 at 03:01:31PM -0400, Jason Gunthorpe wrote:
+> On Tue, Dec 16, 2025 at 11:01:00AM -0500, Peter Xu wrote:
+> > Do we have any function that we can fetch the best mapping lower than a
+> > specific order?
+> 
+> I'm not aware of anything
+
+Maybe I can introduce a per-arch helper for it, then.  I'll see if I can
+cover some tests from ARM side, or I'll enable x86_64 first so we can do it
+in two steps.
+
+> 
+> > > None of this logic should be in drivers.
 > > 
-> > IMHO that's one of the major benefits of this API, so that there's no need
-> > to mention impl details like this.
+> > I still think it's the driver's decision to have its own macro controlling
+> > the huge pfnmap behavior.  I agree with you core mm can have it, I don't
+> > see it blocks the driver not returning huge order if huge pfnmap is turned
+> > off.  VFIO-PCI currently indeed only depends directly on global THP
+> > configs, but I don't see why it's strictly needed.  So I think it's fine if
+> > a driver (even if global THP enabled for pmd/pud) deselect huge pfnmap for
+> > other reasons, then here the order returned can still always be PSIZE for
+> > the driver.  It's really not a huge deal to me.
 > 
-> It needs to be clearly explained exactly how pgoff and the returned
-> order are related because it impacts how the drivers need to manage
-> their pgoff space.
+> All these APIs should be around the idea that the driver just returns
+> what it has and the core mm places it into ptes. There is not a good
+> reason drivers should be overriding this logic or doing their own
+> thing.
 
-Here "pgoff" plays two roles:
-
-  (1) as a range, (pgoff, len) on top of the fd, decides which device blob
-      to be mapped.  This is relevant to the driver, for sure..
-
-  (2) as an offset, pgoff is relevant when we want to make sure mmap()
-      request's VA will be aligned in a way so that we can maximize huge
-      mappings.  This has, IMHO, nothing to do with the driver, and that's
-      what I want to make the new API transparent of.
-
-I agree drivers need to know pgoff for (1) in terms of get_mapping_order(),
-not (2).
+I'll make sure the driver will not need to consider size of mapping that
+arch would support.
 
 > 
-> > Here the point is, the driver should only care about the size of mapping,
-> > nothing else like how exactly the alignments will be calculated, and how
-> > that interacts with pgoff.  The kernel mm manages that. It's done exactly
-> > like what anon thp does already when len is pmd aligned.
+> > > Drivers shouldn't implement this alignment function without also
+> > > implementing huge fault, it is pointless. Don't see a reason to add
+> > > extra complexity.
+> > 
+> > It's not implementing the order hint without huge fault.  It's when both
+> > are turned off in a kernel config.. then the order hint (even from driver
+> > POV) shouldn't need to be reported.
 > 
-> The driver owns the pgoff number space, it has to care about how that
-> relates to the PTEs.
+> No, it should still all be the same the core code just won't call the
+> function.
 > 
-> > Or maybe I misunderstood what you're suggesting to document?  If so, please
-> > let me know; some example would be greatly helpful.
+> > I don't know why you have so strong feeling on having a config check in
+> > vfio-pci drivers is bad.
 > 
-> Just document the 'VA % order = pgoff % order' equation in the kdoc
-> for the new op.
+> It is leaking MM details into drivers that should not be in drivers.
 
-When it's "related to PTEs", it's talking about (2) above, so that's really
-what I want to avoid mentioning.
+To me it still makes perfect sense here to pair with huge_fault(), and it's
+driver knowledge alone.  It has nothing to do with leaking mm details.
 
-Docuemnt anything about VA is just confusing on its own especially when
-"int get_mapping_order(fd, pgoff, len)" doesn't even have anything in param
-or retval that is relevant to the virtual address space..
-
-If you think missing such info is harder for reviews, I can definitely add
-a rich comment when repost explaining how __thp_get_unmapped_area() works
-here.
-
-We can also pause this a bit and wait for Matthew's review on the API,
-where he showed concerns.  If there's major reason this API is rejected, we
-don't need to bother this part of detail either.
-
-Thanks,
+I think I get your point above, maybe when the core mm fallback paths not
+available yet we can mix things together. I'll see what I can do when
+repost.
 
 -- 
 Peter Xu
