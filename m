@@ -1,235 +1,262 @@
-Return-Path: <kvm+bounces-66058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66059-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39299CC071D
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 02:24:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D5D9CC0762
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 02:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 655CB3039993
-	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 01:22:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 438BD3016193
+	for <lists+kvm@lfdr.de>; Tue, 16 Dec 2025 01:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31048254AFF;
-	Tue, 16 Dec 2025 01:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213AA27B34F;
+	Tue, 16 Dec 2025 01:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E85KftC4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lzmpMzgr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A2222B8B6
-	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 01:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC68E2222D2
+	for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 01:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765848130; cv=none; b=aSMwyB29YLEWwg5SINRxEbfXnN/Nlc0INdAGHnYSDnEVT5Rh6sQ15+guI6KkJaAliVFn3ZThOO4p3lsXeHVZQmQWJGTB6peAhLavCQ9/kM9SbHyQPkVv07YNZUdJ2RTCLiB4UBa5ob3xRa7wRyttwFofxewdAgHyFqa1FRNhkbo=
+	t=1765848563; cv=none; b=I1b22sMimvVdcc1Or8N18S7srljTBm0I5kBBbz4TykK+MeV3un4a3qhxjgP6Ec+EOwpATIMSscuCqHJ9nceGNY3ERgV5GQgqPlYclRd5IDKa22Nj+r6ObwyETYmYY3LvlL07JBFvnJa+8/SsmnvrTXTCLHAUCLLvDWua8fBz1sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765848130; c=relaxed/simple;
-	bh=KhTpBrq3o1OcDzqZyQ5v6akeq46HasfcRLGJ5YYrEKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fgohb1LTFnrGciUm/GSsAylewnmzv5sRVPvnUkZduGbuTYlyV4k66pT2cJHodw7/SYCoj5pSsDy6i7MmhmULVJf0NRsHDVe33l4ayt5EbZQTc0XXOUsrbwCtA9ABmo/nxNc0CN1vwOWXKTHXuJMoG6TJjM/mhftE0L+SJZGPn2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E85KftC4; arc=none smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-6446fcddf2fso4008461d50.0
-        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 17:22:07 -0800 (PST)
+	s=arc-20240116; t=1765848563; c=relaxed/simple;
+	bh=/Z72mjCBNhAToDsEtwlKRTY1obGxGVZnyq3d38OZe3Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Qjsn+2e3BUSh4QCm4QA1rz4OvCmqi3XwvxBpDP7ChzBLGHzcB6Z9Dzu+DqquGNrdt2CdWa8aS0DgKYUuyVlod+1nYhXJGvu3d6bcVa8Kqx/fkqq42tYeC8CbXHexAyH5AsxOaHjIXJUsyldL2dVzMPQOFk0+dOlryA73MsE0MUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lzmpMzgr; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34abec8855aso7368209a91.0
+        for <kvm@vger.kernel.org>; Mon, 15 Dec 2025 17:29:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765848127; x=1766452927; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lI4+C9X3I7yvyc2773MJlpz/r2L4renU7eOoChO1rz0=;
-        b=E85KftC4BWZfUx89LtZEIH8y7/RxFdxyiOLkF/oGhurra3KCTuuTJmFT29mGuDqhmC
-         ekGXhRUT8UCkCdfhC1g+OBDvcWXLE7x4vuiTCBNxq/6/oSLmJxCCudHAeg9dtOwTLhP7
-         2zVPhEafOkBq3IsFm0xmc8K0M1DRgZab9KpcWlxKImXXLmk7i5/EZoqvUdSVy3d3keUq
-         u09A5L3XTMi7GhosnNUH3ITVQbgUophG9kNdAB/9iUGr5yLfZURBwoHfkZj6DwpuDSOf
-         Ox+M5hZD4MSgsMS29AuTiQo4tbX85GGZR9einVh9K+y4ecgUvbTD8aF1JF8NPyJMEC5K
-         PiHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765848127; x=1766452927;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1765848561; x=1766453361; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lI4+C9X3I7yvyc2773MJlpz/r2L4renU7eOoChO1rz0=;
-        b=hZIATALarImeR+M1AtG1umeMnuSv/HI1M+JaAdjnZ9NB8OOFaBEks6qgkZFTEhPJlg
-         VYPB8OBq15Zt3e2zR6Rk4igD4+Ie51TDj2fqBpSFmCAfcB8kdMmjmfjjwSf42tc7Vbd3
-         1wkAmuKM/QSUjoMYbVXyOpltpJ6j0blcELQVIxXGekXIJw1CZMjbFzAPNhtX1kcFxpU6
-         chvErsAGRUq9DuBu7C0TB9UcomuaNwmGb85/nveBnOmeXjvMU7gr+S1SwVmCOTyRhUdl
-         Gk7483GRwfmXtdYK99knJOUlQ2hUDki7t8+s732A8aLfW9o6A7qePOBNKPxVOZkcmG1m
-         km/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU8C72ACR7CFvZU1mhCvzGspGMo4/ZhMViONPfXSDfX/P7J3JtNHRX7xQl+R/5h9ILfk1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVyAofckqmSkka1h78n4CKm8Y3dDS1i9OTZhtcEJrVvjSmrnlu
-	xESCJy21DRpfab/e5SBPchIhciK/KzoBeSRnnrJB6wfBzlTCPakBuuuD
-X-Gm-Gg: AY/fxX6I8AC+gCSNpa7UJw2l60wo4y+LhnPHzfRjwawe9dmLcRbIq3xVcjIfrPFb1xT
-	E3BZ5GWZKqrLG/OIAUopGZSeYBTMq5NNbEGUnql/LH37XYVHK344CDAhGNkXoFmobINg7YnY8oZ
-	Hbvh89wQMt/OXFsxiTL8x4FlUUpwypp4gvdhBs+ZDmBziUxxT7XAYU2JBSbb4tzxkmHeesFw4ZG
-	SVz0tyynYuyOzvgL41KkE+dJlV88YYTmtDO49awVLXl/Q+FHSlks+QwvEjgQwoaSMhKrRRZumGE
-	U0br5FOzsCBCTSlJCJ6zlfy6hXF5obZL5GPymqhti87GnsiuXSdwBd3JtyP+PiXRi1xzn+/PUHD
-	QANTmtoqsK8ztioc/UXlbdeKroHQP2B1oW0kJogtqScini60FvUe6ALDn5WwDQU6uf7Ar5flvXO
-	PURBMUK9vKxXbqPAoebm3GsnFKNpernWZfqkAcjH3JV9LQIRQ=
-X-Google-Smtp-Source: AGHT+IHFuEiGcW0GH4lABrKUUSbE6qv7huuMOYC9DtT8UyxlS9XUtUukZA6W5M9Qt9zONS5q8T2xVg==
-X-Received: by 2002:a05:690e:128c:b0:63f:ab00:1a07 with SMTP id 956f58d0204a3-64555643a56mr9274950d50.49.1765848124847;
-        Mon, 15 Dec 2025 17:22:04 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:58::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78e748cecd9sm34175187b3.9.2025.12.15.17.22.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 17:22:04 -0800 (PST)
-Date: Mon, 15 Dec 2025 17:22:02 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <aUC0Op2trtt3z405@devvm11784.nha0.facebook.com>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
- <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
- <aTw0F6lufR/nT7OY@devvm11784.nha0.facebook.com>
- <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
+        bh=FCL7LHY0wF9Ikdt1KzJ+83HEGAeQ7TrD3GWbUO0GwzI=;
+        b=lzmpMzgrPFpoRAW48hFJcmdcXQBq/hKGGv9xh8K2gvplDS7LH3HWeqDu/XCSCWtwjq
+         84lCyPFIY2vTcx/0jIkEHV3mTy0z4W1IXDr1DGd4RILwQh05nq3ZHagbdNPML3Tr4PjR
+         n2s7wjhZOvB+hJie2MWRl3EXODIjhGk+4KF1PmbimOy/GabI884+Z9jLgERcjYCv0pby
+         R9SVzaXGxfByZjfmzJVYddkLskm2jI6Zi9woFgKc2nTKk9MI3n2QbOzKTRMKAHom2FWa
+         r4U5CaslGAjrfMDkJsnjdzQTLINerBDwOmm+7nHRa+a3PnozYPI96XgQ2joVBKrHDhro
+         +cLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765848561; x=1766453361;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FCL7LHY0wF9Ikdt1KzJ+83HEGAeQ7TrD3GWbUO0GwzI=;
+        b=XcvPEARkWxpPuga8zdzKJSWJqr6EvUG8AEUSl2rIh6EmamiEfr9ohsdG6T1v1NGk9t
+         RuccYc+Y77GBcJs2pFboZNPs6+ZqmAxuXguPXyzPRPjfQkeZarku7dnL6GKmaCh4phXl
+         j/q7o+uzFOtrQSE8wxIk8TRC6AMOoegH2Jt8eEh44ANzFIZTNPUZEx5SBuFGqTWrxh7C
+         0NLHsGczurzHHAsgt16HmcsEMN98dgGTUse6barPo+4opG/Gwb9E94sk9vMnJ+bZYjxm
+         j2FGGKoXe967CWThUovANn0b1U1+Y4T75WgCIg8bIohjcIP52m0k5V2GQGzJetze96Ot
+         Z1JQ==
+X-Gm-Message-State: AOJu0YyVskAH0k5mcoHJI4v5ZefYBcE+FjMtiPXSvgL/0TwY7lYaF3eC
+	b10dWSyItYzlJqSf5IcHspLZNEk0vYN+2/FR8Go3a0uKgT6CQ/hBJqq83baosIJMk+nMOcnGZK5
+	WhlTH7w==
+X-Google-Smtp-Source: AGHT+IHx4Li2ZIEKf0xP3cTYDpK7FV67BrOnN4rZ2Ti+ZOk2X9O83GLHRiTcWYV8fIum9BJow6Qw0lDB6kY=
+X-Received: from pgg23.prod.google.com ([2002:a05:6a02:4d97:b0:c08:6ff5:286b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:1584:b0:35d:7f7:4aac
+ with SMTP id adf61e73a8af0-369afa01e9emr13111683637.47.1765848561029; Mon, 15
+ Dec 2025 17:29:21 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon, 15 Dec 2025 17:29:18 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251216012918.1707681-1-seanjc@google.com>
+Subject: [PATCH] KVM: nVMX: Disallow access to vmcs12 fields that aren't
+ supported by "hardware"
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 15, 2025 at 03:11:22PM +0100, Stefano Garzarella wrote:
-> On Fri, Dec 12, 2025 at 07:26:15AM -0800, Bobby Eshleman wrote:
-> > On Tue, Dec 02, 2025 at 02:01:04PM -0800, Bobby Eshleman wrote:
-> > > On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
-> > > > On 12/2/25 6:56 PM, Bobby Eshleman wrote:
-> > > > > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
-> > > > >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
-> > > > >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
-> > > > >>>  		goto out;
-> > > > >>>  	}
-> > > > >>>
-> > > > >>> +	net = current->nsproxy->net_ns;
-> > > > >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
-> > > > >>> +
-> > > > >>> +	/* Store the mode of the namespace at the time of creation. If this
-> > > > >>> +	 * namespace later changes from "global" to "local", we want this vsock
-> > > > >>> +	 * to continue operating normally and not suddenly break. For that
-> > > > >>> +	 * reason, we save the mode here and later use it when performing
-> > > > >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
-> > > > >>> +	 */
-> > > > >>> +	vsock->net_mode = vsock_net_mode(net);
-> > > > >>
-> > > > >> I'm sorry for the very late feedback. I think that at very least the
-> > > > >> user-space needs a way to query if the given transport is in local or
-> > > > >> global mode, as AFAICS there is no way to tell that when socket creation
-> > > > >> races with mode change.
-> > > > >
-> > > > > Are you thinking something along the lines of sockopt?
-> > > >
-> > > > I'd like to see a way for the user-space to query the socket 'namespace
-> > > > mode'.
-> > > >
-> > > > sockopt could be an option; a possibly better one could be sock_diag. Or
-> > > > you could do both using dumping the info with a shared helper invoked by
-> > > > both code paths, alike what TCP is doing.
-> > > > >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
-> > > > >> may cross netns boundaris and connect to 'local' socket in other netns
-> > > > >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
-> > > > >> isolation.
-> > > > >
-> > > > > Local mode sockets are unable to communicate with local mode (and global
-> > > > > mode too) sockets that are in other namespaces. The key piece of code
-> > > > > for that is vsock_net_check_mode(), where if either modes is local the
-> > > > > namespaces must be the same.
-> > > >
-> > > > Sorry, I likely misread the large comment in patch 2:
-> > > >
-> > > > https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
-> > > >
-> > > > >> Have you considered instead a slightly different model, where the
-> > > > >> local/global model is set in stone at netns creation time - alike what
-> > > > >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
-> > > > >> inter-netns connectivity is explicitly granted by the admin (I guess
-> > > > >> you will need new transport operations for that)?
-> > > > >>
-> > > > >> /P
-> > > > >>
-> > > > >> [1] tcp allows using per-netns established socket lookup tables - as
-> > > > >> opposed to the default global lookup table (even if match always takes
-> > > > >> in account the netns obviously). The mentioned sysctl specify such
-> > > > >> configuration for the children namespaces, if any.
-> > > > >
-> > > > > I'll save this discussion if the above doesn't resolve your concerns.
-> > > > I still have some concern WRT the dynamic mode change after netns
-> > > > creation. I fear some 'unsolvable' (or very hard to solve) race I can't
-> > > > see now. A tcp_child_ehash_entries-like model will avoid completely the
-> > > > issue, but I understand it would be a significant change over the
-> > > > current status.
-> > > >
-> > > > "Luckily" the merge window is on us and we have some time to discuss. Do
-> > > > you have a specific use-case for the ability to change the netns >
-> > > mode
-> > > > after creation?
-> > > >
-> > > > /P
-> > > 
-> > > I don't think there is a hard requirement that the mode be change-able
-> > > after creation. Though I'd love to avoid such a big change... or at
-> > > least leave unchanged as much of what we've already reviewed as
-> > > possible.
-> > > 
-> > > In the scheme of defining the mode at creation and following the
-> > > tcp_child_ehash_entries-ish model, what I'm imagining is:
-> > > - /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
-> > > - /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
-> > >   number of times
-> > > 
-> > > - when a netns is created, the new netns mode is inherited from
-> > >   child_ns_mode, being assigned using something like:
-> > > 
-> > > 	  net->vsock.ns_mode =
-> > > 		get_net_ns_by_pid(current->pid)->child_ns_mode
-> > > 
-> > > - /proc/sys/net/vsock/ns_mode queries the current mode, returning
-> > >   "local" or "global", returning value of net->vsock.ns_mode
-> > > - /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
-> > >   reject writes
-> > > 
-> > > Does that align with what you have in mind?
-> > 
-> > Hey Paolo, I just wanted to sync up on this one. Does the above align
-> > with what you envision?
-> 
-> Hi Bobby, AFAIK Paolo was at LPC, so there could be some delay.
-> 
-> FYI I'll be off from Dec 25 to Jan 6, so if we want to do an RFC in the
-> middle, I'll do my best to take a look before my time off.
-> 
-> Thanks,
-> Stefano
-> 
+Disallow access (VMREAD/VMWRITE) to fields that the loaded incarnation of
+KVM doesn't support, e.g. due to lack of hardware support, as a middle
+ground between allowing access to any vmcs12 field defined by KVM (current
+behavior) and gating access based on the userspace-defined vCPU model (the
+most correct, but costly, implementation).
 
-Sounds like a plan, thanks!
+Disallowing access to unsupported fields helps a tiny bit in terms of
+closing the virtualization hole (see below), but the main motivation is to
+avoid having to weed out unsupported fields when synchronizing between
+vmcs12 and a shadow VMCS.  Because shadow VMCS accesses are done via
+VMREAD and VMWRITE, KVM _must_ filter out unsupported fields (or eat
+VMREAD/VMWRITE failures), and filtering out just shadow VMCS fields is
+about the same amount of effort, and arguably much more confusing.
 
-Best,
-Bobby
+As a bonus, this also fixes a KVM-Unit-Test failure bug when running on
+_hardware_ without support for TSC Scaling, which fails with the same
+signature as the bug fixed by commit ba1f82456ba8 ("KVM: nVMX: Dynamically
+compute max VMCS index for vmcs12"):
+
+  FAIL: VMX_VMCS_ENUM.MAX_INDEX expected: 19, actual: 17
+
+Dynamically computing the max VMCS index only resolved the issue where KVM
+was hardcoding max index, but for CPUs with TSC Scaling, that was "good
+enough".
+
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+Link: https://lore.kernel.org/all/20251026201911.505204-22-xin@zytor.com
+Link: https://lore.kernel.org/all/YR2Tf9WPNEzrE7Xg@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/nested.c |  6 -----
+ arch/x86/kvm/vmx/vmcs.h   |  8 ++++++
+ arch/x86/kvm/vmx/vmcs12.c | 55 +++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmcs12.h |  8 ++++--
+ arch/x86/kvm/vmx/vmx.c    |  2 ++
+ 5 files changed, 69 insertions(+), 10 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 6137e5307d0f..9d8f84e3f2da 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -7074,12 +7074,6 @@ void nested_vmx_set_vmcs_shadowing_bitmap(void)
+ 	}
+ }
+ 
+-/*
+- * Indexing into the vmcs12 uses the VMCS encoding rotated left by 6.  Undo
+- * that madness to get the encoding for comparison.
+- */
+-#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) << 10)))
+-
+ static u64 nested_vmx_calc_vmcs_enum_msr(void)
+ {
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
+index b25625314658..98281e019e38 100644
+--- a/arch/x86/kvm/vmx/vmcs.h
++++ b/arch/x86/kvm/vmx/vmcs.h
+@@ -11,7 +11,15 @@
+ 
+ #include "capabilities.h"
+ 
++/*
++ * Indexing into the vmcs12 uses the VMCS encoding rotated left by 6 as a very
++ * rudimentary compression of the range of indices.  The compression ratio is
++ * good enough to allow KVM to use a (very sparsely populated) array without
++ * wasting too much memory, while the "algorithm" is fast enough to be used to
++ * lookup vmcs12 fields on-demand, e.g. for emulation.
++ */
+ #define ROL16(val, n) ((u16)(((u16)(val) << (n)) | ((u16)(val) >> (16 - (n)))))
++#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) << 10)))
+ 
+ struct vmcs_hdr {
+ 	u32 revision_id:31;
+diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
+index 4233b5ca9461..78eca9399975 100644
+--- a/arch/x86/kvm/vmx/vmcs12.c
++++ b/arch/x86/kvm/vmx/vmcs12.c
+@@ -9,7 +9,7 @@
+ 	FIELD(number, name),						\
+ 	[ROL16(number##_HIGH, 6)] = VMCS12_OFFSET(name) + sizeof(u32)
+ 
+-const unsigned short vmcs12_field_offsets[] = {
++const __initconst u16 supported_vmcs12_field_offsets[] = {
+ 	FIELD(VIRTUAL_PROCESSOR_ID, virtual_processor_id),
+ 	FIELD(POSTED_INTR_NV, posted_intr_nv),
+ 	FIELD(GUEST_ES_SELECTOR, guest_es_selector),
+@@ -158,4 +158,55 @@ const unsigned short vmcs12_field_offsets[] = {
+ 	FIELD(HOST_SSP, host_ssp),
+ 	FIELD(HOST_INTR_SSP_TABLE, host_ssp_tbl),
+ };
+-const unsigned int nr_vmcs12_fields = ARRAY_SIZE(vmcs12_field_offsets);
++
++u16 vmcs12_field_offsets[ARRAY_SIZE(supported_vmcs12_field_offsets)] __ro_after_init;
++unsigned int nr_vmcs12_fields __ro_after_init;
++
++#define VMCS12_CASE64(enc) case enc##_HIGH: case enc
++
++static __init bool cpu_has_vmcs12_field(unsigned int idx)
++{
++	switch (VMCS12_IDX_TO_ENC(idx)) {
++	case VIRTUAL_PROCESSOR_ID: return cpu_has_vmx_vpid();
++	case POSTED_INTR_NV: return cpu_has_vmx_posted_intr();
++	VMCS12_CASE64(TSC_MULTIPLIER): return cpu_has_vmx_tsc_scaling();
++	VMCS12_CASE64(VIRTUAL_APIC_PAGE_ADDR): return cpu_has_vmx_tpr_shadow();
++	VMCS12_CASE64(APIC_ACCESS_ADDR): return cpu_has_vmx_virtualize_apic_accesses();
++	VMCS12_CASE64(POSTED_INTR_DESC_ADDR): return cpu_has_vmx_posted_intr();
++	VMCS12_CASE64(VM_FUNCTION_CONTROL): return cpu_has_vmx_vmfunc();
++	VMCS12_CASE64(EPT_POINTER): return cpu_has_vmx_ept();
++	VMCS12_CASE64(EPTP_LIST_ADDRESS): return cpu_has_vmx_vmfunc();
++	VMCS12_CASE64(XSS_EXIT_BITMAP): return cpu_has_vmx_xsaves();
++	VMCS12_CASE64(ENCLS_EXITING_BITMAP): return cpu_has_vmx_encls_vmexit();
++	VMCS12_CASE64(GUEST_IA32_PERF_GLOBAL_CTRL): return cpu_has_load_perf_global_ctrl();
++	VMCS12_CASE64(HOST_IA32_PERF_GLOBAL_CTRL): return cpu_has_load_perf_global_ctrl();
++	case TPR_THRESHOLD: return cpu_has_vmx_tpr_shadow();
++	case SECONDARY_VM_EXEC_CONTROL: return cpu_has_secondary_exec_ctrls();
++	case GUEST_S_CET: return cpu_has_load_cet_ctrl();
++	case GUEST_SSP: return cpu_has_load_cet_ctrl();
++	case GUEST_INTR_SSP_TABLE: return cpu_has_load_cet_ctrl();
++	case HOST_S_CET: return cpu_has_load_cet_ctrl();
++	case HOST_SSP: return cpu_has_load_cet_ctrl();
++	case HOST_INTR_SSP_TABLE: return cpu_has_load_cet_ctrl();
++
++	/* KVM always emulates PML and the VMX preemption timer in software. */
++	case GUEST_PML_INDEX:
++	case VMX_PREEMPTION_TIMER_VALUE:
++	default:
++		return true;
++	}
++}
++
++void __init nested_vmx_setup_vmcs12_fields(void)
++{
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(supported_vmcs12_field_offsets); i++) {
++		if (!supported_vmcs12_field_offsets[i] ||
++		    !cpu_has_vmcs12_field(i))
++			continue;
++
++		vmcs12_field_offsets[i] = supported_vmcs12_field_offsets[i];
++		nr_vmcs12_fields = i + 1;
++	}
++}
+diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+index 4ad6b16525b9..e5905ba0bb42 100644
+--- a/arch/x86/kvm/vmx/vmcs12.h
++++ b/arch/x86/kvm/vmx/vmcs12.h
+@@ -374,8 +374,12 @@ static inline void vmx_check_vmcs12_offsets(void)
+ 	CHECK_OFFSET(guest_pml_index, 996);
+ }
+ 
+-extern const unsigned short vmcs12_field_offsets[];
+-extern const unsigned int nr_vmcs12_fields;
++extern const __initconst u16 supported_vmcs12_field_offsets[];
++
++extern u16 vmcs12_field_offsets[] __ro_after_init;
++extern unsigned int nr_vmcs12_fields __ro_after_init;
++
++void __init nested_vmx_setup_vmcs12_fields(void);
+ 
+ static inline short get_vmcs12_field_offset(unsigned long field)
+ {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6b96f7aea20b..e5ad3853f51d 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8670,6 +8670,8 @@ __init int vmx_hardware_setup(void)
+ 	 * can hide/show features based on kvm_cpu_cap_has().
+ 	 */
+ 	if (nested) {
++		nested_vmx_setup_vmcs12_fields();
++
+ 		nested_vmx_setup_ctls_msrs(&vmcs_config, vmx_capability.ept);
+ 
+ 		r = nested_vmx_hardware_setup(kvm_vmx_exit_handlers);
+
+base-commit: 58e10b63777d0aebee2cf4e6c67e1a83e7edbe0f
+-- 
+2.52.0.239.gd5f0c6e74e-goog
+
 
