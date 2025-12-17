@@ -1,331 +1,158 @@
-Return-Path: <kvm+bounces-66176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A2ACC8420
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 15:43:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C558CC8544
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 16:03:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8808C306ADE7
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 14:38:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0AC1305D43F
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 14:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD196387B1B;
-	Wed, 17 Dec 2025 14:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqM8XNqz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9478138C648;
+	Wed, 17 Dec 2025 14:29:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7675E387B1C;
-	Wed, 17 Dec 2025 14:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D39C389F77;
+	Wed, 17 Dec 2025 14:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765981763; cv=none; b=Fjm/SUQvtobWOKALYXORk7/bq1qOoVyOjYp4GnCixw2cJjx3NYQ+HeymfHGCuwsfBACI1THue2ZbMj8nSIYgwFviVp+klRJG4nxl6fa/Xj+PzFpdjhW8vw7DXVh7ncuDS98+aHTUx2CtXuqP3O5Ffa2lFKMqzV6oB3vhye2NKhE=
+	t=1765981794; cv=none; b=ihAVE+lm40y9mO3VXQTrbd3gKs7dTlV1yYWmU4uiAQUQ+b/b1Z7HFG3hGuDeS+P8poW0lb1swB7ya4clWndUeIsE65nJdX8y9UfYe0FOu8thh16AYSnWjoLcvNhz5yhUpYGwIZQM9ptaAR5kccYFvIPuHUf4NdpYou7AnrJTuS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765981763; c=relaxed/simple;
-	bh=wFfaliFE9aT542xijNvuDtQEWHPNLaDffA9AasSc3Ow=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j3qf+vS/mtXujxIQmCyeKZYfEbGyPJQR32uBFi9Mdx6OV1jQNDZcUbninhEi+hgXz1iYeQb2PjcJlhbG10vlB0nEXWr5XhRWutZa/W0WtKU/TeyUnCWTtrtNglzKk8832jU8YA99Y0YMi/ca0B7AYVJxH0I21rRTOU5l90soOJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqM8XNqz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD8F3C113D0;
-	Wed, 17 Dec 2025 14:29:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765981761;
-	bh=wFfaliFE9aT542xijNvuDtQEWHPNLaDffA9AasSc3Ow=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lqM8XNqzqosbQvO45T5UX8yqwpgHKJzJNuHlzxIyUa1fSnbiZjqSzJ5/vXHc9uzdg
-	 PPriKgMOgNX6fPqoc1zKOZ9u7X3F3i00RtILr4Dhd3cBCZnw7O0SEVaviphDDAg9xH
-	 qcz8yLMPr43BDJ9XBnEkDhXNaKNdkepgrUKcMDwy0tU+HAke0NXBcBKLv+Zh1gApLs
-	 BGpJuo0p+hmzzPb6CH7iCTMRNIs3wvG5j7nwBzzfGzSSCYrsOescJD222rZaflKYrk
-	 7O0hlDx80HwCIJGu7ZZULNbqT4zmfEOp8Jiz/w+wjHcz85CmQS/EAfs9NLLZt9Lj3u
-	 imniPCo24QZlg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vVsWl-0000000DOoB-0MFe;
-	Wed, 17 Dec 2025 14:29:19 +0000
-Date: Wed, 17 Dec 2025 14:29:18 +0000
-Message-ID: <86zf7hmbb5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 18/32] KVM: arm64: gic-v5: Check for pending PPIs
-In-Reply-To: <20251212152215.675767-19-sascha.bischoff@arm.com>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-19-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765981794; c=relaxed/simple;
+	bh=P8UoqtDkSIejHJ3dZSwB+Al5ZpdAYzsvTp6EFWWH3vM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c22ifXSKW8zav82DVUCEmZPrFhRLILfeakXcroibVufkJabOPfNkRW+dH3P0E8Ht4BsckJMT1EPzNA1Hr5n+LvZh12r/bE67c3q8oWgtwPAOfb5XndAuhiPdsrd7NktAkdx6PGkgygAcHiQdfSogqvoTZ6O1mS4CLHYvRw30et0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 91910FEC;
+	Wed, 17 Dec 2025 06:29:44 -0800 (PST)
+Received: from [10.57.79.105] (unknown [10.57.79.105])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 495223F73B;
+	Wed, 17 Dec 2025 06:29:48 -0800 (PST)
+Message-ID: <f04bdf46-c752-43ec-88fa-dcd37f29d374@arm.com>
+Date: Wed, 17 Dec 2025 14:29:46 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 11/46] arm64: RMI: Activate realm on first VCPU run
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+ <20251217101125.91098-12-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20251217101125.91098-12-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Dec 2025 15:22:41 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
->=20
-> This change allows KVM to check for pending PPI interrupts. This has
-> two main components:
->=20
-> First of all, the effective priority mask is calculated.  This is a
-> combination of the priority mask in the VPEs ICC_PCR_EL1.PRIORITY and
-> the currently running priority as determined from the VPE's
-> ICH_APR_EL1. If an interrupt's prioirity is greater than or equal to
-> the effective priority mask, it can be signalled. Otherwise, it
-> cannot.
->=20
-> Secondly, any Enabled and Pending PPIs must be checked against this
-> compound priority mask. The reqires the PPI priorities to by synced
-> back to the KVM shadow state - this is skipped in general operation as
-> it isn't required and is rather expensive. If any Enabled and Pending
-> PPIs are of sufficient priority to be signalled, then there are
-> pending PPIs. Else, there are not.  This ensures that a VPE is not
-> woken when it cannot actually process the pending interrupts.
->=20
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+On 17/12/2025 10:10, Steven Price wrote:
+> When a VCPU migrates to another physical CPU check if this is the first
+> time the guest has run, and if so activate the realm.
+> 
+> Before the realm can be activated it must first be created, this is a
+> stub in this patch and will be filled in by a later patch.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 123 ++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    |  10 ++-
->  arch/arm64/kvm/vgic/vgic.h    |   1 +
->  3 files changed, 131 insertions(+), 3 deletions(-)
->=20
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index d54595fbf4586..35740e88b3591 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -54,6 +54,31 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
->  }
-> =20
-> +static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+> New patch for v12
+> ---
+>   arch/arm64/include/asm/kvm_rmi.h |  1 +
+>   arch/arm64/kvm/arm.c             |  6 +++++
+>   arch/arm64/kvm/rmi.c             | 42 ++++++++++++++++++++++++++++++++
+>   3 files changed, 49 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index cb7350f8a01a..e4534af06d96 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -69,6 +69,7 @@ void kvm_init_rmi(void);
+>   u32 kvm_realm_ipa_limit(void);
+>   
+>   int kvm_init_realm_vm(struct kvm *kvm);
+> +int kvm_activate_realm(struct kvm *kvm);
+>   void kvm_destroy_realm(struct kvm *kvm);
+>   void kvm_realm_destroy_rtts(struct kvm *kvm);
+>   
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 941d1bec8e77..542df37b9e82 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -951,6 +951,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>   			return ret;
+>   	}
+>   
+> +	if (kvm_is_realm(vcpu->kvm)) {
+> +		ret = kvm_activate_realm(kvm);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>   	mutex_lock(&kvm->arch.config_lock);
+>   	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+>   	mutex_unlock(&kvm->arch.config_lock);
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index e57e8b7eafa9..98929382c365 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -223,6 +223,48 @@ void kvm_realm_destroy_rtts(struct kvm *kvm)
+>   	WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
+>   }
+>   
+> +static int realm_ensure_created(struct kvm *kvm)
 > +{
-> +	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
-> +	unsigned highest_ap, priority_mask;
-
-Please use explicit types that match their assignment.
-
-> +
-> +	/*
-> +	 * Counting the number of trailing zeros gives the current
-> +	 * active priority. Explicitly use the 32-bit version here as
-> +	 * we have 32 priorities. 0x20 then means that there are no
-> +	 * active priorities.
-> +	 */
-> +	highest_ap =3D __builtin_ctz(cpu_if->vgic_apr);
-
-=46rom https://gcc.gnu.org/onlinedocs/gcc/Bit-Operation-Builtins.html
-
-<quote>
-Built-in Function: int __builtin_ctz (unsigned int x)
-
-    Returns the number of trailing 0-bits in x, starting at the least
-significant bit position. If x is 0, the result is undefined.
-</quote>
-
-We really don't like undefined results.
-
-> +
-> +	/*
-> +	 * An interrupt is of sufficient priority if it is equal to or
-> +	 * greater than the priority mask. Add 1 to the priority mask
-> +	 * (i.e., lower priority) to match the APR logic before taking
-> +	 * the min. This gives us the lowest priority that is masked.
-> +	 */
-> +	priority_mask =3D FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, cpu_if->vgic_v=
-mcr);
-> +	priority_mask =3D min(highest_ap, priority_mask + 1);
-> +
-> +	return priority_mask;
+> +	/* Provided in later patch */
+> +	return -ENXIO;
 > +}
 > +
->  static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
->  					  struct vgic_irq *irq)
->  {
-> @@ -121,6 +146,104 @@ void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
->  	irq->ops =3D &vgic_v5_ppi_irq_ops;
->  }
-> =20
-> +
-> +/*
-> + * Sync back the PPI priorities to the vgic_irq shadow state
-> + */
-> +static void vgic_v5_sync_ppi_priorities(struct kvm_vcpu *vcpu)
+> +int kvm_activate_realm(struct kvm *kvm)
 > +{
-> +	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
-> +	unsigned long flags;
-> +	int i, reg;
+> +	struct realm *realm = &kvm->arch.realm;
+> +	int ret;
 > +
-> +	/* We have 16 PPI Priority regs */
-> +	for (reg =3D 0; reg < 16; reg++) {
-> +		const unsigned long priorityr =3D cpu_if->vgic_ppi_priorityr[reg];
+> +	if (!kvm_is_realm(kvm))
+> +		return -ENXIO;
 > +
-> +		for (i =3D 0; i < 8; ++i) {
-
-Urgh... 128 locks being taken is no good. We need something better.
-
-> +			struct vgic_irq *irq;
-> +			u32 intid;
-> +			u8 priority;
+> +	if (kvm_realm_state(kvm) == REALM_STATE_ACTIVE)
+> +		return 0;
 > +
-> +			priority =3D (priorityr >> (i * 8)) & 0x1f;
+> +	guard(mutex)(&kvm->arch.config_lock);
+> +	/* Check again with the lock held */
+> +	if (kvm_realm_state(kvm) == REALM_STATE_ACTIVE)
+> +		return 0;
 > +
-> +			intid =3D FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
-> +			intid |=3D FIELD_PREP(GICV5_HWIRQ_ID, reg * 8 + i);
+> +	ret = realm_ensure_created(kvm);
+> +	if (ret)
+> +		return ret;
 > +
-> +			irq =3D vgic_get_vcpu_irq(vcpu, intid);
-> +			raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +	/* Mark state as dead in case we fail */
+> +	WRITE_ONCE(realm->state, REALM_STATE_DEAD);
 > +
-> +			irq->priority =3D priority;
-> +
-> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-
-scoped_guard()
-
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +		}
-> +	}
-> +}
-> +
-> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if =3D &vcpu->arch.vgic_cpu.vgic_v5;
-> +	unsigned long flags;
-> +	int i, reg;
-> +	unsigned int priority_mask;
-> +
-> +	/* If no pending bits are set, exit early */
-> +	if (likely(!cpu_if->vgic_ppi_pendr[0] && !cpu_if->vgic_ppi_pendr[1]))
-> +		return false;
-> +
-> +	priority_mask =3D vgic_v5_get_effective_priority_mask(vcpu);
-> +
-> +	/* If the combined priority mask is 0, nothing can be signalled! */
-> +	if (!priority_mask)
-> +		return false;
-> +
-> +	/* The shadow priority is only updated on demand, sync it across first =
-*/
-> +	vgic_v5_sync_ppi_priorities(vcpu);
-> +
-> +	for (reg =3D 0; reg < 2; reg++) {
-> +		unsigned long possible_bits;
-> +		const unsigned long enabler =3D cpu_if->vgic_ich_ppi_enabler_exit[reg];
-> +		const unsigned long pendr =3D cpu_if->vgic_ppi_pendr_exit[reg];
-> +		bool has_pending =3D false;
-> +
-> +		/* Check all interrupts that are enabled and pending */
-> +		possible_bits =3D enabler & pendr;
-> +
-> +		/*
-> +		 * Optimisation: pending and enabled with no active priorities
-> +		 */
-> +		if (possible_bits && priority_mask > 0x1f)
-> +			return true;
-> +
-> +		for_each_set_bit(i, &possible_bits, 64) {
-> +			struct vgic_irq *irq;
-> +			u32 intid;
-> +
-> +			intid =3D FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
-> +			intid |=3D FIELD_PREP(GICV5_HWIRQ_ID, reg * 64 + i);
-> +
-> +			irq =3D vgic_get_vcpu_irq(vcpu, intid);
-> +			raw_spin_lock_irqsave(&irq->irq_lock, flags);
-> +
-> +			/*
-> +			 * We know that the interrupt is enabled and pending, so
-> +			 * only check the priority.
-> +			 */
-> +			if (irq->priority <=3D priority_mask)
-> +				has_pending =3D true;
-> +
-> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +
-> +			if (has_pending)
-> +				return true;
-> +		}
+> +	if (!irqchip_in_kernel(kvm)) {
+> +		/* Userspace irqchip not yet supported with realms */
+> +		return -EOPNOTSUPP;
 > +	}
 
-So we do this stuff *twice*. Doesn't strike me as being optimal. It is
-also not clear that we need to resync it all when calling
-kvm_vgic_vcpu_pending_irq(), which can happen for any odd reason
-(spurious wake-up from kvm_vcpu_check_block()).
+super minor nit: We could do this check before create the realm, within
+the config_lock'ed region.
 
-> +
-> +	return false;
-> +}
-> +
->  /*
->   * Detect any PPIs state changes, and propagate the state with KVM's
->   * shadow structures.
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index e534876656ca7..5d18a03cc11d5 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -1174,11 +1174,15 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vc=
-pu)
->  	unsigned long flags;
->  	struct vgic_vmcr vmcr;
-> =20
-> -	if (!vcpu->kvm->arch.vgic.enabled)
-> +	if (!vcpu->kvm->arch.vgic.enabled && !vgic_is_v5(vcpu->kvm))
->  		return false;
-> =20
-> -	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
-> -		return true;
-> +	if (vcpu->kvm->arch.vgic.vgic_model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V5) {
-> +		return vgic_v5_has_pending_ppi(vcpu);
-> +	} else {
+Suzuki
 
-Drop the 'else'.
-
-> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
-> +			return true;
-> +	}
-> =20
->  	vgic_get_vmcr(vcpu, &vmcr);
-> =20
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 5a77318ddb87a..4b3a1e7ca3fb4 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -387,6 +387,7 @@ void vgic_debug_destroy(struct kvm *kvm);
->  int vgic_v5_probe(const struct gic_kvm_info *info);
->  void vgic_v5_set_ppi_ops(struct vgic_irq *irq);
->  int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
-> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu);
->  void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu);
->  void vgic_v5_fold_irq_state(struct kvm_vcpu *vcpu);
->  void vgic_v5_load(struct kvm_vcpu *vcpu);
-
-Thanks,
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
 
