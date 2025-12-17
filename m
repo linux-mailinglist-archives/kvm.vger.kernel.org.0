@@ -1,96 +1,96 @@
-Return-Path: <kvm+bounces-66174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66175-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB16CC8547
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 16:03:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BAACCC8607
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 16:16:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 026A43015589
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 14:55:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 34C2B3016D8D
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 15:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C839393DF4;
-	Wed, 17 Dec 2025 14:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1838F341AAA;
+	Wed, 17 Dec 2025 14:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YG37dGiK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZqOommqU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfBn0/jR";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EbKPPNa+"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0085D38C647
-	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 14:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508C333891D
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 14:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765980476; cv=none; b=hMciMdHXaglePxjLawQe75ZzRnqZG1sVshr1fgWNRPT96TiBC+ilUnVFsimH63nz+fxo1oCplRlOL4ZC32kbJq2W39r167N7l2QajG7QecDYvp31YjTeDJhTm23UzIcjC3Gyi+Q+CwkOdC6vvx+KMrmMb7WE6PxW17PZOigwNM8=
+	t=1765980999; cv=none; b=YJheYXdPBE+00aM9CnaxevjB6f8D0L3bUHsIAXuhQTmkX9YEfqfY5beY25SotZoUUfQv8vEewdfG9JJsKaS/K5AeYsEMbdFd8WPNyoElaT+73DZj4HiDRUaZGeu0fp54InT7FMY+F95gXPnFIb+CGgEZH63pEFQIxz2e2zs+v0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765980476; c=relaxed/simple;
-	bh=T1VdTu+evdRFXsQyo3f+aFcCIUVAkctTP4WtyXiBNIs=;
+	s=arc-20240116; t=1765980999; c=relaxed/simple;
+	bh=8cyOwKnPppWEoB2x3Onz2bvU2zSIOwae9j+OOKDfK6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dhh1LWH3AlU5NbukRfoJenmHskXWltBnerzl5fy/N0zBHyzzvIfoB98/IxhDAsUmhPQn+UYMjWFgJrxTkAAFBExxGsQfoNwb2b3L7X64UUJcJHyr7TOg8Kf9BpyfmHdTfbRymj1kn8mu50y55f+ieLWFetAPuwh7jghONN1R75Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YG37dGiK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZqOommqU; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=nD98+NUOhVhrpfEu0QwISPxKQxTly8tlqBe85MOGSxtzBOs0e7c3HSQXiSKG93aOJU7jKrtZ/KKzF/RXnMrXNd+Lw/ACP79ph/yUkuOecw4Qf/Wp+9/FWTAPasoDL89cHXzM7+x0STHFLY3skkFC1qXRak6cm34uBA+su9QCK4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BfBn0/jR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EbKPPNa+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765980473;
+	s=mimecast20190719; t=1765980995;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aljhJcWsDJ3PFFfYqiQ4P5tji0PBbRIzCHEZWg9XRYg=;
-	b=YG37dGiK045dBPgfmpqnxZPQ54Ddk6xUZOxxoUGr8Z8VVnhIOtswDF6mGpqcOQsRipWl+c
-	b0srEREXuBI4a1t05CgJJFQJYD9mBqRnSQSpFVJdSlPSI6KHO2tKzRYl2AMPV/FS0TkViZ
-	LyXgJrhRmzIfTcqVX5PXzrB+R6Z07QM=
+	bh=UPuvZsVg2/P92nYtjYvwgSdJvJL9SagAwz9Q3Fo+Uxo=;
+	b=BfBn0/jRCpulmT4IaFxAy/lleZ5SSdaJj9FHMmBP3tXIVfavoYD27p9f5VNAqkm2cKAW+6
+	ViOxTitlFirkTXMCvh9siKSDukb9xCxqyRzGIQQQr4TelVZjA/KOpifUMLwsHHxtujytyo
+	/Idz+f+Jh0I28krmQITqlLw087yxzf0=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-142-vf7gLnTxOkSNWDL5V22J2w-1; Wed, 17 Dec 2025 09:07:51 -0500
-X-MC-Unique: vf7gLnTxOkSNWDL5V22J2w-1
-X-Mimecast-MFC-AGG-ID: vf7gLnTxOkSNWDL5V22J2w_1765980470
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43065ad16a8so2221521f8f.1
-        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 06:07:51 -0800 (PST)
+ us-mta-546-UVf04yGmPqKL3Wxg-vK_1A-1; Wed, 17 Dec 2025 09:16:33 -0500
+X-MC-Unique: UVf04yGmPqKL3Wxg-vK_1A-1
+X-Mimecast-MFC-AGG-ID: UVf04yGmPqKL3Wxg-vK_1A_1765980992
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4310062d97bso1478560f8f.0
+        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 06:16:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765980470; x=1766585270; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1765980991; x=1766585791; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aljhJcWsDJ3PFFfYqiQ4P5tji0PBbRIzCHEZWg9XRYg=;
-        b=ZqOommqUdUEqGPbKf7T99UC19eEoealIauypDEJW4M/zpn3YNRXxY6L8O1FNLZ1Y/g
-         DIoW68dgjWhSJ98QTTueuDVJdEJzYbI959eCtYafX5f4BVkypjiSVXz5pA4d5+cOWeNU
-         sfAZLhwgzU6kjm4hqTa/w2T4OobZqGB7KAgpyAe2gItB7oCWoy/AesZoaxnw1Rs+qLTy
-         clzgA4TlSqfZepOeOUyrTaBVy3kqhsiDUv19EwcV+yHoBMWSYYkk75sP59l2/DMTRxgP
-         hKFQuTqlb4RapOuN7xqicuVrkCSGme9I2dRlcSV0dU3CZEOv4thra+uW7nmnFrzCEvgY
-         98Hg==
+        bh=UPuvZsVg2/P92nYtjYvwgSdJvJL9SagAwz9Q3Fo+Uxo=;
+        b=EbKPPNa+5pYqgvD7hf43ZccJEA3hQVaR8+DQ2OobsvoFU5O7DyAYINU2MlqnefQEM3
+         grzIAAxIPEMojM/Qr89GQ4r+WKeOMMXxTFmlOQzGnYWN9VtX2W38pBHD9SfQTrp1I/71
+         u/Dz2c5+zeuYx8SxjEr2Qqc7BdYtMo+zYTDPoMaQ8sZhbqof5mlSt+7z/hXIPzUiJ8f2
+         w5ryOwLxUtrtW9uxnyhIHUVkEwgqO6FeyO8lM17yqOF9GufPVHhS7+VQ4WQ/m8ls51r4
+         DmXRLnGPlCbyOlyhoA1KdhwWw9pAeC3+AG6/alIyk1TFYua6ISqZyJ/KFefgD9xko2J5
+         gr3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765980470; x=1766585270;
+        d=1e100.net; s=20230601; t=1765980991; x=1766585791;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=aljhJcWsDJ3PFFfYqiQ4P5tji0PBbRIzCHEZWg9XRYg=;
-        b=t8RwgGxu5RJIfW/58VpxdvmOwmXPz6Bgzp8ns6P1OLq+iO/1opjIsZ0eub0sdfZ+NH
-         ft3N5lpodB8f247g7zrLAZzjenWVKkj1GoBbYQu8pTpDmO//3Y3b0o+2y/U7ZnEoEJEF
-         AEXFQRcW6D9rsJr599yevHfIJzL/5KnxAT/WzgPdYDskk2vtnjjZ8WMRU4TPeAEGxa//
-         nwQixUcyeFyfS07fL64pn76GMWswmZKQlCq8MSHxek6st8tgokSRx+egZkG/khfwkCIt
-         N/yQDwfIarES8NETKwok+l09rnUhAqYZWB8MIp+4rluurVpgo4R7uHAHQYLe6O7puwpX
-         ErDA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8GUp+Eyrt5KbwChrUq8x1iOPecFSnrWCn3fNPZpLNbtZ3tq7BxEABJf/DHLdbqw6paq8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1dmIvSq0EIfZ4ak8S3vOUCGW++fjyFgWsSrJWADTYa8mzh/0p
-	dK5cP2u+jmDnvc41yCR7Xz6IfvZsGXEnzlRQQGt2L7K4f5kRsE4ZlvF7Ka20uSpdXGy1+8kXuzW
-	C1/bPpKCRGCmVsGpDIclAKwACtwyK8hC3J+TOXwaj1d0lnYNDLd3nrQ==
-X-Gm-Gg: AY/fxX6PYiweKVm8ufE1DxVQfAuoFnHkUS4hajSpwR7P1fP7bd5/hJGewHsV8nqlwAU
-	AE9fdNK0VSLP0JiJkEwtSqMmxOe+egZ5zE8++UtQZJKGXgbPgNpgzazIboLrKsF7uxVa57id/FU
-	lPZ7Wm+lpOVyEkYVqaBI/LwXy7NNNaXh5p5O0XAiObZc70X4P8TtvXyuTC7uaGwxb3+AZfWIum5
-	zhbKxYq4uDXr1F4twGdomVYvbr4MhyzyM6Bp9tfIeUqJi0Pt5O6KGQbhQ96UXj8gkuOYSWMkKVv
-	+ze0NX5004/dfczCopRTn/fXQhN0udwtYGBx8HOixRZ0ko53z38dgfm7xTrIrfu9p+ycUg==
-X-Received: by 2002:a05:6000:230f:b0:430:fa9a:75a with SMTP id ffacd0b85a97d-430fa9a0d44mr13417673f8f.62.1765980470130;
-        Wed, 17 Dec 2025 06:07:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHpXoLJz1298FbluPk6Xn1ITwdOxZzapjcXfhQvPzVc4SMQoEloQ6OJ4+yK0Lg6SKLVv9uCjQ==
-X-Received: by 2002:a05:6000:230f:b0:430:fa9a:75a with SMTP id ffacd0b85a97d-430fa9a0d44mr13417644f8f.62.1765980469532;
-        Wed, 17 Dec 2025 06:07:49 -0800 (PST)
-Received: from imammedo ([213.175.46.86])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4310adad192sm5220905f8f.14.2025.12.17.06.07.48
+        bh=UPuvZsVg2/P92nYtjYvwgSdJvJL9SagAwz9Q3Fo+Uxo=;
+        b=WogZk5iGdAbVyMHGggIkkUiCedLFB185X7+4LpO/RolLvnPuGEbgHGSFl2Ra7MoIhL
+         vrDSMtgrpswpQfWwmfxDP4edm45QDsS5v4zZbimWOkNLNkuK1Ofh5hAF80BMqon40osJ
+         EK5cuFMVbzo1jjMwn1L5+1itaxUHt4mekGsdrK0pYzx9nMUiRStOzSDysj6MqU2Tzmho
+         HTt6t68lNQZhZOGjCF7JFG5G7ylPYhHooxVZRPeGRIleuNekyUo696YkOhG01na3zXSy
+         e2GSKYjIOinXL3U0aOB4pB73JsOuFBNDFb5XIsgx+QKp6+EUthfHIrQ67b1OcOZwCPvU
+         NLIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUV70tmaLxhuRYsjrUWHFzOIOl9NDsiRHJyXeHtg0zfgQG1Bd3UhiK1+C770pIUhjyKRFQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSx0e4+is5tvD0D4jh1GJx6zLPZJo/DCUTKSu2KuVu/5pWYU2N
+	Nf9I+EerX7MCmg2KMxFQH5Mrj5/Du5C+YBMAwv3yTWvIVZs0NvN6dLosOyfhwp6rge3UI2fm97b
+	0zFDDaZKmoPkKb7NsKlFynAhyUQSS04sE4YwmnJA8ZlGD1Ts76NR3FA==
+X-Gm-Gg: AY/fxX6RrbPWR8oHlZHbfgjfPitXPvipvKTvCy4oOqvbqqQlDDu158bSabcnos00pow
+	26xBXlfRRXpvi9Ts6j2lD9M81p5Km6rYNHONbqRgxihDhNjwaLrK886btY1xixe/G1ILrbsGImx
+	0GO8kw8RGqZQM0sEGD1ApI1iMHfMNm63NapznZiYOdAY2CM/OH7T5jKR3zSE4jFcwNNOqie4tix
+	6rVPQM14c1nGMKoZ3yuSkEmsn+bk5YR8UE3i+T4j/MLvacwEH2Oh1leYcsXRygJu77WhlCmlAub
+	OSNNV7VcnE4Ma+1USCrDxUVhrCOTMV7KeoBuU+USQQTBPscBV/5t9LgtMblnR07tf6d5Iw==
+X-Received: by 2002:a05:6000:22c4:b0:431:5ca:c1b0 with SMTP id ffacd0b85a97d-43105cac279mr6386397f8f.4.1765980990793;
+        Wed, 17 Dec 2025 06:16:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHj4yTZFGhFGg4sY1F3wyJEyzPlbljJv4mOI7hBcL/tv70HvAtVNpU0cfi6m1v8b2iyH3GSrw==
+X-Received: by 2002:a05:6000:22c4:b0:431:5ca:c1b0 with SMTP id ffacd0b85a97d-43105cac279mr6386355f8f.4.1765980990046;
+        Wed, 17 Dec 2025 06:16:30 -0800 (PST)
+Received: from imammedo ([213.175.37.14])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4310adb5f24sm4979348f8f.19.2025.12.17.06.16.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 06:07:49 -0800 (PST)
-Date: Wed, 17 Dec 2025 15:07:47 +0100
+        Wed, 17 Dec 2025 06:16:29 -0800 (PST)
+Date: Wed, 17 Dec 2025 15:16:27 +0100
 From: Igor Mammedov <imammedo@redhat.com>
 To: Zhao Liu <zhao1.liu@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
@@ -116,11 +116,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
  Cave-Ayland <mark.caveayland@nutanix.com>, BALATON Zoltan
  <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>, Jiri Denemark
  <jdenemar@redhat.com>
-Subject: Re: [PATCH v5 14/28] hw/i386/pc: Remove multiboot.bin
-Message-ID: <20251217150747.13d77fab@imammedo>
-In-Reply-To: <20251202162835.3227894-15-zhao1.liu@intel.com>
+Subject: Re: [PATCH v5 07/28] tests/acpi: Update DSDT tables for pc machine
+Message-ID: <20251217151627.3ee7bf07@imammedo>
+In-Reply-To: <20251202162835.3227894-8-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
-	<20251202162835.3227894-15-zhao1.liu@intel.com>
+	<20251202162835.3227894-8-zhao1.liu@intel.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -128,606 +128,1206 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed,  3 Dec 2025 00:28:21 +0800
+On Wed,  3 Dec 2025 00:28:14 +0800
 Zhao Liu <zhao1.liu@intel.com> wrote:
 
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
->=20
-> All PC machines now use the multiboot_dma.bin binary,
-> we can remove the non-DMA version (multiboot.bin).
->=20
-> This doesn't change multiboot_dma binary file.
->=20
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Now the legacy cpu hotplug way has gone away, and there's no _INIT
+> method in DSDT table for modern cpu hotplug support.
+> 
+> Update DSDT tables for pc machine.
+> 
+> The following diff changes show only _INIT methods are removed from DSDT
+> tables.
+> 
+
+below diff in commit message confuses git am,
+I'd suggests to point out only what's deleted  
+and skip the rest, aka.
+removed section in x86 DSDTs:
+  -
+  -            Method (_INI, 0, Serialized)  // _INI: Initialize
+  -            {
+  -                CSEL = Zero
+  -            }
+
+ditto for blurb in the next patch
+
+> * tests/data/acpi/x86/pc/DSDT:
+> 
+> --- /tmp/asl-6MNNG3.dsl	2025-11-27 11:35:53.011791359 +0800
+> +++ /tmp/asl-ENING3.dsl	2025-11-27 11:35:53.004791360 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT, Thu Nov 27 11:35:53 2025
+> + * Disassembly of /tmp/aml-RMING3, Thu Nov 27 11:35:53 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000021A3 (8611)
+> + *     Length           0x00002196 (8598)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0xF0
+> + *     Checksum         0xF7
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.acpierst:
+> 
+> --- /tmp/asl-0Q9CG3.dsl	2025-11-27 11:36:09.513790743 +0800
+> +++ /tmp/asl-0A3CG3.dsl	2025-11-27 11:36:09.505790743 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.acpierst, Thu Nov 27 11:36:09 2025
+> + * Disassembly of /tmp/aml-S72CG3, Thu Nov 27 11:36:09 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x0000214A (8522)
+> + *     Length           0x0000213D (8509)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x38
+> + *     Checksum         0x3F
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.acpihmat:
+> 
+> --- /tmp/asl-5ICTG3.dsl	2025-11-27 11:36:11.803790658 +0800
+> +++ /tmp/asl-5A4SG3.dsl	2025-11-27 11:36:11.795790658 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.acpihmat, Thu Nov 27 11:36:11 2025
+> + * Disassembly of /tmp/aml-273SG3, Thu Nov 27 11:36:11 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000026D0 (9936)
+> + *     Length           0x000026C3 (9923)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0xAD
+> + *     Checksum         0xB4
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+> 
+>                  If ((Arg0 == One))
+>                  {
+>                      Notify (C001, Arg1)
+> 
+> * tests/data/acpi/x86/pc/DSDT.bridge:
+> 
+> --- /tmp/asl-0OWEG3.dsl	2025-11-27 11:35:57.430791194 +0800
+> +++ /tmp/asl-H2CFG3.dsl	2025-11-27 11:35:57.415791195 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.bridge, Thu Nov 27 11:35:57 2025
+> + * Disassembly of /tmp/aml-P89EG3, Thu Nov 27 11:35:57 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x00003C7A (15482)
+> + *     Length           0x00003C6D (15469)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0xFE
+> + *     Checksum         0x05
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.cphp:
+> 
+> --- /tmp/asl-Z59FG3.dsl	2025-11-27 11:36:01.356791048 +0800
+> +++ /tmp/asl-UVSGG3.dsl	2025-11-27 11:36:01.348791048 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.cphp, Thu Nov 27 11:36:01 2025
+> + * Disassembly of /tmp/aml-JUSGG3, Thu Nov 27 11:36:01 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x00002373 (9075)
+> + *     Length           0x00002366 (9062)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x63
+> + *     Checksum         0x6A
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+> 
+>                  If ((Arg0 == One))
+>                  {
+>                      Notify (C001, Arg1)
+> 
+> * tests/data/acpi/x86/pc/DSDT.dimmpxm:
+> 
+> --- /tmp/asl-87HXG3.dsl	2025-11-27 11:36:10.604790702 +0800
+> +++ /tmp/asl-GXDXG3.dsl	2025-11-27 11:36:10.597790703 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.dimmpxm, Thu Nov 27 11:36:10 2025
+> + * Disassembly of /tmp/aml-8TDXG3, Thu Nov 27 11:36:10 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x00002819 (10265)
+> + *     Length           0x0000280C (10252)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x10
+> + *     Checksum         0x17
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      External (_SB_.NVDR, UnknownObj)
+> 
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+> @@ -1484,37 +1484,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+> 
+>                  If ((Arg0 == One))
+>                  {
+>                      Notify (C001, Arg1)
+> 
+> * tests/data/acpi/x86/pc/DSDT.hpbridge:
+> 
+> --- /tmp/asl-85THG3.dsl	2025-11-27 11:36:19.302790377 +0800
+> +++ /tmp/asl-JXOHG3.dsl	2025-11-27 11:36:19.292790378 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.hpbridge, Thu Nov 27 11:36:19 2025
+> + * Disassembly of /tmp/aml-7XOHG3, Thu Nov 27 11:36:19 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x00002172 (8562)
+> + *     Length           0x00002165 (8549)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x24
+> + *     Checksum         0x2B
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.hpbrroot:
+> 
+> --- /tmp/asl-9C0IG3.dsl	2025-11-27 11:36:17.217790455 +0800
+> +++ /tmp/asl-P7LJG3.dsl	2025-11-27 11:36:17.213790456 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.hpbrroot, Thu Nov 27 11:36:17 2025
+> + * Disassembly of /tmp/aml-97LJG3, Thu Nov 27 11:36:17 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000013EC (5100)
+> + *     Length           0x000013DF (5087)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x63
+> + *     Checksum         0x6A
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1389,37 +1389,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.ipmikcs:
+> 
+> --- /tmp/asl-W20MG3.dsl	2025-11-27 11:36:00.052791096 +0800
+> +++ /tmp/asl-STSMG3.dsl	2025-11-27 11:36:00.041791097 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.ipmikcs, Thu Nov 27 11:36:00 2025
+> + * Disassembly of /tmp/aml-C1SMG3, Thu Nov 27 11:36:00 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000021EB (8683)
+> + *     Length           0x000021DE (8670)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x6C
+> + *     Checksum         0x73
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.memhp:
+> 
+> --- /tmp/asl-X0EDG3.dsl	2025-11-27 11:36:09.487790744 +0800
+> +++ /tmp/asl-9EXDG3.dsl	2025-11-27 11:36:09.477790744 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.memhp, Thu Nov 27 11:36:09 2025
+> + * Disassembly of /tmp/aml-PCXDG3, Thu Nov 27 11:36:09 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000026F2 (9970)
+> + *     Length           0x000026E5 (9957)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0xC4
+> + *     Checksum         0xCB
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.nohpet:
+> 
+> --- /tmp/asl-AY9OG3.dsl	2025-11-27 11:36:07.974790801 +0800
+> +++ /tmp/asl-Q8PPG3.dsl	2025-11-27 11:36:07.964790801 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.nohpet, Thu Nov 27 11:36:07 2025
+> + * Disassembly of /tmp/aml-HLQPG3, Thu Nov 27 11:36:07 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x00002115 (8469)
+> + *     Length           0x00002108 (8456)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0xB9
+> + *     Checksum         0xC0
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1437,37 +1437,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.numamem:
+> 
+> --- /tmp/asl-GVAYG3.dsl	2025-11-27 11:36:02.576791002 +0800
+> +++ /tmp/asl-856XG3.dsl	2025-11-27 11:36:02.568791002 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.numamem, Thu Nov 27 11:36:02 2025
+> + * Disassembly of /tmp/aml-926XG3, Thu Nov 27 11:36:02 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x000021A9 (8617)
+> + *     Length           0x0000219C (8604)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x7C
+> + *     Checksum         0x83
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
+> * tests/data/acpi/x86/pc/DSDT.roothp:
+> 
+> --- /tmp/asl-VG4JG3.dsl	2025-11-27 11:36:18.176790420 +0800
+> +++ /tmp/asl-R0LKG3.dsl	2025-11-27 11:36:18.169790420 +0800
+> @@ -1,30 +1,30 @@
+>  /*
+>   * Intel ACPI Component Architecture
+>   * AML/ASL+ Disassembler version 20200925 (64-bit version)
+>   * Copyright (c) 2000 - 2020 Intel Corporation
+>   *
+>   * Disassembling to symbolic ASL+ operators
+>   *
+> - * Disassembly of tests/data/acpi/x86/pc/DSDT.roothp, Thu Nov 27 11:36:18 2025
+> + * Disassembly of /tmp/aml-NYLKG3, Thu Nov 27 11:36:18 2025
+>   *
+>   * Original Table Header:
+>   *     Signature        "DSDT"
+> - *     Length           0x00003074 (12404)
+> + *     Length           0x00003067 (12391)
+>   *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+> - *     Checksum         0x7C
+> + *     Checksum         0x83
+>   *     OEM ID           "BOCHS "
+>   *     OEM Table ID     "BXPC    "
+>   *     OEM Revision     0x00000001 (1)
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+>  DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPC    ", 0x00000001)
+>  {
+>      Scope (\)
+>      {
+>          OperationRegion (DBG, SystemIO, 0x0402, One)
+>          Field (DBG, ByteAcc, NoLock, Preserve)
+>          {
+>              DBGB,   8
+>          }
+> 
+> @@ -1478,37 +1478,32 @@
+>                  Offset (0x04),
+>                  CPEN,   1,
+>                  CINS,   1,
+>                  CRMV,   1,
+>                  CEJ0,   1,
+>                  CEJF,   1,
+>                  Offset (0x05),
+>                  CCMD,   8
+>              }
+> 
+>              Field (PRST, DWordAcc, NoLock, Preserve)
+>              {
+>                  CSEL,   32,
+>                  Offset (0x08),
+>                  CDAT,   32
+>              }
+> -
+> -            Method (_INI, 0, Serialized)  // _INI: Initialize
+> -            {
+> -                CSEL = Zero
+> -            }
+>          }
+> 
+>          Device (\_SB.CPUS)
+>          {
+>              Name (_HID, "ACPI0010" /* Processor Container Device */)  // _HID: Hardware ID
+>              Name (_CID, EisaId ("PNP0A05") /* Generic Container Device */)  // _CID: Compatible ID
+>              Method (CTFY, 2, NotSerialized)
+>              {
+>                  If ((Arg0 == Zero))
+>                  {
+>                      Notify (C000, Arg1)
+>                  }
+>              }
+> 
+>              Method (CSTA, 1, Serialized)
+>              {
+> 
 > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
 > ---
 > Changes since v4:
->  * There's a recent change for multiboot.S: commit 4c8f69b94839.
->    Rebase this patch on that.
+>  * New patch.
 > ---
->  hw/i386/pc.c                      |   1 -
->  pc-bios/meson.build               |   1 -
->  pc-bios/multiboot.bin             | Bin 1024 -> 0 bytes
->  pc-bios/optionrom/Makefile        |   2 +-
->  pc-bios/optionrom/multiboot.S     | 232 -----------------------------
->  pc-bios/optionrom/multiboot_dma.S | 234 +++++++++++++++++++++++++++++-
->  pc-bios/optionrom/optionrom.h     |   4 -
->  7 files changed, 233 insertions(+), 241 deletions(-)
->  delete mode 100644 pc-bios/multiboot.bin
->  delete mode 100644 pc-bios/optionrom/multiboot.S
->=20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2b8d3982c4a0..9d88d4a5207a 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -669,7 +669,6 @@ void xen_load_linux(PCMachineState *pcms)
->          assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
->                 !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
->                 !strcmp(option_rom[i].name, "pvh.bin") ||
-> -               !strcmp(option_rom[i].name, "multiboot.bin") ||
->                 !strcmp(option_rom[i].name, "multiboot_dma.bin"));
->          rom_add_option(option_rom[i].name, option_rom[i].bootindex);
->      }
-> diff --git a/pc-bios/meson.build b/pc-bios/meson.build
-> index 9260aaad78e8..efe45c16705d 100644
-> --- a/pc-bios/meson.build
-> +++ b/pc-bios/meson.build
-> @@ -62,7 +62,6 @@ blobs =3D [
->    'efi-e1000e.rom',
->    'efi-vmxnet3.rom',
->    'qemu-nsis.bmp',
-> -  'multiboot.bin',
->    'multiboot_dma.bin',
->    'linuxboot.bin',
->    'linuxboot_dma.bin',
-> diff --git a/pc-bios/multiboot.bin b/pc-bios/multiboot.bin
-> deleted file mode 100644
-> index e772713c95749bee82c20002b50ec6d05b2d4987..0000000000000000000000000=
-000000000000000
+>  tests/data/acpi/x86/pc/DSDT                 | Bin 8611 -> 8598 bytes
+>  tests/data/acpi/x86/pc/DSDT.acpierst        | Bin 8522 -> 8509 bytes
+>  tests/data/acpi/x86/pc/DSDT.acpihmat        | Bin 9936 -> 9923 bytes
+>  tests/data/acpi/x86/pc/DSDT.bridge          | Bin 15482 -> 15469 bytes
+>  tests/data/acpi/x86/pc/DSDT.cphp            | Bin 9075 -> 9062 bytes
+>  tests/data/acpi/x86/pc/DSDT.dimmpxm         | Bin 10265 -> 10252 bytes
+>  tests/data/acpi/x86/pc/DSDT.hpbridge        | Bin 8562 -> 8549 bytes
+>  tests/data/acpi/x86/pc/DSDT.hpbrroot        | Bin 5100 -> 5087 bytes
+>  tests/data/acpi/x86/pc/DSDT.ipmikcs         | Bin 8683 -> 8670 bytes
+>  tests/data/acpi/x86/pc/DSDT.memhp           | Bin 9970 -> 9957 bytes
+>  tests/data/acpi/x86/pc/DSDT.nohpet          | Bin 8469 -> 8456 bytes
+>  tests/data/acpi/x86/pc/DSDT.numamem         | Bin 8617 -> 8604 bytes
+>  tests/data/acpi/x86/pc/DSDT.roothp          | Bin 12404 -> 12391 bytes
+>  tests/qtest/bios-tables-test-allowed-diff.h |  13 -------------
+>  14 files changed, 13 deletions(-)
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT b/tests/data/acpi/x86/pc/DSDT
+> index 4beb5194b84a711fcb52e3e52cc2096497d18442..6ea2d36d138daffb59a8636759078500adc58f24 100644
 > GIT binary patch
-> literal 0
-> HcmV?d00001
->=20
-> literal 1024
-> zcmeHFF-Tic6utlZQ$OjD#Hxcx2u0GNQv6GySOkZR(ulaX<>%N!Y#>cWhY}nf36J7X
-> zN(%*X6NHY>xcqO11dG^02a8L@B~ihln|%1*|7(haWa`)l@80w7;U4Ziyv0rZ8{K-w =20
-> zX(Ib3tLZ)RgZ}w1ei{~QEqQq9q1J-iHc<Nk_t=3D0qf%XfPZVHw2DY#ujc2P|}*P%6X
-> z5J{pPlX4<yP&N5pXK;s@UhB~&!E&UdqEwGZF6xQMIcu9YL#zeSRCoLGt{Nh+08t>}
-> z{m%E-b32A??+@XljSYirtWObwngi<ymS1Ta*dFGMp;8@=3D_3Z52!v09{UU~`QnFsB_
-> z7BiEC)uZxH%SW9kPWCicN{_iUjmk<~D^H|R%@|m9%43Woc(Pkeq%n{&8ND5Z*tPt#
-> zJua+xXAQhN4K(1MMs0{u_6sp>l#NmvPZ7KC<lsLdQgMFC@A6POvMoDMgW=3DM+K;T<o
-> zTkpnNq6x*`vM0CGE>t40l-CQ}*)y<y--c)(x}o&1TMzwX+ToGS@VER4zR&s70fl+( =20
-> qI)9<-H_-!n#lLJmGq*^~<$US&%R-@)$`@YPx#A6#|L`9<;9UXPG71m?
->=20
-> diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
-> index 30d07026c790..1183ef889228 100644
-> --- a/pc-bios/optionrom/Makefile
-> +++ b/pc-bios/optionrom/Makefile
-> @@ -2,7 +2,7 @@ include config.mak
->  SRC_DIR :=3D $(TOPSRC_DIR)/pc-bios/optionrom
->  VPATH =3D $(SRC_DIR)
-> =20
-> -all: multiboot.bin multiboot_dma.bin linuxboot.bin linuxboot_dma.bin kvm=
-vapic.bin pvh.bin
-> +all: multiboot_dma.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.=
-bin
->  # Dummy command so that make thinks it has done something
->  	@true
-> =20
-> diff --git a/pc-bios/optionrom/multiboot.S b/pc-bios/optionrom/multiboot.S
-> deleted file mode 100644
-> index c95e35c9cb62..000000000000
-> --- a/pc-bios/optionrom/multiboot.S
-> +++ /dev/null
-> @@ -1,232 +0,0 @@
-> -/*
-> - * Multiboot Option ROM
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License as published by
-> - * the Free Software Foundation; either version 2 of the License, or
-> - * (at your option) any later version.
-> - *
-> - * This program is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-> - * GNU General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU General Public License
-> - * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> - *
-> - * Copyright Novell Inc, 2009
-> - *   Authors: Alexander Graf <agraf@suse.de>
-> - */
-> -
-> -#include "optionrom.h"
-> -
-> -#define BOOT_ROM_PRODUCT "multiboot loader"
-> -
-> -#define MULTIBOOT_MAGIC		0x2badb002
-> -
-> -#define GS_PROT_JUMP		0
-> -#define GS_GDT_DESC		6
-> -
-> -
-> -BOOT_ROM_START
-> -
-> -run_multiboot:
-> -
-> -	cli
-> -	cld
-> -
-> -	mov		%cs, %eax
-> -	shl		$0x4, %eax
-> -
-> -	/* set up a long jump descriptor that is PC relative */
-> -
-> -	/* move stack memory to %gs */
-> -	mov		%ss, %ecx
-> -	shl		$0x4, %ecx
-> -	mov		%esp, %ebx
-> -	add		%ebx, %ecx
-> -	sub		$0x20, %ecx
-> -	sub		$0x30, %esp
-> -	shr		$0x4, %ecx
-> -	mov		%cx, %gs
-> -
-> -	/* now push the indirect jump descriptor there */
-> -	mov		(prot_jump), %ebx
-> -	add		%eax, %ebx
-> -	movl		%ebx, %gs:GS_PROT_JUMP
-> -	mov		$8, %bx
-> -	movw		%bx, %gs:GS_PROT_JUMP + 4
-> -
-> -	/* fix the gdt descriptor to be PC relative */
-> -	movw		(gdt_desc), %bx
-> -	movw		%bx, %gs:GS_GDT_DESC
-> -	movl		(gdt_desc+2), %ebx
-> -	add		%eax, %ebx
-> -	movl		%ebx, %gs:GS_GDT_DESC + 2
-> -
-> -	xor		%eax, %eax
-> -	mov		%eax, %es
-> -
-> -	/* Read the bootinfo struct into RAM */
-> -	read_fw_blob_dma(FW_CFG_INITRD)
-> -
-> -	/* FS =3D bootinfo_struct */
-> -	read_fw		FW_CFG_INITRD_ADDR
-> -	shr		$4, %eax
-> -	mov		%ax, %fs
-> -
-> -	/* Account for the EBDA in the multiboot structure's e801
-> -	 * map.
-> -	 */
-> -	int		$0x12
-> -	cwtl
-> -	movl		%eax, %fs:4
-> -
-> -	/* ES =3D mmap_addr */
-> -	mov 		%fs:48, %eax
-> -	shr		$4, %eax
-> -	mov		%ax, %es
-> -
-> -	/* Initialize multiboot mmap structs using int 0x15(e820) */
-> -	xor		%ebx, %ebx
-> -	/* Start storing mmap data at %es:0 */
-> -	xor		%edi, %edi
-> -
-> -mmap_loop:
-> -	/* The multiboot entry size has offset -4, so leave some space */
-> -	add		$4, %di
-> -	/* entry size (mmap struct) & max buffer size (int15) */
-> -	movl		$20, %ecx
-> -	/* e820 */
-> -	movl		$0x0000e820, %eax
-> -	/* 'SMAP' magic */
-> -	movl		$0x534d4150, %edx
-> -	int		$0x15
-> -
-> -mmap_check_entry:
-> -	/* Error or last entry already done? */
-> -	jb		mmap_done
-> -
-> -mmap_store_entry:
-> -	/* store entry size */
-> -	/* old as(1) doesn't like this insn so emit the bytes instead:
-> -	movl		%ecx, %es:-4(%edi)
-> -	*/
-> -	.dc.b		0x26,0x67,0x66,0x89,0x4f,0xfc
-> -
-> -	/* %edi +=3D entry_size, store as mbs_mmap_length */
-> -	add		%ecx, %edi
-> -	movw		%di, %fs:0x2c
-> -
-> -	/* Continuation value 0 means last entry */
-> -	test		%ebx, %ebx
-> -	jnz		mmap_loop
-> -
-> -mmap_done:
-> -	/* Calculate upper_mem field: The amount of memory between 1 MB and
-> -	   the first upper memory hole. Get it from the mmap. */
-> -	xor		%di, %di
-> -	mov		$0x100000, %edx
-> -upper_mem_entry:
-> -	cmp		%fs:0x2c, %di
-> -	je		upper_mem_done
-> -	add		$4, %di
-> -
-> -	/* Skip if type !=3D 1 */
-> -	cmpl		$1, %es:16(%di)
-> -	jne		upper_mem_next
-> -
-> -	/* Skip if > 4 GB */
-> -	movl		%es:4(%di), %eax
-> -	test		%eax, %eax
-> -	jnz		upper_mem_next
-> -
-> -	/* Check for contiguous extension (base <=3D %edx < base + length) */
-> -	movl		%es:(%di), %eax
-> -	cmp		%eax, %edx
-> -	jb		upper_mem_next
-> -	addl		%es:8(%di), %eax
-> -	cmp		%eax, %edx
-> -	jae		upper_mem_next
-> -
-> -	/* If so, update %edx, and restart the search (mmap isn't ordered) */
-> -	mov		%eax, %edx
-> -	xor		%di, %di
-> -	jmp		upper_mem_entry
-> -
-> -upper_mem_next:
-> -	addl		%es:-4(%di), %edi
-> -	jmp		upper_mem_entry
-> -
-> -upper_mem_done:
-> -	sub		$0x100000, %edx
-> -	shr		$10, %edx
-> -	mov		%edx, %fs:0x8
-> -
-> -real_to_prot:
-> -	/* Load the GDT before going into protected mode */
-> -lgdt:
-> -	data32 lgdt	%gs:GS_GDT_DESC
-> -
-> -	/* get us to protected mode now */
-> -	movl		$1, %eax
-> -	movl		%eax, %cr0
-> -
-> -	/* the LJMP sets CS for us and gets us to 32-bit */
-> -ljmp:
-> -	data32 ljmp	*%gs:GS_PROT_JUMP
-> -
-> -prot_mode:
-> -.code32
-> -
-> -	/* initialize all other segments */
-> -	movl		$0x10, %eax
-> -	movl		%eax, %ss
-> -	movl		%eax, %ds
-> -	movl		%eax, %es
-> -	movl		%eax, %fs
-> -	movl		%eax, %gs
-> -
-> -	/* Read the kernel and modules into RAM */
-> -	read_fw_blob_dma(FW_CFG_KERNEL)
-> -
-> -	/* Jump off to the kernel */
-> -	read_fw		FW_CFG_KERNEL_ENTRY
-> -	mov		%eax, %ecx
-> -
-> -	/* EBX contains a pointer to the bootinfo struct */
-> -	read_fw		FW_CFG_INITRD_ADDR
-> -	movl		%eax, %ebx
-> -
-> -	/* EAX has to contain the magic */
-> -	movl		$MULTIBOOT_MAGIC, %eax
-> -ljmp2:
-> -	jmp		*%ecx
-> -
-> -/* Variables */
-> -.align 4, 0
-> -prot_jump:	.long prot_mode
-> -		.short 8
-> -
-> -.align 8, 0
-> -gdt:
-> -	/* 0x00 */
-> -.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-> -
-> -	/* 0x08: code segment (base=3D0, limit=3D0xfffff, type=3D32bit code exe=
-c/read, DPL=3D0, 4k) */
-> -.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00
-> -
-> -	/* 0x10: data segment (base=3D0, limit=3D0xfffff, type=3D32bit data rea=
-d/write, DPL=3D0, 4k) */
-> -.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00
-> -
-> -	/* 0x18: code segment (base=3D0, limit=3D0x0ffff, type=3D16bit code exe=
-c/read/conf, DPL=3D0, 1b) */
-> -.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9e, 0x00, 0x00
-> -
-> -	/* 0x20: data segment (base=3D0, limit=3D0x0ffff, type=3D16bit data rea=
-d/write, DPL=3D0, 1b) */
-> -.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0x00, 0x00
-> -
-> -gdt_desc:
-> -.short	(5 * 8) - 1
-> -.long	gdt
-> -
-> -BOOT_ROM_END
-> diff --git a/pc-bios/optionrom/multiboot_dma.S b/pc-bios/optionrom/multib=
-oot_dma.S
-> index d809af3e23fc..c95e35c9cb62 100644
-> --- a/pc-bios/optionrom/multiboot_dma.S
-> +++ b/pc-bios/optionrom/multiboot_dma.S
-> @@ -1,2 +1,232 @@
-> -#define USE_FW_CFG_DMA 1
-> -#include "multiboot.S"
-> +/*
-> + * Multiboot Option ROM
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + * Copyright Novell Inc, 2009
-> + *   Authors: Alexander Graf <agraf@suse.de>
-> + */
-> +
-> +#include "optionrom.h"
-> +
-> +#define BOOT_ROM_PRODUCT "multiboot loader"
-> +
-> +#define MULTIBOOT_MAGIC		0x2badb002
-> +
-> +#define GS_PROT_JUMP		0
-> +#define GS_GDT_DESC		6
-> +
-> +
-> +BOOT_ROM_START
-> +
-> +run_multiboot:
-> +
-> +	cli
-> +	cld
-> +
-> +	mov		%cs, %eax
-> +	shl		$0x4, %eax
-> +
-> +	/* set up a long jump descriptor that is PC relative */
-> +
-> +	/* move stack memory to %gs */
-> +	mov		%ss, %ecx
-> +	shl		$0x4, %ecx
-> +	mov		%esp, %ebx
-> +	add		%ebx, %ecx
-> +	sub		$0x20, %ecx
-> +	sub		$0x30, %esp
-> +	shr		$0x4, %ecx
-> +	mov		%cx, %gs
-> +
-> +	/* now push the indirect jump descriptor there */
-> +	mov		(prot_jump), %ebx
-> +	add		%eax, %ebx
-> +	movl		%ebx, %gs:GS_PROT_JUMP
-> +	mov		$8, %bx
-> +	movw		%bx, %gs:GS_PROT_JUMP + 4
-> +
-> +	/* fix the gdt descriptor to be PC relative */
-> +	movw		(gdt_desc), %bx
-> +	movw		%bx, %gs:GS_GDT_DESC
-> +	movl		(gdt_desc+2), %ebx
-> +	add		%eax, %ebx
-> +	movl		%ebx, %gs:GS_GDT_DESC + 2
-> +
-> +	xor		%eax, %eax
-> +	mov		%eax, %es
-> +
-> +	/* Read the bootinfo struct into RAM */
-> +	read_fw_blob_dma(FW_CFG_INITRD)
-> +
-> +	/* FS =3D bootinfo_struct */
-> +	read_fw		FW_CFG_INITRD_ADDR
-> +	shr		$4, %eax
-> +	mov		%ax, %fs
-> +
-> +	/* Account for the EBDA in the multiboot structure's e801
-> +	 * map.
-> +	 */
-> +	int		$0x12
-> +	cwtl
-> +	movl		%eax, %fs:4
-> +
-> +	/* ES =3D mmap_addr */
-> +	mov 		%fs:48, %eax
-> +	shr		$4, %eax
-> +	mov		%ax, %es
-> +
-> +	/* Initialize multiboot mmap structs using int 0x15(e820) */
-> +	xor		%ebx, %ebx
-> +	/* Start storing mmap data at %es:0 */
-> +	xor		%edi, %edi
-> +
-> +mmap_loop:
-> +	/* The multiboot entry size has offset -4, so leave some space */
-> +	add		$4, %di
-> +	/* entry size (mmap struct) & max buffer size (int15) */
-> +	movl		$20, %ecx
-> +	/* e820 */
-> +	movl		$0x0000e820, %eax
-> +	/* 'SMAP' magic */
-> +	movl		$0x534d4150, %edx
-> +	int		$0x15
-> +
-> +mmap_check_entry:
-> +	/* Error or last entry already done? */
-> +	jb		mmap_done
-> +
-> +mmap_store_entry:
-> +	/* store entry size */
-> +	/* old as(1) doesn't like this insn so emit the bytes instead:
-> +	movl		%ecx, %es:-4(%edi)
-> +	*/
-> +	.dc.b		0x26,0x67,0x66,0x89,0x4f,0xfc
-> +
-> +	/* %edi +=3D entry_size, store as mbs_mmap_length */
-> +	add		%ecx, %edi
-> +	movw		%di, %fs:0x2c
-> +
-> +	/* Continuation value 0 means last entry */
-> +	test		%ebx, %ebx
-> +	jnz		mmap_loop
-> +
-> +mmap_done:
-> +	/* Calculate upper_mem field: The amount of memory between 1 MB and
-> +	   the first upper memory hole. Get it from the mmap. */
-> +	xor		%di, %di
-> +	mov		$0x100000, %edx
-> +upper_mem_entry:
-> +	cmp		%fs:0x2c, %di
-> +	je		upper_mem_done
-> +	add		$4, %di
-> +
-> +	/* Skip if type !=3D 1 */
-> +	cmpl		$1, %es:16(%di)
-> +	jne		upper_mem_next
-> +
-> +	/* Skip if > 4 GB */
-> +	movl		%es:4(%di), %eax
-> +	test		%eax, %eax
-> +	jnz		upper_mem_next
-> +
-> +	/* Check for contiguous extension (base <=3D %edx < base + length) */
-> +	movl		%es:(%di), %eax
-> +	cmp		%eax, %edx
-> +	jb		upper_mem_next
-> +	addl		%es:8(%di), %eax
-> +	cmp		%eax, %edx
-> +	jae		upper_mem_next
-> +
-> +	/* If so, update %edx, and restart the search (mmap isn't ordered) */
-> +	mov		%eax, %edx
-> +	xor		%di, %di
-> +	jmp		upper_mem_entry
-> +
-> +upper_mem_next:
-> +	addl		%es:-4(%di), %edi
-> +	jmp		upper_mem_entry
-> +
-> +upper_mem_done:
-> +	sub		$0x100000, %edx
-> +	shr		$10, %edx
-> +	mov		%edx, %fs:0x8
-> +
-> +real_to_prot:
-> +	/* Load the GDT before going into protected mode */
-> +lgdt:
-> +	data32 lgdt	%gs:GS_GDT_DESC
-> +
-> +	/* get us to protected mode now */
-> +	movl		$1, %eax
-> +	movl		%eax, %cr0
-> +
-> +	/* the LJMP sets CS for us and gets us to 32-bit */
-> +ljmp:
-> +	data32 ljmp	*%gs:GS_PROT_JUMP
-> +
-> +prot_mode:
-> +.code32
-> +
-> +	/* initialize all other segments */
-> +	movl		$0x10, %eax
-> +	movl		%eax, %ss
-> +	movl		%eax, %ds
-> +	movl		%eax, %es
-> +	movl		%eax, %fs
-> +	movl		%eax, %gs
-> +
-> +	/* Read the kernel and modules into RAM */
-> +	read_fw_blob_dma(FW_CFG_KERNEL)
-> +
-> +	/* Jump off to the kernel */
-> +	read_fw		FW_CFG_KERNEL_ENTRY
-> +	mov		%eax, %ecx
-> +
-> +	/* EBX contains a pointer to the bootinfo struct */
-> +	read_fw		FW_CFG_INITRD_ADDR
-> +	movl		%eax, %ebx
-> +
-> +	/* EAX has to contain the magic */
-> +	movl		$MULTIBOOT_MAGIC, %eax
-> +ljmp2:
-> +	jmp		*%ecx
-> +
-> +/* Variables */
-> +.align 4, 0
-> +prot_jump:	.long prot_mode
-> +		.short 8
-> +
-> +.align 8, 0
-> +gdt:
-> +	/* 0x00 */
-> +.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-> +
-> +	/* 0x08: code segment (base=3D0, limit=3D0xfffff, type=3D32bit code exe=
-c/read, DPL=3D0, 4k) */
-> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9a, 0xcf, 0x00
-> +
-> +	/* 0x10: data segment (base=3D0, limit=3D0xfffff, type=3D32bit data rea=
-d/write, DPL=3D0, 4k) */
-> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0xcf, 0x00
-> +
-> +	/* 0x18: code segment (base=3D0, limit=3D0x0ffff, type=3D16bit code exe=
-c/read/conf, DPL=3D0, 1b) */
-> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x9e, 0x00, 0x00
-> +
-> +	/* 0x20: data segment (base=3D0, limit=3D0x0ffff, type=3D16bit data rea=
-d/write, DPL=3D0, 1b) */
-> +.byte	0xff, 0xff, 0x00, 0x00, 0x00, 0x92, 0x00, 0x00
-> +
-> +gdt_desc:
-> +.short	(5 * 8) - 1
-> +.long	gdt
-> +
-> +BOOT_ROM_END
-> diff --git a/pc-bios/optionrom/optionrom.h b/pc-bios/optionrom/optionrom.h
-> index 7bcdf0eeb240..2e6e2493f83f 100644
-> --- a/pc-bios/optionrom/optionrom.h
-> +++ b/pc-bios/optionrom/optionrom.h
-> @@ -117,16 +117,12 @@
->   *
->   * Clobbers: %eax, %edx, %es, %ecx, %edi and adresses %esp-20 to %esp
->   */
-> -#ifdef USE_FW_CFG_DMA
->  #define read_fw_blob_dma(var)                           \
->          read_fw         var ## _SIZE;                   \
->          mov             %eax, %ecx;                     \
->          read_fw         var ## _ADDR;                   \
->          mov             %eax, %edi ;                    \
->          read_fw_dma     var ## _DATA, %ecx, %edi
-> -#else
-> -#define read_fw_blob_dma(var) read_fw_blob(var)
-> -#endif
-> =20
->  #define read_fw_blob_pre(var)                           \
->          read_fw         var ## _SIZE;                   \
+> delta 39
+> vcmZ4NJk6QQCD<ionj!-O<M)kRr+K(so#KO?;-j0qIVa!enYp=@S55=~{=N*|
+> 
+> delta 53
+> zcmbQ{yx5t`CD<iou_6Nl<A;r0r+K)Xoa2L?;-i~9xF+A{naL}{6YuHg$x*=I9PH||
+> Jxq??t1OUPD58VI&
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.acpierst b/tests/data/acpi/x86/pc/DSDT.acpierst
+> index abda6863b64c5dc8ba5aba1a286cbfa76772a1e4..d8c173aa613f51b1c76ea7b9dee19e899cba240d 100644
+> GIT binary patch
+> delta 39
+> vcmX@*wAYEtCD<jzR*`{$(S9S>X&x?Dr}$u}_~<5Y&dK+AW^QifJt_<U?(Yn~
+> 
+> delta 53
+> zcmdn%bjpd#CD<jzOOb(r(PAUlX&x>o=lEc!_~<4NuF3a#X7Y;g#C!UAauhH)2fO-g
+> JuHZc?3;?HG5552Z
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.acpihmat b/tests/data/acpi/x86/pc/DSDT.acpihmat
+> index d081db26d7ba504b3344fad130d5812419291ac0..ba363d6af76af728b7c88bbaf47f7e0ea3dcb41f 100644
+> GIT binary patch
+> delta 39
+> vcmccMd)SxDCD<k8uo?pc<CcwFr+K(sJmQ0$;-j0qIVa!enYp=@*IN<*4-pM<
+> 
+> delta 53
+> zcmX@?d%>5>CD<k8f*Jz@<Jyf}r+K&>J>!F&;-i~9xF+A{naL}{6YuHg$x*=I9PH||  
+> Jxq{bQ5&+kc5ODwi
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.bridge b/tests/data/acpi/x86/pc/DSDT.bridge
+> index e16897dc5f0fbb3f7b4de8db913884046246cc3b..b68302363cb24181988d6e3dceb04a0946838d5e 100644
+> GIT binary patch
+> delta 39
+> vcmexW@wS4?CD<h-*M@<Ck#!^2X&x?Dr}$u}_~<5Y&dK+AW^Qif{i+855Lyl9
+> 
+> delta 53
+> zcmaD`@vDN%CD<jT%7%e~@!v+S(>z>G&hf!c@zG5lT$Atf%;Xi}iTCvL<S1Zp4tDj~
+> JT*3QQ4*>hl5#|5@  
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.cphp b/tests/data/acpi/x86/pc/DSDT.cphp
+> index e95711cd9cde5d50b841b701ae0fed5a4b15e872..20688edf2da41146ece4faa4141517408a42870c 100644
+> GIT binary patch
+> delta 39
+> vcmezD_RNjTCD<h-O__m#F>52&X&x@u`1oL__~<5Y&dK+AW^QifeJ2V42kQ;C
+> 
+> delta 53
+> zcmaFn_SucgCD<jTSeb!=F?l1`X&x@8g!o{m_~<4NuF3a#X7Y;g#C!UAauhH)2fO-g
+> JuHbzq3INN05VimS
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.dimmpxm b/tests/data/acpi/x86/pc/DSDT.dimmpxm
+> index 90ba66b9164f9a958d5a3c4371b1eec03e922828..8d4be05d2c71ca8de6d732d3e48e0e323143160c 100644
+> GIT binary patch
+> delta 39
+> vcmbOk&=bJr66_Mfqrt$yD87;FJ`a~)aD1>+d~}mH=j6{kGdIuVZIA*0-<AwM  
+> 
+> delta 53
+> zcmeAPm>Iz366_KpslmX&D6o<1J`b07NPMtUd~}ls*W}MUGkHaL;ywL5ISLq@gI#?#  
+> J_wY7I0RWRv4?X|@
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.hpbridge b/tests/data/acpi/x86/pc/DSDT.hpbridge
+> index 0eafe5fbf3d73719c9c3e6e26371863bfb44ed2f..2b5b885b862a2fe8bc4a24446400dccf685dab85 100644
+> GIT binary patch
+> delta 39
+> vcmez5^wf#VCD<h-Rgr;#QF|lTX&x?Dr}$u}_~<5Y&dK+AW^QifeJczA{o4&n
+> 
+> delta 53
+> zcmaFr^vQ|KCD<jTNRfeoQDr07X&x>o=lEc!_~<4NuF3a#X7Y;g#C!UAauhH)2fO-g
+> JuHbzu3;?^p5J~_5
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.hpbrroot b/tests/data/acpi/x86/pc/DSDT.hpbrroot
+> index 077a4cc988dc417a1bc9317dddd2dbd96ff1ff50..cc6f26a3f8fe85f34a8acb5432bab3cf4d3ab1f6 100644
+> GIT binary patch
+> delta 39
+> vcmaE(eqWu-CD<k8zAys=W7bBl9BwXGr}$u}_~<5Y&dCkjGdHX89AgIn`U?zT
+> 
+> delta 53
+> zcmcbw{zje4CD<k8jW7cPWAa9>9BwWr=lEc!_~<4NuE`DDGkHaL;ywL5ISLq@gI#?#
+> JOY$6J2LQ7!4`2WQ
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.ipmikcs b/tests/data/acpi/x86/pc/DSDT.ipmikcs
+> index 8d465f027772f9c59b0c328c1a099e374a6d2a90..052a84e294eee4ecef9a36341493f841caf887a5 100644
+> GIT binary patch
+> delta 39
+> vcmaFue9xK7CD<k8o+1MSWAR3=(>z?RPVvD`@zG7*oRjbK%-r0{n<fGP5J?Sr
+> 
+> delta 53
+> zcmccT{MwnzCD<k8wITxpW6nmd(>z>G&hf!c@zG5lT$Atf%;Xi}iTCvL<S1Zp4tDj~
+> JT)~?r0sz<r5P1Lq
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.memhp b/tests/data/acpi/x86/pc/DSDT.memhp
+> index e3b49757cb7abd7536ee89a6824967d2cb2485cf..7efc12a46cb87c0684b7d880b2cc94d302744e03 100644
+> GIT binary patch
+> delta 39
+> vcmez5`_z}qCD<k8sTu<V<LQlDr+K)%o#KO?;-j0qIVa!enYp=@H&+q>AHfb0
+> 
+> delta 53
+> zcmaFr`^lHfCD<k8lNtj9<B^SAr+K(Moa2L?;-i~9xF+A{naL}{6YuHg$x*=I9PH||
+> Jxq>%W5&-Wd5fK0Y  
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.nohpet b/tests/data/acpi/x86/pc/DSDT.nohpet
+> index 9e772c1316d0ea07c51717466c4c7e383553f345..7eedfcd64ebd0193744864b4f6cbead35c7c3ab2 100644
+> GIT binary patch
+> delta 39
+> vcmbR0)ZxVC66_Mfp~%3%cwi%!Ef1HgQ+%*fd~}mH=j1@1nVY}!$cX>|)oKe*  
+> 
+> delta 53
+> zcmeBhn(D;m66_Kps>r~=xN{?yEf1HIb9}H<d~}ls*W^H+nY<!A@t%I390d%{!LB}=  
+> JU-8I^004Ze4o?68
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.numamem b/tests/data/acpi/x86/pc/DSDT.numamem
+> index 9bfbfc28213713c208dfc38a85abb46fb190871d..910b4952a0757025cfed1c60416d16054e70846f 100644
+> GIT binary patch
+> delta 39
+> vcmZ4KJja>KCD<iojv@mCWAjF?(>z?>PVvD`@zG7*oRjbK%-r0{t0Dpb_GAo)  
+> 
+> delta 53
+> zcmbQ^ywaJ=CD<ior6L0ZW6egc(>z=r&hf!c@zG5lT$Atf%;Xi}iTCvL<S1Zp4tDj~
+> JT*0d%0syp+4~GB%
+> 
+> diff --git a/tests/data/acpi/x86/pc/DSDT.roothp b/tests/data/acpi/x86/pc/DSDT.roothp
+> index efbee6d8aa5c62ff4fcb83e6c5cff59542977850..45d3dbe1b69143a956b4f829913ca47f07134741 100644
+> GIT binary patch
+> delta 39
+> vcmey8@H~ObCD<h--GG6Cv3VocX&x?Dr}$u}_~<5Y&dK+AW^QifeXj%n5y%b%
+> 
+> delta 53
+> zcmaE!@FjuECD<jT#DIZ;v1TLJX&x>o=lEc!_~<4NuF3a#X7Y;g#C!UAauhH)2fO-g
+> JuHb#I1OV9F5d;7L
+> 
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+> index eed8ded69335..2ed74f72e7c9 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1,17 +1,4 @@
+>  /* List of comma-separated changed AML files to ignore */
+> -"tests/data/acpi/x86/pc/DSDT",
+> -"tests/data/acpi/x86/pc/DSDT.bridge",
+> -"tests/data/acpi/x86/pc/DSDT.ipmikcs",
+> -"tests/data/acpi/x86/pc/DSDT.cphp",
+> -"tests/data/acpi/x86/pc/DSDT.numamem",
+> -"tests/data/acpi/x86/pc/DSDT.nohpet",
+> -"tests/data/acpi/x86/pc/DSDT.memhp",
+> -"tests/data/acpi/x86/pc/DSDT.dimmpxm",
+> -"tests/data/acpi/x86/pc/DSDT.acpihmat",
+> -"tests/data/acpi/x86/pc/DSDT.acpierst",
+> -"tests/data/acpi/x86/pc/DSDT.roothp",
+> -"tests/data/acpi/x86/pc/DSDT.hpbridge",
+> -"tests/data/acpi/x86/pc/DSDT.hpbrroot",
+>  "tests/data/acpi/x86/q35/DSDT",
+>  "tests/data/acpi/x86/q35/DSDT.tis.tpm2",
+>  "tests/data/acpi/x86/q35/DSDT.tis.tpm12",
 
 
