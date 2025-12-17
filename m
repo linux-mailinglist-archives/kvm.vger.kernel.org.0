@@ -1,478 +1,426 @@
-Return-Path: <kvm+bounces-66169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66170-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5FBCC7E61
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 14:42:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58469CC81DF
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 15:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F29E43005501
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 13:42:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 408AE302BBBD
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 14:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F75B36C586;
-	Wed, 17 Dec 2025 13:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EDC343D75;
+	Wed, 17 Dec 2025 13:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpTGQEAs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDnNgoPB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BM0WeZ6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A31358D29
-	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 13:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289F632254E
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 13:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765978797; cv=none; b=bA37wBc17hL+lT//XmQo6MMncWVTKnWfupzBJW/1ply/XLcbgP5GbPVRxBKJ7JWtfBkKOz8d9GVbBk5LUuFLuHhcPIzHtQsuu2tQJ1kWtlx5kDR/NkFXENDj4U2R7+QmCLLnuyvQY/KHUT76Svjo0MWCsPehFn+Xp2s8RBDdiT0=
+	t=1765979843; cv=none; b=Q38BbMTzBcoz5wkjJaMpenBV9f7rAHcutS1TlIXqeTnyoynMqpzfr5L/gelp/9fn3u3ZVyIKAddkM/Pjb1utNv3hR1iMeX1gz7Hwb/c/YRz0aHqM/ijTQ8UdbJXPChgkITBCbC8B9UUHku4gc8XBo0tXvcbCexSz0U99OAxAg7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765978797; c=relaxed/simple;
-	bh=Y8HwpCJLp5JuXwZzLKV+3HBK3WSOBZDnT2hxF952di4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sRQM/AMkQLkR3Z+GF8GnrHFKOFHIQe92ZWnsKRbCM0EEWDZi1s6zKa84C67cV4OlQ8FVAxT6+3i9O9GRqlVvfYxBzYIUV4kWw1y57IBmvyGg9Dkqch8uQrjjt3ac1KWc25RgXeRLNTFCUjf8r+VAc2NTuTOnQtGlORvIts4U6C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cpTGQEAs; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-34aa62f9e74so7248748a91.1
-        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 05:39:54 -0800 (PST)
+	s=arc-20240116; t=1765979843; c=relaxed/simple;
+	bh=B0g/jCT8UxPv6CYDxKZGiJk8nzTgOMCmY/RznO8D7UU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YOj1sf6HuQ4yJz0pdic/ujoIBqsyXxyjgFqcPCGrTDdB+pALdt7o9ekPQ7ET9Iz4rFyQm0vGRsN62zvR9xbhs105n12lfOua+xOS5I8K8eEV3hCu7LoMNFcp3JxUGbMJSWKonPyb/Hv/u7qfiyKSsEZlEg1YFytnbuezTA0zz2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UDnNgoPB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BM0WeZ6R; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765979836;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3F0WNLaHFmVlf6aY2Jthg+sJHJ2H3h6kMJ0SNkDNwm0=;
+	b=UDnNgoPBmNB37p1gBebfjU8GTXbj22LHXYAU9tDS0pNkKg6u26Tk3Jfq9XhkmlLVsgRyTb
+	Ww4QNY0LYpGJZVyAD5yTlbiZ993kAhUOOta2g0jvYEx6Db+nvsmIxkdgAE+emURphKhsgC
+	X8dZZkT3GYBtq4d/79IXAJOspX0NBi8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-JXILemGtPz6Df2tXEtJRVg-1; Wed, 17 Dec 2025 08:57:14 -0500
+X-MC-Unique: JXILemGtPz6Df2tXEtJRVg-1
+X-Mimecast-MFC-AGG-ID: JXILemGtPz6Df2tXEtJRVg_1765979834
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-430fcfe4494so2302201f8f.2
+        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 05:57:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765978794; x=1766583594; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6pIj46nVvtUq+4eec5aThnrTEmEGNk5gVfAEDmgIrpg=;
-        b=cpTGQEAs+MbjtnSc1P7z9XQx590NDBC3jqO55epJUksXi7Lk3VvHMG65d9+7P5N8X8
-         cMhSjOqxgvFcYPSYe04Iix9FH2Rh0eD2mwd56ZY1UAqZA5o4TNYZIOoBJwizsmD8KtNQ
-         37deqL/gv1+nRuLSUlacjYmE3RtvdcqugtDcXWOCtn+yBtIbxJl2KzH1jrNZzPlsu4uF
-         i7fEDI1VBjaBghltESg0pjT9NkXPkppNjEXYu44KzENZUJEKUj3ZGNFJs3sa1DNLmwk3
-         qllVcBuVbUOjnNlYUDNLHNki3M09/98GQDLMZtG7tAypXS7eRp8LvIVAe299vMHkRgxe
-         EcQw==
+        d=redhat.com; s=google; t=1765979833; x=1766584633; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3F0WNLaHFmVlf6aY2Jthg+sJHJ2H3h6kMJ0SNkDNwm0=;
+        b=BM0WeZ6RW4mZL9C4LCFJfn83/ND8BIy/+fDfzk9zjYfQnU7q3PLWp7wZC8eaxSCpG2
+         9vsi35n94gHDWBeanClN+yc/BNafjixnY4uVL9U+rZQHbMqIDqlq+aiC/kG9MDboquEb
+         wuS+JJu1c2lOdjt9nA/UHVDXt0YGTjCUxcbAPxF2tjORwNckkQF2fUEneEhXYOkItB/v
+         gi0htktKsuWvUvzwy9OAEu4Bx23Rit50kAV5QdvaEkeqb8wDM0z/bHMIOAI1YNFrMTiQ
+         uyGyuyFqO5x+9fq27lwxIhPfJSnme0+LrGEtK/3fHuS9+owXeUxLtHYlezfPBv3ECsUW
+         wJhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765978794; x=1766583594;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6pIj46nVvtUq+4eec5aThnrTEmEGNk5gVfAEDmgIrpg=;
-        b=GLcXzonsp3MtzN3lHvh9bxtSvhFgA95iZ1OtO7TInwvVwOA9MhL8kpG0iw0P/pbao2
-         I2BwlVQCT8gBDFnp4JzFCFys7KcA2rCFVNojUZ2YlTUZsqy8zW6WAX/A+yo15Zv38W9O
-         PekHGHXpwD0oRKllTrmhIEO4vK51NTS37xMCiFDX9wTJVI+l5PfmEepHayjggKX04JEe
-         zJpzRm6LRbLNYMeu0rdW1b7mfKmErvMVHJmocyr1kSzsJAf0gI85HoJCV3gZmHtuBR1J
-         AE8zdy71uVaqT6XSt6QR4EABej0cH4OhaT1dBAT/jMo74pI8Ow8iH2WHfgClLs5UUXPd
-         Nvaw==
-X-Forwarded-Encrypted: i=1; AJvYcCX20k11YJaAFYTSe5I//tOUh1r/Wl6PC7AoRY1JNGwbrP+lxTFFSUFA4SiWM7gh1ceP6AE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUGmpe6QVsEXz3JrrfK9Zjfc9fJdCPHwGk6tkyNP9BhaYdT0nI
-	t+zp9bngw7u7tPVvmX5dlqwPGQteede2bCQEVAUEv61jdkm+fHkhL4zY
-X-Gm-Gg: AY/fxX4ay20uMQTcMKoVzKT9I+3Sgn5gNAo3Ru/+aaMqtF6G1lwTStcZ5KPGjBuPpPk
-	b8gCDO6RNvPk9/9mkDVvf7RoaBPk6XcHDK10m9/2gh0Mpztgulu1+t+Lbt9YR85aKsAM9KUNQQW
-	x88E99QPkMnSrQRqW7DGjlEWCfRXzmO3wsiR5Site/bYyg+/L4GTWEPalk0NMvTRENGjGII5zuc
-	pQFLS6W++8lcX7I/48hjVwOcRJf3RRKBK3vOSGORoiggl6WGPJI70Zwpj6JckntDtXJ2PEt7ph9
-	mRGD1U7mC5prusLWrS4yKKmgCl6705eHqFgfu0RY/9NkK96/tKmqU7MVVC+olHpi6stpsKLxMdw
-	EKoSe5b+qL8bg21WR+Mpfg1pnX1sD4/Z6y51rVMxmc+6mhZSOs5fGyCQTnuhCRFSNOEnS03jQjb
-	pjbxIeIeHRqRncVOQiiVFYkOqDmZJjVv99YDVu1Nu3fMrzW9cKcb60cFKfJ9vmv+BNFQr71o+ax
-	MD+V+EugME9sV+7JBHhG+7fQcg=
-X-Google-Smtp-Source: AGHT+IG3LzjynQX7X4H7S9Io3Ynamjd2a9PPbU+36SGNDnZcAgiWppcnGVLBSdjNiAVnsvjUFOBbeQ==
-X-Received: by 2002:a17:90b:2ccf:b0:340:cb18:922 with SMTP id 98e67ed59e1d1-34abd71f7e6mr16889624a91.14.1765978794294;
-        Wed, 17 Dec 2025 05:39:54 -0800 (PST)
-Received: from [172.27.236.53] (ec2-13-250-3-147.ap-southeast-1.compute.amazonaws.com. [13.250.3.147])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c0c25b7d59dsm18602604a12.6.2025.12.17.05.39.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Dec 2025 05:39:53 -0800 (PST)
-Message-ID: <87df4cba-b191-49cf-9486-fc379470a6eb@gmail.com>
-Date: Wed, 17 Dec 2025 21:39:45 +0800
+        d=1e100.net; s=20230601; t=1765979833; x=1766584633;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3F0WNLaHFmVlf6aY2Jthg+sJHJ2H3h6kMJ0SNkDNwm0=;
+        b=o2IoOrkC4pogB1sayHKs4gdtAvPL1xJzgDy00Dt5TRnaEtWx3P6GSwG+QM5Ef+zOTt
+         9KwA/X1Q0UUrmbSW+jkVHmLCtzkVSgR4j6Nkn5w8Z7ImObX0ZTm8mx4WO2HGm2eEbQOb
+         7JQjyH39LygmM9Sthv7BcRUgVZg/f5jKpxQSGUcHxmsub0iMQixEd14CiBbMZ1TxXZTZ
+         lII4wwHWs8Pg2urMWDldfyfZG1i7gT1/2it8zLE8ly08V1A2Ia+XfZVT7B4h48RvheeG
+         yZKTUKQDQ/xh7iEL7hegeDIqSBHRydHwhM11meyCmeu8NyLuctUzG0o/tyoRrTbb+loH
+         Zopg==
+X-Forwarded-Encrypted: i=1; AJvYcCWaGH/WVTrofOIqQGKZqTWoSBRBvhYaZfdIz7z8Q1esHbBmPB/1GmP67lEDy8fOEbzmi5g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeeO4Gf6tb2hnU7IlgvSEWGxDoilNeSIiOctCTR+w8LUj0Bk2L
+	Dtcsvh3nCEJTShl8iCY/aM8/TKSYy7t1ZO5qRgKORTxb/NXgxpbp2bS7lfLzP4wVWEO4ZGS6wIO
+	GL37R44vfHblady8GTJhXNGRmHAEK+o3XUqgoFhtjmh1XHT/6zZhxug==
+X-Gm-Gg: AY/fxX4WGJWqcqcKf7TMgoXRfeZJXt+YTrPwmTuMBAQEWTZNI3BVyCN5seSW22goapE
+	/WUIn/KB56diO3lsQ8waJgR8R2TLwQRQa1NW/Ut2D3m7tF22WS+J4T0jvKy2mgbcL3TAbznrbLm
+	SAk4rdyWEkElJxXeUkCD3MFwuQkx1poTmZE/W2lr08hhoweY6ZnFhPnhy/LtArHrUdB0XosCI8n
+	nRFlG4e1PCnOwqJhJfAEi4jXMcbIl7aag2k7cpJJ1boqPVq6kYrdBlg+OYjaihaUJjri/lJz+Ze
+	HUAGMlP0tMJA01ZMgzwqwD0hp2duCLDiyej31jPftNxyq2e6GRj/zyhDo0uQ0lH2ta00iw==
+X-Received: by 2002:adf:facf:0:b0:42f:b707:56ef with SMTP id ffacd0b85a97d-42fb7075b6cmr15802325f8f.39.1765979833332;
+        Wed, 17 Dec 2025 05:57:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRSB9EC73JDvLGo3x+MzaKK4LeTXIeDiVz9ApXbCYEhRDC0td/CszxCOm3C8378xhfhySZtA==
+X-Received: by 2002:adf:facf:0:b0:42f:b707:56ef with SMTP id ffacd0b85a97d-42fb7075b6cmr15802289f8f.39.1765979832753;
+        Wed, 17 Dec 2025 05:57:12 -0800 (PST)
+Received: from imammedo ([213.175.46.86])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4310ade8072sm5151757f8f.25.2025.12.17.05.57.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 05:57:12 -0800 (PST)
+Date: Wed, 17 Dec 2025 14:57:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?=
+ <philmd@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas
+ Huth <thuth@redhat.com>, qemu-devel@nongnu.org, devel@lists.libvirt.org,
+ kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org, Richard
+ Henderson <richard.henderson@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Jiaxun
+ Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>, Eduardo
+ Habkost <eduardo@habkost.net>, Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, Weiwei Li <liwei1518@gmail.com>, Amit Shah
+ <amit@kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, Yanan Wang
+ <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>, Palmer Dabbelt
+ <palmer@dabbelt.com>, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?="
+ <berrange@redhat.com>, Ani Sinha <anisinha@redhat.com>, Fabiano Rosas
+ <farosas@suse.de>, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?B?Q2zDqW1lbnQ=?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Huacai
+ Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>, Mark
+ Cave-Ayland <mark.caveayland@nutanix.com>, BALATON Zoltan
+ <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>, Jiri Denemark
+ <jdenemar@redhat.com>
+Subject: Re: [PATCH v5 04/28] hw/i386/pc: Remove
+ PCMachineClass::legacy_cpu_hotplug field
+Message-ID: <20251217145709.21b9e2d6@imammedo>
+In-Reply-To: <20251202162835.3227894-5-zhao1.liu@intel.com>
+References: <20251202162835.3227894-1-zhao1.liu@intel.com>
+	<20251202162835.3227894-5-zhao1.liu@intel.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF
- events
-To: Tian Zheng <zhengtian10@huawei.com>, maz@kernel.org,
- oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net,
- pbonzini@redhat.com, will@kernel.org
-Cc: linux-kernel@vger.kernel.org, yuzenghui@huawei.com,
- wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com,
- zhengchuan@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- suzuki.poulose@arm.com
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
- <20251121092342.3393318-5-zhengtian10@huawei.com>
-Content-Language: en-US
-From: Robert Hoo <robert.hoo.linux@gmail.com>
-In-Reply-To: <20251121092342.3393318-5-zhengtian10@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 11/21/2025 5:23 PM, Tian Zheng wrote:
-> From: eillon <yezhenyu2@huawei.com>
-> 
-> Implement the HDBSS enable/disable functionality using the
-> KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl.
-> 
-> Userspace (e.g., QEMU) can enable HDBSS by invoking the ioctl
-> at the start of live migration, configuring the buffer size.
-> The feature is disabled by invoking the ioctl again with size
-> set to 0 once migration completes.
-> 
-> Add support for updating the dirty bitmap based on the HDBSS
-> buffer. Similar to the x86 PML implementation, KVM flushes the
-> buffer on all VM-Exits, so running vCPUs only need to be kicked
-> to force a VM-Exit.
-> 
-> Signed-off-by: eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+On Wed,  3 Dec 2025 00:28:11 +0800
+Zhao Liu <zhao1.liu@intel.com> wrote:
+
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+>=20
+> Now all PC & Q35 machiens are using modern hotplug from the beginning,
+> and all legacy_cpu_hotplug flags keep false during runtime.
+>=20
+> So it's safe to remove legacy_cpu_hotplug flags and related properties,
+> with unused gpe_cpu field.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->   arch/arm64/include/asm/kvm_host.h |  10 +++
->   arch/arm64/include/asm/kvm_mmu.h  |  17 +++++
->   arch/arm64/kvm/arm.c              | 107 ++++++++++++++++++++++++++++++
->   arch/arm64/kvm/handle_exit.c      |  45 +++++++++++++
->   arch/arm64/kvm/hyp/vhe/switch.c   |   1 +
->   arch/arm64/kvm/mmu.c              |  10 +++
->   arch/arm64/kvm/reset.c            |   3 +
->   include/linux/kvm_host.h          |   1 +
->   8 files changed, 194 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index d962932f0e5f..408e4c2b3d1a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -87,6 +87,7 @@ int __init kvm_arm_init_sve(void);
->   u32 __attribute_const__ kvm_target_cpu(void);
->   void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
->   void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
-> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
-> 
->   struct kvm_hyp_memcache {
->   	phys_addr_t head;
-> @@ -793,6 +794,12 @@ struct vcpu_reset_state {
->   	bool		reset;
->   };
-> 
-> +struct vcpu_hdbss_state {
-> +	phys_addr_t base_phys;
-> +	u32 size;
-> +	u32 next_index;
-> +};
-> +
->   struct vncr_tlb;
-> 
->   struct kvm_vcpu_arch {
-> @@ -897,6 +904,9 @@ struct kvm_vcpu_arch {
-> 
->   	/* Per-vcpu TLB for VNCR_EL2 -- NULL when !NV */
->   	struct vncr_tlb	*vncr_tlb;
-> +
-> +	/* HDBSS registers info */
-> +	struct vcpu_hdbss_state hdbss;
->   };
-> 
->   /*
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index e4069f2ce642..6ace1080aed5 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -331,6 +331,23 @@ static __always_inline void __load_stage2(struct kvm_s2_mmu *mmu,
->   	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
->   }
-> 
-> +static __always_inline void __load_hdbss(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	u64 br_el2, prod_el2;
-> +
-> +	if (!kvm->enable_hdbss)
-> +		return;
-> +
-> +	br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu->arch.hdbss.size);
-> +	prod_el2 = vcpu->arch.hdbss.next_index;
-> +
-> +	write_sysreg_s(br_el2, SYS_HDBSSBR_EL2);
-> +	write_sysreg_s(prod_el2, SYS_HDBSSPROD_EL2);
-> +
-> +	isb();
-> +}
-> +
->   static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
->   {
->   	return container_of(mmu->arch, struct kvm, arch);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 870953b4a8a7..64f65e3c2a89 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -79,6 +79,92 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
->   	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
->   }
-> 
-> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
-> +{
-> +	struct page *hdbss_pg = NULL;
-> +
-> +	hdbss_pg = phys_to_page(vcpu->arch.hdbss.base_phys);
-> +	if (hdbss_pg)
-> +		__free_pages(hdbss_pg, vcpu->arch.hdbss.size);
-> +
-> +	vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
-> +		.base_phys = 0,
-> +		.size = 0,
-> +		.next_index = 0,
-> +	};
-> +}
-> +
-> +static int kvm_cap_arm_enable_hdbss(struct kvm *kvm,
-> +				    struct kvm_enable_cap *cap)
-> +{
-> +	unsigned long i;
-> +	struct kvm_vcpu *vcpu;
-> +	struct page *hdbss_pg = NULL;
-> +	int size = cap->args[0];
-> +	int ret = 0;
-> +
-> +	if (!system_supports_hdbss()) {
-> +		kvm_err("This system does not support HDBSS!\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (size < 0 || size > HDBSS_MAX_SIZE) {
-> +		kvm_err("Invalid HDBSS buffer size: %d!\n", size);
-> +		return -EINVAL;
-> +	}
-> +
-
-I think you should check if it's already enabled here. What if user space calls 
-this twice?
-
-> +	/* Enable the HDBSS feature if size > 0, otherwise disable it. */
-> +	if (size) {
-> +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> +			hdbss_pg = alloc_pages(GFP_KERNEL_ACCOUNT, size);
-> +			if (!hdbss_pg) {
-> +				kvm_err("Alloc HDBSS buffer failed!\n");
-> +				ret = -ENOMEM;
-> +				goto error_alloc;
-> +			}
-> +
-> +			vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
-> +				.base_phys = page_to_phys(hdbss_pg),
-> +				.size = size,
-> +				.next_index = 0,
-> +			};
-> +		}
-> +
-> +		kvm->enable_hdbss = true;
-> +		kvm->arch.mmu.vtcr |= VTCR_EL2_HD | VTCR_EL2_HDBSS;
-
-VTCR_EL2_HA is also a necessity for VTCR_EL2_HDBSS to take effect.
-
-> +
-> +		/*
-> +		 * We should kick vcpus out of guest mode here to load new
-> +		 * vtcr value to vtcr_el2 register when re-enter guest mode.
-> +		 */
-> +		kvm_for_each_vcpu(i, vcpu, kvm)
-> +			kvm_vcpu_kick(vcpu);
-> +	} else if (kvm->enable_hdbss) {
-> +		kvm->arch.mmu.vtcr &= ~(VTCR_EL2_HD | VTCR_EL2_HDBSS);
-> +
-> +		kvm_for_each_vcpu(i, vcpu, kvm) {
-> +			/* Kick vcpus to flush hdbss buffer. */
-> +			kvm_vcpu_kick(vcpu);
-> +
-> +			kvm_arm_vcpu_free_hdbss(vcpu);
-> +		}
-> +
-> +		kvm->enable_hdbss = false;
-> +	}
-> +
-> +	return ret;
-> +
-> +error_alloc:
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		if (!vcpu->arch.hdbss.base_phys && !vcpu->arch.hdbss.size)
-> +			continue;
-> +
-> +		kvm_arm_vcpu_free_hdbss(vcpu);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->   int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   			    struct kvm_enable_cap *cap)
->   {
-> @@ -132,6 +218,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		}
->   		mutex_unlock(&kvm->lock);
->   		break;
-> +	case KVM_CAP_ARM_HW_DIRTY_STATE_TRACK:
-> +		mutex_lock(&kvm->lock);
-> +		r = kvm_cap_arm_enable_hdbss(kvm, cap);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
->   	default:
->   		break;
->   	}
-> @@ -420,6 +511,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   			r = kvm_supports_cacheable_pfnmap();
->   		break;
-> 
-> +	case KVM_CAP_ARM_HW_DIRTY_STATE_TRACK:
-> +		r = system_supports_hdbss();
-> +		break;
->   	default:
->   		r = 0;
->   	}
-> @@ -1837,7 +1931,20 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
-> 
->   void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
->   {
-> +	/*
-> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
-> +	 * before reporting dirty_bitmap to userspace.  KVM flushes the buffers
-> +	 * on all VM-Exits, thus we only need to kick running vCPUs to force a
-> +	 * VM-Exit.
-> +	 */
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
-> 
-> +	if (!kvm->enable_hdbss)
-> +		return;
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		kvm_vcpu_kick(vcpu);
->   }
-> 
->   static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index cc7d5d1709cb..9ba0ea6305ef 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -412,6 +412,49 @@ static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
->   	return arm_exit_handlers[esr_ec];
->   }
-> 
-> +static void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
-> +{
-> +	int idx, curr_idx;
-> +	u64 *hdbss_buf;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	u64 br_el2;
-> +
-> +	if (!kvm->enable_hdbss)
-> +		return;
-> +
-> +	dsb(sy);
-> +	isb();
-> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
-> +	br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu->arch.hdbss.size);
-> +
-> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
-> +	if (curr_idx == 0 || br_el2 == 0)
-> +		return;
-> +
-> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
-> +	if (!hdbss_buf) {
-> +		kvm_err("Enter flush hdbss buffer with buffer == NULL!");
-> +		return;
-> +	}
-> +
-> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
-> +	for (idx = 0; idx < curr_idx; idx++) {
-> +		u64 gpa;
-> +
-> +		gpa = hdbss_buf[idx];
-> +		if (!(gpa & HDBSS_ENTRY_VALID))
-> +			continue;
-> +
-> +		gpa &= HDBSS_ENTRY_IPA;
-> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
-> +	}
-> +
-> +	/* reset HDBSS index */
-> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
-> +	vcpu->arch.hdbss.next_index = 0;
-> +	isb();
-> +}
-> +
->   /*
->    * We may be single-stepping an emulated instruction. If the emulation
->    * has been completed in the kernel, we can return to userspace with a
-> @@ -447,6 +490,8 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
->   {
->   	struct kvm_run *run = vcpu->run;
-> 
-> +	kvm_flush_hdbss_buffer(vcpu);
-> +
->   	if (ARM_SERROR_PENDING(exception_index)) {
->   		/*
->   		 * The SError is handled by handle_exit_early(). If the guest
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 9984c492305a..3787c9c5810d 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -220,6 +220,7 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
->   	__vcpu_load_switch_sysregs(vcpu);
->   	__vcpu_load_activate_traps(vcpu);
->   	__load_stage2(vcpu->arch.hw_mmu, vcpu->arch.hw_mmu->arch);
-> +	__load_hdbss(vcpu);
->   }
-> 
->   void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7cc964af8d30..91a2f9dbb406 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1843,6 +1843,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	if (writable)
->   		prot |= KVM_PGTABLE_PROT_W;
-> 
-> +	if (writable && kvm->enable_hdbss && logging_active)
-> +		prot |= KVM_PGTABLE_PROT_DBM;
-> +
->   	if (exec_fault)
->   		prot |= KVM_PGTABLE_PROT_X;
-> 
-> @@ -1950,6 +1953,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> 
->   	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> 
-> +	/*
-> +	 * HDBSS buffer already flushed when enter handle_trap_exceptions().
-> +	 * Nothing to do here.
-> +	 */
-> +	if (ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF)
-> +		return 1;
-> +
->   	if (esr_fsc_is_translation_fault(esr)) {
->   		/* Beyond sanitised PARange (which is the IPA limit) */
->   		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 959532422d3a..65e8f890f863 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -161,6 +161,9 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->   	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
->   	kfree(vcpu->arch.vncr_tlb);
->   	kfree(vcpu->arch.ccsidr);
-> +
-> +	if (vcpu->arch.hdbss.base_phys || vcpu->arch.hdbss.size)
-> +		kvm_arm_vcpu_free_hdbss(vcpu);
->   }
-> 
->   static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 5bd76cf394fa..aa8138604b1e 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -876,6 +876,7 @@ struct kvm {
->   	struct xarray mem_attr_array;
->   #endif
->   	char stats_id[KVM_STATS_NAME_SIZE];
-> +	bool enable_hdbss;
->   };
-> 
->   #define kvm_err(fmt, ...) \
-> --
-> 2.33.0
-> 
-> 
+> Changes since v4:
+>  * Referring Igor's v5 [*], drop gpe_cpu field and does not only remove
+>    build_legacy_cpu_hotplug_aml(), but instead remove the entire
+>    cpu_hotplug.c file in a separate patch.
+>=20
+> [*]: https://lore.kernel.org/qemu-devel/20251031142825.179239-1-imammedo@=
+redhat.com/
+> ---
+>  hw/acpi/ich9.c          | 40 ++++------------------------------------
+>  hw/acpi/piix4.c         | 40 ++++------------------------------------
+>  hw/i386/acpi-build.c    |  4 +---
+>  include/hw/acpi/ich9.h  |  2 --
+>  include/hw/acpi/piix4.h |  2 --
+>  include/hw/i386/pc.h    |  3 ---
+>  6 files changed, 9 insertions(+), 82 deletions(-)
+>=20
+> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+> index 54590129c695..f254f3879716 100644
+> --- a/hw/acpi/ich9.c
+> +++ b/hw/acpi/ich9.c
+> @@ -339,26 +339,6 @@ static void ich9_pm_get_gpe0_blk(Object *obj, Visito=
+r *v, const char *name,
+>      visit_type_uint32(v, name, &value, errp);
+>  }
+> =20
+> -static bool ich9_pm_get_cpu_hotplug_legacy(Object *obj, Error **errp)
+> -{
+> -    ICH9LPCState *s =3D ICH9_LPC_DEVICE(obj);
+> -
+> -    return s->pm.cpu_hotplug_legacy;
+> -}
+> -
+> -static void ich9_pm_set_cpu_hotplug_legacy(Object *obj, bool value,
+> -                                           Error **errp)
+> -{
+> -    ICH9LPCState *s =3D ICH9_LPC_DEVICE(obj);
+> -
+> -    assert(!value);
+> -    if (s->pm.cpu_hotplug_legacy && value =3D=3D false) {
+> -        acpi_switch_to_modern_cphp(&s->pm.gpe_cpu, &s->pm.cpuhp_state,
+> -                                   ICH9_CPU_HOTPLUG_IO_BASE);
+> -    }
+> -    s->pm.cpu_hotplug_legacy =3D value;
+> -}
+> -
+>  static bool ich9_pm_get_enable_tco(Object *obj, Error **errp)
+>  {
+>      ICH9LPCState *s =3D ICH9_LPC_DEVICE(obj);
+> @@ -403,7 +383,6 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMReg=
+s *pm)
+>  {
+>      static const uint32_t gpe0_len =3D ICH9_PMIO_GPE0_LEN;
+>      pm->acpi_memory_hotplug.is_enabled =3D true;
+> -    pm->cpu_hotplug_legacy =3D false;
+>      pm->disable_s3 =3D 0;
+>      pm->disable_s4 =3D 0;
+>      pm->s4_val =3D 2;
+> @@ -422,9 +401,6 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMReg=
+s *pm)
+>                          NULL, NULL, pm);
+>      object_property_add_uint32_ptr(obj, ACPI_PM_PROP_GPE0_BLK_LEN,
+>                                     &gpe0_len, OBJ_PROP_FLAG_READ);
+> -    object_property_add_bool(obj, "cpu-hotplug-legacy",
+> -                             ich9_pm_get_cpu_hotplug_legacy,
+> -                             ich9_pm_set_cpu_hotplug_legacy);
+>      object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S3_DISABLED,
+>                                    &pm->disable_s3, OBJ_PROP_FLAG_READWRI=
+TE);
+>      object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S4_DISABLED,
+> @@ -477,11 +453,7 @@ void ich9_pm_device_plug_cb(HotplugHandler *hotplug_=
+dev, DeviceState *dev,
+>                                  dev, errp);
+>          }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> -        if (lpc->pm.cpu_hotplug_legacy) {
+> -            legacy_acpi_cpu_plug_cb(hotplug_dev, &lpc->pm.gpe_cpu, dev, =
+errp);
+> -        } else {
+> -            acpi_cpu_plug_cb(hotplug_dev, &lpc->pm.cpuhp_state, dev, err=
+p);
+> -        }
+> +        acpi_cpu_plug_cb(hotplug_dev, &lpc->pm.cpuhp_state, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>          acpi_pcihp_device_plug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotplug,
+>                                    dev, errp);
+> @@ -500,8 +472,7 @@ void ich9_pm_device_unplug_request_cb(HotplugHandler =
+*hotplug_dev,
+>          acpi_memory_unplug_request_cb(hotplug_dev,
+>                                        &lpc->pm.acpi_memory_hotplug, dev,
+>                                        errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+> -               !lpc->pm.cpu_hotplug_legacy) {
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          uint64_t negotiated =3D lpc->smi_negotiated_features;
+> =20
+>          if (negotiated & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT) &&
+> @@ -533,8 +504,7 @@ void ich9_pm_device_unplug_cb(HotplugHandler *hotplug=
+_dev, DeviceState *dev,
+> =20
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          acpi_memory_unplug_cb(&lpc->pm.acpi_memory_hotplug, dev, errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+> -               !lpc->pm.cpu_hotplug_legacy) {
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          acpi_cpu_unplug_cb(&lpc->pm.cpuhp_state, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>          acpi_pcihp_device_unplug_cb(hotplug_dev, &lpc->pm.acpi_pci_hotpl=
+ug,
+> @@ -556,7 +526,5 @@ void ich9_pm_ospm_status(AcpiDeviceIf *adev, ACPIOSTI=
+nfoList ***list)
+>      ICH9LPCState *s =3D ICH9_LPC_DEVICE(adev);
+> =20
+>      acpi_memory_ospm_status(&s->pm.acpi_memory_hotplug, list);
+> -    if (!s->pm.cpu_hotplug_legacy) {
+> -        acpi_cpu_ospm_status(&s->pm.cpuhp_state, list);
+> -    }
+> +    acpi_cpu_ospm_status(&s->pm.cpuhp_state, list);
+>  }
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index a7a29b0d09a9..6ad5f1d1c19d 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -336,11 +336,7 @@ static void piix4_device_plug_cb(HotplugHandler *hot=
+plug_dev,
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>          acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev=
+, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> -        if (s->cpu_hotplug_legacy) {
+> -            legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
+> -        } else {
+> -            acpi_cpu_plug_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+> -        }
+> +        acpi_cpu_plug_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
+>      } else {
+>          g_assert_not_reached();
+>      }
+> @@ -358,8 +354,7 @@ static void piix4_device_unplug_request_cb(HotplugHan=
+dler *hotplug_dev,
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>          acpi_pcihp_device_unplug_request_cb(hotplug_dev, &s->acpi_pci_ho=
+tplug,
+>                                              dev, errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+> -               !s->cpu_hotplug_legacy) {
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, er=
+rp);
+>      } else {
+>          error_setg(errp, "acpi: device unplug request for not supported =
+device"
+> @@ -378,8 +373,7 @@ static void piix4_device_unplug_cb(HotplugHandler *ho=
+tplug_dev,
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
+>          acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, d=
+ev,
+>                                      errp);
+> -    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
+> -               !s->cpu_hotplug_legacy) {
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          acpi_cpu_unplug_cb(&s->cpuhp_state, dev, errp);
+>      } else {
+>          error_setg(errp, "acpi: device unplug for not supported device"
+> @@ -523,26 +517,6 @@ static const MemoryRegionOps piix4_gpe_ops =3D {
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>  };
+> =20
+> -
+> -static bool piix4_get_cpu_hotplug_legacy(Object *obj, Error **errp)
+> -{
+> -    PIIX4PMState *s =3D PIIX4_PM(obj);
+> -
+> -    return s->cpu_hotplug_legacy;
+> -}
+> -
+> -static void piix4_set_cpu_hotplug_legacy(Object *obj, bool value, Error =
+**errp)
+> -{
+> -    PIIX4PMState *s =3D PIIX4_PM(obj);
+> -
+> -    assert(!value);
+> -    if (s->cpu_hotplug_legacy && value =3D=3D false) {
+> -        acpi_switch_to_modern_cphp(&s->gpe_cpu, &s->cpuhp_state,
+> -                                   PIIX4_CPU_HOTPLUG_IO_BASE);
+> -    }
+> -    s->cpu_hotplug_legacy =3D value;
+> -}
+> -
+>  static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+>                                             PCIBus *bus, PIIX4PMState *s)
+>  {
+> @@ -558,10 +532,6 @@ static void piix4_acpi_system_hot_add_init(MemoryReg=
+ion *parent,
+>          qbus_set_hotplug_handler(BUS(pci_get_bus(PCI_DEVICE(s))), OBJECT=
+(s));
+>      }
+> =20
+> -    s->cpu_hotplug_legacy =3D false;
+> -    object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> -                             piix4_get_cpu_hotplug_legacy,
+> -                             piix4_set_cpu_hotplug_legacy);
+>      cpu_hotplug_hw_init(parent, OBJECT(s), &s->cpuhp_state,
+>                          PIIX4_CPU_HOTPLUG_IO_BASE);
+> =20
+> @@ -576,9 +546,7 @@ static void piix4_ospm_status(AcpiDeviceIf *adev, ACP=
+IOSTInfoList ***list)
+>      PIIX4PMState *s =3D PIIX4_PM(adev);
+> =20
+>      acpi_memory_ospm_status(&s->acpi_memory_hotplug, list);
+> -    if (!s->cpu_hotplug_legacy) {
+> -        acpi_cpu_ospm_status(&s->cpuhp_state, list);
+> -    }
+> +    acpi_cpu_ospm_status(&s->cpuhp_state, list);
+>  }
+> =20
+>  static void piix4_send_gpe(AcpiDeviceIf *adev, AcpiEventStatusBits ev)
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 23147ddc25e7..bf7ed2e50837 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -960,9 +960,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      }
+>      aml_append(dsdt, scope);
+> =20
+> -    if (pcmc->legacy_cpu_hotplug) {
+> -        build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+> -    } else {
+> +    {
+>          CPUHotplugFeatures opts =3D {
+>              .acpi_1_compatible =3D true,
+>              .smi_path =3D pm->smi_on_cpuhp ? "\\_SB.PCI0.SMI0.SMIC" : NU=
+LL,
+> diff --git a/include/hw/acpi/ich9.h b/include/hw/acpi/ich9.h
+> index 245fe08dc245..6a21472eb32e 100644
+> --- a/include/hw/acpi/ich9.h
+> +++ b/include/hw/acpi/ich9.h
+> @@ -53,8 +53,6 @@ typedef struct ICH9LPCPMRegs {
+>      uint32_t pm_io_base;
+>      Notifier powerdown_notifier;
+> =20
+> -    bool cpu_hotplug_legacy;
+> -    AcpiCpuHotplug gpe_cpu;
+>      CPUHotplugState cpuhp_state;
+> =20
+>      bool keep_pci_slot_hpc;
+> diff --git a/include/hw/acpi/piix4.h b/include/hw/acpi/piix4.h
+> index eb1c122d8069..e075f0cbeaf1 100644
+> --- a/include/hw/acpi/piix4.h
+> +++ b/include/hw/acpi/piix4.h
+> @@ -63,8 +63,6 @@ struct PIIX4PMState {
+>      uint8_t disable_s4;
+>      uint8_t s4_val;
+> =20
+> -    bool cpu_hotplug_legacy;
+> -    AcpiCpuHotplug gpe_cpu;
+>      CPUHotplugState cpuhp_state;
+> =20
+>      MemHotplugState acpi_memory_hotplug;
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index e83157ab358f..698e3fb84af0 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -110,9 +110,6 @@ struct PCMachineClass {
+>      bool enforce_amd_1tb_hole;
+>      bool isa_bios_alias;
+> =20
+> -    /* generate legacy CPU hotplug AML */
+> -    bool legacy_cpu_hotplug;
+> -
+>      /* use PVH to load kernels that support this feature */
+>      bool pvh_enabled;
+> =20
 
 
