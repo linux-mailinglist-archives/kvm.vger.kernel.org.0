@@ -1,288 +1,139 @@
-Return-Path: <kvm+bounces-66097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4CE7CC59CB
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 01:39:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D48CC59EE
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 01:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA9A8302BDAA
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 00:39:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15E4D302AE0A
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 00:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5465A1F5847;
-	Wed, 17 Dec 2025 00:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96EF1F30A9;
+	Wed, 17 Dec 2025 00:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nk2XeqmG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cm8cG+8M"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8C11EA7CE;
-	Wed, 17 Dec 2025 00:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963343A1E91
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 00:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765931941; cv=none; b=U6amrpIUm8/sAiucWuNNRIxv8eMggzickoQdA09n/MWDUDqo1klM3CZczcGykvYifjyu4vbDrN9PLGl6YAHva+pHVD1Y47tzw7x2EI6ULPuwzOk1F0LazXFnqktVjaQ4qXDB30EwTFKHysHgx0hrV3euYUH7Lz/7qtT4OHZbioc=
+	t=1765932229; cv=none; b=c8b9MgPcdYBxpet9ytAFA90y3h7KxipTnRX5SfuKa52brpw/0+ycMPM/t6Wy7UN4vj04fksCBJF0wmgZfmGhXeKIMgoKPmrWjRwzCUuOq8Ft0szrGEJBmqW8lFkxvY2PrIc6vnLfTXeMn1647eIflsPE+CBJUME2EA4NxSQ9RrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765931941; c=relaxed/simple;
-	bh=CgBzMRy5n84/JhVTOPnlB/AAjJQet/ZrLpftEd0Ve4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s6JeL+2N7CPsJwOHoj2v/p2SkVz4ywyR1Aw15BDce27PR8WMBL3m0BABnX1QmQ3x0CeHkVdRMY8naDdrOQMLClAdIw86+c8pUX1kxyRvWvdb9LbhmTKsz0hcP3qC530rfF37ACAwcCcd2dGFrDUGQX9NysCuY1dLD8eHsLRLVa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nk2XeqmG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 704D2C4CEF1;
-	Wed, 17 Dec 2025 00:38:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765931938;
-	bh=CgBzMRy5n84/JhVTOPnlB/AAjJQet/ZrLpftEd0Ve4U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nk2XeqmGc3QP1eIkHBAG3gOL682U+01tvpTpArKsPII4Pu5aHUXUQGtTwGThMNmjC
-	 gjvqoKc8X3qH4z1F/cYw9NSfpDyqom2M4LZ8wsF8QUTHU+ZG08r5jzKCjZeZdRiEX4
-	 nwpBltVtbgR3QhfJ1HinDq/UwHAdSpFtF29lWuv2oXte8WcBC3d+F+FpBik9QMla82
-	 UHE10uDaT5KIW71AUAzhT0BR1HOiMo9I6qZURnDwtC2bGjaTBFsn3vJ6orcfoXgdC6
-	 w70+idWQFgUkXOfUHN6PZgWhIcujetZLxOU7R+us1o8SACY32HHgBfuGR9Jp/TCaPn
-	 t+Wtc+HcNiyNA==
-Date: Tue, 16 Dec 2025 16:38:56 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 14/24] KVM: arm64: Write fast path PMU register
- handlers
-Message-ID: <aUH7oC41XaEMsXf_@kernel.org>
-References: <20251209205121.1871534-1-coltonlewis@google.com>
- <20251209205121.1871534-15-coltonlewis@google.com>
+	s=arc-20240116; t=1765932229; c=relaxed/simple;
+	bh=BEXC4cp8IeNnPaAxOBRWxTdUJAnOXp4RBdEWW4l/l/U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pnrvNr0t2pPKXZ/ivEvCVZQ0nS1bq5SWlS7vdgYqauBxdQ/hS3/V7HQ6Jb75IPYayUW9w6GrPCvVsRjNymNE+2w+gSMjLpKcR/FaHJBtgyQBKbz1TPJFwVug307jDyf3J0YTKCp9vlwvvonrL8NgWw1ZgV0UNtYiylEHmJ2mTDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cm8cG+8M; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29f1f79d6afso55919365ad.0
+        for <kvm@vger.kernel.org>; Tue, 16 Dec 2025 16:43:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765932227; x=1766537027; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z64Hm0NcsDIXSNOMwbMGDh8Ad9YqDdjtof4pt8CxbK4=;
+        b=cm8cG+8M54KVCkUS6hSn/68AvGChzgs7/8SzYaZ3lcQhBVXhSsvOgNbCEtz83eRQmG
+         LV+njwVG59fVeW5UQoN6ZlsQ6DQr/reNd2PI6Isxxaf2JZqCI9/P0O4hUnmYQCWcpUDN
+         a19iZfE2PLnB+omfpp8S37X7Z3sfiei2dYcy3WBCFSUMi005nFEN90XrTqAP94Gexctx
+         1v+I19mDqHxwpHbVuc0nNQh9IWGcUyV8+Y6ZnMGGO7znOOwJNioMq3tx8kLIEeshUcVo
+         f2t1XLARL2ut61rfWJ8JCIJKzuK171kPSzAi6dGTWxWeOul8WCiW8GDJCPh241dKSU9X
+         D4Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765932227; x=1766537027;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z64Hm0NcsDIXSNOMwbMGDh8Ad9YqDdjtof4pt8CxbK4=;
+        b=LqijlmDy28iLFmZNL3SvWShSjz6Dmhktpn/p93mOk6xyVhlM2GjuNgAShFJ0E2c13U
+         W25vgUHwnvZzZMNv5eBAFhTcCgiMDr7Qyg9xdSOUihha0HKdgUJIf3PkiR9xmYb61SmJ
+         /iyJxeWdmWZ/GbgMZS72usAF5dW/+yhebHzksUYbk/0ckhIqtyh2WQ39QjuhMsQKXS7d
+         nyrwin7BchiVkqxZYBDlS7Sd+D6++1bIVdJz0+VA5az+ikQuCjk+yDABt2twW7Q12Vj/
+         3jXYuf1oVAAGmDgyKP5ynO4rHUV/eLgNRteviPYjXyfBXYz5suqW0YUSrzllS71ap5Uw
+         olug==
+X-Gm-Message-State: AOJu0YyvZ5AaGYFvbinRdH4DETCCuleRDn0YmZyO2h+ao8OzLgrZlrQa
+	vG1JqWmJ3vmvU4fZLhODCPtAhqzwULHCAb0r9MDjWrvlBLGmA3/S7cPLYijeF/7AvyiYAEnDnjd
+	KD4Vteg==
+X-Google-Smtp-Source: AGHT+IG86FyITG6MdeWDX0lWFy1KXbTKNCn2+9D86W99XySfTjmKhuSftLdA4lQt73MkC+ZNFlP/sR2DxsU=
+X-Received: from plrp23.prod.google.com ([2002:a17:902:b097:b0:2a1:14da:f724])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d58a:b0:2a0:c1f5:c695
+ with SMTP id d9443c01a7336-2a0c1f5cf3amr105448735ad.16.1765932226935; Tue, 16
+ Dec 2025 16:43:46 -0800 (PST)
+Date: Tue, 16 Dec 2025 16:43:45 -0800
+In-Reply-To: <20251213161537.GA65365@k08j02272.eu95sqa>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209205121.1871534-15-coltonlewis@google.com>
+Mime-Version: 1.0
+References: <cover.1757416809.git.houwenlong.hwl@antgroup.com>
+ <45cbc005e14ea2a4b9ec803a91af63e364aeb71a.1757416809.git.houwenlong.hwl@antgroup.com>
+ <aTMdLPvT3gywUY6F@google.com> <20251211140520.GC42509@k08j02272.eu95sqa>
+ <aTr9Kx9PjLuV9bi1@google.com> <20251212094647.GA65305@k08j02272.eu95sqa>
+ <aTxWkDfknBCK6Iiv@google.com> <20251213161537.GA65365@k08j02272.eu95sqa>
+Message-ID: <aUH8wcu4zRclhYUn@google.com>
+Subject: Re: [PATCH 4/7] KVM: x86: Consolidate KVM_GUESTDBG_SINGLESTEP check
+ into the kvm_inject_emulated_db()
+From: Sean Christopherson <seanjc@google.com>
+To: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Cc: kvm@vger.kernel.org, Lai Jiangshan <jiangshan.ljs@antgroup.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Dec 09, 2025 at 08:51:11PM +0000, Colton Lewis wrote:
-> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-> index 3e25c0313263c..41ec6730ebc62 100644
-> --- a/arch/arm64/include/asm/arm_pmuv3.h
-> +++ b/arch/arm64/include/asm/arm_pmuv3.h
-> @@ -39,6 +39,16 @@ static inline unsigned long read_pmevtypern(int n)
->  	return 0;
->  }
->  
-> +static inline void write_pmxevcntr(u64 val)
-> +{
-> +	write_sysreg(val, pmxevcntr_el0);
-> +}
-> +
-> +static inline u64 read_pmxevcntr(void)
-> +{
-> +	return read_sysreg(pmxevcntr_el0);
-> +}
-> +
->  static inline unsigned long read_pmmir(void)
->  {
->  	return read_cpuid(PMMIR_EL1);
-> @@ -105,21 +115,41 @@ static inline void write_pmcntenset(u64 val)
->  	write_sysreg(val, pmcntenset_el0);
->  }
->  
-> +static inline u64 read_pmcntenset(void)
-> +{
-> +	return read_sysreg(pmcntenset_el0);
-> +}
-> +
->  static inline void write_pmcntenclr(u64 val)
->  {
->  	write_sysreg(val, pmcntenclr_el0);
->  }
->  
-> +static inline u64 read_pmcntenclr(void)
-> +{
-> +	return read_sysreg(pmcntenclr_el0);
-> +}
-> +
->  static inline void write_pmintenset(u64 val)
->  {
->  	write_sysreg(val, pmintenset_el1);
->  }
->  
-> +static inline u64 read_pmintenset(void)
-> +{
-> +	return read_sysreg(pmintenset_el1);
-> +}
-> +
->  static inline void write_pmintenclr(u64 val)
->  {
->  	write_sysreg(val, pmintenclr_el1);
->  }
->  
-> +static inline u64 read_pmintenclr(void)
-> +{
-> +	return read_sysreg(pmintenclr_el1);
-> +}
-> +
->  static inline void write_pmccfiltr(u64 val)
->  {
->  	write_sysreg(val, pmccfiltr_el0);
-> @@ -160,11 +190,16 @@ static inline u64 read_pmovsclr(void)
->  	return read_sysreg(pmovsclr_el0);
->  }
->  
-> -static inline void write_pmuserenr(u32 val)
-> +static inline void write_pmuserenr(u64 val)
->  {
->  	write_sysreg(val, pmuserenr_el0);
->  }
->  
-> +static inline u64 read_pmuserenr(void)
-> +{
-> +	return read_sysreg(pmuserenr_el0);
-> +}
-> +
->  static inline void write_pmuacr(u64 val)
->  {
->  	write_sysreg_s(val, SYS_PMUACR_EL1);
+On Sun, Dec 14, 2025, Hou Wenlong wrote:
+> On Fri, Dec 12, 2025 at 09:53:20AM -0800, Sean Christopherson wrote:
+> > On Fri, Dec 12, 2025, Hou Wenlong wrote:
+> > > On Thu, Dec 11, 2025 at 09:19:39AM -0800, Sean Christopherson wrote:
+> > > > On Thu, Dec 11, 2025, Hou Wenlong wrote:
+> > > > +static noinline unsigned long singlestep_with_code_db(void)
+> > > > +{
+> > > > +	unsigned long start;
+> > > > +
+> > > > +	asm volatile (
+> > > > +		"lea 1f(%%rip), %0\n\t"
+> > > > +		"mov %0, %%dr2\n\t"
+> > > > +		"mov $" xstr(DR7_FIXED_1 | DR7_EXECUTE_DRx(2) | DR7_GLOBAL_ENABLE_DR2) ", %0\n\t"
+> > > > +		"mov %0, %%dr7\n\t"
+> > > > +		"pushf\n\t"
+> > > > +		"pop %%rax\n\t"
+> > > > +		"or $(1<<8),%%rax\n\t"
+> > > > +		"push %%rax\n\t"
+> > > > +		"popf\n\t"
+> > > > +		"and $~(1<<8),%%rax\n\t"
+> > > In my previous understanding, I thought there would be two #DBs
+> > > generated at the instruction boundary. First, the single-step trap #DB
+> > > would be handled, and then, when resuming to start the new instruction,
+> > > it would check for the code breakpoint and generate a code fault #DB.
+> > > However, it turns out that the check for the code breakpoint happened
+> > > before the instruction boundary. 
+> > 
+> > Yeah, that's what I was trying to explain by describing code breakpoint as fault-like.
+> > 
+> > > I also see in the kernel hardware breakpoint handler that it notes that code
+> > > breakpoints and single-step can be detected together. Is this due to
+> > > instruction prefetch?
+> > 
+> > Nope, it's just how #DBs work, everything pending gets smushed together.  Note,
+> > data #DBs can also be coincident.  E.g. it's entirely possible that you could
+> > observe a code breakpoint, a data breakpoint, and a single-step breakpoint in a
+> > single #DB.
+> > 
+> > > If we want to emulate the hardware behavior in the emulator, does that
+> > > mean we need to check for code breakpoints in kvm_vcpu_do_single_step()
+> > > and set the DR_TRAP_BITS along with the DR6_BS bit?
+> > 
+> > Hmm, ya, I think so?  I don't think the CPU will fetch and merge the imminent
+> > code #DB with the injected single-step #DB.
+> Um, I have one more question: what do you mean when you say that
+> kvm_vcpu_check_code_breakpoint() doesn't account for RFLAGS.TF?
 
-I wouldn't bother with adding accessors to the PMUv3 driver header, this
-gets a bit confusing when the 32-bit counterpart lacks matching definitions.
-Additionally, the part of KVM you're modifying is very much an
-"internal" part meant to run in a not-quite-kernel context.
-
-Considering this, I'd prefer KVM directly accessed the PMU registers to
-avoid the possibility of taking some instrumented codepath in the
-future.
-
-> +	if (!kvm_vcpu_pmu_is_partitioned(vcpu)
-> +	    || pmu_access_el0_disabled(vcpu))
-
-Always put operators on the preceding line for line continuations.
-
-Also, don't call pmu_access_el0_disabled() from here. It can potentially
-do a full emulated exception entry even though the vCPU is in an
-extremely inconsistent state (i.e. haven't returned to kernel context
-yet). Isn't the current value for PMUSERENR_EL0 on the CPU instead of in
-the vCPU's saved context anyway?
-
-The fast-path accessors really need to be *just* accessors, reading
-state from the CPU in the unfortunate situation that a TPM trap has been
-forced upon us.
-
-> +	case SYS_PMXEVCNTR_EL0:
-> +		idx = FIELD_GET(PMSELR_EL0_SEL, read_pmselr());
-> +
-> +		if (pmu_access_event_counter_el0_disabled(vcpu))
-> +			return false;
-> +
-> +		if (!pmu_counter_idx_valid(vcpu, idx))
-> +			return false;
-> +
-> +		ret = handle_pmu_reg(vcpu, &p, PMEVCNTR0_EL0 + idx, rt, val,
-> +				     &read_pmxevcntr, &write_pmxevcntr);
-> +		break;
-
-It is a bit odd to handle the muxing for finding the in-memory value yet
-using the selector-based register for hardware.
-
-> +	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
-> +		idx = ((p.CRm & 3) << 3) | (p.Op2 & 7);
-> +
-> +		if (pmu_access_event_counter_el0_disabled(vcpu))
-> +			return false;
-> +
-> +		if (!pmu_counter_idx_valid(vcpu, idx))
-> +			return false;
-> +
-> +		if (p.is_write) {
-> +			write_pmevcntrn(idx, val);
-> +			__vcpu_assign_sys_reg(vcpu, PMEVCNTR0_EL0 + idx, val);
-> +		} else {
-> +			vcpu_set_reg(vcpu, rt, read_pmevcntrn(idx));
-> +		}
-> +
-> +		ret = true;
-> +		break;
-
-Can't both of these cases share a helper once you've worked out the
-index? Same for PMEVTYPERn_EL0.
-
-> +	default:
-> +		ret = false;
-> +	}
-> +
-> +	if (ret)
-> +		__kvm_skip_instr(vcpu);
-> +
-> +	return ret;
-> +}
-> +
->  static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
->  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
-> @@ -785,6 +983,9 @@ static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	if (kvm_handle_cntxct(vcpu))
->  		return true;
->  
-> +	if (kvm_hyp_handle_pmu_regs(vcpu))
-> +		return true;
-> +
-
-Since the whole partitioned PMU feature is constrained to VHE-only you
-should call this from kvm_hyp_handle_sysreg_vhe().
-
-> +
-> +bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
-> +{
-> +	u64 reg = __vcpu_sys_reg(vcpu, PMUSERENR_EL0);
-> +	bool enabled = (reg & flags) || vcpu_mode_priv(vcpu);
-> +
-> +	if (!enabled)
-> +		kvm_inject_undefined(vcpu);
-> +
-> +	return !enabled;
-> +}
-> +
-> +bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_EN);
-> +}
-> +
-> +bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
-> +{
-> +	u64 pmcr, val;
-> +
-> +	pmcr = kvm_vcpu_read_pmcr(vcpu);
-> +	val = FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
-> +	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
-> +		kvm_inject_undefined(vcpu);
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +bool pmu_access_cycle_counter_el0_disabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_CR | ARMV8_PMU_USERENR_EN);
-> +}
-> +
-> +bool pmu_access_event_counter_el0_disabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_ER | ARMV8_PMU_USERENR_EN);
-> +}
-
-Refactorings need to happen in a separate patch.
-
-Thanks,
-Oliver
+I was pointing out that if KVM is emulating multiple instructions without
+entering the guest, then I'm pretty sure kvm_vcpu_check_code_breakpoint() would
+fail to detect a coincident single-step #DB.  kvm_vcpu_check_code_breakpoint()
+may not be the right place to try and handle that though.
 
