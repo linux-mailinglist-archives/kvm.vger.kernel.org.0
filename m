@@ -1,296 +1,347 @@
-Return-Path: <kvm+bounces-66167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B55CCC77EB
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 13:08:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3621FCC7DBC
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 14:37:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7821E3053B3B
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 12:07:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 60B0E302653A
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 13:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D85733E34C;
-	Wed, 17 Dec 2025 12:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74163659E8;
+	Wed, 17 Dec 2025 13:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="B31ddzXn";
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="UDMJbxGr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czd1ZjIv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Buc8EGhu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097BC33CE92;
-	Wed, 17 Dec 2025 12:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765973266; cv=fail; b=Rq8/kGm1dRiiRdMLyEHgyeMXAgqbvjU7TBfbKijWVnC8UIQUPMK5dtIWMEALf1aCCLXnG0scgrJ+mpZD35hhhmreC2Gs1A/8U6muCtBzzYZ2NJ9QkWTv7gc2dOfmiDbeaTgrGPHfTrjPZ8bbrUNzp43eLgYjl0TrnNR4+mzb7cI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765973266; c=relaxed/simple;
-	bh=/WF6myMOJ4MVdebTMnYsaneVzT9PReXtClmTIfXIx+k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=WNpLtPoElfv550FVWKg941GrR4/9hU3Fq+qHxFXAVD4M2y/mg4lebi5uxpg8u8arAOhNkwVPUpJ+jiHQqGz9t48I5DjHHaYxfrNxXwq4Ac/u2GmbthGC2LRh9H9FPwtwOl3Sfh0L0Tpt4RmAl8w+AoFWTZO5YYrRmNWcAoSgcIw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=B31ddzXn; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=UDMJbxGr; arc=fail smtp.client-ip=148.163.155.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
-Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
-	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BH8V5XG3554790;
-	Wed, 17 Dec 2025 04:06:48 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
-	cc:content-id:content-transfer-encoding:content-type:date:from
-	:in-reply-to:message-id:mime-version:references:subject:to; s=
-	proofpoint20171006; bh=/WF6myMOJ4MVdebTMnYsaneVzT9PReXtClmTIfXIx
-	+k=; b=B31ddzXnbzj2rJGb//n99tNNmDL471lA+rcj5GnRi/VQ8x5PiiYPUIRxu
-	xcVbeu5OOdur75EFy8CoA29e89dUSk7Hc7Jv8k0ZcT5nGnsQq7edSy5oB546Wsrf
-	9UT47BKSX/UenB3OcfPDwfTukY32w4+PbTuXFx+2vOTt90VjuJFU22O0DCqO8cLn
-	fgyyInuHwZN20lBS51g5pGgXx/9bPB/w1DpHuaEWxg07q49xwf8bmO7gSaoq59pi
-	uq7Rpt1/wf6M/BwMo528mQbPyVUuwayHhZN/8x0Kke9DSXW76inGajTLybWqHCMI
-	D7Y16TSsSF7Q6dBuLrdjc3Z3VJ5tA==
-Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11022107.outbound.protection.outlook.com [52.101.48.107])
-	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4b3s310f47-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 17 Dec 2025 04:06:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=q5Wjjvf0wh6VebY/KHC/HTkAv6YcDAYW77sr/2XbyP/craV5f02W2TmlNUzGyH39x4IU2RvRB65Rj5jInXCuke2T8HKmp+Y6Y/K7wYdsxEEYgdsFYZRUoyqivUaDkBY3C+YWXICb+8exO7LmWwdeOionZDKPgmZ1cTfqpq/tCTrLFULlLpK/rXIwRmCTyIpm1QspPTVw9JaFdhlKMMiDHdqViObz43+xPxE1hTLx0zyog4huxMnEASOSCJqQxZKwyDpmEWm4TmIjtVSzz0L+4vV02SYGr7j56cDVdJOpbBky2NyZ8ftJP/7VzrK4jrT1GITJjPmUOr1ud5lUhZDEqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/WF6myMOJ4MVdebTMnYsaneVzT9PReXtClmTIfXIx+k=;
- b=HRqSs1NZnLyZlBXvyYWltjYz6+HkB6wut/VhmNrSlm2rf5eXNYJJ7ged4I7wuM/10V3bSo/pYwGXleB5822aY3+HXuLLcZKVc8ISyPG+qmMUrY/NgaUk4CDGN0MnclDOiOzNNluXu8mtd26J5AsRdAgoNiLhHx9lodgadHyRILg5nrZrJEjiW5EwkDfXxoCmCgDhfxMFN1kOftj1aYFOQzshFCWiGsJma4M2o7H+ivbHDIFjC8RCcTMmhw/oVpPSClI6rD3KnpwBKNrIAWD9/9KS9vqGNT4v3ef4+Sl5UJgq22yYhqeWJtcwPHvPfJZlL+8yvK18gJRmT08Th+NAzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/WF6myMOJ4MVdebTMnYsaneVzT9PReXtClmTIfXIx+k=;
- b=UDMJbxGrKBYtvGtQAlkTZpq2fbL3ktbouckrrrhdqLNZrHfvqab7IxrKKCvRJJw/2dU41TRQqJY0S+cpHGDVamGF0XmOybld4jAztkwkb1equr9Fz53179EEG0zSJFDQ5eNL4swhQJAi7k7dAF/yqfQXN52oWnAkU3VJCMkocwGhBUoECFAWdX3/IKTWGDxfqjnrvwAspGZCnJkkrzzaJZ8X94ay/N8j90qowh5/Zqm64NAjpEKn77v3323W3/CT89G8i5ZSrDRLaK3Bv9FF3TrVDp8JplfN6S6pl06Gtm63PzPCj70K5aylJR0rKRQFakO0UPa47ZKVcoZ7sRDbLQ==
-Received: from SA2PR02MB7564.namprd02.prod.outlook.com (2603:10b6:806:146::23)
- by DM4PR02MB9166.namprd02.prod.outlook.com (2603:10b6:8:10d::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.6; Wed, 17 Dec
- 2025 12:06:44 +0000
-Received: from SA2PR02MB7564.namprd02.prod.outlook.com
- ([fe80::27c4:c948:370:572b]) by SA2PR02MB7564.namprd02.prod.outlook.com
- ([fe80::27c4:c948:370:572b%4]) with mapi id 15.20.9434.001; Wed, 17 Dec 2025
- 12:06:44 +0000
-From: Khushit Shah <khushit.shah@nutanix.com>
-To: Sean Christopherson <seanjc@google.com>,
-        David Woodhouse
-	<dwmw2@infradead.org>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kai.huang@intel.com"
-	<kai.huang@intel.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        Jon Kohler <jon@nutanix.com>,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH v4] KVM: x86: Add x2APIC "features" to control EOI
- broadcast suppression
-Thread-Topic: [PATCH v4] KVM: x86: Add x2APIC "features" to control EOI
- broadcast suppression
-Thread-Index: AQHcao1m0m+Je6bySUSdnhU8EZf0EbUdH8CAgAB3S4CACC8FgA==
-Date: Wed, 17 Dec 2025 12:06:43 +0000
-Message-ID: <9B3CAB86-B3E6-475E-8849-85CE63BD7E36@nutanix.com>
-References: <20251211110024.1409489-1-khushit.shah@nutanix.com>
- <83cf40c6168c97670193340b00d0fe71a35a6c1b.camel@infradead.org>
- <B45DB519-3B04-46F7-894E-42A44DF2FC8E@nutanix.com>
-In-Reply-To: <B45DB519-3B04-46F7-894E-42A44DF2FC8E@nutanix.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA2PR02MB7564:EE_|DM4PR02MB9166:EE_
-x-ms-office365-filtering-correlation-id: 4016ceeb-660f-493b-3dba-08de3d64bec7
-x-proofpoint-crosstenant: true
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|10070799003|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?THBHT05yV3pDNGFIeUhkWjFoUzlodFNGbnl1OTVLWjAzdit0S080djJ5V2E0?=
- =?utf-8?B?VWkzUTNaZnpIN0NvQ1JqMW1vSHo5NEw3YldzWmtzcWRmV2Y3RDhIdlJpdDcv?=
- =?utf-8?B?RFArMzdtZVE3czZmOTJzOER2QkErUnpwbGxNTE9TMWhrMFdBM0c1c1pBUnZw?=
- =?utf-8?B?bk1mNzhPeTdrc1ByWGRnajQ1ek12V2JQT0o5OVB0Sm13d0tBc0JMMUd0bGZy?=
- =?utf-8?B?cVAvUmxmMjNXMk5aSFllNFdzZWhLRHd0T29VelpMeXZNc0VReXp0U2pYZnpw?=
- =?utf-8?B?aFp0RTA1cnpOcStsWFlZQVEvSFhPQ2tnSS9tM2lKYnZXYS9zejZlWHM4NEZG?=
- =?utf-8?B?VmlMeGM3ME9KdXZDNnAvU2ZNaVgwdkhIRW1uRGU4NEp0eXRjYVA4MnNJV2dV?=
- =?utf-8?B?T0QvNzRnUmN5bjZaNnFHb0dRUUgrRC9CTGl3STA5Qkl2aDIxUitudHBoZVAv?=
- =?utf-8?B?VE0xNU92Yi8yelFmRFpWL1dpc3VFZTB3SkZ1bVA5WVV5Q1A3d1NUQVZBWFVo?=
- =?utf-8?B?ZGl4a2lMMWZ4eWpSOVhqZHMvdXZ4TGtKUzJXbi9OU3hxcEwxZHlwNWJrT1F1?=
- =?utf-8?B?T3FMWUdpZk1IbUhTdWhuZkYvdjcyNEc1RnN5ckZOZFNVMWdDRWJrZFBleHFL?=
- =?utf-8?B?bWNkK2lnbGpST0lSeEtrMGJvV2t2MzdVV1IzQm9NMDVGTlpkQUhGaWVyVllt?=
- =?utf-8?B?bmdTcjVPRk9IakVRWHFFMVQvQmQ4andzTTBoS09NTllvVXNOa1VFZHJIWnRO?=
- =?utf-8?B?QXlkVHpONlU1WmoxWG4waWpWUFlvdHlkczU4S01nb2xwS3VudytMcUVtQ25x?=
- =?utf-8?B?bTI5WTNaRXZCUFRXWjYyV08zQmRabktpREQ2Umg3bmZtU21ka1oyTC9IaGVm?=
- =?utf-8?B?R3RrNlJNUW90c3lLazFlTlN4Q0t4YWFOSEJ1bjEvSlRoSlB0WHhpa3hCa0Rq?=
- =?utf-8?B?MU1OSkJzaVZMOUYyQ3JQR3F5dkxkUEVXSU9nbmpLOHlrMm5UYjZpRkg4czBR?=
- =?utf-8?B?UzJDWVJjQUsyenhPMXZzQ1gwdUdIQzhwWWJnVkRZZ29URlYwcnBKNGFLNlpo?=
- =?utf-8?B?cXlPK0o1ZFJOUVRFdk9BV2t3czZXT1ZjcGY5cjAvTmlzSkloeTV4ZFBBV09K?=
- =?utf-8?B?V3BHaDZSS096SUVnTyt6ZkxOV0Rsb3lvT3lUNk9ZNGVwTURFS3J6c2RRRHdI?=
- =?utf-8?B?MUFIR052dDI4U0pkTVM0aHFHNytGdWNmamRUVnlGL0JLMTdWYThqcURUdjRa?=
- =?utf-8?B?cS82QndMb3NLR1FvekNpS1lZZVgwNGRULzRFRzlVQ0xEWTQ1ZjVzYitiQjVH?=
- =?utf-8?B?c2lGUmQrbkZXT1A4eFJIRllIakFIek5scUhOVUh3MmtFNCtjQ0wxcnhHbUNa?=
- =?utf-8?B?ZEM5TUJaTjU2Qm9HTHJmUG1TY0ZkaXB5VWRKRGNhK0p4UmJUTllta3orS2pH?=
- =?utf-8?B?cEl3NzhtUTBkQjRoK1R4QlhiSkc0VlVBakFQZVJvamp3UWUvRHB2bmJ0a3NI?=
- =?utf-8?B?Q2xyeTFjYmpBdUxkcHJEeXIrZlB5cVhhSVBaK1lEMmVXK1lqUnhjSXFJNkkv?=
- =?utf-8?B?RWdDc1BBbC9RNG8yWUp1aFNJYzVBYkRmS3kvd3pXK0xxbDc0ZXJXMEdwYW9a?=
- =?utf-8?B?NENDMHp2Y2NkZWw2K2l6Vkh3VmlnVEVTbDBhK2FTVVpuTVJKSVRQWitnbXFU?=
- =?utf-8?B?T2d1aHZpTTdianVLOFhuc2N3SVFSSW9MVDk5cUZmNC9Db0kyVG94cXVsSnZJ?=
- =?utf-8?B?RDhYNkJUbHBGZmxqUHM5WDcrZGN0ZFpyRzRBSVR0WUxqOEN0d3RjdHhZVGMv?=
- =?utf-8?B?NTQ1aUIvcmlNUGE2bUdWOGk0Zm11amNYMkRyVXcrWHFCR3dJVlVEWm5MV1Ri?=
- =?utf-8?B?YlQrTXVOMk9OQmZIUzFPMlk3d0RtTFZ6SndheEVtSW5sR3hMQkRsL1cvY3pW?=
- =?utf-8?B?VUZ4dVhQR1dxZzJDTUswQzk3elZTYmc0RjBNVXhvQ3dwQ1NweENLSWFOU0Jl?=
- =?utf-8?B?T1ZvOGN4emRnNGtzR3FlZ1kzcHRVVUF2NkdjY0RhZTdacSsydkp1bGlUSktK?=
- =?utf-8?Q?XR/Qka?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR02MB7564.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(10070799003)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dklRL0JQRVdYTDVCcjhudTgweXE1V1J5Tjc3cWtieXovQTNoSzFtM3hJOTRh?=
- =?utf-8?B?V2xVcStCNENTc29RKzdCQXFVQVV0MjZLNm9DVUljblBTNzlPK1pvcWxlNnFG?=
- =?utf-8?B?bWlhY1BlTU1kWmhNVVFDVFJQWlhzbTIrYytCNGp4TEZKb1cvREo2STBZSDRq?=
- =?utf-8?B?bCt6a3BOUlJ5ejlueEczVVpwS1NPblJ2aVN5SElUdmt4VjNzVWxJYmJjSFFr?=
- =?utf-8?B?bUMxaWYwdHRJcWNRTHEzOGxhV25mZjRweDNsV0pyRVMxTGl1RXJJc1BwOFU5?=
- =?utf-8?B?QU5idnVpMEZoZDVLVWY2OGQyb05FS1lNUkwzMmlZcWRzcDZQTE1oaStWWXYy?=
- =?utf-8?B?ZmVzbURtWGNXMDNjZ2xNZEdLSFdXK1A1VVFPSVVvVXZlVnpSYzllQ2tsb2Fa?=
- =?utf-8?B?Uk9CTHEvcGNnRzNqdC8rdWJ6MWdGa2JpcDhNY0xsUklPWmMvOUJieWpDVjUv?=
- =?utf-8?B?TVJjSTl2d1B0S2NyajFKbWEvQSs2Z0pIZlNYb0pJMjBER2YxS0I3RHFxSnhH?=
- =?utf-8?B?OU5BOGJzb0lxcm9RWWMxV0xjTEFIUHZXNjlOellNa1kxTWY5T3ZOOUtpWjNX?=
- =?utf-8?B?U2FwSUNqbkhtVnJuMEw5NXlYNmpJaWVHSW9UbGtXYlZoT1FtUDMyK1RPTDZy?=
- =?utf-8?B?VmVabngyd0hnWDdsKzN5d1FiNmMzRzc3a0k0ZlFZOS9FSU9MeDVKRTZWakh4?=
- =?utf-8?B?RUViZ290c1VyTzJVWTFTWlpxSng5eWNnQjdUbkVGa0wxaU9aWDNEYmp3TUtH?=
- =?utf-8?B?Y0FxdjdZa0cyLzRKR3VkV09EVnVBbTVzemxZWDlzYTRIa3Uyb2wxaDI4MUlO?=
- =?utf-8?B?bHFiUFAvb09CVFlQRXlaMk96Uno4eTZRZWF6ZCtxOG9yakh1Y0ZvREFWT2kv?=
- =?utf-8?B?OTJNUFVoWGVkQm91YnJKcDZTcTY5V3ozd0pJUXJhN3l2clhBcHM3WTFWNE1s?=
- =?utf-8?B?Sm9LQ09seXRRQkNNQjVnS2UvYThNcEZ6ZmxwTlRqc21LOE84dDN2YlArdTRq?=
- =?utf-8?B?eWZwTGFwWGV6K3pCQjlqTDdJRm5sUDRqYm1KZzV2MU5qVmE0TFZWckJXNWNy?=
- =?utf-8?B?dUUwLzFSRzVnRkoydmZkVGJiL2pWNXVxSWVRelU0eCtVSkZxT2UwUkg5T3pS?=
- =?utf-8?B?Z2loQ2thd1Y4K0J4a0dyL3VMYThFYjF2MXVhK0VaUjJER25EWm5TZGRXYmVu?=
- =?utf-8?B?bFRnUDY5cWI5bXRZNDU1WTRHR2tHT3hPNEJHSXdUNkhoTXVPdDBkZE5SYWZH?=
- =?utf-8?B?dWhjSU5IRnl3VHNTMWVvNDdHQmcrd3kvQ0pzcE5oVzZYSDQvbTl1RFZUbkg4?=
- =?utf-8?B?akhMSkp0dUV2V1N3NHZ2YlVXYk1GMTg5RUt6eUtjeS9LdDJyR2tWdVhpeGt3?=
- =?utf-8?B?N3FncFhvbitNMkpHUFlSWnh0c1c4OU96d2pHTWhUQ2dNU09la0IwcU1FWTVl?=
- =?utf-8?B?TXppbUFQZ0QxYVIwUFpzc0N0NkcyTjczT29BcllMTy95WWlEYmlCNlBxYlpH?=
- =?utf-8?B?dm5CN21RZUtEWFVhL25MMnU4ZXRVdFFOMW40aG9BcEYwUlZzRkxYZFkzVjk4?=
- =?utf-8?B?dytBaUExMUlBOTR1TEtpQ0lHUFhEV1lEUy9mVVpwVHc3NzZNTXFkQ2JWVDgx?=
- =?utf-8?B?SkhkMkNsRkJjQmxaOUFZaU81eFkzTzZ0Y0RFaVdQanZMT2wvL01sM2xVelhM?=
- =?utf-8?B?dzRXNEYwaUovVWJHczBtYVFrbWFzemFtMC9PejJkSGNyaEFMK0hwTm1VYnUy?=
- =?utf-8?B?K2NIUFpVSjROY0tIcHNCN2hUVTRqSjJvWU9vNUI4cFd5UmNPdTJkQjBzdGJL?=
- =?utf-8?B?RDVGbUlXZ2JHZTJEd2hYM3Zqd2J1WVpXdGxURDJFR3VjRkFDcWdyUFF3ZEhy?=
- =?utf-8?B?OGVjT3g1MHFQTExtUHp5NEZrSEg2SG0vR0h2MUJFTmhRUDNGRWJjUDdybVJB?=
- =?utf-8?B?RGFMK2Q2R0lNVnNhelQ4ZzhZS09pMG5yS2x6QTgvbWNyWUdRRUlPa3lNeGtR?=
- =?utf-8?B?RkdTcmJtY3VLUzRTWmlpMUl6NGtlTU5lSXE0bVZTQzM4UWwrM2VvcHBUS0lX?=
- =?utf-8?B?MmZPQkorS21hVzJ6RU9Ma0VhYkZtNkVUcWRVUTJTZUMxOU8zZ2xkNmlJN0pP?=
- =?utf-8?B?cDhkeVpCZmVhVHFwVTdFWm1Tbkt6dTJpWE1sVHAvaUpHdHM3NDRNMTQwampo?=
- =?utf-8?B?T0dmazg3RXAwRm1tQ0VlSjZLcm9Vc0gwQzEwOEc0dXdPcHJJUldXcENxakRs?=
- =?utf-8?B?UEhwZ1l6L1ZFTWNmbE1tc2pxQ09RPT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <33BD53A62B3E484CBBC6CF02510B6460@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C1A33D6F1
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 13:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765978366; cv=none; b=eWH/+y9NccWEP4G1xOLRXQHkCaz1l9bmsoWCi4/AhSqsF/7PUPuJm7dNFO/ysmURUln8k5ToCi6Wlc1Xtwr3WVRSt0ptIUwhOayI2FgwdOSUeplOiXXOZK4si0hvcIH5eYj0NiqQvI1USfGbu6r4M5qB1Kk+JhcGpEafp+DC470=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765978366; c=relaxed/simple;
+	bh=GcmYvmQqjnAaAu8m8L0HtAe5fJnCcmQQ8b/cUpuilfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T2yOGSo/YcaD+fPDex938IlQOzjj2wB3ro7rppAswh+h1DtNzvhWZ0AmmzD2ypMQaBXaCFFafLfE1AUdkv+sQoiUEIYmzbqE5U9Xbn4fT/RXoQbO6tZBZSEzANFaRNy9rqY9Rt5F284krDoC3YTuvM03payc8Napi1WeKyza1SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=czd1ZjIv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Buc8EGhu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765978363;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y88grvNyA6vLs9Q+keb1EkjPRPpjjnzTbnJK7zRddLU=;
+	b=czd1ZjIvozLa31vvMaJKyMrXYDqSAS4HT2ZyIg8iz6qyQZjsU3mgNC9nBgWp8timCyL+4m
+	/Z2R2F7UVsVS4scVYWmP87FmuS3YPAVQIGZyDxdKeat8xNSMkJMyzYzuo0hm889MLe3Ohm
+	Exy9aEZmbOmp+eAlJsee748pdb3HFto=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-LVuia9QwPvud129LSaySgQ-1; Wed, 17 Dec 2025 08:32:42 -0500
+X-MC-Unique: LVuia9QwPvud129LSaySgQ-1
+X-Mimecast-MFC-AGG-ID: LVuia9QwPvud129LSaySgQ_1765978361
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477cabba65dso37473255e9.2
+        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 05:32:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765978361; x=1766583161; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y88grvNyA6vLs9Q+keb1EkjPRPpjjnzTbnJK7zRddLU=;
+        b=Buc8EGhu5W/YPvSGzl4iVYnLcjHaYVEgT0YnU15TkoBR/zphu4+r02DDymFx680SyV
+         5SY5xWMVpGfODkst+MI7jyS7/08Owi0MaC4gxWbESyrE5Y9yfm8mFHVftjpWhnFx4MiN
+         bVRP1O6YWuvDophSg5w5KXK4GouEpBvFqqNwvDyD1uhD9M9Le+yKTWhNj51R32WsenIt
+         vL3/eyWasZeJCc2voZIq96vGYZgoUo0tNBtvA9wrSDTTh4rsQpEak7JCcn71MCojHM2r
+         PpdNoaLjdWdp1s99U8aOcRWcPCCes/TPibAXoBzFAF3LbITCtQp18ywRNpBovWTBP//S
+         7edA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765978361; x=1766583161;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y88grvNyA6vLs9Q+keb1EkjPRPpjjnzTbnJK7zRddLU=;
+        b=NnWYuAJTFMT5Zyf5oASGXDBXaVnddbUKET9w2b9w97flEw14mvgOAI2VDP2okwcCwN
+         ef2Ku1TWSiD80obZePic129rr29oOPvVKDKADRwpISY6T4fF3+lXyEkzfduZBGV2ko85
+         tZ2nZUixV9uGSlcka+GdeiWFBa3pee2jz3FjxnfRprHmBhEkJBC4AG/NF0jFQ/S4fB7H
+         3jGmlNQNhdwf1IKYRYSJF8egYgYIzE5yFaySseKwrMEEIT80ayuCxOlQSdEsoAhwXlAT
+         L30ITCXuUThdYir4Ne1Z+EBRvTaUQrz5a59g0YQIpQ38avsMl5scWK9EwCxld7MGrYuV
+         HJtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVtlU2mURoCqf3DMIxrprdXugit0U41SoIsExI7flfVWihp9V+ElptGAXFE7T4DTVB+KMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRmYtQS2Rw1qELXJ/08JLtnz8dFmVFjxDXLRKPL59yq2+2y/iF
+	ng4EDLC23wkAtvxx9SzqhGeVMBcW1/rA5jdPLvAbsWuCybgqEOelHTamEsAeQzY2yv5R1OWqgOF
+	ju5TjArSwy+fEOjOH+fXIZWj0eAy2zRSIcItbG9Q1pDYj1a5wH6QjXA==
+X-Gm-Gg: AY/fxX6oBnyBllcZZMBkDQPPPNMwoZ+xxovQl5lFlPyildb/cCdI4PTekXM4wFh0tys
+	IXAVnO6P8fJxfzNc8SgD9hILQN4umVWLguwbQLVjGfhqCmaUdZe1J0Darl8LdClb1MV7xKk3uxl
+	JklioxspH1XAn3gcC4fPyN4LtpuJjZDjgfEnH0Z2qXhcB9L1Pw9C3rPHYEP/oXSGMuTFF9krZVB
+	5zFk7Cyf9H3ACwvX/YcdkY8/ktHu6WUExk1+YQzBmOjghOTXNhrvEE1SYnsANLFU35fDsTTacQs
+	qdNO09jclaRZbqjgYmA4YHknm7ThpS+FnFIHqYc5dmR4ORn5O1TyzlL84JgdnAIX9TWK7Q==
+X-Received: by 2002:a05:600c:4f90:b0:477:9dc1:b706 with SMTP id 5b1f17b1804b1-47a8f9055bfmr166586265e9.19.1765978361060;
+        Wed, 17 Dec 2025 05:32:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH1DBxXjUwAXD60W++JB0qTpdlbwvJgM0HJ5acxEXUSUAiFGW/S+fxK32pWtLvkiy3PWkiKnQ==
+X-Received: by 2002:a05:600c:4f90:b0:477:9dc1:b706 with SMTP id 5b1f17b1804b1-47a8f9055bfmr166585685e9.19.1765978360422;
+        Wed, 17 Dec 2025 05:32:40 -0800 (PST)
+Received: from imammedo ([213.175.46.86])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47bdc1de9cesm39837815e9.8.2025.12.17.05.32.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 05:32:39 -0800 (PST)
+Date: Wed, 17 Dec 2025 14:32:37 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?=
+ <philmd@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas
+ Huth <thuth@redhat.com>, qemu-devel@nongnu.org, devel@lists.libvirt.org,
+ kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org, Richard
+ Henderson <richard.henderson@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Jiaxun
+ Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>, Eduardo
+ Habkost <eduardo@habkost.net>, Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, Weiwei Li <liwei1518@gmail.com>, Amit Shah
+ <amit@kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, Yanan Wang
+ <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>, Palmer Dabbelt
+ <palmer@dabbelt.com>, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?="
+ <berrange@redhat.com>, Ani Sinha <anisinha@redhat.com>, Fabiano Rosas
+ <farosas@suse.de>, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?B?Q2zDqW1lbnQ=?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Huacai
+ Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>, Mark
+ Cave-Ayland <mark.caveayland@nutanix.com>, BALATON Zoltan
+ <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>, Jiri Denemark
+ <jdenemar@redhat.com>
+Subject: Re: [PATCH v5 03/28] pc: Start with modern CPU hotplug interface by
+ default
+Message-ID: <20251217143237.7829af2e@imammedo>
+In-Reply-To: <20251202162835.3227894-4-zhao1.liu@intel.com>
+References: <20251202162835.3227894-1-zhao1.liu@intel.com>
+	<20251202162835.3227894-4-zhao1.liu@intel.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA2PR02MB7564.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4016ceeb-660f-493b-3dba-08de3d64bec7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2025 12:06:43.9466
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PEFPbpOYEwTtkzC9HmEzO+5Mn4CGQILNA/bvd0ixn7a51BcBX2dgGmzwWPruHFTxgSEwnqiyDcp0wU30IV6uW8ZRJPuA5A6d+a0+ZsGlT4k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR02MB9166
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE3MDA5NCBTYWx0ZWRfX+Ru4W17JPkVO
- MOU01NoPUivws937uszE0BhMhXSOn+Yv8887jolI4z0HMtVGV4lJLmY6AxZHkotVd7v4RFTIOZh
- Q5Yl9ippZzqOVerAl70PmYkuij4cAPYTwtpIB7+XoYt/QOyFAS01dN9EEjNXGTOX1IEcs2Bdam7
- vMJ/E4Zd5/moZLcCuBxNdKwxFQVEMA1dgQ1QlDCGHw0q+89OIZL9vbBTT3QlssLjaudA3iVVqcb
- PJW8sPD7eNRm9M2er54UO4Wpp2IKUAUPh2j59myisercaLXlYyiQlQRhHbGjgus/GyKI094xVii
- WFa0nBV0Oe0+b+8AFcwsx0Y0RAx++rnhtlg9BTE98+KI4036jclrug3hD0n2v23b/eLHn6Y1L4Y
- B40FKE06mEkNIvZKYIvR6FWm/cq1+w==
-X-Proofpoint-ORIG-GUID: D3SKpiZ4KYrdJeTMW0JJiv_ZgSY4BXFc
-X-Proofpoint-GUID: D3SKpiZ4KYrdJeTMW0JJiv_ZgSY4BXFc
-X-Authority-Analysis: v=2.4 cv=GrtPO01C c=1 sm=1 tr=0 ts=69429cd8 cx=c_pps
- a=ZfDhP9WrRDodUAgXLfoXmg==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=wP3pNCr1ah4A:10 a=0kUYKlekyDsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=64Cc0HZtAAAA:8 a=e0wmN8nCD2NwXIuBd6QA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-17_01,2025-12-16_05,2025-10-01_01
-X-Proofpoint-Spam-Reason: safe
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-DQoNCj4gT24gMTIgRGVjIDIwMjUsIGF0IDEyOjM44oCvUE0sIEtodXNoaXQgU2hhaCA8a2h1c2hp
-dC5zaGFoQG51dGFuaXguY29tPiB3cm90ZToNCj4gDQo+IEBAIC0xNTE1LDYgKzE1NTIsMTcgQEAg
-c3RhdGljIHZvaWQga3ZtX2lvYXBpY19zZW5kX2VvaShzdHJ1Y3Qga3ZtX2xhcGljICphcGljLCBp
-bnQgdmVjdG9yKQ0KPiAgICAgICAgaWYgKGFwaWMtPnZjcHUtPmFyY2guaGlnaGVzdF9zdGFsZV9w
-ZW5kaW5nX2lvYXBpY19lb2kgPT0gdmVjdG9yKQ0KPiAgICAgICAgICAgICAgICBrdm1fbWFrZV9y
-ZXF1ZXN0KEtWTV9SRVFfU0NBTl9JT0FQSUMsIGFwaWMtPnZjcHUpOw0KPiANCj4gKyAgICAgICAv
-Kg0KPiArICAgICAgICogRG9uJ3Qgc2VuZCB0aGUgRU9JIHRvIHRoZSBJL08gQVBJQyBpZiB0aGUg
-Z3Vlc3QgaGFzIGVuYWJsZWQgRGlyZWN0ZWQNCj4gKyAgICAgICAqIEVPSSwgYS5rLmEuIFN1cHBy
-ZXNzIEVPSSBCcm9hZGNhc3RzLCBpbiB3aGljaCBjYXNlIHRoZSBsb2NhbA0KPiArICAgICAgICog
-QVBJQyBkb2Vzbid0IGJyb2FkY2FzdCBFT0lzICh0aGUgZ3Vlc3QgbXVzdCBFT0kgdGhlIHRhcmdl
-dA0KPiArICAgICAgICogSS9PIEFQSUMocykgZGlyZWN0bHkpLiBJZ25vcmUgdGhlIHN1cHByZXNz
-aW9uIGlmIHRoZSBndWVzdCBoYXMgbm90DQo+ICsgICAgICAgKiBleHBsaWNpdGx5IGVuYWJsZWQg
-U3VwcHJlc3MgRU9JIGJyb2FkY2FzdC4NCj4gKyAgICAgICAqLw0KPiArICAgICAgIGlmICgoa3Zt
-X2xhcGljX2dldF9yZWcoYXBpYywgQVBJQ19TUElWKSAmIEFQSUNfU1BJVl9ESVJFQ1RFRF9FT0kp
-ICYmDQo+ICsgICAgICAgICAgICAgICAgICFrdm1fbGFwaWNfaWdub3JlX3N1cHByZXNzX2VvaV9i
-cm9hZGNhc3QoYXBpYy0+dmNwdS0+a3ZtKSkNCj4gKyAgICAgICAgICAgICAgIHJldHVybjsNCj4g
-Kw0KPiAgICAgICAgLyogUmVxdWVzdCBhIEtWTSBleGl0IHRvIGluZm9ybSB0aGUgdXNlcnNwYWNl
-IElPQVBJQy4gKi8NCj4gICAgICAgIGlmIChpcnFjaGlwX3NwbGl0KGFwaWMtPnZjcHUtPmt2bSkp
-IHsNCj4gICAgICAgICAgICAgICAgYXBpYy0+dmNwdS0+YXJjaC5wZW5kaW5nX2lvYXBpY19lb2kg
-PSB2ZWN0b3I7DQo+IA0KPiANCj4gSSBhbSBub3QgZW50aXJlbHkgc3VyZSBpZiByZXR1cm5pbmcg
-ZnJvbSBrdm1faW9hcGljX3NlbmRfZW9pKCkgZWFybHkgaXMgY29ycmVjdA0KPiBmb3Iga2VybmVs
-IElPQVBJQy4gVGhlIG9yaWdpbmFsIGNvZGUgKHdoaWNoIGlzIG5vdyByZWR1bmRhbnQpIGRvZXMg
-dGhpcyB2ZXJ5IA0KPiBsYXRlIGluIGt2bV9pb2FwaWNfdXBkYXRlX2VvaV9vbmUoKS4NCg0KDQpB
-bSBJIGNvcnJlY3QgaW4gYXNzdW1pbmcgd2Ugc3RpbGwgbmVlZCBhIGNhbGwgdG8gcnRjX2lycV9l
-b2koKSBldmVuIGlmIHRoZSBndWVzdA0KaGFzIGVuYWJsZWQgU0VPSUI/IA0KDQpXZSB3aWxsIGNh
-bGwga3ZtX2lvYXBpY191cGRhdGVfZW9pX29uZSgpIG9uIEkvTyBBUElDIEVPSVIgd3JpdGUuIEJ1
-dCwgdGhlDQpmb2xsb3dpbmcgY29uZGl0aW9uIGluIGt2bV9pb2FwaWNfdXBkYXRlX2VvaV9vbmUo
-KSBibG9ja3MgRU9JIHByb2Nlc3Npbmc6DQoNCmlmICh0cmlnZ2VyX21vZGUgIT0gSU9BUElDX0xF
-VkVMX1RSSUcgfHwgDQogICAgICAgIGt2bV9sYXBpY19nZXRfcmVnKGFwaWMsIEFQSUNfU1BJVikg
-JiBBUElDX1NQSVZfRElSRUNURURfRU9JKQ0KICAgICAgICAgICAgICAgIHJldHVybjsNCg0KU28s
-IHRoZSBjb25kaXRpb24gbmVlZHMgdG8gbW92ZWQgZnJvbSBrdm1faW9hcGljX3VwZGF0ZV9lb2lf
-b25lKCkuIEl0IG1ha2VzDQpzZW5zZSB0byBrZWVwIGl0IGluIGt2bV9pb2FwaWNfc2VuZF9lb2ko
-KSBldmVuIGZvciBrZXJuZWwgSVJRQ0hJUC4gQnV0IGlmIGEgY2FsbA0KdG8gcnRjX2lycV9lb2ko
-KSBpcyByZXF1aXJlZCAobGlrZWx5KSwgdGhlbiB3ZSBuZWVkIHNvbWV0aGluZyBzaW1pbGFyIHRv
-IGZvbGxvd2luZzogDQoNCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vaW9hcGljLmMgYi9hcmNo
-L3g4Ni9rdm0vaW9hcGljLmMNCmluZGV4IDJjMjc4MzI5NmFlZC4uNzZlNTExYTM2Njk5IDEwMDY0
-NA0KLS0tIGEvYXJjaC94ODYva3ZtL2lvYXBpYy5jDQorKysgYi9hcmNoL3g4Ni9rdm0vaW9hcGlj
-LmMNCkBAIC01NjAsOCArNTYwLDcgQEAgc3RhdGljIHZvaWQga3ZtX2lvYXBpY191cGRhdGVfZW9p
-X29uZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQogICAgICAgIGt2bV9ub3RpZnlfYWNrZWRfaXJx
-KGlvYXBpYy0+a3ZtLCBLVk1fSVJRQ0hJUF9JT0FQSUMsIHBpbik7DQogICAgICAgIHNwaW5fbG9j
-aygmaW9hcGljLT5sb2NrKTsNCiANCi0gICAgICAgaWYgKHRyaWdnZXJfbW9kZSAhPSBJT0FQSUNf
-TEVWRUxfVFJJRyB8fA0KLSAgICAgICAgICAga3ZtX2xhcGljX2dldF9yZWcoYXBpYywgQVBJQ19T
-UElWKSAmIEFQSUNfU1BJVl9ESVJFQ1RFRF9FT0kpDQorICAgICAgIGlmICh0cmlnZ2VyX21vZGUg
-IT0gSU9BUElDX0xFVkVMX1RSSUcpDQogICAgICAgICAgICAgICAgcmV0dXJuOw0KIA0KICAgICAg
-ICBBU1NFUlQoZW50LT5maWVsZHMudHJpZ19tb2RlID09IElPQVBJQ19MRVZFTF9UUklHKTsNCkBA
-IC01OTUsNiArNTk0LDExIEBAIHZvaWQga3ZtX2lvYXBpY191cGRhdGVfZW9pKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSwgaW50IHZlY3RvciwgaW50IHRyaWdnZXJfbW9kZSkNCiANCiAgICAgICAgc3Bp
-bl9sb2NrKCZpb2FwaWMtPmxvY2spOw0KICAgICAgICBydGNfaXJxX2VvaShpb2FwaWMsIHZjcHUs
-IHZlY3Rvcik7DQorDQorICAgICAgIGlmKChrdm1fbGFwaWNfZ2V0X3JlZyhhcGljLCBBUElDX1NQ
-SVYpICYgQVBJQ19TUElWX0RJUkVDVEVEX0VPSSkgJiYNCisgICAgICAgICAgIGt2bV9sYXBpY19y
-ZXNwZWN0X3N1cHByZXNzX2VvaV9icm9hZGNhc3QoaW9hcGljLT5rdm0pKQ0KKyAgICAgICAgICAg
-ICAgIGdvdG8gb3V0Ow0KKw0KICAgICAgICBmb3IgKGkgPSAwOyBpIDwgSU9BUElDX05VTV9QSU5T
-OyBpKyspIHsNCiAgICAgICAgICAgICAgICB1bmlvbiBrdm1faW9hcGljX3JlZGlyZWN0X2VudHJ5
-ICplbnQgPSAmaW9hcGljLT5yZWRpcnRibFtpXTsNCiANCkBAIC02MDIsNiArNjA2LDggQEAgdm9p
-ZCBrdm1faW9hcGljX3VwZGF0ZV9lb2koc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBpbnQgdmVjdG9y
-LCBpbnQgdHJpZ2dlcl9tb2RlKQ0KICAgICAgICAgICAgICAgICAgICAgICAgY29udGludWU7DQog
-ICAgICAgICAgICAgICAga3ZtX2lvYXBpY191cGRhdGVfZW9pX29uZSh2Y3B1LCBpb2FwaWMsIHRy
-aWdnZXJfbW9kZSwgaSk7DQogICAgICAgIH0NCisNCitvdXQ6DQogICAgICAgIHNwaW5fdW5sb2Nr
-KCZpb2FwaWMtPmxvY2spOw0KIH0NCi0tLQ0KRmluYWxseSwganVzdCB0byBkb3VibGUtY2hlY2ss
-IGl0IGlzIHNhZmUgdG8gbm90IGNhbGwga3ZtX25vdGlmeV9hY2tlZF9pcnEoKQ0Kb24gTEFQSUMg
-RU9JIHdoZW4gZ3Vlc3QgaGFzIGVuYWJsZWQgU3VwcHJlc3MgRU9JIEJyb2FkY2FzdCwgcmlnaHQ/
-IEFzIGl0IHdpbGwgDQphbnl3YXkgYmUgY2FsbGVkIG9uIERpcmVjdCBFT0kuDQoNClRoYW5rcywg
-DQpLaHVzaGl0
+On Wed,  3 Dec 2025 00:28:10 +0800
+Zhao Liu <zhao1.liu@intel.com> wrote:
+
+> From: Igor Mammedov <imammedo@redhat.com>
+^^^
+given you resplit original patch, it's better to replace this with you,
+keeping my SoB is sufficient
+
+> 
+> For compatibility reasons PC/Q35 will start with legacy CPU hotplug
+> interface by default but with new CPU hotplug AML code since 2.7
+> machine type (in commit 679dd1a957df ("pc: use new CPU hotplug interface
+> since 2.7 machine type")). In that way, legacy firmware that doesn't use
+> QEMU generated ACPI tables was able to continue using legacy CPU hotplug
+> interface.
+> 
+> While later machine types, with firmware supporting QEMU provided ACPI
+> tables, generate new CPU hotplug AML, which will switch to new CPU
+> hotplug interface when guest OS executes its _INI method on ACPI tables
+> loading.
+> 
+> Since 2.6 machine type is now gone, and consider that the legacy BIOS
+> (based on QEMU ACPI prior to v2.7) should be no longer in use, previous
+> compatibility requirements are no longer necessary. So initialize
+> 'modern' hotplug directly from the very beginning for PC/Q35 machines
+> with cpu_hotplug_hw_init(), and drop _INIT method.
+> 
+> Additionally, remove the checks and settings around cpu_hotplug_legacy
+> in cpuhp VMState (for piix4 & ich9), to eliminate the risk of
+> segmentation faults, as gpe_cpu no longer has the opportunity to be
+> initialized. This is safe because all hotplug now start with the modern
+> way, and it's impossible to switch to legacy way at runtime (even the
+> "cpu-hotplug-legacy" properties does not allow it either).
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+
+tested ping pong cross version (master vs master+this patch) migration
+with 10.1 machine type, nothing is broken, hence
+
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+> Changes since v4:
+>  * New patch split off from Igor's v5 [*].
+> 
+> [*]: https://lore.kernel.org/qemu-devel/20251031142825.179239-1-imammedo@redhat.com/
+> ---
+>  hw/acpi/cpu.c                  | 10 ----------
+>  hw/acpi/ich9.c                 | 22 +++-------------------
+>  hw/acpi/piix4.c                | 21 +++------------------
+>  hw/i386/acpi-build.c           |  2 +-
+>  hw/loongarch/virt-acpi-build.c |  1 -
+>  include/hw/acpi/cpu.h          |  1 -
+>  6 files changed, 7 insertions(+), 50 deletions(-)
+> 
+> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> index 6f1ae79edbf3..d63ca83c1bcd 100644
+> --- a/hw/acpi/cpu.c
+> +++ b/hw/acpi/cpu.c
+> @@ -408,16 +408,6 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+>          aml_append(field, aml_reserved_field(4 * 8));
+>          aml_append(field, aml_named_field(CPU_DATA, 32));
+>          aml_append(cpu_ctrl_dev, field);
+> -
+> -        if (opts.has_legacy_cphp) {
+> -            method = aml_method("_INI", 0, AML_SERIALIZED);
+> -            /* switch off legacy CPU hotplug HW and use new one,
+> -             * on reboot system is in new mode and writing 0
+> -             * in CPU_SELECTOR selects BSP, which is NOP at
+> -             * the time _INI is called */
+> -            aml_append(method, aml_store(zero, aml_name(CPU_SELECTOR)));
+> -            aml_append(cpu_ctrl_dev, method);
+> -        }
+>      }
+>      aml_append(sb_scope, cpu_ctrl_dev);
+>  
+> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+> index 2b3b493c014b..54590129c695 100644
+> --- a/hw/acpi/ich9.c
+> +++ b/hw/acpi/ich9.c
+> @@ -183,26 +183,10 @@ static const VMStateDescription vmstate_tco_io_state = {
+>      }
+>  };
+>  
+> -static bool vmstate_test_use_cpuhp(void *opaque)
+> -{
+> -    ICH9LPCPMRegs *s = opaque;
+> -    return !s->cpu_hotplug_legacy;
+> -}
+> -
+> -static int vmstate_cpuhp_pre_load(void *opaque)
+> -{
+> -    ICH9LPCPMRegs *s = opaque;
+> -    Object *obj = OBJECT(s->gpe_cpu.device);
+> -    object_property_set_bool(obj, "cpu-hotplug-legacy", false, &error_abort);
+> -    return 0;
+> -}
+> -
+>  static const VMStateDescription vmstate_cpuhp_state = {
+>      .name = "ich9_pm/cpuhp",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> -    .needed = vmstate_test_use_cpuhp,
+> -    .pre_load = vmstate_cpuhp_pre_load,
+>      .fields = (const VMStateField[]) {
+>          VMSTATE_CPU_HOTPLUG(cpuhp_state, ICH9LPCPMRegs),
+>          VMSTATE_END_OF_LIST()
+> @@ -338,8 +322,8 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm, qemu_irq sci_irq)
+>      pm->powerdown_notifier.notify = pm_powerdown_req;
+>      qemu_register_powerdown_notifier(&pm->powerdown_notifier);
+>  
+> -    legacy_acpi_cpu_hotplug_init(pci_address_space_io(lpc_pci),
+> -        OBJECT(lpc_pci), &pm->gpe_cpu, ICH9_CPU_HOTPLUG_IO_BASE);
+> +    cpu_hotplug_hw_init(pci_address_space_io(lpc_pci),
+> +        OBJECT(lpc_pci), &pm->cpuhp_state, ICH9_CPU_HOTPLUG_IO_BASE);
+>  
+>      acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
+>                               &pm->acpi_memory_hotplug,
+> @@ -419,7 +403,7 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPMRegs *pm)
+>  {
+>      static const uint32_t gpe0_len = ICH9_PMIO_GPE0_LEN;
+>      pm->acpi_memory_hotplug.is_enabled = true;
+> -    pm->cpu_hotplug_legacy = true;
+> +    pm->cpu_hotplug_legacy = false;
+>      pm->disable_s3 = 0;
+>      pm->disable_s4 = 0;
+>      pm->s4_val = 2;
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 7a18f18dda21..a7a29b0d09a9 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -195,25 +195,10 @@ static const VMStateDescription vmstate_memhp_state = {
+>      }
+>  };
+>  
+> -static bool vmstate_test_use_cpuhp(void *opaque)
+> -{
+> -    PIIX4PMState *s = opaque;
+> -    return !s->cpu_hotplug_legacy;
+> -}
+> -
+> -static int vmstate_cpuhp_pre_load(void *opaque)
+> -{
+> -    Object *obj = OBJECT(opaque);
+> -    object_property_set_bool(obj, "cpu-hotplug-legacy", false, &error_abort);
+> -    return 0;
+> -}
+> -
+>  static const VMStateDescription vmstate_cpuhp_state = {
+>      .name = "piix4_pm/cpuhp",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> -    .needed = vmstate_test_use_cpuhp,
+> -    .pre_load = vmstate_cpuhp_pre_load,
+>      .fields = (const VMStateField[]) {
+>          VMSTATE_CPU_HOTPLUG(cpuhp_state, PIIX4PMState),
+>          VMSTATE_END_OF_LIST()
+> @@ -573,12 +558,12 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+>          qbus_set_hotplug_handler(BUS(pci_get_bus(PCI_DEVICE(s))), OBJECT(s));
+>      }
+>  
+> -    s->cpu_hotplug_legacy = true;
+> +    s->cpu_hotplug_legacy = false;
+>      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+>                               piix4_get_cpu_hotplug_legacy,
+>                               piix4_set_cpu_hotplug_legacy);
+> -    legacy_acpi_cpu_hotplug_init(parent, OBJECT(s), &s->gpe_cpu,
+> -                                 PIIX4_CPU_HOTPLUG_IO_BASE);
+> +    cpu_hotplug_hw_init(parent, OBJECT(s), &s->cpuhp_state,
+> +                        PIIX4_CPU_HOTPLUG_IO_BASE);
+>  
+>      if (s->acpi_memory_hotplug.is_enabled) {
+>          acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug,
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 9446a9f862ca..23147ddc25e7 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -964,7 +964,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
+>          CPUHotplugFeatures opts = {
+> -            .acpi_1_compatible = true, .has_legacy_cphp = true,
+> +            .acpi_1_compatible = true,
+>              .smi_path = pm->smi_on_cpuhp ? "\\_SB.PCI0.SMI0.SMIC" : NULL,
+>              .fw_unplugs_cpu = pm->smi_on_cpu_unplug,
+>          };
+> diff --git a/hw/loongarch/virt-acpi-build.c b/hw/loongarch/virt-acpi-build.c
+> index 3694c9827f04..8d01c8e3de87 100644
+> --- a/hw/loongarch/virt-acpi-build.c
+> +++ b/hw/loongarch/virt-acpi-build.c
+> @@ -369,7 +369,6 @@ build_la_ged_aml(Aml *dsdt, MachineState *machine)
+>  
+>      if (event & ACPI_GED_CPU_HOTPLUG_EVT) {
+>          opts.acpi_1_compatible = false;
+> -        opts.has_legacy_cphp = false;
+>          opts.fw_unplugs_cpu = false;
+>          opts.smi_path = NULL;
+>  
+> diff --git a/include/hw/acpi/cpu.h b/include/hw/acpi/cpu.h
+> index 32654dc274fd..2cb0ca4f3dce 100644
+> --- a/include/hw/acpi/cpu.h
+> +++ b/include/hw/acpi/cpu.h
+> @@ -54,7 +54,6 @@ void cpu_hotplug_hw_init(MemoryRegion *as, Object *owner,
+>  
+>  typedef struct CPUHotplugFeatures {
+>      bool acpi_1_compatible;
+> -    bool has_legacy_cphp;
+>      bool fw_unplugs_cpu;
+>      const char *smi_path;
+>  } CPUHotplugFeatures;
+
 
