@@ -1,283 +1,108 @@
-Return-Path: <kvm+bounces-66163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F959CC7668
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 12:44:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F67CC7695
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 12:46:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D349F30CBDA7
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 11:40:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E14D330993BF
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 11:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E318528C87D;
-	Wed, 17 Dec 2025 11:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19BD329C6B;
+	Wed, 17 Dec 2025 11:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FNybXqu8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qmz/fZ/y"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C59B3A1E9A;
-	Wed, 17 Dec 2025 11:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C6B2D7DCF
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 11:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765971635; cv=none; b=Z5+Rrgiqq6dkn4uHEpesUm5wYWDXF2HNmDvka1O+iIqWd+l7aR2o4ZaO9A0ohGhkzspzVz486t0ZWQOyHZGjamiXgiWUIM5eXEXTHuV7Vid1mO2KP6LW/ZcvWALNq0GwEXwOYhgYTd/aDKMnX1kDIoW2shosR46lv4iFixTx5qo=
+	t=1765971852; cv=none; b=SdsnELycT8bQjR/uSjn4NNW8f3Cp7kQGhBouUkJaxLxEq+KVsEJ7TW2lWqQyb8E6eO1d/gvxggrzcfwxinfsrkuiWniqOPWe82EhQBWQYXP+n9v0tb/9IVtVsAbLMrpc8R1fP3jCb8SZ8GWQq9QyGMgNNFxo49k7gnZ6U6C85Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765971635; c=relaxed/simple;
-	bh=uqwVsWJ8uisJ2wNnLh7lsr40H7RB5s1TQv5LWb9t0R4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Amg4LTdx/REun/uUCUX2t1nXwB+ps8G97/GFw+E4J1uSGdHTsKSt0fQ8kYMaFuEBVbxSjO6x46mVTMIRuKqdzfMC1WQh4ps6wNwc4dGjUjwUWuY/PhKh5BzBo3pJWXKFNTkN0IfdqMYmF/ZjTzbDOzlY9zkvaTpWct7FkgUWnYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FNybXqu8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FF23C4CEF5;
-	Wed, 17 Dec 2025 11:40:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765971634;
-	bh=uqwVsWJ8uisJ2wNnLh7lsr40H7RB5s1TQv5LWb9t0R4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FNybXqu812pCpuRRRwMC9R7TwkcMb2fQtVD1jCfoC4Ri6bEZqaLvs1Uv5WeuVQL8r
-	 sZ0ffVl7jcNeCcNEcB53jDJyXtByxIMMJWd70zt2NsEo4MBGRGTgEWb7rFC0ScIX8d
-	 UKPSt/9/YgKVSYJrk/7rZXVHZA72eO0O2TmiyUswuHK4+W6DZpLqcYCNSyJlnN6WKP
-	 4wlMrizNmjG9ZDfA0Jr5YFM4V0tlFc3ndegm1UaAEtxJuAsNxP1gYU+y+VIvcgN0FI
-	 Gbo3E2cRybovmdKIROhZbCGpcYXNS+CXpjiLnhdG/mdqwz/7o5uKLYap5S5lLKLu2b
-	 +TCrk+i6kN4tQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vVptP-0000000DLhr-3EaW;
-	Wed, 17 Dec 2025 11:40:31 +0000
-Date: Wed, 17 Dec 2025 11:40:31 +0000
-Message-ID: <861pktnxow.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 15/32] KVM: arm64: gic-v5: Implement direct injection of PPIs
-In-Reply-To: <20251212152215.675767-16-sascha.bischoff@arm.com>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-16-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765971852; c=relaxed/simple;
+	bh=jXPm1Uf2f56XOX3GHeLzCWAbUjN8TNN1Cj0Y1/2QNbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fQelGeSfQHLQQ735c90k3APtS2F4kaP5QiBlOOymIXhWYqbbW/6N+42j06Gaxuy5IJLhMiYo/YLUAL3vqJqCoYeSfj/mCxNNbJSk36FLrAOr5zZjbyy0nYGNaxaYyGiyMTE8d8LW9DG8Ju9HwMwgB7CET+xQ4MxQ/9JoRUYtKaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qmz/fZ/y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765971850;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=byYbQW2aOTVienLeGnmuCCWlLXqBV6cfpvW/+Acp7fA=;
+	b=Qmz/fZ/yy3K3fj9rzXz5V4yKDjqgcWFrXE6X2jB2pVcJpqC0q6+vPaRPw9X1wvg5rr8zoS
+	3JeB4Apn6sCmltGjC67RuyEFuP9bl5MEI9kqoEWYj6m1zBab2XgyBWjfy6nGDl/xDKcHO9
+	OKQH5Z0lIs1ZEEHxxGenwJTglf+k9dE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-fGt1zVYEOneFoK8CoOhToQ-1; Wed,
+ 17 Dec 2025 06:44:07 -0500
+X-MC-Unique: fGt1zVYEOneFoK8CoOhToQ-1
+X-Mimecast-MFC-AGG-ID: fGt1zVYEOneFoK8CoOhToQ_1765971846
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1157C19560A5;
+	Wed, 17 Dec 2025 11:44:06 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.44.32.156])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 951AA19560A7;
+	Wed, 17 Dec 2025 11:44:05 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 48F861800869; Wed, 17 Dec 2025 12:44:03 +0100 (CET)
+Date: Wed, 17 Dec 2025 12:44:03 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Ani Sinha <anisinha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
+	Marcelo Tosatti <mtosatti@redhat.com>, vkuznets@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v1 15/28] i386/sev: add migration blockers only once
+Message-ID: <aas37tpm2yrqueip7mhgqd7lzy5f3ckk6zrt73bzq6dawpjoox@47o27xg5acqt>
+References: <20251212150359.548787-1-anisinha@redhat.com>
+ <20251212150359.548787-16-anisinha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212150359.548787-16-anisinha@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, 12 Dec 2025 15:22:40 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> GICv5 is able to directly inject PPI pending state into a guest using
-> a mechanism called DVI whereby the pending bit for a paticular PPI is
-> driven directly by the physically-connected hardware. This mechanism
-> itself doesn't allow for any ID translation, so the host interrupt is
-> directly mapped into a guest with the same interrupt ID.
-> 
-> When mapping a virtual interrupt to a physical interrupt via
-> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
-> PPI or not. If it is, and the host's interrupt ID matches that used
-> for the guest DVI is enabled, and the interrupt itself is marked as
-> directly_injected.
-> 
-> When the interrupt is unmapped again, this process is reversed, and
-> DVI is disabled for the interrupt again.
-> 
-> Note: the expectation is that a directly injected PPI is disabled on
-> the host while the guest state is loaded. The reason is that although
-> DVI is enabled to drive the guest's pending state directly, the host
-> pending state also remains driven. In order to avoid the same PPI
-> firing on both the host and the guest, the host's interrupt must be
-> disabled (masked). This is left up to the code that owns the device
-> generating the PPI as this needs to be handled on a per-VM basis. One
-> VM might use DVI, while another might not, in which case the physical
-> PPI should be enabled for the latter.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 22 ++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    | 16 ++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.h    |  1 +
->  include/kvm/arm_vgic.h        |  1 +
->  4 files changed, 40 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 2fb2db23ed39a..22558080711eb 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -54,6 +54,28 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
->  }
->  
-> +/*
-> + * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
-> + */
-> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
-> +
-> +	if (ppi >= 128)
-> +		return -EINVAL;
+On Fri, Dec 12, 2025 at 08:33:43PM +0530, Ani Sinha wrote:
+> sev_launch_finish() and sev_snp_launch_finish() could be called multiple times
+> if the confidential guest is capable of being reset/rebooted. The migration
+> blockers should not be added multiple times, once per invocation. This change
+> makes sure that the migration blockers are added only one time and not every
+> time upon invocvation of launch_finish() calls.
 
-Surely this is bad. *very* bad. How can we get here the first place?
+> +    static bool added_migration_blocker;
 
-> +
-> +	if (dvi) {
-> +		/* Set the bit */
-> +		cpu_if->vgic_ppi_dvir[ppi / 64] |= 1UL << (ppi % 64);
-> +	} else {
-> +		/* Clear the bit */
-> +		cpu_if->vgic_ppi_dvir[ppi / 64] &= ~(1UL << (ppi % 64));
-> +	}
+> -    error_setg(&sev_mig_blocker,
+> -               "SEV: Migration is not implemented");
+> -    migrate_add_blocker(&sev_mig_blocker, &error_fatal);
+> +    if (!added_migration_blocker) {
+> +        /* add migration blocker */
+> +        error_setg(&sev_mig_blocker,
+> +                   "SEV: Migration is not implemented");
+> +        migrate_add_blocker(&sev_mig_blocker, &error_fatal);
+> +        added_migration_blocker = true;
+> +    }
 
-This should be simplified:
+Maybe move this to another place which is called only once?  The
+migration blocker should not be very sensitive to initialization
+ordering, so I'd expect finding another place where you don't need
+the added_migration_blocker tracker variable isn't too much of a
+problem.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index d74cc3543b9a4..f434ee85f7e1a 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -191,8 +191,8 @@ bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
- 				   struct vgic_irq *irq)
- {
- 	struct vgic_v5_cpu_if *cpu_if;
--	const u32 id_bit = BIT_ULL(irq->intid % 64);
- 	const u32 reg = FIELD_GET(GICV5_HWIRQ_ID, irq->intid) / 64;
-+	unsigned long *p;
- 
- 	if (!vcpu || !irq)
- 		return false;
-@@ -203,10 +203,8 @@ bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
- 
- 	cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
- 
--	if (irq_is_pending(irq))
--		cpu_if->vgic_ppi_pendr[reg] |= id_bit;
--	else
--		cpu_if->vgic_ppi_pendr[reg] &= ~id_bit;
-+	p = (unsigned long *)&cpu_if->vgic_ppi_pendr[reg];
-+	__assign_bit(irq->intid % 64, p, irq_is_pending(irq));
- 
- 	return true;
- }
-@@ -449,17 +447,13 @@ int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
- {
- 	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
- 	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
-+	unsigned long *p;
- 
- 	if (ppi >= 128)
- 		return -EINVAL;
- 
--	if (dvi) {
--		/* Set the bit */
--		cpu_if->vgic_ppi_dvir[ppi / 64] |= 1UL << (ppi % 64);
--	} else {
--		/* Clear the bit */
--		cpu_if->vgic_ppi_dvir[ppi / 64] &= ~(1UL << (ppi % 64));
--	}
-+	p = (unsigned long *)&cpu_if->vgic_ppi_dvir[ppi / 64];
-+	__assign_bit(ppi % 64, p, dvi);
- 
- 	return 0;
- }
+take care,
+  Gerd
 
-(yes, unsigned long and u64 are the same thing on any sane
-architecture).
-
-> +
-> +	return 0;
-> +}
-> +
->  void vgic_v5_load(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1005ff5f36235..1fe3dcc997860 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -577,12 +577,28 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	irq->host_irq = host_irq;
->  	irq->hwintid = data->hwirq;
->  	irq->ops = ops;
-> +
-> +	if (vgic_is_v5(vcpu->kvm)) {
-> +		/* Nothing for us to do */
-> +		if (!irq_is_ppi_v5(irq->intid))
-> +			return 0;
-> +
-> +		if (FIELD_GET(GICV5_HWIRQ_ID, irq->intid) == irq->hwintid) {
-> +			if (!vgic_v5_set_ppi_dvi(vcpu, irq->hwintid, true))
-> +				irq->directly_injected = true;
-
-The error handling gives me the creeps. If we can end-up at this stage
-with the wrong INTID, we're screwed.
-
-> +		}
-> +	}
-> +
->  	return 0;
->  }
->  
->  /* @irq->irq_lock must be held */
->  static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
->  {
-> +	if (irq->directly_injected && vgic_is_v5(irq->target_vcpu->kvm))
-> +		WARN_ON(vgic_v5_set_ppi_dvi(irq->target_vcpu, irq->hwintid, false));
-> +
-> +	irq->directly_injected = false;
->  	irq->hw = false;
->  	irq->hwintid = 0;
->  	irq->ops = NULL;
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 6e1f386dffade..b6e3f5e3aba18 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -363,6 +363,7 @@ void vgic_debug_init(struct kvm *kvm);
->  void vgic_debug_destroy(struct kvm *kvm);
->  
->  int vgic_v5_probe(const struct gic_kvm_info *info);
-> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
->  void vgic_v5_load(struct kvm_vcpu *vcpu);
->  void vgic_v5_put(struct kvm_vcpu *vcpu);
->  void vgic_v5_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 45d83f45b065d..ce9e149b85a58 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -163,6 +163,7 @@ struct vgic_irq {
->  	bool enabled:1;
->  	bool active:1;
->  	bool hw:1;			/* Tied to HW IRQ */
-> +	bool directly_injected:1;	/* A directly injected HW IRQ */
->  	bool on_lr:1;			/* Present in a CPU LR */
->  	refcount_t refcount;		/* Used for LPIs */
->  	u32 hwintid;			/* HW INTID number */
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
