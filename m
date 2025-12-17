@@ -1,199 +1,120 @@
-Return-Path: <kvm+bounces-66102-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39CA5CC5DE6
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 04:10:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8319CC5EE3
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 04:50:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 37FBA301CD06
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 03:10:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21C863027CC2
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 03:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EC029BD94;
-	Wed, 17 Dec 2025 03:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="KCvIGR+6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19552D29C2;
+	Wed, 17 Dec 2025 03:49:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F043B1B3;
-	Wed, 17 Dec 2025 03:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F5F3A1E7F;
+	Wed, 17 Dec 2025 03:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765941019; cv=none; b=Upg45I6J4lEr53Wv2LY60NgbuP+3mOhadaDa6TT5bOI7EdvOZp7oj7brw3b9tp52F3XbmW4deZWWKmpHUgI8DNrA0xfpjhaNenVCVB0kOrmxy8crl/9P91v1tlX8oiw1t5QEL1exjq10T0Uoux82YeScj9MRB3oPbFN1MO+11cY=
+	t=1765943382; cv=none; b=YjUkhRet/+MT9pbTvZ4tg7o+l55Y4kt3BErVBQZ2MX+n9V8+kG6H7RzPRXJWIqNuOL2c85Iq8YFjOA1bWaf9R3EqpM2pFjp0UNqm6B4SAGxcoi5TxeP9IXZk7jwgtice8RJO4GaQ8CfCu/U/wcjzUzQHM1phOgGtR2no941Q4wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765941019; c=relaxed/simple;
-	bh=WNqHZI7KJTkRxa7G8xlCYAKQ66Di7c7gSmm2tzvuM34=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qAuqK4GCc/HuI2FDzPx12FA8XtPn6zFnl8ZKfHG1DsEvDlFO2undj09HfTjRAyK+SCMT7zg7v2HB55pct3KGfHE2kD0CeXiEsPpIZRXB40Y+VgIgJWxaYoaIX3JIniQpg63B9jLBvXRRYl+1i8xBtaKBb8otAmICBiIOHZ+7g6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=KCvIGR+6; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Hbw9zR0xEpNm9A0Pc6HSS0+c52olIIH10RNS2pDgzjs=;
-	b=KCvIGR+6Fj9i8JqE2aOH3ZT7Ll4mDUiB1+4jFjDbno13RnDEFL0vddTBuxsYXAK8IqvPJfOC5
-	eIDGY7bSeSCftA4ReTD2b3uoaCuk7lku20l2CYrd4VQn/ys574cTYHcBCtcueyQfs8WamJAE9sR
-	iTfELMeilc1vFhS+AdFbEJk=
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dWJcT2PcBz1cyPb;
-	Wed, 17 Dec 2025 11:07:05 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 55EFF1401E9;
-	Wed, 17 Dec 2025 11:10:07 +0800 (CST)
-Received: from kwepemq500010.china.huawei.com (7.202.194.235) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Dec 2025 11:10:07 +0800
-Received: from [10.173.125.37] (10.173.125.37) by
- kwepemq500010.china.huawei.com (7.202.194.235) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Dec 2025 11:10:06 +0800
-Subject: Re: [PATCH v2 1/3] mm: fixup pfnmap memory failure handling to use
- pgoff
-To: <ankita@nvidia.com>
-CC: <cjia@nvidia.com>, <zhiw@nvidia.com>, <kjaju@nvidia.com>,
-	<yishaih@nvidia.com>, <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <vsethi@nvidia.com>,
-	<jgg@nvidia.com>, <mochs@nvidia.com>, <jgg@ziepe.ca>,
-	<skolothumtho@nvidia.com>, <alex@shazbot.org>, <akpm@linux-foundation.org>,
-	<nao.horiguchi@gmail.com>
-References: <20251213044708.3610-1-ankita@nvidia.com>
- <20251213044708.3610-2-ankita@nvidia.com>
-From: Miaohe Lin <linmiaohe@huawei.com>
-Message-ID: <f871d90d-11e0-1719-c946-1c0bf341042a@huawei.com>
-Date: Wed, 17 Dec 2025 11:10:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	s=arc-20240116; t=1765943382; c=relaxed/simple;
+	bh=ULSab/ik4daYyQjyWWBw7TYBPA3oOzNlLNWSmx9HoBs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gYMTdVtO63GOW1JYLZhUQ/4Nv4/fE+AtDHwg9bGZA/VtBA7BDn+jPmH/NErKt8C448rbo+N444xD15dCFo5Rvk70aVvSheyuWCkgL6s3aVvZVFAXlT3W7D5xeGqFeBr9Bt6dEFCNs+dhWttREv6TrRHUjAppThj3eF5//okjL9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.185])
+	by gateway (Coremail) with SMTP id _____8Dx_8NKKEJpyQAAAA--.46S3;
+	Wed, 17 Dec 2025 11:49:30 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.185])
+	by front1 (Coremail) with SMTP id qMiowJCxPMJFKEJpksAAAA--.913S2;
+	Wed, 17 Dec 2025 11:49:26 +0800 (CST)
+From: Xianglai Li <lixianglai@loongson.cn>
+To: loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	lixianglai@loongson.cn
+Cc: Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>,
+	Charlie Jenkins <charlie@rivosinc.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	stable@vger.kernel.org
+Subject: [PATCH 0/2] LoongArch: KVM: fix "unreliable stack" issue
+Date: Wed, 17 Dec 2025 11:24:48 +0800
+Message-Id: <20251217032450.954344-1-lixianglai@loongson.cn>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251213044708.3610-2-ankita@nvidia.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemq500010.china.huawei.com (7.202.194.235)
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxPMJFKEJpksAAAA--.913S2
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On 2025/12/13 12:47, ankita@nvidia.com wrote:
-> From: Ankit Agrawal <ankita@nvidia.com>
-> 
-> The memory failure handling implementation for the PFNMAP memory with no
-> struct pages is faulty. The VA of the mapping is determined based on the
-> the PFN. It should instead be based on the file mapping offset.
-> 
-> At the occurrence of poison, the memory_failure_pfn is triggered on the
-> poisoned PFN. Introduce a callback function that allows mm to translate
-> the PFN to the corresponding file page offset. The kernel module using
-> the registration API must implement the callback function and provide the
-> translation. The translated value is then used to determine the VA
-> information and sending the SIGBUS to the usermode process mapped to
-> the poisoned PFN.
-> 
-> The callback is also useful for the driver to be notified of the poisoned
-> PFN, which may then track it.
-> 
-> Fixes: 2ec41967189c ("mm: handle poisoning of pfn without struct pages")
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+When starting multi-core loongarch virtualization on loongarch physical
+machine, loading livepatch on the physical machine will cause an error
+similar to the following:
+[  411.686289] livepatch: klp_try_switch_task: CPU 31/KVM:3116 has an
+unreliable stack
 
-Thanks for your patch.
+The specific test steps are as follows:
+1.Start a multi-core virtual machine on a physical machine
 
-> ---
->  include/linux/memory-failure.h |  2 ++
->  mm/memory-failure.c            | 29 ++++++++++++++++++-----------
->  2 files changed, 20 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/linux/memory-failure.h b/include/linux/memory-failure.h
-> index bc326503d2d2..7b5e11cf905f 100644
-> --- a/include/linux/memory-failure.h
-> +++ b/include/linux/memory-failure.h
-> @@ -9,6 +9,8 @@ struct pfn_address_space;
->  struct pfn_address_space {
->  	struct interval_tree_node node;
->  	struct address_space *mapping;
-> +	int (*pfn_to_vma_pgoff)(struct vm_area_struct *vma,
-> +				unsigned long pfn, pgoff_t *pgoff);
->  };
->  
->  int register_pfn_address_space(struct pfn_address_space *pfn_space);
-> diff --git a/mm/memory-failure.c b/mm/memory-failure.c
-> index fbc5a01260c8..c80c2907da33 100644
-> --- a/mm/memory-failure.c
-> +++ b/mm/memory-failure.c
-> @@ -2161,6 +2161,9 @@ int register_pfn_address_space(struct pfn_address_space *pfn_space)
->  {
->  	guard(mutex)(&pfn_space_lock);
->  
-> +	if (!pfn_space->pfn_to_vma_pgoff)
-> +		return -EINVAL;
-> +
->  	if (interval_tree_iter_first(&pfn_space_itree,
->  				     pfn_space->node.start,
->  				     pfn_space->node.last))
-> @@ -2183,10 +2186,10 @@ void unregister_pfn_address_space(struct pfn_address_space *pfn_space)
->  }
->  EXPORT_SYMBOL_GPL(unregister_pfn_address_space);
->  
-> -static void add_to_kill_pfn(struct task_struct *tsk,
-> -			    struct vm_area_struct *vma,
-> -			    struct list_head *to_kill,
-> -			    unsigned long pfn)
-> +static void add_to_kill_pgoff(struct task_struct *tsk,
-> +			      struct vm_area_struct *vma,
-> +			      struct list_head *to_kill,
-> +			      pgoff_t pgoff)
->  {
->  	struct to_kill *tk;
->  
-> @@ -2197,12 +2200,12 @@ static void add_to_kill_pfn(struct task_struct *tsk,
->  	}
->  
->  	/* Check for pgoff not backed by struct page */
-> -	tk->addr = vma_address(vma, pfn, 1);
-> +	tk->addr = vma_address(vma, pgoff, 1);
->  	tk->size_shift = PAGE_SHIFT;
->  
->  	if (tk->addr == -EFAULT)
->  		pr_info("Unable to find address %lx in %s\n",
-> -			pfn, tsk->comm);
-> +			pgoff, tsk->comm);
->  
->  	get_task_struct(tsk);
->  	tk->tsk = tsk;
-> @@ -2212,11 +2215,12 @@ static void add_to_kill_pfn(struct task_struct *tsk,
->  /*
->   * Collect processes when the error hit a PFN not backed by struct page.
->   */
-> -static void collect_procs_pfn(struct address_space *mapping,
-> +static void collect_procs_pfn(struct pfn_address_space *pfn_space,
->  			      unsigned long pfn, struct list_head *to_kill)
->  {
->  	struct vm_area_struct *vma;
->  	struct task_struct *tsk;
-> +	struct address_space *mapping = pfn_space->mapping;
->  
->  	i_mmap_lock_read(mapping);
->  	rcu_read_lock();
-> @@ -2226,9 +2230,12 @@ static void collect_procs_pfn(struct address_space *mapping,
->  		t = task_early_kill(tsk, true);
->  		if (!t)
->  			continue;
-> -		vma_interval_tree_foreach(vma, &mapping->i_mmap, pfn, pfn) {
-> -			if (vma->vm_mm == t->mm)
-> -				add_to_kill_pfn(t, vma, to_kill, pfn);
-> +		vma_interval_tree_foreach(vma, &mapping->i_mmap, 0, ULONG_MAX) {
-> +			pgoff_t pgoff;
+2.Enter the following command on the physical machine to turn on the debug
+switch:
+  echo "file kernel/livepatch/transition.c +p"  > /sys/kernel/debug/\
+dynamic_debug/control 
 
-IIUC, all vma will be traversed to find the final pgoff. This might not be a good idea
-because rcu lock is held and this traversal might take a really long time. Or am I miss
-something?
 
-Thanks.
-.
+3.Load livepatch:
+ modprobe  livepatch-sample 
+
+Through the above steps, similar prints can be viewed in dmesg.
+
+The reason for this issue is that the code of the kvm_exc_entry function
+was copied in the function kvm_loongarch_env_init. When the cpu needs to
+execute kvm_exc_entry, it will switch to the copied address for execution.
+The new address of the kvm_exc_entry function cannot be recognized in ORC,
+which eventually leads to the arch_stack_walk_reliable function returning
+an error and printing an exception message.
+
+To solve the above problems, we directly compile the switch.S file into
+the kernel instead of the module. In this way, the function kvm_exc_entry
+will no longer need to be copied.
+
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: Bibo Mao <maobibo@loongson.cn>
+Cc: Charlie Jenkins <charlie@rivosinc.com>
+Cc: Xianglai Li <lixianglai@loongson.cn>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: stable@vger.kernel.org
+
+Xianglai Li (2):
+  LoongArch: KVM: Compile the switch.S file directly into the kernel
+  LoongArch: KVM: fix "unreliable stack" issue
+
+ arch/loongarch/Kbuild                       |  2 +-
+ arch/loongarch/include/asm/asm-prototypes.h | 16 ++++++++++
+ arch/loongarch/include/asm/kvm_host.h       |  5 +--
+ arch/loongarch/include/asm/kvm_vcpu.h       | 20 ++++++------
+ arch/loongarch/kvm/Makefile                 |  2 +-
+ arch/loongarch/kvm/main.c                   | 35 ++-------------------
+ arch/loongarch/kvm/switch.S                 | 24 +++++++++++---
+ 7 files changed, 51 insertions(+), 53 deletions(-)
+
+
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+-- 
+2.39.1
+
 
