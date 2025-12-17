@@ -1,70 +1,53 @@
-Return-Path: <kvm+bounces-66164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F67CC7695
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 12:46:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29C8CC76D7
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 12:49:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E14D330993BF
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 11:44:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9668C300F1A9
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 11:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19BD329C6B;
-	Wed, 17 Dec 2025 11:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qmz/fZ/y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC6433C503;
+	Wed, 17 Dec 2025 11:49:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C6B2D7DCF
-	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 11:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FA5280023
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 11:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765971852; cv=none; b=SdsnELycT8bQjR/uSjn4NNW8f3Cp7kQGhBouUkJaxLxEq+KVsEJ7TW2lWqQyb8E6eO1d/gvxggrzcfwxinfsrkuiWniqOPWe82EhQBWQYXP+n9v0tb/9IVtVsAbLMrpc8R1fP3jCb8SZ8GWQq9QyGMgNNFxo49k7gnZ6U6C85Z8=
+	t=1765972182; cv=none; b=UfLBetJe4h09wWQc2nZhsJQWFu1sSWK9OBnR02Vf+W989uQIKyYfIj6LxXkj03yFTtJP5ixmq2mfgpGKgL+2ipKl0ICdDhGn0A9qJOxXDWqhCyQ9UFjoxSkr1QrgUNIVcxhJ3ID9FjHoapXtwlg+S39pEx/Hgl0C03FpIg05oJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765971852; c=relaxed/simple;
-	bh=jXPm1Uf2f56XOX3GHeLzCWAbUjN8TNN1Cj0Y1/2QNbM=;
+	s=arc-20240116; t=1765972182; c=relaxed/simple;
+	bh=tPuhQutOLTQLn1wA4d7OiW+lh6nPDv0oZ+V8VykUVSM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fQelGeSfQHLQQ735c90k3APtS2F4kaP5QiBlOOymIXhWYqbbW/6N+42j06Gaxuy5IJLhMiYo/YLUAL3vqJqCoYeSfj/mCxNNbJSk36FLrAOr5zZjbyy0nYGNaxaYyGiyMTE8d8LW9DG8Ju9HwMwgB7CET+xQ4MxQ/9JoRUYtKaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qmz/fZ/y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765971850;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=byYbQW2aOTVienLeGnmuCCWlLXqBV6cfpvW/+Acp7fA=;
-	b=Qmz/fZ/yy3K3fj9rzXz5V4yKDjqgcWFrXE6X2jB2pVcJpqC0q6+vPaRPw9X1wvg5rr8zoS
-	3JeB4Apn6sCmltGjC67RuyEFuP9bl5MEI9kqoEWYj6m1zBab2XgyBWjfy6nGDl/xDKcHO9
-	OKQH5Z0lIs1ZEEHxxGenwJTglf+k9dE=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-362-fGt1zVYEOneFoK8CoOhToQ-1; Wed,
- 17 Dec 2025 06:44:07 -0500
-X-MC-Unique: fGt1zVYEOneFoK8CoOhToQ-1
-X-Mimecast-MFC-AGG-ID: fGt1zVYEOneFoK8CoOhToQ_1765971846
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1157C19560A5;
-	Wed, 17 Dec 2025 11:44:06 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.44.32.156])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 951AA19560A7;
-	Wed, 17 Dec 2025 11:44:05 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 48F861800869; Wed, 17 Dec 2025 12:44:03 +0100 (CET)
-Date: Wed, 17 Dec 2025 12:44:03 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Ani Sinha <anisinha@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
-	Marcelo Tosatti <mtosatti@redhat.com>, vkuznets@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v1 15/28] i386/sev: add migration blockers only once
-Message-ID: <aas37tpm2yrqueip7mhgqd7lzy5f3ckk6zrt73bzq6dawpjoox@47o27xg5acqt>
-References: <20251212150359.548787-1-anisinha@redhat.com>
- <20251212150359.548787-16-anisinha@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LRPUabp4y7/0tTNZmzt/LjHIe+XL2fP/Qf0hMTMkZZNhqZEkLxfi5gNTLMd6ZKfwFbcx8mwV04vn+fSMqYZN20Xuq1Dw5e2n+RzACPPxM+Ib3WyPzpqtgg2yJrYslHWwkpaLo8kVWMhIKVVUf/2MMI7j79E8GzvkBg46hFr3OKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E56514BF;
+	Wed, 17 Dec 2025 03:49:32 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC8CF3F73B;
+	Wed, 17 Dec 2025 03:49:37 -0800 (PST)
+Date: Wed, 17 Dec 2025 11:49:32 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 18/32] KVM: arm64: gic-v5: Check for pending PPIs
+Message-ID: <20251217114932.GA1626516@e124191.cambridge.arm.com>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+ <20251212152215.675767-19-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,36 +56,222 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251212150359.548787-16-anisinha@redhat.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <20251212152215.675767-19-sascha.bischoff@arm.com>
 
-On Fri, Dec 12, 2025 at 08:33:43PM +0530, Ani Sinha wrote:
-> sev_launch_finish() and sev_snp_launch_finish() could be called multiple times
-> if the confidential guest is capable of being reset/rebooted. The migration
-> blockers should not be added multiple times, once per invocation. This change
-> makes sure that the migration blockers are added only one time and not every
-> time upon invocvation of launch_finish() calls.
+Hi Sascha,
 
-> +    static bool added_migration_blocker;
+On Fri, Dec 12, 2025 at 03:22:41PM +0000, Sascha Bischoff wrote:
+> This change allows KVM to check for pending PPI interrupts. This has
+> two main components:
+> 
+> First of all, the effective priority mask is calculated.  This is a
+> combination of the priority mask in the VPEs ICC_PCR_EL1.PRIORITY and
+> the currently running priority as determined from the VPE's
+> ICH_APR_EL1. If an interrupt's prioirity is greater than or equal to
+> the effective priority mask, it can be signalled. Otherwise, it
+> cannot.
+> 
+> Secondly, any Enabled and Pending PPIs must be checked against this
+> compound priority mask. The reqires the PPI priorities to by synced
+> back to the KVM shadow state - this is skipped in general operation as
+> it isn't required and is rather expensive. If any Enabled and Pending
+> PPIs are of sufficient priority to be signalled, then there are
+> pending PPIs. Else, there are not.  This ensures that a VPE is not
+> woken when it cannot actually process the pending interrupts.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 123 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    |  10 ++-
+>  arch/arm64/kvm/vgic/vgic.h    |   1 +
+>  3 files changed, 131 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index d54595fbf4586..35740e88b3591 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -54,6 +54,31 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
+>  }
+>  
+> +static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	unsigned highest_ap, priority_mask;
+> +
+> +	/*
+> +	 * Counting the number of trailing zeros gives the current
+> +	 * active priority. Explicitly use the 32-bit version here as
+> +	 * we have 32 priorities. 0x20 then means that there are no
+> +	 * active priorities.
+> +	 */
+> +	highest_ap = __builtin_ctz(cpu_if->vgic_apr);
 
-> -    error_setg(&sev_mig_blocker,
-> -               "SEV: Migration is not implemented");
-> -    migrate_add_blocker(&sev_mig_blocker, &error_fatal);
-> +    if (!added_migration_blocker) {
-> +        /* add migration blocker */
-> +        error_setg(&sev_mig_blocker,
-> +                   "SEV: Migration is not implemented");
-> +        migrate_add_blocker(&sev_mig_blocker, &error_fatal);
-> +        added_migration_blocker = true;
-> +    }
+__builtin_ctz(0) is undefined (https://gcc.gnu.org/onlinedocs/gcc/Bit-Operation-Builtins.html)
 
-Maybe move this to another place which is called only once?  The
-migration blocker should not be very sensitive to initialization
-ordering, so I'd expect finding another place where you don't need
-the added_migration_blocker tracker variable isn't too much of a
-problem.
+Looking at __vgic_v3_clear_highest_active_priority(), it handles that like this:
 
-take care,
-  Gerd
+	c0 = ap0 ? __ffs(ap0) : 32;
 
+Thanks,
+Joey
+
+> +
+> +	/*
+> +	 * An interrupt is of sufficient priority if it is equal to or
+> +	 * greater than the priority mask. Add 1 to the priority mask
+> +	 * (i.e., lower priority) to match the APR logic before taking
+> +	 * the min. This gives us the lowest priority that is masked.
+> +	 */
+> +	priority_mask = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, cpu_if->vgic_vmcr);
+> +	priority_mask = min(highest_ap, priority_mask + 1);
+> +
+> +	return priority_mask;
+> +}
+> +
+>  static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+>  					  struct vgic_irq *irq)
+>  {
+> @@ -121,6 +146,104 @@ void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
+>  	irq->ops = &vgic_v5_ppi_irq_ops;
+>  }
+>  
+> +
+> +/*
+> + * Sync back the PPI priorities to the vgic_irq shadow state
+> + */
+> +static void vgic_v5_sync_ppi_priorities(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	unsigned long flags;
+> +	int i, reg;
+> +
+> +	/* We have 16 PPI Priority regs */
+> +	for (reg = 0; reg < 16; reg++) {
+> +		const unsigned long priorityr = cpu_if->vgic_ppi_priorityr[reg];
+> +
+> +		for (i = 0; i < 8; ++i) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +			u8 priority;
+> +
+> +			priority = (priorityr >> (i * 8)) & 0x1f;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 8 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +			raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +
+> +			irq->priority = priority;
+> +
+> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +		}
+> +	}
+> +}
+> +
+> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	unsigned long flags;
+> +	int i, reg;
+> +	unsigned int priority_mask;
+> +
+> +	/* If no pending bits are set, exit early */
+> +	if (likely(!cpu_if->vgic_ppi_pendr[0] && !cpu_if->vgic_ppi_pendr[1]))
+> +		return false;
+> +
+> +	priority_mask = vgic_v5_get_effective_priority_mask(vcpu);
+> +
+> +	/* If the combined priority mask is 0, nothing can be signalled! */
+> +	if (!priority_mask)
+> +		return false;
+> +
+> +	/* The shadow priority is only updated on demand, sync it across first */
+> +	vgic_v5_sync_ppi_priorities(vcpu);
+> +
+> +	for (reg = 0; reg < 2; reg++) {
+> +		unsigned long possible_bits;
+> +		const unsigned long enabler = cpu_if->vgic_ich_ppi_enabler_exit[reg];
+> +		const unsigned long pendr = cpu_if->vgic_ppi_pendr_exit[reg];
+> +		bool has_pending = false;
+> +
+> +		/* Check all interrupts that are enabled and pending */
+> +		possible_bits = enabler & pendr;
+> +
+> +		/*
+> +		 * Optimisation: pending and enabled with no active priorities
+> +		 */
+> +		if (possible_bits && priority_mask > 0x1f)
+> +			return true;
+> +
+> +		for_each_set_bit(i, &possible_bits, 64) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 64 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +			raw_spin_lock_irqsave(&irq->irq_lock, flags);
+> +
+> +			/*
+> +			 * We know that the interrupt is enabled and pending, so
+> +			 * only check the priority.
+> +			 */
+> +			if (irq->priority <= priority_mask)
+> +				has_pending = true;
+> +
+> +			raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +
+> +			if (has_pending)
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  /*
+>   * Detect any PPIs state changes, and propagate the state with KVM's
+>   * shadow structures.
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index e534876656ca7..5d18a03cc11d5 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -1174,11 +1174,15 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+>  	unsigned long flags;
+>  	struct vgic_vmcr vmcr;
+>  
+> -	if (!vcpu->kvm->arch.vgic.enabled)
+> +	if (!vcpu->kvm->arch.vgic.enabled && !vgic_is_v5(vcpu->kvm))
+>  		return false;
+>  
+> -	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
+> -		return true;
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
+> +		return vgic_v5_has_pending_ppi(vcpu);
+> +	} else {
+> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
+> +			return true;
+> +	}
+>  
+>  	vgic_get_vmcr(vcpu, &vmcr);
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 5a77318ddb87a..4b3a1e7ca3fb4 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -387,6 +387,7 @@ void vgic_debug_destroy(struct kvm *kvm);
+>  int vgic_v5_probe(const struct gic_kvm_info *info);
+>  void vgic_v5_set_ppi_ops(struct vgic_irq *irq);
+>  int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
+> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu);
+>  void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_fold_irq_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_load(struct kvm_vcpu *vcpu);
+> -- 
+> 2.34.1
 
