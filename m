@@ -1,268 +1,321 @@
-Return-Path: <kvm+bounces-66195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0FF2CC9AA5
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 23:08:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 371DFCC9C38
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 00:03:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E8F54300D025
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 22:08:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B1EC4303ADD2
+	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 23:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470EC31062C;
-	Wed, 17 Dec 2025 22:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B8832FA2B;
+	Wed, 17 Dec 2025 23:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="TiXpXxIM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mqWRTRGA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rIPrPCAK"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DAB310624;
-	Wed, 17 Dec 2025 22:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA911DB54C
+	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 23:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766009289; cv=none; b=cnQ5/M5jG/11kp2gDh1+yhOK7LP3sxqYE/ourXdGuz7N0cmLe729YME/usr6RxRULHLvEUIfRyP0HV0bvZdd4bDf09Jtg2Z6Q1hN8hAV5NYUM9hLkm6OEvyW3Gr2+CVEIb1HpZ+jXfz4LAOnlQrK8KMniEEoL/Ps2lh2zGhSPBo=
+	t=1766012625; cv=none; b=B6hXLDj2MfiDgPsnjT85WvEyI5nlqisPmL0qvhtbjgdQY96eUnwFG+O+PrHNNpKv20vzUgkxpTPIdQCqis9bRjw0dyie4A8NMps3nJhHU6tp1Ee2fwYA6njhJCn4gvnyKrJ97Xla3QrezJH7gOH7TeVlkxgKlaf9SW6LLKeCdSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766009289; c=relaxed/simple;
-	bh=81VOuZCEN7Dh4zK1j+i/yZFtaz82r5hdgOHH9luCgAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xa4k9PSNsac0JwMhmssxsmj6q/aLh3RiVoleDN7xNN+Bxi8+2l91k59KTzo5SVW5oczfzH/nwBB+P+JgMHl9MKcM/CbA5gPbAW6Lz10poD9Qy3ks5z/dZ6HLeLxSKX9DzJNMnyHp1Hw/BdQZaEhKKyAFI8Z+XwKwysVexsEJs+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=TiXpXxIM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mqWRTRGA; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id ED7307A003F;
-	Wed, 17 Dec 2025 17:08:01 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 17 Dec 2025 17:08:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1766009281;
-	 x=1766095681; bh=9rWdXAFTyaCJXKyyFm+bRbV33yTESmH5JCp9fA9WXPU=; b=
-	TiXpXxIMXgvY3LCw2WE/p+jWDFYdBFQBdswWIoVXXLM7ooDMx+kqwknGcWWCQ+7a
-	qV79e83kzuYS28EF2LTu+Atq1XuA7dUjwhA0vGTDATQyd31jeOiF55+oLMfJtY9O
-	zRaM3M8eu52UeTO4KRBwEJhe+BGUjVuN47JYBzxanGuofsMJHv9eFKzQ23W4M+Cc
-	SOxu+DuT9Zkcrpm3BGhSXczhw/oHER5O9iBGp1VMAO9FykKAsoJPB7yZh+DZKaUK
-	f74n8yK72j59jk5mH2EhJnKCPkcqdu4Rs/VaoZuvA3W7rIwVJhvkYHdG7/HjY32M
-	5yLP0zP/y4wCtQkhz8DCkw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1766009281; x=
-	1766095681; bh=9rWdXAFTyaCJXKyyFm+bRbV33yTESmH5JCp9fA9WXPU=; b=m
-	qWRTRGA8bUKLH4KANpZ+vjbyUelQlY0k+TKVE4wIKRd25DAG1muS0pvsq8h+OZcm
-	YTTNFCfDw7ReF5ZgX3kR+yCrZ4fSWVNYWxKPbnCbrIQvDaK2NBlDHxNfyFkwMlyb
-	u9MeaxqE7T34Ds5rrps6lsQSStuZULVLY7A4dxeHfhDzWHJWB+kz2bcNuVS+XhB+
-	+Jx2+ylSLZZSockntXGJHcPYEjmubC6MthQaTzHS0mTpNQI7AW85nHsq3kZWgyBy
-	93TklhRrkcuzJrKUHCelH/cPfTBo1WrlwEb/9vYBapb2vsm/CqHfPJs+HDdd0BRs
-	Gs75U6XonAWaIxTxLboIA==
-X-ME-Sender: <xms:wSlDaYbG-UDw1tKFCYFrz-biVAkl3Dc-_lyutvGqYMvm8_dzjYlyvQ>
-    <xme:wSlDafS9IkEUXFkLb23JLVVOPoaXup5HY9iT55WC2a7eXsfRBPzc46KPNvNzMpdBH
-    XmvdpzRdgMyVIVGvhOthlN0enZwA98ppTC8qP5d8gD2pBdLPJxIDw>
-X-ME-Received: <xmr:wSlDaf8zL3dqANPfpt7fjmwL6JYC9CFGbEabkBS9PADFlFMk-Vj3FqrU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdegfeejvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfgjfhggtgfgsehtjeertddttddvnecuhfhrohhmpeetlhgvgicuhghi
-    lhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeehvddtueevjeduffejfeduhfeufeejvdetgffftdeiieduhfejjefhhfefueev
-    udenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhn
-    sggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhgvvh
-    hinhdrthhirghnsehinhhtvghlrdgtohhmpdhrtghpthhtoheprghnkhhithgrsehnvhhi
-    ughirgdrtghomhdprhgtphhtthhopehjghhgseiiihgvphgvrdgtrgdprhgtphhtthhope
-    ihihhshhgrihhhsehnvhhiughirgdrtghomhdprhgtphhtthhopehskhholhhothhhuhhm
-    thhhohesnhhvihguihgrrdgtohhmpdhrtghpthhtoheprhgrmhgvshhhrdhthhhomhgrsh
-    esihhnthgvlhdrtghomhdprhgtphhtthhopeihuhhngihirghnghdrlhhisegrmhgurdgt
-    ohhmpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:wSlDaXioFfYbBVNtsJFO1cwy26dNx-r-qBYHFfHeDO2V6yqBuPA2Zg>
-    <xmx:wSlDaYbEhWOTPO6floNBUz9FMbrLha4ZQnFr4NN6ih2grxodfYrlhQ>
-    <xmx:wSlDaU9OuyBqKs4QpayXODQwzzNOb0Euy00mlhYMW7x6NbXdj-XaTg>
-    <xmx:wSlDaSPoeTHcsMB-wI7M8l-c0YdtAZntGtlAHgFfFhHvsfIpw9Fqzw>
-    <xmx:wSlDafxIY1HFM7VPOv1pVF0LbAz4KHAi9zGNyFXnOmkgJ70QmPSbfSyR>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 17 Dec 2025 17:08:00 -0500 (EST)
-Date: Wed, 17 Dec 2025 15:07:55 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Kevin Tian <kevin.tian@intel.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yishai Hadas <yishaih@nvidia.com>, Shameer Kolothum
- <skolothumtho@nvidia.com>, Ramesh Thomas <ramesh.thomas@intel.com>,
- Yunxiang Li <Yunxiang.Li@amd.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Farrah Chen <farrah.chen@intel.com>,
- stable@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: Disable qword access to the PCI ROM bar
-Message-ID: <20251217150755.10d88a04.alex@shazbot.org>
-In-Reply-To: <20251212020941.338355-1-kevin.tian@intel.com>
-References: <20251212020941.338355-1-kevin.tian@intel.com>
+	s=arc-20240116; t=1766012625; c=relaxed/simple;
+	bh=GcH2YU9svXn1lwAwNWQlWL84mdn4ZPEmHup1iY+NLn4=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=lrWp/wAohbOwJ9RHAzXzuzFRqKEu4KPIuKwSlmW3O57aJyjFOJHbBdtuLi/ozD+NFxxmEa5psysizsH0oZTC2funwPLX/XqOmXe67jjRwhDaEHraODAUhFvvefOrNxM7VDZu3z2wBorl7AY1njCISA2ngtr5x+IR36kcmegX0X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rIPrPCAK; arc=none smtp.client-ip=209.85.160.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-3f578b8136fso99201fac.0
+        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 15:03:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766012622; x=1766617422; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aRTGpXalCpTw9EJ3jwwqmWQTyjHYa0HLkPGjExiFjCQ=;
+        b=rIPrPCAKLA8TVt8dJxvDb+V4hecsW6IZV/IKE1B7Wyao84NDPJag6rll8HfyFWh72T
+         QQ7q1kA1ZgcGll/QN81Eb1F/X3ZzdXDd6StpuJEiv4w/GmbYGvWMS0WvBZ0XCgeWae43
+         cstm9EcONBmeCEQtQ3uLgmE8qEzjvnE3TPT4rC7d62x/HIFdzzXsjeeT6KeawWNJYmlc
+         Guywernkj//1zm54qgEN0bn/sOUNOsBXLbQHG7H13AsEYJonMTIXH3r+kb8rfVMtYj7q
+         N9TxMrwAtpR7GU13YA12cZ3/Fh/BttjHwuYmQ8pD/KD8zJcWMSXgp4wnWZKCMEKa+fAU
+         zwCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766012622; x=1766617422;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aRTGpXalCpTw9EJ3jwwqmWQTyjHYa0HLkPGjExiFjCQ=;
+        b=TpgjXYSVKdNKzZJAYLUCORXSvI5yOfrwMT97K23kbUpv4WNnguSD0Ta65SjK8Wu/uV
+         S8PvSnot2JrG8GHkwThasScU19wf7ZlNl7wjxe32dN3uE1UJY3ldyZsHxQfmUtxV/dcw
+         UstBL9BmZv9H4RTVY11GpnzVhaKs14EdBLwCqufxamjthvo+D9Vr5X80dcjDyfeCqx+F
+         GZ75z7Uqk3+jxYNZhWbeW+E8nGI5YOS1RnTsy0PHwxhbuVhyu2ZJvJxRyiuB0snCE0Uc
+         cC/W9tnPu+UG14fx1Gg2XNlmvfjQJy5ExNzhAoiCDVIAI6cWGxkcmXb9g3nK9A3NCCYS
+         EqfQ==
+X-Gm-Message-State: AOJu0YzoGKA7vZu+QKCl5HfpYFda0djrNXKir3Quu8JLnpFVLWo/fR6C
+	YehMQHYU22Thp4kBiKCwo6QBKz5ASccHxvoE9BSEGy22EQZLczUzZW5LTGYZtCRBcVgzri/Sa1/
+	pg4pr7hkdzbRg30AN5Vx/4h3kwA==
+X-Google-Smtp-Source: AGHT+IFQs5k1bWdHtz7tc4/8DEUyRxbCe8MSuSfyN2BvguDIeAIIerMywbvjRsitUO6G8RkTOEE+yjjKcwPQBwUtTA==
+X-Received: from jaii7.prod.google.com ([2002:a05:6638:4007:b0:5c6:3249:f8ff])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6820:2915:b0:659:9a49:8fb7 with SMTP id 006d021491bc7-65b452574dfmr8508202eaf.48.1766012622152;
+ Wed, 17 Dec 2025 15:03:42 -0800 (PST)
+Date: Wed, 17 Dec 2025 23:03:41 +0000
+In-Reply-To: <aUH7oC41XaEMsXf_@kernel.org> (message from Oliver Upton on Tue,
+ 16 Dec 2025 16:38:56 -0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Message-ID: <gsnt34583e42.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 14/24] KVM: arm64: Write fast path PMU register handlers
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
+	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
+	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Fri, 12 Dec 2025 02:09:41 +0000
-Kevin Tian <kevin.tian@intel.com> wrote:
+Oliver Upton <oupton@kernel.org> writes:
 
-> Commit 2b938e3db335 ("vfio/pci: Enable iowrite64 and ioread64 for vfio
-> pci") enables qword access to the PCI bar resources. However certain
-> devices (e.g. Intel X710) are observed with problem upon qword accesses
-> to the rom bar, e.g. triggering PCI aer errors.
-> 
-> Instead of trying to identify all broken devices, universally disable
-> qword access to the rom bar i.e. going back to the old way which worked
-> reliably for years.
+> On Tue, Dec 09, 2025 at 08:51:11PM +0000, Colton Lewis wrote:
+>> diff --git a/arch/arm64/include/asm/arm_pmuv3.h  
+>> b/arch/arm64/include/asm/arm_pmuv3.h
+>> index 3e25c0313263c..41ec6730ebc62 100644
+>> --- a/arch/arm64/include/asm/arm_pmuv3.h
+>> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+>> @@ -39,6 +39,16 @@ static inline unsigned long read_pmevtypern(int n)
+>>   	return 0;
+>>   }
 
-Thanks for finding the root cause of this, Kevin.  I think it would add
-useful context in the commit log here to describe that the ROM is
-somewhat unique in this respect because it's cached by QEMU which
-simply does a pread() of the remaining size until it gets the full
-contents.  The other BARs would only perform operations at the same
-access width as their guest drivers.
+>> +static inline void write_pmxevcntr(u64 val)
+>> +{
+>> +	write_sysreg(val, pmxevcntr_el0);
+>> +}
+>> +
+>> +static inline u64 read_pmxevcntr(void)
+>> +{
+>> +	return read_sysreg(pmxevcntr_el0);
+>> +}
+>> +
+>>   static inline unsigned long read_pmmir(void)
+>>   {
+>>   	return read_cpuid(PMMIR_EL1);
+>> @@ -105,21 +115,41 @@ static inline void write_pmcntenset(u64 val)
+>>   	write_sysreg(val, pmcntenset_el0);
+>>   }
 
-> Reported-by: Farrah Chen <farrah.chen@intel.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220740
-> Fixes: 2b938e3db335 ("vfio/pci: Enable iowrite64 and ioread64 for vfio pci")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
-> ---
->  drivers/vfio/pci/nvgrace-gpu/main.c |  4 ++--
->  drivers/vfio/pci/vfio_pci_rdwr.c    | 19 +++++++++++++++----
->  include/linux/vfio_pci_core.h       |  2 +-
->  3 files changed, 18 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-> index e346392b72f6..9b39184f76b7 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -491,7 +491,7 @@ nvgrace_gpu_map_and_read(struct nvgrace_gpu_pci_core_device *nvdev,
->  		ret = vfio_pci_core_do_io_rw(&nvdev->core_device, false,
->  					     nvdev->resmem.ioaddr,
->  					     buf, offset, mem_count,
-> -					     0, 0, false);
-> +					     0, 0, false, true);
->  	}
->  
->  	return ret;
-> @@ -609,7 +609,7 @@ nvgrace_gpu_map_and_write(struct nvgrace_gpu_pci_core_device *nvdev,
->  		ret = vfio_pci_core_do_io_rw(&nvdev->core_device, false,
->  					     nvdev->resmem.ioaddr,
->  					     (char __user *)buf, pos, mem_count,
-> -					     0, 0, true);
-> +					     0, 0, true, true);
->  	}
->  
->  	return ret;
-> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-> index 6192788c8ba3..95dc7e04cb08 100644
-> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
-> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-> @@ -135,7 +135,7 @@ VFIO_IORDWR(64)
->  ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
->  			       void __iomem *io, char __user *buf,
->  			       loff_t off, size_t count, size_t x_start,
-> -			       size_t x_end, bool iswrite)
-> +			       size_t x_end, bool iswrite, bool allow_qword)
+>> +static inline u64 read_pmcntenset(void)
+>> +{
+>> +	return read_sysreg(pmcntenset_el0);
+>> +}
+>> +
+>>   static inline void write_pmcntenclr(u64 val)
+>>   {
+>>   	write_sysreg(val, pmcntenclr_el0);
+>>   }
 
-I've been trying to think about how we avoid yet another bool arg here.
-What do you think about creating an enum:
+>> +static inline u64 read_pmcntenclr(void)
+>> +{
+>> +	return read_sysreg(pmcntenclr_el0);
+>> +}
+>> +
+>>   static inline void write_pmintenset(u64 val)
+>>   {
+>>   	write_sysreg(val, pmintenset_el1);
+>>   }
 
-enum vfio_pci_io_width {
-	VFIO_PCI_IO_WIDTH_1 = 1,
-	VFIO_PCI_IO_WIDTH_2 = 2,
-	VFIO_PCI_IO_WIDTH_4 = 4,
-	VFIO_PCI_IO_WIDTH_8 = 8,
-};
+>> +static inline u64 read_pmintenset(void)
+>> +{
+>> +	return read_sysreg(pmintenset_el1);
+>> +}
+>> +
+>>   static inline void write_pmintenclr(u64 val)
+>>   {
+>>   	write_sysreg(val, pmintenclr_el1);
+>>   }
 
-The arg here would then be enum vfio_pci_io_width max_width, and for
-each test we'd add a condition && max_width >= 8 (4, 2), where we can
-assume byte access as the minimum regardless of the arg.  It's a little
-more than we need, but it follows a simple pattern and I think makes
-the call sites a bit more intuitive.
+>> +static inline u64 read_pmintenclr(void)
+>> +{
+>> +	return read_sysreg(pmintenclr_el1);
+>> +}
+>> +
+>>   static inline void write_pmccfiltr(u64 val)
+>>   {
+>>   	write_sysreg(val, pmccfiltr_el0);
+>> @@ -160,11 +190,16 @@ static inline u64 read_pmovsclr(void)
+>>   	return read_sysreg(pmovsclr_el0);
+>>   }
 
->  {
->  	ssize_t done = 0;
->  	int ret;
-> @@ -150,7 +150,7 @@ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
->  		else
->  			fillable = 0;
->  
-> -		if (fillable >= 8 && !(off % 8)) {
-> +		if (allow_qword && fillable >= 8 && !(off % 8)) {
->  			ret = vfio_pci_iordwr64(vdev, iswrite, test_mem,
->  						io, buf, off, &filled);
->  			if (ret)
-> @@ -234,6 +234,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->  	void __iomem *io;
->  	struct resource *res = &vdev->pdev->resource[bar];
->  	ssize_t done;
-> +	bool allow_qword = true;
->  
->  	if (pci_resource_start(pdev, bar))
->  		end = pci_resource_len(pdev, bar);
-> @@ -262,6 +263,16 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->  		if (!io)
->  			return -ENOMEM;
->  		x_end = end;
-> +
-> +		/*
-> +		 * Certain devices (e.g. Intel X710) don't support qword
-> +		 * access to the ROM bar. Otherwise PCI AER errors might be
-> +		 * triggered.
-> +		 *
-> +		 * Disable qword access to the ROM bar universally, which
-> +		 * worked reliably for years before qword access is enabled.
-> +		 */
-> +		allow_qword = false;
->  	} else {
->  		int ret = vfio_pci_core_setup_barmap(vdev, bar);
->  		if (ret) {
-> @@ -278,7 +289,7 @@ ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->  	}
->  
->  	done = vfio_pci_core_do_io_rw(vdev, res->flags & IORESOURCE_MEM, io, buf, pos,
-> -				      count, x_start, x_end, iswrite);
-> +				      count, x_start, x_end, iswrite, allow_qword);
->  
->  	if (done >= 0)
->  		*ppos += done;
-> @@ -352,7 +363,7 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_core_device *vdev, char __user *buf,
->  	 * to the memory enable bit in the command register.
->  	 */
->  	done = vfio_pci_core_do_io_rw(vdev, false, iomem, buf, off, count,
-> -				      0, 0, iswrite);
-> +				      0, 0, iswrite, true);
+>> -static inline void write_pmuserenr(u32 val)
+>> +static inline void write_pmuserenr(u64 val)
+>>   {
+>>   	write_sysreg(val, pmuserenr_el0);
+>>   }
 
-I have no basis other than paranoia and "VGA is old and a 64-bit access
-to it seem wrong", but I'm tempted to restrict this to dword access as
-well.  I don't want to take your fix off track from it's specific goal
-though.  Thanks,
+>> +static inline u64 read_pmuserenr(void)
+>> +{
+>> +	return read_sysreg(pmuserenr_el0);
+>> +}
+>> +
+>>   static inline void write_pmuacr(u64 val)
+>>   {
+>>   	write_sysreg_s(val, SYS_PMUACR_EL1);
 
-Alex
+> I wouldn't bother with adding accessors to the PMUv3 driver header, this
+> gets a bit confusing when the 32-bit counterpart lacks matching  
+> definitions.
+> Additionally, the part of KVM you're modifying is very much an
+> "internal" part meant to run in a not-quite-kernel context.
 
->  
->  	vga_put(vdev->pdev, rsrc);
->  
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index f541044e42a2..3a75b76eaed3 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -133,7 +133,7 @@ pci_ers_result_t vfio_pci_core_aer_err_detected(struct pci_dev *pdev,
->  ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
->  			       void __iomem *io, char __user *buf,
->  			       loff_t off, size_t count, size_t x_start,
-> -			       size_t x_end, bool iswrite);
-> +			       size_t x_end, bool iswrite, bool allow_qword);
->  bool vfio_pci_core_range_intersect_range(loff_t buf_start, size_t buf_cnt,
->  					 loff_t reg_start, size_t reg_cnt,
->  					 loff_t *buf_offset,
+> Considering this, I'd prefer KVM directly accessed the PMU registers to
+> avoid the possibility of taking some instrumented codepath in the
+> future.
 
+Will do.
+
+>> +	if (!kvm_vcpu_pmu_is_partitioned(vcpu)
+>> +	    || pmu_access_el0_disabled(vcpu))
+
+> Always put operators on the preceding line for line continuations.
+
+> Also, don't call pmu_access_el0_disabled() from here. It can potentially
+> do a full emulated exception entry even though the vCPU is in an
+> extremely inconsistent state (i.e. haven't returned to kernel context
+> yet). Isn't the current value for PMUSERENR_EL0 on the CPU instead of in
+> the vCPU's saved context anyway?
+
+> The fast-path accessors really need to be *just* accessors, reading
+> state from the CPU in the unfortunate situation that a TPM trap has been
+> forced upon us.
+
+Understood.
+
+>> +	case SYS_PMXEVCNTR_EL0:
+>> +		idx = FIELD_GET(PMSELR_EL0_SEL, read_pmselr());
+>> +
+>> +		if (pmu_access_event_counter_el0_disabled(vcpu))
+>> +			return false;
+>> +
+>> +		if (!pmu_counter_idx_valid(vcpu, idx))
+>> +			return false;
+>> +
+>> +		ret = handle_pmu_reg(vcpu, &p, PMEVCNTR0_EL0 + idx, rt, val,
+>> +				     &read_pmxevcntr, &write_pmxevcntr);
+>> +		break;
+
+> It is a bit odd to handle the muxing for finding the in-memory value yet
+> using the selector-based register for hardware.
+
+Agreed
+
+>> +	case SYS_PMEVCNTRn_EL0(0) ... SYS_PMEVCNTRn_EL0(30):
+>> +		idx = ((p.CRm & 3) << 3) | (p.Op2 & 7);
+>> +
+>> +		if (pmu_access_event_counter_el0_disabled(vcpu))
+>> +			return false;
+>> +
+>> +		if (!pmu_counter_idx_valid(vcpu, idx))
+>> +			return false;
+>> +
+>> +		if (p.is_write) {
+>> +			write_pmevcntrn(idx, val);
+>> +			__vcpu_assign_sys_reg(vcpu, PMEVCNTR0_EL0 + idx, val);
+>> +		} else {
+>> +			vcpu_set_reg(vcpu, rt, read_pmevcntrn(idx));
+>> +		}
+>> +
+>> +		ret = true;
+>> +		break;
+
+> Can't both of these cases share a helper once you've worked out the
+> index? Same for PMEVTYPERn_EL0.
+
+Agreed
+
+>> +	default:
+>> +		ret = false;
+>> +	}
+>> +
+>> +	if (ret)
+>> +		__kvm_skip_instr(vcpu);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>>   static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64  
+>> *exit_code)
+>>   {
+>>   	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+>> @@ -785,6 +983,9 @@ static inline bool kvm_hyp_handle_sysreg(struct  
+>> kvm_vcpu *vcpu, u64 *exit_code)
+>>   	if (kvm_handle_cntxct(vcpu))
+>>   		return true;
+
+>> +	if (kvm_hyp_handle_pmu_regs(vcpu))
+>> +		return true;
+>> +
+
+> Since the whole partitioned PMU feature is constrained to VHE-only you
+> should call this from kvm_hyp_handle_sysreg_vhe().
+
+Will do.
+
+>> +
+>> +bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
+>> +{
+>> +	u64 reg = __vcpu_sys_reg(vcpu, PMUSERENR_EL0);
+>> +	bool enabled = (reg & flags) || vcpu_mode_priv(vcpu);
+>> +
+>> +	if (!enabled)
+>> +		kvm_inject_undefined(vcpu);
+>> +
+>> +	return !enabled;
+>> +}
+>> +
+>> +bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_EN);
+>> +}
+>> +
+>> +bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+>> +{
+>> +	u64 pmcr, val;
+>> +
+>> +	pmcr = kvm_vcpu_read_pmcr(vcpu);
+>> +	val = FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+>> +	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
+>> +		kvm_inject_undefined(vcpu);
+>> +		return false;
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>> +bool pmu_access_cycle_counter_el0_disabled(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_CR |  
+>> ARMV8_PMU_USERENR_EN);
+>> +}
+>> +
+>> +bool pmu_access_event_counter_el0_disabled(struct kvm_vcpu *vcpu)
+>> +{
+>> +	return check_pmu_access_disabled(vcpu, ARMV8_PMU_USERENR_ER |  
+>> ARMV8_PMU_USERENR_EN);
+>> +}
+
+> Refactorings need to happen in a separate patch.
+
+Will do
+
+> Thanks,
+> Oliver
 
