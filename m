@@ -1,178 +1,178 @@
-Return-Path: <kvm+bounces-66227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69404CCAF02
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 09:38:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F280CCB01C
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 09:49:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AA25530572D4
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 08:34:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BD0F4300E4EF
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 08:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A61D2ECEBB;
-	Thu, 18 Dec 2025 08:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD46288CA6;
+	Thu, 18 Dec 2025 08:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FnufwIZz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVvM1S8+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvD3P0O1"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356DB2147FB;
-	Thu, 18 Dec 2025 08:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3D126738C
+	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 08:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766046841; cv=none; b=cXULk4xZAp+Jz6gwG3qnQ7kb3/WhJkTjVBaHmV0R19ft0LCYYKLTJb1Wkw5sS7P+lXpUXAUiyaqHvFJxqDPTECXpZqAD6cy2deMzSfzG6EQmp8y9DYStjVs7zyENgIl6g7D96vlnDxHo5IHIXox/PkhrC//E09+FdZtHFsOGYE4=
+	t=1766047758; cv=none; b=eqkUvVuAszvZ5pRwfrmDUhc5NTmWzKGzO9+ttmPMfqh4hmgvJSPYfu7XjihspeS28CDZV3T0jYx0gYtgUQd0rD4iMkDURwHmzTjYj69dBk8hOMMBUZoKhab/oaOIzUNLdeYcnXKAFbQHqoerGuYJGGh8+04u0YfML8fYh/dIK9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766046841; c=relaxed/simple;
-	bh=A9HEH6e9DfkdNSl+qx4MSHwGrDpvTREJchXDMev3nWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GmPfsFxoi8DbMrp1tSpWfG8gi9wevqnT68u+r9jV6H2tpeJ/LhrE/ncYpr9QZpn8XQGEg5f1Zn4MxhWpYH60Yj3u23sG6CQ28bQI9eBrmwI6bHucCjXHtKY+0j2i/CQDisKb+92LuI82NzZqqtxEaXMt3QGLebuk81u9h1OW+Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=FnufwIZz; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=udKtZC5V08ugl6h8GymizkRPGV7cNBOnmpw7k4Dc21k=; b=FnufwIZzi2TPpsqyx0z46oDcLK
-	f5r3rcSxKZsPqGdYhuMFCG9lCDNi08OQx6Tyo2e/tJX2SeNw8+boIsCUaPhyy/VGLLunUOaChARxA
-	yJdmIAbD+mdHWfth2kKYZ8MJu5IDrk28bo2ADgOVD60oscfIgu2VUz6fSAWjD1p60Yvp189DS+MEs
-	8IRDi55x8cu03bdQRprVzvhEDWM+6lR7+RHL4y5UJSdsFDKw4C/yH5Va3LPk9mz3v9ad8MFK1nq71
-	XcjsKez6fhg8Mcufei0NrAeutnwLJrtu+3QOAjcC1jYNyClmqMz1BsTcR+2ld7HeCXUmMIt1hb6Tf
-	VbofWLeA==;
-Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vW8an-00000008Lue-2EHo;
-	Thu, 18 Dec 2025 07:38:35 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 8891E30056B; Thu, 18 Dec 2025 09:33:46 +0100 (CET)
-Date: Thu, 18 Dec 2025 09:33:46 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: linux-kernel@vger.kernel.org, seanjc@google.com, sfr@canb.auug.org.au
-Cc: linux-tip-commits@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
-	kvm@vger.kernel.org
-Subject: Re: [tip: perf/core] perf: Use EXPORT_SYMBOL_FOR_KVM() for the
- mediated APIs
-Message-ID: <20251218083346.GG3708021@noisy.programming.kicks-ass.net>
-References: <20251208115156.GE3707891@noisy.programming.kicks-ass.net>
- <176597507731.510.6380001909229389563.tip-bot2@tip-bot2>
- <20251218083109.GH3707891@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1766047758; c=relaxed/simple;
+	bh=zbFQTVbzAcnxC0KSvv1cIgK1AO9VPWN1Ik5nyWyMluA=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=HIu0usyUODhUdQLqnuUeLLoi5od5E5rVMy5T3d50hpZvD03x1iT3yCOL/hN8Vtxy1WX30PYPuyJpm28wokNhDrtNagGujtZquYZvwZbQoL7MwHn+zXQmuE1gtpQEkNnS6vsZjFI39n32XC/0H0tZIwLM6nI3FHQ1PooMH8vueIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GVvM1S8+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dvD3P0O1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766047755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E3Smmd8mt/DKblta/sNLoWME5GxV7PYjo3wfpy3lvls=;
+	b=GVvM1S8+kaBux/yIg8K4Dn2i9xxQnd47OE0vIQSPrLO/iv00U+fbEaSAboVtnZnqXdYouG
+	9w5jJul9vmUNMQLo+pZnpz2DIfvK/PE6DD9n8kcvZStPR4dxoiXSypJYtc1qYxBDJ35Fmg
+	71XuU1dReYlS4tedkvRlWLL+6qfWoYQ=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-298-Ox9yJfXRNMm22GMuGLemCA-1; Thu, 18 Dec 2025 03:49:14 -0500
+X-MC-Unique: Ox9yJfXRNMm22GMuGLemCA-1
+X-Mimecast-MFC-AGG-ID: Ox9yJfXRNMm22GMuGLemCA_1766047753
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-7bf5cdef41dso798483b3a.0
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 00:49:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1766047753; x=1766652553; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E3Smmd8mt/DKblta/sNLoWME5GxV7PYjo3wfpy3lvls=;
+        b=dvD3P0O1ah+hxBqV9tBnMPOUHHTr3rEhSyFfKOq23V+m9vhqFe1bqQ59VWm3BJpTAP
+         LMNx66uTU03EqePNF36QJDrHD6EK4Ok4imU8bluilX4x1AKp93Wk8GAqpHi+49+S+o3n
+         7aAOp25O/AUMragNdJiKBEkJ+3dhW22pomsPJxWg9Cj8HYnd47spsVT2fnS8SpPYd96P
+         nFnd+hg3325OAVyBrP4hMDazlwPqKUZIaIrPn7NJDpKxBwr4uAuywexlk5Vy498/Du7p
+         bd66QK+vOoTG/3FlUwmRN/hqYrOd7MwPuzAEWBoUmNBrmDW/j+YF0HbZ1+kP9NXhnR3y
+         utVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766047753; x=1766652553;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E3Smmd8mt/DKblta/sNLoWME5GxV7PYjo3wfpy3lvls=;
+        b=N9MjTODXRejtzpWUxW/5ck74NA7/JaeSuqHGIUb1PvnM/jDctUAPudRymrLZM8GJ4J
+         0sVXYHuq/qOm6aqDyAjn9HHcGqCugzGPL5c8dsT860nddbsYdXf5KdxM6RaXspNsLatq
+         OR5ThYsuXSskAm1oc7cWNPx36Uts5yOncdBYHYiO8vz9Rxdux0kBoXsanQ9isQy8rSjH
+         YvHDTxlcXHNAukJ/UnxTL/zdo24AH1RRQ3M0x0zXII4FafCiGAhmek/gRA+QJ723VvUd
+         9hdP/gMlmniU33Fmrw4cYYUL2riufXHIY4xZkhn065/29BHMQWMCdVr0EOox+i9YgOk6
+         quiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDBRGIxAlkFd8IUyJYQBS3dfHbxNx82eGlp4GOqL6/zolFFTKqEPAWba+oBvPlJ/xC/BI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkxeoR5YmGFJkDt0U2Pq8P2DN8jNtELS1AoC/YyVpNpOKDJEDX
+	NolQIxUs2AEzr2rgJszEAuDdcZu1w4/TDraMHrh8MAapdxU0ORgtN61gVWGfQ48LLNgf3E8yBoZ
+	D7dhUZ+FdGVQk+NbYzj9ivSJi5PiD7sS+L9RtE8+dyShgC3jRvfIvcA==
+X-Gm-Gg: AY/fxX69VBJLHzcWDTFkXKhEc0gNZP86ERnl+vnK5C7rg+gbZ8K16spTOLvPuJpfi7g
+	/VfcSsJ0c3PO/00ZmNxyTO57NXZufcynqJqYGLf681tPO2uohwvb5P1npLK/B1RBE6+GWklrIrZ
+	0sDft0hNvSHOKJdyzflg8zMmKODrOhQsSgYtFYxLO0+cIKqejGhx76GNcIz2g1l7Gzrpbk82EVJ
+	ev76ydIQ1PJRg7u5b80KLv/1FlgJ0nKBntHRKbyeqH5fU/ynHcUrDzeQ1WXOCK0qQUxI7E0S1VF
+	lcgBUGi+DEP96T9K7ikv5JnzOqZSGCvqvipx+8DNWVbPaIxcAOdqEp/3oQ+lBaI/aa33Mujm6lS
+	tvt/R7+kUwb5WszoD2jEDGWYasr3tcNBbta07fA==
+X-Received: by 2002:a05:6a20:9147:b0:366:14ac:8c6b with SMTP id adf61e73a8af0-369b04c6afbmr22270425637.65.1766047753154;
+        Thu, 18 Dec 2025 00:49:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGl6QZqKLbeG+27cLeEMo1auqdiS2FC+o/5/xhV6DvEZN7/DFBfxJmABO1JpZAZHnrteg65Qw==
+X-Received: by 2002:a05:6a20:9147:b0:366:14ac:8c6b with SMTP id adf61e73a8af0-369b04c6afbmr22270409637.65.1766047752772;
+        Thu, 18 Dec 2025 00:49:12 -0800 (PST)
+Received: from fc40 ([27.58.53.10])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c1d2fa22a1bsm1679655a12.21.2025.12.18.00.49.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 00:49:12 -0800 (PST)
+Date: Thu, 18 Dec 2025 14:19:07 +0530 (IST)
+From: Ani Sinha <anisinha@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
+    vkuznets@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v1 13/28] i386/tdx: finalize TDX guest state upon reset
+In-Reply-To: <ubmc2igckwxxpgw3zq7lmrhztygazibobjq3ruuhr3kbuzhfpr@odnoz7izs4hn>
+Message-ID: <b18a18b8-0bc7-926e-d5ba-52f304db63da@redhat.com>
+References: <20251212150359.548787-1-anisinha@redhat.com> <20251212150359.548787-14-anisinha@redhat.com> <ubmc2igckwxxpgw3zq7lmrhztygazibobjq3ruuhr3kbuzhfpr@odnoz7izs4hn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251218083109.GH3707891@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=US-ASCII
 
-On Thu, Dec 18, 2025 at 09:31:09AM +0100, Peter Zijlstra wrote:
-> On Wed, Dec 17, 2025 at 12:37:57PM -0000, tip-bot2 for Peter Zijlstra wrote:
-> > diff --git a/kernel/events/core.c b/kernel/events/core.c
-> > index e6a4b1e..376fb07 100644
-> > --- a/kernel/events/core.c
-> > +++ b/kernel/events/core.c
-> > @@ -57,6 +57,7 @@
-> >  #include <linux/task_work.h>
-> >  #include <linux/percpu-rwsem.h>
-> >  #include <linux/unwind_deferred.h>
-> > +#include <linux/kvm_types.h>
-> >  
-> >  #include "internal.h"
-> >  
-> > @@ -6388,7 +6389,7 @@ int perf_create_mediated_pmu(void)
-> >  	atomic_inc(&nr_mediated_pmu_vms);
-> >  	return 0;
-> >  }
-> > -EXPORT_SYMBOL_GPL(perf_create_mediated_pmu);
-> > +EXPORT_SYMBOL_FOR_KVM(perf_create_mediated_pmu);
-> >  
-> >  void perf_release_mediated_pmu(void)
-> >  {
-> > @@ -6397,7 +6398,7 @@ void perf_release_mediated_pmu(void)
-> >  
-> >  	atomic_dec(&nr_mediated_pmu_vms);
-> >  }
-> > -EXPORT_SYMBOL_GPL(perf_release_mediated_pmu);
-> > +EXPORT_SYMBOL_FOR_KVM(perf_release_mediated_pmu);
-> >  
-> >  /* When loading a guest's mediated PMU, schedule out all exclude_guest events. */
-> >  void perf_load_guest_context(void)
-> 
-> Bah, so the !KVM architectures hate on this.
-> 
-> Sean, would something like this be acceptable?
 
-Hmm, the other option is doing something like so:
 
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 376fb07d869b..014d832e8eaa 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -57,7 +57,6 @@
- #include <linux/task_work.h>
- #include <linux/percpu-rwsem.h>
- #include <linux/unwind_deferred.h>
--#include <linux/kvm_types.h>
- 
- #include "internal.h"
- 
-@@ -6325,6 +6324,8 @@ u64 perf_event_pause(struct perf_event *event, bool reset)
- EXPORT_SYMBOL_GPL(perf_event_pause);
- 
- #ifdef CONFIG_PERF_GUEST_MEDIATED_PMU
-+#include <linux/kvm_types.h>
-+
- static atomic_t nr_include_guest_events __read_mostly;
- 
- static atomic_t nr_mediated_pmu_vms __read_mostly;
+On Wed, 17 Dec 2025, Gerd Hoffmann wrote:
 
-> ---
-> Subject: kvm: Fix linux/kvm_types.h for !KVM architectures
-> 
-> As is, <linux/kvm_types.h> hard relies on architectures having
-> <asm/kvm_types.h> which (obviously) breaks for architectures that don't
-> have KVM support.
-> 
-> This means generic code (kernel/events/ in this case) cannot use
-> EXPORT_SYMBOL_FOR_KVM().
-> 
-> Rearrange things just so that <linux/kvm_types.h> becomes usable and
-> provides the (expected) empty stub for EXPORT_SYMBOL_FOR_KVM() for !KVM.
-> 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> ---
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index a568d8e6f4e8..a4cc13e41eec 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -6,6 +6,8 @@
->  #include <linux/bits.h>
->  #include <linux/export.h>
->  #include <linux/types.h>
-> +
-> +#ifdef CONFIG_KVM
->  #include <asm/kvm_types.h>
->  
->  #ifdef KVM_SUB_MODULES
-> @@ -20,13 +22,14 @@
->   * if there are no submodules, e.g. to allow suppressing exports if KVM=m, but
->   * kvm.ko won't actually be built (due to lack of at least one submodule).
->   */
-> -#ifndef EXPORT_SYMBOL_FOR_KVM
-> -#if IS_MODULE(CONFIG_KVM)
-> +#if defined(EXPORT_SYMBOL_FOR_KVM) && IS_MODULE(CONFIG_KVM)
->  #define EXPORT_SYMBOL_FOR_KVM(symbol) EXPORT_SYMBOL_FOR_MODULES(symbol, "kvm")
-> -#else
-> -#define EXPORT_SYMBOL_FOR_KVM(symbol)
->  #endif /* IS_MODULE(CONFIG_KVM) */
-> -#endif /* EXPORT_SYMBOL_FOR_KVM */
-> +#endif /* KVM_SUB_MODULES */
-> +#endif
-> +
-> +#ifndef EXPORT_SYMBOL_FOR_KVM
-> +#define EXPORTEXPORT_SYMBOL_FOR_KVM(symbol)
->  #endif
->  
->  #ifndef __ASSEMBLER__
+> On Fri, Dec 12, 2025 at 08:33:41PM +0530, Ani Sinha wrote:
+> > When the confidential virtual machine KVM file descriptor changes due to the
+> > guest reset, some TDX specific setup steps needs to be done again. This
+> > includes finalizing the inital guest launch state again. This change
+> > re-executes some parts of the TDX setup during the device reset phaze using a
+> > resettable interface. This finalizes the guest launch state again and locks
+> > it in. Also care has been taken so that notifiers are installed only once.
+>
+> > +    if (!notifier_added) {
+> > +        qemu_add_machine_init_done_notifier(&tdx_machine_done_notify);
+> > +        notifier_added = true;
+> > +    }
+>
+> Is this notifier needed still if you finalize the initial guest state in
+> the reset handler?
+>
+
+Yes good point. Following small change will be needed.
+
+From 59e1df5f3c64a75a14139c498106a225bf3b42b2 Mon Sep 17 00:00:00 2001
+From: Ani Sinha <anisinha@redhat.com>
+Date: Thu, 18 Dec 2025 14:11:40 +0530
+Subject: [PATCH] i386/tdx: remove notifier that is not needed
+
+Take Gerd's suggestion.
+
+Signed-off-by: Ani Sinha <anisinha@redhat.com>
+---
+ target/i386/kvm/tdx.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index 20f9d63eff..144020e378 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -392,7 +392,7 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+
+ static void tdx_handle_reset(Object *obj, ResetType type)
+ {
+-    if (!runstate_is_running()) {
++    if (!runstate_is_running() && !phase_check(PHASE_MACHINE_READY)) {
+         return;
+     }
+
+@@ -429,9 +429,6 @@ static NotifierWithReturn tdx_vmfd_pre_change_notifier = {
+     .notify = set_tdx_vm_uninitialized,
+ };
+
+-static Notifier tdx_machine_done_notify = {
+-    .notify = tdx_finalize_vm,
+-};
+
+ /*
+  * Some CPUID bits change from fixed1 to configurable bits when TDX module
+@@ -778,7 +775,6 @@ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     kvm_readonly_mem_allowed = false;
+
+     if (!notifier_added) {
+-        qemu_add_machine_init_done_notifier(&tdx_machine_done_notify);
+         kvm_vmfd_add_pre_change_notifier(&tdx_vmfd_pre_change_notifier);
+         notifier_added = true;
+     }
+-- 
+2.42.0
+
 
