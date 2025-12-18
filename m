@@ -1,193 +1,189 @@
-Return-Path: <kvm+bounces-66255-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C330CCBC09
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 13:15:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64FBCCCBF7E
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA71830A6B17
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 12:12:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 70064305B1D6
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 13:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E26132E72C;
-	Thu, 18 Dec 2025 12:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2E8325483;
+	Thu, 18 Dec 2025 13:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/U93GAB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HDEngMiL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74D532E157;
-	Thu, 18 Dec 2025 12:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9DD2E2DFB
+	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 13:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766059976; cv=none; b=R0A5Fl1Vo6KF7yEqKUwcXGZL4X4KErFbUqFmiuPfgd2ncuY1q+FamfqQmTFFli5eCg2loKiDaSelV/YmLEjV49TS5nM4DyAkELGdNcIYzo5Dlk2rtDgAaLY9QomnW9DajhFyKx1Xsw/PcqpA+KGftmr1IWSf5gzIXTyrQQxbM7M=
+	t=1766063824; cv=none; b=Ub5c0faJktbpxqv0XvzBkK/IdCwREueCT19qifSYKB0JTxpsMsu0CegxoyPctIYx4lTjm4B39mij8yyw2D/JPgkZfqN6Dz5ECeqpPy9da/QDA/7NpCh8WiXqUtB0gt7giwOT97f22Y3vOoNboplQx2ioEig1xvgSTbdWJ60Ufog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766059976; c=relaxed/simple;
-	bh=/Lag984MhuskRtOVAooSzdmrvbrlYsL+tVPR06diles=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NcYMkEuIFwkMBTQVe2gaHvMv7FIel2Ygk4lmMN+Ps4fALnWfBaOeGh4+l3CXlsjshylqIubPi59Jf6sT485GQuKxpJt6+etuR/76Gpue5bHRDWQMqON/+GL+69+GvrhsYp1CoSyL3UeIO5xnGc9QI6H+evE+Lak0X+kXP1c9I6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8CxMvG770Np33UAAA--.2059S3;
-	Thu, 18 Dec 2025 20:12:43 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJBxLMK370NpSFIBAA--.2641S3;
-	Thu, 18 Dec 2025 20:12:41 +0800 (CST)
-Subject: Re: [PATCH v3 2/2] LoongArch: Add paravirt support with
- vcpu_is_preempted() in guest side
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, WANG Xuerui <kernel@xen0n.name>,
- Juergen Gross <jgross@suse.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.makhalov@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, x86@kernel.org
-References: <20251202024833.1714363-1-maobibo@loongson.cn>
- <20251202024833.1714363-3-maobibo@loongson.cn>
- <CAAhV-H6D_XxGTgWjzO26JtBcNeaouqrzH1wTaCn7xK3HGtZ55w@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <c9e3cd01-0c88-adc2-fdd1-ed85414c7550@loongson.cn>
-Date: Thu, 18 Dec 2025 20:10:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1766063824; c=relaxed/simple;
+	bh=FMrYXDIcT8W61zOBuclA60KdyQywVUCtOd/OnTmnIBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JXbs3a4IokcezaNEaRL3oNoCmwzVbkNkUDwRz+tCJVY6UFqHZhtJEp80ktiRoQOgndsubWbn7O69Tz6x8MosiOUMABg7jRU2cuYRmmXYcE2IdE0ZnLYTBouIsXlnzTkRpWrFxA33nlfvedngsvfZYg92l9hgzA+d3jumq/f7YlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D/U93GAB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HDEngMiL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766063820;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D6j7TiY365GJDQffnjJjAGK4FQJdyrblUZ9cP/4dJY4=;
+	b=D/U93GAB46IQJjsdyo1n/ho7cOWS7u7G+nQQTjUOO5eqKrjrH9vnN7/6TtqnocMgB6mvVK
+	PzoPZjU62ZtJxCZ4/q+dAzCy2nlBBHR+yeMRoh9aENoKB+PWCovjU+SpbOkL3IQ7DM0nP3
+	iRJWQ06hRtY666zQ1MXs3v775pUX3SI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-Qhf7RSvFORO7F4vFHWoTPw-1; Thu, 18 Dec 2025 08:16:59 -0500
+X-MC-Unique: Qhf7RSvFORO7F4vFHWoTPw-1
+X-Mimecast-MFC-AGG-ID: Qhf7RSvFORO7F4vFHWoTPw_1766063818
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430f5dcd4d3so356921f8f.1
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 05:16:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1766063818; x=1766668618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D6j7TiY365GJDQffnjJjAGK4FQJdyrblUZ9cP/4dJY4=;
+        b=HDEngMiLl4HO0vKEDxQlcNl7PBUYMchaLx7hDGQ+IwAQVuC8U0JkZqmPdK6v7VVEg6
+         grGW8P9IGkZ0To23PHw4UV2ag7QdNmDaMTM9l1hbSMtYiLxNcq+a0FjUrHihRSFMfd9p
+         e9935ATlfZGBMP1h+maTFhsWISydsjJdo9OgwCjlTrPcLybCivo1VR65n1OvQhDex5CI
+         L93r3bxPqLVdiiJO3BDPHDE5NGO4lDjciC/283XDIy0DZd1lb/1QPO18R3TC5qlq3YOF
+         mwAr3Jg74ZrBOW+lA+sfX0T5KFHOyL97Pw4364jtyYVMgiYOjOEKpw1aJVkpgKIjRpXi
+         Dkgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766063818; x=1766668618;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=D6j7TiY365GJDQffnjJjAGK4FQJdyrblUZ9cP/4dJY4=;
+        b=Fnko8xRCBaMJ8OqO3zrMPezVp5nFLnPKgTyYDFN3xYsARqXSUIZ/tekN85D5rT/VMM
+         Oux4crsRLGGMnGC8x1S7WM/TYLW3q6PxJgeKC7i3+AIzAgMGXjdPWQr721My0sqB+h1w
+         Hc2i1Ys7IRpR1f8B7v4Glm7xIPpwpNaC2qZ7K2HDJ2QeqHu4zejrbtgQ2BGlV/XJuIi3
+         JSX/BvprH/7tqSZvM7UrZqpCmExqcsdGkwKVRAjGgfdAmKjYrdlPjYmdtuTQ4qAqnJVn
+         ynhiZzFM14fvS2zRarkzTXxLRt5Jim13P6q1PptZtTZTi8xYUfzcc1NS31OyvZKqPdu9
+         zyGA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpdizoEGUWDyes9lY+j9tlBasAOJYZXeK6pL9EV4rHGa5OHvjdJXHkSw4nQR1JAuOHSZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3I+wcRSFDG1t+mfDc0dt+g3L3A9GfG852HsyT52n1IAe98Iuw
+	g+V+888PXu+ip7KN/8g1SSKZp774vetvWODNpQ/NUggx/YgM/k1JUCx35LchSSDQ3Njs3FizHtC
+	VY1NN7VBYyaqfZQ1R7MPmMNDPAirMxwFOiMxAU3rVPjeROcQbQR+xkQ==
+X-Gm-Gg: AY/fxX7tu/qCBnh3htJI+EdTxQQ4mPdi4wi1b6//joeuKzRHNcfA/tXF1pM0vWGhkka
+	3FYtRd1iBlVGTjKUnu/NRQVHCTPUQlexJWRM6JFIR5jO1RV0RAR2zzkcVmXSKDAkj6HldtPD8VJ
+	5S5DKTldia7oVs3FVvKMBAdbTtu855Q9v7g4WA65ZRsk3/SA8YH4StwjYfib+1M7QA9FQx0wrur
+	VRTHkGAqXK+zMMVswZthTwCjjTWQQQ841Zyw5zNClAYMpmSpIr/lYCbScVTA1EQxb44QPTWvKkz
+	x8IUHxZzAoWZVmK1VeHVq7oPHJKVf3qSJHhawBzM5U0qWg5eEzMHu3cpuU7JC+3AxRoydA==
+X-Received: by 2002:a05:6000:1848:b0:431:cf0:2e8b with SMTP id ffacd0b85a97d-432448ac61dmr3316974f8f.29.1766063818306;
+        Thu, 18 Dec 2025 05:16:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFzPRYLdA9aqkfme3vftsM2x6w3AnDICmu456zKjmpq+1pcYRrN040I6jJAyyDJQTi4+yLLEw==
+X-Received: by 2002:a05:6000:1848:b0:431:cf0:2e8b with SMTP id ffacd0b85a97d-432448ac61dmr3316909f8f.29.1766063817795;
+        Thu, 18 Dec 2025 05:16:57 -0800 (PST)
+Received: from imammedo ([213.175.37.14])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432449986f1sm5011202f8f.29.2025.12.18.05.16.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 05:16:57 -0800 (PST)
+Date: Thu, 18 Dec 2025 14:16:54 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?=
+ <philmd@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Thomas
+ Huth <thuth@redhat.com>, qemu-devel@nongnu.org, devel@lists.libvirt.org,
+ kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org, Richard
+ Henderson <richard.henderson@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, Laurent Vivier <lvivier@redhat.com>, Jiaxun
+ Yang <jiaxun.yang@flygoat.com>, Yi Liu <yi.l.liu@intel.com>, Eduardo
+ Habkost <eduardo@habkost.net>, Alistair Francis <alistair.francis@wdc.com>,
+ Daniel Henrique Barboza <dbarboza@ventanamicro.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, Weiwei Li <liwei1518@gmail.com>, Amit Shah
+ <amit@kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, Yanan Wang
+ <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>, Palmer Dabbelt
+ <palmer@dabbelt.com>, "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?="
+ <berrange@redhat.com>, Ani Sinha <anisinha@redhat.com>, Fabiano Rosas
+ <farosas@suse.de>, Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+ =?UTF-8?B?Q2zDqW1lbnQ=?= Mathieu--Drif <clement.mathieu--drif@eviden.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Huacai
+ Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>, Mark
+ Cave-Ayland <mark.caveayland@nutanix.com>, BALATON Zoltan
+ <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>, Jiri Denemark
+ <jdenemar@redhat.com>
+Subject: Re: [PATCH v5 17/28] hw/i386/pc: Remove pc_compat_2_6[] array
+Message-ID: <20251218141654.5862533b@imammedo>
+In-Reply-To: <20251202162835.3227894-18-zhao1.liu@intel.com>
+References: <20251202162835.3227894-1-zhao1.liu@intel.com>
+	<20251202162835.3227894-18-zhao1.liu@intel.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H6D_XxGTgWjzO26JtBcNeaouqrzH1wTaCn7xK3HGtZ55w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxLMK370NpSFIBAA--.2641S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxJw4xGryfCFy5ury7Ar1kWFX_yoW5tF1fpa
-	4DAFs5Ka1xG34xC39xtr4Durn8tryvg3WIva47ua45A34DZwnrJr10gryY9FykXwn7WF4I
-	qFn3WFsI9F42yagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUU
-	UUU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Wed,  3 Dec 2025 00:28:24 +0800
+Zhao Liu <zhao1.liu@intel.com> wrote:
 
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+>=20
+> The pc_compat_2_6[] array was only used by the pc-q35-2.6
+> and pc-i440fx-2.6 machines, which got removed. Remove it.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+> Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 
-On 2025/12/6 下午9:04, Huacai Chen wrote:
-> Hi, Bibo,
-> 
-> On Tue, Dec 2, 2025 at 10:48 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->> Function vcpu_is_preempted() is used to check whether vCPU is preempted
->> or not. Here add implementation with vcpu_is_preempted() when option
->> CONFIG_PARAVIRT is enabled.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> ---
->>   arch/loongarch/include/asm/qspinlock.h |  3 +++
->>   arch/loongarch/kernel/paravirt.c       | 23 ++++++++++++++++++++++-
->>   2 files changed, 25 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/loongarch/include/asm/qspinlock.h b/arch/loongarch/include/asm/qspinlock.h
->> index e76d3aa1e1eb..fa3eaf7e48f2 100644
->> --- a/arch/loongarch/include/asm/qspinlock.h
->> +++ b/arch/loongarch/include/asm/qspinlock.h
->> @@ -34,6 +34,9 @@ static inline bool virt_spin_lock(struct qspinlock *lock)
->>          return true;
->>   }
->>
->> +#define vcpu_is_preempted      vcpu_is_preempted
->> +bool vcpu_is_preempted(int cpu);
->> +
->>   #endif /* CONFIG_PARAVIRT */
->>
->>   #include <asm-generic/qspinlock.h>
->> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/paravirt.c
->> index b1b51f920b23..b61a93c6aec8 100644
->> --- a/arch/loongarch/kernel/paravirt.c
->> +++ b/arch/loongarch/kernel/paravirt.c
->> @@ -246,6 +246,7 @@ static void pv_disable_steal_time(void)
->>   }
->>
->>   #ifdef CONFIG_SMP
->> +static DEFINE_STATIC_KEY_FALSE(virt_preempt_key);
->>   static int pv_time_cpu_online(unsigned int cpu)
->>   {
->>          unsigned long flags;
->> @@ -267,6 +268,18 @@ static int pv_time_cpu_down_prepare(unsigned int cpu)
->>
->>          return 0;
->>   }
->> +
->> +bool notrace vcpu_is_preempted(int cpu)
->> +{
->> +       struct kvm_steal_time *src;
->> +
->> +       if (!static_branch_unlikely(&virt_preempt_key))
->> +               return false;
->> +
->> +       src = &per_cpu(steal_time, cpu);
->> +       return !!(src->preempted & KVM_VCPU_PREEMPTED);
->> +}
->> +EXPORT_SYMBOL(vcpu_is_preempted);
->>   #endif
->>
->>   static void pv_cpu_reboot(void *unused)
->> @@ -308,6 +321,9 @@ int __init pv_time_init(void)
->>                  pr_err("Failed to install cpu hotplug callbacks\n");
->>                  return r;
->>          }
->> +
->> +       if (kvm_para_has_feature(KVM_FEATURE_PREEMPT))
->> +               static_branch_enable(&virt_preempt_key);
->>   #endif
->>
->>          static_call_update(pv_steal_clock, paravt_steal_clock);
->> @@ -318,7 +334,12 @@ int __init pv_time_init(void)
->>                  static_key_slow_inc(&paravirt_steal_rq_enabled);
->>   #endif
->>
->> -       pr_info("Using paravirt steal-time\n");
->> +#ifdef CONFIG_SMP
-> 
-> Linux kernel is removing non-SMP step by step [1].
-> https://kernelnewbies.org/Linux_6.17#Unconditionally_compile_task_scheduler_with_SMP_support
-> 
-> Though we cannot remove all "#ifdef CONFIG_SMP" at present, we can at
-> least stop adding more.
-> 
-> So I prefer to make this whole patch out of CONFIG_SMP. But if you
-> don't like this, you can at least move the virt_preempt_key
-> declaration out of "#ifdef CONFIG_SMP", then the #ifdefs here can be
-> removed.
-Sorry, I just notice this mail.
-Will move virt_preempt_key out of CONFIG_SMP in next version.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Regards
-Bibo Mao
-> 
-> Huacai
-> 
->> +       if (static_key_enabled(&virt_preempt_key))
->> +               pr_info("Using paravirt steal-time with preempt enabled\n");
->> +       else
->> +#endif
->> +               pr_info("Using paravirt steal-time with preempt disabled\n");
->>
->>          return 0;
->>   }
->> --
->> 2.39.3
->>
->>
+> ---
+>  hw/i386/pc.c         | 8 --------
+>  include/hw/i386/pc.h | 3 ---
+>  2 files changed, 11 deletions(-)
+>=20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2e315414aeaf..85d12f8d0389 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -263,14 +263,6 @@ GlobalProperty pc_compat_2_7[] =3D {
+>  };
+>  const size_t pc_compat_2_7_len =3D G_N_ELEMENTS(pc_compat_2_7);
+> =20
+> -GlobalProperty pc_compat_2_6[] =3D {
+> -    { TYPE_X86_CPU, "cpuid-0xb", "off" },
+> -    { "vmxnet3", "romfile", "" },
+> -    { TYPE_X86_CPU, "fill-mtrr-mask", "off" },
+> -    { "apic-common", "legacy-instance-id", "on", }
+> -};
+> -const size_t pc_compat_2_6_len =3D G_N_ELEMENTS(pc_compat_2_6);
+> -
+>  /*
+>   * @PC_FW_DATA:
+>   * Size of the chunk of memory at the top of RAM for the BIOS ACPI tables
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 698e3fb84af0..f8f317aee197 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -295,9 +295,6 @@ extern const size_t pc_compat_2_8_len;
+>  extern GlobalProperty pc_compat_2_7[];
+>  extern const size_t pc_compat_2_7_len;
+> =20
+> -extern GlobalProperty pc_compat_2_6[];
+> -extern const size_t pc_compat_2_6_len;
+> -
+>  #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+>      static void pc_machine_##suffix##_class_init(ObjectClass *oc, \
+>                                                   const void *data) \
 
 
