@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-66218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66220-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEC10CCAA36
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 08:26:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF325CCAA8D
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 08:32:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 93A2130652D7
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 07:24:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A5B80302AB8D
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 07:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E221E5B88;
-	Thu, 18 Dec 2025 07:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C6E2C326D;
+	Thu, 18 Dec 2025 07:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="laa656pg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gjp2U1qI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7304972634
-	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 07:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9636218821
+	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 07:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766042655; cv=none; b=Uxoth6KbTYHOxa1sxdLLGbEIPVcbHiQcRHrk3UwXKTkk7SP/LnCdr02cXQN3DrEzlBImU1C7y1bZHIJPDgZnKetmUYf87dGXN5r4T5E8r2Ak6EzKwL0Vvv80QJUP+doClMBL3q6birYx0IscCR+5JqLCTyww91A0snfiuHTtxmc=
+	t=1766042887; cv=none; b=mj6OF06chzmeI+813xNgGxNTcA8wvzSkG9a+9/4jgrlx/myIubH+C3IlPCtZU9vfN9asT1EwtPHfqdoe/mf94pvrrWEfjjIBXTu3wM+j/wXv2l056UFfDiChy3J+K9wRAB/6ORK3eN3IsJNbD4peVnGISG3vC+VzX9mh7wI5wLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766042655; c=relaxed/simple;
-	bh=7DwI0Qs8ZZROCxgks932LOqBfATLVNdCypOv4og2tA4=;
+	s=arc-20240116; t=1766042887; c=relaxed/simple;
+	bh=hWNeVMjmF8yETmL2iScc7y+Xsno1MZFc4t4eczNLXrY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AmHPNgWcwAUqNFCy/7vE8x5XvrhLXizo9f19ETPfUrDl94W2oFY+IaKw6jt/D8GDDdjxp9UhbeIV8aoIKqGfDJpIcaNwq15NvwW4TO/qS/QZ1OmQFKEiShnSvtT4UoP4Nb4LjYgdiPOJ0DT5yrSC3LXPhJ8X8AuBZ/trpDSkuD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=laa656pg; arc=none smtp.client-ip=198.175.65.17
+	 Content-Type:Content-Disposition:In-Reply-To; b=sAQ2HDgEodGf7Fh8Ml3Cg2ZDDQWa0IpRq6IX4hoKfLC+MXjN9HCf9poMorfMNqr+LovFs1f5AgBx9E2i4A4bdejse6m94/4hAGX92nsow9xpx2eWnPgr1fJuJo5VOX8kEyd5g/KiDFpwadqEEAz88xTenQSCOh5tgI5jJTz3sK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gjp2U1qI; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766042655; x=1797578655;
+  t=1766042886; x=1797578886;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=7DwI0Qs8ZZROCxgks932LOqBfATLVNdCypOv4og2tA4=;
-  b=laa656pg5dh0xwqzJeGJQv+gTOuJucxCMFQjJR+OuW92MvpxdUu1moft
-   bf6QO+9GKjqYGcJVE5OE0BQhGUP2twu9HX+AB89SMsawGyCvgmE9nyB7Z
-   HqVHdnHFYhiRY+P49NzCZQce54B/AZoA0OkQvYUX7zJ1a/ucJR1OKGeoZ
-   4ultwNyRkisLnywgMiV6FSA8FkiWguunaM3/6Z8Q16aiB/lDFFfCvRmaz
-   vNzEaEGdJABTqKXRJeHiLS/fXiHA/ULqC7aYuLbcfcLaAR2/x3nh4WHTL
-   IQRlWBc5ECyv9zYNE+MfKUY2JPs0gHUlp1hZRHp4QNlwKDJI5sjtUOjIC
-   Q==;
-X-CSE-ConnectionGUID: 8CFUbt7bRVixRZPB5+dsUg==
-X-CSE-MsgGUID: Wy/PU/+dTYWsapayEmbl6g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="67960045"
+  bh=hWNeVMjmF8yETmL2iScc7y+Xsno1MZFc4t4eczNLXrY=;
+  b=Gjp2U1qIKZ7DlTK8oArATCAwM/5OWpYnDg4UHYxnWlNRXtuuhX4Tp4Fl
+   gTbOpgBKlrmRAxKci9xP9GeWBb7b9kK3L9pdrIfdtRyQJujqn5qpeaAv4
+   1iQGcoU8wFo+Vi4m9I8iPkzxeEvHcAPWc8xa7UZ0I8ORqXRhfrf8HTpBz
+   VP8wsXSdbnO32vpOazUipiPqARvLYKh4Om+WcjGYS5TzHxjz3FfKpwLJS
+   0VD3VBgWiQNee1BoJXJPBvr+IwcYIIJHGX+7Cl80MlOVEgGck9gYB4j5Z
+   +5tokp4A6qxnkZj89bMqVGPf4wSN3YEnyXIvlTNz8HuRt8chaCkWN9flo
+   g==;
+X-CSE-ConnectionGUID: GR/oPrnHS3uV7nl2EN8+og==
+X-CSE-MsgGUID: fu4JY5VFRsqZvGECFSGHpQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="71622095"
 X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="67960045"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2025 23:24:14 -0800
-X-CSE-ConnectionGUID: sxbUkqeGSCCx2CAtSkrTbQ==
-X-CSE-MsgGUID: oV8BMOWXTn2tBLC3VqwuDw==
+   d="scan'208";a="71622095"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2025 23:28:04 -0800
+X-CSE-ConnectionGUID: v88tZuomTSO56nWrPX/fYg==
+X-CSE-MsgGUID: ulShamx1RQqj9xlNDkLIiQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="202898882"
+   d="scan'208";a="229575059"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa005.fm.intel.com with ESMTP; 17 Dec 2025 23:24:06 -0800
-Date: Thu, 18 Dec 2025 15:48:55 +0800
+  by fmviesa001.fm.intel.com with ESMTP; 17 Dec 2025 23:27:55 -0800
+Date: Thu, 18 Dec 2025 15:52:45 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Igor Mammedov <imammedo@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -90,11 +90,12 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	BALATON Zoltan <balaton@eik.bme.hu>,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>
-Subject: Re: [PATCH v5 07/28] tests/acpi: Update DSDT tables for pc machine
-Message-ID: <aUOx5wor+ysd2lNo@intel.com>
+Subject: Re: [PATCH v5 03/28] pc: Start with modern CPU hotplug interface by
+ default
+Message-ID: <aUOyzVHm+mt1pCfL@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
- <20251202162835.3227894-8-zhao1.liu@intel.com>
- <20251217151627.3ee7bf07@imammedo>
+ <20251202162835.3227894-4-zhao1.liu@intel.com>
+ <20251217143237.7829af2e@imammedo>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -103,43 +104,61 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251217151627.3ee7bf07@imammedo>
+In-Reply-To: <20251217143237.7829af2e@imammedo>
 
-On Wed, Dec 17, 2025 at 03:16:27PM +0100, Igor Mammedov wrote:
-> Date: Wed, 17 Dec 2025 15:16:27 +0100
+On Wed, Dec 17, 2025 at 02:32:37PM +0100, Igor Mammedov wrote:
+> Date: Wed, 17 Dec 2025 14:32:37 +0100
 > From: Igor Mammedov <imammedo@redhat.com>
-> Subject: Re: [PATCH v5 07/28] tests/acpi: Update DSDT tables for pc machine
+> Subject: Re: [PATCH v5 03/28] pc: Start with modern CPU hotplug interface
+>  by default
 > X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 > 
-> On Wed,  3 Dec 2025 00:28:14 +0800
+> On Wed,  3 Dec 2025 00:28:10 +0800
 > Zhao Liu <zhao1.liu@intel.com> wrote:
 > 
-> > Now the legacy cpu hotplug way has gone away, and there's no _INIT
-> > method in DSDT table for modern cpu hotplug support.
+> > From: Igor Mammedov <imammedo@redhat.com>
+> ^^^
+> given you resplit original patch, it's better to replace this with you,
+> keeping my SoB is sufficient
+
+Thank you! Will re-organize these signatures
+
+> > For compatibility reasons PC/Q35 will start with legacy CPU hotplug
+> > interface by default but with new CPU hotplug AML code since 2.7
+> > machine type (in commit 679dd1a957df ("pc: use new CPU hotplug interface
+> > since 2.7 machine type")). In that way, legacy firmware that doesn't use
+> > QEMU generated ACPI tables was able to continue using legacy CPU hotplug
+> > interface.
 > > 
-> > Update DSDT tables for pc machine.
+> > While later machine types, with firmware supporting QEMU provided ACPI
+> > tables, generate new CPU hotplug AML, which will switch to new CPU
+> > hotplug interface when guest OS executes its _INI method on ACPI tables
+> > loading.
 > > 
-> > The following diff changes show only _INIT methods are removed from DSDT
-> > tables.
+> > Since 2.6 machine type is now gone, and consider that the legacy BIOS
+> > (based on QEMU ACPI prior to v2.7) should be no longer in use, previous
+> > compatibility requirements are no longer necessary. So initialize
+> > 'modern' hotplug directly from the very beginning for PC/Q35 machines
+> > with cpu_hotplug_hw_init(), and drop _INIT method.
 > > 
+> > Additionally, remove the checks and settings around cpu_hotplug_legacy
+> > in cpuhp VMState (for piix4 & ich9), to eliminate the risk of
+> > segmentation faults, as gpe_cpu no longer has the opportunity to be
+> > initialized. This is safe because all hotplug now start with the modern
+> > way, and it's impossible to switch to legacy way at runtime (even the
+> > "cpu-hotplug-legacy" properties does not allow it either).
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > 
-> below diff in commit message confuses git am,
-> I'd suggests to point out only what's deleted  
-> and skip the rest, aka.
-> removed section in x86 DSDTs:
->   -
->   -            Method (_INI, 0, Serialized)  // _INI: Initialize
->   -            {
->   -                CSEL = Zero
->   -            }
+> tested ping pong cross version (master vs master+this patch) migration
+> with 10.1 machine type, nothing is broken, hence
 > 
-> ditto for blurb in the next patch
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-Yes, good idea. Indeed, this nearly duplicated information makes the
-commit message quite lengthy, so I had to split it into two patches.
+Thanks for your test and review!
 
-Will merge these 2 patches (this patch and next patch).
-
-Thanks,
+Regards,
 Zhao
+
 
