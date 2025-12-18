@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-66264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E35CCC2F7
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 15:10:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49303CCC2E8
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 15:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7782A3019892
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:07:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 969AF30A5E36
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB6D343D84;
-	Thu, 18 Dec 2025 14:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5AA3446B3;
+	Thu, 18 Dec 2025 14:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="rGcs5TYs"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="K3zzeg8Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-148.mail.aliyun.com (out28-148.mail.aliyun.com [115.124.28.148])
+Received: from out28-221.mail.aliyun.com (out28-221.mail.aliyun.com [115.124.28.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CEB340D93;
-	Thu, 18 Dec 2025 14:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861633431E6;
+	Thu, 18 Dec 2025 14:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766066474; cv=none; b=U8FqUcokIOfX4HrK7jR1j3yBGnWCuSTnIry1EOPV/iw/gdI1Xp+WW5owSpw7iIkU1BrZKdEInbnwK1bX+RR7Spg2Bs05p/JPdzIcDkQrhf29iuYdqiGhBui49cbFD6X2GB3Yqsn9QbOii7ZxMNQ4vHgk+0ZWYIW55o1Fv5HWQPw=
+	t=1766066478; cv=none; b=j8lD5PnV+CyFiiZK6xyhkLfvPQocITcb56qdQ8ogAcp8yJpea5onlVHWLkluYLoevdE3HX3hxyyXx3V675LgLuSqJUgHjUKJ7AAZwefTaMZY6aQQe0IdcpqM3/eaTwNYwY6RhNOSIJ7CGQRT9uFm2qTy7/H+5teLzYoI9EzyOzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766066474; c=relaxed/simple;
-	bh=R3YK9B38wu/oiIJtPzlJr0HCTmUwKMeWu4ucBm+cPF0=;
+	s=arc-20240116; t=1766066478; c=relaxed/simple;
+	bh=Uz8/j1l7dC96sfyXq+AD4fX6cqO+4WKg7++VqzGmYaQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fvCJmTaFrubUbJD2LeLaBX1tEthTWCNr4zuaEfQcVzghOoyaudpKpWgqyZ3CzyuhKIv0EeIzpd4tT+zS1Ha5JpzNZ8Z9kYqWI/QJ25uv5zXfZVGEa4go7IdoDvUc5VAq5SKxV91DNMcbSZ3ohN1ghEtmLmTCWmTxYkgVD7aBpWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=rGcs5TYs; arc=none smtp.client-ip=115.124.28.148
+	 MIME-Version; b=UA+iieBEXc+oDwkKz3aIBHNL1FdvSO5T/gwBc9RxpmXo9PIeQQ8mGJbu/fFIZgOf/lbWKKW5WXvqVX6CAx4xTqCqo+945FF6USeriocwDPAjNbyyY3Qz/3Kim8aaSVrDE3eByMDshyAlFiKen6+tvDrcv20QD9IzOm1oxr3m08s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=K3zzeg8Q; arc=none smtp.client-ip=115.124.28.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=antgroup.com; s=default;
-	t=1766066462; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=XKfSRsgufZz35Jo2Mc/srTw4TeEmjiGm2YkpIyQmbl4=;
-	b=rGcs5TYsb+X8zHQM27kw0QninCsLYHiM8y8iXRrgK9QcaPR6OGiSZvrNz4JrzOXxx9JMP6TkWsArRDneRlMDMCqhxL1yze6gKH8w20s27SxS6Cs33l1SiRZpycKLTUnsmFG/sKZyOGj+eMLlpykdDw5OP5tnYwKTR1u6SfQ+o+w=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.fneRYrx_1766066461 cluster:ay29)
+	t=1766066464; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=iIJgsaJAJFg81C2Ck2lA9fwsw0HWn+BnyWHs7EtssAg=;
+	b=K3zzeg8QzpF6hIV30tmEbuEtd8g3211MtbDnw4k/bauM47T4Inxg/kSxETf04yyBkdhR/drqTukS+UMH/AqhGI6c46PYJtY0tQT9Ex38UNv0reXq42BewKXNFlF3ut1Eob4IxeFblkTjWdQCW0TiCamVOHt08EDHdc8ZgykSL0k=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.fnj5fA3_1766066463 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Thu, 18 Dec 2025 22:01:01 +0800
+          Thu, 18 Dec 2025 22:01:03 +0800
 From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 To: kvm@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -49,9 +49,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	x86@kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/9] KVM: x86: Only check effective code breakpoint in emulation
-Date: Thu, 18 Dec 2025 22:00:39 +0800
-Message-Id: <19dc9f355b395a8e7c99b449ca5e93c8fbf5c49c.1766066076.git.houwenlong.hwl@antgroup.com>
+Subject: [PATCH v2 5/9] KVM: x86: Consolidate KVM_GUESTDBG_SINGLESTEP check into the kvm_inject_emulated_db()
+Date: Thu, 18 Dec 2025 22:00:40 +0800
+Message-Id: <f5c495a43a03a20e04fbc9f1f78fd490e1f6ad50.1766066076.git.houwenlong.hwl@antgroup.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1766066076.git.houwenlong.hwl@antgroup.com>
 References: <cover.1766066076.git.houwenlong.hwl@antgroup.com>
@@ -63,80 +63,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When guest debug is enabled, the effective breakpoints are controlled by
-guest debug rather than by the guest itself.  Therefore, only check the
-code breakpoints of guest debug in emulation if guest debug is enabled,
-in order to maintain consistency with hardware behavior.
+Use kvm_inject_emulated_db() in kvm_vcpu_do_singlestep() to consolidate
+'KVM_GUESTDBG_SINGLESTEP' check into kvm_inject_emulated_db() during
+emulation.
 
-Fixes: 4a1e10d5b5d8 ("KVM: x86: handle hardware breakpoints during emulation")
+No functional change intended.
+
+Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/x86.c | 35 ++++++++++-------------------------
- 1 file changed, 10 insertions(+), 25 deletions(-)
+ arch/x86/kvm/x86.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 824eb489de43..3000139a19db 100644
+index 3000139a19db..44c2886589d7 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9272,6 +9272,9 @@ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_skip_emulated_instruction);
- 
- static bool kvm_is_code_breakpoint_inhibited(struct kvm_vcpu *vcpu)
+@@ -8947,7 +8947,7 @@ static int kvm_inject_emulated_db(struct kvm_vcpu *vcpu, unsigned long dr6)
  {
-+	if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP)
-+		return false;
-+
- 	if (kvm_get_rflags(vcpu) & X86_EFLAGS_RF)
- 		return true;
+ 	struct kvm_run *kvm_run = vcpu->run;
  
-@@ -9288,6 +9291,8 @@ static bool kvm_is_code_breakpoint_inhibited(struct kvm_vcpu *vcpu)
- static bool kvm_vcpu_check_code_breakpoint(struct kvm_vcpu *vcpu,
- 					   int emulation_type, int *r)
+-	if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) {
++	if (vcpu->guest_debug & (KVM_GUESTDBG_USE_HW_BP | KVM_GUESTDBG_SINGLESTEP)) {
+ 		kvm_run->debug.arch.dr6 = dr6 | DR6_ACTIVE_LOW;
+ 		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
+ 		kvm_run->debug.arch.exception = DB_VECTOR;
+@@ -9232,17 +9232,7 @@ static int kvm_vcpu_check_hw_bp(unsigned long addr, u32 type, u32 dr7,
+ 
+ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
  {
-+	unsigned long dr7 = kvm_get_eff_dr7(vcpu);
-+
- 	WARN_ON_ONCE(emulation_type & EMULTYPE_NO_DECODE);
- 
- 	/*
-@@ -9308,34 +9313,14 @@ static bool kvm_vcpu_check_code_breakpoint(struct kvm_vcpu *vcpu,
- 			      EMULTYPE_TRAP_UD | EMULTYPE_VMWARE_GP | EMULTYPE_PF))
- 		return false;
- 
--	if (unlikely(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) &&
--	    (vcpu->arch.guest_debug_dr7 & DR7_BP_EN_MASK)) {
--		struct kvm_run *kvm_run = vcpu->run;
--		unsigned long eip = kvm_get_linear_rip(vcpu);
--		u32 dr6 = kvm_vcpu_check_hw_bp(eip, 0,
--					   vcpu->arch.guest_debug_dr7,
--					   vcpu->arch.eff_db);
+-	struct kvm_run *kvm_run = vcpu->run;
 -
--		if (dr6 != 0) {
--			kvm_run->debug.arch.dr6 = dr6 | DR6_ACTIVE_LOW;
--			kvm_run->debug.arch.pc = eip;
--			kvm_run->debug.arch.exception = DB_VECTOR;
--			kvm_run->exit_reason = KVM_EXIT_DEBUG;
--			*r = 0;
--			return true;
--		}
+-	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+-		kvm_run->debug.arch.dr6 = DR6_BS | DR6_ACTIVE_LOW;
+-		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
+-		kvm_run->debug.arch.exception = DB_VECTOR;
+-		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+-		return 0;
 -	}
--
--	if (unlikely(vcpu->arch.dr7 & DR7_BP_EN_MASK) &&
-+	if (unlikely(dr7 & DR7_BP_EN_MASK) &&
- 	    !kvm_is_code_breakpoint_inhibited(vcpu)) {
- 		unsigned long eip = kvm_get_linear_rip(vcpu);
--		u32 dr6 = kvm_vcpu_check_hw_bp(eip, 0,
--					   vcpu->arch.dr7,
--					   vcpu->arch.db);
-+		u32 dr6 = kvm_vcpu_check_hw_bp(eip, 0, dr7,
-+					       vcpu->arch.eff_db);
+-	kvm_queue_exception_p(vcpu, DB_VECTOR, DR6_BS);
+-	return 1;
++	return kvm_inject_emulated_db(vcpu, DR6_BS);
+ }
  
--		if (dr6 != 0) {
--			kvm_queue_exception_p(vcpu, DB_VECTOR, dr6);
--			*r = 1;
-+		if (dr6) {
-+			*r = kvm_inject_emulated_db(vcpu, dr6);
- 			return true;
- 		}
- 	}
+ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
 -- 
 2.31.1
 
