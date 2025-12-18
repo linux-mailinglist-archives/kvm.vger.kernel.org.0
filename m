@@ -1,143 +1,218 @@
-Return-Path: <kvm+bounces-66198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9BBBCC9C44
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 00:05:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1D9CCA003
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 02:44:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3F4CB3041CC9
-	for <lists+kvm@lfdr.de>; Wed, 17 Dec 2025 23:05:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83EE8301CEB1
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 01:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAD4330309;
-	Wed, 17 Dec 2025 23:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E18026B75B;
+	Thu, 18 Dec 2025 01:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EBb1p8bz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xwJSVb5w"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F0E30F54B
-	for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 23:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD95B267AF6
+	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 01:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766012729; cv=none; b=PyOEMfq6IXkIdYpb++Ohd50WHWsTrCgVfBW6W4lBRZIeZrX49x6b1uzGuDFJP+vrvbFLA/nVDAzKuIr2UPnJDKkpYc8ckXbQAsrk1DdM5GU4lnvhJu1NIogqbqhDikL/SwLHttcB3pEbTSJ9L3E4Gfrueh0ORQxdHROmg0tzgUM=
+	t=1766022287; cv=none; b=GlVgpliR4eQFRSuF5j/GtLCI0TiB25ASOC0J9H2Zj1nuovQV0Zj1+3E23SrEsG/98EyP3XEGBecENHhYQuWv++2zDAgZLkOSc3c/1VTdLnlmQlAjR+Q0r/EwUucqhZpGy5uUklQAe0B6/TDp00mkV0DGwLJ9r2zp9sxp21rXta0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766012729; c=relaxed/simple;
-	bh=0l/omZO1v8asiZJMEMWG7M0JnZi5IJrGYo3/p+gESCE=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=F+u/269Fqrd0CmUda0i8q39HyoKULEOCyYBc9tIQ4SxRgMPP0AwnQQX2qAoEkGjpetAXVItYidQT/DXHWUZGI3rYoKHlPVcwo6kq4u44sNSlaZE4zfr/2VKiaAi73Svh4P1sMkn4n6vNw/Uw5KQvTcnDa9CZtiJdhGpywucQlxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EBb1p8bz; arc=none smtp.client-ip=209.85.210.73
+	s=arc-20240116; t=1766022287; c=relaxed/simple;
+	bh=LaBM3Pn65otIp/csDeYzkbqgC1Ny8b0EFTpIoFsrFVs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=naM9CeuG9zyKRHBmJpolCG+0OHeE2ljBkbQi3usOnJ7AdhEuEjKIWIdJUD7SgW9Wyh/izdAwWq5vevBA4cn1HxkCUmtG8yiJ/APwPiDiFJxuw+z8DIxf1CE7qdoY/ly+3IkeJ7QpOXJkLks4WqWAK+0JiVD7wuR3W6rbX9rm+Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xwJSVb5w; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7c70930bdf4so13530029a34.2
-        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 15:05:28 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c48a76e75so278158a91.1
+        for <kvm@vger.kernel.org>; Wed, 17 Dec 2025 17:44:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766012727; x=1766617527; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GLCAorwrKlMW8FunTjt8zj7Va5wWm7XneVrIZBSPv24=;
-        b=EBb1p8bzEwiF3Lu+DMjXUQwtVzw5gBRP72IVghNFvFFa0z7qC/VrsSVB3FLCt5H0AM
-         cJeT1Q5eAutT1RyaPO9goRXe/O8erhAbEj6W0BnVASJ/W26oRRZbDu2X4zjLK7+xsb84
-         k9P/nLv/zwBjdHGGZSg8SI+rXle+u3d1N1O/FRLsv74rddRMufLT6Cy+ZI9f8yEOBprA
-         xsOqku1qz1AlMzgd2YfyJbbDh2Tvv6atVMY3CAunxEp3gFbSlUTtyURuGpgDyP1hJ6zx
-         QFGmI19GEDL2MRqpYN2E/nowvTVLtrxWz6r/bW54R+BPIpv3RheWK/ovhOCzDviKF6HI
-         WwfQ==
+        d=google.com; s=20230601; t=1766022285; x=1766627085; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q6ebwR/Vue4SkDVzpOcpgl8A11+SbAzBAvHEuPdOdMY=;
+        b=xwJSVb5wFPKshjQKV0x8JBxiKNB30m1VsMQ2zF51QyiO+YSowrD0MIXGxj85LTAp/a
+         l0BcaCTGUjxQ/zRV9il1QQFj0FQbnjFFW05UZHYJ/IlNhRohoghuAgSA4Y98nB5K5s3r
+         v79khSPPD3upmrG/eiRfDz27Ok7HxSIMD19iAhgh0S4cPannU12pwbZJQLlkWPLlL6Hj
+         wCq6ubChi2JXf/ddayt8exif3/PY89dQWzAYCzg2jaMdWfrt3n82dw8EUhBeFjJI4T39
+         fNHBWmABoez8virolUcbuV674wFhAskYRm7uv8qYzWF+xhME/x0yQ3SC8lb90+DZa5Yd
+         8ItQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766012727; x=1766617527;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GLCAorwrKlMW8FunTjt8zj7Va5wWm7XneVrIZBSPv24=;
-        b=VqUukxGZn2zsZfBHxXJEDcIz/YSj921fBgcqPW9kTGQiKf4DptNz4HpVm8BV9wU5Qp
-         QLieplOydjwJMFfb0USF+Z14oKaTI/GKXsimeEQ++gs333GMh0zU6g3iGseGi6eFo7JJ
-         xQ6a2lXfso03wYrBS6nbYEaNVgsecs0pIJ9ZQhayTgtHoncOiKasS++JFXNdJBn+myFH
-         dkcuEBmIShCLTZuej+0kX1LPwnTkRnJhNsSCLospu+vsFrhaGphAO8518EfVfryKSlz5
-         aOSiL5pD1pQDQlCh2YdiL2acUpX+c+P2J3sqjfGJzojDO3cy5tsugx4Z6b7SpJjZsy8Z
-         21bw==
-X-Gm-Message-State: AOJu0YwfBj50C/EzNGsBT/uQxbWtEQTUJXqQmEyUnVxR07u5ASjVts54
-	kZVIZgTujuDFCp1e9b1Ji9axrtO7FInqLj649XYZJuMiJFmQDJB/CcfbmRt6v2R/g/UdKHRnRg3
-	tQjaUGbxjTjuQ8LpMid3UyTgBJQ==
-X-Google-Smtp-Source: AGHT+IFeAgC0uw9c+8LafGLGz/f6/NPZAPXmK9qXp7aoSKF9A72AfmoYnPNSSr0uyMWXg523FecZ0oA8sQssQiXDkg==
-X-Received: from ilbbo32.prod.google.com ([2002:a05:6e02:3420:b0:430:ccc7:4f1e])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:4815:b0:65c:fe5b:9f4d with SMTP id 006d021491bc7-65cfe5ba58emr301994eaf.47.1766012727236;
- Wed, 17 Dec 2025 15:05:27 -0800 (PST)
-Date: Wed, 17 Dec 2025 23:05:26 +0000
-In-Reply-To: <aUH_7yYZsmFlRvEc@kernel.org> (message from Oliver Upton on Tue,
- 16 Dec 2025 16:57:19 -0800)
+        d=1e100.net; s=20230601; t=1766022285; x=1766627085;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q6ebwR/Vue4SkDVzpOcpgl8A11+SbAzBAvHEuPdOdMY=;
+        b=MghxYZF7CX9TXyqDfD0xQmY05cU8M5k8Be+vbaQGekB2Q1zDnOaBHfiYqz2/d94jUI
+         GZI/Y8uj1zijnUtrfV8CN0k2HnufDjsI1dD42wLrcDXovml0h4N0qE72MPd2tppRFJNv
+         8lI2znl9GYWSZhnIBn2hy61KQtb/iZhLAeex7n9Ng56fY3binxGswHy4hOQLOC1qzm84
+         Beny4gE/+LieEtdn8i+6cgIQ7Ofhp3mOjMkaIqXnsTPub9oDhdmn1vLcdJRiZvsjkL81
+         7MfFAFdcDHZltLsGA38uMRr/Z1RYj2P3/9o1vJQj0dvidifh/h0Ce05z0l6t9eNkTr4O
+         h84w==
+X-Gm-Message-State: AOJu0Yw3sK71LS+qNacU+m0wzc6G6JZsJ8NkImXMgElf+PNY41vDryR2
+	KmIoUSkkXWPsnJ3KqaeaJzChBC5L6suKxq14lR/7O1gmNKj3p4xmhdbwzMXR5Rux/W8tsunwAbM
+	IGIxX7A==
+X-Google-Smtp-Source: AGHT+IEOIYr+WARtcaV756FZH6EZp/J2PAYEJSqogTwiyMdCgxXOovE9wE+cOpuJ042H6bq3Z8rxYsgTo8g=
+X-Received: from pjbcz3.prod.google.com ([2002:a17:90a:d443:b0:34c:c8a4:313f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2542:b0:343:eb40:8dca
+ with SMTP id 98e67ed59e1d1-34abd75ba02mr18039870a91.19.1766022284893; Wed, 17
+ Dec 2025 17:44:44 -0800 (PST)
+Date: Wed, 17 Dec 2025 17:44:43 -0800
+In-Reply-To: <3bac29b9-4c49-4e5d-997e-9e4019a2fceb@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Message-ID: <gsntzf7g1zgp.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 18/24] KVM: arm64: Enforce PMU event filter at vcpu_load()
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+References: <20250915215432.362444-1-minipli@grsecurity.net>
+ <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+ <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net> <aRufV8mPlW3uKMo4@google.com>
+ <083276ef-ff1b-4ac3-af19-3f73b1581d39@grsecurity.net> <0274322e-e28c-4511-a565-6bb85bfade8b@grsecurity.net>
+ <3bac29b9-4c49-4e5d-997e-9e4019a2fceb@grsecurity.net>
+Message-ID: <aUNci6Oy1EXXoQuY@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf functions
+From: Sean Christopherson <seanjc@google.com>
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
+	Eric Auger <eric.auger@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Oliver Upton <oupton@kernel.org> writes:
+On Fri, Nov 21, 2025, Mathias Krause wrote:
+> On 18.11.25 02:47, Mathias Krause wrote:
+> > On 18.11.25 02:33, Mathias Krause wrote:
+> > [...]
+> > Bleh, I just noticed, f01ea38a385a ("x86: Better backtraces for leaf
+> > functions") broke vmx_sipi_signal_test too :(
+> > 
+> > Looking into it!
+> 
+> Finally found it. It's register corruption within both host and guest.
+> 
+> It's not related to f01ea38a385a at all but, apparently, it actually
+> exposes it, likely because of the enforced stack frame setup, making the
+> code rely on (a corrupted) RBP instead of the properly restored (because
+> VMCS managed) RSP.
+> 
+> The core issue is, 'regs' being a singleton, used by multiple CPUs, so
+> all SMP VMX tests concurrently making use of vmx_enter_guest() are
+> potentially affected.
 
-> Re-reading this patch...
+*sigh*
 
-> On Tue, Dec 09, 2025 at 08:51:15PM +0000, Colton Lewis wrote:
->> The KVM API for event filtering says that counters do not count when
->> blocked by the event filter. To enforce that, the event filter must be
->> rechecked on every load since it might have changed since the last
->> time the guest wrote a value.
+I'm not going to type out the first dozen words that escaped my mouth when
+reading this.  I happen to like my job :-)
 
-> Just directly state that this is guarding against userspace programming
-> an unsupported event ID.
+> When the first vCPU calls vmx_enter_guest() to launch a guest, it'll use
+> 'regs' to load the guest registers but also store its host register
+> state. Now, if while that vCPU is running, another vCPU gets launched
+> via vmx_enter_guest(), it'll load the previous vCPU's host register
+> values as guest register state and store its host registers in 'regs'.
+> 
+> Depending on which vCPU returns first, it'll either load the other
+> vCPU's host registers effectively "switching threads" or, if it's the
+> vCPU that called vmx_enter_guest() last, it'll resume just fine. Either
+> way, the next vCPU returning will run with the guest register values.
+> 
+> The latter is what happens with vmx_sipi_signal_test, causing the crash.
+> 
+> I read a lot of vmx.c and vmx_test.c in the last few days and it's
+> really not meant to be used concurrently by multiple guests. vmx_test.c
+> has quite some hacks to work around obvious limitations (allocating
+> dedicated stacks for APs) but state variables like 'launched',
+> 'in_guest', 'guest_finished', 'hypercall_field' and 'regs' are shared
+> but really meant to be used only by a single thread.
 
-Sure
+You're much more generous than me in your description.  
 
->> +static void kvm_pmu_apply_event_filter(struct kvm_vcpu *vcpu)
->> +{
->> +	struct arm_pmu *pmu = vcpu->kvm->arch.arm_pmu;
->> +	u64 evtyper_set = ARMV8_PMU_EXCLUDE_EL0 |
->> +		ARMV8_PMU_EXCLUDE_EL1;
->> +	u64 evtyper_clr = ARMV8_PMU_INCLUDE_EL2;
->> +	u8 i;
->> +	u64 val;
->> +	u64 evsel;
->> +
->> +	if (!pmu)
->> +		return;
->> +
->> +	for (i = 0; i < pmu->hpmn_max; i++) {
+> I hacked up something to verify my theory and made 'regs' "per-cpu". It
+> needs quite some code churn and I'm not all that happy with it. IMHO,
+> 'regs' and lots of the other VMX management state should be part of some
+> vcpu struct or something. In fact, struct vmx_test already has a
+> 'guest_regs' but using it won't work, as we need offsetable absolute
+> memory references for the inline ASM in vmx_enter_guest() to work as it
+> cannot make use of register-based memory references at all. (My hack
+> uses a global 'scratch_regs' with mutual exclusion on its usage.)
 
-> Iterate the bitmask of counters and you'll handle the cycle counter 'for
-> free'.
+So, much to my chagrin, I started coding away before reading your entire mail
+(I got through the paragraph about 'regs' getting clobbered, and then came back
+to the rest later; that was a mistake).
 
-Will do.
+I had the exact same idea about making regs per-CPU, but without the quotes.
+Of course, because I didn't read your entire mail, converting only regs to be
+per-CPU didn't help.  It actually made things worse (TIL the INIT test shares
+a VMCS between CPUs... WTF).
 
-> <snip>
+After making launch and in_guest per-CPU, and using RAX to communicate hypercalls,
+I've got everything passing (module one unsolvable SIPI wart; see below).  I need
+to write changelogs and squash a few fixups, but overall it ended up being a nice
+cleanuped (de-duplicating the VMX vs. SVM GPR handling drops a lot of code).  I'm
+tempted to delete a blank lines just to get to net negative LoC :-D
 
->> +		val = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
->> +		evsel = val & kvm_pmu_event_mask(vcpu->kvm);
->> +
->> +		if (vcpu->kvm->arch.pmu_filter &&
->> +		    !test_bit(evsel, vcpu->kvm->arch.pmu_filter))
->> +			val |= evtyper_set;
->> +
->> +		val &= ~evtyper_clr;
->> +		write_pmevtypern(i, val);
+ lib/x86/smp.h       |  32 ++++++++++++++++++++++++++++++++
+ lib/x86/virt.h      |  61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ x86/Makefile.common |  14 ++++++++++++++
+ x86/realmode.c      |   3 +++
+ x86/svm.c           |  19 ++++++++-----------
+ x86/svm.h           |  61 +++++++++----------------------------------------------------
+ x86/svm_tests.c     |   5 +++--
+ x86/vmx.c           | 122 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------------------
+ x86/vmx.h           |  72 +++---------------------------------------------------------------------
+ x86/vmx_tests.c     | 104 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++------------------------------------------------
+ 10 files changed, 247 insertions(+), 246 deletions(-)
 
-> </snip>
+> To see the register corruption, one could start the vmx_sipi_signal_test
+> test with -s -S, attach gdb to it and add a watch for regs.rax. Stepping
+> through the test will clearly show how 'regs' get overwritten wrongly.
 
-> This all needs to be shared with writethrough_pmevtyper() instead of
-> open-coding the same thing.
+The test itself is also flawed.  On top of this race that you spotted:
 
-Will do.
+ @@ -9985,11 +9985,11 @@ static void vmx_sipi_signal_test(void)                
+       /* update CR3 on AP */                                                  
+       on_cpu(1, update_cr3, (void *)read_cr3());                              
+                                                                               
+ +     vmx_set_test_stage(0);                                                  
+ +                                                                             
+       /* start AP */                                                          
+       on_cpu_async(1, sipi_test_ap_thread, NULL);                             
+                                                                               
+ -     vmx_set_test_stage(0);                                                  
+ -                                                                             
+       /* BSP enter guest */                                                   
+       enter_guest();                                                          
+  }                                
 
-> Thanks,
-> Oliver
+This snippet is also broken:
+
+	vmx_set_test_stage(1);
+
+	/* AP enter guest */
+	enter_guest();
+
+because the BSP can think the AP has entered WFS before it has even attempted
+VMLAUNCH.  It's "fine" so long as there are host CPUs available, but the test
+fails 100% for me if I run KUT in a VM with e.g. j<number of CPUs>, and on an
+Ivybridge server CPU, it fails pretty consistently.  No idea why, maybe a slower
+nested VM-Enter path?  E.g. the test passes on EMR even if I run with j<2x CPUs>.
+
+Unfortunately, I can't think of any way to fix that problem.  To recognize the
+SIPI, the AP needs to do VM-Enter with a WFS activity state, and I'm struggling
+to think of a way to atomically write software-visible state at the time of VM-Enter.
+E.g. in theory, the test could peek at the LAUNCHED field in the VMCS, but that
+would require reverse engineering the VMCS layout for every CPU.  If KVM emulated
+any VM-wide MSRs, maybe we could throw one in the MSR load list?  But all the ones
+I can think of, e.g. Hyper-V's partition-wide MSRs, aren't guaranteed to be available.
+
+Anywho, now that I know what to look for, I can ignore false failures easily enough.
+If someone cares enough to come up with a clever fix, then yay.  Otherwise, I'll
+just deal with the intermittent failures (or maybe nuke and pave).
+
+As for this patch, I'll write changelogs and get a series posted with the backtrace
+and realmode patch at the end.
 
