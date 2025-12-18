@@ -1,90 +1,138 @@
-Return-Path: <kvm+bounces-66276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E802CCCC8E
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 17:33:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 953D6CCD169
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 19:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 63A563073941
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 16:30:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CAB6D3050407
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 18:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA8C36923F;
-	Thu, 18 Dec 2025 16:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AB7309DC0;
+	Thu, 18 Dec 2025 17:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P5jDWifX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dYd576Mq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxljDisO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09887368290;
-	Thu, 18 Dec 2025 16:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F982F1FFA
+	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 17:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766075414; cv=none; b=VlLZDSZnKWB2oGOFk8nGWjtxBScz5eMG8q+JMbCu1eNZ5KtuIm6v43fptcbdBrFk6dYWoL6PXqAXNqpwrmg9GGeP+cUsC40Zh1nptMZWt5YK5oB3dbhyi8lPQxKLfBanTtt231i65nS4dScL1GrimP7hcryTPz4w061GHib5Rvs=
+	t=1766080624; cv=none; b=TcGsbu7x6151se58mlOAjH1S57xSRAlnXG2G1splUYodwynfEJPhL7qh7TO4KgeHSYI/VXshDEr3xoBlKvgefjNSWdckMYESF9mOW4CsE+DKl7iwoe1G4wX/X0Xc0/eZ9rhkhRTPPHqUc2SCoh17HSxNt/7foW+Ln3MYfJlfBqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766075414; c=relaxed/simple;
-	bh=hI7YFV+z7VDBw39iRCMVjADZ7424gyN0jbW/C3K+dZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=puzs9qSZwJqI0A1M4Q0LXLFKfyRrmDn1ohMLAQGcIJ+FED5jcUTHQKWnArX3XPcqdCAibK3LBSbdgNBE1i1xK7PDmDMumKuZlTYdKCu789TGpykJmPJlSCVdyw3/Wn1hEBF3XIffrRaGEy0us3liIRTo7vzKPmnieqt8nsBJPUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P5jDWifX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03757C4CEFB;
-	Thu, 18 Dec 2025 16:30:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766075412;
-	bh=hI7YFV+z7VDBw39iRCMVjADZ7424gyN0jbW/C3K+dZc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P5jDWifXwa8UJIm8asTtbfPmXxJ3Wm4SF8P8ZTqnRcNZh0y0CYU6FZ8/Bwjgjz4Tm
-	 ApfCH6h/6hR6M9N7+Ml0TphsUgJDcDvlxHEHKcrP0TunrmexGrUAlO7PyU9YwAqnM0
-	 4s/pwfr1XeL8Z47KvQujNa/EqM5cBt+AoOun0zwGsHj0SMtVADGWLaEn5gs8UK9gWE
-	 twhC/fO/zgfL7dfGm8GL8BGFSToOtJugvH0Ky8+H2fuf6BH9YC5ieuTJnAjZxVKBL3
-	 YxoxHEZYuXt1IFix+cKureVZ+gQYfAj/C6CeOYK2D22N+28VPeosPTtuOM8JFdTOkt
-	 1D9W9KcnvtA7A==
-Date: Thu, 18 Dec 2025 18:30:08 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Xiong Weimin <15927021679@163.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Thomas Monjalon <thomas@monjalon.net>,
-	David Marchand <david.marchand@redhat.com>,
-	Luca Boccassi <bluca@debian.org>,
-	Kevin Traynor <ktraynor@redhat.com>,
-	Christian Ehrhardt <christian.ehrhardt@canonical.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xueming Li <xuemingl@nvidia.com>,
-	Maxime Coquelin <maxime.coquelin@redhat.com>,
-	Chenbo Xia <chenbox@nvidia.com>,
-	Bruce Richardson <bruce.richardson@intel.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	RDMA mailing list <linux-rdma@vger.kernel.org>
-Subject: Re: Implement initial driver for virtio-RDMA device(kernel)
-Message-ID: <20251218163008.GH400630@unreal>
-References: <20251218091050.55047-1-15927021679@163.com>
+	s=arc-20240116; t=1766080624; c=relaxed/simple;
+	bh=MiLmbwESC6H7lBWNg7PikrKOKerqb2xLT60f6wh87W8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bh1+7kl7dY2OFCmNZISzXpemxaFX5ZRpUDRc6DXYQzwrwS19hFlfhP+u8uj9Os1OjhhJ5+D+iHA1hIc0ScJXakij4GU+0eQHiZU6nT3MUOIsN1T5xnA/eyL7zRXWJPqbikjQLfIuqZSNYgRfk4HORdN17ZmPnmEvgNSNZypoPes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dYd576Mq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VxljDisO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766080621;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MiLmbwESC6H7lBWNg7PikrKOKerqb2xLT60f6wh87W8=;
+	b=dYd576MqhxkzhMaP0rEckl0tXHOb9CkmXKy8Qon8AyBcfL/oIUEcGKyrjIlX58mjSI5bqM
+	mMQiKgPEo8SIWeJ2QsUCjEcUSL90vY2WWJoSmX1CCIO9Fk/9d0ITtLVbMhbyvFhDJ3KUKY
+	TZmeX5M7wJcal4ley1qlAntoFN8oqTg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-449-8nhvazqLM0OgXPAXO_Ypxw-1; Thu, 18 Dec 2025 12:57:00 -0500
+X-MC-Unique: 8nhvazqLM0OgXPAXO_Ypxw-1
+X-Mimecast-MFC-AGG-ID: 8nhvazqLM0OgXPAXO_Ypxw_1766080619
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-64b45c2c84bso1055606a12.0
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 09:56:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1766080619; x=1766685419; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MiLmbwESC6H7lBWNg7PikrKOKerqb2xLT60f6wh87W8=;
+        b=VxljDisOtefO/nFvCKjapO4heB4OunpyeylTFvw2WM+P7+HIXq/IjkvBq9sQNq3y+H
+         IvkO5zc5gH9sXLB6/4jDkZNp25JQMssaeQFf2ZN0FwhUWsrM7vTr0+TeC5jDVhfwIRH5
+         nRy4TD7umwNteiwwpKsCfBXQfxC4SPtzyVFBTB54C9xWQJPLjCyjYMZY9bennkhy7o5X
+         yYP/MWbIjDcAFseTfl8uHncd5a+4AGmxgL94cavq7dgCvDMpeq4aHEFA3C7wFkTYkePa
+         seVJyn71/SfA4Eedy/XUb3K8AlKNSvr+y2qxsiEpYobNncuPtDi9EHTQe08IuFygzxOF
+         VfTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766080619; x=1766685419;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MiLmbwESC6H7lBWNg7PikrKOKerqb2xLT60f6wh87W8=;
+        b=WI9PzfWldjYHH9XR8hAxKf9P7KxsrCz2uhphfPasGW3pkaaq8fQ2TLV2u5WoSpmZQ7
+         tWHzSM0UltQn8a02O6nMfnzVvEq3O2S82P/CVb0pJeQKbaiw57Bpl4P6/KJRfiu8xiV8
+         KaChEkWJs13V8E23jqfoaBYyjF1tD3foMTwn5PExXjelksTMR596CclCrRCJmbXdWxQU
+         R5Pj2Nzjy+gdHFkjSdwOxaDZOVkSx+W0HEVMqeloUK699x5HoHd2VuUxJMCKrZu6jsSL
+         HGhjJSTbLUJ+lY9J0WXAW29FHf+BY1/CggSCnUTwIdy4KdsVc3DuGTmzkUezdL8gJ1L4
+         Aisw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTVWd+CcN+WRj54N+c00RLQj6B/mSO8TH4VkSE9yHxUIhp+lvZaEdmU+y/NhzPDOkKaIY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXs33gLQ3LeZx6bsklhFF+UR+KME7N7kgdhpCSiqBZ4uUKgwlo
+	rncn3RwjzvD8qpi3cCE7apVh0lZ+EZ2XXHCv4lrwBE5nY5Rf3J+bsIP2jVyrn6Q0fMuBLOrLPIw
+	YddKfYMZ4+OkP0Uu0scBjHf9+6nR61VD/Vmu1AZlM2zHNVRnu/Z9BEA==
+X-Gm-Gg: AY/fxX46KB8ooCquoFwQbl151dhJFSQnJj7Fe7+lSb4FNKo45Myb/iBKtpGhBpvjhZb
+	DJK6K8yO6pMAFqko6PCWfxgORBtx3cVuZE3RPq8T81IdO3C9UdMPBXvpICq071/RJlTv9dK9oRa
+	tYTPFhL+SPNcvO1nD3Z8AXav1PRWifBYm3SsrTpWTZ+3n2Dn0/9kGirbfCDCVS669AdhnMxw3Eu
+	D6SbhDsx7OZtzM+2TWHqLapBBG9bi0hEup9V97hCQaWnp6PRBElAXAcSwD0c3leOsUVCrAOJMBN
+	cn09XRWLqwf8TaA6a9oxe0GxbAHbgq06SIV20Qfiaqg+03gvjAf8XlEsgZEcfuviPpvx9A6L1q/
+	3Kp6tGgBnzmb3WsHFWAniSVwno7k/pYx8CJvUudlvoZZYHYAXy4JaRY1se1RdA3vn2qPn8BWxsV
+	OoDW/Fnzsmsoc=
+X-Received: by 2002:a05:6402:510d:b0:64b:8e3a:603e with SMTP id 4fb4d7f45d1cf-64b8eb636e4mr231930a12.4.1766080618862;
+        Thu, 18 Dec 2025 09:56:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEbJrP2bsDMIITgDGOs6fj+wiRDU0I4JE+3yRSzb3U9uoPVNENaUAKPb6Tp2A4AN+QZ0Vdetw==
+X-Received: by 2002:a05:6402:510d:b0:64b:8e3a:603e with SMTP id 4fb4d7f45d1cf-64b8eb636e4mr231906a12.4.1766080618476;
+        Thu, 18 Dec 2025 09:56:58 -0800 (PST)
+Received: from [192.168.1.84] ([93.56.161.42])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64b91599721sm18202a12.26.2025.12.18.09.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 09:56:57 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Sean Christopherson <seanjc@google.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chao Gao <chao.gao@intel.com>
+Subject: Re: [PATCH 0/4] KVM: x86: Advertise new instruction CPUIDs for Intel Diamond Rapids
+Date: Thu, 18 Dec 2025 18:54:31 +0100
+Message-ID: <20251218175430.894381-2-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251120050720.931449-1-zhao1.liu@intel.com>
+References: 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251218091050.55047-1-15927021679@163.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 18, 2025 at 05:09:40PM +0800, Xiong Weimin wrote:
-> Hi all,
-> 
-> This testing instructions aims to introduce an emulating a soft ROCE 
-> device with normal NIC(no RDMA), we have finished a vhost-user RDMA
-> device demo, which can work with RDMA features such as CM, QP type of 
-> UC/UD and so on.
+> This series advertises new instruction CPUIDs to userspace, which are
+> supported by Intel Diamond Rapids platform.
+>
+> I've attached the spec link for each (family of) instruction in each
+> patch. Since the instructions included in this series don't require
+> additional enabling work, pass them through to guests directly.
+>
+> This series is based on the master branch at the commit 23cb64fb7625
+> ("Merge tag 'soc-fixes-6.18-3' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc").
 
-Same question as on your QEMU patches.
-https://lore.kernel.org/all/20251218162028.GG400630@unreal/
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-And as a bare minimum, you should run get_maintainers.pl script on your
-patches and add the right people and ML to the CC/TO fields.
+I think these can wait for the next merge window since the corresponding
+QEMU code will be released around the same time as 6.20.
 
-Thanks
+Paolo
+
 
