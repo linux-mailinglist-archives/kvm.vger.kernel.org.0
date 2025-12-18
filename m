@@ -1,96 +1,96 @@
-Return-Path: <kvm+bounces-66259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66260-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAFC5CCC16A
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:47:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAE45CCC13A
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:45:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1C7DE306EF7A
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 13:43:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8D448302A7A0
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 13:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D44F334C0A;
-	Thu, 18 Dec 2025 13:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0371033711E;
+	Thu, 18 Dec 2025 13:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fA2TPvVZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQnVVoPn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V8hlKqG1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="W9l4aEQI"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E537A3328F0
-	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 13:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DDD336EF9
+	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 13:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766065426; cv=none; b=JXn7zoFCCRnni9HbN6D6i13B4TCtEzDYdBPNQapinxdB//NshieUoCzpV0ED2LojxvnAKDfvKVaZH9RnbMDncYoTs9lTBGPYoX1LWtlNiAY6hAEZIVWrD/PUb9ULGv0wtXdHT5VE1cTpCDv6awlX8Ax00T8qoA1GXRenNKfwrI0=
+	t=1766065508; cv=none; b=DdsJpel21DlugUZHQDEW94y0gV5YfICsq57sLr9fcFRmLqayOWAls3qi8iYKr78UYape4bBNcEgSyCs0zeUA6IO6IbpCrAasUwNylFDLVMSjQ0dzbIrR9kePk2YvQTLT8vesIbcR0lMlbo0yJMR6Gx/7xre+q04WokjHXvu7xUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766065426; c=relaxed/simple;
-	bh=x4qPUuhlrBPwW8qMzu9PfhHYFLzm9BW4pTafGCL6Xfk=;
+	s=arc-20240116; t=1766065508; c=relaxed/simple;
+	bh=R1dwmLPfeJnDBQH30WEzrx/FdFVQRHG+tdcGWzTjeYc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=opdtKL08ix85Iy6I3SuPehVn2wkC6R1cEne98ooGkcDrb4tL7GqfhuL0TJTpMsN8chTN6THCQsXB7kcx4nHwfp/KeoZ8bMS+8oaAritKttAxJCcSbTN882WrMgFcc0lhmJYVQCbVDu9HV+lqA/2Ddif0KbiYMQOupZ93oPJmR/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fA2TPvVZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQnVVoPn; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=itRuSMJoJ8PXREjDXW4nxcnpCUfImsKJ6GzGRvKuDC/Z86UZjll6JwZGAHoDAZD3UydhI4y1P6q/s/TiWWU08A6X/xj9oCIU3/4rmByd1/Bz2E/WgnyCUALQkHlGJpSCGkxVgOoanvijltpekLlzOEyREfBLvWf2IQEHR7POEXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V8hlKqG1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=W9l4aEQI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766065422;
+	s=mimecast20190719; t=1766065504;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Hnm/Q5APpwGI4EN9d81xpwBKHIVDaJBAyxjHvreVfHU=;
-	b=fA2TPvVZ/p/nY4KWgNgDpfsXhRFdl/hPzhVY3i6vWwtNwyCOGBhTE3+oCDhw4g3YP4vuvs
-	rkmiWRFyEk0al1dQh2u0SNwj/oMJLUbA8UyDuABVSkbibiq/qWju//NF0vjYHK91zCOSOj
-	S9ubcrVEJodKGQRFgWHIA+sgun22zsM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OcGyhvdq0kxqwUU4NFVOHDluMCKeql1WmgcW9G4ZFcU=;
+	b=V8hlKqG1nvnT4gbFBKnDpUphMXwqS1YlE+s1JHNxRkzibnyJpTJIZ/ASwNzeDRBXTOYepG
+	cIqGtTHCZ4jKgjh/L+31Windj1uhTduW5EF8OMojE34KksZC5V/Zhnt041M1YljYG8THZF
+	sasiOCscJHRtXBtobPHgoZeM4N67tfY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578-wkubsyHeP6qNCW3YzXsCZA-1; Thu, 18 Dec 2025 08:43:41 -0500
-X-MC-Unique: wkubsyHeP6qNCW3YzXsCZA-1
-X-Mimecast-MFC-AGG-ID: wkubsyHeP6qNCW3YzXsCZA_1766065420
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4788112ec09so6701695e9.3
-        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 05:43:41 -0800 (PST)
+ us-mta-590-5e9wn8KgMQyRC3rU_WawdQ-1; Thu, 18 Dec 2025 08:45:03 -0500
+X-MC-Unique: 5e9wn8KgMQyRC3rU_WawdQ-1
+X-Mimecast-MFC-AGG-ID: 5e9wn8KgMQyRC3rU_WawdQ_1766065502
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42fb1c2c403so464238f8f.3
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 05:45:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766065420; x=1766670220; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1766065502; x=1766670302; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hnm/Q5APpwGI4EN9d81xpwBKHIVDaJBAyxjHvreVfHU=;
-        b=PQnVVoPn7BuZyHomaI3lS4iguCHsHlKJ2UB52qQQOWhxiAL/FylTLRzw+XOkz87iXF
-         RoTHOKe9AnTdYqIyMe+6JzGOp6fH8QcieWrv0KLyMh/2Lq550Gq+JkzLU4IvN4ucDR7w
-         m0cogdGVdgwXxMod4n5ZME/2MhS3fpKg4ZVr9efRSV3l7wXwbsQ19orQr9aqCMbE6Yqj
-         oqXVyFbgWGOtUY+tZqkXLpX9C8oFKbr8xsQ1wM4uR4XkF0y9yjZL47zn+Q5a3z4WLtIU
-         ExBeoc50LLA5erGvMpMP22ZoepheDGW2G97zz/INusoZ/YvijeRkaQvTFE0MChIJ5ucj
-         Dklw==
+        bh=OcGyhvdq0kxqwUU4NFVOHDluMCKeql1WmgcW9G4ZFcU=;
+        b=W9l4aEQImuVCBi5lubdHSiPYid2BTvfgTXuEnbzz7ZPxKjRMCzT577DWEPBtE8vO1k
+         HrAMBiUzqByFopKonHBlpOG1tAUMTQVMXgwvyWLJUWNF/KNqDVKd2C4XACkdFTJylPtz
+         7MdBPDNPBEam8E1ennvu9h8TLu4gAGwkgKKq0tZb7+VzcewLT/r2kEovby4ns5rlk9xw
+         2H9zQQ/zJZRO2Q94qXdXo6vB6j/wO2n9jgMVtA9Ozv5HUGk13AXZFHHPBzUu9mNjbgJ7
+         Ec7KjCnBp2/BpemzFus4lkifiN8+mgJJPK9E+1BvykB2VNMx2WfgoRtH5rrQdGy7chvd
+         58Jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766065420; x=1766670220;
+        d=1e100.net; s=20230601; t=1766065502; x=1766670302;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Hnm/Q5APpwGI4EN9d81xpwBKHIVDaJBAyxjHvreVfHU=;
-        b=QAbAvvHoKJza/2S4cyrnhxrNEcJWQ7VBitU/ryU747mWXCZDBI+2j4Sw680gn7/t2u
-         Wdt5fej9K3XTZWiQZwNdbKzvh5dau39+SllUKq1mMBmpTTeeB3VgKyJOlgmv3D16pbTF
-         cnzaaMT0On2uxKRTygSQugBMW/DFBGaee4mhg/JR0WzHkaSgI0upSSTYT6ErtTDVAZwW
-         Eeix0l5RFFCwn+/O+MIskNlDw1TG+THs0bBQ2decLINI9CpX8N9rbJusjhuW9ez3mUk0
-         Aq12s7AaMeyG2BKJM7MlQC3AHK82xWTkvOqfOqB9UTodvZBnTo5HXAIJ0iwflYMOp2IF
-         emRw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5FytYFqVEpezLag5jhAV1lcaxYRXNd2F0yt3If4F4FSGikE91xUCa5bmBtVdfMVvTvsk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWQxOYW8kfeJnFWbYv1W+OLLw/OLja5slwWmF9ZN1HXCS6ARiy
-	3akpJ+nEtceVwbUjn9S9tNrGX/8Ge2hfKLj84E0nbofWmUzBrtwLKnrmxFvNg2JJRuGpM9s1f/R
-	C/Oi9ALEimBF0BvizoYO77jkhI929YNpDLR6qgX7pLLPvsFWacs2dtUyy70GVQA==
-X-Gm-Gg: AY/fxX6BV+n3Ai07RTq1Mb3saNt5SCSi2fFKhf0/DQ3afvE4vyxS6mzjBbHdEcKvA4P
-	WMRKi9KKrUMKP59KnMgA17nPuEPVFHsoP5U4/dix1OVsVUeCTbiwwwv6+FiSjIw5ueNdO8mTRxc
-	oTGirUdpahtlqmIXT2/s2OAw+jHBciZAz2Fgna78TiYDaU1jzdORYQrsMZliN/tOBFDk9Tqxm6T
-	UZKgtJnRKDeP06pM6KYenE+X6ht8/IY3jONE+M+f2zhkzldn9ml19MYiOYj0Ea2gwcTbyXugSFB
-	5eG5uIZlOuui527254BwF06LZ/25M0moDnnRK/n76wj0YKg4XVuSCWkMZ7+k98Vwnh2t6Q==
-X-Received: by 2002:a05:600c:34c3:b0:47a:7fdd:2906 with SMTP id 5b1f17b1804b1-47a8f8c47c2mr242773845e9.12.1766065420095;
-        Thu, 18 Dec 2025 05:43:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnuoYyOC7iv0lUxnK/Tn9C/mTvEX+0TSPaAZ1QvvRD1VwB+sDBVdYmFcJzvP15/PNtcrASqA==
-X-Received: by 2002:a05:600c:34c3:b0:47a:7fdd:2906 with SMTP id 5b1f17b1804b1-47a8f8c47c2mr242773255e9.12.1766065419688;
-        Thu, 18 Dec 2025 05:43:39 -0800 (PST)
+        bh=OcGyhvdq0kxqwUU4NFVOHDluMCKeql1WmgcW9G4ZFcU=;
+        b=CysuBR6PHPX/oYf58Fk8x9jonlBp0RKVqIeWWgn2ZgL9rjk9d0Fu8N6Q0XbJwUSGI7
+         YZL/DygsjBlLXN9/kUisYH5F87DpgJVWevWbVw7DT3jN9sG59gRZihP261B83Cgp+hYL
+         Yz10im1evvo1a26aFNa9bfPPTYDo3JPlfeArynaGhkELaAPnGVAp7Pi9mxEcy7ihi+tT
+         hqwSBAYFH3O2SH1FNnvEpQCXn6hHmnREDaqiKlP/3e54lvNqTj4GaeJZXjxMzKyaMk8A
+         Qq16GySAhcUlpwvrzGiKxL09ROjhlYQKMXLGZ7ZTpvh4aqKIgoIsFfypxUUfiUG9kGxQ
+         brLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWwG69cNiPBV3Z688bIaHXIcPddBzgECxYA/ys8FwIjBt0VMUnCj5vgTM/0/J1eGhLzLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNiScx+GBgtxlK5l73ha/HkvqCcd9k45aX4pEpbA2QWb3jTSQD
+	0ojqqss2eiABkgCnS0jkq1tDKCzPtYkF2jtjPro2dYMdcBfEcbRYkniOENvcw5wD8PvxnveegM5
+	7TElpJCYzi/BesD2dYEQEIaH+e3GZX/IifMB18SeZP+W+LRyaW61GSw==
+X-Gm-Gg: AY/fxX7/ZbFfXe4DsIsdwr97zCqVSAh3JTp/GsOtVJhu6hfQo5grWiE5+n1TK2vJ0VN
+	VKnl0MuICCoVa/KW41ELceNgymaJG4yFMOf7+IrQHayA5lGqJTK5vEIlpALbzdyCbAQZYMS9jDJ
+	3b1MY3hW0sUEdhmNnEI3aKBY7HeGMFCXUm59H0HiHQHTRJtqq2KlcRx7X2gGdey6qTs1xT++lAI
+	DwOgMiOhKTpHLss1WSwawu48Ee9cHXVAXC+uxbI6GNQ0DTzMYg6QjNNju6/dtcMUS2BVgWyfpDT
+	gzx3XB1fShS0ieHvSmmgRYHzwlZb2SSIfDMQk8k/JVXvvQRqEZPJ6SsxCm5QJAMtqMtVdA==
+X-Received: by 2002:a5d:64e8:0:b0:430:f6bc:2f8b with SMTP id ffacd0b85a97d-430f6bc3221mr18155844f8f.45.1766065502176;
+        Thu, 18 Dec 2025 05:45:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHnEeHyuc3XOw+0zv5jgfMxc4yPA83Oi7haKTTABOLc0orXoBwjLhHFxyrb01vSj4hp1xkXJg==
+X-Received: by 2002:a5d:64e8:0:b0:430:f6bc:2f8b with SMTP id ffacd0b85a97d-430f6bc3221mr18155764f8f.45.1766065501002;
+        Thu, 18 Dec 2025 05:45:01 -0800 (PST)
 Received: from imammedo ([213.175.46.86])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a9687dsm15060665e9.3.2025.12.18.05.43.38
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324493fda5sm5264021f8f.17.2025.12.18.05.44.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Dec 2025 05:43:39 -0800 (PST)
-Date: Thu, 18 Dec 2025 14:43:37 +0100
+        Thu, 18 Dec 2025 05:45:00 -0800 (PST)
+Date: Thu, 18 Dec 2025 14:44:58 +0100
 From: Igor Mammedov <imammedo@redhat.com>
 To: Zhao Liu <zhao1.liu@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
@@ -116,12 +116,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin"
  Cave-Ayland <mark.caveayland@nutanix.com>, BALATON Zoltan
  <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>, Jiri Denemark
  <jdenemar@redhat.com>
-Subject: Re: [PATCH v5 20/28] hw/virtio/virtio-mmio: Remove
- VirtIOMMIOProxy::format_transport_address field
-Message-ID: <20251218144337.77dcf630@imammedo>
-In-Reply-To: <20251202162835.3227894-21-zhao1.liu@intel.com>
+Subject: Re: [PATCH v5 22/28] hw/i386/pc: Remove pc_compat_2_7[] array
+Message-ID: <20251218144458.1b6b3b40@imammedo>
+In-Reply-To: <20251202162835.3227894-23-zhao1.liu@intel.com>
 References: <20251202162835.3227894-1-zhao1.liu@intel.com>
-	<20251202162835.3227894-21-zhao1.liu@intel.com>
+	<20251202162835.3227894-23-zhao1.liu@intel.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -132,80 +131,61 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed,  3 Dec 2025 00:28:27 +0800
+On Wed,  3 Dec 2025 00:28:29 +0800
 Zhao Liu <zhao1.liu@intel.com> wrote:
 
 > From: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 >=20
-> The VirtIOMMIOProxy::format_transport_address boolean was only set
-> in the hw_compat_2_6[] array, via the 'format_transport_address=3Doff'
-> property. We removed all machines using that array, lets remove
-> that property, simplifying virtio_mmio_bus_get_dev_path().
+> The pc_compat_2_7[] array was only used by the pc-q35-2.7
+> and pc-i440fx-2.7 machines, which got removed. Remove it.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
 > Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > ---
->  hw/virtio/virtio-mmio.c         | 15 ---------------
->  include/hw/virtio/virtio-mmio.h |  1 -
->  2 files changed, 16 deletions(-)
+>  hw/i386/pc.c         | 10 ----------
+>  include/hw/i386/pc.h |  3 ---
+>  2 files changed, 13 deletions(-)
 >=20
-> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> index c05c00bcd4a7..c779836201d5 100644
-> --- a/hw/virtio/virtio-mmio.c
-> +++ b/hw/virtio/virtio-mmio.c
-> @@ -764,8 +764,6 @@ static void virtio_mmio_pre_plugged(DeviceState *d, E=
-rror **errp)
->  /* virtio-mmio device */
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 85d12f8d0389..b88030bf50d0 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -253,16 +253,6 @@ GlobalProperty pc_compat_2_8[] =3D {
+>  };
+>  const size_t pc_compat_2_8_len =3D G_N_ELEMENTS(pc_compat_2_8);
 > =20
->  static const Property virtio_mmio_properties[] =3D {
-> -    DEFINE_PROP_BOOL("format_transport_address", VirtIOMMIOProxy,
-> -                     format_transport_address, true),
->      DEFINE_PROP_BOOL("force-legacy", VirtIOMMIOProxy, legacy, true),
->      DEFINE_PROP_BIT("ioeventfd", VirtIOMMIOProxy, flags,
->                      VIRTIO_IOMMIO_FLAG_USE_IOEVENTFD_BIT, true),
-> @@ -827,19 +825,6 @@ static char *virtio_mmio_bus_get_dev_path(DeviceStat=
-e *dev)
->      virtio_mmio_proxy =3D VIRTIO_MMIO(virtio_mmio_bus->parent);
->      proxy_path =3D qdev_get_dev_path(DEVICE(virtio_mmio_proxy));
-> =20
-> -    /*
-> -     * If @format_transport_address is false, then we just perform the s=
-ame as
-> -     * virtio_bus_get_dev_path(): we delegate the address formatting for=
- the
-> -     * device on the virtio-mmio bus to the bus that the virtio-mmio pro=
-xy
-> -     * (i.e., the device that implements the virtio-mmio bus) resides on=
-. In
-> -     * this case the base address of the virtio-mmio transport will be
-> -     * invisible.
-> -     */
-> -    if (!virtio_mmio_proxy->format_transport_address) {
-> -        return proxy_path;
-> -    }
+> -GlobalProperty pc_compat_2_7[] =3D {
+> -    { TYPE_X86_CPU, "l3-cache", "off" },
+> -    { TYPE_X86_CPU, "full-cpuid-auto-level", "off" },
+> -    { "Opteron_G3" "-" TYPE_X86_CPU, "family", "15" },
+> -    { "Opteron_G3" "-" TYPE_X86_CPU, "model", "6" },
+> -    { "Opteron_G3" "-" TYPE_X86_CPU, "stepping", "1" },
+> -    { "isa-pcspk", "migrate", "off" },
+> -};
+> -const size_t pc_compat_2_7_len =3D G_N_ELEMENTS(pc_compat_2_7);
 > -
-> -    /* Otherwise, we append the base address of the transport. */
->      section =3D memory_region_find(&virtio_mmio_proxy->iomem, 0, 0x200);
->      assert(section.mr);
+>  /*
+>   * @PC_FW_DATA:
+>   * Size of the chunk of memory at the top of RAM for the BIOS ACPI tables
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index f8f317aee197..accd08cb666b 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -292,9 +292,6 @@ extern const size_t pc_compat_2_9_len;
+>  extern GlobalProperty pc_compat_2_8[];
+>  extern const size_t pc_compat_2_8_len;
 > =20
-> diff --git a/include/hw/virtio/virtio-mmio.h b/include/hw/virtio/virtio-m=
-mio.h
-> index aa492620228d..8b19ec2291ac 100644
-> --- a/include/hw/virtio/virtio-mmio.h
-> +++ b/include/hw/virtio/virtio-mmio.h
-> @@ -66,7 +66,6 @@ struct VirtIOMMIOProxy {
->      uint32_t guest_page_shift;
->      /* virtio-bus */
->      VirtioBusState bus;
-> -    bool format_transport_address;
->      /* Fields only used for non-legacy (v2) devices */
->      uint32_t guest_features[2];
->      VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+> -extern GlobalProperty pc_compat_2_7[];
+> -extern const size_t pc_compat_2_7_len;
+> -
+>  #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+>      static void pc_machine_##suffix##_class_init(ObjectClass *oc, \
+>                                                   const void *data) \
 
 
