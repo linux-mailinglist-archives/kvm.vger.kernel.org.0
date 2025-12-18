@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-66265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49303CCC2E8
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 15:09:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3107BCCC2D0
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 15:07:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 969AF30A5E36
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:06:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02D993047461
+	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 14:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5AA3446B3;
-	Thu, 18 Dec 2025 14:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4939434CFB6;
+	Thu, 18 Dec 2025 14:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="K3zzeg8Q"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="tJPFdvL5"
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-221.mail.aliyun.com (out28-221.mail.aliyun.com [115.124.28.221])
+Received: from out28-97.mail.aliyun.com (out28-97.mail.aliyun.com [115.124.28.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861633431E6;
-	Thu, 18 Dec 2025 14:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886BC349B0D;
+	Thu, 18 Dec 2025 14:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766066478; cv=none; b=j8lD5PnV+CyFiiZK6xyhkLfvPQocITcb56qdQ8ogAcp8yJpea5onlVHWLkluYLoevdE3HX3hxyyXx3V675LgLuSqJUgHjUKJ7AAZwefTaMZY6aQQe0IdcpqM3/eaTwNYwY6RhNOSIJ7CGQRT9uFm2qTy7/H+5teLzYoI9EzyOzQ=
+	t=1766066801; cv=none; b=hmznC+q7L0W7Ntx0sadsvrlPoZmhzoVNX+gosPSE69QF/UFshyjEioRlE0CjzWlr2rcHT0q2kadTf1m93rXFG/pE2Skwjh8Nsw2I+tp3ECTN8GtYEqQJrp33uH6rSPwJul84RWDR63zFjdKyJPj2i3M690XGZ8GcxeIqr3zddG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766066478; c=relaxed/simple;
-	bh=Uz8/j1l7dC96sfyXq+AD4fX6cqO+4WKg7++VqzGmYaQ=;
+	s=arc-20240116; t=1766066801; c=relaxed/simple;
+	bh=Lz4tUE8I3RA2w3B1SwUrddlbtllDhQGDdBmoIIjuP2o=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UA+iieBEXc+oDwkKz3aIBHNL1FdvSO5T/gwBc9RxpmXo9PIeQQ8mGJbu/fFIZgOf/lbWKKW5WXvqVX6CAx4xTqCqo+945FF6USeriocwDPAjNbyyY3Qz/3Kim8aaSVrDE3eByMDshyAlFiKen6+tvDrcv20QD9IzOm1oxr3m08s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=K3zzeg8Q; arc=none smtp.client-ip=115.124.28.221
+	 MIME-Version; b=mSMXREMAaap+EoSYTfdjmiLfjt7dDg5LaGLgNoZFToVpHzFJRAGKMH+umxwpCo6EDyu+i9MyR1ryffndmVZD4rxuJzWZKo9OqMwNCFJvTtuur4lbZp3ZEqlAKcz5/zUMkw+KTBiJqjYykj2tKO2kTeYLJ48876XKMIJB6vUEdH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=tJPFdvL5; arc=none smtp.client-ip=115.124.28.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=antgroup.com; s=default;
-	t=1766066464; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=iIJgsaJAJFg81C2Ck2lA9fwsw0HWn+BnyWHs7EtssAg=;
-	b=K3zzeg8QzpF6hIV30tmEbuEtd8g3211MtbDnw4k/bauM47T4Inxg/kSxETf04yyBkdhR/drqTukS+UMH/AqhGI6c46PYJtY0tQT9Ex38UNv0reXq42BewKXNFlF3ut1Eob4IxeFblkTjWdQCW0TiCamVOHt08EDHdc8ZgykSL0k=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.fnj5fA3_1766066463 cluster:ay29)
+	t=1766066788; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=msS+hfWmRvmoDkryeJAbAJ641aMX4QZHGIKrKvHKroA=;
+	b=tJPFdvL5LrNF9BpQ4+uvgvcs8pp+1ed0GDXwgZ8R6NktgfX1AaKAzSFbv5kLx4FXeU5wjJCne/ebeIntzUjWxtwS3xzvugn4TRd1hMJIVEAjyufZ7t5CLNmlIjoAVXslpCsq/EY4rAdQUfVusvbRBoJHeczSG91TxPav6oMvDxY=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.fniMiRB_1766066464 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Thu, 18 Dec 2025 22:01:03 +0800
+          Thu, 18 Dec 2025 22:01:05 +0800
 From: Hou Wenlong <houwenlong.hwl@antgroup.com>
 To: kvm@vger.kernel.org
 Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
@@ -49,9 +49,9 @@ Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
 	x86@kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 5/9] KVM: x86: Consolidate KVM_GUESTDBG_SINGLESTEP check into the kvm_inject_emulated_db()
-Date: Thu, 18 Dec 2025 22:00:40 +0800
-Message-Id: <f5c495a43a03a20e04fbc9f1f78fd490e1f6ad50.1766066076.git.houwenlong.hwl@antgroup.com>
+Subject: [PATCH v2 6/9] KVM: x86: Move kvm_set_rflags() up before kvm_vcpu_do_singlestep()
+Date: Thu, 18 Dec 2025 22:00:41 +0800
+Message-Id: <30964c504cb4683f53093f5f37c2081825db35dc.1766066076.git.houwenlong.hwl@antgroup.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1766066076.git.houwenlong.hwl@antgroup.com>
 References: <cover.1766066076.git.houwenlong.hwl@antgroup.com>
@@ -63,50 +63,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use kvm_inject_emulated_db() in kvm_vcpu_do_singlestep() to consolidate
-'KVM_GUESTDBG_SINGLESTEP' check into kvm_inject_emulated_db() during
-emulation.
+The single-step trap #DB should be injected after the instruction
+completes, as 'ctxt->tf' already records the old value of
+'X86_EFLAGS_TF'.  Therefore, it's okay to move kvm_set_rflags() up
+before kvm_vcpu_do_single_step() to align it more closely with hardware
+behavior.
 
 No functional change intended.
 
-Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/x86.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3000139a19db..44c2886589d7 100644
+index 44c2886589d7..7352c2114bab 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8947,7 +8947,7 @@ static int kvm_inject_emulated_db(struct kvm_vcpu *vcpu, unsigned long dr6)
- {
- 	struct kvm_run *kvm_run = vcpu->run;
+@@ -9593,10 +9593,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 			if (ctxt->is_branch)
+ 				kvm_pmu_branch_retired(vcpu);
+ 			kvm_rip_write(vcpu, ctxt->eip);
++			__kvm_set_rflags(vcpu, ctxt->eflags);
+ 			if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
+ 				r = kvm_vcpu_do_singlestep(vcpu);
+ 			kvm_x86_call(update_emulated_instruction)(vcpu);
+-			__kvm_set_rflags(vcpu, ctxt->eflags);
+ 		}
  
--	if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP) {
-+	if (vcpu->guest_debug & (KVM_GUESTDBG_USE_HW_BP | KVM_GUESTDBG_SINGLESTEP)) {
- 		kvm_run->debug.arch.dr6 = dr6 | DR6_ACTIVE_LOW;
- 		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
- 		kvm_run->debug.arch.exception = DB_VECTOR;
-@@ -9232,17 +9232,7 @@ static int kvm_vcpu_check_hw_bp(unsigned long addr, u32 type, u32 dr7,
- 
- static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
- {
--	struct kvm_run *kvm_run = vcpu->run;
--
--	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
--		kvm_run->debug.arch.dr6 = DR6_BS | DR6_ACTIVE_LOW;
--		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
--		kvm_run->debug.arch.exception = DB_VECTOR;
--		kvm_run->exit_reason = KVM_EXIT_DEBUG;
--		return 0;
--	}
--	kvm_queue_exception_p(vcpu, DB_VECTOR, DR6_BS);
--	return 1;
-+	return kvm_inject_emulated_db(vcpu, DR6_BS);
- }
- 
- int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ 		/*
 -- 
 2.31.1
 
