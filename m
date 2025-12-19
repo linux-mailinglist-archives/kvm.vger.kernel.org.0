@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-66300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5757DCCE66E
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 04:57:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C452CCE674
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 04:58:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E7C130A9C8C
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:54:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B765C30671D8
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95C229D275;
-	Fri, 19 Dec 2025 03:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6382BD58C;
+	Fri, 19 Dec 2025 03:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RjyKucZ5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UP38xo9u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB862BDC03
-	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 03:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983492C11F8
+	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 03:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766116446; cv=none; b=TN3G2yicGHvhkY9fD6WELq2G/u6WpgY3rbdjPb39nSmFVNkwArYj84v6O7OfhpjqCWkQg4kv2wKPVKOFYEDOg+R2gZtfuUsa8nGsfWCo0/3YNQQc5DS+AreU9vGyZRcGC8CiZ3TgTZ8TW71cV/ecypiIhDrmyuVopY5VqI5fM+I=
+	t=1766116450; cv=none; b=eq5HwhWfLt9l3ReuDPYNso2mDmCe5+KdjpdjxwKXwKdlWh7dlw5rjMPqUTkh/yG7VHW4clio7gTvhvb6/M0i9sZVc+EkcJPaxBmwGwL4Lrg6hbYDzDfQwHQUCS6kWayKIJOm9/DcWoB4cfK4GPRUINuVrvUnSEJ59u7unbksbcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766116446; c=relaxed/simple;
-	bh=sVeNQkwu85XNwFxKvxwdIm3b68K3U61I7sq3MYJ3BoY=;
+	s=arc-20240116; t=1766116450; c=relaxed/simple;
+	bh=wyu0Xy5M14HONUNUhNjxjrYaG5XoUEX/b1Lfkrm3zVM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q/ejclt6Aj0y81eoTA3/HGMgISBD+aPnbBSw8b5lDFuFmybLKk1h6zUn1mQPHtMavpfnzX90kr2ZleW7TiCUq7ZEWLVWiM5aDHYY5mNt39ua0vwmyOntbzjt/X3TjQ/zbOYsRST8Mbs31q0beDIVIqzHxv/FhXP4d2ki66AMZTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RjyKucZ5; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=uK+tLWa1seFbF0AveRUMQGJZZXFJ6/KuNWsFI3zMqu/LwLdwcuX1PbcKc1w4Yoe3iVmzBpgcTTPcLtfOcZKz9Q+cg/SmqeOCTtJVtFiRHffq/RuFqYfNxwMTXRuS04ee2oHwyPg3owRw8FGVIPAxQjykuNowVzIMfb+JUPE4qA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UP38xo9u; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2a110548cdeso18318825ad.0
-        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 19:54:03 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2a081c163b0so12811235ad.0
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 19:54:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766116443; x=1766721243; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766116446; x=1766721246; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A9JN/VeY7DZSzpzlV6Lpconwg2zYhw/ALk1DMLwxvu4=;
-        b=RjyKucZ5WKB4ZEzUrPPRqiKEPveNjGedCwU+SeB03B716VLe3vzV8SWMu/aGugDARV
-         PzAfgmqr+7I6bVDMKyive32TvS34hUoLIuH72MdacS3qvIk+blg2PYXggWtASLckLUIz
-         yNRMyUoshMeAJQvUmqcChJdts+vxBZfgScCIdJ7a083lWd7rY7goMB2QlqDode35CcC/
-         SE4/4fn7uz9MN8KVxnm78PkaSZbt/za2ao26fZBhBkyhLhTdsGlBAaC0SHNGietll6F0
-         ZzlIVUpGXU6HG+AQNQRngO6h7v+A2S2lJfIEMg2j8voe3fxVqJbDt+BOqn8ONeCm94Da
-         gizg==
+        bh=XZA9xLUe1wdJNehNCsIwk1F3wttPASSXZeP33LjNfbM=;
+        b=UP38xo9uPmHzhH2RsU+4nrQ1tO6TWTLRhvuVpg8MdyvB6Ee7LPF6NQ3sCW4pJvRXlt
+         BozeuPmvPyYd+FTf5WNWXJSknOvYMKBiMlxN7V1JiwZf3baXgvSGkhrqFlM0SmnP0oVa
+         gOfzsybf0hKWLhGFRTiJ/+ff8ie0nZbjvAbdcfwn+ObyhAPJMAEOLZt2+jyf0vP6X8Ej
+         XmIwzZozLgk04OZyVvyl8+1IMg4djXqk94LosbdwE5eorSvFtToqXStBRuEU+xD9NRM+
+         hb7MD8xFiFJv9tVH4p8f2u0Kgny+SF+1X1z5XHdJo2Khl/jEp57xj2nOHy9n8VGcwH68
+         rhzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766116443; x=1766721243;
+        d=1e100.net; s=20230601; t=1766116446; x=1766721246;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=A9JN/VeY7DZSzpzlV6Lpconwg2zYhw/ALk1DMLwxvu4=;
-        b=hIbq2R3qujmvx9I9h4VAMqdOnB2TP0m6AI/ZnezayOW+u3oA4aN2NaHzdToFlpWRIH
-         +EphpwmqC/drGX+soC7marHCRx9T7EM1WqwuctCavq4hCek75TUf0+OWoa3qg7Qlltdh
-         iiZNH9afKEzJhCYAsmWiCOWJIRc4d1/DrOU5NRxtJL+u/e+WyAYskaqU+bjFwwkX81UX
-         HCCdSmCOVgibagyBKLiepgg5GsSkQASA/6rMTaj0Q0ohmGzULg9BDwbycclmZyVJaZG7
-         /48JtLXzdvWVQc0UsFo4ntEiSD7wkbPZ7BJOjFMA8s4ZraLxUnNb4VOT41aM43WcxHpz
-         7Psw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvVMVivnMsBz1QXLzuJVBpm2DspYYIYMaJR/DFO4EjH14rPq1w/PRQnQas0ZETOCSlgFs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxbej3Z893eQjUys1xDz9cKMoLkvHEeDL/AokOqwo6GcwtK/kcY
-	lfVmS2GtjV7uqZAgTVVsPzAMA6vH7/Vsmuw6cJA0Vrvt+4naRhoD6NT5
-X-Gm-Gg: AY/fxX7CZcG2fMHynGIOqV2qBWUfJ5kblBtqTP81rIsx6/waXvhcBh0um75P42/4QQB
-	H0VoCq2DMCPEjlpBeuGWHVXU4Fil59UaDrsZHtHp5TSSCnTW4Xt85AekV/Eta+cEU5FzHPgeBht
-	MOlilMth4hr3xWbF8mXEDggDMp9eEesWIGYDidkbY9zo5h6GJK2BoKXqOShZfoaHjzjTkte+xgd
-	gmHaP4klPJEqprfIkCFjh3AQOxNeS5HemiNkFocQmEiGLKYeXXIbO7Ts/o+zdzwGxabaZS/SAzT
-	CNxlLO/UH9NWCq+HQzMVrUV2QXmOasxm1VtVFddZYIol02mEkOOfOyV3fuDHN9dGnurHdE+vpb5
-	Vaz9B4refa20iTYAMXUo409ntX/QI1IukhuIsdJif//slBO7Ttvk2PkqfRqHhbuibknvHN7supf
-	C7Aqe4NNg7QCxOTRoOAgmS
-X-Google-Smtp-Source: AGHT+IF9f0bhXfHfqC6drh9F1fDq7qKUfvR+6r5Ke7n7dMoyvnUf3088wxma2hCwi2MheKEe1yqRDQ==
-X-Received: by 2002:a17:902:c94f:b0:29f:2b9:6cca with SMTP id d9443c01a7336-2a2f293d118mr15012375ad.44.1766116442731;
-        Thu, 18 Dec 2025 19:54:02 -0800 (PST)
+        bh=XZA9xLUe1wdJNehNCsIwk1F3wttPASSXZeP33LjNfbM=;
+        b=LxUMhQ+f/mAyPUJB0vr/xzHJR6gSybIvxLO2QMC71haCu4tlSprK0ASvSKsze0PfFu
+         m6obLXzFhPPUuk3RMLQMi9f3vXqt+oC16Hmu9FIg6IYzKg7dZKFpogzHKypN0MHAfraG
+         vgIfpHqvmPR/tXrAeRm5o3+nxPNaJrTj+5t5QPKJ23alejNc1L+/ET7lceR8dRtad3kB
+         8wRPhldsetXFeia3sh8mKTIgobjLUqVGMAjNghQcxu4SZuj5CfrYf+mPpK2WZlMSDOcG
+         BeHAWPxPl4ugsIfl4gfli67kN9aL1/+u7S+f5NuFILZYMd6u2i9cmq+WY5MEvaxfzTdy
+         l/Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCXO+1d7QWO5WAIamOmJUtKmsvzzeGjy5eFXq6eTSnz78rs58cATz2NevLQTYzswcPqYqoM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcsxueZfDP752dqVuj1EIr/X2aCLuHAv++4KH7FCTDFyor1kFp
+	igX1kh6kkPw/BXd2fApYvs5iu6VD3uHN/T0zJUArd953On0gL2dsTwXK
+X-Gm-Gg: AY/fxX7vwvnHuz+9xe1trdsSURAbQpgJ9FetOHDRFAb5jivWCBLE760mcwWOb/vcNlh
+	bpN74Pb8LGxNWGVeq3X0j6k1qwvBp+TyCWHqxV8TLWKTMGTB7JG3NX09x3+YH/NCMbon+zQ/c10
+	MjNu708BrezX8c9l09lDC6lmvGPF4baic+9AefwcQl+wYiwN9aiHOQRQYzlgCB1TOiSAF1+MCWV
+	UxmnNNakWrfxu8rz80vrRwxo6xb4G0S350Wnfgbehq8KTN3wAr1Wn0miqhTn/a3pFoG/xv5blAm
+	4DEdWkCWx0k0F5778HZm/hIvL1lGVpPS7QNG4FRkXlr19ciSOx0dSjXpzS6h8obtHiNj8XYWZmy
+	/lOYh+0K1MB6TK04Ezkpb3Ft+UBpKytpVJ/LefUxwMH8ERIwpywtIGFhDroI35vxcH+YUn6pWab
+	IePBhbqtPlmA==
+X-Google-Smtp-Source: AGHT+IH7i1wMUpIAvo5+XIESo2FqbxEFz6LLhGsiwcOV+fLp/Up+b2cbDa//nLVFrcxtfnqkDIXK1g==
+X-Received: by 2002:a17:902:d488:b0:2a0:8f6f:1a12 with SMTP id d9443c01a7336-2a2f222ac10mr15671525ad.17.1766116446401;
+        Thu, 18 Dec 2025 19:54:06 -0800 (PST)
 Received: from wanpengli.. ([175.170.92.22])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a2f3d4d36esm7368135ad.63.2025.12.18.19.53.59
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a2f3d4d36esm7368135ad.63.2025.12.18.19.54.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Dec 2025 19:54:02 -0800 (PST)
+        Thu, 18 Dec 2025 19:54:06 -0800 (PST)
 From: Wanpeng Li <kernellwp@gmail.com>
 To: Peter Zijlstra <peterz@infradead.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -86,9 +86,9 @@ Cc: K Prateek Nayak <kprateek.nayak@amd.com>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH v2 6/9] KVM: x86: Add IPI tracking infrastructure
-Date: Fri, 19 Dec 2025 11:53:30 +0800
-Message-ID: <20251219035334.39790-7-kernellwp@gmail.com>
+Subject: [PATCH v2 7/9] KVM: x86/lapic: Integrate IPI tracking with interrupt delivery
+Date: Fri, 19 Dec 2025 11:53:31 +0800
+Message-ID: <20251219035334.39790-8-kernellwp@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219035334.39790-1-kernellwp@gmail.com>
 References: <20251219035334.39790-1-kernellwp@gmail.com>
@@ -102,238 +102,180 @@ Content-Transfer-Encoding: 8bit
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Add foundational infrastructure for tracking IPI sender/receiver
-relationships to improve directed yield candidate selection.
+Hook IPI tracking into the LAPIC interrupt delivery path to capture
+sender/receiver relationships for directed yield optimization.
 
-Introduce per-vCPU ipi_context structure containing:
-- last_ipi_receiver: vCPU index that received the last IPI from this vCPU
-- last_ipi_time_ns: timestamp of the last IPI send
-- ipi_pending: flag indicating an unacknowledged IPI
-- last_ipi_sender: vCPU index that sent an IPI to this vCPU
-- last_ipi_recv_time_ns: timestamp when IPI was received
+Implement kvm_ipi_track_send() called from kvm_irq_delivery_to_apic()
+when a unicast fixed IPI is detected (exactly one destination). Record
+sender vCPU index, receiver vCPU index, and timestamp using lockless
+WRITE_ONCE for minimal overhead.
 
-Add module parameters for runtime control:
-- ipi_tracking_enabled (default: true): master switch for IPI tracking
-- ipi_window_ns (default: 50ms): recency window for IPI validity
+Implement kvm_ipi_track_eoi() called from kvm_apic_set_eoi_accelerated()
+and handle_apic_eoi() to clear IPI context when interrupts are
+acknowledged. Use two-stage clearing:
+1. Unconditionally clear the receiver's context (it processed the IPI)
+2. Conditionally clear sender's pending flag only when the sender
+   exists, last_ipi_receiver matches, and the IPI is recent
 
-Implement helper functions:
-- kvm_ipi_tracking_enabled(): check if tracking is active
-- kvm_vcpu_is_ipi_receiver(): determine if a vCPU is a recent IPI target
-
-The infrastructure is inert until integrated with interrupt delivery
-in subsequent patches.
-
-v1 -> v2:
-- Improve documentation for module parameters explaining the 50ms
-  window rationale
-- Add kvm_vcpu_is_ipi_receiver() declaration to x86.h header
-- Add weak function annotation comment in kvm_host.h
+Use lockless accessors for minimal overhead. The tracking only
+activates for unicast fixed IPIs where directed yield provides value.
 
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h | 12 ++++++
- arch/x86/kvm/lapic.c            | 76 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/x86.c              |  3 ++
- arch/x86/kvm/x86.h              |  8 ++++
- include/linux/kvm_host.h        |  3 ++
- virt/kvm/kvm_main.c             |  6 +++
- 6 files changed, 108 insertions(+)
+ arch/x86/kvm/lapic.c | 90 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 86 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5a3bfa293e8b..2464c310f0a2 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1052,6 +1052,18 @@ struct kvm_vcpu_arch {
- 	int pending_external_vector;
- 	int highest_stale_pending_ioapic_eoi;
- 
-+	/*
-+	 * IPI tracking for directed yield optimization.
-+	 * Records sender/receiver relationships when IPIs are delivered
-+	 * to enable IPI-aware vCPU scheduling decisions.
-+	 */
-+	struct {
-+		int last_ipi_sender;	/* vCPU index of last IPI sender */
-+		int last_ipi_receiver;	/* vCPU index of last IPI receiver */
-+		bool pending_ipi;	/* Awaiting IPI response */
-+		u64 ipi_time_ns;	/* Timestamp when IPI was sent */
-+	} ipi_context;
-+
- 	/* be preempted when it's in kernel-mode(cpl=0) */
- 	bool preempted_in_kernel;
- 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 1597dd0b0cc6..23f247a3b127 100644
+index 23f247a3b127..d4fb6f49390b 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -75,6 +75,19 @@ module_param(lapic_timer_advance, bool, 0444);
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
+@@ -1270,6 +1270,9 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
+ 	struct kvm_lapic **dst = NULL;
+ 	int i;
+ 	bool ret;
++	int targets = 0;
++	int delivered;
++	struct kvm_vcpu *unique = NULL;
  
-+/*
-+ * IPI tracking for directed yield optimization.
-+ * - ipi_tracking_enabled: global toggle (default on)
-+ * - ipi_window_ns: recency window for IPI validity (default 50ms)
-+ *   The 50ms window is chosen to be long enough to capture IPI response
-+ *   patterns while short enough to avoid stale information affecting
-+ *   scheduling decisions in throughput-sensitive workloads.
-+ */
-+static bool ipi_tracking_enabled = true;
-+static unsigned long ipi_window_ns = 50 * NSEC_PER_MSEC;
-+module_param(ipi_tracking_enabled, bool, 0644);
-+module_param(ipi_window_ns, ulong, 0644);
+ 	*r = -1;
+ 
+@@ -1291,8 +1294,22 @@ bool kvm_irq_delivery_to_apic_fast(struct kvm *kvm, struct kvm_lapic *src,
+ 		for_each_set_bit(i, &bitmap, 16) {
+ 			if (!dst[i])
+ 				continue;
+-			*r += kvm_apic_set_irq(dst[i]->vcpu, irq, dest_map);
++			delivered = kvm_apic_set_irq(dst[i]->vcpu, irq, dest_map);
++			*r += delivered;
++			if (delivered > 0) {
++				targets++;
++				unique = dst[i]->vcpu;
++			}
+ 		}
 +
- static bool __read_mostly vector_hashing_enabled = true;
- module_param_named(vector_hashing, vector_hashing_enabled, bool, 0444);
++		/*
++		 * Track IPI for directed yield: only for LAPIC-originated
++		 * APIC_DM_FIXED without shorthand, with exactly one recipient.
++		 */
++		if (src && irq->delivery_mode == APIC_DM_FIXED &&
++		    irq->shorthand == APIC_DEST_NOSHORT &&
++		    targets == 1 && unique && unique != src->vcpu)
++			kvm_track_ipi_communication(src->vcpu, unique);
+ 	}
  
-@@ -1113,6 +1126,69 @@ static int kvm_apic_compare_prio(struct kvm_vcpu *vcpu1, struct kvm_vcpu *vcpu2)
- 	return vcpu1->arch.apic_arb_prio - vcpu2->arch.apic_arb_prio;
+ 	rcu_read_unlock();
+@@ -1377,6 +1394,9 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+ 	struct kvm_vcpu *vcpu, *lowest = NULL;
+ 	unsigned long i, dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
+ 	unsigned int dest_vcpus = 0;
++	int targets = 0;
++	int delivered;
++	struct kvm_vcpu *unique = NULL;
+ 
+ 	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
+ 		return r;
+@@ -1400,7 +1420,12 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+ 		if (!kvm_lowest_prio_delivery(irq)) {
+ 			if (r < 0)
+ 				r = 0;
+-			r += kvm_apic_set_irq(vcpu, irq, dest_map);
++			delivered = kvm_apic_set_irq(vcpu, irq, dest_map);
++			r += delivered;
++			if (delivered > 0) {
++				targets++;
++				unique = vcpu;
++			}
+ 		} else if (kvm_apic_sw_enabled(vcpu->arch.apic)) {
+ 			if (!vector_hashing_enabled) {
+ 				if (!lowest)
+@@ -1421,8 +1446,23 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+ 		lowest = kvm_get_vcpu(kvm, idx);
+ 	}
+ 
+-	if (lowest)
+-		r = kvm_apic_set_irq(lowest, irq, dest_map);
++	if (lowest) {
++		delivered = kvm_apic_set_irq(lowest, irq, dest_map);
++		r = delivered;
++		if (delivered > 0) {
++			targets = 1;
++			unique = lowest;
++		}
++	}
++
++	/*
++	 * Track IPI for directed yield: only for LAPIC-originated
++	 * APIC_DM_FIXED without shorthand, with exactly one recipient.
++	 */
++	if (src && irq->delivery_mode == APIC_DM_FIXED &&
++	    irq->shorthand == APIC_DEST_NOSHORT &&
++	    targets == 1 && unique && unique != src->vcpu)
++		kvm_track_ipi_communication(src->vcpu, unique);
+ 
+ 	return r;
+ }
+@@ -1608,6 +1648,45 @@ static void kvm_ioapic_send_eoi(struct kvm_lapic *apic, int vector)
+ #endif
  }
  
 +/*
-+ * Track IPI communication for directed yield optimization.
-+ * Records sender/receiver relationship when a unicast IPI is delivered.
-+ * Only tracks when a unique receiver exists; ignores self-IPI.
-+ */
-+void kvm_track_ipi_communication(struct kvm_vcpu *sender, struct kvm_vcpu *receiver)
-+{
-+	if (!sender || !receiver || sender == receiver)
-+		return;
-+	if (unlikely(!READ_ONCE(ipi_tracking_enabled)))
-+		return;
-+
-+	WRITE_ONCE(sender->arch.ipi_context.last_ipi_receiver, receiver->vcpu_idx);
-+	WRITE_ONCE(sender->arch.ipi_context.pending_ipi, true);
-+	WRITE_ONCE(sender->arch.ipi_context.ipi_time_ns, ktime_get_mono_fast_ns());
-+
-+	WRITE_ONCE(receiver->arch.ipi_context.last_ipi_sender, sender->vcpu_idx);
-+}
-+
-+/*
-+ * Check if 'receiver' is the recent IPI target of 'sender'.
++ * Clear IPI context on EOI to prevent stale boost decisions.
 + *
-+ * Rationale:
-+ * - Use a short window to avoid stale IPI inflating boost priority
-+ *   on throughput-sensitive workloads.
++ * Two-stage cleanup:
++ * 1. Always clear receiver's IPI context (it processed the interrupt)
++ * 2. Conditionally clear sender's pending flag only when:
++ *    - Sender vCPU exists and is valid
++ *    - Sender's last_ipi_receiver matches this receiver
++ *    - IPI was sent recently (within window)
 + */
-+bool kvm_vcpu_is_ipi_receiver(struct kvm_vcpu *sender, struct kvm_vcpu *receiver)
++static void kvm_clear_ipi_on_eoi(struct kvm_lapic *apic)
 +{
++	struct kvm_vcpu *receiver = apic->vcpu;
++	int sender_idx;
 +	u64 then, now;
 +
 +	if (unlikely(!READ_ONCE(ipi_tracking_enabled)))
-+		return false;
++		return;
 +
-+	then = READ_ONCE(sender->arch.ipi_context.ipi_time_ns);
-+	now = ktime_get_mono_fast_ns();
-+	if (READ_ONCE(sender->arch.ipi_context.pending_ipi) &&
-+	    READ_ONCE(sender->arch.ipi_context.last_ipi_receiver) ==
-+	    receiver->vcpu_idx &&
-+	    now - then <= ipi_window_ns)
-+		return true;
++	sender_idx = READ_ONCE(receiver->arch.ipi_context.last_ipi_sender);
 +
-+	return false;
++	/* Step 1: Always clear receiver's IPI context */
++	kvm_vcpu_clear_ipi_context(receiver);
++
++	/* Step 2: Conditionally clear sender's pending flag */
++	if (sender_idx >= 0) {
++		struct kvm_vcpu *sender = kvm_get_vcpu(receiver->kvm, sender_idx);
++
++		if (sender &&
++		    READ_ONCE(sender->arch.ipi_context.last_ipi_receiver) ==
++		    receiver->vcpu_idx) {
++			then = READ_ONCE(sender->arch.ipi_context.ipi_time_ns);
++			now = ktime_get_mono_fast_ns();
++			if (now - then <= ipi_window_ns)
++				WRITE_ONCE(sender->arch.ipi_context.pending_ipi, false);
++		}
++	}
 +}
 +
-+/*
-+ * Clear IPI context for a vCPU (e.g., on EOI or reset).
-+ */
-+void kvm_vcpu_clear_ipi_context(struct kvm_vcpu *vcpu)
-+{
-+	WRITE_ONCE(vcpu->arch.ipi_context.pending_ipi, false);
-+	WRITE_ONCE(vcpu->arch.ipi_context.last_ipi_sender, -1);
-+	WRITE_ONCE(vcpu->arch.ipi_context.last_ipi_receiver, -1);
-+}
-+
-+/*
-+ * Reset IPI context completely (e.g., on vCPU creation/destruction).
-+ */
-+void kvm_vcpu_reset_ipi_context(struct kvm_vcpu *vcpu)
-+{
-+	kvm_vcpu_clear_ipi_context(vcpu);
-+	WRITE_ONCE(vcpu->arch.ipi_context.ipi_time_ns, 0);
-+}
-+
- /* Return true if the interrupt can be handled by using *bitmap as index mask
-  * for valid destinations in *dst array.
-  * Return false if kvm_apic_map_get_dest_lapic did nothing useful.
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0c6d899d53dd..d4c401ef04ca 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12728,6 +12728,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 		goto free_guest_fpu;
- 
- 	kvm_xen_init_vcpu(vcpu);
-+	kvm_vcpu_reset_ipi_context(vcpu);
- 	vcpu_load(vcpu);
- 	kvm_vcpu_after_set_cpuid(vcpu);
- 	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
-@@ -12795,6 +12796,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_mmu_destroy(vcpu);
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	free_page((unsigned long)vcpu->arch.pio_data);
-+	kvm_vcpu_reset_ipi_context(vcpu);
- 	kvfree(vcpu->arch.cpuid_entries);
- }
- 
-@@ -12871,6 +12873,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		kvm_leave_nested(vcpu);
- 
- 	kvm_lapic_reset(vcpu, init_event);
-+	kvm_vcpu_clear_ipi_context(vcpu);
- 
- 	WARN_ON_ONCE(is_guest_mode(vcpu) || is_smm(vcpu));
- 	vcpu->arch.hflags = 0;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index fdab0ad49098..cfc24fb207e0 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -466,6 +466,14 @@ fastpath_t handle_fastpath_wrmsr_imm(struct kvm_vcpu *vcpu, u32 msr, int reg);
- fastpath_t handle_fastpath_hlt(struct kvm_vcpu *vcpu);
- fastpath_t handle_fastpath_invd(struct kvm_vcpu *vcpu);
- 
-+/* IPI tracking helpers for directed yield */
-+void kvm_track_ipi_communication(struct kvm_vcpu *sender,
-+				 struct kvm_vcpu *receiver);
-+bool kvm_vcpu_is_ipi_receiver(struct kvm_vcpu *sender,
-+			      struct kvm_vcpu *receiver);
-+void kvm_vcpu_clear_ipi_context(struct kvm_vcpu *vcpu);
-+void kvm_vcpu_reset_ipi_context(struct kvm_vcpu *vcpu);
-+
- extern struct kvm_caps kvm_caps;
- extern struct kvm_host_values kvm_host;
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d93f75b05ae2..f42315d341b3 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1535,6 +1535,9 @@ static inline void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
- int kvm_vcpu_yield_to(struct kvm_vcpu *target);
- void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool yield_to_kernel_mode);
- 
-+/* Weak function, overridden by arch/x86/kvm for IPI-aware directed yield */
-+bool kvm_vcpu_is_ipi_receiver(struct kvm_vcpu *sender, struct kvm_vcpu *receiver);
-+
- void kvm_flush_remote_tlbs(struct kvm *kvm);
- void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages);
- void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5fcd401a5897..ff771a872c6d 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3964,6 +3964,12 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
- 	return false;
- }
- 
-+bool __weak kvm_vcpu_is_ipi_receiver(struct kvm_vcpu *sender,
-+				     struct kvm_vcpu *receiver)
-+{
-+	return false;
-+}
-+
- void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ static int apic_set_eoi(struct kvm_lapic *apic)
  {
- 	int nr_vcpus, start, i, idx, yielded;
+ 	int vector = apic_find_highest_isr(apic);
+@@ -1643,6 +1722,7 @@ void kvm_apic_set_eoi_accelerated(struct kvm_vcpu *vcpu, int vector)
+ 	trace_kvm_eoi(apic, vector);
+ 
+ 	kvm_ioapic_send_eoi(apic, vector);
++	kvm_clear_ipi_on_eoi(apic);
+ 	kvm_make_request(KVM_REQ_EVENT, apic->vcpu);
+ }
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_apic_set_eoi_accelerated);
+@@ -2453,6 +2533,8 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+ 
+ 	case APIC_EOI:
+ 		apic_set_eoi(apic);
++		/* Precise cleanup for IPI-aware boost */
++		kvm_clear_ipi_on_eoi(apic);
+ 		break;
+ 
+ 	case APIC_LDR:
 -- 
 2.43.0
 
