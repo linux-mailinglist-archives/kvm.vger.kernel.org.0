@@ -1,91 +1,91 @@
-Return-Path: <kvm+bounces-66322-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66325-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044DCCD00C3
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 14:25:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 890C5CCFAEF
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D6D130C3422
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 13:22:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 326F431064E0
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 11:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC28322A24;
-	Fri, 19 Dec 2025 11:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81152326959;
+	Fri, 19 Dec 2025 11:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LYRSNgcf";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c4UYOcss";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fG5CggXi";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9EYX1+lm"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AAyICD07";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Qu9nfYH9";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AAyICD07";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Qu9nfYH9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4D031AF16
-	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 11:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D9D326946
+	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 11:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766144623; cv=none; b=ZHVdBx1WUyk5TNctU19MEHcjI08pdFTWxlAERXdLWaip9SJBHcVtOrQHOb+UvWX7hHFJp/S8erALslxnfMIWveOxuO0jP8T/escy4q+bR5x2Z7FtgHeDBR1ASjWlWGyW3oCeGwVeAOFELUTuF8C273i1UOldVwQehpTL8tAZCEc=
+	t=1766144635; cv=none; b=IyHTTSvNTXK+VTVdDQb3hj1Yzqc2puZQTTo81cR4D1LLqumQ5T9Fk2xy62tTdiDTZ/jbF7fb0+IgbhXg1pRJapvgCIoKxG5u5drWs5iwJQqpEGyjKmZV7woPD3me6fRsRz6Q2l0D/YVFhoGigCOtgzhfPL9rdG068UhiAH2ngg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766144623; c=relaxed/simple;
-	bh=WT+AweqE2BkW0lbQLjFvfZBROAT0sQXjWX6h2baii5A=;
+	s=arc-20240116; t=1766144635; c=relaxed/simple;
+	bh=0llsXn1km+v1kZCm7eAn8T4M52/DVBBZTXvc9qbwkT4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hIIdECB/UjB8nu8dEMN/O0SVbTiF7S9FzLKiN2L9zJ3teDRIzS3SrR1Tpy7Usg9WXlYqBWjqZOU4fZTE8zha9jo8id1xIceCI4tD/jpOMbdAiWO4UCLkLmP4oC5iaIkaFo7y1c5sorH1sPZ3BCpbpmyhvKyIpOi6aRoBZv0JjlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LYRSNgcf; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c4UYOcss; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fG5CggXi; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9EYX1+lm; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version:Content-Type; b=XpyjDLGZ61HNNBwS/uDyPd/vSiFc/d+TzM6+r1M89iNSTeH/VvLzbI14S1fngztKJJ0zQQi3BS4lQn73Nj4rzUN4JQp8KQ+bCWC/Eh47Kg516wc6eUTrr+VkBt57RV8+gHhuLXy4aKRhbYU+JcTBnz1nybxh7F/z0h3KFg1+JtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AAyICD07; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Qu9nfYH9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AAyICD07; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Qu9nfYH9; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id EAF875BD33;
-	Fri, 19 Dec 2025 11:43:39 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C027F33714;
+	Fri, 19 Dec 2025 11:43:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
 	t=1766144620; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5oSZZT48jCa2l0/DziD5ficyj8DE33K7X9MsZAk4m/A=;
-	b=LYRSNgcfbQM8UXqrL8N5JA9GcPz/SR0pRzmqrXO+gmbIcOWBTjwZdDdD92HGvTv/ItjJjJ
-	lAzRnUxBAGBE7Ujh5/wSTF0Qrso+eFcaVPWb6p0rY3mSWM2wBftVzKUmouvXnnDJ4Bd/5M
-	U1+5LouATv7hsa0OeLGuZGV5JeGNvCA=
+	bh=h7AGDWWK7oj01hSc4RtgIJ4/P00xw0qz4cWje4kcoRI=;
+	b=AAyICD07buC4+3LonyP+rCf7tMB3bqoogye5stxAG/B7vZvgxU6PaIjNQXETGlv+CO6J6N
+	YuR0nkqg2JxegpOKZzO0J4UdAAf8U9xa1FZbIUNUYUDMJ0uq5aQd5Ue7B0JCvmzaCrPJUK
+	lR59kiWM7V5UCijJ54ZKRrBHWpue3Pw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
 	s=susede2_ed25519; t=1766144620;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5oSZZT48jCa2l0/DziD5ficyj8DE33K7X9MsZAk4m/A=;
-	b=c4UYOcss3t+vJorOAV9OlUSaX3kPqvXlCAvmlT+eS7bk4OTKXJhF8sUZ20HH+fAeeznlRD
-	8IlQNNQ0M4EmuaBA==
-Authentication-Results: smtp-out2.suse.de;
+	bh=h7AGDWWK7oj01hSc4RtgIJ4/P00xw0qz4cWje4kcoRI=;
+	b=Qu9nfYH9mf4no93L99E6Oans8SBNGJmmQIavNWjweKy721xOjdxyltXMDR7CjNU7YFk1Tt
+	5EDsfrJyUwuDMhAw==
+Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1766144619; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1766144620; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5oSZZT48jCa2l0/DziD5ficyj8DE33K7X9MsZAk4m/A=;
-	b=fG5CggXi+aW9NMAZqGfLrZ1N494WAmjRTmFVS1Bp3zH+faWy0Z5xP1uOM4EcIjXy6y6YTZ
-	1cyeJjWw1OMLGZtcgvZOcpjNJPxczEpdKRh0kJ861eAhmfE5ct3jgdzrcDLzM97ozaKzcY
-	duXZyfpRfJFMakTSCp2D0nSVmFKfq/I=
+	bh=h7AGDWWK7oj01hSc4RtgIJ4/P00xw0qz4cWje4kcoRI=;
+	b=AAyICD07buC4+3LonyP+rCf7tMB3bqoogye5stxAG/B7vZvgxU6PaIjNQXETGlv+CO6J6N
+	YuR0nkqg2JxegpOKZzO0J4UdAAf8U9xa1FZbIUNUYUDMJ0uq5aQd5Ue7B0JCvmzaCrPJUK
+	lR59kiWM7V5UCijJ54ZKRrBHWpue3Pw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1766144619;
+	s=susede2_ed25519; t=1766144620;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5oSZZT48jCa2l0/DziD5ficyj8DE33K7X9MsZAk4m/A=;
-	b=9EYX1+lmjcPOVVzOxv+QZnDx1zsAu4Eh73G5Y6kFz0saMPpCjbX9DR8CFlFHN2ixO5SCGR
-	fjzkS6PYdHykieAg==
+	bh=h7AGDWWK7oj01hSc4RtgIJ4/P00xw0qz4cWje4kcoRI=;
+	b=Qu9nfYH9mf4no93L99E6Oans8SBNGJmmQIavNWjweKy721xOjdxyltXMDR7CjNU7YFk1Tt
+	5EDsfrJyUwuDMhAw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 553913EA66;
-	Fri, 19 Dec 2025 11:43:39 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2A2E33EA63;
+	Fri, 19 Dec 2025 11:43:40 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id SIIjEms6RWnWGgAAD6G6ig
-	(envelope-from <clopez@suse.de>); Fri, 19 Dec 2025 11:43:39 +0000
+	id cEOfB2w6RWnWGgAAD6G6ig
+	(envelope-from <clopez@suse.de>); Fri, 19 Dec 2025 11:43:40 +0000
 From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
 To: kvm@vger.kernel.org,
 	seanjc@google.com,
@@ -98,9 +98,9 @@ Cc: tglx@linutronix.de,
 	hpa@zytor.com,
 	linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
-Subject: [PATCH 2/6] KVM: SEV: use mutex guard in sev_mem_enc_ioctl()
-Date: Fri, 19 Dec 2025 12:41:57 +0100
-Message-ID: <20251219114238.3797364-3-clopez@suse.de>
+Subject: [PATCH 3/6] KVM: SEV: use mutex guard in sev_mem_enc_register_region()
+Date: Fri, 19 Dec 2025 12:41:58 +0100
+Message-ID: <20251219114238.3797364-4-clopez@suse.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251219114238.3797364-1-clopez@suse.de>
 References: <20251219114238.3797364-1-clopez@suse.de>
@@ -112,11 +112,11 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-3.29 / 50.00];
+X-Spamd-Result: default: False [-3.26 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.19)[-0.955];
+	NEURAL_HAM_SHORT(-0.16)[-0.796];
 	MIME_GOOD(-0.10)[text/plain];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -130,78 +130,54 @@ X-Spamd-Result: default: False [-3.29 / 50.00];
 	TO_DN_SOME(0.00)[];
 	FROM_EQ_ENVFROM(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo,sev_cmd.id:url]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
 X-Spam-Level: 
 X-Spam-Flag: NO
-X-Spam-Score: -3.29
+X-Spam-Score: -3.26
 
-Simplify the error paths in sev_mem_enc_ioctl() by using a mutex guard,
-allowing early return instead of using gotos.
+Simplify the error paths in sev_mem_enc_register_region() by using a
+mutex guard, allowing early return instead of using a goto.
 
 Signed-off-by: Carlos López <clopez@suse.de>
 ---
- arch/x86/kvm/svm/sev.c | 25 ++++++++-----------------
- 1 file changed, 8 insertions(+), 17 deletions(-)
+ arch/x86/kvm/svm/sev.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 1b325ae61d15..0ee1b77aeec5 100644
+index 0ee1b77aeec5..253f2ae24bfc 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2575,30 +2575,24 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	if (copy_from_user(&sev_cmd, argp, sizeof(struct kvm_sev_cmd)))
- 		return -EFAULT;
+@@ -2691,13 +2691,13 @@ int sev_mem_enc_register_region(struct kvm *kvm,
+ 	if (!region)
+ 		return -ENOMEM;
  
 -	mutex_lock(&kvm->lock);
 +	guard(mutex)(&kvm->lock);
- 
- 	/* Only the enc_context_owner handles some memory enc operations. */
- 	if (is_mirroring_enc_context(kvm) &&
--	    !is_cmd_allowed_from_mirror(sev_cmd.id)) {
--		r = -EINVAL;
--		goto out;
--	}
-+	    !is_cmd_allowed_from_mirror(sev_cmd.id))
-+		return -EINVAL;
- 
- 	/*
- 	 * Once KVM_SEV_INIT2 initializes a KVM instance as an SNP guest, only
- 	 * allow the use of SNP-specific commands.
- 	 */
--	if (sev_snp_guest(kvm) && sev_cmd.id < KVM_SEV_SNP_LAUNCH_START) {
--		r = -EPERM;
--		goto out;
--	}
-+	if (sev_snp_guest(kvm) && sev_cmd.id < KVM_SEV_SNP_LAUNCH_START)
-+		return -EPERM;
- 
- 	switch (sev_cmd.id) {
- 	case KVM_SEV_ES_INIT:
--		if (!sev_es_enabled) {
--			r = -ENOTTY;
--			goto out;
--		}
-+		if (!sev_es_enabled)
-+			return -ENOTTY;
- 		fallthrough;
- 	case KVM_SEV_INIT:
- 		r = sev_guest_init(kvm, &sev_cmd);
-@@ -2667,15 +2661,12 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 		r = snp_launch_finish(kvm, &sev_cmd);
- 		break;
- 	default:
--		r = -EINVAL;
--		goto out;
-+		return -EINVAL;
+ 	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages,
+ 				       FOLL_WRITE | FOLL_LONGTERM);
+ 	if (IS_ERR(region->pages)) {
+ 		ret = PTR_ERR(region->pages);
+-		mutex_unlock(&kvm->lock);
+-		goto e_free;
++		kfree(region);
++		return ret;
  	}
  
- 	if (copy_to_user(argp, &sev_cmd, sizeof(struct kvm_sev_cmd)))
- 		r = -EFAULT;
+ 	/*
+@@ -2714,13 +2714,8 @@ int sev_mem_enc_register_region(struct kvm *kvm,
+ 	region->size = range->size;
  
--out:
+ 	list_add_tail(&region->list, &sev->regions_list);
 -	mutex_unlock(&kvm->lock);
- 	return r;
+ 
+ 	return ret;
+-
+-e_free:
+-	kfree(region);
+-	return ret;
  }
  
+ static struct enc_region *
 -- 
 2.51.0
 
