@@ -1,212 +1,323 @@
-Return-Path: <kvm+bounces-66289-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66290-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6FCACCDEDC
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 00:26:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A0BCCE216
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 02:20:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 576AF301D9F1
-	for <lists+kvm@lfdr.de>; Thu, 18 Dec 2025 23:26:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A00FE302832C
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 01:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B102BDC03;
-	Thu, 18 Dec 2025 23:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2ED3212557;
+	Fri, 19 Dec 2025 01:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Shh8AMFU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="awyfdZlM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0AD2877DE
-	for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 23:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBA5288D2
+	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 01:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766100392; cv=none; b=gaFasfuF3csVJZbsPIECL0Gx7qCI9qLoWYlxiklKG1ypvuOciY/YAwJpblYJJoOLuMLYHBYez7ZIuwTh5Cvx2rMIP9C3HgAdPt9ijQ7yftGNBytknDY0vr+i7Vj5o26wXL0r0+weE+cX3Ta60celdPrW4G/YEpnM+k/77yFgJ9A=
+	t=1766107248; cv=none; b=iXKwB6qz4f7UgqFEJG7YxH0XFs+LD+fMUaO9dhIQ9rbTBFgsp/kiM3DJSHKKQz6AI0Bbf7NDiufB5qLDQQZyZGsrtVBUzLmOSmfEc0rpcRUDeotbnd910+HlCK418Di+8Af3fkB83T3LwL7hSU+JACGd3Cmab0dbYY2iCOTtwXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766100392; c=relaxed/simple;
-	bh=E1oTLFByAoH1HK8Z6UqYN7q/ITy2oTP4LQ1DypsCyrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bpmuo7GHZDJB09x2DImPbC3s/7PkZLBbvkiljNhdqfps/iQYNd3aoquDKJ6I5QBvXKUiK2K8y+gZQa48pPCkNSMoKE6Tp2mSn1jJHUnd1JsYWPyqyPya3GwFtwWZaZzdkzWz7u2OnHAF1FSkcyQzOHP8znZY9ZIBe8PEfOpbXZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Shh8AMFU; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1766107248; c=relaxed/simple;
+	bh=CrLw4VBrWjUWwrcAbgLxBCMhqzVtML6nTp4cl92xOqw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=myDlqimroqORgPftGfAEj3UsbawVSLf1EP1apaCX/gnz+WDzA1xaE2iNqA0NHVWqyV2exwPlqcjpsAGnQYJqf7piwabh2f11OdT3dGRGd41ygzFYOQPlVpn8m1Pyeb753/5p7IpiBadHIDTGMBj11Z1Of3Y/axEWuPG8WU9oR/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=awyfdZlM; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7bf0ad0cb87so1585284b3a.2
-        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 15:26:30 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c43f8ef9bso2172877a91.1
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 17:20:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766100390; x=1766705190; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YSafY9ekhvlDGN1P53uKSBvaDR1S8x/NREaGerJYSyc=;
-        b=Shh8AMFUNeHQ8vulvCasLdXKSyrl4D95pHvZmwOhFFbTdLvxArLR1LK2UMsjzpGiFc
-         sjM+q5bSjRtlbxT1xpCfiW+TFsQ3mi9fWwdyOjrtEgNMOKBkEmIJMNZj7nYZ6ZUeF3Ry
-         vGYe2J2MYGDfFAywCA7m821VporiOCj42pbAyRNlk0quGWprQbFdSWzJf/TfU7uQ/Vh/
-         xlorJ0o2PKvq6c1uYx4PnORGJAQqzQ4WwIKgRaH4yL2XTGffi16lJWDIdeq5cp2C5TLb
-         lLPIPQ9A+8/6++0IDg4hpkQOb8Nu9G0gTwoW6EIDSBqKYMbnM3yywjeNHnRgqrOMGF1V
-         QDcA==
+        d=google.com; s=20230601; t=1766107246; x=1766712046; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e1oi4mnuLLL6bf0wFuVJldfb0uYmu/pj+f61oQSJDA4=;
+        b=awyfdZlM0JlQyZsn4VtvoBZY/Am538l/fqesSuQlECoTDyXWsKKcPYNe1r/fdFCkYf
+         XfV9dJ1JOx2PPK7hU3LnVkmoKqKnVBOwt3hGZQlyXhRb87mKa17DUh5NxOjA8Sj8dA95
+         tMQIbK2r7x3/131y/lD5RFJI+sDB5cwJEWkdhX5G0maL34tqkrgWpfDhmeaOSQ0onnOx
+         LoTRtWX/hATagY2MxxtSC+5endHdRgZlqBJumawKpjIKM7VNS9IU6k0pwDHzahjM9hvk
+         zxE9kWDhGEtbaniUxZwUGObuNz5zs83zI2ROxDmpCPZ1EvDhTKO94zTW+Fau9Q0OqF9A
+         vRDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766100390; x=1766705190;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YSafY9ekhvlDGN1P53uKSBvaDR1S8x/NREaGerJYSyc=;
-        b=UYUor1v8Rm6MmtDGIqct7EBaPvhpJNx8NKEhLggIOyaRN6hcN10u7lYxMtLrItvjQp
-         gbTM7/jlApW/3gdtS63kHVmOcLIDi58wAY0AvlLM92oeukuRKMb4y8924uQciQOCu8ds
-         hxsrhsYvqDj8BPAJ4YIsM8MY5LgcsAcAaIh0dOhjVN7JAhzlM/ndhjkQ7tdqqKMWos4Q
-         9hHXiELnX3KNR9QDSDtbjuwMba0TJqg7H1s4JF9om7XaW2Qinqx7MZrseGPiYVe+iX+Z
-         ZCpYWXUYzURbLDuMdttPv/4B9yJiKZsUXBW77Ub3iJHVib67uBA1Rwy9TEWZf6AkhN9s
-         FCDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOwoJZyBOX9mWJgVPvM+R/Oy92Xl38vm+7Av33Ne4RR6HtJD30bmJ8AyhvBgr2w5Hd5+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLzCeOMFni+fzGfTbS/JwmcKsDdCIK+s00tu+s+8mTwS5mKU+r
-	EVONqPl7XADrx2bFjyBsS33Wh+ao4C4NBlDVeVxJjMQvy/ayMyN3DfPnyRrWRQLN9Q==
-X-Gm-Gg: AY/fxX4Uxgi7A+N9jT8vSeI0AIaOC9lmqS466BHaaUaEa0TVc/sZSYlMqQM0+9Bi4HJ
-	1ExknguIVuRbpfyisRuONnc/S6pNnVh7DPr6ohGmE9psPZEbluqdOowtGSU1LjRpapbpwyQ9Wu9
-	nMQyL7R7Cwe9/2uigFmAZzYiHBgQLlNMO66RcrZpyfATii45HuR7z8si5+K9k8gxuC4k3rtV9za
-	emrfXCOuyf6pmTT6nhI4mlrE1tQspFm7AVAAWFrejsTn/ooIQuAt8vJkGWXw3Rghb4+xQh/39eG
-	oNzOheu+P5GLqsNST+XZSGTvFDwACZRe4g0Rjq1MhY+Ni6FVEnjVcT2deLn6BgqK5CFyCvsSGaR
-	tFCzmyeiTXgbuEzOV6J5AqZEkkZ/4sVsC6fYTbbI1llsw63aKpU0j5Xi191+chiCSXVr96nQ3zu
-	1a1uuI0DbB64X9df1w4BJ+eWlhUooh1UsjtL+JY2PDknv8gVuECQ==
-X-Google-Smtp-Source: AGHT+IFRV2BjdNwaMYD8x627RpPB3lQF/ELZXS2VxAV/XnLYZeEn9I9A5pq6i1/VqqYKxz9Z559LjQ==
-X-Received: by 2002:a05:6a00:301f:b0:7aa:4f1d:c458 with SMTP id d2e1a72fcca58-7ff657a303bmr827104b3a.19.1766100389450;
-        Thu, 18 Dec 2025 15:26:29 -0800 (PST)
-Received: from google.com (161.206.82.34.bc.googleusercontent.com. [34.82.206.161])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e0a19besm382630b3a.40.2025.12.18.15.26.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Dec 2025 15:26:28 -0800 (PST)
-Date: Thu, 18 Dec 2025 23:26:24 +0000
-From: David Matlack <dmatlack@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Alex Williamson <alex@shazbot.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/6] vfio: selftests: Add tests to validate SR-IOV UAPI
-Message-ID: <aUSNoBzvybi24SUD@google.com>
-References: <20251210181417.3677674-1-rananta@google.com>
- <20251210181417.3677674-7-rananta@google.com>
+        d=1e100.net; s=20230601; t=1766107246; x=1766712046;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e1oi4mnuLLL6bf0wFuVJldfb0uYmu/pj+f61oQSJDA4=;
+        b=N0T5nMwXzDoUuV8xhkdnzz9OLUSEVbaf+KlYwrUH9HFppkxrsSrQBtN9CtUwiW9KRi
+         hfpMEgYfSzUTfaV01zc78TqpgftB/btQeGdbgQucSC9yL8juoDqDsDdn0yeyBhTnS/xR
+         TDflP9Pe2+W5xuM2V2C4Ejf3q6nvoP5KPgYsUWG8ku+7ZZGU7AuuRwQjBVZ6Pley+3fJ
+         aZiSDwBMfYfFCDrXmQ/Rm4INWlRzOZTM1tKYgFVy20y3GGC3pEoDOfNmVRcSw1k38BQc
+         FHS2IAWPEbJYc7rAALt9yDNx0Wor41jikrjZkd98yS0kcIz+0WYRd/wZv42fhfuVli/F
+         jmUQ==
+X-Gm-Message-State: AOJu0Ywq/SI4FoGNqFxJFQKLsZlmvbsZ384Gj2LVuDNViBKzDkHAwpgx
+	tiJgyOB/JhdbxbgtRrNBo+bZ7Ve9/ZQkYGA91SF4/urr3Pv1esDtppcRQnfQxLpWdyilgcIJfy7
+	GrWxS1w==
+X-Google-Smtp-Source: AGHT+IGLTrkeHUpYZnEoFTF29YffsALKfo6ydvjvl5TSAkMMUt/GVaCCR6jGLVhothpsyiRu5euzCVWGq5c=
+X-Received: from pjsg8.prod.google.com ([2002:a17:90a:7148:b0:340:c53d:2599])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:57c6:b0:340:b501:7b83
+ with SMTP id 98e67ed59e1d1-34e90dcfcd2mr1085541a91.10.1766107245633; Thu, 18
+ Dec 2025 17:20:45 -0800 (PST)
+Date: Thu, 18 Dec 2025 17:20:44 -0800
+In-Reply-To: <DS0PR02MB9321EA7B6AB2B559CA1CDFDD8BD9A@DS0PR02MB9321.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251210181417.3677674-7-rananta@google.com>
+Mime-Version: 1.0
+References: <20221005211551.152216-1-thanos.makatos@nutanix.com>
+ <aLrvLfkiz6TwR4ML@google.com> <DS0PR02MB93218C62840E0E9FA240FAF68BD8A@DS0PR02MB9321.namprd02.prod.outlook.com>
+ <aS9uBw_w7NM_Vnw1@google.com> <DS0PR02MB9321EA7B6AB2B559CA1CDFDD8BD9A@DS0PR02MB9321.namprd02.prod.outlook.com>
+Message-ID: <aUSobNVZ9VEaLN79@google.com>
+Subject: Re: [RFC PATCH] KVM: optionally commit write on ioeventfd write
+From: Sean Christopherson <seanjc@google.com>
+To: Thanos Makatos <thanos.makatos@nutanix.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, John Levon <john.levon@nutanix.com>, 
+	"mst@redhat.com" <mst@redhat.com>, "dinechin@redhat.com" <dinechin@redhat.com>, 
+	"cohuck@redhat.com" <cohuck@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"stefanha@redhat.com" <stefanha@redhat.com>, "jag.raman@oracle.com" <jag.raman@oracle.com>, 
+	"eafanasova@gmail.com" <eafanasova@gmail.com>, 
+	"elena.ufimtseva@oracle.com" <elena.ufimtseva@oracle.com>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 2025-12-10 06:14 PM, Raghavendra Rao Ananta wrote:
-> Add a selfttest, vfio_pci_sriov_uapi_test.c, to validate the
-> SR-IOV UAPI, including the following cases, iterating over
-> all the IOMMU modes currently supported:
->  - Setting correct/incorrect/NULL tokens during device init.
->  - Close the PF device immediately after setting the token.
->  - Change/override the PF's token after device init.
++Paolo (just realized Paolo isn't on the Cc)
+
+On Wed, Dec 03, 2025, Thanos Makatos wrote:
+> > From: Sean Christopherson <seanjc@google.com>
+> > Side topic, Paolo had an off-the-cuff idea of adding uAPI to support
+> > notifications on memslot ranges, as opposed to posting writes via
+> > ioeventfd.  E.g. add a memslot flag, or maybe a memory attribute, that
+> > causes KVM to write-protect a region, emulate in response to writes, and
+> > then notify an eventfd after emulating the write.  It'd be a lot like
+> > KVM_MEM_READONLY, except that KVM would commit the write to memory and
+> > notify, as opposed to exiting to userspace.
 > 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Are you thinking for reusing/adapting the mechanism in this patch for that?
 
-I hit the following kernel NULL pointer dereference after running the
-new test a few times (nice!).
+Paolo's idea was to forego this patch entirely and instead add a more generic
+write-notify mechanism.  In practice, the only real difference is that the writes
+would be fully in-place instead of a redirection, which in turn would allow the
+guest to read without triggering a VM-Exit, and I suppose might save userspace
+from some dirty logging operations.
+ 
+While I really like the mechanics of the idea, after sketching out the basic
+gist (see below), I'm not convinced the additional complexity is worth the gains.
+Unless reading from NVMe submission queues is a common operation, it doesn't seem
+like eliding VM-Exits on reads buys much.
 
-Repro:
+Every arch would need to be updated to handle the new way of handling emulated
+writes, with varying degrees of complexity.  E.g. on x86 I think it would just be
+teaching the MMU about the new "emulate on write" behavior, but for arm64 (and
+presumably any other architecture without a generic emulator), it would be that
+plus new code to actually commit the write to guest memory.
 
-  $ tools/testing/selftests/vfio/scripts/setup.sh 0000:16:00.1
-  $ tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test 0000:16:00.1
-  $ tools/testing/selftests/vfio/scripts/cleanup.sh
-  ... repeat ...
+The other scary aspect is correctly handling "writable from KVM" and "can't be
+mapped writable".  Getting that correct in all places is non-trivial, and seems
+like it could be a pain to maintain, which potentially fatal failure modes, e.g.
+if KVM writes guest memory but fails to notify, tracking down the bug would be
+"fun".
 
-The panic:
+So my vote is to add POST_WRITE functionality to I/O eventfd, and hold off on a
+generic write-notify mechanism until there's a (really) strong use case.
 
-[  553.245784][T27601] vfio-pci 0000:1a:00.0: probe with driver vfio-pci failed with error -22
-[  553.256622][T27601] vfio-pci 0000:1a:00.0: probe with driver vfio-pci failed with error -22
-[  574.857650][T27935] BUG: kernel NULL pointer dereference, address: 0000000000000008
-[  574.865322][T27935] #PF: supervisor read access in kernel mode
-[  574.871175][T27935] #PF: error_code(0x0000) - not-present page
-[  574.877021][T27935] PGD 4116e63067 P4D 40fb0a3067 PUD 409597f067 PMD 0
-[  574.883654][T27935] Oops: Oops: 0000 [#1] SMP NOPTI
-[  574.888551][T27935] CPU: 100 UID: 0 PID: 27935 Comm: vfio_pci_sriov_ Tainted: G S      W           6.18.0-smp-DEV #1 NONE
-[  574.899600][T27935] Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
-[  574.905104][T27935] Hardware name: Google Izumi-EMR/izumi, BIOS 0.20250801.2-0 08/25/2025
-[  574.913289][T27935] RIP: 0010:rb_insert_color+0x44/0x110
-[  574.918623][T27935] Code: cc cc 48 89 cf 48 83 cf 01 48 89 3a 48 89 38 48 8b 01 48 89 cf 48 83 e0 fc 48 89 01 74 d7 48 8b 08 f6 c1 01 0f 85 c1 00 00 00 <48> 8b 51 08 48 39 c2 74 0c 48 85 d2 74 4f f6 02 01 74 c5 eb 48 48
-[  574.938080][T27935] RSP: 0018:ff85113dcdd6bb08 EFLAGS: 00010046
-[  574.944013][T27935] RAX: ff3f257594a99e80 RBX: ff3f25758af490c0 RCX: 0000000000000000
-[  574.951857][T27935] RDX: 0000000000001a00 RSI: ff3f25360038eb70 RDI: ff3f2536658bbee0
-[  574.959702][T27935] RBP: ff3f25360038ea00 R08: 0000000000000002 R09: ff85113dcdd6badc
-[  574.967544][T27935] R10: ff3f257590ab8000 R11: ffffffffa78210a0 R12: ff3f2536658bbea0
-[  574.975387][T27935] R13: 0000000000000286 R14: ff3f25758af49000 R15: ff3f25360038eb78
-[  574.983230][T27935] FS:  00000000223403c0(0000) GS:ff3f25b4d4d83000(0000) knlGS:0000000000000000
-[  574.992032][T27935] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  574.998488][T27935] CR2: 0000000000000008 CR3: 00000040fa254005 CR4: 0000000000f71ef0
-[  575.006332][T27935] PKRU: 55555554
-[  575.009753][T27935] Call Trace:
-[  575.012919][T27935]  <TASK>
-[  575.015730][T27935]  intel_iommu_probe_device+0x4c9/0x7b0
-[  575.021153][T27935]  __iommu_probe_device+0x101/0x4c0
-[  575.026231][T27935]  iommu_bus_notifier+0x37/0x100
-[  575.031046][T27935]  blocking_notifier_call_chain+0x53/0xd0
-[  575.036634][T27935]  bus_notify+0x99/0xc0
-[  575.040666][T27935]  device_add+0x252/0x470
-[  575.044872][T27935]  pci_device_add+0x414/0x5c0
-[  575.049429][T27935]  pci_iov_add_virtfn+0x2f2/0x3e0
-[  575.054326][T27935]  sriov_add_vfs+0x33/0x70
-[  575.058613][T27935]  sriov_enable+0x2fc/0x490
-[  575.062992][T27935]  vfio_pci_core_sriov_configure+0x16c/0x210
-[  575.068843][T27935]  sriov_numvfs_store+0xc4/0x190
-[  575.073652][T27935]  kernfs_fop_write_iter+0xfe/0x180
-[  575.078724][T27935]  vfs_write+0x2d0/0x430
-[  575.082846][T27935]  ksys_write+0x7f/0x100
-[  575.086965][T27935]  do_syscall_64+0x6f/0x940
-[  575.091339][T27935]  ? arch_exit_to_user_mode_prepare+0x9/0xb0
-[  575.097193][T27935]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  575.102952][T27935] RIP: 0033:0x46fcf7
-[  575.106721][T27935] Code: 48 89 fa 4c 89 df e8 88 16 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
-[  575.126178][T27935] RSP: 002b:00007ffe991aff40 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-[  575.134457][T27935] RAX: ffffffffffffffda RBX: 00000000223403c0 RCX: 000000000046fcf7
-[  575.142301][T27935] RDX: 0000000000000001 RSI: 00007ffe991b1050 RDI: 0000000000000003
-[  575.150143][T27935] RBP: 00007ffe991b0ff0 R08: 0000000000000000 R09: 0000000000000000
-[  575.157985][T27935] R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffe991b1768
-[  575.165829][T27935] R13: 0000000000000016 R14: 00000000004dd480 R15: 0000000000000016
-[  575.173677][T27935]  </TASK>
-[  575.176573][T27935] Modules linked in: vfat fat dummy bridge stp llc intel_vsec cdc_acm cdc_ncm cdc_eem cdc_ether usbnet mii xhci_pci xhci_hcd ehci_pci ehci_hcd
-[  575.190930][T27935] CR2: 0000000000000008
-[  575.194960][T27935] ---[ end trace 0000000000000000 ]---
-[  575.204004][T27935] RIP: 0010:rb_insert_color+0x44/0x110
-[  575.209336][T27935] Code: cc cc 48 89 cf 48 83 cf 01 48 89 3a 48 89 38 48 8b 01 48 89 cf 48 83 e0 fc 48 89 01 74 d7 48 8b 08 f6 c1 01 0f 85 c1 00 00 00 <48> 8b 51 08 48 39 c2 74 0c 48 85 d2 74 4f f6 02 01 74 c5 eb 48 48
-[  575.228796][T27935] RSP: 0018:ff85113dcdd6bb08 EFLAGS: 00010046
-[  575.234729][T27935] RAX: ff3f257594a99e80 RBX: ff3f25758af490c0 RCX: 0000000000000000
-[  575.242572][T27935] RDX: 0000000000001a00 RSI: ff3f25360038eb70 RDI: ff3f2536658bbee0
-[  575.250414][T27935] RBP: ff3f25360038ea00 R08: 0000000000000002 R09: ff85113dcdd6badc
-[  575.258263][T27935] R10: ff3f257590ab8000 R11: ffffffffa78210a0 R12: ff3f2536658bbea0
-[  575.266105][T27935] R13: 0000000000000286 R14: ff3f25758af49000 R15: ff3f25360038eb78
-[  575.273948][T27935] FS:  00000000223403c0(0000) GS:ff3f25b4d4d83000(0000) knlGS:0000000000000000
-[  575.282741][T27935] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  575.289197][T27935] CR2: 0000000000000008 CR3: 00000040fa254005 CR4: 0000000000f71ef0
-[  575.297046][T27935] PKRU: 55555554
-[  575.300466][T27935] Kernel panic - not syncing: Fatal exception
-[  575.345557][T27935] Kernel Offset: 0x25800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[  575.362075][T27935] mtdoops: Cannot write from panic without panic_write
-[  575.368795][T27935] Rebooting in 10 seconds..
+Paolo, thoughts?
 
-I also have the following diff on top of your series to fix the other
-bug you found.
 
-diff --git a/tools/testing/selftests/vfio/lib/sysfs.c b/tools/testing/selftests/vfio/lib/sysfs.c
-index 5551e8b98107..d94616e8aff4 100644
---- a/tools/testing/selftests/vfio/lib/sysfs.c
-+++ b/tools/testing/selftests/vfio/lib/sysfs.c
-@@ -40,7 +40,7 @@ static void sysfs_set_val(const char *component, const char *name,
+---
+ arch/x86/kvm/mmu/mmu.c   |  6 +++--
+ include/linux/kvm_host.h |  2 ++
+ include/uapi/linux/kvm.h |  3 ++-
+ virt/kvm/kvm_main.c      | 51 +++++++++++++++++++++++++++++++++-------
+ 4 files changed, 51 insertions(+), 11 deletions(-)
 
- static int sysfs_get_device_val(const char *bdf, const char *file)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02c450686b4a..acad277ba2a1 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3493,7 +3493,8 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 	 * into the spte otherwise read access on readonly gfn also can
+ 	 * caused mmio page fault and treat it as mmio access.
+ 	 */
+-	if (fault->pfn == KVM_PFN_ERR_RO_FAULT)
++	if (fault->pfn == KVM_PFN_ERR_RO_FAULT ||
++	    fault->pfn == KVM_PFN_ERR_WRITE_NOTIFY)
+ 		return RET_PF_EMULATE;
+ 
+ 	if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
+@@ -4582,7 +4583,8 @@ static int kvm_mmu_faultin_pfn_gmem(struct kvm_vcpu *vcpu,
+ 		return r;
+ 	}
+ 
+-	fault->map_writable = !(fault->slot->flags & KVM_MEM_READONLY);
++	fault->map_writable = !(fault->slot->flags &
++				(KVM_MEM_READONLY | KVM_MEM_WRITE_NOTIFY));
+ 	fault->max_level = kvm_max_level_for_order(max_order);
+ 
+ 	return RET_PF_CONTINUE;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d93f75b05ae2..e75dc5c2a279 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -99,6 +99,7 @@
+ #define KVM_PFN_ERR_RO_FAULT	(KVM_PFN_ERR_MASK + 2)
+ #define KVM_PFN_ERR_SIGPENDING	(KVM_PFN_ERR_MASK + 3)
+ #define KVM_PFN_ERR_NEEDS_IO	(KVM_PFN_ERR_MASK + 4)
++#define KVM_PFN_ERR_WRITE_NOTIFY (KVM_PFN_ERR_MASK + 5)
+ 
+ /*
+  * error pfns indicate that the gfn is in slot but faild to
+@@ -615,6 +616,7 @@ struct kvm_memory_slot {
+ 		pgoff_t pgoff;
+ 	} gmem;
+ #endif
++	struct eventfd_ctx *eventfd;
+ };
+ 
+ static inline bool kvm_slot_has_gmem(const struct kvm_memory_slot *slot)
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index dddb781b0507..c3d084a09d6c 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -39,7 +39,7 @@ struct kvm_userspace_memory_region2 {
+ 	__u64 userspace_addr;
+ 	__u64 guest_memfd_offset;
+ 	__u32 guest_memfd;
+-	__u32 pad1;
++	__u32 eventfd;
+ 	__u64 pad2[14];
+ };
+ 
+@@ -51,6 +51,7 @@ struct kvm_userspace_memory_region2 {
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
+ #define KVM_MEM_GUEST_MEMFD	(1UL << 2)
++#define KVM_MEM_WRITE_NOTIFY	(1UL << 3)
+ 
+ /* for KVM_IRQ_LINE */
+ struct kvm_irq_level {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index f1f6a71b2b5f..e58d43bae757 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -953,6 +953,8 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
+ /* This does not remove the slot from struct kvm_memslots data structures */
+ static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
  {
--       sysfs_get_val("devices", bdf, file);
-+       return sysfs_get_val("devices", bdf, file);
++	if (slot->flags & KVM_MEM_WRITE_NOTIFY)
++		eventfd_ctx_put(slot->eventfd);
+ 	if (slot->flags & KVM_MEM_GUEST_MEMFD)
+ 		kvm_gmem_unbind(slot);
+ 
+@@ -1607,11 +1609,15 @@ static int check_memory_region_flags(struct kvm *kvm,
+ 	/*
+ 	 * GUEST_MEMFD is incompatible with read-only memslots, as writes to
+ 	 * read-only memslots have emulated MMIO, not page fault, semantics,
+-	 * and KVM doesn't allow emulated MMIO for private memory.
++	 * and KVM doesn't allow emulated MMIO for private memory.  Ditto for
++	 * write-notify memslots (emulated exitless MMIO).
+ 	 */
+-	if (kvm_arch_has_readonly_mem(kvm) &&
+-	    !(mem->flags & KVM_MEM_GUEST_MEMFD))
+-		valid_flags |= KVM_MEM_READONLY;
++	if (!mem->flags & KVM_MEM_GUEST_MEMFD) {
++		if (kvm_arch_has_readonly_mem(kvm))
++			valid_flags |= KVM_MEM_READONLY;
++		if (kvm_arch_has_write_notify_mem(kvm))
++			valid_flags |= KVM_MEM_WRITE_NOTIFY;
++	}
+ 
+ 	if (mem->flags & ~valid_flags)
+ 		return -EINVAL;
+@@ -2100,7 +2106,9 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 			return -EINVAL;
+ 		if ((mem->userspace_addr != old->userspace_addr) ||
+ 		    (npages != old->npages) ||
+-		    ((mem->flags ^ old->flags) & (KVM_MEM_READONLY | KVM_MEM_GUEST_MEMFD)))
++		    ((mem->flags ^ old->flags) & (KVM_MEM_READONLY |
++						  KVM_MEM_GUEST_MEMFD |
++						  KVM_MEM_WRITE_NOTIFY)))
+ 			return -EINVAL;
+ 
+ 		if (base_gfn != old->base_gfn)
+@@ -2131,13 +2139,29 @@ static int kvm_set_memory_region(struct kvm *kvm,
+ 		if (r)
+ 			goto out;
+ 	}
++	if (mem->flags & KVM_MEM_WRITE_NOTIFY) {
++		CLASS(fd, f)(mem->eventfd);
++		if (fd_empty(f)) {
++			r = -EBADF;
++			goto out_unbind;
++		}
++
++		new->eventfd = eventfd_ctx_fileget(fd_file(f));
++		if (IS_ERR(new->eventfd)) {
++			r = PTR_ERR(new->eventfd);
++			goto out_unbind;
++		}
++	}
+ 
+ 	r = kvm_set_memslot(kvm, old, new, change);
+ 	if (r)
+-		goto out_unbind;
++		goto out_eventfd;
+ 
+ 	return 0;
+ 
++out_eventfd:
++	if (mem->flags & KVM_MEM_WRITE_NOTIFY)
++		eventfd_ctx_put(new->eventfd);
+ out_unbind:
+ 	if (mem->flags & KVM_MEM_GUEST_MEMFD)
+ 		kvm_gmem_unbind(new);
+@@ -2727,6 +2751,11 @@ unsigned long kvm_host_page_size(struct kvm_vcpu *vcpu, gfn_t gfn)
+ 	return size;
+ }
+ 
++static bool memslot_is_write_notify(const struct kvm_memory_slot *slot)
++{
++	return slot->flags & KVM_MEM_WRITE_NOTIFY;
++}
++
+ static bool memslot_is_readonly(const struct kvm_memory_slot *slot)
+ {
+ 	return slot->flags & KVM_MEM_READONLY;
+@@ -2786,7 +2815,7 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot,
+ 	unsigned long hva = __gfn_to_hva_many(slot, gfn, NULL, false);
+ 
+ 	if (!kvm_is_error_hva(hva) && writable)
+-		*writable = !memslot_is_readonly(slot);
++		*writable = !memslot_is_readonly(slot)
+ 
+ 	return hva;
+ }
+@@ -3060,7 +3089,11 @@ static kvm_pfn_t kvm_follow_pfn(struct kvm_follow_pfn *kfp)
+ 	if (kvm_is_error_hva(kfp->hva))
+ 		return KVM_PFN_NOSLOT;
+ 
+-	if (memslot_is_readonly(kfp->slot) && kfp->map_writable) {
++	if ((kfp->flags & FOLL_WRITE) && memslot_is_write_notify(kfp->slot))
++		return KVM_PFN_ERR_WRITE_NOTIFY;
++
++	if (kfp->map_writable &&
++	    (memslot_is_readonly(kfp->slot) || memslot_is_write_notify(kfp->slot)) {
+ 		*kfp->map_writable = false;
+ 		kfp->map_writable = NULL;
+ 	}
+@@ -3324,6 +3357,8 @@ static int __kvm_write_guest_page(struct kvm *kvm,
+ 	r = __copy_to_user((void __user *)addr + offset, data, len);
+ 	if (r)
+ 		return -EFAULT;
++	if (memslot_is_write_notify(memslot))
++		eventfd_signal(memslot->eventfd);
+ 	mark_page_dirty_in_slot(kvm, memslot, gfn);
+ 	return 0;
  }
 
- static void sysfs_set_device_val(const char *bdf, const char *file, const char *val)
-
-I'm not sure which exact test case triggered the panic. This is the only
-test output that made it to my ssh window:
-
-  TAP version 13
-  1..45
-  # Starting 45 tests from 15 test cases.
-  #  RUN           vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match ...
+base-commit: 58e10b63777d0aebee2cf4e6c67e1a83e7edbe0f
+--
 
