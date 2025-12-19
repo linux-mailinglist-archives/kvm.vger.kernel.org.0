@@ -1,99 +1,63 @@
-Return-Path: <kvm+bounces-66314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E75CCF146
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 10:06:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10668CCF28E
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 10:36:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C55AA304A7E4
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 09:06:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 235F830343D8
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 09:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3932E7622;
-	Fri, 19 Dec 2025 09:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B292DF3DA;
+	Fri, 19 Dec 2025 09:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvoYspIx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="N2C0Ay8i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OUsnY3Sy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D70B2D1914
-	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 09:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41F22D7DDD;
+	Fri, 19 Dec 2025 09:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766135185; cv=none; b=Q1UL2GC9DxV3zB1yrjhd6Y4cPEEY9RVktv8Sw46V8PksmzdPo5fPsgFmfILGHAybULnfk58WEhffKAT6e3etutFySRXFwrJvjIEPNS0GvrjlEDxEK0vzXNrc1AkF+MM9zF78FMexQhiH/B4iKM8/eVX6LQr944c+RsREuKko/i4=
+	t=1766136965; cv=none; b=pBQ9TrQVY/qBSCrIbBqX6FUgs22Q28+dUQMndkbFwbcrILeao1ZVMW0wFlPzvCQyH0bPQcqYKKN8AzQ/40raT8o2EHfUHlJoA3Q8Cq+cSHrrBSFzydJTQ49C7IZ3u3sGfvP7hee4ieBtwBW1YQkVPPtUt88Y759J8w3jH6Rzays=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766135185; c=relaxed/simple;
-	bh=Ya983u4axH6kjlKeYBWtPpboTZW33y5xeVr4MOP0TRA=;
+	s=arc-20240116; t=1766136965; c=relaxed/simple;
+	bh=NhGQzCcXUfeN4EQP9spJfAUa7YS36bJnOojzeGLNmzM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Eas4Tn/QA6OyxGA7DsfuAwxpAzq9rTsIIpdUnaxtKQiabvNH5epjiizSEdRSOsFETAzz1sdTkZW6w1yoVvbnxZwr9Oue9FUjt9x0WAz9sBNOJschsyc/AJ30gKmjJDG96t1KS7GCcBW+jDmHADE7oB0jHvnsRiZue+6FIUbNFvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DvoYspIx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=N2C0Ay8i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766135181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uEJJ3ZBJInAIh15iKCZRVqfAs4YnUHwyNO2S/KWdSaM=;
-	b=DvoYspIxx7whvLsOvRUlWLraKaTJf74XQZvts/1Q6/Z1gg8Lc470FRlHXPUJWNauZgPoUE
-	v7M0xigBeW0muY5A7Fnzdy7m530lsjJdhSlQSuAy/wXf4hh3nbR3IYTyBOn9u/E3aqpOUz
-	FFVz/gpjQjXknU3QBY28MAQt4uS729U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-408-nr3AxtwtPWeN0uKppc-b3A-1; Fri, 19 Dec 2025 04:06:20 -0500
-X-MC-Unique: nr3AxtwtPWeN0uKppc-b3A-1
-X-Mimecast-MFC-AGG-ID: nr3AxtwtPWeN0uKppc-b3A_1766135179
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477964c22e0so11612345e9.0
-        for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 01:06:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766135179; x=1766739979; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uEJJ3ZBJInAIh15iKCZRVqfAs4YnUHwyNO2S/KWdSaM=;
-        b=N2C0Ay8iFl+7oTUqHvmLPjU7UBmdN/bFA7DZqCeUaZunitNVyo7pGUsH3zOkqNTuMi
-         4r9U+g6DkAX0MmKadMDyfyEVoAgRagUPZ2uU8Hke1bMqqX9Trz0/XOo8aTNr8q7ln93n
-         68BhAhoRGtbi9iWSZwo6bs+bdH6Jt++JG7IoD/T5m2lZML4Nm52NKRoAoMyHjXCSpSPk
-         H+jyYlLD5Oyhzy3Ma04xL4iJoeVRByhsuY+UhGaMrT5FOIbY+90SS1EvbNKsIxq6KJgS
-         0sKZwVb4CWnBgNM6RgiCE7Auyx+Enu1u9rLNqtayVmrpGRB90XRchqrFtQakNx4dIpXj
-         f6gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766135179; x=1766739979;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uEJJ3ZBJInAIh15iKCZRVqfAs4YnUHwyNO2S/KWdSaM=;
-        b=SS6YH/LE9tVpog46QDRwn6ydKy1gJiZENzJmh6hyH2n9gojJm+bJWzKzRT0dbDNXfJ
-         DjALkPdfM70w/gWrD5C3BNKkoZ8GIneqY6GXtGW6QNCPDsWVROIFO0ktjQE4alWhorCB
-         RaZ12DaDs8g5QwDu1DDSqPZeU6kfhOUck+KODvgvPsybWOrwZls5/RBP7ZIDFQDQpKs5
-         hnu9wxfXktn6wZPbZbnI3Cs8WQwqD2h/xRI12UfFQGCJTvggFNLBFKR+p5mN7F8eIGlM
-         bb4Sm9Gz958/s3yiGtdbblD4fhHFGGoVDvjfxXgXlygHhB1SfSBuT7X9qiRdxoJVezoF
-         Wpeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhjG8e3foAP6KDIsvVxiZLViJs7KzQbD+kQnwJ5bnfpfprLuFDL0O9EXfMjPAvEROJAlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9E/tkTzw1E2N3pxvaMEQ1UNSSzzrfGxMCjikYxGTXjbr95mmd
-	+s4zEsUIKzU8SMIdWfkZFM/jQp5vWpR3KjMfc+oX07/tIln78IYMj0NvseeU6f+Ut+ehjOAK5A8
-	q6arDa3UTwYzrCz0+Qm1GlE5ckEdWZ1HaQ3AIRSFgE1Eq2dGGpKCc/g==
-X-Gm-Gg: AY/fxX6iLKE26i0MGwF/SHlc7ijZ1eox+zHyruIpKuknZelpLziWAzm3wiNvmhlg3m9
-	HbkV1t7jK9D+wRq/a7IAplkfPTXlxPHWwQALI7KOHxtUwF/9ELQ8xc+wb/dzkT6JcicgY4/aEeq
-	euVEhgnXVkKAFX5FLFhWUMFD3laD0a8nNqMj4GfKOPern7VAxNUtaSBmHtv0U6hYPI2tVumkeCO
-	Wv3QMyNKz32I7G3Yw5oKxre+vdTzMizNS0edF28EAB+a4Q9M4gE259RCLEhBiCzVc5y4LKh63+k
-	K2yg4r3JwH3LNfMFHApfIj+z9xpEYSTPMiSaplXGnfJc71lkP+b4nvamdiVNIs5fD+AXNwn2dDR
-	WSvcqrotIpqs5
-X-Received: by 2002:a05:600c:c493:b0:45d:5c71:769d with SMTP id 5b1f17b1804b1-47d18ba7befmr19461135e9.8.1766135178935;
-        Fri, 19 Dec 2025 01:06:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7eioW6Xn+tnoEhKXG2yusHQOhJIOjn1R2GKM3dKlAw2syLOpgGZtPDJfLlzWKSUJFj636Ug==
-X-Received: by 2002:a05:600c:c493:b0:45d:5c71:769d with SMTP id 5b1f17b1804b1-47d18ba7befmr19460835e9.8.1766135178533;
-        Fri, 19 Dec 2025 01:06:18 -0800 (PST)
-Received: from [192.168.88.32] ([216.128.11.227])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3963fc3sm32985095e9.0.2025.12.19.01.06.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Dec 2025 01:06:17 -0800 (PST)
-Message-ID: <63de3a12-36bc-45bf-a3e5-89246f4ec73f@redhat.com>
-Date: Fri, 19 Dec 2025 10:06:16 +0100
+	 In-Reply-To:Content-Type; b=LqoPI3yqglunHlrsqs+7buZ14jJ9u+F1OWnUIbhkKAlzZi4ahshLBhVQkexVtcB8x/JxZSfAggaKOKJHh7AU5m9XOf4Oj9Bma3LJlDzdPKzdQw4igL9E7RbwqVv0+HUU+6+wCz/NT8Wmb4TnMAe3ikztR8kbL6ad13GjibqM4Vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OUsnY3Sy; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766136962; x=1797672962;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=NhGQzCcXUfeN4EQP9spJfAUa7YS36bJnOojzeGLNmzM=;
+  b=OUsnY3SyYGHM8ZWWqp4VERGhXIquR7k7vm7KAh8yUAGQ3k0m46FfHVKx
+   EyY7v7hNPp/GCuwnnMIFUoUXOil8JTlzH7sQGFLKz0UUnrjTqxHMkHJXt
+   9pQTmQF7ZZ/7LYikv0H8EGodQNEMhz6nO37C7CeBgGBKGf8v2VQ/KM+bM
+   ufbFI6Mb1SLJUBDVwpFZEYKx/l4xhdXyyhEa8HQc2CCCbWICURLIFRLCF
+   U6aGKswjqXjolkMrfKXUUzpiq0S/ZH7wkzmfNqS0/+weCWWE2PoizbU8E
+   hOjk/AXvij27B6F0j0TG3MXs+vLV/qnPBKkM1Ynie90D+4RO9kco+FpAz
+   A==;
+X-CSE-ConnectionGUID: TUM7/MH9TgSRshPwoGl3EA==
+X-CSE-MsgGUID: ADd8N1yXSFiNBB+2QnOQHA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11646"; a="55673459"
+X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
+   d="scan'208";a="55673459"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2025 01:36:02 -0800
+X-CSE-ConnectionGUID: 6pJldH59TXex1X6SjLXxjw==
+X-CSE-MsgGUID: TikCoaB7QJ6F5bz2U3YcBA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
+   d="scan'208";a="199296786"
+Received: from unknown (HELO [10.94.249.110]) ([10.94.249.110])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2025 01:35:59 -0800
+Message-ID: <8e199209-6af1-4be2-9f10-5ade001bc3bf@linux.intel.com>
+Date: Fri, 19 Dec 2025 10:35:56 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,35 +65,64 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next ] vdpa: fix caching attributes of MMIO regions by
- setting them explicitly
-To: mst@redhat.com
-Cc: virtualization@lists.linux.dev, eperezma@redhat.com, kvm@vger.kernel.org,
- jerinj@marvell.com, ndabilpuram@marvell.com, schalla@marvell.com,
- Kommula Shiva Shankar <kshankar@marvell.com>, netdev@vger.kernel.org,
- jasowang@redhat.com
-References: <20251216175918.544641-1-kshankar@marvell.com>
+Subject: Re: [PATCH] vfio/xe: Add default handler for .get_region_info_caps
+To: Michal Wajdeczko <michal.wajdeczko@intel.com>,
+ intel-xe@lists.freedesktop.org
+Cc: =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Kevin Tian <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>,
+ =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>,
+ dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20251218205106.4578-1-michal.wajdeczko@intel.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251216175918.544641-1-kshankar@marvell.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: "Bernatowicz, Marcin" <marcin.bernatowicz@linux.intel.com>
+In-Reply-To: <20251218205106.4578-1-michal.wajdeczko@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 12/16/25 6:59 PM, Kommula Shiva Shankar wrote:
-> Explicitly set non-cached caching attributes for MMIO regions.
-> Default write-back mode can cause CPU to cache device memory,
-> causing invalid reads and unpredictable behavior.
-> 
-> Invalid read and write issues were observed on ARM64 when mapping the
-> notification area to userspace via mmap.
-> 
-> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
 
-@Micheal: despite the net-next prefix, I assume this patch will go via
-your tree, as it looks unrelated from networking.
+On 12/18/2025 9:51 PM, Michal Wajdeczko wrote:
+> New requirement for the vfio drivers was added by the commit
+> f97859503859 ("vfio: Require drivers to implement get_region_info")
+> followed by commit 1b0ecb5baf4a ("vfio/pci: Convert all PCI drivers
+> to get_region_info_caps") that was missed by the new vfio/xe driver.
+>
+> Add handler for .get_region_info_caps to avoid -EINVAL errors.
+>
+> Fixes: 2e38c50ae492 ("vfio/xe: Add device specific vfio_pci driver variant for Intel graphics")
+> Signed-off-by: Michal Wajdeczko <michal.wajdeczko@intel.com>
+> ---
+> Cc: Thomas Hellström <thomas.hellstrom@linux.intel.com>
+> Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Alex Williamson <alex@shazbot.org>
+> Cc: Michał Winiarski <michal.winiarski@intel.com>
+> Cc: Marcin Bernatowicz <marcin.bernatowicz@linux.intel.com>
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> ---
+>   drivers/vfio/pci/xe/main.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/vfio/pci/xe/main.c b/drivers/vfio/pci/xe/main.c
+> index 0156b53c678b..719ab4660085 100644
+> --- a/drivers/vfio/pci/xe/main.c
+> +++ b/drivers/vfio/pci/xe/main.c
+> @@ -504,6 +504,7 @@ static const struct vfio_device_ops xe_vfio_pci_ops = {
+>   	.open_device = xe_vfio_pci_open_device,
+>   	.close_device = xe_vfio_pci_close_device,
+>   	.ioctl = vfio_pci_core_ioctl,
+> +	.get_region_info_caps = vfio_pci_ioctl_get_region_info,
+>   	.device_feature = vfio_pci_core_ioctl_feature,
+>   	.read = vfio_pci_core_read,
+>   	.write = vfio_pci_core_write,
+Reviewed-by: Marcin Bernatowicz <marcin.bernatowicz@linux.intel.com>
+Tested-by: Marcin Bernatowicz <marcin.bernatowicz@linux.intel.com>
 
-Cheers,
-
-Paolo
-
+I tested it on v6.19-rc1 with QEMU 8.2.2
+passing through an Intel Xe VF. The patch fixes the -EINVAL failure
+on VFIO_DEVICE_GET_REGION_INFO.
 
