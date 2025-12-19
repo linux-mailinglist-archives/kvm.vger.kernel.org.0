@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-66404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C00CD1267
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 18:30:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E283CD13E2
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 18:55:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8C9453036A75
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 17:30:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DD1430CB142
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 17:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5C82DF13E;
-	Fri, 19 Dec 2025 17:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E623557FB;
+	Fri, 19 Dec 2025 17:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DC5SP7Pa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HdXstqCN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B942D3A6A;
-	Fri, 19 Dec 2025 17:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F82A355038;
+	Fri, 19 Dec 2025 17:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766165425; cv=none; b=ttaUVk7hAhpaKipLk0BVDjRKzNN7XsJTisZITQ17C8aqrgyFYmdWcT3jtuc+9Ry1BZI48dU9wKUZQyKq5D8SOc1x/czYqJKf5idq5SlirPuNMF+Cx9beBdhVvHytIdyav7fzTHS6JgGQ2w2L+YirO5dxRDnOi7m6Eu5ujkqCrfk=
+	t=1766166313; cv=none; b=FvgxWXybSReuOC6VyhLBDJ5gK2TuN7YrpeMwGfuCh3UkokYPV/ddWJqrdUJcMyM722H2wEMNCpB1C3QbtxOCOd94SFH+xQBhaPW7nBaZH5HVz4l0dfN5Vw8eX5A+Ij0XOslvrseu1Pe8BuvGmfVGJiaTtlwQp6/qNuBz6MV3yl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766165425; c=relaxed/simple;
-	bh=NnNED/KK7J6k/Jds6419ZvgA54yRJ4moREiGcwIjHQM=;
+	s=arc-20240116; t=1766166313; c=relaxed/simple;
+	bh=z4Soyab2jeoJ7YzJg0t2np5dpClWtNWLEJAC3/9ALwI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IHftYVv4GcCcF/Ter2bWXyhs1Us41TtfTll3x9TIXEZnnEWDmCUitjWKFQz6q2R/jL7W6OeToKazJCUemU1qv+CxXIePB8ECCPPXsFrhkfbil87mnFAa7C6aHtONytwmg0TLAP6Z8kL9uLklroD+Tw7fnzLuUk+n8uGXzXsS+Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DC5SP7Pa; arc=none smtp.client-ip=198.175.65.15
+	 In-Reply-To:Content-Type; b=oEbvhy4XiZ34J+leM00ON0ADXCUr/eAfTl6vFfeWPujTJ50d6jYYb7PF/LaiOlxuGyL2Z8LfcDrSPLIA/adu9HYzojWGWC91cEXlHWBEWvMtlh8dbn71yhIF0jN88gHWFz3dZmVIkHt1LDukmW3+hqkYRVwvK+u/x/MbXhErMs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HdXstqCN; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766165425; x=1797701425;
+  t=1766166311; x=1797702311;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=NnNED/KK7J6k/Jds6419ZvgA54yRJ4moREiGcwIjHQM=;
-  b=DC5SP7Pa0dxvek6F80WMt+c/V5h0JgF6uT9Vwd5rvPeZ8nfQWPlGVQz1
-   M9872IHc1xv4hDQLcTmAdVVpgbFi5ZSqj0eKU5VWbS/LtSILeP/cuqsC8
-   Vuu8dqWRbXuImGC4Q2EhLuxUy7vrU3PH0aSGpm0wKzEQqJHWxK1PyjgtM
-   V94PyUMUqeu4JingSzQy1W++VtrEXWAwp5K5OkGGAwZtddgn2aTzg9RXz
-   syaZdic5xB1caPTzA7NoKFISwnKVhtr+Ds0Li2gipjLWIZ9JjZrFLJkr9
-   nyj2dYCd1HDfmuuHWFcGYKrIaSr48wquaTaVSuw0m6jX32IhAKBfIJIjp
-   Q==;
-X-CSE-ConnectionGUID: 6NTUEv38QrmoWFiJxRIxcw==
-X-CSE-MsgGUID: YNqb+GNgQnmRb9AlSTDOSg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11647"; a="71759877"
+  bh=z4Soyab2jeoJ7YzJg0t2np5dpClWtNWLEJAC3/9ALwI=;
+  b=HdXstqCNq1DQr985VYiUmvfVDDu8zPSkoDLsxI2hDhzcxV/3NJZxxzX6
+   nPxJo3VdF9/4A9gxYmRE5ozdhx33ATPTzbLQ97VVcNQepneV8yzoD73st
+   arUp/W/EoqPqd8VO0/d30w4VH+F73mpeAnGtddbQU3EC+fzxbyx7V0d1a
+   THalRwIUqQ34nAoIRpZNADobaOGkZDPuJ/drLHWvv0ceeK2HJYsQnWWf9
+   jpp1PPlkgxgl2FFwDWA0jRqrhiXWs9Z4BBx1J3CBkLyywORGZ86t0k9u8
+   PxIHNUu0KoF67nuY/UbNf12mydSI3iACn2UPzXXlAu7rkamQQqsd2Q4IK
+   w==;
+X-CSE-ConnectionGUID: yLpMu8YMSm+rYyPycMoedw==
+X-CSE-MsgGUID: N6w7P7vFSaq/FTUDVXD1Mg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11647"; a="78764599"
 X-IronPort-AV: E=Sophos;i="6.21,161,1763452800"; 
-   d="scan'208";a="71759877"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2025 09:30:23 -0800
-X-CSE-ConnectionGUID: fbHrmORNQQyj5SR2FBDohA==
-X-CSE-MsgGUID: MpRsZuLNTMGgDY4dfxuwOQ==
+   d="scan'208";a="78764599"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2025 09:45:11 -0800
+X-CSE-ConnectionGUID: Or1e/VJgQfSaNFH0PfJKfQ==
+X-CSE-MsgGUID: PfkgpOCCQOOjbC3je0dOgQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,161,1763452800"; 
-   d="scan'208";a="198171291"
+   d="scan'208";a="198066920"
 Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.111.100]) ([10.125.111.100])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2025 09:30:22 -0800
-Message-ID: <6a5dd3e0-672c-4be3-a1c7-26fe3db17d00@intel.com>
-Date: Fri, 19 Dec 2025 09:30:22 -0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2025 09:45:11 -0800
+Message-ID: <90837ad5-c9a6-42da-a5a8-fcd2d870dac8@intel.com>
+Date: Fri, 19 Dec 2025 09:45:09 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,17 +68,15 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 2/7] KVM: x86: Extract VMXON and EFER.SVME enablement
  to kernel
 To: Sean Christopherson <seanjc@google.com>,
- Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
- kvm@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, Kiryl Shutsemau <kas@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>
 References: <20251206011054.494190-1-seanjc@google.com>
- <20251206011054.494190-3-seanjc@google.com> <aTe4QyE3h8LHOAMb@intel.com>
- <aUJUbcyz2DXmphtU@yilunxu-OptiPlex-7050> <aUL-J-MvdCrCtDp4@google.com>
- <aUS06wE6IvFti8Le@yilunxu-OptiPlex-7050> <aUVx20ZRjOzKgKqy@google.com>
+ <20251206011054.494190-3-seanjc@google.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -124,21 +122,80 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <aUVx20ZRjOzKgKqy@google.com>
+In-Reply-To: <20251206011054.494190-3-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/19/25 07:40, Sean Christopherson wrote:
-> Is there any **need** for tdx_cpu_enable() and try_init_module_global() to run
-> with IRQs disabled?  AFAICT, the lockdep_assert_irqs_disabled() checks added by
-> commit 6162b310bc21 ("x86/virt/tdx: Add skeleton to enable TDX on demand") were
-> purely because, _when the code was written_, KVM enabled virtualization via IPI
-> function calls.
+On 12/5/25 17:10, Sean Christopherson wrote:
+> Move the innermost VMXON and EFER.SVME management logic out of KVM and
+> into to core x86 so that TDX can force VMXON without having to rely on
+> KVM being loaded, e.g. to do SEAMCALLs during initialization.
+> 
+> Implement a per-CPU refcounting scheme so that "users", e.g. KVM and the
+> future TDX code, can co-exist without pulling the rug out from under each
+> other.
+> 
+> To avoid having to choose between SVM and VMX, simply refuse to enable
+> either if both are somehow supported.  No known CPU supports both SVM and
+> VMX, and it's comically unlikely such a CPU will ever exist.
 
-Yeah, the intent was to prevent "rmmod kvm_intel" from running while TDX
-was being initialized. The way it ended up, though, I think TDX init
-would have been called in a KVM path _anyway_, which makes this double
-useless.
+Yeah, that's totally a "please share your drugs" moment, if it happens.
 
+> +static int x86_vmx_get_cpu(void)
+> +{
+> +	int r;
+> +
+> +	if (cr4_read_shadow() & X86_CR4_VMXE)
+> +		return -EBUSY;
+> +
+> +	intel_pt_handle_vmx(1);
+> +
+> +	r = x86_virt_cpu_vmxon();
+> +	if (r) {
+> +		intel_pt_handle_vmx(0);
+> +		return r;
+> +	}
+> +
+> +	return 0;
+> +}
+...> +#define x86_virt_call(fn)				\
+> +({							\
+> +	int __r;					\
+> +							\
+> +	if (IS_ENABLED(CONFIG_KVM_INTEL) &&		\
+> +	    cpu_feature_enabled(X86_FEATURE_VMX))	\
+> +		__r = x86_vmx_##fn();			\
+> +	else if (IS_ENABLED(CONFIG_KVM_AMD) &&		\
+> +		 cpu_feature_enabled(X86_FEATURE_SVM))	\
+> +		__r = x86_svm_##fn();			\
+> +	else						\
+> +		__r = -EOPNOTSUPP;			\
+> +							\
+> +	__r;						\
+> +})
 
+I'm not a super big fan of this. I know you KVM folks love your macros
+and wrapping function calls in them because you hate grep. ;)
+
+I don't like a foo_get_cpu() call having such fundamentally different
+semantics than good old get_cpu() itself. *Especially* when the calls
+look like:
+
+	r = x86_virt_call(get_cpu);
+
+and get_cpu() itself it not invovled one bit. This 100% looks like it's
+some kind of virt-specific call for get_cpu().
+
+I think it's probably OK to make this get_hw_ref() or inc_hw_ref() or
+something to get it away from getting confused with get_cpu().
+
+IMNHO, the macro magic is overkill. A couple of global function pointers
+would probably be fine because none of this code is even remotely
+performance sensitive. A couple static_call()s would be fine too because
+those at least make it blatantly obvious that the thing being called is
+variable. A good ol' ops structure would also make things obvious, but
+are probably also overkill-adjecent for this.
+
+P.S. In a perfect world, the renames would also be in their own patches,
+but I think I can live with it as-is.
 
