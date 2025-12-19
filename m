@@ -1,321 +1,460 @@
-Return-Path: <kvm+bounces-66293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66294-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F54CCE5CF
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 04:26:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61131CCE64A
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 04:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D0613038F56
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:26:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAB223045F40
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA342BF3DF;
-	Fri, 19 Dec 2025 03:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C8A23AB9D;
+	Fri, 19 Dec 2025 03:53:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="AySTbkGJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxZ1lS3Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2C4286416;
-	Fri, 19 Dec 2025 03:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6DE2472A5
+	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 03:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766114766; cv=none; b=LqsyrU3goKcaE0cTHHpAVUFn/7IX2A5o7xPmn7Zi4NcBW/zAZf8pacoXYeje/pnM1tGE1GfCxdA2RFYjvjEuKKuEI5+a2Cka/Td9npX4Ywe7TljgLiZtpMFXzeDBdCepNIcGV8nj5a+4p+yf0k0PdnPvcI2nn4hRdAbeFBmVNYs=
+	t=1766116423; cv=none; b=NyB+4ok4xxzau1GrIZRaPjw8Fje7Dnd3GCeEf2E+zbbEGrdvVi7g4hVzBMIfaZYBOUe3IRYrugzvkQJqqD5OI9//Z/H99GNrgq6tDn3fBZ3dGFKM61rlWNgShvp4in0CmrKbdwfJxOk8q/dMl86He9ABmVMVaTo2f6gGWDaNr4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766114766; c=relaxed/simple;
-	bh=kYmtpufhJKhAKeX0q5dQjGDQPr7GQvGMR+Gtv3xNNi0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DrvbO9AoBDRLPrFlZI9A41VAqgjFjhpvP0pSkq7IunLx3JmGu/LnzO4RXHVAKkpwz8xFe6C0qJy5RAVICLv2QL3hhCJj+cOJZP4HG/Pp/yjgq1aCVJ+XW+Wb+scE6TGYnol7fEemiY84ApxXbJdc3O2ciMa9tLV5MPTQwK/pnu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=AySTbkGJ; arc=none smtp.client-ip=115.28.160.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
-	t=1766114441; bh=kYmtpufhJKhAKeX0q5dQjGDQPr7GQvGMR+Gtv3xNNi0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AySTbkGJ8FAHK9KJO9inCKRb58MLnb+gpKR0jsK4hwPa0eT99YxZybm5jsKyUR54p
-	 I1AYRpJ7iSFMPYKpyQamrpm1coGevg4AVRPWL/+ZB40TCwnmcmbJD6S7Ss9c7nnm1T
-	 g281XYQ0DK2q81hRn2iBXf/tbOLa20jampTj5sIY=
-Received: from [IPV6:240e:b8f:939d:bb00::8c0] (unknown [IPv6:240e:b8f:939d:bb00::8c0])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id EE5EE600F4;
-	Fri, 19 Dec 2025 11:20:40 +0800 (CST)
-Message-ID: <af2d9f9c-1931-484f-ab67-849093c3a760@xen0n.name>
-Date: Fri, 19 Dec 2025 11:20:40 +0800
+	s=arc-20240116; t=1766116423; c=relaxed/simple;
+	bh=D3IzOb0UNSWmpnaop3MUTIQ4gRoM5sHoMHw4Or7j46Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h5Yfeq8iLtux6LSbLgoTg7bS/1lw1/5LselRU0MRfcrM9dkg+iBcyuSayn2sPZpi2TakoEP9iwvMmTDcCNZsZDto4hCRC91pxUUeaYTsLSJlo+bBidzIlp3IUrCN1o0VnvPPHXw5pj80ipZkImksoE0Q6rbDF+D6D+c5eHvNBvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxZ1lS3Y; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a0d67f1877so16347445ad.2
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 19:53:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766116421; x=1766721221; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2++1S7H4CzbnlFXTlIgiK4kOmz7Luh68vOkeu1BmWWE=;
+        b=mxZ1lS3YaiM0ABkk/M8Dmz/9kp5PHbFwPUnb2F1LCQoeaLuEjlc4SvJTwwrbawcSWD
+         8YCmqn0rW5YZvwGvlqpjn6HVJYlAjmutNQhwbyvcmkFy4Ui3gheeTFCUdiiuOo/3AEOp
+         8qKE6eDD7qoF5v7nh8p/B97rwsrLs+htc5Wtonkvg+jF+LAPK9jW/TYfseGWu61bFP9v
+         MnuadF1MWVkaiZt7Yt+dy5yagzDYgCAvzFUiwENeUgqEA55/kN0ZZtOolVKRk4k9WTd2
+         CgRnhV5QzPJWRyqAMXZ+SdVT4+ymDzqfeY7nmVfS3VLtjA9orjRI7HfkRqKtpUBl+bZ2
+         Gzwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766116421; x=1766721221;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2++1S7H4CzbnlFXTlIgiK4kOmz7Luh68vOkeu1BmWWE=;
+        b=HGlfO+EfR2nMbCG3rEpr4KcjRLN1Va/phVp6oPjS9GkBI1/gJ0hDNKu0QXbtQht02N
+         DpeojQCKPReWYKITMe83CJLxWQ40DiQNzCbO20VC491PTMg/NJdgRY8b91q1dDUFQD9W
+         VAbg5U/egyyFklKykSwB6iKpJV1RBaiELF/au50o4OkyEnDioZCOswjUWpvbAWlWV/a2
+         zW1Ij4jvfGJTWRB4kepA2V9l2ZHk6cWydVXbb1oFCmnYnqG9p62R9dd1nDu6kiRAxuEf
+         5ilelWoSKfduQtDqC7TWIRoNs6HSNSLuKD4QH/6lNug1LVVjk86l2T948pURRkeBoVTu
+         dbAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1gvACy5bzCxl3x1mFqknAq2spNfAlxuZNKSgyimYdMMaJXLKJAMqpz4Jsksfv0/ey2yg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP7yu5t8lSmr02EseGAf6O4JpKigT0P30LgrzpJH8v0wT19fle
+	8x8zH38Z5+GRqqG9L6+5KegdiSZg+sd8xz149PInVs8l63bhgxH20J0M8ocN78DkSKzbmA==
+X-Gm-Gg: AY/fxX6bZami5p8ozSclKquFMyaCuPb2Tb8bIy4XZIGDSo+jKmFNJju5FIcNLjeISYt
+	ckbXIRLEYlXtBiFmoTOqUtOrePQ5QXQ0FF6iUyLyByz86suRKy9mUfDoQRoH1hNVu0GwnSVoIgl
+	sKjLSiUifAtQxK9Ie0zwPYg/8AucDx4f2TTk5AtgdKNBdZNjQut8AAk5UAWzaO+LgSc6cpg44cw
+	tYzT5qsRVsikwL75FvaU29X44jofZVPCkvfLcmyKp6f6JLtjtJOmAHuK7nraKfpGjJXPkhUMUfg
+	KScgDswf4VN+v1DEUGfvX9KBm8ah+NWetM4nTqS4A61Q7+6TyzWwiY5O6JwzQ9zVrH7sxkCL7bV
+	YjCBask6h702WV3N1F2b5xghNXkMyTmaxRhGmPo5mzE5CWP7XtYt4lEZXRKBOttBOyQKLEO+piC
+	tnEgTY35hGTw==
+X-Google-Smtp-Source: AGHT+IH/8Bxvaswhe2sGE9Rce12cO081a3yqdi+RD9pEFIFTvaiaVfXAYUyZi6gQP6qkI0Okr3QYGA==
+X-Received: by 2002:a17:902:c405:b0:2a1:2ed4:ca1e with SMTP id d9443c01a7336-2a2f272b36dmr13187675ad.34.1766116420665;
+        Thu, 18 Dec 2025 19:53:40 -0800 (PST)
+Received: from wanpengli.. ([175.170.92.22])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a2f3d4d36esm7368135ad.63.2025.12.18.19.53.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 19:53:40 -0800 (PST)
+From: Wanpeng Li <kernellwp@gmail.com>
+To: Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: K Prateek Nayak <kprateek.nayak@amd.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Wanpeng Li <wanpengli@tencent.com>
+Subject: [PATCH v2 0/9] sched/kvm: Semantics-aware vCPU scheduling for oversubscribed KVM
+Date: Fri, 19 Dec 2025 11:53:24 +0800
+Message-ID: <20251219035334.39790-1-kernellwp@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/3] LongArch: KVM: Add DMSINTC device support
-To: Song Gao <gaosong@loongson.cn>, maobibo@loongson.cn, chenhuacai@kernel.org
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20251218111822.975455-1-gaosong@loongson.cn>
- <20251218111822.975455-2-gaosong@loongson.cn>
-Content-Language: en-US
-From: WANG Xuerui <kernel@xen0n.name>
-In-Reply-To: <20251218111822.975455-2-gaosong@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/18/25 19:18, Song Gao wrote:
-> Add device model for DMSINTC interrupt controller, implement basic
-> create/destroy/set_attr interfaces, and register device model to kvm
-> device table.
-> 
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Song Gao <gaosong@loongson.cn>
-> ---
->   arch/loongarch/include/asm/kvm_dmsintc.h |  21 +++++
->   arch/loongarch/include/asm/kvm_host.h    |   3 +
->   arch/loongarch/include/uapi/asm/kvm.h    |   4 +
->   arch/loongarch/kvm/Makefile              |   1 +
->   arch/loongarch/kvm/intc/dmsintc.c        | 110 +++++++++++++++++++++++
->   arch/loongarch/kvm/main.c                |   5 ++
->   include/uapi/linux/kvm.h                 |   2 +
->   7 files changed, 146 insertions(+)
->   create mode 100644 arch/loongarch/include/asm/kvm_dmsintc.h
->   create mode 100644 arch/loongarch/kvm/intc/dmsintc.c
-> 
-> diff --git a/arch/loongarch/include/asm/kvm_dmsintc.h b/arch/loongarch/include/asm/kvm_dmsintc.h
-> new file mode 100644
-> index 000000000000..1d4f66996f3c
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_dmsintc.h
-> @@ -0,0 +1,21 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_KVM_DMSINTC_H
-> +#define __ASM_KVM_DMSINTC_H
-> +
-> +
-> +struct loongarch_dmsintc  {
-> +	struct kvm *kvm;
-> +	uint64_t msg_addr_base;
-> +	uint64_t msg_addr_size;
-> +};
-> +
-> +struct dmsintc_state {
-> +	atomic64_t  vector_map[4];
-> +};
-> +
-> +int kvm_loongarch_register_dmsintc_device(void);
-> +#endif
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-> index e4fe5b8e8149..5e9e2af7312f 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -22,6 +22,7 @@
->   #include <asm/kvm_ipi.h>
->   #include <asm/kvm_eiointc.h>
->   #include <asm/kvm_pch_pic.h>
-> +#include <asm/kvm_dmsintc.h>
->   #include <asm/loongarch.h>
->   
->   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -134,6 +135,7 @@ struct kvm_arch {
->   	struct loongarch_ipi *ipi;
->   	struct loongarch_eiointc *eiointc;
->   	struct loongarch_pch_pic *pch_pic;
-> +	struct loongarch_dmsintc *dmsintc;
->   };
->   
->   #define CSR_MAX_NUMS		0x800
-> @@ -244,6 +246,7 @@ struct kvm_vcpu_arch {
->   	struct kvm_mp_state mp_state;
->   	/* ipi state */
->   	struct ipi_state ipi_state;
-> +	struct dmsintc_state dmsintc_state;
->   	/* cpucfg */
->   	u32 cpucfg[KVM_MAX_CPUCFG_REGS];
->   
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
-> index de6c3f18e40a..0a370d018b08 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
->   #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL	        0x40000006
->   #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT	        0
->   
-> +#define KVM_DEV_LOONGARCH_DMSINTC_CTRL			0x40000007
-> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE		0x0
-> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE		0x1
-> +
->   #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-> index cb41d9265662..6e184e24443c 100644
-> --- a/arch/loongarch/kvm/Makefile
-> +++ b/arch/loongarch/kvm/Makefile
-> @@ -19,6 +19,7 @@ kvm-y += vm.o
->   kvm-y += intc/ipi.o
->   kvm-y += intc/eiointc.o
->   kvm-y += intc/pch_pic.o
-> +kvm-y += intc/dmsintc.o
->   kvm-y += irqfd.o
->   
->   CFLAGS_exit.o	+= $(call cc-disable-warning, override-init)
-> diff --git a/arch/loongarch/kvm/intc/dmsintc.c b/arch/loongarch/kvm/intc/dmsintc.c
-> new file mode 100644
-> index 000000000000..3fdea81a08c8
-> --- /dev/null
-> +++ b/arch/loongarch/kvm/intc/dmsintc.c
-> @@ -0,0 +1,110 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/kvm_dmsintc.h>
-> +#include <asm/kvm_vcpu.h>
-> +
-> +static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
-> +				struct kvm_device_attr *attr,
-> +				bool is_write)
-> +{
-> +	int addr = attr->attr;
-> +	void __user *data;
-> +	struct loongarch_dmsintc *s = dev->kvm->arch.dmsintc;
-> +	u64 tmp;
-> +
-> +	data = (void __user *)attr->addr;
-> +	switch (addr) {
-> +	case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE:
-> +		if (is_write) {
-> +			if (copy_from_user(&tmp, data, sizeof(s->msg_addr_base)))
-> +				return -EFAULT;
-> +			if (s->msg_addr_base) {
-> +				/* Duplicate setting are not allowed. */
-> +				return -EFAULT;
-> +			}
-> +			if ((tmp & (BIT(AVEC_CPU_SHIFT) - 1)) == 0)
-> +				s->msg_addr_base = tmp;
-> +			else
-> +				return  -EFAULT;
-> +		}
-> +		break;
-> +	case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE:
-> +		if (is_write) {
-> +			if (copy_from_user(&tmp, data, sizeof(s->msg_addr_size)))
-> +				return -EFAULT;
-> +			if (s->msg_addr_size) {
-> +				/*Duplicate setting are not allowed. */
-> +				return -EFAULT;
-> +			}
-> +			s->msg_addr_size = tmp;
-> +		}
-> +		break;
-> +	default:
-> +		kvm_err("%s: unknown dmsintc register, addr = %d\n", __func__, addr);
-> +		return -ENXIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_dmsintc_set_attr(struct kvm_device *dev,
-> +			struct kvm_device_attr *attr)
-> +{
-> +	switch (attr->group) {
-> +	case KVM_DEV_LOONGARCH_DMSINTC_CTRL:
-> +		return kvm_dmsintc_ctrl_access(dev, attr, true);
-> +	default:
-> +		kvm_err("%s: unknown group (%d)\n", __func__, attr->group);
-> +		return -EINVAL;
-> +	}
-> +}
-> +
-> +static int kvm_dmsintc_create(struct kvm_device *dev, u32 type)
-> +{
-> +	struct kvm *kvm;
-> +	struct loongarch_dmsintc *s;
-> +
-> +	if (!dev) {
-> +		kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	kvm = dev->kvm;
-> +	if (kvm->arch.dmsintc) {
-> +		kvm_err("%s: LoongArch DMSINTC has already been created!\n", __func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	s = kzalloc(sizeof(struct loongarch_dmsintc), GFP_KERNEL);
-> +	if (!s)
-> +		return -ENOMEM;
-> +
-> +	s->kvm = kvm;
-> +	kvm->arch.dmsintc = s;
-> +	return 0;
-> +}
-> +
-> +static void kvm_dmsintc_destroy(struct kvm_device *dev)
-> +{
-> +
-> +	if (!dev || !dev->kvm || !dev->kvm->arch.dmsintc)
-> +		return;
-> +
-> +	kfree(dev->kvm->arch.dmsintc);
-> +}
-> +
-> +static struct kvm_device_ops kvm_dmsintc_dev_ops = {
-> +	.name = "kvm-loongarch-dmsintc",
-> +	.create = kvm_dmsintc_create,
-> +	.destroy = kvm_dmsintc_destroy,
-> +	.set_attr = kvm_dmsintc_set_attr,
-> +};
-> +
-> +int kvm_loongarch_register_dmsintc_device(void)
-> +{
-> +	return kvm_register_device_ops(&kvm_dmsintc_dev_ops, KVM_DEV_TYPE_LOONGARCH_DMSINTC);
-> +}
-> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-> index 80ea63d465b8..2e26d4fd9000 100644
-> --- a/arch/loongarch/kvm/main.c
-> +++ b/arch/loongarch/kvm/main.c
-> @@ -408,6 +408,11 @@ static int kvm_loongarch_env_init(void)
->   
->   	/* Register LoongArch PCH-PIC interrupt controller interface. */
->   	ret = kvm_loongarch_register_pch_pic_device();
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Register LoongArch DMSINTC interrupt contrroller interface */
-> +	ret = kvm_loongarch_register_dmsintc_device();
->   
->   	return ret;
->   }
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dddb781b0507..7c56e7e36265 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1209,6 +1209,8 @@ enum kvm_device_type {
->   #define KVM_DEV_TYPE_LOONGARCH_EIOINTC	KVM_DEV_TYPE_LOONGARCH_EIOINTC
->   	KVM_DEV_TYPE_LOONGARCH_PCHPIC,
->   #define KVM_DEV_TYPE_LOONGARCH_PCHPIC	KVM_DEV_TYPE_LOONGARCH_PCHPIC
-> +	KVM_DEV_TYPE_LOONGARCH_DMSINTC,
-> +#define KVM_DEV_TYPE_LOONGARCH_DMSINTC   KVM_DEV_TYPE_LOONGARCH_DMSINTC
->   
->   	KVM_DEV_TYPE_MAX,
->   
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Not a single line explaining what "DMSINTC" is? I checked v1, v2, and 
-v3, no documentation regarding DINTC or DMSINTC at all. We can see (and 
-Huacai explained in v3 review comment) "MSINTC" means "message-signaled 
-interrupt controller", but what does "D" mean? You may want to update 
-Documentation/arch/loongarch/irq-chip-model.rst for that.
+This series addresses long-standing yield_to() inefficiencies in
+virtualized environments through two complementary mechanisms: a vCPU
+debooster in the scheduler and IPI-aware directed yield in KVM.
+
+Problem Statement
+-----------------
+
+In overcommitted virtualization scenarios, vCPUs frequently spin on locks
+held by other vCPUs that are not currently running. The kernel's
+paravirtual spinlock support detects these situations and calls yield_to()
+to boost the lock holder, allowing it to run and release the lock.
+
+However, the current implementation has two critical limitations:
+
+1. Scheduler-side limitation:
+
+   yield_to_task_fair() relies solely on set_next_buddy() to provide
+   preference to the target vCPU. This buddy mechanism only offers
+   immediate, transient preference. Once the buddy hint expires (typically
+   after one scheduling decision), the yielding vCPU may preempt the target
+   again, especially in nested cgroup hierarchies where vruntime domains
+   differ.
+
+   This creates a ping-pong effect: the lock holder runs briefly, gets
+   preempted before completing critical sections, and the yielding vCPU
+   spins again, triggering another futile yield_to() cycle. The overhead
+   accumulates rapidly in workloads with high lock contention.
+
+2. KVM-side limitation:
+
+   kvm_vcpu_on_spin() attempts to identify which vCPU to yield to through
+   directed yield candidate selection. However, it lacks awareness of IPI
+   communication patterns. When a vCPU sends an IPI and spins waiting for
+   a response (common in inter-processor synchronization), the current
+   heuristics often fail to identify the IPI receiver as the yield target.
+
+   Instead, the code may boost an unrelated vCPU based on coarse-grained
+   preemption state, missing opportunities to accelerate actual IPI
+   response handling. This is particularly problematic when the IPI
+   receiver is runnable but not scheduled, as lock-holder-detection logic
+   doesn't capture the IPI dependency relationship.
+
+Combined, these issues cause excessive lock hold times, cache thrashing,
+and degraded throughput in overcommitted environments, particularly
+affecting workloads with fine-grained synchronization patterns.
+
+Solution Overview
+-----------------
+
+The series introduces two orthogonal improvements that work synergistically:
+
+Part 1: Scheduler vCPU Debooster (patches 1-5)
+
+Augment yield_to_task_fair() with bounded vruntime penalties to provide
+sustained preference beyond the buddy mechanism. When a vCPU yields to a
+target, apply a carefully tuned vruntime penalty to the yielding vCPU,
+ensuring the target maintains scheduling advantage for longer periods.
+
+The mechanism is EEVDF-aware and cgroup-hierarchy-aware:
+
+- Locate the lowest common ancestor (LCA) in the cgroup hierarchy where
+  both the yielding and target tasks coexist. This ensures vruntime
+  adjustments occur at the correct hierarchy level, maintaining fairness
+  across cgroup boundaries.
+
+- Update EEVDF scheduler fields (vruntime, deadline) atomically to keep
+  the scheduler state consistent. Note that vlag is intentionally not
+  modified as it will be recalculated on dequeue/enqueue cycles. The
+  penalty shifts the yielding task's virtual deadline forward, allowing
+  the target to run.
+
+- Apply queue-size-adaptive penalties that scale from 6.0x scheduling
+  granularity for 2-task scenarios (strong preference) down to 1.0x for
+  large queues (>12 tasks), balancing preference against starvation risks.
+
+- Implement reverse-pair debouncing: when task A yields to B, then B yields
+  to A within a short window (~600us), downscale the penalty to prevent
+  ping-pong oscillation.
+
+- Rate-limit penalty application to 6ms intervals to prevent pathological
+  overhead when yields occur at very high frequency.
+
+The debooster works *with* the buddy mechanism rather than replacing it:
+set_next_buddy() provides immediate preference for the next scheduling
+decision, while the vruntime penalty sustains that preference over
+subsequent decisions. This dual approach proves especially effective in
+nested cgroup scenarios where buddy hints alone are insufficient.
+
+Part 2: KVM IPI-Aware Directed Yield (patches 6-9)
+
+Enhance kvm_vcpu_on_spin() with lightweight IPI tracking to improve
+directed yield candidate selection. Track sender/receiver relationships
+when IPIs are delivered and use this information to prioritize yield
+targets.
+
+The tracking mechanism:
+
+- Hooks into kvm_irq_delivery_to_apic() to detect unicast fixed IPIs (the
+  common case for inter-processor synchronization). When exactly one
+  destination vCPU receives an IPI, record the sender->receiver relationship
+  with a monotonic timestamp.
+
+  In high VM density scenarios, software-based IPI tracking through
+  interrupt delivery interception becomes particularly valuable. It
+  captures precise sender/receiver relationships that can be leveraged
+  for intelligent scheduling decisions, providing performance benefits
+  that complement or even exceed hardware-accelerated interrupt delivery
+  in overcommitted environments.
+
+- Uses lockless READ_ONCE/WRITE_ONCE accessors for minimal overhead. The
+  per-vCPU ipi_context structure is carefully designed to avoid cache line
+  bouncing.
+
+- Implements a short recency window (50ms default) to avoid stale IPI
+  information inflating boost priority on throughput-sensitive workloads.
+  Old IPI relationships are naturally aged out.
+
+- Clears IPI context on EOI with two-stage precision: unconditionally clear
+  the receiver's context (it processed the interrupt), but only clear the
+  sender's pending flag if the receiver matches and the IPI is recent. This
+  prevents unrelated EOIs from prematurely clearing valid IPI state.
+
+The candidate selection follows a priority hierarchy:
+
+  Priority 1: Confirmed IPI receiver
+    If the spinning vCPU recently sent an IPI to another vCPU and that IPI
+    is still pending (within the recency window), unconditionally boost the
+    receiver. This directly addresses the "spinning on IPI response" case.
+
+  Priority 2: Fast pending interrupt
+    Leverage arch-specific kvm_arch_dy_has_pending_interrupt() for
+    compatibility with existing optimizations.
+
+  Priority 3: Preempted in kernel mode
+    Fall back to traditional preemption-based logic when yield_to_kernel_mode
+    is requested, ensuring compatibility with existing workloads.
+
+A two-round fallback mechanism provides a safety net: if the first round
+with strict IPI-aware selection finds no eligible candidate (e.g., due to
+missed IPI context or transient runnable set changes), a second round
+applies relaxed selection gated only by preemption state. This is
+controlled by the enable_relaxed_boost module parameter (default on).
+
+Implementation Details
+----------------------
+
+Both mechanisms are designed for minimal overhead and runtime control:
+
+- All locking occurs under existing rq->lock or per-vCPU locks; no new
+  lock contention is introduced.
+
+- Penalty calculations use integer arithmetic with overflow protection.
+
+- IPI tracking uses monotonic timestamps (ktime_get_mono_fast_ns()) for
+  efficient, race-free recency checks.
+
+Advantages over paravirtualization approaches:
+
+- No guest OS modification required: This solution operates entirely within
+  the host kernel, providing transparent optimization without guest kernel
+  changes or recompilation.
+
+- Guest OS agnostic: Works uniformly across Linux, Windows, and other guest
+  operating systems, unlike PV TLB shootdown which requires guest-side
+  paravirtual driver support.
+
+- Broader applicability: Captures IPI patterns from all synchronization
+  primitives (spinlocks, RCU, smp_call_function, etc.), not limited to
+  specific paravirtualized operations like TLB shootdown.
+
+- Deployment simplicity: Existing VM images benefit immediately without
+  guest kernel updates, critical for production environments with diverse
+  guest OS versions and configurations.
+
+- Runtime controls allow disabling features if needed:
+  * /sys/kernel/debug/sched/vcpu_debooster_enabled
+  * /sys/module/kvm/parameters/ipi_tracking_enabled
+  * /sys/module/kvm/parameters/enable_relaxed_boost
+
+- The infrastructure is incrementally introduced: early patches add inert
+  scaffolding that can be verified for zero performance impact before
+  activation.
+
+Performance Results
+-------------------
+
+Test environment: Intel Xeon, 16 physical cores, 16 vCPUs per VM
+
+Dbench 16 clients per VM (filesystem metadata operations):
+  2 VMs: +14.4% throughput (lock contention reduction)
+  3 VMs:  +9.8% throughput
+  4 VMs:  +6.7% throughput
+
+PARSEC Dedup benchmark, simlarge input (memory-intensive):
+  2 VMs: +47.1% throughput (IPI-heavy synchronization)
+  3 VMs: +28.1% throughput
+  4 VMs:  +1.7% throughput
+
+PARSEC VIPS benchmark, simlarge input (compute-intensive):
+  2 VMs: +26.2% throughput (balanced sync and compute)
+  3 VMs: +12.7% throughput
+  4 VMs:  +6.0% throughput
+
+Analysis:
+
+- Gains are most pronounced at moderate overcommit (2-3 VMs). At this level,
+  contention is significant enough to benefit from better yield behavior,
+  but context switch overhead remains manageable.
+
+- Dedup shows the strongest improvement (+47.1% at 2 VMs) due to its
+  IPI-heavy synchronization patterns. The IPI-aware directed yield
+  precisely targets the bottleneck.
+
+- At 4 VMs (heavier overcommit), gains diminish as general CPU contention
+  dominates. However, performance never regresses, indicating the mechanisms
+  gracefully degrade.
+
+- In certain high-density, resource overcommitted deployment scenarios, the
+  performance benefits of APICv can be constrained by scheduling and
+  contention patterns. In such cases, software-based IPI tracking serves as
+  a complementary optimization path, offering targeted scheduling hints
+  without relying on disabling APICv. The practical choice should be
+  evaluated and balanced against workload characteristics and platform
+  configuration.
+
+- Dbench benefits primarily from the scheduler-side debooster, as its lock
+  patterns involve less IPI spinning and more direct lock holder boosting.
+
+The performance gains stem from three factors:
+
+1. Lock holders receive sustained CPU time to complete critical sections,
+   reducing overall lock hold duration and cascading contention.
+
+2. IPI receivers are promptly scheduled when senders spin, minimizing IPI
+   response latency and reducing wasted spin cycles.
+
+3. Better cache utilization results from reduced context switching between
+   lock waiters and holders.
+
+Patch Organization
+------------------
+
+The series is organized for incremental review and bisectability:
+
+Patches 1-5: Scheduler vCPU debooster
+
+  Patch 1: Add infrastructure (per-rq tracking, sysctl, debugfs entry)
+           Infrastructure is inert; no functional change.
+
+  Patch 2: Add rate-limiting and validation helpers
+           Static functions with comprehensive safety checks.
+
+  Patch 3: Add cgroup LCA finder for hierarchical yield
+           Implements CONFIG_FAIR_GROUP_SCHED-aware LCA location.
+
+  Patch 4: Add penalty calculation and application logic
+           Core algorithms with queue-size adaptation and debouncing.
+
+  Patch 5: Wire up yield deboost in yield_to_task_fair()
+           Activation patch. Includes Dbench performance data.
+
+Patches 6-9: KVM IPI-aware directed yield
+
+  Patch 6: Add IPI tracking infrastructure
+           Per-vCPU context, module parameters, helper functions.
+           Infrastructure is inert until activated.
+
+  Patch 7: Integrate IPI tracking with LAPIC interrupt delivery
+           Hook into kvm_irq_delivery_to_apic() and EOI handling.
+
+  Patch 8: Implement IPI-aware directed yield candidate selection
+           Replace candidate selection logic with priority-based approach.
+           Includes PARSEC performance data.
+
+  Patch 9: Add relaxed boost as safety net
+           Two-round fallback mechanism for robustness.
+
+Each patch compiles and boots independently. Performance data is presented
+where the relevant mechanism becomes active (patches 5 and 8).
+
+Testing
+-------
+
+Workloads tested:
+
+- Dbench (filesystem metadata stress)
+- PARSEC benchmarks (Dedup, VIPS, Ferret, Blackscholes)
+- Kernel compilation (make -j16 in each VM)
+
+No regressions observed on any configuration. The mechanisms show neutral
+to positive impact across diverse workloads.
+
+Future Work
+-----------
+
+Potential extensions beyond this series:
+
+- Adaptive recency window: dynamically adjust ipi_window_ns based on
+  observed workload patterns.
+
+- Extended tracking: consider multi-round IPI patterns (A->B->C->A).
+
+- Cross-NUMA awareness: penalty scaling based on NUMA distances.
+
+These are intentionally deferred to keep this series focused and reviewable.
+
+v1 -> v2:
+- Rebase onto v6.19-rc1 (v1 was based on v6.18-rc4)
+- Drop "KVM: Fix last_boosted_vcpu index assignment bug" patch as v6.19-rc1
+  already contains this fix
+- Scheduler debooster changes:
+  * Adapt to v6.19's EEVDF forfeit behavior: yield_to_deboost() must be
+    called BEFORE yield_task_fair() to preserve fairness gap calculation.
+    In v6.19+, yield_task_fair() performs forfeit (se->vruntime =
+    se->deadline), which would inflate the yielding entity's vruntime
+    before penalty calculation, causing need=0 and only baseline penalty
+    being applied.
+  * Change from rq->curr to rq->donor for correct EEVDF donor tracking
+  * Change from nr_queued to h_nr_queued for accurate hierarchical task
+    counting in penalty cap calculation
+  * Remove vlag assignment as it will be recalculated on dequeue/enqueue
+    and modifying it for on-rq entity is incorrect
+  * Remove update_min_vruntime() call: in EEVDF the yielding entity is
+    always cfs_rq->curr (dequeued from RB-tree), so modifying its vruntime
+    does not affect min_vruntime calculation
+  * Remove unnecessary gran_floor safeguard (calc_delta_fair already
+    handles edge cases correctly)
+  * Rename debugfs entry from sched_vcpu_debooster_enabled to
+    vcpu_debooster_enabled for consistency
+- KVM IPI tracking changes:
+  * Improve documentation for module parameters
+  * Add kvm_vcpu_is_ipi_receiver() declaration to x86.h header
+
+Wanpeng Li (9):
+  sched: Add vCPU debooster infrastructure
+  sched/fair: Add rate-limiting and validation helpers
+  sched/fair: Add cgroup LCA finder for hierarchical yield
+  sched/fair: Add penalty calculation and application logic
+  sched/fair: Wire up yield deboost in yield_to_task_fair()
+  KVM: x86: Add IPI tracking infrastructure
+  KVM: x86/lapic: Integrate IPI tracking with interrupt delivery
+  KVM: Implement IPI-aware directed yield candidate selection
+  KVM: Relaxed boost as safety net
+
+ arch/x86/include/asm/kvm_host.h |  12 ++
+ arch/x86/kvm/lapic.c            | 166 ++++++++++++++++-
+ arch/x86/kvm/x86.c              |   3 +
+ arch/x86/kvm/x86.h              |   8 +
+ include/linux/kvm_host.h        |   3 +
+ kernel/sched/core.c             |   9 +-
+ kernel/sched/debug.c            |   2 +
+ kernel/sched/fair.c             | 305 ++++++++++++++++++++++++++++++++
+ kernel/sched/sched.h            |  12 ++
+ virt/kvm/kvm_main.c             |  74 +++++++-
+ 10 files changed, 579 insertions(+), 15 deletions(-)
 
 -- 
-Regards,
-WANG "xen0n" Xuerui
+2.43.0
 
-Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
 
