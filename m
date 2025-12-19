@@ -1,84 +1,95 @@
-Return-Path: <kvm+bounces-66317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F14BCCF8D8
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:19:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CDA2CCF8D3
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:18:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9D493016ECD
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 11:19:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EAB6F30181C3
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 11:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E1B30EF95;
-	Fri, 19 Dec 2025 11:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8A330F53F;
+	Fri, 19 Dec 2025 11:18:40 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from movementarian.org (ssh.movementarian.org [139.162.205.133])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AE62F6199
-	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 11:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.162.205.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9812FF161;
+	Fri, 19 Dec 2025 11:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766143143; cv=none; b=fkNm2Y5gFsfWDBTMz/erS74BoFRUlOLYbmEBPFGzjgsO5M1UEzAIOlOOZ4HCXRBkXY074YXS0wRPIMYTWQSpil/u9BUbccZxUYVUMRLht4sL/I+eZZ1sTav6lJLf0kOh/53kgUQr68qOvD/hhiQbbqWvt2/QIpRiYw8e8xpXts0=
+	t=1766143119; cv=none; b=WGl23CN3ZX810LisSfZIZ8lfkjMmKGRyS1Wc8Q9N2C8PqT0pUfr1lFGJdhoW3fEvC7afeVyhLKJyV7+ug8nBlXcDt/j/0tWjz64jO5AI40hsMLeulWB5m+vuYv/iVqTfaEjOVRCWCgA9kdsltdwWp8Z0Dc/nDmoK41P9TJFoStw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766143143; c=relaxed/simple;
-	bh=H4A2zXrMlc8wNWYnhwCQMBkOYa5zrg7uPyoA3MGcdic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cebjDGMhgQrmAUspAfa17fn5/OtKAvGc8i0Xcu/sNxoK3dI/6kus129uIoaYbaOGefmeLVf7WT9xlIazRmOeUUGTaztHwa4NhQtsn6lutuR6BDjZ72V7CPDUsC8uo03vWmeYQ78DChZ4uS5GDuz+oGAgAkxkgMc/zwQJ9O0q5ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=movementarian.org; spf=pass smtp.mailfrom=movementarian.org; arc=none smtp.client-ip=139.162.205.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=movementarian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=movementarian.org
-Received: from movement by movementarian.org with local (Exim 4.97)
-	(envelope-from <movement@movementarian.org>)
-	id 1vWXqr-00000003NGR-3ibE;
-	Fri, 19 Dec 2025 10:36:49 +0000
-Date: Fri, 19 Dec 2025 10:36:49 +0000
-From: John Levon <levon@movementarian.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Thanos Makatos <thanos.makatos@nutanix.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	"jag.raman@oracle.com" <jag.raman@oracle.com>,
-	"eafanasova@gmail.com" <eafanasova@gmail.com>,
-	"elena.ufimtseva@oracle.com" <elena.ufimtseva@oracle.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH] KVM: optionally commit write on ioeventfd write
-Message-ID: <aUUqwf4GXHHXYJ9w@movementarian.org>
-References: <20221005211551.152216-1-thanos.makatos@nutanix.com>
- <aLrvLfkiz6TwR4ML@google.com>
- <DS0PR02MB93218C62840E0E9FA240FAF68BD8A@DS0PR02MB9321.namprd02.prod.outlook.com>
- <aS9uBw_w7NM_Vnw1@google.com>
- <DS0PR02MB9321EA7B6AB2B559CA1CDFDD8BD9A@DS0PR02MB9321.namprd02.prod.outlook.com>
- <aUSobNVZ9VEaLN79@google.com>
+	s=arc-20240116; t=1766143119; c=relaxed/simple;
+	bh=NHolfz4XzXR6zIHhuwax5OUL7/pF4kuUuASqumpMD1M=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S4xtKa13XqJGNdsDofmFQqaoIAhVD+9snfj6X7Tajpku6rsl+1cVym6J8Ez52nSmFCYz4krxp17//Qy0AIh8OEt6ZZvOIR8wyfbXT9ceKILq0uvGnkalrM47F9znQw/qLTjpKhGYHgc0zIuZrxRrtNikB3PKhayX0EfX5oX0lk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dXlQ235hZzJ46DS;
+	Fri, 19 Dec 2025 19:18:02 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id E9D1640569;
+	Fri, 19 Dec 2025 19:18:34 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 19 Dec
+ 2025 11:18:34 +0000
+Date: Fri, 19 Dec 2025 11:18:32 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+CC: <linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>,
+	<chao.gao@intel.com>, <dave.jiang@intel.com>, <baolu.lu@linux.intel.com>,
+	<yilun.xu@intel.com>, <zhenzhong.duan@intel.com>, <kvm@vger.kernel.org>,
+	<rick.p.edgecombe@intel.com>, <dave.hansen@linux.intel.com>,
+	<dan.j.williams@intel.com>, <kas@kernel.org>, <x86@kernel.org>
+Subject: Re: [PATCH v1 03/26] coco/tdx-host: Support Link TSM for TDX host
+Message-ID: <20251219111832.00004a6b@huawei.com>
+In-Reply-To: <20251117022311.2443900-4-yilun.xu@linux.intel.com>
+References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
+	<20251117022311.2443900-4-yilun.xu@linux.intel.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aUSobNVZ9VEaLN79@google.com>
-X-Url: http://www.movementarian.org/
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Thu, Dec 18, 2025 at 05:20:44PM -0800, Sean Christopherson wrote:
+On Mon, 17 Nov 2025 10:22:47 +0800
+Xu Yilun <yilun.xu@linux.intel.com> wrote:
 
-> > Are you thinking for reusing/adapting the mechanism in this patch for that?
+> Register a Link TSM instance to support host side TSM operations for
+> TDISP, when the TDX Connect support bit is set by TDX Module in
+> tdx_feature0.
 > 
-> While I really like the mechanics of the idea, after sketching out the basic
-> gist (see below), I'm not convinced the additional complexity is worth the gains.
-> Unless reading from NVMe submission queues is a common operation
+> This is the main purpose of an independent tdx-host module out of TDX
+> core. Recall that a TEE Security Manager (TSM) is a platform agent that
+> speaks the TEE Device Interface Security Protocol (TDISP) to PCIe
+> devices and manages private memory resources for the platform. An
+> independent tdx-host module allows for device-security enumeration and
+> initialization flows to be deferred from other TDX Module initialization
+> requirements. Crucially, when / if TDX Module init moves earlier in x86
+> initialization flow this driver is still guaranteed to run after IOMMU
+> and PCI init (i.e. subsys_initcall() vs device_initcall()).
+> 
+> The ability to unload the module, or unbind the driver is also useful
+> for debug and coarse grained transitioning between PCI TSM operation and
+> PCI CMA operation (native kernel PCI device authentication).
+> 
+> For now this is the basic boilerplate with operation flows to be added
+> later.
+> 
+> Signed-off-by: Xu Yilun <yilun.xu@linux.intel.com>
+> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+All very standard looking which is just what we want to see!
 
-NVMe over PCIe, 3.1.2.1:
-
-"...The host should not read the doorbell registers. If a doorbell register is
-read, the value returned is vendor specific."
-
-So, no, not common for NVMe at least.
-
-regards
-john
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
