@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-66330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89165CCFB0D
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 13:02:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 895DACCFB4F
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 13:08:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 091123035807
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:01:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2447730DCF6E
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C8F2459ED;
-	Fri, 19 Dec 2025 11:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50532E175F;
+	Fri, 19 Dec 2025 11:53:15 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D8221ABDC;
-	Fri, 19 Dec 2025 11:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5EC9460;
+	Fri, 19 Dec 2025 11:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766145135; cv=none; b=Nl9UC/CQgNuhfklGgHuslAZmgkIHmngPmRMVGy9PM12k624hw0k4UE+S4e8Nd0gNke6dy53I/r3sgPJdzxCzgMID73GlfIMZWLEU77jdYBGvhLxCQb+mb3GkOyL+LpQidYbAWqxiJdCeGK3/rH1GskSV/kUxwmkzY//zYqONCuI=
+	t=1766145194; cv=none; b=By85Ze1rVLgRmFZKppdR5rENFuIzoDdoVJ3xGtRM4ScF/m8qx5WBrbDAId4FR2mHLueuI3U5i22dMliM5rUtsxRHKLnsl2w2OI5PcsMsnQdlYxsh/uSyBRtYhBRVbd2YXSiSjUwxfwcaZ2po5YDk8HM3lp6RK3cOARbjlwaHwKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766145135; c=relaxed/simple;
-	bh=a+A3/IhorGkly3ylg8hXj7Ua6UftWWtnu2AVm/TxfS0=;
+	s=arc-20240116; t=1766145194; c=relaxed/simple;
+	bh=n3mxc6dsnKLRUrukcePiJscL8WJWxCUCCqHUWA5QFkY=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QAgdI6EMs5+XPDCXENgDWjxRQWpfPEouwLCF8/nRMcsZxZdr52BKJS5Kqc/uwlFcqayX699Zr/nOWlZmfIYCcLH5oMIuoSfuDiTxC7xErOTwqeA2mGFJ7dQi09XELoOnSSf36hQC6g/9e7nQ2TEUMmCenJ3Y4Zmy9apykxCNdCI=
+	 MIME-Version:Content-Type; b=qG+Er3Dm1lMAys3Znxg19bGzVTsgWcDF7LLcBHCMHjAgRBQNLjjKne3q3FNK6QUXcgtrEvnFqUXkAr3ihfB5RT5rxa539HaXNMdFdwOovKkIOkoxNgMyJGLXwM9OD8X6m6r4U9aL50yMKs8n9L+drm0Jxp9lqJCXgymoI5qod+E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dXm8n4XQ7zJ46cH;
-	Fri, 19 Dec 2025 19:51:37 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dXm9z05mBzJ46cH;
+	Fri, 19 Dec 2025 19:52:39 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3092640086;
-	Fri, 19 Dec 2025 19:52:10 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 8D1334056B;
+	Fri, 19 Dec 2025 19:53:11 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 19 Dec
- 2025 11:52:09 +0000
-Date: Fri, 19 Dec 2025 11:52:07 +0000
+ 2025 11:53:10 +0000
+Date: Fri, 19 Dec 2025 11:53:09 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Xu Yilun <yilun.xu@linux.intel.com>
 CC: <linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>,
@@ -45,12 +45,12 @@ CC: <linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>,
 	<yilun.xu@intel.com>, <zhenzhong.duan@intel.com>, <kvm@vger.kernel.org>,
 	<rick.p.edgecombe@intel.com>, <dave.hansen@linux.intel.com>,
 	<dan.j.williams@intel.com>, <kas@kernel.org>, <x86@kernel.org>
-Subject: Re: [PATCH v1 12/26] iommu/vt-d: Reserve the MSB domain ID bit for
- the TDX module
-Message-ID: <20251219115115.00000922@huawei.com>
-In-Reply-To: <20251117022311.2443900-13-yilun.xu@linux.intel.com>
+Subject: Re: [PATCH v1 11/26] iommu/vt-d: Cache max domain ID to avoid
+ redundant calculation
+Message-ID: <20251219115309.00001727@huawei.com>
+In-Reply-To: <20251117022311.2443900-12-yilun.xu@linux.intel.com>
 References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
-	<20251117022311.2443900-13-yilun.xu@linux.intel.com>
+	<20251117022311.2443900-12-yilun.xu@linux.intel.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -58,89 +58,26 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Mon, 17 Nov 2025 10:22:56 +0800
+On Mon, 17 Nov 2025 10:22:55 +0800
 Xu Yilun <yilun.xu@linux.intel.com> wrote:
 
 > From: Lu Baolu <baolu.lu@linux.intel.com>
->=20
-> The Intel TDX Connect Architecture Specification defines some enhancements
-> for the VT-d architecture to introduce IOMMU support for TEE-IO requests.
-> Section 2.2, 'Trusted DMA' states that:
->=20
-> "I/O TLB and DID Isolation =E2=80=93 When IOMMU is enabled to support TDX
-> Connect, the IOMMU restricts the VMM=E2=80=99s DID setting, reserving the=
- MSB bit
-> for the TDX module. The TDX module always sets this reserved bit on the
-> trusted DMA table. IOMMU tags IOTLB, PASID cache, and context entries to
-> indicate whether they were created from TEE-IO transactions, ensuring
-> isolation between TEE and non-TEE requests in translation caches."
->=20
-> Reserve the MSB in the domain ID for the TDX module's use if the
-> enhancement is required, which is detected if the ECAP.TDXCS bit in the
-> VT-d extended capability register is set and the TVM Usable field of the
-> ACPI KEYP table is set.
->=20
+> 
+> The cap_ndoms() helper calculates the maximum available domain ID from
+> the value of capability register, which can be inefficient if called
+> repeatedly. Cache the maximum supported domain ID in max_domain_id field
+> during initialization to avoid redundant calls to cap_ndoms() throughout
+> the IOMMU driver.
+> 
+> No functionality change.
+> 
 > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Missing sign off of the person who 'handled' the patch by sending it to
-the list in this series.  i.e. Xu Yilun.
-
-One comment inline.
-
-Thanks,
-
-Jonathan
-
-> diff --git a/drivers/iommu/intel/dmar.c b/drivers/iommu/intel/dmar.c
-> index a54934c0536f..e9d65b26ad64 100644
-> --- a/drivers/iommu/intel/dmar.c
-> +++ b/drivers/iommu/intel/dmar.c
-> @@ -1033,6 +1033,56 @@ static int map_iommu(struct intel_iommu *iommu, st=
-ruct dmar_drhd_unit *drhd)
->  	return err;
->  }
-> =20
-> +static int keyp_config_unit_tvm_usable(union acpi_subtable_headers *head=
-er,
-> +				       void *arg, const unsigned long end)
-> +{
-> +	struct acpi_keyp_config_unit *acpi_cu =3D
-> +		(struct acpi_keyp_config_unit *)&header->keyp;
-> +	int *tvm_usable =3D arg;
-> +
-> +	if (acpi_cu->flags & ACPI_KEYP_F_TVM_USABLE)
-> +		*tvm_usable =3D true;
-As below. Be consistent on int vs bool as otherwise the subtle use of -1 is=
- very confusing.
-> +
-> +	return 0;
-> +}
-> +
-> +static bool platform_is_tdxc_enhanced(void)
-> +{
-> +	static int tvm_usable =3D -1;
-> +	int ret;
-> +
-> +	/* only need to parse once */
-> +	if (tvm_usable !=3D -1)
-> +		return tvm_usable;
-> +
-> +	tvm_usable =3D false;
-
-This is flipping between an int and a bool which seems odd.
-I'd stick to an integer then make it a bool only at return.
-
-> +	ret =3D acpi_table_parse_keyp(ACPI_KEYP_TYPE_CONFIG_UNIT,
-> +				    keyp_config_unit_tvm_usable, &tvm_usable);
-> +	if (ret < 0)
-> +		tvm_usable =3D false;
-> +
-> +	return tvm_usable;
-> +}
-
-
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Missing sign off of the last person to handle the patch. Xu Yilun.
+That makes this unmergeable :(
 
