@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-66329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D42CCCFAA9
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:51:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89165CCFB0D
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 13:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4368C306451F
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 11:51:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 091123035807
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 12:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C1033DEF6;
-	Fri, 19 Dec 2025 11:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C8F2459ED;
+	Fri, 19 Dec 2025 11:52:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9534331A6B;
-	Fri, 19 Dec 2025 11:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D8221ABDC;
+	Fri, 19 Dec 2025 11:52:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766145081; cv=none; b=Gkn4tW9x7g/P5YubahE19nUipSJIWzGEoaWXvgjdzsWt52AOFA0rLgz8hR2lXEzVxaDDX1Q0yBqRcm/Mgt3tnznUMnJtEW0JVZeZcjbbt0peYUZwlK1AbREUHFrNTEaEeChGllRSiiyJLYP9M+ehRdg/ZItQ6JwIUQ1UKcDC1NI=
+	t=1766145135; cv=none; b=Nl9UC/CQgNuhfklGgHuslAZmgkIHmngPmRMVGy9PM12k624hw0k4UE+S4e8Nd0gNke6dy53I/r3sgPJdzxCzgMID73GlfIMZWLEU77jdYBGvhLxCQb+mb3GkOyL+LpQidYbAWqxiJdCeGK3/rH1GskSV/kUxwmkzY//zYqONCuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766145081; c=relaxed/simple;
-	bh=BFcpzvDXZ0sAbb4S3pSVRd3GRNDjn+23rndb+xLMXCE=;
+	s=arc-20240116; t=1766145135; c=relaxed/simple;
+	bh=a+A3/IhorGkly3ylg8hXj7Ua6UftWWtnu2AVm/TxfS0=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W5RqVhe7UQmJnwMM5/+X527X7dYRjabfWHiCAeJvtdOyd5z/g2XMuWPuW/usxqKiQwhb/sf/8iUqM9QKLCuJ+mM4IYoIU9WnmuLd6APBM9gMYdMolY6Q9r5PhWtzcplOFEETwSge5JwDT27lheZaRip5EZcN780z82u+xHO26wA=
+	 MIME-Version:Content-Type; b=QAgdI6EMs5+XPDCXENgDWjxRQWpfPEouwLCF8/nRMcsZxZdr52BKJS5Kqc/uwlFcqayX699Zr/nOWlZmfIYCcLH5oMIuoSfuDiTxC7xErOTwqeA2mGFJ7dQi09XELoOnSSf36hQC6g/9e7nQ2TEUMmCenJ3Y4Zmy9apykxCNdCI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dXm7r3sh3zHnGcl;
-	Fri, 19 Dec 2025 19:50:48 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dXm8n4XQ7zJ46cH;
+	Fri, 19 Dec 2025 19:51:37 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 95DD94056D;
-	Fri, 19 Dec 2025 19:51:17 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 3092640086;
+	Fri, 19 Dec 2025 19:52:10 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Fri, 19 Dec
- 2025 11:51:16 +0000
-Date: Fri, 19 Dec 2025 11:51:15 +0000
+ 2025 11:52:09 +0000
+Date: Fri, 19 Dec 2025 11:52:07 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Xu Yilun <yilun.xu@linux.intel.com>
 CC: <linux-coco@lists.linux.dev>, <linux-pci@vger.kernel.org>,
@@ -60,7 +60,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
 On Mon, 17 Nov 2025 10:22:56 +0800
@@ -86,7 +86,9 @@ Xu Yilun <yilun.xu@linux.intel.com> wrote:
 > ACPI KEYP table is set.
 >=20
 > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-Hi,
+Missing sign off of the person who 'handled' the patch by sending it to
+the list in this series.  i.e. Xu Yilun.
+
 One comment inline.
 
 Thanks,
