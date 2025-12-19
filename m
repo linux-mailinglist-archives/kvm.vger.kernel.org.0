@@ -1,147 +1,100 @@
-Return-Path: <kvm+bounces-66292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66291-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E16B1CCE44F
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:30:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE2BCCE443
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 94FF3301EFC0
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 02:30:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 225CA303C809
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 02:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73391277C9E;
-	Fri, 19 Dec 2025 02:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C37221FDA;
+	Fri, 19 Dec 2025 02:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oEigF6zf"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="f9b6Yn9l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE23C20459A;
-	Fri, 19 Dec 2025 02:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C9E17BA6;
+	Fri, 19 Dec 2025 02:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766111422; cv=none; b=kZJjPuvh/DQT5QW1iugnFiiBbTVJeD6sb43pzNW28GSrhpHJzMu3qhHCNJV2guMqmGGmN5KTSuk6EmFO4m9dVR6dZU7mCE+Jarqlo3eD1BKEGG1YOr32O6OEz8HqH/XZtxSYNf3xsrBvoNiduy6bg/JEpG/dvzFO5OiV/BFLfPk=
+	t=1766111290; cv=none; b=UXnosE11xu/UwIT4oZfYInsvoZl+ZXwpUAE+mFSjVGF6BUpW2us73wI5nNdRQnQB1+wDozsvz+861rIO46HGFrbdU9mq+wFPhGHE1CqAFfvZkMCXo5HkHyZ1GzgnkqV+gtg69MuPJ+DEj5VHlCR/NyTr97em7t8kmEpr9n14psw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766111422; c=relaxed/simple;
-	bh=xm94Esx+kRHRfSH0LHzzyc9t4VebPhPKDiK8jQ4Wbrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OMnsx8tOb/V51zzjK8T84Q9PjsxPX5Fd9P5lI0bR+IrjhAp1xEI0FdxKLA75mhUtNhqBa4K2Sw614IfBY6XWjdfqmXnrjMlSHuwQ9LNy4U6WXew/WFyujBTCn0VIsogYlNAw70iD/UMDjCcxMyH4PvavC5w20FcfqTmUb6bvN5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oEigF6zf; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766111421; x=1797647421;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xm94Esx+kRHRfSH0LHzzyc9t4VebPhPKDiK8jQ4Wbrg=;
-  b=oEigF6zfiLtzA4h2x2OLUWUvjZJyGGEINRhptbYzz1ug7uOZQCvo6y3P
-   YPfopj+woSjG+rhq7D0bgL6W5MfiQJ7DeNE1iZ+JwYRqIm3l5SZ2RiBDU
-   brkyC7nI+1d3MmwYXgM8kvyvCvML8HvO21WOV1JmJsxE3UTrGKUMsXj8p
-   WTHubl6sGZ6mVYWzZ/weex4KVtnqtw6nnakFjBSVuwPc3j4n3dGtcEhH6
-   qZm70zRKLp4UZA5IAMlyGRyS796cZb1tv9MmXhyG2D+KU+FUjmtV7CpdA
-   1Zn84AGsSZZKh8L9oLhcM0raF+BUlvzt1UiVGrc01m365i2YYrpDEBeJL
-   Q==;
-X-CSE-ConnectionGUID: yAdla1xcTCGmhXTTHQ452Q==
-X-CSE-MsgGUID: 3T/8GaBHR6aCh5GcQhqTfg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11646"; a="68047573"
-X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
-   d="scan'208";a="68047573"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 18:30:20 -0800
-X-CSE-ConnectionGUID: Q5cTNuFSRZmTnDClp5p7iQ==
-X-CSE-MsgGUID: 1BXdbgLJTIS6pg0VcnESMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,159,1763452800"; 
-   d="scan'208";a="203641828"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Dec 2025 18:30:17 -0800
-Date: Fri, 19 Dec 2025 10:14:03 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	Kiryl Shutsemau <kas@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org,
-	Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH v2 2/7] KVM: x86: Extract VMXON and EFER.SVME enablement
- to kernel
-Message-ID: <aUS06wE6IvFti8Le@yilunxu-OptiPlex-7050>
-References: <20251206011054.494190-1-seanjc@google.com>
- <20251206011054.494190-3-seanjc@google.com>
- <aTe4QyE3h8LHOAMb@intel.com>
- <aUJUbcyz2DXmphtU@yilunxu-OptiPlex-7050>
- <aUL-J-MvdCrCtDp4@google.com>
+	s=arc-20240116; t=1766111290; c=relaxed/simple;
+	bh=zzWTfLen8COuX/q/sKLUzJAtj9cSvrwCqbBUYVz6l10=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=I5G29TdC8gOZBDnC68qr5FIncKImMIi+EDXI3W59NThfcjLpkimx27qrQr3ZEFSBafrLu9PfhbF17nAsjClV+crIl2N6H08/4eLo6Fm5irUPMJ5irElG3Qi7ccO8qG5bhUVhcxMkD0XqGvK0MZbd/qLXX2upzNF4J29FRUihEGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=f9b6Yn9l; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=zzWTfLen8COuX/q/sKLUzJAtj9cSvrwCqbBUYVz6l10=; b=f
+	9b6Yn9lpfldBIebFac8ZhjCAfipn5whg40ODcftNj/pMJAS2/R1nEXKECOUF7mwa
+	7En0Kk5Lg4n9rU5PPO6f68NY4XANcZg8Fzn5k6pqs6vSexPCUr0vRBgls48z1Tnh
+	g5amu67ah9mCP9PLJqN6C0uL0XSMwEiycAExhK7HFg=
+Received: from 15927021679$163.com ( [116.128.244.169] ) by
+ ajax-webmail-wmsvr-40-107 (Coremail) ; Fri, 19 Dec 2025 10:27:09 +0800
+ (CST)
+Date: Fri, 19 Dec 2025 10:27:09 +0800 (CST)
+From: =?GBK?B?0NzOsMPxICA=?= <15927021679@163.com>
+To: "Leon Romanovsky" <leon@kernel.org>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	"David Hildenbrand" <david@redhat.com>,
+	"Jason Wang" <jasowang@redhat.com>,
+	"Stefano Garzarella" <sgarzare@redhat.com>,
+	"Thomas Monjalon" <thomas@monjalon.net>,
+	"David Marchand" <david.marchand@redhat.com>,
+	"Luca Boccassi" <bluca@debian.org>,
+	"Kevin Traynor" <ktraynor@redhat.com>,
+	"Christian Ehrhardt" <christian.ehrhardt@canonical.com>,
+	"Xuan Zhuo" <xuanzhuo@linux.alibaba.com>,
+	=?GBK?Q?Eugenio_P=A8=A6rez?= <eperezma@redhat.com>,
+	"Xueming Li" <xuemingl@nvidia.com>,
+	"Maxime Coquelin" <maxime.coquelin@redhat.com>,
+	"Chenbo Xia" <chenbox@nvidia.com>,
+	"Bruce Richardson" <bruce.richardson@intel.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	"RDMA mailing list" <linux-rdma@vger.kernel.org>
+Subject: Re:Re: Implement initial driver for virtio-RDMA device(kernel)
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
+In-Reply-To: <20251218163008.GH400630@unreal>
+References: <20251218091050.55047-1-15927021679@163.com>
+ <20251218163008.GH400630@unreal>
+X-NTES-SC: AL_Qu2dBP2avkop7yKcYukfmU0VgOc9XsWwu/Uk2YRXc+AEvhn91i0NcGBfB13x3/C3Cw2orgSHdD9v4+NFc5ZjnscnuIaIph6uoKKQX33d3Q==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aUL-J-MvdCrCtDp4@google.com>
+Message-ID: <7076944c.4ac4.19b346eb549.Coremail.15927021679@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:aygvCgBnhST9t0Rps8U_AA--.11607W
+X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0R2YIWlEt-1cmgAA3U
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Wed, Dec 17, 2025 at 11:01:59AM -0800, Sean Christopherson wrote:
-> On Wed, Dec 17, 2025, Xu Yilun wrote:
-> > > >+#define x86_virt_call(fn)				\
-> > > >+({							\
-> > > >+	int __r;					\
-> > > >+							\
-> > > >+	if (IS_ENABLED(CONFIG_KVM_INTEL) &&		\
-> > > >+	    cpu_feature_enabled(X86_FEATURE_VMX))	\
-> > > >+		__r = x86_vmx_##fn();			\
-> > > >+	else if (IS_ENABLED(CONFIG_KVM_AMD) &&		\
-> > > >+		 cpu_feature_enabled(X86_FEATURE_SVM))	\
-> > > >+		__r = x86_svm_##fn();			\
-> > > >+	else						\
-> > > >+		__r = -EOPNOTSUPP;			\
-> > > >+							\
-> > > >+	__r;						\
-> > > >+})
-> > > >+
-> > > >+int x86_virt_get_cpu(int feat)
-> > > >+{
-> > > >+	int r;
-> > > >+
-> > > >+	if (!x86_virt_feature || x86_virt_feature != feat)
-> > > >+		return -EOPNOTSUPP;
-> > > >+
-> > > >+	if (this_cpu_inc_return(virtualization_nr_users) > 1)
-> > > >+		return 0;
-> > > 
-> > > Should we assert that preemption is disabled? Calling this API when preemption
-> > > is enabled is wrong.
-> > > 
-> > > Maybe use __this_cpu_inc_return(), which already verifies preemption status.
-> 
-> I always forget that the double-underscores have the checks.  
-> 
-> > Is it better we explicitly assert the preemption for x86_virt_get_cpu()
-> > rather than embed the check in __this_cpu_inc_return()? We are not just
-> > protecting the racing for the reference counter. We should ensure the
-> > "counter increase + x86_virt_call(get_cpu)" can't be preempted.
-> 
-> I don't have a strong preference.  Using __this_cpu_inc_return() without any
-> nearby preemption_{enable,disable}() calls makes it quite clears that preemption
-> is expected to be disabled by the caller.  But I'm also ok being explicit.
-
-Looking into __this_cpu_inc_return(), it finally calls
-check_preemption_disabled() which doesn't strictly requires preemption.
-It only ensures the context doesn't switch to another CPU. If the caller
-is in cpuhp context, preemption is possible.
-
-But in this x86_virt_get_cpu(), we need to ensure preemption disabled,
-otherwise caller A increases counter but hasn't do actual VMXON yet and
-get preempted. Caller B opts in and get the wrong info that VMX is
-already on, and fails on following vmx operations.
-
-On a second thought, maybe we disable preemption inside
-x86_virt_get_cpu() to protect the counter-vmxon racing, this is pure
-internal thing for this kAPI.
-
-Thanks,
-Yilun
+CgoKCgoKCgoKCgoKCgoKCgoKQXQgMjAyNS0xMi0xOSAwMDozMDowOCwgIkxlb24gUm9tYW5vdnNr
+eSIgPGxlb25Aa2VybmVsLm9yZz4gd3JvdGU6Cj5PbiBUaHUsIERlYyAxOCwgMjAyNSBhdCAwNTow
+OTo0MFBNICswODAwLCBYaW9uZyBXZWltaW4gd3JvdGU6Cj4+IEhpIGFsbCwKPj4gCj4+IFRoaXMg
+dGVzdGluZyBpbnN0cnVjdGlvbnMgYWltcyB0byBpbnRyb2R1Y2UgYW4gZW11bGF0aW5nIGEgc29m
+dCBST0NFIAo+PiBkZXZpY2Ugd2l0aCBub3JtYWwgTklDKG5vIFJETUEpLCB3ZSBoYXZlIGZpbmlz
+aGVkIGEgdmhvc3QtdXNlciBSRE1BCj4+IGRldmljZSBkZW1vLCB3aGljaCBjYW4gd29yayB3aXRo
+IFJETUEgZmVhdHVyZXMgc3VjaCBhcyBDTSwgUVAgdHlwZSBvZiAKPj4gVUMvVUQgYW5kIHNvIG9u
+Lgo+Cj5TYW1lIHF1ZXN0aW9uIGFzIG9uIHlvdXIgUUVNVSBwYXRjaGVzLgo+aHR0cHM6Ly9sb3Jl
+Lmtlcm5lbC5vcmcvYWxsLzIwMjUxMjE4MTYyMDI4LkdHNDAwNjMwQHVucmVhbC8KPgo+QW5kIGFz
+IGEgYmFyZSBtaW5pbXVtLCB5b3Ugc2hvdWxkIHJ1biBnZXRfbWFpbnRhaW5lcnMucGwgc2NyaXB0
+IG9uIHlvdXIKPnBhdGNoZXMgYW5kIGFkZCB0aGUgcmlnaHQgcGVvcGxlIGFuZCBNTCB0byB0aGUg
+Q0MvVE8gZmllbGRzLgo+Cgo+VGhhbmtzCgoKU2luY2UgdGhpcyBmZWF0dXJlIGludm9sdmVzIGNv
+b3JkaW5hdGVkIGNoYW5nZXMgYWNyb3NzIFFFTVUsIERQREssIGFuZCB0aGUga2VybmVsLCAKSSBo
+YXZlIHN1Ym1pdHRlZCBwYXRjaGVzIGZvciBhbGwgdGhyZWUgY29tcG9uZW50cyB0byBldmVyeSBt
+YWludGFpbmVyLiBUaGlzIGlzIHRvIAplbnN1cmUgdGhhdCBzZW5pb3IgZGV2ZWxvcGVycyBjYW4g
+cmV2aWV3IHRoZSBjb21wbGV0ZSBhcmNoaXRlY3R1cmUgYW5kIGNvZGUuCgoKVGhhbmtzLg==
 
