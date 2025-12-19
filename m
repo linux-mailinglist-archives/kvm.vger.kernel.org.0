@@ -1,140 +1,117 @@
-Return-Path: <kvm+bounces-66341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8F4CD03D2
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 15:22:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB269CD06E8
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 16:02:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A2C78303E5C4
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 14:21:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 862DA307A86F
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 14:57:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6330330B02;
-	Fri, 19 Dec 2025 14:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580AF328605;
+	Fri, 19 Dec 2025 14:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttgxp3vH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1PK6J7tb"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C841532E125;
-	Fri, 19 Dec 2025 14:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149F832AABC
+	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 14:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766153622; cv=none; b=B20uQz3+R/0qWGpp8jqg0cW1WKJRigNYDrYuuQxzvd2r8NmHy5TBAQqibS5mp1yQTCoV4fo+AR6BSCj/ZWLecrz42a3aS16n+jmePKF66SrLnYjfLvp2Jy9CNNzzNGLPEGxPjIjyagymcDgxRfOPWJaeEZb6XxJXhdTph1Ym5jE=
+	t=1766156273; cv=none; b=icoF7Xs0FfPn35tHRurCbUv8TFLe3jYlxIDUEEdr/o0WTkrvbkuilK5xjjEWsCDAdUWHWIBMce2/sgA4j/rMn5G08SHvEDUsO9j4QhFoGLnAeEfgO8tqHQn9J+sBTwlqWyK2wiS/UbxUq9UwDLkII+/7/sRLQO5U3sAKigrLtr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766153622; c=relaxed/simple;
-	bh=YGYfUTiPbDylJp07ot7ovJ+uF65gEdyPkYPgBvgr4Y0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WvQU5m87QhfBsv2BErwlKCWw8zLobyAiIq5DeNnE5nvvNMNWBSlyn/iCGQD/SSnllOZa+MspSJ0GnSxhmYxGZGUcy/GluxQM7z8UTTHVorZoE38P7qByOh7NYyCrnDP81jl7++j6Wh1DxPT9xzLytsttIGbG624UpM6oLr7liBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttgxp3vH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56EA2C4CEF1;
-	Fri, 19 Dec 2025 14:13:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766153622;
-	bh=YGYfUTiPbDylJp07ot7ovJ+uF65gEdyPkYPgBvgr4Y0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ttgxp3vHi7niD4DYgc4rr4A2aiHchheYflsFW3+fmwJzVXJGqoW3gQX5yo+uNI2gq
-	 Ylsid/pI5hbOQYJTfhin7AyiVyfoLW5SgI1WLEn7r4mR7He84GarpcwHCS7KrARkyn
-	 S9VErJF6RL9rmVPfzAsYxd5kH4TeJbGVc1g6fFwfv+tcfdHmvy/k0wItmYsbSvTcX4
-	 V9j+pPLQVbOdGq/OcjbBAH97+98QTDaz0ynpyQB6VdNAAY4H27taxUpxjzA5j+EB31
-	 arvZf4LVVCiwEmPGX7Ggda2Dn1vEMAdY8I0VzJ8gIwqg8LZHdy90AiPCFjpEqxQkS5
-	 EXs5GFmXgnkiw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vWbEh-0000000DyXf-3enC;
-	Fri, 19 Dec 2025 14:13:39 +0000
-Date: Fri, 19 Dec 2025 14:13:39 +0000
-Message-ID: <86qzsqmuek.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 1/6] KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
-In-Reply-To: <aURFlcm6szeSfLmH@devkitleo>
-References: <20251210173024.561160-1-maz@kernel.org>
-	<20251210173024.561160-2-maz@kernel.org>
-	<aURFlcm6szeSfLmH@devkitleo>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1766156273; c=relaxed/simple;
+	bh=mkNqhV9WiF2+nf9rqKSXFDPOf031Yc4BX0YxsVb/OPs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=szDU+P1XWxBlGsM1q2cp3IrgNro26VBYgiBcC8975Vxp0iwuAHUgSZH5Yb5na+4aFBEs1Vjq90Vp9oTc+BM/nBhBxt8YuhbLYzftzjGBA5vC4lYrGiD5oua62uT9ndSrR4p+/Flu/unQCMvaicc6P29SNGuSfvBlJPDgpybRQgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1PK6J7tb; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34e70e2e363so3681764a91.1
+        for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 06:57:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766156271; x=1766761071; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5MqWiCmNEH8alnJtLTveyyVgFFstQuw8nmjLVj/SWzc=;
+        b=1PK6J7tbn/5Q8mxpbFh9UWGGwKtCPl/eQoZ2YZFZlhXSd4t89e/lOpQ/6wFBw0Dtt6
+         /9VHa0XfCkbI1xidEQgteqzj6W2Z0/Zb1R8kbl2lf8Ye64O1LIl9t/RZW5YkEBbwPw6K
+         fSfhj6nJtRgesqbOq0Mgih16ljN9wVV0aO09kJEAMDB7sOgxyfEz35Xyprju++DfcwDC
+         H9sINGojWDeoTDNwdyG51saV5DgQoJ2cQ3QVIWbpsc7b/ttJd/v7XCi1YHe+uEpLxd3S
+         fOwXSE6n6k2OFhD+4hQ2BAqrHUrvxdb0lQPU0xmllPr2bFqxg8zilndxEskIw4qfR+UW
+         LzMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766156271; x=1766761071;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5MqWiCmNEH8alnJtLTveyyVgFFstQuw8nmjLVj/SWzc=;
+        b=JDPwk+AF4Iq47/1GisMkGekPNu4JfzsuaSvVWUmngD12GAJLe7XlIGGFaSJINVgc1f
+         EgdCBsq9syXRJu9va5I52Xug/lTfikawGh/y2kpS9owKrKEZdxf+MzL7NSxWOIw9vbJ5
+         XvvJ2JVY/WaCtELWKJf3XzJJz2BHFPHZd30wK8hzhtgV95Qh1SBRZXa+J8+Wp+gJ9hIx
+         MAXy54SsvTUl3ezXswQXL6CRRygufFqgzUWqffKerUoB+42kyi1DI5933WgXUaCfZqC8
+         glNFNhOKK9efOebmcgkyTEzGCjYMRrtar5C6iay2V7eYdQJcaPaERwKcAZbtm+mncNaE
+         UStA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTO4gv83bruNEtYFNJNjlAQwPzrPAidn2570m7gQdaQYNWsTXZsSE8uP92DSlJj8O0Zz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6AcnGoOroc8wIX2t9acIrf2t2BoTXJFP7hlRpMNAAAbqobJfv
+	dWgd2LKfeKPzwca0P8ZjiLMG/iCXND18gW/weBv9fdULwqF++oM3sqor9MyMT8d8vVbg/dEaYdV
+	exI0L7A==
+X-Google-Smtp-Source: AGHT+IFclvLPSA0J0AyfZYWwUmH36gc8jxESS4IFZSIxx6EqTt6mr/Mv/CYJlijNnMios0+N+Xc3g8I4Ank=
+X-Received: from pjbst3.prod.google.com ([2002:a17:90b:1fc3:b0:34c:d9a0:3bf6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:53c7:b0:32c:2cd:4d67
+ with SMTP id 98e67ed59e1d1-34e92142bb2mr2492750a91.13.1766156271429; Fri, 19
+ Dec 2025 06:57:51 -0800 (PST)
+Date: Fri, 19 Dec 2025 06:57:50 -0800
+In-Reply-To: <20251219075235.GV3911114@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20251208115156.GE3707891@noisy.programming.kicks-ass.net>
+ <176597507731.510.6380001909229389563.tip-bot2@tip-bot2> <20251218083109.GH3707891@noisy.programming.kicks-ass.net>
+ <20251218083346.GG3708021@noisy.programming.kicks-ass.net>
+ <aURKsxhxpJ0oHDok@google.com> <20251219075235.GV3911114@noisy.programming.kicks-ass.net>
+Message-ID: <aUVn7tPw8EaJS-d7@google.com>
+Subject: Re: [tip: perf/core] perf: Use EXPORT_SYMBOL_FOR_KVM() for the
+ mediated APIs
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kernel@vger.kernel.org, sfr@canb.auug.org.au, 
+	linux-tip-commits@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 19 Dec 2025 13:38:50 +0000,
-Leonardo Bras <leo.bras@arm.com> wrote:
+On Fri, Dec 19, 2025, Peter Zijlstra wrote:
+> On Thu, Dec 18, 2025 at 10:40:51AM -0800, Sean Christopherson wrote:
 > 
-> On Wed, Dec 10, 2025 at 05:30:19PM +0000, Marc Zyngier wrote:
-> > The current XN implementation is tied to the EL2 translation regime,
-> > and fall flat on its face with the EL2&0 one that is used for hVHE,
-> > as the permission bit for privileged execution is a different one.
-> > 
-> > Fixes: 6537565fd9b7f ("KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 10 +++++++++-
-> >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index fc02de43c68dd..be68b89692065 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -87,7 +87,15 @@ typedef u64 kvm_pte_t;
-> >  
-> >  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
-> >  
-> > -#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > +#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > +#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > +#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> > +
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
-> > +	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
-> > +			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
-> > +			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
-> > +			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-> >  
-> >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
-> >  
-> > -- 
-> > 2.47.3
-> > 
 > 
-> Cool,
-> Is this according to the following in Arm ARM?
+> > Include the arch-defined asm/kvm_types.h if and only if the kernel is
+> > being compiled for an architecture that supports KVM so that kvm_types.h
+> > can be included in generic code without having to guard _those_ includes,
+> > and without having to add "generic-y += kvm_types.h" for all architectures
+> > that don't support KVM.
 > 
-> Figure D8-16
-> Stage 1 attribute fields in VMSAv8-64 Block and Page descriptors
+> Something jogged my brain and the below seems to work for the few
+> architectures I've tried. Let me update the patch and see if the build
+> robot still finds fail.
 
-In M.a (or M.a.a, as it is now called), this is all part of
-I_GLMLD. But R_JJNHR is a much more interesting source of information,
-as it clearly outlines in which conditions XN, UXN and PXN are all
-sharing the same two bits in funky ways...
+Nice!  Works on my end as well.  Just when I think I've learned most of the
+build system's tricks...
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> ---
+> diff --git a/include/asm-generic/Kbuild b/include/asm-generic/Kbuild
+> index 295c94a3ccc1..9aff61e7b8f2 100644
+> --- a/include/asm-generic/Kbuild
+> +++ b/include/asm-generic/Kbuild
+> @@ -32,6 +32,7 @@ mandatory-y += irq_work.h
+>  mandatory-y += kdebug.h
+>  mandatory-y += kmap_size.h
+>  mandatory-y += kprobes.h
+> +mandatory-y += kvm_types.h
+>  mandatory-y += linkage.h
+>  mandatory-y += local.h
+>  mandatory-y += local64.h
 
