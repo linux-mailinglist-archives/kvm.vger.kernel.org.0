@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-66296-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66297-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5241CCE650
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 04:54:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442B9CCE659
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 04:55:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86D5E30657AC
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:53:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1554B30378BE
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 03:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA94F28030E;
-	Fri, 19 Dec 2025 03:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2D62BF00B;
+	Fri, 19 Dec 2025 03:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G63yyoXX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cCZjaWc1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E761529C321
-	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 03:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7E028750A
+	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 03:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766116431; cv=none; b=DEWk5g5m5TXMHuO8TGkUkLLwOM2Tia85io4JLP99jqF7EfC+400iiYNFOWKPbYaB21hMqWvYw8cTgeCiQP04qfhDbJqpDF4c6s9XSKqFyf9RZIZMaMLwZA+dzJWR+UhecxJmUbMpixomPk46eW0zihQ6ver68QVM/DXkTdPOlQ4=
+	t=1766116434; cv=none; b=uCYtxFvFP9p2+B+CijJlirZWHF5ZzkAWiczqLqZCTYUTVEpLOPokVX8UyFU6yrqH9GQWvWqjcFl8Vq3T0z/9CLyaBTM6GGwDySxoZI7S0Ow3iHI2Sh0l6GIOojmLC/wq8x/QFq9Dk48dSDpZSquyZsXX2RgCwUMxnmJYH0kteBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766116431; c=relaxed/simple;
-	bh=uyTv52x6ZHnufc68tUyR5LEwDwfJcWQT5mBt9gd8Sac=;
+	s=arc-20240116; t=1766116434; c=relaxed/simple;
+	bh=nCfhV3t3w0fDBZ86SZ2f5UYt0sbOmM5oEt/LOCV1HW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kNIBy9gabxI5F/WqXkfR1tyYfZ++Z4hxWGYJ6cI6mIn9JJ7NP+puE0TaTeb/nGma6KK9Yv4b57pH2CK44HNtlGQ0uMDiazFALDdBZoOgXXjZbN66J9ajw0EMC0uSD3AtUNXipGDfLeJ21LFnvPY3K/N3uvpumeu+wxz4zQE7uTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G63yyoXX; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=e7fTOZAkrwSh/LqYR/9P/YIDobuG1iCRtE6ZaEBdjfEopSrwuBam48m8wreapWZW6GI/LjzPwNrSdg+talb8vkOJpjQtstYZuc2mp3ss8Qo3Ssc/wsfsXnVQKfuSxpMtk7ShibvJ1pt089HVbI2o7O5riWwTg5+WJShibfmT2CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cCZjaWc1; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2a0bae9aca3so18538065ad.3
-        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 19:53:48 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a07f8dd9cdso14999425ad.1
+        for <kvm@vger.kernel.org>; Thu, 18 Dec 2025 19:53:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766116428; x=1766721228; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766116432; x=1766721232; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OMdxKLElCH6dq+q/a5oZXIHsPg35QMvjNqTyuXC9Pks=;
-        b=G63yyoXX90j9rPY6yazBvt59twEN+FEBolKsSOdmwofhO5LXXEcIciPAyy5o0umJoF
-         0rjSz9Bm/plmzOV1yk0fxdYnOJYnSCwi6T2LS4rAGe1AqWXdcXPKpEygsRIRFu6vUDgK
-         ySGFVXEWEIuwjez4FInBEOHKdeMfvZ2aGvpaNYL7kQo/YuXK9WYPF1jrWz1rh2azJooy
-         tUQURw+yMx1ntfnO/Z7/1vGTw/qcTlWZgorw2QpcXOVlrCbYSJEMRwr23Hd0G5m4aQb+
-         c518vrBsJSlh3wqJXpZhJTOa4gN1rQYmJfhfzvRzafNF+ryYCy2se8JWCdVmPzg/9LiJ
-         XgOg==
+        bh=PKNOibSL1/cWKHhBQtnXUGps0akL1GNIAh6E4cPLko8=;
+        b=cCZjaWc1R4JwB3IAFxYJEg8sRuhJCQ6qPTuB6WDCOb47OFHUPBve4lbtnxH1GS+hqb
+         HowBcqxHnw4ZLp4RO7KeGJ5BT6sVt/Td24IW6BvuekBzXu3PB5DTZGKm1Plp7Xs+Q7MY
+         7o/yfgpR4lsI9TCApEMeMEUX31Vipoh1YV5UKlc+O0cKS+s1hXJB93SMQmZlojpmejyU
+         GvyNUbEqvYPVVmKiXA0oXOVV1hu21qle+H+GhzGUeUfJpbI9EBCcxF7OdAXpxtcq/wj0
+         VrP6oVMS21hlZ6z1yTssCT+Nbhy+D/pMXp6ZnWrgJhVenjk88+PFlFHXgq79i9UzAgzD
+         BR/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766116428; x=1766721228;
+        d=1e100.net; s=20230601; t=1766116432; x=1766721232;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OMdxKLElCH6dq+q/a5oZXIHsPg35QMvjNqTyuXC9Pks=;
-        b=jsp+tAEZD72xwbfidAPTZNCeO7pjzyzINQl9DClsFNYTw+BCN8hiypUWRKSDJlG1HJ
-         Zusauv388AcbZ4kQtL7OfkXQcKrYuZj1bTX6dNEt8hs0zdRoWQN2Jk1JZUwodWG8ryzn
-         s/tNMp6raFqZ8skgU2iOPlZ6Lt/TCafaQZ0ghsSiMuyUB+FGsY4dqvWpKwKjhPAZatNu
-         VSHSsyak2IDuaipFW46sBzT7oG4WgR4yqyM+7y9Z+JhdjK5xFpNBzJXZx2T0Vdopikro
-         bLJZJBQ7iFpZ1YYnmy7611V8FOpyP5mhagP9y7VYH2EOvwoMS0nqPWnrc3pdJ2C88Okz
-         KADg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHV4qOSZyoxmNt0MrMEqs9UMtNlnfirgsjHL4elw5QE/6vPKwCJtfufHFtqGTdc3fYoQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCwx0zLqw7ckH6H1iqoNtl+jLoYEAnQ4+ctl919FfwF82Qr0JU
-	rHFzX1eTdVpsZtAlHWoIWBT/jPE5ga8FwKXBFVGEJ69TFWiR1QDZI1bs
-X-Gm-Gg: AY/fxX5arJJ4NA3akJZBpy4/rpPRZBO6vXv1orkgf1AqVFFL8A4eqNb8heKJBzl27lS
-	ZmuNz0vgy3Wrk99kaaMunnmIU5FUAVdPngqr52FMq18unD91kQR241oYP0Q6zBPqLEcUX/ItvUz
-	Ipto6kkXcd8U1GfdRMuQYqHUx8DGNY7rTPbHT9ADKOTYfyh+XTEUg7glRWLr62xfHmjNv/kUTTj
-	GYLXo8uGeV9PKx025M6vCAKPDopXD3TgJyrkm/MBiP1AeBt+tUolXrzYT1HYO0ZNrEZUMZqkQ2s
-	svGWI+1fxAUlToovTjQznaGmnHx/5k+PuNSs+mTjVeTmJWa2wRxHOIXytO7gKOQFfmMlRQIfNWj
-	ZHHE5yie0q4hJlUHj3gJPd6u5iHbKtBaNKsS2EcHjsFyBG9a7f7kLtJTh137Y++wFF8YrAAB3sr
-	EGxo/IKV9N0A==
-X-Google-Smtp-Source: AGHT+IFnJ2R42OMGoxKqOusa0MAzx7Gd6hkBgQwWawENhau2L5GQ8F2uMlxqxfr4j40Vr0WoY7jZWQ==
-X-Received: by 2002:a17:903:2285:b0:29b:e512:752e with SMTP id d9443c01a7336-2a2f293b6c1mr13029455ad.47.1766116428140;
-        Thu, 18 Dec 2025 19:53:48 -0800 (PST)
+        bh=PKNOibSL1/cWKHhBQtnXUGps0akL1GNIAh6E4cPLko8=;
+        b=ZNSkjsHgPujQUsKhPimuB5rC1VqZAfSn1f1u4jfw+tA9CpfSc7M4FDTclEKN0UpWpO
+         3H7YaS6MZRMVWLrdCDtjEPUxpb8aReG9h7uKJRuuKRjb1pfkSl5F50nfuqgScBajTaz6
+         OoyR8jtXf1Gl4AkYCPrlCPqJpLYvyIvXJV5XWSpxf2khtwJIDPxszy2tAkxFeUpH9h+N
+         bmYhOvCJD+RuJsVzO4WcPLTLhfeW3h5jsiKUoOXWolf9K4oGHALr7PYv+uR5U/kJVrH2
+         xr3C1EGbMdFMBYxYSXzfrxrWgBO6Mr3VqjWSz50dt2XDCY2MuyVCJt8N5xdfXcB7D8Wf
+         4q2w==
+X-Forwarded-Encrypted: i=1; AJvYcCXs3k7kOvTuZHgiOIg45fa+nr3wX19/16rVR8NYFFv5CUYjWLL0TMJR0FpdRzoDwdH4s0Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLwuwubKs6Wd/XsMGnfCyxOaspS6WJpw7gq99zxxfDKFqgwFAB
+	q/ZPBBDZrVy3cReaLgM/JZmMZQrbTBu8bXDhRrOCa1EZ5KWxOkfswU4o
+X-Gm-Gg: AY/fxX6GX69W2PNHVJS+kQ/7ZrZP6qMur/DGrwCkscnFe7fv3Izm5W78kDOfzsJ15ly
+	7oBpms7HDirdObCR0tkeqtG86NU+ExbI7couxkwtRcuAiTcP/DRNnmpIQ6/w3tEC+bspL/VBJJx
+	5pDpRHpivVle/1Vden7c/8agn0pD8mvdtp9eRzWtuZmeARFdJVwm0P1y4jPyoVQJt77Fj4zQLQo
+	yBdqN36r4YS3LSLLTNlVHFGCc/a9pClJo9m2RffQD9NPSFyUOLyC+YCfYqcDd1vuWEZ/a4HgfZo
+	7n6akK7eGn991ZrCShy9frtrj+m6cqRfgzwPqEztXuDsNMWbiUW8YwXbvvhDZIM1L/QIj5UNSmO
+	7hzAGlniA76NdCCg4vatOHziOHRg/jCYlH+vKYXsykgiSsXgDkYL/amTjtu2+WZuvyvQzs09rAJ
+	wSkm4oUcsuSg==
+X-Google-Smtp-Source: AGHT+IEJYyJNSB3Ukzqrx3Oaw5wAgD+IMqeB5MdBvVM8lj03fHxXJGocNZ4Q2zrJZ+PSFeJR4jFMuQ==
+X-Received: by 2002:a17:903:2348:b0:2a1:2b5f:d16b with SMTP id d9443c01a7336-2a2f28367e7mr12961555ad.31.1766116431728;
+        Thu, 18 Dec 2025 19:53:51 -0800 (PST)
 Received: from wanpengli.. ([175.170.92.22])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a2f3d4d36esm7368135ad.63.2025.12.18.19.53.44
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2a2f3d4d36esm7368135ad.63.2025.12.18.19.53.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Dec 2025 19:53:47 -0800 (PST)
+        Thu, 18 Dec 2025 19:53:51 -0800 (PST)
 From: Wanpeng Li <kernellwp@gmail.com>
 To: Peter Zijlstra <peterz@infradead.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -86,9 +86,9 @@ Cc: K Prateek Nayak <kprateek.nayak@amd.com>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	Wanpeng Li <wanpengli@tencent.com>
-Subject: [PATCH v2 2/9] sched/fair: Add rate-limiting and validation helpers
-Date: Fri, 19 Dec 2025 11:53:26 +0800
-Message-ID: <20251219035334.39790-3-kernellwp@gmail.com>
+Subject: [PATCH v2 3/9] sched/fair: Add cgroup LCA finder for hierarchical yield
+Date: Fri, 19 Dec 2025 11:53:27 +0800
+Message-ID: <20251219035334.39790-4-kernellwp@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219035334.39790-1-kernellwp@gmail.com>
 References: <20251219035334.39790-1-kernellwp@gmail.com>
@@ -102,109 +102,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Implement core safety mechanisms for yield deboost operations.
+Implement yield_deboost_find_lca() to locate the lowest common ancestor
+(LCA) in the cgroup hierarchy for EEVDF-aware yield operations.
 
-Add yield_deboost_rate_limit() for high-frequency gating to prevent
-excessive overhead on compute-intensive workloads. The 6ms threshold
-balances responsiveness with overhead reduction.
+The LCA represents the appropriate hierarchy level where vruntime
+adjustments should be applied to ensure fairness is maintained across
+cgroup boundaries. This is critical for virtualization workloads where
+vCPUs may be organized in nested cgroups.
 
-Add yield_deboost_validate_tasks() for comprehensive validation ensuring
-both tasks are valid and distinct, both belong to fair_sched_class,
-target is on the same runqueue, and tasks are runnable.
+Key aspects:
+- For CONFIG_FAIR_GROUP_SCHED: Walk up both entity hierarchies by
+  aligning depths, then ascending together until common cfs_rq found
+- For flat hierarchy: Simply verify both entities share the same cfs_rq
+- Validate that meaningful contention exists (h_nr_queued > 1)
+- Ensure yielding entity has non-zero slice for safe penalty calculation
 
-The rate limiter prevents pathological high-frequency cases while
-validation ensures only appropriate task pairs proceed. Both functions
-are static and will be integrated in subsequent patches.
+Function operates under rq->lock protection. Static helper integrated
+in subsequent patches.
 
 v1 -> v2:
-- Remove unnecessary READ_ONCE/WRITE_ONCE for per-rq fields accessed
-  under rq->lock
-- Change rq->clock to rq_clock(rq) helper for consistency
-- Change yield_deboost_rate_limit() signature from (rq, now_ns) to (rq),
-  obtaining time internally via rq_clock()
-- Remove redundant sched_class check for p_yielding (already implied by
-  rq->donor being fair)
-- Simplify task_rq check to only verify p_target
-- Change rq->curr to rq->donor for correct EEVDF donor tracking
-- Move sysctl_sched_vcpu_debooster_enabled and NULL checks to caller
-  (yield_to_deboost) for early exit before update_rq_clock()
-- Simplify function signature by returning p_yielding directly instead
-  of using output pointer parameters
-- Add documentation explaining the 6ms rate limit threshold
+- Change nr_queued to h_nr_queued for accurate hierarchical task
+  counting that includes tasks in child cgroups
+- Improve comments to clarify the LCA algorithm
 
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- kernel/sched/fair.c | 62 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ kernel/sched/fair.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 87c30db2c853..2f327882bf4d 100644
+index 2f327882bf4d..39dbdd222687 100644
 --- a/kernel/sched/fair.c
 +++ b/kernel/sched/fair.c
-@@ -9040,6 +9040,68 @@ static void put_prev_task_fair(struct rq *rq, struct task_struct *prev, struct t
- 	}
+@@ -9102,6 +9102,36 @@ yield_deboost_validate_tasks(struct rq *rq, struct task_struct *p_target)
+ 	return p_yielding;
  }
  
 +/*
-+ * Rate-limit yield deboost operations to prevent excessive overhead.
-+ * Returns true if the operation should be skipped due to rate limiting.
++ * Find the lowest common ancestor (LCA) in the cgroup hierarchy.
++ * Uses find_matching_se() to locate sibling entities at the same level,
++ * then returns their common cfs_rq for vruntime adjustments.
 + *
-+ * The 6ms threshold balances responsiveness with overhead reduction:
-+ * - Short enough to allow timely yield boosting for lock contention
-+ * - Long enough to prevent pathological high-frequency penalty application
-+ *
-+ * Called under rq->lock, so direct field access is safe.
++ * Returns true if a valid LCA with meaningful contention (h_nr_queued > 1)
++ * is found, storing the LCA entities and common cfs_rq in output parameters.
 + */
-+static bool yield_deboost_rate_limit(struct rq *rq)
++static bool __maybe_unused
++yield_deboost_find_lca(struct sched_entity *se_y, struct sched_entity *se_t,
++		       struct sched_entity **se_y_lca_out,
++		       struct sched_entity **se_t_lca_out,
++		       struct cfs_rq **cfs_rq_out)
 +{
-+	u64 now = rq_clock(rq);
-+	u64 last = rq->yield_deboost_last_time_ns;
++	struct sched_entity *se_y_lca = se_y;
++	struct sched_entity *se_t_lca = se_t;
++	struct cfs_rq *cfs_rq;
 +
-+	if (last && (now - last) <= 6 * NSEC_PER_MSEC)
-+		return true;
++	find_matching_se(&se_y_lca, &se_t_lca);
 +
-+	rq->yield_deboost_last_time_ns = now;
-+	return false;
-+}
++	cfs_rq = cfs_rq_of(se_y_lca);
++	if (cfs_rq->h_nr_queued <= 1)
++		return false;
 +
-+/*
-+ * Validate tasks for yield deboost operation.
-+ * Returns the yielding task on success, NULL on validation failure.
-+ *
-+ * Checks: feature enabled, valid target, same runqueue, target is fair class,
-+ * both on_rq. Called under rq->lock.
-+ *
-+ * Note: p_yielding (rq->donor) is guaranteed to be fair class by the caller
-+ * (yield_to_task_fair is only called when curr->sched_class == p->sched_class).
-+ */
-+static struct task_struct __maybe_unused *
-+yield_deboost_validate_tasks(struct rq *rq, struct task_struct *p_target)
-+{
-+	struct task_struct *p_yielding;
-+
-+	if (!sysctl_sched_vcpu_debooster_enabled)
-+		return NULL;
-+
-+	if (!p_target)
-+		return NULL;
-+
-+	if (yield_deboost_rate_limit(rq))
-+		return NULL;
-+
-+	p_yielding = rq->donor;
-+	if (!p_yielding || p_yielding == p_target)
-+		return NULL;
-+
-+	if (p_target->sched_class != &fair_sched_class)
-+		return NULL;
-+
-+	if (task_rq(p_target) != rq)
-+		return NULL;
-+
-+	if (!p_target->se.on_rq || !p_yielding->se.on_rq)
-+		return NULL;
-+
-+	return p_yielding;
++	*se_y_lca_out = se_y_lca;
++	*se_t_lca_out = se_t_lca;
++	*cfs_rq_out = cfs_rq;
++	return true;
 +}
 +
  /*
