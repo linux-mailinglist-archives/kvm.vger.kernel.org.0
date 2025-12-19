@@ -1,40 +1,55 @@
-Return-Path: <kvm+bounces-66340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D60CD016D
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 14:40:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC8F4CD03D2
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 15:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF684305A103
-	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 13:39:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A2C78303E5C4
+	for <lists+kvm@lfdr.de>; Fri, 19 Dec 2025 14:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FC4322B95;
-	Fri, 19 Dec 2025 13:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6330330B02;
+	Fri, 19 Dec 2025 14:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttgxp3vH"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EB4320CA8
-	for <kvm@vger.kernel.org>; Fri, 19 Dec 2025 13:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C841532E125;
+	Fri, 19 Dec 2025 14:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766151584; cv=none; b=eqxcTqFFE0VXTnxac+mFkylbdDeB4TBHRIQN+Ziow9k+QWn3K4RlyB4OD8QxGu+29IGgTizBwBf20H0vxH/BTUEoXWj9B/McHugehNki8+R6/yJqIsu7L0AFyipKMX0QVKX80J9qEQb94GkF9KmiWo4TXkGlhj2oQlb/xrSULYA=
+	t=1766153622; cv=none; b=B20uQz3+R/0qWGpp8jqg0cW1WKJRigNYDrYuuQxzvd2r8NmHy5TBAQqibS5mp1yQTCoV4fo+AR6BSCj/ZWLecrz42a3aS16n+jmePKF66SrLnYjfLvp2Jy9CNNzzNGLPEGxPjIjyagymcDgxRfOPWJaeEZb6XxJXhdTph1Ym5jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766151584; c=relaxed/simple;
-	bh=yrnEo/iFh6LxFGW3M4Eejbp1T9k2pjI267gslL3ql9k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=N/9cqmDTRWphLZ1IqTpyjn8350dZesvkEiypGlxTqtPbho1vWPrHsY4U6C9uTnFO548+8sV8PNmlXHnr5v8VtM86gB+91sLIQGrkPuC1BROo4T6poaKAaTXGlDV/1bOLjOkeLTIvoO4mcMfVMshmKcH9NNp7SRaFfW3857X4aRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3ECCDFEC;
-	Fri, 19 Dec 2025 05:39:34 -0800 (PST)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.93])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 085403F73F;
-	Fri, 19 Dec 2025 05:39:38 -0800 (PST)
-From: Leonardo Bras <leo.bras@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	kvmarm@lists.linux.dev,
+	s=arc-20240116; t=1766153622; c=relaxed/simple;
+	bh=YGYfUTiPbDylJp07ot7ovJ+uF65gEdyPkYPgBvgr4Y0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WvQU5m87QhfBsv2BErwlKCWw8zLobyAiIq5DeNnE5nvvNMNWBSlyn/iCGQD/SSnllOZa+MspSJ0GnSxhmYxGZGUcy/GluxQM7z8UTTHVorZoE38P7qByOh7NYyCrnDP81jl7++j6Wh1DxPT9xzLytsttIGbG624UpM6oLr7liBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttgxp3vH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56EA2C4CEF1;
+	Fri, 19 Dec 2025 14:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766153622;
+	bh=YGYfUTiPbDylJp07ot7ovJ+uF65gEdyPkYPgBvgr4Y0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ttgxp3vHi7niD4DYgc4rr4A2aiHchheYflsFW3+fmwJzVXJGqoW3gQX5yo+uNI2gq
+	 Ylsid/pI5hbOQYJTfhin7AyiVyfoLW5SgI1WLEn7r4mR7He84GarpcwHCS7KrARkyn
+	 S9VErJF6RL9rmVPfzAsYxd5kH4TeJbGVc1g6fFwfv+tcfdHmvy/k0wItmYsbSvTcX4
+	 V9j+pPLQVbOdGq/OcjbBAH97+98QTDaz0ynpyQB6VdNAAY4H27taxUpxjzA5j+EB31
+	 arvZf4LVVCiwEmPGX7Ggda2Dn1vEMAdY8I0VzJ8gIwqg8LZHdy90AiPCFjpEqxQkS5
+	 EXs5GFmXgnkiw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vWbEh-0000000DyXf-3enC;
+	Fri, 19 Dec 2025 14:13:39 +0000
+Date: Fri, 19 Dec 2025 14:13:39 +0000
+Message-ID: <86qzsqmuek.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Leonardo Bras <leo.bras@arm.com>
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -47,63 +62,79 @@ Cc: Leonardo Bras <leo.bras@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Sebastian Ene <sebastianene@google.com>
 Subject: Re: [PATCH v2 1/6] KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
-Date: Fri, 19 Dec 2025 13:38:50 +0000
-Message-ID: <aURFlcm6szeSfLmH@devkitleo>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251210173024.561160-2-maz@kernel.org>
-References: <20251210173024.561160-1-maz@kernel.org> <20251210173024.561160-2-maz@kernel.org>
+In-Reply-To: <aURFlcm6szeSfLmH@devkitleo>
+References: <20251210173024.561160-1-maz@kernel.org>
+	<20251210173024.561160-2-maz@kernel.org>
+	<aURFlcm6szeSfLmH@devkitleo>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: leo.bras@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Dec 10, 2025 at 05:30:19PM +0000, Marc Zyngier wrote:
-> The current XN implementation is tied to the EL2 translation regime,
-> and fall flat on its face with the EL2&0 one that is used for hVHE,
-> as the permission bit for privileged execution is a different one.
+On Fri, 19 Dec 2025 13:38:50 +0000,
+Leonardo Bras <leo.bras@arm.com> wrote:
 > 
-> Fixes: 6537565fd9b7f ("KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+> On Wed, Dec 10, 2025 at 05:30:19PM +0000, Marc Zyngier wrote:
+> > The current XN implementation is tied to the EL2 translation regime,
+> > and fall flat on its face with the EL2&0 one that is used for hVHE,
+> > as the permission bit for privileged execution is a different one.
+> > 
+> > Fixes: 6537565fd9b7f ("KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index fc02de43c68dd..be68b89692065 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -87,7 +87,15 @@ typedef u64 kvm_pte_t;
+> >  
+> >  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
+> >  
+> > -#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+> > +#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+> > +#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
+> > +#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
+> > +
+> > +#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
+> > +	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
+> > +			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
+> > +			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
+> > +			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
+> >  
+> >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+> >  
+> > -- 
+> > 2.47.3
+> > 
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index fc02de43c68dd..be68b89692065 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -87,7 +87,15 @@ typedef u64 kvm_pte_t;
->  
->  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
->  
-> -#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> +#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> +#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> +#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> +
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
-> +	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
-> +			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
-> +			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
-> +			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
->  
->  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
->  
-> -- 
-> 2.47.3
+> Cool,
+> Is this according to the following in Arm ARM?
 > 
+> Figure D8-16
+> Stage 1 attribute fields in VMSAv8-64 Block and Page descriptors
 
-Cool,
-Is this according to the following in Arm ARM?
+In M.a (or M.a.a, as it is now called), this is all part of
+I_GLMLD. But R_JJNHR is a much more interesting source of information,
+as it clearly outlines in which conditions XN, UXN and PXN are all
+sharing the same two bits in funky ways...
 
-Figure D8-16
-Stage 1 attribute fields in VMSAv8-64 Block and Page descriptors
+Thanks,
 
-Thanks!
-Leo
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
