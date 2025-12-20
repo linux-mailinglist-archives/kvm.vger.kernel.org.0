@@ -1,185 +1,175 @@
-Return-Path: <kvm+bounces-66433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66434-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F058CD2B6F
-	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 10:03:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F010ACD2BC0
+	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 10:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4A312300BE7D
-	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 09:03:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B93723013556
+	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 09:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9617C2D8370;
-	Sat, 20 Dec 2025 09:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6945F2FB630;
+	Sat, 20 Dec 2025 09:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="KJBnVS3f"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eC9KWOhd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F802F0C76
-	for <kvm@vger.kernel.org>; Sat, 20 Dec 2025 09:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A12FBE00
+	for <kvm@vger.kernel.org>; Sat, 20 Dec 2025 09:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766221408; cv=none; b=Avo34zzR5TRBfBnPqf/Ja4HnMrJ3v/02WkYNYuHS74nNfWpRl6W8yiMBovp9AlEXmtnYUQ/CZETRv08IV0dKXy3F+/NVvBJoODtG0Cq224Ya5Sy56DdC0kmMUR3pYYZ+tMsON+Kfv3K3eiaH4DV57cVPk1rJL8PjuVjzo+HEnIc=
+	t=1766221736; cv=none; b=E5UU4edko68JbKXfbgAHGURSWiHnAurvq0KxCt2FYCjz37X7gW1aEh5uKQq7eQzlpwVlti+p+kmOsvKezO4rxOO+qsRQHtme+Tz/1YwaCskBLoFDB96NlTrizFStZwCsEnZWCr84NopwojO8eswdQVdF0c4tneU33/T0PzgsJEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766221408; c=relaxed/simple;
-	bh=t2h8aaGu0FtdHCN7ssAmxhJJO8lQYFUEz3w4ZDEi5aU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OeBc4m4eqq1I7adOdDoLqgmr4Qoaq+TX4smhiHYxmd8seRR7dyUTbBpnAOKTqinoXnS8cQCZJi2DR12eQoXp9Up/7EsS3mvXlaoxeHciMW42oDVNm6SqZIcLECN5PuhqbADNTBrbgXf5wZrtuiaSYCFtU5ctwYV7d9ntYIRcXWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=KJBnVS3f; arc=none smtp.client-ip=209.85.217.42
+	s=arc-20240116; t=1766221736; c=relaxed/simple;
+	bh=5sxeVmM1HSneHjU/I1Fk7AXM2eqK42xU7iyfuc1gJG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SjseHvgMaXIhfDm+kzKH0AynvJQi8FCh4YYuA8DiNyxZwhojSW317i6aTcl6K+IOU1Xdx3MrwjSy3i523onBzu92NFnwNyJxMwyRWbabT4GO+7dP8RT0oDpGp2U5pqJ9EJdySW1pSUjb0+MRmN6hwUirxkAuMIKgSwqZRrVyxfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eC9KWOhd; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-5dd6fbe50c0so773982137.2
-        for <kvm@vger.kernel.org>; Sat, 20 Dec 2025 01:03:25 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7f1243792f2so1776497b3a.1
+        for <kvm@vger.kernel.org>; Sat, 20 Dec 2025 01:08:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1766221405; x=1766826205; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Va3aH01h9VzCu+jjyIlDqz4JQd4jmsrCBD/p8egZk2U=;
-        b=KJBnVS3f8Yjc2z9nV1B5zPd1YQMYq/m1ZsX0pXxXBUk2YXDJAmW24PT97HHRjoJGYI
-         PKhYeQYBadYyCNNfKWJwfWNHwHYpHnQnlCIgHNTmzfGKcq0PcAxnOxJD6OcFOexofwa+
-         wj/Cw5tYQ4XZvd2YpmEwzlC6nJJTmYBQjMeCrwsOBzJk7UgcbqLDAjxFphSXq/U7OOQx
-         jHOFDW7CZqZAH5+iCnrXEw7FKffKwVnoBftl2jzFTbJo70APIhbFLp+u6VvMRRF/L9IQ
-         JZAWotvaEsn2f2v0aTYr6WJi9vO9E24fUarqx7SjNC7s/QAay8nlGKGjKDeQhMvJdjbz
-         FHeQ==
+        d=bytedance.com; s=google; t=1766221734; x=1766826534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9FCav/YO9x/c2l0kK2rjBlOI4AUzqgUWfXFrOx8/XtI=;
+        b=eC9KWOhdLyWOS0Ys1nNa9Kyp8TyTk0kyFyVBqUCoWPIvm0FfTziECYZRwl/HHGNGjV
+         0KjGUfAnD5kTrO9nitcpOsKXfcvW0qY+v0yKjofwCsYcBsH+omBhcseX3rds4QSHLoo1
+         pjEmelA/ZPX2gwS2J6mR8Xn2RnaWgebwigAXanAcJDSTwm47Shqp8CroGmdGXXAYHdoC
+         mSPbuR+KJYggmuenmX7BNGfdn4bXAaz/hyJD0HaiXwSgoM7cIGVfsfozZR0XfVIyHsyw
+         MmkWKfGZ4OFjYAzGslo9zgb8Jc2SIKixiXZX/44hghYzSqgbr9+v176q3rfNsdSRfkmF
+         7DpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766221405; x=1766826205;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Va3aH01h9VzCu+jjyIlDqz4JQd4jmsrCBD/p8egZk2U=;
-        b=RGCqXTBxViLAXKwk4mTUFkrxeDWfGtTxMb42Yu1xJOryDqbC503KbfwEuAg1JIfxPy
-         J7lmYANpSo9ngJZwbezrssRIu6BN5ccbsAlqNdnlB2nnuJ88zINz7e1daPPSIV1m9dj2
-         4KcYgv0v10NAwCs544VQ7spgOLtKzZ6lnfgNpdJmUsOPJnNseiO9x3S2EaTpFDzSQH8Y
-         2aU3KjHsRPQGpAqx0h6ZB5IaS/wvdsxWM7axHLHTpnreia5sE7CNaXe3zviOAPbjD6om
-         5RxVzR/iyO+HJ7JbbLCDEPH/U1TtzUpGRCSahjLVB4QGATz1bcKKFbLxvrtyelHZIXel
-         g2pA==
-X-Gm-Message-State: AOJu0YydWOdYxqZ3Qon1RwjLjfcVSQmnxmeJ3OGaNZQgPASgTpKlytVR
-	5sWst3sqTPMGEaim0WMWGfZdnNoYQMINRVHZcjjwY5saW4qQ5p05dBsKuE5b04A6ywSfwQOFsuz
-	tH9wbMaM7GeDPkBYG5SptcLq6Yb3iC/S3lnLLDlYaJ554uo0VNSAhjEw=
-X-Gm-Gg: AY/fxX6bWz+M0FcGnf2b9ObISll2UkdP7wefzUlJmkB1f8a4EQCVc5MXhqOt71vr/cE
-	DPE9J6i1z+sQvHi2TfECg2YAPBkUYi0CBDt8Rw0PeD3SXNuE5aXCa0nBcCPQt1GPcTnG/eVAANW
-	mNUeTSRwY+TNQypJFB232rNqe6cUSl/eGBCxPI/S94PqZTlR/7OtN3S8Z75dUAvKDTisAcaxmMf
-	Evm5vTq0FGnvc7Y7he+oIO6FYmz01i5PO864TAbvy9CeRilXJoM6pcVj3iwll+u8D8Z6+TWspXN
-	Ew==
-X-Google-Smtp-Source: AGHT+IHjJZyxgMociIgVi8Vl7x9+mX3PDgDpt1PBc1PqiaU7VPQpkPAVPp74stlra4EpXF34ykw4FyuuatuGTMhzLEo=
-X-Received: by 2002:a05:6102:2b90:b0:5db:f352:afc0 with SMTP id
- ada2fe7eead31-5eb1a616c83mr1883567137.2.1766221404637; Sat, 20 Dec 2025
- 01:03:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766221734; x=1766826534;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9FCav/YO9x/c2l0kK2rjBlOI4AUzqgUWfXFrOx8/XtI=;
+        b=GGcmzOi5UhGuwQK329ttNR3OwrPnUbnnZFWwvmZzaFcHhl6Vzx0f6bmO7p7qH4OTW6
+         YxTTH2O4htLv6cm3qwF8VUqb+pHMy8zkvFLfuXHzpt+qdwxST/Tf982mtB0UQWdBnKua
+         JrdhNt5UR8Gezrij6x9DeK/Go+uiZKHnLfrw3aFxtohmOdJLz/aQK3qsvHt72HnaUGUf
+         WTovEk8zk98ORIVgav38nsrFDQV8X1Pzt2X9rd+dl2821WXtaNY+vn/ifoaZRLiey7ST
+         yk+fMbdpRPTaOj8RNvnawiBc7F3CnHIPoKRELVU2D8dldnRDDFuwoP4hQZsqF9J1wJzo
+         gs1w==
+X-Gm-Message-State: AOJu0YwOr3pukl1RPJWU0qPqU7sUpobfJvDLah33azp0LBJrfa3OyoUr
+	/FttLb4/Czw3MQFPUFn+XhMixkffBjdvzBVe5ylEGNYe8cHTPMDRrlT+jd1p2zz46Ng=
+X-Gm-Gg: AY/fxX4CUS+z3ZuUQLJvMG36yzJJSXxY9pk4bRgHGfdY/ocIidT9AzplpIWDrWyDrpG
+	m6Qm0EV3IIuGK9sPTe+TrydkYC1RcbseOFEuCG5E462kWFp9eWwb2l3tkEkPTtWH7hbu8WT90q6
+	GzUtv8PL1Lb/XIpuOTB+jjYzB15DaMshKik4HDAgtYWda7hCJ+fwMDZQnLsOt3YBE+3B6XJwg3J
+	PFFkTMevEpmw8sbj2eP/DCde8OZ26t+IV0PWBddY0cV4Sr9wMxxhxS2TAQOzfp83jvtsZY/dhm2
+	rfXxixEqG0FX+bh5MvoxpJnCkB3t0juttd/dmDhBNuQqgmGaMZiZhoSBC0HSNlie2fbjwv2hNIX
+	SRdVG7OjrOfpah8HpKfptjlLAOqc9idV6fVlZIbSOfGW1sc1oX9FH/eYQbE1HQ+6aSkYu2n3qHl
+	1mhbyvMmEsLao5YdhYNt8uaUg/lWqCbOF4tb/7uqp2KXQl83yrHaP+
+X-Google-Smtp-Source: AGHT+IF2jkxbF7mAn+s4RGO9FXrxMFZTWrnAnqrw89U2+BW6yKGvETNKZF8EMf2cRZHfSphIJaGSBg==
+X-Received: by 2002:a05:6a00:330a:b0:7e8:43f5:bd46 with SMTP id d2e1a72fcca58-7ff67257bb3mr4181960b3a.50.1766221733916;
+        Sat, 20 Dec 2025 01:08:53 -0800 (PST)
+Received: from J9GPGXL7NT.bytedance.net ([139.177.225.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e48cd07sm4623647b3a.46.2025.12.20.01.08.49
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 20 Dec 2025 01:08:53 -0800 (PST)
+From: Xu Lu <luxu.kernel@bytedance.com>
+To: anup@brainfault.org,
+	atish.patra@linux.dev,
+	pjw@kernel.org,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	alex@ghiti.fr,
+	tglx@linutronix.de
+Cc: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Xu Lu <luxu.kernel@bytedance.com>
+Subject: [PATCH v2] irqchip/riscv-imsic: Adjust vs irq files num according to MMIO resources
+Date: Sat, 20 Dec 2025 17:08:44 +0800
+Message-ID: <20251220090844.46441-1-luxu.kernel@bytedance.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251220085550.42647-1-luxu.kernel@bytedance.com>
-In-Reply-To: <20251220085550.42647-1-luxu.kernel@bytedance.com>
-From: Xu Lu <luxu.kernel@bytedance.com>
-Date: Sat, 20 Dec 2025 17:03:13 +0800
-X-Gm-Features: AQt7F2rCaGj3uJSbiOnLM5ag5bh3MR_s2uiS2WHTIUVUbqlnbSA-wtGJO6lSIig
-Message-ID: <CAPYmKFvE3ZnsbTFYHe8T2tkF10G08dnEQ5KEdied_6wGjztv7A@mail.gmail.com>
-Subject: Re: [PATCH] irqchip/riscv-imsic: Adjust vs irq files num according to
- MMIO resources
-To: anup@brainfault.org, atish.patra@linux.dev, pjw@kernel.org, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, tglx@linutronix.de
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 20, 2025 at 4:56=E2=80=AFPM Xu Lu <luxu.kernel@bytedance.com> w=
-rote:
->
-> During initialization, kernel maps the MMIO resources of IMSIC, which is
-> parsed from ACPI or DTS and may not strictly contains all guest
-> interrupt files. Page fault happens when KVM wrongly allocates an
-> unmapped guest interrupt file and writes it.
->
-> Thus, during initialization, we calculate the number of available guest
-> interrupt files according to MMIO resources and constrain the number of
-> guest interrupt files that can be allocated by KVM.
->
-> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
-> ---
->  arch/riscv/kvm/aia.c                    | 2 +-
->  drivers/irqchip/irq-riscv-imsic-state.c | 7 ++++++-
->  include/linux/irqchip/riscv-imsic.h     | 3 +++
->  3 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-> index dad3181856600..7b1f6adcf22d6 100644
-> --- a/arch/riscv/kvm/aia.c
-> +++ b/arch/riscv/kvm/aia.c
-> @@ -630,7 +630,7 @@ int kvm_riscv_aia_init(void)
->          */
->         if (gc)
->                 kvm_riscv_aia_nr_hgei =3D min((ulong)kvm_riscv_aia_nr_hge=
-i,
-> -                                           BIT(gc->guest_index_bits) - 1=
-);
-> +                                           BIT(gc->nr_guest_files) - 1);
+During initialization, kernel maps the MMIO resources of IMSIC, which is
+parsed from ACPI or DTS and may not strictly contains all guest
+interrupt files. Page fault happens when KVM wrongly allocates an
+unmapped guest interrupt file and writes it.
 
-Typo here. I will resend this patch.
+Thus, during initialization, we calculate the number of available guest
+interrupt files according to MMIO resources and constrain the number of
+guest interrupt files that can be allocated by KVM.
 
->         else
->                 kvm_riscv_aia_nr_hgei =3D 0;
->
-> diff --git a/drivers/irqchip/irq-riscv-imsic-state.c b/drivers/irqchip/ir=
-q-riscv-imsic-state.c
-> index dc95ad856d80a..1e982ce024a47 100644
-> --- a/drivers/irqchip/irq-riscv-imsic-state.c
-> +++ b/drivers/irqchip/irq-riscv-imsic-state.c
-> @@ -794,7 +794,7 @@ static int __init imsic_parse_fwnode(struct fwnode_ha=
-ndle *fwnode,
->
->  int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
->  {
-> -       u32 i, j, index, nr_parent_irqs, nr_mmios, nr_handlers =3D 0;
-> +       u32 i, j, index, nr_parent_irqs, nr_mmios, nr_guest_files, nr_han=
-dlers =3D 0;
->         struct imsic_global_config *global;
->         struct imsic_local_config *local;
->         void __iomem **mmios_va =3D NULL;
-> @@ -888,6 +888,7 @@ int __init imsic_setup_state(struct fwnode_handle *fw=
-node, void *opaque)
->         }
->
->         /* Configure handlers for target CPUs */
-> +       global->nr_guest_files =3D BIT(global->guest_index_bits) - 1;
->         for (i =3D 0; i < nr_parent_irqs; i++) {
->                 rc =3D imsic_get_parent_hartid(fwnode, i, &hartid);
->                 if (rc) {
-> @@ -928,6 +929,10 @@ int __init imsic_setup_state(struct fwnode_handle *f=
-wnode, void *opaque)
->                 local->msi_pa =3D mmios[index].start + reloff;
->                 local->msi_va =3D mmios_va[index] + reloff;
->
-> +               nr_guest_files =3D (resource_size(&mmios[index]) - reloff=
-) / IMSIC_MMIO_PAGE_SZ - 1;
-> +               global->nr_guest_files =3D global->nr_guest_files > nr_gu=
-est_files ? nr_guest_files :
-> +                                        global->nr_guest_files;
-> +
->                 nr_handlers++;
->         }
->
-> diff --git a/include/linux/irqchip/riscv-imsic.h b/include/linux/irqchip/=
-riscv-imsic.h
-> index 7494952c55187..43aed52385008 100644
-> --- a/include/linux/irqchip/riscv-imsic.h
-> +++ b/include/linux/irqchip/riscv-imsic.h
-> @@ -69,6 +69,9 @@ struct imsic_global_config {
->         /* Number of guest interrupt identities */
->         u32                                     nr_guest_ids;
->
-> +       /* Number of guest interrupt files per core */
-> +       u32                                     nr_guest_files;
-> +
->         /* Per-CPU IMSIC addresses */
->         struct imsic_local_config __percpu      *local;
->  };
-> --
-> 2.20.1
->
+Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
+---
+ arch/riscv/kvm/aia.c                    | 2 +-
+ drivers/irqchip/irq-riscv-imsic-state.c | 7 ++++++-
+ include/linux/irqchip/riscv-imsic.h     | 3 +++
+ 3 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
+index dad3181856600..cac3c2b51d724 100644
+--- a/arch/riscv/kvm/aia.c
++++ b/arch/riscv/kvm/aia.c
+@@ -630,7 +630,7 @@ int kvm_riscv_aia_init(void)
+ 	 */
+ 	if (gc)
+ 		kvm_riscv_aia_nr_hgei = min((ulong)kvm_riscv_aia_nr_hgei,
+-					    BIT(gc->guest_index_bits) - 1);
++					    gc->nr_guest_files);
+ 	else
+ 		kvm_riscv_aia_nr_hgei = 0;
+ 
+diff --git a/drivers/irqchip/irq-riscv-imsic-state.c b/drivers/irqchip/irq-riscv-imsic-state.c
+index dc95ad856d80a..1e982ce024a47 100644
+--- a/drivers/irqchip/irq-riscv-imsic-state.c
++++ b/drivers/irqchip/irq-riscv-imsic-state.c
+@@ -794,7 +794,7 @@ static int __init imsic_parse_fwnode(struct fwnode_handle *fwnode,
+ 
+ int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
+ {
+-	u32 i, j, index, nr_parent_irqs, nr_mmios, nr_handlers = 0;
++	u32 i, j, index, nr_parent_irqs, nr_mmios, nr_guest_files, nr_handlers = 0;
+ 	struct imsic_global_config *global;
+ 	struct imsic_local_config *local;
+ 	void __iomem **mmios_va = NULL;
+@@ -888,6 +888,7 @@ int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
+ 	}
+ 
+ 	/* Configure handlers for target CPUs */
++	global->nr_guest_files = BIT(global->guest_index_bits) - 1;
+ 	for (i = 0; i < nr_parent_irqs; i++) {
+ 		rc = imsic_get_parent_hartid(fwnode, i, &hartid);
+ 		if (rc) {
+@@ -928,6 +929,10 @@ int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
+ 		local->msi_pa = mmios[index].start + reloff;
+ 		local->msi_va = mmios_va[index] + reloff;
+ 
++		nr_guest_files = (resource_size(&mmios[index]) - reloff) / IMSIC_MMIO_PAGE_SZ - 1;
++		global->nr_guest_files = global->nr_guest_files > nr_guest_files ? nr_guest_files :
++					 global->nr_guest_files;
++
+ 		nr_handlers++;
+ 	}
+ 
+diff --git a/include/linux/irqchip/riscv-imsic.h b/include/linux/irqchip/riscv-imsic.h
+index 7494952c55187..43aed52385008 100644
+--- a/include/linux/irqchip/riscv-imsic.h
++++ b/include/linux/irqchip/riscv-imsic.h
+@@ -69,6 +69,9 @@ struct imsic_global_config {
+ 	/* Number of guest interrupt identities */
+ 	u32					nr_guest_ids;
+ 
++	/* Number of guest interrupt files per core */
++	u32					nr_guest_files;
++
+ 	/* Per-CPU IMSIC addresses */
+ 	struct imsic_local_config __percpu	*local;
+ };
+-- 
+2.20.1
+
 
