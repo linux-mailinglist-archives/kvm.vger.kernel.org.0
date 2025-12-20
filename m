@@ -1,175 +1,163 @@
-Return-Path: <kvm+bounces-66434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F010ACD2BC0
-	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 10:09:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B07CD2FF5
+	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 14:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B93723013556
-	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 09:08:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 907E330274C5
+	for <lists+kvm@lfdr.de>; Sat, 20 Dec 2025 13:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6945F2FB630;
-	Sat, 20 Dec 2025 09:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF255269D18;
+	Sat, 20 Dec 2025 13:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eC9KWOhd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VtPl+gKE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A12FBE00
-	for <kvm@vger.kernel.org>; Sat, 20 Dec 2025 09:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95211269B1C;
+	Sat, 20 Dec 2025 13:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766221736; cv=none; b=E5UU4edko68JbKXfbgAHGURSWiHnAurvq0KxCt2FYCjz37X7gW1aEh5uKQq7eQzlpwVlti+p+kmOsvKezO4rxOO+qsRQHtme+Tz/1YwaCskBLoFDB96NlTrizFStZwCsEnZWCr84NopwojO8eswdQVdF0c4tneU33/T0PzgsJEg=
+	t=1766238423; cv=none; b=ZLTzWcnTfalv92E+mOn71NKzcG5On2R+J6ECNPOBWmBow81VYlqnmR26d1r5ij8NrPb0ViGHn77GWgNa4TdQ0q6x5HwNILcqYJonrileISYmvvBfpLxKOfXzKymdVCx71jy0hCIdL50/n4lpb1VDenpdzmxwo5Mkfbp7gEfyjX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766221736; c=relaxed/simple;
-	bh=5sxeVmM1HSneHjU/I1Fk7AXM2eqK42xU7iyfuc1gJG0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SjseHvgMaXIhfDm+kzKH0AynvJQi8FCh4YYuA8DiNyxZwhojSW317i6aTcl6K+IOU1Xdx3MrwjSy3i523onBzu92NFnwNyJxMwyRWbabT4GO+7dP8RT0oDpGp2U5pqJ9EJdySW1pSUjb0+MRmN6hwUirxkAuMIKgSwqZRrVyxfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eC9KWOhd; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7f1243792f2so1776497b3a.1
-        for <kvm@vger.kernel.org>; Sat, 20 Dec 2025 01:08:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1766221734; x=1766826534; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9FCav/YO9x/c2l0kK2rjBlOI4AUzqgUWfXFrOx8/XtI=;
-        b=eC9KWOhdLyWOS0Ys1nNa9Kyp8TyTk0kyFyVBqUCoWPIvm0FfTziECYZRwl/HHGNGjV
-         0KjGUfAnD5kTrO9nitcpOsKXfcvW0qY+v0yKjofwCsYcBsH+omBhcseX3rds4QSHLoo1
-         pjEmelA/ZPX2gwS2J6mR8Xn2RnaWgebwigAXanAcJDSTwm47Shqp8CroGmdGXXAYHdoC
-         mSPbuR+KJYggmuenmX7BNGfdn4bXAaz/hyJD0HaiXwSgoM7cIGVfsfozZR0XfVIyHsyw
-         MmkWKfGZ4OFjYAzGslo9zgb8Jc2SIKixiXZX/44hghYzSqgbr9+v176q3rfNsdSRfkmF
-         7DpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766221734; x=1766826534;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9FCav/YO9x/c2l0kK2rjBlOI4AUzqgUWfXFrOx8/XtI=;
-        b=GGcmzOi5UhGuwQK329ttNR3OwrPnUbnnZFWwvmZzaFcHhl6Vzx0f6bmO7p7qH4OTW6
-         YxTTH2O4htLv6cm3qwF8VUqb+pHMy8zkvFLfuXHzpt+qdwxST/Tf982mtB0UQWdBnKua
-         JrdhNt5UR8Gezrij6x9DeK/Go+uiZKHnLfrw3aFxtohmOdJLz/aQK3qsvHt72HnaUGUf
-         WTovEk8zk98ORIVgav38nsrFDQV8X1Pzt2X9rd+dl2821WXtaNY+vn/ifoaZRLiey7ST
-         yk+fMbdpRPTaOj8RNvnawiBc7F3CnHIPoKRELVU2D8dldnRDDFuwoP4hQZsqF9J1wJzo
-         gs1w==
-X-Gm-Message-State: AOJu0YwOr3pukl1RPJWU0qPqU7sUpobfJvDLah33azp0LBJrfa3OyoUr
-	/FttLb4/Czw3MQFPUFn+XhMixkffBjdvzBVe5ylEGNYe8cHTPMDRrlT+jd1p2zz46Ng=
-X-Gm-Gg: AY/fxX4CUS+z3ZuUQLJvMG36yzJJSXxY9pk4bRgHGfdY/ocIidT9AzplpIWDrWyDrpG
-	m6Qm0EV3IIuGK9sPTe+TrydkYC1RcbseOFEuCG5E462kWFp9eWwb2l3tkEkPTtWH7hbu8WT90q6
-	GzUtv8PL1Lb/XIpuOTB+jjYzB15DaMshKik4HDAgtYWda7hCJ+fwMDZQnLsOt3YBE+3B6XJwg3J
-	PFFkTMevEpmw8sbj2eP/DCde8OZ26t+IV0PWBddY0cV4Sr9wMxxhxS2TAQOzfp83jvtsZY/dhm2
-	rfXxixEqG0FX+bh5MvoxpJnCkB3t0juttd/dmDhBNuQqgmGaMZiZhoSBC0HSNlie2fbjwv2hNIX
-	SRdVG7OjrOfpah8HpKfptjlLAOqc9idV6fVlZIbSOfGW1sc1oX9FH/eYQbE1HQ+6aSkYu2n3qHl
-	1mhbyvMmEsLao5YdhYNt8uaUg/lWqCbOF4tb/7uqp2KXQl83yrHaP+
-X-Google-Smtp-Source: AGHT+IF2jkxbF7mAn+s4RGO9FXrxMFZTWrnAnqrw89U2+BW6yKGvETNKZF8EMf2cRZHfSphIJaGSBg==
-X-Received: by 2002:a05:6a00:330a:b0:7e8:43f5:bd46 with SMTP id d2e1a72fcca58-7ff67257bb3mr4181960b3a.50.1766221733916;
-        Sat, 20 Dec 2025 01:08:53 -0800 (PST)
-Received: from J9GPGXL7NT.bytedance.net ([139.177.225.247])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e48cd07sm4623647b3a.46.2025.12.20.01.08.49
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 20 Dec 2025 01:08:53 -0800 (PST)
-From: Xu Lu <luxu.kernel@bytedance.com>
-To: anup@brainfault.org,
-	atish.patra@linux.dev,
-	pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr,
-	tglx@linutronix.de
-Cc: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Xu Lu <luxu.kernel@bytedance.com>
-Subject: [PATCH v2] irqchip/riscv-imsic: Adjust vs irq files num according to MMIO resources
-Date: Sat, 20 Dec 2025 17:08:44 +0800
-Message-ID: <20251220090844.46441-1-luxu.kernel@bytedance.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1766238423; c=relaxed/simple;
+	bh=1pFvDAhK/0OcjfDXa8369dj+tMnoofvfLqxmhTvaU8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WTMVLmk35SK+ZwCkGGyuE/LZ2EuAE/bsOfyanoQEil0RP3aXZLthpM9T0EIELtNsxSQyFGG7wiN2GMYwioT9IL0b2smX1bC8S5wvG6FE/F7h3wiRwdCsp5289Ug/eMYN/WmvzLw70+zwMhLropX9xfEeWY5nWKEkvUQklyRNZLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VtPl+gKE; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766238421; x=1797774421;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1pFvDAhK/0OcjfDXa8369dj+tMnoofvfLqxmhTvaU8c=;
+  b=VtPl+gKEZFOod/bUb60oQrlxy/G+P7fCl3Qi76TnVvqZCHctHMxox+g3
+   R+0QY/gbgU03kykRb/NdSI47VNxqx1XCmc+nOdAt46ygTO92Aul2ru511
+   th2XHvrbMrd39EA9ivscoDkhAgtwiyT4PRjc5XaaV8PIdlvKqOzgU1Jo7
+   BVKyidSzZNgUPduJManfAj3yNcUqsO03vVRFWRIkuAmo5hmdU7o8KIxYC
+   9ilSB3Ua7jv2kAPRCDoPMEHmd3s34n8XWNVcjQ+5XX9exY5hANhS6p1iF
+   PkyoqKtOJeFkB6GdYV6inqKGSd+rwgB4OtFzDDDbBzsAQAuhNV/h64hQ2
+   A==;
+X-CSE-ConnectionGUID: rA1UM9VeQjO4c4+J5PgqTw==
+X-CSE-MsgGUID: zsp8bzAIR3aTYOJWEqI7Rg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="70743485"
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="70743485"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 05:47:01 -0800
+X-CSE-ConnectionGUID: bCJ4A+TsSdWZ9Q4Ncue62A==
+X-CSE-MsgGUID: CKi6IRQPS9Sz/jESAesUuw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="229775584"
+Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 20 Dec 2025 05:46:55 -0800
+Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vWxIK-000000004Zz-3jrU;
+	Sat, 20 Dec 2025 13:46:52 +0000
+Date: Sat, 20 Dec 2025 21:46:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH v12 19/46] KVM: arm64: Expose support for private memory
+Message-ID: <202512202102.XFW5Jfym-lkp@intel.com>
+References: <20251217101125.91098-20-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251217101125.91098-20-steven.price@arm.com>
 
-During initialization, kernel maps the MMIO resources of IMSIC, which is
-parsed from ACPI or DTS and may not strictly contains all guest
-interrupt files. Page fault happens when KVM wrongly allocates an
-unmapped guest interrupt file and writes it.
+Hi Steven,
 
-Thus, during initialization, we calculate the number of available guest
-interrupt files according to MMIO resources and constrain the number of
-guest interrupt files that can be allocated by KVM.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
----
- arch/riscv/kvm/aia.c                    | 2 +-
- drivers/irqchip/irq-riscv-imsic-state.c | 7 ++++++-
- include/linux/irqchip/riscv-imsic.h     | 3 +++
- 3 files changed, 10 insertions(+), 2 deletions(-)
+[auto build test ERROR on linus/master]
+[also build test ERROR on v6.19-rc1 next-20251219]
+[cannot apply to kvmarm/next kvm/queue kvm/next arm64/for-next/core kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-index dad3181856600..cac3c2b51d724 100644
---- a/arch/riscv/kvm/aia.c
-+++ b/arch/riscv/kvm/aia.c
-@@ -630,7 +630,7 @@ int kvm_riscv_aia_init(void)
- 	 */
- 	if (gc)
- 		kvm_riscv_aia_nr_hgei = min((ulong)kvm_riscv_aia_nr_hgei,
--					    BIT(gc->guest_index_bits) - 1);
-+					    gc->nr_guest_files);
- 	else
- 		kvm_riscv_aia_nr_hgei = 0;
- 
-diff --git a/drivers/irqchip/irq-riscv-imsic-state.c b/drivers/irqchip/irq-riscv-imsic-state.c
-index dc95ad856d80a..1e982ce024a47 100644
---- a/drivers/irqchip/irq-riscv-imsic-state.c
-+++ b/drivers/irqchip/irq-riscv-imsic-state.c
-@@ -794,7 +794,7 @@ static int __init imsic_parse_fwnode(struct fwnode_handle *fwnode,
- 
- int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
- {
--	u32 i, j, index, nr_parent_irqs, nr_mmios, nr_handlers = 0;
-+	u32 i, j, index, nr_parent_irqs, nr_mmios, nr_guest_files, nr_handlers = 0;
- 	struct imsic_global_config *global;
- 	struct imsic_local_config *local;
- 	void __iomem **mmios_va = NULL;
-@@ -888,6 +888,7 @@ int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
- 	}
- 
- 	/* Configure handlers for target CPUs */
-+	global->nr_guest_files = BIT(global->guest_index_bits) - 1;
- 	for (i = 0; i < nr_parent_irqs; i++) {
- 		rc = imsic_get_parent_hartid(fwnode, i, &hartid);
- 		if (rc) {
-@@ -928,6 +929,10 @@ int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaque)
- 		local->msi_pa = mmios[index].start + reloff;
- 		local->msi_va = mmios_va[index] + reloff;
- 
-+		nr_guest_files = (resource_size(&mmios[index]) - reloff) / IMSIC_MMIO_PAGE_SZ - 1;
-+		global->nr_guest_files = global->nr_guest_files > nr_guest_files ? nr_guest_files :
-+					 global->nr_guest_files;
-+
- 		nr_handlers++;
- 	}
- 
-diff --git a/include/linux/irqchip/riscv-imsic.h b/include/linux/irqchip/riscv-imsic.h
-index 7494952c55187..43aed52385008 100644
---- a/include/linux/irqchip/riscv-imsic.h
-+++ b/include/linux/irqchip/riscv-imsic.h
-@@ -69,6 +69,9 @@ struct imsic_global_config {
- 	/* Number of guest interrupt identities */
- 	u32					nr_guest_ids;
- 
-+	/* Number of guest interrupt files per core */
-+	u32					nr_guest_files;
-+
- 	/* Per-CPU IMSIC addresses */
- 	struct imsic_local_config __percpu	*local;
- };
+url:    https://github.com/intel-lab-lkp/linux/commits/Steven-Price/kvm-arm64-Include-kvm_emulate-h-in-kvm-arm_psci-h/20251218-030351
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20251217101125.91098-20-steven.price%40arm.com
+patch subject: [PATCH v12 19/46] KVM: arm64: Expose support for private memory
+config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20251220/202512202102.XFW5Jfym-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251220/202512202102.XFW5Jfym-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512202102.XFW5Jfym-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/kvm_host.h:45,
+                    from arch/arm64/kernel/asm-offsets.c:16:
+>> include/linux/kvm_host.h:725:45: error: expected identifier or '(' before 'struct'
+     725 | static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+         |                                             ^~~~~~
+   arch/arm64/include/asm/kvm_host.h:1465:41: note: in definition of macro 'kvm_arch_has_private_mem'
+    1465 | #define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
+         |                                         ^~~
+>> arch/arm64/include/asm/kvm_host.h:1465:45: error: expected ')' before '->' token
+    1465 | #define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
+         |                                             ^~
+   include/linux/kvm_host.h:725:20: note: in expansion of macro 'kvm_arch_has_private_mem'
+     725 | static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+         |                    ^~~~~~~~~~~~~~~~~~~~~~~~
+   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1
+   make[3]: Target 'prepare' not remade because of errors.
+   make[2]: *** [Makefile:1314: prepare0] Error 2
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:248: __sub-make] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:248: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
+
+
+vim +725 include/linux/kvm_host.h
+
+f481b069e67437 Paolo Bonzini       2015-05-17  723  
+d1e54dd08f163a Fuad Tabba          2025-07-29  724  #ifndef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+a7800aa80ea4d5 Sean Christopherson 2023-11-13 @725  static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+a7800aa80ea4d5 Sean Christopherson 2023-11-13  726  {
+a7800aa80ea4d5 Sean Christopherson 2023-11-13  727  	return false;
+a7800aa80ea4d5 Sean Christopherson 2023-11-13  728  }
+a7800aa80ea4d5 Sean Christopherson 2023-11-13  729  #endif
+a7800aa80ea4d5 Sean Christopherson 2023-11-13  730  
+
 -- 
-2.20.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
