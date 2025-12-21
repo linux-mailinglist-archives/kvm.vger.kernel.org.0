@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-66459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F651CD3D25
-	for <lists+kvm@lfdr.de>; Sun, 21 Dec 2025 09:46:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B46CD3D5C
+	for <lists+kvm@lfdr.de>; Sun, 21 Dec 2025 10:12:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A6AE83012762
-	for <lists+kvm@lfdr.de>; Sun, 21 Dec 2025 08:46:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CCCAE30094B3
+	for <lists+kvm@lfdr.de>; Sun, 21 Dec 2025 09:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDA4279324;
-	Sun, 21 Dec 2025 08:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AB721CC4F;
+	Sun, 21 Dec 2025 09:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqpj2yAW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u194GqCt"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BCE1A262A;
-	Sun, 21 Dec 2025 08:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB082773CB;
+	Sun, 21 Dec 2025 09:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766306781; cv=none; b=hdx1dueONOaW7jd+MEwBD/x0hGFlo+rlXLy6kqcAcVxJgZXLH/IWVdi3jzth1iDwTPM+ORhKT6FP9afIug6TRlOLphg16xpidCNfKMOKwePQxfg78X31i7J3CHO7Up5x3wsssDKzaKrEwsXW+1rOgSVGXNCPs1D4h/SuEmNttGQ=
+	t=1766308321; cv=none; b=dFhnukRHHvu+Ai+/IuxD/coixjvHN1rZ09RYTpYtbF5iun52u1O3B89Oqt2IgDPjaNVFLygBtiU2vq/mdgVucV4UfGkoNSGc2dUkbQ9wZMFSAfARK/y0J4LqKhRB+cbNJ7NGDLfR05Bk+dsPTxKYrW/uREunXFsiMawB7PzrawQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766306781; c=relaxed/simple;
-	bh=LzD3evTlbOZ9okKa/QPL8yyABDk/ui8XeBYX9VdYiL8=;
+	s=arc-20240116; t=1766308321; c=relaxed/simple;
+	bh=w4Q/AwdSQbx5fH+/eAOuT3Pq5WmWbR1QvwU43aGlk5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e83JbEcbWMd8KveabuZ+AtXTZ1AylIRnsu2IV2qbJe13tNXlSB/tc9D3cWgBlxSZlWONo9rl3SRMiujMlx80pYBn1mLiJF3gjYHmU3JQ4zFgTgaOzRtBkIc5sBBNPxoCfnPu7UgttxwnsKOPzRgntV0kCjuo0eriFXWzdOrlIFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqpj2yAW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02106C116B1;
-	Sun, 21 Dec 2025 08:46:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HGsvg6UjaXyJlkt/+fu46dT23E7f9UmjjDWjnkvByarlWYv2EdM3zkgHks1Vyg0mNTQ8F7zsTG+epeee2fUoeQCRZ/El4/wPpepu3v3QpdOpCH2egzNgBHdJZAm4s7YvTihlsUev1t1PyVnyA7f9XDA8mIk7Zf4r9Og2VfzmIr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u194GqCt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F6CDC19423;
+	Sun, 21 Dec 2025 09:11:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766306780;
-	bh=LzD3evTlbOZ9okKa/QPL8yyABDk/ui8XeBYX9VdYiL8=;
+	s=k20201202; t=1766308319;
+	bh=w4Q/AwdSQbx5fH+/eAOuT3Pq5WmWbR1QvwU43aGlk5s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iqpj2yAWQXba4lB65BL8nDC1aWyjVjtIjEMQGcnEx/w31Hcytp7St/mUJbbn9BUM2
-	 mZi8a1JUPvdGpq7uAmmyVglB9HJtI4W+LvtFeqCWtSz2gCVxn46mEbwmcHPHEffY3M
-	 pB8R3osQbPLuJcdSfV/lD9lONJ5QXPIbTlN/2vB8r+x7LXWLE0YoEgQpcvM8pGHVYJ
-	 glF4yGGndQ30vWEHuKbodeh5SedLAy+lCGo62tSXCMCMKtRYoioNfAfiDHIrS79RQu
-	 rL/b2JFXfPe7AtNqDvEzO0/262NCpkbKQ7/lrkQlwyBg3g+TOng1g4yFJf36SQiFh2
-	 LFiH6oqjQog4w==
-Date: Sun, 21 Dec 2025 10:46:15 +0200
+	b=u194GqCtos9i7JOLGAYf7G7qSPcCC4ktN8TmqznloUV1PiSGewkOdeEjTfoKKG6IU
+	 6lAk4G9zQWq1BxdMZn9ZnPWXN+LKHjtbgN9A6oE6IQFC1FcRHZ6b5kQWGN7ZEvwIbO
+	 Xp4Y/wQP45BmRRnKng42u5X65heg99ZM6tLizMTiis8CsvjVVafbNTEOVxAiSQWcJ0
+	 6tthXzPHKOUqAGjeE/MG0NnEO4NFji2TJdTWMJOH6jBNZvysIsKxiPji3PEmISLemv
+	 rbW+K+Fi6gB8r8mbEAdqVymzpEkM+2hzUwNo+riVtAeJ22nEGDUmdTVXF3CZsKivhc
+	 oWOXBCWogwryA==
+Date: Sun, 21 Dec 2025 11:11:54 +0200
 From: Leon Romanovsky <leon@kernel.org>
-To: =?utf-8?B?54aK5Lyf5rCR?= <15927021679@163.com>
+To: Xiong Weimin <15927021679@163.com>
 Cc: "Michael S . Tsirkin" <mst@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
 	Jason Wang <jasowang@redhat.com>,
@@ -58,56 +58,125 @@ Cc: "Michael S . Tsirkin" <mst@redhat.com>,
 	Chenbo Xia <chenbox@nvidia.com>,
 	Bruce Richardson <bruce.richardson@intel.com>, kvm@vger.kernel.org,
 	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	RDMA mailing list <linux-rdma@vger.kernel.org>
-Subject: Re: Re: Implement initial driver for virtio-RDMA device(kernel)
-Message-ID: <20251221084615.GD13030@unreal>
+	xiongweimin <xiongweimin@kylinos.cn>
+Subject: Re: [PATCH 01/10] drivers/infiniband/hw/virtio: Initial driver for
+ virtio RDMA devices
+Message-ID: <20251221091154.GE13030@unreal>
 References: <20251218091050.55047-1-15927021679@163.com>
- <20251218163008.GH400630@unreal>
- <6ef11502.4847.19b34677a76.Coremail.15927021679@163.com>
+ <20251218091050.55047-2-15927021679@163.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6ef11502.4847.19b34677a76.Coremail.15927021679@163.com>
+In-Reply-To: <20251218091050.55047-2-15927021679@163.com>
 
-On Fri, Dec 19, 2025 at 10:19:15AM +0800, 熊伟民  wrote:
+On Thu, Dec 18, 2025 at 05:09:41PM +0800, Xiong Weimin wrote:
+> From: xiongweimin <xiongweimin@kylinos.cn>
 > 
-> At 2025-12-19 00:30:08, "Leon Romanovsky" <leon@kernel.org> wrote:
-> >On Thu, Dec 18, 2025 at 05:09:40PM +0800, Xiong Weimin wrote:
-> >> Hi all,
-> >> 
-> >> This testing instructions aims to introduce an emulating a soft ROCE 
-> >> device with normal NIC(no RDMA), we have finished a vhost-user RDMA
-> >> device demo, which can work with RDMA features such as CM, QP type of 
-> >> UC/UD and so on.
-> >
-> >Same question as on your QEMU patches.
-> >https://lore.kernel.org/all/20251218162028.GG400630@unreal/
-> >
-> >And as a bare minimum, you should run get_maintainers.pl script on your
-> >patches and add the right people and ML to the CC/TO fields.
-> >
+> This commit introduces a new driver for RDMA over virtio, enabling
+> RDMA capabilities in virtualized environments. The driver consists
+> of the following main components:
 > 
-> >Thanks
+> 1. Driver registration with the virtio subsystem and device discovery.
+> 2. Device probe and remove handlers for managing the device lifecycle.
+> 3. Initialization of the InfiniBand device attributes by reading the
+>    virtio configuration space, including conversion from little-endian
+>    to CPU byte order and capability mapping.
+> 4. Setup of virtqueues for:
+>    - Control commands (no callback)
+>    - Completion queues (with callback for CQ events)
+>    - Send and receive queues for queue pairs (no callbacks)
+> 5. Integration with the network device layer for RoCE support.
+> 6. Registration with the InfiniBand core subsystem.
+> 7. Comprehensive error handling during initialization and a symmetric
+>    teardown process.
 > 
+> Key features:
+> - Support for multiple virtqueues based on device capabilities (max_cq, max_qp)
+> - Fast doorbell optimization when notify_offset_multiplier equals PAGE_SIZE
+> - Safe resource management with rollback on failure
 > 
-> Since this feature involves coordinated changes across QEMU, DPDK, and the kernel, 
-> I have submitted patches for all three components to every maintainer. This is to 
-> ensure that senior developers can review the complete architecture and code.
+> Signed-off-by: Xiong Weimin <xiongweimin@kylinos.cn>
 
-Please run get_maintainers.pl on your kernel patches and check if you
-really added "every maintainer".
+<...>
 
-Hint, you didn't even add right mailing list here.
+> +/**
+> + * vrdma_init_netdev - Attempt to find paired virtio-net device on same PCI slot
+> + * @vrdev: The vRDMA device
+> + *
+> + * WARNING: This is a non-standard hack for development/emulation environments.
+> + *          Do not use in production or upstream drivers.
+
+I'm impressed how much AI advanced in code generation. Please recheck
+everything that was generated.
+
+> + *
+> + * Returns 0 on success, or negative errno.
+> + */
+> +int vrdma_init_netdev(struct vrdma_dev *vrdev)
+> +{
+> +    struct pci_dev *pdev_net;
+> +    struct virtio_pci_device *vp_dev;
+> +    struct virtio_pci_device *vnet_pdev;
+> +    void *priv;
+> +    struct net_device *netdev;
+> +
+> +    if (!vrdev || !vrdev->vdev) {
+> +        pr_err("%s: invalid vrdev or vdev\n", __func__);
+> +        return -EINVAL;
+> +    }
+> +
+> +    vp_dev = to_vp_device(vrdev->vdev);
+> +
+> +    /* Find the PCI device at function 0 of the same slot */
+> +    pdev_net = pci_get_slot(vp_dev->pci_dev->bus,
+> +                            PCI_DEVFN(PCI_SLOT(vp_dev->pci_dev->devfn), 0));
+> +    if (!pdev_net) {
+> +        pr_err("Failed to find PCI device at fn=0 of slot %x\n",
+> +               PCI_SLOT(vp_dev->pci_dev->devfn));
+> +        return -ENODEV;
+> +    }
+> +
+> +    /* Optional: Validate it's a known virtio-net device */
+> +    if (pdev_net->vendor != PCI_VENDOR_ID_REDHAT_QUMRANET ||
+> +        pdev_net->device != 0x1041) {
+> +        pr_warn("PCI device %04x:%04x is not expected virtio-net (1041) device\n",
+> +                pdev_net->vendor, pdev_net->device);
+> +        pci_dev_put(pdev_net);
+> +        return -ENODEV;
+> +    }
+> +
+> +    /* Get the virtio_pci_device from drvdata */
+> +    vnet_pdev = pci_get_drvdata(pdev_net);
+> +    if (!vnet_pdev || !vnet_pdev->vdev.priv) {
+> +        pr_err("No driver data or priv for virtio-net device\n");
+> +        pci_dev_put(pdev_net);
+> +        return -ENODEV;
+> +    }
+> +
+> +    priv = vnet_pdev->vdev.priv;
+> +	vrdev->netdev = priv - ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
+> +    netdev = vrdev->netdev; 
+> +
+> +    if (!netdev || !netdev->netdev_ops) {
+> +        pr_err("Invalid net_device retrieved from virtio-net\n");
+> +        pci_dev_put(pdev_net);
+> +        return -ENODEV;
+> +    }
+> +
+> +    /* Hold reference so netdev won't disappear */
+> +    dev_hold(netdev);
+> +
+> +    pci_dev_put(pdev_net);  /* Release reference from pci_get_slot */
+> +
+> +    return 0;
+> +}
+
+AI was right here. It is awful hack.
 
 Thanks
-
-> 
-> 
-> Thanks.
 
