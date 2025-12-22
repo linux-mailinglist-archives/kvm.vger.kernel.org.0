@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-66500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B43CD6C22
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:05:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D156ACD6BE5
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:02:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC54E30BBCC8
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:01:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A4EE83007653
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE2D34678E;
-	Mon, 22 Dec 2025 16:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E43D346E78;
+	Mon, 22 Dec 2025 16:51:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Gxihkx5A"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YAue7iuH"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F483446C7;
-	Mon, 22 Dec 2025 16:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CF23469E0;
+	Mon, 22 Dec 2025 16:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766422272; cv=none; b=IGkDJ4PuTINfknRWxPacnLb+Jt1Hf0nNjyQCmqadZ3YuCYlf9MqPd/F92wtAVllEYaUQLRyo9NAXRZvkFNP7GZ+xcFuQJNyW/OAzcvYuBfmh/IB7RBA4f7/8Pl87twh0vOaZyvCODXVa4wdBtcwrH9dqbc41QpdFxvPzGqy6Db4=
+	t=1766422275; cv=none; b=sBgYJAUg7Bx982k2W7Jlz65xk+dllYtiYJHUazyvu6iaCFTL70Zf6Jrr9v/JkYl8xcMr4RImX5agRXY3E1yngqxxtLDwZXF2Sz8BgHtWCOtQpuH29ZRXul2za8BGrbetUXsOTsdOnbm0Fy2nOqqqt56enxpRM6uCGOjvxpol0EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766422272; c=relaxed/simple;
-	bh=3bXGPw+sqw4OSROua4l0QQfwqREdJhj7Ojv2eP9AtN8=;
+	s=arc-20240116; t=1766422275; c=relaxed/simple;
+	bh=igISKK7+v8BlipLv7r4rS7c4NKEeh58owjmh9HI5ruM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mKqZaP++IBERAZFui9eiJqaGMJG25TOOfMljdfCRgixMDRq4ElvWWxb0hBT2vbVggBSPeT/u/NsGPXxEPxFJ75vevIAUjfFqswHtQft2VlmP/oienSDHE7Bmu3Fa8roxV8W/Ph10b/RD76M3zeGL3EWLL4FNrAWpy5OtcijjMmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Gxihkx5A; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=XeG6NBWMqr5adf6ArINxxcVCgdGT7IgoXUsggMdKXD+hEMn4ugrfcuAtDUUuvL6eCuLA1xC3a1Mn5VYQeYRIRgk1dSESrv8hJ6akDU9EqVrB6r1u70kR7FDlvmBhQYdQHd0A3/03Wo3jOkHRJ9E2kk9+lbXTd5dZ3ivyqf+wSRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YAue7iuH; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMDUYwb006747;
-	Mon, 22 Dec 2025 16:51:08 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMDStjJ028720;
+	Mon, 22 Dec 2025 16:51:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Yo1/wWzGulIqhiMgo
-	ZSkXn1/6nmpxw1R8Mrxi66Tl4s=; b=Gxihkx5AJda7X7dimSmW8Jlx7pUkI7Ijz
-	TphxZkCoev2wj27ta3hrOXHg5COONDwzNYBajAIh2M1HkDZu9JDwk1B4OAEOqUKc
-	NBbryUbF5KjdMHzgwRU6WYvvgM5lP8/WuUdHyG7M09A/yHliQukcMycYCy7+XM7L
-	1CAhYz79iQwiWHvlaGWOCQkJ8IWnxFBom+C+mTdeneIeDM4m1LRsYVZMgRUzW0V6
-	tNFxmbZYgXuXFQ+i7foG3jzCIZ5ueQ3fULrfnGnNwIe3rMdH6zzW1pgfCRLqI2dP
-	FvlsjhCHsBFUtJGhVy9YcgsjhSfC2xEKH4mxx6nZf53j4oQkaHqOA==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5ka399gy-1
+	:mime-version:references:subject:to; s=pp1; bh=gswWEi089zPf+dLFl
+	41BgwM5CH+umFApMFEKUX6Stgg=; b=YAue7iuHd2NApRzpsF9GeEp6kJV/qK2BJ
+	kp5WLs2rIiBWBf94c+OU7zunmD4211nyHh8cgYvDChKoxEnIl+6CQssWAxApIWju
+	tMVLub59nFTPMa8aR4wqs4q8cC1qTfmwxJjOMU6m7dB1NsEg9srpGRlEwWC9C2FN
+	N0qfCxJYuGRB5LwxdsZquQIsY1kTIxmjv7J2KAQgQdqaBovJjjcPLSxtlGs9+yTY
+	j0d3ywxUPrSXw2kgyJ06AuqNw724Kl0Xndb0EWWsrRZcnFrsUQxAHMVMAPQdlM1g
+	jwQHBjTlAzAbmdZSK+zFLg1wJ/lHASYX0E95zpuzoMKWo7UZKQo1A==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5kh496au-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:51:07 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMFXWeO001099;
-	Mon, 22 Dec 2025 16:51:06 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4b664s7a7s-1
+	Mon, 22 Dec 2025 16:51:09 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMG0M4b030263;
+	Mon, 22 Dec 2025 16:51:08 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b66gxq97j-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:51:06 +0000
+	Mon, 22 Dec 2025 16:51:08 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGp3Hu43450660
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGp4VK28967388
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Dec 2025 16:51:03 GMT
+	Mon, 22 Dec 2025 16:51:04 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 274892004B;
+	by IMSVA (Postfix) with ESMTP id 7EB3720040;
+	Mon, 22 Dec 2025 16:51:04 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 45E4A20043;
 	Mon, 22 Dec 2025 16:51:03 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0A56C20043;
-	Mon, 22 Dec 2025 16:51:02 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.111.79.149])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Dec 2025 16:51:01 +0000 (GMT)
+	Mon, 22 Dec 2025 16:51:03 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v6 21/28] KVM: s390: Add some helper functions needed for vSIE
-Date: Mon, 22 Dec 2025 17:50:26 +0100
-Message-ID: <20251222165033.162329-22-imbrenda@linux.ibm.com>
+Subject: [PATCH v6 22/28] KVM: s390: Stop using CONFIG_PGSTE
+Date: Mon, 22 Dec 2025 17:50:27 +0100
+Message-ID: <20251222165033.162329-23-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251222165033.162329-1-imbrenda@linux.ibm.com>
 References: <20251222165033.162329-1-imbrenda@linux.ibm.com>
@@ -87,130 +87,99 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cw7WvHtpcQppx9MxdhjZqUlVmJaQon1r
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfX6KTuAR+SjC2Q
- TUfCiiHWeMcud4WvjHmN/gRMBoL7WmOvMt51fh6U0/RKfdkh7toxKA9qQPPBh9SM4Hsv9EhFH/r
- XeJObs5VyQsd/f8azXMZio5zC0l/lGj5DdCctdl72aFbWT1zqVowikpLvKK6R042rTJe4fgl7sO
- nXvDN77HU9+hY6k2cf01XboW5tm8fHoo+FsHvuRcqA2ODtOf+X75B9zO7eCzDa5WYiPqwGpNWPF
- Yen6BIkeZoqpjK7Jfk/2FRPgI04ABFaoGYJzDj4kcJ1Hjip03oaU8s+WxXixzCUcGxoypS3A/bs
- UOhuZgZEWEtiKMLTug7Mw7JbKvu9BiTm4Tl0QnGyxVtqhnCFNC6RinOleUgSITJ8UNN5fJSbZdp
- lnf8XAD8mZqVtdfbrgoQrFoWVHJD4kD6A9oMJ53/6zcat1KWFLYh/oUKMfX2UGwlmZ1XY6La89j
- mwhTxMtLsDMMXx0mVmg==
-X-Proofpoint-ORIG-GUID: cw7WvHtpcQppx9MxdhjZqUlVmJaQon1r
-X-Authority-Analysis: v=2.4 cv=dqHWylg4 c=1 sm=1 tr=0 ts=694976fb cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+X-Authority-Analysis: v=2.4 cv=bulBxUai c=1 sm=1 tr=0 ts=694976fd cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
  a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=DmfEQQ1nzNyZHvt6oY8A:9
+ a=WeuG7GAIFJ3A7Xv3FmEA:9
+X-Proofpoint-ORIG-GUID: jUZRJLJ6fAfsaQhkZVNegxeZN8jCPJvf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfXzI0NzAf9VT1Q
+ Gbl/1r/Ogd4idXRhagL9ZRNvXPs/SnITzQsWVTjKA3VCfT7uxX/X8RyqcVMSuv9ZWrM3rgLr5Zq
+ VfsB2jGi19BCjKe3dhPy8W0L9tK7m38rKH4ujB0uHnwsS3VPL114OrQtIfhRX/glVUSSrlzBv+J
+ CaH+c6tz+s2Ij+Li+eLxR1LVjf/uUoLhIIO7rj6bId/6QIb5JUYe4b1xJJ8YlM9/UP7Dy4ik2vT
+ APtkp8cODZg9nXn79wHkq8AQ/iwJ9JdH1nEErvg457vT3B36/34zEzeI5xTL8rYmKNq7zDO/KGy
+ TGk9C56J4Ae6rV8OWu4KMrOBgxkfEdYb9T2pKmRGy6I2Pvo+TJ1knMV6tRvx1IT8tgtoIFWY753
+ TFbyQSvkH2ZdW5uayRk849CIxzpBiF40RxpQfvjF/zie1Q5opwxQOw812hXCm88Aouw/B09bU1O
+ BiHSuxcyswWrXAvC/Lg==
+X-Proofpoint-GUID: jUZRJLJ6fAfsaQhkZVNegxeZN8jCPJvf
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-22_02,2025-12-22_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=0 phishscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
  definitions=main-2512220154
 
-Implement gmap_protect_asce_top_level(), which was a stub. This
-function was a stub due to cross dependencies with other patches.
+Switch to using IS_ENABLED(CONFIG_KVM) instead of CONFIG_PGSTE, since
+the latter will be removed soon.
+
+Many CONFIG_PGSTE are left behind, because they will be removed
+completely in upcoming patches. The ones replaced here are mostly the
+ones that will stay.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 ---
- arch/s390/kvm/gmap.c | 72 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 70 insertions(+), 2 deletions(-)
+ arch/s390/include/asm/mmu_context.h | 2 +-
+ arch/s390/include/asm/pgtable.h     | 4 ++--
+ arch/s390/mm/fault.c                | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/s390/kvm/gmap.c b/arch/s390/kvm/gmap.c
-index f4f47e5fc3d5..0abed178dde0 100644
---- a/arch/s390/kvm/gmap.c
-+++ b/arch/s390/kvm/gmap.c
-@@ -22,6 +22,7 @@
- #include "dat.h"
- #include "gmap.h"
- #include "kvm-s390.h"
-+#include "faultin.h"
+diff --git a/arch/s390/include/asm/mmu_context.h b/arch/s390/include/asm/mmu_context.h
+index d9b8501bc93d..48e548c01daa 100644
+--- a/arch/s390/include/asm/mmu_context.h
++++ b/arch/s390/include/asm/mmu_context.h
+@@ -29,7 +29,7 @@ static inline int init_new_context(struct task_struct *tsk,
+ 	atomic_set(&mm->context.protected_count, 0);
+ 	mm->context.gmap_asce = 0;
+ 	mm->context.flush_mm = 0;
+-#ifdef CONFIG_PGSTE
++#if IS_ENABLED(CONFIG_KVM)
+ 	mm->context.has_pgste = 0;
+ 	mm->context.uses_skeys = 0;
+ 	mm->context.uses_cmm = 0;
+diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
+index 04335f5e7f47..cd4d135c4503 100644
+--- a/arch/s390/include/asm/pgtable.h
++++ b/arch/s390/include/asm/pgtable.h
+@@ -577,7 +577,7 @@ static inline int mm_has_pgste(struct mm_struct *mm)
  
- static inline bool kvm_s390_is_in_sie(struct kvm_vcpu *vcpu)
+ static inline int mm_is_protected(struct mm_struct *mm)
  {
-@@ -1009,10 +1010,77 @@ static struct gmap *gmap_find_shadow(struct gmap *parent, union asce asce, int e
- 	return NULL;
- }
- 
-+#define CRST_TABLE_PAGES (_CRST_TABLE_SIZE / PAGE_SIZE)
-+struct gmap_protect_asce_top_level {
-+	unsigned long seq;
-+	struct guest_fault f[CRST_TABLE_PAGES];
-+};
-+
-+static inline int __gmap_protect_asce_top_level(struct kvm_s390_mmu_cache *mc, struct gmap *sg,
-+						struct gmap_protect_asce_top_level *context)
-+{
-+	int rc, i;
-+
-+	guard(write_lock)(&sg->kvm->mmu_lock);
-+
-+	if (kvm_s390_array_needs_retry_safe(sg->kvm, context->seq, context->f))
-+		return -EAGAIN;
-+
-+	scoped_guard(spinlock, &sg->parent->children_lock) {
-+		for (i = 0; i < CRST_TABLE_PAGES; i++) {
-+			rc = gmap_protect_rmap(mc, sg, context->f[i].gfn, 0, context->f[i].pfn,
-+					       TABLE_TYPE_REGION1 + 1, context->f[i].writable);
-+			if (rc)
-+				return rc;
-+		}
-+		gmap_add_child(sg->parent, sg);
-+	}
-+
-+	kvm_s390_release_faultin_array(sg->kvm, context->f, false);
-+	return 0;
-+}
-+
-+static inline int _gmap_protect_asce_top_level(struct kvm_s390_mmu_cache *mc, struct gmap *sg,
-+					       struct gmap_protect_asce_top_level *context)
-+{
-+	int rc;
-+
-+	if (kvm_s390_array_needs_retry_unsafe(sg->kvm, context->seq, context->f))
-+		return -EAGAIN;
-+	do {
-+		rc = kvm_s390_mmu_cache_topup(mc);
-+		if (rc)
-+			return rc;
-+		rc = radix_tree_preload(GFP_KERNEL);
-+		if (rc)
-+			return rc;
-+		rc = __gmap_protect_asce_top_level(mc, sg, context);
-+		radix_tree_preload_end();
-+	} while (rc == -ENOMEM);
-+
-+	return rc;
-+}
-+
- static int gmap_protect_asce_top_level(struct kvm_s390_mmu_cache *mc, struct gmap *sg)
+-#ifdef CONFIG_PGSTE
++#if IS_ENABLED(CONFIG_KVM)
+ 	if (unlikely(atomic_read(&mm->context.protected_count)))
+ 		return 1;
+ #endif
+@@ -632,7 +632,7 @@ static inline pud_t set_pud_bit(pud_t pud, pgprot_t prot)
+ #define mm_forbids_zeropage mm_forbids_zeropage
+ static inline int mm_forbids_zeropage(struct mm_struct *mm)
  {
--	KVM_BUG_ON(1, sg->kvm);
--	return -EINVAL;
-+	struct gmap_protect_asce_top_level context = {};
-+	union asce asce = sg->guest_asce;
-+	int rc;
-+
-+	KVM_BUG_ON(!is_shadow(sg), sg->kvm);
-+
-+	context.seq = sg->kvm->mmu_invalidate_seq;
-+	/* Pairs with the smp_wmb() in kvm_mmu_invalidate_end(). */
-+	smp_rmb();
-+
-+	rc = kvm_s390_get_guest_pages(sg->kvm, context.f, asce.rsto, asce.dt + 1, false);
-+	if (rc > 0)
-+		rc = -EFAULT;
-+	if (!rc)
-+		rc = _gmap_protect_asce_top_level(mc, sg, &context);
-+	if (rc)
-+		kvm_s390_release_faultin_array(sg->kvm, context.f, true);
-+	return rc;
+-#ifdef CONFIG_PGSTE
++#if IS_ENABLED(CONFIG_KVM)
+ 	if (!mm->context.allow_cow_sharing)
+ 		return 1;
+ #endif
+diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+index e2e13778c36a..a52aa7a99b6b 100644
+--- a/arch/s390/mm/fault.c
++++ b/arch/s390/mm/fault.c
+@@ -403,7 +403,7 @@ void do_dat_exception(struct pt_regs *regs)
  }
+ NOKPROBE_SYMBOL(do_dat_exception);
  
- /**
+-#if IS_ENABLED(CONFIG_PGSTE)
++#if IS_ENABLED(CONFIG_KVM)
+ 
+ void do_secure_storage_access(struct pt_regs *regs)
+ {
+@@ -470,4 +470,4 @@ void do_secure_storage_access(struct pt_regs *regs)
+ }
+ NOKPROBE_SYMBOL(do_secure_storage_access);
+ 
+-#endif /* CONFIG_PGSTE */
++#endif /* CONFIG_KVM */
 -- 
 2.52.0
 
