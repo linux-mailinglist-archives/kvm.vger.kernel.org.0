@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-66484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 973D6CD6B8A
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:53:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6958CCD6B90
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:54:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C7D730B1158
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 16:51:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84134307A9D0
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 16:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF48333448;
-	Mon, 22 Dec 2025 16:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1497933373D;
+	Mon, 22 Dec 2025 16:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eoFTcz4Z"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Neh1A8Vt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A67332ECD;
-	Mon, 22 Dec 2025 16:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1014633290B;
+	Mon, 22 Dec 2025 16:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766422246; cv=none; b=I2si0Hjnvdix/g3G1LaP+jeRcUFwL443KUJnEBsZT0X/oTxPKMUZ5ZUCuneoSq1+/B3YrAz4/SMlnBdqUnrgKOVYn5U7QSDG8MU+EhlQX/MzLpUYRMRBRI1RcOHCqNHN/DmOobPiGheeGdfufewE6XxbjKjj0YWgY/CjsOA+vak=
+	t=1766422248; cv=none; b=HJrWtqPZ6pdLQuEblGIAZlpNUxHVexQtrKbTs6l/ep0JI5Rae4rS/XGzHJ8Nxfus20ORjF8ni3rKXIkY58CgzYtiVWdw+xLZBVbZ7VrCD8yd6ZtfnMK7HcDHqOSXhnnztPfKfagIVrZgwxbDBXuP0iY5U7MWA7n2eagoVLpbg5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766422246; c=relaxed/simple;
-	bh=8V0RsbJjbg+C2CRylv9rHMgahDcLKD21enufdKYElYs=;
+	s=arc-20240116; t=1766422248; c=relaxed/simple;
+	bh=KKJC+YnSQfRueC8R5pCG5k1inUq4VYQQ3SDb0JxrwfI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xchjt/e0ZGoGysz2RNUEWhpgQGXrEYrKnUnSgD3SZZ0Z5YUvQyfxzzMONzeSmHzA7aaib4R5IGsg6tUY6/j5ePmDoZjQxOA8dEcIHzjCFmW62j8Xv3wCWa90EZrxzUbpKUxqWDNmm3tvsivXfaFmJ+ItMzHrjUVXLCEBUPoqcBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eoFTcz4Z; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=DE7+lxvLWh2m+AORcZxaWUUaoSuRiCm54O54RShRwuD9BkxHZ/9qiHED9fHSTJQtcBjsIpdsC/M6Qfv1tkQEAC61lLWIcVd230raRne/ZjDbT6kOwl7Jqe8VTNYTjdlZuG7ZuGw8HHtwYYvT6uD33TCP+0wux/bGzyQg4INgi4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Neh1A8Vt; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMCpBbw017912;
-	Mon, 22 Dec 2025 16:50:42 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BM7CS4t002196;
+	Mon, 22 Dec 2025 16:50:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=+5QN9fBrz8NVdvPYx
-	1QvWxk2hn6Rv7kUyS/mMpg6ITQ=; b=eoFTcz4ZvtJ0+fU5Q84mQYxKmZ0FV9T2K
-	kou4hZRNha4uZ0Q7xMWYIwwByddVEaEwoP6aouWGvgca4hxC2ydPXWw0HvSwY9dY
-	39YWInD2B6wHEClnG0ELzHE0c4lH8zeP4gkrH+Vw+lT6mx8d4mTMz3oYOCU1G9PP
-	EFMBCrkix18KGDxaZgFqLRUUoIZEG37ZdDH/4pqqVyujhl2tseHOIF/t62rwcV/y
-	NHoOOHBq+xZz6zLfRA6lituTtilz/LsxXZqZUue0NMs8Ib9BgY65RAA0Efryl3At
-	dlYaJq7FSkB+b5CQZPVd1NIwcewNfPxHhIzmvo9bqQvi6+75HbqQw==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5ketrtac-1
+	:mime-version:references:subject:to; s=pp1; bh=HX2NRnK5H2nIdD2i/
+	6mgkh0Vo4qi+8ItWn9NM+weks8=; b=Neh1A8VtOd0sy7lht2Jl/ZMuaL3gvsakT
+	rR7n5+pU3ks1FvUSgTqtxXxsBpqRVsTNrjl1P/iRzzc9eaYKQVAtyfSwMR2CZhOS
+	zzFfbemSrD6zfbR0nLZbNGhskLmdk4MjW/ut7h9Mk+tLiT7gmN5hTrip8hvhSdFw
+	7nLygNcmELebN35+7g371N1R8P7VjqEQvZqcRkHOJSD+/LKSjHzTxAvZWvM7FnOi
+	9p7zKICqWCypzvSS1A0n0lV0ejr3XO0GGKxMUfbuSQYN9MKbBheyA+zV5Wa5JUuK
+	JW/TfoYYYY3gl+7lFe8qIyS8dsAQyZNS3t7Sp24JRj4TrJdRgDiew==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5kh4968q-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:50:42 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMGKH7s004272;
-	Mon, 22 Dec 2025 16:50:41 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b674mq582-1
+	Mon, 22 Dec 2025 16:50:43 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMFUiE5001109;
+	Mon, 22 Dec 2025 16:50:42 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4b664s7a5n-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:50:41 +0000
+	Mon, 22 Dec 2025 16:50:42 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGobQw50856198
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGocTZ41615864
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Dec 2025 16:50:37 GMT
+	Mon, 22 Dec 2025 16:50:39 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7E70E20043;
+	by IMSVA (Postfix) with ESMTP id C5BA420043;
+	Mon, 22 Dec 2025 16:50:38 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9DE3B20040;
 	Mon, 22 Dec 2025 16:50:37 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5C1A520040;
-	Mon, 22 Dec 2025 16:50:36 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.111.79.149])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Dec 2025 16:50:36 +0000 (GMT)
+	Mon, 22 Dec 2025 16:50:37 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v6 02/28] KVM: s390: add P bit in table entry bitfields, move union vaddress
-Date: Mon, 22 Dec 2025 17:50:07 +0100
-Message-ID: <20251222165033.162329-3-imbrenda@linux.ibm.com>
+Subject: [PATCH v6 03/28] s390: Make UV folio operations work on whole folio
+Date: Mon, 22 Dec 2025 17:50:08 +0100
+Message-ID: <20251222165033.162329-4-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251222165033.162329-1-imbrenda@linux.ibm.com>
 References: <20251222165033.162329-1-imbrenda@linux.ibm.com>
@@ -87,136 +87,87 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uE34NIIOU3eTeik5C15RuIg0jwrPHKyT
-X-Authority-Analysis: v=2.4 cv=Qdxrf8bv c=1 sm=1 tr=0 ts=694976e2 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Authority-Analysis: v=2.4 cv=bulBxUai c=1 sm=1 tr=0 ts=694976e3 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=ejxT3_R5mcMXAYFV490A:9
-X-Proofpoint-ORIG-GUID: uE34NIIOU3eTeik5C15RuIg0jwrPHKyT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfXyg9Ft+hTY2Cz
- hoJe0kzvM4O95S8mPM9VxDBIrHxZAHVvJ/oJKQKRvF/5OsOMjOh55zMpITmpeym7Kv7uaX1ETUx
- Yvzmn2AEOOseDeeeif1i6EilH+CO0JzO3DVBy9HCPVV96OSjiVazv94OS7gveq6/+VcCtHiBz4Y
- NxF1EyZotvUviIm7kKfnvtkLSUp1qF1YVHLPWmGWd3HHIDd/SRa33EoqKuKxkwXEx1CztHAOJRy
- I01JLuoTYbWtAC7RQycOyrorVJssCo0Gwlk03E714EJMJGL/O5x5B+f8Kqj4Lvj0qNDJsCf7sF0
- LCiZ0bKX8VxsEvecYIebJ01RGt5P2DK8IVK0/NRPlNWqaoLwRZ+cdfX2XYRMpW5NY3OGa/lfuIs
- WdJKYeGvu78XDrMs9TPSrY9F8a6DkjaoXKQWUDfJ2ayL/HnVtT9CYw0JLJHnYgz8rtGBMZTXfYP
- Rv1GwRPaVgBdOpoprqg==
+ a=56eYp6RrapUnXBmR778A:9
+X-Proofpoint-ORIG-GUID: RBr-c5kDQXEgry7RpIWLrnHlUz4Ilnp_
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfX5oeKI2N1W7mp
+ pDp6tkvPAtMT31gKnvkBTqcaZpD0rIO6Oh/blDNlIN72INPOVr+XREvA6qpicvFkVAcozpNnA0a
+ J7D3BZ/S8PzYkxVX3ws1RNRpu4pY1qRsT5OiiEjTgDVlDSWQfw3sKupIl1V/ETEMSdDhOjRwfHW
+ jr1L/15lld6N3rqlUjXng68puL3P6I+I2pU5cZ3HCcpJD3bOtZJoSzjF4SiAzquxM2y+0uyru2d
+ KP3Th8VOyntES4n6NMXw/3DsxYhRBMGCq4hKyllzqP5hisvCLGy6jNQJi0rphlkZ9hgD1TFY04u
+ jJUmAlKveUbUnEAwStYyDcUj44XYGWNGIUtcOzE3N7JtdUsfYynFeeoClsHX7QA68wbgpPx63pH
+ ALCURtZCoslfQSQ58ttak+OqHP4vDrtSp/R8GkyYRIlQaN6UEBbkk3L6Y5VfviC8DF9MzdraXli
+ ku0tCAzmeY9WgV9T3RA==
+X-Proofpoint-GUID: RBr-c5kDQXEgry7RpIWLrnHlUz4Ilnp_
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-22_02,2025-12-22_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 bulkscore=0 lowpriorityscore=0 malwarescore=0 clxscore=1015
- priorityscore=1501 phishscore=0 impostorscore=0 adultscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2512220154
+ adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=0 phishscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
+ definitions=main-2512220154
 
-Add P bit in hardware definition of region 3 and segment table entries.
+uv_destroy_folio() and uv_convert_from_secure_folio() should work on
+all pages in the folio, not just the first one.
 
-Move union vaddress from kvm/gaccess.c to asm/dat_bits.h
+This was fine until now, but it will become a problem with upcoming
+patches.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 ---
- arch/s390/include/asm/dat-bits.h | 32 ++++++++++++++++++++++++++++++--
- arch/s390/kvm/gaccess.c          | 26 --------------------------
- 2 files changed, 30 insertions(+), 28 deletions(-)
+ arch/s390/kernel/uv.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/arch/s390/include/asm/dat-bits.h b/arch/s390/include/asm/dat-bits.h
-index 8d65eec2f124..c40874e0e426 100644
---- a/arch/s390/include/asm/dat-bits.h
-+++ b/arch/s390/include/asm/dat-bits.h
-@@ -9,6 +9,32 @@
- #ifndef _S390_DAT_BITS_H
- #define _S390_DAT_BITS_H
+diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+index ed46950be86f..ca0849008c0d 100644
+--- a/arch/s390/kernel/uv.c
++++ b/arch/s390/kernel/uv.c
+@@ -134,14 +134,15 @@ static int uv_destroy(unsigned long paddr)
+  */
+ int uv_destroy_folio(struct folio *folio)
+ {
++	unsigned long i;
+ 	int rc;
  
-+/*
-+ * vaddress union in order to easily decode a virtual address into its
-+ * region first index, region second index etc. parts.
-+ */
-+union vaddress {
-+	unsigned long addr;
-+	struct {
-+		unsigned long rfx : 11;
-+		unsigned long rsx : 11;
-+		unsigned long rtx : 11;
-+		unsigned long sx  : 11;
-+		unsigned long px  : 8;
-+		unsigned long bx  : 12;
-+	};
-+	struct {
-+		unsigned long rfx01 : 2;
-+		unsigned long	    : 9;
-+		unsigned long rsx01 : 2;
-+		unsigned long	    : 9;
-+		unsigned long rtx01 : 2;
-+		unsigned long	    : 9;
-+		unsigned long sx01  : 2;
-+		unsigned long	    : 29;
-+	};
-+};
-+
- union asce {
- 	unsigned long val;
- 	struct {
-@@ -98,7 +124,8 @@ union region3_table_entry {
- 	struct {
- 		unsigned long	: 53;
- 		unsigned long fc: 1; /* Format-Control */
--		unsigned long	: 4;
-+		unsigned long p : 1; /* DAT-Protection Bit */
-+		unsigned long	: 3;
- 		unsigned long i : 1; /* Region-Invalid Bit */
- 		unsigned long cr: 1; /* Common-Region Bit */
- 		unsigned long tt: 2; /* Table-Type Bits */
-@@ -140,7 +167,8 @@ union segment_table_entry {
- 	struct {
- 		unsigned long	: 53;
- 		unsigned long fc: 1; /* Format-Control */
--		unsigned long	: 4;
-+		unsigned long p : 1; /* DAT-Protection Bit */
-+		unsigned long	: 3;
- 		unsigned long i : 1; /* Segment-Invalid Bit */
- 		unsigned long cs: 1; /* Common-Segment Bit */
- 		unsigned long tt: 2; /* Table-Type Bits */
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index 41ca6b0ee7a9..d8347f7cbe51 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -20,32 +20,6 @@
- 
- #define GMAP_SHADOW_FAKE_TABLE 1ULL
- 
--/*
-- * vaddress union in order to easily decode a virtual address into its
-- * region first index, region second index etc. parts.
-- */
--union vaddress {
--	unsigned long addr;
--	struct {
--		unsigned long rfx : 11;
--		unsigned long rsx : 11;
--		unsigned long rtx : 11;
--		unsigned long sx  : 11;
--		unsigned long px  : 8;
--		unsigned long bx  : 12;
--	};
--	struct {
--		unsigned long rfx01 : 2;
--		unsigned long	    : 9;
--		unsigned long rsx01 : 2;
--		unsigned long	    : 9;
--		unsigned long rtx01 : 2;
--		unsigned long	    : 9;
--		unsigned long sx01  : 2;
--		unsigned long	    : 29;
--	};
--};
+-	/* Large folios cannot be secure */
+-	if (unlikely(folio_test_large(folio)))
+-		return 0;
 -
- /*
-  * raddress union which will contain the result (real or absolute address)
-  * after a page table walk. The rfaa, sfaa and pfra members are used to
+ 	folio_get(folio);
+-	rc = uv_destroy(folio_to_phys(folio));
++	for (i = 0; i < (1 << folio_order(folio)); i++) {
++		rc = uv_destroy(folio_to_phys(folio) + i * PAGE_SIZE);
++		if (rc)
++			break;
++	}
+ 	if (!rc)
+ 		clear_bit(PG_arch_1, &folio->flags.f);
+ 	folio_put(folio);
+@@ -183,14 +184,15 @@ EXPORT_SYMBOL_GPL(uv_convert_from_secure);
+  */
+ int uv_convert_from_secure_folio(struct folio *folio)
+ {
++	unsigned long i;
+ 	int rc;
+ 
+-	/* Large folios cannot be secure */
+-	if (unlikely(folio_test_large(folio)))
+-		return 0;
+-
+ 	folio_get(folio);
+-	rc = uv_convert_from_secure(folio_to_phys(folio));
++	for (i = 0; i < (1 << folio_order(folio)); i++) {
++		rc = uv_convert_from_secure(folio_to_phys(folio) + i * PAGE_SIZE);
++		if (rc)
++			break;
++	}
+ 	if (!rc)
+ 		clear_bit(PG_arch_1, &folio->flags.f);
+ 	folio_put(folio);
 -- 
 2.52.0
 
