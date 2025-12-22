@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-66491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8540CD6BD9
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:02:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB1ECD6CCB
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 104B03027EAA
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:01:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F24BD30146D7
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4C833DED3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C95E33DEFA;
 	Mon, 22 Dec 2025 16:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="R+eAUF6Y"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nNlsQfvd"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB4F33C1AD;
-	Mon, 22 Dec 2025 16:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1ED33B6CF;
+	Mon, 22 Dec 2025 16:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766422258; cv=none; b=A8A4h8WeTarQ0MuR7ZgieTzuwbHMp8fGAbC6531g4Ga6oXS5DhfSZPoBM+qUyMQS1p92GS+hm5xUE0WQ+m0bkZQ+nlNXPEJGcnpWAAjZYPElRSRthfe3suv8KdcAqgQgtQvVPEpD3j46d6RnSKEqpUEXNqSttoRwB0w+bvrVlKo=
+	t=1766422258; cv=none; b=fmgMKl4U9imxY+cSyCNPQYEY//fS0zqezi6XL00C2QcEv47udfeE0xY6ScQYo+n8JCRNzxgOBSMHcCx1dLEzi7UjoBCZAGVyUY/yTSOBB/CcfPfsZNRVmOQLYluhKQUsE9rUgyK3i4QRtQ8Jjix8f2t8vom8JuA3+e/3hcOAlo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766422258; c=relaxed/simple;
-	bh=MwRlEXS+9TTKAVxXRbRJfm30lcddhdF+DFAQ7aLn7eQ=;
+	bh=8UkpGTWwtwpBCmzbEuC+cxDdvga6PTHi3Kdv9DBkpd4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oVrmmwOBOgzAUcgiSrn0ItFfH/iZBUr6KjM/tpUcZH6no41wbeqsotVpKSqGVVLc0uFpl8VHlGV7IGYm0XvhogBv7lMCkJwczJeK9nvSZsl6eG5/8PWWkbogCbGljRRxOWWKFDIWnvBpECikifg3rwogLzCc4bKCjb9uSGNhZPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=R+eAUF6Y; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=Lsg1z/LSdj8JEYQmZIzxB3bHifjUVQ/adJWqcaFb/LhK5Fu+v/ayfCawOrCc2LPQgu0kCPP9pOZbAjWzRdRM3xNKB+bS/3wRLOrLnovozGGeBrXp7VTCdsNGWDC9EwpWdwDXwRKwD/gX1twRqz5eRpDegTfZPPodQPJDfizaGCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nNlsQfvd; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMDwHVx007191;
-	Mon, 22 Dec 2025 16:50:53 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMB2l0t009244;
+	Mon, 22 Dec 2025 16:50:54 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=9VBHMGApuDPu1H5nW
-	xC2gjbA/GYRZEiMfQwZendHh0k=; b=R+eAUF6YW3Y6JUHRVMHX8YAHwPsZl24lJ
-	vtXuRBneMOMmh3r7n5zfJtoxwQYEeMjD87PMuMp07nmNZJlkRcz6bHtncPQXJNgn
-	atOJbFlDQWie8EccCdjJQ0ywWEJdKeFB4ceuUEVucXQSnlC1nx+GomnIG3iiB/uQ
-	nnqg2KYNj/TvH+ZXNOL5HsSgJGc6I17fCwwOL5cP14dmvDBHxToO8Ul+zDEK98O3
-	2EQpxInlk0nLkFf1Xk/HY8QiWlK25K/IpByrZYlBwnRreJm6ak1wC40pS5uV0Ib4
-	3cDSJhK/jGQPI61bLo2V4qvi/yBZQuHTVeLjms+Q5vOENEi82Q1jA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5kfq16wt-1
+	:mime-version:references:subject:to; s=pp1; bh=lwTngDyaNYF1vtCdZ
+	/G6YT4Oibj8h9KDMYrxj6jl/Wg=; b=nNlsQfvde9MPOjFBvN4aCqAzYS32thaR9
+	zA61zTvCcXcYTAFK/xT81VPmt8abuFFfVBMEivQL+3iO6ohyfh8q8wNGJlqkK5/4
+	MLAF5u//BgrlOqye8PcPkfllAFg7E756m5SLkciSNI21pY4lRXYatxAV3lg7xQ/j
+	ePX5S1BS+wFnL/G7dO0A+BXZ9ErV6Mvg1+sddpeBRbG4B/xURZsk0N6voBx6YoLL
+	0I7vnPqcPp6cB7jPdPPJ187834YslqHq8cZhI/041tkhhWet5lGexUs4y+eVJ0p9
+	MpAC8d69z0JEGu7IkDAvuvTCneNIQnB+KGj0RuPUulTEiSdBmJB6A==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5kh4969g-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:50:52 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMGKfpp005012;
-	Mon, 22 Dec 2025 16:50:51 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b674mq58y-1
+	Mon, 22 Dec 2025 16:50:53 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMGWSRN005259;
+	Mon, 22 Dec 2025 16:50:52 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b67mjy3j7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:50:51 +0000
+	Mon, 22 Dec 2025 16:50:52 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGolOt12189982
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGomkM51183874
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Dec 2025 16:50:47 GMT
+	Mon, 22 Dec 2025 16:50:48 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6220220043;
+	by IMSVA (Postfix) with ESMTP id 9A85420043;
+	Mon, 22 Dec 2025 16:50:48 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7FFB120040;
 	Mon, 22 Dec 2025 16:50:47 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 47DA220040;
-	Mon, 22 Dec 2025 16:50:46 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.111.79.149])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Dec 2025 16:50:46 +0000 (GMT)
+	Mon, 22 Dec 2025 16:50:47 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v6 09/28] KVM: s390: vsie: Pass gmap explicitly as parameter
-Date: Mon, 22 Dec 2025 17:50:14 +0100
-Message-ID: <20251222165033.162329-10-imbrenda@linux.ibm.com>
+Subject: [PATCH v6 10/28] KVM: s390: Enable KVM_GENERIC_MMU_NOTIFIER
+Date: Mon, 22 Dec 2025 17:50:15 +0100
+Message-ID: <20251222165033.162329-11-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251222165033.162329-1-imbrenda@linux.ibm.com>
 References: <20251222165033.162329-1-imbrenda@linux.ibm.com>
@@ -87,184 +87,132 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=carfb3DM c=1 sm=1 tr=0 ts=694976ec cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Authority-Analysis: v=2.4 cv=bulBxUai c=1 sm=1 tr=0 ts=694976ed cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=HXG1Eys9fZm8ipb54dgA:9
-X-Proofpoint-ORIG-GUID: 4za2X7nckNiqDGDSlfTESqBca21_Fsll
-X-Proofpoint-GUID: 4za2X7nckNiqDGDSlfTESqBca21_Fsll
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfX/V7/oVnyZER2
- arMPM0aylySxVz+Rxl5E5+BIdUYMHC+rzOzG4GhpxMGD0k/v2SNEnyi8ZJgPQEnNl9MXRv8H1Vk
- zm0A+PEI+RRA1tp+66criV6E7tghbcIIHXGDf+/YVsnoQyxD7FfAQ8uLlXppO/y51sy0tFNb3f8
- oM9r0g2egSVbKBUKGwZxCk4d39cvyaNs7AmOq3hZSdOxR5fttDjpGLtqMzsNhxYQSIEfLNjxOJb
- JP5RjNXhoRRdTNjnYsuA0HTBT0XsBraMM9khCdAURqSmGb4qOA3oOHlKaMo/E95L4Y/rQM03crH
- hR0OZvxXsg5tfv5F1Kpzok0CRhAXOHUkBva6uglSVnxdfbJL/oNnAH0CxFT/9o1R32Po9MlV2p7
- cUCOI5IdcB18KpXmLQtpz2mx9YFWgsG5pZhxk4Y76tZnjE/wC8EobjQQJaOeXL50F1UOWzi5HZK
- z2XoRtu27JfO6CjgdsA==
+ a=sWpJ-_il0aw9mM0vlR0A:9
+X-Proofpoint-ORIG-GUID: gQx8teKQmE3nWEQf_ZXii7oWBRcHvmt9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfX9rpQV49u2xtt
+ slI8cPukGjdUTfK7XZeX7TRdHDEDYeqRG9C03BVIK9D+xS7baFD9zdTrw/k4JAQjtzyFRYnzTGy
+ Czxd2BpDYZ5Iw+bXrEGt/wEftwt03S3VW5P6OArLESxEWQ7Kswxn96elRyKGSxjJMQh8N5TlWxJ
+ 13oTe+BD2eQn5X0sRNxvcMZfIkoWo2qDUi67E8azUhN3xIgNsvrW09U45JiJrkYzZOuWl4i2gi5
+ r186DbaTjNFk07cE6l7OAqwY+oqcEu1GyGf2vnqeq7Ud6CkP7zQ7Q5zy+khEIYOIfBIjZp6Q9Qw
+ RkPzkkeMOauxPj7Fgxit+99AM2NVdEYZkPH6LG9+6q70yu3zPRpWWM9oAV/nidB7/yHdkSP0A4f
+ T48SY8v90kLxd8pRMnd6KEbZ3u/hTYfVMTPAcpb8mr0vCifpGoINefU+f6e5CY5Ei7kXfujInGl
+ GR/k7pl2nq+jGQ20uNw==
+X-Proofpoint-GUID: gQx8teKQmE3nWEQf_ZXii7oWBRcHvmt9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-22_02,2025-12-22_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 bulkscore=0 suspectscore=0 spamscore=0 clxscore=1015
- malwarescore=0 impostorscore=0 priorityscore=1501 adultscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2512220154
+ adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=0 phishscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
+ definitions=main-2512220154
 
-Pass the gmap explicitly as parameter, instead of just using
-vsie_page->gmap.
+Enable KVM_GENERIC_MMU_NOTIFIER, for now with empty placeholder callbacks.
 
-This will be used in upcoming patches.
+Also enable KVM_MMU_LOCKLESS_AGING and define KVM_HAVE_MMU_RWLOCK.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 ---
- arch/s390/kvm/vsie.c | 40 +++++++++++++++++++---------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+ arch/s390/include/asm/kvm_host.h |  1 +
+ arch/s390/kvm/Kconfig            |  2 ++
+ arch/s390/kvm/kvm-s390.c         | 45 +++++++++++++++++++++++++++++++-
+ 3 files changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index b526621d2a1b..1dd54ca3070a 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -652,7 +652,7 @@ void kvm_s390_vsie_gmap_notifier(struct gmap *gmap, unsigned long start,
-  *          - -EAGAIN if the caller can retry immediately
-  *          - -ENOMEM if out of memory
-  */
--static int map_prefix(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-+static int map_prefix(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct gmap *sg)
- {
- 	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
- 	u64 prefix = scb_s->prefix << GUEST_PREFIX_SHIFT;
-@@ -667,10 +667,9 @@ static int map_prefix(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	/* with mso/msl, the prefix lies at offset *mso* */
- 	prefix += scb_s->mso;
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 3dbddb7c60a9..6ba99870fc32 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -27,6 +27,7 @@
+ #include <asm/isc.h>
+ #include <asm/guarded_storage.h>
  
--	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, prefix, NULL);
-+	rc = kvm_s390_shadow_fault(vcpu, sg, prefix, NULL);
- 	if (!rc && (scb_s->ecb & ECB_TE))
--		rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
--					   prefix + PAGE_SIZE, NULL);
-+		rc = kvm_s390_shadow_fault(vcpu, sg, prefix + PAGE_SIZE, NULL);
- 	/*
- 	 * We don't have to mprotect, we will be called for all unshadows.
- 	 * SIE will detect if protection applies and trigger a validity.
-@@ -951,7 +950,7 @@ static int inject_fault(struct kvm_vcpu *vcpu, __u16 code, __u64 vaddr,
-  *          - > 0 if control has to be given to guest 2
-  *          - < 0 if an error occurred
-  */
--static int handle_fault(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-+static int handle_fault(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct gmap *sg)
- {
- 	int rc;
++#define KVM_HAVE_MMU_RWLOCK
+ #define KVM_MAX_VCPUS 255
  
-@@ -960,8 +959,7 @@ static int handle_fault(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		return inject_fault(vcpu, PGM_PROTECTION,
- 				    current->thread.gmap_teid.addr * PAGE_SIZE, 1);
- 
--	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
--				   current->thread.gmap_teid.addr * PAGE_SIZE, NULL);
-+	rc = kvm_s390_shadow_fault(vcpu, sg, current->thread.gmap_teid.addr * PAGE_SIZE, NULL);
- 	if (rc > 0) {
- 		rc = inject_fault(vcpu, rc,
- 				  current->thread.gmap_teid.addr * PAGE_SIZE,
-@@ -978,12 +976,10 @@ static int handle_fault(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-  *
-  * Will ignore any errors. The next SIE fault will do proper fault handling.
-  */
--static void handle_last_fault(struct kvm_vcpu *vcpu,
--			      struct vsie_page *vsie_page)
-+static void handle_last_fault(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct gmap *sg)
- {
- 	if (vsie_page->fault_addr)
--		kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
--				      vsie_page->fault_addr, NULL);
-+		kvm_s390_shadow_fault(vcpu, sg, vsie_page->fault_addr, NULL);
- 	vsie_page->fault_addr = 0;
+ #define KVM_INTERNAL_MEM_SLOTS 1
+diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+index f4ec8c1ce214..917ac740513e 100644
+--- a/arch/s390/kvm/Kconfig
++++ b/arch/s390/kvm/Kconfig
+@@ -30,6 +30,8 @@ config KVM
+ 	select KVM_VFIO
+ 	select MMU_NOTIFIER
+ 	select VIRT_XFER_TO_GUEST_WORK
++	select KVM_GENERIC_MMU_NOTIFIER
++	select KVM_MMU_LOCKLESS_AGING
+ 	help
+ 	  Support hosting paravirtualized guest machines using the SIE
+ 	  virtualization capability on the mainframe. This should work
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index cd39b2f099ca..ec92e6361eab 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4805,7 +4805,7 @@ int __kvm_s390_handle_dat_fault(struct kvm_vcpu *vcpu, gfn_t gfn, gpa_t gaddr, u
+ 	rc = fixup_user_fault(vcpu->arch.gmap->mm, vmaddr, fault_flags, &unlocked);
+ 	if (!rc)
+ 		rc = __gmap_link(vcpu->arch.gmap, gaddr, vmaddr);
+-	scoped_guard(spinlock, &vcpu->kvm->mmu_lock) {
++	scoped_guard(read_lock, &vcpu->kvm->mmu_lock) {
+ 		kvm_release_faultin_page(vcpu->kvm, page, false, writable);
+ 	}
+ 	mmap_read_unlock(vcpu->arch.gmap->mm);
+@@ -6021,6 +6021,49 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 	return;
  }
  
-@@ -1065,7 +1061,7 @@ static u64 vsie_get_register(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page,
- 	}
- }
- 
--static int vsie_handle_mvpg(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-+static int vsie_handle_mvpg(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct gmap *sg)
++/**
++ * kvm_test_age_gfn() - test young
++ * @kvm: the kvm instance
++ * @range: the range of guest addresses whose young status needs to be cleared
++ *
++ * Context: called by KVM common code without holding the kvm mmu lock
++ * Return: true if any page in the given range is young, otherwise 0.
++ */
++bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return false;
++}
++
++/**
++ * kvm_age_gfn() - clear young
++ * @kvm: the kvm instance
++ * @range: the range of guest addresses whose young status needs to be cleared
++ *
++ * Context: called by KVM common code without holding the kvm mmu lock
++ * Return: true if any page in the given range was young, otherwise 0.
++ */
++bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return false;
++}
++
++/**
++ * kvm_unmap_gfn_range() - Unmap a range of guest addresses
++ * @kvm: the kvm instance
++ * @range: the range of guest page frames to invalidate
++ *
++ * This function always returns false because every DAT table modification
++ * has to use the appropriate DAT table manipulation instructions, which will
++ * keep the TLB coherent, hence no additional TLB flush is ever required.
++ *
++ * Context: called by KVM common code with the kvm mmu write lock held
++ * Return: false
++ */
++bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
++{
++	return false;
++}
++
+ static inline unsigned long nonhyp_mask(int i)
  {
- 	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
- 	unsigned long pei_dest, pei_src, src, dest, mask, prefix;
-@@ -1083,8 +1079,8 @@ static int vsie_handle_mvpg(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	src = vsie_get_register(vcpu, vsie_page, scb_s->ipb >> 16) & mask;
- 	src = _kvm_s390_real_to_abs(prefix, src) + scb_s->mso;
- 
--	rc_dest = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, dest, &pei_dest);
--	rc_src = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, src, &pei_src);
-+	rc_dest = kvm_s390_shadow_fault(vcpu, sg, dest, &pei_dest);
-+	rc_src = kvm_s390_shadow_fault(vcpu, sg, src, &pei_src);
- 	/*
- 	 * Either everything went well, or something non-critical went wrong
- 	 * e.g. because of a race. In either case, simply retry.
-@@ -1144,7 +1140,7 @@ static int vsie_handle_mvpg(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-  *          - > 0 if control has to be given to guest 2
-  *          - < 0 if an error occurred
-  */
--static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-+static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struct gmap *sg)
- 	__releases(vcpu->kvm->srcu)
- 	__acquires(vcpu->kvm->srcu)
- {
-@@ -1153,7 +1149,7 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	int guest_bp_isolation;
- 	int rc = 0;
- 
--	handle_last_fault(vcpu, vsie_page);
-+	handle_last_fault(vcpu, vsie_page, sg);
- 
- 	kvm_vcpu_srcu_read_unlock(vcpu);
- 
-@@ -1191,7 +1187,7 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 			goto xfer_to_guest_mode_check;
- 		}
- 		guest_timing_enter_irqoff();
--		rc = kvm_s390_enter_exit_sie(scb_s, vcpu->run->s.regs.gprs, vsie_page->gmap->asce);
-+		rc = kvm_s390_enter_exit_sie(scb_s, vcpu->run->s.regs.gprs, sg->asce);
- 		guest_timing_exit_irqoff();
- 		local_irq_enable();
- 	}
-@@ -1215,7 +1211,7 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	if (rc > 0)
- 		rc = 0; /* we could still have an icpt */
- 	else if (current->thread.gmap_int_code)
--		return handle_fault(vcpu, vsie_page);
-+		return handle_fault(vcpu, vsie_page, sg);
- 
- 	switch (scb_s->icptcode) {
- 	case ICPT_INST:
-@@ -1233,7 +1229,7 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		break;
- 	case ICPT_PARTEXEC:
- 		if (scb_s->ipa == 0xb254)
--			rc = vsie_handle_mvpg(vcpu, vsie_page);
-+			rc = vsie_handle_mvpg(vcpu, vsie_page, sg);
- 		break;
- 	}
- 	return rc;
-@@ -1330,15 +1326,17 @@ static void unregister_shadow_scb(struct kvm_vcpu *vcpu)
- static int vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- {
- 	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
-+	struct gmap *sg;
- 	int rc = 0;
- 
- 	while (1) {
- 		rc = acquire_gmap_shadow(vcpu, vsie_page);
-+		sg = vsie_page->gmap;
- 		if (!rc)
--			rc = map_prefix(vcpu, vsie_page);
-+			rc = map_prefix(vcpu, vsie_page, sg);
- 		if (!rc) {
- 			update_intervention_requests(vsie_page);
--			rc = do_vsie_run(vcpu, vsie_page);
-+			rc = do_vsie_run(vcpu, vsie_page, sg);
- 		}
- 		atomic_andnot(PROG_BLOCK_SIE, &scb_s->prog20);
- 
+ 	unsigned int nonhyp_fai = (sclp.hmfai << i * 2) >> 30;
 -- 
 2.52.0
 
