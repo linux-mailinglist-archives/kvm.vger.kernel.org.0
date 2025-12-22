@@ -1,345 +1,228 @@
-Return-Path: <kvm+bounces-66519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F2CCD6FAD
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 20:34:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E55C7CD72D4
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 22:13:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B88A2301C97A
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 19:34:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 643D53032707
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 21:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853EE332EBE;
-	Mon, 22 Dec 2025 19:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F96533A9C1;
+	Mon, 22 Dec 2025 21:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VP4JQf90"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kAcebSPj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05ED61A304A
-	for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 19:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DD3327208;
+	Mon, 22 Dec 2025 21:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766432076; cv=none; b=ozpXHdyFBEegPE/5zDfI2ulYf9S85UelU5cNgupBmuRKsayug5tKUPnvn57kKMD+++66dg/c15yNXexDj+0lpyLbqDqRgdRKjzLkmK8dZxQAAEBEvJ1cLWFRVBR/h4t0NgQNYkUfqoy2EcovJ7NQwO4j5XECqoZkNDdiBT4cqXY=
+	t=1766437992; cv=none; b=FkRO9qshzM2GRDT1LgV0Koa5BmhIPE25YrtOawam+yU5EoVT7U8O/HQhmbZ0n16GbGaoNxgFBgZJS+4glI9bj5dRrLgGjZq6HeC8RVZiqr1dNQP1u7gZc2sk39XW5KXLZyg0KI8d9MLcHNNWYUopbgXDftLwg4cqAx+yD610FFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766432076; c=relaxed/simple;
-	bh=KpG9CmoYJ0Jk+JBhdy0Qm8hAb3GQraE85CAdPJ/utdc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Jh7awrywrHXH2C9b7gKhaJQN8uTHrWpYpmgmxBwt+OMMkDNtr0CkaIbGi44vtv6MGV80kAXcq5Iy4bItMiCz4DviTHu9kof5/jVr/6plDLuwftYkwJl98uAC1ysEdY14sj0SSp+523VaVTnOpfWCUwmiGAc+D8hR03eCJUo3cNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VP4JQf90; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b9c91b814cso7302359b3a.2
-        for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 11:34:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766432074; x=1767036874; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AlYkI48R8rDAa0y9XkKvIFrYmbYd8scK8QFFTtIvgyc=;
-        b=VP4JQf90GAwBErlQMeAggSQv9ewluvJsEbaVi9CWBUQ010ogcATWNYX79WejhYZkbL
-         iKaHoeTq0AP52vkqLr50AR5deNqXMXIUVP3cMwHZipTVCYUTE0wP6J4Qnt2MATj3VpRN
-         m4l2QLHQG7MgPpiP95YUOkhvIAb/PnhiTJyo5jgvTP5EL+3D9jyXhsZrrNby1ZSQwOk5
-         LXTczcAyK5XFrVsoNQRLnBaOmKaaX3zACoQ+Xh7RhfOoiKfqRQ+WQTqlk8S8oHGX/rdV
-         zsOgCvtsbzDRl+mAeNUU1fRlpGftElZ1qiVdN/7ZrwQCKYy34VYbkrgETdpL5FGqHAuT
-         2klg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766432074; x=1767036874;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AlYkI48R8rDAa0y9XkKvIFrYmbYd8scK8QFFTtIvgyc=;
-        b=X5TpM06LmsiktpjapZoZowmR8Fx7CKubVFEhETxsS0LV9uU2RG/uXL/Dr+IdN/Y3u/
-         41RhA+nnpOuPU18YrUwtAhit+upqr17wJTuCejnxcCT33G5QODVvG61SIy/BPxf5QFEt
-         PHjUoe5XF4xlt5bqCfpmMHMdZ+3lEzmSznGd1yx18IN8lZEfHE8r2r9hf4HvzrIrTgvu
-         T0rmnM2MwU7eESsiQA16zDMvCY3oYq0fDg/OVBxhMKQJ+qqMv9Q7KKsNjmQ8f8Q8Nrw0
-         MPZw9qAFLJ56wiD6RuFTGoRwF5Mf0xgC2uy+fc4cet6D0foq92sOOHQSfj2WmaPlhIL1
-         xImw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNC7vIOd2DQ92V0CLryQoDm+7vTGBicPzLhedEEDY9tPzn7fEZCTQbWwqUSG9unfzLtvQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWU4jqXXW2xDIbrY+lgUM6VtoHxq04CAMgd5YPXkZq8eZF1zKR
-	Y0KQ1uAcEX8FHj1ZM6q8nqihC3A0voPeWb6e/pM3cxLQPVGBF6DQnYIWWvzV3wzwOrnjywInnD9
-	iOeadDg==
-X-Google-Smtp-Source: AGHT+IFQJqAuyHxNAigny9/MSevy2mpYeUMro9jWgsV9+9vQmlzsPQ5Fm6pbN/pdGRzYpAvVJGojsJA2mQE=
-X-Received: from pjboa3.prod.google.com ([2002:a17:90b:1bc3:b0:34c:2f02:7f5d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7f93:b0:366:14b0:1a31
- with SMTP id adf61e73a8af0-376aaefd515mr11821081637.63.1766432074363; Mon, 22
- Dec 2025 11:34:34 -0800 (PST)
-Date: Mon, 22 Dec 2025 11:34:33 -0800
-In-Reply-To: <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com>
+	s=arc-20240116; t=1766437992; c=relaxed/simple;
+	bh=FohYw9nz0fzNBe1jS2/16lLKKljrrVext2Apd0Bs5cQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hu9xoZB6MOLmukXoPvecFtNRTGhXYmr7ZDA5IJkdAQlvqZuW7HygRv+VEoBQpvbFTRbiPvzlz4uJJPgqwbZdzOiLcAS8t5w+ZSPWZ0UvCDC1GKzd2xhGf0W+SwAQnjxvq/4Jb94KmWl6B31g7HZZbyfQXnlaNmfOBiD4qTqEbfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kAcebSPj; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766437990; x=1797973990;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FohYw9nz0fzNBe1jS2/16lLKKljrrVext2Apd0Bs5cQ=;
+  b=kAcebSPjkUoOX4131pPYe/XmqIdQWp+1Lqvm5Z+gT356XtMyYTLtwgYn
+   +ihduhU0yS/Ow+8qEEsaloDiNW/8TarnAnryEUtO4eaRsYqS9TL9ZvpQU
+   Z7WY7iUoYbrkT56VseeHKMy5IEA+55FcFWVSICoib6Jw7R2fIyzMnnfdx
+   htIhV65SMsQKA+CU0d76pLKDDWvEiYJaI4ve1Z7Bft793DIk4950KxwF5
+   +FJtCuY/2TeVsgOq847AqjKb7WI7G13dWL8EEXJ7aK2/7FtsL8UxQkDXy
+   HnDuJrUNLMQO86g7dBp+kUFMWD002Y6aJOGpEdsMT4sPkbdCZgkeki+Pm
+   A==;
+X-CSE-ConnectionGUID: vJ8uHeoUSQ+q/j+xiH6CUA==
+X-CSE-MsgGUID: xccOeLdESSmsLvWFiZgpqA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="78611112"
+X-IronPort-AV: E=Sophos;i="6.21,169,1763452800"; 
+   d="scan'208";a="78611112"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 13:13:10 -0800
+X-CSE-ConnectionGUID: zckZnThfQfm24Lgr2elbaw==
+X-CSE-MsgGUID: CPw7wIctQ0y2luUuhZl8Sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,169,1763452800"; 
+   d="scan'208";a="199608060"
+Received: from lkp-server02.sh.intel.com (HELO dd3453e2b682) ([10.239.97.151])
+  by orviesa007.jf.intel.com with ESMTP; 22 Dec 2025 13:13:06 -0800
+Received: from kbuild by dd3453e2b682 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vXnD8-0000000017T-0U9U;
+	Mon, 22 Dec 2025 21:12:59 +0000
+Date: Tue, 23 Dec 2025 05:12:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wanpeng Li <kernellwp@gmail.com>, Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, K Prateek Nayak <kprateek.nayak@amd.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Juri Lelli <juri.lelli@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH v2 2/9] sched/fair: Add rate-limiting and validation
+ helpers
+Message-ID: <202512230415.0RatyaQF-lkp@intel.com>
+References: <20251219035334.39790-3-kernellwp@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-40-seanjc@google.com>
- <njhjud3e6wbdftzr3ziyuh5bhyvc5ndt5qvmg7rlvh5isoop2l@f2uxctws2c7d> <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com>
-Message-ID: <aUmdSb3d7Z5REMLk@google.com>
-Subject: Re: possible deadlock due to irq_set_thread_affinity() calling into
- the scheduler (was Re: [PATCH v3 38/62] KVM: SVM: Take and hold ir_list_lock
- across IRTE updates in IOMMU)
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ankit Soni <Ankit.Soni@amd.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
-	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>, 
-	Naveen Rao <Naveen.Rao@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251219035334.39790-3-kernellwp@gmail.com>
 
-On Mon, Dec 22, 2025, Paolo Bonzini wrote:
-> On 12/22/25 10:16, Ankit Soni wrote:
-> >    ======================================================
-> >    WARNING: possible circular locking dependency detected
-> >    6.19.0-rc2 #20 Tainted: G            E
-> >    ------------------------------------------------------
-> >    CPU 58/KVM/28597 is trying to acquire lock:
-> >      ff12c47d4b1f34c0 (&irq_desc_lock_class){-.-.}-{2:2}, at: __irq_get_desc_lock+0x58/0xa0
-> > 
-> >      but task is already holding lock:
-> >      ff12c49b28552110 (&svm->ir_list_lock){....}-{2:2}, at: avic_pi_update_irte+0x147/0x270 [kvm_amd]
-> > 
-> >      which lock already depends on the new lock.
-> > 
-> >    Chain exists of:
-> >      &irq_desc_lock_class --> &rq->__lock --> &svm->ir_list_lock
-> > 
-> >    Possible unsafe locking scenario:
-> > 
-> >          CPU0                            CPU1
-> >          ----                            ----
-> >     lock(&svm->ir_list_lock);
-> >                                        lock(&rq->__lock);
-> >                                        lock(&svm->ir_list_lock);
-> >     lock(&irq_desc_lock_class);
-> > 
-> >          *** DEADLOCK ***
-> > 
-> > So lockdep sees:
-> > 
-> >    &irq_desc_lock_class -> &rq->__lock -> &svm->ir_list_lock
-> > 
-> > while avic_pi_update_irte() currently holds svm->ir_list_lock and then
-> > takes irq_desc_lock via irq_set_vcpu_affinity(), which creates the
-> > potential inversion.
-> > 
-> >    - Is this lockdep warning expected/benign in this code path, or does it
-> >      indicate a real potential deadlock between svm->ir_list_lock and
-> >      irq_desc_lock with AVIC + irq_bypass + VFIO?
-> 
-> I'd treat it as a potential (if unlikely) deadlock:
-> 
-> (a) irq_set_thread_affinity triggers the scheduler via wake_up_process,
-> while irq_desc->lock is taken
-> 
-> (b) the scheduler calls into KVM with rq_lock taken, and KVM uses
-> ir_list_lock within __avic_vcpu_load/__avic_vcpu_put
-> 
-> (c) KVM wants to block scheduling for a while and uses ir_list_lock for
-> that purpose, but then takes irq_set_vcpu_affinity takes irq_desc->lock.
-> 
-> I don't think there's an alternative choice of lock for (c); and there's
-> no easy way to pull the irq_desc->lock out of the IRQ subsystem--in fact
-> the stickiness of the situation comes from rq->rq_lock and
-> irq_desc->lock being both internal and not leaf.
-> 
-> Of the three, the most sketchy is (a);
+Hi Wanpeng,
 
-Maybe the most unnecessary, but I think there's a pretty strong argument that
-(d) is the most sketchy:
+kernel test robot noticed the following build warnings:
 
-  (d) KVM takes svm->ir_list_lock around the call to irq_set_vcpu_affinity()
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on kvm/next tip/sched/core peterz-queue/sched/core tip/master linus/master v6.19-rc2 next-20251219]
+[cannot apply to kvm/linux-next tip/auto-latest]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> notably, __setup_irq() calls wake_up_process outside desc->lock.  Therefore
-> I'd like so much to treat it as a kernel/irq/ bug; and the simplest (perhaps
-> too simple...) fix is to drop the wake_up_process().  The only cost is extra
-> latency on the next interrupt after an affinity change.
+url:    https://github.com/intel-lab-lkp/linux/commits/Wanpeng-Li/sched-fair-Add-rate-limiting-and-validation-helpers/20251219-125353
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20251219035334.39790-3-kernellwp%40gmail.com
+patch subject: [PATCH v2 2/9] sched/fair: Add rate-limiting and validation helpers
+config: openrisc-randconfig-r122-20251221 (https://download.01.org/0day-ci/archive/20251223/202512230415.0RatyaQF-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251223/202512230415.0RatyaQF-lkp@intel.com/reproduce)
 
-Alternatively, what if we rework the KVM<=>IOMMU exchange to decouple updating
-the IRTE from binding the metadata to the vCPU?  KVM already has the necessary
-exports to do "out-of-band" updates due to the AVIC architecture requiring IRTE
-updates on scheduling changes.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512230415.0RatyaQF-lkp@intel.com/
 
-It's a bit wonky (and not yet tested), but I like the idea of making
-svm->ir_list_lock a leaf lock so that we don't end up with a game of whack-a-mole,
-e.g. if something in the IRQ subsystem changes in the future.
+sparse warnings: (new ones prefixed by >>)
+   kernel/sched/fair.c:1158:49: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct task_struct *running @@     got struct task_struct [noderef] __rcu *curr @@
+   kernel/sched/fair.c:1158:49: sparse:     expected struct task_struct *running
+   kernel/sched/fair.c:1158:49: sparse:     got struct task_struct [noderef] __rcu *curr
+   kernel/sched/fair.c:1194:33: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected struct sched_entity *se @@     got struct sched_entity [noderef] __rcu * @@
+   kernel/sched/fair.c:1194:33: sparse:     expected struct sched_entity *se
+   kernel/sched/fair.c:1194:33: sparse:     got struct sched_entity [noderef] __rcu *
+   kernel/sched/fair.c:1250:34: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct sched_entity const *se @@     got struct sched_entity [noderef] __rcu * @@
+   kernel/sched/fair.c:1250:34: sparse:     expected struct sched_entity const *se
+   kernel/sched/fair.c:1250:34: sparse:     got struct sched_entity [noderef] __rcu *
+   kernel/sched/fair.c:12991:9: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct sched_domain *[assigned] sd @@     got struct sched_domain [noderef] __rcu *parent @@
+   kernel/sched/fair.c:12991:9: sparse:     expected struct sched_domain *[assigned] sd
+   kernel/sched/fair.c:12991:9: sparse:     got struct sched_domain [noderef] __rcu *parent
+   kernel/sched/fair.c:8354:20: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct sched_domain *[assigned] sd @@     got struct sched_domain [noderef] __rcu *parent @@
+   kernel/sched/fair.c:8354:20: sparse:     expected struct sched_domain *[assigned] sd
+   kernel/sched/fair.c:8354:20: sparse:     got struct sched_domain [noderef] __rcu *parent
+   kernel/sched/fair.c:8558:9: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct sched_domain *[assigned] tmp @@     got struct sched_domain [noderef] __rcu *parent @@
+   kernel/sched/fair.c:8558:9: sparse:     expected struct sched_domain *[assigned] tmp
+   kernel/sched/fair.c:8558:9: sparse:     got struct sched_domain [noderef] __rcu *parent
+   kernel/sched/fair.c:8757:39: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct task_struct *donor @@     got struct task_struct [noderef] __rcu *donor @@
+   kernel/sched/fair.c:8757:39: sparse:     expected struct task_struct *donor
+   kernel/sched/fair.c:8757:39: sparse:     got struct task_struct [noderef] __rcu *donor
+   kernel/sched/fair.c:8784:37: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct task_struct *tsk @@     got struct task_struct [noderef] __rcu *curr @@
+   kernel/sched/fair.c:8784:37: sparse:     expected struct task_struct *tsk
+   kernel/sched/fair.c:8784:37: sparse:     got struct task_struct [noderef] __rcu *curr
+>> kernel/sched/fair.c:9089:20: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct task_struct *p_yielding @@     got struct task_struct [noderef] __rcu *donor @@
+   kernel/sched/fair.c:9089:20: sparse:     expected struct task_struct *p_yielding
+   kernel/sched/fair.c:9089:20: sparse:     got struct task_struct [noderef] __rcu *donor
+   kernel/sched/fair.c:9110:38: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct task_struct *curr @@     got struct task_struct [noderef] __rcu *donor @@
+   kernel/sched/fair.c:9110:38: sparse:     expected struct task_struct *curr
+   kernel/sched/fair.c:9110:38: sparse:     got struct task_struct [noderef] __rcu *donor
+   kernel/sched/fair.c:10146:40: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct sched_domain *child @@     got struct sched_domain [noderef] __rcu *child @@
+   kernel/sched/fair.c:10146:40: sparse:     expected struct sched_domain *child
+   kernel/sched/fair.c:10146:40: sparse:     got struct sched_domain [noderef] __rcu *child
+   kernel/sched/fair.c:10774:22: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/fair.c:10774:22: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/fair.c:10774:22: sparse:    struct task_struct *
+   kernel/sched/fair.c:12246:9: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct sched_domain *[assigned] sd @@     got struct sched_domain [noderef] __rcu *parent @@
+   kernel/sched/fair.c:12246:9: sparse:     expected struct sched_domain *[assigned] sd
+   kernel/sched/fair.c:12246:9: sparse:     got struct sched_domain [noderef] __rcu *parent
+   kernel/sched/fair.c:11884:44: sparse: sparse: incorrect type in initializer (different address spaces) @@     expected struct sched_domain *sd_parent @@     got struct sched_domain [noderef] __rcu *parent @@
+   kernel/sched/fair.c:11884:44: sparse:     expected struct sched_domain *sd_parent
+   kernel/sched/fair.c:11884:44: sparse:     got struct sched_domain [noderef] __rcu *parent
+   kernel/sched/fair.c:12359:9: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct sched_domain *[assigned] sd @@     got struct sched_domain [noderef] __rcu *parent @@
+   kernel/sched/fair.c:12359:9: sparse:     expected struct sched_domain *[assigned] sd
+   kernel/sched/fair.c:12359:9: sparse:     got struct sched_domain [noderef] __rcu *parent
+   kernel/sched/fair.c:6688:35: sparse: sparse: marked inline, but without a definition
+   kernel/sched/fair.c: note: in included file:
+   kernel/sched/sched.h:2647:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/sched.h:2647:9: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/sched.h:2647:9: sparse:    struct task_struct *
+   kernel/sched/sched.h:2314:26: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct *
+   kernel/sched/sched.h:2303:25: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/sched.h:2303:25: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/sched.h:2303:25: sparse:    struct task_struct *
+   kernel/sched/sched.h:2314:26: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct *
+   kernel/sched/sched.h:2314:26: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct *
+   kernel/sched/sched.h:2314:26: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct [noderef] __rcu *
+   kernel/sched/sched.h:2314:26: sparse:    struct task_struct *
 
----
- arch/x86/include/asm/irq_remapping.h |  3 --
- arch/x86/kvm/svm/avic.c              | 78 ++++++++++++++++++----------
- drivers/iommu/amd/iommu.c            | 24 +++------
- 3 files changed, 57 insertions(+), 48 deletions(-)
+vim +9089 kernel/sched/fair.c
 
-diff --git a/arch/x86/include/asm/irq_remapping.h b/arch/x86/include/asm/irq_remapping.h
-index 4e55d1755846..1426ecd09943 100644
---- a/arch/x86/include/asm/irq_remapping.h
-+++ b/arch/x86/include/asm/irq_remapping.h
-@@ -35,9 +35,6 @@ struct amd_iommu_pi_data {
- 	u64 vapic_addr;		/* Physical address of the vCPU's vAPIC. */
- 	u32 ga_tag;
- 	u32 vector;		/* Guest vector of the interrupt */
--	int cpu;
--	bool ga_log_intr;
--	bool is_guest_mode;
- 	void *ir_data;
- };
- 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 6b77b2033208..0f4f353c7db6 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -868,6 +868,51 @@ static void svm_ir_list_del(struct kvm_kernel_irqfd *irqfd)
- 	raw_spin_unlock_irqrestore(&to_svm(vcpu)->ir_list_lock, flags);
- }
- 
-+static int avic_pi_add_irte(struct kvm_kernel_irqfd *irqfd, void *ir_data,
-+			    struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	int r;
-+
-+	/*
-+	 * Prevent the vCPU from being scheduled out or migrated until the IRTE
-+	 * is updated and its metadata has been added to the list of IRQs being
-+	 * posted to the vCPU, to ensure the IRTE isn't programmed with stale
-+	 * pCPU/IsRunning information.
-+	 */
-+	guard(raw_spinlock_irqsave)(&svm->ir_list_lock);
-+
-+	if (kvm_vcpu_apicv_active(vcpu)) {
-+		u64 entry = svm->avic_physical_id_entry;
-+		bool ga_log_intr;
-+		int cpu;
-+
-+		/*
-+		 * Update the target pCPU for IOMMU doorbells if the vCPU is
-+		 * running.  If the vCPU is NOT running, i.e. is blocking or
-+		 * scheduled out, KVM will update the pCPU info when the vCPU
-+		 * is awakened and/or scheduled in.  See also avic_vcpu_load().
-+		 */
-+		if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK) {
-+			cpu = entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
-+			ga_log_intr = false;
-+		} else {
-+			cpu = -1;
-+			ga_log_intr = entry & AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR;
-+		}
-+		r = amd_iommu_activate_guest_mode(ir_data, cpu, ga_log_intr);
-+	} else {
-+		r = amd_iommu_deactivate_guest_mode(ir_data);
-+	}
-+
-+	if (r)
-+		return r;
-+
-+	irqfd->irq_bypass_data = ir_data;
-+	list_add(&irqfd->vcpu_list, &svm->ir_list);
-+	return 0;
-+}
-+
- int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 			unsigned int host_irq, uint32_t guest_irq,
- 			struct kvm_vcpu *vcpu, u32 vector)
-@@ -888,36 +933,11 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 		struct amd_iommu_pi_data pi_data = {
- 			.ga_tag = AVIC_GATAG(to_kvm_svm(kvm)->avic_vm_id,
- 					     vcpu->vcpu_idx),
--			.is_guest_mode = kvm_vcpu_apicv_active(vcpu),
- 			.vapic_addr = avic_get_backing_page_address(to_svm(vcpu)),
- 			.vector = vector,
- 		};
--		struct vcpu_svm *svm = to_svm(vcpu);
--		u64 entry;
- 		int ret;
- 
--		/*
--		 * Prevent the vCPU from being scheduled out or migrated until
--		 * the IRTE is updated and its metadata has been added to the
--		 * list of IRQs being posted to the vCPU, to ensure the IRTE
--		 * isn't programmed with stale pCPU/IsRunning information.
--		 */
--		guard(raw_spinlock_irqsave)(&svm->ir_list_lock);
--
--		/*
--		 * Update the target pCPU for IOMMU doorbells if the vCPU is
--		 * running.  If the vCPU is NOT running, i.e. is blocking or
--		 * scheduled out, KVM will update the pCPU info when the vCPU
--		 * is awakened and/or scheduled in.  See also avic_vcpu_load().
--		 */
--		entry = svm->avic_physical_id_entry;
--		if (entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK) {
--			pi_data.cpu = entry & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
--		} else {
--			pi_data.cpu = -1;
--			pi_data.ga_log_intr = entry & AVIC_PHYSICAL_ID_ENTRY_GA_LOG_INTR;
--		}
--
- 		ret = irq_set_vcpu_affinity(host_irq, &pi_data);
- 		if (ret)
- 			return ret;
-@@ -932,9 +952,11 @@ int avic_pi_update_irte(struct kvm_kernel_irqfd *irqfd, struct kvm *kvm,
- 			return -EIO;
- 		}
- 
--		irqfd->irq_bypass_data = pi_data.ir_data;
--		list_add(&irqfd->vcpu_list, &svm->ir_list);
--		return 0;
-+		ret = avic_pi_add_irte(irqfd, pi_data.ir_data, vcpu);
-+		if (WARN_ON_ONCE(ret))
-+			irq_set_vcpu_affinity(host_irq, NULL);
-+
-+		return ret;
- 	}
- 	return irq_set_vcpu_affinity(host_irq, NULL);
- }
-diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-index 5d45795c367a..855c6309900c 100644
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -3970,7 +3970,6 @@ EXPORT_SYMBOL(amd_iommu_deactivate_guest_mode);
- 
- static int amd_ir_set_vcpu_affinity(struct irq_data *data, void *info)
- {
--	int ret;
- 	struct amd_iommu_pi_data *pi_data = info;
- 	struct amd_ir_data *ir_data = data->chip_data;
- 	struct irq_2_irte *irte_info = &ir_data->irq_2_irte;
-@@ -3993,25 +3992,16 @@ static int amd_ir_set_vcpu_affinity(struct irq_data *data, void *info)
- 
- 	ir_data->cfg = irqd_cfg(data);
- 
--	if (pi_data) {
--		pi_data->ir_data = ir_data;
-+	if (!pi_data)
-+		return amd_iommu_deactivate_guest_mode(ir_data);
- 
--		ir_data->ga_root_ptr = (pi_data->vapic_addr >> 12);
--		ir_data->ga_vector = pi_data->vector;
--		ir_data->ga_tag = pi_data->ga_tag;
--		if (pi_data->is_guest_mode)
--			ret = amd_iommu_activate_guest_mode(ir_data, pi_data->cpu,
--							    pi_data->ga_log_intr);
--		else
--			ret = amd_iommu_deactivate_guest_mode(ir_data);
--	} else {
--		ret = amd_iommu_deactivate_guest_mode(ir_data);
--	}
--
--	return ret;
-+	pi_data->ir_data = ir_data;
-+	ir_data->ga_root_ptr = (pi_data->vapic_addr >> 12);
-+	ir_data->ga_vector = pi_data->vector;
-+	ir_data->ga_tag = pi_data->ga_tag;
-+	return 0;
- }
- 
--
- static void amd_ir_update_irte(struct irq_data *irqd, struct amd_iommu *iommu,
- 			       struct amd_ir_data *ir_data,
- 			       struct irq_2_irte *irte_info,
+  9064	
+  9065	/*
+  9066	 * Validate tasks for yield deboost operation.
+  9067	 * Returns the yielding task on success, NULL on validation failure.
+  9068	 *
+  9069	 * Checks: feature enabled, valid target, same runqueue, target is fair class,
+  9070	 * both on_rq. Called under rq->lock.
+  9071	 *
+  9072	 * Note: p_yielding (rq->donor) is guaranteed to be fair class by the caller
+  9073	 * (yield_to_task_fair is only called when curr->sched_class == p->sched_class).
+  9074	 */
+  9075	static struct task_struct __maybe_unused *
+  9076	yield_deboost_validate_tasks(struct rq *rq, struct task_struct *p_target)
+  9077	{
+  9078		struct task_struct *p_yielding;
+  9079	
+  9080		if (!sysctl_sched_vcpu_debooster_enabled)
+  9081			return NULL;
+  9082	
+  9083		if (!p_target)
+  9084			return NULL;
+  9085	
+  9086		if (yield_deboost_rate_limit(rq))
+  9087			return NULL;
+  9088	
+> 9089		p_yielding = rq->donor;
+  9090		if (!p_yielding || p_yielding == p_target)
+  9091			return NULL;
+  9092	
+  9093		if (p_target->sched_class != &fair_sched_class)
+  9094			return NULL;
+  9095	
+  9096		if (task_rq(p_target) != rq)
+  9097			return NULL;
+  9098	
+  9099		if (!p_target->se.on_rq || !p_yielding->se.on_rq)
+  9100			return NULL;
+  9101	
+  9102		return p_yielding;
+  9103	}
+  9104	
 
-base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
---
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
