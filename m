@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-66493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66498-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3812CCD6BDF
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:02:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C506DCD6CFC
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5CFB7301F8E7
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:01:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7755306F04B
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00E033F36D;
-	Mon, 22 Dec 2025 16:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D251345738;
+	Mon, 22 Dec 2025 16:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="As2BtLOa"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fA/pGQU/"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CF633D4F3;
-	Mon, 22 Dec 2025 16:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADE0343D60;
+	Mon, 22 Dec 2025 16:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766422259; cv=none; b=f4UAUJ8stOuoZXN1fbI3+FNqzFrZqjaXG636l1pe/5MJJ02RMRzoEyw13H9BtBD+aF/H8s8+NB6yztFUBmnZqDrN5xwuQmGq166stjdEw1ccISaVZIoj0QtZYw/aoCD9n06+TR9bSoGACz9+nIkktm8a2nz0GfbhoNa17nEWSdM=
+	t=1766422271; cv=none; b=Tg08xnb4Uwo3YtpkLPBkWQiko6c50SJzST8urH2VmxbJ+BzFiXcvjq/v0W3Q5CRktI856AjbBvs/Dhtvp5L/Q7FvhpeqBi/goX7CmEJjcnHmUCJuwRV2t/79JMgosnrpfLggtbl+8ZpQAk1wz/fdxmMjgebJNaRV4xopwtDLfts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766422259; c=relaxed/simple;
-	bh=gvAnFdHT/XMjCR1zs+fqNo8NXhkPFU1ciyQBZIXGeAY=;
+	s=arc-20240116; t=1766422271; c=relaxed/simple;
+	bh=p6v96WXUXFEdJeIINwLM9hNHIebxU2aN1Q/XRUwOUhA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ds5/JBMNLTHlMAFCAxxMHoBE9TIwztOpxW/zm9hrNv4nQdDTGCZprbwxj5l7s40JpFozx8fsFhp7WC45RvJf6MWE/9s+oXpUxsTPPj+WTqSwGcBh4sFeQIj8i7RNEFWNHoiQeu8LnuEw7jB5yIzBZ35MQR+ti8I0WcOoLuSwiXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=As2BtLOa; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=iF+mSmIvruIXPwSLT0MorgzLdVB/Dts9ycutzXxMvf6xbkN3KP9O7DIesdImhotPrGqJazt8AtB39tLWK69VmIEBx8VGPBufLg3HNt7llUfTSOqyamnUhpxxD+Wr2FvkFhdvsPoDQcw9aQdDrH2/40WSLy1F5ESUwSbeChwEnM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fA/pGQU/; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BM98BRG006456;
-	Mon, 22 Dec 2025 16:50:55 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BM8etxS026247;
+	Mon, 22 Dec 2025 16:50:56 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=JtFCSxrF9CLU3LvfT
-	rCfyoeTzzbfLQKkoH4wpG6bzTA=; b=As2BtLOaQnTj9VnDUzi309on7nUIDo1ys
-	xK/tGuT3l7QTYNB5ukFiFx8f9+seaeFwgv2v/2Sa4KiRocwxJEQ1cvWUvYOMeQ3t
-	YPnNd7YixPfiqMrPVTCMjhdkWq/ahk45PeRW7ajerIxWK4yinmUURrG9r9+pDebO
-	Q3jUR/i2/NeuI2L6dqua2HBf/RAQuTEdyAKEXir2yxP9C95/a1FZ7fOvh8pdhDP4
-	x+GeqTaBnNa3ENTuxaWxxALwjx4g0/UN2z2FjxugLwv3mWtQ/9TmyGiKuQX9Ds9G
-	DrPaaTUAPd4VuFDPLE46Gx9vDkMiDBR/FLHzZRDhWYlqWT60YkKdg==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5ka399fk-1
+	:mime-version:references:subject:to; s=pp1; bh=mnVpvp1aD2Z+er12f
+	VM/OjMXWhshAlJqos4w2+1aTAc=; b=fA/pGQU/oMvV1+XCbrvrZ583MsPgDn04i
+	fpvCDvIGiK8VxwoI4jpJs/n7IpIwvfhk/PGsWxJsWW9A1d3406oEYbp+ZbWBWZkD
+	uuLNo5wc2VJMX86hY1K2mEM3lc4HeBHt7ayRwerfazqUtYuqxOQ5eubTlyD6OPxR
+	qfQMtOFKihHoa+N1fGuafkkjrTscuQvDtxjVaQfFV0ByCh57qvvsI6jh+71pvqf2
+	0H9/Pl3VDKD/KpTQ2xOWZ3g73o82boJ3NuD6Q36yAo1nezK4OzuqaDzASUVRvIIa
+	z+yY/rzBoyZ7LIg5RN86ZZE3NokaEgqp5YXtpE2gdhQilnZf1gnxA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b5kh4969q-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:50:55 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMGJQkw005081;
-	Mon, 22 Dec 2025 16:50:54 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b674mq594-1
+	Mon, 22 Dec 2025 16:50:56 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BMFUiE9001109;
+	Mon, 22 Dec 2025 16:50:55 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4b664s7a73-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 16:50:54 +0000
+	Mon, 22 Dec 2025 16:50:55 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGoogs30867750
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BMGopBv51446214
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Dec 2025 16:50:50 GMT
+	Mon, 22 Dec 2025 16:50:51 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E383920043;
-	Mon, 22 Dec 2025 16:50:49 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4D5DD20043;
+	Mon, 22 Dec 2025 16:50:51 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B95F820040;
-	Mon, 22 Dec 2025 16:50:48 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0DB5A20040;
+	Mon, 22 Dec 2025 16:50:50 +0000 (GMT)
 Received: from p-imbrenda.ibmuc.com (unknown [9.111.79.149])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Dec 2025 16:50:48 +0000 (GMT)
+	Mon, 22 Dec 2025 16:50:49 +0000 (GMT)
 From: Claudio Imbrenda <imbrenda@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@redhat.com,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v6 11/28] KVM: s390: Rename some functions in gaccess.c
-Date: Mon, 22 Dec 2025 17:50:16 +0100
-Message-ID: <20251222165033.162329-12-imbrenda@linux.ibm.com>
+Subject: [PATCH v6 12/28] KVM: s390: KVM-specific bitfields and helper functions
+Date: Mon, 22 Dec 2025 17:50:17 +0100
+Message-ID: <20251222165033.162329-13-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251222165033.162329-1-imbrenda@linux.ibm.com>
 References: <20251222165033.162329-1-imbrenda@linux.ibm.com>
@@ -87,192 +87,765 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rrLLpt03bAYDQLi4t1WDVC-UlZZ16wYQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfX9p3wcmZFzSUk
- UsoJA3pf3MWuFG+T0enCEt31+Ic1hijs9odYAsjo9q++5NUuf12ApPwMoQeRu6GgLmPBxLjqAR9
- cgg4VvV5lMgU8lsM1kAvooBD/fWh8Mc1MMGQDexS57KxGSy++dm6bt4Tzky/NtuVzqoV3Hjk7Hb
- E0vHp3Rw9rHVMoHVSENQRJB0xE4rrI798ExdVMgKrgrkZSl4Jg2VVi0ZINZ0dxdyRIkIF+44Z50
- Z+yuSnqidgEgzSz99kdh1iuccXtnaanVIqMfe3OR9ahhvCw/VDVZXQeqQB2mcpbiVNp4gCgu3VK
- JcMv3+zobdTUPtdK7uLkJI9Syxit5HQi3l0BGvorSGwPfpcO2ob61xa/KeSUGV/xwREt8946TqC
- ZAdzq9MCChNqBo8oTupSV9A8NlVAv/al3HNbIy+foqXvZaOJFOCTcis34LaiDnAw4MJBFBuYADh
- h58jDqlrAvFI8XtnVaQ==
-X-Proofpoint-ORIG-GUID: rrLLpt03bAYDQLi4t1WDVC-UlZZ16wYQ
-X-Authority-Analysis: v=2.4 cv=dqHWylg4 c=1 sm=1 tr=0 ts=694976ef cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+X-Authority-Analysis: v=2.4 cv=bulBxUai c=1 sm=1 tr=0 ts=694976f0 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=daTLW1200KpnZZ0VTdgA:9
+ a=3TdPgYH1icVPsE-fAXsA:9
+X-Proofpoint-ORIG-GUID: 2NeSkurF68BfpDeUPTI7fX1DwImIb71w
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIyMDE1NCBTYWx0ZWRfXwpa+2apoLjz9
+ 5u5F5c24FyuEuPAe1UagY77XpDCMq6Tp3h835C0aCPAWaLvVeYaHxXDhAwnOOMMzTlhTw2y0okC
+ cV56Mi4MlM1JESEHUdQVrPhlSvVT1HQ20ncIPj0cCdJij4AS2/QUMsJFWctOW+vmrQsmuJh7RBH
+ 4CPkBydm+qcZKSZ5RCygK9zm+N9wz3nBn4zSunOD2noUGw/cKarx9cqf7KQ3Otp9rqDqd7OQvMG
+ 3r1Q/mlpv7mTte5wSr+y21PNbjAWEiVyv1Q+uxR2+ioaxzlLdMSkJqTnet8oOdRz/iJHhmlUb47
+ FlmUhWWbHi56eUs3St8VSJT7gzkRjYK54lk2qnBjA2VDU8M1z6XjkfX49FRhSrNblYyjIiWBPFH
+ NiWXUDHpy71qmK5P8mF/CZ6b3hrYrhylb/WkVwUl0KIV+UScj0MIBa+TRJmte0e7ta4yZX8d4C3
+ opIM9ghR56bwxpsMZ8g==
+X-Proofpoint-GUID: 2NeSkurF68BfpDeUPTI7fX1DwImIb71w
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-22_02,2025-12-22_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 spamscore=0 clxscore=1015 lowpriorityscore=0
- impostorscore=0 malwarescore=0 bulkscore=0 phishscore=0 suspectscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ adultscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=0 phishscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
  definitions=main-2512220154
 
-Rename some functions in gaccess.c to add a _gva or _gpa suffix to
-indicate whether the function accepts a virtual or a guest-absolute
-address.
-
-This makes it easier to understand the code.
+Add KVM-s390 specific bitfields and helper functions to manipulate DAT
+tables.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 ---
- arch/s390/kvm/gaccess.c | 51 +++++++++++++++++++----------------------
- 1 file changed, 24 insertions(+), 27 deletions(-)
+ arch/s390/kvm/dat.h | 720 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 720 insertions(+)
+ create mode 100644 arch/s390/kvm/dat.h
 
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index d8347f7cbe51..9df868bddf9a 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -397,7 +397,7 @@ static int deref_table(struct kvm *kvm, unsigned long gpa, unsigned long *val)
- }
- 
- /**
-- * guest_translate - translate a guest virtual into a guest absolute address
-+ * guest_translate_gva() - translate a guest virtual into a guest absolute address
-  * @vcpu: virtual cpu
-  * @gva: guest virtual address
-  * @gpa: points to where guest physical (absolute) address should be stored
-@@ -417,9 +417,9 @@ static int deref_table(struct kvm *kvm, unsigned long gpa, unsigned long *val)
-  *	      the returned value is the program interruption code as defined
-  *	      by the architecture
-  */
--static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
--				     unsigned long *gpa, const union asce asce,
--				     enum gacc_mode mode, enum prot_type *prot)
-+static unsigned long guest_translate_gva(struct kvm_vcpu *vcpu, unsigned long gva,
-+					 unsigned long *gpa, const union asce asce,
-+					 enum gacc_mode mode, enum prot_type *prot)
- {
- 	union vaddress vaddr = {.addr = gva};
- 	union raddress raddr = {.addr = gva};
-@@ -600,8 +600,8 @@ static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
- 	return 1;
- }
- 
--static int vm_check_access_key(struct kvm *kvm, u8 access_key,
--			       enum gacc_mode mode, gpa_t gpa)
-+static int vm_check_access_key_gpa(struct kvm *kvm, u8 access_key,
-+				   enum gacc_mode mode, gpa_t gpa)
- {
- 	u8 storage_key, access_control;
- 	bool fetch_protected;
-@@ -663,9 +663,9 @@ static bool storage_prot_override_applies(u8 access_control)
- 	return access_control == PAGE_SPO_ACC;
- }
- 
--static int vcpu_check_access_key(struct kvm_vcpu *vcpu, u8 access_key,
--				 enum gacc_mode mode, union asce asce, gpa_t gpa,
--				 unsigned long ga, unsigned int len)
-+static int vcpu_check_access_key_gpa(struct kvm_vcpu *vcpu, u8 access_key,
-+				     enum gacc_mode mode, union asce asce, gpa_t gpa,
-+				     unsigned long ga, unsigned int len)
- {
- 	u8 storage_key, access_control;
- 	unsigned long hva;
-@@ -757,7 +757,7 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
- 			return trans_exc(vcpu, PGM_PROTECTION, ga, ar, mode,
- 					 PROT_TYPE_LA);
- 		if (psw_bits(*psw).dat) {
--			rc = guest_translate(vcpu, ga, &gpa, asce, mode, &prot);
-+			rc = guest_translate_gva(vcpu, ga, &gpa, asce, mode, &prot);
- 			if (rc < 0)
- 				return rc;
- 		} else {
-@@ -769,8 +769,7 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
- 		}
- 		if (rc)
- 			return trans_exc(vcpu, rc, ga, ar, mode, prot);
--		rc = vcpu_check_access_key(vcpu, access_key, mode, asce, gpa, ga,
--					   fragment_len);
-+		rc = vcpu_check_access_key_gpa(vcpu, access_key, mode, asce, gpa, ga, fragment_len);
- 		if (rc)
- 			return trans_exc(vcpu, rc, ga, ar, mode, PROT_TYPE_KEYC);
- 		if (gpas)
-@@ -782,8 +781,8 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
- 	return 0;
- }
- 
--static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
--			     void *data, unsigned int len)
-+static int access_guest_page_gpa(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
-+				 void *data, unsigned int len)
- {
- 	const unsigned int offset = offset_in_page(gpa);
- 	const gfn_t gfn = gpa_to_gfn(gpa);
-@@ -798,9 +797,8 @@ static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
- 	return rc;
- }
- 
--static int
--access_guest_page_with_key(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
--			   void *data, unsigned int len, u8 access_key)
-+static int access_guest_page_with_key_gpa(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
-+					  void *data, unsigned int len, u8 access_key)
- {
- 	struct kvm_memory_slot *slot;
- 	bool writable;
-@@ -808,7 +806,7 @@ access_guest_page_with_key(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
- 	hva_t hva;
- 	int rc;
- 
--	gfn = gpa >> PAGE_SHIFT;
-+	gfn = gpa_to_gfn(gpa);
- 	slot = gfn_to_memslot(kvm, gfn);
- 	hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
- 
-@@ -841,7 +839,7 @@ int access_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, void *data,
- 
- 	while (min(PAGE_SIZE - offset, len) > 0) {
- 		fragment_len = min(PAGE_SIZE - offset, len);
--		rc = access_guest_page_with_key(kvm, mode, gpa, data, fragment_len, access_key);
-+		rc = access_guest_page_with_key_gpa(kvm, mode, gpa, data, fragment_len, access_key);
- 		if (rc)
- 			return rc;
- 		offset = 0;
-@@ -901,15 +899,14 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
- 	for (idx = 0; idx < nr_pages; idx++) {
- 		fragment_len = min(PAGE_SIZE - offset_in_page(gpas[idx]), len);
- 		if (try_fetch_prot_override && fetch_prot_override_applies(ga, fragment_len)) {
--			rc = access_guest_page(vcpu->kvm, mode, gpas[idx],
--					       data, fragment_len);
-+			rc = access_guest_page_gpa(vcpu->kvm, mode, gpas[idx], data, fragment_len);
- 		} else {
--			rc = access_guest_page_with_key(vcpu->kvm, mode, gpas[idx],
--							data, fragment_len, access_key);
-+			rc = access_guest_page_with_key_gpa(vcpu->kvm, mode, gpas[idx],
-+							    data, fragment_len, access_key);
- 		}
- 		if (rc == PGM_PROTECTION && try_storage_prot_override)
--			rc = access_guest_page_with_key(vcpu->kvm, mode, gpas[idx],
--							data, fragment_len, PAGE_SPO_ACC);
-+			rc = access_guest_page_with_key_gpa(vcpu->kvm, mode, gpas[idx],
-+							    data, fragment_len, PAGE_SPO_ACC);
- 		if (rc)
- 			break;
- 		len -= fragment_len;
-@@ -943,7 +940,7 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
- 	while (len && !rc) {
- 		gpa = kvm_s390_real_to_abs(vcpu, gra);
- 		fragment_len = min(PAGE_SIZE - offset_in_page(gpa), len);
--		rc = access_guest_page(vcpu->kvm, mode, gpa, data, fragment_len);
-+		rc = access_guest_page_gpa(vcpu->kvm, mode, gpa, data, fragment_len);
- 		len -= fragment_len;
- 		gra += fragment_len;
- 		data += fragment_len;
-@@ -1134,7 +1131,7 @@ int check_gpa_range(struct kvm *kvm, unsigned long gpa, unsigned long length,
- 
- 	while (length && !rc) {
- 		fragment_len = min(PAGE_SIZE - offset_in_page(gpa), length);
--		rc = vm_check_access_key(kvm, access_key, mode, gpa);
-+		rc = vm_check_access_key_gpa(kvm, access_key, mode, gpa);
- 		length -= fragment_len;
- 		gpa += fragment_len;
- 	}
+diff --git a/arch/s390/kvm/dat.h b/arch/s390/kvm/dat.h
+new file mode 100644
+index 000000000000..4d2b7a7bf898
+--- /dev/null
++++ b/arch/s390/kvm/dat.h
+@@ -0,0 +1,720 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ *  KVM guest address space mapping code
++ *
++ *    Copyright IBM Corp. 2024, 2025
++ *    Author(s): Claudio Imbrenda <imbrenda@linux.ibm.com>
++ */
++
++#ifndef __KVM_S390_DAT_H
++#define __KVM_S390_DAT_H
++
++#include <linux/radix-tree.h>
++#include <linux/refcount.h>
++#include <linux/io.h>
++#include <linux/kvm_types.h>
++#include <linux/pgalloc.h>
++#include <asm/tlbflush.h>
++#include <asm/dat-bits.h>
++
++#define _ASCE(x) ((union asce) { .val = (x), })
++#define NULL_ASCE _ASCE(0)
++
++enum {
++	_DAT_TOKEN_NONE = 0,
++	_DAT_TOKEN_PIC,
++};
++
++#define _CRSTE_TOK(l, t, p) ((union crste) {	\
++		.tok.i = 1,			\
++		.tok.tt = (l),			\
++		.tok.type = (t),		\
++		.tok.par = (p)			\
++	})
++#define _CRSTE_PIC(l, p) _CRSTE_TOK(l, _DAT_TOKEN_PIC, p)
++
++#define _CRSTE_HOLE(l) _CRSTE_PIC(l, PGM_ADDRESSING)
++#define _CRSTE_EMPTY(l) _CRSTE_TOK(l, _DAT_TOKEN_NONE, 0)
++
++#define _PMD_EMPTY _CRSTE_EMPTY(TABLE_TYPE_SEGMENT)
++
++#define _PTE_TOK(t, p) ((union pte) { .tok.i = 1, .tok.type = (t), .tok.par = (p) })
++#define _PTE_EMPTY _PTE_TOK(_DAT_TOKEN_NONE, 0)
++
++/* This fake table type is used for page table walks (both for normal page tables and vSIE) */
++#define TABLE_TYPE_PAGE_TABLE -1
++
++enum dat_walk_flags {
++	DAT_WALK_CONTINUE	= 0x20,
++	DAT_WALK_IGN_HOLES	= 0x10,
++	DAT_WALK_SPLIT		= 0x08,
++	DAT_WALK_ALLOC		= 0x04,
++	DAT_WALK_ANY		= 0x02,
++	DAT_WALK_LEAF		= 0x01,
++	DAT_WALK_DEFAULT	= 0
++};
++
++#define DAT_WALK_SPLIT_ALLOC (DAT_WALK_SPLIT | DAT_WALK_ALLOC)
++#define DAT_WALK_ALLOC_CONTINUE (DAT_WALK_CONTINUE | DAT_WALK_ALLOC)
++#define DAT_WALK_LEAF_ALLOC (DAT_WALK_LEAF | DAT_WALK_ALLOC)
++
++union pte {
++	unsigned long val;
++	union page_table_entry h;
++	struct {
++		unsigned long   :56; /* Hardware bits */
++		unsigned long u : 1; /* Page unused */
++		unsigned long s : 1; /* Special */
++		unsigned long w : 1; /* Writable */
++		unsigned long r : 1; /* Readable */
++		unsigned long d : 1; /* Dirty */
++		unsigned long y : 1; /* Young */
++		unsigned long sd: 1; /* Soft dirty */
++		unsigned long pr: 1; /* Present */
++	} s;
++	struct {
++		unsigned char hwbytes[7];
++		unsigned char swbyte;
++	};
++	union {
++		struct {
++			unsigned long type :16; /* Token type */
++			unsigned long par  :16; /* Token parameter */
++			unsigned long      :20;
++			unsigned long      : 1; /* Must be 0 */
++			unsigned long i    : 1; /* Must be 1 */
++			unsigned long      : 2;
++			unsigned long      : 7;
++			unsigned long pr   : 1; /* Must be 0 */
++		};
++		struct {
++			unsigned long token:32; /* Token and parameter */
++			unsigned long      :32;
++		};
++	} tok;
++};
++
++/* Soft dirty, needed as macro for atomic operations on ptes */
++#define _PAGE_SD 0x002
++
++/* Needed as macro to perform atomic operations */
++#define PGSTE_CMMA_D_BIT	0x0000000000008000UL	/* CMMA dirty soft-bit */
++
++enum pgste_gps_usage {
++	PGSTE_GPS_USAGE_STABLE = 0,
++	PGSTE_GPS_USAGE_UNUSED,
++	PGSTE_GPS_USAGE_POT_VOLATILE,
++	PGSTE_GPS_USAGE_VOLATILE,
++};
++
++union pgste {
++	unsigned long val;
++	struct {
++		unsigned long acc          : 4;
++		unsigned long fp           : 1;
++		unsigned long              : 3;
++		unsigned long pcl          : 1;
++		unsigned long hr           : 1;
++		unsigned long hc           : 1;
++		unsigned long              : 2;
++		unsigned long gr           : 1;
++		unsigned long gc           : 1;
++		unsigned long              : 1;
++		unsigned long              :16; /* val16 */
++		unsigned long zero         : 1;
++		unsigned long nodat        : 1;
++		unsigned long              : 4;
++		unsigned long usage        : 2;
++		unsigned long              : 8;
++		unsigned long cmma_d       : 1; /* Dirty flag for CMMA bits */
++		unsigned long prefix_notif : 1; /* Guest prefix invalidation notification */
++		unsigned long vsie_notif   : 1; /* Referenced in a shadow table */
++		unsigned long              : 5;
++		unsigned long              : 8;
++	};
++	struct {
++		unsigned short hwbytes0;
++		unsigned short val16;	/* used to store chunked values, see dat_{s,g}et_ptval() */
++		unsigned short hwbytes4;
++		unsigned char flags;	/* maps to the software bits */
++		unsigned char hwbyte7;
++	} __packed;
++};
++
++union pmd {
++	unsigned long val;
++	union segment_table_entry h;
++	struct {
++		struct {
++			unsigned long              :44; /* HW */
++			unsigned long              : 3; /* Unused */
++			unsigned long              : 1; /* HW */
++			unsigned long w            : 1; /* Writable soft-bit */
++			unsigned long r            : 1; /* Readable soft-bit */
++			unsigned long d            : 1; /* Dirty */
++			unsigned long y            : 1; /* Young */
++			unsigned long prefix_notif : 1; /* Guest prefix invalidation notification */
++			unsigned long              : 3; /* HW */
++			unsigned long vsie_notif   : 1; /* Referenced in a shadow table */
++			unsigned long              : 1; /* Unused */
++			unsigned long              : 4; /* HW */
++			unsigned long sd           : 1; /* Soft-Dirty */
++			unsigned long pr           : 1; /* Present */
++		} fc1;
++	} s;
++};
++
++union pud {
++	unsigned long val;
++	union region3_table_entry h;
++	struct {
++		struct {
++			unsigned long              :33; /* HW */
++			unsigned long              :14; /* Unused */
++			unsigned long              : 1; /* HW */
++			unsigned long w            : 1; /* Writable soft-bit */
++			unsigned long r            : 1; /* Readable soft-bit */
++			unsigned long d            : 1; /* Dirty */
++			unsigned long y            : 1; /* Young */
++			unsigned long prefix_notif : 1; /* Guest prefix invalidation notification */
++			unsigned long              : 3; /* HW */
++			unsigned long vsie_notif   : 1; /* Referenced in a shadow table */
++			unsigned long              : 1; /* Unused */
++			unsigned long              : 4; /* HW */
++			unsigned long sd           : 1; /* Soft-Dirty */
++			unsigned long pr           : 1; /* Present */
++		} fc1;
++	} s;
++};
++
++union p4d {
++	unsigned long val;
++	union region2_table_entry h;
++};
++
++union pgd {
++	unsigned long val;
++	union region1_table_entry h;
++};
++
++union crste {
++	unsigned long val;
++	union {
++		struct {
++			unsigned long   :52;
++			unsigned long   : 1;
++			unsigned long fc: 1;
++			unsigned long p : 1;
++			unsigned long   : 1;
++			unsigned long   : 2;
++			unsigned long i : 1;
++			unsigned long   : 1;
++			unsigned long tt: 2;
++			unsigned long   : 2;
++		};
++		struct {
++			unsigned long to:52;
++			unsigned long   : 1;
++			unsigned long fc: 1;
++			unsigned long p : 1;
++			unsigned long   : 1;
++			unsigned long tf: 2;
++			unsigned long i : 1;
++			unsigned long   : 1;
++			unsigned long tt: 2;
++			unsigned long tl: 2;
++		} fc0;
++		struct {
++			unsigned long    :47;
++			unsigned long av : 1; /* ACCF-Validity Control */
++			unsigned long acc: 4; /* Access-Control Bits */
++			unsigned long f  : 1; /* Fetch-Protection Bit */
++			unsigned long fc : 1; /* Format-Control */
++			unsigned long p  : 1; /* DAT-Protection Bit */
++			unsigned long iep: 1; /* Instruction-Execution-Protection */
++			unsigned long    : 2;
++			unsigned long i  : 1; /* Segment-Invalid Bit */
++			unsigned long cs : 1; /* Common-Segment Bit */
++			unsigned long tt : 2; /* Table-Type Bits */
++			unsigned long    : 2;
++		} fc1;
++	} h;
++	struct {
++		struct {
++			unsigned long              :47;
++			unsigned long              : 1; /* HW (should be 0) */
++			unsigned long w            : 1; /* Writable */
++			unsigned long r            : 1; /* Readable */
++			unsigned long d            : 1; /* Dirty */
++			unsigned long y            : 1; /* Young */
++			unsigned long prefix_notif : 1; /* Guest prefix invalidation notification */
++			unsigned long              : 3; /* HW */
++			unsigned long vsie_notif   : 1; /* Referenced in a shadow table */
++			unsigned long              : 1;
++			unsigned long              : 4; /* HW */
++			unsigned long sd           : 1; /* Soft-Dirty */
++			unsigned long pr           : 1; /* Present */
++		} fc1;
++	} s;
++	union {
++		struct {
++			unsigned long type :16; /* Token type */
++			unsigned long par  :16; /* Token parameter */
++			unsigned long      :26;
++			unsigned long i    : 1; /* Must be 1 */
++			unsigned long      : 1;
++			unsigned long tt   : 2;
++			unsigned long      : 1;
++			unsigned long pr   : 1; /* Must be 0 */
++		};
++		struct {
++			unsigned long token:32; /* Token and parameter */
++			unsigned long      :32;
++		};
++	} tok;
++	union pmd pmd;
++	union pud pud;
++	union p4d p4d;
++	union pgd pgd;
++};
++
++union skey {
++	unsigned char skey;
++	struct {
++		unsigned char acc :4;
++		unsigned char fp  :1;
++		unsigned char r   :1;
++		unsigned char c   :1;
++		unsigned char zero:1;
++	};
++};
++
++static_assert(sizeof(union pgste) == sizeof(unsigned long));
++static_assert(sizeof(union pte) == sizeof(unsigned long));
++static_assert(sizeof(union pmd) == sizeof(unsigned long));
++static_assert(sizeof(union pud) == sizeof(unsigned long));
++static_assert(sizeof(union p4d) == sizeof(unsigned long));
++static_assert(sizeof(union pgd) == sizeof(unsigned long));
++static_assert(sizeof(union crste) == sizeof(unsigned long));
++static_assert(sizeof(union skey) == sizeof(char));
++
++struct segment_table {
++	union pmd pmds[_CRST_ENTRIES];
++};
++
++struct region3_table {
++	union pud puds[_CRST_ENTRIES];
++};
++
++struct region2_table {
++	union p4d p4ds[_CRST_ENTRIES];
++};
++
++struct region1_table {
++	union pgd pgds[_CRST_ENTRIES];
++};
++
++struct crst_table {
++	union {
++		union crste crstes[_CRST_ENTRIES];
++		struct segment_table segment;
++		struct region3_table region3;
++		struct region2_table region2;
++		struct region1_table region1;
++	};
++};
++
++struct page_table {
++	union pte ptes[_PAGE_ENTRIES];
++	union pgste pgstes[_PAGE_ENTRIES];
++};
++
++static_assert(sizeof(struct crst_table) == _CRST_TABLE_SIZE);
++static_assert(sizeof(struct page_table) == PAGE_SIZE);
++
++/**
++ * _pte() - Useful constructor for union pte
++ * @pfn: the pfn this pte should point to.
++ * @writable: whether the pte should be writable.
++ * @dirty: whether the pte should be dirty.
++ * @special: whether the pte should be marked as special
++ *
++ * The pte is also marked as young and present. If the pte is marked as dirty,
++ * it gets marked as soft-dirty too. If the pte is not dirty, the hardware
++ * protect bit is set (independently of the write softbit); this way proper
++ * dirty tracking can be performed.
++ *
++ * Return: a union pte value.
++ */
++static inline union pte _pte(kvm_pfn_t pfn, bool writable, bool dirty, bool special)
++{
++	union pte res = { .val = PFN_PHYS(pfn) };
++
++	res.h.p = !dirty;
++	res.s.y = 1;
++	res.s.pr = 1;
++	res.s.w = writable;
++	res.s.d = dirty;
++	res.s.sd = dirty;
++	res.s.s = special;
++	return res;
++}
++
++static inline union crste _crste_fc0(kvm_pfn_t pfn, int tt)
++{
++	union crste res = { .val = PFN_PHYS(pfn) };
++
++	res.h.tt = tt;
++	res.h.fc0.tl = _REGION_ENTRY_LENGTH;
++	res.h.fc0.tf = 0;
++	return res;
++}
++
++/**
++ * _crste() - Useful constructor for union crste with FC=1
++ * @pfn: the pfn this pte should point to.
++ * @tt: the table type
++ * @writable: whether the pte should be writable.
++ * @dirty: whether the pte should be dirty.
++ *
++ * The crste is also marked as young and present. If the crste is marked as
++ * dirty, it gets marked as soft-dirty too. If the crste is not dirty, the
++ * hardware protect bit is set (independently of the write softbit); this way
++ * proper dirty tracking can be performed.
++ *
++ * Return: a union crste value.
++ */
++static inline union crste _crste_fc1(kvm_pfn_t pfn, int tt, bool writable, bool dirty)
++{
++	union crste res = { .val = PFN_PHYS(pfn) & _SEGMENT_MASK };
++
++	res.h.tt = tt;
++	res.h.p = !dirty;
++	res.h.fc = 1;
++	res.s.fc1.y = 1;
++	res.s.fc1.pr = 1;
++	res.s.fc1.w = writable;
++	res.s.fc1.d = dirty;
++	res.s.fc1.sd = dirty;
++	return res;
++}
++
++/**
++ * struct vsie_rmap - reverse mapping for shadow page table entries
++ * @next: pointer to next rmap in the list
++ * @r_gfn: virtual rmap address in the shadow guest address space
++ */
++struct vsie_rmap {
++	struct vsie_rmap *next;
++	union {
++		unsigned long val;
++		struct {
++			long          level: 8;
++			unsigned long      : 4;
++			unsigned long r_gfn:52;
++		};
++	};
++};
++
++static_assert(sizeof(struct vsie_rmap) == 2 * sizeof(long));
++
++static inline struct crst_table *crste_table_start(union crste *crstep)
++{
++	return (struct crst_table *)ALIGN_DOWN((unsigned long)crstep, _CRST_TABLE_SIZE);
++}
++
++static inline struct page_table *pte_table_start(union pte *ptep)
++{
++	return (struct page_table *)ALIGN_DOWN((unsigned long)ptep, _PAGE_TABLE_SIZE);
++}
++
++static inline bool crdte_crste(union crste *crstep, union crste old, union crste new, gfn_t gfn,
++			       union asce asce)
++{
++	unsigned long dtt = 0x10 | new.h.tt << 2;
++	void *table = crste_table_start(crstep);
++
++	return crdte(old.val, new.val, table, dtt, gfn_to_gpa(gfn), asce.val);
++}
++
++/**
++ * idte_crste() - invalidate a crste entry using idte
++ * @crstep: pointer to the crste to be invalidated
++ * @gfn: a gfn mapped by the crste
++ * @opt: options for the idte instruction
++ * @asce: the asce
++ * @local: whether the operation is cpu-local
++ */
++static __always_inline void idte_crste(union crste *crstep, gfn_t gfn, unsigned long opt,
++				       union asce asce, int local)
++{
++	unsigned long table_origin = __pa(crste_table_start(crstep));
++	unsigned long gaddr = gfn_to_gpa(gfn) & HPAGE_MASK;
++
++	if (__builtin_constant_p(opt) && opt == 0) {
++		/* flush without guest asce */
++		asm volatile("idte	%[table_origin],0,%[gaddr],%[local]"
++			: "+m" (*crstep)
++			: [table_origin] "a" (table_origin), [gaddr] "a" (gaddr),
++			  [local] "i" (local)
++			: "cc");
++	} else {
++		/* flush with guest asce */
++		asm volatile("idte %[table_origin],%[asce],%[gaddr_opt],%[local]"
++			: "+m" (*crstep)
++			: [table_origin] "a" (table_origin), [gaddr_opt] "a" (gaddr | opt),
++			  [asce] "a" (asce.val), [local] "i" (local)
++			: "cc");
++	}
++}
++
++static inline void dat_init_pgstes(struct page_table *pt, unsigned long val)
++{
++	memset64((void *)pt->pgstes, val, PTRS_PER_PTE);
++}
++
++static inline void dat_init_page_table(struct page_table *pt, unsigned long ptes,
++				       unsigned long pgstes)
++{
++	memset64((void *)pt->ptes, ptes, PTRS_PER_PTE);
++	dat_init_pgstes(pt, pgstes);
++}
++
++static inline gfn_t asce_end(union asce asce)
++{
++	return 1ULL << ((asce.dt + 1) * 11 + _SEGMENT_SHIFT - PAGE_SHIFT);
++}
++
++#define _CRSTE(x) ((union crste) { .val = _Generic((x),	\
++			union pgd : (x).val,		\
++			union p4d : (x).val,		\
++			union pud : (x).val,		\
++			union pmd : (x).val,		\
++			union crste : (x).val)})
++
++#define _CRSTEP(x) ((union crste *)_Generic((*(x)),	\
++				union pgd : (x),	\
++				union p4d : (x),	\
++				union pud : (x),	\
++				union pmd : (x),	\
++				union crste : (x)))
++
++#define _CRSTP(x) ((struct crst_table *)_Generic((*(x)),	\
++		struct crst_table : (x),			\
++		struct segment_table : (x),			\
++		struct region3_table : (x),			\
++		struct region2_table : (x),			\
++		struct region1_table : (x)))
++
++static inline bool asce_contains_gfn(union asce asce, gfn_t gfn)
++{
++	return gfn < asce_end(asce);
++}
++
++static inline bool is_pmd(union crste crste)
++{
++	return crste.h.tt == TABLE_TYPE_SEGMENT;
++}
++
++static inline bool is_pud(union crste crste)
++{
++	return crste.h.tt == TABLE_TYPE_REGION3;
++}
++
++static inline bool is_p4d(union crste crste)
++{
++	return crste.h.tt == TABLE_TYPE_REGION2;
++}
++
++static inline bool is_pgd(union crste crste)
++{
++	return crste.h.tt == TABLE_TYPE_REGION1;
++}
++
++static inline phys_addr_t pmd_origin_large(union pmd pmd)
++{
++	return pmd.val & _SEGMENT_ENTRY_ORIGIN_LARGE;
++}
++
++static inline phys_addr_t pud_origin_large(union pud pud)
++{
++	return pud.val & _REGION3_ENTRY_ORIGIN_LARGE;
++}
++
++/**
++ * crste_origin_large() - Return the large frame origin of a large crste
++ * @crste: The crste whose origin is to be returned. Should be either a
++ *         region-3 table entry or a segment table entry, in both cases with
++ *         FC set to 1 (large pages).
++ *
++ * Return: The origin of the large frame pointed to by @crste, or -1 if the
++ *         crste was not large (wrong table type, or FC==0)
++ */
++static inline phys_addr_t crste_origin_large(union crste crste)
++{
++	if (unlikely(!crste.h.fc || crste.h.tt > TABLE_TYPE_REGION3))
++		return -1;
++	if (is_pmd(crste))
++		return pmd_origin_large(crste.pmd);
++	return pud_origin_large(crste.pud);
++}
++
++#define crste_origin(x) (_Generic((x),				\
++		union pmd : (x).val & _SEGMENT_ENTRY_ORIGIN,	\
++		union pud : (x).val & _REGION_ENTRY_ORIGIN,	\
++		union p4d : (x).val & _REGION_ENTRY_ORIGIN,	\
++		union pgd : (x).val & _REGION_ENTRY_ORIGIN))
++
++static inline unsigned long pte_origin(union pte pte)
++{
++	return pte.val & PAGE_MASK;
++}
++
++static inline bool pmd_prefix(union pmd pmd)
++{
++	return pmd.h.fc && pmd.s.fc1.prefix_notif;
++}
++
++static inline bool pud_prefix(union pud pud)
++{
++	return pud.h.fc && pud.s.fc1.prefix_notif;
++}
++
++static inline bool crste_leaf(union crste crste)
++{
++	return (crste.h.tt <= TABLE_TYPE_REGION3) && crste.h.fc;
++}
++
++static inline bool crste_prefix(union crste crste)
++{
++	return crste_leaf(crste) && crste.s.fc1.prefix_notif;
++}
++
++static inline bool crste_dirty(union crste crste)
++{
++	return crste_leaf(crste) && crste.s.fc1.d;
++}
++
++static inline union pgste *pgste_of(union pte *pte)
++{
++	return (union pgste *)(pte + _PAGE_ENTRIES);
++}
++
++static inline bool pte_hole(union pte pte)
++{
++	return pte.h.i && !pte.tok.pr && pte.tok.type != _DAT_TOKEN_NONE;
++}
++
++static inline bool _crste_hole(union crste crste)
++{
++	return crste.h.i && !crste.tok.pr && crste.tok.type != _DAT_TOKEN_NONE;
++}
++
++#define crste_hole(x) _crste_hole(_CRSTE(x))
++
++static inline bool _crste_none(union crste crste)
++{
++	return crste.h.i && !crste.tok.pr && crste.tok.type == _DAT_TOKEN_NONE;
++}
++
++#define crste_none(x) _crste_none(_CRSTE(x))
++
++static inline phys_addr_t large_pud_to_phys(union pud pud, gfn_t gfn)
++{
++	return pud_origin_large(pud) | (gfn_to_gpa(gfn) & ~_REGION3_MASK);
++}
++
++static inline phys_addr_t large_pmd_to_phys(union pmd pmd, gfn_t gfn)
++{
++	return pmd_origin_large(pmd) | (gfn_to_gpa(gfn) & ~_SEGMENT_MASK);
++}
++
++static inline phys_addr_t large_crste_to_phys(union crste crste, gfn_t gfn)
++{
++	if (unlikely(!crste.h.fc || crste.h.tt > TABLE_TYPE_REGION3))
++		return -1;
++	if (is_pmd(crste))
++		return large_pmd_to_phys(crste.pmd, gfn);
++	return large_pud_to_phys(crste.pud, gfn);
++}
++
++static inline bool cspg_crste(union crste *crstep, union crste old, union crste new)
++{
++	return cspg(&crstep->val, old.val, new.val);
++}
++
++static inline struct page_table *dereference_pmd(union pmd pmd)
++{
++	return phys_to_virt(crste_origin(pmd));
++}
++
++static inline struct segment_table *dereference_pud(union pud pud)
++{
++	return phys_to_virt(crste_origin(pud));
++}
++
++static inline struct region3_table *dereference_p4d(union p4d p4d)
++{
++	return phys_to_virt(crste_origin(p4d));
++}
++
++static inline struct region2_table *dereference_pgd(union pgd pgd)
++{
++	return phys_to_virt(crste_origin(pgd));
++}
++
++static inline struct crst_table *_dereference_crste(union crste crste)
++{
++	if (unlikely(is_pmd(crste)))
++		return NULL;
++	return phys_to_virt(crste_origin(crste.pud));
++}
++
++#define dereference_crste(x) (_Generic((x),			\
++		union pud : _dereference_crste(_CRSTE(x)),	\
++		union p4d : _dereference_crste(_CRSTE(x)),	\
++		union pgd : _dereference_crste(_CRSTE(x)),	\
++		union crste : _dereference_crste(_CRSTE(x))))
++
++static inline struct crst_table *dereference_asce(union asce asce)
++{
++	return phys_to_virt(asce.val & _ASCE_ORIGIN);
++}
++
++static inline void asce_flush_tlb(union asce asce)
++{
++	__tlb_flush_idte(asce.val);
++}
++
++static inline bool pgste_get_trylock(union pte *ptep, union pgste *res)
++{
++	union pgste *pgstep = pgste_of(ptep);
++	union pgste old_pgste;
++
++	if (READ_ONCE(pgstep->val) & PGSTE_PCL_BIT)
++		return false;
++	old_pgste.val = __atomic64_or_barrier(PGSTE_PCL_BIT, &pgstep->val);
++	if (old_pgste.pcl)
++		return false;
++	old_pgste.pcl = 1;
++	*res = old_pgste;
++	return true;
++}
++
++static inline union pgste pgste_get_lock(union pte *ptep)
++{
++	union pgste res;
++
++	while (!pgste_get_trylock(ptep, &res))
++		cpu_relax();
++	return res;
++}
++
++static inline void pgste_set_unlock(union pte *ptep, union pgste pgste)
++{
++	pgste.pcl = 0;
++	barrier();
++	WRITE_ONCE(*pgste_of(ptep), pgste);
++}
++
++#endif /* __KVM_S390_DAT_H */
 -- 
 2.52.0
 
