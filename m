@@ -1,84 +1,53 @@
-Return-Path: <kvm+bounces-66511-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66512-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B20DCD6C43
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:09:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5F52CD6D48
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 18:32:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F1D73070A37
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:03:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1E6FC30024AF
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 17:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E172934F499;
-	Mon, 22 Dec 2025 16:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE6733B6D8;
+	Mon, 22 Dec 2025 17:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TWRWEj6j"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cl0cRF7B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C15B34F26F
-	for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 16:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFCE133AD87
+	for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 17:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766422408; cv=none; b=S4nFy5ibqDJxUSAq+YPlrlyhO/bCqTbZ+210dO5JMrD2tEliy8JfPmhJzt1CEjCZ5RJKhdrX5bRRgMCdqbbQm2RzhCWvkQUGY0bl8WbQSSp4xoFN7Lh/gpUTsXzylC6Wp9beD0ueHUagLE+raL2URxqkZbF7vRKBI4nbW5iurFU=
+	t=1766424345; cv=none; b=nmsEuImDYwl2+KGJITTU4Pfz2A6GGxL8Yy1UrYPYGPeHwVI3Gw+jA9Nbf8uUejcrepUKkRopix39abm7g9gtFKIj9gr5EHS6m3XIRfh9ZEqJeu1TpSCGwiSihVhd34o0tf7adPzoSTwVCsto34iiIhU3rcftE2/Tj2EC91OZrFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766422408; c=relaxed/simple;
-	bh=SLzPCyVSf2GCKYqR6ihp41nIyXMktxWN6o79iAcwaVc=;
+	s=arc-20240116; t=1766424345; c=relaxed/simple;
+	bh=1EaRCLtIo5S1nAy2LLljSS1lyzWqYY6SwxtCM/xFawE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fhZCQFIIQI9ZQyEPs7fo4ay91g5ATaJWtjG30P0KvZu0n+J0gIOf182w6KN9QcBjZPub9QEdo1lr6ValwuAhYC8RaLYE8Gx3tvUgOCnnau831Jo5uWU4Cc3MgW0sYj3I9QnAK2LoIiHK3Yh4zRiQG/Zvbdn1u2vPAiOosUT1Zbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TWRWEj6j; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766422406; x=1797958406;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SLzPCyVSf2GCKYqR6ihp41nIyXMktxWN6o79iAcwaVc=;
-  b=TWRWEj6jswPKwFATdx2TyUi/xMY4YZ/kSTbHIz7nxuaCYDmeP7z+l86H
-   kqSURJZqNsqIlYqhM08yod8qKYxXkEbu/d4MwFXlNKJa5D5mRilW7tYVV
-   +qjlC47cbOo49M7DiyoBpMud+tkEh4je8YfkUzZclKfLx4Xt7bNBhybcB
-   SL3r8BDLCh2wppW3GYbB7qlZVF7SA+HttarODiruyZ+L/Mtbo0rW3MuEw
-   +3IhQFStlgpvVKMvykZGSdc8tvg+tF9pR8uof5J5AcJMuDzbp2kojB2pb
-   /zKe9YganBMJfOLZ2tYjiDxBN1onyGoKyeGf2D78sErvMIMzt29Q3PsrO
-   A==;
-X-CSE-ConnectionGUID: LEyZbNcVQdOAixiY0tgzPQ==
-X-CSE-MsgGUID: tgv3cgcUTAeJg7gJaoGkeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="55849964"
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="55849964"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 08:53:26 -0800
-X-CSE-ConnectionGUID: 6fDkPJhHRFmrLp8CGDNaLQ==
-X-CSE-MsgGUID: AZDQkn5AQxWF4NRtHppNNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="204049302"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by fmviesa005.fm.intel.com with ESMTP; 22 Dec 2025 08:53:22 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vXj9s-000000005Ym-1Tsx;
-	Mon, 22 Dec 2025 16:53:20 +0000
-Date: Mon, 22 Dec 2025 17:52:47 +0100
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Message-ID: <202512221751.nHKObHNq-lkp@intel.com>
-References: <20251212152215.675767-15-sascha.bischoff@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnBpgltUulQ6QKIk0g7X4M1HzLZsRuM+vgVN72li6BPCMRlsNBEqiJogFqg7eaYVWGB89AIqRDGTcQQxhbUDKQrxd56Tfr0vq5ddeFNn682tKhjt0MS87KyuGzoEj40+5bJJHyigKCCLT4kME0BLrgvJnJZq7NpQIB2g8aSSssw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cl0cRF7B; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 22 Dec 2025 11:25:22 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766424339;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=byvshAmRUwrZC8GVC2vo9mDR5a//m/DN9v63+WgdYgI=;
+	b=Cl0cRF7BIMaB5XtNbuYctsoztFcS9MzXisFXRp6G9r/BLHQYgENEamwlRs/rfTKh5CJvQi
+	ZtdC2ohWeCh1lDeXcJD7BMrkdb5bbewXuMRS4denOS1bpv3WwktrRQKiXl4ERb1KrR2+43
+	mlv5qBjJuJgQFyZjZB7YhM1C728IO5U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com
+Subject: Re: [kvm-unit-tests PATCH 0/4] riscv: sbi: Add support to test PMU
+ extension
+Message-ID: <20251222-4edd14c1464744ef9e24245d@orel>
+References: <20251213150848.149729-1-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,85 +56,47 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251212152215.675767-15-sascha.bischoff@arm.com>
+In-Reply-To: <20251213150848.149729-1-jamestiotio@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Sascha,
+On Sat, Dec 13, 2025 at 11:08:44PM +0800, James Raphael Tiovalen wrote:
+> This patch series adds support for testing most of the SBI PMU
+> extension functions. The functions related to shared memory
+> (FID #7 and #8) are not tested yet.
+> 
+> The first 3 patches add the required support for SBI PMU and some
+> helper functions, while the last patch adds the actual tests.
+> 
+> James Raphael Tiovalen (4):
+>   lib: riscv: Add SBI PMU CSRs and enums
+>   lib: riscv: Add SBI PMU support
+>   lib: riscv: Add SBI PMU helper functions
+>   riscv: sbi: Add tests for PMU extension
+> 
+>  riscv/Makefile      |   2 +
+>  lib/riscv/asm/csr.h |  31 +++
+>  lib/riscv/asm/pmu.h | 167 ++++++++++++++++
+>  lib/riscv/asm/sbi.h | 104 ++++++++++
+>  lib/riscv/pmu.c     | 169 ++++++++++++++++
+>  lib/riscv/sbi.c     |  73 +++++++
+>  riscv/sbi-tests.h   |   1 +
+>  riscv/sbi-pmu.c     | 461 ++++++++++++++++++++++++++++++++++++++++++++
+>  riscv/sbi.c         |   2 +
+>  9 files changed, 1010 insertions(+)
+>  create mode 100644 lib/riscv/asm/pmu.h
+>  create mode 100644 lib/riscv/pmu.c
+>  create mode 100644 riscv/sbi-pmu.c
+> 
+> --
+> 2.43.0
+>
 
-kernel test robot noticed the following build errors:
+Hi James,
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.19-rc2 next-20251219]
-[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thanks for posting this. I'll look at it as soon as possible, but I'm
+juggling some other stuff right now and also plan to be on vacation for
+a week starting tomorrow.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
-patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-config: arm64-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20251222/202512221751.nHKObHNq-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project ecaf673850beb241957352bd61e95ed34256635f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251222/202512221751.nHKObHNq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512221751.nHKObHNq-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/kernel/asm-offsets.c:16:
-   In file included from ./include/linux/kvm_host.h:45:
-   In file included from ./arch/arm64/include/asm/kvm_host.h:36:
->> ./include/kvm/arm_vgic.h:392:19: error: field has incomplete type 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                          ^
-   ./include/kvm/arm_vgic.h:392:9: note: forward declaration of 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                ^
-   1 error generated.
-
-
-vim +392 ./include/kvm/arm_vgic.h
-
-   360	
-   361	struct vgic_v5_cpu_if {
-   362		u64	vgic_apr;
-   363		u64	vgic_vmcr;
-   364	
-   365		/* PPI register state */
-   366		u64	vgic_ppi_hmr[2];
-   367		u64	vgic_ppi_dvir[2];
-   368		u64	vgic_ppi_priorityr[16];
-   369	
-   370		/* The pending state of the guest. This is merged with the exit state */
-   371		u64	vgic_ppi_pendr[2];
-   372	
-   373		/* The state flushed to the regs when entering the guest */
-   374		u64	vgic_ppi_activer_entry[2];
-   375		u64	vgic_ich_ppi_enabler_entry[2];
-   376		u64	vgic_ppi_pendr_entry[2];
-   377	
-   378		/* The saved state of the regs when leaving the guest */
-   379		u64	vgic_ppi_activer_exit[2];
-   380		u64	vgic_ich_ppi_enabler_exit[2];
-   381		u64	vgic_ppi_pendr_exit[2];
-   382	
-   383		/*
-   384		 * The ICSR is re-used across host and guest, and hence it needs to be
-   385		 * saved/restored. Only one copy is required as the host should block
-   386		 * preemption between executing GIC CDRCFG and acccessing the
-   387		 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
-   388		 * it is the hyp's responsibility to keep the state constistent.
-   389		 */
-   390		u64	vgic_icsr;
-   391	
- > 392		struct gicv5_vpe gicv5_vpe;
-   393	};
-   394	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+drew
 
