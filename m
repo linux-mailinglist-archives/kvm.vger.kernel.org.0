@@ -1,145 +1,205 @@
-Return-Path: <kvm+bounces-66524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D50BCD73E3
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 23:10:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FA3ACD745E
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 23:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5C9F73019E0A
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 22:10:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89A0C30A1175
+	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 22:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9B232D42A;
-	Mon, 22 Dec 2025 22:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E67A32D0D0;
+	Mon, 22 Dec 2025 22:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JJ1v2TXX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wy/mV6/l";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDTpbnnq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E2630FC03
-	for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 22:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EB43314C0
+	for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 22:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766441441; cv=none; b=tpVKIiy9fMPzAQEqOs2WXcnmuOVPoLl9Rl7oevUW2kMBVdP++CqyOCFQBk4feLcpdV50/btqaSaK57AVcI5QGh6W8whvQ7RIB+RdAi/rYJwpPgA9uV7ZDh2NnfCN8K4qctY9u5u4fcp8z+/tcWFUqgp0HGam5+1YLUzYG4luuNs=
+	t=1766441920; cv=none; b=AVMYO6q7noVvfOjYZ6pv8YxGgvigo93mZIMIT+8mOetha6hkZ6gP5fA5MGB/fKfvFymej6HfLnVNs/+8mBtxcCrvwZ6OH8YhrT+QZhsFe0kKSntSXB6kt5MDhaA+m05yRypB6/KP3EwrmAq5gdmFj1FYoKAykL2/IJZSX/FAOr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766441441; c=relaxed/simple;
-	bh=RqSH6KbcENeCSoSTIIQWud4cWqtCxOnMMEn5Odibjgk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LTJxpzPz1mZpaLTCpIiYkCPaMO70OGanePzsRnGkuEo6M2vGlpVBIw4I/YAVGtEa7k83WfzzYFc9IPbHCr9gX9cA3v33zWz/VhYdPjFw1l5G5vJvA2b6xgzsMfj74ovTdcT4Xjkb0VgMdv4FSBt55BMhWuXeitoLam5s4IIsfww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JJ1v2TXX; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0f0c7a06eso85191665ad.2
-        for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 14:10:39 -0800 (PST)
+	s=arc-20240116; t=1766441920; c=relaxed/simple;
+	bh=ShsKrVUs0Qp4gdJKeq50wOl6XsfINIYaPaJYi6O5DM8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=RQXXnES2U/jdUU+OjewFaQtaKBTI0/xe3KF28nLO0Nhxge8l2WjWUmXpNzgHHaE/cx+Hc9rqoEVigiFrGcABwA32Fsn89CFq214tBgJcPHPFXqDQRXdNi+xKjhl1tFBHAWLe89C3AgZAS1hb4RxRQOJF5o4DJ6jNILxXv4IiXsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wy/mV6/l; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dDTpbnnq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766441917;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LqteH3CgwCBLCmhAVjYH1gHY89FitVyyDc6ltkR1c6M=;
+	b=Wy/mV6/lE4TqADSRppWEoccSaKhJE+fT2hw+/J6bTj5UaftJt+sQEYmSUCJ23BcMAtmpZ6
+	Zuy+Xel6x3wTMxBqkJPm3r1H18/ekW1YsXoVLrm65AqtaewES6AshsQaZHBLHcunrqCZbc
+	vRXUwL+HXBR5dD73xWO0gOclHBMKJcY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-460-ELhZJtkwMkSu8_Ud69b3HA-1; Mon, 22 Dec 2025 17:18:35 -0500
+X-MC-Unique: ELhZJtkwMkSu8_Ud69b3HA-1
+X-Mimecast-MFC-AGG-ID: ELhZJtkwMkSu8_Ud69b3HA_1766441914
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4788112ec09so41629155e9.3
+        for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 14:18:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766441439; x=1767046239; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9715HtTznOFduyWRjJ/RpqR7EdieRfbBPMra7nL6iYs=;
-        b=JJ1v2TXXTRzhHPxxTTjwY3RsqJrfH3tdsNizZKC4jVVNlWfVFkQWDtNVouuRmRXaej
-         a9ii+4vUp7uZL0gGtI/dJGCQ9WW2WzdO05pW0kjzwsgICE4PKRaieWeUtUGRj1wt0Blk
-         3sl5522Zf51npJw8QRkrKz3XYth7gdV8aPa5y4/OB3HOjzlgSBp8dRyxCxM1HjXK2Eqs
-         57cFKzq16ZMj15euLICO+KNpaGzo8vZYJMgafTvER+JGA/3DxXKGmw39p3cP19JIOwJd
-         Ow/0/iBAv69A+4iOJlS0Dhgh/uwYUNp0a3ynO70xeIi3bARWfxmiQ7rGuqdrvXdP2iw3
-         yOyQ==
+        d=redhat.com; s=google; t=1766441914; x=1767046714; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LqteH3CgwCBLCmhAVjYH1gHY89FitVyyDc6ltkR1c6M=;
+        b=dDTpbnnq6dBpzknqJwoY6RRL3C4cRLvjixqRZCvL9MshcAE5fA45oznllsYtlRfsxB
+         Bu84Zx/JIUoxYfMwZLiN/acteeXvbIPremKkFQ3m/KcrcdGVb+1imIhltiPARQo79OlS
+         EYUrhsfsg7zI73nB/+DuUuAZ23jNPK3ChSgO46BwlS9GNKeniZwtntdpf8s/i1f+saQT
+         LHN/NQhmFr9mJ5DIYhxRluAXzFHTPs9ncQQzYkaRxrK/afScf/xvKr3/hbWJ9MKjjUyN
+         Tvifo98py2bi2lhwVmbWwNRos/tK0qpG+N1XRBcVCqP/shsWqfXwRDhtRRpuxLjTnFbh
+         0SLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766441439; x=1767046239;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9715HtTznOFduyWRjJ/RpqR7EdieRfbBPMra7nL6iYs=;
-        b=t8bmitgWGH8R6b1a0Rp6ElIKd4JyLfFhz9ZR7Cj/NdJudo5qyz3NU3RilF8EMinE94
-         Tq4hsHudJCCokYEehdLR5+n4MIj31EBxhfhRvmaxbV7OFrRFo9Ld5ow7WrLzPMGomQDy
-         1z1E/g58UCcTtY0DYlSoUrkrX0/mPDEOZmaDhCbJS0FQCFtE2B2sFiHkw4w6k07Tt2d6
-         PtLWBUqfnMzwPAeYsPh62ZIEiRN9t547eQXMobzRBT7ODVFEIySyYxmDJcMHyrFgbkmD
-         JRUEV4uCTTbOeCiWt93JfmPo+4dzLB4rlnEgfZxVUAI7repucsaiBOhCDg6Y/wr+Yox2
-         sqBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQj8QGBgj9bOOsT4Z4lvYX2aVP6KyWsCSdSOvB5W3HfWazcpP3dVPKdFpINlz4TaSe/AA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlxrYSXsTZPMcutGo/G4R1xoolg8eUb6VQlY2Fp4NS7T43/1/1
-	L3CmUDbZNbJTrDwjAVDuLjEenBIQS2a/RmJrzl7n+anp6lSguZfAQ+rnSfgc7MyMlo3PZaun/gO
-	7fCmfAA==
-X-Google-Smtp-Source: AGHT+IElsJc59hwdn+BH0pp7IxsX2bM6BeSQ8eCoKXCAmrz5eNfcwC6En114KJ5EJbbxgh/j09hzULxKtUg=
-X-Received: from plry8.prod.google.com ([2002:a17:902:b488:b0:269:8ca7:6998])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d50a:b0:295:290d:4afa
- with SMTP id d9443c01a7336-2a2f242aaa6mr132352445ad.23.1766441439191; Mon, 22
- Dec 2025 14:10:39 -0800 (PST)
-Date: Mon, 22 Dec 2025 14:10:37 -0800
-In-Reply-To: <9218dafc-c6ad-4ef3-b869-2d6d4a308181@redhat.com>
+        d=1e100.net; s=20230601; t=1766441914; x=1767046714;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LqteH3CgwCBLCmhAVjYH1gHY89FitVyyDc6ltkR1c6M=;
+        b=DS2le8is8FhtRsyRnnHPFXCPCJBiyoMrRJLZyXAoutwm1UdPU4tC3UvAHar7Y3zDsv
+         QEItBKfvf0QL834qu/KJKfetlt8xh0cb9K5ChtYmjNKNUbfisaK7WRCBicc8bMP3j/WG
+         Xf7uvNsIaqowuDLJLDSUBUHzY0TL3VFjCBmPZzo28dqSw1ebBVSBc/oAknA27KhlmAIL
+         tf2FYbeQaOSdIc+5kHABHc1B+Waamgze1tQ+U0IND/RUyHXwtQnO42ZbqEoo9MGWCI0H
+         bpGcI2CLg5ir3dUuviaIABvdrJxl4hnpc3Gyv8mJJ9jWBRVhgvOtC1Etx67UyYPP1C9l
+         5zAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZYAlT/Xpf63fo48gMOcN6wgpeV5h2ux928a81oxIg9GU0Pgakl8qp6Of9AxOYDGxwrTY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPY1+1LCGtRUR0WQd8Y6ihL0V+vima/jCGfal5uwa9zDurul7U
+	Y/xAcXNsi9Zkz8+H9XGYDhYZiC+EUvm4Kcse2ivDcey4ja0VJDM+ATrwKMEB+nR+eh7ZrUlZD6Q
+	/uEoqrNe7oWuX6X3hXTU0euWkHEJPTPMymCzou+qmC50Di5t09h/t0g==
+X-Gm-Gg: AY/fxX79UkKpTKxk29miohFac1NV9eN87UzK9NW70XDkW9290V7dsLHePJ5j/jqySNx
+	w8fM+hX48Fl+KuFeZ16S6lhkTMda+iWKDkWQdwqF4y6yq5lvCk926WWpZqiju5pbsmaIkj/NHwF
+	nmmjM1AISQzeAwk/4qwLzPxE730MtfA5aSeyHfCc1BpXGbtubnQn3hUBvBmtSzLX/NE7bScjHTc
+	0Yn/a2C2Oc6EPz7cuzGpztJxAD7ZYeU/9ppvUNtDyTN9BreERBDHUpd1pAbiOQm5D5AucMCHMM0
+	KyYVtYtiR4Y19JDUoekekkJLOXRmqgrAw67NjKhsuOwTs+wst5XRBWt/fF+oru0y28KheqrP4zZ
+	V5B8uqPpHcKZ5F0Qb2dlf/P/PuL6H8ylKtEWfJH4X3zEaHu4yuTP7qf9SHk/bzbfi/tI8Ig0nyu
+	FimGOstfFzLcpoSVg=
+X-Received: by 2002:a05:600c:1ca0:b0:477:af07:dd22 with SMTP id 5b1f17b1804b1-47d195900b5mr130628195e9.28.1766441914165;
+        Mon, 22 Dec 2025 14:18:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH59DzfBwKVcXwaeR0wnV+iw2v4ovL2zSMRFSbAd8cXre+qxGMxndv87s+VMoQEFSt4WPWrHg==
+X-Received: by 2002:a05:600c:1ca0:b0:477:af07:dd22 with SMTP id 5b1f17b1804b1-47d195900b5mr130628045e9.28.1766441913732;
+        Mon, 22 Dec 2025 14:18:33 -0800 (PST)
+Received: from [192.168.10.48] ([151.95.145.106])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47be27b28a7sm268521705e9.12.2025.12.22.14.18.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Dec 2025 14:18:33 -0800 (PST)
+Message-ID: <9b01758f-4441-4f4a-9803-400a94a48e5f@redhat.com>
+Date: Mon, 22 Dec 2025 23:18:32 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-40-seanjc@google.com>
- <njhjud3e6wbdftzr3ziyuh5bhyvc5ndt5qvmg7rlvh5isoop2l@f2uxctws2c7d>
- <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com> <aUmdSb3d7Z5REMLk@google.com>
- <9218dafc-c6ad-4ef3-b869-2d6d4a308181@redhat.com>
-Message-ID: <aUnB3WNLYape2Nap@google.com>
-Subject: Re: possible deadlock due to irq_set_thread_affinity() calling into
- the scheduler (was Re: [PATCH v3 38/62] KVM: SVM: Take and hold ir_list_lock
- across IRTE updates in IOMMU)
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ankit Soni <Ankit.Soni@amd.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
-	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>, 
-	Naveen Rao <Naveen.Rao@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: kvm_fpu_get() is fpregs_lock_and_load()
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20251222213303.842810-1-pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20251222213303.842810-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 22, 2025, Paolo Bonzini wrote:
-> On 12/22/25 20:34, Sean Christopherson wrote:
-> > On Mon, Dec 22, 2025, Paolo Bonzini wrote:
-> > > notably, __setup_irq() calls wake_up_process outside desc->lock.  Therefore
-> > > I'd like so much to treat it as a kernel/irq/ bug; and the simplest (perhaps
-> > > too simple...) fix is to drop the wake_up_process().  The only cost is extra
-> > > latency on the next interrupt after an affinity change.
-> > 
-> > Alternatively, what if we rework the KVM<=>IOMMU exchange to decouple updating
-> > the IRTE from binding the metadata to the vCPU?  KVM already has the necessary
-> > exports to do "out-of-band" updates due to the AVIC architecture requiring IRTE
-> > updates on scheduling changes.
+On 12/22/25 22:33, Paolo Bonzini wrote:
+> The only difference is usage of switch_fpu_return() vs.
+> fpregs_restore_userregs().  In turn, these are only different
+> if there is no FPU at all, but KVM requires one.  Therefore use the
+> pre-made export---the code is simpler and there is no functional change.
 > 
-> In fact this was actually my first idea, exactly because it makes
-> svm->ir_list_lock a leaf lock!
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kernel/fpu/core.c | 2 +-
+>   arch/x86/kvm/fpu.h         | 6 +-----
+>   2 files changed, 2 insertions(+), 6 deletions(-)
 > 
-> I threw it away because it makes amd_ir_set_vcpu_affinity() weird, passing
-> back the ir_data but not really doing anything else.  Basically its role
-> becomes little more than violate abstractions, which seemed wrong.  On the
-> other hand, drivers/iommu is already very much tied to the KVM vendor
-> modules (in particular avic.c already calls
-> amd_iommu_{,de}activate_guest_mode), so who am I to judge what the IOMMU
-> driver does.
+> diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+> index 3ab27fb86618..8ded41b023a2 100644
+> --- a/arch/x86/kernel/fpu/core.c
+> +++ b/arch/x86/kernel/fpu/core.c
+> @@ -858,7 +858,6 @@ void switch_fpu_return(void)
+>   
+>   	fpregs_restore_userregs();
+>   }
+> -EXPORT_SYMBOL_FOR_KVM(switch_fpu_return);
 
-Yeah, I 100% agree the whole thing is a bit gross, but practically speaking it's
-just not feasible to properly abstract the interaction, because in reality the
-IOMMU implementation is tightly coupled to the CPU implementation.  E.g. passing
-in the address of a PID isn't going to work well with an AMD IOMMU, and passing
-in the address of a vCPI isn't going to work well with an Intel IOMMU.
+Oops, unlike in my tree (patch to be sent tomorrow after I write a 
+testcase) there's still an occurrence of switch_fpu_return() in 
+vcpu_enter_guest().
 
-And FWIW, the lack of true abstraction isn't limited to x86.  ARM's GIGv4 passes
-around "struct its_cmd_info" and PPC uses "struct kvmppc_xive_irq_state".
+Paolo
 
-I mean, we could do what GICv4 does and use irq_set_vcpu_affinity() to pass
-different commands to the IOMMU, e.g. by formalizing "enum avic_vcpu_action"
-between KVM and IOMMU so that avic_update_iommu_vcpu_affinity() wouldn't need to
-_directly_ call AMD IOMMU code.  But IMO that would be a net negative because in
-practice all it would do is make it harder to understand what's going on.  And
-it would more directly create this potential deadlock.
+>   void fpregs_lock_and_load(void)
+>   {
+> @@ -877,6 +876,7 @@ void fpregs_lock_and_load(void)
+>   
+>   	fpregs_assert_state_consistent();
+>   }
+> +EXPORT_SYMBOL_FOR_KVM(fpregs_lock_and_load);
+>   
+>   #ifdef CONFIG_X86_DEBUG_FPU
+>   /*
+> diff --git a/arch/x86/kvm/fpu.h b/arch/x86/kvm/fpu.h
+> index f898781b6a06..b6a03d8fa8af 100644
+> --- a/arch/x86/kvm/fpu.h
+> +++ b/arch/x86/kvm/fpu.h
+> @@ -149,11 +149,7 @@ static inline void _kvm_write_mmx_reg(int reg, const u64 *data)
+>   
+>   static inline void kvm_fpu_get(void)
+>   {
+> -	fpregs_lock();
+> -
+> -	fpregs_assert_state_consistent();
+> -	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+> -		switch_fpu_return();
+> +	fpregs_lock_and_load();
+>   }
+>   
+>   static inline void kvm_fpu_put(void)
 
-Huh.  Which begs the question of whether or not ARM is also affected by this
-deadlock, without the extra hop through svm->ir_list_lock:
-
-  (a) irq_set_thread_affinity() triggers the scheduler via wake_up_process(),
-      while irq_desc->lock is taken
-
-  (b) the scheduler calls into KVM with rq_lock taken, and KVM uses
-      irq_set_vcpu_affinity() via vgic_v4_{load,put}()
-
-If ARM is affected, then maybe fixing this in irq_set_thread_affinity() is indeed
-better than fudging around the deadlock in avic.c.
 
