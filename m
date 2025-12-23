@@ -1,144 +1,214 @@
-Return-Path: <kvm+bounces-66635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C346CDAD95
-	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:42:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADEF8CDADA1
+	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86D913034619
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:42:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 837CC304B718
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C0F2FE591;
-	Tue, 23 Dec 2025 23:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC0B2EC0B5;
+	Tue, 23 Dec 2025 23:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="WkXOpqWd";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MTxq6Jli"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Cz1CQEbg"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AF22D9EF0;
-	Tue, 23 Dec 2025 23:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E77E1A2C0B
+	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 23:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766533330; cv=none; b=kEnS2+xPyAiTtyEEXJ5vP99kcecE2gJ7SqsJzgocT7f3vTMyvEKwigJ5NTZ5NFgGErAk0XMP8EVBlr1a0QmN3ZTnEq3T0mGTNYE36EdkbnmRPsm34EMbNpSGyHDwbH8pXWrnqQzc0Jt0c827mVzulSnM6nMOsywfb03qGg3NCkg=
+	t=1766533556; cv=none; b=fD2NNjaNfaZobvT0kGicHPzXxd4iK+iBfDG/tmtXJUyAiz/M14kXWOCQOYtXoRwGgwAKDn/fxd4H1j0tvfJhIUXgCLSCNfbHLxHC8xyDgxmWhPpBCNem8pBYrUnoPV3ugtXZ5f6i+gj+4hrpsJv19T3zPFfcd03Z516ygo5L+WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766533330; c=relaxed/simple;
-	bh=tLOGe/J2aqc+/4ZAx75ceTkhPZHhWr7+kFRFeDjY0O0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g1rz6yKkexmQTxc1cPT7p5gpPBrPEwS9pVDm+bvziw9UMnAtBkFzqNFI+zvUFkvypfXVFMfQEDSH7kftJC+ZTaDkajQBf5uADjdgSTbI12EFDpMTp1WJGAY3/loiLEGRsX16YtqL4u0EjFx9YVkP7yFM4nw7pbE8hfqSVL7HQ/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=WkXOpqWd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MTxq6Jli; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id 76B6CEC0108;
-	Tue, 23 Dec 2025 18:42:04 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Tue, 23 Dec 2025 18:42:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1766533324;
-	 x=1766619724; bh=Y19c4fACZAnzvZCHc5/C1arfdbg9l3UmMLnXEqDYlQE=; b=
-	WkXOpqWdFMUEIGt0CRPB2uj9acGZUydnLGH6H+ENSx0nzJ6zBdRWmrl/UhDr4CsX
-	cHWE1kTFA4JsOYlOjr6R2HIhNELOpufjtFOUqFu91Ey6Jazwv2uI865m4mmx9st7
-	0oVSUQKZcDN4lw6INbqKevSMYRRvN+Rc7qdCOohRN/D43R85ImQKbu+CyUU+WIJQ
-	P/w4dDvgcWrsC2VDZoOIZtnjd1kEKKItScp7so2S+RPxNOoAVOUFFSQ5kgebE03N
-	bFeOXuYc+aGc15jlE//EWPJVJUC4RuONIlgPR4f3nRqdBTg4N0VO1sCV4uBmYcHo
-	DZ5/nBgtnZkvJQruftdQPg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1766533324; x=
-	1766619724; bh=Y19c4fACZAnzvZCHc5/C1arfdbg9l3UmMLnXEqDYlQE=; b=M
-	Txq6JliWXcmfTUQCWH+V6JBcYmTIdA/R5ks6TyydGIrFZp212oIxNcqLRUFp2t93
-	1wcF7kxS+dWd3nC+7TF+s5ifRyNsDWpEXSxeeV/wpq4e1P889u6YT+eCymW71qzl
-	zVNuzUXQGgoX3lBLUkXQCtzIE7KNSwsQ/e3IhEHqcZQi5WUzcicQF0F+ltZYatf/
-	9Q/TcttBqEvYsth9hKbkXI17eALF1l+6wjfGsoETJEL6QihO+FC2AoLVNywgi6nu
-	HhDsu41zXdSPMTpgyjoJz6dIxVOju9jqDfvtbBxXFVY/5Lkv2E4eLQw4704Q6fn3
-	wrHB8WQZY8EfVe+1i+cog==
-X-ME-Sender: <xms:zChLaZdB6w69oKqkPIvYJT5ch16W7FwvnjcRYrQPt6V4HTzi_3BErg>
-    <xme:zChLaTFqMRd3KgO0gK2TTRs7O5XR8WmkYPcndwbfzansxFXvDhhSW1u0_iFyxQKwM
-    opXsDLb7GEJFffWQC2S2hUKFyy20aM6OuBN2ONKdFC4bH12UQ44>
-X-ME-Received: <xmr:zChLafhXaXjPAdv7-quDUyPbUCQWB0SIP6cEn2wik7__h121yNlADvm->
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeiuddujecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfgjfhggtgfgsehtjeertddttddvnecuhfhrohhmpeetlhgvgicuhghi
-    lhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeetteduleegkeeigedugeeluedvffegheeliedvtdefkedtkeekheffhedutefh
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlh
-    gvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepuddupdhmohguvgepshhm
-    thhpohhuthdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpdhrtg
-    hpthhtoheprghmrghsthhrohesfhgsrdgtohhmpdhrtghpthhtoheprghkphhmsehlihhn
-    uhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehjrhhhihhlkhgvsehgoh
-    hoghhlvgdrtghomhdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehrrghnrghnthgrsehgohhoghhlvgdrtghomhdprhgtph
-    htthhopehshhhurghhsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:zChLaX2vtM8Bb_j9IVg34-tmkXFVMDbuVt-h4XEX6i86imdCHn_OsA>
-    <xmx:zChLaac_JrtfA_Np_43vVkqL0U6nr2RClJyNTv_6KbDkNaSV9mCRwQ>
-    <xmx:zChLaVxhG781IWr69l-EmHUO0V7_zUXrkIRtCP3RNYLpCDdLWYbnqA>
-    <xmx:zChLaayye8eSHqGCTOnsQTxHigc8O9h9234GW6HqXanqD_K_Pvqq2w>
-    <xmx:zChLaTiDUVgLNr_pI9l-7oUGeM_7ZoiARApEDLTBIsCyEx4cTBFGsSti>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 23 Dec 2025 18:42:03 -0500 (EST)
-Date: Tue, 23 Dec 2025 16:42:02 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Mastro <amastro@fb.com>, Andrew Morton <akpm@linux-foundation.org>,
- Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Raghavendra
- Rao Ananta <rananta@google.com>, Shuah Khan <shuah@kernel.org>, Wei Yang
- <richard.weiyang@gmail.com>, Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH 0/2] vfio: selftests: Clean up <uapi/linux/types.h>
- includes
-Message-ID: <20251223164202.34ea5015.alex@shazbot.org>
-In-Reply-To: <20251219233818.1965306-1-dmatlack@google.com>
-References: <20251219233818.1965306-1-dmatlack@google.com>
+	s=arc-20240116; t=1766533556; c=relaxed/simple;
+	bh=ZkOgRjEf8p2sDCPuZPixd1hLoZ8sN8cC9vsV88355TY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WvbreypycjNK3XO/j70gVjapSprDi7IfLmFln93MhipOZPgqeSQtQ65oA/ZvgtqTCIe7XKQ7tuxxe8I62d5z5UwToLZFlDlTftrU3LinErXJRUp1qsl3zkp0JaKLYaONDptjqPOnac3SFxnpJbB091utiVFfs+YKu9hb8ty6VO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Cz1CQEbg; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 23 Dec 2025 23:45:37 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766533540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pS2EYUbR1JvkfYZsgBCkquGjYGcLrjAibCHEHzRzdm4=;
+	b=Cz1CQEbguuwkD5lj5B+zrZbe5XqDAd1N8LOeMvuNPRN17LuyOh/6jWRHSrfbcnjJXnRCzL
+	syrqm4kOR5nS5AhyX9aPa6iLADImfbGmAqvCbPy68imdhR91eTUmxJbW1HVvzGWZEMLvWa
+	5b+CSWR8pnkiIkxbBvE1hJ7/gandcTU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 10/16] KVM: selftests: Reuse virt mapping functions
+ for nested EPTs
+Message-ID: <2sw7xjtjh4ianp2dz7p24cht2v6u55wcdac4xlrxn5vjgqti77@4ohtwtywinmi>
+References: <20251127013440.3324671-1-yosry.ahmed@linux.dev>
+ <20251127013440.3324671-11-yosry.ahmed@linux.dev>
+ <aUshyQad7LjdhYAY@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aUshyQad7LjdhYAY@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 19 Dec 2025 23:38:16 +0000
-David Matlack <dmatlack@google.com> wrote:
+On Tue, Dec 23, 2025 at 03:12:09PM -0800, Sean Christopherson wrote:
+> On Thu, Nov 27, 2025, Yosry Ahmed wrote:
+> > __tdp_pg_map() bears a lot of resemblence to __virt_pg_map(). The
+> > main differences are:
+> > - It uses the EPT struct overlay instead of the PTE masks.
+> > - It always assumes 4-level EPTs.
+> > 
+> > To reuse __virt_pg_map(), initialize the PTE masks in nested MMU with
+> > EPT PTE masks. EPTs have no 'present' or 'user' bits, so use the
+> > 'readable' bit instead like shadow_{present/user}_mask, ignoring the
+> > fact that entries can be present and not readable if the CPU has
+> > VMX_EPT_EXECUTE_ONLY_BIT.  This is simple and sufficient for testing.
+> 
+> Ugh, no.  I am strongly against playing the same insane games KVM itself plays
+> with overloading protectin/access bits.  There's no reason for selftests to do
+> the same, e.g. selftests aren't shadowing guest PTEs and doing permission checks
+> in hot paths and so don't need to multiplex a bunch of things into an inscrutable
+> (but performant!) system.
 
-> Small clean up series to eliminate the extra includes of
-> <uapi/linux/types.h> from various VFIO selftests files. This include is
-> not causing any problems now, but it is causing benign typedef
-> redifinitions. Those redifinitions will become a problem when the VFIO
-> selftests library is built into KVM selftests, since KVM selftests build
-> with -std=gnu99.
-> 
-> Cc: Yosry Ahmed <yosryahmed@google.com>
-> Cc: Josh Hilke <jrhilke@google.com>
-> 
-> David Matlack (2):
->   tools include: Add definitions for __aligned_{l,b}e64
->   vfio: selftests: Drop <uapi/linux/types.h> includes
-> 
->  tools/include/linux/types.h                               | 8 ++++++++
->  .../selftests/vfio/lib/include/libvfio/iova_allocator.h   | 1 -
->  tools/testing/selftests/vfio/lib/iommu.c                  | 1 -
->  tools/testing/selftests/vfio/lib/iova_allocator.c         | 1 -
->  tools/testing/selftests/vfio/lib/vfio_pci_device.c        | 1 -
->  tools/testing/selftests/vfio/vfio_dma_mapping_test.c      | 1 -
->  tools/testing/selftests/vfio/vfio_iommufd_setup_test.c    | 1 -
->  7 files changed, 8 insertions(+), 6 deletions(-)
-> 
-> 
-> base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
+I was trying to stay consistent with the KVM code (rather than care
+about performance), but if you'd rather simplify things here then I am
+fine with that too.
 
-Applied to vfio for-linus branch for v6.19.  Thanks,
+> 
+> > Add an executable bitmask and update __virt_pg_map() and friends to set
+> > the bit on newly created entries to match the EPT behavior. It's a nop
+> > for x86 page tables.
+> > 
+> > Another benefit of reusing the code is having separate handling for
+> > upper-level PTEs vs 4K PTEs, which avoids some quirks like setting the
+> > large bit on a 4K PTE in the EPTs.
+> > 
+> > No functional change intended.
+> > 
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  .../selftests/kvm/include/x86/processor.h     |   3 +
+> >  .../testing/selftests/kvm/lib/x86/processor.c |  12 +-
+> >  tools/testing/selftests/kvm/lib/x86/vmx.c     | 115 ++++--------------
+> >  3 files changed, 33 insertions(+), 97 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+> > index fb2b2e53d453..62e10b296719 100644
+> > --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> > @@ -1447,6 +1447,7 @@ struct pte_masks {
+> >  	uint64_t dirty;
+> >  	uint64_t huge;
+> >  	uint64_t nx;
+> > +	uint64_t x;
+> 
+> To be consistent with e.g. writable, call this executable.
 
-Alex
+Was trying to be consistent with 'nx' :) 
+
+> 
+> >  	uint64_t c;
+> >  	uint64_t s;
+> >  };
+> > @@ -1464,6 +1465,7 @@ struct kvm_mmu {
+> >  #define PTE_DIRTY_MASK(mmu) ((mmu)->pte_masks.dirty)
+> >  #define PTE_HUGE_MASK(mmu) ((mmu)->pte_masks.huge)
+> >  #define PTE_NX_MASK(mmu) ((mmu)->pte_masks.nx)
+> > +#define PTE_X_MASK(mmu) ((mmu)->pte_masks.x)
+> >  #define PTE_C_MASK(mmu) ((mmu)->pte_masks.c)
+> >  #define PTE_S_MASK(mmu) ((mmu)->pte_masks.s)
+> >  
+> > @@ -1474,6 +1476,7 @@ struct kvm_mmu {
+> >  #define pte_dirty(mmu, pte) (!!(*(pte) & PTE_DIRTY_MASK(mmu)))
+> >  #define pte_huge(mmu, pte) (!!(*(pte) & PTE_HUGE_MASK(mmu)))
+> >  #define pte_nx(mmu, pte) (!!(*(pte) & PTE_NX_MASK(mmu)))
+> > +#define pte_x(mmu, pte) (!!(*(pte) & PTE_X_MASK(mmu)))
+> 
+> And then here to not assume PRESENT == READABLE, just check if the MMU even has
+> a PRESENT bit.  We may still need changes, e.g. the page table builders actually
+> need to verify a PTE is _writable_, not just present, but that's largely an
+> orthogonal issue.
+
+Not sure what you mean? How is the PTE being writable relevant to
+assuming PRESENT == READABLE?
+
+> 
+> #define is_present_pte(mmu, pte)		\
+> 	(PTE_PRESENT_MASK(mmu) ?		\
+> 	 !!(*(pte) & PTE_PRESENT_MASK(mmu)) :	\
+> 	 !!(*(pte) & (PTE_READABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu))))
+
+and then Intel will introduce VMX_EPT_WRITE_ONLY_BIT :P
+
+> 
+> And to properly capture the relationship between NX and EXECUTABLE:
+> 
+> #define is_executable_pte(mmu, pte)	\
+> 	((*(pte) & (PTE_EXECUTABLE_MASK(mmu) | PTE_NX_MASK(mmu))) == PTE_EXECUTABLE_MASK(mmu))
+
+Yeah that's a lot better.
+
+> 
+> #define is_nx_pte(mmu, pte)		(!is_executable_pte(mmu, pte))
+> 
+> >  #define pte_c(mmu, pte) (!!(*(pte) & PTE_C_MASK(mmu)))
+> >  #define pte_s(mmu, pte) (!!(*(pte) & PTE_S_MASK(mmu)))
+> >  
+> > diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> > index bff75ff05364..8b0e17f8ca37 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> > @@ -162,8 +162,7 @@ struct kvm_mmu *mmu_create(struct kvm_vm *vm, int pgtable_levels,
+> >  	struct kvm_mmu *mmu = calloc(1, sizeof(*mmu));
+> >  
+> >  	TEST_ASSERT(mmu, "-ENOMEM when allocating MMU");
+> > -	if (pte_masks)
+> > -		mmu->pte_masks = *pte_masks;
+> > +	mmu->pte_masks = *pte_masks;
+> 
+> Rather than pass NULL (and allow NULL here) in the previous patch, pass an
+> empty pte_masks.  That avoids churning the MMU initialization code, and allows
+> for a better TODO in the previous patch.
+
+Makes sense.
+
+> 
+> > +	/*
+> > +	 * EPTs do not have 'present' or 'user' bits, instead bit 0 is the
+> > +	 * 'readable' bit. In some cases, EPTs can be execute-only and an entry
+> > +	 * is present but not readable. However, for the purposes of testing we
+> > +	 * assume 'present' == 'user' == 'readable' for simplicity.
+> > +	 */
+> > +	pte_masks = (struct pte_masks){
+> > +		.present	=	BIT_ULL(0),
+> > +		.user		=	BIT_ULL(0),
+> > +		.writable	=	BIT_ULL(1),
+> > +		.x		=	BIT_ULL(2),
+> > +		.accessed	=	BIT_ULL(5),
+> > +		.dirty		=	BIT_ULL(6),
+> > +		.huge		=	BIT_ULL(7),
+> > +		.nx		=	0,
+> > +	};
+> > +
+> >  	/* EPTP_PWL_4 is always used */
+> 
+> Make this a TODO, e.g.
+> 
+> 	/* TODO: Add support for 5-level paging. */
+> 
+> so that it's clear this is a shortcoming, not some fundamental property of
+> selftests.
+
+Makes sense.
 
