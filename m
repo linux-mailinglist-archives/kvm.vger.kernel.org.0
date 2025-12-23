@@ -1,271 +1,124 @@
-Return-Path: <kvm+bounces-66622-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF3B0CDAC48
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:35:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F276CDAC9E
+	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:01:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C0456300AC58
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 22:35:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 24AEF300CCE9
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA822EF64F;
-	Tue, 23 Dec 2025 22:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84975213E89;
+	Tue, 23 Dec 2025 23:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="V+2cTvC8";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m3pZxsss"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yu+SA2iq"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA75D242D9B;
-	Tue, 23 Dec 2025 22:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2757F19309C
+	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 23:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766529344; cv=none; b=ZVyGRB1cPCF9V9F8ADqOy6l+UZ8dm8zWzPKipJUjH4Yt0ZyCY9MhusIFP883MhJTQYPSTn7THgSt2XLuaiONKWzFnrmgvub1vtUmWPDRZKa3/o/ESr6YMUQw9evBFppY7X9NdLNKcHjUPF6U1IJAWULyhn4O2cShMKIpVm1oTZw=
+	t=1766530861; cv=none; b=pEG8xuGAY7O2KAaR0Vouf0ZuhIL3q26ZZBaeKUWH/M3sbvLwJIpJgEmc7jawtA5Au6jNNFXPmtJ/hqFFsp7hibfhl7OmW2y3cfd/BTVdPDkC824diD1aOvQbZhfKM55/VlZKY3imtz35WqC8qujnoYpljtBcxr5irl5tYvHnx2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766529344; c=relaxed/simple;
-	bh=Yha2eNxOeh/UGStstJ9BB+Fx8iYVdLFItYWc4v2BjTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZTEc4ZoGglmptbNgtr3aztZ6zgMvhePiwNuyFTqFeewGeIVWVwi6S0rBvKSxc5bo+RVsWufXIG8uYiW/cmahYZodxlIkOjcNh0jTYsOEV/eV/OSCURT9u+EJPMPsFwnfhicE45DYnVxBfoL4XM90BM3GdgMuWnBbnlqkoJAPhRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=V+2cTvC8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m3pZxsss; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 00F3514000D0;
-	Tue, 23 Dec 2025 17:35:39 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Tue, 23 Dec 2025 17:35:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1766529338;
-	 x=1766615738; bh=6eOINA65dqP6wa4IDSRn6QH6C2QbsmcVXw+dlu8Du1k=; b=
-	V+2cTvC88glaJYVX00NeTJIJPuqly7d3Jck0wA0Sv2VP43xpep7VRLjYmk3fm80e
-	I9uC8YxE5SQP0yQWydULTUUxA6Pd5vcf2isS85HQu9H6OYCquA2Id5cl6BKxeK6V
-	fA6yTBebUp5DnRiVOE1U0eNKN15a5jLQxt5OZmjiTLXj1EVopz26LFKpM9A52h3+
-	JpMI4fEZ0hys/lAT8VFpIpTaDBcClWXkaeS+XlWklkkMBf4vxZ5/vfRLx23GJKlM
-	UZQTGvwK+QHWSxHzJhmd7ZfmJWTepe0rHNNrTOQNiMOZcRLmpwknoNG8YGCr8jXX
-	bCQ+JUeWwQ20HIlKA/sHSQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1766529338; x=
-	1766615738; bh=6eOINA65dqP6wa4IDSRn6QH6C2QbsmcVXw+dlu8Du1k=; b=m
-	3pZxsssDABxKwwCN+P8Qqwah/Xgdvmqn+AVWWU1afVbgKuJ5MuHYO9EGvJ8IbZnl
-	SXrwGj3wEPxIxoD+bmWP9OiruGb6+/sSUOoNYWHw7/jVe40lGjoOxTTnEakgV1gr
-	zbQSlyYo2G6B0Tx1S7smGMve4AHuANogfUJYrc7oo25LC8t6T1zk6RI+qXAjcH/L
-	+6LeIrunFyTAhxZQ3fire2tOLy0pGVq4NFAQAPIzScsLsyyNKaEtbSiYiFQcQ3z1
-	nECc69sEPsjDc2Catd0ARAHJ1wRoX66SOXDvfNzwSf2gCkwfHMwDOQXD3+3CLECZ
-	5e2EijLHBABVpzw7obziA==
-X-ME-Sender: <xms:OhlLaVCTqqWC5RjXNqhui0rMvJHcqF_vVBfXsOv_s0dnvWUHLUIuOQ>
-    <xme:OhlLae_mUEb6nlGB5o2g3ixVaPZm2jYQe4VuX_qdz7sF8a0zibUa5BGMnkqjR5XKG
-    _m8T0G9xfnu5pjQx4XxrT6QqYTYQbYL9OfZx4zr6B0KlZjuQcuBUg>
-X-ME-Received: <xmr:OhlLaUEhLE7IZEspOoltuHN0qTGjyoh5CQB0UEFDsycBwFncClvXEn5B>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeiuddtfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecunecujfgurhepfffhvfevuffkjghfgggtgfesthejredttd
-    dtvdenucfhrhhomheptehlvgigucghihhllhhirghmshhonhcuoegrlhgvgiesshhhrgii
-    sghothdrohhrgheqnecuggftrfgrthhtvghrnhepteetudelgeekieegudegleeuvdffge
-    ehleeivddtfeektdekkeehffehudethffhnecuvehluhhsthgvrhfuihiivgeptdenucfr
-    rghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhnsggprh
-    gtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehguhhojhhinhhh
-    uhhirdhlihgrmhessgihthgvuggrnhgtvgdrtghomhdprhgtphhtthhopehkvhhmsehvgh
-    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqphgtihesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:OhlLaUN1ww9xUOS-FB2liymC88_63DToA2DcaEc4-uGX7X8ic1aXwQ>
-    <xmx:OhlLaWeyaSiIj_iz8X82cCNi0Pa0tAI76AThGK591KKpGy_wIrWlZw>
-    <xmx:OhlLaRuq3nnED5zAx8VJb_vJ3CS_G5QvIwOlQCjeA-JcuGAb7C4kuw>
-    <xmx:OhlLaXlsnGAUncMrMvr9igpR8USlqzhAiWzClVDuLm5KgWv4-jvs5g>
-    <xmx:OhlLaaGLHo2JpD32oUQzEYvs7KcvC9zj_6M709fnwBAvKNB_UnZV28Wv>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 23 Dec 2025 17:35:38 -0500 (EST)
-Date: Tue, 23 Dec 2025 15:35:34 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: "Jinhui Guo" <guojinhui.liam@bytedance.com>
-Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
-Subject: Re: [RESEND PATCH] vfio/pci: Skip hot reset on Link-Down
-Message-ID: <20251223153534.0968cc15.alex@shazbot.org>
-In-Reply-To: <20251215123029.2746-1-guojinhui.liam@bytedance.com>
-References: <20251215123029.2746-1-guojinhui.liam@bytedance.com>
+	s=arc-20240116; t=1766530861; c=relaxed/simple;
+	bh=AcyzLXHOlyEh2eTJThjUtfUNi/cdLQw4nxXq3JCV/Gc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aDz3K03b8RyxrBh10R4mN4WN3dDfy94afwfiX0enm048WIDQ4LR3HD1tUm+qIYghOMIUP0XmwmJDd2PV6pCcOkMFov2gungj45aPYF0FCk8ebp38hcVCeir0sIV0hs5Lf4F2KbogBLl6IzUX3KtOvMjn9R1YkQ0KnPktIGs2SbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yu+SA2iq; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0b7eb0a56so142298275ad.1
+        for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 15:00:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766530859; x=1767135659; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yWtlv9wKHU4mMU0rwsebBytNAAqoSWRSyobs+OYIPUo=;
+        b=yu+SA2iq5MZ0Ba9z7uRIJfGR30GOkolwMq0mni5iUU6HDOphHf+oUOmTbq7eRf16ue
+         Wr8De6UlvBKTmSdzdRd/gYsF+cObj0v5ugfVpLBfgidImbtdMLJypYj9Ks/5XN2u8zQF
+         uhOeJ9R/G7VDNt5ru25tVsE3Khjqjh42RJChIpKkv4EqFBlSjfbRd6KOIp5N9+RBahds
+         W5E8UJLejP5KsNd9eIVjvWW5/Bqpw3/CFNj0MGcNCu09wBqv862w8WtFnSZCBMiXhTaK
+         7yG9ToCUyaIkF2aaNoJR+xsKNNoqW7Wj18hvkvpAL+iczQDcRUzbC4tCsG3lAm85mRSs
+         rhdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766530859; x=1767135659;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yWtlv9wKHU4mMU0rwsebBytNAAqoSWRSyobs+OYIPUo=;
+        b=rrVECj1N5vPT89EGKuZioyzyzU8UE4S6B5SdOQxRioFhUCAOZd6RiE44t6LAATJ1O4
+         ssK/4ui63xGen7/k2H1s3/cdv9dAWqEKvULCMPab2gpFOL+4jU2eZ2vcUPDuTTmcNyrE
+         YqnKCACTyb/hKfH7vxfKIH7jEe6uqCLLyjomNAmG0QAZ1pxKMkX7C9i+kgPoiiRArM4M
+         5DbGEhmi4B/Vsaq8zCTTJdTcLnlOBtjgvJpeFgQRD+xcaVQJoFS0CLo7hb017x8qPOM6
+         6kpzSrMGpnzXQpuo4DLtoa2pdmQw/raj93AZpO1K342O4FhDNe14ahbAhfb+PTTYKz+4
+         Vu7w==
+X-Gm-Message-State: AOJu0YxUjSISkJKXxGxKKE8w3lTRGKb5TzLq7Bagp+0ZNFTG70KDMXJg
+	N4KqgY/J/goEC8EB7N3PJ62pyyZgjnG/kVXzucq/SD9rCoaOzWcWuAlvXqwE7ViPMvha2IV4L3T
+	96LVjk/SXgwnYnO1T7Ru/aw==
+X-Google-Smtp-Source: AGHT+IH6C5fYKUqHVv6mDli+XJOu5wo4zi2zoEUL7xcEVt9VC/I/E2532A4J8x48rQ0oFk0PHeKmMYsQ+6bVj4NU
+X-Received: from dlaj6.prod.google.com ([2002:a05:701b:2806:b0:11b:90ac:f6fc])
+ (user=aaronlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:701b:270e:b0:119:e569:f260 with SMTP id a92af1059eb24-121721acfc0mr11920679c88.9.1766530859198;
+ Tue, 23 Dec 2025 15:00:59 -0800 (PST)
+Date: Tue, 23 Dec 2025 23:00:42 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20251223230044.2617028-1-aaronlewis@google.com>
+Subject: [RFC PATCH 0/2] vfio: Improve DMA mapping performance for huge pages
+From: Aaron Lewis <aaronlewis@google.com>
+To: alex.williamson@redhat.com, jgg@nvidia.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, seanjc@google.com, 
+	Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Dec 2025 20:30:29 +0800
-"Jinhui Guo" <guojinhui.liam@bytedance.com> wrote:
+This RFC explores the current state of DMA mapping performance across
+vfio, and proposes an implementation to improve the performance
+for "vfio_type1_iommu" for huge pages.
 
-> On hot-pluggable ports, simultaneous surprise removal of multiple
-> PCIe endpoints whether by pulling the card, powering it off, or
-> dropping the link can trigger a system deadlock.
+In putting this together the IOMMU modes: vfio_type1_iommu,
+iommufd_compat_type1, and iommufd were used to get performance metrics
+using the selftest, "vfio_dma_mapping_perf_test" (included in this
+series).
 
-I think this only identifies one small aspect of the problems with
-surprise removal and vfio-pci.  It's not just the release path of the
-device that can trigger a reset, there are various user accessible
-paths as well, ex. the vfio reset and hot-reset ioctls.  I think those
-can trigger this same deadlock.
+These changes were developed on the branch "vfio/next" in the repro:
+ - https://github.com/awilliam/linux-vfio
 
-Beyond reset, CPU and DMA mappings to the device are still present after
-a surprise removal.  The latter can really only be revoked using the
-new dma-buf support for MMIO regions.
+The optimization demonstrated in patch 1/2 shows a >300x speed up when
+pinning gigantic pages in "vfio_type1_iommu".  More work will be needed to
+improve iommufd's mapping performance for gigantic pages, but a
+callstack showing the slow path is included in that patch to help drive
+the conversation forward.
 
-I think we should take a more comprehensive look at enabling vfio-pci to
-support surprise removal beyond this one case where a cooperative guest
-promptly released the device and encountered a deadlock.
+The iommu mode "iommufd_compat_type1" lags much farther behind the other
+two.  If the intention is to have it perform on par (or near par) I can
+attach a callstack in a follow up to see if there is any low hanging
+fruit to be had.  But as it sits right now the performance of this iommu
+mode is an order of magnitude slower than the others.
 
-In doing so, I think we're going to see several more cases where we
-should test for a disconnected device before reset, some of those may
-suggest that PCI-core is actually the better place for the test rather
-than the leaf caller.  Thanks,
+This is being sent as an RFC because while there is a proposed solution
+for "vfio_type1_iommu", there are no solutions for the other two iommu
+modes.  Attached is a callstack in patch 1/2 showing where the latency
+issues are for iommufd, however, I haven't posted one
+for "iommufd_compat_type1". I'm also not clear on what the intention is
+for "iommufd_compat_type1" w.r.t. this issue.  Especially given it is so
+much slower than the others.
 
-Alex
+Aaron Lewis (2):
+  vfio: Improve DMA mapping performance for huge pages
+  vfio: selftest: Add vfio_dma_mapping_perf_test
 
-> Example: two PCIe endpoints are bound to vfio-pci and opened by
-> the same process (fdA for device A, fdB for device B).
-> 
-> 1. A PCIe-fault brings B's link down, then A's.
-> 2. The PCI core starts removing B:
->    - pciehp_unconfigure_device() takes pci_rescan_remove_lock
->    - vfio-pci's remove routine waits for fdB to be closed
-> 3. While B is stuck, the core removes A:
->    - pciehp_ist() takes the read side of reset_lock A
->    - It blocks on pci_rescan_remove_lock already held by B
-> 4. Killing the process closes fdA first (because it was opened first).
->    vfio_pci_core_close_device() tries to hot-reset A, so it needs
->    the write side of reset_lock A.
-> 5. The write request sleeps until the read lock from step 3 is
->    released, but that reader is itself waiting for B's lock
->    -> deadlock.  
-> 
-> The stuck thread's backtrace is as follows:
->   /proc/1909/stack
->     [<0>] vfio_unregister_group_dev+0x99/0xf0 [vfio]
->     [<0>] vfio_pci_core_unregister_device+0x19/0xb0 [vfio_pci_core]
->     [<0>] vfio_pci_remove+0x15/0x20 [vfio_pci]
->     [<0>] pci_device_remove+0x3e/0xb0
->     [<0>] device_release_driver_internal+0x19b/0x200
->     [<0>] pci_stop_bus_device+0x6d/0x90
->     [<0>] pci_stop_and_remove_bus_device+0xe/0x20
->     [<0>] pciehp_unconfigure_device+0x8c/0x150
->     [<0>] pciehp_disable_slot+0x68/0x140
->     [<0>] pciehp_handle_presence_or_link_change+0x246/0x4c0
->     [<0>] pciehp_ist+0x244/0x280
->     [<0>] irq_thread_fn+0x1f/0x60
->     [<0>] irq_thread+0x1ac/0x290
->     [<0>] kthread+0xfa/0x240
->     [<0>] ret_from_fork+0x209/0x260
->     [<0>] ret_from_fork_asm+0x1a/0x30
->   /proc/1910/stack
->     [<0>] pciehp_unconfigure_device+0x43/0x150
->     [<0>] pciehp_disable_slot+0x68/0x140
->     [<0>] pciehp_handle_presence_or_link_change+0x246/0x4c0
->     [<0>] pciehp_ist+0x244/0x280
->     [<0>] irq_thread_fn+0x1f/0x60
->     [<0>] irq_thread+0x1ac/0x290
->     [<0>] kthread+0xfa/0x240
->     [<0>] ret_from_fork+0x209/0x260
->     [<0>] ret_from_fork_asm+0x1a/0x30
->   /proc/6765/stack
->     [<0>] pciehp_reset_slot+0x2c/0x70
->     [<0>] pci_reset_hotplug_slot+0x3e/0x60
->     [<0>] pci_reset_bus_function+0xcd/0x180
->     [<0>] cxl_reset_bus_function+0xc8/0x110
->     [<0>] __pci_reset_function_locked+0x4f/0xd0
->     [<0>] vfio_pci_core_disable+0x381/0x400 [vfio_pci_core]
->     [<0>] vfio_pci_core_close_device+0x63/0xd0 [vfio_pci_core]
->     [<0>] vfio_df_close+0x48/0x80 [vfio]
->     [<0>] vfio_df_group_close+0x32/0x70 [vfio]
->     [<0>] vfio_device_fops_release+0x1d/0x40 [vfio]
->     [<0>] __fput+0xe6/0x2b0
->     [<0>] task_work_run+0x58/0x90
->     [<0>] do_exit+0x29b/0xa80
->     [<0>] do_group_exit+0x2c/0x80
->     [<0>] get_signal+0x8f9/0x900
->     [<0>] arch_do_signal_or_restart+0x29/0x210
->     [<0>] exit_to_user_mode_loop+0x8e/0x4f0
->     [<0>] do_syscall_64+0x262/0x630
->     [<0>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> The deadlock blocks PCI operations (lspci, sysfs removal, unplug, etc.) and
-> sends system load soaring as PCI-related work stalls, preventing the system
-> from isolating the fault.
-> 
-> The ctrl->reset_lock was added by commit 5b3f7b7d062b ("PCI: pciehp:
-> Avoid slot access during reset") to serialize threads that perform or
-> observe a bus reset, including pciehp_ist() and pciehp_reset_slot().
-> 
-> When a PCIe device is surprise-removed (card pulled or link fault)
-> and generates a link-down event, pciehp_ist() handles it first; only
-> later, after the device has already vanished, does vfio_pci_core_disable()
-> invoke pciehp_reset_slot() - because it must take ctrl->reset_lock.
-> Thus the hot reset (FLR, slot, or bus) is performed after the device
-> is gone, which is pointless.
-> 
-> For surprise removal, the device state is set to
-> pci_channel_io_perm_failure in pciehp_unconfigure_device(), indicating
-> the device is already gone (disconnected).
-> 
-> pciehp_ist()
->   pciehp_handle_presence_or_link_change()
->     pciehp_disable_slot()
->       remove_board()
->         pciehp_unconfigure_device(presence) {
-> 	  if (!presence)
-> 	      pci_walk_bus(parent, pci_dev_set_disconnected, NULL);
-> 	}
-> 
-> Commit 39714fd73c6b ("PCI: Make pci_dev_is_disconnected() helper public for
-> other drivers") adds pci_dev_is_disconnected() to let drivers check whether
-> a device is gone.
-> 
-> Fix the deadlock by using pci_dev_is_disconnected() in
-> vfio_pci_core_disable() to detect a gone PCIe device and skip the hot
-> reset.
-> 
-> Signed-off-by: Jinhui Guo <guojinhui.liam@bytedance.com>
-> ---
-> 
-> Hi, alex
-> 
-> Sorry for the noise.
-> I've just resent the patch to expand the commit message; no code changes.
-> I hope the additional context helps the review.
-> 
-> Best Regards,
-> Jinhui
-> 
->  drivers/vfio/pci/vfio_pci_core.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 3a11e6f450f7..f42051552dd4 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -678,6 +678,16 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  		if (!vdev->reset_works)
->  			goto out;
->  
-> +		/*
-> +		 * Skip hot reset on Link-Down. This avoids the reset_lock
-> +		 * deadlock in pciehp_reset_slot() when multiple PCIe devices
-> +		 * go down at the same time.
-> +		 */
-> +		if (pci_dev_is_disconnected(pdev)) {
-> +			vdev->needs_reset = false;
-> +			goto out;
-> +		}
-> +
->  		pci_save_state(pdev);
->  	}
->  
+ drivers/vfio/vfio_iommu_type1.c               |  37 ++-
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../vfio/vfio_dma_mapping_perf_test.c         | 247 ++++++++++++++++++
+ 3 files changed, 277 insertions(+), 8 deletions(-)
+ create mode 100644 tools/testing/selftests/vfio/vfio_dma_mapping_perf_test.c
+
+-- 
+2.52.0.351.gbe84eed79e-goog
 
 
