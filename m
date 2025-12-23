@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-66624-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66625-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A6ACDAC9B
-	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:01:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59DC5CDACA1
+	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:01:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4416A3003DB2
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:01:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EEBD30456BB
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF241221DB3;
-	Tue, 23 Dec 2025 23:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5071E27380A;
+	Tue, 23 Dec 2025 23:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="flo7KYVn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W0P/IthI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49042248176
-	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 23:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD622E62D9
+	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 23:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766530863; cv=none; b=bWb4VsqEcA+viwzM43W6JLEruFMGhoADvl26qEU5NZFT4bBUMTp87K3+/UDaN+28Cfu2WqcZ1xAHs/B8oK01gUoZs/oofcnQV+q2GdNNRnCDpjZm7A1Bb6erc5is3+QskUq4MDp0OyHt+qRrmc1ijg7YaU8pfyrBjnkh41J61k0=
+	t=1766530864; cv=none; b=HLOJrX+H6WtILfipqUTFPNy3qJc7DM9VVsyvTrEd7CQ6bnkH5PDcWVj2ULwTcNrfHQjPxabm8Cc4oOfnJ64YettCq9Dh4V9Ky1ZbqMF8mES/MRaDvTGsvNJyABEX4+ieOm23zavXLYghhRJEI1TM45bI0sDnqc9tW7U3iyplsEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766530863; c=relaxed/simple;
-	bh=rLNGu760rf5ulNmGbVEA7VycQbQuICac6A1NiDTgKjg=;
+	s=arc-20240116; t=1766530864; c=relaxed/simple;
+	bh=/36vnhEQRSZK//3+V3VFig2s2AZAKDQe65ME5A4VaQg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YJ/QpJZu0JdlXOjfHk5XnyI2AOXCcxyMR9tlOSbPdSPy/KrvOVvRKHZz86gtPAgH3y3Q48y5oTrnvzghyfONoAkwneVK6RGts5H0wJdJrS0IKy+U4exGQ6trN59Jjdu5fk7gN3GPgLS/JxD+31s7gZK0jcCFCPiWxN2Y/rofxyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=flo7KYVn; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=O1Rib/hPb+ZajpR9Pc+Cm1WJczftfirfadcxSqlYqWX0XV/4M/BCT15qkaiO5Sa1XDwLCDi3Y0s7YjXeJl3exzTuKR1MZPmDxe/iqAl/K3OLRpQayjNX+hPiS3P7BQ8mcRcL1bXTZ4qC9KPmDOUFvNCLSmJNp6hue1gYySbVZ9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W0P/IthI; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aaronlewis.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a351686c17so6104885ad.0
-        for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 15:01:01 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-ba4c6ac8406so4418395a12.0
+        for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 15:01:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766530860; x=1767135660; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1766530862; x=1767135662; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9pFd8E7CEwyAtGvaqN83UFqYCZHKvMlPmqNvC3XWFA=;
-        b=flo7KYVn9WgPFaRaO4XCdOPinuLBEvbV8MI9STaV+pDeWxcTurtfHeIHsAFKxVdybF
-         7yeHzg7p9AszF+OCh83lJA/Jnsjdd8FzaUi3sqOMqFf9mkLJbSTH7vIObsD8BWDZhIoE
-         PrvG7AR4T6LNHyEMWuNJ6hG/xMVKWdNoOnXGn5qfB55HSqNe44PkdFYRhkwvQGJnuQ/1
-         fimAWOuWP5eRV3GZQGVrwtVVuutWAHeT5DJW/R+uJO4UYmOMw/I12QFcvmJsuS7CZIME
-         O6yRGcNxzSojH8+y+auijYFd7HNFxuqhrQxY347+8FlMGHUKpfjDCwjE45GQx8FPWLQT
-         pf3g==
+        bh=bv3s2RDHQ4OszlXNEdG1Pt4RQgFWzpLzAv9r2lb2HV0=;
+        b=W0P/IthI4xLXvpe1m3wtOQGvRn4qXwesueWw2rkJUABE79Ccfbsrzx+yYETCYv/k94
+         jj6QLKbx07CCG7J2OZO3zMdVkiyxXGbqQG5eHhkXm1aWjFnsUxKdbkKedl392wpCvzgq
+         SYUUDjRjCyOqVfbNGE4rbMMBVcFXV7k7bOAvzm5MaDABoGWorQhXdeG1AoxsBHzysmza
+         54a/YU+P1vua5W9Y3GASSD6F2r/MqPXNmSGaDdudko4LQwDjlXHrM+LDQDsXxHhr8x/t
+         mCAr5meB2JAq38Ptf53rhKE6HjeLQoavXxwcOIz+CqbxXjpN14QbjjEnX/1+PofufKWH
+         iNew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766530860; x=1767135660;
+        d=1e100.net; s=20230601; t=1766530862; x=1767135662;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N9pFd8E7CEwyAtGvaqN83UFqYCZHKvMlPmqNvC3XWFA=;
-        b=Qpsxnp2D6SwBb9B1yY9Cp+LV3eURpUvcJkNn3AY60/XDcZjwKbM9kiwfXw7BfwQmqb
-         JIMnSWY1xiaisDWxUXbjUpgm3IOtwVYb7F1C/7+XcQf6D72iTitYx/ZXrRK2sfJ9L2/M
-         H4SUOb0Lm80nGTSowUIjfCgnciOddxgpy31yfZYam5mk5O5V6oAdtk36oLAHEAcM9Hpt
-         8QlRj8ipGKxfS4MDSTXpbb/DOfFQoHXm52+IgR6dsWcRGN/j5SVSS648KMa53+MTJUN3
-         wCD1eJi42Z1hJXqtyxFPgt7ozHogqUd1s4EGn0cFQd2JdT6fjQkbkGfqvuDcMkXUrG3F
-         zciw==
-X-Gm-Message-State: AOJu0Yyc7nZ6WJrR1JkZaHCE6/uZJx/TzJKF+eqYayjnIrceVRXMI7Ea
-	wZAp29erY/2NInS199aHxB2xUd4vx9WYHRYAqZ0J934K19a6knJH5QqsdhT/HqvK5NhiEbK1Z0P
-	Rtu3M0hfcb1L5oyrWEuakqw==
-X-Google-Smtp-Source: AGHT+IEKBTiT60w7uhNxwFAh2XNhy2bf6OTiZvr+Pn3AcnFScrQECOUvcwH+7dWZf7ZlBFUtVhFtKqNwb/jWTWt3
-X-Received: from dlbtv7.prod.google.com ([2002:a05:7022:3c87:b0:11f:36a2:78d])
+        bh=bv3s2RDHQ4OszlXNEdG1Pt4RQgFWzpLzAv9r2lb2HV0=;
+        b=k+I+r3MOT5jXG+JzT2zR0iduoGJ7yooQ2iGAwMTEvUtd9yi0mkF6maCRycMXjookLX
+         MjV2I2aAQBnhtO/yuQEcIyzPXC2jJVbfo36swxfnvk+fZeIPcLZCwYSmRvx5d1xwNQmV
+         HEIfVGhUE4yMcjZ7vPmxhI9UZxJUdXHNl7FBo2+UnbSHUyDPNHJmgcE/AKx6MbU+NswZ
+         09bd3oYOdA1G35tneHOEm6g15ExrebTQNvDfJnOIT8bjNAANwrAa7GWK6CT4LO1eZBOG
+         UyOZblwGzZqztHm79MI0nq6eUI+2Rdvn6o52H6kvnfeh5rTBrOTv97bPwPEGEnY/kcgN
+         D7pg==
+X-Gm-Message-State: AOJu0YxDnJ8saqrFBVOLwSiMNbNNHhOZcAP6JLkE5HQyEOcs/ck7EXWw
+	9aB9d2QKmTrH3SQ4AOg0+nZRoGuQQKxwtQpqVPui6M1Bx6zuiLFxgBXy8BY2RX3dPqBvfLaiqs+
+	Mh5fTTm1GcQRCGytfUFv62w==
+X-Google-Smtp-Source: AGHT+IFm270QgbuKvBYXeGkbDYksU3QTFPj/bf0AbeaSaQCJSRwnSGRC5TVOqCVqcueW1P/BJyk9lOsAQPtlmohv
+X-Received: from dlbrl11.prod.google.com ([2002:a05:7022:f50b:b0:120:56f0:7b38])
  (user=aaronlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7022:1e09:b0:119:e56b:9583 with SMTP id a92af1059eb24-121722ac4bfmr12001063c88.8.1766530860485;
- Tue, 23 Dec 2025 15:01:00 -0800 (PST)
-Date: Tue, 23 Dec 2025 23:00:43 +0000
+ 2002:a05:7022:170c:b0:11e:3e9:3ea0 with SMTP id a92af1059eb24-12172305ba1mr13010464c88.49.1766530861826;
+ Tue, 23 Dec 2025 15:01:01 -0800 (PST)
+Date: Tue, 23 Dec 2025 23:00:44 +0000
 In-Reply-To: <20251223230044.2617028-1-aaronlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -71,192 +71,303 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251223230044.2617028-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251223230044.2617028-2-aaronlewis@google.com>
-Subject: [RFC PATCH 1/2] vfio: Improve DMA mapping performance for huge pages
+Message-ID: <20251223230044.2617028-3-aaronlewis@google.com>
+Subject: [RFC PATCH 2/2] vfio: selftest: Add vfio_dma_mapping_perf_test
 From: Aaron Lewis <aaronlewis@google.com>
 To: alex.williamson@redhat.com, jgg@nvidia.com, dmatlack@google.com
 Cc: kvm@vger.kernel.org, seanjc@google.com, 
 	Aaron Lewis <aaronlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Huge pages are pinned at 4K granularity.  That means when pinning a 1G
-page, 2^18 pages are pinned one at a time.  This adds needless toil
-which results in high latencies.
+Add a selftest to help investigate latencies when mapping pages in vfio.
 
-To improve this, increase the number of pages the batch is operating on
-to the number of 4k pages in a huge page.  Doing that allows huge
-pages to be pinned in larger chunks, reducing the number of individual
-pages being pinned one at a time.
+To disabiguate the prefetch time from the pinning time the mmap() flag
+MAP_POPULATE is used.  With prefetching done in mmap() that exposes
+pinning latencies when mapping gigantic pages.
 
-This results in a major speed up vs baseline and can be demonstrated
-by the selftest "vfio_dma_mapping_perf_test".
+For this test 8G of memory is pinned to keep the test responsive. Pinning
+more memory could result in the test timing out, e.g. if it pinned 256G.
+The majority of that time is spent prefetching the memory in mmap().
 
-Using this selftest and a sample profiler it is easy to see where all
-the time is being spent, vfio_pin_pages_remote().  Optimizing for that
-led to the gains called out below.
+This test has 4 main phases: mmap(), iova_alloc(), iommu_map(), and
+iommu_unmap().  Each of these stages are timed and reported in
+milliseconds.
 
- Samples     Percentage  Name
- ---------------------------------------------
- 30,947,392      0.209%  vfs_ioctl (ioctl.c) Inlined
- 30,947,392      0.209%  vfio_fops_unl_ioctl (container.c)
- 30,947,392      0.209%  vfio_iommu_type1_ioctl (vfio_iommu_type1.c)
- 30,947,392      0.209%  vfio_iommu_type1_map_dma (vfio_iommu_type1.c) Inlined
- 30,947,392      0.209%  vfio_dma_do_map (vfio_iommu_type1.c) Inlined
- 30,947,392      0.209%  vfio_pin_map_dma (vfio_iommu_type1.c)
- 30,947,392      0.209%  vfio_pin_pages_remote (vfio_iommu_type1.c)
- 29,616,402      0.200%  vaddr_get_pfns (vfio_iommu_type1.c)
- 29,616,402      0.200%  internal_get_user_pages_fast (gup.c)
- 29,616,402      0.200%  __gup_longterm_locked (gup.c)
- 28,962,361      0.195%  __get_user_pages_locked (gup.c) Inlined
- 28,962,361      0.195%  __get_user_pages (gup.c)
- 25,548,889      0.172%  follow_page_mask (gup.c)
- 24,852,062      0.168%  follow_p4d_mask (gup.c) Inlined
- 24,852,062      0.168%  follow_pud_mask (gup.c) Inlined
- 17,683,506      0.119%  follow_devmap_pud (huge_memory.c)
- 6,584,772       0.044%  pud_lock (mm.h) Inlined
-
-
- Results when mapping 8G of memory:
- ----------------------------------
-
-Baseline
- - vfio_type1_iommu:      2.87ms
- - iommufd_compat_type1: 53.23ms
- - iommufd:               4.53ms
-
-With fast huge page pinning
- - vfio_type1_iommu:      0.01ms
- - improvements to iommufd_compat_type1 and iommufd are tbd.
-
-
- Results when mapping 256G of memory:
- ----------------------------------
-
-Baseline
- - vfio_type1_iommu:       99.36ms
- - iommufd_compat_type1: 1576.51ms
- - iommufd:               144.65ms
-
-With fast huge page pinning:
- - vfio_type1_iommu:        0.20ms
- - improvements to iommufd_compat_type1 and iommufd are tbd.
-
-Based on these results that is more than a 300x speed up for
-vfio_type1_iommu!  E.g. 2.87ms -> 0.01ms and 99.36ms -> 0.20ms.
-
-As of now there is only a proposal to speed up "vfio_type1_iommu".
-
-
- IOMMUFD:
- --------
-
-More effort will be needed to see what kind of speed ups can be achieved
-by optimizing iommufd.  Sample profiler results (below) show that it
-isn't the GUP calls that are slowing it down like they were in the
-"vfio_type1_iommu" case.  The majority of the slowdown is coming from
-batch_from_pages(), and the majority of that time is being spent in
-batch_add_pfn_num().
-
- Samples     Percentage  Name
- ---------------------------------------------
- 2,710,320,547   10.22%  iommufd_fops_ioctl (main.c)
- 2,710,320,547   10.22%  iommufd_ioas_map (ioas.c)
- 2,710,320,547   10.22%  iopt_map_user_pages (io_pagetable.c)
- 2,710,320,547   10.22%  iopt_map_common (io_pagetable.c)
- 2,710,320,547   10.22%  iopt_map_pages (io_pagetable.c)
- 2,710,320,547   10.22%  iopt_fill_domains_pages (io_pagetable.c) Inlined
- 2,710,320,547   10.22%  iopt_area_fill_domains (pages.c)
- 2,710,320,547   10.22%  pfn_reader_first (pages.c)
- 2,710,320,547   10.22%  pfn_reader_next (pages.c)
- 2,709,376,056   10.21%  pfn_reader_fill_span (pages.c) Inlined
-   2,435,947,359   9.182%  batch_from_pages (pages.c) Inlined
-     1,864,604,611  7.028%   batch_add_pfn (pages.c) Inlined
-     1,864,604,611  7.028%   batch_add_pfn_num (pages.c) Inlined
-   273,428,697     1.031%  pfn_reader_user_pin (pages.c)
-     271,538,567     1.024%  gup_fast_fallback (gup.c)
+This test doesn't set targets for any of its phases as targets are error
+prone and lead to flaky tests.  Therefore, instead of having targets
+this test simply reports how long each phase took.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 37 ++++++++++++++++++++++++++-------
- 1 file changed, 29 insertions(+), 8 deletions(-)
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../vfio/vfio_dma_mapping_perf_test.c         | 247 ++++++++++++++++++
+ 2 files changed, 248 insertions(+)
+ create mode 100644 tools/testing/selftests/vfio/vfio_dma_mapping_perf_test.c
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 5167bec14e363..c1f7c2600a2d0 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -108,6 +108,7 @@ struct vfio_batch {
- 	unsigned int		capacity;	/* length of pages array */
- 	unsigned int		size;		/* of batch currently */
- 	unsigned int		offset;		/* of next entry in pages */
-+	bool			override_size;	/* has size been overriden. */
- };
- 
- struct vfio_iommu_group {
-@@ -493,6 +494,7 @@ static int put_pfn(unsigned long pfn, int prot)
- 
- static void __vfio_batch_init(struct vfio_batch *batch, bool single)
- {
-+	batch->override_size = false;
- 	batch->size = 0;
- 	batch->offset = 0;
- 
-@@ -598,7 +600,18 @@ static long vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
- 	ret = pin_user_pages_remote(mm, vaddr, pin_pages, flags | FOLL_LONGTERM,
- 				    batch->pages, NULL);
- 	if (ret > 0) {
-+		unsigned long nr_pages = compound_nr(batch->pages[0]);
-+		bool override_size = false;
+diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+index 3c796ca99a509..134ce40b81790 100644
+--- a/tools/testing/selftests/vfio/Makefile
++++ b/tools/testing/selftests/vfio/Makefile
+@@ -1,5 +1,6 @@
+ CFLAGS = $(KHDR_INCLUDES)
+ TEST_GEN_PROGS += vfio_dma_mapping_test
++TEST_GEN_PROGS += vfio_dma_mapping_perf_test
+ TEST_GEN_PROGS += vfio_iommufd_setup_test
+ TEST_GEN_PROGS += vfio_pci_device_test
+ TEST_GEN_PROGS += vfio_pci_device_init_perf_test
+diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_perf_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_perf_test.c
+new file mode 100644
+index 0000000000000..c70f6935e0291
+--- /dev/null
++++ b/tools/testing/selftests/vfio/vfio_dma_mapping_perf_test.c
+@@ -0,0 +1,247 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <stdio.h>
++#include <sys/mman.h>
++#include <time.h>
++#include <unistd.h>
 +
-+		if (PageHead(batch->pages[0]) && nr_pages > pin_pages &&
-+		    ret == pin_pages) {
-+			override_size = true;
-+			ret = nr_pages;
-+			page_ref_add(batch->pages[0], nr_pages - pin_pages);
-+		}
++#include <uapi/linux/types.h>
++#include <linux/iommufd.h>
++#include <linux/limits.h>
++#include <linux/mman.h>
++#include <linux/sizes.h>
++#include <linux/time64.h>
++#include <linux/vfio.h>
 +
- 		*pfn = page_to_pfn(batch->pages[0]);
-+		batch->override_size = override_size;
- 		batch->size = ret;
- 		batch->offset = 0;
- 		goto done;
-@@ -668,6 +681,20 @@ static long vpfn_pages(struct vfio_dma *dma,
- 	return ret;
- }
- 
-+static long vfio_batch_num_pages_contiguous(struct vfio_batch *batch)
++#include <libvfio.h>
++
++#include "../kselftest_harness.h"
++
++static const char *device_bdf;
++
++struct iommu_mapping {
++	u64 pgd;
++	u64 p4d;
++	u64 pud;
++	u64 pmd;
++	u64 pte;
++};
++
++static s64 to_ns(struct timespec ts)
 +{
-+	if (batch->override_size) {
-+		return batch->size;
-+	}
-+
-+	/*
-+	 * Using GUP with the FOLL_LONGTERM in vaddr_get_pfns() will not
-+	 * return invalid or reserved pages.
-+	 */
-+	return num_pages_contiguous(&batch->pages[batch->offset],
-+				    batch->size);
++	return (s64)ts.tv_nsec + NSEC_PER_SEC * (s64)ts.tv_sec;
 +}
 +
- /*
-  * Attempt to pin pages.  We really don't want to track all the pfns and
-  * the iommu can only map chunks of consecutive pfns anyway, so get the
-@@ -747,14 +774,8 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
- 			    rsvd != is_invalid_reserved_pfn(pfn))
- 				goto out;
- 
--			/*
--			 * Using GUP with the FOLL_LONGTERM in
--			 * vaddr_get_pfns() will not return invalid
--			 * or reserved pages.
--			 */
--			nr_pages = num_pages_contiguous(
--					&batch->pages[batch->offset],
--					batch->size);
-+			nr_pages = vfio_batch_num_pages_contiguous(batch);
++static double to_ms(struct timespec ts)
++{
++	return to_ns(ts) / 1000.0 / 1000.0;
++}
 +
- 			if (!rsvd) {
- 				acct_pages = nr_pages;
- 				acct_pages -= vpfn_pages(dma, iova, nr_pages);
++static struct timespec to_timespec(s64 ns)
++{
++	struct timespec ts = {
++		.tv_nsec = ns % NSEC_PER_SEC,
++		.tv_sec = ns / NSEC_PER_SEC,
++	};
++
++	return ts;
++}
++
++static struct timespec timespec_sub(struct timespec a, struct timespec b)
++{
++	return to_timespec(to_ns(a) - to_ns(b));
++}
++
++static double timespec_elapsed_ms(struct timespec start)
++{
++	struct timespec end;
++
++	clock_gettime(CLOCK_MONOTONIC, &end);
++	return to_ms(timespec_sub(end, start));
++}
++
++
++static void parse_next_value(char **line, u64 *value)
++{
++	char *token;
++
++	token = strtok_r(*line, " \t|\n", line);
++	if (!token)
++		return;
++
++	/* Caller verifies `value`. No need to check return value. */
++	sscanf(token, "0x%lx", value);
++}
++
++static int intel_iommu_mapping_get(const char *bdf, u64 iova,
++				   struct iommu_mapping *mapping)
++{
++	char iommu_mapping_path[PATH_MAX], line[PATH_MAX];
++	u64 line_iova = -1;
++	int ret = -ENOENT;
++	FILE *file;
++	char *rest;
++
++	snprintf(iommu_mapping_path, sizeof(iommu_mapping_path),
++		 "/sys/kernel/debug/iommu/intel/%s/domain_translation_struct",
++		 bdf);
++
++	file = fopen(iommu_mapping_path, "r");
++	VFIO_ASSERT_NOT_NULL(file, "fopen(%s) failed", iommu_mapping_path);
++
++	while (fgets(line, sizeof(line), file)) {
++		rest = line;
++
++		parse_next_value(&rest, &line_iova);
++		if (line_iova != (iova / getpagesize()))
++			continue;
++
++		/*
++		 * Ensure each struct field is initialized in case of empty
++		 * page table values.
++		 */
++		memset(mapping, 0, sizeof(*mapping));
++		parse_next_value(&rest, &mapping->pgd);
++		parse_next_value(&rest, &mapping->p4d);
++		parse_next_value(&rest, &mapping->pud);
++		parse_next_value(&rest, &mapping->pmd);
++		parse_next_value(&rest, &mapping->pte);
++
++		ret = 0;
++		break;
++	}
++
++	fclose(file);
++
++	return ret;
++}
++
++static int iommu_mapping_get(const char *bdf, u64 iova,
++			     struct iommu_mapping *mapping)
++{
++	if (!access("/sys/kernel/debug/iommu/intel", F_OK))
++		return intel_iommu_mapping_get(bdf, iova, mapping);
++
++	return -EOPNOTSUPP;
++}
++
++FIXTURE(vfio_dma_mapping_perf_test) {
++	struct iommu *iommu;
++	struct vfio_pci_device *device;
++	struct iova_allocator *iova_allocator;
++};
++
++FIXTURE_VARIANT(vfio_dma_mapping_perf_test) {
++	const char *iommu_mode;
++	u64 size;
++	int mmap_flags;
++	const char *file;
++};
++
++#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode, _name, _size, _mmap_flags) \
++FIXTURE_VARIANT_ADD(vfio_dma_mapping_perf_test, _iommu_mode ## _ ## _name) {   \
++	.iommu_mode = #_iommu_mode,					       \
++	.size = (_size),						       \
++	.mmap_flags = MAP_ANONYMOUS | MAP_PRIVATE |			       \
++		      MAP_POPULATE | (_mmap_flags), 			       \
++}
++
++FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(anonymous_hugetlb_1gb, SZ_1G, MAP_HUGETLB | MAP_HUGE_1GB);
++
++#undef FIXTURE_VARIANT_ADD_IOMMU_MODE
++
++FIXTURE_SETUP(vfio_dma_mapping_perf_test)
++{
++	self->iommu = iommu_init(variant->iommu_mode);
++	self->device = vfio_pci_device_init(device_bdf, self->iommu);
++	self->iova_allocator = iova_allocator_init(self->iommu);
++}
++
++FIXTURE_TEARDOWN(vfio_dma_mapping_perf_test)
++{
++	iova_allocator_cleanup(self->iova_allocator);
++	vfio_pci_device_cleanup(self->device);
++	iommu_cleanup(self->iommu);
++}
++
++TEST_F(vfio_dma_mapping_perf_test, dma_map_unmap)
++{
++	u64 mapping_size = variant->size ?: getpagesize();
++	const u64 size = 8ULL * /*1GB=*/(1ULL << 30);
++	const int flags = variant->mmap_flags;
++	struct dma_region region;
++	struct iommu_mapping mapping;
++	struct timespec start;
++	u64 unmapped;
++	int rc;
++
++	clock_gettime(CLOCK_MONOTONIC, &start);
++	region.vaddr = mmap(NULL, size, PROT_READ | PROT_WRITE, flags, -1, 0);
++	printf("Mmap duration = %.2lfms\n", timespec_elapsed_ms(start));
++
++	/* Skip the test if there aren't enough HugeTLB pages available. */
++	if (flags & MAP_HUGETLB && region.vaddr == MAP_FAILED)
++		SKIP(return, "mmap() failed: %s (%d)\n", strerror(errno), errno);
++	else
++		ASSERT_NE(region.vaddr, MAP_FAILED);
++
++	clock_gettime(CLOCK_MONOTONIC, &start);
++	region.iova = iova_allocator_alloc(self->iova_allocator, size);
++	region.size = size;
++	printf("IOVA alloc duration = %.2lfms\n", timespec_elapsed_ms(start));
++
++	clock_gettime(CLOCK_MONOTONIC, &start);
++	iommu_map(self->iommu, &region);
++	printf("DMA map duration = %.2lfms\n", timespec_elapsed_ms(start));
++
++	ASSERT_EQ(region.iova, to_iova(self->device, region.vaddr));
++
++	rc = iommu_mapping_get(device_bdf, region.iova, &mapping);
++	if (rc == -EOPNOTSUPP) {
++		goto unmap;
++	}
++
++
++	/*
++	 * IOMMUFD compatibility-mode does not support huge mappings when
++	 * using VFIO_TYPE1_IOMMU.
++	 */
++	if (!strcmp(variant->iommu_mode, "iommufd_compat_type1"))
++		mapping_size = SZ_4K;
++
++
++	ASSERT_EQ(0, rc);
++
++	switch (mapping_size) {
++	case SZ_4K:
++		ASSERT_NE(0, mapping.pte);
++		break;
++	case SZ_2M:
++		ASSERT_EQ(0, mapping.pte);
++		ASSERT_NE(0, mapping.pmd);
++		break;
++	case SZ_1G:
++		ASSERT_EQ(0, mapping.pte);
++		ASSERT_EQ(0, mapping.pmd);
++		ASSERT_NE(0, mapping.pud);
++		break;
++	default:
++		VFIO_FAIL("Unrecognized size: 0x%lx\n", mapping_size);
++	}
++
++unmap:
++	clock_gettime(CLOCK_MONOTONIC, &start);
++	rc = __iommu_unmap(self->iommu, &region, &unmapped);
++	printf("DMA unmap duration = %.2lfms\n", timespec_elapsed_ms(start));
++	ASSERT_EQ(rc, 0);
++	ASSERT_EQ(unmapped, region.size);
++	ASSERT_NE(0, __to_iova(self->device, region.vaddr, NULL));
++	ASSERT_NE(0, iommu_mapping_get(device_bdf, region.iova, &mapping));
++
++	ASSERT_TRUE(!munmap(region.vaddr, size));
++}
++
++int main(int argc, char *argv[])
++{
++	device_bdf = vfio_selftests_get_bdf(&argc, argv);
++	return test_harness_run(argc, argv);
++}
 -- 
 2.52.0.351.gbe84eed79e-goog
 
