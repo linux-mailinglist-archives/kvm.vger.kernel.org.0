@@ -1,150 +1,368 @@
-Return-Path: <kvm+bounces-66527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82403CD775E
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 00:37:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF496CD77C1
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 01:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 829FA30184CE
-	for <lists+kvm@lfdr.de>; Mon, 22 Dec 2025 23:37:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 607FF301F8DC
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 00:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679B032F761;
-	Mon, 22 Dec 2025 23:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889FF1D5CD9;
+	Tue, 23 Dec 2025 00:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Swuj+OYA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2VqSPjav"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E824C2FFFBE
-	for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 23:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B0518EFD1
+	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 00:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766446666; cv=none; b=fRMKhEQz0rTyDEIHYsl6LLAOHIR5yubrGUwcBbOcv5IXYHd5S/DoZZcXq7ToEGzQHpqNs6DDrrLWrNm48EiwtxnXU61nmZ75Yo0Dr7O2fmB7ZiP6INhh9FPXqVcF+X3phYiC+VRKUmcSgBr9rtru0m8F+JcIZd8wx4FUVHfki0s=
+	t=1766449261; cv=none; b=jxbt1v8FJFOj0gwyGgTJ/fZDP1H0nA8LWsqrAvGNvn0vZsH7fVSpNoaNkl8CXbG+9XwGdetEsZifhDUWVpapIKtVhKHiNPTFn60ArA3mWUr5vdLpxUpAxrsX4fK/v/7zVceLysAyLtLZo9XTauj8mnu7gbBKM0pumk9p9nxKnJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766446666; c=relaxed/simple;
-	bh=nY66VQOhbvqdzZgeGL+/FZXbOwO7nvJBigVU8eFU+VU=;
-	h=From:Content-Type:Mime-Version:Subject:Date:References:Cc:To:
-	 Message-Id; b=sMvOdFiXTfGgwLLQrm+B7x6AYXb5KP2fQHp0btWPva9cA14uFBe/bVfiqHcMcxSRP3mbv1ZjtIqvOBlSTWkUjxAMqB2Yh0sWBwXlYrXEZ/vodVKmaLBxVs44el5F2x+ZvbAKhmTjTl4nfZe4ZVSJV/hutFqyLYM0pxQBr3FraH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Swuj+OYA; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-88860551e39so35787096d6.3
-        for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 15:37:44 -0800 (PST)
+	s=arc-20240116; t=1766449261; c=relaxed/simple;
+	bh=uqYqKRHeXpTddhMxbshxwAW45YGPsOoicz+wOyJA7R4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EQdmpc8SHNd9EhTEoX1aLuqypKgimoAh6jhVEB+6RcCpTgoGMLVe7L3GuS3ccrZYb5245DhZYQ5nZvhIYSuZ8MYk6+VpCwEJkqfIYD/4WE3Sj7APaP8tOPcMrnag4LmcmYo87je2G8+15BhYdFKIbWBjgxT6c9l7JLDRXBmQoXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2VqSPjav; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42e2d02a3c9so3003313f8f.3
+        for <kvm@vger.kernel.org>; Mon, 22 Dec 2025 16:20:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766446664; x=1767051464; darn=vger.kernel.org;
-        h=message-id:to:cc:references:date:subject:mime-version
-         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FJvGwq+7Pamxnffgvl/Xh+Dw+LtLBntFoSfEkNe0+74=;
-        b=Swuj+OYAPk+niqiClQn7cXdOSe0RYifqTLp+49YcHpXFJ3F+z/+lKk+J7PqHN62TK7
-         awYbXttrcjGQbiY83e9ngG2ZVc/eGpJ0jthG3RBiJKUxdCV/PGQoJGQOPFXr+a/Y+qhj
-         aH5bSu/WOLyXSw+TJpiV+jQ1StOJUT3ccC9q+AUS0sQ+TE/rXK6GD35+vTcIslLfh4jH
-         AJ/XO9jezw9gTciHuz+4LNpyfmwRsTM3gomXPBAwMKOowdO3nQjpsltbAuPuzkFB7lov
-         9a+M/cEXeeZH+WG85yuADxvI4jeOEwKuAMzcZYrQxO5NnJn7o6cPI2qW7qTdHmKO39Fp
-         7iIQ==
+        d=google.com; s=20230601; t=1766449258; x=1767054058; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SZsx7cJ9Ye312xBCkpV4L6PWob6CKPjB4S21GGQ7LzI=;
+        b=2VqSPjav9YuGlPo987SZWoZY+qR5HTJN5el16KUAMagt9bsRITQVBvOCLAM5Y9Yp1F
+         l+W5e90DIQqSABBPhR/C0EyQ6eud1eOhwtE01yNsTloe0HGZLPDLBzIQiwIT1+N1Ggxp
+         A65ZsizDUqaro9thaSIIhDyGkwewFgP4Uq/0BCn7f2SfavFFesHmlFJsPUrSiM39zb40
+         5YMdXJk1aJ25w95eOTgPOexr/vUrBE9bWy10aHFPYZuN4nRSx+frH9dBT1cmw6nhsLhx
+         Xu6OSoVSKV8Ck3ky9vJT2tCBCUT6s7/47zOaVb7oYHfeaNJS57F4rcrbQSDuKF7fx2uu
+         cHNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766446664; x=1767051464;
-        h=message-id:to:cc:references:date:subject:mime-version
-         :content-transfer-encoding:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FJvGwq+7Pamxnffgvl/Xh+Dw+LtLBntFoSfEkNe0+74=;
-        b=pHks8Y0PcoS2bJ4NQ/09FHCasfcL+5tKPibVTG/KtBdWQX3fs1mxXuHYxT6juC0Huz
-         bfpvlM/CB4EDioOH8bsrhHgaY6dOPe1aciK3vDEc7Gpp9mcAAK0OJTO89jH6cIACYJUe
-         yK3PNvtQqlUbltB9RR+nf+x3M0EpwZRoLMslJw+jU8rC8q99/r/Qv6NxOgOSyoUZjsCg
-         Cau/IyZ+8z1/B2/lVsEpuswKsA6R7DckV1e+mQ/uSNY6bo+EDFMs/FF3e/yGEdL8cpNL
-         xS+0gSIUX8RUhA7L26XsRaC/bBQbnKYF1hrF2WLEjl3i5dQK1IrZlFlUq+dgv2Erge5q
-         SvOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVptffFtdH5ecOhq0A7Hq3dF/has8lXZd8riRKAdyTDtroegAxszBPVANMYh7coHGp5Vso=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSkIFR2oIbmQFXOVW209U9Kh8QaueKrkVAQOLVLM2vjaY2eZ+S
-	XNy0wLyuHIccCiF+0kA0jAoyzeUwO2a8YxeUjjz4z4LvG7zmiqZs747JbxjjKA==
-X-Gm-Gg: AY/fxX7iAfKtbjWzmCz/Ln7Tz6ZHsJmIgpe1Zs6GFbNCbCD1gnLotSzayNfbfsBYJE4
-	d2oil/U51DN4FgXuza/vGiWSKmedoXxxnAr+IVim8WRkeX/szLwJFGyDidN0CTRzDR6Yh6vEcIb
-	8JjL9LC2J9g1bUcfwPE0/jCxT6OcGQg32uhHUvnhXFCaEc+36rNOkZl1OBNu3YG+NeWR3ZUB+IN
-	9w5wWosNnE7feZ+W2A97krqNdtQe7oPsb89zNgnvhFczxoL88eNMXcrCTk1NAZp5lMzuYD6pRsb
-	jJ6LYSfan+VI+lF4mDbiUyf+EGtFIhAoks4bX15Y/qhRYQ+lKciJqEzricuOpahQPHzOKHZg7Yh
-	EeUmqUvC4pxkrLa1Oogpv2zM4Nh3Bun7foqhUA4MDLdqA+/hCyOSVyF+/txERyDIg+GvHd1a9v+
-	kZFFKpu0bRP260zKjNdNiGqC2UebzBWo8BEzyxKQ8C8fl5nhZJ
-X-Google-Smtp-Source: AGHT+IH04yosElyDXNujxX0PrNcUfcACTFFNNR9hYLNll/S61gWZPfwdzqxkwHHQqV8TVPhTPC/bVQ==
-X-Received: by 2002:a05:622a:4d08:b0:4ee:1879:e473 with SMTP id d75a77b69052e-4f4abcf3b54mr205212151cf.32.1766446663663;
-        Mon, 22 Dec 2025 15:37:43 -0800 (PST)
-Received: from smtpclient.apple ([2600:4041:45af:2c00:59d7:91be:c779:cc7e])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ac62fa56sm93666341cf.17.2025.12.22.15.37.42
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Dec 2025 15:37:43 -0800 (PST)
-From: Patrick Bianchi <patrick.w.bianchi@gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        d=1e100.net; s=20230601; t=1766449258; x=1767054058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SZsx7cJ9Ye312xBCkpV4L6PWob6CKPjB4S21GGQ7LzI=;
+        b=ZUsSu8OcW5BKIv4TyIlTXWTkTbsQh85KpNKRp0NtsyxrFWnxG4hrzC9Voq6zc+iSwH
+         iE5g3VqicAazoMcnNU3qp+WG3IqUplHLNmuPmELwa8X7MGE1hY3qvj/QtFMeAtMY/EH3
+         e4MYAkTIbUZIn7iiVT9fLUvsJdl804JvsUI9r/Y+ofAS8PXgg74mW+MadxrryQutFORF
+         /bXbDUybS6szUHVHtx3x6UWqMWa92BEoJX6FKAvr9oMT/TJ4PcEEpOvnW5VEcdTh5yvs
+         GsTWFvXgsRyYzeZwvem0NH+4iFJoeImo4qzSca9V+ZojijsG8GkKvfpeVjISyN/lOnHW
+         3svw==
+X-Gm-Message-State: AOJu0YzeCgY7WZbiyxB/hvfHgEZp6HStleBFDo/m1hCIDStSXQycr8YO
+	GMSwFqOOw75B+q2D+b/6+nCx5/j0jLwvdYyHs5NjH53Rd6TaAOzgBaNl+EVzRSoz3ZwDTALztKz
+	OhLPPa9WWDWDQiZE1mk8IbDWwP4DZ6OHTbm5sHBYR2AwJ58wu2Tt5YEyUw90=
+X-Gm-Gg: AY/fxX4ITCwdeErohGvgm/t+NPdjY4tUUdFRbO4BiAgrofJrLJx6fcd6BpqSzZwKtmI
+	6oSkoMqQFEcwcIh8+Cx1F8OzDWmNskH1lqXSLWJIHYN+TnrKfutO29YhrQi3xR6BadsBjGLHuLC
+	nHwMHx7Z26NuoYuinbI0rlIJRazrGmLWwZWDUNkBIgWw7gJ4yAUeG+tPttTg2BeZjNVkV92dxxo
+	n+IKlyDoixcTrS/bfyGI9u9rszXvXcxB1iG/cNRPbtulOeuGz5mULBh4vyf/S7W6GZv1ksLiOnd
+	7r4K/RlqhlcLCTWBE8LymREjGoYriA==
+X-Google-Smtp-Source: AGHT+IGJSmqKHj9E+6BA4yUKZ7nTnIY/bAXjExA7PVMDOTazcUb0ngxKCuC3YYVorq/owP6s3mIVgMvdZOhc0MJJvAA=
+X-Received: by 2002:a5d:58e5:0:b0:431:771:a51f with SMTP id
+ ffacd0b85a97d-4324e50ada8mr11424144f8f.49.1766449257719; Mon, 22 Dec 2025
+ 16:20:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.3\))
-Subject: Fwd: PCI Quirk - UGreen DXP8800 Plus
-Date: Mon, 22 Dec 2025 18:37:32 -0500
-References: <A005FF97-BB8D-49F6-994F-36C4A373FA59@gmail.com>
-Cc: alex@shazbot.org,
- kvm@vger.kernel.org,
- Bjorn Helgaas <bhelgaas@google.com>
-To: linux-pci@vger.kernel.org
-Message-Id: <26F3F2EE-37D4-4F73-9A51-EDD662EBEFF2@gmail.com>
-X-Mailer: Apple Mail (2.3826.700.81.1.3)
+MIME-Version: 1.0
+References: <20251219225908.334766-1-chengkev@google.com> <20251219225908.334766-10-chengkev@google.com>
+In-Reply-To: <20251219225908.334766-10-chengkev@google.com>
+From: Kevin Cheng <chengkev@google.com>
+Date: Mon, 22 Dec 2025 19:20:46 -0500
+X-Gm-Features: AQt7F2pepFhXDRDfJXilqXG3U-Gc1Lj_dLb-WfaYVw3oBG74ve9k-cC-DlWC9Tc
+Message-ID: <CAE6NW_ZhyV8gN_2WC95swK4inceoqszAzprJQ2DUfha8xYHrCA@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 9/9] x86/svm: Add event injection check tests
+To: kvm@vger.kernel.org
+Cc: yosryahmed@google.com, andrew.jones@linux.dev, thuth@redhat.com, 
+	pbonzini@redhat.com, seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello everyone.  At the advice of Bjorn Helgaas, I=E2=80=99m forwarding =
-this message to all of you.  Hope it=E2=80=99s helpful for future kernel =
-revisions!
+On Fri, Dec 19, 2025 at 5:59=E2=80=AFPM Kevin Cheng <chengkev@google.com> w=
+rote:
+>
+> The APM Vol #2 - 15.20 lists illegal combinations related to event
+> injection. Add testing to verify that these illegal combinations cause
+> an invalid VM exit.
+>
+> Also add testing to verify that legal combinations for event injection
+> work as intended. This includes testing all valid injection types and
+> injecting all exceptions when the exception type is specified.
+>
+> Signed-off-by: Kevin Cheng <chengkev@google.com>
+> ---
+>  x86/svm_tests.c | 192 ++++++++++++++++++++++++++++++------------------
+>  1 file changed, 121 insertions(+), 71 deletions(-)
+>
+> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+> index a40468693b396..a069add43d078 100644
+> --- a/x86/svm_tests.c
+> +++ b/x86/svm_tests.c
+> @@ -1674,74 +1674,6 @@ static bool vnmi_check(struct svm_test *test)
+>         return get_test_stage(test) =3D=3D 3;
+>  }
+>
+> -static volatile int count_exc =3D 0;
+> -
+> -static void my_isr(struct ex_regs *r)
+> -{
+> -       count_exc++;
+> -}
+> -
+> -static void exc_inject_prepare(struct svm_test *test)
+> -{
+> -       default_prepare(test);
+> -       handle_exception(DE_VECTOR, my_isr);
+> -       handle_exception(NMI_VECTOR, my_isr);
+> -}
+> -
+> -
+> -static void exc_inject_test(struct svm_test *test)
+> -{
+> -       asm volatile ("vmmcall\n\tvmmcall\n\t");
+> -}
+> -
+> -static bool exc_inject_finished(struct svm_test *test)
+> -{
+> -       switch (get_test_stage(test)) {
+> -       case 0:
+> -               if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
+> -                       report_fail("VMEXIT not due to vmmcall. Exit reas=
+on 0x%x",
+> -                                   vmcb->control.exit_code);
+> -                       return true;
+> -               }
+> -               vmcb->save.rip +=3D 3;
+> -               vmcb->control.event_inj =3D NMI_VECTOR | SVM_EVTINJ_TYPE_=
+EXEPT | SVM_EVTINJ_VALID;
+> -               break;
+> -
+> -       case 1:
+> -               if (vmcb->control.exit_code !=3D SVM_EXIT_ERR) {
+> -                       report_fail("VMEXIT not due to error. Exit reason=
+ 0x%x",
+> -                                   vmcb->control.exit_code);
+> -                       return true;
+> -               }
+> -               report(count_exc =3D=3D 0, "exception with vector 2 not i=
+njected");
+> -               vmcb->control.event_inj =3D DE_VECTOR | SVM_EVTINJ_TYPE_E=
+XEPT | SVM_EVTINJ_VALID;
+> -               break;
+> -
+> -       case 2:
+> -               if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
+> -                       report_fail("VMEXIT not due to vmmcall. Exit reas=
+on 0x%x",
+> -                                   vmcb->control.exit_code);
+> -                       return true;
+> -               }
+> -               vmcb->save.rip +=3D 3;
+> -               report(count_exc =3D=3D 1, "divide overflow exception inj=
+ected");
+> -               report(!(vmcb->control.event_inj & SVM_EVTINJ_VALID), "ev=
+entinj.VALID cleared");
+> -               break;
+> -
+> -       default:
+> -               return true;
+> -       }
+> -
+> -       inc_test_stage(test);
+> -
+> -       return get_test_stage(test) =3D=3D 3;
+> -}
+> -
+> -static bool exc_inject_check(struct svm_test *test)
+> -{
+> -       return count_exc =3D=3D 1 && get_test_stage(test) =3D=3D 3;
+> -}
+> -
+>  static volatile bool virq_fired;
+>  static volatile unsigned long virq_rip;
+>
+> @@ -2548,6 +2480,126 @@ static void test_dr(void)
+>         vmcb->save.dr7 =3D dr_saved;
+>  }
+>
+> +/* Returns true if exception can be injected via the SVM_EVTINJ_TYPE_EXE=
+PT type */
+> +static bool is_injectable_exception(int vec)
+> +{
+> +       /*
+> +        * Vectors that do not correspond to an exception are excluded. N=
+MI is
+> +        * not an exception so it is excluded. BR and OF are excluded bec=
+ause
+> +        * BOUND and INTO are not legal in 64-bit mode.
+> +        *
+> +        * The VE vector is excluded because it is Intel only.
+> +        *
+> +        * The HV and VC vectors are excluded because they are only relev=
+ant
+> +        * within secure guest VMs.
+> +        */
+> +       static u8 exception_vectors[32] =3D {
+> +               [DE_VECTOR] =3D 1, [DB_VECTOR] =3D 1, [BP_VECTOR] =3D 1,
+> +               [UD_VECTOR] =3D 1, [NM_VECTOR] =3D 1, [DF_VECTOR] =3D 1,
+> +               [TS_VECTOR] =3D 1, [NP_VECTOR] =3D 1, [SS_VECTOR] =3D 1,
+> +               [GP_VECTOR] =3D 1, [PF_VECTOR] =3D 1, [MF_VECTOR] =3D 1,
+> +               [AC_VECTOR] =3D 1, [MC_VECTOR] =3D 1, [XF_VECTOR] =3D 1,
+> +               [CP_VECTOR] =3D 1, [SX_VECTOR] =3D 1,
 
+Injecting CP exception relies on shadow stack enablement.
 
+This will need to be added to processor.h
+static inline bool this_cpu_has_shstk(void)
+{
+       return this_cpu_has(X86_FEATURE_SHSTK);
+}
 
-Begin forwarded message:
+and [CP_VECTOR] should be set to this_cpu_has_shstk().
 
-From: Patrick Bianchi <patrick.w.bianchi@gmail.com>
-Subject: PCI Quirk - UGreen DXP8800 Plus
-Date: December 20, 2025 at 9:56:10=E2=80=AFPM EST
-To: bhelgaas@google.com
-
-Hello!
-
-Let me start this off by saying that I=E2=80=99ve never submitted =
-anything like this before and I am not 100% sure I=E2=80=99m even in the =
-right place.  I was advised by a member on the Proxmox community forums =
-to submit my findings/request to the PCI subsystem maintainer and they =
-gave me a link to this e-mail.  If I=E2=80=99m in the wrong place, =
-please feel free to redirect me.
-
-I stumbled upon this thread =
-(https://forum.proxmox.com/threads/problems-with-pcie-passthrough-with-two=
--identical-devices.149003/) when looking for solutions to passing =
-through the SATA controllers in my UGreen DXP8800 Plus NAS to a Proxmox =
-VM.  In post #12 by user =E2=80=9Ccelemine1gig=E2=80=9D they explain =
-that adding a PCI quirk and building a test kernel, which I did - over =
-the course of three days and with a lot of help from Google Gemini!  =
-I=E2=80=99m not very fluent in Linux or this type of thing at all, but =
-I=E2=80=99m also not afraid to try by following some directions.  =
-Thankfully, the proposed solution did work and now both of the NAS=E2=80=99=
-s SATA controllers stay awake and are passed through to the VM.  I=E2=80=99=
-ve pasted the quirk below.
-
-I guess the end goal would be to have this added to future kernels so =
-that people with this particular hardware combination don=E2=80=99t run =
-into PCI reset problems and don=E2=80=99t have to build their own =
-kernels at ever update.  Or at least that=E2=80=99s how I understand it =
-from reading through that thread a few times.
-
-I hope this was the right procedure for making this request.  Please let =
-me know if there=E2=80=99s anything else you need from me.  Thank you!
-
--Patrick Bianchi
-
-
-
-C:
-/*
-* Test patch for Asmedia SATA controller issues with PCI-pass-through
-* Some Asmedia ASM1164 controllers do not seem to successfully
-* complete a bus reset.
-*/
-
+> +       };
+> +
+> +       return exception_vectors[vec];
+> +}
+> +
+> +static bool is_valid_injection_type_mask(int type_mask)
+> +{
+> +       return type_mask =3D=3D SVM_EVTINJ_TYPE_INTR ||
+> +              type_mask =3D=3D SVM_EVTINJ_TYPE_NMI ||
+> +              type_mask =3D=3D SVM_EVTINJ_TYPE_EXEPT ||
+> +              type_mask =3D=3D SVM_EVTINJ_TYPE_SOFT;
+> +}
+> +
+> +static volatile bool event_injection_handled;
+> +static void event_injection_irq_handler(isr_regs_t *regs)
+> +{
+> +       event_injection_handled =3D true;
+> +       vmmcall();
+> +}
+> +
+> +static void event_injection_exception_handler(struct ex_regs *r)
+> +{
+> +       event_injection_handled =3D true;
+> +       vmmcall();
+> +}
+> +
+> +static void test_event_injection(void)
+> +{
+> +       u32 event_inj_saved =3D vmcb->control.event_inj, vector =3D 0x22,=
+ event_inj;
+> +       int type, type_mask;
+> +       bool reserved;
+> +
+> +       handle_exception(DE_VECTOR, event_injection_exception_handler);
+> +       handle_irq(vector, event_injection_irq_handler);
+> +
+> +       /* Setting reserved values of TYPE is illegal */
+> +       for (type =3D 0; type < 8; type++) {
+> +               type_mask =3D type << SVM_EVTINJ_TYPE_SHIFT;
+> +               reserved =3D !is_valid_injection_type_mask(type_mask);
+> +               event_injection_handled =3D false;
+> +               event_inj =3D SVM_EVTINJ_VALID;
+> +
+> +               switch (type_mask) {
+> +               case SVM_EVTINJ_TYPE_EXEPT:
+> +                       event_inj |=3D DE_VECTOR;
+> +                       break;
+> +               default:
+> +                       event_inj |=3D vector;
+> +               }
+> +
+> +               vmcb->control.event_inj =3D event_inj |
+> +                                         (type << SVM_EVTINJ_TYPE_SHIFT)=
+;
+> +               if (reserved) {
+> +                       report(svm_vmrun() =3D=3D SVM_EXIT_ERR,
+> +                              "Test EVENTINJ error code with type %d", t=
+ype);
+> +                       report(!event_injection_handled,
+> +                              "Reserved type %d ignores EVENTINJ vector =
+field", type);
+> +               } else {
+> +                       report(svm_vmrun() =3D=3D SVM_EXIT_VMMCALL,
+> +                              "Test EVENTINJ delivers with type %d", typ=
+e);
+> +               }
+> +
+> +               if (type_mask =3D=3D SVM_EVTINJ_TYPE_NMI)
+> +                       report(!event_injection_handled,
+> +                              "Injected NMI ignores EVENTINJ vector fiel=
+d");
+> +               else if (!reserved)
+> +                       report(event_injection_handled,
+> +                              "Test EVENTINJ IRQ handler invoked with ty=
+pe %d", type);
+> +
+> +               vmcb->control.event_inj =3D event_inj_saved;
+> +       }
+> +
+> +       /*
+> +        * It is illegal to specify event injection type 3 (Exception) wi=
+th a
+> +        * vector that does not correspond to an exception.
+> +        */
+> +       event_inj =3D SVM_EVTINJ_VALID | SVM_EVTINJ_TYPE_EXEPT;
+> +       for (vector =3D 0; vector < 256; vector++) {
+> +               vmcb->control.event_inj =3D event_inj | vector;
+> +               event_injection_handled =3D false;
+> +
+> +               if (vector >=3D 32 || !is_injectable_exception(vector)) {
+> +                       report(svm_vmrun() =3D=3D SVM_EXIT_ERR,
+> +                              "Test EVENTINJ exception type error code w=
+ith vector %d",
+> +                              vector);
+> +               } else {
+> +                       handle_exception(vector, event_injection_exceptio=
+n_handler);
+> +                       report(svm_vmrun() =3D=3D SVM_EXIT_VMMCALL,
+> +                              "Test EVENTINJ exception type delivers wit=
+h vector %d",
+> +                              vector);
+> +                       report(event_injection_handled,
+> +                              "Test EVENTINJ exception handler invoked w=
+ith vector %d",
+> +                              vector);
+> +               }
+> +
+> +               vmcb->control.event_inj =3D event_inj_saved;
+> +       }
+> +}
+> +
+> +
+>  asm(
+>         "insn_sidt: sidt idt_descr;ret\n\t"
+>         "insn_sgdt: sgdt gdt_descr;ret\n\t"
+> @@ -2893,6 +2945,7 @@ static void svm_guest_state_test(void)
+>         test_dr();
+>         test_msrpm_iopm_bitmap_addrs();
+>         test_canonicalization();
+> +       test_event_injection();
+>  }
+>
+>  extern void guest_rflags_test_guest(struct svm_test *test);
+> @@ -4074,9 +4127,6 @@ struct svm_test svm_tests[] =3D {
+>         { "latency_svm_insn", default_supported, lat_svm_insn_prepare,
+>           default_prepare_gif_clear, null_test,
+>           lat_svm_insn_finished, lat_svm_insn_check },
+> -       { "exc_inject", default_supported, exc_inject_prepare,
+> -         default_prepare_gif_clear, exc_inject_test,
+> -         exc_inject_finished, exc_inject_check },
+>         { "pending_event", default_supported, pending_event_prepare,
+>           default_prepare_gif_clear,
+>           pending_event_test, pending_event_finished, pending_event_check=
+ },
+> --
+> 2.52.0.322.g1dd061c0dc-goog
+>
 
