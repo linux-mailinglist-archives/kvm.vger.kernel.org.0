@@ -1,62 +1,60 @@
-Return-Path: <kvm+bounces-66613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8378CD8CA9
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 11:27:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 318E8CD8F9F
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 11:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EAB79302E052
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 10:26:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0AA4230202E1
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 10:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A61361DBC;
-	Tue, 23 Dec 2025 10:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D463B322C67;
+	Tue, 23 Dec 2025 10:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IqI5E1L2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vt+MVyAO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D503357730;
-	Tue, 23 Dec 2025 10:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECF0327208;
+	Tue, 23 Dec 2025 10:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766485576; cv=none; b=q8PIUxmcAWcI+swUn24h0J52QFuZ/+ZG8pF096zfuVlB4jKAQ/hyHqhgxIXRHxi6hfAp7H5SWXIrjOyiWD6ySGFfNF5PbhapyD3WK5T0Zma1GFm+a1zL8obKDjv3IV4/n5RBARqYwxDQy7GmwMZb1We1+5a/7rYjCY3JaD71nAo=
+	t=1766487342; cv=none; b=LcWnMiVLrjidYyvfz7OkLVHYtfxd3O88jg6FYBTverO3ctdu0+LpiJ9VKEfC9SGYb5XOhnoGVogtVxGZ+9rNzIqlNDG1q7VaXCMDlEdEVG8bI0BcgrIPyHJLpvw9TtmDzYLiIff4G4SdRkaBEyUReDlsgsplqv4XT8Awl9PUXvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766485576; c=relaxed/simple;
-	bh=DZSmaqOKTpdLaqUk8h2iDgNeAYpywbVMX6m2VxRPyTU=;
+	s=arc-20240116; t=1766487342; c=relaxed/simple;
+	bh=0MkwZrX1T1LeSLHzFNoDWJL+sFoAXO5+alSFH6ZqLLQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jSoxIv5eTUFC2jwEDcMoNJEVrETQRrJ6WHWNX+btawJuCJswABCE1wgz+iTwguK2S0F+IqZS0D8FA6ZxYbOGoIbUzjO9Zr/sggpnv/WaAXwgZyB6nnZBS9HVDBIbc34UNCYFpz/eNH5YdJeBRFhCarN4R5nLCPOWv0bU1d3n0xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IqI5E1L2; arc=none smtp.client-ip=192.198.163.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=fzRvXRelo7L8WnmnHYtlJXz9rhhovuImTK6IBnPWH0Ls4bUzWr/R6tPc38kiZO95DWXWjNJl7jN1L+AjF9r+aYO08oaQKwYofhqVJAs/4S0GXYWyPrkkCIZTivzi0in8I3/Lx0qcinuyoTbxbBd5GmxVeaC1ZVvm+xp+uN9ZbNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vt+MVyAO; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766485573; x=1798021573;
+  t=1766487339; x=1798023339;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DZSmaqOKTpdLaqUk8h2iDgNeAYpywbVMX6m2VxRPyTU=;
-  b=IqI5E1L2F29L/brHqky17GfQEF8NRImbg2fjXB/K5pm46PRAfXFKui9H
-   G6neGA1xwnTzv96EsZMc1V8uaXXBSnFbDMItormT9uXmuNISwMTWe9wbV
-   y919Cb//gvSozq8lTE7lOitwjoTlIjFYnPnLAKHqsXaB9NJdezbCCyBTG
-   EHBQmHSh2Lcco6350wjBKdWjZOPH8n3Mw7RRrXdQ4gc42V4ekf1R7EVoA
-   ZfXtJU2ED/5dAfZAAijT33lUtD22a6Zk1tp26WA1B/S6sqlVhCkx5EnwU
-   vUYHzSt2tqms5I5wPa31VbDWIsRRKOrQJgOGERkjMZfFtfv7oRsZI7a0p
-   Q==;
-X-CSE-ConnectionGUID: yOBWFvqFS7yoyr1Ej7TM/g==
-X-CSE-MsgGUID: DH9BzuweS26ge7xckBTHJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="70910098"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=0MkwZrX1T1LeSLHzFNoDWJL+sFoAXO5+alSFH6ZqLLQ=;
+  b=Vt+MVyAOetPbJXIn0DsYt4z0G5M0NmLRDZfEDbXBgoMFtOy1LYqFkf9g
+   IdJqe6DuVb1O+bspsRBZaAfcbr0kJnpOT9+P+B+4VYWaFjrJ4hqwks1Hs
+   4YIM4AfqtR6Z4p6v3S68l2elymxT5Pi0i91TOs9z7qiKdSUGEpTY85Zxy
+   zLQq+5KOg/LUE0xt/c1B5QC0yEucj9BkaSUPkJ35m30mubXjE0nXZS0SL
+   5zhxg+noiokICmzURvHdYm7auaD7/6HokddkWuiFqPSsvtZWXu018skqb
+   ghhbVHwld0Fz+mlp2TXGAmwk+wefprfxWm2erj5IHwmTarC2WtE76uZgo
+   A==;
+X-CSE-ConnectionGUID: JAJZjOehT0aHvZx29Bo+gA==
+X-CSE-MsgGUID: JqRh1f6RQNyO7F1e9SkRkw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="79453581"
 X-IronPort-AV: E=Sophos;i="6.21,170,1763452800"; 
-   d="scan'208";a="70910098"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2025 02:26:12 -0800
-X-CSE-ConnectionGUID: BzPN5HZMSwyorlPYN4zhew==
-X-CSE-MsgGUID: nG28A0AcRNmvR5Q4ryTqvg==
+   d="scan'208";a="79453581"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2025 02:55:38 -0800
+X-CSE-ConnectionGUID: l3XXydjMRKWMs9RlLeKyMw==
+X-CSE-MsgGUID: t004zd1tStaREg6nDqq5KA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,170,1763452800"; 
-   d="scan'208";a="204272968"
 Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa004.jf.intel.com with ESMTP; 23 Dec 2025 02:26:09 -0800
-Date: Tue, 23 Dec 2025 18:09:42 +0800
+  by fmviesa003.fm.intel.com with ESMTP; 23 Dec 2025 02:55:35 -0800
+Date: Tue, 23 Dec 2025 18:39:08 +0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
 To: Jonathan Cameron <jonathan.cameron@huawei.com>
 Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
@@ -64,40 +62,136 @@ Cc: linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
 	yilun.xu@intel.com, zhenzhong.duan@intel.com, kvm@vger.kernel.org,
 	rick.p.edgecombe@intel.com, dave.hansen@linux.intel.com,
 	dan.j.williams@intel.com, kas@kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 11/26] iommu/vt-d: Cache max domain ID to avoid
- redundant calculation
-Message-ID: <aUpqZjqANRcSko/z@yilunxu-OptiPlex-7050>
+Subject: Re: [PATCH v1 12/26] iommu/vt-d: Reserve the MSB domain ID bit for
+ the TDX module
+Message-ID: <aUpxTD3yyU20jqzy@yilunxu-OptiPlex-7050>
 References: <20251117022311.2443900-1-yilun.xu@linux.intel.com>
- <20251117022311.2443900-12-yilun.xu@linux.intel.com>
- <20251219115309.00001727@huawei.com>
+ <20251117022311.2443900-13-yilun.xu@linux.intel.com>
+ <20251219115115.00000922@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251219115309.00001727@huawei.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251219115115.00000922@huawei.com>
 
-On Fri, Dec 19, 2025 at 11:53:09AM +0000, Jonathan Cameron wrote:
-> On Mon, 17 Nov 2025 10:22:55 +0800
+On Fri, Dec 19, 2025 at 11:51:15AM +0000, Jonathan Cameron wrote:
+> On Mon, 17 Nov 2025 10:22:56 +0800
 > Xu Yilun <yilun.xu@linux.intel.com> wrote:
 > 
 > > From: Lu Baolu <baolu.lu@linux.intel.com>
 > > 
-> > The cap_ndoms() helper calculates the maximum available domain ID from
-> > the value of capability register, which can be inefficient if called
-> > repeatedly. Cache the maximum supported domain ID in max_domain_id field
-> > during initialization to avoid redundant calls to cap_ndoms() throughout
-> > the IOMMU driver.
+> > The Intel TDX Connect Architecture Specification defines some enhancements
+> > for the VT-d architecture to introduce IOMMU support for TEE-IO requests.
+> > Section 2.2, 'Trusted DMA' states that:
 > > 
-> > No functionality change.
+> > "I/O TLB and DID Isolation – When IOMMU is enabled to support TDX
+> > Connect, the IOMMU restricts the VMM’s DID setting, reserving the MSB bit
+> > for the TDX module. The TDX module always sets this reserved bit on the
+> > trusted DMA table. IOMMU tags IOTLB, PASID cache, and context entries to
+> > indicate whether they were created from TEE-IO transactions, ensuring
+> > isolation between TEE and non-TEE requests in translation caches."
+> > 
+> > Reserve the MSB in the domain ID for the TDX module's use if the
+> > enhancement is required, which is detected if the ECAP.TDXCS bit in the
+> > VT-d extended capability register is set and the TVM Usable field of the
+> > ACPI KEYP table is set.
 > > 
 > > Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> > Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-> Missing sign off of the last person to handle the patch. Xu Yilun.
-> That makes this unmergeable :(
+> Hi,
+> One comment inline.
+> 
+> Thanks,
+> 
+> Jonathan
+> 
+> > diff --git a/drivers/iommu/intel/dmar.c b/drivers/iommu/intel/dmar.c
+> > index a54934c0536f..e9d65b26ad64 100644
+> > --- a/drivers/iommu/intel/dmar.c
+> > +++ b/drivers/iommu/intel/dmar.c
+> > @@ -1033,6 +1033,56 @@ static int map_iommu(struct intel_iommu *iommu, struct dmar_drhd_unit *drhd)
+> >  	return err;
+> >  }
+> >  
+> > +static int keyp_config_unit_tvm_usable(union acpi_subtable_headers *header,
+> > +				       void *arg, const unsigned long end)
+> > +{
+> > +	struct acpi_keyp_config_unit *acpi_cu =
+> > +		(struct acpi_keyp_config_unit *)&header->keyp;
+> > +	int *tvm_usable = arg;
+> > +
+> > +	if (acpi_cu->flags & ACPI_KEYP_F_TVM_USABLE)
+> > +		*tvm_usable = true;
+> As below. Be consistent on int vs bool as otherwise the subtle use of -1 is very confusing.
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static bool platform_is_tdxc_enhanced(void)
+> > +{
+> > +	static int tvm_usable = -1;
+> > +	int ret;
+> > +
+> > +	/* only need to parse once */
+> > +	if (tvm_usable != -1)
+> > +		return tvm_usable;
+> > +
+> > +	tvm_usable = false;
+> 
+> This is flipping between an int and a bool which seems odd.
+> I'd stick to an integer then make it a bool only at return.
 
-Will add my Sign off in v2, thanks.
+I agree. My change below:
+
+> 
+> > +	ret = acpi_table_parse_keyp(ACPI_KEYP_TYPE_CONFIG_UNIT,
+> > +				    keyp_config_unit_tvm_usable, &tvm_usable);
+> > +	if (ret < 0)
+> > +		tvm_usable = false;
+> > +
+> > +	return tvm_usable;
+> > +}
+
+-----------8<----------------------
+
+diff --git a/drivers/iommu/intel/dmar.c b/drivers/iommu/intel/dmar.c
+index 645b72270967..fd14de8775b6 100644
+--- a/drivers/iommu/intel/dmar.c
++++ b/drivers/iommu/intel/dmar.c
+@@ -1041,7 +1041,7 @@ static int keyp_config_unit_tvm_usable(union acpi_subtable_headers *header,
+        int *tvm_usable = arg;
+
+        if (acpi_cu->flags & ACPI_KEYP_F_TVM_USABLE)
+-               *tvm_usable = true;
++               *tvm_usable = 1;
+
+        return 0;
+ }
+@@ -1053,15 +1053,15 @@ static bool platform_is_tdxc_enhanced(void)
+
+        /* only need to parse once */
+        if (tvm_usable != -1)
+-               return tvm_usable;
++               return !!tvm_usable;
+
+-       tvm_usable = false;
++       tvm_usable = 0;
+        ret = acpi_table_parse_keyp(ACPI_KEYP_TYPE_CONFIG_UNIT,
+                                    keyp_config_unit_tvm_usable, &tvm_usable);
+        if (ret < 0)
+-               tvm_usable = false;
++               tvm_usable = 0;
+
+-       return tvm_usable;
++       return !!tvm_usable;
+ }
+
+
+> 
+> 
+> 
 
