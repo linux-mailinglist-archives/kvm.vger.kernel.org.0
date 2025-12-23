@@ -1,55 +1,53 @@
-Return-Path: <kvm+bounces-66637-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66638-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FF7ECDADAD
-	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:48:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AAF2CDADCC
+	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 00:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FC7C304D576
-	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:47:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CCF56304A29F
+	for <lists+kvm@lfdr.de>; Tue, 23 Dec 2025 23:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C972F7444;
-	Tue, 23 Dec 2025 23:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C7F2F1FC3;
+	Tue, 23 Dec 2025 23:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wEJVQEwe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WJ2ExA1m"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C612110E
-	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 23:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013C11A2C0B
+	for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 23:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766533665; cv=none; b=PxghrktXDayUIIomo1B+xYvuFBt6A5df8N3gpjP7IuDtEqlFI+Eh1a4585Bd6Td8qmLizpPRp1e5tSRcjH/c8AJ5tviNSBN9vgc4H7XEgO6ghKblJZVua1m7jh1vsAUETqFvM9ldJo/u8a6zBZ82hvH/lN/dArHJW7Ka+jQMAcc=
+	t=1766533723; cv=none; b=eZt9zlZgdvYpYtgpMtXk2QyaDm7g3N5DIsiE1Vhef/qrinoxq+qXTU3gshS3UqagxT9rS5UYKQ7ObmHZyu4wZ9Irg53m1Mrv9+Y1xthrw9IVOQcURE3+FdYqCV1+sxzqY6JK5mT+AU3bKrFXcrKuBRRYl7RbvrKf3nEqUZ8oNSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766533665; c=relaxed/simple;
-	bh=4kdfOHgvHO/hFc/+/sfbWKNvs1wPuuy5HirJv/k8GJk=;
+	s=arc-20240116; t=1766533723; c=relaxed/simple;
+	bh=bhpZsNmDLgq+AzoKSmdW1PaYd3OEAVGTNJ2wO3s82qo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=naWWf9tju2u9uSugBaEhJnaW8JX/0Eg9PphMA25V/LnpA6aaIp5c6zD4/H2hphKDEEc+9s1BsVS3h6oUIpGIlx90t4OqcvQyLtSyEZNi4SiqyEqnIrJhBAg3GGtNMf6f1/toaXdtJXXAHlQm9Zzfd0XV9/0JMS5rKQ9rfX91EZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wEJVQEwe; arc=none smtp.client-ip=91.218.175.184
+	 Content-Type:Content-Disposition:In-Reply-To; b=BKs+OhS/MxowRZDvS/7QxeNnQ1yKA6DtH4Il6aUtdV+4bx8oJpL9oUlZ2fsldD3HyBVwx+APZubMZSoCrpsc9ZEAULQDfmnLIZz/AAAFQ9Visy6j4SAdRGoSNIWG2U+Lg0rujXNnqvlVsaIRjQJdIzxAk/vRsfvkhrJSWzCsZyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WJ2ExA1m; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 23 Dec 2025 23:47:37 +0000
+Date: Tue, 23 Dec 2025 23:48:32 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766533661;
+	t=1766533720;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cxwjMbW5MXnln5af81Jrm0OP8rTLKvSAcvbCi5VzBdE=;
-	b=wEJVQEweEmtsMLeZuPpez/jg8vqpNM0dWhtX0lQowsw5Hf92nu/wLTcG2WbGC6gu2HGjdR
-	7IKyXQdGz4pfi29zc/oBfUNgisTIHIxg2c04b+gNO2I7YEfn+CR7Twhh9BcQ5Dz7JUh5PK
-	po1o1VzeMh4D+EvdANBifGWCvkAabIs=
+	bh=7S2AHVbxRBo2XmEiH6YRfMT02PCl4ry2HOPoPqRgmjQ=;
+	b=WJ2ExA1mZ002aSjEtF8DOnNnud1axEsKMX2OB1n4Y7T5F7SfMB2+BHYtLDV4NaSu5j8rQC
+	CnKuV7fOs152zKqqDZ7dNfpQSlNSU2wx2lZ0C5kvLKovFqEbcqzCQpSsyoXAo5VFYTWHeW
+	yzboai7rQ+gp1l9/OdsBhHl3dMhHHRI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 10/16] KVM: selftests: Reuse virt mapping functions
- for nested EPTs
-Message-ID: <6udca7kfrwy6gzads46r2eczyaapiav6h37y5e4oqxsdpl6j7h@oj5x5qr6d5jw>
+Subject: Re: [PATCH v3 00/16] Add Nested NPT support in selftests
+Message-ID: <bqq5iht35entb5oayouofi4o3v3adfjyi62dsjl6k7wdwkaaw4@ui4v7hymrn7w>
 References: <20251127013440.3324671-1-yosry.ahmed@linux.dev>
- <20251127013440.3324671-11-yosry.ahmed@linux.dev>
- <aUsiVDjIrj6szEWt@google.com>
+ <aUsRQMYwmYOUCXvp@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,32 +56,33 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aUsiVDjIrj6szEWt@google.com>
+In-Reply-To: <aUsRQMYwmYOUCXvp@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 23, 2025 at 03:14:28PM -0800, Sean Christopherson wrote:
+On Tue, Dec 23, 2025 at 02:01:36PM -0800, Sean Christopherson wrote:
 > On Thu, Nov 27, 2025, Yosry Ahmed wrote:
-> > +	/*
-> > +	 * EPTs do not have 'present' or 'user' bits, instead bit 0 is the
-> > +	 * 'readable' bit. In some cases, EPTs can be execute-only and an entry
-> > +	 * is present but not readable. However, for the purposes of testing we
-> > +	 * assume 'present' == 'user' == 'readable' for simplicity.
-> > +	 */
-> > +	pte_masks = (struct pte_masks){
-> > +		.present	=	BIT_ULL(0),
-> > +		.user		=	BIT_ULL(0),
-> > +		.writable	=	BIT_ULL(1),
-> > +		.x		=	BIT_ULL(2),
-> > +		.accessed	=	BIT_ULL(5),
-> > +		.dirty		=	BIT_ULL(6),
+> > Yosry Ahmed (16):
+> >   KVM: selftests: Make __vm_get_page_table_entry() static
+> >   KVM: selftests: Stop passing a memslot to nested_map_memslot()
+> >   KVM: selftests: Rename nested TDP mapping functions
+> >   KVM: selftests: Kill eptPageTablePointer
+> >   KVM: selftests: Stop setting AD bits on nested EPTs on creation
+> >   KVM: selftests: Introduce struct kvm_mmu
+> >   KVM: selftests: Move PTE bitmasks to kvm_mmu
+> >   KVM: selftests: Use a nested MMU to share nested EPTs between vCPUs
+> >   KVM: selftests: Stop passing VMX metadata to TDP mapping functions
+> >   KVM: selftests: Reuse virt mapping functions for nested EPTs
+> >   KVM: selftests: Move TDP mapping functions outside of vmx.c
+> >   KVM: selftests: Allow kvm_cpu_has_ept() to be called on AMD CPUs
+> >   KVM: selftests: Add support for nested NPTs
+> >   KVM: selftests: Set the user bit on nested NPT PTEs
+> >   KVM: selftests: Extend vmx_dirty_log_test to cover SVM
+> >   KVM: selftests: Extend memstress to run on nested SVM
 > 
-> Almost forgot, the Accessed and Dirty bits are wrong.  They are bits 8 and 9
-> respectively, not 5 and 6.  Amusingly (well, it's amusing *now*, it wasn't so
-> amusing at the time), I found that out when I couldn't get KVM to create a writable
-> SPTE on a read fault in the nested dirty log test :-)
+> Lot's of feedback incoming, but no need for you to doing anything unless you
+> disagree with something.  I have all the "requested" changes in a local branch,
+> and will post v4 (probably next week).
 
-Instead of being a reasonable person and own up to my mistake, I will
-blame Intel for putting the bits there to begin with :P
-
-(But seriously, sorry for such a dumb mistake)
+Thanks a lot for taking care of this. No disagreements, just a couple of
+comments/questions in the replies.
 
