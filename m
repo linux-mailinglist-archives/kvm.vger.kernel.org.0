@@ -1,262 +1,186 @@
-Return-Path: <kvm+bounces-66659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11FA5CDB18E
-	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 02:44:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C872CDB206
+	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 03:04:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CAFAE30380FC
-	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 01:43:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9142A300D665
+	for <lists+kvm@lfdr.de>; Wed, 24 Dec 2025 02:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0917280308;
-	Wed, 24 Dec 2025 01:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B04329D26D;
+	Wed, 24 Dec 2025 02:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="va/B1/QZ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="V0/VIXIU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012036.outbound.protection.outlook.com [52.101.43.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBB127E07E
-	for <kvm@vger.kernel.org>; Wed, 24 Dec 2025 01:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766540613; cv=none; b=rLq9t+EkcQjriwysDdF/pP2o4M1la4kLSz7Zi/gB60Ho+PHtth8y2/OjxZBVr5x+55J+/hwHEB2tl/XOpHC/ynKsWV9eTYBRuWEZZhb8102YTi/e1PbH+e5TTalHDYt/0UCZo+bPAySYU7LzVzVG4rVGPyQbWMmr7CDTpEaa5Vs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766540613; c=relaxed/simple;
-	bh=2gBOukd8P0+d94IFZ3cvcQeNSIg0XUhdih1vBjqpR3Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IJ4OrWcG2joPMsHiFxr2xjaLpzi5mlyiTwPwl5D5R5RZgVAVqcnCtcob7T3EAjekJqQ1csrnYu5aBc1H0MvXm/W31cpIw/hjqvKb4FLXAKqDLF7fGwqBHm9rd8Acz9XVMXDK5mX2yWwcSb2xH18IXx9oWYhirKqkuOgVvnLcYPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=va/B1/QZ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34cc8bf226cso12273457a91.3
-        for <kvm@vger.kernel.org>; Tue, 23 Dec 2025 17:43:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766540611; x=1767145411; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OYrgx3fhnAwijJ2RM64Eo+7F0BoQTHdfVNbtE9OQfxk=;
-        b=va/B1/QZeOhx3uW6fgUiMewD6DrG5Um+Afyiaf8MyQhBzGRX6h2MsaCrN3ztHUoj5F
-         pWaZLSuYaGcKC2OHeic3BcjF6AXL/OxFuoGDQRmqLoKaIkFvBbu+oqHwbhzaf3NF6qyJ
-         E3Qdnrtpx9gHyUQptg+vufkcxWRaBg/A/ekNzFwzUGYAoYbM7nXHAgAZT0Xfvfyumg6Q
-         03vvLF5/8VcAthfyD16krjlW0ZHyHvmxLqjXb2DVMcokLWBYtNSmUjTuQL/xq7oVrxNG
-         YWRkpfknvvnoT8g1ORid6Q/0ZX3dCX5fXDBPjJkT0KUeXK9Jmlojouoi8dq1s5SNScVm
-         iACA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766540611; x=1767145411;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OYrgx3fhnAwijJ2RM64Eo+7F0BoQTHdfVNbtE9OQfxk=;
-        b=tQHJKZdgaJeWm7j3LcPrwQkucAqo9lztviRyeaFt6jnAD6MmQRWVK5RwnOYzGUvB9S
-         HDhFsPfbO2H6pKnXvhtdpFGFHmZD2P4zcvWLr44nMudNr7tfmj9TipGJN1KvwPhxl4Ll
-         GM0ORcA9pzUyp/nJMfn95GREJ0AGOQOT7VjApXYBXEIBJD9WGyBMJdNeqIukZh05DAsu
-         16oFH3skCk3CGP6FnXRggeRGGUPBVvT5gb6TJClXiu4XmuzYPZiVgyEhzebzCChITgA8
-         hvNciYFU16oo4XutFfdoKjignnr4towjWw+RXy1QfGjLBE7QCrQWtxgHvB+MjGQ6Y7Dj
-         xWaw==
-X-Gm-Message-State: AOJu0YxceLum2DPl+HPriVNI6AWYurWQGNnlychFNRb1DYluYK2yOQaZ
-	LQ8HNwjoov2uuooUg4cU6YzdKuKKJXAWuER9fDokpoOYwgAoY06p9SrzPNgeLpRcyvXEEc1d+BY
-	IXutYUv8kQvMRxFHFzajpzJ0D4dww3Xfw3SkOjRhdXKCGaxJrUJdp7scCYDp3e2aDhnz2Z1RwJl
-	7Gw6Ow4b3EUcp3vu0vDIXsb7OTgND3haePAutSNDyPLro=
-X-Google-Smtp-Source: AGHT+IFQLaE6qe+8WTvll70QG0bZuApIj+uic3oLZFaV5L6BoVzYoDRnMy/xWYDSjrxjyYaidg3FBD7pJ9cAZQ==
-X-Received: from pjvm16.prod.google.com ([2002:a17:90a:de10:b0:34b:75f2:43e])
- (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2688:b0:34a:a1c1:90a0 with SMTP id 98e67ed59e1d1-34e921be0e1mr12470121a91.28.1766540610654;
- Tue, 23 Dec 2025 17:43:30 -0800 (PST)
-Date: Wed, 24 Dec 2025 01:43:24 +0000
-In-Reply-To: <20251224014324.1307211-1-chengkev@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE277273F9
+	for <kvm@vger.kernel.org>; Wed, 24 Dec 2025 02:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766541867; cv=fail; b=aWrr9feTPyA7/uiDVlCtrCzgre28Z8LtWp+HxMwYJw6ghoKjcrVoQnzhFA7FC4Aoud2MlWhMsRaS/ZcH3N9RBC8vqsSubJanWwJIOd9UqEsjpAfna0MTZaxhF2SH83sHMLmGuRnIqCw5BDGOs2pqLYvB1d3BT4nMIKbA+VOl52o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766541867; c=relaxed/simple;
+	bh=3zweAPQsBVHZUp50+PNinpfXd06RtYHKDA7mg1PyjJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=uj/yJMd65zkkS0SoL7XWoa2QPyIVh7RQFo/eK0xdyR6uq29QUcuSBwOk//Jv+UIBV1cJqgV2E/4saxIdMYyrJH1VDluw5p36tbbiyEok5i2yhddRWiLUCBxwdWxSEpFf0yzZQL0VYF5FUaWxRxUVXw3+A117d5zruYMYsgcmev0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=V0/VIXIU; arc=fail smtp.client-ip=52.101.43.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lplgIQAawZvpDChInlAa9A9KOgK1ZWD2/4FAU44xH3abytdl5X/mTFa97hp4gyhfQbfcCEfI/afeCGm5GQ8067SkKdXoKX4UhpCuQzEpT5kZZE7PipdXPAu0wrpNKWwaUMC7EOql5WjJkDw2HOPWHmev+oqsLUfoNh/vKRjqQP3eU8K2FTV4fqgsFoWNzk7gLCG2knGSVGtGgNFeaXChTnY13Ocbyzwv79zQns0NT3WYaIRtjtWAbpkUMjqxT/NISklwBiG10SCw2lyZ4cgnISs2MQ5WeszVbeoeksnn6nMeKPxWIYvqzLJRebeqFGUTSytwN+yQFOIGXcL6z2hgTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sUjOoObXcQvez26r6JBeRCAxe3sKDJSA/XinhlfBItk=;
+ b=NJF3gCyCloORt6Hmvb7cw94YX1NHFNUxaXNWowLLQwFTCuFPh2YO1jLYnbyRYhyI8BBUtjcfnm/F6MQv/UbRal4Jz7XBENygQUfx6MSOJ/Ddr/voShgto0L/4v7XJBlvD4pYhMcwQEMxIk6me+cMMdCaeS15jFgpS5VULoiQ8vR514NG/haSWw/bZjvYE41SDC2G2282gM8ia0/3N9FrFIhgt2ks9Q/I9gtzmMbgU6xFNiv8U8rQx2pdpNaW/mBoYYVsyDqJ4yRQO5M85ibPwDbFFTbTaTKZASwy6ne5e1176Y/kPJqgI+KTOtVmnhEShA29wcw9mDRf+Rda6e9S8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sUjOoObXcQvez26r6JBeRCAxe3sKDJSA/XinhlfBItk=;
+ b=V0/VIXIU41TODak9SrBTJ5rBEQ/wo1u07MaxmoP9mnGfnXyWXee7AqaoUfBCFXY4+Im6nIMwcPMCxWyht9/+GITE+g50OrPv97qIyYQ4nCncgyfGahppp2LhSfQ2Gi1NUKXEtODFe88l4TNKSJK4bEQJaRyO+aS5r0M8o/bjIMKePW46GLoqPdOpGTHK7HNlHbxby1f/jUO23PGVw9WOAJPpLu695lH0uC6gSYxEqRneKyKZ7kQlBbaEor9efIR7esu0IVyeEnF6QTrNFc3ZWX7Dex1JGUfq/iZQv65KKqXFNg6R1lhgF6oDZ3QuSNebvIWLdFrDU5niAqicjH54zA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
+ by PH7PR12MB5656.namprd12.prod.outlook.com (2603:10b6:510:13b::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.11; Wed, 24 Dec
+ 2025 02:04:23 +0000
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::1b59:c8a2:4c00:8a2c]) by LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::1b59:c8a2:4c00:8a2c%3]) with mapi id 15.20.9456.008; Wed, 24 Dec 2025
+ 02:04:23 +0000
+Date: Tue, 23 Dec 2025 22:04:21 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Aaron Lewis <aaronlewis@google.com>
+Cc: alex.williamson@redhat.com, dmatlack@google.com, kvm@vger.kernel.org,
+	seanjc@google.com
+Subject: Re: [RFC PATCH 0/2] vfio: Improve DMA mapping performance for huge
+ pages
+Message-ID: <aUtKJbvsQNANXjO/@nvidia.com>
+References: <20251223230044.2617028-1-aaronlewis@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251223230044.2617028-1-aaronlewis@google.com>
+X-ClientProxiedBy: MW3PR05CA0003.namprd05.prod.outlook.com
+ (2603:10b6:303:2b::8) To LV8PR12MB9620.namprd12.prod.outlook.com
+ (2603:10b6:408:2a1::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251224014324.1307211-1-chengkev@google.com>
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251224014324.1307211-3-chengkev@google.com>
-Subject: [kvm-unit-tests PATCH v3 2/2] x86/svm: Add unsupported instruction
- intercept test
-From: Kevin Cheng <chengkev@google.com>
-To: kvm@vger.kernel.org
-Cc: yosryahmed@google.com, andrew.jones@linux.dev, thuth@redhat.com, 
-	pbonzini@redhat.com, seanjc@google.com, Kevin Cheng <chengkev@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|PH7PR12MB5656:EE_
+X-MS-Office365-Filtering-Correlation-Id: f195d303-d575-4237-122e-08de4290c1cc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?K8bJD9ea06U/GHycmRD8zd0Myc89ne5sgYm+r8+DXezn6hTqWlt+DdkacnyT?=
+ =?us-ascii?Q?heLS+S505faLqzNd78AxJD3jliTsvCLJgT33rUv959OIGayBO0ESPksZ8Nse?=
+ =?us-ascii?Q?qfKzdD0aD/AW2ueAAu4twek27KAow1vGmhiN5UnZRFDy7wBCKYmKEokQdxjM?=
+ =?us-ascii?Q?i++WbOAR9HLoiNjfm6vvHUzioIII54pKGcenIBoSzHZif4PDTbZs3kzhtvxb?=
+ =?us-ascii?Q?jxEZaz2BpWICHzxvjx6sv4db64WNVvtUDlxRNYra7x/kO3zPXvN0Ht5mUoVV?=
+ =?us-ascii?Q?JRgWNZHNizfRtvQ3hyBkTLdwWrOPv9IXceDSD7ho0DIF3ky4x4iMHhH+xZkY?=
+ =?us-ascii?Q?7f3A/j9aq+ReqHkDwQtQ5KpFHhs3vINOnbskxd4zvPhNtyJxzSubnTfCnSOm?=
+ =?us-ascii?Q?nMaaTUcKu0AVjeyokCh2RkPXQAmS0UBxU0Sgmuy301gFNdX6ALP2iwj+n+xv?=
+ =?us-ascii?Q?puawKzh72k448lD6GOf2IZsCeeEvfSns4ejwIgCRihQF6jT+KH6biXL+CDFN?=
+ =?us-ascii?Q?zxAxqWln8iZZsLM52PaSGV9dSsVaWrA0nTupEJlG0PY77HvgsN9qCX1Uxgyo?=
+ =?us-ascii?Q?hrCdUZQrnhQlj0M3/9VJitSawCQPVQ5gD1p1OrNmKOKv9CmlYdCqOTMT7jMp?=
+ =?us-ascii?Q?Ah40M8k/1qpSYQB+4P13AQJTHEo11zSVuq0YxHSpnYBsepfgyoLuOJclJWv+?=
+ =?us-ascii?Q?CuAcyqW8VPD7ClnXiUPBWOxrx4qX1m2aWGn5+vxu1ZX4Z0Wp8ixw5UR+0RC+?=
+ =?us-ascii?Q?GM4ucQeEFl0Qmyw0Za0qXCPQAWQ6/JBHI/cCIIKgrKFCw4TlGVdi2eAOauEc?=
+ =?us-ascii?Q?R65ILMOYYnPGP4z9r7eJ53xiJ2f22WLaFlgEXjwAdk3omIQnuPwKoPK0uLtf?=
+ =?us-ascii?Q?T0pLtSVbRXlW9+PRVuTGb6nfh4ypenXvm9NyNCZn6hUYDMSgteLMGHlS1q+A?=
+ =?us-ascii?Q?YEigFd5NZ9V0i5+YoSmTtEIgLyL9kIbx8UD8JV/0HJXTLbVeTvtKvq5P81Yu?=
+ =?us-ascii?Q?dTxNAP7WL/EfqlCHkfgohPZOA6QyWuMj5OpVPoNQZb64tNs7bg/nrcd2EjTb?=
+ =?us-ascii?Q?3akpmKYP17AvYA1fGStOnIspHKdT9JW4BTjWOcMycqNgnuuUs0xZiOJrALYp?=
+ =?us-ascii?Q?axkFdBccpm6a36PmYGx8UBrRC2mXAiaFiCw38g2DrrXss+c/7n+R4gdBcted?=
+ =?us-ascii?Q?X2Q86RPg0Z+TjqZsPjpahx5JGCd67PHpff/Em8ysYiegmNSYe3pSSyxcLfdH?=
+ =?us-ascii?Q?0/M84oqyv7VpJ0qBHO2TlJ12O1Y7k5i9OEyftqM3KxxlsLhMvvlW2EeYySVC?=
+ =?us-ascii?Q?YTfWPkkGLphBNSr4vxI3E4mEv0XjJmqpYCSLckB4Wpx48Zp/2wWGet/oY0i4?=
+ =?us-ascii?Q?PBqqV+CdSUG79W7CJ8aShDfb8Nowmwk9wcn9rD9AVoYcjQLlIKDLHUHtGUkW?=
+ =?us-ascii?Q?2P6SfhaSMFgILJfyiQkxCQv6yov6vWtT?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WBi49qF3iS7idFdYaarLOlAlcs7uIjvMGx429RpjtVX7bwKrLOk7ouIWdnmr?=
+ =?us-ascii?Q?fH2Cy/dgP0uK0JrJbrP5JpKcBrrkOwsJXONaGSnUCyDUE3pOKUVcGkoblQS5?=
+ =?us-ascii?Q?bjlI6Ai6uZhXzUEQcFNK0Gmhma4GNeERINCeLruw0uzQ2lwPfC9bZ680+54+?=
+ =?us-ascii?Q?hdnMHiJ6Jn5YA0E6OvaBhwVmfwJl78zFbJzibZ7lKV2iYjOyOaTJLHR5Qy9h?=
+ =?us-ascii?Q?gyMZwcgKwdYgwiaG1//1EJOqc2GBiDpZFKq9HLpPnRSIdUB3TZCOhDxJ58g2?=
+ =?us-ascii?Q?+rvXW9Ky483AAyFEv2QRGUbCrtOXz01hBrj8hklyO9sY2U58FRGoK86IjGbB?=
+ =?us-ascii?Q?boYkuVOuDzhSmqqSP+Os4pIuM+eyffHDILudv3IIG0TwstfrMXL5RQxBhymZ?=
+ =?us-ascii?Q?B4yZ0X+4U4FXmjfIiV5+HQjftMHnqS30oGpbDhzajt1D6bTZkqMRuIHdjziZ?=
+ =?us-ascii?Q?5KXfxDkUoT/kooj7RRsgUYzgXak7o18yLm827W9CbcGAm544y/eXmg+dZ1KQ?=
+ =?us-ascii?Q?1jAY86XDTYxkXkz17Qo7xdWHklJ+46bGfJ6BlPbYg/5BvyynoUJ34YaOgWk/?=
+ =?us-ascii?Q?Mb4X6Uhy3rO7otBskjwjySyu6J9WSj9NB0LfNRUYPna4x16WBs1wZdgGrc7H?=
+ =?us-ascii?Q?nAGSaBA7BD7Bf4scTmgoryN3IXn1+2rMpDLuNm0vYKEBJPru1M7kBRctdgR6?=
+ =?us-ascii?Q?sfwhtd0lLWOYcqFpI7iSOQwUazmTIQKQCIKhUBpFQMxZOT5A30GWiBD0RPF+?=
+ =?us-ascii?Q?+mW/swRE1VJw9cvgTV5BrXHqRj3rf5qodvYH2OLHRE5owcaDMuvUr7lRiPVk?=
+ =?us-ascii?Q?MlXBsEWEM/hlNLrT+5SPI5n4F6MCqETlMGVHEVGTwwGoQhpiOhEzy0EeCpWO?=
+ =?us-ascii?Q?w/uWo8VlOfzc27/23xhFSEtIVZaPNmjRMKaZU0KCfr3BcnCtf2fbhfNbY28O?=
+ =?us-ascii?Q?rVuQa3NtZghYu2g1Gz8lR2vKcBbrFZxSTLRwP82lyiE3GRnwVTBPKTqoURUg?=
+ =?us-ascii?Q?gjUwIc3xTL+4CWK4B0llfNxsh4aaBJ06IXJMBpuqnU8B0RRT/GuoIT/tNpIx?=
+ =?us-ascii?Q?1V9l7GxzYAkiWW48+cqVIU0y/XoQLH0b2RHB1Uai1wZvDjm5x6mBg4wkSRBu?=
+ =?us-ascii?Q?KPXHJuc0fh8OHiOF3rDdvkPyO24k7IrUU+QE92U7f7n9rcjFVrLh/RbA/D2k?=
+ =?us-ascii?Q?ytdDB4k68IzyUW+1EZgSayBE1VcvMgWriTCXRsBQorlXD4nkvmBVacblykSB?=
+ =?us-ascii?Q?6AJ80oe0yDTRdtmpjGo6cO0q38xEZjPAWzPwJfFXVPhZfVmhbVWryOFNFAiY?=
+ =?us-ascii?Q?FVCSPH31trvxyfrhZ4fxerRtp8SatamuT6roTiMPjmD2GC7Eou/qOWYS3Zx1?=
+ =?us-ascii?Q?MZpAqvzgxwXtxHovQD/5T3570vxnpMgyOONY0LYsqdU0Usapx1UaXRYrhsaq?=
+ =?us-ascii?Q?1SfkayeVpjiLZt9QFTsNhNEW3SBAHIe+a8mXYhUWZm4GC6c5Fq1Pcdnl1Rxr?=
+ =?us-ascii?Q?2RlL3qo8QegM/FceP5C0kebjgblUXLycufh9m4W/DgIk80mDHmLV0/4MRGnp?=
+ =?us-ascii?Q?QGIy/CUX+YMhOiREUiREJjRPfIH71+brqzNTF9tFHVyWYgrTh5Bk2zoB19HH?=
+ =?us-ascii?Q?t3ciN+OeNgGulkJesufbYYMlCknmBVT/XAYzjGtwwhh361nyyAp5uu4hoKBO?=
+ =?us-ascii?Q?Cd1oEuiAWs0U4sDVpzLAfl0ELuer4ygYEwQgbxoRiGpG0uRQ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f195d303-d575-4237-122e-08de4290c1cc
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Dec 2025 02:04:22.9372
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ciTWD6GAVmbrvAXf5Ce+JQ5sWfzJy8eAB2q3HRiZMgp63/eYCuWmYV07dxx6xJAQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5656
 
-Add tests that expect a nested vm exit, due to an unsupported
-instruction, to be handled by L0 even if L1 intercepts are set for that
-instruction.
+On Tue, Dec 23, 2025 at 11:00:42PM +0000, Aaron Lewis wrote:
+> This RFC explores the current state of DMA mapping performance across
+> vfio, and proposes an implementation to improve the performance
+> for "vfio_type1_iommu" for huge pages.
 
-The new test exercises bug fixed by:
-https://lore.kernel.org/all/20251205070630.4013452-1-chengkev@google.com/
+We are trying to sunset type1, please just use the memfd path on
+iommufd which is supposed to be the fastest available option. You can
+try to improve iommufd as well.
 
-Signed-off-by: Kevin Cheng <chengkev@google.com>
----
- lib/x86/processor.h |  1 +
- x86/svm.h           |  5 ++-
- x86/svm_tests.c     | 88 +++++++++++++++++++++++++++++++++++++++++++++
- x86/unittests.cfg   | 11 +++++-
- 4 files changed, 103 insertions(+), 2 deletions(-)
+But we definately should not be making type 1 the best option and then
+encouraging people to use it - that is the opposite of what we are
+trying to do!
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 42dd2d2a4787c..7e1c562aa7378 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -358,6 +358,7 @@ struct x86_cpu_feature {
-  * Extended Leafs, a.k.a. AMD defined
-  */
- #define X86_FEATURE_SVM			X86_CPU_FEATURE(0x80000001, 0, ECX, 2)
-+#define X86_FEATURE_SKINIT		X86_CPU_FEATURE(0x80000001, 0, ECX, 12)
- #define X86_FEATURE_PERFCTR_CORE	X86_CPU_FEATURE(0x80000001, 0, ECX, 23)
- #define X86_FEATURE_NX			X86_CPU_FEATURE(0x80000001, 0, EDX, 20)
- #define X86_FEATURE_GBPAGES		X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
-diff --git a/x86/svm.h b/x86/svm.h
-index c22c252fed001..e2158ab0622bb 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -406,7 +406,10 @@ struct __attribute__ ((__packed__)) vmcb {
- #define SVM_EXIT_MONITOR	0x08a
- #define SVM_EXIT_MWAIT		0x08b
- #define SVM_EXIT_MWAIT_COND	0x08c
--#define SVM_EXIT_NPF  		0x400
-+#define SVM_EXIT_XSETBV		0x08d
-+#define SVM_EXIT_RDPRU		0x08e
-+#define SVM_EXIT_INVPCID	0x0a2
-+#define SVM_EXIT_NPF		0x400
- 
- #define SVM_EXIT_ERR		-1
- 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index e732fb4eeea38..8ea3c344ec4fa 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -3575,6 +3575,93 @@ static void svm_shutdown_intercept_test(void)
- 	report(vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown test passed");
- }
- 
-+struct invpcid_desc desc;
-+
-+asm(
-+	"insn_rdtscp: rdtscp;ret\n\t"
-+	"insn_skinit: skinit;ret\n\t"
-+	"insn_xsetbv: xor %eax, %eax; xor %edx, %edx; xor %ecx, %ecx; xsetbv;ret\n\t"
-+	"insn_rdpru: xor %ecx, %ecx; rdpru;ret\n\t"
-+	"insn_invpcid: xor %eax, %eax; invpcid desc, %rax;ret\n\t"
-+);
-+
-+extern void insn_rdtscp(struct svm_test *test);
-+extern void insn_skinit(struct svm_test *test);
-+extern void insn_xsetbv(struct svm_test *test);
-+extern void insn_rdpru(struct svm_test *test);
-+extern void insn_invpcid(struct svm_test *test);
-+
-+struct insn_table {
-+	const char *name;
-+	u64 intercept;
-+	void (*insn_func)(struct svm_test *test);
-+	u32 reason;
-+};
-+
-+static struct insn_table insn_table[] = {
-+	{ "RDTSCP", INTERCEPT_RDTSCP, insn_rdtscp, SVM_EXIT_RDTSCP},
-+	{ "SKINIT", INTERCEPT_SKINIT, insn_skinit, SVM_EXIT_SKINIT},
-+	{ "XSETBV", INTERCEPT_XSETBV, insn_xsetbv, SVM_EXIT_XSETBV},
-+	{ "RDPRU", INTERCEPT_RDPRU, insn_rdpru, SVM_EXIT_RDPRU},
-+	{ "INVPCID", INTERCEPT_INVPCID, insn_invpcid, SVM_EXIT_INVPCID},
-+	{ NULL },
-+};
-+
-+static void assert_unsupported_instructions(void)
-+{
-+	assert(!this_cpu_has(X86_FEATURE_RDTSCP));
-+	assert(!this_cpu_has(X86_FEATURE_SKINIT));
-+	assert(!this_cpu_has(X86_FEATURE_XSAVE));
-+	assert(!this_cpu_has(X86_FEATURE_RDPRU));
-+	assert(!this_cpu_has(X86_FEATURE_INVPCID));
-+}
-+
-+/*
-+ * Test that L1 does not intercept instructions that are not advertised in
-+ * guest CPUID.
-+ */
-+static void svm_unsupported_instruction_intercept_test(void)
-+{
-+	u32 cur_insn;
-+	u32 exit_code;
-+
-+	assert_unsupported_instructions();
-+
-+	vmcb_set_intercept(INTERCEPT_EXCEPTION_OFFSET + UD_VECTOR);
-+
-+	for (cur_insn = 0; insn_table[cur_insn].name != NULL; ++cur_insn) {
-+		struct insn_table insn = insn_table[cur_insn];
-+
-+		test_set_guest(insn.insn_func);
-+		vmcb_set_intercept(insn.intercept);
-+		svm_vmrun();
-+		exit_code = vmcb->control.exit_code;
-+
-+		if (exit_code == SVM_EXIT_EXCP_BASE + UD_VECTOR)
-+			report_pass("UD Exception injected");
-+		else if (exit_code == insn.reason)
-+			report_fail("L1 should not intercept %s when instruction is not advertised in guest CPUID",
-+				    insn.name);
-+		else
-+			report_fail("Unknown exit reason, 0x%x", exit_code);
-+
-+		/*
-+		 * Verify that the intercept bits are not cleared in the vmcb.
-+		 * This is mainly to catch any potential bugs in the future
-+		 * if we ever directly copy from the cached vmcb12 to L1's
-+		 * vmcb12. KVM currently ignores the L1 intercept by
-+		 * conditionally clearing intercept bits from KVM's cached
-+		 * vmcb12 based on guest's CPUID table. This is only allowed as
-+		 * long as the assumption that the cached vmcb12 doesn't affect
-+		 * L1's vmcb12 holds true.
-+		 */
-+		report(test_and_clear_bit(insn.intercept,
-+					  vmcb->control.intercept),
-+					  "%s intercept bit not cleared by KVM",
-+					  insn.name);
-+	}
-+}
-+
- struct svm_test svm_tests[] = {
- 	{ "null", default_supported, default_prepare,
- 	  default_prepare_gif_clear, null_test,
-@@ -3716,6 +3803,7 @@ struct svm_test svm_tests[] = {
- 	TEST(svm_tsc_scale_test),
- 	TEST(pause_filter_test),
- 	TEST(svm_shutdown_intercept_test),
-+	TEST(svm_unsupported_instruction_intercept_test),
- 	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
- };
- 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 522318d32bf68..27a1a68104362 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -253,11 +253,20 @@ arch = x86_64
- [svm]
- file = svm.flat
- smp = 2
--test_args = "-pause_filter_test"
-+test_args = "-pause_filter_test -svm_unsupported_instruction_intercept_test"
- qemu_params = -cpu max,+svm -m 4g
- arch = x86_64
- groups = svm
- 
-+# RDPRU feature name is not defined in Qemu so it can't be excluded here. This
-+# should be okay though since KVM does not advertise RDPRU by default anyways.
-+[svm_unsupported_instruction_intercept_test]
-+file = svm.flat
-+test_args = "svm_unsupported_instruction_intercept_test"
-+qemu_params = -cpu max,+svm,-rdtscp,-xsave,-invpcid,-skinit
-+arch = x86_64
-+groups = svm
-+
- [svm_pause_filter]
- file = svm.flat
- test_args = pause_filter_test
--- 
-2.52.0.351.gbe84eed79e-goog
+> This is being sent as an RFC because while there is a proposed solution
+> for "vfio_type1_iommu", there are no solutions for the other two iommu
+> modes.  Attached is a callstack in patch 1/2 showing where the latency
+> issues are for iommufd, however, I haven't posted one
+> for "iommufd_compat_type1". I'm also not clear on what the intention is
+> for "iommufd_compat_type1" w.r.t. this issue.  Especially given it is so
+> much slower than the others.
 
+Probably your test is using VFIO_TYPE1_IOMMU for iommufd and comparing
+it to VFIO_TYPE1v2_IOMMU for vfio. v0 forces 4k pages at the iommu
+domain which is much slower.
+
+It is also really weird because I have seen other people reporting a
+30x speedup using iommufd and here you are reporting it is the slowest
+option?
+
+Jason
 
