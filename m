@@ -1,201 +1,115 @@
-Return-Path: <kvm+bounces-66686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66690-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09C3CDD979
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 10:35:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 771A3CDDA49
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 11:15:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0554301E93A
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 09:35:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AAE933017397
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 10:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2EF3090C9;
-	Thu, 25 Dec 2025 09:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QZZYH/WH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672A630FC2F;
+	Thu, 25 Dec 2025 10:15:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3550A2D97A6
-	for <kvm@vger.kernel.org>; Thu, 25 Dec 2025 09:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DE330B50D;
+	Thu, 25 Dec 2025 10:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766655345; cv=none; b=S6lt7d7y6Mktp3jyfTWR0Jat+7gbZQjtGW31Px7Zq0WPSajFP9ykdM59ikx3SF7jHRwWxKnCGt0DPLWsr9ETHprmMzg8DNu+bc3gzH9B3YSauz7k7NfTgvLahcxkl0gs3mzDptD31l62xp1O0eJ6WAjcthqZ+a5uSoICplM4qUk=
+	t=1766657711; cv=none; b=EQQYyRlahDkNQr3Yc/+3EK1YV79NIsyqDW/b/l5XcGPZS5io16tduv07R5Tl3Uq9baMzh4rXWB5A8IHfnfnsyvfin4a9R/NdY/+F9IuBd4pbeUVNaRP5Yx5ktnu31D41sV1Z8qRjp7q1f8uJlUt3xgtCiu+HF/rCi089o1GORJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766655345; c=relaxed/simple;
-	bh=TcCc2zIbX0Qe9C4Qf96J+EeN2S2w6bx5WWKs0C2meac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRxDCMeKkZac20r7Nll0lP2DIh6W4hMT5IrSYafRwnE21olnzyP0iE/+l2l8ctNRYXVlRAHmHIHznpY/769kvFA2DRFZ1Gxv1J4k+Fz98Oj5p/DgU47l5xF4zKPv8gI5zXIL0w2FBRESQzIzV5LmMG1YC5WG0yARN1RMUT6yEKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QZZYH/WH; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766655343; x=1798191343;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TcCc2zIbX0Qe9C4Qf96J+EeN2S2w6bx5WWKs0C2meac=;
-  b=QZZYH/WHjcWJDjDJxUhTlJcpIf7EswbqLu1ARWcXlKCdVc4RPOmcTv4J
-   InZ0K4ZcfJEOHD+nRD3KsyOWurz62/yfHZu0RULy1n+GxLW9wRC+WldJO
-   CCZrEg99WJhtZWrZuBjIWeZUR/WxojPkhGEzY1KrIPxhHwudaKSNbeo/x
-   a73f6/vqRi8vvTCNs+4X0A0j8yHQb8hXLcy8xXYuMzO47mqMZzti3yNNJ
-   HjpcZtXSh9S0xXWqW+2FY449ORoM5H2T/zzDeqE5zhRDrXVq1VoT32hyv
-   DuvcLpoIuBt1Tgd+EK+8FvXdCsA2jLqHyoAB9irCHj7FInGy0+dDzmGqz
-   Q==;
-X-CSE-ConnectionGUID: 9DksUPsDSCyy/uQ74QZUiQ==
-X-CSE-MsgGUID: HA/d7HDdSuOlNzcNcUEqcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11652"; a="72317162"
-X-IronPort-AV: E=Sophos;i="6.21,176,1763452800"; 
-   d="scan'208";a="72317162"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Dec 2025 01:35:42 -0800
-X-CSE-ConnectionGUID: Podu9RDwTZepowNu+9wXMg==
-X-CSE-MsgGUID: T2D3D8GcROOzwu5fhhsoRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,176,1763452800"; 
-   d="scan'208";a="200492621"
-Received: from lkp-server02.sh.intel.com (HELO dd3453e2b682) ([10.239.97.151])
-  by fmviesa008.fm.intel.com with ESMTP; 25 Dec 2025 01:35:40 -0800
-Received: from kbuild by dd3453e2b682 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vYhkp-000000003x3-0Mzd;
-	Thu, 25 Dec 2025 09:35:33 +0000
-Date: Thu, 25 Dec 2025 17:34:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yanfei Xu <yanfei.xu@bytedance.com>, pbonzini@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kvm@vger.kernel.org, caixiangfeng@bytedance.com,
-	fangying.tommy@bytedance.com, yanfei.xu@bytedance.com
-Subject: Re: [PATCH] KVM: irqchip: KVM: Reduce allocation overhead in
- kvm_set_irq_routing()
-Message-ID: <202512251741.UOsoJoam-lkp@intel.com>
-References: <20251224023201.381586-1-yanfei.xu@bytedance.com>
+	s=arc-20240116; t=1766657711; c=relaxed/simple;
+	bh=quMzQLJ3gvgceF6EgP0zuFXasglHAAekjNTPMHmaPmQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gzmor7VYhB6M5EWfSX1wQhZVoOvklMtm6pUn6Uqp5Kaj+Bl127WwO94BuEQRMbCBdKsUSiWak0Gh2TeQF2HRB69wA4yikxNG3UL9jbKYpkJhwldsgkKld9IrG0BijQuZ5uhpGP2Ljs/DpnqN6wZlHyWCpNLhc0nJJ5j1D2zUdGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.105] (unknown [114.241.82.59])
+	by APP-01 (Coremail) with SMTP id qwCowACH826RDk1pT2zJAQ--.26576S2;
+	Thu, 25 Dec 2025 18:14:42 +0800 (CST)
+Message-ID: <38ce44c1-08cf-4e3f-8ade-20da224f529c@iscas.ac.cn>
+Date: Thu, 25 Dec 2025 18:14:41 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251224023201.381586-1-yanfei.xu@bytedance.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 06/14] riscv: misaligned: request misaligned exception
+ from SBI
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-kselftest@vger.kernel.org
+Cc: Samuel Holland <samuel.holland@sifive.com>,
+ Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>,
+ Charlie Jenkins <charlie@rivosinc.com>
+References: <20250523101932.1594077-1-cleger@rivosinc.com>
+ <20250523101932.1594077-7-cleger@rivosinc.com>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <20250523101932.1594077-7-cleger@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowACH826RDk1pT2zJAQ--.26576S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4UuF4kAF45WFy8Kw13CFg_yoW8Xr48pF
+	s5Gr4akrW5CrnFq3W3uwnFqF4Yvw4rGr4xJrsrJ343urs8Zr4FvF4ktF1DXa47JrWkuw10
+	gFy3Kr1rua4DZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_tr1lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
+	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
+	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
+	1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07jDsqXUUUUU=
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-Hi Yanfei,
+Hi Clément and riscv maintainers:
 
-kernel test robot noticed the following build warnings:
+On 5/23/25 18:19, Clément Léger wrote:
+> Now that the kernel can handle misaligned accesses in S-mode, request
+> misaligned access exception delegation from SBI. This uses the FWFT SBI
+> extension defined in SBI version 3.0.
+>
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/include/asm/cpufeature.h        |  3 +-
+>  arch/riscv/kernel/traps_misaligned.c       | 71 +++++++++++++++++++++-
+>  arch/riscv/kernel/unaligned_access_speed.c |  8 ++-
+>  3 files changed, 77 insertions(+), 5 deletions(-)
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on kvm/next linus/master v6.19-rc2 next-20251219]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This causes a regression on platforms where vector misaligned access can
+be emulated with OpenSBI (since OpenSBI commit c2acc5e ("lib:
+sbi_misaligned_ldst: Add handling of vector load/store"), because this
+disables that with FWFT. This means that vector misaligned loads and
+stores that were emulated instead get a SIGBUS.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yanfei-Xu/KVM-irqchip-KVM-Reduce-allocation-overhead-in-kvm_set_irq_routing/20251224-103451
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20251224023201.381586-1-yanfei.xu%40bytedance.com
-patch subject: [PATCH] KVM: irqchip: KVM: Reduce allocation overhead in kvm_set_irq_routing()
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20251225/202512251741.UOsoJoam-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251225/202512251741.UOsoJoam-lkp@intel.com/reproduce)
+This happens on Sophgo SG2044 and SpacemiT K1. Notably this causes these
+platforms to fail Zicclsm which stipulates that misaligned vector memory
+accesses succeed if vector instructions are available at all [1].
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512251741.UOsoJoam-lkp@intel.com/
+I'm not very certain why vector emulation support was omitted in this
+series. Should we perhaps add the same emulation support to Linux as
+well for the sake of these kind of platforms?
 
-All warnings (new ones prefixed by >>):
+Thanks,
+Vivian "dramforever" Wang
 
->> arch/loongarch/kvm/../../../virt/kvm/irqchip.c:190:6: warning: variable 'r' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-     190 |         if (!e)
-         |             ^~
-   arch/loongarch/kvm/../../../virt/kvm/irqchip.c:233:9: note: uninitialized use occurs here
-     233 |         return r;
-         |                ^
-   arch/loongarch/kvm/../../../virt/kvm/irqchip.c:190:2: note: remove the 'if' if its condition is always false
-     190 |         if (!e)
-         |         ^~~~~~~
-     191 |                 goto out;
-         |                 ~~~~~~~~
-   arch/loongarch/kvm/../../../virt/kvm/irqchip.c:176:7: note: initialize the variable 'r' to silence this warning
-     176 |         int r;
-         |              ^
-         |               = 0
-   1 warning generated.
+[1]: https://github.com/riscv/riscv-profiles/issues/58
 
-
-vim +190 arch/loongarch/kvm/../../../virt/kvm/irqchip.c
-
-   167	
-   168	int kvm_set_irq_routing(struct kvm *kvm,
-   169				const struct kvm_irq_routing_entry *ue,
-   170				unsigned nr,
-   171				unsigned flags)
-   172	{
-   173		struct kvm_irq_routing_table *new, *old;
-   174		struct kvm_kernel_irq_routing_entry *e;
-   175		u32 i, j, nr_rt_entries = 0;
-   176		int r;
-   177	
-   178		for (i = 0; i < nr; ++i) {
-   179			if (ue[i].gsi >= KVM_MAX_IRQ_ROUTES)
-   180				return -EINVAL;
-   181			nr_rt_entries = max(nr_rt_entries, ue[i].gsi);
-   182		}
-   183	
-   184		nr_rt_entries += 1;
-   185	
-   186		new = kzalloc(struct_size(new, map, nr_rt_entries), GFP_KERNEL_ACCOUNT);
-   187		if (!new)
-   188			return -ENOMEM;
-   189		e = kcalloc(nr, sizeof(*e), GFP_KERNEL_ACCOUNT);
- > 190		if (!e)
-   191			goto out;
-   192		new->entries_addr = e;
-   193	
-   194		new->nr_rt_entries = nr_rt_entries;
-   195		for (i = 0; i < KVM_NR_IRQCHIPS; i++)
-   196			for (j = 0; j < KVM_IRQCHIP_NUM_PINS; j++)
-   197				new->chip[i][j] = -1;
-   198	
-   199		for (i = 0; i < nr; ++i) {
-   200			r = -EINVAL;
-   201			switch (ue->type) {
-   202			case KVM_IRQ_ROUTING_MSI:
-   203				if (ue->flags & ~KVM_MSI_VALID_DEVID)
-   204					goto out;
-   205				break;
-   206			default:
-   207				if (ue->flags)
-   208					goto out;
-   209				break;
-   210			}
-   211			r = setup_routing_entry(kvm, new, e + i, ue);
-   212			if (r)
-   213				goto out;
-   214			++ue;
-   215		}
-   216	
-   217		mutex_lock(&kvm->irq_lock);
-   218		old = rcu_dereference_protected(kvm->irq_routing, 1);
-   219		rcu_assign_pointer(kvm->irq_routing, new);
-   220		kvm_irq_routing_update(kvm);
-   221		kvm_arch_irq_routing_update(kvm);
-   222		mutex_unlock(&kvm->irq_lock);
-   223	
-   224		synchronize_srcu_expedited(&kvm->irq_srcu);
-   225	
-   226		new = old;
-   227		r = 0;
-   228		goto out;
-   229	
-   230	out:
-   231		free_irq_routing_table(new);
-   232	
-   233		return r;
-   234	}
-   235	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
