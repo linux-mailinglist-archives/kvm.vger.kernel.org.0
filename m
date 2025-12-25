@@ -1,51 +1,92 @@
-Return-Path: <kvm+bounces-66691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57E7ECDDDC5
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 15:32:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B2D3CDDE11
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 16:14:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4BF1301EFB4
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 14:32:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2AE04301AD37
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 15:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE57D248F7C;
-	Thu, 25 Dec 2025 14:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B57C3271F1;
+	Thu, 25 Dec 2025 15:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="cgXmgCk9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgD6Jq8z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5CB1684B4;
-	Thu, 25 Dec 2025 14:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B167A32570F
+	for <kvm@vger.kernel.org>; Thu, 25 Dec 2025 15:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766673129; cv=none; b=MuGu4xcLgVimh+v4O5xnqtkqggDWNbC+dwkPlI4WNL+lFYIuF1QT6C3aLl89HzmPwfBEp3CyWVJcw5NU2H6+18RI8JjDIumhXAEaBzGG5NFykWyLoA+S3rEpAnqLyG0NrDHBH5rf2Wpr7zQD+qiqpjqiyNbwniax2dwgRAotKRs=
+	t=1766675668; cv=none; b=dlVKBBRl4FhQ+Iidg4dxKcRuB9lzsDDD0Bz+oXw5/yLUOteREzB5ZNO8b15zjkKFwCYPJGBLNMj1DeWmPdMoTBNXHvY+YRrWs272fFAVUDKpULAGYlQwG85wNY1D/uHZQO+tSssMGYIISCC7kqNMjACueNtK66VvSmf8hqu19b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766673129; c=relaxed/simple;
-	bh=gP2JcycdLSBY+BoKEzv/oBxHnxcGgKEkskGCVtpp1Hc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YL5X5JdSZlkBe66a3IoeUfYtTYiVSKRf4jfe0mxUyq9yPb0Gwzks+f3mv1EPPwynWfKhKa9HyT5l4X1z89GdfIp9ZiqUuIiMnz1CTdajI1w04UZyIOCQSxLgRV7mTIOXyAjNG9U/IAAiqQONuOgU/TbbOr0i9DJ1BBFU5Boo5O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=cgXmgCk9; arc=none smtp.client-ip=45.254.49.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from LAPTOP-N070L597.localdomain (unknown [222.191.246.242])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 2e90b931f;
-	Thu, 25 Dec 2025 22:31:54 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: jgg@ziepe.ca
-Cc: yishaih@nvidia.com,
-	skolothumtho@nvidia.com,
-	kevin.tian@intel.com,
-	brett.creeley@amd.com,
-	alex@shazbot.org,
+	s=arc-20240116; t=1766675668; c=relaxed/simple;
+	bh=zrRepONqIcsuxD2qRt8uUb3Hu7HQL9DjDNsFfLzb3qk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TUnjMbbTlm6jMc9xOPgdNMa4XfsNNg9nwJfZTZXiXNkwFG9jBngSnnHM+WPIkU3d84R8akS/cGuo1Q5ykcXY7R6MKUDclx8yaYHMo+faWziAg6XpCJxwK0XVWHfkN5Qugm+AZAB4DI5g/80ymB9QjxHRcA9Zhj9Ptr91/2ydZUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgD6Jq8z; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-598f81d090cso7136908e87.2
+        for <kvm@vger.kernel.org>; Thu, 25 Dec 2025 07:14:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766675665; x=1767280465; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CRsUoCK6ChAGV/EtS0TA3rEDcBe8J8WItk/OJdEL24A=;
+        b=YgD6Jq8zrZsqpF4NOMl9jQEFwBAX8+3884k+WtluPtpk68qzYZ2Az9nw9tg9DyBz+E
+         1RDn20zK1sJx6+gH4Ge9TiJ4HhTOsHfo1QXLzZRpvjLFTfdZIIVSr0a/JNr8m+7c8TcK
+         1hSTOnGUT6AeF1PKwEd442wVOm6qnQlrIw1YYk6/7SxVP818lELy5II5F80EYnDhimcE
+         ipbCe8nB4ZN0nuECE64Eh3f++o/CulBBwGR38kMwX6U5LhW/CtTcehd5V/aB9bdXmFv6
+         4azVHQw1Mr0Chcu+gKWqAJgJI3wzdmpIlwsytXPCt5bMTr2KnesdKIuIPf8wAWjafxju
+         XJVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766675665; x=1767280465;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CRsUoCK6ChAGV/EtS0TA3rEDcBe8J8WItk/OJdEL24A=;
+        b=d+QI437QqVTZuuiOsZx7WY5WSlfVUs1NGeZ6yiuqATFBo7heRpSHGa4hXM+pq0nV4F
+         t58Pb6lD7CBujhRzi2PuXddrLug9TFAr66smL52KI/b1qFBr3pv1q/QH1lov1qR8MKWv
+         jMH7LwFCSBKL9aUmbvKGKmDhpX+deAeLHmCOoieL1VJS5UL3W5YCiMk045dnT7YV43Xt
+         HpjMrxJLTw2uPbfdkyWYSQDVCCfvgqxfb4NEN8X/AZbDS2gokw+ogvWoS00vKKdRUafs
+         AP1ei6DzEj4Rj1jiV6B2tTfinjF1klBYtP2tY3MyHwYGvabkeQ0Sb4B15V5Ei1pon2x2
+         ytjg==
+X-Forwarded-Encrypted: i=1; AJvYcCVo3e2RQKMz5H2NSWah9LjINd6JNVyeW6K4sViRiq5+CgTlYljqxngQl9CWRykSP4bXg/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4Iez7XH8HcK0OLwE7ervKh2vl3ayzID9MSVfqyto8jjbt1xZb
+	n5cHCjrTm34bvSwWgp6zI0db+lg8ADOt3jMOGmoBOoHh41ChET4xrJd6
+X-Gm-Gg: AY/fxX4f9orH7cRY76V9Vv02vzFH1Vf/qZnq5i0sV36/woE8BhUEvqEuAdXbIMjCSUo
+	QSKAfaK6nYlkPae1x1HJlAFECvIbnNPiwqlDhqg6Z0XND5huD6+zLuJ5mJu9OhFosZtDW6I6QA7
+	j4cOyYuBb7cVa0ZiHg8JRmhCEgk84D/V2WCqj4RqT4yywmVvhWawEqPGJdyq2GAjBIUhzcMpzCh
+	80yKl901bCSslOOOXAzIo6zvdz1SA+TkYBB23AVul1YaH636PEfRtpQ9StyiA7zhkGbHFobgWKo
+	tnJXOrKvP7Cig2SS+VVazG7t1k1iQDYUGqtbTWq4xHgh92cmbcur+Nfl+GjgJf6zEq6VAfEcbS5
+	/Z9EoJ2efnIJz+Ty4+xBUIIdAEEA/KPxbS/+UHgl79J7F2uGMCqRHX9QR+4vMzyfr9GtfFuQ9T8
+	VxYcORaw0oVHo3EM+6wQAlYOs1ShzTF8z6T7U4
+X-Google-Smtp-Source: AGHT+IG3fUB1OsaIHa7q7zKQFUnyBJ8l/j3vz64gfQ66ecODeQkSk6h74hXbYooIM/aC2AokrIX88g==
+X-Received: by 2002:ac2:4e0a:0:b0:594:2db8:312b with SMTP id 2adb3069b0e04-59a17cff3c1mr6593946e87.7.1766675664468;
+        Thu, 25 Dec 2025 07:14:24 -0800 (PST)
+Received: from localhost.localdomain ([176.33.67.19])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a186203eesm5866402e87.77.2025.12.25.07.14.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Dec 2025 07:14:23 -0800 (PST)
+From: Alper Ak <alperyasinak1@gmail.com>
+To: michal.winiarski@intel.com
+Cc: Alper Ak <alperyasinak1@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
 	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH] vfio/pds: Fix memory leak in pds_vfio_dirty_enable()
-Date: Thu, 25 Dec 2025 14:31:50 +0000
-Message-Id: <20251225143150.1117366-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	intel-xe@lists.freedesktop.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] vfio/xe: Fix use-after-free in xe_vfio_pci_alloc_file()
+Date: Thu, 25 Dec 2025 18:13:49 +0300
+Message-ID: <20251225151349.360870-1-alperyasinak1@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -53,49 +94,40 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9b55ec66ce03a1kunm8556cb3653a3
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZQkpKVktITEJCTUhOQkpCSFYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
-	tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=cgXmgCk9TulyTSod9BsbcL7nLj2Ld7/GQ4odstXU3KHgjnp/7tEWEfrB7yuotEqmuzyuHUWG5G5EeWVSl8ygWnRqntxNsZPab8/4fsuaM4F1/jubqnH491CwQDYTqqpFY6G+nD2gpHlK6em8Nbn4GRYTH84fPSIuIRR/HiBgQSw=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=FRpWnB3JXKOe8+EG9U0c29yXRNuZlvgoBQogwEH901U=;
-	h=date:mime-version:subject:message-id:from;
 
-pds_vfio_dirty_enable() allocates memory for region_info. If
-interval_tree_iter_first() returns NULL, the function returns -EINVAL
-immediately without freeing the allocated memory, causing a memory leak.
+migf->filp is accessed after migf has been freed. Save the error
+value before calling kfree() to prevent use-after-free.
 
-Fix this by jumping to the out_free_region_info label to ensure
-region_info is freed.
-
-Fixes: 2e7c6feb4ef52 ("vfio/pds: Add multi-region support")
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Fixes: 1f5556ec8b9e ("vfio/xe: Add device specific vfio_pci driver variant for Intel graphics")
+Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
 ---
- drivers/vfio/pci/pds/dirty.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/vfio/pci/xe/main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/pds/dirty.c b/drivers/vfio/pci/pds/dirty.c
-index 481992142f79..4915a7c1c491 100644
---- a/drivers/vfio/pci/pds/dirty.c
-+++ b/drivers/vfio/pci/pds/dirty.c
-@@ -292,8 +292,11 @@ static int pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
- 	len = num_ranges * sizeof(*region_info);
+diff --git a/drivers/vfio/pci/xe/main.c b/drivers/vfio/pci/xe/main.c
+index 0156b53c678b..8e1595e00e18 100644
+--- a/drivers/vfio/pci/xe/main.c
++++ b/drivers/vfio/pci/xe/main.c
+@@ -250,6 +250,7 @@ xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
+ 	struct xe_vfio_pci_migration_file *migf;
+ 	const struct file_operations *fops;
+ 	int flags;
++	int ret;
  
- 	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
--	if (!node)
--		return -EINVAL;
-+	if (!node) {
-+		err = -EINVAL;
-+		goto out_free_region_info;
-+	}
-+
- 	for (int i = 0; i < num_ranges; i++) {
- 		struct pds_lm_dirty_region_info *ri = &region_info[i];
- 		u64 region_size = node->last - node->start + 1;
+ 	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
+ 	if (!migf)
+@@ -259,8 +260,9 @@ xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
+ 	flags = type == XE_VFIO_FILE_SAVE ? O_RDONLY : O_WRONLY;
+ 	migf->filp = anon_inode_getfile("xe_vfio_mig", fops, migf, flags);
+ 	if (IS_ERR(migf->filp)) {
++		ret = PTR_ERR(migf->filp);
+ 		kfree(migf);
+-		return ERR_CAST(migf->filp);
++		return ERR_PTR(ret);
+ 	}
+ 
+ 	mutex_init(&migf->lock);
 -- 
-2.34.1
+2.43.0
 
 
