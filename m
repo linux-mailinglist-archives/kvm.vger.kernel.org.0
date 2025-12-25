@@ -1,241 +1,333 @@
-Return-Path: <kvm+bounces-66683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8606CCDD635
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 07:52:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D42CDD73F
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 08:36:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F06F9300DB9F
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 06:52:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23F65305AE4F
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 07:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BAB283CBF;
-	Thu, 25 Dec 2025 06:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4ufkNiH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8E72FFDF4;
+	Thu, 25 Dec 2025 07:34:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9741EB5F8
-	for <kvm@vger.kernel.org>; Thu, 25 Dec 2025 06:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9C223D7EC;
+	Thu, 25 Dec 2025 07:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766645547; cv=none; b=CxyFWed6np1iqbT4ntxJ+iCZDw7nVFMEh0QSZEr8ctYxGObF4u5SvzRI0DLkdVBbHKwU1vGie20q3WDHYFRkSErubebMH9KJ1d3j+g4LIPw7BiGsCNvmdwMY+WHC/Gtp/JmYJ/ADBAgBLQebkjJLJJYvaNj/gBz54Jg+09Dfi84=
+	t=1766648069; cv=none; b=ZYA+GPEpyNXQY0vRvbndK5JwwPnAJ0leGFufQxImMH/MUpgZruwC4nfo46uVS5EJok+flXK+lD4PuS8RdQduxm5Ek+WwFB0uioFSqYzl/kNSDG+/kUBkv777JvNOCdSTkS4Th9E5EIughgZZqOndH9TL6ewkWdgoD6bxQLTGmIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766645547; c=relaxed/simple;
-	bh=isd6HGqy/sg2n7ckVNki1fOEFjslzRnZoaWBlNKZw+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CifbL+tQ7G8PqiFN5q4cosC5cZRnl/ii5xGjnnQXj5AyWEeU9TpAQ/TVYB3wtBf6Z9GBJL490aXXvesok4wnvIMQZqbrqV2+fsaaDJCROXO06WBTTXxsR2IlE/ndLmlgo4LSFThAW8BjEcdm13BBHGxLvts57VwebGSEKuglbw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y4ufkNiH; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo7338215b3a.2
-        for <kvm@vger.kernel.org>; Wed, 24 Dec 2025 22:52:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766645545; x=1767250345; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y3uCWfc7sMOchK6NyBr2nFKxzXIULsvWwWuH2RIHi8E=;
-        b=Y4ufkNiHkSJsbgFJLSDWhCRhFBx1oJyxBpn1s1dp6PEMEp1jH3sSjsyxdO2MKK9g4o
-         XU/uiycV1GyZHqIge7lpVz1CPblr7V8Q32wdk9azP1GWOzdJgWjW5NQwBJNPlTfyLyW+
-         YDtKqoLdDRdlZzpfRulL0hK4oQ/4zA4AFkkG8cLBATmLqT6zb7GlPsf3qDPiwcNoNe1+
-         Mopw8RoKD5gAhXLWe+o0v9OSbgRBnGyuLHvsCBZ2E8nNeAKphSQ4C9VNYn/WWl3bBvaM
-         rRhJA4HE803EVnFVXDb58XHv2aTCBdAYP7cYfeGoz6+kVs6RpGYLaCI+r1PM7+GKzGt2
-         Fu0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766645545; x=1767250345;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y3uCWfc7sMOchK6NyBr2nFKxzXIULsvWwWuH2RIHi8E=;
-        b=SwHNaQ8788S7AduFNARx5MIkehYtWqiczg4iX0LQcGw9IkwFzfe40wMAnl1Wp/poAL
-         gzITwhGYR4Yyz5phRWZMglevUPTsvk5eQZxuUsj3sCK6QNvlnz3KDs9XcgXKL4WlH0Bs
-         2ukktYGUn6vKj2WgGiSEmQgZJS+QZYsLXspBvqHfTZyFOTwfx3SoBFWA9rvnUAd126+G
-         kADyvzlx4Glo53qutAHrKezk0jPf7rkDJ1yTdlnME4NY5f1EhTFMIuc4LTmBgNZq08KW
-         +aA7N2vt0CmfRT+7gfoqFMXlX7wIasfTDnntTn/euxeYD+UgBnQlLXV9c7qZvjacRhLW
-         ETQA==
-X-Gm-Message-State: AOJu0Ywu/FRpGTNSf97FqHN7ErJFrU2ZK8z+AORPIoNT5HygAtwPlHty
-	R4t56GXv0Ur8hspeJk4KyBQPfoWBiOJPz4FkyKPNabQF/tAexCUsEVix
-X-Gm-Gg: AY/fxX45BSXsEPfV/ZNGvRMVVMDfkIkuB8qAHdNLJ7QqBL1wc+SDNUgAcQQ2bXWLh3k
-	NAbAi4yQLbh0GIqsMYEg0k+V3LdNYyuRMeXczbOiEgQ/86E8K3TJ26mVvPhUHDb/aIq2VuvmNmP
-	UhIajcoaa3CMgcAxC1UVyNwYXPmjEYHPV4BeD3fRxcgsHpjJU+xN5KNtPMxL6J42POKnjT0wgYl
-	kqMEuZzFLd0twm6Swd3QkDGLYUkXTkis63ibya24bbKFEwi1gaTSDqT+7WNjoULfH3IwhWdYEZV
-	RAx/4AZ+mjJh2FWBR63o/p2GDfw5jXKOUdVAiqXtGh1xlFhoRhHmPsOdEsECleyZMqaUWl5QW46
-	hrdwggE78xlfeyqf9AsRf2AZTQynfOo9M7zXuEPmMX6dBUatM5I1aVlrPzkh47qThHLhTF9pxVm
-	hwi0DWOl8NIQbQMNx6KqZHbNHzcA==
-X-Google-Smtp-Source: AGHT+IHag5DUPBAXJdp7qU/XBoBT+pBt5JqBALlHA1O9ZBr3lgysekVSQQSjGNooInOWNccTQZDVgQ==
-X-Received: by 2002:a05:6a00:bb84:b0:7e8:4471:ae6d with SMTP id d2e1a72fcca58-7ff67e55cafmr17120251b3a.57.1766645545209;
-        Wed, 24 Dec 2025 22:52:25 -0800 (PST)
-Received: from [10.3.168.204] ([61.213.176.11])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e0a19besm18352151b3a.40.2025.12.24.22.52.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Dec 2025 22:52:24 -0800 (PST)
-Message-ID: <ad38f0c1-83c1-4977-8846-32864973331d@gmail.com>
-Date: Thu, 25 Dec 2025 14:52:20 +0800
+	s=arc-20240116; t=1766648069; c=relaxed/simple;
+	bh=FxsfbNyeiCU+dwgDZRewpDUkmcXX5yTACo8eH2fBIIc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Yj/GHke6slPFTqpcvgBHo1XaKVJxguA93cqK2DvL6ngXSsO011p22HesgfawV9ymhGHhqq8OoQWTmXSh1IiSiBVYN5So8FMnx0GJLOrSNHsRQ8Gs4UA/7GBmsLrheu1U11hlOF0vyN0Dvh9fLiFdo6Dm3tfdtYRpAzRArQbIBNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.239])
+	by gateway (Coremail) with SMTP id _____8AxisL56ExpDhUDAA--.9472S3;
+	Thu, 25 Dec 2025 15:34:17 +0800 (CST)
+Received: from [10.20.42.239] (unknown [10.20.42.239])
+	by front1 (Coremail) with SMTP id qMiowJDxD8P06ExphagEAA--.14033S3;
+	Thu, 25 Dec 2025 15:34:16 +0800 (CST)
+Subject: Re: [PATCH v4 1/3] LongArch: KVM: Add DMSINTC device support
+To: Bibo Mao <maobibo@loongson.cn>, chenhuacai@kernel.org
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev, kernel@xen0n.name,
+ linux-kernel@vger.kernel.org
+References: <20251218111822.975455-1-gaosong@loongson.cn>
+ <20251218111822.975455-2-gaosong@loongson.cn>
+ <83440865-63e1-d8bc-ccb1-9617e5ef33e5@loongson.cn>
+From: gaosong <gaosong@loongson.cn>
+Message-ID: <56ae2003-0eae-a877-0f64-85b7d956b951@loongson.cn>
+Date: Thu, 25 Dec 2025 15:34:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: irqchip: KVM: Reduce allocation overhead in
- kvm_set_irq_routing()
-To: Yanfei Xu <yanfei.xu@bytedance.com>, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, caixiangfeng@bytedance.com,
- fangying.tommy@bytedance.com
-References: <20251224023201.381586-1-yanfei.xu@bytedance.com>
-From: Yanfei Xu <isyanfei.xu@gmail.com>
-In-Reply-To: <20251224023201.381586-1-yanfei.xu@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <83440865-63e1-d8bc-ccb1-9617e5ef33e5@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJDxD8P06ExphagEAA--.14033S3
+X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Zr48CF45Aw15GFy5JF13Awc_yoWDWrWxpF
+	1kAFZ8GrW8Grn3Jr1DJa45ZFyUAr18Gw1UWr18XFyUArsFyr10qr18Wr9F9F1UJw48Gr10
+	qr17W3ZrZF17J3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9Ib4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
+	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
+	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
+	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E
+	14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4
+	CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1x
+	MIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnI
+	WIevJa73UjIFyTuYvjxU70PfDUUUU
 
-
-On 2025/12/24 10:32, Yanfei Xu wrote:
-> In guests with many VFIO devices and MSI-X vectors, kvm_set_irq_routing()
-> becomes a high-overhead operation. Each invocation walks the entire IRQ
-> routing table and reallocates/frees every routing entry.
+在 2025/12/25 下午2:48, Bibo Mao 写道:
 >
-> As the routing table grows on each call, entry allocation and freeing
-> dominate the execution time of this function. In scenarios such as VM
-> live migration or live upgrade, this behavior can introduce unnecessary
-> downtime.
 >
-> Allocate memory for all routing entries in one shot using kcalloc(),
-> allowing them to be freed together with a single kfree() call.
+> On 2025/12/18 下午7:18, Song Gao wrote:
+>> Add device model for DMSINTC interrupt controller, implement basic
+>> create/destroy/set_attr interfaces, and register device model to kvm
+>> device table.
+>>
+>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>> Signed-off-by: Song Gao <gaosong@loongson.cn>
+>> ---
+>>   arch/loongarch/include/asm/kvm_dmsintc.h |  21 +++++
+>>   arch/loongarch/include/asm/kvm_host.h    |   3 +
+>>   arch/loongarch/include/uapi/asm/kvm.h    |   4 +
+>>   arch/loongarch/kvm/Makefile              |   1 +
+>>   arch/loongarch/kvm/intc/dmsintc.c        | 110 +++++++++++++++++++++++
+>>   arch/loongarch/kvm/main.c                |   5 ++
+>>   include/uapi/linux/kvm.h                 |   2 +
+>>   7 files changed, 146 insertions(+)
+>>   create mode 100644 arch/loongarch/include/asm/kvm_dmsintc.h
+>>   create mode 100644 arch/loongarch/kvm/intc/dmsintc.c
+>>
+>> diff --git a/arch/loongarch/include/asm/kvm_dmsintc.h 
+>> b/arch/loongarch/include/asm/kvm_dmsintc.h
+>> new file mode 100644
+>> index 000000000000..1d4f66996f3c
+>> --- /dev/null
+>> +++ b/arch/loongarch/include/asm/kvm_dmsintc.h
+>> @@ -0,0 +1,21 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#ifndef __ASM_KVM_DMSINTC_H
+>> +#define __ASM_KVM_DMSINTC_H
+>> +
+>> +
+>> +struct loongarch_dmsintc  {
+>> +    struct kvm *kvm;
+>> +    uint64_t msg_addr_base;
+>> +    uint64_t msg_addr_size;
+>> +};
+>> +
+>> +struct dmsintc_state {
+>> +    atomic64_t  vector_map[4];
+>> +};
+>> +
+>> +int kvm_loongarch_register_dmsintc_device(void);
+>> +#endif
+>> diff --git a/arch/loongarch/include/asm/kvm_host.h 
+>> b/arch/loongarch/include/asm/kvm_host.h
+>> index e4fe5b8e8149..5e9e2af7312f 100644
+>> --- a/arch/loongarch/include/asm/kvm_host.h
+>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>> @@ -22,6 +22,7 @@
+>>   #include <asm/kvm_ipi.h>
+>>   #include <asm/kvm_eiointc.h>
+>>   #include <asm/kvm_pch_pic.h>
+>> +#include <asm/kvm_dmsintc.h>
+>>   #include <asm/loongarch.h>
+>>     #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>> @@ -134,6 +135,7 @@ struct kvm_arch {
+>>       struct loongarch_ipi *ipi;
+>>       struct loongarch_eiointc *eiointc;
+>>       struct loongarch_pch_pic *pch_pic;
+>> +    struct loongarch_dmsintc *dmsintc;
+>>   };
+>>     #define CSR_MAX_NUMS        0x800
+>> @@ -244,6 +246,7 @@ struct kvm_vcpu_arch {
+>>       struct kvm_mp_state mp_state;
+>>       /* ipi state */
+>>       struct ipi_state ipi_state;
+>> +    struct dmsintc_state dmsintc_state;
+>>       /* cpucfg */
+>>       u32 cpucfg[KVM_MAX_CPUCFG_REGS];
+>>   diff --git a/arch/loongarch/include/uapi/asm/kvm.h 
+>> b/arch/loongarch/include/uapi/asm/kvm.h
+>> index de6c3f18e40a..0a370d018b08 100644
+>> --- a/arch/loongarch/include/uapi/asm/kvm.h
+>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+>> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
+>>   #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL 0x40000006
+>>   #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT            0
+>>   +#define KVM_DEV_LOONGARCH_DMSINTC_CTRL            0x40000007
+>> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE        0x0
+>> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE        0x1
+>> +
+>>   #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+>> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
+>> index cb41d9265662..6e184e24443c 100644
+>> --- a/arch/loongarch/kvm/Makefile
+>> +++ b/arch/loongarch/kvm/Makefile
+>> @@ -19,6 +19,7 @@ kvm-y += vm.o
+>>   kvm-y += intc/ipi.o
+>>   kvm-y += intc/eiointc.o
+>>   kvm-y += intc/pch_pic.o
+>> +kvm-y += intc/dmsintc.o
+>>   kvm-y += irqfd.o
+>>     CFLAGS_exit.o    += $(call cc-disable-warning, override-init)
+>> diff --git a/arch/loongarch/kvm/intc/dmsintc.c 
+>> b/arch/loongarch/kvm/intc/dmsintc.c
+>> new file mode 100644
+>> index 000000000000..3fdea81a08c8
+>> --- /dev/null
+>> +++ b/arch/loongarch/kvm/intc/dmsintc.c
+>> @@ -0,0 +1,110 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/kvm_dmsintc.h>
+>> +#include <asm/kvm_vcpu.h>
+>> +
+>> +static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
+>> +                struct kvm_device_attr *attr,
+>> +                bool is_write)
+>> +{
+>> +    int addr = attr->attr;
+>> +    void __user *data;
+>> +    struct loongarch_dmsintc *s = dev->kvm->arch.dmsintc;
+>> +    u64 tmp;
+>> +
+>> +    data = (void __user *)attr->addr;
+>> +    switch (addr) {
+>> +    case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE:
+>> +        if (is_write) {
+>> +            if (copy_from_user(&tmp, data, sizeof(s->msg_addr_base)))
+>> +                return -EFAULT;
+>> +            if (s->msg_addr_base) {
+>> +                /* Duplicate setting are not allowed. */
+>> +                return -EFAULT;
+>> +            }
+>> +            if ((tmp & (BIT(AVEC_CPU_SHIFT) - 1)) == 0)
+>> +                s->msg_addr_base = tmp;
+>> +            else
+>> +                return  -EFAULT;
+>> +        }
+>> +        break;
+>> +    case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE:
+>> +        if (is_write) {
+>> +            if (copy_from_user(&tmp, data, sizeof(s->msg_addr_size)))
+>> +                return -EFAULT;
+>> +            if (s->msg_addr_size) {
+>> +                /*Duplicate setting are not allowed. */
+>> +                return -EFAULT;
+>> +            }
+>> +            s->msg_addr_size = tmp;
+>> +        }
+>> +        break;
+>> +    default:
+>> +        kvm_err("%s: unknown dmsintc register, addr = %d\n", 
+>> __func__, addr);
+>> +        return -ENXIO;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static int kvm_dmsintc_set_attr(struct kvm_device *dev,
+>> +            struct kvm_device_attr *attr)
+>> +{
+>> +    switch (attr->group) {
+>> +    case KVM_DEV_LOONGARCH_DMSINTC_CTRL:
+>> +        return kvm_dmsintc_ctrl_access(dev, attr, true);
+>> +    default:
+>> +        kvm_err("%s: unknown group (%d)\n", __func__, attr->group);
+>> +        return -EINVAL;
+>> +    }
+>> +}
+>> +
+>> +static int kvm_dmsintc_create(struct kvm_device *dev, u32 type)
+>> +{
+>> +    struct kvm *kvm;
+>> +    struct loongarch_dmsintc *s;
+>> +
+>> +    if (!dev) {
+>> +        kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    kvm = dev->kvm;
+>> +    if (kvm->arch.dmsintc) {
+>> +        kvm_err("%s: LoongArch DMSINTC has already been created!\n", 
+>> __func__);
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    s = kzalloc(sizeof(struct loongarch_dmsintc), GFP_KERNEL);
+>> +    if (!s)
+>> +        return -ENOMEM;
+>> +
+>> +    s->kvm = kvm;
+>> +    kvm->arch.dmsintc = s;
+>> +    return 0;
+>> +}
+>> +
+>> +static void kvm_dmsintc_destroy(struct kvm_device *dev)
+>> +{
+>> +
+>> +    if (!dev || !dev->kvm || !dev->kvm->arch.dmsintc)
+>> +        return;
+>> +
+>> +    kfree(dev->kvm->arch.dmsintc);
+>> +}
+>> +
+>> +static struct kvm_device_ops kvm_dmsintc_dev_ops = {
+>> +    .name = "kvm-loongarch-dmsintc",
+>> +    .create = kvm_dmsintc_create,
+>> +    .destroy = kvm_dmsintc_destroy,
+>> +    .set_attr = kvm_dmsintc_set_attr,
+>> +};
+>> +
+>> +int kvm_loongarch_register_dmsintc_device(void)
+>> +{
+>> +    return kvm_register_device_ops(&kvm_dmsintc_dev_ops, 
+>> KVM_DEV_TYPE_LOONGARCH_DMSINTC);
+>> +}
+>> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+>> index 80ea63d465b8..2e26d4fd9000 100644
+>> --- a/arch/loongarch/kvm/main.c
+>> +++ b/arch/loongarch/kvm/main.c
+>> @@ -408,6 +408,11 @@ static int kvm_loongarch_env_init(void)
+>>         /* Register LoongArch PCH-PIC interrupt controller interface. */
+>>       ret = kvm_loongarch_register_pch_pic_device();
+>> +    if (ret)
+>> +        return ret;
+>> +
+>> +    /* Register LoongArch DMSINTC interrupt contrroller interface */
+>> +    ret = kvm_loongarch_register_dmsintc_device();
+> I think it will be better if cpu_has_msgint() is added, in theory 
+> dmsintc cannot be added on 3C5000 host machine, and KVM cannot prevent 
+> VMM executing FUZZ ioctl commands.
 >
-> Example: On a VM with 120 vCPUs and 15 VFIO devices (virtio-net), the
-> total number of calls to kzalloc and kfree is over 20000. With this
-> change, it is reduced to around 30.
->
-> Reported-by: Xiangfeng Cai <caixiangfeng@bytedance.com>
-> Signed-off-by: Yanfei Xu <yanfei.xu@bytedance.com>
-> ---
->   include/linux/kvm_host.h |  1 +
->   virt/kvm/irqchip.c       | 21 +++++++++------------
->   2 files changed, 10 insertions(+), 12 deletions(-)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 15656b7fba6c..aae6ea9940a0 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -690,6 +690,7 @@ struct kvm_kernel_irq_routing_entry {
->   struct kvm_irq_routing_table {
->   	int chip[KVM_NR_IRQCHIPS][KVM_IRQCHIP_NUM_PINS];
->   	u32 nr_rt_entries;
-> +	struct kvm_kernel_irq_routing_entry *entries_addr;
->   	/*
->   	 * Array indexed by gsi. Each entry contains list of irq chips
->   	 * the gsi is connected to.
-> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-> index 6ccabfd32287..0eac1c634fa5 100644
-> --- a/virt/kvm/irqchip.c
-> +++ b/virt/kvm/irqchip.c
-> @@ -109,10 +109,10 @@ static void free_irq_routing_table(struct kvm_irq_routing_table *rt)
->   
->   		hlist_for_each_entry_safe(e, n, &rt->map[i], link) {
->   			hlist_del(&e->link);
-> -			kfree(e);
->   		}
->   	}
+I will add it on next version.
 
-Hi maintainer,
+Thanks.
+Song Gao
+> Regards
+> Bibo Mao
+>>         return ret;
+>>   }
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index dddb781b0507..7c56e7e36265 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1209,6 +1209,8 @@ enum kvm_device_type {
+>>   #define KVM_DEV_TYPE_LOONGARCH_EIOINTC KVM_DEV_TYPE_LOONGARCH_EIOINTC
+>>       KVM_DEV_TYPE_LOONGARCH_PCHPIC,
+>>   #define KVM_DEV_TYPE_LOONGARCH_PCHPIC KVM_DEV_TYPE_LOONGARCH_PCHPIC
+>> +    KVM_DEV_TYPE_LOONGARCH_DMSINTC,
+>> +#define KVM_DEV_TYPE_LOONGARCH_DMSINTC KVM_DEV_TYPE_LOONGARCH_DMSINTC
+>>         KVM_DEV_TYPE_MAX,
+>>
 
-Before sending v2 to address the lkp warning, I would like to ask whether
-
-free_irq_routing_table() can be simplified by removing the iteration over
-
-the entries and the hlist cleanup, as shown below.
-
-The contents of the irq routing table are always replaced by creating a
-
-new table under srcu, so iterating over the entries and calling hlist_del()
-
-is effectively unnecessary. I kept the cleanup logic originally because
-
-semantically it seemed reasonable to clear the data structures before
-
-freeing them, but in practice it does not appear to be required.
-
-
-Thanks，
-
-Yanfei
-
-  static void free_irq_routing_table(struct kvm_irq_routing_table *rt)
-  {
--       int i;
--
-         if (!rt)
-                 return;
-
--       for (i = 0; i < rt->nr_rt_entries; ++i) {
--               struct kvm_kernel_irq_routing_entry *e;
--               struct hlist_node *n;
--
--               hlist_for_each_entry_safe(e, n, &rt->map[i], link) {
--                       hlist_del(&e->link);
--               }
--       }
--
-         kfree(rt->entries_addr);
-         kfree(rt);
-  }
-
->   
-> +	kfree(rt->entries_addr);
->   	kfree(rt);
->   }
->   
-> @@ -186,6 +186,10 @@ int kvm_set_irq_routing(struct kvm *kvm,
->   	new = kzalloc(struct_size(new, map, nr_rt_entries), GFP_KERNEL_ACCOUNT);
->   	if (!new)
->   		return -ENOMEM;
-> +	e = kcalloc(nr, sizeof(*e), GFP_KERNEL_ACCOUNT);
-> +	if (!e)
-> +		goto out;
-> +	new->entries_addr = e;
->   
->   	new->nr_rt_entries = nr_rt_entries;
->   	for (i = 0; i < KVM_NR_IRQCHIPS; i++)
-> @@ -193,25 +197,20 @@ int kvm_set_irq_routing(struct kvm *kvm,
->   			new->chip[i][j] = -1;
->   
->   	for (i = 0; i < nr; ++i) {
-> -		r = -ENOMEM;
-> -		e = kzalloc(sizeof(*e), GFP_KERNEL_ACCOUNT);
-> -		if (!e)
-> -			goto out;
-> -
->   		r = -EINVAL;
->   		switch (ue->type) {
->   		case KVM_IRQ_ROUTING_MSI:
->   			if (ue->flags & ~KVM_MSI_VALID_DEVID)
-> -				goto free_entry;
-> +				goto out;
->   			break;
->   		default:
->   			if (ue->flags)
-> -				goto free_entry;
-> +				goto out;
->   			break;
->   		}
-> -		r = setup_routing_entry(kvm, new, e, ue);
-> +		r = setup_routing_entry(kvm, new, e + i, ue);
->   		if (r)
-> -			goto free_entry;
-> +			goto out;
->   		++ue;
->   	}
->   
-> @@ -228,8 +227,6 @@ int kvm_set_irq_routing(struct kvm *kvm,
->   	r = 0;
->   	goto out;
->   
-> -free_entry:
-> -	kfree(e);
->   out:
->   	free_irq_routing_table(new);
->   
 
