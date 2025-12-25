@@ -1,115 +1,101 @@
-Return-Path: <kvm+bounces-66690-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66691-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771A3CDDA49
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 11:15:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57E7ECDDDC5
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 15:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AAE933017397
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 10:15:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4BF1301EFB4
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 14:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672A630FC2F;
-	Thu, 25 Dec 2025 10:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE57D248F7C;
+	Thu, 25 Dec 2025 14:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="cgXmgCk9"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DE330B50D;
-	Thu, 25 Dec 2025 10:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5CB1684B4;
+	Thu, 25 Dec 2025 14:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766657711; cv=none; b=EQQYyRlahDkNQr3Yc/+3EK1YV79NIsyqDW/b/l5XcGPZS5io16tduv07R5Tl3Uq9baMzh4rXWB5A8IHfnfnsyvfin4a9R/NdY/+F9IuBd4pbeUVNaRP5Yx5ktnu31D41sV1Z8qRjp7q1f8uJlUt3xgtCiu+HF/rCi089o1GORJI=
+	t=1766673129; cv=none; b=MuGu4xcLgVimh+v4O5xnqtkqggDWNbC+dwkPlI4WNL+lFYIuF1QT6C3aLl89HzmPwfBEp3CyWVJcw5NU2H6+18RI8JjDIumhXAEaBzGG5NFykWyLoA+S3rEpAnqLyG0NrDHBH5rf2Wpr7zQD+qiqpjqiyNbwniax2dwgRAotKRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766657711; c=relaxed/simple;
-	bh=quMzQLJ3gvgceF6EgP0zuFXasglHAAekjNTPMHmaPmQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gzmor7VYhB6M5EWfSX1wQhZVoOvklMtm6pUn6Uqp5Kaj+Bl127WwO94BuEQRMbCBdKsUSiWak0Gh2TeQF2HRB69wA4yikxNG3UL9jbKYpkJhwldsgkKld9IrG0BijQuZ5uhpGP2Ljs/DpnqN6wZlHyWCpNLhc0nJJ5j1D2zUdGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.105] (unknown [114.241.82.59])
-	by APP-01 (Coremail) with SMTP id qwCowACH826RDk1pT2zJAQ--.26576S2;
-	Thu, 25 Dec 2025 18:14:42 +0800 (CST)
-Message-ID: <38ce44c1-08cf-4e3f-8ade-20da224f529c@iscas.ac.cn>
-Date: Thu, 25 Dec 2025 18:14:41 +0800
+	s=arc-20240116; t=1766673129; c=relaxed/simple;
+	bh=gP2JcycdLSBY+BoKEzv/oBxHnxcGgKEkskGCVtpp1Hc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YL5X5JdSZlkBe66a3IoeUfYtTYiVSKRf4jfe0mxUyq9yPb0Gwzks+f3mv1EPPwynWfKhKa9HyT5l4X1z89GdfIp9ZiqUuIiMnz1CTdajI1w04UZyIOCQSxLgRV7mTIOXyAjNG9U/IAAiqQONuOgU/TbbOr0i9DJ1BBFU5Boo5O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=cgXmgCk9; arc=none smtp.client-ip=45.254.49.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+Received: from LAPTOP-N070L597.localdomain (unknown [222.191.246.242])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 2e90b931f;
+	Thu, 25 Dec 2025 22:31:54 +0800 (GMT+08:00)
+From: Zilin Guan <zilin@seu.edu.cn>
+To: jgg@ziepe.ca
+Cc: yishaih@nvidia.com,
+	skolothumtho@nvidia.com,
+	kevin.tian@intel.com,
+	brett.creeley@amd.com,
+	alex@shazbot.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: [PATCH] vfio/pds: Fix memory leak in pds_vfio_dirty_enable()
+Date: Thu, 25 Dec 2025 14:31:50 +0000
+Message-Id: <20251225143150.1117366-1-zilin@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 06/14] riscv: misaligned: request misaligned exception
- from SBI
-To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Shuah Khan <shuah@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-kselftest@vger.kernel.org
-Cc: Samuel Holland <samuel.holland@sifive.com>,
- Andrew Jones <ajones@ventanamicro.com>, Deepak Gupta <debug@rivosinc.com>,
- Charlie Jenkins <charlie@rivosinc.com>
-References: <20250523101932.1594077-1-cleger@rivosinc.com>
- <20250523101932.1594077-7-cleger@rivosinc.com>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <20250523101932.1594077-7-cleger@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowACH826RDk1pT2zJAQ--.26576S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww4UuF4kAF45WFy8Kw13CFg_yoW8Xr48pF
-	s5Gr4akrW5CrnFq3W3uwnFqF4Yvw4rGr4xJrsrJ343urs8Zr4FvF4ktF1DXa47JrWkuw10
-	gFy3Kr1rua4DZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_tr1lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
-	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
-	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
-	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
-	1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
-	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
-	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
-	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
-	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
-	ZFpf9x07jDsqXUUUUU=
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+X-HM-Tid: 0a9b55ec66ce03a1kunm8556cb3653a3
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZQkpKVktITEJCTUhOQkpCSFYeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlJSUlVSkJKVUlPTVVJT0lZV1kWGg8SFR0UWUFZT0tIVUpLSUhOQ0NVSktLVU
+	tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=cgXmgCk9TulyTSod9BsbcL7nLj2Ld7/GQ4odstXU3KHgjnp/7tEWEfrB7yuotEqmuzyuHUWG5G5EeWVSl8ygWnRqntxNsZPab8/4fsuaM4F1/jubqnH491CwQDYTqqpFY6G+nD2gpHlK6em8Nbn4GRYTH84fPSIuIRR/HiBgQSw=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=FRpWnB3JXKOe8+EG9U0c29yXRNuZlvgoBQogwEH901U=;
+	h=date:mime-version:subject:message-id:from;
 
-Hi Clément and riscv maintainers:
+pds_vfio_dirty_enable() allocates memory for region_info. If
+interval_tree_iter_first() returns NULL, the function returns -EINVAL
+immediately without freeing the allocated memory, causing a memory leak.
 
-On 5/23/25 18:19, Clément Léger wrote:
-> Now that the kernel can handle misaligned accesses in S-mode, request
-> misaligned access exception delegation from SBI. This uses the FWFT SBI
-> extension defined in SBI version 3.0.
->
-> Signed-off-by: Clément Léger <cleger@rivosinc.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/include/asm/cpufeature.h        |  3 +-
->  arch/riscv/kernel/traps_misaligned.c       | 71 +++++++++++++++++++++-
->  arch/riscv/kernel/unaligned_access_speed.c |  8 ++-
->  3 files changed, 77 insertions(+), 5 deletions(-)
+Fix this by jumping to the out_free_region_info label to ensure
+region_info is freed.
 
-This causes a regression on platforms where vector misaligned access can
-be emulated with OpenSBI (since OpenSBI commit c2acc5e ("lib:
-sbi_misaligned_ldst: Add handling of vector load/store"), because this
-disables that with FWFT. This means that vector misaligned loads and
-stores that were emulated instead get a SIGBUS.
+Fixes: 2e7c6feb4ef52 ("vfio/pds: Add multi-region support")
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+---
+ drivers/vfio/pci/pds/dirty.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-This happens on Sophgo SG2044 and SpacemiT K1. Notably this causes these
-platforms to fail Zicclsm which stipulates that misaligned vector memory
-accesses succeed if vector instructions are available at all [1].
-
-I'm not very certain why vector emulation support was omitted in this
-series. Should we perhaps add the same emulation support to Linux as
-well for the sake of these kind of platforms?
-
-Thanks,
-Vivian "dramforever" Wang
-
-[1]: https://github.com/riscv/riscv-profiles/issues/58
+diff --git a/drivers/vfio/pci/pds/dirty.c b/drivers/vfio/pci/pds/dirty.c
+index 481992142f79..4915a7c1c491 100644
+--- a/drivers/vfio/pci/pds/dirty.c
++++ b/drivers/vfio/pci/pds/dirty.c
+@@ -292,8 +292,11 @@ static int pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
+ 	len = num_ranges * sizeof(*region_info);
+ 
+ 	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
+-	if (!node)
+-		return -EINVAL;
++	if (!node) {
++		err = -EINVAL;
++		goto out_free_region_info;
++	}
++
+ 	for (int i = 0; i < num_ranges; i++) {
+ 		struct pds_lm_dirty_region_info *ri = &region_info[i];
+ 		u64 region_size = node->last - node->start + 1;
+-- 
+2.34.1
 
 
