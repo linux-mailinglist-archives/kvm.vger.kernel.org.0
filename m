@@ -1,171 +1,201 @@
-Return-Path: <kvm+bounces-66678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AE8CDD340
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 03:14:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF3AACDD58E
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 07:04:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 83A783025163
-	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 02:13:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D90103008796
+	for <lists+kvm@lfdr.de>; Thu, 25 Dec 2025 06:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68F7246778;
-	Thu, 25 Dec 2025 02:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A9E23D28C;
+	Thu, 25 Dec 2025 06:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XU6CLyrT";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSzMxfdM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BpUEj/gx"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E873239562
-	for <kvm@vger.kernel.org>; Thu, 25 Dec 2025 02:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5FC2AD32
+	for <kvm@vger.kernel.org>; Thu, 25 Dec 2025 06:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766628823; cv=none; b=Fbs97pG3EtNPRThvLqVWXs3tBtus4TTGGDSSmG+1SfhGiT7zy29XYt6WwvVIQ6bDrpNJb6JlBlV/3izao3jbo0+9pB6eJFQa8dOM0HYhs69+X5PpwrtLj9h4zZMPATHtvUuEAiImcFzzzwofJt9pjol8SNJv1LRlwXHn3g27m6Q=
+	t=1766642689; cv=none; b=bHPW7btYQu6LwZsKeORJTkvwZ3TYOEDDu661lF1zZsMylECb7p7Pta6quzWFExox1go/YaEykGiEg7e2Vj2IYAuJwI2t/4LE8js7JH18fEu97rfqARUWAt2uebtL9Czo1B5Pje/8TaPCmc6lrDBBK8nPnfnfgH9b0pGtM2dHNr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766628823; c=relaxed/simple;
-	bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C4dG1C7MBB+a+moPBhncoI9EBFV0n4Nf8xVEt9tIturFbCJCWm5o6mfaGY2a8G8oalUgXYGfhV9sWONi3Cx+A1d8PN0wEqWQIupRkzyYt6AETgDXbJ3w5XTrvruAF0but7r1f79azK6IPgTkM1/bpxDLI6/MMpFIPBc+0pN5Hhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XU6CLyrT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JSzMxfdM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766628820;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-	b=XU6CLyrT/VdgXEPoWY5trT2aCyyOmuRYA+09DjZfEikqemKZxoyH1SBg5Xh3fjEEP/HKw9
-	kliTWxSzsjq1Bs1D9jEWbATTsIUZNJ8T8KfR5Ple3NYWCT8bnU9pNgWZter0ImJTren6AM
-	WgRMRVMHVgSuw3dC41Cdygjqaf6Kxck=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-23DtI8VBPGWTuZARed3baw-1; Wed, 24 Dec 2025 21:13:38 -0500
-X-MC-Unique: 23DtI8VBPGWTuZARed3baw-1
-X-Mimecast-MFC-AGG-ID: 23DtI8VBPGWTuZARed3baw_1766628817
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34e5a9f0d6aso6353834a91.0
-        for <kvm@vger.kernel.org>; Wed, 24 Dec 2025 18:13:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766628817; x=1767233617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-        b=JSzMxfdMJyuCsS2OBbrEAl+zrz6JqtaRczEID9eoCqvzYVhaDJwxX7yolyRTjueKSE
-         gGhoKuN3bk1fehz3M7+kC/9kpUNlt3abGkxiVM7LPrWRsrYptYLfrgcp75gIPTNtgxF0
-         OBe1sAw4BfegBgPc3GGLiKUxWdsMGB1CR3DZOqos2cB1D855fGBiRP5e/SFe8T6kb3z4
-         FA0ofUTRi1m1Q232GXnMWgUGuqYfdaWfrJTsNpfWZdMsO1ZmgHrc7MXtZ7bj389jHGdA
-         5PlR1YrvRoBzyG1qYkPQtvG9MoQYky0+gtPmHW7KCzEZnS7bEOaiguWRakghW/hqG93k
-         KmcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766628817; x=1767233617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-        b=P4ypgSgipzp1qkv07tuRZdVeBWgTciS6poOxwylgNMxO5e9gwegbxjRxqpebEVdPoA
-         Av9zNYVrR4gHxjl3o3PTDXTCeEyWbeII0ydU+pQ2tJ0gDbHu0UWP9OMhf+UkYS/m94i9
-         D6mCVAGGmgefC19WMn1wdNnP3HW5stu42xG7oMXnZEigoC3QQ/ke6FmDxb2aZU9PQRsZ
-         CGjyzhzBnSiwAXtXqz6xAfZEwNQMNaj1xEg2OMPrTp42YYwM8z5ltiN0ZXkbqkL+N+0S
-         iu95XkTv9C830UNqYzjOWzMsiY7zn0YktzlHI/DzYZn0j+tyXk0dvmQLnSNyynTC+2J4
-         igPw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlUMH/EnyBtITmKucupQhLWZlMAUiQ/iVfXDKIjA2HtK8asE+I2bisnlKI7paunI209XU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKaB0ySOMzTCfzxTKP2N8XQpfxvVB+H7qBLhuxNc2jB9KVBwPY
-	9jqOPJBMf9/RKjhP/rJ0Uohrd+sW6zAUdcVlaw9fvRCaGVAO2BOD/TylkIgfmn+9WFKyTX++OSC
-	mkfOw/voVP1gvJlPjV0pB5K+Rp5pg3tiCNEwSuhy0c4U0/qTbFaNZOQvMty65O3JRBdfE+oGYsG
-	+zGzSHD3W5qgx42tg75djvJu9bUqfQPQvFsFYvr3U=
-X-Gm-Gg: AY/fxX56kJnFjr1HSAMV4bx6jyWPhodFvZnqoJxQERGTmGKznWTlIR2zyyLzcjZMtRX
-	sDW1gTiEnhDzjLDj2D+FrE0K+kaec+YR6aSr/FFiImLKDmo4OrWgPv20Dl4Iup/ccXL702K0yoW
-	g7tfFidX8vmBdEkc9HZT3hmCU6ISvNpOog1O4FMnLSGKPeJWEmYONRNHYveqaYjOeOdBjE
-X-Received: by 2002:a17:90b:17cf:b0:34b:75f4:96d3 with SMTP id 98e67ed59e1d1-34e71d80c4bmr18119985a91.5.1766628816957;
-        Wed, 24 Dec 2025 18:13:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwhbsMVHrIOb+o/clMZRBZzzVHUxqhhpyOgjv8QLYkGMTunA2LZlvhWcPpsC0hOAXEzKg6bxSfXCXXoKtYoEA=
-X-Received: by 2002:a17:90b:17cf:b0:34b:75f4:96d3 with SMTP id
- 98e67ed59e1d1-34e71d80c4bmr18119967a91.5.1766628816541; Wed, 24 Dec 2025
- 18:13:36 -0800 (PST)
+	s=arc-20240116; t=1766642689; c=relaxed/simple;
+	bh=OwoQ8LLuJ0L0BO2q3wFDVu0UQmtLzj2aPGVWbwQB6qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pvIaO4Ibh9Zi7j/owXSOFIUYubrbWeQgyj9WbH/bBgOZ4NvLPaHyyaHIP2wKRPDRWvvdvoa1J+ckogf3yXnd0X4xCkaNQPOmCOolzGiB1EyjyJ8ZqnRKdsZIXcuvVUObCatMS0qcj17TPCCWjn4JDpUKFXzx22Mm4FOoAclMkU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BpUEj/gx; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766642688; x=1798178688;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OwoQ8LLuJ0L0BO2q3wFDVu0UQmtLzj2aPGVWbwQB6qU=;
+  b=BpUEj/gxcUaGh4Irxgqk0o+J0RaQuEFjWshWUodZAvZVKSDReQNUFGEu
+   nYrAaiWkm95WNXWSK43mJB2ZKvhIoHBSPQwE5C7pYjTxlB+dkMzOeOSpx
+   KFDvk13GqCCJmuTehbVNAhC2J8r9RFxKdl5o1nilwdEBqn6SMOELitlP6
+   z5TvPwB9Jn9ivc4NbF/U1eOUBZhbW0bn+YBB86E5Q8Z3ble4dOdG16aHR
+   NxnT3e0LduHT5tLYeS4INGqwHdDzTFzsq0sKvOIAqqyGHq3pMPh7B4Ws5
+   xcgMDNIzyiFhtyL5KZuWZnwoI4Ie2nYXqXFfGfjiU+nDFeuSKDkegV6Sp
+   w==;
+X-CSE-ConnectionGUID: J86GGbVAToOze9e837vAdg==
+X-CSE-MsgGUID: f7qnNgi8QLqV63c0K0DuNQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11652"; a="68438980"
+X-IronPort-AV: E=Sophos;i="6.21,175,1763452800"; 
+   d="scan'208";a="68438980"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2025 22:04:48 -0800
+X-CSE-ConnectionGUID: OD2JONPuQUiPnMfdWSJ4gQ==
+X-CSE-MsgGUID: jwVrFT5VTH6Ppypzi1Icyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,175,1763452800"; 
+   d="scan'208";a="200466995"
+Received: from lkp-server02.sh.intel.com (HELO dd3453e2b682) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 24 Dec 2025 22:04:45 -0800
+Received: from kbuild by dd3453e2b682 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vYeSo-000000003nt-2txd;
+	Thu, 25 Dec 2025 06:04:42 +0000
+Date: Thu, 25 Dec 2025 14:04:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yanfei Xu <yanfei.xu@bytedance.com>, pbonzini@redhat.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	kvm@vger.kernel.org, caixiangfeng@bytedance.com,
+	fangying.tommy@bytedance.com, yanfei.xu@bytedance.com
+Subject: Re: [PATCH] KVM: irqchip: KVM: Reduce allocation overhead in
+ kvm_set_irq_routing()
+Message-ID: <202512251312.VbcflZDz-lkp@intel.com>
+References: <20251224023201.381586-1-yanfei.xu@bytedance.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251218091050.55047-1-15927021679@163.com> <CACGkMEvbrF=g0_yedXKsccVN6vmfm+oQVbRkR1PGtQgFHH+v3g@mail.gmail.com>
- <3a4733b.8bcf.19b4fb2b303.Coremail.15927021679@163.com>
-In-Reply-To: <3a4733b.8bcf.19b4fb2b303.Coremail.15927021679@163.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 25 Dec 2025 10:13:25 +0800
-X-Gm-Features: AQt7F2qv14pEjpotcQVKXINUs_y7jmmFmHc1_NfnTrxSaTXcN2AvZ9sBp2_RjGE
-Message-ID: <CACGkMEtZUpTG5fG5+JvJw=4RGDo89xoXQjkLyLnWVXHx1gUW7g@mail.gmail.com>
-Subject: Re: Re: Implement initial driver for virtio-RDMA device(kernel)
-To: =?UTF-8?B?54aK5Lyf5rCR?= <15927021679@163.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Thomas Monjalon <thomas@monjalon.net>, 
-	David Marchand <david.marchand@redhat.com>, Luca Boccassi <bluca@debian.org>, 
-	Kevin Traynor <ktraynor@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xueming Li <xuemingl@nvidia.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, 
-	Chenbo Xia <chenbox@nvidia.com>, Bruce Richardson <bruce.richardson@intel.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	Yongji Xie <xieyongji@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251224023201.381586-1-yanfei.xu@bytedance.com>
 
-On Wed, Dec 24, 2025 at 5:32=E2=80=AFPM =E7=86=8A=E4=BC=9F=E6=B0=91 <159270=
-21679@163.com> wrote:
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
-> At 2025-12-23 09:16:40, "Jason Wang" <jasowang@redhat.com> wrote:
-> >On Thu, Dec 18, 2025 at 5:11=E2=80=AFPM Xiong Weimin <15927021679@163.co=
-m> wrote:
-> >>
-> >> Hi all,
-> >>
-> >> This testing instructions aims to introduce an emulating a soft ROCE
-> >> device with normal NIC(no RDMA), we have finished a vhost-user RDMA
-> >> device demo, which can work with RDMA features such as CM, QP type of
-> >> UC/UD and so on.
-> >>
-> >
-> >I think we need
-> >
-> >1) to know the difference between this and [1]
-> >2) the spec patch
-> >
-> >Thanks
-> >
->
-> >[1] https://yhbt.net/lore/virtio-dev/CACycT3sShxOR41Kk1znxC7Mpw73N0LAP66=
-cC3-iqeS_jp8trvw@mail.gmail.com/T/#m0602ee71de0fe389671cbd81242b5f3ceeab010=
-1
->
->
-> Sorry, I can't access this webpage link. Is there another way to view it?
+Hi Yanfei,
 
-How about this?
+kernel test robot noticed the following build warnings:
 
-https://lore.kernel.org/virtio-comment/20220511095900.343-1-xieyongji@byted=
-ance.com/
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on kvm/next linus/master v6.19-rc2 next-20251219]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks
+url:    https://github.com/intel-lab-lkp/linux/commits/Yanfei-Xu/KVM-irqchip-KVM-Reduce-allocation-overhead-in-kvm_set_irq_routing/20251224-103451
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20251224023201.381586-1-yanfei.xu%40bytedance.com
+patch subject: [PATCH] KVM: irqchip: KVM: Reduce allocation overhead in kvm_set_irq_routing()
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20251225/202512251312.VbcflZDz-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251225/202512251312.VbcflZDz-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512251312.VbcflZDz-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/kvm/../../../virt/kvm/irqchip.c:190:6: warning: variable 'r' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     190 |         if (!e)
+         |             ^~
+   arch/x86/kvm/../../../virt/kvm/irqchip.c:233:9: note: uninitialized use occurs here
+     233 |         return r;
+         |                ^
+   arch/x86/kvm/../../../virt/kvm/irqchip.c:190:2: note: remove the 'if' if its condition is always false
+     190 |         if (!e)
+         |         ^~~~~~~
+     191 |                 goto out;
+         |                 ~~~~~~~~
+   arch/x86/kvm/../../../virt/kvm/irqchip.c:176:7: note: initialize the variable 'r' to silence this warning
+     176 |         int r;
+         |              ^
+         |               = 0
+   1 warning generated.
+
+
+vim +190 arch/x86/kvm/../../../virt/kvm/irqchip.c
+
+   167	
+   168	int kvm_set_irq_routing(struct kvm *kvm,
+   169				const struct kvm_irq_routing_entry *ue,
+   170				unsigned nr,
+   171				unsigned flags)
+   172	{
+   173		struct kvm_irq_routing_table *new, *old;
+   174		struct kvm_kernel_irq_routing_entry *e;
+   175		u32 i, j, nr_rt_entries = 0;
+   176		int r;
+   177	
+   178		for (i = 0; i < nr; ++i) {
+   179			if (ue[i].gsi >= KVM_MAX_IRQ_ROUTES)
+   180				return -EINVAL;
+   181			nr_rt_entries = max(nr_rt_entries, ue[i].gsi);
+   182		}
+   183	
+   184		nr_rt_entries += 1;
+   185	
+   186		new = kzalloc(struct_size(new, map, nr_rt_entries), GFP_KERNEL_ACCOUNT);
+   187		if (!new)
+   188			return -ENOMEM;
+   189		e = kcalloc(nr, sizeof(*e), GFP_KERNEL_ACCOUNT);
+ > 190		if (!e)
+   191			goto out;
+   192		new->entries_addr = e;
+   193	
+   194		new->nr_rt_entries = nr_rt_entries;
+   195		for (i = 0; i < KVM_NR_IRQCHIPS; i++)
+   196			for (j = 0; j < KVM_IRQCHIP_NUM_PINS; j++)
+   197				new->chip[i][j] = -1;
+   198	
+   199		for (i = 0; i < nr; ++i) {
+   200			r = -EINVAL;
+   201			switch (ue->type) {
+   202			case KVM_IRQ_ROUTING_MSI:
+   203				if (ue->flags & ~KVM_MSI_VALID_DEVID)
+   204					goto out;
+   205				break;
+   206			default:
+   207				if (ue->flags)
+   208					goto out;
+   209				break;
+   210			}
+   211			r = setup_routing_entry(kvm, new, e + i, ue);
+   212			if (r)
+   213				goto out;
+   214			++ue;
+   215		}
+   216	
+   217		mutex_lock(&kvm->irq_lock);
+   218		old = rcu_dereference_protected(kvm->irq_routing, 1);
+   219		rcu_assign_pointer(kvm->irq_routing, new);
+   220		kvm_irq_routing_update(kvm);
+   221		kvm_arch_irq_routing_update(kvm);
+   222		mutex_unlock(&kvm->irq_lock);
+   223	
+   224		synchronize_srcu_expedited(&kvm->irq_srcu);
+   225	
+   226		new = old;
+   227		r = 0;
+   228		goto out;
+   229	
+   230	out:
+   231		free_irq_routing_table(new);
+   232	
+   233		return r;
+   234	}
+   235	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
