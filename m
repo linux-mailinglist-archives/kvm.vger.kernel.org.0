@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-66711-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66712-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F83CDEC89
-	for <lists+kvm@lfdr.de>; Fri, 26 Dec 2025 16:08:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D74EACDEC95
+	for <lists+kvm@lfdr.de>; Fri, 26 Dec 2025 16:09:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0347B3009C34
-	for <lists+kvm@lfdr.de>; Fri, 26 Dec 2025 15:08:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD2BB30255BA
+	for <lists+kvm@lfdr.de>; Fri, 26 Dec 2025 15:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AB524C676;
-	Fri, 26 Dec 2025 15:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162BE252917;
+	Fri, 26 Dec 2025 15:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="IqAskk4Q"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="KRrne3jc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E2024886A;
-	Fri, 26 Dec 2025 15:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B1A248891;
+	Fri, 26 Dec 2025 15:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766761701; cv=none; b=KqPxqNUKUWgnRWlMtklCnx1/Os6bVc6WIaxgYTpGmkNRvZ+b94vs1c60tjnt+Gg/1dz8zLulErXvnAO6wk7ROg1ivnAFp+1tb5WpYZUhdt7lMaLVfEeh2hI0qiYD9TkPHSsS06Sx/Wd8bZmSe4A8CpdlU2HfMmt+gd+SmuNp8JE=
+	t=1766761715; cv=none; b=gZN8mMEuWgfJR/VqFKwurCszu/Xg5dENzDbXgqZjkV6wja1dIjZB7YIhvXR6bA3da+62AuQKmOTiOgsOIr1dfKwVhwk19uuINvF47ucYtYOzTErAFIcL8NFNG7Qx92GKSVZpGOYt812MH66fJHio88cuxgNP72pBWTSeN6gbG2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766761701; c=relaxed/simple;
-	bh=uXxLR0MGTqOzFrqXX4Ne6S9wWwXR3kK+OXiCgCprU2Y=;
+	s=arc-20240116; t=1766761715; c=relaxed/simple;
+	bh=76qE1+cU/nVx7gkBkJGi1456blDzExtWHQs+4qo0GHM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LJ+KYNcvkEwJm6xPPYR9MRkUi5MV3yLXVIrc7poCE/k2M3o7jiFv1z49Ieb03yT+NhTmfLiYcuWEPISrJ8yOZQ6hhhu6c4tSA/qlfMgyzM01HrGVUR2s2DZ5FYQ6z4uN+e/21XYzkC3AFNJFxXDNhfl14sR8Q3fyBc7+5Ar+ZMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=IqAskk4Q; arc=none smtp.client-ip=54.206.34.216
+	 MIME-Version; b=kLdSVMYQcadZThPBcPBDinFUFMUZ7oE1L92/bCShv2QGlcsMcdVtNm3uNQ6fH9OnASJCH7/dkAaqKSHiBtFDlOTGUn8AzU6nR3AeRRpJbu+yTPP/9mcJNnDgxV/NP2XKcQPVLVbJHACWM1oovJJ5+WJDWjbbTkxfTfpxZ+tk5mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=KRrne3jc; arc=none smtp.client-ip=18.194.254.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1766761679;
-	bh=H/ljW3XaP6vzoo1T1qMzrSYeqbnkzt5TovpDcS9Twv8=;
+	s=onoh2408; t=1766761685;
+	bh=gAA8ercDf/MBI9jGYZi3I+nHltQEY5W8JCzCFw10xbg=;
 	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=IqAskk4QzdiMC3x+SK9SRDXk+W4HQ0efH3LPpqZ6KMheBhBzrmW3fml+2GWbhrhIC
-	 BbMK1R7FkOfTx2W8uXDLK0dyan5zKqGNpUepJ64YhDzkeKIJYzcbgeLZd7PgYUTOZi
-	 l6LoqOtho1CyOO9chSLjULiT5bJK5xsGNLxT61js=
-X-QQ-mid: zesmtpgz9t1766761674t914098cb
-X-QQ-Originating-IP: ENZ2oCc4iZCQyWcVmDUCsDXsw32lUBmpKWAWS3IE+I4=
+	b=KRrne3jchrI+y1qLUhZnvL/o1IFWPF3NOGzUJOk6tBTij3PGtdLNg+NMnm4+ZTINT
+	 aMvGrWSiqLDzUKIKbJO7dw5FVH6eNbJbCsWTUyXNsH0kLxIJLrYd+ph3BikPr3qE9z
+	 xbDBDEwY37FyqZAWKgQYyQatifsmnzSQZm6w1tJo=
+X-QQ-mid: zesmtpgz9t1766761680td78bb22e
+X-QQ-Originating-IP: IAZD2qB3oP1GJHKGhPt5DXJjFbmGIk9+HCgeAASKpdg=
 Received: from localhost.localdomain ( [123.114.60.34])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 26 Dec 2025 23:07:47 +0800 (CST)
+	id ; Fri, 26 Dec 2025 23:07:56 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 752817031373649488
+X-BIZMAIL-ID: 9278752954791636414
 EX-QQ-RecipientCnt: 8
 From: Qiang Ma <maqianga@uniontech.com>
 To: zhaotianrui@loongson.cn,
@@ -54,9 +54,9 @@ Cc: kvm@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Qiang Ma <maqianga@uniontech.com>
-Subject: [PATCH 2/3] LoongArch: KVM: Fix kvm_device leak in kvm_ipi_destroy
-Date: Fri, 26 Dec 2025 23:07:05 +0800
-Message-Id: <20251226150706.2511127-3-maqianga@uniontech.com>
+Subject: [PATCH 3/3] LoongArch: KVM: Fix kvm_device leak in kvm_eiointc_destroy
+Date: Fri, 26 Dec 2025 23:07:06 +0800
+Message-Id: <20251226150706.2511127-4-maqianga@uniontech.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20251226150706.2511127-1-maqianga@uniontech.com>
 References: <20251226150706.2511127-1-maqianga@uniontech.com>
@@ -69,51 +69,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: Of5NOHXWTvQUWQM6enTE9jKV5SgmBxm109sJQjaTdSUBluvWWEH47CJJ
-	wL4aYcfJrYUKRY1RiaS5gL8uWcomG4v2Hzupqt+qnSOR7UB8KTIdX4wpxWSuBt9NV/nXAxP
-	H93murCB3N5SuGh+Kh8UaVCYsA4I80VN3nOQvOp2LybM9lUSg3V8+ko7LhFm+bIs+G++hhq
-	7KhudpYiWkKY4CcaF/NetrQHXFDAezRXQRx9BYbIubLqyVb8mnwpygClX7cPiXRNSG0aJC4
-	65uzg9nh1H5GnYf683ZiW1OTIGDI5yZiWneKXuikCDouY6bk+1NsZnzcD6JwPrZhwUW28o2
-	NRqDQTAC1NNCoKlY1UQMs8jpuVnVmkc2+6JYyaEPmu8RT7rN+HYZuHS+GYVcOBFI9Q5UQ5O
-	PC+vxxPgkypsJMTR/tWL2m3EThMSnbFaGXSo5MgyRV3XRuWEAOSebV9GyqmiBQ+p6QvK4RJ
-	MhgKSX/B20kpAvM50p2CwoZdcgZsUWtD0J9mhOlJ4Hq9Jro9iE8MCp2uS0O7HSdOi4jxTfp
-	uPvQlklwZeIovUBs1XSy+OjdgrDUWJnzR4El1DFFKJCt4vYlSD0PjZ34Iy1VCHWiGuQawV5
-	pYNDguBsNZyssit83IaUvenJs5MpKhd7xjJMkDARTYcDAnF9jAlZ44zBl0xWY7T5XJkSB9F
-	xmWz51S6dvBId1ENh5gK/45/cKwufayK5PZUjvjPLNwnnYaZ8kL/Pg73x+qQkwnFGcjLnL1
-	cTSvBtozGCFlXROFSDEyXa2yJ8Li8Djar8wQeDdxXEY5k6WuOkwQPfJhEIZ+NzDhzlvjCIi
-	j8BmqdlR4qlSLBUK5hu4jddg58dmURVWGFDI4AekD+GNm0kiv4A6NoQs8S+gYkYohMu+sU5
-	TLrKkDODLpWCsAMJgh2pEUtkeTFXH4aozc39R6S9iGOCOuUsRmDBLKoTK1GVxZsDQUSjWxD
-	r+J18hA3HwXv9LPC4+jlAYqEp6g+Ul6f/tMVxPvqg6xzYdjGrjOj6MZ+mkhHRgHA0R5QYc6
-	X/p+6x6EXTN97s2WXZYWBRmokpYWu1FmiFxzTTEvxcvBZZlcnXPokeCKcnAqcIT76ZdoUqe
-	4mJqOylhaLQM76OoQmECn0EnM19KnDgwWFxxK/8oaPa
+X-QQ-XMAILINFO: MJGq/3UMnf82C1EgfPv3Cck32TYRKw7Dv4E6iP74ymDimHJiSqWyK7BV
+	O4sKxb/yFmRxod6gFjFpNd0vbQAibw1ev/4xeEURCe1UTCmcYNanbeNs6EWRlBF5L+MipDx
+	IAy3SJoO7ydocLMeJgaiBk26u43IPDSyLCjk00Jt/LUK8UAYOKky5Ui1Hbv5U6eW0Ip9omN
+	TjtZPwzQNziYD7nLB3qRcZAMPxTBvBncDcPCSGD6JqpJoAWWy22iVUMny7bbXRvyNgM6UDl
+	Vn5Aldbb3r+OJF3PcBc+mG/3UC73PxxOcaI3d7kilYcuY1LAe+dfjdZe8jGPyk8zBgZUFQd
+	Q/xtBtakLa1ftHhfklPMW6QE0R9fOqurt52LsAZuuNs+bvF4oMaXMG7QC8J33ZOhPoY1Fak
+	uLRmN3wPS42OjGSWHVOlNqjsn/yMDg8vZ9VUMEZ7YVyICK0FaLWCGu2Vksstsy9nPpNokgq
+	b26GPbm3xQe4nNpTNw5AgjvvYqpC/kKglQuPtdUQ8jJB/9QSo8tmtiYQdVAExkh1gfAnUTU
+	PhxN/jvY+1R5vNTKR23oxn0/R16vEq57RjcqlrLBvc7h5VSL3xvz/EpUeyLeaA+2o/t0gJa
+	/r4KS3Tq7N8/tZGcRJENbcYl3cynBZf4u0CacrMd+eEkcv0fucS8L9Img7dZavx2GqUt3uq
+	AUuImNoVAKCNrrwzolKnbF47qVNiK8WHiVwfY+XlwXgz4aHgOYoYrsKzG/OSAZT2C7V5+ay
+	+G6HjH9c1Od1PKyfyTvgTlzta9hrcDNDTF5d6LmLVEBl7u3PivClTVo5jHS0yF6EMn7ssgP
+	EVsXawAq3PXhgP8WvY1KymbFCSyy3jap1rieSRKefpsKWwjZG608gbItiO58vVCpvQ1H+2O
+	MGtyfT/vhNTEsSmp6Ph3JBieZhtDRnztcuoE4stqsExeKzvlQR8Sz/kXPJOFxPP1po/iVMO
+	9J1FqanpnbDQXaQkMBsAb2fb1voAZbBV2o1uY0p2eoffVqaknNrTPRkSv786o3hIdC8O3XC
+	n6T+v2h7Ymn76wQovn/Z6Mxj5GoALftN5hVSiJVAMafhcjOTXEqDXHJVJA6cmIWQMDKdnYk
+	9Ak7KKmeDrY
 X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
 X-QQ-RECHKSPAM: 0
 
 In kvm_ioctl_create_device(), kvm_device has allocated memory,
 kvm_device->destroy() seems to be supposed to free its kvm_device
-struct, but kvm_ipi_destroy() is not currently doing this, that
-would lead to a memory leak.
+struct, but kvm_eiointc_destroy() is not currently doing this,
+that would lead to a memory leak.
 
 So, fix it.
 
 Signed-off-by: Qiang Ma <maqianga@uniontech.com>
 ---
- arch/loongarch/kvm/intc/ipi.c | 2 ++
+ arch/loongarch/kvm/intc/eiointc.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/arch/loongarch/kvm/intc/ipi.c b/arch/loongarch/kvm/intc/ipi.c
-index 05cefd29282e..77169bf49f3f 100644
---- a/arch/loongarch/kvm/intc/ipi.c
-+++ b/arch/loongarch/kvm/intc/ipi.c
-@@ -459,6 +459,8 @@ static void kvm_ipi_destroy(struct kvm_device *dev)
- 	ipi = kvm->arch.ipi;
- 	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &ipi->device);
- 	kfree(ipi);
+diff --git a/arch/loongarch/kvm/intc/eiointc.c b/arch/loongarch/kvm/intc/eiointc.c
+index 29886876143f..cb94c7e8267a 100644
+--- a/arch/loongarch/kvm/intc/eiointc.c
++++ b/arch/loongarch/kvm/intc/eiointc.c
+@@ -679,6 +679,8 @@ static void kvm_eiointc_destroy(struct kvm_device *dev)
+ 	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->device);
+ 	kvm_io_bus_unregister_dev(kvm, KVM_IOCSR_BUS, &eiointc->device_vext);
+ 	kfree(eiointc);
 +	/* alloc by kvm_ioctl_create_device, free by .destroy */
 +	kfree(dev);
  }
  
- static struct kvm_device_ops kvm_ipi_dev_ops = {
+ static struct kvm_device_ops kvm_eiointc_dev_ops = {
 -- 
 2.20.1
 
