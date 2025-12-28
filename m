@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-66726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49121CE5753
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 21:48:12 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE9DCE5756
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 21:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4EB82300983B
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 20:48:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 82B4C30010FA
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 20:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832FA275AFD;
-	Sun, 28 Dec 2025 20:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F3F27FB34;
+	Sun, 28 Dec 2025 20:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="B1E0wpsM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b+8+aWpM"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="NFKUvsh7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TlYe/woh"
 X-Original-To: kvm@vger.kernel.org
 Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8170F38DD3;
-	Sun, 28 Dec 2025 20:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0DB22256F;
+	Sun, 28 Dec 2025 20:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766954878; cv=none; b=EwSbI9O+a6eucsgVl3JcXWrAIVoDoVb5pZ/xJJusL2J7qWJdlEFRW6LjGkPvMkstRk3YrSFufUf9/VnldvLXqFqd9YJQUu++Q9hsuVuMRYh2KMQ5QJ+j/Mc5ohfNrxygkO9A4eGTHEiyGMY4RpNMIJkcYocH7Q/l38TqavVtgOE=
+	t=1766954889; cv=none; b=Hh4sOXpZI9GxkyCgOv2Jk+iIcvlb2141FgLcgMTk8rUpbY7S+DPBL98xHkJplwzJkiuUc6kZ8EZNLlaBXTMr0Q7BppeaNtc8D8L+h09GJ6zlMAt4i0hvKFwSz5DcEx3P2+Mu02xiyWEchzCP0nhgSs/ohn6fp7taXdZdlBMqOHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766954878; c=relaxed/simple;
-	bh=YymCIV37LwleL4G3xZsnr9uhARJyzYmZKmlEssmIjDc=;
+	s=arc-20240116; t=1766954889; c=relaxed/simple;
+	bh=Ol9zMwLZf+HQas0pyHTmH8ZqnpB+E40UMR1Tr1zIdPo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DQE/iLAYS/gSIJYEcTHRKz0z5Zwk1wI1OHaJB7Nfrp6l6qdgK5Dhxhp7IA/Kxrosf5b0ePje5980M/hp9+rH5SJiIVFRHo3pubOU1DoEz/wB1jsgZsQX0QeGsxJjNkFsA+j5raxMx4ZzDuTMPP+iG2BrwkD14wBjWV5ahWxY12k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=B1E0wpsM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=b+8+aWpM; arc=none smtp.client-ip=202.12.124.153
+	 MIME-Version:Content-Type; b=NA7VTTawGEeYQrKx+T7dPtrilcVMMT/MgMvHzW7j9hRp5olYgC5oRe5jZYJgd9QEctDOc0NwUeb6/+839G78N0m4Lp4VekaT/v16y6VI4VZ/Hc9zwzlUMLOyIthsJnLhlbNxmo9/hJNvZdz8nDsfEnZ9Ef8PyfmYDbzCmriXvPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=NFKUvsh7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TlYe/woh; arc=none smtp.client-ip=202.12.124.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 687037A003E;
-	Sun, 28 Dec 2025 15:47:53 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Sun, 28 Dec 2025 15:47:53 -0500
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 83AFD7A031C;
+	Sun, 28 Dec 2025 15:48:04 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Sun, 28 Dec 2025 15:48:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1766954873;
-	 x=1767041273; bh=zCs4nzBuBnhRnTykVVN9yu/lt4v+RVgzy+LGuBY9dno=; b=
-	B1E0wpsMvUgsX1Dy4Tq+/nCqmI7VDfVd1v9Hducm5h6hMYU0qImbGoSRxVcd3Iek
-	6oHsQ9RcveXZ/0L514JyEftWJXnpWJ+CG6o8YGm7KRcM5LOZrsPq0FdgPeZJetIc
-	WtplHshqgTXlbezh2/lSPw4bBcJM0GUh5g99vKKObCZ9oTC8U7kEwPowd9GBD7Eh
-	6a2/lke4285/q4ubCaJ7q3CbJ2AYZbPJQU83CBg7EMeOW+hvxthlPC1pTbxiQkql
-	cI3Zirs7xKlLyVjP5/v/SiIokLufWTsP6rcyiut3Xg9d5TbuynEB2EwabsseiGpa
-	svVnHIj+nXLyRSm6KBf7Zw==
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1766954884;
+	 x=1767041284; bh=stmomKs5w9KPTMilxwJpAtcHDNCZFqnQi0xKX7GpdkU=; b=
+	NFKUvsh7sSjNnclgLQtHS2XztgLH8JgYCzfSZ/kpkL/FRblqetbygnKnfOGFve5x
+	KuAStxpdY4SniMQ2mTE3KaRw812BJYC4YQacXsXWz7qIDGJoPyNh5mVqDzfCdx90
+	rcBhpOW36Eo38+25lzOqz8PUrdndDSTrArLrq45sFAzPXuzsKE5LKaOUrRhW59TR
+	kC2Pql5z7OdotdwgmEbtTl+pWmI/aQUAfQ7lDAqzTNeArsRZQd9Suc7ytUQSK34y
+	n73hzfgF/kyugFNvUT8n1qIhcJY6t4qJXP2jjyJOVv/rC3L3+I9EcrsDNv84NZ1w
+	CufRHJTx9Pj9kWG7TOa9AA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1766954873; x=
-	1767041273; bh=zCs4nzBuBnhRnTykVVN9yu/lt4v+RVgzy+LGuBY9dno=; b=b
-	+8+aWpMML/R/KdgsmsVRl2tF89OE7xPUh6/lQa6CvvBPLYbUZKAyL18AUG+UgDGp
-	5Awgq0ae9q4EIDttxDB+BsuiMDsPgWSNF/aq82+Gk+NtGEsX0Xaq5wx0wg4hxxoe
-	mSUQld+gFBQpXyxsCGaCKO1NaUAcSavSeVmafCO2RgITbklT/6tJ3J9FEl/oTOyQ
-	L8u4Uk654M00lEUDi/Qy7xhADC3+0SRketawlv68pZR4FevtSt2hTiK0TEOOa5sf
-	vmmFtfQZaEmkL2Ovs6EYTobYLGje4wh2LRLUZDc1lt5TIqfcXFyn0n7XXJ34/fdK
-	EIN12P4RdlvuYMSChwlhQ==
-X-ME-Sender: <xms:eJdRaX6pByRjYFLodUhBal1Wo9pNxfC9NLe77vZUOFVlyPxCHZldDQ>
-    <xme:eJdRaYmXWDFC0N2cWjBVoMY81deCzwgjZiNkno7DMLP7NPSWSZJdJAtIlEkVU478A
-    kohxUTMvh5boYaWjHowvcKVrDr2CiLl7xUjWA8Qy4H9gbkUqp_qVw>
-X-ME-Received: <xmr:eJdRaa6cnktFC1Du_70gpyRojnIlUFNwEYvBzXGVZL_ZRvhHEz9dZBxUR0E>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1766954884; x=
+	1767041284; bh=stmomKs5w9KPTMilxwJpAtcHDNCZFqnQi0xKX7GpdkU=; b=T
+	lYe/wohkAHFaxZThgD5iVL+k83+yaVrPMr7N4KYqMGDyCptqeJSCTCFegmni8hsb
+	42ZTXY6rhFH14ur8/eczdRqY9dscooc9xcUeMz8WVHEhRyc69dZkMtu3g1fCl44j
+	FB1Vc41Wp3Z9OUCSdQJesnN/r9WLVCBkFgikR4lKRbDXfi+7OnVxPmIGJI7ILM9n
+	HsNfsg4bcCv1chgDCWwUG0ZcCUBn5gOiGThkYE8pAxbErhdbKgJlpDqW3k2z0Luq
+	0rxHL8VWzbBwYcDWSeqtIatCnm0IgQ+DlHi+9jXMNQE1PBvY7bFmn9k7NJzkfkts
+	BhxIERT41aL5+cRgZ9ikg==
+X-ME-Sender: <xms:g5dRafxwV9FsC59vj4kA2h1ktk9jtz8eLQiY-DjkWk1sb5vEuWDEEg>
+    <xme:g5dRaTHuPh9-N_qthCAPpCWqGQBCt2UB3DU5xmbNfhSIaRWZQ7E5PqxNK-2KKlXr1
+    VPxnGE2efsoalXXjz7NoW04NyjuMlLAUuu2PiLqR9BB0kQkJkDMgA>
+X-ME-Received: <xmr:g5dRaUuqSLMb3ce8etAyOuFDY_oVJlRwH1dKdUYWHWAjF_OCY2Fbo2qzvs0>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdejhedviecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
     ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
@@ -70,33 +70,36 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdejhedviecutefuodetgg
     lhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrghtth
     gvrhhnpeetteduleegkeeigedugeeluedvffegheeliedvtdefkedtkeekheffhedutefh
     hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlh
-    gvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhht
-    phhouhhtpdhrtghpthhtohepiihilhhinhesshgvuhdrvgguuhdrtghnpdhrtghpthhtoh
-    epjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrghihhesnhhvihguihgr
-    rdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtghomh
-    dprhgtphhtthhopehkvghvihhnrdhtihgrnhesihhnthgvlhdrtghomhdprhgtphhtthho
-    pegsrhgvthhtrdgtrhgvvghlvgihsegrmhgurdgtohhmpdhrtghpthhtohepkhhvmhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhes
-    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjihgrnhhhrghordiguhessh
-    gvuhdrvgguuhdrtghn
-X-ME-Proxy: <xmx:eJdRaRTi0mPXlxVxUVnQzaiJGYJTyQiz1saZxahs7X7Vyjkk0wt9Sw>
-    <xmx:eJdRaQyyWpNc6lF3cGqu3eQL-cXo2l9lOak83Wc8ly6zaZXfut7fpw>
-    <xmx:eJdRaRoAZViD41sbTq-NzcIBnHO2iB7y1owgxUHQER-yq6aXsV4oMA>
-    <xmx:eJdRab13gsear2FNQNU-VxWnjbioUwWjv3Jz67awzGoFrjeqP1Ke0Q>
-    <xmx:eZdRabm56C4G8En51o-7_SptKtq-olfzHO_Dbx-M6YeBnBLz1XqCiy6Q>
+    gvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepuddupdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopegrlhhpvghrhigrshhinhgrkhdusehgmhgrihhlrdgtoh
+    hmpdhrtghpthhtohepmhhitghhrghlrdifihhnihgrrhhskhhisehinhhtvghlrdgtohhm
+    pdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrghihh
+    esnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhi
+    ughirgdrtghomhdprhgtphhtthhopehkvghvihhnrdhtihgrnhesihhnthgvlhdrtghomh
+    dprhgtphhtthhopehthhhomhgrshdrhhgvlhhlshhtrhhomheslhhinhhugidrihhnthgv
+    lhdrtghomhdprhgtphhtthhopehrohgurhhighhordhvihhvihesihhnthgvlhdrtghomh
+    dprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:g5dRaTAhwtiqhhDwWv05hoX3qUoQ9Gn1XAq05zlaIo0yaU-jYb0Hwg>
+    <xmx:g5dRafDXQzM9UNWhax1sGC4cY29v_LoG2k4LGcRHDW3wXBSwiTnzOw>
+    <xmx:g5dRadpiIyTN_Sx3e8zMLgDrX6WthoI-enrA4zGbX7h7pSCUjdUVhA>
+    <xmx:g5dRaaEAciTqumbPyQeyI1qJtoC49N-o2KRrUtM8A9_AUjcWlqKc7A>
+    <xmx:hJdRabh8KzAYwhbu7ke6oEdxIrQpnjEkWKltGMkfIqNsnW8uzkzuaWgH>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 28 Dec 2025 15:47:51 -0500 (EST)
-Date: Sun, 28 Dec 2025 13:47:49 -0700
+ 28 Dec 2025 15:48:02 -0500 (EST)
+Date: Sun, 28 Dec 2025 13:48:01 -0700
 From: Alex Williamson <alex@shazbot.org>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: jgg@ziepe.ca, yishaih@nvidia.com, skolothumtho@nvidia.com,
- kevin.tian@intel.com, brett.creeley@amd.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-Subject: Re: [PATCH] vfio/pds: Fix memory leak in pds_vfio_dirty_enable()
-Message-ID: <20251228134749.128276c4.alex@shazbot.org>
-In-Reply-To: <20251225143150.1117366-1-zilin@seu.edu.cn>
-References: <20251225143150.1117366-1-zilin@seu.edu.cn>
+To: Alper Ak <alperyasinak1@gmail.com>
+Cc: michal.winiarski@intel.com, Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas
+ <yishaih@nvidia.com>, Shameer Kolothum <skolothumtho@nvidia.com>, Kevin
+ Tian <kevin.tian@intel.com>, Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?=
+ <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ kvm@vger.kernel.org, intel-xe@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/xe: Fix use-after-free in xe_vfio_pci_alloc_file()
+Message-ID: <20251228134801.074ed34c.alex@shazbot.org>
+In-Reply-To: <20251225151349.360870-1-alperyasinak1@gmail.com>
+References: <20251225151349.360870-1-alperyasinak1@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -106,40 +109,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 25 Dec 2025 14:31:50 +0000
-Zilin Guan <zilin@seu.edu.cn> wrote:
+On Thu, 25 Dec 2025 18:13:49 +0300
+Alper Ak <alperyasinak1@gmail.com> wrote:
 
-> pds_vfio_dirty_enable() allocates memory for region_info. If
-> interval_tree_iter_first() returns NULL, the function returns -EINVAL
-> immediately without freeing the allocated memory, causing a memory leak.
+> migf->filp is accessed after migf has been freed. Save the error
+> value before calling kfree() to prevent use-after-free.
 > 
-> Fix this by jumping to the out_free_region_info label to ensure
-> region_info is freed.
-> 
-> Fixes: 2e7c6feb4ef52 ("vfio/pds: Add multi-region support")
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> Fixes: 1f5556ec8b9e ("vfio/xe: Add device specific vfio_pci driver variant for Intel graphics")
+> Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
 > ---
->  drivers/vfio/pci/pds/dirty.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  drivers/vfio/pci/xe/main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/vfio/pci/pds/dirty.c b/drivers/vfio/pci/pds/dirty.c
-> index 481992142f79..4915a7c1c491 100644
-> --- a/drivers/vfio/pci/pds/dirty.c
-> +++ b/drivers/vfio/pci/pds/dirty.c
-> @@ -292,8 +292,11 @@ static int pds_vfio_dirty_enable(struct pds_vfio_pci_device *pds_vfio,
->  	len = num_ranges * sizeof(*region_info);
+> diff --git a/drivers/vfio/pci/xe/main.c b/drivers/vfio/pci/xe/main.c
+> index 0156b53c678b..8e1595e00e18 100644
+> --- a/drivers/vfio/pci/xe/main.c
+> +++ b/drivers/vfio/pci/xe/main.c
+> @@ -250,6 +250,7 @@ xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
+>  	struct xe_vfio_pci_migration_file *migf;
+>  	const struct file_operations *fops;
+>  	int flags;
+> +	int ret;
 >  
->  	node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
-> -	if (!node)
-> -		return -EINVAL;
-> +	if (!node) {
-> +		err = -EINVAL;
-> +		goto out_free_region_info;
-> +	}
-> +
->  	for (int i = 0; i < num_ranges; i++) {
->  		struct pds_lm_dirty_region_info *ri = &region_info[i];
->  		u64 region_size = node->last - node->start + 1;
+>  	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
+>  	if (!migf)
+> @@ -259,8 +260,9 @@ xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
+>  	flags = type == XE_VFIO_FILE_SAVE ? O_RDONLY : O_WRONLY;
+>  	migf->filp = anon_inode_getfile("xe_vfio_mig", fops, migf, flags);
+>  	if (IS_ERR(migf->filp)) {
+> +		ret = PTR_ERR(migf->filp);
+>  		kfree(migf);
+> -		return ERR_CAST(migf->filp);
+> +		return ERR_PTR(ret);
+>  	}
+>  
+>  	mutex_init(&migf->lock);
 
 Applied to vfio for-linus branch for v6.19.  Thanks,
 
