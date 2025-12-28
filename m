@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-66741-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66742-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 578C7CE593F
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:57:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF25CCE5945
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A53930054B0
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:57:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36D9E30115F8
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0D02E092E;
-	Sun, 28 Dec 2025 23:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E505729A326;
+	Sun, 28 Dec 2025 23:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="LcgRTI9I"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="fCaFkTAc"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.pv.icloud.com (p-west1-cluster4-host1-snip4-4.eps.apple.com [57.103.65.135])
+Received: from outbound.pv.icloud.com (p-west1-cluster4-host11-snip4-10.eps.apple.com [57.103.65.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AFA413B585
-	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.65.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5F113B585
+	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.65.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766966229; cv=none; b=bmQ7eFQBmhcfhvRbHBoYh/h7EAvKACWTd5pd0nmjQ5OLtnWNwsLpUHjZgli7jrM7j/YtmXgsCQSk7XkbRf8i2Jah3U9YhiXaQ7bzdsyJ+YZzEKLGVWMLil6rlLr/R+femd47oTMFDMKnI/rd0sVoglhznX6eKYuf+2Jr1j1ur6k=
+	t=1766966233; cv=none; b=onaKRjUFSfqV5k4t4vxYR5uwkL1BtbYuPLM4xn/+O+3Cbq5y7IsoYlmEhKQ9nP5XFPXcp4mseBbugGJeO5UC2vN9J08XDI5eHS71t6GNJlXbOUiQ0Rg3gVB8W90QTP6jd4lUBQUw9cpKMX3Vnr5LZ0XD9ixtOboIDIxxRse27HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766966229; c=relaxed/simple;
-	bh=ND343gPd5MZcSuo0ZaIcwPAvbzTch6RWEF7oGjqJx5w=;
+	s=arc-20240116; t=1766966233; c=relaxed/simple;
+	bh=bMFiyPOaiAOjWaBH1iy2wmCK5wLDCuA6+weZV+00804=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c7bpBi1L6S6RBowPF+/4AKB7nAV9wgBmVl8Hh3W22SaEfCSOHtzRk/984bC8/PKisPnpqMkNeundaArBYUO017To1ieZHW/Rm0qoUFvNj/phNmHBMYe6fWTIvUVfp4yMNIZaUGId6U6DbF7EMKFFXkwFt0K/mN9teGDmb6XrvDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=LcgRTI9I; arc=none smtp.client-ip=57.103.65.135
+	 MIME-Version; b=sSqRWr2R9pcM+2GlY3YxqZxNK5izBI4ZkVJNzNIxvPfjFtnp6LPCzJ7F0mHzJgYmf5Hn+gBMCEThGa2ToWUNeVhdBDIRloZ/9LvbXBz2VRExDdmKHZ5jGFf8EgxLf0MnNXyFHCvISGcbXme5QxP1BF6KlFekVSLtvVl9pOY0sTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=fCaFkTAc; arc=none smtp.client-ip=57.103.65.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id D7E041800753;
-	Sun, 28 Dec 2025 23:56:57 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=pv9LTpPl13EUE97IZEQWuikh1ZpqnK830pITzzND0NY=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=LcgRTI9InhRpSzDz0rnPsMrbxpRdtjvZcKB/tI3VG/e0A5WQ0SoynA8cN1bxx0f6ojIxVcc+luOO/+a1cCtjPtOuX08Iwyybi+WoEo27MJiFStKZo3tNk4A2kAUNJGK87rY1fsRDZni0yYqjeharv8djcM9qdiHpz2e8DFiGmYpsGf0vYpTaQ2hEZEUY+SFQItmpLQSTbw5krYI9Ksq6cm6akAJ5PBPdCf87kJpGKPu+Hr0wWxI5TyJcr2qsTOf7kfTbRxVvBbYTZCGsqWtY03SE94YO7MifJVe6q0YfZaRSduQtunOh0xWf4TvEqmhsTto9mJvcI1sRY8A/FqHLpw==
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id E4C2B1800762;
+	Sun, 28 Dec 2025 23:57:02 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=end3vQ5HTg5+AzpY8GST0stqcJ3jw0HSal6FDpQd1X0=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=fCaFkTAcmAR7bY5UjYGhfxwRzKXb2rUYtoUPsZ3bFsh0knpKp55j1fsmG17w5N3XL+MbF0NHN0N1XmLDoA9eihyWrodLCos9riXzrsKv8ZQgqJ7t6b8Y7uVEx8bj98EmVCzveTO6GfMt6A7h+8aO2rzX6ceGLOcbGqinBlLtN3Pfqy3lUugI6cZwk1JzwhkZh3JSTEnsUMrfv4qSnEO9qUw28UcjNLezO69XKvzqyhTaWQDBuRpBzeMLyPySWI4rzBFKgKZ2ZL/8+qDw5bzTs6zW4V9hiiSF11EAD4uIKQRs69LwyWZm99h9e/BL45yzzQjc0vwBIJG2JcLZrnOicw==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id DE5891800759;
-	Sun, 28 Dec 2025 23:56:51 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id 201D6180016B;
+	Sun, 28 Dec 2025 23:56:56 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org,
 	mohamed@unpredictable.fr
@@ -66,9 +66,9 @@ Cc: Alexander Graf <agraf@csgraf.de>,
 	Mads Ynddal <mads@ynddal.dk>,
 	Cameron Esfahani <dirty@apple.com>,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v12 12/28] whpx: ifdef out winhvemulation on non-x86_64
-Date: Mon, 29 Dec 2025 00:54:06 +0100
-Message-ID: <20251228235422.30383-13-mohamed@unpredictable.fr>
+Subject: [PATCH v12 13/28] whpx: common: add WHPX_INTERCEPT_DEBUG_TRAPS define
+Date: Mon, 29 Dec 2025 00:54:07 +0100
+Message-ID: <20251228235422.30383-14-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251228235422.30383-1-mohamed@unpredictable.fr>
 References: <20251228235422.30383-1-mohamed@unpredictable.fr>
@@ -79,152 +79,65 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfX9kMyA6Ya9PRL
- ZGNeIGDN6sx1tKcmJx9upNZEZXVWYfWXweUMhcN8JIXbeNTEi5hDbWrnWScCwZV9DMpUbNnxs4F
- BY08DgHXgPGfusvSvvTUIilNp+I6bEkyXNsE7v0cKHv3rWPYo1OcqKj69irOa7dyxc451Fmhppb
- 5MSbfyHcfRAmLSW0RVjRQSYhGzW5IwJ9g4l1nFwQK4MgXvgOMxrcfAkjL+c1Y8rl9FEDySwbCBi
- Zfp68/dtMf5NlKTOSyG8E35TFydjGp6Lir2ndyWvLJGy8J2iVl5remDlGgSDGtjyCSfxevaEAlB
- cYGBeIaONWEvO1KsESI
-X-Authority-Info: v=2.4 cv=O600fR9W c=1 sm=1 tr=0 ts=6951c3ce cx=c_apl:c_pps
+X-Proofpoint-GUID: E2w8f0VWQvxnhwCPvvsEAMxA98TWUbqX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfXzcO8vA0V97RN
+ YrG52mD+yBDw2T++nNEYr2m75efeDMr2UCWEGmu5eVSuqjz3TbrprYzIjeqgEN7dQ2ehzU+fKvS
+ Maywgxde43OiXVwQRAdTvRuNarwnTGBLJhW2sr71MG0F9Y4GbrGm/X0SvSpqjr15fsDmD4O2/OY
+ m/T0afSQlS5LV/t8d+o+yX4LTT/XJOwK3CoLjGhS6UCXVpWmnGv+FBJOJs8uX2KK17oMtIgFmoy
+ Ef+O6kOrmwuUDLMTa6Uoz1CgnJRLYFHxdEKbIe0t36Aso2cVprEwwC90GH6AQrr88CUlcFPAWaU
+ ebqrmPSHah23RBIUySw
+X-Authority-Info: v=2.4 cv=X/9f6WTe c=1 sm=1 tr=0 ts=6951c3d3 cx=c_apl:c_pps
  a=azHRBMxVc17uSn+fyuI/eg==:117 a=azHRBMxVc17uSn+fyuI/eg==:17
  a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=KKAkSRfTAAAA:8
- a=VExx-Oqz_yhFp4n2Ql0A:9 a=cvBusfyB2V15izCimMoJ:22
-X-Proofpoint-GUID: TscuJr8mrurIBbJm5fl-ob52L0nzqDaA
-X-Proofpoint-ORIG-GUID: TscuJr8mrurIBbJm5fl-ob52L0nzqDaA
+ a=2psWIPzlEfUqwKpUe20A:9 a=cvBusfyB2V15izCimMoJ:22
+X-Proofpoint-ORIG-GUID: E2w8f0VWQvxnhwCPvvsEAMxA98TWUbqX
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-28_07,2025-12-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- phishscore=0 malwarescore=0 spamscore=0 mlxscore=0 mlxlogscore=894
- bulkscore=0 clxscore=1030 adultscore=0 classifier=spam authscore=0 adjust=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030
+ spamscore=0 suspectscore=0 mlxscore=0 mlxlogscore=974 malwarescore=0
+ bulkscore=0 adultscore=0 phishscore=0 classifier=spam authscore=0 adjust=0
  reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512280223
-X-JNJ: AAAAAAAB/SHWJB4X6LBTaMgPZ/Op10PBxGIgbDZqgo2P2Pga+dWxvzq0xmhI1Bfk5wJWknKDHSiBZkRRMql0X/eUHZVtIhPIxawiG+Siq5dYrO+6QQ/xKAPFjBpB2ENTEsiBk/U2ZwcAlloauDwKt/1EkXzm+ueKW8eemH9GoRgDVCTMTl8T4e5wHCEFA1CbnRVMB/6VUD6osNuUrTRUT03oV7GVNsiD86zfKwcF+igxikA95M5FP/neKujA5Ehm9vF5IJA05ACC4b8Gx7XSKTcRoRW0tmr4Vp/J7zHx9NM+SvOk8D1wDVl5+dgBJex4p4HbAq/FYICuC3AUUjb/pT1+vdRa6qAq/5KvUYMbfTYOEP6CXtqwzFiNKCjx6WJxkiHg9+MD4r5ShyQsMGyBs+wzNK8IS770TNn2/gVgdzuZoHA5LYKanZsYwOrLS3WHfspIvR0ddfpGXOcrwxD551Ipn1Scic4gmSvZxALAn6K0JItcjKRm8LL/0Kb8p41X+nEWMkgRaGXQHtRZgz50akUe9+s80MoHnUuP32f6Vb7RmZU+RBe7+bw0IZpMsQXbLA9NAtMjIRuZpHljUuJu7oZDfhlmvLzcUEImuTxfjbqRpvC/wEJNUbRL2EwVD6aImFNtR09/yYBuptxAWt9nTki5X05gM8ZyOIUf168cIe0kBMpLKGVcEFgAGqntecqXMW+5nQJ7kHtSmqMyYsXiMPUd8dtgLecE6JyqmMSgv3/BBwrk1gH2FAjsgL3bZeZQCqTFBROOTXTG4phz2wDzrsQs0Zl4j6OEYMi0YLXlMLrSIjc+M/YDy1E2Bx1yg+YtaRPRKhoBuhnTdmBekH4yVsATHewOnYCA2T525gKp8ftxue8F5abfQ0Ug09TCi49lDzM3Evxr12BuuXV+PJw8LBmP8Mv1zUhZ2itcPU9gehuQKlfejVoRIT56ReW1aFiHjSsNCpmLToszFnz+6e1ezwdMLPxIjGo
- h/zBIUkKOIcJPmz0+VqqcokmMTIYX
+X-JNJ: AAAAAAABhPhKioGqDEQaBe5+ImY3Dcl0TT1xS1aOq8PLIebodLzUvNZkcYH/4kaaS9tfLLwMGqmlBKI7mNFoHZ5etj59iTamdoB46YA+908TcWBX5xP9jkfhpF2N0XhNZlm+hmCXLVu9TG0gjxaXYUcWFayqoVzxbiFO4yzkm1iqgi4Kj9iLpYFQ/foIDXKVEU70X2UeApEpJj8dka9F3rYkW5V1QvZbVM8BRa7yRHnXD/GJmWaOL50A+8w/bsL3Mg40TqJygrn5y6/ZBPrnPJCqttv4ow7ugpRtVpsClp1GguJ7mlHMsYbT3I7EevT4CIkceX6fExId4lfQyUw7R5ntaURBDjkqZMhSbrc5sMhJhXeSdUsiNH6AA2fZJRFn9ITXJQCpZbb20H14FvpGUbEBE7Lt7fIY2+GOwNTmvuZ0xosKPMynn09WyKRxnEdNVGbT5Of05e3quUkW3/EpztL0GxiQyVcvj+ESBusI0DrSQrGWP5EIcj/TVVd9fMvNjtWnaW/uU1jG3CkW+C9JdeHbGcXP3FPeQq3DLaN3cdYF9Kq/qS7i5hG539nYoXgQBeSgdK1pdLtYEOQ/9ovl7orI9nDZys7hRLsk42QY8/y1H1zIoO6e8qWsm2Y8VHPlNeByASCAsXCjvBzBkSMRUSqHDT39w6ih0i8Ic0b9yzbINErHfUzBZla3LTds9DJnrCplTL42ffJDLvhfB4pKrizhp5obF2JarbLr4wy7DyHg5hrfkzAfEA4ypQjAR9LuK3g2bt5JgRH+LT+NnHhkbAgTHvNoO9qfZUe/HyAQeI3F4AsAIuSTVvBL61rPOiClzKqCt7U0hhnQW7B+MqpK0Npz6gow1mGz8f4V+xpZCspPSSiMIYf9oaMfEQOie38xkf5/Rb/wxeVYDIyZp4RUB1661Cpmvo4zyUFlZ2qnMeXIYq9Jmm1nE6HGq9zJy707w8gvc+OnCoYCeNkueg8pR1UZ1govwf5
+ TrXfc2OmQovpv08oOAyo+nBe0HDC2kwPSxWVCdFE=
 
-winhvemulation is x86_64 only.
+As of why: WHPX on arm64 doesn't have debug trap support as of today.
 
-In the future, we might want to get rid of winhvemulation usage
-entirely.
+Keep the exception bitmap interface for now - despite that being entirely unavailable on arm64 too.
 
 Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 
 Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- accel/whpx/whpx-common.c       | 14 ++++++++++++--
- include/system/whpx-common.h   |  2 ++
- include/system/whpx-internal.h |  7 ++++++-
- 3 files changed, 20 insertions(+), 3 deletions(-)
+ accel/whpx/whpx-common.c     | 2 +-
+ include/system/whpx-common.h | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/accel/whpx/whpx-common.c b/accel/whpx/whpx-common.c
-index d106776ff4..5152f80804 100644
+index 5152f80804..c3e8200c0f 100644
 --- a/accel/whpx/whpx-common.c
 +++ b/accel/whpx/whpx-common.c
-@@ -41,7 +41,9 @@
- bool whpx_allowed;
- static bool whp_dispatch_initialized;
- static HMODULE hWinHvPlatform;
-+#ifdef HOST_X86_64
- static HMODULE hWinHvEmulation;
-+#endif
- 
- struct whpx_state whpx_global;
- struct WHPDispatch whp_dispatch;
-@@ -236,8 +238,10 @@ void whpx_destroy_vcpu(CPUState *cpu)
-     struct whpx_state *whpx = &whpx_global;
- 
-     whp_dispatch.WHvDeleteVirtualProcessor(whpx->partition, cpu->cpu_index);
-+#ifdef HOST_X86_64
-     AccelCPUState *vcpu = cpu->accel;
-     whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
-+#endif
-     g_free(cpu->accel);
- }
- 
-@@ -412,8 +416,12 @@ static bool load_whp_dispatch_fns(HMODULE *handle,
-         LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
-         break;
-     case WINHV_EMULATION_FNS_DEFAULT:
-+#ifdef HOST_X86_64
-         WHP_LOAD_LIB(WINHV_EMULATION_DLL, hLib)
-         LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
-+#else
-+        g_assert_not_reached();
-+#endif
-         break;
-     case WINHV_PLATFORM_FNS_SUPPLEMENTAL:
-         WHP_LOAD_LIB(WINHV_PLATFORM_DLL, hLib)
-@@ -539,11 +547,11 @@ bool init_whp_dispatch(void)
-     if (!load_whp_dispatch_fns(&hWinHvPlatform, WINHV_PLATFORM_FNS_DEFAULT)) {
-         goto error;
-     }
--
-+#ifdef HOST_X86_64
-     if (!load_whp_dispatch_fns(&hWinHvEmulation, WINHV_EMULATION_FNS_DEFAULT)) {
-         goto error;
-     }
--
-+#endif
-     assert(load_whp_dispatch_fns(&hWinHvPlatform,
-         WINHV_PLATFORM_FNS_SUPPLEMENTAL));
-     whp_dispatch_initialized = true;
-@@ -553,9 +561,11 @@ error:
-     if (hWinHvPlatform) {
-         FreeLibrary(hWinHvPlatform);
-     }
-+#ifdef HOST_X86_64
-     if (hWinHvEmulation) {
-         FreeLibrary(hWinHvEmulation);
-     }
-+#endif
-     return false;
- }
- 
+@@ -123,7 +123,7 @@ int whpx_first_vcpu_starting(CPUState *cpu)
+          * have one or more breakpoints enabled. Both require intercepting
+          * the WHvX64ExceptionTypeBreakpointTrap exception.
+          */
+-        exception_mask = 1UL << WHvX64ExceptionTypeDebugTrapOrFault;
++        exception_mask = 1UL << WHPX_INTERCEPT_DEBUG_TRAPS;
+     } else {
+         /* Let the guest handle all exceptions. */
+         exception_mask = 0;
 diff --git a/include/system/whpx-common.h b/include/system/whpx-common.h
-index e549c7539c..8f171d1397 100644
+index 8f171d1397..b86fe9db6e 100644
 --- a/include/system/whpx-common.h
 +++ b/include/system/whpx-common.h
-@@ -3,7 +3,9 @@
- #define SYSTEM_WHPX_COMMON_H
- 
- struct AccelCPUState {
-+#ifdef HOST_X86_64
-     WHV_EMULATOR_HANDLE emulator;
-+#endif
-     bool window_registered;
-     bool interruptable;
-     bool ready_for_pic_interrupt;
-diff --git a/include/system/whpx-internal.h b/include/system/whpx-internal.h
-index 041fa958b4..609d0e1c08 100644
---- a/include/system/whpx-internal.h
-+++ b/include/system/whpx-internal.h
-@@ -4,8 +4,9 @@
- 
- #include <windows.h>
- #include <winhvplatform.h>
-+#ifdef HOST_X86_64
- #include <winhvemulation.h>
--
-+#endif
- #include "hw/i386/apic.h"
- #include "exec/vaddr.h"
- 
-@@ -101,12 +102,16 @@ void whpx_apic_get(APICCommonState *s);
- 
- /* Define function typedef */
- LIST_WINHVPLATFORM_FUNCTIONS(WHP_DEFINE_TYPE)
-+#ifdef HOST_X86_64
- LIST_WINHVEMULATION_FUNCTIONS(WHP_DEFINE_TYPE)
-+#endif
- LIST_WINHVPLATFORM_FUNCTIONS_SUPPLEMENTAL(WHP_DEFINE_TYPE)
- 
- struct WHPDispatch {
-     LIST_WINHVPLATFORM_FUNCTIONS(WHP_DECLARE_MEMBER)
-+#ifdef HOST_X86_64
-     LIST_WINHVEMULATION_FUNCTIONS(WHP_DECLARE_MEMBER)
-+#endif
-     LIST_WINHVPLATFORM_FUNCTIONS_SUPPLEMENTAL(WHP_DECLARE_MEMBER)
- };
- 
+@@ -20,4 +20,7 @@ int whpx_first_vcpu_starting(CPUState *cpu);
+ int whpx_last_vcpu_stopping(CPUState *cpu);
+ void whpx_memory_init(void);
+ struct whpx_breakpoint *whpx_lookup_breakpoint_by_addr(uint64_t address);
++
++/* On x64: same as WHvX64ExceptionTypeDebugTrapOrFault */
++#define WHPX_INTERCEPT_DEBUG_TRAPS 1
+ #endif
 -- 
 2.50.1 (Apple Git-155)
 
