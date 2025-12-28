@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-66737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD042CE591B
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:56:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 545D1CE591E
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E582B3009F96
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:56:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A3EF3006A86
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73177287276;
-	Sun, 28 Dec 2025 23:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AAE2E0904;
+	Sun, 28 Dec 2025 23:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="LAc4znXf"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="TA6dNCEY"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.pv.icloud.com (p-west1-cluster4-host1-snip4-4.eps.apple.com [57.103.65.135])
+Received: from outbound.pv.icloud.com (p-west1-cluster4-host4-snip4-10.eps.apple.com [57.103.65.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7253A1E6F
-	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.65.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3A11E32A2
+	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.65.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766966199; cv=none; b=O8F7H5z3qs/7n1ADIw+33Wb53WuoJZROadwE+bKZBUaxLVZSi6zgXsX9re9pxbIBElkuqIAgTtzZA/KD/H+ZXx8jShE+rj+dYzkcyIWOphTeNhV+nQso3rgMjlO4JVwo3Il/+566YZ1h4E4GAeQw9O/kuz/xaQ+R48M4p7OtQHM=
+	t=1766966205; cv=none; b=BvQDo7Yi16d52cEp4AjPZrUK0ozSPGtUH7IK3M4x9ry4M5M5IhnikFEhBTY/oIl1yPuYRirTN/pvucdHmwAgfT9Q0QJ4jzqaH1TWGgkz5jz6ZPwtY0N1oMu8S0/MSU2iQ3tH+XV0Pw97HCpBoGnEwrJdCfA4/Ro84Xt/2pgp8mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766966199; c=relaxed/simple;
-	bh=+sheOkzDX655AAUS+duET1q3qmnyRfK6vaNq9kK3fz4=;
+	s=arc-20240116; t=1766966205; c=relaxed/simple;
+	bh=vzl2b/xiCls1qE8iN15//zpDp2M8JQSGEEsxn2apHnk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a5wuiZMloXgJO8WCmM1K/OVHCe+8bTuT2ftoWXZnlRX1WQwhmatFOCh3cmBh8e1BIdsEGTrF2H8Vyb96R5MDdZASYuFvzKmRF9f9JQII++iHxQK0N0aNBx789T2BltBznPgfwKC4dPY8pX4Ivob4kTPjyOgqi7IWcxjOEwG9Dec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=LAc4znXf; arc=none smtp.client-ip=57.103.65.135
+	 MIME-Version; b=RIf49QzQT79RbQ1/wuWEvMnVPvaZ4X1fD2HSunvgOZcjmkoz6DZws8ODGc3rc2pLVt2Ue2WWwJIB4ZSfHQvprfSbFicb4e/b6tgLT9Jw1MkjysWpFIGj+b7MN2EDyDQTjMWtV7N7e9owViG6P6XtTFmMX/IF5q6PagYwEQNSu/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=TA6dNCEY; arc=none smtp.client-ip=57.103.65.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id 076141800751;
-	Sun, 28 Dec 2025 23:56:33 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=1CjKM6KDEmf5eo7QDBOx5N5scvQteXKGcwrcKL+2vCA=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=LAc4znXfQbXvtnHRxjnjmD3r1JY73JOEbc3WY3g/vlgg6rPRoFchnju8/XXVxJB8ns8T5TrRVtNs5MJpWE/yxLlELHoFMXDdqKe6on9tB4N63FDiH+u2GSx4Lx1/I3aSYvD7Y5FzgKIYMRw1uZGw9VPK1cNylkOBIi1Mo23das99T9UwnFRpWTCkdeqNsy9kiNNLiDJUKrEhoGpSo/OxqOlIvaVLsqIVyTSrulEV4OdBlx86tY6Tgq8wTjERbVhCCzVj9K8L5nQ+EMkaNNzFBPE8jqTJA4NSnA+egZkIzKeqqAPW7XZiKkdsdlQC/mEAl7ODpuvS1pJr0Wyiq/mQyQ==
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id 827461800744;
+	Sun, 28 Dec 2025 23:56:40 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=9dZ0bIRQfVZYIGGuhzKfcBpJ5dwbdg2lwsrZICRf3mY=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=TA6dNCEYGCcH0VOu8eJBSrw8c8EO+WqT96BfmHI7Cv3vIsu3zR5xDilA3+tEbrPDuKlcAOSUx19hzA6kjpzZIP+ZHMFKTnUJdGL8XW5nO9KLzVyOQauuW/gZdjMHHx2ZtNoGvwEiQ+iEXOP/wvc70ib7RTEysxCowUIaBiAeVoYDXYtI4qhHThvskXcLXWrRuXHi9IudpCr+g9x+4ruWPJk4v8g7oVeqyPdIVqh8Xwr3MlMhg+ioz+TnujLhuPAd5BxAsYqlvoYEkKaGNwsDOEZQXZEkMh1V/Mcv0nJRHEcZUidzI9EBJvB6nHuZiEASukCEuh0yu9ynDSIB8ux6jQ==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id B3ED318000B9;
-	Sun, 28 Dec 2025 23:56:28 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id BC0E2180074E;
+	Sun, 28 Dec 2025 23:56:33 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org,
 	mohamed@unpredictable.fr
@@ -65,9 +65,9 @@ Cc: Alexander Graf <agraf@csgraf.de>,
 	"Michael S. Tsirkin" <mst@redhat.com>,
 	Mads Ynddal <mads@ynddal.dk>,
 	Cameron Esfahani <dirty@apple.com>
-Subject: [PATCH v12 08/28] hw: arm: virt-acpi-build: add temporary hack to match existing behavior
-Date: Mon, 29 Dec 2025 00:54:02 +0100
-Message-ID: <20251228235422.30383-9-mohamed@unpredictable.fr>
+Subject: [PATCH v12 09/28] docs: arm: update virt machine model description
+Date: Mon, 29 Dec 2025 00:54:03 +0100
+Message-ID: <20251228235422.30383-10-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251228235422.30383-1-mohamed@unpredictable.fr>
 References: <20251228235422.30383-1-mohamed@unpredictable.fr>
@@ -78,89 +78,68 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfXzrTr5EsRZPYj
- QXxB6Y6/+7lKl8AoIuseWMBO6m45XWgAWzNGySC3hy/QqstbtaGquaMET0A4uFoQ3x372RhOjxA
- Uv2jDhfi6uVObAj4jhtRmM08dJqKHyGyG8oq0aWCkoX4uy2hL7C9oZYz6o2RO4qViONQemMh7kI
- 9ki/K0PMyA5jUPd3OMCT1QbSvVaDJGsBfrUaabNkWFi0dXkghsiT8WSM8qeCAJ9LH0TWA2XaxUf
- O6nUSUixZIEVb9EpQRrpfv4xv/h2kS8YkpkgdmgegFCv5dOac9GEYkKGU/9z7a9PNKHxmDYczVt
- tn6s7CSPw87WzNo3Js1
-X-Proofpoint-GUID: Fadwj1TMWmJSLQzJeE44ZuSqq06F9ZMJ
-X-Proofpoint-ORIG-GUID: Fadwj1TMWmJSLQzJeE44ZuSqq06F9ZMJ
-X-Authority-Info: v=2.4 cv=CcYFJbrl c=1 sm=1 tr=0 ts=6951c3b3 cx=c_apl:c_pps
+X-Authority-Info: v=2.4 cv=YYKwJgRf c=1 sm=1 tr=0 ts=6951c3ba cx=c_apl:c_pps
  a=azHRBMxVc17uSn+fyuI/eg==:117 a=azHRBMxVc17uSn+fyuI/eg==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=HMNHyw_DGvBsvbusI_IA:9
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=UWX6RoDBcPCHCN3xbnsA:9
+X-Proofpoint-GUID: EtxjQywVbxc3nE96Rj7CmIafWux5kYLL
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfXzjNmEipZwqVg
+ PMgPx/XF4NwWggXrLdc74Aksqyxjloxll6KJZpSnquRXmhfKO6Iv3s0meQvURoXGxSHxry4dorU
+ G3YBkzqt3mVXhqhYdwGZGeeZRGNyj22XGvOIq/u656bMBb6H0HHZTgs4mvgCXJZiDyp0qeeCyvW
+ JKpKAxs+MowLyKFqkwRQhPHTkPe/qDtWA2uiuUi4OmlwMlFq+7ZaznIZ2e70V9Ub0n4fpN0HaSi
+ oOf/iRtxTNl9AJls9SevXyA0ycPYfCV5qCdvXU0gpwHVRlVHGIS0r6qY1zX5PIVPYj8H+eK5gdw
+ 4AZkcarplqMZvLZKjLc
+X-Proofpoint-ORIG-GUID: EtxjQywVbxc3nE96Rj7CmIafWux5kYLL
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-28_07,2025-12-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 malwarescore=0 adultscore=0
- mlxscore=0 suspectscore=0 clxscore=1030 classifier=spam authscore=0 adjust=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 suspectscore=0 clxscore=1030
+ adultscore=0 spamscore=0 mlxscore=0 classifier=spam authscore=0 adjust=0
  reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512280223
-X-JNJ: AAAAAAABTeNfovWtPCnelYkI7Whkwav5cIsnvyD1YFj4+gLpYVM6erlHd1gMDCCuCfmkEetazzj4nuv3JEo4cZwiqirqzD8NR1vbLAYl92rNJe9TQ2aZNA47LxKZSuv6zHU4miCEfLVvq0Q0Lhqbb9qQ38ezOqCquPR8vxK0Ow7I2o2XKTPcq1NI1HunJ8+7vPG31VBtaXRXCz6vGPxOkbxo/bcQO3/y0aBryR1AqeB5kN3JxamlC6fvoqrlbwRgv1MCiXSBGFb0m3KqKQyGTlXlYC4HqUhb4rue//i8iJ7yjR+Le3q/p7z+kkHEjShMEISTcYr7RwytweZ6m02oIFryUuBZjI6/QfjiDR7FE9mFO5rGIAa257ujXrzoOvycdl+tbes/5GzbzZc4TTq95DhR+MrPZFh5SEcx/nhLePGaXO8B5XluPxeMPzWAJbp1TqsLA2oLoOygGrcurZh7PLZXEsyJgVzxdHo/GkmM59Cys+i8Rm7qN5Ob5Oy/TUSHXOjKIvBvCYTOybyP/agg5IMvxUZ4Sjdiugjh9XPt1IU3wDxDtPcGzP+E2Hz9Y7FQuoXTr/d1hVS1oqEXmBwUu0xieqLdmQGGMGKqDiyQvrjHCLkejfFdXWh6SeWZihEyQFdnAj4B1SPMxqdyIhz/yPLKOR/lYOyU9Z+jiu1RY/2yn2ty/kRw8ICmmcRJakzJPIzjGP9Qw+4xboX4RwIiZGEsGcVhgcNFx5SeankJwbp2AUrQubkCX1zj6AZsd5aUxgby+ZRBNa1GX2U6imeA8htmep0wx48/qcZgSwMdYYzZBBCvT2LGysAIyr4fWsEjhftDKb/Geg+28xROcnS5KdQCAUHcZHGmzKTD6BXqMcARJ7viTgQuGyRIgDFKKQhXPgylUZTOeMfRG37JnACAhiCH5iY8oGekaizpEaAy6dVqlI9PhRaU90r24MajTfrqYoA=
+X-JNJ: AAAAAAABMrBUqk1HogRBIFKO7KFoGZLlIHnJ5goFC0HZDvLyIENksuNF9H2PPzdO4GJKku4Z249JQLpF5fwdymciuYHxwYosuKHy9fc8NE9QT3518ppMPZfCfn59t0wiywj+F9wv0ju6jAmQjYk0TXoE+HoahNFz16JCakWGFq+rbEMLnEKYviOkpcm2eOomtcEb7n07aZowZ6Ggo3mpi81XJ3f3CE3DzeGtKRxYMyw2upnQn428P83vNvfKRt9794x6aERlOVEKouzdGF49M1lZQUEKDM5PIDx9PKcSXmUtBeaVEwadGPXUtVqZgTw6nSkYNZDTnnGH4MLy1jWssewrB2EvgNAfcHPpkuq/lWq4yJ7+xZgTAPaiP7k24GG+iqgbq7nSlrCklxmkoSZGp9wbZn08MWwkgG1vRJ/oMsSHNOcLrb0V78VQhNVJwyOj2A2WfubZx/aIkCWXEOU0SF7Ri7XpwLGB/BqZiPTni/Mc75tHgm7qOqGIcnt7956dwfSD0bfw+NqeiZVOLJpDdFoNrwlMjwSI4pXmCRRjuvxwdxuwiDr0WIPiqcoGo3Hy6kaJEkP6oEFqYWETucnO52/5d+ZciP86Ag2NqaDomMP06vWbozWXpJOjbV+kC8Ovsq9olujP9o4IGIKw3PVZoTN1rqmO/FRqQy2US3CMrbx6zG4AWCoUAhbNbpXVaWkRXAwXWPUTuUGygB8KTiAUXlO/zgwtW6Ve3HcyBMaUfM+pWypi4u4Jgl8KMSi7SHPIkEc4iHTLfKPbJE3o07WlQxssn/X/ADKulcMRZquuslcMKKB2vU1LeCyRVWih0oop2Bmjbj5xOHMP8jECSg1i+6r8aVpsy8U61x1jhMCVhnhpI2KBSTXF/cKJZ/54TWtozQWCD61+PvGkTUw6efH2q/jKllZceT9zPiVPyPeJmWMCjif8/iq6ne7YGfTeyIHRA7V0N/g9cKsFDSBT
 
-In the prior Qemu ACPI table handling, GICv2 configurations
-had vms->its=1... That's broken.
+Update the documentation to match current QEMU.
 
-Match that assumption to match the existing ACPI tables that
-have been shipping for quite a while.
-
-And see what to do for older releases. Likely don't
-want this to be carried around indefinitely.
+Remove the mention of pre-2.7 machine models as those aren't provided
+anymore.
 
 Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 ---
- hw/arm/virt-acpi-build.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ docs/system/arm/virt.rst | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index f3adb95cfe..2b217e8681 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -473,7 +473,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         nb_nodes = num_smmus + 1; /* RC and SMMUv3 */
-         rc_mapping_count = rc_smmu_idmaps_len;
+diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
+index e5570773ba..b6e88c4f13 100644
+--- a/docs/system/arm/virt.rst
++++ b/docs/system/arm/virt.rst
+@@ -41,9 +41,10 @@ The virt board supports:
+ - User-creatable SMMUv3 devices (see below for example)
+ - hotpluggable DIMMs
+ - hotpluggable NVDIMMs
+-- An MSI controller (GICv2M or ITS). GICv2M is selected by default along
+-  with GICv2. ITS is selected by default with GICv3 (>= virt-2.7). Note
+-  that ITS is not modeled in TCG mode.
++- An MSI controller (GICv2m or ITS).
++  - When using a GICv3, ITS is selected by default when available on the platform.
++  - If using a GICv2 or when ITS is not available or disabled, a GICv2m is provided by default instead.
++  - Before virt-11.0, when using a GICv3 without the ITS, a GICv2m is not provided.
+ - 32 virtio-mmio transport devices
+ - running guests using the KVM accelerator on aarch64 hardware
+ - large amounts of RAM (at least 255GB, and more if using highmem)
+@@ -167,9 +168,11 @@ gic-version
+     with TCG this is currently ``3`` if ``virtualization`` is ``off`` and
+     ``4`` if ``virtualization`` is ``on``, but this may change in future)
  
--        if (virt_is_its_enabled(vms)) {
-+        if (virt_is_its_enabled(vms) || vms->gic_version == 2) {
-             /*
-              * Knowing the ID ranges from the RC to the SMMU, it's possible to
-              * determine the ID ranges from RC that go directly to ITS.
-@@ -484,7 +484,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-             rc_mapping_count += rc_its_idmaps->len;
-         }
-     } else {
--        if (virt_is_its_enabled(vms)) {
-+        if (virt_is_its_enabled(vms) || vms->gic_version == 2) {
-             nb_nodes = 2; /* RC and ITS */
-             rc_mapping_count = 1; /* Direct map to ITS */
-         } else {
-@@ -499,7 +499,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     build_append_int_noprefix(table_data, IORT_NODE_OFFSET, 4);
-     build_append_int_noprefix(table_data, 0, 4); /* Reserved */
++msi
++  Set ``auto``/``gicv2m``/``its``/``none`` to control MSI controller configuration. The default is ``auto``.
++
+ its
+-  Set ``on``/``off`` to enable/disable ITS instantiation. The default is ``on``
+-  for machine types later than ``virt-2.7``.
++  Set ``on``/``off``/``auto`` to control ITS instantiation. The default is ``auto``.
  
--    if (virt_is_its_enabled(vms)) {
-+    if (virt_is_its_enabled(vms) || vms->gic_version == 2) {
-         /* Table 12 ITS Group Format */
-         build_append_int_noprefix(table_data, 0 /* ITS Group */, 1); /* Type */
-         node_size =  20 /* fixed header size */ + 4 /* 1 GIC ITS Identifier */;
-@@ -518,7 +518,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         int smmu_mapping_count, offset_to_id_array;
-         int irq = sdev->irq;
- 
--        if (virt_is_its_enabled(vms)) {
-+        if (virt_is_its_enabled(vms) || vms->gic_version == 2) {
-             smmu_mapping_count = 1; /* ITS Group node */
-             offset_to_id_array = SMMU_V3_ENTRY_SIZE; /* Just after the header */
-         } else {
-@@ -611,7 +611,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-             }
-         }
- 
--        if (virt_is_its_enabled(vms)) {
-+        if (virt_is_its_enabled(vms) || vms->gic_version == 2) {
-             /*
-              * Map bypassed (don't go through the SMMU) RIDs (input) to
-              * ITS Group node directly: RC -> ITS.
+ iommu
+   Set the IOMMU type to create for the guest. Valid values are:
 -- 
 2.50.1 (Apple Git-155)
 
