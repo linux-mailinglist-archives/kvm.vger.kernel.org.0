@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-66731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66732-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0AA2CE5906
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:55:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07DB5CE590F
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 830EE300442A
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:55:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41CE8300FE11
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376E92E173F;
-	Sun, 28 Dec 2025 23:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF86113B585;
+	Sun, 28 Dec 2025 23:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="bdnMWOfa"
+	dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="NUTq8IiE"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.pv.icloud.com (p-west1-cluster3-host5-snip4-10.eps.apple.com [57.103.66.13])
+Received: from outbound.pv.icloud.com (p-west1-cluster3-host2-snip4-2.eps.apple.com [57.103.66.105])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5F11E32A2
-	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.66.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E292285CA8
+	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.66.105
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766966143; cv=none; b=PXXA6qTp5IdOYRuNRw3msapPXhD6h0xri2qcSxA6ZRHcfnSIRdKpvFYGasNIQDbvxO0Jmr7Exs+SSGyZwKbfIdyqJ1y5107g8DqfwAnBBhb7Kkj2UpmsNmEE+Q00DOfG4OGNxCoSNn+CiJ4Skqv7yIXs3dZvxWOQnWtpybawQfs=
+	t=1766966148; cv=none; b=QZyLYzhZWLcO1IT+ESsafpV2allPWDgUW9CO3qfvC7sdIhMCEmk/6o5cja6Ejvb12DGfdQfbdiu92I6JigQ1OYsWgCRoBzFxmKhlKy2+atZhWroIdaI6+AHhQJ1qjlVwAuGztnfw6UHD0ZfBAIPjYjE9p92MIRkvVPy61+zKP3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766966143; c=relaxed/simple;
-	bh=zYLQVDbjH6U/5wVrDJdcy4U1ETlPIZJW7JCyPKEFi7s=;
+	s=arc-20240116; t=1766966148; c=relaxed/simple;
+	bh=Std8vhl5XVqnH6KDZNU5jTMgCSlZUu668RDV5S6M6M0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rZ4eksVo66DGkMbC2+aWc2Ldc6i7OmDguHjC2KWgo/nOlnKG1Row+dMHNWY5zniXODM5dPyoLBtFC1QlEybvnbAaSrWxwkrkNEGJlspM1AQqugbz/WU8IbtuW9uqU4O9qIdZqf1uk7BgLwh/IKvGbS4uPJxuUytnUMeDB7PAu38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=bdnMWOfa; arc=none smtp.client-ip=57.103.66.13
+	 MIME-Version; b=OFksWdCm0vnwDMeYZ6jFH+Ow2NRb6d9MUIR6vimDxwU+JMKM/Cjnm7a2uyoczgp7WbZk8nRbMyfvxzyvPB9s74tqNKiVNItT7BzSnsJfFaa4cDBJ7YINSAN6hoHRsoo/xJMqMPdScP0Hi/2OfJG1LY0ijQo8/HrbptO3+9q2lew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=NUTq8IiE; arc=none smtp.client-ip=57.103.66.105
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
 Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id 2EA8F1800748;
-	Sun, 28 Dec 2025 23:55:38 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=aRq3YU5535mG5uSPAFBSlmsbBJkL1R5+IAqIsTf/zZw=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=bdnMWOfahgz6fnYRjVy9cKGOj3Y7JQrUtnQV/V1AH1KWi/smWESPc1GCYDO4op+vOO/FmuQJw1udQ8a2/7fGXrQhFARizktQi756xP3IKFKXVQukm9tlVGBW1wD18u5hBUIJy8R98/TDnYJu++Cg1NXAI9ZEHZqC8iFyaCV7HkShIWgFFdt92Y5nYSBf4P8AG1R6OItSRSO4mzr+WvQvikxTYANrFsvFHCghjC+PsSoM+EaxErFuYTWlivDE43/qcpLtChkE0LmEUstiQ0qKHJW1mIiwAT5JbAzlVsRmFJByUQvQwEOp6X6JJnp6HyX740TyEPCdHrm7r+D7fiAtKw==
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id 307A5180015B;
+	Sun, 28 Dec 2025 23:55:43 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=lE935EhSo6eiiRGBTf1TCzdO8HBh375WWDyS664DB/c=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=NUTq8IiENXuXg33x+OZ06YbUXbdW8TqrjQDhtVa64u4BQW1SK+lLNlOOIQrC0dfZU39Vup09miq9vghrXwn50ZAE2xJNGgHHSC9hGQTbofthSNo3ZA9Ya7DmYVLVyRmomPSACV/ucK8AW4g5P95esl2m/7S+/r0OBj3+a3LoSFnCg4ZiPYwgnk97N2WxySOzG3dbbvq5R/QiCUM8EJcpVz9HZAL5/Bj+7s3HBj3jdgZ11L4JS0cuc9THJym2KCx+1LJRrwohl/8oOJm8fbWtn1aTcuX3Zk95B81I8gPmxl6fO/hb79y5vqMt3MNR3WKrogJLY/AvEgK+DSj9hdnLWA==
 mail-alias-created-date: 1752046281608
 Received: from localhost.localdomain (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id 2B5F7180015E;
-	Sun, 28 Dec 2025 23:55:33 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id 3ADB11800755;
+	Sun, 28 Dec 2025 23:55:38 +0000 (UTC)
 From: Mohamed Mediouni <mohamed@unpredictable.fr>
 To: qemu-devel@nongnu.org,
 	mohamed@unpredictable.fr
@@ -64,10 +64,11 @@ Cc: Alexander Graf <agraf@csgraf.de>,
 	Ani Sinha <anisinha@redhat.com>,
 	"Michael S. Tsirkin" <mst@redhat.com>,
 	Mads Ynddal <mads@ynddal.dk>,
-	Cameron Esfahani <dirty@apple.com>
-Subject: [PATCH v12 02/28] accel/system: Introduce hwaccel_enabled() helper
-Date: Mon, 29 Dec 2025 00:53:56 +0100
-Message-ID: <20251228235422.30383-3-mohamed@unpredictable.fr>
+	Cameron Esfahani <dirty@apple.com>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: [PATCH v12 03/28] qtest: hw/arm: virt: skip ACPI test for ITS off
+Date: Mon, 29 Dec 2025 00:53:57 +0100
+Message-ID: <20251228235422.30383-4-mohamed@unpredictable.fr>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251228235422.30383-1-mohamed@unpredictable.fr>
 References: <20251228235422.30383-1-mohamed@unpredictable.fr>
@@ -77,64 +78,42 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: oGpg2w8p3aeBitWq5trlw_Fg7qxPMaNM
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfX9GX8lbpm4kCp
- PIFvOwMW9hJXdbT+uj0FZHxRAdjwdPN6XgUpzAQ43Q8SN5pwqn8rYdWXRfup6bz0Z0NpzwaslwT
- MGjDcGqbfNx74L6ezlTtZOYz/SQ118CSrmADCw+dYAl3YK0NVNgPdl8xepDucorTu56cA2BXkLn
- mfxK1l5Yz8Ot6cDGCSZJrFixVIeghbo2ObKE7UjJXwFlbNZjHa0hn4omtjmsN0fv5CFCK+6gCa4
- 58raDOcBn+Bt/JGMoyp8L3qHOwc2VJ2qJfmoiJm1oUU/n6NSegOAxziUH6F1aErpTbInht9U1m3
- 8dYs0I8qPXWZZz2Nl2S
-X-Proofpoint-ORIG-GUID: oGpg2w8p3aeBitWq5trlw_Fg7qxPMaNM
-X-Authority-Info: v=2.4 cv=drDWylg4 c=1 sm=1 tr=0 ts=6951c37b cx=c_apl:c_pps
+X-Authority-Info: v=2.4 cv=aNf9aL9m c=1 sm=1 tr=0 ts=6951c380 cx=c_apl:c_pps
  a=azHRBMxVc17uSn+fyuI/eg==:117 a=azHRBMxVc17uSn+fyuI/eg==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=KKAkSRfTAAAA:8 a=e3h0T9cBdxntahtQdW8A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cvBusfyB2V15izCimMoJ:22
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=KKAkSRfTAAAA:8
+ a=1t8nasy7xzbR8br5Zw8A:9 a=cvBusfyB2V15izCimMoJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfX4veoBlSlau7S
+ X/EK76yLhK9HBf9Rltiu8l49mP8jzx1OjGWwxG5FO0o2iknbZhrt3dD/8RBRGdRSizwczAmwI6i
+ PWF52JeT6ppSFjdyFAdqSG9mNE9ikxi8PHyE5yXVfDkVOL/B4yaZfLB+ifbjMa8e38gL/G1LwPq
+ oTcmeLcMeLj9dTFlnrCr5VbT9kTDgQajjeQM8IGcD5FD+LkQrc1+1fu00Nds7Ce4H9vN3jkj6X2
+ 3qLd++nvXiobX4Wb2vAJnVqNERUrDqAH+eLaWWv2yVMt6/fpwxwj17ltVVhpcSkE0lxbKKFSrw/
+ AdEq+fCMYOAHv2vh8ml
+X-Proofpoint-ORIG-GUID: BO4dTnxI7MPXiEQel8doq6bcBsigBof9
+X-Proofpoint-GUID: BO4dTnxI7MPXiEQel8doq6bcBsigBof9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-28_07,2025-12-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- spamscore=0 adultscore=0 bulkscore=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 clxscore=1030 suspectscore=0 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2512280223
-X-JNJ: AAAAAAABoVcFCB49ye50TvD5t5xrezN5WMd1ltYhviWFt8ES+u1Mhf60pkgNJ1wnWeihX0LWzVUrVKg0Ha45cpHgIbtg5CzspMmYHYMYumPT84+V/c2+mq12Kqkng49lv3x6cP7bFEyNu2wbsQvqCBokK94aB+UXTYNhoiwGZSQ0BODJ3SPkvWvt0ov/l/S9CeZc73POUpESFuipph3wBdbcQ/7PE0ehutadZFAjoj25ko/yYdQZPi8jUvnkjmzPe6EIGogFcjP+OuZPu8ABSX0SnqUoU3TlbH40hEZ7dTwPV9iuHTa20zCPlPHhcBmzGsRfdWHl2aY3vTSKlYQhL/6L2qqeSG7I560RH/Xm6B88eBMFkNcVev0s+rUip2t3ZtA8qE2RCzsg9xZ9MSVo5F7QTYz8nKccmfbaQllz6aOLmRL1hjNSKm+SwNK4pmcfyKgokPYaz3gClsqoxBhuS3QyBX/NinA+Igqg0TEBDG4ZeWSFazKt/1ufFDBVWvqRLeR7ZKgHkVSJpTsi7yVqaPc/C+qtanbTwymyXpwM4b/NyS46Li6JFpkpW4Awyb+IEV3eCJ17uN8j04KLkFG/79YidXV3ni3m8aPf4wpkpiDSrV9Fua/zAuG1GiKWn6nO5otQpRqbiBNSYcCB7WbMsIvXeTXUFI+P6vCTEOAf4pM66WWvHgoCnM1jCVObW6WFi4AcHMBvnp1lkNDKPUsOx44BRTQsJ4DqxJEH4uMhp81sd5om6/6BYC+h8XIffsn57wsWRxJEcgI88eQQ8sauD35NM04P8J5CyndzcmIQvkUiqyM6kuZ7M4ruvzZW6gIZcBptDozFST/mIbBU4iZnLzQMTcnGmcZZrpfaBIgsWqWFRBK4W5/z79v123ox3mrmoYr5PXnIXq2mgwSGdFCPU+LUkdFEqAlNfZq/Tw8Hehvo0x/i1Jq1emOGgqNYr6iS14uUdthxRuBvwftxVUwjng==
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ phishscore=0 spamscore=0 bulkscore=0 mlxlogscore=910 clxscore=1030
+ malwarescore=0 mlxscore=0 adultscore=0 classifier=spam authscore=0 adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512280223
+X-JNJ: AAAAAAAB6ujN0HzKfP1mxylqRawFQH98olFt1w7OZSP5birJjbpfjDMzDJX9c8+6VZRZm7Q0iufF0wA2N70PBKEmqY8kS+XNdN2NQww8xElh6fk7Na6WwcJQjQYtoWlnA9JVha2/sNWgj+VseLLKHwfhsZqMWuTNq5aGuXDd6uQRLUAor+dpFpZn2L2GTBC19IZF2nNDokdzIfkFB+xtnZFIkIve3lVYS2fTuRPXnglxdFZuvjnMknvr2tlazFDpanfDNce9PHchUyLr4k1EKbKEMh3OlNUz1m4BmebaE8AHSmRvH1rQjW/E3MpACISCaFu1i7r9WKsNGqnJKQir9SHDGw5JmcBnQx11cs+4tfHE1O0Os+szahKHhuoYn9h/aWNGWwre9jOfWh5Ygxa67G7AhqU7Sln2/1D7ELajlFOxjPmjzk0Zf3Z31WsA+MCmvnTd/qcq5gjj2vVsClOPcsmDnb7LN0dj1eeHc48e6nj8kqetOYW5dEvs1jN/ocPB4JEEEYCt78QNQ/cO+4Z+wXQzgsrGkNaYrODzNuQq5rQtqu7o6cV4cV/5WPLiFTmM21eTfjSkxD6+HARwTmVmsDmgKX9uOHG8NMRTFekgedwF9UFdBhrfexg+fYZzEWP0LU9cacmfp6ViAYoCPSsrg7dVh6cmbU4sc2o76ejVB0DTH0hNrvMJj0TbP7r9q7IFcAt9i6FAjOmMOUgGYaCrOlxrWabLgf6yk4o3jNg3l4n5eazCdLckcpI7o/tBbMHe3iV0w50aWOdUmbHNgJLzFZmQ1EyozaJXdcHuqbP+T5ybNg/r9F7zifrEhZDRVe7MyJxkvWZ6/+LAYpnVf6XiYchgyuMp2u+xDqUnbfNOZhIXsAp4VHDzXaTPdwAeiojo/ztwjNhJQfCm181h7w20+IJR8SEYYGGzOyWrZqtJch5P3OHF+mXp87fuc94zIF+l6/bZPfmIn2lLpsZ82vM=
 
-From: Philippe Mathieu-Daudé <philmd@linaro.org>
+Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 
-hwaccel_enabled() return whether any hardware accelerator
-is enabled.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- include/system/hw_accel.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tests/qtest/bios-tables-test-allowed-diff.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/system/hw_accel.h b/include/system/hw_accel.h
-index 55497edc29..628a50e066 100644
---- a/include/system/hw_accel.h
-+++ b/include/system/hw_accel.h
-@@ -40,4 +40,17 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu);
- void cpu_synchronize_post_reset(CPUState *cpu);
- void cpu_synchronize_post_init(CPUState *cpu);
- 
-+/**
-+ * hwaccel_enabled:
-+ *
-+ * Returns: %true if a hardware accelerator is enabled, %false otherwise.
-+ */
-+static inline bool hwaccel_enabled(void)
-+{
-+    return hvf_enabled()
-+        || kvm_enabled()
-+        || nvmm_enabled()
-+        || whpx_enabled();
-+}
-+
- #endif /* QEMU_HW_ACCEL_H */
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..bfc4d60124 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,2 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/aarch64/virt/APIC.its_off",
 -- 
 2.50.1 (Apple Git-155)
 
