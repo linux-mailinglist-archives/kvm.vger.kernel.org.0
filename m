@@ -1,151 +1,140 @@
-Return-Path: <kvm+bounces-66727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66728-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EE9DCE5756
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 21:48:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3772CE5842
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 23:49:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 82B4C30010FA
-	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 20:48:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D7E64300ACFE
+	for <lists+kvm@lfdr.de>; Sun, 28 Dec 2025 22:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F3F27FB34;
-	Sun, 28 Dec 2025 20:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A280229AAFD;
+	Sun, 28 Dec 2025 22:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="NFKUvsh7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TlYe/woh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPetPV5i"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0DB22256F;
-	Sun, 28 Dec 2025 20:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5637A3A1E6F
+	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 22:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766954889; cv=none; b=Hh4sOXpZI9GxkyCgOv2Jk+iIcvlb2141FgLcgMTk8rUpbY7S+DPBL98xHkJplwzJkiuUc6kZ8EZNLlaBXTMr0Q7BppeaNtc8D8L+h09GJ6zlMAt4i0hvKFwSz5DcEx3P2+Mu02xiyWEchzCP0nhgSs/ohn6fp7taXdZdlBMqOHI=
+	t=1766962147; cv=none; b=KsoCXn+MAdctOgh8Ctobg7urNFvixetcy829/FHPiMAcLS6WSvbcaHB/snbXanL88ew/IvpKD3yG0QkOSPexsh/DsuNO5wmszKdHR3YHkHSI4KtKFqkMrmQzigDBN97noLw9IXQECjh9onGPc/zJnFAqd7ASBq0WMOmOC9daek4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766954889; c=relaxed/simple;
-	bh=Ol9zMwLZf+HQas0pyHTmH8ZqnpB+E40UMR1Tr1zIdPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NA7VTTawGEeYQrKx+T7dPtrilcVMMT/MgMvHzW7j9hRp5olYgC5oRe5jZYJgd9QEctDOc0NwUeb6/+839G78N0m4Lp4VekaT/v16y6VI4VZ/Hc9zwzlUMLOyIthsJnLhlbNxmo9/hJNvZdz8nDsfEnZ9Ef8PyfmYDbzCmriXvPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=NFKUvsh7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TlYe/woh; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 83AFD7A031C;
-	Sun, 28 Dec 2025 15:48:04 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Sun, 28 Dec 2025 15:48:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1766954884;
-	 x=1767041284; bh=stmomKs5w9KPTMilxwJpAtcHDNCZFqnQi0xKX7GpdkU=; b=
-	NFKUvsh7sSjNnclgLQtHS2XztgLH8JgYCzfSZ/kpkL/FRblqetbygnKnfOGFve5x
-	KuAStxpdY4SniMQ2mTE3KaRw812BJYC4YQacXsXWz7qIDGJoPyNh5mVqDzfCdx90
-	rcBhpOW36Eo38+25lzOqz8PUrdndDSTrArLrq45sFAzPXuzsKE5LKaOUrRhW59TR
-	kC2Pql5z7OdotdwgmEbtTl+pWmI/aQUAfQ7lDAqzTNeArsRZQd9Suc7ytUQSK34y
-	n73hzfgF/kyugFNvUT8n1qIhcJY6t4qJXP2jjyJOVv/rC3L3+I9EcrsDNv84NZ1w
-	CufRHJTx9Pj9kWG7TOa9AA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1766954884; x=
-	1767041284; bh=stmomKs5w9KPTMilxwJpAtcHDNCZFqnQi0xKX7GpdkU=; b=T
-	lYe/wohkAHFaxZThgD5iVL+k83+yaVrPMr7N4KYqMGDyCptqeJSCTCFegmni8hsb
-	42ZTXY6rhFH14ur8/eczdRqY9dscooc9xcUeMz8WVHEhRyc69dZkMtu3g1fCl44j
-	FB1Vc41Wp3Z9OUCSdQJesnN/r9WLVCBkFgikR4lKRbDXfi+7OnVxPmIGJI7ILM9n
-	HsNfsg4bcCv1chgDCWwUG0ZcCUBn5gOiGThkYE8pAxbErhdbKgJlpDqW3k2z0Luq
-	0rxHL8VWzbBwYcDWSeqtIatCnm0IgQ+DlHi+9jXMNQE1PBvY7bFmn9k7NJzkfkts
-	BhxIERT41aL5+cRgZ9ikg==
-X-ME-Sender: <xms:g5dRafxwV9FsC59vj4kA2h1ktk9jtz8eLQiY-DjkWk1sb5vEuWDEEg>
-    <xme:g5dRaTHuPh9-N_qthCAPpCWqGQBCt2UB3DU5xmbNfhSIaRWZQ7E5PqxNK-2KKlXr1
-    VPxnGE2efsoalXXjz7NoW04NyjuMlLAUuu2PiLqR9BB0kQkJkDMgA>
-X-ME-Received: <xmr:g5dRaUuqSLMb3ce8etAyOuFDY_oVJlRwH1dKdUYWHWAjF_OCY2Fbo2qzvs0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdejhedviecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfgjfhggtgfgsehtjeertddttddvnecuhfhrohhmpeetlhgvgicuhghi
-    lhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeetteduleegkeeigedugeeluedvffegheeliedvtdefkedtkeekheffhedutefh
-    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlh
-    gvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepuddupdhmohguvgepshhm
-    thhpohhuthdprhgtphhtthhopegrlhhpvghrhigrshhinhgrkhdusehgmhgrihhlrdgtoh
-    hmpdhrtghpthhtohepmhhitghhrghlrdifihhnihgrrhhskhhisehinhhtvghlrdgtohhm
-    pdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrghihh
-    esnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhi
-    ughirgdrtghomhdprhgtphhtthhopehkvghvihhnrdhtihgrnhesihhnthgvlhdrtghomh
-    dprhgtphhtthhopehthhhomhgrshdrhhgvlhhlshhtrhhomheslhhinhhugidrihhnthgv
-    lhdrtghomhdprhgtphhtthhopehrohgurhhighhordhvihhvihesihhnthgvlhdrtghomh
-    dprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:g5dRaTAhwtiqhhDwWv05hoX3qUoQ9Gn1XAq05zlaIo0yaU-jYb0Hwg>
-    <xmx:g5dRafDXQzM9UNWhax1sGC4cY29v_LoG2k4LGcRHDW3wXBSwiTnzOw>
-    <xmx:g5dRadpiIyTN_Sx3e8zMLgDrX6WthoI-enrA4zGbX7h7pSCUjdUVhA>
-    <xmx:g5dRaaEAciTqumbPyQeyI1qJtoC49N-o2KRrUtM8A9_AUjcWlqKc7A>
-    <xmx:hJdRabh8KzAYwhbu7ke6oEdxIrQpnjEkWKltGMkfIqNsnW8uzkzuaWgH>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 28 Dec 2025 15:48:02 -0500 (EST)
-Date: Sun, 28 Dec 2025 13:48:01 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Alper Ak <alperyasinak1@gmail.com>
-Cc: michal.winiarski@intel.com, Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas
- <yishaih@nvidia.com>, Shameer Kolothum <skolothumtho@nvidia.com>, Kevin
- Tian <kevin.tian@intel.com>, Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- kvm@vger.kernel.org, intel-xe@lists.freedesktop.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/xe: Fix use-after-free in xe_vfio_pci_alloc_file()
-Message-ID: <20251228134801.074ed34c.alex@shazbot.org>
-In-Reply-To: <20251225151349.360870-1-alperyasinak1@gmail.com>
-References: <20251225151349.360870-1-alperyasinak1@gmail.com>
+	s=arc-20240116; t=1766962147; c=relaxed/simple;
+	bh=7xs7rBHCkEu0qSnjRBBkrDuWcff1dR9koDAyagfZn70=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQpGIa5N/lueDD/XBYEyZXkk1PB5+w7vsKCjDNMy5/57xfqDVd3b24oTb58PstDN/W3/I7L86BlbSJBtNbObD/uGSCslT3mNjE6LBs5ypwbcy0HyjalumbgJgNN4y6vliPm5y9dorjrb9G3e6nsKnJQkc7vK55XnnGnuo8ChDX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPetPV5i; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a12ebe4b74so154940115ad.0
+        for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 14:49:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766962145; x=1767566945; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BnVxB8hHP+UEx+EyrlcIpTFAKkUEwNTCu8Of5uWFpkg=;
+        b=nPetPV5iEOKTg1X99grd64geyoYpeN4Aexbgs6Ab9dSP8ku/hSCne77nN4ic/KtHRe
+         QeF1BxOq+zpVNa2hBhjMcTITqfxM2j5YLOqjp6vH4Scp5HIheECDkIxseNuIm6q88mYT
+         5zfL8LAEMuihdNDx9B4KvoZb3yjGgnxApFfOxPfh+Q9KuWncQDcYv8MQ9Ct6cOCzC+Pu
+         3HZjGlpZlLVZ7rZGQ3FYefIwvYTa+1D8y9Cp2d62mqDY1qxN670qHTEyhdA7kfklSyTg
+         wr7bxMvXOAUeXPnS/N5fUg1zIEFh3EY81RoXkJwdDrUgI1H4J8UYxFbg8iLF9vohSa0M
+         KNDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766962145; x=1767566945;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BnVxB8hHP+UEx+EyrlcIpTFAKkUEwNTCu8Of5uWFpkg=;
+        b=jEu9ulwE1O7SThJpICSvX5JPW2rO+1uI51oZaZpU23qoFQdO+2YGX27DPlKQWH2/fx
+         sq83szjNr/i4FB3fKkN+O8bHSTgJxsD1RLWPlq36TJ5l/j+fbJLLO4Pm6+8QtFMMwjr3
+         so8qc5qNKN0Ye1HvXx/DLuMA+Lx+ZtQ4G6+jGYTyKOrvsvTC7oanhwtinpfl8HnmWc+y
+         qX8Y/sSuZkCQKku7xEYldXGFckapKQ0uBCAjVVUutYSJJkL1atLk+t92oqfWParDZ53e
+         nf1FXuHestIZHfkeZTQVCDODRP91He1SBDiXV/6M5UexLqC157WShEunFqzZ5lv9I1bz
+         fmsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpEU+EudlVV3noiaSKlE8WeW7Ewo0eTTqqadeJjm5eRGshBws873hb9pZObWirV/ddhgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBmwBF9GqBXQdwqXrsXlZZsyFThjo8r/X7mJniG8bEYTKVKRwt
+	BqgWtAGEvhwMl3ne5i9SX/NWmEulkF5ibmrbAI3ioODmVBXFkULgGTpk
+X-Gm-Gg: AY/fxX6sJ+/ar7YtQfmb9ekmXS4sgCGSWdbsa5hAHrelvciQjNMhfrPcIm7m4rCXb8C
+	tADpqmF9o2Gs3g1zs/YJTVkKX5g0nDTaN6yRjadiPpG2QzXJJyQUvxhcZ6/ccYs2XUtp1KoADoq
+	DgIMjJK3hOrZ6bJxhtU1FgIT3FoCcRxGIhj66RI7gEHvynhLuIk5Ghhk1qI8OrUcAAvRFprJ3dY
+	/yj7vpnzkB4eSR+hKnSHgAMegK8S0hpRjYJUH58qtlSkXtBCpPQrzsxwlSS6uGOqQ//RNKl2E4t
+	VSWkv/vnhLHQVlGbBt54hC6lHxvu9g2wvQeUANcIeoTYVWc7gKl37gk12fpXRNGMGSXfXpG8kE7
+	R4eOfrkUi1xJJn6dsEC4S2Gt9ipjqUGHDLPeiY3JMrzSL2iWnB4w972PGPxNVYezls/GqVxpBWy
+	XfIu++PGMiN5vkRMgR
+X-Google-Smtp-Source: AGHT+IFrZ0jqqyfa4w9leqRMWpvEB4wvR96T1u2WwgRjWIQZDJOokmhOcBM1uE4s/VnzQJrZGEFtuA==
+X-Received: by 2002:a05:7022:4284:b0:11b:9386:7ed3 with SMTP id a92af1059eb24-1217230b84amr31429073c88.48.1766962145520;
+        Sun, 28 Dec 2025 14:49:05 -0800 (PST)
+Received: from localhost ([2601:647:6802:dbc0:79af:1f76:2f9:193d])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253bfe2sm83886095c88.10.2025.12.28.14.49.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Dec 2025 14:49:04 -0800 (PST)
+Date: Sun, 28 Dec 2025 14:49:03 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, Cong Wang <cwang@multikernel.io>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [Patch net] vsock: fix DMA cacheline overlap warning using
+ coherent memory
+Message-ID: <aVGz39EoF5ScJfIP@pop-os.localdomain>
+References: <20251228015451.1253271-1-xiyou.wangcong@gmail.com>
+ <20251228104521-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251228104521-mutt-send-email-mst@kernel.org>
 
-On Thu, 25 Dec 2025 18:13:49 +0300
-Alper Ak <alperyasinak1@gmail.com> wrote:
-
-> migf->filp is accessed after migf has been freed. Save the error
-> value before calling kfree() to prevent use-after-free.
+On Sun, Dec 28, 2025 at 02:31:36PM -0500, Michael S. Tsirkin wrote:
+> On Sat, Dec 27, 2025 at 05:54:51PM -0800, Cong Wang wrote:
+> > From: Cong Wang <cwang@multikernel.io>
+> > 
+> > The virtio-vsock driver triggers a DMA debug warning during probe:
+> > 
+[...]
+> > This occurs because event_list[8] contains 8 struct virtio_vsock_event
+> > entries, each only 4 bytes (__le32 id). When virtio_vsock_event_fill()
+> > creates DMA mappings for all 8 events via virtqueue_add_inbuf(), these
+> > 32 bytes all fit within a single 64-byte cacheline.
+> > 
+> > The DMA debug subsystem warns about this because multiple DMA_FROM_DEVICE
+> > mappings within the same cacheline can cause data corruption: if the CPU
+> > writes to one event while the device is writing another event in the same
+> > cacheline, the CPU cache writeback could overwrite device data.
 > 
-> Fixes: 1f5556ec8b9e ("vfio/xe: Add device specific vfio_pci driver variant for Intel graphics")
-> Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
-> ---
->  drivers/vfio/pci/xe/main.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> But the CPU never writes into one of these, or did I miss anything?
 > 
-> diff --git a/drivers/vfio/pci/xe/main.c b/drivers/vfio/pci/xe/main.c
-> index 0156b53c678b..8e1595e00e18 100644
-> --- a/drivers/vfio/pci/xe/main.c
-> +++ b/drivers/vfio/pci/xe/main.c
-> @@ -250,6 +250,7 @@ xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
->  	struct xe_vfio_pci_migration_file *migf;
->  	const struct file_operations *fops;
->  	int flags;
-> +	int ret;
->  
->  	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
->  	if (!migf)
-> @@ -259,8 +260,9 @@ xe_vfio_pci_alloc_file(struct xe_vfio_pci_core_device *xe_vdev,
->  	flags = type == XE_VFIO_FILE_SAVE ? O_RDONLY : O_WRONLY;
->  	migf->filp = anon_inode_getfile("xe_vfio_mig", fops, migf, flags);
->  	if (IS_ERR(migf->filp)) {
-> +		ret = PTR_ERR(migf->filp);
->  		kfree(migf);
-> -		return ERR_CAST(migf->filp);
-> +		return ERR_PTR(ret);
->  	}
->  
->  	mutex_init(&migf->lock);
+> The real issue is other data in the same cache line?
 
-Applied to vfio for-linus branch for v6.19.  Thanks,
+You are right, it is misleading.
 
-Alex
+The CPU never writes to the event buffers themselves, it only reads them
+after the device writes. The problem is other struct fields in the same
+cacheline.
+
+I will update the commit message.
+
+> 
+> You want virtqueue_map_alloc_coherent/virtqueue_map_free_coherent
+> methinks.
+> 
+> Then you can use normal inbuf/outbut and not muck around with premapped.
+> 
+> 
+> I prefer keeping fancy premapped APIs for perf sensitive code,
+> let virtio manage DMA API otherwise.
+
+Yes, I was not aware of these API's, they are indeed better than using
+DMA API's directly.
+
+Thanks!
+Cong
 
