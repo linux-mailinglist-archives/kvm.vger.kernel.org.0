@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-66767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA95CE6433
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 09:53:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5EDCE65BB
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 11:15:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C72C7300B9A3
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 08:53:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3673E300C6C9
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 10:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA37227CB35;
-	Mon, 29 Dec 2025 08:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B07F2D061D;
+	Mon, 29 Dec 2025 10:15:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43D822A7F1;
-	Mon, 29 Dec 2025 08:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FB1275B1A;
+	Mon, 29 Dec 2025 10:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766998384; cv=none; b=o8gT9R428APM/eoIjl2PuIXwVhYbrfWtt7h8De3SbN0BpEMIeB5UvzBx4E4x4gt7KokouwaHELvpgd0sz9DZqO4HkYhpCLERWdKfelUOmSHKhqVjreAUc8PUTKuDLyGr988XTjFpxHJB1k2TEvf9PiYVAG1JQpVHbKq4BAvgRmc=
+	t=1767003308; cv=none; b=TXC1CYlj3Lj6R/eHlxtlesK3pkHO8CclUUkncdD1lw6Vt1rXnIpm0D9r8zlzzN8xJh7rEjIROtC9GKN+B+vmZL0lWkWAvDmDro/zFt2m4QNm/dSuDjlcjPxjJoImV+1YSQ8f22Jx7GkpZNdFJ4D4AnM5OfD0bbq2waHKsa7F0qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766998384; c=relaxed/simple;
-	bh=1d9RO0KDVFMKwVGy0z3bG4f8MOgC1CsTpOkIxDtoEA0=;
+	s=arc-20240116; t=1767003308; c=relaxed/simple;
+	bh=zbJVtcfrE76Bh7J4/8DAH9uZq82n1d+mYg91k08j2xo=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=nappWRhYT6rsUyGp623avALK792gNqR32GJqpYhaNrEJrMSy1QEDm3qN8yAoBp0QQpmMZM1yRXLEiECkdxhsFdPojfRzMq4Uqzb4vEdjItZFvOMdo1F+DFnRcsNxtXs+QayFRtB5VEPEz5lX4gmrPq1EIiWY9XS5pntkwSRoDLs=
+	 In-Reply-To:Content-Type; b=I/C5otKFqPNv0c/zvWC4bKO6mhp1O+BkSVKVk1VKPZzOayx/pYsqzP29CwMM9QUeHdTbXwQKZApn0uWtyfEPCuBcxpBo2uBwlz229ZxyL/OgRUwN9x18cTpcB9QpuJaLEzYu0XNsymJtRR7HdvWue5ybNF28ESu44Jx6846zX7U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8DxAfFlQVJpjAoEAA--.13295S3;
-	Mon, 29 Dec 2025 16:52:53 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJBx78JfQVJpPSIGAA--.16867S3;
-	Mon, 29 Dec 2025 16:52:49 +0800 (CST)
+Received: from loongson.cn (unknown [10.20.42.126])
+	by gateway (Coremail) with SMTP id _____8Dx+8KiVFJp1A4EAA--.12125S3;
+	Mon, 29 Dec 2025 18:14:58 +0800 (CST)
+Received: from [10.20.42.126] (unknown [10.20.42.126])
+	by front1 (Coremail) with SMTP id qMiowJBx78KaVFJpYygGAA--.16928S3;
+	Mon, 29 Dec 2025 18:14:53 +0800 (CST)
 Subject: Re: [PATCH V3 2/2] LoongArch: KVM: fix "unreliable stack" issue
-To: Jinyang He <hejinyang@loongson.cn>, lixianglai <lixianglai@loongson.cn>
+To: Jinyang He <hejinyang@loongson.cn>
 Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, stable@vger.kernel.org,
  Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
  Charlie Jenkins <charlie@rivosinc.com>, Thomas Gleixner
  <tglx@linutronix.de>, Tiezhu Yang <yangtiezhu@loongson.cn>
 References: <20251227012712.2921408-1-lixianglai@loongson.cn>
@@ -44,9 +44,9 @@ References: <20251227012712.2921408-1-lixianglai@loongson.cn>
  <08143343-cb10-9376-e7df-68ad854b9275@loongson.cn>
  <9e1a8d4f-251f-f78e-01a3-5c483249fac8@loongson.cn>
  <dec5cb06-6858-20f2-facb-d5e7f44f5d16@loongson.cn>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <d368e6ab-5751-9a8b-a22e-4aa2c2d7ee59@loongson.cn>
-Date: Mon, 29 Dec 2025 16:50:15 +0800
+From: lixianglai <lixianglai@loongson.cn>
+Message-ID: <df8f52e3-fea5-763a-d5fd-629308dc6fcc@loongson.cn>
+Date: Mon, 29 Dec 2025 18:11:22 +0800
 User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 Precedence: bulk
@@ -57,17 +57,17 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 In-Reply-To: <dec5cb06-6858-20f2-facb-d5e7f44f5d16@loongson.cn>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBx78JfQVJpPSIGAA--.16867S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3JFy5Aw47Xr4ruw4DtrW3XFc_yoWfCrWkpw
-	nayFsIyrWDA34kAw4UKa4DAryxtrW8G3WUWr1xXFy8Jr4qvr1Yqr48Xr1v9ryDC3y0gFyq
+Content-Language: en-US
+X-CM-TRANSID:qMiowJBx78KaVFJpYygGAA--.16928S3
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3uw1xtF1kCr4rCw1fJrykCrX_yoWDCr4rp3
+	sayFZxtrWDA34kAw1UK3WDAryIq3y8G3WDWr1xXFyrAr4qvr1Ygr48Wr1v9ryDC3y0gFyj
 	qFWUt3ZrZan8ArcCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
 	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
 	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
 	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
@@ -79,10 +79,8 @@ X-Coremail-Antispam: 1Uk129KBj93XoW3JFy5Aw47Xr4ruw4DtrW3XFc_yoWfCrWkpw
 	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
 	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU466zUUUUU
 
-
-
-On 2025/12/29 下午3:10, Jinyang He wrote:
-> 
+Hi Jinyang:
+>
 > On 2025-12-29 11:53, lixianglai wrote:
 >> Hi Jinyang:
 >>> On 2025-12-27 09:27, Xianglai Li wrote:
@@ -95,7 +93,8 @@ On 2025/12/29 下午3:10, Jinyang He wrote:
 >>>> module
 >>>> on a physical machine running multiple vcpus virtual machines.
 >>>>
->>>> While solving the above problems, we have gained an additional benefit,
+>>>> While solving the above problems, we have gained an additional 
+>>>> benefit,
 >>>> that is, we can obtain more call stack information
 >>>>
 >>>> Stack information that can be obtained before the problem is fixed:
@@ -177,14 +176,16 @@ On 2025/12/29 下午3:10, Jinyang He wrote:
 >>>>   +    /*
 >>>> +     * The csr_era member variable of the pt_regs structure is 
 >>>> required
->>>> +     * for unwinding orc to perform stack traceback, so we need to put
+>>>> +     * for unwinding orc to perform stack traceback, so we need to 
+>>>> put
 >>>> +     * pc into csr_era member variable here.
 >>>> +     */
 >>>> +    pcaddi    t0, 0
 >>>> +    st.d    t0, a2, PT_ERA
 >>> Hi, Xianglai,
 >>>
->>> It should use `SYM_CODE_START` to mark the `kvm_enter_guest` rather than
+>>> It should use `SYM_CODE_START` to mark the `kvm_enter_guest` rather 
+>>> than
 >>> `SYM_FUNC_START`, since the `SYM_FUNC_START` is used to mark "C-likely"
 >>> asm functionw. 
 >>
@@ -244,42 +245,78 @@ On 2025/12/29 下午3:10, Jinyang He wrote:
 >>     [<0>] kvm_exc_entry+0x104/0x1e4
 > I found this might be a coincidence—correct behavior due to the incorrect
 > UNWIND_HINT_REGS mark and unusual stack adjustment.
-> 
-> First, the kvm_enter_guest contains only a single branch instruction, ertn.
-> It hardware-jump to the CSR.ERA address directly, jump into kvm_exc_entry.
-> 
+>
+> First, the kvm_enter_guest contains only a single branch instruction, 
+> ertn.
+> It hardware-jump to the CSR.ERA address directly, jump into 
+> kvm_exc_entry.
+>
 > At this point, the stack layout looks like this:
 > -------------------------------
->    frame from call to `kvm_enter_guest`
+>   frame from call to `kvm_enter_guest`
 > -------------------------------  <- $sp
->    PT_REGS
+>   PT_REGS
 > -------------------------------  <- $a2
-> 
+>
 > Then kvm_exc_entry adjust stack without save any register (e.g. $ra, $sp)
 > but still marked UNWIND_HINT_REGS.
 > After the adjustment:
 > -------------------------------
->    frame from call to `kvm_enter_guest`
+>   frame from call to `kvm_enter_guest`
 > -------------------------------
->    PT_REGS
+>   PT_REGS
 > -------------------------------  <- $a2, new $sp
-> 
+>
 > During unwinding, when the unwinder reaches kvm_exc_entry,
 > it meets the mark of PT_REGS and correctly recovers
->   pc = regs.csr_era, sp = regs.sp, ra = regs.ra
-> 
+>  pc = regs.csr_era, sp = regs.sp, ra = regs.ra
+>
+Yes, here unwinder does work as you say.
+
 > a) Can we avoid "ertn" rather than `jr reg (or jirl ra, reg, 0)`
-> instead, like call? The kvm_exc_entry cannot back to kvm_enter_guest
+> instead, like call?
+No,  we need to rely on the 'ertn instruction return PIE to CRMD IE,
+at the same time to ensure that its atomic,
+there should be no other instruction than' ertn 'more appropriate here.
+
+> The kvm_exc_entry cannot back to kvm_enter_guest
 > if we use "ertn", so should the kvm_enter_guest appear on the stacktrace?
-> 
+>
+
+It is flexible. As I mentioned above, the cpu completes the switch from 
+host-mode to guest mode through kvm_enter_guest,
+and then the switch from guest mode to host-mode through kvm_exc_entry. 
+When we ignore the details of the host-mode
+and guest-mode switching in the middle, we can understand that the host 
+cpu has completed kvm_enter_guest->kvm_exc_entry.
+ From this perspective, I think it can exist in the call stack, and at 
+the same time, we have obtained the maximum call stack information.
+
+
 > b) Can we adjust $sp before entering kvm_exc_entry? Then we can mark
 > UNWIND_HINT_REGS at the beginning of kvm_exc_entry, which something
 > like ret_from_kernel_thread_asm.
-Talk is cheap. Could you show your code?
+>
+The following command can be used to dump the orc entries of the kernel:
+./tools/objtool/objtool --dump vmlinux
 
-Regards
-Bibo Mao
-> 
+You can observe that not all orc entries are generated at the beginning 
+of the function.
+For example:
+handle_tlb_protect
+ftrace_stub
+handle_reserved
+
+So, is it unnecessary for us to modify UNWIND_HINT_REGS in order to 
+place it at the beginning of the function.
+
+If you have a better solution, could you provide an example of the 
+modification?
+I can test the feasibility of the solution.
+
+Thanks!
+Xianglai.
+
 >> [<0>] kvm_enter_guest+0x38/0x11c
 >>     [<0>] kvm_arch_vcpu_ioctl_run+0x26c/0x498 [kvm]
 >>     [<0>] kvm_vcpu_ioctl+0x200/0xcf8 [kvm]
@@ -293,6 +330,5 @@ Bibo Mao
 >> interrupts are always off during the cpu root-mode and guest-mode 
 >> switching in kvm_enter_guest and kvm_exc_entry.
 >>
-> 
 
 
