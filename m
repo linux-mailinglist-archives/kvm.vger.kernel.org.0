@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-66787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 957F7CE7C77
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 18:53:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38BC1CE7C7D
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 18:54:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 866BD3010AA8
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 17:53:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A78DB30022F4
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 17:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC80E32B98A;
-	Mon, 29 Dec 2025 17:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6A432B9A7;
+	Mon, 29 Dec 2025 17:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mLE4FTj6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LDtyeRSP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F581E98E3
-	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 17:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253601E98E3
+	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 17:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767030833; cv=none; b=DupbtiP5092J4yxTVNwZdbRZS+DNMoiq9/BiTVI644C8MnK0DX9kZ+gAeHbtYAvpOGojje2Nu2o5lIIwEyX+dN/2VxLpkcR9RkkWwjTzfBdDuYaT/mres65Hmbi64UCd6b8zj8v/16ZOSaa7Uj0zFcGyOQfq5rzunqhJp3CZWIQ=
+	t=1767030867; cv=none; b=NrW61tYflO1ubzt7kVq5Dm+eYWeMTqZWJ2HyKoWDp3irFQ9f4DYlGyEg7SlqA/ReMiwDMTsL63yrfLqMMbRCS9PmTfH1JvMGlUwgIs6IWcoCnws5IGu3iNXLvMyI8FMQEyY4RVU/L3trJmSZO3+/y8NlS+3bC9ENU22AxIkb3Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767030833; c=relaxed/simple;
-	bh=cGtU268PVyKbIb6Ku1262dj4d03/RfJVQM9jAVXb5qc=;
+	s=arc-20240116; t=1767030867; c=relaxed/simple;
+	bh=ZfudRRrjxmfozq2Wd6dQzmYi4utdaQaZ1iCsn7CUmuo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eWsE6r+TpLSCBfzzMtIcVaEjNLVXU/W59aalLFyv7umakM9Bpaa42MkS/+oqx0Mp5nsD7wWPbqAAiPvP38yyja7+eSNXo94uJoobVwcQJ57NaWn4Ch0It4/VOq48U2lLErvG1ukwaQaE3VsdGAnRrtGjNzwXPePa2v235Mh5pYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mLE4FTj6; arc=none smtp.client-ip=209.85.214.176
+	 In-Reply-To:Content-Type; b=Jm8HsnTPnHFnWD151jVo6CLnq5sykoL77nCHzoYMvfFQLQZzJzTo85C3/QMA5KKPaDfcEBWPmjSpknW6rapsh0HEoVQQL/sK2DKR0FutVgvPstHPgrwMIX7uXr55uQ2kSocbFV38IchXeyt3aEP8uHeY5PqcxSswnGMyYj/5LwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LDtyeRSP; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-29efd139227so122484575ad.1
-        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 09:53:51 -0800 (PST)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7f216280242so2844599b3a.1
+        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 09:54:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767030831; x=1767635631; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1767030865; x=1767635665; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=lky3eRWjNVZKS+mrPVmhhZW7nvQlMJxhyck2GcA5NUA=;
-        b=mLE4FTj6sWch/fPsCZdzaRHnX2iwWhQQCPm8pOvGmy1YElwKxpXzXG3o2Gi5piJGIP
-         aQjTjReF3XP/7Fw0QHLuG56ODlcHdPfprsqy4ePGC07cCn2nW/EMkRTj8CMXq+52EIzj
-         Bj2X3JjiUVCYzDW2Ic/nC5HyR6Kf+OsuU6DZ3RTwfaRYUAKT2DDVvA4R2fe/ANNFwVxc
-         3pJQz2uNqgfvYt+in0C8mzGsSIo4rPzb38LnheSgat0g1gvbdbQ+ETK5zysaheraHrLk
-         auaYjrQkR8EIVDQHWzvm0b/UqrMztQKlCzJLOy53Xff67NPO2/Oleus3eFBygoqgv0ry
-         hnmw==
+        bh=5mESAwMIaZhTqkXM52ikDUvB0G0HmjkijOpwFN/LSz0=;
+        b=LDtyeRSPGSrwCW3zR+DktoN+47r8crCNMTY+iLuvTL6soQLW4QS1SFUhfQIIiicj2G
+         KFuXfm7ly5qXhJL8rkAKirlxcw9vuACvsVei51B68A4Vc7rgRkmYCnf40Ji/4SVspYkf
+         DSBmjhij9g7jBzdfwqL1q4mdJphFCen/GfLjqP1+FF12EEqL/atUSmAGZZYQbUZQ1MsP
+         h7yLbcA4DTQeC6tWrn9fc4J7cnoI5FIdEYNRsJzaSE868JOXy/UPu61iCoDOaynDkSHq
+         Grk9UbGJ+g1nBbUR5CUU3DGls+z+9IUFqzoyJYVhjM+Yu6XjO2NwV2FP4ugftp8thwSS
+         SxMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767030831; x=1767635631;
+        d=1e100.net; s=20230601; t=1767030865; x=1767635665;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lky3eRWjNVZKS+mrPVmhhZW7nvQlMJxhyck2GcA5NUA=;
-        b=kwwvCd3FazIkEdHbQhVY3P5y4pcZCikWIHEBkxL6OpXa9anYd3JtANVf3sx88QW3Ya
-         Lp9Vuf9d/pXQ7bmIS7ylYNlQUMlqJ6yMhFFdugXXgygEaOmmZPGfiV/MI8RwgKULh3rC
-         xPq9c7ytdyVwcOZ51VDAHbvVWyWtH7k4+cBkXmjfI3h7GskFjNB2xbdcgMH2wUNM3+ou
-         rGLqnmMcThzyH2KoDZT5g+tRfSFVUa+0I9ETQ3lfwMP/gGZdsAKmBF9t337+GcY5OfBa
-         H6Jjilv3/ZgK2CXWWaCjjBovfpjXhPKyHDQ8f0jltkSvCFa8PdBvZHwH8ESIR5wcOgAq
-         rw1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVUHvSU3LabMnYFKdEg+4xOd23N+cGRCDtdKgDFRvNkcLr1juMvGfibWUpWyt4+Xb9rghQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO92WDFXqzyTEZ0745tgvJI71bIdcnTw6FZQEpX5mCAIVaRyAh
-	tPmjLDFy2V2hIHT51gbwKjbYhF7Tu74k9ZZg55rDy0OhLVkXFtgJJPL6u7IzALKTj2U=
-X-Gm-Gg: AY/fxX6n4I7NbZIaECKETL2exsK22uZG4y8L3ECS8KwOROfIuPIoAErVS8rm303Caa9
-	5wqq7QDRc74MMad5/HCJsU8sxyOqFhJLs4TKnBVRiuWNUlwUkYblTVCKttsiDYiVCoZHN07dDe2
-	UqZ+Zeh4w0IVSFDat5CRwXfc2klq+iDjWBgLt9TD1JWDfrIHIW5iBKOFz25c1RWspBOgrOsOK6A
-	2cYZjbpfXlu1s5qF1yI75yRi4ZyvLE/rquLRoRQ7SGgJ4EJiVwULFGDz012ZcC3tjk3R/tnO9Ej
-	eQw9uPzXAxhOFeOhWm0A82Z/w9ND6g+/DRLdMAyv+dVDUQOXE3u7F4TA6X8t9fQ/SAP14y4f/SA
-	+uFQr8pJpr9fBuO4s72V/UMrQDIa192mRzo4JRsqUiC3EhTXondBMGi3sGv19sj7tAlxGjJhnMS
-	MHBAIR9Dcyj4B5clwz1hhQ/R70I8Y3exs/3/WCRspkuwQL9KsqHtSyfKyc0XDZ0MR9YgQ=
-X-Google-Smtp-Source: AGHT+IF3q1WBxBVC8iD6QACtpbZ43a201nZhMCGmysPIkpzipaQ8LOlenvNFJc0//WIB7MVZ2DNQXg==
-X-Received: by 2002:a17:902:daca:b0:295:5dbe:f629 with SMTP id d9443c01a7336-2a2f21fc4c9mr274162615ad.8.1767030830730;
-        Mon, 29 Dec 2025 09:53:50 -0800 (PST)
+        bh=5mESAwMIaZhTqkXM52ikDUvB0G0HmjkijOpwFN/LSz0=;
+        b=br6jFhuCRKlsuJaxnI3DHIPCHQbeKstA41FfSvZKMlKb1z9a3kwYNDBZ+UNcPw0d1g
+         n2GDdheVSOp/lM6FyhkaaFUR+Kq1+ulLxwVq6G0xA32z0G6ho4lfdqivZ0Ivh3EA8Nfx
+         hV8s1blY+/+eaKYY+YZADsvvI447d7+SJaRv+s9deGza2cYz45RYmsbFpQqDmCJ5pMQb
+         RW4ID3rwyVUGw1NFrFU2uSNbu3PKf+QHij6JTyJU4F/zPbUdwaV2SIePWlxFbYf1ZEyV
+         yDtlGDsGhKQ2Ixl9hMWjFzgd63jbH5qsN2j1AxfHd6jjXXdCtYSHdcNETKxmjrFMWmjS
+         uUug==
+X-Forwarded-Encrypted: i=1; AJvYcCWSpWMARZfYAZ8Fy8tPRdjvUsGY38dzJnZV6GH0vCq02mi9UuqKCxgpEp2zvRjrHKDoItM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJSH1k4oMcjWt1wAfQnwP+3sBgKbHl0rtHmuWed3xfwZjxHO04
+	PN1og9/YIkhlChcZAKCmbsdZQwzGGhhDe1H9kBzCboykREN1K3WbSAgm9ub+Q55dUZs=
+X-Gm-Gg: AY/fxX5H1ZXTtAEpYLpyDOW5Gk/VL9woayqKf/WmcpVeMsv7VQjkaVO2mCqvTqBBI8w
+	6jrP56fLSkgXcUsc6pfprDYkaeNbmzY1z2W+TB/M4KFtdXN8mXpXo8ZYwzctGPS+Uu1cZEalwIO
+	Q7ZawR8CldlrR6n/R+zFBHQ60e3nB1Vy8XIp/8GFre8KDhwXv40hhxWgsgY2G4fdFSzg/x+1jLA
+	aOuouxz8RSaJGybKX6a2ls5TCoMoPnmaLXQjDE60UHQ2f8G2I4YYCkHC5jqgruZCQxQ+hmhUnnK
+	YTau9lvR4/t4HnWN+sPpLFlaFVVRB1NzY9xfvA0H+BAhcwI3Wd+vR+/d4WehQYy2d9PsALld1qT
+	xdTYmhosxyfxgODgfL9XSmKQ6dQuqbzmIP0YJ2vBYtOTaqRcQx2H5IzALoIpFC3UX6L5pn7wLPj
+	mniGzbY2aSWqpifmg4jLo/EnG3tmSWxObaXDsaOMxqpg0XIZfl1YsXCHoPoS9lwyS9510=
+X-Google-Smtp-Source: AGHT+IHQ8yYvue4jDg7JeE3lH+Gt+4MdRjzYLTmvkOUCJGp4EE3jFYwbcLmUa8MKW1PV9cUvFd421Q==
+X-Received: by 2002:a05:6a21:99aa:b0:366:14b0:4b17 with SMTP id adf61e73a8af0-3769ff1ba96mr30143190637.34.1767030865328;
+        Mon, 29 Dec 2025 09:54:25 -0800 (PST)
 Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d4d858sm282363275ad.57.2025.12.29.09.53.49
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c1e7c147943sm26110508a12.26.2025.12.29.09.54.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Dec 2025 09:53:50 -0800 (PST)
-Message-ID: <e5607e7b-3523-4d75-b0b6-d134c7c5d1cf@linaro.org>
-Date: Mon, 29 Dec 2025 09:53:49 -0800
+        Mon, 29 Dec 2025 09:54:24 -0800 (PST)
+Message-ID: <6f75cae4-817f-495d-98ec-c7af210db9db@linaro.org>
+Date: Mon, 29 Dec 2025 09:54:24 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 09/28] docs: arm: update virt machine model
- description
+Subject: Re: [PATCH v12 14/28] hw, target, accel: whpx: change
+ apic_in_platform to kernel_irqchip
 Content-Language: en-US
 To: Mohamed Mediouni <mohamed@unpredictable.fr>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@csgraf.de>,
@@ -106,22 +106,30 @@ Cc: Alexander Graf <agraf@csgraf.de>,
  "Michael S. Tsirkin" <mst@redhat.com>, Mads Ynddal <mads@ynddal.dk>,
  Cameron Esfahani <dirty@apple.com>
 References: <20251228235422.30383-1-mohamed@unpredictable.fr>
- <20251228235422.30383-10-mohamed@unpredictable.fr>
+ <20251228235422.30383-15-mohamed@unpredictable.fr>
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <20251228235422.30383-10-mohamed@unpredictable.fr>
+In-Reply-To: <20251228235422.30383-15-mohamed@unpredictable.fr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/28/25 3:54 PM, Mohamed Mediouni wrote:
-> Update the documentation to match current QEMU.
+> Change terminology to match the KVM one, as APIC is x86-specific.
 > 
-> Remove the mention of pre-2.7 machine models as those aren't provided
-> anymore.
+> And move out whpx_irqchip_in_kernel() to make it usable from common
+> code even when not compiling with WHPX support.
 > 
 > Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
 > ---
->   docs/system/arm/virt.rst | 13 ++++++++-----
->   1 file changed, 8 insertions(+), 5 deletions(-)
+>   accel/stubs/whpx-stub.c        |  1 +
+>   accel/whpx/whpx-accel-ops.c    |  2 +-
+>   accel/whpx/whpx-common.c       | 10 +---------
+>   hw/i386/x86-cpu.c              |  4 ++--
+>   include/system/whpx-internal.h |  1 -
+>   include/system/whpx.h          |  5 +++--
+>   target/i386/cpu-apic.c         |  2 +-
+>   target/i386/whpx/whpx-all.c    | 14 +++++++-------
+>   8 files changed, 16 insertions(+), 23 deletions(-)  
+
 Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
 
