@@ -1,416 +1,251 @@
-Return-Path: <kvm+bounces-66769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66771-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51B0ACE663D
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 11:42:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9249CCE67F0
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 12:19:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6B45300ACE7
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 10:41:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A72B63011A5B
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 11:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B41F2E54D3;
-	Mon, 29 Dec 2025 10:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D164D30171A;
+	Mon, 29 Dec 2025 11:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="XgK2FNMT";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="aj6C5IEk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8859426056D;
-	Mon, 29 Dec 2025 10:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767004915; cv=none; b=SN374a+cxRjCGnOn5uytHB8uf+bHUn4E2880IW/i09bX/290cKwdRrEFxdnDbfATivzkZghcyDNQ169nfebYM1fmf8F4s94hejKJyEf6MKTnK2igmJnBtX09/G4Mr0NCF0hnz/GMjKFZ2Sa5UmY/YPFR0nDSVUW9IyHx1LaGKIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767004915; c=relaxed/simple;
-	bh=dNRixogdwkkXT3ZIMOQ+3F0ZThi0GagA5SDoZDLwtOM=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=bwvPzVnv3R73aH7GDkdyGkAlTLJhL7fAVlx2K4bI8jEGFAw3KfucwOtCrqPd3wo7k9NoPJ23bPiP8d6PcFXCfLj53oPeifHk8+pIJLRQoQpJCMkxv8i4VcdzXjNvw/xT/+wK7iMB9gZHF4pgbJiw0IlS5unl7AiLEFsl26eq8gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [111.9.175.10])
-	by gateway (Coremail) with SMTP id _____8CxVvDnWlJpDRAEAA--.13252S3;
-	Mon, 29 Dec 2025 18:41:43 +0800 (CST)
-Received: from [10.136.12.26] (unknown [111.9.175.10])
-	by front1 (Coremail) with SMTP id qMiowJCx98DeWlJpRysGAA--.2622S3;
-	Mon, 29 Dec 2025 18:41:38 +0800 (CST)
-Subject: Re: [PATCH V3 2/2] LoongArch: KVM: fix "unreliable stack" issue
-To: lixianglai <lixianglai@loongson.cn>
-Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, stable@vger.kernel.org,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Charlie Jenkins <charlie@rivosinc.com>, Thomas Gleixner
- <tglx@linutronix.de>, Tiezhu Yang <yangtiezhu@loongson.cn>
-References: <20251227012712.2921408-1-lixianglai@loongson.cn>
- <20251227012712.2921408-3-lixianglai@loongson.cn>
- <08143343-cb10-9376-e7df-68ad854b9275@loongson.cn>
- <9e1a8d4f-251f-f78e-01a3-5c483249fac8@loongson.cn>
- <dec5cb06-6858-20f2-facb-d5e7f44f5d16@loongson.cn>
- <df8f52e3-fea5-763a-d5fd-629308dc6fcc@loongson.cn>
-From: Jinyang He <hejinyang@loongson.cn>
-Message-ID: <a1009e1e-34de-68b4-7680-d2a99a06a71c@loongson.cn>
-Date: Mon, 29 Dec 2025 18:41:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8D42749CF;
+	Mon, 29 Dec 2025 11:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767007120; cv=fail; b=QB24wOmAQbrGMTUU1jPiW7A9thVmJi3zdds+OwZ9QN783KwowTW5qFkKb/Xdd+n16MlcCKZY3Q7/n8fvHD7eTmM6SiYxzATvmwuLqwTZ4zw/BeZ3VFGxq/KGpwA9O2nAzhwDJyRvS8AE3y5cRV1FlxaSoMHZdBtDAxNFiWR2R68=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767007120; c=relaxed/simple;
+	bh=fx8FO3oHjez9pmKEpRBD/WrNGq9ezMGN+sF7HRELj6k=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=oGCaun9fsPdY32jkij1kYbkZcq6dk55znV9x97LJQNQXVOL2u12soTqwR1dd0GiwiNteOZGLplPe+E3eoa6G7nKhg0YfzgHixuz0SyeYdsxZIUyEpdfX2Mzw2yJPK9DoZHUhnN4t4PbryApIK+nJ4eO4jBPFy+WZ07CQFFrTQAA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=XgK2FNMT; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=aj6C5IEk; arc=fail smtp.client-ip=148.163.155.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BSJsnK8670278;
+	Mon, 29 Dec 2025 03:17:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint20171006; bh=5FRyFzeW8XaGD
+	RCcJiwe7m+1ZgGeDBPjRDLmSt1+18c=; b=XgK2FNMTPF7mVMUqWIwmkNwBJ5n2A
+	/cfFIk2Vz9VgxpS5nOxHPsDFQsI7G+D9fjy7/wLPlXG1GKQPVljELQgUTb1gCDuK
+	RpSCLGI00HzjCnvCVtMRbhQVvU4X3XTMaegDp5NQOOQgXvm1KogPvMZ3uaiOaKM3
+	MnQQW2DJqZVyWd5vH+3anzIK/fsSa7nqm1eSi+iv/ljUHiWDfH2/6esn+CEjlHN+
+	4IhrhS+bfOktZ+DfrItAxQv890gbNj7W70jsYqITdNV/KUDlt9Y+CPupofuErCKW
+	UQt2bRFMegrEl8Aml1+3PPAfiAPgQMKDN93tfLFVETf2yvZMKKWPPOf9A==
+Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11021103.outbound.protection.outlook.com [40.93.194.103])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 4badv92mmq-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 29 Dec 2025 03:17:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bjkAUJKdM5O9u7ace7iC0pHz88bq7GOh85fw6RJe4nc3dx8BELEQ1/ub0NxaAdDgImXlDjKy5ixscpoqKJCVRGqQz7P9KIYxFoja9i63aYxagEaDFAvXzPF088F7P8G9WCzakkse3kXwrcbiRWYV3Yi9tOFCidFK2hmgSbDqXtXgeqtGvO9vbUYP2pE0dLfl0rfcyr55iJ5Os340q2SlRP59TA160ojqAbw+fc4HpfhcYq+EFel8f4M17R2EuZyh4OWYZJV2//0HhDs4Onot2h4agMJvYkMHbGUqOD0SYrmj5p9EgByQ2vedBNHmrbla7l8LLDi3J/PPbCrJbQUwPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5FRyFzeW8XaGDRCcJiwe7m+1ZgGeDBPjRDLmSt1+18c=;
+ b=YcT7xlm6tQTE5I+qt7j9hW+/U+8Z837LDKxCqWLQjgHejWSxtrr0Q101Zql8mZE/SxfFqr49dQ88c6D+z/ZhwSohoS575ri1m4U3eJzgtwBENq4epCqOR8fJMCbvpAu+C+MZjdz6Tp23R//RRw5w2GqvdA4oYCLqMEfOsI/NXI2DkqNyn7s5j02iw+xiv44XxCwtxtrhkjqKFtkLy5BHdjM+7Uj7m7GfsyRXVHkBXu97tnA5EuirCOJ3JCcZ/ZoVH0TYJzS3D83EQTDjXxSGFns3zv3djnMKm/3oF/VsTGCx2gtRJFvDOFe3IM6mAAfcrEadq6H/n3bjNgbEGtHf6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5FRyFzeW8XaGDRCcJiwe7m+1ZgGeDBPjRDLmSt1+18c=;
+ b=aj6C5IEkCBxzWR2OuWG/RgtOM3YPxYi16lIW7GnwVneIBL+g163NVZb/OlR+fUibD0ezMFbwXB0sVcrjUb4kXuynVnTHkUKPmPtVl38YBkh6U+Pg1YahrDoj7c8JhzwqEAWl2XXS2MI2on5I73cyW+k2CzRe2Ghjj2hyjgrftFv6HSb865dZGn4OAgmJ78grGRYVXrMhl7NSQfVSBA24hjPcfhz8Pi9qSciHPIXYD+UIDn7DNBF2NEVTNuM7fDuwHu1WRdpyNs4a56FSuRkP1RZ/5y/lQXPsaB6ywzGXlah0zg+9nYUjfNr5/DD4rQ/h7ewulPt0BaqxJB+DXuS31A==
+Received: from PH0PR02MB7557.namprd02.prod.outlook.com (2603:10b6:510:54::17)
+ by PH7PR02MB9965.namprd02.prod.outlook.com (2603:10b6:510:2f9::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Mon, 29 Dec
+ 2025 11:17:39 +0000
+Received: from PH0PR02MB7557.namprd02.prod.outlook.com
+ ([fe80::4917:bc05:4373:6bef]) by PH0PR02MB7557.namprd02.prod.outlook.com
+ ([fe80::4917:bc05:4373:6bef%5]) with mapi id 15.20.9456.013; Mon, 29 Dec 2025
+ 11:17:39 +0000
+From: Khushit Shah <khushit.shah@nutanix.com>
+To: seanjc@google.com, pbonzini@redhat.com, kai.huang@intel.com,
+        dwmw2@infradead.org
+Cc: mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        dave.hansen@linux.intel.com, tglx@linutronix.de, jon@nutanix.com,
+        shaju.abraham@nutanix.com, Khushit Shah <khushit.shah@nutanix.com>
+Subject: [PATCH v5 0/3] KVM: x86: Add userspace control for Suppress EOI Broadcast
+Date: Mon, 29 Dec 2025 11:17:05 +0000
+Message-ID: <20251229111708.59402-1-khushit.shah@nutanix.com>
+X-Mailer: git-send-email 2.43.7
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: PH5P220CA0011.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:34a::11) To PH0PR02MB7557.namprd02.prod.outlook.com
+ (2603:10b6:510:54::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <df8f52e3-fea5-763a-d5fd-629308dc6fcc@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowJCx98DeWlJpRysGAA--.2622S3
-X-CM-SenderInfo: pkhmx0p1dqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3uw17ur47try3Gr48Cw48AFc_yoW8JFWUJo
-	Z093WIvw1rtF1UKF1DJwsrtr45Jw18GrnrtryUGr13Gr1Ut3WUX3yxGry7Kay5trn5Gr43
-	Jry3X34qyFyrtF18l-sFpf9Il3svdjkaLaAFLSUrUUUU8b8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUYA7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	JF0_Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwI
-	xGrwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
-	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uuWJUUUUU==
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR02MB7557:EE_|PH7PR02MB9965:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d884399-d6e6-4002-41d0-08de46cbe04b
+x-proofpoint-crosstenant: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1OQH1wdr341HKv+pCLGma5a3b9H8i/b3/T0aPQhYKQh+/oCYtx9lDfX0W9Ea?=
+ =?us-ascii?Q?xkq8ii4q9xAYid5XCO4wCLLtqQFmQQ89ZQWM/Eg7SlxmEtKNerud1e+Pvzwg?=
+ =?us-ascii?Q?CePR3qQkAyEPDMcK+Z7HUjwnwtoUCpPAAefRDCc5EipcolnKb352FUQl1hjX?=
+ =?us-ascii?Q?AgQ2xm4c1zv/ON+CwWor/DU32LZLdcdkzpNE/fCFKD6H2hQjfkwouhEIpSIK?=
+ =?us-ascii?Q?J+QASmOl3xyevaze5pNfR32pyuiMAZ9D0oOeiqJBFAdoc54zr4v70s27vllQ?=
+ =?us-ascii?Q?KmaISpDBlngiQaggm54mxrXL3Rv86eAQyjFFp+NIVuG0FpqW5/znWFOftQnt?=
+ =?us-ascii?Q?xjjT3lwt/39GHI1gK0UktvYTHhzZQbhkZzDM5tgPS+DarHUFfbyTBxHHPGWU?=
+ =?us-ascii?Q?nSnSI47ECDyRJvZ3+OsTTstI2pRYEbzzWkHPR48BlmCufm7EZntfID0ydDWL?=
+ =?us-ascii?Q?h78uZ5GouzznUKMnd6fBorGIm2psX37vVk5FTRdjXQMFkpcvQkjiFmUpBscy?=
+ =?us-ascii?Q?QrLZpCQhvnGB0asZdN+ZzFb0DFaSlKyDg+2rcQIk/PPjwRhVzVl0nDquKezy?=
+ =?us-ascii?Q?98rtNr1RgnJ30/qXjPgw2kwy2lgijC2tmgvGESDBfW+95xV8QUppqLCbgCIr?=
+ =?us-ascii?Q?EIICTqtgEQRKrS82uq9J6+I1dZtwaFmWUfaYM3rIowgcC32sgOhNJvH56O71?=
+ =?us-ascii?Q?ksyPy10VIaZa6FohLGkNq68GCtZfpsNyX3+Q8HTvYACk2gjO4htlQbrNg1Xi?=
+ =?us-ascii?Q?D7WttbatbxoT0noiJqGZ01pmWFo/KsS4eDxmmKTbFDit1Jh/1WfqiT0lPYRO?=
+ =?us-ascii?Q?8niNEWkipX8ZghpR0evsIMCf8LW4gyqqQ3TePtoe5ucZ1aVCzTOfwtN7n7rM?=
+ =?us-ascii?Q?JdWL2N51YkQapiAIRUPaaBl6HxNmjvHoKK+Ftan+GHzZ0K3/iZMKTtVwdISM?=
+ =?us-ascii?Q?PGU6tHjx4Gvpv1Y7n+uCfPvoui9RRaEW80Z3RmRQtCzOMS3b7dvAagf2p82k?=
+ =?us-ascii?Q?+X126XeZ0CrUzeB73Kf4rHaqUF4kqWJQCdVUhWZuCIuO39cDnqXCninDMr+v?=
+ =?us-ascii?Q?o1qzZKJ0Adaf4ZuBe3RJMNkg+qSO1ADkrNIRz5ejCvgdmi1lWN92Rn3bswjY?=
+ =?us-ascii?Q?BiGt0leDVYQ5lrGuTfpfNrchQ4oQchu1ZyeVUuPZsa1F6eIrYXOZHJrcnvOW?=
+ =?us-ascii?Q?YzXLDuE/m6nOGsTIMPC5KZET5duzwjEJF6TSmXmwNbwSNyS7QFkd3/5Di51B?=
+ =?us-ascii?Q?EKRTOZimFwsVqLawvHV93lhG1Iq4r5KTGk/wMLfkurQ7maDBO0fdecFdpsFO?=
+ =?us-ascii?Q?gJIFvzOWQFFU4rOpSD4CuN25jyX1A81Ht3Ob2d3nP83KkN1cPo4fMPVtYj3g?=
+ =?us-ascii?Q?V0X7/aNOb55bCoA5g7tDkK6C59lf+d36UDinxypJrAxX/ZHl989kWe1JuD35?=
+ =?us-ascii?Q?/bgEls8voEsjQxgxKxgYXEviHtV8Ot/l?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR02MB7557.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?7wdZUOV9Qgw0EvoWeTnwD9JOU5kSE8n/xZOIbXi3JhAFRlU+1ny2v8C0IAen?=
+ =?us-ascii?Q?EfHwsj7/d3KAaq46+688I1F6eX+RiAs6pSR9pW6Wy1MvqsmCuCPeCra7bwXP?=
+ =?us-ascii?Q?TPB+CNHp8mFxfKu11+B/eIUNy4eT4ul2SmlwPWA1s5Xpu1N4pSQOJ9P2/2Vm?=
+ =?us-ascii?Q?bn3nsHTJlkItaO9J5JBm+Rt4BZg8qa/UTazybgSnaCS+RReQZK9ZE0UVrlM4?=
+ =?us-ascii?Q?rrYeiqksgnbEc4tqqkCLGJcrBzFDNSCE5abbLiiPtcY3yRmu/3qmU0LGEtw8?=
+ =?us-ascii?Q?dWr8Dz/7oOKCckHfBzP2GNhNHVu4N1BWOadtM5OC1K5YbOMLy1muz2D3iDTd?=
+ =?us-ascii?Q?OREJeuSyjcY/z1Eua4CJT9w4wIuSk+QxAQY5sKwdp+rlWmkcAzShI9uUAH7R?=
+ =?us-ascii?Q?BPkhuBv+yhKDT9iBI3ZMgxMnFj20w9muGulRUYlnPuI8xCPvOvlv59UInQt5?=
+ =?us-ascii?Q?ya/74v91swaUUPbZiOn/HAXn4K9+2vSwqOoCruc85Sd7RJApj5gGjwMYphgR?=
+ =?us-ascii?Q?fWEIbzPF03JNH+2cnR0wOBagGCdP4wHbW8t/bAJFEv/XSGATBIBh7pzFvEQo?=
+ =?us-ascii?Q?jgVBj5NpafxKB5JWGPLYv9aDbY48jU6JsziTl/nLbplDJZMZU/f4BJ52AR6O?=
+ =?us-ascii?Q?/kRFP+5jcHscUb51Rc/hHh/BJheDdf6ngH558LEcclA7XEyeWWQpFkFSdqng?=
+ =?us-ascii?Q?HxlvtFv8oaJFvLU8KF70dIJLLJ/343N786PCW9AbjmM2Tyq+bYDUkqUkn2E7?=
+ =?us-ascii?Q?VpyQxz+72tiW3CROxzfNUvgVnLSjEOQAcDTlui816CLP6y7yiXwsoIZ30x2u?=
+ =?us-ascii?Q?gYuzOmxVF3TDr1q288Z6dFkkIn226RrLKRSprUtubxgoz+dpu5kO88sLCcU7?=
+ =?us-ascii?Q?UNdQjOqxTcoyRkRB70arp8bhyS+lqEysW4Gc2oDGjQpAQNVblQmk+606jTBf?=
+ =?us-ascii?Q?pwxnPRyWbIsVWxg65JL28SV1hqu6uGFW2OnG92jg4ZpRNMrnJ8Q/aXuIP+pB?=
+ =?us-ascii?Q?kLiP17itoluytLiq4SJQ4TimZfcPLKng9/jnY2TTzG46n9FZwMi9iyEWs0lh?=
+ =?us-ascii?Q?skJP8pnMAswwnWFeMYiLXOf4DsTFQlTzQM3tFyVhYERvpagSwjzP7BMs/OiM?=
+ =?us-ascii?Q?oHPw9ZrMGryKzKLkWzKdPERm+Ri3tRyxKnllGwYSimW16V287qcdRQ4sr9qi?=
+ =?us-ascii?Q?SDh+Yjvz8OlP10r0e7yFUk7FuFdeLc19vb5O7OzjJCoyZmO/YqwKuPSp6Njy?=
+ =?us-ascii?Q?pcFZRH3sG84PNOMbBkA0hhUXPuOeah9wHt0Buj8RSH7AdutWZnxsUNsT+/H7?=
+ =?us-ascii?Q?dTkibTF60UKo9v7jm+zPCeH6KiXe3mmwMGPBa85wbCa76PLHEpZrYzXooT+s?=
+ =?us-ascii?Q?4D8WrL0cWrCsFKKN0ZPQkX0fb7VzbKpzR9/ND0nyMuU1fo1UVnscP4BjEDRn?=
+ =?us-ascii?Q?/G0LflndvLCagKqdJc96k3/9ZzAxYg9iHHSuweeoaPDahXA7r21sCcgc0JjV?=
+ =?us-ascii?Q?rFRSY3SrrCoL/31ovMLGGfKyOpO8qSWQwDI9qqmWQEdFi9f9AgEaGUlW6HPR?=
+ =?us-ascii?Q?mo0na7MDxUmUxIXl87eSPXOqsRFSBjAMtQy2PZoXzM+MMq1HNkdsSLTcJwMI?=
+ =?us-ascii?Q?6IzHHR/h+mtfhPm1UORYkLxIgQUGEZ+AmmGKjTjhzzSLeYrBFO0fiErFbLK4?=
+ =?us-ascii?Q?nJKkDQky7LXssYsBQznuki7ueVtV61zimZgs5vs6S5UyAb/5udaIXbRPhRyK?=
+ =?us-ascii?Q?0fjh/6QqmTCnEcsdb6FXlqvNvsxa+cQ=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d884399-d6e6-4002-41d0-08de46cbe04b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR02MB7557.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2025 11:17:39.1791
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nfoGzUKNGHdwdN4ZC2Nx0EKZiaRpmxX3gLeHvsGis0yf2pTbZbJcx94W0GXMh5xTg2zP8OV1hJI9WJ4Kwd0TwnyoYvoFmPYnHVsL74PntgE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR02MB9965
+X-Proofpoint-ORIG-GUID: bMEP-5CdEG3FzF7v_N9y-jiz4We2s9V1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI5MDEwNSBTYWx0ZWRfX00JUXeX9w7Y3
+ vYuDq5b4YlOnEg2xyAwUW1thVMEBXX88clN7VK2boUZNG2PCXo9M8Th8gwsBAB17DQx1R/Qq7YH
+ UEC8lDsKqIcgt89GEoWNMfT+yc9bhoBSr4A8Ndx11UJhfNx5QS5th1UOQW2WRzjLDZ3H7Iya7Kj
+ SNg/0hxILbrn/2yjkkdtSJIvYkawhNvMBF6SjerQwLUHIngHTaPw0MHHjIfHbGHFYeckGshOiw5
+ HmM9CPfUwgREHrUlReStaN89kT/k2WfL6Su8DgxMkaciDcx+ZD2yDLXQXfvp0EzH7TwhmpPCf6u
+ HTih0pqAFs9AaKDPjnU1H4nRFTBgQMYpUtnZLzmrkDnoFLYXH6+4TiidIXTMWsfYZG48sLLmMnL
+ 2rrOB9A6MVGJzLyOlS2+DF34Bj1YwLRcQBY5ohitjp0HuPnQQzCiBe4+Dugd0xx9eAthz4BN3h5
+ F1upUiPTxLa68hDBZEQ==
+X-Proofpoint-GUID: bMEP-5CdEG3FzF7v_N9y-jiz4We2s9V1
+X-Authority-Analysis: v=2.4 cv=BuWQAIX5 c=1 sm=1 tr=0 ts=69526356 cx=c_pps
+ a=GZ5nxs7iJwyXCG4rR3qJ+A==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=wP3pNCr1ah4A:10 a=0kUYKlekyDsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=WfwK6sBijsG41Jo_XmkA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-29_03,2025-12-29_01,2025-10-01_01
+X-Proofpoint-Spam-Reason: safe
 
-On 2025-12-29 18:11, lixianglai wrote:
+Suppress EOI Broadcast (SEOIB) is an x2APIC feature that stops the local
+APIC from broadcasting EOIs to I/O APICs.  When enabled, guests must
+directly write to specific I/O APIC's EOI Register (available in I/O APIC
+version 0x20+) to EOI the interrupt.
 
-> Hi Jinyang:
->>
->> On 2025-12-29 11:53, lixianglai wrote:
->>> Hi Jinyang:
->>>> On 2025-12-27 09:27, Xianglai Li wrote:
->>>>
->>>>> Insert the appropriate UNWIND macro definition into the 
->>>>> kvm_exc_entry in
->>>>> the assembly function to guide the generation of correct ORC table 
->>>>> entries,
->>>>> thereby solving the timeout problem of loading the 
->>>>> livepatch-sample module
->>>>> on a physical machine running multiple vcpus virtual machines.
->>>>>
->>>>> While solving the above problems, we have gained an additional 
->>>>> benefit,
->>>>> that is, we can obtain more call stack information
->>>>>
->>>>> Stack information that can be obtained before the problem is fixed:
->>>>> [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
->>>>> [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
->>>>> [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
->>>>> [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
->>>>> [<0>] kvm_handle_exit+0x160/0x270 [kvm]
->>>>> [<0>] kvm_exc_entry+0x100/0x1e0
->>>>>
->>>>> Stack information that can be obtained after the problem is fixed:
->>>>> [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
->>>>> [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
->>>>> [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
->>>>> [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
->>>>> [<0>] kvm_handle_exit+0x160/0x270 [kvm]
->>>>> [<0>] kvm_exc_entry+0x104/0x1e4
->>>>> [<0>] kvm_enter_guest+0x38/0x11c
->>>>> [<0>] kvm_arch_vcpu_ioctl_run+0x26c/0x498 [kvm]
->>>>> [<0>] kvm_vcpu_ioctl+0x200/0xcf8 [kvm]
->>>>> [<0>] sys_ioctl+0x498/0xf00
->>>>> [<0>] do_syscall+0x98/0x1d0
->>>>> [<0>] handle_syscall+0xb8/0x158
->>>>>
->>>>> Cc: stable@vger.kernel.org
->>>>> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
->>>>> ---
->>>>> Cc: Huacai Chen <chenhuacai@kernel.org>
->>>>> Cc: WANG Xuerui <kernel@xen0n.name>
->>>>> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
->>>>> Cc: Bibo Mao <maobibo@loongson.cn>
->>>>> Cc: Charlie Jenkins <charlie@rivosinc.com>
->>>>> Cc: Xianglai Li <lixianglai@loongson.cn>
->>>>> Cc: Thomas Gleixner <tglx@linutronix.de>
->>>>> Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
->>>>>
->>>>>   arch/loongarch/kvm/switch.S | 28 +++++++++++++++++++---------
->>>>>   1 file changed, 19 insertions(+), 9 deletions(-)
->>>>>
->>>>> diff --git a/arch/loongarch/kvm/switch.S 
->>>>> b/arch/loongarch/kvm/switch.S
->>>>> index 93845ce53651..a3ea9567dbe5 100644
->>>>> --- a/arch/loongarch/kvm/switch.S
->>>>> +++ b/arch/loongarch/kvm/switch.S
->>>>> @@ -10,6 +10,7 @@
->>>>>   #include <asm/loongarch.h>
->>>>>   #include <asm/regdef.h>
->>>>>   #include <asm/unwind_hints.h>
->>>>> +#include <linux/kvm_types.h>
->>>>>     #define HGPR_OFFSET(x)        (PT_R0 + 8*x)
->>>>>   #define GGPR_OFFSET(x)        (KVM_ARCH_GGPR + 8*x)
->>>>> @@ -110,9 +111,9 @@
->>>>>        * need to copy world switch code to DMW area.
->>>>>        */
->>>>>       .text
->>>>> +    .p2align PAGE_SHIFT
->>>>>       .cfi_sections    .debug_frame
->>>>>   SYM_CODE_START(kvm_exc_entry)
->>>>> -    .p2align PAGE_SHIFT
->>>>>       UNWIND_HINT_UNDEFINED
->>>>>       csrwr    a2,   KVM_TEMP_KS
->>>>>       csrrd    a2,   KVM_VCPU_KS
->>>>> @@ -170,6 +171,7 @@ SYM_CODE_START(kvm_exc_entry)
->>>>>       /* restore per cpu register */
->>>>>       ld.d    u0, a2, KVM_ARCH_HPERCPU
->>>>>       addi.d    sp, sp, -PT_SIZE
->>>>> +    UNWIND_HINT_REGS
->>>>>         /* Prepare handle exception */
->>>>>       or    a0, s0, zero
->>>>> @@ -200,7 +202,7 @@ ret_to_host:
->>>>>       jr      ra
->>>>>     SYM_CODE_END(kvm_exc_entry)
->>>>> -EXPORT_SYMBOL(kvm_exc_entry)
->>>>> +EXPORT_SYMBOL_FOR_KVM(kvm_exc_entry)
->>>>>     /*
->>>>>    * int kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu)
->>>>> @@ -215,6 +217,14 @@ SYM_FUNC_START(kvm_enter_guest)
->>>>>       /* Save host GPRs */
->>>>>       kvm_save_host_gpr a2
->>>>>   +    /*
->>>>> +     * The csr_era member variable of the pt_regs structure is 
->>>>> required
->>>>> +     * for unwinding orc to perform stack traceback, so we need 
->>>>> to put
->>>>> +     * pc into csr_era member variable here.
->>>>> +     */
->>>>> +    pcaddi    t0, 0
->>>>> +    st.d    t0, a2, PT_ERA
->>>> Hi, Xianglai,
->>>>
->>>> It should use `SYM_CODE_START` to mark the `kvm_enter_guest` rather 
->>>> than
->>>> `SYM_FUNC_START`, since the `SYM_FUNC_START` is used to mark 
->>>> "C-likely"
->>>> asm functionw. 
->>>
->>> Ok, I will use SYM_CODE_START to mark kvm_enter_guest in the next 
->>> version.
->>>
->>>> I guess the kvm_enter_guest is something like exception
->>>> handler becuase the last instruction is "ertn". So usually it should
->>>> mark UNWIND_HINT_REGS where can find last frame info by "$sp".
->>>> However, all info is store to "$a2", this mark should be
->>>>   `UNWIND_HINT sp_reg=ORC_REG_A2(???) type=UNWIND_HINT_TYPE_REGS`.
->>>> I don't konw why save this function internal PC here by `pcaddi t0, 
->>>> 0`,
->>>> and I think it is no meaning(, for exception handler, they save 
->>>> last PC
->>>> by read CSR.ERA). The `kvm_enter_guest` saves registers by
->>>> "$a2"("$sp" - PT_REGS) beyond stack ("$sp"), it is dangerous if IE
->>>> is enable. So I wonder if there is really a stacktrace through this 
->>>> function?
->>>>
->>> The stack backtracking issue in switch.S is rather complex because 
->>> it involves the switching between cpu root-mode and guest-mode:
->>> Real stack backtracking should be divided into two parts:
->>> part 1:
->>>     [<0>] kvm_enter_guest+0x38/0x11c
->>>     [<0>] kvm_arch_vcpu_ioctl_run+0x26c/0x498 [kvm]
->>>     [<0>] kvm_vcpu_ioctl+0x200/0xcf8 [kvm]
->>>     [<0>] sys_ioctl+0x498/0xf00
->>>     [<0>] do_syscall+0x98/0x1d0
->>>     [<0>] handle_syscall+0xb8/0x158
->>>
->>> part 2:
->>>     [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
->>>     [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
->>>     [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
->>>     [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
->>>     [<0>] kvm_handle_exit+0x160/0x270 [kvm]
->>>     [<0>] kvm_exc_entry+0x104/0x1e4
->>>
->>>
->>> In "part 1", after executing kvm_enter_guest, the cpu switches from 
->>> root-mode to guest-mode.
->>> In this case, stack backtracking is indeed very rare.
->>>
->>> In "part 2", the cpu switches from the guest-mode to the root-mode,
->>> and most of the stack backtracking occurs during this phase.
->>>
->>> To obtain the longest call chain, we save pc in kvm_enter_guest to 
->>> pt_regs.csr_era,
->>> and after restoring the sp of the root-mode cpu in kvm_exc_entry,
->>> The ORC entry was re-established using "UNWIND_HINT_REGS",
->>>  and then we obtained the following stack backtrace as we wanted:
->>>
->>>     [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
->>>     [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
->>>     [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
->>>     [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
->>>     [<0>] kvm_handle_exit+0x160/0x270 [kvm]
->>>     [<0>] kvm_exc_entry+0x104/0x1e4
->> I found this might be a coincidence—correct behavior due to the 
->> incorrect
->> UNWIND_HINT_REGS mark and unusual stack adjustment.
->>
->> First, the kvm_enter_guest contains only a single branch instruction, 
->> ertn.
->> It hardware-jump to the CSR.ERA address directly, jump into 
->> kvm_exc_entry.
->>
->> At this point, the stack layout looks like this:
->> -------------------------------
->>   frame from call to `kvm_enter_guest`
->> -------------------------------  <- $sp
->>   PT_REGS
->> -------------------------------  <- $a2
->>
->> Then kvm_exc_entry adjust stack without save any register (e.g. $ra, 
->> $sp)
->> but still marked UNWIND_HINT_REGS.
->> After the adjustment:
->> -------------------------------
->>   frame from call to `kvm_enter_guest`
->> -------------------------------
->>   PT_REGS
->> -------------------------------  <- $a2, new $sp
->>
->> During unwinding, when the unwinder reaches kvm_exc_entry,
->> it meets the mark of PT_REGS and correctly recovers
->>  pc = regs.csr_era, sp = regs.sp, ra = regs.ra
->>
-> Yes, here unwinder does work as you say.
->
->> a) Can we avoid "ertn" rather than `jr reg (or jirl ra, reg, 0)`
->> instead, like call?
-> No,  we need to rely on the 'ertn instruction return PIE to CRMD IE,
-> at the same time to ensure that its atomic,
-> there should be no other instruction than' ertn 'more appropriate here.
-You are right! I got it.
->
->> The kvm_exc_entry cannot back to kvm_enter_guest
->> if we use "ertn", so should the kvm_enter_guest appear on the 
->> stacktrace?
->>
->
-> It is flexible. As I mentioned above, the cpu completes the switch 
-> from host-mode to guest mode through kvm_enter_guest,
-> and then the switch from guest mode to host-mode through 
-> kvm_exc_entry. When we ignore the details of the host-mode
-> and guest-mode switching in the middle, we can understand that the 
-> host cpu has completed kvm_enter_guest->kvm_exc_entry.
-> From this perspective, I think it can exist in the call stack, and at 
-> the same time, we have obtained the maximum call stack information.
->
->
->> b) Can we adjust $sp before entering kvm_exc_entry? Then we can mark
->> UNWIND_HINT_REGS at the beginning of kvm_exc_entry, which something
->> like ret_from_kernel_thread_asm.
->>
-> The following command can be used to dump the orc entries of the kernel:
-> ./tools/objtool/objtool --dump vmlinux
->
-> You can observe that not all orc entries are generated at the 
-> beginning of the function.
-> For example:
-> handle_tlb_protect
-> ftrace_stub
-> handle_reserved
->
-> So, is it unnecessary for us to modify UNWIND_HINT_REGS in order to 
-> place it at the beginning of the function.
->
-> If you have a better solution, could you provide an example of the 
-> modification?
-> I can test the feasibility of the solution.
->
-The expression at the beginning of the function is incorrect (feeling 
-sorry).
-It should be marked where have all stacktrace info.
-Thanks for all the explaining, since I'm unfamiliar with kvm, I need 
-these to help my understanding.
+KVM has historically mishandled SEOIB support.  When x2APIC was introduced,
+KVM advertised the feature without implementing the I/O APIC side (directed
+EOI).  This flaw carried over to split IRQCHIP mode, where KVM always
+advertised support but didn't actually honor the guest's decision to
+suppress EOI broadcast, and kept broadcasting EOIs to userspace.
 
-Can you try with follows, with save regs by $sp, set more precise era to 
-pt_regs, and more unwind hint.
+The broken behavior can cause interrupt storms on guests that perform I/O
+APIC EOI well after LAPIC EOI (e.g. Windows with Credential Guard enabled).
 
+KVM "fixed" in-kernel IRQCHIP by not advertising SEOIB support, but
+split IRQCHIP was never fixed.  Rather than silently changing guest-visible
+behavior, this series adds userspace control via KVM_CAP_X2APIC_API flags,
+allowing VMMs to explicitly enable or disable SEOIB support.  When enabled
+with in-kernel IRQCHIP, KVM uses I/O APIC version 0x20 which provides the
+EOI Register for directed EOI.
 
-diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
-index f1768b7a6194..8ed1d7b72c54 100644
---- a/arch/loongarch/kvm/switch.S
-+++ b/arch/loongarch/kvm/switch.S
-@@ -14,13 +14,13 @@
-  #define GGPR_OFFSET(x)        (KVM_ARCH_GGPR + 8*x)
+The series maintains backward compatibility: if neither flag is set,
+legacy behavior is preserved.  Modern VMMs should explicitly set either
+KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST or
+KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST.
 
-  .macro kvm_save_host_gpr base
--    .irp n,1,2,3,22,23,24,25,26,27,28,29,30,31
-+    .irp n,1,2,22,23,24,25,26,27,28,29,30,31
-      st.d    $r\n, \base, HGPR_OFFSET(\n)
-      .endr
-  .endm
+Tested:
+- No flags set: legacy quirky behavior preserved.
+- ENABLE flag set: SEOIB advertised, in-kernel IRQCHIP uses I/O APIC
+  version 0x20.
+- DISABLE flag set: SEOIB not advertised.
 
-  .macro kvm_restore_host_gpr base
--    .irp n,1,2,3,22,23,24,25,26,27,28,29,30,31
-+    .irp n,1,2,22,23,24,25,26,27,28,29,30,31
-      ld.d    $r\n, \base, HGPR_OFFSET(\n)
-      .endr
-  .endm
-@@ -88,6 +88,7 @@
-      /* Load KVM_ARCH register */
-      ld.d    a2, a2,    (KVM_ARCH_GGPR + 8 * REG_A2)
+Changes in v5:
+- Split into 3-patch series (refactor, I/O APIC 0x20 support, userspace
+  control)
+- Extended to support in-kernel IRQCHIP mode.
+- I/O APIC version 0x20 is used when enabling with in-kernel IRQCHIP
 
-+111:
-      ertn /* Switch to guest: GSTAT.PGM = 1, ERRCTL.ISERR = 0, 
-TLBRPRMD.ISTLBR = 0 */
-  .endm
+David Woodhouse (1):
+  KVM: x86/ioapic: Implement support for I/O APIC version 0x20 with EOIR
 
-@@ -158,9 +159,10 @@ SYM_CODE_START(kvm_exc_entry)
-      csrwr    t0, LOONGARCH_CSR_GTLBC
-      ld.d    tp, a2, KVM_ARCH_HTP
-      ld.d    sp, a2, KVM_ARCH_HSP
-+    UNWIND_HINT_REGS
-+
-      /* restore per cpu register */
-      ld.d    u0, a2, KVM_ARCH_HPERCPU
--    addi.d    sp, sp, -PT_SIZE
+Khushit Shah (2):
+  KVM: x86: Refactor suppress EOI broadcast logic
+  KVM: x86: Add x2APIC "features" to control EOI broadcast suppression
 
-      /* Prepare handle exception */
-      or    a0, s0, zero
-@@ -184,10 +186,11 @@ SYM_CODE_START(kvm_exc_entry)
-      csrwr    s1, KVM_VCPU_KS
-      kvm_switch_to_guest
+ Documentation/virt/kvm/api.rst  | 28 +++++++++++-
+ arch/x86/include/asm/kvm_host.h |  7 +++
+ arch/x86/include/uapi/asm/kvm.h |  6 ++-
+ arch/x86/kvm/ioapic.c           | 43 ++++++++++++++++---
+ arch/x86/kvm/ioapic.h           | 19 +++++----
+ arch/x86/kvm/lapic.c            | 75 +++++++++++++++++++++++++++++----
+ arch/x86/kvm/lapic.h            |  3 ++
+ arch/x86/kvm/trace.h            | 17 ++++++++
+ arch/x86/kvm/x86.c              | 15 ++++++-
+ 9 files changed, 186 insertions(+), 27 deletions(-)
 
-+    UNWIND_HINT_UNDEFINED
-  ret_to_host:
--    ld.d    a2, a2, KVM_ARCH_HSP
--    addi.d  a2, a2, -PT_SIZE
--    kvm_restore_host_gpr    a2
-+    ld.d    sp, a2, KVM_ARCH_HSP
-+    kvm_restore_host_gpr    sp
-+    addi.d    sp, sp, PT_SIZE
-      jr      ra
-
-  SYM_INNER_LABEL(kvm_exc_entry_end, SYM_L_LOCAL)
-@@ -200,11 +203,15 @@ SYM_CODE_END(kvm_exc_entry)
-   *  a0: kvm_run* run
-   *  a1: kvm_vcpu* vcpu
-   */
--SYM_FUNC_START(kvm_enter_guest)
-+SYM_CODE_START(kvm_enter_guest)
-+    UNWIND_HINT_UNDEFINED
-      /* Allocate space in stack bottom */
--    addi.d    a2, sp, -PT_SIZE
-+    addi.d    sp, sp, -PT_SIZE
-      /* Save host GPRs */
--    kvm_save_host_gpr a2
-+    kvm_save_host_gpr sp
-+    la.pcrel a2, 111f
-+    st.d     a2, sp, PT_ERA
-+    UNWIND_HINT_REGS
-
-      addi.d    a2, a1, KVM_VCPU_ARCH
-      st.d    sp, a2, KVM_ARCH_HSP
-
-Jinyang
+-- 
+2.39.3
 
 
