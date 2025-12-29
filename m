@@ -1,139 +1,253 @@
-Return-Path: <kvm+bounces-66799-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66800-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DA3CE832E
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 22:16:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C65DDCE83B9
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 22:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7995F3001027
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 21:16:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5268F3015875
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 21:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E193244661;
-	Mon, 29 Dec 2025 21:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66FC2D0605;
+	Mon, 29 Dec 2025 21:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r31lWlC5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="miCNusS4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCBE14A8E
-	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 21:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767042991; cv=none; b=js13qthtQM5rl1uVIu9AI0u8974NYebBGAtXtrwCfYfeqsXwLYxFzfIcg6Yggk53E3itEhnKGv8zW7nVm0z8n8vo6wBT3c9Wy4ytz7V08CIKjZy7TlItYxSUOrU8FaZT5erqak8u3cZqqtJjAS1oyd+UFsFiemwc+B70c1VBjOE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767042991; c=relaxed/simple;
-	bh=6y+HyNwD5g+wa1kJC3jJX6XiHxEWqSEQZ6rjChjxSiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JSEJjl3dZEWBgpqpniUJTPiN6vpHcouAk+fURWh/03QwsY1C2BmfkimWKpGkvm4Xs2hp4X/9WNchNBn8Q4zUMO92qyIG2xReG3PmOsfeukL5/PCT8XDkToQDdC3oShSTnaegZv95N0/+QJxco9QQ4y0mgfh/9wBzLAiSagLH4qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r31lWlC5; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a0f3f74587so134004235ad.2
-        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 13:16:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B4417A2FB
+	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 21:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767044416; cv=pass; b=gBX4bMN6+OPL0v5LxFfjLqVAERxzIIh4rPImQxbqwTIYVCwmQIIJd6n/WiiQebnY81+Ahn5lKB4Y/8XEXsVmaCwuT1cyG75q0x30MYEQGHghDaSTggbUIlsUdlWSgwxzN32SXpEOz87ui8XVVyYGu1p8EwDqPsIQCI3kQlAVo/g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767044416; c=relaxed/simple;
+	bh=9g6ZJJnUbfB2BUQiXgcVEoHjFyip0CSAvWAeyE1DniQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WjCAU9p4Inenn0kAc2RhgYgWiRhvXzLZDTAPlBuQ5gB6QxiHXb4PAmKujIpxVrugSwb7kht6ppkuOy1ETXIqCayTlfeY5UJT7nnjx8J+c5B6E+DPA3L2fOTCga++vjjO68w9tYMrvZVvsjV97WsG6uUuVRDJ7pSsgtdjtNVT5AM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=miCNusS4; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee147baf7bso31371cf.1
+        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 13:40:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767044414; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OYPkeQ/tsPy53kDVDE+MXSTyE/dg0EEh3prJ1Rkf1zOyeibnrF3uB+boLh8wJLU/y3
+         o2gt6tBi8b3U0XL84Scs5xPya6Nle1OMVTrhWQC18SwK0vvnZ2yVEr2vY4T7qY1mNHy4
+         BXuUcQZAeYDNpIONTAVEzFDP80xKUV1DRIsITeehd6vAkGlL3+RbgtkpqDmlneTMU2cG
+         /fKBGysliBEfndu1sLj1xWLHbgQGgxAScswRsHpywj1IuHw3iNIipylkUd+VQmbLB6WK
+         Y2srDdCPW+VKiZXsvRBLwH3p8s3BIH2V8SZKuOKqZDkkVHgL3rJPbdaQ5mY658VEebxW
+         mT3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FjH28vXaYrpZwROX8iBiNVL1uo7oPX4Tea1DG2Y6vBM=;
+        fh=EFeCXK1FML2//0sI1L1pk/rd/TnXeSM7FD2l7oFQGjM=;
+        b=RsU2B15d1gpSxvWHT+HbuSaJzUfCnLoGXxsOJ9sRlBIoxSsEgPEoUdyyhKACD27759
+         K30NKFuPx+Wsd1mW062uf0ADeyPluF5omqMWDokPKXJHZxZz4bMT6TxqahnYfvTPM6rl
+         tCZ2OFgTSm7duzB3JL/CLQtgIAU0OSnTef/rf0L2ZL494wHWvHGWcwyLQhjNGMR3brSw
+         E2Jk2Eze0paH0oUbVmBir3+PO9X0nHDy6l2ENvMjg0RW6amJtU8jN6gn/qxy99XWGy2H
+         UByb5kDvroyBjHJMaoQccz1TxIuFpFCKB5Pq3L/yHLtwqEtALNksx2IyIg0xr2G8OH+K
+         xaAQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767042989; x=1767647789; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qhFsOZyvBBszKZWunrdffetKMiWyonnb2R4wITLXaZg=;
-        b=r31lWlC510z8mbNunlvDSexgAz/qL+/6QuEubtTMqgfTERbm8n1ae1oUTRrZKU4CSr
-         EXP1fPePIHAvYrMrSJTyWgESvToIvmFSebh60vZE2uMOlkn/4qP5KPwfoHSWuWLbQQ1p
-         IvAleui2sgv0iL3aAwiJmvt8cDJvl8kBjrwPhhImagSfKLbLoi/HO6KQU41zCdGAWwLX
-         VbwmAnQGMzgrmVmx73LNIWF7L2leOH1vU9sOrTr+H5wsAYpSG7G1Ewc8pLjGwG+kIVq+
-         F84yQJQXZZsBwqIBI44tpsndmxy7+C0vgYg/UxFKRZjcwdprWu+rPJsTY1nAKHlt+bKl
-         LlLw==
+        d=google.com; s=20230601; t=1767044414; x=1767649214; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FjH28vXaYrpZwROX8iBiNVL1uo7oPX4Tea1DG2Y6vBM=;
+        b=miCNusS4z0njUY6MLv04Si5XSLPw/CsO7kWtKBGcZxNqXl4GLMjniO3UFwNeMgy6gV
+         Eq9DPO9n+G6bBlHbM1K01AZgmGcNDwYt1nHVtmDBSuE4u9ZapSZbZFzJ4PGMkhmkRwz/
+         iBdJi9nCq0lPxUBkfRMcv/D4QieT3q8mUjWxu3jv38lv7RnsJo9a26vYpw17foSyIwvF
+         xOovuo9UIsZ6fu5tUjw4PhoEYI6VlRn08WxR82H0/wlrpmRZCO0kTINE2DWS3gyFBPaJ
+         wJaNlt0N07Z5uWpz4zww24mE2pj71CQMLIOoLF1GWkS4vRBXteHQrApxh2qyXwDqcWBJ
+         UwhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767042989; x=1767647789;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qhFsOZyvBBszKZWunrdffetKMiWyonnb2R4wITLXaZg=;
-        b=DziaxBBWiN3ijtFUYBhIHAFtdbolvBeEfBeQjO+P7FfzJMJnszCJAdybAB0oFspeWj
-         n5pgto2qL9PhptgKfozykByW4/4A0nQYL/50rfGCIKBvfW9WIfoVgK7/skcxH3Aa+zel
-         oOkUlW3xp5iioSdFNrQ8TZ+DKF6w3EDumskhWThTWK3+QsgnB9wVreaOXR3CueiRgcwQ
-         ydpKPT/GsNxWNq+w50KQ1XnnkaAP4sSD6xpi6Cy/UZZM8MlIKDinLgubSPAD0ubOlGfh
-         NEfMdYSq3CvRifXOT30lOiNAs0zKpcFeIEWNQaC5a2dsRaWUW8VbtGe94KFI7CT9uydl
-         1FsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFhL8r6fCCXvrbLY/LqJRG8PHyes47iHD4q0ybfaTEyQah3gzcl6KwGbQ5c4GGKlbS2cU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcWvsQEm5wGGdCBLCzaYYzf/1iuRgn3eI/8VaeMnYajH/XNhVs
-	ZjpRkqbDi48cv0g6YZVqKqzIxepjTq7TTYrbOEpUMtCbzR23PKLm0ks7oKElQWtnvH8=
-X-Gm-Gg: AY/fxX5g/isYTSvoSnO4d/fA220eqnrHmICemUs//x71Qa7Qd+1sWw68x1HT9K9kxpg
-	9VxDz7KncQCrEyZ8ENtjCX4bmJXroiaMZNvF06HyE5HXSLqs+5JjjEdi0iZT2m6IWix/iHbt3Tq
-	9istoFa5bgQyLo94Ljy/BrYOB0pnsRX4b+f/oSlPvaninJrQ0bPQPdW9cImbFvkVkdWn6tQ9esi
-	ey12/Hpp+p+Yi2XdNHo76BQQB2Td2YzCgTrGIizEsm5EhmVTCmcIQ7nVxaaeTPVMsTCwt8/loNR
-	vmOIqvcI4TXC6aEZ0vREkD3DFJt6iaaSJ2sRiLbBt9IrzpEWpk3aluPM46aYHCRpe0KP3IfHdre
-	5aYYj4SJZuNVzQnILbZAW6quHYHRKoA/ovdSql1AETGBdc6hzQJeECBkhZLpxfvQduBx36/Oyfj
-	V3PKweitkPATjXhbutoHat2isQwQTrV+s0MfdCmuda4rsRln9cHkNGa+IN
-X-Google-Smtp-Source: AGHT+IEGt52KsPDYD4kZ/T/EKTKTWuY3l6wP4cc7Qhm9l5w3PkTsTalivjc5D+ZGTBaFT/NH/WE3jQ==
-X-Received: by 2002:a17:902:ccd1:b0:2a2:f465:1273 with SMTP id d9443c01a7336-2a2f4651332mr282066605ad.35.1767042988982;
-        Mon, 29 Dec 2025 13:16:28 -0800 (PST)
-Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d5d20dsm281656315ad.67.2025.12.29.13.16.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Dec 2025 13:16:28 -0800 (PST)
-Message-ID: <3bb036dc-e38a-4879-bdae-34e1f0ae0ba9@linaro.org>
-Date: Mon, 29 Dec 2025 13:16:27 -0800
+        d=1e100.net; s=20230601; t=1767044414; x=1767649214;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FjH28vXaYrpZwROX8iBiNVL1uo7oPX4Tea1DG2Y6vBM=;
+        b=dSHGWuO/B7t8rzrW3W4YxOldFy1wm2d2nL1KG2usIPnOWDO8QGnNw32iki/dvSsWBk
+         mxtCVwcJPSHhI6GzJlxzx6G9j4ndwFE8CsdBWmFFvMxIr/wRAAfL3779+OaX4JiYGIBr
+         6Wmf7DebgViXR6Ayprd+TS5Dfw5lwlXmi45LDeQ6mY02vb4XeT+yki6bZkso9WG17m2W
+         j/fA3aHOmaOC6LSZRtc7N+gxZ5aROrhYAubxxqith1YiW4gUNDpKUEJppPLrRxLeDGhl
+         iVl3Qbfzrgg4TgH9IfHMFVuZWDZDKVFD9wadstjqwlZWjL8rngfCK+ZEXHmFDkzDyBGa
+         3CLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWg0p7rQQEbT5U0QnMTWqlQ54jT3taWPS+/YY2ry/lyloC7U6AJffpN9qBkxop4UPybBXA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzw5erC4rEQF84thbzfFN4htDo6riHvaTTxLogskteDozNYd891
+	f4ej5CtzMFciKh1sGWKJbLg2t8qgLJyLkZ30OYaqcM2rif+tHcEhpMfxlteCVCPtRa/7AOvqyTI
+	r1EOtLKuKKc3D+vTK9PpDB26lmPrgyrISwKAutadL
+X-Gm-Gg: AY/fxX4BIm8hfS26nQTf64/+q8SmxhpjEoQOi5EOwS2dk9VUhI3gusqUjLObPm7+Yk+
+	RcXhs/lcJxs4jzHuq7bVHtzydqHDt91OTs4xtlnLE06acI0WE1Z4wFgKic1Vr2iTMdJ+JMjgvi4
+	biFIbpAy+m5aPxEIf1aaWOvT6+D8t/XTRZqQFSU1PkLL5aKe036EUd10RTdrvj+qtQueFUVF8ut
+	s4J80jPqOEAqHNg2UEuWRnmZiC48sBISxMFrwio1a2SYtVf3ie5BK9IbSLkBTkwQQ9rwIE=
+X-Google-Smtp-Source: AGHT+IE1u1nZxmCpeFmu9qgnqSujzbw35266/C7GM8gXBEmZKD1modM4mbTF+J8EhTEnruS5nmOKdQXAtCcfmqm4SwM=
+X-Received: by 2002:a05:622a:1387:b0:4f1:9c3f:2845 with SMTP id
+ d75a77b69052e-4fab5bf80b1mr164071cf.9.1767044413842; Mon, 29 Dec 2025
+ 13:40:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 11/28] whpx: reshuffle common code
-To: Mohamed Mediouni <mohamed@unpredictable.fr>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@csgraf.de>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Phil Dennis-Jordan <phil@philjordan.eu>, Zhao Liu <zhao1.liu@intel.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- kvm@vger.kernel.org, Roman Bolshakov <rbolshakov@ddn.com>,
- Pedro Barbuda <pbarbuda@microsoft.com>, qemu-arm@nongnu.org,
- Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
- Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Peter Maydell
- <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, Ani Sinha <anisinha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Mads Ynddal <mads@ynddal.dk>,
- Cameron Esfahani <dirty@apple.com>
-References: <20251228235422.30383-1-mohamed@unpredictable.fr>
- <20251228235422.30383-12-mohamed@unpredictable.fr>
- <c8bba373-0ff1-4acc-ac3e-7157b3627247@linaro.org>
- <2F12B75F-5AE5-494A-96E8-5B0766804685@unpredictable.fr>
-Content-Language: en-US
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <2F12B75F-5AE5-494A-96E8-5B0766804685@unpredictable.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20251223230044.2617028-1-aaronlewis@google.com>
+ <20251223230044.2617028-2-aaronlewis@google.com> <aUtLrp2smpXZPpBO@nvidia.com>
+In-Reply-To: <aUtLrp2smpXZPpBO@nvidia.com>
+From: Aaron Lewis <aaronlewis@google.com>
+Date: Mon, 29 Dec 2025 13:40:02 -0800
+X-Gm-Features: AQt7F2rdOsmH5ZDCBDCO39GaPcr7H5M4IF7gM9gJXGPzoNU8Vu4aI82ebODxZyI
+Message-ID: <CAAAPnDEcAGEBexGfC92pS=t9iYQRJFyFE9yPUU916T92Y465qw@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] vfio: Improve DMA mapping performance for huge pages
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: alex.williamson@redhat.com, dmatlack@google.com, kvm@vger.kernel.org, 
+	seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/29/25 1:11 PM, Mohamed Mediouni wrote:
-> 
-> 
->> On 29. Dec 2025, at 19:46, Pierrick Bouvier 
->> <pierrick.bouvier@linaro.org> wrote:
->>
->> ERROR: New file 'accel/whpx/whpx-common.c' must not have license 
->> boilerplate header text, only the SPDX-License-Identifier, unless this 
->> file was copied from existing code already having such text.
-> 
-> Hello,
-> 
-> Deliberately didn’t do it because it’s copying chunks of the existing 
-> x86_64 WHPX backend.
-> 
-> Should I still do it despite that?
+I tried the memfd path on iommufd and it is indeed fast.  It was in
+the same ballpark as the optimization I posted for VFIO_TYPE1_IOMMU.
+I also tried it with a HugeTLB fd, e.g. /mnt/huge/tmp.bin, and it was
+fast too.  I haven't had a chance to try it with DevDax w/ 1G pages,
+though.  I noticed DevDax was quite a bit slower than HugeTLB when I
+tested it on VFIO_TYPE1_IOMMU.  Have you heard how DevDax performs on
+IOMMU_IOAS_MAP_FILE?  I'm curious if it has similar slowdowns compared
+to HugeTLB.
+
+I'll post an updated vfio_dma_mapping_perf_test that includes the
+memfd updates in a follow up.
+
+On Tue, Dec 23, 2025 at 6:10=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
 >
+> On Tue, Dec 23, 2025 at 11:00:43PM +0000, Aaron Lewis wrote:
+>
+> > More effort will be needed to see what kind of speed ups can be achieve=
+d
+> > by optimizing iommufd.  Sample profiler results (below) show that it
+> > isn't the GUP calls that are slowing it down like they were in the
+> > "vfio_type1_iommu" case.  The majority of the slowdown is coming from
+> > batch_from_pages(), and the majority of that time is being spent in
+> > batch_add_pfn_num().
+>
+> This is probably because vfio is now using num_pages_contiguous()
+> which seems to be a little bit faster than batch_add_pfn()
+>
+> Since that is pretty new maybe it explains the discrepancy in reports.
+>
+> > @@ -598,7 +600,18 @@ static long vaddr_get_pfns(struct mm_struct *mm, u=
+nsigned long vaddr,
+> >       ret =3D pin_user_pages_remote(mm, vaddr, pin_pages, flags | FOLL_=
+LONGTERM,
+> >                                   batch->pages, NULL);
+> >       if (ret > 0) {
+> > +             unsigned long nr_pages =3D compound_nr(batch->pages[0]);
+> > +             bool override_size =3D false;
+> > +
+> > +             if (PageHead(batch->pages[0]) && nr_pages > pin_pages &&
+> > +                 ret =3D=3D pin_pages) {
+> > +                     override_size =3D true;
+> > +                     ret =3D nr_pages;
+> > +                     page_ref_add(batch->pages[0], nr_pages - pin_page=
+s);
+> > +             }
+>
+> This isn't right, num_pages_contiguous() is the best we can do for
+> lists returns by pin_user_pages(). In a VMA context you cannot blindly
+> assume the whole folio was mapped contiguously. Indeed I seem to
+> recall this was already proposed and rejected and that is how we ended
+> up with num_pages_contiguous().
 
-I think you can remove the GPL boilerplate part yes.
+Can't we assume a single page will be mapped contiguously?  If we are
+operating on 1GB pages and the batch only covers ~30MB of that, if we
+are a head page can't we assume the VA and PA will be contiguous at
+least until the end of the current page?  Is the issue with the VMA
+context that we have to ensure the VMA includes the entire page?  If
+so, would something like this resolve that?  Instead of simply
+checking:
 
-> Thank you,
-> -Mohamed
+> > +             if (PageHead(batch->pages[0]) && nr_pages > pin_pages &&
+> > +                 ret =3D=3D pin_pages) {
 
+Do this instead:
+
+> > +             if (pin_huge_page_fast(...) {
+
+Where pin_huge_page_fast() does this:
+
++/* Must hold mmap_read_lock(mm). */
++static bool pin_huge_page_fast(struct page *page, struct mm_struct *mm,
++        unsigned long vaddr, unsigned long npages,
++        unsigned long pin_pages, long npinned) {
++ unsigned long nr_pages, nr_vmas_pages, untagged_vaddr;
++ struct vm_area_struct *vma;
++
++ /* Did pin_user_pages_remote() pin as many pages as expected? */
++ if (npinned !=3D pin_pages)
++ return false;
++
++ /*
++ * Only consider head pages.  That will give the maximum
++ * benefits and simplify some of the checks below.
++ */
++ if (!PageHead(page))
++ return false;
++
++ /*
++ * Reject small pages.  Very large pages give the best benefits.
++ */
++ nr_pages =3D compound_nr(page);
++ if (nr_pages <=3D pin_pages)
++ return false;
++
++ /*
++ * Don't pin more pages than requested by VFIO_IOMMU_MAP_DMA.
++ */
++ if (nr_pages > npages)
++ return false;
++
++ untagged_vaddr =3D untagged_addr_remote(mm, vaddr);
++ vma =3D vma_lookup(mm, untagged_vaddr);
++
++ /* Does the virtual address map to a VMA? */
++ if (!vma)
++ return false;
++
++ /* Is the virtual address in the VMA? */
++ if (untagged_vaddr < vma->vm_start ||
++     untagged_vaddr >=3D vma->vm_end)
++ return false;
++
++ /*
++ * Does the VMA contain the entire very large page?  I.e. it
++ * isn't being overrun.
++ */
++ nr_vmas_pages =3D ((vma->vm_end - untagged_vaddr) >> PAGE_SHIFT);
++ if (nr_pages > nr_vmas_pages)
++ return false;
++
++ /*
++ * This is a good candidate for huge page optimizations.  The
++ * page is larger than a batch and fits in its VMA.  Therefore,
++ * pin the entire page all at once, rather than walking over
++ * each struct page in this huge page.
++ */
++ return true;
++}
+
+>
+> Again, use the memfd path which supports this optimization already.
+>
+> Jason
+
+Using memfd sounds reasonable assuming DevDax w/ 1GB pages performs
+well.  I guess I'm more asking about pin_huge_page_fast() as a sanity
+check to make sure I'm not missing anything, though if you are not
+looking to take changes for VFIO_TYPE1_IOMMU I can remove it from the
+series.
+
+Aaron
 
