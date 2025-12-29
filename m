@@ -1,142 +1,129 @@
-Return-Path: <kvm+bounces-66781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26B0CE746F
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 16:58:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45C6CE7C4A
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 18:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 390933001BDB
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 15:58:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74D523019BE1
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 17:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FFC132B9BA;
-	Mon, 29 Dec 2025 15:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D67D32A3C5;
+	Mon, 29 Dec 2025 17:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h2/8SG9e"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dT+yuqg4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54AFD329E42
-	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 15:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4041E98E3
+	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 17:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767023915; cv=none; b=fRtsFkURXsE4Jc+NFeIi14ZRGFBbwTmX9Ty49vmpsaYO0/MH/Sb1/t4hlmFVVa3MiLuQl1dlzt8P9x2ejEXxAnBimoAdZQD6bQ7rHXsfhtFrnBHkFB0clnz915kQucnomzw0BvnZxev/vxYdY/qa40+VK5EpyOE78kU6MPMmk7c=
+	t=1767030601; cv=none; b=SKkiMUqfG+JlQ9mrxq3j/Q9PJX0D3V0h9W/YhbXwvccI19oGdLpoJzyD4oma9FMxXMHcLG7ts5TZxoaJV4vvRj2I93B7UqQ71Fbzilq0X1U1FQ8myf7qr24qvR22iFkTD+HZQ/tDcaejELujXY0eamQTHeLzRyunhLzOMDZThuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767023915; c=relaxed/simple;
-	bh=1q4GxWTKxNhBnKy5rhKHfNQPUo5qaFihuAu+sE9BCE4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WBcBOrOW6wH6LNfJxkVQvn3WdEtuYEQJJvcsERK4vnAJaf+cOZODKymiXPAHIdGLMFp7UxGN13jMUPGlDoq12JmL46OOHY6xw0EFojd5BequGRxQm1o11a6z+rKE5qUemeGMgRigZrtlzaqMGNbogLGFNnUQr7omkZAQ/6+k94Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h2/8SG9e; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7a99a5f77e0so15503996b3a.2
-        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 07:58:34 -0800 (PST)
+	s=arc-20240116; t=1767030601; c=relaxed/simple;
+	bh=evOcPYr79NXvjH6UwclLIxxp8CxThbuJiZTQo2IiL3E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kx3wjF66Rgeo8N9vZR+TX8uiVpv1B0MnZ8xFvGjULcOQ1+qK8Ua1FJSlWmTYqneGAVetunKn+d/ax7MI04EF6vaRqGc5pkIYiVM/Hbx3bZq0fAFAGkQoX7ow6I04KxCvbWVUj1EKS78/AyvjHJTw8IWQSW/q96ixYvwq6encJtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dT+yuqg4; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7fbbb84f034so6254652b3a.0
+        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 09:49:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767023913; x=1767628713; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsY7DmCtEBPG/2V9InsEE1AQkRIUnM2k6RE8KjmAuX8=;
-        b=h2/8SG9e2kiB2JhaHXPFSxkc+WJ1MPn1mNSIQp9y1nVglKdDFsqlA4s09EC2Yq/L1o
-         JqD75zmweHzRbs2znEraTyC7E7fzA0AuytKPy63o5JW2AqJyWWUC3A+udiu7U8q3gRxW
-         dx1k6C/Eu5vHKirUyPmL66xRR2IzlWRxLJipfo6v6gbJZVN/niaRdbVyooTmdihAIPGy
-         UNkNA5BjNWgKgziw5zcEwuka+t37UQ3oIxd4LKYxdUKSle/kOPyTTn9MPIOQ9vGa4Y6R
-         6G1STHo7xXktHd+hURRwFJSsfS/7dxegbhGNAHlL/dDfeuhr3RUch2aBOiitSPD2/I2r
-         sLlA==
+        d=linaro.org; s=google; t=1767030599; x=1767635399; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EcAbgDXHVxo//9dE/opdwDSUstPmjyc3Gle9ozu/kak=;
+        b=dT+yuqg4c4sc3to+VgCbsUUoqcblypyZDsuyQuqbw4nveRuDaZBd3lUuB9iwSfunXy
+         sI6AM4lwUrTsxHp+rdoWEeA1xDGRhfNdMn7NerCJc/gY2rm6C0f5B8y8ROhSuY2fBBb8
+         FaMorfou0jkZ6tARBVFcyXA0ZCLfowMNZ96BItBr0kxtPnFysVxdcRmw0BSytck3eGRL
+         5tHxJYw+iEhLO4fipCzohLtf248T7WYDO9FJ2VGoRSDO1q3hYPYFuYbLorQN0nJFaxza
+         jMhD+UFXwgoASuyWGqlapROF3ziH/ju0ae2/kwmBXwbm7gJtpVPxFzDIJOfQOjkxWtFe
+         +Q6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767023913; x=1767628713;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsY7DmCtEBPG/2V9InsEE1AQkRIUnM2k6RE8KjmAuX8=;
-        b=BkUnLqIJTQM2FdHyo/0Hh6T+tT5l6ZvhA2jWC4eVtNQE0Zh1/Rk/g24kkBR2THhJwy
-         AcD5ug5zSHeHvTmnM5ZM1N/tJ7PAbLiQg3pLAZJRnY7QGhL+01DOCs57A/8avW3SszNP
-         4/u/X7mloPmTfX1DHMyUnfNIvVWZa3whpMNFOBIbeMa3r8LgbgIWg31ZMtyzF1vVJKBy
-         6PSRYCenafv22yyUsewALp9RzUSudMKIxqzh7ngWGe6QR7Q3pYrrorABsp99cjtMvv/8
-         +t3P5n5h5v+33lHahmTGyx34rFxu2MPpq5mGS5HviG5Q0tS7F26IWnoeh/dNnfo7O70B
-         Mgzg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOdc3vs8XlaU/RCzsk2ee75iIAaqYmmap26eER85yjp+3bpjElwAcAgtJswgJGYVV7Whs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwpqhfcFfeDshwPGEMsewXMAl2WL/BbpkUOFsxHInlud7QaSN4
-	oxyDWws+91KW+Kyq44aojYOiM2E8gRQwsJrRE9QibrG0jouy1xDvs2dhMxuHtW6tqhrdS9BOV1D
-	jztIydQ==
-X-Google-Smtp-Source: AGHT+IEm1Henxy7WNKshf2l4r3viWwWVwM5WWhx/D1rwx8s6sLIMg02yiyYe9UxrlES/7PAqEhXA6MKem3A=
-X-Received: from pfwp41.prod.google.com ([2002:a05:6a00:26e9:b0:776:1344:ca77])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:301f:b0:7aa:4f1d:c458
- with SMTP id d2e1a72fcca58-7ff657a303bmr27264653b3a.19.1767023913436; Mon, 29
- Dec 2025 07:58:33 -0800 (PST)
-Date: Mon, 29 Dec 2025 07:58:31 -0800
-In-Reply-To: <ub4djdh4iqy5mhl4ea6gpalu2tpv5ymnw63wdkwehldzh477eq@frxtjt3umsqh>
+        d=1e100.net; s=20230601; t=1767030599; x=1767635399;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EcAbgDXHVxo//9dE/opdwDSUstPmjyc3Gle9ozu/kak=;
+        b=uw+TWTPNEZiZefn+ID3dnd301y6/IjR4c+eaMx0sQ+GeniVScIRHRe0kcEffSjfWPf
+         NSNnbDLtU+2rLDlGUXnYuZlR0Z8tzW6cwTHkctRe2jp2D/S3yEFCSu1K4e6qrzd3bpec
+         XQy5bv5nEFh2/YvM4m8yva1TQEhkykx20zk30Y8JM9wkcPcq+37hZCRZCLIGR4HGxWOT
+         2zsiV9oyKTJAWuftXHRMm2hmKfcchfPNmWDzMJJ2j6HFi6dYGPxQfBXuoTkZJDMFrybf
+         Wpd4pmonS8wkUIiEGtwE14+DIPhHCRJfzf5J/3UGOtIStdPihW09AInJkJQE3VzD4jQP
+         1NjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUe3SGjwWxKdw7vH7lG0mAv5hgHOMlGm9TRY1EzFwWRGPK8fuIX1cVj+HCbSwWNakEXdiQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYMTXf2RSlqu1sQpGdp4QGFvXsJLBzBe6/4s94VC4uTZdiXKn/
+	jH9OjFgBYhwf2ES75Ce2nGoP9JMuUsaK9LGQZ45VOcr5UWNl0YmZxGfu0PA6C5ikyag=
+X-Gm-Gg: AY/fxX5G1YIclHgnqnTVafYPKjBvIyJ/3o3ISkGMfUXS1WxcoFXbhdQvSUtzuKyYXNi
+	opvpdhkcoFgkHX0ldB92dxwL8sfpDWNHoBFffARX08dgGqN6KEL7YyTq8cPx00KKeSuX8FOYd1d
+	s7FYeWh01Ee5oeA49bsSUmFAcilH4dEXSAavIMHth0WC7ieThgw+FOxeadBzNsHs7HS+0hQC9Hx
+	diK8cAMx8RUBbs33YKZJNup6YL6tlbfb1O9ydOptryK4tfNNSTjCuxLydEfy1ZK8Ur8JYGhwbgr
+	cWqZQczJpXkfB3eb5AMkILmlhfAFEoPQFKVwmaZEiJ/T16VsGR9ZeVAva6rJwMbMWNszIuiVQx+
+	qSFKf2dxQ/maLg2ZPDjPMqUJ0DIhxn8klNI0BcadGISrFc6AAvdJ7y84WooxfaWm4PuoydcG+mV
+	H57BQcQp3jYt9UAkv50M457KrGrBsuFLLr6TM6XXQiaWhHp9oNE3Qch3jl
+X-Google-Smtp-Source: AGHT+IGHkY0NPJFlofxy7Lt+4zSf3MOYzItOPAg2JidTI0ZvomHj5KR6VtjPsNPyzYiGIk6cD5T2YA==
+X-Received: by 2002:a05:6a21:33a0:b0:350:66b2:9723 with SMTP id adf61e73a8af0-376a9acee6emr27007930637.43.1767030599142;
+        Mon, 29 Dec 2025 09:49:59 -0800 (PST)
+Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c1e7bd61b4csm26034630a12.18.2025.12.29.09.49.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Dec 2025 09:49:58 -0800 (PST)
+Message-ID: <322e53ba-4b89-48df-95b0-98c2a72d174a@linaro.org>
+Date: Mon, 29 Dec 2025 09:49:57 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251224001249.1041934-1-pbonzini@redhat.com> <20251224001249.1041934-2-pbonzini@redhat.com>
- <ub4djdh4iqy5mhl4ea6gpalu2tpv5ymnw63wdkwehldzh477eq@frxtjt3umsqh>
-Message-ID: <aVKlJ5OBc8yRqjlF@google.com>
-Subject: Re: [PATCH 1/5] x86, fpu: introduce fpu_load_guest_fpstate()
-From: Sean Christopherson <seanjc@google.com>
-To: Yao Yuan <yaoyuan@linux.alibaba.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	x86@kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 02/28] accel/system: Introduce hwaccel_enabled()
+ helper
+Content-Language: en-US
+To: Mohamed Mediouni <mohamed@unpredictable.fr>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@csgraf.de>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Phil Dennis-Jordan <phil@philjordan.eu>, Zhao Liu <zhao1.liu@intel.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ kvm@vger.kernel.org, Roman Bolshakov <rbolshakov@ddn.com>,
+ Pedro Barbuda <pbarbuda@microsoft.com>, qemu-arm@nongnu.org,
+ Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
+ Yanan Wang <wangyanan55@huawei.com>, Peter Xu <peterx@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
+ <philmd@linaro.org>, Ani Sinha <anisinha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Mads Ynddal <mads@ynddal.dk>,
+ Cameron Esfahani <dirty@apple.com>
+References: <20251228235422.30383-1-mohamed@unpredictable.fr>
+ <20251228235422.30383-3-mohamed@unpredictable.fr>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+In-Reply-To: <20251228235422.30383-3-mohamed@unpredictable.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 26, 2025, Yao Yuan wrote:
-> On Wed, Dec 24, 2025 at 01:12:45AM +0800, Paolo Bonzini wrote:
-> > Create a variant of fpregs_lock_and_load() that KVM can use in its
-> > vCPU entry code after preemption has been disabled.  While basing
-> > it on the existing logic in vcpu_enter_guest(), ensure that
-> > fpregs_assert_state_consistent() always runs and sprinkle a few
-> > more assertions.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: 820a6ee944e7 ("kvm: x86: Add emulation for IA32_XFD", 2022-01-14)
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  arch/x86/include/asm/fpu/api.h |  1 +
-> >  arch/x86/kernel/fpu/core.c     | 17 +++++++++++++++++
-> >  arch/x86/kvm/x86.c             |  8 +-------
-> >  3 files changed, 19 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-> > index cd6f194a912b..0820b2621416 100644
-> > --- a/arch/x86/include/asm/fpu/api.h
-> > +++ b/arch/x86/include/asm/fpu/api.h
-> > @@ -147,6 +147,7 @@ extern void *get_xsave_addr(struct xregs_state *xsave, int xfeature_nr);
-> >  /* KVM specific functions */
-> >  extern bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu);
-> >  extern void fpu_free_guest_fpstate(struct fpu_guest *gfpu);
-> > +extern void fpu_load_guest_fpstate(struct fpu_guest *gfpu);
-> >  extern int fpu_swap_kvm_fpstate(struct fpu_guest *gfpu, bool enter_guest);
-> >  extern int fpu_enable_guest_xfd_features(struct fpu_guest *guest_fpu, u64 xfeatures);
-> >
-> > diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-> > index 3ab27fb86618..a480fa8c65d5 100644
-> > --- a/arch/x86/kernel/fpu/core.c
-> > +++ b/arch/x86/kernel/fpu/core.c
-> > @@ -878,6 +878,23 @@ void fpregs_lock_and_load(void)
-> >  	fpregs_assert_state_consistent();
-> >  }
-> >
-> > +void fpu_load_guest_fpstate(struct fpu_guest *gfpu)
-> > +{
-> > +#ifdef CONFIG_X86_DEBUG_FPU
-> > +	struct fpu *fpu = x86_task_fpu(current);
-> > +	WARN_ON_ONCE(gfpu->fpstate != fpu->fpstate);
-> > +#endif
-> > +
-> > +	lockdep_assert_preemption_disabled();
+On 12/28/25 3:53 PM, Mohamed Mediouni wrote:
+> From: Philippe Mathieu-Daudé <philmd@linaro.org>
 > 
-> Hi Paolo,
+> hwaccel_enabled() return whether any hardware accelerator
+> is enabled.
 > 
-> Do we need make sure the irq is disabled w/ lockdep ?
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   include/system/hw_accel.h | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
 
-Yes please, e.g. see commit 2620fe268e80 ("KVM: x86: Revert "KVM: X86: Fix fpu
-state crash in kvm guest"").
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
-> The irq_fpu_usable() returns true for:
-> 
-> !in_nmi () && in_hardirq() and !softirq_count()
-> 
-> It's possible that the TIF_NEED_FPU_LOAD is set again
-> w/ interrupt is enabled.
 
