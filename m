@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-66793-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66794-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1E52CE7F98
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 20:01:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDBA6CE7FAA
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 20:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2AE59301EC55
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 19:01:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B3F1302BAAA
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 19:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD96E32BF5B;
-	Mon, 29 Dec 2025 18:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F4D2EF64C;
+	Mon, 29 Dec 2025 18:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lj8SxOeh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JyryG4N3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626A227AC28
-	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 18:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7E23321C1
+	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 18:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767033825; cv=none; b=mmadU/ESrX15eRwQnO5DWVZa5avPSSF3pntJkTKlD9JFjv4tseS72fu2hfiEyWoaxisEAGqYTLhuCQWSFntvVUxQqVNYcN+kewBECg6X45JcU9fhrolwLO51hmqw3G5ppnn9b/Sg1MQ4mawFv8D+M43XVRUmlA3QE6KDQA3tAcg=
+	t=1767033913; cv=none; b=pQAmImW762djLI4pVTAC+uUuk5Ms40J2RD8uv7sgCvn27PTxK5RWUUHb7CcFMWNUliQCxPPPNKJSCfHZ7nYb/9o4mKmyA63IEYjB43lJzqEOvfTvMiOyl09b1ggTNklfVddbVdbaqum44fLTx7h7z0jlYwlElOdMk+H4L470mrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767033825; c=relaxed/simple;
-	bh=Wz+2pwviLEhPTrbS5vzrOFXD35f+OhfvE0Fol2fc7i4=;
+	s=arc-20240116; t=1767033913; c=relaxed/simple;
+	bh=LfHwiOYTXdh6VEESV+TofAVzBrJ1OupvTivnwGb6Aew=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TTmAIWRboUJssnKPUh5DtlGQe6hj3LV203Uf7w5Pivbs2sjCRJekkj2etmDU25Oo2pcs+dI6ooTZ9ez38taRu7/IG7UNSmqZZxUBRMzSwHhmBmGQwR9EIwmv4Ak0H3z3ny5m54j/LGIqaMHozYE2bqCNNnemF9DsMvSlcBSgsGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Lj8SxOeh; arc=none smtp.client-ip=209.85.214.170
+	 In-Reply-To:Content-Type; b=UUWKHCkw3q0kOqepWR3gESCSi+g988fHbFSnkh18XZzDZawTUhA/6PzaMAUg5+GjCWbGfAFGUHwcDZh1Gzn3hCR1b9d4F3QIfl4uNJnpXbO7iNWVUWoj+2bVRSwesVdjINAdacZKe7ZYr0U+g7nbTxbAly3W66ekImUZBOumZvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JyryG4N3; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a0d0788adaso83169245ad.3
-        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 10:43:41 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2a0d0788adaso83182045ad.3
+        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 10:45:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767033820; x=1767638620; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1767033910; x=1767638710; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=uwn1Ia6i5f2r6o+NnwihSUzXHLhls41F5p1+a1eMrFQ=;
-        b=Lj8SxOehcb2dVFz+NwrKfaqdRx9YOJiEsyG5cT8196zBi5fv0NQJbOqc8L5KHtM0ha
-         hmo5BI0SoNtQcqjEOQavyXXhBGvgn100HMpIr83v7EOQPSR0lL0GHoMxjKxAFd8HpNUZ
-         M7O6XXCk5NRNuTd8xgS5JdxVWYNEXRXex9aidHjOers++BZjc0gAy5PTQA759J2uEZNq
-         RijdVv1jGZgAGAR5gYmM5lvHCPAsHf+jMdfyLyqLWXjXOWNXFSrgbwpjGDYzfjKH20aH
-         8/ABMIFsekBqlszqWrcaLu9b+55NtS0YAkKYeBG/vA+Vq5nhWApWGGKNOCtNUUPGw7Sw
-         IJHQ==
+        bh=L5b0ZmnLwNNT+g6DJnrDN46+Pb4pwpxsVnlZ830iB9g=;
+        b=JyryG4N3+5EyP3maC9yNZXysACm6ZHdKj7mvWCxc5ST9DvGhVkcZuHMPq5m+IhB4Kb
+         QsY2R9iphaCo+L2+GYk7YoE6oWer+VWDYj0gR7IHxSXgI8N82L6Mkr7neSJrrvu56dOS
+         r1nPOhxuCK8YogFPC7nGkmwN24kekOtWNVFHwgOliZYKNB5w+f53NFv44dTY4qRSEYl3
+         BNNXnfOmr9zNbMY3/ac9yQgoGWQ/VFYjF3VxHLNTUJu9Si4yTHuMyKEcilppNxI9k/hx
+         mnwfNEI6tYXbYRvfMZ55PYcQzpzI54kkgYPdrLfR3Gdcnt4QShzJsd4xrzj2ytSgNdI2
+         AbTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767033820; x=1767638620;
+        d=1e100.net; s=20230601; t=1767033910; x=1767638710;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uwn1Ia6i5f2r6o+NnwihSUzXHLhls41F5p1+a1eMrFQ=;
-        b=mljJjZIZR1iM6KOIZRZJ8GagncB8d9aVFi2My4XCoExpZ2EHzT2X8NWr+TZYSw8OCq
-         mRhzOeS5TJltwI8oz9Z3tE4pP9s511H38aYuFS41cDV8Tm4eBU9pQ55ubs0w3G5Yp3rM
-         Ao0NJE/zUDFJAzWIhWHhstCNMVA2UcqGLUqZshcDmxUW6ANz9w19KaWRvJt16SuGsW2s
-         4JsQ2YIvYc/ppsmKhBFX7FjoeObVCBeP/rkERtNLT0eU/ZJsA9X5Unl5V8Luma8S2A/R
-         AB82J4Q2GFpRAU5uCJenEawKD5B7DuRNNELmV1ye//jSIE1UObHxqbrVyGVWzw+crCCY
-         FYJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWeOiSQNOsVodKcWDxw4TKNml2Bcab8B4R1RhlJq/HamBuUIXexRRENZT6jwnvqSTWFAH4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv+BVbHaf91ZYSB8YKeja1fhRC8itbxnuiccxcTGtQ2ROoYr6H
-	igutwfH6WbIluBLk3iLVH3JQaKfkpC+OI/5r2PedE78HtTanRJzMI5ebbzCFPrPzqmY=
-X-Gm-Gg: AY/fxX6USTzCVaSEakpywld9ex8zFFzKwW/iboVqgK0MOILl0PfClkFrdd2ex86lbZM
-	/GMwTK4K4VNUkLM+wCZ8NaIsjU7/mwOcVunOzNbyQqod9USb2FyZc5vlKpvBNOHcK4nUBYv19k8
-	yB70PYsUw+/QYOgeVxbarnEVLe6tLewFt5CFEkKxPFCYYbXDWjUl9F6oQdQ+RkwV9CcWp2nPr4S
-	BYcPYISJONGhqSix4llDnftLownugl4gzfyMuLz1UvZsHI6OLMqyizVJJAnRDcexa0M7+xICXY5
-	bOsK8uoCe7jq/0XzEGM9TcWKMvIHbvQPg+LGe7f7++cUkckXrrZIZz3hF7NnwywBF096CL+xj9i
-	qK3ON93XQv/BveaXZRIgziQTc/G7EwnzyUa6W7/kFFWI9s6wuqmV8oSBxj5AokaBut3c/h0oj4Q
-	no6cPqeqczdgynBR9xq0vOMm1AHdZjD+TLY9wso26k/CG4DOik4u7k/uYt
-X-Google-Smtp-Source: AGHT+IH38YtqoTF7wx7s38i2m+/OSaoP7yEHgGhDuk2Zgmj+fK7stjLK8Nlx5s43A/87PIrNe3VV5A==
-X-Received: by 2002:a17:903:1a2e:b0:297:d764:9874 with SMTP id d9443c01a7336-2a2f222bfebmr313442345ad.21.1767033820186;
-        Mon, 29 Dec 2025 10:43:40 -0800 (PST)
+        bh=L5b0ZmnLwNNT+g6DJnrDN46+Pb4pwpxsVnlZ830iB9g=;
+        b=f8nS9ZiadoTVjBpx94ZQ+AjNnbQHmHhFR2tyC57Ew5HmHJYsEIYSTrZv1Y5VDSZAUz
+         9eab2XoYamgdXOyKpSCtJlMvyGmernr704eMOBFvwxXv9TrnAMnImxq69mAslCQO0AW8
+         t2eDe595KCozXaU4uxWGfrU9O0qI1ids4zCqtpuQWGdHJ5inwMxKiEOy3lrueirRQQ+x
+         y0n7cFWdRnnDLKVpnyIlq8ja0RSFYauwKEZ2XrTR08DAye87tjWXguEZYvOUc9KfL6cv
+         xhIP9zlUE5Q7YdNYmro2maYchphK2SNyhyDcPE6QN92VPAQQliDGG6w1ng6UXF/+3Sj7
+         RofA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfpB51dhh4hj93DH9tIs0Batc9O2yr/dXxIYAqf/lIXJeakymuGU9HBE77BmT97z4tEss=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn9/yLBMNv8G9cQodcrZHLxtJHLjwu8474bukjB3FtSjC6snao
+	PyUCePrcvmzmF02qTUZt4mXBaXegKPZx7Qvxr4Iyo4bo9WwChhZuq6wWJKyP43VZdVs=
+X-Gm-Gg: AY/fxX5705ayqWoYZpID1/VgshOBBfNPLlK+dBQ++oGtE9HfkZ/waAYWKkSpQz53vs7
+	H4mCr4Y8xcKlZsyc0H7JMspzYVL68sohRur5CCeE4ugkor7qs5EYajkc6O9en/XvN9EoPTturn+
+	yCf65tbQkjuPpGG8c2XgG2i4ORmBZ7AuejPyQG2ADctLa+LnPnSBvZiHlA8PFOK+7A41la3ht8w
+	aFAecqGy6eJyi/W7HHxaJNHft8Z8fBDkJsq9ESQNYNu4ZOptxN38EN9OcEIEGbmD4FCAxHQylrR
+	KD0VpoEMQaluY7p/O5P6p+IdBUlHRiM4DCrZD8xe2h5bpNzAQLRR9FVB3iVoKu+DQ58SBMoIe5H
+	fl2gQxBBN4OCAm8/YZh46xqyM1JtomI9Alaw4TGDUA8O94TuFAEZiQ+g+AeB6KHvFrEHLdduBJi
+	Yk7+ylxLMhAxuirmVfPodALKJZPuHysOahhrU3mwjOnyYB8AoRGA+PN8Me
+X-Google-Smtp-Source: AGHT+IExCqEi/ChGsKnsoyZoiipt0DrI7F6rVRq1e9X0KXF+Rj/pzZvX2cLlIQiAOX+og9f6vzqWRA==
+X-Received: by 2002:a17:903:b8b:b0:2a1:243:94a8 with SMTP id d9443c01a7336-2a2f2a4f102mr333447125ad.49.1767033909492;
+        Mon, 29 Dec 2025 10:45:09 -0800 (PST)
 Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3c83325sm281846545ad.34.2025.12.29.10.43.39
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d5d663sm278943885ad.77.2025.12.29.10.45.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Dec 2025 10:43:39 -0800 (PST)
-Message-ID: <f9a6ac85-f3d5-4e14-a717-bd2183cda1d6@linaro.org>
-Date: Mon, 29 Dec 2025 10:43:38 -0800
+        Mon, 29 Dec 2025 10:45:09 -0800 (PST)
+Message-ID: <e250a18d-9b08-4cb9-88d6-c21d0b8ed60b@linaro.org>
+Date: Mon, 29 Dec 2025 10:45:08 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 04/28] hw/arm: virt: add GICv2m for the case when ITS
- is not available
+Subject: Re: [PATCH v12 07/28] hw: arm: virt: rework MSI-X configuration
 Content-Language: en-US
 To: Mohamed Mediouni <mohamed@unpredictable.fr>, qemu-devel@nongnu.org
 Cc: Alexander Graf <agraf@csgraf.de>,
@@ -106,118 +105,257 @@ Cc: Alexander Graf <agraf@csgraf.de>,
  "Michael S. Tsirkin" <mst@redhat.com>, Mads Ynddal <mads@ynddal.dk>,
  Cameron Esfahani <dirty@apple.com>
 References: <20251228235422.30383-1-mohamed@unpredictable.fr>
- <20251228235422.30383-5-mohamed@unpredictable.fr>
+ <20251228235422.30383-8-mohamed@unpredictable.fr>
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <20251228235422.30383-5-mohamed@unpredictable.fr>
+In-Reply-To: <20251228235422.30383-8-mohamed@unpredictable.fr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/28/25 3:53 PM, Mohamed Mediouni wrote:
-> On Hypervisor.framework for macOS and WHPX for Windows, the provided environment is a GICv3 without ITS.
+On 12/28/25 3:54 PM, Mohamed Mediouni wrote:
+> Introduce a -M msi= argument to be able to control MSI-X support independently
+> from ITS, as part of supporting GICv3 + GICv2m platforms.
 > 
-> As such, support a GICv3 w/ GICv2m for that scenario.
+> Remove vms->its as it's no longer needed after that change.
 > 
 > Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
-> 
-> Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 > ---
->   hw/arm/virt-acpi-build.c |  4 +++-
->   hw/arm/virt.c            | 16 +++++++++++++++-
->   include/hw/arm/virt.h    |  2 ++
->   3 files changed, 20 insertions(+), 2 deletions(-)
+>   hw/arm/virt-acpi-build.c |   3 +-
+>   hw/arm/virt.c            | 112 +++++++++++++++++++++++++++++++--------
+>   include/hw/arm/virt.h    |   4 +-
+>   3 files changed, 95 insertions(+), 24 deletions(-)
 > 
 > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 03b4342574..b6f722657a 100644
+> index 86024a1a73..f3adb95cfe 100644
 > --- a/hw/arm/virt-acpi-build.c
 > +++ b/hw/arm/virt-acpi-build.c
-> @@ -960,7 +960,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->               build_append_int_noprefix(table_data, memmap[VIRT_GIC_ITS].base, 8);
->               build_append_int_noprefix(table_data, 0, 4);    /* Reserved */
+> @@ -962,8 +962,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
 >           }
-> -    } else {
-> +    }
-> +
-> +    if (!(vms->gic_version != VIRT_GIC_VERSION_2 && vms->its) && !vms->no_gicv3_with_gicv2m) {
-
-check patch reports:
-ERROR: line over 90 characters
-#31: FILE: hw/arm/virt-acpi-build.c:965:
-+    if (!(vms->gic_version != VIRT_GIC_VERSION_2 && vms->its) && 
-!vms->no_gicv3_with_gicv2m) {
-
+>       }
+>   
+> -    if (!(vms->gic_version != VIRT_GIC_VERSION_2 && virt_is_its_enabled(vms))
+> -     && !vms->no_gicv3_with_gicv2m) {
+> +    if (virt_is_gicv2m_enabled(vms)) {
 >           const uint16_t spi_base = vms->irqmap[VIRT_GIC_V2M] + ARM_SPI_BASE;
 >   
 >           /* 5.2.12.16 GIC MSI Frame Structure */
 > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index fd0e28f030..0fb8dcb07d 100644
+> index dcdb740586..80c9b2bc76 100644
 > --- a/hw/arm/virt.c
 > +++ b/hw/arm/virt.c
-> @@ -959,6 +959,8 @@ static void create_gic(VirtMachineState *vms, MemoryRegion *mem)
+> @@ -966,12 +966,12 @@ static void create_gic(VirtMachineState *vms, MemoryRegion *mem)
 >   
->       if (vms->gic_version != VIRT_GIC_VERSION_2 && vms->its) {
+>       fdt_add_gic_node(vms);
+>   
+> -    if (vms->gic_version != VIRT_GIC_VERSION_2 && virt_is_its_enabled(vms)) {
+> +    if (virt_is_its_enabled(vms)) {
 >           create_its(vms);
-> +    } else if (vms->gic_version != VIRT_GIC_VERSION_2 && !vms->no_gicv3_with_gicv2m) {
-> +        create_v2m(vms);
->       } else if (vms->gic_version == VIRT_GIC_VERSION_2) {
+> -    } else if (vms->gic_version != VIRT_GIC_VERSION_2 && !vms->no_gicv3_with_gicv2m) {
+> -        create_v2m(vms);
+> -    } else if (vms->gic_version == VIRT_GIC_VERSION_2) {
+> +    } else if (virt_is_gicv2m_enabled(vms)) {
 >           create_v2m(vms);
+> +    } else {
+> +        vms->msi_controller = VIRT_MSI_CTRL_NONE;
 >       }
-> @@ -2444,6 +2446,8 @@ static void machvirt_init(MachineState *machine)
->       vms->ns_el2_virt_timer_irq = ns_el2_virt_timer_present() &&
->           !vmc->no_ns_el2_virt_timer_irq;
+>   }
 >   
-> +    vms->no_gicv3_with_gicv2m = vmc->no_gicv3_with_gicv2m;
+> @@ -2710,32 +2710,95 @@ static void virt_set_highmem_mmio_size(Object *obj, Visitor *v,
+>   
+>   bool virt_is_its_enabled(VirtMachineState *vms)
+>   {
+> -    if (vms->its == ON_OFF_AUTO_OFF) {
+> -        return false;
+> +    switch (vms->msi_controller) {
+> +        case VIRT_MSI_CTRL_NONE:
+> +            return false;
+> +        case VIRT_MSI_CTRL_ITS:
+> +            return true;
+> +        case VIRT_MSI_CTRL_GICV2M:
+> +            return false;
+> +        case VIRT_MSI_CTRL_AUTO:
+> +            if (whpx_enabled() && whpx_irqchip_in_kernel()) {
+> +                return false;
+> +            }
+> +            if (vms->gic_version == VIRT_GIC_VERSION_2) {
+> +                return false;
+> +            }
+> +            return true;
+> +        default:
+> +            return false;
+>       }
+> -    if (vms->its == ON_OFF_AUTO_AUTO) {
+> -        if (whpx_enabled()) {
+> +}
+
+ERROR: switch and case should be at the same indent
+#63: FILE: hw/arm/virt.c:2713:
++    switch (vms->msi_controller) {
++        case VIRT_MSI_CTRL_NONE:
+[...]
++        case VIRT_MSI_CTRL_ITS:
+[...]
++        case VIRT_MSI_CTRL_GICV2M:
+[...]
++        case VIRT_MSI_CTRL_AUTO:
+[...]
++        default:
+
 > +
->       fdt_add_timer_nodes(vms);
->       fdt_add_cpu_nodes(vms);
+> +bool virt_is_gicv2m_enabled(VirtMachineState *vms)
+> +{
+> +    switch (vms->msi_controller) {
+> +        case VIRT_MSI_CTRL_NONE:
+>               return false;
+> -        }
+> +        default:
+> +            return !virt_is_its_enabled(vms);
+
+#89: FILE: hw/arm/virt.c:2735:
++    switch (vms->msi_controller) {
++        case VIRT_MSI_CTRL_NONE:
+[...]
++        default:
+
+>       }
+> -    return true;
+>   }
 >   
-> @@ -3488,6 +3492,7 @@ static void virt_instance_init(Object *obj)
->       vms->its = true;
+> -static void virt_get_its(Object *obj, Visitor *v, const char *name,
+> -                          void *opaque, Error **errp)
+> +static char *virt_get_msi(Object *obj, Error **errp)
+>   {
+>       VirtMachineState *vms = VIRT_MACHINE(obj);
+> -    OnOffAuto its = vms->its;
+> +    const char *val;
+>   
+> -    visit_type_OnOffAuto(v, name, &its, errp);
+> +    switch (vms->msi_controller) {
+> +    case VIRT_MSI_CTRL_NONE:
+> +        val = "off";
+> +        break;
+> +    case VIRT_MSI_CTRL_ITS:
+> +        val = "its";
+> +        break;
+> +    case VIRT_MSI_CTRL_GICV2M:
+> +        val = "gicv2m";
+> +        break;
+> +    default:
+> +        val = "auto";
+> +        break;
+> +    }
+> +    return g_strdup(val);
+>   }
+>   
+> -static void virt_set_its(Object *obj, Visitor *v, const char *name,
+> -                          void *opaque, Error **errp)
+> +static void virt_set_msi(Object *obj, const char *value, Error **errp)
+>   {
+> +    ERRP_GUARD();
+>       VirtMachineState *vms = VIRT_MACHINE(obj);
+>   
+> -    visit_type_OnOffAuto(v, name, &vms->its, errp);
+> +    if (!strcmp(value, "auto")) {
+> +        vms->msi_controller = VIRT_MSI_CTRL_AUTO; /* Will be overriden later */
+> +    } else if (!strcmp(value, "its")) {
+> +        vms->msi_controller = VIRT_MSI_CTRL_ITS;
+> +    } else if (!strcmp(value, "gicv2m")) {
+> +        vms->msi_controller = VIRT_MSI_CTRL_GICV2M;
+> +    } else if (!strcmp(value, "none")) {
+> +        vms->msi_controller = VIRT_MSI_CTRL_NONE;
+> +    } else {
+> +        error_setg(errp, "Invalid msi value");
+> +        error_append_hint(errp, "Valid values are auto, gicv2m, its, off\n");
+> +    }
+> +}
+> +
+> +static bool virt_get_its(Object *obj, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    return virt_is_its_enabled(vms);
+> +}
+> +
+> +static void virt_set_its(Object *obj, bool value, Error **errp)
+> +{
+> +    VirtMachineState *vms = VIRT_MACHINE(obj);
+> +
+> +    if (value) {
+> +        vms->msi_controller = VIRT_MSI_CTRL_ITS;
+> +    } else if (vms->no_gicv3_with_gicv2m) {
+> +        vms->msi_controller = VIRT_MSI_CTRL_NONE;
+> +    } else {
+> +        vms->msi_controller = VIRT_MSI_CTRL_GICV2M;
+> +    }
+>   }
+>   
+>   static bool virt_get_dtb_randomness(Object *obj, Error **errp)
+> @@ -3062,6 +3125,8 @@ static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>               db_start = base_memmap[VIRT_GIC_V2M].base;
+>               db_end = db_start + base_memmap[VIRT_GIC_V2M].size - 1;
+>               break;
+> +        case VIRT_MSI_CTRL_AUTO:
+> +            g_assert_not_reached();
+>           }
+>           resv_prop_str = g_strdup_printf("0x%"PRIx64":0x%"PRIx64":%u",
+>                                           db_start, db_end,
+> @@ -3452,13 +3517,18 @@ static void virt_machine_class_init(ObjectClass *oc, const void *data)
+>                                             "guest CPU which implements the ARM "
+>                                             "Memory Tagging Extension");
+>   
+> -    object_class_property_add(oc, "its", "OnOffAuto",
+> -        virt_get_its, virt_set_its,
+> -        NULL, NULL);
+> +    object_class_property_add_bool(oc, "its", virt_get_its,
+> +                                   virt_set_its);
+>       object_class_property_set_description(oc, "its",
+>                                             "Set on/off to enable/disable "
+>                                             "ITS instantiation");
+>   
+> +    object_class_property_add_str(oc, "msi", virt_get_msi,
+> +                                  virt_set_msi);
+> +    object_class_property_set_description(oc, "msi",
+> +                                          "Set MSI settings. "
+> +                                          "Valid values are auto/gicv2m/its/off");
+> +
+>       object_class_property_add_bool(oc, "dtb-randomness",
+>                                      virt_get_dtb_randomness,
+>                                      virt_set_dtb_randomness);
+> @@ -3515,7 +3585,7 @@ static void virt_instance_init(Object *obj)
+>       vms->highmem_redists = true;
+>   
+>       /* Default allows ITS instantiation if available */
+> -    vms->its = ON_OFF_AUTO_AUTO;
+> +    vms->msi_controller = VIRT_MSI_CTRL_AUTO;
 >       /* Allow ITS emulation if the machine version supports it */
 >       vms->tcg_its = !vmc->no_tcg_its;
-> +    vms->no_gicv3_with_gicv2m = false;
->   
->       /* Default disallows iommu instantiation */
->       vms->iommu = VIRT_IOMMU_NONE;
-> @@ -3533,10 +3538,19 @@ static void machvirt_machine_init(void)
->   }
->   type_init(machvirt_machine_init);
->   
-> +static void virt_machine_11_0_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_VIRT_MACHINE_AS_LATEST(11, 0)
-> +
->   static void virt_machine_10_2_options(MachineClass *mc)
->   {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> +
-> +    vmc->no_gicv3_with_gicv2m = true;
-> +    virt_machine_11_0_options(mc);
->   }
-> -DEFINE_VIRT_MACHINE_AS_LATEST(10, 2)
-> +DEFINE_VIRT_MACHINE(10, 2)
->   
->   static void virt_machine_10_1_options(MachineClass *mc)
->   {
+>       vms->no_gicv3_with_gicv2m = false;
 > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 8694aaa4e2..c5bc47ee88 100644
+> index 394b70c62e..ff43bcb739 100644
 > --- a/include/hw/arm/virt.h
 > +++ b/include/hw/arm/virt.h
-> @@ -130,6 +130,7 @@ struct VirtMachineClass {
->       bool no_cpu_topology;
->       bool no_tcg_lpa2;
->       bool no_ns_el2_virt_timer_irq;
-> +    bool no_gicv3_with_gicv2m;
->       bool no_nested_smmu;
->   };
+> @@ -101,6 +101,8 @@ typedef enum VirtIOMMUType {
 >   
-> @@ -178,6 +179,7 @@ struct VirtMachineState {
->       char *oem_id;
->       char *oem_table_id;
->       bool ns_el2_virt_timer_irq;
-> +    bool no_gicv3_with_gicv2m;
->       CXLState cxl_devices_state;
->       bool legacy_smmuv3_present;
->   };
+>   typedef enum VirtMSIControllerType {
+>       VIRT_MSI_CTRL_NONE,
+> +    /* This value is overriden at runtime.*/
+> +    VIRT_MSI_CTRL_AUTO,
+>       VIRT_MSI_CTRL_GICV2M,
+>       VIRT_MSI_CTRL_ITS,
+>   } VirtMSIControllerType;
+> @@ -147,7 +149,6 @@ struct VirtMachineState {
+>       bool highmem_ecam;
+>       bool highmem_mmio;
+>       bool highmem_redists;
+> -    OnOffAuto its;
+>       bool tcg_its;
+>       bool virt;
+>       bool ras;
+> @@ -217,5 +218,6 @@ static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+>   }
+>   
+>   bool virt_is_its_enabled(VirtMachineState *vms);
+> +bool virt_is_gicv2m_enabled(VirtMachineState *vms);
+>   
+>   #endif /* QEMU_ARM_VIRT_H */
 
 
