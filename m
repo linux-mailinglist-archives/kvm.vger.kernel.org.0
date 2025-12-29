@@ -1,253 +1,408 @@
-Return-Path: <kvm+bounces-66800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65DDCE83B9
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 22:40:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F8E9CE84B6
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 23:45:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5268F3015875
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 21:40:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6038F30275EB
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 22:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66FC2D0605;
-	Mon, 29 Dec 2025 21:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9041275B1A;
+	Mon, 29 Dec 2025 22:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="miCNusS4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sMYuqmpB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B4417A2FB
-	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 21:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767044416; cv=pass; b=gBX4bMN6+OPL0v5LxFfjLqVAERxzIIh4rPImQxbqwTIYVCwmQIIJd6n/WiiQebnY81+Ahn5lKB4Y/8XEXsVmaCwuT1cyG75q0x30MYEQGHghDaSTggbUIlsUdlWSgwxzN32SXpEOz87ui8XVVyYGu1p8EwDqPsIQCI3kQlAVo/g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767044416; c=relaxed/simple;
-	bh=9g6ZJJnUbfB2BUQiXgcVEoHjFyip0CSAvWAeyE1DniQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WjCAU9p4Inenn0kAc2RhgYgWiRhvXzLZDTAPlBuQ5gB6QxiHXb4PAmKujIpxVrugSwb7kht6ppkuOy1ETXIqCayTlfeY5UJT7nnjx8J+c5B6E+DPA3L2fOTCga++vjjO68w9tYMrvZVvsjV97WsG6uUuVRDJ7pSsgtdjtNVT5AM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=miCNusS4; arc=pass smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2328C7081E
+	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 22:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767048312; cv=none; b=oVpRtw8cW/DZ6iyiOgVqfmbGqD2yC/8HrYV5LgRag5AIs9P2DG+uIDeMWDyFW2zG0cYbBWiwTVOtF/KBeL/abFKKJ5zyNqb0lkWQ0GMnX82PVKGMjugs7YdqBsRBWSgKKwHFSvn1eg8Tus/uS89sP9ldmibtFtdyK2+CxqV8rZk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767048312; c=relaxed/simple;
+	bh=kiADvlJoC0yHPGtgcmpdeC5yCElgvtnH/oVPMFv58lI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=etrKW2/awGSjOWjwSINa5DUFMGEm6BVbWSpwnhXJu2tM3500UluWG4vWhWdHKWm2cceuFEjEyG5lzX0D8i154zqg1SOPVmV4A58r0Q6R9l4NmgI4mCT5QCcCN0jX5xwfp6M1IXjDSXmEHeT5Rdj9YEkclVz32bgcjPXv9s/UzNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sMYuqmpB; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee147baf7bso31371cf.1
-        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 13:40:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767044414; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OYPkeQ/tsPy53kDVDE+MXSTyE/dg0EEh3prJ1Rkf1zOyeibnrF3uB+boLh8wJLU/y3
-         o2gt6tBi8b3U0XL84Scs5xPya6Nle1OMVTrhWQC18SwK0vvnZ2yVEr2vY4T7qY1mNHy4
-         BXuUcQZAeYDNpIONTAVEzFDP80xKUV1DRIsITeehd6vAkGlL3+RbgtkpqDmlneTMU2cG
-         /fKBGysliBEfndu1sLj1xWLHbgQGgxAScswRsHpywj1IuHw3iNIipylkUd+VQmbLB6WK
-         Y2srDdCPW+VKiZXsvRBLwH3p8s3BIH2V8SZKuOKqZDkkVHgL3rJPbdaQ5mY658VEebxW
-         mT3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FjH28vXaYrpZwROX8iBiNVL1uo7oPX4Tea1DG2Y6vBM=;
-        fh=EFeCXK1FML2//0sI1L1pk/rd/TnXeSM7FD2l7oFQGjM=;
-        b=RsU2B15d1gpSxvWHT+HbuSaJzUfCnLoGXxsOJ9sRlBIoxSsEgPEoUdyyhKACD27759
-         K30NKFuPx+Wsd1mW062uf0ADeyPluF5omqMWDokPKXJHZxZz4bMT6TxqahnYfvTPM6rl
-         tCZ2OFgTSm7duzB3JL/CLQtgIAU0OSnTef/rf0L2ZL494wHWvHGWcwyLQhjNGMR3brSw
-         E2Jk2Eze0paH0oUbVmBir3+PO9X0nHDy6l2ENvMjg0RW6amJtU8jN6gn/qxy99XWGy2H
-         UByb5kDvroyBjHJMaoQccz1TxIuFpFCKB5Pq3L/yHLtwqEtALNksx2IyIg0xr2G8OH+K
-         xaAQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c904a1168so21331054a91.1
+        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 14:45:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767044414; x=1767649214; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FjH28vXaYrpZwROX8iBiNVL1uo7oPX4Tea1DG2Y6vBM=;
-        b=miCNusS4z0njUY6MLv04Si5XSLPw/CsO7kWtKBGcZxNqXl4GLMjniO3UFwNeMgy6gV
-         Eq9DPO9n+G6bBlHbM1K01AZgmGcNDwYt1nHVtmDBSuE4u9ZapSZbZFzJ4PGMkhmkRwz/
-         iBdJi9nCq0lPxUBkfRMcv/D4QieT3q8mUjWxu3jv38lv7RnsJo9a26vYpw17foSyIwvF
-         xOovuo9UIsZ6fu5tUjw4PhoEYI6VlRn08WxR82H0/wlrpmRZCO0kTINE2DWS3gyFBPaJ
-         wJaNlt0N07Z5uWpz4zww24mE2pj71CQMLIOoLF1GWkS4vRBXteHQrApxh2qyXwDqcWBJ
-         UwhA==
+        d=google.com; s=20230601; t=1767048307; x=1767653107; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wgj7qu+GiOdHD/x88lluwxHNX0D8i+TzbpMzcnvTlDk=;
+        b=sMYuqmpBPqnf06TjeZWQAYRLGPLG04tcamMdKLu7KiuecqKn8SVh6BNCi//bUnuq+Y
+         MiiGdPun4lkBA/f+nSU3i8JfLk311bbKbvG7b0cy7weUbRBwpG1DiOJHaldH3886uXyx
+         GEIH/er1YeE475CfWuppVtNeu88jiierqKshgRfGyOjmqFKKN9YjcrpeQbXVaYkNJAIy
+         CIbA44uuJZcLzgOcvVUSHMfnsjMRWPNrXJjWk2stJxxZ5zoKUT8IqRzIe2Zq9SVXze3O
+         OzyrQAcZsbf/0e2hFTnr6u4WgwXaawxl8ygKkyJIA87JxmpSaqfeDdWOcjc7UtUR0DsH
+         pKHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767044414; x=1767649214;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FjH28vXaYrpZwROX8iBiNVL1uo7oPX4Tea1DG2Y6vBM=;
-        b=dSHGWuO/B7t8rzrW3W4YxOldFy1wm2d2nL1KG2usIPnOWDO8QGnNw32iki/dvSsWBk
-         mxtCVwcJPSHhI6GzJlxzx6G9j4ndwFE8CsdBWmFFvMxIr/wRAAfL3779+OaX4JiYGIBr
-         6Wmf7DebgViXR6Ayprd+TS5Dfw5lwlXmi45LDeQ6mY02vb4XeT+yki6bZkso9WG17m2W
-         j/fA3aHOmaOC6LSZRtc7N+gxZ5aROrhYAubxxqith1YiW4gUNDpKUEJppPLrRxLeDGhl
-         iVl3Qbfzrgg4TgH9IfHMFVuZWDZDKVFD9wadstjqwlZWjL8rngfCK+ZEXHmFDkzDyBGa
-         3CLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWg0p7rQQEbT5U0QnMTWqlQ54jT3taWPS+/YY2ry/lyloC7U6AJffpN9qBkxop4UPybBXA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw5erC4rEQF84thbzfFN4htDo6riHvaTTxLogskteDozNYd891
-	f4ej5CtzMFciKh1sGWKJbLg2t8qgLJyLkZ30OYaqcM2rif+tHcEhpMfxlteCVCPtRa/7AOvqyTI
-	r1EOtLKuKKc3D+vTK9PpDB26lmPrgyrISwKAutadL
-X-Gm-Gg: AY/fxX4BIm8hfS26nQTf64/+q8SmxhpjEoQOi5EOwS2dk9VUhI3gusqUjLObPm7+Yk+
-	RcXhs/lcJxs4jzHuq7bVHtzydqHDt91OTs4xtlnLE06acI0WE1Z4wFgKic1Vr2iTMdJ+JMjgvi4
-	biFIbpAy+m5aPxEIf1aaWOvT6+D8t/XTRZqQFSU1PkLL5aKe036EUd10RTdrvj+qtQueFUVF8ut
-	s4J80jPqOEAqHNg2UEuWRnmZiC48sBISxMFrwio1a2SYtVf3ie5BK9IbSLkBTkwQQ9rwIE=
-X-Google-Smtp-Source: AGHT+IE1u1nZxmCpeFmu9qgnqSujzbw35266/C7GM8gXBEmZKD1modM4mbTF+J8EhTEnruS5nmOKdQXAtCcfmqm4SwM=
-X-Received: by 2002:a05:622a:1387:b0:4f1:9c3f:2845 with SMTP id
- d75a77b69052e-4fab5bf80b1mr164071cf.9.1767044413842; Mon, 29 Dec 2025
- 13:40:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767048307; x=1767653107;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wgj7qu+GiOdHD/x88lluwxHNX0D8i+TzbpMzcnvTlDk=;
+        b=E9mqd44R4Kez8n1GciTU4bo5/vkKIxoliKFeUnQR0s31wABYSy6Ig75KdzRiYukC6Y
+         WvRW9FyFn2I5QoPspnQ7cHWozphVlJTbS3SNKPCoKpiwTsKAZa+y3yP0C6sIv7BxDZgS
+         35tcgvHrjXzX3i7ZboYK1IyAlQgh21vDKDpA7Hae+70k3VuwlhxtZ1+Vp0pewN7eYZgo
+         /3um+fWlO85ZbmyuNnZnfRAfxfzW/ZMXYKdJD/fHBZlq3956taK/y8MxFCHTmdxteIAN
+         qH3/Ia2Z7HTs5TAAbrp2LZMK5/3u0f9LXGnGOjUZva/lHW/6qvBzwTK86I4Vcr710jtq
+         rh2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWIks4qpMijN0FRCUmpA1rsB8YOFvR5oRKMr+Orn7/HT4etTRtftW4XttipajyeAzSmlKs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXk0JJG55MirkHHE93txyfP02/Rfs+wVVlUPwqyYo8t9hESvaA
+	DvVgdfbMrA9ovyTl1iZL8EzmlatIFiKUCLxiOF+3NO2seqM/AjlaDS+63C1sf/OWNQJ3Fo0qaDM
+	OB+huJw==
+X-Google-Smtp-Source: AGHT+IH6ssmQ/KpXbP+vxQDPmz1nnBUaH3HFJfb+3lp4SqJOAOHFmtpp1myLfHFoyrGR7s2YGNAAM7tVWBE=
+X-Received: from pjbpw11.prod.google.com ([2002:a17:90b:278b:b0:34a:bc3a:e81a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e4e:b0:34a:b4a2:f0c1
+ with SMTP id 98e67ed59e1d1-34e9215e623mr28025790a91.16.1767048307229; Mon, 29
+ Dec 2025 14:45:07 -0800 (PST)
+Date: Mon, 29 Dec 2025 14:45:05 -0800
+In-Reply-To: <20251224001249.1041934-3-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251223230044.2617028-1-aaronlewis@google.com>
- <20251223230044.2617028-2-aaronlewis@google.com> <aUtLrp2smpXZPpBO@nvidia.com>
-In-Reply-To: <aUtLrp2smpXZPpBO@nvidia.com>
-From: Aaron Lewis <aaronlewis@google.com>
-Date: Mon, 29 Dec 2025 13:40:02 -0800
-X-Gm-Features: AQt7F2rdOsmH5ZDCBDCO39GaPcr7H5M4IF7gM9gJXGPzoNU8Vu4aI82ebODxZyI
-Message-ID: <CAAAPnDEcAGEBexGfC92pS=t9iYQRJFyFE9yPUU916T92Y465qw@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] vfio: Improve DMA mapping performance for huge pages
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: alex.williamson@redhat.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	seanjc@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20251224001249.1041934-1-pbonzini@redhat.com> <20251224001249.1041934-3-pbonzini@redhat.com>
+Message-ID: <aVMEcaZD_SzKzRvr@google.com>
+Subject: Re: [PATCH 2/5] x86, fpu: separate fpstate->xfd and guest XFD
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-I tried the memfd path on iommufd and it is indeed fast.  It was in
-the same ballpark as the optimization I posted for VFIO_TYPE1_IOMMU.
-I also tried it with a HugeTLB fd, e.g. /mnt/huge/tmp.bin, and it was
-fast too.  I haven't had a chance to try it with DevDax w/ 1G pages,
-though.  I noticed DevDax was quite a bit slower than HugeTLB when I
-tested it on VFIO_TYPE1_IOMMU.  Have you heard how DevDax performs on
-IOMMU_IOAS_MAP_FILE?  I'm curious if it has similar slowdowns compared
-to HugeTLB.
-
-I'll post an updated vfio_dma_mapping_perf_test that includes the
-memfd updates in a follow up.
-
-On Tue, Dec 23, 2025 at 6:10=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
+On Wed, Dec 24, 2025, Paolo Bonzini wrote:
+> Until now, fpstate->xfd has acted as both the guest value and the value
+> that the host used when executing XSAVES and XRSTORS.  This is wrong: the
+> data in the guest's FPU might not be initialized even if a bit is
+> set in XFD and, when that happens, XRSTORing the guest FPU will fail
+> with a #NM exception *on the host*.
+> 
+> Instead, store the value of XFD together with XFD_ERR in struct
+> fpu_guest; it will still be synchronized in fpu_load_guest_fpstate(), but
+> the XRSTOR(S) operation will be able to load any valid state of the FPU
+> independent of the XFD value.
 >
-> On Tue, Dec 23, 2025 at 11:00:43PM +0000, Aaron Lewis wrote:
->
-> > More effort will be needed to see what kind of speed ups can be achieve=
-d
-> > by optimizing iommufd.  Sample profiler results (below) show that it
-> > isn't the GUP calls that are slowing it down like they were in the
-> > "vfio_type1_iommu" case.  The majority of the slowdown is coming from
-> > batch_from_pages(), and the majority of that time is being spent in
-> > batch_add_pfn_num().
->
-> This is probably because vfio is now using num_pages_contiguous()
-> which seems to be a little bit faster than batch_add_pfn()
->
-> Since that is pretty new maybe it explains the discrepancy in reports.
->
-> > @@ -598,7 +600,18 @@ static long vaddr_get_pfns(struct mm_struct *mm, u=
-nsigned long vaddr,
-> >       ret =3D pin_user_pages_remote(mm, vaddr, pin_pages, flags | FOLL_=
-LONGTERM,
-> >                                   batch->pages, NULL);
-> >       if (ret > 0) {
-> > +             unsigned long nr_pages =3D compound_nr(batch->pages[0]);
-> > +             bool override_size =3D false;
-> > +
-> > +             if (PageHead(batch->pages[0]) && nr_pages > pin_pages &&
-> > +                 ret =3D=3D pin_pages) {
-> > +                     override_size =3D true;
-> > +                     ret =3D nr_pages;
-> > +                     page_ref_add(batch->pages[0], nr_pages - pin_page=
-s);
-> > +             }
->
-> This isn't right, num_pages_contiguous() is the best we can do for
-> lists returns by pin_user_pages(). In a VMA context you cannot blindly
-> assume the whole folio was mapped contiguously. Indeed I seem to
-> recall this was already proposed and rejected and that is how we ended
-> up with num_pages_contiguous().
+> Cc: stable@vger.kernel.org
+> Fixes: 820a6ee944e7 ("kvm: x86: Add emulation for IA32_XFD", 2022-01-14)
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-Can't we assume a single page will be mapped contiguously?  If we are
-operating on 1GB pages and the batch only covers ~30MB of that, if we
-are a head page can't we assume the VA and PA will be contiguous at
-least until the end of the current page?  Is the issue with the VMA
-context that we have to ensure the VMA includes the entire page?  If
-so, would something like this resolve that?  Instead of simply
-checking:
+...
 
-> > +             if (PageHead(batch->pages[0]) && nr_pages > pin_pages &&
-> > +                 ret =3D=3D pin_pages) {
+>  extern void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf,
+> diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
+> index 93e99d2583d6..7abe231e2ffe 100644
+> --- a/arch/x86/include/asm/fpu/types.h
+> +++ b/arch/x86/include/asm/fpu/types.h
+> @@ -545,6 +545,13 @@ struct fpu_guest {
+>  	 */
+>  	u64				xfeatures;
+>  
+> +	/*
+> +	 * @xfd:			Save the guest value.  Note that this is
+> +	 *				*not* fpstate->xfd, which is the value
+> +	 *				the host uses when doing XSAVE/XRSTOR.
+> +	 */
+> +	u64				xfd;
 
-Do this instead:
+After staring at this and playing with the selftest for pretty much the entire
+day, I'm strongly against this fix.
 
-> > +             if (pin_huge_page_fast(...) {
+The fix works only because the userspace XFD[18] must be '0' since the kernel
+never re-disables XFD features after they are enabled.  Which is probably fine
+in practice since re-disabling a component for a guest task would need to force
+the guest FPU back into an init state as well, but I don't love the complexity.
 
-Where pin_huge_page_fast() does this:
+This also creates a nasty, subtle asymmetry in KVM's ABI.  Notably, the comment
+above is wrong.  XSAVE does NOT run with fpstate->xfd, it runs with whatever
+happens to be in hardware.  For non-guest tasks, fpstate->xfd is guaranteed to
+be resident in hardware when save_fpregs_to_fpstate() runs, but for guest tasks,
+it will usually be the _guest's_ value.  So in the common case, KVM_GET_XSAVE2
+would not return the same data set by KVM_SET_XSAVE.
 
-+/* Must hold mmap_read_lock(mm). */
-+static bool pin_huge_page_fast(struct page *page, struct mm_struct *mm,
-+        unsigned long vaddr, unsigned long npages,
-+        unsigned long pin_pages, long npinned) {
-+ unsigned long nr_pages, nr_vmas_pages, untagged_vaddr;
-+ struct vm_area_struct *vma;
-+
-+ /* Did pin_user_pages_remote() pin as many pages as expected? */
-+ if (npinned !=3D pin_pages)
-+ return false;
-+
-+ /*
-+ * Only consider head pages.  That will give the maximum
-+ * benefits and simplify some of the checks below.
-+ */
-+ if (!PageHead(page))
-+ return false;
-+
-+ /*
-+ * Reject small pages.  Very large pages give the best benefits.
-+ */
-+ nr_pages =3D compound_nr(page);
-+ if (nr_pages <=3D pin_pages)
-+ return false;
-+
-+ /*
-+ * Don't pin more pages than requested by VFIO_IOMMU_MAP_DMA.
-+ */
-+ if (nr_pages > npages)
-+ return false;
-+
-+ untagged_vaddr =3D untagged_addr_remote(mm, vaddr);
-+ vma =3D vma_lookup(mm, untagged_vaddr);
-+
-+ /* Does the virtual address map to a VMA? */
-+ if (!vma)
-+ return false;
-+
-+ /* Is the virtual address in the VMA? */
-+ if (untagged_vaddr < vma->vm_start ||
-+     untagged_vaddr >=3D vma->vm_end)
-+ return false;
-+
-+ /*
-+ * Does the VMA contain the entire very large page?  I.e. it
-+ * isn't being overrun.
-+ */
-+ nr_vmas_pages =3D ((vma->vm_end - untagged_vaddr) >> PAGE_SHIFT);
-+ if (nr_pages > nr_vmas_pages)
-+ return false;
-+
-+ /*
-+ * This is a good candidate for huge page optimizations.  The
-+ * page is larger than a batch and fits in its VMA.  Therefore,
-+ * pin the entire page all at once, rather than walking over
-+ * each struct page in this huge page.
-+ */
-+ return true;
-+}
+In theory we could ensure KVM saved exactly what is resident in hardware, but
+that's quite tricky (and costly!) as it would require doing xfd_update_state()
+before _every_ save_fpregs_to_fpstate(), e.g. not just in fpu_swap_kvm_fpstate().
+E.g. if the host kernel used the FPU from IRQ context (spoiler alert!), then KVM
+wouldn't have a chance to swap in the maximal XFD[18]=0 value (i.e. the userspace
+task's XFD).
 
->
-> Again, use the memfd path which supports this optimization already.
->
-> Jason
+As evidenced by how long it took for someone to run into this bug, saving non-init
+XTILE data with XFD[18]=1 requires hitting a rare edge case, so for all intents
+and purposes KVM's ABI is that XSTATE compontents that are disabled via XFD are
+effectively dropped across save/load.  Which is a bit gross, but architecturally
+acceptable because the SDM explicitly says software must not rely on state being
+retained when XFD[i]=1, i.e. KVM is allowed to clobber the state.
 
-Using memfd sounds reasonable assuming DevDax w/ 1GB pages performs
-well.  I guess I'm more asking about pin_huge_page_fast() as a sanity
-check to make sure I'm not missing anything, though if you are not
-looking to take changes for VFIO_TYPE1_IOMMU I can remove it from the
-series.
+Lastly, the fix is effectively papering over another bug, which I'm pretty sure
+is the underlying issue that was originally encountered.  Assuming QEMU doesn't
+intercept MSR_IA32_XFD for its own purposes, the only sequence I've come up with
+that would result in KVM trying to load XTILE data with XFD[18]=1, without a
+colluding userspace VMM (Paolo's selftest) is:
 
-Aaron
+  1. vCPU loads non-init XTILE data without ever setting XFD to a non-zero value
+     (KVM only disables XFD interception on writes with a non-zero value).
+  2. Guest executes WRMSR(MSR_IA32_XFD) to set XFD[18] = 1
+  3. VM-Exit due to the WRMSR
+  4. Host IRQ arrives and triggers kernel_fpu_begin()
+  5. save_fpregs_to_fpstate() saves guest FPU with XFD[18]=0
+  6. fpu_update_guest_xfd() stuffs guest_fpu->fpstate->xfd = XFD[18]=1
+  7. vcpu_enter_guest() attempts to load XTILE data with XFD[18]=1
+
+Note!  There's no KVM_SET_XSAVE2 in the above, i.e. this doesn't require userspace
+to trigger save/restore for live migration or whatever, the only timing condition
+is the arrival of an IRQ that uses kernel FPU during the XFD 0=>1 VM-Exit.
+
+E.g. with a simulated IRQ in the KVM:
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ff8812f3a129..9fc7c0aadfd7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4261,6 +4261,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+                if (data & ~kvm_guest_supported_xfd(vcpu))
+                        return 1;
+ 
++               /* Simulate an IRQ arriving at just the wrong time. */
++               kernel_fpu_begin();
++               kernel_fpu_end();
++
+                fpu_update_guest_xfd(&vcpu->arch.guest_fpu, data);
+                break;
+        case MSR_IA32_XFD_ERR:
+
+and a lightly modified KVM AMX selftest to write XFD *before* TILERELEASE:
+
+diff --git a/tools/testing/selftests/kvm/x86/amx_test.c b/tools/testing/selftests/kvm/x86/amx_test.c
+index f4ce5a185a7d..13d4a6befd5e 100644
+--- a/tools/testing/selftests/kvm/x86/amx_test.c
++++ b/tools/testing/selftests/kvm/x86/amx_test.c
+@@ -143,6 +143,8 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+        /* Check save/restore when trap to userspace */
+        __tileloadd(tiledata);
+        GUEST_SYNC(4);
++       /* xfd=0x40000, disable amx tiledata */
++       wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILE_DATA);
+        __tilerelease();
+        GUEST_SYNC(5);
+        /*
+
+we get a nice explosion:
+
+  ------------[ cut here ]------------
+  WARNING: arch/x86/kernel/fpu/core.c:289 at fpu_free_guest_fpstate+0x2f/0x40, CPU#30: kvm-nx-lpage-re/853
+  Modules linked in: kvm_intel kvm irqbypass
+  CPU: 30 UID: 1000 PID: 853 Comm: kvm-nx-lpage-re Tainted: G      D W           6.19.0-rc2-ffa07f7fd437-x86_amx_nm_xfd_non_init-vm #171 NONE 
+  Tainted: [D]=DIE, [W]=WARN
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:fpu_free_guest_fpstate+0x2f/0x40
+  Call Trace:
+   <TASK>
+   kvm_arch_vcpu_destroy+0xa1/0x120 [kvm]
+   kvm_destroy_vcpus+0xc6/0x150 [kvm]
+   kvm_arch_destroy_vm+0x2d/0xe0 [kvm]
+   kvm_destroy_vm+0x15e/0x260 [kvm]
+   kvm_vcpu_release+0x35/0x50 [kvm]
+   __fput+0xd9/0x290
+   task_work_run+0x5b/0x80
+   do_exit+0x290/0x9d0
+   vhost_task_fn+0x9d/0xe0
+   ret_from_fork+0x1a3/0x200
+   ret_from_fork_asm+0x11/0x20
+   </TASK>
+
+So, given that KVM's effective ABI is to record XSTATE_BV[i]=0 if XFD[i]==1, I
+vote to fix this by emulating that behavior when stuffing XFD in
+fpu_update_guest_xfd(), and then manually closing the hole Paolo found in
+fpu_copy_uabi_to_guest_fpstate().
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Mon, 29 Dec 2025 12:14:09 -0800
+Subject: [PATCH] x86/fpu: Clear XSTATE_BV[i] in save state whenever XFD[i]=1
+
+When loading guest XSAVE state via KVM_SET_XSAVE, and when updating XFD in
+response to a guest WRMSR, clear XFD-disabled features in the saved (or to
+be restored) XSTATE_BV to ensure KVM doesn't attempt to load state for
+features that are disabled via the guest's XFD.  Because the kernel
+executes XRSTOR with the guest's XFD, saving XSTATE_BV[i]=1 with XFD[i]=1
+will cause XRSTOR to #NM and panic the kernel.
+
+E.g. if fpu_update_guest_xfd() sets XFD without clearing XSTATE_BV:
+
+  ------------[ cut here ]------------
+  WARNING: arch/x86/kernel/traps.c:1524 at exc_device_not_available+0x101/0x110, CPU#29: amx_test/848
+  Modules linked in: kvm_intel kvm irqbypass
+  CPU: 29 UID: 1000 PID: 848 Comm: amx_test Not tainted 6.19.0-rc2-ffa07f7fd437-x86_amx_nm_xfd_non_init-vm #171 NONE
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:exc_device_not_available+0x101/0x110
+  Call Trace:
+   <TASK>
+   asm_exc_device_not_available+0x1a/0x20
+  RIP: 0010:restore_fpregs_from_fpstate+0x36/0x90
+   switch_fpu_return+0x4a/0xb0
+   kvm_arch_vcpu_ioctl_run+0x1245/0x1e40 [kvm]
+   kvm_vcpu_ioctl+0x2c3/0x8f0 [kvm]
+   __x64_sys_ioctl+0x8f/0xd0
+   do_syscall_64+0x62/0x940
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
+  ---[ end trace 0000000000000000 ]---
+
+and if userspace stuffs XSTATE_BV[i]=1 via KVM_SET_XSAVE:
+
+  ------------[ cut here ]------------
+  WARNING: arch/x86/kernel/traps.c:1524 at exc_device_not_available+0x101/0x110, CPU#14: amx_test/867
+  Modules linked in: kvm_intel kvm irqbypass
+  CPU: 14 UID: 1000 PID: 867 Comm: amx_test Not tainted 6.19.0-rc2-2dace9faccd6-x86_amx_nm_xfd_non_init-vm #168 NONE
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:exc_device_not_available+0x101/0x110
+  Call Trace:
+   <TASK>
+   asm_exc_device_not_available+0x1a/0x20
+  RIP: 0010:restore_fpregs_from_fpstate+0x36/0x90
+   fpu_swap_kvm_fpstate+0x6b/0x120
+   kvm_load_guest_fpu+0x30/0x80 [kvm]
+   kvm_arch_vcpu_ioctl_run+0x85/0x1e40 [kvm]
+   kvm_vcpu_ioctl+0x2c3/0x8f0 [kvm]
+   __x64_sys_ioctl+0x8f/0xd0
+   do_syscall_64+0x62/0x940
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
+  ---[ end trace 0000000000000000 ]---
+
+Note, the new behavior is consistent with KVM's de facto ABI and with the
+AMX architecture.  Per Intel's SDM, XSAVE saves XSTATE_BV as '0' for
+components that are disabled via XFD (and non-compacted XSAVE saves the
+initial configuration of the state component):
+
+  If XSAVE, XSAVEC, XSAVEOPT, or XSAVES is saving the state component i,
+  the instruction does not generate #NM when XCR0[i] = IA32_XFD[i] = 1;
+  instead, it operates as if XINUSE[i] = 0 (and the state component was
+  in its initial state): it saves bit i of XSTATE_BV field of the XSAVE
+  header as 0; in addition, XSAVE saves the initial configuration of the
+  state component (the other instructions do not save state component i).
+
+Because fpu_swap_kvm_fpstate() => save_fpregs_to_fpstate() saves the
+outgoing FPU state with the current XFD, it is extremely unlikely for
+userspace to save non-initialized data and/or XSTATE_BV[i]=1 for
+XFD-disabled features.  Specifically, the only known sequence where KVM
+can save XTILE data and also see XFD[18]=1 _without_ a colluding VMM is by
+hitting the bug in fpu_update_guest_xfd():
+
+  1. vCPU loads non-init XTILE data without ever setting XFD to a non-zero
+     value (KVM only disables XFD interception on the first non-zero write).
+  2. Guest executes WRMSR(MSR_IA32_XFD) to set XFD[18] = 1
+  3. VM-Exit due to the WRMSR
+  4. Host IRQ arrives and triggers kernel_fpu_begin()
+  5. save_fpregs_to_fpstate() saves guest FPU with XFD[18]=0
+  6. fpu_update_guest_xfd() stuffs guest_fpu->fpstate->xfd = XFD[18]=1
+  7. vcpu_enter_guest() attempts to load XTILE data with XFD[18]=1
+
+Alternatively, KVM could always do XRSTOR with XFD=0, e.g. by using the
+VMM task's XFD, but that approach really only papers over the bug, and it
+would create a subtle asymmetry in KVM's ABI as KVM_GET_XSAVE2 would NOT
+return the XSTATE_BV set by KVM_SET_XSAVE.  And if hardening KVM against
+XFD-related bugs is desirable, a more robust solution would be to eat #NM
+faults on XRSTOR and signal to KVM that XRSTOR failed, e.g. so that KVM
+can terminate the VM instead of panicking the host.
+
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Closes: https://lore.kernel.org/all/20251224001249.1041934-1-pbonzini@redhat.com
+Cc: stable@vger.kernel.org
+Fixes: 820a6ee944e7 ("kvm: x86: Add emulation for IA32_XFD", 2022-01-14)
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/fpu/api.h |  2 +-
+ arch/x86/kernel/fpu/core.c     | 35 ++++++++++++++++++++++++++++------
+ 2 files changed, 30 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index cd6f194a912b..0b218f5eaafd 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -160,7 +160,7 @@ static inline void fpu_sync_guest_vmexit_xfd_state(void) { }
+ 
+ extern void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf,
+ 					   unsigned int size, u64 xfeatures, u32 pkru);
+-extern int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf, u64 xcr0, u32 *vpkru);
++extern int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, void *buf, u64 xcr0, u32 *vpkru);
+ 
+ static inline void fpstate_set_confidential(struct fpu_guest *gfpu)
+ {
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index da233f20ae6f..af756875c701 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -319,10 +319,25 @@ EXPORT_SYMBOL_FOR_KVM(fpu_enable_guest_xfd_features);
+ #ifdef CONFIG_X86_64
+ void fpu_update_guest_xfd(struct fpu_guest *guest_fpu, u64 xfd)
+ {
++	struct fpstate *fpstate = guest_fpu->fpstate;
++
+ 	fpregs_lock();
+-	guest_fpu->fpstate->xfd = xfd;
+-	if (guest_fpu->fpstate->in_use)
+-		xfd_update_state(guest_fpu->fpstate);
++	fpstate->xfd = xfd;
++	if (fpstate->in_use)
++		xfd_update_state(fpstate);
++
++	/*
++	 * If the guest's FPU state is NOT resident in hardware, clear disabled
++	 * components in XSTATE_BV as attempting to load disabled components
++	 * will generate #NM _in the host_, and KVM's ABI is that saving guest
++	 * XSAVE state should see XSTATE_BV[i]=0 if XFD[i]=1.
++	 *
++	 * If the guest's FPU state is in hardware, simply do nothing as XSAVE
++	 * itself saves XSTATE_BV[i] as 0 if XFD[i]=1.
++	 */
++	if (xfd && test_thread_flag(TIF_NEED_FPU_LOAD))
++		fpstate->regs.xsave.header.xfeatures &= ~xfd;
++
+ 	fpregs_unlock();
+ }
+ EXPORT_SYMBOL_FOR_KVM(fpu_update_guest_xfd);
+@@ -412,11 +427,11 @@ void fpu_copy_guest_fpstate_to_uabi(struct fpu_guest *gfpu, void *buf,
+ }
+ EXPORT_SYMBOL_FOR_KVM(fpu_copy_guest_fpstate_to_uabi);
+ 
+-int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
+-				   u64 xcr0, u32 *vpkru)
++int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, void *buf, u64 xcr0,
++				   u32 *vpkru)
+ {
+ 	struct fpstate *kstate = gfpu->fpstate;
+-	const union fpregs_state *ustate = buf;
++	union fpregs_state *ustate = buf;
+ 
+ 	if (!cpu_feature_enabled(X86_FEATURE_XSAVE)) {
+ 		if (ustate->xsave.header.xfeatures & ~XFEATURE_MASK_FPSSE)
+@@ -430,6 +445,14 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
+ 	if (ustate->xsave.header.xfeatures & ~xcr0)
+ 		return -EINVAL;
+ 
++	/*
++	 * Initialize features that are disabled via XFD instead of restoring
++	 * state provided by userspace.  KVM's ABI is that XFD-disabled state
++	 * is undefined on "save" and initialized on "load" (KVM doesn't reject
++	 * non-initialized XFD state for backwards compatibility).
++	 */
++	ustate->xsave.header.xfeatures &= ~kstate->xfd;
++
+ 	/*
+ 	 * Nullify @vpkru to preserve its current value if PKRU's bit isn't set
+ 	 * in the header.  KVM's odd ABI is to leave PKRU untouched in this
+
+base-commit: 1ea29dfaec1a81bab4ac00c442293fda2cc56942
+--
 
