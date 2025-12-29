@@ -1,125 +1,270 @@
-Return-Path: <kvm+bounces-66757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526D3CE59B7
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 01:07:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A427DCE5B96
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 02:57:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B29F13026BDA
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 00:06:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9093730019FF
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 01:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023272E7650;
-	Sun, 28 Dec 2025 23:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b="Lq1UcpCR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4BF2571BE;
+	Mon, 29 Dec 2025 01:56:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.pv.icloud.com (p-west1-cluster3-host5-snip4-10.eps.apple.com [57.103.66.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378A72E7BD2
-	for <kvm@vger.kernel.org>; Sun, 28 Dec 2025 23:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.66.13
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC6B17C21C;
+	Mon, 29 Dec 2025 01:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766966311; cv=none; b=uy4Am7IpMOt1N38XbwP2S5aDMs7zsTKA3Him59wT4ZQYP/8dgZtmaulOEQ8WYyUUwRBHxfi4jtZ26Ik7HbfsL07sIGDDC3BlaU9K1TIEwcjjdDAtixJJUeeS6Bri/rv7DkPlfnAEBlVaMLGTCTaAfAiDEjQN3h+lUWZmj4UmkNU=
+	t=1766973416; cv=none; b=l+3LfifHJMBaCZ76yk9Vuve3WqNrRsGvF61G5eQftpXFBI9fJkBEXPp555ytab0x63uN5hqxqJG8u2Bhpd5K3sZ+KFFxPECYjNqAtWCkv1vLSAMgnAvfl0mb4kEn0fa3P74U8gSbatkvzqx3LrBP93lomG9qyfjS9CLbjBVoQwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766966311; c=relaxed/simple;
-	bh=X0xI4cc9F+qeEBDomMtEKG5Y5J86jU27RsIi0vHZc0c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ijm/G1NZ5smHOy0bRgfbN6nyffMO8NTfwT39Q9RQ0jZG3gtC9cwl5yFYPpYRfSZhhCNT4TXVQYugy5uDjhLOs70rip9rYSxhnfk3zwPiE6QWutrj6LvoYUDRFaGUshhv2YGas1QGhZFlt35z0fyowreZfcBiiNhLNfeqEPGKrH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr; spf=pass smtp.mailfrom=unpredictable.fr; dkim=pass (2048-bit key) header.d=unpredictable.fr header.i=@unpredictable.fr header.b=Lq1UcpCR; arc=none smtp.client-ip=57.103.66.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=unpredictable.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unpredictable.fr
-Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPS id CD1A318000A7;
-	Sun, 28 Dec 2025 23:58:27 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unpredictable.fr; s=sig1; bh=Z3QC1xsGoWlyM6qiWEninqsw442X+pblDFh3uzygGEs=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=Lq1UcpCRmd0Jgion/YwXZR0H7y1NrXxtJZpUBvBNtbogJowXcsrfms1SEZobT6mvzAntAV99MpRs1zKKrJxxKwRJDtbrhyAfMEaCYQ77bARwcxpIhLiRIZnRNlNW5adkBJ02yEGuOriQZcPfNwyXuuHuzQUEBj7CgpLw/cTSl9lsSrFXBvRIJGdZPoplW24YCPKC2XjJfkYMkPxmL9pzeiBulhmmeZLH4y594a+jkig2qlZc4WSKyc1oHcYjE5C5iE6qNcViR4jg1gY9gTDw6gOy5JkAJLDY8nGFBID8rjzQPY2pb/lQU9cICauiugjxVcM0Ykog9rnhlbPNCr7rHw==
-mail-alias-created-date: 1752046281608
-Received: from localhost.localdomain (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-5 (Postfix) with ESMTPSA id 1901918000B9;
-	Sun, 28 Dec 2025 23:58:22 +0000 (UTC)
-From: Mohamed Mediouni <mohamed@unpredictable.fr>
-To: qemu-devel@nongnu.org,
-	mohamed@unpredictable.fr
-Cc: Alexander Graf <agraf@csgraf.de>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Phil Dennis-Jordan <phil@philjordan.eu>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	kvm@vger.kernel.org,
-	Roman Bolshakov <rbolshakov@ddn.com>,
-	Pedro Barbuda <pbarbuda@microsoft.com>,
-	qemu-arm@nongnu.org,
-	Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	Peter Xu <peterx@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Ani Sinha <anisinha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Mads Ynddal <mads@ynddal.dk>,
-	Cameron Esfahani <dirty@apple.com>
-Subject: [PATCH v12 28/28] MAINTAINERS: update the list of maintained files for WHPX
-Date: Mon, 29 Dec 2025 00:54:22 +0100
-Message-ID: <20251228235422.30383-29-mohamed@unpredictable.fr>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251228235422.30383-1-mohamed@unpredictable.fr>
-References: <20251228235422.30383-1-mohamed@unpredictable.fr>
+	s=arc-20240116; t=1766973416; c=relaxed/simple;
+	bh=l3WEVU/CgJG+BdtBK3zv+iEN8UKq7g5yswrtPD8gm/4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=KL+yB1dnYqxE9zxwo0MAcSHgtlr5Ae2+x49Eaw+68/AqHJwJYxLAb6ezqHd/vCWlGkxJVL4yat0SVXVV0IhOC4J72LQDd05YITx1GkilPUK7zfJm+JoAavjoy7rty14MPhrQGLlR5n94ERnW+a9eWK4uyUlGu4O384SKrg+g44k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.126])
+	by gateway (Coremail) with SMTP id _____8DxHvDh31FpL_YDAA--.13078S3;
+	Mon, 29 Dec 2025 09:56:49 +0800 (CST)
+Received: from [10.20.42.126] (unknown [10.20.42.126])
+	by front1 (Coremail) with SMTP id qMiowJCxWeDe31FpSwMGAA--.16906S3;
+	Mon, 29 Dec 2025 09:56:47 +0800 (CST)
+Subject: Re: [PATCH V3 2/2] LoongArch: KVM: fix "unreliable stack" issue
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, stable@vger.kernel.org, WANG Xuerui
+ <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Bibo Mao <maobibo@loongson.cn>, Charlie Jenkins <charlie@rivosinc.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Tiezhu Yang <yangtiezhu@loongson.cn>,
+ hejinyang@loongson.cn
+References: <20251227012712.2921408-1-lixianglai@loongson.cn>
+ <20251227012712.2921408-3-lixianglai@loongson.cn>
+ <CAAhV-H6vxwDkBUQgY=YKnhk+3i_hW06E0UFLHK5F3VnG7tzdwA@mail.gmail.com>
+From: lixianglai <lixianglai@loongson.cn>
+Message-ID: <18698ea8-781e-cea0-ac1f-2f0623775fac@loongson.cn>
+Date: Mon, 29 Dec 2025 09:53:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAAhV-H6vxwDkBUQgY=YKnhk+3i_hW06E0UFLHK5F3VnG7tzdwA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: Rj7Romy-xmkHQloxAGTARtkhCR6i1xJp
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI4MDIyMyBTYWx0ZWRfX3rEriqSZtQEB
- 3XRWKGytrB7FAPpBOajuYh4D5mzUNS6ONwVX8f0evPrGRMQj1LvLSEVHzmYZTe9ucPnXqTtnRy4
- caulxXsSvyZiYNZp+YEgSkR885+8KeT4ZbND7R22MTSb2aKl5Ou/KxOA7jlWRNrbn6Tr12Ua3F/
- Tb9ELXPvOarnd4o+Ge8iq5/HG5W3tBjMG08HzQ2k6s+yPHhkbB6Vb0l0CQPcgLqACIXNLdU3Ilc
- SpbTFl8XfCGa9OhE6fkJ+BpZcgf6V1t4NemBH5u5/X+pgTy7ROZJ6UUu+94msGjaioe224rBCRZ
- 267QStjQrjGW4T0k1oa
-X-Authority-Info: v=2.4 cv=ZJTaWH7b c=1 sm=1 tr=0 ts=6951c424 cx=c_apl:c_pps
- a=azHRBMxVc17uSn+fyuI/eg==:117 a=azHRBMxVc17uSn+fyuI/eg==:17
- a=t-S863UTctjxRPX8:21 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=hdCJvu6vi-O6ykQZt0QA:9
-X-Proofpoint-GUID: Rj7Romy-xmkHQloxAGTARtkhCR6i1xJp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-28_07,2025-12-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- clxscore=1030 mlxlogscore=999 bulkscore=0 malwarescore=0 spamscore=0
- adultscore=0 suspectscore=0 phishscore=0 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512280223
-X-JNJ: AAAAAAAB0TYzjbInwuLNkWeN2iZyibBPeceX+Ca3t6BsdRotJOWMOnnkbRMPyaL19bBSn6pB6zpT6HXgQ1gH9u7GRXu7nye4+Spz4icVzSK5lxKVYBnRApb+PPbk63VJaWE6xQLLOsfRTqEhzqx0yqcf47fLaMQm1H1yfp/H251uDy17wEUdUtAAHBZi02hpRhl87eYtSPQnjeFdwUy8Sy6IyhMAeaIAdeetO4qe7EP6o09wYufbp27RAEqqJi1vgECdpJUhNzaBBFSCpISOAdFbLE7TalproE+RFnVEtw+yAzRARC23OcOMWzEgfamjznXYtTe7w5htuM2cTl68feguTXC4vhtK+ZvScTBEzpT9kzjbA/6JMYISgRgOXbjQamjKsutlwxYVBiupDznJ4YFGXf/2hwqHEnX0E/PdCeeZtUygwn+jRp10eVo5MQKMoOo4DvEkdclodTGq8a6mHm3DKuUPE1jved/NQwAyh/E8zL0lzUXpEc+W2dvpRNE0x9AmYSHZXX1+gj2dUbMXrrlid6ECnI3N9DxUzCU1rAOOej/Aqi8dLB9MnzAkh8wD194FKac959iTNC5LXQHGhK6vMtTW42N8ulsA5XnPYr5GTmHh+sttRFICTuCvFqfHcZfbXNP7dc4oJ8fF/yKP1TPOEU6TKhR9CpAhcxg4CnDfjWYj4hiOZ/gHeO8CmRue/N8Ew/8L9ffizw7FeGtLW3IbRXi7ZWpgaCO78HcB4gxnFlkCbapQLOUL4Nym6D9IG0DDPsjNsIPCfvkAcNI36jMD+1Pnt3Du0ealGQN+aqGMtr1XetWpCh2NlxvvqMxQIuogyaZdlTWh5ie8EQI77m6LZL4NLlqt6DinHMWQA+38bxdm1fKvdfzBoLUbmIh37NqRSSjODtXG4nFF/MwIILfHbLmgwV88Yv0hMTmicYOFXnaO36s1c/moZaPo/2WFr6dTk7OYgxBf5MGarKlFtP0A
+Content-Language: en-US
+X-CM-TRANSID:qMiowJCxWeDe31FpSwMGAA--.16906S3
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3JFyUZF4xAr1kAFy8Xw4UJrc_yoWxXryrpw
+	13AFs0ka1kJ3s8Zw47JFyDArZaqr4kKF1Sgrs7ArWrAw1qgr9xWFy8twsxXF9rKw18XFnY
+	qFyUWr1rA3ykJagCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jepB-UUUUU=
 
-Add arm64-specific files.
+Hi Huacai:
+> Hi, Xianglai,
+>
+> On Sat, Dec 27, 2025 at 9:52 AM Xianglai Li <lixianglai@loongson.cn> wrote:
+>> Insert the appropriate UNWIND macro definition into the kvm_exc_entry in
+>> the assembly function to guide the generation of correct ORC table entries,
+>> thereby solving the timeout problem of loading the livepatch-sample module
+>> on a physical machine running multiple vcpus virtual machines.
+>>
+>> While solving the above problems, we have gained an additional benefit,
+>> that is, we can obtain more call stack information
+>>
+>> Stack information that can be obtained before the problem is fixed:
+>> [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
+>> [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
+>> [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
+>> [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
+>> [<0>] kvm_handle_exit+0x160/0x270 [kvm]
+>> [<0>] kvm_exc_entry+0x100/0x1e0
+>>
+>> Stack information that can be obtained after the problem is fixed:
+>> [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
+>> [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
+>> [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
+>> [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
+>> [<0>] kvm_handle_exit+0x160/0x270 [kvm]
+>> [<0>] kvm_exc_entry+0x104/0x1e4
+>> [<0>] kvm_enter_guest+0x38/0x11c
+>> [<0>] kvm_arch_vcpu_ioctl_run+0x26c/0x498 [kvm]
+>> [<0>] kvm_vcpu_ioctl+0x200/0xcf8 [kvm]
+>> [<0>] sys_ioctl+0x498/0xf00
+>> [<0>] do_syscall+0x98/0x1d0
+>> [<0>] handle_syscall+0xb8/0x158
+>>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
+>> ---
+>> Cc: Huacai Chen <chenhuacai@kernel.org>
+>> Cc: WANG Xuerui <kernel@xen0n.name>
+>> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> Cc: Bibo Mao <maobibo@loongson.cn>
+>> Cc: Charlie Jenkins <charlie@rivosinc.com>
+>> Cc: Xianglai Li <lixianglai@loongson.cn>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
+>>
+>>   arch/loongarch/kvm/switch.S | 28 +++++++++++++++++++---------
+>>   1 file changed, 19 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+>> index 93845ce53651..a3ea9567dbe5 100644
+>> --- a/arch/loongarch/kvm/switch.S
+>> +++ b/arch/loongarch/kvm/switch.S
+>> @@ -10,6 +10,7 @@
+>>   #include <asm/loongarch.h>
+>>   #include <asm/regdef.h>
+>>   #include <asm/unwind_hints.h>
+>> +#include <linux/kvm_types.h>
+>>
+>>   #define HGPR_OFFSET(x)         (PT_R0 + 8*x)
+>>   #define GGPR_OFFSET(x)         (KVM_ARCH_GGPR + 8*x)
+>> @@ -110,9 +111,9 @@
+>>           * need to copy world switch code to DMW area.
+>>           */
+>>          .text
+>> +       .p2align PAGE_SHIFT
+>>          .cfi_sections   .debug_frame
+>>   SYM_CODE_START(kvm_exc_entry)
+>> -       .p2align PAGE_SHIFT
+>>          UNWIND_HINT_UNDEFINED
+>>          csrwr   a2,   KVM_TEMP_KS
+>>          csrrd   a2,   KVM_VCPU_KS
+>> @@ -170,6 +171,7 @@ SYM_CODE_START(kvm_exc_entry)
+>>          /* restore per cpu register */
+>>          ld.d    u0, a2, KVM_ARCH_HPERCPU
+>>          addi.d  sp, sp, -PT_SIZE
+>> +       UNWIND_HINT_REGS
+>>
+>>          /* Prepare handle exception */
+>>          or      a0, s0, zero
+>> @@ -200,7 +202,7 @@ ret_to_host:
+>>          jr      ra
+>>
+>>   SYM_CODE_END(kvm_exc_entry)
+>> -EXPORT_SYMBOL(kvm_exc_entry)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_exc_entry)
+> Why not use EXPORT_SYMBOL_FOR_KVM in the first patch directly?
+Ok,I will put it in the first patch.
 
-Signed-off-by: Mohamed Mediouni <mohamed@unpredictable.fr>
----
- MAINTAINERS | 2 ++
- 1 file changed, 2 insertions(+)
+>>   /*
+>>    * int kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu)
+>> @@ -215,6 +217,14 @@ SYM_FUNC_START(kvm_enter_guest)
+>>          /* Save host GPRs */
+>>          kvm_save_host_gpr a2
+>>
+>> +       /*
+>> +        * The csr_era member variable of the pt_regs structure is required
+>> +        * for unwinding orc to perform stack traceback, so we need to put
+>> +        * pc into csr_era member variable here.
+>> +        */
+>> +       pcaddi  t0, 0
+>> +       st.d    t0, a2, PT_ERA
+> I am still confused here, does this overwrite PT_ERA stored by
+> kvm_save_host_gpr?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8d84f141cc..7ac1efd904 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -552,6 +552,8 @@ M: Mohamed Mediouni <mohamed@unpredictable.fr>
- S: Supported
- F: accel/whpx/
- F: target/i386/whpx/
-+F: target/arm/whpx/
-+F: hw/intc/arm_gicv3_whpx.c
- F: accel/stubs/whpx-stub.c
- F: include/system/whpx.h
- F: include/system/whpx-accel-ops.h
--- 
-2.50.1 (Apple Git-155)
+No, kvm_save_host_gpr does not overwrite PT_ERA. In fact,
+  it is precisely because PT_ERA is not assigned a value that we need to 
+add these lines of statements here.
+
+Now the a2 register points to the structure pt_regs. Here, we are 
+assigning a value to the pt_regs.csr_era member variable.
+Then the function unwind_next_frame uses the pt_regs.csr_era member 
+variable as a pc to do the stack traceback.
+
+Thanks,
+Xianglai.
+
+> Huacai
+>
+>> +
+>>          addi.d  a2, a1, KVM_VCPU_ARCH
+>>          st.d    sp, a2, KVM_ARCH_HSP
+>>          st.d    tp, a2, KVM_ARCH_HTP
+>> @@ -225,7 +235,7 @@ SYM_FUNC_START(kvm_enter_guest)
+>>          csrwr   a1, KVM_VCPU_KS
+>>          kvm_switch_to_guest
+>>   SYM_FUNC_END(kvm_enter_guest)
+>> -EXPORT_SYMBOL(kvm_enter_guest)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_enter_guest)
+>>
+>>   SYM_FUNC_START(kvm_save_fpu)
+>>          fpu_save_csr    a0 t1
+>> @@ -233,7 +243,7 @@ SYM_FUNC_START(kvm_save_fpu)
+>>          fpu_save_cc     a0 t1 t2
+>>          jr              ra
+>>   SYM_FUNC_END(kvm_save_fpu)
+>> -EXPORT_SYMBOL(kvm_save_fpu)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_save_fpu)
+>>
+>>   SYM_FUNC_START(kvm_restore_fpu)
+>>          fpu_restore_double a0 t1
+>> @@ -241,7 +251,7 @@ SYM_FUNC_START(kvm_restore_fpu)
+>>          fpu_restore_cc     a0 t1 t2
+>>          jr                 ra
+>>   SYM_FUNC_END(kvm_restore_fpu)
+>> -EXPORT_SYMBOL(kvm_restore_fpu)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_restore_fpu)
+>>
+>>   #ifdef CONFIG_CPU_HAS_LSX
+>>   SYM_FUNC_START(kvm_save_lsx)
+>> @@ -250,7 +260,7 @@ SYM_FUNC_START(kvm_save_lsx)
+>>          lsx_save_data   a0 t1
+>>          jr              ra
+>>   SYM_FUNC_END(kvm_save_lsx)
+>> -EXPORT_SYMBOL(kvm_save_lsx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_save_lsx)
+>>
+>>   SYM_FUNC_START(kvm_restore_lsx)
+>>          lsx_restore_data a0 t1
+>> @@ -258,7 +268,7 @@ SYM_FUNC_START(kvm_restore_lsx)
+>>          fpu_restore_csr  a0 t1 t2
+>>          jr               ra
+>>   SYM_FUNC_END(kvm_restore_lsx)
+>> -EXPORT_SYMBOL(kvm_restore_lsx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_restore_lsx)
+>>   #endif
+>>
+>>   #ifdef CONFIG_CPU_HAS_LASX
+>> @@ -268,7 +278,7 @@ SYM_FUNC_START(kvm_save_lasx)
+>>          lasx_save_data  a0 t1
+>>          jr              ra
+>>   SYM_FUNC_END(kvm_save_lasx)
+>> -EXPORT_SYMBOL(kvm_save_lasx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_save_lasx)
+>>
+>>   SYM_FUNC_START(kvm_restore_lasx)
+>>          lasx_restore_data a0 t1
+>> @@ -276,7 +286,7 @@ SYM_FUNC_START(kvm_restore_lasx)
+>>          fpu_restore_csr   a0 t1 t2
+>>          jr                ra
+>>   SYM_FUNC_END(kvm_restore_lasx)
+>> -EXPORT_SYMBOL(kvm_restore_lasx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_restore_lasx)
+>>   #endif
+>>
+>>   #ifdef CONFIG_CPU_HAS_LBT
+>> --
+>> 2.39.1
+>>
 
 
