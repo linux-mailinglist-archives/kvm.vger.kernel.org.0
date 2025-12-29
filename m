@@ -1,124 +1,116 @@
-Return-Path: <kvm+bounces-66778-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89FD0CE733E
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 16:24:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A643CE7391
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 16:36:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A8363012DE5
-	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 15:24:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B7963013EF8
+	for <lists+kvm@lfdr.de>; Mon, 29 Dec 2025 15:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2951F32B9A8;
-	Mon, 29 Dec 2025 15:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A8A325700;
+	Mon, 29 Dec 2025 15:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iTXCUM0S"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Yad/3u+y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36DD2165EA
-	for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 15:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0535416CD33;
+	Mon, 29 Dec 2025 15:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767021885; cv=none; b=g2Sc6j+0tzfAbCdDRyCtWEM3rSASA/TbmlHZ9CWjJ3AP/ko2JAQvgsxiFWFXcmd1FVaiJuUDZz+vi6D7IkW5t7RHKoTLszw6ozBbBLJO8P6V5gTctEFj2T91HQTZQwXGzbKkoaIcaYKhm+6H1rqWj+GnLrZKt3Ysz0kga3wYTjA=
+	t=1767022575; cv=none; b=uV1yV5NEp0NqjiDseLWPsyaHke2HcWdJBY5ysy2LDhbTcU+rjYAp4l4F3Qvcar9MmWR+7VquI4AvlgZ4EiDk6SdDzjKUPXhB/QhYaZvqn/+lbMiG8Gt3zfJV65SDml5xzfF6M+dyMWdDCe9BXMvEwyw5+gl7bUa/xbNqcwxNcxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767021885; c=relaxed/simple;
-	bh=NN8T3287x7Ols1SXOdTD/e2049uwV6Gj932H5nZUdZM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Q9v2CfHa7roMwfV7rlra1oTc1/tb9BH82XUJFbAoQiEBk4+bCycV3sbEaf8IxiXkU8IBi+q+GZtQN0xgS30W71TH1cCA7gHzjFZQ7gB5aM4FLz0U1TIxivKg5OR7EREE1vbhbEEJerUtnZ2kEx/l3du1ro0zzUntG+LmnYCNKqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iTXCUM0S; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7f046e16d50so15329463b3a.3
-        for <kvm@vger.kernel.org>; Mon, 29 Dec 2025 07:24:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767021883; x=1767626683; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IPdy/u4ar4zg+FvL/tA84pDfFm5/wiGlEDxZ5SeN1nQ=;
-        b=iTXCUM0SC9c3cD7+83LI9YBZBsLYPDvE5eIx8ftopShbVj5FYZiT1B2Rrepow65+J5
-         e/dkJ9BHmFPuEkwiL2rNTy918CUYqHB+izIOw9wJNCUSLNoACtwXOUalKPPXu8rd0Gvk
-         wmEuqxL2VY9CRnRucGZTVrc7SrMuiPk8NV/r4iWSiqqmTFcZNnyC//+GKOnJIgbVPZbj
-         cXdfkcQYZ8yzhbinC+yzoP2NHrSZCW42fSSV96qttu+YpOxB8dmAnPUYN1FZ5LhI1YoK
-         sGGIBXiz8X34ZHt947cfJy9WAh6Nxqazdm5hgU3xNfpIZiPudZykheBsbp2/G29Tc7lg
-         fJfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767021883; x=1767626683;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IPdy/u4ar4zg+FvL/tA84pDfFm5/wiGlEDxZ5SeN1nQ=;
-        b=agkjrs+Z1PuOxJCJDzE3peuN+HGQtcEBun8S7AcfaIExnwhbWzNPAwq30w8TFQhGv1
-         Ju6dpwjoiPxzBsdxnD7OrEWN2Z0vc8VjrxMdap0c+zgPrO/HPE69AAQGiNXfhM1kj6V0
-         aqwNDLLi9vLVh0mVBtmDRdjII0aoE3TEFh4SvaqvnGOSJgtZNP+ei8Db2tQRl8Dh3wxx
-         s/ZMq1xDxCSOdYa7RyiqC4EGu3wZgNNXJUuju2yZk9w7OsHGUQO3QGugYDyD3lmPqqoH
-         U6MnsShhZ0LPISVXz9ww/eQJbuA44dzt0F2oCGjkxR1paMfaOoWiC3ROLlyP1LusRJJN
-         lPCg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1KWxp96PYTHGaBSsLPVNxz01R/Xs1Q2Kj7zRML7KbOfROc6o9egYEBSkc4dZgHyc1/i8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5y3jiYwdD0kT5yO6jwCE6GcWWYzjF5na9zEP0PoIUMliH/424
-	C7NkH5sCfjO2h8IEiVC0eIhU9fM/10AYicaF1c4UP7r1jrwwOQYhh1jljd8BaIrQz8XHtdXgeUj
-	jLC36Xw==
-X-Google-Smtp-Source: AGHT+IFgS7WihSzpyIuhrJFpLQJCGyE0BCoxx8nYlJDyjilVPlDY1U8ZPShs2HwghBqKbLanUNIlqfzMI1o=
-X-Received: from pfbff2.prod.google.com ([2002:a05:6a00:2f42:b0:793:b157:af42])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:44c6:b0:7e8:4433:8fb9
- with SMTP id d2e1a72fcca58-7ff66d5f992mr22928778b3a.65.1767021883283; Mon, 29
- Dec 2025 07:24:43 -0800 (PST)
-Date: Mon, 29 Dec 2025 07:24:41 -0800
-In-Reply-To: <yq7u5tot4mr67pxiu7frq62ndk2mpzwjir5264alva3jhcd6z5@mgaew5c3vms7>
+	s=arc-20240116; t=1767022575; c=relaxed/simple;
+	bh=vPos8tMKyFalMXEmW7FG3fOfEYOyPxH+bggND0prJvI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=E17Q6FrJDIYOpzGWnp/cTrm+8aYxcPR4O2Vs1VcqiHCGxnW7aS9la0qkKsVTSZpuzHV4VznrXUiTUy7jLAwKVx3zOOryIc4Lu1lEj9O7jIlCsECA7iBn4eEHScHAbfJQBtrI1NHEbSppSWoS5DbXHKSJ/2MHKso7WtZp9F/Efi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Yad/3u+y; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=vPos8tMKyFalMXEmW7FG3fOfEYOyPxH+bggND0prJvI=; b=Yad/3u+yN4JD/hg2estUQIoDIR
+	dcqdX6KkFHQvNLiV0oHjAVRLnZSse0zh/q2bxz31FbsvhPsUi1gPwdXFFvFGlQstAiW1mvJK9xeMZ
+	1fy3ZodBGRke4Fa4ZC+DpqUazrHb/9Aqxxos0MnmTyL7r+2Hfw/XwTKMfWKtxB+Nk9Gf3MG7c5w8p
+	c42Ylm9+5wWNyESJgi+qKQTbQDHUGAMoXGO+6dOz3/JrARitqngfASf+LcoJ7XndqtvqjajaLPSw9
+	TynVr3cQlBhQWqmr85UOv8MwHOsaij5dCzR3eDdmA2RECYo8rsLd0BA0lo70AHtWtaQ4j2Mgy2R+t
+	AzB23VJw==;
+Received: from [2001:8b0:10b:5:c095:f2fb:8d79:fda1] (helo=ehlo.thunderbird.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vaFHs-00000002vKB-3xyO;
+	Mon, 29 Dec 2025 15:36:01 +0000
+Date: Mon, 29 Dec 2025 15:36:00 +0000
+From: David Woodhouse <dwmw2@infradead.org>
+To: Khushit Shah <khushit.shah@nutanix.com>
+CC: "seanjc@google.com" <seanjc@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "kai.huang@intel.com" <kai.huang@intel.com>,
+ "mingo@redhat.com" <mingo@redhat.com>, "x86@kernel.org" <x86@kernel.org>,
+ "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, Jon Kohler <jon@nutanix.com>,
+ Shaju Abraham <shaju.abraham@nutanix.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v5_2/3=5D_KVM=3A_x86/ioapic=3A_Implemen?=
+ =?US-ASCII?Q?t_support_for_I/O_APIC_version_0x20_with_EOIR?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <BE16B024-0BE6-46B4-A1B4-7B2F00E4107B@nutanix.com>
+References: <20251229111708.59402-1-khushit.shah@nutanix.com> <20251229111708.59402-3-khushit.shah@nutanix.com> <7294A61D-A794-4599-950C-9EC9B5E94B58@infradead.org> <DD13B2B3-5719-410F-8B98-9DB3E1738997@nutanix.com> <9a04f3dda43aa50e2a160ccfd57d0d4f168b3dce.camel@infradead.org> <BE16B024-0BE6-46B4-A1B4-7B2F00E4107B@nutanix.com>
+Message-ID: <D6CA802E-F7E0-410D-87FB-6E6E5897460E@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251127013440.3324671-1-yosry.ahmed@linux.dev>
- <20251127013440.3324671-7-yosry.ahmed@linux.dev> <aUsXw9m4g-Pn7LtO@google.com>
- <yq7u5tot4mr67pxiu7frq62ndk2mpzwjir5264alva3jhcd6z5@mgaew5c3vms7>
-Message-ID: <aVKdOU8scPANWb1h@google.com>
-Subject: Re: [PATCH v3 06/16] KVM: selftests: Introduce struct kvm_mmu
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Dec 23, 2025, Yosry Ahmed wrote:
-> On Tue, Dec 23, 2025 at 02:29:23PM -0800, Sean Christopherson wrote:
-> > On Thu, Nov 27, 2025, Yosry Ahmed wrote:
-> > > diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> > > index 972bb1c4ab4c..d8808fa33faa 100644
-> > > --- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> > > +++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> > > @@ -10,6 +10,8 @@
-> > >  
-> > >  extern bool is_forced_emulation_enabled;
-> > >  
-> > > +struct kvm_mmu;
-> > > +
-> > >  struct kvm_vm_arch {
-> > >  	vm_vaddr_t gdt;
-> > >  	vm_vaddr_t tss;
-> > > @@ -19,6 +21,8 @@ struct kvm_vm_arch {
-> > >  	uint64_t s_bit;
-> > >  	int sev_fd;
-> > >  	bool is_pt_protected;
-> > > +
-> > > +	struct kvm_mmu *mmu;
-> > 
-> > No, put kvm_mmu in common code and create kvm_vm.mmu.  This makes the "mmu" object
-> > a weird copy of state that's already in kvm_vm (pgd, pgd_created, and pgtable_levels),
-> > and more importantly makes it _way_ to easy to botch the x86 MMU code (speaking
-> > from first hand experience), e.g. due to grabbing vm->pgtable_levels instead of
-> > the mmu's version.  I don't see an easy way to _completely_ guard against goofs
-> > like that, but it's easy-ish to audit code the code for instance of "vm->mmu.",
-> > and adding a common kvm_mmu avoids the weird duplicate code.
-> 
-> Do you mean move pgd, pgd_created, and pgtable_levels into kvm_mmu?
+On 29 December 2025 15:16:40 GMT, Khushit Shah <khushit=2Eshah@nutanix=2Eco=
+m> wrote:
+>
+>
+>> On 29 Dec 2025, at 6:31=E2=80=AFPM, David Woodhouse <dwmw2@infradead=2E=
+org> wrote:
+>>=20
+>> Hm? IIUC kvm_lapic_advertise_suppress_eoi_broadcast() is true whenever
+>> userspace *hasn't* set KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST
+>> (either userspace has explicitly *enabled* it instead, or userspace has
+>> done neither and we should preserve the legacy behaviour)=2E
+>
+>The legacy behaviour for "kvm_lapic_advertise_suppress_eoi_broadcast()" i=
+s:
+>- true for split IRQCHIP (userspace I/O APIC)
+>- false for in-kernel IRQCHIP
+>
+>The in-kernel IRQCHIP case was "fixed" by commit 0bcc3fb95b97 ("KVM: lapi=
+c:
+>stop advertising DIRECTED_EOI when in-kernel IOAPIC is in use"), which ma=
+de
+>it return false when IOAPIC is in-kernel=2E
+>
+>With this series, in QUIRKED mode the function still returns !ioapic_in_k=
+ernel(),
+>preserving that exact legacy behavior=2E The I/O APIC version 0x20 (with =
+EOIR)
+>is only used when userspace explicitly sets the ENABLE flag=2E
+>
+>The comments in patch 1 explain this in more detail ;)
 
-Yep, exactly.
+Ah, OK=2E So in the case of in-kernel I/O APIC, kvm_lapic_advertise_suppre=
+ss_eoi_broadcast() kvm_lapic_respect_suppress_eoi_broadcast() are the same=
+=2E In that case we can choose the one which is easier to understand and do=
+esn't need the reader to refer back to an earlier commit? I accept your cor=
+rection; the patch is correct=2E
 
-> If yes, that makes sense to me and is obviously an improvement over what it's
-> in this patch.
-> 
-> I didn't immediately make the connection, but in hindsight it's obvious
-> that having some of the state in kvm_vm_arch and some in kvm_vm is
-> fragile.
+But I think I still prefer the check to be on _respect_ as it's clearer th=
+at it's part of the new behaviour that is only introduced with this series=
+=2E
 
