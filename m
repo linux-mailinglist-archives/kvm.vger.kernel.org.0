@@ -1,168 +1,179 @@
-Return-Path: <kvm+bounces-66825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98531CE8EDF
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 08:55:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B03CCE9566
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 11:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 15E923015027
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 07:55:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D36B303E647
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 10:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC0B2BD5A7;
-	Tue, 30 Dec 2025 07:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52303279DC8;
+	Tue, 30 Dec 2025 10:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ER5Pdv0d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0yYMVW3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQ/HbEYj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882A12FE044
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 07:55:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA448212557
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 10:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767081335; cv=none; b=eMTdHwfziBH2I1AgAe+O7AJbZJOJ0PFy6YmAz0QyyCWDFkaWi/J3Q8ZkAeTGihxTlCYn1hVgS4dKowwKy3U40Mg7aMQUtAkMMfa9UocZX9rkQkqvsnNafRldCrDd3soMWQXQ4NU7zCam4OaTqOYkpbBeyO3THSyu15Ib8Ms9UiI=
+	t=1767089752; cv=none; b=L0dT6IYXS5MbFCtlYd6NpkC7XLzogMgH65pSoF6lhJKFejd2+rdEbHoJqXfJc610INdiP4KxnHWTk3wR2zmGobCAa49abPrgEkZLgAxegPkesszKlpU9pdH3JePNi+deiuNphVNRbtnjJlV6BJLXvyrCdqTrDkE70osws93DvHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767081335; c=relaxed/simple;
-	bh=4wQ00zDbHUWkEWSCzPKoa1XePJwJ08RqjKo50yhCvZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RJezncOOh23Y+GtmWp3h4R7ODzHSH0k0LqiCbd5fF2EI5Df0FfivKgR3jy35uCfEhXIceCFwd/opSiHUw1cKaupGTHmEihvzYhSrDD/ZzZ65Rh84X05o7GST0qwB6Ehy3c0ltr8veT+JnqffYpPeVnUVkI8JZSHd9dFM2u8pgEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ER5Pdv0d; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BU612pX3626008;
-	Tue, 30 Dec 2025 07:55:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=A4VuO
-	i5V/u2/47ABsdM0K5gmHM2jEfr/+HCMsnrkztQ=; b=ER5Pdv0dh6mD8eW3umfgE
-	zYWSRNyV2U+0uh4FznpFUazEtW535ij6UkwBfje4d4f1zAmsS7i+cy3m2MSoVlct
-	6vzARZexmTRq3cnfxwKghZ3ZVnpg0vPzPYqCk9QhyKnRcE+ZD9vVI4mjlpZ1QV/N
-	ufmoaKxqxSyt2NuOWc4s+WhmFIUP5kvbqi9ocq9BS605ZIavOJN6eCmL1P/vdh6k
-	OrSMdUBNJqRXltHxRxTAHPgfzRW34OKIIighaiUYvToNweOz699fCeObddDHYsI3
-	Y52TUBcw6keLeiTjNULiUMa/hYRcfNAJNcAb8Ue0OqPcnZi+Qtg/LlERdlpN54nk
-	A==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ba7b5j9m0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Dec 2025 07:55:05 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5BU40BU3017259;
-	Tue, 30 Dec 2025 07:55:03 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ba5wbp6fu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Dec 2025 07:55:03 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5BU7smZx005421;
-	Tue, 30 Dec 2025 07:55:03 GMT
-Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4ba5wbp6aa-8;
-	Tue, 30 Dec 2025 07:55:03 +0000
-From: Dongli Zhang <dongli.zhang@oracle.com>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
-        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
-        like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
-        alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
-        davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
-        dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
-        ewanhai@zhaoxin.com
-Subject: [PATCH v8 7/7] target/i386/kvm: don't stop Intel PMU counters
-Date: Mon, 29 Dec 2025 23:42:46 -0800
-Message-ID: <20251230074354.88958-8-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20251230074354.88958-1-dongli.zhang@oracle.com>
-References: <20251230074354.88958-1-dongli.zhang@oracle.com>
+	s=arc-20240116; t=1767089752; c=relaxed/simple;
+	bh=LCt+6pV3SVXX+jVlhPofZ+B+PV2iA9I/7Ha5xrB3hCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=St36WZMtz/9pEpuo79Y2iDmEGsM7VnOB6T//K9X5fbLNq4xnCPdqXEbefTbMHin/jg2ssrNKcvdWHVvJZpC1wt+ITr19ip1t0PYFmBbUDaMqw1KzUbMvmICGZHalFeKvUWzyJ4Aqft78Sbd+fi+P/xo4Ws5Kg5J83PY1OCjg4V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P0yYMVW3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bQ/HbEYj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767089749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=QPeHJm+twCiufdOXqLeCn+SgUmZXimx3Kj8OMbSgWcg=;
+	b=P0yYMVW35jxYgBF3YWX+d5Ks1WvgEpHVbY7hSsHdHk78Zw0WyrCeBBSmS2yyK5oTbRjjF3
+	I2ThzC+UAqPDYagw+qh9Y0x6x56cCzUJauXeqWrqndmgRCxf/08HSGzrcABR2iQB8QGVxM
+	4lSXGaXGdADw9gUk4PbTfeYlI1of3DM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-44A5UbFqPMW-mHa_C8s4Dg-1; Tue, 30 Dec 2025 05:15:48 -0500
+X-MC-Unique: 44A5UbFqPMW-mHa_C8s4Dg-1
+X-Mimecast-MFC-AGG-ID: 44A5UbFqPMW-mHa_C8s4Dg_1767089747
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-430ffa9fccaso7718805f8f.1
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 02:15:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767089747; x=1767694547; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QPeHJm+twCiufdOXqLeCn+SgUmZXimx3Kj8OMbSgWcg=;
+        b=bQ/HbEYjNkNw4GOqt29NjfpwNJkMUoztoEvr64Ppr8lbJ3224HO5X8wrOAe+mil+Pz
+         Tz1I0PKlgmqhMtQFmBGBSCLC/Omr1qWBkrAkVME27WwwXQ/vtgA7j1IqAHRWqRWFRl2G
+         /ns5g2z/FMVxRZEozM550fAkUewyL5nAUJj1T5/Z70GbdMjHTHLhG7+DiZfqEvKPctjV
+         KVM6uHGAP0ULWx1FjNINl3cd7Gcx7vwi7I/xJ84jnZygb5VPe50x62PvVKLT60UjIM3v
+         mGBb0I2g9F9gw0qbl+/IdaOhP4baFcH3/2DCOkfKmwfkVjObQk103KmD6GGz0GXvuTFS
+         a/QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767089747; x=1767694547;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QPeHJm+twCiufdOXqLeCn+SgUmZXimx3Kj8OMbSgWcg=;
+        b=dCf/ekA6xiBhSxj+v22SOpgTgvJ6/6BH8dI2L1Oyn22G8cC7KsQn5YHZAhbH0/HsuO
+         ed9WIVhqPyLM6paj4FaZXPckKdffh7t1FT4SXlInVBL/Svf4/wyakjQl9KmiNi8SE3zI
+         bxJgT65HtEeB3ZxtEYQXEkASj/QREFqphJO/C1YoiGHaGPWpKI2kaxMXPQkkPa6PexQ8
+         qVINbkcIyj8RyY/AdIXyMnF4yPY6SNlcr3gqFSrcu5PsC5Wbf5PIxPXm4oFoIWX6ha3P
+         pskGfibaDOivlQc5iFwiIEJkYlPaXtE9PXciI+1v4AJjysj2sUOXjW0daIRFhcNTY2eR
+         q1fw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZcLbXAxWn3vSwwhzZdwsjDzT6StejgHLJu6QW1n4z4WdzIc2ZhEuqNzHjHgqO7xseUZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLZXxTvcOhoQV1lP+H8OHsKvx/elqHZivoimoRTv5T8EU5cGm6
+	dTwkVxnD9ZfDGQnMWPawDpaHWHXK7WSrUxJolRdiOUbTM9F+CjGRR4GuTAFTHWIYa1khBa2tcJU
+	6mraaD6zNkBbiNaTzGAU1XNdlIqSn+P0C4FXEdoYDAjooIDX+/4Mr7g==
+X-Gm-Gg: AY/fxX5QpBZVdPLcQBUtIA3A6KlY4aF3Xqz5phrH8gFHFRy2jHNo5dSUiXskMsD73+M
+	viGa7oM77pZtmStNIj9nybMmgWJ3jRV/sd4Cp6p3P82c+tNhoJButPepboxFBF/2ZhkTn1k5Nq7
+	db4csEuXf9Fj3IGXGgNp/hJ03Q89k2GoD+gls6iaNUWGvviGAGdeLm3jUXBM31On+/TpPDnDuuL
+	HFfuMp1IotJVcGJTJvkuZQV+Jzq6aq4Wn/c8F3NKlQwSWEWU5V89vq6lkD1GUBYv24/d/Z4BlO0
+	i/4Gu2gd7ZxtQOWzGxyRZoBLPqL9RfGOKeK38GJ8BR1A5mtktojCXV2hBVBamfKoq0gNdXDVPh4
+	9o1aKQ2HN1Rmm3onmqtbyTsyN+PT2LJNs3Q==
+X-Received: by 2002:a05:6000:2503:b0:431:a33:d872 with SMTP id ffacd0b85a97d-4324e4c1219mr30005604f8f.8.1767089746604;
+        Tue, 30 Dec 2025 02:15:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEbvOFHJ91a0TKLxq+k7tMABBS8U1GQCYZPCELRU5Zsc1Gaj+GYCwYcD6RmChYOtX8+5x3fqQ==
+X-Received: by 2002:a05:6000:2503:b0:431:a33:d872 with SMTP id ffacd0b85a97d-4324e4c1219mr30005566f8f.8.1767089746108;
+        Tue, 30 Dec 2025 02:15:46 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324e9ba877sm67681523f8f.0.2025.12.30.02.15.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 02:15:45 -0800 (PST)
+Date: Tue, 30 Dec 2025 05:15:42 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH RFC 00/13] fix DMA aligment issues around virtio
+Message-ID: <cover.1767089672.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-29_07,2025-12-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=999 phishscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2512120000 definitions=main-2512300070
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDA3MCBTYWx0ZWRfX4TRJegSSiHj3
- Rt82NvAGLJ4EDlWN2T2JT1nNshDbwrdrzjAzCYAsgKDNXrqU8kLPHbRPvtmopRMADzPormwjv8Z
- 27Q80huL0UcOIUExp7D2gvWG/JRrAa33RDiL9WAMiwutiVHxWa7MJj0cBb3NP+9qIbhPMnlY+lY
- MGFtL4uNmFZvf9sx4eCZe/llnxh+tJM1RY4jTNB+MXGSHj1AYPYoEmzgL29dxpBA/vqC1Hweghn
- nGbIoRIZkljPBM2BwyI3aJaZ/tVl3E8cb0ArTXCRYLZaG4eksIke1SsX3OEUcq1hdieU+vy+X9j
- IcJjCAoZ89+OzkmpXwUOW9Ro4k6z3X+ePBkKRP3CV5F/UiAdLbvVsHJo00TQoNU1xHhczAkIrk1
- dyG0qEjSoELdU6FDeZ90owT773f/DWOpNMLFgdysB7QZFkaqGFCpIo+kqTAVWUyOA2Gc7mw3ja7
- P9bdg+HVgjAm2U8OUhZEQyRmtYvARewBF/gXEE4I=
-X-Proofpoint-GUID: zKkeHLrTXwZvxqrXIS27uvJJE-ocOni_
-X-Authority-Analysis: v=2.4 cv=ccjfb3DM c=1 sm=1 tr=0 ts=69538559 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8 a=QyXUC8HyAAAA:8
- a=A3X0-5CtyMG_TZ3YDawA:9 cc=ntf awl=host:12109
-X-Proofpoint-ORIG-GUID: zKkeHLrTXwZvxqrXIS27uvJJE-ocOni_
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-PMU MSRs are set by QEMU only at levels >= KVM_PUT_RESET_STATE,
-excluding runtime. Therefore, updating these MSRs without stopping events
-should be acceptable.
 
-In addition, KVM creates kernel perf events with host mode excluded
-(exclude_host = 1). While the events remain active, they don't increment
-the counter during QEMU vCPU userspace mode.
+Cong Wang reported dma debug warnings with virtio-vsock
+and proposed a patch, see:
 
-Finally, The kvm_put_msrs() sets the MSRs using KVM_SET_MSRS. The x86 KVM
-processes these MSRs one by one in a loop, only saving the config and
-triggering the KVM_REQ_PMU request. This approach does not immediately stop
-the event before updating PMC. This approach is true since Linux kernel
-commit 68fb4757e867 ("KVM: x86/pmu: Defer reprogram_counter() to
-kvm_pmu_handle_event"), that is, v6.2.
+https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
 
-No Fixed tag is going to be added for the commit 0d89436786b0 ("kvm:
-migrate vPMU state"), because this isn't a bugfix.
+however, the issue is more widespread.
+This is an attempt to fix it systematically.
+Note: i2c and gio might also be affected, I am still looking
+into it. Help from maintainers welcome.
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
----
-Changed since v3:
-  - Re-order reasons in commit messages.
-  - Mention KVM's commit 68fb4757e867 (v6.2).
-  - Keep Zhao's review as there isn't code change.
-Changed since v6:
-  - Add Reviewed-by from Dapeng Mi.
+Early RFC, compile tested only. Sending for early feedback/flames.
+Cursor/claude used liberally mostly for refactoring, and english.
 
- target/i386/kvm/kvm.c | 9 ---------
- 1 file changed, 9 deletions(-)
+DMA maintainers, could you please confirm the DMA core changes
+are ok with you?
 
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 99837048b8..742dc6ac0d 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4222,13 +4222,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-         }
- 
-         if ((IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env)) && pmu_version > 0) {
--            if (pmu_version > 1) {
--                /* Stop the counter.  */
--                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
--                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
--            }
--
--            /* Set the counter values.  */
-             for (i = 0; i < num_pmu_fixed_counters; i++) {
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
-                                   env->msr_fixed_counters[i]);
-@@ -4244,8 +4237,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-                                   env->msr_global_status);
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
-                                   env->msr_global_ovf_ctrl);
--
--                /* Now start the PMU.  */
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
-                                   env->msr_fixed_ctr_ctrl);
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
+Thanks!
+
+
+Michael S. Tsirkin (13):
+  dma-mapping: add __dma_from_device_align_begin/end
+  docs: dma-api: document __dma_align_begin/end
+  dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+  docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+  dma-debug: track cache clean flag in entries
+  virtio: add virtqueue_add_inbuf_cache_clean API
+  vsock/virtio: fix DMA alignment for event_list
+  vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+  virtio_input: fix DMA alignment for evts
+  virtio_scsi: fix DMA cacheline issues for events
+  virtio-rng: fix DMA alignment for data buffer
+  virtio_input: use virtqueue_add_inbuf_cache_clean for events
+  vsock/virtio: reorder fields to reduce struct padding
+
+ Documentation/core-api/dma-api-howto.rst  | 42 +++++++++++++
+ Documentation/core-api/dma-attributes.rst |  9 +++
+ drivers/char/hw_random/virtio-rng.c       |  2 +
+ drivers/scsi/virtio_scsi.c                | 18 ++++--
+ drivers/virtio/virtio_input.c             |  5 +-
+ drivers/virtio/virtio_ring.c              | 72 +++++++++++++++++------
+ include/linux/dma-mapping.h               | 17 ++++++
+ include/linux/virtio.h                    |  5 ++
+ kernel/dma/debug.c                        | 26 ++++++--
+ net/vmw_vsock/virtio_transport.c          |  8 ++-
+ 10 files changed, 172 insertions(+), 32 deletions(-)
+
 -- 
-2.39.3
+MST
 
 
