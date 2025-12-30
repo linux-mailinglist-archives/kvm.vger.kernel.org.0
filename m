@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-66882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE798CEAD80
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:15:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4B5CEAD68
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:11:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E76EC3065794
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:12:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09F6A302B11D
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1032731D730;
-	Tue, 30 Dec 2025 23:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5920E32142F;
+	Tue, 30 Dec 2025 23:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NM4tcSTQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A7rTKwVw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E913043BE
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6902E2DC763
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767135736; cv=none; b=eEmRAPIxfY0uAgZvE9zGXz6kiW5XCecNTaYLuhSn4+5S+5Oad/dTZC8OBR2R5ULWtD5qRIJCOXnDlxUh8fGJujJFxY85GkybIglF1OFWq8Sjwxq0WqBO1+QaKrGYlD8pcw7ZiBJew/I6/oJH1NOHriWQI/fAAj0efEGGiSnvfc4=
+	t=1767135736; cv=none; b=iSPUCCvE4LOFihg7+K6PbEUvvHHXqLgWMQw70eeGKNcQZUwaj2Zv8GN1EcqcPg7eyMm4Cjd4jqKj7wIy4j1zAIjYBT2zqhZe1/S/wLMEKLySUiosMksKVBj6dBhjyWXLGh9Du7RgChO8QTI5w2zKjm8RFZR+rdPOR7DHQDiyiIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767135736; c=relaxed/simple;
-	bh=Yh8Qab0Gq4P0gx+ZK5aVX/2lf28QcgZxjaey8n2Vr4c=;
+	bh=2ZolxtbeL/TfZv1wuBul5eMq3hwecEq8h3mFaMWxBTA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gbA6+AcAIH0y8RJw/yEhjhKlV5Iygwpxr3WIyDpA1LHxczmYpSVczy+BifElza46127s/wdYegv/0hwh5f1+4yETgXBiQg3Krp45RcFbXS6LSK2JBL70f2fwYN2lriDSgw5bDYnW9kkodnNW0NWJi3LQImknT9F7dlHNBbPmU/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NM4tcSTQ; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=noNsK8YQhygkwcTHwOsJRxyMS18dPhPiz5azx92cEYyh3CkSfdkjKNQjrPmBbn+o117nfLtIS0RK6E2Yxd+Bvdss8mHaQfsdvi/hVftX26mO19PAkZepWhNhSQrmBRRXb6rNAYPntJ1C3lBeaTV2NFwBwcadQi47cRNEgIqqbi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A7rTKwVw; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34eff656256so7531925a91.2
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:12 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34a9bb41009so16720358a91.3
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767135732; x=1767740532; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767135733; x=1767740533; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ja2t3RddJQQ9WtlMGrZPDGGnut4pYDpTPLHSPL1hvlg=;
-        b=NM4tcSTQsnog7kEFqij1HPgUespL5azjSD2YAmvQ16xjGL+BCaCYFxoIACilYFosNi
-         J9YuTRwp53KWD5jEeSjdhngm7TqKnNngnr2iT4wfkODJPBNQwxOYpib1Sc6ypHSbsFjZ
-         5fdNN0Tk9b1bdBD1tdS7zQEYncVPcRiYZpSGe9S1lMj0K+AKs7FPcmv2u+2jc/b7QEQI
-         91vCaSlKw3lo9RIR0sOU9jdfw25Xfu7PhDhYvQSaiKPHYR1bKZ/izvJWuJDHja/pIH7H
-         axIQZzcWnzm+oTOxVKxO6m1dtNiFaH9u7SIriNhgeZLU+BHXhzumlaykruDm1pu+Cuys
-         v9+g==
+        bh=aempC3xup8zdxs82u0niExWKRbrEWWiY7rS3u4Pr19E=;
+        b=A7rTKwVwsRCeC0uteG3QsCqrQL5vkk7PzZI2Sv1a0R2/DY5MO3fNN84Bm+k1Ga1X87
+         sG3MgvdCQ6aFgRopYw4JVEh0ns96otmmF+KyrKtsm4wCtGtWLdEODZoH5tnfP8MSy+EQ
+         aCm4NyUDp8wougXheksx4Hhvhr2TomuR97XY1yLbJy+GC/5ibBxDTVACMvlb3hSyZQOE
+         uZ7XcT87GUqgTjik4HDORNqwATaJloIEyOEzZKn4ktaoBJHY+SwrywpMT45R9PO8Ap7v
+         XInNRUV/JeqfBmCt8oH+KM/0EJHbxyq8AtrxrX58b2FrK/CXoGYqJt6swbbOTyQkDlXg
+         n1sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767135732; x=1767740532;
+        d=1e100.net; s=20230601; t=1767135733; x=1767740533;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ja2t3RddJQQ9WtlMGrZPDGGnut4pYDpTPLHSPL1hvlg=;
-        b=iKBmmVX8lFaVFrxQGTU1hRIDaHIPuDDZJmDUiZpaUolbx0nbSfPHfffYNPPhPA9Nnm
-         QkJOdoxQZM29MpP3JcwIv7osNP2+/KByNdtUjIJgH+9ORKXHOgWLMw2yOktJvasmPRMg
-         wW/NX6SDvQBUAnurt4mADFAU1urrrYbFsq+PZETAeH5uHiOKIjgXWTf2sU/osSjKS7tD
-         Zk7ySnuLsc6JZDI92/SZoH11WltjiTfrBo3zI8USdZSnBmRFjvDumQaaPHHpufB0FQOd
-         ngd3/pXDiRByp0qE8HoZBb5kqTVOGA3lMWFkikUaTIjmpmko71r0udBdoWq/UA+ugUXY
-         HXow==
-X-Gm-Message-State: AOJu0YzTRucjLWyf68y1RFxE60A/6JYA3lbxEJOTaZiHAdYWr/tvba1J
-	TURk8OlBS3L4uDfXFv7CKzKAr2bBF9hPnbx8fiEw6cIV7mvAE8dfK8F3Uv7XGCnM7gxooKJcl0v
-	I/BJdJw==
-X-Google-Smtp-Source: AGHT+IFlmvuQfNmiHzFuNq9XlPth424WfhGaGaW+Waxyx9tMx4HEJVVNAsbuKBuWKPaCjxwrIKXmvslHERQ=
-X-Received: from pjbnw17.prod.google.com ([2002:a17:90b:2551:b0:34c:30f1:8d54])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3882:b0:340:d511:e167
- with SMTP id 98e67ed59e1d1-34e9207378fmr28865851a91.0.1767135731850; Tue, 30
- Dec 2025 15:02:11 -0800 (PST)
+        bh=aempC3xup8zdxs82u0niExWKRbrEWWiY7rS3u4Pr19E=;
+        b=J3XYMQb5I0e7H/0XJjTCXAbkIvViyCKVAZ75Mm7+mWVA+d8ikZk6tT5wp4jr3ixbZY
+         mWopjfH5kccJDQ6Nl7wo8/4aoX58OO6BD9iE5e+/2VAeiMfWieXzSCb1sjpqWs3q81oj
+         TM1SYcvzpYgzau8IwO5363TSA1ZJli8g3DGIJI1xG+FzClR0i8I5tE2dO8jneZFKeq8C
+         3qFGGkcP35gh+All+ls7khhvyobPMWPkVYIwCA4Ng4DfOtJRVhg37wMJAIhvx7DcSViR
+         ondu3fANxzgy1vHxZx1pwYLBm8X8kSLDhkizsoggmZ0k05r3Ama7ob4SfPEvEAyHz+v/
+         zEMw==
+X-Gm-Message-State: AOJu0Yw1ebZoMxIhy5WMz6U0VP2Ogdu4mab4oSaFeQn8r4OBdbhFCKmV
+	VzMOQMstsQzGdV+Z67qeBfQeaawWyn7/3T34Rm/TvlMhIHZRI01tlPjjd94KwIKBxkrjFL32Kuc
+	cbfpkbw==
+X-Google-Smtp-Source: AGHT+IF1//ZF8YQZFDW338R6CLvvv/Jhm6bfFusPZNwPuigVsAoIaoiYhFuoR4zT4Z2vqbXSCzOrQaND/Kk=
+X-Received: from pjbpm1.prod.google.com ([2002:a17:90b:3c41:b0:34a:b3a0:78b9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52:b0:34c:94f0:fc09
+ with SMTP id 98e67ed59e1d1-34e92139d60mr28142377a91.10.1767135733534; Tue, 30
+ Dec 2025 15:02:13 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 15:01:40 -0800
+Date: Tue, 30 Dec 2025 15:01:41 -0800
 In-Reply-To: <20251230230150.4150236-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,9 +73,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251230230150.4150236-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230230150.4150236-12-seanjc@google.com>
-Subject: [PATCH v4 11/21] KVM: selftests: Stop passing VMX metadata to TDP
- mapping functions
+Message-ID: <20251230230150.4150236-13-seanjc@google.com>
+Subject: [PATCH v4 12/21] KVM: selftests: Add a stage-2 MMU instance to kvm_vm
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -90,216 +89,37 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
+Add a stage-2 MMU instance so that architectures that support nested
+virtualization (more specifically, nested stage-2 page tables) can create
+and track stage-2 page tables for running L2 guests.  Plumb the structure
+into common code to avoid cyclical dependencies, and to provide some line
+of sight to having common APIs for creating stage-2 mappings.
 
-The root GPA can now be retrieved from the nested MMU, stop passing VMX
-metadata. This is in preparation for making these functions work for
-NPTs as well.
+As a bonus, putting the member in common code justifies using stage2_mmu
+instead of tdp_mmu for x86.
 
-Opportunistically drop tdp_pg_map() since it's unused.
-
-No functional change intended.
-
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/x86/vmx.h | 11 ++-----
- .../testing/selftests/kvm/lib/x86/memstress.c | 11 +++----
- tools/testing/selftests/kvm/lib/x86/vmx.c     | 33 +++++++------------
- .../selftests/kvm/x86/vmx_dirty_log_test.c    |  9 +++--
- 4 files changed, 24 insertions(+), 40 deletions(-)
+ tools/testing/selftests/kvm/include/kvm_util.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/x86/vmx.h b/tools/testing/selftests/kvm/include/x86/vmx.h
-index 1fd83c23529a..4dd4c2094ee6 100644
---- a/tools/testing/selftests/kvm/include/x86/vmx.h
-+++ b/tools/testing/selftests/kvm/include/x86/vmx.h
-@@ -557,14 +557,9 @@ bool load_vmcs(struct vmx_pages *vmx);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index c1497515fa6a..371d55e0366e 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -116,7 +116,12 @@ struct kvm_vm {
+ 	uint32_t dirty_ring_size;
+ 	uint64_t gpa_tag_mask;
  
- bool ept_1g_pages_supported(void);
++	/*
++	 * "mmu" is the guest's stage-1, with a short name because the vast
++	 * majority of tests only care about the stage-1 MMU.
++	 */
+ 	struct kvm_mmu mmu;
++	struct kvm_mmu stage2_mmu;
  
--void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm, uint64_t nested_paddr,
--		uint64_t paddr);
--void tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm, uint64_t nested_paddr,
--	     uint64_t paddr, uint64_t size);
--void tdp_identity_map_default_memslots(struct vmx_pages *vmx,
--				       struct kvm_vm *vm);
--void tdp_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
--			 uint64_t addr, uint64_t size);
-+void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
-+void tdp_identity_map_default_memslots(struct kvm_vm *vm);
-+void tdp_identity_map_1g(struct kvm_vm *vm,  uint64_t addr, uint64_t size);
- bool kvm_cpu_has_ept(void);
- void vm_enable_ept(struct kvm_vm *vm);
- void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm);
-diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-index 00f7f11e5f0e..3319cb57a78d 100644
---- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-+++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-@@ -59,7 +59,7 @@ uint64_t memstress_nested_pages(int nr_vcpus)
- 	return 513 + 10 * nr_vcpus;
- }
+ 	struct kvm_vm_arch arch;
  
--static void memstress_setup_ept_mappings(struct vmx_pages *vmx, struct kvm_vm *vm)
-+static void memstress_setup_ept_mappings(struct kvm_vm *vm)
- {
- 	uint64_t start, end;
- 
-@@ -68,16 +68,15 @@ static void memstress_setup_ept_mappings(struct vmx_pages *vmx, struct kvm_vm *v
- 	 * KVM can shadow the EPT12 with the maximum huge page size supported
- 	 * by the backing source.
- 	 */
--	tdp_identity_map_1g(vmx, vm, 0, 0x100000000ULL);
-+	tdp_identity_map_1g(vm, 0, 0x100000000ULL);
- 
- 	start = align_down(memstress_args.gpa, PG_SIZE_1G);
- 	end = align_up(memstress_args.gpa + memstress_args.size, PG_SIZE_1G);
--	tdp_identity_map_1g(vmx, vm, start, end - start);
-+	tdp_identity_map_1g(vm, start, end - start);
- }
- 
- void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[])
- {
--	struct vmx_pages *vmx;
- 	struct kvm_regs regs;
- 	vm_vaddr_t vmx_gva;
- 	int vcpu_id;
-@@ -87,11 +86,11 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
- 
- 	vm_enable_ept(vm);
- 	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
--		vmx = vcpu_alloc_vmx(vm, &vmx_gva);
-+		vcpu_alloc_vmx(vm, &vmx_gva);
- 
- 		/* The EPTs are shared across vCPUs, setup the mappings once */
- 		if (vcpu_id == 0)
--			memstress_setup_ept_mappings(vmx, vm);
-+			memstress_setup_ept_mappings(vm);
- 
- 		/*
- 		 * Override the vCPU to run memstress_l1_guest_code() which will
-diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-index 9d4e391fdf2c..ea1c09f9e8ab 100644
---- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-@@ -409,8 +409,8 @@ static void tdp_create_pte(struct kvm_vm *vm,
- }
- 
- 
--void __tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
--		  uint64_t nested_paddr, uint64_t paddr, int target_level)
-+void __tdp_pg_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
-+		  int target_level)
- {
- 	const uint64_t page_size = PG_LEVEL_SIZE(target_level);
- 	void *eptp_hva = addr_gpa2hva(vm, vm->arch.tdp_mmu->pgd);
-@@ -453,12 +453,6 @@ void __tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
- 	}
- }
- 
--void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
--		uint64_t nested_paddr, uint64_t paddr)
--{
--	__tdp_pg_map(vmx, vm, nested_paddr, paddr, PG_LEVEL_4K);
--}
--
- /*
-  * Map a range of EPT guest physical addresses to the VM's physical address
-  *
-@@ -476,9 +470,8 @@ void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-  * Within the VM given by vm, creates a nested guest translation for the
-  * page range starting at nested_paddr to the page range starting at paddr.
-  */
--void __tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm,
--	       uint64_t nested_paddr, uint64_t paddr, uint64_t size,
--		  int level)
-+void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
-+	       uint64_t size, int level)
- {
- 	size_t page_size = PG_LEVEL_SIZE(level);
- 	size_t npages = size / page_size;
-@@ -487,23 +480,22 @@ void __tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm,
- 	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
- 
- 	while (npages--) {
--		__tdp_pg_map(vmx, vm, nested_paddr, paddr, level);
-+		__tdp_pg_map(vm, nested_paddr, paddr, level);
- 		nested_paddr += page_size;
- 		paddr += page_size;
- 	}
- }
- 
--void tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm,
--	     uint64_t nested_paddr, uint64_t paddr, uint64_t size)
-+void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
-+	     uint64_t size)
- {
--	__tdp_map(vmx, vm, nested_paddr, paddr, size, PG_LEVEL_4K);
-+	__tdp_map(vm, nested_paddr, paddr, size, PG_LEVEL_4K);
- }
- 
- /* Prepare an identity extended page table that maps all the
-  * physical pages in VM.
-  */
--void tdp_identity_map_default_memslots(struct vmx_pages *vmx,
--				       struct kvm_vm *vm)
-+void tdp_identity_map_default_memslots(struct kvm_vm *vm)
- {
- 	uint32_t s, memslot = 0;
- 	sparsebit_idx_t i, last;
-@@ -520,16 +512,15 @@ void tdp_identity_map_default_memslots(struct vmx_pages *vmx,
- 		if (i > last)
- 			break;
- 
--		tdp_map(vmx, vm, (uint64_t)i << vm->page_shift,
-+		tdp_map(vm, (uint64_t)i << vm->page_shift,
- 			(uint64_t)i << vm->page_shift, 1 << vm->page_shift);
- 	}
- }
- 
- /* Identity map a region with 1GiB Pages. */
--void tdp_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
--			    uint64_t addr, uint64_t size)
-+void tdp_identity_map_1g(struct kvm_vm *vm, uint64_t addr, uint64_t size)
- {
--	__tdp_map(vmx, vm, addr, addr, size, PG_LEVEL_1G);
-+	__tdp_map(vm, addr, addr, size, PG_LEVEL_1G);
- }
- 
- bool kvm_cpu_has_ept(void)
-diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-index 5c8cf8ac42a2..370f8d3117c2 100644
---- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-@@ -80,7 +80,6 @@ void l1_guest_code(struct vmx_pages *vmx)
- static void test_vmx_dirty_log(bool enable_ept)
- {
- 	vm_vaddr_t vmx_pages_gva = 0;
--	struct vmx_pages *vmx;
- 	unsigned long *bmap;
- 	uint64_t *host_test_mem;
- 
-@@ -96,7 +95,7 @@ static void test_vmx_dirty_log(bool enable_ept)
- 	if (enable_ept)
- 		vm_enable_ept(vm);
- 
--	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+	vcpu_alloc_vmx(vm, &vmx_pages_gva);
- 	vcpu_args_set(vcpu, 1, vmx_pages_gva);
- 
- 	/* Add an extra memory slot for testing dirty logging */
-@@ -120,9 +119,9 @@ static void test_vmx_dirty_log(bool enable_ept)
- 	 * GPAs as the EPT enabled case.
- 	 */
- 	if (enable_ept) {
--		tdp_identity_map_default_memslots(vmx, vm);
--		tdp_map(vmx, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, PAGE_SIZE);
--		tdp_map(vmx, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, PAGE_SIZE);
-+		tdp_identity_map_default_memslots(vm);
-+		tdp_map(vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, PAGE_SIZE);
-+		tdp_map(vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, PAGE_SIZE);
- 	}
- 
- 	bmap = bitmap_zalloc(TEST_MEM_PAGES);
 -- 
 2.52.0.351.gbe84eed79e-goog
 
