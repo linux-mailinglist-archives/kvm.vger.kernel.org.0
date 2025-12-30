@@ -1,69 +1,67 @@
-Return-Path: <kvm+bounces-66853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B6A3CEA874
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 20:13:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F8EECEAA38
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 21:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC6A33020C49
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 19:13:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 500943010294
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 20:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2AF2F1FC7;
-	Tue, 30 Dec 2025 19:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF3A2FD1C1;
+	Tue, 30 Dec 2025 20:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sB+sMvxe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aji2ts3G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3EC2AD35
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 19:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22262E8DFD
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 20:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767122027; cv=none; b=uvQ6YN0evCb+mxmqn9NyqeAy86u3ZP+fgopNVw7pbGU7BaPecHIeE/acN2uNLVT2lpwg3g2IbCghY7BO4DnRrKYJz6UkaN3hNU+DXercMz+IzLXJaUvH+zYhDYH0Au5blEopxdAuvpBG8Ko8vBSF8lXgJ+N8z1BPr/VZq2KSD/Y=
+	t=1767128205; cv=none; b=Dsb2+xsGm+RFptKHJNtl+7yq5u7AoQ7xn4XAfr4gzkHBOmvXDYrwwoT3+ujEl5lo4C6w5LrDBO/61jJmoUns/a436ffyXHpZ6AfkCzRPUg3/smcgkSXxBTJ77cdvEH5eqal05Os67ithxGBHF6Ua3bSlY9zi5fhR76lVkzFdDCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767122027; c=relaxed/simple;
-	bh=K7yxmw1WbhvWRVN4tfCf0MvQQM5XQ5yAGgYTaGQ2Guo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HOFuT4Xuf531PATyyORHstQN8pWp24Gxx3JzMu6bIOScTjW1P18pYMOhcs7xUmE7suAj7aylOE90ByS2nzFcPp4i02sHqt3M4ZhzbqdHcZ3XDfFjR0I6CpONYSZ+c2S8r9cQYAmuL5aQULWABjSstI2yQTYit2BXxPltOEIEdEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sB+sMvxe; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1767128205; c=relaxed/simple;
+	bh=Zpti2DE8NLjjGFX7QkWgyP3/8trcS9RnFliaTJhMRTY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q/OuCtVkM0DiUv/Ov0iz7aONKUEdhjfFV96EIQ1VEFtnS5iz2By7hTkAayydkMzyY25wZBUAzd6oQnHb76NpyCeW1kCNaOziFFBFtEMmYojzwifXK3PwBFU8Zm2Puw3YVsqPhSxSi8U7owlixp5wpZuHbRw8SHpJ09Rq/w6KEak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aji2ts3G; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c21341f56so30436078a91.2
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 11:13:45 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7c240728e2aso21695362b3a.3
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 12:56:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767122025; x=1767726825; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eNt6L3/n5eEkpGm6v60dZjdonqUcKri9z/pXfbeCT9E=;
-        b=sB+sMvxe42CtXjSpJBKfcRdxp8cX9iLtchDJM3URj5OwUTBxNgoKEqTq49B45mXYv5
-         /W/UJbb9WZzv15K3ZKwOthLyaUUaeNicNe8JLMgifrcsvqfP1a6rT4JWmwyO71fjqoiq
-         1LRurxmcf1LZSiJ4q2tCIywjCb3Dwh/77tMUNbeNFDtIicy7fkJauwpuvu3nERhqArtJ
-         5Y44QVQRhT4KCyzM2Tp4gNwbKr+w/wwgsPE3saus3YXfwbPvu89stGseZtTU5BrnmeZN
-         4nKNtKKrEGkVCKJj6RDw6UNzBbHn4UD2IsGeqHuZTUeVWE1ryVw8AxSOuwtqf7QbmNMM
-         /gSA==
+        d=google.com; s=20230601; t=1767128203; x=1767733003; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DRabemupLF66hH0SwZ7ZSRwpDtdLTil/3jaPkZaQB7o=;
+        b=aji2ts3GhG7yuHt66nPSk1iY2jORzWlSmHZp3PumsDcBs8BBeOlxVTwRcqXbzM6wBv
+         x5b7hRAE+9DD+D4RGWZDXrPF+iX3rgq2xGy3ZJemCLWhelv1esgvSG9FjY8XPeduUfp4
+         Caf8Z155hoFkgxEm1+f/e6efNKXZS6nJuIT1LD3KVT8GA5QENRupI1oc9bZ++gPvOOxU
+         yaopOAStO+e6UxXa44pPMj7r/AX8ncG7ThoadzBXrct4rN6tLVOeg2qhDtGUOCr47mwQ
+         YZFF8ZB8IVL+S9shaidrEeMkvdPVQ5+zF13XYJ9FNAaLKCgQ8sEVr/y0Rcxz3qXLRZbg
+         Iaiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767122025; x=1767726825;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eNt6L3/n5eEkpGm6v60dZjdonqUcKri9z/pXfbeCT9E=;
-        b=SjUVQ5qjfWiqoMtSGogz1QbvfYd7UTY28waRstF7YoWdcPlal5LqkLgSxfaFw0uexH
-         m7CaEJx6YFwdfX87sWbzTiVxXa7sZ5hckmRPFxLlQcnKkGBFzzNwZo9sGz/W2GDX6DJl
-         QAT8Fl+xngv6QecnRptGpJsrjNYLPaAEzvMmk8h1hI2Kbdhk3p+v8m27+qPvmMZXmvLP
-         SGfOqs871G89YFrlLzL39Wa2O5WP/hPf0w7BqX4xrFn5VnM6ZMLLKbj9jEHYS3swhkQc
-         KJ+wRRs78jeUXDpfAarXLDPwfKfr1Fgu9KYiB377/ny9x4P/e7RV6bCQy39wjo8pvC3m
-         E9NQ==
-X-Gm-Message-State: AOJu0YzMvPIzW+xf6vynBIl0Wuons4Ev3j7W7AoaREt+ZmkUxnvhUOdl
-	IRJfUl0TPV81LMDeLqYFPoLGn98QimWcxDQBUwD+LY9lKyqlIjRnz7xJOr5W9mglFhnYL94bDDQ
-	UDwsYsQ==
-X-Google-Smtp-Source: AGHT+IGOJLu14tw79sMinni6Pg5XCfEWqRsYhCBUSuWaCuNb8d2pxz471kq10G4aKRQvDgx1/8eOS4yVZls=
-X-Received: from pjbsw11.prod.google.com ([2002:a17:90b:2c8b:b0:34a:bf4e:cb5c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f08:b0:341:8601:d77a
- with SMTP id 98e67ed59e1d1-34e921ccb3bmr30834508a91.29.1767122024981; Tue, 30
- Dec 2025 11:13:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767128203; x=1767733003;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DRabemupLF66hH0SwZ7ZSRwpDtdLTil/3jaPkZaQB7o=;
+        b=vONF7V28bdbzQMCf7F1vXtprhYQzsAPdCLijnblWTODHfQpFOG59//EZk08nfYqfxH
+         Mz2q/v21veouJLW2vrntNw8ke6rBjHOyobohA08F1uUR+X8zPooxaUGx1yR/3MYhHVyN
+         E9Jw+7ZkMqvtxpSh0Fr/Ut4wleocELij5AwRCEvmiBZEg2l4DIEPat3iWoWaaSfu6Oh7
+         qB3cTOMKr97W8D3Ar4cojNWCnMnBHdM80dfVIloonwr/lVSQ9yXn2JP0zRMzdq+qJz5P
+         9WzaQCWmyJCV71CKqi5htM2m0C9MRASXg+cvA5jDTfZidDm5NwK94GYnowDTTOuzAA5v
+         lVWA==
+X-Gm-Message-State: AOJu0YxqUL5ecEm0Mkor+wpHOCa4qJPtoXpVDVoWPq3bkMpLCMIli/xY
+	n9agas2YiVQI5GqEiV5yYpXUgP3A3yDasaPjNuau6W1DR8BInMToUCL0Wk6IaPArjaRE/98eRjg
+	WCJwJAQ==
+X-Google-Smtp-Source: AGHT+IEX1PqvWuWghUFfljNmHndzHQxhOTfzYiMCKX2gYau/+FcPOnzEAXLj2mcgonFc2H2/No2Y4aDmEU8=
+X-Received: from pflb16.prod.google.com ([2002:a05:6a00:a90:b0:7b0:e3d3:f040])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:278e:b0:7f6:fd3b:caa6
+ with SMTP id d2e1a72fcca58-7ff648e960dmr27916022b3a.19.1767128203055; Tue, 30
+ Dec 2025 12:56:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 11:13:42 -0800
+Date: Tue, 30 Dec 2025 12:56:41 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,453 +69,150 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230191342.4052363-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH] x86/svm: Track and handle exit code as an
- unsigned 64-bit value
+Message-ID: <20251230205641.4092235-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Disallow setting CPUID and/or feature MSRs if L2 is active
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, Kevin Cheng <chengkev@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Track and handle SVM's exit_code as an unsigned 64-bit value.  Per the
-APM, offset 0x70 is a single 64-bit value:
+Extend KVM's restriction on CPUID and feature MSR changes to disallow
+updates while L2 is active in addition to rejecting updates after the vCPU
+has run at least once.  Like post-run vCPU model updates, attempting to
+react to model changes while L2 is active is practically infeasible, e.g.
+KVM would need to do _something_ in response to impossible situations where
+userspace has a removed a feature that was consumed as parted of nested
+VM-Enter.
 
-  070h 63:0 EXITCODE
+In practice, disallowing vCPU model changes while L2 is active is largely
+uninteresting, as the only way for L2 to be active without the vCPU having
+run at least once is if userspace stuffed state via KVM_SET_NESTED_STATE.
+And because KVM_SET_NESTED_STATE can't put the vCPU into L2 without
+userspace first defining the vCPU model, e.g. to enable SVM/VMX, modifying
+the vCPU model while L2 is active would require deliberately setting the
+vCPU model, then loading nested state, and then changing the model.  I.e.
+no sane VMM should run afoul of the new restriction, and any VMM that does
+encounter problems has likely been running a broken setup for a long time.
 
-And a sane reading of the error values defined in "Table C-1. SVM Intercept
-Codes" is that negative values use the full 64 bits:
-
-  =E2=80=931 VMEXIT_INVALID Invalid guest state in VMCB.
-  =E2=80=932 VMEXIT_BUSYBUSY bit was set in the VMSA
-  =E2=80=933 VMEXIT_IDLE_REQUIREDThe sibling thread is not in an idle state
-  -4 VMEXIT_INVALID_PMC Invalid PMC state
-
-And that interpretation is confirmed by testing on Milan and Turin (by
-setting bits in CR0[63:32] to generate VMEXIT_INVALID on VMRUN).
-
-Furthermore, Xen has treated exitcode as a 64-bit value since HVM support
-was adding in 2006 (see Xen commit d1bd157fbc ("Big merge the HVM
-full-virtualisation abstractions.")).
-
-Note, the SVM tests will fail when on KVM builds without commit
-f402ecd7a8b6 ("KVM: nSVM: Set exit_code_hi to -1 when synthesizing
-SVM_EXIT_ERR (failed VMRUN)").
-
-Link: https://lore.kernel.org/all/20251113225621.1688428-1-seanjc@google.co=
-m
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Kevin Cheng <chengkev@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/svm.c       |  4 +--
- x86/svm.h       |  9 +++----
- x86/svm_npt.c   |  4 +--
- x86/svm_tests.c | 66 ++++++++++++++++++++++++-------------------------
- 4 files changed, 41 insertions(+), 42 deletions(-)
+ arch/x86/kvm/cpuid.c   | 19 +++++++++++--------
+ arch/x86/kvm/mmu/mmu.c |  6 +-----
+ arch/x86/kvm/pmu.c     |  2 +-
+ arch/x86/kvm/x86.c     | 13 +++++++------
+ arch/x86/kvm/x86.h     |  4 ++--
+ 5 files changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/x86/svm.c b/x86/svm.c
-index de9eb194..3f6d70dc 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -227,7 +227,7 @@ void svm_setup_vmrun(u64 rip)
- 	vmcb->save.rsp =3D (ulong)(guest_stack + ARRAY_SIZE(guest_stack));
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 88a5426674a1..f37331ad3ad8 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -534,17 +534,20 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+ 	BUILD_BUG_ON(sizeof(vcpu_caps) != sizeof(vcpu->arch.cpu_caps));
+ 
+ 	/*
+-	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+-	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+-	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
+-	 * faults due to reusing SPs/SPTEs. In practice no sane VMM mucks with
+-	 * the core vCPU model on the fly. It would've been better to forbid any
+-	 * KVM_SET_CPUID{,2} calls after KVM_RUN altogether but unfortunately
+-	 * some VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
++	 * KVM does not correctly handle changing guest CPUID after KVM_RUN or
++	 * while L2 is active, as MAXPHYADDR, GBPAGES support, AMD reserved bit
++	 * behavior, etc. aren't tracked in kvm_mmu_page_role, and L2 state
++	 * can't be adjusted (without breaking L2 in some way).  As a result,
++	 * KVM may reuse SPs/SPTEs and/or run L2 with bad/misconfigured state.
++	 *
++	 * In practice, no sane VMM mucks with the core vCPU model on the fly.
++	 * It would've been better to forbid any KVM_SET_CPUID{,2} calls after
++	 * KVM_RUN or KVM_SET_NESTED_STATE altogether, but unfortunately some
++	 * VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
+ 	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
+ 	 * whether the supplied CPUID data is equal to what's already set.
+ 	 */
+-	if (kvm_vcpu_has_run(vcpu)) {
++	if (!kvm_can_set_cpuid_and_feature_msrs(vcpu)) {
+ 		r = kvm_cpuid_check_equal(vcpu, e2, nent);
+ 		if (r)
+ 			goto err;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02c450686b4a..f17324546900 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6031,11 +6031,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.nested_mmu.cpu_role.ext.valid = 0;
+ 	kvm_mmu_reset_context(vcpu);
+ 
+-	/*
+-	 * Changing guest CPUID after KVM_RUN is forbidden, see the comment in
+-	 * kvm_arch_vcpu_ioctl().
+-	 */
+-	KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm);
++	KVM_BUG_ON(!kvm_can_set_cpuid_and_feature_msrs(vcpu), vcpu->kvm);
  }
-=20
--int __svm_vmrun(u64 rip)
-+u64 __svm_vmrun(u64 rip)
+ 
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 487ad19a236e..ff20b4102173 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -853,7 +853,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
  {
- 	svm_setup_vmrun(rip);
- 	regs.rdi =3D (ulong)v2_test;
-@@ -243,7 +243,7 @@ int __svm_vmrun(u64 rip)
- 	return (vmcb->control.exit_code);
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 
+-	if (KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm))
++	if (KVM_BUG_ON(!kvm_can_set_cpuid_and_feature_msrs(vcpu), vcpu->kvm))
+ 		return;
+ 
+ 	/*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ff8812f3a129..211d8c24a4b1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2314,13 +2314,14 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+ 	u64 val;
+ 
+ 	/*
+-	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
+-	 * not support modifying the guest vCPU model on the fly, e.g. changing
+-	 * the nVMX capabilities while L2 is running is nonsensical.  Allow
+-	 * writes of the same value, e.g. to allow userspace to blindly stuff
+-	 * all MSRs when emulating RESET.
++	 * Reject writes to immutable feature MSRs if the vCPU model is frozen,
++	 * as KVM doesn't support modifying the guest vCPU model on the fly,
++	 * e.g. changing the VMX capabilities MSRs while L2 is active is
++	 * nonsensical.  Allow writes of the same value, e.g. so that userspace
++	 * can blindly stuff all MSRs when emulating RESET.
+ 	 */
+-	if (kvm_vcpu_has_run(vcpu) && kvm_is_immutable_feature_msr(index) &&
++	if (!kvm_can_set_cpuid_and_feature_msrs(vcpu) &&
++	    kvm_is_immutable_feature_msr(index) &&
+ 	    (do_get_msr(vcpu, index, &val) || *data != val))
+ 		return -EINVAL;
+ 
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index fdab0ad49098..9084e0dfa15c 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -172,9 +172,9 @@ static inline void kvm_nested_vmexit_handle_ibrs(struct kvm_vcpu *vcpu)
+ 		indirect_branch_prediction_barrier();
  }
-=20
--int svm_vmrun(void)
-+u64 svm_vmrun(void)
+ 
+-static inline bool kvm_vcpu_has_run(struct kvm_vcpu *vcpu)
++static inline bool kvm_can_set_cpuid_and_feature_msrs(struct kvm_vcpu *vcpu)
  {
- 	return __svm_vmrun((u64)test_thunk);
+-	return vcpu->arch.last_vmentry_cpu != -1;
++	return vcpu->arch.last_vmentry_cpu == -1 && !is_guest_mode(vcpu);
  }
-diff --git a/x86/svm.h b/x86/svm.h
-index 264583a6..02d9bac3 100644
---- a/x86/svm.h
-+++ b/x86/svm.h
-@@ -88,8 +88,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u32 int_vector;
- 	u32 int_state;
- 	u8 reserved_3[4];
--	u32 exit_code;
--	u32 exit_code_hi;
-+	u64 exit_code;
- 	u64 exit_info_1;
- 	u64 exit_info_2;
- 	u32 exit_int_info;
-@@ -354,7 +353,7 @@ struct __attribute__ ((__packed__)) vmcb {
- #define SVM_EXIT_MWAIT_COND	0x08c
- #define SVM_EXIT_NPF  		0x400
-=20
--#define SVM_EXIT_ERR		-1
-+#define SVM_EXIT_ERR		-1ull
-=20
- #define SVM_CR0_SELECTIVE_MASK (X86_CR0_TS | X86_CR0_MP)
-=20
-@@ -435,8 +434,8 @@ void vmcb_ident(struct vmcb *vmcb);
- struct regs get_regs(void);
- void vmmcall(void);
- void svm_setup_vmrun(u64 rip);
--int __svm_vmrun(u64 rip);
--int svm_vmrun(void);
-+u64 __svm_vmrun(u64 rip);
-+u64 svm_vmrun(void);
- void test_set_guest(test_guest_func func);
-=20
- extern struct vmcb *vmcb;
-diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-index bd5e8f35..24d7707b 100644
---- a/x86/svm_npt.c
-+++ b/x86/svm_npt.c
-@@ -219,7 +219,7 @@ static void __svm_npt_rsvd_bits_test(u64 * pxe, u64 rsv=
-d_bits, u64 efer,
- 				     ulong cr4, u64 guest_efer, ulong guest_cr4)
- {
- 	u64 pxe_orig =3D *pxe;
--	int exit_reason;
-+	u64 exit_reason;
- 	u64 pfec;
-=20
- 	wrmsr(MSR_EFER, efer);
-@@ -233,7 +233,7 @@ static void __svm_npt_rsvd_bits_test(u64 * pxe, u64 rsv=
-d_bits, u64 efer,
- 	exit_reason =3D svm_vmrun();
-=20
- 	report(exit_reason =3D=3D SVM_EXIT_NPF,
--	       "Wanted #NPF on rsvd bits =3D 0x%lx, got exit =3D 0x%x", rsvd_bits=
-,
-+	       "Wanted #NPF on rsvd bits =3D 0x%lx, got exit =3D 0x%lx", rsvd_bit=
-s,
- 	       exit_reason);
-=20
- 	if (pxe =3D=3D npt_get_pdpe((u64) basic_guest_main) || pxe =3D=3D npt_get=
-_pml4e()) {
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 37616476..8ce3cc2e 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -103,7 +103,7 @@ static bool finished_rsm_intercept(struct svm_test *tes=
-t)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_RSM) {
--			report_fail("VMEXIT not due to rsm. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to rsm. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -113,7 +113,7 @@ static bool finished_rsm_intercept(struct svm_test *tes=
-t)
-=20
- 	case 1:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_EXCP_BASE + UD_VECTOR) {
--			report_fail("VMEXIT not due to #UD. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to #UD. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -971,7 +971,7 @@ static void svm_tsc_scale_run_testcase(u64 duration,
- 	start_tsc =3D rdtsc();
-=20
- 	if (svm_vmrun() !=3D SVM_EXIT_VMMCALL)
--		report_fail("unexpected vm exit code 0x%x", vmcb->control.exit_code);
-+		report_fail("unexpected vm exit code 0x%lx", vmcb->control.exit_code);
-=20
- 	actual_duration =3D (rdtsc() - start_tsc) >> TSC_SHIFT;
-=20
-@@ -1190,7 +1190,7 @@ static bool pending_event_finished(struct svm_test *t=
-est)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_INTR) {
--			report_fail("VMEXIT not due to pending interrupt. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to pending interrupt. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1271,7 +1271,7 @@ static void pending_event_cli_test(struct svm_test *t=
-est)
- static bool pending_event_cli_finished(struct svm_test *test)
- {
- 	report_svm_guest(vmcb->control.exit_code =3D=3D SVM_EXIT_VMMCALL, test,
--			 "Wanted VMMCALL VM-Exit, got exit reason 0x%x",
-+			 "Wanted VMMCALL VM-Exit, got exit reason 0x%lx",
- 			 vmcb->control.exit_code);
-=20
- 	switch (get_test_stage(test)) {
-@@ -1394,7 +1394,7 @@ static bool interrupt_finished(struct svm_test *test)
- 	case 0:
- 	case 2:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1407,7 +1407,7 @@ static bool interrupt_finished(struct svm_test *test)
- 	case 1:
- 	case 3:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_INTR) {
--			report_fail("VMEXIT not due to intr intercept. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to intr intercept. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1470,7 +1470,7 @@ static bool nmi_finished(struct svm_test *test)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1481,7 +1481,7 @@ static bool nmi_finished(struct svm_test *test)
-=20
- 	case 1:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_NMI) {
--			report_fail("VMEXIT not due to NMI intercept. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to NMI intercept. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1563,7 +1563,7 @@ static bool nmi_hlt_finished(struct svm_test *test)
- 	switch (get_test_stage(test)) {
- 	case 1:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1574,7 +1574,7 @@ static bool nmi_hlt_finished(struct svm_test *test)
-=20
- 	case 2:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_NMI) {
--			report_fail("VMEXIT not due to NMI intercept. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to NMI intercept. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1624,7 +1624,7 @@ static bool vnmi_finished(struct svm_test *test)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_ERR) {
--			report_fail("Wanted ERR VM-Exit, got 0x%x",
-+			report_fail("Wanted ERR VM-Exit, got 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1635,7 +1635,7 @@ static bool vnmi_finished(struct svm_test *test)
-=20
- 	case 1:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("Wanted VMMCALL VM-Exit, got 0x%x",
-+			report_fail("Wanted VMMCALL VM-Exit, got 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1646,7 +1646,7 @@ static bool vnmi_finished(struct svm_test *test)
-=20
- 	case 2:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("Wanted VMMCALL VM-Exit, got 0x%x",
-+			report_fail("Wanted VMMCALL VM-Exit, got 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1697,7 +1697,7 @@ static bool exc_inject_finished(struct svm_test *test=
-)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1707,7 +1707,7 @@ static bool exc_inject_finished(struct svm_test *test=
-)
-=20
- 	case 1:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_ERR) {
--			report_fail("VMEXIT not due to error. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to error. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1717,7 +1717,7 @@ static bool exc_inject_finished(struct svm_test *test=
-)
-=20
- 	case 2:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1795,7 +1795,7 @@ static bool virq_inject_finished(struct svm_test *tes=
-t)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1811,7 +1811,7 @@ static bool virq_inject_finished(struct svm_test *tes=
-t)
-=20
- 	case 1:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VINTR) {
--			report_fail("VMEXIT not due to vintr. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vintr. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1824,7 +1824,7 @@ static bool virq_inject_finished(struct svm_test *tes=
-t)
-=20
- 	case 2:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1838,7 +1838,7 @@ static bool virq_inject_finished(struct svm_test *tes=
-t)
-=20
- 	case 3:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1848,7 +1848,7 @@ static bool virq_inject_finished(struct svm_test *tes=
-t)
- 	case 4:
- 		// INTERCEPT_VINTR should be ignored because V_INTR_PRIO < V_TPR
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+			report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -1886,7 +1886,7 @@ static void virq_inject_within_shadow_prepare_gif_cle=
-ar(struct svm_test *test)
- static bool virq_inject_within_shadow_finished(struct svm_test *test)
- {
- 	if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL)
--		report_fail("VMEXIT not due to vmmcall. Exit reason 0x%x",
-+		report_fail("VMEXIT not due to vmmcall. Exit reason 0x%lx",
- 			    vmcb->control.exit_code);
- 	if (!virq_fired)
- 		report_fail("V_IRQ did not fire");
-@@ -2063,7 +2063,7 @@ static bool init_intercept_finished(struct svm_test *=
-test)
- 	vmcb->save.rip +=3D 3;
-=20
- 	if (vmcb->control.exit_code !=3D SVM_EXIT_INIT) {
--		report_fail("VMEXIT not due to init intercept. Exit reason 0x%x",
-+		report_fail("VMEXIT not due to init intercept. Exit reason 0x%lx",
- 			    vmcb->control.exit_code);
-=20
- 		return true;
-@@ -2165,7 +2165,7 @@ static bool host_rflags_finished(struct svm_test *tes=
-t)
- 	switch (get_test_stage(test)) {
- 	case 0:
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL) {
--			report_fail("Unexpected VMEXIT. Exit reason 0x%x",
-+			report_fail("Unexpected VMEXIT. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -2180,7 +2180,7 @@ static bool host_rflags_finished(struct svm_test *tes=
-t)
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL ||
- 		    host_rflags_guest_main_flag !=3D 1) {
- 			report_fail("Unexpected VMEXIT or #DB handler"
--				    " invoked before guest main. Exit reason 0x%x",
-+				    " invoked before guest main. Exit reason 0x%lx",
- 				    vmcb->control.exit_code);
- 			return true;
- 		}
-@@ -2196,7 +2196,7 @@ static bool host_rflags_finished(struct svm_test *tes=
-t)
- 		if (vmcb->control.exit_code !=3D SVM_EXIT_VMMCALL ||
- 		    rip_detected !=3D (u64)&vmrun_rip + 3) {
- 			report_fail("Unexpected VMEXIT or RIP mismatch."
--				    " Exit reason 0x%x, RIP actual: %lx, RIP expected: "
-+				    " Exit reason 0x%lx, RIP actual: %lx, RIP expected: "
- 				    "%lx", vmcb->control.exit_code,
- 				    (u64)&vmrun_rip + 3, rip_detected);
- 			return true;
-@@ -2214,7 +2214,7 @@ static bool host_rflags_finished(struct svm_test *tes=
-t)
- 		    read_rflags() & X86_EFLAGS_RF) {
- 			report_fail("Unexpected VMEXIT or RIP mismatch or "
- 				    "EFLAGS.RF not cleared."
--				    " Exit reason 0x%x, RIP actual: %lx, RIP expected: "
-+				    " Exit reason 0x%lx, RIP actual: %lx, RIP expected: "
- 				    "%lx", vmcb->control.exit_code,
- 				    (u64)&vmrun_rip, rip_detected);
- 			return true;
-@@ -2301,7 +2301,7 @@ static void basic_guest_main(struct svm_test *test)
- 				  exit_code, test_name)			\
- {									\
- 	u64 tmp, mask;							\
--	u32 r;								\
-+	u64 r;								\
- 	int i;								\
- 									\
- 	for (i =3D start; i <=3D end; i =3D i + inc) {			\
-@@ -2320,8 +2320,8 @@ static void basic_guest_main(struct svm_test *test)
- 			vmcb->save.cr4 =3D tmp;				\
- 		}							\
- 		r =3D svm_vmrun();					\
--		report(r =3D=3D exit_code, "Test CR%d %s%d:%d: %lx, wanted exit 0x%x, go=
-t 0x%x", \
--		       cr, test_name, end, start, tmp, exit_code, r);	\
-+		report(r =3D=3D exit_code, "Test CR%d %s%d:%d: %lx, wanted exit 0x%lx, g=
-ot 0x%lx", \
-+		       cr, test_name, end, start, tmp, (u64)exit_code, r);	\
- 	}								\
- }
-=20
-@@ -3316,7 +3316,7 @@ static void dummy_nmi_handler(struct ex_regs *regs)
- }
-=20
-=20
--static void svm_intr_intercept_mix_run_guest(volatile int *counter, int ex=
-pected_vmexit)
-+static void svm_intr_intercept_mix_run_guest(volatile int *counter, u64 ex=
-pected_vmexit)
- {
- 	if (counter)
- 		*counter =3D 0;
-@@ -3335,7 +3335,7 @@ static void svm_intr_intercept_mix_run_guest(volatile=
- int *counter, int expected
- 		report(*counter =3D=3D 1, "Interrupt is expected");
-=20
- 	report(vmcb->control.exit_code =3D=3D expected_vmexit,
--	       "Wanted VM-Exit reason 0x%x, got 0x%x",
-+	       "Wanted VM-Exit reason 0x%lx, got 0x%lx",
- 	       expected_vmexit, vmcb->control.exit_code);
- 	report(vmcb->save.rflags & X86_EFLAGS_IF, "Guest should have EFLAGS.IF se=
-t now");
- 	cli();
+ 
+ static inline void kvm_set_mp_state(struct kvm_vcpu *vcpu, int mp_state)
 
-base-commit: 31d91f5c9b7546471b729491664b05c933d64a7a
---=20
+base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
+-- 
 2.52.0.351.gbe84eed79e-goog
 
 
