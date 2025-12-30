@@ -1,168 +1,116 @@
-Return-Path: <kvm+bounces-66866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A62CEAB49
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:17:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6B3CEAC03
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:02:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E36C730060DF
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 21:17:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E5EF301F7CA
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932F423F40D;
-	Tue, 30 Dec 2025 21:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE60288C81;
+	Tue, 30 Dec 2025 22:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="YdAc/5+U";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="r/kUGXwu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="asLRNHKn"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90563A1E81;
-	Tue, 30 Dec 2025 21:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF1F267B02
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 22:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767129466; cv=none; b=Qy5pkQIw4aXarAqsb/681FTur0qrKXeIDVl6Z1dFZDDuao6mdSixSfLZPCMcLNiEcCmbIf7Qh0+8TL1A+71Xqr8PkW1Eg78o2cB5ynwwLX4RM+0EOzh3Eu9Dn3o/9sFC7I4kaEMtdRdh/9DmNooljp+cK5z+AqZdPAy7B2E/Uts=
+	t=1767132144; cv=none; b=Xv8Vhjp29kAfKU90yV/5D7rbosdBzYyKU8jirBFBinnC8I4WcaA/YdTBVW8Bm27mucz5+QIJ/poBn+Qaw48SeMe/d3j6j7Hb5hBKjoMdfVWVScta+2vGDMbppzMiJaG4AkoFqakv0xePQXDKPACSvwEct6Rg6z8CDbyiuTY6eSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767129466; c=relaxed/simple;
-	bh=23pZtuKI6hZxEU+5r0j0fvSd2Faldgal1ZPXSF6OX9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=KhL8Idvq3OgX9PwtIITtEJpRNI2/KVJ9fsF2H5V8OVnrBzVyR00H6gqms4JrzFA7navPLYPHbhddzxJ6LxtgC86cJAM1P2VGHnloMue/zJ4r8tKbdtmZVjibgfHNjPfL3PQofWBvCFuBpn1YQxljga7zxmApuxBBt2Qjn07Y8zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=YdAc/5+U; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=r/kUGXwu; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id DB6F27A0055;
-	Tue, 30 Dec 2025 16:17:41 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Tue, 30 Dec 2025 16:17:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm1; t=1767129461; x=1767215861; bh=qN
-	YNjYfPAZkTCpyt5WK5132yIKd/qwo5ilMauEb4eqk=; b=YdAc/5+U/MOveftl7F
-	6KR7GZK97H8qTDkoU7UxU9Q9AQcdpmDKPUD9Jq8YmEOqmrsDnb4Yc4eYPXaMxDHp
-	JlClaGvTF0DHE9doUCMGtBliIJxzH/GokzMIIr+/9yPCEigCoL0Q6gkdtNmJyT1u
-	Q8NbPr/ZYeVOzBgMAvOdUFNCbeV6DCjpFPRvX+nY5oIsZtzJgq76Sx0rdxSEA59O
-	2GbLj5JjmHJrMETYpdQo66PzYmV0zm06bjQ4Y/H26QMhEjm5nt+b+59gsCJkffl3
-	AOP5DbbVUcBz7Qry3JCAQr6Ja5Ji8Diki7r7xotFAhEwOE+Ly5j0+u7MOTMPyLdv
-	3s8Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1767129461; x=1767215861; bh=qNYNjYfPAZkTCpyt5WK5132yIKd/
-	qwo5ilMauEb4eqk=; b=r/kUGXwurfOKl4MSczPr+hDszXhza0J6/mAtCVEA5qcJ
-	i9kDLyAODOLh+0rJ2YtqYHO5wZKJlWOjxx95LDUs33x5ie3Ugv0NnRZ9YATki1v1
-	YECVyKcK7RhP8Sj9bL1e2Muwpg1RLr6QgwmNyIHg1INXWdG/yyJQZ4OT7LJw+kci
-	dlZioectON8so3mpXDlCw0eSG5HKDSScPMNNC7tlcK+qIA339xMAyt9icrgNDEI+
-	M2nDYRQw3ys3o7vms14NUhJh8z5tTtjIAkDtjhdWDJmyX7qYgGVsH0U2VmQujQcD
-	5x8xPbDlafH4okSNSxDDq9srJp+uSjI9rRE9K5YWqQ==
-X-ME-Sender: <xms:dUFUaSKRyhCZYFtrD1QxB8YqxZCb0yDgpqfQV9LX83jgLRmbyaXsfg>
-    <xme:dUFUaR7bxlThe2uC9VqQWKIagHBPIjk5rmsGU9hpY6e-i51qYb4Ghzvejjp_PKsbH
-    UD17yz-DZmpGYggAKb_pTaFZeONYmuQsO8y6jYZeTeaAwvm2iEI5kM>
-X-ME-Received: <xmr:dUFUaVy7kS9XDrtOSgStKDY_R7gMMOZYefvGtrcKgXPIXrCVrvFevuHgoMw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdekuddtkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfggtgfgsehtjeertddttddvnecuhfhrohhmpeetlhgvgicuhghilhhl
-    ihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrghtthgvrh
-    hnpeeifeegieelheehueehgfehhffghedvgfdtieffuefhvddvkeehhfeuueduffefleen
-    ucffohhmrghinhepghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhnsggp
-    rhgtphhtthhopeefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtohhrvhgrlh
-    gusheslhhinhhugidqfhhouhhnuggrthhiohhnrdhorhhgpdhrtghpthhtoheplhhinhhu
-    gidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:dUFUaVbvwrpVWAOizbgomNx-NCSgnmj-uz3zRs6_GiDPAJ9BOqlp0A>
-    <xmx:dUFUaXQ1Ik2G4aZK7F9fTDBkPKow7FlLl1bkS7uqbPk_Ltcf-3hNsw>
-    <xmx:dUFUafy6tdWgT711Ad3S-NBzIGNe2t_bimoWT1VBZjvzxgKOmNSY6A>
-    <xmx:dUFUaR0TmZqsIagjk3sDdfi-_Qx7Df_S7fZ-20PnJkZ5U66KyD_TEA>
-    <xmx:dUFUadeHxkInRfl5u7ZImoF4xj3rLFt5X0KE-8tQJ81Sc-PFHYJeioGH>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 30 Dec 2025 16:17:40 -0500 (EST)
-Date: Tue, 30 Dec 2025 14:17:39 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO fixes for v6.19-rc4
-Message-ID: <20251230141739.7e11a0c4.alex@shazbot.org>
+	s=arc-20240116; t=1767132144; c=relaxed/simple;
+	bh=PrO8ZpspcY9uetE5zi9xzA6cbVUP1q2CFd+R8evW2IU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=QoDO4T0VF3klqclj87ODO8n4n4AmS6n3KAqM9bP575Rj5eLLewtyoDJZ5wtW7kIhRZXjGIZodble4rms7Kw7pNvT31D7zZ28QvnjuDQcyUdcz1AtNQG8CVbCytlVXH7CESkDbqt4yALw7GNVQtPhpkq7dg9MoHuuOomdpc/XOvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=asLRNHKn; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c6e05af3bso22702883a91.3
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 14:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767132142; x=1767736942; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ao6FbYZ3gNN1FVAqmoUiire9m+aObbtdDrXexkBVZEU=;
+        b=asLRNHKnTKjDeFlKTrghm17DJkkDEsuqtJ8PekAZKRAQCyDDSciokOjic7m7RlbfJg
+         TGb52S4phjgGzVq5c04lgXSMGijm/GozcL7DSA8IVVxvRvQISd+n0CoGgtt622SJFXn0
+         8MsYevXuMN6sky6Zm3obFxcPXb0UG73Ix+vBSWtPP3S1d+DUhNm+TRFjDVkLXNacUrbV
+         ZXom60pH7o5kU0SWdx/DvVGhX1RqZiD4Xya5LLYnw8kW1DLJL91cvUyAMsgOo6aSug6c
+         oHQs7zP5B0LdRuSHUNrB38oYLwzBW9304GUUIQx4WbO01hlDj2jn6GKCSlkPUeX4kUhS
+         RMVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767132142; x=1767736942;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ao6FbYZ3gNN1FVAqmoUiire9m+aObbtdDrXexkBVZEU=;
+        b=STey/0x1OrxNbaaosq5V+QugNoEstyrAJh8Bhh+VbWp/ZleAEwT0roOlo4W/Z4CrzS
+         kMtCJpR0F0fFXEdu/WWiN07ZxXTuOh7gGCYlboktWhFYGlJxb33hll4udKoYPvC4MpsD
+         6Hzi1RtN/O3j6Y+0RIfloSqGEPPjxrxBgDrWnBZ2XrWmmMRV1S3DGLoGPO2Brlv7dB5/
+         3YCUO2G69f4Rn+5G7J7JTTZk2rBu0VQkcvU8BPwbh2fog8oXxDj5GumGw9xbQ7F16mtY
+         qLLfK3NuOamX1tCFwMnhLfKQ5xThe/D3+Q/upwJVOw7Vt+2aZHP3dHW0DW0GHN+v01UU
+         ckbA==
+X-Gm-Message-State: AOJu0YxgWK//WOzZhEhxdU7bea+tSgghiWh2YSQ1m+Hy/U47+IQ1Lvf7
+	vi2Jlx7sCc4O4pE9toF5FTj4MbtKuypT9hZR1nPMP4tf0bqiPhhSdCPNIX/t0CgqlM2L9rHg4AZ
+	rz+CrKQ==
+X-Google-Smtp-Source: AGHT+IHpa19P8F2HlGXcpKqQSM5qO1/gWJ/4MRi9sMQD8KNAkp88VDfiKcbfYBmqfpO9FpSVMHBvsK3/e6g=
+X-Received: from pjboa3.prod.google.com ([2002:a17:90b:1bc3:b0:34c:2f02:7f5d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:58e3:b0:33f:eca0:47c6
+ with SMTP id 98e67ed59e1d1-34e921e713dmr28144660a91.30.1767132141994; Tue, 30
+ Dec 2025 14:02:21 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 30 Dec 2025 14:02:18 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20251230220220.4122282-1-seanjc@google.com>
+Subject: [PATCH v2 0/2] KVM: nVMX: Disallow access to unsupported vmcs12 fields
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>, 
+	Chao Gao <chao.gao@intel.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Linus,
+Disallow accesses to vmcs12 fields that are defined by KVM, but are unsupported
+in the current incarnation of KVM, e.g. due to lack of hardware support for the
+underlying VMCS fields.
 
-The following changes since commit 9448598b22c50c8a5bb77a9103e2d49f134c9578:
+The primary motivation is to avoid having to carry the same logic for shadowed
+VMCS fields, which can't play nice with unsupported fields since VMREAD/VMWRITE
+will fail when attempting to transfer state between vmcs12 and the shadow VMCS.
 
-  Linux 6.19-rc2 (2025-12-21 15:52:04 -0800)
+v2:
+ - Name the array of KVM-defined fields kvm_supported_vmcs12_field_offsets,
+   e.g. so that it's no confused with what's supported by hardware. [Xin]
+ - Combine encodings in switch statements for fields shared fate. [Xin]
+ - Drop the extern declaration of supported_vmcs12_field_offsets. [Chao]
+ - Handle GUEST_INTR_STATUS in cpu_has_vmcs12_field() and add a patch to
+   drop the custom handling from init_vmcs_shadow_fields(). [Chao]
 
-are available in the Git repository at:
+v1: https://lore.kernel.org/all/20251216012918.1707681-1-seanjc@google.com
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.19-rc4
+Sean Christopherson (2):
+  KVM: nVMX: Disallow access to vmcs12 fields that aren't supported by
+    "hardware"
+  KVM: nVMX: Remove explicit filtering of GUEST_INTR_STATUS from shadow
+    VMCS fields
 
-for you to fetch changes up to acf44a2361b8d6356b71a970ab016065b5123b0e:
+ arch/x86/kvm/vmx/nested.c | 17 +++-------
+ arch/x86/kvm/vmx/vmcs.h   |  8 +++++
+ arch/x86/kvm/vmx/vmcs12.c | 70 +++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmcs12.h |  6 ++--
+ arch/x86/kvm/vmx/vmx.c    |  2 ++
+ 5 files changed, 86 insertions(+), 17 deletions(-)
 
-  vfio/xe: Fix use-after-free in xe_vfio_pci_alloc_file() (2025-12-28 12:42:46 -0700)
 
-----------------------------------------------------------------
-VFIO fixes for v6.19-rc4
+base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
+-- 
+2.52.0.351.gbe84eed79e-goog
 
- - Restrict ROM access to dword to resolve a regression introduced
-   with qword access seen on some Intel NICs.  Update VGA region
-   access to the same given lack of precedent for 64-bit users.
-   (Kevin Tian)
-
- - Fix missing .get_region_info_caps callback in the xe-vfio-pci
-   variant driver due to integration through the DRM tree.
-   (Michal Wajdeczko)
-
- - Add aligned 64-bit access macros to tools/include/linux/types.h,
-   allowing removal of uapi/linux/type.h includes from various
-   vfio selftest, resolving redefinition warnings for integration
-   with KVM selftests. (David Matlack)
-
- - Fix error path memory leak in pds-vfio-pci variant driver.
-   (Zilin Guan)
-
- - Fix error path use-after-free in xe-vfio-pci variant driver.
-   (Alper Ak)
-
-----------------------------------------------------------------
-Alper Ak (1):
-      vfio/xe: Fix use-after-free in xe_vfio_pci_alloc_file()
-
-David Matlack (2):
-      tools include: Add definitions for __aligned_{l,b}e64
-      vfio: selftests: Drop <uapi/linux/types.h> includes
-
-Kevin Tian (2):
-      vfio/pci: Disable qword access to the PCI ROM bar
-      vfio/pci: Disable qword access to the VGA region
-
-Michal Wajdeczko (1):
-      vfio/xe: Add default handler for .get_region_info_caps
-
-Zilin Guan (1):
-      vfio/pds: Fix memory leak in pds_vfio_dirty_enable()
-
- drivers/vfio/pci/nvgrace-gpu/main.c                |  4 ++--
- drivers/vfio/pci/pds/dirty.c                       |  7 ++++--
- drivers/vfio/pci/vfio_pci_rdwr.c                   | 25 ++++++++++++++++------
- drivers/vfio/pci/xe/main.c                         |  5 ++++-
- include/linux/vfio_pci_core.h                      | 10 ++++++++-
- tools/include/linux/types.h                        |  8 +++++++
- .../vfio/lib/include/libvfio/iova_allocator.h      |  1 -
- tools/testing/selftests/vfio/lib/iommu.c           |  1 -
- tools/testing/selftests/vfio/lib/iova_allocator.c  |  1 -
- tools/testing/selftests/vfio/lib/vfio_pci_device.c |  1 -
- .../testing/selftests/vfio/vfio_dma_mapping_test.c |  1 -
- .../selftests/vfio/vfio_iommufd_setup_test.c       |  1 -
- 12 files changed, 46 insertions(+), 19 deletions(-)
 
