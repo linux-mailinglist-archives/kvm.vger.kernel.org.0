@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-66887-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47AA1CEAD4D
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:06:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B29ACEAD50
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EED4E30519F2
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:04:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE72E3017671
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3E032FA12;
-	Tue, 30 Dec 2025 23:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7368A33064B;
+	Tue, 30 Dec 2025 23:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QC5JJ93d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r97hhyBv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB7A32862B
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5B12F290B
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767135745; cv=none; b=HjgOgIejOFzkqxwxIdeLFAcIWtEcJ8Db84YL6heA0bOpStW839TXqlq0cpyny7Npfkx6nAkbW6Cd5w/F46gSJDbeS+NOkghUbTLEhHMlToBalbcVCZjkToO2yiJBYvLKNdeo/mb8F3Ctgtqu55Aq4h/t3RrugTt3NXZz1M7gLA4=
+	t=1767135747; cv=none; b=dVOA+4anb78j/OZSeOfZSetD0nYsoKMzuc6xHz3A9pHLhCMFgQq51jmWwieuFJfw0hmiIYNXra7Thn03wz6CD2e+7cMKkzhCTFzhdIdBqyYG+HRLPzmyMy5jWZXZ4BbJPQDwP72VfVK/9om8kt6NbAGCl0cBmlmjH5ILvOpRXcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767135745; c=relaxed/simple;
-	bh=MPbkHc4GV4TzFE9XoAUnnbKF5eS/YzsDgg5s4A8v2yQ=;
+	s=arc-20240116; t=1767135747; c=relaxed/simple;
+	bh=YGA8CA4s7Z2CWClwBVpAk8yl9E1CB5xxazIcYOSG0No=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=upzaFqNICSZgdn0oxxOXzHQGO0YyQOXfRa4/gvQt6JBYI9/ahoblztvKxQU5DZ8irfc/0PXQjWlIwZNf7VW9BmCGYWdKcUZgU+65xuA1/2nzbeBYe6iWCEvVvHRICFIxtHDGfsFNomLygVZ8yr2XTtnpWxKwhuS4Mqu3jk1lg34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QC5JJ93d; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=YTVlsXup3sEmh73ti6ch2khlNIoroLMLqWOF9vvJsxIlEiYwguGkxf7R1bHOXmdfxfT3yGSduWXaKQgXoeOczi55kSBWsasUqeDaA4y5bO7RJlRrSnUQiuoMdmzfWJvVSqa530kpvG4zqKweBHBRG3LZVcDH08j2ZZ60TwDDR0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r97hhyBv; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ac814f308so23353030a91.3
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:22 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a090819ed1so84562775ad.2
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767135740; x=1767740540; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767135742; x=1767740542; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J6aMxlCW9zWw4tw+lh+J4j0Q+W18rvfDg7v6hfZtyes=;
-        b=QC5JJ93dMbM5QK+ubSuJf0hON/hzsIi1EgqzhnOjxGW7/reU2Z1vl+KkBX7NbutwK4
-         5k4bShqEy18WORIf8N0woE6Ukg9FMteAM+dV7cEaZUkrp5AoiSJ6gqy/3blRcs+0JwLc
-         E+AT/968f29drHcOwwu+F/6WFx0XqO4MKZ7UogInMuVVQOp0LU+kV08VmciGfc3AIJ+e
-         S2uZU2Wjo77++tJxXvT/0DESmtNwcP9z5im26ehIyc3dDJdc/ueAk/H+ajPnYi3j6Owz
-         DCxMUC0+/6lZka/lvNRk225erzZJ2ZhqqhxpWPRdIb1Nz2vHWoEEvaN/TBDtND9hof3e
-         gIgg==
+        bh=FMYWTnD6Tv1L5yY9MguuNjhNHloVV4vNjkLbvD2vfOU=;
+        b=r97hhyBvJa5Xp4IjZ+4CK7ISV0b1iVpq7LJv44TM0nAmALdfGX77uhDwWS1g6kYrJk
+         o9g/gjs5NAIp7bDbJmEvmc+kF2BXn0tXQmTPSFxY9BEc0bUq6uG2kkI2z+XG7Y8JA7TE
+         RvxIpYTS8IKsDmxUAroDvW/F1szaH87uZPswQw8yG054ahwXzjne0QH3A6A7dxi39O5o
+         YcT6GU4l0XWYKvyqRQuBDKWGy9Qwxq64K05rtfCSu/FVAc1itfXuxudSReWqttu7k/dM
+         5BaoWT5bmzBHRwVfNxb1R58GY2tkPgJ6O1mJrYyen3Wk479NEpW0hPYWqv32auHvBsVx
+         +87w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767135740; x=1767740540;
+        d=1e100.net; s=20230601; t=1767135742; x=1767740542;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J6aMxlCW9zWw4tw+lh+J4j0Q+W18rvfDg7v6hfZtyes=;
-        b=AKqGnDYzMDNy3jrhHhN/5q2lvP7ztYP59mTOE3xENXA/B5s3bHoIWJvXwbarqU/bGN
-         IsaOw6md2kljx7B18xrHePdnlmCAucgaO0nuZ8GPLJHasf64JFOheuStjk2zwP0NVHqV
-         MJTnDzNkZL88KY/t5zY/ksUBX0wQP4ezdHKXpfxzAPtfMlzG9am2YmpnpqLRzR3jUDoK
-         GBO0DMMRqwbqFLK3cCBOpA9i6pixkn7N7TuvaxGPWi+BRjQhKhKFMnu1B/fI8BhM3NN0
-         7WIoS98tAWlM+86BeEd+4l2fRzdiyL6WO4UdvGjs6YS8lNHrZ7ZcblVDWoKpcFTn6mfY
-         Zk/g==
-X-Gm-Message-State: AOJu0Yzo1E06JGT2lNOvn0mP0DZf3kE97Wkttcq/1CbRZ3lZXtSEwbyB
-	rw0NnvXibZtnDMjvtiz/ipfJtB5cA6KzpKiVhLkqCGX212le4iVxrBaf31xv446y5lM8cQON5Wd
-	ufsZSGg==
-X-Google-Smtp-Source: AGHT+IESYs7jwx5GIZk4Cye/l7AaZRkTq4obaLXSbCdWxS8VVf/3eTwf0I/EcUJvNMDTKAMTNzECK0j0uSQ=
-X-Received: from pjbkk6.prod.google.com ([2002:a17:90b:4a06:b0:34e:795d:fe31])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:49:b0:343:5f43:933e
- with SMTP id 98e67ed59e1d1-34e921afaf8mr26205194a91.19.1767135740506; Tue, 30
- Dec 2025 15:02:20 -0800 (PST)
+        bh=FMYWTnD6Tv1L5yY9MguuNjhNHloVV4vNjkLbvD2vfOU=;
+        b=EaPD5csH/pS3moEgE0SnluecBuCiswTcMrQC8LHWtguqy+huQs+YEXkCpWQ9y7KFdX
+         MWUrYz1akDgf4lwZjG2RBDcdO+o9EAR7QE+rSmQ3qXrnTY+ycw7VEz+n4tDWxJtrkkbv
+         PSQCjUHJUHYIjTDIyiFsHUSjwE8/kqTncQWnNdT4XEGDwNnrg3Gp0VfCkcgcqhWdfeJG
+         HLzi+6v6KFqQzOVCMb3wJX3Gpxi31Vjti2muqoso6MH+pegUqsFWarJkFIBxIIHSRATn
+         RbWgvZnckUUh+qaH5XIm8/62GI2Z8sYP72Oym6qvKLT45LRLukPY6d7FlxYrS/jAElX6
+         3HEA==
+X-Gm-Message-State: AOJu0YxCLfavmeFqHGoK0JTXctIUaC++YcWqelWmgECLtfKYuB9q9YRf
+	ksUxSkaNfuhh3+BP+i7rrNACJTglKdNzqqpUnB2ZWlduaFoO4Ueag935cHxjebFW0zyMLx1oLEt
+	wHbT9qg==
+X-Google-Smtp-Source: AGHT+IEPzwhGxGkpTdzvCyQe6ViV9J79G7ardG1q/yA1uYuatCDGiLbmMWR1E1eqCq7xQW2f9AolN3qf2J8=
+X-Received: from plzv12.prod.google.com ([2002:a17:902:b7cc:b0:298:1f9e:c334])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e5c7:b0:2a0:be5d:d53d
+ with SMTP id d9443c01a7336-2a2f2a361c2mr352279255ad.53.1767135742297; Tue, 30
+ Dec 2025 15:02:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 15:01:45 -0800
+Date: Tue, 30 Dec 2025 15:01:46 -0800
 In-Reply-To: <20251230230150.4150236-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251230230150.4150236-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230230150.4150236-17-seanjc@google.com>
-Subject: [PATCH v4 16/21] KVM: selftests: Add support for nested NPTs
+Message-ID: <20251230230150.4150236-18-seanjc@google.com>
+Subject: [PATCH v4 17/21] KVM: selftests: Set the user bit on nested NPT PTEs
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -91,176 +91,81 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 
-Implement nCR3 and NPT initialization functions, similar to the EPT
-equivalents, and create common TDP helpers for enablement checking and
-initialization. Enable NPT for nested guests by default if the TDP MMU
-was initialized, similar to VMX.
-
-Reuse the PTE masks from the main MMU in the NPT MMU, except for the C
-and S bits related to confidential VMs.
+According to the APM, NPT walks are treated as user accesses. In
+preparation for supporting NPT mappings, set the 'user' bit on NPTs by
+adding a mask of bits to always be set on PTEs in kvm_mmu.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86/processor.h     |  2 ++
- .../selftests/kvm/include/x86/svm_util.h      |  9 ++++++++
- .../testing/selftests/kvm/lib/x86/memstress.c |  4 ++--
- .../testing/selftests/kvm/lib/x86/processor.c | 15 +++++++++++++
- tools/testing/selftests/kvm/lib/x86/svm.c     | 21 +++++++++++++++++++
- .../selftests/kvm/x86/vmx_dirty_log_test.c    |  4 ++--
- 6 files changed, 51 insertions(+), 4 deletions(-)
+ tools/testing/selftests/kvm/include/x86/kvm_util_arch.h | 2 ++
+ tools/testing/selftests/kvm/include/x86/processor.h     | 1 +
+ tools/testing/selftests/kvm/lib/x86/processor.c         | 5 +++--
+ tools/testing/selftests/kvm/lib/x86/svm.c               | 3 +++
+ 4 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index d134c886f280..deb471fb9b51 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1477,6 +1477,8 @@ void __virt_pg_map(struct kvm_vm *vm, struct kvm_mmu *mmu, uint64_t vaddr,
- void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 		    uint64_t nr_bytes, int level);
- 
-+void vm_enable_tdp(struct kvm_vm *vm);
-+bool kvm_cpu_has_tdp(void);
- void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
- void tdp_identity_map_default_memslots(struct kvm_vm *vm);
- void tdp_identity_map_1g(struct kvm_vm *vm,  uint64_t addr, uint64_t size);
-diff --git a/tools/testing/selftests/kvm/include/x86/svm_util.h b/tools/testing/selftests/kvm/include/x86/svm_util.h
-index b74c6dcddcbd..5d7c42534bc4 100644
---- a/tools/testing/selftests/kvm/include/x86/svm_util.h
-+++ b/tools/testing/selftests/kvm/include/x86/svm_util.h
-@@ -27,6 +27,9 @@ struct svm_test_data {
- 	void *msr; /* gva */
- 	void *msr_hva;
- 	uint64_t msr_gpa;
+diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+index 1cf84b8212c6..be35d26bb320 100644
+--- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
++++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+@@ -22,6 +22,8 @@ struct pte_masks {
+ 	uint64_t nx;
+ 	uint64_t c;
+ 	uint64_t s;
 +
-+	/* NPT */
-+	uint64_t ncr3_gpa;
++	uint64_t always_set;
  };
  
- static inline void vmmcall(void)
-@@ -57,6 +60,12 @@ struct svm_test_data *vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva);
- void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp);
- void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa);
- 
-+static inline bool kvm_cpu_has_npt(void)
-+{
-+	return kvm_cpu_has(X86_FEATURE_NPT);
-+}
-+void vm_enable_npt(struct kvm_vm *vm);
-+
- int open_sev_dev_path_or_exit(void);
- 
- #endif /* SELFTEST_KVM_SVM_UTILS_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-index 3319cb57a78d..407abfc34909 100644
---- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-+++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-@@ -82,9 +82,9 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
- 	int vcpu_id;
- 
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
--	TEST_REQUIRE(kvm_cpu_has_ept());
-+	TEST_REQUIRE(kvm_cpu_has_tdp());
- 
--	vm_enable_ept(vm);
-+	vm_enable_tdp(vm);
- 	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
- 		vcpu_alloc_vmx(vm, &vmx_gva);
- 
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index 29e7d172f945..a3a4c9a4cbcb 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -8,7 +8,9 @@
- #include "kvm_util.h"
- #include "pmu.h"
- #include "processor.h"
-+#include "svm_util.h"
- #include "sev.h"
-+#include "vmx.h"
- 
- #ifndef NUM_INTERRUPTS
- #define NUM_INTERRUPTS 256
-@@ -472,6 +474,19 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- 	}
- }
- 
-+void vm_enable_tdp(struct kvm_vm *vm)
-+{
-+	if (kvm_cpu_has(X86_FEATURE_VMX))
-+		vm_enable_ept(vm);
-+	else
-+		vm_enable_npt(vm);
-+}
-+
-+bool kvm_cpu_has_tdp(void)
-+{
-+	return kvm_cpu_has_ept() || kvm_cpu_has_npt();
-+}
-+
- void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
- 	       uint64_t size, int level)
- {
-diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-index d239c2097391..8e4795225595 100644
---- a/tools/testing/selftests/kvm/lib/x86/svm.c
-+++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-@@ -59,6 +59,22 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
- 	seg->base = base;
- }
- 
-+void vm_enable_npt(struct kvm_vm *vm)
-+{
-+	struct pte_masks pte_masks;
-+
-+	TEST_ASSERT(kvm_cpu_has_npt(), "KVM doesn't supported nested NPT");
-+
-+	/*
-+	 * NPTs use the same PTE format, but deliberately drop the C-bit as the
-+	 * per-VM shared vs. private information is only meant for stage-1.
-+	 */
-+	pte_masks = vm->mmu.arch.pte_masks;
-+	pte_masks.c = 0;
-+
-+	tdp_mmu_init(vm, vm->mmu.pgtable_levels, &pte_masks);
-+}
-+
- void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp)
- {
- 	struct vmcb *vmcb = svm->vmcb;
-@@ -102,6 +118,11 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
- 	vmcb->save.rip = (u64)guest_rip;
- 	vmcb->save.rsp = (u64)guest_rsp;
- 	guest_regs.rdi = (u64)svm;
-+
-+	if (svm->ncr3_gpa) {
-+		ctrl->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
-+		ctrl->nested_cr3 = svm->ncr3_gpa;
-+	}
- }
+ struct kvm_mmu_arch {
+diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+index deb471fb9b51..7b7d962244d6 100644
+--- a/tools/testing/selftests/kvm/include/x86/processor.h
++++ b/tools/testing/selftests/kvm/include/x86/processor.h
+@@ -1450,6 +1450,7 @@ enum pg_level {
+ #define PTE_NX_MASK(mmu)		((mmu)->arch.pte_masks.nx)
+ #define PTE_C_BIT_MASK(mmu)		((mmu)->arch.pte_masks.c)
+ #define PTE_S_BIT_MASK(mmu)		((mmu)->arch.pte_masks.s)
++#define PTE_ALWAYS_SET_MASK(mmu)	((mmu)->arch.pte_masks.always_set)
  
  /*
-diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-index 370f8d3117c2..032ab8bf60a4 100644
---- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-@@ -93,7 +93,7 @@ static void test_vmx_dirty_log(bool enable_ept)
- 	/* Create VM */
- 	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
- 	if (enable_ept)
--		vm_enable_ept(vm);
-+		vm_enable_tdp(vm);
+  * For PTEs without a PRESENT bit (i.e. EPT entries), treat the PTE as present
+diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+index a3a4c9a4cbcb..5a3385d48902 100644
+--- a/tools/testing/selftests/kvm/lib/x86/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+@@ -231,7 +231,8 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
  
- 	vcpu_alloc_vmx(vm, &vmx_pages_gva);
- 	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
+ 	if (!is_present_pte(mmu, pte)) {
+ 		*pte = PTE_PRESENT_MASK(mmu) | PTE_READABLE_MASK(mmu) |
+-		       PTE_WRITABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu);
++		       PTE_WRITABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu) |
++		       PTE_ALWAYS_SET_MASK(mmu);
+ 		if (current_level == target_level)
+ 			*pte |= PTE_HUGE_MASK(mmu) | (paddr & PHYSICAL_PAGE_MASK);
+ 		else
+@@ -299,7 +300,7 @@ void __virt_pg_map(struct kvm_vm *vm, struct kvm_mmu *mmu, uint64_t vaddr,
+ 		    "PTE already present for 4k page at vaddr: 0x%lx", vaddr);
+ 	*pte = PTE_PRESENT_MASK(mmu) | PTE_READABLE_MASK(mmu) |
+ 	       PTE_WRITABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu) |
+-	       (paddr & PHYSICAL_PAGE_MASK);
++	       PTE_ALWAYS_SET_MASK(mmu) | (paddr & PHYSICAL_PAGE_MASK);
  
- 	test_vmx_dirty_log(/*enable_ept=*/false);
+ 	/*
+ 	 * Neither SEV nor TDX supports shared page tables, so only the final
+diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
+index 8e4795225595..18e9e9089643 100644
+--- a/tools/testing/selftests/kvm/lib/x86/svm.c
++++ b/tools/testing/selftests/kvm/lib/x86/svm.c
+@@ -72,6 +72,9 @@ void vm_enable_npt(struct kvm_vm *vm)
+ 	pte_masks = vm->mmu.arch.pte_masks;
+ 	pte_masks.c = 0;
  
--	if (kvm_cpu_has_ept())
-+	if (kvm_cpu_has_tdp())
- 		test_vmx_dirty_log(/*enable_ept=*/true);
++	/* NPT walks are treated as user accesses, so set the 'user' bit. */
++	pte_masks.always_set = pte_masks.user;
++
+ 	tdp_mmu_init(vm, vm->mmu.pgtable_levels, &pte_masks);
+ }
  
- 	return 0;
 -- 
 2.52.0.351.gbe84eed79e-goog
 
