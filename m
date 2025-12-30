@@ -1,266 +1,212 @@
-Return-Path: <kvm+bounces-66855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98423CEAA3F
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:00:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C8CCEAA54
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8A5830245F8
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 20:59:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2350630221AE
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 21:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228452FBE00;
-	Tue, 30 Dec 2025 20:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B2E263C7F;
+	Tue, 30 Dec 2025 21:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="McvBej4V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="StYbdgis"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B331F5847
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 20:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E4F1DE8AD
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 21:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767128393; cv=none; b=O0VjHfd4ljSgP97qiUnNyJAiP6fj+FJZCNm6h++CYuSmeOV9Hpd46V1B0yak4Qn29UJuomLr/yckJQwMHW4kV3Jvfid1n15mgXI5IStm48nylfk234s4HrRJMr1Nq2u89oYqh/aRXe3FEBBpO9Eke/8mKqgQXvKILNPFSV0EjlQ=
+	t=1767128628; cv=none; b=ikpkzzFSNOrR/b9fRZ3E8u0CeVXUGdTlHVjqXRyfvIjqkZYdli58PYSnpVawvwXWwuCcHhIZ96RtDkOcY4lXv1gZVejruCZ9g4fzIwnBRyVJRlEP3tD08XHh4wJC2WoaR8p3R1Pzi0mE7Lw5IEa4uoycgmG/QUWyZSJtnog78jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767128393; c=relaxed/simple;
-	bh=Yf8c47fOuuNkzfnpHdoKVTxRaTYauBW8yFATb/V1hEw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sQ2RR7KoIipyNgrw7Olycyth/D9vdUIQ1RhfF2zo2BfCPdF3FANNhcsLIiRNOWKOkEpODKvcOOMCOBM1hfoR9rqRX/pyj9MOLnNHN6OFSNf4pvXFB360VaxKQimY0nq+4IZsiTDB/GhwrxM5yXqJhSW9HLiodoSmFbTPXAPIBLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=McvBej4V; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1767128628; c=relaxed/simple;
+	bh=4+7jjQn6JzQNnlhRmzZZE4sdlO+Oh+y4wNWPEles7Qw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hnxSbaKIyRCZ4tX3+1SH7f8UvRA/pbeTk8wzUBOVmfe5NBBliivXGsGfzNagaGxFLkpSXfaWVxSB/1dDymHE/3wJdm3xI7zRS0vF+94fjenH890jqYbebZ+4W++DxGaPIRG3uJNPR4HS8g83auSSJ85J5HsxcH4lHE+AlevCj3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=StYbdgis; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7a9fb6fcc78so8384795b3a.3
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 12:59:51 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c66cb671fso14302285a91.3
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 13:03:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767128391; x=1767733191; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5nk5TvmPe83Os2b9bwchwqySErdfgrBx32d2v4ifhjQ=;
-        b=McvBej4VUUB9Yb8J/modRXXzWV8LmbcxQSKiQuodrDUnkfifP/LgLthbW7Dv06Ciji
-         7reSgGEshmmQ0SP+0DBgOd9bhppRe8Y0xwEAiYf59l6di9asiZk2ctMScohyKNivL+ZH
-         nt8o7MhgjFx4KUSgRvy8UWVAvJ3f5KvVvrHYeV+HMKnDFuvhHy04v2azdLPzRWzZy5UV
-         w8uFNe5SDagiweQcax4EBdl33jXgrX6DopMy1fO3c7SAmoE7wsfV1nDH03qvCtYxmHEX
-         07MEUlnY1eg02vaycZjsMcFxkd8Dol1+TgpR9vONNvVU9ILQbJ0qyFQFDeGkEPGhPRqI
-         hNzQ==
+        d=google.com; s=20230601; t=1767128626; x=1767733426; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ym4S0QyvPMG0XiW+HIJvIT/hvfPyeKcaVKLj0gbxhNQ=;
+        b=StYbdgis5smx/HqLl59qmx8b9yVJu44NjPdSjste1uFJVyV/+QgME4PNkNCgr5ezli
+         IOBdLQ7WCyCkBLNQcvtxkdtzN/MrEcznka2rVCptdi9/YXdIdMifEfNwn7cWgbPynzW3
+         8GFUB2jQMDHtSfQ3PbunMpcrvgGJw5dVrsXfrg66GNF3XRiK4Cb0Za6ckm+C4sBZC6rw
+         SINGKeguqJCl/kwlsW2ruFCO9MsqMQraLTCvw8yQgm47erE3VJhVZawKICme7BNyGVQF
+         z9BpevMyi6abfxM+7XxYMceG4RNIi7LxaW2XbqDfU+4qASllmbvjD8n22UHwHjgfEywL
+         a9pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767128391; x=1767733191;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5nk5TvmPe83Os2b9bwchwqySErdfgrBx32d2v4ifhjQ=;
-        b=H7o9qf5vQJH123f1VCr7aPhJyYKneq64+v5Mwaf3w3NLwmEJnjf+DzpOtmcfw8NUif
-         5Ds7AGvrdJnolhHirmwRswacRMWrusgFvAXRbDvXPZpampe9/hrNbik851XV0mcPmLYI
-         ilErmxOki9+MIBm0vCVW7rUyl5rm71Eo6Yi1QacXFhiVZjZagd18M1OPWosHu98/wT9C
-         Pvby/D3HsEA3d63bOSSpy94MAOtagyvIJYacq+irebAvi3s7VBQgwZcj8w19mRage8VD
-         g98G0eexgOVsyJm7dut5RsoJqh/nrYmcKHejWP9xH5r57BQGucocyO7DY6DoePhft3F6
-         zacg==
-X-Gm-Message-State: AOJu0YzS0zzE9Fil5xk7XgdgVmKH1ll/GaZRZMDA8Ru+X5a6TnOiCNgF
-	pKWQ5e9AndQyEjj9u1kSgSigKIQJEMPYyQtcO5G0dhT5SFmuadEZb3xlYtIz4hUjj16o6lOIK9x
-	HtZK6fg==
-X-Google-Smtp-Source: AGHT+IGAuzn+m4gMdXThPs7O1JzbOAo+Q8is8e2w2bdDiH2qejYHd3LZNgFF858yE21dPAksD4Kjte1A2Ck=
-X-Received: from pfbfb38.prod.google.com ([2002:a05:6a00:2da6:b0:7c2:629c:5908])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:9a85:0:b0:7f7:398c:a855
- with SMTP id d2e1a72fcca58-7ff65f789e1mr28943109b3a.39.1767128390969; Tue, 30
- Dec 2025 12:59:50 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 12:59:48 -0800
+        d=1e100.net; s=20230601; t=1767128626; x=1767733426;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ym4S0QyvPMG0XiW+HIJvIT/hvfPyeKcaVKLj0gbxhNQ=;
+        b=CPB3rgbvbfOw/snHnZBQvaOF1NJSv+e2bUGeimm/Ay8xeOcsg+PuVErRL7HKJU8jL6
+         E+qdSTgIb+WyC/649ZO0kzo+ZXtVtXBCmsNwBD8hea6qtclhuERLJTSzVL3vHaautIax
+         4/5elxAvg5liLr1YY10IQgyAetw+6Xhls12wXSRb0PxTlGYFvBANyetMMMNA+/Nqw15b
+         cAnLoQKqFs2CxAL/wPDFEx3jYEQmPK8s07tjr3+LFO9OJOWfc2J4zJzlm3yKnltqAyCQ
+         QRJ9axEbm7gV7ZgqanpV4qma+dW4vMoAsl7pwQwVZaiEvr+OOEKc2irwyQWlFThBqo72
+         OCSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHqeE0/82F4z9dNGBa3VDSd+cN7Nh8B8d3JZXxZwG+uQzLmQyML3h1EHaR+WlAuTfp/7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj858+1wtEvnBIFyw18IwpTgK8tLdU5KvlPfKT8vv+10ni6RC/
+	xGphS4xeO17N9NH1wftkJ5NhlYEOva4agSUT4kFPnjk9cHHcEm/zgXSKfA1siD+zN3o9mxR00Ox
+	v6ZomSg==
+X-Google-Smtp-Source: AGHT+IFLYyERmex9TveHvRNqbQTL0j6gSDW/CkDKRhvyrotz4Q+v2kV0VwCqI9KSie6bNkqYczyCbX9S7UY=
+X-Received: from pjbbj19.prod.google.com ([2002:a17:90b:893:b0:34c:a40f:705a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d86:b0:366:58cc:b74b
+ with SMTP id adf61e73a8af0-376a7aed58cmr35177912637.21.1767128625750; Tue, 30
+ Dec 2025 13:03:45 -0800 (PST)
+Date: Tue, 30 Dec 2025 13:03:44 -0800
+In-Reply-To: <aUz2J/cK2PN/n0of@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230205948.4094097-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Return "unsupported" instead of "invalid" on access
- to unsupported PV MSR
+References: <20251205231913.441872-1-seanjc@google.com> <20251205231913.441872-7-seanjc@google.com>
+ <aUz2J/cK2PN/n0of@intel.com>
+Message-ID: <aVQ-MNmUa1fb83zH@google.com>
+Subject: Re: [PATCH v3 06/10] KVM: nVMX: Switch to vmcs01 to update SVI
+ on-demand if L2 is active
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Dongli Zhang <dongli.zhang@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Return KVM_MSR_RET_UNSUPPORTED instead of '1' (which for all intents and
-purposes means "invalid") when rejecting accesses to KVM PV MSRs to adhere
-to KVM's ABI of allowing host reads and writes of '0' to MSRs that are
-advertised to userspace via KVM_GET_MSR_INDEX_LIST, even if the vCPU model
-doesn't support the MSR.
+On Thu, Dec 25, 2025, Chao Gao wrote:
+> On Fri, Dec 05, 2025 at 03:19:09PM -0800, Sean Christopherson wrote:
+> >@@ -6963,21 +6963,16 @@ void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
+> > 	u16 status;
+> > 	u8 old;
+> > 
+> >-	/*
+> >-	 * If L2 is active, defer the SVI update until vmcs01 is loaded, as SVI
+> >-	 * is only relevant for if and only if Virtual Interrupt Delivery is
+> >-	 * enabled in vmcs12, and if VID is enabled then L2 EOIs affect L2's
+> >-	 * vAPIC, not L1's vAPIC.  KVM must update vmcs01 on the next nested
+> >-	 * VM-Exit, otherwise L1 with run with a stale SVI.
+> >-	 */
+> >-	if (is_guest_mode(vcpu)) {
+> >-		to_vmx(vcpu)->nested.update_vmcs01_hwapic_isr = true;
+> >-		return;
+> >-	}
+> >-
+> > 	if (max_isr == -1)
+> > 		max_isr = 0;
+> > 
+> >+	/*
+> >+	 * Always update SVI in vmcs01, as SVI is only relevant for L2 if and
+> >+	 * only if Virtual Interrupt Delivery is enabled in vmcs12, and if VID
+> >+	 * is enabled then L2 EOIs affect L2's vAPIC, not L1's vAPIC.
+> >+	 */
+> >+	guard(vmx_vmcs01)(vcpu);
+> 
+> KVM calls this function when virtualizing EOI for L2, and in a previous
+> discussion, you mentioned that the overhead of switching to VMCS01 is
+> "non-trivial and unnecessary" (see [1]).
+> 
+> My testing shows that guard(vmx_vmcs01) takes about 140-250 cycles. I think
+> this overhead is acceptable for nested scenarios, since it only affects
+> EOI-induced VM-exits in specific/suboptimal configurations.
+> 
+> But I'm wondering whether KVM should update SVI on every VM-entry instead of
+> doing it on-demand (i.e., when vISR gets changed). We've encountered two
+> SVI-related bugs [1][2] that were difficult to debug. Preventing these issues
+> entirely seems worthwhile, and the overhead of always updating SVI during
+> VM-entry should be minimal since KVM already updates RVI (RVI and SVI are in
+> the the same VMCS field) in vmx_sync_irr_to_pir() when APICv is enabled.
 
-E.g. running a QEMU VM with
+Hmm.  At first glance, I _really_ like this idea, but I'm leaning fairly strongly
+towards keeping .hwapic_isr_update().
 
-  -cpu host,-kvmclock,kvm-pv-enforce-cpuid
+While small (~28 cycles on EMR), the runtime cost isn't zero, and it affects the
+fastpath.  And number of useful updates is comically small.  E.g. without a nested
+VM, AFAICT they basically never happen post-boot.  Even when running nested VMs,
+the number of useful update when running L1 hovers around ~0.001%.
 
-yields:
+More importantly, KVM will carry most of the complexity related to vISR updates
+regardless of how KVM handles SVI because of the ISR caching for non-APICv
+systems.  So while I acknowledge that we've had some nasty bugs and 100% agree
+that squashing them entirely is _very_ enticing, I think those bugs were due to
+what were effectively two systemic flaws in KVM: (1) not aligning SVI with KVM's
+ISR caching code, and (2) the whole "defer updates to nested VM-Exit" mess.
 
-  qemu: error: failed to set MSR 0x12 to 0x0
-  qemu: target/i386/kvm/kvm.c:3301: kvm_buf_set_msrs:
-        Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+At the end of this series, both (1) and (2) are "solved".  Huh.  And now that I
+look at (1) again, the last patch is wrong (benignly wrong, but still wrong).
+The changelog says this:
 
-Fixes: 66570e966dd9 ("kvm: x86: only provide PV features if enabled in guest's CPUID")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+  First, it adds a call during kvm_lapic_reset(), but that's a glorified nop as
+  the ISR has already been zeroed.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ff8812f3a129..dd0b5be1514d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4096,47 +4096,47 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_KVM_WALL_CLOCK_NEW:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		vcpu->kvm->arch.wall_clock = data;
- 		kvm_write_wall_clock(vcpu->kvm, data, 0);
- 		break;
- 	case MSR_KVM_WALL_CLOCK:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		vcpu->kvm->arch.wall_clock = data;
- 		kvm_write_wall_clock(vcpu->kvm, data, 0);
- 		break;
- 	case MSR_KVM_SYSTEM_TIME_NEW:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
- 		break;
- 	case MSR_KVM_SYSTEM_TIME:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		kvm_write_system_time(vcpu, data, true,  msr_info->host_initiated);
- 		break;
- 	case MSR_KVM_ASYNC_PF_EN:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		if (kvm_pv_enable_async_pf(vcpu, data))
- 			return 1;
- 		break;
- 	case MSR_KVM_ASYNC_PF_INT:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		if (kvm_pv_enable_async_pf_int(vcpu, data))
- 			return 1;
- 		break;
- 	case MSR_KVM_ASYNC_PF_ACK:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 		if (data & 0x1) {
- 			/*
- 			 * Pairs with the smp_mb__after_atomic() in
-@@ -4149,7 +4149,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_KVM_STEAL_TIME:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		if (unlikely(!sched_info_on()))
- 			return 1;
-@@ -4167,7 +4167,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_KVM_PV_EOI_EN:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		if (kvm_lapic_set_pv_eoi(vcpu, data, sizeof(u8)))
- 			return 1;
-@@ -4175,7 +4175,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 	case MSR_KVM_POLL_CONTROL:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		/* only enable bit supported */
- 		if (data & (-1ULL << 1))
-@@ -4476,61 +4476,61 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_KVM_WALL_CLOCK:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->kvm->arch.wall_clock;
- 		break;
- 	case MSR_KVM_WALL_CLOCK_NEW:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->kvm->arch.wall_clock;
- 		break;
- 	case MSR_KVM_SYSTEM_TIME:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.time;
- 		break;
- 	case MSR_KVM_SYSTEM_TIME_NEW:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.time;
- 		break;
- 	case MSR_KVM_ASYNC_PF_EN:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.apf.msr_en_val;
- 		break;
- 	case MSR_KVM_ASYNC_PF_INT:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.apf.msr_int_val;
- 		break;
- 	case MSR_KVM_ASYNC_PF_ACK:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = 0;
- 		break;
- 	case MSR_KVM_STEAL_TIME:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.st.msr_val;
- 		break;
- 	case MSR_KVM_PV_EOI_EN:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.pv_eoi.msr_val;
- 		break;
- 	case MSR_KVM_POLL_CONTROL:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
--			return 1;
-+			return KVM_MSR_RET_UNSUPPORTED;
- 
- 		msr_info->data = vcpu->arch.msr_kvm_poll_control;
- 		break;
+but that's simply not true.  There's already a call in kvm_lapic_reset().  So
+that patch can be amended with:
 
-base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
--- 
-2.52.0.351.gbe84eed79e-goog
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 7be4d759884c..55a7a2be3a2e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2907,10 +2907,8 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 
+        vcpu->arch.pv_eoi.msr_val = 0;
+        apic_update_ppr(apic);
+-       if (apic->apicv_active) {
++       if (apic->apicv_active)
+                kvm_x86_call(apicv_post_state_restore)(vcpu);
+-               kvm_x86_call(hwapic_isr_update)(vcpu, -1);
+-       }
+ 
+        vcpu->arch.apic_arb_prio = 0;
+        vcpu->arch.apic_attention = 0;
 
+
+At which point updates to highest_isr_cache and .hwapic_isr_update() are fully
+symmetrical (ignoring that KVM simply invalidates highest_isr_cache instead of
+scanning the vISR on EOI and APICv changes).
+
+So yeah, the more I look at all of this, the more I'm in favor of keeping
+.hwapic_isr_update(), e.g. if only to let it serve as a canary for finding issues
+related to highest_isr_cache and/or isr_count.
+
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ef8d29c677b9..e7883bf7665f 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6957,45 +6957,20 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
+> 	read_unlock(&vcpu->kvm->mmu_lock);
+>  }
+>  
+> -void vmx_hwapic_isr_update(struct kvm_vcpu *vcpu, int max_isr)
+> +static void vmx_set_rvi_svi(int rvi, int svi)
+
+If this ever goes anywhere, my vote would be to call this vmx_sync_guest_intr_status(),
+and pass in only @rvi, e.g. 
+
+  static void vmx_sync_guest_intr_status(struct kvm_vcpu *vcpu, int rvi)
+  {
+	int svi = kvm_lapic_find_highest_isr(vcpu);
+	u16 status, new;
+
+	...
+  }
+
+> 	status = vmcs_read16(GUEST_INTR_STATUS);
+> +	new = (rvi & 0xff) | ((u8)svi << 8);
+
+I think this is technically undefined behavior?  Due to a shift larger than type
+(casting to an 8-bit value and then shifting by 8).  svi[31:8] should always be
+'0', but to be paranoid we could do:
+
+	new = (rvi & 0xff) | ((svi & 0xff) << 8);
+
+> +	if (new != status)
+> +		vmcs_write16(GUEST_INTR_STATUS, new);
+>  }
 
