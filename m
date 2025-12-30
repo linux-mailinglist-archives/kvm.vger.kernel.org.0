@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-66875-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66876-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70ADFCEAD08
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:02:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9470CEAD0E
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DBE6530081A7
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:02:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7CBC230146F8
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100D719E819;
-	Tue, 30 Dec 2025 23:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95AD62E5D32;
+	Tue, 30 Dec 2025 23:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C66zMUm+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jCtDd5bb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289D3221FCF
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E322E7F1D
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767135722; cv=none; b=GdNyzhujvAVhaPAJPtIiD7+LXVEJbzc5F77apdgfMlJDYOd0EyzrcqQaL/KKxnUnKRe/6nSiVF9U2t148G5fIDdhqXemEM8ma59vUBPXZ4iSgCT+x2pcqHFUbaaer35q+vzyRuk8M/H9GuX8rGBZwYHGY0+hsKYsoAsvVtAg3qM=
+	t=1767135724; cv=none; b=pa6XvzeR+PRZkvAK4yBq5xZ3RT36/xuMLMNcjssJH7r2i8zFixsBEsl+cors1htBkHlciq0voEXl0qOCHQAombhipqzFV5apREPNIvizwuZK4ffYFtBNfR98mdDXIF5BOHQxqqmyzk94P7wry7c7CxFDsaVnWmVTVEudfusrBv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767135722; c=relaxed/simple;
-	bh=gzGPTMBPkQtGA7aekWTJchDP0r6Rf1tv37EAxV+/uf0=;
+	s=arc-20240116; t=1767135724; c=relaxed/simple;
+	bh=NTL8KGsm6USzTzkvmwpcMZD2nPHbvkmlY/rR1jDM3PA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FNLT/JaXrdsie13ekpbY0CJa1r4SEIkDc5HXOSG8/NsEY/OElmrXOQVXHwjwYtEVlf5e2PuxTc/AVcg/AX3boJ4NTgqDCmf+IaKIo2sNsp1TqQ0DWE7Bqp8MMFZRkTZAEen2VGxPK91UkujQnBbeG97G4yQWsBsAoYC3HUbSkSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C66zMUm+; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=jv+ZtBDmuRWQWuoDD9fc2sgh6c1tdKcBD0qZlGGcJKFZXk36vvrp5cSo1Hky6iJd7k/QiRDD5zRqPb0nMdIS93kWirmKXI27pRO8mgGfOP2spqLJRtrDNoqBg7B3kMPtd+PGS35jex4Tvc69Ie6+7x2Pk8Qr+/OkcBwf0nCUMmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jCtDd5bb; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34aa1d06456so23431307a91.0
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:01:59 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c64cd48a8so22827158a91.0
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767135719; x=1767740519; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767135721; x=1767740521; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=kFEesFGPsutGHqF0001WthlsbSNNmBrKZgvGONrq/UE=;
-        b=C66zMUm+m45C1Yfnisi0/OlzQr1RuAzz45D6IWDHIZJLUM6ZDjvvONA4fZjTm+pfB9
-         hL5L7QuJxbLejhQGr5oMAlVcMPwSDC/pQ2K+QOSBmVkk3geKsU6F2qUAgZluLSIKsa0A
-         E0a0X+JN5Y2IP0geYYv2/g1nGoDsa2G8jV9vRbvwwW+fz7lKxUbu1p8UkNEqy3WlwTeP
-         tfgv4QSEeuLd4KGUfNucjvilN1NDehbp1g3Y5A7gq1R/Fkda0wdYvwMjsxDZI2yuQs2u
-         MUfrgHO96PvVBYQNeWvgeDqj8NK+QtsgLuilh8y/Z2gK9Uw3fSzUo+Xf+a+coGr0OrRt
-         1+tw==
+        bh=snslv60TkZffEAQE2fKI/7w9i9KGKI8ATFVeEcgF+Qk=;
+        b=jCtDd5bbIb/tv7YqEYBezTqu/1qenXfDKzunLM5fXgpJWGQHsAmtf6yaK5jMGtdah8
+         dAgOesSk3RqGLPHh4/wUdlPY7+ofxZN1UCwvxzJQaBScdwdgd5eEIlwaa5qmtXSbguEC
+         UgNYFpgLptqLjhjubwVu+rX4MxaPGcANWiUuFbB+KpzRE7hyhC383+Fqh+tGWOX5MPu8
+         MAZJd24BylJTzFdNA+UK5H/xG3AyMT3tUwY8nUL1KDQhtQsIK4eTR31nDbLDVZ5x9cBm
+         VrRBwh6hU0lJEabwEWc3VFQjQOAlMY5WgTBEfzYvryKrsn2trU1X4g9WS7pMHod2hjvY
+         uRmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767135719; x=1767740519;
+        d=1e100.net; s=20230601; t=1767135721; x=1767740521;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kFEesFGPsutGHqF0001WthlsbSNNmBrKZgvGONrq/UE=;
-        b=RT09pCC0b1U2n0Xxo71MUWt8TNyVqx3pNIhKM/o+pObJLWXVhqvzhWRT6E6tM24bB5
-         //KnMzePkWfZecQnnAhcEZ2dnBOQ+Nz0g5WAEW6cSyAwxLKK6ZswZg0YJy2MXTjPiTwT
-         93WLrG8Slmxn0GzxZcoliIcC84x5wBSOe3YVnTlSvwCT+iDnyvVZRZz3YtPnPLI0rr6q
-         /h42MVtx9hV6kwy6FmG9TrBof0PHHPkIR1bdNpr1RkTv2HI+ScGud0fWhI3N+P58SEK+
-         05MoZ3ki5MAR3/0/MrDEVzlF/TD7SUhmyk+OgGaPoV9r7OcR1tp0fjRf+pun01s+SdV2
-         WnKA==
-X-Gm-Message-State: AOJu0Yza2r5ccf7QjnN5SbzX/mCUjd826h3EN6v0K08XE8VVxLWsYcmf
-	jQEA29kS4bQOU+kzkm9+pC4M0gRooTxvE2Z/squMErttB1nyltS1iHT6zjtvAivgmTtaQBZaO86
-	VVdRBSQ==
-X-Google-Smtp-Source: AGHT+IFMvmVZegtbcaH8ygYeOdZA18LUtrqVKCjaPL92fD8viNNyqFkg9jykfPAXGidnl1kcsTEoQKpdcsc=
-X-Received: from pjbqe11.prod.google.com ([2002:a17:90b:4f8b:b0:34a:9e02:ffa0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a52:b0:340:99fd:9676
- with SMTP id 98e67ed59e1d1-34e9212aaa9mr28973871a91.10.1767135719406; Tue, 30
- Dec 2025 15:01:59 -0800 (PST)
+        bh=snslv60TkZffEAQE2fKI/7w9i9KGKI8ATFVeEcgF+Qk=;
+        b=eLXu9jYaFzYxAm8yakXk/rfb0BQIhvneXZXuefHAKCf6F9f8K1DpYotVwcMQJdlFV0
+         z2yze48wfY61tsprm5MhKCU2xT1uhgHknh3gr0sDzkloZ77cK3LlDBE9JmblOtUGZ35y
+         q8nB/OznCvoovKoxDqLOV86ex85tSZaXQpfNP4/7iBc3t4Nif+vZ2oUO0gkjnGzY8Jvo
+         wgbkYFgGwniNsGBS7/Ns2B16wV5Tsl404MDZNzt1baDGYcv9biBm+KuE8HnwSJD11Usw
+         TuQ6JeSW+PUL4HMzJ6DHxF9G1fFHQ9N1K8pebvP+hpMAKmakJYUVLcC7KGUFpyChU4Xi
+         IspA==
+X-Gm-Message-State: AOJu0YyzITrBrnTxS1fPBxeV6eKZQ2ezIHZu/Of8hLK8Dpv0PpjcUrA7
+	+9506ujsvLPqtDlWQsjiCb/DFKcSOSSyvbHEYN/e4D5TM/idO2tIio9fLpYi427JniKAxXM+zdq
+	d09hGDg==
+X-Google-Smtp-Source: AGHT+IElvIFPPzPbx/fWhmlKYhmrHPLLecvBIwXjPK26QLj43KDrpSTQ0SF/ILvphJaY0JI4Mn53QzvVzYY=
+X-Received: from pjoo4.prod.google.com ([2002:a17:90b:5824:b0:34a:a9d5:99d6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e0c:b0:341:8bda:d0ae
+ with SMTP id 98e67ed59e1d1-34e921b7334mr26690257a91.20.1767135721380; Tue, 30
+ Dec 2025 15:02:01 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 15:01:33 -0800
+Date: Tue, 30 Dec 2025 15:01:34 -0800
 In-Reply-To: <20251230230150.4150236-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,8 +73,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251230230150.4150236-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230230150.4150236-5-seanjc@google.com>
-Subject: [PATCH v4 04/21] KVM: selftests: Kill eptPageTablePointer
+Message-ID: <20251230230150.4150236-6-seanjc@google.com>
+Subject: [PATCH v4 05/21] KVM: selftests: Stop setting A/D bits when creating
+ EPT PTEs
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -91,84 +92,83 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 
-Replace the struct overlay with explicit bitmasks, which is clearer and
-less error-prone. See commit f18b4aebe107 ("kvm: selftests: do not use
-bitfields larger than 32-bits for PTEs") for an example of why bitfields
-are not preferable.
+Stop setting Accessed/Dirty bits when creating EPT entries for L2 so that
+the stage-1 and stage-2 (a.k.a. TDP) page table APIs can use common code
+without bleeding the EPT hack into the common APIs.
 
-Remove the unused PAGE_SHIFT_4K definition while at it.
+While commit 094444204570 ("selftests: kvm: add test for dirty logging
+inside nested guests") is _very_ light on details, the most likely
+explanation is that vmx_dirty_log_test was attempting to avoid taking an
+EPT Violation on the first _write_ from L2.
 
-No functional change intended.
+  static void l2_guest_code(u64 *a, u64 *b)
+  {
+	READ_ONCE(*a);
+	WRITE_ONCE(*a, 1);   <===
+	GUEST_SYNC(true);
+
+	...
+  }
+
+When handling read faults in the shadow MMU, KVM opportunistically creates
+a writable SPTE if the mapping can be writable *and* the gPTE is dirty (or
+doesn't support the Dirty bit), i.e. if KVM doesn't need to intercept
+writes in order to emulate Dirty-bit updates.  By setting A/D bits in the
+test's EPT entries, the above READ+WRITE will fault only on the read, and
+in theory expose the bug fixed by KVM commit 1f4e5fc83a42 ("KVM: x86: fix
+nested guest live migration with PML").  If the Dirty bit is NOT set, the
+test will get a false pass due; though again, in theory.
+
+However, the test is flawed (and always was, at least in the versions
+posted publicly), as KVM (correctly) marks the corresponding L1 GFN as
+dirty (in the dirty bitmap) when creating the writable SPTE.  I.e. without
+a check on the dirty bitmap after the READ_ONCE(), the check after the
+first WRITE_ONCE() will get a false pass due to the dirty bitmap/log having
+been updated by the read fault, not by PML.
+
+Furthermore, the subsequent behavior in the test's l2_guest_code()
+effectively hides the flawed test behavior, as the straight writes to a
+new L2 GPA fault also trigger the KVM bug, and so the test will still
+detect the failure due to lack of isolation between the two testcases
+(Read=>Write vs. Write=>Write).
+
+	WRITE_ONCE(*b, 1);
+	GUEST_SYNC(true);
+	WRITE_ONCE(*b, 1);
+	GUEST_SYNC(true);
+	GUEST_SYNC(false);
+
+Punt on fixing vmx_dirty_log_test for the moment as it will be easier to
+properly fix the test once the TDP code uses the common MMU APIs, at which
+point it will be trivially easy for the test to retrieve the EPT PTE and
+set the Dirty bit as needed.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+[sean: rewrite changelog to explain the situation]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86/vmx.c | 35 +++++++++++------------
- 1 file changed, 16 insertions(+), 19 deletions(-)
+ tools/testing/selftests/kvm/lib/x86/vmx.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-index 1954ccdfc353..85043bb1ec4d 100644
+index 85043bb1ec4d..a3e2eae981da 100644
 --- a/tools/testing/selftests/kvm/lib/x86/vmx.c
 +++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-@@ -10,10 +10,16 @@
- #include "processor.h"
- #include "vmx.h"
+@@ -432,14 +432,6 @@ void __tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
  
--#define PAGE_SHIFT_4K  12
--
- #define KVM_EPT_PAGE_TABLE_MIN_PADDR 0x1c0000
- 
-+#define EPTP_MT_SHIFT		0 /* EPTP memtype bits 2:0 */
-+#define EPTP_PWL_SHIFT		3 /* EPTP page walk length bits 5:3 */
-+#define EPTP_AD_ENABLED_SHIFT	6 /* EPTP AD enabled bit 6 */
-+
-+#define EPTP_WB			(X86_MEMTYPE_WB << EPTP_MT_SHIFT)
-+#define EPTP_PWL_4		(3ULL << EPTP_PWL_SHIFT) /* PWL is (levels - 1) */
-+#define EPTP_AD_ENABLED		(1ULL << EPTP_AD_ENABLED_SHIFT)
-+
- bool enable_evmcs;
- 
- struct hv_enlightened_vmcs *current_evmcs;
-@@ -34,14 +40,6 @@ struct eptPageTableEntry {
- 	uint64_t suppress_ve:1;
- };
- 
--struct eptPageTablePointer {
--	uint64_t memory_type:3;
--	uint64_t page_walk_length:3;
--	uint64_t ad_enabled:1;
--	uint64_t reserved_11_07:5;
--	uint64_t address:40;
--	uint64_t reserved_63_52:12;
--};
- int vcpu_enable_evmcs(struct kvm_vcpu *vcpu)
- {
- 	uint16_t evmcs_ver;
-@@ -196,16 +194,15 @@ static inline void init_vmcs_control_fields(struct vmx_pages *vmx)
- 	vmwrite(PIN_BASED_VM_EXEC_CONTROL, rdmsr(MSR_IA32_VMX_TRUE_PINBASED_CTLS));
- 
- 	if (vmx->eptp_gpa) {
--		uint64_t ept_paddr;
--		struct eptPageTablePointer eptp = {
--			.memory_type = X86_MEMTYPE_WB,
--			.page_walk_length = 3, /* + 1 */
--			.ad_enabled = ept_vpid_cap_supported(VMX_EPT_VPID_CAP_AD_BITS),
--			.address = vmx->eptp_gpa >> PAGE_SHIFT_4K,
--		};
-+		uint64_t eptp = vmx->eptp_gpa | EPTP_WB | EPTP_PWL_4;
- 
--		memcpy(&ept_paddr, &eptp, sizeof(ept_paddr));
--		vmwrite(EPT_POINTER, ept_paddr);
-+		TEST_ASSERT((vmx->eptp_gpa & ~PHYSICAL_PAGE_MASK) == 0,
-+			    "Illegal bits set in vmx->eptp_gpa");
-+
-+		if (ept_vpid_cap_supported(VMX_EPT_VPID_CAP_AD_BITS))
-+			eptp |= EPTP_AD_ENABLED;
-+
-+		vmwrite(EPT_POINTER, eptp);
- 		sec_exec_ctl |= SECONDARY_EXEC_ENABLE_EPT;
+ 		pt = addr_gpa2hva(vm, pte->address * vm->page_size);
  	}
+-
+-	/*
+-	 * For now mark these as accessed and dirty because the only
+-	 * testcase we have needs that.  Can be reconsidered later.
+-	 */
+-	pte->accessed = true;
+-	pte->dirty = true;
+-
+ }
  
+ void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
 -- 
 2.52.0.351.gbe84eed79e-goog
 
