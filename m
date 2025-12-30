@@ -1,135 +1,150 @@
-Return-Path: <kvm+bounces-66869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD22FCEAC09
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:03:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68523CEACF7
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:59:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 961FB302E874
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:02:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 692B8300673F
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A654B2E0418;
-	Tue, 30 Dec 2025 22:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8171299AB4;
+	Tue, 30 Dec 2025 22:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JhWCyteI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CZPpEYXt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDAD2C028F
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 22:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0899248F6F
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 22:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767132147; cv=none; b=dFz0zycLhG350wHLRrbzXmSugsZSvqR0mp7M7TxZZoTBJBU821XBERSjqWjUfnXtUq64u2l6XpbDbLrxUxWLi3nFeJkk1R3cVdzHxpmgUJ/l6fkt8PBKJAupzH5hD7BT54BLmDEUIjQRG7lTdwOH2pUv8OPGNG002gE2YmH3q0g=
+	t=1767135594; cv=none; b=KuZ/Fn1Q4gZig7Rwj8taaTfzG3oAS0ZbmaGdkY9+1eJMWLLaZxu8Wvpbr0OOvaMTWWK5ZKlhBUb729bv9Y1qHlkcHOceLcnPmvtNU04QigvpNPqMlClBCNXfM50o2xYowO9GYO6vguW5oWnISsvX9RbPzGAnG0EgIsWK5QyWf1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767132147; c=relaxed/simple;
-	bh=Ol8Q1P2DspwmDzNsce460hRFuWrj2m2NNQOvDXhcsas=;
+	s=arc-20240116; t=1767135594; c=relaxed/simple;
+	bh=yojfISBOIFSpXcr5+NNlskwwpGIiPkNElaXPFYmcfyY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=i4oQw9yoY5pk0VPOx11BCF9n8K3Ymn/T+ImRZFy5cijtNfS1cG5LN763ojBKmF4sE+4H0sKvliQfzWEc0smnztX6xS3s4MWyM6UMILqimvoRjgNLtAnFyXtjh4QXHLjuF6zTQNtoKq/usXUlE2n+MM9QS7p9NYQaFSGF2VJQzS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JhWCyteI; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Mu49PU12+k+gPooKHGb33gpSoZasdN3lkCO/ll46zK1kLinOwaBp+lU6oLbmY9EqzAPCMX9wwLJmYkFTuXxmx54uJA5GsDz+nmtdTtx5G+htzvRnqrl6Y+3s2yspKA+76pGmbJAlHd4t+Fli6G3zih51KvNdpOAf+is6XIuUR7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CZPpEYXt; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34abec8855aso22077724a91.0
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 14:02:26 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0e9e0fd49so114536235ad.0
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 14:59:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767132145; x=1767736945; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767135592; x=1767740392; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNWfhcrdkoHWZkKVPidQfqfKWfFIUQ2ZGPzX3rKucVM=;
-        b=JhWCyteIIoQ+DfsEJ6vAIGUvQGh67+OJapqgPeHyLzUHHqJr9f1XJaa24GRMA1SUV0
-         U24JBBdbYPQIYadJMlzGv7Odct+162y0cBz3Jy0J1WNPZlrMC3e2sNSKe8QMxh3s1TzE
-         KY9WJi7fW9R6q4nXm2Ezld4Pxk59j19kGuJtFsmup/kTcHYA5r+MYfci2ITMTR0KfDGM
-         oIeHsC9pF4GDvwIVaPNhrikC1hzkiQa6r/0li9EdVBxdT/F7+mNMlwccW9V1VTJ7cRpu
-         wqdtCPQ7yFJh+VSI4me3RQqoj6BJS+zIUrxE0ZE2lKrZl+m/+fzrYPlL01fdh68Q9Uei
-         T0kg==
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fBDadXmXw1V+5U8Oi2GEcCZPNX2euffTMHG2vLf3Jyo=;
+        b=CZPpEYXtsSAbVkqKnkI93Vesh904zYR8pN4Z6Yg3Hz5vj+1j7Ucva+kg803cnpnwIr
+         AiJRoW04GLOZaGIHFFsK1eqSskJlkYR3730eXEYOv/fOUd/nHHpS8Xi2XAgCgs6zlrj0
+         PKt/5iqTVG3HzoBd7ylf4Q6lyuLJwRrNKHovF4VAFUgrBNhi6cKOuxP9zsMv0KBrWC4n
+         PPsjihUzTlBQNrj6iOpMbeG3cRp178f09hAzRpyEaLJ2sqjP3gfmfhGEjy/n3KkWW/dr
+         IJKkO9+WNSk4QmMSjavgqDK1cHbG7Vh6ASIQestF4rGf0euS3DMNqeqjO/7HfE4n1AmF
+         wnZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767132145; x=1767736945;
+        d=1e100.net; s=20230601; t=1767135592; x=1767740392;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jNWfhcrdkoHWZkKVPidQfqfKWfFIUQ2ZGPzX3rKucVM=;
-        b=QbcMYRE4MPXTxSFbox49X4r76VtrmzbMcoukAG9iQN2w/Dr5UMOtpwhZE92PU1c9mb
-         G6DS9mTX0cnCeaTB5ggfwzlw8u3qPkAVZJn6YO0OogN0ovORIvVrJzZSQkJ5tjhcWYf9
-         rD3U1q0rbI7uvPFpWErLHDI9hM6yRDhvzPww1p3pn7WfSh8OOKd/+HhJYTDiEQX1Q6WK
-         /EE9J587adPNG4o2MXRv6zTDFyHUoHXuLO6uxANQeG+WItRx2xKxylf2N4tK2oxabqhB
-         lK4zRdmlH/PCRy/0tR2m9cpULhqZAj0IeO2iRDXjJnjBwLQqrMFAwkemv6VZvdL2bJqw
-         V4Pw==
-X-Gm-Message-State: AOJu0Yw+Ux4KJKh2pdqupp64duUQT0o6M6/MstW9dHr87CMnZpygMb6p
-	4sc4ywjqqxPkbIpwc1SWdC3Dn0e0bLcvYPzbx3i+F1Ce6DcHR1wohhM+QkHaFTEIeze6BvK/hI4
-	PCahAPg==
-X-Google-Smtp-Source: AGHT+IHN1J89n4cMOgQCEej01IxvUanktN/Lpxev8oNAKJoKAIUKOTfCKourZVIb+utPYAPKKtYErWGIBRc=
-X-Received: from pjj16.prod.google.com ([2002:a17:90b:5550:b0:34c:37db:8f1b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1e42:b0:341:6164:c27d
- with SMTP id 98e67ed59e1d1-34e92137f6fmr27146295a91.3.1767132145556; Tue, 30
- Dec 2025 14:02:25 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 14:02:20 -0800
-In-Reply-To: <20251230220220.4122282-1-seanjc@google.com>
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fBDadXmXw1V+5U8Oi2GEcCZPNX2euffTMHG2vLf3Jyo=;
+        b=Zi8WcPGV24nD2rDp7r0TMqMDVq0Hm2DFx5g3Qxh/HXMoG4f/uqk5Jk/yAJxcaQNiPV
+         7i/ySQt7qO88I1ITFmojcjv7DzULf+oop9+x6WF7/ML0EIlJ0YFI9POJfI8jL7CJRqS9
+         6VKYDRpFPWfSTPmRV5KX/t3NPzpIWN48eCqOFSrRdehdwiQhSKaKS2OC1K4qkPoOaMaL
+         qYDuTFNEB66p6RyBAEsb57/3XT9R1hXGdGlqLcZ9SojdR800UTejBatEaED/eI7QQYDM
+         lDx6OaLTXrTbCIzMkh1VXDKQ2JYYdNhQFXRIxxIxiCbnuFaKMJ/2XxYIF/po7ht1j55t
+         mP5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVZoSc+xPfs72SvP1crp2oSRXPWirs4eTTjXMstEXVXe6KkgtcFLyB7nzuEVxZBihmoRdc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytnJ+MbKkLOisrtBV/vWPiFJT3gvyRNp2R+fYsuw/wmf2GFhRO
+	m8k2hnjD0iJYbj1D358rxDg5mnoxjUB5N/6J/0ZJBHgcTXbwELCk6NO675PQduJmvNy+UYaoHNb
+	quQQ0Nw==
+X-Google-Smtp-Source: AGHT+IFeD+h6n1YidrAbsE5HiAota6bVKAwW35UPDKlcY0mTqb6cSWAiLyOFKPv8tt+wNUg2L4+hFSIa5lY=
+X-Received: from pjzz4.prod.google.com ([2002:a17:90b:58e4:b0:34a:b8aa:69d8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d48e:b0:29e:fc06:b8a5
+ with SMTP id d9443c01a7336-2a2cab16368mr405899135ad.18.1767135591960; Tue, 30
+ Dec 2025 14:59:51 -0800 (PST)
+Date: Tue, 30 Dec 2025 14:59:50 -0800
+In-Reply-To: <aUvJWmZP5wLpvhnw@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251230220220.4122282-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230220220.4122282-3-seanjc@google.com>
-Subject: [PATCH v2 2/2] KVM: nVMX: Remove explicit filtering of
- GUEST_INTR_STATUS from shadow VMCS fields
+References: <20251206011054.494190-1-seanjc@google.com> <20251206011054.494190-3-seanjc@google.com>
+ <69352b2239a33_1b2e100d2@dwillia2-mobl4.notmuch> <aTiAKG4TlKcZnJnn@google.com>
+ <6939242dcfff1_20cb5100c3@dwillia2-mobl4.notmuch> <aTmBobJJo_sFbre9@google.com>
+ <aUvJWmZP5wLpvhnw@yilunxu-OptiPlex-7050>
+Message-ID: <aVRZZkAgmdLfudJc@google.com>
+Subject: Re: [PATCH v2 2/7] KVM: x86: Extract VMXON and EFER.SVME enablement
+ to kernel
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li <xin@zytor.com>, 
-	Chao Gao <chao.gao@intel.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: dan.j.williams@intel.com, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
+	Chao Gao <chao.gao@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Drop KVM's filtering of GUEST_INTR_STATUS when generating the shadow VMCS
-bitmap now that KVM drops GUEST_INTR_STATUS from the set of supported
-vmcs12 fields if the field isn't supported by hardware.
+On Wed, Dec 24, 2025, Xu Yilun wrote:
+> On Wed, Dec 10, 2025 at 06:20:17AM -0800, Sean Christopherson wrote:
+> > On Wed, Dec 10, 2025, dan.j.williams@intel.com wrote:
+> > > Sean Christopherson wrote:
+> > > > On Sat, Dec 06, 2025, dan.j.williams@intel.com wrote:
+> > > > I don't think we need anything at this time.  INTEL_TDX_HOST depends on KVM_INTEL,
+> > > > and so without a user that needs VMXON without KVM_INTEL, I think we're good as-is.
+> > > > 
+> > > >  config INTEL_TDX_HOST
+> > > > 	bool "Intel Trust Domain Extensions (TDX) host support"
+> > > > 	depends on CPU_SUP_INTEL
+> > > > 	depends on X86_64
+> > > > 	depends on KVM_INTEL
+> > > 
+> > > ...but INTEL_TDX_HOST, it turns out, does not have any functional
+> > > dependencies on KVM_INTEL. At least, not since I last checked. Yes, it
+> > > would be silly and result in dead code today to do a build with:
+> > > 
+> > > CONFIG_INTEL_TDX_HOST=y
+> > > CONFIG_KVM_INTEL=n
+> > > 
+> > > However, when the TDX Connect support arrives you could have:
+> > > 
+> > > CONFIG_INTEL_TDX_HOST=y
+> > > CONFIG_KVM_INTEL=n
+> > > CONFIG_TDX_HOST_SERVICES=y
+> > > 
+> > > Where "TDX Host Services" is a driver for PCIe Link Encryption and TDX
+> > > Module update. Whether such configuration freedom has any practical
+> > > value is a separate question.
+> > > 
+> > > I am ok if the answer is, "wait until someone shows up who really wants
+> > > PCIe Link Encryption without KVM".
+> > 
+> > Ya, that's my answer.  At the very least, wait until TDX_HOST_SERVICES comes
+> > along.
+> 
+> I've tested the PCIe Link Encryption without KVM, with the kernel
+> config:
+> 
+>   CONFIG_INTEL_TDX_HOST=y
+>   CONFIG_KVM_INTEL=n
+>   CONFIG_TDX_HOST_SERVICES=y
+> 
+> and
+> 
+> --- /dev/null
+> +++ b/drivers/virt/coco/tdx-host/Kconfig
+> @@ -0,0 +1,10 @@
+> +config TDX_HOST_SERVICES
+> +       tristate "TDX Host Services Driver"
+> +       depends on INTEL_TDX_HOST
+> +       default m
+> 
+> Finally I enabled the combination successfully with a patch below, do we
+> need the change when TDX_HOST_SERVICES comes?
 
-Note, there is technically a small functional change here, as the vmcs12
-filtering only requires support for Virtual Interrupt Delivery, whereas
-the shadow VMCS code being removed required "full" APICv support, i.e.
-required Virtual Interrupt Delivery *and* APIC Register Virtualizaton *and*
-Posted Interrupt support.
-
-Opportunistically tweak the comment to more precisely explain why the
-PML and VMX preemption timer fields need to be explicitly checked.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 9d8f84e3f2da..f50d21a6a2d7 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -112,9 +112,10 @@ static void init_vmcs_shadow_fields(void)
- 			  "Update vmcs12_write_any() to drop reserved bits from AR_BYTES");
- 
- 		/*
--		 * PML and the preemption timer can be emulated, but the
--		 * processor cannot vmwrite to fields that don't exist
--		 * on bare metal.
-+		 * KVM emulates PML and the VMX preemption timer irrespective
-+		 * of hardware support, but shadowing their related VMCS fields
-+		 * requires hardware support as the CPU will reject VMWRITEs to
-+		 * fields that don't exist.
- 		 */
- 		switch (field) {
- 		case GUEST_PML_INDEX:
-@@ -125,10 +126,6 @@ static void init_vmcs_shadow_fields(void)
- 			if (!cpu_has_vmx_preemption_timer())
- 				continue;
- 			break;
--		case GUEST_INTR_STATUS:
--			if (!cpu_has_vmx_apicv())
--				continue;
--			break;
- 		default:
- 			break;
- 		}
--- 
-2.52.0.351.gbe84eed79e-goog
-
+Ya, we'll need something along those lines.  What exactly we want the Kconfig
+soup to look like is TBD though, e.g. it may or may not make sense to have a
+common config that says "I want virtualization!"?
 
