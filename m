@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-66854-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8EECEAA38
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 21:56:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98423CEAA3F
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 22:00:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 500943010294
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 20:56:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8A5830245F8
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 20:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF3A2FD1C1;
-	Tue, 30 Dec 2025 20:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228452FBE00;
+	Tue, 30 Dec 2025 20:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aji2ts3G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="McvBej4V"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22262E8DFD
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 20:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B331F5847
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 20:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767128205; cv=none; b=Dsb2+xsGm+RFptKHJNtl+7yq5u7AoQ7xn4XAfr4gzkHBOmvXDYrwwoT3+ujEl5lo4C6w5LrDBO/61jJmoUns/a436ffyXHpZ6AfkCzRPUg3/smcgkSXxBTJ77cdvEH5eqal05Os67ithxGBHF6Ua3bSlY9zi5fhR76lVkzFdDCE=
+	t=1767128393; cv=none; b=O0VjHfd4ljSgP97qiUnNyJAiP6fj+FJZCNm6h++CYuSmeOV9Hpd46V1B0yak4Qn29UJuomLr/yckJQwMHW4kV3Jvfid1n15mgXI5IStm48nylfk234s4HrRJMr1Nq2u89oYqh/aRXe3FEBBpO9Eke/8mKqgQXvKILNPFSV0EjlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767128205; c=relaxed/simple;
-	bh=Zpti2DE8NLjjGFX7QkWgyP3/8trcS9RnFliaTJhMRTY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q/OuCtVkM0DiUv/Ov0iz7aONKUEdhjfFV96EIQ1VEFtnS5iz2By7hTkAayydkMzyY25wZBUAzd6oQnHb76NpyCeW1kCNaOziFFBFtEMmYojzwifXK3PwBFU8Zm2Puw3YVsqPhSxSi8U7owlixp5wpZuHbRw8SHpJ09Rq/w6KEak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aji2ts3G; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1767128393; c=relaxed/simple;
+	bh=Yf8c47fOuuNkzfnpHdoKVTxRaTYauBW8yFATb/V1hEw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sQ2RR7KoIipyNgrw7Olycyth/D9vdUIQ1RhfF2zo2BfCPdF3FANNhcsLIiRNOWKOkEpODKvcOOMCOBM1hfoR9rqRX/pyj9MOLnNHN6OFSNf4pvXFB360VaxKQimY0nq+4IZsiTDB/GhwrxM5yXqJhSW9HLiodoSmFbTPXAPIBLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=McvBej4V; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7c240728e2aso21695362b3a.3
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 12:56:43 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7a9fb6fcc78so8384795b3a.3
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 12:59:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767128203; x=1767733003; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767128391; x=1767733191; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DRabemupLF66hH0SwZ7ZSRwpDtdLTil/3jaPkZaQB7o=;
-        b=aji2ts3GhG7yuHt66nPSk1iY2jORzWlSmHZp3PumsDcBs8BBeOlxVTwRcqXbzM6wBv
-         x5b7hRAE+9DD+D4RGWZDXrPF+iX3rgq2xGy3ZJemCLWhelv1esgvSG9FjY8XPeduUfp4
-         Caf8Z155hoFkgxEm1+f/e6efNKXZS6nJuIT1LD3KVT8GA5QENRupI1oc9bZ++gPvOOxU
-         yaopOAStO+e6UxXa44pPMj7r/AX8ncG7ThoadzBXrct4rN6tLVOeg2qhDtGUOCr47mwQ
-         YZFF8ZB8IVL+S9shaidrEeMkvdPVQ5+zF13XYJ9FNAaLKCgQ8sEVr/y0Rcxz3qXLRZbg
-         Iaiw==
+        bh=5nk5TvmPe83Os2b9bwchwqySErdfgrBx32d2v4ifhjQ=;
+        b=McvBej4VUUB9Yb8J/modRXXzWV8LmbcxQSKiQuodrDUnkfifP/LgLthbW7Dv06Ciji
+         7reSgGEshmmQ0SP+0DBgOd9bhppRe8Y0xwEAiYf59l6di9asiZk2ctMScohyKNivL+ZH
+         nt8o7MhgjFx4KUSgRvy8UWVAvJ3f5KvVvrHYeV+HMKnDFuvhHy04v2azdLPzRWzZy5UV
+         w8uFNe5SDagiweQcax4EBdl33jXgrX6DopMy1fO3c7SAmoE7wsfV1nDH03qvCtYxmHEX
+         07MEUlnY1eg02vaycZjsMcFxkd8Dol1+TgpR9vONNvVU9ILQbJ0qyFQFDeGkEPGhPRqI
+         hNzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767128203; x=1767733003;
+        d=1e100.net; s=20230601; t=1767128391; x=1767733191;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DRabemupLF66hH0SwZ7ZSRwpDtdLTil/3jaPkZaQB7o=;
-        b=vONF7V28bdbzQMCf7F1vXtprhYQzsAPdCLijnblWTODHfQpFOG59//EZk08nfYqfxH
-         Mz2q/v21veouJLW2vrntNw8ke6rBjHOyobohA08F1uUR+X8zPooxaUGx1yR/3MYhHVyN
-         E9Jw+7ZkMqvtxpSh0Fr/Ut4wleocELij5AwRCEvmiBZEg2l4DIEPat3iWoWaaSfu6Oh7
-         qB3cTOMKr97W8D3Ar4cojNWCnMnBHdM80dfVIloonwr/lVSQ9yXn2JP0zRMzdq+qJz5P
-         9WzaQCWmyJCV71CKqi5htM2m0C9MRASXg+cvA5jDTfZidDm5NwK94GYnowDTTOuzAA5v
-         lVWA==
-X-Gm-Message-State: AOJu0YxqUL5ecEm0Mkor+wpHOCa4qJPtoXpVDVoWPq3bkMpLCMIli/xY
-	n9agas2YiVQI5GqEiV5yYpXUgP3A3yDasaPjNuau6W1DR8BInMToUCL0Wk6IaPArjaRE/98eRjg
-	WCJwJAQ==
-X-Google-Smtp-Source: AGHT+IEX1PqvWuWghUFfljNmHndzHQxhOTfzYiMCKX2gYau/+FcPOnzEAXLj2mcgonFc2H2/No2Y4aDmEU8=
-X-Received: from pflb16.prod.google.com ([2002:a05:6a00:a90:b0:7b0:e3d3:f040])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:278e:b0:7f6:fd3b:caa6
- with SMTP id d2e1a72fcca58-7ff648e960dmr27916022b3a.19.1767128203055; Tue, 30
- Dec 2025 12:56:43 -0800 (PST)
+        bh=5nk5TvmPe83Os2b9bwchwqySErdfgrBx32d2v4ifhjQ=;
+        b=H7o9qf5vQJH123f1VCr7aPhJyYKneq64+v5Mwaf3w3NLwmEJnjf+DzpOtmcfw8NUif
+         5Ds7AGvrdJnolhHirmwRswacRMWrusgFvAXRbDvXPZpampe9/hrNbik851XV0mcPmLYI
+         ilErmxOki9+MIBm0vCVW7rUyl5rm71Eo6Yi1QacXFhiVZjZagd18M1OPWosHu98/wT9C
+         Pvby/D3HsEA3d63bOSSpy94MAOtagyvIJYacq+irebAvi3s7VBQgwZcj8w19mRage8VD
+         g98G0eexgOVsyJm7dut5RsoJqh/nrYmcKHejWP9xH5r57BQGucocyO7DY6DoePhft3F6
+         zacg==
+X-Gm-Message-State: AOJu0YzS0zzE9Fil5xk7XgdgVmKH1ll/GaZRZMDA8Ru+X5a6TnOiCNgF
+	pKWQ5e9AndQyEjj9u1kSgSigKIQJEMPYyQtcO5G0dhT5SFmuadEZb3xlYtIz4hUjj16o6lOIK9x
+	HtZK6fg==
+X-Google-Smtp-Source: AGHT+IGAuzn+m4gMdXThPs7O1JzbOAo+Q8is8e2w2bdDiH2qejYHd3LZNgFF858yE21dPAksD4Kjte1A2Ck=
+X-Received: from pfbfb38.prod.google.com ([2002:a05:6a00:2da6:b0:7c2:629c:5908])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:9a85:0:b0:7f7:398c:a855
+ with SMTP id d2e1a72fcca58-7ff65f789e1mr28943109b3a.39.1767128390969; Tue, 30
+ Dec 2025 12:59:50 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 12:56:41 -0800
+Date: Tue, 30 Dec 2025 12:59:48 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,147 +69,195 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230205641.4092235-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Disallow setting CPUID and/or feature MSRs if L2 is active
+Message-ID: <20251230205948.4094097-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Return "unsupported" instead of "invalid" on access
+ to unsupported PV MSR
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>, Kevin Cheng <chengkev@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Extend KVM's restriction on CPUID and feature MSR changes to disallow
-updates while L2 is active in addition to rejecting updates after the vCPU
-has run at least once.  Like post-run vCPU model updates, attempting to
-react to model changes while L2 is active is practically infeasible, e.g.
-KVM would need to do _something_ in response to impossible situations where
-userspace has a removed a feature that was consumed as parted of nested
-VM-Enter.
+Return KVM_MSR_RET_UNSUPPORTED instead of '1' (which for all intents and
+purposes means "invalid") when rejecting accesses to KVM PV MSRs to adhere
+to KVM's ABI of allowing host reads and writes of '0' to MSRs that are
+advertised to userspace via KVM_GET_MSR_INDEX_LIST, even if the vCPU model
+doesn't support the MSR.
 
-In practice, disallowing vCPU model changes while L2 is active is largely
-uninteresting, as the only way for L2 to be active without the vCPU having
-run at least once is if userspace stuffed state via KVM_SET_NESTED_STATE.
-And because KVM_SET_NESTED_STATE can't put the vCPU into L2 without
-userspace first defining the vCPU model, e.g. to enable SVM/VMX, modifying
-the vCPU model while L2 is active would require deliberately setting the
-vCPU model, then loading nested state, and then changing the model.  I.e.
-no sane VMM should run afoul of the new restriction, and any VMM that does
-encounter problems has likely been running a broken setup for a long time.
+E.g. running a QEMU VM with
 
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Kevin Cheng <chengkev@google.com>
+  -cpu host,-kvmclock,kvm-pv-enforce-cpuid
+
+yields:
+
+  qemu: error: failed to set MSR 0x12 to 0x0
+  qemu: target/i386/kvm/kvm.c:3301: kvm_buf_set_msrs:
+        Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+
+Fixes: 66570e966dd9 ("kvm: x86: only provide PV features if enabled in guest's CPUID")
+Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c   | 19 +++++++++++--------
- arch/x86/kvm/mmu/mmu.c |  6 +-----
- arch/x86/kvm/pmu.c     |  2 +-
- arch/x86/kvm/x86.c     | 13 +++++++------
- arch/x86/kvm/x86.h     |  4 ++--
- 5 files changed, 22 insertions(+), 22 deletions(-)
+ arch/x86/kvm/x86.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 88a5426674a1..f37331ad3ad8 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -534,17 +534,20 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
- 	BUILD_BUG_ON(sizeof(vcpu_caps) != sizeof(vcpu->arch.cpu_caps));
- 
- 	/*
--	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
--	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
--	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
--	 * faults due to reusing SPs/SPTEs. In practice no sane VMM mucks with
--	 * the core vCPU model on the fly. It would've been better to forbid any
--	 * KVM_SET_CPUID{,2} calls after KVM_RUN altogether but unfortunately
--	 * some VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
-+	 * KVM does not correctly handle changing guest CPUID after KVM_RUN or
-+	 * while L2 is active, as MAXPHYADDR, GBPAGES support, AMD reserved bit
-+	 * behavior, etc. aren't tracked in kvm_mmu_page_role, and L2 state
-+	 * can't be adjusted (without breaking L2 in some way).  As a result,
-+	 * KVM may reuse SPs/SPTEs and/or run L2 with bad/misconfigured state.
-+	 *
-+	 * In practice, no sane VMM mucks with the core vCPU model on the fly.
-+	 * It would've been better to forbid any KVM_SET_CPUID{,2} calls after
-+	 * KVM_RUN or KVM_SET_NESTED_STATE altogether, but unfortunately some
-+	 * VMMs (e.g. QEMU) reuse vCPU fds for CPU hotplug/unplug and do
- 	 * KVM_SET_CPUID{,2} again. To support this legacy behavior, check
- 	 * whether the supplied CPUID data is equal to what's already set.
- 	 */
--	if (kvm_vcpu_has_run(vcpu)) {
-+	if (!kvm_can_set_cpuid_and_feature_msrs(vcpu)) {
- 		r = kvm_cpuid_check_equal(vcpu, e2, nent);
- 		if (r)
- 			goto err;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 02c450686b4a..f17324546900 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6031,11 +6031,7 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 	vcpu->arch.nested_mmu.cpu_role.ext.valid = 0;
- 	kvm_mmu_reset_context(vcpu);
- 
--	/*
--	 * Changing guest CPUID after KVM_RUN is forbidden, see the comment in
--	 * kvm_arch_vcpu_ioctl().
--	 */
--	KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm);
-+	KVM_BUG_ON(!kvm_can_set_cpuid_and_feature_msrs(vcpu), vcpu->kvm);
- }
- 
- void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 487ad19a236e..ff20b4102173 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -853,7 +853,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
--	if (KVM_BUG_ON(kvm_vcpu_has_run(vcpu), vcpu->kvm))
-+	if (KVM_BUG_ON(!kvm_can_set_cpuid_and_feature_msrs(vcpu), vcpu->kvm))
- 		return;
- 
- 	/*
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ff8812f3a129..211d8c24a4b1 100644
+index ff8812f3a129..dd0b5be1514d 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2314,13 +2314,14 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
- 	u64 val;
+@@ -4096,47 +4096,47 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_KVM_WALL_CLOCK_NEW:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
  
- 	/*
--	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
--	 * not support modifying the guest vCPU model on the fly, e.g. changing
--	 * the nVMX capabilities while L2 is running is nonsensical.  Allow
--	 * writes of the same value, e.g. to allow userspace to blindly stuff
--	 * all MSRs when emulating RESET.
-+	 * Reject writes to immutable feature MSRs if the vCPU model is frozen,
-+	 * as KVM doesn't support modifying the guest vCPU model on the fly,
-+	 * e.g. changing the VMX capabilities MSRs while L2 is active is
-+	 * nonsensical.  Allow writes of the same value, e.g. so that userspace
-+	 * can blindly stuff all MSRs when emulating RESET.
- 	 */
--	if (kvm_vcpu_has_run(vcpu) && kvm_is_immutable_feature_msr(index) &&
-+	if (!kvm_can_set_cpuid_and_feature_msrs(vcpu) &&
-+	    kvm_is_immutable_feature_msr(index) &&
- 	    (do_get_msr(vcpu, index, &val) || *data != val))
- 		return -EINVAL;
+ 		vcpu->kvm->arch.wall_clock = data;
+ 		kvm_write_wall_clock(vcpu->kvm, data, 0);
+ 		break;
+ 	case MSR_KVM_WALL_CLOCK:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
  
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index fdab0ad49098..9084e0dfa15c 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -172,9 +172,9 @@ static inline void kvm_nested_vmexit_handle_ibrs(struct kvm_vcpu *vcpu)
- 		indirect_branch_prediction_barrier();
- }
+ 		vcpu->kvm->arch.wall_clock = data;
+ 		kvm_write_wall_clock(vcpu->kvm, data, 0);
+ 		break;
+ 	case MSR_KVM_SYSTEM_TIME_NEW:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
  
--static inline bool kvm_vcpu_has_run(struct kvm_vcpu *vcpu)
-+static inline bool kvm_can_set_cpuid_and_feature_msrs(struct kvm_vcpu *vcpu)
- {
--	return vcpu->arch.last_vmentry_cpu != -1;
-+	return vcpu->arch.last_vmentry_cpu == -1 && !is_guest_mode(vcpu);
- }
+ 		kvm_write_system_time(vcpu, data, false, msr_info->host_initiated);
+ 		break;
+ 	case MSR_KVM_SYSTEM_TIME:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
  
- static inline void kvm_set_mp_state(struct kvm_vcpu *vcpu, int mp_state)
+ 		kvm_write_system_time(vcpu, data, true,  msr_info->host_initiated);
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_EN:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		if (kvm_pv_enable_async_pf(vcpu, data))
+ 			return 1;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_INT:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		if (kvm_pv_enable_async_pf_int(vcpu, data))
+ 			return 1;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_ACK:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 		if (data & 0x1) {
+ 			/*
+ 			 * Pairs with the smp_mb__after_atomic() in
+@@ -4149,7 +4149,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_KVM_STEAL_TIME:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		if (unlikely(!sched_info_on()))
+ 			return 1;
+@@ -4167,7 +4167,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_KVM_PV_EOI_EN:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		if (kvm_lapic_set_pv_eoi(vcpu, data, sizeof(u8)))
+ 			return 1;
+@@ -4175,7 +4175,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 
+ 	case MSR_KVM_POLL_CONTROL:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		/* only enable bit supported */
+ 		if (data & (-1ULL << 1))
+@@ -4476,61 +4476,61 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_KVM_WALL_CLOCK:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->kvm->arch.wall_clock;
+ 		break;
+ 	case MSR_KVM_WALL_CLOCK_NEW:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->kvm->arch.wall_clock;
+ 		break;
+ 	case MSR_KVM_SYSTEM_TIME:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.time;
+ 		break;
+ 	case MSR_KVM_SYSTEM_TIME_NEW:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.time;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_EN:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.apf.msr_en_val;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_INT:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.apf.msr_int_val;
+ 		break;
+ 	case MSR_KVM_ASYNC_PF_ACK:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_ASYNC_PF_INT))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = 0;
+ 		break;
+ 	case MSR_KVM_STEAL_TIME:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_STEAL_TIME))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.st.msr_val;
+ 		break;
+ 	case MSR_KVM_PV_EOI_EN:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.pv_eoi.msr_val;
+ 		break;
+ 	case MSR_KVM_POLL_CONTROL:
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_POLL_CONTROL))
+-			return 1;
++			return KVM_MSR_RET_UNSUPPORTED;
+ 
+ 		msr_info->data = vcpu->arch.msr_kvm_poll_control;
+ 		break;
 
 base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
 -- 
