@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-66890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3C73CEAD65
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:11:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1939CEAD5F
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:08:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2F50C30094F8
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:11:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8B953076334
+	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03777331208;
-	Tue, 30 Dec 2025 23:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71D1330D32;
+	Tue, 30 Dec 2025 23:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KHJJfccE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IAmq9RMt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3592F25F0
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC7932F76D
+	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767135752; cv=none; b=SYo4AHj41t8KBdKjAxXu6jyUBLKvMySMIEoG1f+N/XU/lhZiKTnRknrwMcvm3lkCkWx4IIMNBtaH8YFw14Gdr7hEPyt6VhQNI7r19GFk6SPKgBTnNSfd1czvDaqGbtmUUguv7JjeB5XbItirY1mGwihFO38P4PhoAKhFf7YOILM=
+	t=1767135753; cv=none; b=B5MKBEV4YeqlDtdV3cFOxdCrBYQsqp07yJMOb/zhACQiJbEu5jP7+UnnOuR6o6TFEvsTMAPvejaMrtgCE9fEgZ6+xJyG5004ZyI13URg/OKM2qeDSRfM73AqQM6v3zU/R4YPzTLrsVvGfty9eG4bY4Uhv/WYhLeBlSRsklLmM4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767135752; c=relaxed/simple;
-	bh=Eq5mGpLfTFizGCRwHdHtCNJ7Yw0gxiv2sS6vsyfOLoI=;
+	s=arc-20240116; t=1767135753; c=relaxed/simple;
+	bh=p2Pgz/yRJSbUlMESZ6664VqIIQNLSRXLMLize367QyE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZhIjpZx1rTzMhQv95xL8R4opb2CodETyeQV5dm3CngcIwAqRP17zWQiZ523WPfjHcrBF6Bz3M73DrDzBH5WEab0Hv8pwC2dz7ENX9Mr8a0SfwdhF2FpzHz64by4gY7Em1RncQQ4Zugic1IAf6xCb2P8vS88Hm0zT6dWU/u9/Z0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KHJJfccE; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=LcK3CzIxOBreBr1Uuk1KYgZCKRpTUW5EivPGuDZg1UWN19w1uSE1jaTATh1JzASPLx3j7/JVDqPjuW5RdekVPI9XbDUPsgqvupkJ9F2xNxElGR/CJmjVaT1mEvIvGMv1kOiAlFOsyY+K+3NIyT411zlVfbJj9Jf3wNrpZEl6uCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IAmq9RMt; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b9c91b814cso23582152b3a.2
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:28 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34cc8bf226cso23074061a91.3
+        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767135747; x=1767740547; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767135749; x=1767740549; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=DkXelmu7bqFxndg8qpo6pKIzfvXDHv9zHII5ienX1m4=;
-        b=KHJJfccEAu9ygfghc1NclStBZFqg2G+X34jOX1BC7x2tVkMyGfJ70S9zZTcMQw8efJ
-         yZw2SWk3JEtm1ah4KcaRwGbHsWS/3nQaZsi/1nnFemLNnXEy43XP6mneOtej3DKMT6UZ
-         TQbTSxwlWePWhHWORKPMxghOiSic6KdOfWg7mj/7TyYwQ8AZ/djoGqPrmtCsb1ZQrA2I
-         XRg0u8mGAqUosc31n0M6crfNVMIfeE9Y6VrHxNbHz8RjjXRXe8v/nl3YWFl7S0BKWpfg
-         52oQ0AdXq4vmiNnWtsKTEs7+/3U1R02X3fdJZqNDE6fWeFU1XLc8RT5wB9E4oAJB/1HO
-         R2qQ==
+        bh=ykxeCu2rd9E7NdPIA3m898BLFxasNeM9KWtJ/FC5NbY=;
+        b=IAmq9RMtPLYgJBWPNQ5CFowVLi7+XjbabhZEpKBDiq98e2oHgxclRfY4Jg/5P/m54B
+         4S33dJtnhUQvoKBCqZFZMsATU7TxAtmxVUVRU65HxoGRrU1RBGkE7/QNCFZcji95JcJZ
+         pPdtkZR31TT16mEKQE1HoHN+og23DwCh9+0Bpon2gFkZgjfhMdroLByb64vXu0KlUeN7
+         Axr0Y1TNkhnF7J6lqdIw/f3Z6GnBWfF0WCjSxQ9ZwHXWaeBdke0TwtnJ0imWoHpawn/d
+         C/izWTTEXs+N9GvIvatLxWLbzHeexXYT7i62Gbn6x9v2q1OYEmXYRfCGikQ/do2imGA5
+         2xRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767135747; x=1767740547;
+        d=1e100.net; s=20230601; t=1767135749; x=1767740549;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DkXelmu7bqFxndg8qpo6pKIzfvXDHv9zHII5ienX1m4=;
-        b=Hswncl+Jaoq+Yp4hTqmjANWxmq5WklOd07m+Oc7Q3bdAbNfs3VGikg9fzfE3RGvxvc
-         lllLqplpcMk2ZtB15HSUQswrqHDrjTgZkN6/Or91c0wn08yS4a7CHdzyFocbRS6tB7PL
-         xSOXKJS1M9KVve3sUgwOPDXWTYADtKxw3TeujZDvgakZuawFJQ91gAZV2Z2neqXhD/7t
-         f0G6yrld6Fc+Vx+xmVOpynyUE7x2ONNeOru/OZLQahAeiXZUZ43LfEKLt/2FcZ2rSwhW
-         boRjZ7MN8091Vs+0LGmHtgT+EoX/cNJJx4+XM4Z/DPei6FCkGXJnphoEc/NTQRyI7JWZ
-         Ntcw==
-X-Gm-Message-State: AOJu0Yyxnhd0ioNS4HIr8VOcTdGWr2zqKeiW6FBDXd7NkW43H+clvdiR
-	112F1mxmDoyuX5o722+uHSGIQ0q/32iAGnbwDl1LfxACeqxeS9CTaYMI59hAtYCtaeskHkNHpyY
-	jl0J6ag==
-X-Google-Smtp-Source: AGHT+IEInX/hcWFTn62wzbw74nK2yGoqn05dsItc6QCyzO/aFUt0jVk0kLNXelUPHMxHCU04rbTUsERgFgA=
-X-Received: from pgav5.prod.google.com ([2002:a05:6a02:2dc5:b0:b55:6eb3:fd4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7346:b0:319:fc6f:8adf
- with SMTP id adf61e73a8af0-376a81e2c20mr34940934637.12.1767135747025; Tue, 30
- Dec 2025 15:02:27 -0800 (PST)
+        bh=ykxeCu2rd9E7NdPIA3m898BLFxasNeM9KWtJ/FC5NbY=;
+        b=f5v1RulCajRRBaTOzbeK+NPaFM0Avzq/J0QWcbmtB+ZpU/s36jyB3CzR/c6UOl0gSE
+         HK9c8MYHRUGNVY8smUV9x9kXyNQvGj0JbVEuAoeQvdTkkZioXVvvogXEYAepd4A+/OOS
+         63mixtwu1CCJ6K+MzPSbUmA5yh/X7r88OgwQ0Nk5uR51bdroVz1yR0IexYZiPVP/5Dd+
+         hOPP6gzzhv3JShaSTWYskS2qUY6Sz9UD/sTldFS/W1iNMQuzyVEm57+jszJ5jyV+oLgD
+         0dvd7ixO8PM4aWFvKBmAvUqAr+bE7rfzHoCmeeasA8ex+NA+xJC5lcqbt2nUXIrVEH/W
+         AhFQ==
+X-Gm-Message-State: AOJu0YyHwXU2uyxxyUgB7OX71fHs6dfP1lb21SA9sZzsfpH+XWruGog7
+	goO9yWH92v0jNqAHPq9beqxA9gqokWMXlUdbYqYi1VTVWPDcBQ9sHYDmM3NGNKJ7corD6yVNfRq
+	sfq8E7g==
+X-Google-Smtp-Source: AGHT+IEpuChkB0izCaZM7wAnBEmg/NFDOHvlk8mvLyNibHqxg0YqGOIPaICPmBipc+pvYA8R48I/lk77pf0=
+X-Received: from pjbqe11.prod.google.com ([2002:a17:90b:4f8b:b0:34a:9e02:ffa0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfc6:b0:340:d1a1:af8e
+ with SMTP id 98e67ed59e1d1-34e921e60d9mr30599932a91.37.1767135748870; Tue, 30
+ Dec 2025 15:02:28 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 15:01:48 -0800
+Date: Tue, 30 Dec 2025 15:01:49 -0800
 In-Reply-To: <20251230230150.4150236-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251230230150.4150236-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230230150.4150236-20-seanjc@google.com>
-Subject: [PATCH v4 19/21] KVM: selftests: Extend memstress to run on nested SVM
+Message-ID: <20251230230150.4150236-21-seanjc@google.com>
+Subject: [PATCH v4 20/21] KVM: selftests: Rename vm_get_page_table_entry() to vm_get_pte()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -89,107 +89,81 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
+Shorten the API to get a PTE as the "PTE" acronym is ubiquitous, and the
+"page table entry" makes it unnecessarily difficult to quickly understand
+what callers are doing.
 
-Add L1 SVM code and generalize the setup code to work for both VMX and
-SVM. This allows running 'dirty_log_perf_test -n' on AMD CPUs.
+No functional change intended.
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/lib/x86/memstress.c | 42 +++++++++++++++----
- 1 file changed, 35 insertions(+), 7 deletions(-)
+ tools/testing/selftests/kvm/include/x86/processor.h           | 2 +-
+ tools/testing/selftests/kvm/lib/x86/processor.c               | 2 +-
+ tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c            | 2 +-
+ .../selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c     | 4 +---
+ 4 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-index 407abfc34909..86f4c5e4c430 100644
---- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-+++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-@@ -13,6 +13,7 @@
- #include "kvm_util.h"
- #include "memstress.h"
- #include "processor.h"
-+#include "svm_util.h"
- #include "vmx.h"
- 
- void memstress_l2_guest_code(uint64_t vcpu_id)
-@@ -29,9 +30,10 @@ __asm__(
- "	ud2;"
- );
- 
--static void memstress_l1_guest_code(struct vmx_pages *vmx, uint64_t vcpu_id)
--{
- #define L2_GUEST_STACK_SIZE 64
-+
-+static void l1_vmx_code(struct vmx_pages *vmx, uint64_t vcpu_id)
-+{
- 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
- 	unsigned long *rsp;
- 
-@@ -45,10 +47,34 @@ static void memstress_l1_guest_code(struct vmx_pages *vmx, uint64_t vcpu_id)
- 	prepare_vmcs(vmx, memstress_l2_guest_entry, rsp);
- 
- 	GUEST_ASSERT(!vmlaunch());
--	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_VMCALL);
-+	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
- 	GUEST_DONE();
+diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+index 7b7d962244d6..ab29b1c7ed2d 100644
+--- a/tools/testing/selftests/kvm/include/x86/processor.h
++++ b/tools/testing/selftests/kvm/include/x86/processor.h
+@@ -1357,7 +1357,7 @@ static inline bool kvm_is_ignore_msrs(void)
+ 	return get_kvm_param_bool("ignore_msrs");
  }
  
-+static void l1_svm_code(struct svm_test_data *svm, uint64_t vcpu_id)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	unsigned long *rsp;
-+
-+
-+	rsp = &l2_guest_stack[L2_GUEST_STACK_SIZE - 1];
-+	*rsp = vcpu_id;
-+	generic_svm_setup(svm, memstress_l2_guest_entry, rsp);
-+
-+	run_guest(svm->vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT_EQ(svm->vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_DONE();
-+}
-+
-+
-+static void memstress_l1_guest_code(void *data, uint64_t vcpu_id)
-+{
-+	if (this_cpu_has(X86_FEATURE_VMX))
-+		l1_vmx_code(data, vcpu_id);
-+	else
-+		l1_svm_code(data, vcpu_id);
-+}
-+
- uint64_t memstress_nested_pages(int nr_vcpus)
- {
- 	/*
-@@ -78,15 +104,17 @@ static void memstress_setup_ept_mappings(struct kvm_vm *vm)
- void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[])
- {
- 	struct kvm_regs regs;
--	vm_vaddr_t vmx_gva;
-+	vm_vaddr_t nested_gva;
- 	int vcpu_id;
+-uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr);
++uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr);
  
--	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
- 	TEST_REQUIRE(kvm_cpu_has_tdp());
- 
- 	vm_enable_tdp(vm);
- 	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
--		vcpu_alloc_vmx(vm, &vmx_gva);
-+		if (kvm_cpu_has(X86_FEATURE_VMX))
-+			vcpu_alloc_vmx(vm, &nested_gva);
-+		else
-+			vcpu_alloc_svm(vm, &nested_gva);
- 
- 		/* The EPTs are shared across vCPUs, setup the mappings once */
- 		if (vcpu_id == 0)
-@@ -99,6 +127,6 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
- 		vcpu_regs_get(vcpus[vcpu_id], &regs);
- 		regs.rip = (unsigned long) memstress_l1_guest_code;
- 		vcpu_regs_set(vcpus[vcpu_id], &regs);
--		vcpu_args_set(vcpus[vcpu_id], 2, vmx_gva, vcpu_id);
-+		vcpu_args_set(vcpus[vcpu_id], 2, nested_gva, vcpu_id);
- 	}
+ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+ 		       uint64_t a3);
+diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+index 5a3385d48902..ab869a98bbdc 100644
+--- a/tools/testing/selftests/kvm/lib/x86/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+@@ -390,7 +390,7 @@ static uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm,
+ 	return virt_get_pte(vm, mmu, pte, vaddr, PG_LEVEL_4K);
  }
+ 
+-uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr)
++uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr)
+ {
+ 	int level = PG_LEVEL_4K;
+ 
+diff --git a/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c
+index a3b7ce155981..c542cc4762b1 100644
+--- a/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c
++++ b/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c
+@@ -619,7 +619,7 @@ int main(int argc, char *argv[])
+ 	 */
+ 	gva = vm_vaddr_unused_gap(vm, NTEST_PAGES * PAGE_SIZE, KVM_UTIL_MIN_VADDR);
+ 	for (i = 0; i < NTEST_PAGES; i++) {
+-		pte = vm_get_page_table_entry(vm, data->test_pages + i * PAGE_SIZE);
++		pte = vm_get_pte(vm, data->test_pages + i * PAGE_SIZE);
+ 		gpa = addr_hva2gpa(vm, pte);
+ 		virt_pg_map(vm, gva + PAGE_SIZE * i, gpa & PAGE_MASK);
+ 		data->test_pages_pte[i] = gva + (gpa & ~PAGE_MASK);
+diff --git a/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+index fabeeaddfb3a..0e8aec568010 100644
+--- a/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
++++ b/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+@@ -47,7 +47,6 @@ int main(int argc, char *argv[])
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+ 	struct ucall uc;
+-	uint64_t *pte;
+ 	uint64_t *hva;
+ 	uint64_t gpa;
+ 	int rc;
+@@ -73,8 +72,7 @@ int main(int argc, char *argv[])
+ 	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
+ 	memset(hva, 0, PAGE_SIZE);
+ 
+-	pte = vm_get_page_table_entry(vm, MEM_REGION_GVA);
+-	*pte |= BIT_ULL(MAXPHYADDR);
++	*vm_get_pte(vm, MEM_REGION_GVA) |= BIT_ULL(MAXPHYADDR);
+ 
+ 	vcpu_run(vcpu);
+ 
 -- 
 2.52.0.351.gbe84eed79e-goog
 
