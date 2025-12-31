@@ -1,105 +1,138 @@
-Return-Path: <kvm+bounces-66899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66900-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC130CEB5AE
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 07:35:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FFC6CEB8D2
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 09:37:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EF6FF3009F1B
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 06:35:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E3FFF3045CDE
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 08:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF813112A5;
-	Wed, 31 Dec 2025 06:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58A5313E02;
+	Wed, 31 Dec 2025 08:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mFy9ADcX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C67524728E;
-	Wed, 31 Dec 2025 06:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF4B18CBE1;
+	Wed, 31 Dec 2025 08:37:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767162928; cv=none; b=WAMTe/CLCyZru7yUIwePYiXpaFUJOJjuYDqq5dAGKf26ueQ2Lbx/GzTBsG0ZN+uTOm4wl03nb6Kh+telSbF72lynIVJss7dUWAjvaG2KuhlFF2UoPtuxP7zBNNhadnYUkzkLfDXBdq3y4e4ZL0JS8UVahf/dP0TV7DAz/MbdhT0=
+	t=1767170222; cv=none; b=iPp9ziuAWgoFo/gTIbW6lZ2Kk/YujmNfi2JUSR5NepegsCORz99k9YIRYMs0eakORXN6j5Tnj4rkGS6ZXbZoJN7I0qYD0dHMGUkNUL/z8NrTNtyZPiO+DJrMyp9Qf788LFg/IOzpLujEIRbwQDB5JfcDFNCLfykb+hqGx7t4u2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767162928; c=relaxed/simple;
-	bh=bxw4Aj30meQU68rcCriF9pGZTUcJEVG7IgcnyMcUF98=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=mgOHhCcB0Y0IQwxkmKw1lcup/L92DMQ0hFb0HqPsB2EIVNzysPM3bxJqUc4AlV5EyHLotewdDh/h2+UEFo/y9c2BIL2jCru+ib+BhuS0jgxST3Jb3DACaozwocohTwPAsLic4qIGg7HpgPkthnwaCXHLHga+iRT1Nx6tYUrOrRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxisInxFRp05kEAA--.14119S3;
-	Wed, 31 Dec 2025 14:35:19 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAx28EkxFRp3qYHAA--.16941S3;
-	Wed, 31 Dec 2025 14:35:18 +0800 (CST)
-Subject: Re: [PATCH 0/3] LoongArch: KVM: Fix kvm_device leak in
- kvm_{pch_pic|ipi|eiointc}_destroy
-To: Qiang Ma <maqianga@uniontech.com>, zhaotianrui@loongson.cn,
- chenhuacai@kernel.org, kernel@xen0n.name
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20251226150706.2511127-1-maqianga@uniontech.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <99826cf9-356d-235b-9c7c-9d51d36e53c3@loongson.cn>
-Date: Wed, 31 Dec 2025 14:32:44 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1767170222; c=relaxed/simple;
+	bh=blI6GpL8mo2hOJFqWDE/aCp3PDuJRDyIPZScdgw4U0o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZXCOZE9c4vhasuOyarYnRQpRk8uBoi7JLd087nrMMT/vxtH76u2hCCh9VnbSI+0sXKUle0Bfb0XtI/G8/cPC4d+HiFsa+70LLh3Wtjk9qFyLkyoW/PIrVetxxb1K70LsIfNq3D/nGwAPvslMBSOVDAE0H3JMuyAdFcWCzc1l/2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mFy9ADcX; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767170222; x=1798706222;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=blI6GpL8mo2hOJFqWDE/aCp3PDuJRDyIPZScdgw4U0o=;
+  b=mFy9ADcXVdLHM3k0uceivcW3+2UPBNSlKOGOgUfzlN2gUKY8LUzEWmMg
+   sppZeqPXupHq5gGrzmUVmCfKyiz3Ney458itfVjMVqVQzI4Dix4frib5S
+   d/Uqpp2uoNH/tb9HH21GTEmQQ1eXUO2GFnohqCZZK5XqwxR/2ZWCbjvye
+   mNOs8vcAvwCbxlQmh3wW1hv9bh130WlvQ3Bx1cV0CTJ5MX7bYgyFXxR4d
+   SEQBIBeSXYTJxkibj/4CSjOQEna04XpaSwC5TDEFcY7u8cJ4R8bKkv9/9
+   uzYMvMJ26dgjeTqD3cwJQfpgWd+uqTBKHeHfQBnW9vx25aD8y6mbe4+9i
+   g==;
+X-CSE-ConnectionGUID: Uz0FonMGQ5aMhyXS3qqmyA==
+X-CSE-MsgGUID: L58mZz51Rui2q8tmBzFpOQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11657"; a="68644366"
+X-IronPort-AV: E=Sophos;i="6.21,191,1763452800"; 
+   d="scan'208";a="68644366"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2025 00:37:01 -0800
+X-CSE-ConnectionGUID: chBFWYoIT067+JES92swUQ==
+X-CSE-MsgGUID: +t1eGQawSLqd5brHGYTbbg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,191,1763452800"; 
+   d="scan'208";a="206448863"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.173]) ([10.124.240.173])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2025 00:36:58 -0800
+Message-ID: <777040ff-8064-4b19-8bd0-f4262e6c2e68@intel.com>
+Date: Wed, 31 Dec 2025 16:36:55 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251226150706.2511127-1-maqianga@uniontech.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] KVM: nVMX: Disallow access to vmcs12 fields that
+ aren't supported by "hardware"
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li
+ <xin@zytor.com>, Chao Gao <chao.gao@intel.com>,
+ Yosry Ahmed <yosry.ahmed@linux.dev>
+References: <20251230220220.4122282-1-seanjc@google.com>
+ <20251230220220.4122282-2-seanjc@google.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAx28EkxFRp3qYHAA--.16941S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7Jr4rXFy3KFy5Gr48AryxJFc_yoW3trb_XF
-	1Iyrn7ZrWkW3W8Gr1Yvr1rJwnIkF4FqFZ5tr93Zry8W34YqrWDZrW5W3s2vF1Igw4UZrZ8
-	AFZ2yr9Yyr1jkosvyTuYvTs0mTUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbI8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE
-	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
-	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
-	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtw
-	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
-	67AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
-	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU7_Ma
-	UUUUU
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20251230220220.4122282-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi qiang,
+On 12/31/2025 6:02 AM, Sean Christopherson wrote:
+> +/*
+> + * Indexing into the vmcs12 uses the VMCS encoding rotated left by 6 as a very
+> + * rudimentary compression of the range of indices.  The compression ratio is
+> + * good enough to allow KVM to use a (very sparsely populated) array without
+> + * wasting too much memory, while the "algorithm" is fast enough to be used to
+> + * lookup vmcs12 fields on-demand, e.g. for emulation.
+> + */
+>   #define ROL16(val, n) ((u16)(((u16)(val) << (n)) | ((u16)(val) >> (16 - (n)))))
+> +#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) << 10)))
 
-Thanks for the patch, it looks good to me.
+Put them together is really good.
 
-For the whole series.
-Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+And ROL16(val, 16-n) is exactly undoing ROL16(val, n), so that we can 
+further do
 
-Regards
-Bibo Mao
+---8<---
+diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
+index 98281e019e38..be2f410f82cd 100644
+--- a/arch/x86/kvm/vmx/vmcs.h
++++ b/arch/x86/kvm/vmx/vmcs.h
+@@ -19,7 +19,8 @@
+   * lookup vmcs12 fields on-demand, e.g. for emulation.
+   */
+  #define ROL16(val, n) ((u16)(((u16)(val) << (n)) | ((u16)(val) >> (16 
+- (n)))))
+-#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) 
+<< 10)))
++#define ENC_TO_VMCS12_IDX(enc) ROL16(enc, 6)
++#define VMCS12_IDX_TO_ENC(idx) ROL16(idx,10)
 
-On 2025/12/26 下午11:07, Qiang Ma wrote:
-> In kvm_ioctl_create_device(), kvm_device has allocated memory,
-> kvm_device->destroy() seems to be supposed to free its kvm_device
-> struct, but kvm_pch_pic_destroy() is not currently doing this,
-> that would lead to a memory leak.
-> 
-> So, fix it.
-> 
-> Qiang Ma (3):
->    LoongArch: KVM: Fix kvm_device leak in kvm_pch_pic_destroy
->    LoongArch: KVM: Fix kvm_device leak in kvm_ipi_destroy
->    LoongArch: KVM: Fix kvm_device leak in kvm_eiointc_destroy
-> 
->   arch/loongarch/kvm/intc/eiointc.c | 2 ++
->   arch/loongarch/kvm/intc/ipi.c     | 2 ++
->   arch/loongarch/kvm/intc/pch_pic.c | 2 ++
->   3 files changed, 6 insertions(+)
-> 
+  struct vmcs_hdr {
+         u32 revision_id:31;
+diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
+index b92db4768346..1ebe67c384ad 100644
+--- a/arch/x86/kvm/vmx/vmcs12.c
++++ b/arch/x86/kvm/vmx/vmcs12.c
+@@ -4,10 +4,10 @@
+  #include "vmcs12.h"
+
+  #define VMCS12_OFFSET(x) offsetof(struct vmcs12, x)
+-#define FIELD(number, name)    [ROL16(number, 6)] = VMCS12_OFFSET(name)
++#define FIELD(number, name)    [ENC_TO_VMCS12_IDX(number)] = 
+VMCS12_OFFSET(name)
+  #define FIELD64(number, name)                                          \
+         FIELD(number, name),                                            \
+-       [ROL16(number##_HIGH, 6)] = VMCS12_OFFSET(name) + sizeof(u32)
++       [ENC_TO_VMCS12_IDX(number##_HIGH)] = VMCS12_OFFSET(name) + 
+sizeof(u32)
+
+  static const u16 kvm_supported_vmcs12_field_offsets[] __initconst = {
+         FIELD(VIRTUAL_PROCESSOR_ID, virtual_processor_id),
+
+
 
 
