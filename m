@@ -1,360 +1,248 @@
-Return-Path: <kvm+bounces-66892-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED472CEAD77
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 00:14:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B636CEAFC2
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 02:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33350302AFA5
-	for <lists+kvm@lfdr.de>; Tue, 30 Dec 2025 23:11:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C8B1E301A72B
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 01:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D37433122C;
-	Tue, 30 Dec 2025 23:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gywlyQb+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5A31F130B;
+	Wed, 31 Dec 2025 01:14:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D612E093C
-	for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 23:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3341A2392;
+	Wed, 31 Dec 2025 01:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767135755; cv=none; b=IDvcoeY8nPcMWHYgMYDdWtL9UqJdCBZ+hq6t9O31Svq6HRPgLKj9TvPlnwgHoupd19TO5TobbXoROIrPPWDKY9TIeeYkEA8SHzpM1n9zfePQQPsQ7K4CQn1fvrjRnl0QS2HVb5LNRwHmcpX9wy+VC/wphO+bitzASlwgq6Ak9m8=
+	t=1767143697; cv=none; b=BrKFBlPo0O+ZQZFWVfKFo4YGeYGkdBByntNo5NxqAkHTEgB+0eBOwMlXGIkGDtrlBQafAiNU/qCP4TkA2jKagnHrkeuXsYbhRavkwWlwXts7ek0yyjcZDU62Fq3T5IsAM3EQ6nxNFgiYi4gLREf+BNdWnbNQ1uveVL1NZKY2mos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767135755; c=relaxed/simple;
-	bh=/HuCjXMO8BYhY2cJwTr7wd/hfTFZHB16fDr6+9ntWyE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jydy5vD85qLIqDn4PyQrdsu17cDZ+KYWhJDU5WLS1aM1lTtvgqTN8DbxWlEmP+s/QwowO+MMNps39nL2ofDM1duIKnYULB5yFFKpLJBOuiu42IhOrXuvwMj7L+xtBbAARw4Oy9h3KWmrhr6u/ZVogmrVOvIWaSie8bYpbamiEhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gywlyQb+; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7b82c2c2ca2so19025471b3a.1
-        for <kvm@vger.kernel.org>; Tue, 30 Dec 2025 15:02:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767135751; x=1767740551; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=lvDGtOJlZOshVNKy7HhFV38ObB7SdC2/7YpvR2O0iOs=;
-        b=gywlyQb+i1TiFGonSLX9ONNK0xwrR1f6v5bUGwf1DaC42S0MpXFzYCnYHufUI0zs+n
-         ZVCc1GAW8EjN0vP9zomhqDvepfb5CI/uL4EOQrWC6s7mqirDp0mwsR6KsxsiII7OygWW
-         sxD13lolCBSwNPahpqTFWJTa+1xRf6Q7tktxe1DO02CF7rj/ZWwIaYgJntAoBZBSsa25
-         CvGc5POwKVKbNa1o3dLwJkHi/mTh039sjRRVLJRBaY9KXNYwopLCq4Z34sjAMVZctceu
-         ONk0pR47MGjlV7VcxiIvbkQytu1JeCUzl13kZBSigXwqZVvxP+roAyASGsAxF+yoxhoY
-         bx2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767135751; x=1767740551;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lvDGtOJlZOshVNKy7HhFV38ObB7SdC2/7YpvR2O0iOs=;
-        b=DZ5eMWfBzlYQbaEY8GsbYrKBggYW0RRnNBm0Nzth1RK6Qvn1zA068Gy0Hse3RP0RAI
-         YjyeTMScyI1T1SG6dmq5tEYmeQ53juaogexnJH9YZJmZMK5hhnJz99O48SyBxlqLwgFT
-         RaM6RqZ3EK7VomPIDTjS8+BJpYCHrj8Nx9SHecOhFgHtGTuixSt7S+Mtdug/XC31+9ZT
-         SWXXtxrQhUFDvSUFTD9r3lxXQkJggyYYj4TaUe7+AD27oGEzVv+R+KFpO42NFMoPx3CF
-         73auy4O9D1PC2veyq9PQ82Oi61AunmkV2fxj9KnaKDKMHaJJ9DatXRggg4Ju4qYSGv3s
-         kqyw==
-X-Gm-Message-State: AOJu0YyOHq+HHjCNgmWxWkiUggurr0MSatGRpaMaA2YaN/P8iNmabF3R
-	yzJMAKKR+2CR34K+/zVLK2LQtBAh7B+kLek+STTuk7XASixvJjsH61cf4Bnp3Qbx2reieCKIwYi
-	r/KnWzQ==
-X-Google-Smtp-Source: AGHT+IFl+E4iBtLvuy29ZNl15W5f+YM/yuQ6NLYMRsjb6K6O2MuWbmEY/dD/ZgE2AJbg2gFPgmlYtjYuvMQ=
-X-Received: from pfbem48.prod.google.com ([2002:a05:6a00:3770:b0:7f9:3450:d9b0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:420b:b0:7e8:4471:ae55
- with SMTP id d2e1a72fcca58-7ff6745678amr28709155b3a.33.1767135750526; Tue, 30
- Dec 2025 15:02:30 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 15:01:50 -0800
-In-Reply-To: <20251230230150.4150236-1-seanjc@google.com>
+	s=arc-20240116; t=1767143697; c=relaxed/simple;
+	bh=ZV1ZWXso45FXh2ISWY0xpY7LIrC5943/+WBvhvx3Bzs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TqJpilxqVtRvSYUSa133aJaMT5fGhtvHmctMJ4sY+jPWDUmNu/eEGLt9Q8lofVSnsrXVS0Ow56GLpfLDlfsfVwEQhkry/iRjtHT0BL4KNewv5KX81lp55gj7Sb5HV9BZ6/K2lSJVHmQfL0tdQ+uj6VHMW6sfinhbgmDaOr2Xez0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.126])
+	by gateway (Coremail) with SMTP id _____8Cx68IKeVRp4YwEAA--.14148S3;
+	Wed, 31 Dec 2025 09:14:50 +0800 (CST)
+Received: from [10.20.42.126] (unknown [10.20.42.126])
+	by front1 (Coremail) with SMTP id qMiowJDxaeAEeVRptmIHAA--.19189S3;
+	Wed, 31 Dec 2025 09:14:47 +0800 (CST)
+Subject: Re: [PATCH V3 2/2] LoongArch: KVM: fix "unreliable stack" issue
+To: Bibo Mao <maobibo@loongson.cn>, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: stable@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>,
+ Charlie Jenkins <charlie@rivosinc.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Tiezhu Yang <yangtiezhu@loongson.cn>
+References: <20251227012712.2921408-1-lixianglai@loongson.cn>
+ <20251227012712.2921408-3-lixianglai@loongson.cn>
+ <2ab951d8-f039-af36-bfe5-afc0f2c93a9a@loongson.cn>
+From: lixianglai <lixianglai@loongson.cn>
+Message-ID: <6eb528bd-adc5-983a-3725-ff95cab85a72@loongson.cn>
+Date: Wed, 31 Dec 2025 09:11:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251230230150.4150236-1-seanjc@google.com>
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230230150.4150236-22-seanjc@google.com>
-Subject: [PATCH v4 21/21] KVM: selftests: Test READ=>WRITE dirty logging
- behavior for shadow MMU
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <2ab951d8-f039-af36-bfe5-afc0f2c93a9a@loongson.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJDxaeAEeVRptmIHAA--.19189S3
+X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Gw1fKFW3AF4UKFyxKFyUurX_yoWxZFWxpw
+	nYyFZ0yFWDCwn5Xr4UJF1DAryfJr4kt3W5Xr1kAFyrJr1DGryYgF18Xw1q9Fy7Xw48JFn5
+	XF1UXr13ZrWUJagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j5xhLUUUUU=
 
-Update the nested dirty log test to validate KVM's handling of READ faults
-when dirty logging is enabled.  Specifically, set the Dirty bit in the
-guest PTEs used to map L2 GPAs, so that KVM will create writable SPTEs
-when handling L2 read faults.  When handling read faults in the shadow MMU,
-KVM opportunistically creates a writable SPTE if the mapping can be
-writable *and* the gPTE is dirty (or doesn't support the Dirty bit), i.e.
-if KVM doesn't need to intercept writes in order to emulate Dirty-bit
-updates.
+Hi Bibo Mao:
+>
+>
+> On 2025/12/27 上午9:27, Xianglai Li wrote:
+>> Insert the appropriate UNWIND macro definition into the kvm_exc_entry in
+>> the assembly function to guide the generation of correct ORC table 
+>> entries,
+>> thereby solving the timeout problem of loading the livepatch-sample 
+>> module
+>> on a physical machine running multiple vcpus virtual machines.
+>>
+>> While solving the above problems, we have gained an additional benefit,
+>> that is, we can obtain more call stack information
+>>
+>> Stack information that can be obtained before the problem is fixed:
+>> [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
+>> [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
+>> [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
+>> [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
+>> [<0>] kvm_handle_exit+0x160/0x270 [kvm]
+>> [<0>] kvm_exc_entry+0x100/0x1e0
+>>
+>> Stack information that can be obtained after the problem is fixed:
+>> [<0>] kvm_vcpu_block+0x88/0x120 [kvm]
+>> [<0>] kvm_vcpu_halt+0x68/0x580 [kvm]
+>> [<0>] kvm_emu_idle+0xd4/0xf0 [kvm]
+>> [<0>] kvm_handle_gspr+0x7c/0x700 [kvm]
+>> [<0>] kvm_handle_exit+0x160/0x270 [kvm]
+>> [<0>] kvm_exc_entry+0x104/0x1e4
+>> [<0>] kvm_enter_guest+0x38/0x11c
+>> [<0>] kvm_arch_vcpu_ioctl_run+0x26c/0x498 [kvm]
+>> [<0>] kvm_vcpu_ioctl+0x200/0xcf8 [kvm]
+>> [<0>] sys_ioctl+0x498/0xf00
+>> [<0>] do_syscall+0x98/0x1d0
+>> [<0>] handle_syscall+0xb8/0x158
+>>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
+>> ---
+>> Cc: Huacai Chen <chenhuacai@kernel.org>
+>> Cc: WANG Xuerui <kernel@xen0n.name>
+>> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
+>> Cc: Bibo Mao <maobibo@loongson.cn>
+>> Cc: Charlie Jenkins <charlie@rivosinc.com>
+>> Cc: Xianglai Li <lixianglai@loongson.cn>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
+>>
+>>   arch/loongarch/kvm/switch.S | 28 +++++++++++++++++++---------
+>>   1 file changed, 19 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/arch/loongarch/kvm/switch.S b/arch/loongarch/kvm/switch.S
+>> index 93845ce53651..a3ea9567dbe5 100644
+>> --- a/arch/loongarch/kvm/switch.S
+>> +++ b/arch/loongarch/kvm/switch.S
+>> @@ -10,6 +10,7 @@
+>>   #include <asm/loongarch.h>
+>>   #include <asm/regdef.h>
+>>   #include <asm/unwind_hints.h>
+>> +#include <linux/kvm_types.h>
+>>     #define HGPR_OFFSET(x)        (PT_R0 + 8*x)
+>>   #define GGPR_OFFSET(x)        (KVM_ARCH_GGPR + 8*x)
+>> @@ -110,9 +111,9 @@
+>>        * need to copy world switch code to DMW area.
+>>        */
+>>       .text
+>> +    .p2align PAGE_SHIFT
+>>       .cfi_sections    .debug_frame
+>>   SYM_CODE_START(kvm_exc_entry)
+>> -    .p2align PAGE_SHIFT
+>>       UNWIND_HINT_UNDEFINED
+>>       csrwr    a2,   KVM_TEMP_KS
+>>       csrrd    a2,   KVM_VCPU_KS
+>> @@ -170,6 +171,7 @@ SYM_CODE_START(kvm_exc_entry)
+>>       /* restore per cpu register */
+>>       ld.d    u0, a2, KVM_ARCH_HPERCPU
+>>       addi.d    sp, sp, -PT_SIZE
+>> +    UNWIND_HINT_REGS
+>>         /* Prepare handle exception */
+>>       or    a0, s0, zero
+>> @@ -200,7 +202,7 @@ ret_to_host:
+>>       jr      ra
+>>     SYM_CODE_END(kvm_exc_entry)
+>> -EXPORT_SYMBOL(kvm_exc_entry)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_exc_entry)
+>>     /*
+>>    * int kvm_enter_guest(struct kvm_run *run, struct kvm_vcpu *vcpu)
+>> @@ -215,6 +217,14 @@ SYM_FUNC_START(kvm_enter_guest)
+>>       /* Save host GPRs */
+>>       kvm_save_host_gpr a2
+>>   +    /*
+>> +     * The csr_era member variable of the pt_regs structure is required
+>> +     * for unwinding orc to perform stack traceback, so we need to put
+>> +     * pc into csr_era member variable here.
+>> +     */
+>> +    pcaddi    t0, 0
+>> +    st.d    t0, a2, PT_ERA
+> maybe PRMD need be set with fake pt_regs also, something like this:
+>         ori     t0, zero, CSR_PRMD_PIE
+>         st.d    t0, a2, PT_PRMD
+>
+Ok, I will fix it in the next version
 
-To actually test the L2 READ=>WRITE sequence, e.g. without masking a false
-pass by other test activity, route the READ=>WRITE and WRITE=>WRITE
-sequences to separate L1 pages, and differentiate between "marked dirty
-due to a WRITE access/fault" and "marked dirty due to creating a writable
-SPTE for a READ access/fault".  The updated sequence exposes the bug fixed
-by KVM commit 1f4e5fc83a42 ("KVM: x86: fix nested guest live migration
-with PML") when the guest performs a READ=>WRITE sequence.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/include/x86/processor.h     |   1 +
- .../testing/selftests/kvm/lib/x86/processor.c |   7 ++
- .../selftests/kvm/x86/nested_dirty_log_test.c | 115 +++++++++++++-----
- 3 files changed, 90 insertions(+), 33 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index ab29b1c7ed2d..8945c9eea704 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1483,6 +1483,7 @@ bool kvm_cpu_has_tdp(void);
- void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
- void tdp_identity_map_default_memslots(struct kvm_vm *vm);
- void tdp_identity_map_1g(struct kvm_vm *vm,  uint64_t addr, uint64_t size);
-+uint64_t *tdp_get_pte(struct kvm_vm *vm, uint64_t l2_gpa);
- 
- /*
-  * Basic CPU control in CR0
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index ab869a98bbdc..fab18e9be66c 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -390,6 +390,13 @@ static uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm,
- 	return virt_get_pte(vm, mmu, pte, vaddr, PG_LEVEL_4K);
- }
- 
-+uint64_t *tdp_get_pte(struct kvm_vm *vm, uint64_t l2_gpa)
-+{
-+	int level = PG_LEVEL_4K;
-+
-+	return __vm_get_page_table_entry(vm, &vm->stage2_mmu, l2_gpa, &level);
-+}
-+
- uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr)
- {
- 	int level = PG_LEVEL_4K;
-diff --git a/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c b/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
-index 89d2e86a0db9..1e7c1ed917e1 100644
---- a/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
-@@ -17,29 +17,39 @@
- 
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
--#define TEST_MEM_PAGES			3
-+#define TEST_MEM_PAGES			4
- 
- /* L1 guest test virtual memory offset */
--#define GUEST_TEST_MEM			0xc0000000
-+#define GUEST_TEST_MEM1			0xc0000000
-+#define GUEST_TEST_MEM2			0xc0002000
- 
- /* L2 guest test virtual memory offset */
- #define NESTED_TEST_MEM1		0xc0001000
--#define NESTED_TEST_MEM2		0xc0002000
-+#define NESTED_TEST_MEM2		0xc0003000
- 
- #define L2_GUEST_STACK_SIZE 64
- 
-+#define TEST_SYNC_PAGE_MASK	0xfull
-+#define TEST_SYNC_READ_FAULT	BIT(4)
-+#define TEST_SYNC_WRITE_FAULT	BIT(5)
-+#define TEST_SYNC_NO_FAULT	BIT(6)
-+
- static void l2_guest_code(u64 *a, u64 *b)
- {
- 	READ_ONCE(*a);
-+	GUEST_SYNC(0 | TEST_SYNC_READ_FAULT);
- 	WRITE_ONCE(*a, 1);
--	GUEST_SYNC(true);
--	GUEST_SYNC(false);
-+	GUEST_SYNC(0 | TEST_SYNC_WRITE_FAULT);
-+	READ_ONCE(*a);
-+	GUEST_SYNC(0 | TEST_SYNC_NO_FAULT);
- 
- 	WRITE_ONCE(*b, 1);
--	GUEST_SYNC(true);
-+	GUEST_SYNC(2 | TEST_SYNC_WRITE_FAULT);
- 	WRITE_ONCE(*b, 1);
--	GUEST_SYNC(true);
--	GUEST_SYNC(false);
-+	GUEST_SYNC(2 | TEST_SYNC_WRITE_FAULT);
-+	READ_ONCE(*b);
-+	GUEST_SYNC(2 | TEST_SYNC_NO_FAULT);
-+	GUEST_SYNC(2 | TEST_SYNC_NO_FAULT);
- 
- 	/* Exit to L1 and never come back.  */
- 	vmcall();
-@@ -53,7 +63,7 @@ static void l2_guest_code_tdp_enabled(void)
- static void l2_guest_code_tdp_disabled(void)
- {
- 	/* Access the same L1 GPAs as l2_guest_code_tdp_enabled() */
--	l2_guest_code((u64 *)GUEST_TEST_MEM, (u64 *)GUEST_TEST_MEM);
-+	l2_guest_code((u64 *)GUEST_TEST_MEM1, (u64 *)GUEST_TEST_MEM2);
- }
- 
- void l1_vmx_code(struct vmx_pages *vmx)
-@@ -72,9 +82,11 @@ void l1_vmx_code(struct vmx_pages *vmx)
- 
- 	prepare_vmcs(vmx, l2_rip, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
- 
--	GUEST_SYNC(false);
-+	GUEST_SYNC(0 | TEST_SYNC_NO_FAULT);
-+	GUEST_SYNC(2 | TEST_SYNC_NO_FAULT);
- 	GUEST_ASSERT(!vmlaunch());
--	GUEST_SYNC(false);
-+	GUEST_SYNC(0 | TEST_SYNC_NO_FAULT);
-+	GUEST_SYNC(2 | TEST_SYNC_NO_FAULT);
- 	GUEST_ASSERT_EQ(vmreadz(VM_EXIT_REASON), EXIT_REASON_VMCALL);
- 	GUEST_DONE();
- }
-@@ -91,9 +103,11 @@ static void l1_svm_code(struct svm_test_data *svm)
- 
- 	generic_svm_setup(svm, l2_rip, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
- 
--	GUEST_SYNC(false);
-+	GUEST_SYNC(0 | TEST_SYNC_NO_FAULT);
-+	GUEST_SYNC(2 | TEST_SYNC_NO_FAULT);
- 	run_guest(svm->vmcb, svm->vmcb_gpa);
--	GUEST_SYNC(false);
-+	GUEST_SYNC(0 | TEST_SYNC_NO_FAULT);
-+	GUEST_SYNC(2 | TEST_SYNC_NO_FAULT);
- 	GUEST_ASSERT_EQ(svm->vmcb->control.exit_code, SVM_EXIT_VMMCALL);
- 	GUEST_DONE();
- }
-@@ -106,6 +120,11 @@ static void l1_guest_code(void *data)
- 		l1_svm_code(data);
- }
- 
-+static uint64_t test_read_host_page(uint64_t *host_test_mem, int page_nr)
-+{
-+	return host_test_mem[PAGE_SIZE * page_nr / sizeof(*host_test_mem)];
-+}
-+
- static void test_dirty_log(bool nested_tdp)
- {
- 	vm_vaddr_t nested_gva = 0;
-@@ -133,32 +152,45 @@ static void test_dirty_log(bool nested_tdp)
- 
- 	/* Add an extra memory slot for testing dirty logging */
- 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
--				    GUEST_TEST_MEM,
-+				    GUEST_TEST_MEM1,
- 				    TEST_MEM_SLOT_INDEX,
- 				    TEST_MEM_PAGES,
- 				    KVM_MEM_LOG_DIRTY_PAGES);
- 
- 	/*
--	 * Add an identity map for GVA range [0xc0000000, 0xc0002000).  This
-+	 * Add an identity map for GVA range [0xc0000000, 0xc0004000).  This
- 	 * affects both L1 and L2.  However...
- 	 */
--	virt_map(vm, GUEST_TEST_MEM, GUEST_TEST_MEM, TEST_MEM_PAGES);
-+	virt_map(vm, GUEST_TEST_MEM1, GUEST_TEST_MEM1, TEST_MEM_PAGES);
- 
- 	/*
--	 * ... pages in the L2 GPA range [0xc0001000, 0xc0003000) will map to
--	 * 0xc0000000.
-+	 * ... pages in the L2 GPA ranges [0xc0001000, 0xc0002000) and
-+	 * [0xc0003000, 0xc0004000) will map to 0xc0000000 and 0xc0001000
-+	 * respectively.
- 	 *
- 	 * When TDP is disabled, the L2 guest code will still access the same L1
- 	 * GPAs as the TDP enabled case.
-+	 *
-+	 * Set the Dirty bit in the PTEs used by L2 so that KVM will create
-+	 * writable SPTEs when handling read faults (if the Dirty bit isn't
-+	 * set, KVM must intercept the next write to emulate the Dirty bit
-+	 * update).
- 	 */
- 	if (nested_tdp) {
- 		tdp_identity_map_default_memslots(vm);
--		tdp_map(vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, PAGE_SIZE);
--		tdp_map(vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, PAGE_SIZE);
-+		tdp_map(vm, NESTED_TEST_MEM1, GUEST_TEST_MEM1, PAGE_SIZE);
-+		tdp_map(vm, NESTED_TEST_MEM2, GUEST_TEST_MEM2, PAGE_SIZE);
-+
-+
-+		*tdp_get_pte(vm, NESTED_TEST_MEM1) |= PTE_DIRTY_MASK(&vm->stage2_mmu);
-+		*tdp_get_pte(vm, NESTED_TEST_MEM2) |= PTE_DIRTY_MASK(&vm->stage2_mmu);
-+	} else {
-+		*vm_get_pte(vm, GUEST_TEST_MEM1) |= PTE_DIRTY_MASK(&vm->mmu);
-+		*vm_get_pte(vm, GUEST_TEST_MEM2) |= PTE_DIRTY_MASK(&vm->mmu);
- 	}
- 
- 	bmap = bitmap_zalloc(TEST_MEM_PAGES);
--	host_test_mem = addr_gpa2hva(vm, GUEST_TEST_MEM);
-+	host_test_mem = addr_gpa2hva(vm, GUEST_TEST_MEM1);
- 
- 	while (!done) {
- 		memset(host_test_mem, 0xaa, TEST_MEM_PAGES * PAGE_SIZE);
-@@ -169,25 +201,42 @@ static void test_dirty_log(bool nested_tdp)
- 		case UCALL_ABORT:
- 			REPORT_GUEST_ASSERT(uc);
- 			/* NOT REACHED */
--		case UCALL_SYNC:
-+		case UCALL_SYNC: {
-+			int page_nr = uc.args[1] & TEST_SYNC_PAGE_MASK;
-+			int i;
-+
- 			/*
- 			 * The nested guest wrote at offset 0x1000 in the memslot, but the
- 			 * dirty bitmap must be filled in according to L1 GPA, not L2.
- 			 */
- 			kvm_vm_get_dirty_log(vm, TEST_MEM_SLOT_INDEX, bmap);
--			if (uc.args[1]) {
--				TEST_ASSERT(test_bit(0, bmap), "Page 0 incorrectly reported clean");
--				TEST_ASSERT(host_test_mem[0] == 1, "Page 0 not written by guest");
--			} else {
--				TEST_ASSERT(!test_bit(0, bmap), "Page 0 incorrectly reported dirty");
--				TEST_ASSERT(host_test_mem[0] == 0xaaaaaaaaaaaaaaaaULL, "Page 0 written by guest");
-+
-+			/*
-+			 * If a fault is expected, the page should be dirty
-+			 * as the Dirty bit is set in the gPTE.  KVM should
-+			 * create a writable SPTE even on a read fault, *and*
-+			 * KVM must mark the GFN as dirty when doing so.
-+			 */
-+			TEST_ASSERT(test_bit(page_nr, bmap) == !(uc.args[1] & TEST_SYNC_NO_FAULT),
-+				    "Page %u incorrectly reported %s on %s fault", page_nr,
-+				    test_bit(page_nr, bmap) ? "dirty" : "clean",
-+				    uc.args[1] & TEST_SYNC_NO_FAULT ? "no" :
-+				    uc.args[1] & TEST_SYNC_READ_FAULT ? "read" : "write");
-+
-+			for (i = 0; i < TEST_MEM_PAGES; i++) {
-+				if (i == page_nr && uc.args[1] & TEST_SYNC_WRITE_FAULT)
-+					TEST_ASSERT(test_read_host_page(host_test_mem, i) == 1,
-+						    "Page %u not written by guest", i);
-+				else
-+					TEST_ASSERT(test_read_host_page(host_test_mem, i) == 0xaaaaaaaaaaaaaaaaULL,
-+						    "Page %u written by guest", i);
-+
-+				if (i != page_nr)
-+					TEST_ASSERT(!test_bit(i, bmap),
-+						    "Page %u incorrectly reported dirty", i);
- 			}
--
--			TEST_ASSERT(!test_bit(1, bmap), "Page 1 incorrectly reported dirty");
--			TEST_ASSERT(host_test_mem[PAGE_SIZE / 8] == 0xaaaaaaaaaaaaaaaaULL, "Page 1 written by guest");
--			TEST_ASSERT(!test_bit(2, bmap), "Page 2 incorrectly reported dirty");
--			TEST_ASSERT(host_test_mem[PAGE_SIZE*2 / 8] == 0xaaaaaaaaaaaaaaaaULL, "Page 2 written by guest");
- 			break;
-+		}
- 		case UCALL_DONE:
- 			done = true;
- 			break;
--- 
-2.52.0.351.gbe84eed79e-goog
+Thanks,
+Xianglai.
+> Regards
+> Bibo Mao
+>> +
+>>       addi.d    a2, a1, KVM_VCPU_ARCH
+>>       st.d    sp, a2, KVM_ARCH_HSP
+>>       st.d    tp, a2, KVM_ARCH_HTP
+>> @@ -225,7 +235,7 @@ SYM_FUNC_START(kvm_enter_guest)
+>>       csrwr    a1, KVM_VCPU_KS
+>>       kvm_switch_to_guest
+>>   SYM_FUNC_END(kvm_enter_guest)
+>> -EXPORT_SYMBOL(kvm_enter_guest)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_enter_guest)
+>>     SYM_FUNC_START(kvm_save_fpu)
+>>       fpu_save_csr    a0 t1
+>> @@ -233,7 +243,7 @@ SYM_FUNC_START(kvm_save_fpu)
+>>       fpu_save_cc    a0 t1 t2
+>>       jr              ra
+>>   SYM_FUNC_END(kvm_save_fpu)
+>> -EXPORT_SYMBOL(kvm_save_fpu)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_save_fpu)
+>>     SYM_FUNC_START(kvm_restore_fpu)
+>>       fpu_restore_double a0 t1
+>> @@ -241,7 +251,7 @@ SYM_FUNC_START(kvm_restore_fpu)
+>>       fpu_restore_cc       a0 t1 t2
+>>       jr                 ra
+>>   SYM_FUNC_END(kvm_restore_fpu)
+>> -EXPORT_SYMBOL(kvm_restore_fpu)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_restore_fpu)
+>>     #ifdef CONFIG_CPU_HAS_LSX
+>>   SYM_FUNC_START(kvm_save_lsx)
+>> @@ -250,7 +260,7 @@ SYM_FUNC_START(kvm_save_lsx)
+>>       lsx_save_data   a0 t1
+>>       jr              ra
+>>   SYM_FUNC_END(kvm_save_lsx)
+>> -EXPORT_SYMBOL(kvm_save_lsx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_save_lsx)
+>>     SYM_FUNC_START(kvm_restore_lsx)
+>>       lsx_restore_data a0 t1
+>> @@ -258,7 +268,7 @@ SYM_FUNC_START(kvm_restore_lsx)
+>>       fpu_restore_csr  a0 t1 t2
+>>       jr               ra
+>>   SYM_FUNC_END(kvm_restore_lsx)
+>> -EXPORT_SYMBOL(kvm_restore_lsx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_restore_lsx)
+>>   #endif
+>>     #ifdef CONFIG_CPU_HAS_LASX
+>> @@ -268,7 +278,7 @@ SYM_FUNC_START(kvm_save_lasx)
+>>       lasx_save_data  a0 t1
+>>       jr              ra
+>>   SYM_FUNC_END(kvm_save_lasx)
+>> -EXPORT_SYMBOL(kvm_save_lasx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_save_lasx)
+>>     SYM_FUNC_START(kvm_restore_lasx)
+>>       lasx_restore_data a0 t1
+>> @@ -276,7 +286,7 @@ SYM_FUNC_START(kvm_restore_lasx)
+>>       fpu_restore_csr   a0 t1 t2
+>>       jr                ra
+>>   SYM_FUNC_END(kvm_restore_lasx)
+>> -EXPORT_SYMBOL(kvm_restore_lasx)
+>> +EXPORT_SYMBOL_FOR_KVM(kvm_restore_lasx)
+>>   #endif
+>>     #ifdef CONFIG_CPU_HAS_LBT
+>>
 
 
