@@ -1,138 +1,169 @@
-Return-Path: <kvm+bounces-66900-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66901-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FFC6CEB8D2
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 09:37:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C67CEBBA9
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 10:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3FFF3045CDE
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 08:37:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5924130274E1
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 09:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58A5313E02;
-	Wed, 31 Dec 2025 08:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05075319617;
+	Wed, 31 Dec 2025 09:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mFy9ADcX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWg0A+fw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF4B18CBE1;
-	Wed, 31 Dec 2025 08:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3E21C84D0
+	for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 09:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767170222; cv=none; b=iPp9ziuAWgoFo/gTIbW6lZ2Kk/YujmNfi2JUSR5NepegsCORz99k9YIRYMs0eakORXN6j5Tnj4rkGS6ZXbZoJN7I0qYD0dHMGUkNUL/z8NrTNtyZPiO+DJrMyp9Qf788LFg/IOzpLujEIRbwQDB5JfcDFNCLfykb+hqGx7t4u2I=
+	t=1767175047; cv=none; b=nwAeP724abdMAhG5l4+GfsHib3dS4eMcMWYGdgprzErdTFwDCbCX9ycH7kVe+3eJtbtYWkhLU69K/jM0Q50Tls0mmkx7v+wHYgdau9BkyUXMpRP0bGsa3Ri5wQ3GE2TFRLMpcgTFPyGRa1/7wTMvgG2zPRl5Jq0ga6lll9uY3sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767170222; c=relaxed/simple;
-	bh=blI6GpL8mo2hOJFqWDE/aCp3PDuJRDyIPZScdgw4U0o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZXCOZE9c4vhasuOyarYnRQpRk8uBoi7JLd087nrMMT/vxtH76u2hCCh9VnbSI+0sXKUle0Bfb0XtI/G8/cPC4d+HiFsa+70LLh3Wtjk9qFyLkyoW/PIrVetxxb1K70LsIfNq3D/nGwAPvslMBSOVDAE0H3JMuyAdFcWCzc1l/2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mFy9ADcX; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767170222; x=1798706222;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=blI6GpL8mo2hOJFqWDE/aCp3PDuJRDyIPZScdgw4U0o=;
-  b=mFy9ADcXVdLHM3k0uceivcW3+2UPBNSlKOGOgUfzlN2gUKY8LUzEWmMg
-   sppZeqPXupHq5gGrzmUVmCfKyiz3Ney458itfVjMVqVQzI4Dix4frib5S
-   d/Uqpp2uoNH/tb9HH21GTEmQQ1eXUO2GFnohqCZZK5XqwxR/2ZWCbjvye
-   mNOs8vcAvwCbxlQmh3wW1hv9bh130WlvQ3Bx1cV0CTJ5MX7bYgyFXxR4d
-   SEQBIBeSXYTJxkibj/4CSjOQEna04XpaSwC5TDEFcY7u8cJ4R8bKkv9/9
-   uzYMvMJ26dgjeTqD3cwJQfpgWd+uqTBKHeHfQBnW9vx25aD8y6mbe4+9i
-   g==;
-X-CSE-ConnectionGUID: Uz0FonMGQ5aMhyXS3qqmyA==
-X-CSE-MsgGUID: L58mZz51Rui2q8tmBzFpOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11657"; a="68644366"
-X-IronPort-AV: E=Sophos;i="6.21,191,1763452800"; 
-   d="scan'208";a="68644366"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2025 00:37:01 -0800
-X-CSE-ConnectionGUID: chBFWYoIT067+JES92swUQ==
-X-CSE-MsgGUID: +t1eGQawSLqd5brHGYTbbg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,191,1763452800"; 
-   d="scan'208";a="206448863"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.173]) ([10.124.240.173])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2025 00:36:58 -0800
-Message-ID: <777040ff-8064-4b19-8bd0-f4262e6c2e68@intel.com>
-Date: Wed, 31 Dec 2025 16:36:55 +0800
+	s=arc-20240116; t=1767175047; c=relaxed/simple;
+	bh=XvxoJbk1n4B1oJqYc+bpz+GSlIINHD8bl2ATrnimr0E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JiFq3DaJhhnQxm2J7E4Li7gRD/nMrJqY2nZpwCQFITU+R8qkE9btcDL4sHqOmK7/VTc6alg6vaslWWXjV8Ga4+lnqYzkexQoIFtcqle5AYc5g/M1erRD7kKKJK4H68k624jM78ik+uBUbZZQ/xMWaoRGbyyA4qPWCVTd9v/r0CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWg0A+fw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10388C113D0
+	for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 09:57:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767175047;
+	bh=XvxoJbk1n4B1oJqYc+bpz+GSlIINHD8bl2ATrnimr0E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=cWg0A+fwAqLDO9LJjaGk+JnCdLCrEexDqxYbWVjda8mSn8pOXTm9CcfBe9TGWoWNz
+	 c74ehg/Lir+uG2icmcjNP+g03Zit8Jo7sH/MEiT8nTXBwHW3qpfl2smpbWrqo3zr/p
+	 BQIiOReRG1Xp8Dxpx7cldY0nZFut33ODWaeHZX36NDP2ZN0Ilcg/ORJvQPm3E5h4+0
+	 pJ8VxhUuetO9f2hWBdDBv77Ffh8tQj51VFhEvB7XQYzN9j/fLZnvV+EW77Zwk95xDn
+	 5MWhj8ua7BjqbMB0c9tJhlhlj0pj2uA64mJpIKIYI0t/mqInOARqoy7a9lxtWLIl+8
+	 dNXaODEBySaEw==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-64e48264e56so5378600a12.1
+        for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 01:57:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW1jeGJuG/pHG9HAD8/4eh9s+GXl6R3mfp9DEL7f/sslf82+bj5E52TjX6b8M2Yiy8eEUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzscZx+CsbwDWiifx2TAIEx4BxcprW5noBVSuhfsIOCDhFFJnBo
+	pbs1cVm0whPFx8LagDOBSlNUdXfMGL2fKpORdWLs37Wb8BQOYLjq8zuBxte4ZSc1MWWkUGwr0hq
+	so//CbJFcOwoJ/Tors/DyA5A0sK4aoZU=
+X-Google-Smtp-Source: AGHT+IGFvAfQAolQJ2K+0/uCxaIU8otYl6h/fq5oX7O3pcXzWhQopfnVb02NugdZPQ/WGQxCpOFaXUbUOr6KUygbnYg=
+X-Received: by 2002:a17:907:868e:b0:b76:4c8f:2cd8 with SMTP id
+ a640c23a62f3a-b8037233e75mr3604962566b.55.1767175044185; Wed, 31 Dec 2025
+ 01:57:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] KVM: nVMX: Disallow access to vmcs12 fields that
- aren't supported by "hardware"
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Xin Li
- <xin@zytor.com>, Chao Gao <chao.gao@intel.com>,
- Yosry Ahmed <yosry.ahmed@linux.dev>
-References: <20251230220220.4122282-1-seanjc@google.com>
- <20251230220220.4122282-2-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20251230220220.4122282-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251231020227.1526779-1-maobibo@loongson.cn>
+In-Reply-To: <20251231020227.1526779-1-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Wed, 31 Dec 2025 17:57:42 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H4CU1Ct8ZcxpZcMEZy7uL-wPmkxVhJwEWQdy0rpBAo8fg@mail.gmail.com>
+X-Gm-Features: AQt7F2pVX4avY4bk2RV3KDOYexQPEQMo7NMugvWE4Gz5dX2R9QHc-obzRmQeIYQ
+Message-ID: <CAAhV-H4CU1Ct8ZcxpZcMEZy7uL-wPmkxVhJwEWQdy0rpBAo8fg@mail.gmail.com>
+Subject: Re: [PATCH] LoongArch: KVM: Add more CPUCFG mask bit
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: WANG Xuerui <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/31/2025 6:02 AM, Sean Christopherson wrote:
-> +/*
-> + * Indexing into the vmcs12 uses the VMCS encoding rotated left by 6 as a very
-> + * rudimentary compression of the range of indices.  The compression ratio is
-> + * good enough to allow KVM to use a (very sparsely populated) array without
-> + * wasting too much memory, while the "algorithm" is fast enough to be used to
-> + * lookup vmcs12 fields on-demand, e.g. for emulation.
-> + */
->   #define ROL16(val, n) ((u16)(((u16)(val) << (n)) | ((u16)(val) >> (16 - (n)))))
-> +#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) << 10)))
+Hi, Bibo,
 
-Put them together is really good.
+On Wed, Dec 31, 2025 at 10:02=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wro=
+te:
+>
+> With LA664 CPU there are more features supported which are indicated
+> in CPUCFG2 bit24:30 and CPUCFG3 bit17 and bit 23. These features do
+> not depend on KVM and there is no KVM exception when it is used in
+> VM mode.
+>
+> Here add more CPUCFG mask support with LA664 if VM is configured with
+> host CPU model.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/loongarch.h |  7 +++++++
+>  arch/loongarch/kvm/vcpu.c              | 11 +++++++++++
+>  2 files changed, 18 insertions(+)
+>
+> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/incl=
+ude/asm/loongarch.h
+> index e6b8ff61c8cc..553c4dc7a156 100644
+> --- a/arch/loongarch/include/asm/loongarch.h
+> +++ b/arch/loongarch/include/asm/loongarch.h
+> @@ -94,6 +94,12 @@
+>  #define  CPUCFG2_LSPW                  BIT(21)
+>  #define  CPUCFG2_LAM                   BIT(22)
+>  #define  CPUCFG2_PTW                   BIT(24)
+> +#define  CPUCFG2_FRECIPE               BIT(25)
+> +#define  CPUCFG2_DIV32                 BIT(26)
+> +#define  CPUCFG2_LAM_BH                        BIT(27)
+> +#define  CPUCFG2_LAMCAS                        BIT(28)
+> +#define  CPUCFG2_LLACQ_SCREL           BIT(29)
+> +#define  CPUCFG2_SCQ                   BIT(30)
+>
+>  #define LOONGARCH_CPUCFG3              0x3
+>  #define  CPUCFG3_CCDMA                 BIT(0)
+> @@ -108,6 +114,7 @@
+>  #define  CPUCFG3_SPW_HG_HF             BIT(11)
+>  #define  CPUCFG3_RVA                   BIT(12)
+>  #define  CPUCFG3_RVAMAX                        GENMASK(16, 13)
+> +#define  CPUCFG3_DBAR_HINTS            BIT(17)
+>  #define  CPUCFG3_ALDORDER_CAP          BIT(18) /* All address load order=
+ed, capability */
+>  #define  CPUCFG3_ASTORDER_CAP          BIT(19) /* All address store orde=
+red, capability */
+>  #define  CPUCFG3_ALDORDER_STA          BIT(20) /* All address load order=
+ed, status */
+I applied the first part because it both needed by KVM and George's patch:
+https://lore.kernel.org/loongarch/20251231034523.47014-1-dongtai.guo@linux.=
+dev/T/#u
 
-And ROL16(val, 16-n) is exactly undoing ROL16(val, n), so that we can 
-further do
+Huacai
 
----8<---
-diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-index 98281e019e38..be2f410f82cd 100644
---- a/arch/x86/kvm/vmx/vmcs.h
-+++ b/arch/x86/kvm/vmx/vmcs.h
-@@ -19,7 +19,8 @@
-   * lookup vmcs12 fields on-demand, e.g. for emulation.
-   */
-  #define ROL16(val, n) ((u16)(((u16)(val) << (n)) | ((u16)(val) >> (16 
-- (n)))))
--#define VMCS12_IDX_TO_ENC(idx) ((u16)(((u16)(idx) >> 6) | ((u16)(idx) 
-<< 10)))
-+#define ENC_TO_VMCS12_IDX(enc) ROL16(enc, 6)
-+#define VMCS12_IDX_TO_ENC(idx) ROL16(idx,10)
-
-  struct vmcs_hdr {
-         u32 revision_id:31;
-diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-index b92db4768346..1ebe67c384ad 100644
---- a/arch/x86/kvm/vmx/vmcs12.c
-+++ b/arch/x86/kvm/vmx/vmcs12.c
-@@ -4,10 +4,10 @@
-  #include "vmcs12.h"
-
-  #define VMCS12_OFFSET(x) offsetof(struct vmcs12, x)
--#define FIELD(number, name)    [ROL16(number, 6)] = VMCS12_OFFSET(name)
-+#define FIELD(number, name)    [ENC_TO_VMCS12_IDX(number)] = 
-VMCS12_OFFSET(name)
-  #define FIELD64(number, name)                                          \
-         FIELD(number, name),                                            \
--       [ROL16(number##_HIGH, 6)] = VMCS12_OFFSET(name) + sizeof(u32)
-+       [ENC_TO_VMCS12_IDX(number##_HIGH)] = VMCS12_OFFSET(name) + 
-sizeof(u32)
-
-  static const u16 kvm_supported_vmcs12_field_offsets[] __initconst = {
-         FIELD(VIRTUAL_PROCESSOR_ID, virtual_processor_id),
-
-
-
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 656b954c1134..9d186004670c 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -652,6 +652,8 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigne=
+d int id, u64 val)
+>
+>  static int _kvm_get_cpucfg_mask(int id, u64 *v)
+>  {
+> +       unsigned int config;
+> +
+>         if (id < 0 || id >=3D KVM_MAX_CPUCFG_REGS)
+>                 return -EINVAL;
+>
+> @@ -684,9 +686,18 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+>                 if (cpu_has_ptw)
+>                         *v |=3D CPUCFG2_PTW;
+>
+> +               /*
+> +                * Some features depends on host and they are irrelative =
+with
+> +                * KVM hypervisor
+> +                */
+> +               config =3D read_cpucfg(LOONGARCH_CPUCFG2);
+> +               *v |=3D config & (CPUCFG2_FRECIPE | CPUCFG2_DIV32 | CPUCF=
+G2_LAM_BH);
+> +               *v |=3D config & (CPUCFG2_LAMCAS | CPUCFG2_LLACQ_SCREL | =
+CPUCFG2_SCQ);
+>                 return 0;
+>         case LOONGARCH_CPUCFG3:
+>                 *v =3D GENMASK(16, 0);
+> +               config =3D read_cpucfg(LOONGARCH_CPUCFG3);
+> +               *v |=3D config & (CPUCFG3_DBAR_HINTS | CPUCFG3_SLDORDER_S=
+TA);
+>                 return 0;
+>         case LOONGARCH_CPUCFG4:
+>         case LOONGARCH_CPUCFG5:
+>
+> base-commit: dbf8fe85a16a33d6b6bd01f2bc606fc017771465
+> --
+> 2.39.3
+>
+>
 
