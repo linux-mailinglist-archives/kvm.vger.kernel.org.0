@@ -1,205 +1,118 @@
-Return-Path: <kvm+bounces-66907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66908-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CDCACEC1D3
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 15:43:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B71B4CEC30C
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 16:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B23013026AA6
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 14:42:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A57243043794
+	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 15:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A83528002B;
-	Wed, 31 Dec 2025 14:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66740292B2E;
+	Wed, 31 Dec 2025 15:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrSuiZCH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhOq0hUA"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ZmNR7hwz"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from terminus.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FF319D071
-	for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 14:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23C41DFD8B;
+	Wed, 31 Dec 2025 15:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767192171; cv=none; b=OccBlKp+D5MtlKLTKlzHYsKtEHVkmRzVrgdf+22B51b8t7MPjvL4Fuuxnn8weQaF5CnolG58H+v6uESlizFK8+PybRQqAXJKPQp7PIW6E40JSYX9QpUzHiivW1Qa22IAnq/OJm/2d+3YUCixjNUlq2qwIX4fpN02zUSkIfy5wZw=
+	t=1767195818; cv=none; b=c4LD14+f+ie9lqc0exGR6z0wBiKS7XA3LUcWnDlWPhcBOrNIjc3O/ny9tRT25q02SiWiTCmukZXvWSK/J45utnPU9cySVhwvv3pb6YMYvRM2Muasx0Us8rwlHvi64mQbUamkyRik/sKk20zDGg3eyfL5yTly9rZCccIUVGjeJ4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767192171; c=relaxed/simple;
-	bh=7yEDDnq5O6nyMipRBT3oeW2l7NFO4JF7mnRHmsBSRLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JtdC/c7/fmvi+jBwiJLLkgZU9OIcrcvxBREIZgWtUI9S/vQUF5+AZnsVPyh1nA0OY9ErISTXUtn5eBRf7Dz2gyFh21jMI9a28q/a2vw18f7qw1VDp5hbnqUZmJUHxY0fqfE2xMofv5Hh3qXIGUbfRDcLjjLPN6QimdS71Od6+e4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DrSuiZCH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NhOq0hUA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767192168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g4mmJIWspy2eeK4ehzqbWNIMKVXq0BnPvs75MDLcYu0=;
-	b=DrSuiZCHZRPJ++80OcIJO1H8s5eDqlixmLsJMkjQmrgUPCbrsb8Rua/5MlfY7qzVSUJzZ5
-	suIbS4mM+39Hu0PVPduC04UmIhWT+Ycp2AOD7HoYVUTGFsO+lErr4P5ADGoXzNgQdYnYsO
-	fj0hZeOe8epO9JBiLde/88nDbS07QpI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-111-eZ8-Qc0uOD-vlusWtF_wJA-1; Wed, 31 Dec 2025 09:42:47 -0500
-X-MC-Unique: eZ8-Qc0uOD-vlusWtF_wJA-1
-X-Mimecast-MFC-AGG-ID: eZ8-Qc0uOD-vlusWtF_wJA_1767192166
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-430f5dcd4d3so5887902f8f.1
-        for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 06:42:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767192166; x=1767796966; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4mmJIWspy2eeK4ehzqbWNIMKVXq0BnPvs75MDLcYu0=;
-        b=NhOq0hUAZmQSTLFVcSJwCjoeM/cV7ikzBF1n4eKFKunBwlAuDDh7nQkdS98fW1jyn/
-         YUty9qdkQGqSzzIfsB4lgUlvbm62k3hHJ9h5Kq038uone/fp0iEl9RJp/qNZGC/2ymir
-         QQL/vNADxP9eZ4GPx5bcRNoz65GtihR4xUPfM3Y55hcX6siLx0r2IQGnlsKaZ1rS7/G0
-         PEG2pBMhe1rynbAA6pXsPB/ggvvj+8xaEzQ/mUyfNPvBDmDzE4zRfphhC3p5rM3R+soI
-         miVqSE76vU302nEwNJFJVREoUFe2hmcM+30wB2jXvKj1BnWEKozkKLJeL356no2bLUIx
-         J2bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767192166; x=1767796966;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g4mmJIWspy2eeK4ehzqbWNIMKVXq0BnPvs75MDLcYu0=;
-        b=GHa3OCLcQn220mbyERvscL6zmnE4XjYC/nL9UDhziNzqHfpum1BnE5TFl8gKBgRYBQ
-         1Stnl0hZVFtgwhZESfwTPIjpty9jnU/R66O35c6RcfhVTMFuYWlKyaujDjUDM9R0I6Jv
-         0cuBo3LDMIXSi/BLMvxfAa1guj5XcDIWjyPXbW3RzfjiMjR4mJWcgHmk1X/P/2m7cdEJ
-         z/BqHcufpHyZXfEKK31BAAjA8KpEE2BqzLu9TmQoxXSOkmbjiKBAVTAouO4rR4epj1hH
-         YOwC6uSPezAaHBUfJZojDqPiZ4vcOCnTsyLtoRnsfCCkPoeGGTnnS8WlI7yJDwpeZjNa
-         nJfA==
-X-Forwarded-Encrypted: i=1; AJvYcCULp3n8+dP+vt/fWOpcSEXZP63sBV4eLbW7xgIFY0BI3WWBodZ3xQCdN0/6t0AlQSabr8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybSdjA/4WfLQHc8oWifohR3yMHYTH90zc4qVPCLmGdKOjV7Ex1
-	UFE3iegVlVfItr3Dlo9zzC6Q0pGeOjzrC4oWmg8lkPsROv+QMcuNCT1aCPpchBSSplxz66DkIqo
-	IIaleuU6Q4G6ovwDkETHkja08DZsZFtOhn5eSPQ9buW6C8iakZ5ZwXA==
-X-Gm-Gg: AY/fxX4SyywG9LK4yx2032ESb1/BqTFOt4W+CQ5D2UpqKtxM0K3cRCluvS86XfDHe/o
-	WhZeKdcvj6dPsjfhCGjqYJ00w7N8l+M/acwkash9r4+XXZvOykjXbjo4yXUoOjh0CIHyMI0Tm7T
-	YJWcr2H6WLYptYx4qPTId0GCPeynwLY7i4AHQM9etYipnOGo/c//6CeP0QisuuPMggRQA8spPfN
-	wSmX/SMYdG7D9VgpyAfkTh2PDQN+p9pZIrLWJnaesPdlEjoQCPQXpLG2KVN6o7h/rgG7GAtsGpc
-	jkyi6Qh9cXNB9tugpol/A/lm5siJo+VGKhV7gNHzCa+Gl2D4/44Q5U0rRjcAR7vMfFVoptyN8ea
-	JMNrDOop7+AefBqHzUjbxiTH4EN2m2Hc1wg==
-X-Received: by 2002:a05:6000:2005:b0:430:2773:84d6 with SMTP id ffacd0b85a97d-4324e42eb06mr50147689f8f.24.1767192166347;
-        Wed, 31 Dec 2025 06:42:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGF5p3yqPt+kPdPb7TGA5JeM+zegz4+9TsD6bOekShro6ixOnDhxT1ci9gV1aizVZntyxUQBg==
-X-Received: by 2002:a05:6000:2005:b0:430:2773:84d6 with SMTP id ffacd0b85a97d-4324e42eb06mr50147651f8f.24.1767192165832;
-        Wed, 31 Dec 2025 06:42:45 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa64cesm74610221f8f.35.2025.12.31.06.42.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Dec 2025 06:42:45 -0800 (PST)
-Date: Wed, 31 Dec 2025 09:42:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Petr Tesarik <ptesarik@suse.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 00/13] fix DMA aligment issues around virtio
-Message-ID: <20251231094052-mutt-send-email-mst@kernel.org>
-References: <cover.1767089672.git.mst@redhat.com>
- <20251231141224.56d4ce56@mordecai>
+	s=arc-20240116; t=1767195818; c=relaxed/simple;
+	bh=Bd3Vac3whQ6zL7QRJ99H8nJmDJaJ8LFvyi6Hn5vhvmk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=kD0NGHiBd8RUG3QsSRoRtPBftjl4mDFhLw2xnkw2IipkFxr55GlYafopllZlKYNUEO0GKFfBEQ6qxofV/9pxVu2zDXe++lvrJy7UAUHSPiXFl3xXNXtadgxsiQCYP/LdHWpzk5lXanxah0I/AmB/T4Ao/MPKtNaDt4mfgNcnjfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ZmNR7hwz; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from smtpclient.apple (c-24-130-165-117.hsd1.ca.comcast.net [24.130.165.117])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5BVFcS4X3547598
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 31 Dec 2025 07:38:29 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5BVFcS4X3547598
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025122301; t=1767195509;
+	bh=btFoKdmhQuWliDpI09xQO1DTWFXIUJTI/TJ8ccNcofE=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=ZmNR7hwzcvJlEg3ad4KTtRAM03DrrnjHzouQiQ/yWrdk+YOeWnRLfBd0FxEbKg9bL
+	 xmMcgkv+s1HMSpPB0osWrTegn7VR4V11GHmzLaHwy0W+/8e6sipOl9pmjoADk9SYdg
+	 zCP9gmNrohgG/pKKvXC7zaMTG0sPZscYpz2/LNhVaP6A6BcUCyO1wwuyjUh1xQnfJc
+	 wJjVBhmYfO8ZJUINo3opVGGCjO9jusG9MPSODJ+1nfFijqkV0G8V146Ch7m0yQbwxr
+	 AbEcm8Ebt+4HqeSKsI1yLPNMsDGOYSoUjtbPgvkpr0KUkSk+Y/4ySx2k7YHuMLvHov
+	 6IMogU+Re8c8g==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251231141224.56d4ce56@mordecai>
-
-On Wed, Dec 31, 2025 at 02:12:24PM +0100, Petr Tesarik wrote:
-> On Tue, 30 Dec 2025 05:15:42 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > Cong Wang reported dma debug warnings with virtio-vsock
-> > and proposed a patch, see:
-> > 
-> > https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
-> > 
-> > however, the issue is more widespread.
-> > This is an attempt to fix it systematically.
-> > Note: i2c and gio might also be affected, I am still looking
-> > into it. Help from maintainers welcome.
-> > 
-> > Early RFC, compile tested only. Sending for early feedback/flames.
-> > Cursor/claude used liberally mostly for refactoring, and english.
-> > 
-> > DMA maintainers, could you please confirm the DMA core changes
-> > are ok with you?
-> 
-> Before anyone else runs into the same issue as I did: This patch series
-> does not apply cleanly unless you first apply commit b148e85c918a
-> ("virtio_ring: switch to use vring_virtqueue for virtqueue_add
-> variants") from the mst/vhost/vhost branch.
-
-Oh right sorry I forgot to mention it.  It's this one:
-
-https://lore.kernel.org/all/20251230064649.55597-8-jasowang@redhat.com/
-
-one can just do
-
-b4 shazam 20251230064649.55597-8-jasowang@redhat.com
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
+Subject: Re: [PATCH v2 1/2] KVM: nVMX: Disallow access to vmcs12 fields that
+ aren't supported by "hardware"
+From: Xin Li <xin@zytor.com>
+In-Reply-To: <20251230220220.4122282-2-seanjc@google.com>
+Date: Wed, 31 Dec 2025 07:38:18 -0800
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
+        Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <1D1B6FEC-1D50-4A0D-92D1-33B522576670@zytor.com>
+References: <20251230220220.4122282-1-seanjc@google.com>
+ <20251230220220.4122282-2-seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+X-Mailer: Apple Mail (2.3864.300.41.1.7)
 
 
-> But if you go to the trouble of adding the mst/vhost remote, then the
-> above-mentioned branch also contains this patch series, and it's
-> probably the best place to find the patched code...
-> 
-> Now, let me set out for review.
-> 
-> Petr T
-> 
-> > Thanks!
-> > 
-> > 
-> > Michael S. Tsirkin (13):
-> >   dma-mapping: add __dma_from_device_align_begin/end
-> >   docs: dma-api: document __dma_align_begin/end
-> >   dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
-> >   docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
-> >   dma-debug: track cache clean flag in entries
-> >   virtio: add virtqueue_add_inbuf_cache_clean API
-> >   vsock/virtio: fix DMA alignment for event_list
-> >   vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
-> >   virtio_input: fix DMA alignment for evts
-> >   virtio_scsi: fix DMA cacheline issues for events
-> >   virtio-rng: fix DMA alignment for data buffer
-> >   virtio_input: use virtqueue_add_inbuf_cache_clean for events
-> >   vsock/virtio: reorder fields to reduce struct padding
-> > 
-> >  Documentation/core-api/dma-api-howto.rst  | 42 +++++++++++++
-> >  Documentation/core-api/dma-attributes.rst |  9 +++
-> >  drivers/char/hw_random/virtio-rng.c       |  2 +
-> >  drivers/scsi/virtio_scsi.c                | 18 ++++--
-> >  drivers/virtio/virtio_input.c             |  5 +-
-> >  drivers/virtio/virtio_ring.c              | 72 +++++++++++++++++------
-> >  include/linux/dma-mapping.h               | 17 ++++++
-> >  include/linux/virtio.h                    |  5 ++
-> >  kernel/dma/debug.c                        | 26 ++++++--
-> >  net/vmw_vsock/virtio_transport.c          |  8 ++-
-> >  10 files changed, 172 insertions(+), 32 deletions(-)
-> > 
+> On Dec 30, 2025, at 2:02=E2=80=AFPM, Sean Christopherson =
+<seanjc@google.com> wrote:
+>=20
+> Disallow access (VMREAD/VMWRITE) to fields that the loaded incarnation =
+of
+> KVM doesn't support, e.g. due to lack of hardware support, as a middle
+> ground between allowing access to any vmcs12 field defined by KVM =
+(current
+> behavior) and gating access based on the userspace-defined vCPU model =
+(the
+> most correct, but costly, implementation).
+>=20
+> Disallowing access to unsupported fields helps a tiny bit in terms of
+> closing the virtualization hole (see below), but the main motivation =
+is to
+> avoid having to weed out unsupported fields when synchronizing between
+> vmcs12 and a shadow VMCS.  Because shadow VMCS accesses are done via
+> VMREAD and VMWRITE, KVM _must_ filter out unsupported fields (or eat
+> VMREAD/VMWRITE failures), and filtering out just shadow VMCS fields is
+> about the same amount of effort, and arguably much more confusing.
+>=20
+> As a bonus, this also fixes a KVM-Unit-Test failure bug when running =
+on
+> _hardware_ without support for TSC Scaling, which fails with the same
+> signature as the bug fixed by commit ba1f82456ba8 ("KVM: nVMX: =
+Dynamically
+> compute max VMCS index for vmcs12"):
+>=20
+>  FAIL: VMX_VMCS_ENUM.MAX_INDEX expected: 19, actual: 17
+>=20
+> Dynamically computing the max VMCS index only resolved the issue where =
+KVM
+> was hardcoding max index, but for CPUs with TSC Scaling, that was =
+"good
+> enough".
+>=20
+> Cc: Xin Li <xin@zytor.com>
+> Cc: Chao Gao <chao.gao@intel.com>
+> Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Link: =
+https://lore.kernel.org/all/20251026201911.505204-22-xin@zytor.com
+> Link: https://lore.kernel.org/all/YR2Tf9WPNEzrE7Xg@google.com
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Xin Li <xin@zytor.com <mailto:xin@zytor.com>>
 
 
