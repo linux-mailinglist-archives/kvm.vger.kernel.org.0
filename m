@@ -1,106 +1,105 @@
-Return-Path: <kvm+bounces-66915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4211ECECEAF
-	for <lists+kvm@lfdr.de>; Thu, 01 Jan 2026 10:12:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F07CACECEC7
+	for <lists+kvm@lfdr.de>; Thu, 01 Jan 2026 10:13:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7460630169BF
-	for <lists+kvm@lfdr.de>; Thu,  1 Jan 2026 09:11:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46762300B2A5
+	for <lists+kvm@lfdr.de>; Thu,  1 Jan 2026 09:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447782BEFE5;
-	Thu,  1 Jan 2026 09:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBF12C0281;
+	Thu,  1 Jan 2026 09:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMEWgrMw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ckKpStMj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CuoQNaZl";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWqwi8vG"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440A8289376
-	for <kvm@vger.kernel.org>; Thu,  1 Jan 2026 09:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F42052BEC4E
+	for <kvm@vger.kernel.org>; Thu,  1 Jan 2026 09:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767258331; cv=none; b=tODvkTUNKeBScCKqAn2Vtf3lWyxwkxV8UiTxZC9VHZ0k/k0puOoUKHxoU0NExHNZHRiRQazL6j2AIWyvDxkjNXaAHQrMiPq7EpRWcNcc650tG7EsQaS5+glMq0HJQEEQuY+OMTnnhNPY7HsXC6rBG2tVHbX06Q1ZJH9RP5krBcQ=
+	t=1767258333; cv=none; b=BpSz/4KBpdj95QzQvLBFHlYGE1JnJXn0+OfB/l7w1JKlt91mbBcRHy9+h/qp+HKPKHvWHMgNlvpCwuoZ4PMjasoxZuLHt/OAijsTA+u8lPp6Bhbp3/oqzw+TC94IaRrxE492PjjyMpGV977xm600C0Y4LapNn8X2N4xcX2pDe4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767258331; c=relaxed/simple;
-	bh=Hsx0y+DbmN46u/TuVMRMvMafpwW8lChJnxfxXyvlonY=;
+	s=arc-20240116; t=1767258333; c=relaxed/simple;
+	bh=HIN6QlfVhZ4iSbowtVUzS1M4y8SBEv60XuhX6Cf8bms=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DpwiVUPtMeHqowyAfQB6uJkP3+kONMLyduiFarAybJmYCfkjQx0fUN6EYL/thQjojwGcls7HpEKaDb5Aq7aCB2PvXZf5t6HXcaSwpaTWAlQ7Je2NokpJt0k2q/vEifTOXo3bV42JSzPGix3XnGx5D4OexRtgdR1xlW2ZPRvaMus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dMEWgrMw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ckKpStMj; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=n49DOLiU32lLszGY/SWZakpawA6g4Zz8+x96iUiQ/CN803PWJF3rNGbHBVv3emMulfYyYi7Pto+6cGfD9tLSvA0tO7k900sSCO4kMYqbIGDu3THEVBBcvYLYc32Gzt6QUqd5Fc/ID6r3g1MbLX79wmBQ/Ye5VRTZ85QZgNxd/xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CuoQNaZl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZWqwi8vG; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767258328;
+	s=mimecast20190719; t=1767258330;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dv2vXP7l71EPJ3a2syyzSbz7LlQzp2jJ3iF7aDVd9lk=;
-	b=dMEWgrMwqWzCZHlECByXISSQtLkPrbL+egBv8h0BDolxAVim+hZfnUb9GYMBuNLeinY1ls
-	AANsP1f3EpY6cBOTHSV4zTtv/1fOlhpNLCLibiudMSG2es+uRp3qWvZJfTyDVhguYIkS2Y
-	ANUJLclWC0tvQNtaF2hSDBRQigor954=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QTE9pNuMeO2V67xpWkcGk7SdONFO3mBmobXIG/f1Hmo=;
+	b=CuoQNaZlwTSg/TTOZkCu7anejHoxk+pXAuBv/yZYOEIl73JPrM1NR/JCoWM1bb+AZAt9+D
+	TCowsxtkuG9aGLTPZiZVDBx7q+7mshiv4WdOL3vj7Kjk1nTRT2esLFDQbEmtTWu3gGSR6h
+	7y+fiOoO+89WS2fkneARRM9Ub/GcvyA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-e0Zzq93rPN6CxyKa-WkfFQ-1; Thu, 01 Jan 2026 04:05:26 -0500
-X-MC-Unique: e0Zzq93rPN6CxyKa-WkfFQ-1
-X-Mimecast-MFC-AGG-ID: e0Zzq93rPN6CxyKa-WkfFQ_1767258325
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432586f2c82so5908010f8f.0
-        for <kvm@vger.kernel.org>; Thu, 01 Jan 2026 01:05:26 -0800 (PST)
+ us-mta-352-7Vz7KqSTPsGrW4BfWWqTAg-1; Thu, 01 Jan 2026 04:05:29 -0500
+X-MC-Unique: 7Vz7KqSTPsGrW4BfWWqTAg-1
+X-Mimecast-MFC-AGG-ID: 7Vz7KqSTPsGrW4BfWWqTAg_1767258328
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477a11d9e67so70253915e9.2
+        for <kvm@vger.kernel.org>; Thu, 01 Jan 2026 01:05:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767258325; x=1767863125; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767258328; x=1767863128; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dv2vXP7l71EPJ3a2syyzSbz7LlQzp2jJ3iF7aDVd9lk=;
-        b=ckKpStMjNpS+wan6drbcpjHb/zKY7iZtX5J8CwjEShs6iBU+nwETNJSPeVwKHbzLR8
-         W7w1MtVw6rKflZWuPVnSh9DyDHys+uXk26HuAWDFHQcj3PylUsSG4jcVVoDcskcW6cOY
-         H7QOoQOi6wEg+IGNE/dDSvvz/W4XnlAWaaGffEsKA7XMtf8DweG2Z1SVtG7jduu7Z/BV
-         xXm7XrmqwZmrq5Pod6CPVjD61T1W6PYryiL3WRmdnN+JS8thnJgpZPzo+lCOnt6NwHwu
-         4AcZT8DgiULlBwcJJQ1KqixjIk+79rA7JJJnM51mGe9tAmtC30A2y4hE9AfqE+PNonnV
-         R6Sw==
+        bh=QTE9pNuMeO2V67xpWkcGk7SdONFO3mBmobXIG/f1Hmo=;
+        b=ZWqwi8vGnnusemr4ekiEnYZsTDG0jX4DAFYfojl93J+SauqEpqTqLWUJBdNpFFq4Vf
+         /7r2O6JaFrUSOrZFi3YnbeTtxMW0SIt2VBiNsgoB95LG2uTLPIfoo1efsNnkubCyie1S
+         YPtUiMIpFvjMVB8XmHdoeMHe3LASByE+gG7GjulrW+hTWiNqwFgooIJmWQRSzSoPVRtP
+         IEtR3Jd0jORx7J2JuDoZzTHQEYm6Y/WV7/3mnMJoKX+A/JcoyAMWXawlZf1kYiEGGMPX
+         54IYH3nFMPMr3H4uim1cPnq99WRgY996T0hEHesTQaJWZmpngO6EeE3us7jdXdGkA3IK
+         84YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767258325; x=1767863125;
+        d=1e100.net; s=20230601; t=1767258328; x=1767863128;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=dv2vXP7l71EPJ3a2syyzSbz7LlQzp2jJ3iF7aDVd9lk=;
-        b=uAhX4jfwFIuyGnQImay+Z7qLHEzbD7ykzeLbWAVuOqN64z6Z8WHfSilf7yNrBElu2g
-         RSa1w9enL7YoEcZm3t8SEFhfTlAEW5bRqeCpbieESUW0+bAjdY996QdMf8RgdzDZoSh1
-         WBxSgPg45dwm84Ln1cTm3fH/qmIo2FaPuVAY1zXTlyDuH3tf4L0cHzXbq1qRHFbW7E9R
-         Ny+kwR1i2xU0TdwocHN9U3KhgBVyscRPjSkEKljHZPx2Yv6v6FCoTb6Qb2SiVlRn49Ke
-         B4rYhF1kaEiZT8c7KDmdumPItDe9jmY1VmIvwfQeW4nB1zUYQuZFaPnXrj47KRMtFRfC
-         ydCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpYJZKaivZ+1Q0BLHiWCVXTiZRjDC6VRHFWRRtNZMmMhMDezH3U7z2ulBzyMRHCegrAdA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrzMxD6pO6szSrlOO+lwHC+5o1dXEIYCA9VdzDtqY1+fu95kwL
-	zwHqO5lkQPzNBvWN4rvByS/RpdwH9YF5PlojO39eN3BbrPw9PUlAB+Pb9F31hHjRyZqKa82875t
-	1Q5JQcH2lUZcLxI7tQtdwIQnKhJU5xU+SGW5OQfngkzlMmlOIMkIVyQ==
-X-Gm-Gg: AY/fxX6lzCv3WXNBPJcXxnXxopeXgQMlzw5lj2GyT9ig2mSaKrLq0/qoKIQlWDGyXa1
-	ZPp8Antm5em2JA8uTxV5lRS9tuCaohkyXB+tmnGb6JWUsm6E3NwMxfaz4paCBs3DoYaX6/x7Y1T
-	Nl/rkue90QQYu+PToL25XwLKnXwePCuMDIAi/pbYEU8jgM0FeaVYp589jjLq5PfTCJnGjmizfLe
-	HN+HKNFrPAilW6Br/e43XwZkSEXhCfIqKKPZM+WaI/O71+aqgjeF9OXXcttKSpl6GEkxHmczf8G
-	puZCS5dKm3mW7RoD95kEhj7msZE3C/1kDvTse2hIw6rCbuu9DALKP9l9v6KeXJHgHt7n/dFTHfb
-	mVxD9VJ9IoA6RncmjobNaln/kz3/Fj6PXxMnvn8HrpC64OVuut3siTTUvskpwke8As/3P8Lpt/R
-	C1FEmAWHWfnYVl8g==
-X-Received: by 2002:a5d:64e9:0:b0:431:382:f141 with SMTP id ffacd0b85a97d-4324e3f5da3mr60213163f8f.12.1767258325314;
-        Thu, 01 Jan 2026 01:05:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE4WAOxBJTLEpMN3jGlnx3z7h44fd/Ys6O2ejcU9i7fcmeDx6jvrwYWYXW2AgjJFsozrXROrA==
-X-Received: by 2002:a5d:64e9:0:b0:431:382:f141 with SMTP id ffacd0b85a97d-4324e3f5da3mr60213121f8f.12.1767258324894;
-        Thu, 01 Jan 2026 01:05:24 -0800 (PST)
+        bh=QTE9pNuMeO2V67xpWkcGk7SdONFO3mBmobXIG/f1Hmo=;
+        b=dmnQQl3qW8+C6xQBtTZcw4WOAvRnSN5U71j8y8x8ScBTOCDtLfqavksLqGRiRsSRUh
+         mSxLvBUyKqJrlmUpCdmvQU1QOJ+dpveriinETTLR8YMwYPkp4/DRnrIR4iB9H4I0zARA
+         V0raAGVlDLPYvgjQd+fD7JFkkVhGBAN4wDGa0ROopLt+Acu7xvkoTyWV2owaLzSvNpmX
+         TdB3ocTxHuBN6ptPgZbUBzmBJfT0An5MG0WLuytalXWqmIJahQpdc/+asmr3WqZrs8zK
+         3Q5Qp3+sqvpd6/l6diwRthrVLovh2mKi/ll3i0AERVuApuq2kBsrgm4bmR/Ik91j+tCm
+         jhoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWocBNpAkZc8g+erpv1Vd1YkJ7x7ruEcuQ+0Kj1PXaFH/oCUXhtbHLowF3XgneqntiDDSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQEuzvBri/ZWSIEm9gOr7igls8hTVSPPsd6yZ3rmbtwOcp5MKM
+	QNy9dQtefz/fFmN8pOb97CEh5hdzgsYu8Peb9C2NBX3TMln//wz74a4M0LLu7r5wNAC8Q6nXojo
+	YbJgga3xT94Kq4a24R4VQy05QhBu+Chns8DrW+f9HG4/tk9ivJqnMSw==
+X-Gm-Gg: AY/fxX6li6wcR6a9OMXclN6IJixqptBpZZ/x6cF0L1TWu3uqVWdS9teQhQV5S0b/mZH
+	rqGfcoElWhtvTk4Ki2JmsPh/J+IKpL5ivf7I3UhaSye/OotC6S+2gbfBOeIQAv7SCy/3FdZew85
+	s/YZWsH/mlOmi33kUq5zq8YKf8iOJJBwFjs4HKzu5Ji7ZBopzFucgKbcwcmQw8EkrjCID+4qUT3
+	ymvWaWfUDxN6ms5r/cS15mnbMtuwUHEuGK4v2/6WnImCjPomupaQUNFQu1gLCPdCNjuZ8IuSUWL
+	inlVXVTFAo4MJzWyJaxQQOrSUdn8PQ+ukGWygkEjSmKT9+rz6Iz5Ii4r74mcMr7Jr2eOps1jTkR
+	O9pavmvIYm+Cx8C0R/UJJohUKkRLrt9qW5RMGMkoYAR0Ad2m8VKFRsAS7fhN67ULICSOxeBJ0/I
+	WTfu8xuZUkfYhNug==
+X-Received: by 2002:a05:600c:468f:b0:45c:4470:271c with SMTP id 5b1f17b1804b1-47d269c7019mr429028405e9.18.1767258328309;
+        Thu, 01 Jan 2026 01:05:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEBmL9IKTWaJ4XtgqdZRB2G/c+eVr1WEScolURdqAQ/qGjBC7KkISj0FN8QL1kAXg0awIdr+g==
+X-Received: by 2002:a05:600c:468f:b0:45c:4470:271c with SMTP id 5b1f17b1804b1-47d269c7019mr429028105e9.18.1767258327943;
+        Thu, 01 Jan 2026 01:05:27 -0800 (PST)
 Received: from [192.168.10.48] ([151.61.26.160])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eab2c4fsm78890215f8f.42.2026.01.01.01.05.22
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be27c2260sm719923195e9.15.2026.01.01.01.05.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jan 2026 01:05:23 -0800 (PST)
+        Thu, 01 Jan 2026 01:05:25 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: seanjc@google.com,
-	x86@kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH 3/4] selftests: kvm: try getting XFD and XSAVE state out of sync
-Date: Thu,  1 Jan 2026 10:05:15 +0100
-Message-ID: <20260101090516.316883-4-pbonzini@redhat.com>
+	x86@kernel.org
+Subject: [PATCH 4/4] selftests: kvm: Verify TILELOADD actually #NM faults when XFD[18]=1
+Date: Thu,  1 Jan 2026 10:05:16 +0100
+Message-ID: <20260101090516.316883-5-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260101090516.316883-1-pbonzini@redhat.com>
 References: <20260101090516.316883-1-pbonzini@redhat.com>
@@ -112,101 +111,88 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The host is allowed to set FPU state that includes a disabled
-xstate component.  Check that this does not cause bad effects.
+From: Sean Christopherson <seanjc@google.com>
 
-Cc: stable@vger.kernel.org
+Rework the AMX test's #NM handling to use kvm_asm_safe() to verify an #NM
+actually occurs.  As is, a completely missing #NM could go unnoticed.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tools/testing/selftests/kvm/x86/amx_test.c | 38 +++++++++++++++++-----
- 1 file changed, 30 insertions(+), 8 deletions(-)
+ tools/testing/selftests/kvm/x86/amx_test.c | 30 +++++++++++++---------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/x86/amx_test.c b/tools/testing/selftests/kvm/x86/amx_test.c
-index 4ac41c1a7255..00a42a592a37 100644
+index 00a42a592a37..371355bde54e 100644
 --- a/tools/testing/selftests/kvm/x86/amx_test.c
 +++ b/tools/testing/selftests/kvm/x86/amx_test.c
-@@ -125,11 +125,17 @@ static void set_tilecfg(struct tile_config *cfg)
+@@ -69,6 +69,12 @@ static inline void __tileloadd(void *tile)
+ 		     : : "a"(tile), "d"(0));
  }
  
- enum {
-+	/* Retrieve TMM0 from guest, stash it for TEST_RESTORE_TILEDATA */
-+	TEST_SAVE_TILEDATA = 1,
++static inline int tileloadd_safe(void *tile)
++{
++	return kvm_asm_safe(".byte 0xc4,0xe2,0x7b,0x4b,0x04,0x10",
++			    "a"(tile), "d"(0));
++}
 +
- 	/* Check TMM0 against tiledata */
--	TEST_COMPARE_TILEDATA = 1,
-+	TEST_COMPARE_TILEDATA = 2,
+ static inline void __tilerelease(void)
+ {
+ 	asm volatile(".byte 0xc4, 0xe2, 0x78, 0x49, 0xc0" ::);
+@@ -142,6 +148,8 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+ 						    struct tile_data *tiledata,
+ 						    struct xstate *xstate)
+ {
++	int vector;
 +
-+	/* Restore TMM0 from earlier save */
-+	TEST_RESTORE_TILEDATA = 4,
- 
- 	/* Full VM save/restore */
--	TEST_SAVE_RESTORE = 2,
-+	TEST_SAVE_RESTORE = 8,
- };
- 
- static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
-@@ -150,7 +156,16 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
- 	GUEST_SYNC(TEST_SAVE_RESTORE);
- 	/* Check save/restore when trap to userspace */
- 	__tileloadd(tiledata);
+ 	GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE) &&
+ 		     this_cpu_has(X86_FEATURE_OSXSAVE));
+ 	check_xtile_info();
+@@ -195,17 +203,13 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+ 	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == XFEATURE_MASK_XTILE_DATA);
+ 	set_tilecfg(amx_cfg);
+ 	__ldtilecfg(amx_cfg);
++
+ 	/* Trigger #NM exception */
+-	__tileloadd(tiledata);
 -	GUEST_SYNC(TEST_COMPARE_TILEDATA | TEST_SAVE_RESTORE);
-+	GUEST_SYNC(TEST_SAVE_TILEDATA | TEST_COMPARE_TILEDATA | TEST_SAVE_RESTORE);
-+
-+	/* xfd=0x40000, disable amx tiledata */
-+	wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILE_DATA);
-+
-+	/* host tries setting tiledata while guest XFD is set */
-+	GUEST_SYNC(TEST_RESTORE_TILEDATA);
-+	GUEST_SYNC(TEST_SAVE_RESTORE);
-+
-+	wrmsr(MSR_IA32_XFD, 0);
- 	__tilerelease();
++	vector = tileloadd_safe(tiledata);
++	__GUEST_ASSERT(vector == NM_VECTOR,
++		       "Wanted #NM on tileloadd with XFD[18]=1, got %s",
++		       ex_str(vector));
+ 
+-	GUEST_DONE();
+-}
+-
+-void guest_nm_handler(struct ex_regs *regs)
+-{
+-	/* Check if #NM is triggered by XFEATURE_MASK_XTILE_DATA */
+-	GUEST_SYNC(TEST_SAVE_RESTORE);
+ 	GUEST_ASSERT(!(get_cr0() & X86_CR0_TS));
+ 	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILE_DATA);
+ 	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == XFEATURE_MASK_XTILE_DATA);
+@@ -217,6 +221,11 @@ void guest_nm_handler(struct ex_regs *regs)
+ 	/* xfd=0, enable amx */
+ 	wrmsr(MSR_IA32_XFD, 0);
  	GUEST_SYNC(TEST_SAVE_RESTORE);
- 	/*
-@@ -210,10 +225,10 @@ int main(int argc, char *argv[])
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	struct kvm_x86_state *state;
-+	struct kvm_x86_state *tile_state = NULL;
- 	int xsave_restore_size;
- 	vm_vaddr_t amx_cfg, tiledata, xstate;
- 	struct ucall uc;
--	u32 amx_offset;
- 	int ret;
++
++	__tileloadd(tiledata);
++	GUEST_SYNC(TEST_COMPARE_TILEDATA | TEST_SAVE_RESTORE);
++
++	GUEST_DONE();
+ }
  
- 	/*
-@@ -265,20 +280,27 @@ int main(int argc, char *argv[])
- 			/* NOT REACHED */
- 		case UCALL_SYNC:
- 			++iter;
-+			if (uc.args[1] & TEST_SAVE_TILEDATA) {
-+				fprintf(stderr, "GUEST_SYNC #%d, save tiledata\n", iter);
-+				tile_state = vcpu_save_state(vcpu);
-+			}
- 			if (uc.args[1] & TEST_COMPARE_TILEDATA) {
- 				fprintf(stderr, "GUEST_SYNC #%d, check TMM0 contents\n", iter);
+ int main(int argc, char *argv[])
+@@ -253,9 +262,6 @@ int main(int argc, char *argv[])
  
- 				/* Compacted mode, get amx offset by xsave area
- 				 * size subtract 8K amx size.
- 				 */
--				amx_offset = xsave_restore_size - NUM_TILES*TILE_SIZE;
--				state = vcpu_save_state(vcpu);
--				void *amx_start = (void *)state->xsave + amx_offset;
-+				u32 amx_offset = xsave_restore_size - NUM_TILES*TILE_SIZE;
-+				void *amx_start = (void *)tile_state->xsave + amx_offset;
- 				void *tiles_data = (void *)addr_gva2hva(vm, tiledata);
- 				/* Only check TMM0 register, 1 tile */
- 				ret = memcmp(amx_start, tiles_data, TILE_SIZE);
- 				TEST_ASSERT(ret == 0, "memcmp failed, ret=%d", ret);
--				kvm_x86_state_cleanup(state);
-+			}
-+			if (uc.args[1] & TEST_RESTORE_TILEDATA) {
-+				fprintf(stderr, "GUEST_SYNC #%d, before KVM_SET_XSAVE\n", iter);
-+				vcpu_xsave_set(vcpu, tile_state->xsave);
-+				fprintf(stderr, "GUEST_SYNC #%d, after KVM_SET_XSAVE\n", iter);
- 			}
- 			if (uc.args[1] & TEST_SAVE_RESTORE) {
- 				fprintf(stderr, "GUEST_SYNC #%d, save/restore VM state\n", iter);
+ 	vcpu_regs_get(vcpu, &regs1);
+ 
+-	/* Register #NM handler */
+-	vm_install_exception_handler(vm, NM_VECTOR, guest_nm_handler);
+-
+ 	/* amx cfg for guest_code */
+ 	amx_cfg = vm_vaddr_alloc_page(vm);
+ 	memset(addr_gva2hva(vm, amx_cfg), 0x0, getpagesize());
 -- 
 2.52.0
 
