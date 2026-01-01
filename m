@@ -1,223 +1,154 @@
-Return-Path: <kvm+bounces-66911-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB51CEC8A7
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 21:48:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39494CECEB8
+	for <lists+kvm@lfdr.de>; Thu, 01 Jan 2026 10:12:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 52FB2300911B
-	for <lists+kvm@lfdr.de>; Wed, 31 Dec 2025 20:48:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F1915300CA1A
+	for <lists+kvm@lfdr.de>; Thu,  1 Jan 2026 09:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE5530EF62;
-	Wed, 31 Dec 2025 20:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872A528CF42;
+	Thu,  1 Jan 2026 09:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KO2pst7a";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pvP0z3pG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itPhK1UM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rxA+j7IE"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730E717C69
-	for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 20:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F4F289376
+	for <kvm@vger.kernel.org>; Thu,  1 Jan 2026 09:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767214117; cv=none; b=nhs9rXdBq8dKBPNMTEeaDTI0gpJIaqRUWYeoI7y+XWgDFRBLgQqllA4vm2Zi5WXL5xcu0bdoNyKCb74EIrL0cTDYPSou+bNheN7eXsumUXe+wqK1rUPPvhO0XiUP0UGkb0VRTGBYHz46pgPtZQ8MCobUPJaUacewixL1jMkxJ5A=
+	t=1767258325; cv=none; b=C1tzlrhOogy8rG2CyieF/kmpZI4Tl0oJBRAfDNmTqvSCmn5XxE5BNvZnWv4GfNs+p0oaWlBR3xhYllNYqCnwsk7EFiMb0BMOnBz8gUMp7yM7bthbsZdlmn1G1rMbVYs34awSMKusuBri7/aLnXACModqWm+6WcY8p2DvN5qK80U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767214117; c=relaxed/simple;
-	bh=BpH6W25VRu697Yn7DFwf7krulZ0ceVuuDV1JpnQSClg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nis89W+8mDU0eBuujwmZRU7cqz0EJOF1yIwXDiTSGf3dnsPRyyhANLMhVILunczz3QoSoaho6t5bgvha9UeWX7ZMX2E6L8aBfh3NRzTcpENF0nx+1wjGy3fvJowFPhI430LfgyDA/9ZAL2Pvr56iSnnNA93d/GVGOL68w/zW5hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KO2pst7a; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pvP0z3pG; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1767258325; c=relaxed/simple;
+	bh=QecIbI8ayv5frn1nCSUZ1SrVTu0TcbdLc3zmHPbFHJk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E29unQU09oz6wlOGjglyD8dh4jkNQL+BTDmFa0SGATeC0sJLOTiXU5xAWC23EjsXvKV5rwmypWj66A+lb/MTNyUvtmST09BSYVsuAyEftLgp37V1rPwYEI49AlY8yX6AGmyOUPDLjl6mVWzffi9LNj4zeWc0GQWmPnCemBekIz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=itPhK1UM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rxA+j7IE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767214114;
+	s=mimecast20190719; t=1767258321;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t2sN+P6W4rMfz5k+VlkZX24a7rMpvbJroFZ4fnRS1gs=;
-	b=KO2pst7a6knSWN6rwQQ5+yUFBz7s4wLh4IGyTsMIGnvbkyIE/0qxnBMpRegE4yi2MmXl2s
-	vff0dvjNVp0zDxOfz/B46oqVHAM7wvR2Azxy9iXq3hp3M6oed6ampl9o9l0xauspk84wAk
-	cjzW7jrv5VoxMU+rxuxsP+aLjHY/wmc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UlAEzcPXR845UamWej3hkdwwZvPd+P/8Ht0alhVeA1k=;
+	b=itPhK1UMG7Pfmog2GCKoZ2RW/ecL0ze0f3AqdLIMvMqEhIvoKALnO7ebFdPBZBQ13IzCma
+	OaVqiLo0BKmWaRo3UlV7BQLGb8ogcIu723DTJrb5xH7sVX1Rb1+KDxoGfiXi/gsiNYQWBo
+	32+lF/hVfCJfWLENIDaj7dBWAVEhuYQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-Z1E9W-4iMZOXj9tldqedWA-1; Wed, 31 Dec 2025 15:48:33 -0500
-X-MC-Unique: Z1E9W-4iMZOXj9tldqedWA-1
-X-Mimecast-MFC-AGG-ID: Z1E9W-4iMZOXj9tldqedWA_1767214112
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477cf2230c8so111894705e9.0
-        for <kvm@vger.kernel.org>; Wed, 31 Dec 2025 12:48:32 -0800 (PST)
+ us-mta-376-HCNweomANPinu2t-Dsy4-A-1; Thu, 01 Jan 2026 04:05:19 -0500
+X-MC-Unique: HCNweomANPinu2t-Dsy4-A-1
+X-Mimecast-MFC-AGG-ID: HCNweomANPinu2t-Dsy4-A_1767258319
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4775e00b16fso41620355e9.2
+        for <kvm@vger.kernel.org>; Thu, 01 Jan 2026 01:05:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767214112; x=1767818912; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t2sN+P6W4rMfz5k+VlkZX24a7rMpvbJroFZ4fnRS1gs=;
-        b=pvP0z3pG4NqUkDHEluND0t26A7txfqzDiv+38R+RThoSWb5dEsO1hy7Cc4yqorCchh
-         gik/JRZenBBZc51cql+BtTqJJ63YhG+FLqOw9wpzLarl/BMIS0RnUe/QPBsvoap2cNeP
-         FPw9Um2+unbT1MD29TdHNIN5x6W6gv1CorNe9QPA67D0EGBlz4F2Pg+xnhbBbVQOPknf
-         JfYCugGl1w2hambIeB0Hr1bPNMdkSO822uk37H8IbRyOPNuPt4eIr1xt94kQ5rA6TcXZ
-         m2ERDOWtf+wCEVR++av9x3FewQECEcUv6ApsMPpFpR6DmoQcUZXLYWIoCdEXXmjyyXhP
-         SN3A==
+        d=redhat.com; s=google; t=1767258318; x=1767863118; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UlAEzcPXR845UamWej3hkdwwZvPd+P/8Ht0alhVeA1k=;
+        b=rxA+j7IEW/82sHOtLfrjpGwbuE78voI36ix4GlAyCqaNRPg5zN4W0fiHXuAdMmESeU
+         HPTJ/nl4c97P4HeN0QbSH7S3yAowyIkKeYaCz42wY9Fp+fNFpacr3ERKECszRmKnsZxw
+         9J9T4eFAnQVWlhDqiFnXHqnBT+XXKm0OUM5Qrm2wb9sfQs3+XcyF4B7cFuqxXDydBYpW
+         rzFxa3U2pox7A4JGM4EFKpf6Zw+UEqLYIMSCye4lgVoQKDsSSy5Bc9MocD+uCkuRbQpf
+         vHQn63usM67jbQeaX+Jl/to4RelpqRgOZ385pxXlBX+EbAUBCoww34u4FayTc1JdP+Oh
+         6xlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767214112; x=1767818912;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t2sN+P6W4rMfz5k+VlkZX24a7rMpvbJroFZ4fnRS1gs=;
-        b=gJ3O4BJp96T1pyAi1Nahsq2vrwg0r4DHrtolDzhWwZ5pO8FnUckoHmXtUfmwOiej4I
-         PLEu1MX0dLWjT61T5+fiRzILTEL1bPado1DyDnUpbWYLNEy6nVi9JsEls1NizhmKObH8
-         4S3dQ+wMZzCDrCwoZkbwQ+1uFt/be0FhLDQwLfxl8663S9jt3ycqmTYVz6yrVbWL82Pd
-         qw4HWfoXmNc1/6R7YvJ/Iub4arhZMXstN4VH+Mo1zZPgPXyuumKEM0SicLhLsrU3wIRs
-         n5hOHmVWucm+pfgobBL0v9a9Ha3N5M3b6oNKGsd034P+NRX2jBkhUuXgHJSeBBL2LLMI
-         z6Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCW11Er+L9ZqI8YA2RtgezmMizPkDr5HpIDOCo4l8rLyvBH/FMMAySgTA+8n/JG1M4IJKTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCNywCuua9ejYS/X/AUCom649YZ228rtgOzEArprXR/n2kE4Pj
-	PLdaDDcNimF4Q/LfmuNkSP4dIPachnj9t8OLEgVIe4EgZMxplCHNnKnWREe7XC9NveReruQWXbU
-	kac8SIBzV7hoBBtZMP2GiKvftux+wKi5Qk5J3P537sDnnKXrSdFQQqw==
-X-Gm-Gg: AY/fxX7z8+kSELKUqyzuBUGRAgb+/Bf2s1r2wz1OeTQ7DHYBzO6sXpZ9hFvEvTKaUWn
-	r6r+auf/6Yti4dblOiaCan5gr3V6DZ7740LU96hCLaUEdfPYTlmzi5t+bkqm+sxFLE1MOVAwNO4
-	mbJncA1B9NvGRTYzpLvDv/fJKlmFuv1Xx+ml/wNoZyzWb58EM3qnULq4pf4ftVLBYu2x805j6pj
-	3Gz7czv0gwE/DRNAO1LlK7UZK+2wVUGV3Hva28V8JQOEyY5HWlPhlQigxHGCa9OMwO29qZElKWg
-	5hVWHmnGIsd4ljRP3329rmd/xBTmRwaudivIsA/PUkbrosC9qlLQVEXs9z9+z6+aWbJoQwO0bL7
-	FDFHVYmHpGovBiyZi8Uuni4qTNNYEd6bKLA==
-X-Received: by 2002:a05:600c:444b:b0:477:9814:6882 with SMTP id 5b1f17b1804b1-47d1953b77fmr390890785e9.5.1767214111811;
-        Wed, 31 Dec 2025 12:48:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGUX2S3Ts6MrXbJAEZ1+1hODDbGMnh81w30kfQclg714E6BWRq3zDXGinSJodthec3i9GHMDw==
-X-Received: by 2002:a05:600c:444b:b0:477:9814:6882 with SMTP id 5b1f17b1804b1-47d1953b77fmr390890515e9.5.1767214111286;
-        Wed, 31 Dec 2025 12:48:31 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d19362345sm662070775e9.6.2025.12.31.12.48.28
+        d=1e100.net; s=20230601; t=1767258318; x=1767863118;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UlAEzcPXR845UamWej3hkdwwZvPd+P/8Ht0alhVeA1k=;
+        b=VtLvzwe8PzaYp/V8MAUFNA/LkMB07pT/n3Vh+cbWqqITvKCY9rDsLSTquLr3DxmDHA
+         4exn1BLG6PukHT9bA1Zzz20zzUwLGyrGDsnNxpPIMUL4pMfizc3ANuyQAnsTjwWaKoHo
+         lXk/yzXejgqNir8Ryb1m/i2AbS2rRtDAfXfzjDp6r3/ZJJ5URoEHLJE3U4Nycr5vl8VG
+         Jw+aFWq9pg2Q7AXIbAL0FG6aV7AjM3sic7w5zKySEsYrCc6rPNO0D/3LTILgkNhDWVdg
+         nHe6KSQ6U45bxHtv+CtDRGb8VV2jlj42JQU+Qzb13g2uIXGoNEw265LOM+XX6yOOnGXS
+         R85g==
+X-Forwarded-Encrypted: i=1; AJvYcCWmKlBE5VaG5ZXhzg4QewQwJ92ftS/ppEyIXroMs3MiAkumwelak1ejaghHNFkaIP1C1ww=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/n5QXhPo2NnTQWUd9O1VzB5vwnVfx2uzeHtxtUYNA1wLjRL9W
+	3xSp0zV/GgPZsyC08dEvpskr1AEINMcO+LTbqCJtugMGoo+7dkUcQTXqNKIBU4N1+leTc/bFPvw
+	u9NO4p+ubGHMcjjfEH8D4PFgn7KfQOj+Ew+VP3jobcsBeBtVHDwU8OQ==
+X-Gm-Gg: AY/fxX4P3rvINplXVLJXMTyCsMwbw4QRjQhcccF+qmbIWQFhBeGTGksESVuKwmTQHus
+	90UnJXqqYpUKFCVqD0a88pT5DUCduzv61QBk2iUc45YOgWF1bLARLEPk0Ikx62aedlMCDgQ6cFD
+	kBfkR3OGMsrCuF8zrf9tNyqU+KQciltDWVTACpoMpHEoA9WXdK1a+GBYQIYi7TouCciPJg2yixV
+	ir9vfABpO6uveJZNGavo7cxzcZLyBJOr4/qfmwzTwv49sqal5r9ZAY30ZgYQ/Zswokp0QaqNqtb
+	48WSlF3cHIZw/PmNG2ZorhjIl4LgOZAxLbfWyOf/mgg5Q7VzlpWZLEV7Z+Tjscpmv6gE+EIkmaj
+	Df24TZIG6D/atWjFzrp7MdeVjzPYBU3VpYBHzbYfEFzunIuy9wlp6CE72VTldyd25GtMLIKImFh
+	R35GMRSDW0UQ76Ug==
+X-Received: by 2002:a05:600c:1d1d:b0:471:d2f:7987 with SMTP id 5b1f17b1804b1-47d1958f9c5mr445504445e9.26.1767258318517;
+        Thu, 01 Jan 2026 01:05:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFnRKxVGahaGqq0YTZ2CUKQ2TtfV42YjByKztYMXCFLLp/SOg/1JjoMPjiKkrkVYXp6l52M0w==
+X-Received: by 2002:a05:600c:1d1d:b0:471:d2f:7987 with SMTP id 5b1f17b1804b1-47d1958f9c5mr445504105e9.26.1767258318083;
+        Thu, 01 Jan 2026 01:05:18 -0800 (PST)
+Received: from [192.168.10.48] ([151.61.26.160])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3aac6d9sm306477025e9.4.2026.01.01.01.05.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Dec 2025 12:48:30 -0800 (PST)
-Date: Wed, 31 Dec 2025 15:48:26 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Petr Tesarik <ptesarik@suse.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 01/13] dma-mapping: add
- __dma_from_device_align_begin/end
-Message-ID: <20251231154722-mutt-send-email-mst@kernel.org>
-References: <cover.1767089672.git.mst@redhat.com>
- <ca12c790f6dee2ca0e24f16c0ebf3591867ddc4a.1767089672.git.mst@redhat.com>
- <20251231150159.1779b585@mordecai>
+        Thu, 01 Jan 2026 01:05:17 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	x86@kernel.org
+Subject: [PATCH v2 0/4] x86, fpu/kvm: fix crash with AMX
+Date: Thu,  1 Jan 2026 10:05:12 +0100
+Message-ID: <20260101090516.316883-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251231150159.1779b585@mordecai>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 31, 2025 at 03:01:59PM +0100, Petr Tesarik wrote:
-> On Tue, 30 Dec 2025 05:15:46 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > When a structure contains a buffer that DMA writes to alongside fields
-> > that the CPU writes to, cache line sharing between the DMA buffer and
-> > CPU-written fields can cause data corruption on non-cache-coherent
-> > platforms.
-> > 
-> > Add __dma_from_device_aligned_begin/__dma_from_device_aligned_end
-> > annotations to ensure proper alignment to prevent this:
-> > 
-> > struct my_device {
-> > 	spinlock_t lock1;
-> > 	__dma_from_device_aligned_begin char dma_buffer1[16];
-> > 	char dma_buffer2[16];
-> > 	__dma_from_device_aligned_end spinlock_t lock2;
-> > };
-> > 
-> > When the DMA buffer is the last field in the structure, just
-> > __dma_from_device_aligned_begin is enough - the compiler's struct
-> > padding protects the tail:
-> > 
-> > struct my_device {
-> > 	spinlock_t lock;
-> > 	struct mutex mlock;
-> > 	__dma_from_device_aligned_begin char dma_buffer1[16];
-> > 	char dma_buffer2[16];
-> > };
-> 
-> This works, but it's a bit hard to read. Can we reuse the
-> __cacheline_group_{begin, end}() macros from <linux/cache.h>?
-> Something like this:
-> 
-> #define __dma_from_device_group_begin(GROUP)			\
-> 	__cacheline_group_begin(GROUP)				\
-> 	____dma_from_device_aligned
-> #define __dma_from_device_group_end(GROUP)			\
-> 	__cacheline_group_end(GROUP)				\
-> 	____dma_from_device_aligned
-> 
-> And used like this (the "rxbuf" group id was chosen arbitrarily):
-> 
-> struct my_device {
-> 	spinlock_t lock1;
-> 	__dma_from_device_group_begin(rxbuf);
-> 	char dma_buffer1[16];
-> 	char dma_buffer2[16];
-> 	__dma_from_device_group_end(rxbuf);
-> 	spinlock_t lock2;
-> };
-> 
-> Petr T
+Fix a possible host panic, due to an unexpected #NM, when a KVM guest
+is using AMX features.
 
-Made this change, and pushed out to my tree.
+The guest's XFD value, which is stored in fpstate->xfd, is used for both
+guest execution and host XSAVE operations.  However, the guest-configured
+XFD setting can disable features that were enabled when the guest executed
+XSAVE, and this causes a #NM when executing XRSTOR on the guest FPU state.
 
-I'll post the new version in a couple of days, if no other issues
-surface.
+This can happen in two cases: due to a KVM_SET_XSAVE that includes a
+disabled component, or if an interrupt causes XSAVE to be executed
+before the call to fpu_update_guest_xfd().
+
+The first patch fixes both cases, the rest is improvements to selftests
+in order to cover this test and also verify that #NM faults are injected
+corectly.
+
+v1 had extra patches to export higher-level functions for KVM in place
+of switch_fpu_return() and fpregs_assert_state_consistent().  Those
+were part of refactoring how KVM loaded guest state when KVM_RUN is
+issued, but are not needed anymore with this v2 fix and I will submit
+them separately.
+
+Tested on a Sapphire Rapids machine, reviews and acks are welcome so
+that I can submit it to Linus via the KVM tree.
+
+Paolo
 
 
 
+Paolo Bonzini (2):
+  selftests: kvm: replace numbered sync points with actions
+  selftests: kvm: try getting XFD and XSAVE state out of sync
 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  include/linux/dma-mapping.h | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> > 
-> > diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> > index aa36a0d1d9df..47b7de3786a1 100644
-> > --- a/include/linux/dma-mapping.h
-> > +++ b/include/linux/dma-mapping.h
-> > @@ -703,6 +703,16 @@ static inline int dma_get_cache_alignment(void)
-> >  }
-> >  #endif
-> >  
-> > +#ifdef ARCH_HAS_DMA_MINALIGN
-> > +#define ____dma_from_device_aligned __aligned(ARCH_DMA_MINALIGN)
-> > +#else
-> > +#define ____dma_from_device_aligned
-> > +#endif
-> > +/* Apply to the 1st field of the DMA buffer */
-> > +#define __dma_from_device_aligned_begin ____dma_from_device_aligned
-> > +/* Apply to the 1st field beyond the DMA buffer */
-> > +#define __dma_from_device_aligned_end ____dma_from_device_aligned
-> > +
-> >  static inline void *dmam_alloc_coherent(struct device *dev, size_t size,
-> >  		dma_addr_t *dma_handle, gfp_t gfp)
-> >  {
+Sean Christopherson (2):
+  x86/fpu: Clear XSTATE_BV[i] in save state whenever XFD[i]=1
+  selftests: kvm: Verify TILELOADD actually #NM faults when XFD[18]=1
+
+ arch/x86/kernel/fpu/core.c                 |  32 ++++-
+ arch/x86/kvm/x86.c                         |   9 ++
+ tools/testing/selftests/kvm/x86/amx_test.c | 144 ++++++++++++---------
+ 3 files changed, 123 insertions(+), 62 deletions(-)
+
+-- 
+2.52.0
 
 
