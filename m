@@ -1,63 +1,64 @@
-Return-Path: <kvm+bounces-66948-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66949-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2419BCEEF66
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 17:24:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F44CEEFED
+	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 17:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 675CE301BE9C
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 16:23:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6527C3009C10
+	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 16:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891C32BE7CD;
-	Fri,  2 Jan 2026 16:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBAA2C0F97;
+	Fri,  2 Jan 2026 16:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YuLDf+gA"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dMJAamDH"
 X-Original-To: kvm@vger.kernel.org
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34F7258CCC;
-	Fri,  2 Jan 2026 16:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71540291C33;
+	Fri,  2 Jan 2026 16:41:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767371027; cv=none; b=ZCf8xSW3kx1Dli8gWZfPeymQs9/ycnq5Z5YAwvy3PjsmlXxAGAqVFVa35qaOiKBc9Pezhk7cLvGAHMpCkcYgEYzFdfKg9sG1sYcMDz/62LlzcXaqgEkoXnKo9cDRhHuaUlsgDtF1FO52NXohovNGVgGWANkjIbU5JNJR6YzNG8A=
+	t=1767372101; cv=none; b=HWS67afINbZe04IxqskulRMXDLlULxPjjmzrLDCJ6vT3b9MEu8xMxnx+oXbLkg7iH4pKG1D61toAWATzqTwSJmALlT0duiBzQbp50vnaiWgJj5yqJjN0dvhWbnhGm/icZcx57ywiJWzLzy6YwfsiyrcKRTCPhqndEHWmiXshcIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767371027; c=relaxed/simple;
-	bh=+t/1yoVWnEBfJtgTtDW5aaVGUutMl1Z0qbp+ZH3X9PA=;
+	s=arc-20240116; t=1767372101; c=relaxed/simple;
+	bh=5/a6Lsy/D5Wxzb+zjVDb9wcOmyYEPpU2zUn1m69k67s=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ajYwMdFsruMjyx+Ua2GY3VFOp0e7vJXgX6ulJMdEDYbug/E3Gt/11sqfmUWNo3IWnzGveWSPFKI6yGITUqxZw6e8tR3QeEjAy6vx3hemZXqWWTO2dQiZOIw/DRD3utch8ums6u6hqPLMApMP9ciNDzzvCVU7ZMPWTro/w1itPqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YuLDf+gA; arc=none smtp.client-ip=90.155.92.199
+	 Content-Type:MIME-Version; b=PtUyjye0y9itGb97N9FDL4PBgtcrqQe/6B1tY/WBKfZcDUB2lwsuM1Bj1jkQqePmBDPNNOLOFHSYkdMi3/yZFFxb+dOC2sePZ+a/b5SY39ZDJsqLjmInzCjMqomJxe52V0JxxJtfY6kXVS4qZWyBmI4dC94hU5rsEtyE79A+1zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dMJAamDH; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=+t/1yoVWnEBfJtgTtDW5aaVGUutMl1Z0qbp+ZH3X9PA=; b=YuLDf+gArUabMOhmI7J8QNDyeO
-	4HXEGlNXS+mv0Sm0NXVotj0LUyF2hfCzW/sI+2COjtynnIkKmheDpoFvDbEZUUr4Z86bmb+uEWGeJ
-	rT5DEayeHgivpapamC7IJxoXmwYo2MOd9TBlu9EX52OOu6ieDEeU+Kkd0Lzzh4KmA9vmeDt4cM/M5
-	kAbzAFXyX8R8O5wYLIwudd3d+UPe/Wr31AwnW2E1ve9hkiRmo0wv8P8DBxXXbK4x7SHaUl9jsBI5U
-	1a7n7KyOB1BuJf1SVhLjdW8uqlrsl2It+TQG5bFz6FVpCudbbgS3DvFUISOo3AAgOojPA36aMrKBE
-	0W9+zbjg==;
+	bh=fsp1VhPpYZb1dGASRwU5WZIOS6V2+sf0wq+zIAQmtSk=; b=dMJAamDHMVd/hSmg5hL1KlOrq/
+	hEXmSqf3e0/YPQ2t8LoTREFJf4UJdM+4MvsBVb2D4emL7fA7LZ7J7kwS9mx4CcSsqtij/PWiKyYxq
+	cC3mVKDdc+8kGMP/R+11xs5sbxPsieorQxmzGF3ZSPYULDiBGIiLktjSaPLbsNpSs7USmJu5evjqY
+	dXUTWMBC70rFTOToaTueHOfm6RiKBkyeqJ6pAXX4urkj04gLomwNVjDQTw6S9RRY/s8gmABBX38PG
+	2L91dA36Wwof3UN/jOUfUfCYViWS4pAJgsNhbmRjv37si4F3scDWJY3mSQxFtdkMpC6VqMMA9oxAe
+	lY71YqzA==;
 Received: from [172.31.31.240] (helo=u09cd745991455d.ant.amazon.com)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vbhw7-000000061iC-2IBj;
-	Fri, 02 Jan 2026 16:23:36 +0000
-Message-ID: <e09b6b6f623e98a2b21a1da83ff8071a0a87f021.camel@infradead.org>
-Subject: Re: [PATCH v5 1/3] KVM: x86: Refactor suppress EOI broadcast logic
+	id 1vbiDR-000000062NN-0RXy;
+	Fri, 02 Jan 2026 16:41:29 +0000
+Message-ID: <179aa29aa9d5baa698171b884bb6fbe66ad5c2b3.camel@infradead.org>
+Subject: Re: [PATCH v5 3/3] KVM: x86: Add x2APIC "features" to control EOI
+ broadcast suppression
 From: David Woodhouse <dwmw2@infradead.org>
 To: Khushit Shah <khushit.shah@nutanix.com>, seanjc@google.com, 
 	pbonzini@redhat.com, kai.huang@intel.com
 Cc: mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com, 
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  dave.hansen@linux.intel.com,  tglx@linutronix.de, jon@nutanix.com,
- shaju.abraham@nutanix.com
-Date: Fri, 02 Jan 2026 16:23:35 +0000
-In-Reply-To: <20251229111708.59402-2-khushit.shah@nutanix.com>
+ shaju.abraham@nutanix.com,  stable@vger.kernel.org
+Date: Fri, 02 Jan 2026 16:41:28 +0000
+In-Reply-To: <20251229111708.59402-4-khushit.shah@nutanix.com>
 References: <20251229111708.59402-1-khushit.shah@nutanix.com>
-	 <20251229111708.59402-2-khushit.shah@nutanix.com>
+	 <20251229111708.59402-4-khushit.shah@nutanix.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-5l/WRKmSJXRdPZCZ/cK5"
+	boundary="=-fwQoJZLWYsFrxIprpRpV"
 User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -68,38 +69,111 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-5l/WRKmSJXRdPZCZ/cK5
+--=-fwQoJZLWYsFrxIprpRpV
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, 2025-12-29 at 11:17 +0000, Khushit Shah wrote:
-> Extract the suppress EOI broadcast (Directed EOI) logic into helper
-> functions and move the check from kvm_ioapic_update_eoi_one() to
-> kvm_ioapic_update_eoi() (required for a later patch). Prepare
-> kvm_ioapic_send_eoi() to honor Suppress EOI Broadcast in split IRQCHIP
-> mode.
+> Add two flags for KVM_CAP_X2APIC_API to allow userspace to control suppor=
+t
+> for Suppress EOI Broadcasts, which KVM completely mishandles. When x2APIC
+> support was first added, KVM incorrectly advertised and "enabled" Suppres=
+s
+> EOI Broadcast, without fully supporting the I/O APIC side of the equation=
+,
+> i.e. without adding directed EOI to KVM's in-kernel I/O APIC.
 >=20
-> Introduce two helper functions:
-> - kvm_lapic_advertise_suppress_eoi_broadcast(): determines whether KVM
-> =C2=A0 should advertise Suppress EOI Broadcast support to the guest
-> - kvm_lapic_respect_suppress_eoi_broadcast(): determines whether KVM shou=
-ld
-> =C2=A0 honor the guest's request to suppress EOI broadcasts
+> That flaw was carried over to split IRQCHIP support, i.e. KVM advertised
+> support for Suppress EOI Broadcasts irrespective of whether or not the
+> userspace I/O APIC implementation supported directed EOIs. Even worse,
+> KVM didn't actually suppress EOI broadcasts, i.e. userspace VMMs without
+> support for directed EOI came to rely on the "spurious" broadcasts.
 >=20
-> This refactoring prepares for I/O APIC version 0x20 support and userspace
-> control of suppress EOI broadcast behavior.
+> KVM "fixed" the in-kernel I/O APIC implementation by completely disabling
+> support for Suppress EOI Broadcasts in commit 0bcc3fb95b97 ("KVM: lapic:
+> stop advertising DIRECTED_EOI when in-kernel IOAPIC is in use"), but
+> didn't do anything to remedy userspace I/O APIC implementations.
 >=20
+> KVM's bogus handling of Suppress EOI Broadcast is problematic when the
+> guest relies on interrupts being masked in the I/O APIC until well after
+> the initial local APIC EOI. E.g. Windows with Credential Guard enabled
+> handles interrupts in the following order:
+> =C2=A0 1. Interrupt for L2 arrives.
+> =C2=A0 2. L1 APIC EOIs the interrupt.
+> =C2=A0 3. L1 resumes L2 and injects the interrupt.
+> =C2=A0 4. L2 EOIs after servicing.
+> =C2=A0 5. L1 performs the I/O APIC EOI.
+>=20
+> Because KVM EOIs the I/O APIC at step #2, the guest can get an interrupt
+> storm, e.g. if the IRQ line is still asserted and userspace reacts to the
+> EOI by re-injecting the IRQ, because the guest doesn't de-assert the line
+> until step #4, and doesn't expect the interrupt to be re-enabled until
+> step #5.
+>=20
+> Unfortunately, simply "fixing" the bug isn't an option, as KVM has no way
+> of knowing if the userspace I/O APIC supports directed EOIs, i.e.
+> suppressing EOI broadcasts would result in interrupts being stuck masked
+> in the userspace I/O APIC due to step #5 being ignored by userspace. And
+> fully disabling support for Suppress EOI Broadcast is also undesirable, a=
+s
+> picking up the fix would require a guest reboot, *and* more importantly
+> would change the virtual CPU model exposed to the guest without any buy-i=
+n
+> from userspace.
+>=20
+> Add KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST and
+> KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST flags to allow userspace to
+> explicitly enable or disable support for Suppress EOI Broadcasts. This
+> gives userspace control over the virtual CPU model exposed to the guest,
+> as KVM should never have enabled support for Suppress EOI Broadcast witho=
+ut
+> userspace opt-in. Not setting either flag will result in legacy quirky
+> behavior for backward compatibility.
+>=20
+> When KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST is set and using in-kernel
+> IRQCHIP mode, KVM will use I/O APIC version 0x20, which includes support
+> for the EOI Register.
+>=20
+> Note, Suppress EOI Broadcasts is defined only in Intel's SDM, not in AMD'=
+s
+> APM. But the bit is writable on some AMD CPUs, e.g. Turin, and KVM's ABI
+> is to support Directed EOI (KVM's name) irrespective of guest CPU vendor.
+>=20
+> Fixes: 7543a635aa09 ("KVM: x86: Add KVM exit for IOAPIC EOIs")
+> Closes: https://lore.kernel.org/kvm/7D497EF1-607D-4D37-98E7-DAF95F099342@=
+nutanix.com
+> Cc: stable@vger.kernel.org
+
+Do we want the Cc:stable? And if we do we'd want it on all three
+patches, surely?=20
+
+> Suggested-by: David Woodhouse <dwmw2@infradead.org>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
-
-Looks good to me, thanks for pushing this through to completion!
-
 
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-Nit: Ideally I would would prefer to see an explicit 'no functional
-change intended' and a reference to commit 0bcc3fb95b97a.
+Although...
 
---=-5l/WRKmSJXRdPZCZ/cK5
+
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1229,6 +1229,12 @@ enum kvm_irqchip_mode {
+> =C2=A0	KVM_IRQCHIP_SPLIT,=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* cr=
+eated with KVM_CAP_SPLIT_IRQCHIP */
+> =C2=A0};
+> =C2=A0
+> +enum kvm_suppress_eoi_broadcast_mode {
+> +	KVM_SUPPRESS_EOI_BROADCAST_QUIRKED, /* Legacy behavior */
+
+
+I believe it's cosmetic but I think I'd be slightly happier with an
+explicit '=3D 0' on that, as we rely on that field being initialised to
+zero with the allocation of struct kvm, don't we?
+
+
+--=-fwQoJZLWYsFrxIprpRpV
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -178,22 +252,22 @@ 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
-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
+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
-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
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAwNd2IimrZmfN
+tRGWsiunPx4iNvZI9bv8wJiDgYjVYGbxjNqLnqGc2gR3YDw1N1/vDCB7cESw7liqXt9GtmY7jDIP
+zBuCTZ3NyguIwOp1yOJ2iUnnEqhwyKFMfMLnkSFbPV6OPTPa6BN6x4YK1JVUwYHSXQJ2e5aaOCZs
+jI+yQpOwKRoof6Zi0F/P1lIT+/eXsODbRthBWkaRluHjT0ViSruMtPkwTowG4lc+FqX5zqH24ieh
+J1R7ENOkqKx3p7hcszbMnK+HlEWj9mopxQUKOeUugx1MKDefz4P/s1KxvT2ERedYBRVrhIkrTn0I
+i2fMQAYJq+YxlKXG8b8OWeuRaU2oenPhFdPrSvAraZj3uVgvCwqflxieWCVJnEeoCHt+6JMqTzHH
+wuwy0OinhY6KUWn3ZAF+qLGbG+iPVrvYfn4KhYlcvhwcLeNUDkkoEKWCh12U9eWT6qYwhbwH0Gvf
+4E/A4fsxxR5HqnFqZAYIBhIUb1Obmyih3ZWtBqHWYwa/3xWflj/E+GcR31Kxne6kifKVPJXXO/FT
+0Ko/Brr4WjrTz2sZ7QIOZP7Rp8Z38TkqoO/Ubs3JgGZgWMB5Oqr8kJcrleQf118UirThnVIi0a5X
+M0nzlwLSnnaKJEz3B1JMPNBNXvrwuYdWcYoNK2lVXuT/yg6v1Jh5/6QIRw82fv8AAAAAAAA=
 
 
---=-5l/WRKmSJXRdPZCZ/cK5--
+--=-fwQoJZLWYsFrxIprpRpV--
 
