@@ -1,153 +1,219 @@
-Return-Path: <kvm+bounces-66930-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66931-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74EFCEEAB3
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 14:28:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD02FCEEBF1
+	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 15:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D5DB13002889
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 13:28:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AA4C301D67E
+	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 14:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944DA311967;
-	Fri,  2 Jan 2026 13:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA70312820;
+	Fri,  2 Jan 2026 14:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/LYyrVW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efWmseMs"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75417260F
-	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 13:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEA330E857
+	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 14:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767360497; cv=none; b=nLRoHkdhP0xFi3MF2BxIjokWU8KEuiJR7tkkMYf9EzB0sj9C5OjBdwvx/kBAVYBocP+/H012PDqe5YhZoVzsBrdij4OWIiXSOmzYNjGFUnvg1LBKpEWntsSRALctudqv+7Nq08ssYwCmystBBwjVGqFCRZpij54yTPX0G7WyQyU=
+	t=1767363878; cv=none; b=DYr0+c2ScERam2qiJSsBy6oLmnZwXwefRttZLXPIiwc7H00fQF7sBXLwsywKeMFChMZU+aoj9kUXM5IfRZ5/GXfWCmSPUlaT+VLk4jBcayFmYZajnxMX+JQjhxRdDZ8YaHKG9DEHj0uEvqXvz24bImyz6gTObyYZJ2SVJ2vJ4a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767360497; c=relaxed/simple;
-	bh=caKMln/4An5074vy/0LbmODygrWbyLltEqRTVzyaZyo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VRwKIJthPo9dB1HDRNpEChlwodvA0Xn7LRmrZLY07XSgc+Ikx5j5ZMGQtMbyJUiVd0kAsonMQ1y2R0P4pFQCWiLiVqK43vJbbo9xaNUCHlUrMFHcdqp4kJ8PzXG7OkRLJIiFZGqutpJ5iAD3Gh8J7mfV27gKm2mpHoLl2Y7uUBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/LYyrVW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E0FEC19423
-	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 13:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767360497;
-	bh=caKMln/4An5074vy/0LbmODygrWbyLltEqRTVzyaZyo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=j/LYyrVWYBX6/xiFBJCYzPt2mAjHPCdML6RZHqYxHB3JLuG+XVa48k+IbFa1/ydYH
-	 yzLWkGX2d/nsNwNLBfGEKgQx/Y31IcJRJytcsUrwFYWxV4I4ndl8HDE1gsWW9D+fsW
-	 tkOdzT6QA4VM80ok+nOp6C16Iy1MKAT95Q/2l9114MivMXUzbox1yPNxO2sfnrqTwX
-	 pm8UKITq5tQDOE65/Qnd0pkfKV9M7ZB31pmItU0vWSV/qe8rZrpUm2qM/b1BHC1YYp
-	 F/QZg0d4SfPs97bZzrucZYLPyO4UX37A651XQnEg9dQ930Z2nK3qcF40HhLqhQRSeU
-	 h/5hZzEbjYRDQ==
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-598eaafa587so13826650e87.3
-        for <kvm@vger.kernel.org>; Fri, 02 Jan 2026 05:28:17 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU1wEQxQ/Gl4Yw5VaUx8FQKJN1aNz78g0W1XKPnVcOmgB/5LGyKM52G53+AziPOp/Vz7Co=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7AU5es5+QBmBjxOXzLk8/tGZMZzE7z7K4JyvcC23UlSSrRZQe
-	u5QPnqoESfxEb36ZtyY/PzRd14NEXUwZfFTgfuniJ3RbzT8crhx1HcQRiwOkoNIcQfe+sQROppS
-	ap3PwLWrmhT1WBQjaxp+OmzhAr7iFru+h/vwhvlshxQ==
-X-Google-Smtp-Source: AGHT+IHHF6srkWGBj0h2W2m125Q8RRqweGoiS7tVO11k+MLcdE1dgvfbJ2DaGFg9ECUq+/XShJKxHMrRpS3Ip55rUHI=
-X-Received: by 2002:a05:6512:398c:b0:594:522d:68f4 with SMTP id
- 2adb3069b0e04-59a17de2c1amr14462802e87.28.1767360495900; Fri, 02 Jan 2026
- 05:28:15 -0800 (PST)
+	s=arc-20240116; t=1767363878; c=relaxed/simple;
+	bh=SW0KvHxcB5Ki/WF5fTbvn7mCbva6OjKHduifm92d7qs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gPSZfWwLRqBkY/WW5QGIyeNxadyXBsMqkzYRoOGPD22TYo2Gum8//FYewdUaTD9bjubhkrRjj8Jyg01v7AYtro2UF5gBASYtGwmrM5zti4bMGf5UDRboIqFjmtBH2eN1YF0N8ycZjxbhRbZEugUfHLLzFiFAsqcJFMPYbNnoQVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efWmseMs; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47a8195e515so73160205e9.0
+        for <kvm@vger.kernel.org>; Fri, 02 Jan 2026 06:24:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767363874; x=1767968674; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=my2o2dIzac4OWOq3Y/Xzs5/dD+yeMBpNp7+C9Ouq+1w=;
+        b=efWmseMsIdBa0FjkBMPTz932H+aXyuzffRoZIknFj7y6y7Mzrw+LWajNnvFdoVkAAv
+         yQuXpTzuDq1C2OvSB0D7yFwnmxfAYRkIQ26Q2t+vQ/irfuQeC5sW+5yO0dHNe9Ag/ZER
+         cP4nsclq/k+q1ZfE8ghGIhk+09/iuJZ4fUzDNduA5rMv7VdqUerhvDDZ3f0a72HW8BgA
+         tBlmNnFW89HUl/B3aZ1u73je5ENPEFQK4kWNx+V6wnudCaQHzNxBuMyPeRlQcuYY3Tq1
+         7CnXQIhoXApiTSlOOfUcZZU7cbaYHHxYdo6eqnfH0SdbEWeuA3pNe+rHKw2e92EduyEV
+         5H7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767363874; x=1767968674;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=my2o2dIzac4OWOq3Y/Xzs5/dD+yeMBpNp7+C9Ouq+1w=;
+        b=S5VJJGrolID2C5DePPJFUeqTqP5iTJtYNbGvNamuIxt50EUl+bvZyJJ5HST98Tr1u1
+         gQGwBu37105Sro9Rq6FBkJTcwytKjEzDQVC5sZChjIseHjBoiTFN4VbmgTMuDLWNlI+o
+         m9WA92IiQnDFL3g0sVh89xq7gu9YI0i/sHsPqhepEkbqIcV1WD8zaK66/U/4vWDyy3am
+         AyTUIikE1L06OTqxcCp3P6bnZKU3CYQooqxqRU+4IipjnRie+dg0JGZBb0cw/U0dGGOU
+         a5SeeqGnxAAJD9qfUBDJ1ZbYaEYT69S13q9kQWQktx2mv/68QtsHsrHm6FssZSg3JZP3
+         1Oeg==
+X-Gm-Message-State: AOJu0YwM/LByJS6BBsY+sMiN7pHHEcqhTX1x1+VEnKBKMrA20DXwRm/+
+	p46mdrLw0GIuhq6CwKs6xX4VVJogarrMFjfrdTK8AF547ETcdWeEYN8OLhP8UGk3qRw=
+X-Gm-Gg: AY/fxX6KSbbttpq/3tTaa2gXeJmLRWbxC30hFPXNKlrU+ugphooUNUhjrYSCZEsTz7r
+	/1sE7+NEcpUC4Ng/B1xTCs8Z4nmUJeFhcjdDC7/V3tSWQ0BRu1akpaJ+AbE3Evf1aZu0XlEbNts
+	hWk2eO4DcJFsS5L0Ya/OgXpR79R/JAwgfMHuWRGV87d0CtSwVGFhW4pfHbyWhqTDpwjBLo5Ep6+
+	muNqKSBnj+XG59y4vErlprUhx964SKVvY3PuB+0OaLZiGqvwpAWBUAw1o0VFPlH1CZNjFM8s+EG
+	+j5ewrXVCFvpTJ7D+sYL6qS48OcpEX1oNyVviriojKlTAU9jlKQLsg15+AbZ2HMyi22MDPEt1d/
+	aRdZqMBRGwGp8jUOdw87i/A1ozC/0EgOmlQBGAkh58eEdRMW0g2EpLnUJ5d+ELISSep46mqp6BE
+	34tNlrZ0tvpj6I/qNgy7pBpH+OkYCGaMotmnS/3iniF9ik2dcoxe/PYy1JO4dx8fWQkHZZhO7u1
+	jQuuwzuHj1XjYe2EvsKYO+MLnOwqCG4
+X-Google-Smtp-Source: AGHT+IHKBXGau8MPaeirsCahDaWE9JWXdxyLyEdTLY2SGjXfRl6mxef/BeRFqCvfVfgG/TbOxXbT1Q==
+X-Received: by 2002:a05:600c:4511:b0:477:af74:ed64 with SMTP id 5b1f17b1804b1-47d19593992mr491692865e9.27.1767363873762;
+        Fri, 02 Jan 2026 06:24:33 -0800 (PST)
+Received: from ip-10-0-150-200.eu-west-1.compute.internal (ec2-52-49-196-232.eu-west-1.compute.amazonaws.com. [52.49.196.232])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be27b0d5asm806409235e9.13.2026.01.02.06.24.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jan 2026 06:24:33 -0800 (PST)
+From: Fred Griffoul <griffoul@gmail.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	vkuznets@redhat.com,
+	shuah@kernel.org,
+	dwmw@amazon.co.uk,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fred Griffoul <fgriffo@amazon.co.uk>
+Subject: [PATCH v4 00/10] KVM: nVMX: Improve performance for unmanaged guest memory
+Date: Fri,  2 Jan 2026 14:24:19 +0000
+Message-ID: <20260102142429.896101-1-griffoul@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1767089672.git.mst@redhat.com> <55e9351282f530e2302e11497c6339c4a2e74471.1767112757.git.mst@redhat.com>
- <CAMRc=MfWX5CZ6GL0ph1g-KupBS3gaztk=VxTnfC1QwUvQmuZrg@mail.gmail.com> <20260102080135-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260102080135-mutt-send-email-mst@kernel.org>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Fri, 2 Jan 2026 14:27:50 +0100
-X-Gmail-Original-Message-ID: <CAMRc=MdWWQihgt8haFYxSh7MgUoBuf3ZkBA6cbErSVNmAtb8Mw@mail.gmail.com>
-X-Gm-Features: AQt7F2qkcWsOmteak3UHSQG8tO-rpcwm3KC2_8dv0RlxH64IzhKa8xcVzXSnZm4
-Message-ID: <CAMRc=MdWWQihgt8haFYxSh7MgUoBuf3ZkBA6cbErSVNmAtb8Mw@mail.gmail.com>
-Subject: Re: [PATCH RFC 15/13] gpio: virtio: reorder fields to reduce struct padding
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Petr Tesarik <ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	"Enrico Weigelt, metux IT consult" <info@metux.net>, Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linusw@kernel.org>, 
-	linux-gpio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 2, 2026 at 2:02=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Fri, Jan 02, 2026 at 12:47:04PM +0000, Bartosz Golaszewski wrote:
-> > On Tue, 30 Dec 2025 17:40:33 +0100, "Michael S. Tsirkin" <mst@redhat.co=
-m> said:
-> > > Reorder struct virtio_gpio_line fields to place the DMA buffers (req/=
-res)
-> > > last. This eliminates the need for __dma_from_device_aligned_end padd=
-ing
-> > > after the DMA buffer, since struct tail padding naturally protects it=
-,
-> > > making the struct a bit smaller.
-> > >
-> > > Size reduction estimation when ARCH_DMA_MINALIGN=3D128:
-> > > - request is 8 bytes
-> > > - response is 2 bytes
-> > > - removing _end saves up to 128-6=3D122 bytes padding to align rxlen =
-field
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  drivers/gpio/gpio-virtio.c | 5 ++---
-> > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> > > index 32b578b46df8..8b30a94e4625 100644
-> > > --- a/drivers/gpio/gpio-virtio.c
-> > > +++ b/drivers/gpio/gpio-virtio.c
-> > > @@ -26,12 +26,11 @@ struct virtio_gpio_line {
-> > >     struct mutex lock; /* Protects line operation */
-> > >     struct completion completion;
-> > >
-> > > +   unsigned int rxlen;
-> > > +
-> > >     __dma_from_device_aligned_begin
-> > >     struct virtio_gpio_request req;
-> > >     struct virtio_gpio_response res;
-> > > -
-> > > -   __dma_from_device_aligned_end
-> > > -   unsigned int rxlen;
-> > >  };
-> > >
-> > >  struct vgpio_irq_line {
-> > > --
-> > > MST
-> > >
-> > >
-> >
-> > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
->
-> Thanks! There's a new API as suggested by Petr so these patches got chang=
-ed,
-> but the same idea. Do you want me to carry your ack or you prefer to
-> re-review?
->
-> --
-> MST
->
+From: Fred Griffoul <fgriffo@amazon.co.uk>
 
-I'll take a second look. Can you Cc me on all the key patches - like
-the ones introducing new APIs? I needed to grab it from lore this
-time.
+This patch series addresses both performance and correctness issues in
+nested VMX when handling guest memory.
 
-Bart
+During nested VMX operations, L0 (KVM) accesses specific L1 guest pages
+to manage L2 execution. These pages fall into two categories: pages
+accessed only by L0 (such as the L1 MSR bitmap page or the eVMCS page),
+and pages passed to the L2 guest via vmcs02 (such as APIC access,
+virtual APIC, and posted interrupt descriptor pages).
+
+The current implementation uses kvm_vcpu_map/unmap, which causes two
+issues.
+
+First, the current approach is missing proper invalidation handling in
+critical scenarios. Enlightened VMCS (eVMCS) pages can become stale when
+memslots are modified, as there is no mechanism to invalidate the cached
+mappings. Similarly, APIC access and virtual APIC pages can be migrated
+by the host, but without proper notification through mmu_notifier
+callbacks, the mappings become invalid and can lead to incorrect
+behavior.
+
+Second, for unmanaged guest memory (memory not directly mapped by the
+kernel, such as memory passed with the mem= parameter or guest_memfd for
+non-CoCo VMs), this workflow invokes expensive memremap/memunmap
+operations on every L2 VM entry/exit cycle. This creates significant
+overhead that impacts nested virtualization performance.
+
+This series replaces kvm_host_map with gfn_to_pfn_cache in nested VMX.
+The pfncache infrastructure maintains persistent mappings as long as the
+page GPA does not change, eliminating the memremap/memunmap overhead on
+every VM entry/exit cycle. Additionally, pfncache provides proper
+invalidation handling via mmu_notifier callbacks and memslots generation
+check, ensuring that mappings are correctly updated during both memslot
+updates and page migration events.
+
+As an example, a microbenchmark using memslot_perf_test with 8192
+memslots demonstrates huge improvements in nested VMX operations with
+unmanaged guest memory (this is a synthetic benchmark run on
+AWS EC2 Nitro instances, and the results are not representative of
+typical nested virtualization workloads):
+
+                        Before          After           Improvement
+  map:                  26.12s          1.54s           ~17x faster
+  unmap:                40.00s          0.017s          ~2353x faster
+  unmap chunked:        10.07s          0.005s          ~2014x faster
+
+The series is organized as follows:
+
+Patches 1-5 handle the L1 MSR bitmap page and system pages (APIC access,
+virtual APIC, and posted interrupt descriptor). Patch 1 converts the MSR
+bitmap to use gfn_to_pfn_cache. Patches 2-3 restore and complete
+"guest-uses-pfn" support in pfncache. Patch 4 converts the system pages
+to use gfn_to_pfn_cache. Patch 5 adds a selftest for cache invalidation
+and memslot updates.
+
+Patches 6-7 add enlightened VMCS support. Patch 6 avoids accessing eVMCS
+fields after they are copied into the cached vmcs12 structure. Patch 7
+converts eVMCS page mapping to use gfn_to_pfn_cache.
+
+Patches 8-10 implement persistent nested context to handle L2 vCPU
+multiplexing and migration between L1 vCPUs. Patch 8 introduces the
+nested context management infrastructure. Patch 9 integrates pfncache
+with persistent nested context. Patch 10 adds a selftest for this L2
+vCPU context switching.
+
+v4:
+ - Rebase on kvm/next required additional vapic handling in patch 4
+   and a tiny fix in patch 5.
+ - Fix patch 9 to re-assign vcpu to pfncache if the nested
+   context has been recycled, and to clear the vcpu context in
+   free_nested().
+
+v3:
+  - fixed warnings reported by kernel test robot in patches 7 and 8.
+
+v2:
+  - Extended series to support enlightened VMCS (eVMCS).
+  - Added persistent nested context for improved L2 vCPU handling.
+  - Added additional selftests.
+
+Suggested-by: dwmw@amazon.co.uk
+
+
+Fred Griffoul (10):
+  KVM: nVMX: Implement cache for L1 MSR bitmap
+  KVM: pfncache: Restore guest-uses-pfn support
+  KVM: x86: Add nested state validation for pfncache support
+  KVM: nVMX: Implement cache for L1 APIC pages
+  KVM: selftests: Add nested VMX APIC cache invalidation test
+  KVM: nVMX: Cache evmcs fields to ensure consistency during VM-entry
+  KVM: nVMX: Replace evmcs kvm_host_map with pfncache
+  KVM: x86: Add nested context management
+  KVM: nVMX: Use nested context for pfncache persistence
+  KVM: selftests: Add L2 vcpu context switch test
+
+ arch/x86/include/asm/kvm_host.h               |  32 ++
+ arch/x86/include/uapi/asm/kvm.h               |   2 +
+ arch/x86/kvm/Makefile                         |   2 +-
+ arch/x86/kvm/nested.c                         | 199 +++++++
+ arch/x86/kvm/vmx/hyperv.c                     |   5 +-
+ arch/x86/kvm/vmx/hyperv.h                     |  33 +-
+ arch/x86/kvm/vmx/nested.c                     | 499 ++++++++++++++----
+ arch/x86/kvm/vmx/vmx.c                        |   8 +
+ arch/x86/kvm/vmx/vmx.h                        |  16 +-
+ arch/x86/kvm/x86.c                            |  19 +-
+ include/linux/kvm_host.h                      |  34 +-
+ include/linux/kvm_types.h                     |   1 +
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +
+ .../selftests/kvm/x86/vmx_apic_update_test.c  | 302 +++++++++++
+ .../selftests/kvm/x86/vmx_l2_switch_test.c    | 416 +++++++++++++++
+ virt/kvm/kvm_main.c                           |   3 +-
+ virt/kvm/kvm_mm.h                             |   6 +-
+ virt/kvm/pfncache.c                           |  43 +-
+ 18 files changed, 1496 insertions(+), 126 deletions(-)
+ create mode 100644 arch/x86/kvm/nested.c
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_apic_update_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_l2_switch_test.c
+
+
+base-commit: 0499add8efd72456514c6218c062911ccc922a99
+--
+2.43.0
+
 
