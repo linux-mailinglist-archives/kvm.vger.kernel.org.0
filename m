@@ -1,73 +1,63 @@
-Return-Path: <kvm+bounces-66947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA1ACEEF36
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 17:18:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2419BCEEF66
+	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 17:24:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6661300974A
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 16:18:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 675CE301BE9C
+	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 16:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A072BE620;
-	Fri,  2 Jan 2026 16:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891C32BE7CD;
+	Fri,  2 Jan 2026 16:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W/AM8bKn"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YuLDf+gA"
 X-Original-To: kvm@vger.kernel.org
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8837D2BE02B;
-	Fri,  2 Jan 2026 16:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34F7258CCC;
+	Fri,  2 Jan 2026 16:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767370694; cv=none; b=FPoDA/ZEH7HyExbPmCHjupdIaT7KAX4pVNnDKCk2ATWWKtOoXWhq3e0iCKQvSPr9IyoJgRMTghQPHCCp7z1wP8Le0+FImyD0oWoztlK7160oVAAdgc+GF/zfGgsGeZ+FCNMX+fKrw3qWFQUhpccX8YanQh9bbYJPg5vaOYLZ1do=
+	t=1767371027; cv=none; b=ZCf8xSW3kx1Dli8gWZfPeymQs9/ycnq5Z5YAwvy3PjsmlXxAGAqVFVa35qaOiKBc9Pezhk7cLvGAHMpCkcYgEYzFdfKg9sG1sYcMDz/62LlzcXaqgEkoXnKo9cDRhHuaUlsgDtF1FO52NXohovNGVgGWANkjIbU5JNJR6YzNG8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767370694; c=relaxed/simple;
-	bh=UVFu5WY4Q5Ogne1834V1RgoibA08KxqFlyG9gSUuAm4=;
+	s=arc-20240116; t=1767371027; c=relaxed/simple;
+	bh=+t/1yoVWnEBfJtgTtDW5aaVGUutMl1Z0qbp+ZH3X9PA=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UublJhZInbJdN30xRfsVmZQ05iy2pPFe1M0wDkHRNfAOcBSAzk913sViwJV6sIESDhpd/xTzZ4ZJWfhFO7K8a1yoG/TrEscdMY9OSJpnF2Olwec2hmIOKIDnBWWCu6dz0HX/9cY0DBEkoL/L0Z3B92rvE0+jvQ8IMVfIK99gwHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W/AM8bKn; arc=none smtp.client-ip=90.155.92.199
+	 Content-Type:MIME-Version; b=ajYwMdFsruMjyx+Ua2GY3VFOp0e7vJXgX6ulJMdEDYbug/E3Gt/11sqfmUWNo3IWnzGveWSPFKI6yGITUqxZw6e8tR3QeEjAy6vx3hemZXqWWTO2dQiZOIw/DRD3utch8ums6u6hqPLMApMP9ciNDzzvCVU7ZMPWTro/w1itPqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YuLDf+gA; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=UVFu5WY4Q5Ogne1834V1RgoibA08KxqFlyG9gSUuAm4=; b=W/AM8bKnin3tM8CX9lJfQlVjZ/
-	oqRQPp27PdmDcYvL8KUnBOby1hmCc5rQP28K/eZnGacVkxoS38yWTtDSzQ9QRcrk1zk2SxPUg8CEr
-	7eYGzOx/NINc5AArDJ5S8ldLaYoWsq08ulMvJk2Ta2kh3EVN8b/4yz3cc/lHoxGMHUE6XR5i6dpr5
-	N2KhN9wwAzvhEixghT1I6xBVOH6yxYBdDrM4UTxI42idQrZ64FDMw7KlUSx456Db4Bl5IQzpy2QdQ
-	RrEQzVO348OpBbKNC/LH+reTfeqU3AubKmmMszwI45LxSg6i2uZTivXO25tyls2hlAF1n/H2TKniV
-	488nPMuQ==;
+	bh=+t/1yoVWnEBfJtgTtDW5aaVGUutMl1Z0qbp+ZH3X9PA=; b=YuLDf+gArUabMOhmI7J8QNDyeO
+	4HXEGlNXS+mv0Sm0NXVotj0LUyF2hfCzW/sI+2COjtynnIkKmheDpoFvDbEZUUr4Z86bmb+uEWGeJ
+	rT5DEayeHgivpapamC7IJxoXmwYo2MOd9TBlu9EX52OOu6ieDEeU+Kkd0Lzzh4KmA9vmeDt4cM/M5
+	kAbzAFXyX8R8O5wYLIwudd3d+UPe/Wr31AwnW2E1ve9hkiRmo0wv8P8DBxXXbK4x7SHaUl9jsBI5U
+	1a7n7KyOB1BuJf1SVhLjdW8uqlrsl2It+TQG5bFz6FVpCudbbgS3DvFUISOo3AAgOojPA36aMrKBE
+	0W9+zbjg==;
 Received: from [172.31.31.240] (helo=u09cd745991455d.ant.amazon.com)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vbhqb-000000061Oe-2iva;
-	Fri, 02 Jan 2026 16:17:54 +0000
-Message-ID: <69c98d8e34fadd14152d625956c3371e8dbb1c76.camel@infradead.org>
-Subject: Re: [PATCH v5 2/3] KVM: x86/ioapic: Implement support for I/O APIC
- version 0x20 with EOIR
+	id 1vbhw7-000000061iC-2IBj;
+	Fri, 02 Jan 2026 16:23:36 +0000
+Message-ID: <e09b6b6f623e98a2b21a1da83ff8071a0a87f021.camel@infradead.org>
+Subject: Re: [PATCH v5 1/3] KVM: x86: Refactor suppress EOI broadcast logic
 From: David Woodhouse <dwmw2@infradead.org>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: "seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
- <pbonzini@redhat.com>, "kai.huang@intel.com" <kai.huang@intel.com>, 
- "mingo@redhat.com" <mingo@redhat.com>, "x86@kernel.org" <x86@kernel.org>,
- "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,  "dave.hansen@linux.intel.com"
- <dave.hansen@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
- Jon Kohler <jon@nutanix.com>, Shaju Abraham <shaju.abraham@nutanix.com>
-Date: Fri, 02 Jan 2026 16:17:53 +0000
-In-Reply-To: <02B570C0-BEF5-439C-A081-9537489A7FF7@nutanix.com>
+To: Khushit Shah <khushit.shah@nutanix.com>, seanjc@google.com, 
+	pbonzini@redhat.com, kai.huang@intel.com
+Cc: mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com, 
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ dave.hansen@linux.intel.com,  tglx@linutronix.de, jon@nutanix.com,
+ shaju.abraham@nutanix.com
+Date: Fri, 02 Jan 2026 16:23:35 +0000
+In-Reply-To: <20251229111708.59402-2-khushit.shah@nutanix.com>
 References: <20251229111708.59402-1-khushit.shah@nutanix.com>
-	 <20251229111708.59402-3-khushit.shah@nutanix.com>
-	 <7294A61D-A794-4599-950C-9EC9B5E94B58@infradead.org>
-	 <DD13B2B3-5719-410F-8B98-9DB3E1738997@nutanix.com>
-	 <9a04f3dda43aa50e2a160ccfd57d0d4f168b3dce.camel@infradead.org>
-	 <BE16B024-0BE6-46B4-A1B4-7B2F00E4107B@nutanix.com>
-	 <D6CA802E-F7E0-410D-87FB-6E6E5897460E@infradead.org>
-	 <02B570C0-BEF5-439C-A081-9537489A7FF7@nutanix.com>
+	 <20251229111708.59402-2-khushit.shah@nutanix.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-RB3+XT6+u++MZQIAadCn"
+	boundary="=-5l/WRKmSJXRdPZCZ/cK5"
 User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -78,36 +68,38 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-RB3+XT6+u++MZQIAadCn
+--=-5l/WRKmSJXRdPZCZ/cK5
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-12-29 at 15:57 +0000, Khushit Shah wrote:
+On Mon, 2025-12-29 at 11:17 +0000, Khushit Shah wrote:
+> Extract the suppress EOI broadcast (Directed EOI) logic into helper
+> functions and move the check from kvm_ioapic_update_eoi_one() to
+> kvm_ioapic_update_eoi() (required for a later patch). Prepare
+> kvm_ioapic_send_eoi() to honor Suppress EOI Broadcast in split IRQCHIP
+> mode.
 >=20
+> Introduce two helper functions:
+> - kvm_lapic_advertise_suppress_eoi_broadcast(): determines whether KVM
+> =C2=A0 should advertise Suppress EOI Broadcast support to the guest
+> - kvm_lapic_respect_suppress_eoi_broadcast(): determines whether KVM shou=
+ld
+> =C2=A0 honor the guest's request to suppress EOI broadcasts
 >=20
-> We can't use `_respect_` here because in QUIRKED mode with in-kernel IRQC=
-HIP:
+> This refactoring prepares for I/O APIC version 0x20 support and userspace
+> control of suppress EOI broadcast behavior.
 >=20
-> =C2=A0 advertise =3D false=C2=A0 (version 0x11 advertised, no EOIR regist=
-er)
-> =C2=A0 respect=C2=A0=C2=A0 =3D true=C2=A0=C2=A0 (legacy quirk: honor SPIV=
- bit even if not advertised)
+> Signed-off-by: Khushit Shah <khushit.shah@nutanix.com>
 
-Oh wow, right. Since commit 0bcc3fb95b97a ("KVM: lapic: stop
-advertising DIRECTED_EOI when in-kernel IOAPIC is in use"), KVM with
-the in-kernel I/O APIC will *not* advertise the EOI suppression in the
-local APIC version register=E2=80=A6 but does actually honour the DIRECTED_=
-EOI
-bit if the guest sets it anyway.
+Looks good to me, thanks for pushing this through to completion!
 
-While with a userspace I/O APIC, KVM *will* advertise it, but not
-honour it.
 
-Yay.
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-So yes, your code is the best way to do it. Sorry for the noise.
+Nit: Ideally I would would prefer to see an explicit 'no functional
+change intended' and a reference to commit 0bcc3fb95b97a.
 
---=-RB3+XT6+u++MZQIAadCn
+--=-5l/WRKmSJXRdPZCZ/cK5
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -186,22 +178,22 @@ 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
-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
+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
-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
+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
 
 
---=-RB3+XT6+u++MZQIAadCn--
+--=-5l/WRKmSJXRdPZCZ/cK5--
 
