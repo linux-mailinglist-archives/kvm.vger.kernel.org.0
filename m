@@ -1,76 +1,78 @@
-Return-Path: <kvm+bounces-66925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EAF7CEE756
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 13:10:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CE38CEE78F
+	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 13:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D1393031A1E
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 12:09:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94581301DBAA
+	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 12:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EAE130F550;
-	Fri,  2 Jan 2026 12:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B1130F550;
+	Fri,  2 Jan 2026 12:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mnFqQSSy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Si0Dr9Lp"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012024.outbound.protection.outlook.com [52.101.53.24])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013053.outbound.protection.outlook.com [40.107.201.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF9730EF7E;
-	Fri,  2 Jan 2026 12:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7676927A123;
+	Fri,  2 Jan 2026 12:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767355757; cv=fail; b=Y+PHQE+G0pkQIyzzZ/1wCIevtBVSCblRjWGUKmpY0FKzTYKwyjry3kKnzesLtPkAANErq97lAsBVEwZs5QPp7CecnkWzMavvppHg/3EaD6wQWfKUSFJU1f3+WUOxc2mrs3BWcrRTLEuZ0ygCr05Smq1b5NKExVFvlXnxZDLATiQ=
+	t=1767356051; cv=fail; b=OawhVzljMXnUsW9HWyMNDDMf6xZCO7AoFE0FmQYua1/a6VOPsFSzuzHIufO1SsFhER48QLI3sC5HoJ2F6OakjagMjmc36mOqIn/BAEBkbhRzTiI2BkUk/Z0vGZY7ppbiqfKuwWCaA49AryfzDn6AjpNBKBYHkhdsWmCWbLxKcMY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767355757; c=relaxed/simple;
-	bh=r5F3vh/pRx2AlDUYOHJgLG1XVNlxBW3yfWCCM06cB+g=;
+	s=arc-20240116; t=1767356051; c=relaxed/simple;
+	bh=hEOBqfIEBufsGBIa3dYKqXwHOhCtIYyvn4BN/kDCDn0=;
 	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=sAyy5vqpCKUBb5ncUSb/cc76vzOhjvojI+KIy/yaWNvk8xuzYXtdatGMYfYXNO3oXa3b9b4e2Mnx9X/2k3CA1VIOuLZzzZWsadsDRZ19eREKXpdUxscIM31FR4d18Qc8Ii4yjkzHtuQ/hBapwg9Vn04FH3dS+CHvrzxjH57pPIA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mnFqQSSy; arc=fail smtp.client-ip=52.101.53.24
+	 Content-Type:MIME-Version; b=KqBTDaSorBhKXwykQQ6Kv/Fuu/EDx5g/cadTMxdrURAAiqLkVyX+9CGFWLWxz0OUGg0ZkK2yfD4Swez1LUAbUibXM4FT0y4P1Pa+FHD/bDtUTjtaT16zqNkK1+LgPYyIbkdTqVxTfL+Cn8ePyBSPiuX6yxJM1uvuQiWe2fbHNUg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Si0Dr9Lp; arc=fail smtp.client-ip=40.107.201.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XZveA6McocwRrJQ6rix+t6xDD0DPo23PL15mSRJBVrrPOBhGbjHUMBN3j819HKVpq/9aVxv065bHuX/3Ev59ZZ3BGpA2jKNRy50Eq0FWPyH89p0nQIi1KWiioDj9nDnhYBM+l6dNo3zEVYGmE8pBUAKKpqlpCym9SLOyQBX27T99EL9V1dJdT+xKO0hrE3wLXcutWXg6EA+vKNyvUyC0OnnXIREyBH0Bgeam/p9R0sBKYHLFCMeQI6EvCbGPkkekVZ3rV0z8XJkZa2Hk3XrR/vWZnB/4bGexJtgmbCS3B1MjAcdA8Y8kRB1OKLAKtwNlniPiGMhoyhPgBeGd8NcnqA==
+ b=B5GGNyoqC+kuHMI2flbP/evr9uqgKqcTdJmJx5gBvFpGGXTU+gLxvyXdF36Mg9zuJdLXSGiBKJK8K+NmPFOHMhZKXNC0y68C7LbR4sAUHTHxjxlMPp/0Zy5L0hl4Y1pn5De5zp/Kl0iojV2XhowPJWO1DdzGJWIC0fCD7uFVmyFYGQ+hYEUwGXsTm7xoKdkFcNG/V+bjkq3xtZMgqAdZBW90VQFOnrX3KyHpA7ODqIL3eVZ5SJgUNFwd4i5YLmsYacEiBprcAB+dc2+TYWYTgOUO24tkiOQW1KimxOmFFvA0+7xHJndZyROnh8G7Sb5d/trxmtyRSWDMbcaVmlm4Ow==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZxBCzQjcImqKC1Lo2cE1am9WdZLC/ElZBVRmKhJg3mE=;
- b=hpEgXo25hyvsd176VVkewMTWuXS6XtqY+OAp6iMDurLlD92eMJmZqEMflSwO5lTE7fWrUU6cgiAUVSy6NFRgwseA0ojtxLgjj3VPkU4S89LuKzz21s9IpIk8qovXu5RXcWb9b10do+z4VqS4xwxSYD3YEph2GLLBvVt8wqJi2OdyrgKSkWpUYfT2tepgyuNYBYEeWujh9r8S49xBgf5ylwT/WaFo5RTEzoMkZ8YuWQ6Od5E3xpor5AZzTAa0XUVWxDNVEr9A+HHdTIHx3J/B2K1l+7yu0khMspNlRwhpYRA99dCcALpk/zFSGTn4gjiB+DrpLvdoM6JJe5XUR32F9w==
+ bh=1/B1tyI/e5+EhzXBK6s8NoUl4VuEW+WM2Y/wyqJC/7k=;
+ b=qMyqNGWzyiTNFCACwBsaQ0YtgD35gY2AIXgj49F4fNpUoutSAW3Z2Twp3adbUfai1hBWpJGNZNmia873BEpgplWIYYsq/qYUAUiXduF5CgwUnVtutkQp50/Xk59RhLj9TXQUkObIfXkm9eMFdIE/L7ZTqOWCOqMcFEnXoviSI91XzMZxWvMrVv73WLmz/ikJnBA/rVM0dxd0HhmhDcYdkgLzxPqT79f5dHyFQqVRJHhlIV782iAnUmThfi/DMBsvH2kzFdX7D8uozm+1VPs5g6QguLM3jK6Sv3KpK/II2C1aGj4b0JZf+g3l3+tKbeIE35Upm4a4FlfBCszZ5d/WwA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZxBCzQjcImqKC1Lo2cE1am9WdZLC/ElZBVRmKhJg3mE=;
- b=mnFqQSSyFdPMHOB8sBaR3myagDSTSp5F87YMIdONN6b4fmqnQ2OeoOLXMjG0+kdaIDiUiU6KJGWPeyWD7ne/jq9jQoYglvjauxv+DFswLojUf5ZyHqePslCobMqvnQn8IFGDEauovOZzKEygRycuc/Ioj761bR2PV10jFJtdU0I0o9hcWhWamM+MAhJEs/FcwEPl0O6ESLEVFWX3/MRqaSQmoA5FdalJHgHdI+I4fZH9S9Tp2JMxWRHvQSBb/VlEIz7WGT5ML3wq7cdHagKT3om+rKcxWZx1tEIgK3bKlcf+dKJiruq2gh5pR4FIM9tUmgXgcoyh26h08Sd3n11siw==
+ bh=1/B1tyI/e5+EhzXBK6s8NoUl4VuEW+WM2Y/wyqJC/7k=;
+ b=Si0Dr9LpUzlNL4gI1A2ySiJvs00ZOxSk8C0Bko4aCgF6cGjvYjiHuksXkV9hfil+wZD/2ig5PSDoo9zplCdAyFnkn279m7/0gMxCRg3/rWJlo6Dij31vMUw7FVRt6f2mP7pApqXbs4zJN2PRgFae+TiqASnUsys4uFk05SYLrdO2gP272rFrzub/t1QtBhgap8wIiAuGctFyY7YPGUAHTXCk/8iN+qAomI/BNIDCVOxy9RmqWUCCAKwW1b9gzgqFZ5d9rWqrgYCuf43kTp6DomFZUzD7NmWNMWZXCKuksUbHuxhjuLrt3Hg1qyPmz8TNT1ARmUixhcaducDm3AoKYA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
- by DM4PR12MB6373.namprd12.prod.outlook.com (2603:10b6:8:a4::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9478.4; Fri, 2 Jan 2026 12:09:12 +0000
+ by MN2PR12MB4063.namprd12.prod.outlook.com (2603:10b6:208:1dc::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Fri, 2 Jan
+ 2026 12:14:04 +0000
 Received: from CH3PR12MB8728.namprd12.prod.outlook.com
  ([fe80::7e7c:df25:af76:ab87]) by CH3PR12MB8728.namprd12.prod.outlook.com
  ([fe80::7e7c:df25:af76:ab87%5]) with mapi id 15.20.9478.004; Fri, 2 Jan 2026
- 12:09:12 +0000
-Message-ID: <b7a12756-88b5-4758-8e6d-b6538458c81e@nvidia.com>
-Date: Fri, 2 Jan 2026 13:09:09 +0100
+ 12:14:04 +0000
+Message-ID: <3fa838af-4eec-441c-8739-020990d1826d@nvidia.com>
+Date: Fri, 2 Jan 2026 13:14:00 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] vdpa/mlx5: reuse common function for MAC address
- updates
+Subject: Re: [PATCH v2 3/3] vdpa/mlx5: update MAC address handling in
+ mlx5_vdpa_set_attr()
 To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, jasowang@redhat.com,
  virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, netdev@vger.kernel.org
 References: <20251229071614.779621-1-lulu@redhat.com>
- <20251229071614.779621-2-lulu@redhat.com>
+ <20251229071614.779621-3-lulu@redhat.com>
 Content-Language: en-US
 From: Dragos Tatulea <dtatulea@nvidia.com>
-In-Reply-To: <20251229071614.779621-2-lulu@redhat.com>
+In-Reply-To: <20251229071614.779621-3-lulu@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0008.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::18)
- To CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12)
+X-ClientProxiedBy: FR3P281CA0078.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1f::19) To CH3PR12MB8728.namprd12.prod.outlook.com
+ (2603:10b6:610:171::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,261 +80,150 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|DM4PR12MB6373:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87f7f52d-a330-497b-662f-08de49f7be11
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8728:EE_|MN2PR12MB4063:EE_
+X-MS-Office365-Filtering-Correlation-Id: 105ad3e2-2bab-49ec-2ef2-08de49f86bfd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V0R3QlNRb0drMFlKM1J2U3d1eHFTZnd6dUtRUWR0TmZoT0J2U0hHMlZ3bDA3?=
- =?utf-8?B?TW5XQkJva3dsT3RUbjEwdXVpeEo0dE0rS3ByZVVlSDFoTi9VQ21YZThPTUhV?=
- =?utf-8?B?UUtwUVdSbTF6N1NBOUhMR3NWK2Zod1lkWFRpMGtZbEozR1J3VWxFaVp3NWor?=
- =?utf-8?B?Zi9vdkg2ZG1FZVFKbWtzVy85U1JVa3BNUUNOVmtWWlJqVWhXSWFycEZDRU43?=
- =?utf-8?B?U2tKWVR2ejhnT2JDa2tSMVYvbEtmeGJiQUR3M2Y5MGVQdmNFUWpmUDlVNS9z?=
- =?utf-8?B?bEpqcWN4TE96UjMwWlBFaHBoUldSOVFHazZsZXV3a01lR2tTZDJjZ0lWYm5t?=
- =?utf-8?B?a2xPREdZZXFVcjluM0FqRU52K1FFRDdvaFQ1UiszcDRxdjlJSy8xdS9jY3NF?=
- =?utf-8?B?azlhR0lxQzF5Z2JsQkNWMkVaUnpuNm9kSkhHNU01eWx6bGFZNWNBeGtUK1g0?=
- =?utf-8?B?UjZndUhwZHpaRDJWUVhqSUtVQkV3RnU0ZzNsWmVubGlhQm5MMCs0Rk5MNnY3?=
- =?utf-8?B?TlVweEFwci9ZaUw2cTE0Ly94MExRSkFvc1BoRThUQ0ordTg1d0FHNkFlRjVB?=
- =?utf-8?B?aXQzUmxrLzFwcG5TZFN6eFhFbDBjcUhEa093YjNMZVVkdjNVaHRyVHlrdWR6?=
- =?utf-8?B?TEhlTERtd0JXQldkaklQbDd3RUN4UWRTK3RWVTFuVXBGUGJkWEFaU1N4cHdl?=
- =?utf-8?B?YXVkbzd0bFNZTEpHL2xhNlpXaU13YUVNTERaSEU1bHFQQ0x1MUh4SjZlV0hm?=
- =?utf-8?B?Q2tRS0hWeEtibEhJSGZmMXltSEhYekR3c3FIcWZmN1NLK0NyQWVKZlZmN0h2?=
- =?utf-8?B?czFoV1o5U0ozUWVLMW4zeDE3NS9JYURZbmUrTmROMncxanE1ODd0TUtWS3dQ?=
- =?utf-8?B?VTcxazc0STltODhia0pOS0dOczFETkFnbDNWUlQwZzFKVnhhZ055aStON2Np?=
- =?utf-8?B?djcvR2JGNlpXVTM0TUhsNG9FMmRva01ITU1RVjNXTGMxeXR5TFZxWXE4U3hL?=
- =?utf-8?B?cmZROHFXNmhPaDFiM0dtUlVMUmZXVFlnMm1zKzl4TnFwbGpmMllVUDRyL0JS?=
- =?utf-8?B?WjUxblV3eE0ycmJvUHJCU2ZjK3BUUWtKVjlya083cUF2WnMvcnJLV0sxVGVQ?=
- =?utf-8?B?dnQ5WkE0T0tvanZSOTMwVGlkSWQzVGFZbjhvbk0zU0J5bDBFNVU0VzhqbEU2?=
- =?utf-8?B?d1lkbUZCR1VYMWZVNkJ4c2NmdmFQODMrRUMwdWFpUXlwWjR5UjlQVS94akFo?=
- =?utf-8?B?TjhzenVJZUxvOHFsOG9vRHUxYzF3Qm16Q2MrR2VPL3c5M3RrTWdmaHFYMmZa?=
- =?utf-8?B?angxbkNJSEQ3RGRsemVGc1czdDNOWDJ6ei91aXRUQ0NNUHkxSVhTeGwrNXQ0?=
- =?utf-8?B?UWRnV1FUZzRmK293cWJoeS9PYmF6RHBDL0YxUTBFbG5oMUdTbmcwdUV2RVlV?=
- =?utf-8?B?U2hJV215SzhWYjVTNlhOd2ZZaHlqZnZ5YmZqcE1pZ29yZU5mNi9Uelo2b0NJ?=
- =?utf-8?B?SXJTTEtKTW1iMVVBRk5vK3QrV0NMSmk0QkdaVno2UDBKcVdrcWZHeVZlWGk4?=
- =?utf-8?B?OHBubW5pL0dGMHFZMWR1ei9seXJzazZOOVlta0ZmSHN5R1RBcjErTElvN2F5?=
- =?utf-8?B?eWs3MjViSU1SNlc3eTlDeUg5MHdNb0NNWVZzT3k5UmN6VjBXd3RVUDVLUHBj?=
- =?utf-8?B?cHJ5T1VWUGo4eEphcVJzTGRjMDMwZU9raUlsSlVDdkt3bjhySWNPcy9peGZV?=
- =?utf-8?B?MFNSVGZPUy8wc3NKcmlQSEM1Sm9pTHkyYTJrZnI4TzFWUFZnRWJyeTRObTM3?=
- =?utf-8?B?SHgvdUkzOGx2RXdNZHFib2tkM1lGY0orbmhjTWVvQXFkS2FkdGhYYUF0Y2Vu?=
- =?utf-8?B?U1l4UzVrOHdBb09SeHJydkMxWXJuUzdjcUlkYUJ5dHc0ajJUaW5WOFpMU1FS?=
- =?utf-8?Q?DJzQc+7BjtkK15c2OE74rR/Jr+kn9iYm?=
+	=?utf-8?B?dndWdllmTVJjUHdVZThwN2NlWFVwUlcrbmM0L2FveFFPOVhKd1ZkQndQbmlt?=
+ =?utf-8?B?dm5GNFROeWZNQ0Z1TzdmTmFpK2IxcGRSQTBUekNOenFnVHdBM24xdkxKeGlt?=
+ =?utf-8?B?eG8zazZRdnFnNi83dm5CeFcyb2xhQlJOR2c5YWk3TGQ2RklKRGtmejZTaGp0?=
+ =?utf-8?B?OG4wK2lOVEhTeUpZUDN2b0xoUHoweE14djhPVms1SytIQUplWENQdVJwczBq?=
+ =?utf-8?B?MkV3YTZBQXJFZ1M2bnFJNll0Z3RhWXd0N0h5VGNLLzB0ckxnZlVnUk9NdHhN?=
+ =?utf-8?B?NFo4dEx5ZnVITU5QdVNoNXBGS3FyTHlQYk0zRUlLcnhtTWRMdWtRNUVUemo4?=
+ =?utf-8?B?VWFMZHFaeWh4eWl4TmEyRXkzbkNIajJrQm9UbWVpNHVjVkFNODI5VzI5SFIw?=
+ =?utf-8?B?aFNyRFZESFNIZGMvaFRNc0RVTkxhbjFWeTFkNXFsNEVOam8rT1Z3bU5mQ3Fy?=
+ =?utf-8?B?R2VtMEN1cG9IUDJPUnozeXR6YWNWTjRodkg4cG93WTVHM0o4K2ZDVnhuWC9k?=
+ =?utf-8?B?bFJlb2hFdjIzL3B5LzZMOUNGVWxMbUdrT3ZrUHEzeTQwMUNBM21MY2piT3JC?=
+ =?utf-8?B?OWFoeVVEeDV3V0lIcXZrQzNJSHVseUQvQUZpcDlSTkptVERQV0tYbFA1MnVJ?=
+ =?utf-8?B?R2JmTExFVmpTcXBUaERzZjAwVXl1ZFI4aDhET0VaRWlQeUtiVThPc29jSGZG?=
+ =?utf-8?B?Tzh0bE42WjhiK0c2WkdtZ2ZDMUpjNlBqTlNyTVo3STZUUzNKcG9ESGRoM3Yr?=
+ =?utf-8?B?aVhsSkFjS3dabEpYOFR2UzM5MGJHMERRSGNvWU5Ka3VHTnZLQy9MUFErYkZ4?=
+ =?utf-8?B?cjh2VmJ0YkhGSGoxMDgvMzh5eVhWOVM5c05KWFlRd0FDaThSNG02RmtoKzR3?=
+ =?utf-8?B?Nlordm8rcHo3Zko1RXZnV3FTNGhESVdQWWJ3aTNua3ZRUFdJRU9FRmNhZ3Vt?=
+ =?utf-8?B?RWUzY0trMEprS3RXWmxJcm1ScThvem00dVN1Nk1vQUxYV2FqTHU2cXU1YUlw?=
+ =?utf-8?B?eGkyTENHY2NiSVFtQm4xdDdNbkVhZDFyeXZPUXgyRUtDNGtqN2JBbDhDV0g3?=
+ =?utf-8?B?aVJkTmhlMitoQWpNdlFvT3NYR25xc1FPNmVsK2tjNXNIdnRpY1VEQ0R2ME5C?=
+ =?utf-8?B?UXZkenE4YUZNUWw4aXd4R0hHS0hSTlROTUptT1ZNdjNMckxMSjhoWVdyTHRt?=
+ =?utf-8?B?WmJYUWR3MVhzY1MvNEdYMDNYcnZXY3hLclRlV3NQZHpLUXdzcnEwaFBDSU5x?=
+ =?utf-8?B?cnZkWW14OHM3Q1pGb1VpaGJQZis4bC9jdHl5L3d5Z3NCbTdIc29VbzdQOVJS?=
+ =?utf-8?B?Sy90ZW1uZ1J5SkV1RnpIOXN0NkhFQjJsdFpKYnJWNjZjS3ZoZmRQM0lncDQ0?=
+ =?utf-8?B?WlNVSFVnQ0p4d3RuLzd3RmFPN0JhTVFaeWpzWmwvblZ3eGMwVVhuYld1dkRU?=
+ =?utf-8?B?RlIwU1FKbkhoSURFdytFL0dxRDFISHZGZ1ZpalpES1cvSmNsdHlOOGJhNms5?=
+ =?utf-8?B?bVhCYm9mcTh1UStFR0hZSmYxRGlFSVpvSE1kRytzNlQzSnNudGpFeUsvdmRN?=
+ =?utf-8?B?Z2owKysxNFIzYVJRanM3TTI3LzQ4RWcwY0RWSG44QmRtR01yYk13Q1pFYWZt?=
+ =?utf-8?B?WlQrQVVwVnNuNThUblAyUGcwcEZURzdhZFJCVUg5Y0xrcUo3cCtoeXFWT0hR?=
+ =?utf-8?B?Q0Y4NDVRQU1nM0Z4WE5GdkQzeWNBSUx2UWR4eHdncEl5T1RjK1RBMGlIa0VL?=
+ =?utf-8?B?RXZWeG14ZFhaa1pUeFdyOGgxakNHUG5xMDhYa0lsVXpXZDJnbHFnRktqZDJt?=
+ =?utf-8?B?dEQ4KytpNldKZ2NUVU5Jczk4UlRPMXh0ZmNKakNuVzVZdndDRFVuWHl3em43?=
+ =?utf-8?B?bnBjYk1NVW95VzA4b0ZVaVBza3NYSXhYUWJSWVZKSHZHaGJHTjYyckszbUMv?=
+ =?utf-8?Q?wCEnECFHVq6BRoTOMNhyHj7qDrcK5hEE?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8728.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TFZLVHJxKzdob09kSXdpY3VEa205OFFpbThkZ1cvQjVoMHBKL0cyZVByMXo4?=
- =?utf-8?B?QVJXMThzUjZOUk9vZE11NThCM2hYQUJjNWp2STBQQTZhamFVVlF6QUc0STFO?=
- =?utf-8?B?eGt1UjAveUdsNXdvMjRVWjBQeGtGTnkwWmt1TWVCTDBDdEljcy9XMUVVdFJj?=
- =?utf-8?B?U3gzWnIxVW1kaFAvc2JoL3VuanpQaWswblFSN21uQ0NyVFYyUFg2QjVjSHlx?=
- =?utf-8?B?alVycnNaTDhwWWlXOHZMWWtxV28zdFNoTlFCeCtnYVc3Yzdia09zWDBIbTdH?=
- =?utf-8?B?RktzZjdYODZDNFNLV1IzOW5IU05wL01XekRBVENZTzlsNnpFVGhvT0hueGp6?=
- =?utf-8?B?cm00VC9JeStqNjJKWFJaZUN2VnUzOVdicCtCMDRpV3VqaHVvUjVVcUZOeHlJ?=
- =?utf-8?B?ckxWczhZMTFMM1NKdUdXOVJkMDBIM1NTOWIvYXlvU1A5YTRhN1VXNXhXQkhZ?=
- =?utf-8?B?VVV5L01aYTJERktnbzArTGl5dzY1OUdZRERxd1QxTnJybDNmdXZLMnpWTFds?=
- =?utf-8?B?R3ZLcHArRi84SDloM2lYSW13SmxDc3FldnRpOEVBbzNmOFBPUEsrNStIbEpF?=
- =?utf-8?B?L25tZm5zb2ovYTQ3VVNXL3VMdnVGc1VLcjRnVnY2M0JSTFF3OVlTSjdQRzRj?=
- =?utf-8?B?VC8wdHZ4TDZkUldDM29ZVFBNN2JweTNKNHdIdUMvL3pwTmFJWndIUGlzQk9x?=
- =?utf-8?B?c2x3eVBNRDRZNnNoY21NNEUvYmdGeGYyOXpKbUJ6Q2lZYllpMVJNSllJN2RV?=
- =?utf-8?B?ZDc2YWdpQjNqMmJsL3hsNzVFTnFTSzVMTENhY1ZtRzlFVm9PTDlUdFBaeVhj?=
- =?utf-8?B?dGZySWZtMXN2c051N2FrcDRaT3Y4QXBBcGVRTGZiT2pRNGRneTUvcTdHYjVa?=
- =?utf-8?B?dktJeWQ1VENkTXFZeUFJTWF6M3o5WVUrOEUveUllUGhucjZDR1FTTlhSU3Vk?=
- =?utf-8?B?S2lsU2JzSmw1VjhYODl1cnBTU1E4ODFMYmR2SzZNUFZvOFRGcE5TMXNHSXlR?=
- =?utf-8?B?MlhMenRwTDl3Q0JaQjhsSXd5YXBEc0cxV2hmZ1FWQlo0d2tXYnNVT3lUVFZ3?=
- =?utf-8?B?TDc2bVRqN0pvQmJ3NUgxckMzWXVVQjhnQ1Q5WEQ0RkpabVllbVQwL0tZb1hB?=
- =?utf-8?B?ZjdhOEp1YmlGbmhPSHQ0NHhnclhMVlNKV3NVTndCZTZud1NuVmhrN1pmWEhk?=
- =?utf-8?B?NEZ3WmdLOGhjZDA1Y3JPY1AybGRHenBsb3U0dFVxYWV1L1BCZDZIQlZBbTY1?=
- =?utf-8?B?VWhwZ2Ivb1lvV3FiWGlqQmZuS3R5aEJoMkVCdE13T2VEV0tNeitxZUIwNkVU?=
- =?utf-8?B?MmZENFE2VkJ4dDVHTUozMEZ2WENyMTA1WEJYZzg0azNQb2JmVno4RUNIVzhL?=
- =?utf-8?B?RWU1cEQ4akVYdnhaLy9WVTdLRFpDWkhzandnR2NJbUNPNDlSRUJtbU5CdEw4?=
- =?utf-8?B?cWREUitLdDZUbCtQZ3VpSHZ2azZ5NlhuOG1sbDJTTkEyRFo0WmtSMzhmVkJO?=
- =?utf-8?B?NDdCRXV3dW9zM1RSTzhIeVlTUWxZYkdYMUtKbkVqSmZ2cm5iZ2FsaklLeTZv?=
- =?utf-8?B?MmFlTmZPR2pjcTgvYjZwYWF4SzkzeVlBbVVSZi9aUldZckorQW4yOThMaE1M?=
- =?utf-8?B?elhZWldad2ZxYzIrQ2tvYVE1aTFzNWRLamhDd0YwcEM4cGZ2WDJwc2JDSEtS?=
- =?utf-8?B?T3BGaHJMU2xXdnI3L2lnYW5JdFJSeHV2MTk2K1JnNlZ1S0FCNVRWWW9xcDdO?=
- =?utf-8?B?QVNPUFdJVnp2elY1VlJNbGc2U0pKV09TZXFnVmZONWpoZm1HakdWMG9meCtj?=
- =?utf-8?B?Y2c3ajIvUjI0NUZnc1BsWmlQbXlLVkNOVHg4V243YzZxMWE2aFM1dFV6Mkpv?=
- =?utf-8?B?QUZMYnhSSzZ5blpWMkRJaDdLcEVCRHhNVUhiZXRFc0hqejY4VEhxUmtVWXo5?=
- =?utf-8?B?WHBDb2VmWXd1NlJndHJ5blNIVzVCdkF4YXd6UHNpTkJqSFVGU3BoM0tXVWdF?=
- =?utf-8?B?WVUrcXd1ejdUK1d1SWFqSDI0UjNqdFZSTXJFRVlPdkNLVTdEOHYzOGpWWkpx?=
- =?utf-8?B?eG1Ed016RVM0OEpOVlVXeCtKR2lEdWcyNC9XT0FkejVyTDZYWFFCK1pMM243?=
- =?utf-8?B?dGpXUzhQeWlvb0sxM0N4ZVNhanBMb3pqUkNpd2FBUjVpNWtPMDR3VzRueE9r?=
- =?utf-8?B?VW1ZYVNSdDhNeU50VFZFVUdISzVHMmROR3RVWjlpMTdObklsVFU0U2UyeXJU?=
- =?utf-8?B?R1lZMmNWYXVHd0xMc2pOWm9admk3Q2dEbm1nNXpsbHMvNWU4WVZNWlU2czhu?=
- =?utf-8?B?VHNyRjV4MVk4anJrY2toRVlsOTFpNE8rUXpWZGFtQmZ1S3ROKy85Zz09?=
+	=?utf-8?B?R2I1Z2dNc1UyMExGOXJGRzAxR0JZSFYrNW52UFNkUnRpR0xxeXRmUXJ5OVJt?=
+ =?utf-8?B?cmJodlcwSkE3bFl4dU1Zc2loTFRIZ1NXcVUxbGFvVWN0OFVMeUdVY3dETVh4?=
+ =?utf-8?B?ZmdjcWJ4ZzI2Q1lyVzl0L0d4blM2YkVQYmhqMHBwREtrTDVDMElQSGRiTHJB?=
+ =?utf-8?B?MXozblBzbEI1ckRPU1c1ajQ0anpVeDR6TjVKZk9MMGdmSVVtUm5nUDA4cmM4?=
+ =?utf-8?B?YTRjSVVaNVhGVHI5UTUzcG52dEY2T2NpU3lGaWtTQVgyYW1WcHdGdCtab1g0?=
+ =?utf-8?B?MDBUUlhJdFFham10dndhWGhTV1k3ODd3NWlsc2lDNW11SE1RUytzc29JWjlS?=
+ =?utf-8?B?MkxQTHZZZjk2TmZtbmZrT0ZiK2oyYjBQcDJselpEeVNKSlphKzc0RVNNSHZQ?=
+ =?utf-8?B?VjFYU1prVjBwNkkvRjRiblJlK20yMGhPRmxIS3FiZVFZd2tWSE8xRlFlNHZL?=
+ =?utf-8?B?elhxL0JUaW1GVzJuUWgxSmVTVENmR2NlazRKVjJPN21KQ1BTdkFOcTMzelFL?=
+ =?utf-8?B?Y2VLcjRoa0dzOHprYzBpVDI0T2hjb0J0bEtCNDl1M1FYNC8vK21NSGg4NzFX?=
+ =?utf-8?B?QStvVXIvb3BydU9LQVp4U0VJaFc4ZnBrQmFISHFyOHJsQysrNE9sUTUrNjkz?=
+ =?utf-8?B?eFBDYkJMY2dQeHBSSkU1THdNUGI0bFYySEFyclRueTlybVlrSU5WYnYvbjll?=
+ =?utf-8?B?dE9CMmttbk5BVWQzQ2lkOG1nT0pma1p5SGJvdlQ1c2I5c29EMmpXU3Yyb2xv?=
+ =?utf-8?B?OWNZSUdJdmRYeUJTZWp1alduSVlIRjZQbENCeTk2MlEzQ3EydDRNVVNoU0U0?=
+ =?utf-8?B?WGdkVnhFaTIyK2hyQ1NLcjJaRmFmTWZTcmlLU3lZTVhyK1NXVk9GU1RPWC9m?=
+ =?utf-8?B?d3cxdnNXSk5MQXpKdlRJQk52cWpKbHRzN3RZMmRFT2ZNV3pybGUyd3VvUDBC?=
+ =?utf-8?B?bW10Y1c3eDhCSGd2V1cvNGo3T2pqcXZxclV4V1BINUMrWXdwa1U5ZXBNUnk4?=
+ =?utf-8?B?ai9Lc01LQzE1SEQyZzBwZE5sbUEyaU1IQXYvTCt2Rm9CSW11MXJzOW5iYnBa?=
+ =?utf-8?B?SktFK3RpL0dnTmZpc092Q3h1SlE1OUtvS3pGWDF4MzhRNlFseDNQWkI2QzB4?=
+ =?utf-8?B?dWE0QkY5eE8yQ3d5L0U5UW5KTzhiMHQwN2JzMWtpRU1MUnpMeGFSUmNsV29q?=
+ =?utf-8?B?U3VqOFZROEwzZklZdkJGaTBLdGQzb2pKUmlJOXloRkFYaDMrSTdOSEVTUlVr?=
+ =?utf-8?B?d2Y5U3g1UHVRL1VDaDFtNzVYNW0ycmQ2ck0za1pCNzdLZnJOUmpqaFdTbUFE?=
+ =?utf-8?B?SktKVis0ZjRCZUVyZ0R6cUZzSUJJbGhlK2NiREdqNStWcmdjRWRFclVKdXBh?=
+ =?utf-8?B?bm9MZUEyMnhEdGtScFpubk5oRjNvcDZWNElkRFdSYXY4WlBJUmt2TUdib3RS?=
+ =?utf-8?B?dWlEbW5vS3I4Mk5jSnlmWXk0M0g4dXA0WWJ4VDZmZEhPd0VVM2h5ZmFIaTFB?=
+ =?utf-8?B?UXFaRDZzc2s5dEpTOUdsZnNCb2Q1NGpuV3Nldk11Y3ZlamY1NmgyTkduRCtl?=
+ =?utf-8?B?Vk0rc3o1WHYxcjdQQnZEN0RQNWdzSkRqb1hlOWFVbi9MWmgwNDRmTHRlS3Nw?=
+ =?utf-8?B?Rmk5cEE0bVkreDRVRzVqQWZUWFdlOUpmQ0NOb293YXVDMVpmWWpDY0xjay9h?=
+ =?utf-8?B?aW1mWnk3Sk1jSkltTXNBb3hrcWtTU3lIWTlwZzFtTVZJNXUrQmIrMGw1N1lu?=
+ =?utf-8?B?UDBQbG1KSy9GV2tCL1QwdE1qdXVhZlVuVXBMTUtVeW56a2YzUlp1SVVEVCtP?=
+ =?utf-8?B?WlRIaHdjZ1RZMFZYV1Z1cTJzZi9hQWc2ZmZMdnRaVkRyN2gxWnNaMlptU0gz?=
+ =?utf-8?B?KzhZdndZOEdrb3pISE9hZDBBeFc4WkJoaTByVkZ2ZVVzS2FPWGozNURSN0lm?=
+ =?utf-8?B?aWNZblhJOWQ1OXJvdWM3ZHR5SW83TC8vb0dUckdTMk9MMEdZL0NzSEVheE1R?=
+ =?utf-8?B?NzB1Ynh1c0VDdFpwK3pkRTJqc1JIcDltWE9TeFE0U2RNcG41SEJUL2pBeHlG?=
+ =?utf-8?B?NFViZjdaYTMrOUh6VHp5WDhyaUdCZmwzb0VRRTJNQ2hiVDlVRkpZdjZMTERw?=
+ =?utf-8?B?bG50S2g3djNJb2RMM0ZiZXJmV0tsZHEwYXBERXk1WWJsc3FhN3JHZExMNzZa?=
+ =?utf-8?B?a0EvTzlhWVNDcVdaMG1nVVR2VXBBQTlrVm9icjl0S1l6MjU2QjVUUHpsTnE0?=
+ =?utf-8?B?UEVES09KOFk2cURjemxFZGlUT3BHK2poRkZDaFdVL3lzdU1MMGFBckU0Wkc5?=
+ =?utf-8?B?TklKRXEvcXNGU0dKSGYzQVhmNnA5aDB1d2NNVWtGbmwxcXp3cC9DZz09?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87f7f52d-a330-497b-662f-08de49f7be11
+X-MS-Exchange-CrossTenant-Network-Message-Id: 105ad3e2-2bab-49ec-2ef2-08de49f86bfd
 X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8728.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2026 12:09:12.8659
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2026 12:14:04.7889
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: u1u8SZnjdnf/704Iy3JEPKN8T3ouabuq2X/xVqSKcQlG+Tr1gIG2O4n/3DbOzVWU6mkUdOmyn7SoUSopbvss7w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6373
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4FxX8cxUtsc3IEnOUDFaE6VjCxw8wymicrEX5mXZGXMh6aomrkx5Xqybuy+GspS+50tfcLf0lETKMJxClXCz2w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4063
 
 
 
 On 29.12.25 08:16, Cindy Lu wrote:
-> Factor out MAC address update logic and reuse it from handle_ctrl_mac().
+> Improve MAC address handling in mlx5_vdpa_set_attr() to ensure that
+> old MAC entries are properly removed from the MPFS table before
+> adding a new one. The new MAC address is then added to both the MPFS
+> and VLAN tables.
 > 
-> This ensures that old MAC entries are removed from the MPFS table
-> before adding a new one and that the forwarding rules are updated
-> accordingly. If updating the flow table fails, the original MAC and
-> rules are restored as much as possible to keep the software and
-> hardware state consistent.
+> This change fixes an issue where the updated MAC address would not
+> take effect until QEMU was rebooted.
 > 
 > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 95 +++++++++++++++++--------------
->  1 file changed, 53 insertions(+), 42 deletions(-)
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
 > 
 > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 6e42bae7c9a1..c87e6395b060 100644
+> index c87e6395b060..a75788ace401 100644
 > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
 > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -2125,62 +2125,48 @@ static void teardown_steering(struct mlx5_vdpa_net *ndev)
->  	mlx5_destroy_flow_table(ndev->rxft);
->  }
->  
-> -static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
-> +static int mlx5_vdpa_change_new_mac(struct mlx5_vdpa_net *ndev,
-> +				    struct mlx5_core_dev *pfmdev,
-> +				    const u8 *new_mac)
-Nit: I would drop the "new" and leave it mlx5_vdpa_change_mac?
-
+> @@ -4055,7 +4055,6 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
+>  static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *dev,
+>  			      const struct vdpa_dev_set_config *add_config)
 >  {
-> -	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> -	struct mlx5_control_vq *cvq = &mvdev->cvq;
-> -	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
-> -	struct mlx5_core_dev *pfmdev;
-> -	size_t read;
-> -	u8 mac[ETH_ALEN], mac_back[ETH_ALEN];
-> -
-> -	pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
-> -	switch (cmd) {
-> -	case VIRTIO_NET_CTRL_MAC_ADDR_SET:
-> -		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov, (void *)mac, ETH_ALEN);
-> -		if (read != ETH_ALEN)
-> -			break;
-> -
-> -		if (!memcmp(ndev->config.mac, mac, 6)) {
-> -			status = VIRTIO_NET_OK;
-> -			break;
-> -		}
-> +	struct mlx5_vdpa_dev *mvdev = &ndev->mvdev;
-> +	u8 old_mac[ETH_ALEN];
+> -	struct virtio_net_config *config;
+>  	struct mlx5_core_dev *pfmdev;
+>  	struct mlx5_vdpa_dev *mvdev;
+>  	struct mlx5_vdpa_net *ndev;
+> @@ -4065,7 +4064,6 @@ static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
+>  	mvdev = to_mvdev(dev);
+>  	ndev = to_mlx5_vdpa_ndev(mvdev);
+>  	mdev = mvdev->mdev;
+> -	config = &ndev->config;
 >  
-> -		if (is_zero_ether_addr(mac))
-> -			break;
-> +	if (is_zero_ether_addr(new_mac))
-> +		return -EINVAL;
+>  	down_write(&ndev->reslock);
 >  
-> -		if (!is_zero_ether_addr(ndev->config.mac)) {
-> -			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
-> -				mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
-> -					       ndev->config.mac);
-> -				break;
-> -			}
-> +	if (!is_zero_ether_addr(ndev->config.mac)) {
-> +		if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
-> +			mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
-> +				       ndev->config.mac);
-> +			return -EIO;
+> @@ -4078,9 +4076,7 @@ static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
+>  			goto out;
 >  		}
-> +	}
+>  		pfmdev = pci_get_drvdata(pci_physfn(mdev->pdev));
+> -		err = mlx5_mpfs_add_mac(pfmdev, config->mac);
+> -		if (!err)
+> -			ether_addr_copy(config->mac, add_config->net.mac);
+> +		err = mlx5_vdpa_change_new_mac(ndev, pfmdev, (u8 *)add_config->net.mac);
+>  	}
 >  
-> -		if (mlx5_mpfs_add_mac(pfmdev, mac)) {
-> -			mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
-> -				       mac);
-> -			break;
-> -		}
-> +	if (mlx5_mpfs_add_mac(pfmdev, (u8 *)new_mac)) {
-> +		mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
-> +			       new_mac);
-> +		return -EIO;
-> +	}
->  
->  		/* backup the original mac address so that if failed to add the forward rules
->  		 * we could restore it
->  		 */
-> -		memcpy(mac_back, ndev->config.mac, ETH_ALEN);
-> +		memcpy(old_mac, ndev->config.mac, ETH_ALEN);
->  
-> -		memcpy(ndev->config.mac, mac, ETH_ALEN);
-> +		memcpy(ndev->config.mac, new_mac, ETH_ALEN);
->  
->  		/* Need recreate the flow table entry, so that the packet could forward back
->  		 */
-> -		mac_vlan_del(ndev, mac_back, 0, false);
-> +		mac_vlan_del(ndev, old_mac, 0, false);
->  
->  		if (mac_vlan_add(ndev, ndev->config.mac, 0, false)) {
->  			mlx5_vdpa_warn(mvdev, "failed to insert forward rules, try to restore\n");
->  
->  			/* Although it hardly run here, we still need double check */
-> -			if (is_zero_ether_addr(mac_back)) {
-> +			if (is_zero_ether_addr(old_mac)) {
->  				mlx5_vdpa_warn(mvdev, "restore mac failed: Original MAC is zero\n");
-> -				break;
-> +				return -EIO;
->  			}
->  
->  			/* Try to restore original mac address to MFPS table, and try to restore
-> @@ -2191,20 +2177,45 @@ static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
->  					       ndev->config.mac);
->  			}
->  
-> -			if (mlx5_mpfs_add_mac(pfmdev, mac_back)) {
-> +			if (mlx5_mpfs_add_mac(pfmdev, old_mac)) {
->  				mlx5_vdpa_warn(mvdev, "restore mac failed: insert old MAC %pM into MPFS table failed\n",
-> -					       mac_back);
-> +					       old_mac);
->  			}
->  
-> -			memcpy(ndev->config.mac, mac_back, ETH_ALEN);
-> +			memcpy(ndev->config.mac, old_mac, ETH_ALEN);
->  
->  			if (mac_vlan_add(ndev, ndev->config.mac, 0, false))
->  				mlx5_vdpa_warn(mvdev, "restore forward rules failed: insert forward rules failed\n");
->  
-> -			break;
-> +			return -EIO;
->  		}
->  
-> -		status = VIRTIO_NET_OK;
-> +		return 0;
-> +}
-> +
-> +static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
-> +{
-> +	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> +	struct mlx5_control_vq *cvq = &mvdev->cvq;
-> +	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
-> +	struct mlx5_core_dev *pfmdev;
-> +	size_t read;
-> +	u8 mac[ETH_ALEN];
-> +
-> +	pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
-> +	switch (cmd) {
-> +	case VIRTIO_NET_CTRL_MAC_ADDR_SET:
-> +		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov,
-> +					     (void *)mac, ETH_ALEN);
-> +		if (read != ETH_ALEN)
-> +			break;
-> +
-> +		if (!memcmp(ndev->config.mac, mac, 6)) {
-> +			status = VIRTIO_NET_OK;
-> +			break;
-> +		}
-> +		status = mlx5_vdpa_change_new_mac(ndev, pfmdev, mac) ? VIRTIO_NET_ERR :
-> +								       VIRTIO_NET_OK;
->  		break;
->  
->  	default:
+>  out:
 
-Besides the nit, the code looks good. You can add in the next version:
+Thanks for your patch. It looks much better like this.
+
 Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 
 Thanks,
