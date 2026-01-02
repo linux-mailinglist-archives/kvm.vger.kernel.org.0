@@ -1,181 +1,156 @@
-Return-Path: <kvm+bounces-66920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C00EBCEE01D
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 09:15:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FDBCEE1D2
+	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 10:59:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2CA2C3001BF2
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 08:15:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 515C33010990
+	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 09:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564342D24BF;
-	Fri,  2 Jan 2026 08:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4FD2D8393;
+	Fri,  2 Jan 2026 09:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YA76nKi/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pn+lg3Oj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lLEsGTuY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713302D5C74
-	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 08:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03812D24A0
+	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 09:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767341707; cv=none; b=RGaNsOltbuW3MscF/lrCKvPjPK/VnsbcNyG1ZM/qTjFpcXCprfflgWove0sEr4WLo6AhEsNhEommXrDDbxAjt50Gn49wetK+UvzCMOhAa9s3ZbroW2ztR+tjomNmqL1si+r6q8Q+Dbqy4s70OIo0f/OWHuj/ex51FKyThG5WPgk=
+	t=1767347950; cv=none; b=bVR9Y6hi6S9pYe9RIlUa0s70ZkLPpPl4cfXMppB5iWShm0fPQNOITZPzbKG9qIRzIwee1eTAS4UCSkBz5lg19p2HnR6nWHHSGg9kY3FqJlQdz7+O7gB17/DK6lSREpur8Km67xrVUYtp5hqxaIqv0Qh35bZyFN98DMwotpmhxV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767341707; c=relaxed/simple;
-	bh=pR9J2JcpyuSslYDA7lsLX4ZhILZRZva1Jx7LQCRL2xc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bo9VcTY6+fiQVK43tNWQVbJp54c6p/3D6i8gQ16FcTQP4pcOy4J/qkuNbJGYAJl5Q7TM1j/B8YKTB2PPeXpo7Np/Z6HR2Ml8G/LEKb77pDsg1VID6Q5HkOlUzS2Nzf9kTtBBIXvggrFPIQk83FWGRqRGKBXfXtYD3eJZjpcDNJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YA76nKi/; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-477aa91e75dso12208695e9.3
-        for <kvm@vger.kernel.org>; Fri, 02 Jan 2026 00:15:03 -0800 (PST)
+	s=arc-20240116; t=1767347950; c=relaxed/simple;
+	bh=xwN5SJgpKv5d/dw9zKfPpCMUcx2M/mX4rbiBa7U8+Ns=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HH1/r+W6nQh4SgHubbzht4aBgy+CFHWYm6pDb6qQXMc6tpmlD1nd38f9G6Do+L1DYYq3Vr3lYCaarHZvH1gZ1BsQqzrkMxTsDrpV6DN4+TOVF5m2L3mKqPkOL+cGaDW0PY3nP4+Ko9UYd/6eTL4hfQ8HKhplN0zIl5Bfgo3wPYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pn+lg3Oj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lLEsGTuY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767347946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PUxS4f8mPvClX+DwiPHnFyp+SWqUM3DkFf5Rfhn2JeY=;
+	b=Pn+lg3OjevG037qfDADhk0/Zv/gtSg1MxC4Nnv5rsKreksaO4c9lI4xfKoPpVKNXJjVt+G
+	1u67Q8tHzZh9wUuJG79vQv6KSiM0ZgF+LCY+D0j/P6WYfwxksfYWVRkktCh5zH6lkft2o/
+	5Ouj65JKUQkzCfZ0pm65RONnpFD2d3A=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-655-IuzVANp6ORuX5auCesDKEQ-1; Fri, 02 Jan 2026 04:59:03 -0500
+X-MC-Unique: IuzVANp6ORuX5auCesDKEQ-1
+X-Mimecast-MFC-AGG-ID: IuzVANp6ORuX5auCesDKEQ_1767347942
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430f5dcd4d3so6496495f8f.1
+        for <kvm@vger.kernel.org>; Fri, 02 Jan 2026 01:59:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1767341702; x=1767946502; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7B5OROvqw/DgiaRfLYZJf4GjF/wj6CLJOtpsQ8Z+Uq0=;
-        b=YA76nKi/w+4r6QrU3u2zf5Le8V9XRZBLFbZgcDqg8nvt9MckDoEaO8By8k5rFaH2zj
-         M6FOWUp+8LwZBjF7Ct+EYIO0kH0S0v+Pr9wSVpl4cXLp1lFB/7/Pb3+7EkRYFZ3ouqef
-         b8TA2l7ZzYNtFHMUb7pVDcW0ZmWyV8GwubCAvrstaOiHAncUBTCHGnjdqJUtd1u693Nf
-         pm12hnFgGAbipqxoZBPGus+ExXjFykcTzIXHpoBAw8wzK/IcFi5XxjN/gsygR6pDcVF0
-         P1iYMU4BuJYFaPN7BknV7Vy3fKB9GXy/u40sq+1UrdlhP1knI9/5NYPkaXLxDyogj33o
-         q9Jw==
+        d=redhat.com; s=google; t=1767347942; x=1767952742; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PUxS4f8mPvClX+DwiPHnFyp+SWqUM3DkFf5Rfhn2JeY=;
+        b=lLEsGTuY8U/CWI/26HlcDFTaNpeLJUNCGkYyXSlhQ8hbSDR3vKmqoQCIu3wIF0/cDq
+         2xZfnRLBFQsrAdcm8Z8SpWCuIGUwB2qIfmZ5FG+/xQVVtQT0YTKbj2wjrkhYC6H0TFIv
+         s0yV+cmoB3IzlobwMb3hX5QiTzD3rVqTMaGDo/77LWodWmieepLR5pE7pQ95EeX9EVCZ
+         e1AXxGhayydsfZDfFRPGwvKj8OwaI0KxULEMh0nfPJtxA4paQusEOkiSqOy46QGoNkDY
+         2UH3U5ACx80VsEx4OBAIgS+60ILP7RUO0vF6cS2QD3Z6w3CBJ3B42canI77tC1aKK7A7
+         CNEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767341702; x=1767946502;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7B5OROvqw/DgiaRfLYZJf4GjF/wj6CLJOtpsQ8Z+Uq0=;
-        b=rCG2tMP0141W9L6Y8DCIS9z3SrCX6lIxoY6V4bLP8vL/daljkCOrbSFzCGehO1Qhbs
-         Rh+X+DFx3Kj2LGNzmG+yjRH7M513G2sdVYrL5DKHhrrkbXrfSCdXpfqw5aybSBiTJA4m
-         H3gTpmp/NkOGQHW+NattSsIjW0FpLJtIb646i6GDd0/rR3SzdNdVKsDZRLa10bv++eW6
-         N2FNf/AKVIQtwOasqgYdtmPQldH3W3tqOCXwblcwUKHljgPlpiGpA8IHSGf/O5bpiKLM
-         WBaOtOwas0B1fk4U+He+eU/UYZEDTjxbDC+QI+XQfz28gFBmmac/2x7+YUvMh58ha96N
-         Rt0g==
-X-Forwarded-Encrypted: i=1; AJvYcCU+0Mc5Ua+Dd4KRDPh4tin+ACjiIiWNcBVzEzdA5BbaAmC4C7PBWYSDfqp+w3760uh4YTM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRmdHBVZX3dthLHfGOH4AV942eF5euI1eeJBeKwOvG0qvnUVuG
-	jcl1Q+yPUTuCKkQdqlLsxX1Lxqit7T9wtZJFCZVTi5G0KKWsl1Y8SRqD1nJ5O7TybdY=
-X-Gm-Gg: AY/fxX4wUNckKmoDgElwqIaTecFn5KP2Sy3oC0zQJcvs72VScH6F1DvDhQivHHT4ArH
-	VKmHpCHAnpdERJ0Rysl32g3lsgSzDFfXlPzeOXZaxO7MzzPQrZ+QaWDr1SMF0c8qrJ6J/Fn0zlv
-	TSGHB7ZxuZXa7+s+P2AUd4Yy60xEJW9uGcci6MPPaI7ysP29/CT/S+l5evV0u4XamGvrAsnBibs
-	8+IS6fbI1dOzOGG+Mbrjehb7QmzpJaVCXu8oaOEoPPf3hpNeWxeV2ArHTt6n3v5dO43rFKGUp/Q
-	6O/B99vSHZvFtY6WeLdQ2R46ZkNYpkFyY9P/+kE5+3Iexq0773rdysFkz1beQ1Pzc7f4yPEuC2o
-	l1hHLxSAvExyQNvhaV28RBNePRLad+3Dn3TlnrmjAXUnGwhz+uyEkC29sKtWJqFeIGLkykqg++2
-	GQl1rV59w5t2KhnVVd8v0B17GlkKB4POQb2OAJt1zGkH0qaNXe5YFyxF5Q+tuX3lJpANroEGRGt
-	jMQ
-X-Google-Smtp-Source: AGHT+IEG7/UqWg/6ELIcyq0mVb3xfMQn4RI8cpiRrR5W4zXnA35xM+TJgjTRoe1XllkShxIti5fDKg==
-X-Received: by 2002:a05:600c:3151:b0:477:a203:66dd with SMTP id 5b1f17b1804b1-47d197f69demr322547935e9.2.1767341702410;
-        Fri, 02 Jan 2026 00:15:02 -0800 (PST)
-Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be27b0d5asm792930555e9.13.2026.01.02.00.15.00
+        d=1e100.net; s=20230601; t=1767347942; x=1767952742;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PUxS4f8mPvClX+DwiPHnFyp+SWqUM3DkFf5Rfhn2JeY=;
+        b=QRgDXSpXba76sJobG2/K6PmhzZITuUH0mJEiTNVNtY6LEE25O//IOTce/8IIGyNhgh
+         oOq13Rh/za3vortmspzxve8ucLJZQNhV3Pqh/2f744/W/zX0ldLNdLlG23fMJrNz6I4t
+         DtzqQBBuQ8OPYLkDr88P9ut0g4aUVXNBzVxiFjgD4zZLTvyZGFX7XKM6QXHm3iA3ck+e
+         ea8/ohnPNBv0hE8g6YsIuRi8VZ8hKAG8kzZfx8qr5W8musNq1l9HmErKn63ZOa6jMk1d
+         Qv4Y/yQLdkGXMRYDL9Ev0W1s5OlA5o95GY2oLeJxCi3dB+GZ82ONUx4Rt5WOdzAv2mdA
+         zheA==
+X-Gm-Message-State: AOJu0Yy/URmSl+MG/IEdEedGRe4C1IfgJw98tN2azucNlaBOFBlfggkS
+	BtQ6MdhZBdg9W1CLdqBtREmx6GA1aadEuks2JYHCoFYVcsDLr9risQ+dHoXSHAmbDJ2ayWTaqcg
+	HJZYZ4YT+9cHHl7na+gVpqYS2dgf6kxPALx4Gw1iWiw52XoEl61Vx9A==
+X-Gm-Gg: AY/fxX7utrGk0YcGk2op/MjCmMxioUWPoaNr/6ANGJjfqbRKdXO1r8PVIoajU9tiKdT
+	eUlrKDJOzTDVnnJDVhFMSoISy0Nxi7fi4cmhVvaEk+7XaICloi7TD2BlFii5oMUTqddaKQ2Yemf
+	010i3NgOMOScUQB9abBkJs890ZAKcQePFReylNrY4tTw4WHUE1FmtQqhD3McQPczt/vvjRQQpJb
+	IjLuqqxWPDvV681DvKb4tbPtUtSQoft4N54Oi76yml0xxHoDHXFH7d7sUC8nIG/6lfZiFRheMwD
+	NUZldMo7t7OeW3a29U7C5Cq/hpq49FDPG2dLV1ypsVlX2s1o/aEmBjZbeSqQ6R+wLzCFKyL7qZI
+	egvhwcg==
+X-Received: by 2002:a05:6000:1052:b0:432:84f0:9683 with SMTP id ffacd0b85a97d-43284f0971dmr22484617f8f.24.1767347942190;
+        Fri, 02 Jan 2026 01:59:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHXb22RGg1w4fy3z8I/bvF7q1MbAh1dJe/WDLMVTEQmMTtkYSsT5t/aZbCWXfL696OPjB6p8w==
+X-Received: by 2002:a05:6000:1052:b0:432:84f0:9683 with SMTP id ffacd0b85a97d-43284f0971dmr22484602f8f.24.1767347941743;
+        Fri, 02 Jan 2026 01:59:01 -0800 (PST)
+Received: from fedora (g3.ign.cz. [91.219.240.17])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1b1b1sm83175299f8f.3.2026.01.02.01.59.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jan 2026 00:15:01 -0800 (PST)
-Date: Fri, 2 Jan 2026 09:14:59 +0100
-From: Petr Tesarik <ptesarik@suse.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
- <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
- <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
- virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
- iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 01/13] dma-mapping: add
- __dma_from_device_align_begin/end
-Message-ID: <20260102091459.6bec60c2@mordecai>
-In-Reply-To: <20251231154722-mutt-send-email-mst@kernel.org>
-References: <cover.1767089672.git.mst@redhat.com>
-	<ca12c790f6dee2ca0e24f16c0ebf3591867ddc4a.1767089672.git.mst@redhat.com>
-	<20251231150159.1779b585@mordecai>
-	<20251231154722-mutt-send-email-mst@kernel.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
+        Fri, 02 Jan 2026 01:59:01 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Long Li <longli@microsoft.com>
+Cc: kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>, Yosry
+ Ahmed <yosry.ahmed@linux.dev>
+Subject: Re: [PATCH v2 8/8] KVM: SVM: Assert that Hyper-V's
+ HV_SVM_EXITCODE_ENL == SVM_EXIT_SW
+In-Reply-To: <20251230211347.4099600-9-seanjc@google.com>
+References: <20251230211347.4099600-1-seanjc@google.com>
+ <20251230211347.4099600-9-seanjc@google.com>
+Date: Fri, 02 Jan 2026 10:58:59 +0100
+Message-ID: <87eco8bajg.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Wed, 31 Dec 2025 15:48:26 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-> On Wed, Dec 31, 2025 at 03:01:59PM +0100, Petr Tesarik wrote:
-> > On Tue, 30 Dec 2025 05:15:46 -0500
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > When a structure contains a buffer that DMA writes to alongside fields
-> > > that the CPU writes to, cache line sharing between the DMA buffer and
-> > > CPU-written fields can cause data corruption on non-cache-coherent
-> > > platforms.
-> > > 
-> > > Add __dma_from_device_aligned_begin/__dma_from_device_aligned_end
-> > > annotations to ensure proper alignment to prevent this:
-> > > 
-> > > struct my_device {
-> > > 	spinlock_t lock1;
-> > > 	__dma_from_device_aligned_begin char dma_buffer1[16];
-> > > 	char dma_buffer2[16];
-> > > 	__dma_from_device_aligned_end spinlock_t lock2;
-> > > };
-> > > 
-> > > When the DMA buffer is the last field in the structure, just
-> > > __dma_from_device_aligned_begin is enough - the compiler's struct
-> > > padding protects the tail:
-> > > 
-> > > struct my_device {
-> > > 	spinlock_t lock;
-> > > 	struct mutex mlock;
-> > > 	__dma_from_device_aligned_begin char dma_buffer1[16];
-> > > 	char dma_buffer2[16];
-> > > };  
-> > 
-> > This works, but it's a bit hard to read. Can we reuse the
-> > __cacheline_group_{begin, end}() macros from <linux/cache.h>?
-> > Something like this:
-> > 
-> > #define __dma_from_device_group_begin(GROUP)			\
-> > 	__cacheline_group_begin(GROUP)				\
-> > 	____dma_from_device_aligned
-> > #define __dma_from_device_group_end(GROUP)			\
-> > 	__cacheline_group_end(GROUP)				\
-> > 	____dma_from_device_aligned
-> > 
-> > And used like this (the "rxbuf" group id was chosen arbitrarily):
-> > 
-> > struct my_device {
-> > 	spinlock_t lock1;
-> > 	__dma_from_device_group_begin(rxbuf);
-> > 	char dma_buffer1[16];
-> > 	char dma_buffer2[16];
-> > 	__dma_from_device_group_end(rxbuf);
-> > 	spinlock_t lock2;
-> > };
-> > 
-> > Petr T  
-> 
-> Made this change, and pushed out to my tree.
-> 
-> I'll post the new version in a couple of days, if no other issues
-> surface.
+> Add a build-time assertiont that Hyper-V's "enlightened" exit code is that,
+> same as the AMD-defined "Reserved for Host" exit code, mostly to help
+> readers connect the dots and understand why synthesizing a software-defined
+> exit code is safe/ok.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/hyperv.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/arch/x86/kvm/svm/hyperv.c b/arch/x86/kvm/svm/hyperv.c
+> index 3ec580d687f5..4f24dcb45116 100644
+> --- a/arch/x86/kvm/svm/hyperv.c
+> +++ b/arch/x86/kvm/svm/hyperv.c
+> @@ -10,6 +10,12 @@ void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> +	/*
+> +	 * The exit code used by Hyper-V for software-defined exits is reserved
+> +	 * by AMD specifically for such use cases.
+> +	 */
+> +	BUILD_BUG_ON(HV_SVM_EXITCODE_ENL != SVM_EXIT_SW);
+> +
+>  	svm->vmcb->control.exit_code = HV_SVM_EXITCODE_ENL;
+>  	svm->vmcb->control.exit_info_1 = HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH;
+>  	svm->vmcb->control.exit_info_2 = 0;
 
-FTR except my (non-critical) suggestions for PATCH 5/13, the updated
-series looks good to me.
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Thank you!
+Alternatively (or additionally?) to BUG_ON, I guess we could've
 
-Petr T
+#define HV_SVM_EXITCODE_ENL SVM_EXIT_SW 
+
+unless including SVM's headers into include/hyperv/hvgdk.h is too big of
+a mess.
+
+-- 
+Vitaly
+
 
