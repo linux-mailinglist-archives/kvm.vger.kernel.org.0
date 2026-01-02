@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-66953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6E8CEF069
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 18:05:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3394CEF084
+	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 18:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 03E76304ED96
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 17:03:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 510E6300A28A
+	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 17:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3C728750B;
-	Fri,  2 Jan 2026 17:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590A528750B;
+	Fri,  2 Jan 2026 17:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GONbZMow"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vlCdmtgt"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F2627FB28
-	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 17:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEAA1E531
+	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 17:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767373395; cv=none; b=kigxuwW2w6NzlY4TSeQM0xP4t2NsWXAKB57auDV+FiQGLEhG9uSyz9pTzXDODJhb3kmWondakuhRBSMr3TMtE0LoXIEgXen75vBcw0GKy4Ctw81jsrluGy9G/etLMXZ5xN4N/iaCHkNS9dxtHZjIV474tEAOPOkAKwVCxKb9m0A=
+	t=1767373836; cv=none; b=fx0X7rISCp3cW8WPYtwdXXItAooBHY23xJvfsxByVDkRadpqQcY/AoJ9pwt/MWZHFCovsftMjo499XM+4RNFJXbENGki0xgD+2+2elD5fXHsnI+fRrn+xQxLHBl5esSj5LridTGB2Q5oLIByTbyyXzILdqlp4B4UFXupk9A156U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767373395; c=relaxed/simple;
-	bh=JtRgiIz4qm7QwkSobh9knxZkbdl4ppeJJ0eoR86dqEI=;
+	s=arc-20240116; t=1767373836; c=relaxed/simple;
+	bh=tY7Sj0Wt8ofwV9+N5ha5BDvDitbq3rSLlm59a+CLOSQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0fZJXqNHPCPk0UAi1KIhCPrNcb8O/rR4hKV7YihfkzcBWTm+6zf1XWXlc+9PQnTFeSe3IH9/raSLaiAyDBZo2YkZEuOEJMb4nJaAY3nb89KgVJEq8u6kdEgMPdH4hojEnLn4iu8DkB+eAiO0kbJSuDCsSdtIxlDc+uJzJ5SG7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GONbZMow; arc=none smtp.client-ip=91.218.175.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=hhVYQ2RPWgAZOxelkv7YXgfh4kP/W0+0874uYjbIkn67bTm9WvKFRWSDgZCGxy3AQ6Zb7QRn5fR7vo1CtzieIqllL/gmlB28LhkNKQYTgvyfET5nms4JgD3uuKfeS3/O5CBbuL/WM840eI2MOACGTPAeZh3rIGnLUmmgo5kfTYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vlCdmtgt; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 2 Jan 2026 17:02:53 +0000
+Date: Fri, 2 Jan 2026 17:10:21 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767373380;
+	t=1767373830;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VquIGlMG22FiqzSomuVxO3pJuNTPu1MzbM7EM1lJb+o=;
-	b=GONbZMowDit/CV6j92ss1DbpkpRLpd6qgnfPipRYspttY2hjT9J8/ZF3pok9rWI/4fjbSf
-	hs+i0uPiXAMWZJwTtp/Fzpg+0n0R9LSGrjR5qoZU2OU/PKQk7gz+ub8uJKEEqVgu6Pn7fL
-	J/YI5uLwXzBRESM9/1oHrvonV9ZHBoA=
+	bh=jVV1USKSvlkP8yy4xlBDNM9RAl76sphsQ5V9uMR2oHg=;
+	b=vlCdmtgtMIxaW81mMsur8wK/rEEgTOOUMtcLgWwmSxP2Vz2CcZrG+LS6zCMrp/P+tNdJTE
+	iGgy3y57Mq466D17AOcEx4V3De3b/l2hps5vWyXQR1/kwsCDp7Y1b4lZAL6WG50pw11vso
+	zHin2v43gjeOeTH++RQGXFpV0FNDJ7c=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
@@ -51,11 +51,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 08/21] KVM: selftests: Add a "struct kvm_mmu_arch
- arch" member to kvm_mmu
-Message-ID: <sckc5rvtxzmzra5l4otjoe5smm3r2xmieyybyx6xlxibrngegi@4r7iks23pa56>
+Subject: Re: [PATCH v4 20/21] KVM: selftests: Rename
+ vm_get_page_table_entry() to vm_get_pte()
+Message-ID: <txx7pwn52hbd5oen56famqzwtauxdiwuw7ulrq3jiqr3t5dy6d@pxwlz2tkjswo>
 References: <20251230230150.4150236-1-seanjc@google.com>
- <20251230230150.4150236-9-seanjc@google.com>
+ <20251230230150.4150236-21-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,12 +64,13 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251230230150.4150236-9-seanjc@google.com>
+In-Reply-To: <20251230230150.4150236-21-seanjc@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 30, 2025 at 03:01:37PM -0800, Sean Christopherson wrote:
-> Add an arch structure+field in "struct kvm_mmu" so that architectures can
-> track arch-specific information for a given MMU.
+On Tue, Dec 30, 2025 at 03:01:49PM -0800, Sean Christopherson wrote:
+> Shorten the API to get a PTE as the "PTE" acronym is ubiquitous, and the
+> "page table entry" makes it unnecessarily difficult to quickly understand
+> what callers are doing.
 > 
 > No functional change intended.
 > 
@@ -78,89 +79,73 @@ On Tue, Dec 30, 2025 at 03:01:37PM -0800, Sean Christopherson wrote:
 Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 
 > ---
->  tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h     | 2 ++
->  tools/testing/selftests/kvm/include/kvm_util.h                | 2 ++
->  tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h | 1 +
->  tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h     | 1 +
->  tools/testing/selftests/kvm/include/s390/kvm_util_arch.h      | 1 +
->  tools/testing/selftests/kvm/include/x86/kvm_util_arch.h       | 2 ++
->  6 files changed, 9 insertions(+)
+>  tools/testing/selftests/kvm/include/x86/processor.h           | 2 +-
+>  tools/testing/selftests/kvm/lib/x86/processor.c               | 2 +-
+>  tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c            | 2 +-
+>  .../selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c     | 4 +---
+>  4 files changed, 4 insertions(+), 6 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> index b973bb2c64a6..4a2033708227 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> @@ -2,6 +2,8 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+> index 7b7d962244d6..ab29b1c7ed2d 100644
+> --- a/tools/testing/selftests/kvm/include/x86/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
+> @@ -1357,7 +1357,7 @@ static inline bool kvm_is_ignore_msrs(void)
+>  	return get_kvm_param_bool("ignore_msrs");
+>  }
 >  
-> +struct kvm_mmu_arch {};
-> +
->  struct kvm_vm_arch {
->  	bool	has_gic;
->  	int	gic_fd;
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 39558c05c0bf..c1497515fa6a 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -92,6 +92,8 @@ struct kvm_mmu {
->  	bool pgd_created;
->  	uint64_t pgd;
->  	int pgtable_levels;
-> +
-> +	struct kvm_mmu_arch arch;
->  };
+> -uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr);
+> +uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr);
 >  
->  struct kvm_vm {
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> index e43a57d99b56..d5095900e442 100644
-> --- a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> @@ -2,6 +2,7 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
+>  uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+>  		       uint64_t a3);
+> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+> index 5a3385d48902..ab869a98bbdc 100644
+> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+> @@ -390,7 +390,7 @@ static uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm,
+>  	return virt_get_pte(vm, mmu, pte, vaddr, PG_LEVEL_4K);
+>  }
 >  
-> +struct kvm_mmu_arch {};
->  struct kvm_vm_arch {};
+> -uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr)
+> +uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr)
+>  {
+>  	int level = PG_LEVEL_4K;
 >  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h b/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
-> index e43a57d99b56..d5095900e442 100644
-> --- a/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
-> @@ -2,6 +2,7 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c
+> index a3b7ce155981..c542cc4762b1 100644
+> --- a/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c
+> +++ b/tools/testing/selftests/kvm/x86/hyperv_tlb_flush.c
+> @@ -619,7 +619,7 @@ int main(int argc, char *argv[])
+>  	 */
+>  	gva = vm_vaddr_unused_gap(vm, NTEST_PAGES * PAGE_SIZE, KVM_UTIL_MIN_VADDR);
+>  	for (i = 0; i < NTEST_PAGES; i++) {
+> -		pte = vm_get_page_table_entry(vm, data->test_pages + i * PAGE_SIZE);
+> +		pte = vm_get_pte(vm, data->test_pages + i * PAGE_SIZE);
+>  		gpa = addr_hva2gpa(vm, pte);
+>  		virt_pg_map(vm, gva + PAGE_SIZE * i, gpa & PAGE_MASK);
+>  		data->test_pages_pte[i] = gva + (gpa & ~PAGE_MASK);
+> diff --git a/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+> index fabeeaddfb3a..0e8aec568010 100644
+> --- a/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+> +++ b/tools/testing/selftests/kvm/x86/smaller_maxphyaddr_emulation_test.c
+> @@ -47,7 +47,6 @@ int main(int argc, char *argv[])
+>  	struct kvm_vcpu *vcpu;
+>  	struct kvm_vm *vm;
+>  	struct ucall uc;
+> -	uint64_t *pte;
+>  	uint64_t *hva;
+>  	uint64_t gpa;
+>  	int rc;
+> @@ -73,8 +72,7 @@ int main(int argc, char *argv[])
+>  	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
+>  	memset(hva, 0, PAGE_SIZE);
 >  
-> +struct kvm_mmu_arch {};
->  struct kvm_vm_arch {};
+> -	pte = vm_get_page_table_entry(vm, MEM_REGION_GVA);
+> -	*pte |= BIT_ULL(MAXPHYADDR);
+> +	*vm_get_pte(vm, MEM_REGION_GVA) |= BIT_ULL(MAXPHYADDR);
 >  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h b/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
-> index e43a57d99b56..d5095900e442 100644
-> --- a/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
-> @@ -2,6 +2,7 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
+>  	vcpu_run(vcpu);
 >  
-> +struct kvm_mmu_arch {};
->  struct kvm_vm_arch {};
->  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> index 972bb1c4ab4c..456e5ca170df 100644
-> --- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> @@ -10,6 +10,8 @@
->  
->  extern bool is_forced_emulation_enabled;
->  
-> +struct kvm_mmu_arch {};
-> +
->  struct kvm_vm_arch {
->  	vm_vaddr_t gdt;
->  	vm_vaddr_t tss;
 > -- 
 > 2.52.0.351.gbe84eed79e-goog
 > 
