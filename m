@@ -1,129 +1,129 @@
-Return-Path: <kvm+bounces-66966-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66967-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8B2CEFD9E
-	for <lists+kvm@lfdr.de>; Sat, 03 Jan 2026 10:47:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14554CF013E
+	for <lists+kvm@lfdr.de>; Sat, 03 Jan 2026 15:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D35CD3062E0B
-	for <lists+kvm@lfdr.de>; Sat,  3 Jan 2026 09:46:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 402CE301AE3C
+	for <lists+kvm@lfdr.de>; Sat,  3 Jan 2026 14:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B532F6577;
-	Sat,  3 Jan 2026 09:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FA730DEA2;
+	Sat,  3 Jan 2026 14:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1Guby/7"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="NnrV8OQn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020921A95D
-	for <kvm@vger.kernel.org>; Sat,  3 Jan 2026 09:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE0D3FF1
+	for <kvm@vger.kernel.org>; Sat,  3 Jan 2026 14:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767433580; cv=none; b=EVB+Is4RqpQXZ3Ks2yiGTQAx016Y0xvgqm2rtoLgW+m35M60OS7ERMC4YxWog4I3Xki02BY1XYzPJ7q1VsN2+cRsaHqzWMrbip9ztt/sTXRbiVA0Hu+KnqSNXrxVz3XXjCkAaOZGcxjrPGQRNp+0ulShkpkMGQ/YraA3vdKmTTI=
+	t=1767451576; cv=none; b=FQVDnF2ZJQlqaJTVMb27QcP81WsTbWJ7CBdcJKORM3Ia9v8AcghJ1pfZom46tOYFgFJOXQqjaDXsi7GaTRJrhbhGBjXfxyzjJ3dp+T1cAnygmq0PZRoTKAiSURYxfydJqgSMUEVXJtco3KJsgJPyeDgZNU61Elw50eKSWx0ARjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767433580; c=relaxed/simple;
-	bh=IJTgg8oliI0wBung+FX2PEpyuBK0HOEoNJVtq00Xp1s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jI4lNlvvQpMMWtKvvYASLmdehz9Sbi+mJZ9jjVS/ZhBTD2kcNscGJzDqSpg+PZtInou130pLQoIES5TjRsTNaF+IEmJPAyBJpuwIT+BHQ4Ikmm3IheG8y8B4eW+gBRZ1+i0VbpDJfiEf6Ra7kSQd8Me0GI16Hqok2lCMBJMhq5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1Guby/7; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a07f8dd9cdso130543055ad.1
-        for <kvm@vger.kernel.org>; Sat, 03 Jan 2026 01:46:18 -0800 (PST)
+	s=arc-20240116; t=1767451576; c=relaxed/simple;
+	bh=DKhRg7gKRzdyLuTKZF8AQFRPyuh91CLjAA3UK/sfqcQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ADQSC0R7/20p1muiag6v945MgvrtjPbpcaYPC4vgyeq0XqbLqVYh3sVTZgI5G3FPusP8XfyGbOSK8rDA+6s3V0lRD5mUZiFdVFQjmdu8ssjbR10/Y40/mba7njU+/r5m4hpOuA7S1Imvz6J4jSMFZBvuH0AHA3bjvkNbwI/seHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=NnrV8OQn; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-37b9728a353so154975381fa.0
+        for <kvm@vger.kernel.org>; Sat, 03 Jan 2026 06:46:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767433578; x=1768038378; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=ventanamicro.com; s=google; t=1767451572; x=1768056372; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dP0IVTx42h14KuVE1/XaC/JEoSCL6PoSMoPSC6rOH4g=;
-        b=e1Guby/75ytZ1y9WAmLt0IEZFBO5eycvKmzSDYg8EIbmPl9g83pcMKKYLEnLzIXV/w
-         U/Z/CRdGsiux+eZ5uY7isddRGMq5jhymklgBLqa7jHT9WT1GkMpBMA7TofjSh/4+Snc5
-         fO/zrjfKX+5q2TkWPKt49Dmem0258wspB/MR2uK5CiT3wOmkbOxw/kmC/LedInK7adbK
-         S8BTxaP3qQ2h1Zad9BZUdKVMmfeUySXF14BYOa+rsxez1ob39rDFB9ILWiilQDv06n+F
-         aNJaHO0+8Br4u9z7XWUONDnxPABpWobB9PeDunPL8TiWWnPhYI0vRghMzY+vDltKcc85
-         IIXw==
+        bh=1rNP0amHfQZI+Bt5JBFPQlAXbRaSEgN4u2DbQlN2RHg=;
+        b=NnrV8OQnuGjWy1Dydbu6b11zSZQl1g277zctiHFuk+iYe6qBBjezbjqwKNQiBk/Iwh
+         kxNJrTCaMieLSc/bZCrDqHywNkR3tOa6LnpCXYGYJSqmfsl1ylbKseaGdUhNzS5UkXj0
+         dss1DgQSbUPyN6RK4lUQIOPXSkM4Zd9tbl+WRR3pIkuG/WAI4lEa8TovjOuXAIHN+9SP
+         VJkco+kxzcs9CsfRQD92pVN8jhQbIo2EuXxqpqHQhSKht/YFR5kBWG2dsLmJfZMpPFrc
+         BNYlBWJlJx5iJV3VwfXoOCZ9cQ+/3LAvknWWDizAFg963HtWt9wMi1LNKqsohjgoGKQz
+         mYNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767433578; x=1768038378;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1767451572; x=1768056372;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=dP0IVTx42h14KuVE1/XaC/JEoSCL6PoSMoPSC6rOH4g=;
-        b=QdjtP+XmjgjialHPIB2B+1DqE/pM5pRq4ots7jWJSHSXqS+CDoz3517ZFu65Ck8CWS
-         bk0YhG135rHwY7K26uJ/U6/mx2ESgeRIvjcn1kTiTkfo+g7vb8LsO00MGQCzzT6auIe+
-         Rh5ur1MHCn9SWxjgarWWa6uwobViUW/tPjTzo0HZPlllPa5/aEBAmsy85GmhgUEqKARd
-         HOCTiNmyMA1v+du+H3w99QLMBYbGbZOuxK6BFyqf/C6/S0MNmH47bsl2i53itxKkyPcZ
-         TpZdqLyoRGvEngX9CVT2VqbkhTjyZ14tvM4cBGOt5UcEhpsvfeV1IRH96ryGuVcmFQmN
-         8pRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3x70m763NvIoDdIYr4NYR6lS5TZewY2GtVFOfis0MvSXP3mscyviINVPnzk99OTMNd3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKDUp7yKrP2ori89QPQl8vVuW6Cw86K3KxAXfgj7bYI1k0E4zH
-	h+dwur5/8W6B5H64l8O8PzhwJ4Zfq+45ydrTQB3Qb/h1RGqRZd5ALXVe
-X-Gm-Gg: AY/fxX7i9fO/sbEBV3cHvhabxd/x1Ul8dntl+NLv61RDPvrVQQewwCu1UFuXuv1NMwk
-	KsuZX19VLxIsJXQt9Ea/rqU/ViKHL6u6n20KUxWWLu3RKCfLf/USbTQk4EgEzGVogndkT7fgwFT
-	OWXTF19VK0sRbres/f68ihj4eW2e84W0gLO8yccZ6bS00KHTPuvsvXMUu7tY2s2y4R/vUrKedWs
-	VE5lgh2NOrsFtmrEebVyfvnVeeSCbjLzz+7bsdixY8LdaTSnUy/0ttsTm1TGhFcWHi3+xsZV8Nn
-	GBX+9c+9+p5+lm1cxHx91i93nz9+tvg7KQSFtPkpzN6JQkiohQKcIh5kbpCrHGTdcSK3jvFYYLl
-	67KziZvBcOcA1PO6Sea4rLwkdufLhm0QOyUiDXO05b2HjjUU8jPzDdzmgYYbWe4xPW0G9jB0/eL
-	Ww5j0zofD6rR5xp8qZWA9Ng7e0zYAX8LHAj69GLIjpNbNKPQabOIGvfc4FFcDJ2P9Z
-X-Google-Smtp-Source: AGHT+IG1CFsdsCyqKZEWFTi8fQu6+83oYv/ThQFQjQRZsNEh4BZNCae/3IqB71uabmFWXjYrwHYsoQ==
-X-Received: by 2002:a17:902:f68a:b0:295:99f0:6c66 with SMTP id d9443c01a7336-2a2f2836964mr436024535ad.36.1767433578268;
-        Sat, 03 Jan 2026 01:46:18 -0800 (PST)
-Received: from localhost.localdomain (123-48-16-240.area55c.commufa.jp. [123.48.16.240])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d4cbdasm403124315ad.65.2026.01.03.01.46.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 01:46:17 -0800 (PST)
-From: Naohiko Shimizu <naohiko.shimizu@gmail.com>
-To: pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu
-Cc: alex@ghiti.fr,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	daniel.lezcano@linaro.org,
-	tglx@linutronix.de,
-	nick.hu@sifive.com,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Naohiko Shimizu <naohiko.shimizu@gmail.com>
-Subject: [PATCH 3/3] riscv: suspend: Fix stimecmp update hazard on RV32
-Date: Sat,  3 Jan 2026 18:45:01 +0900
-Message-Id: <20260103094501.5625-4-naohiko.shimizu@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260103094501.5625-1-naohiko.shimizu@gmail.com>
-References: <20260103094501.5625-1-naohiko.shimizu@gmail.com>
+        bh=1rNP0amHfQZI+Bt5JBFPQlAXbRaSEgN4u2DbQlN2RHg=;
+        b=IFDZDJ1/cqAlhJfQXUlsC0nHci1ZPxMA/VxWz/a60snG31zX2OFAxJkBQ8U06WQwE8
+         7KlkAbgP5O/QfMltF+XxokEBxJA6mTswxPepQ2z72v2xcb2BaKG4DhpSPtWx2fFqStsc
+         vpMMdrodXeKvSX9wnnSBUHpqoHwe/gzNt1mvUStif7H0KqbrEuvFsr/jA/jDBJ0dnlZZ
+         RtJg3YbcR+JCA8c6m8rmR2d8Q5uEfeYaVJtAGDQd1K8lTT9EStZm9OYwb6xUR0XKDVst
+         v92ImTajR8cYSMl4JNZ0TqMkQt3N5ItamzQSzqEq7j2QpBNExrOllAdjBu2gWSfNbjgu
+         NvLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWqGHHA0FSdEyuNMo+dL4u3w68Z/32oxNODIRLDkumQ7MF1i22Z1Dtwein5pgrkiQjvrw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3SMSOvaaCTWfx4TfKmy2VqLSimJpyGs6FYBq0lVPcvOB8ffVv
+	+6kKsqjuNw9P7zC+3IUU92uWz7yrG4Hg5Vme2qOv0B+qjyjCu6v5V7CsFUOHBaOINN+S4zmCVkp
+	SbnRgoH01IrihtDkjkf3sKoYTkr7emd4I8bDn2npJ0g==
+X-Gm-Gg: AY/fxX77sAnXNl5U9MWfjh+piG1d1cozd/cAsVdFSL1sQQ7aR/jAPZCbYWokGmLPtlB
+	xDI1Mh0Fysfvlpl04hNHL818AaaeIKZvCGdw6KMUnzMAfK+/vWvBiYswFlVjaEsVVRsf9r1GMQi
+	72BJmLJsp8erHbq1qEDesspHauQDIt9teDRjvue9XE9CPWeCab8kKn5qdtzOBVPf5dpeY0zrN3s
+	htOd/uqxo/kEWSfga+PmM2NC10tsELbAdWNNCuw3gEUed7qKCuxs3lOpnyHRL09Y5XwJnZN8NGr
+	HuA3aWAL0x5PjczbxGFQUP0nDM0j
+X-Google-Smtp-Source: AGHT+IF7eF6cn+HX5XYXj+oXYPZdeoxSmdOgiJeCygugV4mMTsAnlrOB1uBjUgSKh5J2mzU4hEupTp4yBLk/voocWR4=
+X-Received: by 2002:a2e:a883:0:b0:37b:8d78:e4bf with SMTP id
+ 38308e7fff4ca-381216747bemr111199151fa.43.1767451571724; Sat, 03 Jan 2026
+ 06:46:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260103094501.5625-1-naohiko.shimizu@gmail.com> <20260103094501.5625-2-naohiko.shimizu@gmail.com>
+In-Reply-To: <20260103094501.5625-2-naohiko.shimizu@gmail.com>
+From: Anup Patel <apatel@ventanamicro.com>
+Date: Sat, 3 Jan 2026 20:16:01 +0530
+X-Gm-Features: AQt7F2r6vAqM7C6IoN6U2-LtJjI5r5Bvxkcv5JqaaOeR5ZkwLpMsZJFGBVlH8g0
+Message-ID: <CAK9=C2XTi9Gjy0oJExGyaVvPbh2+cJzmeea5JnMR4d3kbvDJDA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] riscv: clocksource: Fix stimecmp update hazard on RV32
+To: Naohiko Shimizu <naohiko.shimizu@gmail.com>
+Cc: pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
+	anup@brainfault.org, atish.patra@linux.dev, daniel.lezcano@linaro.org, 
+	tglx@linutronix.de, nick.hu@sifive.com, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Naohiko Shimizu <naohiko.shimizu@gmail.com>
----
- arch/riscv/kernel/suspend.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Sat, Jan 3, 2026 at 3:16=E2=80=AFPM Naohiko Shimizu
+<naohiko.shimizu@gmail.com> wrote:
 
-diff --git a/arch/riscv/kernel/suspend.c b/arch/riscv/kernel/suspend.c
-index 24b3f57d467f..aff93090c4ef 100644
---- a/arch/riscv/kernel/suspend.c
-+++ b/arch/riscv/kernel/suspend.c
-@@ -51,10 +51,11 @@ void suspend_restore_csrs(struct suspend_context *context)
- 
- #ifdef CONFIG_MMU
- 	if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SSTC)) {
--		csr_write(CSR_STIMECMP, context->stimecmp);
- #if __riscv_xlen < 64
-+		csr_write(CSR_STIMECMP, ULONG_MAX);
- 		csr_write(CSR_STIMECMPH, context->stimecmph);
- #endif
-+		csr_write(CSR_STIMECMP, context->stimecmp);
- 	}
- 
- 	csr_write(CSR_SATP, context->satp);
--- 
-2.39.5
+Please add a detailed commit description about why the
+new way of programming stimecmp is better. Also, explain
+what the current Priv spec says in this context.
 
+>
+> Signed-off-by: Naohiko Shimizu <naohiko.shimizu@gmail.com>
+> ---
+>  drivers/clocksource/timer-riscv.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/clocksource/timer-riscv.c b/drivers/clocksource/time=
+r-riscv.c
+> index 4d7cf338824a..cfc4d83c42c0 100644
+> --- a/drivers/clocksource/timer-riscv.c
+> +++ b/drivers/clocksource/timer-riscv.c
+> @@ -50,8 +50,9 @@ static int riscv_clock_next_event(unsigned long delta,
+>
+>         if (static_branch_likely(&riscv_sstc_available)) {
+>  #if defined(CONFIG_32BIT)
+> -               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
+> +               csr_write(CSR_STIMECMP, ULONG_MAX);
+>                 csr_write(CSR_STIMECMPH, next_tval >> 32);
+> +               csr_write(CSR_STIMECMP, next_tval & 0xFFFFFFFF);
+>  #else
+>                 csr_write(CSR_STIMECMP, next_tval);
+>  #endif
+> --
+> 2.39.5
+>
+>
+
+Regards,
+Anup
 
