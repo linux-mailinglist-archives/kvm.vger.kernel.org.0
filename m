@@ -1,61 +1,63 @@
-Return-Path: <kvm+bounces-66960-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66961-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B093ECEF739
-	for <lists+kvm@lfdr.de>; Fri, 02 Jan 2026 23:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83364CEF8BD
+	for <lists+kvm@lfdr.de>; Sat, 03 Jan 2026 01:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1DF823013388
-	for <lists+kvm@lfdr.de>; Fri,  2 Jan 2026 22:59:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3892A3019BF7
+	for <lists+kvm@lfdr.de>; Sat,  3 Jan 2026 00:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F54F26C3AE;
-	Fri,  2 Jan 2026 22:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D0C223DD6;
+	Sat,  3 Jan 2026 00:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rw7cCibD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D/hpxgKG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE3E221540
-	for <kvm@vger.kernel.org>; Fri,  2 Jan 2026 22:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B251E9B37
+	for <kvm@vger.kernel.org>; Sat,  3 Jan 2026 00:27:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767394757; cv=none; b=pIs/RumZ6Qut5LEJEm2MsjugL65QYAeqJp5DU7peWU3IvCNZxac1QvdpkGmUPL4E7Igd7qW8c+j0AiiAsPLw5JPlhJtgrAKY29CDE58BHXP0jo3VBbhTu93VEpsbduKzrBA9I2GCPqm8x9LjcqgK0H+vOXh3T+LHwN8q1Lk+WfM=
+	t=1767400044; cv=none; b=m1j1Q9nPZn+33zGdYXvGhS8GgsuGovIXTtdcWDpubSuMSuCAjzWHo/FDIdf4sCANwqXlQGgF58kczVc4ODLJCJtZU+AQmadb1VVC8YlZAo6pSDX0FYgxfhjw6jM+C846SV3neSpOOrGL2kaHEsAarVJBlwtHvURL6ODh1aJ8bA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767394757; c=relaxed/simple;
-	bh=D20EtKNYAY+TWKUOPiodzmWKx69NyYfF3aLv9FA9bKk=;
+	s=arc-20240116; t=1767400044; c=relaxed/simple;
+	bh=IAttkKUPdKV3jr6OHhRsvukqZBqhsMR4lNcX9qeUMRE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FZSndx1H5OgF6F8Dua1Q/hn/BwoISn0dKr9Cr4UwsWLQLOAt9E+cPQiwwkTvKm5RDDKaxMcOVudxSXQ60kV9P99u6ufH6nri2CBfs8j9tnqlhNHMYYdfawT5QyPTMvPJ+YLCkj+DTqwm4oGZFUYkt/f66z6E8qABPgbhizXdOIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rw7cCibD; arc=none smtp.client-ip=198.175.65.17
+	 In-Reply-To:Content-Type; b=t5YDLtW/LueyAiJoGPpvYCC9oFUqekvEUjpGv5bFqbt6ZpW4o8/6c8c06cTOkt27m4/jZQ+CK47p2ERVQJKzYiLZkhjSb8JuuhYM3vmCuIJQ4pXZxaNTQjS3473J9lkyMxzUJqVXSacwfX9qZm83mXRVTPFSlpKlE+CBLo7oqXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D/hpxgKG; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767394756; x=1798930756;
+  t=1767400043; x=1798936043;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=D20EtKNYAY+TWKUOPiodzmWKx69NyYfF3aLv9FA9bKk=;
-  b=Rw7cCibDRW4zjNxkh2BL6Vvtv/AUy6omyZMhtPvChbs3XV2lI6GtCiB1
-   Rc6q+qm+Ovtc0B32SocF/d0QvQNUxWqsvtf4CYlsXX0GhjIXRMEmL7ZG8
-   B1xZbLmTB3LZC+PnQjPxRHltyg0KJgAHYRr+xp/x6+NaCI4zCqfud4e9A
-   4L6kWAhZxJUGQpNIKCGWIVdjiea9aqVWdoxiyMnr69L6gQi2abhxkHwHA
-   jR5xhnM7zYA/2DkXn+e/uMF8zXJ8gygzS3w8OtnZbBo/dfcUeMK7TwrfT
-   adlmKvAH3/Jd49eTCdY6+Q32iVvns6a29olHpeAjF6u1hB+UlITuNU0I8
-   A==;
-X-CSE-ConnectionGUID: fNejScGIQzO9H2opTqQ7FA==
-X-CSE-MsgGUID: loolYVJgTBOCWT4j2oTA7Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11659"; a="68862154"
+  bh=IAttkKUPdKV3jr6OHhRsvukqZBqhsMR4lNcX9qeUMRE=;
+  b=D/hpxgKGj2t/Da8TSP7Xy/XZ4rCE1p/BSFtaFLFvwMbvuSRw2c2IEhBY
+   9ZTJf784hRTFLvzEw5xeRhFMNzZWj/rOMD9Xt49XWHe+U9pLlqSXHuquF
+   FcsaiRkJ5s0ZNCXXJ1qxRCixbeL440/FS/ip+7M8VXXZTP6GP/Wx/G+R2
+   fd1A4cxz0nKQQommwVgC6ega7IipugowgdLcDfunVW2myxurI9wNePg0Y
+   n+DlZzCsUOiRYCPwU8IsP89ZIlx8pwdOb/XChc7bK5tp7QxJFP4tKm/XN
+   jbPd95xI21XWXyj0bEbQ6rRX1FkJlr8b/rxJCUIXDsl6w/NydEF8nH5QP
+   g==;
+X-CSE-ConnectionGUID: VO5aI8DwRhqZDjhnk0vMYA==
+X-CSE-MsgGUID: rh18NoGvTEKg2IzJMnZvMw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11659"; a="91535742"
 X-IronPort-AV: E=Sophos;i="6.21,198,1763452800"; 
-   d="scan'208";a="68862154"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2026 14:59:15 -0800
-X-CSE-ConnectionGUID: vRiXAqa6SEOb//OBkJgM0g==
-X-CSE-MsgGUID: bicxgchGTNWycW3NUEgpSA==
+   d="scan'208";a="91535742"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2026 16:27:22 -0800
+X-CSE-ConnectionGUID: vCR2KWO/StmyDAmprPanQQ==
+X-CSE-MsgGUID: dHMzlpObSQWoeWYUhFs9EQ==
 X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,198,1763452800"; 
+   d="scan'208";a="225411362"
 Received: from soc-cp83kr3.clients.intel.com (HELO [10.241.240.111]) ([10.241.240.111])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2026 14:59:14 -0800
-Message-ID: <b6c531d4-328d-48a7-856b-051c918c24ae@intel.com>
-Date: Fri, 2 Jan 2026 14:59:13 -0800
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2026 16:27:21 -0800
+Message-ID: <de20e04a-bfeb-4737-9e30-15d117e796e8@intel.com>
+Date: Fri, 2 Jan 2026 16:27:20 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,7 +65,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 4/7] target/i386/kvm: query kvm.enable_pmu parameter
+Subject: Re: [PATCH v8 7/7] target/i386/kvm: don't stop Intel PMU counters
 To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
  kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
@@ -74,162 +76,90 @@ Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
  dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
  ewanhai@zhaoxin.com
 References: <20251230074354.88958-1-dongli.zhang@oracle.com>
- <20251230074354.88958-5-dongli.zhang@oracle.com>
+ <20251230074354.88958-8-dongli.zhang@oracle.com>
 Content-Language: en-US
 From: "Chen, Zide" <zide.chen@intel.com>
-In-Reply-To: <20251230074354.88958-5-dongli.zhang@oracle.com>
+In-Reply-To: <20251230074354.88958-8-dongli.zhang@oracle.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 
 
 On 12/29/2025 11:42 PM, Dongli Zhang wrote:
-> When PMU is enabled in QEMU, there is a chance that PMU virtualization is
-> completely disabled by the KVM module parameter kvm.enable_pmu=N.
+> PMU MSRs are set by QEMU only at levels >= KVM_PUT_RESET_STATE,
+> excluding runtime. Therefore, updating these MSRs without stopping events
+> should be acceptable.
+
+It seems preferable to keep the existing logic. The sequence of
+disabling -> setting new counters -> re-enabling is complete and
+reasonable. Re-enabling the PMU implicitly tell KVM to do whatever
+actions are needed to make the new counters take effect.
+
+If the purpose of this patch to improve performance, given that this is
+a non-critical path, trading this clear and robust logic for a minor
+performance gain does not seem necessary.
+
+
+> In addition, KVM creates kernel perf events with host mode excluded
+> (exclude_host = 1). While the events remain active, they don't increment
+> the counter during QEMU vCPU userspace mode.
 > 
-> The kvm.enable_pmu parameter is introduced since Linux v5.17.
-> Its permission is 0444. It does not change until a reload of the KVM
-> module.
+> Finally, The kvm_put_msrs() sets the MSRs using KVM_SET_MSRS. The x86 KVM
+> processes these MSRs one by one in a loop, only saving the config and
+> triggering the KVM_REQ_PMU request. This approach does not immediately stop
+> the event before updating PMC. This approach is true since Linux kernel
+> commit 68fb4757e867 ("KVM: x86/pmu: Defer reprogram_counter() to
+> kvm_pmu_handle_event"), that is, v6.2.
+
+This seems to assume KVM's internal behavior. While that is true today
+(and possibly in the future), it’s not necessary for QEMU to  make such
+assumptions, as that could unnecessarily limit KVM’s flexibility to
+change its behavior later.
+
+
+> No Fixed tag is going to be added for the commit 0d89436786b0 ("kvm:
+> migrate vPMU state"), because this isn't a bugfix.
 > 
-> Read the kvm.enable_pmu value from the module sysfs to give a chance to
-> provide more information about vPMU enablement.> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 > Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > ---
-> Changed since v2:
->   - Rework the code flow following Zhao's suggestion.
->   - Return error when:
->     (*kvm_enable_pmu == 'N' && X86_CPU(cpu)->enable_pmu)
 > Changed since v3:
->   - Re-split the cases into enable_pmu and !enable_pmu, following Zhao's
->     suggestion.
->   - Rework the commit messages.
->   - Bring back global static variable 'kvm_pmu_disabled' from v2.
-> Changed since v4:
->   - Add Reviewed-by from Zhao.
-> Changed since v5:
->   - Rebase on top of most recent QEMU.
+>   - Re-order reasons in commit messages.
+>   - Mention KVM's commit 68fb4757e867 (v6.2).
+>   - Keep Zhao's review as there isn't code change.
 > Changed since v6:
 >   - Add Reviewed-by from Dapeng Mi.
 > 
->  target/i386/kvm/kvm.c | 61 +++++++++++++++++++++++++++++++------------
->  1 file changed, 44 insertions(+), 17 deletions(-)
+>  target/i386/kvm/kvm.c | 9 ---------
+>  1 file changed, 9 deletions(-)
 > 
 > diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 3b803c662d..338b9558e4 100644
+> index 99837048b8..742dc6ac0d 100644
 > --- a/target/i386/kvm/kvm.c
 > +++ b/target/i386/kvm/kvm.c
-> @@ -187,6 +187,10 @@ static int has_triple_fault_event;
->  static bool has_msr_mcg_ext_ctl;
->  
->  static int pmu_cap;
-> +/*
-> + * Read from /sys/module/kvm/parameters/enable_pmu.
-> + */
-> +static bool kvm_pmu_disabled;
->  
->  static struct kvm_cpuid2 *cpuid_cache;
->  static struct kvm_cpuid2 *hv_cpuid_cache;
-> @@ -2068,23 +2072,30 @@ int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
->      if (first) {
->          first = false;
->  
-> -        /*
-> -         * Since Linux v5.18, KVM provides a VM-level capability to easily
-> -         * disable PMUs; however, QEMU has been providing PMU property per
-> -         * CPU since v1.6. In order to accommodate both, have to configure
-> -         * the VM-level capability here.
-> -         *
-> -         * KVM_PMU_CAP_DISABLE doesn't change the PMU
-> -         * behavior on Intel platform because current "pmu" property works
-> -         * as expected.
-> -         */
-> -        if ((pmu_cap & KVM_PMU_CAP_DISABLE) && !X86_CPU(cpu)->enable_pmu) {
-> -            ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
-> -                                    KVM_PMU_CAP_DISABLE);
-> -            if (ret < 0) {
-> -                error_setg_errno(errp, -ret,
-> -                                 "Failed to set KVM_PMU_CAP_DISABLE");
-> -                return ret;
-> +        if (X86_CPU(cpu)->enable_pmu) {
-> +            if (kvm_pmu_disabled) {
-> +                warn_report("Failed to enable PMU since "
-> +                            "KVM's enable_pmu parameter is disabled");
-
-I'm wondering about the intended value of this patch?
-
-If enable_pmu is true in QEMU but the corresponding KVM parameter is
-false, then KVM_GET_SUPPORTED_CPUID or KVM_GET_MSRS should be able to
-tell that the PMU feature is not supported by host.
-
-The logic implemented in this patch seems somewhat redundant.
-
-Additionally, in this scenario — where the user intends to enable a
-feature but the host cannot support it — normally no warning is emitted
-by QEMU.
-
-> +            }
-> +        } else {
-> +            /*
-> +             * Since Linux v5.18, KVM provides a VM-level capability to easily
-> +             * disable PMUs; however, QEMU has been providing PMU property per
-> +             * CPU since v1.6. In order to accommodate both, have to configure
-> +             * the VM-level capability here.
-> +             *
-> +             * KVM_PMU_CAP_DISABLE doesn't change the PMU
-> +             * behavior on Intel platform because current "pmu" property works
-> +             * as expected.
-> +             */
-> +            if (pmu_cap & KVM_PMU_CAP_DISABLE) {
-> +                ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
-> +                                        KVM_PMU_CAP_DISABLE);
-> +                if (ret < 0) {
-> +                    error_setg_errno(errp, -ret,
-> +                                     "Failed to set KVM_PMU_CAP_DISABLE");
-> +                    return ret;
-> +                }
->              }
+> @@ -4222,13 +4222,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
 >          }
->      }
-> @@ -3302,6 +3313,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      int ret;
->      struct utsname utsname;
->      Error *local_err = NULL;
-> +    g_autofree char *kvm_enable_pmu;
 >  
->      /*
->       * Initialize confidential guest (SEV/TDX) context, if required
-> @@ -3437,6 +3449,21 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->  
->      pmu_cap = kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY);
->  
-> +    /*
-> +     * The enable_pmu parameter is introduced since Linux v5.17,
-> +     * give a chance to provide more information about vPMU
-> +     * enablement.
-> +     *
-> +     * The kvm.enable_pmu's permission is 0444. It does not change
-> +     * until a reload of the KVM module.
-> +     */
-> +    if (g_file_get_contents("/sys/module/kvm/parameters/enable_pmu",
-> +                            &kvm_enable_pmu, NULL, NULL)) {
-> +        if (*kvm_enable_pmu == 'N') {
-> +            kvm_pmu_disabled = true;
-
-It’s generally better not to rely on KVM’s internal implementation
-unless really necessary.
-
-For example, in the new mediated vPMU framework, even if the KVM module
-parameter enable_pmu is set, the per-guest kvm->arch.enable_pmu could
-still be cleared.
-
-In such a case, the logic here might not be correct.
-
-> +        }
-> +    }
-> +
->      return 0;
->  }
->  
+>          if ((IS_INTEL_CPU(env) || IS_ZHAOXIN_CPU(env)) && pmu_version > 0) {
+> -            if (pmu_version > 1) {
+> -                /* Stop the counter.  */
+> -                kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+> -                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> -            }
+> -
+> -            /* Set the counter values.  */
+>              for (i = 0; i < num_pmu_fixed_counters; i++) {
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
+>                                    env->msr_fixed_counters[i]);
+> @@ -4244,8 +4237,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
+>                                    env->msr_global_status);
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+>                                    env->msr_global_ovf_ctrl);
+> -
+> -                /* Now start the PMU.  */
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
+>                                    env->msr_fixed_ctr_ctrl);
+>                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL,
 
 
