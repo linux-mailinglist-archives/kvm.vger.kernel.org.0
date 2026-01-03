@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-66965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F39ADCEFD95
-	for <lists+kvm@lfdr.de>; Sat, 03 Jan 2026 10:46:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8B2CEFD9E
+	for <lists+kvm@lfdr.de>; Sat, 03 Jan 2026 10:47:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A7A3C303443E
-	for <lists+kvm@lfdr.de>; Sat,  3 Jan 2026 09:46:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D35CD3062E0B
+	for <lists+kvm@lfdr.de>; Sat,  3 Jan 2026 09:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB502DF701;
-	Sat,  3 Jan 2026 09:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B532F6577;
+	Sat,  3 Jan 2026 09:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpbiXT3u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1Guby/7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCC92F5A10
-	for <kvm@vger.kernel.org>; Sat,  3 Jan 2026 09:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020921A95D
+	for <kvm@vger.kernel.org>; Sat,  3 Jan 2026 09:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767433577; cv=none; b=COp+qzlsHDLfThK8tec0aqz3lhnSf3+GZ9+UmsLKDk14APwp5X8Bvw1XfY1H7s8QbQlu6wK4PmgYaqULj2ducgB/NZLVlROfTdfgVxfIZcDaX8pBp8IxSJyxPProSgqA2cBR/yCCJLDR8lYbgQI6aUXoPTETk56JrhUzjpXU2NA=
+	t=1767433580; cv=none; b=EVB+Is4RqpQXZ3Ks2yiGTQAx016Y0xvgqm2rtoLgW+m35M60OS7ERMC4YxWog4I3Xki02BY1XYzPJ7q1VsN2+cRsaHqzWMrbip9ztt/sTXRbiVA0Hu+KnqSNXrxVz3XXjCkAaOZGcxjrPGQRNp+0ulShkpkMGQ/YraA3vdKmTTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767433577; c=relaxed/simple;
-	bh=yc4wocHubhJNjuOJ923K2RmiU09pvoJT7Cjlm+DcU+I=;
+	s=arc-20240116; t=1767433580; c=relaxed/simple;
+	bh=IJTgg8oliI0wBung+FX2PEpyuBK0HOEoNJVtq00Xp1s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oiZHfVcZGHssyAQumcSakGbSxeJUFraBFtcbxHRs5vBnpYzQb7xxxkKYP343GHsq2bq4sbZexC2mmxo+m4fmahQvjVBgxxjAT4FolOYbLqfGJjI23d5KJuJzyP6jIyxZMmGnlHvG3DEib5fVka6vn4SolxuD4A9sFGa9AaHjhJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CpbiXT3u; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version; b=jI4lNlvvQpMMWtKvvYASLmdehz9Sbi+mJZ9jjVS/ZhBTD2kcNscGJzDqSpg+PZtInou130pLQoIES5TjRsTNaF+IEmJPAyBJpuwIT+BHQ4Ikmm3IheG8y8B4eW+gBRZ1+i0VbpDJfiEf6Ra7kSQd8Me0GI16Hqok2lCMBJMhq5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1Guby/7; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a12ebe4b74so226666135ad.0
-        for <kvm@vger.kernel.org>; Sat, 03 Jan 2026 01:46:15 -0800 (PST)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a07f8dd9cdso130543055ad.1
+        for <kvm@vger.kernel.org>; Sat, 03 Jan 2026 01:46:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767433575; x=1768038375; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767433578; x=1768038378; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lxjRzDH8YfA2CgJ8ukRlCUfNc/bMZBLM3ftExUQvlc8=;
-        b=CpbiXT3ul96SlIlEKAVPFONPB0ilsaJ8ZF9177y3PFMkzapnX6j+L17C54PbJT/Rdj
-         G/avRhjj327eWzEfu/T0imsPH63MEGqVE9Tdm8Aw8o5TTSsFVoEV/iYMjVmCv2P4+FEw
-         5cr+GC7N6AVKkkEVB/p1LTLbmcLNoqqnzlQoYRz+kw/S+CYSz271ZVnH3VeYiY5BgmVm
-         2QXsLNHH+JIv9yCLYVKvLZdl1AxbOvanLkLD+uWXpPOhgrxy1VILLWcikHAN0HEOXUfQ
-         1kkWDCZ7aSYf/S1LvpmrPENqt+CqxItZYorPudMW2EYDimxRAiJ/0kKOZRYrVAPEIIM0
-         FkAw==
+        bh=dP0IVTx42h14KuVE1/XaC/JEoSCL6PoSMoPSC6rOH4g=;
+        b=e1Guby/75ytZ1y9WAmLt0IEZFBO5eycvKmzSDYg8EIbmPl9g83pcMKKYLEnLzIXV/w
+         U/Z/CRdGsiux+eZ5uY7isddRGMq5jhymklgBLqa7jHT9WT1GkMpBMA7TofjSh/4+Snc5
+         fO/zrjfKX+5q2TkWPKt49Dmem0258wspB/MR2uK5CiT3wOmkbOxw/kmC/LedInK7adbK
+         S8BTxaP3qQ2h1Zad9BZUdKVMmfeUySXF14BYOa+rsxez1ob39rDFB9ILWiilQDv06n+F
+         aNJaHO0+8Br4u9z7XWUONDnxPABpWobB9PeDunPL8TiWWnPhYI0vRghMzY+vDltKcc85
+         IIXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767433575; x=1768038375;
+        d=1e100.net; s=20230601; t=1767433578; x=1768038378;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lxjRzDH8YfA2CgJ8ukRlCUfNc/bMZBLM3ftExUQvlc8=;
-        b=fJaLZxO692HarO9+8LZmPYOzIXyYY+USNxPDi4FeQnJdIF1A2W6pbxdzpuUYdm8uvV
-         EtAyMll2g4NyRuAUjTQ0ZbVrQNcDi2sR1T2fqTUz5SdIsb1DAd26o7Xeoqfjo7va17bE
-         AVpBonVlnMxk6gGoSsbWOUd6mzXvPrwPm1oFDajGC/U+MGYHuW5vkeHXk31gKuad/BXf
-         ZZR5W/qPKR/8jmx1WgYXCcI/tyWCPg5tXyGrsQhSi20y7dkXuI/4Vo6FYEoTS2xWbmi/
-         qNfOnE8M8qCVAaZkeMZZ85Dg1kKxhpJeGhIwfThjBfR65Tegh6fqLo+WCspPowXIC0jm
-         d64A==
-X-Forwarded-Encrypted: i=1; AJvYcCUKawl8YetXgTR7KY3SjNmkDodg47yoGa6l7dVAtAIWpOlU3239JH04hAX7W0WB4BjckmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLkjTNiGwKyXliUDEZXF6dHHOr1X0CIUvouFLY0A8gtFttzhfR
-	TEy8VV85AG1QELEHXtgKG404sj9tmz1VvJduNVVvCyDfu8KWW27rcy5+
-X-Gm-Gg: AY/fxX5g15K2J8E30lhRZt+bX2mA5evo71kUk3Y9QnLqbVa9+JJljR6Mqe/ZA2MXwIE
-	3dZG1+6BNwfdZISajTZbgq89QZp091yB16MA0yONU+sKCT4UmB4EmwsM5KlnN6vu634DT7lPh4I
-	UmrE/oTO+gbXvTWcMEYnbB4vBYicQnUMrtK8X1F6QajlKP9HD+23kS5gEvmsHMnNRIsW2bLHHoP
-	hZWhGT218WMN0pgPxxQHj3pPQEf6IheYX2+XEevDC6QMJl+KisiJ9b9ypzjPmEygANGxP2ue32y
-	xkoS2FYMywgym03DF18GbgPsWes8WgfGbXixeoxH9STNNtUi89zE44rCdamd7uYaRy8/WWgEqwq
-	2icLSqLZbAAEFH3K9mxusZKgGzrEFYSfsJHTSmw9/Fib4N/9ZnRTBJwZHN+7nlKk3zF2n/PCiJK
-	ox11hI59u42HFaJKOr5bTAaYxp4Hy2Lz4gd8xnRFjVBP7AF/GwT2EXLHQ3vO9l4CLW
-X-Google-Smtp-Source: AGHT+IEkB956+B9xGmx9cTGzL/pONpKgSLBP8lNFvd+0O3zkG68Mte459jHa1jjHCkA3n/rN8fRFsg==
-X-Received: by 2002:a17:903:290:b0:2a1:e19:ff5 with SMTP id d9443c01a7336-2a2f273818fmr480811265ad.38.1767433574809;
-        Sat, 03 Jan 2026 01:46:14 -0800 (PST)
+        bh=dP0IVTx42h14KuVE1/XaC/JEoSCL6PoSMoPSC6rOH4g=;
+        b=QdjtP+XmjgjialHPIB2B+1DqE/pM5pRq4ots7jWJSHSXqS+CDoz3517ZFu65Ck8CWS
+         bk0YhG135rHwY7K26uJ/U6/mx2ESgeRIvjcn1kTiTkfo+g7vb8LsO00MGQCzzT6auIe+
+         Rh5ur1MHCn9SWxjgarWWa6uwobViUW/tPjTzo0HZPlllPa5/aEBAmsy85GmhgUEqKARd
+         HOCTiNmyMA1v+du+H3w99QLMBYbGbZOuxK6BFyqf/C6/S0MNmH47bsl2i53itxKkyPcZ
+         TpZdqLyoRGvEngX9CVT2VqbkhTjyZ14tvM4cBGOt5UcEhpsvfeV1IRH96ryGuVcmFQmN
+         8pRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3x70m763NvIoDdIYr4NYR6lS5TZewY2GtVFOfis0MvSXP3mscyviINVPnzk99OTMNd3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKDUp7yKrP2ori89QPQl8vVuW6Cw86K3KxAXfgj7bYI1k0E4zH
+	h+dwur5/8W6B5H64l8O8PzhwJ4Zfq+45ydrTQB3Qb/h1RGqRZd5ALXVe
+X-Gm-Gg: AY/fxX7i9fO/sbEBV3cHvhabxd/x1Ul8dntl+NLv61RDPvrVQQewwCu1UFuXuv1NMwk
+	KsuZX19VLxIsJXQt9Ea/rqU/ViKHL6u6n20KUxWWLu3RKCfLf/USbTQk4EgEzGVogndkT7fgwFT
+	OWXTF19VK0sRbres/f68ihj4eW2e84W0gLO8yccZ6bS00KHTPuvsvXMUu7tY2s2y4R/vUrKedWs
+	VE5lgh2NOrsFtmrEebVyfvnVeeSCbjLzz+7bsdixY8LdaTSnUy/0ttsTm1TGhFcWHi3+xsZV8Nn
+	GBX+9c+9+p5+lm1cxHx91i93nz9+tvg7KQSFtPkpzN6JQkiohQKcIh5kbpCrHGTdcSK3jvFYYLl
+	67KziZvBcOcA1PO6Sea4rLwkdufLhm0QOyUiDXO05b2HjjUU8jPzDdzmgYYbWe4xPW0G9jB0/eL
+	Ww5j0zofD6rR5xp8qZWA9Ng7e0zYAX8LHAj69GLIjpNbNKPQabOIGvfc4FFcDJ2P9Z
+X-Google-Smtp-Source: AGHT+IG1CFsdsCyqKZEWFTi8fQu6+83oYv/ThQFQjQRZsNEh4BZNCae/3IqB71uabmFWXjYrwHYsoQ==
+X-Received: by 2002:a17:902:f68a:b0:295:99f0:6c66 with SMTP id d9443c01a7336-2a2f2836964mr436024535ad.36.1767433578268;
+        Sat, 03 Jan 2026 01:46:18 -0800 (PST)
 Received: from localhost.localdomain (123-48-16-240.area55c.commufa.jp. [123.48.16.240])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d4cbdasm403124315ad.65.2026.01.03.01.46.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d4cbdasm403124315ad.65.2026.01.03.01.46.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 01:46:14 -0800 (PST)
+        Sat, 03 Jan 2026 01:46:17 -0800 (PST)
 From: Naohiko Shimizu <naohiko.shimizu@gmail.com>
 To: pjw@kernel.org,
 	palmer@dabbelt.com,
@@ -87,9 +87,9 @@ Cc: alex@ghiti.fr,
 	kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org,
 	Naohiko Shimizu <naohiko.shimizu@gmail.com>
-Subject: [PATCH 2/3] riscv: kvm: Fix vstimecmp update hazard on RV32
-Date: Sat,  3 Jan 2026 18:45:00 +0900
-Message-Id: <20260103094501.5625-3-naohiko.shimizu@gmail.com>
+Subject: [PATCH 3/3] riscv: suspend: Fix stimecmp update hazard on RV32
+Date: Sat,  3 Jan 2026 18:45:01 +0900
+Message-Id: <20260103094501.5625-4-naohiko.shimizu@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260103094501.5625-1-naohiko.shimizu@gmail.com>
 References: <20260103094501.5625-1-naohiko.shimizu@gmail.com>
@@ -103,35 +103,26 @@ Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Naohiko Shimizu <naohiko.shimizu@gmail.com>
 ---
- arch/riscv/kvm/vcpu_timer.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/riscv/kernel/suspend.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-index 85a7262115e1..f36247e4c783 100644
---- a/arch/riscv/kvm/vcpu_timer.c
-+++ b/arch/riscv/kvm/vcpu_timer.c
-@@ -72,8 +72,9 @@ static int kvm_riscv_vcpu_timer_cancel(struct kvm_vcpu_timer *t)
- static int kvm_riscv_vcpu_update_vstimecmp(struct kvm_vcpu *vcpu, u64 ncycles)
- {
- #if defined(CONFIG_32BIT)
--	ncsr_write(CSR_VSTIMECMP, ncycles & 0xFFFFFFFF);
-+	ncsr_write(CSR_VSTIMECMP,  ULONG_MAX);
- 	ncsr_write(CSR_VSTIMECMPH, ncycles >> 32);
-+	ncsr_write(CSR_VSTIMECMP, (u32)ncycles);
- #else
- 	ncsr_write(CSR_VSTIMECMP, ncycles);
- #endif
-@@ -307,8 +308,9 @@ void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
- 		return;
+diff --git a/arch/riscv/kernel/suspend.c b/arch/riscv/kernel/suspend.c
+index 24b3f57d467f..aff93090c4ef 100644
+--- a/arch/riscv/kernel/suspend.c
++++ b/arch/riscv/kernel/suspend.c
+@@ -51,10 +51,11 @@ void suspend_restore_csrs(struct suspend_context *context)
  
- #if defined(CONFIG_32BIT)
--	ncsr_write(CSR_VSTIMECMP, (u32)t->next_cycles);
-+	ncsr_write(CSR_VSTIMECMP, ULONG_MAX);
- 	ncsr_write(CSR_VSTIMECMPH, (u32)(t->next_cycles >> 32));
-+	ncsr_write(CSR_VSTIMECMP, (u32)(t->next_cycles));
- #else
- 	ncsr_write(CSR_VSTIMECMP, t->next_cycles);
+ #ifdef CONFIG_MMU
+ 	if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SSTC)) {
+-		csr_write(CSR_STIMECMP, context->stimecmp);
+ #if __riscv_xlen < 64
++		csr_write(CSR_STIMECMP, ULONG_MAX);
+ 		csr_write(CSR_STIMECMPH, context->stimecmph);
  #endif
++		csr_write(CSR_STIMECMP, context->stimecmp);
+ 	}
+ 
+ 	csr_write(CSR_SATP, context->satp);
 -- 
 2.39.5
 
