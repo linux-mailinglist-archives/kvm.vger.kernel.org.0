@@ -1,62 +1,54 @@
-Return-Path: <kvm+bounces-66982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17434CF0B1D
-	for <lists+kvm@lfdr.de>; Sun, 04 Jan 2026 08:09:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1196CF0CAD
+	for <lists+kvm@lfdr.de>; Sun, 04 Jan 2026 10:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 25F54301E1BF
-	for <lists+kvm@lfdr.de>; Sun,  4 Jan 2026 07:09:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D321F3014ACF
+	for <lists+kvm@lfdr.de>; Sun,  4 Jan 2026 09:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD792DC339;
-	Sun,  4 Jan 2026 07:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC7F27EFF1;
+	Sun,  4 Jan 2026 09:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="mnh0jAwI"
+	dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b="KTHFT0AA"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from m204-227.eu.mailgun.net (m204-227.eu.mailgun.net [161.38.204.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8261EEA55;
-	Sun,  4 Jan 2026 07:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727A722F772
+	for <kvm@vger.kernel.org>; Sun,  4 Jan 2026 09:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.38.204.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767510564; cv=none; b=pcQVLQ/4K02XLJWgWqGw1qx2LCS6e/UVsZ1pu0v6sCIjHxfKGnxLCW/6VHL6qSHp02JjZi67YeyZ4KUPDKDyNVx9MbhroA3Dg7qZuRLEPjQqTVPfuHx2U9XkGmHuiYljhGK+KJWFwbfIqG88r5ZjzR34rZTYHEm7+fGfxW1Lcgk=
+	t=1767519155; cv=none; b=JHG1nSo4EOaeZdnYEMDNePcp4n357b+AbmmwRu7z9G/hzSuaXMOTzP5PJbFCK+jU3kLgrYqfujtbPL/kRneKIV1TFc6JUl0nPvVrHFKLTHhO8N2jKs8bXjZQmdkPu+VL6wRLJz2pwTX5tYnPPHt2z9xIArCeM3O12iidlJnyUaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767510564; c=relaxed/simple;
-	bh=yo4s7tNHJPYzEeNHy5USwxfrEjAlLe8Wyca+9lI7Sqw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eZ6Wm/XdsDJ9jSk23jwgN8o7UbU6DmFwDBSoUpq/tzQbpxMeroSHRS2S7Vp+hAfZgnopP3nb+aLkZ5YYbIfxeVdD0WhlurSnTL0LxkgWmUnf47jTgdcZB8G4cawQxXUAim9fgAT4rZANFy/msei1ibptYRw8GbO2qlRpN9lbXzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=mnh0jAwI; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=K2Rn//20dzEeCrYi224axDNWkg8lyp1rwlU1LUEqigs=;
-	b=mnh0jAwINorMSexBIwFFbSXeqPdFInVDb361qn3sdmeEYOD6BVMfbYkoKTgME86dMxHac8148
-	GxkRD8lHUM8KtrN0S29mzljWtv4Iu6l4f+UWiMa/6w5Bkkh0YFV6iRS+Qpq6bRTDM98lqcJQkV6
-	M+3j7MBTci0cnfCFRO12EmE=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dkT3Z40r9zcZxv;
-	Sun,  4 Jan 2026 15:05:46 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id B9C0540569;
-	Sun,  4 Jan 2026 15:09:12 +0800 (CST)
-Received: from huawei.com (10.90.31.46) by dggpemf500015.china.huawei.com
- (7.185.36.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sun, 4 Jan
- 2026 15:09:11 +0800
-From: Longfang Liu <liulongfang@huawei.com>
-To: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<jonathan.cameron@huawei.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<liulongfang@huawei.com>
-Subject: [PATCH 4/4] hisi_acc_vfio_pci: fix the queue parameter anomaly issue
-Date: Sun, 4 Jan 2026 15:07:06 +0800
-Message-ID: <20260104070706.4107994-5-liulongfang@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260104070706.4107994-1-liulongfang@huawei.com>
-References: <20260104070706.4107994-1-liulongfang@huawei.com>
+	s=arc-20240116; t=1767519155; c=relaxed/simple;
+	bh=MUgFvgqEB7XgxmikpsKlkfbvurFl8ED2oN0SDRcm7vI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mppCu20QldfhJMUYVyHaXgxd4POflfwqNkEZqzA8yLEEMmqIVI4eQ44vmYbCEleTu3XNoQOlCfH/gcJp3yt5uQBWpyUCEvgRMl0u2r4H8x7nTAfG37UQcwCTD1o7fEsD6DFNfaxWOaUZw2TZO8wz27eICO+TXL1UNXt/A9MBuT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net; spf=pass smtp.mailfrom=0x65c.net; dkim=pass (2048-bit key) header.d=0x65c.net header.i=@0x65c.net header.b=KTHFT0AA; arc=none smtp.client-ip=161.38.204.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x65c.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x65c.net
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=0x65c.net; q=dns/txt; s=email; t=1767519151; x=1767526351;
+ h=Content-Transfer-Encoding: MIME-Version: Message-ID: Date: Subject: Subject: Cc: To: To: From: From: Sender: Sender;
+ bh=XIeTYHnUQ/H/W/LI0nzsaTNmZqgXMJjMjR4cWFuMupE=;
+ b=KTHFT0AADEsSN0V1C5VlOWkTpDpNJOI1mgFspEpA6pviZJBlOdv/8VHFKv8hVeOoaQUL348bTqvKxd19cuPGkggsiPcZejIMrqk4aU/Su+6o2pt/F0ddQuvUHJ3cQU/w/KsgQ1ZXqOSH7Mz8jjRRvGNpIzhGI2SFiebdQXdKDgRYmmxrsxXD1CFmKkUBb+IWPxaU4ZWDsKoy3iqh7EY/Z+tpEf50ULJpNZuzSp7KeOb5APh8c7V66gt/2r0EjYKHEXBUYol2GAWiS+B8L7+kpwoUvcWYHKaSNX0f7tMm0FWgSsl+qTuvuKGyaOqzKjXuaCuGN8OrYFjElqE+hFdJQw==
+X-Mailgun-Sid: WyI1MzdiMyIsImt2bUB2Z2VyLmtlcm5lbC5vcmciLCI1NGVmNCJd
+Received: from fedora (pub082136115007.dh-hfc.datazug.ch [82.136.115.7]) by
+ 92fd60d16f98f66e64e22c6810b3b3dfcf197ead3d84d42024c93a95946dee14 with SMTP id
+ 695a33aff97895dc57720484; Sun, 04 Jan 2026 09:32:31 GMT
+X-Mailgun-Sending-Ip: 161.38.204.227
+Sender: alessandro@0x65c.net
+From: Alessandro Ratti <alessandro@0x65c.net>
+To: pbonzini@redhat.com,
+	seanjc@google.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com,
+	Alessandro Ratti <alessandro@0x65c.net>
+Subject: [PATCH] KVM: x86: Retry guest entry on -EBUSY from kvm_check_nested_events()
+Date: Sun,  4 Jan 2026 10:32:21 +0100
+Message-ID: <20260104093221.494510-1-alessandro@0x65c.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,62 +56,57 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500015.china.huawei.com (7.185.36.143)
 
-When the number of QPs initialized by the device, as read via vft, is zero,
-it indicates either an abnormal device configuration or an abnormal read
-result.
-Returning 0 directly in this case would allow the live migration operation
-to complete successfully, leading to incorrect parameter configuration after
-migration and preventing the service from recovering normal functionality.
-Therefore, in such situations, an error should be returned to roll back the
-live migration operation.
+When a vCPU running in nested guest mode attempts to block (e.g., due
+to HLT), kvm_check_nested_events() may return -EBUSY to indicate that a
+nested event is pending but cannot be injected immediately, such as
+when event delivery is temporarily blocked in the guest.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Currently, vcpu_block() logs a WARN_ON_ONCE() and then treats -EBUSY
+like any other error, returning 0 to exit to userspace. This can cause
+the vCPU to repeatedly block without making forward progress, delaying
+event injection and potentially leading to guest hangs under rare timing
+conditions.
+
+Remove the WARN_ON_ONCE() and handle -EBUSY explicitly by returning 1
+to retry guest entry instead of exiting to userspace. This allows the
+nested event to be injected once the temporary blocking condition
+clears, ensuring forward progress.
+
+This issue was triggered by syzkaller while exercising nested
+virtualization.
+
+Fixes: 45405155d876 ("KVM: x86: WARN if a vCPU gets a valid wakeup that KVM can't yet inject")
+Reported-by: syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1522459a74d26b0ac33a
+Tested-by: syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
+Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
 ---
- drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/x86.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 394f1952a7ed..e0cc20f5f38b 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -406,7 +406,7 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
- 	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
- 	struct device *dev = &vf_qm->pdev->dev;
- 	u32 que_iso_state;
--	int ret;
-+	int qp_num, ret;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ff8812f3a129..d5cf9a7ff8c5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11596,7 +11596,15 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
+ 	if (is_guest_mode(vcpu)) {
+ 		int r = kvm_check_nested_events(vcpu);
  
- 	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
- 		return 0;
-@@ -423,18 +423,18 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+-		WARN_ON_ONCE(r == -EBUSY);
++		/*
++		 * -EBUSY indicates a nested event is pending but cannot be
++		 * injected immediately (e.g., event delivery is temporarily
++		 * blocked). Return to the vCPU run loop to retry guest entry
++		 * instead of blocking, which would lose the pending event.
++		 */
++		if (r == -EBUSY)
++			return 1;
++
+ 		if (r < 0)
+ 			return 0;
  	}
- 
- 	/* VF qp num check */
--	ret = qm_get_vft(vf_qm, &vf_qm->qp_base);
--	if (ret <= 0) {
-+	qp_num = qm_get_vft(vf_qm, &vf_qm->qp_base);
-+	if (qp_num <= 0) {
- 		dev_err(dev, "failed to get vft qp nums\n");
--		return ret;
-+		return -EINVAL;
- 	}
- 
--	if (ret != vf_data->qp_num) {
-+	if (qp_num != vf_data->qp_num) {
- 		dev_err(dev, "failed to match VF qp num\n");
- 		return -EINVAL;
- 	}
- 
--	vf_qm->qp_num = ret;
-+	vf_qm->qp_num = qp_num;
- 
- 	/* VF isolation state check */
- 	ret = qm_read_regs(pf_qm, QM_QUE_ISO_CFG_V, &que_iso_state, 1);
 -- 
-2.24.0
+2.52.0
 
 
