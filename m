@@ -1,189 +1,157 @@
-Return-Path: <kvm+bounces-66976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66977-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A60AECF0995
-	for <lists+kvm@lfdr.de>; Sun, 04 Jan 2026 05:25:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70D2CF09D6
+	for <lists+kvm@lfdr.de>; Sun, 04 Jan 2026 06:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2E7230155FB
-	for <lists+kvm@lfdr.de>; Sun,  4 Jan 2026 04:24:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8B0B301EC65
+	for <lists+kvm@lfdr.de>; Sun,  4 Jan 2026 05:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015C4280033;
-	Sun,  4 Jan 2026 04:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E3D2D640D;
+	Sun,  4 Jan 2026 05:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="nF4j9irY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yg6Zqa0y"
 X-Original-To: kvm@vger.kernel.org
-Received: from r3-24.sinamail.sina.com.cn (r3-24.sinamail.sina.com.cn [202.108.3.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E7D18DB35
-	for <kvm@vger.kernel.org>; Sun,  4 Jan 2026 04:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A52720322
+	for <kvm@vger.kernel.org>; Sun,  4 Jan 2026 05:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767500692; cv=none; b=US9d2z3rxqlClozbKNnUkeQ4mYkkFjZ3FC81/macgdfI5w1iNbuc6g3zUMxDjdT0k7TAvxyAXr/4nbEigdfCPnTGF1ENyb7Gf8dlymkxsGm4E60XuLLJKhtXxIq1zsWlhiYj5u685VHrx/Skm/K9G3JNWP0saEC9EW7ITnCwznE=
+	t=1767504552; cv=none; b=NEBf508jr3eu+OReeEjoQT3EdVBaJLNLYpj9K2EFjmbqcAKTYQe6jm8h4Q0WUqQgm0ed3xZQeNTPvECmthjxDlWnm8UIXBcOfeMMmHMx8qMd4rR/Gv5XM69l2rz7cbbSzO6D5ouBVrOkfWykQ4cakh2lwWhW18PyX3NxOREMFQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767500692; c=relaxed/simple;
-	bh=OK/WPYwWrVKlcRorPhuJ65nPxNrq5wx3wOHqrXF08NY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=USPr0UVSYu30bH739DN+TMb+slfkYzpoyQ5wft5GvK/oqb+oUKgbD4n+SEc80qU1VmUT3A1c+8LsqoePZzaQYvGoda5H65QlHU1vPWT5sA6jfZ26Fmg6GXzbMv3Ny2eYXU+TqmZpS5DkDQXMa6DYJVJmewgZ0CrICwUIhtUut50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=nF4j9irY; arc=none smtp.client-ip=202.108.3.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1767500686;
-	bh=U0ogmGsROkK7SdrhjnDjiDrRhFMjLh2c01njNVOPXjU=;
-	h=From:Subject:Date:Message-ID;
-	b=nF4j9irYEkZyEcELYF4PSHeXYGmqBpkLJHUbPlKJW4NUCG/NMdLjzBP34DWxnsV7K
-	 vrOk0Jo1/OkySBTHTHccAcCP+czI821si0CQ+qDNVbdKp121+A8AOshNp7vBY2f32w
-	 sSS/mUfTF8RXaRf2+4Dof4Hr+gYm+rRzaiMT7BAA=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.57.85])
-	by sina.com (10.54.253.31) with ESMTP
-	id 6959E80500003A64; Sun, 4 Jan 2026 12:09:43 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 3720196816273
-X-SMAIL-UIID: C517F5C6778747118466FBC437C605EE-20260104-120943-1
-From: Hillf Danton <hdanton@sina.com>
-To: Wanpeng Li <kernellwp@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	K Prateek Nayak <kprateek.nayak@amd.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH v2 2/9] sched/fair: Add rate-limiting and validation helpers
-Date: Sun,  4 Jan 2026 12:09:34 +0800
-Message-ID: <20260104040936.1912-1-hdanton@sina.com>
-In-Reply-To: <20251219035334.39790-3-kernellwp@gmail.com>
-References: <20251219035334.39790-1-kernellwp@gmail.com>
+	s=arc-20240116; t=1767504552; c=relaxed/simple;
+	bh=65vgSVMqf/BQy1Yp33ggrUZQR1FCpsrPR3lKZwoF6e0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lsFXlzvhw+GXpZdJCkaleD0i76KXtJyB8ciulM1DGOyd9bimZyk5DPm73tMnrC64WG3aYTp3Skgz3AWMk9WdKcZ++EkcSdRXY/tIIzRxrLHSpW1MsNfbuT/jNCXzxupMDoZgRjWuLnpXfVTjmlCkWSZfMGGu5pC2Msik0xpFE+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yg6Zqa0y; arc=none smtp.client-ip=74.125.82.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-11beb0a7bd6so1228608c88.1
+        for <kvm@vger.kernel.org>; Sat, 03 Jan 2026 21:29:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767504548; x=1768109348; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nvOkP8SZJigPzeyYaj+yZhhAkS0A2aAjhXuUNUZVL+k=;
+        b=Yg6Zqa0yl4Ps3xat499EvczeKmPP3moBORRbUlV1QwjEzeMc2FetSIJuCtbs0xtf+l
+         lCWXpwZzaZAEqvlD0feNi3BzaeGwEw9+ejVV+ZUjPH1Lpan1bVeLIixJaVysBv+/t5IV
+         X6YFXEH5EKv1KMD6dbg8J7d7sWaWzu8wK59iQ90DJMds5LwqrLJEMQcY49mX6eC/kQVV
+         bHEo2ypbv+2s6Wj3z8y8lxVNyQBOTMvbiL0tTw7YnhkiXz3fUdvsRDd9kbVNpOkjDxQ5
+         DBrABF2OGuS5DIGq7A+GwgXOr3T4uR8t7sJyTp3eHFAUf2ft/ISVWPeE2X7lvHUzovGG
+         FAXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767504548; x=1768109348;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nvOkP8SZJigPzeyYaj+yZhhAkS0A2aAjhXuUNUZVL+k=;
+        b=JltbbaMn2pTPkf86rfCXWDuPa7lPkjWlnt6jgjTgXMwM3Wm9e58vUMnaSyVooeyd5e
+         MkAEBuAaGWBQc2+ONTj1ukCqDMlfv7AryDWmIrovUnVpOMvrzEVwpryt5brQXFiBShw9
+         4yyPDUZm6SLZahDalouzV2pCU4K+b2SeW9ZaD2rBeCTzHeK+gMghz5fwCuJ1/BMTbekC
+         BfJqd6WWkcpckGEiToDzzt3nmqjwvYOYLy19YHalopunDeP58IqF9rflFFf5VLuiBjBh
+         ZG3t5uTFGFeZ6y0LWom7fJz2I8FIQFdfNtTPOFiP/7fQo0mIT//38FlQwIGfLOX7xm/7
+         Y7QA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOvSC3JXgLsUEN2p6/HmwBnmvSEYSh3XiwfzyYi2cK9lN3rKUbCvsXuIATGf7yqZgDi0w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsPB/qErk2HK2aAeFYk+vPLsbeqmbqmDFkZk/yhDQYolyJT8F8
+	TSswmcFmIknbNgAs+WRf+FMxjMnbjeq0bFAP99ELn4/brAUhNMjlsmPNuD2BiA==
+X-Gm-Gg: AY/fxX7X0wLRZKUGVg+/MiT84dKKfH4GuVat1b7Q8Rz5kUiycTgJChusy+9c1CPDg2v
+	83IjLy65uNMJ5gch82tM/MkS/t1BkKfHtiQ6UEfqRYS9YMkWritxt5tS6SBjS0Avqnwrs1Xccio
+	7YQjmeDgL6fN/szwDFSxHgWsSBwvNOavr+pJH0yTdEqEw4hR/NaJzWf5mIUpDCeM1SOoDj0Gfb6
+	cwEb4/ihGS+cODhW9xbrJuwjd3ZlKv4PBS/Tp0/cDgNgoe+ZnsSyKJhFwe0tIFXW2q2v5t4mnNx
+	9a56PnVL36xokLwC4qcgBiXBKNYZ25QHuY9HLrlpcVrEmaAfZFomVL/lJWjjUyiu4FJjSP62Fdv
+	7ZgOUJnX2IxmGLjUYscC6IBwXP7uNs9hkX8ZX+G8hwgemH37uRqPws92VHtgxjO5klHMSAsanIY
+	Oxquth0JgQ2PSBCwKg
+X-Google-Smtp-Source: AGHT+IEUP35P72PXbqK3T+Jw88HQN7ZqgMrv6wlEXPBBGaZBS9BBhhgZozXciIYpR2i4MqLpZOsSXw==
+X-Received: by 2002:a05:7022:320:b0:11f:3479:fb72 with SMTP id a92af1059eb24-121d808b16emr3204222c88.6.1767504547989;
+        Sat, 03 Jan 2026 21:29:07 -0800 (PST)
+Received: from localhost ([2601:647:6802:dbc0:8a10:ce2:890f:8db0])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121724cfdd0sm164944598c88.4.2026.01.03.21.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Jan 2026 21:29:07 -0800 (PST)
+Date: Sat, 3 Jan 2026 21:29:06 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, Cong Wang <cwang@multikernel.io>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [Patch net] vsock: fix DMA cacheline overlap warning using
+ coherent memory
+Message-ID: <aVn6ooxGnWH3X8ZZ@pop-os.localdomain>
+References: <20251228015451.1253271-1-xiyou.wangcong@gmail.com>
+ <20251228104521-mutt-send-email-mst@kernel.org>
+ <aVGz39EoF5ScJfIP@pop-os.localdomain>
+ <20251230081220-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251230081220-mutt-send-email-mst@kernel.org>
 
-Hi Wanpeng 
+On Tue, Dec 30, 2025 at 08:12:47AM -0500, Michael S. Tsirkin wrote:
+> On Sun, Dec 28, 2025 at 02:49:03PM -0800, Cong Wang wrote:
+> > On Sun, Dec 28, 2025 at 02:31:36PM -0500, Michael S. Tsirkin wrote:
+> > > On Sat, Dec 27, 2025 at 05:54:51PM -0800, Cong Wang wrote:
+> > > > From: Cong Wang <cwang@multikernel.io>
+> > > > 
+> > > > The virtio-vsock driver triggers a DMA debug warning during probe:
+> > > > 
+> > [...]
+> > > > This occurs because event_list[8] contains 8 struct virtio_vsock_event
+> > > > entries, each only 4 bytes (__le32 id). When virtio_vsock_event_fill()
+> > > > creates DMA mappings for all 8 events via virtqueue_add_inbuf(), these
+> > > > 32 bytes all fit within a single 64-byte cacheline.
+> > > > 
+> > > > The DMA debug subsystem warns about this because multiple DMA_FROM_DEVICE
+> > > > mappings within the same cacheline can cause data corruption: if the CPU
+> > > > writes to one event while the device is writing another event in the same
+> > > > cacheline, the CPU cache writeback could overwrite device data.
+> > > 
+> > > But the CPU never writes into one of these, or did I miss anything?
+> > > 
+> > > The real issue is other data in the same cache line?
+> > 
+> > You are right, it is misleading.
+> > 
+> > The CPU never writes to the event buffers themselves, it only reads them
+> > after the device writes. The problem is other struct fields in the same
+> > cacheline.
+> > 
+> > I will update the commit message.
+> > 
+> > > 
+> > > You want virtqueue_map_alloc_coherent/virtqueue_map_free_coherent
+> > > methinks.
+> > > 
+> > > Then you can use normal inbuf/outbut and not muck around with premapped.
+> > > 
+> > > 
+> > > I prefer keeping fancy premapped APIs for perf sensitive code,
+> > > let virtio manage DMA API otherwise.
+> > 
+> > Yes, I was not aware of these API's, they are indeed better than using
+> > DMA API's directly.
+> > 
+> > Thanks!
+> > Cong
+> 
+> BTW I sent an RFC fixing these bugs in all drivers. Review/testing would
+> be appreciated.
 
-On Fri, 19 Dec 2025 11:53:26 +0800
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Implement core safety mechanisms for yield deboost operations.
-> 
-> Add yield_deboost_rate_limit() for high-frequency gating to prevent
-> excessive overhead on compute-intensive workloads. The 6ms threshold
-> balances responsiveness with overhead reduction.
-> 
-> Add yield_deboost_validate_tasks() for comprehensive validation ensuring
-> both tasks are valid and distinct, both belong to fair_sched_class,
-> target is on the same runqueue, and tasks are runnable.
-> 
-Given IPI in subsequent pacthes, why is same rq required?
+Thanks for taking care of it.
 
-> The rate limiter prevents pathological high-frequency cases while
-> validation ensures only appropriate task pairs proceed. Both functions
-> are static and will be integrated in subsequent patches.
-> 
-> v1 -> v2:
-> - Remove unnecessary READ_ONCE/WRITE_ONCE for per-rq fields accessed
->   under rq->lock
-> - Change rq->clock to rq_clock(rq) helper for consistency
-> - Change yield_deboost_rate_limit() signature from (rq, now_ns) to (rq),
->   obtaining time internally via rq_clock()
-> - Remove redundant sched_class check for p_yielding (already implied by
->   rq->donor being fair)
-> - Simplify task_rq check to only verify p_target
-> - Change rq->curr to rq->donor for correct EEVDF donor tracking
-> - Move sysctl_sched_vcpu_debooster_enabled and NULL checks to caller
->   (yield_to_deboost) for early exit before update_rq_clock()
-> - Simplify function signature by returning p_yielding directly instead
->   of using output pointer parameters
-> - Add documentation explaining the 6ms rate limit threshold
-> 
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  kernel/sched/fair.c | 62 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 62 insertions(+)
-> 
-> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-> index 87c30db2c853..2f327882bf4d 100644
-> --- a/kernel/sched/fair.c
-> +++ b/kernel/sched/fair.c
-> @@ -9040,6 +9040,68 @@ static void put_prev_task_fair(struct rq *rq, struct task_struct *prev, struct t
->  	}
->  }
->  
-> +/*
-> + * Rate-limit yield deboost operations to prevent excessive overhead.
-> + * Returns true if the operation should be skipped due to rate limiting.
-> + *
-> + * The 6ms threshold balances responsiveness with overhead reduction:
-> + * - Short enough to allow timely yield boosting for lock contention
-> + * - Long enough to prevent pathological high-frequency penalty application
-> + *
-> + * Called under rq->lock, so direct field access is safe.
-> + */
-> +static bool yield_deboost_rate_limit(struct rq *rq)
-> +{
-> +	u64 now = rq_clock(rq);
-> +	u64 last = rq->yield_deboost_last_time_ns;
-> +
-> +	if (last && (now - last) <= 6 * NSEC_PER_MSEC)
-> +		return true;
-> +
-> +	rq->yield_deboost_last_time_ns = now;
-> +	return false;
-> +}
-> +
-> +/*
-> + * Validate tasks for yield deboost operation.
-> + * Returns the yielding task on success, NULL on validation failure.
-> + *
-> + * Checks: feature enabled, valid target, same runqueue, target is fair class,
-> + * both on_rq. Called under rq->lock.
-> + *
-> + * Note: p_yielding (rq->donor) is guaranteed to be fair class by the caller
-> + * (yield_to_task_fair is only called when curr->sched_class == p->sched_class).
-> + */
-> +static struct task_struct __maybe_unused *
-> +yield_deboost_validate_tasks(struct rq *rq, struct task_struct *p_target)
-> +{
-> +	struct task_struct *p_yielding;
-> +
-> +	if (!sysctl_sched_vcpu_debooster_enabled)
-> +		return NULL;
-> +
-> +	if (!p_target)
-> +		return NULL;
-> +
-> +	if (yield_deboost_rate_limit(rq))
-> +		return NULL;
-> +
-> +	p_yielding = rq->donor;
-> +	if (!p_yielding || p_yielding == p_target)
-> +		return NULL;
-> +
-> +	if (p_target->sched_class != &fair_sched_class)
-> +		return NULL;
-> +
-> +	if (task_rq(p_target) != rq)
-> +		return NULL;
-> +
-> +	if (!p_target->se.on_rq || !p_yielding->se.on_rq)
-> +		return NULL;
-> +
-> +	return p_yielding;
-> +}
-> +
->  /*
->   * sched_yield() is very simple
->   */
-> -- 
-> 2.43.0
+In case you need, it is 100% reproducible with CONFIG_DMA_API_DEBUG=y.
+
+If you need my config, here it is:
+https://github.com/congwang/kernelconfig/blob/master/kvm-debug-config
+
+Regards,
+Cong Wang
 
