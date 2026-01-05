@@ -1,95 +1,95 @@
-Return-Path: <kvm+bounces-67027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A871CF2789
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 09:39:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5628CF26F3
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 09:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 72F3930021D7
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 08:39:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AA3F304B062
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 08:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66F532C928;
-	Mon,  5 Jan 2026 08:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94C432ABCF;
+	Mon,  5 Jan 2026 08:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Io/btUN1";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qtt1gD9p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JJQonVME";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="uMRMouiJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C6932ABCF
-	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 08:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266E231CA72
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 08:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601434; cv=none; b=pmP95dzKh8Y4LelRSgxnN6tj7CRvShCnVJd3XEPn5sTlqoDPkwveQVqRLkB3ydVJrZLgDw5VQD9e16qGA1Pp/Yo1Z5lDYiW2gQaGGVu08+lHbg9FrAAsCx7YxoIco5nnKMJvCYzR98BIDDpaMSAGRiSvj7ffb9sd5XnNkM57+4g=
+	t=1767601436; cv=none; b=ba1n6vIhSCrZ+2VczLapPy+JPf0chHT2c9+9oT+t7Zg2q84fjcw58XI2eq+XPphC2pALf+B+5iPnGyLTtmpAiaMBkIhSxr4wbnPlPd8IMgY2znEIPGO5T5B6VK81q7XKukeVCK4nsaUW0BdZ6x19ZW3zvIe98GI72e+JBVAyNh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601434; c=relaxed/simple;
-	bh=SZ7yoG8PLS6oSz/uClprybkzflRSWBjZBPmgt2pUyWw=;
+	s=arc-20240116; t=1767601436; c=relaxed/simple;
+	bh=5+AqmnW4PA/6edyK6U8dTvigNJLqhC7cXNvV8IIXjTk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sgDuS5y4nCkQUB//YK2aujDU39rHAppyXTK0Yc84+itM6TAoMAl6DlpbADzZ/6V8PGQja/1LVpypaoeTByGBhLDsIRVfQk2cUe3UZVQeDvcOKsudtnQ04Lyv1mta/6FecIfnvagaadea+VbHa1ECRkzKhLhaqVwnqccxK4rVW/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Io/btUN1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qtt1gD9p; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=t6bl7Myl+D3j6C0v97Dmz7Bh346uff43v8fwizYGuFNJoIsHyI69fD1eQ58SPXvqcg9UIEa1yUGuTwlgjaUd2HGhxZIagit5Rd/EbAi0oQsMni5I2/J/zSnX44XmGsnVaT/GFzme7iChhQK9u8xKjvSV5ZJABZFyYTJFBWNGjOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JJQonVME; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=uMRMouiJ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767601428;
+	s=mimecast20190719; t=1767601432;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UCCLeq+lwQP+R3LKzuvNuhkNhAmceABICngBBmDYRE8=;
-	b=Io/btUN14Pz93JGjiSMLn8JU4k3jep6SAudvCUMDNbgMvcAm2YiJl2peavOlnsbE3tNs9W
-	RS3bNAH4RsEwQR5x43TvQxfxwUrHlRmlJ0bniPMQ/RN82e8xmwbFtqQH9OiNWkEoxz9iEz
-	H9Bb+vvTkYL05LQ8Dy1BccJ7DxXDg78=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=F5gbCeCGdOPWPA7+HFhpRVcPZoxhZ6OosT4+6pGbwi0=;
+	b=JJQonVMEcOItokzsUwiqnP3io1Vx/zxDy2HJhR7fArK7F+T3OQNYmTlxXz4tM7G93/kDfq
+	n+05vl+jskjAaa+CurAeXka56F8nUW++06U8r1BCBQ0yiI2k1lsNwiEdpuwvYnqwA2HmdF
+	VioRLxFYzzBETrM61V0Wrw1DRHt4XA4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-nSoRb1LEMDSRziVNxmBQ3g-1; Mon, 05 Jan 2026 03:23:47 -0500
-X-MC-Unique: nSoRb1LEMDSRziVNxmBQ3g-1
-X-Mimecast-MFC-AGG-ID: nSoRb1LEMDSRziVNxmBQ3g_1767601426
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4775e00b16fso58311965e9.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 00:23:47 -0800 (PST)
+ us-mta-615-vupsb712OCO_-QdacM4Ghg-1; Mon, 05 Jan 2026 03:23:50 -0500
+X-MC-Unique: vupsb712OCO_-QdacM4Ghg-1
+X-Mimecast-MFC-AGG-ID: vupsb712OCO_-QdacM4Ghg_1767601430
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47d3ffa98fcso56797935e9.3
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 00:23:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767601426; x=1768206226; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767601430; x=1768206230; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UCCLeq+lwQP+R3LKzuvNuhkNhAmceABICngBBmDYRE8=;
-        b=qtt1gD9poIHpzjauiXtVKb1u88sTn7Wwbfi00HKlGMPnuFWOhzi+vYbAQiA6E+/QOy
-         KHA1rws1YgxHL3D+ZGXGlsplhJBj1Xcxi0JKkOJ4sFAjpsHNb9ZS08H9jbEmcnM7vZnl
-         RK7P3fTatZ/EWpjeFzLDDJoZL+87zOa90w7aj72Had0j0ntALOHFkMwbzOKcchnCq0Av
-         wmwv/ZZjPGhAvvLs19IXb29uwOB3Tm5qZvnBmugl+i6s4BeM6sHQCR5u7Czf5RCGzkYR
-         jHYq07piUzqY53pdXGmmnXX4TXosiZaYUteYthXVUIuM2Fec/06gqy85cfBDx3zAqzHe
-         jckA==
+        bh=F5gbCeCGdOPWPA7+HFhpRVcPZoxhZ6OosT4+6pGbwi0=;
+        b=uMRMouiJplEJw0f5B11uiIHSrH3LOhXawBmO9iJbtMCtXnX76GJLVIoCkShGK39nz3
+         yp/NJ7wiFbxpJw2CqA2z5GllV5j3v4RQodT9PE3uofpmD/LQL4+/+ePrrpw1yinD3uu8
+         XIxgLJ0DWDIUKFBxq5afHUXbvrWFgjVsEY80bWFw3F61Un3Tpu0pJG5jVHbyKeznPoC1
+         kivOJYvUuXJZkuX8nyKEn4HczMNlKVdhiVmQXmTptPA1XNeK/R3VbMXt8ZnWptwL4v2a
+         tfGAc6lMpotFue6H+9pQit71eSYmLEbJa+KluiO5wx5Ofeip7XGSq9shXAFsF7BCYI6S
+         7Wsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767601426; x=1768206226;
+        d=1e100.net; s=20230601; t=1767601430; x=1768206230;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UCCLeq+lwQP+R3LKzuvNuhkNhAmceABICngBBmDYRE8=;
-        b=c9whQPzWLeUl/BvZnwDGi7OTlH+Xgs0jsUEd4Ns1wTdeKA1FPUzWDvbYib11MjDfCy
-         5U3YQQpSogBH0n/WMgTiv243SK5G0ZazwfN+ssxnPCvuTZwuGOZy9rTH0XGQVQdy6ibL
-         I/fP5GEF8wVKFWbYc22ZKmcQHo9toA6ngTotVlg92GWdCeSduB+AkhB1yizWhOuxizrn
-         8+wBFM0Kq57RRXwKI2Yix4b4WVWjemkEXQGFaKe0Z8v2C2a8ozRnZRjYFPciqZ70Uago
-         2oh83BuhjKS/fKrRcPFvjo05lumx4yOblrRHD5kLpRKThp/trDGdS/ybwFezWs0e+ghY
-         7iBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWtxuxWdzpRiP1UDDD6C+2RXH3/f9/B1ZBL17HJCZ/p6e3Gipqq/eHixHNw+qhrMtPibPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRR5Pnk9io/iqEw46AKUYus7hvVDLPerxFCp4wtqbigtsXg6Pb
-	jKz3OBIYq/X1KdXZ/iS+lQ//6I7uLTDG5e7bug3B4uilLkj8m0dhmdTetLNUvR6YGUZ2vbo8BQu
-	0NF/ngShuSEPtikNCPmVRuXVkiegZOnjk8lWDLMP+1p6FkWi98N5BTQ==
-X-Gm-Gg: AY/fxX6cuPAOt+b8XPbXcFhqD+u+T1EQ5zFbGqyTsIlOVnc3CjbDoN1mxB+RzGZSTLc
-	Gxxfv+0nNmDDEZZLXBZRH39wpc13llvU8nGvJNJGcqehWTr+iOvll875soya8nwf6pvYzYn11A0
-	h0UouQjTiPP3PWCQ7jVP4FR9P3DTi82Np0Z3HKbjdLAs1QivKoSijqsoF53QS2+wdFNe/r22KbL
-	817uwuBmK4Rxxy1wrshnQ2XcwlNXIykQHhktUddALpgIg7shHrPLgpaBkAAyjv1nBKp+VHe0eAt
-	i4tq5jDlmuDrV14CCUbXyhOMq4qzYhqA7moMqajWnnMpetwZrirRG1eGFEElU2x339jDI/36+h5
-	bathLSj7gkJ4DMFpxkovp4CELn4q4nuaONw==
-X-Received: by 2002:a05:600c:6287:b0:47d:5dae:73b1 with SMTP id 5b1f17b1804b1-47d5dae7628mr228845985e9.23.1767601425892;
-        Mon, 05 Jan 2026 00:23:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF11RG7JP48/6nhX1x0r6bivcNnxiVBPQ+hub/0+kajaGoE0Knx7g5Xjp0dkxgQjwSwKtknIQ==
-X-Received: by 2002:a05:600c:6287:b0:47d:5dae:73b1 with SMTP id 5b1f17b1804b1-47d5dae7628mr228845285e9.23.1767601425245;
-        Mon, 05 Jan 2026 00:23:45 -0800 (PST)
+        bh=F5gbCeCGdOPWPA7+HFhpRVcPZoxhZ6OosT4+6pGbwi0=;
+        b=mgwCyYxobxsRxOIPA28mrxLhLFHGYsFkb+T5PdV72UvnMFcxrKXlATzYMqrcr0t3v5
+         XGIcVmcfKveTcQ1zGGCxoPIYWblnqMoK9oKtERxxkQkP+Gufm9FngwTWUFrjpaCiENZ/
+         RHbT/+W1DqK38l45w+83zfCl+CCkxZz3PI14SK6vP+hEofMhVUE7EtACLJOBFgrohAm+
+         E3NA0rMp88Y7+MLhAoqcgN+gXqylBRiLftB32bD+utCkZDLJfQswmkekIjLT1in/hdWc
+         etq6WveeRsqub1NMXch5x913hEjn0+Zeg2vq5CYfGwCcbPaZ5g3JFSad5BbLaxMbYnj3
+         xQiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVxlhktBj3M3SYeWRp5qLlQIIRl/9GOy2fL7mEDn0i1WKb002GsEhRx02q29zi6Zw986cU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5RXq1Mvp/HSpIn7/EPh4potjAGgBiRb3zmpz1Jn+JJhM3wAeE
+	jC7gxdi1yfZkqBt/MMPpn2SqAqLPr6YpWHZoq8RDKxruOovnv/u4YQd31erCRxvIqaRDT7fCmhG
+	1l4PaPbOFZJ5VIcSAr7bNv8uz/7GdyvqAfhmMze9vSU/dC0k9xeCjmA==
+X-Gm-Gg: AY/fxX5VcS8Ry80oFSCuCiHYpqVI2puIeIA3+KCPIIS5H32F77pVPW6gwIdgvxDYsb7
+	uFrJ5cuFMVxlDRQGsnZrIdKDga18vAAwtnt/BDA048fMCGlNTfgxxQPRlSp/fUatT98Syg8czeg
+	KMXe3+xYDiyf9AN4+RupyURTPwGalicT2tUssY73WEwzytGkxP6zTqp6EzfdIqhaOk8If7CxM81
+	D5tTl/Ey6yncE6FqfCm52yj9dleAAa47A/BXVpVWxvDIzQWOibUYPtwTCCZJ2QuF/iqQXoJ9S7I
+	MADKUWfifSxSC8MoQ8JdjOwhsobnavRqVXfmPcPW6jKhKNl785l0zetVt5K+3274QrhjQdtBqT3
+	VQUJJahwgZNMY/Fz0e8r5NyR0sC3iez4Oww==
+X-Received: by 2002:a05:600c:45d3:b0:47d:4044:4ada with SMTP id 5b1f17b1804b1-47d40444b44mr461188015e9.13.1767601429698;
+        Mon, 05 Jan 2026 00:23:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEMwRI3MA2DTNX2WICs7qzlXbxMYmhW2AMGnc8lzpwkl8AC0h1+xs4bbHr0vh3wAjjaNt43Dw==
+X-Received: by 2002:a05:600c:45d3:b0:47d:4044:4ada with SMTP id 5b1f17b1804b1-47d40444b44mr461187535e9.13.1767601429208;
+        Mon, 05 Jan 2026 00:23:49 -0800 (PST)
 Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea830fesm100331450f8f.20.2026.01.05.00.23.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6ce21fcdsm154121375e9.0.2026.01.05.00.23.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 00:23:44 -0800 (PST)
-Date: Mon, 5 Jan 2026 03:23:41 -0500
+        Mon, 05 Jan 2026 00:23:48 -0800 (PST)
+Date: Mon, 5 Jan 2026 03:23:45 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -114,9 +114,13 @@ Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
 	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
 	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
 	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v2 13/15] vsock/virtio: reorder fields to reduce padding
-Message-ID: <fdc1da263186274b37cdf7660c0d1e8793f8fe40.1767601130.git.mst@redhat.com>
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	"Enrico Weigelt, metux IT consult" <info@metux.net>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linusw@kernel.org>, linux-gpio@vger.kernel.org
+Subject: [PATCH v2 14/15] gpio: virtio: fix DMA alignment
+Message-ID: <ba7e025a6c84aed012421468d83639e5dae982b0.1767601130.git.mst@redhat.com>
 References: <cover.1767601130.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -130,41 +134,74 @@ In-Reply-To: <cover.1767601130.git.mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 
-Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
-last. This eliminates the padding from aligning the struct size on
-ARCH_DMA_MINALIGN.
+The res and ires buffers in struct virtio_gpio_line and struct
+vgpio_irq_line respectively are used for DMA_FROM_DEVICE via
+virtqueue_add_sgs().  However, within these structs, even though these
+elements are tagged as ____cacheline_aligned, adjacent struct elements
+can share DMA cachelines on platforms where ARCH_DMA_MINALIGN >
+L1_CACHE_BYTES (e.g., arm64 with 128-byte DMA alignment but 64-byte
+cache lines).
 
+The existing ____cacheline_aligned annotation aligns to L1_CACHE_BYTES
+which is not always sufficient for DMA alignment. For example, with
+L1_CACHE_BYTES = 32 and ARCH_DMA_MINALIGN = 128
+  - irq_lines[0].ires at offset 128
+  - irq_lines[1].type at offset 192
+both in same 128-byte DMA cacheline [128-256)
+
+When the device writes to irq_lines[0].ires and the CPU concurrently
+modifies one of irq_lines[1].type/disabled/masked/queued flags,
+corruption can occur on non-cache-coherent platforms.
+
+Fix by using __dma_from_device_group_begin()/end() annotations on the
+DMA buffers. Drop ____cacheline_aligned - it's not required to isolate
+request and response, and keeping them would increase the memory cost.
+
+Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- net/vmw_vsock/virtio_transport.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/gpio/gpio-virtio.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index ef983c36cb66..964d25e11858 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -60,9 +60,7 @@ struct virtio_vsock {
- 	 */
- 	struct mutex event_lock;
- 	bool event_run;
--	__dma_from_device_group_begin();
--	struct virtio_vsock_event event_list[8];
--	__dma_from_device_group_end();
-+
- 	u32 guest_cid;
- 	bool seqpacket_allow;
+diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+index 17e040991e46..b70294626770 100644
+--- a/drivers/gpio/gpio-virtio.c
++++ b/drivers/gpio/gpio-virtio.c
+@@ -10,6 +10,7 @@
+  */
  
-@@ -76,6 +74,10 @@ struct virtio_vsock {
- 	 */
- 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
- 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
+ #include <linux/completion.h>
++#include <linux/dma-mapping.h>
+ #include <linux/err.h>
+ #include <linux/gpio/driver.h>
+ #include <linux/io.h>
+@@ -24,8 +25,11 @@
+ struct virtio_gpio_line {
+ 	struct mutex lock; /* Protects line operation */
+ 	struct completion completion;
+-	struct virtio_gpio_request req ____cacheline_aligned;
+-	struct virtio_gpio_response res ____cacheline_aligned;
 +
 +	__dma_from_device_group_begin();
-+	struct virtio_vsock_event event_list[8];
++	struct virtio_gpio_request req;
++	struct virtio_gpio_response res;
++	__dma_from_device_group_end();
+ 	unsigned int rxlen;
+ };
+ 
+@@ -37,8 +41,10 @@ struct vgpio_irq_line {
+ 	bool update_pending;
+ 	bool queue_pending;
+ 
+-	struct virtio_gpio_irq_request ireq ____cacheline_aligned;
+-	struct virtio_gpio_irq_response ires ____cacheline_aligned;
++	__dma_from_device_group_begin();
++	struct virtio_gpio_irq_request ireq;
++	struct virtio_gpio_irq_response ires;
 +	__dma_from_device_group_end();
  };
  
- static u32 virtio_transport_get_local_cid(void)
+ struct virtio_gpio {
 -- 
 MST
 
