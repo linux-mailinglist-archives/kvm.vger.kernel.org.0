@@ -1,153 +1,136 @@
-Return-Path: <kvm+bounces-67070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6CB3CF53A4
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:25:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18B4CF53AA
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:25:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AA350302C9C6
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:25:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5D1B305CD20
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698062C08AD;
-	Mon,  5 Jan 2026 18:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D562333FE05;
+	Mon,  5 Jan 2026 18:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="O1UxU7h7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="txFGgRxt"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (unknown [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E022DECD2
-	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 18:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767637497; cv=none; b=pJg/jiowJ5NBkQsJ3nR7azQ8RTfgPyJb2h0jWlU/noj4U4J6QNZ4+o6qx6nEFKFzDVc7lKnc2oNlsO6uUge/q2fguOVW5B/OOlxKA19Ai5BfGNOtt9bP7CWSZvtG52PdD5Vkocm2xC3xNn/ADHD5zWJw7stbM8Z8mNN3+DJJEiQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767637497; c=relaxed/simple;
-	bh=29V3nPy6eJu/bhkMjbdH03w6SXwDnxJzaFIcAXMbrJI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozce28olWLbCf1zNViWrH7qhn7ITY6dVGl2iatamwRnIR+x1pWRgNc6E3qlj8bYTFzBUF5AufFqKfSRaUm6+aO9p8BUzt4pahmtH2h0P368HNj1nAsbH5xCS9jcXcgaTuSsJb4Cpm8ed5apFFvgmnypKWvF4NDICZ2DjrWCyBO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 5 Jan 2026 18:23:41 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767637456;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YUU6nk2pVRwB0+dTQNl94WlC0B8Ka7nFN+gIz226+k8=;
-	b=O1UxU7h7AtNcz7vnL3wMYZsYzkomreORbFiyGkGG/USwrfw1whwon5+8jGkFcGN1AtPHXB
-	iEl7AL3MEt32YmWtM4wh2mgk9CB216tp/AeBwVg/i5ZslVJt/t5kxrDseoLvcBslAfvbHv
-	th0x1hUPcPVLVGC23DuWV1KabApZFns=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, 
-	Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] x86: Increase the timeout for
- vmx_pf_{vpid/no_vpid/invvpid}_test
-Message-ID: <6fltlvsnlbqyw3sme2zamsxp2u54tkoauydeoq2v3rri6r2uja@lmxwn57ll5ta>
-References: <20260102183039.496725-1-yosry.ahmed@linux.dev>
- <aVv6xaI0hYwgB0ce@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C932C08AD
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 18:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767637544; cv=pass; b=ufM9kSECRYQ8oqrvbWUr2CLujUU5NsrYsA8qjyOKK51NkLvvlnua9Q9QW+zA8y5lqkW2iseIBPnLyDzleyMEpepJO6i3qkNqrM9NhgO1yC1SgIlZL1CvHS/749XCK9ekdp9KBhQdHv5U/HkVmTJuUiCV17cQSHZJRsh6iJkuzIM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767637544; c=relaxed/simple;
+	bh=+rsLOIW1esrUzCtOfr5nyd6WlEJlB2L9jLpWg3L3/0s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OMCH05BjHx58NHAiXcv2ghOv5cexgGZ1YSxsAZdNshe9m3J59/OfJhVCQt1Ks2Npl4dx2uxpQXdwfDd5W99j/T9eLIwlIv3tv0frkkqyVPxZNRVXub5X0ya7sVXmJWlmxGLiWKx/zHwDyvtjjbdHDqO6kxY4POgnMNqZljXg8+4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=txFGgRxt; arc=pass smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64b72793544so564a12.1
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 10:25:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767637541; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IAXcBy4FCdovq5Bx0DeOZBp1NxSCL0Nktb/Ee7GnYmasDqUFXr/JhIRLnv+LRzJWR8
+         DRjdmnJWHgmCf3KXpX4uD4d6oPz3w/NgedaD8yXZaeHPHbV/MGWnJrvvO5/ihPkx0J4/
+         V0rTBDzSRrVm2/10lTWakIUE/XUfKYVf5ccspyqQhLzDPhn1lnHQ62w55GcedCFw8Gdq
+         lFndUX3gB2zTxuhG2BWjrZLxGi7BNiHtTgKNLUpqihvaZxH2T0VNZcGwZXMr7ILYiKmr
+         lnpxAE5xNj66KhXOrI7PXj95FuRfuMJ30zQk+80TXE3b4EWAnOk5gWgh9p7BTf2MEPGe
+         CbuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=oi7DZ2qZ4qrdJiiBgsksWiRY2EW14PGxhtG4/wy5aM0=;
+        fh=NrEMd4cv6v5Zjivu5N0zx3J+1YFispouXmGrRwwFDbE=;
+        b=dvN5oR5RMdks8qZN0mMZCnK3nTGiZ1v6Nxn+fszNTmX/ZZPoEuoOKiKfFDwjMNEHSp
+         rdy8lcbLiS5AfRORK4VSVEOkxNGlTX+VFR5JUlBVyKCs7wr7elwqgP1tlDjvb8cqSQIX
+         Cxv/J7c5CUxKLhTtmNlydjhowH+NHoMOvpFabjTqDX29nQPw+/oku1AcFQQEvxFuEJUY
+         c3pNnkTLMh3nWQjZAryXW9j5yQiAve1UrdShdAwMszPOhhS6pYcbSA67lllSJC1EeVr2
+         EWgok8HzXvOWmriw+cLj5o5eznFQ275UuV2xYRk7JE4dBcjKZOkW4QzV7MzJ4eiMdAST
+         GuVQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767637541; x=1768242341; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oi7DZ2qZ4qrdJiiBgsksWiRY2EW14PGxhtG4/wy5aM0=;
+        b=txFGgRxty9VFn1GCHEoBhcF5T4a3n8AL6DB5vPxRW87ZSCvLt/G0/xalm13rMEb0/5
+         A7aBhCF8No4QCBpZJjD+mL5HQ+Wv8S68TZtOu68hqbHauc3f3EzPHNfzBD30XVG12Ebv
+         tVlZFI9he7IElfrRdsi96Puur5pxkMlhWV0HEDxca6DEZKY91OGQRrFHQQcwoYBl0TCu
+         OCV3PVSD68NubdxLKM3IaEjGPOGwtLeioXDI8CZJaTtgddnBCPdPhoGRr6V/DEbvOQI1
+         UWYWH9nlR/LNt3KgxiXwjRtdFaFVKFFTdtM1WinpGQpPQPRqCJ8p0g0F8b+bO9u+7P1M
+         0ahA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767637541; x=1768242341;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oi7DZ2qZ4qrdJiiBgsksWiRY2EW14PGxhtG4/wy5aM0=;
+        b=AS0lj8syouVMx6mrKeBMjuXrq6CoZ/j0B4hK0rICiAmHqbybwBXAshaKt/u/8hz/l/
+         I4sklUxN2hzq6axn8BF4UVJ2GVCgu2kSAuDDUK4JHyj5ZbRpEuPBeBRUn06EcxDvvOoV
+         OybO8U+fLcnJ9Q6iYOLP+lXIrLVDHyjlVxWrbqcXpO6cVpyGzj6VGV1kQ45XX1jZ89m+
+         qHyEURBepfbWtLcyU4G0czmm76+WkN6aFSEYQHXRzMMUdX9bvtxnqPKlUPcgCQ1e7AW7
+         73uCwqiinlp5W5R8/oWCSdv4Nx9e/KHjX8K3PprkoGBbVAu0IyftQHMarUSnVzIKQVIL
+         XAlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUxLU8QnuwXzjVW1wmk7688+pw4zqP0jomdadRRYiS7VORQRnpbKCRkCE8LeeUdkrFIZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxi0+pWIw0A1i8nC+zD5/XRRjxKHQIN9W3mZb1ThennhqyYc1G5
+	misP4UOO0zaEJTZPOvH5DsQ5aNOJr2qak7tR49BZvGiNtZikiD0y4BheBxCxzonTi5HpZ6nwoWX
+	YRPS7hkYYfmvAFlNTVICgvd7FrJHrvwUuW3atDwnW
+X-Gm-Gg: AY/fxX6rlucSSHord5hsBycHGCoXB6JES0Mx+4OIAmx+lPbYC7nbG7CZtSqB6aomcyI
+	PY5ZRUD18Ij9mwapq+/UR9mYmOSCXAd/wMiLuLNCaYLU1lRnxegyk1VfyJCWwHDep4oX+Nm6tLs
+	KHCSr2Adbb+9cOQLi6DQZJklKruejhLC36c077lm8v7JSEEo0L6Mm8q8REdQ5UXUHk342Aumax8
+	pb7rdoYUYzcQ1ceohx9VsWaqLgQjbOePxPVVjY2INFWqx0h1d/sdGK8X+CFe7PsS821PX4=
+X-Google-Smtp-Source: AGHT+IErmY1RR8fLs/bjJFbgpDgfaRvZSMUD/4PW+5SFPA4YPh9Oztw0aeecX5CGguWN8QnEuPIYiNSwbHCoOiZhZkw=
+X-Received: by 2002:aa7:cc89:0:b0:649:8aa1:e524 with SMTP id
+ 4fb4d7f45d1cf-6507c4c2e60mr538a12.11.1767637540797; Mon, 05 Jan 2026 10:25:40
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aVv6xaI0hYwgB0ce@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20251230205948.4094097-1-seanjc@google.com>
+In-Reply-To: <20251230205948.4094097-1-seanjc@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Mon, 5 Jan 2026 10:25:27 -0800
+X-Gm-Features: AQt7F2qPUCLxZZdRMopKqbpIrNbx1KXa_BXaN9XOn7WdSE3_SLKOsBzEV1b-iKI
+Message-ID: <CALMp9eTmHs4k7_iiCb16u96whZFdW-Mckw2mL2WRtDag15256g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Return "unsupported" instead of "invalid" on
+ access to unsupported PV MSR
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 05, 2026 at 09:54:13AM -0800, Sean Christopherson wrote:
-> On Fri, Jan 02, 2026, Yosry Ahmed wrote:
-> > When running the tests on some older CPUs (e.g. Skylake) on a kernel
-> > with some debug config options enabled (e.g. CONFIG_DEBUG_VM,
-> > CONFIG_PROVE_LOCKING, ..), the tests timeout. In this specific setup,
-> > the tests take between 4 and 5 minutes, so pump the timeout from 4 to 6
-> > minutes.
-> 
-> Ugh.  Can anyone think of a not-insane way to skip these tests when running in
-> an environment that is going to be sloooooow?  Because (a) a 6 minute timeout
-> could very well hide _real_ KVM bugs, e.g. if is being too aggressive with TLB
-> flushes (speaking from experience) and (b) running a 5+ minute test is a likely
-> a waste of time/resources.
-
-The definition of a slow enviroment is also very dynamic, I don't think
-we want to play whack-a-mole with config options or runtime knobs that
-would make the tests slow.
-
-I don't like just increasing the timeout either, but the tests are slow
-even without these specific config options. They only make them a little
-bit slower, enough to consistently reproduce the timeout.
-
-I grabbed an Icelake machine With v6.18 (without the debug config
-options mentioned above) and ran a couple of them (I still have some
-debug config options enabled like CONFIG_SLUB_DEBUG, but I suspect some
-of these are enabled by default):
-
-# time ./vmx_pf_invvpid_test <<<y
-...
-PASS vmx_pf_invvpid_test (38338679 tests)
-
-real	4m28.907s
-user	2m40.198s
-sys	1m47.991s
-
-# time ./vmx_pf_vpid_test <<<y
-...
-PASS vmx_pf_vpid_test (38338679 tests)
-
-real	4m21.043s
-user	2m39.916s
-sys	1m40.416s
-
-This is also acknowledged by commit ca785dae0dd3 ("vmx: separate VPID
-tests"), which introduced the separate targets to increase the timeout.
-It mentions the 3 tests taking 12m (so roughly 4m each).  I think the
-chosen 4m timeout just had very litle margin. We can make the timeout
-5m, but I suspect we may still hit that on some setups (on Skylake with
-the debug options, some of the tests take 4m 50s).
-
-> 
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  x86/unittests.cfg | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> > index 522318d32bf6..bb2b9f033b11 100644
-> > --- a/x86/unittests.cfg
-> > +++ b/x86/unittests.cfg
-> > @@ -427,7 +427,7 @@ test_args = "vmx_pf_vpid_test"
-> >  qemu_params = -cpu max,+vmx
-> >  arch = x86_64
-> >  groups = vmx nested_exception nodefault
-> > -timeout = 240
-> > +timeout = 360
-> >  
-> >  [vmx_pf_invvpid_test]
-> >  file = vmx.flat
-> > @@ -435,7 +435,7 @@ test_args = "vmx_pf_invvpid_test"
-> >  qemu_params = -cpu max,+vmx
-> >  arch = x86_64
-> >  groups = vmx nested_exception nodefault
-> > -timeout = 240
-> > +timeout = 360
-> >  
-> >  [vmx_pf_no_vpid_test]
-> >  file = vmx.flat
-> > @@ -443,7 +443,7 @@ test_args = "vmx_pf_no_vpid_test"
-> >  qemu_params = -cpu max,+vmx
-> >  arch = x86_64
-> >  groups = vmx nested_exception nodefault
-> > -timeout = 240
-> > +timeout = 360
-> >  
-> >  [vmx_pf_exception_test_reduced_maxphyaddr]
-> >  file = vmx.flat
-> > -- 
-> > 2.52.0.351.gbe84eed79e-goog
-> > 
+On Tue, Dec 30, 2025 at 12:59=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> Return KVM_MSR_RET_UNSUPPORTED instead of '1' (which for all intents and
+> purposes means "invalid") when rejecting accesses to KVM PV MSRs to adher=
+e
+> to KVM's ABI of allowing host reads and writes of '0' to MSRs that are
+> advertised to userspace via KVM_GET_MSR_INDEX_LIST, even if the vCPU mode=
+l
+> doesn't support the MSR.
+>
+> E.g. running a QEMU VM with
+>
+>   -cpu host,-kvmclock,kvm-pv-enforce-cpuid
+>
+> yields:
+>
+>   qemu: error: failed to set MSR 0x12 to 0x0
+>   qemu: target/i386/kvm/kvm.c:3301: kvm_buf_set_msrs:
+>         Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+>
+> Fixes: 66570e966dd9 ("kvm: x86: only provide PV features if enabled in gu=
+est's CPUID")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
