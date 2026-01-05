@@ -1,121 +1,166 @@
-Return-Path: <kvm+bounces-67065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67066-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF17CF5085
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 18:42:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B63CF5181
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 18:53:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 567B4301F002
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 17:42:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18C9830D2673
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 17:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785DC331233;
-	Mon,  5 Jan 2026 17:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A684E3469FD;
+	Mon,  5 Jan 2026 17:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FkZ2XIFL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EIrHzyKE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF7D2FC00C
-	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 17:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2754A32E729;
+	Mon,  5 Jan 2026 17:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767634941; cv=none; b=rtXg3qXgNomIDd+wsHWkLH0sX9vKGzrUUH0qg+j4411g+r58f7iYLrVM1ouo6ks2Yksm/wY2vEOCEImL7nTR1XoYeUaSTVqVOfU5fpca5isYsqxNF3e+mhI8GND2oCxZR4CPPfv4xvWYS4I1DfUw4XC68ZxXG10DJuNqW5sc8qk=
+	t=1767635338; cv=none; b=dSj+vnvaDoKKQlzpINcd+3JsY/nHU9fFKo7MUqeneStYJL/PPhSFvTJT9fa4n80irOvo6r+8Q915+WaPxHYs6VW/CY34vIvJgEvT1ISYJ78mtPWOtR5oN0nwSMT1j6CNpNfo4E7cHhln1Y8x59sobpfbQfhTAcExMlceORcQsL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767634941; c=relaxed/simple;
-	bh=4b6ti+RmgfZJNtUxvbEGFQg50xjmQpryddCzAS0dEKg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oAtdlq1kkTNbsVnmsStrr48TWgnBGpNHZV+spgjTb16zJRtZDz/TdDImi/RXuVgSAXlUAIOA2P/xq5Jv+xe31fZFKkCIuKmo/Zt8uGbcZIwWmvrXRRG7C06Hf9aTVdzFA/uZj2ndBB4KMpC96LpXaDvRsi1MTxjj5DXbo4cSHjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FkZ2XIFL; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7f66686710fso430095b3a.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 09:42:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767634939; x=1768239739; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rhaaoIrpwKmi1popYwImOlBJQVWglr2lIzlwBR1M0gE=;
-        b=FkZ2XIFLuD8R5qsX3JCJ3TkHBSO/HYVktpzLkIiNK5smNzfrSgMXrQsq1kqCJWktf4
-         EldMlUksSGJRqkTMpxGehoghkukF5BePehnNoJN2jdyc9TnVsUMt9momIPQ2ukGCUBKk
-         8QJBwo+cnr4JIZwlEeQlWOJAlIj3vW0vjNf0LWP4xvqGzDjhhfBN/XJ/kNSsZKu9Oo0T
-         19Bi3H+w7JBVh8MUWJRZlg83SGWeSh3UOlABZC+wjh3H0h7CNa8uV9AvB4EEdvPlv+zC
-         6coj5cfyl2Dp0f353AMzQS3AzVGM3CEPN+3ttGHFoSVsQUpApq1LdItIv1oVy8GJurFv
-         IBcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767634939; x=1768239739;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rhaaoIrpwKmi1popYwImOlBJQVWglr2lIzlwBR1M0gE=;
-        b=VR2YJ3ovGj/sU3OGNx94IEdJ7q4Rj+AwLANERQi1pq0cVwzI9w0Nm/uUB9WO/Wuagj
-         g7R/h6bA7XTo9PJP7Lb7IW0DgwsvdLO36B9JgckVHf8wS181hXVhbKCrNXMV0CDP3LgK
-         K55jCuE8VuFPMCkJ378x404HbGANNNx+dNCCrjaPQgE8OYS4ZWg7ThewxCoKhGxEKIPb
-         1l+Gmk+Po8BLbkDTuNJ9dtJT6ALkRHSwccmMQVGamoElIaYgB3ZpGT4hlynAMyrZrhGq
-         jgk/pMIkWXEaNtmo1yv2K+4iYVNkcFiJMbk/+EwaoWjEh7V98404ROV6YyWQLEBEYax/
-         wL3g==
-X-Forwarded-Encrypted: i=1; AJvYcCW/LKa4R7a6NIETgZ1e36Zur2g5kYCmkvCMbB2fiB0o3sr6iNjSMBeg5P1jxTPiRWaP5CQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8epEJLh/IWhMThpbGxRP1B1C4s3Rj/y9iAuTOlqZyxES3hQs1
-	WrWQp3qNKCZUXWVZM6kpNd0ozxveyTxPfmNHBHDI1G7ICTg1szFzyNifPl5ZZH3ox4GMXWLjdPZ
-	VSfbw5w==
-X-Google-Smtp-Source: AGHT+IHVQhNdzqxSBDWtZhkY1cbUxdZB6/e/xfSz8pxhB4np55/4r3z1TMMdoc4zF4qbMHXb5rrPeUwWoP0=
-X-Received: from pffn21.prod.google.com ([2002:a62:e515:0:b0:7ee:f5f6:a02f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3387:b0:35d:53dc:cb56
- with SMTP id adf61e73a8af0-389822d69d9mr122558637.36.1767634939225; Mon, 05
- Jan 2026 09:42:19 -0800 (PST)
-Date: Mon, 5 Jan 2026 09:42:17 -0800
-In-Reply-To: <aVSZGRpvMIrmUku1@intel.com>
+	s=arc-20240116; t=1767635338; c=relaxed/simple;
+	bh=3yXE3Y7Xeg3MRKN6+FSWjAtsomhfe8rUxy+9S1YJpl4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OjKs/9DdZ2q2/PwMnBgxZaTr+hjSL2nyTwUvUNPC+L2FewBG5GciYnzB8Z7E1bPLBIThvCi5ZvJLuW49QsevQ4G5U6W5t+CLmM2DbYXrxatkglLN0Fmb2G/hT1z3geBavOWvvyLK1pWookj7B7bkYzmK8a4jcQX5CdXaIvKaF58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EIrHzyKE; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767635337; x=1799171337;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=3yXE3Y7Xeg3MRKN6+FSWjAtsomhfe8rUxy+9S1YJpl4=;
+  b=EIrHzyKEESRRBtinUfEfuaBYVQXlmsmGlHNYpjLLSvxt3u+R+OvB0xd4
+   pm5KkCZ2dJ896i423iM2E08f1TyyaBFyjjiEFki62tupMiY9+61yrcFky
+   hvpnsjO9QoVL2avKjKo1z/XNAFT4GEL0kJycvzpPx/6XYvgtJ46S84HWN
+   GnqQ2QQtKiOPFmnkzMFGN8yFbI4TkO5lozBDqi/dAMl9uRQFw+mgUABRT
+   15bVuOxUDR3XrAia0iE8BmhuZaxfULRcbdUiwwTTAqwJ6SlNp9HFGzjrf
+   AP6ZiDv4/CB3cv2gOKaaJU6a6P/FFJ6b2sCPDnTxz0s3Ki2uJkDahCPf9
+   g==;
+X-CSE-ConnectionGUID: GVs+9bypQsmmIP2/D+YXsw==
+X-CSE-MsgGUID: 33YsH5gDRCCyEKJUWid8eA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="71582065"
+X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
+   d="scan'208";a="71582065"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 09:48:52 -0800
+X-CSE-ConnectionGUID: uzS25mogQ6CaFxT2D1Y9EA==
+X-CSE-MsgGUID: e3s11rXeTcqdytvO9SomwQ==
+X-ExtLoop1: 1
+Received: from dwesterg-mobl1.amr.corp.intel.com (HELO [10.125.109.56]) ([10.125.109.56])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 09:48:51 -0800
+Message-ID: <823305ad-7618-4083-baa4-c88a6cb8dd93@intel.com>
+Date: Mon, 5 Jan 2026 09:48:50 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251230220220.4122282-1-seanjc@google.com> <20251230220220.4122282-3-seanjc@google.com>
- <aVSZGRpvMIrmUku1@intel.com>
-Message-ID: <aVv3-V1mXohnyeFK@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: nVMX: Remove explicit filtering of
- GUEST_INTR_STATUS from shadow VMCS fields
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Xin Li <xin@zytor.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/7] KVM: x86: Move kvm_rebooting to x86
+To: Sean Christopherson <seanjc@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, Kiryl Shutsemau <kas@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, Chao Gao <chao.gao@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>
+References: <20251206011054.494190-1-seanjc@google.com>
+ <20251206011054.494190-2-seanjc@google.com>
+Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20251206011054.494190-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 31, 2025, Chao Gao wrote:
-> On Tue, Dec 30, 2025 at 02:02:20PM -0800, Sean Christopherson wrote:
-> >Drop KVM's filtering of GUEST_INTR_STATUS when generating the shadow VMCS
-> >bitmap now that KVM drops GUEST_INTR_STATUS from the set of supported
-> >vmcs12 fields if the field isn't supported by hardware.
-> 
-> IIUC, the construction of the shadow VMCS bitmap and fields doesn't reference
-> "the set of supported vmcs12 fields".
+On 12/5/25 17:10, Sean Christopherson wrote:
+> Move kvm_rebooting, which is only read by x86, to KVM x86 so that it can
+> be moved again to core x86 code.  Add a "shutdown" arch hook to facilate
+> setting the flag in KVM x86.
 
-Argh, right you are.  I assumed init_vmcs_shadow_fields() would already verify
-the field is a valid vmcs12 field, at least as a sanity check, but it doesn't.
+For the pure code move:
 
-> So, with the filtering dropped, copy_shadow_to_vmcs12() and
-> copy_vmcs12_to_shadow() may access GUEST_INTR_STATUS on unsupported hardware.
-> 
-> Do we need something like this (i.e., don't shadow unsupported vmcs12 fields)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index f50d21a6a2d7..08433b3713d2 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -127,6 +127,8 @@ static void init_vmcs_shadow_fields(void)
-> 				continue;
-> 			break;
-> 		default:
-> +			if (!cpu_has_vmcs12_field(field))
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 
-This can be
+That said, I wouldn't mind some clarification around 'kvm_rebooting' and
+a small bit of documentation about what kvm_arch_shutdown() is conceptually.
 
-			if (get_vmcs12_field_offset(field) < 0)
+It doesn't have to be in this set, but maybe:
 
-And I think I'll put it outside the switch statement, because the requirement
-applies to all fields, even those that have additional restrictions.
+/*
+ * Override this to make global, arch-specific changes which
+ * prepare the system to disable hardware virtualization support.
+ */
+__weak void kvm_arch_shutdown(void)
+{
+}
 
-I also think it makes sense to have patch 1 call nested_vmx_setup_vmcs12_fields()
-from nested_vmx_hardware_setup(), so that the ordering and dependency between
-configuring vmcs12 fields and shadow VMCS fields can be explicitly documented.
+and something like:
+
+void kvm_arch_shutdown(void)
+{
+	/*
+	 * Indicate that hardware virtualization support will soon be
+	 * disabled asynchronously. Attempts to use hardware
+	 * virtualization will start generating errors and exceptions.
+	 *
+	 * Start being more tolerant of those conditions.
+	 */
+	kvm_rebooting = true;
+	smp_wmb();
+}
+
+The barrier is almost certainly not needed in practice. But I do find it
+helpful as an indicator that other CPUs are going to be reading this
+thing and we have zero clue what they're doing.
 
