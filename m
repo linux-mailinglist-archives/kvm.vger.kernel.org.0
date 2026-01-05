@@ -1,172 +1,114 @@
-Return-Path: <kvm+bounces-67073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3629CF53D4
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:29:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6B1CF53FE
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:32:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DCDCC300BFAB
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:29:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E8B5F3060A76
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B488340DB1;
-	Mon,  5 Jan 2026 18:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871B33271F2;
+	Mon,  5 Jan 2026 18:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LdlQdo1J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IMStvlLB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630EC1F94A;
-	Mon,  5 Jan 2026 18:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA3A33FE05
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 18:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767637741; cv=none; b=i2cz0YultQ9gnzMYFz86NlyrX11Ybn4num+ZUYwrbUz7T34S7nzUxn76q5YjEIHqdI20u5/914SAdDl3qucidGsVDDrlQ/6fSBrlY9b523aGXz/l12M9MWk3GFvH27I7mgv9o9tN5Yxd/6pqM2irtaNAt4rb1A67L4FTdlIS1SY=
+	t=1767637907; cv=none; b=iiKDXk3ZxI7pa/4XKIo+1UKLvmEt3eO6kWGm0SLNoOLyomn5lHYQsT7DIeIeQWITl8dySQIZz2U+9WXUxTkLEmVqdqqXV+tUZtESb54CoGCY1qP8GafUBOExAkJBTTIf5gV7xLlkx0IxgOpiJLCp5iPKr04hkiU6qoMp88V8D1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767637741; c=relaxed/simple;
-	bh=wkAGmiMchBtc9OScQOQ+Muej3QggBVoP0YqNKFLI0KM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=UG5A5UOeHXBgqjtmWK9z0+QLW+6piABj8V6/8ezdge4p0Q5V7G7mUOufw8xQKkVnubzWaTpd1jM3zC2qpbTz/fOvMhE1C81iOY3aHWA+Dx24AzR6vD6eBO8pACD6hk4+qWFl1IDFJKYfu2wV1207E31cYr4S6Rqq8bIe1wALQuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=LdlQdo1J; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260105182857euoutp026f24319d0d6511f3b1dbeb43bf327fba~H6Sg15q060910809108euoutp02v;
-	Mon,  5 Jan 2026 18:28:57 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260105182857euoutp026f24319d0d6511f3b1dbeb43bf327fba~H6Sg15q060910809108euoutp02v
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1767637737;
-	bh=F01Bjiv9Jbar7XQTaAD7ePnWrXaKEdBZUMCzSmOxZ3Q=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=LdlQdo1JQFmuW+nVqR6pwR1qxAMBlcHCB53DqTjz4qoL8zVNAVcLAY7DEdvFDUPEX
-	 xa+oSFRiA5tW+HJopKkBa4sbH+fRMdumqVRL0lkSIiiIDowbEKKdngy5qaMdQoXYiq
-	 YpSPdz3zIWjH8xm+/pth0F/AvhREHn05EsTPmbcU=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260105182856eucas1p158734c1d57a10887c100d14aab210ced~H6Sf77ObP2452124521eucas1p1_;
-	Mon,  5 Jan 2026 18:28:56 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260105182850eusmtip28ed1049745959a614ed8486dd208282c~H6SaLDVa40433904339eusmtip2D;
-	Mon,  5 Jan 2026 18:28:50 +0000 (GMT)
-Message-ID: <278f23d7-4c95-49df-b9c9-6ad19e6a08ca@samsung.com>
-Date: Mon, 5 Jan 2026 19:28:49 +0100
+	s=arc-20240116; t=1767637907; c=relaxed/simple;
+	bh=Hjb9PEmk0CwZ04L7O6evq15v1hkM7p+EwzDaeZG5gbU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uoCvFhSaTIdHXd+B69X++mFv00iiYSguvZDZmbrMUyFbSmR0KdfGgVd2ixGblpEQheYNOwQNuQyQOhUrb7fuZlW7JXh2Z/wuT5tM57KU9PZwIU9ifueFpLoMC4cy3DwElrB6AOXC9BhqNDn+eezaYym4sUjLW3YKPkyljVheISo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IMStvlLB; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-598f81d090cso153895e87.2
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 10:31:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767637903; x=1768242703; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hjb9PEmk0CwZ04L7O6evq15v1hkM7p+EwzDaeZG5gbU=;
+        b=IMStvlLB0+eiNPE7JXcKNqSOFV14AFx624sv2VzPPYZipiSGsxskYql/8lNoYTQLHx
+         6wvKxdZzPbgodfqXxn5ksTeJZtJnqo9pQnrbBhp750UMOV48qf8ZL04sfIOSxckKhbWS
+         ZMVQxz+4GRyNNHKJzOqA6UPxso5O1W+GjXS1WKPoT9bQwauU99EfcznLuHDIViGK1Wnn
+         +UzG9iswK9EjuezFFHYmSGEtoGmw122JzIfXZty+rCkQUpqxDxA4IApmd7gI51pozPmB
+         1fUWJOAR0f1tju3OZ2haysYLmk6XAg2mMPkBVNQ+jmrtwZ3R194BTkWoaeMPy7jXFbkD
+         lEIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767637903; x=1768242703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Hjb9PEmk0CwZ04L7O6evq15v1hkM7p+EwzDaeZG5gbU=;
+        b=P0AwR4K7/lXb42hRZXhL3anofoibC6dreqa4RpJGancnhBC8Ci3FeCtwnyPskPG4MM
+         g3mzStKZmvRgXidv3DTWmyYiTHcwA42ZUJ8v/rgi4Xi1VPCHF3oTn8MTVhLbaSGhtTOK
+         fxjWdMk/Oalo0FW/3HUG26oWzbgHVJSoYuqpoT9lm+8YFnLryl+nBjlHS5NuEjfs1bHc
+         +jYkWhcHJSHj9VJj1WiABXqzS/W1m5ybu/cqsafiNlxi+NSHvpbgnh/ML7Eeu0fiPxKK
+         3vXVQR66a46kqZFoXCiY4ZxVFS9XNyJwIqmmKwAb0KQrVi9J392Fbs9QnbMswOt7jehv
+         FmuA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6uyIFWfKEkCPSi9qpmipJbf/xKVbTeS81UvXDdom7Ofnaa6d4HhizSb9mS13imokF6yE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLl2fScMklBjvUGpMCwcnUl0dFqsvV/Y5vuEtk/ERyid6ooqfb
+	Xd/KKj8hekgTYJnqXWlhbj5ABf/U7kpQDDJEQHjUPHf73QKgBD4XHpczM6cBtmMcZJTQh30mLW1
+	IYzVHRBJsIjELSSgKeFJ2xCIpmQSNFdQIBlpSno52
+X-Gm-Gg: AY/fxX7wF/2syxc3XiMsmlRHYyXuK4MjdR4Fl75/z80GwN/IbCVUZlUwEChi38lc+Ox
+	MMpzX20m7tIKbcUgB4faX62j1JD+gR7gCg+DwEu4KGrHMwvRQ/km818nPQVGr3k5EazxjHl8oSw
+	pMxEwfd3CAnuDghTGTLdttnorqsEDr7jVDSLbQX65OxA4zUjWWa3k6y2BwNCzZeAGL93Jz1lInV
+	V61xiWyYjU0wbnOkww/GHOvqsthPb2MOWkHTluHUZtPgwHVjmfGLHa71wx58QUP310or8lmRMJO
+	W8/OJ9E=
+X-Google-Smtp-Source: AGHT+IHdR2+io7/Yo4N4iYBgt1cqRemG+YBgtGJJ6X+momuowtZE6LCsA9lnKpeqVYlpau849KCt0SwwWBBAtMQk2pk=
+X-Received: by 2002:a05:6512:3b20:b0:595:8258:ccc5 with SMTP id
+ 2adb3069b0e04-59b652544d2mr223814e87.26.1767637902982; Mon, 05 Jan 2026
+ 10:31:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH v2 02/15] docs: dma-api: document
- __dma_from_device_group_begin()/end()
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, Robin Murphy <robin.murphy@arm.com>, Stefano
-	Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
-	Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Petr Tesarik
-	<ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Bartosz Golaszewski <brgl@kernel.org>,
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <01ea88055ded4d70cac70ba557680fd5fa7d9ff5.1767601130.git.mst@redhat.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260105182856eucas1p158734c1d57a10887c100d14aab210ced
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260105082311eucas1p2f6744dcf6d7bb74e39e353e57dc99c86
-X-EPHeader: CA
-X-CMS-RootMailID: 20260105082311eucas1p2f6744dcf6d7bb74e39e353e57dc99c86
-References: <cover.1767601130.git.mst@redhat.com>
-	<CGME20260105082311eucas1p2f6744dcf6d7bb74e39e353e57dc99c86@eucas1p2.samsung.com>
-	<01ea88055ded4d70cac70ba557680fd5fa7d9ff5.1767601130.git.mst@redhat.com>
+References: <20251223230044.2617028-1-aaronlewis@google.com>
+ <20251223230044.2617028-2-aaronlewis@google.com> <aUtLrp2smpXZPpBO@nvidia.com>
+ <CAAAPnDEcAGEBexGfC92pS=t9iYQRJFyFE9yPUU916T92Y465qw@mail.gmail.com> <20251230011241.GA23056@nvidia.com>
+In-Reply-To: <20251230011241.GA23056@nvidia.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 5 Jan 2026 10:31:14 -0800
+X-Gm-Features: AQt7F2runKUQHU9-oW7zHMSmwf0lpU6DHnYPnmwP1ApVliyQmJbYgJ5T7nshrNY
+Message-ID: <CALzav=c32W4d=_WtXHWDmjfQaJDyzdxWXS9_kVHvseUsqh=+NQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] vfio: Improve DMA mapping performance for huge pages
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Aaron Lewis <aaronlewis@google.com>, alex.williamson@redhat.com, kvm@vger.kernel.org, 
+	seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 05.01.2026 09:22, Michael S. Tsirkin wrote:
-> Document the __dma_from_device_group_begin()/end() annotations.
+On Mon, Dec 29, 2025 at 5:12=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+> On Mon, Dec 29, 2025 at 01:40:02PM -0800, Aaron Lewis wrote:
+> > Can't we assume a single page will be mapped contiguously?
 >
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->   Documentation/core-api/dma-api-howto.rst | 52 ++++++++++++++++++++++++
->   1 file changed, 52 insertions(+)
+> No.
+>
+> pin_user_pages() ignores VMA boundaries and the user can create a
+> combination of VMAs that slices a folio.
+>
+> In general the output of pin_user_pages() cannot be assumed to work
+> like this.
 
-Acked-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Ack on the feedback that this is not a general solution and we should
+switch to iommufd with memfd pinning for our use-case. But I think
+Google will need to carry an optimization locally to type1 until we
+can make that switch to meet our goals.
 
-> diff --git a/Documentation/core-api/dma-api-howto.rst b/Documentation/core-api/dma-api-howto.rst
-> index 96fce2a9aa90..e97743ab0f26 100644
-> --- a/Documentation/core-api/dma-api-howto.rst
-> +++ b/Documentation/core-api/dma-api-howto.rst
-> @@ -146,6 +146,58 @@ What about block I/O and networking buffers?  The block I/O and
->   networking subsystems make sure that the buffers they use are valid
->   for you to DMA from/to.
->   
-> +__dma_from_device_group_begin/end annotations
-> +=============================================
-> +
-> +As explained previously, when a structure contains a DMA_FROM_DEVICE /
-> +DMA_BIDIRECTIONAL buffer (device writes to memory) alongside fields that the
-> +CPU writes to, cache line sharing between the DMA buffer and CPU-written fields
-> +can cause data corruption on CPUs with DMA-incoherent caches.
-> +
-> +The ``__dma_from_device_group_begin(GROUP)/__dma_from_device_group_end(GROUP)``
-> +macros ensure proper alignment to prevent this::
-> +
-> +	struct my_device {
-> +		spinlock_t lock1;
-> +		__dma_from_device_group_begin();
-> +		char dma_buffer1[16];
-> +		char dma_buffer2[16];
-> +		__dma_from_device_group_end();
-> +		spinlock_t lock2;
-> +	};
-> +
-> +To isolate a DMA buffer from adjacent fields, use
-> +``__dma_from_device_group_begin(GROUP)`` before the first DMA buffer
-> +field and ``__dma_from_device_group_end(GROUP)`` after the last DMA
-> +buffer field (with the same GROUP name). This protects both the head
-> +and tail of the buffer from cache line sharing.
-> +
-> +The GROUP parameter is an optional identifier that names the DMA buffer group
-> +(in case you have several in the same structure)::
-> +
-> +	struct my_device {
-> +		spinlock_t lock1;
-> +		__dma_from_device_group_begin(buffer1);
-> +		char dma_buffer1[16];
-> +		__dma_from_device_group_end(buffer1);
-> +		spinlock_t lock2;
-> +		__dma_from_device_group_begin(buffer2);
-> +		char dma_buffer2[16];
-> +		__dma_from_device_group_end(buffer2);
-> +	};
-> +
-> +On cache-coherent platforms these macros expand to zero-length array markers.
-> +On non-coherent platforms, they also ensure the minimal DMA alignment, which
-> +can be as large as 128 bytes.
-> +
-> +.. note::
-> +
-> +        It is allowed (though somewhat fragile) to include extra fields, not
-> +        intended for DMA from the device, within the group (in order to pack the
-> +        structure tightly) - but only as long as the CPU does not write these
-> +        fields while any fields in the group are mapped for DMA_FROM_DEVICE or
-> +        DMA_BIDIRECTIONAL.
-> +
->   DMA addressing capabilities
->   ===========================
->   
-
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
-
+For HugeTLB mappings specifically, can it be assumed the VMA contains
+the entire folio? I'm wondering what is the safest way to achieve
+performance close to what Aaron achieved in his patch in type1 for
+HugeTLB and DevDAX. (Not for upstream, just internally.)
 
