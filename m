@@ -1,174 +1,116 @@
-Return-Path: <kvm+bounces-67052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6ACCF42C6
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 15:38:45 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DCDCF44A1
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 16:04:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED41A3090DF4
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 14:35:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C2D48300A3F5
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 15:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F8F27C84B;
-	Mon,  5 Jan 2026 14:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587042EC0AE;
+	Mon,  5 Jan 2026 15:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qnQ8/XAE"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ek6JXvFh"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53585199E94;
-	Mon,  5 Jan 2026 14:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05942367AC
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 15:04:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767623577; cv=none; b=dtTKLOIsQKoHOQ5w9wnptuwoTaCU3pD5Yf/Dh8WjBFEjKmZUR9qs/RGp4KhDqx1PwwjQ6kCaaVAliAu2Jbjc+AKyrJhwv4VarR1gHdzFLyRobzVcYv2PRB/b3RRYI6A8VLRG3QH2ftkCrtUPgivZjY2wZn0nW0O0/BJIqZavAW0=
+	t=1767625462; cv=none; b=BKrU2/+O9p2wMeLMVvl7S3s7HHQkeZqVMDGWB5W7d271lqE/vApItkF5yUwIUGntmCelS/S1Tqoxd8zBDLGOJ2bzxTorsowcCnRcxDfnqNsRhtgjEQABRUayYZmBMqC/z21GReGXU0FC7CeOssYJVO+aB5unyeaLOqDOCUrn4L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767623577; c=relaxed/simple;
-	bh=b4cE936b1RYCDSr7VXFgvtUVAS0JilSHQK2ihWwWCc0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VfwvIBOFf40xFj3vj3nYXh5ZkyjXBnfYBwaEznEGo3bml5Ll0F7n+ZEa0B1tJI6k55NLx9iU8ajwR5I9lg1H6EMCeFhaMt4tXYlhp16ilId31lmVB8Xnbn9ZwodWRWbU7KeY69i5MKH5Y/YXjxgy3/4TuBWlD7eNt/BzCbU3KTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qnQ8/XAE; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1767623572; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=9x1tEfrDdtu6NZBn53IIP9pnsOoKSxBLjmTO87rJs+U=;
-	b=qnQ8/XAEXRPfMM30AuSJcD+jIlq9dSET4FjNRq3BCBwVphOalx2ucV+6x7z8H5EctLyQhZRfUddM+LPhYP6PUSzaopZG6q6GRctxiwjGnX/EaQy87L2D0iuE3mFFzam+8oUIJW9/v8E8DK7/GJivL8HtoXQObGOQ7jlGpg+eEeY=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WwPuTws_1767623568 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Jan 2026 22:32:51 +0800
-From: fangyu.yu@linux.alibaba.com
-To: pbonzini@redhat.com,
-	corbet@lwn.net,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	alex@ghiti.fr
-Cc: guoren@kernel.org,
-	ajones@ventanamicro.com,
-	rkrcmar@ventanamicro.com,
-	linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Fangyu Yu <fangyu.yu@linux.alibaba.com>
-Subject: [PATCH v2] RISC-V: KVM: add KVM_CAP_RISCV_SET_HGATP_MODE
-Date: Mon,  5 Jan 2026 22:32:32 +0800
-Message-Id: <20260105143232.76715-3-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20260105143232.76715-1-fangyu.yu@linux.alibaba.com>
-References: <20260105143232.76715-1-fangyu.yu@linux.alibaba.com>
+	s=arc-20240116; t=1767625462; c=relaxed/simple;
+	bh=X5MIHAp5JK1NlV89p7C9v/3gPK3omfO9gWSPtLvKdYU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FAhnTBtM8hgPaHMwE8oDbzQjVOlYFxsO/5XT3FqK+IBEiPnfAMOTVjex6nQXRpHDNCH08ijxl12OcyBzUtMAgMxO10r7ZKYHHcKn6AvZOX3TZzTeTFzCBoY1AI8sBGiT3H91YCa67AFM6Ro3uPlwOVVfxtEJhAF+jR+ED4fpfWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ek6JXvFh; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8bc53dae8c2so2157099085a.2
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 07:04:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1767625460; x=1768230260; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yb2yGX8XpVdwAg+BOMxHsU4DTiVLYDcQfLOceevAzvY=;
+        b=Ek6JXvFhePFfs9uW2hC4xuuriHVSbC+G0qNrnuWpsGEOHoPTIuzqwYFpcMGgBitvT2
+         ++w99S1nbZB/5DbxrVBTR9S48B8Ebhur1It08J9j0fuZ/R+dq1l7HwVyIeTwaz0scHAn
+         PRVpYVYEFO9yJe463RQZMRptIhid178185YflpFPJ0ZJjTffDrYpRmERo23KZ7qfTchL
+         PmJUjzhD4uMtnMnVmKQHNFiwkpGz0fRymu4ZgE4u31vy3Vj7K0xlTIvdyHDzOEEGtFoC
+         fcj38uRIMyFSinpGVevGBpNOysoJ42gXbmCbqbJWBGlxqQwG8WgWmJU3M0AvzREUBC1m
+         ztzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767625460; x=1768230260;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yb2yGX8XpVdwAg+BOMxHsU4DTiVLYDcQfLOceevAzvY=;
+        b=CCu1ONJDPtsUA0GsTWT2V4PdvasWniqmdHQn+aoYfF/lHXvAH3zl/damAL/A70APpV
+         6VmvrQwulSXJon33RuG31fM4v6twV/oJOoNdGkRzEfL9tWIgtzGz/HO8/5MMVT/Xhcn3
+         EuGCENYPZmwOFHq3HTfuVhSJjj/MUv8m3lNfGLQ7UN5Px4PP+bWhN83z9PFw0TO/9eTq
+         kj/D72/TGFQdbTnqPQGTweK0teF2a88OxSfmJaDpUcRG1flY9nSBp5zS5U53feMAseiJ
+         utmPzJTobrLn10AeBhoJH8KEOg52KzRgiu6a0RAhCBLXRSm6X3y3jpsUN3pLmD96kxoF
+         FVhw==
+X-Forwarded-Encrypted: i=1; AJvYcCXbsj1528zUDYKJoV9TalIsCIKyz0ZQ3LuN6R9g0JdXrTm8s1dtgMaQJuLA+g4xNwYuRaE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYk3eR67fMyT6w8gHNeqQNK/j492tHyrPRwK6JTdecKd3AVFAg
+	3K/AfKEfuEzqXV3DNYZlTlZljhwiakagBXWA6YAwCMp8fS8/qBreCKyKrLVNwtp4GQg=
+X-Gm-Gg: AY/fxX7m91D+VvI+3S+qO6+Bn9GyN7znUS1FYtgq8MNAkZV6PnS5+BLVlt+OOFCzACd
+	R02u9aYt5ld/EpChK4AydzstCZ4h1pImUgAnsvt2epc84Vswc/W5K0EEVZpqOmqOnRcrLdS+fga
+	dBG/e6cDCk3wEaYkLjFRjG3kvRtdxAEIomm+wVLPCoRpCyaj+fwuD1863oIQ11Pq873kKTeF5i8
+	GYYfyoCc1g10CPBMEJ7FFQ4J7dyzsno87HJUYwozWig5K6y3qIpOUwRAcKBRk8vK1JVbIzk95mh
+	pDU4t1g59zTlOjGsk9/If7PR5Jkgzr0Y4xaGtupkqJHWxZOAFEEefJUeFGJBJAeqY8DRcnjoCh8
+	T2bqZSBkLth+StyfG515yHErC9Ly1ov9/dxhjKTUeQkqKfpRsO5/BxDDcx5JWQC7ZMFluifFNUE
+	pihc7ReowGxf8gOLJtAg9IPSQ7DhRfkTV+OMwCdvMAj8sWasbMEQDOWlXtOn0n/Br2NS4=
+X-Google-Smtp-Source: AGHT+IE0KSB9dzoXLvYDNi/2QizYzBYbxFHcrGMTg8rYaX5btB81fEkojeSpnken2msWHtKygqw6qA==
+X-Received: by 2002:a05:620a:1789:b0:8b2:7290:27da with SMTP id af79cd13be357-8c08fa9bf01mr7773575785a.12.1767625459349;
+        Mon, 05 Jan 2026 07:04:19 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c09689153asm3620440885a.17.2026.01.05.07.04.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 07:04:18 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vcm81-00000001AVB-0TCK;
+	Mon, 05 Jan 2026 11:04:17 -0400
+Date: Mon, 5 Jan 2026 11:04:17 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Julia Lawall <Julia.Lawall@inria.fr>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, yunbolyu@smu.edu.sg,
+	kexinsun@smail.nju.edu.cn, ratnadiraw@smu.edu.sg,
+	xutong.ma@inria.fr, Alex Williamson <alex@shazbot.org>,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/mdev: update outdated comment
+Message-ID: <20260105150417.GE125261@ziepe.ca>
+References: <20251230164113.102604-1-Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251230164113.102604-1-Julia.Lawall@inria.fr>
 
-From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+On Tue, Dec 30, 2025 at 05:41:13PM +0100, Julia Lawall wrote:
+> The function add_mdev_supported_type() was renamed mdev_type_add() in
+> commit da44c340c4fe ("vfio/mdev: simplify mdev_type handling").
+> Update the comment accordingly.
+> 
+> Note that just as mdev_type_release() now states that its put pairs
+> with the get in mdev_type_add(), mdev_type_add() already stated that
+> its get pairs with the put in mdev_type_release().
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+> 
+> ---
+>  drivers/vfio/mdev/mdev_sysfs.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This capability allows userspace to explicitly select the HGATP mode
-for the VM. The selected mode must be less than or equal to the max
-HGATP mode supported by the hardware. This capability must be enabled
-before creating any vCPUs, and can only be set once per VM.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
----
- Documentation/virt/kvm/api.rst | 14 ++++++++++++++
- arch/riscv/kvm/vm.c            | 26 ++++++++++++++++++++++++--
- include/uapi/linux/kvm.h       |  1 +
- 3 files changed, 39 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 01a3abef8abb..9e17788e3a9d 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8765,6 +8765,20 @@ helpful if user space wants to emulate instructions which are not
- This capability can be enabled dynamically even if VCPUs were already
- created and are running.
- 
-+7.47 KVM_CAP_RISCV_SET_HGATP_MODE
-+---------------------------------
-+
-+:Architectures: riscv
-+:Type: VM
-+:Parameters: args[0] contains the requested HGATP mode
-+:Returns: 0 on success, -EINVAL if arg[0] is outside the range of hgatp
-+          modes supported by the hardware.
-+
-+This capability allows userspace to explicitly select the HGATP mode for
-+the VM. The selected mode must be less than or equal to the maximum HGATP
-+mode supported by the hardware. This capability must be enabled before
-+creating any vCPUs, and can only be set once per VM.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 4b2156df40fc..e9275023a73a 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -202,6 +202,13 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VM_GPA_BITS:
- 		r = kvm_riscv_gstage_gpa_bits(&kvm->arch);
- 		break;
-+	case KVM_CAP_RISCV_SET_HGATP_MODE:
-+#ifdef CONFIG_64BIT
-+		r = 1;
-+#else/* CONFIG_32BIT */
-+		r = 0;
-+#endif
-+		break;
- 	default:
- 		r = 0;
- 		break;
-@@ -212,12 +219,27 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 
- int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- {
-+	if (cap->flags)
-+		return -EINVAL;
- 	switch (cap->cap) {
- 	case KVM_CAP_RISCV_MP_STATE_RESET:
--		if (cap->flags)
--			return -EINVAL;
- 		kvm->arch.mp_state_reset = true;
- 		return 0;
-+	case KVM_CAP_RISCV_SET_HGATP_MODE:
-+#ifdef CONFIG_64BIT
-+		if (cap->args[0] < HGATP_MODE_SV39X4 ||
-+			cap->args[0] > kvm_riscv_gstage_max_mode)
-+			return -EINVAL;
-+		if (kvm->arch.gstage_mode_initialized)
-+			return 0;
-+		kvm->arch.gstage_mode_initialized = true;
-+		kvm->arch.kvm_riscv_gstage_mode = cap->args[0];
-+		kvm->arch.kvm_riscv_gstage_pgd_levels = 3 +
-+		    kvm->arch.kvm_riscv_gstage_mode - HGATP_MODE_SV39X4;
-+		kvm_info("using SV%lluX4 G-stage page table format\n",
-+			39 + (cap->args[0] - HGATP_MODE_SV39X4) * 9);
-+#endif
-+		return 0;
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index dddb781b0507..00c02a880518 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -974,6 +974,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_GUEST_MEMFD_FLAGS 244
- #define KVM_CAP_ARM_SEA_TO_USER 245
- #define KVM_CAP_S390_USER_OPEREXEC 246
-+#define KVM_CAP_RISCV_SET_HGATP_MODE 247
- 
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
--- 
-2.50.1
-
+Jason
 
