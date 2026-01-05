@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-67039-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67040-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48EA7CF2DC1
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 10:53:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 454EDCF2DF7
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 10:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A24E8304B97B
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 09:50:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AEA4306B7AF
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 09:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC50337699;
-	Mon,  5 Jan 2026 09:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6B318DB1E;
+	Mon,  5 Jan 2026 09:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ch6/Q7bJ"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="U6x72nMH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C08330B2B
-	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 09:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8AD3A1E63
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 09:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767606625; cv=none; b=dpX62DrVkwS6OOLEjmwbgh/exI5HPTgTbV+zEQILTVAOz7raJOvLL9mq/qP4l6r7IP5i9SxAccaZYNmmiGgf2rCdPnf0BO6/joShm+BYMIEvm4M0K5GYbAcP/o+o+7NWp3nMY7xqQO7m/ZYZfzvp/xtGz5NJGzu7e1ab7fqusKw=
+	t=1767606725; cv=none; b=Gn5bMni/cfFdz3m3MhuQ9KmUvJv4qqTncq4NFqUXy0D6tAEzF51CEdeYHi/Dyn2iLLSphN1u0A4N3HKE1Vb0M7rDdlLYigLgQ/UkoOmKYy5RdPfTIX5ffIYW/LIpiHX4h+0M4HFMEPSvVFPVzC/qvqG1ZqwWphtGSb+XTYnm4zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767606625; c=relaxed/simple;
-	bh=FhA8UK+chCa+pd17hZ6IOPyBbup1JCfkMRjpIxTkHNo=;
+	s=arc-20240116; t=1767606725; c=relaxed/simple;
+	bh=5ejwvdViHGpZahmzeANBNrpoCx269JspGOeia0IssR8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qFgKhA0keo1XSYJ4HuGgVubifyuzwXCztyT18t0LmHMO8ZWrNtJBr5WN6b0dlBPTdK9vBtdJ02ydw8nJI8+zb9NYzAOVWCTDtV4m7BTdzN1fcnZ3XiIMZkePrKc/5krrlwjR/aZHNdjv7XqzzZHorClWHTEJDzd5z8p2TVLNZ0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ch6/Q7bJ; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version:Content-Type; b=Fqe3G4rlfwOWccAJn/nSEP1A7opR67hTbV9q9nLiIbV1neMFVQAjh8cXN7mEsQiXSLaQap+h0kQKdLKsSzw8YLqBSo5CJmj/IvARtSK1czUcq66rf1FzvmFFy+AUUV+4mUFjtDX5OqtRohaSs5wMwdVGx1Z10uGNmcb5qoPwwY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=U6x72nMH; arc=none smtp.client-ip=209.85.221.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47928022b93so20053975e9.0
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 01:50:22 -0800 (PST)
+Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-42f94c2eeebso726902f8f.1
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 01:52:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1767606621; x=1768211421; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1767606721; x=1768211521; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FHbyaIHmldcU+eqqgyAXM9nUM8TFQGdgTiHVbrY2G0o=;
-        b=ch6/Q7bJAAq2dveUyIY5ODasRlLELdDmSr5b55hbxAvwj+DMYKdVCaUko5AOiQmhgi
-         N0EgetQVqD8vgYahlGMM9R+BEC99QpGuJJpdFQa0NQQ3yG2LTA2Tu0ZRyqO634+rlWN9
-         wWzjBF++QRgs75FDG2EkurOYdM0VguozM5JgJzY852qkRTaFJqNo7vxptgkwUADi1VrB
-         Qa+9fTkoB5MRLnHd8dUxsp5bdfGE6gD+Tq/xeCHSn57yb3largDmjmBNlL2mU4Z43TzA
-         mPZkRDY3siUk5PgIkppZuLF4tj/VclHM+LbsIjkSiZ36Ee2gIjBXlOBAVtAhFgWCg783
-         97qA==
+        bh=txMxKLJCIQFzStXgaX6zCY9uCsyn60vWSct+HXcfqZM=;
+        b=U6x72nMHxpmbQRXs1gnsE0GzwU9BM8OMC8fDOUEuszh/7vfjE3AvoxufBx+ZjziY55
+         j9XpiczMVZ2WuGt6gdThIsTQXQ4wJFmMRUuoK1Cd3WyYjsJK/oC6+Z3J4LosaJDZw9L0
+         WK7R9vTUx8GashsEauSiZc27QN3PZPeKtbTjQTejebn2GdPST/MM2eS8CEtjk/VZ0BJe
+         lAC5Q5bGVIZQ8YyAXXcu/d9ChWPDfUSWxCRTGDfGpmkRA9eYFooxD/yM76hPB3pEAzjQ
+         JbSrEg6nhtP08npXldyRH8jEiJwwljOBkglCGAZ+2ihUdiCfnkYpre6UjJl+XUsvU/us
+         a0jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767606621; x=1768211421;
+        d=1e100.net; s=20230601; t=1767606721; x=1768211521;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=FHbyaIHmldcU+eqqgyAXM9nUM8TFQGdgTiHVbrY2G0o=;
-        b=tqH/AHPBe71wzoi55hQv3E7AYuJRrCwhZOns0t0HfkR+aehOh5EJhhpWos9P65iIiC
-         28XbwtVjRVm0jUd7Wxxjx9YGxHr5guRqmOkScKQBzx8VmKICxgmVzzKkY2oLsJJ5KEHC
-         04vy6oNCpglxcoXQe86zsO2aLYRzHgr1g1z3/WdpXlChcReR+zVOG6zMMhd3GMW2ugbP
-         PCOKZW7YIKNwoepnBvAaITHtD8k40Z9+Yag5EHvbDS2+bdjb1U9Yo1LcF5q9wD6chN2k
-         axWD5jh4/6O+WSjxbP97v5yrpHC9/VaYGV0OSnPW+yWiLqiKBgykyJCZ5XsIw0m/oDDA
-         gOqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaW+TMjINWGDFCYwlURVxfv8KRt2pg8bzG4QU2l4RmaHbEuCAbFfp3IzzewuSMqfGSUtM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhFg04XgaEcYP0vBf+v++lsM+BN8BIWp8CXbwSvoN9FL42afZk
-	KksAd8UfUzDpIu40seIUBtIfm3K+JEHv9AKanCqqqCM+mDyO8B2YAa/cmG/yRTVMKko=
-X-Gm-Gg: AY/fxX4YcWRfKJvHJxhedsWNrSqBtkpPO07n+vNlnGNWTMnJJu0zHzCOZfgObUBaNW3
-	h2djS5xwvE4iXIPIosxg2GRAHv2I3J8sYxaRgyO+IBqtxSntGp5s/OjXR7zPHIuIpWaxEqN5ef/
-	b3YUsKhCcmpsZi3PP9ZCkNZcJRSiZ4VWVSjQ9Kua6SPvIHJIEjqZ10EEjlYzjjvkZ2o9IUgjpRw
-	5enJTTcP1U3eNLoHcv1klLeFSeLbe9crCl++MTuqiBKDCoV+M7wk/9l6RAPb8LkzEb/0sxuj4y1
-	cd9PAJ5/IdZh/Z0PVARnRYtOe4YFr9iafr4K5ajoyPjnjJ+IQRG3X/aMSiCll2YhcAVCKjYY9/5
-	ZF0ejsAvG+kNhk4GQvwKjKUYn5xqnuL06970/S1bedKL7QWyseUFLVvntBtHXt+el/+XpKMkR++
-	9PsM8Cy5MJaqF5k5L4cbGX8UWtnRvc2NAWTYVH/o2kslOKZKmHQkW4U22q1+QmPhWreafGeK7ry
-	/651Fzgkxryf+Y=
-X-Google-Smtp-Source: AGHT+IGnsRamZ5T2skVdNNSZv9niwK5H6wuQG4RJC9WMb4c0kDes0M5FONvR6OuiLsAxcMrzh8ZmXw==
-X-Received: by 2002:a05:600c:1d1d:b0:477:a6f1:499d with SMTP id 5b1f17b1804b1-47d19574e09mr373374595e9.3.1767606620962;
-        Mon, 05 Jan 2026 01:50:20 -0800 (PST)
+        bh=txMxKLJCIQFzStXgaX6zCY9uCsyn60vWSct+HXcfqZM=;
+        b=dREFjiCarJIH72NXLovvNdaHJyi++mOmVmEXzJTnawJ3G8LMrXl1BPfidCYDnRus8C
+         u0iKnvUyPp99ftq3jCQ2Q12A2sIiYTQD+ncW/R9F5zgQ2KL5M02Ky0ZXeDNaYEu8q2am
+         R4zAOa3/qDHpfNfyKVQ2KmZimsfhmNlS72K7wHsAXMKOI0hDd7mFngjG5hZSYE1/kleJ
+         po/D/4H3bSxlZn0jdgBYZRMjsTF7nP0LQj8nBsay0z7k3n8K2QqS7oHBvMWHdBx+DQTG
+         mCZjExsVBQhcDjAiQPBSjb9pl3eEKOI+jM538XivoZ9NdtmzN9eyL4hA7qMLy59hc7Nq
+         vsTA==
+X-Forwarded-Encrypted: i=1; AJvYcCVX9KVxHXvKb9PKSJg0GoAK9pA8TAQzH0IV5e7QNtoKbKuKbzyqTJINsIXJAYAMwS/NjvQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/igkp2L+FKbZgWBSCcE4HAGsxbzU+f2BFo2FCnBdCaf+/R0g6
+	VoXZ3RGLtUJL/eXiJOVTOPzysAZhjunnQRa719QH+EFh4U+Q4jH1yJcfMaRvNzOwuEc=
+X-Gm-Gg: AY/fxX5ECcvAxVt45KJuyGYG0ZSijYP+nfkZFQoMCUYThM0vhP5tlb6UP/Qob27ZYB1
+	Ll6BMIWhLaLYQUFmmKs2tTBdZaCMANMUaDH8fa/sEfFacaWnDgLZyV14zP6dPVWLjHjysfHmfJ7
+	OeXwPztsNxomZssIxTUfggJ0gRGHX3YJDmpf4vWDswuuJXGZsz9X52uTuTUpJOK3vAGI6JYBa+g
+	E08LHYH24e7FK0djzcoycFCT1fhl6S+/N8yHfzXmPcwnjs/7H1IExKPWV5dM0b1vij39VdFpL5O
+	fvEJJkrqsgOAaVHJlvYPCOTNmRLXbcZ2ykea2r80iyrRFvNgT/oqt+nxsCZrHcN9pgsl1v9OtR+
+	wlc+NWkJ96LDc2Kv1gx43v/21gDOTQ2h3bp5YZn0nhTs4v2I2TC4hFXjJT29Pth369wTQPqsBPf
+	Set6eZ5yZu/emx2XLEUanu6O4DqPvnhrKxBg1agvvdzqpNr7GRAhslHsja1Ok61f3ee/+f0WR/o
+	eQ7
+X-Google-Smtp-Source: AGHT+IG/wqgOkqwXrB1rsCOv37yZ5+KfBZKuhJz5pDuTeJ4oXS1iaQsQoWFexgrkxGoC7pycuuDd5g==
+X-Received: by 2002:a05:6000:2305:b0:429:cf2b:cb0a with SMTP id ffacd0b85a97d-4324e4bf220mr35541794f8f.2.1767606721058;
+        Mon, 05 Jan 2026 01:52:01 -0800 (PST)
 Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7443c04csm28265855e9.1.2026.01.05.01.50.19
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4327778e27bsm66263511f8f.12.2026.01.05.01.51.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 01:50:20 -0800 (PST)
-Date: Mon, 5 Jan 2026 10:50:18 +0100
+        Mon, 05 Jan 2026 01:52:00 -0800 (PST)
+Date: Mon, 5 Jan 2026 10:51:58 +0100
 From: Petr Tesarik <ptesarik@suse.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
@@ -92,11 +92,12 @@ Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
  <brgl@kernel.org>, linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
  virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
  iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 03/15] dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
-Message-ID: <20260105105018.732dd009@mordecai>
-In-Reply-To: <2d5d091f9d84b68ea96abd545b365dd1d00bbf48.1767601130.git.mst@redhat.com>
+Subject: Re: [PATCH v2 04/15] docs: dma-api: document
+ DMA_ATTR_CPU_CACHE_CLEAN
+Message-ID: <20260105105158.248b4dd2@mordecai>
+In-Reply-To: <0720b4be31c1b7a38edca67fd0c97983d2a56936.1767601130.git.mst@redhat.com>
 References: <cover.1767601130.git.mst@redhat.com>
-	<2d5d091f9d84b68ea96abd545b365dd1d00bbf48.1767601130.git.mst@redhat.com>
+	<0720b4be31c1b7a38edca67fd0c97983d2a56936.1767601130.git.mst@redhat.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -107,18 +108,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 5 Jan 2026 03:23:01 -0500
+On Mon, 5 Jan 2026 03:23:05 -0500
 "Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> When multiple small DMA_FROM_DEVICE or DMA_BIDIRECTIONAL buffers share a
-> cacheline, and DMA_API_DEBUG is enabled, we get this warning:
-> 	cacheline tracking EEXIST, overlapping mappings aren't supported.
-> 
-> This is because when one of the mappings is removed, while another one
-> is active, CPU might write into the buffer.
-> 
-> Add an attribute for the driver to promise not to do this, making the
-> overlapping safe, and suppressing the warning.
+> Document DMA_ATTR_CPU_CACHE_CLEAN as implemented in the
+> previous patch.
 > 
 > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
@@ -127,41 +121,25 @@ LGTM. I'm not formally a reviewer, but FWIW:
 Reviewed-by: Petr Tesarik <ptesarik@suse.com>
 
 > ---
->  include/linux/dma-mapping.h | 7 +++++++
->  kernel/dma/debug.c          | 3 ++-
->  2 files changed, 9 insertions(+), 1 deletion(-)
+>  Documentation/core-api/dma-attributes.rst | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> index 29ad2ce700f0..29973baa0581 100644
-> --- a/include/linux/dma-mapping.h
-> +++ b/include/linux/dma-mapping.h
-> @@ -79,6 +79,13 @@
->   */
->  #define DMA_ATTR_MMIO		(1UL << 10)
->  
-> +/*
-> + * DMA_ATTR_CPU_CACHE_CLEAN: Indicates the CPU will not dirty any cacheline
-> + * overlapping this buffer while it is mapped for DMA. All mappings sharing
-> + * a cacheline must have this attribute for this to be considered safe.
-> + */
-> +#define DMA_ATTR_CPU_CACHE_CLEAN	(1UL << 11)
+> diff --git a/Documentation/core-api/dma-attributes.rst b/Documentation/core-api/dma-attributes.rst
+> index 0bdc2be65e57..1d7bfad73b1c 100644
+> --- a/Documentation/core-api/dma-attributes.rst
+> +++ b/Documentation/core-api/dma-attributes.rst
+> @@ -148,3 +148,12 @@ DMA_ATTR_MMIO is appropriate.
+>  For architectures that require cache flushing for DMA coherence
+>  DMA_ATTR_MMIO will not perform any cache flushing. The address
+>  provided must never be mapped cacheable into the CPU.
 > +
->  /*
->   * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
->   * be given to a device to use as a DMA source or target.  It is specific to a
-> diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
-> index 138ede653de4..7e66d863d573 100644
-> --- a/kernel/dma/debug.c
-> +++ b/kernel/dma/debug.c
-> @@ -595,7 +595,8 @@ static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
->  	if (rc == -ENOMEM) {
->  		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
->  		global_disable = true;
-> -	} else if (rc == -EEXIST && !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
-> +	} else if (rc == -EEXIST &&
-> +		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
->  		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
->  		     is_swiotlb_active(entry->dev))) {
->  		err_printk(entry->dev, entry,
+> +DMA_ATTR_CPU_CACHE_CLEAN
+> +------------------------
+> +
+> +This attribute indicates the CPU will not dirty any cacheline overlapping this
+> +DMA_FROM_DEVICE/DMA_BIDIRECTIONAL buffer while it is mapped. This allows
+> +multiple small buffers to safely share a cacheline without risk of data
+> +corruption, suppressing DMA debug warnings about overlapping mappings.
+> +All mappings sharing a cacheline should have this attribute.
 
 
