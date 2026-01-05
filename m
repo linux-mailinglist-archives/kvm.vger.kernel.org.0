@@ -1,136 +1,160 @@
-Return-Path: <kvm+bounces-67071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18B4CF53AA
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:25:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6000ACF53CB
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5D1B305CD20
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:25:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 207053082EA9
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D562333FE05;
-	Mon,  5 Jan 2026 18:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F10340A79;
+	Mon,  5 Jan 2026 18:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="txFGgRxt"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TddU8smh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C932C08AD
-	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 18:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767637544; cv=pass; b=ufM9kSECRYQ8oqrvbWUr2CLujUU5NsrYsA8qjyOKK51NkLvvlnua9Q9QW+zA8y5lqkW2iseIBPnLyDzleyMEpepJO6i3qkNqrM9NhgO1yC1SgIlZL1CvHS/749XCK9ekdp9KBhQdHv5U/HkVmTJuUiCV17cQSHZJRsh6iJkuzIM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767637544; c=relaxed/simple;
-	bh=+rsLOIW1esrUzCtOfr5nyd6WlEJlB2L9jLpWg3L3/0s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OMCH05BjHx58NHAiXcv2ghOv5cexgGZ1YSxsAZdNshe9m3J59/OfJhVCQt1Ks2Npl4dx2uxpQXdwfDd5W99j/T9eLIwlIv3tv0frkkqyVPxZNRVXub5X0ya7sVXmJWlmxGLiWKx/zHwDyvtjjbdHDqO6kxY4POgnMNqZljXg8+4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=txFGgRxt; arc=pass smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64b72793544so564a12.1
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 10:25:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767637541; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IAXcBy4FCdovq5Bx0DeOZBp1NxSCL0Nktb/Ee7GnYmasDqUFXr/JhIRLnv+LRzJWR8
-         DRjdmnJWHgmCf3KXpX4uD4d6oPz3w/NgedaD8yXZaeHPHbV/MGWnJrvvO5/ihPkx0J4/
-         V0rTBDzSRrVm2/10lTWakIUE/XUfKYVf5ccspyqQhLzDPhn1lnHQ62w55GcedCFw8Gdq
-         lFndUX3gB2zTxuhG2BWjrZLxGi7BNiHtTgKNLUpqihvaZxH2T0VNZcGwZXMr7ILYiKmr
-         lnpxAE5xNj66KhXOrI7PXj95FuRfuMJ30zQk+80TXE3b4EWAnOk5gWgh9p7BTf2MEPGe
-         CbuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=oi7DZ2qZ4qrdJiiBgsksWiRY2EW14PGxhtG4/wy5aM0=;
-        fh=NrEMd4cv6v5Zjivu5N0zx3J+1YFispouXmGrRwwFDbE=;
-        b=dvN5oR5RMdks8qZN0mMZCnK3nTGiZ1v6Nxn+fszNTmX/ZZPoEuoOKiKfFDwjMNEHSp
-         rdy8lcbLiS5AfRORK4VSVEOkxNGlTX+VFR5JUlBVyKCs7wr7elwqgP1tlDjvb8cqSQIX
-         Cxv/J7c5CUxKLhTtmNlydjhowH+NHoMOvpFabjTqDX29nQPw+/oku1AcFQQEvxFuEJUY
-         c3pNnkTLMh3nWQjZAryXW9j5yQiAve1UrdShdAwMszPOhhS6pYcbSA67lllSJC1EeVr2
-         EWgok8HzXvOWmriw+cLj5o5eznFQ275UuV2xYRk7JE4dBcjKZOkW4QzV7MzJ4eiMdAST
-         GuVQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767637541; x=1768242341; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oi7DZ2qZ4qrdJiiBgsksWiRY2EW14PGxhtG4/wy5aM0=;
-        b=txFGgRxty9VFn1GCHEoBhcF5T4a3n8AL6DB5vPxRW87ZSCvLt/G0/xalm13rMEb0/5
-         A7aBhCF8No4QCBpZJjD+mL5HQ+Wv8S68TZtOu68hqbHauc3f3EzPHNfzBD30XVG12Ebv
-         tVlZFI9he7IElfrRdsi96Puur5pxkMlhWV0HEDxca6DEZKY91OGQRrFHQQcwoYBl0TCu
-         OCV3PVSD68NubdxLKM3IaEjGPOGwtLeioXDI8CZJaTtgddnBCPdPhoGRr6V/DEbvOQI1
-         UWYWH9nlR/LNt3KgxiXwjRtdFaFVKFFTdtM1WinpGQpPQPRqCJ8p0g0F8b+bO9u+7P1M
-         0ahA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767637541; x=1768242341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oi7DZ2qZ4qrdJiiBgsksWiRY2EW14PGxhtG4/wy5aM0=;
-        b=AS0lj8syouVMx6mrKeBMjuXrq6CoZ/j0B4hK0rICiAmHqbybwBXAshaKt/u/8hz/l/
-         I4sklUxN2hzq6axn8BF4UVJ2GVCgu2kSAuDDUK4JHyj5ZbRpEuPBeBRUn06EcxDvvOoV
-         OybO8U+fLcnJ9Q6iYOLP+lXIrLVDHyjlVxWrbqcXpO6cVpyGzj6VGV1kQ45XX1jZ89m+
-         qHyEURBepfbWtLcyU4G0czmm76+WkN6aFSEYQHXRzMMUdX9bvtxnqPKlUPcgCQ1e7AW7
-         73uCwqiinlp5W5R8/oWCSdv4Nx9e/KHjX8K3PprkoGBbVAu0IyftQHMarUSnVzIKQVIL
-         XAlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUxLU8QnuwXzjVW1wmk7688+pw4zqP0jomdadRRYiS7VORQRnpbKCRkCE8LeeUdkrFIZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi0+pWIw0A1i8nC+zD5/XRRjxKHQIN9W3mZb1ThennhqyYc1G5
-	misP4UOO0zaEJTZPOvH5DsQ5aNOJr2qak7tR49BZvGiNtZikiD0y4BheBxCxzonTi5HpZ6nwoWX
-	YRPS7hkYYfmvAFlNTVICgvd7FrJHrvwUuW3atDwnW
-X-Gm-Gg: AY/fxX6rlucSSHord5hsBycHGCoXB6JES0Mx+4OIAmx+lPbYC7nbG7CZtSqB6aomcyI
-	PY5ZRUD18Ij9mwapq+/UR9mYmOSCXAd/wMiLuLNCaYLU1lRnxegyk1VfyJCWwHDep4oX+Nm6tLs
-	KHCSr2Adbb+9cOQLi6DQZJklKruejhLC36c077lm8v7JSEEo0L6Mm8q8REdQ5UXUHk342Aumax8
-	pb7rdoYUYzcQ1ceohx9VsWaqLgQjbOePxPVVjY2INFWqx0h1d/sdGK8X+CFe7PsS821PX4=
-X-Google-Smtp-Source: AGHT+IErmY1RR8fLs/bjJFbgpDgfaRvZSMUD/4PW+5SFPA4YPh9Oztw0aeecX5CGguWN8QnEuPIYiNSwbHCoOiZhZkw=
-X-Received: by 2002:aa7:cc89:0:b0:649:8aa1:e524 with SMTP id
- 4fb4d7f45d1cf-6507c4c2e60mr538a12.11.1767637540797; Mon, 05 Jan 2026 10:25:40
- -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D39254AFF;
+	Mon,  5 Jan 2026 18:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767637663; cv=none; b=t7KYYD3u/87rRnt+mpJwSUkq7nSalcWXzHj0kRWAdOY6qURfhWTrn6536pzYVJKeDlWS63x7bzHC241r+zynCchJBnfWvCI+Ckwv2Nn/6uypTfw4QFAdGf+bsI7MUIjazDMaCKYSlLfDbxW8ak3wXC1OsEuU8bXsQQ9IytvueUo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767637663; c=relaxed/simple;
+	bh=aGY/jlM6jY/RHCqnrtrgzV8zleTgHdpL34u5gI/QqUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=ruZi3k8rBQ5XDOK8qMhcICk8X7r/21hdg4ObpN4ByhX3iiPtFGgVhfHiwyGJm7oun1NrEzJJ07w30EmMO1q5uDN1wVfze1iQ77U8Hi611bRNqpYUCb84dmxrT+gtsS1vH52VCm39VpeMLm+LpJBc0MfFy50dWKnc89ohxGk02Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=TddU8smh; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20260105182739euoutp022c0ff5a531ea4a0ade8d8afe18af64cd~H6RXqDdGD0910109101euoutp020;
+	Mon,  5 Jan 2026 18:27:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20260105182739euoutp022c0ff5a531ea4a0ade8d8afe18af64cd~H6RXqDdGD0910109101euoutp020
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1767637659;
+	bh=k3VI0xxK+JeEJMM9Qf4YGsqhbmobVgQABwML3v0f724=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=TddU8smhT91bAmPPPVq7FIf3NQCkbbVU9aNLByOb2P/DDi2aBekl1kXF5mdRP1cIn
+	 04/MBVqWhu3U3NvHPwpdzcABtd2Zl4zBlANwfVyE2Hj+e3qvxbF4zfWyc6ausnM1jx
+	 6vZEn1ciuXJrSioooL28+l0dHbJkRmxKf6Iwolts=
+Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260105182737eucas1p2d0cda04e784d1c0731b62be8b7f6b6c1~H6RWkV_tt1261112611eucas1p2O;
+	Mon,  5 Jan 2026 18:27:37 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260105182731eusmtip2518af9f606f96a7775289d347a5aed87~H6RQX-7If0188901889eusmtip2W;
+	Mon,  5 Jan 2026 18:27:31 +0000 (GMT)
+Message-ID: <8dbf60ac-0821-4ebf-8191-acf348525c26@samsung.com>
+Date: Mon, 5 Jan 2026 19:27:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251230205948.4094097-1-seanjc@google.com>
-In-Reply-To: <20251230205948.4094097-1-seanjc@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 5 Jan 2026 10:25:27 -0800
-X-Gm-Features: AQt7F2qPUCLxZZdRMopKqbpIrNbx1KXa_BXaN9XOn7WdSE3_SLKOsBzEV1b-iKI
-Message-ID: <CALMp9eTmHs4k7_iiCb16u96whZFdW-Mckw2mL2WRtDag15256g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Return "unsupported" instead of "invalid" on
- access to unsupported PV MSR
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Betterbird (Windows)
+Subject: Re: [PATCH v2 01/15] dma-mapping: add
+ __dma_from_device_group_begin()/end()
+To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, Paolo
+	Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, "James E.J. Bottomley"
+	<James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, Robin Murphy <robin.murphy@arm.com>, Stefano
+	Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+	Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Petr Tesarik
+	<ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Bartosz Golaszewski <brgl@kernel.org>,
+	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Content-Language: en-US
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <19163086d5e4704c316f18f6da06bc1c72968904.1767601130.git.mst@redhat.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260105182737eucas1p2d0cda04e784d1c0731b62be8b7f6b6c1
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20260105082306eucas1p28cec7ef0955fa7ef06248075e148af37
+X-EPHeader: CA
+X-CMS-RootMailID: 20260105082306eucas1p28cec7ef0955fa7ef06248075e148af37
+References: <cover.1767601130.git.mst@redhat.com>
+	<CGME20260105082306eucas1p28cec7ef0955fa7ef06248075e148af37@eucas1p2.samsung.com>
+	<19163086d5e4704c316f18f6da06bc1c72968904.1767601130.git.mst@redhat.com>
 
-On Tue, Dec 30, 2025 at 12:59=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
+On 05.01.2026 09:22, Michael S. Tsirkin wrote:
+> When a structure contains a buffer that DMA writes to alongside fields
+> that the CPU writes to, cache line sharing between the DMA buffer and
+> CPU-written fields can cause data corruption on non-cache-coherent
+> platforms.
 >
-> Return KVM_MSR_RET_UNSUPPORTED instead of '1' (which for all intents and
-> purposes means "invalid") when rejecting accesses to KVM PV MSRs to adher=
-e
-> to KVM's ABI of allowing host reads and writes of '0' to MSRs that are
-> advertised to userspace via KVM_GET_MSR_INDEX_LIST, even if the vCPU mode=
-l
-> doesn't support the MSR.
+> Add __dma_from_device_group_begin()/end() annotations to ensure proper
+> alignment to prevent this:
 >
-> E.g. running a QEMU VM with
+> struct my_device {
+> 	spinlock_t lock1;
+> 	__dma_from_device_group_begin();
+> 	char dma_buffer1[16];
+> 	char dma_buffer2[16];
+> 	__dma_from_device_group_end();
+> 	spinlock_t lock2;
+> };
 >
->   -cpu host,-kvmclock,kvm-pv-enforce-cpuid
->
-> yields:
->
->   qemu: error: failed to set MSR 0x12 to 0x0
->   qemu: target/i386/kvm/kvm.c:3301: kvm_buf_set_msrs:
->         Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
->
-> Fixes: 66570e966dd9 ("kvm: x86: only provide PV features if enabled in gu=
-est's CPUID")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>   include/linux/dma-mapping.h | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
+
+Right, this was one of the long standing issues, how to make DMA to the 
+buffers embedded into some structures safe and this solution looks 
+really nice.
+
+Acked-by: Marek Szyprowski <m.szyprowski@samsung.com>
+
+
+> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+> index aa36a0d1d9df..29ad2ce700f0 100644
+> --- a/include/linux/dma-mapping.h
+> +++ b/include/linux/dma-mapping.h
+> @@ -7,6 +7,7 @@
+>   #include <linux/dma-direction.h>
+>   #include <linux/scatterlist.h>
+>   #include <linux/bug.h>
+> +#include <linux/cache.h>
+>   
+>   /**
+>    * List of possible attributes associated with a DMA mapping. The semantics
+> @@ -703,6 +704,18 @@ static inline int dma_get_cache_alignment(void)
+>   }
+>   #endif
+>   
+> +#ifdef ARCH_HAS_DMA_MINALIGN
+> +#define ____dma_from_device_aligned __aligned(ARCH_DMA_MINALIGN)
+> +#else
+> +#define ____dma_from_device_aligned
+> +#endif
+> +/* Mark start of DMA buffer */
+> +#define __dma_from_device_group_begin(GROUP)			\
+> +	__cacheline_group_begin(GROUP) ____dma_from_device_aligned
+> +/* Mark end of DMA buffer */
+> +#define __dma_from_device_group_end(GROUP)			\
+> +	__cacheline_group_end(GROUP) ____dma_from_device_aligned
+> +
+>   static inline void *dmam_alloc_coherent(struct device *dev, size_t size,
+>   		dma_addr_t *dma_handle, gfp_t gfp)
+>   {
+
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
 
