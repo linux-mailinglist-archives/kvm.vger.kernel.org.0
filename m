@@ -1,95 +1,54 @@
-Return-Path: <kvm+bounces-67069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE95CF525C
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:04:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6CB3CF53A4
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 19:25:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B4A3B3031784
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:04:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA350302C9C6
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 18:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A669533A9D6;
-	Mon,  5 Jan 2026 18:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698062C08AD;
+	Mon,  5 Jan 2026 18:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOJ/0sVw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="O1UxU7h7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta0.migadu.com (unknown [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10D83246E4;
-	Mon,  5 Jan 2026 18:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E022DECD2
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 18:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767636235; cv=none; b=do0A4dkxgJ0/bfZyzZi95v92nWqrYAP/FLeZn+pC8lfd3AgRZfniElJEyglY8MmI56gCHNXdol5kEQs/+orUn62vEZzpym/NM7GJMWKRMZLOS2ItjHjco4od3WK9S4o1flJQoSm2/9VJtWxc1WvqEN5BY6bwQme0TC+ltzHEQ2Y=
+	t=1767637497; cv=none; b=pJg/jiowJ5NBkQsJ3nR7azQ8RTfgPyJb2h0jWlU/noj4U4J6QNZ4+o6qx6nEFKFzDVc7lKnc2oNlsO6uUge/q2fguOVW5B/OOlxKA19Ai5BfGNOtt9bP7CWSZvtG52PdD5Vkocm2xC3xNn/ADHD5zWJw7stbM8Z8mNN3+DJJEiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767636235; c=relaxed/simple;
-	bh=Rx9Dh5v9FKLm3TAH7X9oHG0AANMqTq50IU73toEHYtc=;
+	s=arc-20240116; t=1767637497; c=relaxed/simple;
+	bh=29V3nPy6eJu/bhkMjbdH03w6SXwDnxJzaFIcAXMbrJI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E1C0AZgKSZIJJM0l2EyNRJxhcx5cKWa5iD3KYYQ9FqKc+Lk1DpmsUk8Va9/wnE8I0r4IKb3GkGPTF8XJuaASw9hAVlDuD9ZoZ8LTiJlSs3VgiK4Wv6zDydSxbcDlmHGa1X9Swf9kH44bkRzwhcF5JeziPMBmgCdwIIYTf7k2AqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOJ/0sVw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1CA8C116D0;
-	Mon,  5 Jan 2026 18:03:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767636235;
-	bh=Rx9Dh5v9FKLm3TAH7X9oHG0AANMqTq50IU73toEHYtc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YOJ/0sVwU6Nu9v4k39WwZuqXkRPyUiZ39wgLJGshVE97haS/a/vjDxdQ9pHK3ORha
-	 x4zS3ZkAAsyzZEMnmXu6dMhHVGBYvu2iq0sNmRa3sXP7flxdnTRDC7fWr1cYzaoeQI
-	 fTWsY3Atopbr4vrCv+EBIdvG/yAYcap7iz9qgX08qaUqbhliN+spx63Ls13WrV8iW5
-	 9dm42EARuQ/oyQeWpEV3C0X9Hg89HssejO6nD+YFf5+MfXu0E+vuU4UtvzYPfWxQKF
-	 SnnJ4+IDNwmIYITU/EpPRCOYheIqRLS/eVMY+WN7j+MlN4eKzI5ZikbNwOZOwc1bkt
-	 NcErLpLjeR3Yg==
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfauth.phl.internal (Postfix) with ESMTP id E8C15F40071;
-	Mon,  5 Jan 2026 13:03:53 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Mon, 05 Jan 2026 13:03:53 -0500
-X-ME-Sender: <xms:Cf1baccKwenw4QgMvQrJaqiemlz19bq7R7M3Q76MhH8HaYmW2uVDcA>
-    <xme:Cf1baVDGdByLltJ10-8o8jYy97XGYCGWTYtwY5SKkk_rsq5YNeeJYM0grlM_zYlsB
-    UqI_yVoPxReHRs6LqFqzrlkplWdoyNG-sciuXboHMwk0gdX16y0NZet>
-X-ME-Received: <xmr:Cf1baWfmMRe7jP3QNGsmVoXiLBqpMTgex7gKG133g7vaHnN-QhR0rCh7qJQH4A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeljeeljecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpefmihhrhihlucfu
-    hhhuthhsvghmrghuuceokhgrsheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
-    hnpeehieekueevudehvedtvdffkefhueefhfevtdduheehkedthfdtheejveelueffgeen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrih
-    hllhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeiudduiedvieehhedq
-    vdekgeeggeejvdekqdhkrghspeepkhgvrhhnvghlrdhorhhgsehshhhuthgvmhhovhdrnh
-    grmhgvpdhnsggprhgtphhtthhopeefgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthht
-    ohepuggrvhgvrdhhrghnshgvnhesihhnthgvlhdrtghomhdprhgtphhtthhopegthhgroh
-    drghgrohesihhnthgvlhdrtghomhdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghotghosehlihhsthhsrdhlihhnuh
-    igrdguvghvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtohepgiekieeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epvhhishhhrghlrdhlrdhvvghrmhgrsehinhhtvghlrdgtohhmpdhrtghpthhtohepkhgr
-    ihdrhhhurghnghesihhnthgvlhdrtghomhdprhgtphhtthhopegurghnrdhjrdifihhllh
-    hirghmshesihhnthgvlhdrtghomh
-X-ME-Proxy: <xmx:Cf1baUxvNYboyB3oIIBMq5LOv3cm_aY81UXcRxei1icpfxanTzsJmA>
-    <xmx:Cf1bac8uf8jidjzY3ROR_mexG9ng8dk2SKtcucFAlBj63iRSScy6Ew>
-    <xmx:Cf1baWlQ960j5-TwAqNGOaIWzBxd9Dyl6AUv4EThU-BoMXoyjg39oA>
-    <xmx:Cf1baWrPF35inpT0p3PubfZjCwtoiRb5WROETQoDNAYa718nC-8SXg>
-    <xmx:Cf1baa_UncmXMqKm4r6TOdNO9W2AinSDNs-ulNHINO5SWu2wEnSniKIr>
-Feedback-ID: i10464835:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 5 Jan 2026 13:03:53 -0500 (EST)
-Date: Mon, 5 Jan 2026 18:03:52 +0000
-From: Kiryl Shutsemau <kas@kernel.org>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org, 
-	linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	vishal.l.verma@intel.com, kai.huang@intel.com, dan.j.williams@intel.com, 
-	yilun.xu@linux.intel.com, vannapurve@google.com, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 0/3] Expose TDX Module version
-Message-ID: <spfgdkv5cnerut7sl3kkrdhgnvpg6xidhey5rmtjmnswtiowfv@uuhvtiv4wztk>
-References: <20260105074350.98564-1-chao.gao@intel.com>
- <dfb66mcbxqw2a6qjyg74jqp7aucmnkztl224rj3u6znrcr7ukw@yy65kqagdsoh>
- <d45cc504-509c-48a7-88e2-374e00068e79@intel.com>
- <zhsopfh4qddsg2q5xj26koahf2xzyg2qvn7oo4sqyd3z4mhnly@u7bwmrzxqbhx>
- <7cbac499-6145-4b83-873c-c2d283f9cb79@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozce28olWLbCf1zNViWrH7qhn7ITY6dVGl2iatamwRnIR+x1pWRgNc6E3qlj8bYTFzBUF5AufFqKfSRaUm6+aO9p8BUzt4pahmtH2h0P368HNj1nAsbH5xCS9jcXcgaTuSsJb4Cpm8ed5apFFvgmnypKWvF4NDICZ2DjrWCyBO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 5 Jan 2026 18:23:41 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767637456;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YUU6nk2pVRwB0+dTQNl94WlC0B8Ka7nFN+gIz226+k8=;
+	b=O1UxU7h7AtNcz7vnL3wMYZsYzkomreORbFiyGkGG/USwrfw1whwon5+8jGkFcGN1AtPHXB
+	iEl7AL3MEt32YmWtM4wh2mgk9CB216tp/AeBwVg/i5ZslVJt/t5kxrDseoLvcBslAfvbHv
+	th0x1hUPcPVLVGC23DuWV1KabApZFns=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86: Increase the timeout for
+ vmx_pf_{vpid/no_vpid/invvpid}_test
+Message-ID: <6fltlvsnlbqyw3sme2zamsxp2u54tkoauydeoq2v3rri6r2uja@lmxwn57ll5ta>
+References: <20260102183039.496725-1-yosry.ahmed@linux.dev>
+ <aVv6xaI0hYwgB0ce@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,36 +57,97 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7cbac499-6145-4b83-873c-c2d283f9cb79@intel.com>
+In-Reply-To: <aVv6xaI0hYwgB0ce@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 05, 2026 at 09:19:07AM -0800, Dave Hansen wrote:
-> On 1/5/26 09:04, Kiryl Shutsemau wrote:
-> >> What are other CPU vendors doing for this? SEV? CCA? S390? How are their
-> >> firmware versions exposed? What about other things in the Intel world
-> >> like CPU microcode or the billion other chunks of firmware? How about
-> >> hypervisors? Do they expose their versions to guests with an explicit
-> >> ABI? Are those exposed to userspace?
-> > My first thought was that it should be under /sys/hypervisor/, no?
-> > 
-> > So far hypervisor_kobj only used by Xen and S390.
+On Mon, Jan 05, 2026 at 09:54:13AM -0800, Sean Christopherson wrote:
+> On Fri, Jan 02, 2026, Yosry Ahmed wrote:
+> > When running the tests on some older CPUs (e.g. Skylake) on a kernel
+> > with some debug config options enabled (e.g. CONFIG_DEBUG_VM,
+> > CONFIG_PROVE_LOCKING, ..), the tests timeout. In this specific setup,
+> > the tests take between 4 and 5 minutes, so pump the timeout from 4 to 6
+> > minutes.
 > 
-> As with everything else around TDX, it's not clear to me. The TDX module
-> is a new middle ground between the hypervisor and CPU. It's literally
-> there to arbitrate between the trusted CPU world and the untrusted
-> hypervisor world.
+> Ugh.  Can anyone think of a not-insane way to skip these tests when running in
+> an environment that is going to be sloooooow?  Because (a) a 6 minute timeout
+> could very well hide _real_ KVM bugs, e.g. if is being too aggressive with TLB
+> flushes (speaking from experience) and (b) running a 5+ minute test is a likely
+> a waste of time/resources.
 
-The TDX module has absorbed some functionality that was traditionally
-provided by the hypervisor. Treating it as a hypervisor is a valid
-option. But, yeah, I agree that it is not an exact match.
+The definition of a slow enviroment is also very dynamic, I don't think
+we want to play whack-a-mole with config options or runtime knobs that
+would make the tests slow.
 
-> It's messy because there was (previously) no component there. It's new
-> space. We could (theoretically) a Linux guest running under Xen the
-> hypervisor using TDX. So we can't trivially just take over
-> /sys/hypervisor for TDX.
+I don't like just increasing the timeout either, but the tests are slow
+even without these specific config options. They only make them a little
+bit slower, enough to consistently reproduce the timeout.
 
-Note that Xen uses /sys/hypervisor/xen, so there's no conflict, we can
-have both xen and tdx_whatever there.
+I grabbed an Icelake machine With v6.18 (without the debug config
+options mentioned above) and ran a couple of them (I still have some
+debug config options enabled like CONFIG_SLUB_DEBUG, but I suspect some
+of these are enabled by default):
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+# time ./vmx_pf_invvpid_test <<<y
+...
+PASS vmx_pf_invvpid_test (38338679 tests)
+
+real	4m28.907s
+user	2m40.198s
+sys	1m47.991s
+
+# time ./vmx_pf_vpid_test <<<y
+...
+PASS vmx_pf_vpid_test (38338679 tests)
+
+real	4m21.043s
+user	2m39.916s
+sys	1m40.416s
+
+This is also acknowledged by commit ca785dae0dd3 ("vmx: separate VPID
+tests"), which introduced the separate targets to increase the timeout.
+It mentions the 3 tests taking 12m (so roughly 4m each).  I think the
+chosen 4m timeout just had very litle margin. We can make the timeout
+5m, but I suspect we may still hit that on some setups (on Skylake with
+the debug options, some of the tests take 4m 50s).
+
+> 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  x86/unittests.cfg | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> > index 522318d32bf6..bb2b9f033b11 100644
+> > --- a/x86/unittests.cfg
+> > +++ b/x86/unittests.cfg
+> > @@ -427,7 +427,7 @@ test_args = "vmx_pf_vpid_test"
+> >  qemu_params = -cpu max,+vmx
+> >  arch = x86_64
+> >  groups = vmx nested_exception nodefault
+> > -timeout = 240
+> > +timeout = 360
+> >  
+> >  [vmx_pf_invvpid_test]
+> >  file = vmx.flat
+> > @@ -435,7 +435,7 @@ test_args = "vmx_pf_invvpid_test"
+> >  qemu_params = -cpu max,+vmx
+> >  arch = x86_64
+> >  groups = vmx nested_exception nodefault
+> > -timeout = 240
+> > +timeout = 360
+> >  
+> >  [vmx_pf_no_vpid_test]
+> >  file = vmx.flat
+> > @@ -443,7 +443,7 @@ test_args = "vmx_pf_no_vpid_test"
+> >  qemu_params = -cpu max,+vmx
+> >  arch = x86_64
+> >  groups = vmx nested_exception nodefault
+> > -timeout = 240
+> > +timeout = 360
+> >  
+> >  [vmx_pf_exception_test_reduced_maxphyaddr]
+> >  file = vmx.flat
+> > -- 
+> > 2.52.0.351.gbe84eed79e-goog
+> > 
 
