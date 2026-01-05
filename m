@@ -1,167 +1,153 @@
-Return-Path: <kvm+bounces-67062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F1E0CF4F60
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 18:19:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB6ACCF5020
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 18:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 15EBA3008193
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 17:19:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BEBCF3019E01
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 17:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C839B33B6C6;
-	Mon,  5 Jan 2026 17:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D033533E36A;
+	Mon,  5 Jan 2026 17:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gOMXSwXG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uGfxZdmX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5650133A9FB;
-	Mon,  5 Jan 2026 17:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F3233D4FC
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 17:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767633563; cv=none; b=LY8UNixD8vCbV+xHDvlolTYX314Q0qxtvwxB0ZwE35bF6aaQnIbWDnL7Ua0+SWkNNlBy70lwB+e/cZaVyaWaedFLg2D8WoaYS7nnR7neBtpNfL4mDsv7PK9e2IxuHc/qztCCAcpJWjglVm2FsDZK8OO2dd2wdeaDpJCZNWmFvMI=
+	t=1767634269; cv=none; b=PIBWK9gsQJGjZJmFHP6GupqmZZTjU50UFCg1uPBOs3tCSuUCg9Ydf5sPhk9e7YLgJoI10//OopEds1y/46kcEqIWlB/m3521vMPCfpDY+m0DVHn5P1Bq4yhpN6f7TBqo6QAB+DpJBqAZ9zx6wOpDZLcFL2oDP6uvvUwXT6N+Gos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767633563; c=relaxed/simple;
-	bh=w1WedrajXazIUVprYcnvt8REd4ctbM7lgWDFK/DTBNM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JMP6a/tSZOsvgxryevoTPpXWl1tewcMXBXuLnK8oFX9KNf2iLAf5lFpHHSDAPBPU0MLJICVojuezYow5iiDSClWpfyjbjrIycpTQqkB4OGsUJ5K+/tUycIb6i0KhEpc2nOAS5QbNCiKuAWWE9zIdKydieDliKWqG0lK9BscP5bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gOMXSwXG; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767633558; x=1799169558;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=w1WedrajXazIUVprYcnvt8REd4ctbM7lgWDFK/DTBNM=;
-  b=gOMXSwXGyFd/9Hatgb9kGiZd+7ycRGmUfim9TMVlhKRtvJmZkafLFB/Z
-   et4uSNKdIB1hORKgHomFx3SJESvPyuT7NiVe/F5IAMXLn3ZkNzXeaGfd4
-   /Ki9Z/q+T315s3g1pObkoeZjSnoEnHyVDI0sgDzUbmsPE2XWjDCAz0cC6
-   cg1pNLoefrIfHEuSRHzMYDiwKQSLPJp6RcYbECt823E6VjM+oz8ZDFZH1
-   w+ol3APpOPJE8p2lmP3nK1piQKvkBiRLAe6ZcfPQrYa1Qr73kKxaEtCQv
-   WFx/HioZ+lWgfO7FnQYn4ult0ZmuRtJQz3KeSlcQIXQgYtw69ggiudUIQ
-   Q==;
-X-CSE-ConnectionGUID: fgRVWfFLRHq5qRrxVvydqA==
-X-CSE-MsgGUID: YuYkT6VyTry0Uzp4+jqWhw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="72860688"
-X-IronPort-AV: E=Sophos;i="6.21,203,1763452800"; 
-   d="scan'208";a="72860688"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 09:19:08 -0800
-X-CSE-ConnectionGUID: /aNk4qLyQMyUYi1IWqy4gg==
-X-CSE-MsgGUID: mCsnABl+Qw+vMofeJ94WGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,203,1763452800"; 
-   d="scan'208";a="206992514"
-Received: from sghuge-mobl2.amr.corp.intel.com (HELO [10.125.109.25]) ([10.125.109.25])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 09:19:07 -0800
-Message-ID: <7cbac499-6145-4b83-873c-c2d283f9cb79@intel.com>
-Date: Mon, 5 Jan 2026 09:19:07 -0800
+	s=arc-20240116; t=1767634269; c=relaxed/simple;
+	bh=CxZ4OgJGj/k3K59SPvzFQSboJQlhCSm/PlRd8ioDSvI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jJJSLGjdS3uzTz7Wb6d+lWmdpuT5JkVNuuQWJ6oPOHfHP2V5hzHK6oXJ6wYQVZnF22VHYbhGsIXNTg2Y2T7r7Rkmi6sxZHbjyiOzFZYjQmeTrH1Vus9c5PkghWk8BJxjHM4F8HqXBjlijDcNjaXTaud4c1iNfGu4P/lIWnCMdZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uGfxZdmX; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34cc88eca7eso583689a91.2
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 09:31:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767634267; x=1768239067; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kSIPJzul/X8QFqPR13PL+AQ9eUnhoQcnkip5GRavHI=;
+        b=uGfxZdmX5TkKJXc+bdE8nuacRkRqvHrMEdWKdHhK0TaF2Jg/N8WbSzDB4qJjzP5SpG
+         yzI4bGE7H4Ara68Z7h7SO5xjFPYLnksdO1k7Qwu0EB8m/laUCCvqhfwzqE5KH0ZGUp/C
+         wWFDjmBs6r/+3WKOTByUl9XPyOMiJ2TkPZckDPEnqujzEp9Rtve8rJRgmBdRShlF09Ee
+         iOn1nTtgZk6EKaoc/eKCc4n2eOO6IMknbsse7Gl7WoYtGVwQLAMWee0sjX6MQiMfn9yj
+         ySyJQJ8k0B5HWdmsvLIsXVsjkprPYlsZabB9qfEfSGtxnahseilxbqeYZOKRj9xm8OJr
+         i/4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767634267; x=1768239067;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kSIPJzul/X8QFqPR13PL+AQ9eUnhoQcnkip5GRavHI=;
+        b=CB4q1GBzgCmpdam/XSxayk/+wkzohaalj1Mqrsbql9H9TpGaZPFdxK9JOPbQ3oLe3/
+         5wB9KwumUGa7m8js5vgTW2b9RaGJa6Ky5xZSWOWulW6WhfKiZVudbjHnfTeNmbcyWS0i
+         GJH5Og5cDoDABiqVSUqjjybCKexh7osyzMyHMi2H2wmAgZIuyTCYwiF2KAZL1k1/Uum9
+         6AJqNTYg2+bBMG4j/gSUbenoSRhV+NMrtgJW/XDUT3ddrg7wxsJk8jfP8TkIAzAVka+n
+         KlYowsBIzPUSN82b33VUzFGURTgFXW8v41UxHguY7lpav78sa931vibvfUBkt9VEUYIb
+         JCfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLDxexKDQUPyoWsgE4uW81E37HlaWJ2TJ/2Oe+VPQNWkqqwBgkkfv/kOB1N6JwJrXfjX8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/wB8mnNY4tLms8S0aIdvO9mRkiFYbLTu3DopvrkkVmKpZvcBS
+	vx0aU1Uvx/bJLUDaS9jsieOO/SnHJ4lRF6J7dsSo0XG9OoGdA4+ch7pajbioStKwCENbratRYCc
+	JIpOtbQ==
+X-Google-Smtp-Source: AGHT+IFNFCW51z5uQhSMaKAD/3SNzpI333xLiv4+CS5A7/6N6OYcuHjrQA1qzr3I/rduC2hfHA1d6uzkn6Q=
+X-Received: from pjok2.prod.google.com ([2002:a17:90a:9102:b0:34a:bcb2:43ba])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c46:b0:340:5c27:a096
+ with SMTP id 98e67ed59e1d1-34f5f273bebmr106658a91.6.1767634266701; Mon, 05
+ Jan 2026 09:31:06 -0800 (PST)
+Date: Mon, 5 Jan 2026 09:31:05 -0800
+In-Reply-To: <aig6cfdj7vxmm5yt6lvfsyqwlnavrcl2n4z3gzomqydce5suxm@ydomfhhmwd7y>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] Expose TDX Module version
-To: Kiryl Shutsemau <kas@kernel.org>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org,
- vishal.l.verma@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
- yilun.xu@linux.intel.com, vannapurve@google.com,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>
-References: <20260105074350.98564-1-chao.gao@intel.com>
- <dfb66mcbxqw2a6qjyg74jqp7aucmnkztl224rj3u6znrcr7ukw@yy65kqagdsoh>
- <d45cc504-509c-48a7-88e2-374e00068e79@intel.com>
- <zhsopfh4qddsg2q5xj26koahf2xzyg2qvn7oo4sqyd3z4mhnly@u7bwmrzxqbhx>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <zhsopfh4qddsg2q5xj26koahf2xzyg2qvn7oo4sqyd3z4mhnly@u7bwmrzxqbhx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20260101090516.316883-1-pbonzini@redhat.com> <20260101090516.316883-2-pbonzini@redhat.com>
+ <aig6cfdj7vxmm5yt6lvfsyqwlnavrcl2n4z3gzomqydce5suxm@ydomfhhmwd7y>
+Message-ID: <aVv1WTR9Zsx2FpZ0@google.com>
+Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever XFD[i]=1
+From: Sean Christopherson <seanjc@google.com>
+To: Yao Yuan <yaoyuan0329os@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	x86@kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On 1/5/26 09:04, Kiryl Shutsemau wrote:
->> What are other CPU vendors doing for this? SEV? CCA? S390? How are their
->> firmware versions exposed? What about other things in the Intel world
->> like CPU microcode or the billion other chunks of firmware? How about
->> hypervisors? Do they expose their versions to guests with an explicit
->> ABI? Are those exposed to userspace?
-> My first thought was that it should be under /sys/hypervisor/, no?
+On Sat, Jan 03, 2026, Yao Yuan wrote:
+> On Thu, Jan 01, 2026 at 10:05:13AM +0100, Paolo Bonzini wrote:
+> > diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+> > index da233f20ae6f..166c380b0161 100644
+> > --- a/arch/x86/kernel/fpu/core.c
+> > +++ b/arch/x86/kernel/fpu/core.c
+> > @@ -319,10 +319,29 @@ EXPORT_SYMBOL_FOR_KVM(fpu_enable_guest_xfd_features);
+> >  #ifdef CONFIG_X86_64
+> >  void fpu_update_guest_xfd(struct fpu_guest *guest_fpu, u64 xfd)
+> >  {
+> > +	struct fpstate *fpstate = guest_fpu->fpstate;
+> > +
+> >  	fpregs_lock();
+> > -	guest_fpu->fpstate->xfd = xfd;
+> > -	if (guest_fpu->fpstate->in_use)
+> > -		xfd_update_state(guest_fpu->fpstate);
+> > +
+> > +	/*
+> > +	 * KVM's guest ABI is that setting XFD[i]=1 *can* immediately revert
+> > +	 * the save state to initialized.  Likewise, KVM_GET_XSAVE does the
+> > +	 * same as XSAVE and returns XSTATE_BV[i]=0 whenever XFD[i]=1.
+> > +	 *
+> > +	 * If the guest's FPU state is in hardware, just update XFD: the XSAVE
+> > +	 * in fpu_swap_kvm_fpstate will clear XSTATE_BV[i] whenever XFD[i]=1.
+> > +	 *
+> > +	 * If however the guest's FPU state is NOT resident in hardware, clear
+> > +	 * disabled components in XSTATE_BV now, or a subsequent XRSTOR will
+> > +	 * attempt to load disabled components and generate #NM _in the host_.
+> > +	 */
 > 
-> So far hypervisor_kobj only used by Xen and S390.
+> Hi Sean and Paolo,
+> 
+> > +	if (xfd && test_thread_flag(TIF_NEED_FPU_LOAD))
+> > +		fpstate->regs.xsave.header.xfeatures &= ~xfd;
+> > +
+> > +	fpstate->xfd = xfd;
+> > +	if (fpstate->in_use)
+> > +		xfd_update_state(fpstate);
+> 
+> I see a *small* window that the Host IRQ can happen just after above
+> TIF_NEED_FPU_LOAD checking, which could set TIF_NEED_FPU_LOAD
 
-As with everything else around TDX, it's not clear to me. The TDX module
-is a new middle ground between the hypervisor and CPU. It's literally
-there to arbitrate between the trusted CPU world and the untrusted
-hypervisor world.
+Only if the code using FPU from IRQ context is buggy.  More below.
 
-It's messy because there was (previously) no component there. It's new
-space. We could (theoretically) a Linux guest running under Xen the
-hypervisor using TDX. So we can't trivially just take over
-/sys/hypervisor for TDX.
+> but w/o clear the xfd from fpstate->regs.xsave.header.xfeatures.
+> 
+> But there's WARN in in kernel_fpu_begin_mask():
+> 
+> 	WARN_ON_FPU(!irq_fpu_usable());
+> 
+> irq_fpu_usable()
+> {
+> 	...
+> 	/*
+> 	 * In hard interrupt context it's safe when soft interrupts
+> 	 * are enabled, which means the interrupt did not hit in
+> 	 * a fpregs_lock()'ed critical region.
+> 	 */
+> 	return !softirq_count();
+> }
+> 
+> Looks we are relying on this to catch the above *small* window
+> yet, we're in fpregs_lock() region yet.
 
-It's equally valid to sit here and claim that the TDX module is CPU
-microcode. Sure, there's source code for it, but only Intel can bless
-it, a version of it is loaded by the BIOS and can be updated by the OS.
-It's not _super_ different conceptually than SGX XuCode.
+Kernel use of FPU from (soft) IRQ context is required to check irq_fpu_usable()
+(e.g. via may_use_simd()), i.e. calling fpregs_lock() protects against the kernel
+using the FPU and thus setting TIF_NEED_FPU_LOAD.
 
-The main thing that makes the TDX module _not_ CPU microcode is that
-it's managed completely separately and there's almost no connection
-between this:
-
-	/sys/devices/system/cpu/cpu*/microcode/version
-
-and the TDX module version.
-
-Since there's a dearth of discussion of this topic in the changelog or
-cover letter, my working assumption is that Chao did not consider any of
-this before posting.
+The WARN in kernel_fpu_begin_mask() is purely a sanity check to help detect and
+debug buggy users.
 
