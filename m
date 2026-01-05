@@ -1,116 +1,142 @@
-Return-Path: <kvm+bounces-67055-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DCDCF44A1
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 16:04:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10672CF4A0F
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 17:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C2D48300A3F5
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 15:04:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2B2BC301DE2C
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 16:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587042EC0AE;
-	Mon,  5 Jan 2026 15:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3536732E736;
+	Mon,  5 Jan 2026 15:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ek6JXvFh"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WQPb3Zlz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05942367AC
-	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 15:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C353093DF;
+	Mon,  5 Jan 2026 15:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767625462; cv=none; b=BKrU2/+O9p2wMeLMVvl7S3s7HHQkeZqVMDGWB5W7d271lqE/vApItkF5yUwIUGntmCelS/S1Tqoxd8zBDLGOJ2bzxTorsowcCnRcxDfnqNsRhtgjEQABRUayYZmBMqC/z21GReGXU0FC7CeOssYJVO+aB5unyeaLOqDOCUrn4L4=
+	t=1767628021; cv=none; b=AR3E9hK6vhkOTMufwFji+InGIh8QMDbGUfo2OkB9NcSa9sm33pvpnkehtCU/IhF/L7RxaUsPvbzoVfltkmubuwAGKV/pjcboDyaCNTs8YSTZefI3ndx9/+z1NJr4GNmqlNa+uZBOqmHBq9SjEEDWAC9ceJpS3mtAVbzErma7Zsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767625462; c=relaxed/simple;
-	bh=X5MIHAp5JK1NlV89p7C9v/3gPK3omfO9gWSPtLvKdYU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FAhnTBtM8hgPaHMwE8oDbzQjVOlYFxsO/5XT3FqK+IBEiPnfAMOTVjex6nQXRpHDNCH08ijxl12OcyBzUtMAgMxO10r7ZKYHHcKn6AvZOX3TZzTeTFzCBoY1AI8sBGiT3H91YCa67AFM6Ro3uPlwOVVfxtEJhAF+jR+ED4fpfWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ek6JXvFh; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8bc53dae8c2so2157099085a.2
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 07:04:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1767625460; x=1768230260; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yb2yGX8XpVdwAg+BOMxHsU4DTiVLYDcQfLOceevAzvY=;
-        b=Ek6JXvFhePFfs9uW2hC4xuuriHVSbC+G0qNrnuWpsGEOHoPTIuzqwYFpcMGgBitvT2
-         ++w99S1nbZB/5DbxrVBTR9S48B8Ebhur1It08J9j0fuZ/R+dq1l7HwVyIeTwaz0scHAn
-         PRVpYVYEFO9yJe463RQZMRptIhid178185YflpFPJ0ZJjTffDrYpRmERo23KZ7qfTchL
-         PmJUjzhD4uMtnMnVmKQHNFiwkpGz0fRymu4ZgE4u31vy3Vj7K0xlTIvdyHDzOEEGtFoC
-         fcj38uRIMyFSinpGVevGBpNOysoJ42gXbmCbqbJWBGlxqQwG8WgWmJU3M0AvzREUBC1m
-         ztzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767625460; x=1768230260;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Yb2yGX8XpVdwAg+BOMxHsU4DTiVLYDcQfLOceevAzvY=;
-        b=CCu1ONJDPtsUA0GsTWT2V4PdvasWniqmdHQn+aoYfF/lHXvAH3zl/damAL/A70APpV
-         6VmvrQwulSXJon33RuG31fM4v6twV/oJOoNdGkRzEfL9tWIgtzGz/HO8/5MMVT/Xhcn3
-         EuGCENYPZmwOFHq3HTfuVhSJjj/MUv8m3lNfGLQ7UN5Px4PP+bWhN83z9PFw0TO/9eTq
-         kj/D72/TGFQdbTnqPQGTweK0teF2a88OxSfmJaDpUcRG1flY9nSBp5zS5U53feMAseiJ
-         utmPzJTobrLn10AeBhoJH8KEOg52KzRgiu6a0RAhCBLXRSm6X3y3jpsUN3pLmD96kxoF
-         FVhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXbsj1528zUDYKJoV9TalIsCIKyz0ZQ3LuN6R9g0JdXrTm8s1dtgMaQJuLA+g4xNwYuRaE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYk3eR67fMyT6w8gHNeqQNK/j492tHyrPRwK6JTdecKd3AVFAg
-	3K/AfKEfuEzqXV3DNYZlTlZljhwiakagBXWA6YAwCMp8fS8/qBreCKyKrLVNwtp4GQg=
-X-Gm-Gg: AY/fxX7m91D+VvI+3S+qO6+Bn9GyN7znUS1FYtgq8MNAkZV6PnS5+BLVlt+OOFCzACd
-	R02u9aYt5ld/EpChK4AydzstCZ4h1pImUgAnsvt2epc84Vswc/W5K0EEVZpqOmqOnRcrLdS+fga
-	dBG/e6cDCk3wEaYkLjFRjG3kvRtdxAEIomm+wVLPCoRpCyaj+fwuD1863oIQ11Pq873kKTeF5i8
-	GYYfyoCc1g10CPBMEJ7FFQ4J7dyzsno87HJUYwozWig5K6y3qIpOUwRAcKBRk8vK1JVbIzk95mh
-	pDU4t1g59zTlOjGsk9/If7PR5Jkgzr0Y4xaGtupkqJHWxZOAFEEefJUeFGJBJAeqY8DRcnjoCh8
-	T2bqZSBkLth+StyfG515yHErC9Ly1ov9/dxhjKTUeQkqKfpRsO5/BxDDcx5JWQC7ZMFluifFNUE
-	pihc7ReowGxf8gOLJtAg9IPSQ7DhRfkTV+OMwCdvMAj8sWasbMEQDOWlXtOn0n/Br2NS4=
-X-Google-Smtp-Source: AGHT+IE0KSB9dzoXLvYDNi/2QizYzBYbxFHcrGMTg8rYaX5btB81fEkojeSpnken2msWHtKygqw6qA==
-X-Received: by 2002:a05:620a:1789:b0:8b2:7290:27da with SMTP id af79cd13be357-8c08fa9bf01mr7773575785a.12.1767625459349;
-        Mon, 05 Jan 2026 07:04:19 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c09689153asm3620440885a.17.2026.01.05.07.04.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 07:04:18 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vcm81-00000001AVB-0TCK;
-	Mon, 05 Jan 2026 11:04:17 -0400
-Date: Mon, 5 Jan 2026 11:04:17 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Julia Lawall <Julia.Lawall@inria.fr>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, yunbolyu@smu.edu.sg,
-	kexinsun@smail.nju.edu.cn, ratnadiraw@smu.edu.sg,
-	xutong.ma@inria.fr, Alex Williamson <alex@shazbot.org>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio/mdev: update outdated comment
-Message-ID: <20260105150417.GE125261@ziepe.ca>
-References: <20251230164113.102604-1-Julia.Lawall@inria.fr>
+	s=arc-20240116; t=1767628021; c=relaxed/simple;
+	bh=BmhWnRdV1//W+yz/prpbZpVqO6K2wh5PgjWlBcxE/s0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=l6TEPYSdkIL8Bal9XFvuk8DCd1sTvWJ7x8bzW5dx4MXLiYUmJvQsSJiGkm6pG5wE1gwiPCYPjEgi08bXa+I8hEjdLXVqQbHvFtW6Lb2wyOn32+GtgxiUMD6y0z4qzkalxARhidGEvpAiOfRLe7F/sV6i42HtVbKp/tyeVmplfCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WQPb3Zlz; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 605EC86A023995;
+	Mon, 5 Jan 2026 15:46:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=BmhWnR
+	dV1//W+yz/prpbZpVqO6K2wh5PgjWlBcxE/s0=; b=WQPb3ZlzOePhJ21xLsFHQP
+	d3FLDjNyvEBiI56XMBKhLuGzj8vzRwu4wfMKx6AxKBD2nLOH+sibjO7DGKIoERxc
+	0PqCtb3a7t7XnRmaDWVbK/Jeff0kl/uWa8UeisVjSRQI+uihnUAxsR43flSF2TiT
+	rFL4JHauUc+DsQpvSQJlAiaNB6hAwSDn0FTDLxX9nUvHXSL/310W4FBwAOErUcH/
+	pJEfOFCqtI0ZSTvgkpfta0LBpOSzwBWgESyDn6VpaYCBelScm56W1Ko0LQ4GI78S
+	Fnp+GwpcZF/QoEEpdT5Jur7J2wNdMHNgQnyL3TWgy1mGK9yGUVgPMxTL4Gts8k0Q
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4betm700g9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Jan 2026 15:46:57 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 605E21if014511;
+	Mon, 5 Jan 2026 15:46:56 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4bfeempk7q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Jan 2026 15:46:56 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 605FksrQ33555120
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 5 Jan 2026 15:46:54 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A277458062;
+	Mon,  5 Jan 2026 15:46:54 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DDF8158054;
+	Mon,  5 Jan 2026 15:46:53 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.132.176])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  5 Jan 2026 15:46:53 +0000 (GMT)
+Message-ID: <f34d767b2a56fb26526566e43fa355235ee53932.camel@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: vsie: retry SIE when unable to get vsie_page
+From: Eric Farman <farman@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger
+	 <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand
+	 <david@kernel.org>,
+        Christoph Schlameuss <schlameuss@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Date: Mon, 05 Jan 2026 10:46:53 -0500
+In-Reply-To: <8334988f-2caa-4361-b0b9-50b9f41f6d8a@linux.ibm.com>
+References: <20251217030107.1729776-1-farman@linux.ibm.com>
+	 <8334988f-2caa-4361-b0b9-50b9f41f6d8a@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251230164113.102604-1-Julia.Lawall@inria.fr>
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=OdmVzxTY c=1 sm=1 tr=0 ts=695bdcf1 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VnNF1IyMAAAA:8 a=z8VN1rYgAN99UVL_zB0A:9 a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: fge0qkrr_gzHPYucxGm1UQxwC_FWEqth
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA1MDEzOCBTYWx0ZWRfX/eJi50nVy0nn
+ 0vDas1ofd2fy0/N1Q7FTxEixo/nPoGx9f9QWqCVsc0cHpxUvwLwVTxOVsz80WxXN766jBi7S/zp
+ nvMSZClT+aayQcNSfLPvhzediU4AfUpsd8PDyHVr6v0hkwbacrkLSUBaEf8YZ/FySYcH0OVRYkh
+ 037I2IEuPKmwG6kEeZ6xU/hhcIyyZL78wMLwnT3LFx9BVq95uaUwqHMRRo5v8xFqTzvgY5SD50M
+ JSjXhskd9aXQiUrexHejCdfgL0htWgjVTazyRmrXJeckpNMWvzK+R/bzcbW5b+kQYqY+PNK3C4I
+ crbpNE1FaRrdZzsAd6DQDjVGhjkZmyb+Z76t7mQz4hOhaVo45omdk5MgPdS3FBQtOv0UcMPtkBK
+ BDXYYF8GyZtS+n2ysIhJ+RCb2bjoNlQQuHTupyMXfi6420L0HqvIyFnASRD2h7mOAAyhz1cLONC
+ pC84JxmmuaShf+FqlNw==
+X-Proofpoint-ORIG-GUID: fge0qkrr_gzHPYucxGm1UQxwC_FWEqth
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-05_01,2026-01-05_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015 phishscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 bulkscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
+ definitions=main-2601050138
 
-On Tue, Dec 30, 2025 at 05:41:13PM +0100, Julia Lawall wrote:
-> The function add_mdev_supported_type() was renamed mdev_type_add() in
-> commit da44c340c4fe ("vfio/mdev: simplify mdev_type handling").
-> Update the comment accordingly.
-> 
-> Note that just as mdev_type_release() now states that its put pairs
-> with the get in mdev_type_add(), mdev_type_add() already stated that
-> its get pairs with the put in mdev_type_release().
-> 
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
-> 
-> ---
->  drivers/vfio/mdev/mdev_sysfs.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, 2026-01-05 at 13:41 +0100, Janosch Frank wrote:
+> On 12/17/25 04:01, Eric Farman wrote:
+> > SIE may exit because of pending host work, such as handling an interrup=
+t,
+> > in which case VSIE rewinds the guest PSW such that it is transparently
+> > resumed (see Fixes tag). There is still one scenario where those condit=
+ions
+> > are not present, but that the VSIE processor returns with effectively r=
+c=3D0,
+> > resulting in additional (and unnecessary) guest work to be performed.
+> >=20
+> > For this case, rewind the guest PSW as we do in the other non-error exi=
+ts.
+> >=20
+> > Fixes: 33a729a1770b ("KVM: s390: vsie: retry SIE instruction on host in=
+tercepts")
+> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>=20
+> This is purely cosmetic to have all instances look the same, right?
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
+Nope, I can take this path with particularly high I/O loads on the system, =
+which ends up
+(incorrectly) sending the intercept to the guest.
 
