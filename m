@@ -1,150 +1,164 @@
-Return-Path: <kvm+bounces-66991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-66992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 857F7CF10D2
-	for <lists+kvm@lfdr.de>; Sun, 04 Jan 2026 15:00:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A433CF1CB4
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 05:31:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8AACB3002D38
-	for <lists+kvm@lfdr.de>; Sun,  4 Jan 2026 14:00:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86B50301C966
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 04:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FA819D092;
-	Sun,  4 Jan 2026 14:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCAE31E0F0;
+	Mon,  5 Jan 2026 04:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwd2jAOx"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="RlTmTypw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B072AE99
-	for <kvm@vger.kernel.org>; Sun,  4 Jan 2026 14:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9E39475
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 04:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767535221; cv=none; b=TYsR2QgCzqPoeeg3UowI+GsJvy+60MxuYWUzCP7eF9mVefoBpOPPVG0lZ9njtKAsfHbj4LzJTEOCw85yNfAYcNkdYCHG8Ikm5gF031K1UfzyyqyEqOGS/ggUR50P1An+sQjlGRNfahD2zUWorjhNeYzc0rQBNfqADzD40PrPVco=
+	t=1767587496; cv=none; b=gUgWXBrxESQOS8G1YY/pn3Tv3MCRrAqskANZNuPMhuMdr7yH9tBUOQRLAmu9t8bIliiVC8mU1vCy5JDSdBFDMS6rz23dh8lyUVH9VIw2fUYQkSO154U5Z6FJb03Ea0Ws08O/ivqMkyrirn/jTDYM35/LCUztIBIEeQ5rkiF6p3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767535221; c=relaxed/simple;
-	bh=smLKmAbNA+Lg2DxKtUMzNvxFdylFJ6K1oRlbE5gn/dA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MyIdqgLP4YyQy9iSq6p1QnzxDW2yWfGnkpOD7fXo+GgPNrFNCR3EPDFe3a26QlUw/8lWRusURQNcJFC6iGTxcZfofDK+y+whVcmvb3ouBgBPLkSXad8bIG5gJjedoH95iMqQG3kRa/Hzx0yq0ua2gGRne6PrcIwL3Tvu3CPCKkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hwd2jAOx; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a0bb2f093aso133559685ad.3
-        for <kvm@vger.kernel.org>; Sun, 04 Jan 2026 06:00:19 -0800 (PST)
+	s=arc-20240116; t=1767587496; c=relaxed/simple;
+	bh=ph9kgKoINr+xGyytnY9DWI55g7EFaU92zz1Ps7T0tfA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p1K2+Ddf1bUMshsVtmcVME3bJbyVgNgtRQZRHWD8GlQ5SL3RMISLAp1CeQejbqCEE6SaetEmtV1q6dDZiFbQT4bAL8Wbt5YOMzsEg63HZP1o3dswdQbGBI1RgoenFEcX6reoRhBgDjzwiQROItviZIFHFfUS5JHmz92Hs+DKTCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=RlTmTypw; arc=none smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-657464a9010so5174515eaf.3
+        for <kvm@vger.kernel.org>; Sun, 04 Jan 2026 20:31:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767535219; x=1768140019; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1767587493; x=1768192293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qqmQmaFNmFjEy7S54wIHblwNMJ9e6UGwg3T65EY/Hjg=;
-        b=hwd2jAOxW2xI41oyKa1XRrSNjRbA/Y/Vlo5XdM9e0RSYwP3h4R8K50TU1sbNfDOKnu
-         +D+exPSq0RT0Eq2Bn8MOOjvD2icR1kOOaIMQe5b3VgbzJbHyF6WLzJtY1Sj7kSFh3/gl
-         qnf9KdkaX6TqTGCv15TUTS1Zf2U5VQgs5zPMMV6ThS0Ut+JXWHoXSrOGqmu2QC0Vdjdy
-         uHQKned6gexHGgF311kyycSgqSdpRrxlGadAXL5lK6ZOcXefa2Mq2iSdZHYS7Wno17GU
-         CRXVY+4+WeyQnbfAtXzn4ndTxbBL/b/z/3Qt1Aa2HUtjvFXjjo50/H5IMfSphw9F5kNa
-         NYYQ==
+        bh=ZXRh45S0E1wg+SbwJvRj0sTfGM+6MbGGitqWTepWxqA=;
+        b=RlTmTypwWpuebS8emgm8y0XT9qD4y05/H9c1Fvk9f3qNM7VqVQyayaAzTROZtq2UUx
+         wIAiRHix/To7xaiCvYSfPFUlce/NlRQ1/tDbWY3waAJ74HqUkAbqyFs7/943wDf3cnPd
+         9761JvRuPlCxaeqfCDgX8K75JBZplCKH8hpPrClqPg1YraHbmHmDidB1nBTc3BNu8YJA
+         /KmhyZFy+Q0Guda7ikWdra83QfwZn0/MXqTgKFP7+M06FAC5tXhwK3/MYope85UvS2Wz
+         z1Gknubzvjo5/XDgpNvlajowY/vTGdUkdcrIvgW7o/YAeajPncspKTWSgkJ+xu/Cdc6u
+         cuLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767535219; x=1768140019;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1767587493; x=1768192293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=qqmQmaFNmFjEy7S54wIHblwNMJ9e6UGwg3T65EY/Hjg=;
-        b=ZqxZPul3IdnkkcVnNFpR/XaE4TU7THtAKfyy+5f0Wr3SdSgZ2qceo5fbcSzF1NSJYm
-         3WcTyZNGD5+5/4/LTO3ebvQvq+u22OAHrr69bbuBhWpF3EpTGjYnYWQUYKqfKyZFOWZa
-         xR7jCKE1urXPm4XXxZPQmDP1GBHJzfqa5IIhk9DeT6Ys36aQggTArftWVrVF7fgM5puR
-         VYGSk0ni5zyF7urQ1rm8HMjPmy2C/GAh6+bhCGHg0xszZ0UNuH4fXnVj8ysDuhfhSOGx
-         iYbSDU8M3ftwvCpYz2RqVn1mpfbxeb7qI/PnEtWU1WzHAN2tU9pKlUrAtqoWOGQG62xl
-         cbXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpJJkB4IMmQot6+AtMaEzGpiO2sEIIsT5tf4imaguV7X3VrTX2TRpG47J1rWaiZens6ks=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3sfhkOd5kkfqCDZf63Yd03k0JnGyG1Uo3GEbJqLpOPXvNJ1Y9
-	vARYCg7N5XdRpGi8SnSA+GK1bSLa+Hq2Na2Y6arUA9dCnlr3r0E8ElL6
-X-Gm-Gg: AY/fxX5GpwBLfwWCMr0fgJx/L1V7QM2WGCZBZP5t4DzAPJUUpbORL8TLlZmwAvoIjGo
-	IfIJ9rFjOBXziA2/sTkMh0ZRu6zR4SSk/if1DLWpgH5h3aynRAURLUNR7FinvMZx1jdmiv9U8+G
-	WgQCwdChQNBfxyBVDAbRjfTsdzLHqE7QNXAPQVZQaUBC3L/W7PxyiPfTWVPn3KnSna1RMD2rfB7
-	r0QPnFKcq6SZbCED1gXB4SVgMCUluru/sQJXZZCJuSL/TJGeJsWy+YEuMHtWMHLASW+XDten20i
-	jhynU5s4hZHsuf3Vgpgd0PCPMes34UAQwqBArbBRXfe9FTtFUK4uQebIIIwaTBcr7EiAXBJLIsU
-	lEci0WBeSBzDL3v38SuOdY5lg6MXXRJwLK23HOqd/rM1gu0kDWqrupLi2ysPoiTIT0c0tz+WKve
-	cYtQCcvC2FfQixHcUTpD8vGRpzcUHwUBIrpLq0tPUVUZPIosKksAsdwJ9/dR5p4mWl
-X-Google-Smtp-Source: AGHT+IFF0zPQhAdEGQIhG511RClUe4pVQFBGTYZnIh7qDrj28ymiDIGxnpivMIor8szJu6tv6fbZ2A==
-X-Received: by 2002:a17:902:f546:b0:2a0:c84f:412c with SMTP id d9443c01a7336-2a2f2a3be72mr478366475ad.57.1767535219101;
-        Sun, 04 Jan 2026 06:00:19 -0800 (PST)
-Received: from localhost.localdomain (g163-131-201-140.scn-net.ne.jp. [163.131.201.140])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d4cb25sm432327535ad.56.2026.01.04.06.00.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 06:00:18 -0800 (PST)
-From: Naohiko Shimizu <naohiko.shimizu@gmail.com>
-To: pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu
-Cc: alex@ghiti.fr,
-	anup@brainfault.org,
-	atish.patra@linux.dev,
-	daniel.lezcano@linaro.org,
-	tglx@linutronix.de,
-	nick.hu@sifive.com,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Naohiko Shimizu <naohiko.shimizu@gmail.com>
-Subject: [PATCH v3 3/3] riscv: suspend: Fix stimecmp update hazard on RV32
-Date: Sun,  4 Jan 2026 22:59:38 +0900
-Message-Id: <20260104135938.524-4-naohiko.shimizu@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260104135938.524-1-naohiko.shimizu@gmail.com>
-References: <20260104135938.524-1-naohiko.shimizu@gmail.com>
+        bh=ZXRh45S0E1wg+SbwJvRj0sTfGM+6MbGGitqWTepWxqA=;
+        b=lfnrIuflaaq9wmw5A6YKPjq6xBPoHQD4WaV8badrT0L5To2yQtKjD8cei8erVaAMtB
+         1MTVwmvrSBE0vTqdxGCqXHn1KJV/qY/VFQSS8iIU48DUr89LX6DlxxW6lAlnqnuiXCnO
+         hHPHHwBezBsKNRQlCkXxgT90l+4NtTe9DTbwIZAiRqanasqqUdcDlZBl3jXzLyVYGNVt
+         dIDRS6nLau2elzQh4uTAZO1O4K8I8vLD/5JpCE3djx09PwqSu8ghdvIH8dxwbdGY6gCd
+         Qeerlvl+VDAY0RW5K6csIYWlF9T/0/xZ8BTFIeL8RC+TLXST5BNjRP+Hf1LjN/Oq6Xn+
+         /mcg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMv8TesAFg5ozFrEFS6ccR1aw2Y0hEF3y8XLjNB5mkN67JxMlKCAGhdtSsoBNjMFfnki4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5vAE3bW/f3V/8qKpBgZmkp2tTBZSxesBPz1clwaj+ese9qzOt
+	va//QFzLp4O6SR2BTey8jDBYCtf4/uvf7dBowYh5XD3dzAi1JXq2cZqiIXEP6qT2Iyy40Lf3lUU
+	NvvgqlawpizitN10v8Q6v7Tf81TSK2hOxPiZz30S4gg==
+X-Gm-Gg: AY/fxX6EkmhWS5I7iSWOVvW2890ui+7EDCTpxmILiHFOK8dC2t0gf9YlZ4Dk+ctjHrZ
+	WdHHxcnrUcGYRDZOo2tCjUgjx9d40yeOqZhvVJMpNZ45C4JcAKibQ5zoAqZQnPDuZOnJhum4uv1
+	vqDkD7wJjcrJAYXL7A7GlhckuWUcZEMZJK0nV0i+nrce7FgJVXsGctUzfANkRKSr1LH7NHhKGnu
+	tlLRB7JyokBS4auoLnW9qRSaqzfSLtOKorFsdUUvmd/PaKQU4OY0B0Q8FQKcVRspC/5uvABer1t
+	xiQUdAC/JhVK4+1dw7dqe7KhOVRM4/7wyyP/IIxMw5KUoDQXqnz69n8Wjkkpqmg/Nl+j
+X-Google-Smtp-Source: AGHT+IEwkcDRlFymm0SPcnTgEwcBBNPUXBq54o6AH1iKbZWNrVdE8TDy/EhnihwLQhHoswrfeUq7eC4nfF3TU8/lvoI=
+X-Received: by 2002:a4a:dcc8:0:b0:65d:7e5:d49d with SMTP id
+ 006d021491bc7-65d0eade78cmr16123734eaf.72.1767587493534; Sun, 04 Jan 2026
+ 20:31:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260104135938.524-1-naohiko.shimizu@gmail.com> <20260104135938.524-3-naohiko.shimizu@gmail.com>
+In-Reply-To: <20260104135938.524-3-naohiko.shimizu@gmail.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 5 Jan 2026 10:01:22 +0530
+X-Gm-Features: AQt7F2oifOmggNLxX3Gj-6EJLO4qsWCjAuonxgnVcRqV8UojPRmnf2HWnXWgnm4
+Message-ID: <CAAhSdy2rH5Jt5t7zCRfFd5d1X7qG41QoUuWvKgwuKX=X3Wk6cA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] riscv: kvm: Fix vstimecmp update hazard on RV32
+To: Naohiko Shimizu <naohiko.shimizu@gmail.com>
+Cc: pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
+	atish.patra@linux.dev, daniel.lezcano@linaro.org, tglx@linutronix.de, 
+	nick.hu@sifive.com, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On RV32, updating the 64-bit stimecmp (or vstimecmp) CSR requires two
-separate 32-bit writes. A race condition exists if the timer triggers
-during these two writes.
+On Sun, Jan 4, 2026 at 7:30=E2=80=AFPM Naohiko Shimizu
+<naohiko.shimizu@gmail.com> wrote:
+>
+> On RV32, updating the 64-bit stimecmp (or vstimecmp) CSR requires two
+> separate 32-bit writes. A race condition exists if the timer triggers
+> during these two writes.
+>
+> The RISC-V Privileged Specification (e.g., Section 3.2.1 for mtimecmp)
+> recommends a specific 3-step sequence to avoid spurious interrupts
+> when updating 64-bit comparison registers on 32-bit systems:
+>
+> 1. Set the low-order bits (stimecmp) to all ones (ULONG_MAX).
+> 2. Set the high-order bits (stimecmph) to the desired value.
+> 3. Set the low-order bits (stimecmp) to the desired value.
+>
+> Current implementation writes the LSB first without ensuring a future
+> value, which may lead to a transient state where the 64-bit comparison
+> is incorrectly evaluated as "expired" by the hardware. This results in
+> spurious timer interrupts.
+>
+> This patch adopts the spec-recommended 3-step sequence to ensure the
+> intermediate 64-bit state is never smaller than the current time.
+>
+> Fixes: 8f5cb44b1bae ("RISC-V: KVM: Support sstc extension")
+> Signed-off-by: Naohiko Shimizu <naohiko.shimizu@gmail.com>
 
-The RISC-V Privileged Specification (e.g., Section 3.2.1 for mtimecmp)
-recommends a specific 3-step sequence to avoid spurious interrupts
-when updating 64-bit comparison registers on 32-bit systems:
+LGTM.
 
-1. Set the low-order bits (stimecmp) to all ones (ULONG_MAX).
-2. Set the high-order bits (stimecmph) to the desired value.
-3. Set the low-order bits (stimecmp) to the desired value.
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
-Current implementation writes the LSB first without ensuring a future
-value, which may lead to a transient state where the 64-bit comparison
-is incorrectly evaluated as "expired" by the hardware. This results in
-spurious timer interrupts.
+Queued this as fixes for Linux-6.19.
 
-This patch adopts the spec-recommended 3-step sequence to ensure the
-intermediate 64-bit state is never smaller than the current time.
+Thanks,
+Anup
 
-Fixes: ffef54ad4110 ("riscv: Add stimecmp save and restore")
-Signed-off-by: Naohiko Shimizu <naohiko.shimizu@gmail.com>
----
- arch/riscv/kernel/suspend.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/riscv/kernel/suspend.c b/arch/riscv/kernel/suspend.c
-index 24b3f57d467f..aff93090c4ef 100644
---- a/arch/riscv/kernel/suspend.c
-+++ b/arch/riscv/kernel/suspend.c
-@@ -51,10 +51,11 @@ void suspend_restore_csrs(struct suspend_context *context)
- 
- #ifdef CONFIG_MMU
- 	if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SSTC)) {
--		csr_write(CSR_STIMECMP, context->stimecmp);
- #if __riscv_xlen < 64
-+		csr_write(CSR_STIMECMP, ULONG_MAX);
- 		csr_write(CSR_STIMECMPH, context->stimecmph);
- #endif
-+		csr_write(CSR_STIMECMP, context->stimecmp);
- 	}
- 
- 	csr_write(CSR_SATP, context->satp);
--- 
-2.39.5
-
+> ---
+>  arch/riscv/kvm/vcpu_timer.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
+> index 85a7262115e1..f36247e4c783 100644
+> --- a/arch/riscv/kvm/vcpu_timer.c
+> +++ b/arch/riscv/kvm/vcpu_timer.c
+> @@ -72,8 +72,9 @@ static int kvm_riscv_vcpu_timer_cancel(struct kvm_vcpu_=
+timer *t)
+>  static int kvm_riscv_vcpu_update_vstimecmp(struct kvm_vcpu *vcpu, u64 nc=
+ycles)
+>  {
+>  #if defined(CONFIG_32BIT)
+> -       ncsr_write(CSR_VSTIMECMP, ncycles & 0xFFFFFFFF);
+> +       ncsr_write(CSR_VSTIMECMP,  ULONG_MAX);
+>         ncsr_write(CSR_VSTIMECMPH, ncycles >> 32);
+> +       ncsr_write(CSR_VSTIMECMP, (u32)ncycles);
+>  #else
+>         ncsr_write(CSR_VSTIMECMP, ncycles);
+>  #endif
+> @@ -307,8 +308,9 @@ void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vc=
+pu)
+>                 return;
+>
+>  #if defined(CONFIG_32BIT)
+> -       ncsr_write(CSR_VSTIMECMP, (u32)t->next_cycles);
+> +       ncsr_write(CSR_VSTIMECMP, ULONG_MAX);
+>         ncsr_write(CSR_VSTIMECMPH, (u32)(t->next_cycles >> 32));
+> +       ncsr_write(CSR_VSTIMECMP, (u32)(t->next_cycles));
+>  #else
+>         ncsr_write(CSR_VSTIMECMP, t->next_cycles);
+>  #endif
+> --
+> 2.39.5
+>
 
