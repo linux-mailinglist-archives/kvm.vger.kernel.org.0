@@ -1,168 +1,183 @@
-Return-Path: <kvm+bounces-67013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A4E1CF244C
-	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 08:50:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5691FCF25EB
+	for <lists+kvm@lfdr.de>; Mon, 05 Jan 2026 09:23:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBA65303A1BE
-	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 07:48:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2114C3003531
+	for <lists+kvm@lfdr.de>; Mon,  5 Jan 2026 08:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FC22D8793;
-	Mon,  5 Jan 2026 07:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2894A313E09;
+	Mon,  5 Jan 2026 08:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="CD5nQ3xL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVpQPRID";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFnAwaAK"
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-195.mail.aliyun.com (out28-195.mail.aliyun.com [115.124.28.195])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA58BA59;
-	Mon,  5 Jan 2026 07:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4093E31064A
+	for <kvm@vger.kernel.org>; Mon,  5 Jan 2026 08:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767599312; cv=none; b=MQfekedpOmHp7Het63WHqWA7TcXIdhWiAO9kKfb+S1LaU5ylmqSCAjvc10RpZwttVVEJ+le/+5DNqiXYKcIu9nejjESG3Pm4GpgUNWUrirng4XWQLuL8gMXIYwK18Yr+Ex/ZAnqngk8b6XZh/0setKMK/JArzPi90n030c3FC9g=
+	t=1767601380; cv=none; b=B+XFRMAUWSYKncr9XlujyPczdKEwDam5ah1MnJKZ/51PyBa+qGS2J1LvIrLGV5lC0OI8KPjsMeQVmsD1f8fCLkzEalgzA6mae/TrUGn1o7Fu1kyL3myBXqpGblO4Q+lEZnn3yiJelu7Dz44u56lI4nXzq/Y3aVcs+HdVpdvf+pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767599312; c=relaxed/simple;
-	bh=xxdTQLUipXjsBIBt7dai4U8wy/0oeFSdPPypmm2ve60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tU1Z7liI1j22EEM1NIw8U/WfPn0GHYDTMF0JujGKc526g54OVX17jWnvrPRhrIxoUehhpZsFpbey6RKfNyyhc2gMhQ5hEZrjLMeFjjivNDFwxEHLutrVVz6IrU6HwlWDOMIY3hLPZQhMy324aoT7S7Df4B2YV6ezzR8Gzar1Z1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=CD5nQ3xL; arc=none smtp.client-ip=115.124.28.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1767599296; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=W+7K4RRtGsjInJRd4sOSc25Od1aDGNjLovyLLXZZnAM=;
-	b=CD5nQ3xLwAiDzlmwjeRzJCUBKMF5AmAcIooIjW6OsmSS/aaAR5CPTM1miP2RRyaptdvNDpLhNQYYKMXxuJ6wseexck2/cBR2DyZVby+fUlfoyUiR6VakhTZT9jnde4yV38NHeGJ6xbHiFj+odsjuEvKI0YsxChvMJBTM+oWT4Ck=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.g-Bx46a_1767599294 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Jan 2026 15:48:15 +0800
-Date: Mon, 5 Jan 2026 15:48:14 +0800
-From: Hou Wenlong <houwenlong.hwl@antgroup.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
-	Anish Ghulati <aghulati@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	hpa@zytor.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	peterz@infradead.org, paulmck@kernel.org,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH 00/14] Support multiple KVM modules on the same host
-Message-ID: <20260105074814.GA10215@k08j02272.eu95sqa>
-References: <20231107202002.667900-1-aghulati@google.com>
- <CAJhGHyBtis3SkNZP8RSX5nKFcnQ4qvUrfTMD2RPc+w+Rzf30Zw@mail.gmail.com>
- <ZWYtDGH5p4RpGYBw@google.com>
+	s=arc-20240116; t=1767601380; c=relaxed/simple;
+	bh=1rF+5o+RxfvaZWaK/37ivP7Ic43xgdCjtd7a083Lyfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Nas3WRBmyvApbTyNTfcvqwNcjj/s/jNgDQg2Er2IfS4IADgT09IhIBpECK7L2/GUX6mycGZljF77iNwpZ+UMorNnAKE5cA81PQJJEH9ianWB0BoglWHkb8A9dW2BgoVwfqdwh0yCroEdG9Qhis3o3ei87X9SWouXR8GlHwpNdEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OVpQPRID; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aFnAwaAK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767601377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+	b=OVpQPRIDj5fXqBg9A/hP4xVzLw8MYfD0RyVh4Bk3mpjidMcWQVlxb6UWCkDP88f6dbWF3F
+	SvhRQ9LrJEXf8a4sePL5O5s/gicfHgSC7GHHwSCZoSo54sbVX2pEdbD1EQjHEf1CDNwLaQ
+	fzhYe/ROFifr2sDRbPyDY0j+oMXFN/U=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-6fr_u6vYPc-1pOvApwUVvQ-1; Mon, 05 Jan 2026 03:22:55 -0500
+X-MC-Unique: 6fr_u6vYPc-1pOvApwUVvQ-1
+X-Mimecast-MFC-AGG-ID: 6fr_u6vYPc-1pOvApwUVvQ_1767601375
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477b8a667bcso184528695e9.2
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 00:22:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767601374; x=1768206174; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+        b=aFnAwaAKLu7zAhMf+1ZJkNmIT145xhfGYevQ+uwx4Dua/sOWHk6GFH5sAFW7CCCMFZ
+         0cya9z65tmnNTyvX8ggutiwfatl5uHID38vuE/UmtJgcJ4jlVipRomZHHhHg4cIFInDR
+         6fxzl+4UMlWcfjaV+B80TtPV4bNU/SlsWfmvdpHWeonjuIye9gFLQHa5ezv0cGiFYn1M
+         uPIv55VhcCeX+mAns+hZrOKdH37ATwCzhEooCCd6oH/t8AoUlfs90mZBEvbeNgJbXLLq
+         GSSl7PCZXbESwGZq0n141aAGd5Eg/NVjFtyyDdOp5ijpOTk8+jF8eE6VPD6Wf6vrFLzF
+         aNPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767601374; x=1768206174;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+        b=wIDpSP23iOjJrT3nTltxNlxhS3b/HkYJXipUc4V9I+AZFHdY6w0Ppob+QMDaZ3ULE2
+         9bVslgo4tsbemnfHUZaLx26kCHUhspoKqZMBRRZRB3Apj8SyZyEYKKtH3Vc0uXrZWCQV
+         aqA51VifSdLumcHg8Ed/4nrbH2nEEBWT3ZLs8eHXhqF6PyEywelj3nIJ8JLh/eqjhJcg
+         qo7YTuXVcKRvVYTkjwpT++7rtCSf8smAicnev8kKGe3Bmkz8FtviUSpfs9u0/g2p/HhC
+         Xe+Xz0I3TNkk0lYPMvk3rDvFXS0hP1TXyipwXPT5JDZMp93/QLpHjy5aGPit3hEGSAs0
+         0pDg==
+X-Forwarded-Encrypted: i=1; AJvYcCWE6+djqBXXzsRCOc6Uwevw2JUfQhoBFCCgs8BXGDziXHVh4zD6fdfxgGNE4N2FWEB3/iU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcVIbzXXPYUIfsD5RnfXFA0ibUEdrnfejQWnmE17dK6hFo6sfq
+	vDRpNE0wLCr5tQvFp7GQf39ZQPCIpiz0CEvdOQgfmon1tfD4pJ1SbOZSxIRD/Q9ft+7ckN7UrJ+
+	hRbns9tTcyMq26ddIu+1i3mDHiKjxrEAMOqqpHjSs+WBBqeZSj7gO0A==
+X-Gm-Gg: AY/fxX4RRgFpWa/uymTOQ6kII+6BGvlPUTPSW05ZNu01hExcVYg0qQj2bHVz49JO90J
+	KSR/XIp45REOgsyFtEl7am0lFAREfd6ulQ9LCybPtcS25otjljKNh2Lsn39f0yWaRREoRoWF//8
+	F4WHNeKeI3qLe7+w5ary3WX+2EeY9++KJtmh6KEn3pmHijIxUtpEjIJSrSIkL/0lMH67OZRiJhi
+	QFGY7sjh86cVz6LyhaY/O+oBtSmjC/hQh72KqitoqgM4ZNH+EWhbcpqbb+pz8Ofq3qrvnYjL5ld
+	KPTlQXiSTVib153hlQzMtWeTP1eq646i4xPljTzNUqAsaKcueSMc1eOi/sJLV5BfBY9WARItLLr
+	pYxfUwdvKKo2qlQegoXHM3Y8SNaRiROlQdQ==
+X-Received: by 2002:a05:600c:4ed2:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47d1959eaaemr640737525e9.25.1767601374456;
+        Mon, 05 Jan 2026 00:22:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEXw2Pw2EoWGIJB0fy/EdgimCoNIlh1q5tf6OTMnGxG74FiSYxf17YyIIU15mHj+ck3a5eDtg==
+X-Received: by 2002:a05:600c:4ed2:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47d1959eaaemr640737005e9.25.1767601373905;
+        Mon, 05 Jan 2026 00:22:53 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6ba30531sm56554215e9.1.2026.01.05.00.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 00:22:53 -0800 (PST)
+Date: Mon, 5 Jan 2026 03:22:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 00/15] fix DMA aligment issues around virtio
+Message-ID: <cover.1767601130.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZWYtDGH5p4RpGYBw@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-On Tue, Nov 28, 2023 at 10:10:20AM -0800, Sean Christopherson wrote:
-> On Fri, Nov 17, 2023, Lai Jiangshan wrote:
-> > On Wed, Nov 8, 2023 at 4:20 AM Anish Ghulati <aghulati@google.com> wrote:
-> > >
-> > > This series is a rough, PoC-quality RFC to allow (un)loading and running
-> > > multiple KVM modules simultaneously on a single host, e.g. to deploy
-> > > fixes, mitigations, and/or new features without having to drain all VMs
-> > > from the host. Multi-KVM will also allow running the "same" KVM module
-> > > with different params, e.g. to run trusted VMs with different mitigations.
-> > >
-> > > The goal of this RFC is to get feedback on the idea itself and the
-> > > high-level approach.  In particular, we're looking for input on:
-> > >
-> > >  - Combining kvm_intel.ko and kvm_amd.ko into kvm.ko
-> > >  - Exposing multiple /dev/kvmX devices via Kconfig
-> > >  - The name and prefix of the new base module
-> > >
-> > > Feedback on individual patches is also welcome, but please keep in mind
-> > > that this is very much a work in-progress
-> > 
-> > Hello Anish
-> > 
-> > Scarce effort on multi-KVM can be seen in the mail list albeit many
-> > companies enable multi-KVM internally.
-> > 
-> > I'm glad that you took a big step in upstreaming it.  And I hope it
-> > can be materialized soon.
-> > 
-> > 
-> > >
-> > >  - Move system-wide virtualization resource management to a new base
-> > >    module to avoid collisions between different KVM modules, e.g. VPIDs
-> > >    and ASIDs need to be unique per VM, and callbacks from IRQ handlers need
-> > >    to be mediated so that things like PMIs get to the right KVM instance.
-> > 
-> > perf_register_guest_info_callbacks() also accesses to system-wide resources,
-> > but I don't see its relating code including kvm_guest_cbs being moved to AVC.
-> 
-> Yeah, that's on the TODO list.  IIRC, the plan is to have VAC register a single
-> callback with perf, and then have VAC deal with invoking the callback(s) for the
-> correct KVM instance.
-> 
-> > >  - Refactor KVM to make all upgradable assets visible only to KVM, i.e.
-> > >    make KVM a black box, so that the layout/size of things like "struct
-> > >    kvm_vcpu" isn't exposed to the kernel at-large.
-> > >
-> > >  - Fold kvm_intel.ko and kvm_amd.ko into kvm.ko to avoid complications
-> > >    having to generate unique symbols for every symbol exported by kvm.ko.
-> > 
-> > The sizes of kvm_intel.ko and kvm_amd.ko are big, and there
-> > is only 1G in the kernel available for modules. So I don't think folding
-> > two vendors' code into kvm.ko is a good idea.
-> > 
-> > Since the symbols in the new module are invisible outside, I recommend:
-> > new kvm_intel.ko = kvm_intel.ko + kvm.ko
-> > new kvm_amd.ko = kvm_amd.ko + kvm.ko
-> 
-> Yeah, Paolo also suggested this at LPC.
-> 
-> > >  - Add a Kconfig string to allow defining a device and module postfix at
-> > >    build time, e.g. to create kvmX.ko and /dev/kvmX.
-> > >
-> > > The proposed name of the new base module is vac.ko, a.k.a.
-> > > Virtualization Acceleration Code (Unupgradable Units Module). Childish
-> > > humor aside, "vac" is a unique name in the kernel and hopefully in x86
-> > > and hardware terminology, is a unique name in the kernel and hopefully
-> > > in x86 and hardware terminology, e.g. `git grep vac_` yields no hits in
-> > > the kernel. It also has the same number of characters as "kvm", e.g.
-> > > the namespace can be modified without needing whitespace adjustment if
-> > > we want to go that route.
-> > 
-> > How about the name kvm_base.ko?
-> > 
-> > And the variable/function name in it can still be kvm_foo (other than
-> > kvm_base_foo).
-> 
-> My preference is to have a unique name that allows us to differentitate between
-> the "base" module/code and KVM code.  Verbal conversations about all of this get
-> quite confusing because it's not always clear whether "base KVM" refers to what
-> is currently kvm.ko, or what would become kvm_base.ko/vac.ko.
->
-Hi, Sean and Anish.
 
-Sorry for revisiting this topic after a long time. I haven't seen any
-new updates regarding this topic/series, and I didn’t find any recent
-activity on the GitHub repository. Is the multi-KVM topic still being
-considered for upstreaming, or is there anything blocking this?
+Cong Wang reported dma debug warnings with virtio-vsock
+and proposed a patch, see:
 
-As Lai pointed out, we also have a similar multi-KVM implementation in
-our internal environment, so we are quite interested in this topic.
-Recently, when we upgraded our kernel version, we found that maintaining
-multi-KVM has become a significant burden. We are willing to move
-forward with it if multi-KVM is still accepted for upstream. So I look
-forward to feedback from the maintainers.
+https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
 
-From what I've seen, the recent patch set that enables VMX/SVM during
-booting is a good starting point for multi-KVM as well.
+however, the issue is more widespread.
+This is an attempt to fix it systematically.
+Note: i2c and gio might also be affected, I am still looking
+into it. Help from maintainers welcome.
+
+Lightly tested.  Cursor/claude used liberally, mostly for
+refactoring/API updates/English.
+
+DMA maintainers, could you please confirm the DMA core changes
+are ok with you?
 
 Thanks!
+
+
+Michael S. Tsirkin (15):
+  dma-mapping: add __dma_from_device_group_begin()/end()
+  docs: dma-api: document __dma_from_device_group_begin()/end()
+  dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+  docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+  dma-debug: track cache clean flag in entries
+  virtio: add virtqueue_add_inbuf_cache_clean API
+  vsock/virtio: fix DMA alignment for event_list
+  vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+  virtio_input: fix DMA alignment for evts
+  virtio_scsi: fix DMA cacheline issues for events
+  virtio-rng: fix DMA alignment for data buffer
+  virtio_input: use virtqueue_add_inbuf_cache_clean for events
+  vsock/virtio: reorder fields to reduce padding
+  gpio: virtio: fix DMA alignment
+  gpio: virtio: reorder fields to reduce struct padding
+
+ Documentation/core-api/dma-api-howto.rst  | 52 ++++++++++++++
+ Documentation/core-api/dma-attributes.rst |  9 +++
+ drivers/char/hw_random/virtio-rng.c       |  3 +
+ drivers/gpio/gpio-virtio.c                | 15 ++--
+ drivers/scsi/virtio_scsi.c                | 17 +++--
+ drivers/virtio/virtio_input.c             |  5 +-
+ drivers/virtio/virtio_ring.c              | 83 ++++++++++++++++-------
+ include/linux/dma-mapping.h               | 20 ++++++
+ include/linux/virtio.h                    |  5 ++
+ kernel/dma/debug.c                        | 28 ++++++--
+ net/vmw_vsock/virtio_transport.c          |  8 ++-
+ 11 files changed, 205 insertions(+), 40 deletions(-)
+
+-- 
+MST
+
 
