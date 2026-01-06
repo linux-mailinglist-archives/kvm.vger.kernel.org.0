@@ -1,148 +1,125 @@
-Return-Path: <kvm+bounces-67145-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67147-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56FECCF965B
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 17:39:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B57DBCF9712
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 17:48:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4C74301EC62
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 16:35:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 944F33028FFB
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 16:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E7427F724;
-	Tue,  6 Jan 2026 16:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15845337686;
+	Tue,  6 Jan 2026 16:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="EGe3wF3I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgh5MwyV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBEB139579
-	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 16:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7472EACEE;
+	Tue,  6 Jan 2026 16:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767717311; cv=none; b=bJ0Zr/ooB/NpZHbUEWXVsPY+8Zq7MPVCivY+9zGCOi/pD2OUo3g9A+FF/eLqzEYomHtzkClRzG4Y8J2p4LuJQ2p3iQASbOEtKrAKmJJSnjxUQoPxsqpsuTSggizX7UqFZkGr3ALroMl2727npOvPhT2JMCuoqwr0hpp6W1dqB9I=
+	t=1767717665; cv=none; b=LI9niz31aWNgfbZNX2Ask8S3jqr6+4R6JwXWG6JR7xvUJzflMGoeBJr6P430xsHWWdWqxfvLXrViXeL8DyrTgmvQMJ//FSpGp1JGzkf+2cc+l2TF85SwTLn3CaInvyLTp5it+wFwp39Y9cqJ9/+BAoC2WYyUZXRxL/MqQFoQb/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767717311; c=relaxed/simple;
-	bh=nHZN3WhshIL9tfcBxNee2eEsjokCfxiC2OJfBl0pXjk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sn/86oXiQuE8Z4X2gwnDsdTrVFOH1whU7h09fExDAOuMbZn+2vM0AdyhxIJRE8PRHmvchJLCcN0f/PyzeEloWhW7B38/LihATa5KwYjkKPZeNIt/txgO9uH8DuzU20J/kQ/fj0WHdhleyHYHuJCPldLsO4Dxf9N7fLB4VhotwSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=EGe3wF3I; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-65cfddebfd0so640061eaf.0
-        for <kvm@vger.kernel.org>; Tue, 06 Jan 2026 08:35:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1767717309; x=1768322109; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bNrz9UQpAZyojBAeX05y5M58klvOpfZIZjcce2E7lpQ=;
-        b=EGe3wF3ILWaL5d6NKaW8vAqYW1irxTJdf9fUOWnsb+CZB34suIPK8XwTpQNOhtZH8x
-         ke3NFMx9o6HbdJlhob+SrmTUXyKBsm3CFh4ZBDPfgI22NvSrMebLv0yz/kEvAgZJI0sW
-         pEQztpi0fJoFV2TnJrhlbFjfDgVZpR0hQiLX7tzMhdwqc23upLVGfsYVM+g4CQYN47db
-         DHgZtitqKGLtFgGfUrVks2Xs26GeZifXHXqOnB9BJI/oplfAqxZ1nIKMh9urQ9c4pkP5
-         rJl9OGzd5mzsOBgdwMT6Uq8LB82UQch7tAT/T1+hwaKRgSzFPkQTchro9f+qdJDjTNsV
-         H+IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767717309; x=1768322109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bNrz9UQpAZyojBAeX05y5M58klvOpfZIZjcce2E7lpQ=;
-        b=UEkmXVIfIVDGB7Qi6WxkoeUALn1ia71uATPgAKQgX4WKvf7TMNAwi6UxA+lSDag8rF
-         1NtjLZO4471xPXi60GPpTJGkBLr2LUVApCzA3LJiXI9lwnM7iqAdCoGdqzPAASZnUn+g
-         tG9Fj4zwTK5qEQbRAEcXLRoEzlZ2KXszHJgj32Yg73XGAF7APhTHaBGjN9W4Ik0Nf2EH
-         GzBcgr+oDuvTfZHQ2bWTuA0uC2pX1Qm5x5Rf5z8SG5n3YrXMs7k1FYSopouWRfc+TwLz
-         RkSsnrqsffEtVmRFtXsNMpSYWx3vg/F5KGNeUL9lXZg+zSpK3up2p+lMFYgu2O9j1x95
-         K1Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCX/0AF5Mi6rf2ubadqUdf1anDWww6iQPfkT+f6je1uOXyGmlD4l2oiHiQQoV5A6lhTSyxc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs8IYeCbSdODF+ek8do+yTiNHcwWab1m4gentd1mZfA9KB54kN
-	Blh1B05HNJTmByhob4aCV6woeaL6Icgz8wDHIK8IOOf4qCdIG5seHz9bw+XBPjjrzMvf/pEQjYL
-	JIqn8l7BZ0PujctHsoyxG6c6SHusOkoQhJJbd/LeRwQ==
-X-Gm-Gg: AY/fxX4h8t3afGBMFKtBP67/sDa7TLMkC9uVi29ONEdF8YAuI6MonAFbjsWLLWcN1D7
-	mT9mwBqQEJLoBdO39AsjMOXn9bPLSWOCpVbEAZUFQuNNigp2pEJqr0u9Cdj+hqQCrZQeootA5Bu
-	UouqVSKp/fgxBEuU5xZSdILI3yq/YnaEEBYXQCZ3nKZKUVGE+XdTr/Z4CPoRMLM68T9G0oUudq7
-	VCZc2ESgHGUzm3QL2Qj6FfWFuD8/fXjoD+9kmuMy/a6a5txjO6J76NJGFnRLqI28dUmmodo9KLK
-	N4XLhdiZKvWtFjMSadOOPovJAACy3YTu7lSjyqyBze+3w0Hsn66qjpoLeA==
-X-Google-Smtp-Source: AGHT+IEqXxTBeH3LP0fUVizISuCkdADz10TXUBGRVWD+OKCNI8kCKzHUOCYj5zq7rrrDTSe7deN3OOyJ+Sim2FJxOUk=
-X-Received: by 2002:a05:6820:4908:b0:65d:2f7:6eb5 with SMTP id
- 006d021491bc7-65f47a9ac10mr1471540eaf.66.1767717309018; Tue, 06 Jan 2026
- 08:35:09 -0800 (PST)
+	s=arc-20240116; t=1767717665; c=relaxed/simple;
+	bh=iYEeHk+9DnSGURMUeHt4qgmcIQTVl4/JW3coGdB0WE4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ocsSMKLC8Bpi/7gicpc4Aq38kdcdTYpXcxaFcAxDleMbpOBYHNsUuzHYYcTIQx03ugkVj2DBh5VKryIfmuVJ1sK07LPylIf4T8Y9skAWU6TgXXwpk39NV9Ks6Hk2juSF1bfsFTt2CUWDZoUfaP5pM60zFBEXXuGS00Lx5UBkGi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgh5MwyV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 459EBC16AAE;
+	Tue,  6 Jan 2026 16:41:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767717664;
+	bh=iYEeHk+9DnSGURMUeHt4qgmcIQTVl4/JW3coGdB0WE4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=kgh5MwyVHs4IkOtgvFOEPcihx+pynI1zJ20VujdRC50HFKB3rxahAAmuOMeD8Tnyr
+	 XBJIavPRit/wbyRPqgk4Qn525S1HcdnVkMXfoQfuqlkd2glyRHRmB94bhy0F2EAhCv
+	 wV55ipYKDcTLwFhthFcanqMtRj200e/n4Bqzq5ORJmlaq8TAVvFMNwdb+ej9sj+rbZ
+	 Ex1X3OPfBRjt/DWZPEDnZLjaKRhzIYOQXnhgP2/CfALKD+rxxW9NCBkuS8FnHi/U1a
+	 94CTWIoOt1a22jVClX46ikvIYle21evOulXcA8x5XnsIKYHPW27mLfvQaWsN4qhQ3+
+	 OPluFY5HTO3yw==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/5] KVM: selftests: arm64: Improve diagnostics from
+ set_id_regs
+Date: Tue, 06 Jan 2026 16:35:40 +0000
+Message-Id: <20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260106162848.22866-1-ben.dooks@codethink.co.uk>
-In-Reply-To: <20260106162848.22866-1-ben.dooks@codethink.co.uk>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 6 Jan 2026 22:04:55 +0530
-X-Gm-Features: AQt7F2om0UlRUlewDfBuWexms2k5z-xmHfO0JSMf-AgqjjVg_PjC4qOz0utW3LY
-Message-ID: <CAAhSdy1w485+mTNCmX+KgQVnLr5iyDyPLm5+w2QwA+SxQ-2mVw@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: fix __le64 type assignments
-To: Ben Dooks <ben.dooks@codethink.co.uk>
-Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, palmer@dabbelt.com, 
-	pjw@kernel.org, atish.patra@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANw5XWkC/4XNQQrCMBCF4atI1kYy09i0rryHuEjqpA1qKxMJi
+ vTupkUQcdHl/wa+eYlIHCiK3eolmFKIYehz6PVKNJ3tW5LhlFugwi0orOQ5XaXla6llpHs+SqY
+ 2Smu56fJGzhlTl7VW0Ihs3Jh8eMz+4Zi7C/E+8HN+l2BaP3KhFuQEUsm69KRO6MBUtD8T93TZD
+ NyKiU745QD0EoeZKw16BO01OP/HFV8OoV7iisw5b7XR1BQI1Q83juMbbqCidWkBAAA=
+X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1991; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=iYEeHk+9DnSGURMUeHt4qgmcIQTVl4/JW3coGdB0WE4=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpXTsZJaHZBU6eSm/oS3vIxB086dFSrrNy9mg8y
+ YYRR/3jr9CJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaV07GQAKCRAk1otyXVSH
+ 0KZdB/wMSYXCt+ixrXxV5dAlXxTU/oY9SrbGIghLJnY440lUJGfPhSa2/3nQJYZtxDv1/thanJk
+ i4VKeEYt1iwOj58R4Al6zporgAN/Bytdfk4WAflO+bqxMe9n9v9/Z/czfDZl9Zv3p44PloVypUy
+ 5DPDAP1bVm6vLldJrL21ljZL47TQLye7L3rlvUh5Dl6SwAGQbu3NZwak5MjCJZVeqig6fSP3zfe
+ uQ+iUKaQReg5k0FXGHWXhhdswuen8OAuUajCek2mygWYpht4WWPWXrAHkwNfnp+lxBtlxQEj/lZ
+ Yb+qcPYCri+r0mJKwnqCcW4eZZwZzjSxUR9qqrh3L+xdjtSm
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tue, Jan 6, 2026 at 9:59=E2=80=AFPM Ben Dooks <ben.dooks@codethink.co.uk=
-> wrote:
->
-> The two swaps from le32/le64 in arch/riscv/include/asm/kvm_nacl.h
-> are generating a number of type assingment warnings in sparse, so
+While debugging issues related to aarch64 only systems I ran into
+speedbumps due to the lack of detail in the results reported when the
+guest register read and reset value preservation tests were run, they
+generated an immediately fatal assert without indicating which register
+was being tested. Update these tests to report a result per register,
+making it much easier to see what the problem being reported is.
 
-s/assingment/assignment/
+A similar, though less severe, issue exists with the validation of the
+individual bitfields in registers due to the use of immediately fatal
+asserts. Update those asserts to be standard kselftest reports.
 
-> fix by using __force and assuming the code is correct.
->
-> Fixes a number of:
+Finally we have a fix for spurious errors on some NV systems.
 
-s/... number of:/... number of sparse warnings:/
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v4:
+- Correct check for 32 bit ID registers.
+- Link to v3: https://patch.msgid.link/20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org
 
->
-> arch/riscv/kvm/vcpu.c:371:21: warning: cast to restricted __le64
-> arch/riscv/kvm/vcpu.c:374:16: warning: cast to restricted __le64
-> arch/riscv/kvm/vcpu.c:586:17: warning: incorrect type in assignment (diff=
-erent base types)
-> arch/riscv/kvm/vcpu.c:586:17:    expected unsigned long
-> arch/riscv/kvm/vcpu.c:586:17:    got restricted __le64 [usertype]
->
+Changes in v3:
+- Rebase onto v6.19-rc1.
+- Link to v2: https://patch.msgid.link/20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org
 
-Please add a Fixes tag.
+Changes in v2:
+- Add a fix for spurious failures with 64 bit only guests.
+- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
 
-> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
-> ---
->  arch/riscv/include/asm/kvm_nacl.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kvm_nacl.h b/arch/riscv/include/asm/k=
-vm_nacl.h
-> index 4124d5e06a0f..2483738029cb 100644
-> --- a/arch/riscv/include/asm/kvm_nacl.h
-> +++ b/arch/riscv/include/asm/kvm_nacl.h
-> @@ -58,11 +58,11 @@ void kvm_riscv_nacl_exit(void);
->  int kvm_riscv_nacl_init(void);
->
->  #ifdef CONFIG_32BIT
-> -#define lelong_to_cpu(__x)     le32_to_cpu(__x)
-> -#define cpu_to_lelong(__x)     cpu_to_le32(__x)
-> +#define lelong_to_cpu(__x)     le32_to_cpu((__force __le32)__x)
-> +#define cpu_to_lelong(__x)     (__force unsigned long)cpu_to_le32(__x)
->  #else
-> -#define lelong_to_cpu(__x)     le64_to_cpu(__x)
-> -#define cpu_to_lelong(__x)     cpu_to_le64(__x)
-> +#define lelong_to_cpu(__x)     le64_to_cpu((__force __le64)__x)
-> +#define cpu_to_lelong(__x)     (__force unsigned long)cpu_to_le64(__x)
->  #endif
->
->  #define nacl_shmem()                                                   \
-> --
-> 2.37.2.352.g3c44437643
->
+---
+Mark Brown (5):
+      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
+      KVM: selftests: arm64: Report register reset tests individually
+      KVM: selftests: arm64: Make set_id_regs bitfield validatity checks non-fatal
+      KVM: selftests: arm64: Skip all 32 bit IDs when set_id_regs is aarch64 only
+      KVM: selftests: arm64: Use is_aarch32_id_reg() in test_vm_ftr_id_regs()
 
-Regards,
-Anup
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 159 ++++++++++++++++++------
+ 1 file changed, 119 insertions(+), 40 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
 
