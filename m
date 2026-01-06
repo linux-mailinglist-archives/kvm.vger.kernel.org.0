@@ -1,118 +1,100 @@
-Return-Path: <kvm+bounces-67094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C0CACF6A6A
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 05:18:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FFE7CF6A51
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 05:13:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 19806301E980
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 04:18:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 496EB3038326
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 04:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57CD27CB04;
-	Tue,  6 Jan 2026 04:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96E827B4FB;
+	Tue,  6 Jan 2026 04:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uk9ihiEO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GU6Jdc4b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4AE1F19A;
-	Tue,  6 Jan 2026 04:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43AC26C3BE
+	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 04:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767673124; cv=none; b=nF1DY+RYC4MWONcTIcczMXcRq3wA6K2KgQI55bsogZ8IS4VQWRyfZkWa244eph16d/iVDIrpyJBjnMytI/nRcq4fsIzt5fs1oSh65OYsjzKRZoG88fqhkFBa8rN0iWEPRBukQp71nnA0JCD/f1C/3sZRCAS0wNYAPSGqGt3cy6I=
+	t=1767672777; cv=none; b=c6DkV5exqqK7B2FMp+Si/WUykKKnk1yu70tz1zOTY26/Ljr9PSuvSpOilLRny5zata52MaSvD79qzUxvkxo6kbbVPOz7cM1qfe/TkkHLKEWR+zLmrjuq01ORATBDInuuKPU/zIjAekIfmAB2JYyJgkmtoP7ZUUECn0o8FOPj3ZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767673124; c=relaxed/simple;
-	bh=FJht4+x+AmNn8jLnsmkZ6PpTRb3wUqY3p+sCsXEcRpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QfsQ7D43qjpKEgrZ+AZG+ueZZkuau9JR5GI1EfZ/+oegkfBUgmVwvcPng0O2BXiILStaAqK3vfFsGzjc6MMXLGbpO2LHcwlvB8E7Q3h5F/6ugquCJhiYI8NhbbymXD52RQ1Rj0rixl1wSzHJuUVOlnNLFXpwRG9UbA43CkRgk0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uk9ihiEO; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767673123; x=1799209123;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=FJht4+x+AmNn8jLnsmkZ6PpTRb3wUqY3p+sCsXEcRpE=;
-  b=Uk9ihiEOFTCNnjp2cZFU5XAqU9+9dMM9IlgypyfYl/5L4Oi9D9YpdiZS
-   LtamanAf4u/iSOPmsM13OFJY6WmaXZtpPEr5SYnl+05vBe14XvaHmXuKL
-   g8s/855fK912gHVFgRKhvzFiJGFgsq/yv9654Nye17EHytEN3t2o77B/4
-   lmE5VlWZCAOberKWfg4FkGuY7DEfKvWO4d6Rsn5vfuwyKJ3GFQ8L9Vzu5
-   +eZAZoaz6pLevUUzRWrGF+U1s9XMNRIXUvicXs8e1XpNULCBV5R9MKqyz
-   rkRd+al0CP8wk/L5HriJ7hSId2GNBg7/FS8wS/TE08NqB1YiVkJW1OWBQ
-   w==;
-X-CSE-ConnectionGUID: feGXlLPDTtelNvHftHHoVw==
-X-CSE-MsgGUID: IquSEQ2mSjqhb/LA0f7NnQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="72898788"
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="72898788"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 20:18:42 -0800
-X-CSE-ConnectionGUID: XJbA1t1XSZC1O1Is0oSFKA==
-X-CSE-MsgGUID: DaICeh5XROmKtQGBrTqgBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="202176993"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa007.fm.intel.com with ESMTP; 05 Jan 2026 20:18:38 -0800
-Date: Tue, 6 Jan 2026 12:01:31 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"Huang, Kai" <kai.huang@intel.com>,
-	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
-	"Hansen, Dave" <dave.hansen@intel.com>,
-	"Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"Wu, Binbin" <binbin.wu@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"Annapurve, Vishal" <vannapurve@google.com>,
-	"Gao, Chao" <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>,
-	"x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v4 04/16] x86/virt/tdx: Allocate page bitmap for Dynamic
- PAMT
-Message-ID: <aVyJG+vh9r/ZMmOG@yilunxu-OptiPlex-7050>
-References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
- <20251121005125.417831-5-rick.p.edgecombe@intel.com>
- <aUut+PYnX3jrSO0i@yilunxu-OptiPlex-7050>
- <0734a6cc7da3d210f403fdf3e0461ffba6b0aea0.camel@intel.com>
+	s=arc-20240116; t=1767672777; c=relaxed/simple;
+	bh=/gvhaYPwCpvXxA5BAYEaXPq10p9VEf+RX3p6hwx3rWw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tyobZT0WHQGzVOys0gSGPeI6xa5+HTfsKV/tRQbiBDG+rr3rdXXmJwoWuDl4tlf1UENYWXkYrrKncHLtDhtn0VglCtYMQWqQuXDBVH0x6GpK++iDrM1MmL1v70+48ytGlt9q3RIa+tI5f0g9Gvp/ZHDr3g+bmt0WXz5WXc1JutA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GU6Jdc4b; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-815f9dc8f43so1182710b3a.3
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 20:12:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767672775; x=1768277575; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8bO2RxH3D3Alpkfn/EAlJ4/QlkbXyQjaqL8DCAG5FfM=;
+        b=GU6Jdc4bkallOeoDlSWSbJNlU5myjB9H20JYEIM4ewC0GCpIUxeoR03/tC8CqpWnD1
+         Ax4OgFXBQEIosvzjCXXCB0/amYftPp5opZIFy7y6Aj4SM4SsPfU/t8QaVOE/Lp3uEq09
+         JlfJFEEZP98fPnrttTbVTaSJ27T+uzgIIERznLK019/tpg9I/VdSR2xcWx/j5T6khxkj
+         J/SZX6M3YLPXt7tdoWea4xkUe9PBbEHGTsVe4n96AKRUS16dfR4DZ/YxglBr7r2yiZm9
+         tKQapRnoyyd+ExOYFnpveax/B8PTJ0WCS0POATuPd2REeO2u/ohPlVPcPA9uLQ/bbbQf
+         SlCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767672775; x=1768277575;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8bO2RxH3D3Alpkfn/EAlJ4/QlkbXyQjaqL8DCAG5FfM=;
+        b=kShlhhgFP8gEnsYnzA9Z9tJxbayTMQEw78IH52K9XIyoAh+5ZTsY+xwqvhLiSzPAxB
+         Us5eT/V7UiUK8IHtKGHKLpwQc3iqnNf0+hBRrtvNxdAr1ZvUmK7WJY53uD3aOCSjAQlh
+         axshv5YgysdwIO5ii1wbOhLyk/XDJxoBys/8pV0g41DIM50enjqZYFQlZOsbWArFDO01
+         PYg4a36+YGBsRfVlWdGYYP9l+UMYWj+pJ+Sbt8fROc1gStd8fBG2PUaCNTg8S+1cfhAK
+         a32IGO+u+FlWYp5GNoVF51zxbnKeVLGRXFMuzvFzxLxtYUsl9cczayVU6eR4e24KyHmq
+         wd0Q==
+X-Gm-Message-State: AOJu0YwDo3q5kEXrEcPtmo+NVyML/TKKDyrDxeEpBdUbtoYcilj+oOOd
+	GmWHHMFctnJlYcok2hOHqwo9mYg0xbnD3e4u6gjEuWg8i8IzQvjEoYIyG0MhcgIfbt1uCVNhdNm
+	jnoevif8lthj8UA==
+X-Google-Smtp-Source: AGHT+IG1pp40YNhQAPBjufXd8JnGqBmu0CqG5BPG/UL4lB+QRuhuVzfr+72eXDweD9+4CrvY2q6pd26uBjnniQ==
+X-Received: from pjyt20.prod.google.com ([2002:a17:90a:e514:b0:34c:2156:9de7])
+ (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:12d5:b0:366:14ac:e207 with SMTP id adf61e73a8af0-389823cbc9amr1214150637.69.1767672774767;
+ Mon, 05 Jan 2026 20:12:54 -0800 (PST)
+Date: Tue,  6 Jan 2026 04:12:48 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0734a6cc7da3d210f403fdf3e0461ffba6b0aea0.camel@intel.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20260106041250.2125920-1-chengkev@google.com>
+Subject: [PATCH 0/2] KVM: SVM: Align SVM with APM defined behaviors
+From: Kevin Cheng <chengkev@google.com>
+To: seanjc@google.com, pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yosry.ahmed@linux.dev, 
+	Kevin Cheng <chengkev@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jan 05, 2026 at 10:06:31PM +0000, Edgecombe, Rick P wrote:
-> On Wed, 2025-12-24 at 17:10 +0800, Xu Yilun wrote:
-> > Is it better we seal the awkward pattern inside the if (dpamt supported)  block:
-> > 
-> > 	if (tdx_support_dynamic_pamt(&tdx_sysinfo))
-> > 		if (!ret && !(ret = read_sys_metadata_field(0x9100000100000013, &val)))
-> > 			sysinfo_tdmr->pamt_page_bitmap_entry_bits = val;
-> 
-> The extra indentation might be objectionable.
+The APM lists the following behaviors
+  - The VMRUN, VMLOAD, VMSAVE, CLGI, VMMCALL, and INVLPGA instructions
+    can be used when the EFER.SVME is set to 1; otherwise, these
+    instructions generate a #UD exception.
+  - If VMMCALL instruction is not intercepted, the instruction raises a
+    #UD exception.
 
-Yes the extra indentation is unconventional, but everything here is, and
-we know we will eventually change them all. So I more prefer simple
-changes based on:
+The patches in this series fix current SVM bugs that do not adhere to
+the APM listed behaviors.
 
-  if (!ret && !(ret = read_sys_metadata_field(0xABCDEF, &val)))
+Kevin Cheng (2):
+  KVM: SVM: Generate #UD for certain instructions when SVME.EFER is
+    disabled
+  KVM: SVM: Raise #UD if VMMCALL instruction is not intercepted
 
-rather than neat but more LOC (when both are easy to read).
+ arch/x86/kvm/svm/svm.c | 43 +++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 40 insertions(+), 3 deletions(-)
 
-Anyway, this is trivial concern. I have more optional fields to add and
-will follow the final decision.
+--
+2.52.0.351.gbe84eed79e-goog
+
 
