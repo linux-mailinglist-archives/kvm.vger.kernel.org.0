@@ -1,239 +1,154 @@
-Return-Path: <kvm+bounces-67125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFEE0CF822C
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 12:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57A73CF8067
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 12:23:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C926431408D4
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 11:41:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE38F30DBDF4
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 11:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E42331A42;
-	Tue,  6 Jan 2026 10:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C8A326D44;
+	Tue,  6 Jan 2026 11:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WwYV/NKd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tu7fMHjB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D6533122D;
-	Tue,  6 Jan 2026 10:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA28319858
+	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 11:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767695096; cv=none; b=FaJ4TRLJSrOzihWpC/uPTdsYENlZoBnOnxjSI6KeDgIlUhRTuZ+JvcCgSBefCvBMXGTqx8vJKTIwozElEmN2DE8c5INfSzyf99GOmpMoxiskMebpSJbnZnROkFZPuHHWTi7OHAJwuo0CzsJJKAocuECbPXcaClLadRg8/SDnGz8=
+	t=1767698390; cv=none; b=ZY6s3cqtat6NbS33hjI4pEmInUwoyN0Z8VfVDARWtIJ9TlUAz8TUFbMDfaJhaWvxpNqAn18bVeLYm9Tbi8Ai3y8as4d2nze/wDfwpH9Ka3Q3RhFlfl+zBjozCdK2wYzUEGjZCDFOe9+YzkONWAhP1O+SapklbX6xa2XEW3LLod8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767695096; c=relaxed/simple;
-	bh=4ml7WsyFlngxKSf5JvOWbQKUiTbUj6eH/V5cMjcRqcU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OnkZq4CdcKYzsTI9YqzN9kGnRDEG4OcEF6xt8Y0SmJse0BKbVvbt+2aqmOXnXQnigjdhTsEgwH2HaKV83tMsi4Mdeb8PBlM0SZPTu5mDULwuxddk0h2cPhmigaNeG3PTIPWf3a38/bzizH+An+cE+iH8fkfjJvKXeTDLf7QcU2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WwYV/NKd; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767695093; x=1799231093;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4ml7WsyFlngxKSf5JvOWbQKUiTbUj6eH/V5cMjcRqcU=;
-  b=WwYV/NKdcXEaWnTa+jWPLNNNStdVioGqaZI1KA39L5rvjc558Yn8nTuj
-   CDkYdxgYZrCMgDPLKxf/V5njs8eEGuT0gEr1hOOb8mYBX5TDSyb8dh0XQ
-   rFhOnkHScWBMSdArBmPqVfpBbQUWLIPAcaO5Ftjt0ToTrMIMPrrYU3in3
-   V804/nka5obwSVXd5fGwmoDiXA7AMj0yOgA6w8XDg1cCmXg9H7+W31Y86
-   nCAtqZUD+x0CbsttVJ3NYhIuVEZkgTMzGoMy0kWdfY0mFke6yWhPo7Y2f
-   OAGtGQEhTPJ5U1b50OAfdTJIGey4I6d6ehCj7uGvvCyOdcVpcS40b8Iq9
-   g==;
-X-CSE-ConnectionGUID: o+IzO1hySG67eV4FVu3c5A==
-X-CSE-MsgGUID: PmQnvXcZT7yITUrmcKHOkQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="80427399"
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="80427399"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:24:52 -0800
-X-CSE-ConnectionGUID: 77UUouFeSpCgozuCMjOCeA==
-X-CSE-MsgGUID: IDWJSDqzSqiZh0SFaZn13w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="202681611"
-Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:24:48 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	x86@kernel.org,
-	rick.p.edgecombe@intel.com,
-	dave.hansen@intel.com,
-	kas@kernel.org,
-	tabba@google.com,
-	ackerleytng@google.com,
-	michael.roth@amd.com,
-	david@kernel.org,
-	vannapurve@google.com,
-	sagis@google.com,
-	vbabka@suse.cz,
-	thomas.lendacky@amd.com,
-	nik.borisov@suse.com,
-	pgonda@google.com,
-	fan.du@intel.com,
-	jun.miao@intel.com,
-	francescolavra.fl@gmail.com,
-	jgross@suse.com,
-	ira.weiny@intel.com,
-	isaku.yamahata@intel.com,
-	xiaoyao.li@intel.com,
-	kai.huang@intel.com,
-	binbin.wu@linux.intel.com,
-	chao.p.peng@intel.com,
-	chao.gao@intel.com,
-	yan.y.zhao@intel.com
-Subject: [PATCH v3 16/24] KVM: guest_memfd: Split for punch hole and private-to-shared conversion
-Date: Tue,  6 Jan 2026 18:22:50 +0800
-Message-ID: <20260106102250.25194-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20260106101646.24809-1-yan.y.zhao@intel.com>
-References: <20260106101646.24809-1-yan.y.zhao@intel.com>
+	s=arc-20240116; t=1767698390; c=relaxed/simple;
+	bh=3hYa67AZxQskBjBVOM5HLsNEGDB4u77knbx55k4aQfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TppRdXXVjXyF8VEmU5HjDEf9A4On69nQfkI3bkz6yBhutiCAxPZBpp3NFlClVFvGFvWYTGvuhVCeWPXy9gi+8wU2rkAZZlrFoVrRT8UMIFr0Ongae6E9wj9xBHtuMg+U2yFmnvkaM1xl1SbnRMLp0d3LR7m8My2HWOrkrUbPbW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tu7fMHjB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D4F7C4AF0B;
+	Tue,  6 Jan 2026 11:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767698389;
+	bh=3hYa67AZxQskBjBVOM5HLsNEGDB4u77knbx55k4aQfU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Tu7fMHjBaf0QmS5qLP1wx25TU8jDevZF0g3Ke2nEaEuJ1O/2eOStwuA3Q2jntDrtg
+	 yyXmk8hyHV9nWowzFBJuEonZX/hOQgXPNHGFVhXoIWfFPwQ2Q/IOzUHMtVSAlw6qTA
+	 0mRASy6ZPQowDgdkFRv9Vhuw2ZYOdo78pM3NEljdhwPEV+CLmRCqbYTH8ueR22g1Y6
+	 e9OUbX0VrRhHGMj+L6f5LV3LC4Fu0Ohum2H6R7jigGLdqpy0PA3mbjmSfWp8/jKqD2
+	 oOogJJms2IZIDmlt2IzU3em10F7MtXIx20WseFJGauFOML6rlilFStBIQIp8/qzjee
+	 lROeeczQZDrVg==
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 91AB8F40068;
+	Tue,  6 Jan 2026 06:19:48 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Tue, 06 Jan 2026 06:19:48 -0500
+X-ME-Sender: <xms:1O9caW9QaelhreG_g7p3C1HCHYpt4oF7Ve9llVJ8U0h-ze7yqBMiHQ>
+    <xme:1O9caUW0DrYZcgaP0FiUyaj00gwyz30pStE1xGajEYKcHpWn5QBU8vMYwRKbaTnyt
+    o-0DEBFwBDuxD0F15riuio7XqbnHFD0VFxYeMd7koz6Z96KZOCrxbYx>
+X-ME-Received: <xmr:1O9caTZRDY_jN4Cbu2Eaf42Lyv4ZYh86KBzorBeNplEOK93Q-WrN-lJMP48q2Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutddttdeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepmfhirhihlhcu
+    ufhhuhhtshgvmhgruhcuoehkrghssehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepheeikeeuveduheevtddvffekhfeufefhvedtudehheektdfhtdehjeevleeuffeg
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirh
+    hilhhlodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieduudeivdeiheeh
+    qddvkeeggeegjedvkedqkhgrsheppehkvghrnhgvlhdrohhrghesshhhuhhtvghmohhvrd
+    hnrghmvgdpnhgspghrtghpthhtohepfedvpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopegthhgrohdrghgrohesihhnthgvlhdrtghomhdprhgtphhtthhopehkvhhmsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqtghotghosehlihhs
+    thhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepgiekieeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepvhhishhhrghlrdhlrdhvvghrmhgrsehinhhtvghlrdgtohhmpdhrtg
+    hpthhtohepkhgrihdrhhhurghnghesihhnthgvlhdrtghomhdprhgtphhtthhopegurghn
+    rdhjrdifihhllhhirghmshesihhnthgvlhdrtghomhdprhgtphhtthhopeihihhluhhnrd
+    iguheslhhinhhugidrihhnthgvlhdrtghomh
+X-ME-Proxy: <xmx:1O9caWrkkWPA8LVLIC5FZJe-_MBDrP_W5bCKtL1wVFNfG4l-9wyyrw>
+    <xmx:1O9caS419f9F2w7iSO-V33UwCg3LYJUB6FDSXqZU2bl5eFgZ4eep7A>
+    <xmx:1O9caYV5Jhd8rbdTWASP9hqamYMbSsANcNETYBPbVIiuOLL0q91wFQ>
+    <xmx:1O9caYuGCdTDftnSiWBUxkcQrIqS1n0uKigpWFxNa1DjMBUTW2hNUQ>
+    <xmx:1O9caVpHaCYrxTPNAVt3BA_BmBMjWUZpIbxthvwHHJ8toXv4rkbkxC4B>
+Feedback-ID: i10464835:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 6 Jan 2026 06:19:48 -0500 (EST)
+Date: Tue, 6 Jan 2026 11:19:46 +0000
+From: Kiryl Shutsemau <kas@kernel.org>
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, vishal.l.verma@intel.com, kai.huang@intel.com, 
+	dan.j.williams@intel.com, yilun.xu@linux.intel.com, vannapurve@google.com, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v2 0/3] Expose TDX Module version
+Message-ID: <idebornlxlwj4zuk4h3upaibez7vcqiynzuqj65q6sycidax65@uqsqfqqosekx>
+References: <20260105074350.98564-1-chao.gao@intel.com>
+ <dfb66mcbxqw2a6qjyg74jqp7aucmnkztl224rj3u6znrcr7ukw@yy65kqagdsoh>
+ <aVywHbHlcRw2tM/X@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aVywHbHlcRw2tM/X@intel.com>
 
-In TDX, private page tables require precise zapping because faulting back
-the zapped mappings necessitates guest re-acceptance. Therefore, before
-performing a zap for hole punching and private-to-shared conversions, huge
-leaves that cross the boundary of the zapping GFN range in the mirror page
-table must be split.
+On Tue, Jan 06, 2026 at 02:47:57PM +0800, Chao Gao wrote:
+> On Mon, Jan 05, 2026 at 10:38:19AM +0000, Kiryl Shutsemau wrote:
+> >On Sun, Jan 04, 2026 at 11:43:43PM -0800, Chao Gao wrote:
+> >> Hi reviewers,
+> >> 
+> >> This series is quite straightforward and I believe it's well-polished.
+> >> Please consider providing your ack tags. However, since it depends on
+> >> two other series (listed below), please review those dependencies first if
+> >> you haven't already.
+> >> 
+> >> Changes in v2:
+> >>  - Print TDX Module version in demsg (Vishal)
+> >>  - Remove all descriptions about autogeneration (Rick)
+> >>  - Fix typos (Kai)
+> >>  - Stick with TDH.SYS.RD (Dave/Yilun)
+> >>  - Rebase onto Sean's VMXON v2 series
+> >> 
+> >> === Problem & Solution === 
+> >> 
+> >> Currently, there is no user interface to get the TDX Module version.
+> >> However, in bug reporting or analysis scenarios, the first question
+> >> normally asked is which TDX Module version is on your system, to determine
+> >> if this is a known issue or a new regression.
+> >> 
+> >> To address this issue, this series exposes the TDX Module version as
+> >> sysfs attributes of the tdx_host device [*] and also prints it in dmesg
+> >> to keep a record.
+> >
+> >The version information is also useful for the guest. Maybe we should
+> >provide consistent interface for both sides?
+> 
+> Note that only the Major and Minor versions (like 1.5 or 2.0) are available to
+> the guest; the TDX Module doesn't allow guests to read the update version.
+> Given this limitation, exposing version information to guests isn't
+> particularly useful.
 
-Splitting may fail (usually due to out of memory). If this happens, hole
-punching and private-to-shared conversion should bail out early and return
-an error to userspace.
+Ughh. I didn't realize this info is not available to the guest. This is
+unnecessary strict. Isn't it derivable from measurement report anyway?
 
-Splitting is not necessary for zapping shared mappings or zapping in
-kvm_gmem_release()/kvm_gmem_error_folio(). The penalty of zapping more
-shared mappings than necessary is minimal. All mappings are zapped in
-kvm_gmem_release(). kvm_gmem_error_folio() zaps the entire folio range, and
-KVM's basic assumption is that a huge mapping must have a single backend
-folio.
+> And in my opinion, exposing version information to guests is also unnecessary
+> since the module version can already be read from the host with this series.
+> In debugging scenarios, I'm not sure why the TDX module would be so special
+> that guests should know its version but not other host information, such as
+> host kernel version, microcode version, etc. None of these are exposed to guest
+> kernel (not to mention guest userspace).
 
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
-v3:
-- Rebased to [2].
-- Do not flush TLB for kvm_split_cross_boundary_leafs(), i.e., only flush
-  TLB if zaps are performed.
+I already dump attributes and TD CTLS on guest boot, because it is
+useful for debug. Version and features can also be useful for reports
+from the field. Reported may not have access to hypervisor. Or it would
+require additional round trip to get this info from reported.
 
-[2] https://github.com/googleprodkernel/linux-cc/tree/wip-gmem-conversions-hugetlb-restructuring-12-08-25
-
-RFC v2:
-- Rebased to [1]. As changes in this patch are gmem specific, they may need
-  to be updated if the implementation in [1] changes.
-- Update kvm_split_boundary_leafs() to kvm_split_cross_boundary_leafs() and
-  invoke it before kvm_gmem_punch_hole() and private-to-shared conversion.
-
-[1] https://lore.kernel.org/all/cover.1747264138.git.ackerleytng@google.com/
-
-RFC v1:
-- new patch.
----
- virt/kvm/guest_memfd.c | 67 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
-
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 03613b791728..8e7fbed57a20 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -486,6 +486,55 @@ static int merge_truncate_range(struct inode *inode, pgoff_t start,
- 	return ret;
- }
- 
-+static int __kvm_gmem_split_private(struct gmem_file *f, pgoff_t start, pgoff_t end)
-+{
-+	enum kvm_gfn_range_filter attr_filter = KVM_FILTER_PRIVATE;
-+
-+	bool locked = false;
-+	struct kvm_memory_slot *slot;
-+	struct kvm *kvm = f->kvm;
-+	unsigned long index;
-+	int ret = 0;
-+
-+	xa_for_each_range(&f->bindings, index, slot, start, end - 1) {
-+		pgoff_t pgoff = slot->gmem.pgoff;
-+		struct kvm_gfn_range gfn_range = {
-+			.start = slot->base_gfn + max(pgoff, start) - pgoff,
-+			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
-+			.slot = slot,
-+			.may_block = true,
-+			.attr_filter = attr_filter,
-+		};
-+
-+		if (!locked) {
-+			KVM_MMU_LOCK(kvm);
-+			locked = true;
-+		}
-+
-+		ret = kvm_split_cross_boundary_leafs(kvm, &gfn_range, false);
-+		if (ret)
-+			break;
-+	}
-+
-+	if (locked)
-+		KVM_MMU_UNLOCK(kvm);
-+
-+	return ret;
-+}
-+
-+static int kvm_gmem_split_private(struct inode *inode, pgoff_t start, pgoff_t end)
-+{
-+	struct gmem_file *f;
-+	int r = 0;
-+
-+	kvm_gmem_for_each_file(f, inode->i_mapping) {
-+		r = __kvm_gmem_split_private(f, start, end);
-+		if (r)
-+			break;
-+	}
-+	return r;
-+}
-+
- static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- {
- 	pgoff_t start = offset >> PAGE_SHIFT;
-@@ -499,6 +548,13 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
- 	filemap_invalidate_lock(inode->i_mapping);
- 
- 	kvm_gmem_invalidate_begin(inode, start, end);
-+
-+	ret = kvm_gmem_split_private(inode, start, end);
-+	if (ret) {
-+		kvm_gmem_invalidate_end(inode, start, end);
-+		filemap_invalidate_unlock(inode->i_mapping);
-+		return ret;
-+	}
- 	kvm_gmem_zap(inode, start, end);
- 
- 	ret = merge_truncate_range(inode, start, len >> PAGE_SHIFT, true);
-@@ -907,6 +963,17 @@ static int kvm_gmem_convert(struct inode *inode, pgoff_t start,
- 	invalidate_start = kvm_gmem_compute_invalidate_start(inode, start);
- 	invalidate_end = kvm_gmem_compute_invalidate_end(inode, end);
- 	kvm_gmem_invalidate_begin(inode, invalidate_start, invalidate_end);
-+
-+	if (!to_private) {
-+		r = kvm_gmem_split_private(inode, start, end);
-+		if (r) {
-+			*err_index = start;
-+			mas_destroy(&mas);
-+			kvm_gmem_invalidate_end(inode, invalidate_start, invalidate_end);
-+			return r;
-+		}
-+	}
-+
- 	kvm_gmem_zap(inode, start, end);
- 	kvm_gmem_invalidate_end(inode, invalidate_start, invalidate_end);
- 
 -- 
-2.43.2
-
+  Kiryl Shutsemau / Kirill A. Shutemov
 
