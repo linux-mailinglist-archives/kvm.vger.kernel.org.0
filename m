@@ -1,117 +1,196 @@
-Return-Path: <kvm+bounces-67159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F4DCF9D98
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 18:51:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E55CF9B12
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 18:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CD4723067209
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 17:50:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 733AF30393CB
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 17:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 813992FFDCC;
-	Tue,  6 Jan 2026 17:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DC5355044;
+	Tue,  6 Jan 2026 17:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="wA8AGwnU"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="VL4qu+nP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XjH4X3k5"
 X-Original-To: kvm@vger.kernel.org
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391F71E4BE
-	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 17:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F14D352F8F;
+	Tue,  6 Jan 2026 17:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767721395; cv=none; b=aRNeiyrXr6Xy2EJpxYTaOIkA75NugEwkAncB6d3O3usH0COaWG7lmkkBH6VcOm/UCbgmwty9zZ/F8fsIndeW7qqcdfhr1iHpdw669UvkApzNB4RMTlxVWf1ijtSBc69+jWJSGbysDQ/ZX6z8w8kiaqvmyzKLfLTfMKlDIBtgPEA=
+	t=1767720240; cv=none; b=AaE6tXBaDZgdpdWrgIH5vxtY5Cy7oBBsN3QBE5m8cKtXQoZpTOV+kE8NiYOy2Bd04MTaDfA4gt6aYwrOb9r5Z/shbFlII3Sf04975HkuSdue9/D18fXN/DfS/2vV10J1yNtQ6jpyc3LSb8Ub6M6b7PjxpkTJ5mlNlYOrLyImNsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767721395; c=relaxed/simple;
-	bh=RF1u3eonBZzegDg1PZuS6BezgVys09l39qBCJ0/zL0U=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bs7UDXveUMcXO8gNY+kbzEXrThDXfczHw/+ABQqkKTkNZaUeYc1qqG1ohtd0JwpAOt3/nbDCCkftap3o4zRFOTn6KhfXOVBTKZpcXJwjBU8oubZStyxuoSCZOymgZQqKZzPq8Qg+9M4Y+jo/ba5GiaejDJvIRK1LkE5aElAw1OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=wA8AGwnU; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=lC/vPrppfWWJLMXtqrkEQhEuGW9UilLVWhfYhsLXqlM=;
-	b=wA8AGwnUx1Vq5QigHCn0VYFfK4J5ZNl8Ntb+EC5rG1ToX7ySH9N0CRiIQpm75yRmrrJxMpPRs
-	/2H/zmJxLE+C3vnLaJKQQtOfJbYl98JaAprg+qmVkx5lo4yoYhpqh+3KKM4G26tGMTna1y6Zc5T
-	56A9cor4yPwLMcOXjD90jVI=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dlycr0KYxz1vp16;
-	Wed,  7 Jan 2026 01:21:15 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlygD270QzJ46Bs;
-	Wed,  7 Jan 2026 01:23:20 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2DFD440086;
-	Wed,  7 Jan 2026 01:23:22 +0800 (CST)
-Received: from localhost (10.195.245.156) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
- 2026 17:23:21 +0000
-Date: Tue, 6 Jan 2026 17:23:17 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 01/36] KVM: arm64: Account for RES1 bits in
- DECLARE_FEAT_MAP() and co
-Message-ID: <20260106172317.00001463@huawei.com>
-In-Reply-To: <20251219155222.1383109-2-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-2-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1767720240; c=relaxed/simple;
+	bh=sjYVjLIpU88N0FNxAeSDQCndO50FyT2WQHOAUo3znrc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K9V40BWTgjdlCknkkZTtCMpyS2bnX6dalHWu6rLdvLPtagkZH8qgS+jba/gFNf0LLAGXFBzTcjf13KEfAIiUpII7Kj3rOM3hVrk9RgFvJLqEOLesmyN7mHOocRWlhLmvdn8SJg9ZE/WToKTPyPtU7iPMwPfYdmG+g6lZlSBB2OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=VL4qu+nP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XjH4X3k5; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfout.stl.internal (Postfix) with ESMTP id 5F54B1D00116;
+	Tue,  6 Jan 2026 12:23:56 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Tue, 06 Jan 2026 12:23:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1767720236;
+	 x=1767806636; bh=TrczBjp9CgnuX9dZjVpLH4g9fi4Rskt0vtReSN19ZN0=; b=
+	VL4qu+nPxoM85+rjJAo2NX0KADvl0y9u+jbRY+ONMiihUShuUBFgpRPqd8Ae+0rc
+	ytcJbOo01z+Dp+q2XNNBGWffEIEbfcVa+nsn6OJWqwo59+sHa63QcP6qV7qx1FSu
+	eaLI0DC9CLyksCITD6K2opUMDxZcrv5RWU+5epyKUiRlezX3ZNxTZe1KwheK4fPY
+	d+plAuRl4q4FYqYk38czra4e3RCuMQj+qWrxu7kzO5y3sT8aAnL7hzWu9b6su6ci
+	DPpkFg6iYGwIrrn/4kXT9zivTkWLPbfdPbbgdDTENxQ+1vjwZptK9rynJbTU/Md8
+	beiZV2KZd61HqIO6rVoPcA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1767720236; x=
+	1767806636; bh=TrczBjp9CgnuX9dZjVpLH4g9fi4Rskt0vtReSN19ZN0=; b=X
+	jH4X3k5+zIE8UxbHHbmBXHSDeJm9wNQM7G2PCzApycjSI9D13M/07wK+96lnE7kn
+	dDvBmEa3ymlbIx3JfRANEZLnJ0xsWlVFvhbVS+R2dwxzvJsY3F70tqm1Tk7jPBpk
+	1vu2x+L3phWlX4P5CB4thJTWteM4Fp+0YKiiDXxPMk2I68W++TWliWq7GN8Vj7kT
+	Rx1qsjNGUgQTW8jhW5mYvne4mew3OL8q7JRlwO6iOuLycus0OrznLdrXmTz6IJOF
+	iqSrpTdbGXWcjp/eG0BVCfMkwt7v0TE7VSKHPxDiCr2Qe3GTd8MDB+S6X9wkRd4d
+	UBuZioNAsOxyrv5XxDPeg==
+X-ME-Sender: <xms:LEVdaTv_EX7YJYF9h1Yu20noOron-xxzrZi5xuQ38bCJYpK4aJpzVQ>
+    <xme:LEVdaSS8fCYjJiwsWZf_8YCrQVv4XLM5XnOkO6BYEpAWtV-Cc4v7nHosDJ7oQ46Eo
+    EXd1rFAnRXxxCCQORkC-M9NaYo_Iw7oPs5AGq19B1frnr97UEk>
+X-ME-Received: <xmr:LEVdaROplcooSQX6yma18_kLRiBg111T4v8Dbiacw7HOX_6S49P52eF1z7E>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutddtjeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthhqredttddtjeenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepfeehudevjefhgeeileeijefgtddugeetleevvefhvdegueegieevkeekheeg
+    tdeknecuffhomhgrihhnpehprhhogihmohigrdgtohhmnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhg
+    pdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprg
+    htrhhitghkrdifrdgsihgrnhgthhhisehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhi
+    nhhugidqphgtihesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghhvghlghgrrghssehgohho
+    ghhlvgdrtghomh
+X-ME-Proxy: <xmx:LEVdafZcul1rXVUb4WHSoSHxJZ0WfrejLkqnhK41BMT06_EjeicH8Q>
+    <xmx:LEVdaTyskeZ0mbAkQJ9RNwh_FLG3BuiP1DiKso7dKEBJEiCm42gDpg>
+    <xmx:LEVdaSIkQfeus1i1AmGiO8GxsPltEwnMBBaFq3btO7ZdpzbLaZ2R2w>
+    <xmx:LEVdaVqBnTsEiFIK85-zu9AVedSwvuKtO7FyN20yCmI0ZL5CIZ-6QA>
+    <xmx:LEVdaXzJqq6WvOECNNWbWgjRlN7me4zRQGvlOBHpGWpZTbCHLg5jf6st>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 6 Jan 2026 12:23:55 -0500 (EST)
+Date: Tue, 6 Jan 2026 10:23:54 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Patrick Bianchi <patrick.w.bianchi@gmail.com>
+Cc: linux-pci@vger.kernel.org, kvm@vger.kernel.org, Bjorn Helgaas
+ <bhelgaas@google.com>
+Subject: Re: PCI Quirk - UGreen DXP8800 Plus
+Message-ID: <20260106102354.4b84b4a7.alex@shazbot.org>
+In-Reply-To: <26F3F2EE-37D4-4F73-9A51-EDD662EBEFF2@gmail.com>
+References: <A005FF97-BB8D-49F6-994F-36C4A373FA59@gmail.com>
+	<26F3F2EE-37D4-4F73-9A51-EDD662EBEFF2@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 19 Dec 2025 15:52:36 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Mon, 22 Dec 2025 18:37:32 -0500
+Patrick Bianchi <patrick.w.bianchi@gmail.com> wrote:
 
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> None of the registers we manage in the feature dependency infrastructure
-> so far has any RES1 bit. This is about to change, as VTCR_EL2 has
-> its bit 31 being RES1.
+> Hello everyone.  At the advice of Bjorn Helgaas, I=E2=80=99m forwarding t=
+his
+> message to all of you.  Hope it=E2=80=99s helpful for future kernel revis=
+ions!
 
-Oh goody.
+I'm not sure what the proposed change is, but the comment at the end of
+the previous message seems to be leading to the quirk_no_bus_reset
+patch proposed here:
 
-> 
-> In order to not fail the consistency checks by not describing a bit,
-> add RES1 bits to the set of immutable bits. This requires some extra
-> surgery for the FGT handling, as we now need to track RES1 bits there
-> as well.
-> 
-> There are no RES1 FGT bits *yet*. Watch this space.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-FWIW it seems correct.  The only thing I wondered about is
-the assumption that if there is an error best thing to do is
-to assume it was res0 that was wrong and paper over it.
-I guess we can't do anything better if that does happen.
+https://forum.proxmox.com/threads/problems-with-pcie-passthrough-with-two-i=
+dentical-devices.149003/#post-803149
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+IIRC QEMU will favor the bus reset if the device otherwise only
+supports PM reset and interfaces like reset_method only influence the
+reset-function path rather than the bus/slot reset interface available
+through the vfio-pci hot reset ioctl.
 
-Process thing though: before anyone can merge this, Sasha
-please take a look at submitting patches documentation.
+Disabling bus reset appears reasonable given the corroboration in the
+thread and the fact that the device still seems to support PM reset.
 
-When you 'post' a patch that was written by someone else you have
-handled the patch and for the Developer Certificate of origin stuff
-to work you have to add your Signed-off-by after theirs.
+Do you confirm the quirk you were testing is:
 
-Jonathan
+DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_ASMEDIA, 0x1164, quirk_no_bus_reset);
+
+ie. vendor:device ID 1b21:1164?
+
+Thanks,
+Alex
+
+> Begin forwarded message:
+>=20
+> From: Patrick Bianchi <patrick.w.bianchi@gmail.com>
+> Subject: PCI Quirk - UGreen DXP8800 Plus
+> Date: December 20, 2025 at 9:56:10=E2=80=AFPM EST
+> To: bhelgaas@google.com
+>=20
+> Hello!
+>=20
+> Let me start this off by saying that I=E2=80=99ve never submitted anything
+> like this before and I am not 100% sure I=E2=80=99m even in the right pla=
+ce.
+> I was advised by a member on the Proxmox community forums to submit
+> my findings/request to the PCI subsystem maintainer and they gave me
+> a link to this e-mail.  If I=E2=80=99m in the wrong place, please feel fr=
+ee
+> to redirect me.
+>=20
+> I stumbled upon this thread
+> (https://forum.proxmox.com/threads/problems-with-pcie-passthrough-with-tw=
+o-identical-devices.149003/)
+> when looking for solutions to passing through the SATA controllers in
+> my UGreen DXP8800 Plus NAS to a Proxmox VM.  In post #12 by user
+> =E2=80=9Ccelemine1gig=E2=80=9D they explain that adding a PCI quirk and b=
+uilding a
+> test kernel, which I did - over the course of three days and with a
+> lot of help from Google Gemini!  I=E2=80=99m not very fluent in Linux or =
+this
+> type of thing at all, but I=E2=80=99m also not afraid to try by following
+> some directions.  Thankfully, the proposed solution did work and now
+> both of the NAS=E2=80=99s SATA controllers stay awake and are passed thro=
+ugh
+> to the VM.  I=E2=80=99ve pasted the quirk below.
+>=20
+> I guess the end goal would be to have this added to future kernels so
+> that people with this particular hardware combination don=E2=80=99t run i=
+nto
+> PCI reset problems and don=E2=80=99t have to build their own kernels at e=
+ver
+> update.  Or at least that=E2=80=99s how I understand it from reading thro=
+ugh
+> that thread a few times.
+>=20
+> I hope this was the right procedure for making this request.  Please
+> let me know if there=E2=80=99s anything else you need from me.  Thank you!
+>=20
+> -Patrick Bianchi
+>=20
+>=20
+>=20
+> C:
+> /*
+> * Test patch for Asmedia SATA controller issues with PCI-pass-through
+> * Some Asmedia ASM1164 controllers do not seem to successfully
+> * complete a bus reset.
+> */
+>=20
+
 
