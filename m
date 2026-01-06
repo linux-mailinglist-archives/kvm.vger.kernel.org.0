@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67114-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67115-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 330D0CF7C45
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:23:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C589CF7C5D
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A3442300EE70
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:23:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A4852304D48D
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E082326944;
-	Tue,  6 Jan 2026 10:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E7032573E;
+	Tue,  6 Jan 2026 10:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Evrnd25y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RncWkF2F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED3B326920;
-	Tue,  6 Jan 2026 10:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F93A309F19;
+	Tue,  6 Jan 2026 10:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767694950; cv=none; b=cm+ytx1yqIohDR0q69AclIy/JiH8Wc1w/yeGLgdsh7WLB/al+podmRBh57RHu8dMTg9+OvqZXi8YXQyb2jfDjK9GANQjIujZVN1jAnzeWEPjRcof/CCVyS8ep6lBpknGM1YA5iqW5C0OW/Jg1wFoIQG2I8P7+v1wQaDqjc6DfFc=
+	t=1767694972; cv=none; b=CJBHawR6kEvYCN07xR+c/TRMfhtDPsSD9dqBJFCadRekg+B4SlGbPi6HqdPwZyzTMX6RxLBE7a1SDtjkPn9ZyY73zw8UUDCPh+kynn0sGOvuJ/AubWlIXFcofPeJQfFQyX5Daa8SZv8S7M0Cu05mEU7iB312trymTkndf2p1/b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767694950; c=relaxed/simple;
-	bh=GFGrz/CXi/RxbvHEabGemFFSeHhuI34AKA6B/kIEpxc=;
+	s=arc-20240116; t=1767694972; c=relaxed/simple;
+	bh=vDwN3h48oxVtbZG2Fhg72RtCLukqpxS4T1TL6g+eqw0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HnJ62WocRTGp/8ZUQGt523AgZz6cC264bTeiplyNlbK15ak70ftdZtjhy6wF/nQK7G/Qkj+VXKvlnQ+XKxvKue1+fKkufFEB/ciePr3qvx8e/oPSfgU4YXKzno3kwqV+GFSbVavkkIX2tEDJR7AsFzm+mdeCvU7VgZcb8/3GcA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Evrnd25y; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=uNWAkWkN3i4eJnnDwqn81OimTVrQaCnSNZ/zRgYi/xQuuKuXNwHfby4nD6oVsnx5hkddX7A5uOhn4X5+4xAs0HtMC4gT/b53oh0Rm43vO7glO3wTQEWi39T7omsSa6vQeklsOIo2PD1i6flj5JHXIj+s94IlR2bRSRTwNsx/zOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RncWkF2F; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767694948; x=1799230948;
+  t=1767694963; x=1799230963;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GFGrz/CXi/RxbvHEabGemFFSeHhuI34AKA6B/kIEpxc=;
-  b=Evrnd25y8UKd6SD3LkkalxyrKm9olr/pBW70anvk+f3mE97BkDFai0X4
-   Suf3SYePOeuO+ftOQc/lqhsy8N8u/uoPHh99+IIqUWRN9EVJ4p9yWTF2A
-   +hmCetI2wWvwEwKLzV7b/LnLgd8NwGSL/cq237cpZbuacrlNQqaKFS4Hk
-   FaLkLkr77Vid31iUlJRBliuSq+An512zQoO7Rp+L3bhXUfNM9JIOo0fqi
-   jQ8lgNMD84cigYf76ikMNXlNEp2jh7FuZISwWKEmxtLFcsUUgpNozcg/C
-   m2npeph6ahy9jGPzSDVfAFGwKmXcLbbt3De2aB0Ajf2nuEnVpWnx9N0nA
-   w==;
-X-CSE-ConnectionGUID: iAHHcfajTSWGjQ7zetfurQ==
-X-CSE-MsgGUID: ilmTcysXQ8GERKMY2HWZBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="68966617"
+  bh=vDwN3h48oxVtbZG2Fhg72RtCLukqpxS4T1TL6g+eqw0=;
+  b=RncWkF2FMOTtpjCC8FWTrpwnLgouY0QuV3aPOOueDbF1QOzwkuvLBze8
+   Z4OQ9hkYDGtWj/ctnR+TjDHAgRuKUjYMiPJRJF1UDcZM88I5TtQ2Zsx2V
+   amH/1LcG4MatuWUySKCkSG6uVXHQmvOdP3r9Qr7xbD39B0JBlgkPmaJtp
+   qsM7QGMFQnA7HopbWb+ueVMlubxuKlpSSSEFOSa6B45GK3uGAdTz6kEvS
+   F7EaSmpHtYRwrqukzPGybWcruerN0lr5c5YQJbuMrxTYT/nrhsKAqVQDI
+   YRqIM/GMdlParFrupSyFv6vTKj66t6sf/tyoIIOKVbdqbzmDHNGA7/dFF
+   A==;
+X-CSE-ConnectionGUID: OvIGolOVS1a4K0Mhal2fJA==
+X-CSE-MsgGUID: 9vSfBLiXTXGmnE67a8uHOw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="80176839"
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="68966617"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:22:28 -0800
-X-CSE-ConnectionGUID: 4sIsfgaITKafd/iH8wW7Sw==
-X-CSE-MsgGUID: sHG+fAR2TvSsgKlp1x31AQ==
+   d="scan'208";a="80176839"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:22:43 -0800
+X-CSE-ConnectionGUID: CJVlXTmUT92JzZDWqT1ODg==
+X-CSE-MsgGUID: QaTzNb7uRFaE4BHRwl7jWQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="207175372"
+   d="scan'208";a="203085160"
 Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:22:21 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:22:37 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -87,9 +87,9 @@ Cc: linux-kernel@vger.kernel.org,
 	chao.p.peng@intel.com,
 	chao.gao@intel.com,
 	yan.y.zhao@intel.com
-Subject: [PATCH v3 06/24] KVM: x86/mmu: Disallow page merging (huge page adjustment) for mirror root
-Date: Tue,  6 Jan 2026 18:20:24 +0800
-Message-ID: <20260106102024.25023-1-yan.y.zhao@intel.com>
+Subject: [PATCH v3 07/24] KVM: x86/tdp_mmu: Introduce split_external_spte() under write mmu_lock
+Date: Tue,  6 Jan 2026 18:20:40 +0800
+Message-ID: <20260106102040.25041-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20260106101646.24809-1-yan.y.zhao@intel.com>
 References: <20260106101646.24809-1-yan.y.zhao@intel.com>
@@ -101,75 +101,130 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Introduce kvm_x86_ops.split_external_spte() and wrap it in a helper
+function split_external_spte(). Invoke the helper function
+split_external_spte() in tdp_mmu_set_spte() to propagate splitting
+transitions from the mirror page table to the external page table under
+write mmu_lock.
 
-Disallow page merging (huge page adjustment) for the mirror root by
-utilizing disallowed_hugepage_adjust().
+Introduce a new valid transition case for splitting and document all valid
+transitions of the mirror page table under write mmu_lock in
+tdp_mmu_set_spte().
 
-Make the mirror root check asymmetric with NX huge pages and not to litter
-the generic MMU code:
-
-Invoke disallowed_hugepage_adjust() in kvm_tdp_mmu_map() when necessary,
-specifically when KVM has mirrored TDP or the NX huge page workaround is
-enabled.
-
-Check and reduce the goal_level of a fault internally in
-disallowed_hugepage_adjust() when the fault is for a mirror root and
-there's a shadow present non-leaf entry at the original goal_level.
-
-Signed-off-by: Edgecombe, Rick P <rick.p.edgecombe@intel.com>
-Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
+v3:
+- Rename split_external_spt() to split_external_spte().
+
+- Pass in param "old_mirror_spte" to hook kvm_x86_ops.set_external_spte().
+  This is in aligned with the parameter change in hook
+  kvm_x86_ops.set_external_spte() in Sean's cleanup series, and also allows
+  future DPAMT patches to acquire guest private PFN from the old mirror
+  spte.
+
+- Rename param "external_spt" to "new_external_spt" in hook
+  kvm_x86_ops.set_external_spte() to indicate this is a new page table page
+  for the external page table.
+
+- Drop declaration of get_external_spt() by moving split_external_spte()
+  after get_external_spt() but before set_external_spte_present() and
+  tdp_mmu_set_spte(). (Kai)
+
+- split_external_spte --> split_external_spte() (Kai)
+
 RFC v2:
-- Check is_mirror_sp() in disallowed_hugepage_adjust() instead of passing
-  in an is_mirror arg. (Rick)
-- Check kvm_has_mirrored_tdp() in kvm_tdp_mmu_map() to determine whether
-  to invoke disallowed_hugepage_adjust(). (Rick)
+- Removed the KVM_BUG_ON() in split_external_spt(). (Rick)
+- Add a comment for the KVM_BUG_ON() in tdp_mmu_set_spte(). (Rick)
+- Use kvm_x86_call() instead of static_call(). (Binbin)
 
 RFC v1:
-- new patch
+- Split patch.
+- Dropped invoking hook zap_private_spte and kvm_flush_remote_tlbs() in KVM
+  MMU core.
 ---
- arch/x86/kvm/mmu/mmu.c     | 3 ++-
- arch/x86/kvm/mmu/tdp_mmu.c | 4 +++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  4 ++++
+ arch/x86/kvm/mmu/tdp_mmu.c         | 29 +++++++++++++++++++++++++----
+ 3 files changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d2c49d92d25d..b4f2e3ced716 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3418,7 +3418,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
- 	    cur_level == fault->goal_level &&
- 	    is_shadow_present_pte(spte) &&
- 	    !is_large_pte(spte) &&
--	    spte_to_child_sp(spte)->nx_huge_page_disallowed) {
-+	    ((spte_to_child_sp(spte)->nx_huge_page_disallowed) ||
-+	     is_mirror_sp(spte_to_child_sp(spte)))) {
- 		/*
- 		 * A small SPTE exists for this pfn, but FNAME(fetch),
- 		 * direct_map(), or kvm_tdp_mmu_map() would like to create a
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 58c5c9b082ca..84fa8689b45c 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -98,6 +98,7 @@ KVM_X86_OP_OPTIONAL(link_external_spt)
+ KVM_X86_OP_OPTIONAL(set_external_spte)
+ KVM_X86_OP_OPTIONAL(free_external_spt)
+ KVM_X86_OP_OPTIONAL(remove_external_spte)
++KVM_X86_OP_OPTIONAL(split_external_spte)
+ KVM_X86_OP_OPTIONAL(alloc_external_fault_cache)
+ KVM_X86_OP_OPTIONAL(topup_external_fault_cache)
+ KVM_X86_OP_OPTIONAL(free_external_fault_cache)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7818da148a8c..56089d6b9b51 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1848,6 +1848,10 @@ struct kvm_x86_ops {
+ 	void (*remove_external_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ 				     u64 mirror_spte);
+ 
++	/* Split a huge mapping into smaller mappings in external page table */
++	int (*split_external_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
++				   u64 old_mirror_spte, void *new_external_spt);
++
+ 	/* Allocation a pages from the external page cache. */
+ 	void *(*alloc_external_fault_cache)(struct kvm_vcpu *vcpu);
+ 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 9c26038f6b77..dfa56554f9e0 100644
+index dfa56554f9e0..977914b2627f 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1267,6 +1267,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	struct tdp_iter iter;
- 	struct kvm_mmu_page *sp;
- 	int ret = RET_PF_RETRY;
-+	bool hugepage_adjust_disallowed = fault->nx_huge_page_workaround_enabled ||
-+					  kvm_has_mirrored_tdp(kvm);
+@@ -508,6 +508,19 @@ static void *get_external_spt(gfn_t gfn, u64 new_spte, int level)
+ 	return NULL;
+ }
  
- 	KVM_MMU_WARN_ON(!root || root->role.invalid);
++static int split_external_spte(struct kvm *kvm, gfn_t gfn, u64 old_spte,
++			       u64 new_spte, int level)
++{
++	void *new_external_spt = get_external_spt(gfn, new_spte, level);
++	int ret;
++
++	KVM_BUG_ON(!new_external_spt, kvm);
++
++	ret = kvm_x86_call(split_external_spte)(kvm, gfn, level, old_spte,
++						new_external_spt);
++	return ret;
++}
++
+ static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sptep,
+ 						 gfn_t gfn, u64 old_spte,
+ 						 u64 new_spte, int level)
+@@ -758,12 +771,20 @@ static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
+ 	handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
  
-@@ -1279,7 +1281,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	for_each_tdp_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
- 		int r;
+ 	/*
+-	 * Users that do non-atomic setting of PTEs don't operate on mirror
+-	 * roots, so don't handle it and bug the VM if it's seen.
++	 * Propagate changes of SPTE to the external page table under write
++	 * mmu_lock.
++	 * Current valid transitions:
++	 * - present leaf to !present.
++	 * - present non-leaf to !present.
++	 * - present leaf to present non-leaf (splitting)
+ 	 */
+ 	if (is_mirror_sptep(sptep)) {
+-		KVM_BUG_ON(is_shadow_present_pte(new_spte), kvm);
+-		remove_external_spte(kvm, gfn, old_spte, level);
++		if (!is_shadow_present_pte(new_spte))
++			remove_external_spte(kvm, gfn, old_spte, level);
++		else if (is_last_spte(old_spte, level) && !is_last_spte(new_spte, level))
++			split_external_spte(kvm, gfn, old_spte, new_spte, level);
++		else
++			KVM_BUG_ON(1, kvm);
+ 	}
  
--		if (fault->nx_huge_page_workaround_enabled)
-+		if (hugepage_adjust_disallowed)
- 			disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
- 
- 		/*
+ 	return old_spte;
 -- 
 2.43.2
 
