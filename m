@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BECCF7CCC
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:32:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6333CF7CC3
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:31:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 49DA23032CD1
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:32:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1100730E82D4
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243553358B1;
-	Tue,  6 Jan 2026 10:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE693370F4;
+	Tue,  6 Jan 2026 10:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D+3pmAEB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OxzgK6lX"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51830335097;
-	Tue,  6 Jan 2026 10:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5714F336ECF;
+	Tue,  6 Jan 2026 10:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767695138; cv=none; b=tB40wTP8ZmWWaDf3aU9of4wuaTRn3laX2A3AiMN0bni3En/rkP+7Gtavf4hqE3/eyYpSFeGZ+fyFVGT6WJvfYXVgTLzSW86lHkAKnrKSkwp+p6c2RVpI2ds4e+u0JxJ+Ah3J5le3ZESCQZjaAZ/9a6CIkHDn37wgRauNxXfDZUw=
+	t=1767695150; cv=none; b=aujKg3VSnIgnqBPO0vMpzwVw27stOnQw3VTVZOv8zfKXoriEvK6Gn8CCv9Bc3Nc5Xrjc8aLG06EGErmuCYuzFwvp9mabL3efAKvYlVsAkSeMcSjWWxb+WeFkketg09Pjvuonkl7DWow7S9wiwuNk5hMcFHEeI8QrQRGuyK9dWxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767695138; c=relaxed/simple;
-	bh=VJy5UQSBk0MUjLZqt0wrUpLU7GZHYX/hSwGX2hN+5eg=;
+	s=arc-20240116; t=1767695150; c=relaxed/simple;
+	bh=qwwpptGS42i0X5HRafBSLm3iF6+2BtZgb4c3EI3htcs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BoNbK8NAFu3iUkmLVfWP0ohycX3M5179MFY50Fo9qSebthdj7kjGPnOuTeaE8xlNL44QFpbc7MG8yE7HqRexFLRySNeNeF8AR7a6QJ5Zt2C5t9ISLVK3qhwd+W+nsC8oSRyWxbJnlMSw3ZaUpyQOa+Dsa5lDmKRvOfipZx9MFuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D+3pmAEB; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=mDC5u2/v4gZAjcMS0VQRiBFB6NcCN2G7T6dJl7I0Pa8zf6z7xCjhUe3pksaoDg3VM2RaYsQNoiGAaA8uXdjMVmS/SDa0tOKIfaKSXFPtC/nFi5a6j0lc0VP6SnFggcU/10Y0+aAVXBPsBCVenS8D38TFsdWUnjCCqLh28bL6sys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OxzgK6lX; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767695136; x=1799231136;
+  t=1767695149; x=1799231149;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VJy5UQSBk0MUjLZqt0wrUpLU7GZHYX/hSwGX2hN+5eg=;
-  b=D+3pmAEBOGCp9XV2vfg0SHUrr3/dp6mPjgm1VzpL+WtpZxAG+hteSiNb
-   w5ww0Vz/qpfu3DnbAex0ZcUPM2AditmlG26L9R/YdYurWS9chO+B9af5c
-   9DRhJA2390jPD1v7QRw9wxgRR9/SKuTdujF3Q2XgDI0u1N/y2zqHRKlzH
-   HuhtXnzCGX5ARsowSZtIJF+t1qxF74Rws89JUQ94DDQT2TH0XlSEHHFcH
-   a7QNW3rm/CPClU4I7Hs88PMjJUphL41R5lR3uENXRsk4zscwjKZq7MMzw
-   Ll4slcNu3rgRBFcJhnQfuNOEUqMZ+FbQ5ABojRojash/QYIe9CeAV/WNS
+  bh=qwwpptGS42i0X5HRafBSLm3iF6+2BtZgb4c3EI3htcs=;
+  b=OxzgK6lXUN5wLUwGOkyubGO1HtBdeWhrbfL4K0YBYNOZDb0sUWuhOYLn
+   3NuZBxYbKj4/X66uzbeRHMlTcyfjF8oB+2wirt3I4b7wcdYj3+g1bFBSL
+   hI6pnrV5K34jFjuDJYL6nHr3RyUzSbVzjS6QVogwzz00WPN/yM+oIQ0cb
+   DAwV2JLFHMcjRd7Vpw9Pj/Tl+wkpxsjKX++2MLPEmRt5rq8fTMIbJ+pQs
+   Dx8pQytu995ZhxGkIR3/6Q7EK/ZZJ9dJUrvLwI1jsgu/OIN1tI8IcL12L
+   61rQzgTq2kzTIjNoAcM2XL09WRgFtifLatAtaK9SbUCM4RoiQpxq8JmE9
    w==;
-X-CSE-ConnectionGUID: 9NiaDqZoSlOtQ6MSCezPKg==
-X-CSE-MsgGUID: Ep/w2U9kTB2XHeR0sGasCA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="72689736"
+X-CSE-ConnectionGUID: ZWVGWH7RTsKWgKi6ybVAKA==
+X-CSE-MsgGUID: pA/FjI8xTpa/FG1rbm/cbQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="72689752"
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="72689736"
+   d="scan'208";a="72689752"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:34 -0800
-X-CSE-ConnectionGUID: 98YaJTufTiKZm/pvRdVkzQ==
-X-CSE-MsgGUID: Hqu89t5FTZa55nCdoVfZ7Q==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:49 -0800
+X-CSE-ConnectionGUID: vttwPh0gQLuiYzZAfynL2w==
+X-CSE-MsgGUID: 4RoS58UBRvOnrxG9tFIIkg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="202645182"
+   d="scan'208";a="202645207"
 Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:29 -0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:43 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -87,9 +87,9 @@ Cc: linux-kernel@vger.kernel.org,
 	chao.p.peng@intel.com,
 	chao.gao@intel.com,
 	yan.y.zhao@intel.com
-Subject: [PATCH v3 19/24] KVM: x86: Introduce per-VM external cache for splitting
-Date: Tue,  6 Jan 2026 18:23:31 +0800
-Message-ID: <20260106102331.25244-1-yan.y.zhao@intel.com>
+Subject: [PATCH v3 20/24] KVM: TDX: Implement per-VM external cache for splitting in TDX
+Date: Tue,  6 Jan 2026 18:23:45 +0800
+Message-ID: <20260106102345.25261-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20260106101646.24809-1-yan.y.zhao@intel.com>
 References: <20260106101646.24809-1-yan.y.zhao@intel.com>
@@ -101,268 +101,140 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce per-VM external cache for splitting the external page table by
-adding KVM x86 ops for cache "topup", "free", "need topup" operations.
+Implement the KVM x86 ops for per-VM external cache for splitting the
+external page table in TDX.
 
-Invoke the KVM x86 ops for "topup", "need topup" for the per-VM external
-split cache when splitting the mirror root in
-tdp_mmu_split_huge_pages_root() where there's no per-vCPU context.
+Since the per-VM external cache for splitting the external page table is
+intended to be invoked outside of vCPU threads, i.e., when the per-vCPU
+external_fault_cache is not available, introduce a spinlock
+prealloc_split_cache_lock in TDX to protect pages enqueuing/dequeuing
+operations for the per-VM external split cache.
 
-Invoke the KVM x86 op for "free" to destroy the per-VM external split cache
-when KVM frees memory caches.
+Cache topup in tdx_topup_vm_split_cache() manages page enqueuing with the
+help of prealloc_split_cache_lock.
 
-This per-VM external split cache is only used when per-vCPU context is not
-available. Use the per-vCPU external fault cache in the fault path
-when per-vCPU context is available.
+Cache dequeuing will be implemented in tdx_sept_split_private_spte() in
+later patches, which will also hold prealloc_split_cache_lock.
 
-The per-VM external split cache is protected under both kvm->mmu_lock and a
-cache lock inside vendor implementations to ensure that there're enough
-pages in cache for one split:
+Checking the need of topup in tdx_need_topup_vm_split_cache() does not hold
+prealloc_split_cache_lock internally. When tdx_need_topup_vm_split_cache()
+is invoked under write mmu_lock, there's no need for further acquiring
+prealloc_split_cache_lock; when tdx_need_topup_vm_split_cache() is invoked
+under read mmu_lock, it needs to be checked again after acquiring
+prealloc_split_cache_lock for cache dequeuing.
 
-- Dequeuing of the per-VM external split cache is in
-  kvm_x86_ops.split_external_spte() under mmu_lock.
+Cache free does not hold prealloc_split_cache_lock because it's intended to
+be called when there's no contention.
 
-- Yield the traversal in tdp_mmu_split_huge_pages_root() after topup of
-  the per-VM cache, so that need_topup() is checked again after
-  re-acquiring the mmu_lock.
-
-- Vendor implementations of the per-VM external split cache provide a
-  cache lock to protect the enqueue/dequeue of pages into/from the cache.
-
-Here's the sequence to show how enough pages in cache is guaranteed.
-
-a. with write mmu_lock:
-
-   1. write_lock(&kvm->mmu_lock)
-      kvm_x86_ops.need_topup()
-
-   2. write_unlock(&kvm->mmu_lock)
-      kvm_x86_ops.topup() --> in vendor:
-      {
-        allocate pages
-        get cache lock
-        enqueue pages in cache
-        put cache lock
-      }
-
-   3. write_lock(&kvm->mmu_lock)
-      kvm_x86_ops.need_topup() (goto 2 if topup is necessary)  (*)
-
-      kvm_x86_ops.split_external_spte() --> in vendor:
-      {
-         get cache lock
-         dequeue pages in cache
-         put cache lock
-      }
-      write_unlock(&kvm->mmu_lock)
-
-b. with read mmu_lock,
-
-   1. read_lock(&kvm->mmu_lock)
-      kvm_x86_ops.need_topup()
-
-   2. read_unlock(&kvm->mmu_lock)
-      kvm_x86_ops.topup() --> in vendor:
-      {
-        allocate pages
-        get cache lock
-        enqueue pages in cache
-        put cache lock
-      }
-
-   3. read_lock(&kvm->mmu_lock)
-      kvm_x86_ops.need_topup() (goto 2 if topup is necessary)
-
-      kvm_x86_ops.split_external_spte() --> in vendor:
-      {
-         get cache lock
-         kvm_x86_ops.need_topup() (return retry if topup is necessary) (**)
-         dequeue pages in cache
-         put cache lock
-      }
-
-      read_unlock(&kvm->mmu_lock)
-
-Due to (*) and (**) in step 3, enough pages for split is guaranteed.
-
-Co-developed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
 v3:
-- Introduce x86 ops to manages the cache.
+- new patch corresponds to DPAMT v4.
 ---
- arch/x86/include/asm/kvm-x86-ops.h |  3 ++
- arch/x86/include/asm/kvm_host.h    | 17 +++++++
- arch/x86/kvm/mmu/mmu.c             |  2 +
- arch/x86/kvm/mmu/tdp_mmu.c         | 71 +++++++++++++++++++++++++++++-
- 4 files changed, 91 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 61 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h |  5 ++++
+ 2 files changed, 66 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 84fa8689b45c..307edc51ad8d 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -102,6 +102,9 @@ KVM_X86_OP_OPTIONAL(split_external_spte)
- KVM_X86_OP_OPTIONAL(alloc_external_fault_cache)
- KVM_X86_OP_OPTIONAL(topup_external_fault_cache)
- KVM_X86_OP_OPTIONAL(free_external_fault_cache)
-+KVM_X86_OP_OPTIONAL(topup_external_per_vm_split_cache)
-+KVM_X86_OP_OPTIONAL(free_external_per_vm_split_cache)
-+KVM_X86_OP_OPTIONAL(need_topup_external_per_vm_split_cache)
- KVM_X86_OP(has_wbinvd_exit)
- KVM_X86_OP(get_l2_tsc_offset)
- KVM_X86_OP(get_l2_tsc_multiplier)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 315ffb23e9d8..6122801f334b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1862,6 +1862,23 @@ struct kvm_x86_ops {
- 	/* Free in external page fault cache. */
- 	void (*free_external_fault_cache)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index c1dc1aaae49d..40cca273d480 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -671,6 +671,9 @@ int tdx_vm_init(struct kvm *kvm)
  
-+	/*
-+	 * Top up extra pages needed in the per-VM cache for splitting external
-+	 * page table.
-+	 */
-+	int (*topup_external_per_vm_split_cache)(struct kvm *kvm,
-+						 enum pg_level level);
-+
-+	/* Free the per-VM cache for splitting external page table. */
-+	void (*free_external_per_vm_split_cache)(struct kvm *kvm);
-+
-+	/*
-+	 * Check if it's necessary to top up the per-VM cache for splitting
-+	 * external page table.
-+	 */
-+	bool (*need_topup_external_per_vm_split_cache)(struct kvm *kvm,
-+						       enum pg_level level);
-+
- 	bool (*has_wbinvd_exit)(void);
+ 	kvm_tdx->state = TD_STATE_UNINITIALIZED;
  
- 	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 35a6e37bfc68..3d568512201d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6924,6 +6924,8 @@ static void mmu_free_vm_memory_caches(struct kvm *kvm)
- 	kvm_mmu_free_memory_cache(&kvm->arch.split_desc_cache);
- 	kvm_mmu_free_memory_cache(&kvm->arch.split_page_header_cache);
- 	kvm_mmu_free_memory_cache(&kvm->arch.split_shadow_page_cache);
-+	if (kvm_has_mirrored_tdp(kvm))
-+		kvm_x86_call(free_external_per_vm_split_cache)(kvm);
++	INIT_LIST_HEAD(&kvm_tdx->prealloc_split_cache.page_list);
++	spin_lock_init(&kvm_tdx->prealloc_split_cache_lock);
++
+ 	return 0;
  }
  
- void kvm_mmu_uninit_vm(struct kvm *kvm)
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b984027343b7..b45d3da683f2 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1606,6 +1606,55 @@ static bool iter_cross_boundary(struct tdp_iter *iter, gfn_t start, gfn_t end)
- 		 (iter->gfn + KVM_PAGES_PER_HPAGE(iter->level)) <= end);
+@@ -1680,6 +1683,61 @@ static void tdx_free_external_fault_cache(struct kvm_vcpu *vcpu)
+ 		__free_page(page);
  }
  
 +/*
-+ * Check the per-VM external split cache under write mmu_lock or read mmu_lock
-+ * in tdp_mmu_split_huge_pages_root().
-+ *
-+ * When need_topup_external_split_cache() returns false, the mmu_lock is held
-+ * throughout the exectution from
-+ * (a) need_topup_external_split_cache(), and
-+ * (b) the cache dequeuing (in tdx_sept_split_private_spte() called by
-+ *     tdp_mmu_split_huge_page()).
-+ *
-+ * - When mmu_lock is held for write, the per-VM external split cache is
-+ *   exclusively accessed by a single user. Therefore, the result returned from
-+ *   need_topup_external_split_cache() is accurate.
-+ *
-+ * - When mmu_lock is held for read, the per-VM external split cache can be
-+ *   shared among multiple users. Cache dequeuing in
-+ *   tdx_sept_split_private_spte() thus needs to check again of the cache page
-+ *   count after acquiring its internal split cache lock and return an error for
-+ *   retry if the cache page count is not sufficient.
++ * Need to prepare at least 2 pairs of PAMT pages (i.e., 4 PAMT pages) for
++ * splitting a S-EPT PG_LEVEL_2M mapping when Dynamic PAMT is enabled:
++ * - 1 pair for the new 4KB S-EPT page for splitting, which may be dequeued in
++ *   tdx_sept_split_private_spte() when there are no installed PAMT pages for
++ *   the 2MB physical range of the S-EPT page.
++ * - 1 pair for demoting guest private memory from 2MB to 4KB, which will be
++ *   dequeued in tdh_mem_page_demote().
 + */
-+static bool need_topup_external_split_cache(struct kvm *kvm, int level)
++static int tdx_min_split_cache_sz(struct kvm *kvm, int level)
 +{
-+	return kvm_x86_call(need_topup_external_per_vm_split_cache)(kvm, level);
++	KVM_BUG_ON(level != PG_LEVEL_2M, kvm);
++
++	if (!tdx_supports_dynamic_pamt(tdx_sysinfo))
++		return 0;
++
++	return tdx_dpamt_entry_pages() * 2;
 +}
 +
-+static int topup_external_split_cache(struct kvm *kvm, int level, bool shared)
++static int tdx_topup_vm_split_cache(struct kvm *kvm, enum pg_level level)
 +{
-+	int r;
++	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
++	struct tdx_prealloc *prealloc = &kvm_tdx->prealloc_split_cache;
++	int cnt = tdx_min_split_cache_sz(kvm, level);
 +
-+	rcu_read_unlock();
++	while (READ_ONCE(prealloc->cnt) < cnt) {
++		struct page *page = alloc_page(GFP_KERNEL);
 +
-+	if (shared)
-+		read_unlock(&kvm->mmu_lock);
-+	else
-+		write_unlock(&kvm->mmu_lock);
++		if (!page)
++			return -ENOMEM;
 +
-+	r = kvm_x86_call(topup_external_per_vm_split_cache)(kvm, level);
++		spin_lock(&kvm_tdx->prealloc_split_cache_lock);
++		list_add(&page->lru, &prealloc->page_list);
++		prealloc->cnt++;
++		spin_unlock(&kvm_tdx->prealloc_split_cache_lock);
++	}
 +
-+	if (shared)
-+		read_lock(&kvm->mmu_lock);
-+	else
-+		write_lock(&kvm->mmu_lock);
-+
-+	if (!r)
-+		rcu_read_lock();
-+
-+	return r;
++	return 0;
 +}
 +
- static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 					 struct kvm_mmu_page *root,
- 					 gfn_t start, gfn_t end,
-@@ -1614,6 +1663,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
++static bool tdx_need_topup_vm_split_cache(struct kvm *kvm, enum pg_level level)
++{
++	struct tdx_prealloc *prealloc = &to_kvm_tdx(kvm)->prealloc_split_cache;
++
++	return prealloc->cnt < tdx_min_split_cache_sz(kvm, level);
++}
++
++static void tdx_free_vm_split_cache(struct kvm *kvm)
++{
++	struct page *page;
++
++	while ((page = get_tdx_prealloc_page(&to_kvm_tdx(kvm)->prealloc_split_cache)))
++		__free_page(page);
++}
++
+ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+ 			    enum pg_level level, kvm_pfn_t pfn)
  {
- 	struct kvm_mmu_page *sp = NULL;
- 	struct tdp_iter iter;
-+	int r = 0;
- 
- 	rcu_read_lock();
- 
-@@ -1672,6 +1722,21 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 			continue;
- 		}
- 
-+		if (is_mirror_sp(root) &&
-+		    need_topup_external_split_cache(kvm, iter.level)) {
-+			r = topup_external_split_cache(kvm, iter.level, shared);
-+
-+			if (r) {
-+				trace_kvm_mmu_split_huge_page(iter.gfn,
-+							      iter.old_spte,
-+							      iter.level, r);
-+				goto out;
-+			}
-+
-+			iter.yielded = true;
-+			continue;
-+		}
-+
- 		tdp_mmu_init_child_sp(sp, &iter);
- 
- 		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
-@@ -1682,15 +1747,17 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 
- 	rcu_read_unlock();
- 
-+out:
- 	/*
- 	 * It's possible to exit the loop having never used the last sp if, for
- 	 * example, a vCPU doing HugePage NX splitting wins the race and
--	 * installs its own sp in place of the last sp we tried to split.
-+	 * installs its own sp in place of the last sp we tried to split or
-+	 * topup_external_split_cache() failure.
- 	 */
- 	if (sp)
- 		tdp_mmu_free_sp(sp);
- 
--	return 0;
-+	return r;
+@@ -3804,4 +3862,7 @@ void __init tdx_hardware_setup(void)
+ 	vt_x86_ops.alloc_external_fault_cache = tdx_alloc_external_fault_cache;
+ 	vt_x86_ops.topup_external_fault_cache = tdx_topup_external_fault_cache;
+ 	vt_x86_ops.free_external_fault_cache = tdx_free_external_fault_cache;
++	vt_x86_ops.topup_external_per_vm_split_cache = tdx_topup_vm_split_cache;
++	vt_x86_ops.need_topup_external_per_vm_split_cache = tdx_need_topup_vm_split_cache;
++	vt_x86_ops.free_external_per_vm_split_cache = tdx_free_vm_split_cache;
  }
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index 43dd295b7fd6..034e3ddfb679 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -48,6 +48,11 @@ struct kvm_tdx {
+ 	 * Set/unset is protected with kvm->mmu_lock.
+ 	 */
+ 	bool wait_for_sept_zap;
++
++	/* The per-VM cache for splitting S-EPT */
++	struct tdx_prealloc prealloc_split_cache;
++	/* Protect page enqueuing/dequeuing in prealloc_split_cache */
++	spinlock_t prealloc_split_cache_lock;
+ };
  
- 
+ /* TDX module vCPU states */
 -- 
 2.43.2
 
