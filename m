@@ -1,227 +1,209 @@
-Return-Path: <kvm+bounces-67155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B99CFB271
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 22:49:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A284CFB09F
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 22:08:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6EB8E308B345
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 21:46:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4936F303869F
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 21:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E7B34B195;
-	Tue,  6 Jan 2026 17:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54F62F25E4;
+	Tue,  6 Jan 2026 21:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ub9QFSf4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UzOuatOC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB3434AB1E
-	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 17:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F442BCF68;
+	Tue,  6 Jan 2026 21:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767719963; cv=none; b=F0g8QNlOViZ9oKsdkJ6Me5dBMouxySmt3N2EJ8+b4T4uEPzuTT88TGQO1M0d3WyMOgD7pWOQNiJrWyI0B0yJNQ82F/ubQlhyfEMhLDVByksbMU0Wg9kLgmyTP23HKLvxi/nv7r1xFnp7h/md7eMvi6ctlcihW6Nng8/f4ZExD5A=
+	t=1767733683; cv=none; b=BLbsDVPut+dGPzAUVfgVa87ZwGrhpt5cFAz/qP62ilbS+yPyXC8U4CXITV/9ypzhV/iyTDUR+xQZpk+IHU1ecWtTdDw7TSBXIAgmSpstNqYS3MWLcqKfmlH81dcBeE8bEp1D23QKtPxY8f3R9OeQ7fgLofcgfkSXrHjvGI0zmrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767719963; c=relaxed/simple;
-	bh=KyAVrWzv3AID7JMa80Wqw08D32rx5181M5Uz4WEsr4M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bWam4hqwa+Pr9TVvfzAXjwXFj4g3wfQm5HXeqGcvZ1ezBpa5oFDOzA05YKwUXOxAeGnBO6JQYm6FmiiPyNrljnx8OWOLeoyWs/IqWrC8pnuoT8HVI/lF6J6Nqh6lcu4hVNpXihkHEPrIFCuSFYri4CAbExeOSER2epijKmNXKT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ub9QFSf4; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a07fa318fdso17880495ad.0
-        for <kvm@vger.kernel.org>; Tue, 06 Jan 2026 09:19:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767719961; x=1768324761; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HniCsd4ODup/fdDva7XbnCYJAp8ItqdAhsexUFQc9RM=;
-        b=Ub9QFSf4V8lChLq3bV9NV+C8/bR3XwDANetCPy+J+dT6PyrqhyyfULM3fpisWwQBk9
-         Y9OhIiUvdRoN8jnFf6ALOvNFnYnVKDfYQYZVwzqSbt7a7H3psApVZYfbC0u8aBUdzBqu
-         x9hejFaLr8zen51tw9KkI2qqlIVX8Yno/+ou5dmiGIbycikKpfGuaVw1t9wMoXqyay2r
-         kbxSMMUWEsBiwpbTH+l2cLiBL8IXgblT9f/Ub3ZvQhx/CwYQKNfSEWHhd1EGSLyovtS4
-         5ctt5lmoHNKCyp1KCJIEQHYWCMj1VCGShqDt4LpcGzs05V6v61qR+cXhte7b5WoaBzaf
-         WGhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767719961; x=1768324761;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HniCsd4ODup/fdDva7XbnCYJAp8ItqdAhsexUFQc9RM=;
-        b=m1V/w+wuNQGPEMZIDAd59vvD252+sJWmk953V7fYRGQAaDoRXIAMC/nQhnvCVPMcvM
-         j+54qR9TVIrmgFWHcfObzkcEljyGUoabVvar54eJgd/4x936up9bBzyojWtI5fumo8cR
-         nc7bMzWkdfY2TTTeQGSIAz06yEPZ/TJj0aPLzPmUSM9WrJHDx8Zm5kXIjnWaK6EKCe4e
-         urCs2Z0SIpfR1Ei6AEWpAGu4Q8KPsVjjkDij2HGteCrcfQU3z45u9jI2GGXFYtLya+gx
-         StRNK5a9UKeGWkOnuDQnvHkujiPM4ialwwX1yYtFbrSvmZZd3PvDPZFJ5R7uOn4TXoOf
-         bbDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlsi2D8vhByRBlyV5PMz+xPtQoEQL4GS9RryFJYFmBTV/fBLvw8yGLaZFZjKUIg1hDoxE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywmz/TubeShgErFG8H0Eor0yQ5eMX9KUW7M51hhCkIRFXNKRy4h
-	p/4YY9n1lX4K5hxK5+4fgAvqDi7kJvU6wgbPuIOEhTID8rDqeCoVriI5DXAgBZbmbx3ARPIf+/Y
-	I+tyMjQ==
-X-Google-Smtp-Source: AGHT+IHyS7zlYGcQubwOVWHsPNUuLoDSaTcet4YEYvFTyEy7rjsqt5ZlGKGrsst2abDakkNkgyAv/um8oac=
-X-Received: from plek17.prod.google.com ([2002:a17:903:4511:b0:2a0:974c:2e6e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2d1:b0:2a0:f0e5:3f5c
- with SMTP id d9443c01a7336-2a3e2cef6d7mr32610505ad.34.1767719961264; Tue, 06
- Jan 2026 09:19:21 -0800 (PST)
-Date: Tue, 6 Jan 2026 09:19:19 -0800
-In-Reply-To: <20260104093221.494510-1-alessandro@0x65c.net>
+	s=arc-20240116; t=1767733683; c=relaxed/simple;
+	bh=s1o+eQ+FFWh+r40yE/x5M9lt7UYItsaoICnPo6wuWno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ffWwDO+UJrJ3j4fV+UCJkkZzAhplOUECf3bEEj8g+JNnOSeCYnqLjhsoPC8VHvNR/7st824qE1I1CQL7E9sDYtTwLA9Cy/hDWsnfOARxbyF22UUlQMX33Gj+rdeuPzQZ4QQnpRuCplYe9e+d5PcAZnX7ufuDU6fT3d+D0EFLnQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UzOuatOC; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767733682; x=1799269682;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=s1o+eQ+FFWh+r40yE/x5M9lt7UYItsaoICnPo6wuWno=;
+  b=UzOuatOC83URpmOLHHxkKERQ/keE1ebpJjXtJqZ9WXI6FF3z1o/Abqms
+   GLaTeHuErLlSY1gjKm7EVS1ie/C2uV8qwQnXQMR0CCaGXihE5s9hlvVy5
+   V1fEVwIkZBQusXyBGAF76fTxs9uKuaY0bsYS9FBxAEVckxca4a6iLoE0V
+   rvqHw5htlRCez1Hqt+kQIobLjJhlTVaKpGxNPoOikHJ6DjE4cEM+pXY/0
+   WndGmiwfjZP1YpdAkfnFVQ0BNCrYJUDs1PndqIAismVVTpRtKng8C03iG
+   v+cyEJVIt3aXEFUbcWKopzDPsQf/wsY2jH2ZY6i9oB80y+LfOHs4HFmjt
+   g==;
+X-CSE-ConnectionGUID: gYVxCM5FTSmomkIvHTnTwA==
+X-CSE-MsgGUID: F5L1qljrS+yp8Aqjp6e5sA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="80555520"
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="80555520"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 13:08:01 -0800
+X-CSE-ConnectionGUID: oG0dtpXcSnCNzDRCcRXRXw==
+X-CSE-MsgGUID: 8iMOsDQJTU2eRiToMQXw8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="233889165"
+Received: from unknown (HELO [10.24.81.162]) ([10.24.81.162])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 13:08:00 -0800
+Message-ID: <c79e4667-6312-486e-9d55-0894b5e7dc68@intel.com>
+Date: Tue, 6 Jan 2026 13:08:00 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260104093221.494510-1-alessandro@0x65c.net>
-Message-ID: <aV1EF5DU5e66NTK0@google.com>
-Subject: Re: [PATCH] KVM: x86: Retry guest entry on -EBUSY from kvm_check_nested_events()
-From: Sean Christopherson <seanjc@google.com>
-To: Alessandro Ratti <alessandro@0x65c.net>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/24] x86/tdx: Enhance tdh_mem_page_aug() to support
+ huge pages
+To: Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, seanjc@google.com
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+ rick.p.edgecombe@intel.com, kas@kernel.org, tabba@google.com,
+ ackerleytng@google.com, michael.roth@amd.com, david@kernel.org,
+ vannapurve@google.com, sagis@google.com, vbabka@suse.cz,
+ thomas.lendacky@amd.com, nik.borisov@suse.com, pgonda@google.com,
+ fan.du@intel.com, jun.miao@intel.com, francescolavra.fl@gmail.com,
+ jgross@suse.com, ira.weiny@intel.com, isaku.yamahata@intel.com,
+ xiaoyao.li@intel.com, kai.huang@intel.com, binbin.wu@linux.intel.com,
+ chao.p.peng@intel.com, chao.gao@intel.com
+References: <20260106101646.24809-1-yan.y.zhao@intel.com>
+ <20260106101826.24870-1-yan.y.zhao@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20260106101826.24870-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jan 04, 2026, Alessandro Ratti wrote:
-> When a vCPU running in nested guest mode attempts to block (e.g., due
-> to HLT), kvm_check_nested_events() may return -EBUSY to indicate that a
-> nested event is pending but cannot be injected immediately, such as
-> when event delivery is temporarily blocked in the guest.
+On 1/6/26 02:18, Yan Zhao wrote:
+> Enhance the SEAMCALL wrapper tdh_mem_page_aug() to support huge pages.
 > 
-> Currently, vcpu_block() logs a WARN_ON_ONCE() and then treats -EBUSY
-> like any other error, returning 0 to exit to userspace. This can cause
-> the vCPU to repeatedly block without making forward progress, delaying
-> event injection and potentially leading to guest hangs under rare timing
-> conditions.
+> The SEAMCALL TDH_MEM_PAGE_AUG currently supports adding physical memory to
+> the S-EPT up to 2MB in size.
 > 
-> Remove the WARN_ON_ONCE() and handle -EBUSY explicitly by returning 1
-> to retry guest entry instead of exiting to userspace. This allows the
-> nested event to be injected once the temporary blocking condition
-> clears, ensuring forward progress.
+> While keeping the "level" parameter in the tdh_mem_page_aug() wrapper to
+> allow callers to specify the physical memory size, introduce the parameters
+> "folio" and "start_idx" to specify the physical memory starting from the
+> page at "start_idx" within the "folio". The specified physical memory must
+> be fully contained within a single folio.
 > 
-> This issue was triggered by syzkaller while exercising nested
-> virtualization.
+> Invoke tdx_clflush_page() for each 4KB segment of the physical memory being
+> added. tdx_clflush_page() performs CLFLUSH operations conservatively to
+> prevent dirty cache lines from writing back later and corrupting TD memory.
 
-Syzkaller always ruins the fun :-(
+This changelog is heavy on the "what" and weak on the "why". It's not
+telling me what I need to know.
 
-> Fixes: 45405155d876 ("KVM: x86: WARN if a vCPU gets a valid wakeup that KVM can't yet inject")
-> Reported-by: syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=1522459a74d26b0ac33a
-> Tested-by: syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
-> Signed-off-by: Alessandro Ratti <alessandro@0x65c.net>
-> ---
->  arch/x86/kvm/x86.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ff8812f3a129..d5cf9a7ff8c5 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11596,7 +11596,15 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
->  	if (is_guest_mode(vcpu)) {
->  		int r = kvm_check_nested_events(vcpu);
+...
+> +	struct folio *folio = page_folio(page);
+>  	gpa_t gpa = gfn_to_gpa(gfn);
+>  	u64 entry, level_state;
+>  	u64 err;
 >  
-> -		WARN_ON_ONCE(r == -EBUSY);
-> +		/*
-> +		 * -EBUSY indicates a nested event is pending but cannot be
-> +		 * injected immediately (e.g., event delivery is temporarily
-> +		 * blocked). Return to the vCPU run loop to retry guest entry
-> +		 * instead of blocking, which would lose the pending event.
-> +		 */
-> +		if (r == -EBUSY)
-> +			return 1;
+> -	err = tdh_mem_page_aug(&kvm_tdx->td, gpa, tdx_level, page, &entry, &level_state);
+> -
+> +	err = tdh_mem_page_aug(&kvm_tdx->td, gpa, tdx_level, folio,
+> +			       folio_page_idx(folio, page), &entry, &level_state);
+>  	if (unlikely(IS_TDX_OPERAND_BUSY(err)))
+>  		return -EBUSY;
 
-The code and the comment are both wrong.  Returning immediately will incorrectly
-leave vcpu->arch.mp_state in a non-RUNNABLE state, and _that_ will put the vCPU
-into an infinite loop.  The for-loop in vcpu_run() will always see the vCPU as
-!running and so will call back into vcpu_block().  vcpu_block() will see the vCPU
-as _runnable_ (but still not fully running!) because of the pending (and injected)
-event, check nested events again, hit -EBUSY again, and repeat until the VMM kills
-the VM.
+For example, 'folio' is able to be trivially derived from page. Yet,
+this removes the 'page' argument and replaces it with 'folio' _and_
+another value which can be derived from 'page'.
 
-And returning '0' doesn't block the vCPU, it triggers an exit to userspace.  In
-most cases, the spurious exit will be KVM_EXIT_UNKNOWN, but it could be something
-else entirely if KVM filled vcpu->run->exit_reason but didn't complete the exit
-to userspace.
+This looks superficially like an illogical change. *Why* was this done?
 
-And as above, the pending event isn't lost, it'll still be pending if userspace
-invokes KVM_RUN again.  Of course, unless userspace stuff MP_STATE, the infinite
-will still occur, just with userspace's KVM_RUN loop being the outermost loop
-(assuming userspace doesn't simply kill the VM).
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index b0b33f606c11..41ce18619ffc 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -1743,16 +1743,23 @@ u64 tdh_vp_addcx(struct tdx_vp *vp, struct page *tdcx_page)
+>  }
+>  EXPORT_SYMBOL_GPL(tdh_vp_addcx);
+>  
+> -u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct page *page, u64 *ext_err1, u64 *ext_err2)
+> +u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct folio *folio,
+> +		     unsigned long start_idx, u64 *ext_err1, u64 *ext_err2)
+>  {
+>  	struct tdx_module_args args = {
+>  		.rcx = gpa | level,
+>  		.rdx = tdx_tdr_pa(td),
+> -		.r8 = page_to_phys(page),
+> +		.r8 = page_to_phys(folio_page(folio, start_idx)),
+>  	};
+> +	unsigned long npages = 1 << (level * PTE_SHIFT);
+>  	u64 ret;
 
-I said above that syzkaller ruins the fun because, as noted by the changelog in
-the Fixes commit, this scenario _should_ be impossible.  And AFAICT, within KVM
-itself, that still holds true.  I finally found one of syzbot's reproducers that
-is straightforward, i.e. doesn't require hitting a timing window with threading.
-In that reproducer (see Link below), userspace stuff MP_STATE and an "injected"
-event, thus forcing the vCPU into what is effectively an impossible state.
+This 'npages' calculation is not obviously correct. It's not clear what
+"level" is or what values it should have.
 
-All of the other reproducers get into HALTED naturally by executing HLT in L2,
-and then stuff an injected event.  I've never been able to repro those, because
-hitting the WARN requires forcing the vCPU to exit to userspace (e.g. with a
-signal) just after HLT is executed so that userspace can stuff event state.  But
-in principle it's the same scenario: userspace stuffs impossible vCPU state.
+This is precisely the kind of place to deploy a helper that explains
+what is going on.
 
-For now, I'm pretty sure the least awful "fix" is to drop the WARN and continue
-with waking the vCPU.  In all likelhiood, the garbage event stuffed by userspace
-will generate a failed VM-Entry, which KVM will reflect to L1.  So L2 might die,
-but L1 should live on, which more than good enough when userspace is being stupid,
-and is about as good as we can do if KVM itself is buggy, i.e. if there's a
-legitimate KVM but that generates impossible state.
+> -	tdx_clflush_page(page);
+> +	if (start_idx + npages > folio_nr_pages(folio))
+> +		return TDX_OPERAND_INVALID;
 
-I'll post the below as part of a series, as there is at least one cleanup that
-can be done on top to consolidate handling of EBUSY, and I'm hopeful that the
-spirit of the WARN can be preserved, e.g. by adding/extending WARNs in paths where
-KVM (re)injects events.
+Why is this necessary? Would it be a bug if this happens?
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 6 Jan 2026 07:46:38 -0800
-Subject: [PATCH] KVM: x86: Ignore -EBUSY when checking nested events from
- vcpu_block()
+> +	for (int i = 0; i < npages; i++)
+> +		tdx_clflush_page(folio_page(folio, start_idx + i));
 
-Ignore -EBUSY when checking nested events after exiting a blocking state
-while L2 is active, as exiting to userspace will generate a spurious
-userspace exit, usually with KVM_EXIT_UNKNOWN, and likely lead to the VM's
-demise.  Continuing with the wakeup isn't perfect either, as *something*
-has gone sideways if a vCPU is awakened in L2 with an injected event (or
-worse, a nested run pending), but continuing on gives the VM a decent
-chance of surviving without any major side effects.
+All of the page<->folio conversions are kinda hurting my brain. I think
+we need to decide what the canonical type for these things is in TDX, do
+the conversion once, and stick with it.
 
-As explained in the Fixes commits, it _should_ be impossible for a vCPU to
-be put into a blocking state with an already-injected event (exception,
-IRQ, or NMI).  Unfortunately, userspace can stuff MP_STATE and/or injected
-events, and thus put the vCPU into what should be an impossible state.
-
-Don't bother trying to preserve the WARN, e.g. with an anti-syzkaller
-Kconfig, as WARNs can (hopefully) be added in paths where _KVM_ would be
-violating x86 architecture, e.g. by WARNing if KVM attempts to inject an
-exception or interrupt while the vCPU isn't running.
-
-Cc: Alessandro Ratti <alessandro@0x65c.net>
-Cc: stable@vger.kernel.org
-Fixes: 26844fee6ade ("KVM: x86: never write to memory from kvm_vcpu_check_block()")
-Fixes: 45405155d876 ("KVM: x86: WARN if a vCPU gets a valid wakeup that KVM can't yet inject")
-Link: https://syzkaller.appspot.com/text?tag=ReproC&x=10d4261a580000
-Reported-by: syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/671bc7a7.050a0220.455e8.022a.GAE@google.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ff8812f3a129..4bf9be1e17a7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11596,8 +11596,7 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
- 	if (is_guest_mode(vcpu)) {
- 		int r = kvm_check_nested_events(vcpu);
- 
--		WARN_ON_ONCE(r == -EBUSY);
--		if (r < 0)
-+		if (r < 0 && r != -EBUSY)
- 			return 0;
- 	}
- 
-
-base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
---
 
