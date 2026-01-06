@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BA7CF7F01
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 12:01:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9BDCF7D08
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CEC48301FA52
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 11:01:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B912430AB4B9
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CD933439F;
-	Tue,  6 Jan 2026 10:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018E233509A;
+	Tue,  6 Jan 2026 10:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FcJ6LkEU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MpWWpEoq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E244633343F;
-	Tue,  6 Jan 2026 10:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7CF31B101;
+	Tue,  6 Jan 2026 10:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767695109; cv=none; b=Vyv/lqQVNnm4/6B9RQSN+wYrKDJvblcj/jqL1u8ndftOIBX+iOndHWLfxhTGPetwTUVw691/84NSe1FxZV9o1meAwuc7J6WCYPhCPyz7lAF6l7cFEGGpB7CtVGgviG1HS29cggrNBlJKrxmgZX3UtqkEMDXTk9Ph0U+jBUyznb4=
+	t=1767695128; cv=none; b=Y9rpJepNs19e+spHxeHxoeXN/ZYP5nZbOeCV44TXCNo3Qs8WzGYtb36VkkgjMK2jcgr7lcBh2exGmnSSulljCJqdwLzzHSXMS3lg5kYdK8fORu6R1RGEcpZELeX30PRn/VBY7jBg/6dSAijzt1TjEjfeTuBKvWa5gnnBDb/fUaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767695109; c=relaxed/simple;
-	bh=9WemXhIcKEOzBmDaVfEziMNELHtArYfBszBdtuSN710=;
+	s=arc-20240116; t=1767695128; c=relaxed/simple;
+	bh=GFiw5N2oVRbxNS+8hGRru/HArobn9JpEsHC0envKVVQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gbPk44nJ9fUClM/xB2yF+GD2YolzeZKUpUrNX803FwmUfDH3NHtnZL3vm/36Rhp1edYJOHReXhIvWgl5LAM5V77AauP9iU2QG541Tae6rbeJJC7hlywgn70MIGMZjcRAV7LDThZpr+sGLZUQzPa2h/WrPiI1rIHdkVF5s0oWnfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FcJ6LkEU; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=OTPgjg1ZwBKdzzkI7m+eOB2i87y1lvz2gTPoeBXcr+gtTpxURfKAgMwj6shc3BAndvQQipUjiGnpH9kwx9goC6rWBGghTky/IdnmVZaGjxO7Ww01RZp9RBeYyz4euifnXjktu2/sk2LSBylAIgse9tD11O+QvivU+dDnMAmcOTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MpWWpEoq; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767695108; x=1799231108;
+  t=1767695124; x=1799231124;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9WemXhIcKEOzBmDaVfEziMNELHtArYfBszBdtuSN710=;
-  b=FcJ6LkEU+64qGNan8oSWoakP4Tjf0xku8aZGeR09oydtf8YcOiOGR9pc
-   ahuu+CU/BQ3N2UU4RXFBvz41VuBekSCpg9/m5kMMXocgoR390YzWFR4Y4
-   y2XI7sK3HIDmv/8HRMZKNocKrLXhAPP/hJOgqFDeRZAZgVR5uL9HTV29d
-   p/y7tfLn/VkK1ZhEhWra0O3tHwBmOBd4Rf3c7xyYpbCE1LjROUQSOvRPE
-   cKbXRb5jqvZCBCcrlSCwV7pCdqRE+/H5lh2e0Ydfbjp87p17hPs+Lk+JM
-   ENm9u1EJu50CERYZqfRvM9OpNnWA7wt3bwog4tLGVgqGW0wvHTA1NMT2T
+  bh=GFiw5N2oVRbxNS+8hGRru/HArobn9JpEsHC0envKVVQ=;
+  b=MpWWpEoqfigS3OselD3xZtCOp5bvcnoO/mv0ej+PFYWb6R1OH0UVDzx4
+   yuK/AJVMycHN3yLwywtgfuE5lhXwhW9SsBwNN/j0uR4CwrXd2hxiCg8Xm
+   N5OOnFKCPPFV96RIefvkLKTuo1u2M+7cxEgs3kPAGDxLZ8aA16miTi9mD
+   zocx5LOWN5QyWnxzPwdb92n/uyV6lfXiXVKpmBMFbWIoQi7MuQFg8KYH7
+   D9AWlVz9qCZOaJiccYyXkZDZnJHdtnkhlgtBAY0Q59+32S6PtJgfTfK9O
+   0N7TBX+h72492g2JZqEefH3iCPTYBokZnzROKt7C93cSx6zE4r00kYUQA
    g==;
-X-CSE-ConnectionGUID: Qncxhx8mRZ6r8IMKS9Qi9A==
-X-CSE-MsgGUID: clQP6uSmTiWTk0Sp3h6lWg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="86645828"
+X-CSE-ConnectionGUID: xjoP9fitQbq7G+EeyVGpug==
+X-CSE-MsgGUID: /zkdPUbgQRO2GWBgTpZYXw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="86645841"
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="86645828"
+   d="scan'208";a="86645841"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:07 -0800
-X-CSE-ConnectionGUID: 2QYusNpMSKGDujp5XjzsOQ==
-X-CSE-MsgGUID: Y/hOs/sZRWmRzIvJaGe/zw==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:21 -0800
+X-CSE-ConnectionGUID: xGgCTDkEQ6Gp1MSB+4d6rQ==
+X-CSE-MsgGUID: et/eJSCTTlysGA8yEqT+ew==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="202246964"
+   d="scan'208";a="202246988"
 Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:00 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:25:14 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -87,9 +87,9 @@ Cc: linux-kernel@vger.kernel.org,
 	chao.p.peng@intel.com,
 	chao.gao@intel.com,
 	yan.y.zhao@intel.com
-Subject: [PATCH v3 17/24] KVM: TDX: Get/Put DPAMT page pair only when mapping size is 4KB
-Date: Tue,  6 Jan 2026 18:23:04 +0800
-Message-ID: <20260106102304.25211-1-yan.y.zhao@intel.com>
+Subject: [PATCH v3 18/24] x86/virt/tdx: Add loud warning when tdx_pamt_put() fails.
+Date: Tue,  6 Jan 2026 18:23:18 +0800
+Message-ID: <20260106102318.25227-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20260106101646.24809-1-yan.y.zhao@intel.com>
 References: <20260106101646.24809-1-yan.y.zhao@intel.com>
@@ -101,73 +101,41 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+tdx_pamt_put() does not return any error to its caller when SEAMCALL
+TDH_PHYMEM_PAMT_REMOVE fails. Though pamt_refcount for the failed 2MB
+physical range is increased (so the DPAMT pages stay added), it will cause
+that the 2MB physical range can only be mapped at 4KB level, i.e., later
+SEAMCALL TDH_MEM_PAGE_AUG on the 2MB range at 2MB level will therefore fail
+forever.
 
-Invoke tdx_pamt_{get/put}() to add/remove Dynamic PAMT page pair for guest
-private memory only when the S-EPT mapping size is 4KB.
+Since tdx_pamt_put() only fails when there are bugs in the host kernel or
+in the TDX module, simply add a loud warning to aid debugging after such an
+error occurs.
 
-When the mapping size is greater than 4KB, static PAMT pages are used. No
-need to install/uninstall extra PAMT pages dynamically.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-[Yan: Move level checking to callers of tdx_pamt_{get/put}()]
+Link: https://lore.kernel.org/all/67d55b24ef1a80af615c3672e8436e0ac32e8efa.camel@intel.com
+Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
 v3:
 - new patch
-
-  Checking for 4KB level was previously done inside tdx_pamt_{get/put}() in
-  DPAMT v2 [1].
-
-  Move the checking to callers of tdx_pamt_{get/put}() in KVM to avoid
-  introducing an extra "level" parameter to tdx_pamt_{get/put}(). This is
-  also because the callers that could have level > 4KB are limited in KVM,
-  i.e., only inside tdx_sept_{set/remove}_private_spte().
-
-[1] https://lore.kernel.org/all/20250609191340.2051741-5-kirill.shutemov@linux.intel.com
 ---
- arch/x86/kvm/vmx/tdx.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 712aaa3d45b7..c1dc1aaae49d 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1722,9 +1722,11 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	WARN_ON_ONCE(!is_shadow_present_pte(mirror_spte) ||
- 		     (mirror_spte & VMX_EPT_RWX_MASK) != VMX_EPT_RWX_MASK);
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index c12665389b67..76963c563906 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -2348,8 +2348,7 @@ void tdx_pamt_put(struct page *page)
+ 			 */
+ 			atomic_inc(pamt_refcount);
  
--	ret = tdx_pamt_get(page, &tdx->prealloc);
--	if (ret)
--		return ret;
-+	if (level == PG_LEVEL_4K) {
-+		ret = tdx_pamt_get(page, &tdx->prealloc);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	/*
- 	 * Ensure pre_fault_allowed is read by kvm_arch_vcpu_pre_fault_memory()
-@@ -1743,7 +1745,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	else
- 		ret = tdx_mem_page_add(kvm, gfn, level, pfn);
- 
--	if (ret)
-+	if (ret && level == PG_LEVEL_4K)
- 		tdx_pamt_put(page);
- 
- 	return ret;
-@@ -1911,7 +1913,9 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 
- 	tdx_quirk_reset_folio(folio, folio_page_idx(folio, page),
- 			      KVM_PAGES_PER_HPAGE(level));
--	tdx_pamt_put(page);
-+
-+	if (level == PG_LEVEL_4K)
-+		tdx_pamt_put(page);
- }
- 
- /*
+-			pr_err("TDH_PHYMEM_PAMT_REMOVE failed: %#llx\n", tdx_status);
+-
++			WARN_ONCE(1, "TDH_PHYMEM_PAMT_REMOVE failed: %#llx\n", tdx_status);
+ 			/*
+ 			 * Don't free pamt_pa_array as it could hold garbage
+ 			 * when tdh_phymem_pamt_remove() fails.
 -- 
 2.43.2
 
