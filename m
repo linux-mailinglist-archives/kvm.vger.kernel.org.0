@@ -1,123 +1,138 @@
-Return-Path: <kvm+bounces-67087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B79CCF61F3
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 01:55:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEB6ACF6420
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 02:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C0ED43035073
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 00:54:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 176C130D184F
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 01:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9169B20296E;
-	Tue,  6 Jan 2026 00:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F4F328B75;
+	Tue,  6 Jan 2026 01:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RAsUORX1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="srukJ5bz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D84B1F419A
-	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 00:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767660893; cv=pass; b=n6XJhI3wVMCkeCgRnzH9RpEAITehngkQSQIqb67kdcr9AS7fwv3RAOx39yqPb7974j7UDIWBaGr1EqlU66NNkdxB8zLbM296uTQz+XWvNX5RTyhXl5tWhyVd1zI5D1fLyjsjktwsKESa39zaXhHFEx6NH+Ase3xu804clXOhpTk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767660893; c=relaxed/simple;
-	bh=U5ZdZIa4tcOeth8EAljZfL40JPYFUxc61pVVRnuLKFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tr0ZQNNxxhHbfytWJmY0nEJAepm3yG8+f08KMlADRpHsEVUuGaJz9epcpWt1vxUyQpSf3enOmhnd4KJWynf9IPUu9iSDRiflS2HTsSJYvtbL2Vy0VDnY5iwMdUzgXtIPpBb4MUjVGunl2o1c8TKZW+tiMnXBGA+M2JKGHe2wsTA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RAsUORX1; arc=pass smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CAD328B55
+	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 01:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767662247; cv=none; b=l0gsnc9Nxzn2fFCLOmQ8va+GefGSOD8hxV9WH8nLYaNzbKi5UHxmPgF2uxnoAzMW6MuwddzrEz23qcgvMKoq0aZm5stBhvZS/i2OrbfS+kwvtGQhqNuaih8Hv/9GmLYZX5kFIxWMOMQ3mtVQbAlb7yN7eSLSrFWjYTeu4OsGUJM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767662247; c=relaxed/simple;
+	bh=Vkn6d+IzHDTnJtRWg0esRaoSELl3xH6rHxdNRh7E4kQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QO1rPSZRl8LygSYaLS86ybBRh4vF7vYjBq+xO4lPXe3P+erXNAp8en3GD8OCwpcDTw/bVLVjDPExwTGianH+JejxaT1cjp4n5OO7AQlLrg3Tgl/n/hWZvhG2GVN3cZUlTrLpjy3l79VBTlU0z5zzpC1J6tq6I/+85e3mWWGQXdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=srukJ5bz; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6505d147ce4so4312a12.0
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 16:54:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767660889; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QzxOMA89SG0n8GX8XasR6n3bKVvQoMtEWZtb6B06wCoJzBllth+wG8s4TWJ6Dv97eN
-         z4OVan6F25+MCTZEigO70bE7twBiESJ9xF8zRW5xDWFg4izO/ffjHrA/nsw3uYsEINth
-         nRcHljwz5Ta4Lv4f0H/wj+wYGX4Lagsylu3GZDjp2i1aIcuJ5iFieT2qCQrQM3qWQkPR
-         +B6HUezpUIOT8Tj8u60ewKpz6EqxxNrO+Weu/ELdJozJtj9x85nbe2i/ht0tDxHvGVJW
-         6sfIK0rIaBjNqBoIZG73f1mZC7/A4O+dnXWnBJnXIT0xkAo7Hq//z/Y/hCpV1oE6DxnB
-         WXQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=EWNiWePs4Ni8e6iYqPJa5/G2oW8FgnO0nCVcy739CK0=;
-        fh=0KWE0p/KgYiMpStVyQKkt3mSgRW8aUaXfk3EhE7sXBA=;
-        b=VSs7QHbhdPYt7vV6G6nJI/OguSZD2W5KCzjFyqK9tjW3OQVfeOaFOlr78L7CM46GkH
-         qn79gQPjOws0zk9Tp1GCPnE4CfqqxhsjDSDgmjK8GXMrYmVjsIiRCd0OSKEElQNPgri1
-         nB7VYTqd1U/8hbE3pdsCqf6mN+8FVhVKpUjPxsMIU1MZdV2kenVN1dDAMKcQj/Ogm9Ld
-         T1j7P5/9UAry+eGV6AQocVWxFQiETYUWYmivPWhEB0tsxGoLJGa6CUImSp9/Tuwh4Jxs
-         pmaupi6i+O6VWoKUpUCKr3ZzE2fVwvkLM2yoWF6V3DmXqtGin4uE6qZbDUIV8h0igYND
-         k5JQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7c240728e2aso1427141b3a.3
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 17:17:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767660889; x=1768265689; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EWNiWePs4Ni8e6iYqPJa5/G2oW8FgnO0nCVcy739CK0=;
-        b=RAsUORX1omNX0o86SZCqfLDpJt3CoHZ3fHII36wXTBtatjBSwEsm/EC8AWm/ZJePid
-         e+sQQkzFqsRAC4ebx5fvwoFV6t9T7V1v6dM6ZEuSnLnHABAmyKYm1Ds9mi9X+z4maAJv
-         A6pDnhhBS7DYh+uBNRf1p6hdDMBWTzKv46r+kZmhv7Gco2TnJf0Rg8eQBIyYA2D7DRbV
-         dARfLEgH6YO9ZBY+HnYgBMeFiiXTktchYwYqv/3K+VdAs6Q1bI88tb1Tu64/qt0dJVmh
-         qOSduqHTvfHh2MhlQAO1ZoJkfiat+zVPl3Tsc4UI8Nzmr2/F0iPIzKwclDz7IA5H5JFx
-         KLgQ==
+        d=google.com; s=20230601; t=1767662245; x=1768267045; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LHeIv2XQKWavHCM7YPXAh7Bmr80lyuwrW8phEkPDzPc=;
+        b=srukJ5bzvW9Ojh7G3bI0aqEPyws40pOFcZzoyMjcW59bJogNbwN+OOginc2psgwcfl
+         0FG/mhPx9UrlvRgQjhDZ24j1frLhm1ovJoxemadn0k3Q/X56x+lFUk3h3hvCv4FS71Y3
+         Zgt6RIy6jThs1B+OJoZJ1tecn8QitiJaESLUKzhIcXSKcgMdMUzRInnv3lojXw2dKY5b
+         yp8LTAVi9vGc0WNLQ99LUxu0ht+UMBSNqjdtDcJU0AxombQW1bvBEbdbeOU6wEbLnTKd
+         tOg2fmO0OsNbXwHnm0FiOunSctCvDvCQzpJwQOcbk08BLv+a5gZlYbcgTKClgsDSWEE3
+         otqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767660889; x=1768265689;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EWNiWePs4Ni8e6iYqPJa5/G2oW8FgnO0nCVcy739CK0=;
-        b=t8V1zaN2chVXu2o0fs8Z7+G/ZizuBWCFNgg0DecRYweq1AYs9/E5fqhXrelCikW0iP
-         S0qiLiStp/YsqSH3lw50NJIb+qLtQLJY3Js6Ai/tF8t5IDXChTNdC30hxU4iUOz3lHsE
-         YG4uNknFPIeaVznIx9HIEb7YxGFAlTw/8ZwZgPzB/c8WU3+aNixd/oUhzT3EGcyGzMtW
-         OCta6oiVwr47Uq8oA+2WwBF9QnOtJUFcYtuFXDlXJR3v0qptWpDbomtQQdnYhC9fk/eg
-         /OKTB8BzozUqGfrEksli3MgIKdRj+Qs2pac+YpXTrkYgmW7/jyTUJtTfF1jumNfRhX3k
-         IHbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUjBALpUu77vQbTax0nm+bZPB7GrjmshmgtWjybLmOaoggqctjmAGHMtPiZdf7c4DqySdM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1E73lGt+uMj1B6mHYyivisBBggwsNdzxrOw5TyxkZYLBfVetG
-	2grr1w+KGv3mueXGEp0Wx5rrwtzIpgmoQyXy4osWJ24cjUucOk5qfcU1wrU+Btrx3jfYlQ3hBa8
-	A46hQV487r7Sjy+Jz7I/g4uOTBPLXf4jzqh78fsQN
-X-Gm-Gg: AY/fxX7eiBVUvMFHHlPPIrQvW69eegySSxkjPjkHkyiuFCokFF9P9+Rbh2Ohl46Tp/d
-	MLhGOKlr0zfJdNLW7v8YcyKhKfIdk83xKvQvt2OXfnVIlUsdd34qWUS0WVgKwBOSsRFvqGHX2sJ
-	UMantC0xVShHWTuHNWMbhrd45rR2YVrzD+Yr8b2SiR3ZWS3+NCaHSOc/g8wj3RWjEG2Jn3jANJ+
-	uWjnsZQmcGcuse5cBcI8TAb8SZVamQpd/FUvCD8yUJpRMLiidmIlLRGs1N7uHItMVZ00H2Qza7c
-	RXLXyQ==
-X-Google-Smtp-Source: AGHT+IGWKSRnkkKYnK7JG/CvYiGarDCI+ajo3F5kb+1PzJYaiyiFcGanq8SprbF89rYnLJhh9RH/tsrB2I04BC58k8U=
-X-Received: by 2002:aa7:d9c8:0:b0:650:5d5c:711c with SMTP id
- 4fb4d7f45d1cf-65080907ee8mr9405a12.17.1767660889313; Mon, 05 Jan 2026
- 16:54:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767662245; x=1768267045;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LHeIv2XQKWavHCM7YPXAh7Bmr80lyuwrW8phEkPDzPc=;
+        b=jdmQ97Q93JVs35kK0Y11H3Nk6xUyvCR+TatqjhBn8tJ6zfd9Gfn6V6xt//LBOcp9P5
+         tUIln7jaec0fRqdlhF/qj1JWJ5LJAVPwRxjONvq74sQg2RxlmbWCW7MuQaOYNsfZIBaV
+         8pTOSpas/zlHhAVVzKT6UMLXLBTEgpGmppITVm8AXrzMIg+/LpHk0vXAoLaM8GI/4RFb
+         H2R9k87r6OAP1aEDSNTqIop5jY9jiItiA/3dDfqXBTq7pLD/y9A3KXE83ZMw+9eX1k9r
+         B3LMMU6Q6cuQIo3oL5lztfgkFpvr/YwyWZly8yUfRciLXS8Eqm93/+78I8s2mx9cjeEx
+         /88Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWK70pm/0452TztpBytlymuTRZZGYuuNZjlhge3e0OjiwO/xNN8tQDXk4qxVxmaM2eFgp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLUWhUddk+/BmQ+2UsySs7FHP0kbHBDPqmUmTGsQfpmvxkGXCG
+	T97mv2CBLzv9yO89o1BhlrXDi6vngzkYndzVfzoAU+iGgfEIBgYFwBTgCCFKyBrW++Kt+WJmc4L
+	tH2DMLw==
+X-Google-Smtp-Source: AGHT+IH/IIcpsomoZZuFOHAD7u0wqzN+TzokWJVvCMAPsUDjfqeJDbBC1q7HMCbobbBwmcXf/oHu2fSRIbE=
+X-Received: from pffy8.prod.google.com ([2002:aa7:93c8:0:b0:802:f63a:105d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:428a:b0:7e8:4398:b36e
+ with SMTP id d2e1a72fcca58-8188008db4dmr961948b3a.65.1767662245227; Mon, 05
+ Jan 2026 17:17:25 -0800 (PST)
+Date: Mon, 5 Jan 2026 17:17:23 -0800
+In-Reply-To: <CALMp9eSWwjZ83VQXRSD3ciwHmtaK5_i-941KdiAv9V9eU20B8g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20260101090516.316883-1-pbonzini@redhat.com> <20260101090516.316883-2-pbonzini@redhat.com>
-In-Reply-To: <20260101090516.316883-2-pbonzini@redhat.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 5 Jan 2026 16:54:37 -0800
-X-Gm-Features: AQt7F2pqIe33A5HTxusplRp5TOpr0YDWt8-n-oDeaTTLO1max17quIB6VH1aut8
-Message-ID: <CALMp9eSWwjZ83VQXRSD3ciwHmtaK5_i-941KdiAv9V9eU20B8g@mail.gmail.com>
+ <CALMp9eSWwjZ83VQXRSD3ciwHmtaK5_i-941KdiAv9V9eU20B8g@mail.gmail.com>
+Message-ID: <aVxiowGbWNgY2cWD@google.com>
 Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever XFD[i]=1
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com, 
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
 	x86@kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 1, 2026 at 1:13=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->
-> From: Sean Christopherson <seanjc@google.com>
-> ...
-> +       /*
-> +        * KVM's guest ABI is that setting XFD[i]=3D1 *can* immediately r=
-evert
-> +        * the save state to initialized.
+On Mon, Jan 05, 2026, Jim Mattson wrote:
+> On Thu, Jan 1, 2026 at 1:13=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
+> >
+> > From: Sean Christopherson <seanjc@google.com>
+> > ...
+> > +       /*
+> > +        * KVM's guest ABI is that setting XFD[i]=3D1 *can* immediately=
+ revert
+> > +        * the save state to initialized.
+>=20
+> This comment suggests that an entry should be added to
+> Documentation/virt/kvm/x86/errata.rst.
 
-This comment suggests that an entry should be added to
-Documentation/virt/kvm/x86/errata.rst.
+Hmm, I don't think it's necessary, the SDM (in a style more suited for the =
+APM,
+*sigh*), "recommends" that software not rely on state being maintained when=
+ disabled
+via XFD.
+
+  Before doing so, system software should first initialize AMX state (e.g.,=
+ by
+  executing TILERELEASE); maintaining AMX state in a non-initialized state =
+may
+  have negative power and performance implications and will prevent the exe=
+cution
+  of In-Field Scan tests. In addition, software should not rely on the stat=
+e of
+  the tile data after setting IA32_XFD[17] or IA32_XFD[18]; software should=
+ always
+  reload or reinitialize the tile data after clearing IA32_XFD[17] and IA32=
+_XFD[18].
+
+  System software should not use XFD to implement a =E2=80=9Clazy restore=
+=E2=80=9D approach to
+  management of the TILEDATA state component. This approach will not operat=
+e correctly
+  for a variety of reasons. One is that the LDTILECFG and TILERELEASE instr=
+uctions
+  initialize TILEDATA and do not cause an #NM exception. Another is that an=
+ execution
+  of XSAVE, XSAVEC, XSAVEOPT, or XSAVES by a user thread will save TILEDATA=
+ as
+  initialized instead of the data expected by the user thread.
+
+I suppose that doesn't _quite_ say that the CPU is allowed to clobber state=
+, but
+it's darn close.
+
+I'm definitely not opposed to officially documenting KVM's virtual CPU impl=
+ementation,
+but IMO calling it an erratum is a bit unfair.
 
