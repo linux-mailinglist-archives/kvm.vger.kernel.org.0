@@ -1,119 +1,157 @@
-Return-Path: <kvm+bounces-67095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 179ECCF6AA0
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 05:29:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410D2CF6B4C
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 05:56:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DAC8304641D
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 04:29:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF7673007527
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 04:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A1D280332;
-	Tue,  6 Jan 2026 04:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577692BFC70;
+	Tue,  6 Jan 2026 04:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c8gJ9AqF"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="AdxepRR3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE9D1A9B24;
-	Tue,  6 Jan 2026 04:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE4829B8E6
+	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 04:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767673769; cv=none; b=eP1zU7Yb/EsOsq92tkV/prf5pb4GwVAcrZC+S2Q/d9JYHLX24sijXfkWJgKAPrV4R1SUSTDaWvCriAM0m9NkaDtWZvHE5dIJrhUN8ZtnToUhCnFU1DXaF+D7MYtAguxyYL0HX3vd/dI88GE1DhziMQhsSmSPdHzm+MLlGoK6JaU=
+	t=1767675403; cv=none; b=hUu2XTMJzmZOsejenllcV5faIJYehp0ZuPZqDEQDSrNgD/PpFjpOXEDyETdJpIiAye3ghrBFVi5i9qwAiTe6XRPgKI99DMxwY3yKYv4BiZADBxXAVn9xlJUC50tyEU4mrK0YJ6VEzKipkIoR/fSPnFTUY4Wy07fnPzgc/Ou+sMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767673769; c=relaxed/simple;
-	bh=E7Qi2sg6WcAfO/3/z5Mpb0eyvNeHgxKfEhIO+/5XFoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bi38YnA59m4h4PLwslCjrwgjYYogQa1XUYaEVrrux+eGC2oHEj3YyAtM8FCemwWs2WuKcjLciaqRtLg8nN+CuT8rsD4W3UZTN5iiwjL+FmWkPU87AIzJK0rKEyUFZoAVLBnXO44NzRBzyDtZqSZ0BqB422B+rGzBbhgHJdA86So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c8gJ9AqF; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767673768; x=1799209768;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=E7Qi2sg6WcAfO/3/z5Mpb0eyvNeHgxKfEhIO+/5XFoM=;
-  b=c8gJ9AqFegFdLi1hCeLOi8KQkLTibiW3TF0GtDy2W+xuzv6fZz/oEmCu
-   iuYMqYmcB+bHbJ5uhJitK0HQok+cOmTBZ2WNz2k5s9hEqJYieAfyLKIKX
-   suY/dbla/yK28qRSCqnhGNxNgxQz3Iw303NtAMfFKUAYRk6UaodDYc40K
-   KO0EUDWpWt8TFhQhE996dukikbnHV5btV1SnMTVR7SII7GcjG0UnC6Kyz
-   0UwL3lL/6ydVqu3JPZAO6mCrZJvWB4ozJWVr6wovFqJS1AzbZ5VW5WUrD
-   r48NGe0UIOl9ksndF1MFNWs8X8A5V/W1dOFGM3W54PRvUZCxMZBp+vTBo
-   g==;
-X-CSE-ConnectionGUID: yF4UO3QbSceiy6Mb5wJF2g==
-X-CSE-MsgGUID: /9DTrzoaTdK5zYZPchZayQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="68945243"
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="68945243"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 20:29:27 -0800
-X-CSE-ConnectionGUID: CDelGubaSQyPHQKAiPtFkw==
-X-CSE-MsgGUID: kYO5DNZbRZu/icM7psS6Nw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="201789025"
-Received: from akrish4-mobl2.gar.corp.intel.com (HELO windy) ([10.247.133.231])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2026 20:29:22 -0800
-Date: Mon, 5 Jan 2026 20:29:17 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>, 
-	Nikolay Borisov <nik.borisov@suse.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, 
-	Tao Zhang <tao1.zhang@intel.com>
-Subject: Re: [PATCH v6 1/9] x86/bhi: x86/vmscape: Move LFENCE out of
- clear_bhb_loop()
-Message-ID: <pu4fkyawy5ie5axn3whkaj7w6gilcqjzva5zru4lksw7g7y6wy@jzaq5mbhzokx>
-References: <20251201-vmscape-bhb-v6-0-d610dd515714@linux.intel.com>
- <20251201-vmscape-bhb-v6-1-d610dd515714@linux.intel.com>
- <20260101125122.GCaVZtysCPB0cljZJN@fat_crate.local>
+	s=arc-20240116; t=1767675403; c=relaxed/simple;
+	bh=fbOChfkZbXOq4bWAzF7RfS77y5AjBtfElT9+lVK8jhg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JczFKz3btbLZWi7SWlBY7pAgKJ6tG7+jAfDMdRvZVPJvxy3ijxG6LWATrQ/lQdt3FaWMZJhyIXjimj3wh99TzoFcTySuaR07FCbwhaiAqNPpM/jCsBm6u3THycfAPYmrhCFwtS88GgZWiD2NPMFyYqvWfWc8hI/G0giRgAD6FMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=AdxepRR3; arc=none smtp.client-ip=209.85.167.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-4557e6303a5so226714b6e.3
+        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 20:56:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1767675401; x=1768280201; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WA+vnv3FR+Z4SF0lY1aYTXYOVt37m8c4DjPEA2hxbj8=;
+        b=AdxepRR32ZRfNXuAeeUizo+CnwLitQ7zhXMGkWNX+ePYeR8Edb8n82yNZ0WtZmeyVn
+         RjGoMQ5RFebtp9D2clL1nAiKpmFEKNTAN3ui5gMmE0rD1LPLpiE+RLtRQH3jMzLAtVoM
+         fq8D4n7rM4Xj4pp4q6ZMji5Lw9yxCMk2R66PmNkxDKxUd5v6jV6U8uG9wtzY24vCk8ZF
+         Wn/Ntf3/VIShSc2WA6rOrmkZMmyJb4M73uaCM/KJbdRp2ap1VP4tKRc94YjTLJVGbp4N
+         j8R2wNdf42iuSkEuZAAGMlAQNr0F4ulHSiRscM8Qk9fVMd7VWslEpFA8Msf1eTODs3Ex
+         uqDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767675401; x=1768280201;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WA+vnv3FR+Z4SF0lY1aYTXYOVt37m8c4DjPEA2hxbj8=;
+        b=e+UgGXqFaLnJxkpbrdZiIBoH3YEUngBRwhOylE37eZLg+jwMQFGgznIaYAQzz2HJog
+         q2/RObZrADycIW3Ch4Zy1kwxgkwQzzJ7IFZKfSa1YZUsnYR8Olvr9vFZcujcI6rIn1MA
+         +Lud//i5tX9Pelw6eRj0PgdPfRbbApUvhqlc5X9C0KrcwhKsijZFKAOKYRhMkgmXWblA
+         0R1fDTYidrzZ2lxYFem1meLoj/nv0lAyG95BaUCWDvashX2NwWzZaXf4kSR+wVL1a5xz
+         FRFUkV9GfZe4w5XtbLwKhq8oa1sdpDhO42XPLvGlP/xwvvE0Dc5FWRgUgyzDcFoH/mm3
+         1LRg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3ZF3CkeRZ8BsEGdUeRUWYbk3UDD/hU8ZazPz4/DXDTMuVZw+5+VMcY3yCSb0b0RC7bfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUe1IM7qVUdVJmvoIH3mynZboz+v7XwkF/LpH01gGuOxSBycTP
+	ZyxIlNQGBkcwm7EFoGydRe4jciZya3cBwIg7HO3BcikSSOyLjB/uwSxp6L0OkdFlY4TcrKgjnLx
+	VZMP8ipf1p1BHF6s//wY7zE4vxqWRD0SqerGYkJ/EOg==
+X-Gm-Gg: AY/fxX6ogfVagjiYA9s3Ta7/azU4sGNQeznnsRVsxufNiGHoQcZ1F5FO+uzSNU+qrbm
+	by5mj/x/2sX9HByXBFe2CKx69iyNkJtS4nvsrdEFt4z+6kH9JIQ42agUDGrE0DUDBxmk8wIBMl+
+	UhAg0XCmRxAialK1nn8qtQ+ZhFsiNUtRJppaVPne+v2YD8dhgkaNIXVtXvAnhZsxCZDroCLcPZq
+	dFPYhIk5s2d8/cwqc0R1knMYtTV0+e6A6O+IRKcuaB2xTHIphqQ07ooD9Hji+fBkyj0D5c1d//4
+	WlRsEN2pqaOL234Qd19oP52zvjxkHFuLI51BoO9x8mXmHIcjTr8aGANisg==
+X-Google-Smtp-Source: AGHT+IFYFZIDuKpjkDS72Ef6JCpoBzzGRuIzZj1eYSMd9ZLPsEbeYPPSGa4zpnzJp7w6utOo445xI/OFNWfh52Uwiq4=
+X-Received: by 2002:a05:6820:f006:b0:65d:a21:d1f9 with SMTP id
+ 006d021491bc7-65f4799cc06mr1525576eaf.5.1767675400701; Mon, 05 Jan 2026
+ 20:56:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260101125122.GCaVZtysCPB0cljZJN@fat_crate.local>
+References: <20251020042457.30915-1-luxu.kernel@bytedance.com> <20251020042457.30915-5-luxu.kernel@bytedance.com>
+In-Reply-To: <20251020042457.30915-5-luxu.kernel@bytedance.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 6 Jan 2026 10:26:29 +0530
+X-Gm-Features: AQt7F2pAUL7KOytVD0mr7jwpoQ61NGCRNrXweF7HHu0OAcu7_RUK7gg5_B9FCMI
+Message-ID: <CAAhSdy3btmd-G_335XjJ6O_+WFNyrq5wWYSEtEQHUeP1yKmLog@mail.gmail.com>
+Subject: Re: [PATCH v4 09/10] RISC-V: KVM: Allow Zalasr extensions for Guest/VM
+To: Xu Lu <luxu.kernel@bytedance.com>
+Cc: corbet@lwn.net, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, will@kernel.org, peterz@infradead.org, 
+	boqun.feng@gmail.com, mark.rutland@arm.com, atish.patra@linux.dev, 
+	pbonzini@redhat.com, shuah@kernel.org, parri.andrea@gmail.com, 
+	ajones@ventanamicro.com, brs@rivosinc.com, guoren@kernel.org, 
+	linux-doc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
+	apw@canonical.com, joe@perches.com, lukas.bulwahn@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 01, 2026 at 01:51:22PM +0100, Borislav Petkov wrote:
-> On Mon, Dec 01, 2025 at 10:18:59PM -0800, Pawan Gupta wrote:
-> > In preparation for adding the support for BHB sequence (without LFENCE) on
-> > newer CPUs, move the LFENCE to the caller side after clear_bhb_loop() is
-> > executed. This allows callers to decide whether they need the LFENCE or
-> 
-> s/This allows/Allow/
+On Mon, Oct 20, 2025 at 9:55=E2=80=AFAM Xu Lu <luxu.kernel@bytedance.com> w=
+rote:
+>
+> Extend the KVM ISA extension ONE_REG interface to allow KVM user space
+> to detect and enable Zalasr extensions for Guest/VM.
+>
+> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
 
-> > not. This does adds a few extra bytes to the call sites, but it obviates
-> 
-> s/This does adds/This adds/
+LGTM.
 
-Ok.
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
-> > diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-> > index ed04a968cc7d0095ab0185b2e3b5beffb7680afd..886f86790b4467347031bc27d3d761d5cc286da1 100644
-> > --- a/arch/x86/entry/entry_64.S
-> > +++ b/arch/x86/entry/entry_64.S
-> > @@ -1528,6 +1528,9 @@ SYM_CODE_END(rewind_stack_and_make_dead)
-> >   * refactored in the future if needed. The .skips are for safety, to ensure
-> >   * that all RETs are in the second half of a cacheline to mitigate Indirect
-> >   * Target Selection, rather than taking the slowpath via its_return_thunk.
-> > + *
-> > + * Note, callers should use a speculation barrier like LFENCE immediately after
-> > + * a call to this function to ensure BHB is cleared before indirect branches.
-> >   */
-> 
-> Comments do get missed. So, I'd call the function clear_bhb_loop_unfenced or
-> something to that effect so that it is perfectly clear that !BHI_DIS_S parts
-> will need the LFENCE at the end. This way it is in the name and should make
-> people think what they're calling. I'd hope...
+Queued this patch for Linux-6.20
 
-Sure, renaming this to clear_bhb_loop_nofence() in a separate patch.
+Thanks,
+Anup
 
-Will send v7 after some testing.
+> ---
+>  arch/riscv/include/uapi/asm/kvm.h | 1 +
+>  arch/riscv/kvm/vcpu_onereg.c      | 2 ++
+>  2 files changed, 3 insertions(+)
+>
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
+asm/kvm.h
+> index ef27d4289da11..4fbc32ef888fa 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -185,6 +185,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+>         KVM_RISCV_ISA_EXT_ZICCRSE,
+>         KVM_RISCV_ISA_EXT_ZAAMO,
+>         KVM_RISCV_ISA_EXT_ZALRSC,
+> +       KVM_RISCV_ISA_EXT_ZALASR,
+>         KVM_RISCV_ISA_EXT_MAX,
+>  };
+>
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index cce6a38ea54f2..6ae5f9859f25b 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -50,6 +50,7 @@ static const unsigned long kvm_isa_ext_arr[] =3D {
+>         KVM_ISA_EXT_ARR(ZAAMO),
+>         KVM_ISA_EXT_ARR(ZABHA),
+>         KVM_ISA_EXT_ARR(ZACAS),
+> +       KVM_ISA_EXT_ARR(ZALASR),
+>         KVM_ISA_EXT_ARR(ZALRSC),
+>         KVM_ISA_EXT_ARR(ZAWRS),
+>         KVM_ISA_EXT_ARR(ZBA),
+> @@ -184,6 +185,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsign=
+ed long ext)
+>         case KVM_RISCV_ISA_EXT_ZAAMO:
+>         case KVM_RISCV_ISA_EXT_ZABHA:
+>         case KVM_RISCV_ISA_EXT_ZACAS:
+> +       case KVM_RISCV_ISA_EXT_ZALASR:
+>         case KVM_RISCV_ISA_EXT_ZALRSC:
+>         case KVM_RISCV_ISA_EXT_ZAWRS:
+>         case KVM_RISCV_ISA_EXT_ZBA:
+> --
+> 2.20.1
+>
 
