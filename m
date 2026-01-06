@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67122-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67123-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BAACF7CBD
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:30:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4403CF7C63
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 11:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 447FB313F698
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:24:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7D4233048937
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 10:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F23331211;
-	Tue,  6 Jan 2026 10:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534183314DF;
+	Tue,  6 Jan 2026 10:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cjEgxr/u"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kauFI1zN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BB4330B3B;
-	Tue,  6 Jan 2026 10:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7CC330D58;
+	Tue,  6 Jan 2026 10:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767695054; cv=none; b=FHaW4ETdKNwWVit0SM42rAo0dKVxS20cqLJGmgVj6oJ76gqaOzQjOF6GISQrz2i3iYr5KWdxv6NLmXC4Y8sX0eDZ7EOAlH0MW9vnQ0G/9baRyFoHSYNJ7QL4dK17UOaW/9z9bE0ByOss5bh/Bpvv5x01obKBpJeDbA3JmsdRoiY=
+	t=1767695068; cv=none; b=teDiJs68bh5oghQaveXZNH+YY+o3gLeAt+IcG8MGyXDezO5CZasZz8cdSAOb1Gosa+Syvbjml3z+l4pcI0vCee1lKD/mWlBUhReAwAH5z9efq242HuV7k+ItTJl01TYylYVh5wA89bLhvxgwE02I3FiHu+CywSZof6W8we8regM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767695054; c=relaxed/simple;
-	bh=7p4aGDoalMVzElQ2eJw5W4B2KiyonDkzRB5bPxon/3E=;
+	s=arc-20240116; t=1767695068; c=relaxed/simple;
+	bh=ffK1vQpvyzKmlUzz2zxoihkeD9nVSu7GIDcTNxPg6ZM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HM1/HogaUsDxtddC5VGfz8Ye2YCPxCyw3R0qO7g11KXZyRxcfsR/VR1TqM57l8+s9r0vq7gnLoX+A7t/6jzrCMrLXBgid+71FgHvU5Z42LvjoHC4Xl8PyBmHLmEoqHwaUAyIb0dtbnW1C1BO9dLlv9cxkTi13KPh6pxm2dc57qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cjEgxr/u; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=nAHKvustFRbaL8I9p4wmhGHZTjSXJyNn4FxneBVZ2ulEw2lkgZcymxTYocaSf1gWxZyVv6EhEb0wH2fjjsSH64dF/1z3TG8e3NX08qZWW3KT2c/6x9dnayvVFrjGQxtbmBaEbqGI73PQ47yrcc5sPA/B1pDg+b61bBJS4LulHKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kauFI1zN; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767695053; x=1799231053;
+  t=1767695065; x=1799231065;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7p4aGDoalMVzElQ2eJw5W4B2KiyonDkzRB5bPxon/3E=;
-  b=cjEgxr/utQZ/oqQJTPtBy4Pnvd2PZKhM4/ItKagnyza/YXOkYjCM9KBP
-   Ywv1QcFivP/dAfIZERL9L1ru0TQ00SmDnfpg/23bR5gAjm8y7Lzz3Fi/1
-   wbGfZKYmHZoQNAzxqgdNA0Q5BhD89wO8IfikIG8Dw7cWZD/YGuqo03AN7
-   zz0jZnrMjRx6351N/dgrfr52rwj9RnBVMckspdYQvMTtpndFlN9UkW2Qq
-   cMSkY50ro+F1XIPHAn5hxnJj252lSyW4WrKxvhml6zn1IUkam8oSKaQ59
-   nqtAhCHIeFxGUhu4OEQgsYBvWQXELwJL5ZeyVabKCu21GQnw+8Ijx35n1
-   Q==;
-X-CSE-ConnectionGUID: YhwJNKdbQMKTI2b1B7nLvA==
-X-CSE-MsgGUID: UX8SxS5SQbScvmsVZiJc7A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="68257895"
+  bh=ffK1vQpvyzKmlUzz2zxoihkeD9nVSu7GIDcTNxPg6ZM=;
+  b=kauFI1zNy553EM7fgpVzVUwd5nzJw/faJZIBs9lji7LKrWgQfje0TrBG
+   +iOxsAMCBtUsKJmILH4bTl46m2HouIEN8CBo+98aCSrORd6XSO048lQrL
+   m81fjugU62C5vu6yKlgi9ym/FrAq2A1mVMufS6GrAUEfgI3W+J6XZsQSY
+   80OMkEvVCqbzIgsvbHbtHlr7gi7BwhhTskIGnfjPJVjcdjVsLq4gX5OE9
+   IIScZ2UpvG8X3B3tHf38QXaQwGGtbDYlTOleQK/vQyfUYS+56zPpRJBZK
+   SwxY95pHJyN8uaW+JzSNG+5d0tOoR3sbfxjDYWCisBjIleHhhSkWXe0/t
+   w==;
+X-CSE-ConnectionGUID: vEFYgxLjSNGz8nDdPRziUA==
+X-CSE-MsgGUID: 9i6Dut6LQmW8CQxLaUvLIA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11662"; a="80427348"
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="68257895"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:24:11 -0800
-X-CSE-ConnectionGUID: jt86jOuEQoywKPhyMpRMQw==
-X-CSE-MsgGUID: zZlpSrEWRa+F76crevGsvQ==
+   d="scan'208";a="80427348"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:24:24 -0800
+X-CSE-ConnectionGUID: qZCS4Z+ISYiXm6jdpoxKCg==
+X-CSE-MsgGUID: qw4VeN+7TxSY9JjDNSm1xg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="240111124"
+   d="scan'208";a="202681573"
 Received: from yzhao56-desk.sh.intel.com ([10.239.47.19])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:24:05 -0800
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 02:24:19 -0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com
@@ -87,9 +87,9 @@ Cc: linux-kernel@vger.kernel.org,
 	chao.p.peng@intel.com,
 	chao.gao@intel.com,
 	yan.y.zhao@intel.com
-Subject: [PATCH v3 13/24] KVM: TDX: Honor the guest's accept level contained in an EPT violation
-Date: Tue,  6 Jan 2026 18:22:07 +0800
-Message-ID: <20260106102207.25143-1-yan.y.zhao@intel.com>
+Subject: [PATCH v3 14/24] KVM: Change the return type of gfn_handler_t() from bool to int
+Date: Tue,  6 Jan 2026 18:22:22 +0800
+Message-ID: <20260106102222.25160-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20260106101646.24809-1-yan.y.zhao@intel.com>
 References: <20260106101646.24809-1-yan.y.zhao@intel.com>
@@ -101,201 +101,420 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TDX requires guests to accept S-EPT mappings created by the host KVM. Due
-to the current implementation of the TDX module, if a guest accepts a GFN
-at a lower level after KVM maps it at a higher level, the TDX module will
-emulate an EPT violation VMExit to KVM instead of returning a size mismatch
-error to the guest. If KVM fails to perform page splitting in the EPT
-violation handler, the guest's ACCEPT operation will be triggered again
-upon re-entering the guest, causing a repeated EPT violation VMExit.
+Modify the return type of gfn_handler_t() from bool to int. A negative
+return value indicates failure, while a return value of 1 signifies success
+with a flush required, and 0 denotes success without a flush required.
 
-The TDX module thus have the EPT violation VMExit carry the guest's accept
-level if it's caused by the guest's ACCEPT operation.
+This adjustment prepares for a later change that will enable
+kvm_pre_set_memory_attributes() to fail.
 
-Honor the guest's accept level if an EPT violation VMExit contains guest
-accept level:
+No functional changes expected.
 
-(1) Set the guest inhibit bit in the lpage info to prevent KVM MMU core
-    from mapping at a higher level than the guest's accept level.
-
-(2) Split any existing mapping higher than the guest's accept level.
-
-Use write mmu_lock to protect (1) and (2) for now. When the TDX module with
-feature NON-BLOCKING-RESIZE is available, splitting can be performed under
-shared mmu_lock as no need to worry about the failure of UNBLOCK after the
-failure of DEMOTE. Then both (1) and (2) are possible to be done under
-shared mmu_lock.
-
-As an optimization, this patch calls hugepage_test_guest_inhibit() without
-holding the mmu_lock to reduce the frequency of acquiring the write
-mmu_lock. The write mmu_lock is thus only acquired if the guest inhibit bit
-is not already set. This is safe because the guest inhibit bit is set in a
-one-way manner while the splitting under the write mmu_lock is performed
-before setting the guest inhibit bit.
-
-Note: For EPT violation VMExits without the guest's accept level, they are
-not caused by the guest's ACCEPT operation, but are instead caused by the
-guest's access of memory before it accepts the memory. Since KVM can't
-obtain guest accept level info from such EPT violation VMExits (the ACCEPT
-operation hasn't occurred yet), KVM may still map at a higher level than
-the later guest's accept level.
-
-So, the typical guest/KVM interaction flow is:
-- If guest accesses private memory without first accepting it,
-  (like non-Linux guests):
-  1. Guest accesses a private memory.
-  2. KVM finds it can map the GFN at 2MB. So, AUG at 2MB.
-  3. Guest accepts the GFN at 4KB.
-  4. KVM receives an EPT violation with eeq_type of ACCEPT + 4KB level.
-  5. KVM splits the 2MB mapping.
-  6. Guest accepts successfully and accesses the page.
-
-- If guest first accepts private memory before accessing it,
-  (like Linux guests):
-  1. Guest accepts a private memory at 4KB.
-  2. KVM receives an EPT violation with eeq_type of ACCEPT + 4KB level.
-  3. KVM AUG at 4KB.
-  4. Guest accepts successfully and accesses the page.
-
-Link: https://lore.kernel.org/all/a6ffe23fb97e64109f512fa43e9f6405236ed40a.camel@intel.com
-Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
 v3:
-- tdx_check_accept_level() --> tdx_honor_guest_accept_level(). (Binbin)
-- Add patch log and code comment to describe the flows for EPT violations
-  w/ and w/o accept level better. (Kai)
-- Add a comment to descibe why kvm_flush_remote_tlbs() is not needed after
-  kvm_split_cross_boundary_leafs(). (Kai).
-- Return ret to userspace on error of tdx_honor_guest_accept_level(). (Kai)
+- Rebased.
 
-RFC v2
-- Change tdx_get_accept_level() to tdx_check_accept_level().
-- Invoke kvm_split_cross_boundary_leafs() and hugepage_set_guest_inhibit()
-  to change KVM mapping level in a global way according to guest accept
-  level. (Rick, Sean).
+RFC v2:
+- No change
 
 RFC v1:
-- Introduce tdx_get_accept_level() to get guest accept level.
-- Use tdx->violation_request_level and tdx->violation_gfn* to pass guest
-  accept level to tdx_gmem_private_max_mapping_level() to detemine KVM
-  mapping level.
+- New patch.
 ---
- arch/x86/kvm/vmx/tdx.c      | 77 +++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx_arch.h |  3 ++
- 2 files changed, 80 insertions(+)
+ arch/arm64/kvm/mmu.c             |  8 ++++----
+ arch/loongarch/kvm/mmu.c         |  8 ++++----
+ arch/mips/kvm/mmu.c              |  6 +++---
+ arch/powerpc/kvm/book3s.c        |  4 ++--
+ arch/powerpc/kvm/e500_mmu_host.c |  8 ++++----
+ arch/riscv/kvm/mmu.c             | 12 ++++++------
+ arch/x86/kvm/mmu/mmu.c           | 20 ++++++++++----------
+ include/linux/kvm_host.h         | 12 ++++++------
+ virt/kvm/kvm_main.c              | 24 ++++++++++++++++--------
+ 9 files changed, 55 insertions(+), 47 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 1e29722abb36..712aaa3d45b7 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1983,6 +1983,79 @@ static inline bool tdx_is_sept_violation_unexpected_pending(struct kvm_vcpu *vcp
- 	return !(eq & EPT_VIOLATION_PROT_MASK) && !(eq & EPT_VIOLATION_EXEC_FOR_RING3_LIN);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 5ab0cfa08343..c39d3ef577f8 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -2221,12 +2221,12 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return false;
  }
  
-+/*
-+ * An EPT violation can be either due to the guest's ACCEPT operation or
-+ * due to the guest's access of memory before the guest accepts the
-+ * memory.
-+ *
-+ * Type TDX_EXT_EXIT_QUAL_TYPE_ACCEPT in the extended exit qualification
-+ * identifies the former case, which must also contain a valid guest
-+ * accept level.
-+ *
-+ * For the former case, honor guest's accept level by setting guest inhibit bit
-+ * on levels above the guest accept level and split the existing mapping for the
-+ * faulting GFN if it's with a higher level than the guest accept level.
-+ *
-+ * Do nothing if the EPT violation is due to the latter case. KVM will map the
-+ * GFN without considering the guest's accept level (unless the guest inhibit
-+ * bit is already set).
-+ */
-+static inline int tdx_honor_guest_accept_level(struct kvm_vcpu *vcpu, gfn_t gfn)
-+{
-+	struct kvm_memory_slot *slot = gfn_to_memslot(vcpu->kvm, gfn);
-+	struct vcpu_tdx *tdx = to_tdx(vcpu);
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 eeq_type, eeq_info;
-+	int level = -1;
-+
-+	if (!slot)
-+		return 0;
-+
-+	eeq_type = tdx->ext_exit_qualification & TDX_EXT_EXIT_QUAL_TYPE_MASK;
-+	if (eeq_type != TDX_EXT_EXIT_QUAL_TYPE_ACCEPT)
-+		return 0;
-+
-+	eeq_info = (tdx->ext_exit_qualification & TDX_EXT_EXIT_QUAL_INFO_MASK) >>
-+		   TDX_EXT_EXIT_QUAL_INFO_SHIFT;
-+
-+	level = (eeq_info & GENMASK(2, 0)) + 1;
-+
-+	if (level == PG_LEVEL_4K || level == PG_LEVEL_2M) {
-+		if (!hugepage_test_guest_inhibit(slot, gfn, level + 1)) {
-+			gfn_t base_gfn = gfn_round_for_level(gfn, level);
-+			struct kvm_gfn_range gfn_range = {
-+				.start = base_gfn,
-+				.end = base_gfn + KVM_PAGES_PER_HPAGE(level),
-+				.slot = slot,
-+				.may_block = true,
-+				.attr_filter = KVM_FILTER_PRIVATE,
-+			};
-+
-+			scoped_guard(write_lock, &kvm->mmu_lock) {
-+				int ret;
-+
-+				/*
-+				 * No kvm_flush_remote_tlbs() is required after
-+				 * the split for S-EPT, because the
-+				 * "BLOCK + TRACK + kick off vCPUs" sequence in
-+				 * tdx_sept_split_private_spte() has guaranteed
-+				 * the TLB flush. The hardware also doesn't
-+				 * cache stale huge mappings in the fault path.
-+				 */
-+				ret = kvm_split_cross_boundary_leafs(kvm, &gfn_range,
-+								     false);
-+				if (ret)
-+					return ret;
-+
-+				hugepage_set_guest_inhibit(slot, gfn, level + 1);
-+				if (level == PG_LEVEL_4K)
-+					hugepage_set_guest_inhibit(slot, gfn, level + 2);
-+			}
-+		}
-+	}
-+	return 0;
-+}
-+
- static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	unsigned long exit_qual;
-@@ -2008,6 +2081,10 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
- 		 */
- 		exit_qual = EPT_VIOLATION_ACC_WRITE;
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
  
-+		ret = tdx_honor_guest_accept_level(vcpu, gpa_to_gfn(gpa));
-+		if (ret)
-+			return ret;
-+
- 		/* Only private GPA triggers zero-step mitigation */
- 		local_retry = true;
- 	} else {
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
-index a30e880849e3..af006a73ee05 100644
---- a/arch/x86/kvm/vmx/tdx_arch.h
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -82,7 +82,10 @@ struct tdx_cpuid_value {
- #define TDX_TD_ATTR_PERFMON		BIT_ULL(63)
+ 	if (!kvm->arch.mmu.pgt)
+-		return false;
++		return 0;
  
- #define TDX_EXT_EXIT_QUAL_TYPE_MASK	GENMASK(3, 0)
-+#define TDX_EXT_EXIT_QUAL_TYPE_ACCEPT  1
- #define TDX_EXT_EXIT_QUAL_TYPE_PENDING_EPT_VIOLATION  6
-+#define TDX_EXT_EXIT_QUAL_INFO_MASK	GENMASK(63, 32)
-+#define TDX_EXT_EXIT_QUAL_INFO_SHIFT	32
+ 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+ 						   range->start << PAGE_SHIFT,
+@@ -2237,12 +2237,12 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	 */
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
+ 
+ 	if (!kvm->arch.mmu.pgt)
+-		return false;
++		return 0;
+ 
+ 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+ 						   range->start << PAGE_SHIFT,
+diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+index a7fa458e3360..06fa060878c9 100644
+--- a/arch/loongarch/kvm/mmu.c
++++ b/arch/loongarch/kvm/mmu.c
+@@ -511,7 +511,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			range->end << PAGE_SHIFT, &ctx);
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	kvm_ptw_ctx ctx;
+ 
+@@ -523,15 +523,15 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 				range->end << PAGE_SHIFT, &ctx);
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	gpa_t gpa = range->start << PAGE_SHIFT;
+ 	kvm_pte_t *ptep = kvm_populate_gpa(kvm, NULL, gpa, 0);
+ 
+ 	if (ptep && kvm_pte_present(NULL, ptep) && kvm_pte_young(*ptep))
+-		return true;
++		return 1;
+ 
+-	return false;
++	return 0;
+ }
+ 
  /*
-  * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
-  */
+diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
+index d2c3b6b41f18..c26cc89c8e98 100644
+--- a/arch/mips/kvm/mmu.c
++++ b/arch/mips/kvm/mmu.c
+@@ -444,18 +444,18 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return true;
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm_mips_mkold_gpa_pt(kvm, range->start, range->end);
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	gpa_t gpa = range->start << PAGE_SHIFT;
+ 	pte_t *gpa_pte = kvm_mips_pte_for_gpa(kvm, NULL, gpa);
+ 
+ 	if (!gpa_pte)
+-		return false;
++		return 0;
+ 	return pte_young(*gpa_pte);
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index d79c5d1098c0..9bf6e1cf64f1 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -886,12 +886,12 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return kvm->arch.kvm_ops->unmap_gfn_range(kvm, range);
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm->arch.kvm_ops->age_gfn(kvm, range);
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	return kvm->arch.kvm_ops->test_age_gfn(kvm, range);
+ }
+diff --git a/arch/powerpc/kvm/e500_mmu_host.c b/arch/powerpc/kvm/e500_mmu_host.c
+index 06caf8bbbe2b..dd5411ee242e 100644
+--- a/arch/powerpc/kvm/e500_mmu_host.c
++++ b/arch/powerpc/kvm/e500_mmu_host.c
+@@ -697,16 +697,16 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return kvm_e500_mmu_unmap_gfn(kvm, range);
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	/* XXX could be more clever ;) */
+-	return false;
++	return 0;
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	/* XXX could be more clever ;) */
+-	return false;
++	return 0;
+ }
+ 
+ /*****************************************/
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 4ab06697bfc0..aa163d2ef7d5 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -259,7 +259,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return false;
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	pte_t *ptep;
+ 	u32 ptep_level = 0;
+@@ -267,7 +267,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	struct kvm_gstage gstage;
+ 
+ 	if (!kvm->arch.pgd)
+-		return false;
++		return 0;
+ 
+ 	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
+ 
+@@ -277,12 +277,12 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	gstage.pgd = kvm->arch.pgd;
+ 	if (!kvm_riscv_gstage_get_leaf(&gstage, range->start << PAGE_SHIFT,
+ 				       &ptep, &ptep_level))
+-		return false;
++		return 0;
+ 
+ 	return ptep_test_and_clear_young(NULL, 0, ptep);
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	pte_t *ptep;
+ 	u32 ptep_level = 0;
+@@ -290,7 +290,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	struct kvm_gstage gstage;
+ 
+ 	if (!kvm->arch.pgd)
+-		return false;
++		return 0;
+ 
+ 	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
+ 
+@@ -300,7 +300,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	gstage.pgd = kvm->arch.pgd;
+ 	if (!kvm_riscv_gstage_get_leaf(&gstage, range->start << PAGE_SHIFT,
+ 				       &ptep, &ptep_level))
+-		return false;
++		return 0;
+ 
+ 	return pte_young(ptep_get(ptep));
+ }
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 029f2f272ffc..1b180279aacd 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1810,7 +1810,7 @@ static bool kvm_may_have_shadow_mmu_sptes(struct kvm *kvm)
+ 	return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_shadow_pages);
+ }
+ 
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	bool young = false;
+ 
+@@ -1823,7 +1823,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	return young;
+ }
+ 
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	bool young = false;
+ 
+@@ -7962,8 +7962,8 @@ static void hugepage_set_mixed(struct kvm_memory_slot *slot, gfn_t gfn,
+ 	lpage_info_slot(gfn, slot, level)->disallow_lpage |= KVM_LPAGE_MIXED_FLAG;
+ }
+ 
+-bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+-					struct kvm_gfn_range *range)
++int kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++				       struct kvm_gfn_range *range)
+ {
+ 	struct kvm_memory_slot *slot = range->slot;
+ 	int level;
+@@ -7980,10 +7980,10 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+ 	 * a hugepage can be used for affected ranges.
+ 	 */
+ 	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+-		return false;
++		return 0;
+ 
+ 	if (WARN_ON_ONCE(range->end <= range->start))
+-		return false;
++		return 0;
+ 
+ 	/*
+ 	 * If the head and tail pages of the range currently allow a hugepage,
+@@ -8042,8 +8042,8 @@ static bool hugepage_has_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	return true;
+ }
+ 
+-bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+-					 struct kvm_gfn_range *range)
++int kvm_arch_post_set_memory_attributes(struct kvm *kvm,
++					struct kvm_gfn_range *range)
+ {
+ 	unsigned long attrs = range->arg.attributes;
+ 	struct kvm_memory_slot *slot = range->slot;
+@@ -8059,7 +8059,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 	 * SHARED may now allow hugepages.
+ 	 */
+ 	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+-		return false;
++		return 0;
+ 
+ 	/*
+ 	 * The sequence matters here: upper levels consume the result of lower
+@@ -8106,7 +8106,7 @@ bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 				hugepage_set_mixed(slot, gfn, level);
+ 		}
+ 	}
+-	return false;
++	return 0;
+ }
+ 
+ void kvm_mmu_init_memslot_memory_attributes(struct kvm *kvm,
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e563bb22c481..6f3d29db0505 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -273,8 +273,8 @@ struct kvm_gfn_range {
+ 	bool lockless;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+-bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+-bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
++int kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
++int kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
+ int kvm_split_cross_boundary_leafs(struct kvm *kvm, struct kvm_gfn_range *range,
+ 				   bool shared);
+ #endif
+@@ -734,10 +734,10 @@ static inline bool kvm_arch_has_private_mem(struct kvm *kvm)
+ extern bool vm_memory_attributes;
+ bool kvm_range_has_vm_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+ 				     unsigned long mask, unsigned long attrs);
+-bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++int kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
++				       struct kvm_gfn_range *range);
++int kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+ 					struct kvm_gfn_range *range);
+-bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+-					 struct kvm_gfn_range *range);
+ #else
+ #define vm_memory_attributes false
+ #endif /* CONFIG_KVM_VM_MEMORY_ATTRIBUTES */
+@@ -1568,7 +1568,7 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ void kvm_mmu_invalidate_begin(struct kvm *kvm);
+ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+ void kvm_mmu_invalidate_end(struct kvm *kvm);
+-bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
++int kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index feeef7747099..471f798dba2d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -517,7 +517,7 @@ static inline struct kvm *mmu_notifier_to_kvm(struct mmu_notifier *mn)
+ 	return container_of(mn, struct kvm, mmu_notifier);
+ }
+ 
+-typedef bool (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
++typedef int (*gfn_handler_t)(struct kvm *kvm, struct kvm_gfn_range *range);
+ 
+ typedef void (*on_lock_fn_t)(struct kvm *kvm);
+ 
+@@ -601,6 +601,7 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 		kvm_for_each_memslot_in_hva_range(node, slots,
+ 						  range->start, range->end - 1) {
+ 			unsigned long hva_start, hva_end;
++			int ret;
+ 
+ 			slot = container_of(node, struct kvm_memory_slot, hva_node[slots->node_idx]);
+ 			hva_start = max_t(unsigned long, range->start, slot->userspace_addr);
+@@ -641,7 +642,9 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
+ 						goto mmu_unlock;
+ 				}
+ 			}
+-			r.ret |= range->handler(kvm, &gfn_range);
++			ret = range->handler(kvm, &gfn_range);
++			WARN_ON_ONCE(ret < 0);
++			r.ret |= ret;
+ 		}
+ 	}
+ 
+@@ -727,7 +730,7 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
+ 	}
+ }
+ 
+-bool kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
++int kvm_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
+ 	return kvm_unmap_gfn_range(kvm, range);
+@@ -2507,7 +2510,8 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memslot_iter iter;
+ 	bool found_memslot = false;
+-	bool ret = false;
++	bool flush = false;
++	int ret = 0;
+ 	int i;
+ 
+ 	gfn_range.arg = range->arg;
+@@ -2540,19 +2544,23 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+ 					range->on_lock(kvm);
+ 			}
+ 
+-			ret |= range->handler(kvm, &gfn_range);
++			ret = range->handler(kvm, &gfn_range);
++			if (ret < 0)
++				goto err;
++			flush |= ret;
+ 		}
+ 	}
+ 
+-	if (range->flush_on_ret && ret)
++err:
++	if (range->flush_on_ret && flush)
+ 		kvm_flush_remote_tlbs(kvm);
+ 
+ 	if (found_memslot)
+ 		KVM_MMU_UNLOCK(kvm);
+ }
+ 
+-static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
+-					  struct kvm_gfn_range *range)
++static int kvm_pre_set_memory_attributes(struct kvm *kvm,
++					 struct kvm_gfn_range *range)
+ {
+ 	/*
+ 	 * Unconditionally add the range to the invalidation set, regardless of
 -- 
 2.43.2
 
