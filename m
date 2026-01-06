@@ -1,169 +1,138 @@
-Return-Path: <kvm+bounces-67097-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67098-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5381ECF6B69
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 05:58:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7A8CF6C56
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 06:26:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DE01306F8EB
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 04:56:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7300D302D52E
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 05:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3DF2C08AC;
-	Tue,  6 Jan 2026 04:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6836301717;
+	Tue,  6 Jan 2026 05:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Ss7ckk8R"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="hm9fZ7aO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B9D2BF002
-	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 04:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221702BD5A8;
+	Tue,  6 Jan 2026 05:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767675408; cv=none; b=WfUmQIgiB35Bgmj5A/JnymjQLEPl3hdFOciSJSsH6sZ9yCC+1TstKHG8CcgnJgoqtPDnzannOEppMlu/nHaqeznc84j5vJEVB0DVkzfksuPAzw8p8IN6QPKLJSFPJSo5EIaEKRiQHFnnKB+8q0UTp7qD6Z7V8kBUFmmqinZlVJM=
+	t=1767677145; cv=none; b=g1vHzdkGULwDbV2uE86UYViTf8MUPxON9uBDMVgXq5ohNxmtU4eSunUNvkuBuL9rWTTp0nLa1bpavubV6TUbZ6jlegfNU0oH6v88RvfFD2kj1ivFGcZrHDrmtT71ZiKnlJ37dv64Mw6AInI607Saaax/+wsFECY3NX7kfWPetAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767675408; c=relaxed/simple;
-	bh=bPMuOyUg+pCFEpuN7CwHcwhs5rNIMbrQeGA0HQmyckk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nd9rCv63PHB/EnEXS+kcorLB2lScediOAR+Q6DOAPED1WUJrIOu+PLTCjbmhnk0Ex2LQ1oHcHVQaxjQq+dB1+s/k25YIg6Ii1aw76F0cxjCof0HL8mQerJpdeY3hQS3X2UZSDr1sxoxPD+ofw5Haaw19uxOJ4UU/sr++NAFlTGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Ss7ckk8R; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-65ec86c5e70so373962eaf.3
-        for <kvm@vger.kernel.org>; Mon, 05 Jan 2026 20:56:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1767675406; x=1768280206; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bXCgyGXdfFw2jhIVzlU19gmITjYf/onAsSkhutvgS3M=;
-        b=Ss7ckk8RVUlxwrFyuqelWPLqIIJuk2Uj4IEjWUM8dXuPOkWWm+lixB4Muz12tiyLpz
-         mH4Vap32W+6b6n/STLcTzIjbzDLaNbuiPZCTCRxGrpbFOQJCn1ZCkEZ7UbWgPQhtnw8B
-         oXpSumQ1Yeu/eSGxc5lYEgzDskB7hoTS0SMh5PbOGqICGpJP6+kmy0264h1lfjUv10B8
-         qA62nRtRXUYA/ElO5yxDxVyWo2HgxNSGMFKoMiTrA9jAeoe5mjKnHjy41nFUnD1Df5/N
-         aIdq/HaNUaJJ62hgsfOMcg+OWc5Xva5wuuO5pfe4/OfigXsOFHkOEuO8NTE04Fv8SXyG
-         8QFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767675406; x=1768280206;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bXCgyGXdfFw2jhIVzlU19gmITjYf/onAsSkhutvgS3M=;
-        b=Pqt/yyp7PhEVaD0vVacIcdzmpLcENxT/CA6AIgM6ofUlGlOleHgOryfx7PxCekRWMp
-         Xi9Ys96vd3R9APXRIzL5hMIA7NEyX/11EFXYWS9S4fZlsPs0Qv41GcIr21HV1yRhO9+v
-         12DTTegFLvCRPZaS1jbr4G3N1KfH+Z1rXYVePADPESAeJ+hudU11VyLZvqr2X37CjXt+
-         8uxpNf0mmpyau2etQ8QHtAwzNcZ7TEdnCtv+xoUHO8Rh6pdr3fiO0suNQ76wgCIB09nr
-         KwOg5WSGt721VCwFwSN6/dNqvXKXBNhgH45Worhq1TWd2ZoJClZ82i36PYYPiqUouT7J
-         b3Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCWgNCfXXhpQndNMHucL6xZ0L2YqePRRB0Yfj1Ur2RK5O4G/uk7TgHQoLHlLfPMWZCy8HNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0Rl5pOdQsffIO0TrBsi8Kro4QEe3GylnBNJWLwF7vjaagqNVj
-	VfK1NyNAqtEz0ZGPiJ39UDLl7wUEB7go9SxsmX47bNHcY27hM9tM2Z4EmyuX3b+7yBZSVR60SIj
-	VI86S3ZkmYGSH+h7cnNh9a2Lnw2hqlakzHikbQWrrMg==
-X-Gm-Gg: AY/fxX7WAtF26KaPsJB5EsH+rlIIyBDko9wIR187nP0eFi5Q46fPJDKbuDunOoq+DGW
-	ADb/5XlMMM2sQR6KiM9iT3sgjK4pO8i+PcM+qkal0/DkgBSz62IeYO9PR9imxnARVdEjN5tlpLo
-	NqRFNeBo9G7erSTWWRMxamhRlrCbFLzbOf0zBygkzI1T/cRbQ2w+U5CgFWO2DW8DHl4onWbpbJk
-	Ptns4P07gt4fquJVoBpCKWXW31Wy+MzU/3nJWy9rroKA0siEjmA2gytOrSIQ3gHT7l0G7SfhQ3C
-	kpALKaWK+UWNm6ZA6XNYyXYmflY+SZTVmlLa9r2mNUlxOuh0aVIsWoFOEA==
-X-Google-Smtp-Source: AGHT+IGq83xsWiBnk8S8Wan7SqZp6GnFrv0pdr0Nor1LjDGkvPMfuowdAk7rc0hTsmwGhsAqXr8Xk0551qnx4JMiq/Y=
-X-Received: by 2002:a05:6820:2202:b0:65e:f37f:93a4 with SMTP id
- 006d021491bc7-65f479d332fmr1135768eaf.8.1767675405972; Mon, 05 Jan 2026
- 20:56:45 -0800 (PST)
+	s=arc-20240116; t=1767677145; c=relaxed/simple;
+	bh=ePAsxEhBS2WPW4tMMfOev1sOuNfD1Zy2tmgOi1F2lPY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SXZ3Hqwwb0E4VvFr7EV+3bdLmYb3prQ5q6oIhhGrXLUTX+Hy96243UYcRdI/91I29GxqLtqL+1fcHNP0QxfcfdPxPqt7MVcin46Qp5AbwSLH3IkERSLGqZLK9FzfPF1SxHiF4UNzdsJ4dtc661brBNEQj3XT/CX2fQqqkbDobZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=hm9fZ7aO; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1767677138; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=sqKHxsvRqvCMzBbXkJlIz5eLBsYjaU/14IDuOzVUkFo=;
+	b=hm9fZ7aOzDRyVlMa+7bxJCjZiCUHQJR+ZDAFvtyZzI9ehSUbrm08z8tZKRvSw2lOM4V02ugv4YhBQTe2K//4FrzTjGrZ2BfnKzeGoPzJrMYKNmIaFDUyfqy5FRU93QhPfaobWG13uzxuFNZ3woONzFLIROt1dlvouUxW0izAgOg=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0WwUehPs_1767677137 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 06 Jan 2026 13:25:37 +0800
+Date: Tue, 6 Jan 2026 13:25:37 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yao Yuan <yaoyuan0329os@gmail.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	x86@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever
+ XFD[i]=1
+Message-ID: <jehglwyqu243ouotvrfy2cdml73fha23pglabopcskb3qjtsw4@b5spz5uw4suq>
+References: <20260101090516.316883-1-pbonzini@redhat.com>
+ <20260101090516.316883-2-pbonzini@redhat.com>
+ <aig6cfdj7vxmm5yt6lvfsyqwlnavrcl2n4z3gzomqydce5suxm@ydomfhhmwd7y>
+ <aVv1WTR9Zsx2FpZ0@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251020042904.32096-1-luxu.kernel@bytedance.com>
-In-Reply-To: <20251020042904.32096-1-luxu.kernel@bytedance.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 6 Jan 2026 10:26:34 +0530
-X-Gm-Features: AQt7F2rV_3WZCrB_VJwYGn79psT6Smtly97t591oPSUibomNxLFKeK19i9dMZfQ
-Message-ID: <CAAhSdy3M8NMF0ojJdoSvtate6FRjS5hno2Wc5i=TeCF84yOK3Q@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] RISC-V: KVM: selftests: Add Zalasr extensions to
- get-reg-list test
-To: Xu Lu <luxu.kernel@bytedance.com>
-Cc: corbet@lwn.net, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, alex@ghiti.fr, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, will@kernel.org, peterz@infradead.org, 
-	boqun.feng@gmail.com, mark.rutland@arm.com, atish.patra@linux.dev, 
-	pbonzini@redhat.com, shuah@kernel.org, parri.andrea@gmail.com, 
-	ajones@ventanamicro.com, brs@rivosinc.com, guoren@kernel.org, 
-	linux-doc@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org, 
-	apw@canonical.com, joe@perches.com, lukas.bulwahn@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aVv1WTR9Zsx2FpZ0@google.com>
 
-On Mon, Oct 20, 2025 at 9:59=E2=80=AFAM Xu Lu <luxu.kernel@bytedance.com> w=
-rote:
+On Mon, Jan 05, 2026 at 09:31:05AM +0800, Sean Christopherson wrote:
+> On Sat, Jan 03, 2026, Yao Yuan wrote:
+> > On Thu, Jan 01, 2026 at 10:05:13AM +0100, Paolo Bonzini wrote:
+> > > diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+> > > index da233f20ae6f..166c380b0161 100644
+> > > --- a/arch/x86/kernel/fpu/core.c
+> > > +++ b/arch/x86/kernel/fpu/core.c
+> > > @@ -319,10 +319,29 @@ EXPORT_SYMBOL_FOR_KVM(fpu_enable_guest_xfd_features);
+> > >  #ifdef CONFIG_X86_64
+> > >  void fpu_update_guest_xfd(struct fpu_guest *guest_fpu, u64 xfd)
+> > >  {
+> > > +	struct fpstate *fpstate = guest_fpu->fpstate;
+> > > +
+> > >  	fpregs_lock();
+> > > -	guest_fpu->fpstate->xfd = xfd;
+> > > -	if (guest_fpu->fpstate->in_use)
+> > > -		xfd_update_state(guest_fpu->fpstate);
+> > > +
+> > > +	/*
+> > > +	 * KVM's guest ABI is that setting XFD[i]=1 *can* immediately revert
+> > > +	 * the save state to initialized.  Likewise, KVM_GET_XSAVE does the
+> > > +	 * same as XSAVE and returns XSTATE_BV[i]=0 whenever XFD[i]=1.
+> > > +	 *
+> > > +	 * If the guest's FPU state is in hardware, just update XFD: the XSAVE
+> > > +	 * in fpu_swap_kvm_fpstate will clear XSTATE_BV[i] whenever XFD[i]=1.
+> > > +	 *
+> > > +	 * If however the guest's FPU state is NOT resident in hardware, clear
+> > > +	 * disabled components in XSTATE_BV now, or a subsequent XRSTOR will
+> > > +	 * attempt to load disabled components and generate #NM _in the host_.
+> > > +	 */
+> >
+> > Hi Sean and Paolo,
+> >
+> > > +	if (xfd && test_thread_flag(TIF_NEED_FPU_LOAD))
+> > > +		fpstate->regs.xsave.header.xfeatures &= ~xfd;
+> > > +
+> > > +	fpstate->xfd = xfd;
+> > > +	if (fpstate->in_use)
+> > > +		xfd_update_state(fpstate);
+> >
+> > I see a *small* window that the Host IRQ can happen just after above
+> > TIF_NEED_FPU_LOAD checking, which could set TIF_NEED_FPU_LOAD
 >
-> The KVM RISC-V allows Zalasr extensions for Guest/VM so add these
-> extensions to get-reg-list test.
+> Only if the code using FPU from IRQ context is buggy.  More below.
 >
-> Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
-
-LGTM.
-
-Reviewed-by: Anup Patel <anup@brainfault.org>
-
-Queued this patch for Linux-6.20
-
-Thanks,
-Anup
-
-
-> ---
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> > but w/o clear the xfd from fpstate->regs.xsave.header.xfeatures.
+> >
+> > But there's WARN in in kernel_fpu_begin_mask():
+> >
+> > 	WARN_ON_FPU(!irq_fpu_usable());
+> >
+> > irq_fpu_usable()
+> > {
+> > 	...
+> > 	/*
+> > 	 * In hard interrupt context it's safe when soft interrupts
+> > 	 * are enabled, which means the interrupt did not hit in
+> > 	 * a fpregs_lock()'ed critical region.
+> > 	 */
+> > 	return !softirq_count();
+> > }
+> >
+> > Looks we are relying on this to catch the above *small* window
+> > yet, we're in fpregs_lock() region yet.
 >
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/tes=
-ting/selftests/kvm/riscv/get-reg-list.c
-> index a0b7dabb50406..3020e37f621ba 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -65,6 +65,7 @@ bool filter_reg(__u64 reg)
->         case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZAAMO:
->         case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZABHA:
->         case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZACAS:
-> +       case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZALASR:
->         case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZALRSC:
->         case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZAWRS:
->         case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV=
-_ISA_EXT_ZBA:
-> @@ -517,6 +518,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg=
-_off)
->                 KVM_ISA_EXT_ARR(ZAAMO),
->                 KVM_ISA_EXT_ARR(ZABHA),
->                 KVM_ISA_EXT_ARR(ZACAS),
-> +               KVM_ISA_EXT_ARR(ZALASR),
->                 KVM_ISA_EXT_ARR(ZALRSC),
->                 KVM_ISA_EXT_ARR(ZAWRS),
->                 KVM_ISA_EXT_ARR(ZBA),
-> @@ -1112,6 +1114,7 @@ KVM_ISA_EXT_SIMPLE_CONFIG(svvptc, SVVPTC);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zaamo, ZAAMO);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zabha, ZABHA);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zacas, ZACAS);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(zalasr, ZALASR);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zalrsc, ZALRSC);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zawrs, ZAWRS);
->  KVM_ISA_EXT_SIMPLE_CONFIG(zba, ZBA);
-> @@ -1187,6 +1190,7 @@ struct vcpu_reg_list *vcpu_configs[] =3D {
->         &config_zabha,
->         &config_zacas,
->         &config_zalrsc,
-> +       &config_zalasr,
->         &config_zawrs,
->         &config_zba,
->         &config_zbb,
-> --
-> 2.20.1
+> Kernel use of FPU from (soft) IRQ context is required to check irq_fpu_usable()
+> (e.g. via may_use_simd()), i.e. calling fpregs_lock() protects against the kernel
+> using the FPU and thus setting TIF_NEED_FPU_LOAD.
 >
+> The WARN in kernel_fpu_begin_mask() is purely a sanity check to help detect and
+> debug buggy users.
+
+OK, I have same understanding w/ you, thanks.
+
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
