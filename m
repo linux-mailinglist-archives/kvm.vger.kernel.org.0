@@ -1,204 +1,332 @@
-Return-Path: <kvm+bounces-67178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFE9CFAF90
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 21:42:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A59ABCFB07E
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 22:04:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB2A53098DF6
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 20:40:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA47B3028596
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 21:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0095345CDF;
-	Tue,  6 Jan 2026 20:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706382BCF68;
+	Tue,  6 Jan 2026 21:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="yaEeMddW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ewMcDi5S"
 X-Original-To: kvm@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011015.outbound.protection.outlook.com [40.93.194.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FD072621;
-	Tue,  6 Jan 2026 20:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767732036; cv=fail; b=Jyq19YHi7nETgraDvzKCFq7yUCXutgvhnfUqFiRHs0a/5G8egd6bWZrOW33gmh9jiGpRh7RgHlXhrqIV+SoJJIzSjGN9ANxZ5Mk8sgUBEukFq3KlJJWR4gnSD8omPVVPmeDM1ZhCRhQt2OSmvqi05mcKX2ryPnF7mR98jtGdAQI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767732036; c=relaxed/simple;
-	bh=02rHx4kYzT3Eyz28XIUYjhkMKSAEMwGLwqA+iEXcbxg=;
-	h=Message-ID:Date:Cc:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eRkMZWYJWHQRoEIM5RDcJOy2JPKncd8ahaW9AXsstno+HvM3AnAu51dr4v2UwlKszbIDFg8Bdh5ZYPRWzsNfk52HQuTvcyZzAIrZyspDgduRToatasSbOtd+p73UPx4uWL0JyOL9ItClCLLXuHoFq+b2oJP9pikNRsD4rjTIPLc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=yaEeMddW; arc=fail smtp.client-ip=40.93.194.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wNiNj0hNSv88y/kDsab+45oDtyfnkw7suHuczu6ONtLUEHsPwaXfIcFr/y9eKna0rXlDVc7I5K+O4m2wP+Id0K/TNNgV2tRCkK9EkToCXtG1vSxB58sWfZ/TCDlIae0AncGbSLOM4tPmL8EGM6/LwH2nz5Ud7O55Uq+bao9mxpVqpJpYLjN4fDVCTmww2jelxu5yYC3lf6ZuwYcZ9tL2oYayiEPNO3dmEAgX2Jxja1CPMcBaQv3Hp+VisPWzUXTOc2LPwxIQZCCDeQl2IDuQiJnuDu5PMZ4b6qHhXEdXt4qgSjtTPW75Hyz3GXZTaxKsFAUVK2v8I81Zsqo+MEzg4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oNt8TAGnz+Tz+KrkJ45zE4QcJf9FSwm6ohXxtncmZHs=;
- b=Hb+Wg4seHMtzSWeT7S0LwuGJvipnLzcnfBrIDXe5qjeiixTrO8IGDpJcev3ncVn5BGKgSH5LtITi4EjUTZOVtNV5ChUf7RamFYimN8Ry1epFkNWwhJ7ATOQqjYrtQhJ22mCbKDJRTPe+IEzUWriRoEt8ctzeosoGjJYnS8wOyub5z15VFlEU65DLF8WeL40+Sep+3LLyIHQY2bkXIzPQRqSSoOkgyQn+vmy95S7SOh7RqEASYSbRi/m2GD005S/g/0prpp7wZyTWLDlsq/q3xqHh6Lv6UuSWLS/yOi39ilqb315sf+lTVsvJgydVfymFukSlFDCUJwUjbA5OHBmcoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
- dkim=pass header.d=citrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=citrix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oNt8TAGnz+Tz+KrkJ45zE4QcJf9FSwm6ohXxtncmZHs=;
- b=yaEeMddWgrbtCM5/KWoxZCEQEqg6ET0jNhgzSEXmYydxI24KSpGSejHpznHPhoI8GMKaXb5I4SWRTvWx4dKHF2YlcaxKWrvWYGuPqSxeF0pzZ69LxHAcdg1EahDxu54+56bwTOUApYeh69IWj5agl1Rwt/m84UMSfY66bDEDYqo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=citrix.com;
-Received: from CH8PR03MB8275.namprd03.prod.outlook.com (2603:10b6:610:2b9::7)
- by DS1PR03MB7967.namprd03.prod.outlook.com (2603:10b6:8:21a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Tue, 6 Jan
- 2026 20:40:30 +0000
-Received: from CH8PR03MB8275.namprd03.prod.outlook.com
- ([fe80::a70d:dc32:bba8:ce37]) by CH8PR03MB8275.namprd03.prod.outlook.com
- ([fe80::a70d:dc32:bba8:ce37%4]) with mapi id 15.20.9478.005; Tue, 6 Jan 2026
- 20:40:30 +0000
-Message-ID: <29ea5ead-1ee3-4ecd-ad4a-63fd99a7f67f@citrix.com>
-Date: Tue, 6 Jan 2026 20:40:27 +0000
-User-Agent: Mozilla Thunderbird
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>, chengkev@google.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
- yosry.ahmed@linux.dev
-Subject: Re: [PATCH 2/2] KVM: SVM: Raise #UD if VMMCALL instruction is not
- intercepted
-To: Sean Christopherson <seanjc@google.com>
-References: <aV1UpwppcDbOim_K@google.com>
- <4c45344f-a462-4d18-810d-8a76a4695a6b@citrix.com>
- <aV1bC3Wk-LbP1hUZ@google.com>
-Content-Language: en-GB
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-In-Reply-To: <aV1bC3Wk-LbP1hUZ@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P123CA0333.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18c::14) To CH8PR03MB8275.namprd03.prod.outlook.com
- (2603:10b6:610:2b9::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B723D22CBE6
+	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 21:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767733436; cv=none; b=WXQBqMWYmAetOGbbgRK2fh4s3+d8u61frfPrJcKELCSaLhE8pHnMZofJ8DxuaKwLTzpEk+FFKL6Iy2IW3NILC1jzFeLwFJRGaXjve7zE9TLlRlaTw0BUqFdOc1c7JHPq+wn/3jm62jwAJW8ThHQ3El2H9DbNzip9/fDX/gIUNiA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767733436; c=relaxed/simple;
+	bh=0Mpby0dh9MMSR13M59qLjEHM8s7pdUBODbXo9EKiM2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OBAAB4iF6yIgZ+rZgyC6Lwo5Xg+8u8l18JzMQWnI/TARtTUMTK33/hybTO5XLc7hQIA/wLfEJVZ631GX2PQvdnFXHjWo8MeDPJr7rel3Kth9RO5ad8DgMqSEDxumRskulapf36sD0iJ5Gxvi1uyrwzTukfp9MjLvTsJ1Y47CSZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ewMcDi5S; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767733435; x=1799269435;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=0Mpby0dh9MMSR13M59qLjEHM8s7pdUBODbXo9EKiM2k=;
+  b=ewMcDi5SgZ5kRpSdTXcmFJsK/GT3fO+GQBvGKDzzm0ktPEF8Hd5BrBd3
+   eAjTblvnoPh5ca3eJKCKCF2u7HDCwmNirOL6kCibG6ihaU5bSjjmdo2xD
+   57PFtuLoBYzHDeB1N6xSDelSsEn4bil7y5KcsKXoeFMHfOdaNTs7v8K/9
+   7x0tXfu2vcNlWUfTm9POyThOkOQlb9Ugf8Smf9/4mM6TDOnN9M8XMywsm
+   W+1rvXkVg56VqXkGZuBiooCCB5MyE+cv4SmanMBTkDazH4rMOTVtqKeF9
+   ootkDjoXugtcuNd2IQm6DeaWvQMG2sidMXymvrYfB3wslK9CpEyBOCx3E
+   g==;
+X-CSE-ConnectionGUID: I5xiMuTESPeW13UWbFJIVg==
+X-CSE-MsgGUID: IKeLGFgISA2jK+Lv5peOag==
+X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="69179162"
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="69179162"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 13:03:54 -0800
+X-CSE-ConnectionGUID: zW80d5AASpWUX08HJVoptQ==
+X-CSE-MsgGUID: wBiWR5PiRZOzr01nqyI3eQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="202651604"
+Received: from unknown (HELO [10.241.241.119]) ([10.241.241.119])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 13:03:53 -0800
+Message-ID: <e9762b91-175e-444d-b64c-dcded943b312@intel.com>
+Date: Tue, 6 Jan 2026 13:03:53 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH8PR03MB8275:EE_|DS1PR03MB7967:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b23fbe0-1a9f-4e24-74fc-08de4d63d517
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?elVpZVhpc2JPNlpFYlVDVXJjcE1sOGFQU1p2RGR5U3pBeVpqNWdENEVnTFNH?=
- =?utf-8?B?dWlMZjFSUWNLd1dNRmp4cEIvU3dndnV2Mk5SWXVWV3plYll2cy9jaHZjeUVx?=
- =?utf-8?B?TGphSnNpd2lYZVcvTFA3ZWdreHVPaVAxTmJ5NmtlZEF2UWl3WTRIK2pGTWRU?=
- =?utf-8?B?VzZVZS9uSlY1OGRIRXlkOTBza0hLa1N6b1BhSXNGVlVleko5dWlYS1pnZkkz?=
- =?utf-8?B?bDIyQ290cXJGUXVuUmFYUmtIQ2hjbXQ2YjFBMUxGVVhwcmhSalJLZDlNQzB4?=
- =?utf-8?B?UUZna3BhMkdCSlR4M0syWHZ1MUtHQm9GRUJheTFXNm51MTMzZFo5SEZnWndC?=
- =?utf-8?B?b0ZMNFlJRzV0SjF4Qk9IVEpWOCtjN2d1TDJMVkt4N2xaN1F1NG5id3FSeFJJ?=
- =?utf-8?B?d09KSnBXVk9wMWRwdWIwYUJZdkJtWC9XQXdDTUIwN2Y5c2NnN0xleGV3N3Zt?=
- =?utf-8?B?N05SM2JwNFBWc01jT0FQVGpXSzBaQ05GYU82Q2F5em1oSjIyRUQveHRDaDI0?=
- =?utf-8?B?RXJFNzM5YUI3eG9YT0pzcS9XbmpRalBaMVZKeE1xclowTmQwNzFzaFIzdHQ2?=
- =?utf-8?B?T2dJWXpFRWJ0a0NTaHB5d3NLajdaL2pkMmFaenZPdUZnODF4aVVjMXJmN1U2?=
- =?utf-8?B?WC8ydmlCNWQ5TytYZTBBWSswdEtaSnVNQlVFdC9lY08yaTNuNS9hdEc3V2Vq?=
- =?utf-8?B?OHpKdi9uaTgvdWVtblc2ZEtlN2o0M2wvTy9OUFpGRVAwaXRHU011YUVBZGZ6?=
- =?utf-8?B?R1FpMXkvbGhFbHQ3Vk9hdEc2RHM3bEQwQUhjeWUzc3FVMkxoNHA4c0dma3Bk?=
- =?utf-8?B?VFBYMjlibC9KRHpEM3BDRldSWnFhZTZUZGFSV2M1MnA0YjcxckV3Yng5U3M4?=
- =?utf-8?B?a1RwZUoya1RCODVaOGh0Y1N6TTNVNmt5eS9HYkZmVTA5UERUcndrZmZJU2ti?=
- =?utf-8?B?MmlML3pxMVZOMkxIeXJHUGN5LzNZZ1ZXUzIybjVEekp1M3lFRE90emlGRVBl?=
- =?utf-8?B?bkpZS1JQYjEvKzN4WGtiT3VEdS8xWDdNZyt3VTJpU1lDR3RJOVNqUGpMYVY1?=
- =?utf-8?B?VkF2V1VoN2hTbzA5aCt6Z2cxS0hHcFJEa1ZqOHJTWWRDRExWU0drS2hTakRZ?=
- =?utf-8?B?ckl1QjdTYlFMZ3FIQUwzUTNrKzBJeko0elBNcWMwNXBMbEJzVTYvSEZHR0li?=
- =?utf-8?B?eGtmajJBTmNKT09KM3hmY3grNTJZMWp0Tm5lbXFzWTc5Q0k0d3BMQlNNOTBB?=
- =?utf-8?B?bng4cWdLdnphdEE1ZW10V28zZEZhMWpDWlRkeldZNW4zL3g2T044NTRlVmhz?=
- =?utf-8?B?TWZEUmE3Z2lYeUtPb0IyZ0E5Zzdyd21DTHpBckx3dE43QU1XZ2lXREpoTks2?=
- =?utf-8?B?ZXJRbTcxWEFMQVIyL2FabEQ0ZHI5OFc2RzdPc1NlL2RtM2UxVFhMMEF6THlR?=
- =?utf-8?B?L2VscTB0UXBndmgwYnp4M1RCdGNwb21XblJUcndFSUJWSUhIbU1pYTlON05O?=
- =?utf-8?B?V1h6bXhLTEFhelRZbytleUNidjRPZENnQWdZYjlqMDBRRFA2NGhqR0s2VVZX?=
- =?utf-8?B?cUxhbUpoMHMyeUt0OUVsaUo1c1ZtQzNlVDZVNU5CZkd2Yy9OV0RLeHNJaFkx?=
- =?utf-8?B?WVdzSHNBUmpKd01WSzlaTlMrV2NzdzFEUDZVb1c2ZDVIV0VwV1FUb3kvNzIv?=
- =?utf-8?B?dUZPWC85UkRJcFR1cWVNdXJlM0ZaVnl0NzZYdVc4SjB0dkNTZS96c1dHdlBq?=
- =?utf-8?B?UTV6T0lrQ3F4Y3E3L3gra1lNTzRtUkVuOEpyK09EdzFRbmFwYitKejBEM0hB?=
- =?utf-8?B?VlVMemlkYWZyM3dzMHFpcVpWeGoyamp1aWt0ckcrQklyVW1LMllTTkhrR3V2?=
- =?utf-8?B?akROYW9uQ2FiUVA3dVBNRmdZRUp2bC9SSnNzQzFOUjdwR0Q5M0tLNTN5VUpV?=
- =?utf-8?Q?Wyz9K9uVbZefc2GJOMxgrpub68yflwIr?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH8PR03MB8275.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MFE3WXFPc3RpZzZUSXhBTTBiRkEzUVF5bUdPRk9Cbjkyd0Vya056aG1GSklK?=
- =?utf-8?B?V0IzeUlpNmFCeVRMQkVZM2VPMkdqRkdVcTVrNzJIWkdsL0Mrb0gxUmZYY2ZQ?=
- =?utf-8?B?cnBMSkZOQ2hWRTZKOTdGaVJaVlFsam03RmJzSTROQVZSZ0R1bmVmVDBkcUJl?=
- =?utf-8?B?M3FGTXlYTnFXOGxtb2hEd3hpZ2RvV3htK2RvR2xZZU4rOGhzSllIV1F3VUdh?=
- =?utf-8?B?MEJBM09uVzhKa3hMeEVmclZSZTZQc3Z3bmJwUC92TWExS29TdTJUQTNteGpD?=
- =?utf-8?B?eTUrR2ZyRk52UnVXU0tIYnkxMS9iZVQ3a0hlZ1p1Nk5FOWV1UkcvODRtaDRM?=
- =?utf-8?B?WU1na0l5QytHMklubHlabkpFakI2VWkxMkhKVWl1ZUZkTFBSTytMZFJQc0hk?=
- =?utf-8?B?VnZTVFNpWkdacmpIaEdYdDd2TlBBUE5EdG1YRWl2QVV4YlRkT3QvK3lKQWM2?=
- =?utf-8?B?T0Y0STVYVkFjWU5TWk5ndkJrWm1JdExUZVhXS1IxaHF4MVI5S25pdy9VdW5n?=
- =?utf-8?B?QjlPQVBKTzBLTDhrS0VNd2l3V0lrVGZTRWsybWY3YmhSbWg2WG9PZ3RPQm51?=
- =?utf-8?B?UEFydk9SK1lEelRRZERqZWJUVm5acmJ4N1JWRmhPdlVsL1djSUUzKzVYTkVJ?=
- =?utf-8?B?MTVTeEkyZ0gvQUcvV3Z5YWE0ZjJHUWgxcXFEMTR0dE5La3VtZVJZVzVnaHJh?=
- =?utf-8?B?WGFQN0V3QnNiWnYzUVp6RWJVMHIzRVNNMSs4THFHWVpOOVFvbVVhcHp6eUF2?=
- =?utf-8?B?enlpbWduRTVxdDdheVhJWFZSMHp4MExMb3pZaVlIY3FjcnZ3U2ZURlQza09s?=
- =?utf-8?B?a3lCT1haRHVGMy9nc1gzdmU0L0k2aEViUE8wMWpDcU9OMGVGNVhpMUlGa1RD?=
- =?utf-8?B?b2p1VnE3SDR1UXFUeW9xcVliZHVXUjA4N2hmOHR5MVVXcGk5YmpJRXpDbFF4?=
- =?utf-8?B?KzVzak1zTW5WSi9PanJjVDFXNXBwc3VPZlRDcjJiT3A2UFQwNVlla1c1ZVlP?=
- =?utf-8?B?WE9ZQzlMV3pZRnZKcDdFT3JMUkttejBNYm5lcTBRRjduT2xwVGhBaXEvSnJJ?=
- =?utf-8?B?RWdvbkx5QlhzZHVmWjM4Y3A0eHJXYnErc2tLK1oxR3ZzMFJNd2FkUzlncEFl?=
- =?utf-8?B?aVEwWVpWWndKQXY4bCt3bUp4UEhrVCtWT0hTRXRFNXhKVEg5dVFkSWNlY1dh?=
- =?utf-8?B?VmROMElRWHVicElxUWhJdlRVamY2SS9naGFiNjF1VkhlTS8rK0l5TVNJdTY0?=
- =?utf-8?B?RzlWNjg0MHhzNFBEdEgvdUlWUUR2ZzFnRVE3V2s0NjZoN3FIZjFNZTE3Rlc4?=
- =?utf-8?B?RGZWcFRzdlNENEo4RHM2ek1XNTlIQmxUeElDWDhQdFEvTmFnTXMyTWZSTnhj?=
- =?utf-8?B?SHVrU053ZUtBcE1nOE4wVUt5TFJJUHJMYW5TUzVqYWpmdVVqMHJwZDBmbVZ3?=
- =?utf-8?B?MHJITEtOaG1ETFJsOVIzdk9FQjZwbUVEYjBic3J3Sm50RjNCaitXYUNsVjBB?=
- =?utf-8?B?aCs1WEd1TGQyR1ZIMk5FUDhXUi96RlFxZFJLSFhZdXNudEwweXJoVTlzNng1?=
- =?utf-8?B?bnVFbUlkcGhIUHhGM2ZmNkU5S3FKMHYyaFFiNW56dEkydC9GeVUzeWt4NEJ0?=
- =?utf-8?B?VXdDSnZmcU1EdWxhQmgvMUFEWHN5eGUvZnJzcE1USUxnektWSWhmWGEwOVBT?=
- =?utf-8?B?eTV0MHFtcmVjaEk0cXRjclZnVzhOc1RTL2p2QW1xKzVtcGFCOW1uWEFGc0pz?=
- =?utf-8?B?aWtVNHhaVVdZc3hwMmg2Ymg3SndNSlZXeVFRaVlTblhOSmxLTVlkWk5lQmxa?=
- =?utf-8?B?YVJMNGhMdEQ4N0NhWkZVTUc3RElXd3pUd0E3N1l2TmVBc2p2VVFqNzhNQ0pN?=
- =?utf-8?B?cThocEh1b084YXNhMTd0TmZUa2cza0JpM1RDQnp5K3JYYkJQUXlDeVZVaEt5?=
- =?utf-8?B?ckFyNEFlTzduYVFjb3d2dnEwd2pUWFhrZ2pLSzRoTjVRczE5YkQ3WS9iNlpN?=
- =?utf-8?B?dVdlamg0aEg4UWxwVkVXUklydVJTRURHRjZ2blFadXpIZkloMFgvMkF0YURD?=
- =?utf-8?B?Rko0dDhhQUpZQlhkRUM3RTVlNjhIeFRtajNNNnlBSlgySW9VOWhrWTZqb09W?=
- =?utf-8?B?ckZjaUNNUjdZVVc1Q3p6Y3BMQVdBSlhrQU1QaHM1Qit4RUpFRWFuemF2VERV?=
- =?utf-8?B?dlkzV1FOMVpiSGhFY0ZIUUhrNmRaWFhhb3FEK1RzaXZJdkJiOVY1SVpiSWJS?=
- =?utf-8?B?MGMrMG5pc3J3SVZVSTE3VlNHUkVMOEYvclR4cjFrd2lXblRnMEFaNDgvM1I0?=
- =?utf-8?B?QWpqcVU2Qm42WGh0QzBPcmVlRG5xci9QRUwzR2Jrd3dJRmQ1QlpBczVkMStl?=
- =?utf-8?Q?52JSy9VL3jS3bIek=3D?=
-X-OriginatorOrg: citrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b23fbe0-1a9f-4e24-74fc-08de4d63d517
-X-MS-Exchange-CrossTenant-AuthSource: CH8PR03MB8275.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2026 20:40:30.5940
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1i+/7x9UAd/PPCpxPMXy3a8AaQKhc6q2boN81AJW9TDdyf9vsNAVo8TS+5aRK5CAr7RV4IXhSuZVgOZBup9vOspFYjA4gYgjcdCKkkcLV1I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS1PR03MB7967
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 4/7] target/i386/kvm: query kvm.enable_pmu parameter
+To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+ sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+ like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
+ alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+ davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+ dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
+ ewanhai@zhaoxin.com
+References: <20251230074354.88958-1-dongli.zhang@oracle.com>
+ <20251230074354.88958-5-dongli.zhang@oracle.com>
+ <b6c531d4-328d-48a7-856b-051c918c24ae@intel.com>
+ <29969c2f-d71f-4952-9ab4-4ba8f69e1514@oracle.com>
+Content-Language: en-US
+From: "Chen, Zide" <zide.chen@intel.com>
+In-Reply-To: <29969c2f-d71f-4952-9ab4-4ba8f69e1514@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 06/01/2026 6:57 pm, Sean Christopherson wrote:
-> On Tue, Jan 06, 2026, Andrew Cooper wrote:
->>> Mentioning L2 and L1 is confusing.  It reads like arbitrary KVM behavior.  And
->>> IMO the most notable thing is what's missing: an intercept check.  _That_ is
->>> worth commenting, e.g.
->>>
->>> 	/*
->>> 	 * VMMCALL #UDs if it's not intercepted, and KVM reaches this point if
->>> 	 * and only if the VMCALL intercept is not set in vmcb12.
->>> 	 */
->> Not intercepting VMMCALL is stated to be an unconditional VMRUN
->> failure.  APM Vol3 15.5 Canonicalization and Consistency Checks.
-> Hrm, I can't find that.  I see:
->
->   The VMRUN intercept bit is clear.
->
-> but I don't see anything about VMMCALL being a mandatory intercept.
 
-Gah.  I even double checked before sending, but I'm apparently
-completely blind to the difference between VMRUN and VMMCALL.
 
-Sorry for the noise.
+On 1/5/2026 12:21 PM, Dongli Zhang wrote:
+> Hi Zide,
+> 
+> On 1/2/26 2:59 PM, Chen, Zide wrote:
+>>
+>>
+>> On 12/29/2025 11:42 PM, Dongli Zhang wrote:
+> 
+> [snip]
+> 
+>>>  
+>>>  static struct kvm_cpuid2 *cpuid_cache;
+>>>  static struct kvm_cpuid2 *hv_cpuid_cache;
+>>> @@ -2068,23 +2072,30 @@ int kvm_arch_pre_create_vcpu(CPUState *cpu, Error **errp)
+>>>      if (first) {
+>>>          first = false;
+>>>  
+>>> -        /*
+>>> -         * Since Linux v5.18, KVM provides a VM-level capability to easily
+>>> -         * disable PMUs; however, QEMU has been providing PMU property per
+>>> -         * CPU since v1.6. In order to accommodate both, have to configure
+>>> -         * the VM-level capability here.
+>>> -         *
+>>> -         * KVM_PMU_CAP_DISABLE doesn't change the PMU
+>>> -         * behavior on Intel platform because current "pmu" property works
+>>> -         * as expected.
+>>> -         */
+>>> -        if ((pmu_cap & KVM_PMU_CAP_DISABLE) && !X86_CPU(cpu)->enable_pmu) {
+>>> -            ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
+>>> -                                    KVM_PMU_CAP_DISABLE);
+>>> -            if (ret < 0) {
+>>> -                error_setg_errno(errp, -ret,
+>>> -                                 "Failed to set KVM_PMU_CAP_DISABLE");
+>>> -                return ret;
+>>> +        if (X86_CPU(cpu)->enable_pmu) {
+>>> +            if (kvm_pmu_disabled) {
+>>> +                warn_report("Failed to enable PMU since "
+>>> +                            "KVM's enable_pmu parameter is disabled");
+>>
+>> I'm wondering about the intended value of this patch?
+>>
+>> If enable_pmu is true in QEMU but the corresponding KVM parameter is
+>> false, then KVM_GET_SUPPORTED_CPUID or KVM_GET_MSRS should be able to
+>> tell that the PMU feature is not supported by host.
+>>
+>> The logic implemented in this patch seems somewhat redundant.
+> 
+> For Intel, the QEMU userspace can determine if the vPMU is disabled by KVM
+> through the use of KVM_GET_SUPPORTED_CPUID.
+> 
+> However, this approach does not apply to AMD. Unlike Intel, AMD does not rely on
+> CPUID to detect whether PMU is supported. By default, we can assume that PMU is
+> always available, except for the recent PerfMonV2 feature.
+> 
+> The main objective of this PATCH 4/7 is to introduce the variable
+> 'kvm_pmu_disabled', which will be reused in PATCH 5/7 to skip any PMU
+> initialization if the parameter is set to 'N'.
+> 
+> +static void kvm_init_pmu_info(struct kvm_cpuid2 *cpuid, X86CPU *cpu)
+> +{
+> +    CPUX86State *env = &cpu->env;
+> +
+> +    /*
+> +     * The PMU virtualization is disabled by kvm.enable_pmu=N.
+> +     */
+> +    if (kvm_pmu_disabled) {
+> +        return;
+> +    }
 
-~Andrew
+Thanks for explanation.
+
+> The 'kvm_pmu_disabled' variable is used to differentiate between the following
+> two scenarios on AMD:
+> 
+> (1) A newer KVM with KVM_PMU_CAP_DISABLE support, but explicitly disabled via
+> the KVM parameter ('N').
+> 
+> (2) An older KVM without KVM_CAP_PMU_CAPABILITY support.
+> 
+> In both cases, the call to KVM_CAP_PMU_CAPABILITY extension support check may
+> return 0.
+> 
+> By reading the file "/sys/module/kvm/parameters/enable_pmu", we can distinguish
+> between these two scenarios.
+
+As described in PATCH 1/7, without issuing KVM_PMU_CAP_DISABLE, KVM has
+no way to know that userspace does not intend to enable vPMU in AMD
+platforms, and therefore does not fault guest accesses to PMU MSRs.
+
+My understanding is that the issue being addressed here is basically the
+opposite: QEMU does not know that vPMU is disabled by KVM.
+
+IIUC, one difference between Intel and AMD is that AMD lacks a CPUID
+leaf to indicate the availability of PMU version 1. But Intel
+potentially could be in the same situation that KVM advertises PMU
+availability but it's not actually supported. (e.g. kvm->arch.enable_pmu
+is false while modules parameter enable_pmu is true).
+
+From the guest’s point of view, it probes PMU MSRs to determine whether
+PMU support is present and it's fine in this situation.
+
+In userspace, QEMU may issue KVM_SET_MSRS / KVM_GET_MSRS to KVM without
+knowing that vPMU has been disabled by KVM.  I think these IOCTLs should
+not fail, since KVM states that “Userspace is allowed to read MSRs, and
+write ‘0’ to MSRs, that KVM advertises to userspace, even if an MSR
+isn’t fully supported.”
+
+My current understanding is that AMD should be fine even without
+kvm_pmu_disabled, but I may be missing some context here.
+
+The bottom line is this patch doesn't handle the cases that KVM still
+could disable vPMU support even if enable_pmu is true.
+
+
+> As you mentioned, another approach would be to use KVM_GET_MSRS to specifically
+> probe for AMD during QEMU initialization. In this case, we can set
+> 'kvm_pmu_disabled' to true if reading the AMD PMU MSR registers fails.
+> 
+> To implement this, we may need to:
+> 
+> 1. Turn this patch to be AMD specific by probing the AMD PMU registers during
+> initialization. We may need go create a new function in QEMU to use KVM_GET_MSRS
+> for probing only, or we may re-use kvm_arch_get_supported_msr_feature() or
+> kvm_get_one_msr(). I may change in the next version.
+> 
+> 2. Limit the usage of 'kvm_pmu_disabled' to be AMD specific in PATCH 5/7.
+
+I guess this might make things more complicated.
+
+>>
+>> Additionally, in this scenario — where the user intends to enable a
+>> feature but the host cannot support it — normally no warning is emitted
+>> by QEMU.
+> 
+> According to the usage of QEMU, may I assume QEMU already prints warning logs
+> for unsupported features? The below is an example.
+> 
+> QEMU 10.2.50 monitor - type 'help' for more information
+> qemu-system-x86_64: warning: host doesn't support requested feature:
+> CPUID[eax=07h,ecx=00h].EBX.hle [bit 4]
+> qemu-system-x86_64: warning: host doesn't support requested feature:
+> CPUID[eax=07h,ecx=00h].EBX.rtm [bit 11]
+> 
+>>
+>>> +            }
+>>> +        } else {
+>>> +            /*
+>>> +             * Since Linux v5.18, KVM provides a VM-level capability to easily
+>>> +             * disable PMUs; however, QEMU has been providing PMU property per
+>>> +             * CPU since v1.6. In order to accommodate both, have to configure
+>>> +             * the VM-level capability here.
+>>> +             *
+>>> +             * KVM_PMU_CAP_DISABLE doesn't change the PMU
+>>> +             * behavior on Intel platform because current "pmu" property works
+>>> +             * as expected.
+>>> +             */
+>>> +            if (pmu_cap & KVM_PMU_CAP_DISABLE) {
+>>> +                ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PMU_CAPABILITY, 0,
+>>> +                                        KVM_PMU_CAP_DISABLE);
+>>> +                if (ret < 0) {
+>>> +                    error_setg_errno(errp, -ret,
+>>> +                                     "Failed to set KVM_PMU_CAP_DISABLE");
+>>> +                    return ret;
+>>> +                }
+>>>              }
+>>>          }
+>>>      }
+>>> @@ -3302,6 +3313,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>>      int ret;
+>>>      struct utsname utsname;
+>>>      Error *local_err = NULL;
+>>> +    g_autofree char *kvm_enable_pmu;
+>>>  
+>>>      /*
+>>>       * Initialize confidential guest (SEV/TDX) context, if required
+>>> @@ -3437,6 +3449,21 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>>  
+>>>      pmu_cap = kvm_check_extension(s, KVM_CAP_PMU_CAPABILITY);
+>>>  
+>>> +    /*
+>>> +     * The enable_pmu parameter is introduced since Linux v5.17,
+>>> +     * give a chance to provide more information about vPMU
+>>> +     * enablement.
+>>> +     *
+>>> +     * The kvm.enable_pmu's permission is 0444. It does not change
+>>> +     * until a reload of the KVM module.
+>>> +     */
+>>> +    if (g_file_get_contents("/sys/module/kvm/parameters/enable_pmu",
+>>> +                            &kvm_enable_pmu, NULL, NULL)) {
+>>> +        if (*kvm_enable_pmu == 'N') {
+>>> +            kvm_pmu_disabled = true;
+>>
+>> It’s generally better not to rely on KVM’s internal implementation
+>> unless really necessary.
+>>
+>> For example, in the new mediated vPMU framework, even if the KVM module
+>> parameter enable_pmu is set, the per-guest kvm->arch.enable_pmu could
+>> still be cleared.
+>>
+>> In such a case, the logic here might not be correct.
+> 
+> Would the Mediated vPMU set KVM_PMU_CAP_DISABLE to clear per-VM enable_pmu even
+> when the global KVM parameter enable_pmu=N is set?
+> 
+> In this scenario, we plan to rely on KVM_PMU_CAP_DISABLE only when the value of
+> "/sys/module/kvm/parameters/enable_pmu" is not equal to N.
+> 
+> Can I assume that this will work with Mediated vPMU?
+> 
+> 
+> Is there any possibility to follow the current approach before Mediated vPMU is
+> finalized for mainline, and later introduce an incremental change using
+> KVM_GET_MSRS probing? The current approach is straightforward and can work with
+> existing Linux kernel source code.
+
+Apologies for the incorrect statement I made earlier regarding mediated
+vPMU.
+
+According to the mediated vPMU v6, the only behavior specific to
+mediated vPMU is that kvm->arch.enable_pmu may be cleared when
+irqchip_in_kernel() is not true:
+https://lore.kernel.org/all/20251206001720.468579-17-seanjc@google.com/
+
+However, this does not imply that mediated vPMU requires any special
+handling here. In theory, KVM could clear kvm->arch.enable_pmu in the
+future for other reasons.
+
+
+> For quite some time, QEMU has lacked support for disabling or resetting AMD PMU
+> registers. If we could add this feature before Mediated vPMU is finalized, it
+> would benefit many existing kernel versions. This patchset solves production bugs.
+> 
+> 
+> Feel free to let me know your thought, while I would starting working on next
+> version now.
+> 
+> Thank you very much!
+> 
+> Dongli Zhang
+> 
+> 
+
 
