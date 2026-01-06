@@ -1,104 +1,138 @@
-Return-Path: <kvm+bounces-67152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67146-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA56CF979B
-	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 17:56:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F271DCF9644
+	for <lists+kvm@lfdr.de>; Tue, 06 Jan 2026 17:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 982FE30B6B49
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 16:51:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 72418300EA25
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 16:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E859B33B6DB;
-	Tue,  6 Jan 2026 16:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E2231D757;
+	Tue,  6 Jan 2026 16:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QVXwrdpj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kr+h4wuu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC0B33B6C2;
-	Tue,  6 Jan 2026 16:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3E823EAAB;
+	Tue,  6 Jan 2026 16:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767717679; cv=none; b=p/Uj0xZyPx+V4UVx7aTJjEApSETmoJZuCbj2/4rPv3+X2UHEqLSs72y6lZgpZbm/Ssqu/Gof2EDhbOv+Zu0g/bTZmWXD9oGjpmWVhKbT+UICeelJa/bj8/WHOntskzU/khSVnMWxx81WHKaViPxqqyklmCrnTm9O4JJgzMlWhvc=
+	t=1767717466; cv=none; b=HQE+NW9hfoMO/LY19igdwjCCrAUpEowXuRshEYEZB29uRoTYM+d5KvcvlmIXg0Z2dZJO7bgn+W1wmY2y7LwH0gHuVRpJIfkcZemowYLEd1x6Qmwwj256cpbbMGd/C8GAEuXw9Xo+6C3O3mpUvtWHKlrhaLi2YwkV0Z45A7UavNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767717679; c=relaxed/simple;
-	bh=ze09838bu4tgioSjBEqALwERPyBGKXw8MzIwdv5zFGY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=I25X+TMY2Qbjsz/ov7VPmmwDLeBYHVyuBghN/d67tJkvkNBS9xdCjR1vcrpIoXQUduAVASglIqXX7DbzRy95NSNQJJAw024zFpgeyUwPmbdbRRQ4wW+DNESOZOVKparaIznDZvVm0ruDv6RD75Du6QF8WVSSTgfbghoyxwVNGN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVXwrdpj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40264C19424;
-	Tue,  6 Jan 2026 16:41:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767717678;
-	bh=ze09838bu4tgioSjBEqALwERPyBGKXw8MzIwdv5zFGY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=QVXwrdpjRxTlKijpAHvck0fcvXPwrVxZcxwi2UyVL0cQ4ZxkPJ/5QnQMJK+9T0W88
-	 p90vDS2NWetnNMSAg/7uOoejUa330IJitHPLPJyfEIULJM2mhae6+i3NRwRMY9PCKi
-	 sDb8MhBVb5D/1nPb8Juz2VEvWz3f13GuWqohRWbVfjZmA5WCbI4fRBH3lAuDQOxQpf
-	 pQFYXpuJ6XjxCpZVH6iFOIw65f4Sl/HNdgHKNUCZgtv1WLB38yP5vAKxUpIJpzVbG6
-	 V1HBo0Wuw1+m8vAzKxswsIlV4x91v6M48Pkiu1IsYNpEINpUW+fTAFTtlNVpHhL75H
-	 JhYrrKwPbT3Ig==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 06 Jan 2026 16:35:45 +0000
-Subject: [PATCH v4 5/5] KVM: selftests: arm64: Use is_aarch32_id_reg() in
- test_vm_ftr_id_regs()
+	s=arc-20240116; t=1767717466; c=relaxed/simple;
+	bh=rqhwogK0fiC4FgmsQlsmZVmt31ESsRL2ON78sL+R1UI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QmB8ThasJyWWfHoRNkwYIqTeUtUPW+2+0CwXeeUNkv9dYgI3dBDbnn24wdFZtW26bNYCMdAk45J7t2pkvtwcGL4VX361Ur1GksgSaxlAN33v8D5+2F7HW9HO/H/gUkQmVPyyjLedhrxbsv57JZMBT0brcIwqr+5n9zB88s5b3C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kr+h4wuu; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767717465; x=1799253465;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rqhwogK0fiC4FgmsQlsmZVmt31ESsRL2ON78sL+R1UI=;
+  b=kr+h4wuuEaB6JjO0UZiWKFvZNU6hH20EdetiqXG1K+IdaQ6U99GM5H+j
+   T3j1xhJarn3K6CXDSUYq2bz0cFjJBaBpT/8b0tYhrRuUcBOc2QwtAXryU
+   HF9EMoh5pW4L3zeBgaKIOIXtRqErxI4uSNJyMeNdfP3IqqwujZ5ogqcOD
+   YP99Ab9FhqFJpebBx0wuPT5rpDxtRlQnkrMaHe2dzcyfCir0zl6Ak6v46
+   LvtX2Bb7ybCrP1ZZ9Lm8hLkKjMFfCn8S0eqwWbN2V61B8p6hCqmMdX6yP
+   Wj9AHiGU5/ZcPsXuwHxD7cHTi6udumwcEp3s32Muy8oe1hjZ41gFT3H/+
+   g==;
+X-CSE-ConnectionGUID: SVPk8fLMTeWT2ZS6Xnahpg==
+X-CSE-MsgGUID: uchZY1i5QAe92UYMb6sYtg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="68279871"
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="68279871"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 08:37:44 -0800
+X-CSE-ConnectionGUID: llVB9Hd4SbOwToq3NWfefA==
+X-CSE-MsgGUID: vQjhnIjNR06fR6nbujHZOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="240183498"
+Received: from cjhill-mobl.amr.corp.intel.com (HELO [10.125.109.89]) ([10.125.109.89])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 08:37:44 -0800
+Message-ID: <ea966be2-b44d-421c-85f4-03d3db6c790a@intel.com>
+Date: Tue, 6 Jan 2026 08:37:43 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] Expose TDX Module version
+To: Chao Gao <chao.gao@intel.com>
+Cc: Kiryl Shutsemau <kas@kernel.org>, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org,
+ vishal.l.verma@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+ yilun.xu@linux.intel.com, vannapurve@google.com,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>
+References: <20260105074350.98564-1-chao.gao@intel.com>
+ <dfb66mcbxqw2a6qjyg74jqp7aucmnkztl224rj3u6znrcr7ukw@yy65kqagdsoh>
+ <d45cc504-509c-48a7-88e2-374e00068e79@intel.com> <aVzinyLe5rxkJXUu@intel.com>
+Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
+ oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
+ 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
+ ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
+ VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
+ iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
+ c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
+ pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
+ ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
+ QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
+ c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
+ LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
+ lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
+ MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
+ IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
+ aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
+ I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
+ E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
+ F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
+ CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
+ P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
+ 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
+ GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
+ MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
+ Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
+ lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
+ 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
+ qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
+ BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
+ 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
+ vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
+ FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
+ l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
+ yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
+ +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
+ asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
+ WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
+ sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
+ KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
+ MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
+ hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
+ vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
+In-Reply-To: <aVzinyLe5rxkJXUu@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260106-kvm-arm64-set-id-regs-aarch64-v4-5-c7ef4551afb3@kernel.org>
-References: <20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org>
-In-Reply-To: <20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Oliver Upton <oupton@kernel.org>
-Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1148; i=broonie@kernel.org;
- h=from:subject:message-id; bh=ze09838bu4tgioSjBEqALwERPyBGKXw8MzIwdv5zFGY=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpXTsdxCQGJi+W81ZooYRjsa6d9nw9aQbV7Isdo
- 0qUUg6pwlaJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaV07HQAKCRAk1otyXVSH
- 0DXLB/0cXvjbU+zB17kgrZhMg1U0LcQUAP3jU78hE6JW/2AxfQk3FGYKuHLAU35CW7RPJAn+UFW
- R/kcXTN0X6QvAQzE28x99PfulzNjaiAzzrE2XAF72ljHq5FLMoiFM8LCytx3z0oz0VBBTaHDBBy
- GjtYk/60l2OFUZ0k0xmBi9R5eO+SLe2J/qEx6YVCO3+4zz4iiWsdZMrZZAfQ/ioG9B/ZaRcmn8d
- MRaKsNEfAUhN6cv3JNHPG9byRn9JSCerGCTJtQPGABp7T6O43CCBRoBrSmz867KaZka4ci1Jdui
- c5eYwZLQ8ajj+3Gzj8Ab77ihqbjYAeU8MO7B0iWk9pQeP4vb
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-test_vm_ftr_id_regs() uses a simplified check for 32 bit ID registers since
-it knows it will only run on ID registers. For clarity update this to use
-the newly added is_aarch32_id_reg(), there should be no functional change.
+On 1/6/26 02:23, Chao Gao wrote:
+> First I don't think we should expose TDX module version or hypervisor
+> version to guests. See my reply to Kirill.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I just read it. It didn't provide any insight. For now, it's a plain old
+NAK on the new ABI. The water is too muddied.
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 908b3c8947d9..f703c6cfe132 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -503,7 +503,7 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 
- 		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
- 			/* Skip aarch32 reg on aarch64 only system, since they are RAZ/WI. */
--			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
-+			if (aarch64_only && is_aarch32_id_reg(reg_id)) {
- 				ksft_print_msg("%s on AARCH64 only system\n",
- 					       ftr_bits[j].name);
- 				ksft_test_result_skip("%s invalid write rejected\n",
-
--- 
-2.47.3
-
+I'm still open to dumping something to dmesg though.
 
