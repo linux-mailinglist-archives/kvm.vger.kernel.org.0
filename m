@@ -1,171 +1,121 @@
-Return-Path: <kvm+bounces-67189-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67190-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F50CFB5F9
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 00:45:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2642CFB625
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 00:49:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC9E3302AB86
-	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 23:43:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EEA1302D2AC
+	for <lists+kvm@lfdr.de>; Tue,  6 Jan 2026 23:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F08D30AAAE;
-	Tue,  6 Jan 2026 23:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8754431B11E;
+	Tue,  6 Jan 2026 23:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JpkcKQJA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LYL0KA7C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6243830EF71
-	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 23:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5832DA775
+	for <kvm@vger.kernel.org>; Tue,  6 Jan 2026 23:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767743013; cv=none; b=TGi+d4oU4UwZdKYloi3QY7PhaxgtlXtgOqBVoVOmifCkd3InLHRaJhAT7LxW4gsT1r4pMD+dKC7dj5bfyyPaNcTwcJGwpFTIHeR98SeaRAWizi6tAPsQb9PQLdGTvAbfEuBz51VuqK2R1Zjk2nMm9jIgxeUxLsKvw7kbnfYzpY0=
+	t=1767743320; cv=none; b=cJREzKHuP+Kw7fTMBY1Xtfx2sO/wLV+3Non/26uznLQEB5ri4h9xIg6PHa7bEzBZrY6WZaePTx6mXa7Tfn0fDUSDjPs+zG/fUrF4QCxQq/cVdzAY+msLxMLdQ+QYK86nlsq7XVSJ79QaBkQXTzsuOCxUu8kv5eW2mX4boYd7RkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767743013; c=relaxed/simple;
-	bh=VqlAMj3zhYXoC0OdURecxOgC++qyw3AsxgfnrDpB0u8=;
+	s=arc-20240116; t=1767743320; c=relaxed/simple;
+	bh=LZ05UVyGXS3uaEnykz4vyYA6HOE4UeTPNaiHJEkTyp8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dojgZ2t8k9+rl1ZfwT2MiYdPLhIJxAyYO5Repuno70Pj4s+n1KHSi4i0rcsCnxBOH2bPjQzj9Bp/+h8pkfllbjYqphrgAbgDmjVUFV00uGY0UN47Ojg5jg0lFDTiZhDtipGhW10i54+TR/KsVu5rD+FIfczd9uEP4eqF00fVUZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JpkcKQJA; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=A45n2hPSeWk/2IKlD7nnoqJrpXfFLi5ViyDFw4BStCiUsHdk5YsSpjKy0VR820Jg5JTkixaJ4HB0B1he5deMabz0R07XVUlApGfwQqh52fAdmyXMOot49YDFvL0pmO8fOD8EGKBXbXptizwmunziCrOUq4Bll9YAApLSpmt1qTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LYL0KA7C; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c314af2d4so1288168a91.3
-        for <kvm@vger.kernel.org>; Tue, 06 Jan 2026 15:43:31 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a090819ed1so11298025ad.2
+        for <kvm@vger.kernel.org>; Tue, 06 Jan 2026 15:48:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767743011; x=1768347811; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AFLe2qYsLV+D2iZNcYbO4V3mWanhyRl+kO9tBEe1F6c=;
-        b=JpkcKQJA9jIr2hXeOHZi96OlJEhtLJe4X/SUkO8YRx7cqU6j28vQp/i8RBKXV3JeFk
-         /vUz0fc/MC7RPXl3/iVWfhO71k+VQEcR8qd5nDBMRzD7cV5tQTPOuMmP33dbfWJVouOY
-         pC5lOG2pdLUvPqIBqWHVjk5NNLDmakLH2jhNwMa8XzytiWVIyzwOZbUjh/pTwVdoEY3d
-         G9gnEPz3Ka7gEbfJysso+bdvE3+H6g9Ey0Zwo8MRijmsRvYhoJNzqf0dUfQMUVUVcQuk
-         KUMl5UdYashySH/LgeCI/rVDKCHN5wG/FxTtWdWbx8kyM/MYWn+/Sy1ZRBDmEGYMRpwO
-         HJig==
+        d=google.com; s=20230601; t=1767743319; x=1768348119; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WZSvW5wtvITu4SJXRjRAbmEfEMA88gTQfQ+s3BSwlg4=;
+        b=LYL0KA7C72jnqkxSabQdx7Ghiy2e8erO8xf3mXeiAO00NNBIhFC+BX4Zq7QBBh7IH1
+         PDB33xmBwdZra548P9DR+bsgVOUwfHaDzHLN3cmNPV1A4azx2tWiKMiT5zzMqP0kMaOD
+         3nRjVsQLNS1mmjSOBsELpbZCWnYTw88PMGUMbLRJHE9nL0kZDaJCFferD47sr3skcwjf
+         g7FznvlBsVyGU9sojFqh64MZepATDAuw6XDcqgbPVbN8/wxyTV+WwTqxTC8ALmULOK9r
+         VkVYLP+XD2IGDwMVU/rrOQro4+aYytIg9SpX6DQi7t4FFIgUolllURYiA09OWj4QRwe4
+         GCxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767743011; x=1768347811;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AFLe2qYsLV+D2iZNcYbO4V3mWanhyRl+kO9tBEe1F6c=;
-        b=TbnrcUXcMGmsL6hl1Hl5xjT06LxhFu9RFhO/NOV99OKEb/Xl3d7eu9B6GeZgQhs072
-         GMWCPK9lYwTk1IeZqalpDwWspQ+3asamQkTdCSn0DFOBEKBgJCSb9YnuV7/IwJdU4aZV
-         UwelEWi0kLfvM2h8srdHh5FVnnGMz5OIgkSmkzQ6i0XIHrHyxCAEE53zsA8clsqhkks0
-         3DjShraXvGIhyEVj5eNMgwkOXNaXxUDEXyfJsrYsaBhOyc8u0Tkd7PDbPQJZz8rqLT3Z
-         G5XB6otPNTlcQ/LBeRaRuI/EcrnTKuageyaJEyzlcupN1EgJWYERG5FlmKzyGD4NBiXr
-         0+OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuAMfZgX5hJxzCVReyj3fZXXjihKcMWatEwNM4ZepxDAEs4i0NbA6C7lQmx1YdAYUXJ8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7x6Yz0nbquiOI8quFPrHAbkScMJWQbHAsl7B9j9j8EYbZBNOf
-	TnXzyljY5xNjjcTGNVCRYL9TV5BP2+DekwoKVW/kq44pTg23c6e8cXxKAW10Ow8v2aMJFHlwEkv
-	kxHbXVA==
-X-Google-Smtp-Source: AGHT+IGrSHkXO8OJk7Ce749uGfc1vt5vcOfHVVkx+8gcVN8rRM2bUlnULx13EgUhgyaiYuDoxIVlqdDODbk=
-X-Received: from pjbfr15.prod.google.com ([2002:a17:90a:e2cf:b0:34c:84ee:67c4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5708:b0:34a:b459:bd10
- with SMTP id 98e67ed59e1d1-34f68cc2ab3mr628773a91.24.1767743010489; Tue, 06
- Jan 2026 15:43:30 -0800 (PST)
-Date: Tue, 6 Jan 2026 15:43:29 -0800
-In-Reply-To: <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1767743319; x=1768348119;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WZSvW5wtvITu4SJXRjRAbmEfEMA88gTQfQ+s3BSwlg4=;
+        b=q7w8X/tDLSU7cqBM1dXm4nveS31TWOJDWg8yNxFo/m2827NGKGJv2Wl5zAgJ+aqtfX
+         u/dtW0I0WjpRCrsdv1qgR15onuuop6QQFHRs8xQ3s215d2WTIPTPbg5K3wAKMFlKlaAS
+         gqw8riOyhIxNf5hP5TZkIoF6la9MzXULAnV04NbF0I5YwR/o+45NRN39KyJHiewofJhD
+         6AELsg3YFefh3gJ9h5bq+Vl7KFVBpXszFUYBC6FQ4hKvtvzI+fqZ2eXMwHyUdcMoaaRx
+         hgALvDXJeVL5sDWvkm83l3cjNstT/cVdI88kAPMS5PsJSrXX7L0TWXZi0xr9algD2Lv4
+         O54g==
+X-Forwarded-Encrypted: i=1; AJvYcCWrL4tjvbi7LC5M2qZnysNFY5T6wmmItgRKrwhFUi/YA9A1YWgazzwk7ClZKYHOjoSHw6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4YJMx0adzLOkq80yugApMSGb3zrYM2Jvf4C6xLk3jdqSA4/jk
+	FxSJhuLB8WbiDtrQj/dx2auvc6zUz/RzTqbSQnsJkY8VZ36oM2AlMtW62xmEw1H3dIDPdkmmDDY
+	eP3zQNw==
+X-Google-Smtp-Source: AGHT+IEE7vYXak7r+HwQYDu/g5AOkfcndSHO1z6vcKAqtHXXobcOLVQzjsohmyEW9urtWhgG1ubEcOLjj7g=
+X-Received: from pldd12.prod.google.com ([2002:a17:902:c18c:b0:29e:fd13:927b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce08:b0:2a0:34ee:3725
+ with SMTP id d9443c01a7336-2a3ee4456c1mr5326115ad.14.1767743318591; Tue, 06
+ Jan 2026 15:48:38 -0800 (PST)
+Date: Tue, 6 Jan 2026 15:48:37 -0800
+In-Reply-To: <5uwzlb3jvmebvienef5tw7cd6r4wgvtb5m5gu3wcaxh5sery3o@crh6m6cpuaqy>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260106101646.24809-1-yan.y.zhao@intel.com> <CAGtprH-eEUzHDUB0CK2V162HHqvE8kT3bAacb6d3xDYJPwBiYA@mail.gmail.com>
- <CAEvNRgGG+xYhsz62foOrTeAxUCYxpCKCJnNgTAMYMV=w2eq+6Q@mail.gmail.com>
- <aV2A39fXgzuM4Toa@google.com> <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
-Message-ID: <aV2eIalRLSEGozY0@google.com>
-Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
+References: <20260106041250.2125920-1-chengkev@google.com> <20260106041250.2125920-2-chengkev@google.com>
+ <aV1StCzKWxAQ-B93@google.com> <5uwzlb3jvmebvienef5tw7cd6r4wgvtb5m5gu3wcaxh5sery3o@crh6m6cpuaqy>
+Message-ID: <aV2fVaLBrtUsccHJ@google.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: Generate #UD for certain instructions when
+ SVME.EFER is disabled
 From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>, Yan Zhao <yan.y.zhao@intel.com>, pbonzini@redhat.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kas@kernel.org, 
-	tabba@google.com, michael.roth@amd.com, david@kernel.org, sagis@google.com, 
-	vbabka@suse.cz, thomas.lendacky@amd.com, nik.borisov@suse.com, 
-	pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Kevin Cheng <chengkev@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jan 06, 2026, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
->=20
-> > On Tue, Jan 06, 2026, Ackerley Tng wrote:
-> >> Vishal Annapurve <vannapurve@google.com> writes:
-> >>
-> >> > On Tue, Jan 6, 2026 at 2:19=E2=80=AFAM Yan Zhao <yan.y.zhao@intel.co=
-m> wrote:
-> >> >>
-> >> >> - EPT mapping size and folio size
-> >> >>
-> >> >>   This series is built upon the rule in KVM that the mapping size i=
-n the
-> >> >>   KVM-managed secondary MMU is no larger than the backend folio siz=
-e.
-> >> >>
-> >>
-> >> I'm not familiar with this rule and would like to find out more. Why i=
-s
-> >> this rule imposed?
-> >
-> > Because it's the only sane way to safely map memory into the guest? :-D
-> >
-> >> Is this rule there just because traditionally folio sizes also define =
-the
-> >> limit of contiguity, and so the mapping size must not be greater than =
-folio
-> >> size in case the block of memory represented by the folio is not conti=
-guous?
-> >
-> > Pre-guest_memfd, KVM didn't care about folios.  KVM's mapping size was =
-(and still
-> > is) strictly bound by the host mapping size.  That's handles contiguous=
- addresses,
-> > but it _also_ handles contiguous protections (e.g. RWX) and other attri=
-butes.
-> >
-> >> In guest_memfd's case, even if the folio is split (just for refcount
-> >> tracking purposese on private to shared conversion), the memory is sti=
-ll
-> >> contiguous up to the original folio's size. Will the contiguity addres=
-s
-> >> the concerns?
-> >
-> > Not really?  Why would the folio be split if the memory _and its attrib=
-utes_ are
-> > fully contiguous?  If the attributes are mixed, KVM must not create a m=
-apping
-> > spanning mixed ranges, i.e. with multiple folios.
->=20
-> The folio can be split if any (or all) of the pages in a huge page range
-> are shared (in the CoCo sense). So in a 1G block of memory, even if the
-> attributes all read 0 (!KVM_MEMORY_ATTRIBUTE_PRIVATE), the folio
-> would be split, and the split folios are necessary for tracking users of
-> shared pages using struct page refcounts.
+On Tue, Jan 06, 2026, Yosry Ahmed wrote:
+> On Tue, Jan 06, 2026 at 10:21:40AM -0800, Sean Christopherson wrote:
+> > So rather than manually handle the intercepts in svm_set_efer() and fight recalcs,
+> > trigger KVM_REQ_RECALC_INTERCEPTS and teach svm_recalc_instruction_intercepts()
+> > about EFER.SVME handling.
+> > 
+> > After the dust settles, it might make sense to move the #GP intercept logic into
+> > svm_recalc_intercepts() as well, but that's not a priority.
+> 
+> Unrelated question about the #GP intercept logic, it seems like if
+> enable_vmware_backdoor is set, the #GP intercept will be set, even for
+> SEV guests, which goes against the in svm_set_efer():
+> 
+> 	/*
+> 	 * Never intercept #GP for SEV guests, KVM can't
+> 	 * decrypt guest memory to workaround the erratum.
+> 	 */
+> 	if (svm_gp_erratum_intercept && !sev_guest(vcpu->kvm))
+> 		set_exception_intercept(svm, GP_VECTOR);
+> 
+> I initially thought if userspace sets enable_vmware_backdoor and runs
+> SEV guests it's shooting itself in the foot, but given that
+> enable_vmware_backdoor is a module parameter (i.e. global), isn't it
+> possible that the host runs some SEV and some non-SEV VMs, where the
+> non-SEV VMs require the vmware backdoor?
 
-Ahh, that's what the refcounting was referring to.  Gotcha.
+Commit 29de732cc95c ("KVM: SEV: Move SEV's GP_VECTOR intercept setup to SEV")
+moved the override to sev_init_vmcb():
 
-> However the split folios in that 1G range are still fully contiguous.
->=20
-> The process of conversion will split the EPT entries soon after the
-> folios are split so the rule remains upheld.
->=20
-> I guess perhaps the question is, is it okay if the folios are smaller
-> than the mapping while conversion is in progress? Does the order matter
-> (split page table entries first vs split folios first)?
+	/*
+	 * Don't intercept #GP for SEV guests, e.g. for the VMware backdoor, as
+	 * KVM can't decrypt guest memory to decode the faulting instruction.
+	 */
+	clr_exception_intercept(svm, GP_VECTOR);
 
-Mapping a hugepage for memory that KVM _knows_ is contiguous and homogenous=
- is
-conceptually totally fine, i.e. I'm not totally opposed to adding support f=
-or
-mapping multiple guest_memfd folios with a single hugepage.   As to whether=
- we
-do (a) nothing, (b) change the refcounting, or (c) add support for mapping
-multiple folios in one page, probably comes down to which option provides "=
-good
-enough" performance without incurring too much complexity.
+I.e. init_vmcb() will set the #GP intercept, then sev_init_vmcb() will immediately
+clear it.
 
