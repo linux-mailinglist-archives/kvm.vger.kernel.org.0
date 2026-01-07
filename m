@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-67277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67283-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652EBD002DD
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 22:34:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE14D001E3
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 22:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52A593028FF2
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 21:30:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5CFA330090F1
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 21:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A4B33C51B;
-	Wed,  7 Jan 2026 21:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5369B341AD8;
+	Wed,  7 Jan 2026 21:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="lTDO/r9U"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="m+0kD3JN"
 X-Original-To: kvm@vger.kernel.org
 Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA753A0B33;
-	Wed,  7 Jan 2026 21:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4337321428;
+	Wed,  7 Jan 2026 21:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767819978; cv=none; b=r11U4dauRE04ejvZzo35KaN6AvQt9KELkU0+bNJE6jZTQcn8UY1f1i6uQvFGdGvu4Nla3NRA6OxHQT/oTOQiXml6v0fDA7NpvYpzsC12TbLUFpr3n4b6aayu0/1xvX07C46/xibi3JjZU55DvdxxEVomIxN+uCyGY98enyn9XQ0=
+	t=1767819979; cv=none; b=BFwdzF9zA7hKYC2LL+GAtwC5amDQb/DrewHjwEJDxpJ8SIE4205S/bHraiNkbG44tHsmvh2gRwo97gW2mUSd5nhXonqtHdjMbSGbzAY+Kg6kNfnqHrBVaIGiabNswGQJQevYUyRLILjLGHEgFnam0UhbC+cI+diP8kH89Yzjsdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767819978; c=relaxed/simple;
-	bh=i6EXM/dz88Cyoq8LtFGDSx5xkGpNbJe1oE+QY2KW7uQ=;
+	s=arc-20240116; t=1767819979; c=relaxed/simple;
+	bh=jJEomV68RwsvP53WBudoctRPvBFglCe7Oe95ccXv+98=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CKTV/gpk6n17oC04T781pji2k2OOEPtMCznJPuu7zHw1sOfnKB3gdsJ5FZZyv9Unw75xoINPncV35cgqZ6Ur5cQ1BJQJx3HdQa8Htsl5bW6OchTSr1PXupMOnhLPKA+KKt6TQeqS4gVRG+4EDrr/NtIo0iPiKXe7fgwK0JYhpxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=lTDO/r9U; arc=none smtp.client-ip=129.217.128.51
+	 MIME-Version; b=lRIj7Qd6uoV/kiBTR4KoZa1uEfY7+fLkCb5uO/FGHpxkxzYTh2818+4tOfApL3su31bO6STMVjjHdzA5W9hvpADG1qd+9C1WGcP82lwopn2VUY7kUgVuoPlJU459SEaLiXWnLffVkL0+4OUPY92Z65BF+iv5chN5FLZJDFAQRr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=m+0kD3JN; arc=none smtp.client-ip=129.217.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
 Received: from simon-Latitude-5450.fritz.box (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
 	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 607L5t9H026667
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 607L5t9J026667
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 7 Jan 2026 22:05:59 +0100 (CET)
+	Wed, 7 Jan 2026 22:06:00 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
 	s=unimail; t=1767819960;
-	bh=i6EXM/dz88Cyoq8LtFGDSx5xkGpNbJe1oE+QY2KW7uQ=;
+	bh=jJEomV68RwsvP53WBudoctRPvBFglCe7Oe95ccXv+98=;
 	h=From:To:Subject:Date:In-Reply-To:References;
-	b=lTDO/r9UTXkuMXbSINWBD7E+CPaAPkqmT7IPIn58KsophOcArTZxKHTU3djCpgFqq
-	 TdYgigqJn0aNSEmP5iFl+5fl1j5LKHt4H93NTZNuoBCUN4WrYK6rpmvqr04Lj4bs3S
-	 IDJenQI6/2eFYftf8bS1pWX5Gs6mYRK21n9566BY=
+	b=m+0kD3JNyvTIIinmt68ZFElyRLtdu4hok1yqyuwxcl3jtM52HmJ81rhSB5Kz3jgNV
+	 /Q8UxAF9sb7vw1mCNjK8U+yg6en23U9ctS4WZx8y+bsAvDd92/rTiM8msXyasyBeNM
+	 E1PiTD0RoCz9VF6WGqpN2jRppraZx9YX5bLYlp5o=
 From: Simon Schippers <simon.schippers@tu-dortmund.de>
 To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
         andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
@@ -50,9 +50,9 @@ To: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
         simon.schippers@tu-dortmund.de, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux.dev
-Subject: [PATCH net-next v7 1/9] ptr_ring: move free-space check into separate helper
-Date: Wed,  7 Jan 2026 22:04:40 +0100
-Message-ID: <20260107210448.37851-2-simon.schippers@tu-dortmund.de>
+Subject: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly freed space on consume
+Date: Wed,  7 Jan 2026 22:04:41 +0100
+Message-ID: <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
 References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
@@ -64,52 +64,56 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch moves the check for available free space for a new entry into
-a separate function. As a result, __ptr_ring_produce() remains logically
-unchanged, while the new helper allows callers to determine in advance
-whether subsequent __ptr_ring_produce() calls will succeed. This
-information can, for example, be used to temporarily stop producing until
-__ptr_ring_peek() indicates that space is available again.
+This proposed function checks whether __ptr_ring_zero_tail() was invoked
+within the last n calls to __ptr_ring_consume(), which indicates that new
+free space was created. Since __ptr_ring_zero_tail() moves the tail to
+the head - and no other function modifies either the head or the tail,
+aside from the wrap-around case described below - detecting such a
+movement is sufficient to detect the invocation of
+__ptr_ring_zero_tail().
+
+The implementation detects this movement by checking whether the tail is
+at most n positions behind the head. If this condition holds, the shift
+of the tail to its current position must have occurred within the last n
+calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
+invoked and that new free space was created.
+
+This logic also correctly handles the wrap-around case in which
+__ptr_ring_zero_tail() is invoked and the head and the tail are reset
+to 0. Since this reset likewise moves the tail to the head, the same
+detection logic applies.
 
 Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 ---
- include/linux/ptr_ring.h | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ include/linux/ptr_ring.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
-index 534531807d95..a5a3fa4916d3 100644
+index a5a3fa4916d3..7cdae6d1d400 100644
 --- a/include/linux/ptr_ring.h
 +++ b/include/linux/ptr_ring.h
-@@ -96,6 +96,14 @@ static inline bool ptr_ring_full_bh(struct ptr_ring *r)
+@@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
  	return ret;
  }
  
-+static inline int __ptr_ring_produce_peek(struct ptr_ring *r)
++/* Returns true if the consume of the last n elements has created space
++ * in the ring buffer (i.e., a new element can be produced).
++ *
++ * Note: Because of batching, a successful call to __ptr_ring_consume() /
++ * __ptr_ring_consume_batched() does not guarantee that the next call to
++ * __ptr_ring_produce() will succeed.
++ */
++static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
++						    int n)
 +{
-+	if (unlikely(!r->size) || r->queue[r->producer])
-+		return -ENOSPC;
-+
-+	return 0;
++	return r->consumer_head - r->consumer_tail < n;
 +}
 +
- /* Note: callers invoking this in a loop must use a compiler barrier,
-  * for example cpu_relax(). Callers must hold producer_lock.
-  * Callers are responsible for making sure pointer that is being queued
-@@ -103,8 +111,10 @@ static inline bool ptr_ring_full_bh(struct ptr_ring *r)
-  */
- static inline int __ptr_ring_produce(struct ptr_ring *r, void *ptr)
- {
--	if (unlikely(!r->size) || r->queue[r->producer])
--		return -ENOSPC;
-+	int p = __ptr_ring_produce_peek(r);
-+
-+	if (p)
-+		return p;
- 
- 	/* Make sure the pointer we are storing points to a valid data. */
- 	/* Pairs with the dependency ordering in __ptr_ring_consume. */
+ /* Cast to structure type and call a function without discarding from FIFO.
+  * Function must return a value.
+  * Callers must take consumer_lock.
 -- 
 2.43.0
 
