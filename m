@@ -1,251 +1,127 @@
-Return-Path: <kvm+bounces-67222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 414D3CFDB18
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 13:34:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB92CFDAEB
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 13:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCFDD30D4D27
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 12:30:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B742B309AD96
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 12:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4569632A3F3;
-	Wed,  7 Jan 2026 12:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A23831196C;
+	Wed,  7 Jan 2026 12:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQPBqY3d"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="q9N3uFMY"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A60328B70;
-	Wed,  7 Jan 2026 12:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F8530C361
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 12:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767788663; cv=none; b=aa28lq/ucz86TBi/d/GeicIYYm+xJPeUD1evYWmUZzIoMnRKpkypow4DZya0h7Vvw7SfzWTsIVsEJ5Rr6ki5tJlO6MxeZsFe9op2TzTBNFYmU0VX5xhDbt94gHU+d1YpAJ/FSFXbSa3+RNCOzJX7xKZS+N7As3nCBQpUn9VqPvs=
+	t=1767788944; cv=none; b=gDHSbUkg8B/joyJ+Pwau0T/8ck3sX/lCK/XwrPHar4U0XbvW3fKI3g7SLXONVVvAJs4C1tNxAIVeguDwRqoiA/6Q2LXoj/xBZWN7yZQRoXNUVpY5tPbwEdp5WMHBwhGwDzHCamDKV/7BqHUaXn7zP8p2OIysD7k8cnAP/xoQkMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767788663; c=relaxed/simple;
-	bh=IsygWTMZdTG0Nq6crJvMpuu1naoy0zMIB4K4PhC/N+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OQE/KZQoOnjsdN1BQIRFC1Y9PdnjGmbKLKzYRQeh8Y3aP8zNj0oHYL1f9fyFxnaB36nBc2i0R1g4qnUvrlD1/PNK5oTSNL+GCN4xNJw+TxK5ENTvYBv7pEownFX5lOzWSV+bDZlHO4LPpKNdP0KXooCpa0khHNSct9IAhZAQvNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQPBqY3d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7A2C4CEF7;
-	Wed,  7 Jan 2026 12:24:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767788663;
-	bh=IsygWTMZdTG0Nq6crJvMpuu1naoy0zMIB4K4PhC/N+g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IQPBqY3d1wDsYM2p0cWdND2XmtPcU6sME/U61WJINvoK0+GWxk+WGZrcW5N1NQM1N
-	 73Sb6VNbTLeyVeVtSvcGuq01XdzERHaNnnCSIpllqmR85o83ujea5Gm5hz2MczeBy/
-	 JHWs91IWhHNoW7DLlmSc8UndW/pTYDFOLFNQ7GY00vA2nrOibnCos/9s1USnf0dGuD
-	 qEvBv22WKdjZnB8dCGLvYpmSR5Unp3anb0PsaOw6LL7fGw1RXS2LJG9DTpV/RznDhd
-	 0/H8+MMiRmpEnx0rGGoIo6HoQhpSHd0SRTD8/G338qS7bZt6Mel6qlFXr6gHiG7O2V
-	 h2Fospv+Dq25g==
-Date: Wed, 7 Jan 2026 12:24:18 +0000
-From: Simon Horman <horms@kernel.org>
-To: Cindy Lu <lulu@redhat.com>
-Cc: mst@redhat.com, jasowang@redhat.com, dtatulea@nvidia.com,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] vdpa/mlx5: reuse common function for MAC address
- updates
-Message-ID: <20260107122418.GB196631@kernel.org>
-References: <20251229071614.779621-1-lulu@redhat.com>
- <20251229071614.779621-2-lulu@redhat.com>
+	s=arc-20240116; t=1767788944; c=relaxed/simple;
+	bh=FFCdQvw4G/Pjf64xgqggp0TD4BOQcvLgeB3ZH6bO+oQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cM7MY4Arkvgcw6TB9UDtG2+D481M1gFeu83QJrZfVi6iUlougyFqNpm2RW+pmh8L/NF/gnZ5NpQuIBfEWD2HkpqFlAdyu2jZNVYQ8hkdLvF+P3C//jsnsr4qHdDTro3BcQxFAss86I2Yk97qBywn8sVV03q/jT+OEupVBplO+fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=q9N3uFMY; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Dj6UfPJfB6pGRAhSwf9NayQstkd63pLUii227xs7tgU=;
+	b=q9N3uFMYnsif4vSvN4HobhRe4RqLxBvrzgOayPb1BqFgTC5hvm/lInUjmr4agrRAElQ2fJMDN
+	BN66A4ozyvMKXlQZy6jh1vDVtSL2MOT95MGpqMb1BUtHemdvBoPa7aBMoqDYqwIyrIXV1LGt+7V
+	TtRrKkv085GuIKf6n4frqMk=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmS2K2Gqlz1P6ht;
+	Wed,  7 Jan 2026 20:26:33 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmS511pmFzJ46Zl;
+	Wed,  7 Jan 2026 20:28:53 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6E03440570;
+	Wed,  7 Jan 2026 20:28:56 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
+ 2026 12:28:55 +0000
+Date: Wed, 7 Jan 2026 12:28:53 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 15/36] KVM: arm64: gic-v5: Implement GICv5 load/put
+ and save/restore
+Message-ID: <20260107122853.0000131c@huawei.com>
+In-Reply-To: <20251219155222.1383109-16-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-16-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251229071614.779621-2-lulu@redhat.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Mon, Dec 29, 2025 at 03:16:13PM +0800, Cindy Lu wrote:
-> Factor out MAC address update logic and reuse it from handle_ctrl_mac().
+On Fri, 19 Dec 2025 15:52:41 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+
+> This change introduces GICv5 load/put. Additionally, it plumbs in
+> save/restore for:
 > 
-> This ensures that old MAC entries are removed from the MPFS table
-> before adding a new one and that the forwarding rules are updated
-> accordingly. If updating the flow table fails, the original MAC and
-> rules are restored as much as possible to keep the software and
-> hardware state consistent.
+> * PPIs (ICH_PPI_x_EL2 regs)
+> * ICH_VMCR_EL2
+> * ICH_APR_EL2
+> * ICC_ICSR_EL1
 > 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 95 +++++++++++++++++--------------
->  1 file changed, 53 insertions(+), 42 deletions(-)
+> A GICv5-specific enable bit is added to struct vgic_vmcr as this
+> differs from previous GICs. On GICv5-native systems, the VMCR only
+> contains the enable bit (driven by the guest via ICC_CR0_EL1.EN) and
+> the priority mask (PCR).
 > 
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 6e42bae7c9a1..c87e6395b060 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -2125,62 +2125,48 @@ static void teardown_steering(struct mlx5_vdpa_net *ndev)
->  	mlx5_destroy_flow_table(ndev->rxft);
->  }
->  
-> -static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
-> +static int mlx5_vdpa_change_new_mac(struct mlx5_vdpa_net *ndev,
-> +				    struct mlx5_core_dev *pfmdev,
-> +				    const u8 *new_mac)
->  {
-> -	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> -	struct mlx5_control_vq *cvq = &mvdev->cvq;
-> -	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
-> -	struct mlx5_core_dev *pfmdev;
-> -	size_t read;
-> -	u8 mac[ETH_ALEN], mac_back[ETH_ALEN];
-> -
-> -	pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
-> -	switch (cmd) {
-> -	case VIRTIO_NET_CTRL_MAC_ADDR_SET:
-> -		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov, (void *)mac, ETH_ALEN);
-> -		if (read != ETH_ALEN)
-> -			break;
-> -
-> -		if (!memcmp(ndev->config.mac, mac, 6)) {
-> -			status = VIRTIO_NET_OK;
-> -			break;
-> -		}
-> +	struct mlx5_vdpa_dev *mvdev = &ndev->mvdev;
-> +	u8 old_mac[ETH_ALEN];
->  
-> -		if (is_zero_ether_addr(mac))
-> -			break;
-> +	if (is_zero_ether_addr(new_mac))
-> +		return -EINVAL;
->  
-> -		if (!is_zero_ether_addr(ndev->config.mac)) {
-> -			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
-> -				mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
-> -					       ndev->config.mac);
-> -				break;
-> -			}
-> +	if (!is_zero_ether_addr(ndev->config.mac)) {
-> +		if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
-> +			mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
-> +				       ndev->config.mac);
-> +			return -EIO;
->  		}
-> +	}
->  
-> -		if (mlx5_mpfs_add_mac(pfmdev, mac)) {
-> -			mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
-> -				       mac);
-> -			break;
-> -		}
-> +	if (mlx5_mpfs_add_mac(pfmdev, (u8 *)new_mac)) {
-> +		mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
-> +			       new_mac);
-> +		return -EIO;
-> +	}
->  
->  		/* backup the original mac address so that if failed to add the forward rules
->  		 * we could restore it
->  		 */
-> -		memcpy(mac_back, ndev->config.mac, ETH_ALEN);
-> +		memcpy(old_mac, ndev->config.mac, ETH_ALEN);
->  
-> -		memcpy(ndev->config.mac, mac, ETH_ALEN);
-> +		memcpy(ndev->config.mac, new_mac, ETH_ALEN);
+> A struct gicv5_vpe is also introduced. This currently only contains a
+> single field - bool resident - which is used to track if a VPE is
+> currently running or not, and is used to avoid a case of double load
+> or double put on the WFI path for a vCPU. This struct will be extended
+> as additional GICv5 support is merged, specifically for VPE doorbells.
+> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-...
 
-Hi Cindy,
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 1fe1790f1f874..168447ee3fbed 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -1,4 +1,7 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2025 Arm Ltd.
+> + */
 
-I realise that this makes the diffstat significantly more verbose.
-And hides material changes. So perhaps there is a nicer way to do this.
+Why in this patch?  It's trivial enough that maybe it doesn't need to be
+on it's own, but the first patch touching this file seems like a more
+logical place to find it.
 
-But with the current arrangement of this patch, I think that
-the indentation from just above, until the end of this function
-needs to be updated.
 
-I.e. the following incremental patch on top of this one.
 
-This was flagged by Smatch.
 
-diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-index c87e6395b060..c796f502b604 100644
---- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-+++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-@@ -2149,48 +2149,48 @@ static int mlx5_vdpa_change_new_mac(struct mlx5_vdpa_net *ndev,
- 		return -EIO;
- 	}
- 
--		/* backup the original mac address so that if failed to add the forward rules
--		 * we could restore it
--		 */
--		memcpy(old_mac, ndev->config.mac, ETH_ALEN);
-+	/* backup the original mac address so that if failed to add the forward rules
-+	 * we could restore it
-+	 */
-+	memcpy(old_mac, ndev->config.mac, ETH_ALEN);
- 
--		memcpy(ndev->config.mac, new_mac, ETH_ALEN);
-+	memcpy(ndev->config.mac, new_mac, ETH_ALEN);
- 
--		/* Need recreate the flow table entry, so that the packet could forward back
--		 */
--		mac_vlan_del(ndev, old_mac, 0, false);
-+	/* Need recreate the flow table entry, so that the packet could forward back
-+	 */
-+	mac_vlan_del(ndev, old_mac, 0, false);
- 
--		if (mac_vlan_add(ndev, ndev->config.mac, 0, false)) {
--			mlx5_vdpa_warn(mvdev, "failed to insert forward rules, try to restore\n");
-+	if (mac_vlan_add(ndev, ndev->config.mac, 0, false)) {
-+		mlx5_vdpa_warn(mvdev, "failed to insert forward rules, try to restore\n");
- 
--			/* Although it hardly run here, we still need double check */
--			if (is_zero_ether_addr(old_mac)) {
--				mlx5_vdpa_warn(mvdev, "restore mac failed: Original MAC is zero\n");
--				return -EIO;
--			}
-+		/* Although it hardly run here, we still need double check */
-+		if (is_zero_ether_addr(old_mac)) {
-+			mlx5_vdpa_warn(mvdev, "restore mac failed: Original MAC is zero\n");
-+			return -EIO;
-+		}
- 
--			/* Try to restore original mac address to MFPS table, and try to restore
--			 * the forward rule entry.
--			 */
--			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
--				mlx5_vdpa_warn(mvdev, "restore mac failed: delete MAC %pM from MPFS table failed\n",
--					       ndev->config.mac);
--			}
-+		/* Try to restore original mac address to MFPS table, and try to restore
-+		 * the forward rule entry.
-+		 */
-+		if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
-+			mlx5_vdpa_warn(mvdev, "restore mac failed: delete MAC %pM from MPFS table failed\n",
-+				       ndev->config.mac);
-+		}
- 
--			if (mlx5_mpfs_add_mac(pfmdev, old_mac)) {
--				mlx5_vdpa_warn(mvdev, "restore mac failed: insert old MAC %pM into MPFS table failed\n",
--					       old_mac);
--			}
-+		if (mlx5_mpfs_add_mac(pfmdev, old_mac)) {
-+			mlx5_vdpa_warn(mvdev, "restore mac failed: insert old MAC %pM into MPFS table failed\n",
-+				       old_mac);
-+		}
- 
--			memcpy(ndev->config.mac, old_mac, ETH_ALEN);
-+		memcpy(ndev->config.mac, old_mac, ETH_ALEN);
- 
--			if (mac_vlan_add(ndev, ndev->config.mac, 0, false))
--				mlx5_vdpa_warn(mvdev, "restore forward rules failed: insert forward rules failed\n");
-+		if (mac_vlan_add(ndev, ndev->config.mac, 0, false))
-+			mlx5_vdpa_warn(mvdev, "restore forward rules failed: insert forward rules failed\n");
- 
--			return -EIO;
--		}
-+		return -EIO;
-+	}
- 
--		return 0;
-+	return 0;
- }
- 
- static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
+
 
