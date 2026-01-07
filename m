@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-67224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67221-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3242ACFDB57
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 13:40:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1CD2CFDA6D
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 13:26:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9E3973002143
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 12:40:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC3AF3043231
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 12:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD41315D23;
-	Wed,  7 Jan 2026 12:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF2C315D2A;
+	Wed,  7 Jan 2026 12:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="fphM9sz7"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="1VRyJ+0B"
 X-Original-To: kvm@vger.kernel.org
 Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45CC3090D7
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 12:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1561315D24
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 12:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767789244; cv=none; b=oTgv4R34Nd8uDmdcoRaHQ4UxvYEuUzS6OK111/SXFUuoXRVImJdOKlOMRt9VJ5Gy7nvH+bUlsSnc3bZaS5CxIQIHsRyqgkvsiwfHKZpCU4BnWqIRGwqWoxu5gXWe4t7sGWE8WaPNmXVbaibz2+BNE6FaN2cVTIReOl/zSMy3sdU=
+	t=1767788532; cv=none; b=X2TEjqRcKlIV/iO0yHg++IFK7StPt1Fl7uoQuo3jHyuguSwjX2cMoy4iu8nhep9FuNgDENXJP/b2HHWoaTwp4ICTnjn9udSOxv/P9VMZLeqBPRHVbrNqGK88/ZZcECLNVohTvZTx9herW0vhZ7Ymq72bR41+SfxayWVhIVKTYDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767789244; c=relaxed/simple;
-	bh=/wmbG8E71eAN12r4lBeknEL5wNQYSlmOIuvkOGB9wzI=;
+	s=arc-20240116; t=1767788532; c=relaxed/simple;
+	bh=p7UYyZxC4uKCcyOUBAcr3iUz7F5ptluIAzWnVKY9IAE=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c9D8UIsFULPo9cCt+PTO3ZiEq85Fc/iDLMkGqfu/oJaqnurWSMTZjQxMMf+AFAEtwz8UYghLeyFNN+DvgH6w4vXNHotbdrgbf1Xjqs36tmwFLmAMvnzPfYKNbW3QKKaADZrq/jDjKDB/ArQq+8O40Xxj5DASDM+cqDP1VZMxuH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=fphM9sz7; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=ZHrhd+So7kNn2aPMagUMK5m1ExHwO4IjEirTPJDPyUqcHhdKitWQPXmGxoYCdVJr6SYe+1wGCRuhnkfp4NVvcI128KI1svxHFBsh0qFN5FdYmLe/QVfeBYtuyePxF6DWUoQhS/VIMqUJjn0g/m5pZaUMNQzsQj4TI3krXQsWtBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=1VRyJ+0B; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=2/k7aRIMSsRlFmo4uSbFPpMf5BgB8CzmDNkN1SVEfQc=;
-	b=fphM9sz76LXP1qBy6IXllFB6u1bhkKCguaF4iI1BUY5jX8pxr0FW6FtNb0STaafF/R6Gn6gMT
-	1lEk6xHr3nhSZfUDWhrRco7JB8BBaKCQprCpVopAER8fQv0U5oOnVh3z1HutxdGIXy+utraf4O+
-	+p6oqJp4hiZTGHiRBzAl+t0=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmRm63xNTz1P7S0;
-	Wed,  7 Jan 2026 20:14:14 +0800 (CST)
+	bh=3qyYX76QlWUIX26TwaxqltqE5qHT9hotMM6BfsYSweg=;
+	b=1VRyJ+0B4zb5a96x3vwFxKCbJI3YjjVOn3TaHvt4BuD6wdqmEzpeFGcGWQj1f/eNak6eTFwG/
+	mM2uVMv2ZcL/TkAS1Fx479HMdy7LHOgv702e6IKcg7OLwdmLE+15WFd0BY/uJZl1UxvKmzJXMPm
+	vZ60TdQ5GD/L8a2aZWgMzWY=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmRtN1S47z1P7PT;
+	Wed,  7 Jan 2026 20:19:40 +0800 (CST)
 Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmRpn6007zJ46Df;
-	Wed,  7 Jan 2026 20:16:33 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmRx11LFYzHnH4x;
+	Wed,  7 Jan 2026 20:21:57 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 01D6A4056F;
-	Wed,  7 Jan 2026 20:16:37 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4BBD240086;
+	Wed,  7 Jan 2026 20:22:03 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 12:16:35 +0000
-Date: Wed, 7 Jan 2026 12:16:34 +0000
+ 2026 12:22:02 +0000
+Date: Wed, 7 Jan 2026 12:22:00 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -61,12 +61,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 16/36] KVM: arm64: gic-v5: Implement direct injection
- of PPIs
-Message-ID: <20260107121634.00000c13@huawei.com>
-In-Reply-To: <20251219155222.1383109-17-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v2 17/36] KVM: arm64: gic: Introduce irq_queue and
+ set_pending_state to irq_ops
+Message-ID: <20260107122200.00004455@huawei.com>
+In-Reply-To: <20251219155222.1383109-18-sascha.bischoff@arm.com>
 References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-17-sascha.bischoff@arm.com>
+	<20251219155222.1383109-18-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -82,36 +82,81 @@ X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
 On Fri, 19 Dec 2025 15:52:41 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> GICv5 is able to directly inject PPI pending state into a guest using
-> a mechanism called DVI whereby the pending bit for a paticular PPI is
-> driven directly by the physically-connected hardware. This mechanism
-> itself doesn't allow for any ID translation, so the host interrupt is
-> directly mapped into a guest with the same interrupt ID.
+> There are times when the default behaviour of vgic_queue_irq_unlock is
+
+Nice to make function names explicit in a patch description by using
+vgic_queue_irq_unlock() style. Some subsystems insist we do that in commit
+descriptions. No idea if kvm does though.
+
+> undesirable. This is because some GICs, such a GICv5 which is the main
+> driver for this change, handle the majority of the interrupt lifecycle
+> in hardware. In this case, there is no need for a per-VCPU AP list as
+> the interrupt can be made pending directly. This is done either via
+> the ICH_PPI_x_EL2 registers for PPIs, or with the VDPEND system
+> instruction for SPIs and LPIs.
 > 
-> When mapping a virtual interrupt to a physical interrupt via
-> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
-> PPI or not. If it is, and the host's interrupt ID matches that used
-> for the guest DVI is enabled, and the interrupt itself is marked as
-> directly_injected.
+> The queue_irq_unlock function is made overridable using a new function
+> pointer in struct irq_ops. In kvm_vgic_inject_irq,
+> vgic_queue_irq_unlock is overridden if the function pointer is
+> non-null.
 > 
-> When the interrupt is unmapped again, this process is reversed, and
-> DVI is disabled for the interrupt again.
+> Additionally, a new function is added via a function pointer -
+> set_pending_state. The intent is for this to be used to directly set
+> the pending state in hardware.
 > 
-> Note: the expectation is that a directly injected PPI is disabled on
-> the host while the guest state is loaded. The reason is that although
-> DVI is enabled to drive the guest's pending state directly, the host
-> pending state also remains driven. In order to avoid the same PPI
-> firing on both the host and the guest, the host's interrupt must be
-> disabled (masked). This is left up to the code that owns the device
-> generating the PPI as this needs to be handled on a per-VM basis. One
-> VM might use DVI, while another might not, in which case the physical
-> PPI should be enabled for the latter.
+> Both of these new irq_ops are unused in this change - it is purely
+> providing the infrastructure itself. The subsequent PPI injection
+> changes provide a demonstration of their usage.
 > 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
+Trivial stuff only.
+
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
+> ---
+>  arch/arm64/kvm/vgic/vgic.c | 11 +++++++++++
+>  include/kvm/arm_vgic.h     | 15 +++++++++++++++
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index d88570bb2f9f0..ac8cb0270e1e4 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -404,6 +404,13 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+>  
+>  	lockdep_assert_held(&irq->irq_lock);
+>  
+> +	/*
+> +	 * If we have the queue_irq_unlock irq_op, we want to override
+> +	 * the default behaviour. Call that, and return early.
+
+I'd say this comment is really just saying what the code clearly does
+so provides not benefit. So drop it.
+
+> +	 */
+> +	if (irq->ops && irq->ops->queue_irq_unlock)
+> +		return irq->ops->queue_irq_unlock(kvm, irq, flags);
+> +
+>  retry:
+>  	vcpu = vgic_target_oracle(irq);
+>  	if (irq->vcpu || !vcpu) {
+> @@ -547,7 +554,11 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  	else
+>  		irq->pending_latch = true;
+>  
+> +	if (irq->ops && irq->ops->set_pending_state)
+> +		WARN_ON_ONCE(!irq->ops->set_pending_state(vcpu, irq));
+> +
+>  	vgic_queue_irq_unlock(kvm, irq, flags);
+> +
+Reasonable change, for readability but not relevant to this patch, so don't
+do it here.
+
+>  	vgic_put_irq(kvm, irq);
+>  
+>  	return 0;
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
 
 
 
