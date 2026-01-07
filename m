@@ -1,60 +1,87 @@
-Return-Path: <kvm+bounces-67302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67303-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8036BD005EF
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 00:14:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE10BD0062C
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 00:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 70FE4300486C
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 23:14:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 449663014D9B
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 23:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7332FD689;
-	Wed,  7 Jan 2026 23:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0653E2F6930;
+	Wed,  7 Jan 2026 23:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u5Bh4aFM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GAXQFfhX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9717F2D592F
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 23:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C512EDD76
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 23:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767827649; cv=none; b=T80xbIchfbKBM5lzbO0Q8XxVQtTQ2PocFf9JsEy+r34QU4VYyXPe4mIHe/slUD1dfTmbsg1KY1HpcE+o1sDFO8Jy1Y3/lDsEE9ZJrJasBjDgU9PeWU6xQ8yDK9SJPeVQCM3A3fAJ7nwEtbqD97GcPBc7qy2Gf97+7YO7+Jz0t8c=
+	t=1767828170; cv=none; b=s0Oh/0NaIRIryXwaRO4BgBlw4gz/l+E5j5hIlXrLwJh9Em9E4i8MyKARWMUT6+dEpcfy53sXsuQM4RIwQXX/IWv6MzsZdBmoVbuNiOoKnRix1ULf45onumo2ubk0nc56ZtTD2HvFcYzD1+uqZrUJ1A3Ymzq5sXzNc1x8gAl54PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767827649; c=relaxed/simple;
-	bh=Jy64zneAKwy0rKILEqV/YoGs8qWJ+teoZELZJO5YOUA=;
+	s=arc-20240116; t=1767828170; c=relaxed/simple;
+	bh=Y0apOWxCxJEtiyyIz7o8kSQYmhxJacV6R/ASISLkGKU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n900ZYFgSj0beY7aFFnwNNW/jJ3lQ3PmNTfzuyFF7IzYA4+sYb89/gFMLJMHNkOrZxPk3D0oX+O6Tsls6kkpeS4bw8RTgX5Q0pysELz0WM+AvL/FVDKFSxFps7RyIMRrgg4LA9muLW39VdzUpeBERNl83/FhyoyRgwn7ZxSnYSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u5Bh4aFM; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 7 Jan 2026 23:12:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767827632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rR1fnvTTjB0CTE6RfkOtCAeY2jGW4kIZ+UMk8iaKGdI=;
-	b=u5Bh4aFM/DJ6EI3tKWN9ieFoB4g6EEjw1qSeYhK/tQ+6PGvPQrzcSVID7cPg1+zCvC6KFm
-	XbMjwJ3hL72SpmGfx9q0LV4fstFFuDLFPPm5Dw+mLKGD28qAisxn74YyTOvcRrbHUMU5DQ
-	sLtTKWYIAxdxWioTvQMqczCGjCOTVFs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 16/21] KVM: selftests: Add support for nested NPTs
-Message-ID: <fj2wis2dluwtlaawrelfj25ldsk35dpbytytd2koemnv2va4np@feeu6in4gjjg>
-References: <20251230230150.4150236-1-seanjc@google.com>
- <20251230230150.4150236-17-seanjc@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rog6Jp5xU/7F907cWDkjngQBxAgiZvoZh7SNXG/M5O79RVKMG7Hdf1xD0EXT1F7i4KJpv1lYd3QscssBcdwAX7GVd5PnOgLKYNuQtCJp/TNbkEshNi8eGhtWTg7LRTU/lngTA3oEnxN+BVJbAguyl5hXaI1nzwBINz6+2bU5JaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GAXQFfhX; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2a0d52768ccso20106215ad.1
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 15:22:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767828168; x=1768432968; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=saP6/ffuY5vMrIZ58eJfSyCX3/vEpiWaIFkpYUXoNxM=;
+        b=GAXQFfhX4lYS4dDXDeqisMB/tp3e0mvbRXgxWENd18hxi/8XRREWzOC5nvu8ifWlof
+         +vB3bqj6efZOMqSoTbOk/5eGI70B8wMj5lwbrDS6fz+5vQZEXCJ8FfFB6h8bAIr9MiCU
+         zKyrU9r7mB0iqSA4QoxuLSxwSO6UdG4d03JofG4pPeXnFBDqxkiZGhTHq+3g/z2A5KZh
+         Yxq3pTyOY2jGs/9LqQ+bym6G5uB9Q5Rx7c7JPIss51+wbczhzwHl8MBZlwyv4LaosW4y
+         MAbuXcX6EKCQPY+q/eDznhFTjm3mpzPlBDGRzauJnnRYl6WPcg7/8YBD0629Z4PgcISU
+         Tjlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767828168; x=1768432968;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=saP6/ffuY5vMrIZ58eJfSyCX3/vEpiWaIFkpYUXoNxM=;
+        b=kaVmlAEfyexA/2EwAnDcJI+n7o+WOZ8Uskt2YuYCoqM+Y+5EUd+Uhr67e/8Ly9hqfW
+         tAOIrzhVeqKR1defQymasZSbHfJhVYJ95c4/0T1ZWQOrNl6aecCMAqCfH+vYiwT59xyC
+         gUTHuj0MYVEalceUTgemOn1RTx9AoKluJ0/NKDfwS/8NMyu+XearnHs/Ju9p4S+Vk578
+         Dzmd3o+O83JkjkV3pcHjuEpWDrfhVgnOEodTjNuYtIu3vX/Ib4JtthJiYnb8aS+LerOH
+         COBqjIePpMGr+hmpiYHji/jw/7M3yHvPKrMNpxrcHFt8mp080ch3zJZhOp6Jqrnp149q
+         Y7KA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNEpUwr/ayfTeSjBolPSovcU/KYUruyTjuAtb5dOe0H1tswPBFxIIUEFCus33IRUfTpwA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkQSMT+jEWCxOsB1kU23J+xH+I4IU7OCWBaJXyhlIgVgQcTKV9
+	BEvnbXXNbLBblLaD7kVtzZv9vk/6DUJHROKSIkXdvVJwFQYCmqFDrqVLV7LCZ7s+ag==
+X-Gm-Gg: AY/fxX7ZSNyQEfSQN0INt4XVgQOVprxnXO9UzGZY6jMiki5loiiJ4CeSViZaJ2AQPzu
+	TYF/13orLiA/EmMgbzWr7TQ5VN9X31vZ5Ja1WZUc5gMA1VbeLy3jlt2H4eYTZmzvvwn971e7V2c
+	z0X4lg+AhRxKCF3Oq8RXCi0BqIrSn17lprV2nXPjTqRo/nSFxFPCADMT3XjBLj/P0zqEbrUVd9/
+	fJk1EXdVEz2K34BgpZhN/nxN/dEMoWH3j5feN0ahEom19QDrbr1G1L2YtUInK1ka+BCaaZx2N8M
+	kEvYsHQjRFqvmMYc0Eg6I+IDJVXFB0NyJNpXx3OkXF6c+H2uyGb2ud0p/TSSqo04ywLnO85H8UU
+	ui7bfRZ3oXHRKn2frUSGIcl4MEK2lK3ElYG9k+iAgp42yHkSOYdsjOvdSRPptr/5g7+g1Ad9NXU
+	J29sX1R7OqZDnx03QMlCnxMAYBRQirss1yxngcPPW2QVDP
+X-Google-Smtp-Source: AGHT+IEeQtXwtbDk/5Dj++mTabOGSRVkMHVrEGiX/jNYeZkmyH74Mvo4NgMnBQYBuEFoUIpMSFsAnA==
+X-Received: by 2002:a17:903:1a0c:b0:29e:e642:95d6 with SMTP id d9443c01a7336-2a3ee51f755mr41380695ad.59.1767828167431;
+        Wed, 07 Jan 2026 15:22:47 -0800 (PST)
+Received: from google.com (76.9.127.34.bc.googleusercontent.com. [34.127.9.76])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cc88e3sm59056525ad.75.2026.01.07.15.22.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 15:22:46 -0800 (PST)
+Date: Wed, 7 Jan 2026 23:22:42 +0000
+From: David Matlack <dmatlack@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Alex Williamson <alex@shazbot.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/6] vfio: selftests: Add tests to validate SR-IOV UAPI
+Message-ID: <aV7qwp4N_G6f_Bt7@google.com>
+References: <20251210181417.3677674-1-rananta@google.com>
+ <20251210181417.3677674-7-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,206 +90,297 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251230230150.4150236-17-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20251210181417.3677674-7-rananta@google.com>
 
-On Tue, Dec 30, 2025 at 03:01:45PM -0800, Sean Christopherson wrote:
-> From: Yosry Ahmed <yosry.ahmed@linux.dev>
+On 2025-12-10 06:14 PM, Raghavendra Rao Ananta wrote:
+> Add a selfttest, vfio_pci_sriov_uapi_test.c, to validate the
+> SR-IOV UAPI, including the following cases, iterating over
+> all the IOMMU modes currently supported:
+>  - Setting correct/incorrect/NULL tokens during device init.
+>  - Close the PF device immediately after setting the token.
+>  - Change/override the PF's token after device init.
 > 
-> Implement nCR3 and NPT initialization functions, similar to the EPT
-> equivalents, and create common TDP helpers for enablement checking and
-> initialization. Enable NPT for nested guests by default if the TDP MMU
-> was initialized, similar to VMX.
-> 
-> Reuse the PTE masks from the main MMU in the NPT MMU, except for the C
-> and S bits related to confidential VMs.
-> 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Funny story, I missed a teeny tiny part here..
-
-diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-index 18e9e9089643..2e5c480c9afd 100644
---- a/tools/testing/selftests/kvm/lib/x86/svm.c
-+++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-@@ -46,6 +46,9 @@ vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva)
-        svm->msr_gpa = addr_gva2gpa(vm, (uintptr_t)svm->msr);
-        memset(svm->msr_hva, 0, getpagesize());
-
-+       if (vm->stage2_mmu.pgd_created)
-+               svm->ncr3_gpa = vm->stage2_mmu.pgd;
-+
-        *p_svm_gva = svm_gva;
-        return svm;
- }
-
----
-
-The good news is that the test still passes after we start ACTUALLY
-USING the nested NPT :)
-
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  .../selftests/kvm/include/x86/processor.h     |  2 ++
->  .../selftests/kvm/include/x86/svm_util.h      |  9 ++++++++
->  .../testing/selftests/kvm/lib/x86/memstress.c |  4 ++--
->  .../testing/selftests/kvm/lib/x86/processor.c | 15 +++++++++++++
->  tools/testing/selftests/kvm/lib/x86/svm.c     | 21 +++++++++++++++++++
->  .../selftests/kvm/x86/vmx_dirty_log_test.c    |  4 ++--
->  6 files changed, 51 insertions(+), 4 deletions(-)
+>  tools/testing/selftests/vfio/Makefile         |   1 +
+>  .../selftests/vfio/vfio_pci_sriov_uapi_test.c | 215 ++++++++++++++++++
+>  2 files changed, 216 insertions(+)
+>  create mode 100644 tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> index d134c886f280..deb471fb9b51 100644
-> --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> @@ -1477,6 +1477,8 @@ void __virt_pg_map(struct kvm_vm *vm, struct kvm_mmu *mmu, uint64_t vaddr,
->  void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->  		    uint64_t nr_bytes, int level);
+> diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+> index 3c796ca99a509..f00a63902fbfb 100644
+> --- a/tools/testing/selftests/vfio/Makefile
+> +++ b/tools/testing/selftests/vfio/Makefile
+> @@ -4,6 +4,7 @@ TEST_GEN_PROGS += vfio_iommufd_setup_test
+>  TEST_GEN_PROGS += vfio_pci_device_test
+>  TEST_GEN_PROGS += vfio_pci_device_init_perf_test
+>  TEST_GEN_PROGS += vfio_pci_driver_test
+> +TEST_GEN_PROGS += vfio_pci_sriov_uapi_test
 >  
-> +void vm_enable_tdp(struct kvm_vm *vm);
-> +bool kvm_cpu_has_tdp(void);
->  void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
->  void tdp_identity_map_default_memslots(struct kvm_vm *vm);
->  void tdp_identity_map_1g(struct kvm_vm *vm,  uint64_t addr, uint64_t size);
-> diff --git a/tools/testing/selftests/kvm/include/x86/svm_util.h b/tools/testing/selftests/kvm/include/x86/svm_util.h
-> index b74c6dcddcbd..5d7c42534bc4 100644
-> --- a/tools/testing/selftests/kvm/include/x86/svm_util.h
-> +++ b/tools/testing/selftests/kvm/include/x86/svm_util.h
-> @@ -27,6 +27,9 @@ struct svm_test_data {
->  	void *msr; /* gva */
->  	void *msr_hva;
->  	uint64_t msr_gpa;
+>  TEST_FILES += scripts/cleanup.sh
+>  TEST_FILES += scripts/lib.sh
+> diff --git a/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+> new file mode 100644
+> index 0000000000000..4c2951d6e049c
+> --- /dev/null
+> +++ b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+> @@ -0,0 +1,215 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +#include <fcntl.h>
+> +#include <unistd.h>
+> +#include <stdlib.h>
+> +#include <sys/ioctl.h>
+> +#include <linux/limits.h>
 > +
-> +	/* NPT */
-> +	uint64_t ncr3_gpa;
->  };
->  
->  static inline void vmmcall(void)
-> @@ -57,6 +60,12 @@ struct svm_test_data *vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva);
->  void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp);
->  void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa);
->  
-> +static inline bool kvm_cpu_has_npt(void)
+> +#include <libvfio.h>
+> +
+> +#include "../kselftest_harness.h"
+> +
+> +#define UUID_1 "52ac9bff-3a88-4fbd-901a-0d767c3b6c97"
+> +#define UUID_2 "88594674-90a0-47a9-aea8-9d9b352ac08a"
+> +
+> +static const char *pf_dev_bdf;
+
+nit: I think you could simplify some of the names in this file. This
+code isn't in a library so the names dont' have to be globally unique
+and quite so long.
+
+  s/pf_dev_bdf/pf_bdf/
+  s/vf_dev_bdf/vf_bdf/
+  s/pf_device/pf/
+  s/vf_device/vf/
+  s/test_vfio_pci_container_setup/container_setup/
+  s/test_vfio_pci_iommufd_setup/iommufd_setup/
+  s/test_vfio_pci_device_init/device_init/
+  s/test_vfio_pci_device_cleanup/device_cleanup/
+
+Feel free to ignore this though if you think it makes the names too
+terse.
+
+> +
+> +static int test_vfio_pci_container_setup(struct vfio_pci_device *device,
+> +					 const char *bdf,
+> +					 const char *vf_token)
 > +{
-> +	return kvm_cpu_has(X86_FEATURE_NPT);
+> +	vfio_pci_group_setup(device, bdf);
+> +	vfio_container_set_iommu(device);
+> +	__vfio_pci_group_get_device_fd(device, bdf, vf_token);
+> +
+> +	/* The device fd will be -1 in case of mismatched tokens */
+> +	return (device->fd < 0);
 > +}
-> +void vm_enable_npt(struct kvm_vm *vm);
 > +
->  int open_sev_dev_path_or_exit(void);
->  
->  #endif /* SELFTEST_KVM_SVM_UTILS_H */
-> diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-> index 3319cb57a78d..407abfc34909 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-> @@ -82,9 +82,9 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
->  	int vcpu_id;
->  
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-> -	TEST_REQUIRE(kvm_cpu_has_ept());
-> +	TEST_REQUIRE(kvm_cpu_has_tdp());
->  
-> -	vm_enable_ept(vm);
-> +	vm_enable_tdp(vm);
->  	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->  		vcpu_alloc_vmx(vm, &vmx_gva);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-> index 29e7d172f945..a3a4c9a4cbcb 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-> @@ -8,7 +8,9 @@
->  #include "kvm_util.h"
->  #include "pmu.h"
->  #include "processor.h"
-> +#include "svm_util.h"
->  #include "sev.h"
-> +#include "vmx.h"
->  
->  #ifndef NUM_INTERRUPTS
->  #define NUM_INTERRUPTS 256
-> @@ -472,6 +474,19 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
->  	}
->  }
->  
-> +void vm_enable_tdp(struct kvm_vm *vm)
+> +static int test_vfio_pci_iommufd_setup(struct vfio_pci_device *device,
+> +				       const char *bdf, const char *vf_token)
 > +{
-> +	if (kvm_cpu_has(X86_FEATURE_VMX))
-> +		vm_enable_ept(vm);
+> +	vfio_pci_iommufd_cdev_open(device, bdf);
+> +	return __vfio_device_bind_iommufd(device->fd,
+> +					  device->iommu->iommufd, vf_token);
+> +}
+> +
+> +static struct vfio_pci_device *test_vfio_pci_device_init(const char *bdf,
+> +							 struct iommu *iommu,
+> +							 const char *vf_token,
+> +							 int *out_ret)
+> +{
+> +	struct vfio_pci_device *device;
+> +
+> +	device = calloc(1, sizeof(*device));
+> +	VFIO_ASSERT_NOT_NULL(device);
+> +
+> +	device->iommu = iommu;
+> +	device->bdf = bdf;
+
+Can you put this in a helper exposed by vfio_pci_device.h? e.g.
+vfio_pci_device_alloc()
+
+> +
+> +	if (iommu->mode->container_path)
+> +		*out_ret = test_vfio_pci_container_setup(device, bdf, vf_token);
 > +	else
-> +		vm_enable_npt(vm);
+> +		*out_ret = test_vfio_pci_iommufd_setup(device, bdf, vf_token);
+> +
+> +	return device;
 > +}
 > +
-> +bool kvm_cpu_has_tdp(void)
+> +static void test_vfio_pci_device_cleanup(struct vfio_pci_device *device)
 > +{
-> +	return kvm_cpu_has_ept() || kvm_cpu_has_npt();
+> +	if (device->fd > 0)
+> +		VFIO_ASSERT_EQ(close(device->fd), 0);
+> +
+> +	if (device->group_fd)
+> +		VFIO_ASSERT_EQ(close(device->group_fd), 0);
+> +
+> +	free(device);
 > +}
 > +
->  void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
->  	       uint64_t size, int level)
->  {
-> diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-> index d239c2097391..8e4795225595 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/svm.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-> @@ -59,6 +59,22 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
->  	seg->base = base;
->  }
->  
-> +void vm_enable_npt(struct kvm_vm *vm)
+> +FIXTURE(vfio_pci_sriov_uapi_test) {
+> +	char vf_dev_bdf[16];
+> +	char vf_driver[32];
+> +	bool sriov_drivers_autoprobe;
+> +};
+> +
+> +FIXTURE_SETUP(vfio_pci_sriov_uapi_test)
 > +{
-> +	struct pte_masks pte_masks;
+> +	int nr_vfs;
+> +	int ret;
 > +
-> +	TEST_ASSERT(kvm_cpu_has_npt(), "KVM doesn't supported nested NPT");
+> +	nr_vfs = sysfs_get_sriov_totalvfs(pf_dev_bdf);
+> +	if (nr_vfs < 0)
+> +		SKIP(return, "SR-IOV may not be supported by the device\n");
+
+Should this be <= 0?
+
+And replace "the device" with the BDF.
+
 > +
-> +	/*
-> +	 * NPTs use the same PTE format, but deliberately drop the C-bit as the
-> +	 * per-VM shared vs. private information is only meant for stage-1.
-> +	 */
-> +	pte_masks = vm->mmu.arch.pte_masks;
-> +	pte_masks.c = 0;
+> +	nr_vfs = sysfs_get_sriov_numvfs(pf_dev_bdf);
+> +	if (nr_vfs != 0)
+> +		SKIP(return, "SR-IOV already configured for the PF\n");
+
+Let's print the BDF and nr_vfs for the user.
+
 > +
-> +	tdp_mmu_init(vm, vm->mmu.pgtable_levels, &pte_masks);
+> +	self->sriov_drivers_autoprobe =
+> +		sysfs_get_sriov_drivers_autoprobe(pf_dev_bdf);
+> +	if (self->sriov_drivers_autoprobe)
+> +		sysfs_set_sriov_drivers_autoprobe(pf_dev_bdf, 0);
+> +
+> +	/* Export only one VF for testing */
+
+s/Export/Create/
+
+> +	sysfs_set_sriov_numvfs(pf_dev_bdf, 1);
+> +
+> +	sysfs_get_sriov_vf_bdf(pf_dev_bdf, 0, self->vf_dev_bdf);
+> +	if (sysfs_get_driver(self->vf_dev_bdf, self->vf_driver) == 0)
+> +		sysfs_unbind_driver(self->vf_dev_bdf, self->vf_driver);
+
+This should be impossible since we disabled autoprobing.
+
+> +	sysfs_bind_driver(self->vf_dev_bdf, "vfio-pci");
+
+Some devices also require setting driver_override to "vfio-pci" as well
+so the device can be bound to vfio-pci. Let's just do that
+unconditionally.
+
 > +}
 > +
->  void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp)
->  {
->  	struct vmcb *vmcb = svm->vmcb;
-> @@ -102,6 +118,11 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
->  	vmcb->save.rip = (u64)guest_rip;
->  	vmcb->save.rsp = (u64)guest_rsp;
->  	guest_regs.rdi = (u64)svm;
+> +FIXTURE_TEARDOWN(vfio_pci_sriov_uapi_test)
+> +{
+> +	sysfs_unbind_driver(self->vf_dev_bdf, "vfio-pci");
+> +	sysfs_bind_driver(self->vf_dev_bdf, self->vf_driver);
+> +	sysfs_set_sriov_numvfs(pf_dev_bdf, 0);
+> +	sysfs_set_sriov_drivers_autoprobe(pf_dev_bdf,
+> +					  self->sriov_drivers_autoprobe);
+> +}
 > +
-> +	if (svm->ncr3_gpa) {
-> +		ctrl->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
-> +		ctrl->nested_cr3 = svm->ncr3_gpa;
-> +	}
->  }
->  
->  /*
-> diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> index 370f8d3117c2..032ab8bf60a4 100644
-> --- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> @@ -93,7 +93,7 @@ static void test_vmx_dirty_log(bool enable_ept)
->  	/* Create VM */
->  	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
->  	if (enable_ept)
-> -		vm_enable_ept(vm);
-> +		vm_enable_tdp(vm);
->  
->  	vcpu_alloc_vmx(vm, &vmx_pages_gva);
->  	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-> @@ -170,7 +170,7 @@ int main(int argc, char *argv[])
->  
->  	test_vmx_dirty_log(/*enable_ept=*/false);
->  
-> -	if (kvm_cpu_has_ept())
-> +	if (kvm_cpu_has_tdp())
->  		test_vmx_dirty_log(/*enable_ept=*/true);
->  
->  	return 0;
+> +FIXTURE_VARIANT(vfio_pci_sriov_uapi_test) {
+> +	const char *iommu_mode;
+> +	char *vf_token;
+> +};
+> +
+> +#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode, _name, _vf_token)		\
+> +FIXTURE_VARIANT_ADD(vfio_pci_sriov_uapi_test, _iommu_mode ## _ ## _name) {	\
+> +	.iommu_mode = #_iommu_mode,						\
+> +	.vf_token = (_vf_token),						\
+> +}
+> +
+> +FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(same_uuid, UUID_1);
+> +FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(diff_uuid, UUID_2);
+> +FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(null_uuid, NULL);
+> +
+> +/*
+> + * PF's token is always set with UUID_1 and VF's token is rotated with
+> + * various tokens (including UUID_1 and NULL).
+> + * This asserts if the VF device is successfully created for a match
+> + * in the token or actually fails during a mismatch.
+> + */
+> +#define ASSERT_VF_CREATION(_ret) do {					\
+> +	if (!variant->vf_token || strcmp(UUID_1, variant->vf_token)) {	\
+> +		ASSERT_NE((_ret), 0);					\
+> +	} else {							\
+> +		ASSERT_EQ((_ret), 0);					\
+> +	}								\
+> +} while (0)
+> +
+> +/*
+> + * Validate if the UAPI handles correctly and incorrectly set token on the VF.
+> + */
+> +TEST_F(vfio_pci_sriov_uapi_test, init_token_match)
+> +{
+> +	struct vfio_pci_device *pf_device;
+> +	struct vfio_pci_device *vf_device;
+> +	struct iommu *iommu;
+> +	int ret;
+> +
+> +	iommu = iommu_init(variant->iommu_mode);
+> +	pf_device = test_vfio_pci_device_init(pf_dev_bdf, iommu, UUID_1, &ret);
+> +	vf_device = test_vfio_pci_device_init(self->vf_dev_bdf, iommu,
+> +					      variant->vf_token, &ret);
+> +
+> +	ASSERT_VF_CREATION(ret);
+> +
+> +	test_vfio_pci_device_cleanup(vf_device);
+> +	test_vfio_pci_device_cleanup(pf_device);
+> +	iommu_cleanup(iommu);
+> +}
+> +
+> +/*
+> + * After setting a token on the PF, validate if the VF can still set the
+> + * expected token.
+> + */
+> +TEST_F(vfio_pci_sriov_uapi_test, pf_early_close)
+> +{
+> +	struct vfio_pci_device *pf_device;
+> +	struct vfio_pci_device *vf_device;
+> +	struct iommu *iommu;
+> +	int ret;
+> +
+> +	iommu = iommu_init(variant->iommu_mode);
+> +	pf_device = test_vfio_pci_device_init(pf_dev_bdf, iommu, UUID_1, &ret);
+> +	test_vfio_pci_device_cleanup(pf_device);
+> +
+> +	vf_device = test_vfio_pci_device_init(self->vf_dev_bdf, iommu,
+> +					      variant->vf_token, &ret);
+> +
+> +	ASSERT_VF_CREATION(ret);
+> +
+> +	test_vfio_pci_device_cleanup(vf_device);
+> +	iommu_cleanup(iommu);
+> +}
+> +
+> +/*
+> + * After PF device init, override the existing token and validate if the newly
+> + * set token is the one that's active.
+> + */
+> +TEST_F(vfio_pci_sriov_uapi_test, override_token)
+> +{
+> +	struct vfio_pci_device *pf_device;
+> +	struct vfio_pci_device *vf_device;
+> +	struct iommu *iommu;
+> +	int ret;
+> +
+> +	iommu = iommu_init(variant->iommu_mode);
+> +	pf_device = test_vfio_pci_device_init(pf_dev_bdf, iommu, UUID_2, &ret);
+> +	vfio_device_set_vf_token(pf_device->fd, UUID_1);
+> +
+> +	vf_device = test_vfio_pci_device_init(self->vf_dev_bdf, iommu,
+> +					      variant->vf_token, &ret);
+> +
+> +	ASSERT_VF_CREATION(ret);
+> +
+> +	test_vfio_pci_device_cleanup(vf_device);
+> +	test_vfio_pci_device_cleanup(pf_device);
+> +	iommu_cleanup(iommu);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	pf_dev_bdf = vfio_selftests_get_bdf(&argc, argv);
+> +	return test_harness_run(argc, argv);
+> +}
 > -- 
-> 2.52.0.351.gbe84eed79e-goog
+> 2.52.0.239.gd5f0c6e74e-goog
 > 
 
