@@ -1,207 +1,209 @@
-Return-Path: <kvm+bounces-67250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81DC5CFF495
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 19:07:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01D8CFF691
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 19:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46F503646D78
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 16:57:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 221473067217
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 18:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94743A0B26;
-	Wed,  7 Jan 2026 16:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07326169AD2;
+	Wed,  7 Jan 2026 16:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mK+FVVj2"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TxGob7h0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48693A0B3A;
-	Wed,  7 Jan 2026 16:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59A2368285
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 16:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767804006; cv=none; b=dyJBDo5vlF8t4eqHTT4ierdSWsO61ObzYVCOeJVz3vdwhv/Jao1aLco8AoXOtmyhATFouJhdQxePgX2CDayJ1AoOhqrqBw6llr3WOXREP9Z/NkrmCaqkhEplf5VoBNTsd6tnv2UWWbtDR6DcK38pudWQKUx/upKedQA/bos+fvk=
+	t=1767804689; cv=none; b=PAKID/3qPMk3KCA3zzpvoKz485yM/TVfYzzRFGxtOgq+Qw9Kx/b5SImN0xWQ1qsADQRNRc1IgZLtdus8+A4h98G0x03JBnBuwhYplAKgnQPly55l3BIRXKa3L6MSOwmQ8n1BHPcllASrd6l1wv3lTX03tEVjL2Cd7E3WVcXxNlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767804006; c=relaxed/simple;
-	bh=CB2zMbNYO93W6LZtbnqlBYrZeMYIOCmm41I2CVMJN68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YyzHBC1F2mmnZDKYOpp3Adf0iJgOmw2chWfMb0cfNDlORz1Wzeg0CRcIvxdNW2zECMrdVdpScIUxBP+KOHUrthxQS0JKC1dVNokuZVZFtEBYmiljBRVmvanIdN9BvTR2+eUO1faqwAkJRoGma3yiygufPih1qpULiflMYBdSD7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mK+FVVj2; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767804000; x=1799340000;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CB2zMbNYO93W6LZtbnqlBYrZeMYIOCmm41I2CVMJN68=;
-  b=mK+FVVj2dGbvxBtGLKP2hSUYQuhw89QCaC2Vw0op0CoZibN3MUr/sQgw
-   WYhzujQxcBldujEsQ6h3I8JjVo08h/pNc3NRDU6zdCKtV+sLWWZ8E1KcV
-   jpdpOdrVOt2qKula6NAKTblQcgEwbsF1aQkj2xFqkfgp9JGDcmcISIdks
-   zHygCImt9Tug8uOhi9j7QVsUb68eZH1DiJGJZmySxON0CsR9QZDExb3hs
-   lmtsiZkyzl5k7QYuXdE+G9jSIE+441lqjYi2hRvHmS4Xu2iCzKPxXFXpy
-   mGXtNlHaV3LuOyx4lT+OWKjimBoxCn7/1FhlXMh55XsbhIz1xhK3wVF01
-   Q==;
-X-CSE-ConnectionGUID: WwqSQ1pOTSy1+0zkzWpLoA==
-X-CSE-MsgGUID: WOsfPQ5LR3u26vWLyNJK/Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="72811144"
-X-IronPort-AV: E=Sophos;i="6.21,208,1763452800"; 
-   d="scan'208";a="72811144"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 08:39:57 -0800
-X-CSE-ConnectionGUID: sR530GWCQTuEA6Aub0X1og==
-X-CSE-MsgGUID: 0ki8MnLiQSKYmtevaJ4h4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,208,1763452800"; 
-   d="scan'208";a="202096370"
-Received: from aduenasd-mobl5.amr.corp.intel.com (HELO [10.125.109.145]) ([10.125.109.145])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 08:39:57 -0800
-Message-ID: <17a3a087-bcf2-491f-8a9a-1cd98989b471@intel.com>
-Date: Wed, 7 Jan 2026 08:39:55 -0800
+	s=arc-20240116; t=1767804689; c=relaxed/simple;
+	bh=3ol7RsguyxLJHmLBaeFw1Ne81MaMqEY5wsLuayf73Fc=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NVSJebjzKp9x/iIme+dLc6En9hbNs+6BWbxj4CQXeBZDquOWkfZViBsDFKdHlzUUL/PxWOHpIF056MWGJAddz+SLzXy2xk5glp9xfsfGGsaJoinnFNeHKOsgoCUx9oQSjzu4OMnmBzgJifprYvzaqCYrKssI2fmDrwQ2av6sHp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TxGob7h0; arc=none smtp.client-ip=119.8.177.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=5C6jQWVfkjb28klDVK2/Iw/96XcNiZg8oDzeVlxXTuw=;
+	b=TxGob7h0J7DyuITFxG5P7tY9Io8orxNuKiZH+YRkufrT4nWVdkiU2l7kV+5x5BPK/EV8L/l0x
+	sMed21REJUZVbtC+308p685yXNK61w+Fhh68QkeVEwB8SZfQR0/dWk6l2eVj9pzVdvdkkDPs/1b
+	h8k022PqXjg0agVhvTtpYfU=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dmYsG4dt4zN0f4;
+	Thu,  8 Jan 2026 00:49:06 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmYvZ3nqtzHnGdR;
+	Thu,  8 Jan 2026 00:51:06 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 06DAB40570;
+	Thu,  8 Jan 2026 00:51:13 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
+ 2026 16:51:12 +0000
+Date: Wed, 7 Jan 2026 16:51:10 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 36/36] KVM: arm64: gic-v5: Communicate
+ userspace-drivable PPIs via a UAPI
+Message-ID: <20260107165110.0000638d@huawei.com>
+In-Reply-To: <20251219155222.1383109-37-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-37-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/24] x86/tdx: Enhance tdh_mem_page_aug() to support
- huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com,
- kas@kernel.org, tabba@google.com, ackerleytng@google.com,
- michael.roth@amd.com, david@kernel.org, vannapurve@google.com,
- sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com,
- nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com,
- jun.miao@intel.com, francescolavra.fl@gmail.com, jgross@suse.com,
- ira.weiny@intel.com, isaku.yamahata@intel.com, xiaoyao.li@intel.com,
- kai.huang@intel.com, binbin.wu@linux.intel.com, chao.p.peng@intel.com,
- chao.gao@intel.com
-References: <20260106101646.24809-1-yan.y.zhao@intel.com>
- <20260106101826.24870-1-yan.y.zhao@intel.com>
- <c79e4667-6312-486e-9d55-0894b5e7dc68@intel.com>
- <aV4jihx/MHOl0+v6@yzhao56-desk.sh.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <aV4jihx/MHOl0+v6@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On 1/7/26 01:12, Yan Zhao wrote:
-...
-> However, my understanding is that it's better for functions expecting huge pages
-> to explicitly receive "folio" instead of "page". This way, people can tell from
-> a function's declaration what the function expects. Is this understanding
-> correct?
+On Fri, 19 Dec 2025 15:52:48 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-In a perfect world, maybe.
-
-But, in practice, a 'struct page' can still represent huge pages and
-*does* represent huge pages all over the kernel. There's no need to cram
-a folio in here just because a huge page is involved.
-
-> Passing "start_idx" along with "folio" is due to the requirement of mapping only
-> a sub-range of a huge folio. e.g., we allow creating a 2MB mapping starting from
-> the nth idx of a 1GB folio.
+> GICv5 systems will likely not support the full set of PPIs. The
+> presence of any virtual PPI is tied to the presence of the physical
+> PPI. Therefore, the available PPIs will be limited by the physical
+> host. Userspace cannot drive any PPIs that are not implemented.
 > 
-> On the other hand, if we instead pass "page" to tdh_mem_page_aug() for huge
-> pages and have tdh_mem_page_aug() internally convert it to "folio" and
-> "start_idx", it makes me wonder if we could have previously just passed "pfn" to
-> tdh_mem_page_aug() and had tdh_mem_page_aug() convert it to "page".
-
-As a general pattern, I discourage folks from using pfns and physical
-addresses when passing around references to physical memory. They have
-zero type safety.
-
-It's also not just about type safety. A 'struct page' also *means*
-something. It means that the kernel is, on some level, aware of and
-managing that memory. It's not MMIO. It doesn't represent the physical
-address of the APIC page. It's not SGX memory. It doesn't have a
-Shared/Private bit.
-
-All of those properties are important and they're *GONE* if you use a
-pfn. It's even worse if you use a raw physical address.
-
-Please don't go back to raw integers (pfns or paddrs).
-
->>> -	tdx_clflush_page(page);
->>> +	if (start_idx + npages > folio_nr_pages(folio))
->>> +		return TDX_OPERAND_INVALID;
->>
->> Why is this necessary? Would it be a bug if this happens?
-> This sanity check is due to the requirement in KVM that mapping size should be
-> no larger than the backend folio size, which ensures the mapping pages are
-> physically contiguous with homogeneous page attributes. (See the discussion
-> about "EPT mapping size and folio size" in thread [1]).
+> Moreover, it is not desirable to expose all PPIs to the guest in the
+> first place, even if they are supported in hardware. Some devices,
+> such as the arch timer, are implemented in KVM, and hence those PPIs
+> shouldn't be driven by userspace, either.
 > 
-> Failure of the sanity check could only be due to bugs in the caller (KVM). I
-> didn't convert the sanity check to an assertion because there's already a
-> TDX_BUG_ON_2() on error following the invocation of tdh_mem_page_aug() in KVM.
-
-We generally don't protect against bugs in callers. Otherwise, we'd have
-a trillion NULL checks in every function in the kernel.
-
-The only reason to add caller sanity checks is to make things easier to
-debug, and those almost always include some kind of spew:
-WARN_ON_ONCE(), pr_warn(), etc...
-
->>> +	for (int i = 0; i < npages; i++)
->>> +		tdx_clflush_page(folio_page(folio, start_idx + i));
->>
->> All of the page<->folio conversions are kinda hurting my brain. I think
->> we need to decide what the canonical type for these things is in TDX, do
->> the conversion once, and stick with it.
-> Got it!
+> Provided a new UAPI:
+>   KVM_DEV_ARM_VGIC_GRP_CTRL => KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
 > 
-> Since passing in base "page" or base "pfn" may still require the
-> wrappers/helpers to internally convert them to "folio" for sanity checks, could
-> we decide that "folio" and "start_idx" are the canonical params for functions
-> expecting huge pages? Or do you prefer KVM to do the sanity check by itself?
+> This allows userspace to query which PPIs it is able to drive via
+> KVM_IRQ_LINE.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-I'm not convinced the sanity check is a good idea in the first place. It
-just adds complexity.
+A couple of trivial comments on this patch.
+
+Overall, to me as a definite non expert in kvm GIC emulation this
+series looks to be in a pretty good state.
+
+Thanks,
+
+Jonathan
+> ---
+>  .../virt/kvm/devices/arm-vgic-v5.rst          | 13 ++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h             |  1 +
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c         | 25 +++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic-v5.c                 |  8 ++++++
+>  include/kvm/arm_vgic.h                        |  5 ++++
+>  include/linux/irqchip/arm-gic-v5.h            |  4 +++
+>  tools/arch/arm64/include/uapi/asm/kvm.h       |  1 +
+>  7 files changed, 57 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> index 9904cb888277d..d9f2917b609c5 100644
+> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> @@ -25,6 +25,19 @@ Groups:
+>        request the initialization of the VGIC, no additional parameter in
+>        kvm_device_attr.addr. Must be called after all VCPUs have been created.
+>  
+> +   KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
+> +      request the mask of userspace-drivable PPIs. Only a subset of the PPIs can
+> +      be directly driven from userspace with GICv5, and the returned mask
+> +      informs userspace of which it is allowed to drive via KVM_IRQ_LINE.
+> +
+> +      Userspace must allocate and point to __u64[2] with of data in
+
+with of?
+
+> +      kvm_device_attr.addr. When this call returns, the provided memory will be
+> +      populated with the userspace PPI mask. The lower __u64 contains the mask
+> +      for the lower 64 PPIS, with the remaining 64 being in the second __u64.
+> +
+> +      This is a read-only attribute, and cannot be set. Attempts to set it are
+> +      rejected.
+> +
+>    Errors:
+>  
+>      =======  ========================================================
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index 78903182bba08..360c78ed4f104 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -719,6 +719,25 @@ struct kvm_device_ops kvm_arm_vgic_v3_ops = {
+>  	.has_attr = vgic_v3_has_attr,
+>  };
+>  
+> +static int vgic_v5_get_userspace_ppis(struct kvm_device *dev,
+> +				      struct kvm_device_attr *attr)
+> +{
+> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> +	struct gicv5_vm *gicv5_vm = &dev->kvm->arch.vgic.gicv5_vm;
+> +	int i, ret;
+> +
+> +	guard(mutex)(&dev->kvm->arch.config_lock);
+> +
+> +	for (i = 0; i < 2; ++i) {
+
+Can drag declaration of i into loop init.
+Also I just noticed the series is rather random wrt to pre or post increment
+in cases where it doesn't matter. I'd go with post increment for for loops.
+I took a quick look at a random file in this directory and that's what is used there.
+
+
+> +		ret = put_user(gicv5_vm->userspace_ppis[i], uaddr);
+> +		if (ret)
+> +			return ret;
+> +		uaddr++;
+> +	}
+> +
+> +	return 0;
+> +}
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index bf72982d6a2e8..04300926683b6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -122,6 +122,14 @@ int vgic_v5_init(struct kvm *kvm)
+>  		}
+>  	}
+>  
+> +	/*
+> +	 * We only allow userspace to drive the SW_PPI, if it is
+> +	 * implemented.
+> +	 */
+
+	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
+
+Is under 80 chars (just) so go with that.
+
+
+> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] = GICV5_SW_PPI & GICV5_HWIRQ_ID;
+> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] &= ppi_caps->impl_ppi_mask[0];
+> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[1] = 0;
+> +
+>  	return 0;
+>  }
+
+
 
