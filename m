@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-67265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67267-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A687ACFFF4B
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 21:18:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5E4DCFFF5A
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 21:18:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AE0523007C35
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 20:18:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 616D03009210
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 20:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B89333893A;
-	Wed,  7 Jan 2026 20:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F43833A6FE;
+	Wed,  7 Jan 2026 20:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="olMo5wlg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fEI3bV+h"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAAF331A4C
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 20:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802AE3396F8
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 20:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767817086; cv=none; b=UfLR3s23jsrx+x6QxffbLFf9fIMjgsKr9ZRWaYz2uk/TRCcoizRYR9UgUSXSnmKgb9MmRKdoJhLBSpew3XV1YBHf9iDtnRsKMLvNX5RpSmdD//3iZTDYnJYhdkgNIbFcu5f32ogj55kDiwlWfSrGtA8TJCHd0SkH7ffLnfwsL48=
+	t=1767817091; cv=none; b=hLfrRq++nMCLBA+t6tNqSuEQmNMn3vLIog7Viuf+nHTalmIQKtTTQnUFZnhqBUlACFAfRE0ZE6nKLzM+G7iALNsKFTPJe9YYZxVs4CsMPgRReBiDDlRWWtr/ApY8cAo5JypHFOs8e4C2K3R9Ox9wtLu4zngJeQBB4v4o3H55ZZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767817086; c=relaxed/simple;
-	bh=98LSmDyrncFN4yAfUmC/lF2S2QLQXjk1Mnqe7MNMAYA=;
+	s=arc-20240116; t=1767817091; c=relaxed/simple;
+	bh=hUn7TlBmNUdymtQg3Kq9wRTksnPrB1glAZZeGAPR86s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TgUE/nwdaHbtfc9AAPApcgeLdiRV2FIvHuFyyEkeLR0mG2OJv9AW09mWCaTT4jVrXfSscnp+RNcYAV3a1X3Hf3lu5f6MESoDLavU9MtUlIuHk6ZDxDXSGIqOpf4mm8IkZWruAcimIhDYF0IFNV/TP8SbZhTUfkBGIknvGOhcigQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=olMo5wlg; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=mx2CiC26OPu4YmVK+gAiHf1kcQkl82QYXl9bY6kPqzELRA/OdshpmIrs54jdPvGZvkKABtDEiLU9Kz0/mpGixeSiWmCIOa6kaov/ZiPR4GNNRTD9r3DQ9+akH29KtQuNXswTsYeZvFiufJIJxwAAcyPP2LGkL8u+4QrN9i01F8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fEI3bV+h; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34e5a9de94bso4664053a91.0
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 12:18:04 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c387d3eb6so2156148a91.2
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 12:18:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767817084; x=1768421884; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767817087; x=1768421887; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=igY4dYldp2fGVYjzSgtn3dTLLodbnD38eUgrWzBU1Xo=;
-        b=olMo5wlgg3uUQeWFscH3hdCYprnUJbboyvc1+zaIQHbu9jw3samGNMdfuzWOtXiCBi
-         J/6BxMLoNFVTqNv+bXrKTOvTIjfja23InlyF0lnbtlZvhY9YmwAADMx3sy28epU6vH61
-         pwranRAMrh6kFjuN6RjL995lvVBOy5MFypQDAHT/DPKG6uDGRzLl1EaSK6qwQkNoY2Lr
-         9I3veejyM68IzSuDDHuHSkSNMB/RX/yDptSfwzH42M1vhlKagCLjxFophuLq2bwc2+oF
-         bAKmNvEBxdguZYxUQHLta3TV0jZYPT3AedhH0aV2qX+M5rxytyaG2Ri8BAzZxVXG6MLb
-         PPtg==
+        bh=6zK+/AslzkBPlSJC8UvJQiRH9fqye6KU8Yh2AdIhmFE=;
+        b=fEI3bV+hXrU7ePKTI4LcQQozaMA6JOZr6r/H7QyUz7TuPHk0M+wHIDNkq1+xqBE8pM
+         q8XcF3LVV4rLtaH8FurPuaKcO5rK6qMGXkWdPFiTX74a/UudA3GxG25FA0ViCUC8MEuw
+         tAzI2zWY0LIL6UjW+YL0tBIrkP7GoArngvEdHpJ/CoQXwZjD2nSgohd8bdQ8lxH2dkGg
+         EGRiBw60udedDyOGzjeB7FfKPxIKtnK8XPhIi22fhCaktuozv6hsyxN73TjQGltncZle
+         V3SPrRslTGhoIPlPNRowUR8tnvkCCEu1PAOvb85iqPDM39Bwng7N7S1Ww+uX9DC73kNg
+         4wDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767817084; x=1768421884;
+        d=1e100.net; s=20230601; t=1767817087; x=1768421887;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=igY4dYldp2fGVYjzSgtn3dTLLodbnD38eUgrWzBU1Xo=;
-        b=chhVmDQhre3N3lLZowM2x+pdxnzKTOTj54EW8XnCH2AbTNrTb2vKp1Nne8wf0+ty3y
-         dW6A7xMyb7BrXeVanXpcq1auUhco3Vj/vmofqaS+PkW/A1xzBY+KGotggGpzGEuaIPnR
-         ASr6iC6B1Z+hHOasr5NF8oW07tgNYJDoGxi7XcNja15Z6Syh7/5ZzesThVbcYuMDFd/W
-         hGUnpNKBay5JJpaap/mj8ZURrIWGnQMeyDeQnudRjOA2Wfhg66Icz15qqBD1T0AR3VDS
-         cvfGJ8VzZwaY7cd3dUFnxiBNq4sp5MYyh1Q+jBg5ugaxTDzDhMtVkZvbm3VPBh8TKikA
-         RIEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWceiOTYVNeo5Obgg1ZsEHTOzfEvaAIXOraVBuAqoPj5rMcmNntfaKUlQiKTdUshYOev7I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXEEV9OXdys/5z8I+VFtKbtpPL/mdHEDbmpuf2ePlayPe0StCR
-	MQAgXkvpzeoUDOlgg9aS0hHQIbl8mqJy09zaPpb+P07LYP1EA3jua/sOnNbvHdtmGOth4SlFNg9
-	M2Hx46pcnIVZmGQ==
-X-Google-Smtp-Source: AGHT+IHfXVop97/Vz192HqH+eaT1EXDIWQ0CMkd2UMbL7Q1pQUtgV9kwq04SG9DCOLRooq67paZ2vlfZ5GXHcw==
-X-Received: from pjcc11.prod.google.com ([2002:a17:90b:574b:b0:34c:c510:f186])
+        bh=6zK+/AslzkBPlSJC8UvJQiRH9fqye6KU8Yh2AdIhmFE=;
+        b=O1XFt/YjsLo8v9jdrCnwcxIrJgsdVZl9U1fvj1Fu1QgFn6FLWU0cDxznBJ9tAPxbST
+         mw9HM9oOs7q4dfu/GsAPSBLDikW0mIyplZOYASdwUZtAxGzH398B9KRsbWatIUf/NJwm
+         GMuEonHqbwISI+6Egy1UavxIwgThs+auG/3uPNOzHOUGXh1uZIWe2Wnbr9Ma4XzwpmVn
+         E6JgQXAV0mZK0IzS3KaaWzNFDnUOYhuKF5VdawXWvyyCrhW1PgBj80Jm48kM97w/w/9W
+         1zHShvBTuW985XHa7AK0CuX2TFC8UO29AVUWtFAbSzNxqgtlGvKfeOmrlJ2yZ0W/JjCp
+         f1QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURLD9ZU0FpZWviE4rCL82M5Oni++fKt0RqhURH1q85DLVJbqcydX9Hro3b8nzNAI6YJLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnAoDDO+KOLPANShoPUSlAFbwQ3XTkv1ucaRMcSDFbh31s87Oi
+	zVQRKWIYybyquRAK37z4YGaYp4JvgER491xIbiuyKJUyjPGt1PAKz9whzL/epmyYuxuDg9GaIBH
+	gw16wqZObbMpuyA==
+X-Google-Smtp-Source: AGHT+IHThLlbeg0Bz0L6XHahvlrl4KT7b217LsvR54vbtTKdYnIle66+HnkOhYRBZx9jZcBHpKpDIq/Pi3rfmQ==
+X-Received: from pjbhl15.prod.google.com ([2002:a17:90b:134f:b0:34c:2778:11c5])
  (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:544f:b0:343:7714:4ca8 with SMTP id 98e67ed59e1d1-34f68c94494mr3403970a91.15.1767817084253;
- Wed, 07 Jan 2026 12:18:04 -0800 (PST)
-Date: Wed,  7 Jan 2026 20:17:58 +0000
+ 2002:a17:90b:2642:b0:32b:9774:d340 with SMTP id 98e67ed59e1d1-34f68c47f38mr2755853a91.33.1767817086729;
+ Wed, 07 Jan 2026 12:18:06 -0800 (PST)
+Date: Wed,  7 Jan 2026 20:17:59 +0000
 In-Reply-To: <20260107201800.2486137-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,8 +72,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260107201800.2486137-1-skhawaja@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20260107201800.2486137-2-skhawaja@google.com>
-Subject: [PATCH 1/3] iommu/vt-d: Allow replacing no_pasid iommu_domain
+Message-ID: <20260107201800.2486137-3-skhawaja@google.com>
+Subject: [PATCH 2/3] vfio: selftests: Add support of creating iommus from iommufd
 From: Samiullah Khawaja <skhawaja@google.com>
 To: David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
 	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
@@ -87,236 +87,195 @@ Cc: Samiullah Khawaja <skhawaja@google.com>, Robin Murphy <robin.murphy@arm.com>
 	Parav Pandit <parav@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Intel IOMMU driver already supports replacing IOMMU domains attachments
-with PASIDs. Add support for replacing a domain attached with no_pasid.
-This includes replacing domains in legacy mode.
+Add API to init a struct iommu using an already opened iommufd instance
+and attach devices to it.
 
 Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 ---
- drivers/iommu/intel/iommu.c | 107 ++++++++++++++++++++++++++----------
- 1 file changed, 77 insertions(+), 30 deletions(-)
+ .../vfio/lib/include/libvfio/iommu.h          |  2 +
+ .../lib/include/libvfio/vfio_pci_device.h     |  2 +
+ tools/testing/selftests/vfio/lib/iommu.c      | 60 +++++++++++++++++--
+ .../selftests/vfio/lib/vfio_pci_device.c      | 16 ++++-
+ 4 files changed, 74 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-index 134302fbcd92..c0e359fd3ee1 100644
---- a/drivers/iommu/intel/iommu.c
-+++ b/drivers/iommu/intel/iommu.c
-@@ -1140,6 +1140,7 @@ static void context_present_cache_flush(struct intel_iommu *iommu, u16 did,
+diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h b/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+index 5c9b9dc6d993..9e96da1e6fd3 100644
+--- a/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
++++ b/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+@@ -29,10 +29,12 @@ struct iommu {
+ 	int container_fd;
+ 	int iommufd;
+ 	u32 ioas_id;
++	u32 hwpt_id;
+ 	struct list_head dma_regions;
+ };
+ 
+ struct iommu *iommu_init(const char *iommu_mode);
++struct iommu *iommufd_iommu_init(int iommufd, u32 dev_id);
+ void iommu_cleanup(struct iommu *iommu);
+ 
+ int __iommu_map(struct iommu *iommu, struct dma_region *region);
+diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
+index 2858885a89bb..1143ceb6a9b8 100644
+--- a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
++++ b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
+@@ -19,6 +19,7 @@ struct vfio_pci_device {
+ 	const char *bdf;
+ 	int fd;
+ 	int group_fd;
++	u32 dev_id;
+ 
+ 	struct iommu *iommu;
+ 
+@@ -65,6 +66,7 @@ void vfio_pci_config_access(struct vfio_pci_device *device, bool write,
+ #define vfio_pci_config_writew(_d, _o, _v) vfio_pci_config_write(_d, _o, _v, u16)
+ #define vfio_pci_config_writel(_d, _o, _v) vfio_pci_config_write(_d, _o, _v, u32)
+ 
++void vfio_pci_device_attach_iommu(struct vfio_pci_device *device, struct iommu *iommu);
+ void vfio_pci_irq_enable(struct vfio_pci_device *device, u32 index,
+ 			 u32 vector, int count);
+ void vfio_pci_irq_disable(struct vfio_pci_device *device, u32 index);
+diff --git a/tools/testing/selftests/vfio/lib/iommu.c b/tools/testing/selftests/vfio/lib/iommu.c
+index 58b7fb7430d4..2c67d7e24d0c 100644
+--- a/tools/testing/selftests/vfio/lib/iommu.c
++++ b/tools/testing/selftests/vfio/lib/iommu.c
+@@ -408,6 +408,18 @@ struct iommu_iova_range *iommu_iova_ranges(struct iommu *iommu, u32 *nranges)
+ 	return ranges;
  }
  
- static int domain_context_mapping_one(struct dmar_domain *domain,
-+				      struct dmar_domain *old_domain,
- 				      struct intel_iommu *iommu,
- 				      u8 bus, u8 devfn)
++static u32 iommufd_hwpt_alloc(struct iommu *iommu, u32 dev_id)
++{
++	struct iommu_hwpt_alloc args = {
++		.size = sizeof(args),
++		.pt_id = iommu->ioas_id,
++		.dev_id = dev_id,
++	};
++
++	ioctl_assert(iommu->iommufd, IOMMU_HWPT_ALLOC, &args);
++	return args.out_hwpt_id;
++}
++
+ static u32 iommufd_ioas_alloc(int iommufd)
  {
-@@ -1148,7 +1149,8 @@ static int domain_context_mapping_one(struct dmar_domain *domain,
- 	u16 did = domain_id_iommu(domain, iommu);
- 	int translation = CONTEXT_TT_MULTI_LEVEL;
- 	struct pt_iommu_vtdss_hw_info pt_info;
--	struct context_entry *context;
-+	struct context_entry *context, new_context;
-+	u16 did_old;
- 	int ret;
+ 	struct iommu_ioas_alloc args = {
+@@ -418,11 +430,9 @@ static u32 iommufd_ioas_alloc(int iommufd)
+ 	return args.out_ioas_id;
+ }
  
- 	if (WARN_ON(!intel_domain_is_ss_paging(domain)))
-@@ -1166,26 +1168,44 @@ static int domain_context_mapping_one(struct dmar_domain *domain,
- 		goto out_unlock;
+-struct iommu *iommu_init(const char *iommu_mode)
++static struct iommu *iommu_alloc(const char *iommu_mode)
+ {
+-	const char *container_path;
+ 	struct iommu *iommu;
+-	int version;
  
- 	ret = 0;
--	if (context_present(context) && !context_copied(iommu, bus, devfn))
-+	if (!old_domain && (context_present(context) && !context_copied(iommu, bus, devfn)))
- 		goto out_unlock;
+ 	iommu = calloc(1, sizeof(*iommu));
+ 	VFIO_ASSERT_NOT_NULL(iommu);
+@@ -430,6 +440,16 @@ struct iommu *iommu_init(const char *iommu_mode)
+ 	INIT_LIST_HEAD(&iommu->dma_regions);
  
-+	if (old_domain) {
-+		did_old = context_domain_id(context);
-+		WARN_ON(did_old != domain_id_iommu(old_domain, iommu));
+ 	iommu->mode = lookup_iommu_mode(iommu_mode);
++	return iommu;
++}
++
++struct iommu *iommu_init(const char *iommu_mode)
++{
++	const char *container_path;
++	struct iommu *iommu;
++	int version;
++
++	iommu = iommu_alloc(iommu_mode);
+ 
+ 	container_path = iommu->mode->container_path;
+ 	if (container_path) {
+@@ -453,10 +473,42 @@ struct iommu *iommu_init(const char *iommu_mode)
+ 	return iommu;
+ }
+ 
++struct iommu *iommufd_iommu_init(int iommufd, u32 dev_id)
++{
++	struct iommu *iommu;
++
++	iommu = iommu_alloc("iommufd");
++
++	iommu->iommufd = dup(iommufd);
++	VFIO_ASSERT_GT(iommu->iommufd, 0);
++
++	iommu->ioas_id = iommufd_ioas_alloc(iommu->iommufd);
++	iommu->hwpt_id = iommufd_hwpt_alloc(iommu, dev_id);
++
++	return iommu;
++}
++
++static void iommufd_iommu_cleanup(struct iommu *iommu)
++{
++	struct iommu_destroy args = {
++		.size = sizeof(args),
++	};
++
++	if (iommu->hwpt_id) {
++		args.id = iommu->hwpt_id;
++		ioctl_assert(iommu->iommufd, IOMMU_DESTROY, &args);
 +	}
 +
- 	copied_context_tear_down(iommu, context, bus, devfn);
--	context_clear_entry(context);
--	context_set_domain_id(context, did);
-+	context_set_domain_id(&new_context, did);
- 
- 	if (info && info->ats_supported)
- 		translation = CONTEXT_TT_DEV_IOTLB;
++	args.id = iommu->ioas_id;
++	ioctl_assert(iommu->iommufd, IOMMU_DESTROY, &args);
++
++	VFIO_ASSERT_EQ(close(iommu->iommufd), 0);
++}
++
+ void iommu_cleanup(struct iommu *iommu)
+ {
+ 	if (iommu->iommufd)
+-		VFIO_ASSERT_EQ(close(iommu->iommufd), 0);
++		iommufd_iommu_cleanup(iommu);
  	else
- 		translation = CONTEXT_TT_MULTI_LEVEL;
+ 		VFIO_ASSERT_EQ(close(iommu->container_fd), 0);
  
--	context_set_address_root(context, pt_info.ssptptr);
--	context_set_address_width(context, pt_info.aw);
--	context_set_translation_type(context, translation);
--	context_set_fault_enable(context);
--	context_set_present(context);
-+	context_set_address_root(&new_context, pt_info.ssptptr);
-+	context_set_address_width(&new_context, pt_info.aw);
-+	context_set_translation_type(&new_context, translation);
-+	context_set_fault_enable(&new_context);
-+	context_set_present(&new_context);
-+
-+	*context = new_context;
- 	if (!ecap_coherent(iommu->ecap))
- 		clflush_cache_range(context, sizeof(*context));
--	context_present_cache_flush(iommu, did, bus, devfn);
-+
-+	/*
-+	 * Spec 6.5.3.3, changing a present context entry requires,
-+	 * - IOTLB invalidation for each effected Domain.
-+	 * - Issue Device IOTLB invalidation for function.
-+	 */
-+	if (old_domain) {
-+		intel_context_flush_no_pasid(info, context, did);
-+		intel_context_flush_no_pasid(info, context, did_old);
-+	} else {
-+		context_present_cache_flush(iommu, did, bus, devfn);
-+	}
-+
- 	ret = 0;
- 
- out_unlock:
-@@ -1194,30 +1214,39 @@ static int domain_context_mapping_one(struct dmar_domain *domain,
- 	return ret;
+diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
+index fac4c0ecadef..9bc1f5ade5c4 100644
+--- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
++++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
+@@ -298,7 +298,7 @@ const char *vfio_pci_get_cdev_path(const char *bdf)
+ 	return cdev_path;
  }
  
-+struct domain_context_mapping_data {
-+	struct dmar_domain *domain;
-+	struct dmar_domain *old_domain;
-+};
-+
- static int domain_context_mapping_cb(struct pci_dev *pdev,
- 				     u16 alias, void *opaque)
+-static void vfio_device_bind_iommufd(int device_fd, int iommufd)
++static int vfio_device_bind_iommufd(int device_fd, int iommufd)
  {
- 	struct device_domain_info *info = dev_iommu_priv_get(&pdev->dev);
- 	struct intel_iommu *iommu = info->iommu;
--	struct dmar_domain *domain = opaque;
-+	struct domain_context_mapping_data *data = opaque;
+ 	struct vfio_device_bind_iommufd args = {
+ 		.argsz = sizeof(args),
+@@ -306,6 +306,7 @@ static void vfio_device_bind_iommufd(int device_fd, int iommufd)
+ 	};
  
--	return domain_context_mapping_one(domain, iommu,
-+	return domain_context_mapping_one(data->domain, data->old_domain, iommu,
- 					  PCI_BUS_NUM(alias), alias & 0xff);
+ 	ioctl_assert(device_fd, VFIO_DEVICE_BIND_IOMMUFD, &args);
++	return args.out_devid;
  }
  
- static int
--domain_context_mapping(struct dmar_domain *domain, struct device *dev)
-+domain_context_mapping(struct dmar_domain *domain,
-+		       struct dmar_domain *old_domain, struct device *dev)
- {
- 	struct device_domain_info *info = dev_iommu_priv_get(dev);
- 	struct intel_iommu *iommu = info->iommu;
- 	u8 bus = info->bus, devfn = info->devfn;
-+	struct domain_context_mapping_data data;
- 	int ret;
+ static void vfio_device_attach_iommufd_pt(int device_fd, u32 pt_id)
+@@ -326,10 +327,21 @@ static void vfio_pci_iommufd_setup(struct vfio_pci_device *device, const char *b
+ 	VFIO_ASSERT_GE(device->fd, 0);
+ 	free((void *)cdev_path);
  
- 	if (!dev_is_pci(dev))
--		return domain_context_mapping_one(domain, iommu, bus, devfn);
-+		return domain_context_mapping_one(domain, old_domain, iommu, bus, devfn);
- 
-+	data.domain = domain;
-+	data.old_domain = old_domain;
- 	ret = pci_for_each_dma_alias(to_pci_dev(dev),
--				     domain_context_mapping_cb, domain);
-+				     domain_context_mapping_cb, &data);
- 	if (ret)
- 		return ret;
- 
-@@ -1309,18 +1338,28 @@ static int domain_setup_first_level(struct intel_iommu *iommu,
- 					  pt_info.gcr3_pt, flags, old);
+-	vfio_device_bind_iommufd(device->fd, device->iommu->iommufd);
++	device->dev_id = vfio_device_bind_iommufd(device->fd, device->iommu->iommufd);
+ 	vfio_device_attach_iommufd_pt(device->fd, device->iommu->ioas_id);
  }
  
--static int dmar_domain_attach_device(struct dmar_domain *domain,
--				     struct device *dev)
-+static int device_replace_dmar_domain(struct dmar_domain *domain,
-+				      struct dmar_domain *old_domain,
-+				      struct device *dev)
++void vfio_pci_device_attach_iommu(struct vfio_pci_device *device, struct iommu *iommu)
++{
++	u32 pt_id = iommu->ioas_id;
++
++	if (iommu->hwpt_id)
++		pt_id = iommu->hwpt_id;
++
++	VFIO_ASSERT_NE(pt_id, 0);
++	vfio_device_attach_iommufd_pt(device->fd, pt_id);
++}
++
+ struct vfio_pci_device *vfio_pci_device_init(const char *bdf, struct iommu *iommu)
  {
- 	struct device_domain_info *info = dev_iommu_priv_get(dev);
- 	struct intel_iommu *iommu = info->iommu;
- 	unsigned long flags;
- 	int ret;
- 
-+	if (old_domain && dev_is_real_dma_subdevice(dev))
-+		return -EOPNOTSUPP;
-+
- 	ret = domain_attach_iommu(domain, iommu);
- 	if (ret)
- 		return ret;
- 
-+	if (old_domain) {
-+		spin_lock_irqsave(&info->domain->lock, flags);
-+		list_del(&info->link);
-+		spin_unlock_irqrestore(&info->domain->lock, flags);
-+	}
-+
- 	info->domain = domain;
- 	info->domain_attached = true;
- 	spin_lock_irqsave(&domain->lock, flags);
-@@ -1331,27 +1370,27 @@ static int dmar_domain_attach_device(struct dmar_domain *domain,
- 		return 0;
- 
- 	if (!sm_supported(iommu))
--		ret = domain_context_mapping(domain, dev);
-+		ret = domain_context_mapping(domain, old_domain, dev);
- 	else if (intel_domain_is_fs_paging(domain))
- 		ret = domain_setup_first_level(iommu, domain, dev,
--					       IOMMU_NO_PASID, NULL);
-+					       IOMMU_NO_PASID, &old_domain->domain);
- 	else if (intel_domain_is_ss_paging(domain))
- 		ret = domain_setup_second_level(iommu, domain, dev,
--						IOMMU_NO_PASID, NULL);
-+						IOMMU_NO_PASID, &old_domain->domain);
- 	else if (WARN_ON(true))
- 		ret = -EINVAL;
- 
--	if (ret)
--		goto out_block_translation;
-+	if (!ret)
-+		ret = cache_tag_assign_domain(domain, dev, IOMMU_NO_PASID);
- 
--	ret = cache_tag_assign_domain(domain, dev, IOMMU_NO_PASID);
- 	if (ret)
--		goto out_block_translation;
-+		device_block_translation(dev);
- 
--	return 0;
-+	if (old_domain) {
-+		cache_tag_unassign_domain(old_domain, dev, IOMMU_NO_PASID);
-+		domain_detach_iommu(old_domain, iommu);
-+	}
- 
--out_block_translation:
--	device_block_translation(dev);
- 	return ret;
- }
- 
-@@ -3127,19 +3166,27 @@ static int intel_iommu_attach_device(struct iommu_domain *domain,
- 				     struct device *dev,
- 				     struct iommu_domain *old)
- {
-+	struct device_domain_info *info = dev_iommu_priv_get(dev);
- 	int ret;
- 
--	device_block_translation(dev);
-+	if (dev_is_real_dma_subdevice(dev) ||
-+	    domain->type != __IOMMU_DOMAIN_PAGING ||
-+	    !info->domain || &info->domain->domain != old)
-+		old = NULL;
-+
-+	if (!old)
-+		device_block_translation(dev);
- 
- 	ret = paging_domain_compatible(domain, dev);
- 	if (ret)
- 		return ret;
- 
--	ret = iopf_for_domain_set(domain, dev);
-+	ret = iopf_for_domain_replace(domain, old, dev);
- 	if (ret)
- 		return ret;
- 
--	ret = dmar_domain_attach_device(to_dmar_domain(domain), dev);
-+	ret = device_replace_dmar_domain(to_dmar_domain(domain),
-+					 old ? to_dmar_domain(old) : NULL, dev);
- 	if (ret)
- 		iopf_for_domain_remove(domain, dev);
- 
+ 	struct vfio_pci_device *device;
 -- 
 2.52.0.351.gbe84eed79e-goog
 
