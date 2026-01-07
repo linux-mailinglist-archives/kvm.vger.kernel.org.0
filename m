@@ -1,209 +1,134 @@
-Return-Path: <kvm+bounces-67251-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67252-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D01D8CFF691
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 19:22:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6DDCFF390
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 18:55:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 221473067217
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 18:21:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 836A430012FC
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 17:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07326169AD2;
-	Wed,  7 Jan 2026 16:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E2B37D1D2;
+	Wed,  7 Jan 2026 17:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TxGob7h0"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Ch1kgFCN"
 X-Original-To: kvm@vger.kernel.org
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59A2368285
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 16:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2612363C6A
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 17:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767804689; cv=none; b=PAKID/3qPMk3KCA3zzpvoKz485yM/TVfYzzRFGxtOgq+Qw9Kx/b5SImN0xWQ1qsADQRNRc1IgZLtdus8+A4h98G0x03JBnBuwhYplAKgnQPly55l3BIRXKa3L6MSOwmQ8n1BHPcllASrd6l1wv3lTX03tEVjL2Cd7E3WVcXxNlU=
+	t=1767808313; cv=none; b=fVbwPsSSBiDJKkvJs5T9CGNG6gzYWgiHEqTnCcNWUKmVOdAS/MmIGSSNxJZQ4QbrllHsNHZnA0lfZfmWq2icuLkV5DGgvq3ibgZzpOwjVkkI6xbKEpvEPznlEGK3LOJ63cWu9okA7uDfECawi5TrftFGRKM5HLp1kjos5dXTbjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767804689; c=relaxed/simple;
-	bh=3ol7RsguyxLJHmLBaeFw1Ne81MaMqEY5wsLuayf73Fc=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NVSJebjzKp9x/iIme+dLc6En9hbNs+6BWbxj4CQXeBZDquOWkfZViBsDFKdHlzUUL/PxWOHpIF056MWGJAddz+SLzXy2xk5glp9xfsfGGsaJoinnFNeHKOsgoCUx9oQSjzu4OMnmBzgJifprYvzaqCYrKssI2fmDrwQ2av6sHp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TxGob7h0; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=5C6jQWVfkjb28klDVK2/Iw/96XcNiZg8oDzeVlxXTuw=;
-	b=TxGob7h0J7DyuITFxG5P7tY9Io8orxNuKiZH+YRkufrT4nWVdkiU2l7kV+5x5BPK/EV8L/l0x
-	sMed21REJUZVbtC+308p685yXNK61w+Fhh68QkeVEwB8SZfQR0/dWk6l2eVj9pzVdvdkkDPs/1b
-	h8k022PqXjg0agVhvTtpYfU=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dmYsG4dt4zN0f4;
-	Thu,  8 Jan 2026 00:49:06 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmYvZ3nqtzHnGdR;
-	Thu,  8 Jan 2026 00:51:06 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 06DAB40570;
-	Thu,  8 Jan 2026 00:51:13 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 16:51:12 +0000
-Date: Wed, 7 Jan 2026 16:51:10 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 36/36] KVM: arm64: gic-v5: Communicate
- userspace-drivable PPIs via a UAPI
-Message-ID: <20260107165110.0000638d@huawei.com>
-In-Reply-To: <20251219155222.1383109-37-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-37-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1767808313; c=relaxed/simple;
+	bh=RcoDYlucZ66l2Sfv7PYDyJOdRnPBCeYpyqcCKNIchCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OHfO4VbnS/tkOxPhEC4uPXYMQUBb42sO41rOXrhQNCsw9UqJX+yutfMIteYRU13wxI7hKJIRUGpc4F5F25TEshk0MX2uYdGRa309sTHQH8Se1PQYvUk8tHoMzYeTJTgDR9KEjB5sqK/HKjo5ueLcQ8HiMCupEQICYMs0EvWBpJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Ch1kgFCN; arc=none smtp.client-ip=209.85.210.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7c7613db390so1327673a34.2
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 09:51:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1767808302; x=1768413102; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/E5kiVoPjL6HPjfNbHsUE0ncuM+O4VtxgKzooyiAI6s=;
+        b=Ch1kgFCNuj/o4cLx0yF/pnrhRx8vrnNMPxtTz9cLxuWBBjqRZll9ySnpVKSsEe09AB
+         sRylTu41RhJDHf9whs3sVIPrEPZjHSQM8HNiN8PzowIhgWDWBFE6qZTN6H0sPv2qKSZ9
+         F5kfQhsiSyUV84F5NQOCCZyOo08k1SULFS1040re54QJ8s0i8cCocJg0msivVEZnU265
+         AVFU6p+WViRvu75vPMRjZOJXaRqmfqcLk8aO3IVLZ7qzdcCz2/vFPAPkLaSqU9v4SgdA
+         VloVbvffGCRSxitUQM8VP9JY6FWIBsmOhtJ9+Qm1o14raCz8rLrh7brhpLhO1R9m4pCG
+         4yZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767808302; x=1768413102;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/E5kiVoPjL6HPjfNbHsUE0ncuM+O4VtxgKzooyiAI6s=;
+        b=NI8JcmHVA3jQf0BCnVWTC6HzkKHwz+6uEVKZkrncvXhwFT+VK6yy4aQqmME4uDTTJz
+         8Aeds/R8wUVthxBeTYaqQo9E/Njn9WXb1gTRYEWJ3NQNcxBARxsUCT5TvsQGLtmU6HvY
+         Tq/fBe7JKE7/IxCBo5zAVAQr1zp33bQ9BON3kW0E0gthhXkeeYk36hAQZTfFQDDmBFma
+         4ZrgehdBrOYA5Gt6KA7jESISzZKpaCUUbHvGVfYJWxru3cdP56SePoScPG2Gg8SS5B25
+         0BF63yWYkUgkaeynSYxz9NfvUasrCeFSATrM2B43RF8cpFCZIenfNCWGIK5OChc/l9f1
+         U3AA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLkQ0LkAIalmrnOwJJhYesWAruCJE1SXdMg2uQltKl97V/jJQNnQVR8xGfTg2fCrES96Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1txhCrZhTEcUQIuKDKuFQ+dyhASAtVpXQoXp3gSCXV1ru3HAw
+	2AUiKI8X10SPHn0vfZwqj5qCY9gHda74kvRrVpWR2LHSjEkxZByRFQglJI/g1nQ/o7w=
+X-Gm-Gg: AY/fxX5hN443B1HRiwGotQpTXuBc2cCsuUiyh0u3Z6WcMjBdw4ABngX/ss/4k5WwmCi
+	OEN8fgLRVwMh/yhubTo9zL/z6LUs8ExVtLLn9fBO1VhOsGPvWET5SILvRA5v8SIAxP40WGk8cM1
+	iaqcARH5ldsUjMlOqyJXrT2eIUahdgYtbJ+Izmd/fsPY2d6eZiB43SDSwBHeD7QV5WqFg+EnXM2
+	ZcU0kGCMTJ0lNrTpubLrRUyzCec+FT48cTJn8E1PUkVma/ne04QbD4dzXUM6NwshAxI4lVYVRzZ
+	kKE6SXumvJkdfHi5pf7ogfqWQJzboA54c4tkAXSGp/A5og47NwxsKHcVHmOewEI16OjmXhPg94c
+	YutpFHCUbzSK0MQLfYIOvblLgrkCKDKXRtpKvNcJmBNv1fu+LC1MQCg0RtTes06jIF6i4nU6T/S
+	zgK/UoPU4frQC4
+X-Google-Smtp-Source: AGHT+IE13osf5CjYyTbx4kUFVq9/wdcOC/ch/TW3ja8QBG6H6cD6+EWQcns0Lx1kzYLZNwCYibHqkw==
+X-Received: by 2002:a05:6820:2204:b0:659:9a49:8fe1 with SMTP id 006d021491bc7-65f54ed4064mr1332868eaf.14.1767808301928;
+        Wed, 07 Jan 2026 09:51:41 -0800 (PST)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa4de8cbfsm3524574fac.3.2026.01.07.09.51.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 09:51:41 -0800 (PST)
+Date: Wed, 7 Jan 2026 11:51:40 -0600
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Xu Lu <luxu.kernel@bytedance.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Zong Li <zong.li@sifive.com>, 
+	Tomasz Jeznach <tjeznach@rivosinc.com>, joro@8bytes.org, Will Deacon <will@kernel.org>, 
+	Robin Murphy <robin.murphy@arm.com>, Anup Patel <anup@brainfault.org>, atish.patra@linux.dev, 
+	Thomas Gleixner <tglx@linutronix.de>, alex.williamson@redhat.com, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Alexandre Ghiti <alex@ghiti.fr>, iommu@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, linux-riscv <linux-riscv@lists.infradead.org>, 
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: Question about RISCV IOMMU irqbypass patch series
+Message-ID: <20260107-dc4b5f1d879db9afb00a4a87@orel>
+References: <CAPYmKFscKJ1ff470d6YmuMxLdJPSZ-ZmuGMMAFO83TT-vvV2JQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPYmKFscKJ1ff470d6YmuMxLdJPSZ-ZmuGMMAFO83TT-vvV2JQ@mail.gmail.com>
 
-On Fri, 19 Dec 2025 15:52:48 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Wed, Jan 07, 2026 at 06:01:26PM +0800, Xu Lu wrote:
+> Hi Andrew,
+> 
+> Thanks for your brilliant job on the RISCV IOMMU irqbypass patch
+> series[1]. I have rebased it on v6.18 and successfully passed through
+> a nvme device to VM. But I still have some questions about it.
+> 
+> 1. It seems "irqdomain->host_data->domain" can be NULL for blocking or
+> identity domain. So it's better to check whether it's NULL in
+> riscv_iommu_ir_irq_domain_alloc_irqs or
+> riscv_iommu_ir_irq_domain_free_irqs functions. Otherwise page fault
+> can happen.
 
-> GICv5 systems will likely not support the full set of PPIs. The
-> presence of any virtual PPI is tied to the presence of the physical
-> PPI. Therefore, the available PPIs will be limited by the physical
-> host. Userspace cannot drive any PPIs that are not implemented.
-> 
-> Moreover, it is not desirable to expose all PPIs to the guest in the
-> first place, even if they are supported in hardware. Some devices,
-> such as the arch timer, are implemented in KVM, and hence those PPIs
-> shouldn't be driven by userspace, either.
-> 
-> Provided a new UAPI:
->   KVM_DEV_ARM_VGIC_GRP_CTRL => KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> 
-> This allows userspace to query which PPIs it is able to drive via
-> KVM_IRQ_LINE.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Indeed. Did you hit the NULL dereference in your testing?
 
-A couple of trivial comments on this patch.
+> 
+> 2. It seems you are using the first stage iommu page table even for
+> gpa->spa, what if a VM needs an vIOMMU? Or did I miss something?
 
-Overall, to me as a definite non expert in kvm GIC emulation this
-series looks to be in a pretty good state.
+Unfortunately the IOMMU spec wasn't clear on the use of the MSI table
+when only stage1 is in use and now, after discussions with the spec
+author, it appears what I have written won't work. Additionally, Jason
+didn't like this new approach to IRQ_DOMAIN_FLAG_ISOLATED_MSI either,
+so there's a lot of rework that needs to be done for v3. I had had hopes
+to dedicate December to this but got distracted with other things and
+vacation. Now I hope to dedicate this month, but I still need to get
+started!
 
 Thanks,
+drew
 
-Jonathan
-> ---
->  .../virt/kvm/devices/arm-vgic-v5.rst          | 13 ++++++++++
->  arch/arm64/include/uapi/asm/kvm.h             |  1 +
->  arch/arm64/kvm/vgic/vgic-kvm-device.c         | 25 +++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-v5.c                 |  8 ++++++
->  include/kvm/arm_vgic.h                        |  5 ++++
->  include/linux/irqchip/arm-gic-v5.h            |  4 +++
->  tools/arch/arm64/include/uapi/asm/kvm.h       |  1 +
->  7 files changed, 57 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> index 9904cb888277d..d9f2917b609c5 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -25,6 +25,19 @@ Groups:
->        request the initialization of the VGIC, no additional parameter in
->        kvm_device_attr.addr. Must be called after all VCPUs have been created.
->  
-> +   KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> +      request the mask of userspace-drivable PPIs. Only a subset of the PPIs can
-> +      be directly driven from userspace with GICv5, and the returned mask
-> +      informs userspace of which it is allowed to drive via KVM_IRQ_LINE.
-> +
-> +      Userspace must allocate and point to __u64[2] with of data in
-
-with of?
-
-> +      kvm_device_attr.addr. When this call returns, the provided memory will be
-> +      populated with the userspace PPI mask. The lower __u64 contains the mask
-> +      for the lower 64 PPIS, with the remaining 64 being in the second __u64.
-> +
-> +      This is a read-only attribute, and cannot be set. Attempts to set it are
-> +      rejected.
-> +
->    Errors:
->  
->      =======  ========================================================
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index 78903182bba08..360c78ed4f104 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -719,6 +719,25 @@ struct kvm_device_ops kvm_arm_vgic_v3_ops = {
->  	.has_attr = vgic_v3_has_attr,
->  };
->  
-> +static int vgic_v5_get_userspace_ppis(struct kvm_device *dev,
-> +				      struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> +	struct gicv5_vm *gicv5_vm = &dev->kvm->arch.vgic.gicv5_vm;
-> +	int i, ret;
-> +
-> +	guard(mutex)(&dev->kvm->arch.config_lock);
-> +
-> +	for (i = 0; i < 2; ++i) {
-
-Can drag declaration of i into loop init.
-Also I just noticed the series is rather random wrt to pre or post increment
-in cases where it doesn't matter. I'd go with post increment for for loops.
-I took a quick look at a random file in this directory and that's what is used there.
-
-
-> +		ret = put_user(gicv5_vm->userspace_ppis[i], uaddr);
-> +		if (ret)
-> +			return ret;
-> +		uaddr++;
-> +	}
-> +
-> +	return 0;
-> +}
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index bf72982d6a2e8..04300926683b6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -122,6 +122,14 @@ int vgic_v5_init(struct kvm *kvm)
->  		}
->  	}
->  
-> +	/*
-> +	 * We only allow userspace to drive the SW_PPI, if it is
-> +	 * implemented.
-> +	 */
-
-	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
-
-Is under 80 chars (just) so go with that.
-
-
-> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] = GICV5_SW_PPI & GICV5_HWIRQ_ID;
-> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] &= ppi_caps->impl_ppi_mask[0];
-> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[1] = 0;
-> +
->  	return 0;
->  }
-
-
+> [1] https://lore.kernel.org/all/20250920203851.2205115-20-ajones@ventanamicro.com/
+> 
+> Best regards,
+> Xu Lu
 
