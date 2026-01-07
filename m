@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-67229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8CECFE7DE
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 16:10:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA30ECFEC7A
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 17:07:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 37E3A30010F2
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 15:10:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 632693000977
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 16:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5370734B1AF;
-	Wed,  7 Jan 2026 15:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1181C35A95C;
+	Wed,  7 Jan 2026 15:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ylo8m+NR"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ITmUrG3a"
 X-Original-To: kvm@vger.kernel.org
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CC534A3D6
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 15:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DB5348880
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 15:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767798294; cv=none; b=oGDdLyfIHL+wpPT2LambZYsXfYg6ITXpAicLMWW5yl179f2tbTnMxk1XsSRuN6n784MEM51pjvblABwwbAnv1pizspdWBqD6GxCem3U7tBTGlttqjJeqidHn/2zkkdlri5onPRxeAeOM9ZhwS7S8s5pmO0WPTpDW5JMLKF3POik=
+	t=1767798529; cv=none; b=a96uDppfSbdT3byqgiH6YWU63xsx3nP1GpvV0uB5I3QdDleDu65QVYhX81pQvMVBGtmgB/yyWw4ZGR8pZPotuI5oQ/MkK4Mn44bEwsxptSriAuaEvax6lNLILbfOQVzR1ennOFPk3LIVqF+cmzD8Zmphejt25Nux2FCQ/s1Lz3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767798294; c=relaxed/simple;
-	bh=x+BO7+g+ZJi6Bd2XAfDBggbsTUgpEyqIKApCkynG4bI=;
+	s=arc-20240116; t=1767798529; c=relaxed/simple;
+	bh=rjjSF2GjLLnuTppckhQgvKZBsEngKusMJE2hNZFdC3c=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cyIbIoaCYTQnMthYdTJZVXXYStwWUaYROxzXDNDsOM+vRpn1OnpWW/w5EQHSl26b96mzTF1ukSMOMpmuPYK9iMR3yx8h1GDkSs6JFNSDvyDix10oaXN8mM68L762IrSrMn28aqILzcyN9E7lFUtU2jhnJI9V8Zza2XlaBA6pqBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ylo8m+NR; arc=none smtp.client-ip=119.8.177.37
+	 MIME-Version:Content-Type; b=Gv8Vss3Aw9YQ2z8zr4oVEyOBRV79t/ZSsvR9Ds4QSa1zGdTfj0C3fHNfIvtp4TY1Ng5/cpVR81+UIlrYGbvBppYLKbMRblftZ75/OaEM0ZKxx0GJo/251lAXpbiKzH7lD4gA49gKZBP3ygs7FxWy6KaCI8r/GOeDpNZgBt386iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ITmUrG3a; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=ORgRBCEvHqF3ASwTkSpJbEavEYI/IdEmj28e0XJZgk0=;
-	b=ylo8m+NR4VGDUUtfFrV00L9BCU/BsyRDLU+PD/LlKgOIAoCoGPwulnxrlY7QIJBwlwr6Z1kva
-	5/TNF3rVuCJVnrIOLbIVHVLxVp/5Hs98GcBIX1BQ3bH/cWl85z5FK0kXV7z9TvMt82jRPtbBVFp
-	g1x+0lAX7JWkZ1908ZyaNWA=
+	bh=2x/3meMA0G6VDYoHbJ4AHA6vDOYL4w15qQ/fKhtmMm4=;
+	b=ITmUrG3aql95a+0mkqRCs4CkZs3jBo7KClazcloMblBygqzUg7YtcxiBH74AyvDsXD0trZ634
+	LF228aRXerWBfkVnah2wGUfBd62jcd9epzFNMe3tihiQUsEjcJRZzzKYc5cttUJreN8tNXMdeX8
+	7vjGmWX9qRilDkCfHfIwvj0=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dmWVQ6PNzz1vnMS;
-	Wed,  7 Jan 2026 23:02:38 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmWXp4qKRzJ46D6;
-	Wed,  7 Jan 2026 23:04:42 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmWZf0nrKz1P7MM;
+	Wed,  7 Jan 2026 23:06:17 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmWdK6J81zJ469G;
+	Wed,  7 Jan 2026 23:08:37 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 09E1B4056F;
-	Wed,  7 Jan 2026 23:04:46 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 3EAF740539;
+	Wed,  7 Jan 2026 23:08:41 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 15:04:44 +0000
-Date: Wed, 7 Jan 2026 15:04:42 +0000
+ 2026 15:08:40 +0000
+Date: Wed, 7 Jan 2026 15:08:38 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -61,12 +61,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 20/36] KVM: arm64: gic-v5: Init Private IRQs (PPIs)
- for GICv5
-Message-ID: <20260107150442.00004110@huawei.com>
-In-Reply-To: <20251219155222.1383109-21-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v2 21/36] KVM: arm64: gic-v5: Finalize GICv5 PPIs and
+ generate mask
+Message-ID: <20260107150838.00004e00@huawei.com>
+In-Reply-To: <20251219155222.1383109-22-sascha.bischoff@arm.com>
 References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-21-sascha.bischoff@arm.com>
+	<20251219155222.1383109-22-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -79,73 +79,81 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 19 Dec 2025 15:52:42 +0000
+On Fri, 19 Dec 2025 15:52:43 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> Initialise the private interrupts (PPIs, only) for GICv5. This means
-> that a GICv5-style intid is generated (which encodes the PPI type in
-> the top bits) instead of the 0-based index that is used for older
-> GICs.
+> We only want to expose a subset of the PPIs to a guest. If a PPI does
+> not have an owner, it is not being actively driven by a device. The
+> SW_PPI is a special case, as it is likely for userspace to wish to
+> inject that.
 > 
-> Additionally, set all of the GICv5 PPIs to use Level for the handling
-> mode, with the exception of the SW_PPI which uses Edge. This matches
-> the architecturally-defined set in the GICv5 specification (the CTIIRQ
-> handling mode is IMPDEF, so pick Level has been picked for that).
-
-so Level has been
-
+> Therefore, just prior to running the guest for the first time, we need
+> to finalize the PPIs. A mask is generated which, when combined with
+> trapping a guest's PPI accesses, allows for the guest's view of the
+> PPI to be filtered.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-Trivial comment inline, which you can feel free to ignore if you like
+Minor suggestion inline. Either way
 
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c    | 41 +++++++++++++++++++++++-------
->  include/linux/irqchip/arm-gic-v5.h |  2 ++
->  2 files changed, 34 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index bcc2c79f7833c..03f45816464b0 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
 
-> @@ -280,22 +286,39 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
->  	 * Enable and configure all SGIs to be edge-triggered and
->  	 * configure all PPIs as level-triggered.
->  	 */
-> -	for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
-> +	for (i = 0; i < num_private_irqs; i++) {
->  		struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index c7ecc4f40b1e5..f1fa63e67c1f6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -81,6 +81,66 @@ static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+>  	return priority_mask;
+>  }
 >  
->  		INIT_LIST_HEAD(&irq->ap_list);
->  		raw_spin_lock_init(&irq->irq_lock);
-> -		irq->intid = i;
->  		irq->vcpu = NULL;
->  		irq->target_vcpu = vcpu;
->  		refcount_set(&irq->refcount, 0);
-> -		if (vgic_irq_is_sgi(i)) {
-> -			/* SGIs */
-> -			irq->enabled = 1;
-> -			irq->config = VGIC_CONFIG_EDGE;
-> +		if (!vgic_is_v5(vcpu->kvm)) {
-> +			irq->intid = i;
-> +			if (vgic_irq_is_sgi(i)) {
-> +				/* SGIs */
-> +				irq->enabled = 1;
-> +				irq->config = VGIC_CONFIG_EDGE;
-> +			} else {
-> +				/* PPIs */
-> +				irq->config = VGIC_CONFIG_LEVEL;
-> +			}
->  		} else {
-> -			/* PPIs */
-> -			irq->config = VGIC_CONFIG_LEVEL;
-> +			irq->intid = i | FIELD_PREP(GICV5_HWIRQ_TYPE,
-> +						    GICV5_HWIRQ_TYPE_PPI);
-Trivial:
-I'd use FIELD_PREP() even for the ID part.  Makes no difference other than
-making it explicit that it's a field that doesn't overlap with the type
-one.
+> +static int vgic_v5_finalize_state(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!ppi_caps)
+> +		return -ENXIO;
+> +
+> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_mask[0] = 0;
+> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_mask[1] = 0;
+> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[0] = 0;
+> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[1] = 0;
+> +	for (int i = 0; i < VGIC_V5_NR_PRIVATE_IRQS; ++i) {
+> +		int reg = i / 64;
+> +		u64 bit = BIT_ULL(i % 64);
+> +		struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
+> +
+> +		raw_spin_lock(&irq->irq_lock);
+> +
+A little nicer perhaps with:
+		guard(raw_spin_lock(&irq->irq_lock);
+> +		/*
+> +		 * We only expose PPIs with an owner or thw SW_PPI to
+> +		 * the guest.
+> +		 */
+> +		if (!irq->owner && irq->intid == GICV5_SW_PPI)
+> +			goto unlock;
+and
+			continue;
+> +
+> +		/*
+> +		 * If the PPI isn't implemented, we can't pass it
+> +		 * through to a guest anyhow.
+> +		 */
+> +		if (!(ppi_caps->impl_ppi_mask[reg] & bit))
+> +			goto unlock;
+and
+			continue;
+> +
+> +		vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_mask[reg] |= bit;
+> +
+> +		if (irq->config == VGIC_CONFIG_LEVEL)
+> +			vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[reg] |= bit;
+> +
+> +unlock:
+> +		raw_spin_unlock(&irq->irq_lock);
+Then the label and unlock can go away.
+
+> +	}
+> +
+> +	return 0;
+> +}
 
 
