@@ -1,46 +1,45 @@
-Return-Path: <kvm+bounces-67288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33A9D003EB
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 22:52:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BEC1D0044B
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 23:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 49E113003B11
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 21:52:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 022A63060A40
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 22:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501CF2EFD95;
-	Wed,  7 Jan 2026 21:52:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872603002BA;
+	Wed,  7 Jan 2026 22:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzuQX9u/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtBO26mr"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9892FD7BE;
-	Wed,  7 Jan 2026 21:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBCC2DC334;
+	Wed,  7 Jan 2026 22:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767822757; cv=none; b=SavNIUD4V7Oa3gS1u0+TlVwft8d2rr8zoJ6yeA9HO8V6nznLY4O61BvJ3C3JkHJ9LGglbgOkFPAQ5DQ/8rRYmXvCxaii1gNAsog5YIME35MjZMgFi7M/6wQYeh7BSOgpSJaE9Mc6ZVvnzuQoDInX60vbg7GYh0z4DrWQRED4vPo=
+	t=1767823322; cv=none; b=AwHTWmqMCduckFZMawR50M42a32yGRiWzYxRQdVb6+uYdrpRTRGAolqfs6mmZ5cRabYUpJpTrJA5R8h+7Olsi0t6z0xMU6kIJ797Y0zlEXG6XEqD3N31/HCeZ9mCgTTbH67gl3uYKq1r4G+1aYzlpJoAPf+96nWBqsO0L3rMYMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767822757; c=relaxed/simple;
-	bh=RFll13xZ/a5vC1iqrVrPAUqu5AGsBMq8qegGaJ9IV3o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=pXxLJCUdfh1vz8bvHwF875EpJ6gFUXln6DP45s69jn2YW9ojB54FtJg/glka0xg9gqH0SBlXfpHmnxHknqIvQqo9Cyjb2ipPg65jnPPjxeXW/oOnOBWt8x1KuFLEa1z6Ur+o6GXMSbw99D9bD0EN1MtvaZaMT3aZp3hs+nPrW0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzuQX9u/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67FEFC4CEF1;
-	Wed,  7 Jan 2026 21:52:35 +0000 (UTC)
+	s=arc-20240116; t=1767823322; c=relaxed/simple;
+	bh=YlJMHUUuvh8UnbS0yR0hh0WfhM6ELT2k6RHzuxZXmaA=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=pL5aKKN85xczsQRzysKTJIODnsHbzvVHz/teO5nHEkmnEOY4UUCnd12aujKNKih0wEdwPqI4LBgt9KtzxNKhcqlxTTiYbGGrVv8We8P2NiBZsBvtrWmp6bz6C7yoIalok8z9EPayqHBuQir/X3WChYs94gyAp+8xxtw9L5K30q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtBO26mr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21F67C4CEF1;
+	Wed,  7 Jan 2026 22:01:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767822757;
-	bh=RFll13xZ/a5vC1iqrVrPAUqu5AGsBMq8qegGaJ9IV3o=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=kzuQX9u/cZr0QC7rtGsqNU2g8oz3UN556bmK7px+7qe0KfaGafNnQSF2uKAobn4gn
-	 c5wZGdvUbvGUo9i0PJ3pb1Bj4HrPQQ4PEwKvP9Qggas/f/nKSy4vViL0IyEafDPObU
-	 rnf1Pb4C7Esc2PZ8u0sPSQ55JMiuG17wzQELDBoPvUpPIwzVBGM79vvR6r4bnefHE6
-	 OWCYAEgt2UBlH3gS3ZEI0/gUWw6yBU54EbRSfqP0iAGFDfj+SH+t4h9yJf817nmLer
-	 RgOaozskdLOCIerGzgT9YGtBPGAk12Q9ngyJlLnGMo2Oh+kvrY1G55YhWpgdRuFFzN
-	 Cdk8bCTPZqElA==
-Message-ID: <7737563a-c2b8-4e9e-ac18-3551ed9d1a33@kernel.org>
-Date: Wed, 7 Jan 2026 22:52:32 +0100
+	s=k20201202; t=1767823322;
+	bh=YlJMHUUuvh8UnbS0yR0hh0WfhM6ELT2k6RHzuxZXmaA=;
+	h=Date:From:To:Subject:From;
+	b=gtBO26mrtjswfvT2GYCpAD4RfBSxUUL7FocjAW2vEpltg4LbObDt8jaSWq/VBdKU9
+	 RoLYBZZTyScmqr0KR3XhQ0+GRq+7xSbmhX552N+wl+yTvrpRyHkDF2eEraKb9tBuUW
+	 ZstlrEmAFayxJOSTzlKuLoRmFwZWEhSWLGFPAfUcwZ4u/wqMCij5ckEb3H6vtk/cDX
+	 DhI+HKxbCoxELIImHcSCSkifOseRV1K6HndKEvZobhmdPSysGdj+bTluT+EjiaaLOR
+	 DrbQJkX9mmbhr8dr3IRNuyIJj7jryPC/PaPVM0lKOvV8x6y0VvfSBYj/KWNJ6Q3lL+
+	 K7ILTkn1JFlUA==
+Message-ID: <71533bf4-daf7-4c9b-a478-f01dc9b152ed@kernel.org>
+Date: Wed, 7 Jan 2026 23:01:52 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -48,15 +47,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Invitation] bi-weekly guest_memfd upstream call on 2025-12-04
-To: dan.j.williams@intel.com,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
-References: <66c32ad4-a59a-425e-8a00-bcfb918e7559@kernel.org>
- <695ec54cf5c3_875d1009d@dwillia2-mobl4.notmuch>
 From: "David Hildenbrand (Red Hat)" <david@kernel.org>
 Content-Language: en-US
-Cc: Ackerley Tng <ackerleytng@google.com>
+To: "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>, KVM <kvm@vger.kernel.org>
+Subject: [Invitation] bi-weekly guest_memfd upstream call on 2026-01-08
 Autocrypt: addr=david@kernel.org; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -100,52 +95,44 @@ Autocrypt: addr=david@kernel.org; keydata=
  cFAM8nBWrEmNU2vvIGJzjJ/NVYYIY0TgOc5bS9wh6jKHL2+chrfDW5neLJjY2x3snF8q7U9G
  EIbBfNHDlOV8SyhEjtX0DyKxQKioTYPOHcW9gdV5fhSz5tEv+ipqt4kIgWqBgzK8ePtDTqRM
  qZq457g1/SXSoSQi4jN+gsneqvlTJdzaEu1bJP0iv6ViVf15+qHuY5iojCz8fa0=
-In-Reply-To: <695ec54cf5c3_875d1009d@dwillia2-mobl4.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/7/26 21:42, dan.j.williams@intel.com wrote:
-> David Hildenbrand (Red Hat) wrote:
-> [..]
->> This might be the last meeting this year: I will be traveling for LPC on
->> December 11 and December 18. Then, Christmas is already around the
->> corner and we'll skip the one on December 25. So we'll probably have our
->> next meeting then on January 8.
-> 
-> Hi David,
+Hi,
 
-Hi Dan!
+Our next guest_memfd upstream call is scheduled for Thursday,
+2026-01-08 at 8:00 - 9:00am (GMT-08:00) Pacific Time - Vancouver.
 
-> 
-> Great seeing you at LPC! 
+Ackerley will lead this meeting as I am on PTO (and apparently yet 
+writing this mail :) ). I might still join, though.
 
-Absolutely :)
+We'll be using the following Google meet:
+http://meet.google.com/wxp-wtju-jzw
 
-> Can I grab some time on the agenda to
-> brainstorm the next level of detail on the topic I briefly ran by you in
-> the hallway track? I.e. is there a path to decouple dependencies and
-> land some of the low level huge page support upstream while the
-> guest_memfd reworks for in place conversion and hugetlbfs backing
-> continue to mature?
+The meeting notes can be found at [1], where we also link recordings and
+collect current guest_memfd upstream proposals. If you want an google
+calendar invitation that also covers all future meetings, just write me 
+or Ackerley a mail.
 
-Yes, Ackerley already added that to the meeting agenda :)
+In this meeting, we'll cover:
 
-> 
-> As you said this at a minimum needs to be crippled / not production
-> worthy to maintain focus and momentum on the guest_memfd rework
-> completion. The observation that shifted my thinking is that, given the
-> timelines and remaining work, there are solid steps that the low level
-> implementations can be landing and maturing in advance of that
-> integration. All net progress for upstream.
+(1) Updates from LPC
+(2) Private-only guest_memfd THP for testing purposes (continuation from
+     previous discussions)
 
-Right, I think we're good as long as we don't start splitting folios on 
-partial truncation. That is: only allow truncation in THP granularity.
+To put something to discuss onto the agenda, reply to this mail or add
+them to the "Topics/questions for next meeting(s)" section in the
+meeting notes as a comment.
 
-I might not be around tomorrow and Ackerley will likely lead the 
-meeting. I'll send out a reminder mail now that I realize I haven't ...
+
+[1]
+https://docs.google.com/document/d/1M6766BzdY1Lhk7LiR5IqVR8B8mG3cr-cxTxOrAosPOk/edit?usp=sharing
 
 -- 
 Cheers
 
 David
+
+
+
 
