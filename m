@@ -1,320 +1,412 @@
-Return-Path: <kvm+bounces-67208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67207-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70EDCFCC94
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 10:15:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4058FCFCD2C
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 10:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8060D305CCFA
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 09:15:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4C9A830C38E4
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 09:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C193B287517;
-	Wed,  7 Jan 2026 09:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61892F9984;
+	Wed,  7 Jan 2026 09:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FMSzC42R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hDhzIVAA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7F1235358;
-	Wed,  7 Jan 2026 09:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767777298; cv=fail; b=AJVlpy2bPE3rNEoJfhbpaEySjkomrt1Hk+HznM4MR4sDtZqfeiVuW7r++R47xaKc8dWOZtAE4i6WDEwnxsxHEgWLu7hfMeBz90Fh/4HD8S9ondfcJnqxkgAwZvicOQbTCDzDzdhV8p3XlDUOYP2AgvLCG4Xlgont05hId2xqL2I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767777298; c=relaxed/simple;
-	bh=3pLtCgH2vrb9zqzD5cv183LFpQCBdFo6meX9A8lpmWM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QI1D3/io+FPtAtODK54BdaZ0Zu1T4zwVg7Hsmp1ZgCl9cbxFceHGP+uoR3Ss+Z05mvc1wu6v++scZkL5o4S2cpR/zCYTnkx03pZv/c4TusNh0cCaYtYTp4lxBMQwcsmagaIsYLRReC8uTctbd5PGqeioSxilbshkbVxtK9o/Bpc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FMSzC42R; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767777297; x=1799313297;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=3pLtCgH2vrb9zqzD5cv183LFpQCBdFo6meX9A8lpmWM=;
-  b=FMSzC42R1tg/XROEqFWkq3CRIKp440fi5mDtpc+Z+ktdd09HcMc0z7nc
-   wZieq5XzZju7BsAlvybk+eUq3sapIzXE6NCu10dl9+fq4+tc+f/w0MtFZ
-   KKcvMZNQS0JGXbtxKsdFmEP3W7kRSvTOD5En03E/oFGy70EMy6sRmHHtz
-   /rI116yL0VM6f8rZ5ohZSPSr/JoLJruOoLcJ8t9/sA+yyaFsCPEet9IHT
-   VgyKIcfn93LvZbW0rZNSg/vNU4Y0WP+7MjTLf8+RtgwOiTF3R8vc9jHBm
-   d0c5uf+drmkk4ZWf0omgb5XcNFe/wSJ2GPk0Z5l0hwugVQx6YcMnEOibb
-   Q==;
-X-CSE-ConnectionGUID: ntUdSHIzT8C9EVYyehDh1Q==
-X-CSE-MsgGUID: 1cbtBkaySn6G6ikxVmUmGQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="71719413"
-X-IronPort-AV: E=Sophos;i="6.21,207,1763452800"; 
-   d="scan'208";a="71719413"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 01:14:56 -0800
-X-CSE-ConnectionGUID: CuomHYwcQyiwF0oCZlr8Iw==
-X-CSE-MsgGUID: 4tCdU1vWSlSYwa6HoxWSGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,207,1763452800"; 
-   d="scan'208";a="226382132"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 01:14:56 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 7 Jan 2026 01:14:55 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Wed, 7 Jan 2026 01:14:55 -0800
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.36) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 7 Jan 2026 01:14:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sJa/jXQlZDqxvsrkwrdHYV4GHSWmAKXSwTO0FyOiGnDC63mVCnERpzhYnm7FeTrLKfyRcQw5/WUAnQdJ+3uS5MYhE6898ns1ofa6GnQPkaVkEra0s0WcB7i+NsImfzhrwxLJMStRZFuyuIYwp1tYs/tDiUtOc1B5LXJoEyGZR+1Zo8KUnZJPlcpNfi++h6Lyy2s3UO5dBvGP1SJMW0w6QkqBu7wTmu1wtFE11I65gMpoCVdolrpgjTf+4svXgD7YEfFElEaAbFje4JrPWXrTrH1AEIHic0cWRKdKWgZiubSo/xmobAkwVvEDOVXfHo51zu0Y5mTUi6dC3Tq3nHYgog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pAkVmDDdAVwvvjOuLwI4NiDJQnlzOVo8yH9J7+Nmdrk=;
- b=QCfqw1tY8bzfqCtbESlLXhsXK/3C8CYsRIwlYeySBBE4g0JtKRL2OWSaShNXbSbQKiRvnfYZ2ayn4IyLolOXGBFqFsXPa4Wj8IHSURLO0YGuaMWWUk2lRrf2fuUaRobEGRKLbyzQRTpiDEfYgdfGmowHPKTGSbyLGAaT955W4GLpDMh5+5hHIDNAdoWrjfryeFoda+T7eCdJj7nYHQIE0uvdusTYR/kyr2Pmv7QHWJeqP35Ad5VlAtkPh9Kk9kzMHVhR3SXeZSjjcc5EQ4/1h9a/FiiHFaVebOT3GYvvhb3ElchFE4BiV8h5Q3hRHQULlYWxTSmFx4qG00VqUiSIMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- MW4PR11MB6839.namprd11.prod.outlook.com (2603:10b6:303:220::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.5; Wed, 7 Jan
- 2026 09:14:53 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9478.004; Wed, 7 Jan 2026
- 09:14:52 +0000
-Date: Wed, 7 Jan 2026 17:12:42 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Dave Hansen <dave.hansen@intel.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <x86@kernel.org>,
-	<rick.p.edgecombe@intel.com>, <kas@kernel.org>, <tabba@google.com>,
-	<ackerleytng@google.com>, <michael.roth@amd.com>, <david@kernel.org>,
-	<vannapurve@google.com>, <sagis@google.com>, <vbabka@suse.cz>,
-	<thomas.lendacky@amd.com>, <nik.borisov@suse.com>, <pgonda@google.com>,
-	<fan.du@intel.com>, <jun.miao@intel.com>, <francescolavra.fl@gmail.com>,
-	<jgross@suse.com>, <ira.weiny@intel.com>, <isaku.yamahata@intel.com>,
-	<xiaoyao.li@intel.com>, <kai.huang@intel.com>, <binbin.wu@linux.intel.com>,
-	<chao.p.peng@intel.com>, <chao.gao@intel.com>
-Subject: Re: [PATCH v3 01/24] x86/tdx: Enhance tdh_mem_page_aug() to support
- huge pages
-Message-ID: <aV4jihx/MHOl0+v6@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20260106101646.24809-1-yan.y.zhao@intel.com>
- <20260106101826.24870-1-yan.y.zhao@intel.com>
- <c79e4667-6312-486e-9d55-0894b5e7dc68@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c79e4667-6312-486e-9d55-0894b5e7dc68@intel.com>
-X-ClientProxiedBy: SI2PR02CA0037.apcprd02.prod.outlook.com
- (2603:1096:4:196::8) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2E0235358;
+	Wed,  7 Jan 2026 09:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767777287; cv=none; b=WjrkVeFNgoiHVk4GcusOZMOWTF7LoYyWOn5dKemprjsOEagsRoK+VfMJAjIbQTuKUo+lFmt8tkCebqGOgv7vFzsP7QXugr4UF2hD0A7EwC0BbYLVBA2TRPHfjlZoACs/11/Mb+kmHAOpnghmmaLEICc2GyRtI+dR70GstI6rDK0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767777287; c=relaxed/simple;
+	bh=HsPlCCX1CEyta2DFKeO1SH/8Utd6OpTbt/o6QeMxdoI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ugAudALv/ki+cb3L7qbd0MuN8seOYMjIsV5C76PTsZ9yPGNAOLqxgzSzgibASj3czxfNqdtdw7srt0FAxD32gnFqs4aYPGaqLfOUPk1X1EZtGkVfzXWGYO5pY6TcMF/o6XTpBlAhGR2tyFrCcsHhlZPuME+9gNx7ZrxjbT8i7xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hDhzIVAA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8C37C4CEF7;
+	Wed,  7 Jan 2026 09:14:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767777286;
+	bh=HsPlCCX1CEyta2DFKeO1SH/8Utd6OpTbt/o6QeMxdoI=;
+	h=From:To:Subject:Date:From;
+	b=hDhzIVAAC19+cgnPI09bILtCRfXF3p6nxY6+6cBYuiKEvDub7R6ZCbU/tl4v0qTEr
+	 mUKbxTG5qvLxlvcetNxlxnQJAkShZu0jNxBXACh1u8tNEbrKRcZ5PgHNLoPRfAMKYZ
+	 ooXXOC/5JlIKE/fxcP3+oZU9YLfYjU14dikwHIonIlqUWZU4w9NqJbTsi2Cu9PlW/6
+	 JrSkw/Pt6j1+NSZipD4DN2rXk3uvpmx70q0ZmHfa7gIOLW7b9BCpfyEVgorJJHamMT
+	 Heh8v7vInmPCzP1tmE6/Vs+aBlJNT5Bro+LIOxE8TpH+sQvpqBc7JKv8WAGNQNEDNz
+	 zDLX6pBD3yhrA==
+From: Leon Romanovsky <leon@kernel.org>
+To: Alex Williamson <alex@shazbot.org>,
+	linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: types: reuse common phys_vec type instead of DMABUF open‑coded variant
+Date: Wed,  7 Jan 2026 11:14:14 +0200
+Message-ID: <20260107-convert-to-pvec-v1-1-6e3ab8079708@nvidia.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MW4PR11MB6839:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c1b4555-474c-4d87-600a-08de4dcd3766
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?+38SEWf4i6fiSg6fSj5r40VtBASoY3xGioglxmIrAluC1z+KAtq+gDENOQ18?=
- =?us-ascii?Q?0RYHDWDtEghFFFRGM8krekP44yw92tgOjXsDsUjIqx0lE2Ar+W8S8nAowuzC?=
- =?us-ascii?Q?soGdi80F4SHmnbDegQalZJpRJCM6Y1yl17Mt6xURPBJXh5C/4gEBJSM2ERVW?=
- =?us-ascii?Q?dr50233qhgEe0sxasqS6ETuvjFqJe65SGEHfQ6/C+RHuPZDI0p4Zj8Y95L9P?=
- =?us-ascii?Q?b94ZkmklxaygjrfC5G/PbXYV7kmx40aZbho+OW5YBUWqgnOH1+780zRHjscl?=
- =?us-ascii?Q?CcJyxa5G0igvBg5WPfGRslLxJB83qCupxKTDGnjeOaqXVHt6OX/j02yWNhK5?=
- =?us-ascii?Q?7qJZBf0wr2+AVNLflNwfS1f6hhQ3kxGkOs5p8KH2DtsYdlV1oc4VCdPzWrdP?=
- =?us-ascii?Q?oDjMUKLtKboVNZ968nWJzjT9yhT8tLIuDZUmd46tBseWMQ+1InW0u0pqGtyt?=
- =?us-ascii?Q?FAoo37GY6nPIdGjHwWB6yqRPKqCzaLnVXKA2dvHuc1u2WCAgCFniCh2oIkG5?=
- =?us-ascii?Q?DvkH7/Ely6ehMn1szimHFOsuoV9w6WWj2Qea1zEQ0X11K0/O5UbkAvE2daaM?=
- =?us-ascii?Q?5xhmIRSieJjkgiyE567rjOzi22Lhv0toQyziZAYmnDHlL3MhGft5oaIJnQr4?=
- =?us-ascii?Q?AtHdvHzWaGhvmLbjl9xFsgaHFTnh/gz8Ej23dQgotyRDpt5EpmuwsFjSlIjM?=
- =?us-ascii?Q?1KlE5h0YBU+suq+1WTZR88TV1sdbzX1FzVnTJPH1ZPas5/RVMFXuGjsZIdqr?=
- =?us-ascii?Q?p1r8utRMXpETdbHCiFixUEyQ9vcOI7rUrwfJwmKL9UXowf0iPe4cZ7w016cZ?=
- =?us-ascii?Q?PMNGQJQE3PfP2xfPbvFzYhfPPfztVdzQFDkrNssA6FP9TnnVphb77F4sRqzx?=
- =?us-ascii?Q?baTJQ/Z1CChwbPLkdFshfJuK7DUuPexl+kz7mZD+B0Uvvp6qUTXl/rehew5S?=
- =?us-ascii?Q?NxG2/bl8YBQGKCDOACgLyTWMw3F39Ri1DfWehtCdvbci/k6aC/6XSS6gORgY?=
- =?us-ascii?Q?oQT92MgV79LkI3lZMf4n3xcgZqG6ry2CNS6s+XH8oQtF2vwaeMPOHRzYbOyB?=
- =?us-ascii?Q?HbV8ukhlZZvupiLoGrMthcCcZD3ZMcR7QjR3EPWCkhq0M4ZijqDUttaiOpbp?=
- =?us-ascii?Q?6Dyyv1bWZ8y8jd9RoyeUWnYNLNEbTcOsH76qi57MK9SAvvzfYfVVHSltW98d?=
- =?us-ascii?Q?g/hIGLy6EPx7JV6+Uw+fJB407sm58s/INZOJOfTBcigMCTI7l1n/D5gYDrvI?=
- =?us-ascii?Q?HAK/bt2Kinkh1aLZlm9mmDGZuNrJlJRAXuzIeIa1HMSTcaVEpxHFNmLez2w4?=
- =?us-ascii?Q?aZEQxqtF/yU+srcJi1I4zzBDRhCCkn9pmZTeX9LBrRLjbcr1DzftbGfgoMhf?=
- =?us-ascii?Q?GsxSWuHHeBDnBImvEIESudZ7panlWH1TLzt7uheLK9KVqAlg5a+I2veMH2C+?=
- =?us-ascii?Q?H55aF5I0uow6oDa0p+aeq54pddhD1LPMlCNOYtyawzOWvQcbk0mGWg=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rPZ6e/l3M9+tw94xjgh3IkgyKd/UH88kWVIE8pymMORWE3ourol8iowEmVhG?=
- =?us-ascii?Q?AEllfA++82vDe8JJvkwsmgZIidJEoanrR9HocMlx8eRYEGVB5PEtcFD8Q0pZ?=
- =?us-ascii?Q?hcb83/ZG+ox4p8EstRhXiTUwVqIKIH0AgmlNKr+XMA10rvhF30plR1D1mTAk?=
- =?us-ascii?Q?a3F3XxCQtms8d+B+R0CB5nTzg8/6V2aeyFtBquJTd9Do499bWPcNfMUyBfS2?=
- =?us-ascii?Q?146NF6Vog2t4lPR0t/QHnz69G5dYFBrpBsIP6TXMsK74bPvqZBUa8HDH5IBS?=
- =?us-ascii?Q?/EmudoakvV3whDlcuJ1n4QGZetoYZDp23M0T0eFk9Ycsf+UN6I3WMz/+wYU0?=
- =?us-ascii?Q?9vZFsoJ6I991BFwLWOzX5ZFj3V+cuaVhh0k1oHFmYwpXcFoueoKYxv3Qdgjp?=
- =?us-ascii?Q?y9NOla997KEVx8ZeqC7QonDp901gUaiEWQLtfEBdu/mqqm2Dhngr02/pSclk?=
- =?us-ascii?Q?RFZlO2COsIjpdgpRtFZB5Vuwa6TvHJTEM3LzLnDgEIeWDBA8Tq2HocfrClU/?=
- =?us-ascii?Q?Loy1yhXnehOJNTxOPdf2mzHSSjP5luFr6BcRcBK090UnxTKLuTvgYuaMJWjc?=
- =?us-ascii?Q?TMxKaslNbCtaCpPoSZ59q3nTYkxAElS52pgqaX0bT4KeO18CEo/E6A22gTFd?=
- =?us-ascii?Q?yldR426Igp1gmQWAEKUe/1PYoS6y9SZ9JfKUvkyG85Y/BG/X3UC0GDpzeEK0?=
- =?us-ascii?Q?+e4PhTztPlCbFoUo8CN7SITzODiuctFGqTbOxtNnvNbOwoOfX5HgouA39nKC?=
- =?us-ascii?Q?64xqHmfyRxk6JzZk5KM+GpfqUxai8Z7k+BTuay+yUZ+2nH3WncrkDwbJkawN?=
- =?us-ascii?Q?IQfZkAk5FyeerV7+uQhkdaGqRvAfNTRmti5W/pcPa4MENejo6F1B2DfBZBRl?=
- =?us-ascii?Q?ctWRBQfKNGOXZPbzTDzqeHCSuNNFnYPfrPQhhkNEDL6puLmnBz0cAsPgA4sg?=
- =?us-ascii?Q?opAK0toDFQ0243vBElVac7X31hrn2j9PAAYOfCPbzjk57oitXPHd6q0ZIPRV?=
- =?us-ascii?Q?NuHJdusj9eAqn3z4/8OefQDXej36g1I8PAUTIZzmvPlclvbducPqln2kS3sB?=
- =?us-ascii?Q?5USd4R6VuwKbdSE4Sdy/bQXCIXsyVrGsiUm/NCf6f+Pzjc4yWP9PzOrL5LwP?=
- =?us-ascii?Q?T1WWGPsFnSCi+0d8327E0CNjUkTAYLr57ks7N3uBudk2r3Cdl33MunivNWwt?=
- =?us-ascii?Q?7OimYQMmM+Ul+6ISUg09VKBwADEba8DSQLR14UISDtVUFAw3NNUdgPXFn8Gr?=
- =?us-ascii?Q?l5ftwR9+mLRpqrB8+XkiFwJ4IzLvw+g4clneQAgeOzKWfixB3lzPXHJd5Ex8?=
- =?us-ascii?Q?vjsWejQsja5hFEhJ3oXrfYkMC0NWz+i+r7Bx7ozo5FcTBSFfGqnx0MncynxH?=
- =?us-ascii?Q?Q3QNoYOAl+Gw2IzgyIlHoldSR1uTbM6F1Du18RJ2w20r6TBoWMrbmBVAjxOE?=
- =?us-ascii?Q?GrQTz7sgJQeMjJbT3KxhfLwEv8lKJM2AmTAkIKMFWKCLuCzXy/tm+JS0ITRf?=
- =?us-ascii?Q?M7WvWvZBXr7m93S7vjrVXnwbgfMwFG6n9wy0dxkUwVZoOOgjhLomcZXHEMSN?=
- =?us-ascii?Q?l9+ND0obFZv6bH9C9VNnnMPqRrwvyRXu5ishYkAnCFxlMLg1USJ+o2Iq60dt?=
- =?us-ascii?Q?uD2liweJ3lmJSDZinCQbc/cutpIp4wd1Mfr8eR0yU6cYltprXP+cipAgvVL6?=
- =?us-ascii?Q?hbhVaqEhgXjPVTJVxKMsd3hrhajfyPOUHM5i3EEbDBJHKfX3VHnwa1PsVegC?=
- =?us-ascii?Q?3ThF2Llvsw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c1b4555-474c-4d87-600a-08de4dcd3766
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 09:14:52.7943
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7gVfcjVnALfvKj9nBfKqhbCdY2YZxy5k00YUOxFtV3eK5BMxDP/j80a11skGd+wO7rr7TglS1wnSWHGuuzKT8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6839
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20260107-convert-to-pvec-bf04dfcf3d12
+X-Mailer: b4 0.15-dev-a6db3
+Content-Transfer-Encoding: quoted-printable
 
-Hi Dave
-
-Thanks for the review!
-
-On Tue, Jan 06, 2026 at 01:08:00PM -0800, Dave Hansen wrote:
-> On 1/6/26 02:18, Yan Zhao wrote:
-> > Enhance the SEAMCALL wrapper tdh_mem_page_aug() to support huge pages.
-> > 
-> > The SEAMCALL TDH_MEM_PAGE_AUG currently supports adding physical memory to
-> > the S-EPT up to 2MB in size.
-> > 
-> > While keeping the "level" parameter in the tdh_mem_page_aug() wrapper to
-> > allow callers to specify the physical memory size, introduce the parameters
-> > "folio" and "start_idx" to specify the physical memory starting from the
-> > page at "start_idx" within the "folio". The specified physical memory must
-> > be fully contained within a single folio.
-> > 
-> > Invoke tdx_clflush_page() for each 4KB segment of the physical memory being
-> > added. tdx_clflush_page() performs CLFLUSH operations conservatively to
-> > prevent dirty cache lines from writing back later and corrupting TD memory.
-> 
-> This changelog is heavy on the "what" and weak on the "why". It's not
-> telling me what I need to know.
-Indeed. I missed that. I'll keep it in mind. Thanks!
-
-> > +	struct folio *folio = page_folio(page);
-> >  	gpa_t gpa = gfn_to_gpa(gfn);
-> >  	u64 entry, level_state;
-> >  	u64 err;
-> >  
-> > -	err = tdh_mem_page_aug(&kvm_tdx->td, gpa, tdx_level, page, &entry, &level_state);
-> > -
-> > +	err = tdh_mem_page_aug(&kvm_tdx->td, gpa, tdx_level, folio,
-> > +			       folio_page_idx(folio, page), &entry, &level_state);
-> >  	if (unlikely(IS_TDX_OPERAND_BUSY(err)))
-> >  		return -EBUSY;
-> 
-> For example, 'folio' is able to be trivially derived from page. Yet,
-> this removes the 'page' argument and replaces it with 'folio' _and_
-> another value which can be derived from 'page'.
-> 
-> This looks superficially like an illogical change. *Why* was this done?
-Sorry for missing the "why".
-
-I think we can alternatively derive "folio" and "start_idx" from "page" inside
-the wrapper tdh_mem_page_aug() for huge pages.
-
-However, my understanding is that it's better for functions expecting huge pages
-to explicitly receive "folio" instead of "page". This way, people can tell from
-a function's declaration what the function expects. Is this understanding
-correct?
-
-Passing "start_idx" along with "folio" is due to the requirement of mapping only
-a sub-range of a huge folio. e.g., we allow creating a 2MB mapping starting from
-the nth idx of a 1GB folio.
-
-On the other hand, if we instead pass "page" to tdh_mem_page_aug() for huge
-pages and have tdh_mem_page_aug() internally convert it to "folio" and
-"start_idx", it makes me wonder if we could have previously just passed "pfn" to
-tdh_mem_page_aug() and had tdh_mem_page_aug() convert it to "page".
-
-> > diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> > index b0b33f606c11..41ce18619ffc 100644
-> > --- a/arch/x86/virt/vmx/tdx/tdx.c
-> > +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> > @@ -1743,16 +1743,23 @@ u64 tdh_vp_addcx(struct tdx_vp *vp, struct page *tdcx_page)
-> >  }
-> >  EXPORT_SYMBOL_GPL(tdh_vp_addcx);
-> >  
-> > -u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct page *page, u64 *ext_err1, u64 *ext_err2)
-> > +u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct folio *folio,
-> > +		     unsigned long start_idx, u64 *ext_err1, u64 *ext_err2)
-> >  {
-> >  	struct tdx_module_args args = {
-> >  		.rcx = gpa | level,
-> >  		.rdx = tdx_tdr_pa(td),
-> > -		.r8 = page_to_phys(page),
-> > +		.r8 = page_to_phys(folio_page(folio, start_idx)),
-> >  	};
-> > +	unsigned long npages = 1 << (level * PTE_SHIFT);
-> >  	u64 ret;
-> 
-> This 'npages' calculation is not obviously correct. It's not clear what
-> "level" is or what values it should have.
-> 
-> This is precisely the kind of place to deploy a helper that explains
-> what is going on.
-Will do. Thanks for pointing it out!
-
-> > -	tdx_clflush_page(page);
-> > +	if (start_idx + npages > folio_nr_pages(folio))
-> > +		return TDX_OPERAND_INVALID;
-> 
-> Why is this necessary? Would it be a bug if this happens?
-This sanity check is due to the requirement in KVM that mapping size should be
-no larger than the backend folio size, which ensures the mapping pages are
-physically contiguous with homogeneous page attributes. (See the discussion
-about "EPT mapping size and folio size" in thread [1]).
-
-Failure of the sanity check could only be due to bugs in the caller (KVM). I
-didn't convert the sanity check to an assertion because there's already a
-TDX_BUG_ON_2() on error following the invocation of tdh_mem_page_aug() in KVM.
-
-Also, there's no alignment checking because SEAMCALL TDH_MEM_PAGE_AUG() would
-fail with a misaligned base PFN.
-
-[1] https://lore.kernel.org/all/aV2A39fXgzuM4Toa@google.com/
-
-> > +	for (int i = 0; i < npages; i++)
-> > +		tdx_clflush_page(folio_page(folio, start_idx + i));
-> 
-> All of the page<->folio conversions are kinda hurting my brain. I think
-> we need to decide what the canonical type for these things is in TDX, do
-> the conversion once, and stick with it.
-Got it!
-
-Since passing in base "page" or base "pfn" may still require the
-wrappers/helpers to internally convert them to "folio" for sanity checks, could
-we decide that "folio" and "start_idx" are the canonical params for functions
-expecting huge pages? Or do you prefer KVM to do the sanity check by itself?
+From: Leon Romanovsky <leonro@nvidia.com>=0D
+=0D
+After commit fcf463b92a08 ("types: move phys_vec definition to common heade=
+r"),=0D
+we can use the shared phys_vec type instead of the DMABUF=E2=80=91specific=
+=0D
+dma_buf_phys_vec, which duplicated the same structure and semantics.=0D
+=0D
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>=0D
+---=0D
+Alex,=0D
+=0D
+According to diffstat, VFIO is the subsystem with the largest set of change=
+s,=0D
+so it would be great if you could take it through your tree.=0D
+=0D
+The series is based on the for-7.0/blk-pvec shared branch from Jens:=0D
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=3Dfo=
+r-7.0/blk-pvec=0D
+=0D
+Thanks=0D
+---=0D
+Cc: linux-media@vger.kernel.org=0D
+Cc: dri-devel@lists.freedesktop.org=0D
+Cc: linaro-mm-sig@lists.linaro.org=0D
+Cc: linux-kernel@vger.kernel.org=0D
+Cc: iommu@lists.linux.dev=0D
+Cc: kvm@vger.kernel.org=0D
+To: Sumit Semwal <sumit.semwal@linaro.org>=0D
+To: Christian K=C3=B6nig <christian.koenig@amd.com>=0D
+To: Jason Gunthorpe <jgg@ziepe.ca>=0D
+To: Kevin Tian <kevin.tian@intel.com>=0D
+To: Joerg Roedel <joro@8bytes.org>=0D
+To: Will Deacon <will@kernel.org>=0D
+To: Robin Murphy <robin.murphy@arm.com>=0D
+To: Yishai Hadas <yishaih@nvidia.com>=0D
+To: Shameer Kolothum <skolothumtho@nvidia.com>=0D
+To: Ankit Agrawal <ankita@nvidia.com>=0D
+To: Alex Williamson <alex@shazbot.org>=0D
+Cc: Matthew Wilcox <willy@infradead.org>=0D
+Cc: Jens Axboe <axboe@kernel.dk>=0D
+---=0D
+ drivers/dma-buf/dma-buf-mapping.c       |  6 +++---=0D
+ drivers/iommu/iommufd/io_pagetable.h    |  2 +-=0D
+ drivers/iommu/iommufd/iommufd_private.h |  5 ++---=0D
+ drivers/iommu/iommufd/pages.c           |  4 ++--=0D
+ drivers/iommu/iommufd/selftest.c        |  2 +-=0D
+ drivers/vfio/pci/nvgrace-gpu/main.c     |  2 +-=0D
+ drivers/vfio/pci/vfio_pci_dmabuf.c      |  8 ++++----=0D
+ include/linux/dma-buf-mapping.h         |  2 +-=0D
+ include/linux/dma-buf.h                 | 10 ----------=0D
+ include/linux/vfio_pci_core.h           | 13 ++++++-------=0D
+ 10 files changed, 21 insertions(+), 33 deletions(-)=0D
+=0D
+diff --git a/drivers/dma-buf/dma-buf-mapping.c b/drivers/dma-buf/dma-buf-ma=
+pping.c=0D
+index b7352e609fbd..174677faa577 100644=0D
+--- a/drivers/dma-buf/dma-buf-mapping.c=0D
++++ b/drivers/dma-buf/dma-buf-mapping.c=0D
+@@ -33,8 +33,8 @@ static struct scatterlist *fill_sg_entry(struct scatterli=
+st *sgl, size_t length,=0D
+ }=0D
+ =0D
+ static unsigned int calc_sg_nents(struct dma_iova_state *state,=0D
+-				  struct dma_buf_phys_vec *phys_vec,=0D
+-				  size_t nr_ranges, size_t size)=0D
++				  struct phys_vec *phys_vec, size_t nr_ranges,=0D
++				  size_t size)=0D
+ {=0D
+ 	unsigned int nents =3D 0;=0D
+ 	size_t i;=0D
+@@ -91,7 +91,7 @@ struct dma_buf_dma {=0D
+  */=0D
+ struct sg_table *dma_buf_phys_vec_to_sgt(struct dma_buf_attachment *attach=
+,=0D
+ 					 struct p2pdma_provider *provider,=0D
+-					 struct dma_buf_phys_vec *phys_vec,=0D
++					 struct phys_vec *phys_vec,=0D
+ 					 size_t nr_ranges, size_t size,=0D
+ 					 enum dma_data_direction dir)=0D
+ {=0D
+diff --git a/drivers/iommu/iommufd/io_pagetable.h b/drivers/iommu/iommufd/i=
+o_pagetable.h=0D
+index 14cd052fd320..27e3e311d395 100644=0D
+--- a/drivers/iommu/iommufd/io_pagetable.h=0D
++++ b/drivers/iommu/iommufd/io_pagetable.h=0D
+@@ -202,7 +202,7 @@ struct iopt_pages_dmabuf_track {=0D
+ =0D
+ struct iopt_pages_dmabuf {=0D
+ 	struct dma_buf_attachment *attach;=0D
+-	struct dma_buf_phys_vec phys;=0D
++	struct phys_vec phys;=0D
+ 	/* Always PAGE_SIZE aligned */=0D
+ 	unsigned long start;=0D
+ 	struct list_head tracker;=0D
+diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommuf=
+d/iommufd_private.h=0D
+index eb6d1a70f673..6ac1965199e9 100644=0D
+--- a/drivers/iommu/iommufd/iommufd_private.h=0D
++++ b/drivers/iommu/iommufd/iommufd_private.h=0D
+@@ -20,7 +20,6 @@ struct iommu_group;=0D
+ struct iommu_option;=0D
+ struct iommufd_device;=0D
+ struct dma_buf_attachment;=0D
+-struct dma_buf_phys_vec;=0D
+ =0D
+ struct iommufd_sw_msi_map {=0D
+ 	struct list_head sw_msi_item;=0D
+@@ -718,7 +717,7 @@ int __init iommufd_test_init(void);=0D
+ void iommufd_test_exit(void);=0D
+ bool iommufd_selftest_is_mock_dev(struct device *dev);=0D
+ int iommufd_test_dma_buf_iommufd_map(struct dma_buf_attachment *attachment=
+,=0D
+-				     struct dma_buf_phys_vec *phys);=0D
++				     struct phys_vec *phys);=0D
+ #else=0D
+ static inline void iommufd_test_syz_conv_iova_id(struct iommufd_ucmd *ucmd=
+,=0D
+ 						 unsigned int ioas_id,=0D
+@@ -742,7 +741,7 @@ static inline bool iommufd_selftest_is_mock_dev(struct =
+device *dev)=0D
+ }=0D
+ static inline int=0D
+ iommufd_test_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,=0D
+-				 struct dma_buf_phys_vec *phys)=0D
++				 struct phys_vec *phys)=0D
+ {=0D
+ 	return -EOPNOTSUPP;=0D
+ }=0D
+diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c=
+=0D
+index dbe51ecb9a20..bababd564cf9 100644=0D
+--- a/drivers/iommu/iommufd/pages.c=0D
++++ b/drivers/iommu/iommufd/pages.c=0D
+@@ -1077,7 +1077,7 @@ static int pfn_reader_user_update_pinned(struct pfn_r=
+eader_user *user,=0D
+ }=0D
+ =0D
+ struct pfn_reader_dmabuf {=0D
+-	struct dma_buf_phys_vec phys;=0D
++	struct phys_vec phys;=0D
+ 	unsigned long start_offset;=0D
+ };=0D
+ =0D
+@@ -1460,7 +1460,7 @@ static struct dma_buf_attach_ops iopt_dmabuf_attach_r=
+evoke_ops =3D {=0D
+  */=0D
+ static int=0D
+ sym_vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,=0D
+-				 struct dma_buf_phys_vec *phys)=0D
++				 struct phys_vec *phys)=0D
+ {=0D
+ 	typeof(&vfio_pci_dma_buf_iommufd_map) fn;=0D
+ 	int rc;=0D
+diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/selft=
+est.c=0D
+index 550ff36dec3a..989d8c4c60a7 100644=0D
+--- a/drivers/iommu/iommufd/selftest.c=0D
++++ b/drivers/iommu/iommufd/selftest.c=0D
+@@ -2002,7 +2002,7 @@ static const struct dma_buf_ops iommufd_test_dmabuf_o=
+ps =3D {=0D
+ };=0D
+ =0D
+ int iommufd_test_dma_buf_iommufd_map(struct dma_buf_attachment *attachment=
+,=0D
+-				     struct dma_buf_phys_vec *phys)=0D
++				     struct phys_vec *phys)=0D
+ {=0D
+ 	struct iommufd_test_dma_buf *priv =3D attachment->dmabuf->priv;=0D
+ =0D
+diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace=
+-gpu/main.c=0D
+index 84d142a47ec6..a0f4edd6a30b 100644=0D
+--- a/drivers/vfio/pci/nvgrace-gpu/main.c=0D
++++ b/drivers/vfio/pci/nvgrace-gpu/main.c=0D
+@@ -784,7 +784,7 @@ nvgrace_gpu_write(struct vfio_device *core_vdev,=0D
+ static int nvgrace_get_dmabuf_phys(struct vfio_pci_core_device *core_vdev,=
+=0D
+ 				   struct p2pdma_provider **provider,=0D
+ 				   unsigned int region_index,=0D
+-				   struct dma_buf_phys_vec *phys_vec,=0D
++				   struct phys_vec *phys_vec,=0D
+ 				   struct vfio_region_dma_range *dma_ranges,=0D
+ 				   size_t nr_ranges)=0D
+ {=0D
+diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci=
+_dmabuf.c=0D
+index d4d0f7d08c53..9a84c238c013 100644=0D
+--- a/drivers/vfio/pci/vfio_pci_dmabuf.c=0D
++++ b/drivers/vfio/pci/vfio_pci_dmabuf.c=0D
+@@ -14,7 +14,7 @@ struct vfio_pci_dma_buf {=0D
+ 	struct vfio_pci_core_device *vdev;=0D
+ 	struct list_head dmabufs_elm;=0D
+ 	size_t size;=0D
+-	struct dma_buf_phys_vec *phys_vec;=0D
++	struct phys_vec *phys_vec;=0D
+ 	struct p2pdma_provider *provider;=0D
+ 	u32 nr_ranges;=0D
+ 	u8 revoked : 1;=0D
+@@ -94,7 +94,7 @@ static const struct dma_buf_ops vfio_pci_dmabuf_ops =3D {=
+=0D
+  *    will fail if it is currently revoked=0D
+  */=0D
+ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,=0D
+-				 struct dma_buf_phys_vec *phys)=0D
++				 struct phys_vec *phys)=0D
+ {=0D
+ 	struct vfio_pci_dma_buf *priv;=0D
+ =0D
+@@ -116,7 +116,7 @@ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachm=
+ent *attachment,=0D
+ }=0D
+ EXPORT_SYMBOL_FOR_MODULES(vfio_pci_dma_buf_iommufd_map, "iommufd");=0D
+ =0D
+-int vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,=0D
++int vfio_pci_core_fill_phys_vec(struct phys_vec *phys_vec,=0D
+ 				struct vfio_region_dma_range *dma_ranges,=0D
+ 				size_t nr_ranges, phys_addr_t start,=0D
+ 				phys_addr_t len)=0D
+@@ -148,7 +148,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_fill_phys_vec);=0D
+ int vfio_pci_core_get_dmabuf_phys(struct vfio_pci_core_device *vdev,=0D
+ 				  struct p2pdma_provider **provider,=0D
+ 				  unsigned int region_index,=0D
+-				  struct dma_buf_phys_vec *phys_vec,=0D
++				  struct phys_vec *phys_vec,=0D
+ 				  struct vfio_region_dma_range *dma_ranges,=0D
+ 				  size_t nr_ranges)=0D
+ {=0D
+diff --git a/include/linux/dma-buf-mapping.h b/include/linux/dma-buf-mappin=
+g.h=0D
+index a3c0ce2d3a42..09bde3f748e4 100644=0D
+--- a/include/linux/dma-buf-mapping.h=0D
++++ b/include/linux/dma-buf-mapping.h=0D
+@@ -9,7 +9,7 @@=0D
+ =0D
+ struct sg_table *dma_buf_phys_vec_to_sgt(struct dma_buf_attachment *attach=
+,=0D
+ 					 struct p2pdma_provider *provider,=0D
+-					 struct dma_buf_phys_vec *phys_vec,=0D
++					 struct phys_vec *phys_vec,=0D
+ 					 size_t nr_ranges, size_t size,=0D
+ 					 enum dma_data_direction dir);=0D
+ void dma_buf_free_sgt(struct dma_buf_attachment *attach, struct sg_table *=
+sgt,=0D
+diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h=0D
+index 0bc492090237..400a5311368e 100644=0D
+--- a/include/linux/dma-buf.h=0D
++++ b/include/linux/dma-buf.h=0D
+@@ -531,16 +531,6 @@ struct dma_buf_export_info {=0D
+ 	void *priv;=0D
+ };=0D
+ =0D
+-/**=0D
+- * struct dma_buf_phys_vec - describe continuous chunk of memory=0D
+- * @paddr:   physical address of that chunk=0D
+- * @len:     Length of this chunk=0D
+- */=0D
+-struct dma_buf_phys_vec {=0D
+-	phys_addr_t paddr;=0D
+-	size_t len;=0D
+-};=0D
+-=0D
+ /**=0D
+  * DEFINE_DMA_BUF_EXPORT_INFO - helper macro for exporters=0D
+  * @name: export-info name=0D
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h=
+=0D
+index 706877f998ff..2ac288bb2c60 100644=0D
+--- a/include/linux/vfio_pci_core.h=0D
++++ b/include/linux/vfio_pci_core.h=0D
+@@ -28,7 +28,6 @@=0D
+ struct vfio_pci_core_device;=0D
+ struct vfio_pci_region;=0D
+ struct p2pdma_provider;=0D
+-struct dma_buf_phys_vec;=0D
+ struct dma_buf_attachment;=0D
+ =0D
+ struct vfio_pci_eventfd {=0D
+@@ -62,25 +61,25 @@ struct vfio_pci_device_ops {=0D
+ 	int (*get_dmabuf_phys)(struct vfio_pci_core_device *vdev,=0D
+ 			       struct p2pdma_provider **provider,=0D
+ 			       unsigned int region_index,=0D
+-			       struct dma_buf_phys_vec *phys_vec,=0D
++			       struct phys_vec *phys_vec,=0D
+ 			       struct vfio_region_dma_range *dma_ranges,=0D
+ 			       size_t nr_ranges);=0D
+ };=0D
+ =0D
+ #if IS_ENABLED(CONFIG_VFIO_PCI_DMABUF)=0D
+-int vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,=0D
++int vfio_pci_core_fill_phys_vec(struct phys_vec *phys_vec,=0D
+ 				struct vfio_region_dma_range *dma_ranges,=0D
+ 				size_t nr_ranges, phys_addr_t start,=0D
+ 				phys_addr_t len);=0D
+ int vfio_pci_core_get_dmabuf_phys(struct vfio_pci_core_device *vdev,=0D
+ 				  struct p2pdma_provider **provider,=0D
+ 				  unsigned int region_index,=0D
+-				  struct dma_buf_phys_vec *phys_vec,=0D
++				  struct phys_vec *phys_vec,=0D
+ 				  struct vfio_region_dma_range *dma_ranges,=0D
+ 				  size_t nr_ranges);=0D
+ #else=0D
+ static inline int=0D
+-vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,=0D
++vfio_pci_core_fill_phys_vec(struct phys_vec *phys_vec,=0D
+ 			    struct vfio_region_dma_range *dma_ranges,=0D
+ 			    size_t nr_ranges, phys_addr_t start,=0D
+ 			    phys_addr_t len)=0D
+@@ -89,7 +88,7 @@ vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys=
+_vec,=0D
+ }=0D
+ static inline int vfio_pci_core_get_dmabuf_phys(=0D
+ 	struct vfio_pci_core_device *vdev, struct p2pdma_provider **provider,=0D
+-	unsigned int region_index, struct dma_buf_phys_vec *phys_vec,=0D
++	unsigned int region_index, struct phys_vec *phys_vec,=0D
+ 	struct vfio_region_dma_range *dma_ranges, size_t nr_ranges)=0D
+ {=0D
+ 	return -EOPNOTSUPP;=0D
+@@ -228,6 +227,6 @@ static inline bool is_aligned_for_order(struct vm_area_=
+struct *vma,=0D
+ }=0D
+ =0D
+ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,=0D
+-				 struct dma_buf_phys_vec *phys);=0D
++				 struct phys_vec *phys);=0D
+ =0D
+ #endif /* VFIO_PCI_CORE_H */=0D
+=0D
+---=0D
+base-commit: fcf463b92a08686d1aeb1e66674a72eb7a8bfb9b=0D
+change-id: 20260107-convert-to-pvec-bf04dfcf3d12=0D
+=0D
+Best regards,=0D
+--  =0D
+Leon Romanovsky <leonro@nvidia.com>=0D
+=0D
 
