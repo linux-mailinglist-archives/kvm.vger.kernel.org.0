@@ -1,192 +1,140 @@
-Return-Path: <kvm+bounces-67263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74891CFFC52
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 20:35:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E3A3CFFF48
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 21:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 81982300EDD7
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 19:35:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60F1D3015025
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 20:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBCA334C04;
-	Wed,  7 Jan 2026 19:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7658337BB5;
+	Wed,  7 Jan 2026 20:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKqTNx/d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jvTjNPVM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591183242B3
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 19:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767813988; cv=pass; b=li3Bfs1bWR2Wk2WXozQc/aRBNcd2U1T1Sz/0TABPQt47Ttf5zhOAqC9oxWfHkjN/rZYx33TeyXAjOub8LOb2gdWSFkK+9hEEOg/iYXuuVsmOKibuu8EPZIoYtpj7aBky/oecBSh3YtJtGmrA1O2nmRg/YWEscrlmca8Io3jkJgk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767813988; c=relaxed/simple;
-	bh=2LhpsPeSyE8bX8HA6xDr9D/rfFVNInchGx8D0QTzubs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m6N64IdT6+L7pTC4VBq1xFkAuXXaO44kWYigkSTaMEh6frFklTonaHp8o8zOqincgkBcC7qJxS0kBQRcSfi5lhyXg0u6O9I/yqg12RMsFMja8WjRyyu+lfV0V2+lFRWBBtWxJYzIepWt+pgxUwZ8j/M08WD+ka3Xt30AsSOUp48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKqTNx/d; arc=pass smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5321A3179
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 20:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767817084; cv=none; b=OruGqU4jIf+yZZcFiH0Y6aylSNwn14PTM2pFWyy6G6w8KHcDInp30DB3Hp85wFpfv3Cgn7bTJxn2ZBCUKs3jRo/yysDK6iq4Y/rho/U4p2F1TLfaIba69Abv5KbjmBnisrDhLx2glGyYiB62bJQO5pv268SuWSWWLhmlBKfXMAI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767817084; c=relaxed/simple;
+	bh=TvOkn6u8I9/U/iJG9I9EEu4rPAWu4/Ro3ETE+xAntc0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lVVXetWLb9RHKlwn1KkpgLXL6SjPuCJB4v00wajY8fQR40GdVco+6gEXFrx+gjp7PiAXAE0K2mdsSajdVFNT9euq/fyTNU8F3evc8KqAc+PrapUliZeLw64piGrwMUl1GjipLrmhhpHc/r6qR92ejViLC68aHyew9Fqf3XSAZdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jvTjNPVM; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ee243b98caso481191cf.1
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 11:26:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767813984; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MqLkcOFy1rcH8iDFEgPvhTgN5V6UyEO2abbJn1/ikM1Yr9HzegAyemV88J5dbWjUa9
-         WthFVR8qC4p26PDiqARg1/mBxVnWT9uMBF/Bu+A8c+s2ekpOfHUcbb8C/if0eNBULMs8
-         9eOITlSLVgNnx7Aoskw6/lhEEDwRNyrlok5IbbXf4v6OzCo5AP2XLqUh+M5AGZNFOVcI
-         T/zL4d5BPlpOdyCPb8jVhN85F8gqxxsOAM32QbamrcZhgrmfc3Z8nUQKIk/KzwwqzdvF
-         OhcirTKpbMRbtySEIbgq3GxHqJaS3UC7qYMZbK0MjgqECGXt9tdtMBdaEuwfYDx4DCHp
-         pHPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=bWQBkRucMfj+8IZule2bckxNws/YyczMOLNESP4WNJk=;
-        fh=dyX4SayUX9nyp+3J39dgCifNUpNxc7vpJon7xlJGWT4=;
-        b=gVHUmG+D11LHpHylxn7DNElypoMOVNSAoM5abH9/sU2GAjCxLH5CnZ4rL0UtL4gmw9
-         vrL4mpU0JCdRHFDGf+unGqQD5hMJCBeUscOHsDUVlzun4c9fp0BePdR30ivIRY8GvNBB
-         PD26HM/GLoBnBnwl69HghrcAAoi1yjzNTeq7pF1axae4tZ1tt46TDmgqZhLTQy+7tYw4
-         H52DWJvXRfTwI7wanAzFCfJ5uEfDovkrimuzeNAHzUO9SmTW0rxsbi8+qlhqUMsBQOoS
-         m6kdohg7diFNGIN1tovK+859dBTwwWjsw5H9LrTJjTrj2FXJyjBmtzPaRzthhVucWcrO
-         viaw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7f21951c317so1892674b3a.2
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 12:18:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767813984; x=1768418784; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bWQBkRucMfj+8IZule2bckxNws/YyczMOLNESP4WNJk=;
-        b=BKqTNx/dRzg0zFWE+h3P30e/ZQqpYPrHRtHwoRfzxIAMhrBgKBcjzdydRIWKSg7SsE
-         gtx/suaYozcBSsVPh/jsxJ8K4yYllQM04FpNTciw4x9uqYOPxzU4DagpLhl+AuOCVb6V
-         n6vKWwcYnNdh/C/rtKnDVvRWHGhHqg4vk9NxYrAocwehf/0+1Jg7E05p1dt2alT3f5Se
-         xY0Dd9X/odEq6muhhXAtLUZDliohR0oXSgivre+tCIuLte29h6eVCTefIOxnLpL68/jj
-         hl1Elt21T+wHa26chyGvc5W/2or0/a+CTq8udA1rc+POmXxWfMzFQqmLa38dIxuob25S
-         uJBg==
+        d=google.com; s=20230601; t=1767817083; x=1768421883; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BRji2ofdtY/PgKBBjoXBJuWSbx9X2KHKEteqA3GTxBo=;
+        b=jvTjNPVMxJmjDKAmieHVKoN82boPu8dMM1BI4nKDo6dR83kADqx03a+wF2NvgK0gwu
+         kXWHBURxdsmYa0/3w9dmVtc36HuLoqMMcLPCUgUwUHqz0cIrNyO1ezSCLe5Wr2L6SC7e
+         dZ75ZxHlhixc6gpCHme5Cyu7add+wbECRa8kQMoiVhFsdq8q4aNV0yW5svxYQWWxT6KX
+         0EUHFpulk47ycYo7aaW4ur7KPEJvDBmkVXRzu2nmo+ad3Ud8nWMk8VD3BvftQ/ta1d4T
+         c55Pp2DNghxrhH9x0C7AJ+vi9yCKjP9spf7vQU62WcZ9pHba/ws2AoyGhjQYAqhe//E/
+         MrBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767813984; x=1768418784;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bWQBkRucMfj+8IZule2bckxNws/YyczMOLNESP4WNJk=;
-        b=ddTXvshESj9vYX671Jeao1XR4xFVARM2Lq42xaBngbTqX7GHdixYv6pFthcMTMwTEg
-         7nGcz0ePrkcJMYTiWntwjc+RvgpuHqJVRXwuY2ce6XBiVlRu1HdOAKteryuTYUu0PJWt
-         RiqOENoTDT3JYKjz39+r0gXE4iXMBVy7SXjg2VS+99TmmVewaFXOVUuNrMck5o9Mmggm
-         QHtEFMNCKzNCjuP20rwvcxBZXSaVv9dVyuaWIf1f+Sw4Rh4h6y64fXuUQhuxqzJyCXDk
-         5xYfoGo7mXlV32pChl3rum22SCjaDh5u04YUPTSXaw5sw3781KzYprReD2wruuEsr2yG
-         yYNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvfyz8aNCMFFX7ZCvcGi7ABNCf4stExoR3/dSajS+4WtkWmEk3WE7EkoOPObF41RhgmsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC2IrvrRgTWMeTSITiArkLUgO9ocR+miFal/v9/Wx6om64FFn5
-	l0rlsDV2arn4vJmMOm0HyIwMAY7/de94W70sMckvVDHcOWyM4BDlp2p6R4MOW2xqjhMZ7gySW6w
-	2Kt63V/YkIFsPa7lTRmnyZ1PWdXV/7U+hgM5d7Dw3
-X-Gm-Gg: AY/fxX4lDmcx51C97Sz0TrLZgsvFIsorI/s4BVLlhKRUuPKKNK3yOtf0qs/n7ciYa+F
-	ewAwsOr+R6tk0nfeTtz6Xh3p8R8Kxc8qxRsNkiZxZBaxwtTpjlZiJq2FvD63cI564Tz6SXt1VnU
-	pYQx6WBj96mZFvI23Z5B81OUs2KAdKNVU82jLWd3oD967lxb67vgSTgsjIixLdP+ejH7fH7XixS
-	BLtvRxgI0I6ucwBYubt4jgPyH06kJgXKYPCTCZMuT+U8+zddObbXlq7i9KXh72YC57+FzDz
-X-Received: by 2002:ac8:7d0a:0:b0:4ed:ff77:1a87 with SMTP id
- d75a77b69052e-4ffbf94a082mr1122261cf.19.1767813983752; Wed, 07 Jan 2026
- 11:26:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767817083; x=1768421883;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BRji2ofdtY/PgKBBjoXBJuWSbx9X2KHKEteqA3GTxBo=;
+        b=Lcq0zsVc/lycAhXk8+25vvRxuS3zKViIpYWdoKk69iUBmZ6jSxmEm5z0z93229dief
+         xEjZ15VuZKLBhbggEzwSIk/G4vATFZTjfDQM3k2ZQplR24gLW+lQQnagJceKgstCq39t
+         yqvPGVWnKiTGMpox9ZR9R6uyZsb6kHb+JJv2uU2CPo8kAhEw1oEeqSVPIc5WpRw3pzck
+         T5BciJTdOg+Ytgqt47Y8x2exAj2oEDpyDotKrX9Lkt6gHlKUyHHCdKhj5KVidhXr+zs0
+         txjgeBUaL/tZCMKVdbgD9ZCsD+7YDMYGsAq35/LXxQkX1S7uMsv01QdxufIsQO9PONpD
+         kOQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIcJN+IWeYjo7TUdLNFPAEzNTvqoKUPPLH0sByNrnn2tTkppIe9LQjkgeZ7oBFLvsmXQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuzkugYM3238W9vDvk4ug+1/FSaWDTUFeQy/AL+TQGwJfwI+Ib
+	WjbKCqhA+7KYYOkamP8t3OFTs/V63xO0O0VFs4uqgdM53OP3AYmwIy2PgZpIjDj43YkmuhyTsVg
+	bllmdq7fkpwOyjg==
+X-Google-Smtp-Source: AGHT+IHpSjmtFIkns5HQtlhETgrC7VtMTaI0oceBagAYDCz1RUoLr1bA46QQW/+00lvC5tMM37yLiV7a8rdzpg==
+X-Received: from pfblp20.prod.google.com ([2002:a05:6a00:3d54:b0:7b8:565a:73bd])
+ (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:8086:b0:7e8:4471:8c5 with SMTP id d2e1a72fcca58-81b7f101490mr3287211b3a.38.1767817082661;
+ Wed, 07 Jan 2026 12:18:02 -0800 (PST)
+Date: Wed,  7 Jan 2026 20:17:57 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-5-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-5-8be3867cb883@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 7 Jan 2026 19:25:47 +0000
-X-Gm-Features: AQt7F2qO0uzZBb7qE9TqF-7WKMNBoVsC6m-23DUQhmoLKw26Bq83cmx6SM9OSu4
-Message-ID: <CA+EHjTycP4Wz0V7S8hzWygpeXGzeehTL8RFfit7Eaq4rT+Eu+Q@mail.gmail.com>
-Subject: Re: [PATCH v9 05/30] arm64/fpsimd: Determine maximum virtualisable
- SME vector length
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Eric Auger <eric.auger@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20260107201800.2486137-1-skhawaja@google.com>
+Subject: [PATCH 0/3] iommu/vt-d: Add support to hitless replace IOMMU domain
+From: Samiullah Khawaja <skhawaja@google.com>
+To: David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	David Matlack <dmatlack@google.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Pratyush Yadav <pratyush@kernel.org>, Kevin Tian <kevin.tian@intel.com>, 
+	Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Saeed Mahameed <saeedm@nvidia.com>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
+	Parav Pandit <parav@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Mark,
+Intel IOMMU Driver already supports replacing IOMMU domain hitlessly in
+scalable mode. The support is not available in legacy mode and for
+NO_PASID in scalable mode. This patch series adds the support for legacy
+mode and NO_PASID scalable mode.
 
-On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
->
-> As with SVE we can only virtualise SME vector lengths that are supported by
-> all CPUs in the system, implement similar checks to those for SVE. Since
-> unlike SVE there are no specific vector lengths that are architecturally
-> required the handling is subtly different, we report a system where this
-> happens with a maximum vector length of -1.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/kernel/fpsimd.c | 23 ++++++++++++++++++++++-
->  1 file changed, 22 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index f4e8cee00198..22f8397c67f0 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -1257,7 +1257,8 @@ void cpu_enable_sme(const struct arm64_cpu_capabilities *__always_unused p)
->  void __init sme_setup(void)
->  {
->         struct vl_info *info = &vl_info[ARM64_VEC_SME];
-> -       int min_bit, max_bit;
-> +       DECLARE_BITMAP(tmp_map, SVE_VQ_MAX);
-> +       int min_bit, max_bit, b;
->
->         if (!system_supports_sme())
->                 return;
-> @@ -1288,12 +1289,32 @@ void __init sme_setup(void)
->          */
->         set_sme_default_vl(find_supported_vector_length(ARM64_VEC_SME, 32));
->
-> +       bitmap_andnot(tmp_map, info->vq_partial_map, info->vq_map,
-> +                     SVE_VQ_MAX);
-> +
-> +       b = find_last_bit(tmp_map, SVE_VQ_MAX);
-> +       if (b >= SVE_VQ_MAX)
-> +               /* All VLs virtualisable */
-> +               info->max_virtualisable_vl = SVE_VQ_MAX;
-> +       else if (b == SVE_VQ_MAX - 1)
-> +               /* No virtualisable VLs */
-> +               info->max_virtualisable_vl = -1;
+This is needed for the Live update IOMMU persistence to hotswap the
+iommu domain after liveupdate:
+https://lore.kernel.org/all/20251202230303.1017519-1-skhawaja@google.com/
 
-I'm not sure about -1 as the "No virtualisable VLs" value. Unless I've
-missed something, this value gets used without being checked,
-potentially even assigned to an unsigned int:
+The patch adds the support for scalable mode NO_PASID mode by using the
+existing replace semantics. This works since in scalable mode the
+context entries are not updated and only the pasid entries are updated.
 
-> kvm_max_vl[ARM64_VEC_SME] = sme_max_virtualisable_vl();
+The patch series also contains a vfio selftests for the iommu domain
+replace using iommufd hwpt replace functionality.
 
-Cheers,
-/fuad
+Tested on a Host with scalable mode and on Qemu with legacy mode:
+
+tools/testing/selftests/vfio/scripts/setup.sh <dsa_device_bdf>
+tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test <dsa_device_bdf>
+
+TAP version 13
+1..2
+# Starting 2 tests from 2 test cases.
+#  RUN           vfio_iommufd_replace_hwpt_test.domain_replace.memcpy ...
+#            OK  vfio_iommufd_replace_hwpt_test.domain_replace.memcpy
+ok 1 vfio_iommufd_replace_hwpt_test.domain_replace.memcpy
+#  RUN           vfio_iommufd_replace_hwpt_test.noreplace.memcpy ...
+#            OK  vfio_iommufd_replace_hwpt_test.noreplace.memcpy
+ok 2 vfio_iommufd_replace_hwpt_test.noreplace.memcpy
+# PASSED: 2 / 2 tests passed.
+# Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Samiullah Khawaja (3):
+  iommu/vt-d: Allow replacing no_pasid iommu_domain
+  vfio: selftests: Add support of creating iommus from iommufd
+  vfio: selftests: Add iommufd hwpt replace test
+
+ drivers/iommu/intel/iommu.c                   | 107 +++++++++----
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../vfio/lib/include/libvfio/iommu.h          |   2 +
+ .../lib/include/libvfio/vfio_pci_device.h     |   2 +
+ tools/testing/selftests/vfio/lib/iommu.c      |  60 ++++++-
+ .../selftests/vfio/lib/vfio_pci_device.c      |  16 +-
+ .../vfio/vfio_iommufd_hwpt_replace_test.c     | 151 ++++++++++++++++++
+ 7 files changed, 303 insertions(+), 36 deletions(-)
+ create mode 100644 tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c
 
 
-> +       else
-> +               info->max_virtualisable_vl = sve_vl_from_vq(__bit_to_vq(b +  1));
-> +
-> +       if (info->max_virtualisable_vl > info->max_vl)
-> +               info->max_virtualisable_vl = info->max_vl;
-> +
->         pr_info("SME: minimum available vector length %u bytes per vector\n",
->                 info->min_vl);
->         pr_info("SME: maximum available vector length %u bytes per vector\n",
->                 info->max_vl);
->         pr_info("SME: default vector length %u bytes per vector\n",
->                 get_sme_default_vl());
-> +
-> +       /* KVM decides whether to support mismatched systems. Just warn here: */
-> +       if (info->max_virtualisable_vl < info->max_vl)
-> +               pr_warn("SME: unvirtualisable vector lengths present\n");
->  }
->
->  void sme_suspend_exit(void)
->
-> --
-> 2.47.3
->
+base-commit: 6cd6c12031130a349a098dbeb19d8c3070d2dfbe
+-- 
+2.52.0.351.gbe84eed79e-goog
+
 
