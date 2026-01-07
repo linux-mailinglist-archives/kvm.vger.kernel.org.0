@@ -1,172 +1,132 @@
-Return-Path: <kvm+bounces-67236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3813CFEC2F
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 17:02:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A839CFED9B
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 17:25:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 145E130019E9
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 16:02:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F81D32A6A45
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 16:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C2C3876AE;
-	Wed,  7 Jan 2026 15:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE4A3644C5;
+	Wed,  7 Jan 2026 16:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S8kAnC8p"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ft7TghyP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E91E3A97F8
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 15:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A83C346A1A
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 16:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767801306; cv=none; b=dP8Cc24CFRRMOdzWoPMrNYJLzue14VccGDUihhGH+YL7h+a5mUqI351oVzcbOiue2zdF8wOJni/D/5eZ2LsXPpxb8+nUY+WUnKTiAeRLAR+zV+ns9R+8RHnJioA/HRwH9LV9G696wDF/wQRqzgDewJnv3fb5/XBg8FcouAX3+Mo=
+	t=1767801677; cv=none; b=E85Qz5hLKUGseXo5wQtZTOvAKZdk0Jso+yUBms1Gi6+MGSa5D9vrvLyDSLrLVpO2pd30pGFlP+ixw5XnKqb2I7f2ro7H3O639CEBafrn+llOOqdSm4omrkENjNR9sP8XE3NavLX8qqjU9t+EQjdm7IgsbPOsqorp1JU2Xfr8pGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767801306; c=relaxed/simple;
-	bh=yXyephpPsv2jEvNRfKQKQirxxpGxIV/ri/oUYID04Lo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mcZ+7V00Av38nSpIeq+cuUvV/plTucal4/AOghrLN6h5e383PAT7xqccRV+YFsWQ8kx85QD7r5qxgpciATQc4u8mSMQGffkuZ2N8XgoQU7krvniCgblGPyG8+bU4XfzzwZS0YxE8O6YwhO+w98oY3R2Sc/TXavYwfU83cNGo0Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S8kAnC8p; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b952a966d7so4541782b3a.3
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 07:54:56 -0800 (PST)
+	s=arc-20240116; t=1767801677; c=relaxed/simple;
+	bh=V4bVj2wSElYjvUgQlZ6az/4rqywQNYaAH3LZ9i/qB6M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nbh+EM/xL/17UeO/alSsLKd0bXqTBZO1cpqWqJXpnkioBDXKe85Q7KBMAUxyRlmWKzSXv0kGC+E2N0XNwE+8aKeFuxJhdaRJD+7nyJG6fR1wb5QfjQbwVvC+FpmKuQgwSL2I4Kr+xtjKDp4rtVsxRstFPcYIZWQ2qABn9RWzp3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ft7TghyP; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-88a37cb5afdso10998256d6.0
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 08:00:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767801295; x=1768406095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KGDxiUzmOiqUqvFGIUEpvgOPKZQcr6FM34ff6SZAbo8=;
-        b=S8kAnC8ptdPgvVS0TAePJlKqiayWvABWD0EHRv4VpmejkVID7qdCBbjgaQ7OqJjk8x
-         PN1lHi+XKn+UK18JbaWqpodcBxF39LbP++9qHXQD5EnTA4bM+CC0NNPiAS3Ed1nHFj9y
-         euU1GiZlzc2O4w81+2v0B6Vfl56JwHMhrx6WeVVyQgD8irLYRWKKRNWLUeVNXZT+zVS0
-         4VCYtxKP3otQKmOws+lMhB/Z9aiaBB2ye3GXl8AcLzAXSz0DqDVRpEj0eTJryPpeNq2K
-         0wd5WmG/JAoV09mik412hikKlZ2Xsr+d2t7b/jBCNyWCYoRtwNtrA/v4CyWTocxQ/H8F
-         peSA==
+        d=ziepe.ca; s=google; t=1767801653; x=1768406453; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ftSoJlbCa6MOGNHtdz3xW3rHVknPRmwRfQPP71m23p0=;
+        b=Ft7TghyPMhyrb8gGBX881I5VOypjVaEZudanM8zG1RpGlp6JpOZRBP/0Mdbd+OShn3
+         IzoJ2JeRQ0szwl765mDxp+X2zzojtSinUIXBNjPLLVPV4tnqC7r27qQYNkHzmsaQjMV2
+         Fpi1OmRALrgsBXYzyy3GCO5MZtF1qd4fDxqsKiiuNv8REzkXSfrhYJno863pzO54/9AF
+         T4xQ/nB36plu0hFqGot8QHfW1Mnn9n/ICptAuofp3gWnnXjtjaUIDy3dkEPsKuuyDMng
+         DATsBIDSSoJkiYVa+hFPO7j4VoUMm8OfGFzEFjWifY2YbyI5t8iNsSie7bUNNTw3umZZ
+         IUgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767801295; x=1768406095;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KGDxiUzmOiqUqvFGIUEpvgOPKZQcr6FM34ff6SZAbo8=;
-        b=ZtF52empqOx9/dFRxxU+QxjROl2DokbbBRUTDS2XIbim08PRNb3aNo4sCn0ZOWPITl
-         bWNHgtwoAHbVMYWR7hiZngCuaA9aCOAocyNbUsrLMjv916HUsNmvLF4cBuR2M722KVVn
-         zFEXLXFbMkg0AW7ZJKs6WiIH3HPBaTsJL6FGzjp7ciyeg0KBJj4t32I2lO58OHnleNFi
-         WV+bsVROzmlph6ElI9zo+sDW0yZSbAVgaVL/OaSTtp8wv+zMj+jZQJGBiwoVyY9x+ZnP
-         vjkpdcNegQa1IInKb3Ega9fJH+dxhQdBnogzLyEgUbJF90QRhtxaieDVV0pEr+gEHINe
-         /FeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXq+vTQF4n/ElWxckKSYHp8buLJ0K9zLRor7RdOC68jUT5sT2s3dey5IrptR/bbPu2fbUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoRmkgLrSvYJKsG1E+A6nyAAAsg9yZyKVafnPe4SBysonJPd7P
-	kYdnMqI30zzyNc8JTHTiuw2OcwRVDmMGqdpErwlTB9Px7Vof9sTVYqxaSOwM7q6KIbu2JAl5hn4
-	JrtsRKg==
-X-Google-Smtp-Source: AGHT+IHqGFGS6LAIDF1DwPZvkOWcGq1Um8q0uNPgRXMhHrxgju2ZXystVmcBRs3crGdS6VopTdlgO395eMw=
-X-Received: from pfaf9.prod.google.com ([2002:a05:6a00:a119:b0:7dd:8bba:639d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4089:b0:7e8:43f5:bd28
- with SMTP id d2e1a72fcca58-81b7fdc968fmr3065457b3a.61.1767801295223; Wed, 07
- Jan 2026 07:54:55 -0800 (PST)
-Date: Wed, 7 Jan 2026 07:54:53 -0800
-In-Reply-To: <20260105074814.GA10215@k08j02272.eu95sqa>
+        d=1e100.net; s=20230601; t=1767801653; x=1768406453;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ftSoJlbCa6MOGNHtdz3xW3rHVknPRmwRfQPP71m23p0=;
+        b=pQs/MrhNaQ1U+nNgMo8cFXR3Ny23wWMN/orMhm8WVhwfSi1KrsKpk9nXyFv7RZaga/
+         SodCtzY3hONGiEBrniBnTaFxcB15WtuZqU+Ts5Z7mDpYPvealr4TB3ModFtLRsxwc08u
+         9yZ31kWw7DpS8s7nWR9aLm+JFFrYbiQfH9bupvvm9IpRi6HHg0VQAyoZ36Za2Ikzn+mM
+         BzxiOKwdbSLnRtfaHNtqA1K9IgZ1Pross7lGees+kJhH1784avienGZHMcokdL9PXxjg
+         SrVaCdIKFdZdrMkbGzhBDaUkRdMZkgv/8ieVVPJfoge3YkURviuKeTar2tk0Acro4hny
+         1Bfg==
+X-Forwarded-Encrypted: i=1; AJvYcCV57ms49q4/QPL/cH8Mfy5ntjBwP4QkAU+sNipjmhdr67FXNyPD8x/8lD9opG2/8bIHRAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynqZoZsR+UyKojsLabusNBMZNn1z59CbRPIge2sbimkPsHf1qM
+	kr+vDMCG4qaPcT+AQ8U2mhQN7sxypFlWUSLgKCrXTNrq91osbD/rfiVEee85An10p+/rpM7y8zD
+	GGmXP
+X-Gm-Gg: AY/fxX6pJ4edGeR0YZoKTnideKOd2YBYwfsDKomHt/JMe+MOgHdev6AAcFxO9n1tnK+
+	2Aq7Mu04kcWuJ8ZAooAL05e+QcfL4w+J2eN1zwDo8fL/AxRfbbB5DlLFUFPUWiyEzOC15AJ31ph
+	kbiEg5+QedUFnISxjEWJKDLEi2JmAX5VcB1sTw7AFO2UBBVQR8gVRym6ARk4Bod6dFhBETMQetz
+	yz4xLdiedC94uKFrKyRUV8z7X7QA1IX8kOmD/ly/yvPEm2i6iOg5OFuS3aKYb0OogrsvSkftkZY
+	4jJoAxL8l6YnWzGugNnzs/vtaWeaE6Txmm/iGtpezNuvj4BaIwRniJoyYxRJnX2IZbDfo1/dCJk
+	nmTooMKzkmBHq+j31jQvg2F5sPv3fKOYr6OYw4/7JiSUxW2ydTHO5FuauK/6zNXC/9eObbjg1nr
+	zyEHerNC+rxRiKe6AuYb5sGhW4AiyLo0DdBjKD0bS2LxejTmldVe/0PtKdNNhtN3P2UuodEYEf2
+	UoAtw==
+X-Google-Smtp-Source: AGHT+IEsFTBclBHNaJgPLh58sVSxPObjQlXbE6JZhrOur9VbgMkz2k1BHIEIa/RCFDyuscOAoE/vIQ==
+X-Received: by 2002:a05:6214:411:b0:888:4930:7989 with SMTP id 6a1803df08f44-89083d0d91bmr44153996d6.36.1767801649963;
+        Wed, 07 Jan 2026 08:00:49 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8907725ffc7sm34937966d6.44.2026.01.07.08.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 08:00:49 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vdVxn-00000002CVI-0vE2;
+	Wed, 07 Jan 2026 12:00:47 -0400
+Date: Wed, 7 Jan 2026 12:00:47 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Alex Williamson <alex@shazbot.org>, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: types: reuse common =?utf-8?Q?phys=5Fv?=
+ =?utf-8?Q?ec_type_instead_of_DMABUF_open=E2=80=91coded?= variant
+Message-ID: <20260107160047.GB340082@ziepe.ca>
+References: <20260107-convert-to-pvec-v1-1-6e3ab8079708@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231107202002.667900-1-aghulati@google.com> <CAJhGHyBtis3SkNZP8RSX5nKFcnQ4qvUrfTMD2RPc+w+Rzf30Zw@mail.gmail.com>
- <ZWYtDGH5p4RpGYBw@google.com> <20260105074814.GA10215@k08j02272.eu95sqa>
-Message-ID: <aV6BzSbAjZJGJ-D5@google.com>
-Subject: Re: [RFC PATCH 00/14] Support multiple KVM modules on the same host
-From: Sean Christopherson <seanjc@google.com>
-To: Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Anish Ghulati <aghulati@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, hpa@zytor.com, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, peterz@infradead.org, paulmck@kernel.org, 
-	Mark Rutland <mark.rutland@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260107-convert-to-pvec-v1-1-6e3ab8079708@nvidia.com>
 
-On Mon, Jan 05, 2026, Hou Wenlong wrote:
-> Sorry for revisiting this topic after a long time. I haven't seen any
-> new updates regarding this topic/series, and I didn=E2=80=99t find any re=
-cent
-> activity on the GitHub repository. Is the multi-KVM topic still being
-> considered for upstreaming, or is there anything blocking this?
+On Wed, Jan 07, 2026 at 11:14:14AM +0200, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> After commit fcf463b92a08 ("types: move phys_vec definition to common header"),
+> we can use the shared phys_vec type instead of the DMABUF‑specific
+> dma_buf_phys_vec, which duplicated the same structure and semantics.
+> 
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+> Alex,
+> 
+> According to diffstat, VFIO is the subsystem with the largest set of changes,
+> so it would be great if you could take it through your tree.
+> 
+> The series is based on the for-7.0/blk-pvec shared branch from Jens:
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=for-7.0/blk-pvec
 
-We have abandoned upstreaming multi-KVM.  The operational cost+complexity i=
-s too
-high relative to the benefits, especially when factoring in things like ASI=
- and
-live patching, and the benefits are almost entirely obsoleted by kernel liv=
-e update
-support.
+Great!
 
-> As Lai pointed out, we also have a similar multi-KVM implementation in
-> our internal environment, so we are quite interested in this topic.
-> Recently, when we upgraded our kernel version, we found that maintaining
-> multi-KVM has become a significant burden.
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Yeah, I can imagine the pain all too well.  :-/
-
-> We are willing to move forward with it if multi-KVM is still accepted for
-> upstream. So I look forward to feedback from the maintainers.
->
-> From what I've seen, the recent patch set that enables VMX/SVM during
-> booting is a good starting point for multi-KVM as well.
-
-I have mixed feelings on multi-KVM.  Without considering maintenance and su=
-pport
-costs, I still love the idea of reworking the kernel to support running mul=
-tiple
-hypervisors concurrently.  But as I explained in the first cover letter of =
-that
-series[0], there is a massive amount of complexity, both in initial develop=
-ment
-and ongoing maintenance, needed to provide such infrastructure:
-
- : I got quite far long on rebasing some internal patches we have to extrac=
-t the
- : core virtualization bits out of KVM x86, but as I paged back in all of t=
-he
- : things we had punted on (because they were waaay out of scope for our ne=
-eds),
- : I realized more and more that providing truly generic virtualization
- : instrastructure is vastly different than providing infrastructure that c=
-an be
- : shared by multiple instances of KVM (or things very similar to KVM)[1].
- :
- : So while I still don't want to blindly do VMXON, I also think that tryin=
-g to
- : actually support another in-tree hypervisor, without an imminent user to=
- drive
- : the development, is a waste of resources, and would saddle KVM with a pi=
-le of
- : pointless complexity.
-
-For deployment to a relatively homogeneous fleet, many of the pain points c=
-an be
-avoided by either avoiding them entirely or making the settings "inflexible=
-",
-because there is effectively one use case and so such caveats are a non-iss=
-ue.
-But those types of simplifications don't work upstream, e.g. saying "eVMCS =
-is
-unsupported if multi-KVM is possible" instead of moving eVMCS enabling to a=
- base
-module isn't acceptable.
-
-So I guess my "official" stance is that I'm not opposed to upstreaming mult=
-i-KVM
-(or similar) functionality, but I'm not exactly in favor of it either.  And
-practically speaking, because multi-KVM would be in constant conflict with =
-so
-much ongoing/new feature support (both in software and hardware), and is no=
-t a
-priority for anyone pursuing kernel live update, upstreaming would be likel=
-y take
-several years, without any guarantee of a successful landing.
-
-[0] https://lore.kernel.org/all/20251010220403.987927-1-seanjc@google.com
-[1] https://lore.kernel.org/all/aOl5EutrdL_OlVOO@google.com
+Jason
 
