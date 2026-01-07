@@ -1,392 +1,189 @@
-Return-Path: <kvm+bounces-67304-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41686D006D9
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 00:54:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D468D0071B
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 01:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D8AB3021E68
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 23:54:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AED97301F24D
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 00:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F8B2FB997;
-	Wed,  7 Jan 2026 23:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69D014A91;
+	Thu,  8 Jan 2026 00:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2MdhBfbf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aktech.ai header.i=@aktech.ai header.b="gBNLDn1U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta40.uswest2.a.cloudfilter.net (omta40.uswest2.a.cloudfilter.net [35.89.44.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E5E2E5B2A
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 23:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E8417D2
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 00:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767830058; cv=none; b=aSj2igUSmMxlR0YyE76vdiVb5r0NzVX59B7LRAZx0vITgU7498yIU3eXNnFm/GkwC0ukOQKF76D9BskNaSLV62fG4YGZI3+IZ9aVRhN0LUeem7mgnhWjDTEs1cZ7mTbprBNWRtgMptdIrg/7vGFBwzSKZlunIG2cUbkeQIcYIoM=
+	t=1767830551; cv=none; b=UUb0r5fOibtIsU1jhEXWrfdI6EQmC5+RUd9xEc+kmcQI7O6yiGfdg411TBZWBjMzbAErBeWBGFTeTi+SdqmxcVQDvx82WQXxayE8s+gH6MJdEYvHJPbnCAkPW7rW/pXzxwWGzjgaAGUMivCFRMhb1iOgV4zIa75AY6i/AW81XeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767830058; c=relaxed/simple;
-	bh=ICALGn8vcw8bQW0xjrb8HjiRlf1c4iAtTgfas4yBR/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aZTSR7iPv8GjilZYoYcE//MAzVY8PK5vDXb6WyobZdTtpihefdZqSmf6YgApTtFSqto50ahO1a2cwE6m0gm8EhKdiJsgRfqVYvpSsADuJi+HBisIuTIBblJ5cTFqjda0sYqgT/QyAJqnpZE57d0N7NF1pZy0jiXBM5kD/2rny7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2MdhBfbf; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a0bae9aca3so20158635ad.3
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 15:54:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767830056; x=1768434856; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ySZ01fmSHqAK0CB2Cg5tV4LxH3qFgdbOtBP7ijT7ack=;
-        b=2MdhBfbfQJHmdTUNiEmdoWWNW1InGMMj2v4kHHOpzvFuUfuL3LlyW4OgAZbRnFgidB
-         sxAW6MmuieMfGAM7lnCjB7+zoiX/MACXegb8HNZ2kHs+xbk7GgC7XBRXdZH+2trUPPWn
-         cpdqiYOU95Cpar61aMev9kerhlq/eWOMnw1OejFiPV2XBEOiKgc8BE/NO1coGOm6QC3/
-         FzNuWNlccuck9FtbAc+bW3epj63bHHtvvLMctvj4V7/XtdewP3O2couqs3R6S/97UIDp
-         ZQmvnDInm8WVL9f6ntMTd71W8RBe9jQ4UO3DyGJ8h1/39TcnXcvO6CRzR31/ICORYKIQ
-         gffQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767830056; x=1768434856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ySZ01fmSHqAK0CB2Cg5tV4LxH3qFgdbOtBP7ijT7ack=;
-        b=Z7OgVTn+sHDczpmucpsDHYBf0E2uxoHsm19zKjvrphIe5oc+BFTIeeiMqlCJuXOXVI
-         kuzpXDdXp1lVx44YBRQjcNZxM86YWZ17xpCTVNOltAb1Z8VCT/Xb0EOyvn/oLyTFJBwe
-         uzJMS6rhgzawLsdisjkE/9TjwleRp2Pgy5ux32WxZnHZbYVN2LCNpPPl/FpWHr4D7LYc
-         Gg57VgiKamxsv7DAf0vKFfNVaZCR9zjomoKXyMxv7SjkUWKuIyTVPeQM71JIj5Dk0WOO
-         J1jLTAIv5byW28KGTfF1uc9uMLQAPKQqdrftYhWBQzIeYSwEZs5q0WK/wvaY78WRLT7I
-         GYbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXstajaPPtSwo/xxv0kcrz+uMB3frLTZ2MVdyiyEqmGhYzbWOWOmo7DvJJtnY17jR0ZNMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD+V/JIJaWomKjagW4JxqdZx9egFU8OOJ8T2urlsCEFLij6cAl
-	4hU+Wsl4h5qvlOtQfs4+eNRyqBCIr6t3ixltEt1XHkqiuX+50SJH0p2DeNiVX9VKHA==
-X-Gm-Gg: AY/fxX61XJhnqavsKoXQbPT01zY+ku91A1pj865jesIpoqgMNbTie9aKVINM10Bt4iM
-	KBC+J9hkBkCfuB7BLoaEe49jjHgJcDlgn+G/4f2Y9OH2+1vYeg3kI1grSa8bHvUjv5JxuMSBIt6
-	cX85DzeUPg6FpM9EVkPf/Lk7DbWVs4rgTz4tI259UcgDyusKjMUIRX3D8AyJoesFolNKl2ArwEI
-	c/wslWAzmR2TNjQ2ncLUQVjXv/HAiKJ2OpFxrJnazFZIysZxTRngynsqr/1mSgnD6T1sdRZJK8V
-	0OlpoTMJejbkkBmOF7K44uiaiAFfed7RruL4Ul7ElPz8xtBJXu9YhyFX+ZGn+Hv0YrnG5lbfiqm
-	kvFAh8IRQ0DRg4CgxR3NDQxx1M10soEJDkVAKZAVrnX5qwzoLuPNA1KCYaPxBFkfNbmk8kDaWAh
-	DZRkab4mUBHlLzuJq92fjUEFE/XN5a/+c0yEJ5MlAzr1m+D8DO6B7qIjw=
-X-Google-Smtp-Source: AGHT+IGch0PlHObY0efSSUD/tVh1KuSzHqI3VK9Lhx0iVnekPlP49beSoS60rmHylK8nGPNWIHd50A==
-X-Received: by 2002:a17:902:c402:b0:2a0:97d2:a265 with SMTP id d9443c01a7336-2a3ee452277mr34955055ad.14.1767830055433;
-        Wed, 07 Jan 2026 15:54:15 -0800 (PST)
-Received: from google.com (76.9.127.34.bc.googleusercontent.com. [34.127.9.76])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3c4795fsm60921265ad.33.2026.01.07.15.54.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 15:54:14 -0800 (PST)
-Date: Wed, 7 Jan 2026 23:54:09 +0000
-From: David Matlack <dmatlack@google.com>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>,
-	Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <aV7yIchrL3mzNyFO@google.com>
-References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
+	s=arc-20240116; t=1767830551; c=relaxed/simple;
+	bh=+w41y8Tz8w9/9/nF3eU1DZysk8XR8ErFcNeDDOt1Lrc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XMarpk/B5LpOJcY3y1Pv0MTnyeiQLmV25fjWEVgkV1NhglCm+hwqHW62HrBOrg9oJxon4L4ELm17zKogPCSIf4hjEcsBgFUxHylRhmxZRS2X1YV650/ToEmR2i6chqNVD0lrB2HOjsTA6CxtvZ9eQEq8nMxHYn41daUtB1vIOJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aktech.ai; spf=pass smtp.mailfrom=aktech.ai; dkim=pass (2048-bit key) header.d=aktech.ai header.i=@aktech.ai header.b=gBNLDn1U; arc=none smtp.client-ip=35.89.44.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aktech.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aktech.ai
+Received: from eig-obgw-6005b.ext.cloudfilter.net ([10.0.30.162])
+	by cmsmtp with ESMTPS
+	id dbYHvlWTJaPqLddSPvYyQm; Thu, 08 Jan 2026 00:00:53 +0000
+Received: from gator4203.hostgator.com ([108.167.189.28])
+	by cmsmtp with ESMTPS
+	id ddSNvW1kwHSQMddSOvboAK; Thu, 08 Jan 2026 00:00:52 +0000
+X-Authority-Analysis: v=2.4 cv=GIQIEvNK c=1 sm=1 tr=0 ts=695ef3b4
+ a=fpD4kzfX7W8RbeKAuMGPiQ==:117 a=fpD4kzfX7W8RbeKAuMGPiQ==:17
+ a=vUbySO9Y5rIA:10 a=HaeQS5oA3WMA:10 a=NEAV23lmAAAA:8 a=BJ0xTQfxP1RxAdNP3ZIA:9
+ a=tGAC0SnQRR4URLD-nMig:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aktech.ai;
+	s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=dqJ2Bt1+she4cViQWpGTAkmj5/+WSmqyhIQIHbod5T4=; b=gBNLDn1UmlsfhqGMPGNZkVnKRT
+	gStY+FSn7tDuSz1Ej6ysrf17UWaCSVMN1uAUnRsjelUdKAYpGhJ5+GDrkzouDUA6f27tcxNHI23Bm
+	i/JuDaxk9yG2LYAyKCF3M+ALZoMhyQgBzHJ3lDeN1LMwqZGSYL2XpxgKAJrsWOFb3eY8IBTcTaaNI
+	STwUK3y5D/9SuEXMjCAZiiynJxuMJYuPNATPieullEGRQcF7/EO7SxUyj3ah84aJ1WcUkXvTh6vHU
+	BiKjwaS9FCidLeNtz69ydRpR1lSwu42QXW3U8ymlfnHUg+89QgchPhXlP6+mBOKuEdI2D+tqoJe04
+	v+YAyFVA==;
+Received: from fctnnbsc51w-159-2-155-244.dhcp-dynamic.fibreop.nb.bellaliant.net ([159.2.155.244]:49568 helo=owner-linux.home)
+	by gator4203.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.99.1)
+	(envelope-from <aidan@aktech.ai>)
+	id 1vddSN-00000003d8m-1TYD;
+	Wed, 07 Jan 2026 18:00:51 -0600
+From: Aidan Khoury <aidan@aktech.ai>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Aidan Khoury <aidan@revers.engineering>,
+	Nick Peterson <everdox@gmail.com>,
+	Aidan Khoury <aidan@aktech.ai>
+Subject: [PATCH v1 0/1] KVM: x86: Merge pending debug causes when vectoring #DB
+Date: Wed,  7 Jan 2026 19:57:23 -0400
+Message-ID: <20260107235724.28101-1-aidan@aktech.ai>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4203.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - aktech.ai
+X-BWhitelist: no
+X-Source-IP: 159.2.155.244
+X-Source-L: No
+X-Exim-ID: 1vddSN-00000003d8m-1TYD
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: fctnnbsc51w-159-2-155-244.dhcp-dynamic.fibreop.nb.bellaliant.net (owner-linux.home) [159.2.155.244]:49568
+X-Source-Auth: aidan@aktech.ai
+X-Email-Count: 11
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: YWt0ZWNoYWk7YWt0ZWNoYWk7Z2F0b3I0MjAzLmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfB/qcCCFmOq5utWG7NZLxsNKFmFeTh7MkktrIWDBt8qdaGda3RrvD7QRLcaZ6fqKIrE4qNe5p6NtGEcaqxurBLQFxSa2CiYDtMxZWTqB0pGq96vvOccS
+ a45dyxaJC16cieYlsj8kd64bKsjhIJZEpLhzmTAdSa9lkaLfp8l1fY9vTe/JxJueWR/6MY0U8dcVZJV8Eu8Nm8z1wydYGZ9yaqU=
 
-On 2026-01-07 02:13 PM, Alex Mastro wrote:
-> Test MMIO-backed DMA mappings by iommu_map()-ing mmap'ed BAR regions.
+This is a single patch that fixes incorrect guest DR6 contents when KVM
+vectors #DB on Intel VMX in the presence of deferred debug causes recorded
+in VMCS.GUEST_PENDING_DBG_EXCEPTIONS.
 
-Thanks for adding this!
+See Intel SDM Vol. 3C, 27.3.1.5 Checks on Guest Non-Register State
+and Intel SDM Vol. 3C, 27.7.3 Delivery of Pending Debug Exceptions after VM Entry
 
-> Also update vfio_pci_bar_map() to align BAR mmaps for efficient huge
-> page mappings.
-> 
-> Only vfio_type1 variants are tested; iommufd variants can be added
-> once kernel support lands.
+Intel VMX defers certain debug exception causes in the VMCS field
+GUEST_PENDING_DBG_EXCEPTIONS (B0-B3, enabled breakpoint, BS, RTM). This
+state is used when debug exceptions are suppressed due to interrupt
+shadow (e.g. MOV SS/POP SS or STI), and the deferred causes are later
+combined with other debug reasons when #DB is ultimately delivered.
 
-Are there plans to support mapping BARs via virtual address in iommufd?
-I thought the plan was only to support via dma-bufs. Maybe Jason can
-confirm.
+KVM may vector an in-kernel #DB after a VM-exit and/or instruction
+emulation. A concrete example is a guest that:
 
-Assuming not, should we add negative tests here to make sure iommufd
-does not allow mapping BARs?
+  - programs a data breakpoint (B0) on an operand used by MOV SS
+  - enables single-step (RFLAGS.TF)
+  - executes MOV SS (data breakpoint triggers, #DB is suppressed)
+  - executes an instruction that VM-exits and is emulated (e.g. CPUID),
+    or executes ICEBP/INT1 which is intercepted as #DB
 
-And then we can add dma-buf tests in a future commit.
+On bare metal, guest DR6 reports the combined reasons (e.g. BS+B0). In
+KVM/VMX, the deferred breakpoint cause is recorded in
+GUEST_PENDING_DBG_EXCEPTIONS while KVM generates a #DB for single-step,
+but the queued #DB payload delivered to guest DR6 can omit the pending
+causes. This results in guest DR6 missing B0-B3 even though the CPU
+would report them.
 
-> The manual mmap alignment can be removed
-> once mmap(!MAP_FIXED) on vfio device fds improves to automatically
-> return well-aligned addresses.
-> 
-> Signed-off-by: Alex Mastro <amastro@fb.com>
-> ---
-> Sanity test run:
-> 
-> $ ./vfio_dma_mapping_mmio_test 0000:05:00.0
-> TAP version 13
-> 1..4
-> # Starting 4 tests from 2 test cases.
-> #  RUN           vfio_dma_mapping_mmio_test.vfio_type1_iommu.map_full_bar ...
-> Mapping BAR4: vaddr=0x7fad40000000 size=0x2000000000 iova=0x2000000000
-> #            OK  vfio_dma_mapping_mmio_test.vfio_type1_iommu.map_full_bar
-> ok 1 vfio_dma_mapping_mmio_test.vfio_type1_iommu.map_full_bar
-> #  RUN           vfio_dma_mapping_mmio_test.vfio_type1_iommu.map_partial_bar ...
-> Mapping BAR4 (partial): vaddr=0x7fad40000000 size=0x1000 iova=0x0
-> #            OK  vfio_dma_mapping_mmio_test.vfio_type1_iommu.map_partial_bar
-> ok 2 vfio_dma_mapping_mmio_test.vfio_type1_iommu.map_partial_bar
-> #  RUN           vfio_dma_mapping_mmio_test.vfio_type1v2_iommu.map_full_bar ...
-> Mapping BAR4: vaddr=0x7fad40000000 size=0x2000000000 iova=0x2000000000
-> #            OK  vfio_dma_mapping_mmio_test.vfio_type1v2_iommu.map_full_bar
-> ok 3 vfio_dma_mapping_mmio_test.vfio_type1v2_iommu.map_full_bar
-> #  RUN           vfio_dma_mapping_mmio_test.vfio_type1v2_iommu.map_partial_bar ...
-> Mapping BAR4 (partial): vaddr=0x7fad40000000 size=0x1000 iova=0x0
-> #            OK  vfio_dma_mapping_mmio_test.vfio_type1v2_iommu.map_partial_bar
-> ok 4 vfio_dma_mapping_mmio_test.vfio_type1v2_iommu.map_partial_bar
-> # PASSED: 4 / 4 tests passed.
-> # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> ---
->  tools/testing/selftests/vfio/Makefile              |   1 +
->  tools/testing/selftests/vfio/lib/vfio_pci_device.c |  28 ++++-
->  .../selftests/vfio/vfio_dma_mapping_mmio_test.c    | 132 +++++++++++++++++++++
->  3 files changed, 160 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
-> index 3c796ca99a50..ead27892ab65 100644
-> --- a/tools/testing/selftests/vfio/Makefile
-> +++ b/tools/testing/selftests/vfio/Makefile
-> @@ -1,5 +1,6 @@
->  CFLAGS = $(KHDR_INCLUDES)
->  TEST_GEN_PROGS += vfio_dma_mapping_test
-> +TEST_GEN_PROGS += vfio_dma_mapping_mmio_test
->  TEST_GEN_PROGS += vfio_iommufd_setup_test
->  TEST_GEN_PROGS += vfio_pci_device_test
->  TEST_GEN_PROGS += vfio_pci_device_init_perf_test
-> diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> index 13fdb4b0b10f..6f29543856a5 100644
-> --- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> +++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-> @@ -12,10 +12,13 @@
->  #include <sys/mman.h>
->  
->  #include <uapi/linux/types.h>
-> +#include <linux/align.h>
->  #include <linux/iommufd.h>
-> +#include <linux/kernel.h>
->  #include <linux/limits.h>
->  #include <linux/mman.h>
->  #include <linux/overflow.h>
-> +#include <linux/sizes.h>
->  #include <linux/types.h>
->  #include <linux/vfio.h>
->  
-> @@ -124,20 +127,43 @@ static void vfio_pci_region_get(struct vfio_pci_device *device, int index,
->  static void vfio_pci_bar_map(struct vfio_pci_device *device, int index)
->  {
->  	struct vfio_pci_bar *bar = &device->bars[index];
-> +	size_t align, size;
-> +	void *map_base, *map_align;
->  	int prot = 0;
->  
->  	VFIO_ASSERT_LT(index, PCI_STD_NUM_BARS);
->  	VFIO_ASSERT_NULL(bar->vaddr);
->  	VFIO_ASSERT_TRUE(bar->info.flags & VFIO_REGION_INFO_FLAG_MMAP);
-> +	VFIO_ASSERT_GT(bar->info.size, 0);
->  
->  	if (bar->info.flags & VFIO_REGION_INFO_FLAG_READ)
->  		prot |= PROT_READ;
->  	if (bar->info.flags & VFIO_REGION_INFO_FLAG_WRITE)
->  		prot |= PROT_WRITE;
->  
-> -	bar->vaddr = mmap(NULL, bar->info.size, prot, MAP_FILE | MAP_SHARED,
-> +	/*
-> +	 * Align the mmap for more efficient IOMMU mapping.
-> +	 * The largest PUD size supporting huge pfnmap is 1GiB.
-> +	 */
-> +	size = bar->info.size;
-> +	align = min_t(u64, 1ULL << __builtin_ctzll(size), SZ_1G);
+Fix this by merging pending causes from GUEST_PENDING_DBG_EXCEPTIONS into
+the #DB payload when delivering the exception payload to guest state.
+The merge is performed in kvm_deliver_exception_payload() so it applies
+to both the normal injection path and the !guest_mode path where the
+payload may be consumed immediately by kvm_multiple_exception().
 
-What's the reason to align to 1ULL << __builtin_ctzll(size) and not just
-size?
+To keep x86 core code vendor-agnostic, add an optional x86 op
+get_pending_dbg_exceptions() that returns the relevant pending-debug
+bits for the active vendor. VMX implements the hook by reading
+VMCS.GUEST_PENDING_DBG_EXCEPTIONS and masking to architecturally defined
+bits; other vendors return 0.
 
-> +
-> +	map_base = mmap(NULL, size + align, PROT_NONE,
-> +			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-> +	VFIO_ASSERT_NE(map_base, MAP_FAILED);
-> +
-> +	map_align = (void *)ALIGN((uintptr_t)map_base, align);
-> +
-> +	if (map_align > map_base)
-> +		munmap(map_base, map_align - map_base);
-> +	if (align > (size_t)(map_align - map_base))
-> +		munmap(map_align + size, align - (map_align - map_base));
-> +
-> +	bar->vaddr = mmap(map_align, size, prot, MAP_SHARED | MAP_FIXED,
->  			  device->fd, bar->info.offset);
->  	VFIO_ASSERT_NE(bar->vaddr, MAP_FAILED);
-> +
-> +	madvise(bar->vaddr, size, MADV_HUGEPAGE);
->  }
+After this change, guests observe all accumulated #DB causes in DR6 when
+#DB is vectored, matching bare-metal behavior.
 
-Can you split these changes out into a precursor commit? I think they
-stand on their own.
+Tested on Intel host with KVM/VMX enabled by running the tiny repro asm below
+inside a Windows guest. On bare metal, DR6 reports both BS and B0. Under KVM/VMX
+without this patch, DR6 may report BS but miss B0.
 
->  
->  static void vfio_pci_bar_unmap(struct vfio_pci_device *device, int index)
-> diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c
-> new file mode 100644
-> index 000000000000..211fa4203b49
-> --- /dev/null
-> +++ b/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c
-> @@ -0,0 +1,132 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +#include <stdio.h>
-> +#include <sys/mman.h>
-> +#include <unistd.h>
-> +
-> +#include <uapi/linux/types.h>
-> +#include <linux/pci_regs.h>
-> +#include <linux/sizes.h>
-> +#include <linux/vfio.h>
-> +
-> +#include <libvfio.h>
-> +
-> +#include "../kselftest_harness.h"
-> +
-> +static const char *device_bdf;
-> +
-> +static int largest_mapped_bar(struct vfio_pci_device *device)
-> +{
-> +	int bar_idx = -1;
-> +	u64 bar_size = 0;
-> +
-> +	for (int i = 0; i < PCI_STD_NUM_BARS; i++) {
-> +		struct vfio_pci_bar *bar = &device->bars[i];
-> +
-> +		if (!bar->vaddr)
-> +			continue;
-> +
-> +		if (!(bar->info.flags & VFIO_REGION_INFO_FLAG_WRITE))
-> +			continue;
+A minimal reproducer in the guest:
+  - use ptrace (or veh+SetThreadContext on windows) for handling #DB traps and managing DRs
+  - Prime DR0 and DR7 to a memory operand used by MOV SS (data breakpoint, enabled)
+  - execute MOV SS from that memory operand (breakpoint met, delivery suppressed)
+  - execute CPUID (emulated) or ICEBP/INT1 (intercepted)
+  - In the #DB handler, read DR6 to observe the reported causes
 
-nit: Add a comment here. I assume this is because iommu_map() tries to
-create writable IOMMU mappings?
+```
+__asm__ __volatile__(
+	"pushq %%rbx\n"
+	"pushfq\n"
+	"orl $0x100, (%%rsp)\n"    /* set TF in saved RFLAGS on stack */
+	"popfq\n"
+	"movw (%0), %%ss\n"        /* load SS from probe page */
+	"cpuid\n"                  /* trigger intercepting instruction (cpuid in this case) */
+	"popq %%rbx\n"             /* #DB fires here with DR6 missing B0 under KVM/VMX pre-patch */
+	: : "r"(&ss_probe) : "rax", "rcx", "rdx", "memory"
+);
+```
 
-Speaking of, maybe we can add a test that creating writable IOMMU
-mappings fails for read-only BARs?
+Reproducer PoC: https://github.com/ajkhoury/kvm-guest-anomalies
 
-> +
-> +		if (bar->info.size > bar_size) {
-> +			bar_size = bar->info.size;
-> +			bar_idx = i;
-> +		}
-> +	}
-> +
-> +	return bar_idx;
-> +}
-> +
-> +FIXTURE(vfio_dma_mapping_mmio_test) {
-> +	struct iommu *iommu;
-> +	struct vfio_pci_device *device;
-> +	struct iova_allocator *iova_allocator;
-> +	int bar_idx;
-> +};
-> +
-> +FIXTURE_VARIANT(vfio_dma_mapping_mmio_test) {
-> +	const char *iommu_mode;
-> +};
-> +
-> +#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode)			       \
-> +FIXTURE_VARIANT_ADD(vfio_dma_mapping_mmio_test, _iommu_mode) {	       \
-> +	.iommu_mode = #_iommu_mode,					       \
-> +}
+Aidan Khoury (1):
+  KVM: x86: Merge pending debug causes when vectoring #DB
 
-nit: Alignment of trailing backslashes is off.
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/kvm/vmx/main.c            |  9 +++++++++
+ arch/x86/kvm/vmx/vmx.c             | 16 +++++++++++-----
+ arch/x86/kvm/vmx/x86_ops.h         |  1 +
+ arch/x86/kvm/x86.c                 | 12 ++++++++++++
+ 6 files changed, 35 insertions(+), 5 deletions(-)
 
-> +
-> +FIXTURE_VARIANT_ADD_IOMMU_MODE(vfio_type1_iommu);
-> +FIXTURE_VARIANT_ADD_IOMMU_MODE(vfio_type1v2_iommu);
-> +
-> +#undef FIXTURE_VARIANT_ADD_IOMMU_MODE
-> +
-> +FIXTURE_SETUP(vfio_dma_mapping_mmio_test)
-> +{
-> +	self->iommu = iommu_init(variant->iommu_mode);
-> +	self->device = vfio_pci_device_init(device_bdf, self->iommu);
-> +	self->iova_allocator = iova_allocator_init(self->iommu);
-> +	self->bar_idx = largest_mapped_bar(self->device);
-> +}
-> +
-> +FIXTURE_TEARDOWN(vfio_dma_mapping_mmio_test)
-> +{
-> +	iova_allocator_cleanup(self->iova_allocator);
-> +	vfio_pci_device_cleanup(self->device);
-> +	iommu_cleanup(self->iommu);
-> +}
-> +
-> +TEST_F(vfio_dma_mapping_mmio_test, map_full_bar)
-> +{
-> +	struct vfio_pci_bar *bar;
-> +	struct dma_region region;
-> +
-> +	if (self->bar_idx < 0)
-> +		SKIP(return, "No mappable BAR found on device %s", device_bdf);
+-- 
+2.43.0
 
-I think you can do this in the FIXTURE_SETUP() to avoid duplication.
-
-> +
-> +	bar = &self->device->bars[self->bar_idx];
-> +
-> +	region = (struct dma_region) {
-> +		.vaddr = bar->vaddr,
-> +		.size = bar->info.size,
-> +		.iova = iova_allocator_alloc(self->iova_allocator, bar->info.size),
-> +	};
-> +
-> +	printf("Mapping BAR%d: vaddr=%p size=0x%lx iova=0x%lx\n",
-> +	       self->bar_idx, region.vaddr, region.size, region.iova);
-> +
-> +	iommu_map(self->iommu, &region);
-> +	iommu_unmap(self->iommu, &region);
-> +}
-> +
-> +TEST_F(vfio_dma_mapping_mmio_test, map_partial_bar)
-> +{
-> +	struct vfio_pci_bar *bar;
-> +	struct dma_region region;
-> +	size_t page_size;
-> +
-> +	if (self->bar_idx < 0)
-> +		SKIP(return, "No mappable BAR found on device %s", device_bdf);
-> +
-> +	bar = &self->device->bars[self->bar_idx];
-> +	page_size = getpagesize();
-> +
-> +	if (bar->info.size < 2 * page_size)
-> +		SKIP(return, "BAR%d too small for partial mapping test (size=0x%llx)",
-> +		     self->bar_idx, bar->info.size);
-> +
-> +	region = (struct dma_region) {
-> +		.vaddr = bar->vaddr,
-> +		.size = page_size,
-> +		.iova = iova_allocator_alloc(self->iova_allocator, page_size),
-> +	};
-> +
-> +	printf("Mapping BAR%d (partial): vaddr=%p size=0x%lx iova=0x%lx\n",
-> +	       self->bar_idx, region.vaddr, region.size, region.iova);
-> +
-> +	iommu_map(self->iommu, &region);
-> +	iommu_unmap(self->iommu, &region);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	device_bdf = vfio_selftests_get_bdf(&argc, argv);
-> +	return test_harness_run(argc, argv);
-> +}
-> 
-> ---
-> base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
-> change-id: 20260107-scratch-amastro-vfio-dma-mapping-mmio-test-eecf25d9a742
-> 
-> Best regards,
-> -- 
-> Alex Mastro <amastro@fb.com>
-> 
 
