@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-67267-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E4DCFFF5A
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 21:18:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75FD9CFFF63
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 21:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 616D03009210
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 20:18:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6F0E93004EC5
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 20:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F43833A6FE;
-	Wed,  7 Jan 2026 20:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464C133A6E0;
+	Wed,  7 Jan 2026 20:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fEI3bV+h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aIoRH2Wj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802AE3396F8
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 20:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED1332938C
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 20:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767817091; cv=none; b=hLfrRq++nMCLBA+t6tNqSuEQmNMn3vLIog7Viuf+nHTalmIQKtTTQnUFZnhqBUlACFAfRE0ZE6nKLzM+G7iALNsKFTPJe9YYZxVs4CsMPgRReBiDDlRWWtr/ApY8cAo5JypHFOs8e4C2K3R9Ox9wtLu4zngJeQBB4v4o3H55ZZs=
+	t=1767817090; cv=none; b=PctVcIVO3g2Zc4lkQ8+GDLjqVKmHyBwf3IwjjZ7pXRXXtYtNPx6HPSJua2mTQKthmvYrNkTzoy1AMF3upRvoS5IefzKr+P3JdhCnNgAEcW8nPE4dW59DLAnR4KT1u9kXmT+MStoFfcmswTuI+MH/S/l8Hw5WFh+ut6pd0xQ8NlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767817091; c=relaxed/simple;
-	bh=hUn7TlBmNUdymtQg3Kq9wRTksnPrB1glAZZeGAPR86s=;
+	s=arc-20240116; t=1767817090; c=relaxed/simple;
+	bh=4Pd02XCOO1b0RU5MmE2Uwo/GFJB5CoMMUmyDrSB5Hn0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mx2CiC26OPu4YmVK+gAiHf1kcQkl82QYXl9bY6kPqzELRA/OdshpmIrs54jdPvGZvkKABtDEiLU9Kz0/mpGixeSiWmCIOa6kaov/ZiPR4GNNRTD9r3DQ9+akH29KtQuNXswTsYeZvFiufJIJxwAAcyPP2LGkL8u+4QrN9i01F8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fEI3bV+h; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=SH8RrsKm9E8EuTCDzM8tdvclTFfDYOkMk8KaxVKGqWoQGweREEG2a/erjrQ5R79Q/0E93MdrwaFb92Wpal6ty5fYqjcZcleR2anTImQm0AsWvoP3FierXR6eSQE/dBXjAwMZV+ynv/Q+5xrW7I/AFnY5Yf1Mze61jx0I6OcXh1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aIoRH2Wj; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c387d3eb6so2156148a91.2
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 12:18:07 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a09845b7faso23943075ad.3
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 12:18:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767817087; x=1768421887; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767817088; x=1768421888; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zK+/AslzkBPlSJC8UvJQiRH9fqye6KU8Yh2AdIhmFE=;
-        b=fEI3bV+hXrU7ePKTI4LcQQozaMA6JOZr6r/H7QyUz7TuPHk0M+wHIDNkq1+xqBE8pM
-         q8XcF3LVV4rLtaH8FurPuaKcO5rK6qMGXkWdPFiTX74a/UudA3GxG25FA0ViCUC8MEuw
-         tAzI2zWY0LIL6UjW+YL0tBIrkP7GoArngvEdHpJ/CoQXwZjD2nSgohd8bdQ8lxH2dkGg
-         EGRiBw60udedDyOGzjeB7FfKPxIKtnK8XPhIi22fhCaktuozv6hsyxN73TjQGltncZle
-         V3SPrRslTGhoIPlPNRowUR8tnvkCCEu1PAOvb85iqPDM39Bwng7N7S1Ww+uX9DC73kNg
-         4wDQ==
+        bh=YbIgDevabE4WtwYsX6fHSQEhrlUTqPdnsQVPiMzIU6I=;
+        b=aIoRH2WjHIDGeXHNv5++w9KWHjf3ppnHYlnOJ9kv0WcX2PPirM8tAcwjmoxeNX/X7y
+         NxwSWoM23sNLaisokd/iriHBrGQMxV2QXf6BDsliSafO55MmGoIPIXsrqStwVIUj4QNX
+         lK+mwiYhzyEGKJmT6dANzzc8TT/yrtf0Kegi48hG2OZbLIgmgv2mgcfh9EhZtz4zeXXW
+         LfCmHHAHtGeyhFNewT53TNAlaEozzOSZd78QvaeITS0dgSvQCcGh/R6YIKYmct39pFGO
+         W7SENbrFD9iGt0eI5Q46biADU6vf1sH32LTxBXDuvLHzcuY/fIhcJI19xayR1fahJn1n
+         TKRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767817087; x=1768421887;
+        d=1e100.net; s=20230601; t=1767817088; x=1768421888;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zK+/AslzkBPlSJC8UvJQiRH9fqye6KU8Yh2AdIhmFE=;
-        b=O1XFt/YjsLo8v9jdrCnwcxIrJgsdVZl9U1fvj1Fu1QgFn6FLWU0cDxznBJ9tAPxbST
-         mw9HM9oOs7q4dfu/GsAPSBLDikW0mIyplZOYASdwUZtAxGzH398B9KRsbWatIUf/NJwm
-         GMuEonHqbwISI+6Egy1UavxIwgThs+auG/3uPNOzHOUGXh1uZIWe2Wnbr9Ma4XzwpmVn
-         E6JgQXAV0mZK0IzS3KaaWzNFDnUOYhuKF5VdawXWvyyCrhW1PgBj80Jm48kM97w/w/9W
-         1zHShvBTuW985XHa7AK0CuX2TFC8UO29AVUWtFAbSzNxqgtlGvKfeOmrlJ2yZ0W/JjCp
-         f1QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURLD9ZU0FpZWviE4rCL82M5Oni++fKt0RqhURH1q85DLVJbqcydX9Hro3b8nzNAI6YJLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnAoDDO+KOLPANShoPUSlAFbwQ3XTkv1ucaRMcSDFbh31s87Oi
-	zVQRKWIYybyquRAK37z4YGaYp4JvgER491xIbiuyKJUyjPGt1PAKz9whzL/epmyYuxuDg9GaIBH
-	gw16wqZObbMpuyA==
-X-Google-Smtp-Source: AGHT+IHThLlbeg0Bz0L6XHahvlrl4KT7b217LsvR54vbtTKdYnIle66+HnkOhYRBZx9jZcBHpKpDIq/Pi3rfmQ==
-X-Received: from pjbhl15.prod.google.com ([2002:a17:90b:134f:b0:34c:2778:11c5])
+        bh=YbIgDevabE4WtwYsX6fHSQEhrlUTqPdnsQVPiMzIU6I=;
+        b=v6K8m1orRfi5yelg6G/n/nCA2zzKi/Fp2j/mTG+t5EAO+81DMCmcvhigMd915uJQdX
+         fAa2g5WIo1m74ERvbEyZoau5X0vjYXmwqh1nrXInwJ/OYcI297ydEpFM/PRQtPltQt5f
+         cUp3QH2bNvHsGeutkEYzyjqJ4qgL/bFdIdSUZmXSmGWrCEW5Bf4twbGoW2ki6B88MvSP
+         BzP9ls0Er/Wn8DMDggQERaK2QyGacTb2AkigVWIA9Yjr7O4Ypmd01KANvZHrzZSacLSa
+         2aY/n6/ubit9jzXEq4TLGT7hr0HbKqF1BRHyEoq2ee4PP7b/oyIXgSKWBsC21UUKhCLD
+         P+dw==
+X-Forwarded-Encrypted: i=1; AJvYcCVHgCZwlkjLtvKLG8ZY0d8D+qL53QW5g5h9Xol8pDWKB09gvccTzmusuAgQnmVubkQFs1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8qe4yxgWzN+F7guKMdnZR1m8A9K0Bu/9TY8RCWtf4tD6x6ys8
+	x4A7lQkfky7i6o9pHljeoY05Hof6Wru018vLpW2ADSLGtjYfcDz6iAWygPiOFcM95nPSOY6EY0g
+	wGvE6j946NcnT0A==
+X-Google-Smtp-Source: AGHT+IE1DFCnmny/nHtC+I3vQMTODQGJxSrSd6kNwp+xLBMyWXqHQwoP9SAPWVjXbrVNZ0Jk6FS+jUxa+UC6xw==
+X-Received: from plyw19.prod.google.com ([2002:a17:902:d713:b0:2a0:f83c:bb4b])
  (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2642:b0:32b:9774:d340 with SMTP id 98e67ed59e1d1-34f68c47f38mr2755853a91.33.1767817086729;
- Wed, 07 Jan 2026 12:18:06 -0800 (PST)
-Date: Wed,  7 Jan 2026 20:17:59 +0000
+ 2002:a17:902:e391:b0:2a0:9d0f:b1ed with SMTP id d9443c01a7336-2a3ee45b3b5mr21123465ad.24.1767817088271;
+ Wed, 07 Jan 2026 12:18:08 -0800 (PST)
+Date: Wed,  7 Jan 2026 20:18:00 +0000
 In-Reply-To: <20260107201800.2486137-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,8 +72,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260107201800.2486137-1-skhawaja@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20260107201800.2486137-3-skhawaja@google.com>
-Subject: [PATCH 2/3] vfio: selftests: Add support of creating iommus from iommufd
+Message-ID: <20260107201800.2486137-4-skhawaja@google.com>
+Subject: [PATCH 3/3] vfio: selftests: Add iommufd hwpt replace test
 From: Samiullah Khawaja <skhawaja@google.com>
 To: David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
 	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
@@ -87,195 +87,187 @@ Cc: Samiullah Khawaja <skhawaja@google.com>, Robin Murphy <robin.murphy@arm.com>
 	Parav Pandit <parav@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add API to init a struct iommu using an already opened iommufd instance
-and attach devices to it.
+Add a test that does iommufd hwpt replace while a DMA is ongoing. This
+verifies the hitless replace of IOMMU domain without disrupting the DMA.
+
+Note that the new domain is attached after mapping the required DMA
+memory at the same IOVA in the new domain.
 
 Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 ---
- .../vfio/lib/include/libvfio/iommu.h          |  2 +
- .../lib/include/libvfio/vfio_pci_device.h     |  2 +
- tools/testing/selftests/vfio/lib/iommu.c      | 60 +++++++++++++++++--
- .../selftests/vfio/lib/vfio_pci_device.c      | 16 ++++-
- 4 files changed, 74 insertions(+), 6 deletions(-)
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../vfio/vfio_iommufd_hwpt_replace_test.c     | 151 ++++++++++++++++++
+ 2 files changed, 152 insertions(+)
+ create mode 100644 tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c
 
-diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h b/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
-index 5c9b9dc6d993..9e96da1e6fd3 100644
---- a/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
-+++ b/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
-@@ -29,10 +29,12 @@ struct iommu {
- 	int container_fd;
- 	int iommufd;
- 	u32 ioas_id;
-+	u32 hwpt_id;
- 	struct list_head dma_regions;
- };
- 
- struct iommu *iommu_init(const char *iommu_mode);
-+struct iommu *iommufd_iommu_init(int iommufd, u32 dev_id);
- void iommu_cleanup(struct iommu *iommu);
- 
- int __iommu_map(struct iommu *iommu, struct dma_region *region);
-diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-index 2858885a89bb..1143ceb6a9b8 100644
---- a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-+++ b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h
-@@ -19,6 +19,7 @@ struct vfio_pci_device {
- 	const char *bdf;
- 	int fd;
- 	int group_fd;
-+	u32 dev_id;
- 
- 	struct iommu *iommu;
- 
-@@ -65,6 +66,7 @@ void vfio_pci_config_access(struct vfio_pci_device *device, bool write,
- #define vfio_pci_config_writew(_d, _o, _v) vfio_pci_config_write(_d, _o, _v, u16)
- #define vfio_pci_config_writel(_d, _o, _v) vfio_pci_config_write(_d, _o, _v, u32)
- 
-+void vfio_pci_device_attach_iommu(struct vfio_pci_device *device, struct iommu *iommu);
- void vfio_pci_irq_enable(struct vfio_pci_device *device, u32 index,
- 			 u32 vector, int count);
- void vfio_pci_irq_disable(struct vfio_pci_device *device, u32 index);
-diff --git a/tools/testing/selftests/vfio/lib/iommu.c b/tools/testing/selftests/vfio/lib/iommu.c
-index 58b7fb7430d4..2c67d7e24d0c 100644
---- a/tools/testing/selftests/vfio/lib/iommu.c
-+++ b/tools/testing/selftests/vfio/lib/iommu.c
-@@ -408,6 +408,18 @@ struct iommu_iova_range *iommu_iova_ranges(struct iommu *iommu, u32 *nranges)
- 	return ranges;
- }
- 
-+static u32 iommufd_hwpt_alloc(struct iommu *iommu, u32 dev_id)
-+{
-+	struct iommu_hwpt_alloc args = {
-+		.size = sizeof(args),
-+		.pt_id = iommu->ioas_id,
-+		.dev_id = dev_id,
-+	};
+diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+index 3c796ca99a50..09a1e57cc77d 100644
+--- a/tools/testing/selftests/vfio/Makefile
++++ b/tools/testing/selftests/vfio/Makefile
+@@ -1,5 +1,6 @@
+ CFLAGS = $(KHDR_INCLUDES)
+ TEST_GEN_PROGS += vfio_dma_mapping_test
++TEST_GEN_PROGS += vfio_iommufd_hwpt_replace_test
+ TEST_GEN_PROGS += vfio_iommufd_setup_test
+ TEST_GEN_PROGS += vfio_pci_device_test
+ TEST_GEN_PROGS += vfio_pci_device_init_perf_test
+diff --git a/tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c b/tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c
+new file mode 100644
+index 000000000000..efef3233494f
+--- /dev/null
++++ b/tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c
+@@ -0,0 +1,151 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <sys/ioctl.h>
++#include <sys/mman.h>
 +
-+	ioctl_assert(iommu->iommufd, IOMMU_HWPT_ALLOC, &args);
-+	return args.out_hwpt_id;
++#include <linux/sizes.h>
++#include <linux/vfio.h>
++
++#include <libvfio.h>
++
++#include "kselftest_harness.h"
++
++static const char *device_bdf;
++
++static void region_setup(struct iommu *iommu,
++			 struct iova_allocator *iova_allocator,
++			 struct dma_region *region, u64 size)
++{
++	const int flags = MAP_SHARED | MAP_ANONYMOUS;
++	const int prot = PROT_READ | PROT_WRITE;
++	void *vaddr;
++
++	vaddr = mmap(NULL, size, prot, flags, -1, 0);
++	VFIO_ASSERT_NE(vaddr, MAP_FAILED);
++
++	region->vaddr = vaddr;
++	region->iova = iova_allocator_alloc(iova_allocator, size);
++	region->size = size;
++
++	iommu_map(iommu, region);
 +}
 +
- static u32 iommufd_ioas_alloc(int iommufd)
- {
- 	struct iommu_ioas_alloc args = {
-@@ -418,11 +430,9 @@ static u32 iommufd_ioas_alloc(int iommufd)
- 	return args.out_ioas_id;
- }
- 
--struct iommu *iommu_init(const char *iommu_mode)
-+static struct iommu *iommu_alloc(const char *iommu_mode)
- {
--	const char *container_path;
- 	struct iommu *iommu;
--	int version;
- 
- 	iommu = calloc(1, sizeof(*iommu));
- 	VFIO_ASSERT_NOT_NULL(iommu);
-@@ -430,6 +440,16 @@ struct iommu *iommu_init(const char *iommu_mode)
- 	INIT_LIST_HEAD(&iommu->dma_regions);
- 
- 	iommu->mode = lookup_iommu_mode(iommu_mode);
-+	return iommu;
++static void region_teardown(struct iommu *iommu, struct dma_region *region)
++{
++	iommu_unmap(iommu, region);
++	VFIO_ASSERT_EQ(munmap(region->vaddr, region->size), 0);
 +}
 +
-+struct iommu *iommu_init(const char *iommu_mode)
-+{
-+	const char *container_path;
++FIXTURE(vfio_iommufd_replace_hwpt_test) {
 +	struct iommu *iommu;
-+	int version;
++	struct vfio_pci_device *device;
++	struct iova_allocator *iova_allocator;
++	struct dma_region memcpy_region;
++	void *vaddr;
 +
-+	iommu = iommu_alloc(iommu_mode);
- 
- 	container_path = iommu->mode->container_path;
- 	if (container_path) {
-@@ -453,10 +473,42 @@ struct iommu *iommu_init(const char *iommu_mode)
- 	return iommu;
- }
- 
-+struct iommu *iommufd_iommu_init(int iommufd, u32 dev_id)
++	u64 size;
++	void *src;
++	void *dst;
++	iova_t src_iova;
++	iova_t dst_iova;
++};
++
++FIXTURE_SETUP(vfio_iommufd_replace_hwpt_test)
 +{
-+	struct iommu *iommu;
++	struct vfio_pci_driver *driver;
 +
-+	iommu = iommu_alloc("iommufd");
++	self->iommu = iommu_init("iommufd");
++	self->device = vfio_pci_device_init(device_bdf, self->iommu);
++	self->iova_allocator = iova_allocator_init(self->iommu);
 +
-+	iommu->iommufd = dup(iommufd);
-+	VFIO_ASSERT_GT(iommu->iommufd, 0);
++	driver = &self->device->driver;
 +
-+	iommu->ioas_id = iommufd_ioas_alloc(iommu->iommufd);
-+	iommu->hwpt_id = iommufd_hwpt_alloc(iommu, dev_id);
++	region_setup(self->iommu, self->iova_allocator, &self->memcpy_region, SZ_1G);
++	region_setup(self->iommu, self->iova_allocator, &driver->region, SZ_2M);
 +
-+	return iommu;
++	if (driver->ops)
++		vfio_pci_driver_init(self->device);
++
++	self->size = self->memcpy_region.size / 2;
++	self->src = self->memcpy_region.vaddr;
++	self->dst = self->src + self->size;
++
++	self->src_iova = to_iova(self->device, self->src);
++	self->dst_iova = to_iova(self->device, self->dst);
 +}
 +
-+static void iommufd_iommu_cleanup(struct iommu *iommu)
++FIXTURE_TEARDOWN(vfio_iommufd_replace_hwpt_test)
 +{
-+	struct iommu_destroy args = {
-+		.size = sizeof(args),
-+	};
++	struct vfio_pci_driver *driver = &self->device->driver;
 +
-+	if (iommu->hwpt_id) {
-+		args.id = iommu->hwpt_id;
-+		ioctl_assert(iommu->iommufd, IOMMU_DESTROY, &args);
++	if (driver->ops)
++		vfio_pci_driver_remove(self->device);
++
++	region_teardown(self->iommu, &self->memcpy_region);
++	region_teardown(self->iommu, &driver->region);
++
++	iova_allocator_cleanup(self->iova_allocator);
++	vfio_pci_device_cleanup(self->device);
++	iommu_cleanup(self->iommu);
++}
++
++FIXTURE_VARIANT(vfio_iommufd_replace_hwpt_test) {
++	bool replace_hwpt;
++};
++
++FIXTURE_VARIANT_ADD(vfio_iommufd_replace_hwpt_test, domain_replace) {
++	.replace_hwpt = true,
++};
++
++FIXTURE_VARIANT_ADD(vfio_iommufd_replace_hwpt_test, noreplace) {
++	.replace_hwpt = false,
++};
++
++TEST_F(vfio_iommufd_replace_hwpt_test, memcpy)
++{
++	struct dma_region memcpy_region, driver_region;
++	struct iommu *iommu2;
++
++	if (self->device->driver.ops) {
++		memset(self->src, 'x', self->size);
++		memset(self->dst, 'y', self->size);
++
++		vfio_pci_driver_memcpy_start(self->device,
++					     self->src_iova,
++					     self->dst_iova,
++					     self->size,
++					     100);
 +	}
 +
-+	args.id = iommu->ioas_id;
-+	ioctl_assert(iommu->iommufd, IOMMU_DESTROY, &args);
++	if (variant->replace_hwpt) {
++		iommu2 = iommufd_iommu_init(self->iommu->iommufd,
++					    self->device->dev_id);
 +
-+	VFIO_ASSERT_EQ(close(iommu->iommufd), 0);
++		memcpy_region = self->memcpy_region;
++		driver_region = self->device->driver.region;
++
++		iommu_map(iommu2, &memcpy_region);
++		iommu_map(iommu2, &driver_region);
++
++		vfio_pci_device_attach_iommu(self->device, iommu2);
++	}
++
++	if (self->device->driver.ops) {
++		ASSERT_EQ(0, vfio_pci_driver_memcpy_wait(self->device));
++		ASSERT_EQ(0, memcmp(self->src, self->dst, self->size));
++	}
++
++	if (variant->replace_hwpt) {
++		vfio_pci_device_attach_iommu(self->device, self->iommu);
++
++		iommu_unmap(iommu2, &memcpy_region);
++		iommu_unmap(iommu2, &driver_region);
++		iommu_cleanup(iommu2);
++	}
 +}
 +
- void iommu_cleanup(struct iommu *iommu)
- {
- 	if (iommu->iommufd)
--		VFIO_ASSERT_EQ(close(iommu->iommufd), 0);
-+		iommufd_iommu_cleanup(iommu);
- 	else
- 		VFIO_ASSERT_EQ(close(iommu->container_fd), 0);
- 
-diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-index fac4c0ecadef..9bc1f5ade5c4 100644
---- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-+++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-@@ -298,7 +298,7 @@ const char *vfio_pci_get_cdev_path(const char *bdf)
- 	return cdev_path;
- }
- 
--static void vfio_device_bind_iommufd(int device_fd, int iommufd)
-+static int vfio_device_bind_iommufd(int device_fd, int iommufd)
- {
- 	struct vfio_device_bind_iommufd args = {
- 		.argsz = sizeof(args),
-@@ -306,6 +306,7 @@ static void vfio_device_bind_iommufd(int device_fd, int iommufd)
- 	};
- 
- 	ioctl_assert(device_fd, VFIO_DEVICE_BIND_IOMMUFD, &args);
-+	return args.out_devid;
- }
- 
- static void vfio_device_attach_iommufd_pt(int device_fd, u32 pt_id)
-@@ -326,10 +327,21 @@ static void vfio_pci_iommufd_setup(struct vfio_pci_device *device, const char *b
- 	VFIO_ASSERT_GE(device->fd, 0);
- 	free((void *)cdev_path);
- 
--	vfio_device_bind_iommufd(device->fd, device->iommu->iommufd);
-+	device->dev_id = vfio_device_bind_iommufd(device->fd, device->iommu->iommufd);
- 	vfio_device_attach_iommufd_pt(device->fd, device->iommu->ioas_id);
- }
- 
-+void vfio_pci_device_attach_iommu(struct vfio_pci_device *device, struct iommu *iommu)
++int main(int argc, char *argv[])
 +{
-+	u32 pt_id = iommu->ioas_id;
++	device_bdf = vfio_selftests_get_bdf(&argc, argv);
 +
-+	if (iommu->hwpt_id)
-+		pt_id = iommu->hwpt_id;
-+
-+	VFIO_ASSERT_NE(pt_id, 0);
-+	vfio_device_attach_iommufd_pt(device->fd, pt_id);
++	return test_harness_run(argc, argv);
 +}
-+
- struct vfio_pci_device *vfio_pci_device_init(const char *bdf, struct iommu *iommu)
- {
- 	struct vfio_pci_device *device;
 -- 
 2.52.0.351.gbe84eed79e-goog
 
