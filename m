@@ -1,154 +1,361 @@
-Return-Path: <kvm+bounces-67292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1E4D004D0
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 23:26:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A63D004E5
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 23:28:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4EAB6301E9AE
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 22:26:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 331CF302686D
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 22:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1CB2F5A10;
-	Wed,  7 Jan 2026 22:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C04284671;
+	Wed,  7 Jan 2026 22:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hYqZVT4+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fx0iwfqK";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="X536pcoM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA051534EC;
-	Wed,  7 Jan 2026 22:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D4126B95B
+	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 22:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767824766; cv=none; b=f5Oa3cK+vRvBPqZXXGeGFY0Xw+6opgBkiIWK2N0vN/AHOnno+290ZqIPhhdeuA07gCqI2jwI+f4dzyb0Yc8kHE0ucK1iwzK5JcUzyGgnINNKdNUp/YjZSnFZKKKJB9WWP9H0R27DYqLZB8d5ucu3VZ70ii5dwOxe4G6Md++ztrI=
+	t=1767824907; cv=none; b=uLyo9hfSRiBq0womjo9KHhroYi+UDhx+h/lGEW1uhNv1kty2cjQoIQkUg940z432xP8xbURs2lScrTv81F4FqWdVJ43+ESG30y2GyBuOjQyZE+BO+g0f7795A+yCk9nl/j+/8wq/lZntb+zN+4CWbfpvmFeeTJb4NgYJ+Ecfl3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767824766; c=relaxed/simple;
-	bh=3rPeucTPv7lgzR0XRyp/ay87Rn0KnqtiSVU3NEJ+IB8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VIoSlIbc+oiPPN2ilfSQM7Cx/NjY3tEoPosBC6eHt5HnnpBzUgm4BEVq0P/lQaJLoUx9xaSde8YBNbsjSba8e+rxj104VuJIqZGNP5sZsPdIU8KfKU7c7IM/wrsqcZwSFuct6bJXf/nypZUFsel1SjKVqM4jRjvRN/oEngB1Lho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hYqZVT4+; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767824765; x=1799360765;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3rPeucTPv7lgzR0XRyp/ay87Rn0KnqtiSVU3NEJ+IB8=;
-  b=hYqZVT4+t+mZtfnQrdmYzI6PRT3JsdZQL8V63G2saQuncDRTXXDp4PCE
-   8xrEGoOKlgtUi2JHmiMIGay+ZBvyxFpfYWHC8cIgSmWzg4kMudBj4Z1FZ
-   SSLK9rPvFn3yfMt8WEPmlryMVFtrFq2fKo8oEj47Ta9Wicr4RymA1O9HP
-   RMNyfhI/r7Aae3Oa2IZjk/6Fet3elMR8loakn9Z/bY23V1gHAzpR8rn+Z
-   R00G5FhNle5aiJecZNoAuJtE4c0ZjvVErtgFztzq1VCw+MnZOqDRwLUvw
-   GuWRZYXqKWf6upFI9lYIyZ80imhv5ElP/Mh7boAqKv9XD4MiuQ+WGwm3j
-   A==;
-X-CSE-ConnectionGUID: /NxJ2OFkQRKaSXRrTsiyHA==
-X-CSE-MsgGUID: PMHnOGjyTYurTxTQEjiWNA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="73050233"
-X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="73050233"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 14:26:04 -0800
-X-CSE-ConnectionGUID: ZHOr/ZVwRuWr/lQwbj+Nmw==
-X-CSE-MsgGUID: dWJjd0vsSQS+NUQczqpYAw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="202164569"
-Received: from aduenasd-mobl5.amr.corp.intel.com (HELO [10.125.109.145]) ([10.125.109.145])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 14:26:04 -0800
-Message-ID: <aa3f026b-ad69-4070-8433-8950e5250edb@intel.com>
-Date: Wed, 7 Jan 2026 14:26:03 -0800
+	s=arc-20240116; t=1767824907; c=relaxed/simple;
+	bh=aATYOib07sWLOsKiGdtXxigGqpXRH3ZwpLwkMd7SvIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J0zTs4/D+AbVpAH2PSLKyfbCuVERN45G0/q2WmCyJgTqNTrawClkhNiZS+jp9f921UJYwzEeWnzc33P1ZI8cqCogyc37m2gzlXvYz0Q7akUxp7fUwbq68ZZAbHTH/Xs0JkXFg/OjZ1LEnRgWTcD3MuJ8ujPRvzDv+qZlsjcncAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fx0iwfqK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=X536pcoM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767824904;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mVkHTijtpd5br1d+tZXZATxNXfNYRkyffv87kQYQsNw=;
+	b=fx0iwfqKTyCXEwK5GPL8DE9JddWKsDTb6ymrFcZY3/VYhKjfOv8qmOi1P8bbcMMVRn+L7f
+	X+Bng0ebeQrrz1+xuBV5f5eSF67qsMGn3PPP6oFRsCHZh5QnUZVLwQBLFNOW9qYibMrBaT
+	N11kWJ1AUUYGh2++8UevItzihRBw6ng=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-648-SslcJMy7NiCXSH1CnjAERQ-1; Wed, 07 Jan 2026 17:28:21 -0500
+X-MC-Unique: SslcJMy7NiCXSH1CnjAERQ-1
+X-Mimecast-MFC-AGG-ID: SslcJMy7NiCXSH1CnjAERQ_1767824900
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4775e00b16fso17130995e9.2
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 14:28:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767824900; x=1768429700; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mVkHTijtpd5br1d+tZXZATxNXfNYRkyffv87kQYQsNw=;
+        b=X536pcoM0s42QsSWgHGwy+G1z47yk5rukzU72ot3+A8HoUf80TDoWSIeZrXDYvC1TM
+         UTUtwlXV49F55nTCA30prn2mSi/6SlYPu5qietP+w6RzUfnjc8LFXQWkAf0ul8t86wdC
+         K0of0npspoYwcL3m6kfTNI8nB7fHuMHO9UKqYYlYbprKC8rpUvHcbC5Oot72RDEtdhwl
+         rI0SJ7Xn5WNyctjUP+C2B5Wq8UzwWuL7DxeHmfHMQrlmLzQXwMcLOVOKeoE5iHa5IgyP
+         0N3RUo1r/cuyVsGIR803WzvPnmFspFTDrCzAKREOma9VLNzgI8CxtsOYd2nj41SMIqef
+         PGbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767824900; x=1768429700;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mVkHTijtpd5br1d+tZXZATxNXfNYRkyffv87kQYQsNw=;
+        b=wIjro3kC8kBJqfzm/2KXVFjyACqkvk4dx3WfFG9yHBSP8yH1vmOdwCCbpCYiwo+Z5W
+         lJ2eVXEgcy8juo96AVo5NH+qLHTv+sgwE/ivOoRry0v6iPJ8pokgpg/O0DwjvT2Fh8q9
+         6vEMEIrgbl0dUAjnQ+wvqQXPuuoXsBGSqfIB2kTnmvNRBu9JUi5pPL/qw7yomq226wuy
+         X5WAaMKMtZJWhH3JOCka4qe9/dE/x/TwzPIiHs2ysM+K4LmOBvwgquBQ31AQVyKrmSYr
+         nAuaw8Yg8JiCzVZg3qVGM3T8vMbL84N5c8Y8IGBTJkzA76Y509jNLAHLaBTwNc8JqIFY
+         ByUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3lJuydlvWIuQ+rNjerRjQSr70mFwsiqjlQJ6FiH7+Q92aKIhEls2BZpks01v3PHcV7WM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytr8t+JME4Gh9tOyZn/0fW25IfjOe/iOTshPXqflHRJhLuceRF
+	OLh5ijieDDJdpGOll72dOo1AwNl2UigxA4Y/u/K5mpZZdNiIf/u6P9xSfhZsSgHSSbQ7qrV2QY/
+	2NjSZGBpx8ZBhK6j4SgOvIAxjz4yv7ayixrKlxNcXbV2L9LPSL7tOraAi+QJe9WwNPmkeKSulQ1
+	na22Yb+EkEr8J5XH1XH71Y3c1/G6zc
+X-Gm-Gg: AY/fxX5gcWWEezhStDkpNTGqf0xlWopu5GXqxKsABRboJC0TQ4UGhXh1weewAjQthqG
+	EPuBoHny67acQA6ME5Pgmj4m+41xxfzJF58zJBWuCjqlrKgyzOb3KX1OAUaMlRZAHRdT1GxEFti
+	c00yw0+1/H0/zhLc46Qiq+r+Aup5h5YP4BfUngaBb1ECZPXZGmoUQJNSVekazS8AbqcAQ+LkTJL
+	TxtfLFK7GlIRZIRREckikjnS4SjfgmLmz63RRG/IBHX80gqPYoWju9DcW41StIh9zCO9w==
+X-Received: by 2002:a05:600c:46cc:b0:45d:e28c:875a with SMTP id 5b1f17b1804b1-47d84b41034mr50774705e9.31.1767824899189;
+        Wed, 07 Jan 2026 14:28:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE8oZ6T0f25giXXaK3zr72HpUxA+svjIZykRBSrHqHHQIs52WZrfeuqWY5jyHz0B4PduVyOu4c7ILznTVYWndg=
+X-Received: by 2002:a05:600c:46cc:b0:45d:e28c:875a with SMTP id
+ 5b1f17b1804b1-47d84b41034mr50774565e9.31.1767824898727; Wed, 07 Jan 2026
+ 14:28:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] Expose TDX Module version
-To: dan.j.williams@intel.com, Kiryl Shutsemau <kas@kernel.org>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org,
- vishal.l.verma@intel.com, kai.huang@intel.com, yilun.xu@linux.intel.com,
- vannapurve@google.com, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Ingo Molnar <mingo@redhat.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>
-References: <20260105074350.98564-1-chao.gao@intel.com>
- <dfb66mcbxqw2a6qjyg74jqp7aucmnkztl224rj3u6znrcr7ukw@yy65kqagdsoh>
- <d45cc504-509c-48a7-88e2-374e00068e79@intel.com>
- <zhsopfh4qddsg2q5xj26koahf2xzyg2qvn7oo4sqyd3z4mhnly@u7bwmrzxqbhx>
- <7cbac499-6145-4b83-873c-c2d283f9cb79@intel.com>
- <695ed1604db38_4b7a10028@dwillia2-mobl4.notmuch>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <695ed1604db38_4b7a10028@dwillia2-mobl4.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260101090516.316883-1-pbonzini@redhat.com> <20260101090516.316883-3-pbonzini@redhat.com>
+ <aVxRAv888jsmQJ8-@google.com>
+In-Reply-To: <aVxRAv888jsmQJ8-@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 7 Jan 2026 23:28:07 +0100
+X-Gm-Features: AQt7F2puFbK4SdwO10BfREF8NRqeyrqBEt8DtB3vAkNfI090_t10EvoI38O8u9Y
+Message-ID: <CABgObfZSchPMdqSvvVPgy9s5-TkHHZpLPHNYSsK-YHRye0SAaw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] selftests: kvm: replace numbered sync points with actions
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/7/26 13:34, dan.j.williams@intel.com wrote:
-> For sake of argument, I assume you have no fundamental objection to
-> module version information in sysfs in general? I.e. is the question
-> more on the where and how for TDX sysfs?
+On Tue, Jan 6, 2026 at 1:02=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+> > @@ -244,6 +254,7 @@ int main(int argc, char *argv[])
+> >       memset(addr_gva2hva(vm, xstate), 0, PAGE_SIZE * DIV_ROUND_UP(XSAV=
+E_SIZE, PAGE_SIZE));
+> >       vcpu_args_set(vcpu, 3, amx_cfg, tiledata, xstate);
+> >
+> > +     int iter =3D 0;
+>
+> If we want to retain "tracing" of guest syncs, I vote to provide the info=
+rmation
+> from the guest, otherwise I'll end up counting GUEST_SYNC() calls on my f=
+ingers
+> (and run out of fingers) :-D.
 
-For reference, and so the next poster can write an excellent and focused
-changelog wherever this goes, the context I was yearning for in the
-changelog was:
+I had a similar idea, but I was too lazy to implement it because for a
+very linear test such as this one, "12n" in vi does wonders...
 
-1. AMD has a PCI device for the PSP for SEV which provides an existing
-   place to hang their equivalent metadata. TDX has no PCI device.
-2. ARM CCA will likely have a faux device (although it isn't obvious if
-   they have a need to export version information there)
-3. The TDX faux device will drive TDX module updates. The version number
-   is obviously deeply important to entities doing updates.
+> E.g. if we wrap all GUEST_SYNC() calls in a macro, we can print the line =
+number
+> without having to hardcode sync point numbers.
 
-So, no, I don't have a fundamental objection to having TDX module
-version information in sysfs. But, in the context of this series, I
-don't see any incremental value for doing it in addition to dmesg _now_.
-If the module updater userspace needs it, then I'd rather defer the
-sysfs export (and faux device creation) until the time that there's an
-actual concrete user.
+... but there are actually better reasons than laziness and linearity
+to keep the simple "iter++".
+
+First, while using line numbers has the advantage of zero maintenance,
+the disadvantage is that they change all the time as you're debugging.
+So you are left slightly puzzled if the number changed because the
+test passed or because of the extra debugging code you added.
+
+Second, the iteration number is probably more useful to identify the
+places at which the VM was reentered (which are where the iteration
+number changes), than to identify the specific GUEST_SYNC that failed;
+from that perspective there's not much difference between line
+numbers, manually-numbered sync points, or incrementing a counter in
+main().
+
+Paolo
+
+> # ./x86/amx_test
+> Random seed: 0x6b8b4567
+> GUEST_SYNC line 164, save/restore VM state
+> GUEST_SYNC line 168, save/restore VM state
+> GUEST_SYNC line 172, save/restore VM state
+> GUEST_SYNC line 175, save tiledata
+> GUEST_SYNC line 175, check TMM0 contents
+> GUEST_SYNC line 175, save/restore VM state
+> GUEST_SYNC line 181, before KVM_SET_XSAVE
+> GUEST_SYNC line 181, after KVM_SET_XSAVE
+> GUEST_SYNC line 182, save/restore VM state
+> GUEST_SYNC line 186, save/restore VM state
+> GUEST_SYNC line 210, save/restore VM state
+> GUEST_SYNC line 224, save/restore VM state
+> GUEST_SYNC line 231, save/restore VM state
+> GUEST_SYNC line 234, check TMM0 contents
+> GUEST_SYNC line 234, save/restore VM state
+> UCALL_DONE
+>
+> ---
+>  tools/testing/selftests/kvm/x86/amx_test.c | 55 +++++++++++++---------
+>  1 file changed, 33 insertions(+), 22 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/x86/amx_test.c b/tools/testing/s=
+elftests/kvm/x86/amx_test.c
+> index 37b166260ee3..9593ecd47d28 100644
+> --- a/tools/testing/selftests/kvm/x86/amx_test.c
+> +++ b/tools/testing/selftests/kvm/x86/amx_test.c
+> @@ -131,19 +131,27 @@ static void set_tilecfg(struct tile_config *cfg)
+>  }
+>
+>  enum {
+> +       TEST_SYNC_LINE_NUMBER_MASK =3D GENMASK(15, 0),
+> +
+>         /* Retrieve TMM0 from guest, stash it for TEST_RESTORE_TILEDATA *=
+/
+> -       TEST_SAVE_TILEDATA =3D 1,
+> +       TEST_SAVE_TILEDATA =3D BIT(16),
+>
+>         /* Check TMM0 against tiledata */
+> -       TEST_COMPARE_TILEDATA =3D 2,
+> +       TEST_COMPARE_TILEDATA =3D BIT(17),
+>
+>         /* Restore TMM0 from earlier save */
+> -       TEST_RESTORE_TILEDATA =3D 4,
+> +       TEST_RESTORE_TILEDATA =3D BIT(18),
+>
+>         /* Full VM save/restore */
+> -       TEST_SAVE_RESTORE =3D 8,
+> +       TEST_SAVE_RESTORE =3D BIT(19),
+>  };
+>
+> +#define AMX_GUEST_SYNC(action)                                         \
+> +do {                                                                   \
+> +       kvm_static_assert(!((action) & TEST_SYNC_LINE_NUMBER_MASK));    \
+> +       GUEST_SYNC((action) | __LINE__);                                \
+> +} while (0)
+> +
+>  static void __attribute__((__flatten__)) guest_code(struct tile_config *=
+amx_cfg,
+>                                                     struct tile_data *til=
+edata,
+>                                                     struct xstate *xstate=
+)
+> @@ -153,29 +161,29 @@ static void __attribute__((__flatten__)) guest_code=
+(struct tile_config *amx_cfg,
+>         GUEST_ASSERT(this_cpu_has(X86_FEATURE_XSAVE) &&
+>                      this_cpu_has(X86_FEATURE_OSXSAVE));
+>         check_xtile_info();
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>
+>         /* xfd=3D0, enable amx */
+>         wrmsr(MSR_IA32_XFD, 0);
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD) =3D=3D 0);
+>         set_tilecfg(amx_cfg);
+>         __ldtilecfg(amx_cfg);
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>         /* Check save/restore when trap to userspace */
+>         __tileloadd(tiledata);
+> -       GUEST_SYNC(TEST_SAVE_TILEDATA | TEST_COMPARE_TILEDATA | TEST_SAVE=
+_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_TILEDATA | TEST_COMPARE_TILEDATA | TEST_=
+SAVE_RESTORE);
+>
+>         /* xfd=3D0x40000, disable amx tiledata */
+>         wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILE_DATA);
+>
+>         /* host tries setting tiledata while guest XFD is set */
+> -       GUEST_SYNC(TEST_RESTORE_TILEDATA);
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_RESTORE_TILEDATA);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>
+>         wrmsr(MSR_IA32_XFD, 0);
+>         __tilerelease();
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>         /*
+>          * After XSAVEC, XTILEDATA is cleared in the xstate_bv but is set=
+ in
+>          * the xcomp_bv.
+> @@ -199,7 +207,7 @@ static void __attribute__((__flatten__)) guest_code(s=
+truct tile_config *amx_cfg,
+>         GUEST_ASSERT(!(xstate->header.xstate_bv & XFEATURE_MASK_XTILE_DAT=
+A));
+>         GUEST_ASSERT((xstate->header.xcomp_bv & XFEATURE_MASK_XTILE_DATA)=
+);
+>
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD) =3D=3D XFEATURE_MASK_XTILE_DATA)=
+;
+>         set_tilecfg(amx_cfg);
+>         __ldtilecfg(amx_cfg);
+> @@ -213,17 +221,17 @@ static void __attribute__((__flatten__)) guest_code=
+(struct tile_config *amx_cfg,
+>         GUEST_ASSERT(!(get_cr0() & X86_CR0_TS));
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) =3D=3D XFEATURE_MASK_XTILE_D=
+ATA);
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD) =3D=3D XFEATURE_MASK_XTILE_DATA)=
+;
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) =3D=3D XFEATURE_MASK_XTILE_D=
+ATA);
+>         GUEST_ASSERT(rdmsr(MSR_IA32_XFD) =3D=3D XFEATURE_MASK_XTILE_DATA)=
+;
+>         /* Clear xfd_err */
+>         wrmsr(MSR_IA32_XFD_ERR, 0);
+>         /* xfd=3D0, enable amx */
+>         wrmsr(MSR_IA32_XFD, 0);
+> -       GUEST_SYNC(TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_SAVE_RESTORE);
+>
+>         __tileloadd(tiledata);
+> -       GUEST_SYNC(TEST_COMPARE_TILEDATA | TEST_SAVE_RESTORE);
+> +       AMX_GUEST_SYNC(TEST_COMPARE_TILEDATA | TEST_SAVE_RESTORE);
+>
+>         GUEST_DONE();
+>  }
+> @@ -275,7 +283,6 @@ int main(int argc, char *argv[])
+>         memset(addr_gva2hva(vm, xstate), 0, PAGE_SIZE * DIV_ROUND_UP(XSAV=
+E_SIZE, PAGE_SIZE));
+>         vcpu_args_set(vcpu, 3, amx_cfg, tiledata, xstate);
+>
+> -       int iter =3D 0;
+>         for (;;) {
+>                 vcpu_run(vcpu);
+>                 TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+> @@ -285,13 +292,14 @@ int main(int argc, char *argv[])
+>                         REPORT_GUEST_ASSERT(uc);
+>                         /* NOT REACHED */
+>                 case UCALL_SYNC:
+> -                       ++iter;
+>                         if (uc.args[1] & TEST_SAVE_TILEDATA) {
+> -                               fprintf(stderr, "GUEST_SYNC #%d, save til=
+edata\n", iter);
+> +                               fprintf(stderr, "GUEST_SYNC line %d, save=
+ tiledata\n",
+> +                                       (u16)(uc.args[1] & TEST_SYNC_LINE=
+_NUMBER_MASK));
+>                                 tile_state =3D vcpu_save_state(vcpu);
+>                         }
+>                         if (uc.args[1] & TEST_COMPARE_TILEDATA) {
+> -                               fprintf(stderr, "GUEST_SYNC #%d, check TM=
+M0 contents\n", iter);
+> +                               fprintf(stderr, "GUEST_SYNC line %d, chec=
+k TMM0 contents\n",
+> +                                       (u16)(uc.args[1] & TEST_SYNC_LINE=
+_NUMBER_MASK));
+>
+>                                 /* Compacted mode, get amx offset by xsav=
+e area
+>                                  * size subtract 8K amx size.
+> @@ -304,12 +312,15 @@ int main(int argc, char *argv[])
+>                                 TEST_ASSERT(ret =3D=3D 0, "memcmp failed,=
+ ret=3D%d", ret);
+>                         }
+>                         if (uc.args[1] & TEST_RESTORE_TILEDATA) {
+> -                               fprintf(stderr, "GUEST_SYNC #%d, before K=
+VM_SET_XSAVE\n", iter);
+> +                               fprintf(stderr, "GUEST_SYNC line %d, befo=
+re KVM_SET_XSAVE\n",
+> +                                       (u16)(uc.args[1] & TEST_SYNC_LINE=
+_NUMBER_MASK));
+>                                 vcpu_xsave_set(vcpu, tile_state->xsave);
+> -                               fprintf(stderr, "GUEST_SYNC #%d, after KV=
+M_SET_XSAVE\n", iter);
+> +                               fprintf(stderr, "GUEST_SYNC line %d, afte=
+r KVM_SET_XSAVE\n",
+> +                                       (u16)(uc.args[1] & TEST_SYNC_LINE=
+_NUMBER_MASK));
+>                         }
+>                         if (uc.args[1] & TEST_SAVE_RESTORE) {
+> -                               fprintf(stderr, "GUEST_SYNC #%d, save/res=
+tore VM state\n", iter);
+> +                               fprintf(stderr, "GUEST_SYNC line %d, save=
+/restore VM state\n",
+> +                                       (u16)(uc.args[1] & TEST_SYNC_LINE=
+_NUMBER_MASK));
+>                                 state =3D vcpu_save_state(vcpu);
+>                                 memset(&regs1, 0, sizeof(regs1));
+>                                 vcpu_regs_get(vcpu, &regs1);
+>
+> base-commit: bc6eb58bab2fda28ef473ff06f4229c814c29380
+> --
+>
+
 
