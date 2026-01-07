@@ -1,152 +1,139 @@
-Return-Path: <kvm+bounces-67294-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67295-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF4FDD0053C
-	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 23:33:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11069D00572
+	for <lists+kvm@lfdr.de>; Wed, 07 Jan 2026 23:38:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D8563018304
-	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 22:33:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 822C2302EF4B
+	for <lists+kvm@lfdr.de>; Wed,  7 Jan 2026 22:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49A92E62B3;
-	Wed,  7 Jan 2026 22:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443C22E6CB8;
+	Wed,  7 Jan 2026 22:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wz28oRNv";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ab+ZtrwL"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="EV7VAM0E"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573D423373D
-	for <kvm@vger.kernel.org>; Wed,  7 Jan 2026 22:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBDB16A956;
+	Wed,  7 Jan 2026 22:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767825209; cv=none; b=jg0zc6So0g+0nNvaLBT7LD0dgfpi1mOdFh+7Z/RAqQyioPBSYFaWFMXCxsyDs/q/7hRLRxBS31Q4c5zm6OI8OO1N9G0qVNYFJUHnajnKyPfnPUfMp0OyYYLnUJWK5OeAhvA55aD8vS8LBWS6jLOZ7RS/2MU6q9PCSETeJgiv/sk=
+	t=1767825455; cv=none; b=AKquinYHu1ulDbyoaz80ErQ4vSDNIXNuOUcRiXVcZeGxVMaC1AXDVS6vn44PBfCmOBoAvKBnw3OivUVqa3zl6kValL4B5au6EI4n26OsHZSQWIGVh2UjmfP36/2oJ2pS1tnB3IW6M1VK6Y0fpZZ3TXBlnH1pza5l2zmF3/7aTgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767825209; c=relaxed/simple;
-	bh=nKQQImQ1hZC5gl08Mlnp8GyGft7UUB1mwBlEWEHAg/Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cnypn7ExdEhg6WmcU2OB0odRqlk/pe2Z7A+KBZJ9KTznlN1vupdn41L3TC97Vs7lr0HQJQ3YGHGQdIbv/Xfg8mpdWuZAdP9ipN04NFF8fu3iTtXF5LhhcJhcs1xD9HkAtzkja1G6Fnr/lb8O88q7ppENZrc8ADQZ+wJbND5B7Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wz28oRNv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ab+ZtrwL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767825207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YKiv0UN+Y/p0lp7y1aVLPcFYjbDuoHshQ2ZIqZot05Q=;
-	b=Wz28oRNv7Tfaji1yD6+9NWC7gjZN1QOXRy9Bfd8VwT5M4XOs8AEbWplZH9nFLtQHmd/xc+
-	8CLUwNYafE4QBz3G7tj4ieTsMYn4wVt8o4w4+VSrH4XOR6zk7fePhJA9s/xlqOwDCBcPuk
-	BgTq70zNJY68Ejg4WG6Q0aZ92GfUKc0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-400-IhWbJLJTMpmIzV_FwTU79A-1; Wed, 07 Jan 2026 17:33:25 -0500
-X-MC-Unique: IhWbJLJTMpmIzV_FwTU79A-1
-X-Mimecast-MFC-AGG-ID: IhWbJLJTMpmIzV_FwTU79A_1767825204
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-432c05971c6so994703f8f.1
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 14:33:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767825204; x=1768430004; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YKiv0UN+Y/p0lp7y1aVLPcFYjbDuoHshQ2ZIqZot05Q=;
-        b=Ab+ZtrwL5eymV8NoWxkQwhIjjnTc6GGSwgC/M62pwAbGL/arJ23wdrN6mGqwdmdRIM
-         OFtF6Ou5lamYp+71Ah+HcXERkykjnj07Ng8idOwvRD1SqVDr4AXseDkyIyTiaozLtaZU
-         SoPa2K7kK0AFMJBzzKntVjs9LTpAfn9ZO2djTGWrGDTn9qUwia9rVQ9J4sPdB8t/LyGV
-         07nA2g+OFpHxT3ns5k5df8tWPFvpwEBPXPkQKj6Ssm9qW3C7wScasesZi9qJo2rs1PSC
-         zl7wZ37wvxCQYjekT7iPv0KD3TRR8QUXPXyZYSPBqH1FjupjB2L7B5KV0n0CpVYTrINW
-         Is1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767825204; x=1768430004;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YKiv0UN+Y/p0lp7y1aVLPcFYjbDuoHshQ2ZIqZot05Q=;
-        b=C/stMUbj5TgddxGZWewWUrJqGZ0KtjLpvb3LTHiwjjEzqhMyjmsYc1rKe41Ly5tF3j
-         OZPmOwijr4YGCizKMCqs3J6jMXLjGXF9q2W0ts0aPy5dAzgnmU+KuiWxhQ26/kncT8FV
-         dnr/WaWMVAqBBaG3IOLjBC59mjvFLt5RpExnbXDsy4MQqMGKdd/f4RcGMZbMUT/FRgFG
-         gvRajDbEJOAD1ELkWXogd2WqakrrmjUInOoIBlUy6m4ngxb70CeJi8+jENZSXnrnCaBJ
-         mDRQLlI5UUCuAjw3BRGrT+zvmG3V7sO54eH3zNo54qIvMNhnMlAuVmFLn6YJ+fX54Ldm
-         ad0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWCrhVycZyzIfaM7okGlFSC4B/cEpYO0QoN3olE0IghG4OD68+H0lQOANdNmOy59l2Q/C4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzyt6p8diuxPImCvnFg/gyB4V8n+XHcnvknBmxtJO3jahrTMgCO
-	h28Sc1LPPXvINDE7cRvzVm4usf+tVfGPV0hovOZ0hOLSsLDzeGnuVo0QaNx0v3qJ6p+2JRmLjBv
-	+wMS5ZTfzDjDBIMd0sPW4bN+XxJU3n4h50nW0uU7kSj/X/bsoaGZMB5IAfKEKrSqwXH0vjuTDBv
-	DSb1WNLXmfJKQGHH2hCgYgnU/MwMVu
-X-Gm-Gg: AY/fxX4nhQc5M2ngvM1rtVZOLsOn+LcxZoaSrMWIYBLCZsif50tBaScyJBV2knpde1F
-	URXbAC/LMjE3RHzk9OrnzZm/ndF/mczeowyzcaRw6Yf7wSCgV8ALBQWKyJuDUflM018jwDrgkLE
-	8bZjD2BOCzKiUif7+lvryKGvn+W5ZBEKzFD51lNSQ2EOY9X1vB12GOH3JBkxEY9UYZ5CbDFg43F
-	RaWmfR+/wL+vYoWVfrlaiQ7io712oHIVtMfccuPGxS0X7jMvscUMQ1KWPUBCCHp7fTUfQ==
-X-Received: by 2002:a5d:5d83:0:b0:432:86de:f396 with SMTP id ffacd0b85a97d-432c3778dbamr4719706f8f.26.1767825204297;
-        Wed, 07 Jan 2026 14:33:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGIN2Du1SnTyzg+3OHwU4Q86kR8t4orcibSR0LaDUW1yBL0SOLJpnq1WRIlbR5jNipu5lBqW9irEzFt4CIPLS0=
-X-Received: by 2002:a5d:5d83:0:b0:432:86de:f396 with SMTP id
- ffacd0b85a97d-432c3778dbamr4719684f8f.26.1767825203946; Wed, 07 Jan 2026
- 14:33:23 -0800 (PST)
+	s=arc-20240116; t=1767825455; c=relaxed/simple;
+	bh=n10CwoHtArvZ2hTXM8TJah2m11W8MXWUFoXDvfAUrts=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ac/QNZPwl8T0lKb8YLuAXxcDka2k5Ngv/QqWx/1AD6Kb774rwz9csq8FSlNuuD47qUk0WEB+En2/H0yZigB9tvnovEI/QiY6m6vRQ98uWcL43uuZlduZHJw1Y7rKh5i0rpVjCqGoFn5cl6yErBbsUfSb+KsATlNA7A90WkcjtxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=EV7VAM0E; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 607GssKH1548720;
+	Wed, 7 Jan 2026 14:37:27 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=oewil0Ls2jkYTlRSoFgc
+	0ChL5iI5pxNyY3WrmVaKcbY=; b=EV7VAM0EA/6C7oyFEgROCQYIi/ZyNaBpHOgy
+	0oUpJAi28GLOAP5S4EQYHitsuRop3P0mjHZVBKNrP/MYXxnsjU1ukfvaT4nJoNlw
+	4m48HHzYfEacjq7QkGI0DyqVX56Z++MI8uKN6aBOGDgh1jNNvXlVa2bX4ow2pcrj
+	ZPcTUjCIK2wjcXXAXp4GUaD42Fz8WFUzYwCUWbmbjvuXkCXWeqFsCP6Lf7yGnrZl
+	8eIOLwcsXAyAHpROqU72pIzK4Pyy0tMTyiGCpVAOIISZchkcx6eGzoJcxD8hCA5Z
+	tkk8XRDy1D5kMBy2aYqiHeg24UXtFF4Zs9oaGt9DWoeI8tVWRQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bhue6kyrd-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 07 Jan 2026 14:37:27 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::2d) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 7 Jan 2026 22:37:24 +0000
+Date: Wed, 7 Jan 2026 14:37:15 -0800
+From: Alex Mastro <amastro@fb.com>
+To: Alex Williamson <alex@shazbot.org>, David Matlack <dmatlack@google.com>,
+        Shuah Khan <shuah@kernel.org>
+CC: Peter Xu <peterx@redhat.com>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        Jason Gunthorpe
+	<jgg@ziepe.ca>
+Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
+Message-ID: <aV7gG5fWY84BtjNy@devgpu015.cco6.facebook.com>
+References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260101090516.316883-1-pbonzini@redhat.com> <20260101090516.316883-2-pbonzini@redhat.com>
- <c79eaf34-766e-4637-aa09-7eebbec26e0d@intel.com>
-In-Reply-To: <c79eaf34-766e-4637-aa09-7eebbec26e0d@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 7 Jan 2026 23:33:12 +0100
-X-Gm-Features: AQt7F2q_9pEgHsXT2Qg_PuwHAW8sbGhk3udXGcbrhYZaUfOKpfpMhUAIMA8t1t8
-Message-ID: <CABgObfZz4hBscKLMhzTK4YMVWPRiUbH9m19qV4a-2DZ9C76XmQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever XFD[i]=1
-To: "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com, 
-	x86@kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
+X-Proofpoint-ORIG-GUID: FyT89PhjffIojNEfnnQdYQY7WqEv0od1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDE3OSBTYWx0ZWRfX3suOmJW180EZ
+ dwL8W2r0XDeau2OqsJKdpMfrjL8HlHydmxKEWRggTJJUKf+HWYWhSyIJqtgPHCk8Z0IGc/pN5Ni
+ F2nchrxVuQDf4ddhY66t2DkqVCO/TJjyYKF4yPZRi33opY386Wb3HyKnz9E/QlYnEChtv9GWQrN
+ zSO/J3fXP9o/BCUGox5BeOt5QuLlpLyAMsLlfkaQ3dYVk7RLzlAwnCwU+poVRSZ1GlJQmdNlCXp
+ fpeuO1iUaIWgoVn73kPR5EckhdcPH2xIeFoITxg1fuuE7ln5o88FQAv4n3C9TDBtyQgKHXRhRvJ
+ FEFcb+gGBDuPk0hDoc8Mr2+sH/TO+Mu0egaAC9jiEM88gY25J3dB6uwXPgiJ/GARuHZ5WKYsXIS
+ J3oMFjNmNJmWBajnbGhYv8riwQ8dsJ0593Q4xSf8AVyIAwnZ7JXk/8VZUTvwJKm3SGVMcV4+4g+
+ 0UfdvknlDC0xyb45+IQ==
+X-Proofpoint-GUID: FyT89PhjffIojNEfnnQdYQY7WqEv0od1
+X-Authority-Analysis: v=2.4 cv=BsmQAIX5 c=1 sm=1 tr=0 ts=695ee027 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=wyK08riV_XoCUqvJq0wA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-07_04,2026-01-07_03,2025-10-01_01
 
-On Wed, Jan 7, 2026 at 1:29=E2=80=AFAM Chang S. Bae <chang.seok.bae@intel.c=
-om> wrote:
->
-> On 1/1/2026 1:05 AM, Paolo Bonzini wrote:
-> >
-> > Therefore, XFD can only go out of sync with XSTATE_BV in the above
-> > interrupt case, or in similar scenarios involving preemption on
->
-> This seems to restate the scenario already described above; I=E2=80=99m n=
-ot sure
-> whether the repetition is intentional.
->
-> > preemptible kernels, and it we can consider it (de facto) part of KVM
->                             ^^^^^
-> I assume you meant 'we' here though, you might want to slightly rephrase
-> it, given the previous debate:
->
->    https://lore.kernel.org/all/87iko54f42.ffs@tglx/
+On Wed, Jan 07, 2026 at 02:13:28PM -0800, Alex Mastro wrote:
+ 
+> @@ -124,20 +127,43 @@ static void vfio_pci_region_get(struct vfio_pci_device *device, int index,
+>  static void vfio_pci_bar_map(struct vfio_pci_device *device, int index)
+>  {
+>  	struct vfio_pci_bar *bar = &device->bars[index];
+> +	size_t align, size;
+> +	void *map_base, *map_align;
+>  	int prot = 0;
+>  
+>  	VFIO_ASSERT_LT(index, PCI_STD_NUM_BARS);
+>  	VFIO_ASSERT_NULL(bar->vaddr);
+>  	VFIO_ASSERT_TRUE(bar->info.flags & VFIO_REGION_INFO_FLAG_MMAP);
+> +	VFIO_ASSERT_GT(bar->info.size, 0);
+>  
+>  	if (bar->info.flags & VFIO_REGION_INFO_FLAG_READ)
+>  		prot |= PROT_READ;
+>  	if (bar->info.flags & VFIO_REGION_INFO_FLAG_WRITE)
+>  		prot |= PROT_WRITE;
+>  
+> -	bar->vaddr = mmap(NULL, bar->info.size, prot, MAP_FILE | MAP_SHARED,
+> +	/*
+> +	 * Align the mmap for more efficient IOMMU mapping.
+> +	 * The largest PUD size supporting huge pfnmap is 1GiB.
+> +	 */
+> +	size = bar->info.size;
+> +	align = min_t(u64, 1ULL << __builtin_ctzll(size), SZ_1G);
+> +
+> +	map_base = mmap(NULL, size + align, PROT_NONE,
+> +			MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+> +	VFIO_ASSERT_NE(map_base, MAP_FAILED);
+> +
+> +	map_align = (void *)ALIGN((uintptr_t)map_base, align);
+> +
+> +	if (map_align > map_base)
+> +		munmap(map_base, map_align - map_base);
+> +	if (align > (size_t)(map_align - map_base))
 
-There are two possible "we"s:
+I realized that this is tautological. Will fix in v2.
 
-1) the code - in the context of this patch this would be "we force
-XSTATE_BV[i] to 0" or "we can be preempted", and I agree it's bad form
-
-2) the community, or the maintainers - this is the case in the commit
-message, and I think it's acceptable. While I (Paolo) cannot forcibly
-come to your computer and clear XSTATE_BV[i], I certainly can decide
-that KVM will do so. :)
-
-> > ABI that KVM_GET_XSAVE returns XSTATE_BV[i]=3D0 for XFD-disabled featur=
-es.
->
-> On my side, testing on AMX systems, I was able to reproduce the issue
-> described and confirm that this patch resolves it:
->
->    Tested-by: Chang S. Bae <chang.seok.bae@intel.com>
->    Reviewed-by: Chang S. Bae <chang.seok.bae@intel.com>
-
-Thanks!
-
-Paolo
-
+> +		munmap(map_align + size, align - (map_align - map_base));
+> +
+> +	bar->vaddr = mmap(map_align, size, prot, MAP_SHARED | MAP_FIXED,
+>  			  device->fd, bar->info.offset);
+>  	VFIO_ASSERT_NE(bar->vaddr, MAP_FAILED);
+> +
+> +	madvise(bar->vaddr, size, MADV_HUGEPAGE);
+>  }
+ 
 
