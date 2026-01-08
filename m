@@ -1,105 +1,145 @@
-Return-Path: <kvm+bounces-67424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB6CD04E2B
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 18:21:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58932D052BA
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 18:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A49B3454618
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:07:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3F1203062531
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:32:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7952429B77E;
-	Thu,  8 Jan 2026 17:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59E92DCF70;
+	Thu,  8 Jan 2026 17:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qQsQvaeW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiJt+5uT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B3E27603C
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 17:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCF5288C3F;
+	Thu,  8 Jan 2026 17:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767892016; cv=none; b=o+cnEV3r072WR2ao5P6hl1Scj54W2BcOX95rTVW1WkXC4ttg6JlnI2VwSQycQ8iAr/weeDeW45dGu0GAImyjjG7fbktJKYiEr4CWmAcoC+mxLilqmKRNTcvj6Ua/A7JqenQAc3J5dUpc6+ceoL92we1cBkm8Emd2E/AGTwukiZ8=
+	t=1767893559; cv=none; b=o+gSvkxSqM5v+mYWj3wUuWm6RfS55EgxVxZrUSZjXhRitfwkBCx/oHRBhqwZPEZswAN0U9/uBxiCXl829sFQmLMLgbTM+AVHAx9mRDrR5ktTuazz6r2OBuEWZ4C8UTX8sKROM6DXqiKMuJHpm0Fi4eI/YCeW/TNyqH69Gjtvo3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767892016; c=relaxed/simple;
-	bh=muPI2Cu8xaoBPojdhtEq4FRkVwa4sSdm2P6NIFiW0v8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XiRP1H3joC327+JSJrVo4nhcRLA/cV9KVNZNw9ud41YBRMUTBSs8y+TMtuBcDfGCqXABhdVReqI918ftmeZqHFEc1YbjcJgKdk3A9gZrtUcWtsNbNDjH/nJt6NL8G08RooyisITBohk2+YToEQ5d4/FhnkKE+7wIeNRtojVck0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qQsQvaeW; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0c495fc7aso38622365ad.3
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 09:06:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767892014; x=1768496814; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QVefpuP8UR/7XkjLDjyyzWv1Aal+G6i/DuibP933gXc=;
-        b=qQsQvaeWIxRi51/8rPUejYCrwYJsv67H9KdtSk8kBnmRahLnMSYloKHB1MT4s4ICzP
-         UkuRwinoZs62Z4R9sHR/tpX/lWW89XXafme+uqBvN4Vy5JeZqa/Y16r0cvXLBf7izPzZ
-         3N3lpUmeGR6tz8XSwrKJ9frN+x1n0m0/K/GollOsKizUqb3KH8QzpwX6Jsdlxw5QVf57
-         vaIpelGFlfOdtjdOw25ZvxhXxpbdAXKrcr3hEKFwpiTzAT7MV3K6PCaI+OtY/lGTFdal
-         aUt181hnBwx0yFyuhFPb9esBnb3AMUAbkY8WDkNcgldV5e9hmNJnVdJ7UnAQenAl7hGS
-         0dOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767892014; x=1768496814;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QVefpuP8UR/7XkjLDjyyzWv1Aal+G6i/DuibP933gXc=;
-        b=YcCe+jMpP5HjgG81wOFLr0l4ayviRPHfKzlLP47Piyxc2oE/DDnZt55oWuZwLHYGV/
-         1d0w5smYTJ5pFvBeMQ5RKa0hS1jhUl+R/RuCA/vp0wQIZkmY1V63TXNYVn8Y7/0B5f6p
-         x031KXn1tcS1w/empEvIepL6VpDQwvUULOtiKCf6rrGlzI4MfiOTFVM7rmf3IGhEaHjz
-         pSWbPQPOOmzVOjC0sgxnJDDEdqPHARGgI76zuJDMdRnFH1w3t/9qo+kC+t4AKbwk/k0+
-         QGDcRO8E+aoLOIdU9eryLZ/OJkgl0QhOkSLaj17ICKeTEuWRnABPcLQGpB0h/ugF2UWN
-         A0cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/FlgwMv0JJPqbxHcTW1VGyqZwcmDITY69PMjCkB1ne5SlT2XqoHy2N9B9Nxk4sZpAhiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbvhHdSlKbWLs9+XDgYN941vu8xrapA7iQZ+dX+FFxULaxofAN
-	jZ8zeb2eqKnijMhgCMdQsfJYVvcmjet+MUOZIwF0RdBSL6oZrgoJ18x5tsBmQrC4b5mu3qoEqvq
-	s8i6AVQ==
-X-Google-Smtp-Source: AGHT+IFQl0ff8pn8KbqQ/lIIr11/3kfrRynmb0Zf119br04GQv3Ng0sDtXyGq7Ap5LK8lMqpSMFAhy6uy/E=
-X-Received: from plhz2.prod.google.com ([2002:a17:902:d9c2:b0:258:dc43:b015])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d86:b0:334:8a8e:6576
- with SMTP id adf61e73a8af0-3898f91d311mr6362674637.29.1767892014507; Thu, 08
- Jan 2026 09:06:54 -0800 (PST)
-Date: Thu, 8 Jan 2026 09:06:52 -0800
-In-Reply-To: <aV-GPYoKB5HIzcs3@blrnaveerao1>
+	s=arc-20240116; t=1767893559; c=relaxed/simple;
+	bh=UuRofox7XCb3cdDnaXYj1PeEoLZTYke+qDQbE9WjKss=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RRkKcLXSFRCCVuce/ME2st57VWAnH/6jwhUvZrjLXnBJpNK8cK6rd3eYNKJNR9Bh/TeydOBXLAgvLJAIzqGPFJRjVDlbDK7dbwY2F9VIFULDCC8EKzGvUsrgfKOYGOcnVvP3AjTMAguqh2tjGHjHf7Yk8dQjm7CuiXyx+nFCRlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiJt+5uT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B720DC116D0;
+	Thu,  8 Jan 2026 17:32:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767893558;
+	bh=UuRofox7XCb3cdDnaXYj1PeEoLZTYke+qDQbE9WjKss=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JiJt+5uTJRHY+HzgL59bmQ7c5gOnf1B0TMmN02RUEQ7L7TYrfHPVYCp1oZcE4PBYW
+	 EojDLf1Fr+MvQ1T8LttAIXhi2Nyx80mSMpMMiSmpaCCOvpt7OP6ms7b8EdmGAs0vxD
+	 obJBe+oW959zSElfZbJINoO8iaR17Q/bxhemsKTQuVJuzw0/jL1m1xkOQvTanrYpGq
+	 UEOv+KiYIAfD79S739XVbpCkh5VWmOYSnemuIwOvYBz6kdUO0FBPAyhfBvN4pV+/EM
+	 +K2ySN+jhBDJzRvGfidkNUs4SctFmg0MAYha4LUChXNmE/Ekj6eISVYhuAfC8WxxH+
+	 q/tmq6MoHNhCA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdtsC-00000000W9F-1ORF;
+	Thu, 08 Jan 2026 17:32:36 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: [PATCH v4 0/9] KVM: arm64: Add support for FEAT_IDST
+Date: Thu,  8 Jan 2026 17:32:24 +0000
+Message-ID: <20260108173233.2911955-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260107204546.570403-1-seanjc@google.com> <aV-GPYoKB5HIzcs3@blrnaveerao1>
-Message-ID: <aV_kLHFQzu7taPS_@google.com>
-Subject: Re: [PATCH] KVM: SVM: Fix an off-by-one typo in the comment for
- enabling AVIC by default
-From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, ben.horgan@arm.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jan 08, 2026, Naveen N Rao wrote:
-> On Wed, Jan 07, 2026 at 12:45:46PM -0800, Sean Christopherson wrote:
-> > Fix a goof in the comment that documents KVM's logic for enabling AVIC by
-> > default to reference Zen5+ as family 0x1A (Zen5), not family 0x19 (Zen4).
-> > The code is correct (checks for _greater_ than 0x19), only the comment is
-> > flawed.
-> 
-> I had thought that the comment was correct and that you wanted to 
-> reference Zen4 there. That is:
-> 	family 0x19 (Zen4) and later (Zen5+),
-> 
-> Though family 0x19 also includes Zen3 :/
-> 
-> I think it would be better to update the code as well, just so it is 
-> easier to correlate the comment and the code?
-> 
->         if (avic == AVIC_AUTO_MODE)
->                 avic = boot_cpu_has(X86_FEATURE_X2AVIC) &&
-> -                      (boot_cpu_data.x86 > 0x19 || cpu_feature_enabled(X86_FEATURE_ZEN4));
-> +                      (cpu_feature_enabled(X86_FEATURE_ZEN4) || boot_cpu_data.x86 >= 0x1A);
+FEAT_IDST appeared in ARMv8.4, and allows ID registers to be trapped
+if they are not implemented. This only concerns 3 registers (GMID_EL1,
+CCSIDR2_EL1 and SMIDR_EL1), which are part of features that may not be
+exposed to the guest even if present on the host.
 
-This thought crossed my mind as well.  I'll send a v2 with this, I especially
-like the idea of swapping the ordering so that the checks are "ascending".
+For these registers, the HW should report them with EC=0x18, even if
+the feature isn't implemented.
+
+Add support for this feature by handling these registers in a specific
+way and implementing GMID_EL1 support in the process. A very basic
+selftest checks that these registers behave as expected.
+
+* From v3: [3]
+
+  - Added ID_AA64MMFR2_EL1.IDS == EL3 (Ben)
+
+  - Introduced in_feat_id_space() helper (Yao)
+
+  - Collected RBs, with thanks
+
+* From v2: [2]
+
+  - Repainted ID_AA64MMFR2_EL1.IDS description (Oliver)
+
+  - Made the IDST handling more generic in the core KVM code, which
+    resulted in the series being restructured a bit
+
+  - Added handling to pKVM (in a slightly different way, as pKVM
+    insist on seeing a full enumeration of the trapped registers)
+
+  - Some cleanups
+
+  - Collected RBs, with thanks
+
+* From v1: [1]
+
+  - Fixed commit message in patch #4 (Ben)
+
+  - Collected RB, with thanks (Joey)
+
+[1] https://lore.kernel.org/r/20251120133202.2037803-1-maz@kernel.org
+[2] https://lore.kernel.org/r/20251126155951.1146317-1-maz@kernel.org
+[3] https://lore.kernel.org/r/20251204094806.3846619-1-maz@kernel.org
+
+Marc Zyngier (9):
+  arm64: Repaint ID_AA64MMFR2_EL1.IDS description
+  KVM: arm64: Add trap routing for GMID_EL1
+  KVM: arm64: Add a generic synchronous exception injection primitive
+  KVM: arm64: Handle FEAT_IDST for sysregs without specific handlers
+  KVM: arm64: Handle CSSIDR2_EL1 and SMIDR_EL1 in a generic way
+  KVM: arm64: Force trap of GMID_EL1 when the guest doesn't have MTE
+  KVM: arm64: pkvm: Add a generic synchronous exception injection
+    primitive
+  KVM: arm64: pkvm: Report optional ID register traps with a 0x18
+    syndrome
+  KVM: arm64: selftests: Add a test for FEAT_IDST
+
+ arch/arm64/include/asm/kvm_emulate.h          |   1 +
+ arch/arm64/kvm/emulate-nested.c               |  21 ++++
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            |  39 ++++--
+ arch/arm64/kvm/inject_fault.c                 |  10 +-
+ arch/arm64/kvm/sys_regs.c                     |   4 +-
+ arch/arm64/kvm/sys_regs.h                     |  10 ++
+ arch/arm64/tools/sysreg                       |   7 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/arm64/idreg-idst.c  | 117 ++++++++++++++++++
+ 9 files changed, 194 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/arm64/idreg-idst.c
+
+-- 
+2.47.3
+
 
