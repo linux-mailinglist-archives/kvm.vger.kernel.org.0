@@ -1,128 +1,128 @@
-Return-Path: <kvm+bounces-67312-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67313-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE56D007F4
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 01:54:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA994D00B45
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 03:41:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 60DDE30060E4
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 00:54:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 63C663002843
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 02:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D2B1F5842;
-	Thu,  8 Jan 2026 00:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EE625A659;
+	Thu,  8 Jan 2026 02:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="l7eBb33+"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="17evGVds"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE6417C77
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 00:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3AAFC0A;
+	Thu,  8 Jan 2026 02:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767833649; cv=none; b=qJ61U9xO5sjygznw06X7ML3GxfzO6z77wsA0aYCDMwmtEfFlG6QqGConTsHA+zL4o8GuB769D3OTyL8TeJEwRAJdIpJaWUv6eRB6DaYvVgviLDd2C2wUVZ3bQvLYP2VzKS6EcjGSRMKrhcpEbGda6iwXUH+8CpsC9s3SzzBbud0=
+	t=1767840085; cv=none; b=fd6cEv3QHg6AW7tp85Ybbhrn9StoCSqoQMA9BTOu4+TrCQd4yLYC3DmMEBkHUuZsfnxrPMa4U9FYJDWZ2wwpvde1lTouBQnxBp+BarNOMY5LQ2RqZDG57wxLwkjhF7cb8AqqeRGuAvL2Ml8l41j5wl8OSbVFCkyaSB5yUflg7GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767833649; c=relaxed/simple;
-	bh=qkl7DK3BpNF47DqlUVY8OBjoLVg1f80p3hzeztShHy0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPl6aAQst2alQTDw26PLbVOF5kgAjXovSFR7p/l7u8Lb9BuSouwfsiuTSiEPRpHIJgcOigQOd03cS05ZDnLg50ikj9yZKRafCeEX0zbwMfw25+qz2GiQi6IwyyMu5dmebg/ju/ZgUAdUGTDbJrP9zfWewmhVyHhyZ3/GU5iquCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=l7eBb33+; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8888546d570so31714996d6.2
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 16:54:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1767833647; x=1768438447; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zl/wCLSFYxDTasNNIFB7qMIXn4ZfCjA7D6KoNe2mE2Q=;
-        b=l7eBb33+ErdcqaeYohuxsJyrZZWB/2cWlSnM4FMY8waLhQukyvymAgVgI21SKtvFEB
-         cH7ujbYmBeVbmYG4guQ0+FykwuOX192VG9+YrXo4XWMYPVdVxZ7COS7BNJ/Em9oqT+eT
-         JYLA73DI+UDDfeNEIW1j0+MtVTHIh6l95l78qzpGxCpirhzczCQMUk8PRLT70FLLgn2L
-         wUUQ13FrV1vliJkqVqkAkPcBLi6btuCWXeqZ+uZdgnvgw0IWPJJjBqwURxEfOD+hiGEf
-         GwV2uJGeHhHjf992b6V34cgvpEVJ0NzlJhpWuVegY12RkW74njUvx1M/4V7g9LJMCiUc
-         97+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767833647; x=1768438447;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zl/wCLSFYxDTasNNIFB7qMIXn4ZfCjA7D6KoNe2mE2Q=;
-        b=DeoVJU+etGi+3QghFpoGwtbmbGOQr7v4qeu/H28bxxmO9XlnCuIqp9ne3mB//CTteS
-         Vv1+h9nN/bLmkc9gLddSYJECksUzVVDTi4Al6Np2dI06DRpvsRFXpP4fi7nGbodjrJpZ
-         LEYupbhzhHF2xYAVGDOlnowq4mpx4IYJJQyVKJNJAGUUrALglh5MI6x8UkhUhAmrhEiL
-         rUa8fY7FCLCcTCxZOjqrbM1BtlrTphwpei8RDbwynkqswBqAs/1C768d7QSx4Hdarw0x
-         NrylgOvoYZ0m0gWBrT+yaYN+ecagglAwtd4Fzi5DvSEkz/3Cdt4zrcLmijZJSMtZWqk2
-         e7jA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7Mhj/ND3fhddAaCT/gQDBYQUMKx4OzzQd7O+Sb3UnDsHhNTL6iaA0L143Tng0S5nzsyE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybUFBJ/LGtV02QRkXgcPS7hVdntFFIo0JdIkcm6Jfy0Ae8cwIq
-	rP4ZWs0CcNTD7/B1fKjOPZOlDMWAB+AG59Zk6nuxySAcso8OALktH8/ZJr064cHmEmE=
-X-Gm-Gg: AY/fxX51l/QQFgyrqp4RUWJVDH8uoLSHhIbiAtAWd/S+bqCnSzhIx1P9qQmI8dHBJf9
-	ImBdGWwD4+RpRwNxdWKvggNxJiOFwNsb8tKcuKxBOeSQSHOxFgZWa82BspV+435VILHtwregK2J
-	HCYQpr5+E1TNZ+j7vv0fmrqqd5XaDwHPgwm+vKhsrgyCmmITsVvnD5B3Bi4/hiOPsPTaOa8TAs4
-	T1CcMkyltwIrdjTADUFeatbNm+A6/56HrgM9+lYF+sLsILe2H9diwslP2mD9WhenU0iXozZlr2v
-	zm1Vb8KX/TOTsRr5cpQ5K6/wMiFWmcXncwjQ31GvKJnq5tv7MfQTaqcr7IiwY8NXO9T9sKSgGqF
-	reGT8cLrDcOLQaSzWjE1SGKtY8wNfkjUWf/FGMrjKjP6ByLDih9tLkMT4laeaAQnpVo5/e5XZQ9
-	PIok1SNdyhIrvNsIQY94vffuqKJAJijsaoPC7ZjlqN3sajateWALgt6LlHQGuxdgPmlRAyC3bH8
-	dqrDQ==
-X-Google-Smtp-Source: AGHT+IFzwWFM1xm57ldcpfy5lJ/TQeABRvizVWmezixsdp8w652r/WsKLDXS4GvPiS9CZXAymOEobA==
-X-Received: by 2002:a05:6214:4a93:b0:88a:7617:6b8c with SMTP id 6a1803df08f44-890842a1684mr68378556d6.48.1767833647102;
-        Wed, 07 Jan 2026 16:54:07 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770e217bsm42850346d6.13.2026.01.07.16.54.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 16:54:06 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vdeHu-00000002Hrc-0KPf;
-	Wed, 07 Jan 2026 20:54:06 -0400
-Date: Wed, 7 Jan 2026 20:54:06 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Mastro <amastro@fb.com>, Alex Williamson <alex@shazbot.org>,
-	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
+	s=arc-20240116; t=1767840085; c=relaxed/simple;
+	bh=9N7gtfek0CZSERE5rrudUqB6NRFeojNIful35p+BAlE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X5/U+iWtDqVlO4EDiAxsz93E7Qv8Q/YnSJPh34+t01x5HCbH1Y/N+r3uvMtDJ8Ibqk/hjN2i4Y/PxuBgg7Up5YDhriVz0gqdK7wQvmoOB1JICwR7YWaQpNER+s/Sn0pZ5n2bGGdAyl5AqnT2TccvoyU5ihmnX7MjDHKU+pMRQI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=17evGVds; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6081mYQP2888993;
+	Wed, 7 Jan 2026 18:41:15 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=5lRmE98vcvRhVI150GA9
+	NbrLj85CvVEHBjRpAZ3nKgY=; b=17evGVdsVshoa4BNelFRCtaBDUtIDV72yDoe
+	AO1Ho5lb1s4utMUJoUoiOdMZuKJawO3ZxLFfBSfoHOWMWvujULMAjrZ95i9sR+5x
+	sWfaEZIvG9c1Akoa8bPXs/uNBti24o6E4nDrkKCrF/sXFHRcH3vIanvH7t7ppNpl
+	78J+eMQfx3HRFPWx1n3JUqFa5dbhF8Q3nm0LV+dDD8dkiFf3NeGxmsGhCa3k0zp5
+	LXuiudPalgzIMN/zakGweXFO+OQ4t4sVlfiJr9OOQ3Ziiy2UJUH7YF/IHbMnmmb5
+	eRaEMDz2t2f5U6zstKzjWyCAwyHFgkaisAXbyAlRcQ33kCkgCQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bhv484mrj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 07 Jan 2026 18:41:15 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Thu, 8 Jan 2026 02:41:14 +0000
+Date: Wed, 7 Jan 2026 18:41:10 -0800
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>,
+        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>
 Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <20260108005406.GA545276@ziepe.ca>
+Message-ID: <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
 References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
  <aV7yIchrL3mzNyFO@google.com>
+ <20260108005406.GA545276@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aV7yIchrL3mzNyFO@google.com>
+In-Reply-To: <20260108005406.GA545276@ziepe.ca>
+X-Proofpoint-GUID: ESBitpku9tgv-bgoB0v0gHTDKnIpx58Q
+X-Authority-Analysis: v=2.4 cv=H47WAuYi c=1 sm=1 tr=0 ts=695f194b cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=gxYtzChvB9cNzsRSEx4A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDAxOCBTYWx0ZWRfX9SN81BjLRUDZ
+ V/jVM1T+ZOjnO2VUGFUjvp8ApxKhDnhG0t9pT5hlB+jIQQEWJu9bFYV5Pbce1ZIe1DAI56o1j5T
+ yv3P9MranlLY3+HLIXiayWvj4ZPjNm1xlxHu0sHZGHPG1uYXzlN215e4lpkm0LRHUDznh90YKsO
+ cAOD58YAb+V3XNyvMLTKAbD/oY2lA0DMvSWfMes9YGU9u+tr4uALx2xKCXMPLW8MnZ+WDBGAGSF
+ Ko9PoiWkzbwQGZ6g1ebd8yMq1aDRbPZJXYiNiKgJeYUTaIpzZGx1S5jthMe815fauvF7YBd3qRG
+ 7WkTLZtY7RmfKKi4iT8DYdhip0S7YKG4N8WlCcuDHu8BOiNHlatJBoTLOdZeHJD565JBdJcgcjR
+ c3NgmiY2SxrtIJzeJd5ZGipCcFMglNR4Ogy/+RJ+98wEhSxVxfMtMNKZRkYu2BijdMR0tI9NuoH
+ vazL+rmlNOPrhM0Xnkg==
+X-Proofpoint-ORIG-GUID: ESBitpku9tgv-bgoB0v0gHTDKnIpx58Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-07_05,2026-01-07_03,2025-10-01_01
 
-On Wed, Jan 07, 2026 at 11:54:09PM +0000, David Matlack wrote:
-> On 2026-01-07 02:13 PM, Alex Mastro wrote:
-> > Test MMIO-backed DMA mappings by iommu_map()-ing mmap'ed BAR regions.
-> 
-> Thanks for adding this!
-> 
-> > Also update vfio_pci_bar_map() to align BAR mmaps for efficient huge
-> > page mappings.
+On Wed, Jan 07, 2026 at 08:54:06PM -0400, Jason Gunthorpe wrote:
+> On Wed, Jan 07, 2026 at 11:54:09PM +0000, David Matlack wrote:
+> > On 2026-01-07 02:13 PM, Alex Mastro wrote:
+> > > Test MMIO-backed DMA mappings by iommu_map()-ing mmap'ed BAR regions.
 > > 
-> > Only vfio_type1 variants are tested; iommufd variants can be added
-> > once kernel support lands.
+> > Thanks for adding this!
+> > 
+> > > Also update vfio_pci_bar_map() to align BAR mmaps for efficient huge
+> > > page mappings.
+> > > 
+> > > Only vfio_type1 variants are tested; iommufd variants can be added
+> > > once kernel support lands.
+> > 
+> > Are there plans to support mapping BARs via virtual address in iommufd?
+> > I thought the plan was only to support via dma-bufs. Maybe Jason can
+> > confirm.
 > 
-> Are there plans to support mapping BARs via virtual address in iommufd?
-> I thought the plan was only to support via dma-bufs. Maybe Jason can
-> confirm.
+> Only dmabuf.
 
-Only dmabuf.
+Ack. I got confused. I had thought iommufd's vfio container compatibility mode
+was going to support this, but realized that doesn't make sense given past
+discussions about the pitfalls of achieving these mappings the legacy way.
 
-> Assuming not, should we add negative tests here to make sure iommufd
-> does not allow mapping BARs?
+> 
+> > Assuming not, should we add negative tests here to make sure iommufd
+> > does not allow mapping BARs?
+> 
+> Yes
 
-Yes
- 
-> And then we can add dma-buf tests in a future commit.
+Will add.
 
-Yes
-
-Jason
+>  
+> > And then we can add dma-buf tests in a future commit.
+> 
+> Yes
+> 
+> Jason
 
