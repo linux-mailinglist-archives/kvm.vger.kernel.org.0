@@ -1,149 +1,267 @@
-Return-Path: <kvm+bounces-67406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61BB4D042DC
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 17:08:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6534D04414
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 17:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05125358091E
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 15:48:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0C5193025C66
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 16:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B922EFD99;
-	Thu,  8 Jan 2026 15:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="FPoGqxK2";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tmyu2f8W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC35221CC55;
+	Thu,  8 Jan 2026 16:10:43 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DA1261B70;
-	Thu,  8 Jan 2026 15:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702351A3179
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 16:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767887118; cv=none; b=NqCCUD5zwzXc2u5dNn7/0CsDpY4+Lqyx0UVcgNdndsaSnnPUoj5ADMtdlvwdMmIRy+sPRWbAUld7qPdLG4Fc/pO6nxVE26U4CL8bexvo5qPrh/5lp63RkPfY1mU5TxjtIIkmLNg9XSvTapD9jMpaub00PS6GUlgHH7RFZn4Gqiw=
+	t=1767888643; cv=none; b=YTHWVPg1jcunTz1lSDQZ4SyBHct0up6jMEi6mq1J9fDG3fm2w/158tjpYrC3u1fkD7giAYd2GoucebXdycELHvhkseAAUXZLvGKgt1HJEvgzxk/rviYejNEqFesWsP8VzPhPy8jppBc4sX7hzYSMT7bl5WN7MKynw9V5/zzHjMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767887118; c=relaxed/simple;
-	bh=cAifuf60VaB009+/fjECv5OLFMBJMnmjJyrVeuq+Ufc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BO3HYTchiRjRzzL62Qy4rEuWq/mPw/wjp4clnoiw9fBzahIrA+wF0Xtc0Fe31FJTlDm+mKrZOToiP9O1EVWxblAzeL8hKykZ7SCvLjwQcKiF2DNKxozAYcrjO94I9AqTopdCGRdfSngAFoFP57aL+jEHEbv3r2huCkKVoGNBd+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=FPoGqxK2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tmyu2f8W; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 02A8C7A012A;
-	Thu,  8 Jan 2026 10:45:15 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Thu, 08 Jan 2026 10:45:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1767887115;
-	 x=1767973515; bh=P0QqQz8X1HAkcqldFqlq4mLu7Co2xScerhLdHuYGts4=; b=
-	FPoGqxK2sOHXMMmn16LA149TDWDmYiIwj8DtPrdORZthooH8lacl9CcIfJGPAf5b
-	Hk1g35sQ7yUshKwmzNW47f0jwMSnqOxbPqXYz9r9I2XfdV9+SjqjTUlqTMzutv9W
-	v7yBUxTYblWouPvipQ8D/GlBFpZcrUXy0O8eKxV9wNPpxxFDg97CrAwbULQ4fPe9
-	OcWCeWELdd4JJ+6MLpTbvB4nurQzjL4rglEMqxCboXEcsnySd4HbMIjPMTAwbZbs
-	RGoG+rQGgQvYaTxl7tC3XXHPGwzmNGlY6ph2XJQh9qg+wBzXdh8wNI22D7zkEU5T
-	rnpo8653dzT37XiYGWh62g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1767887115; x=
-	1767973515; bh=P0QqQz8X1HAkcqldFqlq4mLu7Co2xScerhLdHuYGts4=; b=t
-	myu2f8W8oYhg5gwf1+A5wtJzJ2IoV4GKw36Za3scc8OHnN7IQsp/qXpn0MvUxKwM
-	9niR2SeshqKgiq5x1xryPav8CgVKgiQNmwD5mJ3W4j/X5zt4xoUXbXPQrqbvT7mc
-	74rdJQXOvqu398QB+DaPXMNTQzfa7RESEgaS8AhsxldLwYGF+8QsiHoowBdkXynm
-	Qr3xi39vfsVv63AJcEp4kumWqcEIAeAw0xN10OKDVMva5u3YMDfzJe/60/K+umbY
-	I84ho2uu1Jw24IKAft9yrvIMvl38JXPWVBdH3BTMOOCrgnp1bjAWZVDnOx+isC+L
-	iEgprTfbXFhIMCfJy3aiQ==
-X-ME-Sender: <xms:C9FfaZnBcaJePHekY8vrQAzoDwfJjE5kBk2EKXDxlU6ClKai5aPcWw>
-    <xme:C9FfaQ3iImYSE7ubOrCOaRzKHungFEr1lB8w9APFvGVGdrcAIieGOxOLWCK6AIpDj
-    a79bxjgHvydI_Nu2THcnrGCAa8LTuAoQOBcUqsN0RAsci91HQl_>
-X-ME-Received: <xmr:C9FfaR0-sQC23k7tmFcvRt691nInzHbBG0abdcWo1acXBbi3WJk_iTtUYp4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutdeifeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepkedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtoheprg
-    hmrghsthhrohesfhgsrdgtohhmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehpvghtvghrgiesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgv
-    rhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshht
-    sehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:C9FfaapgtSQYbM_mfzpZJWcg1sqG3dNoWKHMjV-7-NlkHHwYPDGIZQ>
-    <xmx:C9FfaVi56KWE18zpTzg80Ct9DHblFoDI8U6ElSUhmTR30h4zekoC7g>
-    <xmx:C9Ffae-vSPUkuBz0xkh4xhmOW_KTSXX9fL63O6rxap5obkNfvkuJ7A>
-    <xmx:C9FfaZXS17G5DG5EO3bkBPKY3jv5Wctoo2uSlPPsa4fKCbLmLjkbnA>
-    <xmx:C9FfaRqzcTo_BzbE7bzhNUmSWy8napyKwXRNsbj_lYo_AJNKTA1C_Rpm>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 8 Jan 2026 10:45:14 -0500 (EST)
-Date: Thu, 8 Jan 2026 08:45:14 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Alex Mastro <amastro@fb.com>, David Matlack <dmatlack@google.com>, Shuah
- Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <20260108084514.1d5e3ee3@shazbot.org>
-In-Reply-To: <20260108141044.GC545276@ziepe.ca>
-References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
-	<aV7yIchrL3mzNyFO@google.com>
-	<20260108005406.GA545276@ziepe.ca>
-	<aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
-	<20260108141044.GC545276@ziepe.ca>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1767888643; c=relaxed/simple;
+	bh=Tej4awhuCuuXOnYNKdex5U5yvlB1jVTrTzmYMPKg94g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PFL65HFA7qUSufMEhRRBLILlKwoKdKYPV0n53jmcJAWu+DfoW+w4JysrIDJoZP3lD3hUioLed8jsNs4jJlwOQJtXbWcdcXNEI/HQgfQeIFwfD3CiKM22x+XM983PMy/lIl57eIv9BFKe7NKW3Z0CxEvrb8a09/vzBY1/n3DOcGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27899497;
+	Thu,  8 Jan 2026 08:10:34 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 491613F5A1;
+	Thu,  8 Jan 2026 08:10:38 -0800 (PST)
+Date: Thu, 8 Jan 2026 16:10:31 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 19/36] KVM: arm64: gic-v5: Check for pending PPIs
+Message-ID: <20260108161031.GA223579@e124191.cambridge.arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+ <20251219155222.1383109-20-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251219155222.1383109-20-sascha.bischoff@arm.com>
 
-On Thu, 8 Jan 2026 10:10:44 -0400
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+Small nit,
 
-> On Wed, Jan 07, 2026 at 06:41:10PM -0800, Alex Mastro wrote:
-> > On Wed, Jan 07, 2026 at 08:54:06PM -0400, Jason Gunthorpe wrote:  
-> > > On Wed, Jan 07, 2026 at 11:54:09PM +0000, David Matlack wrote:  
-> > > > On 2026-01-07 02:13 PM, Alex Mastro wrote:  
-> > > > > Test MMIO-backed DMA mappings by iommu_map()-ing mmap'ed BAR regions.  
-> > > > 
-> > > > Thanks for adding this!
-> > > >   
-> > > > > Also update vfio_pci_bar_map() to align BAR mmaps for efficient huge
-> > > > > page mappings.
-> > > > > 
-> > > > > Only vfio_type1 variants are tested; iommufd variants can be added
-> > > > > once kernel support lands.  
-> > > > 
-> > > > Are there plans to support mapping BARs via virtual address in iommufd?
-> > > > I thought the plan was only to support via dma-bufs. Maybe Jason can
-> > > > confirm.  
-> > > 
-> > > Only dmabuf.  
-> > 
-> > Ack. I got confused. I had thought iommufd's vfio container compatibility mode
-> > was going to support this, but realized that doesn't make sense given past
-> > discussions about the pitfalls of achieving these mappings the legacy way.  
+On Fri, Dec 19, 2025 at 03:52:42PM +0000, Sascha Bischoff wrote:
+> This change allows KVM to check for pending PPI interrupts. This has
+> two main components:
 > 
-> Oh, I was thinking about a compatability only flow only in the type 1
-> emulation that internally magically converts a VMA to a dmabuf, but I
-> haven't written anything.. It is a bit tricky and the type 1 emulation
-> has not been as popular as I expected??
+> First of all, the effective priority mask is calculated.  This is a
+> combination of the priority mask in the VPEs ICC_PCR_EL1.PRIORITY and
+> the currently running priority as determined from the VPE's
+> ICH_APR_EL1. If an interrupt's prioirity is greater than or equal to
+> the effective priority mask, it can be signalled. Otherwise, it
+> cannot.
+> 
+> Secondly, any Enabled and Pending PPIs must be checked against this
+> compound priority mask. The reqires the PPI priorities to by synced
+> back to the KVM shadow state - this is skipped in general operation as
+> it isn't required and is rather expensive. If any Enabled and Pending
+> PPIs are of sufficient priority to be signalled, then there are
+> pending PPIs. Else, there are not.  This ensures that a VPE is not
+> woken when it cannot actually process the pending interrupts.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 121 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    |   5 +-
+>  arch/arm64/kvm/vgic/vgic.h    |   1 +
+>  3 files changed, 126 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index cb3dd872d16a6..c7ecc4f40b1e5 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -56,6 +56,31 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
+>  }
+>  
+> +static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u32 highest_ap, priority_mask;
+> +
+> +	/*
+> +	 * Counting the number of trailing zeros gives the current
+> +	 * active priority. Explicitly use the 32-bit version here as
+> +	 * we have 32 priorities. 0x20 then means that there are no
+> +	 * active priorities.
+> +	 */
+> +	highest_ap = cpu_if->vgic_apr ? __builtin_ctz(cpu_if->vgic_apr) : 32;
+> +
+> +	/*
+> +	 * An interrupt is of sufficient priority if it is equal to or
+> +	 * greater than the priority mask. Add 1 to the priority mask
+> +	 * (i.e., lower priority) to match the APR logic before taking
+> +	 * the min. This gives us the lowest priority that is masked.
+> +	 */
+> +	priority_mask = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, cpu_if->vgic_vmcr);
+> +	priority_mask = min(highest_ap, priority_mask + 1);
+> +
+> +	return priority_mask;
+> +}
+> +
+>  static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+>  					  struct vgic_irq *irq)
+>  {
+> @@ -131,6 +156,102 @@ void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
+>  	}
+>  }
+>  
+> +
+> +/*
+> + * Sync back the PPI priorities to the vgic_irq shadow state
+> + */
+> +static void vgic_v5_sync_ppi_priorities(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int i, reg;
+> +
+> +	/* We have 16 PPI Priority regs */
+> +	for (reg = 0; reg < 16; reg++) {
+> +		const unsigned long priorityr = cpu_if->vgic_ppi_priorityr[reg];
+> +
+> +		for (i = 0; i < 8; ++i) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +			u8 priority;
+> +
+> +			priority = (priorityr >> (i * 8)) & 0x1f;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 8 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +
+> +			scoped_guard(raw_spinlock, &irq->irq_lock)
+> +				irq->priority = priority;
+> +
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +		}
+> +	}
+> +}
+> +
+> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int i, reg;
+> +	unsigned int priority_mask;
+> +
+> +	/* If no pending bits are set, exit early */
+> +	if (likely(!cpu_if->vgic_ppi_pendr[0] && !cpu_if->vgic_ppi_pendr[1]))
+> +		return false;
+> +
+> +	priority_mask = vgic_v5_get_effective_priority_mask(vcpu);
+> +
+> +	/* If the combined priority mask is 0, nothing can be signalled! */
+> +	if (!priority_mask)
+> +		return false;
+> +
+> +	/* The shadow priority is only updated on demand, sync it across first */
+> +	vgic_v5_sync_ppi_priorities(vcpu);
+> +
+> +	for (reg = 0; reg < 2; reg++) {
+> +		unsigned long possible_bits;
+> +		const unsigned long enabler = cpu_if->vgic_ich_ppi_enabler_exit[reg];
+> +		const unsigned long pendr = cpu_if->vgic_ppi_pendr_exit[reg];
+> +		bool has_pending = false;
+> +
+> +		/* Check all interrupts that are enabled and pending */
+> +		possible_bits = enabler & pendr;
+> +
+> +		/*
+> +		 * Optimisation: pending and enabled with no active priorities
+> +		 */
+> +		if (possible_bits && priority_mask > 0x1f)
+> +			return true;
+> +
+> +		for_each_set_bit(i, &possible_bits, 64) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 64 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +
+> +			scoped_guard(raw_spinlock, &irq->irq_lock) {
+> +				/*
+> +				 * We know that the interrupt is
+> +				 * enabled and pending, so only check
+> +				 * the priority.
+> +				 */
+> +				if (irq->priority <= priority_mask)
+> +					has_pending = true;
+> +			}
+> +
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +
+> +			if (has_pending)
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  /*
+>   * Detect any PPIs state changes, and propagate the state with KVM's
+>   * shadow structures.
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index cb5d43b34462b..dfec6ed7936ed 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -1180,9 +1180,12 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+>  	unsigned long flags;
+>  	struct vgic_vmcr vmcr;
+>  
+> -	if (!vcpu->kvm->arch.vgic.enabled)
+> +	if (!vcpu->kvm->arch.vgic.enabled && !vgic_is_v5(vcpu->kvm))
+>  		return false;
+>  
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
 
-In part because of this gap, I'd guess.  Thanks,
+        if (vgic_is_v5(vcpu->kvm))
 
-Alex
+Otherwise:
+
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+> +		return vgic_v5_has_pending_ppi(vcpu);
+> +
+>  	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
+>  		return true;
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 978d7f8426361..65c031da83e78 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -388,6 +388,7 @@ int vgic_v5_probe(const struct gic_kvm_info *info);
+>  void vgic_v5_get_implemented_ppis(void);
+>  void vgic_v5_set_ppi_ops(struct vgic_irq *irq);
+>  int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
+> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu);
+>  void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_load(struct kvm_vcpu *vcpu);
+> -- 
+> 2.34.1
 
