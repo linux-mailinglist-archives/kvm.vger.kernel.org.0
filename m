@@ -1,129 +1,140 @@
-Return-Path: <kvm+bounces-67374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA142D02CD3
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 13:59:36 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872D0D03167
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 14:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 858A130674D3
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 12:55:58 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 10A81300A90F
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 13:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C7243D514;
-	Thu,  8 Jan 2026 11:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5DB39E181;
+	Thu,  8 Jan 2026 11:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gztWuRWW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXNJAOji";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gKablw+A"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2956B43E49A;
-	Thu,  8 Jan 2026 11:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4E346920B
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 11:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767873283; cv=none; b=hFAhWc8njk0DP6j840r055cygyzdEWdZMYiSTaCyLjq2Lh2Z0hvfEchlLVyoTdY0gL9+RsTZtAF8VxW5kSYgVO9/EV7qpUUsf1DuS5HUpb879AQiDohhPquk3TQUIj+mTn+O5Zyr+jy9uICleCXExqbUrzxwJcLWOyAEujR2cro=
+	t=1767871678; cv=none; b=VPfiXesQ019xu0CK9gei1M03BrV9K5zNjqM8PUY4xxXEj9MK92t5XeO/U4PLiXGgd98sZjshpDlWOpR2N9FMdhhlFMpnTCT55Td8zqcSlnvrLCd5vf+ZKUEXtJnPUldCTh/cQwOnlMVsKZkSLaSGqimgXxs9Z6KOuLI3PIu+exk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767873283; c=relaxed/simple;
-	bh=2QEBB0tMTbcvjFiR3Bb1wbKlZRI1fz02/DZZV9eNhGg=;
+	s=arc-20240116; t=1767871678; c=relaxed/simple;
+	bh=DXVRxgEjQyIFhLiJRSIIYHf6s0Xh3efyK6PB23H68Xk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lWzMXGwYvZqKkPdRrkCjmcoxO3qZQkf7WN4fDckejdioq7va7ShQmSPGaab5roMbbJWBNUi+HRF/9i/7Gd7/iHjkjAQCky8ZwtX1ydlSOzsCGSbJsGSNXdfKrWanrroyvQnApMgHWnhk43x3hedSGiQ9lr9vasR3Azx/frT0pSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gztWuRWW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EECC116C6;
-	Thu,  8 Jan 2026 11:54:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767873282;
-	bh=2QEBB0tMTbcvjFiR3Bb1wbKlZRI1fz02/DZZV9eNhGg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gztWuRWWWZMayVuI+eb83hb3O95TWjuvXHPnEaq9PU++6FKFEs9agoO8gkYWsLZoQ
-	 AUiOfOAzMknl1KMV1WWRlutba9l6uoUNrHhvu0FBq2uFDn5jpUBzNuZfUQG+FaWQiy
-	 TQrhqyCltaiDZV7MUi4zRKt5lBONbDFu79sjvv63PnDEqWgZx4+WeSFhIbcWa3ZLyd
-	 ccZlJiz329makknk+Pp+h3XLmy4RCnWlzOneHdEprUjri/PYwlvjwZMRdmhPX44NwX
-	 UD4KU7TcamImNx7mzmBzSxb5xMoKo//IO2Ns/eUIaBFOYPgElqwojBE81i/eviy23g
-	 LZPpq0A0TAzqw==
-Date: Thu, 8 Jan 2026 11:54:31 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 02/30] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
-Message-ID: <3c8b4a5e-89f4-47e0-9a5d-24399407db0c@sirena.org.uk>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-2-8be3867cb883@kernel.org>
- <CA+EHjTxdSnpFHkm6o85EtjQjAWemBfcv9Oq6omWyrrMdkOuuVA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SXY/rilOBDdsAUSPeGRAwX6gJw3d38GmDM2+W9jdjOXkHqVqExQxjkgYBsoIo2ClN1NpYK5Le97XCT4sj9KSNhYDL0yhv37fAGVBD2aHAk8atVfRPReP3j6v0tF8808FLc2filCDZvXRAbPkvYWsYevRG+b6/N3PGaPoHoFD7lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VXNJAOji; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gKablw+A; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767871674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7OLB5of9LH4Xgr0g/cKdpkyNCBxF+ZVgPMqVenfELd8=;
+	b=VXNJAOji900LbBB3YipqIIEnHHd09fRytx1wSbSkMJjgNoMIFWPi808TFBWER22JZAyo3h
+	zuaOogzChP+mHw5JgkDog7P2ZscdXwkHq4LLU67BT1HHYCDa9jDe6od92w6ofxx/P0be1q
+	dxcq+YoQRy6psmsKyiyE0qy5PoN0DDI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29--L8Ws2fiNtyyDs9eW9kOXw-1; Thu, 08 Jan 2026 06:27:53 -0500
+X-MC-Unique: -L8Ws2fiNtyyDs9eW9kOXw-1
+X-Mimecast-MFC-AGG-ID: -L8Ws2fiNtyyDs9eW9kOXw_1767871672
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4775d110fabso29033325e9.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 03:27:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767871672; x=1768476472; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7OLB5of9LH4Xgr0g/cKdpkyNCBxF+ZVgPMqVenfELd8=;
+        b=gKablw+ACVcLJ6DvTE9rQO7V6DTsNNxQw+BMfHf4bN/t/62m81D3wxPKm9zWG/vzUA
+         ta7xgfNwl4K+FPLXCwswbzUa+553v+xo1cz9ojeRZBE1E0PGJ1oZkh9GGEuHQgywGjHQ
+         PuQ79p8T+X6WR5VOlHIleeMDyPRWjLIcZJ/imT/YOqX2pZSie4wLKS3rlBtLNw1vZ8lh
+         rFnumjKGmfjyjL+1N7A6TbyRexqpAugySIJRzpRnl8IKPMqxZtZylmkzxpfa8LoaS7Fw
+         bSZrDoQdvLDYaZhp5siaDq7alwWrJat30sSc02G3aTYISGE3YjJrBZbgBsnAUEd2YAAM
+         nEnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767871672; x=1768476472;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7OLB5of9LH4Xgr0g/cKdpkyNCBxF+ZVgPMqVenfELd8=;
+        b=Mt0OaC7LPTHFjHrDwdbHXBNnRSD266Mk62MAv9COqjElSqTjQgsnVkoT9VaOMrXf+9
+         P1X+Vkc+TAVibGCOLWnK7qAaBhvBkXwnvevfEVnzZGsD1Nc0b+lPJ6zdJzKjyZeYBpQS
+         BiV9SH6m3FiNwIW6S9w1euofO6npqNrJjqK4R5z1fXeICWMlEcrdDDEvmkHK751GKSfi
+         P3zL/ka2RHC/u8lYFCddFOH/8NsmFZNgzP30tO7CHycCqcFpKFdz85O6T3VDbP7R04nj
+         lG9jlQtSm4qI0JVzjeZ1rLLnqwzBp9xHVHvtiHzeg+lb32/bN3ObkhHLfdz2PljmQDFa
+         d3/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXHdA4Lhzzidn8xWkwtBy2/FTXJT0RyeeqCD2VCsNzzE9UfMqWsRhaeNHDe2wrOO7/Rtxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzerdpDsDCl+ijKiYKWelSzirwTMvgelc/6zacGSrevQMFPaySX
+	FJcF6MHM2QiPPC9/nbjvguzK5HrZRACdWkmDzBhVLtMuumMu1Mq/TBfBDbsKtsoji/WM0HEkU75
+	O5jmC5KzVPiGsjCOWK9Zjkhsx4hmGqiNbHfrDQQXyUCgCJbDBYqZUuw==
+X-Gm-Gg: AY/fxX5rcaiBZYrdIgCPBVizLSgJTAfoc7ikW+wXrzaB9W7aT1jKu1wHwt4FUEBW6b6
+	br2zIE6mRN59duV6d4uqpsqnJA6yfwaUXA+PrT4y3mdr2SmZLNS79Lb/BvogQbCLdMjN+9TXmS1
+	XfWT8tcXLiJNHgGZF6T+L9/Tv1RypMvsj5jOAbRoLeNUeGDd8paVFHchfeuNirj/pUMqYri2sUQ
+	/3oc40GdKdk8c9hdrj+mo2ej2zmdzUiZdYKPRg5BCL8s+fvMMjbJpgJ1m+5WuMgR01Z+IABCowc
+	jmWvyIvDvSeycq/AxDJShH22GA2G9Olk49+BK+BoF9K6r96Hnb5SdwpNZwpIkclcgyoPukfWilU
+	f1OwbXG0RO57/2iRp
+X-Received: by 2002:a05:600c:648a:b0:47a:9560:ec22 with SMTP id 5b1f17b1804b1-47d84b17ae4mr64276155e9.14.1767871672372;
+        Thu, 08 Jan 2026 03:27:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHCrhVJUOXGI01OCCuWHNzKXAge7t6WHbeU8FiHMv65fBH2sXqaXVpMSUa0Er0tnD1FeKLcmw==
+X-Received: by 2002:a05:600c:648a:b0:47a:9560:ec22 with SMTP id 5b1f17b1804b1-47d84b17ae4mr64275905e9.14.1767871671965;
+        Thu, 08 Jan 2026 03:27:51 -0800 (PST)
+Received: from sgarzare-redhat ([193.207.178.182])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f668e03sm154398805e9.14.2026.01.08.03.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 03:27:51 -0800 (PST)
+Date: Thu, 8 Jan 2026 12:27:41 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Melbin K Mathew <mlbnkm1@gmail.com>
+Cc: stefanha@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org
+Subject: Re: [PATCH net v4 0/4] vsock/virtio: fix TX credit handling
+Message-ID: <aV-UZ9IhrXW2hsOn@sgarzare-redhat>
+References: <20251217181206.3681159-1-mlbnkm1@gmail.com>
+ <xwnhhms5divyalikrekxxfkz7xaeqwuyfzvro72v5b4davo6hc@kii7js242jbc>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="sEpEXEQvmS/iAzMe"
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTxdSnpFHkm6o85EtjQjAWemBfcv9Oq6omWyrrMdkOuuVA@mail.gmail.com>
-X-Cookie: If you suspect a man, don't employ him.
+In-Reply-To: <xwnhhms5divyalikrekxxfkz7xaeqwuyfzvro72v5b4davo6hc@kii7js242jbc>
 
+Hi Melbin and happy new year!
 
---sEpEXEQvmS/iAzMe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Thu, Dec 18, 2025 at 10:18:03AM +0100, Stefano Garzarella wrote:
+>On Wed, Dec 17, 2025 at 07:12:02PM +0100, Melbin K Mathew wrote:
+>>This series fixes TX credit handling in virtio-vsock:
+>>
+>>Patch 1: Fix potential underflow in get_credit() using s64 arithmetic
+>>Patch 2: Cap TX credit to local buffer size (security hardening)
+>>Patch 3: Fix vsock_test seqpacket bounds test
+>>Patch 4: Add stream TX credit bounds regression test
+>
+>Again, this series doesn't apply both on my local env but also on 
+>patchwork:
+>https://patchwork.kernel.org/project/netdevbpf/list/?series=1034314
+>
+>Please, can you fix your env?
+>
+>Let me know if you need any help.
 
-On Wed, Jan 07, 2026 at 07:25:04PM +0000, Fuad Tabba wrote:
-> On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+Any update on this?
+If you have trouble, please let me know.
+I can repost fixing the latest stuff.
 
-> > +#define sme_cond_update_smcr(vl, fa64, zt0, reg)               \
-> > +       do {                                                    \
-> > +               u64 __old = read_sysreg_s((reg));               \
-> > +               u64 __new = vl;                                 \
-> > +               if (fa64)                       \
-> > +                       __new |= SMCR_ELx_FA64;                 \
-> > +               if (zt0)                                        \
-> > +                       __new |= SMCR_ELx_EZT0;                 \
-> > +               if (__old != __new)                             \
-> > +                       write_sysreg_s(__new, (reg));           \
-> > +       } while (0)
-> > +
+Thanks,
+Stefano
 
-> Should we cap the VL based on SMCR_ELx_LEN_MASK (as we do in
-> sve_cond_update_zcr_vq())?
-
-Yes, although I fear if we've got to the point where we've ever got a
-bigger value going in we're going to have bigger problems.
-
-> Should we also preserve the remaining old bits from SMCR_EL1, i.e.,
-> copy over the bits that aren't
-> SMCR_ELx_LEN_MASK|SMCR_ELx_FA64|SMCR_ELx_EZT0? For now they are RES0,
-> but that could change.
-
-My thinking here is that any new bits are almost certainly going to need
-explicit support (like with the addition of ZT0) and that copying them
-forward without understanding is more likely to lead to a bug like
-exposing state we didn't mean to than clearing them will.
-
---sEpEXEQvmS/iAzMe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlfmvYACgkQJNaLcl1U
-h9C5wgf9G+XKmo011/eubfLKJPyBw+Fnrf+TV1a7La9Ua9nDLvYoLuH2+ogXAq0J
-Y2jWf3r7uTwF23+nOLzN6uyqWmqu0RHeW9LSOk4wDgqJDNNnA4UwpNauRFdfFQgd
-5ANBOv6nviVTd0TpmjfCD2OoFKvbx+VHFXoonEsPFCSneA9IHd/8N21I/0q6sSr4
-+5BKfPAr6d0Gk9NS3w1CRfB3XkOcG4Jf/vbJ1fjszfznHkWG1xV0R081qLd+GcDE
-fXUJjF6YAttCNEd57BrKpHNENZnNcNYwW5OvWhsUMG7N754fVb5utrd6b6Rd4xGf
-XcUYMxOkTJpeO7vgmY5AHpVUzXiVfA==
-=JsxG
------END PGP SIGNATURE-----
-
---sEpEXEQvmS/iAzMe--
 
