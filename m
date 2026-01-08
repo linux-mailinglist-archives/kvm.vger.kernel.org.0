@@ -1,206 +1,308 @@
-Return-Path: <kvm+bounces-67366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67368-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3933D0289D
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 13:08:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374F1D02564
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 12:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D201130123FE
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 11:48:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 703FD31DDBB4
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 11:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE3748AE09;
-	Thu,  8 Jan 2026 10:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB12A3DA7F4;
+	Thu,  8 Jan 2026 10:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="JSCbw8qN"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MdX+oJmE"
 X-Original-To: kvm@vger.kernel.org
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010041.outbound.protection.outlook.com [52.101.46.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33EE48CE72
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 10:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767867941; cv=none; b=erkwpCKpP8iJJ0YXDA9ksRWrhZkVMHcz0w1+mZnwvJ8+P/UheGv83AunpR7kJ8WPYHMSv53/zxM+Ycr8QqtclkfiYK+8mnUky36D2Uy0XpSD1XetWB2Kqx0U8NYCb8gdhZ6j8nzagIPLYTqfEpwSWUoFD9MDIScNp3RrYSDE9H0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767867941; c=relaxed/simple;
-	bh=hV8cdqEVmDNIC+PyDeitq6drXJfHlHagjlpm7np4GmA=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l11CSI+LXJgb6HYHZ+uwpSn/DhRS7S32Z8NHQ0ZUW38BMRkq0FSeOToNb/+DVb9AGFIuhReWVEsdBOTusJd1M/Im1AlEhje3n4hz0JKXDa1ctu750tgIpB5SP/HefSOjRiokyty8ag3BDo3/3x8ZWJEYhDusgNEra0oQfvrpGvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=JSCbw8qN; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=of4seSqIPdCyuLzFSq3d1KkXUCDbWW18kLWy2KllRF8=;
-	b=JSCbw8qN3TULPk70WRzdVzdYEXVw3Ik2TS6P58byeRVe4pQ++f7S7y8G8x5dc/31ekpfJDf1c
-	dtKOa3orKfpIohcuJulnWEajcJmvWC14t9ufbitVGdonVyp5TP8op23nK/8hNNA23wjwZSw3pKZ
-	JCHxJfpq8LzRhxo871gW684=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dn1FN1PGtzMlWV;
-	Thu,  8 Jan 2026 18:23:04 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dn1Hg593mzHnH71;
-	Thu,  8 Jan 2026 18:25:03 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id A081C40086;
-	Thu,  8 Jan 2026 18:25:11 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 8 Jan
- 2026 10:25:10 +0000
-Date: Thu, 8 Jan 2026 10:25:09 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "lpieralisi@kernel.org"
-	<lpieralisi@kernel.org>, Timothy Hayes <Timothy.Hayes@arm.com>, "Suzuki
- Poulose" <Suzuki.Poulose@arm.com>, nd <nd@arm.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, "maz@kernel.org"
-	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 07/36] KVM: arm64: gic: Introduce interrupt type
- helpers
-Message-ID: <20260108102509.000061fb@huawei.com>
-In-Reply-To: <5b9fd030e3048fadcd4ac95ddb0671e1af7dc960.camel@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-8-sascha.bischoff@arm.com>
-	<20260106184313.00002a8c@huawei.com>
-	<5b9fd030e3048fadcd4ac95ddb0671e1af7dc960.camel@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A7A3D5D91
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 10:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767868407; cv=fail; b=NyFuzv890+mSMgkA58tVzGVEvvXFsFIoVckIqvaj43Ft9v8Pf2r8RcEji487YAFaJpnH8LD2Ur3OI7VRe/xsVNiluWxxq96DVZd4CoopiMSTq/sUOdwhySOQFpRzinCxyTIK0Wywz7Y9nXtqAa+qdoXlUYyfkbzL87XIp02AsTk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767868407; c=relaxed/simple;
+	bh=pKM0baxLivq48Sco0V1d08vji85RFzm6n06tNom5g8s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=EPndMulGV8wBKZ8XLq/Znz4f4ICTXGLgNlbmb5YhpNrjfvz8Ta8+j6cU3HUpWXBAfGr7HzbyO3HOGqmw6AVGlfQfGbdCUvEElqAVY59emZC2BChZ69lIAkH8cgGuKJnm++EWfUbuEgcMR+5wnMCaypCNiocbg7LNnFE/adh4YLI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MdX+oJmE; arc=fail smtp.client-ip=52.101.46.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Pbs8zvxX0HYHGz1AGOyuubl/6B2B8tOqsWL9ZzDt6LjSKXhvKd3Ijfk7aao6+fbn+3+LDBJN5Rg0YuVYKgKrfns6/zWKA0qYEtJm7KaKwompdAJ+tVKhnAWLU2dAIcq7gPkUvaQsTJDRzxljk//nNx0TuDG+jX9Qv4HX0TN/OycAg80eHpGubKQNEMdHCCwuJXLV2lR4NvCgAi83DTqgV5x8JMww3Sg7lNvb/fXs/UnwXWx944UyxNm5cQj6X8FB0XdqG9OhlWddQeSDsr74OPRCTEkpG5x4oxG0VfqBSOFspLAp8ytyAWHoWWiwcd2ZDbWmr6yec2fWW+jD7iLZ4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FXyrCU8G+78vVYue4sPBuq8Ep9e9JK5JSwB4uC2p26c=;
+ b=Tm9i410xsH2ryn2K3c+pqJyM+ZHuIxr2jt8Ino6+jt/y1Mtd8yKwmluDxn55Dd73cawqZxczXGBhdpNUKyGxCKzhXO6psYJzG6V7MLywG+PeGnP+quUE1RKVJ7KdRbl1nVqcjGNaG3UrI5jK3Tai6w6jIuZMdkiZXfgPufU32GFQE9U3AwvQBSTBWnQVEYCIXFPsLzhIG2UYeGY35PklInOokGu8/f7nhkdjZrPK2iYcX32cVY9vGSHUpripXzgV53e20bYhLQgB74uPSwZ5laU49j0yzyj2bx/nVvBkHZuwk83gn3gvU/tLQsSio9yNdQ9BFbJ3BPzqirvzQXivrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FXyrCU8G+78vVYue4sPBuq8Ep9e9JK5JSwB4uC2p26c=;
+ b=MdX+oJmEq/lzwa+yWxeYuPHQWfCzRZy2H36Vs13OGvl4jgOLytZZYaZpsdJfsEmCfGhZf4EbdcZB+YAzJuWGeVsKN+QFfmAdrbtcdD71r2C2Aiu7wLM7gOZHwrg7JvqspR/hUuSUGs7mPCNdaMu9q/1AvEy2pkX9W+EiNP3o9co=
+Received: from BL1PR13CA0189.namprd13.prod.outlook.com (2603:10b6:208:2be::14)
+ by DS7PR12MB8322.namprd12.prod.outlook.com (2603:10b6:8:ed::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.3; Thu, 8 Jan
+ 2026 10:33:16 +0000
+Received: from BL6PEPF0001AB55.namprd02.prod.outlook.com
+ (2603:10b6:208:2be:cafe::80) by BL1PR13CA0189.outlook.office365.com
+ (2603:10b6:208:2be::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.2 via Frontend Transport; Thu, 8
+ Jan 2026 10:33:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL6PEPF0001AB55.mail.protection.outlook.com (10.167.241.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.1 via Frontend Transport; Thu, 8 Jan 2026 10:33:16 +0000
+Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 8 Jan
+ 2026 04:33:16 -0600
+Received: from [10.85.34.88] (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Thu, 8 Jan 2026 02:33:13 -0800
+Message-ID: <eb712000-bc67-468a-b691-097688233659@amd.com>
+Date: Thu, 8 Jan 2026 16:03:12 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] i386: Implement CPUID 0x80000026
+To: Zhao Liu <zhao1.liu@intel.com>, Shivansh Dhiman <shivansh.dhiman@amd.com>
+CC: <pbonzini@redhat.com>, <mtosatti@redhat.com>, <kvm@vger.kernel.org>,
+	<qemu-devel@nongnu.org>, <seanjc@google.com>, <santosh.shukla@amd.com>,
+	<nikunj.dadhania@amd.com>, <ravi.bangoria@amd.com>, <babu.moger@amd.com>
+References: <20251121083452.429261-1-shivansh.dhiman@amd.com>
+ <20251121083452.429261-2-shivansh.dhiman@amd.com>
+ <aV4KVjjZXZSB5YGw@intel.com>
+Content-Language: en-US
+From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+In-Reply-To: <aV4KVjjZXZSB5YGw@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB55:EE_|DS7PR12MB8322:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6df3641-5e7d-438f-e66f-08de4ea15577
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WDltTkdWSU1US0s4ZGVTV1pCWUtlbGpzM0VPL0tKVE1YamJ1aHUvbzhUbko1?=
+ =?utf-8?B?azJmT0hLODljb2ZnQWRidWJreEVzajl6TThIUFZRTzkvOEordGJaL1FXVlZJ?=
+ =?utf-8?B?Z0pYWGszYUtPd1lSSHY1VytoK3lVYXNCdFEyOWs3VFl5K1pRc1k3YndyVkRt?=
+ =?utf-8?B?WGltMXR3dThVQVpkM21YRmNMYVVmempNSytpVjN5ZXVTS2psWlpTK0QwOE40?=
+ =?utf-8?B?cHpscWVHQjFWVm1hekVPOGovVnViTmZKSStVRFM5Q0VsSGVCTDlidE1iMlRC?=
+ =?utf-8?B?elc4Sk95a3NwT1Z2Q2IzeW1zWmE0bndTZEhwQWVsYnVmU2RjeTBJRXovcXdC?=
+ =?utf-8?B?dWF5VFhYRFc4dWJrYkFWVW50eUxXcTg3YzBWN0h0NEVBM2hBbG1PR3R0Zlli?=
+ =?utf-8?B?eEErNzVhS1pVQm45NE0rVjIwVVBWMmdyckgxTkxMb2Zib1lXaGV6VDZ4M1dj?=
+ =?utf-8?B?Z3pOR2lrZ1BxY3BTK3dScjZIbnI3OWlDUjNBbmduWWN4NkZUTWprNjB0L2dx?=
+ =?utf-8?B?eWsrYWNXSzEvZWhaL3VqT2JzeXorUG1Eb09peHBocWwzekQ1ZHJpNng0SFJD?=
+ =?utf-8?B?NGQvL3krbnYwTmV1bFNjRithYUtXT0tKTEdORHErRENXVnlpdGFBQWhDdGJ4?=
+ =?utf-8?B?bXo5TnJSR25jQlNIdHQveU8vSXlwWTVpN25hYk9Va2Y5TllnNWk3TmY0SThC?=
+ =?utf-8?B?Q3hYNVJMd3FzT2hCVGdmdkUxTlUwWGJzNXQremtHR3hGY1BMZVNJRm5CWGky?=
+ =?utf-8?B?YTd2dnZLWnRZVXFFbzk0emMvY0xGZmNKYUF3TUxGUFFHczJTVEVKYW0zaUxU?=
+ =?utf-8?B?N0l0RXZtZjZQUjN4eVF6M05laXV6Wmd1dE5WeDV1Y3dyd0xCT1ZjYk05MElZ?=
+ =?utf-8?B?NUl1UW1MTzVQeHlqcmY5ZWhSSmxmc3FGWWVWMU5SanVmNVJIZ2JCR0Vvdlc2?=
+ =?utf-8?B?ZlovdEZRYUoyVEJGWjRXL3FZOXNlS1lRL3pjRGtRcW1leklmQTc2NW1aZ0Jx?=
+ =?utf-8?B?TWpmNFpRUk5WYWdkZkQyVEZ2cEMxcnFMcHRlUzlIWVlFdFE1R2VFNW1abjZ0?=
+ =?utf-8?B?cjJ1VjgzZ0tGdTRscnVURDArRGMwcXVUSU9sK0hMMEJvQ0Jpckl0T0hJbXEw?=
+ =?utf-8?B?K2phWCtKOEUyZUJ6K215bE94eW5tb2gvRDRUQmxOY2VSU3hlYXhab0VyZTR3?=
+ =?utf-8?B?cFcvcFh6Y200OWkzZ2gyOHhZYUd5b1NKSTdRM0VoTUxPb1FteFlybi9NdE0r?=
+ =?utf-8?B?QjI1Y08veEU3cEhocWZCUHJxcXdJY2JQOVJxQmFlSzFxdWZ1WHBoWTJiREFm?=
+ =?utf-8?B?b21hNGp4UGxyS0xIWEJ5S2JzZkhrS3drTW15eDUrUldGQ0NQSjUyWHNma21I?=
+ =?utf-8?B?Q0FzanZsVnVrblhSOThXTmhBRUJSWVhtYisrRDFlQkI1Tm9QWTdXTWkyZFRo?=
+ =?utf-8?B?VEhBb25rYkI4REtkYTY2Ukl5UGlsa29kNXdzS0RKb3JrYjFhVlB6TGlYWDFB?=
+ =?utf-8?B?c25jNGN5a01nUDBJbmIrMzJSeUtMYkMxZng5Qk1IZ0xFK1FZK2tsL3gzZG5W?=
+ =?utf-8?B?WEp0YUZGaytlV0ZwSzVXVWFpMXE5dVhmdlNrM1pIWktYUWhadmd0eDFUQVps?=
+ =?utf-8?B?TEdTZU9QeUticC9kelExZ2VWK1VkcjZYc1dPYitLMmNmYlZTVXBGRlNDdEp1?=
+ =?utf-8?B?WFZPdmdtK1JuL01iYnlHZnA5Zi9QZVRvR1dtMk1xazBKdGxXWkRCZkJ4UURk?=
+ =?utf-8?B?S3poTXltWTl1ZXFpRytydWlpcmlhVEJKWlZMUXJxR0ZMVDY5aWVybFFNOTRh?=
+ =?utf-8?B?Q1VJbktFSlNEbmlVMHVqUUN4RG9NT0Eyc25VZ04rM00xdmhuYWFVcmpMRFBJ?=
+ =?utf-8?B?NVd2bnRXT0ZQYnVSSm9wM1djT0ZPSC91MG01K3hvY3NBMFdMeWFVTFNDMnZr?=
+ =?utf-8?B?TUUxbG1WOUJ6eHpEdklqVjI4RlVTTEF1c1diWUZGdGhKaU9EWFZpSiszeUJD?=
+ =?utf-8?B?NHFXdkpmaWpRT1NIOHRJbkdVOEpZUUY0Y3dzVndhT2dVdzhGUFVGTzZCWlJ0?=
+ =?utf-8?B?UCtzekFKQzNRNXhyQUF1Rk5OVllTNFB3clM4RXlDS3BlNTNxZFB5TWtCeTNB?=
+ =?utf-8?Q?oz7Y=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 10:33:16.3455
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6df3641-5e7d-438f-e66f-08de4ea15577
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB55.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8322
 
-On Thu, 8 Jan 2026 09:33:30 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+Hi Zhao,
 
-> On Tue, 2026-01-06 at 18:43 +0000, Jonathan Cameron wrote:
-> > On Fri, 19 Dec 2025 15:52:38 +0000
-> > Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> >  =20
-> > > GICv5 has moved from using interrupt ranges for different interrupt
-> > > types to using some of the upper bits of the interrupt ID to denote
-> > > the interrupt type. This is not compatible with older GICs (which
-> > > rely
-> > > on ranges of interrupts to determine the type), and hence a set of
-> > > helpers is introduced. These helpers take a struct kvm*, and use
-> > > the
-> > > vgic model to determine how to interpret the interrupt ID.
-> > >=20
-> > > Helpers are introduced for PPIs, SPIs, and LPIs. Additionally, a
-> > > helper is introduced to determine if an interrupt is private - SGIs
-> > > and PPIs for older GICs, and PPIs only for GICv5.
-> > >=20
-> > > The helpers are plumbed into the core vgic code, as well as the
-> > > Arch
-> > > Timer and PMU code.
-> > >=20
-> > > There should be no functional changes as part of this change.
-> > >=20
-> > > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com> =20
-> > Hi Sascha,
-> >=20
-> > A bit of bikeshedding / 'valuable' naming feedback to end the day.
-> > Otherwise LGTM.
-> >  =20
-> > > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> > > index b261fb3968d03..6778f676eaf08 100644
-> > > --- a/include/kvm/arm_vgic.h
-> > > +++ b/include/kvm/arm_vgic.h =20
-> > ...
-> >  =20
-> > > =A0enum vgic_type {
-> > > =A0	VGIC_V2,		/* Good ol' GICv2 */
-> > > @@ -418,8 +488,12 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu);
-> > > =A0
-> > > =A0#define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
-> > > =A0#define vgic_initialized(k)	((k)->arch.vgic.initialized)
-> > > -#define vgic_valid_spi(k, i)	(((i) >=3D VGIC_NR_PRIVATE_IRQS) &&
-> > > \
-> > > +#define vgic_valid_nv5_spi(k, i)	(((i) >=3D
-> > > VGIC_NR_PRIVATE_IRQS) && \
-> > > =A0			((i) < (k)->arch.vgic.nr_spis +
-> > > VGIC_NR_PRIVATE_IRQS))
-> > > +#define vgic_valid_v5_spi(k, i)	(irq_is_spi(k, i) && \
-> > > +				 (FIELD_GET(GICV5_HWIRQ_ID, i) <
-> > > (k)->arch.vgic.nr_spis))
-> > > +#define vgic_valid_spi(k, i) (vgic_is_v5(k)
-> > > ?				\
-> > > +			=A0=A0=A0=A0=A0 vgic_valid_v5_spi(k, i) :
-> > > vgic_valid_nv5_spi(k, i)) =20
-> >=20
-> > nv is a little awkward as a name as immediately makes me thinking
-> > nested virtualization instead of not v5 (which I guess is the
-> > thinking behind that?)
-> >=20
-> > Probably just me and naming it v23 will break if we get to GIC
-> > version 23 :)
-> > nv5 breaks when we get GICv6 ;) =20
->=20
-> Absolutely agreed here. The v5 and nv5 macros were not used anywhere,
-> so I've re-worked this a bit to be more in the style of those added
-> earlier:
->=20
-> -#define vgic_valid_nv5_spi(k, i)       (((i) >=3D VGIC_NR_PRIVATE_IRQS) =
-&& \
-> -                       ((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_I=
-RQS))
-> -#define vgic_valid_v5_spi(k, i)        (irq_is_spi(k, i) && \
-> -                                (FIELD_GET(GICV5_HWIRQ_ID, i) < (k)->arc=
-h.vgic.nr_spis))
-> -#define vgic_valid_spi(k, i) (vgic_is_v5(k) ?                          \
-> -                             vgic_valid_v5_spi(k, i) : vgic_valid_nv5_sp=
-i(k, i))
-> +#define vgic_valid_spi(k, i)                                           \
-> +       ({                                                              \
-> +               bool __ret =3D irq_is_spi(k, i);                         =
- \
-> +                                                                       \
-> +               switch ((k)->arch.vgic.vgic_model) {                    \
-> +               case KVM_DEV_TYPE_ARM_VGIC_V5:                          \
-> +                       __ret &=3D FIELD_GET(GICV5_HWIRQ_ID, i) < (k)->ar=
-ch.vgic.nr_spis; \
-> +                       break;                                          \
-> +               default:                                                \
-> +                       __ret &=3D (i) < ((k)->arch.vgic.nr_spis + VGIC_N=
-R_PRIVATE_IRQS); \
-> +               }                                                       \
-> +                                                                       \
-> +               __ret;                                                  \
-> +       })
->=20
-> More verbose (with annoying line lengths), but certainly more scalable
-> and removes the naming issue altogether. Personally, I prefer it
-> because it is more aligned with the related macros above.
->=20
-> Is this preferable/acceptable?
+On 07-01-2026 12:55, Zhao Liu wrote:
+> Hi Shivansh,
+> 
+> Sorry for late reply.
+> 
+> On Fri, Nov 21, 2025 at 08:34:48AM +0000, Shivansh Dhiman wrote:
+>> Date: Fri, 21 Nov 2025 08:34:48 +0000
+>> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+>> Subject: [PATCH 1/5] i386: Implement CPUID 0x80000026
+>> X-Mailer: git-send-email 2.43.0
+>>
+>> Implement CPUID leaf 0x80000026 (AMD Extended CPU Topology). It presents the
+>> complete topology information to guests via a single CPUID with multiple
+>> subleafs, each describing a specific hierarchy level, viz. core, complex,
+>> die, socket.
+>>
+>> Note that complex/CCX level relates to "die" in QEMU, and die/CCD level is
+>> not supported in QEMU yet. Hence, use CCX at CCD level until diegroups are
+>> implemented.
+> 
+> I'm trying to understand AMD's topology hierarchy by comparing it to the
+> kernel's arch/x86/kernel/cpu/topology_ext.c file:
+> 
+> static const unsigned int topo_domain_map_0b_1f[MAX_TYPE_1F] = {
+> 	[SMT_TYPE]	= TOPO_SMT_DOMAIN,
+> 	[CORE_TYPE]	= TOPO_CORE_DOMAIN,
+> 	[MODULE_TYPE]	= TOPO_MODULE_DOMAIN,
+> 	[TILE_TYPE]	= TOPO_TILE_DOMAIN,
+> 	[DIE_TYPE]	= TOPO_DIE_DOMAIN,
+> 	[DIEGRP_TYPE]	= TOPO_DIEGRP_DOMAIN,
+> };
+> 
+> static const unsigned int topo_domain_map_80000026[MAX_TYPE_80000026] = {
+> 	[SMT_TYPE]		= TOPO_SMT_DOMAIN,
+> 	[CORE_TYPE]		= TOPO_CORE_DOMAIN,
+> 	[AMD_CCD_TYPE]		= TOPO_TILE_DOMAIN,
+> 	[AMD_SOCKET_TYPE]	= TOPO_DIE_DOMAIN,
+> };
 
-Looks good to me, though it's getting complex enough that it might be better
-as a static inline function. That will also reduce line lengths
-a little.
+These mappings reuse some original names (SMT_TYPE and CORE_TYPE) along with the
+new ones (AMD_CCD_TYPE and AMD_SOCKET_TYPE). I think to avoid defining more AMD
+specific types the original names are used. So, essentially you can read them
+like this:
 
-Jonathan
+static const unsigned int topo_domain_map_80000026[MAX_TYPE_80000026] = {
+	[AMD_CORE_TYPE]		= TOPO_SMT_DOMAIN,
+	[AMD_CCX_TYPE]		= TOPO_CORE_DOMAIN,
+	[AMD_CCD_TYPE]		= TOPO_TILE_DOMAIN,
+	[AMD_SOCKET_TYPE]	= TOPO_DIE_DOMAIN,
+};
 
->=20
-> Thanks,
-> Sascha
->=20
-> >=20
-> >  =20
-> > > =A0
-> > > =A0bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
-> > > =A0void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu); =20
-> >  =20
->=20
+> 
+> What particularly puzzles me is that "complex" isn't listed here, yet it
+> should be positioned between "core" and CCD. Does this mean complex
+> actually corresponds to kernel's module domain?
+
+There is a nuance with CPUID 80000026h related to the shifting of x2APIC ID.
+According to APM, EAX[4:0] tells us the number of bits to shift x2APIC ID right
+to get unique topology ID of the next instance of the current level type.
+
+So, all logical processors with the same next level ID share current level. This
+results in mapping the Nth level type to (N-1)th domain. This is unlike Intel's
+CPUID 0xb which maps Nth level type to Nth domain.
+
+Back to your question, the complex is same as tile since both represent a L3
+cache boundary.
+
+> 
+> Back to QEMU, now CCX is mapped as QEMU's die level, and AMD socket is mapped
+> to socket level. Should we revisit QEMU's topology level mapping for AMD, to
+> align with the above topology domain mapping?
+> 
+> If we want to go further: supporting CCD configuration would be quite
+> tricky. I feel that adding another new parameter between the smp.dies
+> and smp.sockets would create significant confusion.
+
+The current kernel doesn't have sensitivity to a level between L3 boundary and
+socket. Also, most production systems in current AMD CPU landscape have CCD=CCX.
+Only a handful of models feature CCD=2CCX, so this isn't an immediate pressing need.
+
+In QEMU's terminology, socket represents an actual socket and die represents the
+L3 cache boundary. There is no intermediate level between them. Looking ahead,
+when more granular topology information (like CCD) becomes necessary for VMs,
+introducing a "diegroup" level would be the logical approach. This level would
+fit naturally between die and socket, as its role cannot be fulfilled by
+existing topology levels.
+
+Also, I was looking at Intel's SDM Vol. 2A "Instruction Set Reference, A-Z"
+Table 3-8. "Information Returned by CPUID Instruction". The presence of a
+"diegrp" level between die and socket suggests Intel has already recognized the
+need for this intermediate topology level. If this maps to a similar concept as
+AMD's CCD, it would indeed strengthen the case for introducing a new level in QEMU.
+
+> 
+>> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+>> ---
+>>  target/i386/cpu.c     | 76 +++++++++++++++++++++++++++++++++++++++++++
+>>  target/i386/kvm/kvm.c | 17 ++++++++++
+>>  2 files changed, 93 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 641777578637..b7827e448aa5 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -495,6 +495,78 @@ static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
+>>      assert(!(*eax & ~0x1f));
+>>  }
+>>  
+>> +/*
+>> + * CPUID_Fn80000026: Extended CPU Topology
+>> + *
+>> + * EAX Bits Description
+>> + * 31:5 Reserved
+>> + *  4:0 Number of bits to shift Extended APIC ID right to get a unique
+>> + *      topology ID of the current hierarchy level.
+>> + *
+>> + * EBX Bits Description
+>> + * 31:16 Reserved
+>> + * 15:0  Number of logical processors at the current hierarchy level.
+>> + *
+>> + * ECX Bits Description
+>> + * 31:16 Reserved
+>> + * 15:8  Level Type. Values:
+>> + *       Value   Description
+>> + *       0h      Reserved
+>> + *       1h      Core
+>> + *       2h      Complex
+>> + *       3h      Die
+>> + *       4h      Socket
+>> + *       FFh-05h Reserved
+>> + * 7:0   Input ECX
+>> + *
+>> + * EDX Bits Description
+>> + * 31:0 Extended APIC ID of the logical processor
+>> + */
+> 
+> I feel this long comment is not necessary, since people could check APM for
+> details. Or this description could be included in commit message.
+
+Sure. Will do. Thanks.
+
+> 
+>> +static void encode_topo_cpuid80000026(CPUX86State *env, uint32_t count,
+>> +                                X86CPUTopoInfo *topo_info,
+>> +                                uint32_t *eax, uint32_t *ebx,
+>> +                                uint32_t *ecx, uint32_t *edx)
+> 
+> Regards,
+> Zhao
+> 
 
 
