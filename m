@@ -1,99 +1,99 @@
-Return-Path: <kvm+bounces-67350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 173ECD01373
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 07:10:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3CC3D013B3
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 07:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 77B1F3002176
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 06:10:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BABB130478CC
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 06:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C181329E43;
-	Thu,  8 Jan 2026 06:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D5433A706;
+	Thu,  8 Jan 2026 06:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dRxuyV4n";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHCRGS1a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uz9JD/QB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CqItVALm"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC3F1BF33
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 06:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C8127CB35
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 06:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767852655; cv=none; b=mNvRBUU57ga2PHVuzIquVDSMYaiREJswZp0V+xcfRsjtNP31M5cogAatGgdQcGzjAWzXqY0DSAaM3oUn7rZv5IND3/IKEu0TMAbihjOuZZIKX/ikcXPsEyTeDqVG2cqLTzaltRgJIP2hOG8L8NZNUl3WmrMCckvjoNFypo2+710=
+	t=1767852851; cv=none; b=A2KeYZHRgkg8Iit6JPw7rqiBT+JVhJQiLV55+DaSwMV1SQzC+vKrxYVwi2SWJtw7Qq4CEjjAcehJWyiaq1LXbQShdntLZu8zme24qVpMYX1W+WdH0badyG4+9tuKKAiJrSAYkP3np+q8C6wCOJ/1zrsQa3ouZR6swl+3+dfrXhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767852655; c=relaxed/simple;
-	bh=TriolJYhpgO34OvPdh/503uwBYw64GFr4RLpuk/Kvn4=;
+	s=arc-20240116; t=1767852851; c=relaxed/simple;
+	bh=95+hvgZmWBmKLUF7KdsEmQQmkMg5+rOsYbWCPJ0Lnk0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IiwAH0Xma8+cw2Rs2XfvoU+vtdiyyud8nIBYOxxVUKFAikMJQFBXF9Oln0s1rBpwjd1THjJ6eQKnFcyUJgOCgtWf4dkQKKkJfMarxBu7LTCeXmCjXHF5hFTSBQlXhJCjMpXjSoWyiQSKgXFzcCWKeZcEHEMPxIahILqicNNWWWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dRxuyV4n; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IHCRGS1a; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=PjxnI54ARNUmLtAKcN5yHW/KsgcOHzMuSRd3ByxPbY0/oGlXk8z/92mqhABFIxhDYoXrLFuibo4fBTnK2vpowsPbcwGccP2kxTqhjjEmIUw7D6V2VoSO7rOnApFE3nRecNgMqmDZdO+8cj4r4Vh911iprb7YfIXceladS7tdklU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uz9JD/QB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CqItVALm; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767852652;
+	s=mimecast20190719; t=1767852848;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=GqqoIUnlcs+Zjb3qCkKwSMLUW1dKlhjaUAgjxZyVoPI=;
-	b=dRxuyV4nu2QHKDyrDb/YbUPxkkaH+tAOa90RvOIfjQXAFgnPmjrk6PtXGmhdaJl930kVen
-	BeTsyEffMFMgeoeR5qneJphgtyKMX8kOs6ZsOqJxjxwmWCiwoqZdWN1vj1K68wxA7jdRsG
-	jHmHYte5D2PFUyjYGpaXubA2/Pbq0Mk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=l/lzNt1si/El5u/3JxuEqXHb6Skth5KuEneedRtr6Z4=;
+	b=Uz9JD/QB1WZCPsB4K415hoYO04iE/IJ5A5uJ7Csq8ZSDPAhnLIlowc19kAOlJMloiH0ABS
+	G1IdmmXgPAojDeroOo8KNZ7iya1AXnBDUUTsQapf10ITGlK3akMIFIMyJc17r3Y2m4lW1y
+	2Z0Tr9qPqwnFUkNyfGEE8zDuxTJ8AKI=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-292-Wgw-K5z9NL6wPi8BBVaKgg-1; Thu, 08 Jan 2026 01:10:50 -0500
-X-MC-Unique: Wgw-K5z9NL6wPi8BBVaKgg-1
-X-Mimecast-MFC-AGG-ID: Wgw-K5z9NL6wPi8BBVaKgg_1767852649
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b844098867cso344760566b.3
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 22:10:50 -0800 (PST)
+ us-mta-156-0kdJB36FM2adXQPZEMLhjw-1; Thu, 08 Jan 2026 01:14:06 -0500
+X-MC-Unique: 0kdJB36FM2adXQPZEMLhjw-1
+X-Mimecast-MFC-AGG-ID: 0kdJB36FM2adXQPZEMLhjw_1767852845
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b807c651eefso348416966b.3
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 22:14:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767852649; x=1768457449; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767852845; x=1768457645; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GqqoIUnlcs+Zjb3qCkKwSMLUW1dKlhjaUAgjxZyVoPI=;
-        b=IHCRGS1aBGVbnRbZDFfTqsrzmSuwI8ZvR/H59XZU4tgAp8nSaghHihGGG5RrmBKOYR
-         nAHAjH5dS3LebnyT8F7BsmGGYC1NllbnoEwSLIYMT+EOIlVZ2PBvZFjASxT58HE0Q21S
-         oPdUZsvYdGiarR99MnQrdOI0NNvacaFzin3PujXfQu0vvpxnva8vF8cBiNNMCZfkwoox
-         84zTs2I+lQy34UXUI7WS0pxDcXVEShduvPda/9itfE469RGK7uknQPnncCrb91Kbxuuz
-         KrQmz1uCneXrF5+/9vOS2T8LBjtfj40UWCxT0gaLx0Cjnq2s8reDSd04rI0CbVK2vHyW
-         OXsQ==
+        bh=l/lzNt1si/El5u/3JxuEqXHb6Skth5KuEneedRtr6Z4=;
+        b=CqItVALmcuavA1IevntE1BUuKJ4eOj/RR8XDtPeSIqCz0SdZk5whpEqrGHLhylRs6e
+         qsqGfDoJJ1580u9XPfaKes0N558vNKkZjtK2thppSAzrKvDIAorkOw+gfCb5Cl0M9fpr
+         M0feDIxjA51rJTNsWlrDy1xvDaYlO0eOhPriWfctV1uLwQZtesHJocmPBtMmpowJ0fLV
+         1SOlY+IuOZwFUogfSp5yfDI3iqmaL2xH63BOnDn4Q/b1xPQHzkEowLAemaLLhgLdcel1
+         K2jseeq5yDxjNxvKLm0jLyyJ+lClM/TqJZe+h7d8Arj7QLTSj5tuHPQq2n4fj5Uj9e2A
+         2gqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767852649; x=1768457449;
+        d=1e100.net; s=20230601; t=1767852845; x=1768457645;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GqqoIUnlcs+Zjb3qCkKwSMLUW1dKlhjaUAgjxZyVoPI=;
-        b=b6ii7AoZxBmlXWBoj1OexLJYt0+/iVZCgHs9EG4D0dSBbMxIfP/fn0z+R9u91X48fh
-         i6IqWfiBiJGUhLQt0cwvK/lMnM3Tri8IXlg6OpjNSTjtZBIegi4WeBMjQIMU5WavfXjV
-         uHfWv+3pMjz8nPm/wGzSMmmiO7IZWPaNdqqw7OnPjHKG2ggB+JhQY8KKV7ZmviTcJQYy
-         FTf1a828RcskS8zJAVIH8pgQgQIlcXo3UO5+aywXGozjL7/w4eSZyQNLrbIk6dJZ9EET
-         kF5hdYz300Y0AR6D1qgsY35pWafhnwfaJ8BzOd4q8zBeJ5UuUzkceUQJD7LqcoAiVZ4m
-         HGEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVo+PXBe3bDeVyTkaYQZWluAl9R1Ul0+M5TPAIflcAz7MZchvZu5zNjBkU+yF5UsH5QMJc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvDdusTTHtXz4u/cxnQpbP65HDe2Nk51TusoOePHWghU6JD8G7
-	eTZZbr8bqB0u4GBfWYZlLsyRenklbDT2X30w29jL7SDFRGCuuXPjQ6kzVl7jfEuhnxZoPeZ192S
-	OxsWvxegf1OhTU1qK8+eGyFjZfsfeDMg3Q1kcyronTqdHe90fJTiHxA==
-X-Gm-Gg: AY/fxX69/u3GXI2A7BmxXM25c3tV5Ewk4cQDQeOjau3BATVY58i8c3MLv4fWz1I/t5L
-	7rGQsMxoHPaKS4oQ/u9BUVtTotxqFnml9du9Wduzx70uM306DB8OXOoqfmKTSpfAV9B7UN6NDqj
-	dkP26j2X71iJR0H8/4A8/q6HINPVDJwHfEXT54X3FDB40llQYPiaa793qW9g8kpt50ncsGFVj3H
-	AitF9xMRoTGu0oXxv/DlSM23X9RWVMY0OLjIyqI810Ps4SZjwfzpXj856QULmPvICAE5zU4SpwS
-	RvrgWUm5JUBPq8/aIVZkVhGTTIyimQT8ytw1EzAWoaV2leYBwDTOvePFknPq7SCG9Su+/etoBWp
-	ny0S3JHE=
-X-Received: by 2002:a17:907:3da0:b0:b83:95c7:e984 with SMTP id a640c23a62f3a-b84453ab79emr460305066b.49.1767852649337;
-        Wed, 07 Jan 2026 22:10:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHYdqj39oEPTJdzVEMg8TkaPsz+8ATfse0lKQJoqTGKvMVG2VGHcHoGM4ob2+mdqAIIhK9ksA==
-X-Received: by 2002:a17:907:3da0:b0:b83:95c7:e984 with SMTP id a640c23a62f3a-b84453ab79emr460299266b.49.1767852648854;
-        Wed, 07 Jan 2026 22:10:48 -0800 (PST)
+        bh=l/lzNt1si/El5u/3JxuEqXHb6Skth5KuEneedRtr6Z4=;
+        b=EmdqySOGkMUU6ETLbA7wg61Nj2q/A2iP4ihWIgvby5nJlHKIwcvLftXze0feMAiRr+
+         iWEBPkxciFeTl527REGIdnOa5A1FUz+T+9SGnaO1QU8u2DiaUAOmR5NC26bdAa8J7Re9
+         xiI3SgZwAL6vVZGNRv+v5CTmBFYdegoohPcEJlWZu++SI+XP+4dn5U0DzOVXm0bid2ZN
+         XmGrkjLvYEXcQltJ9p4RjJEQZtsuPZSdXLLTF7EzcZuQsVwZQYnUQgMmpq7+mCA4wDmx
+         QyEOWoa6LZtupzuicW3VA05I+5rXwv8umzgiywNo9vy5XAL2FVnGkAynzwB/8YeGtEJy
+         WGqw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+N9NZo+7+b0PJS1UVlCg5h+iAJqh1BgkwYWiN2hW5PQlUDOCLWYBnZVfks828E37MBfM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmgTGaQqqiqw9fZbp9NAmb0VNLqp2H5sGuZ3TbtixQQrL9XQDZ
+	s2efD2vOsSZX841cG7Hl7CSVBRglfJJCQQ3urdMtgi4aRdVIu8BCNWgqI9hvcKxq7pt1LLcCelR
+	6DmCQPubqHgpdAMqtqUe2yXaYZWkDtN+lVdokwsEJyCPnslLwDXg1Dg==
+X-Gm-Gg: AY/fxX5BIhnFadjOOnthrEouunz94H6hCh8eJJXQxZxOCjfSNdiM/SzEGXJcoSY+nf+
+	SpfEgjpk7IcYdxQcLp/SuSqUiiwC4q1SinrVIOG+raCCAnOdH5WUFOX5+I+lRbXQHGYeFXPwQ2u
+	8sYjxOspfsC/Tm7p4mzlml9QZ1nvnmN21kuJRA0iz8k8mNUBNOwFKb0aqwzYgbG+qJGWXyGuaMc
+	A7WszZ434Q5O52ci5k8ocoiVO3FHCOhm/4LFCqmPWErmOaQP9YWC9rxN6TTo2IeG2z/0agxoxoY
+	W7gSKnjmtd1mdy+5urxDLjJlkCUjW2l+wPJlaQHDrUtF5d/NeZYijw44BRknh8gRcv1pzAkjhCC
+	Bm89cgYI=
+X-Received: by 2002:a17:907:2daa:b0:b83:972a:cb85 with SMTP id a640c23a62f3a-b8444c99d69mr493960666b.21.1767852844992;
+        Wed, 07 Jan 2026 22:14:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHVRsnS9p9n7drdpE60e89TgHoiXqmd2qOHrMYP6giCCfm+VLK5zTWUF3eXR7xUrA4bvP5uMg==
+X-Received: by 2002:a17:907:2daa:b0:b83:972a:cb85 with SMTP id a640c23a62f3a-b8444c99d69mr493958166b.21.1767852844503;
+        Wed, 07 Jan 2026 22:14:04 -0800 (PST)
 Received: from [192.168.0.9] ([47.64.114.194])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a51577bsm702015666b.56.2026.01.07.22.10.46
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a564284sm729832166b.62.2026.01.07.22.14.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jan 2026 22:10:48 -0800 (PST)
-Message-ID: <bc31cc25-ce64-4954-b896-ba9f30c041ac@redhat.com>
-Date: Thu, 8 Jan 2026 07:10:45 +0100
+        Wed, 07 Jan 2026 22:14:04 -0800 (PST)
+Message-ID: <87cda384-3199-42b5-905f-a4a0488dfaba@redhat.com>
+Date: Thu, 8 Jan 2026 07:14:01 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,7 +101,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 15/27] hw/i386: Remove linuxboot.bin
+Subject: Re: [PATCH v6 14/27] hw/i386: Assume fw_cfg DMA is always enabled
 To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
  "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
@@ -129,7 +129,7 @@ Cc: qemu-devel@nongnu.org, devel@lists.libvirt.org, kvm@vger.kernel.org,
  BALATON Zoltan <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>,
  Jiri Denemark <jdenemar@redhat.com>
 References: <20260108033051.777361-1-zhao1.liu@intel.com>
- <20260108033051.777361-16-zhao1.liu@intel.com>
+ <20260108033051.777361-15-zhao1.liu@intel.com>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -174,31 +174,45 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260108033051.777361-16-zhao1.liu@intel.com>
+In-Reply-To: <20260108033051.777361-15-zhao1.liu@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 On 08/01/2026 04.30, Zhao Liu wrote:
 > From: Philippe Mathieu-Daudé <philmd@linaro.org>
 > 
-> All machines now use the linuxboot_dma.bin binary, so it's safe to
-> remove the non-DMA version (linuxboot.bin).
+> Now all calls of x86 machines to fw_cfg_init_io_dma() pass DMA
+> arguments, so the FWCfgState (FWCfgIoState) created by x86 machines
+> enables DMA by default.
 > 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Although other callers of fw_cfg_init_io_dma() besides x86 also pass
+> DMA arguments to create DMA-enabled FwCfgIoState, the "dma_enabled"
+> property of FwCfgIoState cannot yet be removed, because Sun4u and Sun4v
+> still create DMA-disabled FwCfgIoState (bypass fw_cfg_init_io_dma()) in
+> sun4uv_init() (hw/sparc64/sun4u.c).
+> 
+> Maybe reusing fw_cfg_init_io_dma() for them would be a better choice, or
+> adding fw_cfg_init_io_nodma(). However, before that, first simplify the
+> handling of FwCfgState in x86.
+> 
+> Considering that FwCfgIoState in x86 enables DMA by default, remove the
+> handling for DMA-disabled cases and replace DMA checks with assertions
+> to ensure that the default DMA-enabled setting is not broken.
+> 
+> Then 'linuxboot.bin' isn't used anymore, and it will be removed in the
+> next commit.
+> 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
 > ---
 > Changes since v4:
->   * Update commit message: not only pc, but also microvm enables
->     DMA for FwCfgState (in microvm_memory_init).
+>   * Keep "dma_enabled" property in fw_cfg_io_properties[].
+>   * Replace DMA checks with assertions for x86 machines.
 > ---
->   hw/i386/pc.c                  |   3 +-
->   pc-bios/meson.build           |   1 -
->   pc-bios/optionrom/Makefile    |   2 +-
->   pc-bios/optionrom/linuxboot.S | 195 ----------------------------------
->   4 files changed, 2 insertions(+), 199 deletions(-)
->   delete mode 100644 pc-bios/optionrom/linuxboot.S
+>   hw/i386/fw_cfg.c     | 16 ++++++++--------
+>   hw/i386/x86-common.c |  6 ++----
+>   2 files changed, 10 insertions(+), 12 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
