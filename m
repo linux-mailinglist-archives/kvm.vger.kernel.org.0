@@ -1,140 +1,123 @@
-Return-Path: <kvm+bounces-67490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67491-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE55D066A0
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 23:17:37 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49742D06825
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 00:05:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3F7C3026536
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 22:17:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 82722300C9B5
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 23:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D322D47EF;
-	Thu,  8 Jan 2026 22:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644E133CEB0;
+	Thu,  8 Jan 2026 23:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sdkPgPYT"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="S74aaZH0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC02219EB
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 22:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D22225A35;
+	Thu,  8 Jan 2026 23:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767910645; cv=none; b=o+TpGC3g47I7XwGOaTnqdMufN5QtnYFinUMpJ02AjzlZKqTGz5j9VE5VAr6Q8jvff4VmO50f6e6oTFQjsIcTBJeMebpp88tzZxzYdKx7XIfIysA0/acW0rMDXiiUim/IG2LeDFvKZZV1KjCr039p2R6YZE5Uj09YtBssLq3FguM=
+	t=1767913512; cv=none; b=tKcnNHJscl6BpkGt3cd91K7bXmwkwOyTWxuQjhcw4/H8z8b3sZI5dp5Ig9DTp1iX6WKomj0AuceUnsCWxBSsvIpsuik7snOMHwIURw15GqhXdzHbL/FmBf4eKV3BtEQS9lWqHGVbbvAE8DFgdGYeM48TWhi/7dLBvlRHzRXdTvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767910645; c=relaxed/simple;
-	bh=kGtIyrozfErdkkp8yatgyuEMfGxbnG/eJ0Eg4bIJqas=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tZv9j7tFL5Mxg4ok7fMWKhLrhqvOUKLFX6IBNGMJ0F2vyh4I5GYbEDJKFmnkM5bEjPRlhcZkpEUf0S9aCyRh2PSbGOtMU0mnNa8aHQ4XdtuNOMkhOQRZ1PNqpEL+U5GrfIHIF7aT/eGuCbDjStnZi4s5EOvNjPko6iwH9eVwA1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sdkPgPYT; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0d43fcb2fso77840195ad.3
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 14:17:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767910644; x=1768515444; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oX0bkmnPVOAK4yukHCtxtzEmrtPV4mhJxow2A9Nc6IQ=;
-        b=sdkPgPYTfsxqh3iHXsq5wrQ/Egs0R31yb6NENIvVr3UPdw3Eb4ZiLI+LocoKsyZDbL
-         nYudO+FvHDGYt9qOoMmKj80LIZ2XXJ6HpGwe93iy9oYvrz+5DQewnwUc7Uq5Oj0bnor4
-         JXtphOlkcEPpG5X+dXYKGwo8gPbiRRSJShxjnJF59xsvFZqHDuH/RWaFApsqysRozZNb
-         BxQtXFdT+09SZPWkZ9QjXKWJKTczfT3HBs/Cy57oqo0zi0CgXxtrDViBoJK47p6rND2R
-         kWD4s6Kg6aCxSY3AIIYIAaWFEZMzOHW9PFUIP6exCfZGDZXFwDiAmS9b21f/e8Vv+gqU
-         8AcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767910644; x=1768515444;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oX0bkmnPVOAK4yukHCtxtzEmrtPV4mhJxow2A9Nc6IQ=;
-        b=tqlp6Qv4F0HFNN+OWtMMjmvcus/eLToXC7DyYN8ZbA5vcpe1UayDfaSM8dg2eP0h5H
-         I8YU9UFMmLezONCEOywV2UO+FTEVLogdY62DcD9z/GKXm6LoHYV3g7okBblS69kFazRF
-         BLyfzR69xJJH1NSCrgXKq0fUjoPt8yjA92j2eAjjbRjsDWO1Mfw0L8vhvLWJ87po2DI7
-         E036wfmj1EzvUN/r6J4RDI/KGjf5PJ4+JbJlhiStVOHZ7epKXG6O8zSAwWO/ugpK2xnA
-         QLpDccYtFBW+M3pFZ94Bgb/ZjzVUfGyFIj/6UePB9ZfOs4xlh+O3mREYsojpE8vCJ57n
-         lKkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUAcoIkJD3M/m7IvmvBlTYGVz/GA6MKAjv/bZTrau66rVwK85YZDaQttNhaqiyvDzuyx8g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztpkFsLGFdncYgTh98fVSqRmJNCGuIKyVzscP3RKniQDuHy6qN
-	OW8+yxO68ayoU4ljSeTSQViGayD4j+i9+wDpxf1zXsdDtMepX5MfLFWakytsf1xVfXFgi5yfQ3s
-	QiWRszw==
-X-Google-Smtp-Source: AGHT+IHBPQPVdtqOzZVlwV2MFsxhm6DsSl3Eiuip947UQeWs/gCMNAAUq1vwfiXrUcABp9WPpgsMGngD7P4=
-X-Received: from pjbfv11.prod.google.com ([2002:a17:90b:e8b:b0:34c:2f02:7f5d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a122:b0:384:fa66:c1a
- with SMTP id adf61e73a8af0-3898f997599mr6687544637.48.1767910643892; Thu, 08
- Jan 2026 14:17:23 -0800 (PST)
-Date: Thu, 8 Jan 2026 14:17:22 -0800
-In-Reply-To: <6ilulzhszphdjk3ta5jt7t222jicn3zj5e6em3fknzmudeqr3f@dogx6h7lsrax>
+	s=arc-20240116; t=1767913512; c=relaxed/simple;
+	bh=1FJqpYHJd+0eNc7KkS4D027frLwyAfnPWlPEg0b4iHk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oipLhOItcUHxozdBAYSJAe7AkHowS5T1cXEyGihrZCvaD4bwf/vrF+LtfXZhoNkLWLtYzXbMO+qPayCOIyakv2bCdOLEi89Bshs25wthEs/DnN487JihQ4wy5sZ9h+4owAwlH+xeJdKkvPwfxOkwFO4Od36h1rzoDaCtFHnWAfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=S74aaZH0; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 608K8Xbq979954;
+	Thu, 8 Jan 2026 15:05:04 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=EZmUcXkXQOp5oKP9qJzW
+	Jb5jBGWW14QuaEZlqQONPSg=; b=S74aaZH0pNllzNJ3dy03wGFx5N3J+/g2c31o
+	AK6Ub/Xgs4Ze+q7qwgk8o8NSO0AJweXI5pB2ecXSg6vtni8FcY5updBusnakZ5gY
+	1orsKEQqvuY32z5GAhYwabzwJU7JyGW5ddpd2l4wBEDJUGemxAIJ8DVp4tF4RaKj
+	2QzblqMIlei7XPLONvPeg8SanMJly+b/qLr4niPvbR6BAtJUHPWDkmQPjkVAHgna
+	tIoQ3zVzz8HVtKmG3pEuNR00evUkd9ttD/OJKNxJxFp0iT5qf0LfKRwP0fyPdeOl
+	+42PSRLJovcY5FzeMxwkrqf8NFbbonEQoTAY80B9k21ShHXGyw==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bjkbw98w9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 08 Jan 2026 15:05:03 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Thu, 8 Jan 2026 23:05:02 +0000
+Date: Thu, 8 Jan 2026 15:04:56 -0800
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>,
+        Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
+Message-ID: <aWA4GKp5ld92sY6e@devgpu015.cco6.facebook.com>
+References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
+ <aV7yIchrL3mzNyFO@google.com>
+ <aV8mTHk/CUsyEEs1@devgpu015.cco6.facebook.com>
+ <20260108143804.GD545276@ziepe.ca>
+ <aV/ab4BueabG/qZN@devgpu015.cco6.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251121204803.991707-1-yosry.ahmed@linux.dev>
- <20251121204803.991707-2-yosry.ahmed@linux.dev> <aV_-YLO4AVQc-ZmY@google.com> <6ilulzhszphdjk3ta5jt7t222jicn3zj5e6em3fknzmudeqr3f@dogx6h7lsrax>
-Message-ID: <aWAs8kD9Bhih2mtA@google.com>
-Subject: Re: [PATCH v3 1/4] KVM: SVM: Allow KVM_SET_NESTED_STATE to clear GIF
- when SVME==0
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aV/ab4BueabG/qZN@devgpu015.cco6.facebook.com>
+X-Proofpoint-ORIG-GUID: ZQl3iDE18Xsuf5Ue80AohXAfHc726NpI
+X-Authority-Analysis: v=2.4 cv=I8pohdgg c=1 sm=1 tr=0 ts=6960381f cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=EGYj-OwPAAAA:8 a=LBelyFYx9KrIqJ_OhIQA:9 a=CjuIK1q_8ugA:10
+ a=xQyHFheebwQZ3wMG2Lhb:22
+X-Proofpoint-GUID: ZQl3iDE18Xsuf5Ue80AohXAfHc726NpI
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDE3NSBTYWx0ZWRfX0uXti9kqAAwi
+ Q64CxBEIJCbEyzLB9HRcUlsh75arVv7DEmRckXQr0AkNG4+Q3AEtf6pVRaypMcpfvNLlt7Gf9Jm
+ XmNR6bMGr9b91mtkOT3fiGDHoNwgBmDcOXaTIooAtEpJG4s5/XaKqnLCD9eT/hGF6zwhyMzgXEG
+ NxX4sWXPJknawZblygUUxdoyjrXq4yCloz8TI2JkksM1v1ZSlUyqak/OdUTDNhPoVRptYzCw4rl
+ ORBSwcDvJR3UTnsLUVRg3djOOEIvNGtrRXj1Jd8nsIXZs49wJm0c1k7zV0y3HasloD9DuqlZeez
+ v6+ruu3eQiSq5JzZivdOX1kc1Jvd+R4RjumgkTmzn18YA3npirsqSlvSC3al4TXmr1xpQKAjAf7
+ xsCvKkHBU44Ut+f2Uv5u7K/1agpmIb8wAYyQVDu6rZlWuNsh0tBRsWDnX07uQsKSAk8+5SJ3vZi
+ vZI8ox7CjOvP3eGTAPw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-08_05,2026-01-08_02,2025-10-01_01
 
-On Thu, Jan 08, 2026, Yosry Ahmed wrote:
-> On Thu, Jan 08, 2026 at 10:58:40AM -0800, Sean Christopherson wrote:
-> > On Fri, Nov 21, 2025, Yosry Ahmed wrote:
-> > > From: Jim Mattson <jmattson@google.com>
+On Thu, Jan 08, 2026 at 08:25:19AM -0800, Alex Mastro wrote:
+> On Thu, Jan 08, 2026 at 10:38:04AM -0400, Jason Gunthorpe wrote:
+> > On Wed, Jan 07, 2026 at 07:36:44PM -0800, Alex Mastro wrote:
+> > > The intent of QEMU's mmap alignment code is imperfect in the SPARE_MMAP case?
+> > > After a hole, the next mmap'able range could be some arbitrary page-aligned
+> > > offset into the region. It's not helpful mmap some region offset which is
+> > > maximally 4K-aligned at a 1G-aligned vaddr.
 > > > 
-> > > GIF==0 together with EFER.SVME==0 is a valid architectural
-> > > state. Don't return -EINVAL for KVM_SET_NESTED_STATE when this
-> > > combination is specified.
+> > > I think to be optimal, QEMU should be attempting to align the vaddr for bar
+> > > mmaps such that
 > > > 
-> > > Fixes: cc440cdad5b7 ("KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE")
-> > > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > > Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > > ---
-> > >  arch/x86/kvm/svm/nested.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > vaddr % {2M,1G} == region_offset % {2M,1G}
 > > > 
-> > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > > index c81005b24522..3e4bd8d69788 100644
-> > > --- a/arch/x86/kvm/svm/nested.c
-> > > +++ b/arch/x86/kvm/svm/nested.c
-> > > @@ -1784,8 +1784,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
-> > >  	 * EFER.SVME, but EFER.SVME still has to be 1 for VMRUN to succeed.
-> > >  	 */
-> > >  	if (!(vcpu->arch.efer & EFER_SVME)) {
-> > > -		/* GIF=1 and no guest mode are required if SVME=0.  */
-> > > -		if (kvm_state->flags != KVM_STATE_NESTED_GIF_SET)
-> > > +		/* GUEST_MODE must be clear when SVME==0 */
-> > > +		if (kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)
+> > > Would love someone to sanity check me on this. Kind of a diversion.
 > > 
-> > Hmm, this is technically wrong, as it will allow KVM_STATE_NESTED_RUN_PENDING.
-> > Now, arguably KVM already has a flaw there as KVM allows KVM_STATE_NESTED_RUN_PENDING
-> > without KVM_STATE_NESTED_GUEST_MODE for SVME=1, but I'd prefer not to make the
-> > hole bigger.
-> > 
-> > The nested if-statement is also unnecessary.
-> > 
-> > How about this instead?  (not yet tested)
-> > 
-> > 	/*
-> > 	 * If in guest mode, vcpu->arch.efer actually refers to the L2 guest's
-> > 	 * EFER.SVME, but EFER.SVME still has to be 1 for VMRUN to succeed.
-> > 	 * If SVME is disabled, the only valid states are "none" and GIF=1
-> > 	 * (clearing SVME does NOT set GIF, i.e. GIF=0 is allowed).
-> > 	 */
-> > 	if (!(vcpu->arch.efer & EFER_SVME) && kvm_state->flags &&
-> > 	    kvm_state->flags != KVM_STATE_NESTED_GIF_SET)
-> > 		return -EINVAL;
+> > What you write is correct. Ankit recently discovered this bug in
+> > qemu. It happens not just with SPARSE_MMAP but also when mmmaping
+> > around the MSI-X hole..
 > 
-> Looks good to me, with the tiny exception that at this point clearing
-> SVME does set GIF. Maybe re-order the patches?
-> 
-> Let me know if you want me to send a new version or if you'll fix it up
-> while applying.
+> Is my mental model broken? I thought MSI-X holes in a VFIO-exposed BAR region
+> implied SPARSE_MMAP? I didn't think there was another way for the uapi to
+> express hole-yness.
 
-No need for a new version.
+Yes, it was broken. Creating MSI-X table holes with SPARSE_MMAP ended back
+in 2017 and was superseded by VFIO_REGION_INFO_CAP_MSIX_MAPPABLE [1].
+
+[1] https://lore.kernel.org/all/20171213023131.41233-1-aik@ozlabs.ru/
+
+Only nvgrace-gpu and some i915 reference SPARSE_MMAP today.
 
