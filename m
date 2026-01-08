@@ -1,50 +1,50 @@
-Return-Path: <kvm+bounces-67427-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67428-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A433D058B7
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 19:31:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B51BED052C2
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 18:48:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2964373A2AD
+	by sin.lore.kernel.org (Postfix) with ESMTP id 855C030E3CC8
 	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF332E88BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296002E7F1E;
 	Thu,  8 Jan 2026 17:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glimZ8G4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeM/bJyz"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5DC29B204;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE3229BD95;
 	Thu,  8 Jan 2026 17:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767893559; cv=none; b=Az1YVKhWx6oQaoQvsRaudabjk8Qj4vQ2T6shDUURIh+TOexRlH+e8/d52blRApzPquvN0i1WQ+kWKCp11Fk0Zr88AX8BwusHPUtAQvVxGTRje1DzvJtcL67MqMznMjHWb08DaKplqTxCDlxDnv6lyw1s7NgdGfRr7q2S0Sj8hzs=
+	t=1767893559; cv=none; b=CeHVQOPzTFeI4dkE71JQQC7yHpZrNFgfdrzLOJWsWwPg1S6jGiaJE5tHfJYOOWvcPUctsY/hGbWaCQ5sPeblB/CfSI5GjXPkFBqLBQ30pcmp+iLQTp2jDyz6wH5Vz82LZDTdudOlYxcLY48IByMdeJDgW6F/obHWBrsD39O/dCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767893559; c=relaxed/simple;
-	bh=lBM9O1xiYp3upt+sE8CBR/zZAFQ7xYSFnh/kkG4Fd4c=;
+	bh=il8COfiF1FhMwmH8tRnlXmaXeF2Tmchwrjdh9u49mVY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d8jR14Kby7viNF/5ERrAdbHCCEU5ah/DZlIx/F2tq9gFDdsbHYkGrThwLFZJBXEL2Q8rMmCNVUZRnNY26hzoH/lJS/JeEH4r0m8R2d8aN/EMJ2GVpAu23ZR76fBmV0yXf2HW8CEqkwuWqApKPxTnAX0LMffAKpleYRiWvAAYrxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=glimZ8G4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19595C16AAE;
+	 MIME-Version; b=Ka4pQDbpAB3WOBiatEY6p2QyYopT3QCIenaAmUWuXTeH7zxIBtH5Vja9uJBkDQdzgWliCSyS8TGaJoYvdpu53OMqxk550APtv9qvplWQlid7OMBYYXzVNbFW2jf3uzKuGRaTIlcLrbpZ185wO5yD2/Yf7KBDb8yyeaGf25sJIGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeM/bJyz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1BBC19424;
 	Thu,  8 Jan 2026 17:32:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1767893559;
-	bh=lBM9O1xiYp3upt+sE8CBR/zZAFQ7xYSFnh/kkG4Fd4c=;
+	bh=il8COfiF1FhMwmH8tRnlXmaXeF2Tmchwrjdh9u49mVY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=glimZ8G4SNAjTBRQKdLQkzr8Bu1wHkZ7ZUqsu0eyU77PuGcUbUCHZ3JbP/PlNyavO
-	 4QlWY84WAC6XL9nc3PufdAStZjOT/DjAiJKMtzxAB5/BVU8J5Z9Chvjh2GTuwe4aEv
-	 D/kvWVZgM1NSMqr063LhRoKCQtMzjs0gLmeyd6sf6d2ly/LgZkLe75bCblNc7Zqme0
-	 wlGgTrwO/btvQLpYoaqPk+Ou+4I/7fYRDTRPJo/RfWL6vlcFml6K7Ral/Pn1zRSoDH
-	 MIkVzUjXjjaT841GpoDrzTvz+RfnZUEK+5LyV1tF7U1+6Td2914ZJlky2UXpZYdckS
-	 tq8Tap2MHLwRQ==
+	b=FeM/bJyzo8gacN12ll2CLwrsW5eevGOScKJX8pwU3V5uhMNcvFg9CRnc2+Ko8iqlG
+	 zcM+mzqXNh30oan+n9RwX9CORddctNXJU1YwGobFJsoE56cAfSrraEaW1hJvahxxGZ
+	 gojPSMn3jxaVTAUoefgAiOU4deOMcMOb8G/8ag3FpPVmqZE9aSg64+34s0WhiCGFYr
+	 ilaHNL+d+MEP9Fw3IcAC1haoh37cpbcn6g7A7FvLLsmgIQ/Wl7VFysK44Fd8KMxHa1
+	 rSvz4mi/MjpoqURVNByZxU7sAXl06CMvS31KdmZtn+GmqOkdN3mJNFDnv0B3LcPn3y
+	 /zFsgBlEe328A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vdtsC-00000000W9F-3NHY;
-	Thu, 08 Jan 2026 17:32:36 +0000
+	id 1vdtsD-00000000W9F-09Vi;
+	Thu, 08 Jan 2026 17:32:37 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ben Horgan <ben.horgan@arm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v4 2/9] KVM: arm64: Add trap routing for GMID_EL1
-Date: Thu,  8 Jan 2026 17:32:26 +0000
-Message-ID: <20260108173233.2911955-3-maz@kernel.org>
+Subject: [PATCH v4 3/9] KVM: arm64: Add a generic synchronous exception injection primitive
+Date: Thu,  8 Jan 2026 17:32:27 +0000
+Message-ID: <20260108173233.2911955-4-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260108173233.2911955-1-maz@kernel.org>
 References: <20260108173233.2911955-1-maz@kernel.org>
@@ -73,48 +73,64 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-HCR_EL2.TID5 is currently ignored by the trap routing infrastructure.
-Wire it in the routing table so that GMID_EL1, the sole register
-trapped by this bit, is correctly handled in the NV case.
+Maybe in a surprising way, we don't currently have a generic way
+to inject a synchronous exception at the EL the vcpu is currently
+running at.
 
+Extract such primitive from the UNDEF injection code.
+
+Reviewed-by: Ben Horgan <ben.horgan@arm.com>
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/inject_fault.c        | 10 +++++++---
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 834f13fb1fb7d..616eb6ad68701 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -70,6 +70,7 @@ enum cgt_group_id {
- 	CGT_HCR_ENSCXT,
- 	CGT_HCR_TTLBIS,
- 	CGT_HCR_TTLBOS,
-+	CGT_HCR_TID5,
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index c9eab316398e2..df20d47f0d256 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -45,6 +45,7 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
  
- 	CGT_MDCR_TPMCR,
- 	CGT_MDCR_TPM,
-@@ -308,6 +309,12 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= HCR_TTLBOS,
- 		.behaviour	= BEHAVE_FORWARD_RW,
- 	},
-+	[CGT_HCR_TID5] = {
-+		.index		= HCR_EL2,
-+		.value		= HCR_TID5,
-+		.mask		= HCR_TID5,
-+		.behaviour	= BEHAVE_FORWARD_RW,
-+	},
- 	[CGT_MDCR_TPMCR] = {
- 		.index		= MDCR_EL2,
- 		.value		= MDCR_EL2_TPMCR,
-@@ -665,6 +672,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_CCSIDR2_EL1,	CGT_HCR_TID2_TID4),
- 	SR_TRAP(SYS_CLIDR_EL1,		CGT_HCR_TID2_TID4),
- 	SR_TRAP(SYS_CSSELR_EL1,		CGT_HCR_TID2_TID4),
-+	SR_TRAP(SYS_GMID_EL1,		CGT_HCR_TID5),
- 	SR_RANGE_TRAP(SYS_ID_PFR0_EL1,
- 		      sys_reg(3, 0, 0, 7, 7), CGT_HCR_TID3),
- 	SR_TRAP(SYS_ICC_SGI0R_EL1,	CGT_HCR_IMO_FMO_ICH_HCR_TC),
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
++void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr);
+ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
+ int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+ void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index dfcd66c655179..7102424a3fa5e 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -162,12 +162,16 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+ }
+ 
++void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
++{
++	pend_sync_exception(vcpu);
++	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
++}
++
+ static void inject_undef64(struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+ 
+-	pend_sync_exception(vcpu);
+-
+ 	/*
+ 	 * Build an unknown exception, depending on the instruction
+ 	 * set.
+@@ -175,7 +179,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ 	if (kvm_vcpu_trap_il_is32bit(vcpu))
+ 		esr |= ESR_ELx_IL;
+ 
+-	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
++	kvm_inject_sync(vcpu, esr);
+ }
+ 
+ #define DFSR_FSC_EXTABT_LPAE	0x10
 -- 
 2.47.3
 
