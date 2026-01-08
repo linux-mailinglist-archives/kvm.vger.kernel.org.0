@@ -1,267 +1,183 @@
-Return-Path: <kvm+bounces-67326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C021D00CA5
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:08:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC356D00DC5
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:27:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A51D6303831B
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:07:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 800AE3053BF0
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964462853FD;
-	Thu,  8 Jan 2026 03:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927C228504D;
+	Thu,  8 Jan 2026 03:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B/xJ5KUY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P5BuMgMz";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGZ19Jsi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BE928030E;
-	Thu,  8 Jan 2026 03:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E861EBA14
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767841634; cv=none; b=IEsJPiUEvwcWCDAlJ0QruzL82UMo/SUwc/8Vi7tXGeByBaZIe3/YSrFjtQfPWSy8RbCj8G9A00kznGFD672+yMz0+4wbpUCZ14TfIukBFqqoBjaCEQYvsHPwa18GzMbV9k6aVxmq5SMKuzcAcUq/92ypmgXywU4hzo5d8N83omk=
+	t=1767842609; cv=none; b=YrS29bAFYrzqxfk55yT9fnV3EvElOcoZF2wlUam9g6rIYyUcCSfKwX8WGmyoQcQ1EJaP7C8Fg8KoZOoKswe/8EWtGjtvXau76ivA6gaz4rzvvjaauR4BlB3daH2d6y4Ma5KB6/WavX6Os5KQ48M141DjSOfpzjBLCuRzTJi72vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767841634; c=relaxed/simple;
-	bh=A1EDVql3T0qVgDPncFKxMzWgwRWKWjDnLmwzTqzTTKc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d126Nk6fo70ZBQs+MLSHHjqM54H/pF7+Aj73/7ztefvK2gm+riFe/dQe13NU3x2n4cX7dMOrcFeK5JJ84FiOYVjv4AOFqmv+gouS4++zUVHOkFFfGUMZReUfumiZ9jcGCh37VHEBMav0T0Jnky/140x4PFEXovuG5ewzYJ2acRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B/xJ5KUY; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767841633; x=1799377633;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=A1EDVql3T0qVgDPncFKxMzWgwRWKWjDnLmwzTqzTTKc=;
-  b=B/xJ5KUYzvXkjEhjX4L7xNU0+qdAoqXADb8l+S0t716gGjj6h+r8oBeI
-   XfpobAftbKMGFkFkbM7MMa6LZvCgjv1sEPAHb1H9Rv3djOeSX6QFJBPft
-   X3AfpXfL9aGIQM9pss1YGXO8EpO8Qbllvz2r9/b2PYRHmXNHFb/m0GWLJ
-   Ojtfs/Q1UY7v6TeWKL4RVp88fp1YAv3tAyNkD/O14YO7QvJFj2n5BC8Vg
-   suOUwbx7pi3RoYNRAQtXUtzeR2zvEllU0YfNuB1W3/7ASx8xFY/+rTLhm
-   J3bVUvNVFt+sthWhmkReF8ZZhRfk2zFVzm3W8fCkJ5Fc9P0WZ6SV7DJ8N
-   w==;
-X-CSE-ConnectionGUID: OfMRZumUSmyTZjzHFIkBpA==
-X-CSE-MsgGUID: 564hM75VQkGcTEaBDcutNg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877202"
-X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="91877202"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:07:12 -0800
-X-CSE-ConnectionGUID: SpVqtqJKT/WJ/2JUetxXlg==
-X-CSE-MsgGUID: JdiG3z9TQZuPUZfpUCpQEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="203105769"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.240.233]) ([10.124.240.233])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:07:10 -0800
-Message-ID: <959b98b1-fbc4-4515-bc7c-8c146c6c8529@linux.intel.com>
-Date: Thu, 8 Jan 2026 11:06:56 +0800
+	s=arc-20240116; t=1767842609; c=relaxed/simple;
+	bh=oIv7VTewxFjssL2jhliOXXbBPd3GBbrqXH5sFUlQGGM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s1Cn+TaS58jqVMJgFvwDoSV9zSpXaxnqvGRr8Fc9ZqbQAOPJ/+3cNyvk1V3bWgIUYfvzgX20uRS+cPcC/lSvuGx+11tJULEy+nehvmYJOHtLsE/rHnHBET0YoHCblC739vpaafSKKR64O+txECBcxqykChqxxyxwsWpVD9J4JHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P5BuMgMz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GGZ19Jsi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767842606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=53+r2N7iOHCghDUQ95LK593uOrK3zjiCULW2/UR+Mu0=;
+	b=P5BuMgMz3qipG0lldGfymzYfiPt6pDlAz2P4d4lzx9KOwljN1uWqZbzlVCHprLA16DMgeD
+	FZSSJmGukvX2yEVdQlddE52dXh+9fPno7EA/8HdL+MBc4MHKuVMyHFaQXP7QA5uH/id68x
+	Ji6YahO7RiMrSaOnu5SzBGKRBYLPthc=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-77-LVEx3u7COpmeON7IvdoA8Q-1; Wed, 07 Jan 2026 22:23:24 -0500
+X-MC-Unique: LVEx3u7COpmeON7IvdoA8Q-1
+X-Mimecast-MFC-AGG-ID: LVEx3u7COpmeON7IvdoA8Q_1767842604
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c314af2d4so2327583a91.3
+        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 19:23:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767842603; x=1768447403; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=53+r2N7iOHCghDUQ95LK593uOrK3zjiCULW2/UR+Mu0=;
+        b=GGZ19Jsi6VxmGefZT5oxN764U7ZcOhbeaCBGnK+IkkCaFQ1+Uu1Dc9Agwrn9TZ94aw
+         Aj5TsKdjzVdI9hX8qjOTUUB5HHC5XKoIJj2zL6y1cKGiDLFGWpLXHcTMJRzA5xR9PWFb
+         lW6zkQnDOFsEFap/A+fT8q7q4r7Pzg162ZYwsoV5wuAcOICPWHULkN1Yvu8P2Z2LZrxa
+         mYruQPjknQOYCaTkxjGExlA/oged10+vxpp8kR5TM5NMElTqNPk1+u4/IYKzAjwbPlHC
+         f6t26/G6td6m9zqlU5vY08sstrb103l6ZgjivXVnh345d7U+xh1klUrET6wu1oChx65K
+         8WIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767842603; x=1768447403;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=53+r2N7iOHCghDUQ95LK593uOrK3zjiCULW2/UR+Mu0=;
+        b=pfI5sOqn5ar0HDErem93+yoQEGuS0OOBk4PPoRmhrLlooFPFHITOCpmNlrfaovNQGN
+         z10XBhvjBl7ctUS+LdgaxJ67xev+RgaYYT9H1bmP54lhl/fNLIfmyWsy75k0ApwvcsQc
+         LPr/4I7ML3tXOjHr3pCp8yKDWaaMrvDOWxcBbe4ExgZADQgLvv2UAJ53dgYDnSweQldQ
+         FVCR6zelUnjSilbhz9FWO9GtScB0rDMTyQBZeZXWtVm8TuJ28CFjoFzUcxEVh8qXXZ3n
+         o8hI9Mv/G5hiSrB5hfaZqXV7L2Yp4UT/WmvkOY64pwXkSgZtgz7RL9MAxoTw0xt6MfMt
+         lsng==
+X-Forwarded-Encrypted: i=1; AJvYcCXAJ3cyiJzTxw7sse+DIFvp61cMIQLTKMtR3oDmvn4+7BbmBat1BnJnoeMuykKbKeRQ+oU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfVxxHDz4+8VTiAqe8LM29Z7mwe60v4GvACspcXr09iaR7XqLH
+	4tY6KuwWZqvwh3115DcQjC1IZ67Oc+VXflSA0rrObOI9sHN5qW9k+BI9WVu9bBGjgB4TmbP/m6U
+	Q382WMXYJ2lhVifPnpiX2VscIy1ptHX2u6Ru2iJ/uBM/NG0XqUS/yIl17VZmN2RJNAoYqpz1bxj
+	Rw9PaRXYRNW6K+Xld9x06lifIJFhcn
+X-Gm-Gg: AY/fxX64HulNnwsSjkPGKMSdSo5q31mnK/b6DxPnDy9hhtr8d9QOE+uJ/M+wnMr3ctc
+	O6Y+FSOHVGI46Gxnw7fhjFro9gHJqGDIuQXYcNE6BLn1B1pnBgbNm3OKgOfe6u8xtgljuOiTgEl
+	fmF6oLCoVSVZ4Ep8cSMmGk+BXka2HtFe3xV3LGvYly2f0Jqzurd1+VcznqGojFvGk=
+X-Received: by 2002:a17:903:41c9:b0:2a0:a33f:304c with SMTP id d9443c01a7336-2a3ee4c0025mr47651265ad.57.1767842603726;
+        Wed, 07 Jan 2026 19:23:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRtayNY0uqqjM78CiVQw7mFTLxT/iYnZszpaOrmD2ynKaqKve+vos88ChoY6cZhopiJ0fw3kSZsdEyMLVdhzw=
+X-Received: by 2002:a17:903:41c9:b0:2a0:a33f:304c with SMTP id
+ d9443c01a7336-2a3ee4c0025mr47651025ad.57.1767842603302; Wed, 07 Jan 2026
+ 19:23:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever
- XFD[i]=1
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
- x86@kernel.org, stable@vger.kernel.org
-References: <20260101090516.316883-1-pbonzini@redhat.com>
- <20260101090516.316883-2-pbonzini@redhat.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20260101090516.316883-2-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de> <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 8 Jan 2026 11:23:10 +0800
+X-Gm-Features: AQt7F2oDKZ3eYcdC7fFyoqIzzMdHxzeD7csgTVUKHz7k-5CronqUpphVIiXmk98
+Message-ID: <CACGkMEsHxu_iyL+MjJG834hBGNy9tY9f3mAEeZfDn5MMwtuz8Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly
+ freed space on consume
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mst@redhat.com, eperezma@redhat.com, leiyang@redhat.com, 
+	stephen@networkplumber.org, jon@nutanix.com, tim.gebauer@tu-dortmund.de, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 1/1/2026 5:05 PM, Paolo Bonzini wrote:
-> From: Sean Christopherson <seanjc@google.com>
-> 
-> When loading guest XSAVE state via KVM_SET_XSAVE, and when updating XFD in
-> response to a guest WRMSR, clear XFD-disabled features in the saved (or to
-> be restored) XSTATE_BV to ensure KVM doesn't attempt to load state for
-> features that are disabled via the guest's XFD.  Because the kernel
-> executes XRSTOR with the guest's XFD, saving XSTATE_BV[i]=1 with XFD[i]=1
-> will cause XRSTOR to #NM and panic the kernel.
-> 
-> E.g. if fpu_update_guest_xfd() sets XFD without clearing XSTATE_BV:
-> 
->   ------------[ cut here ]------------
->   WARNING: arch/x86/kernel/traps.c:1524 at exc_device_not_available+0x101/0x110, CPU#29: amx_test/848
->   Modules linked in: kvm_intel kvm irqbypass
->   CPU: 29 UID: 1000 PID: 848 Comm: amx_test Not tainted 6.19.0-rc2-ffa07f7fd437-x86_amx_nm_xfd_non_init-vm #171 NONE
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->   RIP: 0010:exc_device_not_available+0x101/0x110
->   Call Trace:
->    <TASK>
->    asm_exc_device_not_available+0x1a/0x20
->   RIP: 0010:restore_fpregs_from_fpstate+0x36/0x90
->    switch_fpu_return+0x4a/0xb0
->    kvm_arch_vcpu_ioctl_run+0x1245/0x1e40 [kvm]
->    kvm_vcpu_ioctl+0x2c3/0x8f0 [kvm]
->    __x64_sys_ioctl+0x8f/0xd0
->    do_syscall_64+0x62/0x940
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
->    </TASK>
->   ---[ end trace 0000000000000000 ]---
-> 
-> This can happen if the guest executes WRMSR(MSR_IA32_XFD) to set XFD[18] = 1,
-> and a host IRQ triggers kernel_fpu_begin() prior to the vmexit handler's
-> call to fpu_update_guest_xfd().
-> 
-> and if userspace stuffs XSTATE_BV[i]=1 via KVM_SET_XSAVE:
-> 
->   ------------[ cut here ]------------
->   WARNING: arch/x86/kernel/traps.c:1524 at exc_device_not_available+0x101/0x110, CPU#14: amx_test/867
->   Modules linked in: kvm_intel kvm irqbypass
->   CPU: 14 UID: 1000 PID: 867 Comm: amx_test Not tainted 6.19.0-rc2-2dace9faccd6-x86_amx_nm_xfd_non_init-vm #168 NONE
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->   RIP: 0010:exc_device_not_available+0x101/0x110
->   Call Trace:
->    <TASK>
->    asm_exc_device_not_available+0x1a/0x20
->   RIP: 0010:restore_fpregs_from_fpstate+0x36/0x90
->    fpu_swap_kvm_fpstate+0x6b/0x120
->    kvm_load_guest_fpu+0x30/0x80 [kvm]
->    kvm_arch_vcpu_ioctl_run+0x85/0x1e40 [kvm]
->    kvm_vcpu_ioctl+0x2c3/0x8f0 [kvm]
->    __x64_sys_ioctl+0x8f/0xd0
->    do_syscall_64+0x62/0x940
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
->    </TASK>
->   ---[ end trace 0000000000000000 ]---
-> 
-> The new behavior is consistent with the AMX architecture.  Per Intel's SDM,
-> XSAVE saves XSTATE_BV as '0' for components that are disabled via XFD
-> (and non-compacted XSAVE saves the initial configuration of the state
-> component):
-> 
->   If XSAVE, XSAVEC, XSAVEOPT, or XSAVES is saving the state component i,
->   the instruction does not generate #NM when XCR0[i] = IA32_XFD[i] = 1;
->   instead, it operates as if XINUSE[i] = 0 (and the state component was
->   in its initial state): it saves bit i of XSTATE_BV field of the XSAVE
->   header as 0; in addition, XSAVE saves the initial configuration of the
->   state component (the other instructions do not save state component i).
-> 
-> Alternatively, KVM could always do XRSTOR with XFD=0, e.g. by using
-> a constant XFD based on the set of enabled features when XSAVEing for
-> a struct fpu_guest.  However, having XSTATE_BV[i]=1 for XFD-disabled
-> features can only happen in the above interrupt case, or in similar
-> scenarios involving preemption on preemptible kernels, because
-> fpu_swap_kvm_fpstate()'s call to save_fpregs_to_fpstate() saves the
-> outgoing FPU state with the current XFD; and that is (on all but the
-> first WRMSR to XFD) the guest XFD.
-> 
-> Therefore, XFD can only go out of sync with XSTATE_BV in the above
-> interrupt case, or in similar scenarios involving preemption on
-> preemptible kernels, and it we can consider it (de facto) part of KVM
-> ABI that KVM_GET_XSAVE returns XSTATE_BV[i]=0 for XFD-disabled features.
-
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
-One nit blew.
-
-> 
-> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: stable@vger.kernel.org
-> Fixes: 820a6ee944e7 ("kvm: x86: Add emulation for IA32_XFD", 2022-01-14)
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> [Move clearing of XSTATE_BV from fpu_copy_uabi_to_guest_fpstate
->  to kvm_vcpu_ioctl_x86_set_xsave. - Paolo]
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
+<simon.schippers@tu-dortmund.de> wrote:
+>
+> This proposed function checks whether __ptr_ring_zero_tail() was invoked
+> within the last n calls to __ptr_ring_consume(), which indicates that new
+> free space was created. Since __ptr_ring_zero_tail() moves the tail to
+> the head - and no other function modifies either the head or the tail,
+> aside from the wrap-around case described below - detecting such a
+> movement is sufficient to detect the invocation of
+> __ptr_ring_zero_tail().
+>
+> The implementation detects this movement by checking whether the tail is
+> at most n positions behind the head. If this condition holds, the shift
+> of the tail to its current position must have occurred within the last n
+> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
+> invoked and that new free space was created.
+>
+> This logic also correctly handles the wrap-around case in which
+> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
+> to 0. Since this reset likewise moves the tail to the head, the same
+> detection logic applies.
+>
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 > ---
->  arch/x86/kernel/fpu/core.c | 32 +++++++++++++++++++++++++++++---
->  arch/x86/kvm/x86.c         |  9 +++++++++
->  2 files changed, 38 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-> index da233f20ae6f..166c380b0161 100644
-> --- a/arch/x86/kernel/fpu/core.c
-> +++ b/arch/x86/kernel/fpu/core.c
-> @@ -319,10 +319,29 @@ EXPORT_SYMBOL_FOR_KVM(fpu_enable_guest_xfd_features);
->  #ifdef CONFIG_X86_64
->  void fpu_update_guest_xfd(struct fpu_guest *guest_fpu, u64 xfd)
->  {
-> +	struct fpstate *fpstate = guest_fpu->fpstate;
-> +
->  	fpregs_lock();
-> -	guest_fpu->fpstate->xfd = xfd;
-> -	if (guest_fpu->fpstate->in_use)
-> -		xfd_update_state(guest_fpu->fpstate);
-> +
-> +	/*
-> +	 * KVM's guest ABI is that setting XFD[i]=1 *can* immediately revert
-> +	 * the save state to initialized.  Likewise, KVM_GET_XSAVE does the
-
-Nit:
-To me "initialized" has the implication that it's active.
-I prefer the description "initial state" or "initial configuration" used in
-SDM here.
-I am not a native English speaker though, please ignore it if it's just my
-feeling.
-
-
-> +	 * same as XSAVE and returns XSTATE_BV[i]=0 whenever XFD[i]=1.
-> +	 *
-> +	 * If the guest's FPU state is in hardware, just update XFD: the XSAVE
-> +	 * in fpu_swap_kvm_fpstate will clear XSTATE_BV[i] whenever XFD[i]=1.
-> +	 *
-> +	 * If however the guest's FPU state is NOT resident in hardware, clear
-> +	 * disabled components in XSTATE_BV now, or a subsequent XRSTOR will
-> +	 * attempt to load disabled components and generate #NM _in the host_.
-> +	 */
-> +	if (xfd && test_thread_flag(TIF_NEED_FPU_LOAD))
-> +		fpstate->regs.xsave.header.xfeatures &= ~xfd;
-> +
-> +	fpstate->xfd = xfd;
-> +	if (fpstate->in_use)
-> +		xfd_update_state(fpstate);
-> +
->  	fpregs_unlock();
+>  include/linux/ptr_ring.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> index a5a3fa4916d3..7cdae6d1d400 100644
+> --- a/include/linux/ptr_ring.h
+> +++ b/include/linux/ptr_ring.h
+> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct=
+ ptr_ring *r,
+>         return ret;
 >  }
->  EXPORT_SYMBOL_FOR_KVM(fpu_update_guest_xfd);
-> @@ -430,6 +449,13 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
->  	if (ustate->xsave.header.xfeatures & ~xcr0)
->  		return -EINVAL;
->  
-> +	/*
-> +	 * Disabled features must be in their initial state, otherwise XRSTOR
-> +	 * causes an exception.
-> +	 */
-> +	if (WARN_ON_ONCE(ustate->xsave.header.xfeatures & kstate->xfd))
-> +		return -EINVAL;
+>
+> +/* Returns true if the consume of the last n elements has created space
+> + * in the ring buffer (i.e., a new element can be produced).
+> + *
+> + * Note: Because of batching, a successful call to __ptr_ring_consume() =
+/
+> + * __ptr_ring_consume_batched() does not guarantee that the next call to
+> + * __ptr_ring_produce() will succeed.
+
+This sounds like a bug that needs to be fixed, as it requires the user
+to know the implementation details. For example, even if
+__ptr_ring_consume_created_space() returns true, __ptr_ring_produce()
+may still fail?
+
+Maybe revert fb9de9704775d?
+
+> + */
+> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
+> +                                                   int n)
+> +{
+> +       return r->consumer_head - r->consumer_tail < n;
+> +}
 > +
->  	/*
->  	 * Nullify @vpkru to preserve its current value if PKRU's bit isn't set
->  	 * in the header.  KVM's odd ABI is to leave PKRU untouched in this
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ff8812f3a129..c0416f53b5f5 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5807,9 +5807,18 @@ static int kvm_vcpu_ioctl_x86_get_xsave(struct kvm_vcpu *vcpu,
->  static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
->  					struct kvm_xsave *guest_xsave)
->  {
-> +	union fpregs_state *xstate = (union fpregs_state *)guest_xsave->region;
-> +
->  	if (fpstate_is_confidential(&vcpu->arch.guest_fpu))
->  		return vcpu->kvm->arch.has_protected_state ? -EINVAL : 0;
->  
-> +	/*
-> +	 * Do not reject non-initialized disabled features for backwards
-> +	 * compatibility, but clear XSTATE_BV[i] whenever XFD[i]=1.
-> +	 * Otherwise, XRSTOR would cause a #NM.
-> +	 */
-> +	xstate->xsave.header.xfeatures &= ~vcpu->arch.guest_fpu.fpstate->xfd;
-> +
->  	return fpu_copy_uabi_to_guest_fpstate(&vcpu->arch.guest_fpu,
->  					      guest_xsave->region,
->  					      kvm_caps.supported_xcr0,
+>  /* Cast to structure type and call a function without discarding from FI=
+FO.
+>   * Function must return a value.
+>   * Callers must take consumer_lock.
+> --
+> 2.43.0
+>
+
+Thanks
 
 
