@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCD4D00D17
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:13:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA76D00D1A
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:13:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 711223051EB5
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:09:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C27A30657BC
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147E12C031E;
-	Thu,  8 Jan 2026 03:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0EF2C0F95;
+	Thu,  8 Jan 2026 03:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C5rdr255"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kNdIxYVq"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D592BEC2A
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA1D2C031B
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767841781; cv=none; b=CPbLw3ngNWgQi1ro8ihCb05nGxz5IFloNJ4maif0ZHMM9FDDIoFISu5EpohQaBxVCSfRVr5d/glIXzAlcVLzGbOyAUZ/PlM2N7J1O6y+mGHsI+nbwqaDBZGRMs3PLsIwo47Oeuws7n6psKNWnEz/3UBsM9+hyFnkTrYWbWo3kd0=
+	t=1767841790; cv=none; b=UrUnkH7ZgcSSeQRRVelonyeuRghzxWQ94Hs7MzPbqpEgsN3qLWh38Sbxst2utxPWG4pik2OWD3LxNwsK00M5hqHA8Rn231rFG3LOs21CSxyUSFIksLqV285FBaCfIj4nOzGl13+VqKJlf3QC/TT6DGkNacJNsDiEkwFVrlYU9dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767841781; c=relaxed/simple;
-	bh=/2b3kXmiCRa/BYYzO/hHr0chSCEMHL45PiGF0m8kKTY=;
+	s=arc-20240116; t=1767841790; c=relaxed/simple;
+	bh=eQl80wcJOArtg5jzbHQMtHiWAJNWb57OsGNNd3OKlKw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e9RMA+C5ZD9tqz18RtTrFvgOvfM4y0MoydyFH2AOrzwjxdtq+LSIWN/c3SzhijtzP6hjNd98Y4YICmcFUc16QgXEDXCfNFoFDSQ02RwAvcWMG+JxG/i4MKRqUT1Gq08I3rqUn3btAAcxPqPF9Ejp0rJ24la+aZA1IZaDETcjqsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C5rdr255; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version:Content-Type; b=UDIdSaSsfkCIM5vDQ6yEZF+34/BMit203hEr+Qunj6wiocaPig+whoAM3C/D8r9Na/HP6u/uL4BANT58YeMLHijGmYaPyYBiaY/JOF2k8v0Nn/PYMzO6WR0A3RAm3zcWCMyIaLDTdoqs1nCj/RQ8HL/qckYSntwyVUOtBOF8md0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kNdIxYVq; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767841779; x=1799377779;
+  t=1767841788; x=1799377788;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/2b3kXmiCRa/BYYzO/hHr0chSCEMHL45PiGF0m8kKTY=;
-  b=C5rdr255Aa+WOgUrFxlHw1YToMO7dUP/4TzYPYybci6WHV3QrcBUFrq8
-   QXqAoIBFNc0i6NMnMxilwIKplPPaVyPD1tLA+awvHYNwmdFSAY/5+mOkF
-   l+laGAGGGghzDe/kl459nbahkbvi1YBG1MTFm73D+71OUpSo0LIxwP5Mu
-   283X9SLjEBFkNXR17tRa2Ijom565VqoLEMJOkuopL8A9RfmuWpRxTSt3U
-   T26IN57uXlVP9kGTJ7XJvVlJQx6T4cq6Gn+BHL9FKl9swTVAg/tMXgRGh
-   cHUIYng/+CN2o1ctOhUdr6RlpElGSBFEHElQ7wXJZ+QuAgmE5msC9tirK
-   A==;
-X-CSE-ConnectionGUID: o1OhWuHsTB2OacY05kHODw==
-X-CSE-MsgGUID: hFtJy8B0TrixjBwqpGaclA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877691"
+  bh=eQl80wcJOArtg5jzbHQMtHiWAJNWb57OsGNNd3OKlKw=;
+  b=kNdIxYVqMPbKTvrI8w1JnKpLizdZndovi/lyVSdi1XwItD2qK06rKY6c
+   BwxBVqQ/hiPmQx7GQi428ABs5im9WRtJgzIo8MeCrkes9Iee5EQM2AFv4
+   J/K1E+1SiQl6aAo9p8lNeuWg8O8zL7HoGhLLRKKCjypDagf6ZiiBs5vzr
+   CH4XBQsWqjvWXBf5XultX68J0RbGY6N2YBgYn0vBgqlZfdZJ81skPc5F6
+   TmopbnBdRl2GIirbFY1vWHimkXvK42NgtmYStM2s+8ZLY+xxlhA1rB9Hf
+   a4kPXGbdo/QduvSyWy7oVFfmCPjMYFjYoB6ydouX2yGDkkebnhupuU6qN
+   g==;
+X-CSE-ConnectionGUID: wTaGFyTTRG+e8rnokxAKgg==
+X-CSE-MsgGUID: nv4JvdBBSBiXSPY3N0hsmA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877719"
 X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="91877691"
+   d="scan'208";a="91877719"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:09:39 -0800
-X-CSE-ConnectionGUID: s23i9cu5TrGrYQuG6Kc3Eg==
-X-CSE-MsgGUID: xPA6wA+1S4qpU2au1duTiA==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:09:48 -0800
+X-CSE-ConnectionGUID: kIWWhqTxQGmT66gxvRoqEQ==
+X-CSE-MsgGUID: KlFeMH7URR2pjppFfeN6xA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="202211269"
+   d="scan'208";a="202211287"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa006.jf.intel.com with ESMTP; 07 Jan 2026 19:09:30 -0800
+  by orviesa006.jf.intel.com with ESMTP; 07 Jan 2026 19:09:39 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -98,9 +98,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v6 26/27] hw/virtio/virtio-pci: Remove VirtIOPCIProxy::ignore_backend_features field
-Date: Thu,  8 Jan 2026 11:30:50 +0800
-Message-Id: <20260108033051.777361-27-zhao1.liu@intel.com>
+Subject: [PATCH v6 27/27] hw/char/virtio-serial: Do not expose the 'emergency-write' property
+Date: Thu,  8 Jan 2026 11:30:51 +0800
+Message-Id: <20260108033051.777361-28-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260108033051.777361-1-zhao1.liu@intel.com>
 References: <20260108033051.777361-1-zhao1.liu@intel.com>
@@ -115,56 +115,77 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-The VirtIOPCIProxy::ignore_backend_features boolean was only set
-in the hw_compat_2_7[] array, via the 'x-ignore-backend-features=on'
+The VIRTIO_CONSOLE_F_EMERG_WRITE feature bit was only set
+in the hw_compat_2_7[] array, via the 'emergency-write=off'
 property. We removed all machines using that array, lets remove
-that property, simplify by only using the default version.
+that property. All instances have this feature bit set and
+it can not be disabled. VirtIOSerial::host_features mask is
+now unused, remove it.
 
 Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/virtio/virtio-pci.c         | 5 +----
- include/hw/virtio/virtio-pci.h | 1 -
- 2 files changed, 1 insertion(+), 5 deletions(-)
+ hw/char/virtio-serial-bus.c       | 9 +++------
+ include/hw/virtio/virtio-serial.h | 2 --
+ 2 files changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index b273eb269196..e2a3dcc5b631 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -2040,8 +2040,7 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
-      * Virtio capabilities present without
-      * VIRTIO_F_VERSION_1 confuses guests
-      */
--    if (!proxy->ignore_backend_features &&
--            !virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
-+    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
-         virtio_pci_disable_modern(proxy);
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index 5ec5f5313b21..b7c57ea9678c 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -557,7 +557,7 @@ static uint64_t get_features(VirtIODevice *vdev, uint64_t features,
  
-         if (!legacy) {
-@@ -2441,8 +2440,6 @@ static const Property virtio_pci_properties[] = {
-                     VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT, false),
-     DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
--    DEFINE_PROP_BOOL("x-ignore-backend-features", VirtIOPCIProxy,
--                     ignore_backend_features, false),
-     DEFINE_PROP_BIT("ats", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_ATS_BIT, false),
-     DEFINE_PROP_BIT("x-ats-page-aligned", VirtIOPCIProxy, flags,
-diff --git a/include/hw/virtio/virtio-pci.h b/include/hw/virtio/virtio-pci.h
-index 639752977ee8..581bb830b792 100644
---- a/include/hw/virtio/virtio-pci.h
-+++ b/include/hw/virtio/virtio-pci.h
-@@ -150,7 +150,6 @@ struct VirtIOPCIProxy {
-     uint16_t last_pcie_cap_offset;
-     uint32_t flags;
-     bool disable_modern;
--    bool ignore_backend_features;
-     OnOffAuto disable_legacy;
-     /* Transitional device id */
-     uint16_t trans_devid;
+     vser = VIRTIO_SERIAL(vdev);
+ 
+-    features |= vser->host_features;
++    features |= BIT_ULL(VIRTIO_CONSOLE_F_EMERG_WRITE);
+     if (vser->bus.max_nr_ports > 1) {
+         virtio_add_feature(&features, VIRTIO_CONSOLE_F_MULTIPORT);
+     }
+@@ -587,8 +587,7 @@ static void set_config(VirtIODevice *vdev, const uint8_t *config_data)
+     VirtIOSerialPortClass *vsc;
+     uint8_t emerg_wr_lo;
+ 
+-    if (!virtio_has_feature(vser->host_features,
+-        VIRTIO_CONSOLE_F_EMERG_WRITE) || !config->emerg_wr) {
++    if (!config->emerg_wr) {
+         return;
+     }
+ 
+@@ -1040,7 +1039,7 @@ static void virtio_serial_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    if (!virtio_has_feature(vser->host_features,
++    if (!virtio_has_feature(vdev->host_features,
+                             VIRTIO_CONSOLE_F_EMERG_WRITE)) {
+         config_size = offsetof(struct virtio_console_config, emerg_wr);
+     }
+@@ -1156,8 +1155,6 @@ static const VMStateDescription vmstate_virtio_console = {
+ static const Property virtio_serial_properties[] = {
+     DEFINE_PROP_UINT32("max_ports", VirtIOSerial, serial.max_virtserial_ports,
+                                                   31),
+-    DEFINE_PROP_BIT64("emergency-write", VirtIOSerial, host_features,
+-                      VIRTIO_CONSOLE_F_EMERG_WRITE, true),
+ };
+ 
+ static void virtio_serial_class_init(ObjectClass *klass, const void *data)
+diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
+index 60641860bf83..da0c91e1a403 100644
+--- a/include/hw/virtio/virtio-serial.h
++++ b/include/hw/virtio/virtio-serial.h
+@@ -186,8 +186,6 @@ struct VirtIOSerial {
+     struct VirtIOSerialPostLoad *post_load;
+ 
+     virtio_serial_conf serial;
+-
+-    uint64_t host_features;
+ };
+ 
+ /* Interface to the virtio-serial bus */
 -- 
 2.34.1
 
