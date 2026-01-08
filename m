@@ -1,134 +1,145 @@
-Return-Path: <kvm+bounces-67477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25989D0651F
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 22:29:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 821AFD06564
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 22:35:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E7E5302EF53
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 21:29:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1C9230285EA
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 21:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444D63382F9;
-	Thu,  8 Jan 2026 21:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5992133D6CA;
+	Thu,  8 Jan 2026 21:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uu+sGzHE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xuywXjtF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B67F3346B9
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 21:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767907776; cv=none; b=Ox27HvDYdfTz8VbV0wjOPic8pTOeU1w560A3lpOpYIlYchm/T464dh02CLpjqPBKmMiavjgqAS+Z0kfsKoSbbw9jIJAq9AJdJ4qPQscBzyfPGDDVkvksJMfVOL5YMuaL1ae0KOyVtNduxYoecuCl5PGWJShZ6iEhQmgFrrgaPrU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767907776; c=relaxed/simple;
-	bh=V8aaW2wlWIxBYmN1io/X6lniPwIvDQZMjId6cleyTII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tnW04YOexkCdg2swzc5RdbZbGsoVGpjXxSk/z/TnH3RNC79Ow/yV5S3NW5qkc+T3S+Sy/ttwGV53gwSpqlKQCjeknmFRUBmGq8qn2zhuEYNBhzaG53B/pgcBfEqgcc0U/TPWmSd6BRZ8Hfa+p8dIr1e/gRchYmWlaoPPzd5CS6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uu+sGzHE; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687DF1DF97C
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 21:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767908065; cv=pass; b=SQBytsOQeA2/fEt8njfAQoT/VP+ekn49xMzqI279Sg55AKXcQbxZ1Ec30x6UTKz9PFmm5gBN08k3GSc2sT7gsQnlwO0gcxwmC0AYarVVFT0NHK3ycDbWNFkqx5B7LER+7vnLNw+rX4zPDpSNZ1m7gPDYleAREIAbo0wIuc3WD0Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767908065; c=relaxed/simple;
+	bh=BIFMGdisYPVJDEKUwNK9cGSBgYcc6A+epTuz8Zo/MyY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TLheO0A65TY7wiyihkAIURv2Av+dJmTtbh2c9B4viqm40ELnu/9QsRnv3t4I7CxCO9QGpPW1cVKYwKJ1M4E87g8TuvNzQ3vuk+1N/kURCbuL8IOUDDYeFS60IvAOQWsQCnzAeERbybIP1lYI0Ns/fovmB3+28ZizW59u3Ig4jhc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xuywXjtF; arc=pass smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a0834769f0so28170785ad.2
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 13:29:35 -0800 (PST)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4ee243b98caso38071cf.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 13:34:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767908061; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RNN1dlLFd+9yDZ+nsGvnVuIUGPch1pjS1iM8fOGPhp064LLKl5nqbOWb0Fu+WsGcqL
+         NwDK66oWQV1JgSLT+gEhQVlR1ICbv0aP6srH/PTr625HAlP7Y594BiBwyDA4IQGKw8u5
+         bu6VXz0T9sGDi0/rqO3PcuzzycLWm7/DHzhIQrzU0KeevjYEG6+1Wvx4v3es03B89CUx
+         sJVaF5sZHIT8EJbXPa6LqdzNVuFU52tUbWCfW01fyKYAy2vDB6O6bcIZOn23elairz9q
+         GjHFmoMSUwia7ex+AkZFhA2GjJCuvISOr2fVCsqTW3adEOdarI1yPG6V43s76ZfrXzRa
+         EJ+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=t8xfNAiLYTrj2PkrzfwvKzprYCcDxmoMPbij5imaAm4=;
+        fh=fZIoNmhYinhWsZXQPCVKgzwq01BLkza2xOPCXrn97xE=;
+        b=N0x9PVcZuIMiD83zIdtobFd+zTOwWGPSmXS7r3/VmliVNcyHLbwVpeELSylU6y3ZtT
+         TrQhm+259qXtgAW8WH0blVWDnlF6EUc9EtHG8DkwrE5NH7ebju/6RjSk2KqoKOIm6eih
+         lid+p5tDqZCEeEmEVH4M/uij81nvJRCBVZlpdTfgUAvSj38rc3vGN076MPs9dnI+bbB7
+         yXam7bSPCPEYZSHxmTuJXzSz9xvOuj51kZqDS5+S1TEgq6iuRdWsFog7FcPIjZuSzelD
+         S10nnHjjHl35yPAMEBhJC+VWP1gnCuMIwb55g4QLZhPApGtmGA8Ik1cyilYfrU645lnm
+         J1rA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767907775; x=1768512575; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2UQGShhuDSY7VMtoaHlIJU7v//N/6s3YoH997K8k7n0=;
-        b=uu+sGzHE6aM+8cKRR1irD44NEx5mZQnSaFZL1mAkZHh5VpKaWZ8rxJiyq0VL4xoFiR
-         wU58V2dyjGDL7d4XaG4/hhEsiMt9xiI09TsEMwaUFTHdDYdxy3HD7kOc3zHInhzke2TO
-         hbmdEOWAgxDocDtCdbJ2/h/S55xZeF1VuEdQuz7zaFpcepTKOFZrDFgDyLS7CIIW+pIZ
-         OZemiNJybtVIlcdAP65t2ai7cDC5jEH8LjIy+SOR/jxIRr2B4JXv9e8yrOk4fRMwslE4
-         ae1rWIWSC/wnaSpA94XhsePJ9wovbA8xNityX7vEI7jabTc/D8X1qlrjtpL5UesvPtGs
-         vf8Q==
+        d=google.com; s=20230601; t=1767908061; x=1768512861; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t8xfNAiLYTrj2PkrzfwvKzprYCcDxmoMPbij5imaAm4=;
+        b=xuywXjtF3Ui3ey8jyqsZaGrjl6L4TBxT1UKutDjQvB6V08UWVpbSllz7Ehq6D6/z6+
+         alD8pGGTEGkWeOXpn5BK2xUpPZpOFMg7cegAgYkomvN7E49hUjSkxSAH77yUMqqg54nV
+         qj2zpDn9+N1VZbULFozztkuQ5z+ilbNPVpC+YDsXCI0Eq9gjY/sa79nqBAOByrKMmajE
+         R1pNvb/C7uBd5/dYizGvACfp0Ft6iwxFj3Ukmo7hxKhH8EHNnPRCARS3oJsWBboVnn3o
+         Fa2o4c6D4zBVvHj93iQLqPB3d+CcYhunzp2/J2m03nMoxzGHG9T8s8iVOlUCgfebIQUz
+         BKDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767907775; x=1768512575;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2UQGShhuDSY7VMtoaHlIJU7v//N/6s3YoH997K8k7n0=;
-        b=KOQPyNIvBlfLNXbxyNLLYdeQDGM6xJmw39lm2U8Jf32cKsXDtwxeniXlAeRgYi1YTj
-         rrRHDyOUmkcBYJRBSAXUXp/dz14KKzhDXhQj20WK4y8xIzYySs9oxuWh/87JxoipKjlN
-         UIXq5/MpagTjDTTVVep363I8YgiH8WI6+vm/DDyaoclvYDUGu8dW0F/IYkIOE/FbKymc
-         03GZBgJldP+ip36b1pDlrHxglTES6pwX7djAahHKkcCxv+Td58qsxogzseCiXhN+Unja
-         jb4IFgrE2+kW46MFEsI+EZocWNMpAiMYlp//YNCoTF/NNhLVQCbLIdcVb4xrzPqUQ1sl
-         3IRg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2inlk8Qb5hHbjnJ0Ji8bFf+83BFkfyEG0ASRpjpddaMwLL4q7RkjQ9FWZbw1+7pWaehw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5w3Uo24N8/DYaibmDiVY+33ap9PK5kbUNNNzClBmcx5vObJZe
-	CUrDa4byH4ZcbMXOxbWUiZZoJFdN2FcaiqzmWfIq/01ZAlEFNIMz6+x9ocxr260MeQ==
-X-Gm-Gg: AY/fxX4gflBCVZDVIgacV5x7pzHQ33raKIjYfksJ3Jp3HFD5OifdoMLfH3dIrjBfrat
-	zaY+smIrpuYfGOMSa5vYEaapoTz8fP0aMf6fimhKoLkMCiJHUKJYg+UZiC2WVu2zSbKAkD+33Km
-	Fn3PmKp6pdN7m4KsZtDPTce/lAf2I7uYIVEFvBH5lttmFE2d/BKxQGJGGHRKn2miBSpIo3pAoCf
-	8+D7iDM3AnEWad97oUKgy6Dqpd2iIFwx4z24M0nuSJPurBDQRLj5DAF7zSL1/XUy1kIQm0QYUTz
-	IxV2DWOVOB87TN5pLJCwvVz6TxMNR+eA5UXbX6rcMGGnEmmsuKG7h9HzD/yRBaNQqe2n6Jk1PnU
-	qqszlicxbV95lpPaRX4ByOOL2XQCeAlprkfLhJHorSiIEgF4q15wB7jvWQoDnZ8L4P/2o3G1WMP
-	K90lZRuzzxmy2mIGDVKokkB+s5qNO463u+3wXQJq5V183/
-X-Google-Smtp-Source: AGHT+IG8G3Re0NFNu3C4hZ7C7HNKESD16GY55MKYmgCs1doiEwN9AfvbG7NZlPjwL3+jqLpFkECpHA==
-X-Received: by 2002:a17:902:cf05:b0:294:f1fa:9097 with SMTP id d9443c01a7336-2a3ee4900a3mr67869205ad.34.1767907774415;
-        Thu, 08 Jan 2026 13:29:34 -0800 (PST)
-Received: from google.com (76.9.127.34.bc.googleusercontent.com. [34.127.9.76])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3c5ceeasm85964085ad.45.2026.01.08.13.29.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 13:29:33 -0800 (PST)
-Date: Thu, 8 Jan 2026 21:29:29 +0000
-From: David Matlack <dmatlack@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>,
-	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <aWAhuSgEQzr_hzv9@google.com>
-References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
- <aV7yIchrL3mzNyFO@google.com>
- <20260108005406.GA545276@ziepe.ca>
- <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
- <20260108141044.GC545276@ziepe.ca>
- <20260108084514.1d5e3ee3@shazbot.org>
- <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
- <20260108183339.GF545276@ziepe.ca>
+        d=1e100.net; s=20230601; t=1767908061; x=1768512861;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=t8xfNAiLYTrj2PkrzfwvKzprYCcDxmoMPbij5imaAm4=;
+        b=AHCHlqFNbGkTXH5JnmFI4U7iy3yjFdasS3BCwFtnm+5EHdldHd9/3XucusIjy1Tdgm
+         lryKkM40v0yqj6Tgm+a9dLIbW5UwxgRbWM6zfl2WfgfB19FQDWGn6nzUmzps0zg941Gt
+         zlL7B8DkfmELqAUOU549c9aDoVsbp+Zc7G0bGQ1NoOrWa2ihI9kzvJ/Oaam2JDFRp/iM
+         /Txdbgduwzxy8E6SHZxZkFgbylo/JvThpt2TQ6uZG7OOoV2rJYLrMutDnUbpf+mTlqlA
+         uQP7DrF/DTXSULhyGOeRJqN2FOrgpDlblHXPMrrBz9N8J5mXfCZvRmcmK8/xR7BqdnD6
+         LzAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXg7eTrg+K10IQRT42CLXxzM1s4XjEOz/AHvzihKAKoLxdm7cI3ks4nfA11KKqCipGPzkY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQcfuSEeLttC4gyMqBFB2uQgk2wjERo5gv4Pi3V/t+ltHJSbk8
+	0szN6KtEfOi5OIadmY+FqAXkjis4cl/dxrMR/ipOPZsAqsOfT+ubWQdPMErikBHKvPe1ICFP2df
+	/xWLZkQhw2CpaIFI6+I0dyIIVK+yGRD6bogMEJoKc
+X-Gm-Gg: AY/fxX56AxDApofy8wQ9aPq9qpXa92dxNJOn3272iYntb9+H1w5fnX8GEZbsQdLP6y7
+	B6g3ho5SO/CpPaw8a4aVnEYwyUhDCQ8wfYlUHBUGrd7iUaD5xHHkx3DEQ/R13d/RB9ge9iqkosE
+	jKBLb1CIQP7evHDdZScHcTu5kzavQw/tdwh3pLv3nNH8qOq3KnAi42zTHTvFiCK3nhc1orPT/vA
+	E6WlRCHl9PMNtlA8TUXRlAMoPS1wSFOL1LHXcXU2SqUYqoh/PopMP4mTZG3IXH6jeUoll2oh7iW
+	d0hfAmjxjYv+abZEyCJNHx5RnQ==
+X-Received: by 2002:a05:622a:3:b0:4ff:a98b:7fd3 with SMTP id
+ d75a77b69052e-4ffca1df40dmr3413331cf.2.1767908060993; Thu, 08 Jan 2026
+ 13:34:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260108183339.GF545276@ziepe.ca>
+References: <20251210181417.3677674-1-rananta@google.com> <20251210181417.3677674-4-rananta@google.com>
+ <aV7i6P3FqPZu1Tq0@google.com>
+In-Reply-To: <aV7i6P3FqPZu1Tq0@google.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 8 Jan 2026 13:34:09 -0800
+X-Gm-Features: AQt7F2ob7H_BJouLaULso-isBlR0aX6N4tnXuzh9Xt3--aWmgdc_NnsFeWXImMU
+Message-ID: <CAJHc60wUEpwRLzaV8a8WG0d7+5+M5c+2s1cLgKK2Kb_rqThufA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/6] vfio: selftests: Extend container/iommufd setup
+ for passing vf_token
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Williamson <alex.williamson@redhat.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2026-01-08 02:33 PM, Jason Gunthorpe wrote:
-> On Thu, Jan 08, 2026 at 10:24:19AM -0800, David Matlack wrote:
-> > > > Oh, I was thinking about a compatability only flow only in the type 1
-> > > > emulation that internally magically converts a VMA to a dmabuf, but I
-> > > > haven't written anything.. It is a bit tricky and the type 1 emulation
-> > > > has not been as popular as I expected??
-> > >
-> > > In part because of this gap, I'd guess.  Thanks,
-> > 
-> > Lack of huge mappings in the IOMMU when using VFIO_TYPE1_IOMMU is
-> > another gap I'm aware of.
-> > vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
-> > fails when IOMMUFD_VFIO_CONTAINER is enabled.
-> 
-> What is this? I'm not aware of it..
+On Wed, Jan 7, 2026 at 2:49=E2=80=AFPM David Matlack <dmatlack@google.com> =
+wrote:
+> > diff --git a/tools/testing/selftests/vfio/lib/libvfio.mk b/tools/testin=
+g/selftests/vfio/lib/libvfio.mk
+> > index b7857319c3f1f..459b14c6885a8 100644
+> > --- a/tools/testing/selftests/vfio/lib/libvfio.mk
+> > +++ b/tools/testing/selftests/vfio/lib/libvfio.mk
+> > @@ -15,6 +15,8 @@ LIBVFIO_C +=3D drivers/ioat/ioat.c
+> >  LIBVFIO_C +=3D drivers/dsa/dsa.c
+> >  endif
+> >
+> > +LDLIBS +=3D -luuid
+> > +
+> >  LIBVFIO_OUTPUT :=3D $(OUTPUT)/libvfio
+> >
+> >  LIBVFIO_O :=3D $(patsubst %.c, $(LIBVFIO_OUTPUT)/%.o, $(LIBVFIO_C))
+> > @@ -25,6 +27,6 @@ $(shell mkdir -p $(LIBVFIO_O_DIRS))
+> >  CFLAGS +=3D -I$(LIBVFIO_SRCDIR)/include
+> >
+> >  $(LIBVFIO_O): $(LIBVFIO_OUTPUT)/%.o : $(LIBVFIO_SRCDIR)/%.c
+> > -     $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+> > +     $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< $(LDLIBS) -o $@
+>
+> Do we need $(LDLIBS) when compiling the intermediate .o files? I thought
+> we would only need it when linking the selftests binaries.
+>
+You are right. We need it only during the final linking. I'll get rid of it=
+.
 
-It's one of the test cases within
-tools/testing/selftests/vfio/vfio_dma_mapping_test.c.
+I'll update this and other nits in the next version.
 
-Here's the output when running with CONFIG_IOMMUFD_VFIO_CONTAINER=y:
-
-  #  RUN           vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap ...
-  Mapped HVA 0x7f0480000000 (size 0x40000000) at IOVA 0x0
-  Searching for IOVA 0x0 in /sys/kernel/debug/iommu/intel/0000:6a:01.0/domain_translation_struct
-  Found IOMMU mappings for IOVA 0x0:
-  PGD: 0x0000000203475027
-  P4D: 0x0000000203476027
-  PUD: 0x0000000203477027
-  PMD: 0x00000001e7562027
-  PTE: 0x00000041c0000067
-  # tools/testing/selftests/vfio/vfio_dma_mapping_test.c:188:dma_map_unmap:Expected 0 (0) == mapping.pte (282394099815)
-  # dma_map_unmap: Test terminated by assertion
-  #          FAIL  vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
+Thank you
+Raghavendra
 
