@@ -1,66 +1,51 @@
-Return-Path: <kvm+bounces-67434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23DD2D058C7
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 19:31:36 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D6BD0545A
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 18:58:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EFFCF31C8227
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:33:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4D3873014EAB
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766F32FD1DC;
-	Thu,  8 Jan 2026 17:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bZFoHH2U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834A02EB859;
+	Thu,  8 Jan 2026 17:58:43 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE912EB85E;
-	Thu,  8 Jan 2026 17:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC1F2EA15C;
+	Thu,  8 Jan 2026 17:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767893560; cv=none; b=MIw9lD0xW3xS+ATu05nwuccql2sqAGMTJYqIKSofKTIirJzJJwWcwVsAbgBIfpAyhf67pZvKM59e837A/5Xufs5JysiKQdgL1BlL/55zBqAAMcNoouozqJ+dcBXxnNeL/dbd5Sd5iq4GcdK88yx80qe6cpKzYzpJgvzMljK+/lQ=
+	t=1767895123; cv=none; b=moI3j6/XQrv0gbps5hhUjkL2pJ/uCZsY88xe6VTMPtrTxVH++MmALIQHJBxhamorc5VXWjF4NF1z5JzE6rN5zEwpZK+5MR6SMicQ9L4E90WB18K33EwgXCkt6x4VCeWO+Onp1nz7GOEN4YGo03Vw0+nbJztC3ZHKg7xMVabli0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767893560; c=relaxed/simple;
-	bh=mFCIxq1Io1+/8/dZGLdbcj7k0ZlOIgAOc6ZXHvORl48=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z7h9ahbI83CN1RdWKX4WCL8W5iuBpg61YEzBjMV+UQiAXjpr8QH2P/iwviqwroJc0MlXr3MGLsEZEf5g0litsiLZyOSW9qxenUIJTOKq5Fed8eteWKWSW1ujd76V78zESzEL0Tp/uIYC/UdvMOyx2B69lXRQOeZ0Ijzj7qxB1Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bZFoHH2U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35D6BC19423;
-	Thu,  8 Jan 2026 17:32:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767893560;
-	bh=mFCIxq1Io1+/8/dZGLdbcj7k0ZlOIgAOc6ZXHvORl48=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bZFoHH2UyToVVW/qc7LMVz7hAwYVrLiM1mZ/93mXB5aQzpPwOkKJ5NubTXGxB0zi/
-	 pm56bsAmGehEeCQD8Uk692AwBHvIv5T4Q8s4vXbod2DYAnWNRGFjwYTqlo0vOTxMZZ
-	 dEM4hCp8D349wPnIkBRX9ecoCj/+WUsAmpNO711bOD6IH8D9Q1EEZySZhxVvTFG7hC
-	 KJ36TDOy3ZKg3LKkQIRfq0SwiYN3iPNxxoiH2hesoX+wtnlqTxgLo0QBT+NuC7VSlh
-	 YLuXbSGuXw8n1kFtAWiP95YXXGroWCDVXoLGPaWTgelKqTJyEz+fPczRh0WLve2FYV
-	 UsmdYroJAun5A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vdtsE-00000000W9F-1fZP;
-	Thu, 08 Jan 2026 17:32:38 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v4 9/9] KVM: arm64: selftests: Add a test for FEAT_IDST
-Date: Thu,  8 Jan 2026 17:32:33 +0000
-Message-ID: <20260108173233.2911955-10-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260108173233.2911955-1-maz@kernel.org>
-References: <20260108173233.2911955-1-maz@kernel.org>
+	s=arc-20240116; t=1767895123; c=relaxed/simple;
+	bh=hZICZNSJDvTerdtTp4mYTKvCaT0mOy3dyl1ZcWY4PyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X6lA2hYbgL+Uv6SBqX+UGWMcuvvofIdSqqJAq0XA6rxyRue5SVG9F91bxnqotsIAAsl+Idz7fuTwLJ7uTMZGFV9C3eDlT5gqoA8nqqJcPWU7J25MjYwXHChNexIg43Hoapzbo7WdkV5dfhJjvoU+lvTDdVvEvuxoZadvrkSm+RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37645497;
+	Thu,  8 Jan 2026 09:58:32 -0800 (PST)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5ED7C3F5A1;
+	Thu,  8 Jan 2026 09:58:36 -0800 (PST)
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	maz@kernel.org,
+	will@kernel.org,
+	oupton@kernel.org,
+	aneesh.kumar@kernel.org,
+	steven.price@arm.com,
+	linux-kernel@vger.kernel.org,
+	alexandru.elisei@arm.com,
+	tabba@google.com,
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [kvmtool PATCH v5 00/15] arm64: Handle PSCI calls in userspace
+Date: Thu,  8 Jan 2026 17:57:38 +0000
+Message-ID: <20260108175753.1292097-1-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,157 +53,77 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, ben.horgan@arm.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add a very basic test checking that FEAT_IDST actually works for
-the {GMID,SMIDR,CSSIDR2}_EL1 registers.
+This is version 5 of the patch series, originally posted by Oliver [0].
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../testing/selftests/kvm/arm64/idreg-idst.c  | 117 ++++++++++++++++++
- 2 files changed, 118 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/idreg-idst.c
+Use SMCCC filtering capability in to handle PSCI calls in the userspace.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index ba5c2b643efaa..bfa2fad0aba12 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -175,6 +175,7 @@ TEST_GEN_PROGS_arm64 += arm64/vgic_irq
- TEST_GEN_PROGS_arm64 += arm64/vgic_lpi_stress
- TEST_GEN_PROGS_arm64 += arm64/vpmu_counter_access
- TEST_GEN_PROGS_arm64 += arm64/no-vgic-v3
-+TEST_GEN_PROGS_arm64 += arm64/idreg-idst
- TEST_GEN_PROGS_arm64 += arm64/kvm-uuid
- TEST_GEN_PROGS_arm64 += access_tracking_perf_test
- TEST_GEN_PROGS_arm64 += arch_timer
-diff --git a/tools/testing/selftests/kvm/arm64/idreg-idst.c b/tools/testing/selftests/kvm/arm64/idreg-idst.c
-new file mode 100644
-index 0000000000000..9ca9f125abdb7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/idreg-idst.c
-@@ -0,0 +1,117 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * Access all FEAT_IDST-handled registers that depend on more than
-+ * just FEAT_AA64, and fail if we don't get an a trap with an 0x18 EC.
-+ */
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <processor.h>
-+
-+static volatile bool sys64, undef;
-+
-+#define __check_sr_read(r)					\
-+	({							\
-+		uint64_t val;					\
-+								\
-+		sys64 = false;					\
-+		undef = false;					\
-+		dsb(sy);					\
-+		val = read_sysreg_s(SYS_ ## r);			\
-+		val;						\
-+	})
-+
-+/* Fatal checks */
-+#define check_sr_read(r)					\
-+	do {							\
-+		__check_sr_read(r);				\
-+		__GUEST_ASSERT(!undef, #r " unexpected UNDEF");	\
-+		__GUEST_ASSERT(sys64, #r " didn't trap");	\
-+	} while(0)
-+
-+
-+static void guest_code(void)
-+{
-+	check_sr_read(CCSIDR2_EL1);
-+	check_sr_read(SMIDR_EL1);
-+	check_sr_read(GMID_EL1);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_sys64_handler(struct ex_regs *regs)
-+{
-+	sys64 = true;
-+	undef = false;
-+	regs->pc += 4;
-+}
-+
-+static void guest_undef_handler(struct ex_regs *regs)
-+{
-+	sys64 = false;
-+	undef = true;
-+	regs->pc += 4;
-+}
-+
-+static void test_run_vcpu(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	do {
-+		vcpu_run(vcpu);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_PRINTF:
-+			printf("%s", uc.buffer);
-+			break;
-+		case UCALL_DONE:
-+			break;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	} while (uc.cmd != UCALL_DONE);
-+}
-+
-+static void test_guest_feat_idst(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	/* This VM has no MTE, no SME, no CCIDX */
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_ELx_EC_SYS64, guest_sys64_handler);
-+	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-+				ESR_ELx_EC_UNKNOWN, guest_undef_handler);
-+
-+	test_run_vcpu(vcpu);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	uint64_t mmfr2;
-+
-+	test_disable_default_vgic();
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, NULL);
-+	mmfr2 = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64MMFR2_EL1));
-+	__TEST_REQUIRE(FIELD_GET(ID_AA64MMFR2_EL1_IDS, mmfr2) > 0,
-+		       "FEAT_IDST not supported");
-+	kvm_vm_free(vm);
-+
-+	test_guest_feat_idst();
-+
-+	return 0;
-+}
+Changes since v4:
+Link: https://lkml.kernel.org/r/20250930103130.197534-1-suzuki.poulose@arm.com
+
+ - Update headers to v6.18
+ - Remove duplicate assignment of pause_req_cpu (Marc)
+ - Flip the command line to opt in for PSCI in userspace, retaining default
+   in kernel handling. (Marc)
+ - Collect Review from Marc, thanks!
+
+Changes since v3:
+ - Address Will's comment on the race between pause/resume - Patch 1
+ - Rebase on to v6.17-rc7
+ - Drop importing cputype.h, which was not used by the series
+
+[0] https://lore.kernel.org/all/20230802234255.466782-1-oliver.upton@linux.dev/
+
+
+
+Oliver Upton (12):
+  Import arm-smccc.h from Linux v6.18
+  arm64: Stash kvm_vcpu_init for later use
+  arm64: Use KVM_SET_MP_STATE ioctl to power off non-boot vCPUs
+  arm64: Expose ARM64_CORE_REG() for general use
+  arm64: Add support for finding vCPU for given MPIDR
+  arm64: Add skeleton implementation for PSCI
+  arm64: psci: Implement CPU_SUSPEND
+  arm64: psci: Implement CPU_ON
+  arm64: psci: Implement AFFINITY_INFO
+  arm64: psci: Implement MIGRATE_INFO_TYPE
+  arm64: psci: Implement SYSTEM_{OFF,RESET}
+  arm64: smccc: Start sending PSCI to userspace
+
+Suzuki K Poulose (3):
+  Allow pausing the VM from vcpu thread
+  update_headers: arm64: Track psci.h for PSCI definitions
+  update headers: Linux v6.18
+
+ Makefile                            |   2 +
+ arm64/include/asm/kvm.h             |  23 ++-
+ arm64/include/asm/smccc.h           |  65 ++++++
+ arm64/include/kvm/kvm-arch.h        |   2 +
+ arm64/include/kvm/kvm-config-arch.h |   8 +-
+ arm64/include/kvm/kvm-cpu-arch.h    |  30 ++-
+ arm64/kvm-cpu.c                     |  51 +++--
+ arm64/kvm.c                         |  20 ++
+ arm64/psci.c                        | 207 +++++++++++++++++++
+ arm64/smccc.c                       |  81 ++++++++
+ include/linux/arm-smccc.h           | 305 ++++++++++++++++++++++++++++
+ include/linux/kvm.h                 |  36 ++++
+ include/linux/psci.h                |  52 +++++
+ include/linux/virtio_ids.h          |   1 +
+ include/linux/virtio_net.h          |  49 ++++-
+ include/linux/virtio_pci.h          |   1 +
+ kvm-cpu.c                           |  13 ++
+ kvm.c                               |  34 +++-
+ powerpc/include/asm/kvm.h           |  13 --
+ riscv/include/asm/kvm.h             |  26 ++-
+ util/update_headers.sh              |  17 +-
+ x86/include/asm/kvm.h               | 115 +++++++++++
+ 22 files changed, 1091 insertions(+), 60 deletions(-)
+ create mode 100644 arm64/include/asm/smccc.h
+ create mode 100644 arm64/psci.c
+ create mode 100644 arm64/smccc.c
+ create mode 100644 include/linux/arm-smccc.h
+
 -- 
-2.47.3
+2.43.0
 
 
