@@ -1,308 +1,116 @@
-Return-Path: <kvm+bounces-67368-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 374F1D02564
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 12:16:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CD1DD024FD
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 12:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 703FD31DDBB4
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 11:07:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB49530695FD
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 10:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB12A3DA7F4;
-	Thu,  8 Jan 2026 10:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4DC4B8DF3;
+	Thu,  8 Jan 2026 10:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MdX+oJmE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lVJ4e930"
 X-Original-To: kvm@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010041.outbound.protection.outlook.com [52.101.46.41])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A7A3D5D91
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 10:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767868407; cv=fail; b=NyFuzv890+mSMgkA58tVzGVEvvXFsFIoVckIqvaj43Ft9v8Pf2r8RcEji487YAFaJpnH8LD2Ur3OI7VRe/xsVNiluWxxq96DVZd4CoopiMSTq/sUOdwhySOQFpRzinCxyTIK0Wywz7Y9nXtqAa+qdoXlUYyfkbzL87XIp02AsTk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767868407; c=relaxed/simple;
-	bh=pKM0baxLivq48Sco0V1d08vji85RFzm6n06tNom5g8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=EPndMulGV8wBKZ8XLq/Znz4f4ICTXGLgNlbmb5YhpNrjfvz8Ta8+j6cU3HUpWXBAfGr7HzbyO3HOGqmw6AVGlfQfGbdCUvEElqAVY59emZC2BChZ69lIAkH8cgGuKJnm++EWfUbuEgcMR+5wnMCaypCNiocbg7LNnFE/adh4YLI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MdX+oJmE; arc=fail smtp.client-ip=52.101.46.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Pbs8zvxX0HYHGz1AGOyuubl/6B2B8tOqsWL9ZzDt6LjSKXhvKd3Ijfk7aao6+fbn+3+LDBJN5Rg0YuVYKgKrfns6/zWKA0qYEtJm7KaKwompdAJ+tVKhnAWLU2dAIcq7gPkUvaQsTJDRzxljk//nNx0TuDG+jX9Qv4HX0TN/OycAg80eHpGubKQNEMdHCCwuJXLV2lR4NvCgAi83DTqgV5x8JMww3Sg7lNvb/fXs/UnwXWx944UyxNm5cQj6X8FB0XdqG9OhlWddQeSDsr74OPRCTEkpG5x4oxG0VfqBSOFspLAp8ytyAWHoWWiwcd2ZDbWmr6yec2fWW+jD7iLZ4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FXyrCU8G+78vVYue4sPBuq8Ep9e9JK5JSwB4uC2p26c=;
- b=Tm9i410xsH2ryn2K3c+pqJyM+ZHuIxr2jt8Ino6+jt/y1Mtd8yKwmluDxn55Dd73cawqZxczXGBhdpNUKyGxCKzhXO6psYJzG6V7MLywG+PeGnP+quUE1RKVJ7KdRbl1nVqcjGNaG3UrI5jK3Tai6w6jIuZMdkiZXfgPufU32GFQE9U3AwvQBSTBWnQVEYCIXFPsLzhIG2UYeGY35PklInOokGu8/f7nhkdjZrPK2iYcX32cVY9vGSHUpripXzgV53e20bYhLQgB74uPSwZ5laU49j0yzyj2bx/nVvBkHZuwk83gn3gvU/tLQsSio9yNdQ9BFbJ3BPzqirvzQXivrA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FXyrCU8G+78vVYue4sPBuq8Ep9e9JK5JSwB4uC2p26c=;
- b=MdX+oJmEq/lzwa+yWxeYuPHQWfCzRZy2H36Vs13OGvl4jgOLytZZYaZpsdJfsEmCfGhZf4EbdcZB+YAzJuWGeVsKN+QFfmAdrbtcdD71r2C2Aiu7wLM7gOZHwrg7JvqspR/hUuSUGs7mPCNdaMu9q/1AvEy2pkX9W+EiNP3o9co=
-Received: from BL1PR13CA0189.namprd13.prod.outlook.com (2603:10b6:208:2be::14)
- by DS7PR12MB8322.namprd12.prod.outlook.com (2603:10b6:8:ed::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.3; Thu, 8 Jan
- 2026 10:33:16 +0000
-Received: from BL6PEPF0001AB55.namprd02.prod.outlook.com
- (2603:10b6:208:2be:cafe::80) by BL1PR13CA0189.outlook.office365.com
- (2603:10b6:208:2be::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.2 via Frontend Transport; Thu, 8
- Jan 2026 10:33:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BL6PEPF0001AB55.mail.protection.outlook.com (10.167.241.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Thu, 8 Jan 2026 10:33:16 +0000
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 8 Jan
- 2026 04:33:16 -0600
-Received: from [10.85.34.88] (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Thu, 8 Jan 2026 02:33:13 -0800
-Message-ID: <eb712000-bc67-468a-b691-097688233659@amd.com>
-Date: Thu, 8 Jan 2026 16:03:12 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FD24946D9;
+	Thu,  8 Jan 2026 10:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767868956; cv=none; b=KWb07oWDEC80HnO0x52f/J/m0X38Y66AAxEvlSu4F1G/gJnPJb0Tafnz4AjUCg9m+T1AQLqY2WgLxfZNnQYydAhLQWvyg8N6zy5AZhkGCjjlTbSI9Kl/ZS5OIxSiMoSkgEHC+RRgde2bElaGzDem9vONP4hkjZbOF0QQzUL3RZU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767868956; c=relaxed/simple;
+	bh=gFiq18moecTevjD0fOTzAn5k+PM0Rp/Uz5/ZwAO18/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GW9aiIOLsuipqsTAn6Lh1oIa44G6RXz+0jicdUNqbHiQISypHoP4fOq2+weWaP+bYBf9KWFBElwqCg2tYfiOmvV2vuV8TM6AxDv/bhUzd0Ek6GLRoDsgd1w9e5PNkGKIxBE/luuQ/RPO8afdfKAyX7zforMWa7LZ/Hbby1JmDds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lVJ4e930; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D061C116C6;
+	Thu,  8 Jan 2026 10:42:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767868956;
+	bh=gFiq18moecTevjD0fOTzAn5k+PM0Rp/Uz5/ZwAO18/4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lVJ4e930FA+E7kPGcjHvr7M0tn8WbmlvUOLuifGfvYHU/1M4XYyXudrq4AiQUFQDZ
+	 gMBexYoPpbXxHEiM9Qgyy2T4lz5W9G9gaTteOPoe7kDeTgICfYrmmvZ+LmNdoE8ucz
+	 eGkp4DQByUoUlTLg1tg2wVyizxhu2MK4zHBrkt6xudC9+mNl7q8vhQx7R5p17NNJCQ
+	 0Ik81gRKkbjNbf9Xs9zR+AHfvp7zO/QFAuDFKzPN1mx0NSPpFJqDTHYPYCvL68FxHH
+	 jPKLtHa8KnmhtpW5PXQ25TIvWjjmebpO8h2XmSxUIQyTl7Y9EVrpAwWQbcWp9M9xZG
+	 wVHpcDdH3FIGQ==
+Date: Thu, 8 Jan 2026 16:06:05 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: SVM: Fix an off-by-one typo in the comment for
+ enabling AVIC by default
+Message-ID: <aV-GPYoKB5HIzcs3@blrnaveerao1>
+References: <20260107204546.570403-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] i386: Implement CPUID 0x80000026
-To: Zhao Liu <zhao1.liu@intel.com>, Shivansh Dhiman <shivansh.dhiman@amd.com>
-CC: <pbonzini@redhat.com>, <mtosatti@redhat.com>, <kvm@vger.kernel.org>,
-	<qemu-devel@nongnu.org>, <seanjc@google.com>, <santosh.shukla@amd.com>,
-	<nikunj.dadhania@amd.com>, <ravi.bangoria@amd.com>, <babu.moger@amd.com>
-References: <20251121083452.429261-1-shivansh.dhiman@amd.com>
- <20251121083452.429261-2-shivansh.dhiman@amd.com>
- <aV4KVjjZXZSB5YGw@intel.com>
-Content-Language: en-US
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-In-Reply-To: <aV4KVjjZXZSB5YGw@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB55:EE_|DS7PR12MB8322:EE_
-X-MS-Office365-Filtering-Correlation-Id: d6df3641-5e7d-438f-e66f-08de4ea15577
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WDltTkdWSU1US0s4ZGVTV1pCWUtlbGpzM0VPL0tKVE1YamJ1aHUvbzhUbko1?=
- =?utf-8?B?azJmT0hLODljb2ZnQWRidWJreEVzajl6TThIUFZRTzkvOEordGJaL1FXVlZJ?=
- =?utf-8?B?Z0pYWGszYUtPd1lSSHY1VytoK3lVYXNCdFEyOWs3VFl5K1pRc1k3YndyVkRt?=
- =?utf-8?B?WGltMXR3dThVQVpkM21YRmNMYVVmempNSytpVjN5ZXVTS2psWlpTK0QwOE40?=
- =?utf-8?B?cHpscWVHQjFWVm1hekVPOGovVnViTmZKSStVRFM5Q0VsSGVCTDlidE1iMlRC?=
- =?utf-8?B?elc4Sk95a3NwT1Z2Q2IzeW1zWmE0bndTZEhwQWVsYnVmU2RjeTBJRXovcXdC?=
- =?utf-8?B?dWF5VFhYRFc4dWJrYkFWVW50eUxXcTg3YzBWN0h0NEVBM2hBbG1PR3R0Zlli?=
- =?utf-8?B?eEErNzVhS1pVQm45NE0rVjIwVVBWMmdyckgxTkxMb2Zib1lXaGV6VDZ4M1dj?=
- =?utf-8?B?Z3pOR2lrZ1BxY3BTK3dScjZIbnI3OWlDUjNBbmduWWN4NkZUTWprNjB0L2dx?=
- =?utf-8?B?eWsrYWNXSzEvZWhaL3VqT2JzeXorUG1Eb09peHBocWwzekQ1ZHJpNng0SFJD?=
- =?utf-8?B?NGQvL3krbnYwTmV1bFNjRithYUtXT0tKTEdORHErRENXVnlpdGFBQWhDdGJ4?=
- =?utf-8?B?bXo5TnJSR25jQlNIdHQveU8vSXlwWTVpN25hYk9Va2Y5TllnNWk3TmY0SThC?=
- =?utf-8?B?Q3hYNVJMd3FzT2hCVGdmdkUxTlUwWGJzNXQremtHR3hGY1BMZVNJRm5CWGky?=
- =?utf-8?B?YTd2dnZLWnRZVXFFbzk0emMvY0xGZmNKYUF3TUxGUFFHczJTVEVKYW0zaUxU?=
- =?utf-8?B?N0l0RXZtZjZQUjN4eVF6M05laXV6Wmd1dE5WeDV1Y3dyd0xCT1ZjYk05MElZ?=
- =?utf-8?B?NUl1UW1MTzVQeHlqcmY5ZWhSSmxmc3FGWWVWMU5SanVmNVJIZ2JCR0Vvdlc2?=
- =?utf-8?B?ZlovdEZRYUoyVEJGWjRXL3FZOXNlS1lRL3pjRGtRcW1leklmQTc2NW1aZ0Jx?=
- =?utf-8?B?TWpmNFpRUk5WYWdkZkQyVEZ2cEMxcnFMcHRlUzlIWVlFdFE1R2VFNW1abjZ0?=
- =?utf-8?B?cjJ1VjgzZ0tGdTRscnVURDArRGMwcXVUSU9sK0hMMEJvQ0Jpckl0T0hJbXEw?=
- =?utf-8?B?K2phWCtKOEUyZUJ6K215bE94eW5tb2gvRDRUQmxOY2VSU3hlYXhab0VyZTR3?=
- =?utf-8?B?cFcvcFh6Y200OWkzZ2gyOHhZYUd5b1NKSTdRM0VoTUxPb1FteFlybi9NdE0r?=
- =?utf-8?B?QjI1Y08veEU3cEhocWZCUHJxcXdJY2JQOVJxQmFlSzFxdWZ1WHBoWTJiREFm?=
- =?utf-8?B?b21hNGp4UGxyS0xIWEJ5S2JzZkhrS3drTW15eDUrUldGQ0NQSjUyWHNma21I?=
- =?utf-8?B?Q0FzanZsVnVrblhSOThXTmhBRUJSWVhtYisrRDFlQkI1Tm9QWTdXTWkyZFRo?=
- =?utf-8?B?VEhBb25rYkI4REtkYTY2Ukl5UGlsa29kNXdzS0RKb3JrYjFhVlB6TGlYWDFB?=
- =?utf-8?B?c25jNGN5a01nUDBJbmIrMzJSeUtMYkMxZng5Qk1IZ0xFK1FZK2tsL3gzZG5W?=
- =?utf-8?B?WEp0YUZGaytlV0ZwSzVXVWFpMXE5dVhmdlNrM1pIWktYUWhadmd0eDFUQVps?=
- =?utf-8?B?TEdTZU9QeUticC9kelExZ2VWK1VkcjZYc1dPYitLMmNmYlZTVXBGRlNDdEp1?=
- =?utf-8?B?WFZPdmdtK1JuL01iYnlHZnA5Zi9QZVRvR1dtMk1xazBKdGxXWkRCZkJ4UURk?=
- =?utf-8?B?S3poTXltWTl1ZXFpRytydWlpcmlhVEJKWlZMUXJxR0ZMVDY5aWVybFFNOTRh?=
- =?utf-8?B?Q1VJbktFSlNEbmlVMHVqUUN4RG9NT0Eyc25VZ04rM00xdmhuYWFVcmpMRFBJ?=
- =?utf-8?B?NVd2bnRXT0ZQYnVSSm9wM1djT0ZPSC91MG01K3hvY3NBMFdMeWFVTFNDMnZr?=
- =?utf-8?B?TUUxbG1WOUJ6eHpEdklqVjI4RlVTTEF1c1diWUZGdGhKaU9EWFZpSiszeUJD?=
- =?utf-8?B?NHFXdkpmaWpRT1NIOHRJbkdVOEpZUUY0Y3dzVndhT2dVdzhGUFVGTzZCWlJ0?=
- =?utf-8?B?UCtzekFKQzNRNXhyQUF1Rk5OVllTNFB3clM4RXlDS3BlNTNxZFB5TWtCeTNB?=
- =?utf-8?Q?oz7Y=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 10:33:16.3455
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6df3641-5e7d-438f-e66f-08de4ea15577
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB55.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8322
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107204546.570403-1-seanjc@google.com>
 
-Hi Zhao,
+On Wed, Jan 07, 2026 at 12:45:46PM -0800, Sean Christopherson wrote:
+> Fix a goof in the comment that documents KVM's logic for enabling AVIC by
+> default to reference Zen5+ as family 0x1A (Zen5), not family 0x19 (Zen4).
+> The code is correct (checks for _greater_ than 0x19), only the comment is
+> flawed.
 
-On 07-01-2026 12:55, Zhao Liu wrote:
-> Hi Shivansh,
-> 
-> Sorry for late reply.
-> 
-> On Fri, Nov 21, 2025 at 08:34:48AM +0000, Shivansh Dhiman wrote:
->> Date: Fri, 21 Nov 2025 08:34:48 +0000
->> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
->> Subject: [PATCH 1/5] i386: Implement CPUID 0x80000026
->> X-Mailer: git-send-email 2.43.0
->>
->> Implement CPUID leaf 0x80000026 (AMD Extended CPU Topology). It presents the
->> complete topology information to guests via a single CPUID with multiple
->> subleafs, each describing a specific hierarchy level, viz. core, complex,
->> die, socket.
->>
->> Note that complex/CCX level relates to "die" in QEMU, and die/CCD level is
->> not supported in QEMU yet. Hence, use CCX at CCD level until diegroups are
->> implemented.
-> 
-> I'm trying to understand AMD's topology hierarchy by comparing it to the
-> kernel's arch/x86/kernel/cpu/topology_ext.c file:
-> 
-> static const unsigned int topo_domain_map_0b_1f[MAX_TYPE_1F] = {
-> 	[SMT_TYPE]	= TOPO_SMT_DOMAIN,
-> 	[CORE_TYPE]	= TOPO_CORE_DOMAIN,
-> 	[MODULE_TYPE]	= TOPO_MODULE_DOMAIN,
-> 	[TILE_TYPE]	= TOPO_TILE_DOMAIN,
-> 	[DIE_TYPE]	= TOPO_DIE_DOMAIN,
-> 	[DIEGRP_TYPE]	= TOPO_DIEGRP_DOMAIN,
-> };
-> 
-> static const unsigned int topo_domain_map_80000026[MAX_TYPE_80000026] = {
-> 	[SMT_TYPE]		= TOPO_SMT_DOMAIN,
-> 	[CORE_TYPE]		= TOPO_CORE_DOMAIN,
-> 	[AMD_CCD_TYPE]		= TOPO_TILE_DOMAIN,
-> 	[AMD_SOCKET_TYPE]	= TOPO_DIE_DOMAIN,
-> };
+I had thought that the comment was correct and that you wanted to 
+reference Zen4 there. That is:
+	family 0x19 (Zen4) and later (Zen5+),
 
-These mappings reuse some original names (SMT_TYPE and CORE_TYPE) along with the
-new ones (AMD_CCD_TYPE and AMD_SOCKET_TYPE). I think to avoid defining more AMD
-specific types the original names are used. So, essentially you can read them
-like this:
+Though family 0x19 also includes Zen3 :/
 
-static const unsigned int topo_domain_map_80000026[MAX_TYPE_80000026] = {
-	[AMD_CORE_TYPE]		= TOPO_SMT_DOMAIN,
-	[AMD_CCX_TYPE]		= TOPO_CORE_DOMAIN,
-	[AMD_CCD_TYPE]		= TOPO_TILE_DOMAIN,
-	[AMD_SOCKET_TYPE]	= TOPO_DIE_DOMAIN,
-};
+I think it would be better to update the code as well, just so it is 
+easier to correlate the comment and the code?
+
+        if (avic == AVIC_AUTO_MODE)
+                avic = boot_cpu_has(X86_FEATURE_X2AVIC) &&
+-                      (boot_cpu_data.x86 > 0x19 || cpu_feature_enabled(X86_FEATURE_ZEN4));
++                      (cpu_feature_enabled(X86_FEATURE_ZEN4) || boot_cpu_data.x86 >= 0x1A);
+ 
+        if (!avic || !npt_enabled)
+		return false;
 
 > 
-> What particularly puzzles me is that "complex" isn't listed here, yet it
-> should be positioned between "core" and CCD. Does this mean complex
-> actually corresponds to kernel's module domain?
+> Fixes: ca2967de5a5b ("KVM: SVM: Enable AVIC by default for Zen4+ if x2AVIC is support")
+> Cc: Naveen N Rao (AMD) <naveen@kernel.org>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-There is a nuance with CPUID 80000026h related to the shifting of x2APIC ID.
-According to APM, EAX[4:0] tells us the number of bits to shift x2APIC ID right
-to get unique topology ID of the next instance of the current level type.
-
-So, all logical processors with the same next level ID share current level. This
-results in mapping the Nth level type to (N-1)th domain. This is unlike Intel's
-CPUID 0xb which maps Nth level type to Nth domain.
-
-Back to your question, the complex is same as tile since both represent a L3
-cache boundary.
+Regardless of that, this change is accurate:
+Acked-by: Naveen N Rao (AMD) <naveen@kernel.org>
 
 > 
-> Back to QEMU, now CCX is mapped as QEMU's die level, and AMD socket is mapped
-> to socket level. Should we revisit QEMU's topology level mapping for AMD, to
-> align with the above topology domain mapping?
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 6b77b2033208..7e62d05c2136 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -1224,7 +1224,7 @@ static bool __init avic_want_avic_enabled(void)
+>  	 * In "auto" mode, enable AVIC by default for Zen4+ if x2AVIC is
+>  	 * supported (to avoid enabling partial support by default, and because
+>  	 * x2AVIC should be supported by all Zen4+ CPUs).  Explicitly check for
+> -	 * family 0x19 and later (Zen5+), as the kernel's synthetic ZenX flags
+> +	 * family 0x1A and later (Zen5+), as the kernel's synthetic ZenX flags
+>  	 * aren't inclusive of previous generations, i.e. the kernel will set
+>  	 * at most one ZenX feature flag.
+>  	 */
 > 
-> If we want to go further: supporting CCD configuration would be quite
-> tricky. I feel that adding another new parameter between the smp.dies
-> and smp.sockets would create significant confusion.
-
-The current kernel doesn't have sensitivity to a level between L3 boundary and
-socket. Also, most production systems in current AMD CPU landscape have CCD=CCX.
-Only a handful of models feature CCD=2CCX, so this isn't an immediate pressing need.
-
-In QEMU's terminology, socket represents an actual socket and die represents the
-L3 cache boundary. There is no intermediate level between them. Looking ahead,
-when more granular topology information (like CCD) becomes necessary for VMs,
-introducing a "diegroup" level would be the logical approach. This level would
-fit naturally between die and socket, as its role cannot be fulfilled by
-existing topology levels.
-
-Also, I was looking at Intel's SDM Vol. 2A "Instruction Set Reference, A-Z"
-Table 3-8. "Information Returned by CPUID Instruction". The presence of a
-"diegrp" level between die and socket suggests Intel has already recognized the
-need for this intermediate topology level. If this maps to a similar concept as
-AMD's CCD, it would indeed strengthen the case for introducing a new level in QEMU.
-
-> 
->> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
->> ---
->>  target/i386/cpu.c     | 76 +++++++++++++++++++++++++++++++++++++++++++
->>  target/i386/kvm/kvm.c | 17 ++++++++++
->>  2 files changed, 93 insertions(+)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 641777578637..b7827e448aa5 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -495,6 +495,78 @@ static void encode_topo_cpuid1f(CPUX86State *env, uint32_t count,
->>      assert(!(*eax & ~0x1f));
->>  }
->>  
->> +/*
->> + * CPUID_Fn80000026: Extended CPU Topology
->> + *
->> + * EAX Bits Description
->> + * 31:5 Reserved
->> + *  4:0 Number of bits to shift Extended APIC ID right to get a unique
->> + *      topology ID of the current hierarchy level.
->> + *
->> + * EBX Bits Description
->> + * 31:16 Reserved
->> + * 15:0  Number of logical processors at the current hierarchy level.
->> + *
->> + * ECX Bits Description
->> + * 31:16 Reserved
->> + * 15:8  Level Type. Values:
->> + *       Value   Description
->> + *       0h      Reserved
->> + *       1h      Core
->> + *       2h      Complex
->> + *       3h      Die
->> + *       4h      Socket
->> + *       FFh-05h Reserved
->> + * 7:0   Input ECX
->> + *
->> + * EDX Bits Description
->> + * 31:0 Extended APIC ID of the logical processor
->> + */
-> 
-> I feel this long comment is not necessary, since people could check APM for
-> details. Or this description could be included in commit message.
-
-Sure. Will do. Thanks.
-
-> 
->> +static void encode_topo_cpuid80000026(CPUX86State *env, uint32_t count,
->> +                                X86CPUTopoInfo *topo_info,
->> +                                uint32_t *eax, uint32_t *ebx,
->> +                                uint32_t *ecx, uint32_t *edx)
-> 
-> Regards,
-> Zhao
+> base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
+> -- 
+> 2.52.0.351.gbe84eed79e-goog
 > 
 
+- Naveen
 
