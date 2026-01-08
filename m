@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0AA2D00CC3
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:10:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B00D00CD0
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DBB22303B7ED
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:08:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E000305E2A2
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7713129E10F;
-	Thu,  8 Jan 2026 03:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CA82BCF5D;
+	Thu,  8 Jan 2026 03:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KZ/R7Wva"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G8YaWoFv"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419AD2BCF46
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D2929E10F
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767841706; cv=none; b=RWn6DbEAfg6I3EwMaNqfZe2l9cWmxMn7gr1sJFv7X0U2+vW+LmWMKt3Ok+MAJPdYwK34RplIUObSNUW9RJrZGmld6Xi706/lQlXjhQ2OUSWQyRK0/2aKELpU68uq0duxGG7/EIX9fKrNEW0kw4IhnFRxlOo5b8Qpf4AVXjfyD/k=
+	t=1767841716; cv=none; b=DExcVO66e/7r+naWIs229OC9U3kdpTn/VYlyYU1PzB2T6hAy4T+PBYVSlVb+k55wBl7gbcQhEKMXKhxFUZokkrofeYGm5/hHKz0IL+eI+L8sIEnmZuqC/t6EC/pwgIK2wqoKvhWr8oVnu1aGbsXkTqABF132kM0EyX88V6Lv/UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767841706; c=relaxed/simple;
-	bh=h8hJFCjpgWizV8fThY8EPP7MvzRhJoCodMT4qRBYUn4=;
+	s=arc-20240116; t=1767841716; c=relaxed/simple;
+	bh=Q2S1HbfA2OWc8pT/OJc71U77jdxwWD7j1qTYdHBk0fg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DGnOHuf5TxwIItfXqZgRBsSAeyoZo2G+/s0LypL3jOXr1siBIs4AP0nVoP4hZ2Qzbx1PsNm2s9zoREKo3vXikk57GnEA7ZqwiRQ0kKgwtvVPwWISWfrlcmau2eQD5qJDzBIX71EyLT1GqYqsipMrboqsKu6cjR60hk9eDtnX/98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KZ/R7Wva; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version:Content-Type; b=XlaBYf/SQUfdAdQZKT+VXhfB0eDGUL+LyZSvJHn9sFPJ3mj1rMI8rfVIXWy1mQhHAIeCMT7+iYG8sk5ofoaHvBMXeWl6q++42HZUBZRNCIMcAV/AbOBHvxOj/1ynb27kEQn8EG3tBWrm75Sb9YTglLDPBt0w5IiJZnMgaAQywJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G8YaWoFv; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767841706; x=1799377706;
+  t=1767841715; x=1799377715;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=h8hJFCjpgWizV8fThY8EPP7MvzRhJoCodMT4qRBYUn4=;
-  b=KZ/R7Wvad3TRG46l9JHkLMBKTQ/1zHGFI1YO+vdHeMAeqlo1Wn4gGm+3
-   sTXgUx5DtZfimeTyDoqlE/4cirpLus/1T0dgcXVQTY4FUOYcRH/9SALOc
-   gjwqW9BZouwEhGIYwoVF9ktvfAaqXYA60M+O4fRdrwVEyLZXZTh9FoCaK
-   oITmzR+akGiJyq8GqtqsIba5jPI6U3UWaPrT6StHeGVNd0tdKKNj9gu1r
-   MEXppSal3GkCOWIh+76MXe3e3ejIME3OtU0qwEmm+KIUZbmDIAUnKv1cf
-   /0p7Ux0C+UYRHYGghMSpnID+Z2tWK1qtb+8wBGs9EWcZO55o4JY+zgjmm
-   w==;
-X-CSE-ConnectionGUID: Xf7dvzw8TLikkBbw34A8Og==
-X-CSE-MsgGUID: kBGiCg4CTn6Bc6KejYRkpw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877428"
+  bh=Q2S1HbfA2OWc8pT/OJc71U77jdxwWD7j1qTYdHBk0fg=;
+  b=G8YaWoFvN+7cuPDDzYBMMOS3FNFcyn2B2lIME+Y00EnjnsdljoZgcebT
+   RjJPZxAh6EItlG9meU5xb0t03JTcCPvKcZJeHBZ6IJsmsMQLrer8cwne8
+   yFTMiiSItQkxVgMSiBeAAzHeMCHqzoIriXcqrEzeBGt881Cl0Ib8/ZBiv
+   l2QX6tQvhJznoM/iHxDEH90ZV2rbppNo5H2VUA5YDv3cMBgMMl97XBd7c
+   QY8X+2JVjNXznQ3fTF4X4whgmcpqxkNlXKSizWauwVZvvwGwUE5of+L3u
+   ekJaOG8yq5ZjtvHSYOhVfKQyfjE6KbCtogDAlpiyXl8uI41R5/OptiGju
+   Q==;
+X-CSE-ConnectionGUID: /t02UHylSrOKj8i/de/0wg==
+X-CSE-MsgGUID: jKGQnY5xSZCEtY+TNrTjoA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877454"
 X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="91877428"
+   d="scan'208";a="91877454"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:08:25 -0800
-X-CSE-ConnectionGUID: 6TvJYjOgRyeStfX/4UyOcg==
-X-CSE-MsgGUID: xek6c36hSEuXJpHy++malg==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:08:35 -0800
+X-CSE-ConnectionGUID: Zt7DD7dHSre3gamWpWGPog==
+X-CSE-MsgGUID: 7KNtoah0RZ2dbmCmnpAKyA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="202211137"
+   d="scan'208";a="202211171"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa006.jf.intel.com with ESMTP; 07 Jan 2026 19:08:15 -0800
+  by orviesa006.jf.intel.com with ESMTP; 07 Jan 2026 19:08:25 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -98,9 +98,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v6 18/27] hw/core/machine: Remove hw_compat_2_6[] array
-Date: Thu,  8 Jan 2026 11:30:42 +0800
-Message-Id: <20260108033051.777361-19-zhao1.liu@intel.com>
+Subject: [PATCH v6 19/27] hw/virtio/virtio-mmio: Remove VirtIOMMIOProxy::format_transport_address field
+Date: Thu,  8 Jan 2026 11:30:43 +0800
+Message-Id: <20260108033051.777361-20-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260108033051.777361-1-zhao1.liu@intel.com>
 References: <20260108033051.777361-1-zhao1.liu@intel.com>
@@ -115,8 +115,10 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-The hw_compat_2_6[] array was only used by the pc-q35-2.6 and
-pc-i440fx-2.6 machines, which got removed. Remove it.
+The VirtIOMMIOProxy::format_transport_address boolean was only set
+in the hw_compat_2_6[] array, via the 'format_transport_address=off'
+property. We removed all machines using that array, lets remove
+that property, simplifying virtio_mmio_bus_get_dev_path().
 
 Reviewed-by: Mark Cave-Ayland <mark.caveayland@nutanix.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
@@ -125,41 +127,55 @@ Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/core/machine.c        | 8 --------
- include/hw/core/boards.h | 3 ---
- 2 files changed, 11 deletions(-)
+ hw/virtio/virtio-mmio.c         | 15 ---------------
+ include/hw/virtio/virtio-mmio.h |  1 -
+ 2 files changed, 16 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 51c28468ff96..b01838c88a60 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -290,14 +290,6 @@ GlobalProperty hw_compat_2_7[] = {
- };
- const size_t hw_compat_2_7_len = G_N_ELEMENTS(hw_compat_2_7);
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 0b0412b22f23..742ca3d3e4d3 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -764,8 +764,6 @@ static void virtio_mmio_pre_plugged(DeviceState *d, Error **errp)
+ /* virtio-mmio device */
  
--GlobalProperty hw_compat_2_6[] = {
--    { "virtio-mmio", "format_transport_address", "off" },
--    /* Optional because not all virtio-pci devices support legacy mode */
--    { "virtio-pci", "disable-modern", "on",  .optional = true },
--    { "virtio-pci", "disable-legacy", "off", .optional = true },
--};
--const size_t hw_compat_2_6_len = G_N_ELEMENTS(hw_compat_2_6);
+ static const Property virtio_mmio_properties[] = {
+-    DEFINE_PROP_BOOL("format_transport_address", VirtIOMMIOProxy,
+-                     format_transport_address, true),
+     DEFINE_PROP_BOOL("force-legacy", VirtIOMMIOProxy, legacy, true),
+     DEFINE_PROP_BIT("ioeventfd", VirtIOMMIOProxy, flags,
+                     VIRTIO_IOMMIO_FLAG_USE_IOEVENTFD_BIT, true),
+@@ -827,19 +825,6 @@ static char *virtio_mmio_bus_get_dev_path(DeviceState *dev)
+     virtio_mmio_proxy = VIRTIO_MMIO(virtio_mmio_bus->parent);
+     proxy_path = qdev_get_dev_path(DEVICE(virtio_mmio_proxy));
+ 
+-    /*
+-     * If @format_transport_address is false, then we just perform the same as
+-     * virtio_bus_get_dev_path(): we delegate the address formatting for the
+-     * device on the virtio-mmio bus to the bus that the virtio-mmio proxy
+-     * (i.e., the device that implements the virtio-mmio bus) resides on. In
+-     * this case the base address of the virtio-mmio transport will be
+-     * invisible.
+-     */
+-    if (!virtio_mmio_proxy->format_transport_address) {
+-        return proxy_path;
+-    }
 -
- MachineState *current_machine;
+-    /* Otherwise, we append the base address of the transport. */
+     section = memory_region_find(&virtio_mmio_proxy->iomem, 0, 0x200);
+     assert(section.mr);
  
- static char *machine_get_kernel(Object *obj, Error **errp)
-diff --git a/include/hw/core/boards.h b/include/hw/core/boards.h
-index 815845207b01..b0e3a523a107 100644
---- a/include/hw/core/boards.h
-+++ b/include/hw/core/boards.h
-@@ -882,7 +882,4 @@ extern const size_t hw_compat_2_8_len;
- extern GlobalProperty hw_compat_2_7[];
- extern const size_t hw_compat_2_7_len;
- 
--extern GlobalProperty hw_compat_2_6[];
--extern const size_t hw_compat_2_6_len;
--
- #endif
+diff --git a/include/hw/virtio/virtio-mmio.h b/include/hw/virtio/virtio-mmio.h
+index 1eab3c0decef..1644d0981050 100644
+--- a/include/hw/virtio/virtio-mmio.h
++++ b/include/hw/virtio/virtio-mmio.h
+@@ -66,7 +66,6 @@ struct VirtIOMMIOProxy {
+     uint32_t guest_page_shift;
+     /* virtio-bus */
+     VirtioBusState bus;
+-    bool format_transport_address;
+     /* Fields only used for non-legacy (v2) devices */
+     uint32_t guest_features[2];
+     VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
 -- 
 2.34.1
 
