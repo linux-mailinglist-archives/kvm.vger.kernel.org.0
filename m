@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-67429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67430-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75C47D058BA
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 19:31:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E1DD058C1
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 19:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B4A47373A68A
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:32:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6033232529A0
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 17:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D12B2E9EAE;
-	Thu,  8 Jan 2026 17:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C922FB0B4;
+	Thu,  8 Jan 2026 17:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="liNKre/p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FeJsbr0O"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F1429BDBD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0812D6E5A;
 	Thu,  8 Jan 2026 17:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767893559; cv=none; b=lc04R4JeuJ/3Sj4S2Lj3nEET9zSN077et+/TF4FrEcvgh/Xv+tbFTw+Py9EUGH4aC1QbX+nB5gfjrIhxM/RsqIXg9k+W+mwl0K3qwvVOicGb9Th+w1WowUuG3CZf4VIN95+Yv65ilEl+rTk7k/qU3XKb+qgVszwKQN1zYvIR2ds=
+	t=1767893559; cv=none; b=eZcVHe2fjbO3OtnzpiFMfrOnoN1WI9s0EMk8rusvvvua7f9Fk4PS73quT6l+2bqzUlq/Cp8GKenX2eWa8hrrK2dQrZTtwV837ZX+rQkE6qVhLMCiEshThqQeAiOnjvP6CTS1Baw+iQEyVGDaY8r4BKyJP4ULdDqgZ7QESXZqPio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767893559; c=relaxed/simple;
-	bh=v78Ho1jfctKksx+ghNDA5fnROsXHxo8/3r+Q1Sd63M0=;
+	bh=IcZW2xKZWVowQUhGma/KcEQQVV01mNOM0ePAXLjLOU8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tKCHW28K+jrG/bWEpPdAUL7cdFJMqZbXNXwivSEG9RlfnErReO+tcewOBpaTBxoYZPoj8Wbp54Ok7HOYETqMLRjnfsrnEzvVUNsZflkpD0jvZ3c5Inaq7dYwuGGMKXdedds0ho7ZTa8Nf7tzj5PxZm1kZp1ENE3B+aUqGtbgLoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=liNKre/p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31C0AC19425;
+	 MIME-Version; b=ktK7RGkmWEWkB/hEu/O93rk8kbHKOdZv9QKXVgv6sIvJcdH9Q8Ij0Ki+OmBuZlHfcpQbShU5SLKS+57d7NjySnHXzJZFaJJG29fUiZSzscfO0x3vuIC8yUU/RiQW6K7rn63q0pn8R1oADH4KCiFgjFwDGvvoaWjnKyN27qt6Dvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FeJsbr0O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DA10C116D0;
 	Thu,  8 Jan 2026 17:32:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1767893559;
-	bh=v78Ho1jfctKksx+ghNDA5fnROsXHxo8/3r+Q1Sd63M0=;
+	bh=IcZW2xKZWVowQUhGma/KcEQQVV01mNOM0ePAXLjLOU8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=liNKre/p2z+wYybw/l2XQ6GEjPKMs7/OgykCUAmBFiLjkPk3Pfx7fn8Ak2evkVWSp
-	 QhgdGKQcwxmwdN+q/GAJlPK9LyaAbtgvHQ8Ne8IJBkpSelJC2pH5CEccPG5fX2vCRS
-	 o1GK3piAYfK/EhXFOeEof0h1FsabSfUuTtMoADmEQf6dL4hq2lFL7J0RnAyO4dWlQJ
-	 rJVt4XDXpC6TgSxM6cCLUmi27acEQyjuyoCTNtqv/nqXEdmC2E54oA7Pp4M4LoRcfm
-	 Fdu1BpI45sAcnH3REVfvF1wstLCz9jImiyR9UxumuN/RgMVJjlxU01EfiTw5ILoUDm
-	 QC9S/CB9kNuBQ==
+	b=FeJsbr0OWcoKulXWMPLVa1AaUkKP9L4fkJuSl3wgiApx23noIJeKkCvfSQmSTgf2B
+	 EYWk7iP/+HBOmePQf6a2uoc4qpPylHQhmn7yGQYjsJNj35+AS8YkJjLNp239Kx7+O6
+	 Si73EEN2zei/ZuD+QffbjBFfaYF9oIJtMcEbDmyRuHXrIcdgLAmq63GG8AqFHFEMI1
+	 8aWcavJL9z6VTQIiFpXSWPWnmORuDCdBrY9sHW8GT+XBsSLykmODO/WaPAGpghbGOo
+	 y7+5WG16U0Mu1xkISDApN0vDzklOpPTLxxUSOtOcLVMzDopOugXhj1yvXNus5CMu1c
+	 JrJqnmjHGkI6w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vdtsD-00000000W9F-16BJ;
+	id 1vdtsD-00000000W9F-237w;
 	Thu, 08 Jan 2026 17:32:37 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Ben Horgan <ben.horgan@arm.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v4 4/9] KVM: arm64: Handle FEAT_IDST for sysregs without specific handlers
-Date: Thu,  8 Jan 2026 17:32:28 +0000
-Message-ID: <20260108173233.2911955-5-maz@kernel.org>
+Subject: [PATCH v4 5/9] KVM: arm64: Handle CSSIDR2_EL1 and SMIDR_EL1 in a generic way
+Date: Thu,  8 Jan 2026 17:32:29 +0000
+Message-ID: <20260108173233.2911955-6-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260108173233.2911955-1-maz@kernel.org>
 References: <20260108173233.2911955-1-maz@kernel.org>
@@ -73,66 +73,28 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add a bit of infrastrtcture to triage_sysreg_trap() to handle the
-case of registers falling into the Feature ID space that do not
-have a local handler.
+Now that we can handle ID registers using the FEAT_IDST infrastrcuture,
+get rid of the handling of CSSIDR2_EL1 and SMIDR_EL1.
 
-For these, we can directly apply the FEAT_IDST semantics and inject
-an EC=0x18 exception. Otherwise, an UNDEF will do.
-
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 13 +++++++++++++
- arch/arm64/kvm/sys_regs.h       | 10 ++++++++++
- 2 files changed, 23 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 616eb6ad68701..4aabd624c4be5 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2588,6 +2588,19 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
- 
- 		params = esr_sys64_to_params(esr);
- 
-+		/*
-+		 * This implements the pseudocode UnimplementedIDRegister()
-+		 * helper for the purpose of dealing with FEAT_IDST.
-+		 */
-+		if (in_feat_id_space(&params)) {
-+			if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, IMP))
-+				kvm_inject_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+			else
-+				kvm_inject_undefined(vcpu);
-+
-+			return true;
-+		}
-+
- 		/*
- 		 * Check for the IMPDEF range, as per DDI0487 J.a,
- 		 * D18.3.2 Reserved encodings for IMPLEMENTATION
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index b3f904472fac5..2a983664220ce 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -49,6 +49,16 @@ struct sys_reg_params {
- 				  .Op2 = ((esr) >> 17) & 0x7,			\
- 				  .is_write = !((esr) & 1) })
- 
-+/*
-+ * The Feature ID space is defined as the System register space in AArch64
-+ * with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7}, op2=={0-7}.
-+ */
-+static inline bool in_feat_id_space(struct sys_reg_params *p)
-+{
-+	return (p->Op0 == 3 && !(p->Op1 & 0b100) && p->Op1 != 2 &&
-+		p->CRn == 0 && !(p->CRm & 0b1000));
-+}
-+
- struct sys_reg_desc {
- 	/* Sysreg string for debug */
- 	const char *name;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c8fd7c6a12a13..a2b14ca2a702b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3414,8 +3414,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
+ 	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
+-	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+-	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+ 	IMPLEMENTATION_ID(AIDR_EL1, GENMASK_ULL(63, 0)),
+ 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+ 	ID_FILTERED(CTR_EL0, ctr_el0,
 -- 
 2.47.3
 
