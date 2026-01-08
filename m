@@ -1,138 +1,158 @@
-Return-Path: <kvm+bounces-67352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67353-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C716D014F4
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 07:55:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC9BD01620
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 08:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0A1CA30208EB
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 06:55:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B37A3026F0D
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 07:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A6D330B07;
-	Thu,  8 Jan 2026 06:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2E733BBDF;
+	Thu,  8 Jan 2026 07:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="Z7RnXhli"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="E5IszURW"
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-76.mail.aliyun.com (out28-76.mail.aliyun.com [115.124.28.76])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDEC2D6401;
-	Thu,  8 Jan 2026 06:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E3632ABEC;
+	Thu,  8 Jan 2026 07:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767855332; cv=none; b=MFrCPAWs6FBSRDY4Rh/6Ee7S7zkAkYDlJ42C8w6kidHx/ioukm388mzxmNsFZQKPZLXaJlMJQaH9LAR464aMDWgOyypFfFYkXIfF5O5fo63p6B7RyhG9LE5zG2XRMapKrffNcOUZ+MzAb2/FaG4dtpl91PMIbT6TulBbrpf496I=
+	t=1767856856; cv=none; b=Bdm1gItxLXm4dPF9v6BBPtE3/lVafojKCyenOSs88z5lDKfzVgBvFy2QJOngcNiIq/GMVTDbuEybDgJ/efdtbvS8JvvlbFfHqRnZ1cAtDRRnulF2ZqsZsRcbPihg68qLH4emdedWg3aKIN8YVwL8JdDBBKUXqzpNYy/IBqfH20A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767855332; c=relaxed/simple;
-	bh=VpsQh2e9bZrEwPorKqQC3RWqqIa6XxDHEJJKu5r/9Qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b7ufbym7nqK1lDEYImhiPbHI3taEUq5MWYZ+PAbW1/A3wAgXnVbpPbYpk+s5Xkt3JVNCt/qbM1BhHnQoXvP+wVWnHR8SWam+7uBT4bDVTNAJvTZbbvsofVTHM5F9gKputa1Mo9fyK5qcMp/on/THmCsh9X/OcBGxF1c7Q5ZxVpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=Z7RnXhli; arc=none smtp.client-ip=115.124.28.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1767855318; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=kjO/f77TXKeXLeT4+zT4iepM/gTaceD+BxWCAT6dsqg=;
-	b=Z7RnXhli1mnGWgIPr4nBWrl62Cs0l8AFqiaytPDBv899C/loesJk/0OUYe89GVcOqYSuemtXHUFkseVLsZFDQJyfpxwaQvgEqa46ivVjIxLHTvZQbz0Gow/Pjk3xbciNg1yZSFCboYNJ6m7vsgDts7ET9hQN7Tf9UI6HmEQUnns=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.g12XRvZ_1767855316 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Thu, 08 Jan 2026 14:55:16 +0800
-Date: Thu, 8 Jan 2026 14:55:16 +0800
-From: Hou Wenlong <houwenlong.hwl@antgroup.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
-	Anish Ghulati <aghulati@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	hpa@zytor.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-	peterz@infradead.org, paulmck@kernel.org,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH 00/14] Support multiple KVM modules on the same host
-Message-ID: <20260108065516.GA8281@k08j02272.eu95sqa>
-References: <20231107202002.667900-1-aghulati@google.com>
- <CAJhGHyBtis3SkNZP8RSX5nKFcnQ4qvUrfTMD2RPc+w+Rzf30Zw@mail.gmail.com>
- <ZWYtDGH5p4RpGYBw@google.com>
- <20260105074814.GA10215@k08j02272.eu95sqa>
- <aV6BzSbAjZJGJ-D5@google.com>
+	s=arc-20240116; t=1767856856; c=relaxed/simple;
+	bh=WgSXEC/bvAwqYjz3NQOqPT+hYzUhtjm2L0+DMjgjk7U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L0qPwIyJ3we1OWAR//Z5YnYPhC53sc7RKXn9Z5zoy6sQv6uELzaHSxJoQXJyGEfzIIF7VQ3TBDd3KKzWKjtif0Fu+vOdFFcsPHGbWiVodUkWs4QQinDn/Ii1PByEPiYs8+Af73JWvTEbSpYFvjI6FpI6Wibo8wexSqWJKU9eKFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=E5IszURW; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.121] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 6087KTle001867
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 8 Jan 2026 08:20:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1767856831;
+	bh=WgSXEC/bvAwqYjz3NQOqPT+hYzUhtjm2L0+DMjgjk7U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=E5IszURWUJy4pzcldz6ggvfCPSDap3Cde4qFGVBw1LFDUHyQywL3CIHQuCCnLcAxG
+	 uDcD+4dzvHv4HgglrD6mQTQGM0odsZJeJajAzWEQpaznAUCcNuZSNofdNdEpq/lz4O
+	 EEz+53zVkvlgXexoXGCQZ+qvjH2a9n5PUGiftAyU=
+Message-ID: <ba3cffe3-b514-435d-88a8-f20c91be722a@tu-dortmund.de>
+Date: Thu, 8 Jan 2026 08:20:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly freed
+ space on consume
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
+ <CACGkMEsHxu_iyL+MjJG834hBGNy9tY9f3mAEeZfDn5MMwtuz8Q@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEsHxu_iyL+MjJG834hBGNy9tY9f3mAEeZfDn5MMwtuz8Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aV6BzSbAjZJGJ-D5@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Jan 07, 2026 at 07:54:53AM -0800, Sean Christopherson wrote:
-> On Mon, Jan 05, 2026, Hou Wenlong wrote:
-> > Sorry for revisiting this topic after a long time. I haven't seen any
-> > new updates regarding this topic/series, and I didn¡¯t find any recent
-> > activity on the GitHub repository. Is the multi-KVM topic still being
-> > considered for upstreaming, or is there anything blocking this?
+On 1/8/26 04:23, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 5:06â€¯AM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> This proposed function checks whether __ptr_ring_zero_tail() was invoked
+>> within the last n calls to __ptr_ring_consume(), which indicates that new
+>> free space was created. Since __ptr_ring_zero_tail() moves the tail to
+>> the head - and no other function modifies either the head or the tail,
+>> aside from the wrap-around case described below - detecting such a
+>> movement is sufficient to detect the invocation of
+>> __ptr_ring_zero_tail().
+>>
+>> The implementation detects this movement by checking whether the tail is
+>> at most n positions behind the head. If this condition holds, the shift
+>> of the tail to its current position must have occurred within the last n
+>> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
+>> invoked and that new free space was created.
+>>
+>> This logic also correctly handles the wrap-around case in which
+>> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
+>> to 0. Since this reset likewise moves the tail to the head, the same
+>> detection logic applies.
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  include/linux/ptr_ring.h | 13 +++++++++++++
+>>  1 file changed, 13 insertions(+)
+>>
+>> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+>> index a5a3fa4916d3..7cdae6d1d400 100644
+>> --- a/include/linux/ptr_ring.h
+>> +++ b/include/linux/ptr_ring.h
+>> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+>>         return ret;
+>>  }
+>>
+>> +/* Returns true if the consume of the last n elements has created space
+>> + * in the ring buffer (i.e., a new element can be produced).
+>> + *
+>> + * Note: Because of batching, a successful call to __ptr_ring_consume() /
+>> + * __ptr_ring_consume_batched() does not guarantee that the next call to
+>> + * __ptr_ring_produce() will succeed.
 > 
-> We have abandoned upstreaming multi-KVM.  The operational cost+complexity is too
-> high relative to the benefits, especially when factoring in things like ASI and
-> live patching, and the benefits are almost entirely obsoleted by kernel live update
-> support.
->
+> This sounds like a bug that needs to be fixed, as it requires the user
+> to know the implementation details. For example, even if
+> __ptr_ring_consume_created_space() returns true, __ptr_ring_produce()
+> may still fail?
 
-We need to look into the new features to see if they¡¯re compatible with
-multi-KVM and how we can integrate them effectively. This is definitely
-challenging work. We also have the option to explore the kernel live
-update now.
+No, it should not fail in that case.
+If you only call consume and after that try to produce, *then* it is
+likely to fail because __ptr_ring_zero_tail() is only invoked once per
+batch.
 
-> > As Lai pointed out, we also have a similar multi-KVM implementation in
-> > our internal environment, so we are quite interested in this topic.
-> > Recently, when we upgraded our kernel version, we found that maintaining
-> > multi-KVM has become a significant burden.
 > 
-> Yeah, I can imagine the pain all too well.  :-/
-> 
-> > We are willing to move forward with it if multi-KVM is still accepted for
-> > upstream. So I look forward to feedback from the maintainers.
-> >
-> > From what I've seen, the recent patch set that enables VMX/SVM during
-> > booting is a good starting point for multi-KVM as well.
-> 
-> I have mixed feelings on multi-KVM.  Without considering maintenance and support
-> costs, I still love the idea of reworking the kernel to support running multiple
-> hypervisors concurrently.  But as I explained in the first cover letter of that
-> series[0], there is a massive amount of complexity, both in initial development
-> and ongoing maintenance, needed to provide such infrastructure:
-> 
->  : I got quite far long on rebasing some internal patches we have to extract the
->  : core virtualization bits out of KVM x86, but as I paged back in all of the
->  : things we had punted on (because they were waaay out of scope for our needs),
->  : I realized more and more that providing truly generic virtualization
->  : instrastructure is vastly different than providing infrastructure that can be
->  : shared by multiple instances of KVM (or things very similar to KVM)[1].
->  :
->  : So while I still don't want to blindly do VMXON, I also think that trying to
->  : actually support another in-tree hypervisor, without an imminent user to drive
->  : the development, is a waste of resources, and would saddle KVM with a pile of
->  : pointless complexity.
-> 
-> For deployment to a relatively homogeneous fleet, many of the pain points can be
-> avoided by either avoiding them entirely or making the settings "inflexible",
-> because there is effectively one use case and so such caveats are a non-issue.
-> But those types of simplifications don't work upstream, e.g. saying "eVMCS is
-> unsupported if multi-KVM is possible" instead of moving eVMCS enabling to a base
-> module isn't acceptable.
-> 
-> So I guess my "official" stance is that I'm not opposed to upstreaming multi-KVM
-> (or similar) functionality, but I'm not exactly in favor of it either.  And
-> practically speaking, because multi-KVM would be in constant conflict with so
-> much ongoing/new feature support (both in software and hardware), and is not a
-> priority for anyone pursuing kernel live update, upstreaming would be likely take
-> several years, without any guarantee of a successful landing.
-> 
-> [0] https://lore.kernel.org/all/20251010220403.987927-1-seanjc@google.com
-> [1] https://lore.kernel.org/all/aOl5EutrdL_OlVOO@google.com
+> Maybe revert fb9de9704775d?
 
-Got it, thanks for your feedback!
+I disagree, as I consider this to be one of the key features of ptr_ring.
+
+That said, there are several other implementation details that users need
+to be aware of.
+
+For example, __ptr_ring_empty() must only be called by the consumer. This
+was for example the issue in dc82a33297fc ("veth: apply qdisc
+backpressure on full ptr_ring to reduce TX drops") and the reason why
+5442a9da6978 ("veth: more robust handing of race to avoid txq getting
+stuck") exists.
+
+> 
+>> + */
+>> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
+>> +                                                   int n)
+>> +{
+>> +       return r->consumer_head - r->consumer_tail < n;
+>> +}
+>> +
+>>  /* Cast to structure type and call a function without discarding from FIFO.
+>>   * Function must return a value.
+>>   * Callers must take consumer_lock.
+>> --
+>> 2.43.0
+>>
+> 
+> Thanks
+> 
 
