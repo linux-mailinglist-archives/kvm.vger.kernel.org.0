@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-67327-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6804D00CB1
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:08:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB7ED00CBA
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 04:09:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D0BF304928D
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:07:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 14F973055F6B
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 03:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA842882D3;
-	Thu,  8 Jan 2026 03:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CBF828CF5F;
+	Thu,  8 Jan 2026 03:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Iqlw+iwk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HZdm4SG6"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EB7276038
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC3C284669
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 03:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767841642; cv=none; b=qoDTTUtpZfq3FioXDkZlMV7j0YuAWzgUOZoAX5+S0lExu1eG88y8+0/ol76qyViJ8nI2CljiL1G1LOPbDNGg65/obe2WVdwCRZJawLVj3UT8eNYbL7cAqtYNTU7vS2iXNxuS0U5onZpQM0RNxzFLw6yChAJ6vHcHN7qOf5CC6b0=
+	t=1767841651; cv=none; b=YggBtRpECX6Vxv1w+DQQLK+7jDrOwtmgDHs41XSvnjIS9yCGjWUdQ+aMedbfYoZkvs4UQ5u80YIfk98B7RLW/QC94E8tCwZalV398TGg6GwEMXB/1JDV5vYQG2PBCT1Prr2c5rAadFrTV+kiHnOMp8ZfhlWrO08xfpLEvKe+XGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767841642; c=relaxed/simple;
-	bh=NSIB8Lxd+wpLEr8wEeRvDDcgtuLqAJSEzM6l94R7lOc=;
+	s=arc-20240116; t=1767841651; c=relaxed/simple;
+	bh=H2ATAxl6nc2NxJwHUemV2+/REmRtA2iQc1/q560G/jk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nLQD6cDsrYEqwEY0GbGknY3maQgDzIK4GSkz7nnD+Ne00T+UrMzD2wUcQbgAeN6SEOBApXizdJLi1nkwNeqMIK6F3PM86ls3BGTvM+9xT2kwzQZlzUi+JbBTllkqJ7z7y5AvONBMplHazgmG/yWCMjJqQB/SAL39k4uOOXTy9CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Iqlw+iwk; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version:Content-Type; b=rBX43WNn8Rjsg4PmA2CGk9wSnqS4uKDMiW6NR8/TgGmAoGZWBW8pQHIKvRwRu6ZaLH+zogEaZXVSrdkThuycWiS2k/TTGrsaaVwAMLs45GsW7POe044v2xyIJP+594erFB+qhD/DjRJPQAkUSkyG11W/EB+8ZKrIrWT4OJUGLxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HZdm4SG6; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767841641; x=1799377641;
+  t=1767841650; x=1799377650;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NSIB8Lxd+wpLEr8wEeRvDDcgtuLqAJSEzM6l94R7lOc=;
-  b=Iqlw+iwkSbEjON5M5124uHoIGN8t9YWsNkkCqQk9kKaiSvC4hStor3Bw
-   01h0FPZUHL+iUxJLN379N4zQPabHCgqr4KKVkV3ON/wsuMXG3XGM7a09h
-   n3dZ24Bar5XPZexGv+VSBPUm9SocvmFL40KASLqTYqQZdu0wqFO2HH5Ai
-   4CAXgbrWtMUto6C2GecfxrHfDIdpnxhx1cIkeEPhbMjkpgv51KhsFcdsK
-   UY+hOEzZWlgZInBV0qnMyvvmrED+fe9qZQoJxQDkEWtcgLpfpH4RHOu2G
-   DwLLGmhyAWVlFJ9mS4EgyfEO3nS8GYIww1jmbYXkgV9DqEYJeK83of//V
-   g==;
-X-CSE-ConnectionGUID: xiKTt+s5RDqE7fWSAsSvMg==
-X-CSE-MsgGUID: vrjTc8DZToq5tIAGeKmCSQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877214"
+  bh=H2ATAxl6nc2NxJwHUemV2+/REmRtA2iQc1/q560G/jk=;
+  b=HZdm4SG6/eolk3C5IXvHNigM25H6ryeIssgw5BjJAXkdRbHFk35URdtu
+   jUUxcPb5VhErKvqyGiaT1ReZbsQR8zuCyF4JOX1A+dlnx25DvpNIruJSB
+   1RG/FBUZHpmF3cA/tXtxm59o5wsSvwlfm78ilXdornNLtKtLVO4kRQKvW
+   Oi6q5uQ4MRc5amwEX2XDqOlAVOP9rYv2BKEiapHZ74IbeL3ZebnWSMBr4
+   lK6Eox7oxIbfGAiOaQqGhj4ly7beQ47YZ4/lrjbmaxCzWPkkw3obDgGOQ
+   9ojMdsPKC6aNWiiPmt/84r4cMtG/+I/38Gatb3mjp1c7H/fFXPrGkhKW0
+   Q==;
+X-CSE-ConnectionGUID: V6YCD0yFTcOYii0VmIAWsg==
+X-CSE-MsgGUID: fqZa8/WYQjC7cJ0sxMsOGw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="91877248"
 X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="91877214"
+   d="scan'208";a="91877248"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:07:20 -0800
-X-CSE-ConnectionGUID: EGA4my4eSGO5a2G8E3IEMQ==
-X-CSE-MsgGUID: 7AmsZXhwSpiPPks01f86Tw==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 19:07:30 -0800
+X-CSE-ConnectionGUID: X3UNGXX6S7e/WJqtSXmOhQ==
+X-CSE-MsgGUID: ASqkVwIvSP2kfXhBiioB+g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="202210834"
+   d="scan'208";a="202210880"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.39])
-  by orviesa006.jf.intel.com with ESMTP; 07 Jan 2026 19:07:10 -0800
+  by orviesa006.jf.intel.com with ESMTP; 07 Jan 2026 19:07:20 -0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
@@ -98,9 +98,9 @@ Cc: qemu-devel@nongnu.org,
 	Peter Krempa <pkrempa@redhat.com>,
 	Jiri Denemark <jdenemar@redhat.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH v6 11/27] hw/nvram/fw_cfg: Rename fw_cfg_init_mem_wide() -> fw_cfg_init_mem_dma()
-Date: Thu,  8 Jan 2026 11:30:35 +0800
-Message-Id: <20260108033051.777361-12-zhao1.liu@intel.com>
+Subject: [PATCH v6 12/27] hw/i386/x86: Remove X86MachineClass::fwcfg_dma_enabled field
+Date: Thu,  8 Jan 2026 11:30:36 +0800
+Message-Id: <20260108033051.777361-13-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260108033051.777361-1-zhao1.liu@intel.com>
 References: <20260108033051.777361-1-zhao1.liu@intel.com>
@@ -115,103 +115,124 @@ Content-Transfer-Encoding: 8bit
 
 From: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-"wide" in fw_cfg_init_mem_wide() means "DMA support".
-Rename for clarity.
+The X86MachineClass::fwcfg_dma_enabled boolean was only used
+by the pc-q35-2.6 and pc-i440fx-2.6 machines, which got
+removed. Remove it and simplify.
 
-Suggested-by: Zhao Liu <zhao1.liu@intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+'multiboot.bin' isn't used anymore, we'll remove it in the
+next commit.
+
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
-Changes since v4:
- * Fix a missing case in hw/loongarch/fw_cfg.c.
----
- hw/arm/virt.c             | 2 +-
- hw/loongarch/fw_cfg.c     | 4 ++--
- hw/nvram/fw_cfg.c         | 6 +++---
- hw/riscv/virt.c           | 4 ++--
- include/hw/nvram/fw_cfg.h | 6 +++---
- 5 files changed, 11 insertions(+), 11 deletions(-)
+ hw/i386/microvm.c     | 3 ---
+ hw/i386/multiboot.c   | 7 +------
+ hw/i386/x86-common.c  | 3 +--
+ hw/i386/x86.c         | 2 --
+ include/hw/i386/x86.h | 2 --
+ 5 files changed, 2 insertions(+), 15 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index fd0e28f030a3..52ab01d7bb72 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1412,7 +1412,7 @@ static FWCfgState *create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
-     FWCfgState *fw_cfg;
-     char *nodename;
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 8cf99ad66237..7ff205126365 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -640,7 +640,6 @@ GlobalProperty microvm_properties[] = {
  
--    fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
-+    fw_cfg = fw_cfg_init_mem_dma(base + 8, base, 8, base + 16, as);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)ms->smp.cpus);
- 
-     nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
-diff --git a/hw/loongarch/fw_cfg.c b/hw/loongarch/fw_cfg.c
-index 493563669e5b..d2a79efbf767 100644
---- a/hw/loongarch/fw_cfg.c
-+++ b/hw/loongarch/fw_cfg.c
-@@ -23,8 +23,8 @@ FWCfgState *virt_fw_cfg_init(ram_addr_t ram_size, MachineState *ms)
-     int max_cpus = ms->smp.max_cpus;
-     int smp_cpus = ms->smp.cpus;
- 
--    fw_cfg = fw_cfg_init_mem_wide(VIRT_FWCFG_BASE + 8, VIRT_FWCFG_BASE, 8,
--                                  VIRT_FWCFG_BASE + 16, &address_space_memory);
-+    fw_cfg = fw_cfg_init_mem_dma(VIRT_FWCFG_BASE + 8, VIRT_FWCFG_BASE, 8,
-+                                 VIRT_FWCFG_BASE + 16, &address_space_memory);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 3c1d0b9c1d09..f962480e6685 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -1088,9 +1088,9 @@ static FWCfgState *fw_cfg_init_mem_internal(hwaddr ctl_addr,
-     return s;
- }
- 
--FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
--                                 hwaddr data_addr, uint32_t data_width,
--                                 hwaddr dma_addr, AddressSpace *dma_as)
-+FWCfgState *fw_cfg_init_mem_dma(hwaddr ctl_addr,
-+                                hwaddr data_addr, uint32_t data_width,
-+                                hwaddr dma_addr, AddressSpace *dma_as)
+ static void microvm_class_init(ObjectClass *oc, const void *data)
  {
-     assert(dma_addr && dma_as);
-     return fw_cfg_init_mem_internal(ctl_addr, data_addr, data_width,
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index bd8608ea5bfd..07e66b39364c 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -1274,8 +1274,8 @@ static FWCfgState *create_fw_cfg(const MachineState *ms, hwaddr base)
+-    X86MachineClass *x86mc = X86_MACHINE_CLASS(oc);
+     MicrovmMachineClass *mmc = MICROVM_MACHINE_CLASS(oc);
+     MachineClass *mc = MACHINE_CLASS(oc);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
+@@ -674,8 +673,6 @@ static void microvm_class_init(ObjectClass *oc, const void *data)
+     hc->unplug_request = microvm_device_unplug_request_cb;
+     hc->unplug = microvm_device_unplug_cb;
+ 
+-    x86mc->fwcfg_dma_enabled = true;
+-
+     object_class_property_add(oc, MICROVM_MACHINE_RTC, "OnOffAuto",
+                               microvm_machine_get_rtc,
+                               microvm_machine_set_rtc,
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 8b6acfee9ba8..0e960a15dda4 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -153,7 +153,6 @@ int load_multiboot(X86MachineState *x86ms,
+                    int kernel_file_size,
+                    uint8_t *header)
  {
-     FWCfgState *fw_cfg;
+-    bool multiboot_dma_enabled = X86_MACHINE_GET_CLASS(x86ms)->fwcfg_dma_enabled;
+     int i, is_multiboot = 0;
+     uint32_t flags = 0;
+     uint32_t mh_entry_addr;
+@@ -402,11 +401,7 @@ int load_multiboot(X86MachineState *x86ms,
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, mb_bootinfo_data,
+                      sizeof(bootinfo));
  
--    fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16,
--                                  &address_space_memory);
-+    fw_cfg = fw_cfg_init_mem_dma(base + 8, base, 8, base + 16,
-+                                 &address_space_memory);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)ms->smp.cpus);
+-    if (multiboot_dma_enabled) {
+-        option_rom[nb_option_roms].name = "multiboot_dma.bin";
+-    } else {
+-        option_rom[nb_option_roms].name = "multiboot.bin";
+-    }
++    option_rom[nb_option_roms].name = "multiboot_dma.bin";
+     option_rom[nb_option_roms].bootindex = 0;
+     nb_option_roms++;
  
-     return fw_cfg;
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index 510b227b7ef1..56f17a0bdcf7 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -309,9 +309,9 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
-                                 AddressSpace *dma_as);
- FWCfgState *fw_cfg_init_mem_nodma(hwaddr ctl_addr, hwaddr data_addr,
-                                   unsigned data_width);
--FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
--                                 hwaddr data_addr, uint32_t data_width,
--                                 hwaddr dma_addr, AddressSpace *dma_as);
-+FWCfgState *fw_cfg_init_mem_dma(hwaddr ctl_addr,
-+                                hwaddr data_addr, uint32_t data_width,
-+                                hwaddr dma_addr, AddressSpace *dma_as);
+diff --git a/hw/i386/x86-common.c b/hw/i386/x86-common.c
+index 85b90ff43248..192e91042f22 100644
+--- a/hw/i386/x86-common.c
++++ b/hw/i386/x86-common.c
+@@ -645,7 +645,6 @@ void x86_load_linux(X86MachineState *x86ms,
+                     int acpi_data_size,
+                     bool pvh_enabled)
+ {
+-    bool linuxboot_dma_enabled = X86_MACHINE_GET_CLASS(x86ms)->fwcfg_dma_enabled;
+     uint16_t protocol;
+     int setup_size, kernel_size, cmdline_size;
+     int dtb_size, setup_data_offset;
+@@ -1004,7 +1003,7 @@ void x86_load_linux(X86MachineState *x86ms,
  
- FWCfgState *fw_cfg_find(void);
- bool fw_cfg_dma_enabled(void *opaque);
+     option_rom[nb_option_roms].bootindex = 0;
+     option_rom[nb_option_roms].name = "linuxboot.bin";
+-    if (linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
++    if (fw_cfg_dma_enabled(fw_cfg)) {
+         option_rom[nb_option_roms].name = "linuxboot_dma.bin";
+     }
+     nb_option_roms++;
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index c29856c810a5..01872cba0733 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -375,14 +375,12 @@ static void x86_machine_initfn(Object *obj)
+ static void x86_machine_class_init(ObjectClass *oc, const void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+-    X86MachineClass *x86mc = X86_MACHINE_CLASS(oc);
+     NMIClass *nc = NMI_CLASS(oc);
+ 
+     mc->cpu_index_to_instance_props = x86_cpu_index_to_props;
+     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
+     mc->kvm_type = x86_kvm_type;
+-    x86mc->fwcfg_dma_enabled = true;
+     nc->nmi_monitor_handler = x86_nmi;
+ 
+     object_class_property_add(oc, X86_MACHINE_SMM, "OnOffAuto",
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index 0dffba95f9a4..23be62743774 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -30,8 +30,6 @@
+ struct X86MachineClass {
+     MachineClass parent;
+ 
+-    /* use DMA capable linuxboot option rom */
+-    bool fwcfg_dma_enabled;
+     /* CPU and apic information: */
+     bool apic_xrupt_override;
+ };
 -- 
 2.34.1
 
