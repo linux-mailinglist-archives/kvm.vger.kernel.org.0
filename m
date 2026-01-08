@@ -1,131 +1,146 @@
-Return-Path: <kvm+bounces-67389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67391-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 801AFD03735
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 15:44:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F9DD039AC
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 15:59:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 63C0331576C1
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 14:28:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 004ED31E05BA
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 14:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0894D89F6;
-	Thu,  8 Jan 2026 14:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6342C4E6E0C;
+	Thu,  8 Jan 2026 14:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Dw0oXzQU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkjFvcQ6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136694D1650
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 14:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6714E6DF6;
+	Thu,  8 Jan 2026 14:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881450; cv=none; b=uF6dzmxFoDRftVP5On8ssjSid2lmzdnqpSzEq5VH1Ro5vpL2jrB5/h4pw7UF1HKlut+YWQdcohur9lt7rA45QwPc7RdxFDNEiBJBXNSFMaGl3KYmdMSADE2FBQruhEyQKtvszV+Lx6JMRSWMCLayRE/lz/v4DP35N1K1FC/iJ+E=
+	t=1767881651; cv=none; b=HnaHhri1fvSpQOTTY0GxHC6BweoGnc9yNW7kxGDkmZACTjeVwEscsvVyWlhJWJDqwEceaauaS1W6sbfb3bCJhA+LKAuVpw2OGehum4Xs58U2WLZvQvEOxKePIU37smVPs7QlfpgfagWI9ADauMWPVl659sI1qKLr0PVrHrbhR1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881450; c=relaxed/simple;
-	bh=mOyKu2qnINj2x88v5g/B8RjO1LOcLsg2eN246pYG+9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Upx5kfMKAlZmre2Owm9GcsLfEg54VYwhRrcUfh5ElKqsAo04+MznCn8dH09uqVvdb9KGgphq3Ov+m4iWDsUvsgGobxDvlR90UHvQd2VOSpCIDWhPIyub7b3d2hMTK31iYqqbjs1LeFh1gSD6IQsWJ0MTkikrobtEKgiIPbV7/NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Dw0oXzQU; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4f4cd02f915so23872831cf.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 06:10:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1767881448; x=1768486248; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDbkV3lGC5q9hIUjdqkuvar4sKouEItjHMXNdXEEOOY=;
-        b=Dw0oXzQUUelmqmGXwTPn16P1HIMNpjgh5MUGjza5ljvke9CJbGeApM1iz54fcR1eJK
-         Aj/osLXYekG8ctsTHFg6lq9RSd1zaDP5vVcWcPZ2SKjpAE9UIavEBwN+IyP3Y9leiOqm
-         a5yW//KYkhnMn04G97HVYf3ztnxeGofHGJv7C+HuXYZtkl/rJBoPWvyWEoxE2ZcD4cKO
-         LAg776359gEcA6avWMXwKBBBRrd+UNOMU+OYq9OMhi2uroi872dOZxmGoZz8jYDga6rX
-         uM4+IEn5fO8ZrZ7pQN18++BY4Fg1KuIr9rM4BZ//VkeqYtDZ3Lhg13kAuCF+4FvkY6At
-         fbeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767881448; x=1768486248;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oDbkV3lGC5q9hIUjdqkuvar4sKouEItjHMXNdXEEOOY=;
-        b=XK1B5UBb6G12za9Qf9+0+twKv+8wPLAQyVvD5Qv3bkX9Yshy6hOlNLdnDjjhFcWC8/
-         1TDpsE7LzXTEX9RYijaq1oUzA+LZ3eYKV96y+ZatpIynzAawlwhKxnzFCYRUgOhD1VjD
-         j7icPlDpQCO7Y/xg5KD1b3qgOLrVczMZvHQv50KdQrw1NAxwiNvbBKh0lyMCjDutS/EF
-         Z28Kl0tNQ7Gcw4labFiqQQSrTlfLaS4DhxGHsnTDTwXmLs+tIu5rw08DUgo3xUo1ZIe1
-         tmIvoo1Pq74SSLm3T/Ie6Pg8uV1BJeWLK8nWVotwoJOiPob+wWpCB2NZnWSByqtlYTEY
-         /Vjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFt3ASS5zLi8vcwHjpKYBsnag4qta3BW4rrAhmD1MlKAHXQH0278IGJZpX6vC5FO39w2c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywbe2xYLVR52XN9ktZKW74bxuUVEJDM+FGrJO3vNBLg9O95v2zc
-	OUtdEmOgh7AzLB37B23bv6QPe/9gTyM4oXLfLmZs7KpMLN9MaD8X0XjiaP4EVCfKHMM=
-X-Gm-Gg: AY/fxX55A02/fuEaPtIbGQBncy2wBTXYNc9aBvOTK0PC2COSzV3Q4zpJWiVPoKF25Nf
-	ZkYb5Xm7MOyoiehbEtiZDlCJyBqhQPFDk93UinxKybvDQJJBySdI08YBuBGX517XGWOleMhdBUk
-	bzUCWvQFem/pqCHeTmI10k+LotwBxki3e4uy6jvIjmc7R3O5F3L5rGMHGXkgxZ9jwqHTcn1QO0L
-	FvmvpweXavu9G6/VaPVahYcP5uZ0WqOLtN0uVSoUPT5CQp2dVe8fEXWnhSaFGa3IgcTeKPsHvP5
-	m++tPUXptp4HFRYeNpLMPn8433ggCHKLmCFIEDC5MhRDToih6Q4ltUcTsnAhvw2ARN43ADlq8df
-	2uQ+UyW49DMlEFEhOxV05Xa/VsK/4o7DHOE9Tv13gFzqQTWTm9Ei3oHV8eNzXBMSA2pMz8TCfBN
-	+EYUD2gcSzttraGgfc1+FXYhcFpf4Bwq8bW4SAvWIqa/a50HF8v7NBz4PYRkEX7LLtWRg=
-X-Google-Smtp-Source: AGHT+IHLFsWgRSX6V5S9B7UJ9/MDZC7xvbmTJCziAAyGWoSQBDoda9rrddhfylBRHlUYqEmcr6mSKA==
-X-Received: by 2002:a05:622a:1aa8:b0:4ec:fdaa:b31e with SMTP id d75a77b69052e-4ffb4933f5bmr83200721cf.32.1767881447747;
-        Thu, 08 Jan 2026 06:10:47 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffb813ffb8sm26637331cf.20.2026.01.08.06.10.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 06:10:45 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vdqiq-00000002Lxb-3Inr;
-	Thu, 08 Jan 2026 10:10:44 -0400
-Date: Thu, 8 Jan 2026 10:10:44 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Mastro <amastro@fb.com>
-Cc: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>,
-	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <20260108141044.GC545276@ziepe.ca>
-References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
- <aV7yIchrL3mzNyFO@google.com>
- <20260108005406.GA545276@ziepe.ca>
- <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
+	s=arc-20240116; t=1767881651; c=relaxed/simple;
+	bh=PclDSMkxQTnfjWJ1QJChIBnve9ojYFh9rJwlsRzU3g0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D24JSsj0Vu1Pn3EwqRJHpLUDDvW4Bxlx1a9EQGu3KDUJ/xutMuuQ6ITsFHjl68XfjuxBoFRZ7E0OtunFOr6ahwFbTJlaAauz37EisSqQNYqZNwtpQ8i35IWomLMMQ/iPQEjtn4S1GFKitK1L78EaKmbjug2VtWUPFykA4weqk5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkjFvcQ6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04B25C19422;
+	Thu,  8 Jan 2026 14:14:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767881651;
+	bh=PclDSMkxQTnfjWJ1QJChIBnve9ojYFh9rJwlsRzU3g0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KkjFvcQ6BqxLJ+uLScB6z4Kil0b0v50RHuWDZACioD+s7xd3vngRo+zgT0b7LIHq5
+	 Glx1BqKsiWfr9woZRag7Q51VeJ+5GVkBwlUspr+3o2SHdGB7RRvXjj5VAKNaKxOOYU
+	 Vs2N8e2j5TDG9MU7BVKhFHK2pcT8mldsEJxZe+N+CLhFLQflvSjDHp+6oY17c5Ra6p
+	 yJU4Fkyxb7QkcXlhgLNNsZp9oDPoXKmnOd8TnThYPjKhCbTvc1Y8m39c8RvxMGdlAA
+	 MVZHVtXSEQ3qp1Yue/GhjREToLDmpvuaJOadJzh3lNdkV+XZuFxUEviUXvXm3VmlQo
+	 AsK03Q8B9/i6g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdqm8-00000000Qvv-31WT;
+	Thu, 08 Jan 2026 14:14:08 +0000
+Date: Thu, 08 Jan 2026 14:14:08 +0000
+Message-ID: <86344gmbtb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	oliver.upton@linux.dev,
+	alexandru.elisei@arm.com,
+	aneesh.kumar@kernel.org,
+	steven.price@arm.com,
+	tabba@google.com
+Subject: Re: [PATCH kvmtool v4 15/15] arm64: smccc: Start sending PSCI to userspace
+In-Reply-To: <20250930103130.197534-17-suzuki.poulose@arm.com>
+References: <20250930103130.197534-1-suzuki.poulose@arm.com>
+	<20250930103130.197534-17-suzuki.poulose@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, will@kernel.org, oliver.upton@linux.dev, alexandru.elisei@arm.com, aneesh.kumar@kernel.org, steven.price@arm.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Jan 07, 2026 at 06:41:10PM -0800, Alex Mastro wrote:
-> On Wed, Jan 07, 2026 at 08:54:06PM -0400, Jason Gunthorpe wrote:
-> > On Wed, Jan 07, 2026 at 11:54:09PM +0000, David Matlack wrote:
-> > > On 2026-01-07 02:13 PM, Alex Mastro wrote:
-> > > > Test MMIO-backed DMA mappings by iommu_map()-ing mmap'ed BAR regions.
-> > > 
-> > > Thanks for adding this!
-> > > 
-> > > > Also update vfio_pci_bar_map() to align BAR mmaps for efficient huge
-> > > > page mappings.
-> > > > 
-> > > > Only vfio_type1 variants are tested; iommufd variants can be added
-> > > > once kernel support lands.
-> > > 
-> > > Are there plans to support mapping BARs via virtual address in iommufd?
-> > > I thought the plan was only to support via dma-bufs. Maybe Jason can
-> > > confirm.
-> > 
-> > Only dmabuf.
+On Tue, 30 Sep 2025 11:31:30 +0100,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> Ack. I got confused. I had thought iommufd's vfio container compatibility mode
-> was going to support this, but realized that doesn't make sense given past
-> discussions about the pitfalls of achieving these mappings the legacy way.
+> From: Oliver Upton <oliver.upton@linux.dev>
+> 
+> kvmtool now has a PSCI implementation that complies with v1.0 of the
+> specification. Use the SMCCC filter to start sending these calls out to
+> userspace for further handling. While at it, shut the door on the
+> legacy, KVM-specific v0.1 functions.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arm64/include/kvm/kvm-config-arch.h |  8 +++++--
+>  arm64/smccc.c                       | 37 +++++++++++++++++++++++++++++
+>  2 files changed, 43 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+> index ee031f01..3158fadf 100644
+> --- a/arm64/include/kvm/kvm-config-arch.h
+> +++ b/arm64/include/kvm/kvm-config-arch.h
+> @@ -15,6 +15,7 @@ struct kvm_config_arch {
+>  	u64		fw_addr;
+>  	unsigned int	sve_max_vq;
+>  	bool		no_pvtime;
+> +	bool		in_kernel_smccc;
+>  };
+>  
+>  int irqchip_parser(const struct option *opt, const char *arg, int unset);
+> @@ -52,11 +53,14 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+>  			   "Force virtio devices to use PCI as their default "	\
+>  			   "transport (Deprecated: Use --virtio-transport "	\
+>  			   "option instead)", virtio_transport_parser, kvm),	\
+> -        OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+> +	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
+>  		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
+>  		     "Type of interrupt controller to emulate in the guest",	\
+>  		     irqchip_parser, NULL),					\
+>  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
+> -		"Address where firmware should be loaded"),
+> +		"Address where firmware should be loaded"),			\
+> +	OPT_BOOLEAN('\0', "in-kernel-smccc", &(cfg)->in_kernel_smccc,		\
+> +			"Disable userspace handling of SMCCC, instead"		\
+> +			" relying on the in-kernel implementation"),
+>
 
-Oh, I was thinking about a compatability only flow only in the type 1
-emulation that internally magically converts a VMA to a dmabuf, but I
-haven't written anything.. It is a bit tricky and the type 1 emulation
-has not been as popular as I expected??
+nit: this really is about PSCI, not SMCCC. The fact that we use the
+SMCCC interface to route PSCI calls is an implementation detail,
+really. The other thing is that this is a change in default behaviour,
+and I'd rather keep in-kernel PSCI to be the default, specially given
+that this otherwise silently fails on old kernels.
 
-Jason
+To that effect, I'd suggest the following instead:
+
++	OPT_BOOLEAN('\0', "psci", &(cfg)->userspace_psci,		\
++			"Request userspace handling of PSCI, instead"		\
++			" relying on the in-kernel implementation"),
+
+and the code modified accordingly.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
