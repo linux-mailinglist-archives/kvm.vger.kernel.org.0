@@ -1,219 +1,138 @@
-Return-Path: <kvm+bounces-67351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3CC3D013B3
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 07:18:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C716D014F4
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 07:55:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BABB130478CC
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 06:14:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0A1CA30208EB
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 06:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D5433A706;
-	Thu,  8 Jan 2026 06:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A6D330B07;
+	Thu,  8 Jan 2026 06:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uz9JD/QB";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CqItVALm"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="Z7RnXhli"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out28-76.mail.aliyun.com (out28-76.mail.aliyun.com [115.124.28.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C8127CB35
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 06:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DDEC2D6401;
+	Thu,  8 Jan 2026 06:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767852851; cv=none; b=A2KeYZHRgkg8Iit6JPw7rqiBT+JVhJQiLV55+DaSwMV1SQzC+vKrxYVwi2SWJtw7Qq4CEjjAcehJWyiaq1LXbQShdntLZu8zme24qVpMYX1W+WdH0badyG4+9tuKKAiJrSAYkP3np+q8C6wCOJ/1zrsQa3ouZR6swl+3+dfrXhM=
+	t=1767855332; cv=none; b=MFrCPAWs6FBSRDY4Rh/6Ee7S7zkAkYDlJ42C8w6kidHx/ioukm388mzxmNsFZQKPZLXaJlMJQaH9LAR464aMDWgOyypFfFYkXIfF5O5fo63p6B7RyhG9LE5zG2XRMapKrffNcOUZ+MzAb2/FaG4dtpl91PMIbT6TulBbrpf496I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767852851; c=relaxed/simple;
-	bh=95+hvgZmWBmKLUF7KdsEmQQmkMg5+rOsYbWCPJ0Lnk0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PjxnI54ARNUmLtAKcN5yHW/KsgcOHzMuSRd3ByxPbY0/oGlXk8z/92mqhABFIxhDYoXrLFuibo4fBTnK2vpowsPbcwGccP2kxTqhjjEmIUw7D6V2VoSO7rOnApFE3nRecNgMqmDZdO+8cj4r4Vh911iprb7YfIXceladS7tdklU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uz9JD/QB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CqItVALm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767852848;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=l/lzNt1si/El5u/3JxuEqXHb6Skth5KuEneedRtr6Z4=;
-	b=Uz9JD/QB1WZCPsB4K415hoYO04iE/IJ5A5uJ7Csq8ZSDPAhnLIlowc19kAOlJMloiH0ABS
-	G1IdmmXgPAojDeroOo8KNZ7iya1AXnBDUUTsQapf10ITGlK3akMIFIMyJc17r3Y2m4lW1y
-	2Z0Tr9qPqwnFUkNyfGEE8zDuxTJ8AKI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-156-0kdJB36FM2adXQPZEMLhjw-1; Thu, 08 Jan 2026 01:14:06 -0500
-X-MC-Unique: 0kdJB36FM2adXQPZEMLhjw-1
-X-Mimecast-MFC-AGG-ID: 0kdJB36FM2adXQPZEMLhjw_1767852845
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b807c651eefso348416966b.3
-        for <kvm@vger.kernel.org>; Wed, 07 Jan 2026 22:14:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767852845; x=1768457645; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=l/lzNt1si/El5u/3JxuEqXHb6Skth5KuEneedRtr6Z4=;
-        b=CqItVALmcuavA1IevntE1BUuKJ4eOj/RR8XDtPeSIqCz0SdZk5whpEqrGHLhylRs6e
-         qsqGfDoJJ1580u9XPfaKes0N558vNKkZjtK2thppSAzrKvDIAorkOw+gfCb5Cl0M9fpr
-         M0feDIxjA51rJTNsWlrDy1xvDaYlO0eOhPriWfctV1uLwQZtesHJocmPBtMmpowJ0fLV
-         1SOlY+IuOZwFUogfSp5yfDI3iqmaL2xH63BOnDn4Q/b1xPQHzkEowLAemaLLhgLdcel1
-         K2jseeq5yDxjNxvKLm0jLyyJ+lClM/TqJZe+h7d8Arj7QLTSj5tuHPQq2n4fj5Uj9e2A
-         2gqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767852845; x=1768457645;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l/lzNt1si/El5u/3JxuEqXHb6Skth5KuEneedRtr6Z4=;
-        b=EmdqySOGkMUU6ETLbA7wg61Nj2q/A2iP4ihWIgvby5nJlHKIwcvLftXze0feMAiRr+
-         iWEBPkxciFeTl527REGIdnOa5A1FUz+T+9SGnaO1QU8u2DiaUAOmR5NC26bdAa8J7Re9
-         xiI3SgZwAL6vVZGNRv+v5CTmBFYdegoohPcEJlWZu++SI+XP+4dn5U0DzOVXm0bid2ZN
-         XmGrkjLvYEXcQltJ9p4RjJEQZtsuPZSdXLLTF7EzcZuQsVwZQYnUQgMmpq7+mCA4wDmx
-         QyEOWoa6LZtupzuicW3VA05I+5rXwv8umzgiywNo9vy5XAL2FVnGkAynzwB/8YeGtEJy
-         WGqw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+N9NZo+7+b0PJS1UVlCg5h+iAJqh1BgkwYWiN2hW5PQlUDOCLWYBnZVfks828E37MBfM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmgTGaQqqiqw9fZbp9NAmb0VNLqp2H5sGuZ3TbtixQQrL9XQDZ
-	s2efD2vOsSZX841cG7Hl7CSVBRglfJJCQQ3urdMtgi4aRdVIu8BCNWgqI9hvcKxq7pt1LLcCelR
-	6DmCQPubqHgpdAMqtqUe2yXaYZWkDtN+lVdokwsEJyCPnslLwDXg1Dg==
-X-Gm-Gg: AY/fxX5BIhnFadjOOnthrEouunz94H6hCh8eJJXQxZxOCjfSNdiM/SzEGXJcoSY+nf+
-	SpfEgjpk7IcYdxQcLp/SuSqUiiwC4q1SinrVIOG+raCCAnOdH5WUFOX5+I+lRbXQHGYeFXPwQ2u
-	8sYjxOspfsC/Tm7p4mzlml9QZ1nvnmN21kuJRA0iz8k8mNUBNOwFKb0aqwzYgbG+qJGWXyGuaMc
-	A7WszZ434Q5O52ci5k8ocoiVO3FHCOhm/4LFCqmPWErmOaQP9YWC9rxN6TTo2IeG2z/0agxoxoY
-	W7gSKnjmtd1mdy+5urxDLjJlkCUjW2l+wPJlaQHDrUtF5d/NeZYijw44BRknh8gRcv1pzAkjhCC
-	Bm89cgYI=
-X-Received: by 2002:a17:907:2daa:b0:b83:972a:cb85 with SMTP id a640c23a62f3a-b8444c99d69mr493960666b.21.1767852844992;
-        Wed, 07 Jan 2026 22:14:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHVRsnS9p9n7drdpE60e89TgHoiXqmd2qOHrMYP6giCCfm+VLK5zTWUF3eXR7xUrA4bvP5uMg==
-X-Received: by 2002:a17:907:2daa:b0:b83:972a:cb85 with SMTP id a640c23a62f3a-b8444c99d69mr493958166b.21.1767852844503;
-        Wed, 07 Jan 2026 22:14:04 -0800 (PST)
-Received: from [192.168.0.9] ([47.64.114.194])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a564284sm729832166b.62.2026.01.07.22.14.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jan 2026 22:14:04 -0800 (PST)
-Message-ID: <87cda384-3199-42b5-905f-a4a0488dfaba@redhat.com>
-Date: Thu, 8 Jan 2026 07:14:01 +0100
+	s=arc-20240116; t=1767855332; c=relaxed/simple;
+	bh=VpsQh2e9bZrEwPorKqQC3RWqqIa6XxDHEJJKu5r/9Qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b7ufbym7nqK1lDEYImhiPbHI3taEUq5MWYZ+PAbW1/A3wAgXnVbpPbYpk+s5Xkt3JVNCt/qbM1BhHnQoXvP+wVWnHR8SWam+7uBT4bDVTNAJvTZbbvsofVTHM5F9gKputa1Mo9fyK5qcMp/on/THmCsh9X/OcBGxF1c7Q5ZxVpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=Z7RnXhli; arc=none smtp.client-ip=115.124.28.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=antgroup.com; s=default;
+	t=1767855318; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=kjO/f77TXKeXLeT4+zT4iepM/gTaceD+BxWCAT6dsqg=;
+	b=Z7RnXhli1mnGWgIPr4nBWrl62Cs0l8AFqiaytPDBv899C/loesJk/0OUYe89GVcOqYSuemtXHUFkseVLsZFDQJyfpxwaQvgEqa46ivVjIxLHTvZQbz0Gow/Pjk3xbciNg1yZSFCboYNJ6m7vsgDts7ET9hQN7Tf9UI6HmEQUnns=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.g12XRvZ_1767855316 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Thu, 08 Jan 2026 14:55:16 +0800
+Date: Thu, 8 Jan 2026 14:55:16 +0800
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+	Anish Ghulati <aghulati@google.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	hpa@zytor.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
+	peterz@infradead.org, paulmck@kernel.org,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [RFC PATCH 00/14] Support multiple KVM modules on the same host
+Message-ID: <20260108065516.GA8281@k08j02272.eu95sqa>
+References: <20231107202002.667900-1-aghulati@google.com>
+ <CAJhGHyBtis3SkNZP8RSX5nKFcnQ4qvUrfTMD2RPc+w+Rzf30Zw@mail.gmail.com>
+ <ZWYtDGH5p4RpGYBw@google.com>
+ <20260105074814.GA10215@k08j02272.eu95sqa>
+ <aV6BzSbAjZJGJ-D5@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 14/27] hw/i386: Assume fw_cfg DMA is always enabled
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: qemu-devel@nongnu.org, devel@lists.libvirt.org, kvm@vger.kernel.org,
- qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>,
- Sergio Lopez <slp@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier
- <lvivier@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Yi Liu <yi.l.liu@intel.com>, Eduardo Habkost <eduardo@habkost.net>,
- Alistair Francis <alistair.francis@wdc.com>,
- Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Weiwei Li <liwei1518@gmail.com>,
- Amit Shah <amit@kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Yanan Wang <wangyanan55@huawei.com>, Helge Deller <deller@gmx.de>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Ani Sinha <anisinha@redhat.com>, Fabiano Rosas <farosas@suse.de>,
- Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
- =?UTF-8?Q?Cl=C3=A9ment_Mathieu--Drif?= <clement.mathieu--drif@eviden.com>,
- =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- Huacai Chen <chenhuacai@kernel.org>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.caveayland@nutanix.com>,
- BALATON Zoltan <balaton@eik.bme.hu>, Peter Krempa <pkrempa@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>
-References: <20260108033051.777361-1-zhao1.liu@intel.com>
- <20260108033051.777361-15-zhao1.liu@intel.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzR5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT7CwXgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDzsFN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABwsFfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260108033051.777361-15-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=gb2312
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <aV6BzSbAjZJGJ-D5@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On 08/01/2026 04.30, Zhao Liu wrote:
-> From: Philippe Mathieu-Daud√© <philmd@linaro.org>
+On Wed, Jan 07, 2026 at 07:54:53AM -0800, Sean Christopherson wrote:
+> On Mon, Jan 05, 2026, Hou Wenlong wrote:
+> > Sorry for revisiting this topic after a long time. I haven't seen any
+> > new updates regarding this topic/series, and I didn°Øt find any recent
+> > activity on the GitHub repository. Is the multi-KVM topic still being
+> > considered for upstreaming, or is there anything blocking this?
 > 
-> Now all calls of x86 machines to fw_cfg_init_io_dma() pass DMA
-> arguments, so the FWCfgState (FWCfgIoState) created by x86 machines
-> enables DMA by default.
-> 
-> Although other callers of fw_cfg_init_io_dma() besides x86 also pass
-> DMA arguments to create DMA-enabled FwCfgIoState, the "dma_enabled"
-> property of FwCfgIoState cannot yet be removed, because Sun4u and Sun4v
-> still create DMA-disabled FwCfgIoState (bypass fw_cfg_init_io_dma()) in
-> sun4uv_init() (hw/sparc64/sun4u.c).
-> 
-> Maybe reusing fw_cfg_init_io_dma() for them would be a better choice, or
-> adding fw_cfg_init_io_nodma(). However, before that, first simplify the
-> handling of FwCfgState in x86.
-> 
-> Considering that FwCfgIoState in x86 enables DMA by default, remove the
-> handling for DMA-disabled cases and replace DMA checks with assertions
-> to ensure that the default DMA-enabled setting is not broken.
-> 
-> Then 'linuxboot.bin' isn't used anymore, and it will be removed in the
-> next commit.
-> 
-> Signed-off-by: Philippe Mathieu-Daud√© <philmd@linaro.org>
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> Acked-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> Changes since v4:
->   * Keep "dma_enabled" property in fw_cfg_io_properties[].
->   * Replace DMA checks with assertions for x86 machines.
-> ---
->   hw/i386/fw_cfg.c     | 16 ++++++++--------
->   hw/i386/x86-common.c |  6 ++----
->   2 files changed, 10 insertions(+), 12 deletions(-)
+> We have abandoned upstreaming multi-KVM.  The operational cost+complexity is too
+> high relative to the benefits, especially when factoring in things like ASI and
+> live patching, and the benefits are almost entirely obsoleted by kernel live update
+> support.
+>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+We need to look into the new features to see if they°Øre compatible with
+multi-KVM and how we can integrate them effectively. This is definitely
+challenging work. We also have the option to explore the kernel live
+update now.
 
+> > As Lai pointed out, we also have a similar multi-KVM implementation in
+> > our internal environment, so we are quite interested in this topic.
+> > Recently, when we upgraded our kernel version, we found that maintaining
+> > multi-KVM has become a significant burden.
+> 
+> Yeah, I can imagine the pain all too well.  :-/
+> 
+> > We are willing to move forward with it if multi-KVM is still accepted for
+> > upstream. So I look forward to feedback from the maintainers.
+> >
+> > From what I've seen, the recent patch set that enables VMX/SVM during
+> > booting is a good starting point for multi-KVM as well.
+> 
+> I have mixed feelings on multi-KVM.  Without considering maintenance and support
+> costs, I still love the idea of reworking the kernel to support running multiple
+> hypervisors concurrently.  But as I explained in the first cover letter of that
+> series[0], there is a massive amount of complexity, both in initial development
+> and ongoing maintenance, needed to provide such infrastructure:
+> 
+>  : I got quite far long on rebasing some internal patches we have to extract the
+>  : core virtualization bits out of KVM x86, but as I paged back in all of the
+>  : things we had punted on (because they were waaay out of scope for our needs),
+>  : I realized more and more that providing truly generic virtualization
+>  : instrastructure is vastly different than providing infrastructure that can be
+>  : shared by multiple instances of KVM (or things very similar to KVM)[1].
+>  :
+>  : So while I still don't want to blindly do VMXON, I also think that trying to
+>  : actually support another in-tree hypervisor, without an imminent user to drive
+>  : the development, is a waste of resources, and would saddle KVM with a pile of
+>  : pointless complexity.
+> 
+> For deployment to a relatively homogeneous fleet, many of the pain points can be
+> avoided by either avoiding them entirely or making the settings "inflexible",
+> because there is effectively one use case and so such caveats are a non-issue.
+> But those types of simplifications don't work upstream, e.g. saying "eVMCS is
+> unsupported if multi-KVM is possible" instead of moving eVMCS enabling to a base
+> module isn't acceptable.
+> 
+> So I guess my "official" stance is that I'm not opposed to upstreaming multi-KVM
+> (or similar) functionality, but I'm not exactly in favor of it either.  And
+> practically speaking, because multi-KVM would be in constant conflict with so
+> much ongoing/new feature support (both in software and hardware), and is not a
+> priority for anyone pursuing kernel live update, upstreaming would be likely take
+> several years, without any guarantee of a successful landing.
+> 
+> [0] https://lore.kernel.org/all/20251010220403.987927-1-seanjc@google.com
+> [1] https://lore.kernel.org/all/aOl5EutrdL_OlVOO@google.com
+
+Got it, thanks for your feedback!
 
