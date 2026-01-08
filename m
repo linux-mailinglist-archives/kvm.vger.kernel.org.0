@@ -1,214 +1,127 @@
-Return-Path: <kvm+bounces-67454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF468D05914
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 19:33:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E15D05962
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 19:36:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 66329306394D
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 18:31:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 29FFB305245E
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 18:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F96831AA91;
-	Thu,  8 Jan 2026 18:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEE531A07C;
+	Thu,  8 Jan 2026 18:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vM6gfqsW"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mdplkM00"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61A730F7E8
-	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 18:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06A63128BE
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 18:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767897087; cv=none; b=RIeClIZMcsrJxYfZkF3GYZzPPEiffE81FuiZhIq4XZm+P0f9sml0tiOYo2QKZXtfK3+vyLu2UAxR44GjCHdSksfTdlYQ2eFE3disG85NVLNBWC+DVUor9jGj7cTuI9e+FPKkronA/pC1GpFXTaN6oYwJRJ6h/O5gBiRZAWySxKk=
+	t=1767897224; cv=none; b=PWOplzMDtaFxFyLY6LouO9Yd+K9F4yFJ2BMmMROIhJ2/thb17QJchSvvZq+c6vxFLZPTFnfXufxtfhSMtpYCoDnvluhpwY1Fe3KRF9IRCFXSg34zctai6UKQ5b/oL7ynkWH6aOxD7p4b9t2pJZ1FDmvyKEO3Vt0g/6bDj/YSki4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767897087; c=relaxed/simple;
-	bh=HiZzKC6IpEiXD+YG7Xq5JdCfDWfJLzGMhECalIcNpBQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cfNUVm7dmRy0X5ldPd8eF/u1OUkoixcfC8Uppp6GoBQ2FIiIPE2TczJXoO0VOiybuPdasAq+jbDq4fndAyr8Lw8gXMgDeeThnxNzoMU+bvUZQr/sYvrIge2mEpHkizNmmwj/qOfy+Rr0IGk69mTRou8VMaffL/HEEX4zu+6WgJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vM6gfqsW; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c704d5d15so5822630a91.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 10:31:24 -0800 (PST)
+	s=arc-20240116; t=1767897224; c=relaxed/simple;
+	bh=friVe+ZjDGl0vJha3E5L94T8EUtcvl8xY3GpjIuxSMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vfm2zwDpHn6b0dmz5nnN3jzU1U1lo45jO7VaGnr7HDlB7zHre3uywk/g5CTq1Kae1zINkN8EqhS7lq5MwMpOdM/bGtRmcMyawkUUpuD6LDJqNPUrNx/GQxeljBSO4iJnZMns1s30NEvOrG5+ivp6cQ4HOrR+x6icP9cV0l2eqXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mdplkM00; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b25dd7ab33so264089485a.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 10:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767897084; x=1768501884; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nY/l54WU76DsZYqDI43j/uSoqA/+4oD9QHehzkck2fM=;
-        b=vM6gfqsWwI1u64FI4M91FEqxL5tVGhgDe3MSHI2wsgQWBqCFuGQS2ZzKKmCwEkwF8V
-         iaZCKCpf8bnkObE5VlthNEtm9ufO/3YoisO2OEvQSKvCI7gh13n6yIt5R4cVD/GjUBwc
-         d+Z4MalPRxDpUjvGoSSNdsn3ryzuXvG7VfGz3wsz80Cov3jLl14vqbQBdapOq7aJYQrc
-         qHxwPwc8fdFwCTpAgBxOt/aqUFqgXKMUfXk6IDGXdpsEkwEwQbmyI+XlDSl71ojwMO4M
-         MwQtlyDS+LuVazXVVLWaRiYF08kPJZtOwiAWsGJzDybEqMUP5Fm05X7IUdpOulkuQm9K
-         d/4A==
+        d=ziepe.ca; s=google; t=1767897221; x=1768502021; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VeDbCR7Lw3XLjb0kHArZW/oJZIOc8ufadN9fvBnzpPw=;
+        b=mdplkM00FTtzMNdw4W2AhXt1dihAiMJcdr80l2u3xXrtq3Y4CchWzA5BaxDdIOnqvY
+         K4hFFDpqQ24zbZTGxM/h10hEKD76drJH80UZDwueq3aMhRvqZojt/NGa2noknnH2AKcM
+         2mwlIZqzjdH3K61O/z8S+42uXAG8aXOI0Q0LBAq+7up9Cf5qrsRqE3QPmP2MnSoOi06G
+         90QsytLCcTOQHKlHu7qVtShpakHPkvRFDqKgfr1vU1AXYj1X0l+Oqn2Sj/8P7ycyLggo
+         prymzqAdno/8te1S5QGeqp2O+SGBwTgK7u8asJj5lDObmZDYHkUulToO3wfy6A0ITz0G
+         LDtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767897084; x=1768501884;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nY/l54WU76DsZYqDI43j/uSoqA/+4oD9QHehzkck2fM=;
-        b=qsXsCXwSTEX9TpYdfKdGBEP8pTFj7aCMO8wCjd0lroZ5oGquxqkpduy7ujqLr92Q7d
-         B3EXkQYPQZ04TzqErbvhVUGySVCHoigWVHUN/yoeFZ0pBA64YZhqfuve7VT6+Exxwkfj
-         tOpgEA0oYz/wQH+lETYt/QNMgnWR5+4Kk4sxK3Iyxl8eBnl5rer7L9lmdXxxy67E9wcm
-         qyNy7o3ExtBPpE71xTt2AZFQzA740MQOBgAvtvgCB5WPaSYzjWTqBuykIq+/mi7ammuS
-         m4rEruPChenqJVFgNHg5WfOl6EvUmpZCaWW136S4ZUuADk+KmAkvjgzi5JRV3HdowTMV
-         Q/yg==
-X-Forwarded-Encrypted: i=1; AJvYcCV0nGCbUe7eVFkuiQjZODWMzNKiNevBCaKdDzXqrvfKSEPpoqo3c40PLbSAcA42Gu2tAWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGU0TW1KrWBQDQD1D9OFkwJQ3/R6kZdjziZrOBwWqqvfIsHW1Y
-	DSMSuqzgmf81a02kJq9poY+lbyZS6Yin1IoT1nLpx9lb1uLt18jOKvrh8Jf06xd4RKeTktPDbOr
-	2W4U3Ig==
-X-Google-Smtp-Source: AGHT+IHEOdI4r0O9pcHM188bqvdusRA2ROI4oJ6wpZajhgwchTGU2kxOjQW3XQ2z18n6bt3vYCQzcYAxHoc=
-X-Received: from pjrx16.prod.google.com ([2002:a17:90a:bc90:b0:34c:6f7a:2ab8])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c09:b0:349:2154:eef4
- with SMTP id 98e67ed59e1d1-34f68b83d71mr6555128a91.5.1767897083980; Thu, 08
- Jan 2026 10:31:23 -0800 (PST)
-Date: Thu, 8 Jan 2026 10:31:22 -0800
-In-Reply-To: <gzyjze3wszmrwxdwnudij6nfqdxzihm37uappfqxorfjy5vatf@hffzaobbm3g7>
+        d=1e100.net; s=20230601; t=1767897221; x=1768502021;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VeDbCR7Lw3XLjb0kHArZW/oJZIOc8ufadN9fvBnzpPw=;
+        b=X6c0JAj5cVHiSwESQl3m72wAnUdV/sxOr7vTMeHmPntKf++Olrl4OvcheQq442s9k0
+         qitAe3tH6X/y0ysWHe0i43qFQMS3ZdykqqBQ7NIRJkwrdgp6LkK9YEtdPFEVgYGAOcok
+         NXuwSSo+6PkCz6/1d+q4kkt9QbCodog3pQX60P6BmmMTA0CVOWmL//g0MImzGIs8ZEbQ
+         yoJpaMlvQG+nfuJE/yZaIvWsQxzYXVjh0R6ja7278pvXe3AvE6DpyaJlz14e8GsGA3tf
+         guIJ+L6D6GFPOhysOaJtQKvNCDJ0MvA98PRMte0zO9ix+SISuP7135erGjYDC+m7hBzj
+         q2FA==
+X-Forwarded-Encrypted: i=1; AJvYcCWY5stiYPOlLApf9VfB2VbVQp/ftT69f/LBgxSm2THFRzHVWcGn4P4qjEkehmdobIQZPQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoERm5VxVpGWkj8xyGMq9RAgsv8p4Fd3KUurvXdrKyuFAMQbfb
+	aWYwbqN+v5d5OU1VA9e4zHv6uVDX7yAjZSxWQwv4ReOG8x8XxE9y1uGKq83zCUft7aE=
+X-Gm-Gg: AY/fxX6+IypNFbov5nedELb4BTFNZksf5O2pchT/wmtRwvz+6Hqa1gi8F24Zoathcca
+	HVG+5BF7OFbSq0YNt0kOuHP1nZckI3aByeZrcFW7fPB9bSiBroW7yIcymKQlBNt133u5PO+1OxH
+	XaCbaGa7OdnZgWrTAfQ7Tc9ZfRJq8rr+yl7iw71VjjGuW9Da2D4OyQ+UgsUkhxT5AJNCoLJgxQr
+	8dckCAisbaS2UfRRpfVmQgFsEpJf8dbN0mYLcEaHMyWeUFNHPt9wvty4oNNOWK1SnKLFzQ1UJzR
+	VNGy3OtVqGHmGHWhoZP6czG/oqJ0KNV4fYLtFusu4nkAk4fcSpvh+QBr31PXJWbbFvblyeAGmwD
+	DleVgTSdIkqFtS4ic2DsF2c7FiW3AY7KRXw1uEsRsW2a5HIeRqx0by8JtNgYt8PNir9OzoBRXi3
+	5+4kxbMwycDQc/JcCxSEdgtLLXKo53uyU37cwu+M1U4NAS6JEIt1sItA/QUj7dbSjFtro=
+X-Google-Smtp-Source: AGHT+IFvxaAGa9/1YlHwiUC0+rcyB8Si3/CdOHpRzOHE2IQYwWhD7wqizXJ2yXbaQu7l341Mgk8JvQ==
+X-Received: by 2002:a05:620a:7001:b0:8b2:2607:83d5 with SMTP id af79cd13be357-8c3893fa385mr961645785a.75.1767897221473;
+        Thu, 08 Jan 2026 10:33:41 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f51cdcesm640455285a.26.2026.01.08.10.33.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 10:33:40 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vdupH-00000002n7A-3fMQ;
+	Thu, 08 Jan 2026 14:33:39 -0400
+Date: Thu, 8 Jan 2026 14:33:39 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>,
+	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
+Message-ID: <20260108183339.GF545276@ziepe.ca>
+References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
+ <aV7yIchrL3mzNyFO@google.com>
+ <20260108005406.GA545276@ziepe.ca>
+ <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
+ <20260108141044.GC545276@ziepe.ca>
+ <20260108084514.1d5e3ee3@shazbot.org>
+ <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251230230150.4150236-1-seanjc@google.com> <20251230230150.4150236-22-seanjc@google.com>
- <t7dcszq3quhqprdcqz7keykxbmqf62pdelqrkeilpbmsrnuji5@a3lplybmlbwf>
- <aV_cLAlz4v1VOkDt@google.com> <gzyjze3wszmrwxdwnudij6nfqdxzihm37uappfqxorfjy5vatf@hffzaobbm3g7>
-Message-ID: <aV_3-lhnZ-MoKnjv@google.com>
-Subject: Re: [PATCH v4 21/21] KVM: selftests: Test READ=>WRITE dirty logging
- behavior for shadow MMU
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
 
-On Thu, Jan 08, 2026, Yosry Ahmed wrote:
-> On Thu, Jan 08, 2026 at 08:32:44AM -0800, Sean Christopherson wrote:
-> > On Fri, Jan 02, 2026, Yosry Ahmed wrote:
-> > diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-> > index ab869a98bbdc..fab18e9be66c 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-> > @@ -390,6 +390,13 @@ static uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm,
-> >  	return virt_get_pte(vm, mmu, pte, vaddr, PG_LEVEL_4K);
-> >  }
-> >  
-> > +uint64_t *tdp_get_pte(struct kvm_vm *vm, uint64_t l2_gpa)
+On Thu, Jan 08, 2026 at 10:24:19AM -0800, David Matlack wrote:
+> > > Oh, I was thinking about a compatability only flow only in the type 1
+> > > emulation that internally magically converts a VMA to a dmabuf, but I
+> > > haven't written anything.. It is a bit tricky and the type 1 emulation
+> > > has not been as popular as I expected??
+> >
+> > In part because of this gap, I'd guess.  Thanks,
 > 
-> nested_paddr is the name used by tdp_map(), maybe use that here as well
-> (and in the header)?
+> Lack of huge mappings in the IOMMU when using VFIO_TYPE1_IOMMU is
+> another gap I'm aware of.
+> vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
+> fails when IOMMUFD_VFIO_CONTAINER is enabled.
 
-Oh hell no :-)  nested_paddr is a terrible name (I was *very* tempted to change
-it on the fly, but restrained myself).  "nested" is far too ambigous, e.g. without
-nested virtualization, "nested_paddr" arguably refers to _L1_ physical addresses
-(SVM called 'em Nested Page Tables after all).
+What is this? I'm not aware of it..
 
-> > +	int level = PG_LEVEL_4K;
-> > +
-> > +	return __vm_get_page_table_entry(vm, &vm->stage2_mmu, l2_gpa, &level);
-> > +}
-> > +
-> >  uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr)
-> >  {
-> >  	int level = PG_LEVEL_4K;
-> [..]
-> > @@ -133,35 +220,50 @@ static void test_dirty_log(bool nested_tdp)
-> >  
-> >  	/* Add an extra memory slot for testing dirty logging */
-> >  	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> > -				    GUEST_TEST_MEM,
-> > +				    TEST_MEM_BASE,
-> >  				    TEST_MEM_SLOT_INDEX,
-> >  				    TEST_MEM_PAGES,
-> >  				    KVM_MEM_LOG_DIRTY_PAGES);
-> >  
-> >  	/*
-> > -	 * Add an identity map for GVA range [0xc0000000, 0xc0002000).  This
-> > +	 * Add an identity map for GVA range [0xc0000000, 0xc0004000).  This
-> >  	 * affects both L1 and L2.  However...
-> >  	 */
-> > -	virt_map(vm, GUEST_TEST_MEM, GUEST_TEST_MEM, TEST_MEM_PAGES);
-> > +	virt_map(vm, TEST_MEM_BASE, TEST_MEM_BASE, TEST_MEM_PAGES);
-> >  
-> >  	/*
-> > -	 * ... pages in the L2 GPA range [0xc0001000, 0xc0003000) will map to
-> > -	 * 0xc0000000.
-> > +	 * ... pages in the L2 GPA ranges [0xc0001000, 0xc0002000) and
-> > +	 * [0xc0003000, 0xc0004000) will map to 0xc0000000 and 0xc0001000
-> > +	 * respectively.
-> 
-> Are these ranges correct? I thought L2 GPA range [0xc0002000,
-> 0xc0004000) will map to [0xc0000000, 0xc0002000).
+> Is the plan to address all the gaps so IOMMUFD_VFIO_CONTAINER can be
+> made the default and the type1 code can be dropped from the upstream
+> kernel?
 
-Gah, no.  I looked at the comments after changing things around, but my eyes had
-glazed over by that point.
+This was a dream for sure, distros can decide if they want to continue
+to support both or have an option to do just one.
 
-> Also, perhaps it's better to express those in terms of the macros?
-> 
-> L2 GPA range [TEST_MEM_ALIAS_BASE, TEST_MEM_ALIAS_BASE + 2*PAGE_SIZE)
-> will map to [TEST_MEM_BASE, TEST_MEM_BASE + 2*PAGE_SIZE)?
-
-Hmm, no, at some point we need to concretely state the addresses, so that people
-debugging this know what to expect, i.e. don't have to manually compute the
-addresses from the macros in order to debug.
-
-> >  	 *
-> >  	 * When TDP is disabled, the L2 guest code will still access the same L1
-> >  	 * GPAs as the TDP enabled case.
-> > +	 *
-> > +	 * Set the Dirty bit in the PTEs used by L2 so that KVM will create
-> > +	 * writable SPTEs when handling read faults (if the Dirty bit isn't
-> > +	 * set, KVM must intercept the next write to emulate the Dirty bit
-> > +	 * update).
-> >  	 */
-> >  	if (nested_tdp) {
-> > +		vm_vaddr_t gva0 = TEST_GUEST_ADDR(TEST_MEM_ALIAS_BASE, 0);
-> > +		vm_vaddr_t gva1 = TEST_GUEST_ADDR(TEST_MEM_ALIAS_BASE, 1);
-> 
-> Why are these gvas? Should these be L2 GPAs?
-
-Pure oversight.
-
-> Maybe 'uint64_t l2_gpa0' or 'uint64_t nested_paddr0'?
-
-For better of worse, vm_paddr_t is the typedef in selftests.  Hmm, if/when we go
-with David M's proposal to switch to u64 (from e.g. uint64_t), it'd probably be
-a good time to switch to KVM's gva_t and gpa_t as well.
-
-> Also maybe add TEST_ALIAS_GPA() macro to keep things consistent?
-
-Ya, then the line lengths are short enough to omit the local variables.  How's
-this look?
-
-	/*
-	 * ... pages in the L2 GPA address range [0xc0002000, 0xc0004000) will
-	 * map to [0xc0000000, 0xc0002000) when TDP is enabled (for L2).
-	 *
-	 * When TDP is disabled, the L2 guest code will still access the same L1
-	 * GPAs as the TDP enabled case.
-	 *
-	 * Set the Dirty bit in the PTEs used by L2 so that KVM will create
-	 * writable SPTEs when handling read faults (if the Dirty bit isn't
-	 * set, KVM must intercept the next write to emulate the Dirty bit
-	 * update).
-	 */
-	if (nested_tdp) {
-		tdp_identity_map_default_memslots(vm);
-		tdp_map(vm, TEST_ALIAS_GPA(0), TEST_GPA(0), PAGE_SIZE);
-		tdp_map(vm, TEST_ALIAS_GPA(1), TEST_GPA(1), PAGE_SIZE);
-
-		*tdp_get_pte(vm, TEST_ALIAS_GPA(0)) |= PTE_DIRTY_MASK(&vm->stage2_mmu);
-		*tdp_get_pte(vm, TEST_ALIAS_GPA(1)) |= PTE_DIRTY_MASK(&vm->stage2_mmu);
-	} else {
-		*vm_get_pte(vm, TEST_GVA(0)) |= PTE_DIRTY_MASK(&vm->mmu);
-		*vm_get_pte(vm, TEST_GVA(1)) |= PTE_DIRTY_MASK(&vm->mmu);
-	}
+Jason
 
