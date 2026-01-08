@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-67394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F67D037BA
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 15:48:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A271D03518
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 15:23:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FCBF333C739
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 14:34:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B3E7A301D2E8
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 14:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6EC5450294;
-	Thu,  8 Jan 2026 14:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B834CCA96;
+	Thu,  8 Jan 2026 14:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lpcp3w7g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBUA3e2E"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC6F44D6A3;
-	Thu,  8 Jan 2026 14:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8E94C00D4;
+	Thu,  8 Jan 2026 14:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881955; cv=none; b=Zc/ChbdKeqf9fKV/n8q2snnqYx6umQWwsyo1B/M+beZQagGdwKL49A3r/bWXvL53CRVeFjGdztEsr2qMa62VdXuSLyg8fCFc7rZysCneTrBawcUXIbEEIgraGjIEKOLdR2PlEBg+t288LoHkj7axA6qZdtDQ8HUnj4zIKY2cAJU=
+	t=1767881983; cv=none; b=pveziAYTjribRu3vzM1U780d5b4fwlYfmM2wFngOff7GduPD3AuMuPEtRby9MTBs6tmVnQDGYcDZrltPHhFuN07DDNYGlF0kzAERp76yBUGMVXXYbSY2eRMNDE9bzO1fu9BeTNXGMYWMGuHQsq7aOEK6Bf4P+gGWfxkhf1fvOYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881955; c=relaxed/simple;
-	bh=Kmij4qyDrN8Z0vImiN8j8I9vDenr/lmN1w+0d4gtGj4=;
+	s=arc-20240116; t=1767881983; c=relaxed/simple;
+	bh=OXZpR2x0jhtPlXKOppogmLUfLlP5QjVMG9P2V3E+IvU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iZJhewwN4GMWiuuw+Or0Fs2qiBecCHw7150i1A+3QEwotTbXE+dG+z8UxmZFrQe+gHQ2eHuvLnwl0EBMLaLfQR9XlZ9e7ygW6vk+Aiiz08l9Bde4k8PvdD89rOX+0/vlgFnLCqJH1pjDXVMGSp9V4SsxvlUe/jP9e9jkn04htBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lpcp3w7g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 369ECC116C6;
-	Thu,  8 Jan 2026 14:19:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=PLT5yt9O3X4JG6E56wPCy27T8AD/vXVw1uIx0DPRdbW4+PMI/ZMmmM9A4xloPvCG3n/JW75o1EmVSHak5e0rMfl6qBenZ8O3twQsvqlFjMdKL0Psw3tWVmQl1TClKnQKj3Q9h2U4u42zZ/9o8csS6tsAS9gZ5xAFyQ++vvh/JUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBUA3e2E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEEAAC16AAE;
+	Thu,  8 Jan 2026 14:19:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767881955;
-	bh=Kmij4qyDrN8Z0vImiN8j8I9vDenr/lmN1w+0d4gtGj4=;
+	s=k20201202; t=1767881983;
+	bh=OXZpR2x0jhtPlXKOppogmLUfLlP5QjVMG9P2V3E+IvU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lpcp3w7g4XxQeU/e4Cup0Ls3LdTAVUc+FH8WBXDZJURrCvMO1FVHzQCNO+mnfqsvT
-	 P6Ilbu/knDjXmRjn5IrVFb9ZTyfxturMu96i/CgkGjB81hd7C703TvIzUT3uHZ/nkT
-	 WefCRw9MQxWjRjV0Ta+utaWiRlozOOCx566yQTL3I9yz4RBXL2zlH0cuoB70hb7+wK
-	 Sa77JV4SLIaPJ8fpxoV0Sq2LBw2sQDwSIxBIpiWCxZpigX5T4hIYlcJXFuNqnk/jz5
-	 iUsvxN+uW0N0rUGtrGd41eDk1GIAtRzyjgnIb9KSeQ1l5+VWLo8tOTqOntdai0nIQf
-	 gfKIvLlT1lE7w==
+	b=UBUA3e2ESC4rqJQPvoLBK5lLDGKusO6010lWnP4RFr8z+MeP8XRPiEr1qNw2V0fEZ
+	 tATpa6cFlGw3jxbT0b0hKhh60I3pCo1OX9PVHWQZA+ZyBQNWFlAr6bZnKl+bRMe0Lz
+	 uYDeIbUmvh6FYgfpM3cEFcsG+zqJ2SYVKfhBQ+4mVxlr2G5QVyukVftlheWvTHMq6U
+	 Ahqj9uR0lmBtsGcKXRW/kQxUvxj0vTgc1eCxAMQfYGSMIpDPGtbWK/B8rCp2ri6dsd
+	 kKtmG+pojiD4FYzATdVWk1Ingu5NbEt0OouvapRqkTOhGV3CyjrXsTkJIoFANkvN9k
+	 K9ElpLFbah+0w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vdqr3-00000000R22-0vOA;
-	Thu, 08 Jan 2026 14:19:13 +0000
-Date: Thu, 08 Jan 2026 14:19:12 +0000
-Message-ID: <861pk0mbkv.wl-maz@kernel.org>
+	id 1vdqrU-00000000R2M-2lzH;
+	Thu, 08 Jan 2026 14:19:40 +0000
+Date: Thu, 08 Jan 2026 14:19:40 +0000
+Message-ID: <86zf6okwzn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -58,10 +58,9 @@ Cc: kvmarm@lists.linux.dev,
 	aneesh.kumar@kernel.org,
 	steven.price@arm.com,
 	tabba@google.com
-Subject: Re: [PATCH kvmtool v4 01/15] Allow pausing the VM from vcpu thread
-In-Reply-To: <20250930103130.197534-2-suzuki.poulose@arm.com>
+Subject: Re: [PATCH kvmtool 00/15] arm64: Handle PSCI calls in userspace
+In-Reply-To: <20250930103130.197534-1-suzuki.poulose@arm.com>
 References: <20250930103130.197534-1-suzuki.poulose@arm.com>
-	<20250930103130.197534-2-suzuki.poulose@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,99 +76,22 @@ X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 30 Sep 2025 11:31:15 +0100,
+On Tue, 30 Sep 2025 11:31:14 +0100,
 Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> Pausing the VM from a vCPU thread doesn't work today, as it waits indefinitely
-> for a signal that never comes. By using the "current_kvm_cpu", enlighten the
-> kvm__pause() to skip the current CPU and do it inline. This also brings in a
-> restriction that a following kvm__continue() must be called from the same vCPU
-> thread.
+> This is version 4 of the patch series, originally posted by Oliver [0]. Mostly
+> remains the same as v3, except for
 > 
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Oliver Upton <oliver.upton@linux.dev>
-> Link: https://lore.kernel.org/all/20230918104028.GA17744@willie-the-truck/
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  kvm.c | 35 +++++++++++++++++++++++++++++++----
->  1 file changed, 31 insertions(+), 4 deletions(-)
+>  - Address Will's comment on the race between pause/resume - Patch 1
+>  - Rebase on to v6.17-rc7
+>  - Drop importing cputype.h, which was not used by the series
 > 
-> diff --git a/kvm.c b/kvm.c
-> index 07089cf1..cc25ecdb 100644
-> --- a/kvm.c
-> +++ b/kvm.c
-> @@ -59,6 +59,8 @@ const char *kvm_exit_reasons[] = {
->  
->  static int pause_event;
->  static DEFINE_MUTEX(pause_lock);
-> +static struct kvm_cpu *pause_req_cpu;
-> +
->  extern struct kvm_ext kvm_req_ext[];
->  
->  static char kvm_dir[PATH_MAX];
-> @@ -573,9 +575,25 @@ void kvm__reboot(struct kvm *kvm)
->  
->  void kvm__continue(struct kvm *kvm)
->  {
-> +	/*
-> +	 * We must ensure that the resume request comes from the same context
-> +	 * as the one requested the pause, especially if it was issued from a
-> +	 * vCPU thread.
-> +	 */
-> +	if (current_kvm_cpu) {
-> +		if (pause_req_cpu != current_kvm_cpu ||
-> +		    !current_kvm_cpu->paused)
-> +			die("Trying to resume VM from invalid context");
-> +		current_kvm_cpu->paused = 0;
-> +	}
->  	mutex_unlock(&pause_lock);
->  }
->  
-> +/*
-> + * Mark all active CPUs as paused, until kvm__continue() is issued.
-> + * NOTE: If this is called from a cpu thread, kvm__continue() must
-> + * be called from the same thread.
-> + */
->  void kvm__pause(struct kvm *kvm)
->  {
->  	int i, paused_vcpus = 0;
-> @@ -590,10 +608,17 @@ void kvm__pause(struct kvm *kvm)
->  	if (pause_event < 0)
->  		die("Failed creating pause notification event");
->  	for (i = 0; i < kvm->nrcpus; i++) {
-> -		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0)
-> -			pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
-> -		else
-> -			paused_vcpus++;
-> +		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0) {
-> +			if (current_kvm_cpu != kvm->cpus[i]) {
-> +				pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
-> +				continue;
-> +			} else if (current_kvm_cpu) {
-> +				current_kvm_cpu->paused = 1;
-> +				pause_req_cpu = current_kvm_cpu;
+> [0] https://lore.kernel.org/all/20230802234255.466782-1-oliver.upton@linux.dev/
 
-This is also set as we leave the function. Why do we need to set it
-twice?
+The remark on the first and last patches aside, this looks rather good
+to me. With that addressed:
 
-> +				/* fall through to update our count */
-> +			}
-> +		}
-> +		paused_vcpus++;
->  	}
->  
->  	while (paused_vcpus < kvm->nrcpus) {
-> @@ -604,6 +629,8 @@ void kvm__pause(struct kvm *kvm)
->  		paused_vcpus += cur_read;
->  	}
->  	close(pause_event);
-> +	/* Remember the context requesting pause */
-> +	pause_req_cpu = current_kvm_cpu;
->  }
->  
->  void kvm__notify_paused(void)
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
