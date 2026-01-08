@@ -1,146 +1,196 @@
-Return-Path: <kvm+bounces-67391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F9DD039AC
-	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 15:59:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 483DAD035E7
+	for <lists+kvm@lfdr.de>; Thu, 08 Jan 2026 15:33:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 004ED31E05BA
-	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 14:28:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5C26B3007916
+	for <lists+kvm@lfdr.de>; Thu,  8 Jan 2026 14:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6342C4E6E0C;
-	Thu,  8 Jan 2026 14:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4365F37F8BD;
+	Thu,  8 Jan 2026 14:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkjFvcQ6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LR/nXuzw";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="g7sjFu/e"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6714E6DF6;
-	Thu,  8 Jan 2026 14:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2340823EA8C
+	for <kvm@vger.kernel.org>; Thu,  8 Jan 2026 14:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881651; cv=none; b=HnaHhri1fvSpQOTTY0GxHC6BweoGnc9yNW7kxGDkmZACTjeVwEscsvVyWlhJWJDqwEceaauaS1W6sbfb3bCJhA+LKAuVpw2OGehum4Xs58U2WLZvQvEOxKePIU37smVPs7QlfpgfagWI9ADauMWPVl659sI1qKLr0PVrHrbhR1c=
+	t=1767881880; cv=none; b=XkflUOd2Nhcboj+bsqdpR593pTidals5RD0wg+nlM1Dgw2lMjEbiKmWfE7HF+HR/keNj6U6y8aUc3KH9uCnPRsDbyR1M3LEplx9fedtDZOnWbBWVAX9+l4VvJDUuCvHvqef28AsDpBVq9jOH/f+yzuq24D33pExzEN2vBOVKj9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881651; c=relaxed/simple;
-	bh=PclDSMkxQTnfjWJ1QJChIBnve9ojYFh9rJwlsRzU3g0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D24JSsj0Vu1Pn3EwqRJHpLUDDvW4Bxlx1a9EQGu3KDUJ/xutMuuQ6ITsFHjl68XfjuxBoFRZ7E0OtunFOr6ahwFbTJlaAauz37EisSqQNYqZNwtpQ8i35IWomLMMQ/iPQEjtn4S1GFKitK1L78EaKmbjug2VtWUPFykA4weqk5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkjFvcQ6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04B25C19422;
-	Thu,  8 Jan 2026 14:14:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767881651;
-	bh=PclDSMkxQTnfjWJ1QJChIBnve9ojYFh9rJwlsRzU3g0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KkjFvcQ6BqxLJ+uLScB6z4Kil0b0v50RHuWDZACioD+s7xd3vngRo+zgT0b7LIHq5
-	 Glx1BqKsiWfr9woZRag7Q51VeJ+5GVkBwlUspr+3o2SHdGB7RRvXjj5VAKNaKxOOYU
-	 Vs2N8e2j5TDG9MU7BVKhFHK2pcT8mldsEJxZe+N+CLhFLQflvSjDHp+6oY17c5Ra6p
-	 yJU4Fkyxb7QkcXlhgLNNsZp9oDPoXKmnOd8TnThYPjKhCbTvc1Y8m39c8RvxMGdlAA
-	 MVZHVtXSEQ3qp1Yue/GhjREToLDmpvuaJOadJzh3lNdkV+XZuFxUEviUXvXm3VmlQo
-	 AsK03Q8B9/i6g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vdqm8-00000000Qvv-31WT;
-	Thu, 08 Jan 2026 14:14:08 +0000
-Date: Thu, 08 Jan 2026 14:14:08 +0000
-Message-ID: <86344gmbtb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	oliver.upton@linux.dev,
-	alexandru.elisei@arm.com,
-	aneesh.kumar@kernel.org,
-	steven.price@arm.com,
-	tabba@google.com
-Subject: Re: [PATCH kvmtool v4 15/15] arm64: smccc: Start sending PSCI to userspace
-In-Reply-To: <20250930103130.197534-17-suzuki.poulose@arm.com>
-References: <20250930103130.197534-1-suzuki.poulose@arm.com>
-	<20250930103130.197534-17-suzuki.poulose@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1767881880; c=relaxed/simple;
+	bh=OyIQ4x46NnhuAF46QiC0P1xvTdYkXW0VaN1yOEbVEDQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=POfTDjyLnbJYvypyuoR3gK6QFP1XQgjTaMV6lZUZm+alB4oYy/LUldP/yqduDjnAtPXrdx53yn7FNDCAFtx6h7WXappZeIXKhbJG1CI6N9kdfVsxPrgMOoDpOuFoFvsF9cS4j61xvYAhLbvBujs9q4X7Wi7+iIHM/6EB4CSoXB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LR/nXuzw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g7sjFu/e; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767881877;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fJ1lT1EolLhB5JifwSURg3jL1WOY3ilSvQ0LTyMqODM=;
+	b=LR/nXuzwop/FXzYCptdu4OOiq9sC3521JW2+LXEkxN/lUr5IwaNlZD/6UimSJt1m6gxeBD
+	lB7QbyX2z8bVdRHRJv6oOFIszLGwLh6VqbO40t9znAg9vBzizZv6dWGSifYoud15A6ovfH
+	ZAqlftreaEAyOM95ouDMq2ilQkrIhak=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-355-rNwMlGvdN7qzEkx9QhNRug-1; Thu, 08 Jan 2026 09:17:55 -0500
+X-MC-Unique: rNwMlGvdN7qzEkx9QhNRug-1
+X-Mimecast-MFC-AGG-ID: rNwMlGvdN7qzEkx9QhNRug_1767881875
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43009df5ab3so2102161f8f.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 06:17:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767881874; x=1768486674; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fJ1lT1EolLhB5JifwSURg3jL1WOY3ilSvQ0LTyMqODM=;
+        b=g7sjFu/eqYd8CduJmJi5LBL/NthqffZdBfVYNP9sT9LiRma1mmPz+uA55dl8r3o+P2
+         9aBN8RtpmX+EPt+OSU70NItWuFCpzVP9lTzO0S3kjaEAW0RFCE4C7CO2Ltl1cdLuMs3p
+         W8sWdOuDHqIBIt0/cnPwvqgIdzHzd87cOZFurOKy2x8JxaKVsuYFUzU7ZK+2zl8wtf9T
+         Tb7WN5/aoUOwSPnXG3rg8+yL4DHPmPSzDFUEmdDn5I8bj2p8nMFEBa2BpHH2YHRdGGOh
+         Et33RI16Zoj2qaq8Cp0r6TJxLtyzonv2QFxTt5Bsh4ILImaEXYrqpadVDKj6B2lb4ABZ
+         4AYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767881874; x=1768486674;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fJ1lT1EolLhB5JifwSURg3jL1WOY3ilSvQ0LTyMqODM=;
+        b=BEwyckqtsCRCiSN8V4zgcIL9sc9l33nLW7mmFOSrsrpxhmNkssQWB6bz/0kcb1pEyj
+         2RNj9ZBhSxakQ4uu9KWRxYgVCBhEPKLUxv1nai0o2XfPbQ2EID4nrxCz80YgHEz9PgjV
+         BPu6viLO9ccLd1Gjk4ZVrHfcp3V3OP90cFzGAdJ+InDEdDM9DY4QjwZN/XCLzlcAbtaK
+         WiYF6Ak737hjKwZBwfUTDomElhV6GqSBk3O4tlWBrqpfiIoD4v1fho1aVZmIjO7fjFcF
+         rvNN4eJHXWJIOaFlwhf621tmYfLtL4aEf7ZES3jiQX7I/RtpOqTJcNihqSs34a5RNt5M
+         0w6w==
+X-Forwarded-Encrypted: i=1; AJvYcCXD2lK94v0nJDGqDxb9Q38068fiwQT/Vm/piPrBLKul3sGLFsPeiVb28lQsB3sEiIdZ7Gs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCEal7x5btWUpMegjdaC+O9VM5C5IyDG6Gbjb0KvAuy4qFJEaN
+	ukB4b+0G/r5tlM3sbe7bw9aJf5uMBj69CnM8Vf5hO+yY8Kmwi3u5thhossKF3zDUu0PYZxQzBbf
+	LItAZ8vCKViormgx2z7dz206KO5x4H943Sv663ej8C23OP+nNwgzFjQ==
+X-Gm-Gg: AY/fxX4kOy3dJtj3vpY5sT8cl/0qWeC1aWlwkZyVODGU+jKu/Kx0+C/SMHgggqQgddf
+	yQ3VkFFVSBR9IPCthN2u+cE4UkPHtSnV3ScmMia3wy7MptiZl+vxxbqbPm/EhikW213dYrjeE7R
+	D4aI+gWOiMK2wuK7TcICFc4Ndmyq408PTd/0eKB6+h9wAnIfNE6Jmo5/DHP0DsHR4IS8ZzDQvPC
+	ykzhFFKcmkQ3NoWZuAYC49pN/awDa9jgaUXj4D3Jc4okKMJqgL93PnuLnpizLNmLD+7mYVk1zlU
+	zYBHPR7RB3xXiSeOa+x+rcHsDRGlhKIDuKTwI+J4ItLIt8uFahc1RDb4KBvp1YTkJR+hcRkQ2rt
+	S0EWdR5oow/nL++Hs+b/QgfZCPk3/crbnJw==
+X-Received: by 2002:a05:6000:2483:b0:42f:b0ab:7b48 with SMTP id ffacd0b85a97d-432c3627fbamr7468094f8f.1.1767881874573;
+        Thu, 08 Jan 2026 06:17:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlUVHuOj7/HPTlOMU0+NpCVpFuCnGhMJ1KC00yBihfngclSciPQ4cpm1QXhZzj17NQ1UZXYA==
+X-Received: by 2002:a05:6000:2483:b0:42f:b0ab:7b48 with SMTP id ffacd0b85a97d-432c3627fbamr7468022f8f.1.1767881873896;
+        Thu, 08 Jan 2026 06:17:53 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee5eesm16735262f8f.34.2026.01.08.06.17.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 06:17:53 -0800 (PST)
+Date: Thu, 8 Jan 2026 09:17:49 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 13/15] vsock/virtio: reorder fields to reduce padding
+Message-ID: <20260108091514-mutt-send-email-mst@kernel.org>
+References: <cover.1767601130.git.mst@redhat.com>
+ <fdc1da263186274b37cdf7660c0d1e8793f8fe40.1767601130.git.mst@redhat.com>
+ <aV-6gniRnZlNvkwc@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, will@kernel.org, oliver.upton@linux.dev, alexandru.elisei@arm.com, aneesh.kumar@kernel.org, steven.price@arm.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aV-6gniRnZlNvkwc@sgarzare-redhat>
 
-On Tue, 30 Sep 2025 11:31:30 +0100,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On Thu, Jan 08, 2026 at 03:11:36PM +0100, Stefano Garzarella wrote:
+> On Mon, Jan 05, 2026 at 03:23:41AM -0500, Michael S. Tsirkin wrote:
+> > Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
+> > last. This eliminates the padding from aligning the struct size on
+> > ARCH_DMA_MINALIGN.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > net/vmw_vsock/virtio_transport.c | 8 +++++---
+> > 1 file changed, 5 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > index ef983c36cb66..964d25e11858 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -60,9 +60,7 @@ struct virtio_vsock {
+> > 	 */
+> > 	struct mutex event_lock;
+> > 	bool event_run;
+> > -	__dma_from_device_group_begin();
+> > -	struct virtio_vsock_event event_list[8];
+> > -	__dma_from_device_group_end();
+> > +
+> > 	u32 guest_cid;
+> > 	bool seqpacket_allow;
+> > 
+> > @@ -76,6 +74,10 @@ struct virtio_vsock {
+> > 	 */
+> > 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
+> > 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
+> > +
 > 
-> From: Oliver Upton <oliver.upton@linux.dev>
+> IIUC we would like to have these fields always on the bottom of this struct,
+> so would be better to add a comment here to make sure we will not add other
+> fields in the future after this?
+
+not necessarily - you can add fields after, too - it's just that
+__dma_from_device_group_begin already adds a bunch of padding, so adding
+fields in this padding is cheaper.
+
+
+do we really need to add comments to teach people about the art of
+struct packing?
+
+> Maybe we should also add a comment about the `event_lock` requirement we
+> have in the section above.
 > 
-> kvmtool now has a PSCI implementation that complies with v1.0 of the
-> specification. Use the SMCCC filter to start sending these calls out to
-> userspace for further handling. While at it, shut the door on the
-> legacy, KVM-specific v0.1 functions.
+> Thanks,
+> Stefano
+
+hmm which requirement do you mean?
+
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arm64/include/kvm/kvm-config-arch.h |  8 +++++--
->  arm64/smccc.c                       | 37 +++++++++++++++++++++++++++++
->  2 files changed, 43 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> index ee031f01..3158fadf 100644
-> --- a/arm64/include/kvm/kvm-config-arch.h
-> +++ b/arm64/include/kvm/kvm-config-arch.h
-> @@ -15,6 +15,7 @@ struct kvm_config_arch {
->  	u64		fw_addr;
->  	unsigned int	sve_max_vq;
->  	bool		no_pvtime;
-> +	bool		in_kernel_smccc;
->  };
->  
->  int irqchip_parser(const struct option *opt, const char *arg, int unset);
-> @@ -52,11 +53,14 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
->  			   "Force virtio devices to use PCI as their default "	\
->  			   "transport (Deprecated: Use --virtio-transport "	\
->  			   "option instead)", virtio_transport_parser, kvm),	\
-> -        OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
-> +	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
->  		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
->  		     "Type of interrupt controller to emulate in the guest",	\
->  		     irqchip_parser, NULL),					\
->  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
-> -		"Address where firmware should be loaded"),
-> +		"Address where firmware should be loaded"),			\
-> +	OPT_BOOLEAN('\0', "in-kernel-smccc", &(cfg)->in_kernel_smccc,		\
-> +			"Disable userspace handling of SMCCC, instead"		\
-> +			" relying on the in-kernel implementation"),
->
+> > +	__dma_from_device_group_begin();
+> > +	struct virtio_vsock_event event_list[8];
+> > +	__dma_from_device_group_end();
+> > };
+> > 
+> > static u32 virtio_transport_get_local_cid(void)
+> > -- 
+> > MST
+> > 
 
-nit: this really is about PSCI, not SMCCC. The fact that we use the
-SMCCC interface to route PSCI calls is an implementation detail,
-really. The other thing is that this is a change in default behaviour,
-and I'd rather keep in-kernel PSCI to be the default, specially given
-that this otherwise silently fails on old kernels.
-
-To that effect, I'd suggest the following instead:
-
-+	OPT_BOOLEAN('\0', "psci", &(cfg)->userspace_psci,		\
-+			"Request userspace handling of PSCI, instead"		\
-+			" relying on the in-kernel implementation"),
-
-and the code modified accordingly.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
