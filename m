@@ -1,248 +1,321 @@
-Return-Path: <kvm+bounces-67632-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67633-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 160AED0BD6F
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 19:30:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9589DD0C00D
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 20:06:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BD7243047FFB
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 18:29:53 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1DCCE3020C06
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 19:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7079B368283;
-	Fri,  9 Jan 2026 18:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E00A2E7631;
+	Fri,  9 Jan 2026 19:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Un1E5eKf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gLbrtWYl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A057F366546
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 18:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767983391; cv=none; b=K9CrJcLKSgat80bcSBbOe1gv1A6gfTcMhfPOQy0SWNzTOIT385Dp/OpqH/K1iLE2/O6YUUgj2jZJK/RFE4kWRitRm/FD6/DIoTbtplJBGFgiDxTWoDg4EpKz8lhUTf9JiR+4+bRPvEgxUFMItJaUyykaTKB4IdxuSHMFSOqf/jc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767983391; c=relaxed/simple;
-	bh=2H4oXaiuKcTkJMgXWW3Q9GF0HFkVU/b0UuFWnXoPIBQ=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c7c0qQb8uS4CeE56d3fRgbGs170jPrXWNyLtZELQeVjGfSm5J8HjN4a+K3vPPY+L18CsKD561b9K5NTtTEoUmVYTZxA70mlqZ0T+srwqN2CfC3JmolNyhS0Bpur4VMBn9QfSr0GUs2DAl30p6aBBAeqiK3ICK92jguRHsfr1qhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Un1E5eKf; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6022DF719
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 19:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767985556; cv=pass; b=j6UNM8xBf42Rq0/NDXwkX+LYLfUGYyiMLdDUc3lBQm/oteARVj+Uci4YZyn+YguUR+b71Y+TlOXCkdISVhX7nZ/H5Yi+tZbZk1PHf4es2639hUEjSSZTSWrNJiVgJ+sPeGqx+Qd40xb1nSH6b2mDli1+RU+av+Jrs87s6meAxyw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767985556; c=relaxed/simple;
+	bh=r30yWHIvJYSIjkE2WJJ9/Bwq+JHgLd6IARJpcPxcu/4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dv9AsCHt9pVt87ie+a7oty0HIyTqhdDMlWYdBv6C8O1f6Fhp5fXnvata2TDUrOmwhXyF1DOvfKl//kPo4yBiWk6pKxgLRSkfcY2EqM0UI0HFMPvBqHnYOpF0iw5hZPBgwpXs9FGSu8NkavLHw/mUK5QD5Hg8++DBxud6wWNsOiY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gLbrtWYl; arc=pass smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-9412f43cb9eso2806988241.2
-        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 10:29:49 -0800 (PST)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ffbaaafac4so65161cf.0
+        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 11:05:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767985554; cv=none;
+        d=google.com; s=arc-20240605;
+        b=H+Q3oIoqKzBtAwLXudA5o9Lu0Qge5hb1wJwl++W2ISZHYIAqzoRJPq84rUKQP7BMkf
+         Yo1DvB+fo4KLEgJNxezoeauExDDddjKcqyLuOv2KUxMTFOmzju4lPJMaKACCQGD9LnL5
+         KK3z48GP/xUKSggbb4NpmP+EmxIpmg+2vmPNV6Mgz5O2JEsWsdwyfF9XlENWjFaNTInc
+         eZ7ZUbc1gkLz/sXRtopFAWR/u7RLQjW+I3ckMesHTrA5WRNa4DyedyKn8aZUkMFVzPed
+         2vKBgBOHF9Hn2QTJEtuU35vPyLgejq4OYphTHIOq6vVnz6xurFE+F+Pefyb7a9VMm2/0
+         cINg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9ft5nMhXTfGwES+fXOJSK+DHN/bCuh84GwyXLcErjqE=;
+        fh=kaSdCCW73mJJapSns359e2WVAOU2ONkUdc5AYCNZSyE=;
+        b=dDn00JRMvfmVs+KNOGgtx0r2reH/m9CEHruXacgzfzeRhAHsEUtFwFE3aT97RN4bY8
+         FkHBXV3nONvAjz5r09WtdO0cdKzxS8aBSRNgW1oMie5hJggx4MWgc+N6WeUZ9Fl0wlaT
+         +WCbdEZ4992xHiklH1wnDL6ugTbTyXeJeZzGuUNYSf2Wi7iWyXVfRarbrNj3+XX7XRUB
+         pV6/RCb0wYUEiXeNI0Y/2c55K+OenXxGOXGbmO/8gMNG64/dbenSKzM1d4OqoNjk2/1W
+         zEKjK0nTeO0s/zy3RqEKg/PB8yxFrEBofC0+7J9opJCGqVzdNs+UKVkxAS+3rXP9vZm0
+         f2Cw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767983388; x=1768588188; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Omv2UnhK3BHG1YqZhmFqBsPS/R21oE1F0P8YdFHtAk=;
-        b=Un1E5eKfzuybHvg5i1IfOs35m7uGZbmj3Mpo4VW021JCGIFNl4rdgAaJoOlgIDnWrx
-         Ym6gNXuQzBNUvbbxG2Ch/ZOvWd5StvkWYnXnIGis7GUghrj2n67V/vPS29aRvXhtzw/B
-         h+cEvW2W8i9pyFjDKCSexk9THeTUKnqjZifY++Hioq3H2Ywq0OqIuDu0F8r9jHotZ30j
-         8RKkAD+gGQdZpQlZD0FVQa3dJ/+OdQvaO/I3ZLHpvDj+9Kf6m/WHF1jZy6zvpBDAFr67
-         XYc6ANhmnh8UrNcWVuMV2Yjqm51PRnBRyrtdPJYJ3ezs7E+DCQmxL6JkhHDqNxJBpX/q
-         EPhQ==
+        d=google.com; s=20230601; t=1767985554; x=1768590354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ft5nMhXTfGwES+fXOJSK+DHN/bCuh84GwyXLcErjqE=;
+        b=gLbrtWYlDvQj40yI0IzTn+mB3hq41329xnLJlPLxJoGHXwBk4JIT+/ezgf+hjb90R2
+         mzBnS9+GLyMHjTDSia2YBfCf2n81YTWeuOUUeqT5lSB5QG5kenaOKQzROnUOkCo63S2x
+         wG8usZp4/yeo5AWdDGvc22HK1Bcepqsnb2O3G6HAxxij20CSrK+sdS2rp0+6CTQQwS3f
+         bUT1Rfn7UeGKJWXu61kWaksjpWgWsCPip7vI0xy8gHhm8z46TZhcuwke+IBrTwyQCOWo
+         nKm1x7OnuFcqYFQq2P00mkISxR3ZfZF8sTCj2uHZ0+wDoRn63IohZQFJ/mR2wHY5Hcj+
+         iarw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767983388; x=1768588188;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0Omv2UnhK3BHG1YqZhmFqBsPS/R21oE1F0P8YdFHtAk=;
-        b=TRH6HiTLBfl9axqQHj0YUs+GP1ViHU3ZN08MnV88NO0JmqRAohIAyjL1lcScp8qv4W
-         nxS8dooBrea8bX4mhcqUueGBNxSsGVYUB6SsmUNpOezbnrqvozVfxEyN1js3helQOFnZ
-         KdgSBFC/MGURo/G4sPN3Xgppsw3tUC7FIBXwQtdqKYDjsgJFXswpWKgn4eVFzmM13wwd
-         QRJuzsP0tK4shUg/BFdj2oajvvasGQqTEJJbPBEwMiXMGVPxZnj/xVTKr027LXA/Jf41
-         yheD1M0c3w4iOtLPHwkBkLbxCQLkbPKB31/O513yhIjjSxkRVA3p03dxguT8YlbMoPiS
-         90Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxuViDbhNMk3o4Jnw/pyDiqzvUPbIBjhef/8l0WulBvIAUxMAc/T05dBgb8CmMIanLX64=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv1zEM7wBx2+N5umgl114Jybvc6/hFrV4MQKj1tVp26w5kZ06U
-	XzlUrcvDPtZLPvkQfAmPwt5G/YP8S2QowM4K/q2cxvPegVgBNEpCUHF9g1O0VTwFKguB7UXLi2N
-	WCjxHhAUZsyVLTwTKCAOFkODgyoZJDvpMjKnyvfEY
-X-Gm-Gg: AY/fxX4A8E6kwuUoQcua1KhDi5axGSr4SkeCDJrk/0gb78dJEktocECfiglAoZ2okJR
-	+ps+cANd/JBOvyWZ8maabVj4JMZPgSwUWKFkEK8TqDIoA8Q7c/49Wh9Dbq/7BrwSmoE0GsHKEC8
-	XT3I13sqwl4DYCof3kPEWFZx9dNQYCNW3tT7rRbWgTHgjFoHhGMGPJ5Y3QS4UYKRdjIMH3WxmPJ
-	PjSt+ZZkxeAeHjjiD81CP793L7Zl8Cf2jqv8xgE2ubKBR2Gbrwv+EPl9/Md2/mbyvEzSDE+Rpdg
-	wJg6LlWFNW2TOpmTq+GanNKx0w==
-X-Google-Smtp-Source: AGHT+IGMMTYzPGp/Mp30QguuEe7/GAoJyFmlnHc/gJd1vWeZWw81hgcnVwY3dgLaAkxs61fETO26Vf3lDcc7HIsbGvE=
-X-Received: by 2002:a05:6102:5714:b0:5db:d60a:6b1f with SMTP id
- ada2fe7eead31-5ecb6938423mr4564466137.23.1767983388250; Fri, 09 Jan 2026
- 10:29:48 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 9 Jan 2026 10:29:47 -0800
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 9 Jan 2026 10:29:47 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <aWBxFXYPzWnkubNH@yzhao56-desk.sh.intel.com>
-References: <20260106101646.24809-1-yan.y.zhao@intel.com> <20260106101826.24870-1-yan.y.zhao@intel.com>
- <c79e4667-6312-486e-9d55-0894b5e7dc68@intel.com> <aV4jihx/MHOl0+v6@yzhao56-desk.sh.intel.com>
- <17a3a087-bcf2-491f-8a9a-1cd98989b471@intel.com> <aWBxFXYPzWnkubNH@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1767985554; x=1768590354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9ft5nMhXTfGwES+fXOJSK+DHN/bCuh84GwyXLcErjqE=;
+        b=dziGjmzo5xtiUvXmb75eefVhm3j1fL35KUgbnlwuQmDYbKqDQu+I0l2vXtNWCmq5Ld
+         itzSdeB4/40QsnW+EmNzyGdtpL2xTtBI+QXw30bPcCs6rdNocs7U/FSKZCChL2qUH1A9
+         zXjmrrGsRwf2yV8Ejiy+xLai70mLKGdK87UQZt6sVO5sYTBBLZIzuxtoRz8Tf35QygmM
+         aErcoJ6zLZSaGKF05/hMlR0QO98OP5E/tsoxQ9u6QIQk8NOFriakfXOAg79oyq+aPnmc
+         DToSWQkk/gcav+JRCYPQGsKbdT62bp7piVqWvkUw20aFqF7os5p4XsM/l17G694hwGRC
+         BRAA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0aUNCFWcWiLGG0cmZsDaeEAyYBi3nEbxJdFTDhTi2TckRhA9t988EDLT/OHabOOZNo80=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzg++VgTYOPGawszF4JNQIoO9u1jmhATNvgSiMddnrAXjrpDDJp
+	33OspNUuc/44Xt3iwYWzDP546t8Xc3F3pvKdDvQox/mmLaZ3L0x9ONtV79+awzmMesd7uzzJflh
+	W1FOQdrAKCvoZa21VEG3oAp3RzAC7K8+F3qNCX33S
+X-Gm-Gg: AY/fxX6swtPd+X2dAmnRKPkdhgVqIG8uzZkNAt0Pa5z2KLjXvsJ5/rOaY6RH76FLPlk
+	4Uh5is5XrrrluV+95u7IEd7eCJ9l/VU6bietGm4WUyRsn9AuUQlMBsMo4H2GEQd+JUdTPgD/pnH
+	BpfowUoqFVstqiRBVLPlGFN8NGCNR5DdyQO0oRZwx7M5178vjPyBBQPj4uXXcwxtb+wLk9+Xudx
+	Mn3iYQ4lsoRoGUw+3iAaBpsyio6pM3CjaFapUzuIyR5PvuvGvxtAibDAd+zFkFeSG5ZSwn7H+2g
+	hQprhVow7vnxWXqBKqBR9M7S4kKb
+X-Received: by 2002:a05:622a:1187:b0:4e5:8707:d31 with SMTP id
+ d75a77b69052e-5011856b0f5mr1292971cf.7.1767985553232; Fri, 09 Jan 2026
+ 11:05:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 9 Jan 2026 10:29:47 -0800
-X-Gm-Features: AZwV_QjW90Epw5jyV04BkSH8MCSgjnOXAHnVLcSFaJumueQQQzvGLAM6a4_nd6U
-Message-ID: <CAEvNRgHtDJx52+KU3dZfhOMjvWxjX7eJ7WdX8y+kN+bNqpspeg@mail.gmail.com>
-Subject: Re: [PATCH v3 01/24] x86/tdx: Enhance tdh_mem_page_aug() to support
- huge pages
-To: Yan Zhao <yan.y.zhao@intel.com>, Dave Hansen <dave.hansen@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	kas@kernel.org, tabba@google.com, michael.roth@amd.com, david@kernel.org, 
-	vannapurve@google.com, sagis@google.com, vbabka@suse.cz, 
-	thomas.lendacky@amd.com, nik.borisov@suse.com, pgonda@google.com, 
-	fan.du@intel.com, jun.miao@intel.com, francescolavra.fl@gmail.com, 
-	jgross@suse.com, ira.weiny@intel.com, isaku.yamahata@intel.com, 
-	xiaoyao.li@intel.com, kai.huang@intel.com, binbin.wu@linux.intel.com, 
-	chao.p.peng@intel.com, chao.gao@intel.com
+References: <20251210181417.3677674-1-rananta@google.com> <20251210181417.3677674-7-rananta@google.com>
+ <aV7qwp4N_G6f_Bt7@google.com>
+In-Reply-To: <aV7qwp4N_G6f_Bt7@google.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 9 Jan 2026 11:05:41 -0800
+X-Gm-Features: AQt7F2pYs03KGdW71m3R_wQ1F0_zP_fh27BllEZHbY3dVJknwxXS3eSRqQ2gGqM
+Message-ID: <CAJHc60wHXkZm_QU=SUtCGHRrMWfBhBdy209wmdQqnox8Z0-mQg@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] vfio: selftests: Add tests to validate SR-IOV UAPI
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Williamson <alex.williamson@redhat.com>, 
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+On Wed, Jan 7, 2026 at 3:22=E2=80=AFPM David Matlack <dmatlack@google.com> =
+wrote:
+>
+> On 2025-12-10 06:14 PM, Raghavendra Rao Ananta wrote:
+> > Add a selfttest, vfio_pci_sriov_uapi_test.c, to validate the
+> > SR-IOV UAPI, including the following cases, iterating over
+> > all the IOMMU modes currently supported:
+> >  - Setting correct/incorrect/NULL tokens during device init.
+> >  - Close the PF device immediately after setting the token.
+> >  - Change/override the PF's token after device init.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  tools/testing/selftests/vfio/Makefile         |   1 +
+> >  .../selftests/vfio/vfio_pci_sriov_uapi_test.c | 215 ++++++++++++++++++
+> >  2 files changed, 216 insertions(+)
+> >  create mode 100644 tools/testing/selftests/vfio/vfio_pci_sriov_uapi_te=
+st.c
+> >
+> > diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/self=
+tests/vfio/Makefile
+> > index 3c796ca99a509..f00a63902fbfb 100644
+> > --- a/tools/testing/selftests/vfio/Makefile
+> > +++ b/tools/testing/selftests/vfio/Makefile
+> > @@ -4,6 +4,7 @@ TEST_GEN_PROGS +=3D vfio_iommufd_setup_test
+> >  TEST_GEN_PROGS +=3D vfio_pci_device_test
+> >  TEST_GEN_PROGS +=3D vfio_pci_device_init_perf_test
+> >  TEST_GEN_PROGS +=3D vfio_pci_driver_test
+> > +TEST_GEN_PROGS +=3D vfio_pci_sriov_uapi_test
+> >
+> >  TEST_FILES +=3D scripts/cleanup.sh
+> >  TEST_FILES +=3D scripts/lib.sh
+> > diff --git a/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c b/=
+tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+> > new file mode 100644
+> > index 0000000000000..4c2951d6e049c
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+> > @@ -0,0 +1,215 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +#include <fcntl.h>
+> > +#include <unistd.h>
+> > +#include <stdlib.h>
+> > +#include <sys/ioctl.h>
+> > +#include <linux/limits.h>
+> > +
+> > +#include <libvfio.h>
+> > +
+> > +#include "../kselftest_harness.h"
+> > +
+> > +#define UUID_1 "52ac9bff-3a88-4fbd-901a-0d767c3b6c97"
+> > +#define UUID_2 "88594674-90a0-47a9-aea8-9d9b352ac08a"
+> > +
+> > +static const char *pf_dev_bdf;
+>
+> nit: I think you could simplify some of the names in this file. This
+> code isn't in a library so the names dont' have to be globally unique
+> and quite so long.
+>
+>   s/pf_dev_bdf/pf_bdf/
+>   s/vf_dev_bdf/vf_bdf/
+>   s/pf_device/pf/
+>   s/vf_device/vf/
+>   s/test_vfio_pci_container_setup/container_setup/
+>   s/test_vfio_pci_iommufd_setup/iommufd_setup/
+>   s/test_vfio_pci_device_init/device_init/
+>   s/test_vfio_pci_device_cleanup/device_cleanup/
+>
+> Feel free to ignore this though if you think it makes the names too
+> terse.
+>
+No, I think the short versions are fine. I can change in the next version.
 
-> On Wed, Jan 07, 2026 at 08:39:55AM -0800, Dave Hansen wrote:
->> On 1/7/26 01:12, Yan Zhao wrote:
->> ...
->> > However, my understanding is that it's better for functions expecting huge pages
->> > to explicitly receive "folio" instead of "page". This way, people can tell from
->> > a function's declaration what the function expects. Is this understanding
->> > correct?
->>
->> In a perfect world, maybe.
->>
->> But, in practice, a 'struct page' can still represent huge pages and
->> *does* represent huge pages all over the kernel. There's no need to cram
->> a folio in here just because a huge page is involved.
-> Ok. I can modify the param "struct page *page" to "struct page *base_page",
-> explaining that it may belong to a huge folio but is not necessarily the
-> head page of the folio.
+> > +
+> > +static int test_vfio_pci_container_setup(struct vfio_pci_device *devic=
+e,
+> > +                                      const char *bdf,
+> > +                                      const char *vf_token)
+> > +{
+> > +     vfio_pci_group_setup(device, bdf);
+> > +     vfio_container_set_iommu(device);
+> > +     __vfio_pci_group_get_device_fd(device, bdf, vf_token);
+> > +
+> > +     /* The device fd will be -1 in case of mismatched tokens */
+> > +     return (device->fd < 0);
+> > +}
+> > +
+> > +static int test_vfio_pci_iommufd_setup(struct vfio_pci_device *device,
+> > +                                    const char *bdf, const char *vf_to=
+ken)
+> > +{
+> > +     vfio_pci_iommufd_cdev_open(device, bdf);
+> > +     return __vfio_device_bind_iommufd(device->fd,
+> > +                                       device->iommu->iommufd, vf_toke=
+n);
+> > +}
+> > +
+> > +static struct vfio_pci_device *test_vfio_pci_device_init(const char *b=
+df,
+> > +                                                      struct iommu *io=
+mmu,
+> > +                                                      const char *vf_t=
+oken,
+> > +                                                      int *out_ret)
+> > +{
+> > +     struct vfio_pci_device *device;
+> > +
+> > +     device =3D calloc(1, sizeof(*device));
+> > +     VFIO_ASSERT_NOT_NULL(device);
+> > +
+> > +     device->iommu =3D iommu;
+> > +     device->bdf =3D bdf;
 >
->> > Passing "start_idx" along with "folio" is due to the requirement of mapping only
->> > a sub-range of a huge folio. e.g., we allow creating a 2MB mapping starting from
->> > the nth idx of a 1GB folio.
->> >
->> > On the other hand, if we instead pass "page" to tdh_mem_page_aug() for huge
->> > pages and have tdh_mem_page_aug() internally convert it to "folio" and
->> > "start_idx", it makes me wonder if we could have previously just passed "pfn" to
->> > tdh_mem_page_aug() and had tdh_mem_page_aug() convert it to "page".
->>
->> As a general pattern, I discourage folks from using pfns and physical
->> addresses when passing around references to physical memory. They have
->> zero type safety.
->>
->> It's also not just about type safety. A 'struct page' also *means*
->> something. It means that the kernel is, on some level, aware of and
->> managing that memory. It's not MMIO. It doesn't represent the physical
->> address of the APIC page. It's not SGX memory. It doesn't have a
->> Shared/Private bit.
->>
->> All of those properties are important and they're *GONE* if you use a
->> pfn. It's even worse if you use a raw physical address.
->>
->> Please don't go back to raw integers (pfns or paddrs).
-> I understood and fully accept it.
+> Can you put this in a helper exposed by vfio_pci_device.h? e.g.
+> vfio_pci_device_alloc()
 >
-> I previously wondered if we could allow KVM to pass in pfn and let the SEAMCALL
-> wrapper do the pfn_to_page() conversion.
-> But it was just out of curiosity. I actually prefer "struct page" too.
->
->
->> >>> -	tdx_clflush_page(page);
->> >>> +	if (start_idx + npages > folio_nr_pages(folio))
->> >>> +		return TDX_OPERAND_INVALID;
->> >>
->> >> Why is this necessary? Would it be a bug if this happens?
->> > This sanity check is due to the requirement in KVM that mapping size should be
->> > no larger than the backend folio size, which ensures the mapping pages are
->> > physically contiguous with homogeneous page attributes. (See the discussion
->> > about "EPT mapping size and folio size" in thread [1]).
->> >
->> > Failure of the sanity check could only be due to bugs in the caller (KVM). I
->> > didn't convert the sanity check to an assertion because there's already a
->> > TDX_BUG_ON_2() on error following the invocation of tdh_mem_page_aug() in KVM.
->>
->> We generally don't protect against bugs in callers. Otherwise, we'd have
->> a trillion NULL checks in every function in the kernel.
->>
->> The only reason to add caller sanity checks is to make things easier to
->> debug, and those almost always include some kind of spew:
->> WARN_ON_ONCE(), pr_warn(), etc...
->
-> Would it be better if I use WARN_ON_ONCE()? like this:
->
-> u64 tdh_mem_page_aug(struct tdx_td *td, u64 gpa, int level, struct page *base_page,
->                      u64 *ext_err1, u64 *ext_err2)
-> {
->         unsigned long npages = tdx_sept_level_to_npages(level);
->         struct tdx_module_args args = {
->                 .rcx = gpa | level,
->                 .rdx = tdx_tdr_pa(td),
->                 .r8 = page_to_phys(base_page),
->         };
->         u64 ret;
->
->         WARN_ON_ONCE(page_folio(base_page) != page_folio(base_page + npages - 1));
+Is that just to wrap the ASSERT() within? Or were you thinking of
+initializing the members as well in there?
 
-This WARNs if the first and last folios are not the same folio, which
-still assumes something about how pages are grouped into folios. I feel
-that this is still stretching TDX code over to make assumptions about
-how the kernel manages memory metadata, which is more than TDX actually
-cares about.
 
+> > +
+> > +     if (iommu->mode->container_path)
+> > +             *out_ret =3D test_vfio_pci_container_setup(device, bdf, v=
+f_token);
+> > +     else
+> > +             *out_ret =3D test_vfio_pci_iommufd_setup(device, bdf, vf_=
+token);
+> > +
+> > +     return device;
+> > +}
+> > +
+> > +static void test_vfio_pci_device_cleanup(struct vfio_pci_device *devic=
+e)
+> > +{
+> > +     if (device->fd > 0)
+> > +             VFIO_ASSERT_EQ(close(device->fd), 0);
+> > +
+> > +     if (device->group_fd)
+> > +             VFIO_ASSERT_EQ(close(device->group_fd), 0);
+> > +
+> > +     free(device);
+> > +}
+> > +
+> > +FIXTURE(vfio_pci_sriov_uapi_test) {
+> > +     char vf_dev_bdf[16];
+> > +     char vf_driver[32];
+> > +     bool sriov_drivers_autoprobe;
+> > +};
+> > +
+> > +FIXTURE_SETUP(vfio_pci_sriov_uapi_test)
+> > +{
+> > +     int nr_vfs;
+> > +     int ret;
+> > +
+> > +     nr_vfs =3D sysfs_get_sriov_totalvfs(pf_dev_bdf);
+> > +     if (nr_vfs < 0)
+> > +             SKIP(return, "SR-IOV may not be supported by the device\n=
+");
 >
->         for (int i = 0; i < npages; i++)
->                 tdx_clflush_page(base_page + i);
+> Should this be <=3D 0?
 >
->         ret = seamcall_ret(TDH_MEM_PAGE_AUG, &args);
->
->         *ext_err1 = args.rcx;
->         *ext_err2 = args.rdx;
->
->         return ret;
-> }
->
-> The WARN_ON_ONCE() serves 2 purposes:
-> 1. Loudly warn of subtle KVM bugs.
-> 2. Ensure "page_to_pfn(base_page + i) == (page_to_pfn(base_page) + i)".
->
+Yes, <=3D 0 should be better. I was only aiming for the case where
+"Device doesn't support SR-IOV if the file is absent." Looking at the
+pci code, I think there's a potential for returning 0, say for a VF or
+an error in the PCI config.
+I'll update this in v3.
 
-I disagree with checking within TDX code, but if you would still like to
-check, 2. that you suggested is less dependent on the concept of how the
-kernel groups pages in folios, how about:
-
-  WARN_ON_ONCE(page_to_pfn(base_page + npages - 1) !=
-               page_to_pfn(base_page) + npages - 1);
-
-The full contiguity check will scan every page, but I think this doesn't
-take too many CPU cycles, and would probably catch what you're looking
-to catch in most cases.
-
-I still don't think TDX code should check. The caller should check or
-know the right thing to do.
-
-> If you don't like using "base_page + i" (as the discussion in v2 [1]), we can
-> invoke folio_page() for the ith page instead.
+> And replace "the device" with the BDF.
 >
-> [1] https://lore.kernel.org/all/01731a9a0346b08577fad75ae560c650145c7f39.camel@intel.com/
+Sure
+
+> > +
+> > +     nr_vfs =3D sysfs_get_sriov_numvfs(pf_dev_bdf);
+> > +     if (nr_vfs !=3D 0)
+> > +             SKIP(return, "SR-IOV already configured for the PF\n");
 >
->> >>> +	for (int i = 0; i < npages; i++)
->> >>> +		tdx_clflush_page(folio_page(folio, start_idx + i));
->> >>
->> >> All of the page<->folio conversions are kinda hurting my brain. I think
->> >> we need to decide what the canonical type for these things is in TDX, do
->> >> the conversion once, and stick with it.
->> > Got it!
->> >
->> > Since passing in base "page" or base "pfn" may still require the
->> > wrappers/helpers to internally convert them to "folio" for sanity checks, could
->> > we decide that "folio" and "start_idx" are the canonical params for functions
->> > expecting huge pages? Or do you prefer KVM to do the sanity check by itself?
->>
->> I'm not convinced the sanity check is a good idea in the first place. It
->> just adds complexity.
-> I'm worried about subtle bugs introduced by careless coding that might be
-> silently ignored otherwise, like the one in thread [2].
+> Let's print the BDF and nr_vfs for the user.
 >
-> [2] https://lore.kernel.org/kvm/aV2A39fXgzuM4Toa@google.com/
+Sure
+
+> > +
+> > +     self->sriov_drivers_autoprobe =3D
+> > +             sysfs_get_sriov_drivers_autoprobe(pf_dev_bdf);
+> > +     if (self->sriov_drivers_autoprobe)
+> > +             sysfs_set_sriov_drivers_autoprobe(pf_dev_bdf, 0);
+> > +
+> > +     /* Export only one VF for testing */
+>
+> s/Export/Create/
+>
+Sure
+
+> > +     sysfs_set_sriov_numvfs(pf_dev_bdf, 1);
+> > +
+> > +     sysfs_get_sriov_vf_bdf(pf_dev_bdf, 0, self->vf_dev_bdf);
+> > +     if (sysfs_get_driver(self->vf_dev_bdf, self->vf_driver) =3D=3D 0)
+> > +             sysfs_unbind_driver(self->vf_dev_bdf, self->vf_driver);
+>
+> This should be impossible since we disabled autoprobing.
+>
+> > +     sysfs_bind_driver(self->vf_dev_bdf, "vfio-pci");
+>
+> Some devices also require setting driver_override to "vfio-pci" as well
+> so the device can be bound to vfio-pci. Let's just do that
+> unconditionally.
+>
+Sure, I'll include that in v3.
+
+Thank you.
+Raghavendra
 
