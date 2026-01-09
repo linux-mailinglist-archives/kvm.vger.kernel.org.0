@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-67634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE088D0C061
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 20:14:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7AFD0C07A
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 20:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 16B99301A306
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 19:14:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A42513098459
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 19:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBC72E973A;
-	Fri,  9 Jan 2026 19:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083D63093C8;
+	Fri,  9 Jan 2026 19:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nglkrs6V"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WnR0qIlR"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740522E54CC;
-	Fri,  9 Jan 2026 19:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7050B2E5B09;
+	Fri,  9 Jan 2026 19:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767986087; cv=none; b=YoWlAYmtAHye8VQIiV5epXq2JbD2uT9PMXazqDNJdDOOf4MZq7o2CGOl16S1vLwYe0BnEeYjocsZYM1qpZty665+7EZYaaiB3jFAvHs3wQi9O6fklDnSLXEoCm+RpUdqShuK98FPNTWWETOCu/5cemCctbAQolXNGARVCVfxhAE=
+	t=1767986089; cv=none; b=n7JYWex8D6Xph3DglnCw4N4eBOWuwJ5/HzDimKK3BSicpmaOkQh97yU/iuEnpVOq9sWTmBUlobqpF94+FPD5XQttiwzLdus5kvX4CSP1DQvwE3O3SZGijVo5iDofPtrr+9ybjevmtg8pao4McOEidH3t0EW0o0ieIaBjXoTOr3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767986087; c=relaxed/simple;
-	bh=7PTXKBjvfAD9+fhj5VBqVUtSsL64VvFvp60LFk6zr00=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hok9qGXOgNN+DlC1rRzZRfB+2MCokdNvRpAV2iQIXcJOYzeCQRMdbHzCovYCSSdYqTd9qOZoXpckwHuPb/ILs0ca4X0XpF4PerZxlDSRaFqQfTA+z1nVIhL8+S9e2qGsjgaHVumEJTfYPVMK0kD0ntGh6w0U4BcDwUnMoGYshp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nglkrs6V; arc=none smtp.client-ip=198.175.65.12
+	s=arc-20240116; t=1767986089; c=relaxed/simple;
+	bh=mlUB6CpgC+NdTjv2wzLOOW7NeBH5rNDUGy/JFjUofP4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=jiBRobn5Y+hihQj4dZf6DC3IoEGi3yAvWENwK428oKwXFwcGunCBJMGKxCphNgr/OjnOYgInHvtug01NeCfHnNaFHebfrjYHIVRs3D3u0/RKexKP42dVfzgJUMd3WVb8BBZ/24uoWxUbJvahvXL57e6Y2LZ19JMOepUCghFpZUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WnR0qIlR; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767986086; x=1799522086;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=7PTXKBjvfAD9+fhj5VBqVUtSsL64VvFvp60LFk6zr00=;
-  b=nglkrs6VA3xBdhLzxIaTb431Hekkb8QzbssV2rFot4afO0vZDmUdy8+r
-   9mozMnwi0EVkFndZsWG5e/ey7WKKbmlngH9ag/TwWUz2wbf8jp1jiriTf
-   i7v581S++mitxN4WmudwZ4PSjEncdwy/V8fKcFgyzARqSdhG/lFhSIlQh
-   1XxSYNz5tKi7+HpIuRBF1V22hVNqy2tIny74J4/dsZ8hwt3Bw2oZ5lLMr
-   j80bgLmVoCVB6QNTzlRuTj5GDij3tdFx0Fj2DYwK4pcUJtvSQRM45TrzI
-   ySjZvIMGsGNVQMkcMGlCVpjOK3dYM01fYTvprdSQ62RIQZjpo6KPsV8xZ
+  t=1767986087; x=1799522087;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=mlUB6CpgC+NdTjv2wzLOOW7NeBH5rNDUGy/JFjUofP4=;
+  b=WnR0qIlROE2bZlTxs5GLR7Ktym7y7NHRoct4KjVwG1+qeAlqUOumI60c
+   iG4F0nskf5gw+7MuENTLx0Qf9TlL4kRIRdDuVvtvKLgE+OSBBgF3jjlIl
+   aWzwjG3T5FMhpwyDBpKNJxam+kcGhsNTqv99anfBET6sm3Th8aEf/MK8P
+   ZKn/5z2iYzDZhBVjEPpBL/u4UMCiJbmns8VvplBjoye9YLqn9vv49m3SY
+   2p/RO5VzDulGKzl4iGK94It0Ka6R8n3RwyraEzYYYko7EPI2lpwIyhduz
+   xPCOlq/fEa/cFd7TVpiVCFPTi/oasDNG/Pjd+GoVGG29dc8gexvMRg6P1
    A==;
-X-CSE-ConnectionGUID: LFAjU2ZvTTmtek9PKnEPdw==
-X-CSE-MsgGUID: Y+6WrbLWQRGquaubo0O5wg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11666"; a="80824246"
+X-CSE-ConnectionGUID: YKC96xc2Rkm0xNhEaSoYXg==
+X-CSE-MsgGUID: T1v81hvcTrOj6wPUTZBQBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11666"; a="80824255"
 X-IronPort-AV: E=Sophos;i="6.21,214,1763452800"; 
-   d="scan'208";a="80824246"
+   d="scan'208";a="80824255"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
   by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2026 11:14:46 -0800
-X-CSE-ConnectionGUID: ADrwN2HYRyeOKJCp+MWtow==
-X-CSE-MsgGUID: maaW5xOoRjOXG1Cvd9qE+g==
+X-CSE-ConnectionGUID: UD05R2SnQNOzXDCchW89sQ==
+X-CSE-MsgGUID: k43n+N7IRKSsaegwYiPLMQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,214,1763452800"; 
-   d="scan'208";a="203456685"
+   d="scan'208";a="203456690"
 Received: from vverma7-desk1.amr.corp.intel.com (HELO [192.168.1.200]) ([10.124.223.127])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2026 11:14:44 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2026 11:14:45 -0800
 From: Vishal Verma <vishal.l.verma@intel.com>
-Subject: [PATCH v2 0/2] x86/virt/tdx: Print TDX module version to dmesg
-Date: Fri, 09 Jan 2026 12:14:29 -0700
-Message-Id: <20260109-tdx_print_module_version-v2-0-e10e4ca5b450@intel.com>
+Date: Fri, 09 Jan 2026 12:14:30 -0700
+Subject: [PATCH v2 1/2] x86/virt/tdx: Retrieve TDX module version
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,11 +67,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJVTYWkC/42NUQqDMBBEryL73ZS4tEnpV+8hImmyrQtqJEmDR
- bx7oyfo5xvmzawQKTBFuFcrBMoc2U8F8FSB7c30JsGuMKBEJWupRXJLNweeUjd69xmoyxR2SdD
- FGk3OliZC0edAL16O6aYt3HNMPnyPp1zv6R+juRZS3BCfxlyVVugepUTD2foR2m3bflOyicLAA
- AAA
-X-Change-ID: 20260107-tdx_print_module_version-e4ca7edc2022
+Message-Id: <20260109-tdx_print_module_version-v2-1-e10e4ca5b450@intel.com>
+References: <20260109-tdx_print_module_version-v2-0-e10e4ca5b450@intel.com>
+In-Reply-To: <20260109-tdx_print_module_version-v2-0-e10e4ca5b450@intel.com>
 To: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
  kvm@vger.kernel.org
 Cc: x86@kernel.org, Chao Gao <chao.gao@intel.com>, 
@@ -82,76 +80,114 @@ Cc: x86@kernel.org, Chao Gao <chao.gao@intel.com>,
  Rick Edgecombe <rick.p.edgecombe@intel.com>, 
  Vishal Verma <vishal.l.verma@intel.com>
 X-Mailer: b4 0.15-dev-e44bb
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2397;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3840;
  i=vishal.l.verma@intel.com; h=from:subject:message-id;
- bh=7PTXKBjvfAD9+fhj5VBqVUtSsL64VvFvp60LFk6zr00=;
- b=owGbwMvMwCXGf25diOft7jLG02pJDJmJwfMu/GOXDZm2vLQ/4PUVvZzgq6+bpKft6e577TxH3
- eXdDuXqjlIWBjEuBlkxRZa/ez4yHpPbns8TmOAIM4eVCWQIAxenAEyk4jsjw/ajJm/T7n38Zei+
- KvurrJve5feVm/+lv75uml6Rvu69qDfDf8/D4ec9GFjSy+MjGlwWBYm/f9Cyof8q20vOHbu2/rJ
- 7wQQA
+ bh=Z+0V8kpF3yoteyWrw6vR62/QKpGxleXBJP3WnKnHjxs=;
+ b=owGbwMvMwCXGf25diOft7jLG02pJDJmJwUscWayM339klGS5Y3zeWuuEzeHc8mSZSYyL3xmms
+ W79HqnWUcrCIMbFICumyPJ3z0fGY3Lb83kCExxh5rAygQxh4OIUgInYfWT4p353raP0w5mRor5y
+ px7GM853/KMcxVNmtL7tgtYdJ92bsxn+KQdUH+LVitkemRWWkbjiiYHT3RdvbQ78uF67woktXeg
+ EMwA=
 X-Developer-Key: i=vishal.l.verma@intel.com; a=openpgp;
  fpr=F8682BE134C67A12332A2ED07AFA61BEA3B84DFF
 
-=== Problem & Solution ===
+From: Chao Gao <chao.gao@intel.com>
 
-Currently, there is neither an ABI, nor any other way to determine from
-the host system, what version of the TDX module is running. A sysfs ABI
-for this has been proposed in [1], but it may need additional discussion.
+Each TDX module has several bits of metadata about which specific TDX
+module it is. The primary bit of info is the version, which has an x.y.z
+format. These represent the major version, minor version, and update
+version respectively. Knowing the running TDX Module version is valuable
+for bug reporting and debugging. Note that the module does expose other
+pieces of version-related metadata, such as build number and date. Those
+aren't retrieved for now, that can be added if needed in the future.
 
-Many/most TDX developers already carry patches like this in their
-development branches. It can be tricky to know which TDX module is
-actually loaded on a system, and so this functionality has been needed
-regularly for development and processing bug reports. Hence, it is
-prudent to break out the patches to retrieve and print the TDX module
-version, as those parts are very straightforward, and get some level of
-debugability and traceability for TDX host systems.
+Retrieve the TDX Module version using the existing metadata reading
+interface. Later changes will expose this information. The metadata
+reading interfaces have existed for quite some time, so this will work
+with older versions of the TDX module as well - i.e. this isn't a new
+interface.
 
-=== Dependencies ===
+As a side note, the global metadata reading code was originally set up
+to be auto-generated from a JSON definition [1]. However, later [2] this
+was found to be unsustainable, and the autogeneration approach was
+dropped in favor of just manually adding fields as needed (e.g. as in
+this patch).
 
-None. This is based on v6.19-rc4, and applies cleanly to tip.git.
-
-=== Patch details ===
-
-Patch 1 is a prerequisite that adds the infrastructure to retrieve the
-TDX module version from its global metadata. This was originally posted in [2].
-
-Patch 2 is based on a patch from Kai Huang [3], and prints the version to
-dmesg during init.
-
-=== Testing ===
-
-This has passed the usual suite of tests, including successful 0day
-builds, KVM Unit tests, KVM selftests, a TD creation smoke test, and
-selected KVM tests from the Avocado test suite.
-
-[1]: https://lore.kernel.org/all/20260105074350.98564-1-chao.gao@intel.com/
-[2]: https://lore.kernel.org/all/20260105074350.98564-2-chao.gao@intel.com/
-[3]: https://lore.kernel.org/all/57eaa1b17429315f8b5207774307f3c1dd40cf37.1730118186.git.kai.huang@intel.com/
-
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+Link: https://lore.kernel.org/kvm/CABgObfYXUxqQV_FoxKjC8U3t5DnyM45nz5DpTxYZv2x_uFK_Kw@mail.gmail.com/ # [1]
+Link: https://lore.kernel.org/all/1e7bcbad-eb26-44b7-97ca-88ab53467212@intel.com/ # [2]
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: Kiryl Shutsemau <kas@kernel.org>
+Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 ---
-Changes in v2:
-- Collect review tags (Kiryl, Rick)
-- Reword commit messages for clarity (Rick)
-- Move the version print get_tdx_sys_info() (Kiryl, Dave)
-- Link to v1: https://patch.msgid.link/20260107-tdx_print_module_version-v1-0-822baa56762d@intel.com
-
----
-Chao Gao (1):
-      x86/virt/tdx: Retrieve TDX module version
-
-Vishal Verma (1):
-      x86/virt/tdx: Print TDX module version during init
-
  arch/x86/include/asm/tdx_global_metadata.h  |  7 +++++++
- arch/x86/virt/vmx/tdx/tdx_global_metadata.c | 22 ++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
----
-base-commit: 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb
-change-id: 20260107-tdx_print_module_version-e4ca7edc2022
+ arch/x86/virt/vmx/tdx/tdx_global_metadata.c | 16 ++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-Best regards,
---  
-Vishal Verma <vishal.l.verma@intel.com>
+diff --git a/arch/x86/include/asm/tdx_global_metadata.h b/arch/x86/include/asm/tdx_global_metadata.h
+index 060a2ad744bff..40689c8dc67eb 100644
+--- a/arch/x86/include/asm/tdx_global_metadata.h
++++ b/arch/x86/include/asm/tdx_global_metadata.h
+@@ -5,6 +5,12 @@
+ 
+ #include <linux/types.h>
+ 
++struct tdx_sys_info_version {
++	u16 minor_version;
++	u16 major_version;
++	u16 update_version;
++};
++
+ struct tdx_sys_info_features {
+ 	u64 tdx_features0;
+ };
+@@ -35,6 +41,7 @@ struct tdx_sys_info_td_conf {
+ };
+ 
+ struct tdx_sys_info {
++	struct tdx_sys_info_version version;
+ 	struct tdx_sys_info_features features;
+ 	struct tdx_sys_info_tdmr tdmr;
+ 	struct tdx_sys_info_td_ctrl td_ctrl;
+diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+index 13ad2663488b1..0454124803f36 100644
+--- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
++++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+@@ -7,6 +7,21 @@
+  * Include this file to other C file instead.
+  */
+ 
++static int get_tdx_sys_info_version(struct tdx_sys_info_version *sysinfo_version)
++{
++	int ret = 0;
++	u64 val;
++
++	if (!ret && !(ret = read_sys_metadata_field(0x0800000100000003, &val)))
++		sysinfo_version->minor_version = val;
++	if (!ret && !(ret = read_sys_metadata_field(0x0800000100000004, &val)))
++		sysinfo_version->major_version = val;
++	if (!ret && !(ret = read_sys_metadata_field(0x0800000100000005, &val)))
++		sysinfo_version->update_version = val;
++
++	return ret;
++}
++
+ static int get_tdx_sys_info_features(struct tdx_sys_info_features *sysinfo_features)
+ {
+ 	int ret = 0;
+@@ -89,6 +104,7 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
+ {
+ 	int ret = 0;
+ 
++	ret = ret ?: get_tdx_sys_info_version(&sysinfo->version);
+ 	ret = ret ?: get_tdx_sys_info_features(&sysinfo->features);
+ 	ret = ret ?: get_tdx_sys_info_tdmr(&sysinfo->tdmr);
+ 	ret = ret ?: get_tdx_sys_info_td_ctrl(&sysinfo->td_ctrl);
+
+-- 
+2.52.0
 
 
