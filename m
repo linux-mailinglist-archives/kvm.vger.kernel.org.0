@@ -1,187 +1,181 @@
-Return-Path: <kvm+bounces-67496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF01ED06A8F
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 01:56:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF55D06DDA
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 03:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 739AE303F0D2
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 00:54:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D7A8301EC42
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 02:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4475C1E32A2;
-	Fri,  9 Jan 2026 00:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8CC3164B0;
+	Fri,  9 Jan 2026 02:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ggX30qBi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WochmuDf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73031EF0B0
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 00:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F12311956;
+	Fri,  9 Jan 2026 02:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767920084; cv=none; b=Bn9r6RcB5mRbp+hvA0MsgHoimCj8HgBM5lxFIzQHwgPVDHGSZHcGOH3JiSQLg8QCdeBMcp+aYutwBJwZ2iACASap+BG/IHtZ2DP5UU+1EV0xuMHbChn0rf+djT6q9Kq3pzYjC3nG4GVTo9UcEdyj5KOjuhPuLgjtt/mE7z7fMRM=
+	t=1767926146; cv=none; b=XcdFbO+fyO58JBelsj2WPhcyhw82eolVhA63tZyyT2dlnySEmUJEONcp/G7EW/jI+LHBdoo6S4pU3/4udDEk1ufoabmALlpl4x9e5dUDI6juQbIyvXMqr6eIVP5bqCioL7lW1oBIp+f9ddmIIUfP7WRP/e2UY0C5xtSEPHYLytc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767920084; c=relaxed/simple;
-	bh=U+ERXgUfSRxYcQMpnmJcQtwAEw2tC+IRhF/3sM+ULAA=;
+	s=arc-20240116; t=1767926146; c=relaxed/simple;
+	bh=HRw0laBu/MM4PZ6zlj8FQySlhAoLIYl/PjG53TaFc6c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O/eXHs/hmLwQ+Gz5c0S5VpSVc9++6sp7V9aTQHHGq+6ZsqTAbyFxOY9rSEIsssqDaOvl6YNKEzyjgiRkqUZkqSDyuDYBNohpB+r9yapOPnHEC5FO4Jm2F6JrPgGshcxjXYzty3w8OlLljuGQLOtcJPYaepUneyLWhPHVPFxL1yA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ggX30qBi; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-88a2f2e5445so43739186d6.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 16:54:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1767920082; x=1768524882; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UAZE/20dBWNTVWUx21XoEWWGeB11q9XckqXbeOgh60E=;
-        b=ggX30qBiAA8FaTfWYEYTd5EVPvdmBPZZ6h4Fzhli80Hv/xquejjv4DN09tgGqAvd1y
-         yAec770oyGkerbMoZxppKuWLybqrpqz3eU4ml/98fCnvuKO36Za7g4bdnyXAM247sZor
-         qSUPOtjBCkrxaXONgBm5oZBIvj4McFWA62b6PeasVvYNnG1QTKH5Gw8uOCMlAyVYNWTU
-         xC/ld2DlyymkCDkMBf4KZ1KzJWmHWTMvTe1xeZujFsL1AASI3zXTwp/PncVOgIeToS9s
-         1Ei8ETUnTti6nu9Gs281fX3h6wmnHZtyIixVcYSbES5jyy+XBepBS5atgox2y4tDn+HD
-         KQNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767920082; x=1768524882;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UAZE/20dBWNTVWUx21XoEWWGeB11q9XckqXbeOgh60E=;
-        b=Uukqo+Pth0bHT/lvmeIMTfRQ+TYV/FlE7ZGNchy28vp+zUhoGxkeVa1K9dBY5N/ACR
-         wNQEXPL3p7SKXX/7JOM/LPgfL4nxQAmwJ87NGRFwzgrC+HuX/bqJtLwp+eg33GfkPkqm
-         iKXjMFK+lj6oDf92dSdXnMoRptqZbSea16X5chx/oudn1zkqXtrG00AKzjcd4ZxO8b2v
-         I34cIVDHCl6Mozvutk1HsTQ8tRpZfFig4biO8wwhIo9ETMHRxoJQyW5rhXrylj2kMgrc
-         DwDqAbYC2eJyJ8CRHM2xWEdKooEAXnznXIa6WHY4Y5BeBygJefqXtYOM5crpUO2s1ESj
-         Kj3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVvozhSLtlXVTWFVHSnjH9eEsBx4Ui5YOVItA0vU6HXHzNsz5v4IslLpdbTxQzXITffBKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlnBNyjUoFVJW+sYqhY96Hh5L4GOWvQxE0ca2n0Q0gi9XBWKtk
-	G6+WjZZW5CcGOMFdO+nBsUpVB3koVrIGaOlX9P7nKWGZDiUVFQ/vc41DznjAbiLr3bk=
-X-Gm-Gg: AY/fxX5xx2oO+8zmv/QkG8SJK5hS8u09DBHOD3FByLliLiFaq+wANpxULYaGvSdd4Ug
-	m4sg8Pc2mrPJPqx84mcc8bqncOOvfuszQQEic7oc3xQ5bEZ1BybIcYZM01rr46SWVGTrSn8qhVd
-	TIrgBtAhENMN/Ht9LwCK9gEzxWdic2jueKNTswehKXHMUa5p+cqaBDEQDAI96UeeZriF7uqAURY
-	ravyhlxDYwqPS0mBoFER2IUsxVMyj5s6/XjhQ3ygMx1rNRMIqOMTUFObTtQqMvN8kFFbxUJrvwT
-	NxLYEKd2j8iU/SRm7AUdCirZTZSZu0MJPJmaxVnCLiYjIEqh92DfIuT/yZlU+Pmi/+pdsSMV7Sp
-	t5t77cuj68s4NcB0Xlm1xlpvib86ll7xOLj9Ta3NA6l13j0bsleBJbszD+ADtnu8cTKJOB1lBge
-	7OOl7kyeYGNDkeJCGg+H2c1fv5xLFHXsZuH0sTAmGt/SOd2Qm3p+/dk9iHyLfu+yZEBuk=
-X-Google-Smtp-Source: AGHT+IEZs++vifxK2irZp/20XefsAkmL6blTJ2OewTq/V0KD+K9JOYPvZ0wrg4AeAg9Aq7isQibh6Q==
-X-Received: by 2002:a05:6214:4509:b0:88a:3c0e:3251 with SMTP id 6a1803df08f44-8908425445emr106914126d6.32.1767920081945;
-        Thu, 08 Jan 2026 16:54:41 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8907726041fsm67934866d6.45.2026.01.08.16.54.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 16:54:41 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ve0m0-00000002vlZ-3hDX;
-	Thu, 08 Jan 2026 20:54:40 -0400
-Date: Thu, 8 Jan 2026 20:54:40 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>,
-	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <20260109005440.GH545276@ziepe.ca>
-References: <aV7yIchrL3mzNyFO@google.com>
- <20260108005406.GA545276@ziepe.ca>
- <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
- <20260108141044.GC545276@ziepe.ca>
- <20260108084514.1d5e3ee3@shazbot.org>
- <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
- <20260108183339.GF545276@ziepe.ca>
- <aWAhuSgEQzr_hzv9@google.com>
- <20260109003621.GG545276@ziepe.ca>
- <aWBPNHOsaP1sNvze@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nbQl7fmgap9K0/VHnJObBvSDRNQs4Y31VR51ou91o3Fv8tWoltFpKrjhHUuMhW1kCl+G1FsMkPxDuTiqiDorfEp7w+Ps3YLvMIfWLU8L7NKI2YqgdP1sdGj1+qhDa+nnciwLvGSCBn10NnzvzOd/az6Px6OO6EvpPnGnOI3tlaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WochmuDf; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767926143; x=1799462143;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=HRw0laBu/MM4PZ6zlj8FQySlhAoLIYl/PjG53TaFc6c=;
+  b=WochmuDfoXiiR37j6yhIDTsZSvgt0pnOHLKAUik43yG7Fv4l44VnMiCc
+   KTSYwM46AZl/CbL7hpPSZGdgJCsr1Vr0+QC/lABg5vKRQ81Cdk6x4aeIG
+   xX2GdB4z504FBLO/8NqfAwth3c6ZkGs9uzbuq9pVpW5X0Pd5w3CXyWTh3
+   1yyzVqP1mZitYkOoL41TGX6nhuiLvP+00jexyiKGiawX+HvAySf/FGNDD
+   JHyNBoMpIlRhPZj10F7j8SIqzCMwsc8Smo8edbFEjio6EVtuKrbzaInb1
+   rmoRbghFrUsz+wVEEuoNzty2A2sUFJKinn5QiWxmbH25WAGLZk5Jp+bNx
+   Q==;
+X-CSE-ConnectionGUID: O5aG8upiRI+I4kzdCsfFnA==
+X-CSE-MsgGUID: opTRvUGUQoesFn0u6Gn6xg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="69213314"
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="69213314"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 18:35:43 -0800
+X-CSE-ConnectionGUID: nP7rR3yjSrqhK3nRXPiNDg==
+X-CSE-MsgGUID: FXlZI4HIQcqaVC54bHhjzQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="234538078"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa001.fm.intel.com with ESMTP; 08 Jan 2026 18:35:39 -0800
+Date: Fri, 9 Jan 2026 10:18:24 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	"Li, Xiaoyao" <xiaoyao.li@intel.com>,
+	"Hansen, Dave" <dave.hansen@intel.com>,
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>,
+	"Wu, Binbin" <binbin.wu@intel.com>,
+	"kas@kernel.org" <kas@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"Annapurve, Vishal" <vannapurve@google.com>,
+	"Gao, Chao" <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>,
+	"x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v4 04/16] x86/virt/tdx: Allocate page bitmap for Dynamic
+ PAMT
+Message-ID: <aWBlcCUvybAYWed8@yilunxu-OptiPlex-7050>
+References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+ <20251121005125.417831-5-rick.p.edgecombe@intel.com>
+ <aUut+PYnX3jrSO0i@yilunxu-OptiPlex-7050>
+ <0734a6cc7da3d210f403fdf3e0461ffba6b0aea0.camel@intel.com>
+ <aVyJG+vh9r/ZMmOG@yilunxu-OptiPlex-7050>
+ <94b619208022ee29812d871eeacab4f979e51d85.camel@intel.com>
+ <aV32uDSqEDOgYp6L@yilunxu-OptiPlex-7050>
+ <44fb20f8cfaa732eb34c3f5d3a3ff0c22c713939.camel@intel.com>
+ <aV+o1VOTxt8hU4ou@yilunxu-OptiPlex-7050>
+ <b4af0f9795d69fdc1f6599032335a2103c2fe29a.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aWBPNHOsaP1sNvze@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b4af0f9795d69fdc1f6599032335a2103c2fe29a.camel@intel.com>
 
-On Fri, Jan 09, 2026 at 12:43:32AM +0000, David Matlack wrote:
-> On 2026-01-08 08:36 PM, Jason Gunthorpe wrote:
-> > On Thu, Jan 08, 2026 at 09:29:29PM +0000, David Matlack wrote:
-> > > On 2026-01-08 02:33 PM, Jason Gunthorpe wrote:
-> > > > On Thu, Jan 08, 2026 at 10:24:19AM -0800, David Matlack wrote:
-> > > > > > > Oh, I was thinking about a compatability only flow only in the type 1
-> > > > > > > emulation that internally magically converts a VMA to a dmabuf, but I
-> > > > > > > haven't written anything.. It is a bit tricky and the type 1 emulation
-> > > > > > > has not been as popular as I expected??
-> > > > > >
-> > > > > > In part because of this gap, I'd guess.  Thanks,
-> > > > > 
-> > > > > Lack of huge mappings in the IOMMU when using VFIO_TYPE1_IOMMU is
-> > > > > another gap I'm aware of.
-> > > > > vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
-> > > > > fails when IOMMUFD_VFIO_CONTAINER is enabled.
-> > > > 
-> > > > What is this? I'm not aware of it..
-> > > 
-> > > It's one of the test cases within
-> > > tools/testing/selftests/vfio/vfio_dma_mapping_test.c.
-> > > 
-> > > Here's the output when running with CONFIG_IOMMUFD_VFIO_CONTAINER=y:
-> > > 
-> > >   #  RUN           vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap ...
-> > >   Mapped HVA 0x7f0480000000 (size 0x40000000) at IOVA 0x0
-> > >   Searching for IOVA 0x0 in /sys/kernel/debug/iommu/intel/0000:6a:01.0/domain_translation_struct
-> > >   Found IOMMU mappings for IOVA 0x0:
-> > >   PGD: 0x0000000203475027
-> > >   P4D: 0x0000000203476027
-> > >   PUD: 0x0000000203477027
-> > >   PMD: 0x00000001e7562027
-> > >   PTE: 0x00000041c0000067
-> > >   # tools/testing/selftests/vfio/vfio_dma_mapping_test.c:188:dma_map_unmap:Expected 0 (0) == mapping.pte (282394099815)
-> > >   # dma_map_unmap: Test terminated by assertion
-> > >   #          FAIL  vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
+On Thu, Jan 08, 2026 at 04:52:10PM +0000, Edgecombe, Rick P wrote:
+> On Thu, 2026-01-08 at 20:53 +0800, Xu Yilun wrote:
+> > I actually don't understand why a RDALL seamcall could eliminate
+> > the check "if (some_optional_feature_exists) read_it;". IIUC, The
+> > check
+> > exists because kernel doesn't trust TDX Module so kernel wants to
+> > verify
+> > the correctness/consistency of the data, otherwise we could accept
+> > whatever TDX Module tells us, do the below for each field:
 > > 
-> > I can't think of any reason this would fail, I think your tests have
-> > found a real bug?? Can you check into it, what kernel call fails and
-> > where does the kernel code come from?
+> >   static int read_sys_metadata_field(u64 field_id, u64 *data)
+> >   {
+> > 	...
+> > 	ret = seamcall(TDH_SYS_RD, &args);
+> > 	if (ret == TDX_SUCCESS) {
+> > 		*data = args.r8;
+> > 		return 0;
+> > 	}
+> > 
+> > 	/* The field doesn't exist */
+> > 	if (ret == TDX_METADATA_FIELD_ID_INCORRECT) {
+> > 		*data = 0;
+> > 		return 0;
+> > 	}
+> > 
+> > 	...
+> > 
+> > 	/* Real reading error */
+> > 	return -EFAULT;
+> >   }
+> > 
+> > The trustness doesn't change no matter how kernel retrieves these
+> > data,
+> > by a series of RD or a RDALL.
 > 
-> Oh I thought it was by design. This code in iommufd_vfio_set_iommu():
+> Having it be field specific behavior (like the diff I posted) means we
+> don't need to worry about TDX module bugs where some field read fails
+> and we don't catch it.
+
+We still need this specific behavior when we bulk read. Can you accept
+a successfully returned blob with TDX_FEATURES0_DYNAMIC_PAMT set but
+pamt_page_bitmap_entry_bits field missing? I assume no, so we still
+need:
+
+	if (blob->tdx_feature0 & TDX_FEATURES0_DYNAMIC_PAMT)
+		check blob->pamt_page_bitmap_entry_bits validity;
+
+BTW: ret == TDX_METADATA_FIELD_ID_INCORRECT is not something bad, TDX
+Module is effectively telling us the field doesn't exist.
+
 > 
-> 	/*
-> 	 * The difference between TYPE1 and TYPE1v2 is the ability to unmap in
-> 	 * the middle of mapped ranges. This is complicated by huge page support
-> 	 * which creates single large IOPTEs that cannot be split by the iommu
-> 	 * driver. TYPE1 is very old at this point and likely nothing uses it,
-> 	 * however it is simple enough to emulate by simply disabling the
-> 	 * problematic large IOPTEs. Then we can safely unmap within any range.
-> 	 */
-> 	if (type == VFIO_TYPE1_IOMMU)
-> 		rc = iopt_disable_large_pages(&ioas->iopt);
-> 
-> git-blame says some guy named Jason Gunthorpe wrote it :P
+> By RDALL, I mean a simpler way to bulk read the metadata. So for future
 
-Er, maybe I mis understood the output then?
+I understand. But as I mentioned that has nothing to do with the
+optional feature checking.
 
-This is not a "failure" though, the map succeeded and gave a small
-page mapping.
+> looking changes, let's think about what we need and not try to find yet
+> more clever ways to code around the current interface. The amount of
 
-This is not reflecting a bug in iommufd but a bug in the TYPE1 support
-in VFIO itself because it definitely cannot maintain the required
-unmap anywhere semantic if it mapped in a 1G huge page like this.
+I don't think so, cause I don't see much benifit bulk reading could
+bring to us. Bulk reading basically retrieves an _unverified_ blob from
+TDX Module. I believe it could also been achieved by a simple iteration
+of existing single reads. The major work, data verification, is still
+there.
 
-Basically, if you are mapping with TYPE1 mode then this should be triggered:
+On the other hand, the cost of a newly designed firmware interface for
+an already online functionality is not low, especially when you want
+backward compatibility to old TDX Module. The worst case is we keep both
+sets of the code...
 
-        if (!strcmp(variant->iommu_mode, "iommufd_compat_type1"))
-                mapping_size = SZ_4K;
+> code and discussion on TDX metadata reading is just too high. Please go
+> back and look at the earlier threads if you haven't yet.
 
-And VFIO should be the one to fail, not iommufd.
-
-If you really want to test TYPE1 you need to test what makes it
-unique, which is that you can map any VMA and then unmap any slice of
-it. Including within what should otherwise be a 1G page.
-
-But I doubt anyone cares enough to fix this, so just exclude
-VFIO_TYPE1_IOMMU from this test?
-
-Jason
+I've read most of the threads before my first posting on this topic.
+Most of the discussion/effort focus on the effective data verification.
+But I haven't found any decisive evidence that bulk reading could
+contribute on it.
 
