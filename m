@@ -1,193 +1,175 @@
-Return-Path: <kvm+bounces-67640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68AAD0C23C
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 21:08:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CACF3D0C57A
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 22:38:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0A322305EF8D
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 20:06:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9AF57302D8A3
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 21:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA3936657E;
-	Fri,  9 Jan 2026 20:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9B333D6F6;
+	Fri,  9 Jan 2026 21:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MH0DShUk"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="fJdZcUro";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="O7CTJaPo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B042DC34B
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 20:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767989188; cv=pass; b=pnj4Fy7uO2MVAszegbbGO7JA99PJYwuZbpftTcq5eT7SC5OZ4tLGmwAyiQveXiaojWkGOVwYbXFGDa5NHI8zO7JQvqE+8S8PRFi7tnW961u8paFS0nAYhh99ArCkwBHW76pUK0BiqAEHto5DPeYwVZBj2JoV6X/tCxkxAOQgqlM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767989188; c=relaxed/simple;
-	bh=lnIUJQkxS9Pwv0vAZpiGY6C+0KRrIsW0ImsiyQtadNs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oNhlc1LZSlEJ970gU35TszwnlJv9jHUidOws5CzcYov3hXYTapBqKcekKURi+QTQOd55vSjt3O8+OaUAu9igEMAnuEBtNqXKoUfbFoV1YHLDVPvkha8vgFjCmvnweHE9nqqqGTKUHTv+Hv5uOvdO63CGkqDS1JcFf4q6rDr0Q0U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MH0DShUk; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee147baf7bso16601cf.1
-        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 12:06:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767989186; cv=none;
-        d=google.com; s=arc-20240605;
-        b=T30pPpAFZF7JP/aUMNrEqrtLuI53bG3zIw44Y4TO2NuX2IvvRM+VC09xSaDa+98sd2
-         mDlFbQF/d0ZU1g8xZevdXz4LBzMU8mghFFoO+WBr5VEfNiVNa/xzyC/A3jwS8jchuX8F
-         e5586O4NUbmnp5ru47VNY2jkvm9q9ytFX5eb+x2xNIDqVa60PK/2M/0FTlDLO7/+csdt
-         FkGE9+TaRBAIhuRV8gBzAPP85Xdq1icpArtHZV1/dQ5XIiLg+vzMss3FXFJpVFO5c0VZ
-         4rGi9EwEowRspB1hqVauhtrabgdKAcuB3YVOkoUe01OsEcx4wa9u5C80p7elJYDMTQKg
-         gWSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3v9Ac84hXSFfPtALk5IIwgHNdB2cCIMVGKjZbTXyYLE=;
-        fh=qbRXptn2WH8skCOjUEeOsKCSGV/z08NzKtt6wWlpO04=;
-        b=PxUlF1Xc1+4B3hT5V46fFQ8j7FpLDUtEtNRYqxana+fy5MlrfMHH8j8d7OKZkSAWFa
-         krQLpc1ewaGnvp4eOqUnDe4WWBB8eUg1A5nF4S8IcrHFIvUWQGdCBmwC525JWy3xCKy6
-         E5c6hJZ2fSnsP1ECX7mTdDyF574am6IRiKBD+90npm2HnScs/TqaYt6WB5lFUfAZz9h7
-         hdKShF3Wuk6aTFiCDlDZe7DTOjvt9j7KzE/0ujNPIDt2lt/F+jbA12qvUqPrO8c9kO6V
-         STnK0OpiJB7Lgk06qX5En308da1XKR1oVZ2fZ+nHVJvRTpXQWfLCBBJ4x6kBsNIP5iSx
-         bq4Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767989186; x=1768593986; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3v9Ac84hXSFfPtALk5IIwgHNdB2cCIMVGKjZbTXyYLE=;
-        b=MH0DShUkKdltwr507ftvTYed0K7XwUj06CSBVS/0vb2BoptD7Js4OeEIEfe0sFcola
-         O2YO4sTuUAxomoKZeTJbBofUlNQK6hD2c1K3a2lpioxg1QvKknzfzFCEOCXdYDD6h3lz
-         s2gjyAS0ctMPUrczymCsCwZDK5DwKkSzPFXPEM2vPWBXdODTDUt6W+osqJxT0U7ijdcj
-         KwYdFp5ePh4fCsgIfkrQVI5nkmQ2ldGlE19nemujeZUwEFJJZQLSgI3g3FHXYH9iTFmq
-         DvyzmyupsWba36Pu120G6Ayv2AdCKyMKyNG1aQCw0HbV5nArrDhoj6AygEiXmiYHSEW7
-         iKuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767989186; x=1768593986;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3v9Ac84hXSFfPtALk5IIwgHNdB2cCIMVGKjZbTXyYLE=;
-        b=XsYsuEccMIMj3zCICSJ+MtIAlmHYf563L7YqyppH6EcoO/wyLv8ZdjRh+ryPlsT++d
-         s2d2o/43bYHml/xnaOihoLyMelKlwfLQDw2zr22yDYU80G5oIY/3ZFemdK/nRN6n9dMo
-         z4ldd5dCHZ5appY/90VEqGxjDA9DubwCQVGISmMMrGvODixhA666Q3G9gZseD5JvqwqD
-         PUt9CfzdsLe/2wnD/L7ZU6N7BtudrBAuu4hWPW4ZWPPfpOCP1M6G2LPu7h6tmiBA9xaE
-         MqlMgDpnNdOzRHZdlQE4ggIF0WWPGtSqmt3Lq8/o4ea7qalCt5w1pAC318N26CQ7vGpW
-         QbbA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJHRJ7/NOMWlIAeixdsCuq5gn83CeCtdC5wuu7w++d0d8ZvK5yt/H894TiXV+9anD7EiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbKlEd7hIXDvllTQca3077Q6oSyeSgULemhgTrg5DZMu48xHVa
-	gvEStt+OmhitwUd5jijNpkqXdtDHUY1ku8ewesXK1ZKgj1/IPTN/UThgDDt6XvraEAOwsEVDfxQ
-	GE96Mr/oEmMNmwNNfjqmqFets7zXDkxzoM0puXIeu
-X-Gm-Gg: AY/fxX5u/HmMooPwiBtDLVVk+m+j5J67IROvhSo37K52HWrfZv7Z4yYA8dufwsRPoMo
-	GSoKqS9wbg6LO4ovOZGgtVzCChiVeK6n7jq0FzcERr0+rzEP9G21UjNFIHrADimjBRRKvA7HtTj
-	chrJQ0JPXcJ1carzLpZlVvfXb2fOSjK0ZEfvbA1bZVxOnv3sHmASfVTRhgTMeAemHI9+dFBGFGx
-	xNqFZYeLUYiqrra2BNKH5hoPNrv/xfm2uztDQ/QtCHA91Umn14ioC/NPNXYQL3PUeSxpzIYsdVs
-	e9T+0fGPSl4ofPqkz4p3nORIpec=
-X-Received: by 2002:a05:622a:1482:b0:4ff:c103:49f1 with SMTP id
- d75a77b69052e-501182d936amr2352541cf.6.1767989185723; Fri, 09 Jan 2026
- 12:06:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B59A33D4F6;
+	Fri,  9 Jan 2026 21:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767994719; cv=none; b=eEPd3O57Zk5QSL6zrtzsAywKuGt9K7S85fNBcomxjCKlPW3BBJpfZz2jjjmGtsNhdZ9vEGPvTnSj/LDcH6za8WmgPYep1g9mIt1qWLzC8jcrsZxh1dX6fPSm46rhL5ISbYgnqxVPIZatwk87amnC/5uCUuq3q3j1VKzyQ//YP0E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767994719; c=relaxed/simple;
+	bh=iFcbhGt4sl07dI/vgTsNt/XXjlhieSN2X15MCPhWfTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MU56B5RV7iXjZfKyjTZ6gfsS41RL6UHjveQuqCAUz/6GDZla7qoPfys3Uw3DYh4PDk9wE2VlmBZ7uqD83eEQmJPZrkuSQbQ0HW6NT6B7Y8zL/E+dZD0veOM8ILHP29GEBE3XOLnJaa4VnZxZ+Y0WafEqO3uO8ZBWweJLYm8nfek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=fJdZcUro; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=O7CTJaPo; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 2EC2BEC0129;
+	Fri,  9 Jan 2026 16:38:33 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Fri, 09 Jan 2026 16:38:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1767994713;
+	 x=1768081113; bh=gvtvSAYi4oFbZNkjA+PRpLh/s0xkmUKgjuZp66x8+6I=; b=
+	fJdZcUroaBUWu505kk5QVkdyQb9ZZc2ZLuIZPelLw80Q98edrJ+km3L3a/fA2Nc+
+	3UId0xTKzJF6wwIhbZSUKIIGIyQ0OFSUHCF4uvAoY4WqYXoavDSU3hNqo/Xea0T2
+	j62h8E+GchdgzdhCjLbsZhr5WhNAUOry8qeLDk1W5Ska4MrFyr5yl/CH0rKy/dYE
+	H/aVyUa3pFLoAZsV633MjyNeLUX9bVUiO7cOAn6uV9PhQn5JDd/mFe1XcNlYvxZN
+	GtjmwJDKyZ8ZlGqaF2CGJFNlV4ApQc4iQ8hHuFKGI0rnzoVQ3dG8uEeJi15TOnD5
+	jOl015QCshOf8ieKofA87A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1767994713; x=
+	1768081113; bh=gvtvSAYi4oFbZNkjA+PRpLh/s0xkmUKgjuZp66x8+6I=; b=O
+	7CTJaPomy1TOqAV138g6AiRzpF26Nq+IqNY1mWuXaXG4P1Ua0g2EkJbFP/D30zZ+
+	32kcEwDqICG51QjtmB7yn+hygqGra90oOP6w1FJBE7y4yC67IwSjF4l5rSEqjBZr
+	kywNqeYe+jUQD65K5AHuITvU3csfdxCN9J8gIomZt1ru39Bc/qEOd/rAgxa/vJ+P
+	w7sWA361vA9tgTanRJVeeqj9kzc50U/WObhmP3Vi2aXGJLpbFELTnbr2vWimuha5
+	d1Pu1MprwWPSkxp5bUSDy6dmBw9f7BMTX5XotkbwyetVc+ce+PB7ZheeSx4Arf7Z
+	5RR+OtgIhC1CEtqkQRsXg==
+X-ME-Sender: <xms:WHVhaWPoUTXswz-TyFSypR8CTtjJLG5qugBXfmRPctJQ3a2c033iKw>
+    <xme:WHVhaQ_ipEA1qy5GI2yfUxcSw6WXhdQkvSf85xmN2LJfbu-4IsW8-b-6r2_LAQisW
+    rixyi0OOACmF9mBtthAPTNdSQ2WNB2_ogWLwwVmK_Dh3lM5VpS2iA>
+X-ME-Received: <xmr:WHVhafcK5ZN_Q7b7gPGZdfvS2ojOFoUsRnYTPCjyCdKNy_DwLvuhyHcPjY0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutdelleduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
+    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
+    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepkedpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohepug
+    hmrghtlhgrtghksehgohhoghhlvgdrtghomhdprhgtphhtthhopegrmhgrshhtrhhosehf
+    sgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehpvghtvghrgiesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgv
+    rhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvg
+    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshht
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:WHVhaXx1x0A8sokKqYTsh5-uaI6p7H-hpPFYgRAhwgufMo5KjEEPJA>
+    <xmx:WHVhacJC6CWuwpDqaVVQkRxCPbT3wWdqtHPMUGmXB7E6jUqVaW-fXg>
+    <xmx:WHVhaRFuQ6SK5RXxhfVm_4LiCuDHCs1k51MdlZYy49qz7jBZqNfEOw>
+    <xmx:WHVhaQ9TxTyCbhPfOeebSxtg9AfNWJz-sD_ERB40lZAHVrm5R_MNLw>
+    <xmx:WXVhacwCEhJEi9X6hZTXQQvwvPOiafZbBlkY1AjsNBRBrcUi_P92jw9Y>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 9 Jan 2026 16:38:32 -0500 (EST)
+Date: Fri, 9 Jan 2026 14:38:30 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: David Matlack <dmatlack@google.com>, Alex Mastro <amastro@fb.com>, Shuah
+ Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
+Message-ID: <20260109143830.176dc279@shazbot.org>
+In-Reply-To: <20260109180153.GI545276@ziepe.ca>
+References: <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
+	<20260108141044.GC545276@ziepe.ca>
+	<20260108084514.1d5e3ee3@shazbot.org>
+	<CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
+	<20260108183339.GF545276@ziepe.ca>
+	<aWAhuSgEQzr_hzv9@google.com>
+	<20260109003621.GG545276@ziepe.ca>
+	<aWBPNHOsaP1sNvze@google.com>
+	<20260109005440.GH545276@ziepe.ca>
+	<CALzav=cBGkhbbyggkfaYh3wfqodxRHZKXTNdnmjoXOgwMouBuA@mail.gmail.com>
+	<20260109180153.GI545276@ziepe.ca>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107201800.2486137-1-skhawaja@google.com> <20260107202812.GD340082@ziepe.ca>
- <20260107204607.GE340082@ziepe.ca>
-In-Reply-To: <20260107204607.GE340082@ziepe.ca>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Fri, 9 Jan 2026 12:06:13 -0800
-X-Gm-Features: AZwV_QjV34fhG0Fu3VYkE_TAOZmadp8pGOc9Pcce_ry5TSbSRKbYuzuTqpawuWI
-Message-ID: <CAAywjhTEyOUmxWeCX6GwCBSnMf-p18Ksu2TUYeQ57K8H4RW-9w@mail.gmail.com>
-Subject: Re: [PATCH 0/3] iommu/vt-d: Add support to hitless replace IOMMU domain
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, David Matlack <dmatlack@google.com>, 
-	Robin Murphy <robin.murphy@arm.com>, Pratyush Yadav <pratyush@kernel.org>, 
-	Kevin Tian <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>, 
-	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Saeed Mahameed <saeedm@nvidia.com>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
-	Parav Pandit <parav@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 7, 2026 at 12:46=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrot=
-e:
->
-> On Wed, Jan 07, 2026 at 04:28:12PM -0400, Jason Gunthorpe wrote:
-> > On Wed, Jan 07, 2026 at 08:17:57PM +0000, Samiullah Khawaja wrote:
-> > > Intel IOMMU Driver already supports replacing IOMMU domain hitlessly =
-in
-> > > scalable mode.
-> >
-> > It does? We were just talking about how it doesn't work because it
-> > makes the PASID entry non-present while loading the new domain.
->
-> If you tried your tests in scalable mode they are probably only
-> working because the HW is holding the entry in cache while the CPU is
-> completely mangling it:
->
-> int intel_pasid_replace_first_level(struct intel_iommu *iommu,
->                                     struct device *dev, phys_addr_t fsptp=
-tr,
->                                     u32 pasid, u16 did, u16 old_did,
->                                     int flags)
-> {
-> [..]
->         *pte =3D new_pte;
->
-> That just doesn't work for "replace", it isn't hitless unless the
-> entry stays in the cache. Since your test effectively will hold the
-> context entry in the cache while testing for "hitless" it doesn't
-> really test if it is really working without races..
+On Fri, 9 Jan 2026 14:01:53 -0400
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-Ah.. you are absolutely correct. This will not work if the entries are
-not cached.
->
-> All of this needs to be reworked to always use the stack to build the
-> entry, like the replace path does, and have a ARM-like algorithm to
-> update the live memory in just the right order to guarentee the HW
-> does not see a corrupted entry.
+> On Fri, Jan 09, 2026 at 09:04:30AM -0800, David Matlack wrote:
+> > > If you really want to test TYPE1 you need to test what makes it
+> > > unique, which is that you can map any VMA and then unmap any slice of
+> > > it. Including within what should otherwise be a 1G page.
+> > >
+> > > But I doubt anyone cares enough to fix this, so just exclude
+> > > VFIO_TYPE1_IOMMU from this test?  
+> > 
+> > Ah, ok, thanks for the explanation. So VFIO_TYPE1_IOMMU should always
+> > use 4K mappings regardless of backend (VFIO or iommufd) so that unmap
+> > can work as intended.  
+> 
+> IDK, I think you should just ignore testing TYPE1v0. The actual real
+> semantics that it had are quite confusing and iommufd provides an
+> emulation that is going to be functionally OK (indeed, functionally
+> more capable) but is not the exactly the same.
+> 
+> The old comment here is sort of enlightening:
+> 
+> +        * vfio-iommu-type1 (v1) - User mappings were coalesced together to
+> +        * avoid tracking individual mappings.  This means that the granularity
+> +        * of the original mapping was lost and the user was allowed to attempt
+> +        * to unmap any range.  Depending on the contiguousness of physical
+> +        * memory and page sizes supported by the IOMMU, arbitrary unmaps may
+> +        * or may not have worked.  We only guaranteed unmap granularity
+> +        * matching the original mapping; even though it was untracked here,
+> +        * the original mappings are reflected in IOMMU mappings.  This
+> +        * resulted in a couple unusual behaviors.  First, if a range is not
+> +        * able to be unmapped, ex. a set of 4k pages that was mapped as a
+> +        * 2M hugepage into the IOMMU, the unmap ioctl returns success but with
+> +        * a zero sized unmap.  Also, if an unmap request overlaps the first
+> +        * address of a hugepage, the IOMMU will unmap the entire hugepage.
+> +        * This also returns success and the returned unmap size reflects the
+> +        * actual size unmapped.
+> 
+> iommufd does not try to do this "returned unmap size reflects the
+> actual size unmapped" part, it always unmaps exactly what was
+> requested, because it disables huge pages.
 
-Agreed. I will go through the VTD specs and also the ARM driver to
-determine the right order to set this up.
->
-> It is a little bit tricky, but it should start with reworking
-> everything to consistently use the stack to create the new entry and
-> calling a centralized function to set the new entry to the live
-> memory. This replace/not replace split should be purged completely.
->
-> Some discussion is here
->
-> https://lore.kernel.org/all/20260106142301.GS125261@ziepe.ca/
->
-> It also needs to be very careful that the invalidation is doing both
-> the old and new context entry concurrently while it is being replaced.
+I think there was also some splitting code in the IOMMU drivers that
+has since been removed that may have made the v1 interface slightly
+more sane.  It certainly never restricted mappings to PAGE_SIZE in
+order to allow arbitrary unmaps, it relied on users to do sane things
+and examine the results.  Those "sane things" sort of became the v2
+interface.
 
-Yes, let me follow the discussion over there closely.
->
-> For instance the placement of cache_tag_assign_domain() looks wrong to
-> me, it can't be *after* the HW has been programmed to use the new tags
-> :\
->
-> I also didn't note where the currently active cache_tag is removed
-> from the linked list during attach, is that another bug?
+In any case, we've had v2 for a long time and if IOMMUFD compat make v1
+more bloated and slow such that users realize they're using an old,
+crappy interface, that's probably for the best.  Examining what page
+size is used for v1 is probably not worthwhile though.  Thanks,
 
-You are correct, the placement of cache_tag_assign_domain is wrong.
-The removal of the currently active cache tag is done in
-dmar_domain_attach_device, but I will re-evaluate the placement of
-both in the v2.
->
-> In short, this needs alot of work to actually properly implement
-> hitless replace the way ARM can. Fortunately I think it is mostly
-> mechanical and should be fairly straightfoward. Refer to the ARM
-> driver and try to structure vtd to have the same essential flow..
-
-Thank you for the feedback. I will prepare a v2 series addressing these poi=
-nts.
->
-> Jason
+Alex
 
