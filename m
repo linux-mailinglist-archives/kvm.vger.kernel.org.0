@@ -1,152 +1,211 @@
-Return-Path: <kvm+bounces-67550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6EFD0874B
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 11:12:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 257D3D087A0
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 11:15:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5327B303F654
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 10:07:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FDAD303F0E5
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 10:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5DE42A80;
-	Fri,  9 Jan 2026 10:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6223382E4;
+	Fri,  9 Jan 2026 10:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dNqldvQP"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="GXP9kHST"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0532F6928
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 10:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EA632E732;
+	Fri,  9 Jan 2026 10:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767953256; cv=none; b=TGYMT/Q4ZiOdrqP7WG9owryXmHEYSZ/ngjhCBuC7e2cnhLNzI2VjE9SBQZpBCFOkBLajyLql32rXz2v7aqt11hxISO8j2oyIg22lY/sqPJRveVl6SLaImR5pyAdB098zQPTGq6eON8t/ii/iQ8kC16U16m0b8r5SUExJRaxNUW8=
+	t=1767953706; cv=none; b=qCSTNUajhmk79XHYFc/YzB6S3yrj2U5nhyk2kqEirUqkKykJxVrsbB4FPobU8FhO4e/1dDPwjh0pEmGMac5FQWFCQMpXFSQ1FgBHGt8JYyTNBsePtEk1t+XpAZt1n7FLZIzzjdNbIGBgafn6zd9XIC7EdjrsXlx58Ntkh4oJGtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767953256; c=relaxed/simple;
-	bh=REVzig4MjHHgYwYSO4zljJ1rWWVvrg8CHBNjRprdGkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QPSo3fZ1UG6dcOxs9dgH21GWYoxPlaMz7JeZBsjDWjXU48MFzbb9zXuTN1DqnJosj6b6rVUCuvmBgYO553RaYXDHriycdlcGx+NHyu8+aFhQq+nCv5k9jZBQ1gZ9P0pN2dczV3EStHNzRUYSVB8F7fIq0Q4m3TPmmgsBiNMVHgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dNqldvQP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767953253;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2kqXqa/z20xXzqGwszoGQHOQvZhM3/sF3LS96EOsBmE=;
-	b=dNqldvQPZ8HrdKb44q60+mgB6rDilhXfdzKcBGtKcOxlW9HvMbBx5ZXCgRx1Lp8/Qh25sR
-	6jZV75x4Ndd7HMSpWSRxdrvDtByqk3ABUfpgnXA0vvygin2pIoezr/ASxHnH4Vji4s89V8
-	wrrrwHN6btXDVKl7iMjmdSY3QQI2Dgk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-225-T-U1g9hDNSSq0BRCIqAthg-1; Fri,
- 09 Jan 2026 05:07:32 -0500
-X-MC-Unique: T-U1g9hDNSSq0BRCIqAthg-1
-X-Mimecast-MFC-AGG-ID: T-U1g9hDNSSq0BRCIqAthg_1767953251
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5914419560B2;
-	Fri,  9 Jan 2026 10:07:31 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.39])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 437F830002D1;
-	Fri,  9 Jan 2026 10:07:29 +0000 (UTC)
-Date: Fri, 9 Jan 2026 10:07:26 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
-	Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	"open list:X86 KVM CPUs" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] Add query-tdx-capabilities
-Message-ID: <aWDTXvXxPRj2fs2b@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20260106183620.2144309-1-marcandre.lureau@redhat.com>
- <aV41CQP0JODTdRqy@redhat.com>
- <87qzrzku9z.fsf@pond.sub.org>
- <aWDMU7WOlGIdNush@redhat.com>
- <87jyxrksug.fsf@pond.sub.org>
+	s=arc-20240116; t=1767953706; c=relaxed/simple;
+	bh=o7JZKnKjaE69MTIhA9EF55nlKQYXzW6zANd0/gTwhds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qde/nN9w/72DnEgL+K48A+d8i8GzuiC6BHYuFwXQYmJYZHsgPoHrU3NPH9RAbBd+HdrBwRV+EVcNZllMotgTrm9PhPUewb+gHrien31R/8pzCSeLWNOyjC6U5hKS4fZs6QJF4WdMePeRXQL2MbSfYAJoIdtug8kME2voMOGoLSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=GXP9kHST; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.165] ([129.217.186.165])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 609AEsWt003313
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 9 Jan 2026 11:14:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1767953695;
+	bh=o7JZKnKjaE69MTIhA9EF55nlKQYXzW6zANd0/gTwhds=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=GXP9kHSTN96tyHIbLuG+YZD3/mt0iz1I0EFcEetx3SCrvbAGGmoA+xpesYfSArqss
+	 9Rtv1DtbTrhfUSQRhy3+zRbDYgaOpeaoG8FYzTwplvLFhAXTMAyavRGimTtYAfovAU
+	 qTAMhF85wHOtgLHFSDFyWj+cBM2+CT5bpXDYk1EI=
+Message-ID: <900c364b-f5ca-4458-a711-bf3e0433b537@tu-dortmund.de>
+Date: Fri, 9 Jan 2026 11:14:54 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 9/9] tun/tap & vhost-net: avoid ptr_ring tail-drop
+ when qdisc is present
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-10-simon.schippers@tu-dortmund.de>
+ <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+ <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de>
+ <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87jyxrksug.fsf@pond.sub.org>
-User-Agent: Mutt/2.2.14 (2025-02-20)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Jan 09, 2026 at 11:01:27AM +0100, Markus Armbruster wrote:
-> Daniel P. Berrangé <berrange@redhat.com> writes:
+On 1/9/26 07:09, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 4:02 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> On 1/8/26 05:37, Jason Wang wrote:
+>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>
+>>>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
+>>>> becomes full. Once an entry is successfully produced and the ptr_ring
+>>>> reaches capacity, the netdev queue is stopped instead of dropping
+>>>> subsequent packets.
+>>>>
+>>>> If producing an entry fails anyways, the tun_net_xmit returns
+>>>> NETDEV_TX_BUSY, again avoiding a drop. Such failures are expected because
+>>>> LLTX is enabled and the transmit path operates without the usual locking.
+>>>> As a result, concurrent calls to tun_net_xmit() are not prevented.
+>>>>
+>>>> The existing __{tun,tap}_ring_consume functions free space in the
+>>>> ptr_ring and wake the netdev queue. Races between this wakeup and the
+>>>> queue-stop logic could leave the queue stopped indefinitely. To prevent
+>>>> this, a memory barrier is enforced (as discussed in a similar
+>>>> implementation in [1]), followed by a recheck that wakes the queue if
+>>>> space is already available.
+>>>>
+>>>> If no qdisc is present, the previous tail-drop behavior is preserved.
+>>>>
+>>>> +-------------------------+-----------+---------------+----------------+
+>>>> | pktgen benchmarks to    | Stock     | Patched with  | Patched with   |
+>>>> | Debian VM, i5 6300HQ,   |           | noqueue qdisc | fq_codel qdisc |
+>>>> | 10M packets             |           |               |                |
+>>>> +-----------+-------------+-----------+---------------+----------------+
+>>>> | TAP       | Transmitted | 196 Kpps  | 195 Kpps      | 185 Kpps       |
+>>>> |           +-------------+-----------+---------------+----------------+
+>>>> |           | Lost        | 1618 Kpps | 1556 Kpps     | 0              |
+>>>> +-----------+-------------+-----------+---------------+----------------+
+>>>> | TAP       | Transmitted | 577 Kpps  | 582 Kpps      | 578 Kpps       |
+>>>> |  +        +-------------+-----------+---------------+----------------+
+>>>> | vhost-net | Lost        | 1170 Kpps | 1109 Kpps     | 0              |
+>>>> +-----------+-------------+-----------+---------------+----------------+
+>>>>
+>>>> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.org/
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  drivers/net/tun.c | 31 +++++++++++++++++++++++++++++--
+>>>>  1 file changed, 29 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>> index 71b6981d07d7..74d7fd09e9ba 100644
+>>>> --- a/drivers/net/tun.c
+>>>> +++ b/drivers/net/tun.c
+>>>> @@ -1008,6 +1008,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>         struct netdev_queue *queue;
+>>>>         struct tun_file *tfile;
+>>>>         int len = skb->len;
+>>>> +       bool qdisc_present;
+>>>> +       int ret;
+>>>>
+>>>>         rcu_read_lock();
+>>>>         tfile = rcu_dereference(tun->tfiles[txq]);
+>>>> @@ -1060,13 +1062,38 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>
+>>>>         nf_reset_ct(skb);
+>>>>
+>>>> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>>>> +       queue = netdev_get_tx_queue(dev, txq);
+>>>> +       qdisc_present = !qdisc_txq_has_no_queue(queue);
+>>>> +
+>>>> +       spin_lock(&tfile->tx_ring.producer_lock);
+>>>> +       ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+>>>> +       if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
+>>>> +               netif_tx_stop_queue(queue);
+>>>> +               /* Avoid races with queue wake-up in
+>>>> +                * __{tun,tap}_ring_consume by waking if space is
+>>>> +                * available in a re-check.
+>>>> +                * The barrier makes sure that the stop is visible before
+>>>> +                * we re-check.
+>>>> +                */
+>>>> +               smp_mb__after_atomic();
+>>>> +               if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+>>>> +                       netif_tx_wake_queue(queue);
+>>>
+>>> I'm not sure I will get here, but I think those should be moved to the
+>>> following if(ret) check. If __ptr_ring_produce() succeed, there's no
+>>> need to bother with those queue stop/wake logic?
+>>
+>> There is a need for that. If __ptr_ring_produce_peek() returns -ENOSPC,
+>> we stop the queue proactively.
 > 
-> > On Fri, Jan 09, 2026 at 10:30:32AM +0100, Markus Armbruster wrote:
-> >> Daniel P. Berrangé <berrange@redhat.com> writes:
-> >> 
-> >> > On Tue, Jan 06, 2026 at 10:36:20PM +0400, marcandre.lureau@redhat.com wrote:
-> >> >> From: Marc-André Lureau <marcandre.lureau@redhat.com>
-> >> >> 
-> >> >> Return an empty TdxCapability struct, for extensibility and matching
-> >> >> query-sev-capabilities return type.
-> >> >> 
-> >> >> Fixes: https://issues.redhat.com/browse/RHEL-129674
-> >> >> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> [...]
-> 
-> >> > This matches the conceptual design used with query-sev-capabilities,
-> >> > where the lack of SEV support has to be inferred from the command
-> >> > returning "GenericError".
-> >> 
-> >> Such guesswork is brittle.  An interface requiring it is flawed, and
-> >> should be improved.
-> >> 
-> >> Our SEV interface doesn't actually require it: query-sev tells you
-> >> whether we have SEV.  Just run that first.
-> >
-> > Actually these commands are intended for different use cases.
-> >
-> > "query-sev" only returns info if you have launched qemu with
-> >
-> >   $QEMU -object sev-guest,id=cgs0  -machine confidential-guest-support=cgs0
-> >
-> > The goal of "query-sev-capabilities" is to allow you to determine
-> > if the combination of host+kvm+qemu are capable of running a guest
-> > with "sev-guest".
-> >
-> > IOW, query-sev-capabilities alone is what you want/need in order
-> > to probe host features.
-> >
-> > query-sev is for examining running guest configuration
-> 
-> The doc comments fail to explain this.  Needs fixing.
-> 
-> Do management applications need to know more than "this combination of
-> host + KVM + QEMU can do SEV, yes / no?
-> 
-> If yes, what do they need?  "No" split up into serval "No, because X"?
+> This seems to conflict with the following NETDEV_TX_BUSY. Or is
+> NETDEV_TX_BUSY prepared for the xdp_xmit?
 
-When libvirt runs  query-sev-capabilities it does not care about the
-reason for it being unsupported.   Any "GenericError" is considered
-to mark the lack of host support, and no fine grained checks are
-performed on the err msg.
+Am I not allowed to stop the queue and then return NETDEV_TX_BUSY?
+And I do not understand the connection with xdp_xmit.
 
-If query-sev-capabilities succeeds (indicating SEV is supported), then
-all the returned info is exposed to mgmt apps in the libvirt domain
-capabilities XML document.
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+> 
+>>
+>> I believe what you are aiming for is to always stop the queue if(ret),
+>> which I can agree with. In that case, I would simply change the condition
+>> to:
+>>
+>> if (qdisc_present && (ret || __ptr_ring_produce_peek(&tfile->tx_ring)))
+>>
+>>>
+>>>> +       }
+>>>> +       spin_unlock(&tfile->tx_ring.producer_lock);
+>>>> +
+>>>> +       if (ret) {
+>>>> +               /* If a qdisc is attached to our virtual device,
+>>>> +                * returning NETDEV_TX_BUSY is allowed.
+>>>> +                */
+>>>> +               if (qdisc_present) {
+>>>> +                       rcu_read_unlock();
+>>>> +                       return NETDEV_TX_BUSY;
+>>>> +               }
+>>>>                 drop_reason = SKB_DROP_REASON_FULL_RING;
+>>>>                 goto drop;
+>>>>         }
+>>>>
+>>>>         /* dev->lltx requires to do our own update of trans_start */
+>>>> -       queue = netdev_get_tx_queue(dev, txq);
+>>>>         txq_trans_cond_update(queue);
+>>>>
+>>>>         /* Notify and wake up reader process */
+>>>> --
+>>>> 2.43.0
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
+> Thanks
+> 
 
