@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-67590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD75DD0B800
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 18:06:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95491D0B908
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 18:15:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CD9AC301B329
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 17:06:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29C2230BEA6D
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 17:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C6E365A07;
-	Fri,  9 Jan 2026 17:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B05C365A05;
+	Fri,  9 Jan 2026 17:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rwERlDPw";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="rwERlDPw"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ezV3ms17";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="ezV3ms17"
 X-Original-To: kvm@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011017.outbound.protection.outlook.com [52.101.70.17])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011062.outbound.protection.outlook.com [52.101.70.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD73931A06C
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 17:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F5E364EB2
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 17:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.62
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767978351; cv=fail; b=GqnLXifTmQi3Z0WPV3h6JEiV3DPJp+AZ0jc/3ld1TG1WgIUMJH2DU5KUQT5CK4w8cjQy8kcLf5tXK0np480Ad1JJGa1bm3jzlLlrN7ZRXnIwkt+GZCjSwUhUUh9wyDyGmFaNgJEzUUfZKmuWvwbMhwGJxAz6lCVxbr0C0KwpOu8=
+	t=1767978422; cv=fail; b=eGOG4LgXyq/TCRNcPqpjdjrx27u+1UPrDR/lu/WXBK4qDlOqlIolGAu9H+Sy1NTnlT8apphmbG3NpA9Dhh0mIX6aoUprmLdFENLiHxzAll140NBsrS/2afHpz+vkpGV2U7bhHx/K4USNxbj8wjG5x3KUQdAlOobRdo85r66tHJM=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767978351; c=relaxed/simple;
-	bh=Osc/Sq3U9wWHHA2DkfiXXhy9JF/RpbT+fqZ1wwVrYv4=;
+	s=arc-20240116; t=1767978422; c=relaxed/simple;
+	bh=JvTPrPthzaPEdUTbk/3Ftb32hQD9H/Bmm/D7CujAUXM=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RX2nu2Sze08Eo7OvI6R+U4NmHeRTkgRx2+i9l6jUwXj5g+vnuIKpuUuCOVmNKb8TLhULq0kNxmVDYOY6Aw937w941BL7rB8CcGA04vVjPjiIOhLWUjP/Y71LY8FIyJgu/BxycUGk6btBAY+GLHUqmk1cyH2idhdk8ansNLf7hVo=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rwERlDPw; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=rwERlDPw; arc=fail smtp.client-ip=52.101.70.17
+	 Content-Type:MIME-Version; b=YGcMvi2BSTyYjALcoePc0eA1PiOydzktIZnVbWx3MYb9g7WzeWKbP/shF+mtgHVKsFdZqPeSxoJQKOrhDIIfVyeXQw2TaOhFsYjWdDO75A7n3K4w8uJxO1Qa5wWi681Jv18PV2rOjD1WjfHL6BhJKZEhOAB9u89n7eN2ZPvHsb4=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ezV3ms17; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=ezV3ms17; arc=fail smtp.client-ip=52.101.70.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=TvBgDO4KhoEiaKFlN971hjU+z+NLYgcJZPNzXZmXKcVWrHOYrR15lB2wvB64Y2fR9l8iCz3q3bGyKD0Y+VdhD2GARudY0DM3oyKDUFTVM2B+uq5ZRmi+HUjO8+Ca+ezYS4lTPBugE8ceChkdMhd9CXhGQmj2AVRZZNMovl6F+bjyDEvHFwvFfcM6OCN30lJr2i4rEenPyKpNjjqK0iBnUpPxB+CFCAOzXkPaiCEyy5d+h3QT6+PJUrJn3kVZt40xClHxJKR2iOI0RbBnyL210Ho6A+4bcKNVMb0/mBbNHaO5VcEAzzM/aCRLQmoTjN8K5KQsyxMwjS88i41KxFGMpA==
+ b=mXU0zSp1Bv4xmEWmv3kqpdhIZlhIeaaL/SRaHFhs3Y1hPW1lpl0XXIzziK67Q96qeb/zfHDnMt99bs7EBfO0CpG6gSjgicWebLmQFkWMhcogT1AE2TDDRciLRsMbdmLXCDfPBIxG56t/xKFIu0UbKriW3AZopkJvu76dC2oDMOMsm1P8EG7gPAFY6twI1yKIeVXHOQTqINYBxq3N2MaJme7RfeXhSx2ogaaitwiG/fgYr5gjKvC2QmYsUMp3mjRx63Qgk+4glMqCcIheWpAHoDLzbG7Y5CLWOXDSiCwlrCdA91G4pAoBY/ca4ueoz0olGKRWhaoXTunVzaOEIejh2Q==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HccP6RVpVK58zdYiQNIcrp6dBL9a71SDFv8fqtENEmA=;
- b=WMBNq1mo/vNfPuQtAZLFwkDBiNDP8NdEeD8ISzS8wZbW2OVFoxvP3Mh9zGiw9n+fRUia9n4OX2R7uTS/szNu07E/Rtyj3UWB8WX1ggsaeyWXpqoQGNpHoPedjxfnwCKvali0nsKNRQbR2qYyfpQpbrS7uyofRGpUWWP88dYbJ3zJ14h9k8xaQNfvCmJ+g0oA5+YJEioYLfgT0i0ttne8FcIxhlcnqsJnjgFXkLwE1ne565+OukNWB8h3htqdayYaRgoHatFQC2EpPzpNlKmbyp3VS+y6nhEamuz+TV7UUL2lweKTm1AvVpdg61zParn47K2C5/3Pn+tulgcP1dkvVg==
+ bh=/DLfqqbfv7Ac9dF0b4f7J0AefvH9xkvpqB5OvVrj7io=;
+ b=XQPMP6VU9qnhadnK8bl/qrFBhEvcN12YDbrWjRVuou1llsbakI52WME1kdqy4BdwxitLlkbcIiplyPaO3ael+oVtSWTA7ReqK8rYBAi+84NnBPd6t7hdz5FUuD7WMDGyewGhfeFQFnkOMSj8Ub39jr0uweOJ8k2cbe7/zA2U4bBZm761bsgvfUqDNh5twvpPn3bGXHh2oI2qzWe3TMLt+UeAOLEP09OSO0EJHY7aFSy6/VT3vng+hgK8Cq+fGc7LxvLn8QSicuZMnk58BaeAO+ijVpE3afwghlnFEprLuIwJJl473fz8InvXx1YjLC0v7BCoZryQ6ijuS0A16CElcQ==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HccP6RVpVK58zdYiQNIcrp6dBL9a71SDFv8fqtENEmA=;
- b=rwERlDPwwjw9A0qmVBrkff3pRTTi0fUpLlL7oP670e+QcbjxwWbP72bsPeAgvWOdQs6AqiNvuby8mDm4n0lxS3XgPnfmE1rJ27OGIdzCeCDg4nxCHC3PHAUJIQUSM/zX09QghnrBqufCiXgoz3daWRpK47ckd8ovDBuRouZOucY=
-Received: from AM0PR02CA0159.eurprd02.prod.outlook.com (2603:10a6:20b:28d::26)
- by AS2PR08MB8719.eurprd08.prod.outlook.com (2603:10a6:20b:55f::15) with
+ bh=/DLfqqbfv7Ac9dF0b4f7J0AefvH9xkvpqB5OvVrj7io=;
+ b=ezV3ms17HEo37t8YcbO45TwwTy1CS8+YKaVI5+o/qUXkpiUZJxFlsLt1Yr/kOsFoENLBzvWuSAmRgxx9Q+qaqZqetcj5t7LnPEqe0cutm0w9i2B22wsfVS/QtG5E/0MdXCbCjzXGxwcadQfek7k1M49O8wEmM4y1aFsNSu2dGi4=
+Received: from CWLP265CA0536.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:18d::18)
+ by DBBPR08MB6122.eurprd08.prod.outlook.com (2603:10a6:10:20d::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.5; Fri, 9 Jan
- 2026 17:05:42 +0000
-Received: from AMS1EPF0000004B.eurprd04.prod.outlook.com
- (2603:10a6:20b:28d:cafe::c2) by AM0PR02CA0159.outlook.office365.com
- (2603:10a6:20b:28d::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.4 via Frontend Transport; Fri, 9
- Jan 2026 17:05:42 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.4; Fri, 9 Jan
+ 2026 17:05:43 +0000
+Received: from AM2PEPF0001C717.eurprd05.prod.outlook.com
+ (2603:10a6:400:18d:cafe::6) by CWLP265CA0536.outlook.office365.com
+ (2603:10a6:400:18d::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.5 via Frontend Transport; Fri, 9
+ Jan 2026 17:05:43 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -64,32 +64,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AMS1EPF0000004B.mail.protection.outlook.com (10.167.16.136) with Microsoft
+ AM2PEPF0001C717.mail.protection.outlook.com (10.167.16.187) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.1
- via Frontend Transport; Fri, 9 Jan 2026 17:05:42 +0000
+ via Frontend Transport; Fri, 9 Jan 2026 17:05:43 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MpOkHLQ+6J93LxDocgbSiYiwSjDAGoxhqXYiC2sztiosFTaumpuIl2bqS2l52u3TuweCoHDq5z/O5yZE1PQcTHDeVvLiVoGGXD0eNBHB//xs3lMSava5c6bkzQwKlHEeHnND1nG5VNxlpeVMvUSAq93m2Vmdnw/4pKfGoBJSgBmC2wExVFyxYeIelmLa9Pm258XL36hNs0z3HMcI3Uqgxod1gGPZO+7V4URYdempbfXeQmhR1XJccOlBXlke8EeNalIcKL4kYRXVYGoo+r5hr24KCo+4oc696yj8IQXcoAZStCg9Ak2h5xMj0F6Kcw0NGz2zuSSS54HCoUI1fpPvjg==
+ b=Ub0L0zvF+66b+7Q55brmXgy9VTA9NnNjE4F6sOKtH3bfvql2W2MgmNrWJkIcBz9peRupnyC8EvPG6mTV4TaZryTYkWF/bDys3FcoRGS3sOoGstEINnWYIOZoar7co6fdiuwn8pXaXIiqT8BdqTObKOZYGudpJ29IWBQKcr6K+zyx1x1yknry4AyqyY0sWAv0b1rx1aw0VMB24Hf+JBSpArMrahu2+eUHqi3PIbPSsV+RuEiyokF1CzAOoWY27a6zxWol54fFSw07f9yz51C5r860nilB2LsqZVneTJOCWWUcaMhxfOHCx8HfAGX467Dy3tmBipeOOQtGGdJ39/y8mg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HccP6RVpVK58zdYiQNIcrp6dBL9a71SDFv8fqtENEmA=;
- b=Yw9GMahHq4L6yP1pdOcIwfZw/NXJgNSNPp2CDkWc2BrzSx+HyTFcgRPpHOKGGkT2x4zG5qztFQhprxH6VOC2apMRy1F9pKlpu3S2b/E9IvjYgl/s8RvUEuPgSqR3/EMAvhPHX17q+ektpMSIGCK+bPbTpooB6QF61e7b4HHT75zqD40YJruevlRC8p428HYYMfAl3EwLKsg5kDixCxNacPKaKhjiTD38EBmcsXyo5d3+yOos1IXfX1ALMTpLW7yf3irK1nKmHmwkNZETPCZj2WSu2uLslq9d94M3ImwJQbabPNjSLvoK22usbX44TiyXBGbW5EbmPxTvjKNd/C+EHg==
+ bh=/DLfqqbfv7Ac9dF0b4f7J0AefvH9xkvpqB5OvVrj7io=;
+ b=kQAniIoA0l3bjx4qsNkGOdowOP+fXPn6YI6oMtIKcBVtPMXM1cTI4zBp5uyWF/LTu6N+mG6grC7eqPZMFsJo0Z4YixsJEGVxCQpKhv8QOljnNvFn7V9B6RU6X3lzxpgJpYigUzJQ2BcRii/DR8H2yyGrEDZD7ds+mOzOEdn/oigLsW7fduh9x9RWrVHR22/JE3xIj84H3OFb7BHi8n1J2keG2Xsm7w1MmVw1/WJ0oA6dBJWXafp2uSCK5sdt4evIBib1UgOMPSz+Gqz+Y+yR+KfHnEOrkXcXMmtBsMBg2UDnjkIi4ADuzizi5OKH8Z7eACZGV0cwnB0+3PHC7t82hg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HccP6RVpVK58zdYiQNIcrp6dBL9a71SDFv8fqtENEmA=;
- b=rwERlDPwwjw9A0qmVBrkff3pRTTi0fUpLlL7oP670e+QcbjxwWbP72bsPeAgvWOdQs6AqiNvuby8mDm4n0lxS3XgPnfmE1rJ27OGIdzCeCDg4nxCHC3PHAUJIQUSM/zX09QghnrBqufCiXgoz3daWRpK47ckd8ovDBuRouZOucY=
+ bh=/DLfqqbfv7Ac9dF0b4f7J0AefvH9xkvpqB5OvVrj7io=;
+ b=ezV3ms17HEo37t8YcbO45TwwTy1CS8+YKaVI5+o/qUXkpiUZJxFlsLt1Yr/kOsFoENLBzvWuSAmRgxx9Q+qaqZqetcj5t7LnPEqe0cutm0w9i2B22wsfVS/QtG5E/0MdXCbCjzXGxwcadQfek7k1M49O8wEmM4y1aFsNSu2dGi4=
 Received: from AS8PR08MB6744.eurprd08.prod.outlook.com (2603:10a6:20b:397::10)
  by AS8PR08MB6216.eurprd08.prod.outlook.com (2603:10a6:20b:29c::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.4; Fri, 9 Jan
- 2026 17:04:39 +0000
+ 2026 17:04:40 +0000
 Received: from AS8PR08MB6744.eurprd08.prod.outlook.com
  ([fe80::c07d:23d6:efa7:7ddb]) by AS8PR08MB6744.eurprd08.prod.outlook.com
  ([fe80::c07d:23d6:efa7:7ddb%6]) with mapi id 15.20.9499.003; Fri, 9 Jan 2026
- 17:04:39 +0000
+ 17:04:40 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -101,13 +101,13 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>, "jonathan.cameron@huawei.com"
 	<jonathan.cameron@huawei.com>
-Subject: [PATCH v3 01/36] KVM: arm64: Account for RES1 bits in
- DECLARE_FEAT_MAP() and co
-Thread-Topic: [PATCH v3 01/36] KVM: arm64: Account for RES1 bits in
- DECLARE_FEAT_MAP() and co
-Thread-Index: AQHcgYoKgQVo8PR5Bku46fLutkFybw==
-Date: Fri, 9 Jan 2026 17:04:39 +0000
-Message-ID: <20260109170400.1585048-2-sascha.bischoff@arm.com>
+Subject: [PATCH v3 04/36] arm64/sysreg: Add remaining GICv5 ICC_ & ICH_
+ sysregs for KVM support
+Thread-Topic: [PATCH v3 04/36] arm64/sysreg: Add remaining GICv5 ICC_ & ICH_
+ sysregs for KVM support
+Thread-Index: AQHcgYoKprpjfVyo4kqROmUKDJKe/g==
+Date: Fri, 9 Jan 2026 17:04:40 +0000
+Message-ID: <20260109170400.1585048-5-sascha.bischoff@arm.com>
 References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260109170400.1585048-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -118,8 +118,8 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	AS8PR08MB6744:EE_|AS8PR08MB6216:EE_|AMS1EPF0000004B:EE_|AS2PR08MB8719:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d6ef2f1-9856-4dee-700f-08de4fa15273
+	AS8PR08MB6744:EE_|AS8PR08MB6216:EE_|AM2PEPF0001C717:EE_|DBBPR08MB6122:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec88150e-3848-42c7-fe8d-08de4fa1531a
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
@@ -127,33 +127,33 @@ X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
  BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
 X-Microsoft-Antispam-Message-Info-Original:
- =?iso-8859-1?Q?A0kWakpvAgucyBxGcYc1Nbj8Gyz7KVGcmCuR/693OPvhECAyvwN95vxNh2?=
- =?iso-8859-1?Q?rjQB3fbKl0jzbF6xW4uWs7FacmXtRS6NQ0YwLEdSQeeAGtg07X6tHQ0+fT?=
- =?iso-8859-1?Q?UM5PYvfP6vtBZ1rmmIgN33e/yh2JCxHFdFx6fOJh5g4evzLo7pUvTj5fzK?=
- =?iso-8859-1?Q?SXpuy+NCG8eLCuYlmNjK2VDL4bWyM5HaPuI9bYM+fWQ664qfwQJm5eFl//?=
- =?iso-8859-1?Q?we1e/FRVaRt/02piEYFtiZ8UhGwwFiJd3DGbro5teNjqoFCHRGI3EkLapl?=
- =?iso-8859-1?Q?6z9Wf/bATRcISudFTcikyu7FXNOe3XJSH7W3H4LpdPfnSJz7SggJbXMGW+?=
- =?iso-8859-1?Q?t+qGtbq6r3jDaPwCBEZFKq2uWzOCphwTd2wLnj0VgBqtsGxA6q17YS+uJz?=
- =?iso-8859-1?Q?MB1knwNlKlj8I4rhSxJPj5txFPHHM9beUcpu6EdsArgpEd/3UAbjpDGYMn?=
- =?iso-8859-1?Q?FNQHhjhEGq+iQg7rgbjyM41/zT7s2PlLJyIJ5cEoxMziYUHCaIVjp9+blE?=
- =?iso-8859-1?Q?9vJcw4+iRZICcTOotv1C7YmJvmSK3XnZtY2VW1oaif3iomeNuw/74lTGTy?=
- =?iso-8859-1?Q?2OgLSHkrY3NY26dVKJ3TX+22ep62XzVSt5bzlBOBm4GwVtPTJi33NVuTvB?=
- =?iso-8859-1?Q?9O7JedTFN2jswXYnxVQthGfOSWEw2KvVdz/2MFJL2zrWVd4S2H9tD6VazF?=
- =?iso-8859-1?Q?gZrbaPs3PsvLSvgWsxMhQoxnmI//JBOz6FuXsXlHxtYLqieniKIEGyKSm+?=
- =?iso-8859-1?Q?ZZjfnUlOGZvZPxv4pBakuApjFF61tDfcCe5ajyFiRtNyBpn8HQ79i8KgyF?=
- =?iso-8859-1?Q?524iLhitn1qEqS8EJbxMafhpoq8mdpG8tWp8XW/ToNPPp4PgCUYdTNIowf?=
- =?iso-8859-1?Q?G3wTwg6ncyCnqVqJkkydYdzKq3osy+BawSMN7kIEsJ2hRp1ttwqe/zFx21?=
- =?iso-8859-1?Q?qxoIbIbqSWLyq8Yq9LamRWBPj6p09GijPs2vDuVw5yvx9cAT2oNCZx9NPY?=
- =?iso-8859-1?Q?14H6CKjdpsjNA9oiQJ2IH10SWt/G3R/+Fn9JMjR+ul+LS5hyO1KzS1pSlM?=
- =?iso-8859-1?Q?CI6rcmYdTAhmoUhz1nVQnGMWkpKvaAb/3uHl+ZOBbwSYfMuft0Oo7ZNs+V?=
- =?iso-8859-1?Q?vwPBog5PJC5pKel2Ov5sh60E60RAdZihia6w4nc0QCB4NN8meSGoT+fruj?=
- =?iso-8859-1?Q?Cu5oHdp/1jJbci4/FjWRiazhPiFT545p0JC6lXDNz8hpQ6c8UIdBYZq3qG?=
- =?iso-8859-1?Q?Tp5c24hpIteSBNXIBS+Ub0JoRdMT+rob+/wHX2cuv7Tv6nP/ywpxyOCFlB?=
- =?iso-8859-1?Q?L3PYQe186eKA57aERWcPrjc6CqJwQTLBHe/bHwa/7bRI4xy6zzVnEsl/39?=
- =?iso-8859-1?Q?Ul3UIJrhzY/bEzytXHSjFMILf67fU7JDF/+g8SllFwLUofsSWTvybtFxhR?=
- =?iso-8859-1?Q?mc2cYMGaiNNc7HzMym/EG4ySafaZKPpkryYpDPhExB4E2Hr8NwMR4Iv507?=
- =?iso-8859-1?Q?mOO17sue53c9rnZy0dX0cunx7NXJ69nn5/RPxGM70yXOnx+VFZg60SScxB?=
- =?iso-8859-1?Q?x0GyPdc5fQH41QxaLLGMMUKMsfU1?=
+ =?iso-8859-1?Q?+5rB6IxVcCEhId3xhZ/1/IpTai7r6rvja4RjpXRUi3JJeaUrzDlOiDjiqr?=
+ =?iso-8859-1?Q?iPDrfja3Pf1JBarKkm5iB2Jgd9IFgF450SfY2rn0MM1/Kk4acS05JBLSOO?=
+ =?iso-8859-1?Q?W0Zseru9ULLN8KKqU+nMeM2p2p0TZHZV1E8M8LG+OwG2MGOTlTu+8EEiPG?=
+ =?iso-8859-1?Q?PFoVbhdfGclqidCN6GQkmwL9xvIml/sW4ar3EIW1g4+XSPuU9dFHDASmgc?=
+ =?iso-8859-1?Q?cU9nG4G/j+N5fuOfRPFeM05wE6aiv9I4pFo+UWu5/uQcjJPYdSmJa4hAk8?=
+ =?iso-8859-1?Q?BuIxBBvyUNQw80AT/pX/vO7gn7pyfqcQxndu7vdRJF56j0/SHnH4eQ6Xsz?=
+ =?iso-8859-1?Q?MtjB78ce+PTa+h4VF/ul64JxtRdSfl+OYA+BHZ1IfiusTnGE50Ux767rDA?=
+ =?iso-8859-1?Q?OPjRp70TTqezRaJeRn6jSuz4N1IRM62CDH0JnBL9AsEYeQs6aWIzM7MLFf?=
+ =?iso-8859-1?Q?PXJMq/coOrCzAKtxm2eEX4jTS3Gzq5vLTsZzzKcRqFHnAoLBkXoJFcRdSO?=
+ =?iso-8859-1?Q?qvO2if5mUkOCM1sfqoL2kjge7WLwxFDlCydTS4Sf5bwwmzNGzNVw6aJWmb?=
+ =?iso-8859-1?Q?vbfh0rtcWvKOSzykxM/oUca9G6FuuokRw7GDntd9MpL60B+/VniL5WH9j7?=
+ =?iso-8859-1?Q?eWaZD4nmVXi4ORdWVyi3Ax83y2HG6krQwTKocRwgmcewcxgP5PI9JJj6fr?=
+ =?iso-8859-1?Q?OGADbefs5oJ/fQzMW4bNYxuTuiTNj/HL83MHoA2/XXqe2JTobyLkJNTRNE?=
+ =?iso-8859-1?Q?przWOFjFZtWIZwANwCtF+fAfX3ZWfBC1jkW0lcfchGd49akFM2Iz/S9xDq?=
+ =?iso-8859-1?Q?RPg9AQwAM89e56Hk8y0DUKiW6/l6JsOzG2/noIiQa9XvVNNKAjxpAKTsFh?=
+ =?iso-8859-1?Q?aHpXw0moSYLMhOLOZW3luyv/+WFLpmVgJpeQuW9FSQxUlmVGgnUC8lK4XZ?=
+ =?iso-8859-1?Q?5jNOti4j5I15Ekk1Lc+krI2L63g33OqSDfCkjKewJXlbttUlqo1eJCqMZd?=
+ =?iso-8859-1?Q?4eRlzEKnpUzziPxQDCt91L44aURJLTpUVirhnYxeWhQPbWvY0NdL+q/NjY?=
+ =?iso-8859-1?Q?b7cBv9h0pAKgzbj45/GegoVdCw151tZBGCkwk2bkC6/6mxrzOA7CPdnkS6?=
+ =?iso-8859-1?Q?Wsq0TA8OU02YwDXhFUqrasXpWUQEgnwzEu4N9Ctb9O9/5sII1KzqW+LgsO?=
+ =?iso-8859-1?Q?BfDbQzxvzDCuSQF0KpCQWyMlaR18IJPcZSQYV7Y/w8rO1a5H4kyv0ebyfv?=
+ =?iso-8859-1?Q?VT/m4Bdt/eDLNFg+32JYSKXtmetPqjN2eEiOEUO/BUjbrqLtoA9Kvityo6?=
+ =?iso-8859-1?Q?YIl0ZLc7yqcW3P3F90auv+kwQAKC2Q8B4MUnlut+jy7ZXw583RWZ4DsGAX?=
+ =?iso-8859-1?Q?m6wXAh+aFYUjc5eVTUTdIt+qaixVraRqZlhMiRJXp2KkXBa6cnuaeDG7ii?=
+ =?iso-8859-1?Q?02aZFYBYzMQghFpJY6PVceRoK90saOyewqHB7H5P5UtsyPeuPSD6ke3nq7?=
+ =?iso-8859-1?Q?rWU6FXPf4tuU2SVHpukUh0bCTYVeCJZXxfYCJOzNmRt6bBi2RFGVl844yv?=
+ =?iso-8859-1?Q?oj1sPwaw42Ve2E6ksqPXBLa2fsqQ?=
 X-Forefront-Antispam-Report-Untrusted:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB6744.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
@@ -167,286 +167,614 @@ MIME-Version: 1.0
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6216
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AMS1EPF0000004B.eurprd04.prod.outlook.com
+ AM2PEPF0001C717.eurprd05.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	dbca2f2e-8744-4c88-2f5f-08de4fa12ce8
+	4576941b-2000-4a7e-62e1-08de4fa12d84
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|35042699022|14060799003|36860700013|1800799024|376014;
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013|35042699022|14060799003;
 X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?k/bg09SADy+A1kMNVA3frbpv4T5dDU8uN5Via0F61P3dO1DHvgQHAO/B4d?=
- =?iso-8859-1?Q?v0Vhf8khRByv9BKtYNSfBUhpjSEMMSFsmRukyvIPEGiAQQ9iezG4PihLLd?=
- =?iso-8859-1?Q?iHGDtAusKpmuLulcD3OmIVLFPT3NlkPjVhVKKaCvCnL0k5+t1CGh5d4mVy?=
- =?iso-8859-1?Q?nXIfJDreRLoFXaH7x18ajJE88AW/vg85St3vLwaf0hsnF/z1D+XBUbbhxy?=
- =?iso-8859-1?Q?Z0XwEBEomwO+3KBMO6rF6zCXdwUI4hg2krfx0BbXePwkLPtxIKmgSNcOoh?=
- =?iso-8859-1?Q?y990pWw7SMo04kakn0HNYoHTLPWdgIJF9SqIfVWA2ValjWIAImk+o7jush?=
- =?iso-8859-1?Q?qLZ/tJYPFu06LKh3BIEmohgoc9awVtVJ/9IOewJ+UoFQOSKj/5gk2Ecltz?=
- =?iso-8859-1?Q?xws/rOLkZ/kqLrR1zMFppgec/Dz1FCnfPSY2hjjmIR+r6Z8pa622DfmKZn?=
- =?iso-8859-1?Q?b3ZrI5uKZRLjDUL95cbXZvWH5yfOMhx74DkhkgtDvH8cKpI9Yp9l2fKCBT?=
- =?iso-8859-1?Q?pOVyLvcOKDJ1hm5eF7GMo2wQ8Mjqb1b7CtHlJNUgmIB4Ml6a0oprjTg+KO?=
- =?iso-8859-1?Q?Mt6Ekyej7RdvTbj8uHbuFCxHZZInNziovJd/w/iZnF8AxbuOTyGv4n+2zv?=
- =?iso-8859-1?Q?v8YgNn99a8diMOI/B5pmf5gV5JKdd9J6hRxDrvlSDxMNkbvIdsYJQcc+hH?=
- =?iso-8859-1?Q?pNOwuG9DLZREi5m9RL2xHuSI/X/TkZBP/YXYmY5AzOzOpMAR63t3Trnihk?=
- =?iso-8859-1?Q?icTA6Qh8VJrzMcQcdbON9ZG9ymflclNiE+Cjb5fC24VpPrTElF5TrFkry0?=
- =?iso-8859-1?Q?ypuhuLOzbPA8swjbp2RFZqC6kdlbz4WKBormheBw3IZaedBJPbzHtMNRFZ?=
- =?iso-8859-1?Q?FelGo/ExMrZRTd2AkWJNlM5/9xNcDBtRxt70oi605OhsCea+HcPyKi2Gw7?=
- =?iso-8859-1?Q?i8AwQT0EsfBInyq3V/r6v4UYmUTEVnoGJlzo0qu/WHsM/kHyVomqF/Al3k?=
- =?iso-8859-1?Q?BPnkmDlbnQ+QSgfrWgUZLJv6SY7SOUVhOxkBrMjIsigjDj7AB2foLwI/mE?=
- =?iso-8859-1?Q?GSEHMcVM1HBNZNyPg7AMgzvec5gQww3s9kfYyFAMl2wc+p+TU2QO/fM815?=
- =?iso-8859-1?Q?fbpBzZbiwpu6l2ZWX/68uJLcqe4Erba+7sDjZiOiA/u9Ddt6+qBL2tVm4l?=
- =?iso-8859-1?Q?FLW61gM2lg9HOZUkfEwzvFiodH17XAc3c0HPHCiZ6Foaxz7QZGhFU256wP?=
- =?iso-8859-1?Q?52MITbd923jZ2cV2CEZQy9iFPDR3rR3/ikt2SOl4NZSeRWJImvtHNVaUtm?=
- =?iso-8859-1?Q?HmK92Cn7opjVD60hfLKfh0CGM5vJuR6bR1qfePS3zepdh3ceFKXclQ/dT/?=
- =?iso-8859-1?Q?rzpLA7xMNRYlVgynU0DkVv2NhZ7ctyAM+oAX8FiGoQVw9cFrvDJMgwV8yN?=
- =?iso-8859-1?Q?E9Hm5ak5J2+jWdUyhUS9w7yLUx21VDf67dF1adzOcQYYtl2RVTLFwhQhRY?=
- =?iso-8859-1?Q?qELsUnmGgJsb+KO5ot/1M9/Xw/eumczZG9wWgV4sZTnz+vd+caPVX9R66K?=
- =?iso-8859-1?Q?F8zMCoPmZQJsUvDYRjZsg1+rrP4ScPWw5L+Z3Mfxp7gIDiaK7oYY2Mqn7D?=
- =?iso-8859-1?Q?DambSdKa4r0XE=3D?=
+	=?iso-8859-1?Q?6cwv2V8t1YwWMidaBlgxZYoJREA5BDFdyfsgzArQ+koiSrvGhJkyRCOpHV?=
+ =?iso-8859-1?Q?QvPlqQHkIrLaBICCwPIrwmv6CKCx4wGvkowtp6/YbexxPMINqutmpwoviQ?=
+ =?iso-8859-1?Q?w2ZQdC5ivLLCy4UD3sm9tXM619r6Qo5QNDDdzl+Gw5c+nyTFIqaEDbopka?=
+ =?iso-8859-1?Q?U5GPGEQX2n0x7KL7zDMDnXm1DEqgxojdOse5gwo0ZOZNNOaIwFoJlDWqgl?=
+ =?iso-8859-1?Q?Wxez2yskRpw4WnMS2yIS3k4j09sFOSho7aVJdYkM7vcOWem1/2sDYXuwRB?=
+ =?iso-8859-1?Q?xdy+Kv422P+hwF/yx8HqQ5BxHoO+tu3i8zQC0cCKRYF5+5+d+WbGlMU0+G?=
+ =?iso-8859-1?Q?ptCxt5T5SHgCDq8tCSTxNtggo+bwRZDp/aQPkMv51jZrWxUkGsytx5XkIz?=
+ =?iso-8859-1?Q?yjIymxwnh0CuouJHm9fx6k7x/iF/yULvWxjNzO3fZJDFusciKuwoKl0JMg?=
+ =?iso-8859-1?Q?mqGyKf81kpxE07slPGJuWHkGl0dWSXEvmiOhLpljemVcO4WTg5fQHIybBK?=
+ =?iso-8859-1?Q?m+818ZK3g/9iwtn/piTblimk+SsA7Y0H33ngG8LQHQjuGQi3acP4fWYdUq?=
+ =?iso-8859-1?Q?FBz7ArKFeyTVKdgLn4x+J/lYLl7hNQguogennv/5/pcgOssp37ep7eCTxp?=
+ =?iso-8859-1?Q?0W2OA54kXuA7i/d93tubltVqx10fE2U2zQ/AokTb0zEZUA1FvBguU6VvaJ?=
+ =?iso-8859-1?Q?tHI9d7qdPnnQ9tx+534OjglxQbwID1yH5naSGqtQmR7srwJhLiop9YAvf3?=
+ =?iso-8859-1?Q?Xacxr5bZStdnOq196zjtCvMBGFtFdsAYHKYm5YMt8Q6AuZSbFAoESMKtrq?=
+ =?iso-8859-1?Q?VY9beIEp+QdCrOxX51xQzzV6tTh+NnjICZa5mrDNXKu6BQj0BeY2Jso7W1?=
+ =?iso-8859-1?Q?leR3eCRdT6BSnX7nBPlm0eU8SBGCENKhWG5kzQZWaTA3WlldnVI47CYio4?=
+ =?iso-8859-1?Q?RuBDUdQRfyDudhE6fw3QFubounQwHJtsgJq/SorT3IunBM5nTXJDrQgLOR?=
+ =?iso-8859-1?Q?Fve7vOoT6rKwZXoDxTJ1vNNp10p40Lh8u5X+kEjGtAJVPQOtb9T0YbApuN?=
+ =?iso-8859-1?Q?/xgX6eSYi0KjEjPvHhKFZ3ZFu0K8r7ItSFkzG+SBHMZHgxukbbHvAM+BkT?=
+ =?iso-8859-1?Q?vHKtEBfmad/a52tMp9Z19B2uW1bCt0q3jTFZkPFepX9DNJnZjNiK6v5pFA?=
+ =?iso-8859-1?Q?FFBYtAfsxPqCSeVlOPktFaLHX+jv9WJDmJH/MeDIUldzctXXixkwn3VEzE?=
+ =?iso-8859-1?Q?6TU6DrARN3BMlSwA2SFvcY7L+1RAWbMOKuSJRDl97tc/68y7903gXGuejD?=
+ =?iso-8859-1?Q?g9A/k6422Ad1rF4nhrxKHqQLxi2U0eUIDDWJWJmrbhqx0qZG9q4baw8j8S?=
+ =?iso-8859-1?Q?o9zGnOuFdUn/lPR/vQaaS68qY0IqrfsgSelWGYDCH/jjDLaZZye4vNol1/?=
+ =?iso-8859-1?Q?tvFlf0IKgawf7ySKB8s0oaHuYb/TF/5TEl/Wd/J/Nrbq+QkOuOYMNmklC6?=
+ =?iso-8859-1?Q?qMRumRu5uoA5qZdFPNon32Tzfhm5EtZ8pCdjaWysvSl2z0KX36+cZgPBWQ?=
+ =?iso-8859-1?Q?R9iN5rM79zglYrrGesSo5U7/5dBrvdXPMHtk5cIs8HbaaZfR6JbSHdLid1?=
+ =?iso-8859-1?Q?c2vPRPCufNvUU=3D?=
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(35042699022)(14060799003)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013)(35042699022)(14060799003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2026 17:05:42.3866
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2026 17:05:43.4833
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d6ef2f1-9856-4dee-700f-08de4fa15273
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec88150e-3848-42c7-fe8d-08de4fa1531a
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF0000004B.eurprd04.prod.outlook.com
+	AM2PEPF0001C717.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR08MB8719
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB6122
 
-From: Marc Zyngier <maz@kernel.org>
+Add the GICv5 system registers required to support native GICv5 guests
+with KVM. Many of the GICv5 sysregs have already been added as part of
+the host GICv5 driver, keeping this set relatively small. The
+registers added in this change complete the set by adding those
+required by KVM either directly (ICH_) or indirectly (FGTs for the
+ICC_ sysregs).
 
-None of the registers we manage in the feature dependency infrastructure
-so far has any RES1 bit. This is about to change, as VTCR_EL2 has
-its bit 31 being RES1.
+The following system registers and their fields are added:
 
-In order to not fail the consistency checks by not describing a bit,
-add RES1 bits to the set of immutable bits. This requires some extra
-surgery for the FGT handling, as we now need to track RES1 bits there
-as well.
+	ICC_APR_EL1
+	ICC_HPPIR_EL1
+	ICC_IAFFIDR_EL1
+	ICH_APR_EL2
+	ICH_CONTEXTR_EL2
+	ICH_PPI_ACTIVER<n>_EL2
+	ICH_PPI_DVI<n>_EL2
+	ICH_PPI_ENABLER<n>_EL2
+	ICH_PPI_PENDR<n>_EL2
+	ICH_PPI_PRIORITYR<n>_EL2
 
-There are no RES1 FGT bits *yet*. Watch this space.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/config.c           | 25 +++++++-------
- arch/arm64/kvm/emulate-nested.c   | 55 +++++++++++++++++--------------
- 3 files changed, 45 insertions(+), 36 deletions(-)
+ arch/arm64/tools/sysreg | 480 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 480 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
-_host.h
-index ac7f970c78830..b552a1e03848c 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -638,6 +638,7 @@ struct fgt_masks {
- 	u64		mask;
- 	u64		nmask;
- 	u64		res0;
-+	u64		res1;
- };
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index dab5bfe8c9686..2f44a568ebf4e 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -3248,6 +3248,14 @@ UnsignedEnum	3:0	ID_BITS
+ EndEnum
+ EndSysreg
 =20
- extern struct fgt_masks hfgrtr_masks;
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 24bb3f36e9d59..3845b188551b6 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -16,14 +16,14 @@
-  */
- struct reg_bits_to_feat_map {
- 	union {
--		u64	bits;
--		u64	*res0p;
-+		u64		 bits;
-+		struct fgt_masks *masks;
- 	};
-=20
- #define	NEVER_FGU	BIT(0)	/* Can trap, but never UNDEF */
- #define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
- #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
--#define	RES0_POINTER	BIT(3)	/* Pointer to RES0 value instead of bits */
-+#define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bit=
-s */
-=20
- 	unsigned long	flags;
-=20
-@@ -92,8 +92,8 @@ struct reg_feat_map_desc {
- #define NEEDS_FEAT_FIXED(m, ...)			\
- 	__NEEDS_FEAT_FLAG(m, FIXED_VALUE, bits, __VA_ARGS__, 0)
-=20
--#define NEEDS_FEAT_RES0(p, ...)				\
--	__NEEDS_FEAT_FLAG(p, RES0_POINTER, res0p, __VA_ARGS__)
-+#define NEEDS_FEAT_MASKS(p, ...)				\
-+	__NEEDS_FEAT_FLAG(p, MASKS_POINTER, masks, __VA_ARGS__)
-=20
- /*
-  * Declare the dependency between a set of bits and a set of features,
-@@ -109,19 +109,20 @@ struct reg_feat_map_desc {
- #define DECLARE_FEAT_MAP(n, r, m, f)					\
- 	struct reg_feat_map_desc n =3D {					\
- 		.name			=3D #r,				\
--		.feat_map		=3D NEEDS_FEAT(~r##_RES0, f), 	\
-+		.feat_map		=3D NEEDS_FEAT(~(r##_RES0 |	\
-+						       r##_RES1), f),	\
- 		.bit_feat_map		=3D m,				\
- 		.bit_feat_map_sz	=3D ARRAY_SIZE(m),		\
- 	}
-=20
- /*
-  * Specialised version of the above for FGT registers that have their
-- * RES0 masks described as struct fgt_masks.
-+ * RESx masks described as struct fgt_masks.
-  */
- #define DECLARE_FEAT_MAP_FGT(n, msk, m, f)				\
- 	struct reg_feat_map_desc n =3D {					\
- 		.name			=3D #msk,				\
--		.feat_map		=3D NEEDS_FEAT_RES0(&msk.res0, f),\
-+		.feat_map		=3D NEEDS_FEAT_MASKS(&msk, f),	\
- 		.bit_feat_map		=3D m,				\
- 		.bit_feat_map_sz	=3D ARRAY_SIZE(m),		\
- 	}
-@@ -1168,21 +1169,21 @@ static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_E=
-L2,
- 			      mdcr_el2_feat_map, FEAT_AA64EL2);
-=20
- static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
--				  int map_size, u64 res0, const char *str)
-+				  int map_size, u64 resx, const char *str)
- {
- 	u64 mask =3D 0;
-=20
- 	for (int i =3D 0; i < map_size; i++)
- 		mask |=3D map[i].bits;
-=20
--	if (mask !=3D ~res0)
-+	if (mask !=3D ~resx)
- 		kvm_err("Undefined %s behaviour, bits %016llx\n",
--			str, mask ^ ~res0);
-+			str, mask ^ ~resx);
- }
-=20
- static u64 reg_feat_map_bits(const struct reg_bits_to_feat_map *map)
- {
--	return map->flags & RES0_POINTER ? ~(*map->res0p) : map->bits;
-+	return map->flags & MASKS_POINTER ? (map->masks->mask | map->masks->nmask=
-) : map->bits;
- }
-=20
- static void __init check_reg_desc(const struct reg_feat_map_desc *r)
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-neste=
-d.c
-index 834f13fb1fb7d..75d49f83342a5 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2105,23 +2105,24 @@ static u32 encoding_next(u32 encoding)
- }
-=20
- #define FGT_MASKS(__n, __m)						\
--	struct fgt_masks __n =3D { .str =3D #__m, .res0 =3D __m, }
--
--FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
--FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
--FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
--FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
--FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
--FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
--FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2_RES0);
--FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2_RES0);
--FGT_MASKS(hfgitr2_masks, HFGITR2_EL2_RES0);
--FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2_RES0);
--FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2_RES0);
-+	struct fgt_masks __n =3D { .str =3D #__m, .res0 =3D __m ## _RES0, .res1 =
-=3D __m ## _RES1 }
++Sysreg	ICC_HPPIR_EL1	3	0	12	10	3
++Res0	63:33
++Field	32	HPPIV
++Field	31:29	TYPE
++Res0	28:24
++Field	23:0	ID
++EndSysreg
 +
-+FGT_MASKS(hfgrtr_masks, HFGRTR_EL2);
-+FGT_MASKS(hfgwtr_masks, HFGWTR_EL2);
-+FGT_MASKS(hfgitr_masks, HFGITR_EL2);
-+FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2);
-+FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2);
-+FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2);
-+FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2);
-+FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2);
-+FGT_MASKS(hfgitr2_masks, HFGITR2_EL2);
-+FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2);
-+FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2);
+ Sysreg	ICC_ICSR_EL1	3	0	12	10	4
+ Res0	63:48
+ Field	47:32	IAFFID
+@@ -3262,6 +3270,11 @@ Field	1	Enabled
+ Field	0	F
+ EndSysreg
 =20
- static __init bool aggregate_fgt(union trap_config tc)
- {
- 	struct fgt_masks *rmasks, *wmasks;
-+	u64 rresx, wresx;
-=20
- 	switch (tc.fgt) {
- 	case HFGRTR_GROUP:
-@@ -2154,24 +2155,27 @@ static __init bool aggregate_fgt(union trap_config =
-tc)
- 		break;
- 	}
-=20
-+	rresx =3D rmasks->res0 | rmasks->res1;
-+	if (wmasks)
-+		wresx =3D wmasks->res0 | wmasks->res1;
++Sysreg	ICC_IAFFIDR_EL1	3	0	12	10	5
++Res0	63:16
++Field	15:0	IAFFID
++EndSysreg
 +
- 	/*
- 	 * A bit can be reserved in either the R or W register, but
- 	 * not both.
- 	 */
--	if ((BIT(tc.bit) & rmasks->res0) &&
--	    (!wmasks || (BIT(tc.bit) & wmasks->res0)))
-+	if ((BIT(tc.bit) & rresx) && (!wmasks || (BIT(tc.bit) & wresx)))
- 		return false;
+ SysregFields	ICC_PPI_ENABLERx_EL1
+ Field	63	EN63
+ Field	62	EN62
+@@ -3668,6 +3681,42 @@ Res0	14:12
+ Field	11:0	AFFINITY
+ EndSysreg
 =20
- 	if (tc.pol)
--		rmasks->mask |=3D BIT(tc.bit) & ~rmasks->res0;
-+		rmasks->mask |=3D BIT(tc.bit) & ~rresx;
- 	else
--		rmasks->nmask |=3D BIT(tc.bit) & ~rmasks->res0;
-+		rmasks->nmask |=3D BIT(tc.bit) & ~rresx;
++Sysreg	ICC_APR_EL1	3	1	12	0	0
++Res0	63:32
++Field	31	P31
++Field	30	P30
++Field	29	P29
++Field	28	P28
++Field	27	P27
++Field	26	P26
++Field	25	P25
++Field	24	P24
++Field	23	P23
++Field	22	P22
++Field	21	P21
++Field	20	P20
++Field	19	P19
++Field	18	P18
++Field	17	P17
++Field	16	P16
++Field	15	P15
++Field	14	P14
++Field	13	P13
++Field	12	P12
++Field	11	P11
++Field	10	P10
++Field	9	P9
++Field	8	P8
++Field	7	P7
++Field	6	P6
++Field	5	P5
++Field	4	P4
++Field	3	P3
++Field	2	P2
++Field	1	P1
++Field	0	P0
++EndSysreg
++
+ Sysreg	ICC_CR0_EL1	3	1	12	0	1
+ Res0	63:39
+ Field	38	PID
+@@ -4567,6 +4616,42 @@ Field	31:16	PhyPARTID29
+ Field	15:0	PhyPARTID28
+ EndSysreg
 =20
- 	if (wmasks) {
- 		if (tc.pol)
--			wmasks->mask |=3D BIT(tc.bit) & ~wmasks->res0;
-+			wmasks->mask |=3D BIT(tc.bit) & ~wresx;
- 		else
--			wmasks->nmask |=3D BIT(tc.bit) & ~wmasks->res0;
-+			wmasks->nmask |=3D BIT(tc.bit) & ~wresx;
- 	}
++Sysreg	ICH_APR_EL2	3	4	12	8	4
++Res0	63:32
++Field	31	P31
++Field	30	P30
++Field	29	P29
++Field	28	P28
++Field	27	P27
++Field	26	P26
++Field	25	P25
++Field	24	P24
++Field	23	P23
++Field	22	P22
++Field	21	P21
++Field	20	P20
++Field	19	P19
++Field	18	P18
++Field	17	P17
++Field	16	P16
++Field	15	P15
++Field	14	P14
++Field	13	P13
++Field	12	P12
++Field	11	P11
++Field	10	P10
++Field	9	P9
++Field	8	P8
++Field	7	P7
++Field	6	P6
++Field	5	P5
++Field	4	P4
++Field	3	P3
++Field	2	P2
++Field	1	P1
++Field	0	P0
++EndSysreg
++
+ Sysreg	ICH_HFGRTR_EL2	3	4	12	9	4
+ Res0	63:21
+ Field	20	ICC_PPI_ACTIVERn_EL1
+@@ -4615,6 +4700,306 @@ Field	1	GICCDDIS
+ Field	0	GICCDEN
+ EndSysreg
 =20
- 	return true;
-@@ -2180,7 +2184,6 @@ static __init bool aggregate_fgt(union trap_config tc=
-)
- static __init int check_fgt_masks(struct fgt_masks *masks)
- {
- 	unsigned long duplicate =3D masks->mask & masks->nmask;
--	u64 res0 =3D masks->res0;
- 	int ret =3D 0;
++SysregFields	ICH_PPI_DVIRx_EL2
++Field	63	DVI63
++Field	62	DVI62
++Field	61	DVI61
++Field	60	DVI60
++Field	59	DVI59
++Field	58	DVI58
++Field	57	DVI57
++Field	56	DVI56
++Field	55	DVI55
++Field	54	DVI54
++Field	53	DVI53
++Field	52	DVI52
++Field	51	DVI51
++Field	50	DVI50
++Field	49	DVI49
++Field	48	DVI48
++Field	47	DVI47
++Field	46	DVI46
++Field	45	DVI45
++Field	44	DVI44
++Field	43	DVI43
++Field	42	DVI42
++Field	41	DVI41
++Field	40	DVI40
++Field	39	DVI39
++Field	38	DVI38
++Field	37	DVI37
++Field	36	DVI36
++Field	35	DVI35
++Field	34	DVI34
++Field	33	DVI33
++Field	32	DVI32
++Field	31	DVI31
++Field	30	DVI30
++Field	29	DVI29
++Field	28	DVI28
++Field	27	DVI27
++Field	26	DVI26
++Field	25	DVI25
++Field	24	DVI24
++Field	23	DVI23
++Field	22	DVI22
++Field	21	DVI21
++Field	20	DVI20
++Field	19	DVI19
++Field	18	DVI18
++Field	17	DVI17
++Field	16	DVI16
++Field	15	DVI15
++Field	14	DVI14
++Field	13	DVI13
++Field	12	DVI12
++Field	11	DVI11
++Field	10	DVI10
++Field	9	DVI9
++Field	8	DVI8
++Field	7	DVI7
++Field	6	DVI6
++Field	5	DVI5
++Field	4	DVI4
++Field	3	DVI3
++Field	2	DVI2
++Field	1	DVI1
++Field	0	DVI0
++EndSysregFields
++
++Sysreg	ICH_PPI_DVIR0_EL2	3	4	12	10	0
++Fields ICH_PPI_DVIx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_DVIR1_EL2	3	4	12	10	1
++Fields ICH_PPI_DVIx_EL2
++EndSysreg
++
++SysregFields	ICH_PPI_ENABLERx_EL2
++Field	63	EN63
++Field	62	EN62
++Field	61	EN61
++Field	60	EN60
++Field	59	EN59
++Field	58	EN58
++Field	57	EN57
++Field	56	EN56
++Field	55	EN55
++Field	54	EN54
++Field	53	EN53
++Field	52	EN52
++Field	51	EN51
++Field	50	EN50
++Field	49	EN49
++Field	48	EN48
++Field	47	EN47
++Field	46	EN46
++Field	45	EN45
++Field	44	EN44
++Field	43	EN43
++Field	42	EN42
++Field	41	EN41
++Field	40	EN40
++Field	39	EN39
++Field	38	EN38
++Field	37	EN37
++Field	36	EN36
++Field	35	EN35
++Field	34	EN34
++Field	33	EN33
++Field	32	EN32
++Field	31	EN31
++Field	30	EN30
++Field	29	EN29
++Field	28	EN28
++Field	27	EN27
++Field	26	EN26
++Field	25	EN25
++Field	24	EN24
++Field	23	EN23
++Field	22	EN22
++Field	21	EN21
++Field	20	EN20
++Field	19	EN19
++Field	18	EN18
++Field	17	EN17
++Field	16	EN16
++Field	15	EN15
++Field	14	EN14
++Field	13	EN13
++Field	12	EN12
++Field	11	EN11
++Field	10	EN10
++Field	9	EN9
++Field	8	EN8
++Field	7	EN7
++Field	6	EN6
++Field	5	EN5
++Field	4	EN4
++Field	3	EN3
++Field	2	EN2
++Field	1	EN1
++Field	0	EN0
++EndSysregFields
++
++Sysreg	ICH_PPI_ENABLER0_EL2	3	4	12	10	2
++Fields ICH_PPI_ENABLERx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_ENABLER1_EL2	3	4	12	10	3
++Fields ICH_PPI_ENABLERx_EL2
++EndSysreg
++
++SysregFields	ICH_PPI_PENDRx_EL2
++Field	63	PEND63
++Field	62	PEND62
++Field	61	PEND61
++Field	60	PEND60
++Field	59	PEND59
++Field	58	PEND58
++Field	57	PEND57
++Field	56	PEND56
++Field	55	PEND55
++Field	54	PEND54
++Field	53	PEND53
++Field	52	PEND52
++Field	51	PEND51
++Field	50	PEND50
++Field	49	PEND49
++Field	48	PEND48
++Field	47	PEND47
++Field	46	PEND46
++Field	45	PEND45
++Field	44	PEND44
++Field	43	PEND43
++Field	42	PEND42
++Field	41	PEND41
++Field	40	PEND40
++Field	39	PEND39
++Field	38	PEND38
++Field	37	PEND37
++Field	36	PEND36
++Field	35	PEND35
++Field	34	PEND34
++Field	33	PEND33
++Field	32	PEND32
++Field	31	PEND31
++Field	30	PEND30
++Field	29	PEND29
++Field	28	PEND28
++Field	27	PEND27
++Field	26	PEND26
++Field	25	PEND25
++Field	24	PEND24
++Field	23	PEND23
++Field	22	PEND22
++Field	21	PEND21
++Field	20	PEND20
++Field	19	PEND19
++Field	18	PEND18
++Field	17	PEND17
++Field	16	PEND16
++Field	15	PEND15
++Field	14	PEND14
++Field	13	PEND13
++Field	12	PEND12
++Field	11	PEND11
++Field	10	PEND10
++Field	9	PEND9
++Field	8	PEND8
++Field	7	PEND7
++Field	6	PEND6
++Field	5	PEND5
++Field	4	PEND4
++Field	3	PEND3
++Field	2	PEND2
++Field	1	PEND1
++Field	0	PEND0
++EndSysregFields
++
++Sysreg	ICH_PPI_PENDR0_EL2	3	4	12	10	4
++Fields ICH_PPI_PENDRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PENDR1_EL2	3	4	12	10	5
++Fields ICH_PPI_PENDRx_EL2
++EndSysreg
++
++SysregFields	ICH_PPI_ACTIVERx_EL2
++Field	63	ACTIVE63
++Field	62	ACTIVE62
++Field	61	ACTIVE61
++Field	60	ACTIVE60
++Field	59	ACTIVE59
++Field	58	ACTIVE58
++Field	57	ACTIVE57
++Field	56	ACTIVE56
++Field	55	ACTIVE55
++Field	54	ACTIVE54
++Field	53	ACTIVE53
++Field	52	ACTIVE52
++Field	51	ACTIVE51
++Field	50	ACTIVE50
++Field	49	ACTIVE49
++Field	48	ACTIVE48
++Field	47	ACTIVE47
++Field	46	ACTIVE46
++Field	45	ACTIVE45
++Field	44	ACTIVE44
++Field	43	ACTIVE43
++Field	42	ACTIVE42
++Field	41	ACTIVE41
++Field	40	ACTIVE40
++Field	39	ACTIVE39
++Field	38	ACTIVE38
++Field	37	ACTIVE37
++Field	36	ACTIVE36
++Field	35	ACTIVE35
++Field	34	ACTIVE34
++Field	33	ACTIVE33
++Field	32	ACTIVE32
++Field	31	ACTIVE31
++Field	30	ACTIVE30
++Field	29	ACTIVE29
++Field	28	ACTIVE28
++Field	27	ACTIVE27
++Field	26	ACTIVE26
++Field	25	ACTIVE25
++Field	24	ACTIVE24
++Field	23	ACTIVE23
++Field	22	ACTIVE22
++Field	21	ACTIVE21
++Field	20	ACTIVE20
++Field	19	ACTIVE19
++Field	18	ACTIVE18
++Field	17	ACTIVE17
++Field	16	ACTIVE16
++Field	15	ACTIVE15
++Field	14	ACTIVE14
++Field	13	ACTIVE13
++Field	12	ACTIVE12
++Field	11	ACTIVE11
++Field	10	ACTIVE10
++Field	9	ACTIVE9
++Field	8	ACTIVE8
++Field	7	ACTIVE7
++Field	6	ACTIVE6
++Field	5	ACTIVE5
++Field	4	ACTIVE4
++Field	3	ACTIVE3
++Field	2	ACTIVE2
++Field	1	ACTIVE1
++Field	0	ACTIVE0
++EndSysregFields
++
++Sysreg	ICH_PPI_ACTIVER0_EL2	3	4	12	10	6
++Fields ICH_PPI_ACTIVERx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_ACTIVER1_EL2	3	4	12	10	7
++Fields ICH_PPI_ACTIVERx_EL2
++EndSysreg
++
+ Sysreg	ICH_HCR_EL2	3	4	12	11	0
+ Res0	63:32
+ Field	31:27	EOIcount
+@@ -4669,6 +5054,18 @@ Field	1	V3
+ Field	0	En
+ EndSysreg
 =20
- 	if (duplicate) {
-@@ -2194,10 +2197,14 @@ static __init int check_fgt_masks(struct fgt_masks =
-*masks)
- 		ret =3D -EINVAL;
- 	}
++Sysreg	ICH_CONTEXTR_EL2	3	4	12	11	6
++Field	63	V
++Field	62	F
++Field	61	IRICHPPIDIS
++Field	60	DB
++Field	59:55	DBPM
++Res0	54:48
++Field	47:32	VPE
++Res0	31:16
++Field	15:0	VM
++EndSysreg
++
+ Sysreg	ICH_VMCR_EL2	3	4	12	11	7
+ Prefix	FEAT_GCIE
+ Res0	63:32
+@@ -4690,6 +5087,89 @@ Field	1	VENG1
+ Field	0	VENG0
+ EndSysreg
 =20
--	masks->res0 =3D ~(masks->mask | masks->nmask);
--	if (masks->res0 !=3D res0)
--		kvm_info("Implicit %s =3D %016llx, expecting %016llx\n",
--			 masks->str, masks->res0, res0);
-+	if ((masks->res0 | masks->res1 | masks->mask | masks->nmask) !=3D GENMASK=
-(63, 0) ||
-+	    (masks->res0 & masks->res1)  || (masks->res0 & masks->mask) ||
-+	    (masks->res0 & masks->nmask) || (masks->res1 & masks->mask)  ||
-+	    (masks->res1 & masks->nmask) || (masks->mask & masks->nmask)) {
-+		kvm_info("Inconsistent masks for %s (%016llx, %016llx, %016llx, %016llx)=
-\n",
-+			 masks->str, masks->res0, masks->res1, masks->mask, masks->nmask);
-+		masks->res0 =3D ~(masks->res1 | masks->mask | masks->nmask);
-+	}
-=20
- 	return ret;
- }
++SysregFields	ICH_PPI_PRIORITYRx_EL2
++Res0	63:61
++Field	60:56	Priority7
++Res0	55:53
++Field	52:48	Priority6
++Res0	47:45
++Field	44:40	Priority5
++Res0	39:37
++Field	36:32	Priority4
++Res0	31:29
++Field	28:24	Priority3
++Res0	23:21
++Field	20:16	Priority2
++Res0	15:13
++Field	12:8	Priority1
++Res0	7:5
++Field	4:0	Priority0
++EndSysregFields
++
++Sysreg	ICH_PPI_PRIORITYR0_EL2	3	4	12	14	0
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR1_EL2	3	4	12	14	1
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR2_EL2	3	4	12	14	2
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR3_EL2	3	4	12	14	3
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR4_EL2	3	4	12	14	4
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR5_EL2	3	4	12	14	5
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR6_EL2	3	4	12	14	6
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR7_EL2	3	4	12	14	7
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR8_EL2	3	4	12	15	0
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR9_EL2	3	4	12	15	1
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR10_EL2	3	4	12	15	2
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR11_EL2	3	4	12	15	3
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR12_EL2	3	4	12	15	4
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR13_EL2	3	4	12	15	5
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR14_EL2	3	4	12	15	6
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
++Sysreg	ICH_PPI_PRIORITYR15_EL2	3	4	12	15	7
++Fields	ICH_PPI_PRIORITYRx_EL2
++EndSysreg
++
+ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
 --=20
 2.34.1
 
