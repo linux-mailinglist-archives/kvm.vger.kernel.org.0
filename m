@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-67535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67538-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5611FD07C64
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 09:23:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14ACED07C52
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 09:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8E77A306A0CA
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 08:22:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C8EB83009D78
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 08:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC461318ECF;
-	Fri,  9 Jan 2026 08:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261D4318EEC;
+	Fri,  9 Jan 2026 08:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="10WDMoYi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ypJR0gvq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-lf1-f74.google.com (mail-lf1-f74.google.com [209.85.167.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EB4314B9A
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 08:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0A5316909
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 08:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767946952; cv=none; b=AmMTQGFfc327W78rh0DMnEGxC+gKez5LXIPTrE89er7OS4AYTvws5kVpJpz80C86wMXroN8XDDPsGZJ5wgMrt8aRe8XdVf1c3Vn2SUE4Qmsp4KD8OHOvOFjsDiELrcw4xT97xs4bqSmHbYPnRXrlYz1FgRnZuoGLVHZ99lTbjZw=
+	t=1767946955; cv=none; b=rtMXnM0rvDEXoeC6MleTT/yxnHUc1kxkuhASbb7+mvEx6V/IoeiETsnqIQZ+dR+lOSWz1FffgZG3fN2HWo4AjSnHE7B/ieJt49Hx8UpRtKswIKmlU+UPhgN3xzW+v2xD2vcCxzOHztX2CeaPILZhTuntyUPgxgIMbeCY6nyYUfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767946952; c=relaxed/simple;
-	bh=a+P8IDuXmE3XGEoH5ksrNZ5ogpqK5TTuuqzWjToyeZM=;
+	s=arc-20240116; t=1767946955; c=relaxed/simple;
+	bh=lFYklkr6Riz3yTMFrVODIzDh0TCEJHS01mgdHAqzi7Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dFULPnSTpc5GYFCrPMTbIsP4DPXXqmkJjqa6T0ZVchqFjXvB/bmysPJ8Y/Cyzkk774NgExXOaIRUs+En4cTd38HraC7cC7WTB+l/aZLDwAMQHQCnCAgfdudfGOSy5+FLXd1XG9j9bbvku+G/bfan0J6H0vxyMlbjDH7CkdtNuW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=10WDMoYi; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=HFaGPdZaP+ZhBCn3UJpUtyuLXcMYNw9JsptfyErm1nkTHHZ1uHIjn1h6BUMQ0sXfnSrGzphElzKlTUlDaPLD4yQE8GRYylQlcxt7N0RFlAVWFJQS/ubqc8/+ByJa7lBy7Rrb6lsMgzAQ3aQMeP3u9D6VaIbMEy/qTeSo7tJU+i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ypJR0gvq; arc=none smtp.client-ip=209.85.167.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-43009df5ab3so2532049f8f.1
-        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 00:22:25 -0800 (PST)
+Received: by mail-lf1-f74.google.com with SMTP id 2adb3069b0e04-59b6fb01675so3440632e87.2
+        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 00:22:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767946940; x=1768551740; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767946942; x=1768551742; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYmtUt8Xl9FkSFC/XVvZCPE49zR2Dt2nIyVImhULnc8=;
-        b=10WDMoYisvr2q/vJWVQn5SwGea6HDHqguODUKe2MZr4WqLnR69bKO2w/z4NTDbf8aq
-         4daW6PqcEOPXHML1QHpfpsMiziOcdnlhczh4aqm8SUxQ5Vl5HFT9KHBXTuedZDNKVykI
-         hZlo7mkVsvO/4KbFjDXdwa6nF/DSd1sKqs0EoyoYaq+X43GnJ689qMryst63N4SZ/ybr
-         YtmtMSJTKdUSVBmX3yMaQznPiJZkzjEYq899rubBHetZD973ICDiTFmqL9lHpVTV3Q+l
-         LgnHpYBHauEEBYoXU9ZIk3CWNr12UCrDC1NyCfvaFGXx0mBUX7gBHb8oVPOGmiEZAepo
-         YHAw==
+        bh=NqG3laPI6vEHEXOM9R+vgmhZHRmAA+/4qmyfh5dJ4MI=;
+        b=ypJR0gvq1rJInbBTXVDcDnT71UsGXD02Zgpdz4hfWJJTk6cFj0vuKIa3Vcp3pWi+2K
+         jgUd2jFTJ83gteF26jyGxfvN1K4SYfVExBdwToQpXVFXpEzNS+IynrRBmEQ5Nix+oiAe
+         hL3VeVPh8Mx9NCYEusWL71cGjw4WlJ1ZvDDfJFdKv1ImD2OfMI/JG+NuDzZB7oAd/CVX
+         3baLVO13Jp+TriXkPx/+vOpMr11z1iouDGFbguInh1WyuqGtX5bDArJiXCtRrwvVcnjY
+         H/PtMB9/zn+1zbNmUpuxmQ7C9Xm/Vn9O+C5egWZYwIiRnndrGw+1C2HJSFY/umChL/b6
+         gJpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767946940; x=1768551740;
+        d=1e100.net; s=20230601; t=1767946942; x=1768551742;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYmtUt8Xl9FkSFC/XVvZCPE49zR2Dt2nIyVImhULnc8=;
-        b=ChX5ihDmEwn67E8kyipFvUDScmIKpB0cLtA22mqAVHhy0/4JrpBIpHjhtLI1076nth
-         xTvAG3TNj2cSkOHa9XlX/cYCGKCA++V+R6TqJ61brzPCOmESazEPlyYlZOkjhFFNOX0x
-         hjda3AXGZyr1phroc7nEDU+ghUwMKjLH91oVBA8LkQMXltubpGfQLnY6A5Bshg53ZCZ7
-         VAcW1NCPjPbDjGP6UhBoa9GPE+fJYx/L2+8KK+hb+kJt56qxUQIU+UGlmI2+rtw6kuHH
-         nFAHec/g/r94WJ0RruHfrAtAEYlPhTvNlv4R7ymdIixPhWDnZug+ZODbk/6OXy6IWt+f
-         sMBw==
-X-Gm-Message-State: AOJu0YxXr8hbMUraRZe2bPnBRgS2XORyFjeye8unbCLL4knWn3wdBPfR
-	NMFfzp7r15NJUp9FsUdSjmI35BZtKhvG0u91Y2Tmc0L2NvWUQJbHc2BQXp3WeFnd4OVWw0M6YPh
-	fdyLmTo53DmCfhFbZ5BYqnkFVflOmLorIboglknwbss4dYTC/qSPzSyw98hrDVnUAsNYfO3gQ9i
-	ryxZHIE78lxERNGh5oI4ztJkGDOT8=
-X-Google-Smtp-Source: AGHT+IETB7LrDsnfiW2BPzlfWyDm7NKj1+DX1BU5/AFEdV7tYtJ3d8mxv/c+jnVIsPQwWb0Tl7EWECUx/w==
-X-Received: from wrbgx16.prod.google.com ([2002:a05:6000:4710:b0:42f:b666:90bb])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:26c4:b0:430:96bd:411b
- with SMTP id ffacd0b85a97d-432c3775a8cmr10939156f8f.58.1767946940503; Fri, 09
- Jan 2026 00:22:20 -0800 (PST)
-Date: Fri,  9 Jan 2026 08:22:14 +0000
+        bh=NqG3laPI6vEHEXOM9R+vgmhZHRmAA+/4qmyfh5dJ4MI=;
+        b=h9gOfjeGK/7xW6HUYCrj7xBvx8RkdH7UZ3yTpS/EDoF8/WwVnDqK4PortY1JVINWEz
+         ffG6BFCVpcuXTnaG6PtTCvpW1DhFYNuMAfTTjyBASIJzw1X+SRf6j4WJBWkrI8tKTI/k
+         BgmqCaovIYIPv3T5mLb9LtXim+t4Q+ZTleJLsb8dWJd9D8Kex1wJu8HdM+nQu3gc+Apo
+         46nLuHFMdOlLJ5W6dYOsqQVFoglIMdyt7ulWFin09FqlgtB/dwyL1TWFXbnIqIt4qc1J
+         t+gQkpNNgxexTo6VHJU3bH84fqNGtcDWyElKUWyB/TZN5vpnYKaq90htkoPvtyxskRKa
+         avow==
+X-Gm-Message-State: AOJu0YxE6KcluY/0UO1uHy+gmjDqZdSnLN19Tk4zeXTCsJRheaAEP8Rx
+	thx4Y2mZrf7dC52Pu5SR+mSbhb/2B3QNFGIhmvU4toCBl2QkBJ3zqxHN25isPCU/FmUtHkGqbWu
+	EisNnrp+odZzM78A4cEklrnvF2nH+eYKSivKn9Y8uhj+yxbnn7knxbbb0s+s6oeelkngqbAQn1d
+	r5KiB+Y/fQj95270Vf40xLBwlO4sY=
+X-Google-Smtp-Source: AGHT+IEPiBQu8APfXNA3IWNbMpdOagfDDvRFnwb8uKkQFHMSY7VPVHw12O3QIkHoI1cD4SsInszAzyQFrA==
+X-Received: from ljdv18.prod.google.com ([2002:a05:651c:4212:b0:37f:dca2:6c99])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6512:3c8d:b0:595:81ce:ff83
+ with SMTP id 2adb3069b0e04-59b6f03a0b4mr2586927e87.25.1767946941603; Fri, 09
+ Jan 2026 00:22:21 -0800 (PST)
+Date: Fri,  9 Jan 2026 08:22:15 +0000
 In-Reply-To: <20260109082218.3236580-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,8 +72,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260109082218.3236580-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260109082218.3236580-2-tabba@google.com>
-Subject: [PATCH v4 1/5] KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+Message-ID: <20260109082218.3236580-3-tabba@google.com>
+Subject: [PATCH v4 2/5] KVM: arm64: selftests: Fix incorrect rounding in page_align()
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -84,67 +84,35 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	seanjc@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-KVM selftests map all guest code and data into the lower virtual address
-range (0x0000...) managed by TTBR0_EL1. The upper range (0xFFFF...)
-managed by TTBR1_EL1 is unused and uninitialized.
+The implementation of `page_align()` in `processor.c` calculates
+alignment incorrectly for values that are already aligned. Specifically,
+`(v + vm->page_size) & ~(vm->page_size - 1)` aligns to the *next* page
+boundary even if `v` is already page-aligned, potentially wasting a page
+of memory.
 
-If a guest accesses the upper range, the MMU attempts a translation
-table walk using uninitialized registers, leading to unpredictable
-behavior.
+Fix the calculation to use standard alignment logic: `(v + vm->page_size
+- 1) & ~(vm->page_size - 1)`.
 
-Set `TCR_EL1.EPD1` to disable translation table walks for TTBR1_EL1,
-ensuring that any access to the upper range generates an immediate
-Translation Fault. Additionally, set `TCR_EL1.TBI1` (Top Byte Ignore) to
-ensure that tagged pointers in the upper range also deterministically
-trigger a Translation Fault via EPD1.
-
-Define `TCR_EPD1_MASK`, `TCR_EPD1_SHIFT`, and `TCR_TBI1` in
-`processor.h` to support this configuration. These are based on their
-definitions in `arch/arm64/include/asm/pgtable-hwdef.h`.
-
-Suggested-by: Will Deacon <will@kernel.org>
-Reviewed-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+Fixes: 7a6629ef746d ("kvm: selftests: add virt mem support for aarch64")
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
- tools/testing/selftests/kvm/lib/arm64/processor.c     | 2 ++
- 2 files changed, 6 insertions(+)
+ tools/testing/selftests/kvm/lib/arm64/processor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index ff928716574d..ac97a1c436fc 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -90,6 +90,9 @@
- #define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
- #define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
- 
-+#define TCR_EPD1_SHIFT		23
-+#define TCR_EPD1_MASK		(UL(1) << TCR_EPD1_SHIFT)
-+
- #define TCR_IPS_SHIFT		32
- #define TCR_IPS_MASK		(UL(7) << TCR_IPS_SHIFT)
- #define TCR_IPS_52_BITS	(UL(6) << TCR_IPS_SHIFT)
-@@ -97,6 +100,7 @@
- #define TCR_IPS_40_BITS	(UL(2) << TCR_IPS_SHIFT)
- #define TCR_IPS_36_BITS	(UL(1) << TCR_IPS_SHIFT)
- 
-+#define TCR_TBI1		(UL(1) << 38)
- #define TCR_HA			(UL(1) << 39)
- #define TCR_DS			(UL(1) << 59)
- 
 diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-index d46e4b13b92c..5b379da8cb90 100644
+index 5b379da8cb90..607a4e462984 100644
 --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-@@ -384,6 +384,8 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
+@@ -23,7 +23,7 @@ static vm_vaddr_t exception_handlers;
  
- 	tcr_el1 |= TCR_IRGN0_WBWA | TCR_ORGN0_WBWA | TCR_SH0_INNER;
- 	tcr_el1 |= TCR_T0SZ(vm->va_bits);
-+	tcr_el1 |= TCR_TBI1;
-+	tcr_el1 |= TCR_EPD1_MASK;
- 	if (use_lpa2_pte_format(vm))
- 		tcr_el1 |= TCR_DS;
+ static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+ {
+-	return (v + vm->page_size) & ~(vm->page_size - 1);
++	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+ }
  
+ static uint64_t pgd_index(struct kvm_vm *vm, vm_vaddr_t gva)
 -- 
 2.52.0.457.g6b5491de43-goog
 
