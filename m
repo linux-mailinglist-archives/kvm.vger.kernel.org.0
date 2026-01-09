@@ -1,175 +1,360 @@
-Return-Path: <kvm+bounces-67641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CACF3D0C57A
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 22:38:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D397D0C583
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 22:39:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9AF57302D8A3
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 21:38:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2B803302E339
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 21:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9B333D6F6;
-	Fri,  9 Jan 2026 21:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA7433DECB;
+	Fri,  9 Jan 2026 21:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="fJdZcUro";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="O7CTJaPo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JEyNlwUB"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B59A33D4F6;
-	Fri,  9 Jan 2026 21:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767994719; cv=none; b=eEPd3O57Zk5QSL6zrtzsAywKuGt9K7S85fNBcomxjCKlPW3BBJpfZz2jjjmGtsNhdZ9vEGPvTnSj/LDcH6za8WmgPYep1g9mIt1qWLzC8jcrsZxh1dX6fPSm46rhL5ISbYgnqxVPIZatwk87amnC/5uCUuq3q3j1VKzyQ//YP0E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767994719; c=relaxed/simple;
-	bh=iFcbhGt4sl07dI/vgTsNt/XXjlhieSN2X15MCPhWfTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MU56B5RV7iXjZfKyjTZ6gfsS41RL6UHjveQuqCAUz/6GDZla7qoPfys3Uw3DYh4PDk9wE2VlmBZ7uqD83eEQmJPZrkuSQbQ0HW6NT6B7Y8zL/E+dZD0veOM8ILHP29GEBE3XOLnJaa4VnZxZ+Y0WafEqO3uO8ZBWweJLYm8nfek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=fJdZcUro; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=O7CTJaPo; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 2EC2BEC0129;
-	Fri,  9 Jan 2026 16:38:33 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Fri, 09 Jan 2026 16:38:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1767994713;
-	 x=1768081113; bh=gvtvSAYi4oFbZNkjA+PRpLh/s0xkmUKgjuZp66x8+6I=; b=
-	fJdZcUroaBUWu505kk5QVkdyQb9ZZc2ZLuIZPelLw80Q98edrJ+km3L3a/fA2Nc+
-	3UId0xTKzJF6wwIhbZSUKIIGIyQ0OFSUHCF4uvAoY4WqYXoavDSU3hNqo/Xea0T2
-	j62h8E+GchdgzdhCjLbsZhr5WhNAUOry8qeLDk1W5Ska4MrFyr5yl/CH0rKy/dYE
-	H/aVyUa3pFLoAZsV633MjyNeLUX9bVUiO7cOAn6uV9PhQn5JDd/mFe1XcNlYvxZN
-	GtjmwJDKyZ8ZlGqaF2CGJFNlV4ApQc4iQ8hHuFKGI0rnzoVQ3dG8uEeJi15TOnD5
-	jOl015QCshOf8ieKofA87A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1767994713; x=
-	1768081113; bh=gvtvSAYi4oFbZNkjA+PRpLh/s0xkmUKgjuZp66x8+6I=; b=O
-	7CTJaPomy1TOqAV138g6AiRzpF26Nq+IqNY1mWuXaXG4P1Ua0g2EkJbFP/D30zZ+
-	32kcEwDqICG51QjtmB7yn+hygqGra90oOP6w1FJBE7y4yC67IwSjF4l5rSEqjBZr
-	kywNqeYe+jUQD65K5AHuITvU3csfdxCN9J8gIomZt1ru39Bc/qEOd/rAgxa/vJ+P
-	w7sWA361vA9tgTanRJVeeqj9kzc50U/WObhmP3Vi2aXGJLpbFELTnbr2vWimuha5
-	d1Pu1MprwWPSkxp5bUSDy6dmBw9f7BMTX5XotkbwyetVc+ce+PB7ZheeSx4Arf7Z
-	5RR+OtgIhC1CEtqkQRsXg==
-X-ME-Sender: <xms:WHVhaWPoUTXswz-TyFSypR8CTtjJLG5qugBXfmRPctJQ3a2c033iKw>
-    <xme:WHVhaQ_ipEA1qy5GI2yfUxcSw6WXhdQkvSf85xmN2LJfbu-4IsW8-b-6r2_LAQisW
-    rixyi0OOACmF9mBtthAPTNdSQ2WNB2_ogWLwwVmK_Dh3lM5VpS2iA>
-X-ME-Received: <xmr:WHVhafcK5ZN_Q7b7gPGZdfvS2ojOFoUsRnYTPCjyCdKNy_DwLvuhyHcPjY0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutdelleduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepkedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohepug
-    hmrghtlhgrtghksehgohhoghhlvgdrtghomhdprhgtphhtthhopegrmhgrshhtrhhosehf
-    sgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehpvghtvghrgiesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgv
-    rhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhvmhesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshht
-    sehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:WHVhaXx1x0A8sokKqYTsh5-uaI6p7H-hpPFYgRAhwgufMo5KjEEPJA>
-    <xmx:WHVhacJC6CWuwpDqaVVQkRxCPbT3wWdqtHPMUGmXB7E6jUqVaW-fXg>
-    <xmx:WHVhaRFuQ6SK5RXxhfVm_4LiCuDHCs1k51MdlZYy49qz7jBZqNfEOw>
-    <xmx:WHVhaQ9TxTyCbhPfOeebSxtg9AfNWJz-sD_ERB40lZAHVrm5R_MNLw>
-    <xmx:WXVhacwCEhJEi9X6hZTXQQvwvPOiafZbBlkY1AjsNBRBrcUi_P92jw9Y>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 9 Jan 2026 16:38:32 -0500 (EST)
-Date: Fri, 9 Jan 2026 14:38:30 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: David Matlack <dmatlack@google.com>, Alex Mastro <amastro@fb.com>, Shuah
- Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <20260109143830.176dc279@shazbot.org>
-In-Reply-To: <20260109180153.GI545276@ziepe.ca>
-References: <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
-	<20260108141044.GC545276@ziepe.ca>
-	<20260108084514.1d5e3ee3@shazbot.org>
-	<CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
-	<20260108183339.GF545276@ziepe.ca>
-	<aWAhuSgEQzr_hzv9@google.com>
-	<20260109003621.GG545276@ziepe.ca>
-	<aWBPNHOsaP1sNvze@google.com>
-	<20260109005440.GH545276@ziepe.ca>
-	<CALzav=cBGkhbbyggkfaYh3wfqodxRHZKXTNdnmjoXOgwMouBuA@mail.gmail.com>
-	<20260109180153.GI545276@ziepe.ca>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C48133A715
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 21:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767994769; cv=pass; b=FsiqGxU7XfAfJTPumWADMxeOfEn0/djCQYvGWhspqs4a7yUMcjlzlcOdz1jwQ9jthJRE/Sda6bcLYYFyxewLcYzGjvNzFKyl8UTqnKZLQpDHfmb54YimcHIp4fPhRxTMLJxILhHFYsr0EcvyHXVBtTPN/BD6mW3skQAXEUJs2hU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767994769; c=relaxed/simple;
+	bh=LRktjBIuVYAHxo/d1MN6i3X7/mOpSmpIHtlRCR3qKu4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fSAuJfielbn5sOKky5+L6FBDO4Y7PIaVFxmAH6xGUCQRahI1dKFDvHQInrhxf8GdelTachc2feeT0kftKHmpz4/dAwSpoIW6VXfap+oahyri7VdZU3KCGh5Gq5ulrXntYU+sUrrmAB8YpbiIKzuHG7ZklyGvhKabBRKesNwr+Wo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JEyNlwUB; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4edb8d6e98aso139641cf.0
+        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 13:39:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767994766; cv=none;
+        d=google.com; s=arc-20240605;
+        b=S2+Dzl5WhFRLRyJw672oQB0LU1GhlqE6VaiKh3wHMbBtU6vwjRGcFvzO4pxple+U+p
+         KceTs0g09z3tDqG/oWTrZt20xlpJZsvcJOTV+th7pAChnc7tCDglyjYLAW4fpg8cm5K/
+         jRW+eleieBFdU2AuG3whMuxTdXHIg3uiCD5HDcyINOKnCaRHMoFp4BY3IsiA5enO6FAL
+         l4BgRcGMgv1r/ppAR7qyUngmY2CILLB0MwBkmB0rmSkeQBdE0eJ7hN1gUy/NSKjk9UzG
+         xYJYZEHs8rlJPQE3zCdNkSWd3uELSrgi0AhsFEgNdjrLRzKc+8k6OxUy/XW45Yim3rEA
+         WRkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=W/dylGzwVL+uyGpMZYNFm7dWAj2mtf9lYu+gfspoxo0=;
+        fh=Vgz+v3kpIGxDvE3EmTaiGgWu25gTZtpEL8lRpJszXwQ=;
+        b=SmKBG8KDLCz3wFU+lFnXNW6lqYq2ASeWEnrLjWmXqQUNUuM75y5XG1hKdb60rXsDEg
+         X10AarmOzc/nWynXtRcnGoexyH4gbXaKUXWCmqendW6RZWYdO/lzjRvG7btI1AmzdDpf
+         m1uWo9lc0dWz5pCj+rk35D9slNUIfXwMEwBmclJDTlQC2zhf7AfJTZQO3kKJMIYhqj0z
+         jPXdCdK14wxENbCXNinIkbPVMCfQwFORk/DzNQGcqahce5BoZmHHSO895cHWJ1R7jjjl
+         zlit1XEQOqvvLz3JobA9+8Mr8epfx9Tn56hkGfyj8gJS0CvJ3v2A+RffikLiUL4mXGck
+         kDBg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767994766; x=1768599566; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W/dylGzwVL+uyGpMZYNFm7dWAj2mtf9lYu+gfspoxo0=;
+        b=JEyNlwUBswD7InseAjUU/K6/4CUnWX3s1opA1oWJDCnkxfPGT0TAJ74d3iVT8kT8rU
+         H9EAkZj2zLDtuuugMWPRxTTunxpGwJB/4sxa+NdVDJIy34Eom8XWKNWOvSD+T+9zye3y
+         CdNCt0L91iqCgG4455mDJTjVSa/DVVPCjTMP90SI/xMlrO3detg1bnl7M2wyjPVWeUXx
+         Fn52qOc/m5svYrhYWw13N3RF/0SpkjWFwWWXZrDahlUw0LY/0clQ1k6PwyGeXDKdl+7J
+         ZeA+D1OumKDRDi69P+KCydwfUHZEDf6QPZTt0g7mHiqXkXt5NHaNycXC1+++asImBtua
+         UcNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767994766; x=1768599566;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=W/dylGzwVL+uyGpMZYNFm7dWAj2mtf9lYu+gfspoxo0=;
+        b=i5YONpyisLZyKshKpa3rR7eZDZdjXyUNkEK6cEaPL7f13UH4NfWvJQ5boHqyjpP7XT
+         2qZskRLBPeezwlKgRt/EoIjpsqs4/732rb9FwBkTgD0NfEGrBucj+7RC0Yp4fHn+8JBn
+         pqv4CcttQwb/KRe5ICOvHksl1782opbSyrBS9nLlFIgGDzZLRDdN/SI8VjxOwwuXMHcf
+         tQbYDkuSIRCdwx9/KAXoqOBSze4XtizjGdwahY3dyWzC7ofI0hSUFiZjUWA2E1XkPtn3
+         /mI2ygLYT3459ZwPqXkYFdlUHqL0uB0F4fR99FstRQibXIUWfw9ZPsVX96iJYZDmcBIE
+         vFxg==
+X-Forwarded-Encrypted: i=1; AJvYcCW60J4Z3ytENF6CG5+WJ8UO0cHQOE4zZ6ksYgF9MAEv2FcFJ3Ki2TtMLH7tRAhVvtd+BGY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeIl3t/zxAv/P04yXT356Z1741y6440Zs7Xl+k8yfIXRowYSvY
+	zTtg7ZzVZYbBAJCK10INw+ztphFrEB/AZtmr7l2X23RMXpF4YQRzsH0+5/Xi7AoWtHtfPRuZZSV
+	zmvHq/i2IRYjv/6ILqdYZZIzqq7WK4cikv4WUHl+v
+X-Gm-Gg: AY/fxX6L+/QK5JhxHgqA4UZAdnDoQHAyzgeN3A4AI+qy2LgAeHlj6B7r+fNH7/2NVKx
+	DyKmskF338+pIetGM+ioA1ZgK04ZZdWXlDBbkwC7VFvTWE6zwYPhU5hAER7g0BHtJP+VtVLbqic
+	/px4T9flYqmVszvVRxw5pcd7YzmqqFqAW/MZBeaZQWFj/fZRqNYR0ag3iS0qfJQOmj7FmXFxZRy
+	S9Di+ppP7i4w3Wy0772BeZqR1K2DOrKlQSJizX0QnV8bUNpiXJoiiDVQd9IzZYuvAcz0r3PkkaK
+	NoaAZV/mFkaaRLA7PEoRi53ytvo=
+X-Received: by 2002:a05:622a:5cf:b0:4b7:9a9e:833f with SMTP id
+ d75a77b69052e-5011975f24dmr1250271cf.7.1767994766141; Fri, 09 Jan 2026
+ 13:39:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260107201800.2486137-1-skhawaja@google.com> <20260107201800.2486137-3-skhawaja@google.com>
+ <aV76VWKNxMw2t2kH@google.com>
+In-Reply-To: <aV76VWKNxMw2t2kH@google.com>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Fri, 9 Jan 2026 13:39:14 -0800
+X-Gm-Features: AZwV_QjwmaqpUXqrmGnwiQj3ddFB2KVdvzXHx4tgLOWE3HGuUmdzWyLSYVCMyWc
+Message-ID: <CAAywjhQSPveBybmq32CtRMnmz_kyzzqRgimqZ3euXB5yZq5-sg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] vfio: selftests: Add support of creating iommus from iommufd
+To: David Matlack <dmatlack@google.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Robin Murphy <robin.murphy@arm.com>, Pratyush Yadav <pratyush@kernel.org>, 
+	Kevin Tian <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Saeed Mahameed <saeedm@nvidia.com>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
+	Parav Pandit <parav@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 9 Jan 2026 14:01:53 -0400
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Wed, Jan 7, 2026 at 4:29=E2=80=AFPM David Matlack <dmatlack@google.com> =
+wrote:
+>
+> On 2026-01-07 08:17 PM, Samiullah Khawaja wrote:
+> > Add API to init a struct iommu using an already opened iommufd instance
+> > and attach devices to it.
+> >
+> > Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+> > ---
+> >  .../vfio/lib/include/libvfio/iommu.h          |  2 +
+> >  .../lib/include/libvfio/vfio_pci_device.h     |  2 +
+> >  tools/testing/selftests/vfio/lib/iommu.c      | 60 +++++++++++++++++--
+> >  .../selftests/vfio/lib/vfio_pci_device.c      | 16 ++++-
+> >  4 files changed, 74 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h b=
+/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+> > index 5c9b9dc6d993..9e96da1e6fd3 100644
+> > --- a/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+> > +++ b/tools/testing/selftests/vfio/lib/include/libvfio/iommu.h
+> > @@ -29,10 +29,12 @@ struct iommu {
+> >       int container_fd;
+> >       int iommufd;
+> >       u32 ioas_id;
+> > +     u32 hwpt_id;
+> >       struct list_head dma_regions;
+> >  };
+> >
+> >  struct iommu *iommu_init(const char *iommu_mode);
+> > +struct iommu *iommufd_iommu_init(int iommufd, u32 dev_id);
+> >  void iommu_cleanup(struct iommu *iommu);
+> >
+> >  int __iommu_map(struct iommu *iommu, struct dma_region *region);
+> > diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_=
+device.h b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device=
+.h
+> > index 2858885a89bb..1143ceb6a9b8 100644
+> > --- a/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.=
+h
+> > +++ b/tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.=
+h
+> > @@ -19,6 +19,7 @@ struct vfio_pci_device {
+> >       const char *bdf;
+> >       int fd;
+> >       int group_fd;
+> > +     u32 dev_id;
+> >
+> >       struct iommu *iommu;
+> >
+> > @@ -65,6 +66,7 @@ void vfio_pci_config_access(struct vfio_pci_device *d=
+evice, bool write,
+> >  #define vfio_pci_config_writew(_d, _o, _v) vfio_pci_config_write(_d, _=
+o, _v, u16)
+> >  #define vfio_pci_config_writel(_d, _o, _v) vfio_pci_config_write(_d, _=
+o, _v, u32)
+> >
+> > +void vfio_pci_device_attach_iommu(struct vfio_pci_device *device, stru=
+ct iommu *iommu);
+> >  void vfio_pci_irq_enable(struct vfio_pci_device *device, u32 index,
+> >                        u32 vector, int count);
+> >  void vfio_pci_irq_disable(struct vfio_pci_device *device, u32 index);
+> > diff --git a/tools/testing/selftests/vfio/lib/iommu.c b/tools/testing/s=
+elftests/vfio/lib/iommu.c
+> > index 58b7fb7430d4..2c67d7e24d0c 100644
+> > --- a/tools/testing/selftests/vfio/lib/iommu.c
+> > +++ b/tools/testing/selftests/vfio/lib/iommu.c
+> > @@ -408,6 +408,18 @@ struct iommu_iova_range *iommu_iova_ranges(struct =
+iommu *iommu, u32 *nranges)
+> >       return ranges;
+> >  }
+> >
+> > +static u32 iommufd_hwpt_alloc(struct iommu *iommu, u32 dev_id)
+> > +{
+> > +     struct iommu_hwpt_alloc args =3D {
+> > +             .size =3D sizeof(args),
+> > +             .pt_id =3D iommu->ioas_id,
+> > +             .dev_id =3D dev_id,
+> > +     };
+> > +
+> > +     ioctl_assert(iommu->iommufd, IOMMU_HWPT_ALLOC, &args);
+> > +     return args.out_hwpt_id;
+> > +}
+> > +
+> >  static u32 iommufd_ioas_alloc(int iommufd)
+> >  {
+> >       struct iommu_ioas_alloc args =3D {
+> > @@ -418,11 +430,9 @@ static u32 iommufd_ioas_alloc(int iommufd)
+> >       return args.out_ioas_id;
+> >  }
+> >
+> > -struct iommu *iommu_init(const char *iommu_mode)
+> > +static struct iommu *iommu_alloc(const char *iommu_mode)
+> >  {
+> > -     const char *container_path;
+> >       struct iommu *iommu;
+> > -     int version;
+> >
+> >       iommu =3D calloc(1, sizeof(*iommu));
+> >       VFIO_ASSERT_NOT_NULL(iommu);
+> > @@ -430,6 +440,16 @@ struct iommu *iommu_init(const char *iommu_mode)
+> >       INIT_LIST_HEAD(&iommu->dma_regions);
+> >
+> >       iommu->mode =3D lookup_iommu_mode(iommu_mode);
+> > +     return iommu;
+> > +}
+> > +
+> > +struct iommu *iommu_init(const char *iommu_mode)
+> > +{
+> > +     const char *container_path;
+> > +     struct iommu *iommu;
+> > +     int version;
+> > +
+> > +     iommu =3D iommu_alloc(iommu_mode);
+> >
+> >       container_path =3D iommu->mode->container_path;
+> >       if (container_path) {
+> > @@ -453,10 +473,42 @@ struct iommu *iommu_init(const char *iommu_mode)
+> >       return iommu;
+> >  }
+> >
+> > +struct iommu *iommufd_iommu_init(int iommufd, u32 dev_id)
+>
+> I don't think the name really captures what this routine is doing. How
+> about iommufd_dup()?
 
-> On Fri, Jan 09, 2026 at 09:04:30AM -0800, David Matlack wrote:
-> > > If you really want to test TYPE1 you need to test what makes it
-> > > unique, which is that you can map any VMA and then unmap any slice of
-> > > it. Including within what should otherwise be a 1G page.
-> > >
-> > > But I doubt anyone cares enough to fix this, so just exclude
-> > > VFIO_TYPE1_IOMMU from this test?  
-> > 
-> > Ah, ok, thanks for the explanation. So VFIO_TYPE1_IOMMU should always
-> > use 4K mappings regardless of backend (VFIO or iommufd) so that unmap
-> > can work as intended.  
-> 
-> IDK, I think you should just ignore testing TYPE1v0. The actual real
-> semantics that it had are quite confusing and iommufd provides an
-> emulation that is going to be functionally OK (indeed, functionally
-> more capable) but is not the exactly the same.
-> 
-> The old comment here is sort of enlightening:
-> 
-> +        * vfio-iommu-type1 (v1) - User mappings were coalesced together to
-> +        * avoid tracking individual mappings.  This means that the granularity
-> +        * of the original mapping was lost and the user was allowed to attempt
-> +        * to unmap any range.  Depending on the contiguousness of physical
-> +        * memory and page sizes supported by the IOMMU, arbitrary unmaps may
-> +        * or may not have worked.  We only guaranteed unmap granularity
-> +        * matching the original mapping; even though it was untracked here,
-> +        * the original mappings are reflected in IOMMU mappings.  This
-> +        * resulted in a couple unusual behaviors.  First, if a range is not
-> +        * able to be unmapped, ex. a set of 4k pages that was mapped as a
-> +        * 2M hugepage into the IOMMU, the unmap ioctl returns success but with
-> +        * a zero sized unmap.  Also, if an unmap request overlaps the first
-> +        * address of a hugepage, the IOMMU will unmap the entire hugepage.
-> +        * This also returns success and the returned unmap size reflects the
-> +        * actual size unmapped.
-> 
-> iommufd does not try to do this "returned unmap size reflects the
-> actual size unmapped" part, it always unmaps exactly what was
-> requested, because it disables huge pages.
+The reason I used _iommu_init because it creates a new hwpt and ioas
+also, and it represents a separate "struct iommu". dup might indicate
+that it is pointing to the same IOAS? Do you think maybe dup is an
+implementation detail that doesn't need to be conveyed?
 
-I think there was also some splitting code in the IOMMU drivers that
-has since been removed that may have made the v1 interface slightly
-more sane.  It certainly never restricted mappings to PAGE_SIZE in
-order to allow arbitrary unmaps, it relied on users to do sane things
-and examine the results.  Those "sane things" sort of became the v2
-interface.
+Do you think maybe I should rename it to iommufd_device_iommu_init as
+it is creating an hwpt compatible with the device "dev_id"? Or
+iommufd_iommu_init_for_device?
+>
+> > +{
+> > +     struct iommu *iommu;
+> > +
+> > +     iommu =3D iommu_alloc("iommufd");
+> > +
+> > +     iommu->iommufd =3D dup(iommufd);
+> > +     VFIO_ASSERT_GT(iommu->iommufd, 0);
+> > +
+> > +     iommu->ioas_id =3D iommufd_ioas_alloc(iommu->iommufd);
+> > +     iommu->hwpt_id =3D iommufd_hwpt_alloc(iommu, dev_id);
+> > +
+> > +     return iommu;
+> > +}
+> > +
+> > +static void iommufd_iommu_cleanup(struct iommu *iommu)
+>
+> nit: iommufd_cleanup()
 
-In any case, we've had v2 for a long time and if IOMMUFD compat make v1
-more bloated and slow such that users realize they're using an old,
-crappy interface, that's probably for the best.  Examining what page
-size is used for v1 is probably not worthwhile though.  Thanks,
+Agreed.
+>
+> > +{
+> > +     struct iommu_destroy args =3D {
+> > +             .size =3D sizeof(args),
+> > +     };
+> > +
+> > +     if (iommu->hwpt_id) {
+> > +             args.id =3D iommu->hwpt_id;
+> > +             ioctl_assert(iommu->iommufd, IOMMU_DESTROY, &args);
+> > +     }
+> > +
+> > +     args.id =3D iommu->ioas_id;
+> > +     ioctl_assert(iommu->iommufd, IOMMU_DESTROY, &args);
+> > +
+> > +     VFIO_ASSERT_EQ(close(iommu->iommufd), 0);
+> > +}
+> > +
+> >  void iommu_cleanup(struct iommu *iommu)
+> >  {
+> >       if (iommu->iommufd)
+> > -             VFIO_ASSERT_EQ(close(iommu->iommufd), 0);
+> > +             iommufd_iommu_cleanup(iommu);
+> >       else
+> >               VFIO_ASSERT_EQ(close(iommu->container_fd), 0);
+> >
+> > diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools=
+/testing/selftests/vfio/lib/vfio_pci_device.c
+> > index fac4c0ecadef..9bc1f5ade5c4 100644
+> > --- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
+> > +++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
+> > @@ -298,7 +298,7 @@ const char *vfio_pci_get_cdev_path(const char *bdf)
+> >       return cdev_path;
+> >  }
+> >
+> > -static void vfio_device_bind_iommufd(int device_fd, int iommufd)
+> > +static int vfio_device_bind_iommufd(int device_fd, int iommufd)
+> >  {
+> >       struct vfio_device_bind_iommufd args =3D {
+> >               .argsz =3D sizeof(args),
+> > @@ -306,6 +306,7 @@ static void vfio_device_bind_iommufd(int device_fd,=
+ int iommufd)
+> >       };
+> >
+> >       ioctl_assert(device_fd, VFIO_DEVICE_BIND_IOMMUFD, &args);
+> > +     return args.out_devid;
+> >  }
+> >
+> >  static void vfio_device_attach_iommufd_pt(int device_fd, u32 pt_id)
+> > @@ -326,10 +327,21 @@ static void vfio_pci_iommufd_setup(struct vfio_pc=
+i_device *device, const char *b
+> >       VFIO_ASSERT_GE(device->fd, 0);
+> >       free((void *)cdev_path);
+> >
+> > -     vfio_device_bind_iommufd(device->fd, device->iommu->iommufd);
+> > +     device->dev_id =3D vfio_device_bind_iommufd(device->fd, device->i=
+ommu->iommufd);
+> >       vfio_device_attach_iommufd_pt(device->fd, device->iommu->ioas_id)=
+;
+> >  }
+> >
+> > +void vfio_pci_device_attach_iommu(struct vfio_pci_device *device, stru=
+ct iommu *iommu)
+> > +{
+> > +     u32 pt_id =3D iommu->ioas_id;
+>
+> /* Only iommufd supports changing struct iommu attachments */
+> VFIO_ASSERT_TRUE(iommu->iommufd);
 
-Alex
+Agreed
+>
+> > +
+> > +     if (iommu->hwpt_id)
+> > +             pt_id =3D iommu->hwpt_id;
+> > +
+> > +     VFIO_ASSERT_NE(pt_id, 0);
+> > +     vfio_device_attach_iommufd_pt(device->fd, pt_id);
+>
+> device->iommu =3D iommu;
+>
+> > +}
+> > +
+> >  struct vfio_pci_device *vfio_pci_device_init(const char *bdf, struct i=
+ommu *iommu)
+> >  {
+> >       struct vfio_pci_device *device;
+> > --
+> > 2.52.0.351.gbe84eed79e-goog
+> >
+
+Thank you for the feedback.
 
