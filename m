@@ -1,99 +1,87 @@
-Return-Path: <kvm+bounces-67493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67494-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449BAD069F1
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 01:36:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B556FD06A1C
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 01:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC17F30334C7
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 00:36:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F16B30341FC
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 00:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF6E1DE4CE;
-	Fri,  9 Jan 2026 00:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7AEB1DE885;
+	Fri,  9 Jan 2026 00:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="QleLx14W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RIg6dMTb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70FD4594A
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 00:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA601F95C;
+	Fri,  9 Jan 2026 00:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767918985; cv=none; b=J5dwwRRTPaA512ZUGmetYFeaEB8YDIR2rlWllXqzxif0tRwx/OUhCJ0GlciCXz4EsqTmIlJlSwNRZzJXZsN3SKKmsUp5mvUvhx5R+5S5QjQFRCMXRNh/gJuBwl+NG8BJa8zywxM/6awI8Z8bKZ0kkeEYdpPeasop43wfASFls0U=
+	t=1767919402; cv=none; b=tj8zUkBlqjjY6VD20U0jGCR11ZurnjiYwNGgkYIjcl4OgJl0UkeAoG58XJmQxCWTUjNlM5v91bNSXE0xWtr6Jv89wEIrn0oJN5x+AvMZMzbO6nzOx40sX9nRF3RjJ2BKaTKzTB9o/LzMJ/JXNtGKSJKiqpLpCTsWxmig82GLOUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767918985; c=relaxed/simple;
-	bh=HSbyzJte7ef9LUSwX8ZKl4Km7f9/oIn4+KkoGy1YFfs=;
+	s=arc-20240116; t=1767919402; c=relaxed/simple;
+	bh=zVzERIgtq6HANfaqGjDaXa14817otLnOv1j2W1S2R40=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pZSqFlZn6A9SIlhw6hOTy8pRJtgxWNZJdvm9O/0QVe144hyt9gIPeIfKn1RzQFhaHbNDhZGnmJZWnQDyj27fN53c8XXsrB2yAVSznuBhJGGEYDVZxoAipg+J94wdl3jO28mJ1h0E01sNh5bI66BEYCnJ2MYgy4kmbGnCMLse48Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=QleLx14W; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4f4cd02f915so28425011cf.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 16:36:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1767918983; x=1768523783; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=akXataDrrm2I8aSPYbuC2L/r92iwVSgkWRP1kilxNcE=;
-        b=QleLx14W8+B1sjcbDSeHYPuLmdRPt64TE4pSsYuMOogdNbj5w0gjjjMdVDbSWS/xxW
-         cWhcMj44zUdkiTADW28uJ8i8I9MahK1tdkwcXADKhbbF+H1cqo2a4WKG9LepEgWPFFjI
-         IpqNvBl6nsvEdB7yNmMc2wJep5ad6xW4wEUoP9q4gu81oJt42MVN90lPSV4hxOtfbdlX
-         PPb6vYbZSIjNU2hiJ6TYNNYA/fiJkh4Ck53VKP7VK1JABgAfvphXZMs6bwyaOR8yqzAf
-         pSc/YcT/ORcOxS+SP/R05iaeYZxV9bV6BLawGzZbERjmsTvrOed2nl16kFGcXtPcDh16
-         tB3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767918983; x=1768523783;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=akXataDrrm2I8aSPYbuC2L/r92iwVSgkWRP1kilxNcE=;
-        b=u3iVd8z4QRHfLBCGp56B7uxCjQaLVGLHpYj7CrfTsL28Lp8CfKTvOpW8zwbuu2PgRG
-         PB7Ham44rXRlCI+qlkZvPx0ULst9FTaxKF1+qlJ6NUY8PriRiZ6sI5xaMBpNteSY/OcK
-         WGk3I6oHo5kZVjltrfdCNRkuLy0yZvmCwoNHu+N6X8kJo0W9D34nqGLD/HTMk6vT7F98
-         5HB1iNJHMjB9e6iVSn5C/JwCfEv6d7z4i0v6Uoxxd54XJIpAbJ46n21gE4vAlfiEfN2R
-         urC0s2pBzNSgsaowmwIGQyWoqirRk4d7TxIeJHVG04NY4uxbu5Y4grQiqTMlEIDoix89
-         5Cbg==
-X-Forwarded-Encrypted: i=1; AJvYcCWPI66dphtJ3B8ipbkiVOMxp/xKxce1CxN8VZV+yV++XM6E/prnbi670G0o66xy50+5V3A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPF5vwI1J7j5j3inYtSOdimHhHunl9A4ODR86venDpT9DM8s3E
-	2co+8Hwa9zaddIeNcWiJYFv+RxOW7qhjB5iKQM52yCHx83pg2mSE5yeh9P3uJYnOmCM=
-X-Gm-Gg: AY/fxX46MR7QrpsNEcf3vgSzRVZg5DHEqKKv66DNjvFAJeenBPLAs4yIB/CzzLaqffl
-	4zsoV28sdf/Ec23CVQ/dR87Z7Sz38DZtaY4MdcfhJTUalubTmFz4967OQfOCa9ymT6Gisbwcn5M
-	Mj7ekw9ri15Pmjq9VxU/T5cV7StFVLl3DCU4PLheZs3l4xNTkwI5JFo5YjEl4bxbZ8u3qgQ9y7p
-	WG2pTFP8QvwqmAr1s53016ZtcvMFH6TUGrCSOHco1ZiYgoktQu9kn1aDcMsJ6fBVtbVEfaB/HwP
-	mR+VKm8VakQzN5q6oR623tUcVbKa3MK9MLP7zTQvOOe0Odp276TMoaPs4mCA+kXqXyyjzoQ3j0o
-	pH8HR45VMkHWvUMZuJR7JcYppcbjlGR/C5NGjoo/0Hris1C7gRTELmaWWHo92WlFVEqcBKtiifP
-	ngRY3JdJykICh70qGlhpmuXUZkmJibEkuGCUzK9J2mCZujEasvDBUtjgKltjBX8jAl2VrKsNlIF
-	xPnpQ==
-X-Google-Smtp-Source: AGHT+IHmWhRihsDEqETUF+e9G1AVgeqEhpLtMexa+k8HuoAsY94LO++GxPutVwxZ0KIRKX6KuiPb9Q==
-X-Received: by 2002:ac8:5785:0:b0:4e8:9920:be58 with SMTP id d75a77b69052e-4ffb456fd65mr100400051cf.0.1767918982598;
-        Thu, 08 Jan 2026 16:36:22 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8e6257esm57727181cf.31.2026.01.08.16.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 16:36:22 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ve0UH-00000002vXg-1uqs;
-	Thu, 08 Jan 2026 20:36:21 -0400
-Date: Thu, 8 Jan 2026 20:36:21 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>,
-	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=KuXKfkR6Pz7l/P8K+adulFs85GEntHfycf3MDfCBi+9XJT4/0WTo0aWc2RhzsfXWPytvp3D6LrmiOuDrYLav61Z6c54217PWvsVS7iVN++MllglfjTgd6EI1r5ZpXqOHQt2h+rRcTavIGe1yRZVYjrxgiqnTLAra8UgzPQsZbEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RIg6dMTb; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767919401; x=1799455401;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zVzERIgtq6HANfaqGjDaXa14817otLnOv1j2W1S2R40=;
+  b=RIg6dMTbnMIoy3pwYucBqnad6pEOsWLlkcws7zqN3kIMStwZQzy2bltt
+   tdGuU70F8wxZ3hPHgloU2ElpEVsmEdNhwMv5ncqOlF4KtPHAtnOuIPSsF
+   1G1VfeEcQJSBVmpijF6CaG1CYBjkWCrRhvBvX0OlCWAcLjjxrnsyUHuOh
+   wD2ARBb6dctSE55et9aOI4LR1oULNucugso9BtW6dM9zBH4g9TUW4niC/
+   +LDXvgIIGb0fvIWYYC6e6WqAKBUdpgSGquPrLFW00iBgZ7hoF1yzF69YS
+   XDaNO/op9NWGjj8fkHgFB363OjgG/HJxEo/Y37cilCeV8+FZYusPWsviY
+   w==;
+X-CSE-ConnectionGUID: oZhVJmxSRWKz/RMWkP5o2g==
+X-CSE-MsgGUID: ajwxLqNOQPyDPkKbYVns3w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="69379399"
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="69379399"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 16:43:20 -0800
+X-CSE-ConnectionGUID: VKvGiQJ1RGCD67zKyZQvxg==
+X-CSE-MsgGUID: WiZL7CY1Q6a6wgJASFoWvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="208393548"
+Received: from igk-lkp-server01.igk.intel.com (HELO 92b2e8bd97aa) ([10.211.93.152])
+  by orviesa005.jf.intel.com with ESMTP; 08 Jan 2026 16:43:15 -0800
+Received: from kbuild by 92b2e8bd97aa with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1ve0au-000000001tk-2Obc;
+	Fri, 09 Jan 2026 00:43:12 +0000
+Date: Fri, 9 Jan 2026 01:42:24 +0100
+From: kernel test robot <lkp@intel.com>
+To: Samiullah Khawaja <skhawaja@google.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, David Matlack <dmatlack@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, Samiullah Khawaja <skhawaja@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Shuah Khan <skhan@linuxfoundation.org>, iommu@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-Message-ID: <20260109003621.GG545276@ziepe.ca>
-References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
- <aV7yIchrL3mzNyFO@google.com>
- <20260108005406.GA545276@ziepe.ca>
- <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
- <20260108141044.GC545276@ziepe.ca>
- <20260108084514.1d5e3ee3@shazbot.org>
- <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
- <20260108183339.GF545276@ziepe.ca>
- <aWAhuSgEQzr_hzv9@google.com>
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Parav Pandit <parav@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
+Subject: Re: [PATCH 3/3] vfio: selftests: Add iommufd hwpt replace test
+Message-ID: <202601090106.YNZaDPcd-lkp@intel.com>
+References: <20260107201800.2486137-4-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -102,48 +90,199 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aWAhuSgEQzr_hzv9@google.com>
+In-Reply-To: <20260107201800.2486137-4-skhawaja@google.com>
 
-On Thu, Jan 08, 2026 at 09:29:29PM +0000, David Matlack wrote:
-> On 2026-01-08 02:33 PM, Jason Gunthorpe wrote:
-> > On Thu, Jan 08, 2026 at 10:24:19AM -0800, David Matlack wrote:
-> > > > > Oh, I was thinking about a compatability only flow only in the type 1
-> > > > > emulation that internally magically converts a VMA to a dmabuf, but I
-> > > > > haven't written anything.. It is a bit tricky and the type 1 emulation
-> > > > > has not been as popular as I expected??
-> > > >
-> > > > In part because of this gap, I'd guess.  Thanks,
-> > > 
-> > > Lack of huge mappings in the IOMMU when using VFIO_TYPE1_IOMMU is
-> > > another gap I'm aware of.
-> > > vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
-> > > fails when IOMMUFD_VFIO_CONTAINER is enabled.
-> > 
-> > What is this? I'm not aware of it..
-> 
-> It's one of the test cases within
-> tools/testing/selftests/vfio/vfio_dma_mapping_test.c.
-> 
-> Here's the output when running with CONFIG_IOMMUFD_VFIO_CONTAINER=y:
-> 
->   #  RUN           vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap ...
->   Mapped HVA 0x7f0480000000 (size 0x40000000) at IOVA 0x0
->   Searching for IOVA 0x0 in /sys/kernel/debug/iommu/intel/0000:6a:01.0/domain_translation_struct
->   Found IOMMU mappings for IOVA 0x0:
->   PGD: 0x0000000203475027
->   P4D: 0x0000000203476027
->   PUD: 0x0000000203477027
->   PMD: 0x00000001e7562027
->   PTE: 0x00000041c0000067
->   # tools/testing/selftests/vfio/vfio_dma_mapping_test.c:188:dma_map_unmap:Expected 0 (0) == mapping.pte (282394099815)
->   # dma_map_unmap: Test terminated by assertion
->   #          FAIL  vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
+Hi Samiullah,
 
-I can't think of any reason this would fail, I think your tests have
-found a real bug?? Can you check into it, what kernel call fails and
-where does the kernel code come from?
+kernel test robot noticed the following build warnings:
 
-I don't think I can run these tests with the HW I have??
+[auto build test WARNING on 6cd6c12031130a349a098dbeb19d8c3070d2dfbe]
 
-Jason
+url:    https://github.com/intel-lab-lkp/linux/commits/Samiullah-Khawaja/iommu-vt-d-Allow-replacing-no_pasid-iommu_domain/20260108-041955
+base:   6cd6c12031130a349a098dbeb19d8c3070d2dfbe
+patch link:    https://lore.kernel.org/r/20260107201800.2486137-4-skhawaja%40google.com
+patch subject: [PATCH 3/3] vfio: selftests: Add iommufd hwpt replace test
+config: i386-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20260109/202601090106.YNZaDPcd-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260109/202601090106.YNZaDPcd-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601090106.YNZaDPcd-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
+      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:4: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                      ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                         ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:6:
+   tools/testing/selftests/vfio/lib/include/libvfio/iommu.h:51:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      51 |         VFIO_ASSERT_EQ(__iommu_unmap(iommu, region, NULL), 0);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
+      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                              ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                                           ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:6:
+   tools/testing/selftests/vfio/lib/include/libvfio/iommu.h:58:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      58 |         VFIO_ASSERT_EQ(__iommu_unmap_all(iommu, NULL), 0);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
+      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:4: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                      ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                         ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:6:
+   tools/testing/selftests/vfio/lib/include/libvfio/iommu.h:58:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      58 |         VFIO_ASSERT_EQ(__iommu_unmap_all(iommu, NULL), 0);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
+      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                              ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                                           ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:8:
+   tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h:80:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      80 |         VFIO_ASSERT_NE(r, -1, "F_GETFL failed for fd %d\n", fd);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:33:37: note: expanded from macro 'VFIO_ASSERT_NE'
+      33 | #define VFIO_ASSERT_NE(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, !=, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:4: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                      ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                         ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:8:
+   tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h:80:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      80 |         VFIO_ASSERT_NE(r, -1, "F_GETFL failed for fd %d\n", fd);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:33:37: note: expanded from macro 'VFIO_ASSERT_NE'
+      33 | #define VFIO_ASSERT_NE(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, !=, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                              ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                                           ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:8:
+   tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h:83:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      83 |         VFIO_ASSERT_NE(r, -1, "F_SETFL O_NONBLOCK failed for fd %d\n", fd);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:33:37: note: expanded from macro 'VFIO_ASSERT_NE'
+      33 | #define VFIO_ASSERT_NE(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, !=, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:4: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                      ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                         ^~~~~~~~~~
+   In file included from tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:8:
+   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:8:
+   tools/testing/selftests/vfio/lib/include/libvfio/vfio_pci_device.h:83:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      83 |         VFIO_ASSERT_NE(r, -1, "F_SETFL O_NONBLOCK failed for fd %d\n", fd);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:33:37: note: expanded from macro 'VFIO_ASSERT_NE'
+      33 | #define VFIO_ASSERT_NE(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, !=, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                              ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                                           ^~~~~~~~~~
+>> tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:23:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      23 |         VFIO_ASSERT_NE(vaddr, MAP_FAILED);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:33:37: note: expanded from macro 'VFIO_ASSERT_NE'
+      33 | #define VFIO_ASSERT_NE(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, !=, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:4: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                      ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                         ^~~~~~~~~~
+>> tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:23:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      23 |         VFIO_ASSERT_NE(vaddr, MAP_FAILED);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:33:37: note: expanded from macro 'VFIO_ASSERT_NE'
+      33 | #define VFIO_ASSERT_NE(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, !=, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                              ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                                           ^~~~~~~~~~
+   tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:35:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      35 |         VFIO_ASSERT_EQ(munmap(region->vaddr, region->size), 0);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
+      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:4: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                      ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                         ^~~~~~~~~~
+   tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c:35:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
+      35 |         VFIO_ASSERT_EQ(munmap(region->vaddr, region->size), 0);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
+      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
+         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
+      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
+         |                                              ~~~~
+      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
+         |                                           ^~~~~~~~~~
+   14 warnings generated.
+
+
+vim +23 tools/testing/selftests/vfio/vfio_iommufd_hwpt_replace_test.c
+
+    13	
+    14	static void region_setup(struct iommu *iommu,
+    15				 struct iova_allocator *iova_allocator,
+    16				 struct dma_region *region, u64 size)
+    17	{
+    18		const int flags = MAP_SHARED | MAP_ANONYMOUS;
+    19		const int prot = PROT_READ | PROT_WRITE;
+    20		void *vaddr;
+    21	
+    22		vaddr = mmap(NULL, size, prot, flags, -1, 0);
+  > 23		VFIO_ASSERT_NE(vaddr, MAP_FAILED);
+    24	
+    25		region->vaddr = vaddr;
+    26		region->iova = iova_allocator_alloc(iova_allocator, size);
+    27		region->size = size;
+    28	
+    29		iommu_map(iommu, region);
+    30	}
+    31	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
