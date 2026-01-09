@@ -1,131 +1,149 @@
-Return-Path: <kvm+bounces-67492-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67493-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9F6D069C7
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 01:30:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 449BAD069F1
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 01:36:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C63E630341FC
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 00:30:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EC17F30334C7
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 00:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055231DF987;
-	Fri,  9 Jan 2026 00:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF6E1DE4CE;
+	Fri,  9 Jan 2026 00:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CtWgBhSf"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="QleLx14W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DD71B4F1F;
-	Fri,  9 Jan 2026 00:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70FD4594A
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 00:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767918602; cv=none; b=iTHAbTqDvwmjJs9cNgzRqdaGV/tM/aOiKz5NkhePaV+y7wzpPgnTYtwy85dJnsQ/QQrajI8Md8DHivs+BMQoM4MmHwcuWZVVYCetDEy2Y7SFa+r/ovdThcYGHW/X73Mf36lRfd+3OcGuAsO53zLVN823qweLhm1yQ9FCMrMd7Is=
+	t=1767918985; cv=none; b=J5dwwRRTPaA512ZUGmetYFeaEB8YDIR2rlWllXqzxif0tRwx/OUhCJ0GlciCXz4EsqTmIlJlSwNRZzJXZsN3SKKmsUp5mvUvhx5R+5S5QjQFRCMXRNh/gJuBwl+NG8BJa8zywxM/6awI8Z8bKZ0kkeEYdpPeasop43wfASFls0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767918602; c=relaxed/simple;
-	bh=mX5XbuFq3oY1fgctrRQBbLXQxLXqk+y8wzPmf6LEIxk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GM51FW9Z/G4j9AizNEXNhO3VrZ/Dx2OSXSeKYJoc7eKfbXA0d/j+1CZiJa7mjNAqagp4Ee+mXbCDhe1Q64wZ8S3X2PNhDFxHlSZz7hKa8zX6zjj5CgWx0D2DhisOVsQ+orKW3V9569JukYSbKDSpVC625hkvm4fXpkSyy+YS1I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CtWgBhSf; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767918601; x=1799454601;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=mX5XbuFq3oY1fgctrRQBbLXQxLXqk+y8wzPmf6LEIxk=;
-  b=CtWgBhSft7qKOIpKv4EWtzblbtp+5ef4vZOqBo6fPRpLTQ8QPlzcFGFx
-   GbCHJIpaGrR/EzCq3ypJ1u4kcgZmwm7r2wisNnrBjfIULb/32JGUxfuq8
-   6MG17ViCUoMkzTcOieTh5uuOy86k/AlhyAK4jdDr9hFi9g9ZG+QLJZ7j5
-   uwtVdcc0DY0gFH6tucsLiHxs3QkI7VgtAA4iQRch8bwz8AAOE7ovj+9lu
-   gZXOqqXHDapC+L8L40hWlYSWLx4ESHczBEiaeDiAWJ+MgMOZfI3izI5Q+
-   CmKGAsb6hJLCmGQ7ZaoEEr+PcLXgJ9u9Ha0E+VJk3orIiXEbEgvr3mCxS
-   g==;
-X-CSE-ConnectionGUID: JJia++8rR8qXCtlv/LMKIg==
-X-CSE-MsgGUID: hZT6qR2MSMmIMk15X/lU0g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="86720691"
-X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
-   d="scan'208";a="86720691"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 16:30:00 -0800
-X-CSE-ConnectionGUID: +aM55RQfSiK4CVJ+HHZuLw==
-X-CSE-MsgGUID: FprPpiFKRD+vf2GC5TB/5g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
-   d="scan'208";a="203255856"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.14]) ([10.124.240.14])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 16:29:52 -0800
-Message-ID: <a34caf32-a0e0-4bd1-a670-14ecb3756ae6@linux.intel.com>
-Date: Fri, 9 Jan 2026 08:29:50 +0800
+	s=arc-20240116; t=1767918985; c=relaxed/simple;
+	bh=HSbyzJte7ef9LUSwX8ZKl4Km7f9/oIn4+KkoGy1YFfs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZSqFlZn6A9SIlhw6hOTy8pRJtgxWNZJdvm9O/0QVe144hyt9gIPeIfKn1RzQFhaHbNDhZGnmJZWnQDyj27fN53c8XXsrB2yAVSznuBhJGGEYDVZxoAipg+J94wdl3jO28mJ1h0E01sNh5bI66BEYCnJ2MYgy4kmbGnCMLse48Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=QleLx14W; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4f4cd02f915so28425011cf.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 16:36:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1767918983; x=1768523783; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=akXataDrrm2I8aSPYbuC2L/r92iwVSgkWRP1kilxNcE=;
+        b=QleLx14W8+B1sjcbDSeHYPuLmdRPt64TE4pSsYuMOogdNbj5w0gjjjMdVDbSWS/xxW
+         cWhcMj44zUdkiTADW28uJ8i8I9MahK1tdkwcXADKhbbF+H1cqo2a4WKG9LepEgWPFFjI
+         IpqNvBl6nsvEdB7yNmMc2wJep5ad6xW4wEUoP9q4gu81oJt42MVN90lPSV4hxOtfbdlX
+         PPb6vYbZSIjNU2hiJ6TYNNYA/fiJkh4Ck53VKP7VK1JABgAfvphXZMs6bwyaOR8yqzAf
+         pSc/YcT/ORcOxS+SP/R05iaeYZxV9bV6BLawGzZbERjmsTvrOed2nl16kFGcXtPcDh16
+         tB3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767918983; x=1768523783;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=akXataDrrm2I8aSPYbuC2L/r92iwVSgkWRP1kilxNcE=;
+        b=u3iVd8z4QRHfLBCGp56B7uxCjQaLVGLHpYj7CrfTsL28Lp8CfKTvOpW8zwbuu2PgRG
+         PB7Ham44rXRlCI+qlkZvPx0ULst9FTaxKF1+qlJ6NUY8PriRiZ6sI5xaMBpNteSY/OcK
+         WGk3I6oHo5kZVjltrfdCNRkuLy0yZvmCwoNHu+N6X8kJo0W9D34nqGLD/HTMk6vT7F98
+         5HB1iNJHMjB9e6iVSn5C/JwCfEv6d7z4i0v6Uoxxd54XJIpAbJ46n21gE4vAlfiEfN2R
+         urC0s2pBzNSgsaowmwIGQyWoqirRk4d7TxIeJHVG04NY4uxbu5Y4grQiqTMlEIDoix89
+         5Cbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPI66dphtJ3B8ipbkiVOMxp/xKxce1CxN8VZV+yV++XM6E/prnbi670G0o66xy50+5V3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPF5vwI1J7j5j3inYtSOdimHhHunl9A4ODR86venDpT9DM8s3E
+	2co+8Hwa9zaddIeNcWiJYFv+RxOW7qhjB5iKQM52yCHx83pg2mSE5yeh9P3uJYnOmCM=
+X-Gm-Gg: AY/fxX46MR7QrpsNEcf3vgSzRVZg5DHEqKKv66DNjvFAJeenBPLAs4yIB/CzzLaqffl
+	4zsoV28sdf/Ec23CVQ/dR87Z7Sz38DZtaY4MdcfhJTUalubTmFz4967OQfOCa9ymT6Gisbwcn5M
+	Mj7ekw9ri15Pmjq9VxU/T5cV7StFVLl3DCU4PLheZs3l4xNTkwI5JFo5YjEl4bxbZ8u3qgQ9y7p
+	WG2pTFP8QvwqmAr1s53016ZtcvMFH6TUGrCSOHco1ZiYgoktQu9kn1aDcMsJ6fBVtbVEfaB/HwP
+	mR+VKm8VakQzN5q6oR623tUcVbKa3MK9MLP7zTQvOOe0Odp276TMoaPs4mCA+kXqXyyjzoQ3j0o
+	pH8HR45VMkHWvUMZuJR7JcYppcbjlGR/C5NGjoo/0Hris1C7gRTELmaWWHo92WlFVEqcBKtiifP
+	ngRY3JdJykICh70qGlhpmuXUZkmJibEkuGCUzK9J2mCZujEasvDBUtjgKltjBX8jAl2VrKsNlIF
+	xPnpQ==
+X-Google-Smtp-Source: AGHT+IHmWhRihsDEqETUF+e9G1AVgeqEhpLtMexa+k8HuoAsY94LO++GxPutVwxZ0KIRKX6KuiPb9Q==
+X-Received: by 2002:ac8:5785:0:b0:4e8:9920:be58 with SMTP id d75a77b69052e-4ffb456fd65mr100400051cf.0.1767918982598;
+        Thu, 08 Jan 2026 16:36:22 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8e6257esm57727181cf.31.2026.01.08.16.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 16:36:22 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1ve0UH-00000002vXg-1uqs;
+	Thu, 08 Jan 2026 20:36:21 -0400
+Date: Thu, 8 Jan 2026 20:36:21 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Alex Mastro <amastro@fb.com>,
+	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
+Message-ID: <20260109003621.GG545276@ziepe.ca>
+References: <20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com>
+ <aV7yIchrL3mzNyFO@google.com>
+ <20260108005406.GA545276@ziepe.ca>
+ <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com>
+ <20260108141044.GC545276@ziepe.ca>
+ <20260108084514.1d5e3ee3@shazbot.org>
+ <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
+ <20260108183339.GF545276@ziepe.ca>
+ <aWAhuSgEQzr_hzv9@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 39/44] KVM: VMX: Bug the VM if either MSR auto-load
- list is full
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
- Sandipan Das <sandipan.das@amd.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-40-seanjc@google.com>
- <04c70698-e523-43ae-9092-f360c848d797@linux.intel.com>
- <aWANuxukqWmo36N0@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aWANuxukqWmo36N0@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWAhuSgEQzr_hzv9@google.com>
 
+On Thu, Jan 08, 2026 at 09:29:29PM +0000, David Matlack wrote:
+> On 2026-01-08 02:33 PM, Jason Gunthorpe wrote:
+> > On Thu, Jan 08, 2026 at 10:24:19AM -0800, David Matlack wrote:
+> > > > > Oh, I was thinking about a compatability only flow only in the type 1
+> > > > > emulation that internally magically converts a VMA to a dmabuf, but I
+> > > > > haven't written anything.. It is a bit tricky and the type 1 emulation
+> > > > > has not been as popular as I expected??
+> > > >
+> > > > In part because of this gap, I'd guess.  Thanks,
+> > > 
+> > > Lack of huge mappings in the IOMMU when using VFIO_TYPE1_IOMMU is
+> > > another gap I'm aware of.
+> > > vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
+> > > fails when IOMMUFD_VFIO_CONTAINER is enabled.
+> > 
+> > What is this? I'm not aware of it..
+> 
+> It's one of the test cases within
+> tools/testing/selftests/vfio/vfio_dma_mapping_test.c.
+> 
+> Here's the output when running with CONFIG_IOMMUFD_VFIO_CONTAINER=y:
+> 
+>   #  RUN           vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap ...
+>   Mapped HVA 0x7f0480000000 (size 0x40000000) at IOVA 0x0
+>   Searching for IOVA 0x0 in /sys/kernel/debug/iommu/intel/0000:6a:01.0/domain_translation_struct
+>   Found IOMMU mappings for IOVA 0x0:
+>   PGD: 0x0000000203475027
+>   P4D: 0x0000000203476027
+>   PUD: 0x0000000203477027
+>   PMD: 0x00000001e7562027
+>   PTE: 0x00000041c0000067
+>   # tools/testing/selftests/vfio/vfio_dma_mapping_test.c:188:dma_map_unmap:Expected 0 (0) == mapping.pte (282394099815)
+>   # dma_map_unmap: Test terminated by assertion
+>   #          FAIL  vfio_dma_mapping_test.vfio_type1_iommu_anonymous_hugetlb_1gb.dma_map_unmap
 
-On 1/9/2026 4:04 AM, Sean Christopherson wrote:
-> On Mon, Dec 08, 2025, Dapeng Mi wrote:
->> On 12/6/2025 8:17 AM, Sean Christopherson wrote:
->>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>> index 38491962b2c1..2c50ebf4ff1b 100644
->>> --- a/arch/x86/kvm/vmx/vmx.c
->>> +++ b/arch/x86/kvm/vmx/vmx.c
->>> @@ -1098,6 +1098,7 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
->>>  {
->>>  	int i, j = 0;
->>>  	struct msr_autoload *m = &vmx->msr_autoload;
->>> +	struct kvm *kvm = vmx->vcpu.kvm;
->>>  
->>>  	switch (msr) {
->>>  	case MSR_EFER:
->>> @@ -1134,12 +1135,10 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
->>>  	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
->>>  	j = vmx_find_loadstore_msr_slot(&m->host, msr);
->>>  
->>> -	if ((i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS) ||
->>> -	    (j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS)) {
->>> -		printk_once(KERN_WARNING "Not enough msr switch entries. "
->>> -				"Can't add msr %x\n", msr);
->>> +	if (KVM_BUG_ON(i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS, kvm) ||
->>> +	    KVM_BUG_ON(j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS, kvm))
->> nit: Remove one extra space before "m->host.nr".
-> Oh, that's intentional, so that the rest of the line is aligned with the "guest"
-> line above.
+I can't think of any reason this would fail, I think your tests have
+found a real bug?? Can you check into it, what kernel call fails and
+where does the kernel code come from?
 
-Good to know. Thanks.
+I don't think I can run these tests with the HW I have??
 
-
+Jason
 
