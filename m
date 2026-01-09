@@ -1,77 +1,71 @@
-Return-Path: <kvm+bounces-67558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67559-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5A9AD08FB4
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 12:45:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAC55D09718
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 13:18:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A07E23042821
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 11:41:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 612C130BA1E9
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 12:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476AC33A9E9;
-	Fri,  9 Jan 2026 11:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537E31DE885;
+	Fri,  9 Jan 2026 12:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bOsvB8Ka"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="aA3Y/9KC";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="k95zaFPt"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012014.outbound.protection.outlook.com [40.107.209.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A0E33375D
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 11:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767958903; cv=fail; b=h2q8DntyhosNUX4U3rQ0EGlqf6hQ2PiF3SCcs+WJ4nYQkvGJFTygAjGttSxMpwLAlXGLp9uOKhzhqrh3qbSPwX2ExInL01WEf3mccAnZgy2yDfsxg/BLcLRU1SiRRJ8PDDUxjwC9DHZX8qxnnzDnJ1dWy2JRvs8rqJoRRMQatWE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767958903; c=relaxed/simple;
-	bh=I0XobOdAHvYyHUWpcdZdHbtOaEdn2Lzlk0gMp04LF6Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rnEaPbNb0S1UqTJmqY/U8K/XQ0R1X/3Iv+CwN5CAwa9us4cQIY1s8uAjiCpGgxUeG0r8vClzcIf7DFgf/dJq9OVsxAtHrT2dqjajAq9q31DdQcDr+ilJck2eiQ8bI42QFvvm9+IrX4LJSRMrmp85OaLvGdCFwaqnk4heQDVCws8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bOsvB8Ka; arc=fail smtp.client-ip=40.107.209.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JzUHFBzqwQNSVXjRwG47JW+UarJ9j0rzDtx0PVcvI6Y6HwVHxgFVEHsWifz2wBtad4sdYMRvTjM0k2JgCYhS2JbX84SS7rUco0pyTwcwraeRv6wEf7AVwAd/Chnk6LtpXULZ9D1LibY168xlnQ27EPM/MAiD62eJ7ki+eED/IgAKGaH5mDEPoCgTL7lFD5nsvGDB6VLPPS/eQD8s3G8cvyoCmh+qj25Q8WpgO/LMgphQf0lIPB7Deooqqfo8oA9l5j9u/Hz+rckJhmeaGiIo2Bz0c0zE0Bd1UeuLfJrPAST+eFMCJRh/9kI8kfogy+eDEXgXnzpnvRYzbtF6vzIWbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fufjMx6DZSLdRdkrR83gPsNDsD2VVgHIM9YtAjdKYxM=;
- b=MlgfjvAAbaO8PoXG2wsODFwDRS8vN/JsoIeQzXGgqL9QXpXRrcjy/yo6PFBKAeJat5NP5njHM6kTT+1aon9NysKHEV3Cwj6/DzEXho4p00oU1At74A4DSaS+0VVHm8GQ89ycTDC5TpjD9CYg5yb+QaT68oj3511hza2N5SEjhCBhQVRCtsHNi0Pm2pyok7e2CpC8NddBPMWkZkBaePmueLxaY36znyMu7vB1tkNW3SzZK8V1Tw5O3sVD2OZszlJ4pTRh5lzwTWyIl2XwA5/cuiUTxaTDWN57M67Q3/pHvSOa8tnJVHTuGZMReLXNv7npzsVtfnjDWASOdwd2ppLi3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
- is 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com;
- dmarc=temperror action=none header.from=amd.com; dkim=none (message not
- signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fufjMx6DZSLdRdkrR83gPsNDsD2VVgHIM9YtAjdKYxM=;
- b=bOsvB8KaDF1+gTBYZnsgXAfq655sOUjc1kFxOgdn9pwXwgQl6s7CZbkDi0MtcNSnDtV6/cj1xYCV3VySRfjqytghiq6eUdizD9IrVKIivjGbll1ueOi8urlIhpwah5tEItN16X/WGjX5Z15uzqExs8ooKfFy+DazYEWoKA328Kk=
-Received: from CH2PR03CA0019.namprd03.prod.outlook.com (2603:10b6:610:59::29)
- by SN7PR12MB8602.namprd12.prod.outlook.com (2603:10b6:806:26d::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Fri, 9 Jan
- 2026 11:41:38 +0000
-Received: from CH1PEPF0000AD75.namprd04.prod.outlook.com
- (2603:10b6:610:59:cafe::e6) by CH2PR03CA0019.outlook.office365.com
- (2603:10b6:610:59::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.5 via Frontend Transport; Fri, 9
- Jan 2026 11:41:18 +0000
-X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
- 165.204.84.17) smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=temperror action=none header.from=amd.com;
-Received-SPF: TempError (protection.outlook.com: error in processing during
- lookup of amd.com: DNS Timeout)
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CH1PEPF0000AD75.mail.protection.outlook.com (10.167.244.54) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Fri, 9 Jan 2026 11:41:36 +0000
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 9 Jan
- 2026 05:41:35 -0600
-Received: from [10.136.45.190] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Fri, 9 Jan 2026 05:41:31 -0600
-Message-ID: <df23391a-599a-495b-a1b2-ed548215e2c5@amd.com>
-Date: Fri, 9 Jan 2026 17:11:29 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FFC359F8C
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 12:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767960482; cv=none; b=r/AQzZD/sP3cq4ZDgiHrBgg2+uhwOzwBbHn3A3xdyJ4UjD++MiZvcTq/GPrRDKNTT8oYpZTxabCiTn6r7kFoDVO6YjJrIp501ZhDo9VDLjbumBvxzy2h5qpk5DiA579yNNJNm3Ks4EXMp9G1VERtc/4YeYr/8cOfhdqMoV/VhLY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767960482; c=relaxed/simple;
+	bh=4Z+d5TRTcuwLi/S5zOetEJtn8Zjhaf3WusJBplaDol4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ItsRuRb9l5SOb0T0Y7hQ/cgPJgvDtBUyh5SM3qZcTJD+sxoLRVc8PGlZYvvgc2VJ19CV/9Ikw1sWTNJQ1LTm3zK0+dZ451xV0CjQDTQNnIBDqYQs3jjHHsNBf7TtbxCZ3Fr4gy8chPG9pkWyviGBzrtogj8GD36ZGpJMkHpX5bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=aA3Y/9KC; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=k95zaFPt; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E62F95BFFC;
+	Fri,  9 Jan 2026 12:07:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1767960479; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=4Z+d5TRTcuwLi/S5zOetEJtn8Zjhaf3WusJBplaDol4=;
+	b=aA3Y/9KCXCEmqClV3RGYgLOys0emintyICqd2JAe/fdYrAisel9rYOc2SiHAdUyo235Iar
+	V6V+uJKMGR4YssidBXnb53iVtigu5dcBMHammyvA6v7PdGqxdNAhZKvQf2vsuR4QoxziwU
+	e865T+Fy69F2EAQ21+P/PTCjVUPGryA=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=k95zaFPt
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1767960478; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=4Z+d5TRTcuwLi/S5zOetEJtn8Zjhaf3WusJBplaDol4=;
+	b=k95zaFPt9RDIKAZ5/+7d7pYm66zVpo3SAxF/Q0von+Okgsg+hb0gC0zkHw8EJMOE3Ee5T3
+	1c3GqBNI63JZ+IxDtNTnKQM4z0Yzp1LWmi6DRQFM/M/h0GGmg7DsCQxmMk2zLD0/C/IH2K
+	V4hTV0PsFkjT1YkS7w9d2JZ1Yi20hik=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 383B63EA63;
+	Fri,  9 Jan 2026 12:07:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 0XBzCp7vYGmiIQAAD6G6ig
+	(envelope-from <jgross@suse.com>); Fri, 09 Jan 2026 12:07:58 +0000
+Message-ID: <3102d712-8fa7-4567-bb8a-0f39fd71712d@suse.com>
+Date: Fri, 9 Jan 2026 13:07:57 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,222 +73,236 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] i386: Implement CPUID 0x80000026
-To: Zhao Liu <zhao1.liu@intel.com>
-CC: <pbonzini@redhat.com>, <mtosatti@redhat.com>, <kvm@vger.kernel.org>,
-	<qemu-devel@nongnu.org>, <seanjc@google.com>, <santosh.shukla@amd.com>,
-	<nikunj.dadhania@amd.com>, <ravi.bangoria@amd.com>, <babu.moger@amd.com>,
-	Shivansh Dhiman <shivansh.dhiman@amd.com>, K Prateek Nayak
-	<kprateek.nayak@amd.com>
-References: <20251121083452.429261-1-shivansh.dhiman@amd.com>
- <20251121083452.429261-2-shivansh.dhiman@amd.com>
- <aV4KVjjZXZSB5YGw@intel.com> <eb712000-bc67-468a-b691-097688233659@amd.com>
- <aWDEYEfB4va41+Tv@intel.com>
+Subject: Re: [PATCH v2 0/5] x86: Cleanups around slow_down_io()
+To: linux-kernel@vger.kernel.org, x86@kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-block@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
+ Alexey Makhalov <alexey.makhalov@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ xen-devel@lists.xenproject.org, Denis Efremov <efremov@linux.com>,
+ Jens Axboe <axboe@kernel.dk>
+References: <20251216134150.2710-1-jgross@suse.com>
 Content-Language: en-US
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-In-Reply-To: <aWDEYEfB4va41+Tv@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD75:EE_|SN7PR12MB8602:EE_
-X-MS-Office365-Filtering-Correlation-Id: 876f0edb-b172-4fc2-5ef2-08de4f740bfa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dkZEekx1RTU3WGUzYmJMaHZ6QmFpcVgweERDeU5xYW9wNTArZmw1MUUzNnkz?=
- =?utf-8?B?dTZlUU5DaVB4b3ZYdndhN09XdlFCTThSNGRWWXY1dWZJUW84OThmeTN0Z3Rw?=
- =?utf-8?B?alNvMzVockZVdWZaNTNLTDVlM3dFTC82Z0QwZmtyZjlFaXVYTTVCLzgyWXlB?=
- =?utf-8?B?MUV0MVo4UnA3clg1Q2NNK1JVaGw3Mnd5d0hvdm8xbnFTL2tvYklxQXVsdjk4?=
- =?utf-8?B?ejVZa0FiYUdRWEp3R0ZHY0pMQTdFSVF0UU9McXp0cXpXZ2t6MnpxbzNGaHlj?=
- =?utf-8?B?M2pHRlMyb2ppQVNQcTlBYUttQ1dOc0xML2FWNHU0MWdYS1c0enBqV2dlb0tw?=
- =?utf-8?B?aXFGcmlLWTF3TElmclYzMm0wU2NZd1lMSWpqVm9VOEpLY2VTU2lZeWtNcHgy?=
- =?utf-8?B?dFArZWdVWmpPN1ZwMkdGVTl6bTEvalBnbk52NnYwV0NDS3VneFVhdWtUNmVT?=
- =?utf-8?B?aWhlVVQ2T2hPSlBxY3JIdkZFM2FobHFkdEZ5eE5HNW1ZQWZ1RGgzSDUyR0xV?=
- =?utf-8?B?b2RZU0JZMFlpVDNrNTVjSGdLSWlkenpjQ0IrNUNLU3lqZHVWekFoSDd6RDBz?=
- =?utf-8?B?ellzckZDNG9BbklRVloyV2M1YVpOeXdJWjJZMzFPelVOSDJCUXZldmx3c29N?=
- =?utf-8?B?QnVRZjdsdTV2TzlWdS9CdXNVT05jQUxHeG1aVlQ5UHcxeFQ2UTN0S0plZUYx?=
- =?utf-8?B?RkowZElDcXAvZ2Q5M3pPcXJ0U3lsYzFhR3BBZ3c5ZkNNVVpYU01IR0ozNVBl?=
- =?utf-8?B?Y2tVN1ppd2NVTUFqZU13SzZnamlzRkF4OEZmMUFubGE4UnArMFJIYVhveDFp?=
- =?utf-8?B?cTFSWDc2RDR4VEp2emlMdE80NmowWTljenJmM0luQTBVUUZWbjlybUtMbGhC?=
- =?utf-8?B?czZDeTRLeEtTZVhGbVZMcHRDT0hoQUhtUEU2UFczckk5UUl6bVl6SGs4Z0RI?=
- =?utf-8?B?Z3YvTzVtb2VnNEx0aFA0M2psblVvNTZxWjVnbGdBcTZLMzUrSURROXRCT2s1?=
- =?utf-8?B?bjNxODVNMEcwVkNUV0F2cnY3S2FFR0dQTlBTS0Yza2crLzVhZDd5WkJMTG1O?=
- =?utf-8?B?YXhYM3ZmdHFReWEyeWptdkQ1Q3BIUzVPWlhOL0g3YWJsV3pRZ05qam5NRVZo?=
- =?utf-8?B?WVJGQlRyZ2g4MFFzOTlod1l1OXFqUURDMzVaUm1SbGZQTG1tL3cvRlp6SkYz?=
- =?utf-8?B?QWlPbGFNMmZON1ViU012bGY4UlNNSk05SktVbk12Y2FVays5bXhQaitKYTA3?=
- =?utf-8?B?TUgwWi9zTHl5WDN6ZlZyOXVEOTdRSW9ZVlZnQi8yWWtPaWVYSUU4WHllZjJ1?=
- =?utf-8?B?OFh0S3R0YlJMajFzWllvN3hFU2l1WVB4dFFDWEk0NzZySjZqQVMvT3cySGxK?=
- =?utf-8?B?TUFiS29aVDdKM0xNMnZjYklzZWlmSkNzUDdLRXB3cUFoNGtVTm1VNEJPM0RV?=
- =?utf-8?B?bk1pYnV3RGFxOEQxTngrQk1oQXlNUGFBYllYSExHODgyR3RFRWlINHExMFVv?=
- =?utf-8?B?aEZDcTBROVBWeDhLTjlYTmJtblJubE1VcGx4V0ZlRUc4TWF2d2YvUTdxSXdQ?=
- =?utf-8?B?bzgwQktuN25nUVBVSldnanZQSFdXeWpHVWdFeUlWODZwSzVVMm15d2RabE4r?=
- =?utf-8?B?dUdFWW0yRlVBdHc5TjdScjlaMDQ5M0JpZHIvUHdUMnRnU1l5QlltQUVqVmgz?=
- =?utf-8?B?QjFCRU5jS0FPcjFNeTJ3b3BhbTFDcUhOUUNGNmN1V0x4QjNLVE9nUFhDakt1?=
- =?utf-8?B?RTlQbzVGbzZlUGkzRkJZRHVqV1RiWTBxa0w2OVgvbDdFYjlvMmdneUFLdVow?=
- =?utf-8?B?cDN3OFNvYWtHNVdvd1RwNkhmOGUyOE1obG5TWEE2SFVBZDJCTHNkVnpzMWJz?=
- =?utf-8?B?LzkxSDVOVVE0MmhFMkVhSjBrNlZLRTVRSEJjd1BFVE8rUm1ybkNFWjNrK3hE?=
- =?utf-8?B?MWxNZ2l6bG4xV0tKRVVUaCtnRjdVelU3M1ZFdW9rWjUzZmZ4a1JwOGtsVW9Z?=
- =?utf-8?B?emhuSWlkc2lBM002WWdySnhvZFhqUU91aFdZc1JQVkpIRDBuTlEvOVpKVWc0?=
- =?utf-8?B?d2NVdm1iZ3FBUU1LeDlMLzdOM2dsalJGR0EzNHFrZDFlWjhBUlBQSkRvL3F5?=
- =?utf-8?Q?H1VU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2026 11:41:36.8341
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 876f0edb-b172-4fc2-5ef2-08de4f740bfa
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD75.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8602
+From: Juergen Gross <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <20251216134150.2710-1-jgross@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------6KmjgHGC0GjFkS6YvFAdgUNk"
+X-Spamd-Result: default: False [-5.41 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SIGNED_PGP(-2.00)[];
+	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MIME_GOOD(-0.20)[multipart/signed,multipart/mixed,text/plain];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_UNKNOWN(0.10)[application/pgp-keys];
+	MIME_BASE64_TEXT(0.10)[];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+,3:+,4:~,5:~];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -5.41
+X-Rspamd-Queue-Id: E62F95BFFC
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------6KmjgHGC0GjFkS6YvFAdgUNk
+Content-Type: multipart/mixed; boundary="------------Gs0D86kS3xPc0aUTHyn2oG1W";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-block@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
+ Alexey Makhalov <alexey.makhalov@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ xen-devel@lists.xenproject.org, Denis Efremov <efremov@linux.com>,
+ Jens Axboe <axboe@kernel.dk>
+Message-ID: <3102d712-8fa7-4567-bb8a-0f39fd71712d@suse.com>
+Subject: Re: [PATCH v2 0/5] x86: Cleanups around slow_down_io()
+References: <20251216134150.2710-1-jgross@suse.com>
+In-Reply-To: <20251216134150.2710-1-jgross@suse.com>
 
+--------------Gs0D86kS3xPc0aUTHyn2oG1W
+Content-Type: multipart/mixed; boundary="------------Ui1zwu9aMuM48dsP0uysbNdM"
 
-On 09-01-2026 14:33, Zhao Liu wrote:
-> On Thu, Jan 08, 2026 at 04:03:12PM +0530, Shivansh Dhiman wrote:
->> Date: Thu, 8 Jan 2026 16:03:12 +0530
->> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
->> Subject: Re: [PATCH 1/5] i386: Implement CPUID 0x80000026
->>
->> Hi Zhao,
->>
->> On 07-01-2026 12:55, Zhao Liu wrote:
->>> Hi Shivansh,
->>>
->>> Sorry for late reply.
->>>
->>> On Fri, Nov 21, 2025 at 08:34:48AM +0000, Shivansh Dhiman wrote:
->>>> Date: Fri, 21 Nov 2025 08:34:48 +0000
->>>> From: Shivansh Dhiman <shivansh.dhiman@amd.com>
->>>> Subject: [PATCH 1/5] i386: Implement CPUID 0x80000026
->>>> X-Mailer: git-send-email 2.43.0
->>>>
->>>> Implement CPUID leaf 0x80000026 (AMD Extended CPU Topology). It presents the
->>>> complete topology information to guests via a single CPUID with multiple
->>>> subleafs, each describing a specific hierarchy level, viz. core, complex,
->>>> die, socket.
->>>>
->>>> Note that complex/CCX level relates to "die" in QEMU, and die/CCD level is
->>>> not supported in QEMU yet. Hence, use CCX at CCD level until diegroups are
->>>> implemented.
->>>
->>> I'm trying to understand AMD's topology hierarchy by comparing it to the
->>> kernel's arch/x86/kernel/cpu/topology_ext.c file:
->>>
->>> static const unsigned int topo_domain_map_0b_1f[MAX_TYPE_1F] = {
->>> 	[SMT_TYPE]	= TOPO_SMT_DOMAIN,
->>> 	[CORE_TYPE]	= TOPO_CORE_DOMAIN,
->>> 	[MODULE_TYPE]	= TOPO_MODULE_DOMAIN,
->>> 	[TILE_TYPE]	= TOPO_TILE_DOMAIN,
->>> 	[DIE_TYPE]	= TOPO_DIE_DOMAIN,
->>> 	[DIEGRP_TYPE]	= TOPO_DIEGRP_DOMAIN,
->>> };
->>>
->>> static const unsigned int topo_domain_map_80000026[MAX_TYPE_80000026] = {
->>> 	[SMT_TYPE]		= TOPO_SMT_DOMAIN,
->>> 	[CORE_TYPE]		= TOPO_CORE_DOMAIN,
->>> 	[AMD_CCD_TYPE]		= TOPO_TILE_DOMAIN,
->>> 	[AMD_SOCKET_TYPE]	= TOPO_DIE_DOMAIN,
->>> };
->>
->> These mappings reuse some original names (SMT_TYPE and CORE_TYPE) along with the
->> new ones (AMD_CCD_TYPE and AMD_SOCKET_TYPE). I think to avoid defining more AMD
->> specific types the original names are used. So, essentially you can read them
->> like this:
->>
->> static const unsigned int topo_domain_map_80000026[MAX_TYPE_80000026] = {
->> 	[AMD_CORE_TYPE]		= TOPO_SMT_DOMAIN,
->> 	[AMD_CCX_TYPE]		= TOPO_CORE_DOMAIN,
->> 	[AMD_CCD_TYPE]		= TOPO_TILE_DOMAIN,
->> 	[AMD_SOCKET_TYPE]	= TOPO_DIE_DOMAIN,
->> };
-> 
-> Thank you! It's clear and I see the difference.
->  
->>> What particularly puzzles me is that "complex" isn't listed here, yet it
->>> should be positioned between "core" and CCD. Does this mean complex
->>> actually corresponds to kernel's module domain?
->>
->> There is a nuance with CPUID 80000026h related to the shifting of x2APIC ID.
->> According to APM, EAX[4:0] tells us the number of bits to shift x2APIC ID right
->> to get unique topology ID of the next instance of the current level type.
->>
->> So, all logical processors with the same next level ID share current level. This
->> results in mapping the Nth level type to (N-1)th domain. This is unlike Intel's
->> CPUID 0xb which maps Nth level type to Nth domain.
-> 
-> Yes, it's the core difference. I think it's better to have a helper
-> clearly define the mapping between QEMU general topo level v.s. AMD topo
-> types, similar to cpuid1f_topo_type().
+--------------Ui1zwu9aMuM48dsP0uysbNdM
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Yeah. That can be done.
+R2VudGxlIHBpbmcuDQoNCk9uIDE2LjEyLjI1IDE0OjQxLCBKdWVyZ2VuIEdyb3NzIHdyb3Rl
+Og0KPiBXaGlsZSBsb29raW5nIGF0IHBhcmF2aXJ0IGNsZWFudXBzIEkgc3R1bWJsZWQgb3Zl
+ciBzbG93X2Rvd25faW8oKSBhbmQNCj4gdGhlIHJlbGF0ZWQgUkVBTExZX1NMT1dfSU8gZGVm
+aW5lLg0KPiANCj4gRG8gc2V2ZXJhbCBjbGVhbnVwcywgcmVzdWx0aW5nIGluIGEgZGVsZXRp
+b24gb2YgUkVBTExZX1NMT1dfSU8gYW5kIHRoZQ0KPiBpb19kZWxheSgpIHBhcmF2aXJ0IGZ1
+bmN0aW9uIGhvb2suDQo+IA0KPiBQYXRjaCA0IGlzIHJlbW92aW5nIHRoZSBjb25maWcgb3B0
+aW9ucyBmb3Igc2VsZWN0aW5nIHRoZSBkZWZhdWx0IGRlbGF5DQo+IG1lY2hhbmlzbSBhbmQg
+c2V0cyB0aGUgZGVmYXVsdCB0byAibm8gZGVsYXkiLiBUaGlzIGlzIGluIHByZXBhcmF0aW9u
+IG9mDQo+IHJlbW92aW5nIHRoZSBpb19kZWxheSgpIGZ1bmN0aW9uYWxpdHkgY29tcGxldGVs
+eSwgYXMgc3VnZ2VzdGVkIGJ5IEluZ28NCj4gTW9sbmFyLg0KPiANCj4gUGF0Y2ggNSBpcyBh
+ZGRpbmcgYW4gYWRkaXRpb25hbCBjb25maWcgb3B0aW9uIGFsbG93aW5nIHRvIGF2b2lkDQo+
+IGJ1aWxkaW5nIGlvX2RlbGF5LmMgKGRlZmF1bHQgaXMgc3RpbGwgdG8gYnVpbGQgaXQpLg0K
+PiANCj4gQ2hhbmdlcyBpbiBWMjoNCj4gLSBwYXRjaGVzIDIgYW5kIDMgb2YgVjEgaGF2ZSBi
+ZWVuIGFwcGxpZWQNCj4gLSBuZXcgcGF0Y2hlcyA0IGFuZCA1DQo+IA0KPiBKdWVyZ2VuIEdy
+b3NzICg1KToNCj4gICAgeDg2L3BhcmF2aXJ0OiBSZXBsYWNlIGlvX2RlbGF5KCkgaG9vayB3
+aXRoIGEgYm9vbA0KPiAgICBibG9jay9mbG9wcHk6IERvbid0IHVzZSBSRUFMTFlfU0xPV19J
+TyBmb3IgZGVsYXlzDQo+ICAgIHg4Ni9pbzogUmVtb3ZlIFJFQUxMWV9TTE9XX0lPIGhhbmRs
+aW5nDQo+ICAgIHg4Ni9pb19kZWxheTogU3dpdGNoIGlvX2RlbGF5KCkgZGVmYXVsdCBtZWNo
+YW5pc20gdG8gIm5vbmUiDQo+ICAgIHg4Ni9pb19kZWxheTogQWRkIGNvbmZpZyBvcHRpb24g
+Zm9yIGNvbnRyb2xsaW5nIGJ1aWxkIG9mIGlvX2RlbGF5Lg0KPiANCj4gICBhcmNoL3g4Ni9L
+Y29uZmlnICAgICAgICAgICAgICAgICAgICAgIHwgIDggKysrDQo+ICAgYXJjaC94ODYvS2Nv
+bmZpZy5kZWJ1ZyAgICAgICAgICAgICAgICB8IDMwIC0tLS0tLS0tLS0NCj4gICBhcmNoL3g4
+Ni9pbmNsdWRlL2FzbS9mbG9wcHkuaCAgICAgICAgIHwgMzEgKysrKysrKystLQ0KPiAgIGFy
+Y2gveDg2L2luY2x1ZGUvYXNtL2lvLmggICAgICAgICAgICAgfCAxNyArKystLS0NCj4gICBh
+cmNoL3g4Ni9pbmNsdWRlL2FzbS9wYXJhdmlydC5oICAgICAgIHwgMTEgKy0tLQ0KPiAgIGFy
+Y2gveDg2L2luY2x1ZGUvYXNtL3BhcmF2aXJ0X3R5cGVzLmggfCAgMyArLQ0KPiAgIGFyY2gv
+eDg2L2tlcm5lbC9NYWtlZmlsZSAgICAgICAgICAgICAgfCAgMyArLQ0KPiAgIGFyY2gveDg2
+L2tlcm5lbC9jcHUvdm13YXJlLmMgICAgICAgICAgfCAgMiArLQ0KPiAgIGFyY2gveDg2L2tl
+cm5lbC9pb19kZWxheS5jICAgICAgICAgICAgfCA4MSArLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0NCj4gICBhcmNoL3g4Ni9rZXJuZWwva3ZtLmMgICAgICAgICAgICAgICAgIHwgIDgg
+Ky0tDQo+ICAgYXJjaC94ODYva2VybmVsL3BhcmF2aXJ0LmMgICAgICAgICAgICB8ICAzICst
+DQo+ICAgYXJjaC94ODYva2VybmVsL3NldHVwLmMgICAgICAgICAgICAgICB8ICA0ICstDQo+
+ICAgYXJjaC94ODYveGVuL2VubGlnaHRlbl9wdi5jICAgICAgICAgICB8ICA2ICstDQo+ICAg
+ZHJpdmVycy9ibG9jay9mbG9wcHkuYyAgICAgICAgICAgICAgICB8ICAyIC0NCj4gICAxNCBm
+aWxlcyBjaGFuZ2VkLCA1NSBpbnNlcnRpb25zKCspLCAxNTQgZGVsZXRpb25zKC0pDQo+IA0K
+DQo=
+--------------Ui1zwu9aMuM48dsP0uysbNdM
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-> 
->> Back to your question, the complex is same as tile since both represent a L3
->> cache boundary.
-> 
-> Yeah, this makes sense. CCD->die, and CCX->tile.
-> 
->>> Back to QEMU, now CCX is mapped as QEMU's die level, and AMD socket is mapped
->>> to socket level. Should we revisit QEMU's topology level mapping for AMD, to
->>> align with the above topology domain mapping?
->>>
->>> If we want to go further: supporting CCD configuration would be quite
->>> tricky. I feel that adding another new parameter between the smp.dies
->>> and smp.sockets would create significant confusion.
->>
->> The current kernel doesn't have sensitivity to a level between L3 boundary and
->> socket. Also, most production systems in current AMD CPU landscape have CCD=CCX.
->> Only a handful of models feature CCD=2CCX, so this isn't an immediate pressing need.
->>
->> In QEMU's terminology, socket represents an actual socket and die represents the
->> L3 cache boundary. There is no intermediate level between them. Looking ahead,
->> when more granular topology information (like CCD) becomes necessary for VMs,
->> introducing a "diegroup" level would be the logical approach. This level would
->> fit naturally between die and socket, as its role cannot be fulfilled by
->> existing topology levels.
-> 
-> With your nice clarification, I think this problem has become a bit easier.
-> 
-> In fact, we can consider that CCD=CCX=die is currently the default
-> assumption in QEMU. When future implementations require distinguishing between
-> these CCD/CCX concepts, we can simply introduce an additional "smp.tiles" and
-> map CCX to it. This may need a documentation or a compatibility option, but I
-> believe these extra efforts are worthwhile.
-> 
-> And "smp.tiles" means "how many tiles in a die", so I feel it's perfect
-> to describe CCX.
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-That indeed looks like a cleaner solution. However, I'm concerned about
-retaining compatibility with existing "dies". But yeah, that's a task for a
-later time.
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
 
-> 
->> Also, I was looking at Intel's SDM Vol. 2A "Instruction Set Reference, A-Z"
->> Table 3-8. "Information Returned by CPUID Instruction". The presence of a
->> "diegrp" level between die and socket suggests Intel has already recognized the
->> need for this intermediate topology level. If this maps to a similar concept as
->> AMD's CCD, it would indeed strengthen the case for introducing a new level in QEMU.
-> 
-> SDM has "diedrp" but currently no product is using it. So it's hard for me
-> to say what this layer will look like in the future, especially with
-> topology-aware features/MSRs. Therefore, I prefer to add the "tile" if
-> needed, as it aligns better with the existing hierarchy definition. Anyway,
-> this is the future topic (though it is related with the last statement in your
-> commit message). At least for now, how to map the AMD hierarchy is fairly
-> clear.
+--------------Ui1zwu9aMuM48dsP0uysbNdM--
 
-Ack.
+--------------Gs0D86kS3xPc0aUTHyn2oG1W--
 
-> 
-> Thanks,
-> Zhao
-> 
+--------------6KmjgHGC0GjFkS6YvFAdgUNk
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmlg750FAwAAAAAACgkQsN6d1ii/Ey+3
+/wgAi5oL7xCqpILZVsO5gRJgR0CTRua+JeXEsT5vAtwtDnpA8iZZVLqBdXDmafTRfSUP0nRw7tUQ
+DVh9aTUpweByMdEoEXUup2HTJwvRf2u7r5yJMS+gM9kQbCqCq8KrhWhDpNzyy46+p9Z8wOnnlFu5
+2FTSjCahYQIRkKgtSxyLmvtAF4kj0adGtpRterfJvgm7RV+FlIUrSHG80G331Lsh/+tRnaFVeyIW
+ETT8zC84K4V6DKfbiFsvmL8zg0ED79+XVtzARSK+Jm+jkXxPXMK8jVqgA9dSvF4/bzbqJckClEK5
+XrBV2JpNaU398fDwvSrPDOhJh8tQYvr7jDyIY+4mRw==
+=fqat
+-----END PGP SIGNATURE-----
+
+--------------6KmjgHGC0GjFkS6YvFAdgUNk--
 
