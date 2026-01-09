@@ -1,91 +1,91 @@
-Return-Path: <kvm+bounces-67521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67522-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8935D0750F
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 07:05:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED2DED07596
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 07:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0FF53301622B
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 06:04:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36BA7303213F
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 06:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C995C2C3251;
-	Fri,  9 Jan 2026 06:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F76E2D9796;
+	Fri,  9 Jan 2026 06:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwqthPnw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPRg9Jen"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyzUeis3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YMpb5MtK"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41D529BDAA
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 06:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8CA2D5936
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 06:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767938667; cv=none; b=eW6u7NbkaDNzAnIHP4MQcm15N9gusSK8csgGK7vP6P8QrRBf5Zycw/LJ79eLSluOxU0csRS61IY/a3qRDcOFIlIA6hvNrdcnWcEAXkrwpaGrq8eOzYR7Bc6+LTOS6ODiljyfWzo1Ey8MvkO6TTvlQFWwnC3bI5yJrwjPcFlMTmo=
+	t=1767938994; cv=none; b=AieMXs75CGjFTnCXNwklYVrT0g7r8F9jqlPysyL65Jj3IxIt5jzpqSHowJws/NLmyT0b0mwtnHEmGJD8exNlU3u0fEx8wGpI+2LG+Svno6mY/JYFoSI1uBaDe/duAYuazZnEBcTHIFJaj+yCHLcK0KteFXLvi8n3C/yqr9Pdoz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767938667; c=relaxed/simple;
-	bh=K/AQAxHPYO+xESgKb7dsvzgDxLsXGlauHRN5QI/r2ho=;
+	s=arc-20240116; t=1767938994; c=relaxed/simple;
+	bh=/Whxa26upJUenWNr2ZsZaRmoZUHwHeEOLf+P/McVcP4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q3aNATat8wjAmc1mpDzoHLZ2+69c7N1pAx6rrO/DZS+unDu1PfeF062A5mdSy8/qeHfUMRTqKcvf03TG998CCw1LjVODkfwleRghy52hMaakK/TCKkg3SwD7L+YoBPj8gWVmjKOW0EyJqfltPs7wmKUwt5StgKKVOAoCfzyRQaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwqthPnw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dPRg9Jen; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=IFgmODd7mRtfPBG+nzxfYBZDYV6JIVAgXfTTgrrY+nOSBMtJ0Ych9m+ksKEdw7FQ/muBx4kKrdSB04ma+xGzu8skoGp3pA7PkJixuW3Du8paUpMcLJkNJnZPiKatdoJPAB5wvQIZ/g+UH8QIQupxNnYOTeT56aHigewr9D2yuU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iyzUeis3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YMpb5MtK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767938664;
+	s=mimecast20190719; t=1767938988;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9euP3q0+K8AwZBKxdvyTpCOtWvHbXFyeoGTxktHAEbg=;
-	b=fwqthPnwHi2+hjtbGWUaeuq58wH6MTq6wOjgw0KL6vnsAvVLEXV/s/5Jrv19sj+8ZoE1vJ
-	W0HUMl5MujtjkzgPtiM1syC1umAWCgV5Vf5cYNNBB+0B0CmWybDlytr7Or1yPwVKZ7yqie
-	WNO5BC9EJLztbMuX4H2Jg0awi83RUYQ=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=UsTn3TvI9UsxAE5f1Ok27om1Z5aK/et/A9uoT4IK01s=;
+	b=iyzUeis3hv7/LbblWWmHIJTGh8dx76JrruOMexGelNOEkTubeviihqxR7N0v/1Rofy3jvV
+	kxeEcHLAe8dzvan7N2UscNLRkziTN+l0Y/dODY/udYOe8yKIOitbeHHVj1xZD5VXAChZwM
+	8MCGBY388iOP1+iJSpMZWD7mhaC5eho=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-213-gr9fIyEhPySJqnR4lo1Xbg-1; Fri, 09 Jan 2026 01:04:21 -0500
-X-MC-Unique: gr9fIyEhPySJqnR4lo1Xbg-1
-X-Mimecast-MFC-AGG-ID: gr9fIyEhPySJqnR4lo1Xbg_1767938660
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-81d9b88caf2so680869b3a.1
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 22:04:21 -0800 (PST)
+ us-mta-116-sTlaaHfANQC3TM8LRm_ObA-1; Fri, 09 Jan 2026 01:09:47 -0500
+X-MC-Unique: sTlaaHfANQC3TM8LRm_ObA-1
+X-Mimecast-MFC-AGG-ID: sTlaaHfANQC3TM8LRm_ObA_1767938986
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-34c48a76e75so4762395a91.1
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 22:09:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767938660; x=1768543460; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767938986; x=1768543786; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9euP3q0+K8AwZBKxdvyTpCOtWvHbXFyeoGTxktHAEbg=;
-        b=dPRg9JenN6Uxp6O4/YErgfojUsxIsL7FeYv9Zj7zB6OXCTco4p4vpAA5Des8rZ/rYA
-         liCm/haF+mwAkUaqaDS4co+GIVyEOPgn51Ub2KeiieKPN+ryFeyOra/2uwuB4NE6QMVC
-         Drm8MI7OUVa4dsByl1tc14GQBRJfMpzpKntT/S6WhZnwvES3dLwhbGJ7Rd8x8HnEQL1r
-         tAcVRTs2+NnJlq6azc+Rt9g4fLv2K3tjnXqX+vtZMzkBjbAYSZ6UHfaWSY5VrVmXUH8l
-         mCV5VG/RfofKxvox0pkYPlQRoB8C7CqsID/le+T/jeKDTVakwI0+OLNxUHZXbpG084xh
-         mMeA==
+        bh=UsTn3TvI9UsxAE5f1Ok27om1Z5aK/et/A9uoT4IK01s=;
+        b=YMpb5MtKSf9oOO36YlMKzyfL9BGr3Vczj08zkjYzHq0O/hY48ptyKTpQ3Pc7MiXb+r
+         kj2Kdsy373DzS3TY8JuK46j9rjn2yn2KSEb6sWQJ7MiUAME0PpAKHokbqWzAQaMJEv9i
+         V/veIYAP7XBbBEDaEkeMi++1QzQaKhQ+j+WGpRjiTf2loUVWNqIcO1gW1155vaEtmm5A
+         I+uhKtGgb1FzHGDbpzllSx8BTIe4Zv5xiLMQuqdA/vQsY45to8SOqRxKZHq86lTY1RRC
+         M4juJmibNfzBr02vWAPLKEwVMYXiuulM5KKynVkTjDq/yNH2M7mlzVl4jLAW6THtsQLW
+         8Zaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767938660; x=1768543460;
+        d=1e100.net; s=20230601; t=1767938986; x=1768543786;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9euP3q0+K8AwZBKxdvyTpCOtWvHbXFyeoGTxktHAEbg=;
-        b=R/HI6p4dz/n1jeWo1R1SIUcuCcwXoO9DsygPQTgmZLyqmr09BWrGz8rSAVEfFVWMBf
-         OdgDjvF0uU+NZ8n+sr5yEXyI1RuQbp4t0x7G0RPr8c4iYegAlay7RifyPEgffVe/VaHt
-         ZCx07Lzb8FKB5BoROusqTcisNPMQ22g56JO5XdZvZz32UYArl4e7WWGBsQVA5G+CTbpx
-         +A/ZReniUhl1n2NkDWElOYhRNeDZhCJiq83brzs2JylzCJIK7MczuBb9wpzFl/kK9fP8
-         uP4HEf9pNQQuFXYARwPZFvENH/3EbQdRQw5P2X6TLC2HsHkshYdFaoCA9gTYeAL79GY9
-         7UJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUsffSxYeK5gKpJbQbyCd66GW/6DXWmDaGXHEbq4a3h3aX6uOCYSdGRtijN29yNzSTvL0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyaaiPhGvzC7T2n8aS1zRkPR1k4/+tprSbXOeNyS6EB2is1p/J
-	/gAvSL1HuufLRNKTF5giMH9K68yLlMn6/eUwbe+dFQ0+ayKquF2GugQuSvc9AejZcVolEIwzjG2
-	zcqOYCmYkyZflJNp7r9oWTXW8CJ/lan3EXSz1yu+INBvA9pLpzlTxZzFdVyiparRSAlfFLbDuCx
-	3STMG5VixQEHMww8szot9s5/On2K7J
-X-Gm-Gg: AY/fxX5xn+GMBGQBFOTZjd8RB7k09lIfP7ah0sTWqeNbiwqc8WAPbFCAaipQ2Huu7ef
-	MUTbK+DHNdcf1pB0fENwmijQWEUdzMo/o8nR7tihKpdMF4hLfdzsLQI+piRnz3ZN/CMKm2DTHLS
-	dOVgZxyEvWb6Z5VuClvCzXOrBVCoc7SNKgTGuZWfsnqOQkIf2qTde1YKanNjEAe9E=
-X-Received: by 2002:a05:6a20:3d0e:b0:37e:4319:d7c9 with SMTP id adf61e73a8af0-3898fa56a3amr8187081637.77.1767938660190;
-        Thu, 08 Jan 2026 22:04:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFHks8HlK8qz7tOXnNtDUBht+V9M/gKJPD9ctTiTc2gpfN67WzvNH4nzU7jF/ixjfYRwtv/VDNE2iyuLZO3PQg=
-X-Received: by 2002:a05:6a20:3d0e:b0:37e:4319:d7c9 with SMTP id
- adf61e73a8af0-3898fa56a3amr8187060637.77.1767938659753; Thu, 08 Jan 2026
- 22:04:19 -0800 (PST)
+        bh=UsTn3TvI9UsxAE5f1Ok27om1Z5aK/et/A9uoT4IK01s=;
+        b=E1ug3HyjUu5ubANBHhz/8uaLjidh2FbSogn8RTypjZkR18yvIoXSsiBDNLkF1Zgs3P
+         z5Cvu49fZaC1KY5eUEogN6QyeoayjmnEgLrm8n+KM1yiVL4Ib9Yfdw7VeAoKOigJNwuF
+         bjBkJA2qFqxEwzJB1ez/M84ysFxqjqUypjffk9oQiwzpNMYc5VsnnNL3cslnPvvEAz5/
+         1cDxg33m/OLBSd8qx6V4JB7r2p/xhO07VHUUChk2fGqjHjhEo37TvPQeAhNVSLUD3ltf
+         1kSncXz1Qp1JuOmiZGU3GWpau4JF0GFvKV0NLX2LAUyGCxhtare9Y2wHe7HTktIeakRS
+         Slgw==
+X-Forwarded-Encrypted: i=1; AJvYcCXfXRSF17vtp2D1/BsiIm+F2hA6XS88xK7EriNGUR/dyU8eNs60VmJRJKXipCQ6N9I6KWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIz6a//H/f0bdnflB4EWKs0cl0RBX0t6dq1WuMwyUIm4Hi2PmQ
+	/ubXi3sfvJD+apQIlAqAw8yyKleVF45AhlqRwZfUs3rap3MC2uhS1FLUBzYRuX4cdEly+jgts6z
+	QC1izWk6J4bFr5hoYsJiJZfhh+rIGJ+3zgBB89VvlxxFoLOp+pLcVqthy6mbqpiuoCIZFmoU9Zs
+	K4Zj7/jgSI00dO1CreZle/Sh+3ipSu2ZkPsLa/xZQ=
+X-Gm-Gg: AY/fxX6qhg8xTvpBnKzq1pdUOs3BQWegg1PvNDFWqCCEsYGDXAMSCIQc9okqcSwfzFM
+	Pe/9zoY/y9wv4O7ZomGNxLzhSjiLGp0K16VDoaUAsMaM3UdgVQ4dl+jD46dE6p9cXgAJgy4gNzW
+	eckl3NEY56jYftA6AqabvFCtfdXgoljKbquJPSCcpoxXqOKeIMVb2SPXAl0aeDsV0=
+X-Received: by 2002:a17:90b:1c87:b0:34c:a35d:de16 with SMTP id 98e67ed59e1d1-34f68c282c6mr8200209a91.11.1767938986168;
+        Thu, 08 Jan 2026 22:09:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGwd/+ri/7IRW9go6ZEYvBIdoZ0mcrieqtY+k0sd20Yk2cfAv4k30KxCjCWEGVfJYZgJ6AXw+vCl3L0aSy822U=
+X-Received: by 2002:a17:90b:1c87:b0:34c:a35d:de16 with SMTP id
+ 98e67ed59e1d1-34f68c282c6mr8200176a91.11.1767938985646; Thu, 08 Jan 2026
+ 22:09:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -93,15 +93,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-8-simon.schippers@tu-dortmund.de> <CACGkMEtndGm+GX+3Kn5AWTkEc+PK0Fo1=VSZzhgBQoYRQbicQw@mail.gmail.com>
- <5961e982-9c52-4e7a-b1ca-caaf4c4d0291@tu-dortmund.de>
-In-Reply-To: <5961e982-9c52-4e7a-b1ca-caaf4c4d0291@tu-dortmund.de>
+ <20260107210448.37851-10-simon.schippers@tu-dortmund.de> <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+ <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de>
+In-Reply-To: <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de>
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 9 Jan 2026 14:04:08 +0800
-X-Gm-Features: AQt7F2rgadpgQhtK4XQcquScTSmPGhMX0nFO2ljkD4pebbVz-Sl7My5aAmLeFXY
-Message-ID: <CACGkMEsKFcsumyNU6vVgBE4LjYWNb2XQNaThwd9H5eZ+RjSwfQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 7/9] vhost-net: vhost-net: replace rx_ring
- with tun/tap ring wrappers
+Date: Fri, 9 Jan 2026 14:09:34 +0800
+X-Gm-Features: AQt7F2pltZRUg0ITK9mA3g-3JDbVoNoxDdcEgN4kSv6FJ9EIKXkiqcx-w4p6MXg
+Message-ID: <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 9/9] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when qdisc is present
 To: Simon Schippers <simon.schippers@tu-dortmund.de>
 Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
@@ -112,69 +112,158 @@ Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 8, 2026 at 3:48=E2=80=AFPM Simon Schippers
+On Thu, Jan 8, 2026 at 4:02=E2=80=AFPM Simon Schippers
 <simon.schippers@tu-dortmund.de> wrote:
 >
-> On 1/8/26 05:38, Jason Wang wrote:
+> On 1/8/26 05:37, Jason Wang wrote:
 > > On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
 > > <simon.schippers@tu-dortmund.de> wrote:
 > >>
-> >> Replace the direct use of ptr_ring in the vhost-net virtqueue with
-> >> tun/tap ring wrapper helpers. Instead of storing an rx_ring pointer,
-> >> the virtqueue now stores the interface type (IF_TUN, IF_TAP, or IF_NON=
-E)
-> >> and dispatches to the corresponding tun/tap helpers for ring
-> >> produce, consume, and unconsume operations.
+> >> This commit prevents tail-drop when a qdisc is present and the ptr_rin=
+g
+> >> becomes full. Once an entry is successfully produced and the ptr_ring
+> >> reaches capacity, the netdev queue is stopped instead of dropping
+> >> subsequent packets.
 > >>
-> >> Routing ring operations through the tun/tap helpers enables netdev
-> >> queue wakeups, which are required for upcoming netdev queue flow
-> >> control support shared by tun/tap and vhost-net.
+> >> If producing an entry fails anyways, the tun_net_xmit returns
+> >> NETDEV_TX_BUSY, again avoiding a drop. Such failures are expected beca=
+use
+> >> LLTX is enabled and the transmit path operates without the usual locki=
+ng.
+> >> As a result, concurrent calls to tun_net_xmit() are not prevented.
 > >>
-> >> No functional change is intended beyond switching to the wrapper
-> >> helpers.
+> >> The existing __{tun,tap}_ring_consume functions free space in the
+> >> ptr_ring and wake the netdev queue. Races between this wakeup and the
+> >> queue-stop logic could leave the queue stopped indefinitely. To preven=
+t
+> >> this, a memory barrier is enforced (as discussed in a similar
+> >> implementation in [1]), followed by a recheck that wakes the queue if
+> >> space is already available.
+> >>
+> >> If no qdisc is present, the previous tail-drop behavior is preserved.
+> >>
+> >> +-------------------------+-----------+---------------+---------------=
+-+
+> >> | pktgen benchmarks to    | Stock     | Patched with  | Patched with  =
+ |
+> >> | Debian VM, i5 6300HQ,   |           | noqueue qdisc | fq_codel qdisc=
+ |
+> >> | 10M packets             |           |               |               =
+ |
+> >> +-----------+-------------+-----------+---------------+---------------=
+-+
+> >> | TAP       | Transmitted | 196 Kpps  | 195 Kpps      | 185 Kpps      =
+ |
+> >> |           +-------------+-----------+---------------+---------------=
+-+
+> >> |           | Lost        | 1618 Kpps | 1556 Kpps     | 0             =
+ |
+> >> +-----------+-------------+-----------+---------------+---------------=
+-+
+> >> | TAP       | Transmitted | 577 Kpps  | 582 Kpps      | 578 Kpps      =
+ |
+> >> |  +        +-------------+-----------+---------------+---------------=
+-+
+> >> | vhost-net | Lost        | 1170 Kpps | 1109 Kpps     | 0             =
+ |
+> >> +-----------+-------------+-----------+---------------+---------------=
+-+
+> >>
+> >> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.o=
+rg/
 > >>
 > >> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
 > >> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> >> Co-developed by: Jon Kohler <jon@nutanix.com>
-> >> Signed-off-by: Jon Kohler <jon@nutanix.com>
 > >> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 > >> ---
-> >>  drivers/vhost/net.c | 92 +++++++++++++++++++++++++++++---------------=
--
-> >>  1 file changed, 60 insertions(+), 32 deletions(-)
+> >>  drivers/net/tun.c | 31 +++++++++++++++++++++++++++++--
+> >>  1 file changed, 29 insertions(+), 2 deletions(-)
 > >>
-> >> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> >> index 7f886d3dba7d..215556f7cd40 100644
-> >> --- a/drivers/vhost/net.c
-> >> +++ b/drivers/vhost/net.c
-> >> @@ -90,6 +90,12 @@ enum {
-> >>         VHOST_NET_VQ_MAX =3D 2,
-> >>  };
+> >> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >> index 71b6981d07d7..74d7fd09e9ba 100644
+> >> --- a/drivers/net/tun.c
+> >> +++ b/drivers/net/tun.c
+> >> @@ -1008,6 +1008,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *=
+skb, struct net_device *dev)
+> >>         struct netdev_queue *queue;
+> >>         struct tun_file *tfile;
+> >>         int len =3D skb->len;
+> >> +       bool qdisc_present;
+> >> +       int ret;
 > >>
-> >> +enum if_type {
-> >> +       IF_NONE =3D 0,
-> >> +       IF_TUN =3D 1,
-> >> +       IF_TAP =3D 2,
-> >> +};
+> >>         rcu_read_lock();
+> >>         tfile =3D rcu_dereference(tun->tfiles[txq]);
+> >> @@ -1060,13 +1062,38 @@ static netdev_tx_t tun_net_xmit(struct sk_buff=
+ *skb, struct net_device *dev)
+> >>
+> >>         nf_reset_ct(skb);
+> >>
+> >> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+> >> +       queue =3D netdev_get_tx_queue(dev, txq);
+> >> +       qdisc_present =3D !qdisc_txq_has_no_queue(queue);
+> >> +
+> >> +       spin_lock(&tfile->tx_ring.producer_lock);
+> >> +       ret =3D __ptr_ring_produce(&tfile->tx_ring, skb);
+> >> +       if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present)=
+ {
+> >> +               netif_tx_stop_queue(queue);
+> >> +               /* Avoid races with queue wake-up in
+> >> +                * __{tun,tap}_ring_consume by waking if space is
+> >> +                * available in a re-check.
+> >> +                * The barrier makes sure that the stop is visible bef=
+ore
+> >> +                * we re-check.
+> >> +                */
+> >> +               smp_mb__after_atomic();
+> >> +               if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+> >> +                       netif_tx_wake_queue(queue);
 > >
-> > This looks not elegant, can we simply export objects we want to use to
-> > vhost like get_tap_socket()?
+> > I'm not sure I will get here, but I think those should be moved to the
+> > following if(ret) check. If __ptr_ring_produce() succeed, there's no
+> > need to bother with those queue stop/wake logic?
 >
-> No, we cannot do that. We would need access to both the ptr_ring and the
-> net_device. However, the net_device is protected by an RCU lock.
->
-> That is why {tun,tap}_ring_consume_batched() are used:
-> they take the appropriate locks and handle waking the queue.
+> There is a need for that. If __ptr_ring_produce_peek() returns -ENOSPC,
+> we stop the queue proactively.
 
-How about introducing a callback in the ptr_ring itself, so vhost_net
-only need to know about the ptr_ring?
-
-Thanks
+This seems to conflict with the following NETDEV_TX_BUSY. Or is
+NETDEV_TX_BUSY prepared for the xdp_xmit?
 
 >
+> I believe what you are aiming for is to always stop the queue if(ret),
+> which I can agree with. In that case, I would simply change the condition
+> to:
+>
+> if (qdisc_present && (ret || __ptr_ring_produce_peek(&tfile->tx_ring)))
+>
+> >
+> >> +       }
+> >> +       spin_unlock(&tfile->tx_ring.producer_lock);
+> >> +
+> >> +       if (ret) {
+> >> +               /* If a qdisc is attached to our virtual device,
+> >> +                * returning NETDEV_TX_BUSY is allowed.
+> >> +                */
+> >> +               if (qdisc_present) {
+> >> +                       rcu_read_unlock();
+> >> +                       return NETDEV_TX_BUSY;
+> >> +               }
+> >>                 drop_reason =3D SKB_DROP_REASON_FULL_RING;
+> >>                 goto drop;
+> >>         }
+> >>
+> >>         /* dev->lltx requires to do our own update of trans_start */
+> >> -       queue =3D netdev_get_tx_queue(dev, txq);
+> >>         txq_trans_cond_update(queue);
+> >>
+> >>         /* Notify and wake up reader process */
+> >> --
+> >> 2.43.0
+> >>
 > >
 > > Thanks
 > >
 >
+
+Thanks
 
 
