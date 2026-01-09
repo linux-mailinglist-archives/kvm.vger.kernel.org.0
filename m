@@ -1,274 +1,223 @@
-Return-Path: <kvm+bounces-67527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78B5D07A7C
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 08:53:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7FD3D07B88
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 09:09:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D769303370F
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 07:53:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B89563067077
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 08:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF04C2F659F;
-	Fri,  9 Jan 2026 07:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277242FBDF0;
+	Fri,  9 Jan 2026 08:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="dLEEdksa"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZUc/mAYR"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3710F76026;
-	Fri,  9 Jan 2026 07:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A15231836
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 08:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767945179; cv=none; b=foe/9pGRdgzghJWeABr3KNmAAXJT0XgPy0G7rjQ7Z73YMQR8vhooqTvx/ciy//3jVpXx0e6aSDjYgsUOMmghXGaPoEgBLXqDPjmuqMLAEg2YPDessfve3dOzBMkjivIvY16flxEd+XqAJVoHF9ncDARa6/qSxVpdiUMan9fgfiI=
+	t=1767946089; cv=none; b=qwaBBD3ZiBjchrWYcAMwfyIkZVmoJImRcsf8eySDCfGeh9acVo1/gaRC5lHAQZ0zCr18xSGDs80rk2xUr+MdtjD9j+2E4iv6nLo2WDLENPmDTg/ecuyoYGovbuieyUUVpnguOF4gAbbwCWnZT1vmZnzQmbU9OrNahTrk4VezjoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767945179; c=relaxed/simple;
-	bh=8bi4os2vIQBeDSrR3DIIeWSQ4/rDPcmqYhe2SkYTrmk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pFZhv3Mgq10JXOLB/c6tb0Hkbb0DG+smVViI3N1ddjvldm3DxHRkJ7avVcQEV9BRdPmHXi9oAMDy81Z1OasTWVLLy62XRfPiolvf6cGlfIv9J7VLBvXiO6yI/lP3GgDBFiHZZHPlxQhCFpGjEvxf2YCHiE03j4sDAbKotcXdSfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=dLEEdksa; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=cAR5LxUosn5MR+Z/5Moz9cTm0bb98yOxJOET8rzyKpQ=;
-	b=dLEEdksaplpS8/45BsNH/BlSmJya5HWO6a3QfmnzOgvITtGrcS4tQqOlz5Stt/MisPFZViHE/
-	WVF9s/WF84xFLu/zuaPkqf+n3pKgW1aAEhkIbKtAQoi0MAiecbB4nh+i3PEjuBou0htiMVD6AY+
-	8YHqy1c3T8XqlD1qRKeDwVE=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dnYn92STTz1T4GT;
-	Fri,  9 Jan 2026 15:49:01 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 13CD74036C;
-	Fri,  9 Jan 2026 15:52:47 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Fri, 9 Jan 2026 15:52:46 +0800
-Message-ID: <36e0a4d0-b440-4aba-8dfd-0c0fcb5f4318@huawei.com>
-Date: Fri, 9 Jan 2026 15:52:45 +0800
+	s=arc-20240116; t=1767946089; c=relaxed/simple;
+	bh=cfHOfCM5lyOdXDe6LZkp3dhZUx9MsjiRIOHtHhBKWok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sCtfrWQ309tagNtETDiaPZSJ3Hy+hyZ2+xtVdq23tuTXjUY7qAgnFYGXWvLLH7iejh1wCXMdYjPxt7e4cJWTWX5W8KLVQLDnBzb/PZ38fdaLSCp9Yq2vMh3MYNlae2sBCJiBFIGjnuO/WidrqVZi8ospb0l4XgdQ84PYHVjpNds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ZUc/mAYR; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6095kN362246565;
+	Fri, 9 Jan 2026 08:07:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=3/VWmsn2aeu3eFtRo6wfM3XGV4gci
+	2/hgCjZZ3xgC4s=; b=ZUc/mAYRmzLZt6xcM/qtmvYbE/CDm4XOXNm8o1gRuX0DA
+	v0oAd2TE4Xm6qcDmJVH2KJzrWoTekiYnGqQe0GIMrO2b01zqvsHGKc0qlPxonp6s
+	P7RjFE+Ni6+ZQOIk9kpDH6TYDxsHDJddK1cW5HnnfH0cb5s360ALJBSn0cGZEO2i
+	dQndSDZTqt+VqIrWULV+AP+QEumuRn/Oe/N0J54FtDJoxmexyDI5bH1nkv+lYosd
+	5/GeR5D7n3+wtzUuSpYDswHFoiuQ0omd0KL1xgViZwvzCMem6Cn7WhZLljn27kDl
+	qIcHnADfBoVaNdw3VLy0b60FAN9sXmtUChzwozxCA==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4bjutt83y5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 09 Jan 2026 08:07:22 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 6097GqhQ026350;
+	Fri, 9 Jan 2026 08:07:21 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4besjpcbka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 09 Jan 2026 08:07:21 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 60987KrN009653;
+	Fri, 9 Jan 2026 08:07:20 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4besjpcbj1-1;
+	Fri, 09 Jan 2026 08:07:20 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+        sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+        like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
+        alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+        davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+        dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
+        ewanhai@zhaoxin.com, zide.chen@intel.com
+Subject: [PATCH v9 0/5] target/i386/kvm/pmu: PMU Enhancement, Bugfix and Cleanup
+Date: Thu,  8 Jan 2026 23:53:55 -0800
+Message-ID: <20260109075508.113097-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF
- events
-To: Robert Hoo <robert.hoo.linux@gmail.com>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
-	<pbonzini@redhat.com>, <will@kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>, <xiexiangyou@huawei.com>,
-	<zhengchuan@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>, <suzuki.poulose@arm.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
- <20251121092342.3393318-5-zhengtian10@huawei.com>
- <87df4cba-b191-49cf-9486-fc379470a6eb@gmail.com>
- <f8e59e80-33b2-47cd-a042-11f28cc61645@huawei.com>
- <77111894-1b9f-4970-b41f-48e3a4c4b754@gmail.com>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <77111894-1b9f-4970-b41f-48e3a4c4b754@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-09_02,2026-01-08_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2512120000
+ definitions=main-2601090056
+X-Proofpoint-GUID: 2F064qVsY7aVD_H-Y4LS4OUvbQmrl3Nu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDA1NiBTYWx0ZWRfX6QUDp4X7Ozve
+ gbIdK4erssNBPCazdm3A/I7uyeG9cgmw6CNizu948SC8iqdxO3uD2N1S81Zl493hbzaKHg1s6vT
+ t/hoU/J9L6dhBWVBN3YwrXkU8fd03OYsZ5AYbdfD8lZMXXHSMmrdfHy8mY2u2b15b4iyQiNB+dG
+ VOLeQR0Q6jA8OnYy26ICoADgH14k2YF0EGqWH0byNsyw2ZiDsvaTK7Jl7Yubs2DAZej0bSZq3/I
+ etNytgiGMNgDV75MB5xz1qKMwcLaIWhKvcrtulV9JKzkuiD+ek642dErHVRJY20JBNm4a+kjaCM
+ YdNlo92F+1cY5A7ZMck4J0C8iDc63DYz6WO1N5BNzd81kMt8PJorin7GZIuFksVL5nqM1UxN5Hu
+ f4948g3WJB1epZmQ2LN6LXEbgqhbonCQV/0rjnzD6CVCm3Ksj1OvL8Ir6GjHbrkUndEgnEYB3ZE
+ /w7ev1zD42XwWEuI4k7WVQ3cx5CFBHZURnQR6IMw=
+X-Authority-Analysis: v=2.4 cv=O5c0fR9W c=1 sm=1 tr=0 ts=6960b73a b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=AW06eDNZEpMqNRz8TqYA:9 cc=ntf awl=host:12110
+X-Proofpoint-ORIG-GUID: 2F064qVsY7aVD_H-Y4LS4OUvbQmrl3Nu
+
+[PATCH v9 0/5] target/i386/kvm/pmu: PMU Enhancement, Bugfix and Cleanup
+
+This patchset addresses two bugs related to AMD PMU virtualization.
+
+1. The third issue is that using "-cpu host,-pmu" does not disable AMD PMU
+virtualization. When using "-cpu EPYC" or "-cpu host,-pmu", AMD PMU
+virtualization remains enabled. On the VM's Linux side, you might still
+see:
+
+[    0.510611] Performance Events: Fam17h+ core perfctr, AMD PMU driver.
+
+instead of:
+
+[    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+[    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+
+To address this, KVM_CAP_PMU_CAPABILITY is used to set KVM_PMU_CAP_DISABLE
+when "-pmu" is configured.
+
+2. The fourth issue is that unreclaimed performance events (after a QEMU
+system_reset) in KVM may cause random, unwanted, or unknown NMIs to be
+injected into the VM.
+
+The AMD PMU registers are not reset during QEMU system_reset.
+
+(1) If the VM is reset (e.g., via QEMU system_reset or VM kdump/kexec) while
+running "perf top", the PMU registers are not disabled properly.
+
+(2) Despite x86_cpu_reset() resetting many registers to zero, kvm_put_msrs()
+does not handle AMD PMU registers, causing some PMU events to remain
+enabled in KVM.
+
+(3) The KVM kvm_pmc_speculative_in_use() function consistently returns true,
+preventing the reclamation of these events. Consequently, the
+kvm_pmc->perf_event remains active.
+
+(4) After a reboot, the VM kernel may report the following error:
+
+[    0.092011] Performance Events: Fam17h+ core perfctr, Broken BIOS detected, complain to your hardware vendor.
+[    0.092023] [Firmware Bug]: the BIOS has corrupted hw-PMU resources (MSR c0010200 is 530076)
+
+(5) In the worst case, the active kvm_pmc->perf_event may inject unknown
+NMIs randomly into the VM kernel:
+
+[...] Uhhuh. NMI received for unknown reason 30 on CPU 0.
+
+To resolve these issues, we propose resetting AMD PMU registers during the
+VM reset process
 
 
-On 12/28/2025 9:21 PM, Robert Hoo wrote:
-> On 12/24/2025 2:15 PM, Tian Zheng wrote:
->>
->>
->> On 12/17/2025 9:39 PM, Robert Hoo wrote:
->>> On 11/21/2025 5:23 PM, Tian Zheng wrote:
->>>> From: eillon <yezhenyu2@huawei.com>
->>>>
->>>> Implement the HDBSS enable/disable functionality using the
->>>> KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl.
->>>>
->>>> Userspace (e.g., QEMU) can enable HDBSS by invoking the ioctl
->>>> at the start of live migration, configuring the buffer size.
->>>> The feature is disabled by invoking the ioctl again with size
->>>> set to 0 once migration completes.
->>>>
->>>> Add support for updating the dirty bitmap based on the HDBSS
->>>> buffer. Similar to the x86 PML implementation, KVM flushes the
->>>> buffer on all VM-Exits, so running vCPUs only need to be kicked
->>>> to force a VM-Exit.
->>>>
->>>> Signed-off-by: eillon <yezhenyu2@huawei.com>
->>>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->>>> ---
->>>>   arch/arm64/include/asm/kvm_host.h |  10 +++
->>>>   arch/arm64/include/asm/kvm_mmu.h  |  17 +++++
->>>>   arch/arm64/kvm/arm.c              | 107 
->>>> ++++++++++++++++++++++++++++++
->>>>   arch/arm64/kvm/handle_exit.c      |  45 +++++++++++++
->>>>   arch/arm64/kvm/hyp/vhe/switch.c   |   1 +
->>>>   arch/arm64/kvm/mmu.c              |  10 +++
->>>>   arch/arm64/kvm/reset.c            |   3 +
->>>>   include/linux/kvm_host.h          |   1 +
->>>>   8 files changed, 194 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/include/asm/kvm_host.h 
->>>> b/arch/arm64/include/ asm/kvm_host.h
->>>> index d962932f0e5f..408e4c2b3d1a 100644
->>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>> @@ -87,6 +87,7 @@ int __init kvm_arm_init_sve(void);
->>>>   u32 __attribute_const__ kvm_target_cpu(void);
->>>>   void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
->>>>   void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
->>>> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
->>>>
->>>>   struct kvm_hyp_memcache {
->>>>       phys_addr_t head;
->>>> @@ -793,6 +794,12 @@ struct vcpu_reset_state {
->>>>       bool        reset;
->>>>   };
->>>>
->>>> +struct vcpu_hdbss_state {
->>>> +    phys_addr_t base_phys;
->>>> +    u32 size;
->>>> +    u32 next_index;
->>>> +};
->>>> +
->>>>   struct vncr_tlb;
->>>>
->>>>   struct kvm_vcpu_arch {
->>>> @@ -897,6 +904,9 @@ struct kvm_vcpu_arch {
->>>>
->>>>       /* Per-vcpu TLB for VNCR_EL2 -- NULL when !NV */
->>>>       struct vncr_tlb    *vncr_tlb;
->>>> +
->>>> +    /* HDBSS registers info */
->>>> +    struct vcpu_hdbss_state hdbss;
->>>>   };
->>>>
->>>>   /*
->>>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/ 
->>>> asm/kvm_mmu.h
->>>> index e4069f2ce642..6ace1080aed5 100644
->>>> --- a/arch/arm64/include/asm/kvm_mmu.h
->>>> +++ b/arch/arm64/include/asm/kvm_mmu.h
->>>> @@ -331,6 +331,23 @@ static __always_inline void 
->>>> __load_stage2(struct kvm_s2_mmu *mmu,
->>>>       asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
->>>>   }
->>>>
->>>> +static __always_inline void __load_hdbss(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +    struct kvm *kvm = vcpu->kvm;
->>>> +    u64 br_el2, prod_el2;
->>>> +
->>>> +    if (!kvm->enable_hdbss)
->>>> +        return;
->>>> +
->>>> +    br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu- 
->>>> >arch.hdbss.size);
->>>> +    prod_el2 = vcpu->arch.hdbss.next_index;
->>>> +
->>>> +    write_sysreg_s(br_el2, SYS_HDBSSBR_EL2);
->>>> +    write_sysreg_s(prod_el2, SYS_HDBSSPROD_EL2);
->>>> +
->>>> +    isb();
->>>> +}
->>>> +
->>>>   static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
->>>>   {
->>>>       return container_of(mmu->arch, struct kvm, arch);
->>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>>> index 870953b4a8a7..64f65e3c2a89 100644
->>>> --- a/arch/arm64/kvm/arm.c
->>>> +++ b/arch/arm64/kvm/arm.c
->>>> @@ -79,6 +79,92 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu 
->>>> *vcpu)
->>>>       return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
->>>>   }
->>>>
->>>> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +    struct page *hdbss_pg = NULL;
->>>> +
->>>> +    hdbss_pg = phys_to_page(vcpu->arch.hdbss.base_phys);
->>>> +    if (hdbss_pg)
->>>> +        __free_pages(hdbss_pg, vcpu->arch.hdbss.size);
->>>> +
->>>> +    vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
->>>> +        .base_phys = 0,
->>>> +        .size = 0,
->>>> +        .next_index = 0,
->>>> +    };
->>>> +}
->>>> +
->>>> +static int kvm_cap_arm_enable_hdbss(struct kvm *kvm,
->>>> +                    struct kvm_enable_cap *cap)
->>>> +{
->>>> +    unsigned long i;
->>>> +    struct kvm_vcpu *vcpu;
->>>> +    struct page *hdbss_pg = NULL;
->>>> +    int size = cap->args[0];
->>>> +    int ret = 0;
->>>> +
->>>> +    if (!system_supports_hdbss()) {
->>>> +        kvm_err("This system does not support HDBSS!\n");
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>> +    if (size < 0 || size > HDBSS_MAX_SIZE) {
->>>> +        kvm_err("Invalid HDBSS buffer size: %d!\n", size);
->>>> +        return -EINVAL;
->>>> +    }
->>>> +
->>>
->>> I think you should check if it's already enabled here. What if user 
->>> space calls this twice?
->>
->> Ok, I review the implement of qemu, when disable the hdbss feature in
->> ram_save_cleanup, size=0 will be set, so here can add a check, if (size
->> && kvm->arch.enable_hdbss), we will do nothing.
->>
->
-> I mean you should check if ' kvm->enable_hdbss' is already set, if so, 
-> return rather than alloc_pages() in below (you have allocated in 
-> previous call with valid 'size').
->
-> qemu is just one of the user space applications that would possibly 
-> call this API, you cannot rely on your qemu patch's flow/sequence as 
-> assumption to design a KVM API's implementation.
+Changed since v1:
+  - Use feature_dependencies for CPUID_EXT3_PERFCORE and
+    CPUID_8000_0022_EAX_PERFMON_V2.
+  - Remove CPUID_EXT3_PERFCORE when !cpu->enable_pmu.
+  - Pick kvm_arch_pre_create_vcpu() patch from Xiaoyao Li.
+  - Use "-pmu" but not a global "pmu-cap-disabled" for KVM_PMU_CAP_DISABLE.
+  - Also use sysfs kvm.enable_pmu=N to determine if PMU is supported.
+  - Some changes to PMU register limit calculation.
+Changed since v2:
+  - Change has_pmu_cap to pmu_cap.
+  - Use cpuid_find_entry() instead of cpu_x86_cpuid().
+  - Rework the code flow of PATCH 07 related to kvm.enable_pmu=N following
+    Zhao's suggestion.
+  - Use object_property_get_int() to get CPU family.
+  - Add support to Zhaoxin.
+Changed since v3:
+  - Re-base on top of Zhao's queued patch.
+  - Use host_cpu_vendor_fms() from Zhao's patch.
+  - Pick new version of kvm_arch_pre_create_vcpu() patch from Xiaoyao.
+  - Re-split the cases into enable_pmu and !enable_pmu, following Zhao's
+    suggestion.
+  - Check AMD directly makes the "compat" rule clear.
+  - Some changes on commit message and comment.
+  - Bring back global static variable 'kvm_pmu_disabled' read from
+    /sys/module/kvm/parameters/enable_pmu.
+Changed since v4:
+  - Re-base on top of most recent mainline QEMU.
+  - Add more Reviewed-by.
+  - All patches are reviewed.
+Changed since v5:
+  - Re-base on top of most recent mainline QEMU.
+  - Remove patch "kvm: Introduce kvm_arch_pre_create_vcpu()" as it is
+    already merged.
+  - To resolve conflicts in new [PATCH v6 3/9] , move the PMU related code
+    before the call site of is_tdx_vm().
+Changed since v6:
+  - Re-base on top of most recent mainline QEMU (staging branch).
+  - Add more Reviewed-by from Dapeng and Sandipan.
+Changed since v7:
+https://lore.kernel.org/qemu-devel/20251111061532.36702-1-dongli.zhang@oracle.com/
+  - Re-base on top of most recent mainline QEMU (staging branch).
+  - Remove PATCH 1 & 2 from the v6 patchset. Zhao may work on them in
+    another patchset.
+Changed since v8:
+https://lore.kernel.org/qemu-devel/20251230074354.88958-1-dongli.zhang@oracle.com/
+  - Remove "PATCH v8 4/7" which introduces 'kvm_pmu_disabled' based on
+    "/sys/module/kvm/parameters/enable_pmu", as suggested by Zide.
+  - Remove the usage of 'kvm_pmu_disabled' ("PATCH v9 4/5").
+  - Remove Reviewed-by from Zhao Liu, Sandipan Das and Dapeng Mi from
+    "PATCH v9 4/5", because there is change to remove the usage of
+    'kvm_pmu_disabled'.
+  - Remove "PATCH v8 7/7" as suggested by Zide. Leave it as TODO.
 
+Dongli Zhang (5):
+  target/i386/kvm: set KVM_PMU_CAP_DISABLE if "-pmu" is configured
+  target/i386/kvm: extract unrelated code out of kvm_x86_build_cpuid()
+  target/i386/kvm: rename architectural PMU variables
+  target/i386/kvm: reset AMD PMU registers during VM reset
+  target/i386/kvm: support perfmon-v2 for reset
 
-Yes, The latest v3 patch fixes this bug by checking if (size > 0 && 
-kvm->arch.enable_hdbss).
-When this condition is met, the function returns immediately rather than 
-alloc_pages().
+ target/i386/cpu.h     |  16 +++
+ target/i386/kvm/kvm.c | 314 +++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 291 insertions(+), 39 deletions(-)
 
+branch: remotes/origin/staging
+base-commit: 146dcea03e276a47404c2cc03ea753fd681c9567
 
->
->>>
->>>> +    /* Enable the HDBSS feature if size > 0, otherwise disable it. */
->>>> +    if (size) {
->>>> +        kvm_for_each_vcpu(i, vcpu, kvm) {
->>>> +            hdbss_pg = alloc_pages(GFP_KERNEL_ACCOUNT, size);
->>>> +            if (!hdbss_pg) {
->>>> +                kvm_err("Alloc HDBSS buffer failed!\n");
->>>> +                ret = -ENOMEM;
->>>> +                goto error_alloc;
->>>> +            }
->>>> +
->>>> +            vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
->>>> +                .base_phys = page_to_phys(hdbss_pg),
->>>> +                .size = size,
->>>> +                .next_index = 0,
->>>> +            };
->>>> +        }
->>>> +
->>>> +        kvm->enable_hdbss = true;
->>>> +        kvm->arch.mmu.vtcr |= VTCR_EL2_HD | VTCR_EL2_HDBSS;
->>>
->
->
+Thank you very much!
+
+Dongli Zhang
+
 
