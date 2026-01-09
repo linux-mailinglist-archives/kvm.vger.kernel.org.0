@@ -1,77 +1,80 @@
-Return-Path: <kvm+bounces-67514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102F0D07189
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 05:15:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BC13D07183
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 05:15:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B98230213D1
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 04:15:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8DFF630096B6
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 04:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D29284B3B;
-	Fri,  9 Jan 2026 04:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FA627B32B;
+	Fri,  9 Jan 2026 04:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ID426t+S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lZ3EZbbG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E7A500958
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 04:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41987261B91
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 04:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767932127; cv=none; b=NdgZ0mxNBOu+BIeNwOsLvlmPL3t7soYX/PMhZIk6NVHqVxzK5NUZ4/bG1h6T+7KpI9potDGx2Oh5u3dcZRa2UJ2ZISHaCKAev9L73aAHtjuNWug2bNhIKTESwYnpPLXeCQUQKYrR9MFRwXOQDbf/QW9jWmwrFKCesWzzduWQIz8=
+	t=1767932131; cv=none; b=iosLB6fqK0gZDYElxobYYMIizoP4EizF4PjzIBtXkT0nDOFMh5rOnYBUdGG36LC9nFilfbSvfGyRf0Antj1FDOqvS8HUmINjkifJf4KP+8ffjrI1nK/jjeo4MCUg+9w4f+fMYL6maqt4M9Zp0SdHqA2cuh9vw1QFlIJi39k9aCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767932127; c=relaxed/simple;
-	bh=74Q51z8vTxjhm1SPaj71MlzSWuITBRUMNs61bqSZO/k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BRp5z1mc0gZGkzwLNlIbu7tjID3HZby2hWUIiCjweknJ4XEMhB4PYy5g79/9uIitzS3iQlfnL6ie6Hg5GaQdLEallC3qVaofHYcvU9HSYkgt9o4e2S4Azfzb9RXD5v2eO2/6LsH6nQ01Cz/2IiOqmd+34gb88sPo0IWC9PgEkLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ID426t+S; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1767932131; c=relaxed/simple;
+	bh=ttBmpLMWidEdkz97YFQ/9Dt2bR+bS4sY/4Xw7P8Aaf0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GxU8+PCMxW5Aj2I4DjUYkOXXKtz0bHi/ZeMxeehC8V94ufD7Z58hhzdsEGk2WKnhTZapb643mu2iJuwQ3Q8ZG6o5jFqN6ksd+UhybYP1xJvjNFhKehAfyrfJ8LU5lcyRxt4/+mMxcDNpZTwZcSt31kCs3OFXWvc7+P6VAgV304o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lZ3EZbbG; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0f47c0e60so83687305ad.3
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 20:15:26 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c552bbd1b03so710841a12.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 20:15:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767932126; x=1768536926; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I/SrHC/cClP7f/QcHfYTZkut4gqfCw+/50QP5zds7PM=;
-        b=ID426t+SFRqNXYrmdZ5DW7MO5n/Vo+MRFJXI+JyKllKmukX0M8y0tbXwSjRgEiOon4
-         rAgRK0MmY429rthhSquio7zUdhOwx0iU+Xsin6SeMDSHW4ySdoVo/y+xgYgz/3cWOMMw
-         qqf1H0cpogPhssFbvmnlJlYS0fFf7Mk7zl+Yqchs6j6lTfeftDeIO54Kd28hIYfguUpt
-         oEyihxe2qFOqDnT98VoLyhlKgpmHc0rfjWQIZphKQzvX0lOIrEStxeeuvLWSnx+ePAiy
-         SNf/pLmAfrxZXDPrIHvhszxPfbQb1Z6M0q2jMQQlBT9kmLI7tHw2GGbBvaHGZTIaUEWp
-         vTqQ==
+        d=google.com; s=20230601; t=1767932127; x=1768536927; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=3GHidu0ea60roJ0gGQhZj+Z1e5++0YYDkHwGtRpk6Cs=;
+        b=lZ3EZbbGnlnNKGvXt4vemw06Jbefhh7SYvVKOaed4AS0qp9QZSZRCh7r0d2JPW9taK
+         2rX0S3jbkRBhxxiuLVtIk5418B6hPp/g8G0GR24RvUlHd4RQFCv9oyJilGdzgaLaTdKO
+         6ii/nwIqLF5NBbZvVGvlgK23L0z0AljAHNoRHP2Vy2ImgjP76DHfSpZST2FSxL2qaTd/
+         8CKQSkBkCqok03z0N51BAGPgUZO2Et+TD4eWjM2V9C8BiWoUFnnwMiv/5EnOz6NE4Yci
+         9jbdH3+V53JDidksnoCpwDckmJzowyt4wGpoqOYp5esYIF1kB07zUGmQIYyOYN1W9RXP
+         ZQ1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767932126; x=1768536926;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I/SrHC/cClP7f/QcHfYTZkut4gqfCw+/50QP5zds7PM=;
-        b=NphIPQIHmCoNICEK9gF3nQost8U5/pezUOdj8GpdzWmfdG6mlqm8ZONySP0iDVZnnd
-         jfsaIIlL+ojL23FgF5hHHmg+adxEjgCdhqyj8bANh5Jl6ctnPr8DmOjbfZrMk1JuW4wM
-         vTy099ZiGEM6f+GFLD57/QQKmmMB1pwmw1Zg7JGLzs4FF4y2M3Yz0899uPujFGf9xA+T
-         s6CRLRBk78iHli4P4NTBGoGnbP+3xew9bvh3bRwHvvdas+m8d6Y/J8YuPUTQrLkZdoLj
-         UrjhqXym7cGHFLg70bVaYaasXDgtpVvkE4D2Vwhs0GVRYJF1aZqkK9G/gVRs7ycTNGgM
-         PXvQ==
-X-Gm-Message-State: AOJu0Yz7K/cPGwQ/C8r+2nt4AzJjFZcnUZ+BL4tfWezk80ajI6J8VqSp
-	B6q8eCuyf71CbTHGqFIZ3REmNR97THEJcTwgC9Zu4f8oH/XNSpkgKV//PKUOKftzkOEsocO48cy
-	nmmHr2g==
-X-Google-Smtp-Source: AGHT+IEToF3QTI5shEOsMmiQ96E7VXqvNzKYUHSM3YkiinzLnNt8kL655tkuOlXBvuaHJl5RH4C8GUvDq7Y=
-X-Received: from plrp13.prod.google.com ([2002:a17:902:b08d:b0:295:50ce:4dd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d488:b0:29f:29ae:8733
- with SMTP id d9443c01a7336-2a3ee4b8be5mr83189225ad.53.1767932125917; Thu, 08
- Jan 2026 20:15:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767932127; x=1768536927;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3GHidu0ea60roJ0gGQhZj+Z1e5++0YYDkHwGtRpk6Cs=;
+        b=Ba9B4oe0ot2EkZw9LTy9KsEgy/TkVWFKUq5JVNc/x69yTIMCiVGQO22IVQ4hdZeWda
+         Moa1KQ5x94g+BO1cMF+YyGKTagtBZtpNDgSyCBQjy8haP4FheaAdBQ40C38q8OTuuOdx
+         VJVuAzACcWgOGv0BiuGNKIav9JW8LjGhJcPb19xS5Sw4pXXJkWRpI+SG1/y3JQyO/ZkI
+         bGuAKYYiav0oPOjcAKBod4c1xhUoMMStNLMGP2HqiwCgW3jVazgpU50skZTEv+bGB1mX
+         aySb2x03rfeUs4Wo3XdDjqNsBEYw8NUaDk4zSPBmXXisemZXqgIfLQsDfMUid/UmscUB
+         4Qyg==
+X-Gm-Message-State: AOJu0YxN7xVxVRDvT9X6GkUf9tuCBN2cV6cmftTzSeNlpDiszruy5UFR
+	+Q/G9HHWZ/XSKavqGc0wkVh5GGV5D8oq9fL++Q0snFGrcgjtWg1WmxNJIYDRc+lTsWWdqIDLp+r
+	fj/FpTg==
+X-Google-Smtp-Source: AGHT+IHgD01Kakv5duDK42eGXuAPcJ3NtDZS3hrl9d7PTOlzUyB8ND722Ru9FIyz63vVI3/ImvorWbJHbZA=
+X-Received: from pjbml23.prod.google.com ([2002:a17:90b:3617:b0:339:ae3b:2bc7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:72a0:b0:364:13aa:a526
+ with SMTP id adf61e73a8af0-3898f9bde7emr7933220637.60.1767932127537; Thu, 08
+ Jan 2026 20:15:27 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  8 Jan 2026 20:15:19 -0800
+Date: Thu,  8 Jan 2026 20:15:20 -0800
+In-Reply-To: <20260109041523.1027323-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260109041523.1027323-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260109041523.1027323-1-seanjc@google.com>
-Subject: [PATCH v3 0/4] KVM: nVMX: Disallow access to vmcs12 fields that
- aren't supported by "hardware"
+Message-ID: <20260109041523.1027323-2-seanjc@google.com>
+Subject: [PATCH v3 1/4] KVM: nVMX: Setup VMX MSRs on loading CPU during nested_vmx_hardware_setup()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -79,53 +82,48 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Disallow accesses to vmcs12 fields that are defined by KVM, but are unsupported
-in the current incarnation of KVM, e.g. due to lack of hardware support for the
-underlying VMCS fields.
+Move the call to nested_vmx_setup_ctls_msrs() from vmx_hardware_setup() to
+nested_vmx_hardware_setup() so that the nested code can deal with ordering
+dependencies without having to straddle vmx_hardware_setup() and
+nested_vmx_hardware_setup().  Specifically, an upcoming change will
+sanitize the vmcs12 fields based on hardware support, and that code needs
+to run _before_ the MSRs are configured, because the lovely vmcs_enum MSR
+depends on the max support vmcs12 field.
 
-The primary motivation is to avoid having to carry the same logic for shadowed
-VMCS fields, which can't play nice with unsupported fields since VMREAD/VMWRITE
-will fail when attempting to transfer state between vmcs12 and the shadow VMCS.
+No functional change intended.
 
-v3:
- - Collect reviews. [Xin, Chao]
- - Actually filter out vmcs12 fields when configuring shadow VMCS. [Chao]
- - Move VMX MSR configuration into nested_vmx_hardware_setup().
- - Add ENC_TO_VMCS12_IDX. [Xiaoyao]
- - Use a Xiaoyao's crazy double ROL16 math. :-) [Xiaoyao, obviously]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/nested.c | 2 ++
+ arch/x86/kvm/vmx/vmx.c    | 2 --
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-v2:
- - https://lore.kernel.org/all/20251230220220.4122282-1-seanjc@google.com
- - Name the array of KVM-defined fields kvm_supported_vmcs12_field_offsets,
-   e.g. so that it's no confused with what's supported by hardware. [Xin]
- - Combine encodings in switch statements for fields shared fate. [Xin]
- - Drop the extern declaration of supported_vmcs12_field_offsets. [Chao]
- - Handle GUEST_INTR_STATUS in cpu_has_vmcs12_field() and add a patch to
-   drop the custom handling from init_vmcs_shadow_fields(). [Chao]
-
-v1: https://lore.kernel.org/all/20251216012918.1707681-1-seanjc@google.com
-
-Sean Christopherson (4):
-  KVM: nVMX: Setup VMX MSRs on loading CPU during
-    nested_vmx_hardware_setup()
-  KVM: VMX: Add a wrapper around ROL16() to get a vmcs12 from a field
-    encoding
-  KVM: nVMX: Disallow access to vmcs12 fields that aren't supported by
-    "hardware"
-  KVM: nVMX: Remove explicit filtering of GUEST_INTR_STATUS from shadow
-    VMCS fields
-
- arch/x86/kvm/vmx/hyperv_evmcs.c |  2 +-
- arch/x86/kvm/vmx/hyperv_evmcs.h |  2 +-
- arch/x86/kvm/vmx/nested.c       | 28 +++++++------
- arch/x86/kvm/vmx/vmcs.h         |  9 ++++
- arch/x86/kvm/vmx/vmcs12.c       | 74 +++++++++++++++++++++++++++++++--
- arch/x86/kvm/vmx/vmcs12.h       |  8 ++--
- arch/x86/kvm/vmx/vmx.c          |  2 -
- 7 files changed, 101 insertions(+), 24 deletions(-)
-
-
-base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 6137e5307d0f..61113ead3d7b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -7407,6 +7407,8 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
+ {
+ 	int i;
+ 
++	nested_vmx_setup_ctls_msrs(&vmcs_config, vmx_capability.ept);
++
+ 	if (!cpu_has_vmx_shadow_vmcs())
+ 		enable_shadow_vmcs = 0;
+ 	if (enable_shadow_vmcs) {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6b96f7aea20b..5bb67566e43a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8670,8 +8670,6 @@ __init int vmx_hardware_setup(void)
+ 	 * can hide/show features based on kvm_cpu_cap_has().
+ 	 */
+ 	if (nested) {
+-		nested_vmx_setup_ctls_msrs(&vmcs_config, vmx_capability.ept);
+-
+ 		r = nested_vmx_hardware_setup(kvm_vmx_exit_handlers);
+ 		if (r)
+ 			return r;
 -- 
 2.52.0.457.g6b5491de43-goog
 
