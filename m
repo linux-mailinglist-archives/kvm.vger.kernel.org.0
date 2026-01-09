@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-67510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0239D07075
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 04:47:58 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C32A3D0707B
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 04:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E3037301FD6B
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 03:46:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D96453021A52
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 03:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA34329C71;
-	Fri,  9 Jan 2026 03:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D5B32F741;
+	Fri,  9 Jan 2026 03:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jdftKX3b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vBm+ai4n"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1963C24A058
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 03:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF115322DD0
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 03:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767930347; cv=none; b=V1f31O/EjtWx82SPEa+gThQrwSURiuo88VLzOsz8nwfjXE1JumwPZpLfK7WTdxPglqeRaFTKLYxZI6RnGAyYRUwCG9S1n+FrnxrUWhfo4XgPjeFA/FnVUSEJ6aQHu8xqMtgjXBIW++E1nS3kpZ95nK0f7SwkOk3vMTM3AevNdR4=
+	t=1767930349; cv=none; b=fEcyR/ELcj/IFoX75KGZnPjM5xqyI9McYaG5gAWBzaFWBPace4scO5moSwbKr62JBV2Fa/qEga6ohyDvTzvirKZw6mUNsGbzDonWSl2hu3b2muouG8e/Y8xAN/O+agbN4MnsBXqXtSt0axTGPPW7fhVG/zjLRhffsAHaB0gjW+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767930347; c=relaxed/simple;
-	bh=o1kKEv4y9G1l1AcUONDgAB0YJoa373EmyRiTlcErh/0=;
+	s=arc-20240116; t=1767930349; c=relaxed/simple;
+	bh=JXh0ie+obtWocTYMsoUxD71I9Ghckom7SaJFDbVOF8c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QgGYy5I81ZE9hUY74pbtavDWzH//vtVa9QMv3btBvs0wbHvrkVWBtu0+C6PtCp3IJZ1t5XCqvd0ueNETjQyRfr0rI1HYsAMPM8HV67A8Ak4wEVGW1yczWpwG0BSRKT3I8XXdCQoWQnSC5xLODBHoc8mqFKgZF2AP+F3WeL05f/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jdftKX3b; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=FSKjkcXMuQkZz87Ty+wYzQaRdzz67L6Jjcz4DA+Qb4gnGjIU1B1AKs6A5Q7gUl9tPq550MVekcZvxKwv7ynnOlmt4HchaTgANtUUyHBY0lpg/8AW0MyrWQXRAnHYDzhW5wNZ+W9znYWUiOIOmtEa8yPHsyjzwPQc9PWJPKiw8UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vBm+ai4n; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a351686c17so48083025ad.0
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 19:45:45 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0fe4ade9eso40099575ad.0
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 19:45:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767930345; x=1768535145; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767930347; x=1768535147; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=J6s9SI/r2bnHM1n7Bm/zP7cWS7ymjW9gwaRGx74RRrI=;
-        b=jdftKX3bPcP9Aatvy4S9m/0nOLlmJdi2RpXf3cqmBcpW121DWJLyiTgemnK//zuap9
-         n10G6Lm+2FzzDUolhbvaPDApabreY+iwz5YfOnu5RngS2m7DzQO4vRPNSegcRr5vB4b5
-         fNhbI155U3HP8VUmliScSlcEwW+v2J0v4Cu+VvmHHu8qx9qfmruVWUyTsYJEu9DWRklV
-         CwIsUP221js2c80ejPdIudPiLiQBujFwtzXS/UP6AAkEcXze+qPORyDImQEaRIByefq2
-         9M6uuWhsoCXy++syUN7I7B67GKOT/6j62C9Zj8zEcEQeL/U1cSPyRToLYQ8nCHO47biL
-         d6jQ==
+        bh=BAkYuiqwP0nictwbePl0dBrZdxmnnDy80TEFALD0j3o=;
+        b=vBm+ai4nRmS9Wq3AQJs3/E27OWNHW/2LUz7nJVGr/z8wQIVlpq3+qK5J2OM+dtv6go
+         TVyQ1r52ewt+7P3JVD/P/273kKfowExsLqJ7XBlH/1otZTIhHCKqf9q7x04s/4VTCcG6
+         g84wIi+wMDhsA459ZP+9TimnffU45Tt4fCu2X8n/tQjNx3emcGzIhmMsclKPhnV+aT2Z
+         CqQkdH2AScGIH0hiPpxhN25on3j+199leBhEKG2/NrRMKJdtkYg+N9/SJUsC0aYNF/NM
+         xk19QvibGqnX61sMqcwTeYbkgSJ0RODtw08HtdLEcBBeXZwbSNHxgJW+zfWgdfAk0/Ma
+         NG+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767930345; x=1768535145;
+        d=1e100.net; s=20230601; t=1767930347; x=1768535147;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J6s9SI/r2bnHM1n7Bm/zP7cWS7ymjW9gwaRGx74RRrI=;
-        b=L0QmEC0IgvMXIwWtRD/DcY2ut3BhB0COENBoFYrE4dFlGEAFweLZMlCCrIFtdXZCA4
-         RinfVun9XiUrzUlJMjGkEZQ8b81XWnrwMtYdslXJuZxLfgmdxSxF44tX/7liT2Dor/TJ
-         Fdr62CLaKjuYWxKSa73xHT0gYAKgQHoSkQCk07IHKDG6VzAt6+bcMuYqK8P6b89gpMLh
-         W2W0+/4P7g2MHjWoeehi71RSaCKoNdQtS+wrLKFt0kElcf+mWGOyEWNvIPdW6JTU4fkK
-         vId33BBDWZ6ZCE+hHEFSR8ctMz5KVVkA+MrancJRk6HzRjyCpx/7VweHWvQDC5tG6RbU
-         excA==
-X-Gm-Message-State: AOJu0Yz4jFSQswnJkD4ntXyl/sbddPLvywvaYR4467yQzMcX+LmHxpBN
-	NNUZhVcTnyLr8+xIzPDEom1hbud3XhUy2dmtdOeq1BqHdQMZB+M673F6ZhS176DQzBGqT+qXoVJ
-	WhrA7bQ==
-X-Google-Smtp-Source: AGHT+IGOKgPXbL3Nx4d+n28wqdscdI7eBJGYNqyaTNz7Nh7KHW8RUVrTgLfwaO8PWz8RoWeT5QsLFUa2oZs=
-X-Received: from plkn7.prod.google.com ([2002:a17:902:6a87:b0:2a1:4291:bc8e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:40c9:b0:298:3aa6:c03d
- with SMTP id d9443c01a7336-2a3ee51bdd6mr87464325ad.57.1767930345433; Thu, 08
- Jan 2026 19:45:45 -0800 (PST)
+        bh=BAkYuiqwP0nictwbePl0dBrZdxmnnDy80TEFALD0j3o=;
+        b=wPzz4zmj1tlMFLnl9VeBqX+66PsKEzIkXAcMynJh5RTC4Vq/n9bp4dMYJs2pzEh4NB
+         RsD4JN0rHpqtdKmg8P5rgRZjaO9xq9SN3EyczTn+SwFRDuopj0juWGpLBKvrHFwCYDeW
+         1IBhWPV7sYhyHxLCP4if/DGBK5wMysNy2myIhHLpcFJjs2NnlE44LF0MCi/uqFZwO74L
+         w8536nAQINFkbb2wutYB7scFyA06Hf03DvvM0mPZXp6NyFTdBmQHCnovlQXAvnLoVToM
+         7X20/hv/iA76FMaNhPL+9bU+L7ARakgIv9FYy0gWrxZlKcrXwvtSruq2IDDR9DLNoQcO
+         ezyw==
+X-Gm-Message-State: AOJu0YxiHkFyTxcuKsXnFviji9tnBXbhVEFT1vLaaQ5Rtlorioz6SG/L
+	Jno6la1OSvUi18ptN/dpdl5gsVklBypMS2Fp/CYTp4g8o5TZj0Vo5OW9/3/tMesQ/+dM41eHMbf
+	TVME3kA==
+X-Google-Smtp-Source: AGHT+IH+44EtSFhcUAG8z3rdDTxFhPX9bO2zMP3KOY2VBO2VeBgYp28++elygt9mi7qCit9q8JNn5XCb1YM=
+X-Received: from pleq17.prod.google.com ([2002:a17:902:f351:b0:29f:25b4:4dc4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1a83:b0:2a0:d629:9032
+ with SMTP id d9443c01a7336-2a3ee40eea0mr83243145ad.3.1767930347215; Thu, 08
+ Jan 2026 19:45:47 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  8 Jan 2026 19:45:30 -0800
+Date: Thu,  8 Jan 2026 19:45:31 -0800
 In-Reply-To: <20260109034532.1012993-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260109034532.1012993-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260109034532.1012993-7-seanjc@google.com>
-Subject: [PATCH v4 6/8] KVM: nVMX: Switch to vmcs01 to update APIC page
+Message-ID: <20260109034532.1012993-8-seanjc@google.com>
+Subject: [PATCH v4 7/8] KVM: nVMX: Switch to vmcs01 to set virtual APICv mode
  on-demand if L2 is active
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
@@ -82,66 +82,90 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Chao Gao <chao.gao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-If the KVM-owned APIC-access page is migrated while L2 is running,
-temporarily load vmcs01 and immediately update APIC_ACCESS_ADDR instead
-of deferring the update until the next nested VM-Exit.  Once changing
-the virtual APIC mode is converted to always do on-demand updates, all
-of the "defer until vmcs01 is active" logic will be gone.
+If L1's virtual APIC mode changes while L2 is active, e.g. because L1
+doesn't intercept writes to the APIC_BASE MSR and L2 changes the mode,
+temporarily load vmcs01 and do all of the necessary actions instead of
+deferring the update until the next nested VM-Exit.
+
+This will help in fixing yet more issues related to updates while L2 is
+active, e.g. KVM neglects to update vmcs02 MSR intercepts if vmcs01's MSR
+intercepts are modified while L2 is active.  Not updating x2APIC MSRs is
+benign because vmcs01's settings are not factored into vmcs02's bitmap, but
+deferring the x2APIC MSR updates would create a weird, inconsistent state.
 
 Reviewed-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c | 5 -----
- arch/x86/kvm/vmx/vmx.c    | 7 ++-----
- arch/x86/kvm/vmx/vmx.h    | 1 -
- 3 files changed, 2 insertions(+), 11 deletions(-)
+ arch/x86/kvm/vmx/nested.c |  5 -----
+ arch/x86/kvm/vmx/vmx.c    | 17 +++++++++++------
+ arch/x86/kvm/vmx/vmx.h    |  2 --
+ 3 files changed, 11 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2b0702349aa1..8196a1ac22e1 100644
+index 8196a1ac22e1..b99e3c80d43e 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -5150,11 +5150,6 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+@@ -5143,11 +5143,6 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 	if (kvm_caps.has_tsc_control)
+ 		vmcs_write64(TSC_MULTIPLIER, vcpu->arch.tsc_scaling_ratio);
  
- 	nested_put_vmcs12_pages(vcpu);
- 
--	if (vmx->nested.reload_vmcs01_apic_access_page) {
--		vmx->nested.reload_vmcs01_apic_access_page = false;
--		kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
+-	if (vmx->nested.change_vmcs01_virtual_apic_mode) {
+-		vmx->nested.change_vmcs01_virtual_apic_mode = false;
+-		vmx_set_virtual_apic_mode(vcpu);
 -	}
 -
+ 	nested_put_vmcs12_pages(vcpu);
+ 
  	if ((vm_exit_reason != -1) &&
- 	    (enable_shadow_vmcs || nested_vmx_is_evmptr12_valid(vmx)))
- 		vmx->nested.need_vmcs12_to_shadow_sync = true;
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 90e167f296d0..af8ec72e8ebf 100644
+index af8ec72e8ebf..54701bb815eb 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6895,11 +6895,8 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
- 	kvm_pfn_t pfn;
- 	bool writable;
+@@ -6842,11 +6842,7 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+ 	    !cpu_has_vmx_virtualize_x2apic_mode())
+ 		return;
  
--	/* Defer reload until vmcs01 is the current VMCS. */
+-	/* Postpone execution until vmcs01 is the current VMCS. */
 -	if (is_guest_mode(vcpu)) {
--		to_vmx(vcpu)->nested.reload_vmcs01_apic_access_page = true;
+-		vmx->nested.change_vmcs01_virtual_apic_mode = true;
 -		return;
 -	}
-+	/* Note, the VIRTUALIZE_APIC_ACCESSES check needs to query vmcs01. */
 +	guard(vmx_vmcs01)(vcpu);
  
- 	if (!(secondary_exec_controls_get(to_vmx(vcpu)) &
- 	    SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES))
+ 	sec_exec_control = secondary_exec_controls_get(vmx);
+ 	sec_exec_control &= ~(SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+@@ -6869,8 +6865,17 @@ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
+ 			 * only do so if its physical address has changed, but
+ 			 * the guest may have inserted a non-APIC mapping into
+ 			 * the TLB while the APIC access page was disabled.
++			 *
++			 * If L2 is active, immediately flush L1's TLB instead
++			 * of requesting a flush of the current TLB, because
++			 * the current TLB context is L2's.
+ 			 */
+-			kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++			if (!is_guest_mode(vcpu))
++				kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
++			else if (!enable_ept)
++				vpid_sync_context(vmx->vpid);
++			else if (VALID_PAGE(vcpu->arch.root_mmu.root.hpa))
++				vmx_flush_tlb_ept_root(vcpu->arch.root_mmu.root.hpa);
+ 		}
+ 		break;
+ 	case LAPIC_MODE_X2APIC:
 diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index dfc9766a7fa3..078bc6fef7e6 100644
+index 078bc6fef7e6..a926ce43ad40 100644
 --- a/arch/x86/kvm/vmx/vmx.h
 +++ b/arch/x86/kvm/vmx/vmx.h
-@@ -132,7 +132,6 @@ struct nested_vmx {
+@@ -131,8 +131,6 @@ struct nested_vmx {
+ 	 */
  	bool vmcs02_initialized;
  
- 	bool change_vmcs01_virtual_apic_mode;
--	bool reload_vmcs01_apic_access_page;
- 
+-	bool change_vmcs01_virtual_apic_mode;
+-
  	/*
  	 * Enlightened VMCS has been enabled. It does not mean that L1 has to
+ 	 * use it. However, VMX features available to L1 will be limited based
 -- 
 2.52.0.457.g6b5491de43-goog
 
