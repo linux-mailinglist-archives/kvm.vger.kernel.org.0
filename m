@@ -1,321 +1,201 @@
-Return-Path: <kvm+bounces-67524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A486D0782D
-	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 08:09:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1050D078D9
+	for <lists+kvm@lfdr.de>; Fri, 09 Jan 2026 08:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 549D93026AAE
-	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 07:09:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CA5923053A1D
+	for <lists+kvm@lfdr.de>; Fri,  9 Jan 2026 07:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBA92E22AA;
-	Fri,  9 Jan 2026 07:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062F22ECE86;
+	Fri,  9 Jan 2026 07:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="LObsfW+E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHmOEDk4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+PxUuWI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C1E1C3C08
-	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 07:09:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D467F2EB87E
+	for <kvm@vger.kernel.org>; Fri,  9 Jan 2026 07:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767942565; cv=none; b=in1So4ba5FcSSiV78iWpR4P/QLDEz1XHhsC55/5F5XJAJOPsgENt/SV/iwtTDIIor/RT31RldQyltO3M/486KnWjt5xUT7Gu1tZVnuSLi1+ygvt3cyIaWvtUdBMIfZeq54o1GqVhQvOWyJ05haxAxfYMfXT6BdKxaZqEq0QlnHo=
+	t=1767943373; cv=none; b=eIzy2OMb9b5I+FikVYpom/5NKPa7V4RNJtlqHHmEnjgSG2GGZL81lez0IXc69X0ppLppNC6xFh//VITOGOLnKTWHvsiGi/PMivNLxjsplJNhwS+lcIRG9slX6xssNf8fOtGDaBD6NpLPwm6FnNtZyA90ei9KiWBIjLIbc+MN8pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767942565; c=relaxed/simple;
-	bh=YFgIynCVXZRSOkrlPL8O4gOweZpRLXGu6CCOXkXoBeA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tW8YkbRBFN/zFRRgyULEsaFWwBN/6dYLjMEN5w5Hwfh7WKl6RgTBsvLHa0Xdin6x3Y34m2c9ZzCnAK1o4mbcNZxnO0pvFTFpNazlmKhQ0a6HNrnza1t+CDPxWLwn7yvi4uIkt66MYTDxX5LJYn+b4MrFxJBpawUMJOQwzV6Zmk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=LObsfW+E; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-65f59501dacso1443733eaf.0
-        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 23:09:23 -0800 (PST)
+	s=arc-20240116; t=1767943373; c=relaxed/simple;
+	bh=j1W235feRg0KN6FKcAZabBql8JsWIHtShwbmzD/a/pk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o8HRNjtgHmx7dv7FBnyWH2e4CXmsbTkPfOraiAIAHyWofoYC/dCQVF8WJx2kazBUZf97Xj0W8cl4Bt7si5Ylntb/v/xtdyBawFg9ecSRGeLEF8S4UbefttptxxVarIhwR57GVJuBJ4fltEGfo/HxJQZqnyO1vuET7A6GnHdZ9e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bHmOEDk4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+PxUuWI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767943370;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
+	b=bHmOEDk4WTx99tib5hmS58Yz3DXmAH+o5LNZBDCMIKk+k6ciaDyr7IXFVQJx+UQQiSHpHG
+	OQKiX+Q3r56Y4XUdvfxiZU5hyMtgtLdcmxyy7AIC5AwxqtCz1LjBeRIiSTK+Sj5eFwrEve
+	qUfxAIzFN7fyuwfNKl25Jv11ngdomro=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-433-XXI0zbF-M3CPKFonz2bz3g-1; Fri, 09 Jan 2026 02:22:49 -0500
+X-MC-Unique: XXI0zbF-M3CPKFonz2bz3g-1
+X-Mimecast-MFC-AGG-ID: XXI0zbF-M3CPKFonz2bz3g_1767943368
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47d4029340aso39413965e9.3
+        for <kvm@vger.kernel.org>; Thu, 08 Jan 2026 23:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1767942562; x=1768547362; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L3hq+fSQfjHo9xTaflofyEl1PRO7ppJLW7nFwrGAnmk=;
-        b=LObsfW+E9kFnGEgGfz6QrlB9uf/+T7PaPw9o2yt40UU6mVCXhessB4jFv+mmCaEYLr
-         arjtfzWG0Kr3SuZ15gc8RkGK8/nqsVdTpVsm9SHXLoGSzTv5O3PEE4GnU8ugzLC2e8Vm
-         SF0MFgG506iogn7z/y0ubXn5Ce6pMXaHVDab58Qs5jiFOfFXYAHPogvT8UIIAIhU/mWT
-         ilHBHb4ZBkiPGX7rZ1jwilp1AmC5caS8vSKCNkGCm6k2zdvhOhAnPlB+XdaNV0cmpe9R
-         BDv0wQB/hxzgpTS7KdMB+jVBT7mrT0f2YS/Pu31UFUTZCaeFxxGUkTU6LR6I9AmpzA35
-         ummQ==
+        d=redhat.com; s=google; t=1767943368; x=1768548168; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
+        b=R+PxUuWIRXIrRgrq1h3TXojF5Qdslf4k8kqVo1et1koqF8PkFGflgODSx6j2GPoEs4
+         z+5gYKngwhNgbZjGBTkdwqs2iBOJUMqhOB5SJ56ZdfWfZFOGyQw2w81Et+uXoFZei9RK
+         5Jsf2uHqjr9s40DhGBdo10pvkPbYvI+WdI3iJTefWTwZo6mIdOyPJXDoMQ56ESGvhPWb
+         5Cv44qQkv6QZV/GQlCMFNl1uCACh2+5RwdSr6wYMNzZzxM9U2BQgx5jKWM15BPJ2/hEs
+         cDCwWQrfmxpRvwyljqijri/2OWLJV8rzsZU+uBXJT7NrkIBPdR3WaciZoiXckSHKb29s
+         bn0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767942562; x=1768547362;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=L3hq+fSQfjHo9xTaflofyEl1PRO7ppJLW7nFwrGAnmk=;
-        b=kzfKAKHZeM62KAamiZOVKEEwVFbjj1UbcfTwAg7vfvgqJzWmmqE9gBQwsiguozrQwe
-         5/oGzHf40gj8E8kiI2GQEXO3kh1j04edwwrfKpjUJPDbM+AB8ImnGHOs8DPMDDsBSQ9z
-         eUfZJLpROc7xyqscEXdvTPf84LRCc1CmXZPOSZffh+J8o0BoCuTEscPlSkIZDAz6TdDZ
-         307FVJfbTCUx3Z3fOrGc6RXQwHWbs0ef0it4erw5zZvsnKy9KVoTJ78Sos7fFAqCknIw
-         ef9rcGFdTZ99BNOsPLH61T1LnPDP8CJzQT0RUu5RPYFieayk2l3PZqdeb37p3eHXv2r/
-         wHcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWrC2FlWBbVGJ6c7q3zACOYpmrS8HJkyZq6jw94ll2ijW5kMJifOh7Hed4dwifLvoQLls=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydHvp39uAVYjPIfYeo0KwD64XxFoM6Nv3VfKFJHks2Gn2RtiKo
-	WXiPgdCT0Rp5egeXZ6NTQYuwSciPeHhg+xoMljHHOfjP83i6k68t1RRJK4XyQ843XqsJLc4nvSU
-	KXlc9Bw/tu7n2nnh8ONVHJdkV1XIJEPvWK9RjY/i2dw==
-X-Gm-Gg: AY/fxX6xKhlFzXY6dCzWqRvun/RrtZBJch46U5OMS4SE5TqcdhO5SMDnn/FJyrhJgQt
-	veOFrUhLDCyflox/YPNIDTis8Y4Q8FCqdcwJwa8JLbNKp/lUETtxXAnP5WVbB6/Hk7juViADowE
-	Fut4IwxW9iCXs1gg9uO/CdJRX6yOabbzFl9XlkHZlFquX1wHQHc0tsYQXe4oWpMnhWfw3giHXxj
-	d9yrjeNSvK7NLpslUF/yFgY/MyGUZLkHlzX9sFpkbQxagtsPDd0Q0aaYjhOBiL21KpKSCpgEqLR
-	0Hyvs8kWdOhVY4HuewI+6krs7TC/Gt4kJ8gqZ3BnDFBvBVaa3dMUuPakI8ovzAAfZuWO
-X-Google-Smtp-Source: AGHT+IHupo8VL1q6/fyEDLMw2ffzv5hWRR+8Fks6xECR+bokgZNh1nRbXbrJmRMRMvS/oTFqcbl9t9pnEs1zluFfkec=
-X-Received: by 2002:a4a:cb94:0:b0:65f:565a:219d with SMTP id
- 006d021491bc7-65f565a3826mr3060334eaf.84.1767942562507; Thu, 08 Jan 2026
- 23:09:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767943368; x=1768548168;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
+        b=aP6zW2rIgqcADGxMVsxdQbFEDFUXXNCoARdq5zoqcHjaX1IqiGpGq0dmY/Nd7B9mr6
+         YT6VGfmK1p+9d3iWrLYWNHHUGetCAvegGJFXPW/v1GyfjYODv9PBQzWi6Q6VzqhkxK41
+         MoxPcNVe4pD8rzHCMpGqhlyRHujPWPHrL/vB7JDxSGfGGkDVle/cwjPOLlRm6jL/LTYc
+         Px+bg2J7XwvxEbw2BzJ2o6jx1jaDzlQeIKbRjNcLACTcOpnvmfJNvZKZrftCq67SvveV
+         lI0JZduWI4ciNEPk2fhbIvxskXA3ua+AQsUcB9ZqQN3n0sJU0cHzu2ySCs4hUg5YShJ0
+         t33g==
+X-Forwarded-Encrypted: i=1; AJvYcCVwraczk5oU7aBFPHicUoeFhMwfeRXG7r2/if3iAEI6Yl7z0Fsk37CHsOwrDW3thpTvXos=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE/Bmr1++dbAfZTlOY17tVxRMJYG5MwNY0zSPKsPo6Sec/iNui
+	ANo3p+LhIhTkFxzf2q90FRFETlGvsc+1cQIA2PjW+dfYQAItLLxuhqm2nASpaUpRmpiZaWhFykJ
+	/uZI4D2Y/FGr8IoO1H0A2mZq9SYnEgUQaylO27bLTaiwrBJ/3TjRUJA==
+X-Gm-Gg: AY/fxX6GOWVizoaZfdkQsktBYSy1jSaDUuI/ivWEZU3UC0InyPwGOooQKmXx+YIlaQb
+	TR8MVzyF1bgsXoV8/f4p2FNAg38yl/BQ19XUjtnVHs0EhlyxEM7NDbZqe7Yw9AJUm5micA2HJ+Z
+	D8P/mUqW1ujQoL6WCvy7R9M2xv+hHv6oCB5cwrgmq5o5cffiBORys3za7EfRKm+qHe+c55UbzzD
+	azEjb9V2la0tm4G6A18jyeZ8mJnU7Hk8FxAKuqZvXE+ABv/IWEEEr+FwTo/kM7Y6EHGc5c1Qtke
+	o0CCBfMArb+3t8yAyHdVRJj/vHUI0R5JbbAVabB6etEIcytlNRFYqx5f+uFwXjj5Y+286qkQ2GP
+	7kZTp4iuDx7rBbJxtnSFukW61Z6AOZ02CzQ==
+X-Received: by 2002:a05:6000:4201:b0:430:f40f:61ba with SMTP id ffacd0b85a97d-432c3798349mr11114917f8f.41.1767943368369;
+        Thu, 08 Jan 2026 23:22:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFHdWMIJxf4esvBI4hULstTggLuOtGp39Tkn3cxYuG9NjEAkGwtcZDffJ90hcLBXgcBNIrf8w==
+X-Received: by 2002:a05:6000:4201:b0:430:f40f:61ba with SMTP id ffacd0b85a97d-432c3798349mr11114886f8f.41.1767943367815;
+        Thu, 08 Jan 2026 23:22:47 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0daa84sm20705982f8f.2.2026.01.08.23.22.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 23:22:47 -0800 (PST)
+Date: Fri, 9 Jan 2026 02:22:44 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly
+ freed space on consume
+Message-ID: <20260109021023-mutt-send-email-mst@kernel.org>
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251127165137780QbUOVPKPAfWSGAFl5qtRy@zte.com.cn>
-In-Reply-To: <20251127165137780QbUOVPKPAfWSGAFl5qtRy@zte.com.cn>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 9 Jan 2026 12:39:10 +0530
-X-Gm-Features: AQt7F2qbRS_M-_2pxgYkPVk2hwt92w_Y59xXj3ghAfqt5f49LTkCXhPWOY5KUN8
-Message-ID: <CAAhSdy3ANMmRL6KAm5J9Amd8-1GFYpNKG_cC1gZ7Za45XsOrPA@mail.gmail.com>
-Subject: Re: [PATCH v4] RISC-V: KVM: Transparent huge page support
-To: liu.xuemei1@zte.com.cn
-Cc: atish.patra@linux.dev, alex@ghiti.fr, pjw@kernel.org, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	inux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
 
-On Thu, Nov 27, 2025 at 2:22=E2=80=AFPM <liu.xuemei1@zte.com.cn> wrote:
->
-> From: Jessica Liu <liu.xuemei1@zte.com.cn>
->
-> Use block mapping if backed by a THP, as implemented in architectures
-> like ARM and x86_64.
->
-> Signed-off-by: Jessica Liu <liu.xuemei1@zte.com.cn>
-
-LGTM.
-
-Reviewed-by: Anup Patel <anup@brainfault.org>
-
-Queued this patch for Linux-6.20
-
-Thanks,
-Anup
-
+On Wed, Jan 07, 2026 at 10:04:41PM +0100, Simon Schippers wrote:
+> This proposed function checks whether __ptr_ring_zero_tail() was invoked
+> within the last n calls to __ptr_ring_consume(), which indicates that new
+> free space was created. Since __ptr_ring_zero_tail() moves the tail to
+> the head - and no other function modifies either the head or the tail,
+> aside from the wrap-around case described below - detecting such a
+> movement is sufficient to detect the invocation of
+> __ptr_ring_zero_tail().
+> 
+> The implementation detects this movement by checking whether the tail is
+> at most n positions behind the head. If this condition holds, the shift
+> of the tail to its current position must have occurred within the last n
+> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
+> invoked and that new free space was created.
+> 
+> This logic also correctly handles the wrap-around case in which
+> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
+> to 0. Since this reset likewise moves the tail to the head, the same
+> detection logic applies.
+> 
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
 > ---
-> Changes in v4:
-> - Substituted kvm_riscv_gstage_get_mapping_size with get_hva_mapping_size
->
->  arch/riscv/kvm/mmu.c    | 140 ++++++++++++++++++++++++++++++++++++++++
->  arch/riscv/mm/pgtable.c |   2 +
->  2 files changed, 142 insertions(+)
->
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 58f5f3536ffd..38816c5895fe 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -302,6 +302,142 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_g=
-fn_range *range)
->         return pte_young(ptep_get(ptep));
+>  include/linux/ptr_ring.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> index a5a3fa4916d3..7cdae6d1d400 100644
+> --- a/include/linux/ptr_ring.h
+> +++ b/include/linux/ptr_ring.h
+> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+>  	return ret;
 >  }
->
-> +static bool fault_supports_gstage_huge_mapping(struct kvm_memory_slot *m=
-emslot,
-> +                                              unsigned long hva)
+>  
+> +/* Returns true if the consume of the last n elements has created space
+> + * in the ring buffer (i.e., a new element can be produced).
+> + *
+> + * Note: Because of batching, a successful call to __ptr_ring_consume() /
+> + * __ptr_ring_consume_batched() does not guarantee that the next call to
+> + * __ptr_ring_produce() will succeed.
+
+
+I think the issue is it does not say what is the actual guarantee.
+
+Another issue is that the "Note" really should be more prominent,
+it really is part of explaining what the functions does.
+
+Hmm. Maybe we should tell it how many entries have been consumed and
+get back an indication of how much space this created?
+
+fundamentally
+	 n - (r->consumer_head - r->consumer_tail)?
+
+
+does the below sound good maybe?
+
+/* Returns the amound of space (number of new elements that can be
+ * produced) that calls to ptr_ring_consume created.
+ *
+ * Getting n entries from calls to ptr_ring_consume() /
+ * ptr_ring_consume_batched() does *not* guarantee that the next n calls to
+ * ptr_ring_produce() will succeed.
+ *
+ * Use this function after consuming n entries to get a hint about
+ * how much space was actually created.
+
+
+
+
+
+> + */
+> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
+> +						    int n)
 > +{
-> +       hva_t uaddr_start, uaddr_end;
-> +       gpa_t gpa_start;
-> +       size_t size;
-> +
-> +       size =3D memslot->npages * PAGE_SIZE;
-> +       uaddr_start =3D memslot->userspace_addr;
-> +       uaddr_end =3D uaddr_start + size;
-> +
-> +       gpa_start =3D memslot->base_gfn << PAGE_SHIFT;
-> +
-> +       /*
-> +        * Pages belonging to memslots that don't have the same alignment
-> +        * within a PMD for userspace and GPA cannot be mapped with g-sta=
-ge
-> +        * PMD entries, because we'll end up mapping the wrong pages.
-> +        *
-> +        * Consider a layout like the following:
-> +        *
-> +        *    memslot->userspace_addr:
-> +        *    +-----+--------------------+--------------------+---+
-> +        *    |abcde|fgh  vs-stage block  |    vs-stage block tv|xyz|
-> +        *    +-----+--------------------+--------------------+---+
-> +        *
-> +        *    memslot->base_gfn << PAGE_SHIFT:
-> +        *      +---+--------------------+--------------------+-----+
-> +        *      |abc|def  g-stage block  |    g-stage block   |tvxyz|
-> +        *      +---+--------------------+--------------------+-----+
-> +        *
-> +        * If we create those g-stage blocks, we'll end up with this inco=
-rrect
-> +        * mapping:
-> +        *   d -> f
-> +        *   e -> g
-> +        *   f -> h
-> +        */
-> +       if ((gpa_start & (PMD_SIZE - 1)) !=3D (uaddr_start & (PMD_SIZE - =
-1)))
-> +               return false;
-> +
-> +       /*
-> +        * Next, let's make sure we're not trying to map anything not cov=
-ered
-> +        * by the memslot. This means we have to prohibit block size mapp=
-ings
-> +        * for the beginning and end of a non-block aligned and non-block=
- sized
-> +        * memory slot (illustrated by the head and tail parts of the
-> +        * userspace view above containing pages 'abcde' and 'xyz',
-> +        * respectively).
-> +        *
-> +        * Note that it doesn't matter if we do the check using the
-> +        * userspace_addr or the base_gfn, as both are equally aligned (p=
-er
-> +        * the check above) and equally sized.
-> +        */
-> +       return (hva >=3D ALIGN(uaddr_start, PMD_SIZE)) && (hva < ALIGN_DO=
-WN(uaddr_end, PMD_SIZE));
+> +	return r->consumer_head - r->consumer_tail < n;
 > +}
 > +
-> +static int get_hva_mapping_size(struct kvm *kvm,
-> +                               unsigned long hva)
-> +{
-> +       int size =3D PAGE_SIZE;
-> +       unsigned long flags;
-> +       pgd_t pgd;
-> +       p4d_t p4d;
-> +       pud_t pud;
-> +       pmd_t pmd;
-> +
-> +       /*
-> +        * Disable IRQs to prevent concurrent tear down of host page tabl=
-es,
-> +        * e.g. if the primary MMU promotes a P*D to a huge page and then=
- frees
-> +        * the original page table.
-> +        */
-> +       local_irq_save(flags);
-> +
-> +       /*
-> +        * Read each entry once.  As above, a non-leaf entry can be promo=
-ted to
-> +        * a huge page _during_ this walk.  Re-reading the entry could se=
-nd the
-> +        * walk into the weeks, e.g. p*d_leaf() returns false (sees the o=
-ld
-> +        * value) and then p*d_offset() walks into the target huge page i=
-nstead
-> +        * of the old page table (sees the new value).
-> +        */
-> +       pgd =3D pgdp_get(pgd_offset(kvm->mm, hva));
-> +       if (pgd_none(pgd))
-> +               goto out;
-> +
-> +       p4d =3D p4dp_get(p4d_offset(&pgd, hva));
-> +       if (p4d_none(p4d) || !p4d_present(p4d))
-> +               goto out;
-> +
-> +       pud =3D pudp_get(pud_offset(&p4d, hva));
-> +       if (pud_none(pud) || !pud_present(pud))
-> +               goto out;
-> +
-> +       if (pud_leaf(pud)) {
-> +               size =3D PUD_SIZE;
-> +               goto out;
-> +       }
-> +
-> +       pmd =3D pmdp_get(pmd_offset(&pud, hva));
-> +       if (pmd_none(pmd) || !pmd_present(pmd))
-> +               goto out;
-> +
-> +       if (pmd_leaf(pmd))
-> +               size =3D PMD_SIZE;
-> +
-> +out:
-> +       local_irq_restore(flags);
-> +       return size;
-> +}
-> +
-> +static unsigned long transparent_hugepage_adjust(struct kvm *kvm,
-> +                                                struct kvm_memory_slot *=
-memslot,
-> +                                                unsigned long hva,
-> +                                                kvm_pfn_t *hfnp, gpa_t *=
-gpa)
-> +{
-> +       kvm_pfn_t hfn =3D *hfnp;
-> +
-> +       /*
-> +        * Make sure the adjustment is done only for THP pages. Also make
-> +        * sure that the HVA and GPA are sufficiently aligned and that th=
-e
-> +        * block map is contained within the memslot.
-> +        */
-> +       if (fault_supports_gstage_huge_mapping(memslot, hva)) {
-> +               int sz;
-> +
-> +               sz =3D get_hva_mapping_size(kvm, hva);
-> +               if (sz < PMD_SIZE)
-> +                       return sz;
-> +
-> +               *gpa &=3D PMD_MASK;
-> +               hfn &=3D ~(PTRS_PER_PMD - 1);
-> +               *hfnp =3D hfn;
-> +
-> +               return PMD_SIZE;
-> +       }
-> +
-> +       return PAGE_SIZE;
-> +}
-> +
->  int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *mem=
-slot,
->                       gpa_t gpa, unsigned long hva, bool is_write,
->                       struct kvm_gstage_mapping *out_map)
-> @@ -395,6 +531,10 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct =
-kvm_memory_slot *memslot,
->         if (mmu_invalidate_retry(kvm, mmu_seq))
->                 goto out_unlock;
->
-> +       /* check if we are backed by a THP and thus use block mapping if =
-possible */
-> +       if (vma_pagesize =3D=3D PAGE_SIZE)
-> +               vma_pagesize =3D transparent_hugepage_adjust(kvm, memslot=
-, hva, &hfn, &gpa);
-> +
->         if (writable) {
->                 mark_page_dirty_in_slot(kvm, memslot, gfn);
->                 ret =3D kvm_riscv_gstage_map_page(&gstage, pcache, gpa, h=
-fn << PAGE_SHIFT,
-> diff --git a/arch/riscv/mm/pgtable.c b/arch/riscv/mm/pgtable.c
-> index 8b6c0a112a8d..fe776f03cc12 100644
-> --- a/arch/riscv/mm/pgtable.c
-> +++ b/arch/riscv/mm/pgtable.c
-> @@ -49,6 +49,7 @@ pud_t *pud_offset(p4d_t *p4d, unsigned long address)
->
->         return (pud_t *)p4d;
->  }
-> +EXPORT_SYMBOL_GPL(pud_offset);
->
->  p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
->  {
-> @@ -57,6 +58,7 @@ p4d_t *p4d_offset(pgd_t *pgd, unsigned long address)
->
->         return (p4d_t *)pgd;
->  }
-> +EXPORT_SYMBOL_GPL(p4d_offset);
->  #endif
->
->  #ifdef CONFIG_HAVE_ARCH_HUGE_VMAP
-> --
-> 2.27.0
+>  /* Cast to structure type and call a function without discarding from FIFO.
+>   * Function must return a value.
+>   * Callers must take consumer_lock.
+> -- 
+> 2.43.0
+
 
