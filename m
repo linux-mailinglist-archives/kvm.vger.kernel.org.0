@@ -1,43 +1,45 @@
-Return-Path: <kvm+bounces-67647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE44DD0CA54
-	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 01:49:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFFE8D0CA51
+	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 01:48:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A6263026AAC
-	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 00:48:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 90E12301831E
+	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 00:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FF41F37D4;
-	Sat, 10 Jan 2026 00:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511BD20C001;
+	Sat, 10 Jan 2026 00:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uu4r54eR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MZOA4y8r"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A2041C62
-	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 00:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10B217A305
+	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 00:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768006125; cv=none; b=tsDH1Y16gg6mhRt1mw3IfW1C6etf07b9HfrKtIGQLlZtmoWq6TFbQnhDQuUlyqTyXu3ZdOJ2177JVnjg2o7PTSsOWGsm/UtlkyV4nXYEaN+rHrJvXjJegySqHG0uGvpLIwQwPLK97pU8qhS2xltC3bYyZB9jqiBsQxfcUcsXqSs=
+	t=1768006126; cv=none; b=okSmWpokKuSmjQ2Rm1qxdFq/7IFHcoe63ol3/6j5N1OUO93vkvE5jf43AhLUioDBjUXFpBeL4i+VlimVBQzd/SV6pMsw7lzwSXn/MCoaPNQ9DIDdAn+sXv44WPt2h4bUlP9PJPYCWkgqVz+W/DgAZCn02BKFeX5/XqW8gDPaMts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768006125; c=relaxed/simple;
-	bh=lG8dW8PIr0m2yCiTqjfQSbBUxLhSe6xTy+qzKr9px4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=twnxD/ZNqlsEGC1ArK6vFGdxPcJcgKjTaca51lL2OaI+POJsOwxHS86zll3ukNcYGM/KZ6YBRTNvJ04IDUu8cJ5E2OAkLpUDtGYf5XNYxoT3nKjrAdRNZ1Rp9xg7yerT6gmaIK0B2GSetZh5P0bCw10LEa4K1U/B42WUdee2bmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uu4r54eR; arc=none smtp.client-ip=95.215.58.176
+	s=arc-20240116; t=1768006126; c=relaxed/simple;
+	bh=FJzmaB4ntWmqyKtFbkyHlSUO1/xoZrNN5rnPXBB6b8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Gs9zeAQWvyeav6Pqf6LxbsW2ouenDP5AtHUMFKFMEV5zu5N9t9hUoRjMRbIQY5eaYivYj+mwgAVn29snEc6lfrPNUQQ2g06QVckwAsFDqtdwRPYwpEF1JhwT9hzgcw7+uG+1zFSUAnhHLMw+oz4wnAGFx+v0jX0hcA7kNRcKtiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MZOA4y8r; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768006121;
+	t=1768006123;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GM4LB/x+7ag1lds0sM/ImZ1OlQOTfGEECkRo4fRqTDA=;
-	b=uu4r54eRMCbmKZHAbpaSlHDKSRS9H6nQamzQaBfIgdksM7E9exSx91mi9jM8/Kzz2YwmpP
-	o+G+Z/trnNiB6jezrLYliB4Nq1NVkzmNzMcJNTiNI20b6k3opGtPeQ7Z5C+amSQj2JVX5+
-	mWqXSAd7FdOPmJJYWIqzkjoggTLYgv0=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gDgt+ECmMkXAmQuSwl6mDbmVPT38/lyN/PXVzf05jSg=;
+	b=MZOA4y8rzWIm/x4hJwN8QkGQFBzJWzpmB3XbH7BBWwXNvj/+1RgbmfuZcp96Rc92z96MIP
+	z9jlw8fpN9mtUwN2IpaYfrcqAXwlLfH75WUuBJbmMfp90CHPiochSEjJooz+u02fYV/Hfu
+	qywhLPccjla3PgYVS+fTTEo00R9p1xI=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -45,10 +47,14 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Kevin Cheng <chengkev@google.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH 0/4] KVM: nSVM: nested VMSAVE/VMLOAD fixes
-Date: Sat, 10 Jan 2026 00:48:17 +0000
-Message-ID: <20260110004821.3411245-1-yosry.ahmed@linux.dev>
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/4] KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation
+Date: Sat, 10 Jan 2026 00:48:18 +0000
+Message-ID: <20260110004821.3411245-2-yosry.ahmed@linux.dev>
+In-Reply-To: <20260110004821.3411245-1-yosry.ahmed@linux.dev>
+References: <20260110004821.3411245-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,33 +64,43 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A couple of fixes for nested VMLOAD/VMSAVE and a selftest that verifies
-correct behavior. The test fails without patch 1.
+Commit cc3ed80ae69f ("KVM: nSVM: always use vmcb01 to for vmsave/vmload
+of guest state") made KVM always use vmcb01 for the fields controlled by
+VMSAVE/VMLOAD, but it missed updating the VMLOAD/VMSAVE emulation code
+to always use vmcb01.
 
-Patch 4 is a proposed added WARNING, I am not sure if such warnings are
-generally acceptable and if that's the correct place for it (hence RFC),
-but I think it's useful to WARN if VMSAVE/VMLOAD are neither intercepted
-nor virtualized by the CPU, because it means that the guest is directly
-accessing host memory with them, a massive security hole.
+As a result, if VMSAVE/VMLOAD is executed by an L2 guest and is not
+intercepted by L1, KVM will mistakenly use vmcb02. Always use vmcb01
+instead of the current VMCB.
 
-The warning doesn't fire with or without the fixes, but at some point I
-thought there might be such a security bug, and having a warning will
-give me some peace of mind.
+Fixes: cc3ed80ae69f ("KVM: nSVM: always use vmcb01 to for vmsave/vmload of guest state")
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+---
+ arch/x86/kvm/svm/svm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Yosry Ahmed (4):
-  KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation
-  KVM: SVM: Stop toggling virtual VMSAVE/VMLOAD on intercept recalc
-  KVM: selftests: Add a selftests for nested VMLOAD/VMSAVE
-  RFC: KVM: SVM: WARN if VMSAVE/VMLOAD are not intercepted or
-    virtualized
-
- arch/x86/kvm/svm/svm.c                        |  23 +-
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/include/x86/processor.h     |   1 +
- .../kvm/x86/nested_vmsave_vmload_test.c       | 197 ++++++++++++++++++
- 4 files changed, 218 insertions(+), 4 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86/nested_vmsave_vmload_test.c
-
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7041498a8091..4e4439a01828 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2165,12 +2165,13 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
+ 
+ 	ret = kvm_skip_emulated_instruction(vcpu);
+ 
++	/* KVM always performs VMLOAD/VMSAVE on VMCB01 (see __svm_vcpu_run()) */
+ 	if (vmload) {
+-		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
++		svm_copy_vmloadsave_state(svm->vmcb01.ptr, vmcb12);
+ 		svm->sysenter_eip_hi = 0;
+ 		svm->sysenter_esp_hi = 0;
+ 	} else {
+-		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
++		svm_copy_vmloadsave_state(vmcb12, svm->vmcb01.ptr);
+ 	}
+ 
+ 	kvm_vcpu_unmap(vcpu, &map);
 -- 
 2.52.0.457.g6b5491de43-goog
 
