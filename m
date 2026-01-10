@@ -1,141 +1,91 @@
-Return-Path: <kvm+bounces-67646-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67647-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 380F1D0C9B4
-	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 01:11:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE44DD0CA54
+	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 01:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CAB633027E1F
-	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 00:11:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A6263026AAC
+	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 00:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67AE613D8B1;
-	Sat, 10 Jan 2026 00:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FF41F37D4;
+	Sat, 10 Jan 2026 00:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WF5/fIAP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uu4r54eR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3677B1400C
-	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 00:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A2041C62
+	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 00:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768003876; cv=none; b=TRDS3VfUi82vCr6mh1c0Fn+R/2MGQNv5JXqz6QoMIgy1Yedkf6R4R8LyAYNgpWV4dblfR6cwqvQBRELIldonK1zEcPDZtCYduW5mskVzzjYBQCle/VOlpb8ecL7LLtIwZyXAag4O8jHaklFAFZHhww3kP1AAup2PC5aikFhVDlQ=
+	t=1768006125; cv=none; b=tsDH1Y16gg6mhRt1mw3IfW1C6etf07b9HfrKtIGQLlZtmoWq6TFbQnhDQuUlyqTyXu3ZdOJ2177JVnjg2o7PTSsOWGsm/UtlkyV4nXYEaN+rHrJvXjJegySqHG0uGvpLIwQwPLK97pU8qhS2xltC3bYyZB9jqiBsQxfcUcsXqSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768003876; c=relaxed/simple;
-	bh=XszBXPJ18HkMpycCWMX0Y8i3Aoh/kyFsduWJiX9qSIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTM0zD74ipdRKCtpsGsNLMXxuTdEE1wq5tBEf2lYYQCDw20M2Q5dkqVzIe2Y3cYRbLLmoEqljPTD8PC2qelk/IXEDHeSH3hMQqyZDLXNheV5GiBNSDssD2PhXAtW4x9qVNOnpXuK/E7wS7b90VSb2XlxEB73gbEbeSVUYe42jdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WF5/fIAP; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-7927416137dso1776187b3.0
-        for <kvm@vger.kernel.org>; Fri, 09 Jan 2026 16:11:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768003874; x=1768608674; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6N0A2c2LYMc0dJDgYzdUUiKfOdoal/WEyiilk+5HTkg=;
-        b=WF5/fIAP4AEyO4f6KWSJP2rwaSy/sViblkfSeeU8EGHt4W8zcGu8GdInztygNBG+SI
-         lFZMtf5mk92Bho0bl/kz0wrylefbq54djvfDKFetQZqFm4VltIFlMyuYZ3TYsee7EuPv
-         cuFATTU+AojUbvwayi9w7OyNstSzzzIWEbhQr08urKNmtzyFQEASvw8VCOBtpjn1hEZ7
-         /S6AXS4ADril+8pCuPrnQcp3DFjvjtLVBL9cCPyinaRd8F5C9kJqxbl7/LUxO4bKzb5y
-         2VTvsnHADEUfrU8ytID59HZXZVXxMG6DT+qvAAEn0faaDEgjA/ym8ZI4sdu6WxDKie2G
-         EoTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768003874; x=1768608674;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6N0A2c2LYMc0dJDgYzdUUiKfOdoal/WEyiilk+5HTkg=;
-        b=H2gEUpTygmyUhleaozzN3upYlgD4g32lQKaKdOeyqglipweWCBr9bwh6vuBe+XA/ay
-         wqahh4btGk5JFZWJlJz3o11oj1/lFzoeMAfMLWKKTU8V5bmsyCgIj4xuBE/YbcotmrgX
-         kmUdVfLOzvAyD7nHi/3ugVzjOulMS2glfIL/5l7/aL+z6yEKyQ9cwNXoQxarV0DiFIdX
-         Ti1hDHcwLLdOuJSZuwtv+WS+IFjk3AHenCGdto9r525Upyz+u/Eo4oCUeTYjIAJToZzY
-         Kfed2zt5kRbusQlrcac+dc2CbQAHG+yLluVadSOYqp36UTdmxJumM/bPHuGCOb2zC4nN
-         LGHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVWuXpzdeQCDh2pzneFWQTtIhzAAs8x1UfFdOc0U+Gqg+/VBCDC/oHOEgE7DJYLMkoLVE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP4w+1a6MlGUvBlencVzky/AOjv71h3BYmm8nHQrZgmkKbPhnN
-	/tsZQ4jDN7Udbi7lJjoEnra6HIYutFmS3BZjzBhzKNojusCAzfOjOwBN
-X-Gm-Gg: AY/fxX7/iBucc0jVyqXga8RMGrk5OBtUo3bI7aOXkZgykLrnE79pundzvwBheo+rtpv
-	YdZ47Vo+by3Ej7ih0ETWr46K03nVKFWIr8Cja1TJ/lfh0xw97VxWLercIkMSU5++9Y3/AARGuJi
-	+eQ0Q22n17Vz6bz/8PTTbdLj4eKaP+7RYzGj57Q/lQYPnUiLlbnVy+hw/ZT8wCy93TaMK5Sr2oR
-	l4jT19abJUpCq9ilRFkUIGz0tAsbCfOLvhEFtUjd3+7Yht5V11oDNb+EmzXeT+Qt++pPfn+Tm8N
-	ajW8hP9PFi830KheHCZetc8oTfezKYFSz1JBjJNLTAclbRThBnhi5l3opGakBZaIV2DtIDRFfZf
-	DTrXkshRVs3gjRznPnvfjjAtJfyXQRJSCwWXbm6C99b535lBmZNQMbV0Dff2xejKWB0JNAX0eh6
-	jHiCS2ANLvfd6WjR14rK+Xbfp4u08iF16JYA==
-X-Google-Smtp-Source: AGHT+IE5CW/VP1bFR/Dosae0XD0Rb9scRJI8ZCC2GQQ5cF/xpuuKEVGU70q9buii5G2BZNROzhlUqg==
-X-Received: by 2002:a05:690e:1611:b0:644:7712:ed72 with SMTP id 956f58d0204a3-64716bd7b38mr8182868d50.43.1768003873903;
-        Fri, 09 Jan 2026 16:11:13 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:a::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa553ac3sm46524707b3.5.2026.01.09.16.11.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 16:11:13 -0800 (PST)
-Date: Fri, 9 Jan 2026 16:11:12 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, kvm@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH RFC net-next v13 00/13] vsock: add namespace support to
- vhost-vsock and loopback
-Message-ID: <aWGZILlNWzIbRNuO@devvm11784.nha0.facebook.com>
-References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
+	s=arc-20240116; t=1768006125; c=relaxed/simple;
+	bh=lG8dW8PIr0m2yCiTqjfQSbBUxLhSe6xTy+qzKr9px4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=twnxD/ZNqlsEGC1ArK6vFGdxPcJcgKjTaca51lL2OaI+POJsOwxHS86zll3ukNcYGM/KZ6YBRTNvJ04IDUu8cJ5E2OAkLpUDtGYf5XNYxoT3nKjrAdRNZ1Rp9xg7yerT6gmaIK0B2GSetZh5P0bCw10LEa4K1U/B42WUdee2bmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uu4r54eR; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768006121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GM4LB/x+7ag1lds0sM/ImZ1OlQOTfGEECkRo4fRqTDA=;
+	b=uu4r54eRMCbmKZHAbpaSlHDKSRS9H6nQamzQaBfIgdksM7E9exSx91mi9jM8/Kzz2YwmpP
+	o+G+Z/trnNiB6jezrLYliB4Nq1NVkzmNzMcJNTiNI20b6k3opGtPeQ7Z5C+amSQj2JVX5+
+	mWqXSAd7FdOPmJJYWIqzkjoggTLYgv0=
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Jim Mattson <jmattson@google.com>,
+	Kevin Cheng <chengkev@google.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: [PATCH 0/4] KVM: nSVM: nested VMSAVE/VMLOAD fixes
+Date: Sat, 10 Jan 2026 00:48:17 +0000
+Message-ID: <20260110004821.3411245-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 23, 2025 at 04:28:34PM -0800, Bobby Eshleman wrote:
-> This series adds namespace support to vhost-vsock and loopback. It does
-> not add namespaces to any of the other guest transports (virtio-vsock,
-> hyperv, or vmci).
-> 
-> The current revision supports two modes: local and global. Local
-> mode is complete isolation of namespaces, while global mode is complete
-> sharing between namespaces of CIDs (the original behavior).
-> 
-> The mode is set using the parent namespace's
-> /proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
-> created. The mode of the current namespace can be queried by reading
-> /proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
-> has been created.
-> 
-> Modes are per-netns. This allows a system to configure namespaces
-> independently (some may share CIDs, others are completely isolated).
-> This also supports future possible mixed use cases, where there may be
-> namespaces in global mode spinning up VMs while there are mixed mode
-> namespaces that provide services to the VMs, but are not allowed to
-> allocate from the global CID pool (this mode is not implemented in this
-> series).
+A couple of fixes for nested VMLOAD/VMSAVE and a selftest that verifies
+correct behavior. The test fails without patch 1.
 
-Stefano, would like me to resend this without the RFC tag, or should I
-just leave as is for review? I don't have any planned changes at the
-moment.
+Patch 4 is a proposed added WARNING, I am not sure if such warnings are
+generally acceptable and if that's the correct place for it (hence RFC),
+but I think it's useful to WARN if VMSAVE/VMLOAD are neither intercepted
+nor virtualized by the CPU, because it means that the guest is directly
+accessing host memory with them, a massive security hole.
 
-Best,
-Bobby
+The warning doesn't fire with or without the fixes, but at some point I
+thought there might be such a security bug, and having a warning will
+give me some peace of mind.
+
+Yosry Ahmed (4):
+  KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation
+  KVM: SVM: Stop toggling virtual VMSAVE/VMLOAD on intercept recalc
+  KVM: selftests: Add a selftests for nested VMLOAD/VMSAVE
+  RFC: KVM: SVM: WARN if VMSAVE/VMLOAD are not intercepted or
+    virtualized
+
+ arch/x86/kvm/svm/svm.c                        |  23 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/include/x86/processor.h     |   1 +
+ .../kvm/x86/nested_vmsave_vmload_test.c       | 197 ++++++++++++++++++
+ 4 files changed, 218 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/nested_vmsave_vmload_test.c
+
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
