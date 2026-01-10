@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-67657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A51DD0DB5C
-	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 20:33:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CFAD0DD0C
+	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 21:03:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BC4353023526
-	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 19:33:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 84D133008988
+	for <lists+kvm@lfdr.de>; Sat, 10 Jan 2026 20:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1F61A9F84;
-	Sat, 10 Jan 2026 19:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6677B2BDC10;
+	Sat, 10 Jan 2026 20:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKSWJa3j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gq1SZFV4"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D394A500948
-	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 19:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9604929B795
+	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 20:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768073605; cv=none; b=jmxH89xZQMMitvNGjid18t+eq77D94l1LC3nuTtZC100NPX1oRka6en6XWLsafy7FjDzZiYix1K4Q+adTt+Vz75gPXthtE2xseHqlCYvSf6ZOgJ8n2Q7adFi9+1CG29bjjpwau6mShcpvqi72ITgzukuhvcTohhBoTF6u2T1f9c=
+	t=1768075388; cv=none; b=B1e37Mzfg1Kc+9M7aMeqp+CyXGa0IgieVEv3JzSnM0V5szKNQ2EHGe8rvXgtuZacI7QFRFBIdFXa6EqdCOYzMGAohVDdQeqAFyIqrmCRWb+3MjdORk7u6ukMbos2ZUVHpnWdTEoD9tGjzbO5+C+9sClpOeLv8zLadyMJGwskZUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768073605; c=relaxed/simple;
-	bh=vCuQV2HPEThYfD439aivLTAKxmmk2vE3G0q4pKhrjS8=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=hnCe1RpFh13ftIWmTpcBufHJEqjurxiuU07lYKlcxDYbQDZx1FCGSOJ1QCFmEPdlZ+E9C9cczEQWnW9rOuarRGTTpS/6N5SQz6CLrxi57ioPmJqcHKaKQbwEu52bqgTSz0hPybgNdRKrTNt3E5x7ROBw3Jz9gdYCJuFZJ6HwCKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKSWJa3j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 64311C16AAE
-	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 19:33:25 +0000 (UTC)
+	s=arc-20240116; t=1768075388; c=relaxed/simple;
+	bh=LXWycroEfD3YqrjtWFUi+1Lngay5LYjhFbUggkE0ofM=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=pGSy4FbvAzmpLuuSDJ6060ac+vgInopoAGeOEAJIKluBWQ01q4HwQEL7k3lRNt+9Qd4AXoMXoVijCfSJFy6+CUnts+mSVN5OZhbI9T9wHloj5mQxvR/dsB9MURKy9sVjVZk7G4m/udVku4/npdMWfd0dqGtZuasyMUZ2Fhlw87E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gq1SZFV4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D1FBC19424
+	for <kvm@vger.kernel.org>; Sat, 10 Jan 2026 20:03:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768073605;
-	bh=vCuQV2HPEThYfD439aivLTAKxmmk2vE3G0q4pKhrjS8=;
+	s=k20201202; t=1768075388;
+	bh=LXWycroEfD3YqrjtWFUi+1Lngay5LYjhFbUggkE0ofM=;
 	h=From:To:Subject:Date:From;
-	b=gKSWJa3joHNptr9/KnFm25F8HQ14ZJM0qEJPCWcCDdi6tsEevkIQi9++f7pR7MDJL
-	 0LH2EBQOGnO64JAdnbfYMvdXG12gvrXeA4ApO30cNfoRqMD06I2DJ1eC2CISvO66S7
-	 e4bTkr+vRLVn0liAB7wHTwtsHTACmAAqRacgacc2ZMbX9355Eui65s4NvVD3Sqr+mG
-	 FnjUaNeAg3l2y+D4d9+0ifjGdMwa/CeRZFv+qHhw0gAdeS/3OJ9FvvlQ6C5QA2YgJk
-	 qhFv0VF27FqDC4HF+CtAMlFZsOrBnYEmcc+sw+d/uQqIcPk5pIg6xpPqkWC8Y/z1ao
-	 stUyUvvlENACQ==
+	b=Gq1SZFV4azVO1p5cvAgOWGAyEIGe+adCu9EQ0zoQTDfXDFPJwQGUp1gqSfOEGUk27
+	 ZIwM7ZOfyDpYMylbJLq6XsyR3H5sz7bZxxzEgdEkVgjNohL8Ba0tbGelWZE3s7fC4W
+	 V3lYPny3qbUpFA9y4B5lC2AlbPFkoWa+EGno70Ap37HvAYC7M4WecBpHKskyxvHQMm
+	 ZVBCTRE1BfY/c8vPiSsdD0jHnWwZ6IwLWTp0g0TX68q/rBY9ArCsbbzb2vUXTNpFmO
+	 OgPgi5b/ro5KY6G5a33DO7yLI+P9x/pZw+6JGbJrm1fRDfE3imdyIeLiVu+w0bk/bL
+	 QoQGN975JO2JQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 59E6AC53BC5; Sat, 10 Jan 2026 19:33:25 +0000 (UTC)
+	id 23A9FC4160E; Sat, 10 Jan 2026 20:03:08 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: kvm@vger.kernel.org
-Subject: [Bug 220963] New: nSVM: missing unmap in nested_svm_vmrun()
-Date: Sat, 10 Jan 2026 19:33:25 +0000
+Subject: [Bug 220964] New: nSVM: missing sanity checks in svm_leave_smm()
+Date: Sat, 10 Jan 2026 20:03:07 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: new
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -61,7 +61,7 @@ X-Bugzilla-Flags:
 X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
  op_sys bug_status bug_severity priority component assigned_to reporter
  cf_regression
-Message-ID: <bug-220963-28872@https.bugzilla.kernel.org/>
+Message-ID: <bug-220964-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -73,10 +73,10 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D220963
+https://bugzilla.kernel.org/show_bug.cgi?id=3D220964
 
-            Bug ID: 220963
-           Summary: nSVM: missing unmap in nested_svm_vmrun()
+            Bug ID: 220964
+           Summary: nSVM: missing sanity checks in svm_leave_smm()
            Product: Virtualization
            Version: unspecified
           Hardware: AMD
@@ -89,14 +89,27 @@ https://bugzilla.kernel.org/show_bug.cgi?id=3D220963
           Reporter: max@m00nbsd.net
         Regression: No
 
-In nested_svm_vmrun():
+In svm_leave_smm():
 
-    ret =3D kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
+    svm_copy_vmrun_state(&svm->vmcb01.ptr->save, map_save.hva + 0x400);
 ...
-    if (WARN_ON_ONCE(!svm->nested.initialized))
-        return -EINVAL;
+    nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
+    nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
+    ret =3D enter_svm_guest_mode(vcpu, smram64->svm_guest_vmcb_gpa, vmcb12,
+false);
 
-A call to kvm_vcpu_unmap() is missing before the return.
+map_save.hva and vmcb12 are guest mappings, but there is no sanity check
+performed on the copied control/save areas. It seems that this allows the g=
+uest
+to modify restricted values (intercepts, EFER, CR4) and gain access to CPU
+features the host may not support or expose.
+
+nested_copy_vmcb_control_to_cache() and nested_vmcb_check_controls() ought =
+to
+be combined into one function, same with nested_copy_vmcb_save_to_cache() a=
+nd
+nested_vmcb_check_save(), to eliminate the risk that a copy is made without
+sanity check.
 
 --=20
 You may reply to this email to add a comment.
