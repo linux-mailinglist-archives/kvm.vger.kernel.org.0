@@ -1,327 +1,120 @@
-Return-Path: <kvm+bounces-67675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04835D0FDDE
-	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 22:00:01 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 653F7D1009C
+	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 23:14:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E126F303F9AE
-	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 20:59:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B2B7A302D8AE
+	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 22:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A732F263F5E;
-	Sun, 11 Jan 2026 20:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C79F42D46C0;
+	Sun, 11 Jan 2026 22:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JtG3kzGY"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="C8lsg9Ft"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3547624DD1F;
-	Sun, 11 Jan 2026 20:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41A2289358
+	for <kvm@vger.kernel.org>; Sun, 11 Jan 2026 22:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768165154; cv=none; b=C0FTmOR/WircpzJuyDHQemUnAze07rlRInu/eESp9He+aGC1x5eo764Jag7gwH0mcHKKqHYWDVmV71DAdJbXuf/mPnVlA6q38n47rgPlclsOb9WKdRl9fCZtypMM72nv6FLfGSv0OVgbjt0DAf0iX46maON1i05YrV9+mPIcqi0=
+	t=1768169684; cv=none; b=Iq8lX2g5hJ0/IXHfVbqRqdYH939wrPUaVdg6xVLLdViEfjgHYQXAz5LPFFOt1se0dK/Oi5IxyGGVOzIzxxBHe4o63p8kEXmZPNW7mwhMbrkVW9V9so0UmGgtbcrtwyf0gPE+8RuiQaguBwFgtH+6Z3sfBZaQWfZbvP7aC18mS4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768165154; c=relaxed/simple;
-	bh=s1T9vuao+kXccuTcOMDTHHq+bj2twItjHB4YXvJcFdM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ula7+9ZRv+a0BH6DGtCPWHQQKRe4KmYNDBkhO7yoagu6VZPh12lMG+fhOfdBlb+Ycg6oF3N/jeFgozKIx5R2s19gIcMVtRrwv1/1muALpWDFsbVz1VGIV/PVoX3x5jDQRlD97fFkKeaxTve30jqrEIsY+J36MPeAABTfia9N2I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JtG3kzGY; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768165154; x=1799701154;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=s1T9vuao+kXccuTcOMDTHHq+bj2twItjHB4YXvJcFdM=;
-  b=JtG3kzGYXmq0jFZA5nRp6BiA0lll/Fbo53OMPwvEoQQGZ4aG9u3h7jx6
-   aljVpAMa1G3hgbk7yim4g8dX7XJ6na7qvn8d4RWQi9SzVbvU0tcWLYDmf
-   eNN7pEd1z6995kPBryjBHNXgdey0HhpyK4JnOehyaSATq/NY+SWxfupJm
-   SZaEdJtte3pOKudD7VVWVBmBCjTbAgR1ucmwVev92cYaRDjHrfHwIA9Zd
-   lyktn8vbVNSI0UgiH/UWk1KNRNmAijESaKOW7vCvQq/TMiX3v/mIu46Qg
-   d+kYm1TFxp7yj3kJ/V5jwSVDUK584B+hl2UC9ZO/BmEo2aNUvGAuxbo/w
-   Q==;
-X-CSE-ConnectionGUID: s0vkVV1OTrOJ61LxYWUNsA==
-X-CSE-MsgGUID: 2GUEF3oeQnifolr9NeQ+Uw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11668"; a="80904678"
-X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
-   d="scan'208";a="80904678"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2026 12:59:12 -0800
-X-CSE-ConnectionGUID: x5hfc93rT7yYrL+IWOJYbg==
-X-CSE-MsgGUID: YcOO9Gc2RRmD+fYdz8alfw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
-   d="scan'208";a="208419956"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO fdugast-desk.home) ([10.245.245.11])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2026 12:59:04 -0800
-From: Francois Dugast <francois.dugast@intel.com>
-To: intel-xe@lists.freedesktop.org
-Cc: dri-devel@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	Zi Yan <ziy@nvidia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Balbir Singh <balbirs@nvidia.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org,
-	nouveau@lists.freedesktop.org,
-	linux-pci@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-cxl@vger.kernel.org,
-	Francois Dugast <francois.dugast@intel.com>
-Subject: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free callback
-Date: Sun, 11 Jan 2026 21:55:40 +0100
-Message-ID: <20260111205820.830410-2-francois.dugast@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260111205820.830410-1-francois.dugast@intel.com>
-References: <20260111205820.830410-1-francois.dugast@intel.com>
+	s=arc-20240116; t=1768169684; c=relaxed/simple;
+	bh=rHiryJM7d29n7Ir5Iumqlnov61xpCgGo0ADph/D20A8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m0mdCrK7s82MkMwldfdkKznYXUCKww/bRWpCn8Etuic/D0ZqXD9BFlE+wbARl8qtCBl4eI6bZeRXSKHgy1DRCTjprjZO38zdoy1cXmLcitIokWyJBOLLejl7CHaNbZqYSPNTqiwehH3rtAruGcfDL+aqzf4c1o3+N+LDQttPLrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=C8lsg9Ft; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-8c0d16bb24dso553019685a.0
+        for <kvm@vger.kernel.org>; Sun, 11 Jan 2026 14:14:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1768169681; x=1768774481; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rHiryJM7d29n7Ir5Iumqlnov61xpCgGo0ADph/D20A8=;
+        b=C8lsg9FtfxlbBLSrRiLLwdQs5WXWbqMBmOC6bccWYim5M7OkJbiaI0+bf0HzTDNnTl
+         cPqu4Zm1ZjBcErgLSNGrlnHW9qvRcbN2qblkBdnm0Js+Y4MrhpDOX+INQUFc01Vpax52
+         XeefgViK/WjC/9Pkw0oj8QJjfgm3Ku4qePg77VeF6DVVDB2zasQTiAMPSGYYxs/gpWUZ
+         w3BQQqA1Q8358cM7qUYI2f7vY2aQ47ZcoDVYv3VZ0VEQ77myUpUFaRRHeLY046jQ5UL7
+         AnVK0jsZanVV18m5N1daj7/rQqcU/8BZ9eZNC3Ng7CCFzTo6lyKLGlUhynxoHu+lF8ek
+         SKKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768169681; x=1768774481;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rHiryJM7d29n7Ir5Iumqlnov61xpCgGo0ADph/D20A8=;
+        b=TIpdUBa+6VP0E04UUu6lfvZ39PYvw6k7oKXJ6GKxLL9JkBq+px1si/u3ogxA78TH+C
+         XkAFWo+BVANx7Yw9eW16oDxY7Vl9L1nYzAnTWxDewV+0bhM6Sje8gmh4a1G50tkC63CN
+         wP3f538CqS4WDAsnlJWZcXZE4G6pqun24ALK1UbiUKyh/LOWJIQ/1wnXkFiFpVbimBMY
+         lOkegkijF1j5WCXb6QKw+PzeYqb+2umoHWCq5Sk/rtehkPj2mKDBvAa5UMYnrh1NFkhm
+         UJWXwctzthZ8LQXEBEq8g9Fjv6quZkgZp2j0fRDdIDAJ4Fu2xLxvYlPic/lgyOVz87d/
+         7LxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1PmB/+gH0ft2292sIF7+n1A4quhY7qoBX0lznI0oG9NFgl8Kv+u5pPQttQG8EQgv0yjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAQ0F1CqX3pN/3iXPF/FLCbk6mz40vp3oqwMc81iLKo4HFxw80
+	eYWkTufoKt+ge8eJBiislTHg99Tm8IVwFq6V2fy7b+OToRZ3rvN+YVl8mvrK/XyRyAM=
+X-Gm-Gg: AY/fxX6ZkV3VDb7lm9tD7vcSaOJXzQAP8YElyhO99HKBQK9UZA0AuBX7DNZXEjmiQ3j
+	xEyciWjyG3NU7NK2Igtyv4VZHxx5nggeHaIyhGv1koa31ONWAjvapq12B2kI96464NMjb8RO9Y/
+	0iDUihuAKbKCngcIHN3CF4LaDMOJSR77G+iOiDF3vVqIm1IqYqkIF5nyZ0DCEoOjpQIv9WvWbyV
+	uoqIipphM37gDjC1gAikRknPXKnm+Gdtldpfgwz6Qs7ooyDeIKTa0zM9AuyZksHcAvk87FU7jli
+	4UIsFhwxcUspAyVx3zMYbnPFOLpc+q7xCVcn/V7KZFf8EWxCfG51YUxEIaYIUGeF86436NMkQs8
+	3Y+uzdmQ+gXwhfUSVpwcYyWkpDiBEkm1WAIR9LgrKJLfm95BOycPo8iUsirc674Xr1+riZVBhRp
+	SAX1xq/8S8JuAMGmPe1NCdNTYonqDb4foRgOU7jKbi2s+JcfQzkuk7ZA6b3yYVOhGRZ+WaQmz55
+	qXEmbwqYiyqaf3o
+X-Google-Smtp-Source: AGHT+IHNj93eZH1ynTU8daiu8l11Esrxq9PJGGVD0zEpnE5HUdS0s6ZkqCQ6JfdxMxeReo3KOm+E4w==
+X-Received: by 2002:a05:620a:1710:b0:8a0:fb41:7f3c with SMTP id af79cd13be357-8c389383f76mr2218905785a.27.1768169681510;
+        Sun, 11 Jan 2026 14:14:41 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c38a9244bdsm1117335285a.3.2026.01.11.14.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Jan 2026 14:14:40 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vf3ho-00000003Kpj-0I67;
+	Sun, 11 Jan 2026 18:14:40 -0400
+Date: Sun, 11 Jan 2026 18:14:40 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	David Matlack <dmatlack@google.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>,
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Parav Pandit <parav@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>
+Subject: Re: [PATCH 0/3] iommu/vt-d: Add support to hitless replace IOMMU
+ domain
+Message-ID: <20260111221440.GA745888@ziepe.ca>
+References: <20260107201800.2486137-1-skhawaja@google.com>
+ <20260107202812.GD340082@ziepe.ca>
+ <20260107204607.GE340082@ziepe.ca>
+ <CAAywjhTEyOUmxWeCX6GwCBSnMf-p18Ksu2TUYeQ57K8H4RW-9w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAywjhTEyOUmxWeCX6GwCBSnMf-p18Ksu2TUYeQ57K8H4RW-9w@mail.gmail.com>
 
-From: Matthew Brost <matthew.brost@intel.com>
+> Thank you for the feedback. I will prepare a v2 series addressing these points.
 
-The core MM splits the folio before calling folio_free, restoring the
-zone pages associated with the folio to an initialized state (e.g.,
-non-compound, pgmap valid, etc...). The order argument represents the
-folio’s order prior to the split which can be used driver side to know
-how many pages are being freed.
+I think there are so many problems here you should talk to Kevin and
+Baolu to come up with some plan. A single series is not going to be
+able to do all of this.
 
-Fixes: 3a5a06554566 ("mm/zone_device: rename page_free callback to folio_free")
-Cc: Zi Yan <ziy@nvidia.com>
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Felix Kuehling <Felix.Kuehling@amd.com>
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: "Christian König" <christian.koenig@amd.com>
-Cc: David Airlie <airlied@gmail.com>
-Cc: Simona Vetter <simona@ffwll.ch>
-Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-Cc: Maxime Ripard <mripard@kernel.org>
-Cc: Thomas Zimmermann <tzimmermann@suse.de>
-Cc: Lyude Paul <lyude@redhat.com>
-Cc: Danilo Krummrich <dakr@kernel.org>
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Logan Gunthorpe <logang@deltatee.com>
-Cc: David Hildenbrand <david@kernel.org>
-Cc: Oscar Salvador <osalvador@suse.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Leon Romanovsky <leon@kernel.org>
-Cc: Balbir Singh <balbirs@nvidia.com>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-Cc: Liam R. Howlett <Liam.Howlett@oracle.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>
-Cc: Mike Rapoport <rppt@kernel.org>
-Cc: Suren Baghdasaryan <surenb@google.com>
-Cc: Michal Hocko <mhocko@suse.com>
-Cc: Alistair Popple <apopple@nvidia.com>
-Cc: linuxppc-dev@lists.ozlabs.org
-Cc: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: amd-gfx@lists.freedesktop.org
-Cc: dri-devel@lists.freedesktop.org
-Cc: nouveau@lists.freedesktop.org
-Cc: linux-pci@vger.kernel.org
-Cc: linux-mm@kvack.org
-Cc: linux-cxl@vger.kernel.org
-Signed-off-by: Matthew Brost <matthew.brost@intel.com>
-Signed-off-by: Francois Dugast <francois.dugast@intel.com>
----
- arch/powerpc/kvm/book3s_hv_uvmem.c       | 2 +-
- drivers/gpu/drm/amd/amdkfd/kfd_migrate.c | 2 +-
- drivers/gpu/drm/drm_pagemap.c            | 3 ++-
- drivers/gpu/drm/nouveau/nouveau_dmem.c   | 4 ++--
- drivers/pci/p2pdma.c                     | 2 +-
- include/linux/memremap.h                 | 7 ++++++-
- lib/test_hmm.c                           | 4 +---
- mm/memremap.c                            | 5 +++--
- 8 files changed, 17 insertions(+), 12 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index e5000bef90f2..b58f34eec6e5 100644
---- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-+++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -1014,7 +1014,7 @@ static vm_fault_t kvmppc_uvmem_migrate_to_ram(struct vm_fault *vmf)
-  * to a normal PFN during H_SVM_PAGE_OUT.
-  * Gets called with kvm->arch.uvmem_lock held.
-  */
--static void kvmppc_uvmem_folio_free(struct folio *folio)
-+static void kvmppc_uvmem_folio_free(struct folio *folio, unsigned int order)
- {
- 	struct page *page = &folio->page;
- 	unsigned long pfn = page_to_pfn(page) -
-diff --git a/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c b/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c
-index af53e796ea1b..a26e3c448e47 100644
---- a/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c
-+++ b/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c
-@@ -567,7 +567,7 @@ svm_migrate_ram_to_vram(struct svm_range *prange, uint32_t best_loc,
- 	return r < 0 ? r : 0;
- }
- 
--static void svm_migrate_folio_free(struct folio *folio)
-+static void svm_migrate_folio_free(struct folio *folio, unsigned int order)
- {
- 	struct page *page = &folio->page;
- 	struct svm_range_bo *svm_bo = page->zone_device_data;
-diff --git a/drivers/gpu/drm/drm_pagemap.c b/drivers/gpu/drm/drm_pagemap.c
-index 03ee39a761a4..df253b13cf85 100644
---- a/drivers/gpu/drm/drm_pagemap.c
-+++ b/drivers/gpu/drm/drm_pagemap.c
-@@ -1144,11 +1144,12 @@ static int __drm_pagemap_migrate_to_ram(struct vm_area_struct *vas,
- /**
-  * drm_pagemap_folio_free() - Put GPU SVM zone device data associated with a folio
-  * @folio: Pointer to the folio
-+ * @order: Order of the folio prior to being split by core MM
-  *
-  * This function is a callback used to put the GPU SVM zone device data
-  * associated with a page when it is being released.
-  */
--static void drm_pagemap_folio_free(struct folio *folio)
-+static void drm_pagemap_folio_free(struct folio *folio, unsigned int order)
- {
- 	drm_pagemap_zdd_put(folio->page.zone_device_data);
- }
-diff --git a/drivers/gpu/drm/nouveau/nouveau_dmem.c b/drivers/gpu/drm/nouveau/nouveau_dmem.c
-index 58071652679d..545f316fca14 100644
---- a/drivers/gpu/drm/nouveau/nouveau_dmem.c
-+++ b/drivers/gpu/drm/nouveau/nouveau_dmem.c
-@@ -115,14 +115,14 @@ unsigned long nouveau_dmem_page_addr(struct page *page)
- 	return chunk->bo->offset + off;
- }
- 
--static void nouveau_dmem_folio_free(struct folio *folio)
-+static void nouveau_dmem_folio_free(struct folio *folio, unsigned int order)
- {
- 	struct page *page = &folio->page;
- 	struct nouveau_dmem_chunk *chunk = nouveau_page_to_chunk(page);
- 	struct nouveau_dmem *dmem = chunk->drm->dmem;
- 
- 	spin_lock(&dmem->lock);
--	if (folio_order(folio)) {
-+	if (order) {
- 		page->zone_device_data = dmem->free_folios;
- 		dmem->free_folios = folio;
- 	} else {
-diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index 4a2fc7ab42c3..a6fa7610f8a8 100644
---- a/drivers/pci/p2pdma.c
-+++ b/drivers/pci/p2pdma.c
-@@ -200,7 +200,7 @@ static const struct attribute_group p2pmem_group = {
- 	.name = "p2pmem",
- };
- 
--static void p2pdma_folio_free(struct folio *folio)
-+static void p2pdma_folio_free(struct folio *folio, unsigned int order)
- {
- 	struct page *page = &folio->page;
- 	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page_pgmap(page));
-diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-index 713ec0435b48..97fcffeb1c1e 100644
---- a/include/linux/memremap.h
-+++ b/include/linux/memremap.h
-@@ -79,8 +79,13 @@ struct dev_pagemap_ops {
- 	 * Called once the folio refcount reaches 0.  The reference count will be
- 	 * reset to one by the core code after the method is called to prepare
- 	 * for handing out the folio again.
-+	 *
-+	 * The core MM splits the folio before calling folio_free, restoring the
-+	 * zone pages associated with the folio to an initialized state (e.g.,
-+	 * non-compound, pgmap valid, etc...). The order argument represents the
-+	 * folio’s order prior to the split.
- 	 */
--	void (*folio_free)(struct folio *folio);
-+	void (*folio_free)(struct folio *folio, unsigned int order);
- 
- 	/*
- 	 * Used for private (un-addressable) device memory only.  Must migrate
-diff --git a/lib/test_hmm.c b/lib/test_hmm.c
-index 8af169d3873a..e17c71d02a3a 100644
---- a/lib/test_hmm.c
-+++ b/lib/test_hmm.c
-@@ -1580,13 +1580,11 @@ static const struct file_operations dmirror_fops = {
- 	.owner		= THIS_MODULE,
- };
- 
--static void dmirror_devmem_free(struct folio *folio)
-+static void dmirror_devmem_free(struct folio *folio, unsigned int order)
- {
- 	struct page *page = &folio->page;
- 	struct page *rpage = BACKING_PAGE(page);
- 	struct dmirror_device *mdevice;
--	struct folio *rfolio = page_folio(rpage);
--	unsigned int order = folio_order(rfolio);
- 
- 	if (rpage != page) {
- 		if (order)
-diff --git a/mm/memremap.c b/mm/memremap.c
-index 63c6ab4fdf08..39dc4bd190d0 100644
---- a/mm/memremap.c
-+++ b/mm/memremap.c
-@@ -417,6 +417,7 @@ void free_zone_device_folio(struct folio *folio)
- {
- 	struct dev_pagemap *pgmap = folio->pgmap;
- 	unsigned long nr = folio_nr_pages(folio);
-+	unsigned int order = folio_order(folio);
- 	int i;
- 
- 	if (WARN_ON_ONCE(!pgmap))
-@@ -453,7 +454,7 @@ void free_zone_device_folio(struct folio *folio)
- 	case MEMORY_DEVICE_COHERENT:
- 		if (WARN_ON_ONCE(!pgmap->ops || !pgmap->ops->folio_free))
- 			break;
--		pgmap->ops->folio_free(folio);
-+		pgmap->ops->folio_free(folio, order);
- 		percpu_ref_put_many(&folio->pgmap->ref, nr);
- 		break;
- 
-@@ -472,7 +473,7 @@ void free_zone_device_folio(struct folio *folio)
- 	case MEMORY_DEVICE_PCI_P2PDMA:
- 		if (WARN_ON_ONCE(!pgmap->ops || !pgmap->ops->folio_free))
- 			break;
--		pgmap->ops->folio_free(folio);
-+		pgmap->ops->folio_free(folio, order);
- 		break;
- 	}
- }
--- 
-2.43.0
-
+Jason
 
