@@ -1,44 +1,44 @@
-Return-Path: <kvm+bounces-67665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67668-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E46D0E9B1
-	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 11:38:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A193FD0E9D9
+	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 11:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 22051300A358
-	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 10:37:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E322305FFD9
+	for <lists+kvm@lfdr.de>; Sun, 11 Jan 2026 10:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36FF334C06;
-	Sun, 11 Jan 2026 10:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2148A3382FE;
+	Sun, 11 Jan 2026 10:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PiXYJHFl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYaAAEaP"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042A8334C1F;
-	Sun, 11 Jan 2026 10:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6CA336EC7;
+	Sun, 11 Jan 2026 10:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768127844; cv=none; b=EjutusShA9ZERKGT10Y5IQKG5IuKkXfxrnFf1EGMPlsj6nVJpY4AGEmPiCJg0Mpl8txWTVjrdf8R6TbwpxAN+8hZHOBNkJdYbRMvlsZL94+2JCF04hJvwBPNWT0oC8gJgA/moqV0vzspqtUAynSohKeFueiEo8injxlmsa1BVGw=
+	t=1768127856; cv=none; b=n5D8wutvXIqUjoGF/Vgitag+Xe2BhrCthJidJP9CVf55mx0YWuDq+YWUNAiIHLpvz6l4Jl1KdumwOnSDFuRxQ3lws02skb8P+hmYb61Xf+6VJp3lTZVqJNcW/Txve8bmUR9YAdyydirnvSdWwCQv//i/eKG1rMA80k4fdAP+680=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768127844; c=relaxed/simple;
-	bh=bVMuAERSBlKdzhLxVaQlP3hzLMvLvZAcJTcCJIC68T8=;
+	s=arc-20240116; t=1768127856; c=relaxed/simple;
+	bh=vKVJahwFDp2BgaIk7FWtQz247pzEh1oOdaEn5cwav6g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gfX3bNkkvI4Nf2QZBekkvkZeU6+xayU32tZwjO3sKcx+0X7UcorwcXqCh6K0h27cWSflvEZnK6/JrhwcGj3s64oNJDKM6gpX+59OHrS2uwAZIcWmGrr4M3zVziZKFJJYpSiDHUM2KkvyyUXqz6Sc+j6OnWHGHwgL/EqYP3ZpTsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PiXYJHFl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 558FFC4CEF7;
-	Sun, 11 Jan 2026 10:37:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dgpBJwWe4hdmCnkt7KOWw6qhs8jZpM29k6bu6JNNUjOoShpDsB1DwW4bLiZL63hl2Rz4ZsEHKVGV/B4cuR4FKww+zzDltpEF7wJtAaSnFfGwtfaXso+zSeweiYr993PzHuavOEGAQWi/rxuRbe5s6BSCBsGnDp8+UPksxunWS7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYaAAEaP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581CCC19423;
+	Sun, 11 Jan 2026 10:37:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768127843;
-	bh=bVMuAERSBlKdzhLxVaQlP3hzLMvLvZAcJTcCJIC68T8=;
+	s=k20201202; t=1768127855;
+	bh=vKVJahwFDp2BgaIk7FWtQz247pzEh1oOdaEn5cwav6g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PiXYJHFlcIoC/JoZ3ceH4yWSeLVsDm8VlgrAF92ZCEZxttSm9JnrPYWffKu4e/rvF
-	 0e1BR1toZVAHOc0NxeaZQtlKIWYDLkjYlQxpd+XHLGAQG7CC0Gkvevxh5V7S2esfVQ
-	 VjESTxhMJdrw9rMKLkziQuuROWp4fDnP+cnF6i8y620MbZcvk5koKkbbpN4GAiijfK
-	 jqNfg0dv1ncnpPlC7kpKAfz1xdZ+0wgQC38s1ynVTcSU4BIrJI0z6Fg9RXDmAx7xnj
-	 vdZgkO86I1XvaAerLFBFYAsQ5o9pxWSgREEfAMHGhUaof748wCuF0DJ2HNeACb5iLG
-	 JhZC5kzgmjb3g==
+	b=eYaAAEaPsCa1kqPN5BEZNCK+/0r801KkCRoagdgFGgTu/MPFWYrWFsb6P8kJdHfdv
+	 OWnIq4rhH6DvN/5hmUU8DxZS4aTKYm9KUiEKE5vtDEQz4A9xH+wJkCLVoqOUWr/Lx1
+	 fM5k3prC+f3spxNqGYmpqPWELXaF/TNm7MtAY9SHlWijhuUcWm4+RMKQVjgXEW78U+
+	 3aCbkQDz2qFSLte+JLouW22VDt/ZxquxvaJuwTKrsN4A50UTg023gMO1GgBO7+UvYB
+	 7S3BVmDmmmDvr7n5VN3BgaptpNjylBWo3U1qPBcdNDO1p/L4eDJjJvnjPidlgCEWfc
+	 Z0xUNukhUxIIA==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jason Gunthorpe <jgg@ziepe.ca>,
 	Leon Romanovsky <leon@kernel.org>,
@@ -56,9 +56,9 @@ Cc: linux-rdma@vger.kernel.org,
 	linaro-mm-sig@lists.linaro.org,
 	kvm@vger.kernel.org,
 	iommu@lists.linux.dev
-Subject: [PATCH 1/4] dma-buf: Introduce revoke semantics
-Date: Sun, 11 Jan 2026 12:37:08 +0200
-Message-ID: <20260111-dmabuf-revoke-v1-1-fb4bcc8c259b@nvidia.com>
+Subject: [PATCH 2/4] vfio: Use dma-buf revoke semantics
+Date: Sun, 11 Jan 2026 12:37:09 +0200
+Message-ID: <20260111-dmabuf-revoke-v1-2-fb4bcc8c259b@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvidia.com>
 References: <20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvidia.com>
@@ -74,177 +74,111 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Add a dma-buf revoke mechanism that allows an exporter to explicitly
-invalidate ("kill") a shared buffer after it has been handed out to
-importers. Once revoked, all further CPU and device access is blocked, and
-importers consistently observe failure.
-
-This requires both importers and exporters to honor the revoke contract.
-For importers, this means no page faults are delivered after the buffer is
-invalidated. For exporters, the dma-buf core prevents attaching new
-importers and remapping existing ones once revocation has occurred.
-
-The proposed mechanism allows binding importers that do not require revoke
-support, and they shall continue using the existing .move_notify() API.
-However, importers that cannot handle page faults to remap buffers will
-fail to bind to exporters that do not support revoke.
+Remove open-code variant of revoked semantics and reuse existing
+dma_buf_move_notify() and newly introduced dma_buf_mark_valid()
+primitives.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/dma-buf/dma-buf.c | 36 ++++++++++++++++++++++++++++++++----
- include/linux/dma-buf.h   | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+), 4 deletions(-)
+ drivers/vfio/pci/vfio_pci_dmabuf.c | 27 ++++++---------------------
+ 1 file changed, 6 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-index edaa9e4ee4ae..4d31fba792ee 100644
---- a/drivers/dma-buf/dma-buf.c
-+++ b/drivers/dma-buf/dma-buf.c
-@@ -697,6 +697,9 @@ struct dma_buf *dma_buf_export(const struct dma_buf_export_info *exp_info)
- 	if (WARN_ON(!exp_info->ops->pin != !exp_info->ops->unpin))
- 		return ERR_PTR(-EINVAL);
+diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+index d4d0f7d08c53..d953bd4cd118 100644
+--- a/drivers/vfio/pci/vfio_pci_dmabuf.c
++++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+@@ -17,20 +17,14 @@ struct vfio_pci_dma_buf {
+ 	struct dma_buf_phys_vec *phys_vec;
+ 	struct p2pdma_provider *provider;
+ 	u32 nr_ranges;
+-	u8 revoked : 1;
+ };
  
-+	if (WARN_ON(exp_info->revoke_semantics && exp_info->ops->pin))
-+		return ERR_PTR(-EINVAL);
-+
- 	if (!try_module_get(exp_info->owner))
- 		return ERR_PTR(-ENOENT);
+ static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
+ 				   struct dma_buf_attachment *attachment)
+ {
+-	struct vfio_pci_dma_buf *priv = dmabuf->priv;
+-
+ 	if (!attachment->peer2peer)
+ 		return -EOPNOTSUPP;
  
-@@ -727,6 +730,7 @@ struct dma_buf *dma_buf_export(const struct dma_buf_export_info *exp_info)
- 	dmabuf->cb_in.poll = dmabuf->cb_out.poll = &dmabuf->poll;
- 	dmabuf->cb_in.active = dmabuf->cb_out.active = 0;
- 	INIT_LIST_HEAD(&dmabuf->attachments);
-+	dmabuf->revoke_semantics = exp_info->revoke_semantics;
- 
- 	if (!resv) {
- 		dmabuf->resv = (struct dma_resv *)&dmabuf[1];
-@@ -948,8 +952,21 @@ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
- 	if (WARN_ON(!dmabuf || !dev))
- 		return ERR_PTR(-EINVAL);
- 
--	if (WARN_ON(importer_ops && !importer_ops->move_notify))
--		return ERR_PTR(-EINVAL);
-+	if (dmabuf->invalidate)
-+		return ERR_PTR(-ENODEV);
-+
-+	if (importer_ops) {
-+		if (WARN_ON(!importer_ops->move_notify &&
-+			    !importer_ops->revoke_notify))
-+			return ERR_PTR(-EINVAL);
-+
-+		if (WARN_ON(importer_ops->move_notify &&
-+			    importer_ops->revoke_notify))
-+			return ERR_PTR(-EINVAL);
-+
-+		if (!dmabuf->revoke_semantics && importer_ops->revoke_notify)
-+			return ERR_PTR(-EINVAL);
-+	}
- 
- 	attach = kzalloc(sizeof(*attach), GFP_KERNEL);
- 	if (!attach)
-@@ -1102,6 +1119,9 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *attach,
- 	if (WARN_ON(!attach || !attach->dmabuf))
- 		return ERR_PTR(-EINVAL);
- 
-+	if (attach->dmabuf->invalidate)
-+		return ERR_PTR(-ENODEV);
-+
- 	dma_resv_assert_held(attach->dmabuf->resv);
- 
- 	if (dma_buf_pin_on_map(attach)) {
-@@ -1261,8 +1281,16 @@ void dma_buf_move_notify(struct dma_buf *dmabuf)
- 	dma_resv_assert_held(dmabuf->resv);
- 
- 	list_for_each_entry(attach, &dmabuf->attachments, node)
--		if (attach->importer_ops)
--			attach->importer_ops->move_notify(attach);
-+		if (attach->importer_ops) {
-+			if (attach->importer_ops->move_notify)
-+				attach->importer_ops->move_notify(attach);
-+
-+			if (attach->importer_ops->revoke_notify)
-+				attach->importer_ops->revoke_notify(attach);
-+		}
-+
-+	if (dmabuf->revoke_semantics)
-+		dmabuf->invalidate = true;
+-	if (priv->revoked)
+-		return -ENODEV;
+-
+ 	return 0;
  }
- EXPORT_SYMBOL_NS_GPL(dma_buf_move_notify, "DMA_BUF");
  
-diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-index 0bc492090237..e198ee490151 100644
---- a/include/linux/dma-buf.h
-+++ b/include/linux/dma-buf.h
-@@ -23,6 +23,7 @@
- #include <linux/dma-fence.h>
- #include <linux/wait.h>
- #include <linux/pci-p2pdma.h>
-+#include <linux/dma-resv.h>
+@@ -42,9 +36,6 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
  
- struct device;
- struct dma_buf;
-@@ -441,6 +442,15 @@ struct dma_buf {
- 		struct dma_buf *dmabuf;
- 	} *sysfs_entry;
- #endif
-+	/**
-+	 * @revoke_semantics:
-+	 *
-+	 * This exporter implements revoke semantics.
-+	 */
-+	bool revoke_semantics;
-+
-+	/** @invalidate: this buffer was revoked and invalidated */
-+	bool invalidate;
- };
+ 	dma_resv_assert_held(priv->dmabuf->resv);
  
- /**
-@@ -476,6 +486,18 @@ struct dma_buf_attach_ops {
- 	 * point to the new location of the DMA-buf.
- 	 */
- 	void (*move_notify)(struct dma_buf_attachment *attach);
-+
-+	/**
-+	 * @revoke_notify: [optional] notification that the DMA-buf is revoking
-+	 *
-+	 * If this callback is provided the importer will invildate the mappings.
-+	 *
-+	 * This callback is called with the lock of the reservation object
-+	 * associated with the dma_buf held.
-+	 *
-+	 * New mappings shouldn't be created after this callback returns.
-+	 */
-+	void (*revoke_notify)(struct dma_buf_attachment *attach);
- };
- 
- /**
-@@ -516,6 +538,7 @@ struct dma_buf_attachment {
-  * @size:	Size of the buffer - invariant over the lifetime of the buffer
-  * @flags:	mode flags for the file
-  * @resv:	reservation-object, NULL to allocate default one
-+ * @revoke_semantics: support revoke semantics
-  * @priv:	Attach private data of allocator to this buffer
+-	if (priv->revoked)
+-		return ERR_PTR(-ENODEV);
+-
+ 	return dma_buf_phys_vec_to_sgt(attachment, priv->provider,
+ 				       priv->phys_vec, priv->nr_ranges,
+ 				       priv->size, dir);
+@@ -90,8 +81,6 @@ static const struct dma_buf_ops vfio_pci_dmabuf_ops = {
   *
-  * This structure holds the information required to export the buffer. Used
-@@ -528,6 +551,7 @@ struct dma_buf_export_info {
- 	size_t size;
- 	int flags;
- 	struct dma_resv *resv;
-+	bool revoke_semantics;
- 	void *priv;
- };
+  * If this function succeeds the following are true:
+  *  - There is one physical range and it is pointing to MMIO
+- *  - When move_notify is called it means revoke, not move, vfio_dma_buf_map
+- *    will fail if it is currently revoked
+  */
+ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
+ 				 struct dma_buf_phys_vec *phys)
+@@ -104,9 +93,6 @@ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
+ 		return -EOPNOTSUPP;
  
-@@ -620,4 +644,11 @@ int dma_buf_vmap_unlocked(struct dma_buf *dmabuf, struct iosys_map *map);
- void dma_buf_vunmap_unlocked(struct dma_buf *dmabuf, struct iosys_map *map);
- struct dma_buf *dma_buf_iter_begin(void);
- struct dma_buf *dma_buf_iter_next(struct dma_buf *dmbuf);
-+
-+static inline void dma_buf_mark_valid(struct dma_buf *dma_buf)
-+{
-+	dma_resv_assert_held(dma_buf->resv);
-+
-+	dma_buf->invalidate = false;
-+}
- #endif /* __DMA_BUF_H__ */
+ 	priv = attachment->dmabuf->priv;
+-	if (priv->revoked)
+-		return -ENODEV;
+-
+ 	/* More than one range to iommufd will require proper DMABUF support */
+ 	if (priv->nr_ranges != 1)
+ 		return -EOPNOTSUPP;
+@@ -268,6 +254,7 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+ 	exp_info.size = priv->size;
+ 	exp_info.flags = get_dma_buf.open_flags;
+ 	exp_info.priv = priv;
++	exp_info.revoke_semantics = true;
+ 
+ 	priv->dmabuf = dma_buf_export(&exp_info);
+ 	if (IS_ERR(priv->dmabuf)) {
+@@ -279,7 +266,6 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+ 	INIT_LIST_HEAD(&priv->dmabufs_elm);
+ 	down_write(&vdev->memory_lock);
+ 	dma_resv_lock(priv->dmabuf->resv, NULL);
+-	priv->revoked = !__vfio_pci_memory_enabled(vdev);
+ 	list_add_tail(&priv->dmabufs_elm, &vdev->dmabufs);
+ 	dma_resv_unlock(priv->dmabuf->resv);
+ 	up_write(&vdev->memory_lock);
+@@ -317,12 +303,12 @@ void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
+ 		if (!get_file_active(&priv->dmabuf->file))
+ 			continue;
+ 
+-		if (priv->revoked != revoked) {
+-			dma_resv_lock(priv->dmabuf->resv, NULL);
+-			priv->revoked = revoked;
++		dma_resv_lock(priv->dmabuf->resv, NULL);
++		if (revoked)
+ 			dma_buf_move_notify(priv->dmabuf);
+-			dma_resv_unlock(priv->dmabuf->resv);
+-		}
++		else
++			dma_buf_mark_valid(priv->dmabuf);
++		dma_resv_unlock(priv->dmabuf->resv);
+ 		fput(priv->dmabuf->file);
+ 	}
+ }
+@@ -340,7 +326,6 @@ void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev)
+ 		dma_resv_lock(priv->dmabuf->resv, NULL);
+ 		list_del_init(&priv->dmabufs_elm);
+ 		priv->vdev = NULL;
+-		priv->revoked = true;
+ 		dma_buf_move_notify(priv->dmabuf);
+ 		dma_resv_unlock(priv->dmabuf->resv);
+ 		vfio_device_put_registration(&vdev->vdev);
 
 -- 
 2.52.0
