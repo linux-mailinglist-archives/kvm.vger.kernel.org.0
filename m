@@ -1,236 +1,183 @@
-Return-Path: <kvm+bounces-67829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FD8D14DDF
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 20:10:02 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45076D150DE
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 20:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AEAC304569A
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 19:09:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1D1503022C8D
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 19:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCD8313E01;
-	Mon, 12 Jan 2026 19:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570DE31B117;
+	Mon, 12 Jan 2026 19:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U1TkGW3R"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="pMnuPJ9A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364132701CF
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 19:09:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768244965; cv=pass; b=cv2daJNPg0kJSyKoopdwW0qoOd593Opxs2kaxBJedTdqsEqRjy/Vjj8fV5WtyDszlpaPbKQc1FytL3OtjR6QOk3Mo11OxQI5YB2KDx6v7HVMN9QfOtbtZSjoAmku1xw+kFTrYrRTNS3FN/yotnzfPLd0QKazOKvT99uh5MTFH+A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768244965; c=relaxed/simple;
-	bh=xheA9QOjQXvJoAbTTZVMmFI6y8wl+wMqp+t7iExkGCo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pI1u/GNu+5FLM/B5erI3qP+AyT31EcntjgV6+0xdbbhZSYtriBCiImkq3rA7AOMNcc3W2Y6ABQzLWQujTQuoWrMLH5g9dpKP2unKsYtGEFnPQG+wsDqF1plf1C8ml4xsI2MEKthSbY9F2/KvmSXEznP1DKSEyB2j5fKyRXgKOjY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U1TkGW3R; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ffbaaafac4so43571cf.0
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 11:09:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768244962; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bsXMtE+rYb5l6JYv7BuupZD2LkCqXyU6JzwwQGYSwTB1jRNhLmVuDJYlxcXVcxA97E
-         XKD5j+q2KBF0yam/jk+tVi3a0wYcltwVxBx/iocbLDs6MyeZYKLZ/6MouYopP/faA1Jy
-         VjupA29LO/kG7zdPK89KeeaMTPFNgUNDZvyl+7D0ChB7reu5hvhCtcisQtSGE5MC71KG
-         srMtITjFA3farl5GiLTMOY0rkkbd45TguxTmbHYxh4P6wimgpkGlHLAJoeDZZv5YNqsx
-         AFiT8K57YwI/w5kyVnSgmKXQaRowz495pPsfZWU1se0y7SnPR4feHJuCDkix40PQ6VcO
-         vCuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
-        fh=3mM/G6DYzLZulkm9xu/c7cCuyPOu2cqpYExnqepf3RI=;
-        b=gg4PfjPcO1BDvGPsAzKryvGrl2jy4qfsqu/DB6LKEV6RkQ+0RxhspyWNw4fGkfS30x
-         jm0BPJbxCopkVCciqCKFRjN1HIbUH3MlRmKmDKCRgT5qvxW3hVcmawkX14I84LksqEGg
-         RUWKs0yBS+XPYvQn17drYy/EeI8co6wLdNn1de7n4vdTHwC2I0ndWiQsSm1/o63aSdhy
-         wKGleLN8kzm7Iw6tbzGGxamPDhH0ctgGaVxqPRTyJm1C8Cs5SrzaeJMOZzIZigFn9P2Z
-         REqZNraNL4Tpr+o/OsTloQ33ykNXV5921px6PKKqK4uAblNZqy7RTyNx821pobM/kQOB
-         ZLbA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CE02FF65B
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 19:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768246100; cv=none; b=eJKuDNRezgQkfj+AEGJSxNTCpiwM25TdcbnC12011sC169Nfy1Y5t9Wpswz1IcnWtKHHaO+N06up4JPiSK3ETxSy3fmN/U2gck0ER/X/e8JvLTomvpWf9MvZa6VDyAQfcWVbEU6CcQQKFvhm0698wIhYLb7nMxhAp/s071zCCMo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768246100; c=relaxed/simple;
+	bh=shxmX2+HmXmALgYV4I/T+QoVuAHA2Vhig6RTaEDJOds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dzVu2+UgsfXUzLd9dPtN/znyGGscYZKxmm6Hkqv5C0A4r5AbGMb0M6ZfSYv86rbf7PmSJ+iryAVVMUgu/BJLT/EfQlzDsZ8pfwK5toN5WgBGNKNzHCtSe4+RX3DjsOZ+3rYfx8W+MEWko0/5gj3T5kQ2VRbQtWx+BomvBbiDxlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=pMnuPJ9A; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8b2f0f9e4cbso457310985a.0
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 11:28:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768244962; x=1768849762; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
-        b=U1TkGW3R2x+Jm1Pqun+QQoL77XNSM9nOE+Fz+CrfJ93zk0CE7+AJwyG98eqiZmyiej
-         L9KNXhyjWHI5cayiwuTkfCGdFUg7mDGoQcKiKKbskcsjbhY+r10zKCoFmkWjT8DMWPlS
-         rPlU+ORQYeoGommPU8tNnoL6uPjteH3Uz3B3Mj/57WWR6/CNrBfp6hHXQ9P+EFdlAAV6
-         WcsBWaiDdpwin02CD4Zq50j4qZU7/M+QfcguzRufpcImsoCsqAyOSnl9z9OY825EtGaO
-         bb1MwRlr5G2xLxwYbJgx5t61IdQwipA+NrmEfZvfyvIM66HgJRffSjO3mkPBAu0M8zgh
-         vmNw==
+        d=ziepe.ca; s=google; t=1768246098; x=1768850898; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=a9AdLI7uJUYtOYd89GixDifcE7N5970uW2swaB6ncSw=;
+        b=pMnuPJ9A29sI3cWXfL3AcdhcYCbp5QX64v+VQQdObhNgHqPse++jj/lwWWU4Ot/o0L
+         ptMMa5o08J8HeJp0iuLYJu4C+et1bBsiHqAqFIvCnT2jJ4ZG9Z4HFAZolq40731tJgYR
+         GIJiYA09Jj8QTQMUlYp4dBqT3UbEnz1VhJE/IW8MoT9ueNAASvDJmCKaX408UqP9afJv
+         P0EIWDjjT3k7iv+UTZO9m6KL7XquMEtRxKW/ntn/MMdJXSqV2RdUAWGbi+YrvVYqC2qd
+         kZjwAZMSfUaAUrYobELCqUhcNbVnLfioXz93dU43Wtw28vnTyYawjN7aGDGNPkKi+HZ2
+         c/bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768244962; x=1768849762;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
-        b=ZMuEDaC7gJeBS4vbuXun2VgHTdsq2HsXELEVLyTnfsv1kyGjm7GkALxOvbGuLgMwiw
-         iV8gEOJcqsbwJXh2iY7crFCPnnUchLBmpuOHYkbmeu4jhs/LG4f2doiPQORoGq33U+ry
-         pwjeleXY7/3QPEijVjvW49CKGwrRFkLZPCcSgSxG8SCBCq05a4CNLegmjhUP9RqVeiH5
-         EpyK7JWoxeQA0zYawc4JYDPG3F991e/ooDsbH75ECocRiqRIKj0MGTGXaDoGy+OYm0y4
-         E2859SsjfufvwzPMRwOM92UET8nCEPNyi4Zt6+SfNSuvX+cYlgRwsuyUvyvqA41StSoH
-         Sh/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5eY9iTU8btDrKzI+cAsPbTXNTdG5X3ZeRw6twz9W1fBhFqAX0I5Mss/EoPXOUP+vj/QI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiZAFgTuAwCbd9YCicQFBJrsvSsUD4tE1xY8IeJa+xRfrbdG6G
-	hjZt/LLpoXs3LQt8iBDts7LiIKFJ/XiyXqOxR5J8i+IHmg41GmBVfPUTKGCfr94+j9Fjd5iLhML
-	Pk50zdH4putxrssNE0BGyOMmBuPYPeNYQmhQwzd4V
-X-Gm-Gg: AY/fxX6FNsfGxBfLSr65gWrNB6iD3fPpMmoj8Mp4RZR0aKDi6Ju7Ov+UjL+4C3LJWqj
-	4M3gqHfg5MRJ1FhiOvdbI0atpZMkn9ehjtVKoOpcsIPljAHksEFQSkQMnhjbetwrVXpXDJ/iDHe
-	bDh9DYT8tqo35r5j4UH78xgOTnCLeWI2myHi0xqdw/SeaFpg2CTMI16RkymQZQ76iIRwjbG5Px/
-	KlohdVxkKWUNNXRgYyiR+jiHxMjGuwK31hfHIb7yPie7OyPgzcVna6jVOpbQBIkCh+6hNhS
-X-Received: by 2002:ac8:5d42:0:b0:4f1:9c6e:cf1c with SMTP id
- d75a77b69052e-5013a41792cmr752671cf.17.1768244961509; Mon, 12 Jan 2026
- 11:09:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768246098; x=1768850898;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a9AdLI7uJUYtOYd89GixDifcE7N5970uW2swaB6ncSw=;
+        b=oFE/Rub4P46+1dDNmw0srHR1JBcUYhOPzOL3CfiuMtgfjFu8brjrZdYoSQIMwKTfrl
+         XbwxO1Nijn+RTndZ3wrAj/BNmmArMSu17KKPSa19MLRq9yV3ZhkhQpcT/fuAjFGBdfvz
+         16SlbpRgywNoviocaDBf3mojsZZ7GFMZRatKrxd/2+YxhnsVZaXtDGKCHgSWs8rv49wK
+         2KMFvGwSoTcA3RkSBUdfd5OxCjELlkrmJC7gGAG8FhRJKZkAHPHv/sDbeLsAmlzyis6K
+         9itbflcOOu74HuwDYIf5jIVgwsXJachHUV7uarV/4idTDhmqdWTEoj7tKr13YlDU9/in
+         XQZw==
+X-Forwarded-Encrypted: i=1; AJvYcCXi1a2HbPpoiBTxTonxRBd3ouFhdAUcN8e+CPSno/+mRsQw21wLcdllFhXCG1/oGuuZr48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMvOOUcemZUioF1LKDM72oKml5O20iJZMiuCngtdxH3KAxzBJ4
+	qy12Pw9pKa41jA4AI30Vpf1CYQr6HMNdDGpzE/Qil8+lgY1e8I1weu0eL214wvkEnoM=
+X-Gm-Gg: AY/fxX4Yr31nEEuGHlLZU+erOIcWppPTN8Tp4/OYogWNfnlx921KFk3hshjDJZODNzm
+	DI6GFd3rHsKrgS/DgZEyaGMchj+l0EBY7rzjshhZ/k4ijopOXhgVLTQsKPwJlzhW2Wc6/2N9nNq
+	1/YfsDj65YwylO6BcH/b0QO+B26okm0wmWpJ4HIpvGEZi9zMXbzxy0n1QAFCYSh2C0Lh9rCoQSC
+	OZHsz4fTgi8SSZYr6F9FiB6od1OGCuYHU+yS27jPtzas16rucDKYjlDt1l+SVwsw3UVVi5LPwTt
+	UzRIXtqTBeenR8FO8H/DSzACFwk2eW4k6OJEaI+I8pTr9Y4LUonexZZ1ZrAjm18WRQHuWfoMTMF
+	6xHvIqbAq4UQ23lQYLjH14YX+iSew39aHYflhMEe9Racj5b77Qa3g3f1wMQqQQtuPNpyGHlPITK
+	Y22Mt0kcVbe1rxtA1WlTp5t36TMurQIMVtsx+yHwOlMYKvG2yLtvt4mVh2qNGggkgVcJU=
+X-Received: by 2002:a05:620a:1726:b0:8b8:7f8d:c33b with SMTP id af79cd13be357-8c5208f18e3mr71372585a.43.1768246097807;
+        Mon, 12 Jan 2026 11:28:17 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f4cd7a3sm1609425185a.24.2026.01.12.11.28.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 11:28:16 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vfNaK-00000003cxB-192v;
+	Mon, 12 Jan 2026 15:28:16 -0400
+Date: Mon, 12 Jan 2026 15:28:16 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Zi Yan <ziy@nvidia.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Balbir Singh <balbirs@nvidia.com>,
+	Francois Dugast <francois.dugast@intel.com>,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	Matthew Brost <matthew.brost@intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	David Hildenbrand <david@kernel.org>,
+	Oscar Salvador <osalvador@suse.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Alistair Popple <apopple@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+	linux-pci@vger.kernel.org, linux-mm@kvack.org,
+	linux-cxl@vger.kernel.org
+Subject: Re: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free
+ callback
+Message-ID: <20260112192816.GL745888@ziepe.ca>
+References: <20260111205820.830410-2-francois.dugast@intel.com>
+ <aWQlsyIVVGpCvB3y@casper.infradead.org>
+ <874d29da-2008-47e6-9c27-6c00abbf404a@nvidia.com>
+ <0D532F80-6C4D-4800-9473-485B828B55EC@nvidia.com>
+ <20260112134510.GC745888@ziepe.ca>
+ <218D42B0-3E08-4ABC-9FB4-1203BB31E547@nvidia.com>
+ <20260112165001.GG745888@ziepe.ca>
+ <86D91C8B-C3EA-4836-8DC2-829499477618@nvidia.com>
+ <20260112182500.GI745888@ziepe.ca>
+ <6AFCEB51-8EE1-4AC9-8F39-FCA561BE8CB5@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-21-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-21-8be3867cb883@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 12 Jan 2026 19:08:00 +0000
-X-Gm-Features: AZwV_Qjgu-sXQZIHm3TAlOW62aUWk-t7wcra038ZJt2_3BJ_d28PSVA3xv4zVCM
-Message-ID: <CA+EHjTz4vDFdhbZMz6mNacdzSJLFfVbQKMGmSo=Vt9bSB4ho0Q@mail.gmail.com>
-Subject: Re: [PATCH v9 21/30] KVM: arm64: Flush register state on writes to
- SVCR.SM and SVCR.ZA
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6AFCEB51-8EE1-4AC9-8F39-FCA561BE8CB5@nvidia.com>
 
-On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
->
-> Writes to the physical SVCR.SM and SVCR.ZA change the state of PSTATE.SM
-> and PSTATE.ZA, causing other floating point state to reset. Emulate this
-> behaviour for writes done via the KVM userspace ABI.
->
-> Setting PSTATE.ZA to 1 causes ZA and ZT0 to be reset to 0, these are stored
-> in sme_state. Setting PSTATE.ZA to 0 causes ZA and ZT0 to become inaccesible
-> so no reset is needed.
+On Mon, Jan 12, 2026 at 01:55:18PM -0500, Zi Yan wrote:
+> > That's different, I am talking about reaching 0 because it has been
+> > freed, meaning there are no external pointers to it.
+> >
+> > Further, when a page is frozen page_ref_freeze() takes in the number
+> > of references the caller has ownership over and it doesn't succeed if
+> > there are stray references elsewhere.
+> >
+> > This is very important because the entire operating model of split
+> > only works if it has exclusive locks over all the valid pointers into
+> > that page.
+> >
+> > Spurious refcount failures concurrent with split cannot be allowed.
+> >
+> > I don't see how pointing at __folio_freeze_and_split_unmapped() can
+> > justify this series.
+> >
+> 
+> But from anyone looking at the folio state, refcount == 0, compound_head
+> is set, they cannot tell the difference.
 
-nit: inaccesible -> inaccessible
+This isn't reliable, nothing correct can be doing it :\
 
->
-> Any change in PSTATE.SM causes the V, Z, P, FFR and FPMR registers to be
-> reset to 0 and FPSR to be reset to 0x800009f.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++++-
->  2 files changed, 52 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 44595a789a97..bd7a9a4efbc3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1147,6 +1147,30 @@ struct kvm_vcpu_arch {
->
->  #define vcpu_sve_state_size(vcpu) sve_state_size_from_vl((vcpu)->arch.max_vl[ARM64_VEC_SVE])
->
-> +#define vcpu_sme_state(vcpu) (kern_hyp_va((vcpu)->arch.sme_state))
-> +
-> +#define sme_state_size_from_vl(vl, sme2) ({                            \
-> +       size_t __size_ret;                                              \
-> +       unsigned int __vq;                                              \
-> +                                                                       \
-> +       if (WARN_ON(!sve_vl_valid(vl))) {                               \
-> +               __size_ret = 0;                                         \
-> +       } else {                                                        \
-> +               __vq = sve_vq_from_vl(vl);                              \
-> +               __size_ret = ZA_SIG_REGS_SIZE(__vq);                    \
-> +               if (sme2)                                               \
-> +                       __size_ret += ZT_SIG_REG_SIZE;                  \
-> +       }                                                               \
-> +                                                                       \
-> +       __size_ret;                                                     \
-> +})
-> +
-> +#define vcpu_sme_state_size(vcpu) ({                                   \
-> +       unsigned long __vl;                                             \
-> +       __vl = (vcpu)->arch.max_vl[ARM64_VEC_SME];                      \
-> +       sme_state_size_from_vl(__vl, vcpu_has_sme2(vcpu));              \
-> +})
-> +
->  /*
->   * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
->   * memory backed version of a register, and not the one most recently
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 51f175bbe8d1..4ecfcb0af24c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -927,6 +927,33 @@ static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
->         return REG_HIDDEN;
->  }
->
-> +static int set_svcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +                   u64 val)
-> +{
-> +       u64 old = __vcpu_sys_reg(vcpu, rd->reg);
-> +
-> +       if (val & SVCR_RES0)
-> +               return -EINVAL;
-> +
-> +       if ((val & SVCR_ZA) && !(old & SVCR_ZA) && vcpu->arch.sme_state)
-> +               memset(vcpu->arch.sme_state, 0, vcpu_sme_state_size(vcpu));
-> +
-> +       if ((val & SVCR_SM) != (old & SVCR_SM)) {
-> +               memset(vcpu->arch.ctxt.fp_regs.vregs, 0,
-> +                      sizeof(vcpu->arch.ctxt.fp_regs.vregs));
-> +
-> +               if (vcpu->arch.sve_state)
-> +                       memset(vcpu->arch.sve_state, 0,
-> +                              vcpu_sve_state_size(vcpu));
+> If what you said is true, why is free_pages_prepare() needed? No one
+> should touch these free pages. Why bother resetting these states.
 
-If sve_state isn't allocated, this means that we've gotten here before
-finalization. Is it better to return an error rather than silently
-skipping this?
+? that function does alot of stuff, thinks like uncharging the cgroup
+should obviously happen at free time.
 
-> +
-> +               __vcpu_assign_sys_reg(vcpu, FPMR, 0);
-> +               vcpu->arch.ctxt.fp_regs.fpsr = 0x800009f;
+What part of it are you looking at?
 
-This matches the Arm Arm, but can we use a define or construct it,
-rather than using a magic number?
+> > You can't refcount a folio out of nothing. It has to come from a
+> > memory location that already is holding a refcount, and then you can
+> > incr it.
+> 
+> Right. There is also no guarantee that all code is correct and follows
+> this.
 
-Cheers,
-/fuad
+Let's concretely point at things that have a problem please.
 
+> My point here is that calling prep_compound_page() on a compound page
+> does not follow core MM’s conventions.
 
-> +       }
-> +
-> +       __vcpu_assign_sys_reg(vcpu, rd->reg, val);
-> +       return 0;
-> +}
-> +
->  static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
->                                    const struct sys_reg_desc *r)
->  {
-> @@ -3512,7 +3539,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->                     CTR_EL0_DminLine_MASK |
->                     CTR_EL0_L1Ip_MASK |
->                     CTR_EL0_IminLine_MASK),
-> -       { SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
-> +       { SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility, .set_user = set_svcr },
->         { SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
->
->         { PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
->
-> --
-> 2.47.3
->
+Maybe, but that doesn't mean it isn't the right solution..
+
+Jason
 
