@@ -1,123 +1,178 @@
-Return-Path: <kvm+bounces-67846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC7C8D15CD3
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:28:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2386CD15CFC
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:32:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8AF0030242A2
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 23:28:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 680B5303C80D
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 23:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F13C283FC3;
-	Mon, 12 Jan 2026 23:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A67F2BCF6C;
+	Mon, 12 Jan 2026 23:32:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WSPQicZb"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="NesXOhhM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2554F27AC4D
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 23:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDA0257423
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 23:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768260490; cv=none; b=tFMnJzBDxhW4dVvSqWuJ3fr+PAlXAf4sPxPqdcMxpzcJKDGIk1UIRbQCdW+JkMxDt/eyYv5jn53QTqTwjSjosMuUCF39Vs9N1/Qf6gbDioj82VfAjkuHZPG9rEfd+nAklU0CGVywIG+2M4/C7hvjxdynmhsV3hD4crhwOdlTCJg=
+	t=1768260719; cv=none; b=GSsxsj4m+e1JTV4LjC41CgpU/fVGdsXNGTJ5+vxMHOaF1TKRIecM8povBOAWNo1uqpJ45tqLHwewEKOykvy5ZirvQWNOSM+SF9MsFLdsH9V2ejcuy0ApWgOmYjAIUhjMe8F41XyXUbQXJFmen+Ti07JeFlq595TBwNAOTBPIDRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768260490; c=relaxed/simple;
-	bh=i1FgT2KkBAzlGWwTWhQV19SVFPmH3tqhTRqToUB+FL0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=P9mUFECAgiOXbyZwLG8YMb5cBE6cM7nqni2FkvSq3q5lCJ+6SCQ3gPu7d/PRMYeByuXbYvCZ6w7yNufwq/LwDmnOgbo48AUQnuy9CsQ8iqQrWuwDvLBhaFuxVNnZ1yyOHe7pQtP+JaEVsmzpkHmSOGaiDcVwgRrPlhVkCpaRFMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WSPQicZb; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0d058fc56so56752175ad.3
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 15:28:08 -0800 (PST)
+	s=arc-20240116; t=1768260719; c=relaxed/simple;
+	bh=L++MAkaQvqNItCkQiT64oQtoza/heC4MjDaHxXJXLzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cPpqz5l6K0M/tYZgZkGTEeCn1uPEfZ0OF0GcdKp2VWgF8JHBkY11lGtL1u0ziilMUa8wrjIH6MomfFI+WVfm3YGEtaPcv2T6EnUZ3Nyf0T0bHpUnCT94hOswBXJ0bS0t2oN+2Mr1YU6hOiKjjGj/piWmD9GUYGNAOPrIqBisUOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=NesXOhhM; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-8b23b6d9f11so747202885a.3
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 15:31:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768260488; x=1768865288; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Al+fnSBeR94EhBCD4DhJYbBsNosAL5fZnJy+evBGpLU=;
-        b=WSPQicZbCBGSVR7fEzI8HBhCArmA/xwHaZ9JhX5bTyn3wPY1Qb48wD79nM+vNsZcqk
-         c85aGJmveW9NuIuxSaXXc6qjb8Jd1IHkv361P7ks3jwlIuAQlmxg1yiCnleJpxZD19wU
-         r6U4kmp6RcTtQJj8/dc+HmM6pq+SPofLRfPHayPcYQjnsaiwLZWX8ohwUmBrRD5WmVQ6
-         7WUeorx80Erzg/5P2Af3uqQiUelT9ysrlqFFPRAHtQp1+RfeM7+BtQTBCk5Ocf5ktRFg
-         wpmC/vmhM9mY++KNU+roQgB2U8ZnLRIiYXceYeb6m8gCklRwUEAaOyG/9geybZtfGZUl
-         VcvQ==
+        d=ziepe.ca; s=google; t=1768260717; x=1768865517; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pIO8dQifpp5qZTd7WcwNdFqrDRKIKFleYoHUkXQdAb0=;
+        b=NesXOhhM3RHd1sfBQMYZi8oTKdiUBU7ArfmPPZ2ookjGX9GilzxcZy7ZsMITZEfhmT
+         atK3pcoNDQ7fXeUBnXlOaQhs7TkHhQLxymDBxRraId3xgBHRxQ0CvEjaT0ZQY898mLW1
+         OgAoPGH9FODHRUMXjttUrb78JkzswM2lxC9mke2j4mfZ+SnwZh37jbs0OJOj9sTRf9Y+
+         /lNvgSkJpPprccWu1SeFpxsP2wVrF/izp9QUHXT7a1ltzRvuEkMOuAt/M/LNrjxi/anX
+         qpAxHku+U0VUggJ1zyl7vH5eInqY383srH2IJEov+I9bn/94GeaIHXIuyns9L4xF1Sul
+         4ZKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768260488; x=1768865288;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+        d=1e100.net; s=20230601; t=1768260717; x=1768865517;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Al+fnSBeR94EhBCD4DhJYbBsNosAL5fZnJy+evBGpLU=;
-        b=ESqLbH9xp37KudQcrsTpoEm6VBMAHc4XZTUYMqsGuLR01s/COUsaonjDiOqFTIuenB
-         FxS2ufERWReIwfK+GIQhkS3sSRuEehiqFoC+gpRSD2uDtzKWyVehoxj9FM8ll0fLVPnp
-         5h+LdovvUsMvKcpW5vs5ZPShgUY2TwksgRCKCbThOU3Z1e8MzXoDtaPKDEhyLE0y0FS3
-         hbRbvgKGbixh12ZuqnpPjBIVdO5F5g36p7vKi1UnNMO1AbE+8h4DJRnTuqKGQv3klAz+
-         jjuKZUbUz0UIrPmJqdRB8xENvnEFcyEBveAD++Pnjt2h8nSLDe14prqHKeb8bsFEhiNw
-         QSvQ==
-X-Gm-Message-State: AOJu0YzyccxaPq+bMLnifV/O8cgp18s7eWf5m18Vy8gYc73yaNhm/sEb
-	eKDnxE+b46R4X9k4bYMLpARNj6+WZ1jgCexQ0oxHyUt2GpNWbXydoXRSBiPIX9vmkO0lWHqMXog
-	W5IvS4Q==
-X-Google-Smtp-Source: AGHT+IGOIbN80r8vWHNwzUMJvpuio0e8RSJ09Va0qih/FIvZBUT+/83z+mkvfCiT1PFbxkM+F9xoI79gr+w=
-X-Received: from plaq12.prod.google.com ([2002:a17:903:204c:b0:2a0:9081:40])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:388e:b0:2a2:f0cd:4351
- with SMTP id d9443c01a7336-2a3ee4e85f6mr168852835ad.37.1768260488524; Mon, 12
- Jan 2026 15:28:08 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 12 Jan 2026 15:28:05 -0800
+        bh=pIO8dQifpp5qZTd7WcwNdFqrDRKIKFleYoHUkXQdAb0=;
+        b=fVnTbYE9zOUme5Qs2MRKJyPByAPgypu/OBBP3F6jRyDVSpgFeu0+qghgEQCV1KdCEt
+         Ag4RftVLLkqmhRIwzAjq/E/SyGWYwu6k5Nb3JqoVpaKBeSLIiTQBJVabSb4M4lyhXBGe
+         Abm6vjBV8b1sga1Qr5uPoSipiBHihhRU0t7G0gjekqM/14wyNXLAldBFlSpT01fEbNko
+         /ZB6cKFhaCb8MMUdKTYHOi758HPnV1unVVjjXf2kNyqiSnZJ3faySt0yfjUWs/r2J6dp
+         fk1ApRHCqNVz4fsqwSEAeQqghWTjr/fwXZ9CQeiUVdXqYXZc8OgHMUdk5CDn+++9Tx5P
+         tXRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvwnQAZCCbdw+KH5EhpGBvDsGeD4L+Qs0eL4W8sdYd3IMWvMTW/OTooDL1Qzu9rOGE2jY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6B6UMJjq0pJe8Cfo9cLIzam7mG9gZz9foFHAHNdar/ZTNFs2X
+	uEHS3du12ueMQBoWc2K6ku9layr7eud8EI8KXMTXED9qKbmAANMlUYmaADio/0v4+Uc=
+X-Gm-Gg: AY/fxX77IKARcAmaS+HS9q2sh70YbeEwnN0KXRUHWhWf0dalN00RQWJfj1FPri3KCSb
+	VTwjjNzxpIUJgHjHxzQDN0iSWOJH7YKe/+caopPbu2VuYXwPPtG0QkVg6tpQ8/+No/QXSHHnHtP
+	8qGui7nIwftRLCBk6y3E7ZGAqRBM4DN6tQNYPtRAsChnsufAZtTlFK0WalpK3ZlpopRIdIQ3x1S
+	Ymmwyc4nI5jfIGrMBLdNEleSZHAEsTKsfVcuBuudV4t/h4lV+gWIfTJOHZHEXzuWWlMkV9+vKf5
+	5lMOd/Qslws2xKp5fPVOQLnDm6tXm8uX3YebqcEJCJ6xH3XSAxeFWksfLK+oEXFOjKjn3t6s+Au
+	3aSgwFf5cvOCTSdrnKpJNUEj1kD6GAGG6CCxBGbDxPmcEEhqupCB2nAcfqXCtopjhBxbUcHLW+u
+	UgZOSMKN7zJXtJafnZGKThx2nxJsHN3vsMs4kbiKSj9e/NM46DilI9hTaLiUStlbiriU8=
+X-Google-Smtp-Source: AGHT+IHEv3oyWJcb06Rw4VjhDeFEk4R9SXi3D7aPoLG3khcVAljGyaq9fJ2LebD88CvTcTHK3Zmx+A==
+X-Received: by 2002:a05:620a:3952:b0:89e:99b3:2eaa with SMTP id af79cd13be357-8c389375870mr2741069685a.8.1768260716611;
+        Mon, 12 Jan 2026 15:31:56 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f51bf8csm1591462585a.28.2026.01.12.15.31.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 15:31:55 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vfRO6-00000003evB-2tne;
+	Mon, 12 Jan 2026 19:31:54 -0400
+Date: Mon, 12 Jan 2026 19:31:54 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Zi Yan <ziy@nvidia.com>
+Cc: Matthew Brost <matthew.brost@intel.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Balbir Singh <balbirs@nvidia.com>,
+	Francois Dugast <francois.dugast@intel.com>,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	David Hildenbrand <david@kernel.org>,
+	Oscar Salvador <osalvador@suse.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Alistair Popple <apopple@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+	linux-pci@vger.kernel.org, linux-mm@kvack.org,
+	linux-cxl@vger.kernel.org
+Subject: Re: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free
+ callback
+Message-ID: <20260112233154.GM745888@ziepe.ca>
+References: <20260111205820.830410-1-francois.dugast@intel.com>
+ <20260111205820.830410-2-francois.dugast@intel.com>
+ <aWQlsyIVVGpCvB3y@casper.infradead.org>
+ <874d29da-2008-47e6-9c27-6c00abbf404a@nvidia.com>
+ <0D532F80-6C4D-4800-9473-485B828B55EC@nvidia.com>
+ <20260112134510.GC745888@ziepe.ca>
+ <aWVsUu1RBKgn0VFH@lstrano-desk.jf.intel.com>
+ <45A4E73B-F6C2-44B7-8C81-13E24ED12127@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260112232805.1512361-1-seanjc@google.com>
-Subject: [PATCH] KVM: SVM: Check vCPU ID against max x2AVIC ID if and only if
- x2AVIC is enabled
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Naveen N Rao <naveen@kernel.org>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <45A4E73B-F6C2-44B7-8C81-13E24ED12127@nvidia.com>
 
-When allocating the AVIC backing page, only check one of the max AVIC vs.
-x2AVIC ID based on whether or not x2AVIC is enabled.  Doing so fixes a bug
-where KVM incorrectly inhibits AVIC if x2AVIC is _disabled_ and any vCPU
-with a non-zero APIC ID is created, as x2avic_max_physical_id is left '0'
-when x2AVIC is disabled.
+On Mon, Jan 12, 2026 at 06:15:26PM -0500, Zi Yan wrote:
+> > We could move the call to free_zone_device_folio_prepare() [1] into the
+> > driver-side implementation of ->folio_free() and drop the order argument
+> > here. Zi didn’t particularly like that; he preferred calling
+> > free_zone_device_folio_prepare() [2] before invoking ->folio_free(),
+> > which is why this patch exists.
+> 
+> On a second thought, if calling free_zone_device_folio_prepare() in
+> ->folio_free() works, feel free to do so.
 
-Fixes: 940fc47cfb0d ("KVM: SVM: Add AVIC support for 4k vCPUs in x2AVIC mode")
-Cc: stable@vger.kernel.org
-Cc: Naveen N Rao (AMD) <naveen@kernel.org>
-Cc: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/avic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I don't think there is anything "prepare" about
+free_zone_device_folio_prepare() it effectively zeros the struct page
+memory - ie undoes some amount of zone_device_page_init() and AFAIK
+there are only two reasons to do this:
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 6b77b2033208..0f6c8596719b 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -376,6 +376,7 @@ void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb)
- 
- static int avic_init_backing_page(struct kvm_vcpu *vcpu)
- {
-+	u32 max_id = x2avic_enabled ? x2avic_max_physical_id : AVIC_MAX_PHYSICAL_ID;
- 	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 	u32 id = vcpu->vcpu_id;
-@@ -388,8 +389,7 @@ static int avic_init_backing_page(struct kvm_vcpu *vcpu)
- 	 * avic_vcpu_load() expects to be called if and only if the vCPU has
- 	 * fully initialized AVIC.
- 	 */
--	if ((!x2avic_enabled && id > AVIC_MAX_PHYSICAL_ID) ||
--	    (id > x2avic_max_physical_id)) {
-+	if (id > max_id) {
- 		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_PHYSICAL_ID_TOO_BIG);
- 		vcpu->arch.apic->apicv_active = false;
- 		return 0;
+ 1) It helps catch bugs where things are UAF'ing the folio, now they
+    read back zeros (it also creates bugs where zero might be OK, so
+    you might be better to poison it under a debug flag)
 
-base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
--- 
-2.52.0.457.g6b5491de43-goog
+ 2) It avoids the allocate side having to zero the page memory - and
+    perhaps the allocate side is not doing a good job of this right now
+    but I think you should state a position why it makes more sense for
+    the free side to do this instead of the allocate side.
 
+    IOW why should it be mandatory to call
+    free_zone_device_folio_prepare() prior to zone_device_page_init()
+    ?
+
+Certainly if the only reason you are passing the order is because the
+core code zero'd the order too early, that doesn't make alot of sense.
+
+I think calling the deinit function paired with
+zone_device_page_init() within the driver does make alot of sense and
+I see no issue with that. But please name it more sensibly and
+describe concretely why it should be split up like this.
+
+Because what I see is you write to all the folios on free and then
+write to them all again on allocation - which is 2x the cost that is
+probably really needed...
+
+Jason
 
