@@ -1,33 +1,33 @@
-Return-Path: <kvm+bounces-67737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23504D12C39
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 14:25:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD13D12C45
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 14:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B0779301BDD2
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 13:24:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 957EC301D8A3
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 13:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577F635B130;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD07359F84;
 	Mon, 12 Jan 2026 13:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ber94AYR";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHEPjzjg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lh87aMuD";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QynTQ+K+"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34328359F84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5827359FAD
 	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 13:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768224234; cv=none; b=LtHmy14iFGONZOQpSqYf4g3fcAYrXht5vawMK28AfQtIQrzItbA1Wv2Y775sZEH64ILvK3OdDm/vhYA6zCOxuIH6M8jVw9gYlBsRuvLpZJGYt/YZnQXdeYpGiA3frsFXqEbdm1AAaEopiCgxKYtqgXe/ZDiMNNyJkHUS9Hqw9/c=
+	t=1768224235; cv=none; b=amYPiBujn3Oo7PIIGuGEU3qNIiZI0fZaVgkkRXAg6PajRtlAmQhnVFUMNV4PB/BEzDrOW33JTs5vmZh1EqXoIH22K+uPvIC2EoML8osn4UaJBc3FaICW/ASnX1eWRIY+S4A/MHwjEeoXFYH5V1CDZZQ3XrTRuqaxvV58S+8X568=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768224234; c=relaxed/simple;
-	bh=HFS/yepFFkAHegUlA2uKprY+IwcMao/SJiqJd/VTAVA=;
+	s=arc-20240116; t=1768224235; c=relaxed/simple;
+	bh=WH7g/lfXqzEE3G7j4k735JI1UZo8u2rMxEnlgtqYRF4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QVdJ8c88g9Al44qQO6e1sQkMDl9d155Ymubgeix8OanHze7+OsVoixaXFObnvI/avV7Ml4FyM9isTXen93FPt8lkExL8XwChdIuy4fMyQ7uawiiXDFIBlsk19c+x83IvCEgyE8ynVkfpr3/2XyRwA+LSKwKAraWr3hnah75W2GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ber94AYR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EHEPjzjg; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=pLVCzwMW0ilOvg9GbYxr0N5UOeMiMLYBo1K3ASrxKMOwR5iLVDgVR3e8Ur83XhuAOCp2kb48uRQeMILJzaNFWU129Ts3QY1ygvo5/s2WC8D8L2MEGnpCK9wQebUJS3wnyTT/3upR2GJxY8CFHrqCkfSxCMpK+SUXjqVF3tMKq4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lh87aMuD; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QynTQ+K+; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -36,70 +36,70 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IcSPzaL3tdDhSxoArxuWvrysyc9k+MnXqGfZnJng8Z4=;
-	b=Ber94AYRUY55HEPQJ3fTZ+4LQECKWnrZOjtHFDs9fe9HUbJfW21CBHycXgfepOc3q4XEYi
-	YJpjDInpsI/ANjssV+APcmvs2FcR4iASKCDayXaxzshtB4egIDoC84eaXMF/k2JkSkGJzi
-	4UTzalvi+n3tEHyGSaPGwP0kpkalWUU=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Zl/mQjtvR/EBMVt9nhPm03gwedh0vVVOzpLgcWm0+Gg=;
+	b=Lh87aMuDpr4hIju7M+W+3l7hEn0X2DUpn6kTshrXSrI8FU5r5BNeHrclPcHSJQVUv3mY/g
+	bi5y09H6/YLcS8Rt/SEF93fLWPxPLXxHezg9z4y30QZDBd4JhUDewUl/GbUWLTSS2MA7Uh
+	i+F05GqS36IV/Rfa45NphU3zwcJprlU=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-511-Y4mcYwbvNeyfp8h-PGqzoA-1; Mon, 12 Jan 2026 08:23:49 -0500
-X-MC-Unique: Y4mcYwbvNeyfp8h-PGqzoA-1
-X-Mimecast-MFC-AGG-ID: Y4mcYwbvNeyfp8h-PGqzoA_1768224228
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c52779e9e65so1798022a12.0
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 05:23:49 -0800 (PST)
+ us-mta-681-pwxjjTORPdu2VFfxtC8Y2w-1; Mon, 12 Jan 2026 08:23:51 -0500
+X-MC-Unique: pwxjjTORPdu2VFfxtC8Y2w-1
+X-Mimecast-MFC-AGG-ID: pwxjjTORPdu2VFfxtC8Y2w_1768224231
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c56848e6f45so1497837a12.2
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 05:23:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768224228; x=1768829028; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768224230; x=1768829030; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IcSPzaL3tdDhSxoArxuWvrysyc9k+MnXqGfZnJng8Z4=;
-        b=EHEPjzjgQNmRWMV+6S0Sk/mjBVIRF5tolw7HbKkZQhkbtEPvOH/A4r6tel9Z3xxEaO
-         wk6HkiGZ22isWCDXIu/zRm0ildDq7UBw6fOlt2JQSnfWq56aj7SgcwKm3/wvs+QhhN6Y
-         5dsnZXna0pIzH8CIYUNe6Rx0llGblA4krFuvI57pJEOuT0Su1whR8iEvvKG0Gm5bofAl
-         7Wfdx7ZmqY/A2IcAdKDfwUXSQIwJ3RgCAEMFC32qcm0Zi1SlASknDhnuAkg9OQzV4KLI
-         PlpSAdHuMHAO/0+E4+MBZLvyLB6iUjLEUGaQBoE2T3pAcUprjc+lyM4xDzZLQSrwxTDN
-         Zolg==
+        bh=Zl/mQjtvR/EBMVt9nhPm03gwedh0vVVOzpLgcWm0+Gg=;
+        b=QynTQ+K+fdZRSYT0A3Z1sZQC693+vl1mQ2Zd8kx6STHxxY6AiC0WhcvkYvaLvyKcTz
+         Bv1Z7aQOuhAc6Y0oUW8KdXa28egOTUfVIp1VrQsuMrtns3udXfZydOtQ6IVJBJHo20t/
+         poX1Ti/WtdthZXVOaHZGflGesFKjIjhCbg0AKJ7bT0VVHSs02MVi2tdRmxQMVIINOf5N
+         b/pFwzu696lW6hbk0ScTtW9D14vTiBzluyOsN7R9VqwC4cvEJvFbedVugJJLiUlYwYXi
+         L14Bo+7LYMlz1nqCcBQ3tevRUEkoptWm8+CueRUhGwEVJy5DrQPtDJdBMhB3vxied1wq
+         GzZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768224228; x=1768829028;
+        d=1e100.net; s=20230601; t=1768224230; x=1768829030;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=IcSPzaL3tdDhSxoArxuWvrysyc9k+MnXqGfZnJng8Z4=;
-        b=a4qY/IGn4nCD3mVVv+Ogg0sAV1poehJEc+yWLfFCQoUgvsMju1pMt5PD9ruJWivG12
-         dzEE4WKdrIHrSszv1k+iXMcP2UCNK6+KjPoLCcSc34Tp6KSwHyUykmx38knY4Ch+t+LS
-         tRdD0OsQrINTybjksD3XDSuods+nQoZbNjDpTINGQAyZVTcEkR/aY0kJQkfiaAi04vgU
-         SQW7SYCMn3IoPZOfe4t45+1ss+8sbA+rcc3zlgszo/MdwwSnmV1rbwyIL5zR32lbMJpA
-         FZCVnAabA/Tilp4C3V+60Fa5tBLwAZeFzCHMkcZrMavNKcVO+IV4GpS/pWpB65z4q8uE
-         e87w==
-X-Forwarded-Encrypted: i=1; AJvYcCW3KPguTolHb6YkVytbmzDeYwsvh+5LgvgFvwpQYMajCU6I1pJR298oaluJl8oKJl9GERY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywqpp/li0ih4iNnLty4z0MCl0/l+ld3gH6vyP4lRGjA9UsleVrY
-	jl7pKj9O19tbM9U/7V9QQLEUrfYklqleRomiYoBIxwfUnv9xbSJBeUHJyoJ43t/Y4BkY4KuKunZ
-	RCfK1z5AtRUBGfEzMFXIm+4LlNP6lJzFr4X98RHyUvycAOykWEOZfKg==
-X-Gm-Gg: AY/fxX5OQ1AKvM8dw53zdKjTTTJolYIYdT1uSJ7nkw0o28a+6F7EPovLdsjrVsprO3N
-	4qL/tkZFFah/Glr/+SjIJ7Si5TrcLD3F1ua+0VCyyEQEW8PciGHGP3J+e8KcQ2OxjrMN5TaEyQi
-	BJCb5FrYh4SXgTHfCpT+YDCZkw+OTo2fJ4HBtRZLpNFO9/XXX6C0H8pX8UotrSLan5ABT4+lz3e
-	S9QYjGA1Xl2aUTAH8bl1s3p4MKxBTJiHbVvffYPaZ2h2CNKx9c0uTGozGTvtRMsDZTOM4AtjruE
-	bvSJUkkPmMmGeL/dtvOuuJIUfTuUKLykok2IdOpqDq0VhIyKqNYBkcQDAEgNfvUBcgTkO6sXRIY
-	lXWDgebJBV/h9A+fL2wmBzvOrHViV4dsMRCAlP452TWo=
-X-Received: by 2002:a05:6a20:7f9a:b0:35d:b5a1:a61d with SMTP id adf61e73a8af0-3898f91b4c0mr17844580637.26.1768224228106;
-        Mon, 12 Jan 2026 05:23:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGLoLDLLXWJii1UGy/1Y4n9jx/3GMA07Q3THZ5tL3NC3wN6HPLqvOEWGOm5zr8R6DDH6syVkg==
-X-Received: by 2002:a05:6a20:7f9a:b0:35d:b5a1:a61d with SMTP id adf61e73a8af0-3898f91b4c0mr17844560637.26.1768224227677;
-        Mon, 12 Jan 2026 05:23:47 -0800 (PST)
+        bh=Zl/mQjtvR/EBMVt9nhPm03gwedh0vVVOzpLgcWm0+Gg=;
+        b=TY7O8dbzW7sbzcbfh0ZNctsCrWtwvHF2J+29X7HuhE4TYUToMJbToFcXRCSZRAfG9T
+         pv+UzJelc7R/Cu196435KESC1rvisNucWMGPqVTxulqbC34GWFuTALaVcG1DqWZLg4zD
+         R6ZGhJ0lpUg9rTS4sNJ3gfQ1tuignJE20fcUbOqYbrWlyqgE4f6g+Y228nA8Ig7o7OfW
+         jmCnwXomfRz7mJQQKBKzRXycVoLJ5YljDcFz8Yz91jphL11GTo2wRTFEIsZo0VN5EGvl
+         IsxYABNJGXyAZzyd8V266BWmL6zxfpuipFC0NUAl96dt7iwUbV9eZDAgVkl6fHC2Fqbl
+         U/PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmFsBGkHh/K7RnATCxWR4TzxYai1QC9XVFyWcGukNvIguGgOJcDh4j2Uu+MZK4CUP1F1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYSzKwS/o1QYoFUGJCbnW5zBGW+YjVFYOyIFRUZ7XjZNvOgYT6
+	RobjrKzchTRCdgpakABy8CBkbIrTXk9b8I+Q2gnZTErPTdNJCPHAtBHSAu/rEzgJE8Bs9TRzBJ+
+	CKtZOadhXX2ib8s1uhy3brA1luOANs2nUfMfICceMA/x5UtXtwM+2kw==
+X-Gm-Gg: AY/fxX5MLT6hxJRYbo7wPCnwt1nBmuDo+FIGRyTL/Cf8Jy9dCc4P5RcZIVwq7wzjnKo
+	vuyFxeShKNQMzSLlFdnvI5Po8wAg5c5OOYXJ2oWdCn+JC1SPMBEKrrFtlHb/qIHmhrTZpBwZRMD
+	YShyYSJthSqkwR3ZZgC0iK8A69O3NXC1YTu8vSWdTuTCJssxRjQyAH0+PurAQZWSJ0OY3gHfteJ
+	ZWge9Ld+1g1jszNZtKJoXxuAoF1t6wiMGEPeIDgSY7ZivF7l5DuUc4l4C3JjG4oEBlXMId2BnZz
+	5D+zwUQBdJrY7js3NCf6icwihXdbzb1xhQzbcblPf6EjqZafwhKXXTebGwyiLgr9ytmh7BbGF4T
+	ax99XGlTIRQ35jTRtpAwEVmsYOdklNChRhnGiP4Co+rI=
+X-Received: by 2002:a05:6a20:7291:b0:342:873d:7e62 with SMTP id adf61e73a8af0-3898f907d2dmr16152486637.29.1768224230540;
+        Mon, 12 Jan 2026 05:23:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHNkZpUCKhcs1ijrkrd4+d1SBMbbxDyfcLyQALQcYQ7NIvDrlosKRvZfpN7YcfBYYgnGd4PjA==
+X-Received: by 2002:a05:6a20:7291:b0:342:873d:7e62 with SMTP id adf61e73a8af0-3898f907d2dmr16152464637.29.1768224230110;
+        Mon, 12 Jan 2026 05:23:50 -0800 (PST)
 Received: from rhel9-box.lan ([110.227.88.119])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c4cc05cd87asm17544771a12.15.2026.01.12.05.23.45
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c4cc05cd87asm17544771a12.15.2026.01.12.05.23.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 05:23:47 -0800 (PST)
+        Mon, 12 Jan 2026 05:23:49 -0800 (PST)
 From: Ani Sinha <anisinha@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
 Cc: Ani Sinha <anisinha@redhat.com>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 08/32] i386/kvm: unregister smram listeners prior to vm file descriptor change
-Date: Mon, 12 Jan 2026 18:52:21 +0530
-Message-ID: <20260112132259.76855-9-anisinha@redhat.com>
+Subject: [PATCH v2 09/32] kvm/i386: implement architecture support for kvm file descriptor change
+Date: Mon, 12 Jan 2026 18:52:22 +0530
+Message-ID: <20260112132259.76855-10-anisinha@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20260112132259.76855-1-anisinha@redhat.com>
 References: <20260112132259.76855-1-anisinha@redhat.com>
@@ -111,54 +111,191 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We will re-register smram listeners after the VM file descriptors has changed.
-We need to unregister them first to make sure addresses and reference counters
-work properly.
+When the kvm file descriptor changes as a part of confidential guest reset,
+some architecture specific setups including SEV/SEV-SNP/TDX specific setups
+needs to be redone. These changes are implemented as a part of the
+kvm_arch_vmfd_change_ops() call which was introduced previously.
 
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- target/i386/kvm/kvm.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ target/i386/kvm/kvm.c        | 135 +++++++++++++++++++++++++++++++----
+ target/i386/kvm/trace-events |   1 +
+ 2 files changed, 122 insertions(+), 14 deletions(-)
 
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 6aa17cecba..89f9e11d3a 100644
+index 89f9e11d3a..4fedc621b8 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -113,6 +113,11 @@ typedef struct {
- static void kvm_init_msrs(X86CPU *cpu);
- static int kvm_filter_msr(KVMState *s, uint32_t msr, QEMURDMSRHandler *rdmsr,
-                           QEMUWRMSRHandler *wrmsr);
-+static int unregister_smram_listener(NotifierWithReturn *notifier,
-+                                     void *data, Error** errp);
-+NotifierWithReturn kvm_vmfd_pre_change_notifier = {
-+    .notify = unregister_smram_listener,
-+};
- 
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_INFO(SET_TSS_ADDR),
-@@ -2749,6 +2754,13 @@ static void register_smram_listener(Notifier *n, void *unused)
-     }
- }
- 
-+static int unregister_smram_listener(NotifierWithReturn *notifier,
-+                                     void *data, Error** errp)
-+{
-+    memory_listener_unregister(&smram_listener.listener);
-+    return 0;
-+}
-+
- /* It should only be called in cpu's hotplug callback */
- void kvm_smm_cpu_address_space_init(X86CPU *cpu)
- {
-@@ -3401,6 +3413,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         }
-     }
- 
-+    kvm_vmfd_add_pre_change_notifier(&kvm_vmfd_pre_change_notifier);
-+
+@@ -3265,14 +3265,132 @@ static int kvm_vm_enable_energy_msrs(KVMState *s)
      return 0;
  }
  
++static int xen_init_wrapper(MachineState *ms, KVMState *s);
++
+ int kvm_arch_vmfd_change_ops(MachineState *ms, KVMState *s)
+ {
+-    abort();
++    Error *local_err = NULL;
++    int ret;
++
++    /*
++     * Initialize confidential context, if required
++     *
++     * If no memory encryption is requested (ms->cgs == NULL) this is
++     * a no-op.
++     *
++     */
++    if (ms->cgs) {
++        ret = confidential_guest_kvm_init(ms->cgs, &local_err);
++        if (ret < 0) {
++            error_report_err(local_err);
++            return ret;
++        }
++    }
++
++    ret = kvm_vm_enable_exception_payload(s);
++    if (ret < 0) {
++        return ret;
++    }
++
++    ret = kvm_vm_enable_triple_fault_event(s);
++    if (ret < 0) {
++        return ret;
++    }
++
++    if (s->xen_version) {
++        ret = xen_init_wrapper(ms, s);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
++    ret = kvm_vm_set_identity_map_addr(s, KVM_IDENTITY_BASE);
++    if (ret < 0) {
++        return ret;
++    }
++
++    ret = kvm_vm_set_tss_addr(s, KVM_IDENTITY_BASE + 0x1000);
++    if (ret < 0) {
++        return ret;
++    }
++    ret = kvm_vm_set_nr_mmu_pages(s);
++    if (ret < 0) {
++        return ret;
++    }
++
++    if (object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
++        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
++        memory_listener_register(&smram_listener.listener,
++                                 &smram_address_space);
++    }
++
++    if (enable_cpu_pm) {
++        ret = kvm_vm_enable_disable_exits(s);
++        if (ret < 0) {
++            error_report("kvm: guest stopping CPU not supported: %s",
++                         strerror(-ret));
++            return ret;
++        }
++    }
++
++    if (object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE)) {
++        X86MachineState *x86ms = X86_MACHINE(ms);
++
++        if (x86ms->bus_lock_ratelimit > 0) {
++            ret = kvm_vm_enable_bus_lock_exit(s);
++            if (ret < 0) {
++                return ret;
++            }
++        }
++        kvm_set_max_apic_id(x86ms->apic_id_limit);
++    }
++
++    if (kvm_check_extension(s, KVM_CAP_X86_NOTIFY_VMEXIT)) {
++        ret = kvm_vm_enable_notify_vmexit(s);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
++    if (kvm_vm_check_extension(s, KVM_CAP_X86_USER_SPACE_MSR)) {
++        ret = kvm_vm_enable_userspace_msr(s);
++        if (ret < 0) {
++            return ret;
++        }
++
++        if (s->msr_energy.enable == true) {
++            ret = kvm_vm_enable_energy_msrs(s);
++            if (ret < 0) {
++                return ret;
++            }
++        }
++    }
++
++    trace_kvm_arch_vmfd_change_ops();
++    return 0;
++}
++
++static int xen_init_wrapper(MachineState *ms, KVMState *s)
++{
++    int ret = 0;
++#ifdef CONFIG_XEN_EMU
++    if (!object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE)) {
++        error_report("kvm: Xen support only available in PC machine");
++        return -ENOTSUP;
++    }
++    /* hyperv_enabled() doesn't work yet. */
++    uint32_t msr = XEN_HYPERCALL_MSR;
++    ret = kvm_xen_init(s, msr);
++#else
++    error_report("kvm: Xen support not enabled in qemu");
++    return -ENOTSUP;
++#endif
++    return ret;
+ }
+ 
+ bool kvm_arch_supports_vmfd_change(void)
+ {
+-    return false;
++    return true;
+ }
+ 
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+@@ -3308,21 +3426,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     }
+ 
+     if (s->xen_version) {
+-#ifdef CONFIG_XEN_EMU
+-        if (!object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE)) {
+-            error_report("kvm: Xen support only available in PC machine");
+-            return -ENOTSUP;
+-        }
+-        /* hyperv_enabled() doesn't work yet. */
+-        uint32_t msr = XEN_HYPERCALL_MSR;
+-        ret = kvm_xen_init(s, msr);
++        ret = xen_init_wrapper(ms, s);
+         if (ret < 0) {
+             return ret;
+         }
+-#else
+-        error_report("kvm: Xen support not enabled in qemu");
+-        return -ENOTSUP;
+-#endif
+     }
+ 
+     ret = kvm_get_supported_msrs(s);
+diff --git a/target/i386/kvm/trace-events b/target/i386/kvm/trace-events
+index 74a6234ff7..1f4786f687 100644
+--- a/target/i386/kvm/trace-events
++++ b/target/i386/kvm/trace-events
+@@ -6,6 +6,7 @@ kvm_x86_add_msi_route(int virq) "Adding route entry for virq %d"
+ kvm_x86_remove_msi_route(int virq) "Removing route entry for virq %d"
+ kvm_x86_update_msi_routes(int num) "Updated %d MSI routes"
+ kvm_hc_map_gpa_range(uint64_t gpa, uint64_t size, uint64_t attributes, uint64_t flags) "gpa 0x%" PRIx64 " size 0x%" PRIx64 " attributes 0x%" PRIx64 " flags 0x%" PRIx64
++kvm_arch_vmfd_change_ops(void) ""
+ 
+ # xen-emu.c
+ kvm_xen_hypercall(int cpu, uint8_t cpl, uint64_t input, uint64_t a0, uint64_t a1, uint64_t a2, uint64_t ret) "xen_hypercall: cpu %d cpl %d input %" PRIu64 " a0 0x%" PRIx64 " a1 0x%" PRIx64 " a2 0x%" PRIx64" ret 0x%" PRIx64
 -- 
 2.42.0
 
