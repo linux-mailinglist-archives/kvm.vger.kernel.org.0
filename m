@@ -1,178 +1,120 @@
-Return-Path: <kvm+bounces-67791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C20BED1445D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:13:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9D9D1446C
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C2BA3300AB0C
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:11:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE82A3029C3F
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F16C37419C;
-	Mon, 12 Jan 2026 17:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA012ED175;
+	Mon, 12 Jan 2026 17:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6P4skvY";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZ7QVE9x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LqSsD2Ja";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XFeJAaF4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E488236E462
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B3417B505
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237900; cv=none; b=M+b3j55bQZKoscoHWb+9DVTaHRIfopoeBLmGUvb53dIk6RUtYPDOl4MhGlnnB4nFOSMrOfoSztf09aqIMfBnSCrQn/BOpR+mdsVrTcSla9Ah1OFG0IhfL/3VRfE51HM7Lk2UXzlMOVqOJzFiNDCuXMHfBJA8lpHfzI6cDtJLX0Y=
+	t=1768237973; cv=none; b=DlfbjZdwFUDlybaZCJISM4Rw5ymVokjKueNQlkgWU8b1QX5Jws3PHVyPnEbXHcq/P63zCYx3MAsQF/q/bs7gbXx/ZpHXJCm/TQszU4y9gNGKu1yKkYC/bdChuVuO3xM5aJu/aUj2Usqh2VzqsDeOW/nj34JwUjHpYPl2NeNrUr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237900; c=relaxed/simple;
-	bh=EyrTa1GG/Km+sqDbaCTA8T8eIlsNKHYrHd8+rTZ/LMk=;
+	s=arc-20240116; t=1768237973; c=relaxed/simple;
+	bh=LcWOT9Ptm6c/PohY1mUMZhqzpHNKKBUMOdW4Dy0BdbU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OUHLEUDjWXFnv2eCh2pMYO3Yg2uOtVmbJsAYMg9ydeEYbWUUhVMx/msCbnsDzc7pzOGbZl5VNIrWt0aB+gMj68mubRHh9aT2o19R/sN1GNWEwoHwmez0nFZg9W8Ind8L1E+KQsDaiHbysFahld9KUNnTuRdkibBxfWShKLQbv9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a6P4skvY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PZ7QVE9x; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=lRkV7mhbYTdjf7lfUcu4GyktbfCKcOKAlT0poYu6SDNtyA6bS2u3bd+Oh1VP0jfMA2p3gO7mXCCEWbKBIzSWtALnBU8zp+/0kt6Nha3zULRnvg6ei0H52lPo+9QpAYpcC9VEtSYfTvs5/2c5elC2OEApcBMrG+Lt9ZAxnLSqvY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LqSsD2Ja; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XFeJAaF4; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768237897;
+	s=mimecast20190719; t=1768237971;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jeffuZkEBfflLSw4ZjTzFu7MFv/30yg8h/xlp/3ODDI=;
-	b=a6P4skvYxLKvB3iFDTnB+y7f4wWBXbme1nz4i77DG9Xi+q0cpE5jYLJfj3prvmoZZeIf7F
-	Elyz1p7NLMzzF76OPrniT97sz2Ws4FUjb+3t+YSLA9hAHa5EHnKSCB91AgvnAzYHtsCDOR
-	Kef5ebpp01SKiAfuHYenHuJGi8w5Wyo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=n4FjcWu0LDKcBLtXzBHQQcI0QgAYGSeNNtKSt3IpPOU=;
+	b=LqSsD2JaM6oBk36kGmxjX0Daj1D//cHCmRqPfDgjjMgCOt/c8MrHOEKOjhsvE8Nygo0/lB
+	/eirfDzyYqGhafIInhkZvXeMuq5yQHvHArOYm4dBfSW82Z1UeSEk4tUqkm6AKPh9Scduov
+	t+DAIXyGX5WNCW1xDM0P1wJhFzjXNWw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-F6GN958bN96mvIr8AIb1DA-1; Mon, 12 Jan 2026 12:11:36 -0500
-X-MC-Unique: F6GN958bN96mvIr8AIb1DA-1
-X-Mimecast-MFC-AGG-ID: F6GN958bN96mvIr8AIb1DA_1768237894
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-43065ad16a8so3748003f8f.1
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:11:35 -0800 (PST)
+ us-mta-235-B4rzRru3OoGbdaJhPiWWpA-1; Mon, 12 Jan 2026 12:12:30 -0500
+X-MC-Unique: B4rzRru3OoGbdaJhPiWWpA-1
+X-Mimecast-MFC-AGG-ID: B4rzRru3OoGbdaJhPiWWpA_1768237949
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477a11d9e67so44538305e9.2
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:12:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768237894; x=1768842694; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768237949; x=1768842749; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jeffuZkEBfflLSw4ZjTzFu7MFv/30yg8h/xlp/3ODDI=;
-        b=PZ7QVE9xvW8iZP55Bqf/38ctGPVIv2rz7kHW+0voTaZOPTn94fmf+ueQ4ylMuj3Rh+
-         ncW+qHtDV0daFF1tPuz9Slz3pwrD8xbcfd/uS2dftS1Zzow6YH4TeDySHZZ6/0I0zTaA
-         r7QBMj2TWNXOBpSQhdGDaeO+Za+WvITLsV8jRFA1XGLV21Jcg349t4DkjXwhR3Aa4WFY
-         m1cB4DLeCoS5KccDDpHEH3ds2R1XIARch6PB/n2uAp8lS1k63dWsZEZf+/kJ8SbL9ZeU
-         0KTnJAw3brJWJBZLqFhbbiAo+omF701qYZeQcPCsyY52evDZUqRukPu0MQGcxTpsk4rv
-         GaXw==
+        bh=n4FjcWu0LDKcBLtXzBHQQcI0QgAYGSeNNtKSt3IpPOU=;
+        b=XFeJAaF4HmLsHFF8ZggYJ2qAWHhjjWcoGe1QmGkIwkMrwVlk0ftuodpCc5OufDlhFG
+         i6BA6Lb8RJ3ziv+Lc4htf9ZbQIHNPBd4LKHG+hNcR4qN6LZIB9rS0uO4Lx0W+VhryTTu
+         f8mrqTAgx7FXRlTweJqpnr8KKJjfw4SbA48DcTuyH0ym8JGjAK33YKqzyAAdeDBiv4ZR
+         Y154kcLJhc/7wTg44wG/Sye3HbKseE+DwtCCd2LYgixDbFP9z9SoSnaCpwNXXEdyWHgX
+         xRw1VxRXWHJGikycxT0rhyDVHVRCmuUKL0xTdjR70moqm6bUMSPTJrWpyPMI1vuhoPgS
+         j0iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768237894; x=1768842694;
+        d=1e100.net; s=20230601; t=1768237949; x=1768842749;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jeffuZkEBfflLSw4ZjTzFu7MFv/30yg8h/xlp/3ODDI=;
-        b=c/avuGdGycH84N4kuvRPguH+luoGoNzkeVxEtnGWP/75Q2A72KYyskwZm3SrNC/IiB
-         S7Z9mdVqIS5o+BNAKSdGvxhoznsIb8ICu4FBlwfCDqj0wOFNdnHIYhgMY9rvbkMXlLJ0
-         CMRU8Ocut3GfJ1/aKmBnpojcD6eXfQAJFK8N6JyYspCmXx0QkFtOTBKxfCdOT9CSCICg
-         Slb506ItHJWRvkqZdqIJqkQH3tlnSma6R2lJGfoSgb1dTBH0+o3aVJFkN8RmLBdGxwoY
-         D/5emDwnUteWc9nSXuGex/7AAwdvYEXBJkHLyt/fjBcMCrEx0CZWm4OuftE0/821HB3/
-         tX/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUpSZgvk31veBKLGjwKhgriP23H/qwff2v6Ht2EaBpKjwGwoiFRjy2UbaWq0Ed6ZRu+7Ng=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1dOiRGmTMkUWcL5/bheSTOumbcJoYsvxghpOYe9fpXbU7DXAU
-	bNuK94nGyJNrpiWSPumoie6y/RJX2ibVPHpVxZW3PFR55+MM32RwukRsgPkrjAxeOoqmEByF8NX
-	7v3M2DhkT7Hy8JegH5qt5GBPrVlnvQI5Qwzl6dy7OyPF/mRgQrtZMSTs3JG0osS71SYB3BYnytZ
-	KHUkXoiDT6xsQnAQFKNvDZQsWehBeW
-X-Gm-Gg: AY/fxX7CycCgUfspXAKXcWG93UVEcOWZ5y1gOaTHOlPcazcxn9Txaa6rMPrtMX+Euly
-	1wKBCHGS7IoEw8cttCnb2Emg5xbTmIYZVoui/hOCMtb0Qh5jX9EXgxy5MnJP2gczvcg0BngIcV0
-	45ciNqsJhiD8xYXUOOQyHuWjnMA4E/k4OTBi/9/jkBKC+GwG+5E//eiT50tQsbs7d60ipmqIzmH
-	IBaA1u9aL2O9E4Mz+gxgPoG/eGRaeKEEfRdaaezc6uuBhI88imI2w1pxLHW47L2ut371g==
-X-Received: by 2002:a05:600c:4447:b0:477:3e0b:c0e3 with SMTP id 5b1f17b1804b1-47d84b3b8b9mr198369515e9.32.1768237894405;
-        Mon, 12 Jan 2026 09:11:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHbj4ph0kqZXQYG+6hVJBWnZOnbRQ5gOzRPnLbag3DhtIZbvTfxen4++f86lHcI3uy+ybhCs5jQjvzZk2f2Yv8=
-X-Received: by 2002:a05:600c:4447:b0:477:3e0b:c0e3 with SMTP id
- 5b1f17b1804b1-47d84b3b8b9mr198369255e9.32.1768237894056; Mon, 12 Jan 2026
- 09:11:34 -0800 (PST)
+        bh=n4FjcWu0LDKcBLtXzBHQQcI0QgAYGSeNNtKSt3IpPOU=;
+        b=DmdKo/o7WDiTJLgNeI3xo6m9XObvqLKKDDvsxWJe15KbFr+EPFMcAbK2OzuoaOssIw
+         rdOH+b14UFc52CPASHSLaegOg56Nok44iKeKByFcaEzEEwkCvGOK4jP/N9R3yTMIcsGE
+         zVs8Q1R1wRz6WblsQs/ifHtC2njjPVRjqVqBif7Tfgcy41fkZt3DR8Fp+4bi6WtIgM0+
+         464eup9bOrtJKViaUdfcVEI2TaUuHJG/8Ig/TfsKFUNjwiTy1o2zXsLM136+MnPMCM0A
+         P8DwckMc6PRny+AGcmfM4SJKLQsLvRbM/M4LTdrd26vLFfL2dNBTmoWwTwH6iWD4LKAT
+         7KQw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUiGUXycdBKb6nKcrmrgTNX9y2XosjQta94l10ReNbUpACKzrw+PsgfQhkTvbSM2eBF4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5jTtPmnkBcy5dl5wM6qOM8cg6lIO0GryT0LiEayUVSpC+nqfm
+	Yabl2jmV45p+O9SHULULq3coAwhHtYDMFt++1wIXwef9P3NqFn9/Y6JsKLMwqgBdKgmh97YdruE
+	k7k0K+ZzjhbxXZPhfG3wus0q+4T14Yh01ilory2o+O2OWMybI9fS7TJuHAqNOBw/56Eqb68oMmA
+	kYTe6/xuPaImmTPGARsX0No/yULh3f
+X-Gm-Gg: AY/fxX71SU5bLqe4WXm2NALEBBXA98AIUFs6KRqalejJpdg6mHB4hO6eJ8s2QdH5XNM
+	DTUFaDqEQGTnE5vszMUI8sIrfcIOwTArvqztkihewlIfwFvzG/YtfPCnNLl7aofHI193ngbFVtM
+	pbD5yyCD+C7WCT1wwTeUshD1YL/ZKP+PbIjjCIUVxBff0462EpBo5o8Ft2Tz0ZMhbw+C7BopRS4
+	ydMwwEFZTBcpfi6fuu0q8iNn068xGXFNlO8onHRT2D2HkSEdBykwdCw93kEVYZ8HW91hg==
+X-Received: by 2002:a05:600c:3e8f:b0:477:5897:a0c4 with SMTP id 5b1f17b1804b1-47d84b0b315mr198969985e9.4.1768237949085;
+        Mon, 12 Jan 2026 09:12:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF+VhlfxTBklsMUvnB2bwD9d0SVSG9i3WldYSftXmzGMnTRQo6eoyUW1AqgCgPVrhVKsoZhsI9d3anZTvrNxc8=
+X-Received: by 2002:a05:600c:3e8f:b0:477:5897:a0c4 with SMTP id
+ 5b1f17b1804b1-47d84b0b315mr198969675e9.4.1768237948726; Mon, 12 Jan 2026
+ 09:12:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112132259.76855-1-anisinha@redhat.com> <20260112132259.76855-25-anisinha@redhat.com>
-In-Reply-To: <20260112132259.76855-25-anisinha@redhat.com>
+References: <20260112132259.76855-1-anisinha@redhat.com> <20260112132259.76855-20-anisinha@redhat.com>
+In-Reply-To: <20260112132259.76855-20-anisinha@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 12 Jan 2026 18:11:21 +0100
-X-Gm-Features: AZwV_QgoeN4vU_XnIQnrItPwiaLkf6qjTWDTE0Y07V15XachaTAf23ut68EpYsY
-Message-ID: <CABgObfYWjQ2FwZZ5Evwdfh4aCdK2cJxO71U+KBgpzB6Jh18zyA@mail.gmail.com>
-Subject: Re: [PATCH v2 24/32] accel/kvm: add a per-confidential class callback
- to unlock guest state
+Date: Mon, 12 Jan 2026 18:12:16 +0100
+X-Gm-Features: AZwV_QjXKzvoLIMEpw40RsKeIM2DnH2rFQQH12t1B2CQDOBP8aJHQrSn88CGaco
+Message-ID: <CABgObfYgKFuBJRAR-t+gU2cUu3nVjy3++3R-k4_E+dti4E5XLg@mail.gmail.com>
+Subject: Re: [PATCH v2 19/32] i386/sev: add support for confidential guest reset
 To: Ani Sinha <anisinha@redhat.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, qemu-devel@nongnu.org, 
-	kvm@vger.kernel.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, kvm@vger.kernel.org, 
+	qemu-devel@nongnu.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, Jan 12, 2026 at 2:24=E2=80=AFPM Ani Sinha <anisinha@redhat.com> wro=
 te:
-> diff --git a/system/runstate.c b/system/runstate.c
-> index b0ce0410fa..710f5882d9 100644
-> --- a/system/runstate.c
-> +++ b/system/runstate.c
-> @@ -58,6 +58,7 @@
->  #include "system/reset.h"
->  #include "system/runstate.h"
->  #include "system/runstate-action.h"
-> +#include "system/confidential-guest-support.h"
->  #include "system/system.h"
->  #include "system/tpm.h"
->  #include "trace.h"
-> @@ -564,7 +565,12 @@ void qemu_system_reset(ShutdownCause reason)
->      if (cpus_are_resettable()) {
->          cpu_synchronize_all_post_reset();
->      } else {
-> -        assert(runstate_check(RUN_STATE_PRELAUNCH));
-> +        /*
-> +         * for confidential guests, cpus are not resettable but their
-> +         * state can be rebuilt under some conditions.
-> +         */
-> +        assert(runstate_check(RUN_STATE_PRELAUNCH) ||
-> +               (current_machine->cgs && runstate_is_running()));
-
-You can remove the assertion altogether.
-
-> +static bool tdx_can_rebuild_guest_state(ConfidentialGuestSupport *cgs)
-> +{
-> +    return true;
-> +}
-> +
->  static void tdx_guest_class_init(ObjectClass *oc, const void *data)
->  {
->      ConfidentialGuestSupportClass *klass =3D CONFIDENTIAL_GUEST_SUPPORT_=
-CLASS(oc);
-> @@ -1596,6 +1601,7 @@ static void tdx_guest_class_init(ObjectClass *oc, c=
-onst void *data)
->      ResettableClass *rc =3D RESETTABLE_CLASS(oc);
+> @@ -2758,6 +2807,8 @@ sev_common_instance_init(Object *obj)
+>      cgs->get_mem_map_entry =3D cgs_get_mem_map_entry;
+>      cgs->set_guest_policy =3D cgs_set_guest_policy;
 >
->      klass->kvm_init =3D tdx_kvm_init;
-> +    klass->can_rebuild_guest_state =3D tdx_can_rebuild_guest_state;
->      x86_klass->kvm_type =3D tdx_kvm_type;
->      x86_klass->cpu_instance_init =3D tdx_cpu_instance_init;
->      x86_klass->adjust_cpuid_features =3D tdx_adjust_cpuid_features;
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index d45356843c..c52027c935 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -2632,6 +2632,14 @@ static int cgs_set_guest_state(hwaddr gpa, uint8_t=
- *ptr, uint64_t len,
->      return -1;
->  }
->
-> +static bool sev_can_rebuild_guest_state(ConfidentialGuestSupport *cgs)
-> +{
-> +    if (!sev_snp_enabled() && !sev_es_enabled()) {
-> +        return false;
-> +    }
-> +    return true;
+> +    qemu_register_resettable(OBJECT(sev_common));
 
-This is always true, because if both are false then CPUs *are* resettable.
-
-So I think .can_rebuild_guest_state can become a bool member of the
-ConfidentialGuestSupportClass, instead of a function.
+Same issue as previous patch.
 
 Paolo
 
