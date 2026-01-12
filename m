@@ -1,280 +1,236 @@
-Return-Path: <kvm+bounces-67828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A8ED14D15
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 19:55:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FD8D14DDF
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 20:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7BF823016AFA
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:55:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1AEAC304569A
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 19:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A115E3876DB;
-	Mon, 12 Jan 2026 18:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCD8313E01;
+	Mon, 12 Jan 2026 19:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="erZJyCR4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U1TkGW3R"
 X-Original-To: kvm@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010004.outbound.protection.outlook.com [52.101.46.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D4937E316;
-	Mon, 12 Jan 2026 18:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364132701CF
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 19:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768244132; cv=fail; b=HNeeYXEOGF3KY7hkv4jTffSAydSfeUXwueassURIN1rYf2PajMoPStoMceA62iqJjmS8hsUpP+dJfTMF1zVFJL57gmmZLSxcDHM7joMPSTsj8u7irBBZFVLrz8RZRi0xuFR7hOxm9xL0UlJHnBBPAmaJkFOCQAiQbdUvMHkem6k=
+	t=1768244965; cv=pass; b=cv2daJNPg0kJSyKoopdwW0qoOd593Opxs2kaxBJedTdqsEqRjy/Vjj8fV5WtyDszlpaPbKQc1FytL3OtjR6QOk3Mo11OxQI5YB2KDx6v7HVMN9QfOtbtZSjoAmku1xw+kFTrYrRTNS3FN/yotnzfPLd0QKazOKvT99uh5MTFH+A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768244132; c=relaxed/simple;
-	bh=AYjKMPusqmp65RoMgETmP3FAOdI30UtIeX9xDEP6UI0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=vAvKD/X4nZsAQbrn8nVL0z65Mj3b7yJ8MR81kh+c0Lh2HDY60e0J3N3/UW2etvhLftEUOF18IgXl7SxhnhzG5M/7UTZAP79PYIpr1FYJcmnNeCJQlYnkZromGKUAuJt62gV5hc0V/QdBS57AqTnH8JNhB3Nuhm1ABAKMsoeX5fA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=erZJyCR4; arc=fail smtp.client-ip=52.101.46.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=c1kLXLQUg3od2EB7AmyE2jJ9gp7phze9w18ZTQAExTAgPjXGYdaSBkyxUhYJYDmEO2pLD796gQN3GK/CGVix3JZxEgddhjiGF5gysc6E5TLlU7NdgbTBYYv9tTHpzSuf6kYGwP64UtYjzJnp0ClLK+qcTxwoCEJGvkbvYDdAuOFKWyl8WfzYRi/cD5yTUi9ngvA6HEf1aLXXrotLN0B6vC6JOBVvuBeSnHW9ZGAtMLi8aOgn9YP73nKhDkcjFMzoE9G7qKDd3SaJkeSTyEbj+aIfrl9l52oALZqKsuDRREKKcDpibXIKrBhjsy1YPklbWaS1nw/k9sAZ48kdddOdxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gK8vzHUnwD+6FB+QwLUb0rC0tZs2DwoXrekFMUNXdV0=;
- b=aqdHDvL+L4luhnw/lJliDJX0qXLC9zytOCGAE8D7GzF+hJvv+NElKiR0RqZA92si/wyXCBVbTls4r2HpjpxuAUPzVLzCH9FlifPwVbnYbSkP2AA/1p0yEyGniTfEWKSbCOfOOsH7gpVI3wPE8pIToQYUEXT8N7o5v3w8ED9wYVT2/bbEgkPG+VxiC3UD+QzIE7FrnODGsGG9Ma+mY4v2uA5kBBW9G6XAr4AjodsHxiwo2W9ZqqI1yHfESIo7AT6i9QAD0PRuLOxSnHw7yd3blGbvdir78mfFant+xkUnKNSEulvPy9PkABzhjhFOwCUck1dStaoyrQ8Z8UfXJDlC1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gK8vzHUnwD+6FB+QwLUb0rC0tZs2DwoXrekFMUNXdV0=;
- b=erZJyCR4ZF4r0SDhS3ODmX0+vU1hB2zRv6wOna9PsVP33uoKgof06+KQ6lSW6gBvxL/dN+Jep/KI68LFENg07qlSyFU0uMR/JTkHgVZkcQMSDvtoKZSZM+cHtL43CmCXcSCOJz6IAFcGbm+L6XDSnQcTa6dql1nS3pljotME0fWp/h0JgwrGeJ52s+FfgD+Ow0yk36gbP0UDX/s9+cKIlZcffaQvr91RcTLYPHezG5elCsxqyXV/TDWJL0n8jTRxWxA7BXVZcBBHmAm0sZKtb2PDQAxEinw02NpzJmseDl7LD9gj58gUA+Nz+xpsxPHx8azc3Orvoz4soECbTkL4dg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- PH8PR12MB6939.namprd12.prod.outlook.com (2603:10b6:510:1be::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
- 2026 18:55:28 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9499.005; Mon, 12 Jan 2026
- 18:55:27 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Matthew Wilcox <willy@infradead.org>, Balbir Singh <balbirs@nvidia.com>,
- Francois Dugast <francois.dugast@intel.com>, intel-xe@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, Matthew Brost <matthew.brost@intel.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Felix Kuehling <Felix.Kuehling@amd.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>,
- David Hildenbrand <david@kernel.org>, Oscar Salvador <osalvador@suse.de>,
- Andrew Morton <akpm@linux-foundation.org>, Leon Romanovsky <leon@kernel.org>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Alistair Popple <apopple@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
- linux-pci@vger.kernel.org, linux-mm@kvack.org, linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free
- callback
-Date: Mon, 12 Jan 2026 13:55:18 -0500
-X-Mailer: MailMate (2.0r6290)
-Message-ID: <6AFCEB51-8EE1-4AC9-8F39-FCA561BE8CB5@nvidia.com>
-In-Reply-To: <20260112182500.GI745888@ziepe.ca>
-References: <20260111205820.830410-1-francois.dugast@intel.com>
- <20260111205820.830410-2-francois.dugast@intel.com>
- <aWQlsyIVVGpCvB3y@casper.infradead.org>
- <874d29da-2008-47e6-9c27-6c00abbf404a@nvidia.com>
- <0D532F80-6C4D-4800-9473-485B828B55EC@nvidia.com>
- <20260112134510.GC745888@ziepe.ca>
- <218D42B0-3E08-4ABC-9FB4-1203BB31E547@nvidia.com>
- <20260112165001.GG745888@ziepe.ca>
- <86D91C8B-C3EA-4836-8DC2-829499477618@nvidia.com>
- <20260112182500.GI745888@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR05CA0004.namprd05.prod.outlook.com
- (2603:10b6:a03:33b::9) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+	s=arc-20240116; t=1768244965; c=relaxed/simple;
+	bh=xheA9QOjQXvJoAbTTZVMmFI6y8wl+wMqp+t7iExkGCo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pI1u/GNu+5FLM/B5erI3qP+AyT31EcntjgV6+0xdbbhZSYtriBCiImkq3rA7AOMNcc3W2Y6ABQzLWQujTQuoWrMLH5g9dpKP2unKsYtGEFnPQG+wsDqF1plf1C8ml4xsI2MEKthSbY9F2/KvmSXEznP1DKSEyB2j5fKyRXgKOjY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U1TkGW3R; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ffbaaafac4so43571cf.0
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 11:09:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768244962; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bsXMtE+rYb5l6JYv7BuupZD2LkCqXyU6JzwwQGYSwTB1jRNhLmVuDJYlxcXVcxA97E
+         XKD5j+q2KBF0yam/jk+tVi3a0wYcltwVxBx/iocbLDs6MyeZYKLZ/6MouYopP/faA1Jy
+         VjupA29LO/kG7zdPK89KeeaMTPFNgUNDZvyl+7D0ChB7reu5hvhCtcisQtSGE5MC71KG
+         srMtITjFA3farl5GiLTMOY0rkkbd45TguxTmbHYxh4P6wimgpkGlHLAJoeDZZv5YNqsx
+         AFiT8K57YwI/w5kyVnSgmKXQaRowz495pPsfZWU1se0y7SnPR4feHJuCDkix40PQ6VcO
+         vCuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
+        fh=3mM/G6DYzLZulkm9xu/c7cCuyPOu2cqpYExnqepf3RI=;
+        b=gg4PfjPcO1BDvGPsAzKryvGrl2jy4qfsqu/DB6LKEV6RkQ+0RxhspyWNw4fGkfS30x
+         jm0BPJbxCopkVCciqCKFRjN1HIbUH3MlRmKmDKCRgT5qvxW3hVcmawkX14I84LksqEGg
+         RUWKs0yBS+XPYvQn17drYy/EeI8co6wLdNn1de7n4vdTHwC2I0ndWiQsSm1/o63aSdhy
+         wKGleLN8kzm7Iw6tbzGGxamPDhH0ctgGaVxqPRTyJm1C8Cs5SrzaeJMOZzIZigFn9P2Z
+         REqZNraNL4Tpr+o/OsTloQ33ykNXV5921px6PKKqK4uAblNZqy7RTyNx821pobM/kQOB
+         ZLbA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768244962; x=1768849762; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
+        b=U1TkGW3R2x+Jm1Pqun+QQoL77XNSM9nOE+Fz+CrfJ93zk0CE7+AJwyG98eqiZmyiej
+         L9KNXhyjWHI5cayiwuTkfCGdFUg7mDGoQcKiKKbskcsjbhY+r10zKCoFmkWjT8DMWPlS
+         rPlU+ORQYeoGommPU8tNnoL6uPjteH3Uz3B3Mj/57WWR6/CNrBfp6hHXQ9P+EFdlAAV6
+         WcsBWaiDdpwin02CD4Zq50j4qZU7/M+QfcguzRufpcImsoCsqAyOSnl9z9OY825EtGaO
+         bb1MwRlr5G2xLxwYbJgx5t61IdQwipA+NrmEfZvfyvIM66HgJRffSjO3mkPBAu0M8zgh
+         vmNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768244962; x=1768849762;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
+        b=ZMuEDaC7gJeBS4vbuXun2VgHTdsq2HsXELEVLyTnfsv1kyGjm7GkALxOvbGuLgMwiw
+         iV8gEOJcqsbwJXh2iY7crFCPnnUchLBmpuOHYkbmeu4jhs/LG4f2doiPQORoGq33U+ry
+         pwjeleXY7/3QPEijVjvW49CKGwrRFkLZPCcSgSxG8SCBCq05a4CNLegmjhUP9RqVeiH5
+         EpyK7JWoxeQA0zYawc4JYDPG3F991e/ooDsbH75ECocRiqRIKj0MGTGXaDoGy+OYm0y4
+         E2859SsjfufvwzPMRwOM92UET8nCEPNyi4Zt6+SfNSuvX+cYlgRwsuyUvyvqA41StSoH
+         Sh/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5eY9iTU8btDrKzI+cAsPbTXNTdG5X3ZeRw6twz9W1fBhFqAX0I5Mss/EoPXOUP+vj/QI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiZAFgTuAwCbd9YCicQFBJrsvSsUD4tE1xY8IeJa+xRfrbdG6G
+	hjZt/LLpoXs3LQt8iBDts7LiIKFJ/XiyXqOxR5J8i+IHmg41GmBVfPUTKGCfr94+j9Fjd5iLhML
+	Pk50zdH4putxrssNE0BGyOMmBuPYPeNYQmhQwzd4V
+X-Gm-Gg: AY/fxX6FNsfGxBfLSr65gWrNB6iD3fPpMmoj8Mp4RZR0aKDi6Ju7Ov+UjL+4C3LJWqj
+	4M3gqHfg5MRJ1FhiOvdbI0atpZMkn9ehjtVKoOpcsIPljAHksEFQSkQMnhjbetwrVXpXDJ/iDHe
+	bDh9DYT8tqo35r5j4UH78xgOTnCLeWI2myHi0xqdw/SeaFpg2CTMI16RkymQZQ76iIRwjbG5Px/
+	KlohdVxkKWUNNXRgYyiR+jiHxMjGuwK31hfHIb7yPie7OyPgzcVna6jVOpbQBIkCh+6hNhS
+X-Received: by 2002:ac8:5d42:0:b0:4f1:9c6e:cf1c with SMTP id
+ d75a77b69052e-5013a41792cmr752671cf.17.1768244961509; Mon, 12 Jan 2026
+ 11:09:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|PH8PR12MB6939:EE_
-X-MS-Office365-Filtering-Correlation-Id: f7b70f56-7404-498e-176a-08de520c26bc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?andJVlVYVEkzZkpLRTJIckk3VHcwLzZpZXQvSC9aempEa3BTQ090cjVTWTZ4?=
- =?utf-8?B?ZEZvbUJuV0ovUm5CV2V0YkV4UjBkTzh0TUVhMHdhVkxlZkhXV05yYVUva3hs?=
- =?utf-8?B?eFBwbWtFRzNpZE1ucVdyRy9JYWk4OXBlcE5oYWJyVURlT3dONDV4M0ZqSGFu?=
- =?utf-8?B?NzA2ZjZ1VEJsd2YwQWhBN0d2ckdKc2h3SG9pQ2w2WHdKdGpROGZxNCtZWHll?=
- =?utf-8?B?cVB3VVd2TFhaSkpobm9PODRaY3JmN3dnc1IzQWptTUNuQzBqK2o2UXdMZlJB?=
- =?utf-8?B?SjBzbTVkRzBpNllFa0RMV3Jra1dCWVFPN09FWm1peWk4RlR6blBEcEFJQU5F?=
- =?utf-8?B?eU5OWnVFOXFtZGtCUWJBOHMvSzlSclpaRmJnS2YyV1EvSG9EcHhuVlNkYnZx?=
- =?utf-8?B?bHFmL0FBWmRoQ29JTTZGbTZwUjNlWEI1c2FxckV5Q0hLZVJuS2dxN1dMcU0w?=
- =?utf-8?B?aGZ4VGo4UUNZblVPVnlWK0VJMXFKMkRSblYrbWhnVUZOSjlhZjVtejB0eFVE?=
- =?utf-8?B?Wk14TTFTZXdFaEJMTWpBTXFITXhLcGpEUnVYYzRNR1VVOWVyVWxyTHlabENw?=
- =?utf-8?B?bFBJbWpyc29BeFpUS1RUWllTTUFVSmNUdE4xeUxTWTZ4OFZaRG0xTkdrdmgy?=
- =?utf-8?B?cjZ6bWJkejhsdkhTV2NiMHA4MlpHU3pjVGhuQkw0YXhRUFVoSlJkYkZxbVkw?=
- =?utf-8?B?bkRpVityckMxbU92Uk0wYU5FdHJGY3JqTXEzcDF6LzJLOS91QmxSYURxVUJZ?=
- =?utf-8?B?ZWx5ZTE5Y3RobTlWZkE4ZU01YU9yNWJjalRWSTRXVituN1hiSTVGY2w0Wkww?=
- =?utf-8?B?OGJ6S0JwN0FMYURNcHZTS1FOZmVvQWo0ZjBMODU0OHdQckxwUUhGL1h3ejFN?=
- =?utf-8?B?RFhkT091OUkrTHd1eXNFUVNURFd3SUoyOUVLbFhPUUgyZzZOTVdvYkZqUjMw?=
- =?utf-8?B?aTBTS2s2Wm9wYzZFTVRsN1Q5WmFyVEdGSkpxWVVlMDIrbGF3Zk9vajlzbi9h?=
- =?utf-8?B?cVNtbjJJQ01iM05BMWNsQ3ZlUUVRM05QY3Q4a1g1SUhGRTBYWVd1OHdSc2Y0?=
- =?utf-8?B?Q0lrdWVaM0ZMZzQvaGVkUGdUN1pId3ZoVVdWYjJneXFxdk9NTXdrK2JtN2lF?=
- =?utf-8?B?cjNSZVM5NklXMjJrc01zbk1yWVVaTVdoMW9uMDhjTkdQM09IYTJQKzVkbUE3?=
- =?utf-8?B?VDgrUjgwVEZUaEhENW1xemcybThvcFZld0F6bkF2dTZldnZ3ajlLT0pDWjMv?=
- =?utf-8?B?cENnNmNjcC9mV0EvL21FWVNENDNwL3g2QzZvakRnaEZsQTBmSnRFOVRSTG52?=
- =?utf-8?B?T0pJZ0lOeXplUjY0Vi8wTTZrT1BPVlB6WEdDSmlsV3l2WVhXNG9zTEVrclNu?=
- =?utf-8?B?TTd2eGN0ZGthRDNMU1Z5V0dXOE1pRVVlbDVsSFQ2V0czcjR3UklLVHU5WW9R?=
- =?utf-8?B?TVZPZkxRRnRRK0lIZFVIZjA2a285SEtxYm42NFRlRXh0ZDFyUkhZMU5oalp1?=
- =?utf-8?B?UUordzh2TEd5dWs4eFhEaFY2b29UV2VwWThlZVBuTDNCVUVxZ2lTbnY4aGZB?=
- =?utf-8?B?UTRZQlNERmlnTkxCTkhyMmVpU2V5WUdlbXRwMkVObXdQRnFuWlphT1BqNTUy?=
- =?utf-8?B?S28zcVpGODBIa0U4dDFKTHBzNjEzRVpQYitENkIxemFLaWx0dldkYUtVdXM5?=
- =?utf-8?B?aUNLdFNUK2l4cmNtUC9VVDdPSHZJVnVhTzRXM0NMUTNUWnd0Vmt2VU8vbnRY?=
- =?utf-8?B?Q0JJU2wzTGFydmlGc2hDeTNUUzVma3dVdjJEY2sxUHp2a05rQ3p5cHphK0dC?=
- =?utf-8?B?cUJ1SVVGSFFMTDhEQ3B0VjQ2WkRWRXJrcEQzdFduZE5Nb2kzWnFDZGRJMVBF?=
- =?utf-8?B?WmpWV3A3MTNXSHVxUzRwU2pscUtBN1QzUEoxNG0zZGI4TjMzbmM2OXdQMVY3?=
- =?utf-8?Q?tlbg2fuDCxa7tXvaATu5EfTUVymZuihS?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VzJRMVNiem9DMEU1L2UyTDRHMHFmaGlCUVNFKytSM3NUU3huTXVla05LTXpZ?=
- =?utf-8?B?WWh1ZElNM3pJOFp5eExPYWY3M1Y1ZWIvNWg5UURVZEN4MFFmSExUOEZzalho?=
- =?utf-8?B?VWZLL2VWcnhxd3ZiMmJXcEVyVHNLdjVJYVU0MmhWRjlpNENVeDBnbkgza1VN?=
- =?utf-8?B?RG5CZllRd3d3RDNTZWNRVVVheXA1a2dEQlpONUpxZkRqdnFkY3U4dkZNcE1S?=
- =?utf-8?B?aVVFS2tNQ3p5ZU5BK2daOHhFRHBWQ0ZtUm5WU3ZhSjRWRHZINURKNWlpNGlE?=
- =?utf-8?B?KzdsQzM1UGxUMlV1K1hJK2p3eHllcnBSaVZUUDdub1FSWkFPZFJHOWFEcEht?=
- =?utf-8?B?c1lLSHNhZXFDcjY2a1JUMWR5bkluREVsTERBS2V5dlRFVE85ajF5V0VzTVBt?=
- =?utf-8?B?Q2MyRGVFdmpvOFFvWHFCWjZTR09BOStLT21EYWdEbkg0amgya1Yyek8xL3pp?=
- =?utf-8?B?b01FeFg0dUlISWNZelBzQVFMa3FTUmc5a2U2bGhWNGJHOEw3OXlVQTZGajRo?=
- =?utf-8?B?ZGRTc1JOY00vcktjWVg5L0hGbmxWN0hGREhmR3YwOWdrNHM4Mm96Umhuc0Mv?=
- =?utf-8?B?aUZPRWVvc1c4cWJOU2Q2cFZHZ3RITEdSTC9JQ2F5UEZIRTFDbXpaanNnSnh4?=
- =?utf-8?B?c01BdTlwVmpMYXEwU2NKbGJlTS9RQzUwQVBXVFhUaWJqSWdhbDl1SWpNM0sy?=
- =?utf-8?B?Q2xiUjI2d2t4YjJyeUhIc2gySTIyZFV2K1lzK0poTERTSTQrK2lsd2JvWlRs?=
- =?utf-8?B?cUx5UGxWVHl6MWVIY21yZG1LK2RxSWxWc1pRYVNmSVh5NXVLTXduUmZZMnlH?=
- =?utf-8?B?MUFTZkIxV2VINmd2b1RleHVBb3FHTTlWZHBOc0VuVEsvTWhnb0o4OHFYTDNv?=
- =?utf-8?B?dng4bXdyT3RWbUlMN0M4ajI3NE1OcUFKdFBGUkFpcmswS21nL2FvbzB2S09I?=
- =?utf-8?B?UUczVUlDUGcxY2FQcVlCd0RLcVlmaHRSWWM2azdCMHN2ZXRoT1grS1JrV0RW?=
- =?utf-8?B?QlpSNndtaDJTRzZDOXhCajJ1UlpVd3FxYzRqVXYyaE9Ca3BmellhRjdXY3lE?=
- =?utf-8?B?Y1VQeHVJRzVwSU1hOVRIdkMyL3dzUUg1ODBFNEMzYzRIanZqLzZpZEhaMlR0?=
- =?utf-8?B?TWdNYzg3NXdDVlpMRCtEbDJjSm0vYTJ6V3Z2WmFYTk96MlM3ZHcyZmNkcHZQ?=
- =?utf-8?B?MGVhL1lqdVlvanc0M0FlMWFsa0JiTmJ1VlhjVTAxMVRXaWRvUDNydU83Y1U5?=
- =?utf-8?B?blpmVENOMGZ0bVZ5QkVFNXpLd21rcDl5NDZwMHFFeUMxSFdVU2hqeWp2SGJx?=
- =?utf-8?B?U2RsdXVHQzhKSWFTcDVsUy9zOVRFVm5EcWFqcGZydlJ5Zit3Q2dkc24wUlZa?=
- =?utf-8?B?cHphbkV0blZEUGVUN0d5bXVQS0N0VmtTRTVkZVppdmRqeHcrbVF1ZUYvNldN?=
- =?utf-8?B?cGhtQitiS1J6eVFGZ0ZVL1RqOGF1NnhUZnQ0d0hmcHczNUhObkxNc3Q2M1Zw?=
- =?utf-8?B?NUFvbWlNRi9LcmxNMm15N2pWUFg0dUpEZW1jMC9wNi90ZXVWNlVQZEJMN3Fa?=
- =?utf-8?B?a0p0MXdjcW9kM2M3N1JHa3ZGOVhoRCs5Rzh2MzZnMlgwMCt5eFF5djBBbS92?=
- =?utf-8?B?cnFSNHFzRDU5Rm9lSTlhL0w1bFRtZ05nMzdhcVZBWE5ic1dYZncwQlpKVXpN?=
- =?utf-8?B?cTNEbmVpUlp0ZlRiMkhLdnFHUFhUc1VkMVByR05OclZxYURVKy9kcXFTSXY4?=
- =?utf-8?B?cUxCWjFLcWhXOHhQVWl6NmpIdjhoMUE2RG9LM3psRnM4cFI5M3hXRWs5U3N2?=
- =?utf-8?B?YzV0UWtpN3hYajl3OEZ3QUNIUUk2Ukx4aEUyR01OMHVJb1lYNjdEaEd2UWZs?=
- =?utf-8?B?TFh0YWZPdnU4NEJxM1J1RlNIMER2dDZuVTRRVlRKTEt5Y0h2WVdHSFRxVk9i?=
- =?utf-8?B?eXBaRVRkai83bkozU3VTRU9BWk1QSWN2TFl6QjAyMkIwSGMxYiswS2I4Ym5F?=
- =?utf-8?B?WGpNOTZLbzRIeFU4SUF3SEZEWkp1VmZwM1RJR2RoRm1tOEYyVTVxakZNK1Bv?=
- =?utf-8?B?Zmc3djZhVTNtNExZWm5YYlFJRGdubzdTZUc1Qmx3bS9QRXBnQUVCQW9XNnVD?=
- =?utf-8?B?TmdKUWREb2s2WmEyS1lvcE9ybzlubWhwZTFaRTZHRGRaaDBSV1NKZDNVemJ2?=
- =?utf-8?B?WWEycmRxcWFqUXZBbVhVbTN5QUNSdW5qQjQwd3hKNlNBeEgvdmZhQ0dQeDFY?=
- =?utf-8?B?TEFRUDhuUzI5bktBUXZuNjFYQUxDSWY3dmtMMDhydWcyV3lEbzBadjJNd1B6?=
- =?utf-8?Q?2+SHQQIbzWl8LDlhs1?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7b70f56-7404-498e-176a-08de520c26bc
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 18:55:27.7629
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m4b0taNI8rzeWYloiVYohOhjjVqU5nlsn/JuxNjI4yXDT/BNbvQTt4Bxk+yGS75i
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6939
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-21-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-21-8be3867cb883@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 12 Jan 2026 19:08:00 +0000
+X-Gm-Features: AZwV_Qjgu-sXQZIHm3TAlOW62aUWk-t7wcra038ZJt2_3BJ_d28PSVA3xv4zVCM
+Message-ID: <CA+EHjTz4vDFdhbZMz6mNacdzSJLFfVbQKMGmSo=Vt9bSB4ho0Q@mail.gmail.com>
+Subject: Re: [PATCH v9 21/30] KVM: arm64: Flush register state on writes to
+ SVCR.SM and SVCR.ZA
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 12 Jan 2026, at 13:25, Jason Gunthorpe wrote:
-
-> On Mon, Jan 12, 2026 at 12:46:57PM -0500, Zi Yan wrote:
->> On 12 Jan 2026, at 11:50, Jason Gunthorpe wrote:
->>
->>> On Mon, Jan 12, 2026 at 11:31:04AM -0500, Zi Yan wrote:
->>>>> folio_free()
->>>>>
->>>>> 1) Allocator finds free memory
->>>>> 2) zone_device_page_init() allocates the memory and makes refcount=1
->>>>> 3) __folio_put() knows the recount 0.
->>>>> 4) free_zone_device_folio() calls folio_free(), but it doesn't
->>>>>    actually need to undo prep_compound_page() because *NOTHING* can
->>>>>    use the page pointer at this point.
->>>>> 5) Driver puts the memory back into the allocator and now #1 can
->>>>>    happen. It knows how much memory to put back because folio->order
->>>>>    is valid from #2
->>>>> 6) #1 happens again, then #2 happens again and the folio is in the
->>>>>    right state for use. The successor #2 fully undoes the work of the
->>>>>    predecessor #2.
->>>>
->>>> But how can a successor #2 undo the work if the second #1 only allocates
->>>> half of the original folio? For example, an order-9 at PFN 0 is
->>>> allocated and freed, then an order-8 at PFN 0 is allocated and another
->>>> order-8 at PFN 256 is allocated. How can two #2s undo the same order-9
->>>> without corrupting each other’s data?
->>>
->>> What do you mean? The fundamental rule is you can't read the folio or
->>> the order outside folio_free once it's refcount reaches 0.
->>
->> There is no such a rule. In core MM, folio_split(), which splits a high
->> order folio to low order ones, freezes the folio (turning refcount to 0)
->> and manipulates the folio order and all tail pages compound_head to
->> restructure the folio.
+On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
 >
-> That's different, I am talking about reaching 0 because it has been
-> freed, meaning there are no external pointers to it.
+> Writes to the physical SVCR.SM and SVCR.ZA change the state of PSTATE.SM
+> and PSTATE.ZA, causing other floating point state to reset. Emulate this
+> behaviour for writes done via the KVM userspace ABI.
 >
-> Further, when a page is frozen page_ref_freeze() takes in the number
-> of references the caller has ownership over and it doesn't succeed if
-> there are stray references elsewhere.
+> Setting PSTATE.ZA to 1 causes ZA and ZT0 to be reset to 0, these are stored
+> in sme_state. Setting PSTATE.ZA to 0 causes ZA and ZT0 to become inaccesible
+> so no reset is needed.
+
+nit: inaccesible -> inaccessible
+
 >
-> This is very important because the entire operating model of split
-> only works if it has exclusive locks over all the valid pointers into
-> that page.
+> Any change in PSTATE.SM causes the V, Z, P, FFR and FPMR registers to be
+> reset to 0 and FPSR to be reset to 0x800009f.
 >
-> Spurious refcount failures concurrent with split cannot be allowed.
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++++-
+>  2 files changed, 52 insertions(+), 1 deletion(-)
 >
-> I don't see how pointing at __folio_freeze_and_split_unmapped() can
-> justify this series.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 44595a789a97..bd7a9a4efbc3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1147,6 +1147,30 @@ struct kvm_vcpu_arch {
 >
-
-But from anyone looking at the folio state, refcount == 0, compound_head
-is set, they cannot tell the difference.
-
-If what you said is true, why is free_pages_prepare() needed? No one
-should touch these free pages. Why bother resetting these states.
-
->> Your fundamental rule breaks this.  Allowing compound information
->> to stay after a folio is freed means you cannot tell whether a folio
->> is under split or freed.
+>  #define vcpu_sve_state_size(vcpu) sve_state_size_from_vl((vcpu)->arch.max_vl[ARM64_VEC_SVE])
 >
-> You can't refcount a folio out of nothing. It has to come from a
-> memory location that already is holding a refcount, and then you can
-> incr it.
+> +#define vcpu_sme_state(vcpu) (kern_hyp_va((vcpu)->arch.sme_state))
+> +
+> +#define sme_state_size_from_vl(vl, sme2) ({                            \
+> +       size_t __size_ret;                                              \
+> +       unsigned int __vq;                                              \
+> +                                                                       \
+> +       if (WARN_ON(!sve_vl_valid(vl))) {                               \
+> +               __size_ret = 0;                                         \
+> +       } else {                                                        \
+> +               __vq = sve_vq_from_vl(vl);                              \
+> +               __size_ret = ZA_SIG_REGS_SIZE(__vq);                    \
+> +               if (sme2)                                               \
+> +                       __size_ret += ZT_SIG_REG_SIZE;                  \
+> +       }                                                               \
+> +                                                                       \
+> +       __size_ret;                                                     \
+> +})
+> +
+> +#define vcpu_sme_state_size(vcpu) ({                                   \
+> +       unsigned long __vl;                                             \
+> +       __vl = (vcpu)->arch.max_vl[ARM64_VEC_SME];                      \
+> +       sme_state_size_from_vl(__vl, vcpu_has_sme2(vcpu));              \
+> +})
+> +
+>  /*
+>   * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
+>   * memory backed version of a register, and not the one most recently
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 51f175bbe8d1..4ecfcb0af24c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -927,6 +927,33 @@ static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
+>         return REG_HIDDEN;
+>  }
+>
+> +static int set_svcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +                   u64 val)
+> +{
+> +       u64 old = __vcpu_sys_reg(vcpu, rd->reg);
+> +
+> +       if (val & SVCR_RES0)
+> +               return -EINVAL;
+> +
+> +       if ((val & SVCR_ZA) && !(old & SVCR_ZA) && vcpu->arch.sme_state)
+> +               memset(vcpu->arch.sme_state, 0, vcpu_sme_state_size(vcpu));
+> +
+> +       if ((val & SVCR_SM) != (old & SVCR_SM)) {
+> +               memset(vcpu->arch.ctxt.fp_regs.vregs, 0,
+> +                      sizeof(vcpu->arch.ctxt.fp_regs.vregs));
+> +
+> +               if (vcpu->arch.sve_state)
+> +                       memset(vcpu->arch.sve_state, 0,
+> +                              vcpu_sve_state_size(vcpu));
 
-Right. There is also no guarantee that all code is correct and follows
-this.
+If sve_state isn't allocated, this means that we've gotten here before
+finalization. Is it better to return an error rather than silently
+skipping this?
 
-My point here is that calling prep_compound_page() on a compound page
-does not follow core MM’s conventions.
+> +
+> +               __vcpu_assign_sys_reg(vcpu, FPMR, 0);
+> +               vcpu->arch.ctxt.fp_regs.fpsr = 0x800009f;
 
-Best Regards,
-Yan, Zi
+This matches the Arm Arm, but can we use a define or construct it,
+rather than using a magic number?
+
+Cheers,
+/fuad
+
+
+> +       }
+> +
+> +       __vcpu_assign_sys_reg(vcpu, rd->reg, val);
+> +       return 0;
+> +}
+> +
+>  static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>                                    const struct sys_reg_desc *r)
+>  {
+> @@ -3512,7 +3539,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>                     CTR_EL0_DminLine_MASK |
+>                     CTR_EL0_L1Ip_MASK |
+>                     CTR_EL0_IminLine_MASK),
+> -       { SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
+> +       { SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility, .set_user = set_svcr },
+>         { SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
+>
+>         { PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
+>
+> --
+> 2.47.3
+>
 
