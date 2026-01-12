@@ -1,178 +1,180 @@
-Return-Path: <kvm+bounces-67840-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A77CD15959
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 23:32:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1E3D15C0C
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:15:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 76E98302039D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 22:32:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0A505301E691
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 23:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35115283FEF;
-	Mon, 12 Jan 2026 22:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1582561A2;
+	Mon, 12 Jan 2026 23:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="kO9UeeRE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gS88dUTJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OK70uyNv"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CAE269D18;
-	Mon, 12 Jan 2026 22:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA373BB40
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 23:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768257171; cv=none; b=FvXDDjRoAcSmVVIIoZjMFYZ7wXNXPJxC1pI87x4BFuKmWoElprqrA8nJlUZVHOCBWVAJWGZJGPALrREppixCbWzujA8h0Kghad8nmWYmY6rkasNtG+7gYUpEEbjF+6op3mIugglVdKeF8zMPzK354koO32JjtSCXpSLKtXywSKM=
+	t=1768259715; cv=none; b=J4fog0J3B9Q6nL+iwaUTHdDX3UbvPFhJCWGxW8vyyJRmBBBT2tUHYbqiv9us+dvj/BWqe6RlzUzMI4K9Cp1ocTMJtrcA7z8KnfJa8PEpuuNraZ3uJQ00F8Gcv01a6y2T6Y1+YshxoZFUDJg+mNzI7vHQ3JmEgOQP5gF90y00Yik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768257171; c=relaxed/simple;
-	bh=x0Y8+T56vpt2wLjy2y5lsv//P1lFieQsVosgTMl1AP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iHlbMOoBnQ+lM9MkQwTW7u+Sxo43m0iRp3Jf/EgmEmJCbnu6rB43E4aHD3boKPHwhEIxW+Vz0gkJd5griF2IE8uoEWSvGDBWAaiFhEJyxzW+XCR1nOeGxWqH8bmOX+Jw9QKutgLQeIXuv9AxrPssD6LYAVbj3CRaw1wfvNFl4bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=kO9UeeRE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gS88dUTJ; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id 9A4141D000F9;
-	Mon, 12 Jan 2026 17:32:47 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 12 Jan 2026 17:32:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1768257167;
-	 x=1768343567; bh=ZgBrEuDhy3L+HbqTfkoSAu7E5PgSbf+QDr5oTUW4q6g=; b=
-	kO9UeeRESmSyeFfvKzuni6bdq/B57jmfZ+XMzpNBjbBLnuhILeVjysXZw6YiHdID
-	pwNKsxWcm8OtfmO0NfKzUILiCwDhJveoLuR7RtYa68Veug0wrY5KfxNV1/VVaMn0
-	EfZZXNQocIUZzq0jjnGgDVPD/gBeXH4yVepRwf+oihfuElmTDhjRRPx80Agvw0hv
-	bAfFJ0YrufW0L+t+JG33WyN2wxqwbH92vi1j2TUP3jT+eKjNIKSlpvPSQNvLq9tx
-	ZuFafmv9CLIuUNs2mDgnHT0KxrMkGUWnxIPUivL2H+bnnt0UoCrGjacHUVtYWxNb
-	3UrKhXrbozmPiitxLCHRwg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768257167; x=
-	1768343567; bh=ZgBrEuDhy3L+HbqTfkoSAu7E5PgSbf+QDr5oTUW4q6g=; b=g
-	S88dUTJTt9dZ11ZgvPrc2fdP6jQe80jawk07i+DrmIrqvfq8sdAsc1BtxPLDa9lV
-	r8p9glV1Ufjjnkpv6nbl2KKZCo4vTyb5JENMnsrHcc2HVsNgmV4kXltCsQQqmB4O
-	v11dmMVgm85ntCW32kGKBmeTSipVREOl8SOr9+UeNun+16JUjOeGgmCMzEMCr9wE
-	xtrdOCDQSWXETVcV1Of3Xb4MaKeETI2aCGEH6orwpiOcPE2iIr2qBYfil2OqIZtO
-	JLjdPZRkxOr/M8gVV/sbpsXUTjG2Hi92tvmE6w/d4PhVBH+l3zxI/Du8UEUppM6Z
-	keaBulTPxWwpfJgquUV4w==
-X-ME-Sender: <xms:j3ZlaRPDIvQsySsInlKfp--eaV2REk9mXoBVGDngdZE75r1q7GazEw>
-    <xme:j3ZlaVdLNQNw4f5b311Dh4w7r46ErpOjhTiV1N2Amxy-3Cx3kDjFHhCEvfj1thQT7
-    P99V4AV91p1QgY1-DxjKOBPP3CjiEhpstm5smV9lU8OeQAoA-04>
-X-ME-Received: <xmr:j3ZlaQX7qlrvkpg9s8rlh9g8kdSFzJT9bgJYjVNJuEEVcC5D2JztqVYrESE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduudekieeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohephedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheprghnthhhohhnhidrphhighhhihhnsehnohhkihgrrd
-    gtohhmpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehlihhnuhigqdhptghisehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epnhgrthhhrghntgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesnhhvihgu
-    ihgrrdgtohhm
-X-ME-Proxy: <xmx:j3Zladi46_pdzDGRWzislpA68taKdQ_gU6FgJqUEiZKsbqN5qF5fyg>
-    <xmx:j3Zlaf8LyatFQTSxxpT4KJsRnaKAIWijYJWpbjWa5OifbXl7812fOg>
-    <xmx:j3ZlafZ25u3X90XJSsYO-BGjAXf6A152QoHl-lfrvOnXVCHb-dGTAQ>
-    <xmx:j3ZlaW0FjaEt9COe-ZHcFiO3GtB38SbpFKkOAji8RUUr1OBQfxqDjQ>
-    <xmx:j3ZlaQAIk-_d9AoQJuPR94BrQx7dAIebKLB6xZC37-qEhC53QM8Iabgt>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 12 Jan 2026 17:32:46 -0500 (EST)
-Date: Mon, 12 Jan 2026 15:32:45 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: "Anthony Pighin (Nokia)" <anthony.pighin@nokia.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-pci@vger.kernel.org"
- <linux-pci@vger.kernel.org>, Nathan Chen <nathanc@nvidia.com>, Jason
- Gunthorpe <jgg@nvidia.com>
-Subject: Re: VFIO_GROUP_GET_DEVICE_FD triggering an "unlocked secondary bus
- reset" warning
-Message-ID: <20260112153245.1e64dca9@shazbot.org>
-In-Reply-To: <BN0PR08MB6951416BAFA500FC9902DAA68381A@BN0PR08MB6951.namprd08.prod.outlook.com>
-References: <BN0PR08MB6951416BAFA500FC9902DAA68381A@BN0PR08MB6951.namprd08.prod.outlook.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1768259715; c=relaxed/simple;
+	bh=D/QOV+PvgeGDhnZ/ix6Fp2phNTxa9gFGlVxWZXZmAqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ItObdOuwATWNaw8ujsp7Psry+vGVwb8TdV/ebdVhryCWfOuQFLamCEpiNNEReXsXG0V/L2Nr4lD6SHH+EIzvVkQJ0Qj7B9xVR/YaYBX5hRh7KC4zqoS3/y1RgYYIYZzWHzVx6kKHnovtAkkrpC2TBH9CrMaHqla4ca/NXhlkiNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OK70uyNv; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee13dc0c52so60247761cf.2
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 15:15:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768259712; x=1768864512; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VrgEBLHMQ7w7z7OSk0+LmFxB5np8c3y6da/CYllo/d4=;
+        b=OK70uyNvYv8MOnkRzIM/7MCuD5vzOxFDCxe/t23Tkzz3IrP8JXhtIyOyplRMi2R78y
+         vAp0VFaeflBYfelfkHB3mKC0ITRu8vz9NXh7oaKcwQFx+lzTd3LJphaa+b2jBnqE+a7F
+         6z4DKcNZvNHBKoMg5Esx8y0RGbOo/8PmOPk5KGw+V6qyb+SBKsVfSvHb8MNnr01Ct2c5
+         GJvy4OUo5oHKfS1CH0WtCoFioAl0RV3IZZSIYXwouHHef7eQwJCXxJ+wVFJAe7iHpd8q
+         brwZGuqGH7BJIR0DxBPeBQ5idtyo6+C5mIGzF/3szxPJeSzY56dtl3cu+oiLBYXfLRvW
+         zR8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768259712; x=1768864512;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VrgEBLHMQ7w7z7OSk0+LmFxB5np8c3y6da/CYllo/d4=;
+        b=jMOSTukSZiIR3jxDfvmLZrq/AikBWGnWYKBwohYlX7KOsT/76pMqzJNdKIkyhaDmRy
+         Cki41foGp1BWeDwWwVMHwD8hBQUamBZZnjOyH/HeJ9XYvdEI2zlpxAE96ZgxRF1T2wuo
+         OZZaai10AfdOejrdSj2JH76OIQwJAJgzoK9QI6WRmzNBzGpR8orj9kdzEHGBBRfxSmx6
+         7cIFe6vuuc3z6CxzOXP6qpJmytw+sFHNxAwKjU8arXzhHoH9REHO3kqCMfDYssmoPRIY
+         iykxLwES72HYlhnLlQUxTfzD3IaUidguhcAm5kkC1rz7KHKisQSNwYrRI5hnAmPFQGia
+         Kcww==
+X-Forwarded-Encrypted: i=1; AJvYcCUK2GGVfReCgx/oidLoSHHa7/gZdJKH8Od4AWlwcnmNtSGkZKIbStO59CrPUlVfXcwYgGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8xuw0GTWJl08plmRmW3RcsnsTMdRdi731TywcUSVMM23k8SZ2
+	+ne3T6jyNaWHepwKL+ahKq3dCcgz1fu4OcE2tqYJ4hGyrQgS/BPN5c5l4Cb8pQ==
+X-Gm-Gg: AY/fxX6tGphYXTDmdB/h2UB2dPqgXsoqKHCKqt3FQSYzaZEV9UzfMXpwKQ6zzigTxfi
+	6f5doEBolQh4Q9rzTLgOSvN1PhYmoM2yof2lfQHeDR3vIi3UgvT+ZOYTuADomHMoTg15ma1bLs8
+	Sx/d/zttS58UhD9osDx5TaiJaWNZFm4Np88dEbFBACsezl59QL47EGLFuQnUYtijbngsucWgI4L
+	2OjlQmhdygZAcO1YnYvZaWakGwYhxaUpJVdgA8MU803MnHm8Dl0SXR9GG7NJ0rUQ4nb+DtlbhOz
+	GP0z78nDA3Jh1P6iOr4PGdful0IuLj7IBA2x18iw/B20AUXNasdYUgDm74noWY47we58Y6Jfthy
+	24ilGhU43dVi/q9dHHMymQ+BqeeEh8W8uv6EOBu66omsM22wjLS5WCDMn1/8ypGBUtPaGGKHawL
+	UCIyGVM6ejBqkWnQEu3UbcKjHFwTG5uljm5mxtenynrIZd
+X-Google-Smtp-Source: AGHT+IEEIChW46EWJZZzmGq0dv1aKbX23y4OJcSbpVgI4A7CpdyG+MDzyxvMqujhAfbDeFoADMp1dQ==
+X-Received: by 2002:a53:e303:0:b0:63f:a727:8403 with SMTP id 956f58d0204a3-64716bd78d9mr12404043d50.38.1768254541320;
+        Mon, 12 Jan 2026 13:49:01 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:8::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6470d7f7c04sm8530959d50.2.2026.01.12.13.49.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 13:49:00 -0800 (PST)
+Date: Mon, 12 Jan 2026 13:48:58 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, kvm@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v13 00/13] vsock: add namespace support to
+ vhost-vsock and loopback
+Message-ID: <aWVsSq7lORhM+prM@devvm11784.nha0.facebook.com>
+References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
+ <aWGZILlNWzIbRNuO@devvm11784.nha0.facebook.com>
+ <20260110191107-mutt-send-email-mst@kernel.org>
+ <aWUnqbDlBmjfnC_Q@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWUnqbDlBmjfnC_Q@sgarzare-redhat>
 
-On Mon, 12 Jan 2026 21:58:44 +0000
-"Anthony Pighin (Nokia)" <anthony.pighin@nokia.com> wrote:
+On Mon, Jan 12, 2026 at 06:26:18PM +0100, Stefano Garzarella wrote:
+> On Sat, Jan 10, 2026 at 07:12:07PM -0500, Michael S. Tsirkin wrote:
+> > On Fri, Jan 09, 2026 at 04:11:12PM -0800, Bobby Eshleman wrote:
+> > > On Tue, Dec 23, 2025 at 04:28:34PM -0800, Bobby Eshleman wrote:
+> > > > This series adds namespace support to vhost-vsock and loopback. It does
+> > > > not add namespaces to any of the other guest transports (virtio-vsock,
+> > > > hyperv, or vmci).
+> > > >
+> > > > The current revision supports two modes: local and global. Local
+> > > > mode is complete isolation of namespaces, while global mode is complete
+> > > > sharing between namespaces of CIDs (the original behavior).
+> > > >
+> > > > The mode is set using the parent namespace's
+> > > > /proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
+> > > > created. The mode of the current namespace can be queried by reading
+> > > > /proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
+> > > > has been created.
+> > > >
+> > > > Modes are per-netns. This allows a system to configure namespaces
+> > > > independently (some may share CIDs, others are completely isolated).
+> > > > This also supports future possible mixed use cases, where there may be
+> > > > namespaces in global mode spinning up VMs while there are mixed mode
+> > > > namespaces that provide services to the VMs, but are not allowed to
+> > > > allocate from the global CID pool (this mode is not implemented in this
+> > > > series).
+> > > 
+> > > Stefano, would like me to resend this without the RFC tag, or should I
+> > > just leave as is for review? I don't have any planned changes at the
+> > > moment.
+> > > 
+> > > Best,
+> > > Bobby
+> > 
+> > i couldn't apply it on top of net-next so pls do.
+> > 
+> 
+> Yeah, some difficulties to apply also here.
+> I tried `base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59` as mentioned
+> in the cover, but didn't apply. After several tries I successfully applied
+> on top of commit bc69ed975203 ("Merge tag 'for_linus' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost")
+> 
+> So, I agree, better to resend and you can remove RFC.
+> 
+> BTW I'll do my best to start to review tomorrow!
+> 
+> Thanks,
+> Stefano
+> 
 
-> When adding a PCI device to a VFIO group, the following is triggered:
-> pcieport 0000:00:00.0: unlocked secondary bus reset via: pci_reset_bus_function+0x188/0x1b8 
-> 
-> As a result of:
-> 920f6468924f ("PCI: Warn on missing cfg_access_lock during secondary bus reset")
-> 
-> PCI topology is very simple:
-> # lspci -vvvtn
-> -[0000:00]---00.0-[01-ff]----00.0  10ee:7011
-> 
-> Full backtrace is as follows:
-> [  125.942637] Hardware name: Freescale ARMv8 based Layerscape SoC family
-> [  125.942642] Call trace:
-> [  125.942648]  dump_backtrace from show_stack+0x20/0x24
-> [  125.942669]  r7:600f0013 r6:600f0013 r5:c11bd5e8 r4:00000000
-> [  125.942672]  show_stack from dump_stack_lvl+0x58/0x6c
-> [  125.942688]  dump_stack_lvl from dump_stack+0x18/0x1c
-> [  125.942706]  r7:c3663483 r6:c1c2e000 r5:00000000 r4:c1c2e000
-> [  125.942709]  dump_stack from pci_bridge_secondary_bus_reset+0x74/0x78
-> [  125.942724]  pci_bridge_secondary_bus_reset from pci_reset_bus_function+0x188/0x1b8
-> [  125.942740]  r5:00000000 r4:c3663000
-> [  125.942742]  pci_reset_bus_function from __pci_reset_function_locked+0x4c/0x6c
-> [  125.942761]  r6:c104aa58 r5:c3663000 r4:c366347c
-> [  125.942764]  __pci_reset_function_locked from pci_try_reset_function+0x64/0xd4
-> [  125.942782]  r7:c24b3700 r6:c36630cc r5:c3648400 r4:c3663000
-> [  125.942784]  pci_try_reset_function from vfio_pci_core_enable+0x74/0x29c
-> [  125.942802]  r7:c24b3700 r6:c3663000 r5:c3648400 r4:00000000
-> [  125.942805]  vfio_pci_core_enable from vfio_pci_open_device+0x1c/0x34
-> [  125.942825]  r7:c24b3700 r6:c3648400 r5:c3648400 r4:c3648400
-> [  125.942828]  vfio_pci_open_device from vfio_df_open+0xc8/0xe4
-> [  125.942844]  r5:00000000 r4:c3648400
-> [  125.942847]  vfio_df_open from vfio_group_fops_unl_ioctl+0x3dc/0x704
-> [  125.942861]  r7:c24b3700 r6:00000013 r5:c3179cc0 r4:c3648400
-> [  125.942863]  vfio_group_fops_unl_ioctl from sys_ioctl+0x2d4/0xc80
-> [  125.942879]  r10:c24b3700 r9:00000012 r8:c3757300 r7:beb3c8e8 r6:00003b6a r5:c3757301
-> [  125.942883]  r4:00003b6a
-> [  125.942886]  sys_ioctl from ret_fast_syscall+0x0/0x5c
-> 
-> Some added debug shows that the trylock is successful for the device being attached. However,
-> the parent (controller) is not locked, leading to the warning.
-> 
-> [  126.254846] pci_cfg_access_trylock: locked for 0000:01:00.0
-> [  126.255081] pci_parent_bus_reset called for dev 0000:01:00.0
-> [  126.255086] pci_parent_bus_reset: checking conditions for dev 0000:01:00.0
-> [  126.255091]   pci_is_root_bus: 0
-> [  126.255096]   subordinate: 00000000
-> [  126.255102]   bus->self: e8833d2c
-> [  126.255108]   PCI_DEV_FLAGS_NO_BUS_RESET: 0
-> [  126.255112] pci_parent_bus_reset: resetting bus for dev 0000:00:00.0
-> [  126.255120] pcieport 0000:00:00.0: unlocked secondary bus reset via: pci_reset_bus_function+0x21c/0x220
-> 
-> The reset methods are as follows:
-> # cat /sys/devices/platform/soc/3500000.pcie/pci0000:00/0000:00:00.0/reset_method
-> pm
-> # cat /sys/devices/platform/soc/3500000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0/reset_method
-> bus
+Sounds good to me. Sorry about that, I must have done something weird
+with b4 to pin the base commit because it has been
+962ac5ca99a5c3e7469215bf47572440402dfd59 for the last several revisions.
 
+Looks like my local of this is actually based on:
 
-Thanks for the report, I'm surprised we haven't seen more of this.
-The warning was added in 7e89efc6e9e4 ("PCI: Lock upstream bridge for
-pci_reset_function()"), where locking of the parent bridge was added
-for pci_reset_function() but not for pci_try_reset_function().  There's
-another case too where vfio_pci_core_disable() makes use of
-__pci_reset_function_locked() and was also not updated to match the
-requirement enforced by 7e89efc6e9e4  Thanks,
+7b8e9264f55a ("Merge tag 'net-6.19-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net")
 
-Alex
+I'll re-apply to head and resend today!
+
+While I'm at it I will try to address Michael's feedback and bump a
+version.
+
+Best,
+Bobby
 
