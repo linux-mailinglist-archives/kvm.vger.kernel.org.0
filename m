@@ -1,100 +1,109 @@
-Return-Path: <kvm+bounces-67809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67810-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14118D14716
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:43:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05CDD14761
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:45:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12B4C30A15AF
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:41:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 78AC03051587
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6763B37F0E5;
-	Mon, 12 Jan 2026 17:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7A837E31F;
+	Mon, 12 Jan 2026 17:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ONQu/2IK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wkz2cVjD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9211437E2F9
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAF324397A
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768239710; cv=none; b=Vp8lcAORiz3/AdWRiNWmvIj9WxxXdty2KBwOGdwKK2VpsqCR5D8ojr/W6T/10UHrAuDgfNROc+OF8eCSvOL7x0G+ewKXam8isO1zU31OugplonjnCW5Ucx3pghvKYgcPBBh/O+cnQ1rPeb1oxClDa7zCVEnygcSqTgC//iqq/jU=
+	t=1768239736; cv=none; b=Ojm9zVHNgTjqGOckkV2vrih5t6QHfztnbQs43gn/Hc051KmEQdawUzVDZkf9iUHWPH+jvMZB3rdx/J6JiMAexXqkqie/vNfIUwueyYcq77dKJZ4F7BMpsuyy9XbvfZYgWUOX2AYDbVd2ygbW76LkuJk0771yP8PXcc1vi3O7d0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768239710; c=relaxed/simple;
-	bh=IN9oPN1vXZbpcR2vz0Dd4fnZMUOOoYvfAM7Ab9jHc10=;
+	s=arc-20240116; t=1768239736; c=relaxed/simple;
+	bh=VzCnP9eiupLpePiHSwZLVuj5ssn5dd1cbk6U5LaMpI4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CYUfs/+FsyNfHTA2I0+ctMIx1Qz1nMgvg46RmuP1NOfOkl+gaUX2djub8NmpAwz8E5LJhgxKmIwijfGS6OUTFTy54AwFM36jCDl6+HgaoWfYWfJbzJ+F32rf8RaxR03Y29wKKrRP4tKJ2i8fuNI1lg6ojTYNgb+Cq8tBdt81nJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ONQu/2IK; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=Fk7XU/okMyDGAfj9sOdMLU7cRFSKP9T3hl2ftxqXF8DDBnza/CboLe95fdIR44Q0n8M8kR2lL4M+YJSCJo81DxUaxW32dtO6kjhzXTFiOg+XxlaYwxEuZg24ooA/jLimHECEPY6LVD7Qoidep3NISkJyMpowaWO1jfcoj+Bi6bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wkz2cVjD; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c314af2d4so5415776a91.3
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:41:48 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-81ee4f90ef8so2018811b3a.1
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:42:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768239708; x=1768844508; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768239733; x=1768844533; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fjt02/b1VuBuSk+xDeFvO3JyVZAEhaBhrJ2tDPDu7dk=;
-        b=ONQu/2IKyabFabqwfoNn7Gb/InAdCsQUbEjb6oekwNLF9LCQyVP72t57B5YN5+dsVu
-         t6TGx+vkURc/V6NVcXVA1xeqimGqKM5i5kbtWAWspFb8B68ozbAkGrrCUFVBT9daVPM6
-         5ws3DGOpUdH1qUeM+4d3S92dtNudy9MMDCiSgduz3HyJoz+jsA8t6WVoyc6HlXAuCPkO
-         hGXGpvOTQH1xP3whbzHRReHZFyHQHhQCMMbrGHi9+H3w1lG+tC1rsgB8CZlA8Lea+nkJ
-         1vtT70KiNPwYY0knghCd5f5++GgNVQU1fm4+5Yz0E1/U4vLnsDEcJ7Moj5U8s5GTwqMs
-         8w5Q==
+        bh=hF0F1wYHks88ql+q5tFmnuZk1jksWoy6owIWqYKviSk=;
+        b=Wkz2cVjDGM0C5vIrvLAwQTF2UgMbQ9AZAD8g2wF4Sqx08AweHgfh9/Lt9VsAmGo0Pw
+         hD6Y9TBzW26gpEeVWvbSMmQfO42TkdfJc6fg6ChTG5k+8McTjf/cLZiwp+Yv/va/SaZh
+         9LShRojv11XPsTqhezRckLwLokGu/yA24cPVNBOJ8qUXzDmXfRiYliK4gcjV3lgIawy/
+         55GiRWvIZstTtYJJsDFzd7rPtYSWyfBfnSWrn2SKiXrhEyYiMs+Z6s5D8l9kOQ8T3hYe
+         aeUWdLrJDkqd71bXJ5qpSkcxqAPe69BOquzpF7KlJMlvHXtgOd/ezG1Hp93RijEojz6e
+         sFzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768239708; x=1768844508;
+        d=1e100.net; s=20230601; t=1768239733; x=1768844533;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fjt02/b1VuBuSk+xDeFvO3JyVZAEhaBhrJ2tDPDu7dk=;
-        b=vgRXAvUpW58VatkjJLupxENvO2xv5i1XnfxKjd5QmkvP9jFB8DIPh4iupaGEcK0eLn
-         YLM6fLbE+1mHtLNzEPJ5jtcypTvs23BGRr8Mznpt57IIxGMpjYshB7jNScqfF+ITdzuG
-         5NfSRZPaTU7+6ymg7BLFyIOCTh7IYVtjNNhDjWg8tDXSOdHnmb5W7tFTpTB3enak/XuT
-         DpzBTf4Uuc+fvYolI711veRDFPRtQ/FmTfOOLAtKYTckSEsRJx21zPaIhpx9ZYW6NFbz
-         IYVP+gT2DNJ2MqY9yQXbeEjTx9vSf5kILNtr82wyexRoYgNgDiy9dIXoKYJ+GSCaN6gs
-         SxOA==
-X-Gm-Message-State: AOJu0YzFNFNQyPrGQIAzZ1YJUeKl1PjqtQBXQcCGj0F+O1sG/YoulicU
-	FMnLz2SXqA99RhDU4+tx7bhwn7QnttgCnD3FMFMb+hSDwneQsGMl2cVrK3qJBCQPv2/eiPKXsMU
-	B99WO3Q==
-X-Google-Smtp-Source: AGHT+IENKjcIdEGcGHg//2lKH4q3iFswDnPs/g3DnsXhOsWYIlrLK2upmufXPjIKKsi+UrYMKB0Kqrk/aug=
-X-Received: from pjyj20.prod.google.com ([2002:a17:90a:e614:b0:34c:f8b8:349b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ecc:b0:340:bb56:79de
- with SMTP id 98e67ed59e1d1-34f68cddd79mr15903418a91.30.1768239708076; Mon, 12
- Jan 2026 09:41:48 -0800 (PST)
-Date: Mon, 12 Jan 2026 09:38:58 -0800
-In-Reply-To: <20251216161755.1775409-1-seanjc@google.com>
+        bh=hF0F1wYHks88ql+q5tFmnuZk1jksWoy6owIWqYKviSk=;
+        b=nh3o1GAo4/ZI6KDUxl5Xjh6Hhjm+TaBjCai1aZa1l4FbqqPBdhlrOJmKqG8BdDaOKS
+         RxdVpMwgzt5lJDxq190RMM6kWL14LSCDb1M+SOwaEpe3uxpALjPEj71Wm2c7/QQgmpiO
+         QyWVhRRMHSVXhUAWhcswb/2bpCh06rXqWwHOTFTMhvozjhTPBDASqCqGzZtzHxZh/A5H
+         1RSmCDTUB1ATgvEjoj/UCw4QBxRy6sjmlkUeF6A0JchIPAo9sMg+zPLxOw0O0Te1wpO4
+         j+RL6pgVa3ZNhehI8Ro0VFiNARHLIm0ZaTJN8c83bY2wk7doBp9f4jB/5PK6J1eEANrC
+         64QA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPdCgd0eBhAlpdv4LwSZGduzawISYUC/3Bc1qOm+dMUDC0/P2YDDbQy0oe017aE6Gu8Ps=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBwKk9UkSVMer0yRGsdcwXAsQx8QOuW/Z2u8aKNBemKy4R1Fy8
+	/nvmLXD5QIY76ifIHrVVu6lgpljMyBPxDiNCfHnDc4nEjsB5EGE7bZlVMlWyThLEXWzkMi1DyDL
+	KdkGJig==
+X-Google-Smtp-Source: AGHT+IHAiTZ5/n/hYqVbrJntap0IKOSyiwf5IseZZtDEeh+eB1yG4jNLVZUOt635znoR5FLQYWwHxD1bbJY=
+X-Received: from pffv4.prod.google.com ([2002:aa7:8084:0:b0:7e5:5121:f943])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:bc91:b0:81c:c98c:aebb
+ with SMTP id d2e1a72fcca58-81cc98cb60emr14422230b3a.61.1768239733376; Mon, 12
+ Jan 2026 09:42:13 -0800 (PST)
+Date: Mon, 12 Jan 2026 09:39:02 -0800
+In-Reply-To: <20251121204803.991707-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251216161755.1775409-1-seanjc@google.com>
+References: <20251121204803.991707-1-yosry.ahmed@linux.dev>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <176823878206.1368770.15606306361125405997.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: nSVM: Remove a user-triggerable WARN on
- nested_svm_load_cr3() succeeding
+Message-ID: <176823870995.1367937.15505376193038248820.b4-ty@google.com>
+Subject: Re: [PATCH v3 0/4] KVM: SVM: GIF and EFER.SVME are independent
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 16 Dec 2025 08:17:54 -0800, Sean Christopherson wrote:
-> Drop the WARN in svm_set_nested_state() on nested_svm_load_cr3() failing
-> as it is trivially easy to trigger from userspace by modifying CPUID after
-> loading CR3.  E.g. modifying the state restoration selftest like so:
+On Fri, 21 Nov 2025 20:47:59 +0000, Yosry Ahmed wrote:
+> Clearing EFER.SVME is not architected to set GIF, so GIF may be clear
+> even when EFER.SVME is clear.
 > 
->   --- tools/testing/selftests/kvm/x86/state_test.c
->   +++ tools/testing/selftests/kvm/x86/state_test.c
->   @@ -280,7 +280,16 @@ int main(int argc, char *argv[])
+> This is covered in the discussion at [1].
+> 
+> v2 -> v3:
+> - Keep setting GIF when force-leaving nested (Sean).
+> - Moved the relevant selftests patches from the series at [2] here
+>   (Sean).
 > 
 > [...]
 
-Applied to kvm-x86 svm, thanks!
+Applied to kvm-x86 svm, with my suggested fixup and the order of 1 and 2
+swapped.  Thanks!
 
-[1/1] KVM: nSVM: Remove a user-triggerable WARN on nested_svm_load_cr3() succeeding
-      https://github.com/kvm-x86/linux/commit/fc3ba56385d0
+[1/4] KVM: SVM: Don't set GIF when clearing EFER.SVME
+      https://github.com/kvm-x86/linux/commit/8312f1b9dd71
+[2/4] KVM: SVM: Allow KVM_SET_NESTED_STATE to clear GIF when SVME==0
+      https://github.com/kvm-x86/linux/commit/6f4d3ebc24c6
+[3/4] KVM: selftests: Use TEST_ASSERT_EQ() in test_vmx_nested_state()
+      https://github.com/kvm-x86/linux/commit/bda6ae6f2966
+[4/4] KVM: selftests: Extend vmx_set_nested_state_test to cover SVM
+      https://github.com/kvm-x86/linux/commit/ca2eccb953fd
 
 --
 https://github.com/kvm-x86/linux/tree/next
