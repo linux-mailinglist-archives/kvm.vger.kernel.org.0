@@ -1,189 +1,206 @@
-Return-Path: <kvm+bounces-67825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60DCBD14C1D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 19:26:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A9EBD14C08
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 19:25:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2D12330319BB
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:23:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33043301AE21
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:25:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D717D3876A4;
-	Mon, 12 Jan 2026 18:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2A63815C1;
+	Mon, 12 Jan 2026 18:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ikhpPbkZ"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="X5yKzpec"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D950387341
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 18:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE85387370
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 18:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768242179; cv=none; b=fItA0MrbqItPYwZZuDAaI0AoPIzCGKSgw6cMPyJX7rRFDCkZXbvx+CbgJlxZgAUQnZMRTx3jsAfJOu1tbL1eol/4zTDAbUini+mZIvO9HRtAKzifXGfiyKBX1qVCrvTLOKUocatXkgRUOQD+KI6E//tUImdJF0lz3RoOpOaQ/tA=
+	t=1768242304; cv=none; b=mn/YWPPJQQEK09reMODd+/yc8CaZFHAr49du4Dmzq6QoCC2W8KxRSCugzs5t6zW7fceTrq31KzShEcxq7THn0ysf6FgLc5jHpSglVm/G4Wd8DDyC7CyYCVhywQPOBpHmdfJtKCpqKPV6OuGA2A5sO5y+BMkEc/CsZZD6w4A2j1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768242179; c=relaxed/simple;
-	bh=z1NKW5ZCrpGqmL8Qz27BnkiAuI36cpXaWazpTBWgWCI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IRDvPe6VKm+8IO/YRFymOfoEEUSAb/TJxVYaqMNMl7ugaZ6SvnGT6D1C806lPGWHADGTMrnT+VaASa1YIR36Uvp0r3/ijaprRbJ7FqCN0w4vbnCb7cdIWT1v6qnPZTr+MzEuUS6VoXw6PCUboqP3/yWjpHh2bhamjEnWSYE7+0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ikhpPbkZ; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=z1NKW5ZCrpGqmL8Qz27BnkiAuI36cpXaWazpTBWgWCI=; b=ikhpPbkZIFB9UIgqLCpxg2qI6V
-	Z8db45b1y5ftTOa8VrXSM6yK8jTX8aQIKw+Lx2hFkCNi47kr0Umy2x2EURIr5M+SpAOTB+9u+gi68
-	RxjK7N33DSqlo+slhurj4INaE5R2YGI1GtRCBeEqn38jytszxLdPwjhCI7znkFy20OMHgZvV7o/b/
-	Fw8EsJe+DdE/nzJjOCSPGb6LhMpt+PdC1qLtCvrb1H0osAKEMijfMMbitunbpuKKhuN8vceQfruJf
-	HYqLgH/RxUNUQOwBMnuI8mn3/sjX1+4+qzaupfyQcXCllFVsnNeJ0QkQ0ebphjO8VGIyOvK50azad
-	jM9iGRAA==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vfMZ1-00000001PDd-3BLf;
-	Mon, 12 Jan 2026 18:22:51 +0000
-Message-ID: <f8bd5f720ecf435701d4f9c3ffa544bad7fabe85.camel@infradead.org>
-Subject: Re: [PATCH v2 25/32] kvm/xen-emu: re-initialize capabilities during
- confidential guest reset
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <anisinha@redhat.com>
-Cc: Paul Durrant <paul@xen.org>, Marcelo Tosatti <mtosatti@redhat.com>, 
-	kvm@vger.kernel.org, qemu-devel@nongnu.org
-Date: Mon, 12 Jan 2026 18:22:51 +0000
-In-Reply-To: <CABgObfbA_SODCgRFkX61nt+tdGK7txurUXo3yLbSuMfnjyyG8w@mail.gmail.com>
-References: <20260112132259.76855-1-anisinha@redhat.com>
-	 <20260112132259.76855-26-anisinha@redhat.com>
-	 <CABgObfbA_SODCgRFkX61nt+tdGK7txurUXo3yLbSuMfnjyyG8w@mail.gmail.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-uPVeXMGU3GG8iTkqYDtN"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1768242304; c=relaxed/simple;
+	bh=zGOveUJBSydj6+f1Ng48sG1u8gGyaZbL+TtCvCFhQyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mnG932qo68+ENBVgoEUppxL91tGkP029jI+lGrjL8amFpZNBv3tNp3iiJNPPIHEiY+tXBV3wYq2/VALYbK9lL/BBK9SamjW4VNtP5LeGzzZymZvz0QnrCbgRf2DcmT4V7+xKNA34Q8KBIShIrEJD3YS09B6ZE9b8BHVIt8OthOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=X5yKzpec; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-88a379ca088so73962666d6.0
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 10:25:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1768242301; x=1768847101; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jdD8MqriJAO2uyiGLSo7KkiIHx3VWLqLd6aNoF+yCm8=;
+        b=X5yKzpec7drmkLwczvotHIEs/RFApJJlDqIJrFABBm597UK3AtaxvQmn7L2a0gqWKc
+         I/NFZxdnyIaTbC1Vnp/3JAbp5EmAJ7M8n7mARHPlcAzRHyAVAOy0yiNrY8gYYVasf9Tj
+         PlJTnC56YVduwV5Lp8XP+YXgJc0YwfBy7HiTFEK/9Tvdgckp/FVA/6LMe38MGRGVB5UR
+         TGatHKQS0Uv303CYzW8psHNHBHcp6W5jklx+95Bxkjz0SIbj/9B1G9xvzGWSez2Vn69u
+         KtqwdsV7eEcss5kCDA4kzPztcm4yrV3fCxxALKK7lXuPZJX3/dzMJhNYYhirMp19EJj4
+         rMkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768242301; x=1768847101;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jdD8MqriJAO2uyiGLSo7KkiIHx3VWLqLd6aNoF+yCm8=;
+        b=iPhpBS6zb9wQ/uaX5X1/qezGr/6as7YK8QULprZ30Nnt0S7VabygKU/AEU7emhw67C
+         ZFVdjaXDcWe76oMBbxWtJuhzUZhTwH3bujTJpvlf6kMQ++vw3GPmsqUNfTE/hZ+4MT0j
+         br/WPnc/DoEDoasQbbPzRh16/tptEA3DTO6rAdwe4h9Ev8I7D1wDgMJMXNiSs88aoyl2
+         yYqbth9fmlQhZN2wEuinDVFPedLDZvQUkGyROon4IoilchGl7vHZbZn++7JAGBHQ5sPO
+         v51ANZyCqUsEJ8DEIVil8ozgv+7sXuJhZFvV2VDv6Vd+vYdT9UgBigW/ZEJliLIC3tI9
+         YAJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGAgp6zuOueoH5CTWE7fuy0APlngMJp3N/Iz2jsqTzgl26OaH/kfr1Qo5mF7Yu0gyzx9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJMLLphiEVQAgbrIq7n+sNWiFsFRq8Xm8vwCpqpbSY+WImROTJ
+	jjRKxwNF5BWUq4ei0fI1688HUGl1P+jZJk6GT0TsNLyTg2QybbmV2c/D7V0Ek2jgy8w=
+X-Gm-Gg: AY/fxX45aBLd+1fA0ErlFI41dKUNhM5YD1cYnSd4+r4oEeMleXh6aQuKX6W3QpuKscq
+	EX6tBLE+S7qwLybqRyzjnYBU5bnol3PPVxL5D9CDZnIR0tru90oue+1JG514whddu0FF1dbxreH
+	b5QKdBIKA/iFfSIJuZvX+sIBvhUryr/fsll0LKqhfZx1VPU7iRbpD2MigF4KGhLp/jdgZIiiHcT
+	gJFKThcls2PxByvL5X53EMEj/SoLQmX8MLvfnSk08FwvoXPitxemJqhsofT980Wio6ex84O+XtA
+	BfLwPzwX7HgrshXaaLg6ZjQ9Tr7xk9O8DYXmPFSyRhtI7TGP9WFHtxHRv4KVM7sPaBQ9WOz7TqP
+	/8tH3tfkubZTehmHgI+CY8FTMzuTwiq2ZBrfBiauqxdE4Q+FEg3f1MXbxHnBY1fabgev1Tt4AY0
+	szwn+kaoi5bJNm5D/DNS1IMFkaQOku5ygRkgYVjepQwK9aROV8ocOHGoeUu8olsaKy7Z0=
+X-Google-Smtp-Source: AGHT+IGn2SBiEVfPnYP4nrga1XlmOOc9x/h3J7lqU+usVoOUoaNofJJs2v26tTONjDwmwZ1AsmIeFg==
+X-Received: by 2002:a05:6214:428e:b0:88e:9f73:2c08 with SMTP id 6a1803df08f44-89084179da3mr258471116d6.5.1768242300986;
+        Mon, 12 Jan 2026 10:25:00 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890770ce985sm138366276d6.11.2026.01.12.10.25.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 10:25:00 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vfMb6-00000003SfZ-05E0;
+	Mon, 12 Jan 2026 14:25:00 -0400
+Date: Mon, 12 Jan 2026 14:25:00 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Zi Yan <ziy@nvidia.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Balbir Singh <balbirs@nvidia.com>,
+	Francois Dugast <francois.dugast@intel.com>,
+	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	Matthew Brost <matthew.brost@intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	David Hildenbrand <david@kernel.org>,
+	Oscar Salvador <osalvador@suse.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Alistair Popple <apopple@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+	linux-pci@vger.kernel.org, linux-mm@kvack.org,
+	linux-cxl@vger.kernel.org
+Subject: Re: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free
+ callback
+Message-ID: <20260112182500.GI745888@ziepe.ca>
+References: <20260111205820.830410-1-francois.dugast@intel.com>
+ <20260111205820.830410-2-francois.dugast@intel.com>
+ <aWQlsyIVVGpCvB3y@casper.infradead.org>
+ <874d29da-2008-47e6-9c27-6c00abbf404a@nvidia.com>
+ <0D532F80-6C4D-4800-9473-485B828B55EC@nvidia.com>
+ <20260112134510.GC745888@ziepe.ca>
+ <218D42B0-3E08-4ABC-9FB4-1203BB31E547@nvidia.com>
+ <20260112165001.GG745888@ziepe.ca>
+ <86D91C8B-C3EA-4836-8DC2-829499477618@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86D91C8B-C3EA-4836-8DC2-829499477618@nvidia.com>
 
+On Mon, Jan 12, 2026 at 12:46:57PM -0500, Zi Yan wrote:
+> On 12 Jan 2026, at 11:50, Jason Gunthorpe wrote:
+> 
+> > On Mon, Jan 12, 2026 at 11:31:04AM -0500, Zi Yan wrote:
+> >>> folio_free()
+> >>>
+> >>> 1) Allocator finds free memory
+> >>> 2) zone_device_page_init() allocates the memory and makes refcount=1
+> >>> 3) __folio_put() knows the recount 0.
+> >>> 4) free_zone_device_folio() calls folio_free(), but it doesn't
+> >>>    actually need to undo prep_compound_page() because *NOTHING* can
+> >>>    use the page pointer at this point.
+> >>> 5) Driver puts the memory back into the allocator and now #1 can
+> >>>    happen. It knows how much memory to put back because folio->order
+> >>>    is valid from #2
+> >>> 6) #1 happens again, then #2 happens again and the folio is in the
+> >>>    right state for use. The successor #2 fully undoes the work of the
+> >>>    predecessor #2.
+> >>
+> >> But how can a successor #2 undo the work if the second #1 only allocates
+> >> half of the original folio? For example, an order-9 at PFN 0 is
+> >> allocated and freed, then an order-8 at PFN 0 is allocated and another
+> >> order-8 at PFN 256 is allocated. How can two #2s undo the same order-9
+> >> without corrupting each other’s data?
+> >
+> > What do you mean? The fundamental rule is you can't read the folio or
+> > the order outside folio_free once it's refcount reaches 0.
+> 
+> There is no such a rule. In core MM, folio_split(), which splits a high
+> order folio to low order ones, freezes the folio (turning refcount to 0)
+> and manipulates the folio order and all tail pages compound_head to
+> restructure the folio.
 
---=-uPVeXMGU3GG8iTkqYDtN
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+That's different, I am talking about reaching 0 because it has been
+freed, meaning there are no external pointers to it.
 
-On Mon, 2026-01-12 at 18:19 +0100, Paolo Bonzini wrote:
-> On Mon, Jan 12, 2026 at 2:24=E2=80=AFPM Ani Sinha <anisinha@redhat.com> w=
-rote:
-> >=20
-> > On confidential guests KVM virtual machine file descriptor changes as a
-> > part of the guest reset process. Xen capabilities needs to be re-initia=
-lized in
-> > KVM against the new file descriptor.
-> >=20
-> > This patch is untested on confidential guests and exists only for compl=
-eteness.
->=20
-> This sentence should be changed since now your code can be tests on
-> non-confidential guests (or removed altogether).=C2=A0 Same for patch
-> 23/32.
+Further, when a page is frozen page_ref_freeze() takes in the number
+of references the caller has ownership over and it doesn't succeed if
+there are stray references elsewhere.
 
-Are the KVM selftests expanded to cover this?
+This is very important because the entire operating model of split
+only works if it has exclusive locks over all the valid pointers into
+that page.
 
---=-uPVeXMGU3GG8iTkqYDtN
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Spurious refcount failures concurrent with split cannot be allowed.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDExMjE4MjI1
-MVowLwYJKoZIhvcNAQkEMSIEIHhlIvFsJ8wdZ+NT82466Lt2bi4BHST+2sybWpCigTqQMGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAyHC6zKeVpQd4
-4buLzxxTlj/sKwxMzSjvgUcMapXwJSu8F6ecTYNXJ/kVTm/u7sWcuiINwRA3nLb3yu3NxhnKI09i
-31HHo1gWaH2q91O2jNYsSBAoUJ6Jn61M+1Pw3h6w8Prrv2JAF16YP9g/GmHr3U7+Lb/eftZONB/1
-FgHbHh/Xaz46L+lUmqzPDs1ZE4UIiL7kQjnjug/cYcy0xPBSFv8nWoN20TGhOeI/pW5A+V/PVvJy
-zGpiJ2TT3dwYSA5zcidtEUuj8goMNHpjleDIyRWIP/ggwf7DnnVp6As7lKbY9sYxsDmPhRBc3cfk
-S/1yDhxikYskEQhWWIA4XfzqNsqZxmMcepZHZowKPS4F6/aiQ6QXb4r58cPTRuu/USzNy+XMqgEw
-q/q9Jwc/Pj4jWf+0Q6Lsrk3Dnhh3Zo+qvSa59SmEXOf8DNCItx4tQFz3MzUXoFLIuRQcVzUUh7KV
-nuZORe6xAgh67q3mAGnfvVYXLkW0hm+MRJtuTaHIcFucn1du4bOy5skF1+nKU2Kp/X7G6BcE0/tr
-Qf39F/YzxbcSc5QgPIyecmHeR2KbrzNcZfyv18/5ORhYw0tUTFXCZeQf5lFy9F4hULSZ0XZt/o7w
-xJAnPeSnvcxbszoy/6wFAOEeIvhAGDv3Y7RczwoxbuTai0faWjCxA/o2nyrVl5AAAAAAAAA=
+I don't see how pointing at __folio_freeze_and_split_unmapped() can
+justify this series.
 
+> Your fundamental rule breaks this.  Allowing compound information
+> to stay after a folio is freed means you cannot tell whether a folio
+> is under split or freed.
 
---=-uPVeXMGU3GG8iTkqYDtN--
+You can't refcount a folio out of nothing. It has to come from a
+memory location that already is holding a refcount, and then you can
+incr it.
+
+For example lockless GUP fast will read the PTE, adjust to the head
+page, attempt to incr it, then recheck the PTE.
+
+If there are races then sure maybe the PTE will point to a stray tail
+page that refers to an already allocated head page, but the re-check
+of the PTE wille exclude this. The refcount system already has to
+tolerate spurious refcount incrs because of GUP fast.
+
+Nothing should be looking at order and refcount to try to guess if
+concurrent split is happening!!
+
+Jason
 
