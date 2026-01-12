@@ -1,142 +1,164 @@
-Return-Path: <kvm+bounces-67784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725ADD141FE
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:44:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 892BAD142D6
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 23FB43015165
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 16:42:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A323F303C982
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 16:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408A634D383;
-	Mon, 12 Jan 2026 16:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2927D36C0A7;
+	Mon, 12 Jan 2026 16:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="BbiUjK5U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxmUZUU7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgZOeLUd"
 X-Original-To: kvm@vger.kernel.org
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A4D366557
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D0036C0AD
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768236153; cv=none; b=f1pjNiYopFCSOD6CjvP+VaQviKU73R6vLYRYZIGSQBzvRxZ0IWQLcwWFfB3klRSFS0KJX/zNv4RIhvAdP1E6dNGY84eXNPi1VdXrXvk8W0p8EzyA93dcA7vATiE0l8jTxyBqTMbBbd6zzXeTOzqMqrVnLiMwJd+QeFcwB+7y5fQ=
+	t=1768236559; cv=none; b=Qh2bVX7DvReBfNBojxinNFYE2eHmS6gNifxdYhNrZT9vidJzcza3SzBRqbWv0A9xzHG+a4Wgs8j2vG+ozq/GS/xKmXz3EozMVAONNC1NoFiSYjxyXWsF/yizm1IuhOrsKwcEQPbDxhbzrjwoN8yZAAQ5uz2hSZrlzF+ua+c+3RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768236153; c=relaxed/simple;
-	bh=GCV/3QBtc+eIdYfvw5hxOGvLLmtdFxdHoXyuuvKPKYM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ri7OGcWaZIl9wsT4qmTbjRqqNsuvwtKz1eY5hJy1wQeECyatm9Z12P6hk8JT2FFD9VCmzx3Z7hCq4tglARBcu7/H68hjV15afg+Bj7p3QZu4SjS9CUAmvaf1cECm8R8s0k7FXGjUGtcobPe9OdZLTnyqHWD1YNaGL/lL26Fx+sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=BbiUjK5U; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=eZmC8E9x0lsORQcKBHO7BPce7Bp4VCsTTDrVTj1p9/k=;
-	b=BbiUjK5UomxqSiXsKG9eFzkpXanoKP+1SBcbtDaePrflU8sK/g28VzaBCBsf8TdrXeuVEpFVt
-	bXLPjve1C4smFydsDNsbelt8NqQaGS/jbc3M5UeJV2867Fny+cCBph7iHOgWfPERst3eyCOdvJX
-	Ro/y+PTtKpmuNgmNFB/6bKw=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dqdQc4Bw1zMksc;
-	Tue, 13 Jan 2026 00:40:08 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqdSx2mVMzJ46F7;
-	Tue, 13 Jan 2026 00:42:09 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 050C340086;
-	Tue, 13 Jan 2026 00:42:21 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 16:42:20 +0000
-Date: Mon, 12 Jan 2026 16:42:19 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 36/36] KVM: arm64: gic-v5: Communicate
- userspace-driveable PPIs via a UAPI
-Message-ID: <20260112164219.00001d70@huawei.com>
-In-Reply-To: <20260109170400.1585048-37-sascha.bischoff@arm.com>
-References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-37-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1768236559; c=relaxed/simple;
+	bh=rSpDYYDAlrC2qkyCkQQP9wvtpup8H0/216lHMC+q/jI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XYX7v5JG5k5uNQs+HNIBIbULMrdrrqgvcTC5hCG3VV9gW8+zONZC7P886RI82aqRTzdGjhh8eQ6og1uCKQUDaJc+lYblFy90tXQs5lWcSV5yzLW0DY5Xl7xV5HEYDycABd9qS50A77hdvqGVix7758+6AzgHAN4ZVuU4YNtLMvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KxmUZUU7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YgZOeLUd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768236554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7/pAFr0/aoSxJfBcAQjHBP8K9Jsu2l/1rwtc+O6U0sw=;
+	b=KxmUZUU7MZfcOQI9YpVgEx33b2F6UZklh5F373JIpc56rKG6CIAsc4UiOphS4eQW74ZtDn
+	pBhUPBpAj/Ll7nFHxSvLOrOAVhpJyPJoiWIptGJyARZcxJ8aMrb+HCW5GPFGbEydHzfCEP
+	8fYgNPha6k1qfvRpmwq8oSRH5h6WFJ0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-_B4fwesIOP2zBtx-MIE3iw-1; Mon, 12 Jan 2026 11:49:12 -0500
+X-MC-Unique: _B4fwesIOP2zBtx-MIE3iw-1
+X-Mimecast-MFC-AGG-ID: _B4fwesIOP2zBtx-MIE3iw_1768236552
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47d3c4468d8so42735255e9.2
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 08:49:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768236551; x=1768841351; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7/pAFr0/aoSxJfBcAQjHBP8K9Jsu2l/1rwtc+O6U0sw=;
+        b=YgZOeLUdV3qfhMEqiDu8okLFTjc37c9d2amQ6hvc5TtmHWm3IiRKtiQK4IrQubkGut
+         NwIlHPOFDekx8lrt6c1oi4Y1bKjlgKifpA/mvUGdWgwzyKVgFXMXspmdMFiJw7m963uy
+         lApWF1okdig11IInab5cMoSAM0YJqi52Tw/cn6sSvdMFxGXkqm5QMNXWLQftVnyjrPgO
+         olvE17ccMfcmuEaDXUY22A4gNp7SlPr0mCM0LyH56SzTJOC1LpH9LscZPKmtM0UXMssT
+         cOK063RbiSTO7CI0HnyCki3HWLZ03EOH/cfmEIqkuUfmeV1s+6lEjHgLWthXUpPVvr8P
+         w4+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768236551; x=1768841351;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7/pAFr0/aoSxJfBcAQjHBP8K9Jsu2l/1rwtc+O6U0sw=;
+        b=mUUetmtN/xuIrgS0cmHV6/WPekvjBThCLLcDP0+HOZb7KNUY87UNYi6+X1DNyEz7je
+         yKK/MCoy+X2JGBJJD6GItlLFGxMtG+uOUgksIKT9/mwxTbPMxh4zoi7WRgwwOwi+uyUf
+         3uTmpI6uIiKJBECiAPl5Nh69ttJJFZERkVuNIanc4royL14pC4On/7c2y+5uEpwwbMbn
+         Gswgsc+sJNlnnQvXFADkCmdHqYeNkPgkxUvP+N6TilU/nhqTAGfKFY+G/5CYuEGHK24O
+         Tz9YuZW7mxVMg3cK9asgNPLW/J8kWWlT/urdlMoEoV1FBHNshSkqugtwZIgXgAm800pZ
+         2a8g==
+X-Forwarded-Encrypted: i=1; AJvYcCW5KDyejzZFXcMQZ0PS4Zt8u9xHsGl95n0s56hOaS7j7aT7TXAZRqO6y3GAFgMK/L5GWgA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKf95K8crGHr+KlEFtHOIv9AtJTOrJhWwCTcMqm6FrafSQ1wBx
+	NyopHPw30vYMetY4hT7UYNYwlG9OHZYZEvhsZpGQPRoOgxe1fAXcdTSZqMTWwyxzS8fjQ0cxELs
+	k5pfx0Kewc6I4nW7zX/pdzB3nfG56qCWW+z3aziOG53+SlrgyAfpT0Q==
+X-Gm-Gg: AY/fxX6Ezvjtfx2CEvQfltx0UYoC9M15TsK6egW2vO79LWas6DOxf+0P1JmG1CDKNCR
+	ziSiEXco0uE7k8B/l0KbFhghKbZ76FtKMv56+78HjAjuXx7iL5ZwRZBKdJUTVbCU8pGohrAxuav
+	wswReXWS28JDWnANsC3xqtOb+u9GUROJxIo0+zlGaGDBMKZaP1VdQPTPAAkYjcKmnO62y+rGGHy
+	vQBvl5Yk2tFl0r8YAixdlEn9FBROl0vNnU7dfeEDMVkR+p3yPtOZ6eher15/X3/UXKNSoCp9AOb
+	zA7W/Cpye1vkfO6V8q7KaR80Uv7P7Z/YTcXn+BWHVPEwBnxRbpalontFNycvRnyGtICvnlUF7zd
+	v6F6PtvO4M4zCtu5AEzmTz3aZfxFN+uFeDxyyBlpd2TlwMI7AFinWo/16ypw2Kw==
+X-Received: by 2002:a05:600c:1991:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-47d84b40aa4mr239691915e9.35.1768236550745;
+        Mon, 12 Jan 2026 08:49:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGbfHpDO7Px43Be+w7n1YsI5iuj6cCFBAlIOAFZDgERsn4SYfumZjikc9aia43Emr8rvTaF4g==
+X-Received: by 2002:a05:600c:1991:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-47d84b40aa4mr239691475e9.35.1768236550199;
+        Mon, 12 Jan 2026 08:49:10 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8718b1a6sm133003075e9.13.2026.01.12.08.49.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 08:49:09 -0800 (PST)
+Date: Mon, 12 Jan 2026 17:48:56 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
+ getting coalesced
+Message-ID: <aWUk0axv-GZu7VD2@sgarzare-redhat>
+References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
+ <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
+ <aWEqjjE1vb_t35lQ@sgarzare-redhat>
+ <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
+ <aWT6EH8oWpw-ADtm@sgarzare-redhat>
+ <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
 
-On Fri, 9 Jan 2026 17:04:50 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Mon, Jan 12, 2026 at 04:52:02PM +0100, Michal Luczaj wrote:
+>On 1/12/26 14:44, Stefano Garzarella wrote:
+>> On Sun, Jan 11, 2026 at 11:59:54AM +0100, Michal Luczaj wrote:
+>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>>>>> index bbe3723babdc..21c8616100f1 100644
+>>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
+>>>>> 		.run_client = test_stream_accepted_setsockopt_client,
+>>>>> 		.run_server = test_stream_accepted_setsockopt_server,
+>>>>> 	},
+>>>>> +	{
+>>>>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
+>>>>
+>>>> This is essentially a regression test for virtio transport, so I'd add
+>>>> virtio in the test name.
+>>>
+>>> Isn't virtio transport unaffected? It's about loopback transport (that
+>>> shares common code with virtio transport).
+>>
+>> Why virtio transport is not affected?
+>
+>With the usual caveat that I may be completely missing something, aren't
+>all virtio-transport's rx skbs linear? See virtio_vsock_alloc_linear_skb()
+>in virtio_vsock_rx_fill().
+>
 
-> GICv5 systems will likely not support the full set of PPIs. The
-> presence of any virtual PPI is tied to the presence of the physical
-> PPI. Therefore, the available PPIs will be limited by the physical
-> host. Userspace cannot drive any PPIs that are not implemented.
-> 
-> Moreover, it is not desirable to expose all PPIs to the guest in the
-> first place, even if they are supported in hardware. Some devices,
-> such as the arch timer, are implemented in KVM, and hence those PPIs
-> shouldn't be driven by userspace, either.
-> 
-> Provided a new UAPI:
->   KVM_DEV_ARM_VGIC_GRP_CTRL => KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> 
-> This allows userspace to query which PPIs it is able to drive via
-> KVM_IRQ_LINE.
-> 
-> Additionally, introduce a check in kvm_vm_ioctl_irq_line() to reject
-> any PPIs not in the userspace mask.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> 
-> FOLD: Limit KVM_IRQ_LINE PPIs
+True, but what about drivers/vhost/vsock.c ?
 
-Looks like you did a squash rather than a fixup merge and failed to drop this.
+IIUC in vhost_vsock_handle_tx_kick() we call vhost_vsock_alloc_skb(), 
+that calls virtio_vsock_alloc_skb() and pass that skb to 
+virtio_transport_recv_pkt(). So, it's also affected right?
 
-Otherwise, just one trivial thing below.
+BTW in general we consider loopback as one of virtio devices since it 
+really shares with them most of the code.
+
+That said, now I'm thinking more about Fixes tag.
+Before commit 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs for 
+handling large transmit buffers") was that a real issue?
 
 Thanks,
-
-Jonathan
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1cfd1e53b060e..e15c97395f50f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1437,6 +1437,14 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  			if (irq_num >= VGIC_V5_NR_PRIVATE_IRQS)
->  				return -EINVAL;
->  
-> +			/*
-> +			 * Only allow PPIs that are explicitly exposed to
-> +			 * usespace to be driven via KVM_IRQ_LINE
-> +			 */
-> +			u64 mask = kvm->arch.vgic.gicv5_vm.userspace_ppis[irq_num / 64];
-
-Inline declarations are still normally limited to when we need to have
-them, e.g for cleanup.h stuff.  So declare mask at top of appropriate
-scope.
-
-> +			if (!(mask & BIT_ULL(irq_num % 64)))
-> +				return -EINVAL;
-> +
->  			/* Build a GICv5-style IntID here */
->  			irq_num |= FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
->  		} else if (irq_num < VGIC_NR_SGIS ||
-
+Stefano
 
 
