@@ -1,153 +1,98 @@
-Return-Path: <kvm+bounces-67703-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67704-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E53D113D1
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 09:32:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D4BD11488
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 09:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 37FB73004611
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 08:32:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 083C530ACE04
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 08:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BB4340A4D;
-	Mon, 12 Jan 2026 08:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="klpItBNg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94D334320D;
+	Mon, 12 Jan 2026 08:40:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE6113FEE;
-	Mon, 12 Jan 2026 08:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE947342529
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 08:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768206738; cv=none; b=swH7vZ/mDL0xYRnAE27ElmrKHJeHoiJIA0xX/2luIDK2aAc3Gq1XldEckI1f4aCvWquGnnWyzcen9DCf1Ics5VZ1GQxzv0jpEclK9+U5dmp0POK9PNGO2qSWsAS7oUCSZGoHnXr5YcPeex4iajeRmZThGE6oxdkgYNoMWcLjDm4=
+	t=1768207236; cv=none; b=QAeHfARdkrC8bcFAV/0X7gQx6HMX014B3ykUQzOGLsd6kjMnjhhlKtXQsXY0qC2fA+6G185cJtCQBy8giXXSQVqfteW9beH8+qFhyTYY9PMSgPp3jEtuUVt2EbudulSHynwNbbumWklzcuyAakoOxmLDJ3S8oOITozHuQzgLY4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768206738; c=relaxed/simple;
-	bh=SHfD2RJWN07Ig3ppVBYX66809qmhB/Z3/h6UsWxKPm4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YO5498Zv3thIxXrKxpl5JCYNfT5Blu5k/0ivz45Du+PS/g6AwM5D0pYCnDRc5KzIAZFhnJf8SNgDwgtITC4jL0jX4SvJ1YFFoC27RlUIb82g97BMjQz7RQhZ9KSaKADgNkuy2iYikalYjVNJ+4Hhg0YPJAv9FLbgVwHWBGQHulo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=klpItBNg; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768206737; x=1799742737;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SHfD2RJWN07Ig3ppVBYX66809qmhB/Z3/h6UsWxKPm4=;
-  b=klpItBNgBoYocNkeFBAVbnpPJWXCGPG3f67s6p4JMHlZFkFJ6hHrn2B0
-   alW90iISqNi75NzPJx/BiKyqobtdp5kNnYITbksGt1poBnJm9uC55knvz
-   37ednWMaFIwOYEKsMrkxWxJnrVAyuQ5ejkrEIIE6AL5snJdGw6i3U9wXV
-   VNr1XCncnLXrTA6Fw8eyL9jYR5229ks5MUQQuRcDHejTcxQamE3GrC+OL
-   hpy2dYoTh69CZ62At5Q/WqSiGJx2zEsmZ1SIbNJKwu8BfXFN9Repd0nfy
-   x8dO4mBaF3brzmmCi2xb+cuNx2qbIFqZZUI8UB25eBTMCyPyhYG2ltJv9
-   A==;
-X-CSE-ConnectionGUID: mTO1DKfXSXedjf87AUXcMw==
-X-CSE-MsgGUID: Zpfq2OTZT1Gg4aYGT4bCDQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11668"; a="86893676"
-X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
-   d="scan'208";a="86893676"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 00:32:17 -0800
-X-CSE-ConnectionGUID: 3mXeXO1JTiKW1ZMdkdAAgQ==
-X-CSE-MsgGUID: eJxxRbviSE6kc/PJi7/DTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
-   d="scan'208";a="235271447"
-Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 00:32:13 -0800
-Message-ID: <da8d8997-e8b8-41e8-909b-44c49cae4a08@linux.intel.com>
-Date: Mon, 12 Jan 2026 16:32:11 +0800
+	s=arc-20240116; t=1768207236; c=relaxed/simple;
+	bh=wyDBDkTtk6G7w6AHFfqdlfQSinv49LnsPo8nuwFZCQY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jd2tKYuZxxekZvF8rmydZqtt09YzthEw6wqmWNyAARrNQ5fPkmoobikYIuQzZDuhBUZrw5bwjiYxXoAXx89+2HIe+ZoPWYtB+/ZOiYtr5m5n9k7twot5WCSVHL6bofd85yEIr/8dXdMqLvyEfWWbkx/A0I9hRiF7FnBwRJfh/uM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7c7028db074so18268319a34.1
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 00:40:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768207234; x=1768812034;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gparABUglWjoRW7xpv3rlbYer4LDYJ2R87NuDCttHCw=;
+        b=VaHl0Bz/JjGER6szmHkjhXFKQezoBculF73PM+uIemCzuhN4D3hitQnagW485GcPlZ
+         LJKzNe/dPt5EH27BYTTfmJATp9q2vUaBg0N+hOc+ToeQYOwQSrPUiIQu463twx8YuYmr
+         0Xo3B+RNfRBD+QWW/KZsZPfp0DqQQKGD305XG8iVqIst4+O0+rTeMzNT1ZDvhvBv0gsb
+         Z2jXNGckcplUzh5yrEdL9rpkYaI81+MPv4mI77C8YwqSNk3zKEPmN7O/3lI56oK3uhWx
+         K+i6fSg2jXCCsDfwRdgfJPiUtse5QZaFrwKf+nvDH/HmgO0DeNrkR9AbKM6COOQUk+eH
+         enLw==
+X-Gm-Message-State: AOJu0YxF62bVHGR7jGV+vEe6fFNhlCONMzaEuSIGQ0Q9y2pdXfw/3Ad1
+	Cat+BNwYqELaBmgpaomN2Dj4sqph0jo8vvJFvjD7wtFBZ09L1S8z7ZOLnUMEirXZI2cCu9iJ0At
+	l8w2BI4m8EuGgu1/a8IGwqXZexkQ3qvJ60H1PXdM3Ns9RIfONicXlmYzyywQ=
+X-Google-Smtp-Source: AGHT+IEdRombO2HyVM7sGgtNedsJB665Id7Q4qIo06Zc17es4XydB6IFsTQJ+e5MamyODkiN7CP26tawFPku3NIRGZ/4JKskMfJL
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] x86/virt/tdx: Print TDX module version during init
-To: Vishal Verma <vishal.l.verma@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
- kvm@vger.kernel.org, x86@kernel.org, Chao Gao <chao.gao@intel.com>,
- Dan Williams <dan.j.williams@intel.com>, Kai Huang <kai.huang@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>
-References: <20260109-tdx_print_module_version-v2-0-e10e4ca5b450@intel.com>
- <20260109-tdx_print_module_version-v2-2-e10e4ca5b450@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20260109-tdx_print_module_version-v2-2-e10e4ca5b450@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a4a:dd8b:0:b0:65f:6c35:688c with SMTP id
+ 006d021491bc7-65f6c357120mr3082154eaf.26.1768207233841; Mon, 12 Jan 2026
+ 00:40:33 -0800 (PST)
+Date: Mon, 12 Jan 2026 00:40:33 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6964b381.050a0220.eaf7.0091.GAE@google.com>
+Subject: [syzbot] Monthly kvm report (Jan 2026)
+From: syzbot <syzbot+list5240cc45942723eeb3a7@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hello kvm maintainers/developers,
 
+This is a 31-day syzbot report for the kvm subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/kvm
 
-On 1/10/2026 3:14 AM, Vishal Verma wrote:
-> It is useful to print the TDX module version in dmesg logs. This is
-> currently the only way to determine the module version from the host. It
-> also creates a record for any future problems being investigated. This
-> was also requested in [1].
-> 
-> Include the version in the log messages during init, e.g.:
-> 
->   virt/tdx: TDX module version: 1.5.24
->   virt/tdx: 1034220 KB allocated for PAMT
->   virt/tdx: module initialized
-> 
-> Print the version in get_tdx_sys_info(), right after the version
-> metadata is read, which makes it available even if there are subsequent
-> initialization failures.
-> 
-> Based on a patch by Kai Huang <kai.huang@intel.com> [2]
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 7 issues are still open and 65 have already been fixed.
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+Some of the still happening issues:
 
-One nit below.
+Ref Crashes Repro Title
+<1> 660     Yes   WARNING: locking bug in kvm_xen_set_evtchn_fast
+                  https://syzkaller.appspot.com/bug?extid=919877893c9d28162dc2
+<2> 49      Yes   WARNING in __kvm_gpc_refresh (3)
+                  https://syzkaller.appspot.com/bug?extid=cde12433b6c56f55d9ed
+<3> 12      No    INFO: task hung in kvm_swap_active_memslots (2)
+                  https://syzkaller.appspot.com/bug?extid=5c566b850d6ab6f0427a
+<4> 4       Yes   WARNING in kvm_read_guest_offset_cached
+                  https://syzkaller.appspot.com/bug?extid=bc0e18379a290e5edfe4
 
-> 
-> Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
-> Cc: Chao Gao <chao.gao@intel.com>
-> Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Cc: Kai Huang <kai.huang@intel.com>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Link: https://lore.kernel.org/all/CAGtprH8eXwi-TcH2+-Fo5YdbEwGmgLBh9ggcDvd6N=bsKEJ_WQ@mail.gmail.com/ # [1]
-> Link: https://lore.kernel.org/all/6b5553756f56a8e3222bfc36d0bdb3e5192137b7.1731318868.git.kai.huang@intel.com # [2]
-> ---
->  arch/x86/virt/vmx/tdx/tdx_global_metadata.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-> index 0454124803f3..4c9917a9c2c3 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-> @@ -105,6 +105,12 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
->  	int ret = 0;
->  
->  	ret = ret ?: get_tdx_sys_info_version(&sysinfo->version);
-> +
-> +	pr_info("Module version: %u.%u.%02u\n",
-> +		sysinfo->version.major_version,
-> +		sysinfo->version.minor_version,
-> +		sysinfo->version.update_version);
-> +
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Nit:
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-There is a mismatch b/t the change log and the code.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-The printed message will be 
-    virt/tdx: Module version: x.x.xx
-instead of the format in the change log
-    virt/tdx: TDX module version: x.x.xx
-
-
->  	ret = ret ?: get_tdx_sys_info_features(&sysinfo->features);
->  	ret = ret ?: get_tdx_sys_info_tdmr(&sysinfo->tdmr);
->  	ret = ret ?: get_tdx_sys_info_td_ctrl(&sysinfo->td_ctrl);
-> 
-
+You may send multiple commands in a single email message.
 
