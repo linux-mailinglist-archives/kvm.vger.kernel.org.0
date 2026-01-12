@@ -1,99 +1,100 @@
-Return-Path: <kvm+bounces-67801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67802-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C092D146DA
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:40:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D1BD146E7
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 896A830066C0
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:40:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A0DB23019BF4
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2695D37BE8B;
-	Mon, 12 Jan 2026 17:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7D737E2F9;
+	Mon, 12 Jan 2026 17:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HUZ87I4V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iJmbeRXA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D70374176
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81511376BDD
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768239620; cv=none; b=bxy7UZ8zitH+XNHrNnct63UnIoGmKSHZFxLwcLsLoJDwCnsnQmjd86SqPmEo7/JwKKFGdPhRhaXWuyaAoexTK0BYp5mgZBxNrzSySmD6oWsrg4DLJfI1Tw/QYEkCzsBSsqkZx6m4TPasm98kMYVt2C7QCw9cjao9LeCoBkywZTY=
+	t=1768239627; cv=none; b=HP5ENdKs9V1NhxTcIgfS4WjmWkgWU3kf2YnTXFMq12+B1Ju9/CCSP6c7TIZu7b+DqvFPRROELTUXp3xcae8Q6JbaYSBVhxp4a7KmarcNo/+1/QyN5dHiwdgINiZd1m8WPIZLzqxOHcEpZGwxUrZyQjiPgwyrtyd7q38l2wPpa0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768239620; c=relaxed/simple;
-	bh=g0rVZPHa3Cv+zMK1dY9bAeK/DHLgiSvDT0Ke2Pc6Mow=;
+	s=arc-20240116; t=1768239627; c=relaxed/simple;
+	bh=e465do8mTCSq6jCcBPw82MmLIgs8TWi8DhwOetVjcuk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VcOKHU4HOqR2EgJFA4ZEPg/cXAE2jMfftgdde5Kj/2XuzsA0dSCvs1zombqzF2c9Nky3v8fmtl76d13JovnBfLJpSNN+UACJE3qbNhMURzfInNVJVP3DEd592eVbGOpSR+XpdYLDSy/CLgLY3KfHDyIFUFa+h13Hv2nt2qnj0CE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HUZ87I4V; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=r4vwqbY+6Lrz6XMTR3ZjO6OSStITE8elLqDzQQxZiqcROvENjo6zhOpdOtwaraPKiaAPC+HhW2rYlnUoDAdaGGi4YN85ZGXxppTcfOT8CuHD5E00el4yzSeNtQAhqH6gOZAT48xr/l/v/eO4obIo3nI4boW6UbklnEf6G26O+kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iJmbeRXA; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0bb1192cbso62211475ad.1
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:40:17 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c337cde7e40so3682999a12.1
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:40:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768239617; x=1768844417; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768239626; x=1768844426; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xma1JJ36tOas9v7m+y+X519iNPhPGylf+hfn5A3Kz70=;
-        b=HUZ87I4V4hyBnTM60YvqgNfcwxtovLJCilE+8xUJjg74nqKY0QxKtrJejgTLoIc6Qb
-         b+XD3m6U/W+8SeI5E9kRXIQQnoVVpcRmMY+VNvfCbiHEL4nr0B6yR6UXlkyZ5A4cRvaK
-         vYSJYjsLSP3swuTxnWGSPRnjQGkx85ix6rUQJ9WBaRQomPbBsR3fdHz8kS1wmgoxsw4W
-         K0g7awKgYENFE7/v1vouk4jXSGcplC9PZPnAU0BxJovn2duBE3sQulTI564oG3N+xcVG
-         Gykq4m+xLss1C4gPDn7NFULdjJLTU5i8o+qyf/96LthbOjbfvUaSG02hzSN6NPk0XnO1
-         Hp1Q==
+        bh=QA8lrtEsLeAJYV3cxgMyR5xiZ5dk8thBjeZcy3q6xNM=;
+        b=iJmbeRXA9XanKOvF8OF3S6JyuZRyAkY8XkALItbasTu/Iqdj+CKUa1Life6cFdlxta
+         Qs+pyRbXl5ZWW1k/uAD6qy7V18uniUlz2wWXj04vJmDf54IOWuJbYNovPhZ5HIOdOm22
+         19F8QzjAs2TUNMvKVJf4vt4XIJDyoSEBvAswj7aT3OCMBavwqUpQg8+CpDwhnOg++wTb
+         nH3F10tWYuzmIsMIA3OtyaLqQkA99ZC4E4f5X5uoVMGkVn7tELIxfE8QrLyVuLJ7mh8H
+         /MeejwjoKtYH/Rkn+eovWQr5HjwGULbKs7N5NXEd32ti5zuC0qRpVbKfA2ycDKXJuJpk
+         myMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768239617; x=1768844417;
+        d=1e100.net; s=20230601; t=1768239626; x=1768844426;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xma1JJ36tOas9v7m+y+X519iNPhPGylf+hfn5A3Kz70=;
-        b=EAEPAjRXLtaYFhsWA4DWgYFHhMIE/mMLkZQ9zgfXcMt0B0qcgwBU48k87K9IXpUEit
-         H7G50zJ9Z1n2T1H6pXTHcHJTvndgX/nylu3AXQ9JIKeIQ2kXZgcLHPy3PXITJwuxjyLy
-         he4PCNn/lgyYk86n4LSQQ31lYK3CWzRxLBt4cAeD7o1VaL81YJ1EN0KgPMnCrszxTu5r
-         aNpxBdI0CxHBAHM89vFI3/8TEto4uihpOoJbvKcN2OssPVw48NSHed8xPFU2NmFgfO5k
-         EVrlgJU7ihWGqiLTzOp2fm0iDdaPzFhC06dYSJv4QSWcunQ1JsImQd3pKDbIKFx+q7gy
-         DiUQ==
-X-Gm-Message-State: AOJu0YwyntaclNssSNxsx7MtcBzPN+0pYAaTl1J7nEJ70KHfDHzagZj7
-	3OCF2SI0stDcU3wrbKgzZCHzYNNFam7rQEsdK2hCX8kNRgvn/OlYJH5FljDxOpWWxnAjJi+IMzw
-	HAnjMrg==
-X-Google-Smtp-Source: AGHT+IE3K+EBia3NvnE6/5rwf5yo2XVyOvquIvGQVHMVNGv2iBbslq0NWguco/PoHUjSovErbkcIRydlIwU=
-X-Received: from plbiy23.prod.google.com ([2002:a17:903:1317:b0:2a0:895f:4fbd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d511:b0:2a3:e7aa:dd6f
- with SMTP id d9443c01a7336-2a3ee4f339dmr160761305ad.50.1768239617402; Mon, 12
- Jan 2026 09:40:17 -0800 (PST)
-Date: Mon, 12 Jan 2026 09:38:42 -0800
-In-Reply-To: <20251230205948.4094097-1-seanjc@google.com>
+        bh=QA8lrtEsLeAJYV3cxgMyR5xiZ5dk8thBjeZcy3q6xNM=;
+        b=BK/R1pKn6RIeOLzcBeykI+QSTFZKcdPAVk/BPT2fsQBNRQPC/czPORj4WD86WbwLyr
+         ss94MD2mk/MHWSKWuVVn5XxDxKHlzaVYU6ai3MLX/7Pw84szrstb4Y3vbBTmveI7KYL0
+         DCiz0fQecgAVQwX0Tr1edlJrJ3pGkeC2CnHKwViyX9l4yJk+6ep9hZwqnRQTCXcNzL15
+         Rdq4myQhKfu4b18/i4X7psxz09QepRRiEEHNeYiOMWM550oVfqdP52BseQ4jycvImf9X
+         bil08C0l8UmrVg6/BiWED2/ewWGT6iMn+LEUZMhTJujKxmxxhj61J5XuT5t1RTiB952O
+         2KVQ==
+X-Gm-Message-State: AOJu0YyBdpGE5WvsNWShOasBiVfiu1yr3YRtbDoac+3+xBgAX5/LR07v
+	8yBZT05cMZkxiWdXwiXs/kJrp9NrHyzGPHnaHdgjd7gUdAsKmBUpopuI8LcIPCItYsUhDpxmrCs
+	BZGjDcQ==
+X-Google-Smtp-Source: AGHT+IGlKf57XaO5h7Wqp/jcsHy/f04+Z8QyhdclzNa9x+ohD4YNMeq4TjEPmB09McrkcVJued0fiiORTYo=
+X-Received: from plbaz12.prod.google.com ([2002:a17:902:a58c:b0:29e:fe54:8944])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2450:b0:35c:dfd6:6acb
+ with SMTP id adf61e73a8af0-3898f91cec4mr16610770637.30.1768239625788; Mon, 12
+ Jan 2026 09:40:25 -0800 (PST)
+Date: Mon, 12 Jan 2026 09:38:44 -0800
+In-Reply-To: <20251121190514.293385-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251230205948.4094097-1-seanjc@google.com>
+References: <20251121190514.293385-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <176823890112.1370389.10484759715072723882.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: Return "unsupported" instead of "invalid" on
- access to unsupported PV MSR
+Message-ID: <176823924074.1374169.120221674826221123.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Enforce use of EXPORT_SYMBOL_FOR_KVM_INTERNAL
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Gao <chao.gao@intel.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Tue, 30 Dec 2025 12:59:48 -0800, Sean Christopherson wrote:
-> Return KVM_MSR_RET_UNSUPPORTED instead of '1' (which for all intents and
-> purposes means "invalid") when rejecting accesses to KVM PV MSRs to adhere
-> to KVM's ABI of allowing host reads and writes of '0' to MSRs that are
-> advertised to userspace via KVM_GET_MSR_INDEX_LIST, even if the vCPU model
-> doesn't support the MSR.
+On Fri, 21 Nov 2025 11:05:14 -0800, Sean Christopherson wrote:
+> Add a (gnarly) inline "script" in the Makefile to fail the build if there
+> is EXPORT_SYMBOL_GPL or EXPORT_SYMBOL usage in virt/kvm or arch/x86/kvm
+> beyond the known-good/expected exports for other modules.  Remembering to
+> use EXPORT_SYMBOL_FOR_KVM_INTERNAL is surprisingly difficult, and hoping
+> to detect "bad" exports via code review is not a robust long-term strategy.
 > 
-> E.g. running a QEMU VM with
+> Jump through a pile of hoops to coerce make into printing a human-friendly
+> error message, with the offending files+lines cleanly separated.
 > 
 > [...]
 
 Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: x86: Return "unsupported" instead of "invalid" on access to unsupported PV MSR
-      https://github.com/kvm-x86/linux/commit/5bb9ac186512
+[1/1] KVM: x86: Enforce use of EXPORT_SYMBOL_FOR_KVM_INTERNAL
+      https://github.com/kvm-x86/linux/commit/fc4d3a6558af
 
 --
 https://github.com/kvm-x86/linux/tree/next
