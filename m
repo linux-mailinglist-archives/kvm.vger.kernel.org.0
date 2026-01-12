@@ -1,98 +1,262 @@
-Return-Path: <kvm+bounces-67767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE2AD138D8
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 16:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE7DAD1395B
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 16:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BA8CB30EE66D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 14:55:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 884AB31251FC
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 14:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684601F3B87;
-	Mon, 12 Jan 2026 14:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E444C2D4B68;
+	Mon, 12 Jan 2026 14:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ImExJt/s"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KJO7jv7r"
 X-Original-To: kvm@vger.kernel.org
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011017.outbound.protection.outlook.com [40.93.194.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AE02DB79C
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 14:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768229735; cv=none; b=d7NBkzxU0aYzAuzc3LjsVAgum2n52WrMpK4c9Pa8ceBPZ7oIvzjypr25KZsWp/e1ad+4V5Xm12fwIN4JOeW5t196NmN8FGomP1A4cvFLb890rh14XIis3WIw19wkoBcSaqwF0ImRS19YCE4uRJWyJmW5kw1aC5SYjXBC2lbal1w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768229735; c=relaxed/simple;
-	bh=8uavkiVKE+qnmI89ydIhqq/zTw3NmneV7vtVM7A0+Io=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f20UR6AlbQrl3q8e+dWc0wQZnp1CawgPLgl44Ch86h9CnrUsNGfZW5crDZr9WtshhREmxP47QcOcCaxV+RAziMgf1M9zjd43AiKrKPkmWZOCQLIN73fxiuPgIPjn4qc3UGG9ZozVdPqaGNSOhgxbEAIZ7bj9C3bDgmxCs4OAQIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ImExJt/s; arc=none smtp.client-ip=119.8.177.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=wfnIzNSfkHDE44pyh3cGL1QPG+efZ7Gv5MuAyZB8E5M=;
-	b=ImExJt/s6LNoNcA/vrSpxVVyUzmxGT3dJH5TmRqHgbYOrTZB7cPTesjGCDlW0IBmvoESs1EN7
-	X21VS1YdH3O/wahIa0SPY3Q9sExaE/tBZ+PiHUjw7ayc+nMMnwDq0l2fzFfD90KuuWad6fUAkcR
-	idV2Q8kAkJwL9gv3B7kuQrw=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dqb322LRnz1P7Js;
-	Mon, 12 Jan 2026 22:53:02 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqb5V2HJgzHnGh7;
-	Mon, 12 Jan 2026 22:55:10 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7B67640585;
-	Mon, 12 Jan 2026 22:55:26 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 14:55:25 +0000
-Date: Mon, 12 Jan 2026 14:55:24 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 12/36] KVM: arm64: gic-v5: Support GICv5 FGTs & FGUs
-Message-ID: <20260112145524.0000164c@huawei.com>
-In-Reply-To: <20260109170400.1585048-13-sascha.bischoff@arm.com>
-References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-13-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FD06F2F2;
+	Mon, 12 Jan 2026 14:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768229803; cv=fail; b=tUqDjTEYEjJRu9OTYmDZydbdotUsMQeFslbQriuRGey+LNfaltuCe3ZeGO9IE8yWyRvTywIJVncrPrUZVYCTcODTSS3ua8y26iOBP37sCjVmVEB55rRkgT0d+xrkzvDwbAKFIhBcuIYHKxpeY7JTLuXAxPlWixYLcE/UEWq5MOg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768229803; c=relaxed/simple;
+	bh=JTYmvnQzaB+wfZIoZaq91MX4so1JERPZBEC4iJh0Uc4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=OM3mCgvjOr2G0Q1M/bU0y4XpTDiMVP7hjIR5n6HiFSW6ee59sB2HTk0xyw7j6GKjvBybrKCkRxeqLJFf7BPQIHVCxsh2TSbZqP4yAjdk9fTN6hqI3XVVJONox0pCebtPP+djcwVaeCI5VvTsKQ3DZ0oy6nSkrBl1Stv6XfuFhek=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KJO7jv7r; arc=fail smtp.client-ip=40.93.194.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PXREwUMqKlgH/M/afb8lOyUlCAZrnc3hMBp6qR2gpmRQrIdKyWA6JGoCyAGesaFica+UHeyQyGE6twXcuVPBt7w79+YzBBu2SbhhbS+jaxchvgf1CwuwcVtQqprJKQg/cwaTnYp/gHpYYkEW0sCvrLScZXP7fCuPIskm5X/jiwln0N/d4f6phOX8+M9eua1Y+SQBYpzPRsIOtUtek9CoXaw6QEf1yMzzQVSONjY/2kim8gTalPpDry+KDIUjAsQMmwSCRW1gpsGUlqgw+lehtWHY0R0JzaqXDqzamM3zNaWqusdHnJK5mM0H659H0YTVALH+OpkO+sIys1eHz2oQtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RSPK60YoGahwIv93vY5tyv7YvlL0ESoZun9xjYX6M/Q=;
+ b=rczYyn5orGmw4m8e2kv7167a1baXi59kl1cK4w3qTGa3fcHffHajfm84a7muFrdhb9v7cJ9l53+0jMRoI8WSp9l8F0Zfrov3c4bMGmTH8tsGDlmjZWSkCJX/uLEs77LaTK2wETT6ULr+IvoPoGLSGcZ1+pFU0DGwekg0vSOzthH4EyiLjzcldE8+6hUD45AZUA2ZOTFLPWPAcCObTd/0NlYSuC+J3/+lJo0ssiN3lTjMIiyj6IjtZMoVfS9+Jcdm8U3x6fwG8pwm1gGD7BXs2vOZCfoGAFfsF17mU3GUXjGCnV23V1DnruvQr3MGTZ89+2M4v5VDqHIpWvTLBtTW1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RSPK60YoGahwIv93vY5tyv7YvlL0ESoZun9xjYX6M/Q=;
+ b=KJO7jv7ro51CSQ0iQNubUFrXM5Bpv+Rot3eRVFvJpUYpQ30S7B2qpsJu4J5iwBhAQfF4K/pHNh0VqTPqdzezYI2IfeYG3WV/99J+2O6OO+Tj/PoYnMGEabc6RmzPS1Q1ZCPufz6GgUTpVG+pdIZ+KDfcFl7mBln3DIiHRoEelxw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by DS0PR12MB8526.namprd12.prod.outlook.com (2603:10b6:8:163::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
+ 2026 14:56:38 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%4]) with mapi id 15.20.9499.005; Mon, 12 Jan 2026
+ 14:56:38 +0000
+Message-ID: <f7f1856a-44fa-44af-b496-eb1267a05d11@amd.com>
+Date: Mon, 12 Jan 2026 15:56:32 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] dma-buf: add revoke mechanism to invalidate shared
+ buffers
+To: Jason Gunthorpe <jgg@ziepe.ca>, Simona Vetter <simona.vetter@ffwll.ch>
+Cc: Leon Romanovsky <leon@kernel.org>, Sumit Semwal
+ <sumit.semwal@linaro.org>, Alex Williamson <alex@shazbot.org>,
+ Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org, iommu@lists.linux.dev
+References: <20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvidia.com>
+ <eed9fd4c-ca36-4f6a-af10-56d6e0997d8c@amd.com>
+ <20260112121956.GE14378@unreal>
+ <2db90323-9ddc-4408-9074-b44d9178bc68@amd.com>
+ <20260112141440.GE745888@ziepe.ca>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <20260112141440.GE745888@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0398.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:cf::16) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|DS0PR12MB8526:EE_
+X-MS-Office365-Filtering-Correlation-Id: eda155c2-f9da-44f0-68cc-08de51eac9cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UDNnVFcrUnRjOVREQk1FTndta1R0azBJNkFqd2JOWGxhZ0JzcEMrQTVLTCt0?=
+ =?utf-8?B?eGxQaWtvM0VIZXlXVkZTVlZvbllxcHR3OC9KdlByTmRiKzBGUXMvWGxoYTEr?=
+ =?utf-8?B?Y1QwbzZrNkJFVWgwbFlKTlRMYjNtTlpHNlN4VFV4Vndhd05ENTBMeU1EbUhI?=
+ =?utf-8?B?S29GbVVRNmZzTTgzc2RGTmZwMlFJYnFVNXJQazl3cmNlMSs4Z0RJWnpKQmNo?=
+ =?utf-8?B?ZnZBUVlFUkVBMnRxdEgxVXpTcXl5aVJxZlViMGVEbDJQNkNLaDR2WkpVSnFm?=
+ =?utf-8?B?RU9aOUw4YW5oUlZwaTdzNmNlQmJtcmk4YlN6cG9PMUI2b2JrREJLQk1rSkFW?=
+ =?utf-8?B?ak5iY0U2UGVBNE1yRHgyMi9aVjNRZkExY2I1VnRrcmNQVzdZRUVlSm9DS3NN?=
+ =?utf-8?B?TzloN3U4NTYzT28wQkh6M2IxcXkzVnYzQlJIQklrSGR6eEtYRWJ4STRRckhs?=
+ =?utf-8?B?K0N1L0pFQ0E2L0crd256K3oyaVJHeFZLRkQ0UEFDM1owYlkwYVd0SHE1dkdZ?=
+ =?utf-8?B?Ky8yYVFzRFhKaHl2Mys3SENTN2JlOHBiVnNYREEyQStwK1J1aXYzRHVhdG5V?=
+ =?utf-8?B?MkpJOWJpRWlwbUxsWmQrbnNqbUxTaWFYaDV0L1VKWUxuWVJiQnk0bEVnRGc4?=
+ =?utf-8?B?MG9mTmlVTGhHckZXajFWZTk5UGtEQnBFRnFscUllSUZEUlRNam1GSUQzUEt1?=
+ =?utf-8?B?Z0NTTWNyc0E0QkJwbm01dzluSzg1bTBhQXlyRmsyRWlYN29OVEt6SloxYkhl?=
+ =?utf-8?B?RHhEM01qNmx4NmJoVVBHN2RocHpBYnhIZkNYcXNtTG9wWCt1ZWpOZGZYVVU0?=
+ =?utf-8?B?MWViY0pDZk9TR29Sa3pCRXB2YlhSUFFtV1lxb0Z3SXFlL1pUQ0VuRUJOVHY5?=
+ =?utf-8?B?OE1ZaGY0MG5CTXNkNWdFeEcyR3BsUVVZRXZYQmlXeXYrUTZPMEZkeTBYUklY?=
+ =?utf-8?B?ajRuakVFV2VZSUVjeHNLazJzMzNkd2xLV1QyUnlsMi9YdDgyNnlraWZJT3o5?=
+ =?utf-8?B?a01McjZ0WHVOWUEzcVFEZzJWc3FFUmFycUFvNW9BYzlqdTUzN2JsRG1QOW5i?=
+ =?utf-8?B?TGxTM2t6Z05IZFRYeXB0TmFZYTZURmE4bU42VDIvZm5KQ3NyTW1sdjdhcWZV?=
+ =?utf-8?B?ZFhBMExKc21TR1pseUwxOTU5RFJISHJ4elV3dVZvdktJdjVkakt2dnJvSG16?=
+ =?utf-8?B?OUc0aVIwUSs2UHdobWh0a3hGSFZ2eDFMU0lPVW0xM1BRdTBZVzhoNDZPUWNE?=
+ =?utf-8?B?WDR6STVqS2RzOWNwUlB4clREQnZuK1ExNjRrTGlwL3lEZ09vYVNxd3BRUXN6?=
+ =?utf-8?B?VWhLZTNLMzlVNHdRUzJTdy8zSENtUmYyalNTY3hHcXM2SGRrSWRzalhEbTcx?=
+ =?utf-8?B?aWVIakxlVzhTdmpjUHB2K3lsbWdsN0xqcmFna0N2MXlaRnhRalEvc0l0Qjd0?=
+ =?utf-8?B?TXBiMm5lcS82SEtUekxZM3Q3cjU3bnpHOG4rb09ZUEdGdTBTSzZEREprKzBs?=
+ =?utf-8?B?bEovUldBRDVJY3VISlA2MzFoWmhkdE05Rnd5NHFUQ25FZDJvSThGK3I3djlX?=
+ =?utf-8?B?Z2t0b0dCRjQxRGp3WGU4R0pzNm4zWEJwRGMvY1JIWTBrMzc2c0tDY0s3Ukln?=
+ =?utf-8?B?RUIyQ3QycTJvQjA0RHFlUExHZksveXdvd1J6ajYwYThINTRnQVhRZHhtZXZs?=
+ =?utf-8?B?NzV3cUU3Smlpc3czU21FNEc0eDc3dFRTRjNFTHNEU29QMEhlaWZEVkpucENT?=
+ =?utf-8?B?NkNna0x0SXFObzlOZ0d6b2hvd093MFNPRXZDNnhpY2lRUjM2ck5DSlp5MFQ5?=
+ =?utf-8?B?SjNwQjdDMm1aalV0ZVdrcHUyc3FMN2JsSmtzYzdNNlJJcGdjYVUydUJNVThs?=
+ =?utf-8?B?ZDh0TEJnbjF2alROZWZ3dTU1N0Q1U2VsK0h2RWNvQnlnY1Q0Q1BURzdWWEVw?=
+ =?utf-8?B?eithWnNHa3l0R2ZscE5Tc2s5NUdDamNSTFNXbXhONldyeHF0SVRLVjcwalpy?=
+ =?utf-8?B?MzFtbDhNTExRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?akhTOWJXbEdxNGdXV3UxVEpxYjVwamtLWU1ZbmFjV2cwNWF3M1hWR1pFelhj?=
+ =?utf-8?B?SzM2REladGN6UWZkdmNRdnUwZ1RpbmdlWllnUnJpd2FIcFJqMk8rdGhvTGFD?=
+ =?utf-8?B?TzdZT25ES0lSVGdpbUZSaXBpRjBqOVBVU3lUdG91SFRxZEE2d1pDeXZUcFZj?=
+ =?utf-8?B?OUxOeVRWWVlGa0VYbXYzYmVmVG5ZcXRwMlpxSXMxT0xsUktHR1RVVS9iUXZP?=
+ =?utf-8?B?S2VxM3llUDB2N2JNSG9BdHJIWmpjSXE4YWUvYXB1ckc0NzJ0aG1jQzFzNVN0?=
+ =?utf-8?B?aGh6aldOT255VzNVbkJxV09qbHZMYkI5WGJpZW1SZ2x6cnpxQnBHaEEzRjJT?=
+ =?utf-8?B?RTU1ek5QMU5OZGsxOUNTM1dybDdlY2o5Nng4QjBiZFhBdFdmNTg5b3RETVVt?=
+ =?utf-8?B?dDV3bzg2dXNkckpsUjRYNEhaUkFDSHcvZlRTRnVVOUpSbXliajBLVjgvYmd5?=
+ =?utf-8?B?T2hsRllVbU51clJEUWRtdXZYWk9zc0I0dzQvWmc2YytPTFcwY1BqVnRiRVVk?=
+ =?utf-8?B?WDNvU01tdVUyNFpZOHliTUE0TG5TREhpTTkxanBycmFZajBaL0dZRnhwWlpF?=
+ =?utf-8?B?aFlTUDdaRXdneGRBcnoxdmFIWno5a0hmUEhmNm9ucGZlSU4ydk4vdGFyL1pv?=
+ =?utf-8?B?Q0l1OFRYcitFV3JlVjNsL0N6blF0a1JCRXlOTjVuQkVNVWt2em1XY3V3N05G?=
+ =?utf-8?B?UEZ1a29WSGt6akM4WnUycmpKYm8vSWViRjMrSTJ6LzErR3IyazRGY09CNXE4?=
+ =?utf-8?B?WjFPeDRzMncvVmxKM0FXVDFOZVF0MUpYVmVrTXAyKzFjNnJ6SldEb3NjNE5v?=
+ =?utf-8?B?QWE0K1F0TitTTkpIdXo5RzBWOXgyR0ROaU9xZ3AvdW5aa2U1QVFVQ29WZ3ZW?=
+ =?utf-8?B?cjUyQXJTc3FzbXdZalhFbnQ0cTRVYVFySG5vNjhZQWkvZldPRTFiSVRDL2Z6?=
+ =?utf-8?B?UlU1VmZSWkphLytxQk9LQktXM0NvVE1KSUVVc2J4eEFBbm9KRkNhc3BkUlhS?=
+ =?utf-8?B?eHc4NmYyc3U2NEpEV1V1Sk9UYUZ0cEdjRlQ5RW0xOUc0cStBaG9LazM1ancy?=
+ =?utf-8?B?d2NleWUvSml4NGhibUFLMWE5OXI1TUNpT1UzK2tDYXFPb21ueThWci9ZMCtY?=
+ =?utf-8?B?UHRzMmZFWUc0TnJoS29VSnRnMndpYTRtZkZEaFhLaFVxSGFKV0F0RVBjekdh?=
+ =?utf-8?B?dzEydlRGMlU1SHNzMzFMeHRWMEQxSVYybXBkK1MwK1JtRCtRVHRqSGxxS2tH?=
+ =?utf-8?B?cEdNZHhUaDNYRWUwdWZZclp1UmgxUEhyQnc5cWszOGZWeTdFRlpzbVg0V1U0?=
+ =?utf-8?B?TXNpMFRBdk5tKzNqOVNRRFNKTWRrbWZBRHM3eTFUVSttNUh4SUs0NEhvZXZu?=
+ =?utf-8?B?eUdMeEpRd0dJUXJES0ZON3o0VGNGbGs1Mm5Mck0rakQ5Q1FiOVRBMC9ScWJp?=
+ =?utf-8?B?SDBGbEpERkNJbGgzdjU2NGNpWnY3MTAyV0tscnJ5bjJwaW83MnVDVVNqMWNu?=
+ =?utf-8?B?SWJ0dzdTODU0T2pUbk51bUZwNG9WcU5sMzFqbDdHcmowUy9Td1g4NkJxNEdY?=
+ =?utf-8?B?aGVoN2xDcEZJWmJSNkxHdis5SEtMVHpDRWFVRzYzVGFrS0RUNU9abUZqUEds?=
+ =?utf-8?B?NWNMazYvbjdRcHhTZnZOd0JtK0s2QmhSN2FmdGNRdVdXd0h3ME5EY2xYSWdF?=
+ =?utf-8?B?M0srS1FHUFpnOHJVUWErWVFoSVRUa2Nha2w1STJhaTN2YVRNSFZyc21JdlY3?=
+ =?utf-8?B?RHlVb1dib2wrejVndWNLRGdNTWNLanowK0FRcitNa3M5b3VYS3hTb1JyUkZ6?=
+ =?utf-8?B?SHI2eFh1SVRrSEYrRDd6dVVGSzhVUmdMa3d1SEpxVVNYbVZXdS8xOXJMcjFL?=
+ =?utf-8?B?alFzbUFVYXRIZzVWR0prODdpNU04Y3EveHdWWEo4S0ErUjlZTVFIM0IvU2Ja?=
+ =?utf-8?B?bXg3UldNSGZpSjM2VjZWZ3dxckRnQ2tTdVRWb1NBU0hqWUdDU0NYdm51V0hB?=
+ =?utf-8?B?c0x3ZVFRNzMzYk05TXVHdEQxeTZ1d05yNnFNMElnNmdCRlcxY2tsYWVobTVM?=
+ =?utf-8?B?NW9VbnlHU0I5QzJDTWZLb0MyZzlmeUJGdHpTNnRraHhQejVjamNDVC84OERn?=
+ =?utf-8?B?eTdvS1IycXlhRWp4UWVtWVhiR0w4M0pPWkpldjBLTnJKWDUweHMrR2VRM2hD?=
+ =?utf-8?B?TlZXVmhlVi8xQVBCSzhBdzF5anV1SUdmTytuZVZ4YTZLY0d1Nk9XallSbmY1?=
+ =?utf-8?B?cDdpYml5WGJtWEFOb3QxQXhIN0QvcjJqWjJWR1VnaXhIM1pzNWthSVNaUDhU?=
+ =?utf-8?Q?fovrMIZezKDeZDKhbw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eda155c2-f9da-44f0-68cc-08de51eac9cf
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 14:56:38.4621
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4Whwq1c/yCYbCmiiHcuiuxpEppDWTRfNr8YPodUQhueuipAqZpHM90d6LpjowJXV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8526
 
-On Fri, 9 Jan 2026 17:04:42 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> Extend the existing FGT/FGU infrastructure to include the GICv5 trap
-> registers (ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, ICH_HFGITR_EL2). This
-> involves mapping the trap registers and their bits to the
-> corresponding feature that introduces them (FEAT_GCIE for all, in this
-> case), and mapping each trap bit to the system register/instruction
-> controlled by it.
+On 1/12/26 15:14, Jason Gunthorpe wrote:
+> On Mon, Jan 12, 2026 at 01:57:25PM +0100, Christian König wrote:
+>> Clear NAK to that plan. This is not something DMA-buf should need to
+>> deal with and as far as I can see is incompatible with the UAPI.
 > 
-> As of this change, none of the GICv5 instructions or register accesses
-> are being trapped.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> We had this discussion with Simona and you a while back and there was
+> a pretty clear direction we needed to add a revoke to sit inbetween
+> pin and move. I think Leon has no quite got the "dmabuf lingo" down
+> right to explain this.
 
+I was already wondering why this was clearly not what we have discussed before.
+
+>  https://lore.kernel.org/dri-devel/Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local/
+> 
+>    Since you mention pin here, I think that's another aspect of the revocable
+>    vs dynamic question. Dynamic buffers are expected to sometimes just move
+>    around for no reason, and importers must be able to cope.
+> 
+>    For recovable exporters/importers I'd expect that movement is not
+>    happening, meaning it's pinned until the single terminal revocation. And
+>    maybe I read the kvm stuff wrong, but it reads more like the latter to me
+>    when crawling through the pfn code.
+> 
+> The issue is that DMABUF only offers two attachment options today, pin
+> and move. iommufd/kvm can implement pin, but not move because they
+> don't support faulting.
+> 
+> vfio and others don't need move with faulting but they do need pin
+> with a terminal, emergency, revocation.
+
+Yeah, I know that this is confusing. But that use case is already supported and we just need to properly document things.
+
+The move_notify callback can be called even after pin() in the case of PCIe hotplug for example.
+
+We could potentially rename the callback to something like invalidate_mappings.
+
+And yes, I know that we had a few issues with that because we didn't properly documented things...
+> The purpose of revoke is to add a new negotiated attachment mode
+> between exporter and importer that behaves the same as pin up until
+> the user does something catastrophic (like ubind a driver) then a
+> revoke invalidation is used to clean everything up safely.
+
+With or with pin() you need to guarantee to the importer that the DMA address you gave out stay valid until the importer had a chance to free up it's mappings.
+
+It is intentionally done this way to properly support PCIe hot plug because even when a device is gone the address space can't be re-used until all importers stated that they stopped their DMA.
+
+> You are right that the existing move_notify already meets this
+> semantic, and today VFIO exporter, RDMA ODP importer even implement
+> this. Upon VFIO revoke move_notify() will invalidate and map() will
+> fail. RDMA ODP then HW fails all faults.
+> 
+> The problem revoke is designed to solve is that many importers have
+> hardware that can either be DMA'ing or failing. There is no fault
+> mechanims that can be used to implement the full "move around for no
+> reason" semantics that are implied by move_notify.
+
+In this case just call dma_buf_pin(). We already support that approach for RDMA devices which can't do ODP.
+
+Regards,
+Christian.
+
+> Thus they can't implement move_notify!
+> 
+> Revoke allows this less capable HW to still be usable with exporters,
+> so long as exporters promise only to issue an invalidation for a
+> "single terminal revocation". Which does nicely match the needs of
+> exporters which are primarily pin based.
+> 
+> IOW this is an enhancement to pin modes to add a terminal error case
+> invalidation to pinned attachments.
+> 
+> It is not intended to be UAPI changing, and Leon is not trying to say
+> that importers have to drop their attachment. The attachment just
+> becomes permanently non-present.
+> 
+> Jason
 
 
