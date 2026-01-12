@@ -1,130 +1,219 @@
-Return-Path: <kvm+bounces-67787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F3C7D143D6
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:07:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D5ED14454
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 177BA30158E6
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:05:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 20F02305B4C3
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02BC37F0E5;
-	Mon, 12 Jan 2026 17:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55691376BE5;
+	Mon, 12 Jan 2026 17:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EN/mLACy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="kdgC398W"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="l7zXiZ/a"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99AD379973
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3459245019
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237357; cv=none; b=NkWKDwIQtETVqt5JpTHp0miwUiBei5WJNhkRc3dYmkrrd22IFZBHpFv+Y5sCkoRpX/e6yMO7wGFTBhJAEUL0cQDJWP34Zimf3r4LKXKYGYD1qZebYlnUEKnzf/DHU8GlHSbXpsiFBh9eJD1LDMvQVMjSIPDZFUL8BASDKMtXj3E=
+	t=1768237479; cv=none; b=UUMankztgjlcD8ctdr/8n51I49F/miNvltTxTb3V5SkqOlGT9VDbELhpXfuX4uXfMTU/HNYfMFMXBG6HdPJoMUKHm+YUHe7ADB6kVqRzicx5ZKcngCpv2MCyuQB0ISE1ojgGTP+5GiTWCmqilOYzIPK12qir3yoMWnrPivvGp5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237357; c=relaxed/simple;
-	bh=7rKFUdQx23abFlJVm0uQPQFiuDu8lmtmxqOTgmBnKZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AEp9D5m2F/LZGHSYF05r839Dh3edM89X+6eBbyUNT5z8pvarnCaPP2he1GwslsLcg+bjw6dlnr7SXf2nJwZXb1g/92U9ucFjjB3n/EwLUjzwfwhSZAVqp+VRDtggAlNPdr/Cs8q5G2fgU8UK3d52D3ZV/lmlkqVAQixOt4uKXo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EN/mLACy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=kdgC398W; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768237352;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7rKFUdQx23abFlJVm0uQPQFiuDu8lmtmxqOTgmBnKZI=;
-	b=EN/mLACyTo+RJ0aTPAg/BTaaoffKHpDROrgzsFWCRx+SC4kzGwHwUTCV2JrHXjYYs9sgEr
-	aI+aGphlzu/dAKt3G2LOiPzJIWqBqJWc+mGonaY66E8pus/BeKXJICXscKVWmkrY2BxQoD
-	WlweRHOvyeDh8DMAige+YldLgvxFcUk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-278-V4s3_QN2OZSPK_atpHUyQA-1; Mon, 12 Jan 2026 12:02:30 -0500
-X-MC-Unique: V4s3_QN2OZSPK_atpHUyQA-1
-X-Mimecast-MFC-AGG-ID: V4s3_QN2OZSPK_atpHUyQA_1768237349
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477bf8c1413so44795605e9.1
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:02:30 -0800 (PST)
+	s=arc-20240116; t=1768237479; c=relaxed/simple;
+	bh=kqVUiqT6KtRytlahMDtuyi2Socb+UOgt4TA6Nk04jRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jGd3XTdKHtPwNUIy+RmiH9Gkb8u1lT+X36L4IQC4Sp6O3OoudvQbUFlxWx0NjI3+kkMpjP1fH4BgwKEwzTFiVbpJHAwZb7WQSJYYcFpO+jxHd2Q2rflNBPqwAeKMnfM28hrNoeSC67FKKp0thOhUiqg3X/OxeEakEOUgSNvehdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=l7zXiZ/a; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8b2148ca40eso956631885a.1
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:04:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768237349; x=1768842149; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7rKFUdQx23abFlJVm0uQPQFiuDu8lmtmxqOTgmBnKZI=;
-        b=kdgC398W0e/9IAD/vF5M5Z+vE8UItEPfbHXm1uqC1KbdoUg5eeJnK4lNWuPlRuX5Ru
-         ZIqCMPpBjw0XY2C/qAO7+5Q5jgPRVC8vmM4GYkYaKYHHCXUnznz7NEymOAXIa64wapu3
-         p84mdYGxWrBTq05mwJ8GC07wtRuaP5CuLiblD/BVHdHavC8H8xG8Lt+EZT/KNNvTV/tJ
-         PQmJQCg7GxrmiHk6VeWmRhHO0scsWxnv0JZOwAjxHFqxzpf0V1el6eJLYfXVTCrL1muB
-         +PBIUov1rZMGS4LCQb66mnOATETvcx6f68Dxz0HjZyQVfbnvDyzh04H+kiVwEoHxXlk7
-         OPIQ==
+        d=ziepe.ca; s=google; t=1768237477; x=1768842277; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OcyVQ16xm+GiG5uZamh0DYF4z7rm9kbmhFMirpeUsGo=;
+        b=l7zXiZ/aW+yD1Lv6DQdcw5be3vS+3NHd7+FDGKooRgEbQI6AqXfFuAIWjkUm6CnH7V
+         WLgNA/iA+xYpZmsSFB33UemonE6M2qdmV6VRIKY1GKU8x4ry/68eS8UB94cynvPnLpeH
+         5Ubp3Jr0ipJixDxja4/jscEMwwcBGK836j0E+1rh2nMA4t9qjmi8uY2F3NVTZ/8FpnTB
+         F+3/wAZasvEB0FYVd5Xkka/xfcpQiKuvn+7Ong8qGxeIn50jZfTjDbPHXxNOMctSbKFG
+         pwAy4nc+ZKZNsVrYlcIlNHMt6FEeMVpkedypb3/mt0QVC1toBayqtsCyhBYNJWmnaRoR
+         mAOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768237349; x=1768842149;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7rKFUdQx23abFlJVm0uQPQFiuDu8lmtmxqOTgmBnKZI=;
-        b=StCOoXVneRSfY+Pd/CBeJydpmz6Z0p+JCUohsZnIY6BKnkNnkvmWG2rWq/OtD8vs5m
-         6od/r7zgXQIRtigkZwMvXO4iFkI7kihL+dyAL8BkH8ObpbeNXPr6V5bUEUDOGjf9amNr
-         nEEiDwjWLxh9icMNfByA08MYGmjidQ858cS5K57q3YFQGWw6QpJkJsDmpdvQc1MWr1N6
-         AWh78s93szi/UWVe6FOIcZkQAsmPkiKH1L3k61h/TEz2FxPkrz0WG1jyUMQ6gcGpWjQ0
-         XVyd2Jhr3T8xXULkM+EKSYGERU7PegoHp6rDBPfnHEnW56yjJL7miT3/5joqyDmq5H+9
-         vGyg==
-X-Forwarded-Encrypted: i=1; AJvYcCW41HFgFF52CP/87LW1H2Ezvu2LOe4VJ/uKCP1Uc7bkXPQu6mZTlwVAb13RSyc3JwSGVJ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE344gmQamCdlE2WQN4T/OqfEw2yGlEEaoYXjOZg18uOL90aJ7
-	gHPrjmZ6rXqOJH3B/Yvgpv3R1itd1b3wten2LtFo+mc3K6+48kaWavqSo+iTLboAzRgENJ53Xdp
-	Jf5A4xpzX2UxkzCI8DWLHNLoxDAc0vYOz5bOcK3zsQk+zL6Hund08RB6JiDeH0DIjvyuEdbfR2r
-	xuirumX1e352Cq/IVXtPUiIfSMI+JR
-X-Gm-Gg: AY/fxX6txIYjcLBeSIUanKetfFSzrOqpo2rxPBcVKi/wNwQBczJxjUnZe0hyur5Api9
-	RS2sTTyWb5XfthpXQttstXFergTZ+/h93dYs80mW71hJfZ/XwROn7od6xA7Xrd4vK6eRY/AKo/Q
-	C5ESJOSASLOeiGVjOU73ViJ0sgaKn3MAqwbuhAcuh7UoeH4ZZeDox3a4pTLxlqi6X0cAtCIoAUl
-	F1DW01PwBj/3sga5rJdu5vxcXm4I0ECJQbC9znXa5Aq/w3+DtiM4KyvdLaclVJjgkn4xA==
-X-Received: by 2002:a05:600c:4e8a:b0:479:2a09:9262 with SMTP id 5b1f17b1804b1-47d84b18037mr244900345e9.9.1768237349449;
-        Mon, 12 Jan 2026 09:02:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHUkrA/EFIxVDM9YasT0A251/Gyn1594BDFpmWhdj7boyiZzv/zO4AO7cbSLgAcvcRPwuDBrYXkZ0Raazwm8y8=
-X-Received: by 2002:a05:600c:4e8a:b0:479:2a09:9262 with SMTP id
- 5b1f17b1804b1-47d84b18037mr244899935e9.9.1768237349058; Mon, 12 Jan 2026
- 09:02:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768237477; x=1768842277;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OcyVQ16xm+GiG5uZamh0DYF4z7rm9kbmhFMirpeUsGo=;
+        b=GZT0G/R6EhisTwk25GWUzFDCM8PNkaxuLJ2ndYCie57cpp7xlD5XhrOPfBr1dH0zGn
+         /ZZvUjRfiRQJYJm+3WVwPxv9t1ZRwIXYAwUBiStyPdKzosnZGianWHmnaHFwfttrzkNA
+         NsELc741ONuASjsaNGKn5lnbKlt7cJV5oX2SjtO7mPKPRUO1uN4Wc4u87lDg84+LOmt0
+         cC3DWweD8kVxRB7wYgt1/ZGhkmcrwhIyDH9w79gvAL1alSinzG0R3qZoJfOn+pdNijHi
+         Q76zAH5gtm+pB/4EPdn6OavTluSWFuuI0t3+UyusasxTLXCCtfAzXLJFHopCQl75nnfp
+         vzXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUN5Bn75BN6NwCeCGtiTSYevVNqLsVUBlJlIJ0nV2RtLAWXYUCto3j8f0UvY3fMro9yypc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywzcnv+VdB080bHXXKuWqTnLVU9IZ++4P1g3LYncFWVJcGKV5+r
+	K0AcjQVg0pP3SN3VaX4h2iR/fU2E4YgSBFwPGh7kzR9YGQhl+yJBsaaFVH5s0uYAOYc=
+X-Gm-Gg: AY/fxX4q3lX713N1IktU/oza4xVR6ytJmmzHRGrTQ1y60aXnAhCm0QIU25Ftr7YASy7
+	jqZYC8em9folFIZ3ID01subVWBobmbPYsiob3zw6duJlUVRe1I5fg27PilfGwKAUeIUyE8ZGjzo
+	8SwjgP/0XMTJbUFn4NdVZOmYZz6V1es7daBFx6ca9zNYcGC0c3PNFNR/Inwz97KbxbvastnBCsw
+	ZoTYRa1t5BWo6FXnQ/NUDN6vC48wA+hI6EJXAhSYb25fMKSvTG3tIbc8K1ZkKd1vTPnyd7PQL4X
+	q8bxs9yXneJjVKQiLeT0Pt3XkB+MvY0YOVpaJK15RLYjVpWBxxJWP/JjB4pU6rLUomoHO1rzn92
+	3N+5cX6H82EYBiCaR0J+IWBBco6+PdwNuvkuffdAfJ0sdCzMhDTk18kjT6XU7NgPuon8tIgmbJQ
+	4pnkGfFh+EpnjwavKyeJ/2t2VQajedEHmRDpbtsJjNLudUsX7xzyAIlU3dg7iyZdTV78bto7ju5
+	dpq8g==
+X-Google-Smtp-Source: AGHT+IFNLsjliAScqbFFhKVSqiGiRJW+dH1w6MdFsmu8SpI9IHI7Dx7AHxGoF9vGvT6LPNemfh4Zsw==
+X-Received: by 2002:a05:620a:2807:b0:8b5:5a03:36e3 with SMTP id af79cd13be357-8c38936c4e7mr2741533585a.16.1768237475821;
+        Mon, 12 Jan 2026 09:04:35 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f51cdcesm1544825185a.26.2026.01.12.09.04.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 09:04:35 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vfLLG-00000003RoH-2rL8;
+	Mon, 12 Jan 2026 13:04:34 -0400
+Date: Mon, 12 Jan 2026 13:04:34 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Simona Vetter <simona.vetter@ffwll.ch>,
+	Leon Romanovsky <leon@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Williamson <alex@shazbot.org>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	iommu@lists.linux.dev
+Subject: Re: [PATCH 0/4] dma-buf: add revoke mechanism to invalidate shared
+ buffers
+Message-ID: <20260112170434.GH745888@ziepe.ca>
+References: <20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvidia.com>
+ <eed9fd4c-ca36-4f6a-af10-56d6e0997d8c@amd.com>
+ <20260112121956.GE14378@unreal>
+ <2db90323-9ddc-4408-9074-b44d9178bc68@amd.com>
+ <20260112141440.GE745888@ziepe.ca>
+ <f7f1856a-44fa-44af-b496-eb1267a05d11@amd.com>
+ <20260112153503.GF745888@ziepe.ca>
+ <f2f82341-3799-4379-a0e7-6e9d56a7eda1@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112132259.76855-1-anisinha@redhat.com> <20260112132259.76855-5-anisinha@redhat.com>
-In-Reply-To: <20260112132259.76855-5-anisinha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 12 Jan 2026 18:02:17 +0100
-X-Gm-Features: AZwV_QiPnwcipYRTdzj7RyQ4o9zK-24ynHKg3jtYwESKklZ6rTj1MR4pRLLSp6w
-Message-ID: <CABgObfbDTAvm6E0imC=HSm2=BAC4rzUDmuHcoUbVjJ-YeXFw-w@mail.gmail.com>
-Subject: Re: [PATCH v2 04/32] accel/kvm: add changes required to support KVM
- VM file descriptor change
-To: Ani Sinha <anisinha@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>, 
-	Song Gao <gaosong@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Aurelien Jarno <aurelien@aurel32.net>, Jiaxun Yang <jiaxun.yang@flygoat.com>, 
-	Aleksandar Rikalo <arikalo@gmail.com>, Nicholas Piggin <npiggin@gmail.com>, 
-	Harsh Prateek Bora <harshpb@linux.ibm.com>, Chinmay Rath <rathc@linux.ibm.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Alistair Francis <alistair.francis@wdc.com>, 
-	Weiwei Li <liwei1518@gmail.com>, Daniel Henrique Barboza <dbarboza@ventanamicro.com>, 
-	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>, Halil Pasic <pasic@linux.ibm.com>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
-	Matthew Rosato <mjrosato@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ilya Leoshkevich <iii@linux.ibm.com>, 
-	David Hildenbrand <david@kernel.org>, kvm@vger.kernel.org, qemu-devel@nongnu.org, 
-	qemu-arm@nongnu.org, qemu-ppc@nongnu.org, qemu-riscv@nongnu.org, 
-	qemu-s390x@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f2f82341-3799-4379-a0e7-6e9d56a7eda1@amd.com>
 
-On Mon, Jan 12, 2026 at 2:23=E2=80=AFPM Ani Sinha <anisinha@redhat.com>:
- > +int kvm_arch_vmfd_change_ops(MachineState *ms, KVMState *s)
+On Mon, Jan 12, 2026 at 05:12:36PM +0100, Christian König wrote:
+> > static struct dma_buf_attach_ops ib_umem_dmabuf_attach_pinned_ops = {
+> > 	.allow_peer2peer = true,
+> > 	.move_notify = ib_umem_dmabuf_unsupported_move_notify,
+> > };
+> > 
+> > So we can't just allow it to attach to exporters that are going to
+> > start calling move_notify while pinned.
+> 
+> The point is exporters are already doing this.
 
-Weird name since there are no "operations". Maybe kvm_arch_on_vmfd_change?
+:( So obviously this doesn't work fully correctly..
 
-Paolo
+> > Which is why we are coming to negotiation because at least the above
+> > isn't going to work if move_notify is called for revoke reasons, and
+> > we'd like to block attaching exporters that need revoke for the above.
+> 
+> Ah, yes that makes sense. This is clearly a new requirement.
+> 
+> So basically for PCIe hotplug was a rare event were we said we have
+> some problems with non-ODP but we can live with that, but for this
+> use case here it's more like a perfectly normal condition that
+> userspace can trigger.
 
+Yes that seems to be exactly the case. I didn't know about the PCI RAS
+case until now :(
+
+> So the exporter wants to reject importers which can't handle a
+> mapping invalidation while the BO is pinned, correct?
+
+Yes. I think at a minimum exporters where it is a normal use case
+should block it so unpriv user space cannot trigger incorrect behavior
+/ ignored invalidation. ie VFIO will trigger this based on unpriv user
+system calls.
+
+I supposed we have to retain the PCI RAS misbehavior for now at least.
+It would probably be uAPI regression to start blocking some of the
+existing ones.
+
+It also seems we should invest in the RDMA side to minimize where this
+is used.
+
+> > So, would you be happier with this if we documented that move_notify
+> > can be called for pinned importers for revoke purposes and figure out
+> > something to mark the above as special so exporters can fail pin if
+> > they are going to call move_notify?
+> 
+> That would work for me. I mean it is already current practice, we
+> just never fully documented it.
+
+OK
+ 
+> > Then this series would transform into documentation, making VFIO
+> > accept pin and continue to call move_notify as it does right now, and
+> > some logic to reject the RDMA non-ODP importer.
+> 
+> I think we just need to expose this with flags or similar from the
+> importer side. As far as I know RDMA without ODP is currently the
+> only one really needing this (except for cross device scanout, but
+> that is special anyway).
+
+I did not see any other importers with an obvious broken move_notify,
+so I hope this is right. Even iommufd has a working move_notify
+(disruptive, but working).
+
+How do you feel about an enum in the ops:
+
++enum dma_buf_move_notify_level {
++	/*
++	 * The importer can pause HW access while move_notify is running
++	 * and cleanly handle dynamic changes to the DMA mapping without
++	 * any disruption.
++	 */
++	DMA_BUF_MOVE_NOTIFY_FAULTING = 0,
++	/*
++	 * The importer can stop HW access and disruptively fail any
++	 * of its DMA activity. move_notify should only be called if the
++	 * exporter is experiencing an unusual error and can accept
++	 * that the importer will be disrupted.
++	 */
++	DMA_BUF_MOVE_NOTIFY_REVOKING,
++	/*
++	 * move_notify is not supported at all and must not be called. Do not
++	 * introduce new drivers using this, it has significant draw backs
++	 * around PCI error handling and other cases. It has the most limited
++	 * set of compatible importers.
++	 */
++	DMA_BUF_MOVE_NOTIFY_UNSUPPORTED,
++};
++
+ /**
+  * struct dma_buf_attach_ops - importer operations for an attachment
+  *
+@@ -457,6 +480,8 @@ struct dma_buf_attach_ops {
+ 	 */
+ 	bool allow_peer2peer;
+ 
++	enum dma_buf_move_notify_level move_notify_level;
++
+ 	/**
+ 	 * @move_notify: [optional] notification that the DMA-buf is moving
+ 	 *
+
+Jason
 
