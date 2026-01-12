@@ -1,121 +1,151 @@
-Return-Path: <kvm+bounces-67698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E4C0D10CE1
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 08:08:58 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81F38D10E19
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 08:32:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF66E3063887
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 07:06:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E4DB8301A0C5
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 07:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B01F326D63;
-	Mon, 12 Jan 2026 07:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC873328FB;
+	Mon, 12 Jan 2026 07:32:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VC3g7yaa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MBqNoCZb"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5232A3161A7
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 07:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E7A314B72
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 07:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768201611; cv=none; b=tlLjn25fsm4xBXzC7ZjuWorJEB7ft0YTa1/MZ7pdGS9GC7Lx4BzfRvoZDoePC/RcIzRPRgGpjQw1Dn8yNxhiHYIonMI5vMFRaFX/XjPbA19PcFSx1l6itoiGu9cah9pLi6OGLLrA3VlUPUM8xYeAA6SbNhNz33j54Qo+YyGh8AM=
+	t=1768203124; cv=none; b=Uc2SAA0Ys4DSm85sgOHsvBHNjlbK6ti2a8PN65U+c2PncoypSrLWxmQgdWJ/EtHMmOdP0qNkRcdu2RlKgqIkt5joTufcB5X4INZBUCTz4eq15CtQzDdcc5wL/555lsd3Ik/YOipwSV5ybTkYJFEdVAhaG1NU5wKGzuZyliyYGpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768201611; c=relaxed/simple;
-	bh=OYdWZwv7Z3l2W/6fbqIsB9pfYnSqj71IEtjS+go7wdY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=FQxAqv7IXylzMed7mcD9Kwm++SkTEfQwhVID+Ss29vzlsnWePjkm1m/UmP+tOC8XICkeLSO/e/9xDb0Qr5ObDPn1m9uScnUUpjJXyTfTxLPloskCbD4/k0eMAxkbxAtPvCDBlh2k95m3v6xeeJBfpryJL1BtKifUAJ6pBvGd7Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VC3g7yaa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768201609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=92C3yHxeYvHOLFJEMSNqtc2Gy84JWmMyd6P+9QOrZcY=;
-	b=VC3g7yaaSRdhD2IAIYxZpiybfkN5ONZuUz/bjD6XB+orvviMS92qAVV4tGIpdttI0Cohjl
-	zPYVPceGL9Co+PQAyezQCGIQR35N0LQizNwSGR3IGbbL8tpKlGRyVGaUiOA1+0sMFCI3UZ
-	yMPRxzemteSAQKxK/Yu3Ir7vW3NH0cM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-XqKedLBoNYm_wlt4slVB4w-1; Mon,
- 12 Jan 2026 02:06:44 -0500
-X-MC-Unique: XqKedLBoNYm_wlt4slVB4w-1
-X-Mimecast-MFC-AGG-ID: XqKedLBoNYm_wlt4slVB4w_1768201602
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B27011956071;
-	Mon, 12 Jan 2026 07:06:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.45.242.32])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A60A61956048;
-	Mon, 12 Jan 2026 07:06:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 2982021E6683; Mon, 12 Jan 2026 08:06:38 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org,  "Dr. David Alan Gilbert" <dave@treblig.org>,
-  Pierrick Bouvier <pierrick.bouvier@linaro.org>,  Richard Henderson
- <richard.henderson@linaro.org>,  Paolo Bonzini <pbonzini@redhat.com>,
-  qemu-riscv@nongnu.org,  "Michael S. Tsirkin" <mst@redhat.com>,  Marcel
- Apfelbaum <marcel.apfelbaum@gmail.com>,  Eduardo Habkost
- <eduardo@habkost.net>,  Zhao Liu <zhao1.liu@intel.com>,  Marcelo Tosatti
- <mtosatti@redhat.com>,  Laurent Vivier <laurent@vivier.eu>,  Palmer
- Dabbelt <palmer@dabbelt.com>,  Alistair Francis
- <alistair.francis@wdc.com>,  Weiwei Li <liwei1518@gmail.com>,  Daniel
- Henrique Barboza <dbarboza@ventanamicro.com>,  Liu Zhiwei
- <zhiwei_liu@linux.alibaba.com>,  Yoshinori Sato
- <yoshinori.sato@nifty.com>,  Max Filippov <jcmvbkbc@gmail.com>,
-  kvm@vger.kernel.org
-Subject: Re: [PATCH 2/2] monitor/hmp: Reduce target-specific definitions
-In-Reply-To: <20260107182019.51769-3-philmd@linaro.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 7 Jan 2026 19:20:19
- +0100")
-References: <20260107182019.51769-1-philmd@linaro.org>
-	<20260107182019.51769-3-philmd@linaro.org>
-Date: Mon, 12 Jan 2026 08:06:38 +0100
-Message-ID: <875x97ia2p.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1768203124; c=relaxed/simple;
+	bh=wCdVxv++vV4zY3U/Uah3D3XPw6RJeI7tbc9d7yTBM7o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eNMMx5ehdrbScvXGlXmkqAeEeVy7MgYtlWvBeT0DRH3UhB0UxHNymHonlmqB5Mod7Cg0I/lOWO5EDuXKGJhWThJcYRJcv18kLyZP1wEkgL0/W/MLiAOxeGYOcOE0xF8Ump7oym2CdNFYQiweDLkjdIDcbKF2kVEDg7wC5AH7Hfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MBqNoCZb; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768203123; x=1799739123;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wCdVxv++vV4zY3U/Uah3D3XPw6RJeI7tbc9d7yTBM7o=;
+  b=MBqNoCZb0mAEwhQnyi1UQF0nceDHW56E+gnfoLVsB4oxTNx4HAkpAMtD
+   TEu+NRQjyC4kCcYxDbV8oMBWiymGI/9rfVXVogntJLgbu7aYSVMYGGL9q
+   UY9ijlE45LKnHcF46FQjQ+0Mlo0Rp6oEy0OAKavTDgofkN8WoHi2X/0kL
+   MXVwaP4Rqv04QTBs7sCNQ9CWL73yutHZ4q55XrboR8dAB/VQX0Xr29Zzn
+   byC7HAtAlKuwNEV9/OHtcP1zJdTCDUXl5SNsMZHhHHgWyCXHNY65dgrRg
+   HOTrRNjw72xC72G1N1Ng99KiSGsblqQXTjZ+W9bqkrypKb8/tIxZurUV3
+   Q==;
+X-CSE-ConnectionGUID: cJi0K2fUReqdrEnnc6zmGA==
+X-CSE-MsgGUID: ozIXr1x/SVeOu9jZ3CQqRw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11668"; a="79766995"
+X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
+   d="scan'208";a="79766995"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2026 23:32:03 -0800
+X-CSE-ConnectionGUID: CiYmraRrTG2+bJ4JHwrfKA==
+X-CSE-MsgGUID: 61hwoF19S3Cw0+KZP2FN0w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
+   d="scan'208";a="203175604"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
+  by orviesa006.jf.intel.com with ESMTP; 11 Jan 2026 23:32:00 -0800
+Date: Mon, 12 Jan 2026 15:57:27 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Cc: pbonzini@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org,
+	qemu-devel@nongnu.org, seanjc@google.com, santosh.shukla@amd.com,
+	nikunj.dadhania@amd.com, ravi.bangoria@amd.com, babu.moger@amd.com
+Subject: Re: [PATCH 2/5] i386: Add CPU property x-force-cpuid-0x80000026
+Message-ID: <aWSpZxg7kKrdBifu@intel.com>
+References: <20251121083452.429261-1-shivansh.dhiman@amd.com>
+ <20251121083452.429261-3-shivansh.dhiman@amd.com>
+ <aV4PgVwYVXHgmCi3@intel.com>
+ <8ef42171-5473-449f-bd72-e9874fa6f7f1@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ef42171-5473-449f-bd72-e9874fa6f7f1@amd.com>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
+> On 07-01-2026 13:17, Zhao Liu wrote:
+> > On Fri, Nov 21, 2025 at 08:34:49AM +0000, Shivansh Dhiman wrote:
+> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> index b7827e448aa5..01c4da7cf134 100644
+> >> --- a/target/i386/cpu.c
+> >> +++ b/target/i386/cpu.c
+> >> @@ -9158,6 +9158,12 @@ void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+> >>          if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_SGX) {
+> >>              x86_cpu_adjust_level(cpu, &env->cpuid_min_level, 0x12);
+> >>          }
+> >> +
+> >> +        /* Enable CPUID[0x80000026] for AMD Genoa models and above */
+> >> +        if (cpu->force_cpuid_0x80000026 ||
+> >> +            (!xcc->model && x86_is_amd_zen4_or_above(cpu))) {
+> > 
+> > I understand you want to address max/host CPU case here, but it's still
+> > may not guarentee the compatibility with old QEMU PC mahinces, e.g.,
+> > boot a old PC machine on v11.0 QEMU, it can still have this leaf.
+> 
+> Wouldn't initializing x-force-cpuid-0x80000026 default to false prevent this?
+> Oh, but, this CPUID can still be enabled on an older machine-type with latest
+> QEMU with the existing checks. And probably this could also affect live migration.
 
->>From "monitor/hmp-target.h", only the MonitorDef structure
-> is target specific (by using the 'target_long' type). All
-> the rest (even target_monitor_defs and target_get_monitor_def)
-> can be exposed to target-agnostic units, allowing to build
-> some of them in meson common source set.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+Yes, on a zen4 host, booting an older machine with latest QEMU will have
+this CPUID leaf.
+ 
+> > So it would be better to add a compat option to disable 0x80000026 for
+> > old PC machines by default.
+> 
+> Does this look fine?
+> 
+> GlobalProperty pc_compat_10_2[] = {
+>     { TYPE_X86_CPU, "x-force-cpuid-0x80000026", "false" },
+> };
+> const size_t pc_compat_10_2_len = G_N_ELEMENTS(pc_compat_10_2);
 
-target_long is only used as return type of MonitorDef method
-get_value().  Its only caller is
+It looks fine if we only check "if (cpu->force_cpuid_0x80000026)".
 
-    int get_monitor_def(Monitor *mon, int64_t *pval, const char *name)
-    {
-        [...]
+> > If needed, to avoid unnecessarily enabling extended CPU topology, I think
+> > it's possible to implement a check similar to x86_has_cpuid_0x1f().
+> 
+> Do you mean something like this? I avoided it initially because it is
+> functionally same as current one, and a bit lengthy.
 
-        for(; md->name !=3D NULL; md++) {
-            if (hmp_compare_cmd(name, md->name)) {
-                if (md->get_value) {
---->                *pval =3D md->get_value(mon, md, md->offset);
-                } else {
+Sorry for confusion. Could we get rid of model check
+(x86_is_amd_zen4_or_above)? and could we do something like 0x1f leaf,
 
-We store the return value in an int64_t.
+static inline bool x86_has_cpuid_0x1f(X86CPU *cpu)
+{
+    return cpu->force_cpuid_0x1f ||
+           x86_has_extended_topo(cpu->env.avail_cpu_topo);
+	   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
 
-Change the return type to match?
+similarly, apply x86_has_extended_topo() for AMD CPU as well?
+
+x86_has_extended_topo() also checks "module" level, but I think we could
+return error in encode_topo_cpuid80000026() for unsupported "moduel"
+level?
+
+Thus, when users explicitly set these levels, the 0x80000026 leaf will be
+enabled.
+
+Furthermore, I think it's better that different x86 vendors could adopt
+similar behavior for these extended topology levels, especially since
+they are all all configured through a unified "-smp" interface.
+
+Thanks,
+Zhao
 
 
