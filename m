@@ -1,89 +1,189 @@
-Return-Path: <kvm+bounces-67701-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67702-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61123D111C2
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 09:12:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 832D3D11392
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 09:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0451E30735EA
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 08:12:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29ECC305B596
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 08:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEFF533D6CE;
-	Mon, 12 Jan 2026 08:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECAF33F365;
+	Mon, 12 Jan 2026 08:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b="r9W8gKqH";
-	dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b="rPDEkkl6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TWUOEi8a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail8.us4.mandrillapp.com (mail8.us4.mandrillapp.com [205.201.136.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB9D33C18C
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 08:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.201.136.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91378217F27;
+	Mon, 12 Jan 2026 08:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768205544; cv=none; b=fSF4hbuhRIsLwry3OINzNj9tT7guT6/0XdK8Ek0C977iIfFeTwDGgyYcNh//+DrC0XMJsXANeVlhqlYcKRpQVhj8dNkYrjT10A7bwzxvEbfZN8fBtL56iI4JRj4a//Vx0tDb+cfoAgp7ir/FKJesnEPg4D8BBebIaj9irvjHOE8=
+	t=1768206619; cv=none; b=P9JNAOxVde50j1q0S1FjuQ4fc9K9EtHOX0Ih5XkeLtMRb5ZOeCrHIqJglehNkWS8LVpnfusG5cYKf2W6lD7Ux7cqe6OYpklIJ50/tj+UxmrZeme/TqqDvpNV06rR0dkjOvFVegCpgBGueT+L+N+FyXEeOX0jFBXzJWv7Xfvd8zA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768205544; c=relaxed/simple;
-	bh=keYa/bbbVNIONFLF2/By6XeO0uZvqCHaw1BMj3KZd3I=;
-	h=From:Subject:To:Cc:Message-Id:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=Qd6noOTN0vdembQwznwr1QjSiYRMGpa9zy0+1iah5G7UbE51j/OWwZdggMVvtC83u5RoWAWAjF+usnCl/v4fK94hqbuiN5OUpoCZoNMNo1y8EIuTrrVSlGoyfD8jVCoL3kAGMsjL9LIV7K+HC2tWFbPnhUc0MGyiEsa8oYMTVmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vates.tech; spf=pass smtp.mailfrom=bounce.vates.tech; dkim=pass (2048-bit key) header.d=mandrillapp.com header.i=@mandrillapp.com header.b=r9W8gKqH; dkim=pass (2048-bit key) header.d=vates.tech header.i=thomas.courrege@vates.tech header.b=rPDEkkl6; arc=none smtp.client-ip=205.201.136.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vates.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.vates.tech
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mandrillapp.com;
-	s=mte1; t=1768205542; x=1768475542;
-	bh=keYa/bbbVNIONFLF2/By6XeO0uZvqCHaw1BMj3KZd3I=;
-	h=From:Subject:To:Cc:Message-Id:In-Reply-To:References:Feedback-ID:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
-	 Subject:From;
-	b=r9W8gKqHnrAjQP/asRZz+U7gzkju2tWRA7z8P/toMi3S4ioHOijfbsiVfF5dTzBp2
-	 fdDwELeSQ/AMkJc62SrFZfS/ua77X14aRSnb4xMS/b4khbL6RrdnkiyyZOkScMt2VK
-	 ClS10ARqARdEsC30Nn9HwaCsfknFYen5iby2OZrRI+IykNmzS9QDBg0AG+GpMK1Ws/
-	 NdmWQmFgLaGkT3CVmTyYqZTy8u43m7Ny7Ko0sU6q6lDdLI8mxFcTW1l8UTRIIlT9pO
-	 myORWvqNekTCldRow4JSSordbxvI1xGs6SkqMQL2i+9Zd1ST4x6HR19mnsdNhVd8H0
-	 cwGuibZYIYurw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vates.tech; s=mte1;
-	t=1768205542; x=1768466042; i=thomas.courrege@vates.tech;
-	bh=keYa/bbbVNIONFLF2/By6XeO0uZvqCHaw1BMj3KZd3I=;
-	h=From:Subject:To:Cc:Message-Id:In-Reply-To:References:Feedback-ID:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding:CC:Date:
-	 Subject:From;
-	b=rPDEkkl6sGec8BTvEzekSsFMhdF1cgu5gebvWEowBfqBXGQ1CU0UaKWlVBb6b0z5i
-	 250U564fnlUSvaLIHWPqF7A5o+z1UQnVIuJKuU6/ZzTYIctOvRN/LpB9JkPnMScX4K
-	 q3OulRJCQKsDxeb/sw5CXTYkc0JyiASdKp41r0VSDSNHEEKqzdwTKxIe1Vmu1YF3nJ
-	 C8H1RR4HgNlmLKdBRyJ58YvTVMAchhVpqpUBTpoVijpi8RPIkE5sFqFdv61ALSb9rz
-	 yO6153vOTlqRC7DR5tvXc78pw67KDFNho9EwK49NpwgSziCSb44IX34X73MPU5PcaD
-	 D3bEqrAfCj2zg==
-Received: from pmta15.mandrill.prod.suw01.rsglab.com (localhost [127.0.0.1])
-	by mail8.us4.mandrillapp.com (Mailchimp) with ESMTP id 4dqQ8k3GfKz2K1rjw
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 08:12:22 +0000 (GMT)
-From: "Thomas Courrege" <thomas.courrege@vates.tech>
-Subject: =?utf-8?Q?Re:=20[PATCH=20v3]=20KVM:=20SEV:=20Add=20KVM=5FSEV=5FSNP=5FHV=5FREPORT=5FREQ=20command?=
-Received: from [37.26.189.201] by mandrillapp.com id 994276116e0c41d4a6e12c1fe3ad1ff5; Mon, 12 Jan 2026 08:12:22 +0000
-X-Mailer: git-send-email 2.52.0
-X-Bm-Milter-Handled: 4ffbd6c1-ee69-4e1b-aabd-f977039bd3e2
-X-Bm-Transport-Timestamp: 1768205539240
-To: thomas.courrege@vates.tech
-Cc: ashish.kalra@amd.com, corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com, kvm@vger.kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com, thomas.lendacky@amd.com, x86@kernel.org
-Message-Id: <20260112081204.20368-1-thomas.courrege@vates.tech>
-In-Reply-To: <20251215141417.2821412-1-thomas.courrege@vates.tech>
-References: <20251215141417.2821412-1-thomas.courrege@vates.tech>
-X-Native-Encoded: 1
-X-Report-Abuse: =?UTF-8?Q?Please=20forward=20a=20copy=20of=20this=20message,=20including=20all=20headers,=20to=20abuse@mandrill.com.=20You=20can=20also=20report=20abuse=20here:=20https://mandrillapp.com/contact/abuse=3Fid=3D30504962.994276116e0c41d4a6e12c1fe3ad1ff5?=
-X-Mandrill-User: md_30504962
-Feedback-ID: 30504962:30504962.20260112:md
-Date: Mon, 12 Jan 2026 08:12:22 +0000
+	s=arc-20240116; t=1768206619; c=relaxed/simple;
+	bh=jrAgn4dXHsnYYAywiEulVTrTcFbmHdDn3kMlPlVibnA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U+YmxD4keenCwKBx2hv+IKF4xnmGuemjJCmwjckQEkXfrDNC/Up5Q8DxgfsiShVEt4EQGJjwC6BAgrjImZ6jC6u1NYntrStmMJf1ccRQfEhWXsVZaHuhdQvReIRuC0XpgHL4T93X9veH70XYDn+LnkvWrk25wRna4UnWvoTvvdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TWUOEi8a; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768206619; x=1799742619;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=jrAgn4dXHsnYYAywiEulVTrTcFbmHdDn3kMlPlVibnA=;
+  b=TWUOEi8af1Fz1UKE8Kq/L1D2m2YL97wrGnPzbYYvs2oQrJsMiSoWxY56
+   LQzGeAPY9JJsQtpJpvGf2Q6ioRUWRMgPHCR3+vt0EOcJuQ+ygpL0uoYQ/
+   mtteQXwhmsIlJUXZ7NtS3Wnr7Tx09T9rOiDMisH/jxhe5iCJ36IqWgohy
+   NxeQoSaFejQJH7oJaaVsezhxvoNSspoz4KhijPZ6QDd9BiHFSDpcl3ZrA
+   AZlx1vv/NuvdPE6KDpXpPYZ1xMze2fZsnamGQHUgPh7VqLpNkl5aU43z1
+   j/xy9BCaCXwIpwWrygrm+nPeUqqPdfaCAWEI3iJPXTBf5B/myRcdvvhUB
+   g==;
+X-CSE-ConnectionGUID: g/p/UFU5QGusmqUrU+DdCA==
+X-CSE-MsgGUID: TDf9Y1QIQpOXcZwVGx0phw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11668"; a="86893547"
+X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
+   d="scan'208";a="86893547"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 00:30:19 -0800
+X-CSE-ConnectionGUID: AzF1K0QHQtGgfl9q+ehw0A==
+X-CSE-MsgGUID: DOnwtQKmSaa/NPKCnoECyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
+   d="scan'208";a="235271172"
+Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 00:30:15 -0800
+Message-ID: <de791cf0-9259-48f0-96d7-5248b145c7e4@linux.intel.com>
+Date: Mon, 12 Jan 2026 16:30:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] x86/virt/tdx: Retrieve TDX module version
+To: Vishal Verma <vishal.l.verma@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, x86@kernel.org, Chao Gao <chao.gao@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>, Kai Huang <kai.huang@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Kiryl Shutsemau <kas@kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>
+References: <20260109-tdx_print_module_version-v2-0-e10e4ca5b450@intel.com>
+ <20260109-tdx_print_module_version-v2-1-e10e4ca5b450@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20260109-tdx_print_module_version-v2-1-e10e4ca5b450@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Gentle ping.
 
-Thanks,
-Thomas
+
+On 1/10/2026 3:14 AM, Vishal Verma wrote:
+> From: Chao Gao <chao.gao@intel.com>
+> 
+> Each TDX module has several bits of metadata about which specific TDX
+> module it is. The primary bit of info is the version, which has an x.y.z
+> format. These represent the major version, minor version, and update
+> version respectively. Knowing the running TDX Module version is valuable
+> for bug reporting and debugging. Note that the module does expose other
+> pieces of version-related metadata, such as build number and date. Those
+> aren't retrieved for now, that can be added if needed in the future.
+> 
+> Retrieve the TDX Module version using the existing metadata reading
+> interface. Later changes will expose this information. The metadata
+> reading interfaces have existed for quite some time, so this will work
+> with older versions of the TDX module as well - i.e. this isn't a new
+> interface.
+> 
+> As a side note, the global metadata reading code was originally set up
+> to be auto-generated from a JSON definition [1]. However, later [2] this
+> was found to be unsustainable, and the autogeneration approach was
+> dropped in favor of just manually adding fields as needed (e.g. as in
+> this patch).
+
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Link: https://lore.kernel.org/kvm/CABgObfYXUxqQV_FoxKjC8U3t5DnyM45nz5DpTxYZv2x_uFK_Kw@mail.gmail.com/ # [1]
+> Link: https://lore.kernel.org/all/1e7bcbad-eb26-44b7-97ca-88ab53467212@intel.com/ # [2]
+> Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Cc: Kai Huang <kai.huang@intel.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: Kiryl Shutsemau <kas@kernel.org>
+> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+> ---
+>  arch/x86/include/asm/tdx_global_metadata.h  |  7 +++++++
+>  arch/x86/virt/vmx/tdx/tdx_global_metadata.c | 16 ++++++++++++++++
+>  2 files changed, 23 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/tdx_global_metadata.h b/arch/x86/include/asm/tdx_global_metadata.h
+> index 060a2ad744bff..40689c8dc67eb 100644
+> --- a/arch/x86/include/asm/tdx_global_metadata.h
+> +++ b/arch/x86/include/asm/tdx_global_metadata.h
+> @@ -5,6 +5,12 @@
+>  
+>  #include <linux/types.h>
+>  
+> +struct tdx_sys_info_version {
+> +	u16 minor_version;
+> +	u16 major_version;
+> +	u16 update_version;
+> +};
+> +
+>  struct tdx_sys_info_features {
+>  	u64 tdx_features0;
+>  };
+> @@ -35,6 +41,7 @@ struct tdx_sys_info_td_conf {
+>  };
+>  
+>  struct tdx_sys_info {
+> +	struct tdx_sys_info_version version;
+>  	struct tdx_sys_info_features features;
+>  	struct tdx_sys_info_tdmr tdmr;
+>  	struct tdx_sys_info_td_ctrl td_ctrl;
+> diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> index 13ad2663488b1..0454124803f36 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
+> @@ -7,6 +7,21 @@
+>   * Include this file to other C file instead.
+>   */
+>  
+> +static int get_tdx_sys_info_version(struct tdx_sys_info_version *sysinfo_version)
+> +{
+> +	int ret = 0;
+> +	u64 val;
+> +
+> +	if (!ret && !(ret = read_sys_metadata_field(0x0800000100000003, &val)))
+> +		sysinfo_version->minor_version = val;
+> +	if (!ret && !(ret = read_sys_metadata_field(0x0800000100000004, &val)))
+> +		sysinfo_version->major_version = val;
+> +	if (!ret && !(ret = read_sys_metadata_field(0x0800000100000005, &val)))
+> +		sysinfo_version->update_version = val;
+> +
+> +	return ret;
+> +}
+> +
+>  static int get_tdx_sys_info_features(struct tdx_sys_info_features *sysinfo_features)
+>  {
+>  	int ret = 0;
+> @@ -89,6 +104,7 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
+>  {
+>  	int ret = 0;
+>  
+> +	ret = ret ?: get_tdx_sys_info_version(&sysinfo->version);
+>  	ret = ret ?: get_tdx_sys_info_features(&sysinfo->features);
+>  	ret = ret ?: get_tdx_sys_info_tdmr(&sysinfo->tdmr);
+>  	ret = ret ?: get_tdx_sys_info_td_ctrl(&sysinfo->td_ctrl);
+> 
+
 
