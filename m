@@ -1,266 +1,200 @@
-Return-Path: <kvm+bounces-67818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F7AD148AE
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:51:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC690D1489C
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 18:51:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 24FEE302663A
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:49:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 16F963019E29
+	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 17:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5AD387362;
-	Mon, 12 Jan 2026 17:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D5134FF57;
+	Mon, 12 Jan 2026 17:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pxBqF0Pl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dbgll+02"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010036.outbound.protection.outlook.com [52.101.61.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3218D37F8A5;
-	Mon, 12 Jan 2026 17:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768240031; cv=fail; b=mHAmQfwBfGZczaX3/DSM0hC3bpdxAMjgQ2/KuZam4Vc27o+GEHRZipfuri5g2jq3dxCvFIOiTKLGoQcq0C/lz2/u5wWvZqA0OgjsuPXsYqeFcG5IoLmoG40s8hLX1DYevtV15mwz2fnQNuuZP5lYZgUprn5IuPYmhgdTDC4hmhI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768240031; c=relaxed/simple;
-	bh=tWoQ58cvR5Qn2vkX+5K/GBYs5d1pdioM1XVSyKZupQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kbTE4PfP7C6w4wmisBAgCh3k7jNAKhTcM0kYuJZaQaEsnVSqpURNMvKhhvn+BFP7T2u02//XbdaTITmSSj1YkA2HSq99XqEMvrHET/vyiQcN7mLRGIhQv3G1KEcCKkzlV8D1Ehnf7u52sE/Y+IsMXUy8ZaIhKXfEQQud5+IEm2I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pxBqF0Pl; arc=fail smtp.client-ip=52.101.61.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YILb9ezFyb3MG9kKGXbgAts5PVvg2ko3eHKPYcBRr6ug7KJjT92f9RHlQF3sG143HdTHOsUVVxYrxyieR7Pg7WlJR/G06k7nD9dWF5UD00hVjBBRUq2lbncGGkWA62BXTXLgnUcfV0RYNAVFz1HXRj4VMBswPkT5HaL8zQstZEQqEhU3BpV57BbVCJD/HUP43HhNuaCj1QnvGIQpiUTTCs0ngUu4tn8bNfbLC8nFvnEkM6jBQHIM2fDL60h6C7zmXRM4CWNwzOGDjp7CGVGBOjs4O9S6yVDJsF3jRiSSoIowoaZgiq4Ux8rIyTBzTnOJbd/TRyx20xxLeILMfW46Xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N1J+BdCt6tiyG5IlAf9740izsatqm4Ntj+zK5oiEn5g=;
- b=qyvA6xHOoul1NBtABxTwOUecPxqUDUeWVzjEqzYZvXvB+74L5O/XMgc6d5qwaWoQU85hBdpnmb8p/+7tBi+oMzUN5aJFiMa/JnXHsZGjxZ+d7l7F0NhphYYFasyA2OTuVHpZCYmAq3FKfp76BJi2M1B16TaI0offEa7NAMy5UCoCVyO05wvghrZxpvcYwavZp5b4v/QOaLMRhxrLj34OX+kcs3HIX4FTJURCX9Q3xziFuL0Y3OqZlR/yuIcL5KMMNwEfy6OZe3VZ58tryfmFQ82xM4W/efRYi5OoVNhn2kHFs7h8wu6cE1zU4RgppgRGAK2+w4TyvIQLb4LeH+xsrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N1J+BdCt6tiyG5IlAf9740izsatqm4Ntj+zK5oiEn5g=;
- b=pxBqF0PlH3aKPOw1Lws0EBbewATSYCKIGXibh0/NWJo2Swe83FpBekNjpw3gy+3xX58+VynNoC+mNopbqz2C6iG60dROhUuR9NMs6pQRGP+558XsVYtBhmiMj6HyYFbUB2dkqTVnUf5lOG5t93mSE6nCMZ+NIKp8yNq7dfM+BgSthOeiJmC2n28ttJadOxDWmvLLBFpQRqoyw3qoAwsewVV1dGY6tK44KR/W219p3W2ltoGnwKH1AvValA2/UK3Qoe9EHOwVKo6vIKYVmIsrBVkrkDM7q+VTdjcZA0xW8GhUdmRiibOwTzvHQudXGKFTGaMqlyrLv5P1/Jjndra/2g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- DM4PR12MB6012.namprd12.prod.outlook.com (2603:10b6:8:6c::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9499.7; Mon, 12 Jan 2026 17:47:07 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9499.005; Mon, 12 Jan 2026
- 17:47:07 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Matthew Wilcox <willy@infradead.org>, Balbir Singh <balbirs@nvidia.com>,
- Francois Dugast <francois.dugast@intel.com>, intel-xe@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, Matthew Brost <matthew.brost@intel.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Felix Kuehling <Felix.Kuehling@amd.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe <logang@deltatee.com>,
- David Hildenbrand <david@kernel.org>, Oscar Salvador <osalvador@suse.de>,
- Andrew Morton <akpm@linux-foundation.org>, Leon Romanovsky <leon@kernel.org>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>,
- Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Alistair Popple <apopple@nvidia.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
- linux-pci@vger.kernel.org, linux-mm@kvack.org, linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free
- callback
-Date: Mon, 12 Jan 2026 12:46:57 -0500
-X-Mailer: MailMate (2.0r6290)
-Message-ID: <86D91C8B-C3EA-4836-8DC2-829499477618@nvidia.com>
-In-Reply-To: <20260112165001.GG745888@ziepe.ca>
-References: <20260111205820.830410-1-francois.dugast@intel.com>
- <20260111205820.830410-2-francois.dugast@intel.com>
- <aWQlsyIVVGpCvB3y@casper.infradead.org>
- <874d29da-2008-47e6-9c27-6c00abbf404a@nvidia.com>
- <0D532F80-6C4D-4800-9473-485B828B55EC@nvidia.com>
- <20260112134510.GC745888@ziepe.ca>
- <218D42B0-3E08-4ABC-9FB4-1203BB31E547@nvidia.com>
- <20260112165001.GG745888@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0195.namprd03.prod.outlook.com
- (2603:10b6:a03:2ef::20) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBC83090D4
+	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 17:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768240276; cv=none; b=ixIn+8lT0UsocGCrPv25o5oAMuIpMUcNgKZnhLYDnlSeEjY18tWuCnMwzx2V5eJTp2jwd4pTUknaklnLfVePa2XzMW4S0BSNqfwhR8ZYlo5l77oguCNQ+/qkcEjlWQ9u9HEOTdM+kWJvx0hi9HZFHbhaC+h440WsvV/YgmIUyXQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768240276; c=relaxed/simple;
+	bh=LrFB4UFo6TPYH27QP3oPdi1iHfmysVG8Hjr8H2qOYPg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=O+7L+PR+oO0o5qJvdqJGSMMFDelfIAoNg8SmWBj/yQEDZ+Ui0xSdZcldM1N56i7VQC9k+tBOUFKYeLGAvxMyHJCuUvfDTBw+N35Hi6DKBbc+LrZrkoGiViDzPFalWj8EvkhLjo8S22ssEYPy02n9RhTASfBkZbOV8tkJRjNcDRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dbgll+02; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0bae9acd4so49174235ad.3
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 09:51:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768240274; x=1768845074; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5YUR1KrggRucIOKz0xpy1KoutyssE0Qt3ng0v3tUWw8=;
+        b=Dbgll+02aQ947bsEInxtseTUnfOEn+A6/rglkKCpDxOsDmJBUTDVdGZCwgIvsorayE
+         spxacsCUAlQVuE682kltJ3IC8IK7fWhz6ar7h3vAjDpELfgEVVpp/KUNSLevnBPZZSSd
+         ooUHmIvrJP096/v8czH28HVmrMJt1UUCaWaIUFNX8SWB5fLJj3f6hWNJcQHsmh26QFv/
+         F+iwM/PwJ8Tx+iUlpEzWdUHvq23Y6rzHGSZU6ORj21IbRWu488bgjlRROFFE4nPaTL7u
+         +hWMocpFDmWbtgIgN8Eom65f07Ny8KZqFcd4G9pc5X60cOQTVUtdISnzGLA7XIhkdzVG
+         VwFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768240274; x=1768845074;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5YUR1KrggRucIOKz0xpy1KoutyssE0Qt3ng0v3tUWw8=;
+        b=geEOOKYSjuwlTuBwyGUTqCn4bFJaK8b1d0n/2lepLXkqBP69cvu/PHDUUuuZelzJKz
+         QPEsZkSBpBh83GNDEtPJLIiNYvVBLMXfMRTz8As+YKiOoRcJJ6Y17W6YgA1bp4O2TzOm
+         HokPR37iBDAJJAf8J7RpMTIT2/ZS3ZLAZP7IJz88T41Mvo9+l1xfEPbPyH2h6FZXQOpx
+         Jxh+ZrEnNarb/r0L6AE3d5gqUKcKk3huVllIUX2NMgwSnlTkPCRe9gNg4sqcAr8NUiRH
+         mviSqQSm0mgetKcLIAi7RVrehNZSkbOoGTu+/vECm61DfCAWKpPYKfG/L3DXP2Ri8mkA
+         xUvA==
+X-Forwarded-Encrypted: i=1; AJvYcCXQJT1SLgoEel1P0bYYvitSWC+GV/UmBtxnBT+zT8eb3D8qaacbelOrLVIpnMGv9mb6gM8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdcLFPpUCj9x9iNlAkl0Q+2v72IOeQitkcixp2XudG4zPB9Bdx
+	ufhE41UYqZz7e9fJM668h6OzBnlJL57AxHLsekzQIgp5J1yXLYGXBU1a1CD3ox3Z9DOnnLk0mpM
+	e+M8UVw==
+X-Google-Smtp-Source: AGHT+IGtsanUz74PgJV7AAnA6vaG3LCmS5pgi54E5TKj9ojMdiu1/d/IWpd0suoCnfgC8UmHSkaejG7pVEM=
+X-Received: from plhz1.prod.google.com ([2002:a17:902:d9c1:b0:29a:1de:14aa])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:37c3:b0:29f:2734:6ffb
+ with SMTP id d9443c01a7336-2a3ee434de2mr164169645ad.22.1768240274529; Mon, 12
+ Jan 2026 09:51:14 -0800 (PST)
+Date: Mon, 12 Jan 2026 09:51:13 -0800
+In-Reply-To: <aR913X8EqO6meCqa@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DM4PR12MB6012:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0ed69ae2-ee15-4670-2fff-08de52029ac4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dytEcXlBTlZtRDNiMFMrbnloVEVaVGdqa2puM1FJeEY2VnJOWDFtL1F0TGtl?=
- =?utf-8?B?SWZENVdMdU1ZbzFhSU0zb2ZRSjVqcXRVQmFDZW81NjU0UytYdGZBYjZsNENv?=
- =?utf-8?B?eWNIUkJFYUV1cmd2ZmtEYnZWSjJWRHZpUTZyUEsyS0JIZE1Hbk9JNGRvK0Z5?=
- =?utf-8?B?Y09mTTlPNThNS1BGa1VvOFFMdGYrVjIvZFVNNWpoWTkyRGhRT2cyRHhuMVpG?=
- =?utf-8?B?aWdpTlZOTkYydVlmMDlrdnZuZXhmRk5FTERBTzZkUitlUHdyTzZGZ25ab205?=
- =?utf-8?B?YjBIL1BBRGNyazBLYTVlSEZPM0JiR3lnSS9GWVRheC94OWFrc1I0SmwzQ0M3?=
- =?utf-8?B?WDE4WmJLMkQ1bjcxY09hSTVmUXlUcVZ1UFgvNXJSaXk0MVBCSWRJdllDWnBH?=
- =?utf-8?B?N0MyTzV2TDE3T0NrZFRhOWtGUlJRR21HNFZGOHlTVWRlNk1hQ3JodlF3RUNk?=
- =?utf-8?B?dzh6WllVdTRyOEE3ZTZ6RUk3TG00Q3JtT2llUjlSTm5ibzRlL0VEcnptZFJY?=
- =?utf-8?B?L2NNb3p3YWVBT0JYeWxIeVd0VzdwTU51bFp6c2k3MXcwbjRldHY3SFZMU1dp?=
- =?utf-8?B?alp3K0YyNGVSenZ6WWVVRVQ5WXd1bFBrQ3JqNnVUb0srNzdrK1VPTDVVUVBD?=
- =?utf-8?B?UytMa3d1dFNvd2d5Rkw0WExzNndkbmVKa245d0lhK053YWpvL1FRYXZDTWo0?=
- =?utf-8?B?UHpQQkFIZlpwRnE0cTlsUHA2VzRwQnkrVFVmVytHNHcwYTVZQndvQlRhdjVZ?=
- =?utf-8?B?MVdPNUJrd3ZNRlNRaE41VUI5cXZCb2JPenRKZXEzdEU2aWF6Q3VGcHpwRVI2?=
- =?utf-8?B?dlJLZWxzQXNNQmJlQ05MemV2ZUM0bDJBZEhMc0pwZFQrM1hITmVnYmlyTVcx?=
- =?utf-8?B?ZmFJbEJaL2dNZEduU284MU1Pa0JobmpVWXRtQzJ5d0kvVVJrVmxBTjhNK3Vq?=
- =?utf-8?B?TWR4dEpjZ0lDRC9iaE9QSndITlc2QUhwV3V5YmVta0RiVzJVY1FycTFnTDF2?=
- =?utf-8?B?UG9RWTJmUjdJMHlRbVFCRm4zMXdOV3lWOGZQTVRjU1ZpS0dvVGt0K043QnZ6?=
- =?utf-8?B?Tk5NY1Q1ZmRkOWNYMXZvMVFWVVFQUGxaQ29sM0JMM0lFeHlmUjhIMWlCNndM?=
- =?utf-8?B?Zmd3clI0dndnak5LTnk0cEY1SEgvWHVXbWhhMHkzY0NEc1p2YU1vcGdMNllR?=
- =?utf-8?B?TmUxOFBOSGhFVE5XdU5QRVdSdEFSWTlzcHRJdGZkM1hOdWNYbnBhc2oraUtq?=
- =?utf-8?B?MmJYL3NoZVZJeVBpVUVNUXN0d0s1cDZlc2hsVnhrYmdCMW1tTkFwS3d3dlN2?=
- =?utf-8?B?YmladmhiUndaaDM1NHBmQUlsYi95enBHa2FPUWNoU1JQdlJla09icHBZK3RU?=
- =?utf-8?B?bUtLMUw1ZTIyRWFVZUZJYkk1Y0FqOWw0bm9FZSt2dnFUWmNUbXlacG5iV0cv?=
- =?utf-8?B?RVlZSld6RWxZMldoOWlSdlYyZklPRjZtZTBxODJYVlJXaHRhU3BrbFdHS0dT?=
- =?utf-8?B?ZXJyMkhNMzFBci90dmJ6Unc2Y29HNXM3Q0p6NnFnd1dXS2VDRm1UMkF2RVhJ?=
- =?utf-8?B?VXFHSGRMdlc2ZGVxaGtjNXZIWWRCRk1SWWV0VWpuMy9pbGNVcnRzbENtSmlw?=
- =?utf-8?B?ZUxWbk1vRkN4a0wyeHByWnNjYjhzckVCc3pWdWhUME1DWUl5OUpwbnlmWUto?=
- =?utf-8?B?OVVJZzhSZnJVdzJkUmVKek5PM1pzTGs3ZXdVUUk4V2pDeWtKeEFtaEFKWlVL?=
- =?utf-8?B?Vk14ZE8vckdkOUJhS2s4a1BGY1RBYVFxc1IzVDQvWlVmVVh1VVMyQ09BNGlY?=
- =?utf-8?B?UmttQkNycHVZd3R3VExOT3RmTDFPZWtUSVZuT1Y0dnVqZ0xxREw4OFRsWWFt?=
- =?utf-8?B?ZHZ2VUt4ckZOd3pGT2poOFlaVlZoY3oyMjJQTnl2ZXV2Y25pcTJCZnZsQ2lX?=
- =?utf-8?Q?nWRc6PnT2UOD0jXlRWGp035ZvNOS9Aq4?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UEdDZXE3Qi9QUjFJYjB2M2x2VytPc2xPTVd1TE14OUhzMElRdENqVTJKYTRS?=
- =?utf-8?B?ZU14RGxaSG9uU3dxd0M4Rm1PVXlmaXVrcWN5RTA3YmFxRHprOWx1T2EzVmpa?=
- =?utf-8?B?NTdmWWY1UWF3MTdRcFduYjJOd0ozQTYySlhjRXp2Y2xtbC9NWkV3TmQvN2lv?=
- =?utf-8?B?OStkZjZQNm5oMXprWGpRekFzamxIUUtlM3BMdHk4MnpMZ2NKbDZiWlJvNnZ6?=
- =?utf-8?B?ejZYZ3BUV1dESmxSQTRtd2xBNGtDYUNHYS9WS2hhelRzVzNlVEpTYmNHdy9O?=
- =?utf-8?B?OWdRVFNBUkVzNlBlMUdVVVhaT251SXp4V2w1cmtHbmxKRExBcEdtOFpoSWlZ?=
- =?utf-8?B?UVdxbURRbG1ZK3J2QUNvUys5cHdaK0QwSjBWa21XdFZvUzdqNStSeU91U1U2?=
- =?utf-8?B?RFBTY3htNjdSZlEvRjI2QUlPTWs5T1B0RGVhUlgySDVNRFVDNzVqMFpCTHFv?=
- =?utf-8?B?YW94N0hiczNTOFFhK2R5bmR0RFFBUHNvMXIyd1FzS3ZVWCtndWg4citJUnhK?=
- =?utf-8?B?a1FXUGJHbCtYK3ExbjRIczFhM2JPakxSY1lsam80ejhVUThFTGZPRG90amFB?=
- =?utf-8?B?VGlRTWtNVXhMejIxK2VvcFpZd0s2aml4cy9Gb2lUYWR5NXU4MHlNMzZ1NitG?=
- =?utf-8?B?My9XVmZBYWNuaGlJcG5ONUJYMUVWK0VKcGwzWU5XUFIyY3pJdTJ6SGVEQjdl?=
- =?utf-8?B?eFpsWFpJbGNheWt2S1orejhrVUk3emc4MVhOT1FkUzdYZVdaRWlkMGRtVE92?=
- =?utf-8?B?ZnVRNmErN0RDY2tGV0Z5OW5FZjNLWG13Wk5QbW5vcUppUy9UN2tURitPc1Js?=
- =?utf-8?B?SGlobm83YldoU1I4b1o1ekRJbVdvSk1rTkt0N0xnZC9WV3o2dmJBZkwwclRD?=
- =?utf-8?B?Z3NidnUzSm5EM3k3SWt1bGN6TmtTdGwyOVlsYWlCM0VjV0tjc251eGVRRGth?=
- =?utf-8?B?RGwrYnQxeU0rN1djNVpjcFBKVlduV3VqdG9wVTZWNVl0T0J5OFVTcSt3N2F4?=
- =?utf-8?B?TUJIRG9CU0xhMUNKVFRxeXpOMmVzSHBqNjhDV2dOY0h3aThtMU1HbUxnc1c1?=
- =?utf-8?B?bU9qUDZza201K2VwQ0FSZ0t6ajVkZWRsYUQ3VUZwTEhWbmZJSHNzTTVLL05p?=
- =?utf-8?B?NTdmNWFWRDE3UG9XUGFkZEY3c29KVHFXalhCRktSTkUzWCthOE5ySkd6V0ZZ?=
- =?utf-8?B?eXQ1bnB2eEhDN2JNOG1XNGtTLzBhUlE5VkgvUmpYcVFCd21NTmZKODc4ejFM?=
- =?utf-8?B?SUdEZkdzd00wQTdvTHBxdTVGbWRjaDhjNHBGRXVzdlM0R3U5Z0txcWFsYW5v?=
- =?utf-8?B?TU5uT0RKcERUZ2ppbTIrMHh1S3hPYy81TEZLQm40Ym1CWnZYelpkWWtWWFBI?=
- =?utf-8?B?V1Q2RVA5RjJKTXc1WC9rSUYwTjBCRUd1a0lhV1VDdC93Z28yNm81V3J6TUxy?=
- =?utf-8?B?c1F6V3BBdHFQNllmdkNmZE9SMTNjV2tuOEZBZjQ2T08wWS8xVUY1M09UQ3ZL?=
- =?utf-8?B?VkJOME1RMHdQL1BXZ2xhUHNNY2x0Nm1TUHk0YzdMek9RQ0w5aStLV1RURGtC?=
- =?utf-8?B?QVlrVDgvRzBNUU1HTStVbENXNHg0bENPKzdwVlNSNTlGTDRJb1Z3dTJYYS9E?=
- =?utf-8?B?Q09MZlFTU3Mvc1dtK05LdzJpbXlCQmNWajNVYnN1U2dOS0t4dTR1RXJQaGxM?=
- =?utf-8?B?UURuV3RkWVBBS09SNkhZTGVhMnNFVE1nODloenJWWmh5dmpWb29XdHRRVzNF?=
- =?utf-8?B?UVlMU21yU3BadEpOTHhOeVpPODMzcHRLcC8vejFzMithckpuZ1FGc0tDZ3NZ?=
- =?utf-8?B?Y1U0OFRVKzg0VHVxV25aUXoybkhNVXJwanVzN0N5ejQreW4wcFpFVE5XMkdQ?=
- =?utf-8?B?VXhVdGloTDJzNnBpVmtodGluNW5SaktmemdNOG5FVVRmYUltek54bFBHT3Vn?=
- =?utf-8?B?OEM5d2NOTzlET3M5STRNS3Y1OEhjMnJtNXlQaHMwdVErMjlWZVRvZ1RNT3FV?=
- =?utf-8?B?ZXVZNnBpU0FvNnFtVUtScHM1aXA4RUxqV3pBdHBXUEltRkpwZ1A1L3Y1dVpB?=
- =?utf-8?B?anNKcjZ2K1pCN1U4QngrZnl6UlUvZDJGMWVYZVZ1ZnRCTlBObDdmTTRYblJ4?=
- =?utf-8?B?aERZaE14Nlc4eGtMUlFuOUF1QXllUlk2TW9aK3RmMDdIQ2hablFTcWdZZHZy?=
- =?utf-8?B?Sy9hamMzMTBYamJzbGhoNUF6MnFoVGVjMHlJcUk5OEg5OTJWa3Q4ajYrZWtY?=
- =?utf-8?B?ZklraDhDeWtzanV2UFdadW9hSUZadWdOV2RuaVNaMmdEUUJQd1ZJdU1EaU9L?=
- =?utf-8?Q?0qRRHi2DIoGdMi79k9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ed69ae2-ee15-4670-2fff-08de52029ac4
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 17:47:07.4247
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7z6sPf+8v8slvfmOJEmaD3i4bGffy247ah29D6PaqtxxpDfobutQ0aiRiYvbdrMA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6012
+Mime-Version: 1.0
+References: <20251107093239.67012-1-amit@kernel.org> <20251107093239.67012-2-amit@kernel.org>
+ <aR913X8EqO6meCqa@google.com>
+Message-ID: <aWU0kWomCX0lrtf5@google.com>
+Subject: Re: [PATCH v6 1/1] x86: kvm: svm: set up ERAPS support for guests
+From: Sean Christopherson <seanjc@google.com>
+To: Amit Shah <amit@kernel.org>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-doc@vger.kernel.org, amit.shah@amd.com, thomas.lendacky@amd.com, 
+	bp@alien8.de, tglx@linutronix.de, peterz@infradead.org, jpoimboe@kernel.org, 
+	pawan.kumar.gupta@linux.intel.com, corbet@lwn.net, mingo@redhat.com, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, pbonzini@redhat.com, 
+	daniel.sneddon@linux.intel.com, kai.huang@intel.com, sandipan.das@amd.com, 
+	boris.ostrovsky@oracle.com, Babu.Moger@amd.com, david.kaplan@amd.com, 
+	dwmw@amazon.co.uk, andrew.cooper3@citrix.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12 Jan 2026, at 11:50, Jason Gunthorpe wrote:
+n Thu, Nov 20, 2025, Sean Christopherson wrote:
+> --
+> From: Amit Shah <amit.shah@amd.com>
+> Date: Fri, 7 Nov 2025 10:32:39 +0100
+> Subject: [PATCH] KVM: SVM: Virtualize and advertise support for ERAPS
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=3DUTF-8
+> Content-Transfer-Encoding: 8bit
+>=20
+> AMD CPUs with the Enhanced Return Address Predictor Security (ERAPS)
+> feature (available on Zen5+) obviate the need for FILL_RETURN_BUFFER
+> sequences right after VMEXITs.  ERAPS adds guest/host tags to entries in
+> the RSB (a.k.a. RAP).  This helps with speculation protection across the
+> VM boundary, and it also preserves host and guest entries in the RSB that
+> can improve software performance (which would otherwise be flushed due to
+> the FILL_RETURN_BUFFER sequences).
+>=20
+> Importantly, ERAPS also improves cross-domain security by clearing the RA=
+P
+> in certain situations.  Specifically, the RAP is cleared in response to
+> actions that are typically tied to software context switching between
+> tasks.  Per the APM:
+>=20
+>   The ERAPS feature eliminates the need to execute CALL instructions to
+>   clear the return address predictor in most cases. On processors that
+>   support ERAPS, return addresses from CALL instructions executed in host
+>   mode are not used in guest mode, and vice versa. Additionally, the
+>   return address predictor is cleared in all cases when the TLB is
+>   implicitly invalidated and in the following cases:
+>=20
+>   =E2=80=A2 MOV CR3 instruction
+>   =E2=80=A2 INVPCID other than single address invalidation (operation typ=
+e 0)
+>=20
+> ERAPS also allows CPUs to extends the size of the RSB/RAP from the older
+> standard (of 32 entries) to a new size, enumerated in CPUID leaf
+> 0x80000021:EBX bits 23:16 (64 entries in Zen5 CPUs).
+>=20
+> In hardware, ERAPS is always-on, when running in host context, the CPU
+> uses the full RSB/RAP size without any software changes necessary.
+> However, when running in guest context, the CPU utilizes the full size of
+> the RSB/RAP if and only if the new ALLOW_LARGER_RAP flag is set in the
+> VMCB; if the flag is not set, the CPU limits itself to the historical siz=
+e
+> of 32 entires.
+>=20
+> Requiring software to opt-in for guest usage of RAPs larger than 32 entri=
+es
+> allows hypervisors, i.e. KVM, to emulate the aforementioned conditions in
+> which the RAP is cleared as well as the guest/host split.  E.g. if the CP=
+U
+> unconditionally used the full RAP for guests, failure to clear the RAP on
+> transitions between L1 or L2, or on emulated guest TLB flushes, would
+> expose the guest to RAP-based attacks as a guest without support for ERAP=
+S
+> wouldn't know that its FILL_RETURN_BUFFER sequence is insufficient.
+>=20
+> Address the ~two broad categories of ERAPS emulation, and advertise
+> ERAPS support to userspace, along with the RAP size enumerated in CPUID.
+>=20
+> 1. Architectural RAP clearing: as above, CPUs with ERAPS clear RAP entrie=
+s
+>    on several conditions, including CR3 updates.  To handle scenarios
+>    where a relevant operation is handled in common code (emulation of
+>    INVPCID and to a lesser extent MOV CR3), piggyback VCPU_EXREG_CR3 and
+>    create an alias, VCPU_EXREG_ERAPS.  SVM doesn't utilize CR3 dirty
+>    tracking, and so for all intents and purposes VCPU_EXREG_CR3 is unused=
+.
+>    Aliasing VCPU_EXREG_ERAPS ensures that any flow that writes CR3 will
+>    also clear the guest's RAP, and allows common x86 to mark ERAPS vCPUs
+>    as needing a RAP clear without having to add a new request (or other
+>    mechanism).
+>=20
+> 2. Nested guests: the ERAPS feature adds host/guest tagging to entries
+>    in the RSB, but does not distinguish between the guest ASIDs.  To
+>    prevent the case of an L2 guest poisoning the RSB to attack the L1
+>    guest, the CPU exposes a new VMCB bit (CLEAR_RAP).  The next
+>    VMRUN with a VMCB that has this bit set causes the CPU to flush the
+>    RSB before entering the guest context.  Set the bit in VMCB01 after a
+>    nested #VMEXIT to ensure the next time the L1 guest runs, its RSB
+>    contents aren't polluted by the L2's contents.  Similarly, before
+>    entry into a nested guest, set the bit for VMCB02, so that the L1
+>    guest's RSB contents are not leaked/used in the L2 context.
+>=20
+> Enable ALLOW_LARGER_RAP (and emulate RAP clears) if and only if ERAPS is
+> exposed to the guest.  Enabling ALLOW_LARGER_RAP unconditionally wouldn't
+> cause any functional issues, but ignoring userspace's (and L1's) desires
+> would put KVM into a grey area, which is especially undesirable due to th=
+e
+> potential security implications.  E.g. if a use case wants to have L1 do
+> manual RAP clearing even when ERAPS is present in hardware, enabling
+> ALLOW_LARGER_RAP could result in L1 leaving stale entries in the RAP.
+>=20
+> ERAPS is documented in AMD APM Vol 2 (Pub 24593), in revisions 3.43 and
+> later.
+>=20
+> Signed-off-by: Amit Shah <amit.shah@amd.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
 
-> On Mon, Jan 12, 2026 at 11:31:04AM -0500, Zi Yan wrote:
->>> folio_free()
->>>
->>> 1) Allocator finds free memory
->>> 2) zone_device_page_init() allocates the memory and makes refcount=1
->>> 3) __folio_put() knows the recount 0.
->>> 4) free_zone_device_folio() calls folio_free(), but it doesn't
->>>    actually need to undo prep_compound_page() because *NOTHING* can
->>>    use the page pointer at this point.
->>> 5) Driver puts the memory back into the allocator and now #1 can
->>>    happen. It knows how much memory to put back because folio->order
->>>    is valid from #2
->>> 6) #1 happens again, then #2 happens again and the folio is in the
->>>    right state for use. The successor #2 fully undoes the work of the
->>>    predecessor #2.
->>
->> But how can a successor #2 undo the work if the second #1 only allocates
->> half of the original folio? For example, an order-9 at PFN 0 is
->> allocated and freed, then an order-8 at PFN 0 is allocated and another
->> order-8 at PFN 256 is allocated. How can two #2s undo the same order-9
->> without corrupting each other’s data?
->
-> What do you mean? The fundamental rule is you can't read the folio or
-> the order outside folio_free once it's refcount reaches 0.
+Applied to kvm-x86 svm.
 
-There is no such a rule. In core MM, folio_split(), which splits a high
-order folio to low order ones, freezes the folio (turning refcount to 0)
-and manipulates the folio order and all tail pages compound_head to
-restructure the folio. Your fundamental rule breaks this.
-Allowing compound information to stay after a folio is freed means
-you cannot tell whether a folio is under split or freed.
+[1/1] KVM: SVM: Virtualize and advertise support for ERAPS
+      https://github.com/kvm-x86/linux/commit/db5e82496492
 
->
-> So the successor #2 will write updated heads and order to the order 8
-> pages at PFN 0 and the ones starting at PFN 256 will remain with
-> garbage.
->
-> This is OK because nothing is allowed to read them as their refcount
-> is 0.
->
-> If later PFN256 is allocated then it will get updated head and order
-> at the same time it's refcount becomes 1.
->
-> There is corruption and they don't corrupt each other's data.
->
->>> If the allocator is using the struct page memory then step #5 should
->>> also clean up the struct page with the allocator data before returning
->>> it to the allocator.
->>
->> Do you mean ->folio_free() callback should undo prep_compound_page()
->> instead?
->
-> I wouldn't say undo, I was very careful to say it needs to get the
-> struct page memory into a state that the allocator algorithm expects,
-> whatever that means.
->
-> Jason
-
-
-Best Regards,
-Yan, Zi
+--
+https://github.com/kvm-x86/linux/tree/next
 
