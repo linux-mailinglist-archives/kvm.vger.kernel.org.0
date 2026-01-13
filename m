@@ -1,352 +1,246 @@
-Return-Path: <kvm+bounces-67911-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67912-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A20D16C67
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 07:13:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D53D16CDD
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 07:21:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F1BDD302BA9C
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 06:13:42 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A32B6301AB49
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 06:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16622368271;
-	Tue, 13 Jan 2026 06:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337EB36AB63;
+	Tue, 13 Jan 2026 06:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VVAzyB4H"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="CsxZI6Cb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38FCA41;
-	Tue, 13 Jan 2026 06:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A4036AB4B;
+	Tue, 13 Jan 2026 06:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768284821; cv=fail; b=J0Dap0290+4vxO9v3hQQM1pBP/sUv+1SBaXwXjqvNJmCSqYNlpmwHn9xMli2LVwXoehaJAT5LJVF9CeayPebzLWRX2JDNwAjU4yKtxOh9wjRbeaLN3hooqAxZFV5BCmQ0HzSxfCpYBOx19YDZ7ag1jmbYS7Md/AB3vV5i5wt2QM=
+	t=1768285207; cv=fail; b=JlAloRiZ9CgZKAEIFAzQMqPPIWQQAySbuuu/LeI8vvYi2WGTSJRP48hMTXGhrO2WgvOHx6pRdbvlucDwnBeaGLRdbZI+l8GJHbxLPnTc9GeWn362/oSuSBQHLlrCrW1KBNxd2W87iaUAip9spw21jSWj9X1O6pLyB5JbjBxvq/A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768284821; c=relaxed/simple;
-	bh=2S5szE132RAzaPTejk9uPxSxOBcv6eEOd/+awarGehY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=JKOC7svN0UxIwTjsv7tHORZ6mHP0TPLb7bVbjG49pAWOUlm4mcSu9RBN6qh4PomeI1HwAfaZtYh8IJlwMgU0UoykJ1SQc2pxTv0DwpnCzcTTPEepl82Bqfe6R8CezVKPVEdQJvn+35MO7MsT/+fn2+dbNVox6q4iL3jcPS/H1g8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VVAzyB4H; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768284820; x=1799820820;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=2S5szE132RAzaPTejk9uPxSxOBcv6eEOd/+awarGehY=;
-  b=VVAzyB4HY1ovAozP7/sxPdljWOxUZtkgwY0juSdrkqPuN/UJLtMXiH8N
-   0bLhE5Pw0ZpXvY5xca+Ut2tXb+lRze4ozWuNwvgJSi4Pkmv+ENaD9PLKI
-   6xfxwbNcjEiSzzwPPB2TtWJd1aKV6jYTxra5vvfTXO3SpJg4+WBjDJEwt
-   +sTBUicFgnL/9y13Vh/0LmZ1GLDkXmx4ReV7LsP6SKHpCWaM8NpcfsVpQ
-   8AtWZzISkHV6dzkIAwRJs3TA/970hCvUiSlyVzIoJKscXR/sk+5fKVYR+
-   +H2AJFeN3S54NE3lJStIXjh+2EhUNftfYmA7G2/fXCaH1z0wlC5reNcTD
-   A==;
-X-CSE-ConnectionGUID: wzYrz0fZSQCQz9G/wkq6qg==
-X-CSE-MsgGUID: NGQrrmrUQae6unzpNg9Msw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="81017758"
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="81017758"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 22:13:40 -0800
-X-CSE-ConnectionGUID: A5vR41oIRDqNU+3nn4HbKg==
-X-CSE-MsgGUID: ywnNd3WDTv+04rh6cZR8Tg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="204382779"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 22:13:39 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 12 Jan 2026 22:13:38 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 12 Jan 2026 22:13:38 -0800
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.59) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 12 Jan 2026 22:13:38 -0800
+	s=arc-20240116; t=1768285207; c=relaxed/simple;
+	bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=VTNA5OQQguPLY1+d8C50hJ4XCJd3kGtPUuWSuhHX+hEo1x6Xc8ozlvsI6lmdoorS2bRgDJ+QcP9BD53dmEz+OKQkC7E7RriBV0LwBYlhb0Tj5VLRCMcAW0Joj8obIgpgRUIEGvtT0sQCZh70tnTKBw1UCH2w+IzPDuNWaJGntx4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=CsxZI6Cb; arc=fail smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D6INKY325821;
+	Mon, 12 Jan 2026 22:19:54 -0800
+Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11022107.outbound.protection.outlook.com [52.101.43.107])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bngnq802j-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Mon, 12 Jan 2026 22:19:54 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GsNh/krDCeh9p7igYRIW0BOP+n0pOOKeaY/ihdHOnnHSDJWKR3iLAqagh5oNyTlH3+skMWSWoIDrVEG6ksJhlrMw8ORfRjm+3wzw699NQAfspVV6o0Ojr3a0prxkAMtWvTlxqutn1psCDVPsWPY2U4bRTL7osjYVIDhZQmI7riBysSYYpVcvgfN776oy+b+fNWDid9EtathSNJSJ2OzevHcBd2bM+0yCIT18mo2JpChnWHbX7u1TCRhCngiD9VkivivFekCyinDa73NUQihoSJ2bGUh235j6DoLuIRpCdUkDAq8Lhyv3ZHybevmFy7RozuN8KiHk6PsPvlefs4j2Bg==
+ b=UJyOqd7roKL4bB8swO41jyBE0VbX/OfL18DhGNDs4gGRh/cGSinTwRnH+WXQRvYGkkAZTun+AphftRM+eoAReTwdpsC5yzG/2UPvCCjMJIE3XmxocyAQ7gIn2lCqbpoKVuvbIf0BjBaNoZwnyZ6KJejmhISIFKF1CRhxZvJ3CzSCJ6QX7yjgrB6nLbP3uE5ls3HxOgkp+zajYmoEUhodF2lv2rKNnrcQsh1kYFpycrqwwk57oxtmKG4dTr5mF2VBPNCGoFgook/1lUjtaQ8J21AFWGUnX+vX9TQRYk/WaHcZ3C3Su/uoTIiw02SrIcgUoWxqlA8B2BUD2Ox94FuVFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/C32T0fEwVejKhZrejGJVCYyDqWwxEJu78e1qcKNuBw=;
- b=Q11ZMJbgfKzQVcQaDLBcJ3TWYuDFexUr1oEevCypLjC4FDcwaem00yw6gJhhRMi0YMIuxk16BZn+/PwfYkBWYATjFZ3nZY8L/IyuV7dSbQwvT3WzcVm4uF+jQI5ErJ1rtGPMFPEMMVkX09lf7iFJk3zWnP203MKVAqkn5JMAbyzJCERJciASkuwColINCmrHXrp43rvUC5c+Gp9HP2K4NJSPs/wTyfefxqOI+eQ4kVeNiXp16oggwFABhpckD4ymvyIVJG2QtbABCk0smHtc8yzkvOo9CieHOWLdqjqdJwAlAgzDJUHt7TpNQRr4nuur6AWnjlZZJVsbPohn2ciJrA==
+ bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
+ b=qVaOVfdsHJ4zcPJw8ypCDz0DRNTQit12WNPCqUVSXTUsMTIEOIz/rGrdQ+amlgZ7UPWKy+Fl3FpcVdWvTuk6l6ePqjwJC60PwuOiEnrqOtRQpucF5QmsKwBFidugF848SRew1gCO3JFpSkpNcB2kL1FtDeFBgb61X+whifF8hC0PGp+lvOce5w8fTg6Waid1m9lJlr2cVXB3ueumb9pTbvX6zSwuG7H6IvbPhJCgnjdfr/kFd3QzaNIde/a1RiJxfWx4Evp8cj/rm+DuNkMTzN9cyigABI31zWOjFKRWWx2mTmMo0KA1o5ZDi6XIxwR3R12p8pCUvP2djDSfbJeOVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- MW3PR11MB4522.namprd11.prod.outlook.com (2603:10b6:303:2d::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.4; Tue, 13 Jan 2026 06:13:29 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::413f:aab:68fa:b1b2]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::413f:aab:68fa:b1b2%4]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
- 06:13:29 +0000
-Date: Tue, 13 Jan 2026 14:10:47 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: Vishal Annapurve <vannapurve@google.com>, Sean Christopherson
-	<seanjc@google.com>, <pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <x86@kernel.org>, <rick.p.edgecombe@intel.com>,
-	<dave.hansen@intel.com>, <kas@kernel.org>, <tabba@google.com>,
-	<michael.roth@amd.com>, <david@kernel.org>, <sagis@google.com>,
-	<vbabka@suse.cz>, <thomas.lendacky@amd.com>, <nik.borisov@suse.com>,
-	<pgonda@google.com>, <fan.du@intel.com>, <jun.miao@intel.com>,
-	<francescolavra.fl@gmail.com>, <jgross@suse.com>, <ira.weiny@intel.com>,
-	<isaku.yamahata@intel.com>, <xiaoyao.li@intel.com>, <kai.huang@intel.com>,
-	<binbin.wu@linux.intel.com>, <chao.p.peng@intel.com>, <chao.gao@intel.com>
-Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
-Message-ID: <aWWQq6tHkK+97SOB@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
- <aV2eIalRLSEGozY0@google.com>
- <aV4hAfPZXfKKB+7i@yzhao56-desk.sh.intel.com>
- <diqzqzrzdfvh.fsf@google.com>
- <aWDH3Z/bjA9unACB@yzhao56-desk.sh.intel.com>
- <CAGtprH-E1iizdDE5PD9E3UHXJHNiiu2H4du9NkVt6vNAhV=O4g@mail.gmail.com>
- <CAEvNRgGk73cNFSTBB2p4Jbc-KS6YhU0WSd0pv9JVDArvRd=v4g@mail.gmail.com>
- <aWRQ2xyc9coA6aCg@yzhao56-desk.sh.intel.com>
- <aWRW51ckW2pxmAlK@yzhao56-desk.sh.intel.com>
- <CAEvNRgGCpDniO2TFqY9cpCJ1Sf84tM_Q4pQCg0mNq25mEftTKw@mail.gmail.com>
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
+ b=CsxZI6CbfaY6HE24qGo6iWngiIMon/Bf/5JLXXJ0W3t3HwIyTIZlxI0pZ/jgIppKZCmauYRabX2QhsWDgKvVEp7uWdAJwSAmkPU3f+JvAZEqP2Gcycq/VRtbHJAWFYBuMHHD8GeA6MrplRvtbfYzM7qgcqtpuwdevrVWJsymFVU=
+Received: from DM4PR18MB4269.namprd18.prod.outlook.com (2603:10b6:5:394::18)
+ by SJ0PR18MB5213.namprd18.prod.outlook.com (2603:10b6:a03:381::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
+ 2026 06:19:51 +0000
+Received: from DM4PR18MB4269.namprd18.prod.outlook.com
+ ([fe80::9796:166:30d:454a]) by DM4PR18MB4269.namprd18.prod.outlook.com
+ ([fe80::9796:166:30d:454a%6]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
+ 06:19:51 +0000
+From: Shiva Shankar Kommula <kshankar@marvell.com>
+To: "mst@redhat.com" <mst@redhat.com>
+CC: "jasowang@redhat.com" <jasowang@redhat.com>,
+        "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+        "eperezma@redhat.com" <eperezma@redhat.com>,
+        "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Jerin Jacob <jerinj@marvell.com>,
+        Nithin Kumar Dabilpuram
+	<ndabilpuram@marvell.com>,
+        Srujana Challa <schalla@marvell.com>
+Subject: Re: [EXTERNAL] [PATCH] vhost: fix caching attributes of MMIO regions
+ by setting them explicitly
+Thread-Topic: [EXTERNAL] [PATCH] vhost: fix caching attributes of MMIO regions
+ by setting them explicitly
+Thread-Index: AQHce7UIItncUIS6dU6cL1NVseOYirVPsZCA
+Date: Tue, 13 Jan 2026 06:19:51 +0000
+Message-ID: <ECE065A9-1556-4525-A478-62343C6FB477@marvell.com>
+References: <20260102065703.656255-1-kshankar@marvell.com>
+In-Reply-To: <20260102065703.656255-1-kshankar@marvell.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: Apple Mail (2.3826.600.51.1.1)
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR18MB4269:EE_|SJ0PR18MB5213:EE_
+x-ms-office365-filtering-correlation-id: b0c71b2e-014e-4064-20db-08de526bc2a8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?UqFzpz0uCHscW1U0YXX/TThUiCKc9LyTYXb/yPcezuyPoYZuzou+Umz6S4qY?=
+ =?us-ascii?Q?Ht+7gnoHFWoAq0eMV6U2bv9JFwghxH/WDvR64l0Lr/tORXz7zAI6jYDA+eaQ?=
+ =?us-ascii?Q?Ce9bm3L0E4Vv8mMpGXRlK5rchM5ftSltGIm1U6t6Ydr3JOcXzBtgEdYrA/mw?=
+ =?us-ascii?Q?SJLIhOJaAEB/DID/Kb28ylUPwrBisXNpRZHV0URjPjVYBHVQ8USkXJCOW/4e?=
+ =?us-ascii?Q?9E0yVS5hnebHJvCtlGyYlhcO/SSj85ZnLtdG0O5gG3sqzfbIld6qOqDkM+H/?=
+ =?us-ascii?Q?pf15rnJP00AQGk9FtxqRYindTcCboNhc9uCJrvhOewL+cywMsGuIOEvMqCcc?=
+ =?us-ascii?Q?1VohoH4PEQhoQx35UMlXscJBEj2bRAQ0wdb323DSQd0rcUmCdNy4vSoKca7W?=
+ =?us-ascii?Q?su1zVZhGNbspVszdeCYu75135ouMfcKC/sdqJAOXteh7LMK1mfqnQnSvRqF3?=
+ =?us-ascii?Q?9ZqGclheOYvO8Us9KwKtedlvUEWCLpnGO4Xohyf7GSeGnSlz2t2Y/fXoJBYe?=
+ =?us-ascii?Q?5Lle8v0s3KmjXvGbNOK9R2hdgOkCixaD3I+N0P7lms8756dydXnesbYBbawu?=
+ =?us-ascii?Q?IvVEAdx/CuiXjPpQFvaqiGpGeQQocoFwHVGxRPGwjmvhGkpAGOPg1l50L9ew?=
+ =?us-ascii?Q?vP1GMNFw5LGbWNrWC+7fi5hIsPxrQQx4FqpeMiiOX39v6KzvIy2h+r6aSTDB?=
+ =?us-ascii?Q?Ozo1l+S+58SgE4Bk4HmhP4PYWZsD3i8IxqGAoa2Y1/SLtCK/LeU7m5TmJZRg?=
+ =?us-ascii?Q?QjvaiLu+cHQ52FsD8pFQPX8Djhcj4p7adcZuszZCUz/iKT99T+4w/8eELiuH?=
+ =?us-ascii?Q?Qq+6zejHjHU//yxRwC+TYfEpB/NGi0OUPUzUWft9BbYS4Fyy97mzbdc2goN0?=
+ =?us-ascii?Q?eSSE9gRE3NTp7MLKKv8kvMlCxvQLAeg9SBV+0kpELRLNNhs5Zp/0c13Wbmi/?=
+ =?us-ascii?Q?i8zIoVszbrI7j4hsRGUdyPqhkKLVbQDntJnQgmNkRUS7oeeA+mVRxvVJcVao?=
+ =?us-ascii?Q?2b1WqOniKy9jKBAgOTcHf4m4RVJbKYXdCFUogyK87hXmpyqH8FiCYE91y7Ar?=
+ =?us-ascii?Q?Ux602fECBbNMVADgh/hQPdXeqvSg80JqoAjgcga1xfYMm2tX5bfjxdLVHlAN?=
+ =?us-ascii?Q?9Uf9VSFVuW5n5tNVfn9zyYvUQd9TdbxfAhfFWNYHi9sDMPMCp975Zt32rwlB?=
+ =?us-ascii?Q?GSASjqnS9LT8bpYJ1lgInwkGIitz9R3kHc5hf7jFyAnADuWCzGN9V4PSFRnN?=
+ =?us-ascii?Q?WoQSdcZZhKzqtoKPTp1KqHvNezfqQU+efRICrbQQ9OJju29Fhu2y/Ddy9oiQ?=
+ =?us-ascii?Q?OyayhTcUXNL1xZwdZXLXSMfvf/lUqY5c3MoNUmE2NW6jpmWJNAeUOIQ3y+/F?=
+ =?us-ascii?Q?Oc/+Zpp5kenSCgve6ngaUSm+C3Fh9L862rTIjugUdQg0v4JZagOHm8jiadnb?=
+ =?us-ascii?Q?EKrI4gpzXOIIhnNf5DewPYCFO63kiAQe+62zyLcVWScCfm6yswwU7+fjXT63?=
+ =?us-ascii?Q?i2WZces4RSarazgydFnuQboKXQTog2HLVosL?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR18MB4269.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?TOVPVgcPv0L+uGYoEb1ETwPGtHjJdYdFVb+H0ZehQsl6otIF4TmxoGI0HS5R?=
+ =?us-ascii?Q?32xoeDTEUZSwrTAxNSLqoM4BIwn2aAZH5c3ZaF252pj02e8c8FVTTxLoyVMG?=
+ =?us-ascii?Q?DQ1HOUfAzgfoJf6fm7bNAdhc45LOrL+Ikv1S5RDm5vqJpC9IPY/XLCFy39Na?=
+ =?us-ascii?Q?bmEI5JmF7m//ABWCeZ/9FxVJInTEZLlg7xDRW+OgZbUGWJzvX9omqLMyU9MY?=
+ =?us-ascii?Q?yuvI00Y/m6VaPpAxyBu9MvVVGN7NWyqM2Ve8o23/VH2p0I5dhe/cvvkNzYCK?=
+ =?us-ascii?Q?6wMIFPOw4YEEsRLAlN4aT842J1XaXOb/gTxux3G6uXmgQDOz6WzDFOgATdUp?=
+ =?us-ascii?Q?h127owBza3MXb4dhpwo9TpVrJXIlvfq4+lKo4/ghPRgdqM1/exVdW6svJih8?=
+ =?us-ascii?Q?YR3KlCnfwf9XkHndTVZe/dhH7a7MZdKavZJ2ycMI+B8tQotnHvVrGnQXw/1f?=
+ =?us-ascii?Q?UwTTos5sO6EtualxGy/BunL1ps+Lut8kbKuQcyFSZXI8pNd1lSgI57SR/wn+?=
+ =?us-ascii?Q?al6YnjiQpEqVbdCOjgNdKzh6fOkpjhvTrinrFLn6wSwKXqy/3QLIsm1QmKPd?=
+ =?us-ascii?Q?Pe2j1RB+9eLqR9uhcyOvQHpHmD28sGDqN+yg5cFXFx8P4wMuULl1hHs4OyMc?=
+ =?us-ascii?Q?CU9vHzMOyKx2qiGttHsDhqE/xIulEXtj9NeNl1SVyoKCzZaIiIxBJtPv0sL7?=
+ =?us-ascii?Q?ACuKdZMnCt9pLx7qVmoEnhJ3yAJ8YXcxj1IElukFMOYb2pVqDHNwBbZ+GmcG?=
+ =?us-ascii?Q?7U7U7LO7inHarPXUq0p3ao3QfRXkI50xvbEdV9VKUMydICKkc3Na2IP1yZLe?=
+ =?us-ascii?Q?p6/Ni/1Ev2ZZPj05F0Yo6esWQ6HP0i2n1L8UrCZqblvbTssHHkRjuc3XML+P?=
+ =?us-ascii?Q?EzWKl4nU/ay5s76CYrU+QfJaDBx3KahlqXJJSj3Gn18Ro1BTH383maEe/Zbx?=
+ =?us-ascii?Q?C8bjq5Avn4xlDim0Wu4T2BghjUo6LypUMRQgFjU2g9pYpRPfmO5iak6swJ1q?=
+ =?us-ascii?Q?rFLxgYtaP23VcLz/fh74tMNBxniqgazCgDshaatRsc90N2REChmYV6jpmHXs?=
+ =?us-ascii?Q?b3TYPiyLQiCKLbkig9LEeSM1/XWSE5HY3e60aao64j3XUsnZY/mI2XeDMdaA?=
+ =?us-ascii?Q?IRQ8EjxnkuJMRmeqqZ0vfItJApeVVXD6fpc9+Glbac/eIRckh3FGTtdPA9pS?=
+ =?us-ascii?Q?hZ1RdEec8KDiPahTOzyKzl595NMHmg6oV1umD6X1fby8cUDe6yRCNhOKRzsk?=
+ =?us-ascii?Q?tIbEApikCrXENkyx1M0XZ3StMGrQ8XsC5AVsWuq7KXdulT2sXdW0xB04i9G5?=
+ =?us-ascii?Q?4e06IGV/gcetsfvizL/vEMXW5Z9qOoD3v6oSug1uK4TgZ+WWE3ttiOdBihyc?=
+ =?us-ascii?Q?Vk3BJaXlZJGNLp8rQMCdD1qJudNyMqBUX7oqz5jDx8aW7T71Y1TU8GSQFn1i?=
+ =?us-ascii?Q?bS9ACPDuszPB09nqFnyrx/K73KgXqsfYB5QJagAPoEntsRVE9wZWtnTzmjEc?=
+ =?us-ascii?Q?z1EVhY7nke3lQPFpsWDKdtgllpmd4M+jSmgdjFxKhzWjLOEM5v0R3gxFkDyk?=
+ =?us-ascii?Q?x6ZbH2SGNGn+jwss9qigVXOUKr79j0UtGtI1CJfpfKj4GKctdk3fpJZZatd5?=
+ =?us-ascii?Q?y3J9C7nbbCaaezbOO/FedpYYd3s+XV9n2DoocfqosGb4EYJaNnD1cJaYMz5Q?=
+ =?us-ascii?Q?4B7XlepuayZ2JVW7sNrCETgWNdJUgev+aJknNPgAkKnfWz0YLdCOtAhghpmB?=
+ =?us-ascii?Q?2HrxLird2Q=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAEvNRgGCpDniO2TFqY9cpCJ1Sf84tM_Q4pQCg0mNq25mEftTKw@mail.gmail.com>
-X-ClientProxiedBy: TP0P295CA0020.TWNP295.PROD.OUTLOOK.COM
- (2603:1096:910:5::10) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+Content-ID: <7DACC71CC02521498F00DF9729FFF151@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MW3PR11MB4522:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f3d420d-7e6d-4216-35a6-08de526adeaa
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?mz9KWHr2qlVy/F3vv3e4OAxYgzV8tQlion8kg4mHoLagIw8nlBC7JwE33MjC?=
- =?us-ascii?Q?pcnpGXmJW7Igr3RpmZhuFdxEjHqRLNG2z86KnrNdzZyFrSrBTpXExUP/6735?=
- =?us-ascii?Q?NbRigCgjGr8cmVADut2If598CVqtU05MtFAf56OFIqkBqPpU1MsAnfGOZEZa?=
- =?us-ascii?Q?Wg0ALwuSUyaE074ksElKRpcPXKO+H29mMp9SI7W1uzb/6y0ZanHaUSDJcn+R?=
- =?us-ascii?Q?gjhoU2kxvXIBlrNSegUm2SaIBnpLNZw/GwIxZbW0TiFrw0P9uUyeQsua1fy7?=
- =?us-ascii?Q?H8y0wmL7P+MHo5frfFCgE0xaWDCDioLa5amFIVaSJ2xQAxg3SIkcoj4O7OC6?=
- =?us-ascii?Q?X/4us/CCjhzrYnbmfip1Y/2tuc8Gs+7NQ1MNgV/cVHUZNRog0+lBY0jTbb4U?=
- =?us-ascii?Q?EP5TJL4Wu1V/q253J/802+LfrBJRN+6JM9aK42Q/75lRTrtPKyp6KRM81Wp5?=
- =?us-ascii?Q?l28iuUSd/gGCovwe7vbWaJMZKY2uEYgGAUPe9N2BxD0ZTNe8TqqUjQPu+kYz?=
- =?us-ascii?Q?d6gQtl+LKDOAJBiK3iVyuiuSaG6vy8cTla73krTPzeQN3xaISKYY2hNCZQdm?=
- =?us-ascii?Q?8fUbxQtUSZjwx3ckbzwyz842jVUHkhCS3wc5FccDZxH+u6mp2oFnXeg35DqB?=
- =?us-ascii?Q?qlDQO5lS2JjIkzCHHSRRAprGPd/Bn0nrwetiM8XeEigE9LY1TT6obuclVCxT?=
- =?us-ascii?Q?okHhdZHlRZANQdMvL8aXnN6RRjFE0g9CAbetfLJeRoe1LBTBKEftU/PVmwr6?=
- =?us-ascii?Q?3j8iRza4nRLr55VN40xhKXJFqbx8ISuEIILcDnEvUsXJ3zldv/q4ZTFU+9iy?=
- =?us-ascii?Q?DVTvlT8JFgVnnnhe5augIZnn2ncvdQsvJBZCRISEekLaWu/ZyfHGRM5U2Ey6?=
- =?us-ascii?Q?TR3ko0jE4ktZbLlRWKUNdQ7cES4xzNhKcMK2989hnJjxHXA+X8LMiS8rgtfN?=
- =?us-ascii?Q?TmVmVZDM7xWmsZlhv4iENfh5HS1SNcK01inM+TNGAf3ZiJYHquDSmHMGKeoa?=
- =?us-ascii?Q?BM+ZWToDSLjiruZdOhybLY9i2cz/ez6l5eibf5LulWA8myQWPtCkwDKWm6xT?=
- =?us-ascii?Q?6vZbPf6uaDAUUQjODvuDsctFoWxS7/5n5bAjpX5d/ezHEbqTFceCvXYFXuR1?=
- =?us-ascii?Q?azdyxdfrdAVCcT2QdjOILUvqibO9/+puXEAjQOkyueF7j5D9qEB9gebte2cU?=
- =?us-ascii?Q?4ZfUVHqqbBvCa6Z++5LDKGLW1zWu0evZouzv2o09zwdo5g3FkYnbABzy8xUf?=
- =?us-ascii?Q?7Nodvq0UHH2U0wghffMNjNTxR70jC3RHssikxBrmF1mMxYZOFVBeO/tzsAV0?=
- =?us-ascii?Q?HOo/flrtbLWlWdg9CV0QaOQxhzhfZyOtmWy+KZFjRlPdyad53MZnA/RBUC2a?=
- =?us-ascii?Q?Qit0dWDk9a5V7OP1a95RoMNrcZwcza2UN8XfNzzRnDEt+CRkSLWDe32iQaaV?=
- =?us-ascii?Q?c3EZnwPYaESAw6d57oghAb7IHwTeNTyVcDwOpYqD/Xlo5FqMclEFCg=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+xh+pT4CdUAqRHaQ0VcoaLIwkXfDmGDcl2mWhi73CnMBqLZTKZiXUB6Wym2Z?=
- =?us-ascii?Q?drtVW6mvFeInGx2vbQJO78wLlEQo30ZPmVsPAZQMtUtYNKIr6EVmco2Ewgwa?=
- =?us-ascii?Q?uXuoZInm7JyGDrBhNFkeALr4jaaXFyYkhOFN7txMSFVsA7W7bOdWnxiKLCLd?=
- =?us-ascii?Q?koVvSNdzwqChi0jMivFweTGhohR75UYrKa0x/ypDY5puVk0edc0BLocSXfol?=
- =?us-ascii?Q?S6IECh7mzTHwDlVxpsntfyEnasX6T9i5hqMXSnx6sPp3CIyoV1TFSaqBJnAY?=
- =?us-ascii?Q?3isOUsp6mlFAIO4bEogDWYylLbYzy0jUsE5nNkTe2xIQloBE7P9Gzo2XbdB4?=
- =?us-ascii?Q?lAvMC7fXjDP/Qwg+Lh/DV09PUwUvnchTTupteyNgR22fgSeK76tKGFxotKZ6?=
- =?us-ascii?Q?bhf8HyRriA1MwormGjoElsV80Ibaqkxh38jwF6H7lNuye/5FurancaQRU7qg?=
- =?us-ascii?Q?nGrm8kPwXG+iN2qgLUZBVd79IQ38QnxDNAueCNAX+rXg3G95LLZgb+b87MCk?=
- =?us-ascii?Q?sE71w5IUbMSUilJhTHsx/+Ch9XABcIUh1LgRPBbl3nO2YW7X5I0QKr6wrnZ5?=
- =?us-ascii?Q?ZW3BtlyatgWfE9du/KyTkaeSaYavf1CHkXvu0uzf7P9mEq5JeZXfuXFuu139?=
- =?us-ascii?Q?4y3IH0kqpeQHpkXbr3ohpxfApA8/wK3Ozp1/Q7QuXG10vBnBWZhEbXM+iNnb?=
- =?us-ascii?Q?5zqf2ydhNiOiEim5ijnP/kq3VFvG9DdP7/ub5yW2BtrB1VlTORVOGDeMdC5r?=
- =?us-ascii?Q?ynsu2JMuP8TNZRoNZDy/HoMnbMIAr8RW8Pqm5p6CjywVwFc5TmJi4Wzp9r0H?=
- =?us-ascii?Q?faYFs8V8ktIKzRpM6U7sMye9jhr4zbWNpR+81orXfySnDxo5eke/RomLmA31?=
- =?us-ascii?Q?6h5QMzzmHfiAtcLlq2CavRH4qjeZoSkCtvgJ2LgNoa7ZbPgQIA3IulA4KraE?=
- =?us-ascii?Q?UhlVT294/RcAIFCpDYgEt3H4IUOdDf22vD7nCe+kY9Cu9GSi1KJixtIEbnWs?=
- =?us-ascii?Q?MoaTpz4zSDbF2fASKFBUb6C+16sSfR9k3HHwlNBFpOaRy1wOPSc+2wUCDUT7?=
- =?us-ascii?Q?ZB86IK+jWvpFNFskSbaPmuojIVVACbawDnRZuyQXDz00R0AgIemiCmmgsL6B?=
- =?us-ascii?Q?rpfuu3fd6DPmBvMNjj2ADIhG65yd8qW9hVvNLDTi2evmzgwuBqvY3fKky691?=
- =?us-ascii?Q?us0RiQdNvEd2hiDgksnVfOxtTz1WI3bffcwcxm9ScS3JrNi0Q4buQw2hifsg?=
- =?us-ascii?Q?ShKrzu+kn1KL85OowmXXcuANbzaVw3KIMiZknpNmqMEuOgkWBdGuYh2DIoVO?=
- =?us-ascii?Q?iLw9wkTXm9VGtXt9c5uxrWW83NRv0Qw+GMpWeS/56Ed6fAauKreo/LUp/p3W?=
- =?us-ascii?Q?tr0NT3IF4lhg5pVFysFrKZFyelyvu5eiCQHd6s47tfEvjQSG6cLwg276P0NR?=
- =?us-ascii?Q?bHGq3F32PdzPHg1BOj+h0EfMxsnvgyjJK9NKoxCbXBsktgTIuEyOw8GJr13N?=
- =?us-ascii?Q?FSkclH7cxDXdpqiNM53e4nnIqJdnVzAq85I4oRm0tE1+Sauq/l53QXO4xqhM?=
- =?us-ascii?Q?/MPQYdzZWe9ARn8RNHwDVhLkpx5twRaqDygqBrmafiUfCUzvQRyuyF8Gf8Dw?=
- =?us-ascii?Q?0WuCCRWlucj3cn7yR+W+75glPoZ03D9VHBtt4b5AI8S9+9TqzSCvHC6l1Gxx?=
- =?us-ascii?Q?a/heXOqUc63iE1Tk4gS7EyCX1fRo2Pq0VuUkk/3PZqCu1aApOsjdcIS3suqY?=
- =?us-ascii?Q?LP86jfo/mg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f3d420d-7e6d-4216-35a6-08de526adeaa
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-OriginatorOrg: marvell.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 06:13:29.1465
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR18MB4269.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0c71b2e-014e-4064-20db-08de526bc2a8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2026 06:19:51.3429
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dkKBcpAzo0Yub24J63788iECddMYf6WRY2cnep8Tmf67P/RPugrMqYV6RflrVpaj2wwWKf9Nn8OE6f0CGLwkaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4522
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OHylkZ4cNx/+oa0ml9ABXAkj9VvEo9UjamBqCwGlZrV1O7jzkO50wj/ny5TnuMeqD8TcAoNskY30Lb3/FoAiHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB5213
+X-Authority-Analysis: v=2.4 cv=DLeCIiNb c=1 sm=1 tr=0 ts=6965e40a cx=c_pps
+ a=sUbwXUxkMQNSWKNRO95rnw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=vUbySO9Y5rIA:10 a=-AAbraWEqlQA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=M5GUcnROAAAA:8 a=20KFwNOVAAAA:8 a=-EP0ZEmctIjLeFn3QbIA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 6KcMf4VJVleEfBZy_LxSdixmxdOd_xP2
+X-Proofpoint-ORIG-GUID: 6KcMf4VJVleEfBZy_LxSdixmxdOd_xP2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA1MCBTYWx0ZWRfXzhvDcatB9ioh
+ 7oAtAhLWkn1YpXGAin2qsWzYCL9qg6iCRJNLftanyHkZ3gCuI0eiq+C8XC64A38t9egSObnEbpM
+ gFuiPVfEz8XZXzpyvpezQa3w3HM0Dt78Ceowzh7KttQG1ppzKwrAoY+bpXM6YPY0JIrDHcZCwji
+ N6T1Bkr7/zYsE0u4LwUruSg0NrvH7E7vaV5MFULuLx8wXRuAiTPw3qtPE4GV2IxHxf/xWgXJAKE
+ CTfTu6uNiGZg7lZpNkLV2Tw0vyZiQlUtMbXA8+sho3A/FiCPE+wyMFxXSfVfdp20oi/I/HSIQv6
+ wxy7HIh7Yc8U8R9CLK9RRo6wvYK886gy/gMBv2Tpx1zOIMcS+/d8nN78IKXIsVCgq5zDuq6/24P
+ aex8L9iPPUXa1AJZcKT/6hcrau8SCOS9t1hrh0kEC0auC6o/cT2370miiUFHyI8B9KdYsaPCcW2
+ hCV93zofqntZjWEjWYA==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-13_01,2026-01-09_02,2025-10-01_01
 
-On Mon, Jan 12, 2026 at 11:56:01AM -0800, Ackerley Tng wrote:
-> Yan Zhao <yan.y.zhao@intel.com> writes:
-> 
-> >> > >> > I think the central question I have among all the above is what TDX
-> >> > >> > needs to actually care about (putting aside what KVM's folio size/memory
-> >> > >> > contiguity vs mapping level rule for a while).
-> >> > >> >
-> >> > >> > I think TDX code can check what it cares about (if required to aid
-> >> > >> > debugging, as Dave suggested). Does TDX actually care about folio sizes,
-> >> > >> > or does it actually care about memory contiguity and alignment?
-> >> > >> TDX cares about memory contiguity. A single folio ensures memory contiguity.
-> >> > >
-> >> > > In this slightly unusual case, I think the guarantee needed here is
-> >> > > that as long as a range is mapped into SEPT entries, guest_memfd
-> >> > > ensures that the complete range stays private.
-> >> > >
-> >> > > i.e. I think it should be safe to rely on guest_memfd here,
-> >> > > irrespective of the folio sizes:
-> >> > > 1) KVM TDX stack should be able to reclaim the complete range when unmapping.
-> >> > > 2) KVM TDX stack can assume that as long as memory is mapped in SEPT
-> >> > > entries, guest_memfd will not let host userspace mappings to access
-> >> > > guest private memory.
-> >> > >
-> >> > >>
-> >> > >> Allowing one S-EPT mapping to cover multiple folios may also mean it's no longer
-> >> > >> reasonable to pass "struct page" to tdh_phymem_page_wbinvd_hkid() for a
-> >> > >> contiguous range larger than the page's folio range.
-> >> > >
-> >> > > What's the issue with passing the (struct page*, unsigned long nr_pages) pair?
-> >> > >
-> 
-> Please let us know what you think of this too, why not parametrize using
-> page and nr_pages?
-With (struct page*, unsigned long nr_pages) pair, IMHO, a warning when the
-entire range is not fully contained in a folio is still necessary. 
+Hi Michael,=20
+Just a ping on this patch. Would appreciate your review when you get a chan=
+ce.
 
-I expressed the concern here:
-https://lore.kernel.org/kvm/aWRfVOZpTUdYJ+7C@yzhao56-desk.sh.intel.com/
+Thanks
 
-> >> > >>
-> >> > >> Additionally, we don't split private mappings in kvm_gmem_error_folio().
-> >> > >> If smaller folios are allowed, splitting private mapping is required there.
-> >> >
-> >> > It was discussed before that for memory failure handling, we will want
-> >> > to split huge pages, we will get to it! The trouble is that guest_memfd
-> >> > took the page from HugeTLB (unlike buddy or HugeTLB which manages memory
-> >> > from the ground up), so we'll still need to figure out it's okay to let
-> >> > HugeTLB deal with it when freeing, and when I last looked, HugeTLB
-> >> > doesn't actually deal with poisoned folios on freeing, so there's more
-> >> > work to do on the HugeTLB side.
-> >> >
-> >> > This is a good point, although IIUC it is a separate issue. The need to
-> >> > split private mappings on memory failure is not for confidentiality in
-> >> > the TDX sense but to ensure that the guest doesn't use the failed
-> >> > memory. In that case, contiguity is broken by the failed memory. The
-> >> > folio is split, the private EPTs are split. The folio size should still
-> >> > not be checked in TDX code. guest_memfd knows contiguity got broken, so
-> >> > guest_memfd calls TDX code to split the EPTs.
-> >>
-> >> Hmm, maybe the key is that we need to split S-EPT first before allowing
-> >> guest_memfd to split the backend folio. If splitting S-EPT fails, don't do the
-> >> folio splitting.
-> >>
-> >> This is better than performing folio splitting while it's mapped as huge in
-> >> S-EPT, since in the latter case, kvm_gmem_error_folio() needs to try to split
-> >> S-EPT. If the S-EPT splitting fails, falling back to zapping the huge mapping in
-> >> kvm_gmem_error_folio() would still trigger the over-zapping issue.
-> >>
-> 
-> Let's put memory failure handling aside for now since for now it zaps
-> the entire huge page, so there's no impact on ordering between S-EPT and
-> folio split.
-Relying on guest_memfd's specific implemenation is not a good thing. e.g.,
 
-Given there's a version of guest_memfd allocating folios from buddy.
-1. KVM maps a 2MB folio in a 2MB mappings.
-2. guest_memfd splits the 2MB folio into 4KB folios, but fails and leaves the
-   2MB folio partially split.
-3. Memory failure occurs on one of the split folio.
-4. When splitting S-EPT fails, the over-zapping issue is still there.
+> On 2 Jan 2026, at 12:27, Kommula Shiva Shankar <kshankar@marvell.com> wro=
+te:
+>=20
+> Prioritize security for external emails:
+> Confirm sender and content safety before clicking links or opening attach=
+ments
+> Report Suspicious
+> Explicitly set non-cached caching attributes for MMIO regions.
+> Default write-back mode can cause CPU to cache device memory,
+> causing invalid reads and unpredictable behavior.
+>=20
+> Invalid read and write issues were observed on ARM64 when mapping the
+> notification area to userspace via mmap.
+>=20
+> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Originally sent to net-next, now redirected to vhost tree
+> per Jason Wang's suggestion.=20
+>=20
+> drivers/vhost/vdpa.c | 1 +
+> 1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 05a481e4c385..b0179e8567ab 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struc=
+t vm_area_struct *vma)
+> if (vma->vm_end - vma->vm_start !=3D notify.size)
+> return -ENOTSUPP;
+>=20
+> + vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
+> vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+> vma->vm_ops =3D &vhost_vdpa_vm_ops;
+> return 0;
+> --=20
+> 2.48.1
+>=20
+>=20
+>=20
+>=20
 
-> >> In the primary MMU, it follows the rule of unmapping a folio before splitting,
-> >> truncating, or migrating a folio. For S-EPT, considering the cost of zapping
-> >> more ranges than necessary, maybe a trade-off is to always split S-EPT before
-> >> allowing backend folio splitting.
-> >>
-> 
-> The mapping size <= folio size rule (for KVM and the primary MMU) is
-> there because it is the safe way to map memory into the guest because a
-> folio implies contiguity. Folios are basically a core MM concept so it
-> makes sense that the primary MMU relies on that.
-So, why the primary MMU needs to unmap and check refcount before folio
-splitting?
-
-> IIUC the core of the rule isn't folio sizes, it's memory
-> contiguity. guest_memfd guarantees memory contiguity, and KVM should be
-> able to rely on guest_memfd's guarantee, especially since guest_memfd is
-> virtualiation-first, and KVM first.
->
-> I think rules from the primary MMU are a good reference, but we
-> shouldn't copy rules from the primary MMU, and KVM can rely on
-> guest_memfd's guarantee of memory contiguity.
->
-> >> Does this look good to you?
-> > So, the flow of converting 0-4KB from private to shared in a 1GB folio in
-> > guest_memfd is:
-> >
-> > a. If guest_memfd splits 1GB to 2MB first:
-> >    1. split S-EPT to 4KB for 0-2MB range, split S-EPT to 2MB for the rest range.
-> >    2. split folio
-> >    3. zap the 0-4KB mapping.
-> >
-> > b. If guest_memfd splits 1GB to 4KB directly:
-> >    1. split S-EPT to 4KB for 0-2MB range, split S-EPT to 4KB for the rest range.
-> >    2. split folio
-> >    3. zap the 0-4KB mapping.
-> >
-> > The flow of converting 0-2MB from private to shared in a 1GB folio in
-> > guest_memfd is:
-> >
-> > a. If guest_memfd splits 1GB to 2MB first:
-> >    1. split S-EPT to 4KB for 0-2MB range, split S-EPT to 2MB for the rest range.
-> >    2. split folio
-> >    3. zap the 0-2MB mapping.
-> >
-> > b. If guest_memfd splits 1GB to 4KB directly:
-> >    1. split S-EPT to 4KB for 0-2MB range, split S-EPT to 4KB for the rest range.
-> >    2. split folio
-> >    3. zap the 0-2MB mapping.
-> >
-> >> So, to convert a 2MB range from private to shared, even though guest_memfd will
-> >> eventually zap the entire 2MB range, do the S-EPT splitting first! If it fails,
-> >> don't split the backend folio.
-> >>
-> >> Even if folio splitting may fail later, it just leaves split S-EPT mappings,
-> >> which matters little, especially after we support S-EPT promotion later.
-> >>
-> 
-> I didn't consider leaving split S-EPT mappings since there is a
-> performance impact. Let me think about this a little.
-> 
-> Meanwhile, if the folios are split before the S-EPTs are split, as long
-> as huge folios worth of memory are guaranteed contiguous by guest_memfd
-> for KVM, what are the problems you see?
-Hmm. As the reply in
-https://lore.kernel.org/kvm/aV4hAfPZXfKKB+7i@yzhao56-desk.sh.intel.com/,
-there're pros and cons. I'll defer to maintainers' decision.
 
