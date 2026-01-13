@@ -1,96 +1,163 @@
-Return-Path: <kvm+bounces-67930-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67931-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30BDFD189DE
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 13:02:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9805CD18A46
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 13:11:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3061C3008C48
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 12:02:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18059302A940
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 12:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EB738F223;
-	Tue, 13 Jan 2026 12:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="ABd7W1HJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F16038E5DF;
+	Tue, 13 Jan 2026 12:11:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out28-123.mail.aliyun.com (out28-123.mail.aliyun.com [115.124.28.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7EC2FC876;
-	Tue, 13 Jan 2026 12:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.123
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D16738E5DD
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 12:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768305759; cv=none; b=iggLbpFfxybhi188XLHYPudjCo+kf4Trh+ezTRkSIgrJzHj1+saSGFlITjjnmQacjgtNWmy/g1RxlDgheEYgciB25gJJpeCfaggMJ+VPqNfdpWq0vs/YUKvkxAN9HLqUC/2UXEjNwOnjdv1OUYt/Q/S6BBh37zobaohN59fbGdI=
+	t=1768306271; cv=none; b=lx3lIJHngHp9w375BAWDBkkyE/J4lARHKUC67GGkxn3qZgnWuimZaiWcSK6IrSlGAf6LjbfCyE49+l0eWCf2bIAhYldzDGy94TvTadmzLzeKav6JRg4theVvFqKvTvjEyxpdPkcBjzALFkt6J5n/vcpWa59GyeziIP37k3vSFEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768305759; c=relaxed/simple;
-	bh=liGCF5XL/Z+gRTRIuzDIGEE2qfzpzjujRT5RyoBpgzY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J68QNkVrSceQ6YX48ZnxGM4K2uoGYl4BaNDz4MK0xP4ic0X2rYm60kW3XbtywbtZ1d6Fd7AQlVNM6tUdbfrAjDgQCSGDuYPFImkDGNDaVi3QJ5vwp8mt/oWIjrgTl0obRhNfhtZzxASRGLeXlO1tK07Y441mcYrZ8JHrR0lyb8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=ABd7W1HJ; arc=none smtp.client-ip=115.124.28.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1768305748; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=ZhUvNgEHaZP6ZDzht3OPJleePfuESKAnVaa2eCNHGaI=;
-	b=ABd7W1HJnLW/upLtZ4UlLrSYDuL7mD8U9BhdZFJFrHl2zGh6zN6rNUKDfNKiyQ9cgatOx5y0IXuVUeBityQPZHkK+0FGkIqrtWqjaet890fpzmTHW7vbPwxGaOgbiErXshkKm5yw0iaf2Q5FErtCeejbKgDcfrthKCSXpIby2Ig=
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.g5Y-hDa_1768305426 cluster:ay29)
-          by smtp.aliyun-inc.com;
-          Tue, 13 Jan 2026 19:57:07 +0800
-From: Hou Wenlong <houwenlong.hwl@antgroup.com>
-To: kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: VMX: Don't register posted interrupt wakeup handler if alloc_kvm_area() fails
-Date: Tue, 13 Jan 2026 19:56:50 +0800
-Message-Id: <0ac6908b608cf80eab7437004334fedd0f5f5317.1768304590.git.houwenlong.hwl@antgroup.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1768306271; c=relaxed/simple;
+	bh=t3AVbgBejNV3YOE7Fe351AcCZ/6rnzkz7G8SngGhrvw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RuvXihd0u4CX97pcWAmiWA8WozmAbKiVn3tHyPfPFz2srP+ZEGl5DNW4CNdrKcQ4aDtvbdmr3P7EOlZAFjaB2/KZUDRY5mIUVfXpTYJAyu0N/VfiexdeyOL5QxmF45sbUwvuKuAnLFnnxKnysM8sxiPZC2eka0P/lt3W/2s3LSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7B2AD497;
+	Tue, 13 Jan 2026 04:11:01 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5956B3F59E;
+	Tue, 13 Jan 2026 04:11:06 -0800 (PST)
+Date: Tue, 13 Jan 2026 12:11:00 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v3 27/36] KVM: arm64: gic-v5: Mandate architected PPI for
+ PMU emulation on GICv5
+Message-ID: <20260113121100.GA801634@e124191.cambridge.arm.com>
+References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
+ <20260109170400.1585048-28-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260109170400.1585048-28-sascha.bischoff@arm.com>
 
-Unregistering the posted interrupt wakeup handler only happens during
-hardware unsetup. Therefore, if alloc_kvm_area() fails and continue to
-register the posted interrupt wakeup handler, this will leave the global
-posted interrupt wakeup handler pointer in an incorrect state. Although
-it should not be an issue, it's still better to change it.
+On Fri, Jan 09, 2026 at 05:04:47PM +0000, Sascha Bischoff wrote:
+> Make it mandatory to use the architected PPI when running a GICv5
+> guest. Attempts to set anything other than the architected PPI (23)
+> are rejected.
+> 
+> Additionally, KVM_ARM_VCPU_PMU_V3_INIT is relaxed to no longer require
+> KVM_ARM_VCPU_PMU_V3_IRQ to be called for GICv5-based guests. In this
+> case, the architectued PPI is automatically used.
+> 
+> Documentation is bumped accordingly.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
----
- arch/x86/kvm/vmx/vmx.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9b92f672ccfe..676f32aa72bb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8829,8 +8829,11 @@ __init int vmx_hardware_setup(void)
- 	}
- 
- 	r = alloc_kvm_area();
--	if (r && nested)
--		nested_vmx_hardware_unsetup();
-+	if (r) {
-+		if (nested)
-+			nested_vmx_hardware_unsetup();
-+		return r;
-+	}
- 
- 	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
- 
-
-base-commit: f62b64b970570c92fe22503b0cdc65be7ce7fc7c
--- 
-2.31.1
-
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst |  5 +++--
+>  arch/arm64/kvm/pmu-emul.c               | 13 +++++++++++--
+>  include/kvm/arm_pmu.h                   |  5 ++++-
+>  3 files changed, 18 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index 60bf205cb3730..5e38058200105 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -37,7 +37,8 @@ Returns:
+>  A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
+>  number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
+>  type must be same for each vcpu. As a PPI, the interrupt number is the same for
+> -all vcpus, while as an SPI it must be a separate number per vcpu.
+> +all vcpus, while as an SPI it must be a separate number per vcpu. For
+> +GICv5-based guests, the architected PPI (23) must be used.
+>  
+>  1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+>  ---------------------------------------
+> @@ -50,7 +51,7 @@ Returns:
+>  	 -EEXIST  Interrupt number already used
+>  	 -ENODEV  PMUv3 not supported or GIC not initialized
+>  	 -ENXIO   PMUv3 not supported, missing VCPU feature or interrupt
+> -		  number not set
+> +		  number not set (non-GICv5 guests, only)
+>  	 -EBUSY   PMUv3 already initialized
+>  	 =======  ======================================================
+>  
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index afc838ea2503e..ba7f22b636040 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -962,8 +962,13 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>  		if (!vgic_initialized(vcpu->kvm))
+>  			return -ENODEV;
+>  
+> -		if (!kvm_arm_pmu_irq_initialized(vcpu))
+> -			return -ENXIO;
+> +		if (!kvm_arm_pmu_irq_initialized(vcpu)) {
+> +			if (!vgic_is_v5(vcpu->kvm))
+> +				return -ENXIO;
+> +
+> +			/* Use the architected irq number for GICv5. */
+> +			vcpu->arch.pmu.irq_num = KVM_ARMV8_PMU_GICV5_IRQ;
+> +		}
+>  
+>  		ret = kvm_vgic_set_owner(vcpu, vcpu->arch.pmu.irq_num,
+>  					 &vcpu->arch.pmu);
+> @@ -988,6 +993,10 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+>  	unsigned long i;
+>  	struct kvm_vcpu *vcpu;
+>  
+> +	/* On GICv5, the PMUIRQ is architecturally mandated to be PPI 23 */
+> +	if (vgic_is_v5(kvm) && irq != KVM_ARMV8_PMU_GICV5_IRQ)
+> +		return false;
+> +
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		if (!kvm_arm_pmu_irq_initialized(vcpu))
+>  			continue;
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 96754b51b4116..0a36a3d5c8944 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -12,6 +12,9 @@
+>  
+>  #define KVM_ARMV8_PMU_MAX_COUNTERS	32
+>  
+> +/* PPI #23 - architecturally specified for GICv5 */
+> +#define KVM_ARMV8_PMU_GICV5_IRQ		0x20000017
+> +
+>  #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
+>  struct kvm_pmc {
+>  	u8 idx;	/* index into the pmu->pmc array */
+> @@ -38,7 +41,7 @@ struct arm_pmu_entry {
+>  };
+>  
+>  bool kvm_supports_guest_pmuv3(void);
+> -#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+> +#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num != 0)
+>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+>  void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+> -- 
+> 2.34.1
 
