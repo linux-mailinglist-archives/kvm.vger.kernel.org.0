@@ -1,148 +1,166 @@
-Return-Path: <kvm+bounces-67991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 639E1D1BBDA
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:41:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 698EAD1BC01
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:48:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 42A8F300B9B5
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:40:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34732303B1AE
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE2936BCEC;
-	Tue, 13 Jan 2026 23:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B43C355050;
+	Tue, 13 Jan 2026 23:48:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DQ1eZEXs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nCzrI/qd"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DC41DC985;
-	Tue, 13 Jan 2026 23:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB4821D585
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 23:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768347649; cv=none; b=MJ+obp5z/+0DmX/oz3hlAmfK+XmeshATsqCdWa/qfIx1ptm8phOhocyga9P3CLoFNAVj3kvvrpytxGzwpfaDVxNeeR7Q1Ad9op4+MQl76m8NGIatvAXJxQMh8ZSlAPozF2Ce6x8qU1h3X2kLWOp1K5+7+csqnvtgZLu/TzqeeAo=
+	t=1768348106; cv=none; b=gCX3Bvlv4wnQppYdUJC+OWs437pmZxWd/uzWXOs1fcvg3BoNTk1n1LuIv5PlyyXG/c7PJAWbpFLD1ND9UZCexLlK4frHEYMUyWQmU9x/oOkDUxbN4YQJlqEzbZ0jWlwsLWpB2pzWbcnCI7Qn9W2p7pIV3tropAL8F9QWn46tW70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768347649; c=relaxed/simple;
-	bh=uAqI3fIuQ9dQpiz4bvlkShASmIj+EfpnFrWiJka4qko=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Q4miWbGk3m9R9bXRvwva3EpCp3IgT9Dj8eIkUOwBbZzRGAWJwrSwCSWHZ1tb3upy3GAisUyO7fr0BpUjxZ1DJsKB2AeBKfysITzqIybbZqFTzrFWi8CvqOdGPVW92r/WJuuQCuyxydrsZqRQkYr5qgaK+L4+E+owVPGGJPu2vqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DQ1eZEXs; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=S7gFUpYJQbg37o5/6HDO6Bs9Y0fg/vJUfna1ZIxerBE=; b=DQ1eZEXs9omuHvDp9OtHjkPwcO
-	IBEHdR5mN+XKTQEyRajDfOfO5fXSVe1qgp/v7DhLNTG9J3J3OQ2mQkD3iq6QzImjA2PwOAmP8hWhC
-	UP5Wl6B5KRWnUT/zxZDArLj3X+TccczSaObGYOtei+1fj+eWP4LSf9HvZmbHGJ8I+NJg8OHw3n6di
-	h4Mc1eq1Kd2OVGjnGZ89/23ncz71UCsNGKHJXqAFcXzSB1Cgp10YY5wIEwslC9C9qYL49WXuShj4i
-	mDZS3DcX4k1kJXLZ+2wKwb0+LEkyH6+m5wzqm9qFtMn+wW6tIwsmpt00a35rGy5t1jyU8KajBl/G6
-	o3YMstfA==;
-Received: from [172.31.31.143] (helo=ehlo.thunderbird.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vfnzz-00000003nYa-3djB;
-	Tue, 13 Jan 2026 23:40:32 +0000
-Date: Tue, 13 Jan 2026 23:40:31 +0000
-From: David Woodhouse <dwmw2@infradead.org>
-To: Khushit Shah <khushit.shah@nutanix.com>
-CC: "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "kai.huang@intel.com" <kai.huang@intel.com>,
- "mingo@redhat.com" <mingo@redhat.com>, "x86@kernel.org" <x86@kernel.org>,
- "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "tglx@linutronix.de" <tglx@linutronix.de>, Jon Kohler <jon@nutanix.com>,
- Shaju Abraham <shaju.abraham@nutanix.com>
-Subject: Re: [PATCH v5 1/3] KVM: x86: Refactor suppress EOI broadcast logic
-User-Agent: K-9 Mail for Android
-In-Reply-To: <9CB80182-701E-4D28-A150-B3A0E774CD61@nutanix.com>
-References: <20251229111708.59402-1-khushit.shah@nutanix.com> <20251229111708.59402-2-khushit.shah@nutanix.com> <e09b6b6f623e98a2b21a1da83ff8071a0a87f021.camel@infradead.org> <9CB80182-701E-4D28-A150-B3A0E774CD61@nutanix.com>
-Message-ID: <6DF6855A-3F9F-4C31-89FC-6905B11553AF@infradead.org>
+	s=arc-20240116; t=1768348106; c=relaxed/simple;
+	bh=/3nEZHruNblgDoS195XRf5u7JVjr67KdR83C5VowS9Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=REnygxwe5NcTfhYLjf1hs3vl0RzQ58Vfagcj2nMTmUhL7QqyqGdL0RDatKyygQe0ylJhZTO/PMxlDhEMXVtb6L8u6MVNzVQQBiDImoFqRf0pii9RQSm2Z0F9uMNk1DENGTF+zDurzmhCEn+PA9uVLpjR27ISjVtepcingvjVZB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nCzrI/qd; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-943d0cafe77so2659462241.3
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 15:48:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768348104; x=1768952904; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sVWLNrdwIQNBKBOwJy78In7uUpvJppqCzymGUhTOU5w=;
+        b=nCzrI/qd2XChWascNusYWBbbJ0/LTp8VqDkYaycSBvUrYLEXFlue2RIWiLid3jTXe8
+         1WyxAyq3Yv3djLD+U9W0CnrNGsezCLLfoDwYPuxi2XGfVmJ4NOZx+/akKAYbaGXRmB2k
+         suETMjDzWspF78UIbKwu0Cl+MUzwK6P8dl53QORhLK+ugC7gted9PqGkidTpRDnQBE0C
+         9OcwupbP9kuX+YC7P9lDjvnTClfsp6maxwAQxNDSmpFJlNjiJTc0gEzSj0TM3gtLCVMW
+         kNFxRBLPUaSUsqQ+uET0O0CwvW45NlRB9lgwv450tWplYurWgOmEzEm6PHqWYnHGWOde
+         /VdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768348104; x=1768952904;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sVWLNrdwIQNBKBOwJy78In7uUpvJppqCzymGUhTOU5w=;
+        b=KdgA0gxp7np7BJhrgbVD32yw64H8MWu1Eg67DqHaB74THZpkQX3Rm2Jx7oULE/HNTS
+         rWO9UeSoDLqud6UkdqzNAOBk1v9gYev9hnN1829jLHGFx4XvQyySDgFsT+golmh8/TU8
+         X9klZ/61oW6JZL5LliwwpxF0y0YT8931XvHylPb2s50Clu4SVqKdTRWrH8eiY2ZJJoTW
+         j//agSReQJHwrgwnhh2LdBp/fzv+u0ULOudghFUJMK+QYVUb3SOedUazZYMDcknQz6CS
+         NAzuzvuPMKExhwvid3mN4vv0mAfFLqLkONfI8KBzE4cmkCgEjwzQqej+iyZWt2uC9UdM
+         NmSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeirNJHI1jmzFzCLrOOeayxKIKqLrJLJonF9ge+U+JRQqRaCVQIhOmLqLOAj89/AsD/JI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzQ2H3gY3gZM4c3RonQA2pTjZ92I+M/oTZ5UmcXcre1vQ/A0kA
+	P4ANW151sjNH50LWfjGbOcX+gO7gY9ehvr6dynC2L6pIgvi9fk1meGJ8Mi5VLETrPZ5bpq8p2Ei
+	GwgJlbGaJ+ITUkaVjtYOecAaCHsOppeC7pg/OUcWRbZKNJ+hGhqvysm5e
+X-Gm-Gg: AY/fxX4KEY5VS8d8UZOuo79txahPjdMTyw2A2h18h4Fr6FogfL96iXlfz5Zb3ljkuwf
+	KCSK9cKS3VrJm2PR+J6aLAtn4sWYpG3HSh7PrdMg6sNClFJ5+C5Io/wMX/kktXjtAiTy3eq7U/b
+	GaOaOUelMUIYYyp2HCRiPXnpIiHE4KX1H+mGJK2bapoqBi3kAinRTXjIUwSYEq1GIbIKUdJvQTd
+	OX6HvEIrEBzmZweyxJBNSg7bh+nTghUyYyXD9wyEwwroxKT9yQaANKhjmb2p+VN9ga4JbXB
+X-Received: by 2002:a05:6102:3f09:b0:5e5:672a:b19 with SMTP id
+ ada2fe7eead31-5f17f419d9fmr365708137.4.1768348103587; Tue, 13 Jan 2026
+ 15:48:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com> <20260108141044.GC545276@ziepe.ca>
+ <20260108084514.1d5e3ee3@shazbot.org> <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
+ <20260108183339.GF545276@ziepe.ca> <aWAhuSgEQzr_hzv9@google.com>
+ <20260109003621.GG545276@ziepe.ca> <aWBPNHOsaP1sNvze@google.com>
+ <20260109005440.GH545276@ziepe.ca> <CALzav=cBGkhbbyggkfaYh3wfqodxRHZKXTNdnmjoXOgwMouBuA@mail.gmail.com>
+ <20260109180153.GI545276@ziepe.ca> <20260109143830.176dc279@shazbot.org>
+In-Reply-To: <20260109143830.176dc279@shazbot.org>
+From: David Matlack <dmatlack@google.com>
+Date: Tue, 13 Jan 2026 15:47:53 -0800
+X-Gm-Features: AZwV_QjdcFsJsgt85dNhSC_YTux420gKxRVuQRmmDpaV4k1qPluDDfAJcne_NFU
+Message-ID: <CALzav=cE4SQbbcWL9-bhHPEjCq3DPOWnGZnqrHcvR5mYB_t3cA@mail.gmail.com>
+Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
+To: Alex Williamson <alex@shazbot.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Alex Mastro <amastro@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-On 12 January 2026 04:15:37 GMT, Khushit Shah <khushit=2Eshah@nutanix=2Ecom=
-> wrote:
+On Fri, Jan 9, 2026 at 1:38=E2=80=AFPM Alex Williamson <alex@shazbot.org> w=
+rote:
 >
+> On Fri, 9 Jan 2026 14:01:53 -0400
+> Jason Gunthorpe <jgg@ziepe.ca> wrote:
 >
->> On 2 Jan 2026, at 9:53=E2=80=AFPM, David Woodhouse <dwmw2@infradead=2Eo=
-rg> wrote:
->>=20
->> On Mon, 2025-12-29 at 11:17 +0000, Khushit Shah wrote:
->>> Extract the suppress EOI broadcast (Directed EOI) logic into helper
->>> functions and move the check from kvm_ioapic_update_eoi_one() to
->>> kvm_ioapic_update_eoi() (required for a later patch)=2E Prepare
->>> kvm_ioapic_send_eoi() to honor Suppress EOI Broadcast in split IRQCHIP
->>> mode=2E
->>>=20
->>> Introduce two helper functions:
->>> - kvm_lapic_advertise_suppress_eoi_broadcast(): determines whether KVM
->>>   should advertise Suppress EOI Broadcast support to the guest
->>> - kvm_lapic_respect_suppress_eoi_broadcast(): determines whether KVM s=
-hould
->>>   honor the guest's request to suppress EOI broadcasts
->>>=20
->>> This refactoring prepares for I/O APIC version 0x20 support and usersp=
-ace
->>> control of suppress EOI broadcast behavior=2E
->>>=20
->>> Signed-off-by: Khushit Shah <khushit=2Eshah@nutanix=2Ecom>
->>=20
->> Looks good to me, thanks for pushing this through to completion!
->>=20
->>=20
->> Reviewed-by: David Woodhouse <dwmw@amazon=2Eco=2Euk>
->>=20
->> Nit: Ideally I would would prefer to see an explicit 'no functional
->> change intended' and a reference to commit 0bcc3fb95b97a=2E
+> > On Fri, Jan 09, 2026 at 09:04:30AM -0800, David Matlack wrote:
+> > > > If you really want to test TYPE1 you need to test what makes it
+> > > > unique, which is that you can map any VMA and then unmap any slice =
+of
+> > > > it. Including within what should otherwise be a 1G page.
+> > > >
+> > > > But I doubt anyone cares enough to fix this, so just exclude
+> > > > VFIO_TYPE1_IOMMU from this test?
+> > >
+> > > Ah, ok, thanks for the explanation. So VFIO_TYPE1_IOMMU should always
+> > > use 4K mappings regardless of backend (VFIO or iommufd) so that unmap
+> > > can work as intended.
+> >
+> > IDK, I think you should just ignore testing TYPE1v0. The actual real
+> > semantics that it had are quite confusing and iommufd provides an
+> > emulation that is going to be functionally OK (indeed, functionally
+> > more capable) but is not the exactly the same.
+> >
+> > The old comment here is sort of enlightening:
+> >
+> > +        * vfio-iommu-type1 (v1) - User mappings were coalesced togethe=
+r to
+> > +        * avoid tracking individual mappings.  This means that the gra=
+nularity
+> > +        * of the original mapping was lost and the user was allowed to=
+ attempt
+> > +        * to unmap any range.  Depending on the contiguousness of phys=
+ical
+> > +        * memory and page sizes supported by the IOMMU, arbitrary unma=
+ps may
+> > +        * or may not have worked.  We only guaranteed unmap granularit=
+y
+> > +        * matching the original mapping; even though it was untracked =
+here,
+> > +        * the original mappings are reflected in IOMMU mappings.  This
+> > +        * resulted in a couple unusual behaviors.  First, if a range i=
+s not
+> > +        * able to be unmapped, ex. a set of 4k pages that was mapped a=
+s a
+> > +        * 2M hugepage into the IOMMU, the unmap ioctl returns success =
+but with
+> > +        * a zero sized unmap.  Also, if an unmap request overlaps the =
+first
+> > +        * address of a hugepage, the IOMMU will unmap the entire hugep=
+age.
+> > +        * This also returns success and the returned unmap size reflec=
+ts the
+> > +        * actual size unmapped.
+> >
+> > iommufd does not try to do this "returned unmap size reflects the
+> > actual size unmapped" part, it always unmaps exactly what was
+> > requested, because it disables huge pages.
 >
+> I think there was also some splitting code in the IOMMU drivers that
+> has since been removed that may have made the v1 interface slightly
+> more sane.  It certainly never restricted mappings to PAGE_SIZE in
+> order to allow arbitrary unmaps, it relied on users to do sane things
+> and examine the results.  Those "sane things" sort of became the v2
+> interface.
 >
->I took another careful look at the refactor specifically through the
->=E2=80=9Cno functional change=E2=80=9D lens=2E
+> In any case, we've had v2 for a long time and if IOMMUFD compat make v1
+> more bloated and slow such that users realize they're using an old,
+> crappy interface, that's probably for the best.  Examining what page
+> size is used for v1 is probably not worthwhile though.  Thanks,
 
-This is, of course, exactly why I make people type those words explicitly =
-:)
-
->The legacy behavior with the in-kernel IRQCHIP can be summarized as:
->- Suppress EOI Broadcast (SEOIB) is not advertised to the guest=2E
->- If the guest nevertheless enables SEOIB, it is honored (already in un-s
->  upported territory)=2E
->- Even in that case, the legacy code still ends up calling
->  kvm_notify_acked_irq() in kvm_ioapic_update_eoi_one()=2E
->
->With the refactor, kvm_notify_acked_irq() is no longer reached in this
->specific legacy scenario when the guest enables SEOIB despite it not
->being advertised=2E I believe this is acceptable, as the guest is relying
->on an unadvertised feature=2E
-
-That sounds sensible as you describe it=2E
-
-Note that we did advertise this in the past and then silently just stop do=
-ing so potentially underneath already running guests, but that (commit=20
-0bcc3fb95b97a) was back in 2018 so I guess there won't be many "innocent v=
-ictim" guests around any more who genuinely did see the feature advertised=
-=2E
-
-
->For non-QUIRKED configurations, the behavior is also correct:
->- When SEOIB is ENABLED, kvm_notify_acked_irq() is called on EOIR write,
->  when enabled by guest=2E
->- When SEOIB is DISABLED, kvm_notify_acked_irq() is called on EOI
->  broadcast=2E
->
->I would appreciate others chiming in if they see a reason to preserve
->the legacy ack behavior even in the unsupported case=2E
-
-LGTM=2E Thanks=2E
+Ack. I'll send a patch to skip the page size checks for v1.
 
