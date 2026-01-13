@@ -1,189 +1,150 @@
-Return-Path: <kvm+bounces-67949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFDA7D19F0C
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 16:35:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2977D19F6F
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 16:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA319308FEAC
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:30:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D2E7F3016B86
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F6A39341B;
-	Tue, 13 Jan 2026 15:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA3F3939BE;
+	Tue, 13 Jan 2026 15:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbolqtDY";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cV0YLU1q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LV9PXd/g";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JrmS9Uxv"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A664393404
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 15:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246B02E2DEF
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 15:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768318210; cv=none; b=uitXhKnTCbrtLrQAyd5XqKIkSwlCzi3/PIAlAGAdaA2rI/O0cb91I0xqZGBbHFcM9nYck8Em44JpeaJfEKMAsIp/Bc3TAsF+e9xeEX+fGN2lig1bsxoOoGt9Wv2fuAkZkJ2/SY60Y2bain18TCX6NRokgsB7EIlPWI6qw5oREaA=
+	t=1768318940; cv=none; b=J8O0v/duNNjVK7xIevmfUfk0Jf5XZvs5JcvEU7Yuk/n064454ev8l+9DaNu+JPPB8GDlcCO6/zh+hapEnRCbM6ar4gyeaTvvcdshVrVxDZ/DdHKVUWSPeK4qDVz7OVoG8A1p9C31qGauwWh5YmCfVRJm56LcdChi9GkXR8DNs2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768318210; c=relaxed/simple;
-	bh=hNuRIypnQQ+01BoUezpIGEppam+IQ5ZOaCciQB2jycA=;
+	s=arc-20240116; t=1768318940; c=relaxed/simple;
+	bh=z0ktrf9THh1+HjKG5G+Ar30QQHeNINGUrFDEbpyqHsg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chBUGG5pPf9KuhufSpL2DuqP09Bf6MNGGb1d4on9KcIuPP+JxTsheWX4WlJu4oMn4xtIaXdKD+a1JI/Y1Opqvr6W+0jJW3L02RGaA8LoxgqLIJK4saLCLUuxsd7heQrOVfHGn32qHmVqoE+Ljud741JWYRjXLv6sQd8uU5HEHj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gbolqtDY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cV0YLU1q; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ww1DOMMc2mQHGzXcG66x0CoJBCYgGCVHUvuKTD40S6TKE0Zo19g/6ILtbplv20078/DgJWe+MVVl1/UZoGR1VBYgNAfOej7UT+UIaojqBL6+FZo7uUQX56HiuetgiWWLIRBS0r7GSmOFUBRnBsNKxieuqXLAphbiabB+/Y+4yOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LV9PXd/g; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JrmS9Uxv; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768318207;
+	s=mimecast20190719; t=1768318938;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qz3VmyYWi3AhF6/Je/tiOgzVdeSqGzdCIhZvINzrSEc=;
-	b=gbolqtDYSB+8VlkjrUgFIuPB37oF2iYS0E+vmTvbLLLFg5idyn0v2wdcAXUXRFOzxVwl89
-	bTU7PymxIIJfuNWEpwXQ1jQG8Vl4PjftRSdKI3nvuRoIPhKGtLOLS32446acXnyox7b/QB
-	wBB8S5jy721tqXwUHQF0ST9UxsJDzxE=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VJEPhbiWRGNl7Jboc5mq3GBmXz9jBXvM23UB3dUFjRY=;
+	b=LV9PXd/gXyzpcWQx6Sl8WWRqddeGd1BVbWsrIG/Tspzhnetk5UQCe38IFqOyw25jcaohVg
+	3ZPNNLODNo2gTfXaUENurKKO0vvsh0YRcgXQRHz5RUSwrTZV1LHekSVcIutzu9wE7YDt9E
+	BZhMWTgIl7r1RnHkrqlWeaPDgBVn358=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-531-W29y17cAPueVKIcTypU7wg-1; Tue, 13 Jan 2026 10:30:06 -0500
-X-MC-Unique: W29y17cAPueVKIcTypU7wg-1
-X-Mimecast-MFC-AGG-ID: W29y17cAPueVKIcTypU7wg_1768318206
-Received: by mail-ua1-f72.google.com with SMTP id a1e0cc1a2514c-93f568048ccso10245325241.2
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 07:30:06 -0800 (PST)
+ us-mta-53-T9orHpB3NUCOtsHHL8Pp-A-1; Tue, 13 Jan 2026 10:42:16 -0500
+X-MC-Unique: T9orHpB3NUCOtsHHL8Pp-A-1
+X-Mimecast-MFC-AGG-ID: T9orHpB3NUCOtsHHL8Pp-A_1768318935
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47edee0b11cso3045915e9.1
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 07:42:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768318206; x=1768923006; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768318935; x=1768923735; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qz3VmyYWi3AhF6/Je/tiOgzVdeSqGzdCIhZvINzrSEc=;
-        b=cV0YLU1qMixE8qIUEHxWJwqObPJXipOLRuIxDrYGdIB5lpzCN/VBEkrzONobYBUgfw
-         QuLpOEedWinuXlUXK+AyKnLSFQeHns5lzAO7S1+HlNji3+lqIUsHWAHOfex4enb2/2zZ
-         uOoCD3pLQE3+oMzpPkegeZsXV5iiw/3eYkXR0L2l1WTKn2g10ZAq7oE6v0Y7d+bOA0Yc
-         WlF1JMOoyWY+R3COVwOlJP8uM4rcDZx3Cqlhb4KrIZsosxnQIEqjpc79ytZX/4aNbEcI
-         itdUIbp4/WFQGDFu57IiMjfggHSYNaCC49rwoW8T755PyY5vrtib+6uDOpbwD7ISjW4w
-         ZVvQ==
+        bh=VJEPhbiWRGNl7Jboc5mq3GBmXz9jBXvM23UB3dUFjRY=;
+        b=JrmS9UxvNExe9f0SxaMLZoIqNBf7wtmAt8LITJYbNiw8wcDm6muI6r2os8ZOKn0Ca6
+         6WO9MVzG9DOZulAg4srR9tXLbN3f9YohQoXAZ9nBFl8dVw20k1mSwxkOX8w0dTQMliaC
+         sOypnMmVoneA9NqPRZEPqV4c3JRZ+QQpTqFsh3Ve7qzdbEvI0ubsOpaDN6KWOxd1mKfa
+         k0+ns9Tv3H9VxsrLEMWAUjj5fJt4fdvlxq/kUgGWGhzMPjPS4qxw3rNwXYBqtiGEFRt5
+         7o39St8tnHHvicCO5whiI7kF/E/yOR5la0T2nmv3ZTyZhdr4B9mZZNQj7KcyVnk6qM6V
+         5NdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768318206; x=1768923006;
+        d=1e100.net; s=20230601; t=1768318935; x=1768923735;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Qz3VmyYWi3AhF6/Je/tiOgzVdeSqGzdCIhZvINzrSEc=;
-        b=pe3yPqsENnQvktujsYMnIVBRjyIrmb7r52fiZemIJtZhAB6Xp6JjBPLf8abDLWn+45
-         4iCjxvuMXVzQPdK2Ym3isGXvVF5J2zwHd1sW/iNpsxXDQGn8NXJ8a1A3ulEtjnIj45f2
-         9bJMbRtJk2TL5SwV3ZSt2w74DgsWPJkVLslcKqdl43ScrzIa1lfajPLSXr2bJVwFNZdZ
-         pEDDBv39aZvqzEXKeW+Hte7TPfOPcTyzYu2mk1EKqnqDRG6UiJuC1lGm0PHdDINUPCNG
-         azh4PXt6nn8RqM8+0cohoLecHyAS9LhikM8aybQtMv0YuTt4pPrOT4lVyb/nzqOnaTVE
-         B8IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXsvPRDxcW0dRULViEVd7WdkhMED0SEVlYKZ7iVjjqIW6LS4SuYym8JE6KqlEW8n95jl+g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgQJvKp5YqZ1LHm5nXoOhF8EbmuT6APyL0ixsoNHdkc6uqudPD
-	qTUSBQFSwt/69xdCGc/v7xhbn1FX0eNKEuYNzWNntjV+8TeqcktabUCQy9/taFCkoQGgGoVJzM6
-	mUQKIpy1+ajTLhO92dWsXl6dkjCV6IkMIj6VysmdzCIVHZ4FNnut79w==
-X-Gm-Gg: AY/fxX4YSQIucxpndoezfKGFMM2tVvcRU0xZoNpMFSFL3dudXvX+0yedoOtttDhZvUm
-	qyTsbn5VO6cClmCWWaqpX6DMKyanQCKPACC7t4e4Mq5Hf86MM6R3dvHB3oS9uifTqfW6Ol6fH3n
-	zl+YXFa7uPf8+OyxVMFpv0WPYXqIS2wu4I/NqzJq7rsp2Cr38HibobrRn/Ml4EhGSUg6lcVK7oF
-	xTuEuRMkN3+lffExBlbPwNuGJZzez4xzidUvUZm7y3xEmqZjK8BYHn1OkokL36L6c6O4It8ImLa
-	Ii0klqoEwlip+ttCwHIlzHZXWe7oiuTpR9NjWeBwDSTHYe5yuSTCchUKdNfUgDJYpk6/ik/BSJK
-	qel0=
-X-Received: by 2002:a05:6102:2ac3:b0:5ef:7220:bca6 with SMTP id ada2fe7eead31-5ef7220c52dmr5778864137.33.1768318204249;
-        Tue, 13 Jan 2026 07:30:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGb21i8wbXldhw9xlGcMduETSeDqTwoLzXJxR0H8CmAOHE8xGD0URpboYFAQJNeOmYUoC8R0A==
-X-Received: by 2002:a05:6102:2ac3:b0:5ef:7220:bca6 with SMTP id ada2fe7eead31-5ef7220c52dmr5778814137.33.1768318202381;
-        Tue, 13 Jan 2026 07:30:02 -0800 (PST)
-Received: from x1.local ([142.188.210.156])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5ecdaf1bab4sm20087598137.2.2026.01.13.07.29.53
+        bh=VJEPhbiWRGNl7Jboc5mq3GBmXz9jBXvM23UB3dUFjRY=;
+        b=JAsmPYhJFTJ8QqbG+30tzE09inAHHZO6sLJjvDWWS78LEEUmm8E98HO6DKf4QJ+LK2
+         YcoNQCFRIkWA/RK0UGfKfEzL5tKOpBdB8/BP/nlCawvHHhd8YOD2RFbz2RfHCWj98Nrn
+         /F36yKX8w6CNCscQCMXQEz6OTRpIN2lXnIB944BwlwCVuexz064NgnuT4J3FZ0WAbvVD
+         JwVaPYB8IPWtUxIdUSumW3ZxRrFAoTE1NjQPhPYPf+seVEbO+7CCLmkshym+W9Oi1vVl
+         murFYM424G+7ByFXDmewzf75rZXSoXVn9I9Gtf3E9ILYgzQK0Fy3FbxbUjt1rBdAoJUr
+         3SLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVws0127vdM5sD7n+XZst7BuuD/ugNZkFbbS2DHIT/eZsqQ4qKL9pBuOQ3C2xr+SLjyAzo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOLz8mt0t0JuPrScv9mO6cxKXTGzVkUDwCSWEPTEyWEEI+nYko
+	6v1YhTYrsMJ1zH1nYGOoGK/3jXFdOFMtSz8ylf+IVAzBG7VPZnRpsLnek3cGuRw1fC4NGBlJShi
+	tJ4pvmO/5Y7hNViEiIyxInqe/a72ORVtYPYs9dO39sgSGDdAdBwK4HQ==
+X-Gm-Gg: AY/fxX5VrrWjNwgs4A8VuO8a/wzPD8HHHTGPaWYb6HDofCaj6nFj4GoVbgRY9NfOWGq
+	mhe7SJZeZGcoTiHJWigxsq/ZP9ydlDvJrA0Og57bgS6oLwkZ09ecTe5Vdy2lqNgJcAgBR7i1/AH
+	5XZThGewfN4V+YgL7JpGzDd7lqCarUbOCcs2zV7RjziOLydl4aAp1B87/u5EZzreBEScYcYqYaH
+	LQlCV4BwRDdY4plWe4HYDaTy1g8bFfsldEiyGfI8h6/h6+dsyzDOa4of7+kc0Zq4HnNnXXmPLDZ
+	+pJlVsWCw7Id67sJdk2q4kQjX2MRBXgyp//mxUeUxU1HdLyOwnVZda5N9+X7AJF8Dw6CNKbY3Qm
+	PbYjc1MlpWulzMklUF07TSZaKEMOZiaWKLCw7adDHdRGOPPPuW50fVRcCOzL10g==
+X-Received: by 2002:a05:600c:620c:b0:46e:33b2:c8da with SMTP id 5b1f17b1804b1-47d84b3be47mr241262845e9.32.1768318935372;
+        Tue, 13 Jan 2026 07:42:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH4paz0040d/vitY+T5rv1eo5WHxtcQ4X4vPvSUCFKLot5Wf40qNTKU1VjGBirJbB8u4247Wg==
+X-Received: by 2002:a05:600c:620c:b0:46e:33b2:c8da with SMTP id 5b1f17b1804b1-47d84b3be47mr241262525e9.32.1768318934958;
+        Tue, 13 Jan 2026 07:42:14 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e1adbsm45281481f8f.17.2026.01.13.07.42.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 07:30:01 -0800 (PST)
-Date: Tue, 13 Jan 2026 10:29:50 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>,
-	German Maglione <gmaglione@redhat.com>,
-	Hanna Reitz <hreitz@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, danpb@redhat.com,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Alex Bennee <alex.bennee@linaro.org>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Marco Cavenati <Marco.Cavenati@eurecom.fr>,
-	Fabiano Rosas <farosas@suse.de>
-Subject: Re: Call for GSoC internship project ideas
-Message-ID: <aWZk7udMufaXPw-E@x1.local>
-References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+        Tue, 13 Jan 2026 07:42:14 -0800 (PST)
+Date: Tue, 13 Jan 2026 16:42:07 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v14 04/12] selftests/vsock: increase timeout to
+ 1200
+Message-ID: <aWZnnHxzaV9pgwzb@sgarzare-redhat>
+References: <20260112-vsock-vmtest-v14-0-a5c332db3e2b@meta.com>
+ <20260112-vsock-vmtest-v14-4-a5c332db3e2b@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+In-Reply-To: <20260112-vsock-vmtest-v14-4-a5c332db3e2b@meta.com>
 
-On Mon, Jan 05, 2026 at 04:47:22PM -0500, Stefan Hajnoczi wrote:
-> Dear QEMU and KVM communities,
-> QEMU will apply for the Google Summer of Code internship
-> program again this year. Regular contributors can submit project
-> ideas that they'd like to mentor by replying to this email by
-> January 30th.
+On Mon, Jan 12, 2026 at 07:11:13PM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Increase the timeout from 300s to 1200s. On a modern bare metal server
+>my last run showed the new set of tests taking ~400s. Multiply by an
+>(arbitrary) factor of three to account for slower/nested runners.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+> tools/testing/selftests/vsock/settings | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There's one idea from migration side that should be self-contained, please
-evaluate if this suites for the application.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-I copied Marco who might be interested on such project too at least from an
-user perspective on fuzzing [1].
-
-[1] https://lore.kernel.org/all/193e5a-681dfa80-3af-701c0f80@227192887/
-
-Thanks,
-
-=== Fast Snapshot Load ===
-
-'''Summary:''' Fast loadvm process based on postcopy approach
-
-We have two common ways to load snapshots: (1) QMP "snapshot-load", or QMP
-"migrate_incoming" with a "file:" URI. The idea to be discussed here should
-apply to either form of loadvm, however here we will focus on "file:"
-migration only, because it should be the modern and suggested way of using
-snapshots nowadays.
-
-Load snapshot currently requires all VM data (RAM states and the rest
-device states) to be loaded into the QEMU instance before VM starts.
-
-It is not required, though, to load guest memory to start the VM. For
-example, in a postcopy live migration process, QEMU uses userfaultfd to
-allow VM run without all of the guest memory migrated. A similar technique
-can also be used in a loadvm process to make loadvm very fast, starting the
-VM almost immediately right after the loadvm command.
-
-The idea is simple: we can start the VM right after loading device states
-(but without loading the guest memory), then QEMU can start the VM. In the
-background, the loadvm process should keep loading all the VM data in an
-atomically way. Meanwhile, the vCPUs may from time to time access a missing
-guest page. QEMU needs to trap these accesses with userfaultfd, and resolve
-the page faults.
-
-After loading all the RAM state, the whole loadvm procedure is completed.
-
-This feature needs to depend on mapped-ram feature, which allows offsetting
-into the snapshots to find whatever page being asked by the guest vCPUs at
-any point in time.
-
-This feature may not be very help in VM suspend / resume use cases, because
-in those cases the VM was down previously, normally it's fine waiting for
-the VM to be fully loaded. However, it might be useful in some other cases
-(like, frequently loading snapshots).
-
-'''Links:'''
-* https://wiki.qemu.org/ToDo/LiveMigration#Fast_load_snapshot
-
-'''Details:'''
-* Skill level: advanced
-* Language: C
-* Mentor: Peter Xu <peterx@redhat.com>, peterx (on #qemu IRC)
-
--- 
-Peter Xu
+>
+>diff --git a/tools/testing/selftests/vsock/settings b/tools/testing/selftests/vsock/settings
+>index 694d70710ff0..79b65bdf05db 100644
+>--- a/tools/testing/selftests/vsock/settings
+>+++ b/tools/testing/selftests/vsock/settings
+>@@ -1 +1 @@
+>-timeout=300
+>+timeout=1200
+>
+>-- 
+>2.47.3
+>
 
 
