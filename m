@@ -1,77 +1,115 @@
-Return-Path: <kvm+bounces-67971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82074D1ACF1
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 19:15:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B889DD1AF46
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 20:08:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3ACC63038992
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 18:15:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE484304B957
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 19:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5DD34C130;
-	Tue, 13 Jan 2026 18:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CF835B132;
+	Tue, 13 Jan 2026 19:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ikuw0w/8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFe+UyiA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909EE31B131;
-	Tue, 13 Jan 2026 18:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EBF359FB3;
+	Tue, 13 Jan 2026 19:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768328125; cv=none; b=kjOczZxHms4HHUuco2UCqQ1EGzM9n8wP16LY5Ta/m67MWL/MJmpB6a2ak/C2oyYb1UEOCnnHYRRVQcv0iSPlJAc1kEY/KJWC4klkdKlwHmme9MqU/B1zuyyvUkcV0g6rEtMd15SXmpBWsgZEIak4J15xKnylzn1znvnQvfEtnuw=
+	t=1768331316; cv=none; b=qPMbWcF6L1Otk60OgO73lqezvJpKEVhyos4hLSYONKyacX3bvGO8ZchvYcV+kfdSz300cyX/wfetWpJDwQoiscsDJ9TgQdP8i/5npIe2Kc5x0GywqvkMbqGUUsfi0FLnJRN657A6X6pJCavzAc1/Faol2AduVJI9i1Yhf5+f7BA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768328125; c=relaxed/simple;
-	bh=40Wsrd5Bibzh7RWq7iyhvmOeEgbSrYPW25LYjuglYhk=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=NcQs5AsJEN3LkcBfW/Y+85zz9sbDltNwoBCzH82tY1/n+lB5TidQbz1gCmqfARSl0CaLEYeM/TkNL9wMvYi1+S8ptKRE6LzzI4zY8Er7pp+G4bA2cb+gmYlsi/S6AMmMLNYt4WMbvkoXuizVdGeas00LbqSi/hV1JywABoH3lKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ikuw0w/8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F682C116C6;
-	Tue, 13 Jan 2026 18:15:25 +0000 (UTC)
+	s=arc-20240116; t=1768331316; c=relaxed/simple;
+	bh=BlG7Ssce28/FBGer2w45hjxLQrro3n1kR5hQ9PoxQUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZEomG4BmjCWT5SklZDS1pR33d4zq8FxKJcE6g/tV5TAI6wtSChG8kvKb7GUP/sv6R/8O49Bl3SPWmY4nVHXOuZAWyGiqrqZssA+htPVuAVzqkujBJ3REpLPFjxRBZA5euEUUs+CfMppGeMlvqRQnZaZatBDQteuEl4WVcHuqrfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFe+UyiA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AAC7C116C6;
+	Tue, 13 Jan 2026 19:08:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768328125;
-	bh=40Wsrd5Bibzh7RWq7iyhvmOeEgbSrYPW25LYjuglYhk=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Ikuw0w/8nm8bsJ4wOGiNVL2KO4o5Q35K3gOOB/QruIpaXXukoKKMWTkGmicy4qVWl
-	 4mDKugXRaISaQd7QQyZ54p8gyCDB25BuxcnbudBvVsA64P56t3jYnJxdsVDdpGFGTz
-	 xpzxBI87Xzhk8rLmsXQDPRBJM6DVVWsngREW8YcUO3QH5OGZfWO/bILfBvJJjK7DcS
-	 52pHWDsyT4wdfM6N/swrMuSqgUZ055jeiXYxc3QUKdkBzghn3dlzTJP7me9xBnAdIA
-	 hyyR0NJCjbhXCv3yNYBAF74SFFERNHHp9oHoVlKR/rr3dJHPQ9YTHflRYL4TKFqfxl
-	 ZtapSYXzAWlCA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5AF13808200;
-	Tue, 13 Jan 2026 18:11:59 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 6.19-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260113172459.1291801-1-pbonzini@redhat.com>
-References: <20260113172459.1291801-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260113172459.1291801-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 3611ca7c12b740e250d83f8bbe3554b740c503b0
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0bb933a9fcdee14ef82970caeb8617ad59a11303
-Message-Id: <176832791827.2405565.1388238832879364807.pr-tracker-bot@kernel.org>
-Date: Tue, 13 Jan 2026 18:11:58 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com
+	s=k20201202; t=1768331315;
+	bh=BlG7Ssce28/FBGer2w45hjxLQrro3n1kR5hQ9PoxQUo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uFe+UyiAM8nw1RpAZ8dnDlZg7/u+WeSfZkLTq7hnyWk/FNs6VBsAtz048ZbbD5t9S
+	 sMryJrpGRz4zXqNq/VugUWEiTtkVm407BclAEbyYBo8ZXLyYcRCP0kTrYmT/vBtZE1
+	 ydoUfR7Y75lBJf8cLjhopc9HQWUwMMAGmE5PTe51i5DMO/Qcu8w4IWY/pN19OMiCuT
+	 PbHW0nF0dSWtdmm6qJRxA94B4J62po295i/yIZaGjC8D93JhOS4K5ZuanffOipvgWc
+	 P3BLm5C3i2DzEKJBiA6O3CrVWchyOJdcHOxkI8+fc0/cSnBSN51m/+k9rPsF0GanYs
+	 +/G1hpujfSJSg==
+Date: Tue, 13 Jan 2026 19:08:29 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 18/30] KVM: arm64: Support SME priority registers
+Message-ID: <24d06740-f8da-43d0-9e40-81323f6a9237@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-18-8be3867cb883@kernel.org>
+ <CA+EHjTwxc=+1TodVR7X96fnKu-mykivdFxMbB5nUrw_h4MGKHg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hJ8Uz2qkTdkXhDSA"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwxc=+1TodVR7X96fnKu-mykivdFxMbB5nUrw_h4MGKHg@mail.gmail.com>
+X-Cookie: All models over 18 years of age.
 
-The pull request you sent on Tue, 13 Jan 2026 18:24:59 +0100:
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+--hJ8Uz2qkTdkXhDSA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0bb933a9fcdee14ef82970caeb8617ad59a11303
+On Mon, Jan 12, 2026 at 11:59:22AM +0000, Fuad Tabba wrote:
+> On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
 
-Thank you!
+> > +       /*
+> > +        * We block SME priorities so SMPRIMAP_EL2 is RES0, however we
+> > +        * do not have traps to block access so the guest might have
+> > +        * updated the state, overwrite anything there.
+>=20
+> nit: overwrite -> overwriting
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> > +        */
+> > +       __vcpu_assign_sys_reg(vcpu, SMPRIMAP_EL2, 0);
+> >  }
+
+My original is correct here - the action we are taking is that we will
+overwrite the value.  To use overwriting we'd need something more like
+"handle this by overwriting anything there".
+
+--hJ8Uz2qkTdkXhDSA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlmmCwACgkQJNaLcl1U
+h9DLzQf9ECKYlxB9v/nA6ULn595t/Ut+L10MjxH5UG+Bx55K2Z6nM9DNxKzi74iW
+92pZ/UIu2DAB+mKumhcHsSGtFvDONyUqeZwfIUE5XYWH+VoBEMQC4DIdYRi2YDwb
+zSfvAh2lqiySy9RHeI6orV6dKs9u3HVxF/eb85+XpPbswIiOej4OW5RECEPrPUmC
+A4ohL7KRW4flNvHV7WrA6gPpy+dAbkkh2/zP2V1VhwhKydikY7gAEyt5ec2BmK8o
+aREwbFcuMiRGJaXWU+LhNmgus3k0YGLjZTOrtd+YmDlwCYv5qTjdbtc4iU82BusN
+bjR4dgGoOXiso3+khcbbpEsljh4Oiw==
+=Xsd1
+-----END PGP SIGNATURE-----
+
+--hJ8Uz2qkTdkXhDSA--
 
