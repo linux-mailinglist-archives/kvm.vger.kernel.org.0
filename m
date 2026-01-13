@@ -1,145 +1,167 @@
-Return-Path: <kvm+bounces-67852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C7BD15E47
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:54:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB47D15FF0
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 01:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 81A4A300C62D
-	for <lists+kvm@lfdr.de>; Mon, 12 Jan 2026 23:54:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 422003024251
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053F52D5C97;
-	Mon, 12 Jan 2026 23:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D44248891;
+	Tue, 13 Jan 2026 00:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="HAWkep//"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yzge7/5h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7192D3EF2
-	for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 23:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C060F187346
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 00:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768262058; cv=none; b=t7Y+1H3o951fpA8e5YACRzskNsc8KSx2grnvkhTp/QEGGS3n5+bRWZyuF7kCbI/I2sMK8z7Ot5xyFYREmy87GAAsQ3qe01o3YZbIJ5P1hEJdFkEeI+l02Qcfuq7vgrunSeS5fVB94eSlDETBZO414/cw1kechUDG6oJA6Wl3xgQ=
+	t=1768264239; cv=none; b=gEEcLRauQv21ea7re4+D9Wp2rf86JWApzaU3drUc6RYg1dnukIDy4udwxFDzDyQmG0Vk8ZpMy97VbdYq4KCZGVRZRfuS3zN4avUSVs7eqzmCF2R6Gcltdp6USHn2dnarB0S8OqdjKc/TXvEMD7smZ4s4BDwzIl/czHMVOAQA0MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768262058; c=relaxed/simple;
-	bh=vbQpTPqvkNza84fX2uyalXQvb9OzER6/e1aJC0fiWDY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JqbGLVugJbKqORILpa7G3pVbWtRTetBGx6gndnnPwPim2Vywkp7hB4YVHPc2NTsTedHDhyaLYPHo1Sas1udJYkHD9akSzWX02MEM+pmSUTtYEKBhajuRRK9fU0D6g+1j4xwQ2qvJtCGi1jfTJ0y2/fBCRMX+eA8qGCqToyKWb7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=HAWkep//; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5013d163e2fso401641cf.0
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 15:54:16 -0800 (PST)
+	s=arc-20240116; t=1768264239; c=relaxed/simple;
+	bh=Z55azhBqb+eYmuyst7BrcTN2e+iwhv1VBIGSzB2TzsU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SRxJUM1vZIjLBDR8bFSrefaBMigxLiN/kyeWvgZNetCoCLwtcFW0zg0+NFqtFlr1U1jelQzAXvOCTP5wd0RHLNuE4xV4k2DDpGEOTQXod/FK9cwrZbIXSvzsuFiuBVyUdGvf+Ujd5L0SGq/6euhwiiL6nyG/8v97d5kgmhwGmJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yzge7/5h; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34e5a9f0d6aso5240942a91.0
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:30:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1768262056; x=1768866856; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vbQpTPqvkNza84fX2uyalXQvb9OzER6/e1aJC0fiWDY=;
-        b=HAWkep//EFhJW9wywQFy2dMaCD6x0rWanih6xdYl+a8hTir2qjOknoBiE1lYRxRgVM
-         /whsUs9cl+Ycb2AwF8z46BlbbZhWzq2Pmk/lSOqE5IkoroReJFVjrZ+U+1szEvSK6pmk
-         QuYiSTtT7Z/pq6rwN+f6YxFrG2KQnyFXY5sMHbedmi3Q642Ov5MBM/fOix+b27wozxUV
-         VDzacX25oMKjSSCEjRbKUnkEQ0yhlLisnQCaTAysRvJTC6r6HiOKf1jTMCBX8OsO+m5/
-         RvXYkVstXSGVKRf9ehh9ysEdilZPK5RHl2PY19gQMPVMg125ANzOIdNrBAYetGIAzsNU
-         sMpQ==
+        d=google.com; s=20230601; t=1768264236; x=1768869036; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tTGelH1EjMWzWWpPI7L+r4iRVRFfJX23VrUbdCcWEwY=;
+        b=Yzge7/5heNHiX/Qjf1ZR9NJ4k0QZ/s4+Ovkc60bLZU1EYne+VvIbkpjSkEnjb8lVTQ
+         XVv+U3zW11B0St0r7c8wu+zzELinyP4mxXgEDF6+uU1K1qqoNnb09PzoKhy7FBs9xbTP
+         mF75E5JNJD2Dond3mWZ3bVVO/yf4S7Ynl54ty+JCfEdgjBjkOgOfldjLimz+rz1F41yE
+         RO4iYjeWTX79qtWDWS6PGvxc7oeoDTB/KVIZOPPucw5vM9j5Fz6K1QUwIhddpchrUA+U
+         MD33yO7l59qZLB8cqcl7+Mg3aS5tnUkevm5sVlGhIVYfzFdWDN+OIjNMAv9MyLJ9ITpk
+         FRHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768262056; x=1768866856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vbQpTPqvkNza84fX2uyalXQvb9OzER6/e1aJC0fiWDY=;
-        b=sezW57qZukYoi3lwtYhpXi2w1Ca5daByD2cb1oWZ/kUPdgoxypvzKAf2gP4+DRUDC8
-         kRVV4UexXp2tkMhrp0vLjD7vxTlqFPwREGOJUNCxWeumfVKlCmMonF9PPzTHDPOx/Nl7
-         ZMdtJEpdD+RUb950uacg9x8oef9RhwLwLTC0Agvfx7UoYE3/Ur4QilPKvLPLH/8eVsbv
-         nOGmh08xeO0lmRvl96Owsy+DRtwtLy6NgvsYATnyeHvgYmPlVVtJ+ARn0FHybOnV0Clz
-         v7j0cQfkW54B6p91BoXSict5a7yZN1cL4yHeSQ5Y6Gxz2aMZ5ztl68p+zoMljxR+zAYO
-         zWjw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjRqh06CGlri2LMRt6UgBrrwcwt+3SYe8Rtt69qr/wHDQiU4Eae8XniyNejXG4oIN71pI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxemBGC1X8LnOQVY7z3xBmGBfvYjhYWIkBaw+HBDYkskueefn+0
-	zp0PCFLAahkkSa0skNtBV5Ix9D5PYJ39FSmGA2xvMAorHxYEJaULVp3SxA3oaKh9n7U=
-X-Gm-Gg: AY/fxX4U4/J6Vb0C7qL807v7wo1/6g3EaHXb2ZJ29/yEQqfIzc6ELlMVXmjMXXohcyH
-	2X12Ur3jA/uqDH3bZOXgXvKs5JysOx5LV0hyWS/RiQQ3dLox9UNxi77CQ832Ppjoy06SQZ1Jb1h
-	qzDCDPfxo7z4izPoHLuAYEi3rVBZE0NDkEw7BfYYFHaYxRs4c5VzSRbW0fw4CkbaRJ6gzeazvAo
-	4ZZXMqbiwKf4t884sdKXb+55Jj1j1m45cpEZo89ohL+cfaPQUC/kD3ikDCaqcKyFAE5nzO2YiVc
-	aAIz9CubUyDJw0r/+D3Y2iU1pQ24rPmI97OBblP9B1f9+Egx+DrJCMEFT6kjzq5Lo0HDAz2A1rO
-	HYUgOFvnzWIVQXOUaqWC5JimT43yHDem73I1DI22TFJAokdxrAAZe0lfw+lVexSqVMAWC6WbPIB
-	7y7uMtdVNDiHp0OKmSgZ/fsiOa4sKsORUVUTFrOtYPnNqwyu1rdznUHIqhcKJTUNMLpvI=
-X-Google-Smtp-Source: AGHT+IFqShnh4nFq4FI+txOqV94h9FNeJmPa4/JUWRJXzRBu2Yp6JXhvTMJ52+U7dVhw4CMApET5TA==
-X-Received: by 2002:a05:622a:8d1b:b0:501:3b8c:7d63 with SMTP id d75a77b69052e-5013b8c8686mr4698571cf.26.1768262055766;
-        Mon, 12 Jan 2026 15:54:15 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8e35dbfsm129011631cf.19.2026.01.12.15.54.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 15:54:15 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vfRji-00000003fUm-0uFg;
-	Mon, 12 Jan 2026 19:54:14 -0400
-Date: Mon, 12 Jan 2026 19:54:14 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alistair Popple <apopple@nvidia.com>
-Cc: Matthew Brost <matthew.brost@intel.com>, Zi Yan <ziy@nvidia.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Balbir Singh <balbirs@nvidia.com>,
-	Francois Dugast <francois.dugast@intel.com>,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-	linux-pci@vger.kernel.org, linux-mm@kvack.org,
-	linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v4 1/7] mm/zone_device: Add order argument to folio_free
- callback
-Message-ID: <20260112235414.GO745888@ziepe.ca>
-References: <20260111205820.830410-1-francois.dugast@intel.com>
- <20260111205820.830410-2-francois.dugast@intel.com>
- <aWQlsyIVVGpCvB3y@casper.infradead.org>
- <874d29da-2008-47e6-9c27-6c00abbf404a@nvidia.com>
- <0D532F80-6C4D-4800-9473-485B828B55EC@nvidia.com>
- <20260112134510.GC745888@ziepe.ca>
- <aWVsUu1RBKgn0VFH@lstrano-desk.jf.intel.com>
- <45A4E73B-F6C2-44B7-8C81-13E24ED12127@nvidia.com>
- <aWWCK0C23CUl9zEq@lstrano-desk.jf.intel.com>
- <fzpd6caij2l73jkdvvmlk4jxlrdbt5ozu4yladpsbdc4c4jvag@d72h42nfolgh>
+        d=1e100.net; s=20230601; t=1768264236; x=1768869036;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tTGelH1EjMWzWWpPI7L+r4iRVRFfJX23VrUbdCcWEwY=;
+        b=MkV0LOoy7hMopwSPSqGWXS22nyk3lMmCifsea8in3HuqfyFsGQMfnTMAhyrrTGIuIG
+         xipcqs8wzj8qUKLuY4XwNDbc9ZEBiE/x2TMIUiJXSgTuhjNAKAmojWs6ys7d8g0g8kjU
+         PRw5rjLkLv/iRUWuTdVqj7WwQb18bOSVHZ5UcBOCD3EYT8yJAHSIli3I+3gdZ9Q9H7a+
+         zYveCt3QrgAIbRbm84DsxXwlVS1LJdQ+24GKCLCTxPgHq4T8Acc+2XUuRpMpt9duAgXG
+         zte5A+kGzGLlg4qsq5jZs/ovudohDIfdU5PWJMpztkbQoKfzGNcxD2iP464RPWAyf57F
+         6jvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVuaBxs0H859TS3fKekKsB+l1gVveFDP4dkWC8X7iQ3y769HcQrmhRPS/V2kzKdOHOrGWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqd/JfdFuccYjukobFsecBCBroBxji/Li574Zx+fHajCBwzXc9
+	aHNfAC9Bi7FHz3aGw+UUjY7ZLwHU6WnS8u7ImzFpfVAT6jaLHGx7QTSU+/Qq015hmVct7mvzydX
+	QOcQK/95mPLHHIg==
+X-Google-Smtp-Source: AGHT+IENkMl8pjN3xq/gUoO6a727rAcJVu3CiOBxXc3YxC6E+VpQFzDU6ky3j8dX95NrKpzdsK4WBAWf3VBi4Q==
+X-Received: from pjbch23.prod.google.com ([2002:a17:90a:f417:b0:34c:d9a0:3bf6])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:17ce:b0:32e:72bd:6d5a with SMTP id 98e67ed59e1d1-350fd12c181mr990901a91.1.1768264236116;
+ Mon, 12 Jan 2026 16:30:36 -0800 (PST)
+Date: Mon, 12 Jan 2026 16:29:55 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fzpd6caij2l73jkdvvmlk4jxlrdbt5ozu4yladpsbdc4c4jvag@d72h42nfolgh>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260113003016.3511895-1-jmattson@google.com>
+Subject: [PATCH 00/10] KVM: x86: nSVM: Improve PAT virtualization
+From: Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, Joerg Roedel <joro@8bytes.org>, 
+	Avi Kivity <avi@redhat.com>, Alexander Graf <agraf@suse.de>, 
+	"=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?=" <rkrcmar@redhat.com>, David Hildenbrand <david@kernel.org>, Cathy Avery <cavery@redhat.com>, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 13, 2026 at 10:44:27AM +1100, Alistair Popple wrote:
+KVM's implementation of nested SVM treats PAT the same way whether or
+not nested NPT is enabled: L1 and L2 share a PAT.
 
-> Also drivers may have different strategies than just resetting everything back
-> to small pages. For example the may choose to only ever allocate large folios
-> making the whole clearing/resetting of folio fields superfluous.
+This is correct when nested NPT is disabled, but incorrect when nested
+NPT is enabled. When nested NPT is enabled, L1 and L2 have independent
+PATs.
 
-+1
+The architectural specification for this separation is unusual. There
+is a "guest PAT register" that is accessed by references to the PAT
+MSR in guest mode, but it is different from the (host) PAT MSR. Other
+resources that have distinct host and guest values have a shared
+storage location, and the values are swapped on VM-entry/VM-exit.
 
-Jason
+In
+https://lore.kernel.org/kvm/20251107201151.3303170-1-jmattson@google.com/,
+I proposed an implementation that adhered to the architectural
+specification. It had a few warts. The worst was the necessity of
+"fixing up" KVM_SET_MSRS when executing KVM_SET_NESTED_STATE if L2 was
+active and nested NPT was enabled when a snapshot was taken. Aside
+from Yosry's clarification, no one has responded. I will take silence
+to imply rejection. That's okay; I wasn't fond of that implementation
+myself.
+
+The current series treats PAT just like any other resource with
+distinct host and guest values. There is a single shared storage
+location (vcpu->arch.pat), and the values are swapped on
+VM-entry/VM-exit. Though this implementation doesn't precisely follow
+the architectural specification, the guest visible behavior is the
+same as architected.
+
+The first three patches ensure that the vmcb01.g_pat value at VMRUN is
+preserved through virtual SMM and serialization. When NPT is enabled,
+this field holds the host (L1) hPAT value from emulated VMRUN to
+emulated #VMEXIT.
+
+The fourth patch restores (L1) hPAT value from vmcb01.g_pat at
+emulated #VMEXIT. Note that this is not architected, but it is
+required for this implementation, because hPAT and gPAT occupy the
+same storage location.
+
+The next three patches handle loading vmcb12.g_pat into the (L2) guest
+PAT register at VMRUN. Most of this behavior is architected, but the
+architectural specification states that the value is loaded into the
+guest PAT register, leaving the hPAT register unchanged.
+
+The eighth patch stores the (L2) guest PAT register into vmcb12_g_pat
+on emulated #VMEXIT, as architected.
+
+The ninth patch fixes the emulation of WRMSR(IA32_PAT) when nested NPT
+is enabled.
+
+The tenth patch introduces a new KVM selftest to validate virtualized
+PAT behavior.
+
+Jim Mattson (10):
+  KVM: x86: nSVM: Add g_pat to fields copied by svm_copy_vmrun_state()
+  KVM: x86: nSVM: Add VALID_GPAT flag to kvm_svm_nested_state_hdr
+  KVM: x86: nSVM: Handle legacy SVM nested state in SET_NESTED_STATE
+  KVM: x86: nSVM: Restore L1's PAT on emulated #VMEXIT from L2 to L1
+  KVM: x86: nSVM: Cache g_pat in vmcb_save_area_cached
+  KVM: x86: nSVM: Add validity check for VMCB12 g_pat
+  KVM: x86: nSVM: Set vmcb02.g_pat correctly for nested NPT
+  KVM: x86: nSVM: Save gPAT to vmcb12.g_pat on emulated #VMEXIT from L2
+    to L1
+  KVM: x86: nSVM: Fix assignment to IA32_PAT from L2
+  KVM: selftests: nSVM: Add svm_nested_pat test
+
+ arch/x86/include/uapi/asm/kvm.h               |   3 +
+ arch/x86/kvm/svm/nested.c                     |  74 +++-
+ arch/x86/kvm/svm/svm.c                        |  14 +-
+ arch/x86/kvm/svm/svm.h                        |   2 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/svm_nested_pat_test.c   | 357 ++++++++++++++++++
+ 6 files changed, 432 insertions(+), 19 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
+
+
+base-commit: f62b64b970570c92fe22503b0cdc65be7ce7fc7c
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
