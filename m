@@ -1,157 +1,129 @@
-Return-Path: <kvm+bounces-67988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083B2D1BAA9
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:12:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0517D1BABB
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED79F3032960
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:11:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E051E3045489
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD40368264;
-	Tue, 13 Jan 2026 23:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0B536B050;
+	Tue, 13 Jan 2026 23:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1j8e8IIT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nqAAh529"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0489531AF31
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 23:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC8335CB93;
+	Tue, 13 Jan 2026 23:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768345865; cv=none; b=FmpHHOw+NCcRDRJA3ZJBcVyZ+J0v/LEUqSITuPBv1UvLGuMrQcm+5MqrXYkwPZE6L4/5rHb83xXwLY4WWPAj4kCEEcm7tutX470EsYV0/+zUHXvnvek/8PoSuhKgwFG9kgHLqh+ien7qSwuTYAwQwNEv6N3erZb0Q/hw5H9l4RI=
+	t=1768345980; cv=none; b=KcIZy2X6gGlM5j4Zib5R0f1IICzHVB8UlrEkDXhdrUx9z59X3NEVlvWO5d/635cROUQM9gi8GuGHFi3wcv+P5FPUGeAQ75uBEjNPUT/ffydelTXlforaztNUigKr9vf03S/Kr3slDKGz5j0OIDTD3yMWQtyrzTrWWs4w7/vLWLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768345865; c=relaxed/simple;
-	bh=fLyu+0cU6qmRu11TkEOA4FgiHbBAgNe08/ZJFz1riZQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HoS7HmnCZLppcvt/jApOprGjhhTcH3/KHqUrYoJhZ68SJZ9uU39VG2mEGO1q8davE+jllaBStw9Os6zzXVu0dSIO4Dijhzb/PBUn51UXsLGCN/w1hNn1DjWl5ZHWVpJWmyKeuCrF5HYXk0d8REMn2m3dJRUUiCQaV1ieC8Bxje4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1j8e8IIT; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34aa6655510so8564057a91.1
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 15:11:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768345863; x=1768950663; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gMHd11+SPOANXiJEC1562pMSsk1oD23Ptnjj0uWhAaQ=;
-        b=1j8e8IITICKtYyBpej7OJdWxrLBPOCEpDA02lbKoJ69o/y6cdLg+ZBC554touUuPnF
-         PXvxZInyUT8ol8yXuyk1c9jSpBqKHjPHqhGa24FCLEKoGMzciJhEVRFnt/GwVra1+vK9
-         L3/4sSV2EaWSaBQN49sYPB4pGjJ463epXJ1k3M2m33psbDZtxzNEFT+1ssg7weeKUiA5
-         nBTnSqAvQJcYweIlLQg3H0ioXOF9W4ydJdC1cO7IKwDXCHDBWIxwy25puzw0WICbKo8N
-         jnwcOMYMiRhMMwymknz3FzAzoL//Vccr5m4IAxUb8ppE9HMcP5dJGPYYMEuI5PjpJDWa
-         vUWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768345863; x=1768950663;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gMHd11+SPOANXiJEC1562pMSsk1oD23Ptnjj0uWhAaQ=;
-        b=QJJMG+lEp5sTncfpxJD462L4SDA4JKEmQXKzS2WvMcdu/LdYmyipcQo0ZMRaeu8e8L
-         hc+j0ua/wAB7v/6DQOPtL8YDg2k+/zFyRQLOx+h32yio5uWi0zhtdlwq6xstfmRv2rpj
-         A8pF9BflFpLAGVO7CbA4UdTncFp07SMjaSHrX6bcx738zWYL90L8VavU2RsHv+1GuthW
-         B7SbZARWm/46WTUHhLq5tHutnHx71Tv7o70WN2714UD2pt+N4PBOXUAMRyU3tj60zqC0
-         744kvV/VIvIvcCKCSM6VbZoAXRDSw5PsgOwW7uBKxG57ZIDXJLUDClxeRNJNt4gHpNIG
-         UgJw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ+dW5Gnhfi/aWgYGfCzALPFm6MPHBhUHMm0OiDKQVEsNfIvt/2H4dnK//dxiGZcMUP80=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHcID6DdxkHm5+4tyRvO64+sfjmyFfSkpw4JUR5VNMWGhr7Snx
-	GYQXWGJQzKcfwSdDLZq5iPATQEpIleccpH+ICfe0a6FVz98I36HzHp07sI94LGGnjmteQhsYvQw
-	2TbNdTw==
-X-Received: from pjre16.prod.google.com ([2002:a17:90a:b390:b0:340:9d73:9c06])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:520e:b0:340:2f48:b51a
- with SMTP id 98e67ed59e1d1-351090c679emr708041a91.15.1768345863234; Tue, 13
- Jan 2026 15:11:03 -0800 (PST)
-Date: Tue, 13 Jan 2026 15:11:01 -0800
-In-Reply-To: <20251229111708.59402-2-khushit.shah@nutanix.com>
+	s=arc-20240116; t=1768345980; c=relaxed/simple;
+	bh=tfux4HuM++A7BLYQlaWz5mpF//WwyNWgU6Ipl96sA5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RIoomfMS18r7Qpy4BSLqBXioMPiXzEGH8tiDMwErwmJA5vDc2yRBjkQo2DI5qmtGXZhF2Ig0sNxNUXAbTRuldDG5o+xKDIks28l6CR605eF0goebpETeuQzWt3cLLJ8o1NJWAjP/X6V2LjjvrrjxWYDvPg5z2jQm6cA9IoeIfNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nqAAh529; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768345978; x=1799881978;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tfux4HuM++A7BLYQlaWz5mpF//WwyNWgU6Ipl96sA5I=;
+  b=nqAAh529Wap5PRAuBNWOW1ERqtSVdKqybJiJ2X0aGgs8bkMDkE4Ogk5y
+   SqEdgCbGQwAczu0baC93vAUgXpYKyBCfwFpAKxR67zSRxPXZwekkv8/SG
+   DGRdgVLTHv+F2UMaWFVojMUMGh4pzIF73sZVGD7NtMy0Ud2FWZIEJduLL
+   UCYWgXaIkMVhlzLSGTfPPEtUnVhL9gDQRFzrEIB8QOIf9uk9UjfTDe421
+   3z/I6+EOQjSi742o7f2dNl2sVUimySh64fHhUcN4l08TkGLAqzhPOEmMH
+   02V4ZU0eG0n3X+Tmu3jXTOGKmq+wmhwqVJjrJl5tuu0ZcRqztR6xvw2aM
+   Q==;
+X-CSE-ConnectionGUID: Dzp/q/EJQ3Sbq7j+4clz+Q==
+X-CSE-MsgGUID: KQ/P4AJmQV2SNN53EoZ6WQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69376945"
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="69376945"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 15:12:57 -0800
+X-CSE-ConnectionGUID: kzgyrO3ORaOlo4V3eNE03g==
+X-CSE-MsgGUID: IWu9cYVeQviBmeKCDLTDgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="204307734"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 13 Jan 2026 15:12:52 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vfnZB-00000000FTo-04NN;
+	Tue, 13 Jan 2026 23:12:49 +0000
+Date: Wed, 14 Jan 2026 07:12:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Long Li <longli@microsoft.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, berrange@redhat.com,
+	Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: Re: [PATCH net-next v14 01/12] vsock: add netns to vsock core
+Message-ID: <202601140749.5TXm5gpl-lkp@intel.com>
+References: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251229111708.59402-1-khushit.shah@nutanix.com> <20251229111708.59402-2-khushit.shah@nutanix.com>
-Message-ID: <aWbRBd85eeb0awfF@google.com>
-Subject: Re: [PATCH v5 1/3] KVM: x86: Refactor suppress EOI broadcast logic
-From: Sean Christopherson <seanjc@google.com>
-To: Khushit Shah <khushit.shah@nutanix.com>
-Cc: pbonzini@redhat.com, kai.huang@intel.com, dwmw2@infradead.org, 
-	mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	dave.hansen@linux.intel.com, tglx@linutronix.de, jon@nutanix.com, 
-	shaju.abraham@nutanix.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com>
 
-On Mon, Dec 29, 2025, Khushit Shah wrote:
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 0ae7f913d782..2c24fd8d815f 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -105,6 +105,39 @@ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector)
->  		apic_test_vector(vector, apic->regs + APIC_IRR);
->  }
->  
-> +bool kvm_lapic_advertise_suppress_eoi_broadcast(struct kvm *kvm)
+Hi Bobby,
 
-This can be static, its only caller is kvm_apic_set_version().
+kernel test robot noticed the following build warnings:
 
-> +{
-> +	/*
-> +	 * The default in-kernel I/O APIC emulates the 82093AA and does not
-> +	 * implement an EOI register. Some guests (e.g. Windows with the
-> +	 * Hyper-V role enabled) disable LAPIC EOI broadcast without checking
-> +	 * the I/O APIC version, which can cause level-triggered interrupts to
-> +	 * never be EOI'd.
-> +	 *
-> +	 * To avoid this, KVM must not advertise Suppress EOI Broadcast support
-> +	 * when using the default in-kernel I/O APIC.
-> +	 *
-> +	 * Historically, in split IRQCHIP mode, KVM always advertised Suppress
-> +	 * EOI Broadcast support but did not actually suppress EOIs, resulting
-> +	 * in quirky behavior.
-> +	 */
-> +	return !ioapic_in_kernel(kvm);
-> +}
-> +
-> +bool kvm_lapic_respect_suppress_eoi_broadcast(struct kvm *kvm)
+[auto build test WARNING on net-next/main]
 
-I don't see any point in forcing every caller to check SPIV *and* this helper.
-Just do:
+url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/virtio-set-skb-owner-of-virtio_transport_reset_no_sock-reply/20260113-125559
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260112-vsock-vmtest-v14-1-a5c332db3e2b%40meta.com
+patch subject: [PATCH net-next v14 01/12] vsock: add netns to vsock core
+config: x86_64-buildonly-randconfig-004-20260113 (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/reproduce)
 
-bool kvm_lapic_suppress_eoi_broadcast(struct kvm_lapic *apic)
-{
-	struct kvm *kvm = apic->vcpu->kvm;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601140749.5TXm5gpl-lkp@intel.com/
 
-	if (!(kvm_lapic_get_reg(apic, APIC_SPIV) & APIC_SPIV_DIRECTED_EOI))
-		return false;
+All warnings (new ones prefixed by >>, old ones prefixed by <<):
 
-	switch (kvm->arch.suppress_eoi_broadcast_mode) {
+>> WARNING: modpost: net/vmw_vsock/vsock: section mismatch in reference: vsock_exit+0x25 (section: .exit.text) -> vsock_sysctl_ops (section: .init.data)
 
-	...
-	}
-}
-
-And then callers are much more readable, e.g. (spoiler alert if you haven't read
-my other mail, which I haven't sent yet):
-
-	if (trigger_mode != IOAPIC_LEVEL_TRIG ||
-	    kvm_lapic_suppress_eoi_broadcast(apic))
-		return;
-
-and
-
-	/* Request a KVM exit to inform the userspace IOAPIC. */
-	if (irqchip_split(apic->vcpu->kvm)) {
-		/*
-		 * Don't exit to userspace if the guest has enabled Directed
-		 * EOI, a.k.a. Suppress EOI Broadcasts, in which case the local
-		 * APIC doesn't broadcast EOIs (the guest must EOI the target
-		 * I/O APIC(s) directly).
-		 */
-		if (kvm_lapic_suppress_eoi_broadcast(apic))
-			return;
-
-		apic->vcpu->arch.pending_ioapic_eoi = vector;
-		kvm_make_request(KVM_REQ_IOAPIC_EOI_EXIT, apic->vcpu);
-		return;
-	}
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
