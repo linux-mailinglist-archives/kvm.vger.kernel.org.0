@@ -1,246 +1,333 @@
-Return-Path: <kvm+bounces-67912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D53D16CDD
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 07:21:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23BB2D16D76
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 07:29:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A32B6301AB49
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 06:20:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3FE46302D90A
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 06:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337EB36AB63;
-	Tue, 13 Jan 2026 06:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5153B369227;
+	Tue, 13 Jan 2026 06:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="CsxZI6Cb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VWWI3LaW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+OgEE1G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A4036AB4B;
-	Tue, 13 Jan 2026 06:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768285207; cv=fail; b=JlAloRiZ9CgZKAEIFAzQMqPPIWQQAySbuuu/LeI8vvYi2WGTSJRP48hMTXGhrO2WgvOHx6pRdbvlucDwnBeaGLRdbZI+l8GJHbxLPnTc9GeWn362/oSuSBQHLlrCrW1KBNxd2W87iaUAip9spw21jSWj9X1O6pLyB5JbjBxvq/A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768285207; c=relaxed/simple;
-	bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VTNA5OQQguPLY1+d8C50hJ4XCJd3kGtPUuWSuhHX+hEo1x6Xc8ozlvsI6lmdoorS2bRgDJ+QcP9BD53dmEz+OKQkC7E7RriBV0LwBYlhb0Tj5VLRCMcAW0Joj8obIgpgRUIEGvtT0sQCZh70tnTKBw1UCH2w+IzPDuNWaJGntx4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=CsxZI6Cb; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D6INKY325821;
-	Mon, 12 Jan 2026 22:19:54 -0800
-Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11022107.outbound.protection.outlook.com [52.101.43.107])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bngnq802j-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 12 Jan 2026 22:19:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UJyOqd7roKL4bB8swO41jyBE0VbX/OfL18DhGNDs4gGRh/cGSinTwRnH+WXQRvYGkkAZTun+AphftRM+eoAReTwdpsC5yzG/2UPvCCjMJIE3XmxocyAQ7gIn2lCqbpoKVuvbIf0BjBaNoZwnyZ6KJejmhISIFKF1CRhxZvJ3CzSCJ6QX7yjgrB6nLbP3uE5ls3HxOgkp+zajYmoEUhodF2lv2rKNnrcQsh1kYFpycrqwwk57oxtmKG4dTr5mF2VBPNCGoFgook/1lUjtaQ8J21AFWGUnX+vX9TQRYk/WaHcZ3C3Su/uoTIiw02SrIcgUoWxqlA8B2BUD2Ox94FuVFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
- b=qVaOVfdsHJ4zcPJw8ypCDz0DRNTQit12WNPCqUVSXTUsMTIEOIz/rGrdQ+amlgZ7UPWKy+Fl3FpcVdWvTuk6l6ePqjwJC60PwuOiEnrqOtRQpucF5QmsKwBFidugF848SRew1gCO3JFpSkpNcB2kL1FtDeFBgb61X+whifF8hC0PGp+lvOce5w8fTg6Waid1m9lJlr2cVXB3ueumb9pTbvX6zSwuG7H6IvbPhJCgnjdfr/kFd3QzaNIde/a1RiJxfWx4Evp8cj/rm+DuNkMTzN9cyigABI31zWOjFKRWWx2mTmMo0KA1o5ZDi6XIxwR3R12p8pCUvP2djDSfbJeOVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
- b=CsxZI6CbfaY6HE24qGo6iWngiIMon/Bf/5JLXXJ0W3t3HwIyTIZlxI0pZ/jgIppKZCmauYRabX2QhsWDgKvVEp7uWdAJwSAmkPU3f+JvAZEqP2Gcycq/VRtbHJAWFYBuMHHD8GeA6MrplRvtbfYzM7qgcqtpuwdevrVWJsymFVU=
-Received: from DM4PR18MB4269.namprd18.prod.outlook.com (2603:10b6:5:394::18)
- by SJ0PR18MB5213.namprd18.prod.outlook.com (2603:10b6:a03:381::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
- 2026 06:19:51 +0000
-Received: from DM4PR18MB4269.namprd18.prod.outlook.com
- ([fe80::9796:166:30d:454a]) by DM4PR18MB4269.namprd18.prod.outlook.com
- ([fe80::9796:166:30d:454a%6]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
- 06:19:51 +0000
-From: Shiva Shankar Kommula <kshankar@marvell.com>
-To: "mst@redhat.com" <mst@redhat.com>
-CC: "jasowang@redhat.com" <jasowang@redhat.com>,
-        "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Jerin Jacob <jerinj@marvell.com>,
-        Nithin Kumar Dabilpuram
-	<ndabilpuram@marvell.com>,
-        Srujana Challa <schalla@marvell.com>
-Subject: Re: [EXTERNAL] [PATCH] vhost: fix caching attributes of MMIO regions
- by setting them explicitly
-Thread-Topic: [EXTERNAL] [PATCH] vhost: fix caching attributes of MMIO regions
- by setting them explicitly
-Thread-Index: AQHce7UIItncUIS6dU6cL1NVseOYirVPsZCA
-Date: Tue, 13 Jan 2026 06:19:51 +0000
-Message-ID: <ECE065A9-1556-4525-A478-62343C6FB477@marvell.com>
-References: <20260102065703.656255-1-kshankar@marvell.com>
-In-Reply-To: <20260102065703.656255-1-kshankar@marvell.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: Apple Mail (2.3826.600.51.1.1)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR18MB4269:EE_|SJ0PR18MB5213:EE_
-x-ms-office365-filtering-correlation-id: b0c71b2e-014e-4064-20db-08de526bc2a8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?UqFzpz0uCHscW1U0YXX/TThUiCKc9LyTYXb/yPcezuyPoYZuzou+Umz6S4qY?=
- =?us-ascii?Q?Ht+7gnoHFWoAq0eMV6U2bv9JFwghxH/WDvR64l0Lr/tORXz7zAI6jYDA+eaQ?=
- =?us-ascii?Q?Ce9bm3L0E4Vv8mMpGXRlK5rchM5ftSltGIm1U6t6Ydr3JOcXzBtgEdYrA/mw?=
- =?us-ascii?Q?SJLIhOJaAEB/DID/Kb28ylUPwrBisXNpRZHV0URjPjVYBHVQ8USkXJCOW/4e?=
- =?us-ascii?Q?9E0yVS5hnebHJvCtlGyYlhcO/SSj85ZnLtdG0O5gG3sqzfbIld6qOqDkM+H/?=
- =?us-ascii?Q?pf15rnJP00AQGk9FtxqRYindTcCboNhc9uCJrvhOewL+cywMsGuIOEvMqCcc?=
- =?us-ascii?Q?1VohoH4PEQhoQx35UMlXscJBEj2bRAQ0wdb323DSQd0rcUmCdNy4vSoKca7W?=
- =?us-ascii?Q?su1zVZhGNbspVszdeCYu75135ouMfcKC/sdqJAOXteh7LMK1mfqnQnSvRqF3?=
- =?us-ascii?Q?9ZqGclheOYvO8Us9KwKtedlvUEWCLpnGO4Xohyf7GSeGnSlz2t2Y/fXoJBYe?=
- =?us-ascii?Q?5Lle8v0s3KmjXvGbNOK9R2hdgOkCixaD3I+N0P7lms8756dydXnesbYBbawu?=
- =?us-ascii?Q?IvVEAdx/CuiXjPpQFvaqiGpGeQQocoFwHVGxRPGwjmvhGkpAGOPg1l50L9ew?=
- =?us-ascii?Q?vP1GMNFw5LGbWNrWC+7fi5hIsPxrQQx4FqpeMiiOX39v6KzvIy2h+r6aSTDB?=
- =?us-ascii?Q?Ozo1l+S+58SgE4Bk4HmhP4PYWZsD3i8IxqGAoa2Y1/SLtCK/LeU7m5TmJZRg?=
- =?us-ascii?Q?QjvaiLu+cHQ52FsD8pFQPX8Djhcj4p7adcZuszZCUz/iKT99T+4w/8eELiuH?=
- =?us-ascii?Q?Qq+6zejHjHU//yxRwC+TYfEpB/NGi0OUPUzUWft9BbYS4Fyy97mzbdc2goN0?=
- =?us-ascii?Q?eSSE9gRE3NTp7MLKKv8kvMlCxvQLAeg9SBV+0kpELRLNNhs5Zp/0c13Wbmi/?=
- =?us-ascii?Q?i8zIoVszbrI7j4hsRGUdyPqhkKLVbQDntJnQgmNkRUS7oeeA+mVRxvVJcVao?=
- =?us-ascii?Q?2b1WqOniKy9jKBAgOTcHf4m4RVJbKYXdCFUogyK87hXmpyqH8FiCYE91y7Ar?=
- =?us-ascii?Q?Ux602fECBbNMVADgh/hQPdXeqvSg80JqoAjgcga1xfYMm2tX5bfjxdLVHlAN?=
- =?us-ascii?Q?9Uf9VSFVuW5n5tNVfn9zyYvUQd9TdbxfAhfFWNYHi9sDMPMCp975Zt32rwlB?=
- =?us-ascii?Q?GSASjqnS9LT8bpYJ1lgInwkGIitz9R3kHc5hf7jFyAnADuWCzGN9V4PSFRnN?=
- =?us-ascii?Q?WoQSdcZZhKzqtoKPTp1KqHvNezfqQU+efRICrbQQ9OJju29Fhu2y/Ddy9oiQ?=
- =?us-ascii?Q?OyayhTcUXNL1xZwdZXLXSMfvf/lUqY5c3MoNUmE2NW6jpmWJNAeUOIQ3y+/F?=
- =?us-ascii?Q?Oc/+Zpp5kenSCgve6ngaUSm+C3Fh9L862rTIjugUdQg0v4JZagOHm8jiadnb?=
- =?us-ascii?Q?EKrI4gpzXOIIhnNf5DewPYCFO63kiAQe+62zyLcVWScCfm6yswwU7+fjXT63?=
- =?us-ascii?Q?i2WZces4RSarazgydFnuQboKXQTog2HLVosL?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR18MB4269.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?TOVPVgcPv0L+uGYoEb1ETwPGtHjJdYdFVb+H0ZehQsl6otIF4TmxoGI0HS5R?=
- =?us-ascii?Q?32xoeDTEUZSwrTAxNSLqoM4BIwn2aAZH5c3ZaF252pj02e8c8FVTTxLoyVMG?=
- =?us-ascii?Q?DQ1HOUfAzgfoJf6fm7bNAdhc45LOrL+Ikv1S5RDm5vqJpC9IPY/XLCFy39Na?=
- =?us-ascii?Q?bmEI5JmF7m//ABWCeZ/9FxVJInTEZLlg7xDRW+OgZbUGWJzvX9omqLMyU9MY?=
- =?us-ascii?Q?yuvI00Y/m6VaPpAxyBu9MvVVGN7NWyqM2Ve8o23/VH2p0I5dhe/cvvkNzYCK?=
- =?us-ascii?Q?6wMIFPOw4YEEsRLAlN4aT842J1XaXOb/gTxux3G6uXmgQDOz6WzDFOgATdUp?=
- =?us-ascii?Q?h127owBza3MXb4dhpwo9TpVrJXIlvfq4+lKo4/ghPRgdqM1/exVdW6svJih8?=
- =?us-ascii?Q?YR3KlCnfwf9XkHndTVZe/dhH7a7MZdKavZJ2ycMI+B8tQotnHvVrGnQXw/1f?=
- =?us-ascii?Q?UwTTos5sO6EtualxGy/BunL1ps+Lut8kbKuQcyFSZXI8pNd1lSgI57SR/wn+?=
- =?us-ascii?Q?al6YnjiQpEqVbdCOjgNdKzh6fOkpjhvTrinrFLn6wSwKXqy/3QLIsm1QmKPd?=
- =?us-ascii?Q?Pe2j1RB+9eLqR9uhcyOvQHpHmD28sGDqN+yg5cFXFx8P4wMuULl1hHs4OyMc?=
- =?us-ascii?Q?CU9vHzMOyKx2qiGttHsDhqE/xIulEXtj9NeNl1SVyoKCzZaIiIxBJtPv0sL7?=
- =?us-ascii?Q?ACuKdZMnCt9pLx7qVmoEnhJ3yAJ8YXcxj1IElukFMOYb2pVqDHNwBbZ+GmcG?=
- =?us-ascii?Q?7U7U7LO7inHarPXUq0p3ao3QfRXkI50xvbEdV9VKUMydICKkc3Na2IP1yZLe?=
- =?us-ascii?Q?p6/Ni/1Ev2ZZPj05F0Yo6esWQ6HP0i2n1L8UrCZqblvbTssHHkRjuc3XML+P?=
- =?us-ascii?Q?EzWKl4nU/ay5s76CYrU+QfJaDBx3KahlqXJJSj3Gn18Ro1BTH383maEe/Zbx?=
- =?us-ascii?Q?C8bjq5Avn4xlDim0Wu4T2BghjUo6LypUMRQgFjU2g9pYpRPfmO5iak6swJ1q?=
- =?us-ascii?Q?rFLxgYtaP23VcLz/fh74tMNBxniqgazCgDshaatRsc90N2REChmYV6jpmHXs?=
- =?us-ascii?Q?b3TYPiyLQiCKLbkig9LEeSM1/XWSE5HY3e60aao64j3XUsnZY/mI2XeDMdaA?=
- =?us-ascii?Q?IRQ8EjxnkuJMRmeqqZ0vfItJApeVVXD6fpc9+Glbac/eIRckh3FGTtdPA9pS?=
- =?us-ascii?Q?hZ1RdEec8KDiPahTOzyKzl595NMHmg6oV1umD6X1fby8cUDe6yRCNhOKRzsk?=
- =?us-ascii?Q?tIbEApikCrXENkyx1M0XZ3StMGrQ8XsC5AVsWuq7KXdulT2sXdW0xB04i9G5?=
- =?us-ascii?Q?4e06IGV/gcetsfvizL/vEMXW5Z9qOoD3v6oSug1uK4TgZ+WWE3ttiOdBihyc?=
- =?us-ascii?Q?Vk3BJaXlZJGNLp8rQMCdD1qJudNyMqBUX7oqz5jDx8aW7T71Y1TU8GSQFn1i?=
- =?us-ascii?Q?bS9ACPDuszPB09nqFnyrx/K73KgXqsfYB5QJagAPoEntsRVE9wZWtnTzmjEc?=
- =?us-ascii?Q?z1EVhY7nke3lQPFpsWDKdtgllpmd4M+jSmgdjFxKhzWjLOEM5v0R3gxFkDyk?=
- =?us-ascii?Q?x6ZbH2SGNGn+jwss9qigVXOUKr79j0UtGtI1CJfpfKj4GKctdk3fpJZZatd5?=
- =?us-ascii?Q?y3J9C7nbbCaaezbOO/FedpYYd3s+XV9n2DoocfqosGb4EYJaNnD1cJaYMz5Q?=
- =?us-ascii?Q?4B7XlepuayZ2JVW7sNrCETgWNdJUgev+aJknNPgAkKnfWz0YLdCOtAhghpmB?=
- =?us-ascii?Q?2HrxLird2Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7DACC71CC02521498F00DF9729FFF151@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56C7359714
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 06:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768285600; cv=none; b=D3LGKPDL50V3UJCucfB440VPK+ERdGHRYjI20LK0QvduBD7f4XAu64u0PRudGOTZuUJ3drd2ixL2Mta2s1tX2uAgHmCBrpA3rbxLvc8KIfqb3p1aqjQ3ySrFYo0SMSbMkIbyMd90hqCpsUp1vAVXlxr1n41ZeQ0tWRF7TKoZ1Zo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768285600; c=relaxed/simple;
+	bh=2KJOX7Y1h6Sza8SV2r3yloVs1Dz7199qc4bMzJHHhMc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=clvIzOkxUD+onKdHvqMTs8HuEg3V9F9f+jNdQQxtTKyP11yIkm4KRwFJWlFL7FFRABvUoquLy0tFLFw4aQmpZISf836zP6Eto68yXStR/1Gvveiekx0Ic7WqMOEP55IL6VgmvTfFhWhCNpEq4IjN1Pm80npPhfP68AbN3/5dNGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VWWI3LaW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=g+OgEE1G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768285598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=spmIztd2EKRamvoD/LZmM+FSW3z8/AEEzT5gP8xnhtI=;
+	b=VWWI3LaWqW0M/wWFBs60jqn+GVyRsGW5HdASjlWIKFUkqGvS0I3MBkprW3cOncrEMvyD71
+	YsuCG3dejPSVQkcVYEwe3fmNhJT9jcwmS6WEf+oMXSQPOMwcKT8yeMhJxJQY7S4It+J5we
+	7Zsp4xp29O+kKRb4Cm2JhiogbNy6MZo=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-uY29XdNfOm-FTCqviJQk9g-1; Tue, 13 Jan 2026 01:26:36 -0500
+X-MC-Unique: uY29XdNfOm-FTCqviJQk9g-1
+X-Mimecast-MFC-AGG-ID: uY29XdNfOm-FTCqviJQk9g_1768285595
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-34eff656256so7334944a91.2
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 22:26:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768285595; x=1768890395; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=spmIztd2EKRamvoD/LZmM+FSW3z8/AEEzT5gP8xnhtI=;
+        b=g+OgEE1GjxfdvU0bJ4XMAgpAP+WK68cVC8nLF5o920ssdewltXBNO+rIhRY/B81Dwf
+         FuGv3MaKXyh+SEKNm8HlP59186LGN3J5P68VKsOx2hF+0kvc3ofSVU0Pw/Hx/3EhK9QG
+         V8YCIDKl7tpIFGXqltVFKaYasCKZ7e5CiSakh2SDJYIP7Cqh7UudTTjpUPxMYtiem4EN
+         kNezU8fblb7YY63JuEmAbB+PfZvNTNDN/vb7dIEgzwQMYqaOdlYlcXODTqpgiRcJsm9g
+         YITLhOr1PrsDU4SwF9OOpSg6jS9zXNwpMUxyCUbtRgJpOPQ8JCVeLLg0ACTXDJCgqfNI
+         JlVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768285595; x=1768890395;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=spmIztd2EKRamvoD/LZmM+FSW3z8/AEEzT5gP8xnhtI=;
+        b=RTGKLoinoRYLb/P25OLJ8xzNiagz1UssO+6BTkyUS2eWY8h2SAposug4qAlJ2e3N9E
+         OBxcY4sPwW1rcGL/8qJ59BwpVCs+oQuZsGaVnL0xZ+ZxsJUp+66ml+miY83If0YyV2ZT
+         G2F1elUc/DXPk9Jzw2JQeeLtoA7aI6rQqdPz0rZphn405AvTnv+WVkfY7RYhtSF1UhIy
+         QZy7xFR7Oj/aGw/XeVQi/zI7nXlrEHFB8UATh8AxG+Ww+cfB+G6BL35MVJmlj7pPfsyp
+         7kMfjF2nhvN6JVsDZZTq6Ts3DdsJYSmABhudaxvYPS5CTl8EKluhC8wkJqYGvcTfZNhR
+         5pFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWdzpMu5yXvRYcJZs7Rl7mlNaLPt9N4JVRAZDA2IrsRlXXn0HliCxTl1VwOeaGmmxVGET4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMm4ckK6frEHi+Wcm4vkcYRH4v+VnuGLD43KqI990qe2RH0HfC
+	fZ508RLYYcYYQkcdN6OlbeZP0RVrnXFCnERZ47/oxOZzhiXewYtpB1M2HvyiaCjDC5lnYiinR3a
+	70wAzq6nCFOH1CMZOJK2u+wpAgaowvOoq20M+k39KwJxct1uqkod6Ic9ogZoS1YeXJwTzAKmSfa
+	Qw5+2mdBXk3L8gtBWCJYnClvd5SzAM
+X-Gm-Gg: AY/fxX4sRo7Q1xjAw5USbxJg+22ZPbNHD4eelgezRNAqQBrcsakTs2c6BqkAOasdoNj
+	hTTGcjmOQfYeGTnfmrKQxQtpr7z17Ec1sNUm+IAFrGbmFy2wL69xoJ8uqX7sNblJhFqJELC0+uE
+	ZS3k6RnWo2+9Kgi67s6IclK1cIoPvW//CFVKLdIH48+Hd14Co1aEJ+07KYZMbvejMkUEc=
+X-Received: by 2002:a17:903:2309:b0:2a1:1f28:d7ee with SMTP id d9443c01a7336-2a3ee4e7b36mr210661605ad.57.1768285595139;
+        Mon, 12 Jan 2026 22:26:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEkrFx7g5uPp/RVCdWIKCbFMZKKQEX7QrKp7mlNw23iQIFZMsd+pNgwa63opXK27IJ+KJs7xwsgiZ/pqlR/VE8=
+X-Received: by 2002:a17:903:2309:b0:2a1:1f28:d7ee with SMTP id
+ d9443c01a7336-2a3ee4e7b36mr210661285ad.57.1768285594667; Mon, 12 Jan 2026
+ 22:26:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR18MB4269.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0c71b2e-014e-4064-20db-08de526bc2a8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2026 06:19:51.3429
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OHylkZ4cNx/+oa0ml9ABXAkj9VvEo9UjamBqCwGlZrV1O7jzkO50wj/ny5TnuMeqD8TcAoNskY30Lb3/FoAiHA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB5213
-X-Authority-Analysis: v=2.4 cv=DLeCIiNb c=1 sm=1 tr=0 ts=6965e40a cx=c_pps
- a=sUbwXUxkMQNSWKNRO95rnw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=vUbySO9Y5rIA:10 a=-AAbraWEqlQA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=M5GUcnROAAAA:8 a=20KFwNOVAAAA:8 a=-EP0ZEmctIjLeFn3QbIA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: 6KcMf4VJVleEfBZy_LxSdixmxdOd_xP2
-X-Proofpoint-ORIG-GUID: 6KcMf4VJVleEfBZy_LxSdixmxdOd_xP2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA1MCBTYWx0ZWRfXzhvDcatB9ioh
- 7oAtAhLWkn1YpXGAin2qsWzYCL9qg6iCRJNLftanyHkZ3gCuI0eiq+C8XC64A38t9egSObnEbpM
- gFuiPVfEz8XZXzpyvpezQa3w3HM0Dt78Ceowzh7KttQG1ppzKwrAoY+bpXM6YPY0JIrDHcZCwji
- N6T1Bkr7/zYsE0u4LwUruSg0NrvH7E7vaV5MFULuLx8wXRuAiTPw3qtPE4GV2IxHxf/xWgXJAKE
- CTfTu6uNiGZg7lZpNkLV2Tw0vyZiQlUtMbXA8+sho3A/FiCPE+wyMFxXSfVfdp20oi/I/HSIQv6
- wxy7HIh7Yc8U8R9CLK9RRo6wvYK886gy/gMBv2Tpx1zOIMcS+/d8nN78IKXIsVCgq5zDuq6/24P
- aex8L9iPPUXa1AJZcKT/6hcrau8SCOS9t1hrh0kEC0auC6o/cT2370miiUFHyI8B9KdYsaPCcW2
- hCV93zofqntZjWEjWYA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_01,2026-01-09_02,2025-10-01_01
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-10-simon.schippers@tu-dortmund.de> <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+ <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de> <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+ <900c364b-f5ca-4458-a711-bf3e0433b537@tu-dortmund.de> <CACGkMEvqoxSiM65ectKaF=UQ6PJn6+FQyJ=_YjgCo+QBCj1umg@mail.gmail.com>
+ <9aaf2420-089d-4fd9-824d-24982a86a70d@tu-dortmund.de>
+In-Reply-To: <9aaf2420-089d-4fd9-824d-24982a86a70d@tu-dortmund.de>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 13 Jan 2026 14:26:20 +0800
+X-Gm-Features: AZwV_QjHXGnkpFliLh_wH6DUhN9nDzDN7okYZwH3wTHNoiHdG1zRFgliI6b-EAo
+Message-ID: <CACGkMEvpb-kAhC7hB2SOtBZ6L6O9SVGK3J9e0pN-XJmpztr2CA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 9/9] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when qdisc is present
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mst@redhat.com, eperezma@redhat.com, leiyang@redhat.com, 
+	stephen@networkplumber.org, jon@nutanix.com, tim.gebauer@tu-dortmund.de, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,=20
-Just a ping on this patch. Would appreciate your review when you get a chan=
-ce.
+On Mon, Jan 12, 2026 at 7:08=E2=80=AFPM Simon Schippers
+<simon.schippers@tu-dortmund.de> wrote:
+>
+> On 1/12/26 03:22, Jason Wang wrote:
+> > On Fri, Jan 9, 2026 at 6:15=E2=80=AFPM Simon Schippers
+> > <simon.schippers@tu-dortmund.de> wrote:
+> >>
+> >> On 1/9/26 07:09, Jason Wang wrote:
+> >>> On Thu, Jan 8, 2026 at 4:02=E2=80=AFPM Simon Schippers
+> >>> <simon.schippers@tu-dortmund.de> wrote:
+> >>>>
+> >>>> On 1/8/26 05:37, Jason Wang wrote:
+> >>>>> On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
+> >>>>> <simon.schippers@tu-dortmund.de> wrote:
+> >>>>>>
+> >>>>>> This commit prevents tail-drop when a qdisc is present and the ptr=
+_ring
+> >>>>>> becomes full. Once an entry is successfully produced and the ptr_r=
+ing
+> >>>>>> reaches capacity, the netdev queue is stopped instead of dropping
+> >>>>>> subsequent packets.
+> >>>>>>
+> >>>>>> If producing an entry fails anyways, the tun_net_xmit returns
+> >>>>>> NETDEV_TX_BUSY, again avoiding a drop. Such failures are expected =
+because
+> >>>>>> LLTX is enabled and the transmit path operates without the usual l=
+ocking.
+> >>>>>> As a result, concurrent calls to tun_net_xmit() are not prevented.
+> >>>>>>
+> >>>>>> The existing __{tun,tap}_ring_consume functions free space in the
+> >>>>>> ptr_ring and wake the netdev queue. Races between this wakeup and =
+the
+> >>>>>> queue-stop logic could leave the queue stopped indefinitely. To pr=
+event
+> >>>>>> this, a memory barrier is enforced (as discussed in a similar
+> >>>>>> implementation in [1]), followed by a recheck that wakes the queue=
+ if
+> >>>>>> space is already available.
+> >>>>>>
+> >>>>>> If no qdisc is present, the previous tail-drop behavior is preserv=
+ed.
+> >>>>>>
+> >>>>>> +-------------------------+-----------+---------------+-----------=
+-----+
+> >>>>>> | pktgen benchmarks to    | Stock     | Patched with  | Patched wi=
+th   |
+> >>>>>> | Debian VM, i5 6300HQ,   |           | noqueue qdisc | fq_codel q=
+disc |
+> >>>>>> | 10M packets             |           |               |           =
+     |
+> >>>>>> +-----------+-------------+-----------+---------------+-----------=
+-----+
+> >>>>>> | TAP       | Transmitted | 196 Kpps  | 195 Kpps      | 185 Kpps  =
+     |
+> >>>>>> |           +-------------+-----------+---------------+-----------=
+-----+
+> >>>>>> |           | Lost        | 1618 Kpps | 1556 Kpps     | 0         =
+     |
+> >>>>>> +-----------+-------------+-----------+---------------+-----------=
+-----+
+> >>>>>> | TAP       | Transmitted | 577 Kpps  | 582 Kpps      | 578 Kpps  =
+     |
+> >>>>>> |  +        +-------------+-----------+---------------+-----------=
+-----+
+> >>>>>> | vhost-net | Lost        | 1170 Kpps | 1109 Kpps     | 0         =
+     |
+> >>>>>> +-----------+-------------+-----------+---------------+-----------=
+-----+
+> >>>>>>
+> >>>>>> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kern=
+el.org/
+> >>>>>>
+> >>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> >>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> >>>>>> ---
+> >>>>>>  drivers/net/tun.c | 31 +++++++++++++++++++++++++++++--
+> >>>>>>  1 file changed, 29 insertions(+), 2 deletions(-)
+> >>>>>>
+> >>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >>>>>> index 71b6981d07d7..74d7fd09e9ba 100644
+> >>>>>> --- a/drivers/net/tun.c
+> >>>>>> +++ b/drivers/net/tun.c
+> >>>>>> @@ -1008,6 +1008,8 @@ static netdev_tx_t tun_net_xmit(struct sk_bu=
+ff *skb, struct net_device *dev)
+> >>>>>>         struct netdev_queue *queue;
+> >>>>>>         struct tun_file *tfile;
+> >>>>>>         int len =3D skb->len;
+> >>>>>> +       bool qdisc_present;
+> >>>>>> +       int ret;
+> >>>>>>
+> >>>>>>         rcu_read_lock();
+> >>>>>>         tfile =3D rcu_dereference(tun->tfiles[txq]);
+> >>>>>> @@ -1060,13 +1062,38 @@ static netdev_tx_t tun_net_xmit(struct sk_=
+buff *skb, struct net_device *dev)
+> >>>>>>
+> >>>>>>         nf_reset_ct(skb);
+> >>>>>>
+> >>>>>> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+> >>>>>> +       queue =3D netdev_get_tx_queue(dev, txq);
+> >>>>>> +       qdisc_present =3D !qdisc_txq_has_no_queue(queue);
+> >>>>>> +
+> >>>>>> +       spin_lock(&tfile->tx_ring.producer_lock);
+> >>>>>> +       ret =3D __ptr_ring_produce(&tfile->tx_ring, skb);
+> >>>>>> +       if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_pres=
+ent) {
+> >>>>>> +               netif_tx_stop_queue(queue);
+> >>>>>> +               /* Avoid races with queue wake-up in
+> >>>>>> +                * __{tun,tap}_ring_consume by waking if space is
+> >>>>>> +                * available in a re-check.
+> >>>>>> +                * The barrier makes sure that the stop is visible=
+ before
+> >>>>>> +                * we re-check.
+> >>>>>> +                */
+> >>>>>> +               smp_mb__after_atomic();
+> >>>>>> +               if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+> >>>>>> +                       netif_tx_wake_queue(queue);
+> >>>>>
+> >>>>> I'm not sure I will get here, but I think those should be moved to =
+the
+> >>>>> following if(ret) check. If __ptr_ring_produce() succeed, there's n=
+o
+> >>>>> need to bother with those queue stop/wake logic?
+> >>>>
+> >>>> There is a need for that. If __ptr_ring_produce_peek() returns -ENOS=
+PC,
+> >>>> we stop the queue proactively.
+> >>>
+> >>> This seems to conflict with the following NETDEV_TX_BUSY. Or is
+> >>> NETDEV_TX_BUSY prepared for the xdp_xmit?
+> >>
+> >> Am I not allowed to stop the queue and then return NETDEV_TX_BUSY?
+> >
+> > No, I mean I don't understand why we still need to peek since we've
+> > already used NETDEV_TX_BUSY.
+>
+> Yes, if __ptr_ring_produce() returns -ENOSPC, there is no need to check
+> __ptr_ring_produce_peek(). I agree with you on this point and will update
+> the code accordingly. In all other cases, checking
+> __ptr_ring_produce_peek() is still required in order to proactively stop
+> the queue.
+>
+> >
+> >> And I do not understand the connection with xdp_xmit.
+> >
+> > Since there's we don't modify xdp_xmit path, so even if we peek next
+> > ndo_start_xmit can still hit ring full.
+>
+> Ah okay. Would you apply the same stop-and-recheck logic in
+> tun_xdp_xmit when __ptr_ring_produce() fails to produce it, or is that
+> not permitted there?
+
+I think it won't work as there's no qdsic logic implemented in the XDP
+xmit path. NETDEV_TX_BUSY for tun_net_xmit() should be sufficient.
+
+>
+> Apart from that, as noted in the commit message, since we are using LLTX,
+> hitting a full ring is still possible anyway. I could see that especially
+> at multiqueue tests with pktgen by looking at the qdisc requeues.
+>
+> Thanks
 
 Thanks
 
-
-> On 2 Jan 2026, at 12:27, Kommula Shiva Shankar <kshankar@marvell.com> wro=
-te:
->=20
-> Prioritize security for external emails:
-> Confirm sender and content safety before clicking links or opening attach=
-ments
-> Report Suspicious
-> Explicitly set non-cached caching attributes for MMIO regions.
-> Default write-back mode can cause CPU to cache device memory,
-> causing invalid reads and unpredictable behavior.
->=20
-> Invalid read and write issues were observed on ARM64 when mapping the
-> notification area to userspace via mmap.
->=20
-> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> ---
-> Originally sent to net-next, now redirected to vhost tree
-> per Jason Wang's suggestion.=20
->=20
-> drivers/vhost/vdpa.c | 1 +
-> 1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 05a481e4c385..b0179e8567ab 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struc=
-t vm_area_struct *vma)
-> if (vma->vm_end - vma->vm_start !=3D notify.size)
-> return -ENOTSUPP;
->=20
-> + vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
-> vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> vma->vm_ops =3D &vhost_vdpa_vm_ops;
-> return 0;
-> --=20
-> 2.48.1
->=20
->=20
->=20
->=20
+>
+> >
+> > Thanks
+> >
+> >>
+> >>>
+> >>>>
+> >>>> I believe what you are aiming for is to always stop the queue if(ret=
+),
+> >>>> which I can agree with. In that case, I would simply change the cond=
+ition
+> >>>> to:
+> >>>>
+> >>>> if (qdisc_present && (ret || __ptr_ring_produce_peek(&tfile->tx_ring=
+)))
+> >>>>
+> >>>>>
+> >>>>>> +       }
+> >>>>>> +       spin_unlock(&tfile->tx_ring.producer_lock);
+> >>>>>> +
+> >>>>>> +       if (ret) {
+> >>>>>> +               /* If a qdisc is attached to our virtual device,
+> >>>>>> +                * returning NETDEV_TX_BUSY is allowed.
+> >>>>>> +                */
+> >>>>>> +               if (qdisc_present) {
+> >>>>>> +                       rcu_read_unlock();
+> >>>>>> +                       return NETDEV_TX_BUSY;
+> >>>>>> +               }
+> >>>>>>                 drop_reason =3D SKB_DROP_REASON_FULL_RING;
+> >>>>>>                 goto drop;
+> >>>>>>         }
+> >>>>>>
+> >>>>>>         /* dev->lltx requires to do our own update of trans_start =
+*/
+> >>>>>> -       queue =3D netdev_get_tx_queue(dev, txq);
+> >>>>>>         txq_trans_cond_update(queue);
+> >>>>>>
+> >>>>>>         /* Notify and wake up reader process */
+> >>>>>> --
+> >>>>>> 2.43.0
+> >>>>>>
+> >>>>>
+> >>>>> Thanks
+> >>>>>
+> >>>>
+> >>>
+> >>> Thanks
+> >>>
+> >>
+> >
+>
 
 
