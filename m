@@ -1,106 +1,105 @@
-Return-Path: <kvm+bounces-67943-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67944-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60307D19940
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:46:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5024D19AB0
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D37630B3721
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 14:41:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 332E03004858
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 14:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0002C3244;
-	Tue, 13 Jan 2026 14:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD292D7801;
+	Tue, 13 Jan 2026 14:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i5sbARgr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OpYL2D4L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37432BE05E
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 14:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D022D6E6A
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 14:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768315300; cv=pass; b=DDPdlzPaeNPjOu5GYo4CF41DAI0u8ARYlhMq0IVPZNZ3CdAZLZIpWdNOoYMCJ1ghznPo2CxMImbnd+tBOiyxJTV6/mgD2NvaJgiXD9KBP1eLfg9BycExksixFqAFoscX2d0aFw3/zsJzphc/t+6RxuSJq5ztzwHEvnDJhrOvQlg=
+	t=1768316358; cv=pass; b=BHvYzTJAyDquLRB8Z8YOiJOKt5eJ5lGPbdriJRaqoc67iORPRw21RHHkP70xYGFrXdtns6n2wVfrfFl/PmFKb0XgFuwaQIA9F13j2tR4Ib2cmDVdhWr2h1E1jCnEX5CHViJpDEVWwD+TY6JGdvJPLrZ/ptPbTq+RI+I84zU/gG8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768315300; c=relaxed/simple;
-	bh=dNriQwKXZH4dpoAWUnVSUJJKNeh/XVODgCOA7a8SQ9g=;
+	s=arc-20240116; t=1768316358; c=relaxed/simple;
+	bh=zPf3YoW4m/woyXDwob6YFjb2tYc58F297IepxgIBakc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DqdQloXlJHfZ0kJpQKNfz3fFaoYLJIuwsAv6t99ZhZgt58FtrGo/IYiSaCK6FF02cPWaA5KC0gnWev5+IQAjuPMYkq8OoRn0YzYrzVg5Z//L6NuiEaFTl0PkJykeDfTRu0sOCPgym+R6USM9gRRCXtUXhvyYJb6AwFAXfUSHIuY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i5sbARgr; arc=pass smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=R6Ay7B62WyE69l3UiusM1ZBMLX58VC+EZL6yTg1L7C+d3i7Ji++27jdXFrqnXGStzz4kU0l2HT625P2c0H6f0lT2CEoxnxOfXrYP+uu2R8RSHMFoK7AKUYUUXeBcXrvpmVghcCR4pDL/mLGyjts9MxTChQOSsvT/xNq0pLWlI64=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OpYL2D4L; arc=pass smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4edb8d6e98aso430261cf.0
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 06:41:37 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768315296; cv=none;
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ffbaaafac4so593541cf.0
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 06:59:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768316355; cv=none;
         d=google.com; s=arc-20240605;
-        b=GNron6lfsqrROiNPFvnRPZXs11VxOjwigSKVt4HgonjTxObD65QcSX326SZ7BWVwOW
-         otRPUPJwCc89k9ArA3wEw22D72X0MFowySOnDnX6uuy1kG9EDwxRZBRUTOKeUtAsaSfz
-         sxZkBEQNqOQPv9Ny0Im7jBMLgahCiJGjzlsZgaEkoUkVoZsab4oWq9eaZ9+XLRSKkLkA
-         7O7q+2sTNsPi2ibVc1Jn9MXujr619rHWHUpmtVnTGAdx6LIA/MhHbmwOMO1fuy1weVvB
-         QlPIpK/GhOcw0eU0iVdzlQdVzs85CY/E4xaYl4+afqD1AB1O6nUevfPHj0vCz3rmLmmD
-         5DUw==
+        b=N6gPeTVbbyhdERkLVtCYa46MgoNlu8zlfI+H/1DSezEfL1zTRCsTJ6PFbDwDiOA5j2
+         2WheU9NqEOxYW9CRBJOfmf1DeTomQOCfvWzj6CPFtqwyTP0KhF8fWmZVCIDGowDont1u
+         eGzU9N3fodTAOhtcdJ/kBaSS5f8FBUuc8OSDCWd3F8Ir+q8B3Ztw5F4qRFTwbSdrzbH/
+         Fy1fMB8+ETPCUnGR3hnd22I+yUqTn7KCICw66b4ahxxTjURbPEOaK3g00vdcHyt9nIoV
+         ANWzqH3f/But2FxmRF7+tVOagUxpCaXdpi4lct6q3/oq82ZC7TdnxTRuchIsqGHSGwIF
+         jHog==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=NyT7yshjxI28rxht5+ZbiYBc0/2eKd+sQKdTY3zp/D4=;
-        fh=G22GJlnO1yrK7nHN+3GWoMf2HqfPE9T9vcK6/XemH9U=;
-        b=APbhhmb8o/4rfVH39LYg9JSmX9BHdJKMW0Y+7VqtMO30MwdkQKq4NneBpocTSr1VDQ
-         0QAhO+696Uq2zuflysXzgkIfLawJNZpckODI0dGoro8Jg0kAT1XBKBCewFJpMkgpfwUR
-         +soeIwziCKulAXZDaOMN21eBAl4woUBexjLggX6D8Sz6irxADIeExjQys4pW3U5G2lOv
-         47HvYXzcyTCwBWLo1A//BckMAbZPUbt5VjNEqHIiCmlNZIVVAYOI84JeGlhdcpkSLadn
-         3Mr2smfc20/2yS1M/lHogzcbj/9flzReS6wJK5DGE5X5z97NkP4ywZpX1cSFTB+o/y/4
-         YL0A==;
+        bh=pZlojhgCGQRJd86Bfq6GmjSuTaKdj0Ma2frE3Xf58I0=;
+        fh=vJZVlOFcvmgRdnY90y4r0OOP30KcMQPPaOkl+jZaqcs=;
+        b=Ykp6/N+K3cP4SWLHvTSm78DgLemdOXn+domg14SG5Zyj+3L7ICfVHZrWjGoTT2BLiq
+         bCd8ve7OFCupVwLrobHFFpqt1On/Oj7hz3uh0d8PRgAwDbNheIEEJOL+vcaM6/NGmULE
+         2sMg9FaRkQCx/kRZdyADg9GEM6kaxoRhoGXcTh26IdWsZsSQjQAq/cMU8SV76edAKAE5
+         d0NRuENQzelaS5bTNoEiVTP3Ft8Sk20zRNZtYd/LCVEa7I4ohz/QZ4Im4LxR8lFE2rLe
+         eMouvIVm+tN49Co4Fwqdw7h/sbHgBMHJzrdEh3cpZpjI78TcB8qWofJmoaB8PkFR930Y
+         W5SQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768315296; x=1768920096; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768316355; x=1768921155; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NyT7yshjxI28rxht5+ZbiYBc0/2eKd+sQKdTY3zp/D4=;
-        b=i5sbARgromojfpICDXuDKKp3WmPcP6k7qk3NChxrYvhKuOhfOVXvrd7XkGu51Aqr13
-         61EAwvaa0FM0pQPPCejA58z2k9p3M13nbCQm16Ca5afPceQFkYmw99Qd9SVrBX+yqoBH
-         TZ7TPVamMh6sLNteW2nqTghSisDD6+Z3cfciNrUYmKxK4PIb4YCUH3EMiq1Qd6uJaFR3
-         FmpzS39JaGp1ves9z3BkfbTeHovmXYEh4C3fLBmxjLG77j/P/KcsuA7Walmh1SLlsqA4
-         hce8PyESKH33BYE9of6hgh1T1hEljwn2ESV8kymZag6J9VY5I9CRYreT6zMyhHo9RpYZ
-         LBqA==
+        bh=pZlojhgCGQRJd86Bfq6GmjSuTaKdj0Ma2frE3Xf58I0=;
+        b=OpYL2D4LPoDrU+QpNTzLqEcsYg22APbpR7Q09oqDR5BE2nxA1b1/zPdSnUGEdrl63h
+         Owx/Rde+YVTFPcvnusAm4VDI1jQmJjwFVXhOD7mbaXhiIOqcodRHwGERIUyYiI7ZjDNC
+         tSxCAH9bCoIuPdGqcfuScWsgSGFTEaZXGci1UIuqfAALpNmyuKA0Vb4tYwWLJa2qX6Hy
+         5UJdHxzuPzFPWhg3hO/IikG0nCdmZXn8ST5Cr2wQ5hRk1FHlEx0dHB5NWPgSCS+FBl1t
+         OyMXwWx3RmGNdlNfU/ORJX7YpNQhsykvlh2y47wFe4uuRF6x8F63DoAgK0tzylymzL52
+         RBEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768315296; x=1768920096;
+        d=1e100.net; s=20230601; t=1768316355; x=1768921155;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NyT7yshjxI28rxht5+ZbiYBc0/2eKd+sQKdTY3zp/D4=;
-        b=l80cHwikzLxnI7hSRgOkJEznp7BD2Bto6i25xDogZxTbzv+VFia3qQdCgZnnbgRvTj
-         B2KmFTRl2JyhF1+7cb/34Nj3LMsqvcfZnQCF3bcRxIhLsrBEtVdzRUZuqZOom9CQ66fX
-         h3BTWxI2FPG1EjMgTdurDcHhNHIeYkOL69aeztCwVN+nuP0qODTRBb4d550b20f1sqFD
-         lpxaLPsE+jT7MAQcuQb3i+wNpH/IcvVnpVg6iR007hx6JAc+rESFo2TVUxvo/qH8WbBI
-         isQ783ppFZRQ+wr/kUhXC0+Vr41rhYd4f57M9yAtUJBU6Gz9PEcz/+CVl2vVEpPSNOgY
-         awSA==
-X-Forwarded-Encrypted: i=1; AJvYcCWi6+GrovbheNiWFAYYIwWAtymz7Oa99ObpQ7fijRc3jcFgOHv5swWckxip7vDqJVdoTcE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX1RQguYsnWCii4/abFVb6EjwDXlWVqJ2wXuBfYUbD4Kp4mp6V
-	7Q8G0GbHB/xd7g13aM5Goq0ZFxnNlW+xF3PpBdn7dGe8k213Wnuy/m/raTLAk0svrkm095e7u3L
-	GEGhO2if+gYvwX1dpFFDEMB6GWJEdmko6lB9RII2Y
-X-Gm-Gg: AY/fxX71+fiXrXeav4Lj6c5WFCbrXV/e5a/nzrRJJVkevm+JQo8N7+K/beT8EVY20oS
-	8qYbnB0TuB/wigV/vzBF/0o9I9SpjWd6NfNCx5iIUQvLLEtobuAwYBFHObPEA5uZZwsqI+RzlDO
-	Ol9D/PjiWX4yY9E/bLAzT6xgK1cyNT4306oyCtSOGAlnxPqOpeB+Bn8gMGaFlZaIYasBwOsDtqO
-	Z+oGeNc6uKMMzSq/kqoTgN4DqQcx3PbbxlqmKaLPeFsf9hgV1H2dNTYINxWyxopI0+Gqx7Y9gDA
-	vib7pygBjY1Q/kOM5OsxbO2cxg==
-X-Received: by 2002:a05:622a:3cd:b0:4ff:cb75:2a22 with SMTP id
- d75a77b69052e-5013af6d173mr9629161cf.3.1768315295481; Tue, 13 Jan 2026
- 06:41:35 -0800 (PST)
+        bh=pZlojhgCGQRJd86Bfq6GmjSuTaKdj0Ma2frE3Xf58I0=;
+        b=rnKqelzoKPj67FV1qGjMFYUFXEInlaAsJaE1Mo55bFgT2oGoyt0ZArxTtgG2e8FGOm
+         46yWUhgsVCINzY4j6aCoNrZqZ8o8BWF9hSlPZVlGRFnlHrNjehUbJqJNbg+fN7TdXEGy
+         13UkIM7iNONE7nwhgeF1iPwd6M+kbKDLHNLz+8P5QE/NgmdjkFPiUHCkzaC0fy6hfoJi
+         bKeorYmAFFJUBwEWH6kscRRUXOx41/0R0mxtiHXO2uujBSpaywzxyI0cv0JLsFCDsCuR
+         tOTJbGwb2mZNSEa8mCWZ6mvJrd9st+E23F2IRViuVB9gFUD/d+P0CWkqMD6dVDxUBwfg
+         1/jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXFextg08V1EfnOZdsZWti2ILuGM97V49HXA06q1Otow91qIVP2SMqaBSzPByxo6vIIsmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXJ+uZ20/HOaM8HbP16XeQGibcCqWcBpPMFuGCEjBxrxtxUTBe
+	PTxpEkp3RddHYKS9pd7Op3SUurCA+1LW408j/5QY2zgpDsdrt+38DUD8feVWTiwnK/fUno1MQCc
+	wMK+4a9GRkNtqsXBmX/UyJCSewyzmtU3AG0cXCv7F
+X-Gm-Gg: AY/fxX6lC5JyNWiMLYHRqOLri9NzZZkTttBBshky21c3TC7u3BTNUdyI/63/Q4Lku4u
+	jj9GSkv0IWvRA2eUOPj8R+b8iPktURdBYjr7CADor9SrevPQH2WfBsD9jeN8FFCAsej6xCfPqf3
+	fbOm5HB2VapwiH6P1pF2loSCYmj84uv/0QBE+ILBtqRH25B4g/CPovH2gReY/jnFY7bAWkvrSES
+	QgUSz3Hw/8HqY40LsvcRVUNgJPym93HT6+MSvhtJfqRq2EE82PoSy0PwM4Xs9Mz0JYDFpIZqnUk
+	/WUZUllPVf8X9AelyIsL64/rrA==
+X-Received: by 2002:a05:622a:1803:b0:4ed:ff79:e679 with SMTP id
+ d75a77b69052e-5013b24c643mr4567491cf.19.1768316354656; Tue, 13 Jan 2026
+ 06:59:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-26-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-26-8be3867cb883@kernel.org>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 13 Jan 2026 14:40:58 +0000
-X-Gm-Features: AZwV_Qjs5e4uEcbnEJuVrBfT-1moEDZsHvN3tHWheQOa84fBcmYp4v7F-T0DOhM
-Message-ID: <CA+EHjTxFfY_XkEQrNvme94uHoxQLWEaX1q1MikbcmwmUMq=NwA@mail.gmail.com>
-Subject: Re: [PATCH v9 26/30] KVM: arm64: Provide interface for configuring
- and enabling SME for guests
+Date: Tue, 13 Jan 2026 14:58:37 +0000
+X-Gm-Features: AZwV_QjSfPf_Qtos4PBfowPO8me3Hnm4jktWm-anHeSkcEqLyKFJ9qvABg5y_BU
+Message-ID: <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
+Subject: Re: [PATCH v9 00/30] KVM: arm64: Implement support for SME
 To: Mark Brown <broonie@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -113,487 +112,268 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
->
-> Since SME requires configuration of a vector length in order to know the
-> size of both the streaming mode SVE state and ZA array we implement a
-> capability for it and require that it be enabled and finalized before
-> the SME specific state can be accessed, similarly to SVE.
->
-> Due to the overlap with sizing the SVE state we finalise both SVE and
-> SME with a single finalization, preventing any further changes to the
-> SVE and SME configuration once KVM_ARM_VCPU_VEC (an alias for _VCPU_SVE)
-> has been finalised. This is not a thing of great elegance but it ensures
+Hi Mark,
 
-With KVM_ARM_VCPU_VEC being an alias for KVM_ARM_VCPU_SVE, wouldn't
-kvm_arm_vcpu_finalize() fail for guests that have only SME enabled but
-not SVE?
+On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+>
+> I've removed the RFC tag from this version of the series, but the items
+> that I'm looking for feedback on remains the same:
 
-Cheers,
+Now that I've gone through the patch series (except for the
+selftests), here are some of my thoughts at a high level.
+
+The first one is something you have documented in api.rst:
+
+> Changing the value of SVCR.SM will result in the contents of
+> the Z, P and FFR registers being reset to 0.  When restoring the
+> values of these registers for a VM with SME support it is
+> important that SVCR.SM be configured first.
+
+However, the order returned by kvm_arm_copy_reg_indices() is core,
+sve, fw, then system. So this means that the VMM will need to hardcode
+this order, rather than rely on KVM_GET_REG_LIST. It _is_ documented,
+but it is tricky and it's easy to miss.
+
+Looking at copy_sve_reg_indices(), there's a special case for
+KVM_REG_ARM64_SVE_VLS, which forces it to appear before the other SVE
+registers. So I wonder if we need to do something at the level of
+kvm_arm_copy_reg_indices(), or do some sort of post-processing to the
+list, to avoid this problem.
+
+>  - The userspace ABI, in particular:
+>   - The vector length used for the SVE registers, access to the SVE
+>     registers and access to ZA and (if available) ZT0 depending on
+>     the current state of PSTATE.{SM,ZA}.
+
+One issue I see here, from a VMM's perspective, is that the amount of
+data transferred via KVM_GET_ONE_REG/KVM_SET_ONE_REG depends on the
+guest's current architectural mode. So now the VMM needs to first
+figure out what that is, before being able to SET/GET when
+saving/restoring a VM state.
+
+Before this series, SVE just assumed a maximum amount of data and
+zero-pad the rest. SME state is bigger, but in practice, do we expect
+many cases where the VL sizes between modes would be drastically
+different that it would make a difference in terms of storage?
+
+Other than that, I think the asymmetry of VLs might be a painpoint for
+users. The problem is that there is no guarantee that the set of
+vector lengths supported for SME match or the set supported for SVE.
+But I wonder if there's something we can do to help. Maybe a discovery
+IOCTL that returns the entire matrix of supported configurations (SVE
+VLs, SME VLs, and their intersection) to simplify VMM decision-making?
+
+One final note, I think the pKVM code will change a bit, especially
+since the pKVM SVE code has changed in Android. But since none of this
+is upstream yet, your changes are consistent with the existing code.
+I'll have a closer look at that code on the next respin.
+
+Thanks,
 /fuad
 
 
-> that we never have a state where one of SVE or SME is finalised and the
-> other not, avoiding complexity.
+
+
+
+>   - The use of a single finalisation for both SVE and SME.
 >
-> SME is supported for normal and protected guests.
+>  - The addition of control for enabling fine grained traps in a similar
+>    manner to FGU but without the UNDEF, I'm not clear if this is desired
+>    at all and at present this requires symmetric read and write traps like
+>    FGU. That seemed like it might be desired from an implementation
+>    point of view but we already have one case where we enable an
+>    asymmetric trap (for ARM64_WORKAROUND_AMPERE_AC03_CPU_38) and it
+>    seems generally useful to enable asymmetrically.
+>
+> This series implements support for SME use in non-protected KVM guests.
+> Much of this is very similar to SVE, the main additional challenge that
+> SME presents is that it introduces a new vector length similar to the
+> SVE vector length and two new controls which change the registers seen
+> by guests:
+>
+>  - PSTATE.ZA enables the ZA matrix register and, if SME2 is supported,
+>    the ZT0 LUT register.
+>  - PSTATE.SM enables streaming mode, a new floating point mode which
+>    uses the SVE register set with the separately configured SME vector
+>    length.  In streaming mode implementation of the FFR register is
+>    optional.
+>
+> It is also permitted to build systems which support SME without SVE, in
+> this case when not in streaming mode no SVE registers or instructions
+> are available.  Further, there is no requirement that there be any
+> overlap in the set of vector lengths supported by SVE and SME in a
+> system, this is expected to be a common situation in practical systems.
+>
+> Since there is a new vector length to configure we introduce a new
+> feature parallel to the existing SVE one with a new pseudo register for
+> the streaming mode vector length.  Due to the overlap with SVE caused by
+> streaming mode rather than finalising SME as a separate feature we use
+> the existing SVE finalisation to also finalise SME, a new define
+> KVM_ARM_VCPU_VEC is provided to help make user code clearer.  Finalising
+> SVE and SME separately would introduce complication with register access
+> since finalising SVE makes the SVE registers writeable by userspace and
+> doing multiple finalisations results in an error being reported.
+> Dealing with a state where the SVE registers are writeable due to one of
+> SVE or SME being finalised but may have their VL changed by the other
+> being finalised seems like needless complexity with minimal practical
+> utility, it seems clearer to just express directly that only one
+> finalisation can be done in the ABI.
+>
+> Access to the floating point registers follows the architecture:
+>
+>  - When both SVE and SME are present:
+>    - If PSTATE.SM == 0 the vector length used for the Z and P registers
+>      is the SVE vector length.
+>    - If PSTATE.SM == 1 the vector length used for the Z and P registers
+>      is the SME vector length.
+>  - If only SME is present:
+>    - If PSTATE.SM == 0 the Z and P registers are inaccessible and the
+>      floating point state accessed via the encodings for the V registers.
+>    - If PSTATE.SM == 1 the vector length used for the Z and P registers
+>  - The SME specific ZA and ZT0 registers are only accessible if SVCR.ZA is 1.
+>
+> The VMM must understand this, in particular when loading state SVCR
+> should be configured before other state.  It should be noted that while
+> the architecture refers to PSTATE.SM and PSTATE.ZA these PSTATE bits are
+> not preserved in SPSR_ELx, they are only accessible via SVCR.
+>
+> There are a large number of subfeatures for SME, most of which only
+> offer additional instructions but some of which (SME2 and FA64) add
+> architectural state. These are configured via the ID registers as per
+> usual.
+>
+> Protected KVM supported, with the implementation maintaining the
+> existing restriction that the hypervisor will refuse to run if streaming
+> mode or ZA is enabled.  This both simplfies the code and avoids the need
+> to allocate storage for host ZA and ZT0 state, there seems to be little
+> practical use case for supporting this and the memory usage would be
+> non-trivial.
+>
+> The new KVM_ARM_VCPU_VEC feature and ZA and ZT0 registers have not been
+> added to the get-reg-list selftest, the idea of supporting additional
+> features there without restructuring the program to generate all
+> possible feature combinations has been rejected.  I will post a separate
+> series which does that restructuring.
 >
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h  |  12 +++-
->  arch/arm64/include/uapi/asm/kvm.h  |   1 +
->  arch/arm64/kvm/arm.c               |  10 ++++
->  arch/arm64/kvm/hyp/nvhe/pkvm.c     |  76 +++++++++++++++++++-----
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c |   6 ++
->  arch/arm64/kvm/reset.c             | 116 +++++++++++++++++++++++++++++++------
->  include/uapi/linux/kvm.h           |   1 +
->  7 files changed, 189 insertions(+), 33 deletions(-)
+> Changes in v9:
+> - Rebase onto v6.19-rc1.
+> - ABI document clarifications.
+> - Add changes dropping asserts on single bit wide bitfields in set_id_regs.
+> - Link to v8: https://lore.kernel.org/r/20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org
 >
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index bceaf0608d75..011debfc1afd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -39,7 +39,7 @@
+> Changes in v8:
+> - Small fixes in ABI documentation.
+> - Link to v7: https://lore.kernel.org/r/20250822-kvm-arm64-sme-v7-0-7a65d82b8b10@kernel.org
 >
->  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+> Changes in v7:
+> - Rebase onto v6.17-rc1.
+> - Handle SMIDR_EL1 as a VM wide ID register and use this in feat_sme_smps().
+> - Expose affinity fields in SMIDR_EL1.
+> - Remove SMPRI_EL1 from vcpu_sysreg, the value is always 0 currently.
+> - Prevent userspace writes to SMPRIMAP_EL2.
+> - Link to v6: https://lore.kernel.org/r/20250625-kvm-arm64-sme-v6-0-114cff4ffe04@kernel.org
 >
-> -#define KVM_VCPU_MAX_FEATURES 9
-> +#define KVM_VCPU_MAX_FEATURES 10
->  #define KVM_VCPU_VALID_FEATURES        (BIT(KVM_VCPU_MAX_FEATURES) - 1)
+> Changes in v6:
+> - Rebase onto v6.16-rc3.
+> - Link to v5: https://lore.kernel.org/r/20250417-kvm-arm64-sme-v5-0-f469a2d5f574@kernel.org
 >
->  #define KVM_REQ_SLEEP \
-> @@ -82,6 +82,7 @@ extern unsigned int __ro_after_init kvm_host_max_vl[ARM64_VEC_MAX];
->  DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+> Changes in v5:
+> - Rebase onto v6.15-rc2.
+> - Add pKVM guest support.
+> - Always restore SVCR.
+> - Link to v4: https://lore.kernel.org/r/20250214-kvm-arm64-sme-v4-0-d64a681adcc2@kernel.org
 >
->  int __init kvm_arm_init_sve(void);
-> +int __init kvm_arm_init_sme(void);
+> Changes in v4:
+> - Rebase onto v6.14-rc2 and Mark Rutland's fixes.
+> - Expose SME to nested guests.
+> - Additional cleanups and test fixes following on from the rebase.
+> - Flush register state on VMM PSTATE.{SM,ZA}.
+> - Link to v3: https://lore.kernel.org/r/20241220-kvm-arm64-sme-v3-0-05b018c1ffeb@kernel.org
 >
->  u32 __attribute_const__ kvm_target_cpu(void);
->  void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> @@ -1149,7 +1150,14 @@ struct kvm_vcpu_arch {
->         __size_ret;                                                     \
->  })
+> Changes in v3:
+> - Rebase onto v6.12-rc2.
+> - Link to v2: https://lore.kernel.org/r/20231222-kvm-arm64-sme-v2-0-da226cb180bb@kernel.org
 >
-> -#define vcpu_sve_state_size(vcpu) sve_state_size_from_vl((vcpu)->arch.max_vl[ARM64_VEC_SVE])
-> +#define vcpu_sve_state_size(vcpu) ({                                   \
-> +       unsigned int __max_vl;                                          \
-> +                                                                       \
-> +       __max_vl = max((vcpu)->arch.max_vl[ARM64_VEC_SVE],              \
-> +                      (vcpu)->arch.max_vl[ARM64_VEC_SME]);             \
-> +                                                                       \
-> +       sve_state_size_from_vl(__max_vl);                               \
-> +})
+> Changes in v2:
+> - Rebase onto v6.7-rc3.
+> - Configure subfeatures based on host system only.
+> - Complete nVHE support.
+> - There was some snafu with sending v1 out, it didn't make it to the
+>   lists but in case it hit people's inboxes I'm sending as v2.
 >
->  #define vcpu_sme_state(vcpu) (kern_hyp_va((vcpu)->arch.sme_state))
+> ---
+> Mark Brown (30):
+>       arm64/sysreg: Update SMIDR_EL1 to DDI0601 2025-06
+>       arm64/fpsimd: Update FA64 and ZT0 enables when loading SME state
+>       arm64/fpsimd: Decide to save ZT0 and streaming mode FFR at bind time
+>       arm64/fpsimd: Check enable bit for FA64 when saving EFI state
+>       arm64/fpsimd: Determine maximum virtualisable SME vector length
+>       KVM: arm64: Pay attention to FFR parameter in SVE save and load
+>       KVM: arm64: Pull ctxt_has_ helpers to start of sysreg-sr.h
+>       KVM: arm64: Move SVE state access macros after feature test macros
+>       KVM: arm64: Rename SVE finalization constants to be more general
+>       KVM: arm64: Document the KVM ABI for SME
+>       KVM: arm64: Define internal features for SME
+>       KVM: arm64: Rename sve_state_reg_region
+>       KVM: arm64: Store vector lengths in an array
+>       KVM: arm64: Implement SME vector length configuration
+>       KVM: arm64: Support SME control registers
+>       KVM: arm64: Support TPIDR2_EL0
+>       KVM: arm64: Support SME identification registers for guests
+>       KVM: arm64: Support SME priority registers
+>       KVM: arm64: Provide assembly for SME register access
+>       KVM: arm64: Support userspace access to streaming mode Z and P registers
+>       KVM: arm64: Flush register state on writes to SVCR.SM and SVCR.ZA
+>       KVM: arm64: Expose SME specific state to userspace
+>       KVM: arm64: Context switch SME state for guests
+>       KVM: arm64: Handle SME exceptions
+>       KVM: arm64: Expose SME to nested guests
+>       KVM: arm64: Provide interface for configuring and enabling SME for guests
+>       KVM: arm64: selftests: Remove spurious check for single bit safe values
+>       KVM: arm64: selftests: Skip impossible invalid value tests
+>       KVM: arm64: selftests: Add SME system registers to get-reg-list
+>       KVM: arm64: selftests: Add SME to set_id_regs test
 >
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 9a19cc58d227..b4be424e4230 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -106,6 +106,7 @@ struct kvm_regs {
->  #define KVM_ARM_VCPU_PTRAUTH_GENERIC   6 /* VCPU uses generic authentication */
->  #define KVM_ARM_VCPU_HAS_EL2           7 /* Support nested virtualization */
->  #define KVM_ARM_VCPU_HAS_EL2_E2H0      8 /* Limit NV support to E2H RES0 */
-> +#define KVM_ARM_VCPU_SME               9 /* enable SME for this CPU */
+>  Documentation/virt/kvm/api.rst                   | 120 ++++++++---
+>  arch/arm64/include/asm/fpsimd.h                  |  26 +++
+>  arch/arm64/include/asm/kvm_emulate.h             |   6 +
+>  arch/arm64/include/asm/kvm_host.h                | 163 ++++++++++++---
+>  arch/arm64/include/asm/kvm_hyp.h                 |   5 +-
+>  arch/arm64/include/asm/kvm_pkvm.h                |   2 +-
+>  arch/arm64/include/asm/vncr_mapping.h            |   2 +
+>  arch/arm64/include/uapi/asm/kvm.h                |  33 +++
+>  arch/arm64/kernel/cpufeature.c                   |   2 -
+>  arch/arm64/kernel/fpsimd.c                       |  89 ++++----
+>  arch/arm64/kvm/arm.c                             |  10 +
+>  arch/arm64/kvm/config.c                          |  11 +-
+>  arch/arm64/kvm/fpsimd.c                          |  28 ++-
+>  arch/arm64/kvm/guest.c                           | 252 ++++++++++++++++++++---
+>  arch/arm64/kvm/handle_exit.c                     |  14 ++
+>  arch/arm64/kvm/hyp/fpsimd.S                      |  28 ++-
+>  arch/arm64/kvm/hyp/include/hyp/switch.h          | 168 +++++++++++++--
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h       | 110 ++++++----
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c               |  86 ++++++--
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                   |  85 ++++++--
+>  arch/arm64/kvm/hyp/nvhe/switch.c                 |   4 +-
+>  arch/arm64/kvm/hyp/nvhe/sys_regs.c               |   6 +
+>  arch/arm64/kvm/hyp/vhe/switch.c                  |  17 +-
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c               |   7 +
+>  arch/arm64/kvm/nested.c                          |   3 +-
+>  arch/arm64/kvm/reset.c                           | 156 ++++++++++----
+>  arch/arm64/kvm/sys_regs.c                        | 140 ++++++++++++-
+>  arch/arm64/tools/sysreg                          |   8 +-
+>  include/uapi/linux/kvm.h                         |   1 +
+>  tools/testing/selftests/kvm/arm64/get-reg-list.c |  15 +-
+>  tools/testing/selftests/kvm/arm64/set_id_regs.c  |  84 ++++++--
+>  31 files changed, 1367 insertions(+), 314 deletions(-)
+> ---
+> base-commit: 3e7f562e20ee87a25e104ef4fce557d39d62fa85
+> change-id: 20230301-kvm-arm64-sme-06a1246d3636
 >
->  /*
->   * An alias for _SVE since we finalize VL configuration for both SVE and SME
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4f80da0c0d1d..7de7b497f74f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -402,6 +402,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->         case KVM_CAP_ARM_SVE:
->                 r = system_supports_sve();
->                 break;
-> +       case KVM_CAP_ARM_SME:
-> +               r = system_supports_sme();
-> +               break;
->         case KVM_CAP_ARM_PTRAUTH_ADDRESS:
->         case KVM_CAP_ARM_PTRAUTH_GENERIC:
->                 r = kvm_has_full_ptr_auth();
-> @@ -1456,6 +1459,9 @@ static unsigned long system_supported_vcpu_features(void)
->         if (!system_supports_sve())
->                 clear_bit(KVM_ARM_VCPU_SVE, &features);
->
-> +       if (!system_supports_sme())
-> +               clear_bit(KVM_ARM_VCPU_SME, &features);
-> +
->         if (!kvm_has_full_ptr_auth()) {
->                 clear_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, &features);
->                 clear_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features);
-> @@ -2878,6 +2884,10 @@ static __init int kvm_arm_init(void)
->         if (err)
->                 return err;
->
-> +       err = kvm_arm_init_sme();
-> +       if (err)
-> +               return err;
-> +
->         err = kvm_arm_vmid_alloc_init();
->         if (err) {
->                 kvm_err("Failed to initialize VMID allocator.\n");
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index b656449dff69..30ee9f371b0d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -148,10 +148,6 @@ static int pkvm_check_pvm_cpu_features(struct kvm_vcpu *vcpu)
->             !kvm_has_feat(kvm, ID_AA64PFR0_EL1, AdvSIMD, IMP))
->                 return -EINVAL;
->
-> -       /* No SME support in KVM right now. Check to catch if it changes. */
-> -       if (kvm_has_feat(kvm, ID_AA64PFR1_EL1, SME, IMP))
-> -               return -EINVAL;
-> -
->         return 0;
->  }
->
-> @@ -377,6 +373,11 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
->                 kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_GUEST_HAS_SVE);
->         }
->
-> +       if (kvm_pvm_ext_allowed(KVM_CAP_ARM_SME)) {
-> +               set_bit(KVM_ARM_VCPU_SME, allowed_features);
-> +               kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_GUEST_HAS_SME);
-> +       }
-> +
->         bitmap_and(kvm->arch.vcpu_features, host_kvm->arch.vcpu_features,
->                    allowed_features, KVM_VCPU_MAX_FEATURES);
->  }
-> @@ -399,6 +400,18 @@ static void unpin_host_sve_state(struct pkvm_hyp_vcpu *hyp_vcpu)
->                              sve_state + vcpu_sve_state_size(&hyp_vcpu->vcpu));
->  }
->
-> +static void unpin_host_sme_state(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +       void *sme_state;
-> +
-> +       if (!vcpu_has_feature(&hyp_vcpu->vcpu, KVM_ARM_VCPU_SME))
-> +               return;
-> +
-> +       sme_state = kern_hyp_va(hyp_vcpu->vcpu.arch.sme_state);
-> +       hyp_unpin_shared_mem(sme_state,
-> +                            sme_state + vcpu_sme_state_size(&hyp_vcpu->vcpu));
-> +}
-> +
->  static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
->                              unsigned int nr_vcpus)
->  {
-> @@ -412,6 +425,7 @@ static void unpin_host_vcpus(struct pkvm_hyp_vcpu *hyp_vcpus[],
->
->                 unpin_host_vcpu(hyp_vcpu->host_vcpu);
->                 unpin_host_sve_state(hyp_vcpu);
-> +               unpin_host_sme_state(hyp_vcpu);
->         }
->  }
->
-> @@ -438,23 +452,35 @@ static void init_pkvm_hyp_vm(struct kvm *host_kvm, struct pkvm_hyp_vm *hyp_vm,
->         mmu->pgt = &hyp_vm->pgt;
->  }
->
-> -static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *host_vcpu)
-> +static int pkvm_vcpu_init_vec(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *host_vcpu)
->  {
->         struct kvm_vcpu *vcpu = &hyp_vcpu->vcpu;
-> -       unsigned int sve_max_vl;
-> -       size_t sve_state_size;
-> -       void *sve_state;
-> +       unsigned int sve_max_vl, sme_max_vl;
-> +       size_t sve_state_size, sme_state_size;
-> +       void *sve_state, *sme_state;
->         int ret = 0;
->
-> -       if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
-> +       if (!vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE) &&
-> +           !vcpu_has_feature(vcpu, KVM_ARM_VCPU_SME)) {
->                 vcpu_clear_flag(vcpu, VCPU_VEC_FINALIZED);
->                 return 0;
->         }
->
->         /* Limit guest vector length to the maximum supported by the host. */
-> -       sve_max_vl = min(READ_ONCE(host_vcpu->arch.max_vl[ARM64_VEC_SVE]),
-> -                        kvm_host_max_vl[ARM64_VEC_SVE]);
-> -       sve_state_size = sve_state_size_from_vl(sve_max_vl);
-> +       if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
-> +               sve_max_vl = min(READ_ONCE(host_vcpu->arch.max_vl[ARM64_VEC_SVE]),
-> +                                kvm_host_max_vl[ARM64_VEC_SVE]);
-> +       else
-> +               sve_max_vl = 0;
-> +
-> +       if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SME))
-> +               sme_max_vl = min(READ_ONCE(host_vcpu->arch.max_vl[ARM64_VEC_SME]),
-> +                                kvm_host_max_vl[ARM64_VEC_SME]);
-> +       else
-> +               sme_max_vl = 0;
-> +
-> +       /* We need SVE storage for the larger of normal or streaming mode */
-> +       sve_state_size = sve_state_size_from_vl(max(sve_max_vl, sme_max_vl));
->         sve_state = kern_hyp_va(READ_ONCE(host_vcpu->arch.sve_state));
->
->         if (!sve_state || !sve_state_size) {
-> @@ -466,12 +492,36 @@ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *h
->         if (ret)
->                 goto err;
->
-> +       if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SME)) {
-> +               sme_state_size = sme_state_size_from_vl(sme_max_vl,
-> +                                                       vcpu_has_sme2(vcpu));
-> +               sme_state = kern_hyp_va(READ_ONCE(host_vcpu->arch.sme_state));
-> +
-> +               if (!sme_state || !sme_state_size) {
-> +                       ret = -EINVAL;
-> +                       goto err_sve_mapped;
-> +               }
-> +
-> +               ret = hyp_pin_shared_mem(sme_state, sme_state + sme_state_size);
-> +               if (ret)
-> +                       goto err_sve_mapped;
-> +       } else {
-> +               sme_state = 0;
-> +       }
-> +
->         vcpu->arch.sve_state = sve_state;
->         vcpu->arch.max_vl[ARM64_VEC_SVE] = sve_max_vl;
->
-> +       vcpu->arch.sme_state = sme_state;
-> +       vcpu->arch.max_vl[ARM64_VEC_SME] = sme_max_vl;
-> +
->         return 0;
-> +
-> +err_sve_mapped:
-> +       hyp_unpin_shared_mem(sve_state, sve_state + sve_state_size);
->  err:
->         clear_bit(KVM_ARM_VCPU_SVE, vcpu->kvm->arch.vcpu_features);
-> +       clear_bit(KVM_ARM_VCPU_SME, vcpu->kvm->arch.vcpu_features);
->         return ret;
->  }
->
-> @@ -501,7 +551,7 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
->         if (ret)
->                 goto done;
->
-> -       ret = pkvm_vcpu_init_sve(hyp_vcpu, host_vcpu);
-> +       ret = pkvm_vcpu_init_vec(hyp_vcpu, host_vcpu);
->  done:
->         if (ret)
->                 unpin_host_vcpu(host_vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 3108b5185c20..40127ba86335 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -66,6 +66,11 @@ static bool vm_has_ptrauth(const struct kvm *kvm)
->                 kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_PTRAUTH_GENERIC);
->  }
->
-> +static bool vm_has_sme(const struct kvm *kvm)
-> +{
-> +       return system_supports_sme() && kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_SME);
-> +}
-> +
->  static bool vm_has_sve(const struct kvm *kvm)
->  {
->         return system_supports_sve() && kvm_vcpu_has_feature(kvm, KVM_ARM_VCPU_SVE);
-> @@ -102,6 +107,7 @@ static const struct pvm_ftr_bits pvmid_aa64pfr0[] = {
->  };
->
->  static const struct pvm_ftr_bits pvmid_aa64pfr1[] = {
-> +       MAX_FEAT_FUNC(ID_AA64PFR1_EL1, SME, SME2, vm_has_sme),
->         MAX_FEAT(ID_AA64PFR1_EL1, BT, IMP),
->         MAX_FEAT(ID_AA64PFR1_EL1, SSBS, SSBS2),
->         MAX_FEAT_ENUM(ID_AA64PFR1_EL1, MTE_frac, NI),
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index a8684a1346ec..e6dc04267cbb 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -76,6 +76,34 @@ int __init kvm_arm_init_sve(void)
->         return 0;
->  }
->
-> +int __init kvm_arm_init_sme(void)
-> +{
-> +       if (system_supports_sme()) {
-> +               kvm_max_vl[ARM64_VEC_SME] = sme_max_virtualisable_vl();
-> +               kvm_host_max_vl[ARM64_VEC_SME] = sme_max_vl();
-> +               kvm_nvhe_sym(kvm_host_max_vl[ARM64_VEC_SME]) = kvm_host_max_vl[ARM64_VEC_SME];
-> +
-> +               /*
-> +                * The get_sve_reg()/set_sve_reg() ioctl interface will need
-> +                * to be extended with multiple register slice support in
-> +                * order to support vector lengths greater than
-> +                * VL_ARCH_MAX:
-> +                */
-> +               if (WARN_ON(kvm_max_vl[ARM64_VEC_SME] > VL_ARCH_MAX))
-> +                       kvm_max_vl[ARM64_VEC_SME] = VL_ARCH_MAX;
-> +
-> +               /*
-> +                * Don't even try to make use of vector lengths that
-> +                * aren't available on all CPUs, for now:
-> +                */
-> +               if (kvm_max_vl[ARM64_VEC_SME] < sme_max_vl())
-> +                       pr_warn("KVM: SME vector length for guests limited to %u bytes\n",
-> +                               kvm_max_vl[ARM64_VEC_SME]);
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  static void kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
->  {
->         vcpu->arch.max_vl[ARM64_VEC_SVE] = kvm_max_vl[ARM64_VEC_SVE];
-> @@ -88,42 +116,86 @@ static void kvm_vcpu_enable_sve(struct kvm_vcpu *vcpu)
->         set_bit(KVM_ARCH_FLAG_GUEST_HAS_SVE, &vcpu->kvm->arch.flags);
->  }
->
-> +static void kvm_vcpu_enable_sme(struct kvm_vcpu *vcpu)
-> +{
-> +       vcpu->arch.max_vl[ARM64_VEC_SME] = kvm_max_vl[ARM64_VEC_SME];
-> +
-> +       /*
-> +        * Userspace can still customize the vector lengths by writing
-> +        * KVM_REG_ARM64_SME_VLS.  Allocation is deferred until
-> +        * kvm_arm_vcpu_finalize(), which freezes the configuration.
-> +        */
-> +       set_bit(KVM_ARCH_FLAG_GUEST_HAS_SME, &vcpu->kvm->arch.flags);
-> +}
-> +
->  /*
-> - * Finalize vcpu's maximum SVE vector length, allocating
-> - * vcpu->arch.sve_state as necessary.
-> + * Finalize vcpu's maximum vector lengths, allocating
-> + * vcpu->arch.sve_state and vcpu->arch.sme_state as necessary.
->   */
->  static int kvm_vcpu_finalize_vec(struct kvm_vcpu *vcpu)
->  {
-> -       void *buf;
-> +       void *sve_state, *sme_state;
->         unsigned int vl;
-> -       size_t reg_sz;
->         int ret;
->
-> -       vl = vcpu->arch.max_vl[ARM64_VEC_SVE];
-> -
->         /*
->          * Responsibility for these properties is shared between
->          * kvm_arm_init_sve(), kvm_vcpu_enable_sve() and
->          * set_sve_vls().  Double-check here just to be sure:
->          */
-> -       if (WARN_ON(!sve_vl_valid(vl) || vl > sve_max_virtualisable_vl() ||
-> -                   vl > VL_ARCH_MAX))
-> -               return -EIO;
-> +       if (vcpu_has_sve(vcpu)) {
-> +               vl = vcpu->arch.max_vl[ARM64_VEC_SVE];
-> +               if (WARN_ON(!sve_vl_valid(vl) ||
-> +                           vl > sve_max_virtualisable_vl() ||
-> +                           vl > VL_ARCH_MAX))
-> +                       return -EIO;
-> +       }
->
-> -       reg_sz = vcpu_sve_state_size(vcpu);
-> -       buf = kzalloc(reg_sz, GFP_KERNEL_ACCOUNT);
-> -       if (!buf)
-> +       /* Similarly for SME */
-> +       if (vcpu_has_sme(vcpu)) {
-> +               vl = vcpu->arch.max_vl[ARM64_VEC_SME];
-> +               if (WARN_ON(!sve_vl_valid(vl) ||
-> +                           vl > sme_max_virtualisable_vl() ||
-> +                           vl > VL_ARCH_MAX))
-> +                       return -EIO;
-> +       }
-> +
-> +       sve_state = kzalloc(vcpu_sve_state_size(vcpu), GFP_KERNEL_ACCOUNT);
-> +       if (!sve_state)
->                 return -ENOMEM;
->
-> -       ret = kvm_share_hyp(buf, buf + reg_sz);
-> -       if (ret) {
-> -               kfree(buf);
-> -               return ret;
-> +       ret = kvm_share_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
-> +       if (ret)
-> +               goto err_sve_alloc;
-> +
-> +       if (vcpu_has_sme(vcpu)) {
-> +               sme_state = kzalloc(vcpu_sme_state_size(vcpu),
-> +                                   GFP_KERNEL_ACCOUNT);
-> +               if (!sme_state) {
-> +                       ret = -ENOMEM;
-> +                       goto err_sve_map;
-> +               }
-> +
-> +               ret = kvm_share_hyp(sme_state,
-> +                                   sme_state + vcpu_sme_state_size(vcpu));
-> +               if (ret)
-> +                       goto err_sme_alloc;
-> +       } else {
-> +               sme_state = NULL;
->         }
-> -
-> -       vcpu->arch.sve_state = buf;
-> +
-> +       vcpu->arch.sve_state = sve_state;
-> +       vcpu->arch.sme_state = sme_state;
->         vcpu_set_flag(vcpu, VCPU_VEC_FINALIZED);
->         return 0;
-> +
-> +err_sme_alloc:
-> +       kfree(sme_state);
-> +err_sve_map:
-> +       kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
-> +err_sve_alloc:
-> +       kfree(sve_state);
-> +       return ret;
->  }
->
->  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
-> @@ -153,12 +225,16 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->  void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
->         void *sve_state = vcpu->arch.sve_state;
-> +       void *sme_state = vcpu->arch.sme_state;
->
->         kvm_unshare_hyp(vcpu, vcpu + 1);
->         if (sve_state)
->                 kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
->         kfree(sve_state);
->         free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
-> +       if (sme_state)
-> +               kvm_unshare_hyp(sme_state, sme_state + vcpu_sme_state_size(vcpu));
-> +       kfree(sme_state);
->         kfree(vcpu->arch.vncr_tlb);
->         kfree(vcpu->arch.ccsidr);
->  }
-> @@ -167,6 +243,8 @@ static void kvm_vcpu_reset_vec(struct kvm_vcpu *vcpu)
->  {
->         if (vcpu_has_sve(vcpu))
->                 memset(vcpu->arch.sve_state, 0, vcpu_sve_state_size(vcpu));
-> +       if (vcpu_has_sme(vcpu))
-> +               memset(vcpu->arch.sme_state, 0, vcpu_sme_state_size(vcpu));
->  }
->
->  /**
-> @@ -206,6 +284,8 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->         if (!kvm_arm_vcpu_vec_finalized(vcpu)) {
->                 if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE))
->                         kvm_vcpu_enable_sve(vcpu);
-> +               if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_SME))
-> +                       kvm_vcpu_enable_sme(vcpu);
->         } else {
->                 kvm_vcpu_reset_vec(vcpu);
->         }
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dddb781b0507..d9e068db3b73 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_GUEST_MEMFD_FLAGS 244
->  #define KVM_CAP_ARM_SEA_TO_USER 245
->  #define KVM_CAP_S390_USER_OPEREXEC 246
-> +#define KVM_CAP_ARM_SME 247
->
->  struct kvm_irq_routing_irqchip {
->         __u32 irqchip;
->
+> Best regards,
 > --
-> 2.47.3
+> Mark Brown <broonie@kernel.org>
 >
 
