@@ -1,178 +1,343 @@
-Return-Path: <kvm+bounces-67936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E04D193CB
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:00:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38351D19506
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:10:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 79671302B50A
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 13:58:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 28AFA3038066
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 14:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486CB392810;
-	Tue, 13 Jan 2026 13:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BEAE392B71;
+	Tue, 13 Jan 2026 14:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GnVY2KNk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SobcE576"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBD23921DB
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 13:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768312729; cv=none; b=Bpa4TgTNDMq5FZFVVAerw2TH+ITRyxDo1CDLUs1FDMiQikHYzIEwhcstZ/fqaBaexDp9tAF7LK74MX2J5pV65hyJKv0hLy4D4Jsig3CRQsy6bZCj+f0JdAZxLjPVaGAbtyKYCthtwbiZ3GfiuSp9v/fkuV8Lq2xFdT2ufhDr+Po=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768312729; c=relaxed/simple;
-	bh=+swzV6rbWm8uXrJLnSTotFtu2rG8m+nlvKHDCv7el+U=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=bbutLJBGCwBxZ5gVfMOn4t07YF2VhPAWY3Vszo+DLlcsloepf3acXG3aqRarHtuMWH35gjTgARE5TR4kEyoMYgyYIXhQgzpWSGMLChEWr4LZYzG4azv4lihxCprqYQcMWWrdlyGSfRFvbtGo5WsCvwEWadt6ByCP1YuNnAHbMB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GnVY2KNk; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42fb0fc5aa4so5648535f8f.1
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 05:58:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF897259C9C
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 14:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768313253; cv=pass; b=sesPxZ5/vfutP4xFn/vIaoIetFsQ6EviB02uq2m5X1FPfavPa9AKGpVM2GCiqcRdRp0NdFu85lKpSsjNIHJZa2vj1YtP4GjjdpQY54W+1G0d2hEO8O3MXxil/CKYx6XZFjlooVF1Fbl0gpl7hJ4O2+82VBz7X8/c06NmV4xmyTE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768313253; c=relaxed/simple;
+	bh=W1BKHG2W0/GlQ7ZY8QiX4cI5B6CXeKtQHFJwinuKji4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HeMmMoJOPLodIjcj9jbaq0XsSi2YuaYaW/fZesZLBDWyI4R1Vz2XNvphshXfzbnKfBg4b2ieMZNF6OXU8gcoxtNk/ZAxM6uHIr8YVVfT3AbZVbWQF8tPj9X1DhvVqL+sDs4rU50cqFuoOZZLD08WbizjqJkIYBj7+50Rmp/7WNk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SobcE576; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ffbaaafac4so559801cf.0
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 06:07:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768313251; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CoGxlJu3qDvkUmzqOSXqQT1uN3ZDL1ruNXn77VSqA4JneOWYlo8/OJYUZJaCFbd45W
+         wN6QktjxnPvoHEVpxZNZjlNIjiufffuOJ7BvedKDvUxC/rjGfWF4oktYbFCZ08EiS1QP
+         GFTXNuo9+R8hLzj4u3JKpd38jtQUX288Y3JH441+6M4PH6uOODge+BWqSyC+ziERR4QK
+         T2eNYxEKF17v8khXKyMLmWN67c0gVyfhAz1H4dMM0GcyLyPf0+F946Tym68/sRE+zNWK
+         JUgWxE9jzFyPL+gu2r2mHAqfLteDlz5jcyydiY8jmyvsY+yW8c0C19CI6i4wh5wS8/9C
+         NURg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=vGNeqZdCFRkUH8pVy9i0xdJ5BW3N5lXnZA/HlFDK8XQ=;
+        fh=USoGdevwDAmtVYCu5TUDMqbFiUXPyETE/LaN87yDXqo=;
+        b=ZSCKcgbP/nBZ8y4qB5nf+ybIXConI/11/M1yRpBEnuFnjCgy/2kArDYobZbDZKzIvk
+         vM11VJBUX9eb5eQaCvBalVfUrjHpaspNL8rIVp7qmYR1GF9dFL5uvTcawLUA2F6WfE/+
+         g/pLa9JxpevoelYGZp3SHylWwFbKCRbkDSAmeGNq6uQIT7Y/xLU22uH22Za1aZg+gU6E
+         k5DLKmwL2E8BdnP5aSjUX9nTkF2QOAkxCRf9cC+1h8HQ9dCwyW9bjPc8OxvjoNJyyEVO
+         Db0BIbEYb7YWe8Tqi9FtWZpsxNj0TN+XrWjt07/RjNufkiRVbRBq/xW88/fd80R5dhDM
+         fbsQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768312726; x=1768917526; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6WhGDknja7CQejJLDSeyhPCpGEnEpfpz6CPziZT1+0s=;
-        b=GnVY2KNkP388I901YUjoI8RpNHSWU0SKySKnS4aZN/0CAwL3/mGkB9j3r8YfZKgaBB
-         3wz68m0dh3tVYXMrpSMYIaTLl+2iCumTSiCiOJnRQB+9PB60FbVa7TGVsmDEPunuaggc
-         JJl9D5nIPL16WdlCdFTL9reuT4kIoRv6tq6/vHxOyEo5F1DEhVBDfWLe3aBDIXOYeKdn
-         9Jr0voCcF/884OnzrgE3zZNIKqbWLYhe6hh/axvr+JnXSQT7Z6OQrdi93Nz+pPyA2Hsz
-         8Pq70caZGTf/zgfC2qyXkG0woBZCN1LIwe4zfs922QfjqfIbUQ3BcERIENkeqzct9RpF
-         qVQQ==
+        d=google.com; s=20230601; t=1768313251; x=1768918051; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vGNeqZdCFRkUH8pVy9i0xdJ5BW3N5lXnZA/HlFDK8XQ=;
+        b=SobcE576zDEqGAcmGUh8o3DcbjdHyAZcKGyX8n1P4KnMa8QIfvpcyUkM6XWZjW5yRw
+         STaeoH12VgokhnW/qvJHJVjhNr/A63Jy027h06oulLP+iaBDs6S6enzCV8O43ckoRHy/
+         lrceBaoI+3JBfEoX/RDimHtJ67T5qjIYyZwR9f0YdxUXhgji4v46vtRP/ZnUcR2Uwu7Z
+         hKPjodRR0AEUVw+WKETTdVFx5ouw0/vQrst+T7Uxo9leBYnNvsJc/gGQTEuTY4hyY0Vb
+         b3hTumts18t6JvvOK1fWE/beh46d7EQowgjQg4j8aA5VKbY723glU2itDxsG/d77Nkkd
+         a6pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768312726; x=1768917526;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=6WhGDknja7CQejJLDSeyhPCpGEnEpfpz6CPziZT1+0s=;
-        b=h40cils1TRnZeQvVTXiGuNIxAvmpg/CbEJTBArW3SzF7c3Ny5qvS3Tnd/r/+qoI5h4
-         mQvxrNFMSxrNEUxffvE5H0k3vEiSjlxOd45ukOZMjAQRzcb2uDRBhpq85Btvw92u1pav
-         7tLiHauzk61K6DAAZ5OEhnMgF2RJlst3btJscGk8hV/rEzBOX3efplF/B8E3HcN29EOy
-         OMkzOo0eYJYhv/kOhDUxXsRbwGJfy8n+s28lkxjun/Df3Xqm8mOIn4DW1J8R179ehyxb
-         tTKCesTL8qNGnOGE0UDO2ts9IeMuhsDGyUXM82fgb19xpE79Ww7BQ10U8DVxVWL54ZP7
-         uxig==
-X-Gm-Message-State: AOJu0YzgVTQR3T3EI6WDnj9g1u6cZUJxYxv/9FL8q4ywNwKYm3NRtoAx
-	edNaG5vIRw4jmDLKK7/lN/TsuNe0ASfOFIGaYNbuOZrRYni4vq8n81RC9ITtww==
-X-Gm-Gg: AY/fxX5bzeIt6lZJQQMBD/0WWstkEXQb6SFF+nVJ9IkUt38TucRH8khrgVRInbMGUo1
-	0bh2Lx5i2K4IKdCgS5y/RIYWmpgZawL3VfJIOMqAIKfliXJGkveSrnMO5uh8QV9O1mTQnG4JMr7
-	OeIyLXEHKMOgaYj75fN8klGG4nYq8DEd9L8R9jtqL0Ogv0jAYYy7Vo9t52YTVqFYmoNK32kFEsY
-	THgl2hxzKpQs0hHYpiWEd4lhLbvZ5PDbR31AEiOAC8vbDaHKVcgZBRtaAvvVzYnM0v+WSq6Lnxp
-	/B9ioal/WMv6ructymbCRiP9RhFVb1KxCsSykbUjhEgBv/qfpkdrv0bezLRVEL+3vbxuqxgUByS
-	FCdA3eF/OSNe1M3WvX3ooTTLsYk2JnhIdKcrOpgYsMK0Y442I0YgycJokADo0pA9rhCo1npfwi3
-	QdAiPIyNjaatCu+rg5b2+PNPEded3fUmNfhMNITZd3jmMDnRwon5XdfBiJ1l5Cg23fd4Lc8dD1
-X-Google-Smtp-Source: AGHT+IHz3/MZq5IE1wUR5QXf+2IHt/MHhR2WlMb82Jjaiy4vcro767CKSZ9wAVL85Hpc2XOy6zo8xg==
-X-Received: by 2002:a5d:5d13:0:b0:430:f58d:40d7 with SMTP id ffacd0b85a97d-432c374f477mr29322767f8f.13.1768312725842;
-        Tue, 13 Jan 2026 05:58:45 -0800 (PST)
-Received: from ehlo.thunderbird.net (dynamic-002-242-220-137.2.242.pool.telefonica.de. [2.242.220.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dadcfsm43551328f8f.3.2026.01.13.05.58.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jan 2026 05:58:45 -0800 (PST)
-Date: Tue, 13 Jan 2026 13:58:44 +0000
-From: Bernhard Beschow <shentey@gmail.com>
-To: qemu-devel@nongnu.org, Ani Sinha <anisinha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-CC: kvm@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2_11/32=5D_kvm/i386=3A_reload?=
- =?US-ASCII?Q?_firmware_for_confidential_guest_reset?=
-In-Reply-To: <20260112132259.76855-12-anisinha@redhat.com>
-References: <20260112132259.76855-1-anisinha@redhat.com> <20260112132259.76855-12-anisinha@redhat.com>
-Message-ID: <1840E5EB-CFD2-478E-B6CB-242B46FD5166@gmail.com>
+        d=1e100.net; s=20230601; t=1768313251; x=1768918051;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vGNeqZdCFRkUH8pVy9i0xdJ5BW3N5lXnZA/HlFDK8XQ=;
+        b=QM4InBDPiz+70WRXLFx/Ndz1o1lTIb0UAJFCYUWIGsmjh1D8Vf07FLMhjfgqubv20a
+         cu2oR/hplOx06qrmUabHLT+yEsnpqF3HJZ8ZDY5JXItbtZ3m4U9breO06V/tFzKoG1E2
+         4hnc+lGp30Jh6m22iFL5VsesaxrF2HNtIvA5nfr4FjOhlNgULKOGgjUilkNuQ1DfQhyR
+         nnZjvhKN8gHz9dPgwFSNUt2sjhjPa0D5jbGWQAcBt2NhV/8n3hHIB2EQgsAllS9wBTMJ
+         OeL7xvXtQZH7kVAkFGj1Xfg2lH6zxovlWQbZabQSGhARBqcF8M3EFPh2nfXl1GVqjZCE
+         hsbA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1BXeF+aNR0GmT7DAFq8PHJxVYGLz0KY7Qa5cBu1x97Wpaid1CXqEJgiiHAs41J5109Pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlJboypjM4kmQDi4h1LPbNgMVQGZu/zEUW1CwzVJ+hhMxIkqw5
+	Nd0OZu+x0iLiQmkxeidwngRTtEu/HzQ2+C/n7UZ96/d0l3jRvXiG9n7YtovodbkexrCRaUWWtcd
+	Glx9Hr29ZGy8pCpWBR4Wvo0FLvrk3WgZghJexraM9
+X-Gm-Gg: AY/fxX5ZPGokxn7aR1uhkKCw6oUvVAOnCA73oWXmUVRLyUb9RT1qlSJso8VSxeS5Xpy
+	2Tlc6jzz8yMHzkW0mAVF8pvUezrUTVo82yIVTvNnK92No/IHhN+7sZeI3dLc7hGuR6QXX31kU7y
+	Nm/P4BHd+GLRXUwpoYoLtQ3AboyN7C1wy0SFXRY/mTEKtF6SJGVfY1U+9oHywOoiFTz/3BhNdCm
+	g/oFV1a/TXlMMr3VeErsbmEF0sRuC3bGV7bOlvAnXDe8BJ/kyc8NleqHGn2kQxgyqX9F3DyerNZ
+	OOLbB2m0KOBOZfi0lezaWb1IeA==
+X-Received: by 2002:ac8:7fc1:0:b0:4fb:e3b0:aae6 with SMTP id
+ d75a77b69052e-5013af6a711mr9755261cf.1.1768313250350; Tue, 13 Jan 2026
+ 06:07:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-22-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-22-8be3867cb883@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 13 Jan 2026 14:06:53 +0000
+X-Gm-Features: AZwV_QhU40Lwhaq_0NHueSMC3WoVnp6Uc6Xt-liPmw7nnlV9MFwsJtQrpboZVDo
+Message-ID: <CA+EHjTwMy1crsZLqfy8_Y56NFPJZ7vGyN-egc433GhxB_n=7aA@mail.gmail.com>
+Subject: Re: [PATCH v9 22/30] KVM: arm64: Expose SME specific state to userspace
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-
-Am 12=2E Januar 2026 13:22:24 UTC schrieb Ani Sinha <anisinha@redhat=2Ecom=
->:
->When IGVM is not being used by the confidential guest, the guest firmware=
- has
->to be reloaded explictly again into memory=2E This is because, the memory=
- into
->which the firmware was loaded before reset was encrypted and is thus lost
->upon reset=2E When IGVM is used, it is expected that the IGVM will contai=
-n the
->guest firmware and the execution of the IGVM directives will set up the g=
-uest
->firmware memory=2E
+On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
 >
->Signed-off-by: Ani Sinha <anisinha@redhat=2Ecom>
->---
-> target/i386/kvm/kvm=2Ec | 28 ++++++++++++++++++++++++++++
-> 1 file changed, 28 insertions(+)
+> SME introduces two new registers, the ZA matrix register and the ZT0 LUT
+> register.  Both of these registers are only accessible when PSTATE.ZA is
+> set and ZT0 is only present if SME2 is enabled for the guest. Provide
+> support for configuring these from VMMs.
 >
->diff --git a/target/i386/kvm/kvm=2Ec b/target/i386/kvm/kvm=2Ec
->index 4fedc621b8=2E=2E46c4f9487b 100644
->--- a/target/i386/kvm/kvm=2Ec
->+++ b/target/i386/kvm/kvm=2Ec
->@@ -51,6 +51,8 @@
-> #include "qemu/config-file=2Eh"
-> #include "qemu/error-report=2Eh"
-> #include "qemu/memalign=2Eh"
->+#include "qemu/datadir=2Eh"
->+#include "hw/core/loader=2Eh"
-> #include "hw/i386/x86=2Eh"
-> #include "hw/i386/kvm/xen_evtchn=2Eh"
-> #include "hw/i386/pc=2Eh"
->@@ -3267,6 +3269,22 @@ static int kvm_vm_enable_energy_msrs(KVMState *s)
->=20
-> static int xen_init_wrapper(MachineState *ms, KVMState *s);
->=20
->+static void reload_bios_rom(X86MachineState *x86ms)
->+{
->+    int bios_size;
->+    const char *bios_name;
->+    char *filename;
->+
->+    bios_name =3D MACHINE(x86ms)->firmware ?: "bios=2Ebin";
->+    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->+
->+    bios_size =3D get_bios_size(x86ms, bios_name, filename);
->+
->+    void *ptr =3D memory_region_get_ram_ptr(&x86ms->bios);
->+    load_image_size(filename, ptr, bios_size);
->+    x86_firmware_configure(0x100000000ULL - bios_size, ptr, bios_size);
->+}
+> The ZA matrix is a single SVL*SVL register which is available when
+> PSTATE.ZA is set. We follow the pattern established by the architecture
+> itself and expose this to userspace as a series of horizontal SVE vectors
+> with the streaming mode vector length, using the format already established
+> for the SVE vectors themselves.
+>
+> ZT0 is a single register with a refreshingly fixed size 512 bit register
+> which is like ZA accessible only when PSTATE.ZA is set. Add support for it
+> to the userspace API, as with ZA we allow the register to be read or written
+> regardless of the state of PSTATE.ZA in order to simplify userspace usage.
+> The value will be reset to 0 whenever PSTATE.ZA changes from 0 to 1,
+> userspace can read stale values but these are not observable by the guest
+> without manipulation of PSTATE.ZA by userspace.
+>
+> While there is currently only one ZT register the naming as ZT0 and the
+> instruction encoding clearly leave room for future extensions adding more
+> ZT registers. This encoding can readily support such an extension if one is
+> introduced.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/uapi/asm/kvm.h |  17 ++++++
+>  arch/arm64/kvm/guest.c            | 114 +++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 129 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 498a49a61487..9a19cc58d227 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -357,6 +357,23 @@ struct kvm_arm_counter_offset {
+>  /* SME registers */
+>  #define KVM_REG_ARM64_SME              (0x17 << KVM_REG_ARM_COPROC_SHIFT)
+>
+> +#define KVM_ARM64_SME_VQ_MIN __SVE_VQ_MIN
+> +#define KVM_ARM64_SME_VQ_MAX __SVE_VQ_MAX
+> +
+> +/* ZA and ZTn occupy blocks at the following offsets within this range: */
+> +#define KVM_REG_ARM64_SME_ZA_BASE      0
+> +#define KVM_REG_ARM64_SME_ZT_BASE      0x600
+> +
+> +#define KVM_ARM64_SME_MAX_ZAHREG       (__SVE_VQ_BYTES * KVM_ARM64_SME_VQ_MAX)
+> +
+> +#define KVM_REG_ARM64_SME_ZAHREG(n, i)                                 \
+> +       (KVM_REG_ARM64 | KVM_REG_ARM64_SME | KVM_REG_ARM64_SME_ZA_BASE | \
+> +        KVM_REG_SIZE_U2048 |                                           \
+> +        (((n) & (KVM_ARM64_SME_MAX_ZAHREG - 1)) << 5) |                \
+> +        ((i) & (KVM_ARM64_SVE_MAX_SLICES - 1)))
+> +
+> +#define KVM_REG_ARM64_SME_ZTREG_SIZE   (512 / 8)
+> +
+>  /* Vector lengths pseudo-register: */
+>  #define KVM_REG_ARM64_SME_VLS          (KVM_REG_ARM64 | KVM_REG_ARM64_SME | \
+>                                          KVM_REG_SIZE_U512 | 0xfffe)
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 90dcacb35f01..d4e30eb57a9c 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -594,23 +594,133 @@ static int set_sme_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>         return set_vec_vls(ARM64_VEC_SME, vcpu, reg);
+>  }
+>
+> +/*
+> + * Validate SVE register ID and get sanitised bounds for user/kernel SVE
+> + * register copy
+> + */
+> +static int sme_reg_to_region(struct vec_state_reg_region *region,
+> +                            struct kvm_vcpu *vcpu,
+> +                            const struct kvm_one_reg *reg)
+> +{
+> +       /* reg ID ranges for ZA.H[n] registers */
+> +       unsigned int vq = vcpu_sme_max_vq(vcpu) - 1;
+> +       const u64 za_h_max = vq * __SVE_VQ_BYTES;
+> +       const u64 zah_id_min = KVM_REG_ARM64_SME_ZAHREG(0, 0);
+> +       const u64 zah_id_max = KVM_REG_ARM64_SME_ZAHREG(za_h_max - 1,
+> +                                                      SVE_NUM_SLICES - 1);
+> +       unsigned int reg_num;
+> +
+> +       unsigned int reqoffset, reqlen; /* User-requested offset and length */
+> +       unsigned int maxlen; /* Maximum permitted length */
+> +
+> +       size_t sme_state_size;
+> +
+> +       reg_num = (reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
 
-All code in this function is already present in x86-common=2Ec=2E Can we m=
-ove this function there (possibly renaming it to x86_bios_rom_reload()) and=
- export it? This way, we could avoid code duplication and we didn't need to=
- export additional functions like in the previous patch=2E
+You use array_index_nospec() below for koffset, but it might be worth
+using it for intermediate values, such as this one.
 
-Best regards,
-Bernhard
+> +
+> +       if (reg->id >= zah_id_min && reg->id <= zah_id_max) {
+> +               if (!vcpu_has_sme(vcpu) || (reg->id & SVE_REG_SLICE_MASK) > 0)
+> +                       return -ENOENT;
+> +
+> +               /* ZA is exposed as SVE vectors ZA.H[n] */
+> +               reqoffset = ZA_SIG_ZAV_OFFSET(vq, reg_num) -
+> +                       ZA_SIG_REGS_OFFSET;
+> +               reqlen = KVM_SVE_ZREG_SIZE;
+> +               maxlen = SVE_SIG_ZREG_SIZE(vq);
+> +       } else if (reg->id == KVM_REG_ARM64_SME_ZT_BASE) {
+> +               /* ZA is exposed as SVE vectors ZA.H[n] */
+> +               if (!kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SME, SME2) ||
+> +                   (reg->id & SVE_REG_SLICE_MASK) > 0 ||
+> +                   reg_num > 0)
+> +                       return -ENOENT;
+> +
+> +               /* ZT0 is stored after ZA */
+> +               reqlen = KVM_REG_ARM64_SME_ZTREG_SIZE;
+> +               maxlen = KVM_REG_ARM64_SME_ZTREG_SIZE;
+> +       } else {
+> +               return -EINVAL;
+> +       }
+> +
+> +       sme_state_size = vcpu_sme_state_size(vcpu);
 
->+
-> int kvm_arch_vmfd_change_ops(MachineState *ms, KVMState *s)
-> {
->     Error *local_err =3D NULL;
->@@ -3285,6 +3303,16 @@ int kvm_arch_vmfd_change_ops(MachineState *ms, KVM=
-State *s)
->             error_report_err(local_err);
->             return ret;
->         }
->+        if (object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE)) {
->+            X86MachineState *x86ms =3D X86_MACHINE(ms);
->+            /*
->+             * If an IGVM file is specified then the firmware must be pr=
-ovided
->+             * in the IGVM file=2E
->+             */
->+            if (!x86ms->igvm) {
->+                reload_bios_rom(x86ms);
->+            }
->+        }
->     }
->=20
->     ret =3D kvm_vm_enable_exception_payload(s);
+Is it worth caching this value and storing it in arch, since the state
+size doesn't change after finalization?
+
+> +       if (WARN_ON(!sme_state_size))
+> +               return -EINVAL;
+> +
+> +       region->koffset = array_index_nospec(reqoffset, sme_state_size);
+> +       region->klen = min(maxlen, reqlen);
+> +       region->upad = reqlen - region->klen;
+> +
+> +       return 0;
+> +}
+> +
+> +/*
+> + * ZA is exposed as an array of horizontal vectors with the same
+> + * format as SVE, mirroring the architecture's LDR ZA[Wv, offs], [Xn]
+> + * instruction.
+> + */
+> +
+>  static int get_sme_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+> +       int ret;
+> +       struct vec_state_reg_region region;
+> +       char __user *uptr = (char __user *)reg->addr;
+> +
+>         /* Handle the KVM_REG_ARM64_SME_VLS pseudo-reg as a special case: */
+>         if (reg->id == KVM_REG_ARM64_SME_VLS)
+>                 return get_sme_vls(vcpu, reg);
+>
+> -       return -EINVAL;
+> +       /* Try to interpret reg ID as an architectural SME register... */
+> +       ret = sme_reg_to_region(&region, vcpu, reg);
+> +       if (ret)
+> +               return ret;
+> +
+> +       if (!kvm_arm_vcpu_vec_finalized(vcpu))
+> +               return -EPERM;
+> +
+> +       /*
+> +        * None of the SME specific registers are accessible unless
+> +        * PSTATE.ZA is set.
+> +        */
+> +       if (!vcpu_za_enabled(vcpu))
+> +               return -EINVAL;
+
+I think this should be something other than -EINVAL, since the issue
+isn't that the register isn't valid, but that it's inaccessible, as
+the comment says. -EACCESS or something?
+
+> +
+> +       if (copy_from_user(vcpu->arch.sme_state + region.koffset, uptr,
+> +                          region.klen))
+> +               return -EFAULT;
+
+This should be copy_to_user()
+
+> +
+> +       return 0;
+>  }
+>
+>  static int set_sme_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+>  {
+> +       int ret;
+> +       struct vec_state_reg_region region;
+> +       char __user *uptr = (char __user *)reg->addr;
+> +
+>         /* Handle the KVM_REG_ARM64_SME_VLS pseudo-reg as a special case: */
+>         if (reg->id == KVM_REG_ARM64_SME_VLS)
+>                 return set_sme_vls(vcpu, reg);
+>
+> -       return -EINVAL;
+> +       /* Try to interpret reg ID as an architectural SME register... */
+> +       ret = sme_reg_to_region(&region, vcpu, reg);
+> +       if (ret)
+> +               return ret;
+> +
+> +       if (!kvm_arm_vcpu_vec_finalized(vcpu))
+> +               return -EPERM;
+> +
+> +       /*
+> +        * None of the SME specific registers are accessible unless
+> +        * PSTATE.ZA is set.
+> +        */
+> +       if (!vcpu_za_enabled(vcpu))
+> +               return -EINVAL;
+
+Same as get_sme_reg().
+
+Cheers,
+/fuad
+
+
+
+> +
+> +       if (copy_from_user(vcpu->arch.sme_state + region.koffset, uptr,
+> +                          region.klen))
+> +               return -EFAULT;
+> +
+> +       return 0;
+>  }
+> +
+>  int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+>  {
+>         return -EINVAL;
+>
+> --
+> 2.47.3
+>
 
