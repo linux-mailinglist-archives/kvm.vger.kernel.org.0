@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-67882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB03D160DA
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 01:36:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68343D160DE
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 01:36:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C95A6309F756
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:32:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA4CC304F525
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762A71AE877;
-	Tue, 13 Jan 2026 00:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E59A23D7DE;
+	Tue, 13 Jan 2026 00:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xFIYAMjO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="05tRw5EF"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5054F258CCC
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 00:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F9E258EF3
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 00:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768264319; cv=none; b=OOmd9DotB0DsbSQFRuLl0k5rixZVEfssb6fXZkg8b0dp4hTyGrAsnjsiVOLetmwcdcFeoNzXpMTbdqax5eiF2/xHCZ+qL9KNpiiUPparL1VJDRCWO5kNXR4S+SbwG1bwWh7w0qiKcziFX9aP8bXhDxAsEjCxZeoPA7DOHXUSvA0=
+	t=1768264321; cv=none; b=JumMViA+X7XToB2W5hhvo5W5b0NGd6/gCfCaJxGPSmCyusCJyii3bhz/OpLCBphzujNUv5hQX4E9M5zr17xHvkzZ4+kWQMCuL01PKHXgtfPEuSZ1xPeS9ew8ylYwDoFzR3PzQdE4UbUddueKTQkErzIIXL0ixiR02LJk/3ayLyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768264319; c=relaxed/simple;
-	bh=l7pUcHj3JtKuCovI6QlGWC+6I84CJ+JsJsrLvviwIYE=;
+	s=arc-20240116; t=1768264321; c=relaxed/simple;
+	bh=YI8GKgEWSvy74tTAeJd5OjM9AF8uBnqY649Vn+Aim3A=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VMtNU0j3YB3FuZTjZ2GAnmuJ1Z5G4jRYgPxtkIMKBIszVuGqJi3pIYN1ktk/oUEtuUV07YP2wqXrc8WT6RJPG16/IjiI+EJZhE6eHSCWzBJ3Re7Hgadl/61zJOEsPnvbGq2L98SZDD1Otb2yDr22gJl0jQSBjbqs+oiN3QEHVHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xFIYAMjO; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=FTo0Rtj0mqqx3T1xrzdrs9ryTfajhifcUPQqD6Yw+0d7/1iQ4jHvtWM6UiY1FWuqiEcvX+N241QE86BL/eio0e0Y1gvNLJ/hkE8i8JsIUKaLz4mWYpF7SkeWGfuz4Cr3Ie5hiZIbJdG4rGH7ZzVQnrHpqp38Mun9BgiIdfP54bQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=05tRw5EF; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0e952f153so180876055ad.0
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:31:58 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0c495fc7aso73891505ad.3
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:31:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768264317; x=1768869117; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768264319; x=1768869119; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cwyhiZCM4DoTczOq/02jfKDa+oLIkgQ8T2Ln5iEcgQ=;
-        b=xFIYAMjOkeSmumOeNYwUq3po4PeJwE+03diMosUdJOeLFMCxi8uMt6T/DXX35FNCgO
-         +OoNvy1Se4F0Ux1iVPsSsOPoF157gm05KLCbiwdWDLn0uxhvCYYtwAjb96cbTXft/EEo
-         RLMiJ6T+mhx7oAMfh9DqKAm90u5VK9IhkXXPhH14ETLQpou+IfGaFGwCD17B/kZn0Iwd
-         kpn/ppKYtMVHuI10GEic04kgvDnL4CUf3a9jQ0fmBPtZsbD6nMT3XgNOkGNhxDSoeu77
-         7kP0xqFs5pHC0RRr7Ny2JGPQh0OOgjakF7crVce4EpatTdUn7v0NRY7K0A0j5z6dxjkq
-         KNuw==
+        bh=uKVSseZq191DY2h5cOdzwmHnCWRmfZAKmHrk2bflk/Y=;
+        b=05tRw5EF3WnCk9NhXGAQhDvXEhGmSclL7P5Gxj6Lybj8R3KMkdhqbh5IRco/dVUi4d
+         EuxzUvzGZq2g1EZ6qhMjMdZiWDw0FPChe2Atlpfv3jHkbImjzjuSKm96JGsxlYnbi/02
+         qyjxzA0CW9eIjp+4Y73uTuGfty/s9aSwpn9M0/vtkgcJNT3CcIvasLd/b+JzLxw5NqRh
+         z3atCuYulXeOFC5qZj7X33clXsSyA/bP5W41XAjfXvW8pc9+yELOxAXdOVAo02rmF2a7
+         clFFXqyD8Y47y1vdiBjChW3BPdeW7NeN7P6WQL+RtuEiuxguWGHrYLKlpmAENceG5AWl
+         bOpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768264317; x=1768869117;
+        d=1e100.net; s=20230601; t=1768264319; x=1768869119;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cwyhiZCM4DoTczOq/02jfKDa+oLIkgQ8T2Ln5iEcgQ=;
-        b=BzA4DDW6xkUiis7Lu62zxfBtOkoYOxmyYwagIXqKtita26gxGu6opj5t34Ed56CgqB
-         LccF3agd+QMXIMqOZ4BftrlJogkv9QQsPVJfTdPcYKPgCFCYyhlJLUxhP4JjkBjctR9W
-         QJpT7LrWTGC18qAAgxa7Wnvrh6kCks8CwJA9pt2VCu7pcELzR7PhcOlmp352IxxyToR5
-         Vj+OuLZwkMl7xBNkm3s/35FwJPVLsIIssV7/GgGinS1BAJvWdvLOi3XAJX4S8Yq2x6rZ
-         M/+EVufkLra+O/upv9Ex23GKSpo0Usj4Y/LT4j21jiWVRjMO16tcLDoPKOdRbtC7gRZv
-         7pEA==
-X-Gm-Message-State: AOJu0Yx5FUmbY8mc08b0T48o+48jg8j1Q9X9kp2lMOKxUopV7xgecPd/
-	V2J5f2tKOigBYvAEBhEfihm9Cw21ljTP+tZPDF839F9cAxknygFIsm9GEuCUsrvzQKUljKTaq9b
-	icT8bstxmu26dQVZs1NH65COMyuL97KTIc/+uRD7aqri5vXEOnOWdtc311x9Mc955ep2Q1Zysho
-	Qad6YVKbWUSzZ7OH4gVf6S2YebsEUnrXzLDsMAsRgnXTg=
-X-Google-Smtp-Source: AGHT+IFNFvqXERLOcbZQ4P1ue8DJOSeRY1yclfKryCk/slRq/beKvhB9GE3g5b8nwh97WwTLerjfSe2nSa6qIQ==
-X-Received: from pldu19.prod.google.com ([2002:a17:903:1093:b0:29f:b21:b1c3])
+        bh=uKVSseZq191DY2h5cOdzwmHnCWRmfZAKmHrk2bflk/Y=;
+        b=jQPatpFvbADCZBHCl7u8YdpNSYyejysYahOJUDdVg/urOEvTzpy2wlfF2p+Mlak6po
+         MiHeUH/hemWAyuiUsvvVGNTJ1nkhbVsQ1G0NewLkHOfcSJJeNHoFvR/G+aGwysko1mYp
+         nDvAhmcu5cFtV4YlPQ3HCdh36rqCEcZp7Uhc5nzdzvBAGezH1JSAlAgcrbiGtE/2TKKv
+         fXuIcakLRZG9yWgQrsN31ZdimKTuFFQr4RhqKbZqDwSclPx63NQ/hDcjNon21o5k/XEv
+         zG5NBdHBqdvYqTwqifA5TwA7T84XuNe7AEOjcjwY3X8qveLij/TgrJI7B5xTE9oWy1f+
+         E4sQ==
+X-Gm-Message-State: AOJu0YzWm8GXFt/k6CuvUpMECwUqXYm7yO13dlAT6FznMJlw4eX6YXyC
+	cET0j4yD+6LHXPAwpXPda1hy0P1j5c1WZpsVntLTyFui/Eg9Q4ZcQZYygdTxPoZMv23WCBITdo9
+	XfxzbVbbEUYG7D19Mq0veO5kw2/8bhkeBQ1GYxoz8cJ9aCsp4DIYaDYz20oZmMAgQFVWrMEDSjB
+	pfglquZFY1PW5rqV2GlgsC/iDWgtD1QpT9Ke8Klv1RDpM=
+X-Google-Smtp-Source: AGHT+IH4fcZzHaSTTVO6zmlVgYoaPNoEg0f684CsiwcI/zF8LdNYr08Riw/SCv29kgKkpJzhInEAF5qq927bJQ==
+X-Received: from pjbfy4.prod.google.com ([2002:a17:90b:204:b0:33b:c211:1fa9])
  (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:9cf:b0:2a0:c1ed:d0d9 with SMTP id d9443c01a7336-2a3ee49b022mr177188725ad.46.1768264317538;
- Mon, 12 Jan 2026 16:31:57 -0800 (PST)
-Date: Tue, 13 Jan 2026 00:31:43 +0000
+ 2002:a17:90b:1d01:b0:34c:a35d:de1b with SMTP id 98e67ed59e1d1-34f68c48346mr18156383a91.37.1768264319314;
+ Mon, 12 Jan 2026 16:31:59 -0800 (PST)
+Date: Tue, 13 Jan 2026 00:31:44 +0000
 In-Reply-To: <20260113003153.3344500-1-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,45 +72,224 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260113003153.3344500-1-chengkev@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260113003153.3344500-2-chengkev@google.com>
-Subject: [kvm-unit-tests PATCH V2 01/10] x86/svm: Fix virq_inject SVM test failure
+Message-ID: <20260113003153.3344500-3-chengkev@google.com>
+Subject: [kvm-unit-tests PATCH V2 02/10] x86/nSVM: Add test for NPT A/D bits
 From: Kevin Cheng <chengkev@google.com>
 To: kvm@vger.kernel.org
 Cc: yosryahmed@google.com, andrew.jones@linux.dev, thuth@redhat.com, 
 	pbonzini@redhat.com, seanjc@google.com, Kevin Cheng <chengkev@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Currently, the virq_inject test advances guest RIP regardless of what
-instruction caused the nested VM exit. This is an issue when
-INTERCEPT_VINTR is set and the sti_nop_cli() is called in L2 with a
-pending interrupt. The vmcb save rip will point to the nop instruction
-on exit due to a one instruction interrupt shadow. The unconditional
-advance of the guest rip will move it three bytes, which is past the
-entire sti_nop_cli() call. This produces some unintended/inconsitent
-behavior including test failures.
+Nested page table entries that were touched during nested page table
+walks for guest PTEs always have their dirty and accessed bits set.
+Write a test that verifies this behavior for guest read and writes. Note
+that non-leaf NPT levels encountered during the GPA to HPA translation
+for guest PTEs only have their accessed bits set.
 
-Only advance the guest rip if the exiting instruction was vmmcall().
+The nVMX tests already have coverage for TDP A/D bits. Add a
+similar test for nSVM to improve test parity between nSVM and nVMX.
 
 Signed-off-by: Kevin Cheng <chengkev@google.com>
 ---
- x86/svm_tests.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ x86/svm_npt.c | 178 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 178 insertions(+)
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 3761647642542..11d0e3d39f5ba 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1790,7 +1790,9 @@ static void virq_inject_test(struct svm_test *test)
+diff --git a/x86/svm_npt.c b/x86/svm_npt.c
+index bd5e8f351e343..7b8f57a8c3f07 100644
+--- a/x86/svm_npt.c
++++ b/x86/svm_npt.c
+@@ -380,6 +380,183 @@ skip_pte_test:
+ 	vmcb->save.cr4 = sg_cr4;
+ }
  
- static bool virq_inject_finished(struct svm_test *test)
- {
--	vmcb->save.rip += 3;
-+	/* Only jump over VMMCALL instruction */
-+	if (vmcb->control.exit_code == SVM_EXIT_VMMCALL)
-+		vmcb->save.rip += 3;
++
++static void clear_npt_ad_pte(unsigned long *pml4e, void *gpa)
++{
++	unsigned long *pte;
++	int l;
++
++	for (l = PAGE_LEVEL; l > 0; --l) {
++		pte = get_pte_level(pml4e, gpa, l);
++		*pte &= ~(PT_AD_MASK);
++		if (*pte & PT_PAGE_SIZE_MASK)
++			break;
++	}
++}
++
++/*
++ * clear_npt_ad : Clear NPT A/D bits for the page table walk and the final
++ * GPA of a guest address.
++ */
++static void clear_npt_ad(u64 *pml4e, unsigned long *guest_cr3,
++			 void *gva)
++{
++	unsigned long *pte = guest_cr3, gpa;
++	u64 offset_in_page;
++	int l;
++
++	for (l = PAGE_LEVEL; l > 0; --l) {
++		pte = get_pte_level(guest_cr3, gva, l);
++
++		clear_npt_ad_pte(pml4e, (void *)pte);
++
++		assert(*pte & PT_PRESENT_MASK);
++		if (*pte & PT_PAGE_SIZE_MASK)
++			break;
++	}
++
++	pte = get_pte_level(guest_cr3, gva, l);
++	offset_in_page = (u64)gva &  ((1 << PGDIR_BITS(l)) - 1);
++	gpa = (*pte & PT_ADDR_MASK) | ((u64)gva & offset_in_page);
++	clear_npt_ad_pte(pml4e, (void *)gpa);
++}
++
++/*
++ * found_bad_npt_ad : Check the NPT A/D bits at each level for GPA being
++ * translated. Note that non-leaf NPT levels encountered during translation
++ * only have the access bit set.
++ *
++ * Returns true if incorrect NPT A/D bits are found. Returns false otherwise.
++ */
++static bool found_bad_npt_ad(u64 *pml4e, void *gpa, int guest_level,
++			     int expected_ad)
++{
++	int l, expected_ad_level;
++	unsigned long *pte;
++	bool leaf;
++
++	for (l = PAGE_LEVEL; l > 0; --l) {
++		pte = get_pte_level(pml4e, gpa, l);
++		leaf = (l == 1) || (*pte & PT_PAGE_SIZE_MASK);
++		expected_ad_level = expected_ad;
++
++		/* The dirty bit is only set on leaf PTEs */
++		if (!leaf)
++			expected_ad_level = expected_ad & ~PT_DIRTY_MASK;
++
++		if ((*pte & PT_AD_MASK) != expected_ad_level) {
++			report_fail("NPT - guest level %d npt level %d page table received: A=%d/D=%d, expected A=%d/D=%d",
++				    guest_level,
++				    l,
++				    !!(*pte & PT_ACCESSED_MASK),
++				    !!(*pte & PT_DIRTY_MASK),
++				    !!(expected_ad & PT_ACCESSED_MASK),
++				    !!(expected_ad & PT_DIRTY_MASK));
++			return true;
++		}
++
++		if (leaf)
++			break;
++	}
++
++	return false;
++}
++
++/*
++ * check_npt_ad : Check the content of NPT A/D bits for the page table walk
++ * and the final GPA of a guest address.
++ */
++static void check_npt_ad(u64 *pml4e, unsigned long *guest_cr3,
++			 void *gva, int expected_gpa_ad)
++{
++	unsigned long *pte = guest_cr3, gpa;
++	u64 *npt_pte, offset_in_page;
++	bool bad_pt_ad = false;
++	int l;
++
++	for (l = PAGE_LEVEL; l > 0; --l) {
++		pte = get_pte_level(guest_cr3, gva, l);
++		npt_pte = npt_get_pte((u64) pte);
++
++		if (!npt_pte) {
++			report_fail("NPT - guest level %d page table is not mapped.\n", l);
++			return;
++		}
++
++		if (!bad_pt_ad)
++			bad_pt_ad |= found_bad_npt_ad(pml4e, (void *)pte, l, PT_AD_MASK);
++
++		assert(*pte & PT_PRESENT_MASK);
++		if (*pte & PT_PAGE_SIZE_MASK)
++			break;
++	}
++
++	pte = get_pte_level(guest_cr3, gva, l);
++	offset_in_page = (u64)gva &  ((1 << PGDIR_BITS(l)) - 1);
++	gpa = (*pte & PT_ADDR_MASK) | ((u64)gva & offset_in_page);
++
++	npt_pte = npt_get_pte(gpa);
++
++	if (!npt_pte) {
++		report_fail("NPT - guest physical address is not mapped");
++		return;
++	}
++
++	found_bad_npt_ad(pml4e, (void *)gpa, l, expected_gpa_ad);
++	report((*npt_pte & PT_AD_MASK) == expected_gpa_ad,
++	       "NPT - guest physical address received: A=%d/D=%d, expected A=%d/D=%d",
++	       !!(*npt_pte & PT_ACCESSED_MASK),
++	       !!(*npt_pte & PT_DIRTY_MASK),
++	       !!(expected_gpa_ad & PT_ACCESSED_MASK),
++	       !!(expected_gpa_ad & PT_DIRTY_MASK));
++}
++
++static void npt_ad_read_guest(struct svm_test *test)
++{
++	(void)*(volatile u64 *)scratch_page;
++}
++
++static void npt_ad_write_guest(struct svm_test *test)
++{
++	*((u64 *)scratch_page) = 42;
++}
++
++static void npt_ad_test(void)
++{
++	unsigned long *guest_cr3 = (unsigned long *) vmcb->save.cr3;
++
++	if (!npt_supported()) {
++		report_skip("NPT not supported");
++		return;
++	}
++
++	scratch_page = alloc_page();
++
++	clear_npt_ad(npt_get_pml4e(), guest_cr3, scratch_page);
++
++	test_set_guest(npt_ad_read_guest);
++	svm_vmrun();
++
++	/*
++	 * NPT walks for guest page tables are write accesses by default unless
++	 * read-only guest page tables are used. As a result, we expect the
++	 * dirty bit to be set on NPT mappings of guest page tables. Since the
++	 * access itself is a read, we expect the final translation to not have
++	 * the dirty bit set.
++	 */
++	check_npt_ad(npt_get_pml4e(), guest_cr3, scratch_page, PT_ACCESSED_MASK);
++
++	test_set_guest(npt_ad_write_guest);
++	svm_vmrun();
++
++	check_npt_ad(npt_get_pml4e(), guest_cr3, scratch_page, PT_AD_MASK);
++
++	report(*((u64 *)scratch_page) == 42, "Expected: 42, received: %ld",
++	       *((u64 *)scratch_page));
++
++	clear_npt_ad(npt_get_pml4e(), guest_cr3, scratch_page);
++}
++
+ #define NPT_V1_TEST(name, prepare, guest_code, check)				\
+ 	{ #name, npt_supported, prepare, default_prepare_gif_clear, guest_code,	\
+ 	  default_finished, check }
+@@ -395,6 +572,7 @@ static struct svm_test npt_tests[] = {
+ 	NPT_V1_TEST(npt_l1mmio, npt_l1mmio_prepare, npt_l1mmio_test, npt_l1mmio_check),
+ 	NPT_V1_TEST(npt_rw_l1mmio, npt_rw_l1mmio_prepare, npt_rw_l1mmio_test, npt_rw_l1mmio_check),
+ 	NPT_V2_TEST(svm_npt_rsvd_bits_test),
++	NPT_V2_TEST(npt_ad_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
+ };
  
- 	switch (get_test_stage(test)) {
- 	case 0:
 -- 
 2.52.0.457.g6b5491de43-goog
 
