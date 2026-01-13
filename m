@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-67888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069DAD1605C
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 01:34:16 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE9FD160CB
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 01:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DBF273028685
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:32:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5F226302ADCB
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 00:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB98C231858;
-	Tue, 13 Jan 2026 00:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A031279798;
+	Tue, 13 Jan 2026 00:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b0/plr7t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B+GsRaUk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD33A261B8F
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 00:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B984F262808
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 00:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768264330; cv=none; b=Hc4ydDX6DQjekHX4CPewyTd/amF0WaOfFmO/u9LZpZLjWSJh4stt7GofajEyYcrEB86+5JPrDV/8/7anQw1yvO6hUo8jqeMywWYlo8H20Pdl2TOaLZrq1pxFXArP63PeCio/iX1Z48Qu+ALDHsFModQZV4S/9rpZ9EGbNek3L3s=
+	t=1768264336; cv=none; b=ld1ppkyjyGXnsB5AGQgH3p4ntvEb9/Al5B8o/lTcyP8F8Zt8h2fAvW7SS2MyKOqfrBknY4JAZCq+PtiMX+cJATKNN/t4jHpMs4SSdFG+OMREOLbc8a3wTzX/XDvOGjHsxj6SRZ6jxOwkZVQwZTxrOL5GLtxvN+PvyvuaRMS0lpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768264330; c=relaxed/simple;
-	bh=t+1zRp0OUO5ZNxI5CdmaoojQgpl1kUgc4oy7hjIuBAI=;
+	s=arc-20240116; t=1768264336; c=relaxed/simple;
+	bh=Y7xDGnrQw8X1IC2uGAEyOHkgX6n1Bu0jXAwXxBoxl64=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HDf4Kqpg+FDfNw6rDTg+gMBhkkcc5/a4+pOwsnucgoO1Yr3FUWsIoraAWZ5flwwyFDHQZMfg1w2qIbkUeF3oogbQcjZwsGY3ArMlQOSIC7Eif0WBOtgoxCqnEcaWm6PoCg3i7qZ/he5se/hB6adSPbZjdTVJCOUVrFieFw8wJ0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b0/plr7t; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=qavQmjJoT8eGKWtYNr/2rzMOFSK83xpGmQx1iR0QX5fxueiS0k2MGxcM3OOo+xeWABObClqOT5/IzqFQXr3NRoI71pb76qa9BX44syHNnHT+f3xEVdL7ERBQjzDrs08wUpmYMZA3Wp8S7OTK4XBqOMVA2pWhyVqaiEL1oH2lbXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B+GsRaUk; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c6e05af6fso7112752a91.1
-        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:32:09 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34cc8bf226cso7909744a91.3
+        for <kvm@vger.kernel.org>; Mon, 12 Jan 2026 16:32:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768264329; x=1768869129; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768264331; x=1768869131; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oiTojNlbDAzyVC3pSvqgDKiciei16bt0llNSK0nNKyg=;
-        b=b0/plr7tzwsb3JyqXQh9QWXIH7+JsRu7wnDT3CxKseCk/zXWTANuTMK3GM7w5s3ih3
-         gEdVCPXhVWvOFi6LJ6L2tKG3rWvYNB7TEPOtp43CSUYBll9QnxvWWGrp7kGwrdAxGgIZ
-         iLzsJiv99/lxv1lZo/khLLYQ+sPLt29Jnrw2Kuv2E2QwJAjQn0cse3jk4UaSrVVrVm+p
-         ggcR+cmyeS16NWQD9WOVPo3VooT/IJ/XsgOz8kHuCTwbmyS9ACk8zOPU5X7tsaTzcx5F
-         cMOwIMzwW6uoqEQAOtFzlL5C9Y/wPpft363SN0Mz3GMiX3b3gWc8woA/kLQyJ2qWUi3R
-         ih5w==
+        bh=Vx8IbF6waxvT078eUcaNLcxctazNYIqS+jwtsNKv30M=;
+        b=B+GsRaUkhMCaJsy4O8dui6D///tZ1k0ulLBAymukoQfn7cn1BYnnRSjSPyrvMvdIau
+         iiMXvxrT20S4Gkhkp7ywARD5vDCaYvTHHR4XTnR30RMiYk4Nzq3rXPJoMpZgNcvFQYCZ
+         6StffujPiZpXfnKbtDX9w4DAX5kdwLFwNMDfXzlwrQYBr8t6ln4wcH7cb0t8Hoa7/+gn
+         eEJ9OPDGWY07emFGrWCNetcPSYJnO7ADSkKcARtPfNqXqUHcbjfxWF3GFpdakBaHOGMs
+         r7iEbQBz39amAokUBmihxzQr6FoAexTfZ6g5jNjxqxRUG3j1zEEKOMbxYuUQZnTNYODY
+         ptAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768264329; x=1768869129;
+        d=1e100.net; s=20230601; t=1768264331; x=1768869131;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oiTojNlbDAzyVC3pSvqgDKiciei16bt0llNSK0nNKyg=;
-        b=dwu9lGoZjaVkpn2dR1UxuU/W8ZNrV7NBDGC+GNlhVQ9KAechOFDYxh2lektk2F7XG4
-         E7uGNx0xspZjN3Ln7HHAvsw/zy//BYDGdTMegxz7u+G6RPpweINKvX8JxrzemH+ygIny
-         wCnDqkqvbsIzb8CsmirbBi/PYSs9PQeubOZzXxybHd5wYH5/5nroK88nvGVKHqDd0vY2
-         0vZ/2xLXbgN67y4qH0s3wBxNbS2y8YN4Wqf0ZA34CA21T8qK//qekFSC832DPmIhNyuA
-         QEupBnmTtMjhr8L7E6dScyOK5e7bZmKpCzbxGiBnzkF7TEXNI24HfciA0CGwY+y3dnl0
-         x7Vw==
-X-Gm-Message-State: AOJu0YwkT+7tLgmuHPfisUhMwLozX0wesMN5Emq7Ga4XrIiOxTLL63Wj
-	f+U9AFZ+7oxgvHB1pkHp8XzGx8OyMeXiXv27Rmbr+tt6EoNL4xdAouZBGFe4v4H5PIoZGDhFHih
-	vMMVeOfmox1AWodBpvyQbKg4AiIKgXncbsdN8cgQv3yVk2N5gAcZIimnSVDIlbfMoXkTuge9q2s
-	235r3NZ4piT10G6s+atd/wfNm11BbsTdVd1R6rq5DeBxA=
-X-Google-Smtp-Source: AGHT+IEqeGIc7Ouulf3Ph5RcARwrr2VtIVX+ovnLzkUV8x/BIrT5643xF6W/36+cB8b1e3cE2YKDTsEufsh1Zw==
-X-Received: from pjbds14.prod.google.com ([2002:a17:90b:8ce:b0:34a:bee9:ef2])
+        bh=Vx8IbF6waxvT078eUcaNLcxctazNYIqS+jwtsNKv30M=;
+        b=AmUvh1NLPVb6qgwBtlA2rEOtSAiv6xx2O7505HFpYYj/GZnNO538jLjqdzn1ssXzQD
+         /CpK49TFU8oM1O3nROXYzDpulHd/e7RthNRXag1B0G61Cl1uSbf5asGUvnzktRB17LPm
+         m18Ab7ld6xX74bEXT2TOf+8tlEBhXnu+xcIqsTQ8uVM64cVWKFO0d8XD4F7f+FRgm/Ih
+         UDpJOSEaCBpHkpAoK7tS08IqZF5WmdXRqmYEx1/+sj2U/Vov6l3nJZ0nXINsQK71m/FQ
+         qoGTdXRJ+JzdpyCSJuWo8pNu3OfyDQY8xjG+4vBo9osSj7UomoqbXleJOMYkM1WqDir1
+         k97A==
+X-Gm-Message-State: AOJu0YwLCFeaa+6pEmnRO7mm6ILzQo3xJVUChuJMy/9e1lz043a1ZQGo
+	8ab7415bTspgPD/p6No2G4AmyyhTK+8C8aXpCYgWRMVBQfpd6R8SSpy/YIIIz7h8WS70B5dB5Do
+	/vaCIMZLT/C6ajNUGnfgrdACUSZbY3cQJ1uqJge2nJg06NNL0KcnHhY5glDH0R0hz6wZbsQkq5m
+	oDzrYmJ6OVVFjk2Uq0XWFoQja2YqHKrEe5N7N+OrPaLv8=
+X-Google-Smtp-Source: AGHT+IEz8BynoNDaRdTIWqfQHBcxzY5etNeSSad4Hxg0FO1jg5QoW3FBEcbyd/3AFp4Aeir3e83P2n8po+I//w==
+X-Received: from pjboo9.prod.google.com ([2002:a17:90b:1c89:b0:34c:2f52:23aa])
  (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1c87:b0:34c:635f:f855 with SMTP id 98e67ed59e1d1-34f68c33ab8mr19845816a91.7.1768264328905;
- Mon, 12 Jan 2026 16:32:08 -0800 (PST)
-Date: Tue, 13 Jan 2026 00:31:49 +0000
+ 2002:a17:90b:3e43:b0:34a:b4a2:f0bf with SMTP id 98e67ed59e1d1-34f68c28716mr18975578a91.16.1768264330968;
+ Mon, 12 Jan 2026 16:32:10 -0800 (PST)
+Date: Tue, 13 Jan 2026 00:31:50 +0000
 In-Reply-To: <20260113003153.3344500-1-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -72,70 +72,278 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260113003153.3344500-1-chengkev@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260113003153.3344500-8-chengkev@google.com>
-Subject: [kvm-unit-tests PATCH V2 07/10] x86/svm: Add NPT ignored bits test
+Message-ID: <20260113003153.3344500-9-chengkev@google.com>
+Subject: [kvm-unit-tests PATCH V2 08/10] x86/svm: Add testing for NPT
+ permissions on guest page tables
 From: Kevin Cheng <chengkev@google.com>
 To: kvm@vger.kernel.org
 Cc: yosryahmed@google.com, andrew.jones@linux.dev, thuth@redhat.com, 
 	pbonzini@redhat.com, seanjc@google.com, Kevin Cheng <chengkev@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Bits 62:59 are ignored if memory protection keys are disabled via the
-PKE CR4 bit. Verify that accesses are allowed when these bits are set
-while memory protection keys are disabled.
-
-Bits 52:58 are available so test that those are ignored as well.
+Modify permissions for NPT entries that contain guest page table
+structures. Verify that NPF VM exit correctly reports fault occurred
+during the guest page table walk and correctly reports the right
+violation.
 
 Signed-off-by: Kevin Cheng <chengkev@google.com>
 ---
- x86/svm_npt.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ x86/svm_npt.c | 223 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 221 insertions(+), 2 deletions(-)
 
 diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-index 6ecaf32a8d75a..39e8b01965f25 100644
+index 39e8b01965f25..410c17c7b7cbc 100644
 --- a/x86/svm_npt.c
 +++ b/x86/svm_npt.c
-@@ -372,6 +372,35 @@ static void npt_rwx_test(void)
- 	npt_access_test_cleanup();
+@@ -51,6 +51,12 @@ static void *get_1g_page(void)
+ 	return alloc;
  }
  
-+static void npt_ignored_bit(int bit)
++static void do_npt_access_op(enum npt_access_op op)
 +{
-+	/* Set the bit. */
-+	npt_access_allowed(0, 1ul << bit, OP_READ);
-+	npt_access_allowed(0, 1ul << bit, OP_WRITE);
-+	npt_access_allowed(0, 1ul << bit, OP_EXEC);
-+
-+	/* Clear the bit. */
-+	npt_access_allowed(1ul << bit, 0, OP_READ);
-+	npt_access_allowed(1ul << bit, 0, OP_WRITE);
-+	npt_access_allowed(1ul << bit, 0, OP_EXEC);
++	npt_access_test_data.op = op;
++	svm_vmrun();
 +}
 +
-+static void npt_ignored_bits_test(void)
+ static void
+ diagnose_npt_violation_exit_code(u64 expected, u64 actual)
+ {
+@@ -115,9 +121,8 @@ static void do_npt_access(enum npt_access_op op, u64 expected_fault,
+ 	u64 exit_info_2;
+ 
+ 	/* Try the access and observe the violation. */
+-	npt_access_test_data.op = op;
+ 	vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+-	svm_vmrun();
++	do_npt_access_op(op);
+ 
+ 	exit_code = vmcb->control.exit_code;
+ 	exit_info_1 = vmcb->control.exit_info_1;
+@@ -422,6 +427,215 @@ static bool npt_rw_pfwalk_check(struct svm_test *test)
+ 	    && (vmcb->control.exit_info_2 == read_cr3());
+ }
+ 
++/*
++ * This function modifies the NPT entry that maps the GPA that the guest page
++ * table entry mapping npt_access_test_data.gva resides on.
++ */
++static void npt_access_paddr(unsigned long npt_clear, unsigned long npt_set,
++			     unsigned long pte_set, enum npt_access_op op,
++			     bool expect_violation, u64 expected_fault)
 +{
-+	ulong saved_cr4 = read_cr4();
++	struct npt_access_test_data *data = &npt_access_test_data;
++	unsigned long *ptep;
++	unsigned long gpa;
++	unsigned long orig_npte;
++	unsigned long pte;
++	u64 orig_opt_mask = pte_opt_mask;
++	int level;
 +
-+	/* Setup must be called first because it saves the original cr4 state */
++	/* Modify the guest PTE mapping data->gva according to @pte_set.  */
++	ptep = get_pte_level(current_page_table(), data->gva, 1);
++	report(ptep, "Get pte for gva 0x%lx", (unsigned long)data->gva);
++	report((*ptep & PT_ADDR_MASK) == data->gpa, "gva is correctly mapped");
++	*ptep = (*ptep & ~PT_AD_MASK) | pte_set;
++	do_npt_access_op(OP_FLUSH_TLB);
++
++	/*
++	 * Now modify the access bits on the NPT entry for the GPA that the
++	 * guest PTE resides on. Note that by modifying a single NPT entry,
++	 * we're potentially affecting 512 guest PTEs. However, we've carefully
++	 * constructed our test such that those other 511 PTEs aren't used by
++	 * the guest: data->gva is at the beginning of a 1G huge page, thus the
++	 * PTE we're modifying is at the beginning of a 4K page and the
++	 * following 511 entries are also under our control (and not touched by
++	 * the guest).
++	 */
++	gpa = virt_to_phys(ptep);
++	assert((gpa & ~PAGE_MASK) == 0);
++
++	/*
++	 * Make sure the guest page table page is mapped with a 4K NPT entry,
++	 * otherwise our level=1 twiddling below will fail. We use the
++	 * identity map (gpa = gpa) since page tables are shared with the host.
++	 */
++	pte_opt_mask |= PT_USER_MASK;
++	install_pte(npt_get_pml4e(), /*level=*/1, (void *)(ulong)gpa,
++		    gpa | PT_PRESENT_MASK | PT_WRITABLE_MASK | PT_USER_MASK, 0);
++	pte_opt_mask = orig_opt_mask;
++
++	orig_npte = npt_twiddle(gpa, /*mkhuge=*/0, /*level=1*/1, npt_clear, npt_set);
++
++	if (expect_violation) {
++		do_npt_access(op, expected_fault, gpa);
++		npt_untwiddle(gpa, /*level=*/1, orig_npte);
++		do_npt_access_op(op);
++		TEST_EXPECT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
++	} else {
++		do_npt_access(op, 0, gpa);
++		for (level = PAGE_LEVEL; level > 0; level--) {
++			pte = *find_pte_level(npt_get_pml4e(), (void *)gpa, level).pte;
++			report(pte & PT_ACCESSED_MASK,
++			       "Access flag set. PTE val: 0x%lx",
++			       pte);
++
++			if (level == 1)
++				report(pte & PT_DIRTY_MASK,
++				       "Dirty flag set. PTE val: 0x%lx",
++				       pte);
++			else
++				report(!(pte & PT_DIRTY_MASK),
++				       "Dirty flag not set. PTE val: 0x%lx level: %d",
++				       pte, level);
++		}
++
++		npt_untwiddle(gpa, /*level=*/1, orig_npte);
++	}
++
++	report(*ptep & PT_ACCESSED_MASK, "Access flag set");
++	if ((pte_set & PT_DIRTY_MASK) || op == OP_WRITE)
++		report(*ptep & PT_DIRTY_MASK, "Dirty flag set");
++}
++
++static void npt_access_allowed_paddr(unsigned long npt_clear, unsigned long npt_set,
++				     unsigned long pte_set, enum npt_access_op op)
++{
++	npt_access_paddr(npt_clear, npt_set, pte_set, op, false, 0);
++}
++
++static void npt_access_npf_paddr(unsigned long npt_clear, unsigned long npt_set,
++				 unsigned long pte_set, enum npt_access_op op,
++				 u64 expected_fault)
++{
++	npt_access_paddr(npt_clear, npt_set, pte_set, op, true, expected_fault);
++}
++
++/*
++ * All accesses to guest paging structures are considered as writes as far as
++ * NPT translation is concerned.
++ */
++static void npt_access_paddr_not_present_test(void)
++{
++	u32 pte_set_combinations[3] = {0, PT_ACCESSED_MASK, PT_DIRTY_MASK};
++
 +	npt_access_test_setup();
 +
-+	write_cr4(saved_cr4 & ~X86_CR4_PKE);
++	for (int i = 0; i < ARRAY_SIZE(pte_set_combinations); i++) {
++		npt_access_npf_paddr(PT_PRESENT_MASK, 0,
++				     pte_set_combinations[i], OP_READ,
++				     PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++					     PFERR_WRITE_MASK);
++		npt_access_npf_paddr(PT_PRESENT_MASK, 0,
++				     pte_set_combinations[i], OP_WRITE,
++				     PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++					     PFERR_WRITE_MASK);
++		npt_access_npf_paddr(PT_PRESENT_MASK, 0,
++				     pte_set_combinations[i], OP_EXEC,
++				     PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++					     PFERR_WRITE_MASK);
++	}
 +
-+	for (int i = 52; i <= 62; i++)
-+		npt_ignored_bit(i);
-+
-+	write_cr4(saved_cr4);
 +	npt_access_test_cleanup();
 +}
 +
- static void npt_rw_pfwalk_prepare(struct svm_test *test)
- {
++static void npt_access_paddr_read_only_test(void)
++{
++	u32 pte_set_combinations[3] = {0, PT_ACCESSED_MASK, PT_DIRTY_MASK};
++
++	npt_access_test_setup();
++
++	for (int i = 0; i < ARRAY_SIZE(pte_set_combinations); i++) {
++		npt_access_npf_paddr(PT_WRITABLE_MASK, PT64_NX_MASK,
++				     pte_set_combinations[i], OP_READ,
++				     PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++					     PFERR_WRITE_MASK |
++					     PFERR_PRESENT_MASK);
++		npt_access_npf_paddr(PT_WRITABLE_MASK, PT64_NX_MASK,
++				     pte_set_combinations[i], OP_WRITE,
++				     PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++					     PFERR_WRITE_MASK |
++					     PFERR_PRESENT_MASK);
++		npt_access_npf_paddr(PT_WRITABLE_MASK, PT64_NX_MASK,
++				     pte_set_combinations[i], OP_EXEC,
++				     PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++					     PFERR_WRITE_MASK |
++					     PFERR_PRESENT_MASK);
++	}
++
++	npt_access_test_cleanup();
++}
++
++static void npt_access_paddr_read_execute_test(void)
++{
++	u32 pte_set_combinations[3] = {0, PT_ACCESSED_MASK, PT_DIRTY_MASK};
++
++	npt_access_test_setup();
++
++	for (int i = 0; i < ARRAY_SIZE(pte_set_combinations); i++) {
++		npt_access_npf_paddr(
++			PT_WRITABLE_MASK, 0, pte_set_combinations[i], OP_READ,
++			PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++				PFERR_WRITE_MASK | PFERR_PRESENT_MASK);
++		npt_access_npf_paddr(
++			PT_WRITABLE_MASK, 0, pte_set_combinations[i], OP_WRITE,
++			PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++				PFERR_WRITE_MASK | PFERR_PRESENT_MASK);
++		npt_access_npf_paddr(
++			PT_WRITABLE_MASK, 0, pte_set_combinations[i], OP_EXEC,
++			PFERR_GUEST_PAGE_MASK | PFERR_USER_MASK |
++				PFERR_WRITE_MASK | PFERR_PRESENT_MASK);
++	}
++
++	npt_access_test_cleanup();
++}
++
++static void npt_access_paddr_read_write_test(void)
++{
++	u32 pte_set_combinations[3] = {0, PT_ACCESSED_MASK, PT_DIRTY_MASK};
++
++	npt_access_test_setup();
++
++	/* Read-write access to paging structure. */
++	for (int i = 0; i < ARRAY_SIZE(pte_set_combinations); i++) {
++		npt_access_allowed_paddr(0, PT_WRITABLE_MASK | PT64_NX_MASK,
++					 pte_set_combinations[i], OP_READ);
++		npt_access_allowed_paddr(0, PT_WRITABLE_MASK | PT64_NX_MASK,
++					 pte_set_combinations[i], OP_WRITE);
++		npt_access_allowed_paddr(0, PT_WRITABLE_MASK | PT64_NX_MASK,
++					 pte_set_combinations[i], OP_EXEC);
++	}
++
++	npt_access_test_cleanup();
++}
++
++static void npt_access_paddr_read_write_execute_test(void)
++{
++	u32 pte_set_combinations[3] = {0, PT_ACCESSED_MASK, PT_DIRTY_MASK};
++
++	npt_access_test_setup();
++
++	/* RWX access to paging structure. */
++	for (int i = 0; i < ARRAY_SIZE(pte_set_combinations); i++) {
++		npt_access_allowed_paddr(0, PT_WRITABLE_MASK, pte_set_combinations[i],
++					 OP_READ);
++		npt_access_allowed_paddr(0, PT_WRITABLE_MASK, pte_set_combinations[i],
++					 OP_WRITE);
++		npt_access_allowed_paddr(0, PT_WRITABLE_MASK, pte_set_combinations[i],
++					 OP_EXEC);
++	}
++
++	npt_access_test_cleanup();
++}
++
+ static bool was_x2apic;
  
-@@ -833,6 +862,7 @@ static struct svm_test npt_tests[] = {
- 	NPT_V2_TEST(npt_ro_test),
+ static void npt_apic_prepare(void)
+@@ -863,6 +1077,11 @@ static struct svm_test npt_tests[] = {
  	NPT_V2_TEST(npt_rw_test),
  	NPT_V2_TEST(npt_rwx_test),
-+	NPT_V2_TEST(npt_ignored_bits_test),
+ 	NPT_V2_TEST(npt_ignored_bits_test),
++	NPT_V2_TEST(npt_access_paddr_not_present_test),
++	NPT_V2_TEST(npt_access_paddr_read_only_test),
++	NPT_V2_TEST(npt_access_paddr_read_write_test),
++	NPT_V2_TEST(npt_access_paddr_read_write_execute_test),
++	NPT_V2_TEST(npt_access_paddr_read_execute_test),
  	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
  };
  
