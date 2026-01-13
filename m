@@ -1,183 +1,145 @@
-Return-Path: <kvm+bounces-67983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67984-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DEC2D1BA2C
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:54:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AEA3D1BA76
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:09:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 44D2530373B2
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 22:54:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EB6293012788
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF2C355057;
-	Tue, 13 Jan 2026 22:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB48C36AB74;
+	Tue, 13 Jan 2026 23:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DWY5gWs1"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="g6gP1emt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C82026E710
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 22:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F1C284883;
+	Tue, 13 Jan 2026 23:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768344873; cv=none; b=NNeN464M5+ya1wPujZKogWQYFpvl6KboMPdjJ+5ZvMh4RZrIqIa9ZmJe+XKFvFpsYSnPn1QlnpjCLKqKpa1AXTDJyruySTCC7BqCkz2n/ygTeyDlH/LLhpaCBvGgNSprFZR+shGGtJO/i/MXJxQRdtlYdoCB9kmxNh5BM4e8NOE=
+	t=1768345766; cv=none; b=GC3okzQaZ2aRXSvvkcyBxoVvYRoVVJaeQhZUXVi+s+vjusmKs6X5osX2O7MoCIuYkTz/8xjmHbx9LTsOWMzuMlLi/Edgno2zjbr+emo12F4BpeiWvfUPvhvadN4UpHxJIIEghETwCghwMmSNRiGA+gLHG/uPO0VcR5LqHhgbAdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768344873; c=relaxed/simple;
-	bh=kjYxer+/3V1jI4OHoFVGD+5pSEYcQa3i5tlZizYE17k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OFu4reZuPKU5vB4/XkaVeeetC4hJdVolvTak4Dg+7Isti+lf/cecg6TZfejkR/fXgQ1KrLchYOQY6unyo+kwElz1tdUK9tlIQ1apAPJoLHDaK/ADen0YGnMHEJDF0dVXskol99w/f55vqh8Ta6uSsds1m64MHYOAzP0y7wJ4giY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DWY5gWs1; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c904a1168so8718372a91.1
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 14:54:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768344872; x=1768949672; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AJghbSsJpIgQjxA5ov9Uplap9HJ8WXvKzTlzG3h11mk=;
-        b=DWY5gWs1bHBol3/xdmp8hdy7G8u5ITbsWJ8MLfJbYjLug84WkcaWAhOnEDyZdiVBAE
-         WzMaQChj4/QEzXXDe3zqVHzyfJ1hB+HP7lTXci2CBv8pXTa48VpihTg70ghUiVVvngWi
-         dvRZseoqZTtwatBUoxg9U+cVuysRl0NzEYju/FndC/4U4nmRWg9KoGMhpfwGkiPHQipn
-         bTI/nHI30kFTD2xYCoGP9TG8tBwG0GBw8tWg6JrZ8p2x9hcbWSOgmTpURK/E/0ymXe/q
-         fMRaQBf27D936A++fNJcfhqYGIcYanLvenQy25PeYcVtRaMTU2LUCB+sBlSaM8r0kKBc
-         60vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768344872; x=1768949672;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AJghbSsJpIgQjxA5ov9Uplap9HJ8WXvKzTlzG3h11mk=;
-        b=jxseqDyGIBSR4mtgqhfoy0svPVaV3wbe+gWkMQPyZLEunqEJsjIl6tRNrHNahg7f/v
-         TX0FfSNhkKX3zZgEDySu6Fv9TufqWy+OMaldBusV8LCzxJN4tEQLAT95qXnzQnwE7Qpc
-         zlFR8bG7liITWbWkcXhePsvaQM3PS2G8fgja3cI8J7RVX/gRMrxZCeYv0Aj5lEHsD1zi
-         QMhouWp6x/7TKgWx+sXmUzW9FXjCxQMbcUJb59MPDZag0GQZ+aUQ7/ZzodVugYYRtmNi
-         h6FlhvPY3jbwCkujxHAjqTPsWAK6+r6LhUIye6cPbRkyZPn0VCEN7xcM+haewvtPCDre
-         qUDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWFiA4NF4+okjs+9Yr+ybn1X0uhDoE+sbtssjKmLQlM9MPQsmNB0Ytr6U0EX6JndSNoB6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHf0oOlcdW4y18dnBypMXDIUszDQVx66/b9/NhfojGWpLXbgNq
-	ziVnWpwyiwwQFOCjovdDL1TuPvlQTt9Zl8onqdYmxV54yeV3LrCCk57Pbj9GOQgZ5T9872RAABV
-	JDTIovCSrYfgfSw==
-X-Received: from pjbci23.prod.google.com ([2002:a17:90a:fc97:b0:340:c53d:2599])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2f4c:b0:32d:e780:e9d5 with SMTP id 98e67ed59e1d1-35109129cb5mr473381a91.22.1768344871600;
- Tue, 13 Jan 2026 14:54:31 -0800 (PST)
-Date: Tue, 13 Jan 2026 14:53:52 -0800
+	s=arc-20240116; t=1768345766; c=relaxed/simple;
+	bh=REHwvtrmLyZuAaxApX3wcixqfcyBfRteHzbYHon1TIo=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=i5O+7ShVxZc+C5x7446CXIUv4OO8JZm2zDVPeucgEK7XO9jWdbkBQtaiB/F4RQPyflzEhiCQmd7a7HFIry89URGwLcOeWkQ4o5sSjwUt6R6Pw4uUCOzYthVpKqVgHK33RanpPh8/tLw6AEaMvR/kJoEbU1RtFDZalvAYVo6RSno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=g6gP1emt; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60DN6m624099591;
+	Tue, 13 Jan 2026 15:09:16 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=7G3zwVcKtjRGGwwLj5
+	p1Gbl98yDMOgEESiN4hDwPoYU=; b=g6gP1emt9isAad7wGKAVS0kMRm/RMB7csL
+	X1BDsFvTL1AMyB/vEeMt3rYcbzbH2wPPo2V4kEeugVwPo2ZTpsE85kIRR73xbQyT
+	iGpRPsKwwXSP4vW51ti1hizzAHseODoVItWGIlVZUwXU8jZiJWk08/qhMAm4PI8T
+	Xwio+8FowYfviBEUnecLYVFWm1QjTrNKFIaMOCF5ZVdQHlD8v3S8ZhjTzgKZnRWV
+	581BZn0VXNS0CUuLtB/olsZqTRwc2LgppsdsGEQXAYNDgXyWBjcxgm7gfTJ+y8E9
+	7dNKSOXuoiU7ThfiiEGnEA2xLJzBrWAb8JXjoZ2r1HoXYTNN32uQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bnyeh80r2-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 13 Jan 2026 15:09:16 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Tue, 13 Jan 2026 23:09:03 +0000
+From: Alex Mastro <amastro@fb.com>
+Subject: [PATCH v2 0/3] vfio: selftests: Add MMIO DMA mapping test
+Date: Tue, 13 Jan 2026 15:08:35 -0800
+Message-ID: <20260113-map-mmio-test-v2-0-e6d34f09c0bb@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260113225406.273373-1-jmattson@google.com>
-Subject: [PATCH] KVM: VMX: Add quirk to allow L1 to set FREEZE_IN_SMM in vmcs12
-From: Jim Mattson <jmattson@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHTQZmkC/03NMQ6DMAyF4augzHWVRLQ0nbhH1cEYBzKEICdCl
+ RB3b9qJ8R/e93aVWQJn9Wx2JbyFHNJSw14aRTMuE0MYayur7V0bYyHiCjGGBIVzgaHlluzoTId
+ O1c0q7MPn773etb2kCGUWxpOiO8gkWGgGjJiLJNh8FceIP34Ny3S62AwY0MR0Y8f0cEPvhyulq
+ I7jC6/b9rq+AAAA
+To: Alex Williamson <alex@shazbot.org>, David Matlack <dmatlack@google.com>,
+        Shuah Khan <shuah@kernel.org>
+CC: Peter Xu <peterx@redhat.com>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        Jason Gunthorpe
+	<jgg@ziepe.ca>, Alex Mastro <amastro@fb.com>
+X-Mailer: b4 0.13.0
+X-Proofpoint-ORIG-GUID: aZoN6HpOVsMyfxUeN-0viIITJY5Tzkyw
+X-Authority-Analysis: v=2.4 cv=brZBxUai c=1 sm=1 tr=0 ts=6966d09c cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=3j4BkbkPAAAA:8 a=r1p2_3pzAAAA:8 a=1XWaLZrsAAAA:8
+ a=20KFwNOVAAAA:8 a=9jRdOu3wAAAA:8 a=FOH2dFAWAAAA:8 a=fzhw-T1NQbm0UE1rqVgA:9
+ a=QEXdDO2ut3YA:10 a=r_pkcD-q9-ctt7trBg_g:22 a=ZE6KLimJVUuLrTuGpvhn:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDE4NyBTYWx0ZWRfX8+UqDTtpQre2
+ MGlbQBZLSK/wnY6bSmer9N9Ikrp4EjHORcQ5557dtcDmGQp8ecgkluD+u+16js69MnKJnajr7bu
+ eCFX4mpHXue4N9XtevdgJsR2SrUyZsxlz+KwwnFbU51zkdxb6Zo1Zmd0SQC7jaJW5zHYVEkw2K0
+ 0yWBoPxgW/XI4rTw8n1U/C3dMiH7PkQ9uprqBCQ8KVYPj2uxljPZPWLH6PEJCzQ06zSlnmZit4X
+ he1Xp+8RHbWXsD+o2DIxT0cwVNRC8hXdHoxk2BONgc10/fp6kvr2GsgKLC29VPqzQcMVu72uC+4
+ D6spem6eBlYDEDq340t57jJekqQtYWDGNgkbPJ/+BS9FwVz5vxF9SskuDQ5Ls/HIlKP5mJ3Rvar
+ ob0AEizWwtz1iXmCxgDAtjSGZbpx1uRd+jrc9U4PQdaMVwHIsKkOAXRuof8b4B+h04zl00DBFKA
+ lb8f54BzkxPDuwvMD3Q==
+X-Proofpoint-GUID: aZoN6HpOVsMyfxUeN-0viIITJY5Tzkyw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-13_04,2026-01-09_02,2025-10-01_01
 
-Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM to allow L1 to set
-IA32_DEBUGCTL.FREEZE_IN_SMM in vmcs12 when using nested VMX.  Prior to
-commit 6b1dd26544d0 ("KVM: VMX: Preserve host's
-DEBUGCTLMSR_FREEZE_IN_SMM while running the guest"), L1 could set
-FREEZE_IN_SMM in vmcs12 to freeze PMCs during physical SMM coincident
-with L2's execution.  The quirk is enabled by default for backwards
-compatibility; userspace can disable it via KVM_CAP_DISABLE_QUIRKS2 if
-consistency with WRMSR(IA32_DEBUGCTL) is desired.
+Test IOMMU mapping the BAR mmaps created during vfio_pci_device_setup().
 
-Fixes: 095686e6fcb4 ("KVM: nVMX: Check vmcs12->guest_ia32_debugctl on nested VM-Enter")
-Signed-off-by: Jim Mattson <jmattson@google.com>
+All IOMMU modes are tested: vfio_type1 variants are expected to succeed,
+while non-type1 modes are expected to fail. iommufd compat mode can be
+updated to expect success once kernel support lands; native iommufd will
+not support mapping vaddrs backed by MMIO (it will support dma-buf based
+MMIO mapping instead).
+
+To: Alex Williamson <alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
+To: Shuah Khan <shuah@kernel.org>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+
+Changes in v2:
+- Split into patch series
+- Factor out mmap_aligned() for vaddr alignment
+- Align BAR mmaps to improve hugepage IOMMU mapping efficiency
+- Centralize MODE_* string definitions
+- Add is_power_of_2() assertion for BAR size
+- Simplify align calculation to min(size, 1G)
+- Add map_bar_misaligned test case
+- Link to v1: https://lore.kernel.org/all/aWA4GKp5ld92sY6e@devgpu015.cco6.facebook.com
+
+Signed-off-by: Alex Mastro <amastro@fb.com>
 ---
- Documentation/virt/kvm/api.rst  | 10 ++++++++++
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/include/uapi/asm/kvm.h |  1 +
- arch/x86/kvm/vmx/nested.c       | 22 ++++++++++++++++++----
- 4 files changed, 31 insertions(+), 5 deletions(-)
+Alex Mastro (3):
+      vfio: selftests: Centralize IOMMU mode name definitions
+      vfio: selftests: Align BAR mmaps for efficient IOMMU mapping
+      vfio: selftests: Add vfio_dma_mapping_mmio_test
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 01a3abef8abb..31019675f2f2 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8414,6 +8414,16 @@ KVM_X86_QUIRK_IGNORE_GUEST_PAT      By default, on Intel platforms, KVM ignores
-                                     guest software, for example if it does not
-                                     expose a bochs graphics device (which is
-                                     known to have had a buggy driver).
-+
-+KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM
-+                                    By default, KVM allows L1 to set FREEZE_IN_SMM
-+                                    in vmcs12 when using nested VMX.  When this
-+                                    quirk is disabled, KVM does not allow L1 to
-+                                    set the bit.  Prior to KVM taking ownership
-+                                    of the bit to ensure PMCs are frozen during
-+                                    physical SMM, L1 could set FREEZE_IN_SMM in
-+                                    vmcs12 to freeze PMCs during physical SMM
-+                                    coincident with L2's execution.
- =================================== ============================================
- 
- 7.32 KVM_CAP_MAX_VCPU_ID
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ecd4019b84b7..80f9806862ab 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2476,7 +2476,8 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
- 	 KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS |	\
- 	 KVM_X86_QUIRK_SLOT_ZAP_ALL |		\
- 	 KVM_X86_QUIRK_STUFF_FEATURE_MSRS |	\
--	 KVM_X86_QUIRK_IGNORE_GUEST_PAT)
-+	 KVM_X86_QUIRK_IGNORE_GUEST_PAT |	\
-+	 KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM)
- 
- #define KVM_X86_CONDITIONAL_QUIRKS		\
- 	(KVM_X86_QUIRK_CD_NW_CLEARED |		\
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 7ceff6583652..2b1c494f3adf 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -476,6 +476,7 @@ struct kvm_sync_regs {
- #define KVM_X86_QUIRK_SLOT_ZAP_ALL		(1 << 7)
- #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS	(1 << 8)
- #define KVM_X86_QUIRK_IGNORE_GUEST_PAT		(1 << 9)
-+#define KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM	(1 << 10)
- 
- #define KVM_STATE_NESTED_FORMAT_VMX	0
- #define KVM_STATE_NESTED_FORMAT_SVM	1
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0521b55d47a5..bc8f0b3aa70b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3298,10 +3298,24 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
- 	if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 & X86_CR0_WP)))
- 		return -EINVAL;
- 
--	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
--	    (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
--	     CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugctl, false))))
--		return -EINVAL;
-+	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) {
-+		u64 debugctl = vmcs12->guest_ia32_debugctl;
-+
-+		/*
-+		 * FREEZE_IN_SMM is not virtualized, but allow L1 to set it in
-+		 * L2's DEBUGCTL under a quirk for backwards compatibility.
-+		 * Prior to KVM taking ownership of the bit to ensure PMCs are
-+		 * frozen during physical SMM, L1 could set FREEZE_IN_SMM in
-+		 * vmcs12 to freeze PMCs during physical SMM coincident with
-+		 * L2's execution.
-+		 */
-+		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM))
-+			debugctl &= ~DEBUGCTLMSR_FREEZE_IN_SMM;
-+
-+		if (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-+		    CC(!vmx_is_valid_debugctl(vcpu, debugctl, false)))
-+			return -EINVAL;
-+	}
- 
- 	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
- 	    CC(!kvm_pat_valid(vmcs12->guest_ia32_pat)))
+ tools/testing/selftests/vfio/Makefile              |   1 +
+ tools/testing/selftests/vfio/lib/include/libvfio.h |   9 ++
+ .../selftests/vfio/lib/include/libvfio/iommu.h     |   6 +
+ tools/testing/selftests/vfio/lib/iommu.c           |  12 +-
+ tools/testing/selftests/vfio/lib/libvfio.c         |  25 ++++
+ tools/testing/selftests/vfio/lib/vfio_pci_device.c |  24 +++-
+ .../selftests/vfio/vfio_dma_mapping_mmio_test.c    | 144 +++++++++++++++++++++
+ .../testing/selftests/vfio/vfio_dma_mapping_test.c |   2 +-
+ 8 files changed, 215 insertions(+), 8 deletions(-)
+---
+base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
+change-id: 20260112-map-mmio-test-b4e4c2d917a9
+
+Best regards,
 -- 
-2.52.0.457.g6b5491de43-goog
+Alex Mastro <amastro@fb.com>
 
 
