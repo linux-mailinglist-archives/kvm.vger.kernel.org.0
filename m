@@ -1,144 +1,187 @@
-Return-Path: <kvm+bounces-67923-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67924-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42986D17CA1
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 10:54:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3D5D17C07
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 10:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 325C6301056A
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 09:36:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB0F03053835
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 09:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DEB34575A;
-	Tue, 13 Jan 2026 09:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DF4366560;
+	Tue, 13 Jan 2026 09:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HecYZxIQ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbGB30hh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlZAgJRE";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qe4f/O7u"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023F9341079
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 09:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E5236997D
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 09:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768296991; cv=none; b=UJZWV4VKrVm5vmApbIwVtz7IsAmefq7uPnxVZnh7dsiykIHXOtEeA1bQrQVW5iIcfehPV2bA9Old8zvVwFUTXe14rourN+nLzOBe28/8SKHygIil3CXhhF3YXQ1lVZWvbNggmGaDEpQdR8W8T6k4GQHj8R/lleNUGUDQCVajR4c=
+	t=1768297021; cv=none; b=mfl7pg/azL9BbCQvXkVjrQpkALH7/Fmo7sd3ke2fbxRIF7gTmaAgoerWPAVIFp7qwAYG/x6bwdy5Xdo4Zw3W7eRG079nAEV8EATvHYSYRy5nzw09vXqyWU9vFOf9Ci5DGY9iuKrx+7oyc7s/R1dgZcAvojZWYRg0iHqm6GBLH2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768296991; c=relaxed/simple;
-	bh=LUNG+ln+1Yxh43YagXbgYh3TjS0L/EKjm9H5/PjiDX8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=luV9RnKzbnK3HfxH5t9zySYbsi8SORznhJZDklCvL3F4M2suqWQXZiPIf1LqDFJeskSfDMRltgOTM6tccU6EoVjp05Fb6/XJnoeSmqS3E361RWJ9KTgV7/bdrXajzRiKU7NrX4ZPwz/nOMaO9tK09kJI++CZoxhWNIWdB61U/ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HecYZxIQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GbGB30hh; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1768297021; c=relaxed/simple;
+	bh=i7jmKtKg7PeuT25Uc1BWE7cT/g0kspLdiSl6D9EotN8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A1fOnmdOzowXdqnZn2VHQKF+adcmHV8nJ677KQ24B+eHu5GlMomqjalNUkdmQ5vLIN3pzsOH0cTpeDhZcy1GcRdVk81fTMS5M83m8uCrStjXReXJx8Tm8ybBLvJ3sNIAyotdChgMSVOxv4CbYTywtZ7xdYjDrDQj9AyzvRGzv98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SlZAgJRE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qe4f/O7u; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768296989;
+	s=mimecast20190719; t=1768297017;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JIlCi5Wns02VUYB8sRaXmo5RZqGB5lGXWR590JeS2pc=;
-	b=HecYZxIQZJ733lpIqK3OwcpQ8ErWVf25EaOcg7WvJuMSvs6hhXLUOxIGoG6DLOONdSMJS/
-	4qLzch36/2TZ91S7K6T/QNkC93mm1/DGW2OU2sOgy0qeLflSCWrRYXaEiu2/NriUrcNo6c
-	M29ecW819QuoLPQSzM/cN6pskKgzoyM=
-Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com
- [74.125.224.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
+	b=SlZAgJREKq6/7bFnGegvS8Zw9s4pro4zbRfUcI3Sob2kfplDz+t+pcVUfQKDzKrzt8PIQL
+	KvxgpZ91ylkCnnwS4Ss+/Ugg/gdz5JSLgcByPZaP+FDhEdl/tYcr5rdD8HmbiBOqknV72o
+	bAiUwCu3cvVVsVRlDXGhfhsZryvV/uE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-211-Ugj2Ae9YPXeSQp6dlMcgbw-1; Tue, 13 Jan 2026 04:36:27 -0500
-X-MC-Unique: Ugj2Ae9YPXeSQp6dlMcgbw-1
-X-Mimecast-MFC-AGG-ID: Ugj2Ae9YPXeSQp6dlMcgbw_1768296987
-Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-644790187b7so10141587d50.1
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 01:36:27 -0800 (PST)
+ us-mta-92-9VUVu8TkOSS__cKl3Ww4QQ-1; Tue, 13 Jan 2026 04:36:56 -0500
+X-MC-Unique: 9VUVu8TkOSS__cKl3Ww4QQ-1
+X-Mimecast-MFC-AGG-ID: 9VUVu8TkOSS__cKl3Ww4QQ_1768297015
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47edfdc6c1aso241535e9.3
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 01:36:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768296987; x=1768901787; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JIlCi5Wns02VUYB8sRaXmo5RZqGB5lGXWR590JeS2pc=;
-        b=GbGB30hhFasOz2v9sLR5VDPOuIf+0K07mucjMl//70xThgm3LIEvPLsXI8HJGi3h8i
-         PHgQhhsYv6WlNS44dB/RFHfD+XZOMhnueZqAVmfjp9PyNDESKJDa0zmO4ZyCwjuvIMiB
-         QN8aNpAPWO4Gu63PZ5JVqmRXaJcJwoTJa0LiFgEMSkW3rlxIo3pi0F/mRKLmtgKbhRIv
-         Wn7P7o3WgDjTyYlKl9KB3xDa1KfRAWH4H+SYWEwlCxhOCiEW3vMbDhV85GQAPxiDXgT8
-         qOPGK/jyddDYgL42Wd05iFeUmgcO/BfCzdKz4BJJLU9DNSZTT9aOnOOUsXztjoEl/Eih
-         qSsA==
+        d=redhat.com; s=google; t=1768297011; x=1768901811; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
+        b=Qe4f/O7uRm8C2wshHKoVgSo0Kl26YcWaIctRvc5+rRbcMp2yIlc8OFcugjYLKVOeq9
+         Tzj3Q5U08ZrP2R0Xxm3iRN7AqvjusR8A1Dk/XusPD9tQLfw+cAORRGSyFrMKd/oMwIhI
+         cadGQq+aELEVKZ+nopOlKUSbdvd/sEKEn72y9F729NaZWohibBmgfzB1pT7ZSuil5idq
+         dqm5ajjqHPdj7utUjFTJPk8zqS3nic+LjyBpUOSMKlCcE5BvfO6KwBQ+JX5b/Xbs7452
+         JE6MAsYjCiWwIzCVr23zrG17w190MruR0v7YSznoXTrrLz5a0XXVwrslrz56d12hcnqr
+         iE7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768296987; x=1768901787;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JIlCi5Wns02VUYB8sRaXmo5RZqGB5lGXWR590JeS2pc=;
-        b=q7zHRa+JtdE0En88pO8r5XBD0g281ki06xHg08FszjnuFS5sTBGCGOcVv4h4t7JS3N
-         Lxce9HRxo0R/HWSlO3GPbakVGGtgZVbDW6IuK/BWqv4/ZWOsYQNN0JdG8hlJPfPbvSvZ
-         UbcHhw3t1P4eZA/35qVXeUGbmBHSmvV/VnuVLOnvRmtPG7StwC4B2FkzQK+neNU/uw+5
-         fzHzl8RNmHb1Ob2uhp9EOicPo1zTANQRTwgymcuPApr2iXPx1wAHYFApjEi3TxPmoymP
-         TmbElF41X7Iyyhem+OawOFZqKc+3KRNHYprp0liTueEb0UGhK+/PjxyS2y/dFS29krp5
-         I/Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCXibezZSksv1PSqgO/GsBcnjHm16VE5ALKwjHhtNDL7DjoFzXZ28ocU3AR8L/mCqh4UZxU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlEAXgSOiyT5mUWxVLFOK6cjcklegUk+LG0J7xPRKSIVBpU6Ly
-	dUjyAzEVLKzRuBqAmWXPcuA+i3n1t1Cw2rKxNBVx9YeWVQlBC+S3+AJ6ZNmFPZMOpW6eHk3Fovs
-	dbFdonYjP/M39KL0cRaeaXjlpwtRG60OQSG7ajslgWn7s6RsT1IXyRqQtXEaz0sHRRNW5/zIRHs
-	N5jxHjfGLDJQoUVC4bpdx+t7mw2OdNLlb8j0Po2h0=
-X-Gm-Gg: AY/fxX54sAoIeDQ5iUIn2WtUhEatouzKa8yIseDXj4/WWSttdGe5Cym4Ew/Ls7jYHGi
-	CuhH1UHxMW/4E+yMl9eUOgWVkQRk+rFhMK6Xq874xkSo0YXMLqUWhlQgkrt9CJirsodQCyauSwK
-	EWDqErZ83fwPMCFXUEOfDcyqqMGml7aHHZHNBLrbaYQwS/SGuBfhYoMvPZCHq00EskzxdP6fulC
-	3nUAIaGpgGAFWNVVc9dO8z/rw==
-X-Received: by 2002:a05:690e:188f:b0:646:7835:47cd with SMTP id 956f58d0204a3-64716c904f8mr16820134d50.77.1768296987039;
-        Tue, 13 Jan 2026 01:36:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEKjYTRIqA/phaKuVKUtZuPI7hGff6zqpsw0A6oZq+VqXpu+OcAcCus47MZj7rTghYHbuc8TNLwmZijL3ukze8=
-X-Received: by 2002:a05:690e:188f:b0:646:7835:47cd with SMTP id
- 956f58d0204a3-64716c904f8mr16820115d50.77.1768296986637; Tue, 13 Jan 2026
- 01:36:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768297011; x=1768901811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
+        b=t9OjOMEgJZKozy6WIliX6Wt5THiY/PdandXCi5KOQv7XHx7pm6O7WJkRuN2xexBToT
+         w09fN2X5U4wHgxcVv0cglzJr4tr7WtR+pr7/rOHuwBFs7HDoi7eKQye6JpO6rwVWffst
+         Ua1+v/E7ukjdJHcyr9G8+7PNI5Tf54dv+V9vbbzmz4rAylA4OLpyrBOM67eu5rQ/iOUu
+         /6TmmlTzajt4xH+YpHR6cfyhvih10DKmwVzYze9U5hUs/jK4ZJ+U22X31sj79M2MYNSX
+         aG69iiqHYWwbYIOIaIIihMc4d03Rxh1BsiGSyK9ABbb6T/7FaTUkTR6xV3OXvzwHKRfe
+         9u7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVKp8yCJdue2vFzQDE05AceUy9yqKEfBTa9V2KFotrQqwfOu3qoqrXnxRr2wXmAmVjHsvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVhcad5b53PiQncbYZbw5sborWIqt5AVjmvZ6ihfJarrwTkNVm
+	fotEVZmkTxvB3N6o32gNYYDzlU/2hcZh8PhAP/SWWWJkaq1y3AGScU0iFTbxV4YU8VFqfdI1YuC
+	+TcaGigkYuVXaP7n/uZEljCmYkuSlzj76OtkZZ8qEuWxajCs0AiiJNw==
+X-Gm-Gg: AY/fxX6wdzUMlQ4zl3UBt7D51RUvO8DFR05fLK61a9HWt/wKjxbLy2K26GK68oTftUa
+	UfI46WUj7FPPCdr7I5vnX6qu8qTKZQs2avdkyfLPpJ5xpeiMNCR3ay+PoKn2EZ46GbGpaxQOH9W
+	LVldXTrKbHS+GnvUNJd8Pohk0yMhB3aN8hbuF4PF9Fffg3Gb4bwZUy5OG6wVeE2rwzyMeDGk3J5
+	3Ktzr8NvsJ/GHxRXK4yuJ8DtFsN4LSlGy6A4Xqlz87TDxQOMEoFMSIuyp4woQUkl5E4Rr/+yF32
+	1GfQdkhBXWk/LzHg2WwxPJYYvG/U7HVUXECD/lNOKuNzs9v1SS3+wakRrge9/GGzAcIHaQlm+s/
+	YXFSakcpVQpA7uqLC5AJ+zKfEfTsWIDTcTHmKBBHzfIq2iXJfTUbLBLvqh7Y7HQ==
+X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088615e9.21.1768297011476;
+        Tue, 13 Jan 2026 01:36:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHBInHZFJ8RidwkWLMCKS42wGE9AndYw8hKlz7EsNrZzGfvzlSbcNPT7twl1koVSE4j25wDOQ==
+X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088215e9.21.1768297010851;
+        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe83bsm43257713f8f.38.2026.01.13.01.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
+Date: Tue, 13 Jan 2026 10:36:42 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
+ getting coalesced
+Message-ID: <aWYQRK-fRHOqQNc8@sgarzare-redhat>
+References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
+ <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
+ <aWEqjjE1vb_t35lQ@sgarzare-redhat>
+ <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
+ <aWT6EH8oWpw-ADtm@sgarzare-redhat>
+ <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
+ <aWUk0axv-GZu7VD2@sgarzare-redhat>
+ <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260109143413.293593-1-osteffen@redhat.com> <20260109143413.293593-4-osteffen@redhat.com>
- <CANo9s6muvcOrDH286o1zA06tRUvZBnOBqn03e0RiOEDC60W4sg@mail.gmail.com>
- <aWTBdSDO9KKpXLt4@sirius.home.kraxel.org> <aWTDQZT4L3mX3Rfd@leonardi-redhat> <aWTEO9LIPNbf9YMe@sirius.home.kraxel.org>
-In-Reply-To: <aWTEO9LIPNbf9YMe@sirius.home.kraxel.org>
-From: Oliver Steffen <osteffen@redhat.com>
-Date: Tue, 13 Jan 2026 10:36:15 +0100
-X-Gm-Features: AZwV_Qj3Fdd29A1amIgaXnbBfqyli1-2DYaAiVGZ95HNZgcsp_1ge8w8uG5-S9U
-Message-ID: <CA+bRGFr=JPDW5KgcXVp4mdu19cC27R_CkpZDHKzZoJ1xM04XnQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/6] igvm: Add missing NULL check
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Luigi Leonardi <leonardi@redhat.com>, qemu-devel@nongnu.org, 
-	Richard Henderson <richard.henderson@linaro.org>, Igor Mammedov <imammedo@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
-	Ani Sinha <anisinha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	Zhao Liu <zhao1.liu@intel.com>, Joerg Roedel <joerg.roedel@amd.com>, kvm@vger.kernel.org, 
-	Eduardo Habkost <eduardo@habkost.net>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
 
-On Mon, Jan 12, 2026 at 10:57=E2=80=AFAM Gerd Hoffmann <kraxel@redhat.com> =
-wrote:
+On Mon, Jan 12, 2026 at 10:20:50PM +0100, Michal Luczaj wrote:
+>On 1/12/26 17:48, Stefano Garzarella wrote:
+>>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>>>>>>> index bbe3723babdc..21c8616100f1 100644
+>>>>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>>>>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
+>>>>>>> 		.run_client = test_stream_accepted_setsockopt_client,
+>>>>>>> 		.run_server = test_stream_accepted_setsockopt_server,
+>>>>>>> 	},
+>>>>>>> +	{
+>>>>>>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
+>>>>>>
+>>>>>> This is essentially a regression test for virtio transport, so I'd add
+>>>>>> virtio in the test name.
+>>>>>
+>>>>> Isn't virtio transport unaffected? It's about loopback transport (that
+>>>>> shares common code with virtio transport).
+>>>>
+>>>> Why virtio transport is not affected?
+>>>
+>>> With the usual caveat that I may be completely missing something, aren't
+>>> all virtio-transport's rx skbs linear? See virtio_vsock_alloc_linear_skb()
+>>> in virtio_vsock_rx_fill().
+>>>
+>>
+>> True, but what about drivers/vhost/vsock.c ?
+>>
+>> IIUC in vhost_vsock_handle_tx_kick() we call vhost_vsock_alloc_skb(),
+>> that calls virtio_vsock_alloc_skb() and pass that skb to
+>> virtio_transport_recv_pkt(). So, it's also affected right?
 >
->   Hi,
+>virtio_vsock_alloc_skb() returns a non-linear skb only if size >
+>SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER)). And that is way
+>more than GOOD_COPY_LEN, so we're good.
 >
-> > > > IMHO this should be sent a separate patch
-> > >
-> > > Huh?  It /is/ a separate patch ...
-> >
-> > Sorry, I meant outside of this series.
->
-> Not needed, separate patch is good enough, even though sending a
-> separate 'fixes' series might make sense in some cases (split an
-> already long patch series, or during freeze where only fixes are
-> allowed before the next release).
+>At least until someone increases GOOD_COPY_LEN and/or reduces the size
+>condition for non-linear allocation. So, yeah, a bit brittle.
 
-Since there are more identical cases of missing NULL checks here,
-I'd take this patch out of this series and handle all instances together
-in a new patch/series.
-
-Thanks
-- Olvier
+I see, thanks for clarify. So please add all of this conclusions in the 
+patch 1 description to make it clear that only loopback is affected, so 
+no guest/host attack is possible. (not really severe CVE)
 
 >
-> take care,
->   Gerd
+>> BTW in general we consider loopback as one of virtio devices since it
+>> really shares with them most of the code.
 >
+>Fair enough, I'll add "virtio" to the test name.
+
+Thanks.
+
+>
+>> That said, now I'm thinking more about Fixes tag.
+>> Before commit 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs for
+>> handling large transmit buffers") was that a real issue?
+>
+>I don't really think that commit changes anything for the zerocopy case. It
+>only makes some big (>GOOD_COPY_LEN) non-ZC skbs turn non-linear.
+>
+
+I see.
+
+Stefano
 
 
