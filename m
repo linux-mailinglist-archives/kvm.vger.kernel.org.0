@@ -1,153 +1,149 @@
-Return-Path: <kvm+bounces-67952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA144D1A080
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 16:53:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C77D1A1B2
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 17:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B302E3009259
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 15:53:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66159302C867
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 16:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50EAF33FE2E;
-	Tue, 13 Jan 2026 15:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4745E3451BB;
+	Tue, 13 Jan 2026 16:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XTkz7t1x";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZmInMJA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VTYaz+xn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BBB311583
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 15:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657E336C0D0;
+	Tue, 13 Jan 2026 16:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768319618; cv=none; b=qG3op7mjyKh2uc8bq2ODliM4KemS/sju5e+3K3DVdNbxyvnKDD52Rbvw3PL9bQvWWNBr6KJuJHH0jyMUrwxBhk9nKqjNTFcOE0yZMo9xHwk1gHoxGFEeKxUOURa0JBG8uueT4vNDaj8jPQ/1MPB8mz8pEBWIUKPsCUk91395wXU=
+	t=1768320660; cv=none; b=f5pbVW0DvDAFufQ8J3d3Pdgmyrp9mAZ0yw6wDFPJDVH27xDFBdLt18Hfdhf0r/AXCVxBc5aEXBpiIfKVUeXxfWh5CxpL8CUCPdKpRJ3yYrehKypHu+pPRX7V+OOvCLmXDzUPcq60KSRhYdFfYT3K4UlFfsXgLwhdPDzdXkPa4tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768319618; c=relaxed/simple;
-	bh=Rr2crUz2DUI9okAYGgwFpuu8kDcfbmW4w4rvyQxofL8=;
+	s=arc-20240116; t=1768320660; c=relaxed/simple;
+	bh=/dUbmRww4cHamievMVwgGH9rnRn2MYlwRxvkGfxfk3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LecEPcJdK11Lt+g/DxYyZQz0RNkYTGmTXHtLnl/2anSkuXxfcQ/6i4qzXBVNjw8rduRJpX8YvmmJDVw/wP9LiVfIyJWW3FS/qYXIEUQPEWW3VX/etWhk7ZbdsZtI+7AGdJ1J7KtnCR/qNxxMzlOgjP+2bd8eFCDW2AVmUVhtgfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XTkz7t1x; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AZmInMJA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768319613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TZoXydkaCbRzi/BpIgWSYmd+dDTH7DJWzt1xArcC9YQ=;
-	b=XTkz7t1xNvqocMM7vFWA0GXBOARlFWTV+4S8wKv9Z+o44hevmVOa7t22dTw0UHghJmUaiC
-	DbCpOhN810Ldmslkyjwaf29P4DdS1FcH7zwxeNDS6I0hvLjCpoRvoynx7RHM/KPISIsHjy
-	WXxs21wRI6ulUZ1uSGt+h9BEkfs7ELA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-346-J1FQKXHSMqKivCzFHXt6Bw-1; Tue, 13 Jan 2026 10:53:31 -0500
-X-MC-Unique: J1FQKXHSMqKivCzFHXt6Bw-1
-X-Mimecast-MFC-AGG-ID: J1FQKXHSMqKivCzFHXt6Bw_1768319610
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477a11d9e67so51539905e9.2
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 07:53:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768319610; x=1768924410; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TZoXydkaCbRzi/BpIgWSYmd+dDTH7DJWzt1xArcC9YQ=;
-        b=AZmInMJAKFbIrBf7UToa72AxvvcyYT/ZyN9qd+0NBs/qY1lbUWeo/SM3iFJijD8Wnn
-         CV+rTPczW3bJ2SJWrIGHjz5A5pONIjqR09iBr0+aToxIIL9/lfrBR/8OemiJ4j2fp1Ty
-         xHZQUKwYmlLSkkOcZj56yBNMcn5ZoULiYtVnawOfn+fdTAMOq7MAoI+R1crh2pzMQPdf
-         CW0JHR5Pf8w14iHiPH7835uPvYSY0Kp+WXVbFALOVIQwF7hmZpw9VGr9fe5p0nszDLBT
-         31MntioOtNFIK/Um3yb2GqAjTyGGmw0kuXj68/XA1qzD3VHml60CVmPMmOql+8vXgh43
-         b84A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768319610; x=1768924410;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TZoXydkaCbRzi/BpIgWSYmd+dDTH7DJWzt1xArcC9YQ=;
-        b=YkB/SSo7oBmH+h0sawSBWqamjvdGsDUnrYXc7NLkPO5cxEmYfVv4uolww6Jy4nXkpb
-         wDBJhgpwtIt2LGOb2HKF6C8yumaKJxmXPwdVwhlsPC6U/L6BNzLhmelTx7dHZOKEBNGR
-         BTVWf6egUtFTObNKMhX2AcL4oH/smCn2Z1SBNnZsPmub4qsXyVTKCwkYtZoPTPFn7EK6
-         oPxYpJ8/id41ztaC8qx9lr7LLrSd8f5bTPc6ep796Qrb1+idEeze7KkOVGj82y5yaIKG
-         ZtpPYftGa/RiofidUSlx1WuIcB2Es6z2OLX12wlnXBzLMR08qH4czr2F2qgdti2g/+BW
-         L1Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQvODClLopRZaxf16PPgXCI691wpnFf0dd7ByP4ADjOjoXhcfFqlQmDgUH04AYwZwQmsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjCUAcEoa2vYebt6y63oqmGV6/HLMgGMb7p4NZhil8EzsDesap
-	p/+MRjLcCn4d98nXHMDs6Ql5CjBaFZhT2LaRegmzeDgu+e8bt9UXAFEYMS12EciWh6zmu0Rxxgc
-	/NrJC/cxL1rVzO8emCrvamJBnrtd/n526P39RuGszwyXJ66a+Y+D+gw==
-X-Gm-Gg: AY/fxX4eK5iHYpqdMSAdjW58/4LSulZCA+BFR799erMNVefaK1q/m6Se0YcOlfHT7Yh
-	3J1aM399a8TpXRIZd0P0zWakvBqBWP+uHRCgAHLsYEY7YctN5c0gtUQeU/m5SLnlVA32EsRARL2
-	ItR8U05ua9EuTrbbkfcFBo0A6/mALV1nH49/9HY5TcrNlyZ3idMpAfEMCk33obkZKN9RB87rTp/
-	o6pzUzVBcrUYakGZO+miNdbl40j/9VfNjFsVWyY8/VSKZ+JTrGPnHO9a5Ov8fkQknZCUsUzUScm
-	DrONH+bVWy6qnWSl6RtxQfNUh+JN7kMVkO9m3KIEDW8IPGkGUind3v/a87r/bHC2s89h53JkJ/9
-	vyP9p2FTdhpeSoEivXBbUs1ir+Gh4obIlgwTK4nqZUAFOH0YD1BTxDegql/EdlA==
-X-Received: by 2002:a05:600c:4449:b0:477:aed0:f401 with SMTP id 5b1f17b1804b1-47d84b368f6mr258282695e9.23.1768319610416;
-        Tue, 13 Jan 2026 07:53:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFQfC7/NeIeIlU44iVNxdFG3KKUWSQZIDiswxSwdGso26nsC4+3O4KhbxqfJ82+1Ys/KVNR7A==
-X-Received: by 2002:a05:600c:4449:b0:477:aed0:f401 with SMTP id 5b1f17b1804b1-47d84b368f6mr258282215e9.23.1768319609956;
-        Tue, 13 Jan 2026 07:53:29 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f69e802sm419650175e9.8.2026.01.13.07.53.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 07:53:29 -0800 (PST)
-Date: Tue, 13 Jan 2026 16:53:20 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v14 05/12] selftests/vsock: add namespace
- helpers to vmtest.sh
-Message-ID: <aWZqYWzhGf9gQgHk@sgarzare-redhat>
-References: <20260112-vsock-vmtest-v14-0-a5c332db3e2b@meta.com>
- <20260112-vsock-vmtest-v14-5-a5c332db3e2b@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=crt2RyFHqiywv1LQj9d2Ljy8Pz0+EByH+t43nKfWppGvKPKx5/Fi9N1em5px7ndCcFaVIcqv7WNAW7Zof0XajhY0rpO4Taf+VNMEYnCD6NhqyZUYn/NLQtljWUUqDSU/poQ+bkDF/RRljCCeDptdck0i/Bv7FJsMk/U3X5nlJ8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VTYaz+xn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6AD7C19421;
+	Tue, 13 Jan 2026 16:10:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768320659;
+	bh=/dUbmRww4cHamievMVwgGH9rnRn2MYlwRxvkGfxfk3w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VTYaz+xnWdrALVx1BxBiXwa4OzIIiSKaxfrsMgztr6B2NHaC5uRTXhbCNgeYFt1ja
+	 Y6/6pz2GQxm0hdFh+EZxaxm07rnaR7QRgTgR+sauZ7aIDQwajWWl0AHiDOnl/tA2V6
+	 IXi6u4n/5DURYfljzI0irevQo1TOGgt7Xqr6tJR2VwSjFKMngL+lD5Fe3Wf5KzJian
+	 PjrFomT3c4G9FvTrJWnHC/fjXTWC/fEafQ2Bo20mk0+lT5MBJR4dP0PiZd92EPFBGF
+	 Nk5/XtaUrV5ZgbgHJyF06xjCQ7vVFjxwNb+khJ+nFU8OkesI61zj6SgvMdw9NuQpJB
+	 oGNltgC6Vxw7g==
+Date: Tue, 13 Jan 2026 16:10:53 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 00/30] KVM: arm64: Implement support for SME
+Message-ID: <30488f61-3233-4cf3-995d-717436de60f6@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cbkFj6fysNdPk5Ht"
 Content-Disposition: inline
-In-Reply-To: <20260112-vsock-vmtest-v14-5-a5c332db3e2b@meta.com>
+In-Reply-To: <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
+X-Cookie: All models over 18 years of age.
 
-On Mon, Jan 12, 2026 at 07:11:14PM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
->
->Add functions for initializing namespaces with the different vsock NS
->modes. Callers can use add_namespaces() and del_namespaces() to create
->namespaces global0, global1, local0, and local1.
->
->The add_namespaces() function initializes global0, local0, etc... with
->their respective vsock NS mode by toggling child_ns_mode before creating
->the namespace.
->
->Remove namespaces upon exiting the program in cleanup(). This is
->unlikely to be needed for a healthy run, but it is useful for tests that
->are manually killed mid-test.
->
->This patch is in preparation for later namespace tests.
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
->Changes in v13:
->- intialize namespaces to use the child_ns_mode mechanism
->- remove setting modes from init_namespaces() function (this function
->  only sets up the lo device now)
->- remove ns_set_mode(ns) because ns_mode is no longer mutable
->---
-> tools/testing/selftests/vsock/vmtest.sh | 32 ++++++++++++++++++++++++++++++++
-> 1 file changed, 32 insertions(+)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+--cbkFj6fysNdPk5Ht
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Tue, Jan 13, 2026 at 02:58:37PM +0000, Fuad Tabba wrote:
+> On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+
+> > Changing the value of SVCR.SM will result in the contents of
+> > the Z, P and FFR registers being reset to 0.  When restoring the
+> > values of these registers for a VM with SME support it is
+> > important that SVCR.SM be configured first.
+
+> However, the order returned by kvm_arm_copy_reg_indices() is core,
+> sve, fw, then system. So this means that the VMM will need to hardcode
+> this order, rather than rely on KVM_GET_REG_LIST. It _is_ documented,
+> but it is tricky and it's easy to miss.
+
+> Looking at copy_sve_reg_indices(), there's a special case for
+> KVM_REG_ARM64_SVE_VLS, which forces it to appear before the other SVE
+> registers. So I wonder if we need to do something at the level of
+> kvm_arm_copy_reg_indices(), or do some sort of post-processing to the
+> list, to avoid this problem.
+
+That makes sense.  The whole ordering dependency thing is obviously a
+landmine so if we can do something to make it more likely that things
+will go right then that seems helpful.
+
+> >  - The userspace ABI, in particular:
+> >   - The vector length used for the SVE registers, access to the SVE
+> >     registers and access to ZA and (if available) ZT0 depending on
+> >     the current state of PSTATE.{SM,ZA}.
+
+> One issue I see here, from a VMM's perspective, is that the amount of
+> data transferred via KVM_GET_ONE_REG/KVM_SET_ONE_REG depends on the
+> guest's current architectural mode. So now the VMM needs to first
+> figure out what that is, before being able to SET/GET when
+> saving/restoring a VM state.
+
+> Before this series, SVE just assumed a maximum amount of data and
+> zero-pad the rest. SME state is bigger, but in practice, do we expect
+> many cases where the VL sizes between modes would be drastically
+> different that it would make a difference in terms of storage?
+
+I would expect it to be very common for the forseeable future that the
+SME vector length will be several times that for SVE with no overlap.
+
+> Other than that, I think the asymmetry of VLs might be a painpoint for
+> users. The problem is that there is no guarantee that the set of
+> vector lengths supported for SME match or the set supported for SVE.
+> But I wonder if there's something we can do to help. Maybe a discovery
+> IOCTL that returns the entire matrix of supported configurations (SVE
+> VLs, SME VLs, and their intersection) to simplify VMM decision-making?
+
+I'm thinking such discovery might be better assisted with a userspace
+library, as well as KVM VMMs it's also an issue for things like
+debuggers and trying to design something nice that's also an ioctl()
+feels a lot harder to get right.
+
+--cbkFj6fysNdPk5Ht
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlmbowACgkQJNaLcl1U
+h9BXxgf/Re82kuN/C9D1N1jAvlefDx4tWyo4Yej5K2x+aab7UB8c1wIAHsQZZn+y
+q7tQCcfBt9JS2ZO5KODPc42OkcUMlSGfsNCOU0nQMJiDBO2SWwNjqFwxlGObU5Al
+nVBHLBX3DVeh9nZ0f5otYXTMFyXLYldhRUYCIMPGuV/B4rKCceh4VNXtV8jIzCj2
+J22qiEjUCGsi90zxMYPO7ajbhtzOIWDNifx5n/Mrxk1uDROqRVSNPWW98cK/wmW2
+F+bue7qvlbeI7sOmYWPqNTcu+pMKBHtKsbvQsrf9ZUCKQ10da2Z6CVk5OJbccJyG
+gPk7wK+qCqB4amr6IlNKqK1tjgwriQ==
+=6Ghr
+-----END PGP SIGNATURE-----
+
+--cbkFj6fysNdPk5Ht--
 
