@@ -1,115 +1,117 @@
-Return-Path: <kvm+bounces-67924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3D5D17C07
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 10:47:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E8BD17CA7
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 10:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB0F03053835
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 09:37:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86673305E2BC
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 09:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DF4366560;
-	Tue, 13 Jan 2026 09:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1738938A29D;
+	Tue, 13 Jan 2026 09:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlZAgJRE";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qe4f/O7u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkIKi9Os";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRBaq/+W"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E5236997D
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 09:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD1630F949
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 09:49:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768297021; cv=none; b=mfl7pg/azL9BbCQvXkVjrQpkALH7/Fmo7sd3ke2fbxRIF7gTmaAgoerWPAVIFp7qwAYG/x6bwdy5Xdo4Zw3W7eRG079nAEV8EATvHYSYRy5nzw09vXqyWU9vFOf9Ci5DGY9iuKrx+7oyc7s/R1dgZcAvojZWYRg0iHqm6GBLH2I=
+	t=1768297762; cv=none; b=mPblaIPw+VDopNvhEVs67x6btc1ZObfKDY8v2egsE+6p4Hklx2RQ2TwHoMymRQZhOyro6b+TN5zESqsCnJdLtfSpg18pcYqUgXGL4ELE2aNQp6ir37AndFRi9sDrjeTWr5b6OxDA95QcjMAy1dT4xaWKA35QUpW8w0ITurWNqeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768297021; c=relaxed/simple;
-	bh=i7jmKtKg7PeuT25Uc1BWE7cT/g0kspLdiSl6D9EotN8=;
+	s=arc-20240116; t=1768297762; c=relaxed/simple;
+	bh=YSOEmHQVpZ1XiFP6cpcAsOosEtV841EhtGG6BetY4b0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A1fOnmdOzowXdqnZn2VHQKF+adcmHV8nJ677KQ24B+eHu5GlMomqjalNUkdmQ5vLIN3pzsOH0cTpeDhZcy1GcRdVk81fTMS5M83m8uCrStjXReXJx8Tm8ybBLvJ3sNIAyotdChgMSVOxv4CbYTywtZ7xdYjDrDQj9AyzvRGzv98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SlZAgJRE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qe4f/O7u; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=IOiwmZdR3KJfwIV5LO1S2aW2O0g4kBxptN3A/1xUufBDYNyTkHSTWJuXbLe4Dj663bAc/gOaoXnNxH0tuZMWgD95FLlE+U57R3aFCWX88B2Dq1NVr/1qBMcOulD3hlgGJhCIuxkcc/79xaAEZuO1paM2DOthOo2BV+sWiKFuwac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VkIKi9Os; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KRBaq/+W; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768297017;
+	s=mimecast20190719; t=1768297759;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
-	b=SlZAgJREKq6/7bFnGegvS8Zw9s4pro4zbRfUcI3Sob2kfplDz+t+pcVUfQKDzKrzt8PIQL
-	KvxgpZ91ylkCnnwS4Ss+/Ugg/gdz5JSLgcByPZaP+FDhEdl/tYcr5rdD8HmbiBOqknV72o
-	bAiUwCu3cvVVsVRlDXGhfhsZryvV/uE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=1GS0CRV+w7tRrF7+CCit+G3w4AP8whQo0obFYQAA7qo=;
+	b=VkIKi9OsmvfgSWclN+3m3dr68AoPoa9u4fGAuwXFH1kuO4uyDTGUz7shGnHQ5G89dGF1p8
+	Uzvjit9GIVdVCq40vsPdqCoOnBkmSw0b9MMO+y/20rDMRmNiwG6wfoVoF8kwpMGuad/Utf
+	DEQhPCFZG/K7p8CVXttDi9+sYz6xv0c=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-9VUVu8TkOSS__cKl3Ww4QQ-1; Tue, 13 Jan 2026 04:36:56 -0500
-X-MC-Unique: 9VUVu8TkOSS__cKl3Ww4QQ-1
-X-Mimecast-MFC-AGG-ID: 9VUVu8TkOSS__cKl3Ww4QQ_1768297015
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47edfdc6c1aso241535e9.3
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 01:36:55 -0800 (PST)
+ us-mta-607-kvDNgyZ0MTux1JTSXHe1Zg-1; Tue, 13 Jan 2026 04:49:17 -0500
+X-MC-Unique: kvDNgyZ0MTux1JTSXHe1Zg-1
+X-Mimecast-MFC-AGG-ID: kvDNgyZ0MTux1JTSXHe1Zg_1768297757
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47edee0b11cso784715e9.1
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 01:49:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768297011; x=1768901811; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768297756; x=1768902556; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
-        b=Qe4f/O7uRm8C2wshHKoVgSo0Kl26YcWaIctRvc5+rRbcMp2yIlc8OFcugjYLKVOeq9
-         Tzj3Q5U08ZrP2R0Xxm3iRN7AqvjusR8A1Dk/XusPD9tQLfw+cAORRGSyFrMKd/oMwIhI
-         cadGQq+aELEVKZ+nopOlKUSbdvd/sEKEn72y9F729NaZWohibBmgfzB1pT7ZSuil5idq
-         dqm5ajjqHPdj7utUjFTJPk8zqS3nic+LjyBpUOSMKlCcE5BvfO6KwBQ+JX5b/Xbs7452
-         JE6MAsYjCiWwIzCVr23zrG17w190MruR0v7YSznoXTrrLz5a0XXVwrslrz56d12hcnqr
-         iE7A==
+        bh=1GS0CRV+w7tRrF7+CCit+G3w4AP8whQo0obFYQAA7qo=;
+        b=KRBaq/+WSSclUXnfnWwsAflKS1j1rytI4I/jOwqT+MRwPaoXxpk8/OuxNzO/b7TB8q
+         vClFZSGx+Dz6AcpB1oM2IdifiTvjN420wyXSlUyN1CjcfGQDDhJ6ika6Ug6bKp+PVEtH
+         T2ilr+S5LS2fSCu/8v6dLEXDKPQ3MywovLmhnni9LkTH+VpexZLuIKv+D1kY3V6X/4w3
+         BlLZt92tKTetSXbFjo8QyWvUtWpXH6RfWy9GL3oNlwrQ9C7+C91l87D/sFvnlAIL2YYi
+         DxPgwqPIGT99qR6SutNHtL+9ausp19DYS/g0838hdxvtosnL9VOpF3myeQmf6Y8F5YzN
+         JjLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768297011; x=1768901811;
+        d=1e100.net; s=20230601; t=1768297756; x=1768902556;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
-        b=t9OjOMEgJZKozy6WIliX6Wt5THiY/PdandXCi5KOQv7XHx7pm6O7WJkRuN2xexBToT
-         w09fN2X5U4wHgxcVv0cglzJr4tr7WtR+pr7/rOHuwBFs7HDoi7eKQye6JpO6rwVWffst
-         Ua1+v/E7ukjdJHcyr9G8+7PNI5Tf54dv+V9vbbzmz4rAylA4OLpyrBOM67eu5rQ/iOUu
-         /6TmmlTzajt4xH+YpHR6cfyhvih10DKmwVzYze9U5hUs/jK4ZJ+U22X31sj79M2MYNSX
-         aG69iiqHYWwbYIOIaIIihMc4d03Rxh1BsiGSyK9ABbb6T/7FaTUkTR6xV3OXvzwHKRfe
-         9u7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVKp8yCJdue2vFzQDE05AceUy9yqKEfBTa9V2KFotrQqwfOu3qoqrXnxRr2wXmAmVjHsvA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVhcad5b53PiQncbYZbw5sborWIqt5AVjmvZ6ihfJarrwTkNVm
-	fotEVZmkTxvB3N6o32gNYYDzlU/2hcZh8PhAP/SWWWJkaq1y3AGScU0iFTbxV4YU8VFqfdI1YuC
-	+TcaGigkYuVXaP7n/uZEljCmYkuSlzj76OtkZZ8qEuWxajCs0AiiJNw==
-X-Gm-Gg: AY/fxX6wdzUMlQ4zl3UBt7D51RUvO8DFR05fLK61a9HWt/wKjxbLy2K26GK68oTftUa
-	UfI46WUj7FPPCdr7I5vnX6qu8qTKZQs2avdkyfLPpJ5xpeiMNCR3ay+PoKn2EZ46GbGpaxQOH9W
-	LVldXTrKbHS+GnvUNJd8Pohk0yMhB3aN8hbuF4PF9Fffg3Gb4bwZUy5OG6wVeE2rwzyMeDGk3J5
-	3Ktzr8NvsJ/GHxRXK4yuJ8DtFsN4LSlGy6A4Xqlz87TDxQOMEoFMSIuyp4woQUkl5E4Rr/+yF32
-	1GfQdkhBXWk/LzHg2WwxPJYYvG/U7HVUXECD/lNOKuNzs9v1SS3+wakRrge9/GGzAcIHaQlm+s/
-	YXFSakcpVQpA7uqLC5AJ+zKfEfTsWIDTcTHmKBBHzfIq2iXJfTUbLBLvqh7Y7HQ==
-X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088615e9.21.1768297011476;
-        Tue, 13 Jan 2026 01:36:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHBInHZFJ8RidwkWLMCKS42wGE9AndYw8hKlz7EsNrZzGfvzlSbcNPT7twl1koVSE4j25wDOQ==
-X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088215e9.21.1768297010851;
-        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
+        bh=1GS0CRV+w7tRrF7+CCit+G3w4AP8whQo0obFYQAA7qo=;
+        b=TjO6wc4yHhSvtrFFGVXRKBNDQ3iXbv38HKg9vuL15cJfSsF/2QvOqKhXRYh5yfWfxP
+         IvadsiMeBRzEtkjGRyLr5pw2SBam8nbKBWaU0i+O9l40jLCl6rlNBe2NDpOj8y/LJQdx
+         CMwnWocZvdSvE0osjoLZks/+bIjjV36ghik14/X/nUvqE4vaRisj8itnK6w/xfiBWU5D
+         DoRa2vRwnsCfWMCX7wNxRyVD3SotBA7AXpKUaAVfvl16FT+K2UAzcBNGNHacgIdnLZGT
+         jVAANqLVo43a20fmqzWTUWFwMrpOmQvkP6geTXw50Gcq5GQANkDYFqCB/OIUFzwlq73b
+         mAGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsc/QFinAhq6G6NgM6ZoQp0d00YnXy6cRrKmoxIZx+4Y2L2343MmUYjWih5Nz/Bu6xkXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGrmLvLc8qbLp/S4bqpQPMobNdx16KOCjtvbkBg4eXcnipt8sg
+	3NUFZU10wXDnxGpl5ixNOMWDvJvPYqb9fegepp8oKQVHnp9o97RFW13JEuFZwCErki6qslPPTTa
+	kVq+XK8U0vNkUAS0pAaMP6trZJt4FxEIb6A6TBFg2RlJfJ0XURGkSQQ==
+X-Gm-Gg: AY/fxX463ejm8qos20XaD/0WYF96WOTHKMdxCtf+HI6p1W4beY7+JwOXlFFDCAnPX/y
+	tcL1qYBBV+DftthJSqDsOnwh7Xc2ClSxCFmNwzbdeCIPAltGEuYpbyVH8iUgDY7+ZTWcgwa3msp
+	tiluXsFjKXvFQtMYNGi3tDzlMovAP+SCVTVe8C8z9lVP5pE1GCTUgi5CKeoV1Wh60V1fTZ/0l1V
+	go0atd5FpUNeloXQvnsKPAZ3xZC3rNNkYaXB2RxnSQjwj/bg27k8JASUTrdLjGnY9Y4UNq4mhlo
+	GyIZ7Jy1YyK8Jrzn2IpXOUbJd1yzfDRGIPwwMf6H54xXJko99yHfM6VgQSi1xbkkYLvrmYEDf3v
+	Bjurbo59VUIV7RKSuPXj81xQD9HfO737cJrLsYH+DbxoW5Yf36vUelz2jpDYL3Q==
+X-Received: by 2002:a05:600c:a08:b0:477:b0b8:4dd0 with SMTP id 5b1f17b1804b1-47d84b36b7emr268430935e9.17.1768297756537;
+        Tue, 13 Jan 2026 01:49:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG59H6I4L3LW3VM2eO5vqd4A+F9Msyf0Cpn+5ysJCfFivWNRcqjGAWOBoxCzYxqNC1GJXlk3w==
+X-Received: by 2002:a05:600c:a08:b0:477:b0b8:4dd0 with SMTP id 5b1f17b1804b1-47d84b36b7emr268430695e9.17.1768297756010;
+        Tue, 13 Jan 2026 01:49:16 -0800 (PST)
 Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe83bsm43257713f8f.38.2026.01.13.01.36.49
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e16f4sm44230246f8f.11.2026.01.13.01.49.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
-Date: Tue, 13 Jan 2026 10:36:42 +0100
+        Tue, 13 Jan 2026 01:49:15 -0800 (PST)
+Date: Tue, 13 Jan 2026 10:48:43 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
- getting coalesced
-Message-ID: <aWYQRK-fRHOqQNc8@sgarzare-redhat>
-References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
- <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
- <aWEqjjE1vb_t35lQ@sgarzare-redhat>
- <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
- <aWT6EH8oWpw-ADtm@sgarzare-redhat>
- <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
- <aWUk0axv-GZu7VD2@sgarzare-redhat>
- <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
+	Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v13 02/13] vsock: add netns to vsock core
+Message-ID: <aWYTFBCoJrmnEPgg@sgarzare-redhat>
+References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
+ <20251223-vsock-vmtest-v13-2-9d6db8e7c80b@meta.com>
+ <20260111013536-mutt-send-email-mst@kernel.org>
+ <aWWFB2K5H5OXGWP8@devvm11784.nha0.facebook.com>
+ <aWWXTx6SSNiV3a+v@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -118,69 +120,119 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
+In-Reply-To: <aWWXTx6SSNiV3a+v@devvm11784.nha0.facebook.com>
 
-On Mon, Jan 12, 2026 at 10:20:50PM +0100, Michal Luczaj wrote:
->On 1/12/26 17:48, Stefano Garzarella wrote:
->>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->>>>>>> index bbe3723babdc..21c8616100f1 100644
->>>>>>> --- a/tools/testing/vsock/vsock_test.c
->>>>>>> +++ b/tools/testing/vsock/vsock_test.c
->>>>>>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
->>>>>>> 		.run_client = test_stream_accepted_setsockopt_client,
->>>>>>> 		.run_server = test_stream_accepted_setsockopt_server,
->>>>>>> 	},
->>>>>>> +	{
->>>>>>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
->>>>>>
->>>>>> This is essentially a regression test for virtio transport, so I'd add
->>>>>> virtio in the test name.
->>>>>
->>>>> Isn't virtio transport unaffected? It's about loopback transport (that
->>>>> shares common code with virtio transport).
->>>>
->>>> Why virtio transport is not affected?
->>>
->>> With the usual caveat that I may be completely missing something, aren't
->>> all virtio-transport's rx skbs linear? See virtio_vsock_alloc_linear_skb()
->>> in virtio_vsock_rx_fill().
->>>
+On Mon, Jan 12, 2026 at 04:52:31PM -0800, Bobby Eshleman wrote:
+>On Mon, Jan 12, 2026 at 03:34:31PM -0800, Bobby Eshleman wrote:
+>> On Sun, Jan 11, 2026 at 01:43:37AM -0500, Michael S. Tsirkin wrote:
+>> > On Tue, Dec 23, 2025 at 04:28:36PM -0800, Bobby Eshleman wrote:
+>> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+>> > >
+>> > > Add netns logic to vsock core. Additionally, modify transport hook
+>> > > prototypes to be used by later transport-specific patches (e.g.,
+>> > > *_seqpacket_allow()).
+>> > >
+>> > > Namespaces are supported primarily by changing socket lookup functions
+>> > > (e.g., vsock_find_connected_socket()) to take into account the socket
+>> > > namespace and the namespace mode before considering a candidate socket a
+>> > > "match".
+>> > >
+>> > > This patch also introduces the sysctl /proc/sys/net/vsock/ns_mode to
+>> > > report the mode and /proc/sys/net/vsock/child_ns_mode to set the mode
+>> > > for new namespaces.
+>> > >
+>> > > Add netns functionality (initialization, passing to transports, procfs,
+>> > > etc...) to the af_vsock socket layer. Later patches that add netns
+>> > > support to transports depend on this patch.
+>> > >
+>> > > dgram_allow(), stream_allow(), and seqpacket_allow() callbacks are
+>> > > modified to take a vsk in order to perform logic on namespace modes. In
+>> > > future patches, the net will also be used for socket
+>> > > lookups in these functions.
+>> > >
+>> > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>> >
+>> > ...
+>> >
+>> >
+>> > >  static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>> > >  				    struct sockaddr_vm *addr)
+>> > >  {
+>> > > +	struct net *net = sock_net(sk_vsock(vsk));
+>> > >  	static u32 port;
+>> > >  	struct sockaddr_vm new_addr;
+>> > >
+>> >
+>> >
+>> > Hmm this static port gives me pause. So some port number info leaks
+>> > between namespaces. I am not saying it's a big security issue
+>> > and yet ... people expect isolation.
 >>
->> True, but what about drivers/vhost/vsock.c ?
+>> Probably the easiest solution is making it per-ns, my quick rough draft
+>> looks like this:
 >>
->> IIUC in vhost_vsock_handle_tx_kick() we call vhost_vsock_alloc_skb(),
->> that calls virtio_vsock_alloc_skb() and pass that skb to
->> virtio_transport_recv_pkt(). So, it's also affected right?
+>> diff --git a/include/net/netns/vsock.h b/include/net/netns/vsock.h
+>> index e2325e2d6ec5..b34d69a22fa8 100644
+>> --- a/include/net/netns/vsock.h
+>> +++ b/include/net/netns/vsock.h
+>> @@ -11,6 +11,10 @@ enum vsock_net_mode {
+>>
+>>  struct netns_vsock {
+>>  	struct ctl_table_header *sysctl_hdr;
+>> +
+>> +	/* protected by the vsock_table_lock in af_vsock.c */
+>> +	u32 port;
+>> +
+>>  	enum vsock_net_mode mode;
+>>  	enum vsock_net_mode child_ns_mode;
+>>  };
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index 9d614e4a4fa5..cd2a47140134 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -748,11 +748,10 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>>  				    struct sockaddr_vm *addr)
+>>  {
+>>  	struct net *net = sock_net(sk_vsock(vsk));
+>> -	static u32 port;
+>>  	struct sockaddr_vm new_addr;
+>>
+>> -	if (!port)
+>> -		port = get_random_u32_above(LAST_RESERVED_PORT);
+>> +	if (!net->vsock.port)
+>> +		net->vsock.port = get_random_u32_above(LAST_RESERVED_PORT);
+>>
+>>  	vsock_addr_init(&new_addr, addr->svm_cid, addr->svm_port);
+>>
+>> @@ -761,11 +760,11 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>>  		unsigned int i;
+>>
+>>  		for (i = 0; i < MAX_PORT_RETRIES; i++) {
+>> -			if (port == VMADDR_PORT_ANY ||
+>> -			    port <= LAST_RESERVED_PORT)
+>> -				port = LAST_RESERVED_PORT + 1;
+>> +			if (net->vsock.port == VMADDR_PORT_ANY ||
+>> +			    net->vsock.port <= LAST_RESERVED_PORT)
+>> +				net->vsock.port = LAST_RESERVED_PORT + 1;
+>>
+>> -			new_addr.svm_port = port++;
+>> +			new_addr.svm_port = net->vsock.port++;
+>>
+>>  			if (!__vsock_find_bound_socket_net(&new_addr, net)) {
+>>  				found = true;
+>>
+>>
+>>
 >
->virtio_vsock_alloc_skb() returns a non-linear skb only if size >
->SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER)). And that is way
->more than GOOD_COPY_LEN, so we're good.
+>Another option being to follow inet's path and use
+>siphash_4u32() the way that secure_ipv4_port_ephemeral() does...
 >
->At least until someone increases GOOD_COPY_LEN and/or reduces the size
->condition for non-linear allocation. So, yeah, a bit brittle.
 
-I see, thanks for clarify. So please add all of this conclusions in the 
-patch 1 description to make it clear that only loopback is affected, so 
-no guest/host attack is possible. (not really severe CVE)
+Yeah, I was going to ask what inet does, also because I don't really 
+like the code we have now (not your fault at all).
 
->
->> BTW in general we consider loopback as one of virtio devices since it
->> really shares with them most of the code.
->
->Fair enough, I'll add "virtio" to the test name.
-
-Thanks.
-
->
->> That said, now I'm thinking more about Fixes tag.
->> Before commit 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs for
->> handling large transmit buffers") was that a real issue?
->
->I don't really think that commit changes anything for the zerocopy case. It
->only makes some big (>GOOD_COPY_LEN) non-ZC skbs turn non-linear.
->
-
-I see.
+But maybe is too out of scope to resolve in this series, so I guess just 
+moving what we have per-ns LGTM for now!
 
 Stefano
 
