@@ -1,149 +1,128 @@
-Return-Path: <kvm+bounces-67953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C77D1A1B2
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 17:11:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D6F5D1A30E
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 17:21:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 66159302C867
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 16:11:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F2B1307894F
+	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 16:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4745E3451BB;
-	Tue, 13 Jan 2026 16:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA92F263F5E;
+	Tue, 13 Jan 2026 16:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VTYaz+xn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EsE4TMRD"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657E336C0D0;
-	Tue, 13 Jan 2026 16:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB992EED8
+	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 16:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768320660; cv=none; b=f5pbVW0DvDAFufQ8J3d3Pdgmyrp9mAZ0yw6wDFPJDVH27xDFBdLt18Hfdhf0r/AXCVxBc5aEXBpiIfKVUeXxfWh5CxpL8CUCPdKpRJ3yYrehKypHu+pPRX7V+OOvCLmXDzUPcq60KSRhYdFfYT3K4UlFfsXgLwhdPDzdXkPa4tk=
+	t=1768321002; cv=none; b=LjgOACbUszeBBT+N6HKRgJuIOsO5sLLVJrdeegw1Oa+bu7pu49UuPde1Q7M1qw9mw3Zg8QLt6TCDm7BZWoaHJdfcJ7IEg5Sy0sWMMVOlLIanydnckyIIy0tzM23UU8L8K2GHijydOk+YNew8ZN/anGvouku/HEBuKcbJU/3k3Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768320660; c=relaxed/simple;
-	bh=/dUbmRww4cHamievMVwgGH9rnRn2MYlwRxvkGfxfk3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=crt2RyFHqiywv1LQj9d2Ljy8Pz0+EByH+t43nKfWppGvKPKx5/Fi9N1em5px7ndCcFaVIcqv7WNAW7Zof0XajhY0rpO4Taf+VNMEYnCD6NhqyZUYn/NLQtljWUUqDSU/poQ+bkDF/RRljCCeDptdck0i/Bv7FJsMk/U3X5nlJ8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VTYaz+xn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6AD7C19421;
-	Tue, 13 Jan 2026 16:10:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768320659;
-	bh=/dUbmRww4cHamievMVwgGH9rnRn2MYlwRxvkGfxfk3w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VTYaz+xnWdrALVx1BxBiXwa4OzIIiSKaxfrsMgztr6B2NHaC5uRTXhbCNgeYFt1ja
-	 Y6/6pz2GQxm0hdFh+EZxaxm07rnaR7QRgTgR+sauZ7aIDQwajWWl0AHiDOnl/tA2V6
-	 IXi6u4n/5DURYfljzI0irevQo1TOGgt7Xqr6tJR2VwSjFKMngL+lD5Fe3Wf5KzJian
-	 PjrFomT3c4G9FvTrJWnHC/fjXTWC/fEafQ2Bo20mk0+lT5MBJR4dP0PiZd92EPFBGF
-	 Nk5/XtaUrV5ZgbgHJyF06xjCQ7vVFjxwNb+khJ+nFU8OkesI61zj6SgvMdw9NuQpJB
-	 oGNltgC6Vxw7g==
-Date: Tue, 13 Jan 2026 16:10:53 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 00/30] KVM: arm64: Implement support for SME
-Message-ID: <30488f61-3233-4cf3-995d-717436de60f6@sirena.org.uk>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
+	s=arc-20240116; t=1768321002; c=relaxed/simple;
+	bh=shrcPEzb4aNV5JwEnXnE47Uz3LqyRg3MH/PLatgNdbc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RzqucgMfvaK791hDD3/Lo7ZmNsZEbRwVtuODLeYT9vsJcMoHA3CAH0Z/7cDK92meKMrtz3X8Juf7VdFZ6//uNIHTWuEznUZief86Pr75TQOXoWXR1rXToIxtTx8PmORQgfNR4yVa71oIWNC32YCUlMpg8bnY48m17wrgUGb5ctc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EsE4TMRD; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64d1ef53cf3so11332750a12.0
+        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 08:16:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768320999; x=1768925799; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=shrcPEzb4aNV5JwEnXnE47Uz3LqyRg3MH/PLatgNdbc=;
+        b=EsE4TMRDEMaEwNO2MZ3V4Qhsintrq5Ail25d/gavKwqrlnO1Ql6tlqqroLvKLzsChD
+         sfKHBWWuBdPwLP3X9Sg8AxhIJtP1LW0pJpuZ+aJ0DvedriiMUg1gYjDFyFJbG1McDroY
+         Z3u3YZ/6sFldqp3cgpQDaZPEcd04uSGY8RIp2OQBZU9Jz1dOIBXTwQeFlUKs1p8vKesb
+         t01S44jRM/ZCt49GlyBTUT3dWkhs58edo/TrClWyAta5QaQvBYKSu/1p4aPkpCDluS39
+         s1PqetojURgicZStEHWjJ/gKTyBHAg5pVJAttF8Oyc2d3iZB+9k0lHu1Cg6ZFXEoBsyD
+         dM4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768320999; x=1768925799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=shrcPEzb4aNV5JwEnXnE47Uz3LqyRg3MH/PLatgNdbc=;
+        b=Zbdl3BodD3l/Nk6thNzwO6hS0UChD5XSBuZZnjDJbrs8epCvbAzjkHDtQhI5+i5Uu0
+         E+ilowgEcdnRykWyu0NiQ0wTid5I++Rt5+92T3plgKDrY3jvuxg0u1xD11dcYlzRQhnj
+         6+0vrfy04Q/I8b2sPUCzUbId/CcXDH8mgxBrd+zGmEbooYzhhrvvJRddyPbEjVXEBjiW
+         NK0c7vF8EWhiuFoNiY3YZN+4n/VjhXajaEDb2A1PkgEYOhcZ6sX/ZrvXRoUF6OegKIwu
+         uiAS7ZR+4Ce/Tty45UvNy49suvjh8DPVurcL1MCZUOcisQzVEDBid867kPav+ONU6zSW
+         doeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXf46dHq6og6j4eKX+HnbaqPBsm++IB8CCue41zbRhqlS10F8wgOWjFd7nnIPCN1Z8np5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4zaHp9QOkAOGsSU4h3JtBMW0K+zGg9Vr4nx0hABC3O2s9y36f
+	5a7Cck2N7OUnRlGYh8c4fs5tU2Y7ZJ5/cU6IsfwC4S16ISB0iyXXvoQBs6uEk06OaEU7IXFZV3R
+	qawGVPRZjyVE5Ll2yGhe5vIIOZ9MlIVI=
+X-Gm-Gg: AY/fxX6G85B3s3/tepXthREe49fucg74EeoSj4nkM7exWbwa9tHdnT/YXvF2QU4g/hL
+	sVjcD0m5BZgUBYwzGvGmTvDn67NNKMd6BFWK+QCOS4qkbqvsXHltB1ps5zky2Weezjj6eTshE3M
+	rJ1sQkS5msUOhP1+Cu9SF+OtO+Nl7tF08v5WeZk6hL+WeDhpVKPiAYUxhnz4nvCCfVmFGbCjKnO
+	yrXSL/gQS/ppE8ENR7nfNo93ERBVNqjn8BuwtmkyRbdwnOm/nPiK9Omrpqy09Orc7HG3A==
+X-Google-Smtp-Source: AGHT+IHeiXZQnvw1K14LiD9+GLZGNYRdbytBLKoxdu0+Xta2Qk1o+/1j7ZzV9FMnMVXfT7V6vhkF3XPB6LaigPsCOM4=
+X-Received: by 2002:a05:6402:3546:b0:64b:4720:1c23 with SMTP id
+ 4fb4d7f45d1cf-65097df5b56mr19145568a12.13.1768320999063; Tue, 13 Jan 2026
+ 08:16:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cbkFj6fysNdPk5Ht"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
-X-Cookie: All models over 18 years of age.
+References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+ <aWZk7udMufaXPw-E@x1.local>
+In-Reply-To: <aWZk7udMufaXPw-E@x1.local>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 13 Jan 2026 11:16:27 -0500
+X-Gm-Features: AZwV_Qi7DHm95fI2JQgQGGuriK_wavPbXFOd_YVGKOoEvhXOSPvwsJvXr_ZtxEQ
+Message-ID: <CAJSP0QVm41jSCma73sef7uzgEnqESRfqrxRstNTY_pd4Dk-JXA@mail.gmail.com>
+Subject: Re: Call for GSoC internship project ideas
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
+	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Matias Ezequiel Vara Larsen <mvaralar@redhat.com>, Kevin Wolf <kwolf@redhat.com>, 
+	German Maglione <gmaglione@redhat.com>, Hanna Reitz <hreitz@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	=?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	Thomas Huth <thuth@redhat.com>, danpb@redhat.com, 
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Bennee <alex.bennee@linaro.org>, 
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>, Marco Cavenati <Marco.Cavenati@eurecom.fr>, 
+	Fabiano Rosas <farosas@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 13, 2026 at 10:30=E2=80=AFAM Peter Xu <peterx@redhat.com> wrote=
+:
+>
+> On Mon, Jan 05, 2026 at 04:47:22PM -0500, Stefan Hajnoczi wrote:
+> > Dear QEMU and KVM communities,
+> > QEMU will apply for the Google Summer of Code internship
+> > program again this year. Regular contributors can submit project
+> > ideas that they'd like to mentor by replying to this email by
+> > January 30th.
+>
+> There's one idea from migration side that should be self-contained, pleas=
+e
+> evaluate if this suites for the application.
+>
+> I copied Marco who might be interested on such project too at least from =
+an
+> user perspective on fuzzing [1].
+>
+> [1] https://lore.kernel.org/all/193e5a-681dfa80-3af-701c0f80@227192887/
+>
+> Thanks,
 
---cbkFj6fysNdPk5Ht
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I have edited the project description to make it easier for newcomers
+to understand and added a link to mapped-ram.rst:
+https://wiki.qemu.org/Google_Summer_of_Code_2026#Fast_Snapshot_Load
 
-On Tue, Jan 13, 2026 at 02:58:37PM +0000, Fuad Tabba wrote:
-> On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+Feel free to edit the project idea on the wiki.
 
-> > Changing the value of SVCR.SM will result in the contents of
-> > the Z, P and FFR registers being reset to 0.  When restoring the
-> > values of these registers for a VM with SME support it is
-> > important that SVCR.SM be configured first.
-
-> However, the order returned by kvm_arm_copy_reg_indices() is core,
-> sve, fw, then system. So this means that the VMM will need to hardcode
-> this order, rather than rely on KVM_GET_REG_LIST. It _is_ documented,
-> but it is tricky and it's easy to miss.
-
-> Looking at copy_sve_reg_indices(), there's a special case for
-> KVM_REG_ARM64_SVE_VLS, which forces it to appear before the other SVE
-> registers. So I wonder if we need to do something at the level of
-> kvm_arm_copy_reg_indices(), or do some sort of post-processing to the
-> list, to avoid this problem.
-
-That makes sense.  The whole ordering dependency thing is obviously a
-landmine so if we can do something to make it more likely that things
-will go right then that seems helpful.
-
-> >  - The userspace ABI, in particular:
-> >   - The vector length used for the SVE registers, access to the SVE
-> >     registers and access to ZA and (if available) ZT0 depending on
-> >     the current state of PSTATE.{SM,ZA}.
-
-> One issue I see here, from a VMM's perspective, is that the amount of
-> data transferred via KVM_GET_ONE_REG/KVM_SET_ONE_REG depends on the
-> guest's current architectural mode. So now the VMM needs to first
-> figure out what that is, before being able to SET/GET when
-> saving/restoring a VM state.
-
-> Before this series, SVE just assumed a maximum amount of data and
-> zero-pad the rest. SME state is bigger, but in practice, do we expect
-> many cases where the VL sizes between modes would be drastically
-> different that it would make a difference in terms of storage?
-
-I would expect it to be very common for the forseeable future that the
-SME vector length will be several times that for SVE with no overlap.
-
-> Other than that, I think the asymmetry of VLs might be a painpoint for
-> users. The problem is that there is no guarantee that the set of
-> vector lengths supported for SME match or the set supported for SVE.
-> But I wonder if there's something we can do to help. Maybe a discovery
-> IOCTL that returns the entire matrix of supported configurations (SVE
-> VLs, SME VLs, and their intersection) to simplify VMM decision-making?
-
-I'm thinking such discovery might be better assisted with a userspace
-library, as well as KVM VMMs it's also an issue for things like
-debuggers and trying to design something nice that's also an ioctl()
-feels a lot harder to get right.
-
---cbkFj6fysNdPk5Ht
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlmbowACgkQJNaLcl1U
-h9BXxgf/Re82kuN/C9D1N1jAvlefDx4tWyo4Yej5K2x+aab7UB8c1wIAHsQZZn+y
-q7tQCcfBt9JS2ZO5KODPc42OkcUMlSGfsNCOU0nQMJiDBO2SWwNjqFwxlGObU5Al
-nVBHLBX3DVeh9nZ0f5otYXTMFyXLYldhRUYCIMPGuV/B4rKCceh4VNXtV8jIzCj2
-J22qiEjUCGsi90zxMYPO7ajbhtzOIWDNifx5n/Mrxk1uDROqRVSNPWW98cK/wmW2
-F+bue7qvlbeI7sOmYWPqNTcu+pMKBHtKsbvQsrf9ZUCKQ10da2Z6CVk5OJbccJyG
-gPk7wK+qCqB4amr6IlNKqK1tjgwriQ==
-=6Ghr
------END PGP SIGNATURE-----
-
---cbkFj6fysNdPk5Ht--
+Thanks,
+Stefan
 
