@@ -1,89 +1,137 @@
-Return-Path: <kvm+bounces-68091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68093-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10156D21724
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 22:51:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C23D217BB
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 23:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B3DD4302C730
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 21:48:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6ECB30B6016
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 22:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4D83A782A;
-	Wed, 14 Jan 2026 21:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B8D3A9003;
+	Wed, 14 Jan 2026 22:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="P6vtWoYC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hSW5Vy+S"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CBB3A1A2D;
-	Wed, 14 Jan 2026 21:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25293A89A8
+	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 21:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768427308; cv=none; b=u3Ht+k1ndcXZqlqdXMF5cv0YdmE0ANtTJmdAt9NmjosOz6mWnhzUElSY3SpJguQELWXQPH+ndVUowAEMU7fpGtJAOLLalOSf5vrlbJOlPCBOi1RlpmE+YNPExTdIk2gs5PsS3KJy2YEDTLHgbPMTj4ydqTxG6eXqiPnomoaul3o=
+	t=1768427984; cv=none; b=K+90dTVZxB/xALiJLdVOJFBEOFHQ5jXs0EhEuTLfK9UXmJit97twd02uAqZiKl/jNXqCmK4TJU2t5gbhtub95q9xdnrd5uIVW2aD39fi90Xt8NDZSgsP63t0nlrdYQXclO12NriR3anyml32o9qSc9euFpshf2fpK4hjB5Ixnac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768427308; c=relaxed/simple;
-	bh=sVjE+SfQsdIUMHLLdK2WZZMe9meeOIqp+vLdzF39rao=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=LzxoLsEZ3DVYR6AqSMUSlI3YLt5og3DqD4e1eVbXkAVDhgh+R7k4YcQkFT5sNYKu83kjEEXRdDaukea/TijU4UIWBVxJCc/WCHTsN0SG7uIxvfNOpbUsBM94cxGdvT5ehKxfo8koGaUQA2LHfePCK/PhqW0/Vgq+ePAQqmOv4v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=P6vtWoYC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94455C4CEF7;
-	Wed, 14 Jan 2026 21:48:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1768427306;
-	bh=sVjE+SfQsdIUMHLLdK2WZZMe9meeOIqp+vLdzF39rao=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P6vtWoYCIlr2XYuGHN8Ct1JWv57QVflPPPZ09aqbdSf6sWvv6Psm4BbFl9dEKxvME
-	 9IiuEcpRE83qTyXp72NniYCaihdkRtUtnm5MV6es8ZMUNP2zri1F+QO+WeYttAzUaW
-	 ul+FCK9Uuub6AWdHHLL0xvAdQEb3R2ZlrFvcN/18=
-Date: Wed, 14 Jan 2026 13:48:25 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Francois Dugast <francois.dugast@intel.com>
-Cc: intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org, Matthew
- Brost <matthew.brost@intel.com>, Zi Yan <ziy@nvidia.com>, Alistair Popple
- <apopple@nvidia.com>, adhavan Srinivasan <maddy@linux.ibm.com>, Nicholas
- Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Felix Kuehling
- <Felix.Kuehling@amd.com>, Alex Deucher <alexander.deucher@amd.com>,
- Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>, Lyude Paul <lyude@redhat.com>,
- Danilo Krummrich <dakr@kernel.org>, David Hildenbrand <david@kernel.org>,
- Oscar Salvador <osalvador@suse.de>, Jason Gunthorpe <jgg@ziepe.ca>, Leon
- Romanovsky <leon@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
- <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan
- <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Balbir Singh
- <balbirs@nvidia.com>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- nouveau@lists.freedesktop.org, linux-mm@kvack.org,
- linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v5 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-Message-Id: <20260114134825.8bf1cb3e897c8e41c73dc8ae@linux-foundation.org>
-In-Reply-To: <20260114192111.1267147-2-francois.dugast@intel.com>
-References: <20260114192111.1267147-1-francois.dugast@intel.com>
-	<20260114192111.1267147-2-francois.dugast@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1768427984; c=relaxed/simple;
+	bh=tO0znVmDXAymHNCdzPnVwtYP7QD1kxrOykARoYLTeBE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IyWT8PCu+elsqCMTQ8M78qOZ8SLYp8zDkXnVfRvnHQKy0wjMxydE5glSSiiher4hm3iT0IBrFF0cXPfWrrhDVHbNW1bPboB18F2ujNxbDeYZxfYCrKKXkq3stM/a/vmAJ0fG+IWm5ZKaWlvmT7Z+hQNwD1LNrYEeuyMv5PqqTgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hSW5Vy+S; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c6e05af3bso150828a91.3
+        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 13:59:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768427965; x=1769032765; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wc5IYW1fIu5cyAHFpaj29f0bgcaP13LBp3YapifQT5w=;
+        b=hSW5Vy+SGhQcYxbEd5IwbQss4zcbV4g2hELRx9Isus+w4SC0+K55AFsf5LThNPaD0z
+         iX0qvcGmeRXiOJHpd0TW7z1fwfq5SfuIRL6IAQGWkzrkXFg++BDcf65CDgRNUQ13HqO/
+         Ucr/ZIMFRzYZwT+qn1DZpZAekxqBeeV/NLKibGnhHihyKDKUNxvs2+2pSTVoI6e3Oxuu
+         HJVB2ASDVT69USBw4+bEkh1ThVcyILL8IXhEyzD1tgkNsx2EZQC4qtjS1fk+LMe/3e7R
+         /OIouO1efH52uxgwQxriWCIRsWnwj+8vUwGNZdL5tNVyvn4y5ATbVkpFPmKnxpDZToX2
+         xQNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768427965; x=1769032765;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wc5IYW1fIu5cyAHFpaj29f0bgcaP13LBp3YapifQT5w=;
+        b=Mxij+Z3Dkh973R5E5m7/7bceQLJ5+7KwMvt5/qQ4Pv0FWoyyhM7nK9sJ5Xct9qB2De
+         gx24YGxGzI3tQKoQh9gqh6AhAPp4FydrQpzjxAx3HkxZKGZ3vOGeBvRLHzf4Nv2Jmmi9
+         +sgPamhWUr5mnlO0r+t76/yA4WbWZ4TACYOIYjTUoMQ3R9K2qazJ2n/qu2LMM9N154Eg
+         miCEULrPcaqvWh5Ja9e2LtX9HrrG+E6ze37t0g/W6x3ubxMxYa3vZcpntR/VR/44Bul/
+         XGR1LWfxpNQwUkK6HfKHULiU8p3GGsN1lB2v7ZeRpg4mRFOWClAuYuHhrwyrwU+LA+WN
+         0F7g==
+X-Forwarded-Encrypted: i=1; AJvYcCU5vpGKNRVAVlwbFCJ9QbWzYDKn60wiseyN29UdANCpNJCif0d627rB99yrPUihFXI9xvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWW+BgIYQZN12vvAXuM35zE6nZ1FFtRFmkWrLgvT2ZboJoHoHI
+	8VNYsekDD2/C+QUlRkapq+Rb8ngFcRfOPMuyF+Jqk9p86XXrfUostWmWExIeEXC9QSV8z95PrDn
+	YAiJnGQ==
+X-Received: from pjbga22.prod.google.com ([2002:a17:90b:396:b0:34c:9f0b:fd7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:6d0:b0:341:6164:c27d
+ with SMTP id 98e67ed59e1d1-35109091a6cmr3714526a91.3.1768427965337; Wed, 14
+ Jan 2026 13:59:25 -0800 (PST)
+Date: Wed, 14 Jan 2026 13:59:24 -0800
+In-Reply-To: <jf2zfqo6jrrcdkdatztiijmf7tgkho7bks4q4oaegiqpeflrkj@7blq6f5ck2hf>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250901051656.209083-1-manali.shukla@amd.com>
+ <20250901052146.209158-1-manali.shukla@amd.com> <jf2zfqo6jrrcdkdatztiijmf7tgkho7bks4q4oaegiqpeflrkj@7blq6f5ck2hf>
+Message-ID: <aWgRvCdPsAFHRwcU@google.com>
+Subject: Re: [PATCH v2 03/12] KVM: Add KVM_GET_EXT_LAPIC and KVM_SET_EXT_LAPIC
+ for extapic
+From: Sean Christopherson <seanjc@google.com>
+To: Naveen N Rao <naveen@kernel.org>
+Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, 
+	pbonzini@redhat.com, nikunj@amd.com, bp@alien8.de, peterz@infradead.org, 
+	mingo@redhat.com, mizhang@google.com, thomas.lendacky@amd.com, 
+	ravi.bangoria@amd.com, Sandipan.Das@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 14 Jan 2026 20:19:52 +0100 Francois Dugast <francois.dugast@intel.com> wrote:
+On Tue, Dec 16, 2025, Naveen N Rao wrote:
+> On Mon, Sep 01, 2025 at 10:51:46AM +0530, Manali Shukla wrote:
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 6aa40ee05a4a..0653718a4f04 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -2048,6 +2048,18 @@ error.
+> >  Reads the Local APIC registers and copies them into the input argument.  The
+> >  data format and layout are the same as documented in the architecture manual.
+> >  
+> > +::
+> > +
+> > +  #define KVM_APIC_EXT_REG_SIZE 0x540
 
-> Reinitialize metadata for large zone device private folios in
-> zone_device_page_init prior to creating a higher-order zone device
-> private folio. This step is necessary when the folio’s order changes
-> dynamically between zone_device_page_init calls to avoid building a
-> corrupt folio. As part of the metadata reinitialization, the dev_pagemap
-> must be passed in from the caller because the pgmap stored in the folio
-> page may have been overwritten with a compound head.
+As discussed in PUCK, just go the full 0x1000 bytes, and do:
 
-Thanks.  What are the worst-case userspace-visible effects of the bug?
+#define KVM_GET_LAPIC2            _IOR(KVMIO,  0x8e, struct kvm_lapic_state2)
+#define KVM_SET_LAPIC2            _IOW(KVMIO,  0x8f, struct kvm_lapic_state2)
+
+> > +  struct kvm_ext_lapic_state {
+> > +	__DECLARE_FLEX_ARRAY(__u8, regs);
+> > +  };
+> > +
+> > +Applications should use KVM_GET_EXT_LAPIC ioctl if extended APIC is
+> > +enabled. KVM_GET_EXT_LAPIC reads Local APIC registers with extended
+> > +APIC register space located at offsets 400h-530h and copies them into input
+> > +argument.
+> 
+> I suppose the reason for using a flex array was for addressing review 
+> comments on the previous version -- to make the new APIs extensible so 
+> that they can accommodate any future changes to the extended APIC 
+> register space.
+> 
+> I wonder if it would be better to introduce a KVM extension, say 
+> KVM_CAP_EXT_LAPIC (along the lines of KVM_CAP_PMU_CAPABILITY).
+
+Please figure out a different name than "ext_lapic".  Verbatim from the SDM
+(minus a closing parenthesis)
+
+  the xAPIC architecture) is an extension of the APIC architecture
+
+and
+
+  EXTENDED XAPIC (X2APIC)
+  The x2APIC architecture extends the xAPIC architecture
+
+There's zero chance I'm going to remember which "extended" we're talking about. 
+
+KVM_CAP_X2APIC_API further muddies the waters, so maybe something absurd and
+arbitrary like KVM_CAP_LAPIC2?  The capability doesn't have to strictly follow
+the naming of the underlying feature(s) it supports.
 
