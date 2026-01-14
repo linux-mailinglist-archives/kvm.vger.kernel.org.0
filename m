@@ -1,119 +1,161 @@
-Return-Path: <kvm+bounces-68073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD37D20E51
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 19:50:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9403DD20EC9
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 19:56:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E332F3061287
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 18:48:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2E9433038CE9
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 18:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9413233A9DE;
-	Wed, 14 Jan 2026 18:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0056333BBC4;
+	Wed, 14 Jan 2026 18:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/3YuIa8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xv5p/vMC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36EF296BB7;
-	Wed, 14 Jan 2026 18:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9987C33986C;
+	Wed, 14 Jan 2026 18:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768416520; cv=none; b=S2UpYv6x/s2JSydgbWz9+zjwTO6yAB8tZ8hGNQerrQ5ElG5nvut2bDghmJk63lys/CIqPhpycHw09dg+QdRZNa7CNgr8m2WGiKWH4cXuvu8XyhZjvbzqZpl15xP+wTozsu/LsvoXhlTgkOiZ2IrBGlDx8suHxxrqdcxh2JOUrKU=
+	t=1768416967; cv=none; b=sJ9WRr1AJS+pJBSBKsJI3L+FZuQkr5HWN/Rjir7XG2qR5eEkt3q09Ta8TTUlg7wdDdfMojbphWdPUrfv3y1uXxVq2xcuxUQcS8ALk4gKLflqBjJhQ03l9+IFc89od0iBLWwhw1ybSe5nlsy0CI9qQ0OGFZNtODEBRz77fotaha4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768416520; c=relaxed/simple;
-	bh=8KBWIbkpJwQyTeH+b5e850ZKQFUEMxvg18f8SI8BdoE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EtXKoPGSXr+NKSzSiNg5bbDMjYa/lY3REtzaMsJ7684sugDgBLG+H53UiIEiBXxJvX/TfklAnZbLY1BhEMXyonr/CxRg/oci4JMI2psqAXFefN7ff9+y/wtrrFHZbg/c3S/VkBElgrGN/nDFdnBoSzrVaVSpIpQHzGe+PPfSugc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/3YuIa8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4C58C4CEF7;
-	Wed, 14 Jan 2026 18:48:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768416520;
-	bh=8KBWIbkpJwQyTeH+b5e850ZKQFUEMxvg18f8SI8BdoE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t/3YuIa8oSi/xC/GW3dpb1lZoupC4+ZqSiMYqsiRYtEJqPu5VpCncmLyynSJcab6m
-	 lBJCYevFVEIqegwtLZxHvJqoCjsSXqVVmVsUGI2i5/xAgIiynXIiqV3aVETrQ8pzsj
-	 j/r3LUKh0rJQ7on5AQeo4bk0Y9Xj1uCAYfpwyc9l9iKtksfZ0yQ/yrGOwPx+9pRZO+
-	 FlEG6BL+gLBeSR4cWfZovOpnukvKBAAhf14aDSHc0HB+ZCwyzzyOikgCTwD7+I5dJw
-	 RenN+N1iQg2SsDCExcca65J2x4S77imYS+qqfgCjzcZzgOuVQUnogF40oQgmb+PTt6
-	 U6IahqNfIZSFA==
-Date: Wed, 14 Jan 2026 18:48:34 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 26/30] KVM: arm64: Provide interface for configuring
- and enabling SME for guests
-Message-ID: <3be5b6a7-3b26-4899-8313-c849c28300ca@sirena.org.uk>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-26-8be3867cb883@kernel.org>
- <CA+EHjTxFfY_XkEQrNvme94uHoxQLWEaX1q1MikbcmwmUMq=NwA@mail.gmail.com>
+	s=arc-20240116; t=1768416967; c=relaxed/simple;
+	bh=aiVscpRLIrk18M6F7N3ZFycRSs7+Hj/4fV6ILUDsoSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qso4dJyn0SGuzLrp4yFK6u1Q5LGnb+ZU4MT35pUE342ZPtbF8gBYmPbvmMbVdhpGW6daoE6/uhBky7S243lNz9dNBxPamOqNSCUNuuDxGwm6waCY5O52rTLjF6gxt53Thf+IXl3olZc35mDn2E4qX9JoO6Zj3ZdhWdoKzFdY6eE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xv5p/vMC; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768416965; x=1799952965;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aiVscpRLIrk18M6F7N3ZFycRSs7+Hj/4fV6ILUDsoSE=;
+  b=Xv5p/vMCax5YAhTKedrIFPeBuwFYiYpcqELRt73RgyNL+JseI99PskXC
+   1tNnKCHDvUJY1IndvVgCmtSKZAvCzjAb3t9g4kMTvnxHtk1Zj/bb+kl2j
+   CQ6Cj5IdejkhYy8VOwjY1N+fe2erzsrrnezInp0hHs35IOedy79ArniaH
+   x3RrrWh3PSGpIf2A424N1nDYGqWudrgsBVrZ4GwWkjoLrrbeVuaIoN5nD
+   80T5wOVL7QstLhm8/FITtz7mNcBzQMcedGQ7oTnp+ulM3vSsY/YRTRuS2
+   TZ7stLPbb7G0oo5vP03LtSECKV1D1YkixxB66ei4Hn7H/TH/Bex6gcolY
+   A==;
+X-CSE-ConnectionGUID: q3//IIrxS7KROkKrCG322A==
+X-CSE-MsgGUID: xpslkcIkRp+KOLAy5DY8cw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="73576021"
+X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
+   d="scan'208";a="73576021"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 10:56:05 -0800
+X-CSE-ConnectionGUID: 8BCM1lNTRnaL89f9jiKh1w==
+X-CSE-MsgGUID: d9Z3QpK6SaKoqYC4pFHxMg==
+X-ExtLoop1: 1
+Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.125.110.253]) ([10.125.110.253])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 10:56:04 -0800
+Message-ID: <f4240495-120b-4124-b91a-b365e45bf50a@intel.com>
+Date: Wed, 14 Jan 2026 10:56:03 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oq+yxN5i7kBipvCG"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxFfY_XkEQrNvme94uHoxQLWEaX1q1MikbcmwmUMq=NwA@mail.gmail.com>
-X-Cookie: Absence makes the heart grow frantic.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
+To: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>,
+ Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+ rick.p.edgecombe@intel.com, kas@kernel.org, tabba@google.com,
+ michael.roth@amd.com, david@kernel.org, sagis@google.com, vbabka@suse.cz,
+ thomas.lendacky@amd.com, nik.borisov@suse.com, pgonda@google.com,
+ fan.du@intel.com, jun.miao@intel.com, francescolavra.fl@gmail.com,
+ jgross@suse.com, ira.weiny@intel.com, isaku.yamahata@intel.com,
+ xiaoyao.li@intel.com, kai.huang@intel.com, binbin.wu@linux.intel.com,
+ chao.p.peng@intel.com, chao.gao@intel.com
+References: <20260106101646.24809-1-yan.y.zhao@intel.com>
+ <CAGtprH-eEUzHDUB0CK2V162HHqvE8kT3bAacb6d3xDYJPwBiYA@mail.gmail.com>
+ <CAEvNRgGG+xYhsz62foOrTeAxUCYxpCKCJnNgTAMYMV=w2eq+6Q@mail.gmail.com>
+ <aV2A39fXgzuM4Toa@google.com>
+ <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
+ <aV2eIalRLSEGozY0@google.com>
+ <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
+ <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
+ <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aWe1tKpFw-As6VKg@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 1/14/26 07:26, Sean Christopherson wrote:
+...
+> Dave may feel differently, but I am not going to budge on this.  I am not going
+> to bake in assumptions throughout KVM about memory being backed by page+folio.
+> We _just_ cleaned up that mess in the aformentioned "Stop grabbing references to
+> PFNMAP'd pages" series, I am NOT reintroducing such assumptions.
+> 
+> NAK to any KVM TDX code that pulls a page or folio out of a guest_memfd pfn.
 
---oq+yxN5i7kBipvCG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+'struct page' gives us two things: One is the type safety, but I'm
+pretty flexible on how that's implemented as long as it's not a raw u64
+getting passed around everywhere.
 
-On Tue, Jan 13, 2026 at 02:40:58PM +0000, Fuad Tabba wrote:
-> On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
+The second thing is a (near) guarantee that the backing memory is RAM.
+Not only RAM, but RAM that the TDX module knows about and has a PAMT and
+TDMR and all that TDX jazz.
 
-> > Due to the overlap with sizing the SVE state we finalise both SVE and
-> > SME with a single finalization, preventing any further changes to the
-> > SVE and SME configuration once KVM_ARM_VCPU_VEC (an alias for _VCPU_SVE)
-> > has been finalised. This is not a thing of great elegance but it ensures
+We've also done things like stopping memory hotplug because you can't
+amend TDX page metadata at runtime. So we prevent new 'struct pages'
+from coming into existence. So 'struct page' is a quite useful choke
+point for TDX.
 
-> With KVM_ARM_VCPU_VEC being an alias for KVM_ARM_VCPU_SVE, wouldn't
-> kvm_arm_vcpu_finalize() fail for guests that have only SME enabled but
-> not SVE?
-
-If one of the extensions hasn't been enabled then the goal is that
-finalizing should lock in the current state and prevent enabling it in
-future but you should be able to finalize.  The check for vcpu_has_sve()
-which blocks finialization is changed to vcpu_has_vec() which is true if
-either SVE or SME is enabled.
-
-We should, however, ensure that the VL of disabled vector types isn't
-taken into account when allocating state in order to avoid wasting
-memory - I'll update for that.
-
---oq+yxN5i7kBipvCG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmln5QEACgkQJNaLcl1U
-h9Afugf/W7S3f9Opih1jYVPqRq1ITFPwn4oIVQt8vWQtOp6phpgeaEbVAIaBYQIe
-eD4G1cgA3KXUU+K2fKQo2Ar61nctTEgEr+58MPeuamj4Z1hB2a3Vy5hTGB5LyIv9
-U1EE5voSYFgHHl9+EZafvLf6DuTiPu6MksgwgBDiYvXF+sxtbZSKMHRPMVSYw8BQ
-CEtdcOsodX04euF5khtGm1eSiHeJKuUAaPAEuqMYrFbMSzUHm6MZWm9rWP9JV1Po
-p57BJt8/aUj19+5Q0LS6gnK/ozmrxfxf12t+3HXTcVxD79OOh1Tzw9DxwLDQVhnA
-PbSht5ECwKz//OhF0SUzlplD7m5Wwg==
-=bu0G
------END PGP SIGNATURE-----
-
---oq+yxN5i7kBipvCG--
+I'd love to hear more about how guest_memfd is going to tie all the
+pieces together and give the same straightforward guarantees without
+leaning on the core mm the same way we do now.
 
