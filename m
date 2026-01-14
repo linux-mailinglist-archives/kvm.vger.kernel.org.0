@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-68063-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68064-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4D82D20A4B
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 18:51:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C85E7D20A75
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 18:51:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7ED853065DC6
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 17:50:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7902307F209
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 17:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0133232A3EC;
-	Wed, 14 Jan 2026 17:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F46032ABD0;
+	Wed, 14 Jan 2026 17:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhfjdKww"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LKPhZqjb"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2B1322A1D
-	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 17:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759CE32BF3D
+	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 17:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768413029; cv=none; b=WjCSHV4NgLaxPDkjbaOSpclieMasWINVolK5im2tcTuRulNuVflGe67/HwNpSjbK5ci1sMabvBiF5dEt879hkjX8F8YFLMP5Ulf2+0NhbTfYurLUyMVDLTNfGK+zSzXegvuHpPq7g1fKOTYfFgzo45LswQ24nSQC5lY4oQwDJOU=
+	t=1768413036; cv=none; b=dSokSQiztsfrO837w+vav7KCysKSRkoFs3wo7t+dGOBfcAzbET/cSWOzktZPGioToZzE/tlW1d8uJ9UHf3TxfxLzs/fRQuW+hV5FGPS/XjckYGlM8dJO3OAa+xHqiscjdxZgTLdlsoOgLkN2WnYen85pWUzCnSprZ3SYx7smzdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768413029; c=relaxed/simple;
-	bh=gn0nIGEnPU+hm4hwTTmC5p6+ecZKM43A0laTVmDWYZ0=;
+	s=arc-20240116; t=1768413036; c=relaxed/simple;
+	bh=AsiNpdRxORH1e7eDIrHk62Djeg5aHSaFPaNNedP3klY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kLPyOWBmAuG4Pwosdb7P8iVioXxHq8IxcxIleZKVAeLnNgfDE3qWsdRu1KAtS6ImT945I5TT4JJbHwcbaFDPC6CQakmlQqahLToRI8t/n8BeDBmAIol4cwFM/aLV/wfer6Wx+JEjwPWdn1QlDpS7MudYoNPiWUn58afUCak6voo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UhfjdKww; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=SE3pchAJP4ulnplz8smSQPgMnFM+aIoHCUdlRRLVlIJeO05Pu2jh8KS5UhdPIbssOhFrNAGsfKh0YHv1MwgQONsVoEdsS6LU3NKvghABPp9x6qDCdJ1UrBEx2x0iFQJ3Nc5uY0HMp8AnHpYWl3mF2xpnXKqgWfbwYvCeTStghBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LKPhZqjb; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768413026;
+	s=mimecast20190719; t=1768413034;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vGtwJX7VVQYuFr2VBiDG+YxC+0YSGXZVi3YOZ3uxtvY=;
-	b=UhfjdKwwnHvAY6/IMM3fqEeno4ZkV43EzOnO67ahq+qMXSgtX6jy7fJunV8K1UcUNB3LDK
-	zLDzUtVgZTjcbo474YI9DM6rJlTzuNLw/95Moz54eVdnFsdaV9UTPYx1yGJlopiNIN1W92
-	jY2S4U6Z9QIjBOFrmTNqw4+aVeMVGVo=
+	bh=QpEw8yEkNdxIl1el1j22OB3dfzc6fkynrGThqY7HmlA=;
+	b=LKPhZqjbVkqO/+dXXdF7SWPRGNaQckAIdRa6jBL0Q5ZFB/H5Q9XHJvypScVvDdsJbp3+FD
+	FqxwejkFSOve9GDC88TxN0kb8AJ1ifbVYWDvBHqsP1JXL8dAHnh+wuq6ri7TdC8F7Iwlb7
+	GCJ8Gku/HJB9JqCd8sTBPsgVUbD1iJc=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-0YMH1tWsNWS6jU4iXZJNig-1; Wed,
- 14 Jan 2026 12:50:23 -0500
-X-MC-Unique: 0YMH1tWsNWS6jU4iXZJNig-1
-X-Mimecast-MFC-AGG-ID: 0YMH1tWsNWS6jU4iXZJNig_1768413022
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-L3KsthLzNiiRluxTJVe7tQ-1; Wed,
+ 14 Jan 2026 12:50:29 -0500
+X-MC-Unique: L3KsthLzNiiRluxTJVe7tQ-1
+X-Mimecast-MFC-AGG-ID: L3KsthLzNiiRluxTJVe7tQ_1768413028
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0476618005AF;
-	Wed, 14 Jan 2026 17:50:22 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4270B18005A7;
+	Wed, 14 Jan 2026 17:50:28 +0000 (UTC)
 Received: from osteffen-laptop.redhat.com (unknown [10.45.224.90])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 60FF718007D2;
-	Wed, 14 Jan 2026 17:50:15 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 95A5F1800665;
+	Wed, 14 Jan 2026 17:50:22 +0000 (UTC)
 From: Oliver Steffen <osteffen@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Marcelo Tosatti <mtosatti@redhat.com>,
@@ -72,9 +72,9 @@ Cc: Marcelo Tosatti <mtosatti@redhat.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Luigi Leonardi <leonardi@redhat.com>,
 	Oliver Steffen <osteffen@redhat.com>
-Subject: [PATCH v4 1/5] hw/acpi: Make BIOS linker optional
-Date: Wed, 14 Jan 2026 18:50:03 +0100
-Message-ID: <20260114175007.90845-2-osteffen@redhat.com>
+Subject: [PATCH v4 2/5] hw/acpi: Add standalone function to build MADT
+Date: Wed, 14 Jan 2026 18:50:04 +0100
+Message-ID: <20260114175007.90845-3-osteffen@redhat.com>
 In-Reply-To: <20260114175007.90845-1-osteffen@redhat.com>
 References: <20260114175007.90845-1-osteffen@redhat.com>
 Precedence: bulk
@@ -86,64 +86,43 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Make the BIOS linker optional in acpi_table_end() and calculate the ACPI
-table checksum directly if no linker is provided.
-
-This makes it possible to call for example
-acpi_build_madt() from outside the ACPI table builder context.
+Add a fuction called `acpi_build_madt_standalone()` that builds a MADT
+without the rest of the ACPI table structure.
 
 Signed-off-by: Oliver Steffen <osteffen@redhat.com>
 ---
- hw/acpi/aml-build.c | 29 +++++++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+ hw/i386/acpi-build.c | 9 +++++++++
+ hw/i386/acpi-build.h | 2 ++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-index 2d5826a8f1..0b0baa67f7 100644
---- a/hw/acpi/aml-build.c
-+++ b/hw/acpi/aml-build.c
-@@ -1730,6 +1730,25 @@ void acpi_table_begin(AcpiTable *desc, GArray *array)
-     build_append_int_noprefix(array, 1, 4); /* Creator Revision */
- }
- 
-+static uint8_t calculate_acpi_checksum(const gchar *data, size_t len)
-+{
-+    size_t i;
-+    uint8_t sum = 0;
-+
-+    for (i = 0; i < len; ++i) {
-+        sum += (uint8_t)data[i];
-+    }
-+
-+    return sum;
-+}
-+
-+static void update_acpi_checksum(gchar *data, size_t start_offset,
-+                                 size_t table_len, size_t checksum_offset)
-+{
-+    uint8_t sum = calculate_acpi_checksum(&data[start_offset], table_len);
-+    data[checksum_offset] = 0xff - sum + 1;
-+}
-+
- void acpi_table_end(BIOSLinker *linker, AcpiTable *desc)
- {
-     /*
-@@ -1748,8 +1767,14 @@ void acpi_table_end(BIOSLinker *linker, AcpiTable *desc)
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 9446a9f862..19c62362e3 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2249,3 +2249,12 @@ void acpi_setup(void)
       */
-     memcpy(len_ptr, &table_len_le, sizeof table_len_le);
- 
--    bios_linker_loader_add_checksum(linker, ACPI_BUILD_TABLE_FILE,
--        desc->table_offset, table_len, desc->table_offset + checksum_offset);
-+    if (linker != NULL) {
-+        bios_linker_loader_add_checksum(linker, ACPI_BUILD_TABLE_FILE,
-+                                        desc->table_offset, table_len,
-+                                        desc->table_offset + checksum_offset);
-+    } else {
-+        update_acpi_checksum(desc->array->data, desc->table_offset,
-+                             table_len, desc->table_offset + checksum_offset);
-+    }
+     acpi_build_tables_cleanup(&tables, false);
  }
++
++GArray *acpi_build_madt_standalone(MachineState *machine)
++{
++  X86MachineState *x86ms = X86_MACHINE(machine);
++  GArray *table = g_array_new(false, true, 1);
++  acpi_build_madt(table, NULL, x86ms, x86ms->oem_id,
++                  x86ms->oem_table_id);
++  return table;
++}
+diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
+index 8ba3c33e48..00e19bbe5e 100644
+--- a/hw/i386/acpi-build.h
++++ b/hw/i386/acpi-build.h
+@@ -8,4 +8,6 @@ extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
+ void acpi_setup(void);
+ Object *acpi_get_i386_pci_host(void);
  
- void *acpi_data_push(GArray *table_data, unsigned size)
++GArray *acpi_build_madt_standalone(MachineState *machine);
++
+ #endif
 -- 
 2.52.0
 
