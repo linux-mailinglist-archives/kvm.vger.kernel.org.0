@@ -1,119 +1,143 @@
-Return-Path: <kvm+bounces-68086-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68087-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777A8D21498
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 22:14:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22282D2150B
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 22:23:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 006B33032113
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 21:13:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 386F13048EE7
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 21:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B90335EDA5;
-	Wed, 14 Jan 2026 21:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EF2361676;
+	Wed, 14 Jan 2026 21:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sdsF1d6k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zFQuqASd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692BD35E552
-	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 21:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2073430DEA2
+	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 21:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768425220; cv=none; b=FLXhGx1tW1aN45WmpNvlzHQCWECDtigEBaQ6ZQ9y0DNESzLEt+okIhnZJsfao/FjT8iD+OYQPQTFaK5wiLd5dgIouMdJLQp9CeBs9qvAAMW3tvzY5Mk4HTpTAkKYILcORwAsRMP7vL/oeQroUWr/VAxg7NnjPF3Cn6/gQbpZVOs=
+	t=1768425727; cv=none; b=br70/QNDc9CWSpFQeLvoOdbHLSJui9ed57gNPLQR59E2WD+cxvGmiCVBmBCTWm/FTR+pgFWl947Vu8tk52fzQ+xFiaLaBakFYxs8XJ4fjA8OU1FWaUjwB0wNxXdTc3joF0KEPioTmD+wHzyNr0io2dihv+Ht3sLg4dqenzYPDIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768425220; c=relaxed/simple;
-	bh=9jpWqsc8jBpbfaxxgNOKWHgIWX7+eHnVyX9ZaqegDoo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EHV/oSJTS29UtlINFXVJt4+MuR9ylXzywCGRgpIgmgSVfCnn28q5qTwO/s2sxXozwXhi+ZzgkwuhMwxpOC0FoMXz/OIuG8z5mmseEIN+J5vjOXc5oaPxzgDZOei1PSnGfwuYRRuIFL+GrnawrD6+am2zi6AIom8cJFuhkfZbxrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sdsF1d6k; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1768425727; c=relaxed/simple;
+	bh=pcM72MKuav/QuAZ8ZjSyTm/+mJ8IcZF9kpgDH1NOXZI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=s5CaZjqlAnkcr6Aj/7TYE9zyykweLMoBCeP4GEFEYYSSoxOO2AI1tb/sWxVsCj/21XkiOEh7lvWrLDjm4daQKFbe++l0Cddhyt7gIXXPFJ04Bb8uBoxW9TNfuF3VlZKeWJiwtfjMOJ28+90jQPoD8BfIkD0wvkyrlRWpx6aKt+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zFQuqASd; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-81c43a20b32so142461b3a.0
-        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 13:13:39 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c66cb671fso139919a91.3
+        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 13:22:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768425219; x=1769030019; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kRN9XFSrat55IClnp903+wyZKW1cV4xVvxk5Dw/CtqI=;
-        b=sdsF1d6kRuaqJEEPkxI/TMVc+Z1+L1INjkrPLKBULvtUlVaXxB6C2+msS+NrBWCV7f
-         puCYcyx2uwA3l75Xey9Pzvl3Wsh/hCzzQYYkUVM6oSPW8L/QkZ9o5R+GH7wCxkjyaeJ4
-         rjG+H0rQav+BFEpbwyhhy4EHoIUWYe4GwtglaFACVlFJdpVtVnolPpeBE+KpqEuRK42H
-         lwx2Y+SnQhmQFu1niydUqp+QfbYbUG1Xxe6iFdWx6uISyq5hRItTLiEyge9kDGESdjvV
-         5zolocUmaV1Sj7xGfPnL18eQVCSGq3f3/Xh0dk/Sazww3y5BmsCcCCjixtfchkaIU3W+
-         GfgA==
+        d=google.com; s=20230601; t=1768425725; x=1769030525; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jewDq1FR8YPlL6xUTS1W3TOu/T773vGPiXdXngKGp6g=;
+        b=zFQuqASdfJ/L4sMqejOB44KdZhe2LBzg4gSRQ5/P5BRhex2DDDqrKwLbkO0EVLMmz+
+         4Lc2UXYxEDDSGcUcEYqGXbTqaaTl8RYKtho/VdSytuKykRMx6a4gjZILod2DHWoW5d7O
+         MytNgXho+tg/GZPEfDc6E6A891bEs3WZ5QR+qigPricomkrTM459yke5bfrcsz22FlYi
+         esNohHJoatcYPyfwd7rJFAG16nI5XbodwLeyvIz4UXIBRSpfxgpq768Z/nwCDAxSGWmO
+         GsGF4JZ6HxEmVzgv6btMZwgz803dqapgzRwEtQ67UhjSOAR9V36VLVjGkdJ6m3U+UZ1a
+         kTeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768425219; x=1769030019;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kRN9XFSrat55IClnp903+wyZKW1cV4xVvxk5Dw/CtqI=;
-        b=jrYGOW9OY/uPTvXfZSzXuW1XK6NCB72UAObEqC9+9CoBX7EXHTYvhQxMzx5Q0ayHxn
-         sK/jktz/a5quimegdKn8HTadOUrvpEOXHLdbW12ycKuMq3RoYP1tsHxfClNmtO6n0txN
-         bT8bbn7tFyXHQElKUKHBSvJwrBjhbMJ+HJ4ypiNpAtx113LiTRWDZfNncthlPo4vgEaX
-         jma1oh/o11LTAaQDaQG9wc7k1wuS9pqgf5vuVvTmOcIoCPfirATPqBI03zQDMe4RznQ8
-         Vo4XV2/709ObAwSwdSql9w+JJ2XRLqauAUhcJlcU+mIDKymS5ePoGLMO3OrgA1zlm5Dl
-         9g5w==
-X-Forwarded-Encrypted: i=1; AJvYcCX1w+t+E1aqJMvpM9yr8B6FJ6dZxFGZ7dB4VYPP1D9TdRIpG8h23s2K5IWSgQAcDGEaPAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxycRQLdMCVLgv2uscAzVw3OjQGFp8V1nqLGx62Q+BvHpJr+kj
-	Ce8YOHMf/zBU352lbkQ4KEPvB7zQ/7z6ELbtBLchBB0HfORiz97uXPaYjvMutINFblCLmo5svIK
-	uqiwFYNEHiaSfDQ==
-X-Received: from pfhp36.prod.google.com ([2002:a05:6a00:a24:b0:7e5:3f05:3f6c])
- (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:3695:b0:81d:a1b1:731b with SMTP id d2e1a72fcca58-81f81cee287mr3558018b3a.19.1768425218597;
- Wed, 14 Jan 2026 13:13:38 -0800 (PST)
-Date: Wed, 14 Jan 2026 21:12:52 +0000
+        d=1e100.net; s=20230601; t=1768425725; x=1769030525;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jewDq1FR8YPlL6xUTS1W3TOu/T773vGPiXdXngKGp6g=;
+        b=Si46lB/MQctOm90ByiUUpUiIi6ypIaDM9vm/C5rvDABSX9qrUa5135BEbEQTiU29zl
+         UtxhVTRTAGVopfOKqbdVwQ8rVi1beoYThJZcZTy2h16Q0P67C/YjDTfBIT1KlSeC4OIi
+         e1BaJ3So14w0qdIqilpZEVxkwFfHOk7+5c1WwYo0/jRWHtQBxkFdodvF2IPwFVC9XIRs
+         2Q1hhTXBVpD+GgF9D4KfQRxMv3IoQFMIJe4UVQb7HTEFJGyW+XT1zaGyyCZpQtuK4k8S
+         U0PLGQ5kITNc4VLb/tXH722xj91ureu8clz2jjtQ7YiinNrWUX+Ld9qJRnIAhFnJG8MA
+         LDmA==
+X-Gm-Message-State: AOJu0YxN/uG7o7Sa+3fdm1BAA7qO65vCzPVBVVidG5Ws9EzCcAaaFkQ2
+	tnqa7fhKdEJmAoFAT2S0bHvS8z2HnI6SicVaExLISP+mrn4JJd0KffMIDZ9lAMitf3CLFrx2DZp
+	pyjeenQ==
+X-Received: from pjbft22.prod.google.com ([2002:a17:90b:f96:b0:34a:ae36:b509])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c41:b0:349:7f0a:381b
+ with SMTP id 98e67ed59e1d1-35109086493mr3767736a91.8.1768425725407; Wed, 14
+ Jan 2026 13:22:05 -0800 (PST)
+Date: Wed, 14 Jan 2026 13:22:03 -0800
+In-Reply-To: <20260114031139.GA107826@k08j02272.eu95sqa>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260114211252.2581145-1-dmatlack@google.com>
-Subject: [PATCH] vfio: selftests: Drop IOMMU mapping size assertions for VFIO_TYPE1_IOMMU
-From: David Matlack <dmatlack@google.com>
-To: Alex Williamson <alex@shazbot.org>
-Cc: David Matlack <dmatlack@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Shuah Khan <shuah@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <0ac6908b608cf80eab7437004334fedd0f5f5317.1768304590.git.houwenlong.hwl@antgroup.com>
+ <aWZwE1QukfjYDB_Q@google.com> <20260114031139.GA107826@k08j02272.eu95sqa>
+Message-ID: <aWgI-_2mxtTsx_li@google.com>
+Subject: Re: [PATCH] KVM: VMX: Don't register posted interrupt wakeup handler
+ if alloc_kvm_area() fails
+From: Sean Christopherson <seanjc@google.com>
+To: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Drop the assertions about IOMMU mappings sizes for VFIO_TYPE1_IOMMU
-modes (both the VFIO mode and the iommufd compatibility mode). These
-assertions fail when CONFIG_IOMMUFD_VFIO_CONTAINER is enabled, since
-iommufd compatibility mode provides different huge page behavior than
-VFIO for VFIO_TYPE1_IOMMU. VFIO_TYPE1_IOMMU is an old enough interface
-that it's not worth changing the behavior of VFIO and iommufd to match
-nor care about the IOMMU mapping sizes.
+On Wed, Jan 14, 2026, Hou Wenlong wrote:
+> On Tue, Jan 13, 2026 at 08:17:23AM -0800, Sean Christopherson wrote:
+> > On Tue, Jan 13, 2026, Hou Wenlong wrote:
+> > > Unregistering the posted interrupt wakeup handler only happens during
+> > > hardware unsetup. Therefore, if alloc_kvm_area() fails and continue to
+> > > register the posted interrupt wakeup handler, this will leave the global
+> > > posted interrupt wakeup handler pointer in an incorrect state. Although
+> > > it should not be an issue, it's still better to change it.
+> > 
+> > Ouch, yeah, that's ugly.  It's not entirely benign, as a failed allocation followed
+> > by a spurious notification vector IRQ would trigger UAF.  So it's probably worth
+> > adding:
+> > 
+> >   Fixes: ec5a4919fa7b ("KVM: VMX: Unregister posted interrupt wakeup handler on hardware unsetup")
+> >   Cc: stable@vger.kernel.org
+> >
+> Actually, I'm not sure which commit is better as the fix tag:
+> 'bf9f6ac8d749' or 'ec5a4919fa7b'. Before commit 'ec5a4919fa7b', the
+> handler was registered before alloc_kvm_areas() and was not unregistered
+> if alloc_kvm_areas() failed. However, it seems my commit message
+> description is more suitable for fixing 'ec5a4919fa7b'.
 
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Link: https://lore.kernel.org/kvm/20260109143830.176dc279@shazbot.org/
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- tools/testing/selftests/vfio/vfio_dma_mapping_test.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+Yeah, and the Fixes: chain of <this patch> => ec5a4919fa7b => bf9f6ac8d749 provides
+the context needed to get back to the original bug.
 
-diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-index 5397822c3dd4..ecadd0e6b61b 100644
---- a/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-+++ b/tools/testing/selftests/vfio/vfio_dma_mapping_test.c
-@@ -162,12 +162,8 @@ TEST_F(vfio_dma_mapping_test, dma_map_unmap)
- 	if (rc == -EOPNOTSUPP)
- 		goto unmap;
- 
--	/*
--	 * IOMMUFD compatibility-mode does not support huge mappings when
--	 * using VFIO_TYPE1_IOMMU.
--	 */
--	if (!strcmp(variant->iommu_mode, "iommufd_compat_type1"))
--		mapping_size = SZ_4K;
-+	if (self->iommu->mode->iommu_type == VFIO_TYPE1_IOMMU)
-+		goto unmap;
- 
- 	ASSERT_EQ(0, rc);
- 	printf("Found IOMMU mappings for IOVA 0x%lx:\n", region.iova);
+> > even though I agree it's extremely unlikely to be an issue in practice.
+> > 
+> > > Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> > > ---
+> > >  arch/x86/kvm/vmx/vmx.c | 7 +++++--
+> > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 9b92f672ccfe..676f32aa72bb 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -8829,8 +8829,11 @@ __init int vmx_hardware_setup(void)
+> > >  	}
+> > >  
+> > >  	r = alloc_kvm_area();
+> > > -	if (r && nested)
+> > > -		nested_vmx_hardware_unsetup();
+> > > +	if (r) {
+> > > +		if (nested)
+> > > +			nested_vmx_hardware_unsetup();
+> > > +		return r;
+> > > +	}
+> > 
+> > I'm leaning towards using a goto with an explicit "return 0" in the happy case,
+> > to make it less likely that a similar bug is introduced in the future.  Any
+> > preference on your end?
+> > 
+> I don't have a strong preference either way. However, I agree that using
+> a goto statement could help prevent potential bugs in the future. Do I
+> Thanks!
 
-base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
--- 
-2.52.0.457.g6b5491de43-goog
+Nah, I'll change it to a goto when applying.
 
+Thanks!
 
