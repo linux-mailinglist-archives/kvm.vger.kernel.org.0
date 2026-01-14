@@ -1,137 +1,126 @@
-Return-Path: <kvm+bounces-68093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2C23D217BB
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 23:02:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C23D217DE
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 23:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6ECB30B6016
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 22:00:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 50210300E806
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 22:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B8D3A9003;
-	Wed, 14 Jan 2026 22:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1276D3AA19C;
+	Wed, 14 Jan 2026 22:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hSW5Vy+S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lggvkHTT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25293A89A8
-	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 21:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508EF3AE6F5
+	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 22:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768427984; cv=none; b=K+90dTVZxB/xALiJLdVOJFBEOFHQ5jXs0EhEuTLfK9UXmJit97twd02uAqZiKl/jNXqCmK4TJU2t5gbhtub95q9xdnrd5uIVW2aD39fi90Xt8NDZSgsP63t0nlrdYQXclO12NriR3anyml32o9qSc9euFpshf2fpK4hjB5Ixnac=
+	t=1768428443; cv=none; b=oYMF6ZClTmLI148cwxODxZmefK9o2xD5QPHFRhYNDTQ/PNNPDsRUXH+xDkujZtwGJ2UIS17A745fB4OJOVETGnDqOjyncNA8fdDNPyAmg+vZGDFlc2wU827bZpTXYa/9GoNJAGWWfpu7fd30njnThaq+puVvah+/e7pLa+fYy38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768427984; c=relaxed/simple;
-	bh=tO0znVmDXAymHNCdzPnVwtYP7QD1kxrOykARoYLTeBE=;
+	s=arc-20240116; t=1768428443; c=relaxed/simple;
+	bh=ElI84M0BIOSftAGLVaXtQEldUGCc1BnYArgvHMyYoKk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IyWT8PCu+elsqCMTQ8M78qOZ8SLYp8zDkXnVfRvnHQKy0wjMxydE5glSSiiher4hm3iT0IBrFF0cXPfWrrhDVHbNW1bPboB18F2ujNxbDeYZxfYCrKKXkq3stM/a/vmAJ0fG+IWm5ZKaWlvmT7Z+hQNwD1LNrYEeuyMv5PqqTgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hSW5Vy+S; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=JQtRLeUDQ3fay5qBE5aOYLCRoA1NKSG9vEFNOSrV434X9GZA+vLiyIp04eYS88IBdr8Qh2EZimJ6M/HvhmUO8A61H9zytEqKhit7N0039R9r2gMOfsDuhXKF8QU2/TpUSZ0UCdvB6xFSvW/3lZY/Ie3HcmH1N+Ej9vEfKMOfjq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lggvkHTT; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c6e05af3bso150828a91.3
-        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 13:59:27 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0f4822f77so5871315ad.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 14:07:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768427965; x=1769032765; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768428432; x=1769033232; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wc5IYW1fIu5cyAHFpaj29f0bgcaP13LBp3YapifQT5w=;
-        b=hSW5Vy+SGhQcYxbEd5IwbQss4zcbV4g2hELRx9Isus+w4SC0+K55AFsf5LThNPaD0z
-         iX0qvcGmeRXiOJHpd0TW7z1fwfq5SfuIRL6IAQGWkzrkXFg++BDcf65CDgRNUQ13HqO/
-         Ucr/ZIMFRzYZwT+qn1DZpZAekxqBeeV/NLKibGnhHihyKDKUNxvs2+2pSTVoI6e3Oxuu
-         HJVB2ASDVT69USBw4+bEkh1ThVcyILL8IXhEyzD1tgkNsx2EZQC4qtjS1fk+LMe/3e7R
-         /OIouO1efH52uxgwQxriWCIRsWnwj+8vUwGNZdL5tNVyvn4y5ATbVkpFPmKnxpDZToX2
-         xQNg==
+        bh=DATGHMH+tRYW0PdOYhPY0pT6PT3USRJNw+EAenWZUkM=;
+        b=lggvkHTTXWatg+m8O6ODY7bpqmWLFpEhqIZIHVjHdZN98ybVpa1ArteiwNiXMFcQoD
+         i4Cs0YTeIgmVgvO3Y7nkTrfoZA63OQ1j4tWmNj43jtXloU85CvPUmLs3aaaUdHfvGNOw
+         2r4Tts2+MHVSvy6uhb6CDt/pbXDSsrV0sqx7zIKCGQEnuIZc7DGTuGIHXu4tWqmzvjtE
+         W/Fu4HQurj8e3pZGOpgN5O1yNG0+ADSObWz64MLd3HqNBFX33aUSptlNXlWgYn9nGocU
+         w8YNCLO0S+NlcT6RPT08RoLxtymf8KdHA7E4P+36/FVywHXEkSAgA6w7cKkhSZyxaZTf
+         2M7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768427965; x=1769032765;
+        d=1e100.net; s=20230601; t=1768428432; x=1769033232;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wc5IYW1fIu5cyAHFpaj29f0bgcaP13LBp3YapifQT5w=;
-        b=Mxij+Z3Dkh973R5E5m7/7bceQLJ5+7KwMvt5/qQ4Pv0FWoyyhM7nK9sJ5Xct9qB2De
-         gx24YGxGzI3tQKoQh9gqh6AhAPp4FydrQpzjxAx3HkxZKGZ3vOGeBvRLHzf4Nv2Jmmi9
-         +sgPamhWUr5mnlO0r+t76/yA4WbWZ4TACYOIYjTUoMQ3R9K2qazJ2n/qu2LMM9N154Eg
-         miCEULrPcaqvWh5Ja9e2LtX9HrrG+E6ze37t0g/W6x3ubxMxYa3vZcpntR/VR/44Bul/
-         XGR1LWfxpNQwUkK6HfKHULiU8p3GGsN1lB2v7ZeRpg4mRFOWClAuYuHhrwyrwU+LA+WN
-         0F7g==
-X-Forwarded-Encrypted: i=1; AJvYcCU5vpGKNRVAVlwbFCJ9QbWzYDKn60wiseyN29UdANCpNJCif0d627rB99yrPUihFXI9xvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWW+BgIYQZN12vvAXuM35zE6nZ1FFtRFmkWrLgvT2ZboJoHoHI
-	8VNYsekDD2/C+QUlRkapq+Rb8ngFcRfOPMuyF+Jqk9p86XXrfUostWmWExIeEXC9QSV8z95PrDn
-	YAiJnGQ==
-X-Received: from pjbga22.prod.google.com ([2002:a17:90b:396:b0:34c:9f0b:fd7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:6d0:b0:341:6164:c27d
- with SMTP id 98e67ed59e1d1-35109091a6cmr3714526a91.3.1768427965337; Wed, 14
- Jan 2026 13:59:25 -0800 (PST)
-Date: Wed, 14 Jan 2026 13:59:24 -0800
-In-Reply-To: <jf2zfqo6jrrcdkdatztiijmf7tgkho7bks4q4oaegiqpeflrkj@7blq6f5ck2hf>
+        bh=DATGHMH+tRYW0PdOYhPY0pT6PT3USRJNw+EAenWZUkM=;
+        b=GBzuBjHj/6LYcf9Uvzhp0Q8h7cwWWN6aIcgsygIPpsGaMLiB5VlxsomL5L615nTXvR
+         oJ199CJw99mrfPU+wkrHhdRAHg+HPDvj9swOgCJI+/REaEJJ+kO2igk88h8LKCyg26+V
+         HJKSgFjtrmV8dNikAcLMoXma8ZM9LthLqL5nKCBpVhTIBpX7KYLUNL9lhCjhsE80pSdZ
+         3RJ1o+wjj+pOkQmpmDmD3c69Q7FsZ/IDgvQo3AQoh66m7xRhy/qB/duzh/GjRe/256wG
+         xbErVcqKDpzbb1xQPf0E6El8466zy+D/QsR/Scsho4eT1TQnNbF0In6gEStpcslBAERP
+         jxdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzsF5/w0eNWEHstz/+iTfQcPmk2t2hORzfd/+fH78nijACznoqmRSiP4wBkVJB6qzxTtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOr5jZqJApsalkjoxvV44TWYVuU9BjmW1Ykq+cqnWZSE4LJCGc
+	BLZ9RBWmROyyNz0J6UgBWJ0UAuKHz6VoTPmH6tnCgnTQVpnVHtCUHhuzBIKqbOohaI2J/unKdvj
+	I7waX4A==
+X-Received: from plqs2.prod.google.com ([2002:a17:902:a502:b0:2a5:8c4f:4c6d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e78b:b0:29d:65ed:f481
+ with SMTP id d9443c01a7336-2a599cbac4bmr36340125ad.0.1768428431740; Wed, 14
+ Jan 2026 14:07:11 -0800 (PST)
+Date: Wed, 14 Jan 2026 14:07:10 -0800
+In-Reply-To: <rlwgjee2tjf26jyvdwipdwejqgsira63nvn2r3zczehz3argi4@uarbt5af3wv2>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250901051656.209083-1-manali.shukla@amd.com>
- <20250901052146.209158-1-manali.shukla@amd.com> <jf2zfqo6jrrcdkdatztiijmf7tgkho7bks4q4oaegiqpeflrkj@7blq6f5ck2hf>
-Message-ID: <aWgRvCdPsAFHRwcU@google.com>
-Subject: Re: [PATCH v2 03/12] KVM: Add KVM_GET_EXT_LAPIC and KVM_SET_EXT_LAPIC
- for extapic
+References: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
+ <3rdy3n6phleyz2eltr5fkbsavlpfncgrnee7kep2jkh2air66c@euczg54kpt47>
+ <aUBjmHBHx1jsIcWJ@google.com> <rlwgjee2tjf26jyvdwipdwejqgsira63nvn2r3zczehz3argi4@uarbt5af3wv2>
+Message-ID: <aWgTjoAXdRrA99Dn@google.com>
+Subject: Re: [PATCH] KVM: SVM: Fix redundant updates of LBR MSR intercepts
 From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org, 
-	pbonzini@redhat.com, nikunj@amd.com, bp@alien8.de, peterz@infradead.org, 
-	mingo@redhat.com, mizhang@google.com, thomas.lendacky@amd.com, 
-	ravi.bangoria@amd.com, Sandipan.Das@amd.com
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Dec 16, 2025, Naveen N Rao wrote:
-> On Mon, Sep 01, 2025 at 10:51:46AM +0530, Manali Shukla wrote:
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index 6aa40ee05a4a..0653718a4f04 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -2048,6 +2048,18 @@ error.
-> >  Reads the Local APIC registers and copies them into the input argument.  The
-> >  data format and layout are the same as documented in the architecture manual.
-> >  
-> > +::
-> > +
-> > +  #define KVM_APIC_EXT_REG_SIZE 0x540
-
-As discussed in PUCK, just go the full 0x1000 bytes, and do:
-
-#define KVM_GET_LAPIC2            _IOR(KVMIO,  0x8e, struct kvm_lapic_state2)
-#define KVM_SET_LAPIC2            _IOW(KVMIO,  0x8f, struct kvm_lapic_state2)
-
-> > +  struct kvm_ext_lapic_state {
-> > +	__DECLARE_FLEX_ARRAY(__u8, regs);
-> > +  };
-> > +
-> > +Applications should use KVM_GET_EXT_LAPIC ioctl if extended APIC is
-> > +enabled. KVM_GET_EXT_LAPIC reads Local APIC registers with extended
-> > +APIC register space located at offsets 400h-530h and copies them into input
-> > +argument.
+On Mon, Dec 15, 2025, Yosry Ahmed wrote:
+> On Mon, Dec 15, 2025 at 11:38:00AM -0800, Sean Christopherson wrote:
+> > On Mon, Dec 15, 2025, Yosry Ahmed wrote:
+> > > On Mon, Dec 15, 2025 at 07:26:54PM +0000, Yosry Ahmed wrote:
+> > > > svm_update_lbrv() always updates LBR MSRs intercepts, even when they are
+> > > > already set correctly. This results in force_msr_bitmap_recalc always
+> > > > being set to true on every nested transition, essentially undoing the
+> > > > hyperv optimization in nested_svm_merge_msrpm().
+> > > > 
+> > > > Fix it by keeping track of whether LBR MSRs are intercepted or not and
+> > > > only doing the update if needed, similar to x2avic_msrs_intercepted.
+> > > > 
+> > > > Avoid using svm_test_msr_bitmap_*() to check the status of the
+> > > > intercepts, as an arbitrary MSR will need to be chosen as a
+> > > > representative of all LBR MSRs, and this could theoretically break if
+> > > > some of the MSRs intercepts are handled differently from the rest.
+> > > > 
+> > > > Also, using svm_test_msr_bitmap_*() makes backports difficult as it was
+> > > > only recently introduced with no direct alternatives in older kernels.
+> > > > 
+> > > > Fixes: fbe5e5f030c2 ("KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()")
+> > > > Cc: stable@vger.kernel.org
+> > > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > > 
+> > > Sigh.. I had this patch file in my working directory and it was sent by
+> > > mistake with the series, as the cover letter nonetheless. Sorry about
+> > > that. Let me know if I should resend.
+> > 
+> > Eh, it's fine for now.  The important part is clarfying that this patch should
+> > be ignored, which you've already done.
 > 
-> I suppose the reason for using a flex array was for addressing review 
-> comments on the previous version -- to make the new APIs extensible so 
-> that they can accommodate any future changes to the extended APIC 
-> register space.
-> 
-> I wonder if it would be better to introduce a KVM extension, say 
-> KVM_CAP_EXT_LAPIC (along the lines of KVM_CAP_PMU_CAPABILITY).
+> FWIW that patch is already in Linus's tree so even if someone applies
+> it, it should be fine.
 
-Please figure out a different name than "ext_lapic".  Verbatim from the SDM
-(minus a closing parenthesis)
+Narrator: it wasn't fine.
 
-  the xAPIC architecture) is an extension of the APIC architecture
+Please resend this series.  The base-commit is garbage because your working tree
+was polluted with non-public patches, I can't quickly figure out what your "real"
+base was, and I don't have the bandwidth to manually work through the mess.
 
-and
-
-  EXTENDED XAPIC (X2APIC)
-  The x2APIC architecture extends the xAPIC architecture
-
-There's zero chance I'm going to remember which "extended" we're talking about. 
-
-KVM_CAP_X2APIC_API further muddies the waters, so maybe something absurd and
-arbitrary like KVM_CAP_LAPIC2?  The capability doesn't have to strictly follow
-the naming of the underlying feature(s) it supports.
+In the future, please, please don't post patches against a non-public base.  It
+adds a lot of friction on my end, and your series are quite literally the only
+ones I've had problems with in the last ~6 months.
 
