@@ -1,166 +1,283 @@
-Return-Path: <kvm+bounces-67992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-67993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 698EAD1BC01
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:48:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5488AD1BC6D
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 01:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34732303B1AE
-	for <lists+kvm@lfdr.de>; Tue, 13 Jan 2026 23:48:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E9F930286D0
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 00:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B43C355050;
-	Tue, 13 Jan 2026 23:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42DA288A2;
+	Wed, 14 Jan 2026 00:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nCzrI/qd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lN/W0kig"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB4821D585
-	for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 23:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768348106; cv=none; b=gCX3Bvlv4wnQppYdUJC+OWs437pmZxWd/uzWXOs1fcvg3BoNTk1n1LuIv5PlyyXG/c7PJAWbpFLD1ND9UZCexLlK4frHEYMUyWQmU9x/oOkDUxbN4YQJlqEzbZ0jWlwsLWpB2pzWbcnCI7Qn9W2p7pIV3tropAL8F9QWn46tW70=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768348106; c=relaxed/simple;
-	bh=/3nEZHruNblgDoS195XRf5u7JVjr67KdR83C5VowS9Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=REnygxwe5NcTfhYLjf1hs3vl0RzQ58Vfagcj2nMTmUhL7QqyqGdL0RDatKyygQe0ylJhZTO/PMxlDhEMXVtb6L8u6MVNzVQQBiDImoFqRf0pii9RQSm2Z0F9uMNk1DENGTF+zDurzmhCEn+PA9uVLpjR27ISjVtepcingvjVZB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nCzrI/qd; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-943d0cafe77so2659462241.3
-        for <kvm@vger.kernel.org>; Tue, 13 Jan 2026 15:48:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768348104; x=1768952904; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sVWLNrdwIQNBKBOwJy78In7uUpvJppqCzymGUhTOU5w=;
-        b=nCzrI/qd2XChWascNusYWBbbJ0/LTp8VqDkYaycSBvUrYLEXFlue2RIWiLid3jTXe8
-         1WyxAyq3Yv3djLD+U9W0CnrNGsezCLLfoDwYPuxi2XGfVmJ4NOZx+/akKAYbaGXRmB2k
-         suETMjDzWspF78UIbKwu0Cl+MUzwK6P8dl53QORhLK+ugC7gted9PqGkidTpRDnQBE0C
-         9OcwupbP9kuX+YC7P9lDjvnTClfsp6maxwAQxNDSmpFJlNjiJTc0gEzSj0TM3gtLCVMW
-         kNFxRBLPUaSUsqQ+uET0O0CwvW45NlRB9lgwv450tWplYurWgOmEzEm6PHqWYnHGWOde
-         /VdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768348104; x=1768952904;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sVWLNrdwIQNBKBOwJy78In7uUpvJppqCzymGUhTOU5w=;
-        b=KdgA0gxp7np7BJhrgbVD32yw64H8MWu1Eg67DqHaB74THZpkQX3Rm2Jx7oULE/HNTS
-         rWO9UeSoDLqud6UkdqzNAOBk1v9gYev9hnN1829jLHGFx4XvQyySDgFsT+golmh8/TU8
-         X9klZ/61oW6JZL5LliwwpxF0y0YT8931XvHylPb2s50Clu4SVqKdTRWrH8eiY2ZJJoTW
-         j//agSReQJHwrgwnhh2LdBp/fzv+u0ULOudghFUJMK+QYVUb3SOedUazZYMDcknQz6CS
-         NAzuzvuPMKExhwvid3mN4vv0mAfFLqLkONfI8KBzE4cmkCgEjwzQqej+iyZWt2uC9UdM
-         NmSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeirNJHI1jmzFzCLrOOeayxKIKqLrJLJonF9ge+U+JRQqRaCVQIhOmLqLOAj89/AsD/JI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzQ2H3gY3gZM4c3RonQA2pTjZ92I+M/oTZ5UmcXcre1vQ/A0kA
-	P4ANW151sjNH50LWfjGbOcX+gO7gY9ehvr6dynC2L6pIgvi9fk1meGJ8Mi5VLETrPZ5bpq8p2Ei
-	GwgJlbGaJ+ITUkaVjtYOecAaCHsOppeC7pg/OUcWRbZKNJ+hGhqvysm5e
-X-Gm-Gg: AY/fxX4KEY5VS8d8UZOuo79txahPjdMTyw2A2h18h4Fr6FogfL96iXlfz5Zb3ljkuwf
-	KCSK9cKS3VrJm2PR+J6aLAtn4sWYpG3HSh7PrdMg6sNClFJ5+C5Io/wMX/kktXjtAiTy3eq7U/b
-	GaOaOUelMUIYYyp2HCRiPXnpIiHE4KX1H+mGJK2bapoqBi3kAinRTXjIUwSYEq1GIbIKUdJvQTd
-	OX6HvEIrEBzmZweyxJBNSg7bh+nTghUyYyXD9wyEwwroxKT9yQaANKhjmb2p+VN9ga4JbXB
-X-Received: by 2002:a05:6102:3f09:b0:5e5:672a:b19 with SMTP id
- ada2fe7eead31-5f17f419d9fmr365708137.4.1768348103587; Tue, 13 Jan 2026
- 15:48:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B92A55;
+	Wed, 14 Jan 2026 00:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768349222; cv=fail; b=IFxWXX6O+lh9SdmwoHwRfwMpi0Ww4cYzljNXloH6I3TB/E0mF1e5dAJ/8y9OfkRm18YGowN1or6UX3J87AkAIfD6UOEQ65mO04pl4LijbmWsMu5MC1pyKGCILsab9Tf+0j+db2/j7mYgkq2SMWfIZqFS38n74Bsm6HrnNMp2q5Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768349222; c=relaxed/simple;
+	bh=JkWXsbv2gcCa6jI7AFgqR9WUeDipXfRpbFtG0gBYs/E=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=lKlBhSZjV3SlyL06tn2/Ywc5koCyntGhd7I/JOpgkao9jO3PAqC+fuV67ZxOpqZClgiyM/1g6jFonDDYKRRGzWmAyTpC0Ec8vUl9jMYmVxnEmsPQcOkkdzK0qLjGbKQ8hSVzsGN9/HpzZ3YvvBzZ3Ta4hrJ56iag75ZQgEsQ0PE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lN/W0kig; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768349221; x=1799885221;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=JkWXsbv2gcCa6jI7AFgqR9WUeDipXfRpbFtG0gBYs/E=;
+  b=lN/W0kiguFRAg5fdhhpEZP8nwl4T9xSjFiSGHm3Yh3Gf9D26+si8D9Rl
+   q2OTn006t+Lqqk6dPV3rqNQvt5uOgbSA0e4gub2uuXK6QYo/bl+ZzVHyI
+   SNay8EAZFgDd6ZntXCmnDO0uNzY1qAeWlH/ficN8cEIoLbGqrA4SjLXnB
+   SqvTSpEkxgMBcw49lX2MSqUofuLLCI6c97LthyZ3I3kjTgA76JJoU5qtc
+   m6vQNewEr/RHynhrdVAL+aHhQDGD9HtXmWqXkYFEGBWvK7XS+Q0uHQOvd
+   hIBTf7YF24I5j3HFwT+1cB5xKg4mzB0tkNDFckqi+M58ydCQvM98ZhNxz
+   Q==;
+X-CSE-ConnectionGUID: 3W5iiQRSTxSkis/tmZ2amg==
+X-CSE-MsgGUID: VbMX8PZZSy2GiySztv11VQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="87227269"
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="87227269"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 16:07:00 -0800
+X-CSE-ConnectionGUID: IuTPdHbzSTC6lV+KaAuo3g==
+X-CSE-MsgGUID: uUkxo1DwTyGVIO/iuooCpg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="209577223"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 16:07:00 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 13 Jan 2026 16:06:59 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Tue, 13 Jan 2026 16:06:59 -0800
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.46) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 13 Jan 2026 16:06:59 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iw7vS+Z+Em+xQ/9Ck4tJdV/h4QsJchubV/veXaHKDrLVXUDk831gRdW+JS1DCESRbakrhT9SwnC01ag1aKuP07V1AhDuqRiY4gj1h6LhBffWe0zEaChoY3KleFsvhEiQREDAeETUsjWBCBKYCJRj0iXkcO+XNntZrFZ1RuoZG0VhIngUeako+hgvl0FuAE5Uhw7g8Fm68r5HSeBWB15fAsiJcCD2l9NxEN9dgJgimWGltb5hDLh39u+9Kjayf5ICzRCCWKq0ZIN9HzD7UXtYu1HJlrcB3/Pupku7YN9Kuk4ZhFb1pe08nxFZyEMvFzvNC6SnJMA1CrRNCqkgabBFvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r5fe2MtElShVFUU0Jb3JEeEU7AUhj8clk+Zk0u3+Vis=;
+ b=bdHZda7fJOIFf0681P6tSyqNpAlcGRf//CWcxRIeh9nw2Fe4dpugO0BSJLiW+FBAm/3VD20O4nDHG9MFquskOF9xaGRoBi7DeV15eqYoUHPkn2QLoT7rbZhHqf8zsoVoHH1hdPcWw+cRTg9QR7PlT/yG+2c80KPB/eMA0iKEn9lRusBcB1EMFdgQu1zpxCgCwHMMDFffkq9apI3UBd3zyYLUvIFlYzLyHrGV0UWMdHAyRlgngPaLBl9+S0jlqnETuXEvHZpKGrrHyVVdav4QSDoGtQe416nWVM5qAraxcCmhnVyCJfJbeV1RtMcLom3QqHZbjF/JRWw8shb5cEWSmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH8PR11MB6780.namprd11.prod.outlook.com (2603:10b6:510:1cb::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Wed, 14 Jan
+ 2026 00:06:48 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::413f:aab:68fa:b1b2]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::413f:aab:68fa:b1b2%4]) with mapi id 15.20.9520.005; Wed, 14 Jan 2026
+ 00:06:48 +0000
+Date: Wed, 14 Jan 2026 08:04:38 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>,
+	<pbonzini@redhat.com>, <vbabka@suse.cz>, <ashish.kalra@amd.com>,
+	<liam.merwick@oracle.com>, <david@redhat.com>, <vannapurve@google.com>,
+	<ackerleytng@google.com>, <aik@amd.com>, <ira.weiny@intel.com>,
+	<pankaj.gupta@amd.com>, Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v3 6/6] KVM: guest_memfd: GUP source pages prior to
+ populating guest memory
+Message-ID: <aWbdlg/VKvjiKiaF@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20260108214622.1084057-1-michael.roth@amd.com>
+ <20260108214622.1084057-7-michael.roth@amd.com>
+ <aWabORpkzEJygYNQ@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aWabORpkzEJygYNQ@google.com>
+X-ClientProxiedBy: SI2PR01CA0049.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:193::13) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aV8ZRoDjKzjZaw5r@devgpu015.cco6.facebook.com> <20260108141044.GC545276@ziepe.ca>
- <20260108084514.1d5e3ee3@shazbot.org> <CALzav=eRa49+2wSqrDL1gSw8MpMwXVxb9bx4hvGU0x_bOXypuw@mail.gmail.com>
- <20260108183339.GF545276@ziepe.ca> <aWAhuSgEQzr_hzv9@google.com>
- <20260109003621.GG545276@ziepe.ca> <aWBPNHOsaP1sNvze@google.com>
- <20260109005440.GH545276@ziepe.ca> <CALzav=cBGkhbbyggkfaYh3wfqodxRHZKXTNdnmjoXOgwMouBuA@mail.gmail.com>
- <20260109180153.GI545276@ziepe.ca> <20260109143830.176dc279@shazbot.org>
-In-Reply-To: <20260109143830.176dc279@shazbot.org>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 13 Jan 2026 15:47:53 -0800
-X-Gm-Features: AZwV_QjdcFsJsgt85dNhSC_YTux420gKxRVuQRmmDpaV4k1qPluDDfAJcne_NFU
-Message-ID: <CALzav=cE4SQbbcWL9-bhHPEjCq3DPOWnGZnqrHcvR5mYB_t3cA@mail.gmail.com>
-Subject: Re: [PATCH] vfio: selftests: Add vfio_dma_mapping_mmio_test
-To: Alex Williamson <alex@shazbot.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Alex Mastro <amastro@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH8PR11MB6780:EE_
+X-MS-Office365-Filtering-Correlation-Id: b19beed1-6a05-47af-a86d-08de5300cfd8
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?sY463vfcPNlyd5wyNo/2W8cxz7zf2Z0laiCdCIaArNJo99d9Jh1/YzWBPpP2?=
+ =?us-ascii?Q?vwBnoCAaVbXAJmmIC0tOIXP6wa3mRoOmhL1RGqF6L3001GqXPdcBwSt2NrJ5?=
+ =?us-ascii?Q?gltVyp6amvTpDb8cSv9RGWQbmCBQ6q9Bm00msxujaJIyzQqsnr2MdFbpMN/G?=
+ =?us-ascii?Q?/Qm0Zl8eGyCzox7RzOEiE0+cT5SRc4yPiFyuapc6540h+ihM7LaqSJcrteBr?=
+ =?us-ascii?Q?wTVbTENfHvqq3eN1hC+kQo5nYH8NHMAlrvlcmG2tDQA2vR//z08jgJNM6LHa?=
+ =?us-ascii?Q?S/YMib7gxF996cp1Jzj+hQttoa1zno7eVjtsGqoHumzriA27MZcwEt1Pqt+K?=
+ =?us-ascii?Q?0r9RyQwXW8+FyybFJkVWZ2fDByOqjP3BJldAg3YlMnlWUyY/EYqdv0HpTxOB?=
+ =?us-ascii?Q?0kQseZq8VS1HXVW1Z9HWwcc3Q7ZZMj8rF1ek39aAINBtwr18khisvHkMOKc6?=
+ =?us-ascii?Q?vojTFb4ITQOMgMtPh324nKhT+M1iJqMOmxwAw+PtbsLD9bGoJFBSY3Nn2DJn?=
+ =?us-ascii?Q?ycm5eTRIvLjuXONTYiE2dLDL2nD3yhRtedXUkYSIcwkzogTn2nr+2lsMfjpj?=
+ =?us-ascii?Q?QgWFHZYf8gC2cdAnN7AOfHlOq/DU6A41d4vx3XUPvLQXRZAkaGmPsGqXgF+a?=
+ =?us-ascii?Q?GzgppVhkytw+D5KdfU1gv+Z546vv4o+bcyNkLjKMKV6yKUvbO5hjefafwusH?=
+ =?us-ascii?Q?r/hTUnFIn4Nv+0A78H8SBz4UrQ7VJXdjLmNo0B5WgSzsIA3Yq6ajpxHw3MVg?=
+ =?us-ascii?Q?brG+gKqcYotwpMFkVV2U8KAkIYmta95SMP3PhuMmAp/YmLGEPDSR6QzjWjkb?=
+ =?us-ascii?Q?GIfH5tsO0gYfnEtRSOtvgnEMiFEVb/eOl8CoDP/3Whnt+Eguftg7q1HfgFse?=
+ =?us-ascii?Q?k9BkG+GRYJ4tH/DQJhFjuZBGIQhUcIhSgAQiANWrJWhojldgaW/3LVVzQFiJ?=
+ =?us-ascii?Q?ipFquvd7FJ9RPsMCjo5pT59oFCHnnPGMf/zaaDFGQlm2ubY2RcFc73zxhmnG?=
+ =?us-ascii?Q?X2S7q9O9JldRtdNct1Yo7jLN+roOSwWLRwjChLjbTTYuR58FVSf6fy6vuh6P?=
+ =?us-ascii?Q?cbUlojaCSvYzTcJGBE1agZpYUk9EDUIXdPae7Nj0z/x2kJHdrolcYlOMIkX1?=
+ =?us-ascii?Q?F7mJQrt2UT0DFpZFHCwHVqGviFpPVwS33DezNlHGUT4aauRrrhEbQrCCjp6e?=
+ =?us-ascii?Q?kB2iyMtIsZDQwO5Td2dARbZdKbWXPzSn2UXMgNV/svv+DS+oNKhLMYewaFsB?=
+ =?us-ascii?Q?ZqosKk128KSXvKs03BIPVH9mQu1tSnJYjzYZYxurqBy0SLZAgmUgMMg+fltc?=
+ =?us-ascii?Q?/LE9G6yj8JW6Kvu1MxVjCIXvvoEhAtGFeDjFEa0idpz/E6NI8+Z0rSNElcbN?=
+ =?us-ascii?Q?ORuhMUj0MWiA7uWegIbVkjUtn2s+5DDkdmrMHAt2FPGreagxzW1xfRoVbH5L?=
+ =?us-ascii?Q?osKOv+INrRcYXRAJ2gc+lbUrPUv3vIIB?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?235UkLlQy98XUiNt/F+KJ7JQ2W/ta9ILAUFhNrepo63hrZi7n7sAb2l110ff?=
+ =?us-ascii?Q?dbjNJSnK1jzMnzToJ7D+7m1FdzJE0HzCnP6VqY1oDzuVSfR5imRrIakoenCk?=
+ =?us-ascii?Q?iJ75qLJcfIKWIM1kwOmiwAoMveRW+ntg7Thk4NbTnOXmM69b2WL5QDtk6ABy?=
+ =?us-ascii?Q?RJjMU9gLEFl6kY+DAyz9qLvm5ec3M/oDSdg9fxBtr5dxkqgs5ufwS687yWaZ?=
+ =?us-ascii?Q?8eAWcwWmDAfMAIOcT289Zc1l9BldKeWs4g5Uv0Qc2JexHQXUHFN0wUiaW3pg?=
+ =?us-ascii?Q?wgYNLLI9lhzROiHp5P3M4WE64jdRZldc/XYVKyDbuQYfzy6NSjx+3ptf5MBT?=
+ =?us-ascii?Q?qf8bjtilFnu5U5QnsBMsaD8bTpHzczgJZdC+WSPc+OVXQNLuEZVoGJ8hr+tz?=
+ =?us-ascii?Q?F4JoduOs2dHU3fU2i3MRDhH3LSsxzLZFQI6/o/I3a8Qz4wfBEhd1LbwLe47e?=
+ =?us-ascii?Q?5CsjlVtdp9D3RuxLECoouSI6CMFh61kSTvSmHAAOsbCeLPQW3XIYMULRNLCe?=
+ =?us-ascii?Q?tznx+Bl87Pq732Rjdmt8fCPI6pHuYmbVdKlQSo/h2IG5POVgm9Ju0HLZVvgW?=
+ =?us-ascii?Q?sKMhIklLglHaDflfZfm422MOAnd98gvXAGmq6ieS9Juliqyb4OBwQgy8uyTK?=
+ =?us-ascii?Q?YjqSxofTJRIN+5ZKAaZDIoJ7tJVSuRHpIXpK+G8QdTlt642T3pA6/0gEesUB?=
+ =?us-ascii?Q?N7Yp4s848LPmyBadnCcFabnju3jT8Gn9oKOYiZgYxJ6k4BWhYSke7a1m4NA8?=
+ =?us-ascii?Q?pZzwae+0l8v4qFaVBLiAI74Ojsmu7r7oYNRqxv1G5+mlQPm+cj8BCDSnrbYT?=
+ =?us-ascii?Q?1zr1tZkjFiBRIDz0MgObLUof9XIJEqbZX6r2RP6H9Bb6lKxxKNkvlUD9PxiA?=
+ =?us-ascii?Q?BTSHY52GoXegPCPiIjj2gI7KjODjJPA/pV5ntRa/mf1la7ufJN1jjzkd5Xr+?=
+ =?us-ascii?Q?wH4No+qmV6MxetULc6tBQw/ay5slE4bI+DEGKJeIkvMCTh4WwzZRB3UaesxB?=
+ =?us-ascii?Q?/Io9i8EUNjAD51hFLC15oqhTjKuFyPouQQ9IsM+UPPiq00Dq0qAJEbvakMuc?=
+ =?us-ascii?Q?JTkGEdPzPOOnsrgetcIxZ7bCE1iiHNFO4QhlpW5D+yjmvwOpoEI/LvvCiJtp?=
+ =?us-ascii?Q?gC12e1mIoIE7fRJ52Y2LwosLX+Bpbpjl1A2XCQSDBOwDVCICD1yLxOtO3HZA?=
+ =?us-ascii?Q?w99Ui2tEk8Lb+SPYIuJ03XXbNgRwWg2MFFltZsSeo+aXUbNcBNkM21hsPN5c?=
+ =?us-ascii?Q?FxZB2VpJp9oa+yd+SNbv636JJGsyclAvuTeXq+F9bDfqsU9yk4j/GK8lRjyx?=
+ =?us-ascii?Q?j3StY1BXPdo42FKAZBUbSKQaPVSxht3MfIkeXjK5Boi6h0XsIEgtiaBwfiI1?=
+ =?us-ascii?Q?kx019SCpeZS1HaRftog9TXvcaY/v2F3bM1CSuOEFkh+0QHBHLnvy7m1Os5NV?=
+ =?us-ascii?Q?0eJ4QRKOze32dZxzjdVGlBcYzsyUtun6DduahrDnmk5uGXsfT6AJ+cS1HCXa?=
+ =?us-ascii?Q?86FWvm/rRXieYjsKgtk9XxNi/O3OAhqzomMbwru6La59ikbSHmfBHkslaTVv?=
+ =?us-ascii?Q?xUWFuQZ+Lmnw7mB9ZfDMF7JPR9Y5FewjqIjCZv19OEg4b2W451aD60pRyyRP?=
+ =?us-ascii?Q?HX2sHAAMCZnMgdqZUtta+zP9kfsh+R45wk81FnNTSm+Hkh3J1OR9NEGa3Mjp?=
+ =?us-ascii?Q?IiOWGJWggCqqevo1dkA2X4t6pSiOKrt4BwQ7fpmjs3uKLgmX0WPaBWob5Dw+?=
+ =?us-ascii?Q?4+esBNXi+Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b19beed1-6a05-47af-a86d-08de5300cfd8
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 00:06:48.6799
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IDy0C5b/ws8uhFwA0yWlBNuP+slhCMB56fowZRNB4S7Bd4GZWjbKVnplkHKaUJLQrAjeI/L911OIeMh3lBqltQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6780
+X-OriginatorOrg: intel.com
 
-On Fri, Jan 9, 2026 at 1:38=E2=80=AFPM Alex Williamson <alex@shazbot.org> w=
-rote:
->
-> On Fri, 9 Jan 2026 14:01:53 -0400
-> Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> > On Fri, Jan 09, 2026 at 09:04:30AM -0800, David Matlack wrote:
-> > > > If you really want to test TYPE1 you need to test what makes it
-> > > > unique, which is that you can map any VMA and then unmap any slice =
-of
-> > > > it. Including within what should otherwise be a 1G page.
-> > > >
-> > > > But I doubt anyone cares enough to fix this, so just exclude
-> > > > VFIO_TYPE1_IOMMU from this test?
-> > >
-> > > Ah, ok, thanks for the explanation. So VFIO_TYPE1_IOMMU should always
-> > > use 4K mappings regardless of backend (VFIO or iommufd) so that unmap
-> > > can work as intended.
-> >
-> > IDK, I think you should just ignore testing TYPE1v0. The actual real
-> > semantics that it had are quite confusing and iommufd provides an
-> > emulation that is going to be functionally OK (indeed, functionally
-> > more capable) but is not the exactly the same.
-> >
-> > The old comment here is sort of enlightening:
-> >
-> > +        * vfio-iommu-type1 (v1) - User mappings were coalesced togethe=
-r to
-> > +        * avoid tracking individual mappings.  This means that the gra=
-nularity
-> > +        * of the original mapping was lost and the user was allowed to=
- attempt
-> > +        * to unmap any range.  Depending on the contiguousness of phys=
-ical
-> > +        * memory and page sizes supported by the IOMMU, arbitrary unma=
-ps may
-> > +        * or may not have worked.  We only guaranteed unmap granularit=
-y
-> > +        * matching the original mapping; even though it was untracked =
-here,
-> > +        * the original mappings are reflected in IOMMU mappings.  This
-> > +        * resulted in a couple unusual behaviors.  First, if a range i=
-s not
-> > +        * able to be unmapped, ex. a set of 4k pages that was mapped a=
-s a
-> > +        * 2M hugepage into the IOMMU, the unmap ioctl returns success =
-but with
-> > +        * a zero sized unmap.  Also, if an unmap request overlaps the =
-first
-> > +        * address of a hugepage, the IOMMU will unmap the entire hugep=
-age.
-> > +        * This also returns success and the returned unmap size reflec=
-ts the
-> > +        * actual size unmapped.
-> >
-> > iommufd does not try to do this "returned unmap size reflects the
-> > actual size unmapped" part, it always unmaps exactly what was
-> > requested, because it disables huge pages.
->
-> I think there was also some splitting code in the IOMMU drivers that
-> has since been removed that may have made the v1 interface slightly
-> more sane.  It certainly never restricted mappings to PAGE_SIZE in
-> order to allow arbitrary unmaps, it relied on users to do sane things
-> and examine the results.  Those "sane things" sort of became the v2
-> interface.
->
-> In any case, we've had v2 for a long time and if IOMMUFD compat make v1
-> more bloated and slow such that users realize they're using an old,
-> crappy interface, that's probably for the best.  Examining what page
-> size is used for v1 is probably not worthwhile though.  Thanks,
+On Tue, Jan 13, 2026 at 11:21:29AM -0800, Sean Christopherson wrote:
+> On Thu, Jan 08, 2026, Michael Roth wrote:
+> > @@ -842,47 +881,38 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
+> >  	if (!file)
+> >  		return -EFAULT;
+> >  
+> > -	filemap_invalidate_lock(file->f_mapping);
+> > -
+> >  	npages = min_t(ulong, slot->npages - (start_gfn - slot->base_gfn), npages);
+> >  	for (i = 0; i < npages; i++) {
+> > -		struct folio *folio;
+> > -		gfn_t gfn = start_gfn + i;
+> > -		pgoff_t index = kvm_gmem_get_index(slot, gfn);
+> > -		kvm_pfn_t pfn;
+> > +		struct page *src_page = NULL;
+> > +		void __user *p;
+> >  
+> >  		if (signal_pending(current)) {
+> >  			ret = -EINTR;
+> >  			break;
+> >  		}
+> >  
+> > -		folio = __kvm_gmem_get_pfn(file, slot, index, &pfn, NULL);
+> > -		if (IS_ERR(folio)) {
+> > -			ret = PTR_ERR(folio);
+> > -			break;
+> > -		}
+> > +		p = src ? src + i * PAGE_SIZE : NULL;
+> >  
+> > -		folio_unlock(folio);
+> > +		if (p) {
+> 
+> Computing 'p' when src==NULL is unnecessary and makes it hard to see that gup()
+> is done if and only if src!=NULL.
+> 
+> Anyone object to this fixup?
+LGTM. I also like this change :)
 
-Ack. I'll send a patch to skip the page size checks for v1.
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 18ae59b92257..66afab8f08a3 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -884,17 +884,16 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
+>         npages = min_t(ulong, slot->npages - (start_gfn - slot->base_gfn), npages);
+>         for (i = 0; i < npages; i++) {
+>                 struct page *src_page = NULL;
+> -               void __user *p;
+>  
+>                 if (signal_pending(current)) {
+>                         ret = -EINTR;
+>                         break;
+>                 }
+>  
+> -               p = src ? src + i * PAGE_SIZE : NULL;
+> +               if (src) {
+> +                       unsigned long uaddr = (unsigned long)src + i * PAGE_SIZE;
+>  
+> -               if (p) {
+> -                       ret = get_user_pages_fast((unsigned long)p, 1, 0, &src_page);
+> +                       ret = get_user_pages_fast(uaddr, 1, 0, &src_page);
+>                         if (ret < 0)
+>                                 break;
+>                         if (ret != 1) {
+> 
+> To end up with:
+> 
+> 		struct page *src_page = NULL;
+> 
+> 		if (signal_pending(current)) {
+> 			ret = -EINTR;
+> 			break;
+> 		}
+> 
+> 		if (src) {
+> 			unsigned long uaddr = (unsigned long)src + i * PAGE_SIZE;
+> 
+> 			ret = get_user_pages_fast(uaddr, 1, 0, &src_page);
+> 			if (ret < 0)
+> 				break;
+> 			if (ret != 1) {
+> 				ret = -ENOMEM;
+> 				break;
+> 			}
+> 		}
+> 
+> 		...
 
