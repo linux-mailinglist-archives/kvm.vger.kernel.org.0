@@ -1,161 +1,142 @@
-Return-Path: <kvm+bounces-68074-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9403DD20EC9
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 19:56:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6DAD20EEA
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 19:57:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2E9433038CE9
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 18:56:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 271F93048BBC
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 18:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0056333BBC4;
-	Wed, 14 Jan 2026 18:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C1B33D6DC;
+	Wed, 14 Jan 2026 18:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xv5p/vMC"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="NnakV8MY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9987C33986C;
-	Wed, 14 Jan 2026 18:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB9732D0EE;
+	Wed, 14 Jan 2026 18:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768416967; cv=none; b=sJ9WRr1AJS+pJBSBKsJI3L+FZuQkr5HWN/Rjir7XG2qR5eEkt3q09Ta8TTUlg7wdDdfMojbphWdPUrfv3y1uXxVq2xcuxUQcS8ALk4gKLflqBjJhQ03l9+IFc89od0iBLWwhw1ybSe5nlsy0CI9qQ0OGFZNtODEBRz77fotaha4=
+	t=1768417052; cv=none; b=iBExyumpdVLjbuNry/Ih1i8qGcSn+IS0nyLQc4S6e0fh6lJBnlre0nemFaYEGTgUCrTJ3rycX3uRNVjZzdjKnzpv/y58nW08x2/P8icztZDETNrCScd2cygeMUscijCI6fgF1G3fpQ41qVvKyFrU3Uz7JkTpTOMsjBe5X6Qp0cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768416967; c=relaxed/simple;
-	bh=aiVscpRLIrk18M6F7N3ZFycRSs7+Hj/4fV6ILUDsoSE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qso4dJyn0SGuzLrp4yFK6u1Q5LGnb+ZU4MT35pUE342ZPtbF8gBYmPbvmMbVdhpGW6daoE6/uhBky7S243lNz9dNBxPamOqNSCUNuuDxGwm6waCY5O52rTLjF6gxt53Thf+IXl3olZc35mDn2E4qX9JoO6Zj3ZdhWdoKzFdY6eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xv5p/vMC; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768416965; x=1799952965;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aiVscpRLIrk18M6F7N3ZFycRSs7+Hj/4fV6ILUDsoSE=;
-  b=Xv5p/vMCax5YAhTKedrIFPeBuwFYiYpcqELRt73RgyNL+JseI99PskXC
-   1tNnKCHDvUJY1IndvVgCmtSKZAvCzjAb3t9g4kMTvnxHtk1Zj/bb+kl2j
-   CQ6Cj5IdejkhYy8VOwjY1N+fe2erzsrrnezInp0hHs35IOedy79ArniaH
-   x3RrrWh3PSGpIf2A424N1nDYGqWudrgsBVrZ4GwWkjoLrrbeVuaIoN5nD
-   80T5wOVL7QstLhm8/FITtz7mNcBzQMcedGQ7oTnp+ulM3vSsY/YRTRuS2
-   TZ7stLPbb7G0oo5vP03LtSECKV1D1YkixxB66ei4Hn7H/TH/Bex6gcolY
-   A==;
-X-CSE-ConnectionGUID: q3//IIrxS7KROkKrCG322A==
-X-CSE-MsgGUID: xpslkcIkRp+KOLAy5DY8cw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="73576021"
-X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="73576021"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 10:56:05 -0800
-X-CSE-ConnectionGUID: 8BCM1lNTRnaL89f9jiKh1w==
-X-CSE-MsgGUID: d9Z3QpK6SaKoqYC4pFHxMg==
-X-ExtLoop1: 1
-Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.125.110.253]) ([10.125.110.253])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 10:56:04 -0800
-Message-ID: <f4240495-120b-4124-b91a-b365e45bf50a@intel.com>
-Date: Wed, 14 Jan 2026 10:56:03 -0800
+	s=arc-20240116; t=1768417052; c=relaxed/simple;
+	bh=3I0YdTMNjrj4mGHAqLtGVK61XBILu1ck+tAUnA/KNH8=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=nx2orvxKMkcyGVLrSgOdlS5vPSjgnYlWD8NdneUr9m3iwrUDcJmQWsJ2LVxX3Y3CmUFAm17RY5pGh6CG5eL0LaRFeCj7gGfBt7HR2XGOs8LEkxXKH0qkS4s19tIIqW32lBdTeJ4r2eM7Ii+QwWhKeSmwq0nVSh1q8h7fFG8DsfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=NnakV8MY; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60EHQReG2373504;
+	Wed, 14 Jan 2026 10:57:23 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=l0QAPWBh8G5X5KYvv/
+	T3Ns48OAAl66QLHxnXzPrzOCo=; b=NnakV8MYIhb24rN/kqKEvEF9044How57VQ
+	2Y5DbKzAUrnqJJW4M+Wo1EQWe7j4v0303PbmgQyASFtHFx86vesNkA3wgm9o/FYl
+	hIJHcVJRR09WKIc0ije3o4S5ATEhRkRpzLZoUckr6CeWQ/Ef4R8dN4IiRO31pqXD
+	1X5nM8lzfYyItRg0auRLKc15PJkJ03YtLv7vSNQl5eQWCcOtJAbjvOsrmc/YFQig
+	zhTd+RsYXINxf/s0AMaQggJZKhuYoT913cF2dTfBOBBCvFi7Mjcd8M/9zbq0+FNh
+	UVru2S4JqsJyfsAtRhuu6wmizbFxlja9g9hEDhfU6f8U80MhA37g==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bpactbmre-11
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 14 Jan 2026 10:57:22 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 14 Jan 2026 18:57:21 +0000
+From: Alex Mastro <amastro@fb.com>
+Subject: [PATCH v3 0/3] vfio: selftests: Add MMIO DMA mapping test
+Date: Wed, 14 Jan 2026 10:57:15 -0800
+Message-ID: <20260114-map-mmio-test-v3-0-44e036d95e64@fb.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
-To: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>
-Cc: Ackerley Tng <ackerleytng@google.com>,
- Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
- rick.p.edgecombe@intel.com, kas@kernel.org, tabba@google.com,
- michael.roth@amd.com, david@kernel.org, sagis@google.com, vbabka@suse.cz,
- thomas.lendacky@amd.com, nik.borisov@suse.com, pgonda@google.com,
- fan.du@intel.com, jun.miao@intel.com, francescolavra.fl@gmail.com,
- jgross@suse.com, ira.weiny@intel.com, isaku.yamahata@intel.com,
- xiaoyao.li@intel.com, kai.huang@intel.com, binbin.wu@linux.intel.com,
- chao.p.peng@intel.com, chao.gao@intel.com
-References: <20260106101646.24809-1-yan.y.zhao@intel.com>
- <CAGtprH-eEUzHDUB0CK2V162HHqvE8kT3bAacb6d3xDYJPwBiYA@mail.gmail.com>
- <CAEvNRgGG+xYhsz62foOrTeAxUCYxpCKCJnNgTAMYMV=w2eq+6Q@mail.gmail.com>
- <aV2A39fXgzuM4Toa@google.com>
- <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
- <aV2eIalRLSEGozY0@google.com>
- <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
- <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
- <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <aWe1tKpFw-As6VKg@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAznZ2kC/12OwQ7CIBAFf8Vwdg3QWsWT/2F6gO1iOVAaIERj+
+ u9SE03jcQ5v5r1YougoscvuxSIVl1yYKjT7HcNRT3cCN1RmksuOCyHB6xm8dwEypQympRbloMR
+ JK1Y3cyTrHh/fra9sY/CQx0h6Y+EnSBh1xhG01ynHAMVW4+D1qp/ddN8kigABHAmPpAjPylytO
+ WDwa250KYf4/Lwvco1+jzZ/R4sEDtQNTWu5Qm5+ln5Zlje9CORZBgEAAA==
+To: Alex Williamson <alex@shazbot.org>, David Matlack <dmatlack@google.com>,
+        Shuah Khan <shuah@kernel.org>
+CC: Peter Xu <peterx@redhat.com>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        Jason Gunthorpe
+	<jgg@ziepe.ca>, Alex Mastro <amastro@fb.com>
+X-Mailer: b4 0.13.0
+X-Proofpoint-ORIG-GUID: xOCsMx3UwAJdHQswxFN6vG4SZeASM_Br
+X-Authority-Analysis: v=2.4 cv=d5f4CBjE c=1 sm=1 tr=0 ts=6967e712 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=FOH2dFAWAAAA:8 a=fzhw-T1NQbm0UE1rqVgA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: xOCsMx3UwAJdHQswxFN6vG4SZeASM_Br
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE0MDE1NiBTYWx0ZWRfX+3E4Cw0h13iI
+ iV0RxMoftm9/o3aKPsiXRVtjw/AgYrD7ysoX2YObWEopYB7F3mqz47F6UDwBqDtDHU+jtnFHqtA
+ eFtf/cVy/ITQHPAbOLA1j58S6o+px1Oxoh696r6zY/wc/aHWPzuAc3+bAv3LLTyH9c+ESQbSrR9
+ 4CnScei49q66XJpJ9SxdW/FJD8OEhHO9yAPT4NFsGdSQhIpIVZMhSidq3FX4z5g886DpCz9DQSh
+ 7UD9Brm+SHCZ+Jib5w8KeRwhiJ/SEVOnvyNSMc1qfoaYPhunK9sDxIadMxHa9Zy+DRH3pOIgBQm
+ RfLa+HVq1SZuNcKfKXlzdn4bdZQhHj/Ba5pNiYjN3u79ZjgFj3a4LZE2HGRMV5P87T4bNrbfk3V
+ yciCzUrWfWvfnJCEpYIWByDpgGjb+/G3JH/n3tWgfZqGYPuCpy8S3XT4khRQ8Q2AP9xUK/I2Htm
+ a6kDghi3+9CjGCSLW7w==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-14_06,2026-01-14_01,2025-10-01_01
 
-On 1/14/26 07:26, Sean Christopherson wrote:
-...
-> Dave may feel differently, but I am not going to budge on this.  I am not going
-> to bake in assumptions throughout KVM about memory being backed by page+folio.
-> We _just_ cleaned up that mess in the aformentioned "Stop grabbing references to
-> PFNMAP'd pages" series, I am NOT reintroducing such assumptions.
-> 
-> NAK to any KVM TDX code that pulls a page or folio out of a guest_memfd pfn.
+Test IOMMU mapping the BAR mmaps created during vfio_pci_device_setup().
 
-'struct page' gives us two things: One is the type safety, but I'm
-pretty flexible on how that's implemented as long as it's not a raw u64
-getting passed around everywhere.
+All IOMMU modes are tested: vfio_type1 variants are expected to succeed,
+while non-type1 modes are expected to fail. iommufd compat mode can be
+updated to expect success once kernel support lands. Native iommufd will
+not support mapping vaddrs backed by MMIO (it will support dma-buf based
+MMIO mapping instead).
 
-The second thing is a (near) guarantee that the backing memory is RAM.
-Not only RAM, but RAM that the TDX module knows about and has a PAMT and
-TDMR and all that TDX jazz.
+Changes in v3:
+- Rename mmap_aligned() to mmap_reserve()
+- Reorder variable declarations for reverse-fir-tree style
+- Update patch 2 commit message to mention MADV_HUGEPAGE and MAP_FILE
+- Move BAR size check into map_partial_bar test only
+- Link to v2: https://lore.kernel.org/r/20260113-map-mmio-test-v2-0-e6d34f09c0bb@fb.com
 
-We've also done things like stopping memory hotplug because you can't
-amend TDX page metadata at runtime. So we prevent new 'struct pages'
-from coming into existence. So 'struct page' is a quite useful choke
-point for TDX.
+Changes in v2:
+- Split into patch series
+- Factor out mmap_reserve() for vaddr alignment
+- Align BAR mmaps to improve hugepage IOMMU mapping efficiency
+- Centralize MODE_* string definitions
+- Add is_power_of_2() assertion for BAR size
+- Simplify align calculation to min(size, 1G)
+- Add map_bar_misaligned test case
+- Link to v1: https://lore.kernel.org/all/20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com
 
-I'd love to hear more about how guest_memfd is going to tie all the
-pieces together and give the same straightforward guarantees without
-leaning on the core mm the same way we do now.
+Signed-off-by: Alex Mastro <amastro@fb.com>
+
+---
+Alex Mastro (3):
+      vfio: selftests: Centralize IOMMU mode name definitions
+      vfio: selftests: Align BAR mmaps for efficient IOMMU mapping
+      vfio: selftests: Add vfio_dma_mapping_mmio_test
+
+ tools/testing/selftests/vfio/Makefile              |   1 +
+ tools/testing/selftests/vfio/lib/include/libvfio.h |   9 ++
+ .../selftests/vfio/lib/include/libvfio/iommu.h     |   6 +
+ tools/testing/selftests/vfio/lib/iommu.c           |  12 +-
+ tools/testing/selftests/vfio/lib/libvfio.c         |  25 ++++
+ tools/testing/selftests/vfio/lib/vfio_pci_device.c |  24 +++-
+ .../selftests/vfio/vfio_dma_mapping_mmio_test.c    | 143 +++++++++++++++++++++
+ .../testing/selftests/vfio/vfio_dma_mapping_test.c |   2 +-
+ 8 files changed, 214 insertions(+), 8 deletions(-)
+---
+base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
+change-id: 20260112-map-mmio-test-b4e4c2d917a9
+
+Best regards,
+-- 
+Alex Mastro <amastro@fb.com>
+
 
