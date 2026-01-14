@@ -1,174 +1,170 @@
-Return-Path: <kvm+bounces-68013-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68014-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B8BD1DBB1
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 10:54:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A76D1DC46
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 11:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1977430096AC
-	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 09:54:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A8AE430700D6
+	for <lists+kvm@lfdr.de>; Wed, 14 Jan 2026 09:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54F338757B;
-	Wed, 14 Jan 2026 09:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D232A38A2AB;
+	Wed, 14 Jan 2026 09:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eaTrg3gh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nq+u8htP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQlqzXfp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6A830E0D2;
-	Wed, 14 Jan 2026 09:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153493816F1
+	for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 09:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768384441; cv=none; b=HiQWZlLy1uj8ana26bMpcldrhIqB75RsXt6DcBm39/Gn/r/Ax3bU11zT/5W6pTmTMvIJplsIwhbor6IvjmhLptl+vpSKXhrc36MwodYaAi3Kwdxf4RpzglGHdMcT0RZB2euJ5Os7mJvJ4UyL6yJtP07IIKQrXJ6AHD5x/gxccTE=
+	t=1768384680; cv=none; b=nC3CL8Iq9dhnlmyDgbP3QVZWFlpwXZK2uf403zU6qJ+8Pr/rdZSspq6oHaCs3D4O9UeqDBpgyf60USX6zJemxTWqvhCPh/+5APTPe9cKT/X+NgQ8EwhG6peQ9wme2zH8njlNTAXPxZP7vwJA/Xw7aZ7/EaF/l7rlsaRwGRBBPq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768384441; c=relaxed/simple;
-	bh=kVEHx2+Ge+rtGYjTAJLRHj62Kt9E1pbheNzuU9l4yMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HoleUkHUBt9DnBB/FntkxbHksu6B33PHeFZWwiF6JfqOXbz6V6QHHgM14wcPwxsWj65CweKw1LtQrLqts5vx3QkI/dYg45O51a8jDUOFdwcNU9wqv3Za2R32vlli744aWcHIv5b3+jOR8m5CSi3bIgYXgBHe8LVYgIgydQFZMTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eaTrg3gh; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60E7X74Y010955;
-	Wed, 14 Jan 2026 09:53:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=aeE+Ru
-	ciR36YBexJDcUegWDbTDMlurG0mpHa6t8+zAo=; b=eaTrg3gh+rrifF931Xk7av
-	Ey0mi14B/OhHrODujXCBAF78wgXb9yOgfWS/P9m7PfbVssTLQqj5L7SNTJPyqqJa
-	B56Zm+La1Px7MHekk+wY0nEkGoqgJ3Jd9Aesb41JEE7sZjUp1H4ebYb9J/u+J8YF
-	xY56H+OO97UDqmVQjDoW3gtfxU8q5ijy6If3y8xVce4heLm6WkZBD7SDzxnQ13Zl
-	tK7AyqIxTcunSsSD8cuetEJPWkuaCI9RwgD9sMIiQQGpPPsTgyBcuebC6RdlvgNp
-	7TyU1QKJyTl1kU4DFlojw1694i6fxQ7E47NwjW1lM84eLCrfmPdBJigixsqfx9Tg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4bkeg4gpe9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Jan 2026 09:53:57 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60E83lQl030134;
-	Wed, 14 Jan 2026 09:53:56 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bm3ajs5se-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Jan 2026 09:53:56 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60E9rqwi61800892
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Jan 2026 09:53:52 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9C13220043;
-	Wed, 14 Jan 2026 09:53:52 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 45F5820040;
-	Wed, 14 Jan 2026 09:53:52 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.52.223.175])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 14 Jan 2026 09:53:52 +0000 (GMT)
-Date: Wed, 14 Jan 2026 10:53:50 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, <borntraeger@de.ibm.com>,
-        <frankja@linux.ibm.com>, <nsg@linux.ibm.com>, <nrb@linux.ibm.com>,
-        <seiden@linux.ibm.com>, <gra@linux.ibm.com>, <hca@linux.ibm.com>,
-        <svens@linux.ibm.com>, <agordeev@linux.ibm.com>, <gor@linux.ibm.com>,
-        <david@redhat.com>, <gerald.schaefer@linux.ibm.com>
-Subject: Re: [PATCH v6 28/28] KVM: s390: Storage key manipulation IOCTL
-Message-ID: <20260114105350.6a95fa53@p-imbrenda>
-In-Reply-To: <DFO7J08IZ4HZ.3O6LSE6J09CD3@linux.ibm.com>
-References: <20251222165033.162329-1-imbrenda@linux.ibm.com>
-	<20251222165033.162329-29-imbrenda@linux.ibm.com>
-	<DFO7J08IZ4HZ.3O6LSE6J09CD3@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1768384680; c=relaxed/simple;
+	bh=36C4TLxXEoaix8+fMcGoCyyRChcqMGjtLcHigyw3xhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TZBa3I9T1RcWD9VF1TdJXKJ7qwbvQALVykjw0S0CKS9R9NRphHAWFP8MSd8NogVm63iDMRcPih6vIXhAISQs8bgVStUMLfr5P1kkwd1x8rOVV6CwlFV5iMNUAUo7X7DpFclzfSPIwVivm8uDZTEN6lMYXfEQD7YgH6w2frpKTdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nq+u8htP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZQlqzXfp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768384677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
+	b=Nq+u8htPhUTfkJoQJcSAbrdTjZ21PQLmHKIRvI6fcgHC0hqM/XohE6bnmnXhBpZ7KJDD80
+	lUbiPRDsVifi1xSyf/g068JfoPwSQ8Z6t9BZIbEuoRBnGyJ0zaqToGSda0e5byGM8QNJpL
+	+ej0sQtO4LqRcLZ/G2VNpnnwOBKUd5A=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-119-RH3WyMurP5OlHsFEbpFuGw-1; Wed, 14 Jan 2026 04:57:55 -0500
+X-MC-Unique: RH3WyMurP5OlHsFEbpFuGw-1
+X-Mimecast-MFC-AGG-ID: RH3WyMurP5OlHsFEbpFuGw_1768384674
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47edf8ba319so10710275e9.2
+        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 01:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768384674; x=1768989474; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
+        b=ZQlqzXfpnQ2pDruT5B8sjn8qsNjY+fkKLMytz1ZEgHfFX6TY8wFh7A9qnoylHljs04
+         aoqh7AyDffeAZ20Wk2Adp7zDsXuFUn7Mr9kwwELULdrhwJWAlDPnQkNR4ABMwpEo9PZk
+         5IGGRfboTdTUYYuPSdrNhwJQcFODTCcceTS9Af5ffLvPkv4cCb8htH0JkJPClaKJVVpN
+         7BtESg5jyORObUkYjAwtfm38NbeU4eWg+Xy1AF+WREGfSjOIS/SKfKwrwP6Yo+177w9L
+         6tY9Uh+kxLkMIknust8LfB4pw1bFwVPBhZtcnHHIm6+rH3VOLxMQhhDiF0/yS+CQVql+
+         AOrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768384674; x=1768989474;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
+        b=go8bUhxNfb8/tkw3kf/wFtMlGP8xUZPdHjhB1q3u3NDw+K6/BPe6SswAYrvF9FJZaq
+         DthstnuWtEktW6EwY/U+5rxCMnyXB3r/B0ZN9TeFHlblchsxLlAk/f9U8/3gqplPYZtI
+         APt7J3Y/4f2GBcor/Hv/EWgyeVDHcnfn0IWB9SujFccJh0ppB7A0Z3iVARSkq0FWynWt
+         6aQmxv8ebSKbBrhy3VZG0NsdZkN274o5mh+ezHnbcPKe1vm9VT/DtpQq9I/bso2u6Eap
+         ONrxLM2jRYOMKEgSMeAyTN4PACCL6vPqxp0/h6j8nMeaykXJ/f/l4EJgkTHDoX4VH8p8
+         dyWw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcmbNU8UjLznO7Hoi6gDDYNVxaUQ7qStAEJcwUK3JWH9xribDMtcfJoxiSCm2IMrdR4do=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLxmCTcEpThhiE7ORxvgUJc363OaKHalJPnj56d1CWgHvdFAlq
+	IPdpZzTBn+3rq5r5GH0MiVBakWg2y+vJsE/qiXiT6uiT4BGs4J7s+/orLoFsDNl6y4D/J3N1V1z
+	LCn9pw5SjaLqhvWmh3hXGLg+DvTxb8xvwfchn1ribzVWk2gEcw64bBw==
+X-Gm-Gg: AY/fxX5ZXgZxgSx4MH4o1xQ0b5RRYUkd40YfmBxwcS66BpDlXWLuVqiPLLiZjTj7axB
+	rOeXyMUITFNVGGy9c3sflvr/ilgUPKbTKYc37+BPNi0T7XHR3PkwdbBv+OgNnjSCm7M6L/GtWKT
+	efJQOoe4nwRduG/p6p7QCwqLO93cDdcU92UyrtdQvOwZWszdEbvXPjmG50ityYPo6bGr7OG/vZV
+	pRpqSxrIb6VUqT12s6G/HW0c2aJ17CGI2Qt/WXoBI//TSV6VpV1zJUgdgHq5vcYQQysxhazx6Eb
+	Gypm8JiapXRcOy0JkZkwOvmuBSY/eW7rdLlBnubHM9l+TOrnUTB01yuI4sUpHffg0O6ElxwsY63
+	5Jxtw6N7E8wQebz1BH6Fi9ZNMcXRypZsKPNrEIA3sHrxjwiEWtsKz0HDcU/SFrQ==
+X-Received: by 2002:a05:600c:8b76:b0:47e:e2ec:995b with SMTP id 5b1f17b1804b1-47ee32ff3fbmr19462315e9.9.1768384674479;
+        Wed, 14 Jan 2026 01:57:54 -0800 (PST)
+X-Received: by 2002:a05:600c:8b76:b0:47e:e2ec:995b with SMTP id 5b1f17b1804b1-47ee32ff3fbmr19461915e9.9.1768384673944;
+        Wed, 14 Jan 2026 01:57:53 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee0b4559asm19833435e9.0.2026.01.14.01.57.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jan 2026 01:57:53 -0800 (PST)
+Date: Wed, 14 Jan 2026 10:57:47 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] vsock/virtio: Coalesce only linear skb
+Message-ID: <aWdoY6JqlRiwfFfJ@sgarzare-redhat>
+References: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
+ <20260113-vsock-recv-coalescence-v2-1-552b17837cf4@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE0MDA3OSBTYWx0ZWRfX+McUwYJuxYXe
- oDWFkkClTJqZUxcahnnXN/gkpoBmY11zUTwkZZ6+v12FTnhjOSuOvzjaPdXQHtlvUY0lhEuSjWt
- cUlDR3L5HYlCabSHOprGAikBDyrTkytDDU7sd9qU6toYdC5SXI6Af0oXn8plsPSw7oUK6u7Masa
- RP47LuG2Y5RsLFiYkS8/jkV7+XCtIui3fXNPIX+YQ5DozJNndG9bgq9S92dmcIxax2xuzGeMHqb
- T9YBG6GflkpFpIi+Z3HAoB/csxk4k0xWNz7gafjXZsTI5tZTW8ep0kYv1n8QQqk/mzNlUWj13Y0
- UcGEoMFlqBhxo15DGiiRdqI5WSinb6CbxTqRCnWhkDyexNcx/oTx4c5um2COfrm+EvrKJ7zatAl
- okjQZ5PvioVwgxxrz/cXHKmr6dyURNfUxeKhlLQpoatG09YcXci0oz2UMTCJKMbpCLlCgTrg2UM
- vub4zd9UZr/e3qbYsbg==
-X-Proofpoint-ORIG-GUID: 0qtyupwZigY2QrfRcn99XXyDPQs4hEYj
-X-Authority-Analysis: v=2.4 cv=B/60EetM c=1 sm=1 tr=0 ts=696767b5 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=-AY-3KQBEn9c_OmloDAA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-GUID: 0qtyupwZigY2QrfRcn99XXyDPQs4hEYj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-14_03,2026-01-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 bulkscore=0 spamscore=0 impostorscore=0
- malwarescore=0 phishscore=0 adultscore=0 clxscore=1015 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2601140079
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260113-vsock-recv-coalescence-v2-1-552b17837cf4@rbox.co>
 
-On Wed, 14 Jan 2026 10:33:22 +0100
-"Christoph Schlameuss" <schlameuss@linux.ibm.com> wrote:
+On Tue, Jan 13, 2026 at 04:08:18PM +0100, Michal Luczaj wrote:
+>vsock/virtio common tries to coalesce buffers in rx queue: if a linear skb
+>(with a spare tail room) is followed by a small skb (length limited by
+>GOOD_COPY_LEN = 128), an attempt is made to join them.
+>
+>Since the introduction of MSG_ZEROCOPY support, assumption that a small skb
+>will always be linear is incorrect. In the zerocopy case, data is lost and
+>the linear skb is appended with uninitialized kernel memory.
+>
+>Of all 3 supported virtio-based transports, only loopback-transport is
+>affected. G2H virtio-transport rx queue operates on explicitly linear skbs;
+>see virtio_vsock_alloc_linear_skb() in virtio_vsock_rx_fill(). H2G
+>vhost-transport may allocate non-linear skbs, but only for sizes that are
+>not considered for coalescence; see PAGE_ALLOC_COSTLY_ORDER in
+>virtio_vsock_alloc_skb().
+>
+>Ensure only linear skbs are coalesced. Note that skb_tailroom(last_skb) > 0
+>guarantees last_skb is linear.
+>
+>Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 
-> On Mon Dec 22, 2025 at 5:50 PM CET, Claudio Imbrenda wrote:
-> > Add a new IOCTL to allow userspace to manipulate storage keys directly.
-> >
-> > This will make it easier to write selftests related to storage keys.
-> >
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
-> 
-> Please add some user documentation for the new IOCTL.
+Thank you for enriching the commit message!
 
-already done, it will be in the next iteration.
-and also a capability for the new ioctl
+LGTM!
 
-> 
-> [...]
-> 
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index dddb781b0507..845417e56778 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1219,6 +1219,15 @@ struct kvm_vfio_spapr_tce {
-> >  	__s32	tablefd;
-> >  };
-> >  
-> > +#define KVM_S390_KEYOP_SSKE 0x01
-> > +#define KVM_S390_KEYOP_ISKE 0x02
-> > +#define KVM_S390_KEYOP_RRBE 0x03  
-> 
-> Just a nitpik, but why this order? In the arch the order is ISKE, SSKE, RRBE.
-> Would it not be more logical to keep that order?
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-I don't know why I chose that order, I guess I can reorder it. It
-doesn't really make a difference, but I guess consistency is good
-
-> 
-> > +struct kvm_s390_keyop {
-> > +	__u64 user_addr;
-> > +	__u8  key;
-> > +	__u8  operation;
-> > +};
-> > +
-> >  /*
-> >   * KVM_CREATE_VCPU receives as a parameter the vcpu slot, and returns
-> >   * a vcpu fd.
-> > @@ -1238,6 +1247,7 @@ struct kvm_vfio_spapr_tce {
-> >  #define KVM_S390_UCAS_MAP        _IOW(KVMIO, 0x50, struct kvm_s390_ucas_mapping)
-> >  #define KVM_S390_UCAS_UNMAP      _IOW(KVMIO, 0x51, struct kvm_s390_ucas_mapping)
-> >  #define KVM_S390_VCPU_FAULT	 _IOW(KVMIO, 0x52, unsigned long)
-> > +#define KVM_S390_KEYOP           _IOWR(KVMIO, 0x53, struct kvm_s390_keyop)
-> >  
-> >  /* Device model IOC */
-> >  #define KVM_CREATE_IRQCHIP        _IO(KVMIO,   0x60)  
-> 
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index dcc8a1d5851e..26b979ad71f0 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1359,9 +1359,11 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+>
+> 	/* Try to copy small packets into the buffer of last packet queued,
+> 	 * to avoid wasting memory queueing the entire buffer with a small
+>-	 * payload.
+>+	 * payload. Skip non-linear (e.g. zerocopy) skbs; these carry payload
+>+	 * in skb_shinfo.
+> 	 */
+>-	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue)) {
+>+	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue) &&
+>+	    !skb_is_nonlinear(skb)) {
+> 		struct virtio_vsock_hdr *last_hdr;
+> 		struct sk_buff *last_skb;
+>
+>
+>-- 
+>2.52.0
+>
 
 
