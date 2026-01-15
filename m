@@ -1,113 +1,139 @@
-Return-Path: <kvm+bounces-68237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A28D281A9
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 20:31:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB616D2820A
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 20:34:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 11299301701C
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:17:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A630304D8D5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41902ED17C;
-	Thu, 15 Jan 2026 19:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373463191D5;
+	Thu, 15 Jan 2026 19:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sU0vN5+S"
+	dkim=pass (2048-bit key) header.d=oasis-open-org.20230601.gappssmtp.com header.i=@oasis-open-org.20230601.gappssmtp.com header.b="TbxlGF1O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6552ED846
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 19:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF34F45BE3
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 19:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768504643; cv=none; b=pIq1rfT/jGHIKz8r/VEQgWlHH9C24tQnP+h4jm6B+JA9EDBiAQ6/bbF6vE9j6kscd0zo5Ku9XeI3aDxL64FjjoiYLi9niqlE7kvyoGdzsGgQ80hkWYs5hFs5UWGRetZ3UVFD4YVgmcpm+jbXR/nikMcOSZP1VN14ip85VUr8Xxs=
+	t=1768505663; cv=none; b=KB4U8QQq0foDbUY266twK+tcKw9k50I3w08KoBNwT4vZ8lsx0aoH9Xp2yyjW3VcKWNbkqw2tRa+CnNsciBBIlT1s8b0VVDGA9LghxiDqU95+KQ2OOzvf8zHkhviMeUnj+eMnm+vg5c5ZHUjIJ1JjusAspmbockgWY2VB/14/K7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768504643; c=relaxed/simple;
-	bh=8EsIAojX7izm3eUG0OWRmU4nt+cjKhAtCc3Rt+DkVVo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DJmlkqL9TKm2Iy1O1y9H2SedCQ8w9CnYOxheeHRv2scUdiQxBGB2vfXaHoUGKIpmaeQW2eIuotsqN4I9jcjbdPmET7gX/ISsoTgPzna+7GN3S98F43wSRdtWyQ35yBFURNR53EtOZU8GauoxOccG37qo6SX4mCjH0EiA3KuzZnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sU0vN5+S; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-81dd077ca65so962462b3a.2
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 11:17:20 -0800 (PST)
+	s=arc-20240116; t=1768505663; c=relaxed/simple;
+	bh=tYswEwB2K4rLxDAOYB6DH7qcWpEd+qmrWgR3vmHfzq4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=hTY2NUJeHlOKMC4ZnV/ahJ7DjVtksqFJbOtSXR101KtggSoflnK2H9YQQKRPhvpG2EPja3PqiFdh7MoN9ZzRKe6R7ysOyecyI/YCwgzeMMUGIjr5Tl8k6njfZnck6C6lODIb6B9prv26M4QlCyPYBRznpttJMNjVFn0+YgdbptI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oasis-open.org; spf=pass smtp.mailfrom=oasis-open.org; dkim=pass (2048-bit key) header.d=oasis-open-org.20230601.gappssmtp.com header.i=@oasis-open-org.20230601.gappssmtp.com header.b=TbxlGF1O; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oasis-open.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oasis-open.org
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50145d27b4cso12398661cf.2
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 11:34:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768504640; x=1769109440; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xTgcZS4Su6Azzs6FTl7APd5b9i+AMlUEP5Ldeqc7RbI=;
-        b=sU0vN5+SfipEjWBaEJV+YK9LkHmRtHPwHIppGqnyfwu3ts41DMceTiOcGL2gnXAG3Z
-         wiLGHb31GZIekO9KpfinnIRsXcQlwMyQ6h7erXP/3TgiwNwSRwvlHk5EXubnCn/inKD3
-         4WNWTA0djf0D+79q22b83+7UhV1CWlZ4wuEDFAyf3Y+letOLd/XQLm69qYEDkDEyhHlS
-         JodPLIXSG7+yoWUEMQsjF6xhF+vKnhKEmFBxQcdZrhC5/E3IF7DuSmX/QuF0FeoX6pBZ
-         w7YWdL/iboe65sUD4iYRNy6COQ8Y2yC6QXztgSxCrjuRvk/EIAysBRvtb6iSR6CL7CA9
-         9D9A==
+        d=oasis-open-org.20230601.gappssmtp.com; s=20230601; t=1768505660; x=1769110460; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tYswEwB2K4rLxDAOYB6DH7qcWpEd+qmrWgR3vmHfzq4=;
+        b=TbxlGF1Odr2ePL1Yx4RGoWHzQ9kIwnKh6uDe1+G5FzHve3AGyefJbkP1VtBLIgtc+8
+         W4VnjzR6uW7BN9pCbVLoaPgL48GrbeP5Ylnewu6XNtcMtD/lhxkjpaxa4D9rX9zG3jDx
+         2LJcse6km0pMx38meOjI066s7fKSga8IexErJELWd3KqgiIqSMxspa5/3N3nRWaqrSRS
+         drloWsP8cmAtYqvm3vVSEOrb8BRS8fGg5kZ5xVPo0YxBJa9fLi1cN1fu6IZKE3F/FSB/
+         wSD27RDEDZCiyY7dBC8jwUWcTX30ubCTTkaQW8kt6T0REO0TGJZNtCG0F1T6lMC2d2Ie
+         Lr8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768504640; x=1769109440;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xTgcZS4Su6Azzs6FTl7APd5b9i+AMlUEP5Ldeqc7RbI=;
-        b=YI5hgKz8Lmrzg9bfCsPU2YwXchkGPiJsjDgUKC4ZMdSUI0yBhdSLLcFhLi3nCpj06P
-         VzVTXEnqNynOeSfsCDkWqH/G+ebOaqUwc0hUHTzGW605iwdNaMy9pL6xzx6z4wo3l4mu
-         +V2aKWG/eVDuGQSf2XrEiCs3X195uJCnuSKehOI3eGrixdS5MT7Senz7dIA6MMGXu0Hu
-         33EIhl6APwftitGyddi4Ih9K7008MkqFfrAvgSprw2+hpC+v83aj/aWLqBZARNrVX7be
-         xVP8c1+hE4sQ6QgjNfOiOwiBNE84B3bJ1k/lPdZZuBaVGCfoNnleWUrMDbV990KVulQF
-         l2BA==
-X-Gm-Message-State: AOJu0Yxu0yz7FNZgnLSRwXvfLh2juMvGCbkOGMpNvbA9K9q3BdTIiVn3
-	zFrl8yswpYyoxPcvTmht9jjBm0w65LKeNenLx0f7fcl/su9NJ9wi4+5OZUSkcA8eXdwiPk7CKSV
-	mErLCfg==
-X-Received: from pfbbj16.prod.google.com ([2002:a05:6a00:3190:b0:7b8:922c:725d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2ea0:b0:81f:3d13:e070
- with SMTP id d2e1a72fcca58-81fa17729e5mr189167b3a.12.1768504640018; Thu, 15
- Jan 2026 11:17:20 -0800 (PST)
-Date: Thu, 15 Jan 2026 11:17:18 -0800
-In-Reply-To: <20260108214622.1084057-3-michael.roth@amd.com>
+        d=1e100.net; s=20230601; t=1768505660; x=1769110460;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tYswEwB2K4rLxDAOYB6DH7qcWpEd+qmrWgR3vmHfzq4=;
+        b=pgU2Wab0AyRKZOZ5B+XghC6ANKMaatJdnODoxFWJ2Jb1q/gHYk9CeBSi6bxeQV28SE
+         mWoaj4jDS3DM0wwp75JA5a8EpfPHvTSIQV4ghuDKj/3Etgv8EszRLTRgKm6LfQ+GtWjJ
+         RgSKZATKnZy3hAr3s9Lngb7vi31bKy5ZUHCJfUXSGaknK78yrEazfwrwC/fgdNsJq1Oz
+         KRSUPEKmwaw+y6GZvPkXujifTZf/ZOLzBKP+oMiIryneM7RHPtEcpoh+bcR7GHnxIwsP
+         Hn6L3BA0vLi9k827R1c2nUnlN2ziBIEj8mu3RhfCSQVsLRtrifjNbyYsINfFXpmvmryI
+         rV4g==
+X-Gm-Message-State: AOJu0YwXyHX/zqRp+W/B4+PKt8aNGCw7VkiCKP8tqxfwiCB64oM96Atf
+	PQixsq6BobkYKyjKbWgzdjKKnNLinJcYWKm5l2EVgmmSciYPx1mXxxmT/bi+mjiNh2KKPVi1u3U
+	j9O76NGLsuoJgBKeNK3Y9iCRqtCQ0ekkWo+iQDaFZvzFp+lrzIEkLTWw=
+X-Gm-Gg: AY/fxX57zcTdG1ysXqAyomUgUaiigVK1ag/eUU6qVgv14pKN6X3WaPAWH7FY2yIrzkH
+	FsHllvTTPsID8HLNFfL86oCNLpZnXY1Uy42ytIi6M8gFJhNw3ZhyjpFiYy9xjcDp2uYMupKI+YD
+	aALGfQILo6xH6HZNINja24uIuwwg7H+P2J9ejCSGCicBEL4WJwOBN+obw/c9OBoa9Fqg4bWpOSd
+	YwjNvkFl3apcnz8zlg+ZEE+7iBqLOe8d8iZKtPbPDiWnMwFnuEWNQ0wDWPw2EX4W7cYlU9280+e
+	UBg8/pgW9//G/neBM0sbEnJ+blf0NUnM65GWwqWRmdvUutIHt66l5aaSPjLU
+X-Received: by 2002:ad4:5ba9:0:b0:880:5001:17d1 with SMTP id
+ 6a1803df08f44-8942dd6f83dmr8568456d6.37.1768505660541; Thu, 15 Jan 2026
+ 11:34:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260108214622.1084057-1-michael.roth@amd.com> <20260108214622.1084057-3-michael.roth@amd.com>
-Message-ID: <aWk9PusYNW0iADuD@google.com>
-Subject: Re: [PATCH v3 2/6] KVM: guest_memfd: Remove partial hugepage handling
- from kvm_gmem_populate()
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, pbonzini@redhat.com, 
-	vbabka@suse.cz, ashish.kalra@amd.com, liam.merwick@oracle.com, 
-	david@redhat.com, vannapurve@google.com, ackerleytng@google.com, aik@amd.com, 
-	ira.weiny@intel.com, yan.y.zhao@intel.com, pankaj.gupta@amd.com, 
-	Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+From: Kelly Cullinane <kelly.cullinane@oasis-open.org>
+Date: Thu, 15 Jan 2026 14:33:44 -0500
+X-Gm-Features: AZwV_QjLgjKCdNMgBTREr6rRU8V0tNOOzS4mPABgnuD1SxuS7hshRoGAKcyTr9E
+Message-ID: <CAAiF601+3Qj+=4FA_SK7A1s_d6X2eDhhRgE5JBL3gcVQNQ+a8A@mail.gmail.com>
+Subject: Invitation to comment on VIRTIO v1.4 CSD01
+To: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 08, 2026, Michael Roth wrote:
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index fdaea3422c30..9dafa44838fe 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -151,6 +151,15 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->  					 mapping_gfp_mask(inode->i_mapping), policy);
->  	mpol_cond_put(policy);
->  
-> +	/*
-> +	 * External interfaces like kvm_gmem_get_pfn() support dealing
-> +	 * with hugepages to a degree, but internally, guest_memfd currently
-> +	 * assumes that all folios are order-0 and handling would need
-> +	 * to be updated for anything otherwise (e.g. page-clearing
-> +	 * operations).
-> +	 */
-> +	WARN_ON_ONCE(folio_order(folio));
+ASIS members and other interested parties,
 
-Gah, this is buggy.  __filemap_get_folio_mpol() can return an ERR_PTR().  If that
-happens, this WARN will dereference garbage and explode.
+OASIS and the VIRTIO TC are pleased to announce that VIRTIO v1.4 CSD01
+is now available for public review and comment.
 
-And of course I find it _just_ after sending thank yous, *sigh*.
+VIRTIO TC aims to enhance the performance of virtual devices by
+standardizing key features of the VIRTIO (Virtual I/O) Device
+Specification.
 
-I'll squash to this (after testing):
+Virtual I/O Device (VIRTIO) Version 1.4
+Committee Specification Draft 01 / Public Review Draft 01
+09 December 2025
 
-	WARN_ON_ONCE(!IS_ERR(folio) && folio_order(folio));
+TEX: https://docs.oasis-open.org/virtio/virtio/v1.4/csprd01/virtio-v1.4-csp=
+rd01.html
+(Authoritative)
+HTML: https://docs.oasis-open.org/virtio/virtio/v1.4/csprd01/virtio-v1.4-cs=
+prd01.html
+PDF: https://docs.oasis-open.org/virtio/virtio/v1.4/csprd01/virtio-v1.4-csp=
+rd01.pdf
 
-avoiding a few emails isn't worth having a lurking bug.
+The ZIP containing the complete files of this release is found in the direc=
+tory:
+https://docs.oasis-open.org/virtio/virtio/v1.4/csprd01/virtio-v1.4-csprd01.=
+zip
+
+How to Provide Feedback
+OASIS and the VIRTIO TC value your feedback. We solicit input from
+developers, users and others, whether OASIS members or not, for the
+sake of improving the interoperability and quality of its technical
+work.
+
+The public review is now open and ends Friday, February 13 2026 at 23:59 UT=
+C.
+
+Comments may be submitted to the project=E2=80=99s comment mailing list at
+virtio-comment@lists.linux.dev. You can subscribe to the list by
+sending an email to
+virtio-comment+subscribe@lists.linux.dev.
+
+All comments submitted to OASIS are subject to the OASIS Feedback
+License, which ensures that the feedback you provide carries the same
+obligations at least as the obligations of the TC members. In
+connection with this public review, we call your attention to the
+OASIS IPR Policy applicable especially to the work of this technical
+committee. All members of the TC should be familiar with this
+document, which may create obligations regarding the disclosure and
+availability of a member's patent, copyright, trademark and license
+rights that read on an approved OASIS specification.
+
+OASIS invites any persons who know of any such claims to disclose
+these if they may be essential to the implementation of the above
+specification, so that notice of them may be posted to the notice page
+for this TC's work.
+
+Additional information about the specification and the VIRTIO TC can
+be found at the TC=E2=80=99s public homepage.
 
