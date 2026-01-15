@@ -1,53 +1,46 @@
-Return-Path: <kvm+bounces-68261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68262-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26657D28FC9
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 23:21:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D79D29099
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 23:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9D82830146D3
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 22:21:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9BC50309BC20
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 22:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF74325497;
-	Thu, 15 Jan 2026 22:21:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nv2D1spn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA93032C949;
+	Thu, 15 Jan 2026 22:32:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43322FFDFC
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 22:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C112E090B
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 22:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768515670; cv=none; b=Fu3ctdF5GeBcOSMJovquqSJ0CFK7Nc8IzdcrKUC+YUtpc3vF3oFmV6VYO13NifOEF96p5xanIpPUoQVV7vSXcDIfJ4JlBK2PGmQ4N9YIlytt1cujdTZz3WSckPsN8iquoE8m17UQwtyFnMauE3xxbIG+FfApjbu7cmy/dhj7ldc=
+	t=1768516366; cv=none; b=dJ8uizY+n7fb2i8dzkhtjIwPJ/4oRaXXPZQoBmTI7Zh/4MV+tXDXQRx0iuD/y1G7beKKSV3/P62NE3OQ5mPqJD25psiItHDLa5gNxu7VnPTuDuzKdK6Tz2j2HIBKyxPhcDSaxRdJTWtehLm+hOa71Rxa5xmCh2ibN6loXGu9MM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768515670; c=relaxed/simple;
-	bh=OW3TcPeVB5ZYLJLZPzaY8L9qpGQNXSeXIyuWss/pgxA=;
+	s=arc-20240116; t=1768516366; c=relaxed/simple;
+	bh=p4Ebc87ASzcaCgPWg+YOqfXTIPlgejw1M4LpLbgL/So=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eHBSoaYjD+vwr0lV07sHAkXsPfvmagvhuj53yxukR571G/OugLbcx1NGMiy2E9nD6Oi9Z5UDPtAZD2qDCWmboozt1yWGd7Oq1DnhB8i5ct/4hKTUBzTxhdpyxQ6NyCED4I1sBhhddpr/YVeGYwbDRNga+IW/5RJ5oDzA3PvEZ0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nv2D1spn; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 15 Jan 2026 22:21:01 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768515666;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zc+QHZR9yFxmZa70fEDw4VOYtPawQDDl6jcvS2GVUFg=;
-	b=nv2D1spnx/duoQ05VxqKvf20P9z4HLUxKkwF7vkgm3ez9/yHk/pjS5jqWTcZyzpSnUSBGk
-	60x8LCOzLxcgb3duvXjf3Z1lG42xhuhQ9+KIeYZi3m0vDOQ+aGwyELaeIK+GQgMP6gGp2a
-	MZt6nwUzLFZ7F8zzJtvTwS1iTFIOn90=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5] KVM: selftests: Test READ=>WRITE dirty logging
- behavior for shadow MMU
-Message-ID: <2kgs2paktjfb33sdr46zhlernx2xgokh5ac4og45obrvvlm34d@2df2kb2u44cy>
-References: <20260115172154.709024-1-seanjc@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IXxlfNXoup8TNEtoVb2AmNfsxAsMVPgPpTwPU/N9VuApmCbv/GNvAyQ6djRL5hZOTpf+U76JQopl/6oU+lzLTaqP64BB34nWfpSAeKbhyLAgu3GT6eYV+tfEZ5xXNm7878RMMlvClia/Uj+Xn7/kZbPxfmH2SLAZ+6zVLCYlTTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 445611515;
+	Thu, 15 Jan 2026 14:32:37 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C0C423F632;
+	Thu, 15 Jan 2026 14:32:42 -0800 (PST)
+Date: Thu, 15 Jan 2026 22:32:37 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
+	maz@kernel.org, kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v5 00/11] arm64: EL2 support
+Message-ID: <20260115223237.GA1087383@e124191.cambridge.arm.com>
+References: <20260114115703.926685-1-joey.gouly@arm.com>
+ <csscff65cagzfgyvsseufdqupde64z5x73llmzgzci7u43pzbs@fv7pfn4jxrdv>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,74 +49,45 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260115172154.709024-1-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <csscff65cagzfgyvsseufdqupde64z5x73llmzgzci7u43pzbs@fv7pfn4jxrdv>
 
-On Thu, Jan 15, 2026 at 09:21:54AM -0800, Sean Christopherson wrote:
-> Update the nested dirty log test to validate KVM's handling of READ faults
-> when dirty logging is enabled.  Specifically, set the Dirty bit in the
-> guest PTEs used to map L2 GPAs, so that KVM will create writable SPTEs
-> when handling L2 read faults.  When handling read faults in the shadow MMU,
-> KVM opportunistically creates a writable SPTE if the mapping can be
-> writable *and* the gPTE is dirty (or doesn't support the Dirty bit), i.e.
-> if KVM doesn't need to intercept writes in order to emulate Dirty-bit
-> updates.
+On Thu, Jan 15, 2026 at 11:40:12AM -0600, Andrew Jones wrote:
+> On Wed, Jan 14, 2026 at 11:56:52AM +0000, Joey Gouly wrote:
+> > Hi all,
+> > 
+> > This series is for adding support to running the kvm-unit-tests at EL2.
+> > 
+> > Changes since v4[1]:
+> > 	- changed env var to support EL2=1,y,Y
+> > 	- replaced ifdef in selftest with test_exception_prep()
+> > 
+> > Thanks,
+> > Joey
+> > 
+> > [1] https://lore.kernel.org/kvmarm/20251204142338.132483-1-joey.gouly@arm.com/
+> >
 > 
-> To actually test the L2 READ=>WRITE sequence, e.g. without masking a false
-> pass by other test activity, route the READ=>WRITE and WRITE=>WRITE
-> sequences to separate L1 pages, and differentiate between "marked dirty
-> due to a WRITE access/fault" and "marked dirty due to creating a writable
-> SPTE for a READ access/fault".  The updated sequence exposes the bug fixed
-> by KVM commit 1f4e5fc83a42 ("KVM: x86: fix nested guest live migration
-> with PML") when the guest performs a READ=>WRITE sequence with dirty guest
-> PTEs.
+> Hi Joey,
 > 
-> Opportunistically tweak and rename the address macros, and add comments,
-> to make it more obvious what the test is doing.  E.g. NESTED_TEST_MEM1
-> vs. GUEST_TEST_MEM doesn't make it all that obvious that the test is
-> creating aliases in both the L2 GPA and GVA address spaces, but only when
-> L1 is using TDP to run L2.
+> So this series doesn't appear to regress current tests, but it also
+> doesn't seem to completely work. I noticed these issues when running
+> with EL2=1 (there could be more):
 > 
-> Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>  - timer test times out
+>  - all debug-bp fail
+>  - all watchpoint received tests fail for debug-wp
+>  - micro-bench hits the assert in gicv3_lpi_alloc_tables()
+>    lib/arm/gic-v3.c:183: assert failed: gicv3_data.redist_base[cpu]: Redistributor for cpu0 not initialized. Did cpu0 enable the GIC?
 
-LGTM with one nit/question below:
+Timer and micro-bench are unexpected, maybe regressed, I will investigate.
 
-Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+debug/watchpoint I knew about, would be good if we could skip those, and
+someone more knowledgeable about debug could figure out the issue there?
 
-[..]
-> +static void l2_guest_code(vm_vaddr_t base)
->  {
-> -	READ_ONCE(*a);
-> -	WRITE_ONCE(*a, 1);
-> -	GUEST_SYNC(true);
-> -	GUEST_SYNC(false);
-> +	vm_vaddr_t page0 = TEST_GUEST_ADDR(base, 0);
-> +	vm_vaddr_t page1 = TEST_GUEST_ADDR(base, 1);
->  
-> -	WRITE_ONCE(*b, 1);
-> -	GUEST_SYNC(true);
-> -	WRITE_ONCE(*b, 1);
-> -	GUEST_SYNC(true);
-> -	GUEST_SYNC(false);
-> +	READ_ONCE(*(u64 *)page0);
-> +	GUEST_SYNC(page0 | TEST_SYNC_READ_FAULT);
-> +	WRITE_ONCE(*(u64 *)page0, 1);
-> +	GUEST_SYNC(page0 | TEST_SYNC_WRITE_FAULT);
-> +	READ_ONCE(*(u64 *)page0);
-> +	GUEST_SYNC(page0 | TEST_SYNC_NO_FAULT);
-> +
-> +	WRITE_ONCE(*(u64 *)page1, 1);
-> +	GUEST_SYNC(page1 | TEST_SYNC_WRITE_FAULT);
-> +	WRITE_ONCE(*(u64 *)page1, 1);
-> +	GUEST_SYNC(page1 | TEST_SYNC_WRITE_FAULT);
-> +	READ_ONCE(*(u64 *)page1);
-> +	GUEST_SYNC(page1 | TEST_SYNC_NO_FAULT);
-> +	GUEST_SYNC(page1 | TEST_SYNC_NO_FAULT);
+Thanks,
+Joey
 
-Extra GUEST_SYNC()?
-
->  
->  	/* Exit to L1 and never come back.  */
->  	vmcall();
+> 
+> Thanks,
+> drew
 
