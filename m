@@ -1,164 +1,176 @@
-Return-Path: <kvm+bounces-68192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68193-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09CBCD25AC0
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:16:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE89AD25AE8
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5B296302402F
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:11:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 99D103099C5D
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB93E2C11F3;
-	Thu, 15 Jan 2026 16:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3474334A3AB;
+	Thu, 15 Jan 2026 16:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nHb5fqTH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e3sjdM2A";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NBnEoi1k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A513F86334;
-	Thu, 15 Jan 2026 16:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55802C0F75
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768493480; cv=none; b=AS+N7F6PWy6EX7MKWGCMPZfTVHfIqdH45TD0uNHWu5uaF4OPuiQjYBUBlXIPcQthqWkuShDKqgKFwHZJK9NyhQb6IJ1FpUu+KezfOEx9/hNuCupFuLkuQ1xjhYUGrivDnpILjLtqrI+WdiVBQuVrjI4lGa6BBzEnUUzJ2Cfnb5c=
+	t=1768493549; cv=none; b=mcfhDgctockT+fZwlMxunS0lBvH8bjQU9zfJuIBUGYVo4cfbTU7svkfUnCYJxRFMXIvX3nAVS5LUto4XLhtxXa4EzHYRltlek+pBe4VOsbKPEmBCWh1nJ4Nx0r5dD50NXYaPaR/E2k0FkkJsiKvETCfqd9zekthXmdSJUj0IPBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768493480; c=relaxed/simple;
-	bh=gFIoEC1f1qlzIUpk/6FrkLxr7vkPH7lbau/8uT3TPbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mZsV9j2H1k1hJypPqXJMrIy/eInuhWNS5jNQ94jmfXoxeCzcZ3B0d9iIXMWG2f1kyS5HrRZPlwirDIOTW/JbZDYLfn4WRGOQ6XF8SFNcjQfQaCSubsTmOAOfVM8YO0te64jVOp/6cGIG3DS9vSxWKz1yvnkT+IaPDlFAXibxmGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nHb5fqTH; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768493479; x=1800029479;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gFIoEC1f1qlzIUpk/6FrkLxr7vkPH7lbau/8uT3TPbk=;
-  b=nHb5fqTHh6JL/ZYed6nZR6QQsdekrk8T40lmZgrgAquJRx56luF4UQAc
-   MdKNp9AbOB1ZPRtaP7p5K37Hc7gvxy5fXSgQQ+Rih3VrqcbbsvwgzTsU+
-   GS6IfdFpevEBhzFiM5xtvG+oPTUnETqoW/1hc0nk4+XaPpeICyfu3V3lz
-   wnmlkeggoP/x/0+P2UeKwcmblesuDmnOHyNbdFIXOnvjmFdDVTTckWYl5
-   0OIRS+5bupyuPGdwJ6C9PTVBgiktKWJNYTGkjLp9Ms4MIzgLLQLu0GBvs
-   RLBkhSAjJk07ZhkZU6dwRM6l31i892F07K1KEbe72gXnZRb4JHMm1667u
-   A==;
-X-CSE-ConnectionGUID: gysOvICmSs2nZqiUDOqK+w==
-X-CSE-MsgGUID: RMVgVblfQzuoASGrxQ+AMw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="69701547"
-X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="69701547"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 08:11:19 -0800
-X-CSE-ConnectionGUID: T0RnRcTxRsGGrhE5Yp0D6g==
-X-CSE-MsgGUID: 0Lh0zAVbQ2yEnGpU34emxg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="205020917"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 15 Jan 2026 08:11:14 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vgPwF-00000000IBQ-0m18;
-	Thu, 15 Jan 2026 16:11:11 +0000
-Date: Fri, 16 Jan 2026 00:10:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-	x86@kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Juergen Gross <jgross@suse.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v3 1/5] x86/paravirt: Replace io_delay() hook with a bool
-Message-ID: <202601152321.kJ6D4yKM-lkp@intel.com>
-References: <20260115084849.31502-2-jgross@suse.com>
+	s=arc-20240116; t=1768493549; c=relaxed/simple;
+	bh=RHhCaaRNI/nAzrLA7doEVdluNqjWBfYTZo1IN7DjKzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JcXoZNTaKnUFoHS0xoUCvJCpj8/hr5dYMz5TvuCsucbu02ATTEnLHVXA2EmiYmNLF+UbeA5rdDW4+HU2zeWimcbLOO+7p7EoJ6SJzsRrhZa+obWa0A/f6DyXiG8NnJ8w7JtjgS4YmNeiBr+ekNYIjV8YGtJYnTWGnpjifBbAEqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e3sjdM2A; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NBnEoi1k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768493546;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=x/ZMu7CdHznH2HdFclgVFTLdKzdbKe1vdypK8PHxHR4=;
+	b=e3sjdM2AmgIg+6foSAw35HbkeuO8rK2dZrwnXCjDn215tVvS3M4WXqAVwT1WTl5whR1L68
+	IvMqmOWVfgZhSFOOJ0Cfys/l52uJP1x3VYki/zxi0xY7B6gLh3TIgXP+engL50/fR1+GIe
+	XCjGn9yReXjJZlJ3HTab8hNS73aBh6o=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-418-KahbmJ9dPbOXBc4498xSCQ-1; Thu, 15 Jan 2026 11:12:25 -0500
+X-MC-Unique: KahbmJ9dPbOXBc4498xSCQ-1
+X-Mimecast-MFC-AGG-ID: KahbmJ9dPbOXBc4498xSCQ_1768493544
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b86fd61e3b4so102853266b.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 08:12:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768493544; x=1769098344; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=x/ZMu7CdHznH2HdFclgVFTLdKzdbKe1vdypK8PHxHR4=;
+        b=NBnEoi1kguCa1Ek8nCokqk1nEq5Qw8ftbran239TPZo1Rj9dD/rL1ZbBCVyA+JAPlA
+         1elKWSDwXaY78Vc8664fVRgw7KssWU1MH1R7i1Jl9FDx+/xua+foNydofbtxEP8iFCxN
+         y/o/v2/hvwNl7C/TUxUlksjp/JqKDtnT6Cj0zB0Ht9zQNynh4aGepUcsbPpGi6teae6Y
+         DrhVHu18WbrCT9VQdt1HEglqm4SWpGTh9t1r5LZOne6VoKNFz5YwxsslUfb/ke5W6VGs
+         PNlbfWbqzBtMvmXJhPybrz802ZdfUKWsYWOJ+Ke6TMoGl3Yha2+q9Hmr0eQ+fOYhOrkC
+         lgAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768493544; x=1769098344;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x/ZMu7CdHznH2HdFclgVFTLdKzdbKe1vdypK8PHxHR4=;
+        b=O9OqGoKV6+jj3n+KDmrJzcrnsSWgl6f5qXS7po0oxmCdUDUtskIfCYF9KiQacz9q3T
+         bYIAhD75KFGDzmVEP6MB4glMyKM/r5ReogNqodjjKKMamlhb8sfChWgFR7+E1nx46N8M
+         lAZ0tttzjWucnT/Fjo2eD6OXi5NbI2cKpNtSSkhLcRKkhYDNONC4LSF5RD/YfbN1duM2
+         aQl73Hlw68dEiAQq0m9GOH0U7bojgboa4PA8GE/cGbdA/rl9LM6f88g3pBft8zG04i0W
+         B41QmICpsDSl06ykLGPb/QsnrUBfU8MGIcgwWjUMK5kkBU1fsLVmbDjjQiUCDbPWTBkr
+         mpgg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1u/+iUcwdNIWZIW8V9a6Du3hn1OpLSoPDGrTsVsl/5qqRo7X0cxOPmAAttak0YHZfDs8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzHWuTPY6wzHdDKt6zTIBP0aJntqLtMAf8urlmomCKOi3sHT+Q
+	7bhZTMjhHs9GKYwhzpwmE+S8QsF/FKyEzmp5b6MZ1F3fEOYpVYWxTNAcVZWKk2z6i2YasytU50j
+	LxbxCarcLR8EfgYTkZ0XPKGDDSkXAKfyMAZjgRPDotV3r1d60x3fl+g==
+X-Gm-Gg: AY/fxX519vtJQZ0W5rnSnONN339gtVkP9xLfwYTPY7gvqSR72baLURJpnOsNArJ0DQh
+	Tlf26yBYS0kWdttZ0DyKD7bggMC1Jg88B6T3t1Pt8IfU94r0ms4YrHWLWUa2kRPVHY7aCsi0GBU
+	u5KW2Fi9vpCBSUr8xOgEnHu+pDK+b0+ZGgewdnEx0biJ6TxdZQbB/Ocxx2tN8pc2fcjAElcfxZL
+	04Vi9/c7ZvfiRCujH+IWCWuknDafk81DA3v48nvAl8o/Q8FqMwJpw57Zai42Mct47DulYJAeoGm
+	RV6gqynR1rHusbD7sG4knt4ijOecATZ6t/GJuIQsTmobXHES242sUUr5llk04vbdvSbJAOJGwur
+	/WVtEfndpJWY12b2+ksNrKb6hkUG6Ynqz98zonYtu896+X5LQFsG2YuJ4JYBJOsX0yKviyCo5lA
+	Vt75scnXchs0U=
+X-Received: by 2002:a17:907:1ca5:b0:b77:1233:6f32 with SMTP id a640c23a62f3a-b8792feb14dmr11233066b.48.1768493544155;
+        Thu, 15 Jan 2026 08:12:24 -0800 (PST)
+X-Received: by 2002:a17:907:1ca5:b0:b77:1233:6f32 with SMTP id a640c23a62f3a-b8792feb14dmr11231266b.48.1768493543711;
+        Thu, 15 Jan 2026 08:12:23 -0800 (PST)
+Received: from [192.168.1.84] ([93.56.161.93])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b86faa6be37sm1484355966b.36.2026.01.15.08.12.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 08:12:23 -0800 (PST)
+Message-ID: <43474e30-6a14-4ab1-aa2c-5f079503637d@redhat.com>
+Date: Thu, 15 Jan 2026 17:12:22 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260115084849.31502-2-jgross@suse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever
+ XFD[i]=1
+To: Dave Hansen <dave.hansen@intel.com>, Jim Mattson <jmattson@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+ stable@vger.kernel.org
+References: <20260101090516.316883-1-pbonzini@redhat.com>
+ <20260101090516.316883-2-pbonzini@redhat.com>
+ <CALMp9eSWwjZ83VQXRSD3ciwHmtaK5_i-941KdiAv9V9eU20B8g@mail.gmail.com>
+ <aVxiowGbWNgY2cWD@google.com>
+ <CALMp9eToT-af8kntKK2TiFHHUcUQgU25GaaNqq49RZZt2Buffg@mail.gmail.com>
+ <9beb7ca4-7bcf-45f1-aefa-f8e6e8122ede@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <9beb7ca4-7bcf-45f1-aefa-f8e6e8122ede@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Juergen,
+On 1/15/26 17:07, Dave Hansen wrote:
+> On 1/6/26 09:56, Jim Mattson wrote:
+>> Apologies. You're right. Though Intel is a bit coy, the only way to
+>> interpret that section of the SDM is to conclude that the AMX state in
+>> the CPU becomes undefined when XFD[18] is set.
+> 
+> I'll touch base with the folks that wrote that blurb. I'm a little
+> nervous to interpret that "software should not..." blurb as a full
+> architectural DANGER sign partly because it's in a "RECOMMENDATIONS FOR
+> SYSTEM SOFTWARE" section.
+> 
+> I'm _sure_ they discussed tying XFD[i] and XINUSE[i] together and there
+> was a good reason they did not.
 
-kernel test robot noticed the following build errors:
+Is there anything that prevents an SMM handler (or more likely, an SMI 
+transfer monitor) to do an XSAVE/XRSTOR and destroy tile data?
 
-[auto build test ERROR on tip/master]
-[also build test ERROR on next-20260115]
-[cannot apply to kvm/queue kvm/next tip/x86/core kvm/linux-next tip/auto-latest linus/master v6.19-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Paolo
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Juergen-Gross/x86-paravirt-Replace-io_delay-hook-with-a-bool/20260115-165320
-base:   tip/master
-patch link:    https://lore.kernel.org/r/20260115084849.31502-2-jgross%40suse.com
-patch subject: [PATCH v3 1/5] x86/paravirt: Replace io_delay() hook with a bool
-config: x86_64-randconfig-006-20260115 (https://download.01.org/0day-ci/archive/20260115/202601152321.kJ6D4yKM-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.4.0-5) 12.4.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260115/202601152321.kJ6D4yKM-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601152321.kJ6D4yKM-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   arch/x86/kernel/tboot.c: In function 'tboot_shutdown':
->> arch/x86/kernel/tboot.c:255:17: error: implicit declaration of function 'halt' [-Werror=implicit-function-declaration]
-     255 |                 halt();
-         |                 ^~~~
-   cc1: some warnings being treated as errors
-
-
-vim +/halt +255 arch/x86/kernel/tboot.c
-
-58c41d28259c24 H. Peter Anvin 2009-08-14  225  
-3162534069597e Joseph Cihula  2009-06-30  226  void tboot_shutdown(u32 shutdown_type)
-3162534069597e Joseph Cihula  2009-06-30  227  {
-3162534069597e Joseph Cihula  2009-06-30  228  	void (*shutdown)(void);
-3162534069597e Joseph Cihula  2009-06-30  229  
-3162534069597e Joseph Cihula  2009-06-30  230  	if (!tboot_enabled())
-3162534069597e Joseph Cihula  2009-06-30  231  		return;
-3162534069597e Joseph Cihula  2009-06-30  232  
-11520e5e7c1855 Linus Torvalds 2012-12-15  233  	/*
-11520e5e7c1855 Linus Torvalds 2012-12-15  234  	 * if we're being called before the 1:1 mapping is set up then just
-11520e5e7c1855 Linus Torvalds 2012-12-15  235  	 * return and let the normal shutdown happen; this should only be
-11520e5e7c1855 Linus Torvalds 2012-12-15  236  	 * due to very early panic()
-11520e5e7c1855 Linus Torvalds 2012-12-15  237  	 */
-11520e5e7c1855 Linus Torvalds 2012-12-15  238  	if (!tboot_pg_dir)
-11520e5e7c1855 Linus Torvalds 2012-12-15  239  		return;
-11520e5e7c1855 Linus Torvalds 2012-12-15  240  
-3162534069597e Joseph Cihula  2009-06-30  241  	/* if this is S3 then set regions to MAC */
-3162534069597e Joseph Cihula  2009-06-30  242  	if (shutdown_type == TB_SHUTDOWN_S3)
-58c41d28259c24 H. Peter Anvin 2009-08-14  243  		if (tboot_setup_sleep())
-58c41d28259c24 H. Peter Anvin 2009-08-14  244  			return;
-3162534069597e Joseph Cihula  2009-06-30  245  
-3162534069597e Joseph Cihula  2009-06-30  246  	tboot->shutdown_type = shutdown_type;
-3162534069597e Joseph Cihula  2009-06-30  247  
-3162534069597e Joseph Cihula  2009-06-30  248  	switch_to_tboot_pt();
-3162534069597e Joseph Cihula  2009-06-30  249  
-3162534069597e Joseph Cihula  2009-06-30  250  	shutdown = (void(*)(void))(unsigned long)tboot->shutdown_entry;
-3162534069597e Joseph Cihula  2009-06-30  251  	shutdown();
-3162534069597e Joseph Cihula  2009-06-30  252  
-3162534069597e Joseph Cihula  2009-06-30  253  	/* should not reach here */
-3162534069597e Joseph Cihula  2009-06-30  254  	while (1)
-3162534069597e Joseph Cihula  2009-06-30 @255  		halt();
-3162534069597e Joseph Cihula  2009-06-30  256  }
-3162534069597e Joseph Cihula  2009-06-30  257  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
