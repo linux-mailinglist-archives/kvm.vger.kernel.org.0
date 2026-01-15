@@ -1,330 +1,137 @@
-Return-Path: <kvm+bounces-68165-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A215ED23433
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 09:50:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA08D23577
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 10:05:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B18430ADD99
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 08:49:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B801730B2116
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 09:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EE333E36E;
-	Thu, 15 Jan 2026 08:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4BB343201;
+	Thu, 15 Jan 2026 09:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="OqSKW0h/";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="OqSKW0h/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y+TIzgsj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD3933A02F
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 08:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768466944; cv=none; b=OACYEHd0fnEY4hwo91yZImz77NNLoKs3wTiwpxeQ438VjUDlKZ/az/Xp+9Bob0h9fK3mnF58rDgqkfVlnqgsWHU8s9AMdsoTFf6UG1EgsK65agEf6hf3suqpWz30v5o8lBilWBtp+bk2S+2frTYbAsR++4pzlUGrB1F9e+7sfg4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768466944; c=relaxed/simple;
-	bh=iclbuSqykbLSDpF51iHz3rA9SaEpMPs3TWWgXxi13hw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lEPRoaGEA92m779qO5mTc/iYOo+LwaHgIPwuZbPJR0FxUaCq/YSaztcXVUKn9PK5ikiolpEX85C6YmueDcqEnZOC9PoGqjZPHMez8oDmBtNTF4EBuu+cnfTFUIO8P7mOCyhsLNgDce9LqlFjtTrKJQhcCVkHdIxSTr+X+c/VcFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=OqSKW0h/; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=OqSKW0h/; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 024B05BD50;
-	Thu, 15 Jan 2026 08:49:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1768466941; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IcAVv+KWnCRg/40DoITyiU2vnkn2NT3Rm2oPIYRObDo=;
-	b=OqSKW0h/vTBTF5rxkK8jBk2q9SlrT+BMlkvp1CJtp/WTXpRALfw8fxy8tsdL3j99VTBm2E
-	axEXjWeGzRk5Lpu4U283tMfbvwFKoQqBJq/HSFbufiaspchMqczltzIdIPomOzeSD3DNtb
-	Yul6DYgFjlZDw5neu8XX3s+gzdIPYec=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1768466941; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IcAVv+KWnCRg/40DoITyiU2vnkn2NT3Rm2oPIYRObDo=;
-	b=OqSKW0h/vTBTF5rxkK8jBk2q9SlrT+BMlkvp1CJtp/WTXpRALfw8fxy8tsdL3j99VTBm2E
-	axEXjWeGzRk5Lpu4U283tMfbvwFKoQqBJq/HSFbufiaspchMqczltzIdIPomOzeSD3DNtb
-	Yul6DYgFjlZDw5neu8XX3s+gzdIPYec=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D85283EA63;
-	Thu, 15 Jan 2026 08:48:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UJZeMPupaGnWIAAAD6G6ig
-	(envelope-from <jgross@suse.com>); Thu, 15 Jan 2026 08:48:59 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org
-Subject: [PATCH v3 1/5] x86/paravirt: Replace io_delay() hook with a bool
-Date: Thu, 15 Jan 2026 09:48:45 +0100
-Message-ID: <20260115084849.31502-2-jgross@suse.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260115084849.31502-1-jgross@suse.com>
-References: <20260115084849.31502-1-jgross@suse.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DE832E6BC
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 09:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768467791; cv=pass; b=XrD/osIht3nBWeo0R4O78QeU8U1dC47LGDnqpGaYydE0bNsxJJk3XkhrctF7gF0E/BcyV48pjIRUkgg3eeNMtCBZCxHXx4cHxHpv6pg8jx4Ds/B4cGEfpzfJLfMu0aoQFgqArDUZ34LNoNmAWCQqm+n9EpYRHTl9u5xFh3Y7wBo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768467791; c=relaxed/simple;
+	bh=03g5GHo7VUuroNdnNffpeJG0qnrQfvR4X6uMf/z1OKw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MqwlZRNoT+D/XX4vzuuj2yUd7aFPuG2S3eyPJUfZbOi5liGhW4KGaeoDERi3c79wALN82CoNFFNO8kVBvaAj1hXGz42VfA0zng1AKTH4PEBJxjT3I+60Za26C+DAwvhNMyKQCod7+ZQFpz89Obqrtmvl+6JPTmuIoaZeNqTKFh4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y+TIzgsj; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-501511aa012so446331cf.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:03:09 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768467788; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZcPQdq6+zXkNR07SMF6Rf2TQi26x0tiO7w3gf/BIe9h+a18LW5nGJgMHtWMnmch+/W
+         L5BMtfh1IAQKWa/vn7f/5Dg9kP9T+fC50OOggnbjKAvJlGosjznTRsL1V1PhaWVC1OVz
+         GKPVT7041iISLV6aeul6uAUREMfTAGPmQOsM5rp/pEO7Qor3stpgpIA5+77VpfhfMDT3
+         b/1ri9pRAIiThfwPIT3Iq8Zy/TUJj2m4szkPJbAFx/B9oIxeApOBpFmoyKqwUBNacgbe
+         ccefeJzY+p4byvI9bswbUdtok1pIgj/uCIA2pogmkB5mF4XqQZTrwyxCzuch12jOWBVN
+         1Wqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=jaHTBHlKT0XpapwOdZ2HklxNZ/MZMO/Ynn29Wqw5zNk=;
+        fh=eHwPTZIhX4yd403juZ3wCQwnzWlIHToGuzcBasrMqSQ=;
+        b=JQhWVuVL7jAbNrgm+0TcK2WxxVRs9z0VUhNeUEM4MGc8/zlhBm9gOJ/DJZTmraLwbF
+         F2dmHv0Sf9aorxZk9lE+kHdxaizj4EHoBUhQcohNZNimWGPhfPcIhug+8l9KDaRnqYKm
+         QwzxqHvdyLD+aPKi6rbM5L7LVdw4Zq8tPkhHe3X8a0vqEtpZ3WCxlyF6tgAI3WEXO0eE
+         l+ygAHcWBGhyPNvISOTwRq5COTCUFnjsTr0rmzheS1+2Zrz0NgpYh8mXZCttHDKjA/Hd
+         gu3IhR3uSW0PrVRO9+aCfaLg+cesNOzwLWLcJdeVeBDroTN/MVZZJ5oVzEpo4npSuK01
+         HUoQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768467788; x=1769072588; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jaHTBHlKT0XpapwOdZ2HklxNZ/MZMO/Ynn29Wqw5zNk=;
+        b=Y+TIzgsjwX0wqyLVxHk1V9ZPIbOXuA9OZSYYibpJez1wFrkQujaRFOo5p1sGkl6fgj
+         LU6bpaiZtR9+7pL1gjOyJyuMOP3+ihoibFETGmuyNoIdjWuuJMXbCyr4Z0P90eaN3eQB
+         h9hvaEOE47igHK8xd1x0aJZVoURBgg5zQ7CWNpwwoIkD6AXlhTuUDHnNPS+rm+VV+NH9
+         8rZx9qCAkzjg7MVA5OjbSq2lhVvt5AN48pR3jVKYjqHQbBmAnYwClOtgLMh9YaWZ83Ui
+         JF5XEiFMQsi2pbet37O5LZz/pNq7yUnZnGk3uMpUT9MGOrDvvI6oquIOHZwLBBodRCBc
+         rtnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768467788; x=1769072588;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jaHTBHlKT0XpapwOdZ2HklxNZ/MZMO/Ynn29Wqw5zNk=;
+        b=TP3HtgKoBNdLqUqY6mJwODFgBLG1dzeKg0FP0pD2TIy1HLNtiJowU+W424bQC49CpC
+         O7jKa+cjAo2ozf3VlycI9LiRgIiWuHNMX1DBr6RGnc9aWu7KkyrH3OSXhlKJT4KamGtA
+         26O+2KSypJ3bfQU149plGQiR+hXKzrIcmcVE/A7Jns9Y2yVLa2ksWTchEYWc+s9oBbpK
+         cpea/Iz3YQHLu3hdKeooh9p+IIJdZGtMMYbm3bwI5s/X21hRNUPyu+haXmClM2L1Tab8
+         Y3lasV9SN52/nyn9QKSw8CfsS98QbjOWkPJ9Kk8uEac6ISM06/O5qsdeek8GfQKpqAGy
+         aEIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAQJHo75O97PNlZHF4vkaHUlVWqflfP5urwKFF6Ey5hAHWh+lvfFHbW1xyDmn6byAykQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc4Zug/MCaGjzQJ/Y3nyeDc955T2pO25N3Ekur1DgIY7gFRVO4
+	uZU+Fl9rLjBPgjE8S8txzImQ5pZ1c7Rnym7jgbF7oPNxyxHf4FOVsBrOAGy7BA2btRFfAz+RiDg
+	wWCizzI9M49FUwUjaqaSkXmqab5I1Np533ZbkaZUX
+X-Gm-Gg: AY/fxX7UJUSCamzW8rcm7VtT2jD0WzrWmc1QByxXTF0W1P8FiowVL8gOURXSxFdvyO3
+	FJukLPlbMztNT/vgtgU6yhMdfL9tiI7E6+QNTcegcyTLCskofRPBirGBpGX+/nCc8q8NvoCeWuG
+	mH22xEEvwswsbQgvG/2N6duSQiHk4rRkom8k1DGDzrBq7Duhjq6uSg37tyqAnEumqWTP7G57Fuh
+	8EffFFdcwCeP4wkocHePPqKB4ufug/7FQ74NVv3TR4vu+KwyLVd57YFzoKI5CiWice9N7xF
+X-Received: by 2002:ac8:5dd3:0:b0:4f0:2e33:81aa with SMTP id
+ d75a77b69052e-5026ed4f925mr5343061cf.11.1768467788106; Thu, 15 Jan 2026
+ 01:03:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-23-8be3867cb883@kernel.org> <CA+EHjTyYcrWwBR0AwwdWFfOSwbmTMOhSee7y_-vrMfOxphrvqw@mail.gmail.com>
+ <5a053bb6-5052-4664-b0cb-f05d56d4679d@sirena.org.uk>
+In-Reply-To: <5a053bb6-5052-4664-b0cb-f05d56d4679d@sirena.org.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 15 Jan 2026 09:02:31 +0000
+X-Gm-Features: AZwV_Qg4xCZRn6ebTpsQyf1oiKPYkQGhv7VLsovgzCpdoBOU9QpCHpXoiLQKrWU
+Message-ID: <CA+EHjTwMs6BzZwtcNjyZnxLb9Gs01B1RcDvo1RB-f2w98eMzFQ@mail.gmail.com>
+Subject: Re: [PATCH v9 23/30] KVM: arm64: Context switch SME state for guests
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-The io_delay() paravirt hook is in no way performance critical and all
-users setting it to a different function than native_io_delay() are
-using an empty function as replacement.
+On Wed, 14 Jan 2026 at 17:28, Mark Brown <broonie@kernel.org> wrote:
+>
+> On Tue, Jan 13, 2026 at 02:24:56PM +0000, Fuad Tabba wrote:
+> > On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
+>
+> > > +#define sme_cond_update_smcr_vq(val, reg)                      \
+> > > +       do {                                                    \
+> > > +               u64 __smcr = read_sysreg_s((reg));              \
+> > > +               u64 __new = __smcr & ~SMCR_ELx_LEN_MASK;        \
+> > > +               __new |= (val) & SMCR_ELx_LEN_MASK;             \
+>
+> > Similar to what I pointed out in patch 15 [1], I think you need to
+> > preserve the other bits, since SMCR isn't just about the length.
+>
+> This does preserve the existing bits?  It reads SMCR, masks out and then
+> replaces the length.
 
-This enables to replace the hook with a bool indicating whether
-native_io_delay() should be called.
+You're right. Sorry for the noise.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
-V3:
-- rebase to tip/master kernel branch
----
- arch/x86/include/asm/io.h             |  9 ++++++---
- arch/x86/include/asm/paravirt-base.h  |  6 ++++++
- arch/x86/include/asm/paravirt.h       | 11 -----------
- arch/x86/include/asm/paravirt_types.h |  2 --
- arch/x86/kernel/cpu/vmware.c          |  2 +-
- arch/x86/kernel/kvm.c                 |  8 +-------
- arch/x86/kernel/paravirt.c            |  3 +--
- arch/x86/xen/enlighten_pv.c           |  6 +-----
- 8 files changed, 16 insertions(+), 31 deletions(-)
-
-diff --git a/arch/x86/include/asm/io.h b/arch/x86/include/asm/io.h
-index ca309a3227c7..8a9292ce7d2d 100644
---- a/arch/x86/include/asm/io.h
-+++ b/arch/x86/include/asm/io.h
-@@ -243,11 +243,16 @@ extern int io_delay_type;
- extern void io_delay_init(void);
- 
- #if defined(CONFIG_PARAVIRT)
--#include <asm/paravirt.h>
-+#include <asm/paravirt-base.h>
- #else
-+#define call_io_delay() true
-+#endif
- 
- static inline void slow_down_io(void)
- {
-+	if (!call_io_delay())
-+		return;
-+
- 	native_io_delay();
- #ifdef REALLY_SLOW_IO
- 	native_io_delay();
-@@ -256,8 +261,6 @@ static inline void slow_down_io(void)
- #endif
- }
- 
--#endif
--
- #define BUILDIO(bwl, type)						\
- static inline void out##bwl##_p(type value, u16 port)			\
- {									\
-diff --git a/arch/x86/include/asm/paravirt-base.h b/arch/x86/include/asm/paravirt-base.h
-index 982a0b93bc76..3b9e7772d196 100644
---- a/arch/x86/include/asm/paravirt-base.h
-+++ b/arch/x86/include/asm/paravirt-base.h
-@@ -15,6 +15,8 @@ struct pv_info {
- #ifdef CONFIG_PARAVIRT_XXL
- 	u16 extra_user_64bit_cs;  /* __USER_CS if none */
- #endif
-+	bool io_delay;
-+
- 	const char *name;
- };
- 
-@@ -26,6 +28,10 @@ u64 _paravirt_ident_64(u64);
- #endif
- #define paravirt_nop	((void *)nop_func)
- 
-+#ifdef CONFIG_PARAVIRT
-+#define call_io_delay() pv_info.io_delay
-+#endif
-+
- #ifdef CONFIG_PARAVIRT_SPINLOCKS
- void paravirt_set_cap(void);
- #else
-diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
-index b21072af731d..f4885bd98a18 100644
---- a/arch/x86/include/asm/paravirt.h
-+++ b/arch/x86/include/asm/paravirt.h
-@@ -19,17 +19,6 @@
- #include <linux/cpumask.h>
- #include <asm/frame.h>
- 
--/* The paravirtualized I/O functions */
--static inline void slow_down_io(void)
--{
--	PVOP_VCALL0(pv_ops, cpu.io_delay);
--#ifdef REALLY_SLOW_IO
--	PVOP_VCALL0(pv_ops, cpu.io_delay);
--	PVOP_VCALL0(pv_ops, cpu.io_delay);
--	PVOP_VCALL0(pv_ops, cpu.io_delay);
--#endif
--}
--
- void native_flush_tlb_local(void);
- void native_flush_tlb_global(void);
- void native_flush_tlb_one_user(unsigned long addr);
-diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-index 7ccd41628d36..3946d0f69921 100644
---- a/arch/x86/include/asm/paravirt_types.h
-+++ b/arch/x86/include/asm/paravirt_types.h
-@@ -30,8 +30,6 @@ struct pv_lazy_ops {
- 
- struct pv_cpu_ops {
- 	/* hooks for various privileged instructions */
--	void (*io_delay)(void);
--
- #ifdef CONFIG_PARAVIRT_XXL
- 	unsigned long (*get_debugreg)(int regno);
- 	void (*set_debugreg)(int regno, unsigned long value);
-diff --git a/arch/x86/kernel/cpu/vmware.c b/arch/x86/kernel/cpu/vmware.c
-index a3e6936839b1..eee0d1a48802 100644
---- a/arch/x86/kernel/cpu/vmware.c
-+++ b/arch/x86/kernel/cpu/vmware.c
-@@ -339,7 +339,7 @@ arch_initcall(activate_jump_labels);
- static void __init vmware_paravirt_ops_setup(void)
- {
- 	pv_info.name = "VMware hypervisor";
--	pv_ops.cpu.io_delay = paravirt_nop;
-+	pv_info.io_delay = false;
- 
- 	if (vmware_tsc_khz == 0)
- 		return;
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index de550b12d9ab..8c3221048d9f 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -75,12 +75,6 @@ DEFINE_PER_CPU_DECRYPTED(struct kvm_steal_time, steal_time) __aligned(64) __visi
- static int has_steal_clock = 0;
- 
- static int has_guest_poll = 0;
--/*
-- * No need for any "IO delay" on KVM
-- */
--static void kvm_io_delay(void)
--{
--}
- 
- #define KVM_TASK_SLEEP_HASHBITS 8
- #define KVM_TASK_SLEEP_HASHSIZE (1<<KVM_TASK_SLEEP_HASHBITS)
-@@ -314,7 +308,7 @@ static void __init paravirt_ops_setup(void)
- 	pv_info.name = "KVM";
- 
- 	if (kvm_para_has_feature(KVM_FEATURE_NOP_IO_DELAY))
--		pv_ops.cpu.io_delay = kvm_io_delay;
-+		pv_info.io_delay = false;
- 
- #ifdef CONFIG_X86_IO_APIC
- 	no_timer_check = 1;
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index a6ed52cae003..792fa96b3233 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -94,6 +94,7 @@ struct pv_info pv_info = {
- #ifdef CONFIG_PARAVIRT_XXL
- 	.extra_user_64bit_cs = __USER_CS,
- #endif
-+	.io_delay = true,
- };
- 
- /* 64-bit pagetable entries */
-@@ -101,8 +102,6 @@ struct pv_info pv_info = {
- 
- struct paravirt_patch_template pv_ops = {
- 	/* Cpu ops. */
--	.cpu.io_delay		= native_io_delay,
--
- #ifdef CONFIG_PARAVIRT_XXL
- 	.cpu.cpuid		= native_cpuid,
- 	.cpu.get_debugreg	= pv_native_get_debugreg,
-diff --git a/arch/x86/xen/enlighten_pv.c b/arch/x86/xen/enlighten_pv.c
-index 8a19a88190ee..9c9695f5d158 100644
---- a/arch/x86/xen/enlighten_pv.c
-+++ b/arch/x86/xen/enlighten_pv.c
-@@ -1046,10 +1046,6 @@ static void xen_update_io_bitmap(void)
- }
- #endif
- 
--static void xen_io_delay(void)
--{
--}
--
- static DEFINE_PER_CPU(unsigned long, xen_cr0_value);
- 
- static unsigned long xen_read_cr0(void)
-@@ -1209,6 +1205,7 @@ void __init xen_setup_vcpu_info_placement(void)
- 
- static const struct pv_info xen_info __initconst = {
- 	.extra_user_64bit_cs = FLAT_USER_CS64,
-+	.io_delay = false,
- 	.name = "Xen",
- };
- 
-@@ -1392,7 +1389,6 @@ asmlinkage __visible void __init xen_start_kernel(struct start_info *si)
- 	pv_ops.cpu.invalidate_io_bitmap = xen_invalidate_io_bitmap;
- 	pv_ops.cpu.update_io_bitmap = xen_update_io_bitmap;
- #endif
--	pv_ops.cpu.io_delay = xen_io_delay;
- 	pv_ops.cpu.start_context_switch = xen_start_context_switch;
- 	pv_ops.cpu.end_context_switch = xen_end_context_switch;
- 
--- 
-2.51.0
-
+Cheers,
+/fuad
 
