@@ -1,40 +1,41 @@
-Return-Path: <kvm+bounces-68243-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68244-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA9C7D286A2
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 21:29:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BC2D286AE
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 21:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D8E030AB946
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 20:29:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89E6B30B9BA5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 20:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92BF43242BD;
-	Thu, 15 Jan 2026 20:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F32523909F;
+	Thu, 15 Jan 2026 20:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RkpZ5xAE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JEcg5bOd"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013012.outbound.protection.outlook.com [40.107.201.12])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012006.outbound.protection.outlook.com [52.101.48.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704C731AA94;
-	Thu, 15 Jan 2026 20:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35F43242DD;
+	Thu, 15 Jan 2026 20:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.6
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768508957; cv=fail; b=bWkqu8Ly9X2VfSQwMJYJwyBhvh8shv1svnm3vIyM9My4zZUFAFasmrG/pztSKBiOEmaZegGpq1t7V7k5eqGJV+PYsJfeKuCWIGMnK1aFe7Ofx3+V/FPak6B1LEKheMz3qCuH+yjKB7GcqKwKxsqoW4cJuzg5RanPUDDRhXJGF9c=
+	t=1768508963; cv=fail; b=ktAfrbNYRTmkpGA3kLuXM5Ld0EKmqFzzAnc2FtumWrv+9TO8bfwZjhiwU1owHqaa5BuICrxP/ii6IOH2id2caulInUgziYExuZ+ns1p+In7E3wVx/szNxiwVp1NWWWnXMdi5WRQjV94RS7YwGJAGJ6UVbY39e1DkyOuwWfZOXX4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768508957; c=relaxed/simple;
-	bh=31aPWL8yFEORy5f1EM/dWRGiQ/QPsJQ4Vz+V60Q8evY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YD5/dYtGvoT4VYhESIY1kFr7cwTi8uw9ABREFAnzpIoes+z6TIp0wE1NgeOksczVXoe+zYmU9bndYLp+Rb7zSDSE8xBAqYMxdvEXIgNB2ZAhwfHMATxyFlf4NBrUtZWyX+M1PoZi5Kv2dLr6tKccwnaqZFUaIO5LzyruE+kU4LY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RkpZ5xAE; arc=fail smtp.client-ip=40.107.201.12
+	s=arc-20240116; t=1768508963; c=relaxed/simple;
+	bh=OykvN3WVot5YOHuMxy9/W6f3FTTD8MGg/f7XDgP/H3M=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e8zS8xpgjiaQWfaRg6nzhNQSQ5IK4PEm6IlR0E6LhItoxP1LOp1mrqU5X7PVJt72j128ydLiSz3aCHzJNImkjopseK09uplmsX5ptOoSlts1ABjONvkiHi5jKY7Ieyb4GJQLZARCQ6l++qxkz0hzQHJdFAztSn9KThc1IEBVVUg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JEcg5bOd; arc=fail smtp.client-ip=52.101.48.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hQKJC7DT2YD8M74siC2JS/NVc5t6avwT5I70PoLpyEa+gDdiR1s8TQmRxqV6kuZEcOorh6wdyFg3uw/jJ5YS2Yhl8XORxoMWbBJduzeZVg4grR98L1BE9l6VTIg3V5D0X0aq25R3qxiUx+l2nib0/SfEmbLJYfgvvNCVWwQw9v2ecpk3l3ak7359M9f6i05lpAFZoe+iFOT1J2Q3T3nW0j9MHKNuWlpzfn9sLW37nGOP9XvRPPPKZluNXE7HQP1ugX3Z9AlB1vRSa1x73YA+AXb+MEE4Pu50YWOlUhoCDTuhdiEl0qHjtfdgHhNqVobPy+DQ+cTdRyXQrMWxqgLyhg==
+ b=qSYZrsThxwKV5mVSBWli2jphJrExEpm5W3ZQ4r117t67glgu/eh4bjjox1bhnZ8XghmkVPvQ8pvVNfp0MBLrppHVl1+C8hXRQXIomTWgSehf1TIMCG8lQm2PlPmUIW5nni46V7e5mkO7IWu1s1dfBIC5z13QPqOlBJN223QNRq3b5EBMr4Hobi+EcplkIeXBS5Og+GOJgT9O49hcRv/HdpM/hpMipqnD4KQdfm23YyYzhzO7BPefDsXjQm5jVUxK2hGYHO90yMWDo8IqAgSsuHawzN6ADoYpDsi8/hGz58V8hTlUQWN8kLfxGpRPHhodJYQsWBSKL/jWDuXizFmvwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iP+J5W1eea5ocG7hIf+K/EsJXXePeB1JgZNrvWejgtw=;
- b=j90HqbcJrrwIOsmARFuBglcku5GcMFT2cRRRCzeUy75/sHlX7KOFoQiu8SiqkoELofCRvBNBMQ/GEOl58/EWtW2F5DmBS5i5fENLNHTt0GyqGka/jaYk/Qx+n5jvLRbiDCI5SH+VHBAs+VjMT1M6kL7IxXoI+mZBJuZdPkEK2gYfPJh8dSCZgEugXEqW3xgDE70DuuLJ0/1CLinbbLsjjd4dfgzgBHztX0nYaEipeiAbt7z9aipCa32U8PuXFAXrZa+lYTMA55K2w4fT1SRD+SlQUlmY9LQ8COuUiSsm1v0q1rs40SX8xlVeTnfO9X38otnzZ8mw7cSLRSc6PeFN/w==
+ bh=P+9X97v8oLGLYonIialThNeDaSCMrIwHdgiUJqYKE3k=;
+ b=D+5ghpmzHffyaPU1Exe7Rzo3a8coKuQM3bGLZJIMg2XrXl6ijRenp2b2w9qTfsxljZMhUROQ8mo+D0wJFIdF/gps1TzoOXxkvxqUVph/2uEbhGVxUL8EltdLo31C/kbVldO6rjM9/hEHfEwY9WkncJaDcbpAjHRoi743Kj6VEHyRcr1UGIOP7lklupRoQSN+sZgzd/88fRbHPeH2jjenqN4k2lVapvmnE7zCY30VQa/GM+QayJZD7Q7TLETaoDSBNsXTNb6nXc1Q6/UMERUyZpGVp7AL8mWFqWIEKzp3lh9N0Y8zhTgRt4HYAONuBsSfG9mmdZmH4d45ZQ92DFtVFA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -42,18 +43,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iP+J5W1eea5ocG7hIf+K/EsJXXePeB1JgZNrvWejgtw=;
- b=RkpZ5xAExXLfEHUNszHyq2K1TygSUjTeeW/+FtgRYt6yXP/qH2IWkFW4Q2LnhnH2dx043boa+tBnS3I78ZDvYguuLpmvDquthpuDoT/j5vvduZmp/YRQ37bNWW+qG2SCQqeZX0kbRhcze/5UttyeNQOgGewIsYPgTlqdtAQkfAaA6BASKRPwO8fF6rGgyx44cf/KbSVvhmKMfVcNC+1n6mo8u2l1iZveSMY45PTn/EecGl1qstFC/9j0vOjnrbg686ee7u0vB3/b/0wKtSRyarmDodosNYxKyuB6shsE2zjQdol9Itdsxilw9P9okmbfWDN20VU0pOanqJlyEeuSgw==
-Received: from MN2PR02CA0018.namprd02.prod.outlook.com (2603:10b6:208:fc::31)
- by CY1PR12MB9697.namprd12.prod.outlook.com (2603:10b6:930:107::6) with
+ bh=P+9X97v8oLGLYonIialThNeDaSCMrIwHdgiUJqYKE3k=;
+ b=JEcg5bOdgkOBL9SzMYr+2kL9naywV76olcx+JtjIGu4SBT0nZoMJ8KBqb9mK6Xlr98Kf00ibSahXzZnh/mvJ/MQPFYvfr/hdv7BW6MmObUKJVf3LFLbRSzrVyTqh0uRGX7G/JlCso/Reqj3x/6uyeQJHuxlUUX+VW8N5lxlE3TfEeeCaxxxLtr8ewHGG+k9Ej2t3ZIaE738Uly26gYT3ZoQOTKr7Nf/ihWx7EoHDS9wHmYm8r3egXLVkbzN3hfOnfo+WyHeZ2MA4y0dDKFlBYWl+2ypHH3rKh2/UlLyl4WtDEWU3b8o/GXsZEq23lmIr7luH1N+5LyWsQjN2RFFN4w==
+Received: from MN0PR03CA0003.namprd03.prod.outlook.com (2603:10b6:208:52f::8)
+ by DM6PR12MB4465.namprd12.prod.outlook.com (2603:10b6:5:28f::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Thu, 15 Jan
- 2026 20:29:12 +0000
-Received: from BL6PEPF00020E66.namprd04.prod.outlook.com
- (2603:10b6:208:fc:cafe::29) by MN2PR02CA0018.outlook.office365.com
- (2603:10b6:208:fc::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.6 via Frontend Transport; Thu,
- 15 Jan 2026 20:29:11 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Thu, 15 Jan
+ 2026 20:29:15 +0000
+Received: from BL6PEPF00020E65.namprd04.prod.outlook.com
+ (2603:10b6:208:52f:cafe::57) by MN0PR03CA0003.outlook.office365.com
+ (2603:10b6:208:52f::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.7 via Frontend Transport; Thu,
+ 15 Jan 2026 20:29:12 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -61,17 +62,17 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- BL6PEPF00020E66.mail.protection.outlook.com (10.167.249.27) with Microsoft
+ BL6PEPF00020E65.mail.protection.outlook.com (10.167.249.26) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9542.4 via Frontend Transport; Thu, 15 Jan 2026 20:29:11 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ 15.20.9542.4 via Frontend Transport; Thu, 15 Jan 2026 20:29:13 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 15 Jan
- 2026 12:28:51 -0800
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 12:28:52 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 15 Jan
- 2026 12:28:50 -0800
+ 2026 12:28:51 -0800
 Received: from localhost.nvidia.com (10.127.8.12) by mail.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
@@ -83,10 +84,12 @@ To: <ankita@nvidia.com>, <vsethi@nvidia.com>, <jgg@nvidia.com>,
 CC: <cjia@nvidia.com>, <zhiw@nvidia.com>, <kjaju@nvidia.com>,
 	<yishaih@nvidia.com>, <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>
-Subject: [PATCH v2 0/2] Register device memory for poison handling
-Date: Thu, 15 Jan 2026 20:28:47 +0000
-Message-ID: <20260115202849.2921-1-ankita@nvidia.com>
+Subject: [PATCH v2 1/2] mm: add stubs for PFNMAP memory failure registration functions
+Date: Thu, 15 Jan 2026 20:28:48 +0000
+Message-ID: <20260115202849.2921-2-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260115202849.2921-1-ankita@nvidia.com>
+References: <20260115202849.2921-1-ankita@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,95 +101,98 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00020E66:EE_|CY1PR12MB9697:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca295ede-7161-4a23-7ab0-08de5474be6b
+X-MS-TrafficTypeDiagnostic: BL6PEPF00020E65:EE_|DM6PR12MB4465:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4edc3f02-05f6-466e-8cba-08de5474bf2d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024|13003099007;
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GCb8W3FS4oaqTROvONUzN6FLF0NhxChfjR1upsRxU6nfG+9zg0T3K+ItC1iI?=
- =?us-ascii?Q?+MSnqD15yVy7NfKD26qN3jI9xe7AHtC/gdtGJAojgd+Gp2MPAM+9zaLuG6FC?=
- =?us-ascii?Q?ozJvEy/b1ENV7PmtNAmKKCSgKKxfHCL20wuk5EALfzO9ssSkxB7U0Yww32aB?=
- =?us-ascii?Q?vzcOLOkEOKKx8VVPp5hdAK9GNwgA4MnsBWC5aXd93Sxa6sD/lM1xcvvrbzDR?=
- =?us-ascii?Q?58E5NeBFeIiHaM9/+QfC2hDfiRAUhQlyF6ioGzGnzqEk8+CQrVDgLG0vePKP?=
- =?us-ascii?Q?SV90pLP81dI5R41AcgsTadzf+FH+L0SGv3DlB+f3amqGZpOh61Gk5DKWA7mS?=
- =?us-ascii?Q?LZzIzmKbv0rf5WNMstMEDI9WWjnK11Ij9b4Wv21kw8YvLTMfGfI9MlckpCwS?=
- =?us-ascii?Q?fGBXCZzY2+mYgXTcCskMoiTsH9Ag4L0ZSfxr2ow3zgrksGIqv576xPf8Ht5/?=
- =?us-ascii?Q?uqqG7pjf/7LioqGTHvK5PBv1MpHfsreFcd+3Ui9VB/6rljuy9vQbqpS1RbAF?=
- =?us-ascii?Q?k/kk5P0M3SYlqmy/ej/xeyj+3WK22u9+mlmctSFYEuo3pLgb49C67NDkslRg?=
- =?us-ascii?Q?RZZCBxILvS2divObybTnxOumfafYrT1XGyOyCwqvvG3vUvWmJ1GqvcOhsJ32?=
- =?us-ascii?Q?ouxh7iln5jO26jIxPFg6mMSDASIlpY0h1i+hSz5l7Bs8z/5EEL1KoRSgx0gF?=
- =?us-ascii?Q?g4qVv7xjInvphzYadrwij0gwR1vjKcBEhBNJO6QSG9bFxkgbKpigNgm5YCvI?=
- =?us-ascii?Q?VY9WkFhuglhpKWcR7E/VYNgJlmm7waE4HPZVEpXQwr+ighSi84R9SNkKBNNF?=
- =?us-ascii?Q?efzMvQwiZNNRupKPA4ynA8RS3lTuMs1F56evjy0glXn7pXw0tw17dYRYMIgu?=
- =?us-ascii?Q?OSCENa0l6o3y11LImMheDj0/95Lscow+n+4hQU8T3QOCzrC0JOu4RWVWTjNQ?=
- =?us-ascii?Q?IxajaoQPVO0R30kXzqErqOZMnxVcfW5vksZ25ffvZffAV+U4hp5MLHs3f8cy?=
- =?us-ascii?Q?VCQrA8veaPlmwENp9VvTHkYBj8kL1BrYxjRo5SHPdFPBqZPdCt4fY4uHXE8x?=
- =?us-ascii?Q?FQaSZ3UDoQYNPB7RFkBHfw8rc60F9fOANJ+Xhsm22VUhonlAnGYtx6Oz5dR4?=
- =?us-ascii?Q?8QslDfiMSHq4t+CQldlRdfWgu+QKA98R33AVJ2Fhg3lh2SNRlBwKCnyVzo4h?=
- =?us-ascii?Q?EsVrDLR8fMgeqH3/hXZP2OWISnw1rFg14Pt0R7fx4YTXachE3OY/SGb66XPd?=
- =?us-ascii?Q?B6xpaqMOX42V24zaTXeH4AF8/dMNFkxJ4P2ToUehJRLXb/uoIVL7oz0OPPgR?=
- =?us-ascii?Q?M8eEUyf8D0NQ54w2OoMbs9nxcdyJl++v/0vDz41t9cgbcvVJiWw3jwZ4wruk?=
- =?us-ascii?Q?1b7usIj4tVIvRsx7dVwVIxciN1zPK0xonJmNOC5W6fiY201PhQFF6ZU9Uj3t?=
- =?us-ascii?Q?MKp8AF8pDy8IKm8jmuqPHF37gCqzvxYjDJxlIlErEHmOQerYNfWRAJDoA8AI?=
- =?us-ascii?Q?ttuOSKMrXujeU12Iy68jg3P6d5IkPCJGvwp6J7sGBIHECg6Uq9jnp1AygJLE?=
- =?us-ascii?Q?hEcRVlyNkcW+95/WRcKR0d83Y9aWtGcgzAoSwU7AwyOnyliyuk7+DO6AF8Ub?=
- =?us-ascii?Q?HWQqk4YaPsf6dTwLVZA6fF54cCEgQ+Wkyn4uv87Zl5smyBE8V4tPPCeGyffv?=
- =?us-ascii?Q?8mPUdQ=3D=3D?=
+	=?us-ascii?Q?ADgPXJjKy5/WXM7m+u+1q001YoaKpEe7ABDebyz++5PC7f+yG/3TFxgFXe/o?=
+ =?us-ascii?Q?R2YJWDPdtZ1upbxbfkd9JmwjM04XwRRUc14Uc5eGvjiVkn3Kt+s9+laVCQ5+?=
+ =?us-ascii?Q?pmSTVxkC22rTTr9zAUv8uGDEBn1cuduhmpRBWffHPYcIS67tEtB86xEov8Zz?=
+ =?us-ascii?Q?sBmBs9jz9gvuBklNYILKXojFlHY863TJL0EVJ6qQ41gR9D5jY0up8ow6Gb4V?=
+ =?us-ascii?Q?6nOLW8gigfR6e68Q6j8u0wDNIjrPCboweBh3jqOmmS8hVGki/XT0oQRa7CFb?=
+ =?us-ascii?Q?09kJns3UqRuNMzIQ73Cr574oOm9v88zKdA9L84+gnXDW73OsjJTEQ0rQ16Xf?=
+ =?us-ascii?Q?gxXxlr5XTAiONABBECleXRcmx1+VloEKJF6GZTgpeqzGyDFqw+D/mt4CKk/W?=
+ =?us-ascii?Q?ywuOUlMAhpfOm8eWYuAxWQB6tfUa1jwazQ4gembaZlgN2FUEoTmxcbPsAuwM?=
+ =?us-ascii?Q?RXEq0YOrDRI3MjwHgK/svQHb3xGQNfSIRuBEF5L4umZtAQObZzFbqW2sERVM?=
+ =?us-ascii?Q?0TVqdQKcaOq84gNtNUkw7qoLKws+RFMVLyHBJbNPSiA4TP8x0kvAtYKO2co1?=
+ =?us-ascii?Q?98eWxB74LkqWZHs0f6K3lHNwx37jdau+mezwNDNdrHy2mJBdjArlA9yzNWYN?=
+ =?us-ascii?Q?ctBwiV7ZoHjEaOsOUg3qe4PYG1pRKOlmONKGM2EckGzbaa6E3d0hDopMEyzW?=
+ =?us-ascii?Q?j1mhJoPM8pvLs/vlk9jr+gZEn3GBrI3oOJjIN0dHZ6HXa4FVi5h0WBGS/UeD?=
+ =?us-ascii?Q?/AI/p7sJNAIwUHkYL8u1RtOhiP10xyK4B1KveYK8M+W6EE507o8x6h7PieI5?=
+ =?us-ascii?Q?1JqwZ3uQra6hzFoCawcSjU0wUH/15ZD9OFsTPhJJkhfQ81vuocmOxlfCRmJ3?=
+ =?us-ascii?Q?JPh8dBdM7/iRmJIAnuKdLNNDvNKqehYzyzNEdMRTDWhKWeIegl9R1KHjwIpg?=
+ =?us-ascii?Q?OkLxo0HsFVMfmVylF+MBnRJ4552USOPcMTVNUxbLKHDrcfe6Xi2Z+zfAbVe8?=
+ =?us-ascii?Q?vtg5XFj1NYX5uhQUSb6KmlXKhyqAE9Ui17ydq9FGUc1iUaiGQIriN+iPO30P?=
+ =?us-ascii?Q?eImA1gXbDjHMRv4TXJeeN2oF3cvgJpw1V1z0jZvWfmAMDrrvVRB5ci3cdqpQ?=
+ =?us-ascii?Q?e+wj+KEOLCxCc9ruKB0UNnGrzYA+WgGPbkSxOIxLIc27NUOIBo9zP47sdaHE?=
+ =?us-ascii?Q?ALwxqWQpKqllkypV/nklX/dYff8lst4utQDmOYZj/urZIO0sPy0jZ8PuAps4?=
+ =?us-ascii?Q?eej4KGjuiPtyLEqtg+/9eHQfFTz1HIsz1Vc6ga7+UNGP78TMJ1pO650PTPha?=
+ =?us-ascii?Q?JF3JFnL9lPp06s0C/AJLXu5Y+QcMRyuANOiBdHe7YciCV12b7av23aI6u42P?=
+ =?us-ascii?Q?n8m+sPsfe5qpkfY5xF/K2x9ChMKVTdasCtzVUJpMOhSzeOmjHiMYJwzURduq?=
+ =?us-ascii?Q?2y4QHEakM9jbNRJWNUADkv8IW87OOs/odgH7dmxrrLX72m4w6EGwZU39MjgJ?=
+ =?us-ascii?Q?Ew/B2g/RItV8sdvfJXiUf+Tsd/DJnUK6Nxi0Vztf+WkY0l/rSjrZG7Bd/SVV?=
+ =?us-ascii?Q?f9UfYd31xWwDl6WUfTSrTRGESSoZTybGk4m0VqWy+Ga1ayGcUKce0wd/G8jJ?=
+ =?us-ascii?Q?Jkmkr4spuNNELgIf0sKqzNPXG6Xuz0hGSB/YLjepOviJ85tlmLYaeRzJ8CMF?=
+ =?us-ascii?Q?Vok2bw=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2026 20:29:11.8063
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2026 20:29:13.1702
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca295ede-7161-4a23-7ab0-08de5474be6b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4edc3f02-05f6-466e-8cba-08de5474bf2d
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00020E66.namprd04.prod.outlook.com
+	BL6PEPF00020E65.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR12MB9697
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4465
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-Linux MM provides interfaces to allow a driver to [un]register device
-memory not backed by struct page for poison handling through
-memory_failure.
+Add stubs to address CONFIG_MEMORY_FAILURE disabled.
 
-The device memory on NVIDIA Grace based systems are not added to the
-kernel and are not backed by struct pages. So nvgrace-gpu module
-which manages the device memory can make use of these interfaces to
-get the benefit of poison handling. Make nvgrace-gpu register the device
-memory with the MM on open.
+Suggested-by: Alex Williamson <alex@shazbot.org>
+Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+---
+ include/linux/memory-failure.h | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-Moreover, the stubs are added to accommodate for CONFIG_MEMORY_FAILURE
-being disabled.
-
-Patch 1/2 introduces stubs for CONFIG_MEMORY_FAILURE disabled.
-Patch 2/2 registers the device memory at the time of open instead of mmap.
-
-Note that this is a reposting of an earlier series [1] which is partly
-(patch 1/3) merged to v6.19-rc4. This one addresses the leftover patching.
-Many thanks to Jason Gunthorpe (jgg@nvidia.com) and Alex Williamson
-(alex@shazbot.org) for valuable suggestions.
-
-Link: https://lore.kernel.org/all/20251213044708.3610-1-ankita@nvidia.com/ [1]
-
-Changelog:
-v2:
-- Fixed nit to cleanup nvgrace_gpu_vfio_pci_register_pfn_range
-  (Thanks Jiaqi Yan)
-Link: https://lore.kernel.org/all/20260108153548.7386-1-ankita@nvidia.com/ [v1]
-
-Ankit Agrawal (2):
-  mm: add stubs for PFNMAP memory failure registration functions
-  vfio/nvgrace-gpu: register device memory for poison handling
-
- drivers/vfio/pci/nvgrace-gpu/main.c | 113 +++++++++++++++++++++++++++-
- include/linux/memory-failure.h      |  13 +++-
- 2 files changed, 120 insertions(+), 6 deletions(-)
-
+diff --git a/include/linux/memory-failure.h b/include/linux/memory-failure.h
+index 7b5e11cf905f..d333dcdbeae7 100644
+--- a/include/linux/memory-failure.h
++++ b/include/linux/memory-failure.h
+@@ -4,8 +4,6 @@
+ 
+ #include <linux/interval_tree.h>
+ 
+-struct pfn_address_space;
+-
+ struct pfn_address_space {
+ 	struct interval_tree_node node;
+ 	struct address_space *mapping;
+@@ -13,7 +11,18 @@ struct pfn_address_space {
+ 				unsigned long pfn, pgoff_t *pgoff);
+ };
+ 
++#ifdef CONFIG_MEMORY_FAILURE
+ int register_pfn_address_space(struct pfn_address_space *pfn_space);
+ void unregister_pfn_address_space(struct pfn_address_space *pfn_space);
++#else
++static inline int register_pfn_address_space(struct pfn_address_space *pfn_space)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline void unregister_pfn_address_space(struct pfn_address_space *pfn_space)
++{
++}
++#endif /* CONFIG_MEMORY_FAILURE */
+ 
+ #endif /* _LINUX_MEMORY_FAILURE_H */
 -- 
 2.34.1
 
