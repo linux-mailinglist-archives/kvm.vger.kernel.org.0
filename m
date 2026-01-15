@@ -1,159 +1,138 @@
-Return-Path: <kvm+bounces-68101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68102-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D66D21D69
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B35D21DE4
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:36:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A50D302CF43
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 00:19:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A89E3033702
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 00:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 580968287E;
-	Thu, 15 Jan 2026 00:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC91199FAC;
+	Thu, 15 Jan 2026 00:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MwAaTfOD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N8aevUHY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CEC1397
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 00:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA82312FF69
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 00:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768436362; cv=none; b=sbFZHEtQ/6yNuAWd9OmZVjLP0oVTiCK3dTwdvM09i6VQkPgNam7BE4k9vwZrNlzMNyMh5IOmY0JHdbIGNjAYmGe9qEY1JoCWigBJ9plNl3wm1QGnvcfD3vtddrFCPCJgzTBN4YSObXulCy7GHUGE5y5ZUqTo3GoPc3MlYjR9ItA=
+	t=1768437342; cv=none; b=QKEXr8dAIhOFcVG56RCuOmFxpKGepn43HEYq1597rgTYStFGkzSa7G37LmtAUovJI5A5kUm2cviUfKd9y90HRrKYaVqbfzl7WzSPuwJGEBIeOoP2wPcCDYiZpsO0nKlUC0dHCw8IH/RAmenvgj5YKQ74IbiL9DRm7IJ8JJJAK10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768436362; c=relaxed/simple;
-	bh=9OJ7Bv6EmPT04u7hksmUAJ9D2DTfAs/+5EMvZVUoIQQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EN38BSHmYvi/FbTLOlEwhS8PEOL5CESLDDSzSYDWveHElpS4bRZq7mfpPykv2LyP5uy0wuOhdkQ9D8LVWDHm+7CS/LY+G8NtgqSNeau9WZ3wdpx57oroHtULJPYPrzBBRouerL+hscw1PB+p7TeS9jzh0WO9CtibRMBzkTXrOi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MwAaTfOD; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a090819ed1so2290415ad.2
-        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 16:19:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768436361; x=1769041161; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XXs7JrUDbBtoVcfFWKUiB6HLb56edwyCJBhI/Mr8b0I=;
-        b=MwAaTfODNJ9vr+kuwK879daP5Gb6tbPftLn1uLZL9rC2sZKckFKlVra7FwHLm+UbV0
-         yjN08AWSyz23Z078oZID7BoUiXQa0BWmzAL/OCWa2THoglmaKS46413MCA6Cibysm+rB
-         nCCaOlB55V/VkYvJJzWZ7XRIKizdMINIm4ilR1ylYAK5wOISHP0nHwHkuAEarHXTyWFo
-         Wp5AA59d1E/dk1fpiLGGHCBx3p0Dw2JAkQ3JNlaJIpMTGoU8uF8uXrKG6RIbco+hYqQ3
-         Rgh51RBTnVlLVCTlgNckwgmU7RPnig+mVe0rSnE5zLDOyEvW9/PPjabNYzXHZKe0qd3p
-         SEWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768436361; x=1769041161;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XXs7JrUDbBtoVcfFWKUiB6HLb56edwyCJBhI/Mr8b0I=;
-        b=uyR5IyhkK7dr5KFYmpeLH6092flHEuEHwnRGyWlNXZkFtUd3ynz1a5kJb/u/qj0Hc9
-         GiHnfWEuYr42W2p+7WwbdIZ1C7ILOPmWSjGgf6wbRaHpv27FBbMtIVION3R1PKY0J9Mz
-         JthudVUY8YRwjAfDMh5kXA5Ya51Kwr0GFhO8k6TyIxD2BcxcmQAs1P+Gy5QpuYIM19ws
-         EWwrmO2p2sN944ai6vfwc9ZRa4lZrMTYOH6L+cF8igdxaishxsmpddB2hyH7PW5SSuhs
-         hoqaS9NKlFWdhddTso4NUTqX2i9F5A0dWSbUVeMrWTV4EprsRXdo4bq9PbMzi5K3+iC+
-         rS4g==
-X-Forwarded-Encrypted: i=1; AJvYcCX84aJ/WfxCG2r8hGONxoVqbViOVqKkVnnMCiZxlaTPH2wFCn+gxKiY9MG6LYvztZRH/sY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgyDAQOObo90d8+w4UAeWx2fukCvhgYdOUyfKY3BlH5tW+YkHu
-	RZqMIaoSI7Vwd+Tzhi3823JnVGZaXhBlDG3HLo8mI2dIeAwNuE2Oh5pNiSrZgq2W39kab2kH1Fx
-	QubTmtA==
-X-Received: from pjbpv8.prod.google.com ([2002:a17:90b:3c88:b0:34c:d9a0:3bf6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:11cc:b0:2a0:be5d:d53d
- with SMTP id d9443c01a7336-2a599ea7c5dmr43733585ad.53.1768436360589; Wed, 14
- Jan 2026 16:19:20 -0800 (PST)
-Date: Wed, 14 Jan 2026 16:19:18 -0800
-In-Reply-To: <f4240495-120b-4124-b91a-b365e45bf50a@intel.com>
+	s=arc-20240116; t=1768437342; c=relaxed/simple;
+	bh=hV/I1amt69oPCU6aay0nCIv9p4OreJli9oi11PddXe8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lT6VnG2fz/Y2utpKFHJ3pOHq0oL5NjBMLkahbJ3o6a1LiY30P5BdkoKIxrMAorpJjSWR6dofEPV0S3i+ejiy6PuzN7PZrwTGnpzdXuf0wXZ8CALyiHdcFxs0nRE5aEHFyg4F0p6DgBmdhxTqI6fcCgR58rCwg1uD/UhkDxdsVNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N8aevUHY; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 15 Jan 2026 00:35:33 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768437337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TUJ2AGd/KuMhjjY9mP2rbYed6lZnsOVmk5YpNz11QZ0=;
+	b=N8aevUHY/lcHDX3YLe72XG0bqFGKINjWc5j4Gh0H76maMTTCj8dqyfUwj6ee3beW/O9Ed+
+	MoB99USzUSNf/QGwFo4u4HvTlmGrxsnEnfVz/Fy+RwQI83Y4q3NYWaBhCHdEt4WC73YnwK
+	g4if7sQEtYKfRyho59tlRMU0ZvoXqrI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: SVM: Fix redundant updates of LBR MSR intercepts
+Message-ID: <6cozacewv4sop77ilrqnervzpifinxki2ykef55awan2ka5jdf@sqyj7jed3qii>
+References: <20251215192722.3654335-1-yosry.ahmed@linux.dev>
+ <3rdy3n6phleyz2eltr5fkbsavlpfncgrnee7kep2jkh2air66c@euczg54kpt47>
+ <aUBjmHBHx1jsIcWJ@google.com>
+ <rlwgjee2tjf26jyvdwipdwejqgsira63nvn2r3zczehz3argi4@uarbt5af3wv2>
+ <aWgTjoAXdRrA99Dn@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAEvNRgGG+xYhsz62foOrTeAxUCYxpCKCJnNgTAMYMV=w2eq+6Q@mail.gmail.com>
- <aV2A39fXgzuM4Toa@google.com> <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
- <aV2eIalRLSEGozY0@google.com> <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
- <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
- <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com> <f4240495-120b-4124-b91a-b365e45bf50a@intel.com>
-Message-ID: <aWgyhmTJphGQqO0Y@google.com>
-Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
-From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	kas@kernel.org, tabba@google.com, michael.roth@amd.com, david@kernel.org, 
-	sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com, 
-	nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWgTjoAXdRrA99Dn@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jan 14, 2026, Dave Hansen wrote:
-> On 1/14/26 07:26, Sean Christopherson wrote:
-> ...
-> > Dave may feel differently, but I am not going to budge on this.  I am not going
-> > to bake in assumptions throughout KVM about memory being backed by page+folio.
-> > We _just_ cleaned up that mess in the aformentioned "Stop grabbing references to
-> > PFNMAP'd pages" series, I am NOT reintroducing such assumptions.
+On Wed, Jan 14, 2026 at 02:07:10PM -0800, Sean Christopherson wrote:
+> On Mon, Dec 15, 2025, Yosry Ahmed wrote:
+> > On Mon, Dec 15, 2025 at 11:38:00AM -0800, Sean Christopherson wrote:
+> > > On Mon, Dec 15, 2025, Yosry Ahmed wrote:
+> > > > On Mon, Dec 15, 2025 at 07:26:54PM +0000, Yosry Ahmed wrote:
+> > > > > svm_update_lbrv() always updates LBR MSRs intercepts, even when they are
+> > > > > already set correctly. This results in force_msr_bitmap_recalc always
+> > > > > being set to true on every nested transition, essentially undoing the
+> > > > > hyperv optimization in nested_svm_merge_msrpm().
+> > > > > 
+> > > > > Fix it by keeping track of whether LBR MSRs are intercepted or not and
+> > > > > only doing the update if needed, similar to x2avic_msrs_intercepted.
+> > > > > 
+> > > > > Avoid using svm_test_msr_bitmap_*() to check the status of the
+> > > > > intercepts, as an arbitrary MSR will need to be chosen as a
+> > > > > representative of all LBR MSRs, and this could theoretically break if
+> > > > > some of the MSRs intercepts are handled differently from the rest.
+> > > > > 
+> > > > > Also, using svm_test_msr_bitmap_*() makes backports difficult as it was
+> > > > > only recently introduced with no direct alternatives in older kernels.
+> > > > > 
+> > > > > Fixes: fbe5e5f030c2 ("KVM: nSVM: Always recalculate LBR MSR intercepts in svm_update_lbrv()")
+> > > > > Cc: stable@vger.kernel.org
+> > > > > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > > > 
+> > > > Sigh.. I had this patch file in my working directory and it was sent by
+> > > > mistake with the series, as the cover letter nonetheless. Sorry about
+> > > > that. Let me know if I should resend.
+> > > 
+> > > Eh, it's fine for now.  The important part is clarfying that this patch should
+> > > be ignored, which you've already done.
 > > 
-> > NAK to any KVM TDX code that pulls a page or folio out of a guest_memfd pfn.
+> > FWIW that patch is already in Linus's tree so even if someone applies
+> > it, it should be fine.
 > 
-> 'struct page' gives us two things: One is the type safety, but I'm
-> pretty flexible on how that's implemented as long as it's not a raw u64
-> getting passed around everywhere.
-
-I don't necessarily disagree on the type safety front, but for the specific code
-in question, any type safety is a facade.  Everything leading up to the TDX code
-is dealing with raw PFNs and/or PTEs.  Then the TDX code assumes that the PFN
-being mapped into the guest is backed by a struct page, and that the folio size
-is consistent with @level, without _any_ checks whatsover.  This is providing
-the exact opposite of safety.
-
-  static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
-			    enum pg_level level, kvm_pfn_t pfn)
-  {
-	int tdx_level = pg_level_to_tdx_sept_level(level);
-	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-	struct page *page = pfn_to_page(pfn);    <==================
-	struct folio *folio = page_folio(page);
-	gpa_t gpa = gfn_to_gpa(gfn);
-	u64 entry, level_state;
-	u64 err;
-
-	err = tdh_mem_page_aug(&kvm_tdx->td, gpa, tdx_level, folio,
-			       folio_page_idx(folio, page), &entry, &level_state);
-
-	...
-  }
-
-I've no objection if e.g. tdh_mem_page_aug() wants to sanity check that a PFN
-is backed by a struct page with a valid refcount, it's code like that above that
-I don't want.
-
-> The second thing is a (near) guarantee that the backing memory is RAM.
-> Not only RAM, but RAM that the TDX module knows about and has a PAMT and
-> TDMR and all that TDX jazz.
-
-I'm not at all opposed to backing guest_memfd with "struct page", quite the
-opposite.  What I don't want is to bake assumptions into KVM code that doesn't
-_require_ struct page, because that has cause KVM immense pain in the past.
-
-And I'm strongly opposed to KVM special-casing TDX or anything else, precisely
- because we struggled through all that pain so that KVM would work better with
-memory that isn't backed by "struct page", or more specifically, memory that has
-an associated "struct page", but isn't managed by core MM, e.g. isn't refcounted.
-
-> We've also done things like stopping memory hotplug because you can't
-> amend TDX page metadata at runtime. So we prevent new 'struct pages'
-> from coming into existence. So 'struct page' is a quite useful choke
-> point for TDX.
+> Narrator: it wasn't fine.
 > 
-> I'd love to hear more about how guest_memfd is going to tie all the
-> pieces together and give the same straightforward guarantees without
-> leaning on the core mm the same way we do now.
+> Please resend this series.  The base-commit is garbage because your working tree
+> was polluted with non-public patches, I can't quickly figure out what your "real"
+> base was, and I don't have the bandwidth to manually work through the mess.
+> 
+> In the future, please, please don't post patches against a non-public base.  It
+> adds a lot of friction on my end, and your series are quite literally the only
+> ones I've had problems with in the last ~6 months.
 
-I don't think guest_memfd needs to be different, and that's not what I'm advocating.
-What I don't want is to make KVM TDX's handling of memory different from the rest
-of KVM and KVM's MMU(s).
+Sorry this keeps happening, I honestly don't know how it happened. In my
+local repo the base commit is supposedly from your tree:
+
+	$ git show 58e10b63777d0aebee2cf4e6c67e1a83e7edbe0f
+
+	commit 58e10b63777d0aebee2cf4e6c67e1a83e7edbe0f
+	Merge: e0c26d47def7 297631388309
+	Author: Sean Christopherson <seanjc@google.com>
+	Date:   Mon Dec 8 14:58:37 2025 +0000
+
+	    Merge branch 'fixes'
+
+	    * fixes:
+	      KVM: nVMX: Immediately refresh APICv controls as needed on nested VM-Exit
+	      KVM: VMX: Update SVI during runtime APICv activation
+	      KVM: nSVM: Set exit_code_hi to -1 when synthesizing SVM_EXIT_ERR (failed VMRUN)
+	      KVM: nSVM: Clear exit_code_hi in VMCB when synthesizing nested VM-Exits
+	      KVM: Harden and prepare for modifying existing guest_memfd memslots
+	      KVM: Disallow toggling KVM_MEM_GUEST_MEMFD on an existing memslot
+	      KVM: selftests: Add a CPUID testcase for KVM_SET_CPUID2 with runtime updates
+	      KVM: x86: Apply runtime updates to current CPUID during KVM_SET_CPUID{,2}
+	      KVM: selftests: Add missing "break" in rseq_test's param parsing
+
+But then I cannot actually find it in your tree. Perhaps I rebased the
+baseline patches accidentally :/
+
+Anyway, I rebased and retested on top of kvm-x86/next and will resend
+shortly.
 
