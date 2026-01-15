@@ -1,91 +1,117 @@
-Return-Path: <kvm+bounces-68103-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68104-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE067D21DF0
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:39:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 768B7D21EF9
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 090153026B3E
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 00:39:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E68CC303E41E
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F56B1A2630;
-	Thu, 15 Jan 2026 00:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8282A1FE471;
+	Thu, 15 Jan 2026 01:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ltACZlYZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ebg70OaY"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944C81E50E;
-	Thu, 15 Jan 2026 00:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4073FEF
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768437544; cv=none; b=mFD6jSWF6jLzyZqpznAg+3nNSxrH62QxVnNSTTcADT+KHSijuNdw5Qyoh3fT+T2bTu7D6NT+e4mDCeB6GUTGkguNoV3dKQZdFIWdr7a3JcYp2lWRGcxVyI0AU3Xmn8ghgmxRH0rNkYRmvJP1E5bgSeSaguWpNbsYdeTSsAi4KdQ=
+	t=1768439226; cv=none; b=qjcStTCXj5PtIyZAMBq7CinyWuz0W/hFfsADe9qAUg07YPuKrT25saSV7zm46FmBLz39dCsyZC/WT4ia4XRUFNe9xvgA3/j6dMd56oMPiatHs1DJ3IJdLM1qRM7Wcpuy7DvPcc2u34T4E39QIreHQ76+9bIbHucIUnt3PJJZqG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768437544; c=relaxed/simple;
-	bh=WS7t3IYx3J3S2sfRX9DCoDfu6yOLG0lLMoSGMRG7+X4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tfAZ/+5yxmykDvUBqQkwq4N9aBd6f3R6/dw9Rfqu/9elD/OFsF6RfLymKFVa7xjwVY6SruaJnwA/Vijvy7jZOXFX72bj0VA0qQGscedVuhlX3nPsPyOrF9OdbSOwIt6gh8N8xCReE4kMJXRKVXrNOBGUA0L7SO17TpKih+8IAdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ltACZlYZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E154C4CEF7;
-	Thu, 15 Jan 2026 00:39:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768437544;
-	bh=WS7t3IYx3J3S2sfRX9DCoDfu6yOLG0lLMoSGMRG7+X4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=ltACZlYZs2UDJYv8s8k9TlXywIYpZWNHCwvgHAMfYZqY/R8Zaf7wpMh88m1HkBydD
-	 Gc7hETrNO7iT1cYc7OagiSyMjsRJ77uUw9qPO6HpoXRCowImjF6KhRZ3C7F0bYHxqK
-	 mot6FcZOOI4FzhB+kqOiO11LiDVSQaIHv8G97KZM04TNUIHW9Wsh97cAYTQkE3ledh
-	 NRjJlxqbRl3w6y25gsMgqfFQU+1AMjovYcvcVNBPGIyGQk065QELZC3CWTDnmMIgOY
-	 9yRMzcoikBMnjMZWmV6weqdItRB/uxRlL5Mr37OUto7XLBbzVacovEdjMlMxudkSkp
-	 SWxD4U47bZi4w==
-Date: Wed, 14 Jan 2026 17:39:02 -0700 (MST)
-From: Paul Walmsley <pjw@kernel.org>
-To: Naohiko Shimizu <naohiko.shimizu@gmail.com>
-cc: pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
-    anup@brainfault.org, atish.patra@linux.dev, daniel.lezcano@linaro.org, 
-    tglx@linutronix.de, nick.hu@sifive.com, linux-riscv@lists.infradead.org, 
-    linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-    kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 0/3] riscv: fix timer update hazards on RV32
-In-Reply-To: <20260104135938.524-1-naohiko.shimizu@gmail.com>
-Message-ID: <10a102b9-1dd1-c5ca-66e4-f02794a84a93@kernel.org>
-References: <20260104135938.524-1-naohiko.shimizu@gmail.com>
+	s=arc-20240116; t=1768439226; c=relaxed/simple;
+	bh=WiznaQNyKTEee+KonRMn9LZpkSjZNvxzn8/0C5dd21s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C7+GaK/Rld1yKAECNxuOPMKO1UFYvZ94AjdqxcjKOiGrEqzb8NQGkSE94tsoALiodk6yPyvwCIYXjzod09+mWNKWDVpUnpiqPX3i0sbgf1eZXPvOklGYTQi4IuUypLITUBj4AZ7kRKa0eCSZfhpNw4CFEHrQ4njDA5iksxYTfDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ebg70OaY; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768439225; x=1799975225;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WiznaQNyKTEee+KonRMn9LZpkSjZNvxzn8/0C5dd21s=;
+  b=Ebg70OaYBVL59srePE6nASj7e78Y9OD+3+5bRHUkwuCPuZ0GvWZXdSnE
+   5xakDmrNOJlTQySBO9quLvYl6TZrTfy1WPTJYl2QEKT1HECgshxmqYxml
+   MaXQMxsNpyoROUeSmGpEOv26uvugY0C7FsJsSTl7Xv8JLPk8hNneFbyPr
+   Bve5U2lZOzmRQIF5TwNM/SQj/szV35Z4ofS6lyVysvyrhnKnVd7mLMM1H
+   milN2RQTglyyihx5Cp+vvbdAhoNUR2UclPoIY6Bs0IsPuX+8JxhYX3b7O
+   u3GIMYOuJWcA7Owp2GKnYXa6rSNezE/oWBEPbbC9GSfkD1XUpa82aKD27
+   w==;
+X-CSE-ConnectionGUID: UwL+9vxiRbeeI8rAVGy0/A==
+X-CSE-MsgGUID: 6I1b8U0SRyGJ8APT2EJVbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="69723706"
+X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
+   d="scan'208";a="69723706"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:07:05 -0800
+X-CSE-ConnectionGUID: vlh9H0UkTtOO1ZhUT1gGXw==
+X-CSE-MsgGUID: fc0feO5oQRevSrpIW+1Wpw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
+   d="scan'208";a="235544403"
+Received: from fhuang-mobl1.amr.corp.intel.com (HELO [10.125.38.93]) ([10.125.38.93])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:07:05 -0800
+Message-ID: <ca48a26d-251d-437d-9d5b-b29dd38a4ab1@intel.com>
+Date: Wed, 14 Jan 2026 17:07:04 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 1/5] target/i386/kvm: set KVM_PMU_CAP_DISABLE if "-pmu"
+ is configured
+To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
+ sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
+ like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
+ alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
+ davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
+ dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
+ ewanhai@zhaoxin.com
+References: <20260109075508.113097-1-dongli.zhang@oracle.com>
+ <20260109075508.113097-2-dongli.zhang@oracle.com>
+Content-Language: en-US
+From: "Chen, Zide" <zide.chen@intel.com>
+In-Reply-To: <20260109075508.113097-2-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, 4 Jan 2026, Naohiko Shimizu wrote:
 
-> This patch series fixes timer register update hazards on RV32 for
-> clocksource, KVM, and suspend/resume paths by adopting the 3-step
-> update sequence recommended by the RISC-V Privileged Specification.
+
+On 1/8/2026 11:53 PM, Dongli Zhang wrote:
+> Although AMD PERFCORE and PerfMonV2 are removed when "-pmu" is configured,
+> there is no way to fully disable KVM AMD PMU virtualization. Neither
+> "-cpu host,-pmu" nor "-cpu EPYC" achieves this.
 > 
-> Changes in v3:
-> - Dropped redundant subject line from commit descriptions.
-> - Added Fixes tags for all patches.
-> - Moved Signed-off-by tags to the end of commit messages.
+> As a result, the following message still appears in the VM dmesg:
 > 
-> Changes in v2:
-> - Added detailed architectural background to commit messages.
-> - Added KVM and suspend/resume cases.
+> [    0.263615] Performance Events: AMD PMU driver.
 > 
-> Naohiko Shimizu (3):
->   riscv: clocksource: Fix stimecmp update hazard on RV32
->   riscv: kvm: Fix vstimecmp update hazard on RV32
->   riscv: suspend: Fix stimecmp update hazard on RV32
+> However, the expected output should be:
 > 
->  arch/riscv/kernel/suspend.c       | 3 ++-
->  arch/riscv/kvm/vcpu_timer.c       | 6 ++++--
->  drivers/clocksource/timer-riscv.c | 3 ++-
->  3 files changed, 8 insertions(+), 4 deletions(-)
+> [    0.596381] Performance Events: PMU not available due to virtualization, using software events only.
+> [    0.600972] NMI watchdog: Perf NMI watchdog permanently disabled
+> 
+> This occurs because AMD does not use any CPUID bit to indicate PMU
+> availability.
+> 
+> To address this, KVM_CAP_PMU_CAPABILITY is used to set KVM_PMU_CAP_DISABLE
+> when "-pmu" is configured.
+> 
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> ---
 
-Thanks, queued for v6.19-rc. 
-
-
-- Paul
+LGTM.
+Reviewed-by: Zide Chen <zide.chen@intel.com>
 
