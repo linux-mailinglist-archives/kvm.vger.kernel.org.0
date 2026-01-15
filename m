@@ -1,144 +1,110 @@
-Return-Path: <kvm+bounces-68167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7E9D23A6F
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 10:42:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9741FD23CCE
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 11:05:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F57230CB192
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 09:31:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B53C3018973
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 10:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13AF235F8B3;
-	Thu, 15 Jan 2026 09:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A2533DEDB;
+	Thu, 15 Jan 2026 10:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkDdcCVO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rQIvsgvn"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C87F35F8AA;
-	Thu, 15 Jan 2026 09:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C4F2ED873;
+	Thu, 15 Jan 2026 10:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768469427; cv=none; b=lStsQEruo1qWP993fpt08pP1CBkBCzdK1LcCCPX80vqZ49JWGGVtWot/XrTX8dUP0AfLz/QsCYFLEVI8sPYeRnUAlgTC+Y0VuA21FBcUEPBNIkDtSpHuMaF7VWwxb2MMMAWfS2W4kGWKnaN8RBX2wH4ipVBbpOUz+aQSxVwrgQw=
+	t=1768471490; cv=none; b=B55mqEh8lFPzZDsARlgGCcoDI5/h/OFlFxKnjski9MGbprNrJJFNTuuOG28tmIHko0pXiEPPdEeyAWicz7hDyIpAh1Lk4Oj+RqnJI39DD9CdFUB6db2iwlSYfl5mzPqoJREjyiWkhNd9k5FxQnB+rlN4rgI/zn4QyMVOMQQBDEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768469427; c=relaxed/simple;
-	bh=cJNKCP0S+IAx/bWZM2AbRlGc+iRV/rZqSadbifWheuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kAl91iwTAQYleFndRNSgiTtkA1QtMvkbUXEfKtQwyR7yN6BN57yMq5o38YJj9k475UwXYnKDztaDcnrXODevIJGYuC6iVpWfG12rNuUHJwqhGnMW5LP0XRYanhFQugU0XJdjufOqHc5zEFYfQDjmPj9LZ++fCX8DdgmgwZ2bEmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkDdcCVO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9557C19423;
-	Thu, 15 Jan 2026 09:30:26 +0000 (UTC)
+	s=arc-20240116; t=1768471490; c=relaxed/simple;
+	bh=7XMxe/CLYro3FUDReJ1bUNPGpnZRoIxeAslKy+21mck=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BQt6sjOtZKwkn3bxLhTSF68JrVGO3K/Ev1OaCxERKmCw1bWNSWYAs1qOEuql8iok1LuO4lV/1abIXPhNqGi37CcsU0gWty1KPsOJmgvWaiYaJHrSS8i4+C8PvcIsKrfqodq5C4xMpzWkxv9zqmgHKwVGNIZfdL1uves+ihcFOl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rQIvsgvn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E1FC116D0;
+	Thu, 15 Jan 2026 10:04:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768469426;
-	bh=cJNKCP0S+IAx/bWZM2AbRlGc+iRV/rZqSadbifWheuY=;
-	h=Date:From:To:Cc:Subject:From;
-	b=mkDdcCVOGHX77maeQl0UPb+8HF67I611jGweU7DWQ5BdkuM+zuO2caUQu0OHCZmdD
-	 YLwrmF1/fCjbgOdDs9bkzZvN0n6pc62/9/xfaT3kbaIk7amDoWsh4qm06zDYcBfoWz
-	 qes/pfXsxNHTdOQU5VpQLkRLQ3wb64hH5tT2U43wdxdEyYDvyTXDKlpPdqVyAHYC8q
-	 VTZUSrUem/taulqsB4Lu93fNcgSXrgy8ipfPFG3o3T1PlivWCjTUxzgC8W8VyxEn6X
-	 i7MP23VjojUvwaTiLVSbdODq7A1jTZ1u6vOpCTdWvR+MYFFvEMzjDkbApJICzQUq+W
-	 3LZF/dQqxqsPw==
-Date: Thu, 15 Jan 2026 01:30:25 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+	s=k20201202; t=1768471490;
+	bh=7XMxe/CLYro3FUDReJ1bUNPGpnZRoIxeAslKy+21mck=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rQIvsgvnZXiKoWKaTyi01ZC4GLLkkOIza+4xGbnOASRPXJWCs0/DYsMQKhfYleTok
+	 EMEe/CZturJFUEhL3jA1Y7gnI0Jbs+mjqjohtJkqKU1veadyiS5R0Bj3QrNe5072xR
+	 ie34nNwJFJwcxEOfZwkVgkyABQ2iFLc3sQ5h8Vn3ka13S825VjDzi7gJlhd+UQz5s8
+	 8z6lxmCH7vpkkoxI6+7ip0B/vtKXaf5zJCr2qMrJfuoIc5efjsOsC+kGWojo5FK2ha
+	 HmPtNCTKEQsxBa2xnpkz1Ly0Qa1j437dUOW2NSaGVfObXFVhJvZ25JcrOS22hCIFzB
+	 fJZF4lGgkNthw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgKDf-00000002Tkj-2wRm;
+	Thu, 15 Jan 2026 10:04:47 +0000
+Date: Thu, 15 Jan 2026 10:04:47 +0000
+Message-ID: <86ikd3kx8g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: KVM/arm64 fixes for 6.19
-Message-ID: <aWizsSzD3fRWMsAc@kernel.org>
+Subject: Re: KVM/arm64 fixes for 6.19
+In-Reply-To: <aWizsSzD3fRWMsAc@kernel.org>
+References: <aWizsSzD3fRWMsAc@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, pbonzini@redhat.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Paolo,
+On Thu, 15 Jan 2026 09:30:25 +0000,
+Oliver Upton <oupton@kernel.org> wrote:
+> 
+> Hi Paolo,
+> 
+> Here is the first (and likely only) set of fixes for 6.19. Small batch
+> of changes fixing issues in non-standard configurations like pKVM, hVHE,
+> and nested.
+> 
+> Details are in the tag, please pull.
+> 
+> Thanks,
+> Oliver
+> 
+> The following changes since commit f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
+> 
+>   Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.19-1
+> 
+> for you to fetch changes up to 19cffd16ed6489770272ba383ff3aaec077e01ed:
+> 
+>   KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers (2026-01-10 02:19:52 -0800)
 
-Here is the first (and likely only) set of fixes for 6.19. Small batch
-of changes fixing issues in non-standard configurations like pKVM, hVHE,
-and nested.
-
-Details are in the tag, please pull.
+FWIW, I'll take this as an initial merge in kvmarm/next, as I have a
+couple of things that depend on it [1].
 
 Thanks,
-Oliver
 
-The following changes since commit f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
+	M.
 
-  Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
+[1] https://lore.kernel.org/all/20251210173024.561160-1-maz@kernel.org
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.19-1
-
-for you to fetch changes up to 19cffd16ed6489770272ba383ff3aaec077e01ed:
-
-  KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers (2026-01-10 02:19:52 -0800)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.19
-
- - Ensure early return semantics are preserved for pKVM fault handlers
-
- - Fix case where the kernel runs with the guest's PAN value when
-   CONFIG_ARM64_PAN is not set
-
- - Make stage-1 walks to set the access flag respect the access
-   permission of the underlying stage-2, when enabled
-
- - Propagate computed FGT values to the pKVM view of the vCPU at
-   vcpu_load()
-
- - Correctly program PXN and UXN privilege bits for hVHE's stage-1 page
-   tables
-
- - Check that the VM is actually using VGICv3 before accessing the GICv3
-   CPU interface
-
- - Delete some unused code
-
-----------------------------------------------------------------
-Alexandru Elisei (4):
-      KVM: arm64: Copy FGT traps to unprotected pKVM VCPU on VCPU load
-      KVM: arm64: Inject UNDEF for a register trap without accessor
-      KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
-      KVM: arm64: Remove unused parameter in synchronize_vcpu_pstate()
-
-Dongxu Sun (1):
-      KVM: arm64: Remove unused vcpu_{clear,set}_wfx_traps()
-
-Marc Zyngier (2):
-      KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
-      KVM: arm64: Don't blindly set set PSTATE.PAN on guest exit
-
-Oliver Upton (1):
-      KVM: arm64: nv: Respect stage-2 write permssion when setting stage-1 AF
-
-Sascha Bischoff (1):
-      KVM: arm64: gic: Check for vGICv3 when clearing TWI
-
-Will Deacon (1):
-      KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
-
- arch/arm64/include/asm/kvm_asm.h        |  2 ++
- arch/arm64/include/asm/kvm_emulate.h    | 16 ----------------
- arch/arm64/include/asm/kvm_pgtable.h    | 16 ++++++++++++----
- arch/arm64/include/asm/sysreg.h         |  3 ++-
- arch/arm64/kernel/image-vars.h          |  1 +
- arch/arm64/kvm/arm.c                    |  1 +
- arch/arm64/kvm/at.c                     |  8 ++++++--
- arch/arm64/kvm/hyp/entry.S              |  4 +++-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  3 +++
- arch/arm64/kvm/hyp/nvhe/pkvm.c          |  1 -
- arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
- arch/arm64/kvm/hyp/pgtable.c            |  5 +++--
- arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
- arch/arm64/kvm/mmu.c                    | 12 +++++-------
- arch/arm64/kvm/sys_regs.c               |  5 ++++-
- arch/arm64/kvm/va_layout.c              | 28 ++++++++++++++++++++++++++++
- 17 files changed, 73 insertions(+), 38 deletions(-)
+-- 
+Without deviation from the norm, progress is not possible.
 
