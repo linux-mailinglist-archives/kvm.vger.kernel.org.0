@@ -1,112 +1,128 @@
-Return-Path: <kvm+bounces-68107-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68108-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EACD21F0B
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:09:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30608D21F14
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DED793019665
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:09:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55E9F30386AF
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1B9238C0D;
-	Thu, 15 Jan 2026 01:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3601023B628;
+	Thu, 15 Jan 2026 01:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eLIpk+Ko"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KaLbSVOa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E795FF9D9
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161AA21B9DA
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768439379; cv=none; b=X0NVLWYLWXRpSK5tUvKjVME4Px3DbV1EKH2xWoRRA2n/CtJPOzsFrDKweQxyAloZbjfLnJv4Y+LRWlKQPyr2FaTegVrtHw54OAqDfUezpkPlfE2FAnazhdmtTqb0hqmfXvdoJgPraRx4LwxEZSM8QWWDZvWSvsK4mCcw0jHC8ow=
+	t=1768439482; cv=none; b=uqtP0u6gGy38WQu82OVS85Ifa+uxpFXogOkUq4Wwr3ycMYc/DtFnIiqn5tYD/v4d6rdQ1mvo7avJQ5hXL243gEwI0QxK7UUqtAMzAuNa1ATh1PrQF/TBh6caAsiNDYdAdzC6KQgeFyRhOpCKKMXnNfhGEmHzw2+rJEDO9Bz6CTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768439379; c=relaxed/simple;
-	bh=nKfA7oo3iz6NvIQgBLyXvj0eZxvS2QvpIqQx4MrvuoU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BirWCoeVohPan5Lop2GoomsnpxfVpcaEvGe6LypMFMSwRC7B9pzU53QCjcg/+o9iZS2TdtJWReuqDbavcI8YGKYSFvVEZvi5DaT+5K3TxTYonKQy9dHQbFfXv0jIDomepDIryhaMEqGVOqgS2xsnw+oi+u/RyRT+Z1Hk8v5shEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eLIpk+Ko; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768439378; x=1799975378;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nKfA7oo3iz6NvIQgBLyXvj0eZxvS2QvpIqQx4MrvuoU=;
-  b=eLIpk+Konxija1L85RM8BrCbgEUtoanCX7hT5JI+HGWYdYZx8a0SYOqP
-   sTTcloahH8rH1o3ggI8ZnvH5xZ1jtFFXhk1Db2dH1AhiVM93kcC9rcMo6
-   nvUf25381BUQiCdjkV7krrcvrpG6zgRdzaK+IiNkgeGeCapGmQ0HayKfI
-   tgJy96rzkPLZ+0fheqLYQDZ5QA62uZYC9sy8KuUoVaXfgIAdngMqDPfEU
-   WFlfvJlz3DHGCZ0kDcO7+N4ZogUTLclA50HkAbvyK8LXQiGe3KP2gbeJV
-   2GmPw4hRT2VRNjdMD4JobyxqvrA0kmMHu78IAiGBMr851IMKr1N0XRH+l
-   g==;
-X-CSE-ConnectionGUID: EJ3EqfRHRviNRxtCi7GXUg==
-X-CSE-MsgGUID: r43RyY2dRyiDPqeGxILRgQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="69723965"
-X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="69723965"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:09:37 -0800
-X-CSE-ConnectionGUID: ttJ52xNnST253F5pAA8OGw==
-X-CSE-MsgGUID: M37YBMv5QM6LqbjoKOvHhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="235544620"
-Received: from fhuang-mobl1.amr.corp.intel.com (HELO [10.125.38.93]) ([10.125.38.93])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:09:37 -0800
-Message-ID: <fe918947-054b-4b53-b065-2b51a3fe1835@intel.com>
-Date: Wed, 14 Jan 2026 17:09:36 -0800
+	s=arc-20240116; t=1768439482; c=relaxed/simple;
+	bh=rmt8XDDydkWQ8r1wRcZRWYnvOL/qCyrfLFY7AcLJ3Ao=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qq4mVjmqgy1LdCXncUXvdBQpbQl8TxHvCgETcIJxxCQtsjsRheTfNU4n0VjdkymTgEilAIL9rPgttXZG/3i/nU3vK34XbQ+TgUcIGOG74WiHVRI/nZouZYz8mqpGbB2pAdvWEEnIPuf19RbrHgT8QigqX7cpACTGRm4WtUVSSVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KaLbSVOa; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-941063da73eso300879241.3
+        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 17:11:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768439480; x=1769044280; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uWEmSPSV/4aq+tGwuGvE1EWZPGM77eZ+/59U3WROy80=;
+        b=KaLbSVOainCstWZIa4MCInRUjwaqk1CJ/858JBOqyb89N4VJ51zPQWbIrtD1vXD6rN
+         cyCGlHH729esF32O5cW1gV/jc+2iUPArSAi3gTDLCZGdiYrmHEjvZPjWuECNHWNoQb78
+         +prJIsSOgSEzGfXmRr/DT5Q1fidN2n1vNEyfom7QxtFPY/4NIzkovnPtebF/N15AJ9xO
+         m2vZdVSsxs7AdJe6ywU2bz4UJ3DkPpbZrVgFzNyUY9Oeitv2pN9p1uEwx9qQ9gT8TW8j
+         BbBLJzbgQk5aWfHdFx58OQMJ7uluuUn2Z0MxMXbGhcVkWNOJ850jIfk16iWjfcE3/M3D
+         RYgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768439480; x=1769044280;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uWEmSPSV/4aq+tGwuGvE1EWZPGM77eZ+/59U3WROy80=;
+        b=Sho4xKJNvG/J09hlEao6xDVKxqrULHARgM6E+NS3m8BVItnHAQ+x9/THwI09l/xCng
+         tCwQv47zr2iNICAas2B9wwVtni6GycNZa+P5XV+yI2onBTerOA+EV5+8s9jLYY2bRZtK
+         dz5LKebWQk//7+GW109awCsVfClTq5DYET+ZrRp1/VqXX+npCRY2AgAanr0im4gT2LDX
+         oasev5RCj2yoiumxgSbBsWWdDWDZsgn+A4UpbJI5AdF9EAzTzXzCVvVuEUfTFryLdTcn
+         lBulM+FbSwjzgU0O7YILOHxYRyriH9/01Hlpz7dgDXZoykOF2fvy+vogd6+Cuj3gjTXE
+         uQpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUd++BiPLPLZxO+JXhLaYgI9If/6qd3V6pp3MPptIfStDkmtB35S178SyGjm1vX04j5gAo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1MbMQFtR9/567Wr1OgqvSnul8gZRflUrVA3a/8CCVFXCqG7rk
+	gOw70hJrOraGfZL9nBl2yruH4Dnjsm85SIpeQe8QAOk4O30+5EHLxrozTR9yvFjOexGqrfC7lJG
+	g7UwNUj0bLXQTiwY6fz8jpRGDv+fnFhTiD1PCClM=
+X-Gm-Gg: AY/fxX7CFc7vO/2BeLhb6/InlOyjzOi0RgetGa0WCeJhg1Isw6Qpye9KZqcRII5vtr2
+	am8wK/ykMiO8jkHVbunjn2H8qKezfa87axHkUItycO6oLO59F9ceDToA/tIcfEotOwoRfA05dnN
+	zhG0yHJlHN5rtCTdeiCt4ZBIwYzIN+ewqogY1NigFeZ4O3Aa5SZ2+U7T2sm3QGlLOmD1TNzio1G
+	KQArsW0fDU9AM5l6dqxntTZsCefPCsFX0og4x/OcJhqXdFj+YyF2Cfi4CBQuXSjl6ofT0BiUQ==
+X-Received: by 2002:a05:6102:26d3:b0:5db:f615:1821 with SMTP id
+ ada2fe7eead31-5f1838c16bamr1746719137.10.1768439478555; Wed, 14 Jan 2026
+ 17:11:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 3/5] target/i386/kvm: rename architectural PMU
- variables
-To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
- sandipan.das@amd.com, babu.moger@amd.com, likexu@tencent.com,
- like.xu.linux@gmail.com, groug@kaod.org, khorenko@virtuozzo.com,
- alexander.ivanov@virtuozzo.com, den@virtuozzo.com,
- davydov-max@yandex-team.ru, xiaoyao.li@intel.com,
- dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
- ewanhai@zhaoxin.com
-References: <20260109075508.113097-1-dongli.zhang@oracle.com>
- <20260109075508.113097-4-dongli.zhang@oracle.com>
-Content-Language: en-US
-From: "Chen, Zide" <zide.chen@intel.com>
-In-Reply-To: <20260109075508.113097-4-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260104135938.524-1-naohiko.shimizu@gmail.com> <10a102b9-1dd1-c5ca-66e4-f02794a84a93@kernel.org>
+In-Reply-To: <10a102b9-1dd1-c5ca-66e4-f02794a84a93@kernel.org>
+From: Naohiko Shimizu <naohiko.shimizu@gmail.com>
+Date: Thu, 15 Jan 2026 10:11:09 +0900
+X-Gm-Features: AZwV_QgNY9cbiPSf-Pg_buhTiH9o3_E8wCotzHaSqbEA_BVUDA10Wv_icM50ON8
+Message-ID: <CAA7_YY-3iVLzBJgntPkzMBZFe=uwQnkYUfJzW7rZ-i=Rw5sUKQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] riscv: fix timer update hazards on RV32
+To: Paul Walmsley <pjw@kernel.org>
+Cc: palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, 
+	anup@brainfault.org, atish.patra@linux.dev, daniel.lezcano@linaro.org, 
+	tglx@linutronix.de, nick.hu@sifive.com, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Thank you very much, Paul.
+I really appreciate your quick handling.
 
+Naohiko
 
-On 1/8/2026 11:53 PM, Dongli Zhang wrote:
-> AMD does not have what is commonly referred to as an architectural PMU.
-> Therefore, we need to rename the following variables to be applicable for
-> both Intel and AMD:
-> 
-> - has_architectural_pmu_version
-> - num_architectural_pmu_gp_counters
-> - num_architectural_pmu_fixed_counters
-> 
-> For Intel processors, the meaning of pmu_version remains unchanged.
-> 
-> For AMD processors:
-> 
-> pmu_version == 1 corresponds to versions before AMD PerfMonV2.
-> pmu_version == 2 corresponds to AMD PerfMonV2.
-> 
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-> Reviewed-by: Sandipan Das <sandipan.das@amd.com>
-> ---
-LGTM.
-Reviewed-by: Zide Chen <zide.chen@intel.com>
+On Thu, Jan 15, 2026 at 9:39=E2=80=AFAM Paul Walmsley <pjw@kernel.org> wrot=
+e:
+>
+> On Sun, 4 Jan 2026, Naohiko Shimizu wrote:
+>
+> > This patch series fixes timer register update hazards on RV32 for
+> > clocksource, KVM, and suspend/resume paths by adopting the 3-step
+> > update sequence recommended by the RISC-V Privileged Specification.
+> >
+> > Changes in v3:
+> > - Dropped redundant subject line from commit descriptions.
+> > - Added Fixes tags for all patches.
+> > - Moved Signed-off-by tags to the end of commit messages.
+> >
+> > Changes in v2:
+> > - Added detailed architectural background to commit messages.
+> > - Added KVM and suspend/resume cases.
+> >
+> > Naohiko Shimizu (3):
+> >   riscv: clocksource: Fix stimecmp update hazard on RV32
+> >   riscv: kvm: Fix vstimecmp update hazard on RV32
+> >   riscv: suspend: Fix stimecmp update hazard on RV32
+> >
+> >  arch/riscv/kernel/suspend.c       | 3 ++-
+> >  arch/riscv/kvm/vcpu_timer.c       | 6 ++++--
+> >  drivers/clocksource/timer-riscv.c | 3 ++-
+> >  3 files changed, 8 insertions(+), 4 deletions(-)
+>
+> Thanks, queued for v6.19-rc.
+>
+>
+> - Paul
 
