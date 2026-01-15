@@ -1,99 +1,130 @@
-Return-Path: <kvm+bounces-68263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B63D291CB
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 23:50:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4427BD291F5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 23:52:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE1103076743
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 22:50:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43B663083C7B
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 22:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2D932ABC1;
-	Thu, 15 Jan 2026 22:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE1B3203B6;
+	Thu, 15 Jan 2026 22:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ihLcShTb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LlEwYoMn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EC12EBDDE
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 22:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A14221DAE
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 22:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768517402; cv=none; b=fN0oUJ8c+aC2+n6feZJACxXm2v+9zrTtab9vA/RH+SYySaI1pkoY7WdMXk4Ncco1lm6bHBJRq3pTjPvCCJ7vZBCf6ewYoq0wSbFRvetoKrNY8tQ9yDc9lumQnTZQ4C+ICTcFoAq/kQTR5BCnrZI1W7IB7XMGkYNiKm7Ar+zNHBY=
+	t=1768517563; cv=none; b=TwdQTM/4mznPt9nRGj0Afj1tZu2j1eg0/NRot1WH1UyaiijpqsviNkAprKal6LZNWDdqV+7YB9soS25HoJBeP5jcau8HGkvWnj4DhMCuJETjImfoSX+x4rB+soHy4+PxlBJPy34lq1PBgQzfPzY+GLqh+pNyWD/Bliuf0o/YPTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768517402; c=relaxed/simple;
-	bh=eKWUSRezhgQUKR6mjWtdzsS8Ic9ONFbPugk0AUNtUz0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=S8jnPXYkaydLQ73fvQp7BGXttjtZ7jdoLO4ICXB8y7QTz1/VAmIOzmUYMpI45fx1hgMJj1mh9h9rKqQaXc/D2Dws6Y+4eZNQeQ6bI3oAfaj90VHfOqWET+Wv6tLmiZP8WtRs68+rnATA3REjpl3Eq/vPPSZTjx8lRfmCqI58kb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ihLcShTb; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1768517563; c=relaxed/simple;
+	bh=E+D/xWOr1s8GCE/Wqb9NdzI/sxSTWm/3fxHESTDH6c8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EnLRO1zRPxiTP3uI6i8INPOfMPD7LChwTwZeIuE4RAJWowcV3bfgRAjk2D4rm0J19K/eqlIOjEG/VjorXlq0bhNNWCKHkWbc9iQfKp8iRym6x+o0Im4Zj6Od4nSYkJL7N/pdN6J3FG3p/6w7YQnNrzfP4ot/VL56oRVmZLwgzVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LlEwYoMn; arc=none smtp.client-ip=209.85.167.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c43f8ef9bso2370476a91.1
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 14:50:01 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
+Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-45c879592feso3046384b6e.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 14:52:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768517400; x=1769122200; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3lvuC8n2hoqVbi+jpXkhnYGqcRXSY0sCfjwBRIoz6LU=;
-        b=ihLcShTbsiJrgtiLxIJ3g88DJbjLKl7B7KGY1NSH1nNf9gKJYNrNoMHdTg69XVpsu7
-         jDWhOB3wgA+f9Okm8MHuMI3eZjvmigJiYz7WfsEgolFS7Xuk3avWedT8JbPX86bXgvRO
-         pJyCk9TjBJ4wc20f0OAwHNUKoftc3cDt5wo4mdIGNJyH6q9rxjlTQ8Ogl/B4P5vQjXgj
-         raWfacNx+DRzYpsMjksBf0Xc/OuW7angyLPMyzMb6rJ8hfPkUjlGnLirCzy1Upn8RV2k
-         KFMMIn5WGuOVNOwrdKhazvXng05nwUtV7WaoMljzxgIQEPpnQzp1/koXRfpuy6KAr+Da
-         a6AA==
+        d=google.com; s=20230601; t=1768517561; x=1769122361; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TRmKjaBXNK+AvtD0p9RP9J8FQ82ubxpDWL/utJgxLnI=;
+        b=LlEwYoMnDMAE9vmARkr9Y5EDlNs0TpqSF3FByyYPMC5UWH0SIw4Krr6ow3PZOXN+S9
+         yKaMh8oJjsxkVL3RpiP7QX8vLDZnpuPEWgsoVI+BYuJMHpQRGBrIMHrUk6vlcVD/QUGg
+         f3Hw9XKi8rld2u5gQtJrHG3Ld+IqUo1N7jfZmvRbSzfEozA7Exo+eKXm+LjnME+egzb4
+         4op7ZPsZ3CWeOo95WI2hDT922CWpkL1mDURZo0Et4QdK1qZLdR6+jfpvADv1B9r/QtDv
+         ymQywLIrMIYBPRqy8mn0OUTi3w2T6MKHyAe01jFyQzAguoJxOt1TjN9nic1UMqw1jayJ
+         CD6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768517400; x=1769122200;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3lvuC8n2hoqVbi+jpXkhnYGqcRXSY0sCfjwBRIoz6LU=;
-        b=DVu4GwMrIOsFgmql/C90Zf4NNulmE0ck6tPmdwngsAtTlYAtI9TofXQvoPxUOc/TiV
-         +j8gOUlA9GlCn2JZd5OnduUWgf3espNbBGL5sDfJNyd00HF34rRVKl36Zy6Iy+6PxwHX
-         RUO7zjr++cVrVNdGMpyIWXfPPwnjEq3mRb4TebyFHpTwOo6u0y87Eruzprwd6xeQe1dW
-         RCBj5jpqzdh/8kC5tulUlrIedgTAeuCElVC4WuXSwp5MLN/tjAjOOuptVqqZ1tL8PL0u
-         k+MTyKr0a6FauZIr+VXMFTm7cEd9rnfAX4GN0f5Fha2dfRdK8hen/MGwRkT4sM8c0BIL
-         pICg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/XDcbP40fNsbKknO6BQE1lkx5IT/m0Y6lYgJoj0bHoG0tOmnIPS592GRpw8qflTmrgUc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3nNjWR6F7DQd0ktOniiC1i2yLDpk+J654UtUpqWAwdi4/mCPX
-	cKEqJNkUDU+vozkB2Xp5ISqbG+hPuCHhXB0jobX3YUakUSxsopXNH5adZSol+igx4hvnEobNe2E
-	VPrJZpQ==
-X-Received: from pjbnc12.prod.google.com ([2002:a17:90b:37cc:b0:34c:d212:cb7f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:570f:b0:32e:72bd:6d5a
- with SMTP id 98e67ed59e1d1-35272bcba8cmr975439a91.1.1768517400490; Thu, 15
- Jan 2026 14:50:00 -0800 (PST)
-Date: Thu, 15 Jan 2026 14:49:59 -0800
-In-Reply-To: <20260106102024.25023-1-yan.y.zhao@intel.com>
+        d=1e100.net; s=20230601; t=1768517561; x=1769122361;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TRmKjaBXNK+AvtD0p9RP9J8FQ82ubxpDWL/utJgxLnI=;
+        b=BXfVq2D28sMD5xOQOHgYYmhS0FmYNhca2PPPoLZZY1mWyptwWddGBwi14QzwwQIZKB
+         tu5td06y8rzfWKUXaMGBZ0SjlYDCNNmwZh+LgcAqQNDLggv0WmsJ5a9UrKXoMPUteltX
+         WEIXJzoU5FzLYNU7G/wcICrSFfVAZ9jtLjbgy9ZCnC7CTeowrvk5tcJ00U+hWFk9Xrxe
+         EUamj3GmBiTfphOLE2I/67Q+2s4+0X1gOwVIFzpxAF1yv7deydKv6jDxGIOdmTeWjwyZ
+         Eg1XFDzBc7Da4UarwVjCFvGpNavhgiJAQpA9djKSpHyVtZ2wUrc6lJ+Oj2WxSs4BwJRS
+         9riA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLAZulgavQpX6Oyr4pWqQSWbfd/7vfmFqTABWMlJVyR32qdK3kf0d6eCnS2U3o6NjHo9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO2bEaqH9VreUd/bFQqQmC2ELNw+h9UJBWEdDVNkFKioMP3JP/
+	mRt040ItYyFmCFfLfwGRv5pHMjoHlMuB0OTWZJ0IedaeOQAoG2Dlh8n24keo9G4FZdTmIICtnlC
+	Vcw==
+X-Received: from oijr5.prod.google.com ([2002:a05:6808:aa5:b0:45c:7cc1:5636])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6808:1b1f:b0:45a:4189:d2cf
+ with SMTP id 5614622812f47-45c9d70a437mr379132b6e.8.1768517560722; Thu, 15
+ Jan 2026 14:52:40 -0800 (PST)
+Date: Thu, 15 Jan 2026 22:52:37 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260106101646.24809-1-yan.y.zhao@intel.com> <20260106102024.25023-1-yan.y.zhao@intel.com>
-Message-ID: <aWlvF2rld0Nz3nRz@google.com>
-Subject: Re: [PATCH v3 06/24] KVM: x86/mmu: Disallow page merging (huge page
- adjustment) for mirror root
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	x86@kernel.org, rick.p.edgecombe@intel.com, dave.hansen@intel.com, 
-	kas@kernel.org, tabba@google.com, ackerleytng@google.com, 
-	michael.roth@amd.com, david@kernel.org, vannapurve@google.com, 
-	sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com, 
-	nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260115225238.2837449-1-sagis@google.com>
+Subject: [PATCH v2] KVM: TDX: Allow userspace to return errors to guest for MAPGPA
+From: Sagi Shahar <sagis@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Kiryl Shutsemau <kas@kernel.org>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
+	Vishal Annapurve <vannapurve@google.com>, Sagi Shahar <sagis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 06, 2026, Yan Zhao wrote:
-> From: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-> 
-> Disallow page merging (huge page adjustment) for the mirror root by
-> utilizing disallowed_hugepage_adjust().
+From: Vishal Annapurve <vannapurve@google.com>
 
-Why?  What is this actually doing?  The below explains "how" but I'm baffled as
-to the purpose.  I'm guessing there are hints in the surrounding patches, but I
-haven't read them in depth, and shouldn't need to in order to understand the
-primary reason behind a change.
+MAPGPA request from TDX VMs gets split into chunks by KVM using a loop
+of userspace exits until the complete range is handled.
+
+In some cases userspace VMM might decide to break the MAPGPA operation
+and continue it later. For example: in the case of intrahost migration
+userspace might decide to continue the MAPGPA operation after the
+migration is completed.
+
+Allow userspace to signal to TDX guests that the MAPGPA operation should
+be retried the next time the guest is scheduled.
+
+This is potentially a breaking change since if userspace sets
+hypercall.ret to a value other than EBUSY or EINVAL an EINVAL error code
+will be returned to userspace. As of now QEMU never sets hypercall.ret
+to a non-zero value after handling KVM_EXIT_HYPERCALL so this change
+should be safe.
+
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+Co-developed-by: Sagi Shahar <sagis@google.com>
+Signed-off-by: Sagi Shahar <sagis@google.com>
+---
+ arch/x86/kvm/vmx/tdx.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 2d7a4d52ccfb..9bd4ffbdfecf 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -1189,7 +1189,13 @@ static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
+ 	struct vcpu_tdx *tdx = to_tdx(vcpu);
+ 
+ 	if (vcpu->run->hypercall.ret) {
+-		tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
++		if (vcpu->run->hypercall.ret == EAGAIN)
++			tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_RETRY);
++		else if (vcpu->run->hypercall.ret == EINVAL)
++			tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
++		else
++			return -EINVAL;
++
+ 		tdx->vp_enter_args.r11 = tdx->map_gpa_next;
+ 		return 1;
+ 	}
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
