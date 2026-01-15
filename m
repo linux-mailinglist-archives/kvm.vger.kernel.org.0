@@ -1,203 +1,113 @@
-Return-Path: <kvm+bounces-68235-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA6ED27FA8
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 20:15:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A28D281A9
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 20:31:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0742D308B6A8
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:27:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 11299301701C
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F11F3C0083;
-	Thu, 15 Jan 2026 18:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41902ED17C;
+	Thu, 15 Jan 2026 19:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eutkmsbj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R22dN5Sv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sU0vN5+S"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BAE3B8BB3
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 18:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6552ED846
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 19:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768501590; cv=none; b=EtDEYNANWo/8DybwTezHDejFHQRherWwL5ialQl5shYgWWqlNxmeleN7wreOfEhDot2GLV7olKfbzAB4lZy24tW1paF1yzMA/OZ5Szna1GYGbczPE+27EDj6y5Tt5YgjCR27/MscxCC0XC5RpN5b7mQMuqpeExFR2rKrVGjPP50=
+	t=1768504643; cv=none; b=pIq1rfT/jGHIKz8r/VEQgWlHH9C24tQnP+h4jm6B+JA9EDBiAQ6/bbF6vE9j6kscd0zo5Ku9XeI3aDxL64FjjoiYLi9niqlE7kvyoGdzsGgQ80hkWYs5hFs5UWGRetZ3UVFD4YVgmcpm+jbXR/nikMcOSZP1VN14ip85VUr8Xxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768501590; c=relaxed/simple;
-	bh=0w7qjlkys/t+zaa2dmz/r3JRm0vyMo31Nn/jlIfk5GQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M4XQnhlZVRq3msqJdMcnQwstvOE8qjEylS4iMff9Pm9xTkmoDnT39548QJwipcDAP4IeRjU/qTsYO3syrKimkyTpeOOpXPDaFCn8N1gW8LsCKpJ/JXUu2Gk0KQFnpVqhnWC/mBfCwqRa5FkYNyjYoh24CXdY7hDO9HYRz4cT9Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eutkmsbj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R22dN5Sv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768501587;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/4PSeZvb7SjbMj4tci2c4EAiTmFPySPC3Po5tN6+TGM=;
-	b=EutkmsbjtWpY0u/yxiZ5M5lqj78nauslOnWrE4aaeC01DwwAhWRIkIIrRfIufa3LlAaTKE
-	dAO83dY4UFmrWwxpwXbySu2D2ed6cjK5T82uxceGKb7cdAynhs69lQzTQiTfuVUP6xWP3e
-	+TaGio/nuoVonnHkTcodOaGD/DlT9PI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-7jve81HJMV2NOGpYFCeUEw-1; Thu, 15 Jan 2026 13:26:26 -0500
-X-MC-Unique: 7jve81HJMV2NOGpYFCeUEw-1
-X-Mimecast-MFC-AGG-ID: 7jve81HJMV2NOGpYFCeUEw_1768501585
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b872c88d115so178142366b.2
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 10:26:26 -0800 (PST)
+	s=arc-20240116; t=1768504643; c=relaxed/simple;
+	bh=8EsIAojX7izm3eUG0OWRmU4nt+cjKhAtCc3Rt+DkVVo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DJmlkqL9TKm2Iy1O1y9H2SedCQ8w9CnYOxheeHRv2scUdiQxBGB2vfXaHoUGKIpmaeQW2eIuotsqN4I9jcjbdPmET7gX/ISsoTgPzna+7GN3S98F43wSRdtWyQ35yBFURNR53EtOZU8GauoxOccG37qo6SX4mCjH0EiA3KuzZnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sU0vN5+S; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-81dd077ca65so962462b3a.2
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 11:17:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768501585; x=1769106385; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/4PSeZvb7SjbMj4tci2c4EAiTmFPySPC3Po5tN6+TGM=;
-        b=R22dN5SvefN9ZXHRHXOwBBpPXYMxNzJkZCsVTXXIWihqHW+6IuftSeqAKv9kKoFF0t
-         QOHiUWketlrtp2+zmGg9fJJWiXfyh70bZ/f0nSSi+7rAMnO/M0fGI13PURBGqYnoEJ31
-         8pfP4DO+EYZ9gs4yGWdz/dBceyKub8LV3TtYuP0+OFbbg4fBFaWNoRSYMZbFe8IxNLgq
-         sv9MCYecPHMNR6kljhFffX5Z8Af/FKA+FtBuIKxf4JyW1WNCIeGzEsvFzMDbR1H1R9ic
-         iS05pke37u9PlkBcP8+mkMJXVTdy3ekthFFpJ57AScbGzMbj23zzs1vtxm4Pr9b06mrb
-         CYfQ==
+        d=google.com; s=20230601; t=1768504640; x=1769109440; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xTgcZS4Su6Azzs6FTl7APd5b9i+AMlUEP5Ldeqc7RbI=;
+        b=sU0vN5+SfipEjWBaEJV+YK9LkHmRtHPwHIppGqnyfwu3ts41DMceTiOcGL2gnXAG3Z
+         wiLGHb31GZIekO9KpfinnIRsXcQlwMyQ6h7erXP/3TgiwNwSRwvlHk5EXubnCn/inKD3
+         4WNWTA0djf0D+79q22b83+7UhV1CWlZ4wuEDFAyf3Y+letOLd/XQLm69qYEDkDEyhHlS
+         JodPLIXSG7+yoWUEMQsjF6xhF+vKnhKEmFBxQcdZrhC5/E3IF7DuSmX/QuF0FeoX6pBZ
+         w7YWdL/iboe65sUD4iYRNy6COQ8Y2yC6QXztgSxCrjuRvk/EIAysBRvtb6iSR6CL7CA9
+         9D9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768501585; x=1769106385;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/4PSeZvb7SjbMj4tci2c4EAiTmFPySPC3Po5tN6+TGM=;
-        b=wLSsXPsyncTW8Fzrw84EdElgDp9Tsp5gXENSRCnmLAu7tm3gz6mJH2oRaMXIcFdivZ
-         G6tbKxb5ghA5er4QzBRGKHcf+stG4+zCQXJ/iidadKJYUaCz+pDwc30RVYniVpUlzeXy
-         ZWJOsSUh/922fQbwWtrlNkVxtCf8cizM+WhWkkRJvFMIA2XMuPdfUQv2gWIRFjQWfDok
-         Y8nASXMObuLK6c/sLJp9OjcHQcwF3jQJ4cSvB9ju+BofvKD3DnAZpGJcB0j/+3EJVc7i
-         ZA5XvYvf8Jmt3oO+Wi/MeVJOv/dOgHmCIMgz+IDttlwuZ5YrVFo4tOQPvvdqgVTzH4Bf
-         Lvtg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTITs42BpHwH+NJYvyr/3flXR9ymizYXwSc9BPkXVFg41YbJfLR4P79dEL8Vz7WyiZPSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHZynLtz52zxCrNCBr+6znX0f38DxctJsOeS5lhusc+j4dMxWM
-	U+YrlAmusc3WzEr0flMG0E/48pEzvQUSV2GsOg3Yxpy1UI5WbeTuAGlbaYoeNxjy7g1WebwYf38
-	ZrOK2Jath4lButhmhrcyucUWayZZMxVatTAaEOYulJD0000eL6frZ7A==
-X-Gm-Gg: AY/fxX5OzKxeUj8xnyzqd3tjngnmlhyvGdVNg3Zr3a+KEikkSqr8u1lQ5sQksFKmwNM
-	68pR+4HToZfWQmcApNI/82PwSbwajP5RSsjXXaVQqhPihmatG+SvV5WeUt1kVbS64ne9Kbtsb8b
-	jGxZgCMAGGQ53IsvQQNf6VpYUb6u6p/SzFX26h89jFdlkgRCCGsHDor28GIzKnaFDq7vZUSbsAs
-	sm5lcuE7mvseUVImjXWbPztvqf8780KPZNwDcbFCvXAMT66l8HUZfUHTwBY+lFNMiuYzMMtlQ6u
-	OI75XWRU8DjdPihAivzNnj6d6BFsAkG5QhAR/Z5/4yuM0WnNbGukD+DZjAX3DRtC9MjOMQpw3X7
-	I0jzlT4qmvIiD23NjFVTIbQ5T7LgBfOA96F22Epyk1MyJNBvW+BIflEj3QrLSPcbNgsaG/7Bp3T
-	OJ5TYL2EJXnlM=
-X-Received: by 2002:a17:907:846:b0:b87:6f2:a486 with SMTP id a640c23a62f3a-b8792f79ecdmr47545166b.31.1768501585161;
-        Thu, 15 Jan 2026 10:26:25 -0800 (PST)
-X-Received: by 2002:a17:907:846:b0:b87:6f2:a486 with SMTP id a640c23a62f3a-b8792f79ecdmr47542466b.31.1768501584718;
-        Thu, 15 Jan 2026 10:26:24 -0800 (PST)
-Received: from [192.168.1.84] ([93.56.161.93])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b87959f6e53sm7681666b.47.2026.01.15.10.26.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jan 2026 10:26:24 -0800 (PST)
-Message-ID: <fcd329da-b24a-484b-85df-c3e1c2616a53@redhat.com>
-Date: Thu, 15 Jan 2026 19:26:22 +0100
+        d=1e100.net; s=20230601; t=1768504640; x=1769109440;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xTgcZS4Su6Azzs6FTl7APd5b9i+AMlUEP5Ldeqc7RbI=;
+        b=YI5hgKz8Lmrzg9bfCsPU2YwXchkGPiJsjDgUKC4ZMdSUI0yBhdSLLcFhLi3nCpj06P
+         VzVTXEnqNynOeSfsCDkWqH/G+ebOaqUwc0hUHTzGW605iwdNaMy9pL6xzx6z4wo3l4mu
+         +V2aKWG/eVDuGQSf2XrEiCs3X195uJCnuSKehOI3eGrixdS5MT7Senz7dIA6MMGXu0Hu
+         33EIhl6APwftitGyddi4Ih9K7008MkqFfrAvgSprw2+hpC+v83aj/aWLqBZARNrVX7be
+         xVP8c1+hE4sQ6QgjNfOiOwiBNE84B3bJ1k/lPdZZuBaVGCfoNnleWUrMDbV990KVulQF
+         l2BA==
+X-Gm-Message-State: AOJu0Yxu0yz7FNZgnLSRwXvfLh2juMvGCbkOGMpNvbA9K9q3BdTIiVn3
+	zFrl8yswpYyoxPcvTmht9jjBm0w65LKeNenLx0f7fcl/su9NJ9wi4+5OZUSkcA8eXdwiPk7CKSV
+	mErLCfg==
+X-Received: from pfbbj16.prod.google.com ([2002:a05:6a00:3190:b0:7b8:922c:725d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2ea0:b0:81f:3d13:e070
+ with SMTP id d2e1a72fcca58-81fa17729e5mr189167b3a.12.1768504640018; Thu, 15
+ Jan 2026 11:17:20 -0800 (PST)
+Date: Thu, 15 Jan 2026 11:17:18 -0800
+In-Reply-To: <20260108214622.1084057-3-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever
- XFD[i]=1
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: seanjc@google.com, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
- Borislav Petkov <bp@alien8.de>, "Bae, Chang Seok" <chang.seok.bae@intel.com>
-References: <20260101090516.316883-1-pbonzini@redhat.com>
- <20260101090516.316883-2-pbonzini@redhat.com>
- <cd6721c7-0963-4f4f-89d9-6634b8b559ae@intel.com>
- <8ee84cb9-ef6d-43ac-b9d0-9c22e7d1ecd8@redhat.com>
- <f130ac18-708a-4074-b031-9599006786d3@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <f130ac18-708a-4074-b031-9599006786d3@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20260108214622.1084057-1-michael.roth@amd.com> <20260108214622.1084057-3-michael.roth@amd.com>
+Message-ID: <aWk9PusYNW0iADuD@google.com>
+Subject: Re: [PATCH v3 2/6] KVM: guest_memfd: Remove partial hugepage handling
+ from kvm_gmem_populate()
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, pbonzini@redhat.com, 
+	vbabka@suse.cz, ashish.kalra@amd.com, liam.merwick@oracle.com, 
+	david@redhat.com, vannapurve@google.com, ackerleytng@google.com, aik@amd.com, 
+	ira.weiny@intel.com, yan.y.zhao@intel.com, pankaj.gupta@amd.com, 
+	Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 1/15/26 19:19, Dave Hansen wrote:
-> Is there anything preventing the kernel_fpu_begin() interrupt from
-> happening a little later, say:
-> 
-> 	XFD[18]=0
-> 	...
-> 	XFD[18]=1
-> 	# Interrupt (that does XSAVE)
-> 	XRSTOR (no #NM)
-> 	
-> In that case, the XSAVE in kernel_fpu_begin() "operates as if XINUSE[i]
-> = 0" and would set XFEATURES[18]=0; it would save the component as being
-> in its init state. The later XRSTOR would obviously restore state 18 to
-> its init state.
+On Thu, Jan 08, 2026, Michael Roth wrote:
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index fdaea3422c30..9dafa44838fe 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -151,6 +151,15 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>  					 mapping_gfp_mask(inode->i_mapping), policy);
+>  	mpol_cond_put(policy);
+>  
+> +	/*
+> +	 * External interfaces like kvm_gmem_get_pfn() support dealing
+> +	 * with hugepages to a degree, but internally, guest_memfd currently
+> +	 * assumes that all folios are order-0 and handling would need
+> +	 * to be updated for anything otherwise (e.g. page-clearing
+> +	 * operations).
+> +	 */
+> +	WARN_ON_ONCE(folio_order(folio));
 
-Yes, absolutely, and the fact that the race window is so small is why 
-this issue stayed undetected for years.  In fact, consider that XFD 
-becomes a pass-through MSR after the first write, at which point there's 
-on race window at all---XFD[18] will be 1 if that's the guest value and 
-the state will be destroyed.
+Gah, this is buggy.  __filemap_get_folio_mpol() can return an ERR_PTR().  If that
+happens, this WARN will dereference garbage and explode.
 
-I only mentioned SMIs as a way for this to happen on bare metal, i.e. 
-without KVM involvement at all (though for dual-monitor treatment 
-virtualization _is_ involved).
+And of course I find it _just_ after sending thank yous, *sigh*.
 
-> That's a long-winded way of saying I think I agree with the patch. It
-> destroys the state a bit more aggressively but it doesn't do anything _new_.
+I'll squash to this (after testing):
 
-Thanks. :)
+	WARN_ON_ONCE(!IS_ERR(folio) && folio_order(folio));
 
-> What would folks think about making the SDM language stronger, or at
-> least explicitly adding the language that setting XFD[i]=1 can lead to
-> XINUSE[i] going from 1=>0. Kinda like the language that's already in
-> "XRSTOR and the Init and Modified Optimizations", but specific to XFD:
-> 
-> 	If XFD[i] = 1 and XINUSE[i] = 1, state component i may be
-> 	tracked as init; XINUSE[i] may be set to 0.
-> 
-> That would make it consistent with the KVM behavior. It might also give
-> the CPU folks some additional wiggle room for new behavior.
-Yes, absolutely.  I think any other hypervisor may want to do the same, 
-to avoid save/restores of tile data to when guest XFD[18]=1 (and to 
-avoid unnecessary clearing of XFD, just for the sake of storing tile 
-data that is most likely unused).
-
-Paolo
-
+avoiding a few emails isn't worth having a lurking bug.
 
