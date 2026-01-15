@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-68125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68128-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD03AD21F96
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:17:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE47D21FC6
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:18:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 458F030907D4
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:14:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E520E304DAEA
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B354329ACF7;
-	Thu, 15 Jan 2026 01:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A1D2D541B;
+	Thu, 15 Jan 2026 01:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kH2a+5Wk"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qCvnWcTJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFF923D297
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDB2223702
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768439640; cv=none; b=uCuuHaQf5R4kRSrnxgTlaWle0XSHr9HaAQyAok/JJNs6eoketqnzWK+Ygy2ERULyVysjPi46468Q3176Yd2Z+iw9MeaHld+msYeLP5QoZF+m6d/0LT5aPtldkD4DrwWtoThpWPtOjh5FX4J8bVaQ7tjBKjfOJYrYf3kxdawvqXc=
+	t=1768439646; cv=none; b=qbhIXwJOwIBHfsWwbQq3kTSjz3eyqhDztOcStx/xKNUkWRihMIA4dUyTMzhb/MLpt9feIuFcwGOv/zW/tKl0/X6KmZKjOvxdbWcf9RlnRfUzweCH5uOAA1niYWggzss4o3LSII0kXdJtyFFfNFeEoGTb1Zx5xOxOphRco0HBvrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768439640; c=relaxed/simple;
-	bh=UkTB7/LqH/pyyGJdD2ZNakL2HnEOMm7V0uLGwDf8qjU=;
+	s=arc-20240116; t=1768439646; c=relaxed/simple;
+	bh=Rv6keflG74Ad0j+ZEDSNo83LtfdEflX6pihNX4fDAfQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZdeaBK/TZzeEjmfMOKuIwjaaH6IFm9AlH3ckEeHF7o846052eYSVJn971k//DeRfX74AZoe7z6lSR9UN0znUc28mN7OuSp4GDVhIR7JTHXotrV+ZC+qdoXylaLPlgOHRKLkWSCugDa2ste8XCfP6JRqnjuVOLoB0A0H96h5g3kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kH2a+5Wk; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=HWI5DIbxYHSUIEhhu2/Udxpv44SNwR41OKKOvhPasfC3U/Y+xXISV/bR0FeeL12bDFnuWOptbYy3uj+U94cjhPENhhI6IkCmi9DZ21KkjPoIZS7s+cV2N47itewpJkHZ2nG+/HanMCpTthHhBY0Kkxbg/YGsuzeItMrdpO1sSdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qCvnWcTJ; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768439628;
+	t=1768439631;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jBZGK/DUsBaWT2N5OHFROUf2AuDR00qURUYy9nlXgrA=;
-	b=kH2a+5Wk8lavW9jlY1bV8X39gV1Bw6Zy26gDvN0pga1sT1YNQZHX0liQVaA4yPlkP0aQPp
-	7VEAvYhiCIeVVRsgxSQifUlbyghRrSmntoXqs5OJ53ry/GRjsP9LnEKlN9oeM4zIVmcI01
-	/9P7EHAJSVmdKWx6lzH+1EhAaB+rp+E=
+	bh=oDJF82VacMjoEVccnBD70R2C6pOYhASDAZ5TCc4L/w8=;
+	b=qCvnWcTJZVmQ+m4FcTByiat3Rl45Lf7qC4ax8RfrGgnX4Xq7BITVkE32b7Ufj8JUibEMTb
+	u32UU6BIjHCZV0nPUm29IzeohRHNoBWWSXoRpSR4jXS4Qd6E4yo23bDYmK3IL7+b9qbykl
+	afHBVWfngFUvmEK37s4z7x61D34cPCI=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -47,9 +47,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>,
 	stable@vger.kernel.org
-Subject: [PATCH v4 12/26] KVM: nSVM: Refactor minimal #VMEXIT handling out of nested_svm_vmexit()
-Date: Thu, 15 Jan 2026 01:12:58 +0000
-Message-ID: <20260115011312.3675857-13-yosry.ahmed@linux.dev>
+Subject: [PATCH v4 13/26] KVM: nSVM: Unify handling of VMRUN failures with proper cleanup
+Date: Thu, 15 Jan 2026 01:12:59 +0000
+Message-ID: <20260115011312.3675857-14-yosry.ahmed@linux.dev>
 In-Reply-To: <20260115011312.3675857-1-yosry.ahmed@linux.dev>
 References: <20260115011312.3675857-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -61,139 +61,192 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-In preparation for having a separate minimal #VMEXIT path for handling
-failed VMRUNs, move the minimal logic out of nested_svm_vmexit() into a
+There are currently two possible causes of VMRUN failures:
+
+1) Consistency checks failures. In this case, KVM updates the exit code
+   in the mapped VMCB12 and exits early in nested_svm_vmrun(). This
+   causes a few problems:
+
+  A) KVM does not clear the GIF if the early consistency checks fail
+     (because nested_svm_vmexit() is not called). Nothing requires
+     GIF=0 before a VMRUN, from the APM:
+
+	It is assumed that VMM software cleared GIF some time before
+	executing the VMRUN instruction, to ensure an atomic state
+	switch.
+
+     So an early #VMEXIT from early consistency checks could leave the
+     GIF set.
+
+  B) svm_leave_smm() is missing consistency checks on the newly loaded
+     guest state, because the checks aren't performed by
+     enter_svm_guest_mode().
+
+2) Failure to load L2's CR3 or merge the MSR bitmaps. In this case, a
+   fully-fledged #VMEXIT injection is performed as VMCB02 is already
+   prepared.
+
+Arguably all VMRUN failures should be handled before the VMCB02 is
+prepared, but with proper cleanup (e.g. clear the GIF). Move all the
+potential failure checks inside enter_svm_guest_mode() before switching
+to VMCB02. On failure of any of these checks, nested_svm_vmrun()
+synthesizes a minimal #VMEXIT through the new nested_svm_failed_vmrun()
 helper.
 
-This includes clearing the GIF, handling single-stepping on VMRUN, and a
-few data structure cleanups.  Basically, everything that is required by
-the architecture (or KVM) on a #VMEXIT where L2 never actually ran.
-
-Additionally move uninitializing the nested MMU and reloading host CR3
-to the new helper. It is not required at this point, but following
-changes will require it.
-
-No functional change intended.
+__nested_svm_vmexit() already performs the necessary cleanup for a
+failed VMRUN, including uninitializing the nested MMU and reloading L1's
+CR3. This ensures that consistency check failures do proper necessary
+cleanup, while other failures do not doo too much cleanup. It also
+leaves a unified path for handling VMRUN failures.
 
 Cc: stable@vger.kernel.org
+Fixes: 52c65a30a5c6 ("KVM: SVM: Check for nested vmrun intercept before emulating vmrun")
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/kvm/svm/nested.c | 61 ++++++++++++++++++++++-----------------
- 1 file changed, 34 insertions(+), 27 deletions(-)
+ arch/x86/kvm/svm/nested.c | 62 +++++++++++++++++++++++----------------
+ 1 file changed, 36 insertions(+), 26 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f108f6fae5bc..53ae761b50e2 100644
+index 53ae761b50e2..1dfe5800c98c 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -978,6 +978,34 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	return 0;
+@@ -938,22 +938,19 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 				    vmcb12->control.intercepts[INTERCEPT_WORD4],
+ 				    vmcb12->control.intercepts[INTERCEPT_WORD5]);
+ 
+-
+ 	svm->nested.vmcb12_gpa = vmcb12_gpa;
+ 
+ 	WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
+ 
+ 	enter_guest_mode(vcpu);
+ 
++	if (!nested_vmcb_check_save(vcpu, &svm->nested.save) ||
++	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl))
++		return -EINVAL;
++
+ 	if (nested_npt_enabled(svm))
+ 		nested_svm_init_mmu_context(vcpu);
+ 
+-	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+-
+-	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+-	nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
+-	nested_vmcb02_prepare_save(svm, vmcb12);
+-
+ 	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
+ 				  nested_npt_enabled(svm), from_vmrun);
+ 	if (ret)
+@@ -965,6 +962,17 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 			return ret;
+ 	}
+ 
++	/*
++	 * Any VMRUN failure needs to happen before this point, such that the
++	 * nested #VMEXIT is injected properly by nested_svm_failed_vmrun().
++	 */
++
++	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
++
++	svm_switch_vmcb(svm, &svm->nested.vmcb02);
++	nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
++	nested_vmcb02_prepare_save(svm, vmcb12);
++
+ 	if (!from_vmrun)
+ 		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
+ 
+@@ -983,6 +991,8 @@ static void __nested_svm_vmexit(struct vcpu_svm *svm)
+ 	struct vmcb *vmcb01 = svm->vmcb01.ptr;
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
++	WARN_ON_ONCE(is_guest_mode(vcpu));
++
+ 	svm->nested.vmcb12_gpa = 0;
+ 	svm->nested.ctl.nested_cr3 = 0;
+ 
+@@ -1006,6 +1016,19 @@ static void __nested_svm_vmexit(struct vcpu_svm *svm)
+ 		kvm_queue_exception(vcpu, DB_VECTOR);
  }
  
-+static void __nested_svm_vmexit(struct vcpu_svm *svm)
++static void nested_svm_failed_vmrun(struct vcpu_svm *svm, struct vmcb *vmcb12)
 +{
-+	struct vmcb *vmcb01 = svm->vmcb01.ptr;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
++	WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
 +
-+	svm->nested.vmcb12_gpa = 0;
-+	svm->nested.ctl.nested_cr3 = 0;
++	leave_guest_mode(vcpu);
 +
-+	/* GIF is cleared on #VMEXIT, no event can be injected in L1 */
-+	svm_set_gif(svm, false);
-+	vmcb01->control.exit_int_info = 0;
-+
-+	nested_svm_uninit_mmu_context(vcpu);
-+	if (nested_svm_load_cr3(vcpu, vmcb01->save.cr3, false, true)) {
-+		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-+		return;
-+	}
-+
-+	/*
-+	 * If we are here following the completion of a VMRUN that
-+	 * is being single-stepped, queue the pending #DB intercept
-+	 * right now so that it an be accounted for before we execute
-+	 * L1's next instruction.
-+	 */
-+	if (unlikely(vmcb01->save.rflags & X86_EFLAGS_TF))
-+		kvm_queue_exception(vcpu, DB_VECTOR);
++	vmcb12->control.exit_code = SVM_EXIT_ERR;
++	vmcb12->control.exit_code_hi = -1u;
++	vmcb12->control.exit_info_1 = 0;
++	vmcb12->control.exit_info_2 = 0;
++	__nested_svm_vmexit(svm);
 +}
 +
  int nested_svm_vmrun(struct kvm_vcpu *vcpu)
  {
  	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -1127,8 +1155,6 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
- 	/* in case we halted in L2 */
- 	kvm_set_mp_state(vcpu, KVM_MP_STATE_RUNNABLE);
+@@ -1048,15 +1071,6 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+ 	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
+ 	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
  
--	svm->nested.vmcb12_gpa = 0;
--
- 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
- 		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
- 		return;
-@@ -1246,13 +1272,6 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
- 		}
- 	}
- 
--	/*
--	 * On vmexit the  GIF is set to false and
--	 * no event can be injected in L1.
--	 */
--	svm_set_gif(svm, false);
--	vmcb01->control.exit_int_info = 0;
--
- 	svm->vcpu.arch.tsc_offset = svm->vcpu.arch.l1_tsc_offset;
- 	if (vmcb01->control.tsc_offset != svm->vcpu.arch.tsc_offset) {
- 		vmcb01->control.tsc_offset = svm->vcpu.arch.tsc_offset;
-@@ -1265,8 +1284,6 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
- 		svm_write_tsc_multiplier(vcpu);
- 	}
- 
--	svm->nested.ctl.nested_cr3 = 0;
--
- 	/*
- 	 * Restore processor state that had been saved in vmcb01
- 	 */
-@@ -1292,13 +1309,6 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
- 
- 	nested_svm_transition_tlb_flush(vcpu);
- 
--	nested_svm_uninit_mmu_context(vcpu);
--
--	if (nested_svm_load_cr3(vcpu, vmcb01->save.cr3, false, true)) {
--		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
--		return;
+-	if (!nested_vmcb_check_save(vcpu, &svm->nested.save) ||
+-	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
+-		vmcb12->control.exit_code    = SVM_EXIT_ERR;
+-		vmcb12->control.exit_code_hi = -1u;
+-		vmcb12->control.exit_info_1  = 0;
+-		vmcb12->control.exit_info_2  = 0;
+-		goto out;
 -	}
 -
  	/*
- 	 * Drop what we picked up for L2 via svm_complete_interrupts() so it
- 	 * doesn't end up in L1.
-@@ -1307,21 +1317,18 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
- 	kvm_clear_exception_queue(vcpu);
- 	kvm_clear_interrupt_queue(vcpu);
+ 	 * Since vmcb01 is not in use, we can use it to store some of the L1
+ 	 * state.
+@@ -1077,15 +1091,9 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+ 		svm->nmi_l1_to_l2 = false;
+ 		svm->soft_int_injected = false;
  
--	/*
--	 * If we are here following the completion of a VMRUN that
--	 * is being single-stepped, queue the pending #DB intercept
--	 * right now so that it an be accounted for before we execute
--	 * L1's next instruction.
--	 */
--	if (unlikely(vmcb01->save.rflags & X86_EFLAGS_TF))
--		kvm_queue_exception(&(svm->vcpu), DB_VECTOR);
+-		svm->vmcb->control.exit_code    = SVM_EXIT_ERR;
+-		svm->vmcb->control.exit_code_hi = -1u;
+-		svm->vmcb->control.exit_info_1  = 0;
+-		svm->vmcb->control.exit_info_2  = 0;
+-
+-		nested_svm_vmexit(svm);
++		nested_svm_failed_vmrun(svm, vmcb12);
+ 	}
+ 
+-out:
+ 	kvm_vcpu_unmap(vcpu, &map);
+ 
+ 	return ret;
+@@ -1224,6 +1232,8 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
+ 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
+ 		vmcb01->control.erap_ctl |= ERAP_CONTROL_CLEAR_RAP;
+ 
++	/* VMRUN failures before switching to VMCB02 are handled by nested_svm_failed_vmrun() */
++	WARN_ON_ONCE(svm->vmcb != svm->nested.vmcb02.ptr);
+ 	svm_switch_vmcb(svm, &svm->vmcb01);
+ 
+ 	/*
+@@ -1914,9 +1924,6 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	if (nested_npt_enabled(svm))
+ 		nested_svm_init_mmu_context(vcpu);
+ 
+-	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+-	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
 -
  	/*
- 	 * Un-inhibit the AVIC right away, so that other vCPUs can start
- 	 * to benefit from it right away.
- 	 */
- 	if (kvm_apicv_activated(vcpu->kvm))
- 		__kvm_vcpu_update_apicv(vcpu);
-+
-+	/*
-+	 * Potentially queues an exception, so it needs to be after
-+	 * kvm_clear_exception_queue() is called above.
-+	 */
-+	__nested_svm_vmexit(svm);
- }
+ 	 * While the nested guest CR3 is already checked and set by
+ 	 * KVM_SET_SREGS, it was set when nested state was yet loaded,
+@@ -1928,6 +1935,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	if (ret)
+ 		goto out_free;
  
- static void nested_svm_triple_fault(struct kvm_vcpu *vcpu)
++	svm_switch_vmcb(svm, &svm->nested.vmcb02);
++	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
++
+ 	svm->nested.force_msr_bitmap_recalc = true;
+ 
+ 	kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
 -- 
 2.52.0.457.g6b5491de43-goog
 
