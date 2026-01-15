@@ -1,342 +1,172 @@
-Return-Path: <kvm+bounces-68161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCA0AD22E85
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 08:44:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B721D22EA6
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 08:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA12E30975B5
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 07:44:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6EC5830188FE
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 07:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1395E32ABC7;
-	Thu, 15 Jan 2026 07:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C0D32C336;
+	Thu, 15 Jan 2026 07:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPoabBQC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XTxlO4XO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32480329C7E
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 07:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DA9218592;
+	Thu, 15 Jan 2026 07:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768463041; cv=none; b=fl+F6KfFhFA31oAfnTCNwsJPVglFH2NJAcPaNFOeeveoaAApvmmp44qKmZ7NJkdgjcJUSGDkxZK0XVZS9eDYjYSoPaoWpeMwuvV2KmW8/GaV6U6nJCoX+ANvXTgAshRCVp5E+q3r/ooZp5JWh6hDQMl9R9yoPcfw6iGbixh1OjU=
+	t=1768463252; cv=none; b=BMcZ7OByR+FbRIVjXBqCj3BhAA5QJvnLlLS5nPsR8eA0nIWIGhEBG1CAn2JxjaJt/cUjmTYEtjoHgXBItuXBWB4c3/dbtkS8WTikpA06uHMVaAYwm2CAgfQulc46d2486dNjVx5VAZ5h+uyQ308Dk+AU7qeVcnZwsMnIqjDSSxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768463041; c=relaxed/simple;
-	bh=4FGPv/2RxBM3h5py+1EMqhDtPUHe2D+7RO2VfCfYdZI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lRpJcAXahvM0r0fc0dvOmaTLjvwQDD63ZCrZieN3GEzkcQrMkiag3VAbO7cZ5+HP32Oq5p4Hii5oux3RM9h/WUG1+iz9fbyGM/+xi9qQzkPopvnlpsdBitD0VJWQs5xkr42DLsJz9WpUZSGFVozt3dmkmVzcggOcIrwLkFiSDLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPoabBQC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E42F7C4AF09
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 07:44:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768463040;
-	bh=4FGPv/2RxBM3h5py+1EMqhDtPUHe2D+7RO2VfCfYdZI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=JPoabBQClH8LVoT1CRQ3qky/rMkHsRyVl7+QY2ZIPFUbOQg0xyf6ASkVvCJwKmbgX
-	 5UHinV5rku73xgr8lUOZHaHJzU05116Ds4TzuhKilGa25ccUGD8y1+kPTIulFfQZ7C
-	 ooAdVwg4bYGDlRFHptMg4ZEwf5JVa1v+YrebE1+ikYSR3YZtADt1Y2RJ6ijetJD+BM
-	 cR2FftV3MGt9MMRlrWwuO/0hKf6KEGkLTKoe001EPGTWO6MfcMa2vCV7PnmJKdNvvx
-	 4ClB/mY6p2FWyAEYJHt9XPvZnnZo+UDd69txsxOPo+q8M2b+Q7INv4f4h9nJLPqqO/
-	 G3iO84SuoOhpA==
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-652fec696c9so1024585a12.3
-        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 23:44:00 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVXI0OaykgNIRE3GdwsexuhqlwQcsEfxxDOrk9qN1J8CnpJWbP/Jn0joH/YVDxbeFtb6Zs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRRJ43ulPgtoJEiv7xAqJ3M4eDfhbdIyr0NqNlqr+maDigq71c
-	5V5fwUKlxKcXDR00/x7V1pKKUjH4urEj/IZStLRnZfmdbvX/NHDy6Qc47gDcsCAvQb720ayy3sP
-	jO5BBoYzz5MRoSGl/JFVDbIXo2jrwtjs=
-X-Received: by 2002:a17:907:7f91:b0:b79:d24b:474d with SMTP id
- a640c23a62f3a-b87676a0da7mr359416066b.16.1768463039462; Wed, 14 Jan 2026
- 23:43:59 -0800 (PST)
+	s=arc-20240116; t=1768463252; c=relaxed/simple;
+	bh=S3Wzl5l6bWty/668N7Go2Z+OkYAZypVTcK9mU5Tcjng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p0m965GFmchVilk+VwWosqNCyVlSBPyxqoCDS0NjePhnDhLGDD/ckiFaxO41NszBPQRyEshC8EMrrm8GU6qek1Bfj7o3i66MroMK82K/P/8n3tYttDi+LsyTgTsSENUYLdtGv48fUkDVNiN1fEUsHB4bhidKpkW1vuOBs4VpG0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XTxlO4XO; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768463251; x=1799999251;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=S3Wzl5l6bWty/668N7Go2Z+OkYAZypVTcK9mU5Tcjng=;
+  b=XTxlO4XOnkKu0IBwojD4ni0KhN0qmKWCBgdOJtfoGq3JrOVz+rr3eZ27
+   w/+s8TXM5pM69bjGPr7v0kwpK65ln2+T/KCB2Tpu9iBDfGuFah4yOe3qE
+   TBIudUY1Xmlzhqnq+ChcSQ49z6iK65x3/h9hOq2ZzAhsy1YEcZOhRGztd
+   EJH8e7LdnI2+ou7DqTyYJcu91rNhRCnPBxRwiKqaUBag3VetNbxgo8Egr
+   K/sbc6IwPDkwdGid9Pkaao0S65eo+eZQj3vIQIEE6CmJg18fqQZUTwznv
+   2RIoriALGvQC4ZkhEuRb4JazS6I0vFriPG4ME1ZGJXG80BcHBvoy7+wJE
+   Q==;
+X-CSE-ConnectionGUID: iYb/0e+rRVi7WTIgWsaDLQ==
+X-CSE-MsgGUID: 871KKwdqSAi7+A6fjDQKSg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="57320971"
+X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
+   d="scan'208";a="57320971"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 23:47:31 -0800
+X-CSE-ConnectionGUID: ZWG3pRi+Qyeee/hc3F33sw==
+X-CSE-MsgGUID: jZvx5enlRg2I2NKIkzLHSg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
+   d="scan'208";a="205174135"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.173]) ([10.124.240.173])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 23:47:27 -0800
+Message-ID: <af8bbddc-fcf5-460b-9a6f-1418a0748f37@intel.com>
+Date: Thu, 15 Jan 2026 15:47:24 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251225091224.2893389-1-gaosong@loongson.cn> <20251225091224.2893389-2-gaosong@loongson.cn>
-In-Reply-To: <20251225091224.2893389-2-gaosong@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 15 Jan 2026 15:43:51 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5h2LioH6SZD8RUNewb4De3LWM9g2PJFUnTTkX+GG4cdw@mail.gmail.com>
-X-Gm-Features: AZwV_QiaUyKFTIxEaKv_MY3PKwCihURSdn_6U07VTAlpWKWayuoeaNBCR3B_XX8
-Message-ID: <CAAhV-H5h2LioH6SZD8RUNewb4De3LWM9g2PJFUnTTkX+GG4cdw@mail.gmail.com>
-Subject: Re: [PATCH v5 1/2] LongArch: KVM: Add DMSINTC device support
-To: Song Gao <gaosong@loongson.cn>
-Cc: maobibo@loongson.cn, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kernel@xen0n.name, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: TDX: Allow userspace to return errors to guest for
+ MAPGPA
+To: Sagi Shahar <sagis@google.com>, Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Kiryl Shutsemau <kas@kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>,
+ "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20260114003015.1386066-1-sagis@google.com>
+ <43a0558a-4cca-4d9c-97dc-ffd085186fd9@intel.com>
+ <aWe8zESCJ0ZeAOT3@google.com>
+ <CAAhR5DE=ypkYwqEGEJBZs5A2N9OCVaL_9Jxi5YN5X7rNpKSZTw@mail.gmail.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <CAAhR5DE=ypkYwqEGEJBZs5A2N9OCVaL_9Jxi5YN5X7rNpKSZTw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi, Song,
+On 1/15/2026 9:21 AM, Sagi Shahar wrote:
+> On Wed, Jan 14, 2026 at 9:57 AM Sean Christopherson <seanjc@google.com> wrote:
+>>
+>> On Wed, Jan 14, 2026, Xiaoyao Li wrote:
+>>> On 1/14/2026 8:30 AM, Sagi Shahar wrote:
+>>>> From: Vishal Annapurve <vannapurve@google.com>
+>>>>
+>>>> MAPGPA request from TDX VMs gets split into chunks by KVM using a loop
+>>>> of userspace exits until the complete range is handled.
+>>>>
+>>>> In some cases userspace VMM might decide to break the MAPGPA operation
+>>>> and continue it later. For example: in the case of intrahost migration
+>>>> userspace might decide to continue the MAPGPA operation after the
+>>>> migrration is completed
+>>
+>> migration
+>>
+>>>> Allow userspace to signal to TDX guests that the MAPGPA operation should
+>>>> be retried the next time the guest is scheduled.
+>>
+>> To Xiaoyao's point, changes like this either need new uAPI, or a detailed
+>> explanation in the changelog of why such uAPI isn't deemed necessary.
+>>
+>>>> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+>>>> Co-developed-by: Sagi Shahar <sagis@google.com>
+>>>> Signed-off-by: Sagi Shahar <sagis@google.com>
+>>>> ---
+>>>>    arch/x86/kvm/vmx/tdx.c | 8 +++++++-
+>>>>    1 file changed, 7 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>>>> index 2d7a4d52ccfb..3244064b1a04 100644
+>>>> --- a/arch/x86/kvm/vmx/tdx.c
+>>>> +++ b/arch/x86/kvm/vmx/tdx.c
+>>>> @@ -1189,7 +1189,13 @@ static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
+>>>>      struct vcpu_tdx *tdx = to_tdx(vcpu);
+>>>>      if (vcpu->run->hypercall.ret) {
+>>>> -           tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+>>>> +           if (vcpu->run->hypercall.ret == -EBUSY)
+>>>> +                   tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_RETRY);
+>>>> +           else if (vcpu->run->hypercall.ret == -EINVAL)
+>>>> +                   tdvmcall_set_return_code(vcpu, TDVMCALL_STATUS_INVALID_OPERAND);
+>>>> +           else
+>>>> +                   return -EINVAL;
+>>>
+>>> It's incorrect to return -EINVAL here.
+>>
+>> It's not incorrect, just potentially a breaking change.
+>>
+>>> The -EINVAL will eventually be
+>>> returned to userspace for the VCPU_RUN ioctl. It certainly breaks userspace.
+>>
+>> It _might_ break userspace.  It certainly changes KVM's ABI, but if no userspace
+>> actually utilizes the existing ABI, then userspace hasn't been broken.
+>>
+>> And unless I'm missing something, QEMU _still_ doesn't set hypercall.ret.  E.g.
+>> see this code in __tdx_map_gpa().
+>>
+>>          /*
+>>           * In principle this should have been -KVM_ENOSYS, but userspace (QEMU <=9.2)
+>>           * assumed that vcpu->run->hypercall.ret is never changed by KVM and thus that
+>>           * it was always zero on KVM_EXIT_HYPERCALL.  Since KVM is now overwriting
+>>           * vcpu->run->hypercall.ret, ensuring that it is zero to not break QEMU.
+>>           */
+>>          tdx->vcpu.run->hypercall.ret = 0;
+>>
+>> AFAICT, QEMU kills the VM if anything goes wrong.
+>>
+>> So while I initially had the exact same reaction of "this is a breaking change
+>> and needs to be opt-in", we might actually be able to get away with just making
+>> the change (assuming no other VMMs care, or are willing to change themselves).
+> 
+> Is there a better source of truth for whether QEMU uses hypercall.ret
+> or just point to this comment in the commit message.
 
-On Thu, Dec 25, 2025 at 5:37=E2=80=AFPM Song Gao <gaosong@loongson.cn> wrot=
-e:
->
-> Add device model for DMSINTC interrupt controller, implement basic
-> create/destroy/set_attr interfaces, and register device model to kvm
-> device table.
->
-> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
-> Signed-off-by: Song Gao <gaosong@loongson.cn>
-> ---
->  arch/loongarch/include/asm/kvm_dmsintc.h |  21 +++++
->  arch/loongarch/include/asm/kvm_host.h    |   3 +
->  arch/loongarch/include/uapi/asm/kvm.h    |   4 +
->  arch/loongarch/kvm/Makefile              |   1 +
->  arch/loongarch/kvm/intc/dmsintc.c        | 110 +++++++++++++++++++++++
->  arch/loongarch/kvm/main.c                |   6 ++
->  include/uapi/linux/kvm.h                 |   2 +
->  7 files changed, 147 insertions(+)
->  create mode 100644 arch/loongarch/include/asm/kvm_dmsintc.h
->  create mode 100644 arch/loongarch/kvm/intc/dmsintc.c
->
-> diff --git a/arch/loongarch/include/asm/kvm_dmsintc.h b/arch/loongarch/in=
-clude/asm/kvm_dmsintc.h
-> new file mode 100644
-> index 000000000000..1d4f66996f3c
-> --- /dev/null
-> +++ b/arch/loongarch/include/asm/kvm_dmsintc.h
-> @@ -0,0 +1,21 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#ifndef __ASM_KVM_DMSINTC_H
-> +#define __ASM_KVM_DMSINTC_H
-> +
-> +
-> +struct loongarch_dmsintc  {
-> +       struct kvm *kvm;
-> +       uint64_t msg_addr_base;
-> +       uint64_t msg_addr_size;
-> +};
-> +
-> +struct dmsintc_state {
-> +       atomic64_t  vector_map[4];
-> +};
-> +
-> +int kvm_loongarch_register_dmsintc_device(void);
-> +#endif
-> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
-de/asm/kvm_host.h
-> index e4fe5b8e8149..5e9e2af7312f 100644
-> --- a/arch/loongarch/include/asm/kvm_host.h
-> +++ b/arch/loongarch/include/asm/kvm_host.h
-> @@ -22,6 +22,7 @@
->  #include <asm/kvm_ipi.h>
->  #include <asm/kvm_eiointc.h>
->  #include <asm/kvm_pch_pic.h>
-> +#include <asm/kvm_dmsintc.h>
->  #include <asm/loongarch.h>
->
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-> @@ -134,6 +135,7 @@ struct kvm_arch {
->         struct loongarch_ipi *ipi;
->         struct loongarch_eiointc *eiointc;
->         struct loongarch_pch_pic *pch_pic;
-> +       struct loongarch_dmsintc *dmsintc;
->  };
->
->  #define CSR_MAX_NUMS           0x800
-> @@ -244,6 +246,7 @@ struct kvm_vcpu_arch {
->         struct kvm_mp_state mp_state;
->         /* ipi state */
->         struct ipi_state ipi_state;
-> +       struct dmsintc_state dmsintc_state;
->         /* cpucfg */
->         u32 cpucfg[KVM_MAX_CPUCFG_REGS];
->
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
-de/uapi/asm/kvm.h
-> index de6c3f18e40a..0a370d018b08 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
->  #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL             0x40000006
->  #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT            0
->
-> +#define KVM_DEV_LOONGARCH_DMSINTC_CTRL                 0x40000007
-> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE                0x0
-> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE                0x1
-> +
->  #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-> index cb41d9265662..6e184e24443c 100644
-> --- a/arch/loongarch/kvm/Makefile
-> +++ b/arch/loongarch/kvm/Makefile
-> @@ -19,6 +19,7 @@ kvm-y +=3D vm.o
->  kvm-y +=3D intc/ipi.o
->  kvm-y +=3D intc/eiointc.o
->  kvm-y +=3D intc/pch_pic.o
-> +kvm-y +=3D intc/dmsintc.o
->  kvm-y +=3D irqfd.o
->
->  CFLAGS_exit.o  +=3D $(call cc-disable-warning, override-init)
-> diff --git a/arch/loongarch/kvm/intc/dmsintc.c b/arch/loongarch/kvm/intc/=
-dmsintc.c
-> new file mode 100644
-> index 000000000000..3fdea81a08c8
-> --- /dev/null
-> +++ b/arch/loongarch/kvm/intc/dmsintc.c
-> @@ -0,0 +1,110 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2025 Loongson Technology Corporation Limited
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/kvm_dmsintc.h>
-> +#include <asm/kvm_vcpu.h>
-> +
-> +static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
-> +                               struct kvm_device_attr *attr,
-> +                               bool is_write)
-> +{
-> +       int addr =3D attr->attr;
-> +       void __user *data;
-> +       struct loongarch_dmsintc *s =3D dev->kvm->arch.dmsintc;
-> +       u64 tmp;
-> +
-> +       data =3D (void __user *)attr->addr;
-> +       switch (addr) {
-> +       case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE:
-> +               if (is_write) {
-> +                       if (copy_from_user(&tmp, data, sizeof(s->msg_addr=
-_base)))
-> +                               return -EFAULT;
-> +                       if (s->msg_addr_base) {
-> +                               /* Duplicate setting are not allowed. */
-> +                               return -EFAULT;
-> +                       }
-> +                       if ((tmp & (BIT(AVEC_CPU_SHIFT) - 1)) =3D=3D 0)
-> +                               s->msg_addr_base =3D tmp;
-> +                       else
-> +                               return  -EFAULT;
-> +               }
-> +               break;
-> +       case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE:
-> +               if (is_write) {
-> +                       if (copy_from_user(&tmp, data, sizeof(s->msg_addr=
-_size)))
-> +                               return -EFAULT;
-> +                       if (s->msg_addr_size) {
-> +                               /*Duplicate setting are not allowed. */
-> +                               return -EFAULT;
-> +                       }
-> +                       s->msg_addr_size =3D tmp;
-> +               }
-> +               break;
-> +       default:
-> +               kvm_err("%s: unknown dmsintc register, addr =3D %d\n", __=
-func__, addr);
-> +               return -ENXIO;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_dmsintc_set_attr(struct kvm_device *dev,
-> +                       struct kvm_device_attr *attr)
-> +{
-> +       switch (attr->group) {
-> +       case KVM_DEV_LOONGARCH_DMSINTC_CTRL:
-> +               return kvm_dmsintc_ctrl_access(dev, attr, true);
-> +       default:
-> +               kvm_err("%s: unknown group (%d)\n", __func__, attr->group=
-);
-> +               return -EINVAL;
-> +       }
-> +}
-> +
-> +static int kvm_dmsintc_create(struct kvm_device *dev, u32 type)
-> +{
-> +       struct kvm *kvm;
-> +       struct loongarch_dmsintc *s;
-> +
-> +       if (!dev) {
-> +               kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
-> +               return -EINVAL;
-> +       }
-> +
-> +       kvm =3D dev->kvm;
-> +       if (kvm->arch.dmsintc) {
-> +               kvm_err("%s: LoongArch DMSINTC has already been created!\=
-n", __func__);
-> +               return -EINVAL;
-> +       }
-> +
-> +       s =3D kzalloc(sizeof(struct loongarch_dmsintc), GFP_KERNEL);
-> +       if (!s)
-> +               return -ENOMEM;
-> +
-> +       s->kvm =3D kvm;
-> +       kvm->arch.dmsintc =3D s;
-> +       return 0;
-> +}
-> +
-> +static void kvm_dmsintc_destroy(struct kvm_device *dev)
-> +{
-> +
-> +       if (!dev || !dev->kvm || !dev->kvm->arch.dmsintc)
-> +               return;
-> +
-> +       kfree(dev->kvm->arch.dmsintc);
-No need to call kvm_io_bus_unregister_dev()? And it seems you need to
-kfree(dev) if this series is correct:
+No version of QEMU touches hypercall.ret, from the source code.
 
-https://lore.kernel.org/loongarch/99826cf9-356d-235b-9c7c-9d51d36e53c3@loon=
-gson.cn/T/#t
+I suggest not mentioning the comment, because it only tells QEMU expects 
+vcpu->run->hypercall.ret to be 0 on KVM_EXIT_HYPERCALL. What matters is 
+QEMU never sets vcpu->run->hypercall.ret to a non-zero value after 
+handling KVM_EXIT_HYPERCALL. I think you can just describe the fact that 
+QEMU never set vcpu->run->hypercall.ret to a non-zero value in the 
+commit message.
 
-Huacai
-
-> +}
-> +
-> +static struct kvm_device_ops kvm_dmsintc_dev_ops =3D {
-> +       .name =3D "kvm-loongarch-dmsintc",
-> +       .create =3D kvm_dmsintc_create,
-> +       .destroy =3D kvm_dmsintc_destroy,
-> +       .set_attr =3D kvm_dmsintc_set_attr,
-> +};
-> +
-> +int kvm_loongarch_register_dmsintc_device(void)
-> +{
-> +       return kvm_register_device_ops(&kvm_dmsintc_dev_ops, KVM_DEV_TYPE=
-_LOONGARCH_DMSINTC);
-> +}
-> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
-> index 80ea63d465b8..f363a3b24903 100644
-> --- a/arch/loongarch/kvm/main.c
-> +++ b/arch/loongarch/kvm/main.c
-> @@ -408,6 +408,12 @@ static int kvm_loongarch_env_init(void)
->
->         /* Register LoongArch PCH-PIC interrupt controller interface. */
->         ret =3D kvm_loongarch_register_pch_pic_device();
-> +       if (ret)
-> +               return ret;
-> +
-> +       /* Register LoongArch DMSINTC interrupt contrroller interface */
-> +       if (cpu_has_msgint)
-> +               ret =3D kvm_loongarch_register_dmsintc_device();
->
->         return ret;
->  }
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dddb781b0507..7c56e7e36265 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1209,6 +1209,8 @@ enum kvm_device_type {
->  #define KVM_DEV_TYPE_LOONGARCH_EIOINTC KVM_DEV_TYPE_LOONGARCH_EIOINTC
->         KVM_DEV_TYPE_LOONGARCH_PCHPIC,
->  #define KVM_DEV_TYPE_LOONGARCH_PCHPIC  KVM_DEV_TYPE_LOONGARCH_PCHPIC
-> +       KVM_DEV_TYPE_LOONGARCH_DMSINTC,
-> +#define KVM_DEV_TYPE_LOONGARCH_DMSINTC   KVM_DEV_TYPE_LOONGARCH_DMSINTC
->
->         KVM_DEV_TYPE_MAX,
->
-> --
-> 2.39.3
->
->
 
