@@ -1,209 +1,189 @@
-Return-Path: <kvm+bounces-68233-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7717FD27B40
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:42:25 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DACED27986
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:34:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 859E2305C4DC
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:15:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF91430B481A
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2774C3C1FDF;
-	Thu, 15 Jan 2026 18:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3113B8D5F;
+	Thu, 15 Jan 2026 18:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ap2KEeHs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JPkpOxWZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F953C1FCF
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 18:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768500842; cv=pass; b=uFfeHwqcT37jKygEMHR+VupOeIsJgXolrB+u0ls4huwAh5CoZQpVBojzHm9HuvsS1dQ1DQITOZTC4gtRASM3c9YEw6kip7fxKmgkMTHoi9lPFylMtsnflBc9ENczJP4aZqdhmHyvzxQ5tI5Kxnpu2KECsqPY986uAsJkMg2JcsM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768500842; c=relaxed/simple;
-	bh=yZFI4/ItU0VjZ/966VFXXZ++AOqCW4LQRyI7osYy944=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=atJ53hzKTR+addvOTWn1MlG3fM5cWb1q/0WobF26nl58e459WJMRkCA7EBs1HkcNNqmERILJZvHcoKwrtklvM3fJtDWcg3h+3znZcu1m5soGH9jnzjSP3Asx9BLu9q1lbNagCUKELrgjDkavuzK/YXODuKLxXP564gj3KFF5BR4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ap2KEeHs; arc=pass smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5637b96211aso1075614e0c.2
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 10:14:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768500839; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GMdMfMy0V1GA9w1AkpM8EbJu2qB8/lTPkdCxU3/27X61lbVeSdVullxDoUTysqnkp/
-         ifFHWoilMONTRVQOGbis/1KfLxWfbmmsFcf+sFknaToBhaai/x2SFddcEArfr7FkadXs
-         RzOyWaRdrM1yuLhU+1DeIn6BM/ha9sPjJmRpLEfJtIz427oG539RyVCFYm4cDFFsrlr2
-         DxlUPzjOEqACXhzHe56Bvp1tQYr6jDeBp7PwV4Z6Cwa6Glk2vJypDlh8Rb4FbosCsWpb
-         YQwzbDdvTC/8LvDVRWjBIkklglhDv4BlH+yUBgTp+V9Xg2coxfUsMhSXrVvAgu08G5wN
-         rpjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=THW1AYc40AbtlCiXnGDVyVMD3rqCp5iY5wWFFFterBw=;
-        fh=EbgfIogE5cnV/5DDRN2xv+VrVjYfdJSW9AdnvT1HT+k=;
-        b=bvo3vn+3eIfs1hwEj8A+cODoPklvsQpsKxCf6XDhxnovuQjw9x5JiWtkFBrPDZ2+dm
-         9hMdMdlMhUedAZVkoIS25kNouDpeOIdU2xbgUgwxPhjg75TDgQq+9f8QZ+/47+b5ZqiX
-         CQVFsTwz0fgtmZvP9Mo+EqdQ6uJymcXa3/pP/19yc+fMC5MGEBfdKU05vZhKOM7DHVyX
-         HH7nvotbcaB4LM7pNxxP7ce7D/+7IOad0oM55+8z5JLQcUZdILZNWmLarSkTd+y22+nJ
-         r4jgqqe85zkBb3eCTuzdmR63PNgyGXMkmRjQI4oVXZHXR6rcDlKgJFPeLjqL0tauIJGp
-         Q/lQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768500839; x=1769105639; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=THW1AYc40AbtlCiXnGDVyVMD3rqCp5iY5wWFFFterBw=;
-        b=Ap2KEeHs1hljy6vFGeqVQYsded70yUxD6rn3T/pdW0oSlvACQPG+Ti3bKFz7gFClNc
-         RMqz0HJCyQLtjLGX/knv4GSRbV55b/i64M2nh5mBQkRTbANYTA8IdTQNPgll9BkOWKhh
-         nX2HRJS8CqX53AH4Z+VNb/KByD2bYu/JYRY6SILN8vFkZCLut0qyWE1g0LsjeLJn3JxL
-         BtzyCPlLDxT3ZznoYkag2JuLGhj1u6RiEqSCoHuNWcsvdzD8MjdUsYo9TlxMSEiBLlCW
-         y2S/eL5Z00mBWE2D7IiRs0UTpSt9F42h3i2nuVlGVxornCSIBnXtU+VRu7XZZb4imMGu
-         oDow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768500839; x=1769105639;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=THW1AYc40AbtlCiXnGDVyVMD3rqCp5iY5wWFFFterBw=;
-        b=lmPQV0wvDJ+heB285HKt+2qhp0Z5Sr2hPBwffi/A1vovXEUfxqmghnE5R99f7ISFPn
-         7brAi1IWVQexQVfJZeCvjh1M5J3QlidDKAtqB6Lbz3dhKDmW1zvM9R0sLdOcJbmMITsm
-         eOxsehhDB5N/pWeFRGvGxjkSUA+GbP1RgUztEcdOPevfVT4Mc43m5VDMNHxYF5yMRko0
-         /sw75hXQSd+ACQEC/uCzornHBZoXq9nq6y7t1O0nmxyVQZhK3sJ4c3OLAz27BvkUdfs5
-         IOSdSxUlp8H7hnXGGfvdA+h3Br5ov+RvirsLYjOKeq8c+oVqTVmD3eEEBqwmY3Qhv9AA
-         BDnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsYzOxhvzABka++0Nga7mV+GkF7lyUEomy8envFWj7SkIA+m8ignco/KBkisIaqJQ7N+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0jKDihGK7dfEMBfpZWWUniq3YiuRV7pVp094fWsL4JJbjCYcT
-	wePrx9WKl72qj+S7JlFGYVUAAwL37kSD6mcJFxYLxG0AgXzAr2RUwaBNoVE+9VaJ3/RhgTdIHyE
-	c/Xj67wcpbssIS1HC6syr1Ojq2gZSLkg6A4vn6V4HoB43fwAJ/WHLoy9GbpE=
-X-Gm-Gg: AY/fxX4bGh280qInyPXENyQwE5StP7bVO+OI8ZQ8CuFgUasxvdwSygvcyJkc1X9SrGk
-	UOqOHFro7XAp3gMnHE7MRVyv4SZvTwjii3yw3VPMx1XC93qgYsMe5bRyOyEdJRzuSMKoy45wEzs
-	csbmI2jGGMXANAKSHEm+DooVQoqMTembSHGhLEqHajGE2b3aDBu4MEiKWMmK+LUTaMfKTshhI+u
-	pbC7eoOLYZQMflWa39ACwTQ9TZ9QJpdoGH78Wpj+4kKLO4vHdNOkUYw8HSCMwkzWvsbmvALz/2H
-	dJ8aHUPwOfvwBHiHGDDsKSstqQ==
-X-Received: by 2002:a05:6102:a48:b0:5db:cfb2:e610 with SMTP id
- ada2fe7eead31-5f1a55dce21mr211044137.41.1768500838995; Thu, 15 Jan 2026
- 10:13:58 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Jan 2026 10:13:58 -0800
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Jan 2026 10:13:58 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <aWhaK+ikw8QkH4hU@yzhao56-desk.sh.intel.com>
-References: <CAEvNRgGG+xYhsz62foOrTeAxUCYxpCKCJnNgTAMYMV=w2eq+6Q@mail.gmail.com>
- <aV2A39fXgzuM4Toa@google.com> <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
- <aV2eIalRLSEGozY0@google.com> <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
- <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
- <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com>
- <CAEvNRgG40xtobd=ocReuFydJ-4iFwAQrdTPcjsVQPugMaaLi_A@mail.gmail.com> <aWhaK+ikw8QkH4hU@yzhao56-desk.sh.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC9022E3E7;
+	Thu, 15 Jan 2026 18:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768501150; cv=none; b=mFqZZ01y7svyckbyrGLc7HmroE5P4Xxs5x+paJOK29qzVzFihpqGL8Axx+IZhKAKB9yuPaQZvhjKD4zoCvpAvXz5nrqNXtZubvSBfuKW70SXX+ixbAB6BFe44pOwuG9Vq4fpGEUwQ+9SxZSGr09KLym1iijCPl2G1Klk2PWD6Jc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768501150; c=relaxed/simple;
+	bh=Tl77+ilpEwZ50+49EdkTr7t/MOwSAVmPOeknVpPoaFw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rAo7A0Q7JqwmeiSlZWwBvKTXov4JjthHRErCOxZXSV6SDz6u2XSTCMFgVRgmOnsk9HVj/8cIaDzX17CcV3zsRPxGHIMLC4rEjYyxX4sGjSnymvJ2O2OOzdmUTU4Ko9YfW8G8p1Vx3NAQt4PKuGFLURVRzgmhYlU8lFuB13DAoog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JPkpOxWZ; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768501149; x=1800037149;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Tl77+ilpEwZ50+49EdkTr7t/MOwSAVmPOeknVpPoaFw=;
+  b=JPkpOxWZQL4zxR7wostiDtEX0Vmq8YupyOUiGWuik/p32/Rfob9GQM/c
+   tZrYsLPdYYAPdx0EEslmOp6GBtREbuIJZF2YWkvwFnptllfebT//zQmJv
+   f4nf45CAnvcle1Bslvz51Lbpf1nxqRUshiwUR/QdSbaVTc2y+K60Mu+VY
+   Vtp1mC5ZYmGOmdBhf4y0L+RaHfS73uZRX9g56OBtzJokSKKSfTOAv7xWx
+   4yWAxsK3V7pwIIq14oizHHvaC4ck3yzhkSbEyEmaghFqtBP3bGKaDPjvb
+   WsFWbcULiMhf0gKtnU2K81hInls38IW7DkAgrjcYu1PfAVqVQMz+XsKiF
+   w==;
+X-CSE-ConnectionGUID: hy4pUwlBT9esX8hP6OkVjA==
+X-CSE-MsgGUID: CQWPrFSKRpSlYc9u9+ZjiQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="69906153"
+X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
+   d="scan'208";a="69906153"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 10:19:08 -0800
+X-CSE-ConnectionGUID: TRe12CtfRnevVzEsD6osKw==
+X-CSE-MsgGUID: H9j2mRMjTpOzJYEl/2immQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
+   d="scan'208";a="204161726"
+Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.111.74]) ([10.125.111.74])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 10:19:08 -0800
+Message-ID: <f130ac18-708a-4074-b031-9599006786d3@intel.com>
+Date: Thu, 15 Jan 2026 10:19:07 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 15 Jan 2026 10:13:58 -0800
-X-Gm-Features: AZwV_QgJWa5xE7L7BcNYbcYrcLnI3mZbKkK_YSll-kBeBO63P1k4Zv4BKXAljiQ
-Message-ID: <CAEvNRgGrPr3f9qpfW3KHx-fFLqYOL4u2pQkMUDqfC2-Lh63ePQ@mail.gmail.com>
-Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
-	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kas@kernel.org, 
-	tabba@google.com, michael.roth@amd.com, david@kernel.org, sagis@google.com, 
-	vbabka@suse.cz, thomas.lendacky@amd.com, nik.borisov@suse.com, 
-	pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever
+ XFD[i]=1
+To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Cc: seanjc@google.com, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+ Borislav Petkov <bp@alien8.de>, "Bae, Chang Seok" <chang.seok.bae@intel.com>
+References: <20260101090516.316883-1-pbonzini@redhat.com>
+ <20260101090516.316883-2-pbonzini@redhat.com>
+ <cd6721c7-0963-4f4f-89d9-6634b8b559ae@intel.com>
+ <8ee84cb9-ef6d-43ac-b9d0-9c22e7d1ecd8@redhat.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <8ee84cb9-ef6d-43ac-b9d0-9c22e7d1ecd8@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+On 1/15/26 08:22, Paolo Bonzini wrote:
+> 
+>   Guest running with MSR_IA32_XFD = 0
+>     WRMSR(MSR_IA32_XFD)
+>     vmexit
+>   Host:
+>     enable IRQ
+>     interrupt handler
+>       kernel_fpu_begin() -> sets TIF_NEED_FPU_LOAD
+>         XSAVE -> stores XINUSE[18] = 1
+>         ...
+>       kernel_fpu_end()
+>     handle vmexit
+>       fpu_update_guest_xfd() -> XFD[18] = 1
+>     reenter guest
+>       fpu_swap_kvm_fpstate()
+>         XRSTOR -> XINUSE[18] = 1 && XFD[18] = 1 -> #NM and boom
+> 
+> With the patch, fpu_update_guest_xfd() sees TIF_NEED_FPU_LOAD set and
+> clears the bit from xinuse.
 
-> On Wed, Jan 14, 2026 at 10:45:32AM -0800, Ackerley Tng wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> >> So, out of curiosity, do you know why linux kernel needs to unmap mappings from
->> >> both primary and secondary MMUs, and check folio refcount before performing
->> >> folio splitting?
->> >
->> > Because it's a straightforward rule for the primary MMU.  Similar to guest_memfd,
->> > if something is going through the effort of splitting a folio, then odds are very,
->> > very good that the new folios can't be safely mapped as a contiguous hugepage.
->> > Limiting mapping sizes to folios makes the rules/behavior straightfoward for core
->> > MM to implement, and for drivers/users to understand.
->> >
->> > Again like guest_memfd, there needs to be _some_ way for a driver/filesystem to
->> > communicate the maximum mapping size; folios are the "currency" for doing so.
->> >
->> > And then for edge cases that want to map a split folio as a hugepage (if any such
->> > edge cases exist), thus take on the responsibility of managing the lifecycle of
->> > the mappings, VM_PFNMAP and vmf_insert_pfn() provide the necessary functionality.
->> >
->>
->> Here's my understanding, hope it helps: there might also be a
->> practical/simpler reason for first unmapping then check refcounts, and
->> then splitting folios, and guest_memfd kind of does the same thing.
->>
->> Folio splitting races with lots of other things in the kernel, and the
->> folio lock isn't super useful because the lock itself is going to be
->> split up.
->>
->> Folio splitting wants all users to stop using this folio, so one big
->> source of users is mappings. Hence, get those mappers (both primary and
->> secondary MMUs) to unmap.
->>
->> Core-mm-managed mappings take a refcount, so those refcounts go away. Of
->> the secondary mmu notifiers, KVM doesn't take a refcount, but KVM does
->> unmap as requested, so that still falls in line with "stop using this
->> folio".
->>
->> I think the refcounting check isn't actually necessary if all users of
->> folios STOP using the folio on request (via mmu notifiers or
->> otherwise). Unfortunately, there are other users other than mappers. The
->> best way to find these users is to check the refcount. The refcount
->> check is asking "how many other users are left?" and if the number of
->> users is as expected (just the filemap, or whatever else is expected),
->> then splitting can go ahead, since the splitting code is now confident
->> the remaining users won't try and use the folio metadata while splitting
->> is happening.
->>
->>
->> guest_memfd does a modified version of that on shared to private
->> conversions. guest_memfd will unmap from host userspace page tables for
->> the same reason, mainly to tell all the host users to unmap. The
->> unmapping also triggers mmu notifiers so the stage 2 mappings also go
->> away (TBD if this should be skipped) and this is okay because they're
->> shared pages. guest usage will just map them back in on any failure and
->> it doesn't break guests.
->>
->> At this point all the mappers are gone, then guest_memfd checks
->> refcounts to make sure that guest_memfd itself is the only user of the
->> folio. If the refcount is as expected, guest_memfd is confident to
->> continue with splitting folios, since other folio accesses will be
->> locked out by the filemap invalidate lock.
->>
->> The one main guest_memfd folio user that won't go away on an unmap call
->> is if the folios get pinned for IOMMU access. In this case, guest_memfd
->> fails the conversion and returns an error to userspace so userspace can
->> sort out the IOMMU unpinning.
->>
->>
->> As for private to shared conversions, folio merging would require the
->> same thing that nobody else is using the folios (the folio
->> metadata). guest_memfd skips that check because for private memory, KVM
->> is the only other user, and guest_memfd knows KVM doesn't use folio
->> metadata once the memory is mapped for the guest.
-> Ok. That makes sense. Thanks for the explanation.
-> It looks like guest_memfd also rules out concurrent folio metadata access by
-> holding the filemap_invalidate_lock.
->
-> BTW: Could that potentially cause guest soft lockup due to holding the
-> filemap_invalidate_lock for too long?
+Paolo, thanks for clarifying that!
 
-Yes, potentially. You mean because the vCPUs are all blocked on page
-faults, right? We can definitely optimize later, perhaps lock by
-guest_memfd index ranges.
+Abbreviated, that's just:
+
+	XFD[18]=0
+	...
+	# Interrupt (that does XSAVE)
+	XFD[18]=1
+	XRSTOR => #NM
+
+Is there anything preventing the kernel_fpu_begin() interrupt from
+happening a little later, say:
+
+	XFD[18]=0
+	...
+	XFD[18]=1
+	# Interrupt (that does XSAVE)
+	XRSTOR (no #NM)
+	
+In that case, the XSAVE in kernel_fpu_begin() "operates as if XINUSE[i]
+= 0" and would set XFEATURES[18]=0; it would save the component as being
+in its init state. The later XRSTOR would obviously restore state 18 to
+its init state.
+
+Without involving SMIs, I think it lands feature 18 in its init state as
+well. The state is _already_ being destroyed in the existing code
+without anything exotic needing to happen.
+
+That's a long-winded way of saying I think I agree with the patch. It
+destroys the state a bit more aggressively but it doesn't do anything _new_.
+
+What would folks think about making the SDM language stronger, or at
+least explicitly adding the language that setting XFD[i]=1 can lead to
+XINUSE[i] going from 1=>0. Kinda like the language that's already in
+"XRSTOR and the Init and Modified Optimizations", but specific to XFD:
+
+	If XFD[i] = 1 and XINUSE[i] = 1, state component i may be
+	tracked as init; XINUSE[i] may be set to 0.
+
+That would make it consistent with the KVM behavior. It might also give
+the CPU folks some additional wiggle room for new behavior.
 
