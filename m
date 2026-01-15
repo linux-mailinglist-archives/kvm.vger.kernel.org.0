@@ -1,146 +1,108 @@
-Return-Path: <kvm+bounces-68202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC534D261BD
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:08:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C2DDD2611C
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:06:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8835E3060595
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:05:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 09D713022F0D
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D963BC4FE;
-	Thu, 15 Jan 2026 17:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD193BF2F7;
+	Thu, 15 Jan 2026 17:05:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sOsMiCLA"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Lq3UvPm9"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE043BB9F4
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 17:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A933ACEFE;
+	Thu, 15 Jan 2026 17:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768496727; cv=none; b=G6KFLFlD1atoVmiXtKCviFXSPprXW3xnVOHiEV9Y5WiBqtXFJNSlzk5srXc1pvaQI/kBe/1MGe4e9h9yG+ny1rRPXQ6r78AbDtJ8kBSGLkomfPh5Utv2WTM3kCIvfjlck+THneisLdI51R+12tzg3P+9lF/w9dNlVIWd3b/D2IY=
+	t=1768496740; cv=none; b=oPUwXgNi6BOe7HyIMY6WTWw6dtOpRSw1i5wi1tlrj1G1JE5xeGw5OVM/PtZWib3MUkchm2M2BfqJ5ry9YOcpWZYM1TBFC/Cb6D8CwcANaYstiTmMD7typ9ngFFr2ETss4Gb1XRYJTUIYMX29gAkSPX8JgjCcaheEQzU6aZ2jNog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768496727; c=relaxed/simple;
-	bh=iB/9/GplClxv4ijAsUEFUypu3K8CFlUIld1aVeVAZCU=;
+	s=arc-20240116; t=1768496740; c=relaxed/simple;
+	bh=uvVz6nAFR+gvd7Q0IV23MYNptO/uzmH+NbFBq7wpVEs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8Sb8yJ9NzMm+XnuWi6I3LKxvQgL6W8DfBG62frmTqFSvJIFWm/1sjQDvL0qfVteThF06Wq+4fwF/JosbK7O0RB4DVQrRthfVTecH78rTyEO+SIw2KAbtBA75rgUxYHH3a3Q0zujboyl+jOYp/H+l/cXrVFtBjgfCNEQjetmZfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sOsMiCLA; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 15 Jan 2026 17:05:10 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768496714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0lHAx5OLzKvG6pBf3LcwPb1ssCPSqGTs0gh6FOWtc5A=;
-	b=sOsMiCLAoehAm5UZjK5VjMijgoPp9qQjgCm+Dv2rlOVoFEpL3c16mHdXJXE2sxvVnTyHeo
-	d1t5dY9cS5CDmh8j4LurOAM84HSX7XNJ4wEwNKqFtxEcet3Ik9KLi6pGrAsgzd/6ZEqTBU
-	viChRPz5jVEONGmovfynRu0SifCBxTU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6kKyg2ZNafH8CUCSiCudkm6AbumNDB6RMP0rvtOXvxLeNUBGjAtT2E7rSLzRWolT7JGXmGWuiRhdGE+QO8z2ruCW5hCI8Eq4d+uq6Dt7DVCowomWpRnzChQudT68r5BRK9pxOCFneWfGPwMBRwp1x3Wq8oNXBUQIvl6qIVLU94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Lq3UvPm9; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9EB8740E02D2;
+	Thu, 15 Jan 2026 17:05:30 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id HVxMVg4prymo; Thu, 15 Jan 2026 17:05:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1768496724; bh=fHIhJ3hlz6pKSUTY0YKkzLhmuCLjHwUpcLQVf3oz0Ss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lq3UvPm9mQoKuZO7P/aQLnenVsduGX8uVgR+dznjxO5gi8N9VXpaPZ3o/uOOs6xlp
+	 RmyvKOrkA/+FuBAwSIl3JLbBTfb69gG/vM71CTHy9jxpWXuV+OeufGvnh/VLjkG6y9
+	 gDKHaTSriPtYyiLZCVB4vH7iL6aTIwYm+Hp7ibe39aO2I28vNaSOtyM3ZBM/jCgtse
+	 bY5tmENwiqaezSRPmGWBs/FAoZI18QereP2rvzr/GcTvJbIJTwfIRbTyIll09PWI4f
+	 VrpamUCR2UjPOTsfWCr0zodA7koetwLGbVfRV5SSJ19fVUQFcDvjlP+mSnhRUniUCU
+	 rs3fraBz0cMcApyr5+zG1RI3aFbT39cYNlTRH/eCAFew3yewyyk889ipYS/d8bXm0X
+	 XlG2/50MdokDIaWMExKOXssFKHfyJqG/KTNQaGzcWaA3Dl56O5joNwGmjUEdwu/4aY
+	 rOxIa/rTwXkb5IChw4QXJ6KUuopm1EVakTUsbqB4kFLKHCc0LkoWPJa10TNP3TAkaZ
+	 zEs/rIX9J7v9tLriyKf8FNO+TR9NjcxaB6P6A4qHNl1SqiNorwrSMD/outsLwR6GwF
+	 p9Br51fL5qICmPSObUnpx1kZG8Wuqk4BkYra2A9kaA617Nv4A2w3eWzKA5g89xerDu
+	 Xn78vvQ2G13AG0JCrD1hxEyQ=
+Received: from zn.tnic (pd953023b.dip0.t-ipconnect.de [217.83.2.59])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id C954B40E0252;
+	Thu, 15 Jan 2026 17:05:19 +0000 (UTC)
+Date: Thu, 15 Jan 2026 18:05:11 +0100
+From: Borislav Petkov <bp@alien8.de>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Kevin Cheng <chengkev@google.com>, pbonzini@redhat.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2 1/5] KVM: SVM: Move STGI and CLGI intercept handling
-Message-ID: <ugrjf3qqpeqafg6tnavw6p4l5seapl6mfx6ypypka25shvu6by@pq4qpwn24dyi>
-References: <20260112174535.3132800-1-chengkev@google.com>
- <20260112174535.3132800-2-chengkev@google.com>
- <jmacawbcdorwi2y5ulh2l2mdpeulx5sj7qvjehvnhaa5cgdcs3@2tljlprwtl27>
- <aWhFQcNa8SKd679a@google.com>
- <xndoethnkd2djh5zkemvgmuj6gc4hsnxur2uo5frl57ugxa2ql@c3k7cadxmr4u>
- <aWkdF8gz1IDssQOd@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+	kvm <kvm@vger.kernel.org>,
+	the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: [PATCH v2 0/4] x86, fpu/kvm: fix crash with AMX
+Message-ID: <20260115170511.GFaWkeR1TuFMlzy2LJ@fat_crate.local>
+References: <20260101090516.316883-1-pbonzini@redhat.com>
+ <20260115122204.GDaWjb7Npp80GK-mFn@fat_crate.local>
+ <CABgObfYk-PxxGOj3az26=tt-p7_qu=eFhgdjKFqva7Stui9HYA@mail.gmail.com>
+ <aWkYVwTyOPxnRgzN@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aWkdF8gz1IDssQOd@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <aWkYVwTyOPxnRgzN@google.com>
 
-On Thu, Jan 15, 2026 at 09:00:07AM -0800, Sean Christopherson wrote:
-> On Thu, Jan 15, 2026, Yosry Ahmed wrote:
-> > On Wed, Jan 14, 2026 at 05:39:13PM -0800, Sean Christopherson wrote:
-> > > On Mon, Jan 12, 2026, Yosry Ahmed wrote:
-> > > As for how to fix this, a few ideas:
-> > > 
-> > >  1. Set KVM_REQ_EVENT to force KVM to re-evulate all events.  kvm_check_and_inject_events()
-> > >     will see the pending NMI and/or SMI, that the NMI/SMI is not allowed, and
-> > >     re-call enable_{nmi,smi}_window().
-> > > 
-> > >  2. Manually check for pending+blocked NMI/SMIs.
-> > > 
-> > >  3. Combine parts of #1 and #2.  Set KVM_REQ_EVENT, but only if there's a pending
-> > >     NMI or SMI.
-> > > 
-> > >  4. Add flags to vcpu_svm to explicitly track if a vCPU has an NMI/SMI window,
-> > >     similar to what we're planning on doing for IRQs[*], and use that to more
-> > >     confidently do the right thing when recomputing intercepts.
-> > > 
-> > > I don't love any of those ideas.  Ah, at least not until I poke around KVM.  In
-> > > svm_set_gif() there's already this:
-> > > 
-> > > 		if (svm->vcpu.arch.smi_pending ||
-> > > 		    svm->vcpu.arch.nmi_pending ||
-> > > 		    kvm_cpu_has_injectable_intr(&svm->vcpu) ||
-> > > 		    kvm_apic_has_pending_init_or_sipi(&svm->vcpu))
-> > > 			kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
-> > > 
-> > > So I think it makes sense to bundle that into a helper, e.g. (no idea what to
-> > > call it)
-> > > 
-> > > static bool svm_think_of_a_good_name(struct kvm_vcpu *vcpu)
-> > > {
-> > > 	if (svm->vcpu.arch.smi_pending ||
-> > > 	    svm->vcpu.arch.nmi_pending ||
-> > > 	    kvm_cpu_has_injectable_intr(&svm->vcpu) ||
-> > > 	    kvm_apic_has_pending_init_or_sipi(&svm->vcpu))
-> > > 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
-> > > }
-> > 
-> > Maybe svm_check_gif_events() or svm_check_gif_interrupts()?
-> > 
-> > Or maybe it's clearer if we just put the checks in a helper like
-> > svm_waiting_for_gif() or svm_pending_gif_interrupt().
-> 
-> This was my first idea as well, though I would name it svm_has_pending_gif_event()
-> to better align with kvm_vcpu_has_events().
+On Thu, Jan 15, 2026 at 08:39:51AM -0800, Sean Christopherson wrote:
+>  :   1. vCPU loads non-init XTILE data without ever setting XFD to a non-zero value
+>  :      (KVM only disables XFD interception on writes with a non-zero value).
+>  :   2. Guest executes WRMSR(MSR_IA32_XFD) to set XFD[18] = 1
+>  :   3. VM-Exit due to the WRMSR
+>  :   4. Host IRQ arrives and triggers kernel_fpu_begin()
+>  :   5. save_fpregs_to_fpstate() saves guest FPU with XFD[18]=0
+>  :   6. fpu_update_guest_xfd() stuffs guest_fpu->fpstate->xfd = XFD[18]=1
+>  :   7. vcpu_enter_guest() attempts to load XTILE data with XFD[18]=1
 
-svm_has_pending_gif_event() sounds good.
+I don't know, maybe I'm missing an important aspect but if not, I'm wondering
+how you folks are not seeing the big honking discrepancy here.
 
-> 
-> I suggested a single helper because I don't love that how to react to the pending
-> event is duplicated.  But I definitely don't object to open coding the request if
-> the consensus is that it's more readable overall.
+*Anything* poking in MSRs under the kernel's feet where the kernel doesn't
+know about that poking, is bound to cause trouble. And this is no exception.
 
-A single helper is nice, but I can't think of a name that would read
-well. My first instinct is svm_check_pending_gif_event(), but we are not
-really checking the event as much as requesting for it to be checked.
+Step 5. above should use the updated XFD[18]=1. The guest just disabled that
+state! Anything else is bonkers.
 
-We can do svm_request_gif_event(), perhaps? Not sure if that's better or
-worse than svm_has_pending_gif_event().
+-- 
+Regards/Gruss,
+    Boris.
 
-> 
-> > Then in svm_recalc_instruction_intercepts() we do:
-> > 
-> > 	/*
-> > 	 * If there is a pending interrupt controlled by GIF, set
-> > 	 * KVM_REQ_EVENT to re-evaluate if the intercept needs to be set
-> > 	 * again to track when GIF is re-enabled (e.g. for NMI
-> > 	 * injection).
-> > 	 */
-> > 	svm_clr_intercept(svm, INTERCEPT_STGI);	
-> > 	if (svm_pending_gif_interrupt())
-> > 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
-> > 
-> > and in svm_set_gif() it reads well semantically:
-> > 	
-> > 	enable_gif(svm);
-> > 	if (svm_pending_gif_interrupt())
-> > 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+https://people.kernel.org/tglx/notes-about-netiquette
 
