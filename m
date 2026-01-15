@@ -1,183 +1,129 @@
-Return-Path: <kvm+bounces-68260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2361AD28D7B
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 22:48:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26657D28FC9
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 23:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 39A9F301C81C
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 21:48:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9D82830146D3
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 22:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AD01D61BC;
-	Thu, 15 Jan 2026 21:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF74325497;
+	Thu, 15 Jan 2026 22:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cqSIEd9q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nv2D1spn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D5932A3C6
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 21:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43322FFDFC
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 22:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768513693; cv=none; b=e/JuElfI+irIJOuhBmURrNR/F4q2NADpRm8S4OGCDwbf61aFIyqkrGX7NXp5P5oFv4K+6Z9/3AbTtdaOp4/C78gEOJgyFYkf4EQZS86sj27geauqEHBw45SB+sqkWdrJVcHmNfQoIb/5pwClj1AC/wdhex0B1aSGoDLf4G+uB40=
+	t=1768515670; cv=none; b=Fu3ctdF5GeBcOSMJovquqSJ0CFK7Nc8IzdcrKUC+YUtpc3vF3oFmV6VYO13NifOEF96p5xanIpPUoQVV7vSXcDIfJ4JlBK2PGmQ4N9YIlytt1cujdTZz3WSckPsN8iquoE8m17UQwtyFnMauE3xxbIG+FfApjbu7cmy/dhj7ldc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768513693; c=relaxed/simple;
-	bh=MU9UbiYSxwq7GU1nltEpbwVASUYpa31Sn9dlFINSwh0=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hgR2D4kB4f5y3xRjSwSkFrRYmT+IygeFvsD7cuBjFbr+GsvDplmp1o/UZSW9vbZG8ksfxA1dO/bYa6qlI9INTTA74CHnmZPcBS8ge7XPC8VTwqSsUmpvyVBb8RfAZ3B34bu288PQTPIMfl6pvcl3PyNnvURcw6lcssogJoMPjb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cqSIEd9q; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-93f523bba52so910356241.1
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 13:48:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768513690; x=1769118490; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z1tpnpSOuS/Js87YOF2H5fRocDrhGRoFky0mpImVftk=;
-        b=cqSIEd9qiHPgHv9gnqDiu3reQxfeO0tkgd+5NyxqoUiXxTTY1xYs5N+D/Yx2VTOgAw
-         oZhH50bnPM0uhtaWpNGAtaAjBrF9FHEA6YxnaaZr7riCjv1BNC6qtFmk69RNE7r53SHx
-         VKXyzCi9Y0qQdep1iIB8vbfhubd3t1YJARk+m+3+wPLxcE0/tRfVXdnm1ll2ORSvmMwY
-         3xsuvbANRR0TTYvFAw4FJATQ4OkmIw7nTyMGisctV+OhlabYE21bB5FivmZSc+CqXZ/B
-         vvEqYQtxJl+71+fJSkloq9e0rjHwNgX9T+y+ekloRmiVSCZPQUApt7UCEsBuXHbYG+Qf
-         rykQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768513690; x=1769118490;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z1tpnpSOuS/Js87YOF2H5fRocDrhGRoFky0mpImVftk=;
-        b=bROWRhWG4Jf88lHRCGP5vCS5mkUkGvxRiHydvcxydr1rJaJg6eT1laeiPBssT2KxcX
-         qkweYdQSK3P4j3kOEtO+MRgBqR4tqUw896cQ7NsiwAmZ1HDgMdwGop3kZwmzQHvwIz0i
-         a5Rfb1vsR1ZLPq9Shjo00ulbFwkeWJH657LPujxPA6+6eq95SVq8wQbqwb3lASWXjau9
-         YmIAq38p9EfDof1vNZEBMsHMHz/WZJzU1EjUq0365LSX8lRsGIcdauz2POc18ccBWhSu
-         4e8NFKHKdP2NZGfuwLcSZQFS3KdbrWnebEXgTlowetA3NhYc+MzoILAtwN6RsjfH64IV
-         TiCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKO6uduOuForPaLGxhZ2CPKbycAKxuzAvSKmnNlWSN+sHfC7ZoGFasKD9qNpXUm89eEUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRU1HE2upbaw2h3GLEFu/G48msUNg6JE9qoH8MHISgAoxc5695
-	OM/6MW/q7YswJ0q3IuzNx73UavpZXmF+KW1HyDnOIDqbWbfcHiusCis17k+feSdNOA4U+grpbrG
-	agUV4hNfXZSY6R9NXi14TJ46pU/NOR2oqP6UnODgV
-X-Gm-Gg: AY/fxX5axTR1hX2npQLJxbfp7DGqjiFSueBe9bdqdye7QYXMyHxhya9rYe2mqUfxKkk
-	jtPrnHF3+wl+dxuJuFWQQSFGb9mun0E8h77TNodwGc00y9OahPpeam/1rJd6AHSMty3MTjrf2br
-	sEBWGl8A2cmk5RbNWq9juJpm/vTXDt7Z0V+a/GhmmcRwawZUaniSbyL1DDAvFImqsPw82DJrU8w
-	v+LVKFbrae5c0Ej+CFk8wyyayLCGjTHtmC1QtCQ6sLslUPTfRWaCmaq0IOgxEacGieRp2agkS3K
-	m3S6IaXY4JLlRHFe0AX+iHwL5aIbtBpiJdUL
-X-Received: by 2002:a05:6102:f13:b0:5ec:3107:6b71 with SMTP id
- ada2fe7eead31-5f192508297mr1821684137.14.1768513689093; Thu, 15 Jan 2026
- 13:48:09 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Jan 2026 13:48:08 -0800
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Jan 2026 13:48:08 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20260114134510.1835-6-kalyazin@amazon.com>
-References: <20260114134510.1835-1-kalyazin@amazon.com> <20260114134510.1835-6-kalyazin@amazon.com>
+	s=arc-20240116; t=1768515670; c=relaxed/simple;
+	bh=OW3TcPeVB5ZYLJLZPzaY8L9qpGQNXSeXIyuWss/pgxA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eHBSoaYjD+vwr0lV07sHAkXsPfvmagvhuj53yxukR571G/OugLbcx1NGMiy2E9nD6Oi9Z5UDPtAZD2qDCWmboozt1yWGd7Oq1DnhB8i5ct/4hKTUBzTxhdpyxQ6NyCED4I1sBhhddpr/YVeGYwbDRNga+IW/5RJ5oDzA3PvEZ0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nv2D1spn; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 15 Jan 2026 22:21:01 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768515666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zc+QHZR9yFxmZa70fEDw4VOYtPawQDDl6jcvS2GVUFg=;
+	b=nv2D1spnx/duoQ05VxqKvf20P9z4HLUxKkwF7vkgm3ez9/yHk/pjS5jqWTcZyzpSnUSBGk
+	60x8LCOzLxcgb3duvXjf3Z1lG42xhuhQ9+KIeYZi3m0vDOQ+aGwyELaeIK+GQgMP6gGp2a
+	MZt6nwUzLFZ7F8zzJtvTwS1iTFIOn90=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5] KVM: selftests: Test READ=>WRITE dirty logging
+ behavior for shadow MMU
+Message-ID: <2kgs2paktjfb33sdr46zhlernx2xgokh5ac4og45obrvvlm34d@2df2kb2u44cy>
+References: <20260115172154.709024-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 15 Jan 2026 13:48:08 -0800
-X-Gm-Features: AZwV_QhGkMBioMKFssSOB50hq7Zm3qSZq1aP9Of9c8wem-vUHGjRo2vWaCWRwKU
-Message-ID: <CAEvNRgEhcTE70RLiQo2C_XUdF31qSkQ6yHwpUiXPWb6+6mmA0A@mail.gmail.com>
-Subject: Re: [PATCH v9 05/13] KVM: x86: define kvm_arch_gmem_supports_no_direct_map()
-To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "kernel@xen0n.name" <kernel@xen0n.name>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>, 
-	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>, 
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
-	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
-	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>, 
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, 
-	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>, 
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com" <jgross@suse.com>, 
-	"yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>, "kas@kernel.org" <kas@kernel.org>, 
-	"coxu@redhat.com" <coxu@redhat.com>, "kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, 
-	"maobibo@loongson.cn" <maobibo@loongson.cn>, "prsampat@amd.com" <prsampat@amd.com>, 
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>, 
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, 
-	"alex@ghiti.fr" <alex@ghiti.fr>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
-	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>, 
-	"hca@linux.ibm.com" <hca@linux.ibm.com>, 
-	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"pjw@kernel.org" <pjw@kernel.org>, 
-	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>, 
-	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>, 
-	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>, 
-	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>, 
-	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
-	"Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>, 
-	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco" <xmarcalx@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260115172154.709024-1-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-"Kalyazin, Nikita" <kalyazin@amazon.co.uk> writes:
+On Thu, Jan 15, 2026 at 09:21:54AM -0800, Sean Christopherson wrote:
+> Update the nested dirty log test to validate KVM's handling of READ faults
+> when dirty logging is enabled.  Specifically, set the Dirty bit in the
+> guest PTEs used to map L2 GPAs, so that KVM will create writable SPTEs
+> when handling L2 read faults.  When handling read faults in the shadow MMU,
+> KVM opportunistically creates a writable SPTE if the mapping can be
+> writable *and* the gPTE is dirty (or doesn't support the Dirty bit), i.e.
+> if KVM doesn't need to intercept writes in order to emulate Dirty-bit
+> updates.
+> 
+> To actually test the L2 READ=>WRITE sequence, e.g. without masking a false
+> pass by other test activity, route the READ=>WRITE and WRITE=>WRITE
+> sequences to separate L1 pages, and differentiate between "marked dirty
+> due to a WRITE access/fault" and "marked dirty due to creating a writable
+> SPTE for a READ access/fault".  The updated sequence exposes the bug fixed
+> by KVM commit 1f4e5fc83a42 ("KVM: x86: fix nested guest live migration
+> with PML") when the guest performs a READ=>WRITE sequence with dirty guest
+> PTEs.
+> 
+> Opportunistically tweak and rename the address macros, and add comments,
+> to make it more obvious what the test is doing.  E.g. NESTED_TEST_MEM1
+> vs. GUEST_TEST_MEM doesn't make it all that obvious that the test is
+> creating aliases in both the L2 GPA and GVA address spaces, but only when
+> L1 is using TDP to run L2.
+> 
+> Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-> From: Patrick Roy <patrick.roy@linux.dev>
->
-> x86 supports GUEST_MEMFD_FLAG_NO_DIRECT_MAP whenever direct map
-> modifications are possible (which is always the case).
->
-> Signed-off-by: Patrick Roy <patrick.roy@linux.dev>
-> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 5a3bfa293e8b..68bd29a52f24 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -28,6 +28,7 @@
->  #include <linux/sched/vhost_task.h>
->  #include <linux/call_once.h>
->  #include <linux/atomic.h>
-> +#include <linux/set_memory.h>
->
->  #include <asm/apic.h>
->  #include <asm/pvclock-abi.h>
-> @@ -2481,4 +2482,12 @@ static inline bool kvm_arch_has_irq_bypass(void)
->  	return enable_device_posted_irqs;
->  }
->
-> +#ifdef CONFIG_KVM_GUEST_MEMFD
-> +static inline bool kvm_arch_gmem_supports_no_direct_map(void)
-> +{
-> +	return can_set_direct_map();
-> +}
-> +#define kvm_arch_gmem_supports_no_direct_map kvm_arch_gmem_supports_no_direct_map
-> +#endif /* CONFIG_KVM_GUEST_MEMFD */
+LGTM with one nit/question below:
+
+Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+
+[..]
+> +static void l2_guest_code(vm_vaddr_t base)
+>  {
+> -	READ_ONCE(*a);
+> -	WRITE_ONCE(*a, 1);
+> -	GUEST_SYNC(true);
+> -	GUEST_SYNC(false);
+> +	vm_vaddr_t page0 = TEST_GUEST_ADDR(base, 0);
+> +	vm_vaddr_t page1 = TEST_GUEST_ADDR(base, 1);
+>  
+> -	WRITE_ONCE(*b, 1);
+> -	GUEST_SYNC(true);
+> -	WRITE_ONCE(*b, 1);
+> -	GUEST_SYNC(true);
+> -	GUEST_SYNC(false);
+> +	READ_ONCE(*(u64 *)page0);
+> +	GUEST_SYNC(page0 | TEST_SYNC_READ_FAULT);
+> +	WRITE_ONCE(*(u64 *)page0, 1);
+> +	GUEST_SYNC(page0 | TEST_SYNC_WRITE_FAULT);
+> +	READ_ONCE(*(u64 *)page0);
+> +	GUEST_SYNC(page0 | TEST_SYNC_NO_FAULT);
 > +
->  #endif /* _ASM_X86_KVM_HOST_H */
-> --
-> 2.50.1
+> +	WRITE_ONCE(*(u64 *)page1, 1);
+> +	GUEST_SYNC(page1 | TEST_SYNC_WRITE_FAULT);
+> +	WRITE_ONCE(*(u64 *)page1, 1);
+> +	GUEST_SYNC(page1 | TEST_SYNC_WRITE_FAULT);
+> +	READ_ONCE(*(u64 *)page1);
+> +	GUEST_SYNC(page1 | TEST_SYNC_NO_FAULT);
+> +	GUEST_SYNC(page1 | TEST_SYNC_NO_FAULT);
 
-Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+Extra GUEST_SYNC()?
+
+>  
+>  	/* Exit to L1 and never come back.  */
+>  	vmcall();
 
