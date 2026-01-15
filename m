@@ -1,558 +1,342 @@
-Return-Path: <kvm+bounces-68160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C07CD22E7C
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 08:43:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA0AD22E85
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 08:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0AF8D304B3DD
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 07:43:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA12E30975B5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 07:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D8432A3C3;
-	Thu, 15 Jan 2026 07:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1395E32ABC7;
+	Thu, 15 Jan 2026 07:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JIbC4FfT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPoabBQC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3DF32825D;
-	Thu, 15 Jan 2026 07:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768463016; cv=fail; b=vGmwnXwFnfwZbwpkbUVbGqtVs8Dn53Rl8N/vF4/84R6m22jVvlHDN7QDfbR6f/niuwFOGlHmgw7Kq4dAvmSR4gtvbj99r0MD3Tlxir8ZvAkqb8IdSeVLT4pHjO3Er8QdU6Bs9A0DkmyTqCDULDFCA81mJiqm/EfnG8OwYyMrrns=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768463016; c=relaxed/simple;
-	bh=dabcjbrpJEaxdBBLzSHK0Hbk70BNMmWEIJBTE25kgBg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=axQuV/zTdauDEUX7N1HAyI/hV1ciJP0gLerDNx4JQbprnMImIawWevYlobtSp6eyT2m02XQCESiSWKBLmzqaQZrqTPPFNCkZwkhatXrSJKLZ6271Pf6FqhKw7BJYm9e3yXdScEQV6+Zgd2g7YTIoHZY6w/2Q+22gYccUN6SXbmE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JIbC4FfT; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768463014; x=1799999014;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=dabcjbrpJEaxdBBLzSHK0Hbk70BNMmWEIJBTE25kgBg=;
-  b=JIbC4FfTme29n5t4y+64034NlwCjJLDFTfsxb7wVooSiMDVlBTOUf8l1
-   pLWXnk33Uru4QK0GFoxfLcWTAoZagb2+obmtCsOAGMdBUgVIG6knSH5tf
-   m58orwnOaLECvwe7VpWmerBRLS5NbureYfQCeiLoG6qBgdyE9vBLwPoOq
-   ECJsFhWwRYyWWQRr7/97HUXKfaHp+sUnYvKkZrC25rDr5dkKeApuIXShc
-   YbzKyURswpMx/ujQPb/Y02dXLrxKHdmLILLJQXv2GXBFeS1hss4zpKBbf
-   QNzdi6ELP1Tm1YZvVpcza2MV0YDjc7C8Fd5Th+Ny5a3lADf9MUR6Q0AtL
-   A==;
-X-CSE-ConnectionGUID: 2sU6V542RVep9h1zx0skog==
-X-CSE-MsgGUID: TZqoH/JoTdGfyqiUITVvOQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="73398186"
-X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="73398186"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 23:43:33 -0800
-X-CSE-ConnectionGUID: CgWvbbnZTBCmAYFH3ctXtw==
-X-CSE-MsgGUID: xEZe4xHZTmGVocW49TpMqg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="236143592"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 23:43:31 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 14 Jan 2026 23:43:31 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Wed, 14 Jan 2026 23:43:31 -0800
-Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.19) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 14 Jan 2026 23:43:29 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gEL7j6C6LEbDUfZkgYsPlPJh/2mphvjALNti6q/C5pB+yNQZlKzqbjk5d8oXhCjavoAzGY8WYkPpiHtkSkks3gYJzc2Sw0cizD/3HmQXfx1LGSk0tgaKxZ2ZmuyS1Tp2b/uNRx/8jrgWHCrMkRcBd6GOaqrzx6+t0qHGu2PtdQ5MqqNNSxtoQr3ATRENYVMq7sS7KqFJ4l/T3JFmudNoInz+XS926tFm8Cpng3sbXyAlsIF0HTKkOPGZeEy4OWLJGNjcfEtmDwYGH07Pzrz1yhSeY7yR7JAvYHRqo86M5nPwBEAmg3+GLQIPykE1ot58PTE/OssjwGVRjDyoD+t1mA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v+OFQgNrqDCI4noKRxOauwk0weXLhSep0zw3Dev13DI=;
- b=qsYM0rWcSN7qbbLv++UlQ0mDmSvDgyTb2UQ3YkcblUaFBsQXaiPpXK3221mWOjfUYjKJVuqbIxskl7L9Vc30SkGzeaw7Y2FGmSq9cmRtTupey8MUylqOqz6nlNd85cpPGZg6bPgNSuFArHCdjYtylgu2NKmEFtw7kD9CBLHxWs1b2S2Jpiw9I9ceUFy99bln4op+MV7Z8ESdaSTp+KH+eDsDWJRbTlGVZHjqbNve5SHmRuVowHt0q6wVohPaEyWEXt6DLgm+lYIukepxuVASIJaVAOU09OpCSfzNvSlSoWlSrYBqqmxJxouMlC5TBZ/4uNV+EVUwovdc/5RZwenpJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH7PR11MB6522.namprd11.prod.outlook.com (2603:10b6:510:212::12)
- by MW4PR11MB6715.namprd11.prod.outlook.com (2603:10b6:303:20e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.4; Thu, 15 Jan
- 2026 07:43:22 +0000
-Received: from PH7PR11MB6522.namprd11.prod.outlook.com
- ([fe80::9e94:e21f:e11a:332]) by PH7PR11MB6522.namprd11.prod.outlook.com
- ([fe80::9e94:e21f:e11a:332%7]) with mapi id 15.20.9456.015; Thu, 15 Jan 2026
- 07:43:21 +0000
-Date: Wed, 14 Jan 2026 23:43:18 -0800
-From: Matthew Brost <matthew.brost@intel.com>
-To: Alistair Popple <apopple@nvidia.com>
-CC: Francois Dugast <francois.dugast@intel.com>,
-	<intel-xe@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>, Zi Yan
-	<ziy@nvidia.com>, adhavan Srinivasan <maddy@linux.ibm.com>, Nicholas Piggin
-	<npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, "Christophe Leroy
- (CS GROUP)" <chleroy@kernel.org>, Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>, Christian =?iso-8859-1?Q?K=F6nig?=
-	<christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, Simona Vetter
-	<simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>, "David
- Hildenbrand" <david@kernel.org>, Oscar Salvador <osalvador@suse.de>, "Andrew
- Morton" <akpm@linux-foundation.org>, Jason Gunthorpe <jgg@ziepe.ca>, "Leon
- Romanovsky" <leon@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
-	<vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan
-	<surenb@google.com>, Michal Hocko <mhocko@suse.com>, Balbir Singh
-	<balbirs@nvidia.com>, <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <amd-gfx@lists.freedesktop.org>,
-	<nouveau@lists.freedesktop.org>, <linux-mm@kvack.org>,
-	<linux-cxl@vger.kernel.org>
-Subject: Re: [PATCH v5 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-Message-ID: <aWiall34yq5Eupkf@lstrano-desk.jf.intel.com>
-References: <20260114192111.1267147-1-francois.dugast@intel.com>
- <20260114192111.1267147-2-francois.dugast@intel.com>
- <6spceodgfobizdaziju4yvvfydwvvik2wjyoyfuglozq533rgl@vmkotau3m3kw>
- <aWiBy3nZ4FrPYURF@lstrano-desk.jf.intel.com>
- <aWiGtlKI3LOtjUl6@lstrano-desk.jf.intel.com>
- <pgz2mhy4si2tu4iwusabjxxi4nctz3lamnpbg7773a2mp7srph@bz3ovwxuyakq>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <pgz2mhy4si2tu4iwusabjxxi4nctz3lamnpbg7773a2mp7srph@bz3ovwxuyakq>
-X-ClientProxiedBy: SJ0PR05CA0176.namprd05.prod.outlook.com
- (2603:10b6:a03:339::31) To PH7PR11MB6522.namprd11.prod.outlook.com
- (2603:10b6:510:212::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32480329C7E
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 07:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768463041; cv=none; b=fl+F6KfFhFA31oAfnTCNwsJPVglFH2NJAcPaNFOeeveoaAApvmmp44qKmZ7NJkdgjcJUSGDkxZK0XVZS9eDYjYSoPaoWpeMwuvV2KmW8/GaV6U6nJCoX+ANvXTgAshRCVp5E+q3r/ooZp5JWh6hDQMl9R9yoPcfw6iGbixh1OjU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768463041; c=relaxed/simple;
+	bh=4FGPv/2RxBM3h5py+1EMqhDtPUHe2D+7RO2VfCfYdZI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lRpJcAXahvM0r0fc0dvOmaTLjvwQDD63ZCrZieN3GEzkcQrMkiag3VAbO7cZ5+HP32Oq5p4Hii5oux3RM9h/WUG1+iz9fbyGM/+xi9qQzkPopvnlpsdBitD0VJWQs5xkr42DLsJz9WpUZSGFVozt3dmkmVzcggOcIrwLkFiSDLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPoabBQC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E42F7C4AF09
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 07:44:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768463040;
+	bh=4FGPv/2RxBM3h5py+1EMqhDtPUHe2D+7RO2VfCfYdZI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=JPoabBQClH8LVoT1CRQ3qky/rMkHsRyVl7+QY2ZIPFUbOQg0xyf6ASkVvCJwKmbgX
+	 5UHinV5rku73xgr8lUOZHaHJzU05116Ds4TzuhKilGa25ccUGD8y1+kPTIulFfQZ7C
+	 ooAdVwg4bYGDlRFHptMg4ZEwf5JVa1v+YrebE1+ikYSR3YZtADt1Y2RJ6ijetJD+BM
+	 cR2FftV3MGt9MMRlrWwuO/0hKf6KEGkLTKoe001EPGTWO6MfcMa2vCV7PnmJKdNvvx
+	 4ClB/mY6p2FWyAEYJHt9XPvZnnZo+UDd69txsxOPo+q8M2b+Q7INv4f4h9nJLPqqO/
+	 G3iO84SuoOhpA==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-652fec696c9so1024585a12.3
+        for <kvm@vger.kernel.org>; Wed, 14 Jan 2026 23:44:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVXI0OaykgNIRE3GdwsexuhqlwQcsEfxxDOrk9qN1J8CnpJWbP/Jn0joH/YVDxbeFtb6Zs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRRJ43ulPgtoJEiv7xAqJ3M4eDfhbdIyr0NqNlqr+maDigq71c
+	5V5fwUKlxKcXDR00/x7V1pKKUjH4urEj/IZStLRnZfmdbvX/NHDy6Qc47gDcsCAvQb720ayy3sP
+	jO5BBoYzz5MRoSGl/JFVDbIXo2jrwtjs=
+X-Received: by 2002:a17:907:7f91:b0:b79:d24b:474d with SMTP id
+ a640c23a62f3a-b87676a0da7mr359416066b.16.1768463039462; Wed, 14 Jan 2026
+ 23:43:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR11MB6522:EE_|MW4PR11MB6715:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5576fdc0-3ecc-434c-e294-08de5409c1b0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?THZZSzRMeVdkRXNyc1ZNTWNNak9DdEVubjRLNWw2N29uQWI4RXQya2FKWnh0?=
- =?utf-8?B?UUJTOHg2MUUxVnVLMlVkUy9XUjBMZXdINEFoWDJHL1MzNCtEdS9BYzFzVXhn?=
- =?utf-8?B?VTc4LzJVQXFJczVHdVdrR0JqOUJpZUZXRFpxR0h5dGlnMXNycFQvQVMvN0dt?=
- =?utf-8?B?RmlnT3BIdlBSMEhSRE9QWEt2bjVvUVlpVkR2dU8ydVFlbFJXYlBBNXB3QnFP?=
- =?utf-8?B?RWtpN1R4ZWdHc2dFZFdlSWZtRVBZMXVRM1ArNkpNUnVsOGdLQWZRT2g0WkdH?=
- =?utf-8?B?VGRON25kVXlMREpiZFAvclZLNlJmSUl5SUx0Yml4TU0xUjk0TEV2QWEyaElz?=
- =?utf-8?B?YTBSS2F5bGJnR0dIZytEOENwNE40b24zSlVYYVlLcnJCMnpFcGFobjVmZGwx?=
- =?utf-8?B?V3RzTmZuWm9SZ1JjbEY4NnJCK0JTT1BvZzFRN0hoazk2YjhoMmRiNmYzcGZu?=
- =?utf-8?B?c2orNllSdUwxSndJa2xrTWh3eGJZc09LMklpVGo3Um1ybExmbnQydlZCM3k0?=
- =?utf-8?B?b1d6dldNcWxRNS9OZFZFc203ZWhEd1o2clFLb1Y1L3Q5MUpFb3l3eGVVVlNn?=
- =?utf-8?B?cDhCb3luanVBejlGVG1Dams1OUM1NDVrUHFLWWVqSHJ4eDdOMnNrRDRKUnNw?=
- =?utf-8?B?Q3V6UHNDSHl0dXk5ejV5R205TXVNWWgxcU8xaUxLcTJ1TmVRa29rbElMVkRW?=
- =?utf-8?B?S3pKZXExQzc0b1ZsRDRxQ1psOGhvTGhLczFseUlzdlJHZmU3ZU53dTRzQzRU?=
- =?utf-8?B?bi9VRzdhcENDOGNIZUNMeXJqeWpvVzBXdDdBL241a0VzSWFsdW41RDNXQ09i?=
- =?utf-8?B?TFBlQ3lUWjNVUkpwc3dvVzdrMmwxRUtReFRrdmQ0NXRWY0ZVY25QUnF4RVBz?=
- =?utf-8?B?YkxMM05yUnRDQVZ6S2JHYWovcHc3TkJYQVhXK3FpQzk2Y0VLS1A4dU5QVm1t?=
- =?utf-8?B?ZUpPUXBrTHNkekgydUVTb3lmSVNEbGhTYk53SStMenlrczgxM1dzUE03eXB3?=
- =?utf-8?B?Q0t3L1NFVHlVOVNpOTBYckljSFExL1J2OU9LWEhzcWUwWnlJYVcrUmhIYUY0?=
- =?utf-8?B?RmIyQXVabDR6cExRdkhHRlpSNHZKUWcrc2ZvZTBrNlRiWXFDQUFlSWhoYkhv?=
- =?utf-8?B?VnRHeEtUOUp6TkhRK3oySitYY1R1NzZkaFlkbGJFV2l2Nll6Qm12NUlSYzUz?=
- =?utf-8?B?Y215SEhoWitHN05wTVFZVG8zSDY2dStkaG52L0xPYzQ4dTQ0b2NBQ3ZOTWM2?=
- =?utf-8?B?Wlg2ek9hV3o2bHd4K2p2SEVHMGxpTC9pT0ZTVXhBUmx3RVltbmMrV0hkeFA2?=
- =?utf-8?B?M09hY3l3OWp5SEI4U1k3dXAzTXloZFZ5c05CMTJ0bjg4bmt1alBrSzZBSjVT?=
- =?utf-8?B?RXoxbS9iYjgxeFU4elErNXpHNlRRRVppblorZHJHTzA1S3FiU01aTENYVUp5?=
- =?utf-8?B?TG9sQ3RMVlhiSUZ2NG9WT29SQkhNd0pqcjUzZmVzdURiTVJhdzBzSEVlaFBm?=
- =?utf-8?B?QjFjd2orRHh3SzZsN3dkZWI1YmlsOWNsUG5SN0s0VDZDSVkrY3NhaFdtQjZi?=
- =?utf-8?B?WVZaTEYwTzA2K1M2SmJOaElRVVV1Zzhlbkg2WXZhQTd4dUphdGI5N2l4SHZC?=
- =?utf-8?B?aS9TQVlGeDQwK1NYN0VmOWxVTitEU0V4UEpOU2hwMnJrdUdtcmRsYitPeERz?=
- =?utf-8?B?UTJTdDRTT1FJcFFvcnYyZ2pveFBmdm9HakFFazgrOHd2Vkd2b05jeG9rZHp5?=
- =?utf-8?B?clhrSVh3bFdzZmp6YTJydGpFcWZYT2lJSi95SkxZMzRwUFUzakFLWDdtSVJk?=
- =?utf-8?B?a3orb0hpRVB6VjZQc3NpRjV3bG1OZVdGcE5tRHk1bGgrTm9KV2UrZ2tobmg4?=
- =?utf-8?B?WEFGN0I1MnoxRDAwbVVBTWVtRFBxZ0F4MnhHUUwzTG53UTBKQWtPUFA1U3hK?=
- =?utf-8?B?UWpDZ0h3ZlRucHNHNnovUWQ2MVNCb2MwanBBMlNTUC9XVXhTMEhYNTZncHV1?=
- =?utf-8?B?L3Y1czBVdlYwUXdsOU43VFlQbHpnaGpESmlvNVF5SVFwNjRzaVk2RjYwQzV1?=
- =?utf-8?Q?3niVlg?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB6522.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXhFSGd6N0I5N3pVL2xJSnJZejNEWXRuU3BzWlZkOFpWbW9sd1ZJNCtRZ1dv?=
- =?utf-8?B?NmtUcTVXdDhLM0pNSkl2bDgraFhORUVKd1hTYlE1K0t4OGdRSEtUd0swUWRV?=
- =?utf-8?B?T2p3RG1ieXVTYWN1RG05SDI0cUZlbThyMDQxcFdTS2FreGsrajhHMC9tN1NJ?=
- =?utf-8?B?ekxRcGgxS2hxem5mcGtqVHUzQnNrZnRDNC9Lc2pvOTJmMVZRT3JMc2MyZUp1?=
- =?utf-8?B?cjRjQ0dzOUxDQkJXT1BUUWV2ejZWbXlFKy9kazR5enNSR1VCcE1PNWVJUDNi?=
- =?utf-8?B?VWI1SUJRWmp5eExyUDhiZjN2VHBRL3kwK2ZWR0FzZE0rRUJsOTVjZ01nNzJQ?=
- =?utf-8?B?NENxaGRWNnI1RDE2RTRPYmFHWi95eEs1TXg2YVVqbFdBNDBFMnFHbnhrWTlU?=
- =?utf-8?B?SDN3aHpsK2Y4NG9EQVVESXJmSUozRHlZZWZ5UWRaWlExWmZhOThsdytDSlA0?=
- =?utf-8?B?VWpQb3htUTRLYWJYWXYzeVJ1a1l4QUVHYXFZQ0hFRFUyQjBMdGx6b0k1ZFBy?=
- =?utf-8?B?UDQ1MG5iSDYwVys5WGpuNFVSRXFSUlh6cENXOHNmM0g5K3gzRFp6VGZYSTJa?=
- =?utf-8?B?U0hZaFI5UmdheEVza2JqcmZoVHhzS0t1bEtrcHdPNE0rWmhCNG5NMGR1WHZQ?=
- =?utf-8?B?QzVsbWNBV3lZUFkwNnNMM0JyTGRyT0RtVzNVQ3pRN1FvNnpLNG9CUlRRUFpr?=
- =?utf-8?B?Qk1lY3RDdmFyTVVFbC92amNNS29ISDhXUUl1YThnYXM2U0VLckxtQTlleXMw?=
- =?utf-8?B?ekE3YWNDbkpXMXpKUWxzL0JmVkpNYTc3eVdYRHpPMGJZU2dKYkxEM1M3MG9h?=
- =?utf-8?B?TFh2bjJTVU11aWdGWWc1SlVZTWVDZGpzSkFpMURsRlRHUGZta2M3QjBZWWVj?=
- =?utf-8?B?ZFR3R1BhT3gwWWw1S1BxUHhKcVBzWU5kak8yekFhcGtHSkg2TEJncFY2RG02?=
- =?utf-8?B?QmNvTEZUNXlDOWFYUm1HZ3VFK1B4ZzVmcWNNc213d1QyZU8xNVNTdnRheDAw?=
- =?utf-8?B?dVVBb3Z0VDM4LzFGMG1MN25lOStRVUZZR3dDTzBPbGdHMjVnS2RTakIvMis3?=
- =?utf-8?B?bTVVUWV3OTBWQW5RV3VSSkRiVmtySXpMcWJxQzVNNUlzbWwrWlJiUHRtYW5k?=
- =?utf-8?B?MzFSQXlQaHg3eUdkOVgvaituNElFRkdWT1d2WUlMeCt1V3V1L0s5Tm00Nzh6?=
- =?utf-8?B?WW5kUytKb2taeVkyTFc1YjM5ckZmNVZ1djNvRUIvZnFDWStQQmwvbnNOZHp4?=
- =?utf-8?B?bzQ4RE1ud0V3UUZSeGpwb0RXL1kveHpTbVUzeWY0S0xTYlYzZEVOZ29JZXVh?=
- =?utf-8?B?dUhEZFA2T25HV3ExSEtwMkgrYWRyY3ZNZ0JEL3NsZVIxVlVLeFp1cTY5bm53?=
- =?utf-8?B?OXdOMnYwL1dRVVJNeW81TmRxSDF5T25ESEx3eUVvTFl4OEZTbXFsb1VBM3o3?=
- =?utf-8?B?Wm1vVXJmNHhuR2R6SFU3M1dRejBpalBHYlp0ZDZCdDVRK3JhVnRBZ3FsekhK?=
- =?utf-8?B?bUFpQ1BDeEw3RlZHY0xpNzhkaUlXUGRQa01DdFo0UDVTZ0p4VUZVS3JjdG5p?=
- =?utf-8?B?cm1tQVZYRkI4enlDSjlsMXlHdjIyQmdKbVZLbHhLT2o2c1JJZW0xSjNSL243?=
- =?utf-8?B?dCtHZzI1TkUvRlJxNVExbldnQmsvSmZXYzNyZGVFUTN6bXZIVnFhZWtseG8z?=
- =?utf-8?B?QTRhRk1XMXg3YUFnajB0UUJNWVB5UFBmNTI3cmt0NlY3NCtpSm9NQTVPSDNx?=
- =?utf-8?B?LzZWaFgwcmpFOU43a1FNY2NCUUI1L1A5eVJIQ2VxSFZoUnpOZnp3dGo4UHYy?=
- =?utf-8?B?TG1mNXZ4ZlVpLzlKMVc0MFl2T1NsUklDNUc2K2x0K0NTbEJJd2dzblhWd1lx?=
- =?utf-8?B?NHlxczFtcGFWSDE4T1dXelVaa2VIT2pMcVJPbVh1Njl2YVo3RGxQd3RXcFJF?=
- =?utf-8?B?OUlmdC9pejhJTFcvMFNqV0d1RXNMTUVwbnowUCtEZG43MHJlTDUza2hBYmFN?=
- =?utf-8?B?MzFkcHJtV0duZXRwRldEK2pyVCtFRHN0dmY5VmdsQ0l3OSt1M2YyWXBsK2pu?=
- =?utf-8?B?UVptMHowdmVhZkJXb3lmSndqbXpDNDZQalZhMXNnVGFOU2h3aHk2d05hdnV6?=
- =?utf-8?B?Z295WStKZ1RsVXlxRDVpVFRXZTArZWJWVm4weWhkUkNOd2FJbFJJMUl2U0ph?=
- =?utf-8?B?bHoyc2ZrTkhOcUFCMllYTlhNYWNhRXJSWHVmTGFEN0ozTmZVNEozU0pvVDdy?=
- =?utf-8?B?MXI5bVFXM1NlZG5NTWxvOTZNSjdXelpxZnkyOHJKZEVZTWdKWmtIOHRLS2Za?=
- =?utf-8?B?MG41UEFwMWpUbUJOejdDS0R2NDlKeExsRVNrZXdrd2djd3orcjB3UWIxbmtD?=
- =?utf-8?Q?Tez++52etbJPuhEc=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5576fdc0-3ecc-434c-e294-08de5409c1b0
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB6522.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2026 07:43:21.6182
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nA7IC39vqsHSFk0hgF9BoeZ/3o4kA25yKcRxSQICvZCNKuh1SIF2fWCfesQKLJypzFs8iZDpQXE8HEBfbGKq8g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6715
-X-OriginatorOrg: intel.com
+References: <20251225091224.2893389-1-gaosong@loongson.cn> <20251225091224.2893389-2-gaosong@loongson.cn>
+In-Reply-To: <20251225091224.2893389-2-gaosong@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Thu, 15 Jan 2026 15:43:51 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5h2LioH6SZD8RUNewb4De3LWM9g2PJFUnTTkX+GG4cdw@mail.gmail.com>
+X-Gm-Features: AZwV_QiaUyKFTIxEaKv_MY3PKwCihURSdn_6U07VTAlpWKWayuoeaNBCR3B_XX8
+Message-ID: <CAAhV-H5h2LioH6SZD8RUNewb4De3LWM9g2PJFUnTTkX+GG4cdw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/2] LongArch: KVM: Add DMSINTC device support
+To: Song Gao <gaosong@loongson.cn>
+Cc: maobibo@loongson.cn, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kernel@xen0n.name, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 15, 2026 at 06:07:08PM +1100, Alistair Popple wrote:
-> On 2026-01-15 at 17:18 +1100, Matthew Brost <matthew.brost@intel.com> wrote...
-> > On Wed, Jan 14, 2026 at 09:57:31PM -0800, Matthew Brost wrote:
-> > > On Thu, Jan 15, 2026 at 04:27:26PM +1100, Alistair Popple wrote:
-> > > > On 2026-01-15 at 06:19 +1100, Francois Dugast <francois.dugast@intel.com> wrote...
-> > > > > From: Matthew Brost <matthew.brost@intel.com>
-> > > > > 
-> > > > > Reinitialize metadata for large zone device private folios in
-> > > > > zone_device_page_init prior to creating a higher-order zone device
-> > > > > private folio. This step is necessary when the folio’s order changes
-> > > > > dynamically between zone_device_page_init calls to avoid building a
-> > > > > corrupt folio. As part of the metadata reinitialization, the dev_pagemap
-> > > > > must be passed in from the caller because the pgmap stored in the folio
-> > > > > page may have been overwritten with a compound head.
-> > > > 
-> > > > Thanks for fixing, a couple of minor comments below.
-> > > > 
-> > > > > Cc: Zi Yan <ziy@nvidia.com>
-> > > > > Cc: Alistair Popple <apopple@nvidia.com>
-> > > > > Cc: adhavan Srinivasan <maddy@linux.ibm.com>
-> > > > > Cc: Nicholas Piggin <npiggin@gmail.com>
-> > > > > Cc: Michael Ellerman <mpe@ellerman.id.au>
-> > > > > Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-> > > > > Cc: Felix Kuehling <Felix.Kuehling@amd.com>
-> > > > > Cc: Alex Deucher <alexander.deucher@amd.com>
-> > > > > Cc: "Christian König" <christian.koenig@amd.com>
-> > > > > Cc: David Airlie <airlied@gmail.com>
-> > > > > Cc: Simona Vetter <simona@ffwll.ch>
-> > > > > Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> > > > > Cc: Maxime Ripard <mripard@kernel.org>
-> > > > > Cc: Thomas Zimmermann <tzimmermann@suse.de>
-> > > > > Cc: Lyude Paul <lyude@redhat.com>
-> > > > > Cc: Danilo Krummrich <dakr@kernel.org>
-> > > > > Cc: David Hildenbrand <david@kernel.org>
-> > > > > Cc: Oscar Salvador <osalvador@suse.de>
-> > > > > Cc: Andrew Morton <akpm@linux-foundation.org>
-> > > > > Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> > > > > Cc: Leon Romanovsky <leon@kernel.org>
-> > > > > Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-> > > > > Cc: Liam R. Howlett <Liam.Howlett@oracle.com>
-> > > > > Cc: Vlastimil Babka <vbabka@suse.cz>
-> > > > > Cc: Mike Rapoport <rppt@kernel.org>
-> > > > > Cc: Suren Baghdasaryan <surenb@google.com>
-> > > > > Cc: Michal Hocko <mhocko@suse.com>
-> > > > > Cc: Balbir Singh <balbirs@nvidia.com>
-> > > > > Cc: linuxppc-dev@lists.ozlabs.org
-> > > > > Cc: kvm@vger.kernel.org
-> > > > > Cc: linux-kernel@vger.kernel.org
-> > > > > Cc: amd-gfx@lists.freedesktop.org
-> > > > > Cc: dri-devel@lists.freedesktop.org
-> > > > > Cc: nouveau@lists.freedesktop.org
-> > > > > Cc: linux-mm@kvack.org
-> > > > > Cc: linux-cxl@vger.kernel.org
-> > > > > Fixes: d245f9b4ab80 ("mm/zone_device: support large zone device private folios")
-> > > > > Signed-off-by: Matthew Brost <matthew.brost@intel.com>
-> > > > > Signed-off-by: Francois Dugast <francois.dugast@intel.com>
-> > > > > ---
-> > > > >  arch/powerpc/kvm/book3s_hv_uvmem.c       |  2 +-
-> > > > >  drivers/gpu/drm/amd/amdkfd/kfd_migrate.c |  2 +-
-> > > > >  drivers/gpu/drm/drm_pagemap.c            |  2 +-
-> > > > >  drivers/gpu/drm/nouveau/nouveau_dmem.c   |  2 +-
-> > > > >  include/linux/memremap.h                 |  9 ++++++---
-> > > > >  lib/test_hmm.c                           |  4 +++-
-> > > > >  mm/memremap.c                            | 20 +++++++++++++++++++-
-> > > > >  7 files changed, 32 insertions(+), 9 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> > > > > index e5000bef90f2..7cf9310de0ec 100644
-> > > > > --- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-> > > > > +++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-> > > > > @@ -723,7 +723,7 @@ static struct page *kvmppc_uvmem_get_page(unsigned long gpa, struct kvm *kvm)
-> > > > >  
-> > > > >  	dpage = pfn_to_page(uvmem_pfn);
-> > > > >  	dpage->zone_device_data = pvt;
-> > > > > -	zone_device_page_init(dpage, 0);
-> > > > > +	zone_device_page_init(dpage, &kvmppc_uvmem_pgmap, 0);
-> > > > >  	return dpage;
-> > > > >  out_clear:
-> > > > >  	spin_lock(&kvmppc_uvmem_bitmap_lock);
-> > > > > diff --git a/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c b/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c
-> > > > > index af53e796ea1b..6ada7b4af7c6 100644
-> > > > > --- a/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c
-> > > > > +++ b/drivers/gpu/drm/amd/amdkfd/kfd_migrate.c
-> > > > > @@ -217,7 +217,7 @@ svm_migrate_get_vram_page(struct svm_range *prange, unsigned long pfn)
-> > > > >  	page = pfn_to_page(pfn);
-> > > > >  	svm_range_bo_ref(prange->svm_bo);
-> > > > >  	page->zone_device_data = prange->svm_bo;
-> > > > > -	zone_device_page_init(page, 0);
-> > > > > +	zone_device_page_init(page, page_pgmap(page), 0);
-> > > > >  }
-> > > > >  
-> > > > >  static void
-> > > > > diff --git a/drivers/gpu/drm/drm_pagemap.c b/drivers/gpu/drm/drm_pagemap.c
-> > > > > index 03ee39a761a4..c497726b0147 100644
-> > > > > --- a/drivers/gpu/drm/drm_pagemap.c
-> > > > > +++ b/drivers/gpu/drm/drm_pagemap.c
-> > > > > @@ -201,7 +201,7 @@ static void drm_pagemap_get_devmem_page(struct page *page,
-> > > > >  					struct drm_pagemap_zdd *zdd)
-> > > > >  {
-> > > > >  	page->zone_device_data = drm_pagemap_zdd_get(zdd);
-> > > > > -	zone_device_page_init(page, 0);
-> > > > > +	zone_device_page_init(page, zdd->dpagemap->pagemap, 0);
-> > > > >  }
-> > > > >  
-> > > > >  /**
-> > > > > diff --git a/drivers/gpu/drm/nouveau/nouveau_dmem.c b/drivers/gpu/drm/nouveau/nouveau_dmem.c
-> > > > > index 58071652679d..3d8031296eed 100644
-> > > > > --- a/drivers/gpu/drm/nouveau/nouveau_dmem.c
-> > > > > +++ b/drivers/gpu/drm/nouveau/nouveau_dmem.c
-> > > > > @@ -425,7 +425,7 @@ nouveau_dmem_page_alloc_locked(struct nouveau_drm *drm, bool is_large)
-> > > > >  			order = ilog2(DMEM_CHUNK_NPAGES);
-> > > > >  	}
-> > > > >  
-> > > > > -	zone_device_folio_init(folio, order);
-> > > > > +	zone_device_folio_init(folio, page_pgmap(folio_page(folio, 0)), order);
-> > > > >  	return page;
-> > > > >  }
-> > > > >  
-> > > > > diff --git a/include/linux/memremap.h b/include/linux/memremap.h
-> > > > > index 713ec0435b48..e3c2ccf872a8 100644
-> > > > > --- a/include/linux/memremap.h
-> > > > > +++ b/include/linux/memremap.h
-> > > > > @@ -224,7 +224,8 @@ static inline bool is_fsdax_page(const struct page *page)
-> > > > >  }
-> > > > >  
-> > > > >  #ifdef CONFIG_ZONE_DEVICE
-> > > > > -void zone_device_page_init(struct page *page, unsigned int order);
-> > > > > +void zone_device_page_init(struct page *page, struct dev_pagemap *pgmap,
-> > > > > +			   unsigned int order);
-> > > > >  void *memremap_pages(struct dev_pagemap *pgmap, int nid);
-> > > > >  void memunmap_pages(struct dev_pagemap *pgmap);
-> > > > >  void *devm_memremap_pages(struct device *dev, struct dev_pagemap *pgmap);
-> > > > > @@ -234,9 +235,11 @@ bool pgmap_pfn_valid(struct dev_pagemap *pgmap, unsigned long pfn);
-> > > > >  
-> > > > >  unsigned long memremap_compat_align(void);
-> > > > >  
-> > > > > -static inline void zone_device_folio_init(struct folio *folio, unsigned int order)
-> > > > > +static inline void zone_device_folio_init(struct folio *folio,
-> > > > > +					  struct dev_pagemap *pgmap,
-> > > > > +					  unsigned int order)
-> > > > >  {
-> > > > > -	zone_device_page_init(&folio->page, order);
-> > > > > +	zone_device_page_init(&folio->page, pgmap, order);
-> > > > >  	if (order)
-> > > > >  		folio_set_large_rmappable(folio);
-> > > > >  }
-> > > > > diff --git a/lib/test_hmm.c b/lib/test_hmm.c
-> > > > > index 8af169d3873a..455a6862ae50 100644
-> > > > > --- a/lib/test_hmm.c
-> > > > > +++ b/lib/test_hmm.c
-> > > > > @@ -662,7 +662,9 @@ static struct page *dmirror_devmem_alloc_page(struct dmirror *dmirror,
-> > > > >  			goto error;
-> > > > >  	}
-> > > > >  
-> > > > > -	zone_device_folio_init(page_folio(dpage), order);
-> > > > > +	zone_device_folio_init(page_folio(dpage),
-> > > > > +			       page_pgmap(folio_page(page_folio(dpage), 0)),
-> > > > > +			       order);
-> > > > >  	dpage->zone_device_data = rpage;
-> > > > >  	return dpage;
-> > > > >  
-> > > > > diff --git a/mm/memremap.c b/mm/memremap.c
-> > > > > index 63c6ab4fdf08..6f46ab14662b 100644
-> > > > > --- a/mm/memremap.c
-> > > > > +++ b/mm/memremap.c
-> > > > > @@ -477,10 +477,28 @@ void free_zone_device_folio(struct folio *folio)
-> > > > >  	}
-> > > > >  }
-> > > > >  
-> > > > > -void zone_device_page_init(struct page *page, unsigned int order)
-> > > > > +void zone_device_page_init(struct page *page, struct dev_pagemap *pgmap,
-> > > > > +			   unsigned int order)
-> > > > >  {
-> > > > > +	struct page *new_page = page;
-> > > > > +	unsigned int i;
-> > > > > +
-> > > > >  	VM_WARN_ON_ONCE(order > MAX_ORDER_NR_PAGES);
-> > > > >  
-> > > > > +	for (i = 0; i < (1UL << order); ++i, ++new_page) {
-> > > > > +		struct folio *new_folio = (struct folio *)new_page;
-> > > > > +
-> > > > > +		new_page->flags.f &= ~0xffUL;	/* Clear possible order, page head */
-> > > > 
-> > > > This seems odd to me, mainly due to the "magic" number. Why not just clear
-> > > > the flags entirely? Or at least explicitly just clear the flags you care about
-> > > > which would remove the need for the comment and  should let you use the proper
-> > > > PageFlag functions.
-> > > > 
-> > > 
-> > > I'm copying this from folio_reset_order [1]. My paranoia about touching
-> > > anything related to struct page is high, so I did the same thing
-> > > folio_reset_order does here.
-> 
-> So why not just use folio_reset_order() below?
-> 
-> > > 
-> > > [1] https://elixir.bootlin.com/linux/v6.18.5/source/include/linux/mm.h#L1075
-> > > 
-> > 
-> > This immediately hangs my first SVM test...
-> > 
-> > diff --git a/mm/memremap.c b/mm/memremap.c
-> > index 6f46ab14662b..ef8c56876cf5 100644
-> > --- a/mm/memremap.c
-> > +++ b/mm/memremap.c
-> > @@ -488,7 +488,7 @@ void zone_device_page_init(struct page *page, struct dev_pagemap *pgmap,
-> >         for (i = 0; i < (1UL << order); ++i, ++new_page) {
-> >                 struct folio *new_folio = (struct folio *)new_page;
-> > 
-> > -               new_page->flags.f &= ~0xffUL;   /* Clear possible order, page head */
-> > +               new_page->flags.f = 0;
-> >  #ifdef NR_PAGES_IN_LARGE_FOLIO
-> >                 ((struct folio *)(new_page - 1))->_nr_pages = 0;
-> 
-> This seems wrong to me - I saw your reply to Balbir but for an order-0 page
-> isn't this going to access a completely different, possibly already allocated,
-> page?
-> 
+Hi, Song,
 
-No — it accesses itself (new_page). It just uses some odd memory tricks
-for this, which I agree isn’t the best thing I’ve ever written, but it
-was the least-worst idea I had. I didn’t design the folio/page field
-aliasing; I understand why it exists, but it still makes my head hurt.
-
-folio->_nr_pages is page + 1 for reference (new_page after this math).
-Again, if I touched this memory directly in new_page, it’s most likely
-memcg_data, but that is hidden behind a Kconfig.
-
-This just blindly implementing part of folio_reset_order which clears
-_nr_pages.
-
-> >  #endif
-> > 
-> > I can walk through exactly which flags need to be cleared, but my
-> > feeling is that likely any flag that the order field overloads and can
-> > possibly encode should be cleared—so bits 0–7 based on the existing
-> > code.
-> > 
-> > How about in a follow-up we normalize setting / clearing the order flag
-> > field with a #define and an inline helper?
-> 
-> Ie: Would something like the following work:
-> 
-> 		ClearPageHead(new_page);
-
-Any of these bit could possibly be set the order field in a folio, which
-modifies page + 1 flags field.
-
-	PG_locked,		/* Page is locked. Don't touch. */
-	PG_writeback,		/* Page is under writeback */
-	PG_referenced,
-	PG_uptodate,
-	PG_dirty,
-	PG_lru,
-	PG_head,		/* Must be in bit 6 */
-	PG_waiters,		/* Page has waiters, check its waitqueue. Must be bit #7 and in the same byte as "PG_locked" */
-
-So a common order-9 (2MB) folio would have PG_locked | PG_uptodate set.
-Now we get stuck on the next page lock because PG_locked is set.
-Offhand, I don’t know if different orders—which set different bits—cause
-any nasty issues either. So I figured the safest thing was clear any
-bits which folio order can set within subsequent page's memory flags
-like folio_reset_order does.
-
-> 		clear_compound_head(new_page);
-> 		folio_reset_order(new_folio);
-> 
-> Which would also deal with setting _nr_pages.
+On Thu, Dec 25, 2025 at 5:37=E2=80=AFPM Song Gao <gaosong@loongson.cn> wrot=
+e:
 >
-
-folio_reset_order(new_folio) would set _nr_pages in the memory that is
-new_page + 1. So let's say that page has a ref count + memcg_data, now
-that memory is corrupted and will crash the kernel.
-
-All of the above is why is took me multiple hours to write 6 lines of
-code :).
- 
-> > Matt
-> > 
-> > > > > +#ifdef NR_PAGES_IN_LARGE_FOLIO
-> > > > > +		((struct folio *)(new_page - 1))->_nr_pages = 0;
-> > > > > +#endif
-> > > > > +		new_folio->mapping = NULL;
-> > > > > +		new_folio->pgmap = pgmap;	/* Also clear compound head */
-> > > > > +		new_folio->share = 0;   /* fsdax only, unused for device private */
-> > > > 
-> > > > It would be nice if the FS DAX code actually used this as well. Is there a
-> > > > reason that change was dropped from the series?
-> > > > 
-> > > 
-> > > I don't have a test platform for FS DAX. In prior revisions, I was just
-> > > moving existing FS DAX code to a helper, which I felt confident about.
-> > > 
-> > > This revision is slightly different, and I don't feel comfortable
-> > > modifying FS DAX code without a test platform. I agree we should update
-> > > FS DAX, but that should be done in a follow-up with coordinated testing.
-> 
-> Fair enough, I figured something like this might be your answer :-) You
-> could update it and ask people with access to such a system to test it though
-> (unfortunately my setup has bit-rotted beyond repair).
-> 
-> But I'm ok leaving to for a future change.
+> Add device model for DMSINTC interrupt controller, implement basic
+> create/destroy/set_attr interfaces, and register device model to kvm
+> device table.
 >
+> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+> Signed-off-by: Song Gao <gaosong@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/kvm_dmsintc.h |  21 +++++
+>  arch/loongarch/include/asm/kvm_host.h    |   3 +
+>  arch/loongarch/include/uapi/asm/kvm.h    |   4 +
+>  arch/loongarch/kvm/Makefile              |   1 +
+>  arch/loongarch/kvm/intc/dmsintc.c        | 110 +++++++++++++++++++++++
+>  arch/loongarch/kvm/main.c                |   6 ++
+>  include/uapi/linux/kvm.h                 |   2 +
+>  7 files changed, 147 insertions(+)
+>  create mode 100644 arch/loongarch/include/asm/kvm_dmsintc.h
+>  create mode 100644 arch/loongarch/kvm/intc/dmsintc.c
+>
+> diff --git a/arch/loongarch/include/asm/kvm_dmsintc.h b/arch/loongarch/in=
+clude/asm/kvm_dmsintc.h
+> new file mode 100644
+> index 000000000000..1d4f66996f3c
+> --- /dev/null
+> +++ b/arch/loongarch/include/asm/kvm_dmsintc.h
+> @@ -0,0 +1,21 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+> + */
+> +
+> +#ifndef __ASM_KVM_DMSINTC_H
+> +#define __ASM_KVM_DMSINTC_H
+> +
+> +
+> +struct loongarch_dmsintc  {
+> +       struct kvm *kvm;
+> +       uint64_t msg_addr_base;
+> +       uint64_t msg_addr_size;
+> +};
+> +
+> +struct dmsintc_state {
+> +       atomic64_t  vector_map[4];
+> +};
+> +
+> +int kvm_loongarch_register_dmsintc_device(void);
+> +#endif
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> index e4fe5b8e8149..5e9e2af7312f 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -22,6 +22,7 @@
+>  #include <asm/kvm_ipi.h>
+>  #include <asm/kvm_eiointc.h>
+>  #include <asm/kvm_pch_pic.h>
+> +#include <asm/kvm_dmsintc.h>
+>  #include <asm/loongarch.h>
+>
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+> @@ -134,6 +135,7 @@ struct kvm_arch {
+>         struct loongarch_ipi *ipi;
+>         struct loongarch_eiointc *eiointc;
+>         struct loongarch_pch_pic *pch_pic;
+> +       struct loongarch_dmsintc *dmsintc;
+>  };
+>
+>  #define CSR_MAX_NUMS           0x800
+> @@ -244,6 +246,7 @@ struct kvm_vcpu_arch {
+>         struct kvm_mp_state mp_state;
+>         /* ipi state */
+>         struct ipi_state ipi_state;
+> +       struct dmsintc_state dmsintc_state;
+>         /* cpucfg */
+>         u32 cpucfg[KVM_MAX_CPUCFG_REGS];
+>
+> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
+de/uapi/asm/kvm.h
+> index de6c3f18e40a..0a370d018b08 100644
+> --- a/arch/loongarch/include/uapi/asm/kvm.h
+> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
+>  #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL             0x40000006
+>  #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT            0
+>
+> +#define KVM_DEV_LOONGARCH_DMSINTC_CTRL                 0x40000007
+> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE                0x0
+> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE                0x1
+> +
+>  #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
+> index cb41d9265662..6e184e24443c 100644
+> --- a/arch/loongarch/kvm/Makefile
+> +++ b/arch/loongarch/kvm/Makefile
+> @@ -19,6 +19,7 @@ kvm-y +=3D vm.o
+>  kvm-y +=3D intc/ipi.o
+>  kvm-y +=3D intc/eiointc.o
+>  kvm-y +=3D intc/pch_pic.o
+> +kvm-y +=3D intc/dmsintc.o
+>  kvm-y +=3D irqfd.o
+>
+>  CFLAGS_exit.o  +=3D $(call cc-disable-warning, override-init)
+> diff --git a/arch/loongarch/kvm/intc/dmsintc.c b/arch/loongarch/kvm/intc/=
+dmsintc.c
+> new file mode 100644
+> index 000000000000..3fdea81a08c8
+> --- /dev/null
+> +++ b/arch/loongarch/kvm/intc/dmsintc.c
+> @@ -0,0 +1,110 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <asm/kvm_dmsintc.h>
+> +#include <asm/kvm_vcpu.h>
+> +
+> +static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
+> +                               struct kvm_device_attr *attr,
+> +                               bool is_write)
+> +{
+> +       int addr =3D attr->attr;
+> +       void __user *data;
+> +       struct loongarch_dmsintc *s =3D dev->kvm->arch.dmsintc;
+> +       u64 tmp;
+> +
+> +       data =3D (void __user *)attr->addr;
+> +       switch (addr) {
+> +       case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE:
+> +               if (is_write) {
+> +                       if (copy_from_user(&tmp, data, sizeof(s->msg_addr=
+_base)))
+> +                               return -EFAULT;
+> +                       if (s->msg_addr_base) {
+> +                               /* Duplicate setting are not allowed. */
+> +                               return -EFAULT;
+> +                       }
+> +                       if ((tmp & (BIT(AVEC_CPU_SHIFT) - 1)) =3D=3D 0)
+> +                               s->msg_addr_base =3D tmp;
+> +                       else
+> +                               return  -EFAULT;
+> +               }
+> +               break;
+> +       case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE:
+> +               if (is_write) {
+> +                       if (copy_from_user(&tmp, data, sizeof(s->msg_addr=
+_size)))
+> +                               return -EFAULT;
+> +                       if (s->msg_addr_size) {
+> +                               /*Duplicate setting are not allowed. */
+> +                               return -EFAULT;
+> +                       }
+> +                       s->msg_addr_size =3D tmp;
+> +               }
+> +               break;
+> +       default:
+> +               kvm_err("%s: unknown dmsintc register, addr =3D %d\n", __=
+func__, addr);
+> +               return -ENXIO;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int kvm_dmsintc_set_attr(struct kvm_device *dev,
+> +                       struct kvm_device_attr *attr)
+> +{
+> +       switch (attr->group) {
+> +       case KVM_DEV_LOONGARCH_DMSINTC_CTRL:
+> +               return kvm_dmsintc_ctrl_access(dev, attr, true);
+> +       default:
+> +               kvm_err("%s: unknown group (%d)\n", __func__, attr->group=
+);
+> +               return -EINVAL;
+> +       }
+> +}
+> +
+> +static int kvm_dmsintc_create(struct kvm_device *dev, u32 type)
+> +{
+> +       struct kvm *kvm;
+> +       struct loongarch_dmsintc *s;
+> +
+> +       if (!dev) {
+> +               kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
+> +               return -EINVAL;
+> +       }
+> +
+> +       kvm =3D dev->kvm;
+> +       if (kvm->arch.dmsintc) {
+> +               kvm_err("%s: LoongArch DMSINTC has already been created!\=
+n", __func__);
+> +               return -EINVAL;
+> +       }
+> +
+> +       s =3D kzalloc(sizeof(struct loongarch_dmsintc), GFP_KERNEL);
+> +       if (!s)
+> +               return -ENOMEM;
+> +
+> +       s->kvm =3D kvm;
+> +       kvm->arch.dmsintc =3D s;
+> +       return 0;
+> +}
+> +
+> +static void kvm_dmsintc_destroy(struct kvm_device *dev)
+> +{
+> +
+> +       if (!dev || !dev->kvm || !dev->kvm->arch.dmsintc)
+> +               return;
+> +
+> +       kfree(dev->kvm->arch.dmsintc);
+No need to call kvm_io_bus_unregister_dev()? And it seems you need to
+kfree(dev) if this series is correct:
 
-I did a quick grep in fs/dax.c and don’t see zone_device_page_init
-called there. It probably could be used if it’s creating compound pages
-and drop the open-coded reinit when shared == 0, but yeah, that’s not
-something I can blindly code without testing.
+https://lore.kernel.org/loongarch/99826cf9-356d-235b-9c7c-9d51d36e53c3@loon=
+gson.cn/T/#t
 
-I can try to put something together for people to test soonish.
+Huacai
 
-Matt
-
-> > > 
-> > > Matt 
-> > > 
-> > > > > +		VM_WARN_ON_FOLIO(folio_ref_count(new_folio), new_folio);
-> > > > > +		VM_WARN_ON_FOLIO(!folio_is_zone_device(new_folio), new_folio);
-> > > > > +	}
-> > > > > +
-> > > > >  	/*
-> > > > >  	 * Drivers shouldn't be allocating pages after calling
-> > > > >  	 * memunmap_pages().
-> > > > > -- 
-> > > > > 2.43.0
-> > > > > 
+> +}
+> +
+> +static struct kvm_device_ops kvm_dmsintc_dev_ops =3D {
+> +       .name =3D "kvm-loongarch-dmsintc",
+> +       .create =3D kvm_dmsintc_create,
+> +       .destroy =3D kvm_dmsintc_destroy,
+> +       .set_attr =3D kvm_dmsintc_set_attr,
+> +};
+> +
+> +int kvm_loongarch_register_dmsintc_device(void)
+> +{
+> +       return kvm_register_device_ops(&kvm_dmsintc_dev_ops, KVM_DEV_TYPE=
+_LOONGARCH_DMSINTC);
+> +}
+> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+> index 80ea63d465b8..f363a3b24903 100644
+> --- a/arch/loongarch/kvm/main.c
+> +++ b/arch/loongarch/kvm/main.c
+> @@ -408,6 +408,12 @@ static int kvm_loongarch_env_init(void)
+>
+>         /* Register LoongArch PCH-PIC interrupt controller interface. */
+>         ret =3D kvm_loongarch_register_pch_pic_device();
+> +       if (ret)
+> +               return ret;
+> +
+> +       /* Register LoongArch DMSINTC interrupt contrroller interface */
+> +       if (cpu_has_msgint)
+> +               ret =3D kvm_loongarch_register_dmsintc_device();
+>
+>         return ret;
+>  }
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index dddb781b0507..7c56e7e36265 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1209,6 +1209,8 @@ enum kvm_device_type {
+>  #define KVM_DEV_TYPE_LOONGARCH_EIOINTC KVM_DEV_TYPE_LOONGARCH_EIOINTC
+>         KVM_DEV_TYPE_LOONGARCH_PCHPIC,
+>  #define KVM_DEV_TYPE_LOONGARCH_PCHPIC  KVM_DEV_TYPE_LOONGARCH_PCHPIC
+> +       KVM_DEV_TYPE_LOONGARCH_DMSINTC,
+> +#define KVM_DEV_TYPE_LOONGARCH_DMSINTC   KVM_DEV_TYPE_LOONGARCH_DMSINTC
+>
+>         KVM_DEV_TYPE_MAX,
+>
+> --
+> 2.39.3
+>
+>
 
