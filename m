@@ -1,186 +1,200 @@
-Return-Path: <kvm+bounces-68187-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68188-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A3ED250BE
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 15:49:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21391D255DC
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4CADA30A28FC
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 14:44:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2D32730E1A85
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 15:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0DB35BDBC;
-	Thu, 15 Jan 2026 14:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDBC3B8D45;
+	Thu, 15 Jan 2026 15:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LVc6phDq"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="h3isV5da"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.156.205.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D838E30DD13;
-	Thu, 15 Jan 2026 14:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5A83AE718;
+	Thu, 15 Jan 2026 15:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.156.205.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768488255; cv=none; b=ctl7blD6lbGZXJzBEvkafi9nqc0EvOFCf1L6e/eDBdKJwBtBU1J+frGc8fvWVLvCmJA6eS1RR4gbR4FTz7uqd4W9br0ZpEiEHSH30dNiBOA8gScEFHCSjfjhNr+JPHR3Mzf9foAiSD/8EAokfl6xPOz7eoB48OIq8Rf7Oc5jk5g=
+	t=1768490765; cv=none; b=r7KiAQcVTztQsreDkbqDrDCntuNMvXhpCsv+aceSbZ74UQyq2Meg6SNWKRoU/5BVV0jMWurlrqf8Kp5EWTH+vmv6RuWcvj5vcA3a4i7tLcBQ70h71q4zhyL+FBWEQq5MZZoxAnpdo6Q7p6OKENElw0pw6wH+vHAA68EUZY8sWo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768488255; c=relaxed/simple;
-	bh=W8bSj3Tt1fNR22DvPlznzXtp4tTD+xt+MEIzrxtDuUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ScVIgnP3Sf/FilPytnj4njP730RsjHkIRB83X60cC8OaIppELjWONbOCk7x9BuC+3jg5nNUlkgMJw2NlIGxnLpozxHIbOLRpvjmVy3G315jxBtzLIz02BWIQkqgfy6Nv9RcoXDISORwauvxKNLrG3T+IUQNDRms5VRp4eCjreCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LVc6phDq; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768488253; x=1800024253;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=W8bSj3Tt1fNR22DvPlznzXtp4tTD+xt+MEIzrxtDuUM=;
-  b=LVc6phDq+9bkHTitzDivV2ntcFF+o2uJ1eu6r1PqQe1W/rsLN57MND3/
-   b1ljTjiNWToP+JI+vF8d9ox2axkDDx2lxNgcd567XAKpiKux8ObygoxAg
-   Sp9OHubqtYW46DwSiWarGPpnTZHyilol9iprPY30kZZ/yi4gjuq90Gqbu
-   dcHrMJJ5GzcpteTNIlgDFB1OGRAM4/4qqqwuSPaGUKHMuE5DkTiOHB35I
-   QpdtYrhZhA238GpqmzVnmWty2ClxaCmLiGHNokS5F5mGiyTtLqJ27FZxl
-   GMrBMkHHA/Cbs8h94YQtMn+AyEMHdycReuh+h6H37S6ok76Sfek3Wbtz5
-   Q==;
-X-CSE-ConnectionGUID: +ZUanVDeTI6wwmxK5sSRBQ==
-X-CSE-MsgGUID: cd/LxwxqTLm+CGtGiQy3PA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11672"; a="69773523"
-X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="69773523"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 06:44:13 -0800
-X-CSE-ConnectionGUID: 1CV0d29lS5m316xjAn+w0w==
-X-CSE-MsgGUID: 5+bzz2H0T3OvpIwVh4UbOQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,228,1763452800"; 
-   d="scan'208";a="236223880"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 15 Jan 2026 06:44:09 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vgOZy-00000000I54-3wGb;
-	Thu, 15 Jan 2026 14:44:06 +0000
-Date: Thu, 15 Jan 2026 22:43:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
-	x86@kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Juergen Gross <jgross@suse.com>, Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v3 1/5] x86/paravirt: Replace io_delay() hook with a bool
-Message-ID: <202601152203.plJOoOEF-lkp@intel.com>
-References: <20260115084849.31502-2-jgross@suse.com>
+	s=arc-20240116; t=1768490765; c=relaxed/simple;
+	bh=NsWXJRngFC156YQRHmekUX9Gr1w2AJtYuY37Wjse5YE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WuN4lcOByXa0dDb4vEGQiyG/rE6QU11NsJ9xJ+TzYsICHhBeoG/+t5MgsQBHVswA6irlNISQwh0L/eE69IkPmDorkAQTQn639bL7NNTQBpiBzLlQ/JQmbBy1YbXtYxHDcVVsPZhah41TFU2xkeWymzZ52TounF9FyhR/8eu7Rh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=h3isV5da; arc=none smtp.client-ip=18.156.205.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1768490760; x=1800026760;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=ErA/nUzcQBK9RfXLPHVY+KZIrd4BxzBjllIcAZaOcaQ=;
+  b=h3isV5da2UVsM17m/4RhSvCgPXzx/UaU+5Xtqn/h8gQwMfVyHrXLSNYG
+   XOjf0xz0gv4QNu917NbeG6o+dvlog0SdUX9jDLwod1dHgX+Snd8bctLzD
+   jSVS3xhLl15bVD080doN2uYq/Opout2n/Z97azTG5S1HoXlRzSrk7PVNC
+   t8HY4ti69+hOaSwFHtvIhUjziJHAwo6IyTvb09+zX6xMG1Fxi74KaKAbF
+   4rktc3IlMAJTIBpcVJeOzalS4bdgg3F6OTVSohwlR3Nv8wKwGLJYpieSE
+   qwG4zAD3nl+12fiHd0RCr757QmBhNX2ptsd0ABrQhobHUzGObdxylzZqX
+   A==;
+X-CSE-ConnectionGUID: JEI06koAS36Pqlka9p/LFg==
+X-CSE-MsgGUID: fziZ5aPzRHWEX3iC92dDgA==
+X-IronPort-AV: E=Sophos;i="6.21,228,1763424000"; 
+   d="scan'208";a="7652838"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 15:25:39 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:3758]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.6.3:2525] with esmtp (Farcaster)
+ id 78f75ae8-5037-4d9b-ae68-7dfcd2a25e3c; Thu, 15 Jan 2026 15:25:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 78f75ae8-5037-4d9b-ae68-7dfcd2a25e3c
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Thu, 15 Jan 2026 15:25:32 +0000
+Received: from [192.168.15.69] (10.106.82.11) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Thu, 15 Jan 2026
+ 15:25:28 +0000
+Message-ID: <094591b6-97eb-4cae-aa08-fececcba4ba1@amazon.com>
+Date: Thu, 15 Jan 2026 15:25:27 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260115084849.31502-2-jgross@suse.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v9 01/13] set_memory: add folio_{zap, restore}_direct_map
+ helpers
+To: Heiko Carstens <hca@linux.ibm.com>, "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+	"oupton@kernel.org" <oupton@kernel.org>, "joey.gouly@arm.com"
+	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
+	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+	"luto@kernel.org" <luto@kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org"
+	<david@kernel.org>, "lorenzo.stoakes@oracle.com"
+	<lorenzo.stoakes@oracle.com>, "Liam.Howlett@oracle.com"
+	<Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
+	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
+	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
+	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
+	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
+	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
+	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
+	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
+	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
+	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
+	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
+	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
+	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
+	<gor@linux.ibm.com>, "Jonathan.Cameron@huawei.com"
+	<Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
+	<shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>,
+	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com"
+	<wyihan@google.com>, "yang@os.amperecomputing.com"
+	<yang@os.amperecomputing.com>, "vannapurve@google.com"
+	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
+	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
+	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
+ Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>
+References: <20260114134510.1835-1-kalyazin@amazon.com>
+ <20260114134510.1835-2-kalyazin@amazon.com>
+ <20260115121209.7060B42-hca@linux.ibm.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <20260115121209.7060B42-hca@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D012EUC004.ant.amazon.com (10.252.51.220) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
-Hi Juergen,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on tip/master]
-[also build test ERROR on next-20260115]
-[cannot apply to kvm/queue kvm/next tip/x86/core kvm/linux-next tip/auto-latest linus/master v6.19-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Juergen-Gross/x86-paravirt-Replace-io_delay-hook-with-a-bool/20260115-165320
-base:   tip/master
-patch link:    https://lore.kernel.org/r/20260115084849.31502-2-jgross%40suse.com
-patch subject: [PATCH v3 1/5] x86/paravirt: Replace io_delay() hook with a bool
-config: i386-randconfig-011-20260115 (https://download.01.org/0day-ci/archive/20260115/202601152203.plJOoOEF-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260115/202601152203.plJOoOEF-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601152203.plJOoOEF-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/cpufreq/longhaul.c:145:2: error: call to undeclared function 'arch_safe_halt'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     145 |         safe_halt();
-         |         ^
-   include/linux/irqflags.h:231:3: note: expanded from macro 'safe_halt'
-     231 |                 raw_safe_halt();                \
-         |                 ^
-   include/linux/irqflags.h:192:27: note: expanded from macro 'raw_safe_halt'
-     192 | #define raw_safe_halt()                 arch_safe_halt()
-         |                                         ^
->> drivers/cpufreq/longhaul.c:150:2: error: call to undeclared function 'halt'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     150 |         halt();
-         |         ^
-   drivers/cpufreq/longhaul.c:179:2: error: call to undeclared function 'arch_safe_halt'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     179 |         safe_halt();
-         |         ^
-   include/linux/irqflags.h:231:3: note: expanded from macro 'safe_halt'
-     231 |                 raw_safe_halt();                \
-         |                 ^
-   include/linux/irqflags.h:192:27: note: expanded from macro 'raw_safe_halt'
-     192 | #define raw_safe_halt()                 arch_safe_halt()
-         |                                         ^
-   drivers/cpufreq/longhaul.c:187:4: error: call to undeclared function 'halt'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     187 |                         halt();
-         |                         ^
-   drivers/cpufreq/longhaul.c:205:3: error: call to undeclared function 'halt'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     205 |                 halt();
-         |                 ^
-   drivers/cpufreq/longhaul.c:224:4: error: call to undeclared function 'halt'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     224 |                         halt();
-         |                         ^
-   drivers/cpufreq/longhaul.c:165:6: warning: variable 't' set but not used [-Wunused-but-set-variable]
-     165 |         u32 t;
-         |             ^
-   1 warning and 6 errors generated.
 
 
-vim +/arch_safe_halt +145 drivers/cpufreq/longhaul.c
+On 15/01/2026 12:12, Heiko Carstens wrote:
+> On Wed, Jan 14, 2026 at 01:45:23PM +0000, Kalyazin, Nikita wrote:
+>> From: Nikita Kalyazin <kalyazin@amazon.com>
+>>
+>> These allow guest_memfd to remove its memory from the direct map.
+>> Only implement them for architectures that have direct map.
+>> In folio_zap_direct_map(), flush TLB on architectures where
+>> set_direct_map_valid_noflush() does not flush it internally.
+> 
+> ...
+> 
+>> diff --git a/arch/s390/mm/pageattr.c b/arch/s390/mm/pageattr.c
+>> index d3ce04a4b248..df4a487b484d 100644
+>> --- a/arch/s390/mm/pageattr.c
+>> +++ b/arch/s390/mm/pageattr.c
+>> @@ -412,6 +412,24 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+>>        return __set_memory((unsigned long)page_to_virt(page), nr, flags);
+>>   }
+>>
+>> +int folio_zap_direct_map(struct folio *folio)
+>> +{
+>> +     unsigned long addr = (unsigned long)folio_address(folio);
+>> +     int ret;
+>> +
+>> +     ret = set_direct_map_valid_noflush(folio_page(folio, 0),
+>> +                                        folio_nr_pages(folio), false);
+>> +     flush_tlb_kernel_range(addr, addr + folio_size(folio));
+>> +
+>> +     return ret;
+>> +}
+> 
+> The instructions used in the s390 implementation of
+> set_direct_map_valid_noflush() do flush TLB entries.
+> The extra flush_tlb_kernel_range() is not required.
 
-^1da177e4c3f41 arch/i386/kernel/cpu/cpufreq/longhaul.c Linus Torvalds 2005-04-16  134  
-ac617bd0f7b959 arch/x86/kernel/cpu/cpufreq/longhaul.c  Dave Jones     2009-01-17  135  static void do_longhaul1(unsigned int mults_index)
-^1da177e4c3f41 arch/i386/kernel/cpu/cpufreq/longhaul.c Linus Torvalds 2005-04-16  136  {
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  137  	union msr_bcr2 bcr2;
-^1da177e4c3f41 arch/i386/kernel/cpu/cpufreq/longhaul.c Linus Torvalds 2005-04-16  138  
-c435e608cf59ff drivers/cpufreq/longhaul.c              Ingo Molnar    2025-04-09  139  	rdmsrq(MSR_VIA_BCR2, bcr2.val);
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  140  	/* Enable software clock multiplier */
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  141  	bcr2.bits.ESOFTBF = 1;
-ac617bd0f7b959 arch/x86/kernel/cpu/cpufreq/longhaul.c  Dave Jones     2009-01-17  142  	bcr2.bits.CLOCKMUL = mults_index & 0xff;
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  143  
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  144  	/* Sync to timer tick */
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03 @145  	safe_halt();
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  146  	/* Change frequency on next halt or sleep */
-78255eb2397332 drivers/cpufreq/longhaul.c              Ingo Molnar    2025-04-09  147  	wrmsrq(MSR_VIA_BCR2, bcr2.val);
-179da8e6e8903a arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-08-08  148  	/* Invoke transition */
-179da8e6e8903a arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-08-08  149  	ACPI_FLUSH_CPU_CACHE();
-179da8e6e8903a arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-08-08 @150  	halt();
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  151  
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  152  	/* Disable software clock multiplier */
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  153  	local_irq_disable();
-c435e608cf59ff drivers/cpufreq/longhaul.c              Ingo Molnar    2025-04-09  154  	rdmsrq(MSR_VIA_BCR2, bcr2.val);
-dadb49d8746bc4 arch/i386/kernel/cpu/cpufreq/longhaul.c Rafa³ Bilski   2006-07-03  155  	bcr2.bits.ESOFTBF = 0;
-78255eb2397332 drivers/cpufreq/longhaul.c              Ingo Molnar    2025-04-09  156  	wrmsrq(MSR_VIA_BCR2, bcr2.val);
-^1da177e4c3f41 arch/i386/kernel/cpu/cpufreq/longhaul.c Linus Torvalds 2005-04-16  157  }
-^1da177e4c3f41 arch/i386/kernel/cpu/cpufreq/longhaul.c Linus Torvalds 2005-04-16  158  
+Thanks, Heiko.  Will update in the next version.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
