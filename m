@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-68105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35589D21EFF
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:08:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB882D21F02
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 02:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F1E93038F4D
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:08:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 606653004619
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 01:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867AC20E31C;
-	Thu, 15 Jan 2026 01:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CADF20E31C;
+	Thu, 15 Jan 2026 01:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bm+6sK7A"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CB9mEl2y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9A1F9D9
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBFDF9D9
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 01:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768439326; cv=none; b=RtTJjmm89leqr3pLT3bWy4uj8vKwwptdR+xPKpN2ntZpunPHZ6tuJehsSz8MBUpm1Evtr/zdyokkFgx1RA5fSdnfsFRiXqypZxrFQe6d53C4UEICdOd7l2G87d50tFWgFSt2jkoLJ7MXXH/0VXrl7E76exzHSJwR0CTmc4kpdwg=
+	t=1768439357; cv=none; b=Tn2IwuAH88sexUHbjBYwPplhhlMMJvRSrfPUWs5DKCmI5TzSplRB6HGBx+e0+znANd7T9g0MbZnW8g2UsdxSpjfXe9FJZdri/Wt+ZKgWIzKRwPyVrR2MlRJ7x/z2BzwLKH9G78DCJOo1Qr0EoMkc7MD1h75qE+XgpjkxMKYfUEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768439326; c=relaxed/simple;
-	bh=o5PtTJSEvpJXGgpc3pmgatc+2Pd70u0mxVJPqcWDYg0=;
+	s=arc-20240116; t=1768439357; c=relaxed/simple;
+	bh=j7+IM67mifDuc48YzmS+Yh9v4dq1w2CzQp4UFeFTzMI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SGzXpbJ0ielVBA34sJx2Xdbdp5r5giy9XXr3JC5jh8Y44O0ABbIpfMUvQwdG+7Bstff1QWc/aHluQqewQ2jZO3Y0KSdnUM79wM5+aFDAr0jF1QedF4ZPbzY1WmoNulkuj/PfDTkgIPWsrf4ef8x7qK1/SYpGbiCImMdXNlob110=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bm+6sK7A; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:Content-Type; b=R3mCqPRDC4eLJUyAnZi5Ftuce6wrFjIyVZP62/FfIXmiraMbuTGP+BHnRmR8uEvroNSPJBHrp20JFZQSQ4EFTJ/7Cqc9piC5KUnb9tRA9MzNhLH/tRj0tShQfPF3x86F3wA027Tev4yJs42GI9XhdozvuDZLkd0ZqSGomFrU/V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CB9mEl2y; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768439326; x=1799975326;
+  t=1768439356; x=1799975356;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=o5PtTJSEvpJXGgpc3pmgatc+2Pd70u0mxVJPqcWDYg0=;
-  b=bm+6sK7AJ/dTn6AhoubeVXMk9ufsOm/cjtR0vQhrSwaAnBgaPBp9f/dz
-   1j9tNotPx+uP6iNoGjOMb4brkxA1GdbkntHIvs/ChIwfIl1lEqB66DGEV
-   JQLBHdWoLDLRTZQGBkm3f4nPP1zfmDb8M7sQxbICDLQsMF/YqqTA1pcic
-   DSpCr0pzVgbzCf3xsmLtceUK1cScgx4pc6opYXMKgHMAkOagn32mIEPLB
-   z/UtXHtA1s7Vst3ugY13BRLVT6s6t1wNXBjDgaQ3dHbQGvmVMOfONcS6h
-   RV7BhBZv3C0Ye7nwpk7DIbN2nyHFKbDHfV9aAWSg85GtBAdEaxzxKMK64
+  bh=j7+IM67mifDuc48YzmS+Yh9v4dq1w2CzQp4UFeFTzMI=;
+  b=CB9mEl2ybU+pH/AM6A3kEPKUKlV7PuO1v7tc3HLipSgfLlOJ7OhAqohW
+   QCh1JcSYx6HKPR2zHtOhMWE7VVKkbrPTRGbSucG3zNEUOl9GeFRj8tKJE
+   UChPOzWkNZdOBYURcrTTRF8/dhrqWkBLZa8Y9SZ2KENfTZiHLkdrBo4sN
+   6g2G4k3PisaqAp0mLOdF0r2TwsAVyZWVYENZ/psZMuhr0kvLDM9jwz4m1
+   0thdbRLThQxP9Uq9ivtjdVaU0sdAc1KMepJzzv1Dcp0wLXMuBl5Q4r7t/
+   22Tt+/2VIwrSHpmc9xjFurPlGxjrHCB5fiA5HF3v+F3G+PeNcVZz4lEsu
    Q==;
-X-CSE-ConnectionGUID: w3Kb92w6TyiG2wRyYpWmNQ==
-X-CSE-MsgGUID: vbDOxdUVQ3ieWG99A1b6ag==
-X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="69481493"
+X-CSE-ConnectionGUID: LoxyfPxCQpyAJxymTFfsSA==
+X-CSE-MsgGUID: nSLNS8lpSfGvSKYeqaE45Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="95227390"
 X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="69481493"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:08:46 -0800
-X-CSE-ConnectionGUID: DN03NiI6SR2irFYJoMqVTA==
-X-CSE-MsgGUID: ROvRXqaKQb2PITBLC98dGg==
+   d="scan'208";a="95227390"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:09:15 -0800
+X-CSE-ConnectionGUID: x7Hd1BQJTFiAN1uNp3YVvQ==
+X-CSE-MsgGUID: BeZaA6sYTA65ZO1YNeCn2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,226,1763452800"; 
-   d="scan'208";a="204614704"
+   d="scan'208";a="205241351"
 Received: from fhuang-mobl1.amr.corp.intel.com (HELO [10.125.38.93]) ([10.125.38.93])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:08:45 -0800
-Message-ID: <c952b8d7-d1f9-44cc-812d-1a6600b26709@intel.com>
-Date: Wed, 14 Jan 2026 17:08:44 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 17:09:14 -0800
+Message-ID: <5e72cb05-25b9-4bfe-89da-6f67b54de9b8@intel.com>
+Date: Wed, 14 Jan 2026 17:09:13 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,8 +65,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 2/5] target/i386/kvm: extract unrelated code out of
- kvm_x86_build_cpuid()
+Subject: Re: [PATCH v9 5/5] target/i386/kvm: support perfmon-v2 for reset
 To: Dongli Zhang <dongli.zhang@oracle.com>, qemu-devel@nongnu.org,
  kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
@@ -77,33 +76,36 @@ Cc: pbonzini@redhat.com, zhao1.liu@intel.com, mtosatti@redhat.com,
  dapeng1.mi@linux.intel.com, joe.jin@oracle.com, ewanhai-oc@zhaoxin.com,
  ewanhai@zhaoxin.com
 References: <20260109075508.113097-1-dongli.zhang@oracle.com>
- <20260109075508.113097-3-dongli.zhang@oracle.com>
+ <20260109075508.113097-6-dongli.zhang@oracle.com>
 Content-Language: en-US
 From: "Chen, Zide" <zide.chen@intel.com>
-In-Reply-To: <20260109075508.113097-3-dongli.zhang@oracle.com>
+In-Reply-To: <20260109075508.113097-6-dongli.zhang@oracle.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 1/8/2026 11:53 PM, Dongli Zhang wrote:
-> The initialization of 'has_architectural_pmu_version',
-> 'num_architectural_pmu_gp_counters', and
-> 'num_architectural_pmu_fixed_counters' is unrelated to the process of
-> building the CPUID.
+On 1/8/2026 11:54 PM, Dongli Zhang wrote:
+> Since perfmon-v2, the AMD PMU supports additional registers. This update
+> includes get/put functionality for these extra registers.
 > 
-> Extract them out of kvm_x86_build_cpuid().
+> Similar to the implementation in KVM:
 > 
-> In addition, use cpuid_find_entry() instead of cpu_x86_cpuid(), because
-> CPUID has already been filled at this stage.
+> - MSR_CORE_PERF_GLOBAL_STATUS and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS both
+> use env->msr_global_status.
+> - MSR_CORE_PERF_GLOBAL_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_CTL both use
+> env->msr_global_ctrl.
+> - MSR_CORE_PERF_GLOBAL_OVF_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR
+> both use env->msr_global_ovf_ctrl.
+> 
+> No changes are needed for vmstate_msr_architectural_pmu or
+> pmu_enable_needed().
 > 
 > Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-> Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Reviewed-by: Sandipan Das <sandipan.das@amd.com>
 > ---
 
 LGTM.
 Reviewed-by: Zide Chen <zide.chen@intel.com>
-
-
 
