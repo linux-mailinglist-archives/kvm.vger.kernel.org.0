@@ -1,100 +1,120 @@
-Return-Path: <kvm+bounces-68228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3A0DD276B0
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:23:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BD1ED2780E
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 19:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A47F8319D0AE
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:13:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5FBFE305C1ED
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 18:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4193D6055;
-	Thu, 15 Jan 2026 18:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590B53D3481;
+	Thu, 15 Jan 2026 18:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vZRbbKIJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jGwihb4j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4609F3D6046
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 18:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6A23C1970
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 18:07:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768500426; cv=none; b=nwHWr5lEpUIqA8nNhHWS4mV8wHh18yRZlqamzfjsrWGJbMTd1aUD0gvPqSYdf6MQvC4n+rd0uww7SGrJa1xhUprxoSI/1zB9tptecafPKorjGFnhqHzi0n9PXegPzFzMn7b8fnm2NgZ4sQoejVup5mGLiHGqEM1NjAkuhvP6WZA=
+	t=1768500473; cv=none; b=d222B94/DQm3xGq8TXqOTs/lPhlCCQSXcjMWQZEa80PlOxkLI49ATkQiiG8LtM47Z+L4a0aRZ9jnnIo40PgJpW+tV++38QFRbZlIA/ERJJtrno1k4NyW9RvQyvUNXt/s7yKNw1Zdr5z63sG3FzZm/2IKHUVhkNa5PAT2D9LWHfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768500426; c=relaxed/simple;
-	bh=i5+1/Qsa02xgC7Sf+rEcgx1r6GniEdhsqrbook1edTU=;
+	s=arc-20240116; t=1768500473; c=relaxed/simple;
+	bh=HPD7TG1AvL7tCooRk/oBayY61XqHToF4X+HFMC91ZP8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YW9fuIo8+bTtKB1hdSd7QE97IcNmM61fdXJzU9L+xtku7RDj7vd70XSQ8lTQZY5TT+jgOjYhXxkgpuEvqD7PX/GFYGegIv2vT2ETO8HloS94e3YIMEvhn0NeCWQU1nwH+WgepHNOclll+J5EevLJc39Rje1M92MCh6bH0xfpxiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vZRbbKIJ; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=lxvSlOtzkFfFlrn5sPLhFbh6NHQi77OjfjLNZIoN9JGkV5Gqkal1V6Ycjb3G2zFCS0dra3rKZ/EW55yEjjiQrLjEKLYb16Nn0/yo0XNubPA46jvTPGrcMAG6Zivq736xnR0MUI5W6uJHKO/6h5e3gjPV8++Oy2U+1fDBlPPC5hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jGwihb4j; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ec823527eso1802812a91.2
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 10:07:05 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c52743b781eso737322a12.2
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 10:07:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768500424; x=1769105224; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1768500472; x=1769105272; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N/82cpt0Uas4F64KP8DFk8U21kh16fYHAGtRjudiizI=;
-        b=vZRbbKIJTJKWPoSi1DmBjhQQG4a5D5tT+jB7UD6nEM8449rZJ0eh1XxPpDVtFtbKSL
-         JXsvdhFbx/121gkLXp/AUlC+mRj7J4XwcYy9ZN5Ov+k4Cjl20UZsWAHtLfi+aSbyTPS3
-         Dgbq/lXFl9tOKJNcugw9ukHqgW7ndmOsrO9eJnXPv4uuHintc9Az2Gd0cDSK/0KPrdu+
-         8LmML6IFFpGWR89Ok0FWpABNmwA72BNBDh7cna8yrTfQwHGQ5HpL7UJB9QexAjhkOv9j
-         /H0mMJlT94+CFKRQeR0JgEV2ZwD1ownxfTJ0GidyijJzvrczQ5ajn1BrnkY21p6xeNVi
-         2zjg==
+        bh=n5PnbXF8wA6F7oaRDvwu+VcUBZwYdKD3rN14BB+0Tl8=;
+        b=jGwihb4jj3JLCZ8uRznDs71OgU+xtCo2/HvlLBdDhn8yBNvP8J1CPp1bdOUug/QnbT
+         c8Tjl1woAsTnmDLXqyIub7Ntm6Z18Ir/8YdTpw+loIdOeKPp02f3Vapf1r0Ncx712hiX
+         Cd/EnkLydQktm6NijBY1+GZU5vzA5iy8CF07UIG3aC+n+2vCf+xi9QTctDfPS2sjzEOT
+         d6hw7XS1Hz1om5My5R1cCQA+KHhel7rnlQIJu7SInUfObEXDF8e+FQxBHWveSNowHSFn
+         x/xU0rebQ+IznjqpCvElRZt3hgHqPhWphNUOwT09jslBzW+MHHfsMTxqkFSKvLezXeA/
+         HDDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768500424; x=1769105224;
+        d=1e100.net; s=20230601; t=1768500472; x=1769105272;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N/82cpt0Uas4F64KP8DFk8U21kh16fYHAGtRjudiizI=;
-        b=ST5yW9+BUlj0l9T8ZLQIm7hKSOVjBHT5WPamqWP/up2IIMSAB9sH029eC6hmInBpBu
-         oVeclhPz5ICfDAob2OZXPMwXY4n1rdMSiyWIAF2KDRR/VzGMbzPa+VfWAzR5Sde751Fj
-         izkwgMT8XpNLkM9L1gsiYfmBIcAlpCGf+7RaEg75MBtQK7DpsCCkBrKYIxPxxBLN0Ri2
-         nJ9PdyHCQEzH1F8qwcGU9YJEjRVRpJKsKmvzhsLiulCpxbZDFDAU48enrBwdJhXy6ZTn
-         9WTIQni9VAAGIu/DV/Cm3BwzmmX8CwJyPg1ngQLj0so5LKHLIvS3Ai0D3YwUG0VB4rH5
-         WfxA==
-X-Gm-Message-State: AOJu0YwvyZE1ym0qwFmR4mbKvsZ3Nkc6Dx3/2fVW0IDDY2yoU7r0VZAo
-	07z4CC+UIvZC6sGqrdPWbC0yWcHjaltydxVmcDrhiL/fDeyGSOR6ANRiVNC/HJT4ryRaXawF7Yp
-	kSXoOhw==
-X-Received: from pjbfs21.prod.google.com ([2002:a17:90a:f295:b0:34a:a1c5:9df9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1fcc:b0:34a:b8e0:dd59
- with SMTP id 98e67ed59e1d1-35272f1253cmr243948a91.15.1768500424577; Thu, 15
- Jan 2026 10:07:04 -0800 (PST)
-Date: Thu, 15 Jan 2026 10:03:36 -0800
-In-Reply-To: <20260109035037.1015073-1-seanjc@google.com>
+        bh=n5PnbXF8wA6F7oaRDvwu+VcUBZwYdKD3rN14BB+0Tl8=;
+        b=J0pv1/dAYZ0TDrgaZ53rtywhPQCZSILqDEFC9NJwc5I0H+7+LRg5CgXzXeYnkEG/HC
+         KaOPLKyP/2UPd91Q5UTVL09KAhseRpcfR/41p45EUnZpSdDuFC8DcXA+v9wpFS/2Fv2r
+         kVv5fXEKK7XcK6dbZkub9Der4VxkumsbCvDuiR619CZ40hShJcT2OpYCoZm+BJHr4dQp
+         FjYi0HE0cjBD/WRevj67N518i6NcfYzyqRkiHaqLrSlnfDa8fI2F424BWz8e7Rzd1d7K
+         dmNrsGNiI6/lBe87eOpZL0WHoCoINCZLMUN7q/sno9EpejqWwlztuiyv01nyIRizJQKW
+         WTCw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJaKJgSQYf39SWS9a6tx/6MCVLx0uSg5Ay93joZRI9wOkoIVZD811zKGIemlyi13Rrlps=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSeQhdzxnFzct4dKZYPQhSwZ+Y4z4JnTDh2pV+cPfmS8mSo9RN
+	siTuZ80xIOiw0EFgU83lAIyktSpjnNGXpFJLyfBx4SysYZvbW7kRsLITCUv7xq1Fe0apkNVUQP8
+	gBJ9i5w==
+X-Received: from pjyw19.prod.google.com ([2002:a17:90a:ea13:b0:340:bd8e:458f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51c2:b0:32e:528c:60ee
+ with SMTP id 98e67ed59e1d1-3527323b4demr184460a91.24.1768500471639; Thu, 15
+ Jan 2026 10:07:51 -0800 (PST)
+Date: Thu, 15 Jan 2026 10:03:38 -0800
+In-Reply-To: <20260110004821.3411245-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260109035037.1015073-1-seanjc@google.com>
+References: <20260110004821.3411245-1-yosry.ahmed@linux.dev>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <176849887444.718912.15225828841384052421.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: SVM: Fix an off-by-one typo in the comment for
- enabling AVIC by default
+Message-ID: <176849539790.691793.6615872461180369815.b4-ty@google.com>
+Subject: Re: [PATCH 0/4] KVM: nSVM: nested VMSAVE/VMLOAD fixes
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>, 
+	Kevin Cheng <chengkev@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 08 Jan 2026 19:50:37 -0800, Sean Christopherson wrote:
-> Fix a goof in the comment that documents KVM's logic for enabling AVIC by
-> default to reference Zen5+ as family 0x1A (Zen5), not family 0x19 (Zen4).
-> The code is correct (checks for _greater_ than 0x19), only the comment is
-> flawed.
+On Sat, 10 Jan 2026 00:48:17 +0000, Yosry Ahmed wrote:
+> A couple of fixes for nested VMLOAD/VMSAVE and a selftest that verifies
+> correct behavior. The test fails without patch 1.
 > 
-> Opportunistically tweak the check too, even though it's already correct,
-> so that both the comment and the code reference 0x1A, and so that the
-> checks are "ascending", i.e. check Zen4 and then Zen5+.
-> 
+> Patch 4 is a proposed added WARNING, I am not sure if such warnings are
+> generally acceptable and if that's the correct place for it (hence RFC),
+> but I think it's useful to WARN if VMSAVE/VMLOAD are neither intercepted
+> nor virtualized by the CPU, because it means that the guest is directly
+> accessing host memory with them, a massive security hole.
+
+Sanity checks in KVM are definitely acceptable/encourage, but this particular
+check goes too far.  There are sooooo many things that KVM _must_ get right;
+asserting on every single one without strong evidence that we're likely to
+screw up without noticing isn't something I want to encourage.
+
+In other words, for me, "the consequences are really bad" isn't sufficient
+justification on its own, there also needs to be some amount of "we've botched
+this multiple times in the past", "it's tricky to get right", and/or "this is a
+low level API that makes assumptions about how the rest of KVM works".
+
 > [...]
 
-Applied to kvm-x86 svm, thanks!
+Applied 1-2 to kvm-x86 svm, and 3 to kvm-x86 selftests due to its dependency
+on the selftests NPT support.  Note, this means running the selftests branch
+without the fixes from the svm branch will fail.  Far from ideal, but IMO it's
+not worth doing a merge for something that is unlikely to ever be a problem in
+practice (and now I've jinxed myself).
 
-[1/1] KVM: SVM: Fix an off-by-one typo in the comment for enabling AVIC by default
-      https://github.com/kvm-x86/linux/commit/69555130dccb
+[1/4] KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation
+      https://github.com/kvm-x86/linux/commit/127ccae2c185
+[2/4] KVM: SVM: Stop toggling virtual VMSAVE/VMLOAD on intercept recalc
+      https://github.com/kvm-x86/linux/commit/55780d8a1dcc
+[3/4] KVM: selftests: Add a selftests for nested VMLOAD/VMSAVE
+      https://github.com/kvm-x86/linux/commit/55058e32151f
+[4/4] RFC: KVM: SVM: WARN if VMSAVE/VMLOAD are not intercepted or virtualized
+      [DROPPED]
 
 --
 https://github.com/kvm-x86/linux/tree/next
