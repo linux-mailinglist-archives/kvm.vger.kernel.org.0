@@ -1,234 +1,152 @@
-Return-Path: <kvm+bounces-68199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F2C3D25D07
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:45:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70C6D25F7D
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B37F3025A76
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:45:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B523830CE2D5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794F61C5D59;
-	Thu, 15 Jan 2026 16:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627113BF2FD;
+	Thu, 15 Jan 2026 16:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t2M8kvxL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o98zpagQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012067.outbound.protection.outlook.com [40.107.200.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC8B3BC4F2
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768495516; cv=fail; b=XZbzSIBA4Kwdba4YQalqIF6xMPA4XVoMW2bYaymIq+QYi4xqdg2+eOnWYnqS99am0vgjjkk/TIykIO2UR5qzKUfRX3i9jC9RAtso2gqEa3nKOKTByrKkQJy6fM7+wAKP2M0YoZbL7qFTVq3+3axI16fFTcA+ov+KN3FgwFU33uM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768495516; c=relaxed/simple;
-	bh=qYoSkiM9QLiAJiVfPSSa2jZ0IFnsXgdZdZpV4z/4K5k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gb2hgly51/xoU4XH8f7mvKTR3soYswx4Y1RuTjWU1WCF/hfzETcUYyotYJMJwstkr4NwOlq5oGHbyuwkO1gJg+UX0/Rl3c7PoR7sP4e5X2VNI61SE7yp2Uk+BN339JtYRvgTnWia86JlwKMpn2+ziNMgXIqABIzWUiUUdku6IeA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t2M8kvxL; arc=fail smtp.client-ip=40.107.200.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=otr58ogOC5gIrSSxYm37iBQkcBlkIpTBDFmHSDp/TBzjL/+Bvnq7IQRX1YW4ZmS4uXKh2zVyhXd023IaM6D1yQ9mQa3qMk4qsCdK2tkN1duAZ6j3wlK3UI0O+j/ZymYZ+2NkaRtJoNojTaPxM+CARHDovTolRDuipqdXDJ97sVfp8f6N7FKPhizNSIonGknN3njP79fHBNfdMMz9x33BK6WB60Ijrnt5b2tJv/APCpEstQz/smZo7GCJkkoOaEqo/t+c95v4IcYnH/rCtjUK4pWwBTBadLgsAxNRt/PDMk5sGgEab6O5FNP+vKOnTKh2NVFrwgwrSyK128OCcC9+IA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XRysJpDIArzjEpYuE4F+Cus2EumrW7cX8I5K06PmSPE=;
- b=apTEyxaJbb1oQ1sOKS5pafa94nFtgP/YMksaVthrliMsJvChPu1dcSPPq8V8H41n14eLazcHVAiN8gOrMlFyC5Hby2mn2CjMxoNCEoLw0y/NK2ZPwEnx1nv3ld9J5AiNbskfwnqSV1ARrzKtfT31sOiumNBWzc6wMxIzcvnUnq+i7Yrx171MUrg5fk/F5mq0ZOv0FVqIoCTqt9zo4l1HefYGdowxLmsWY5qnqkFCxyUYhTK05/JuKigsxk+ZRv6Xa0MSpTi/mcjjIlf5DhyE2vMlZhQDgVIwt1VLNBpRMGVaPIchw/8h35D/yZrh88L4CJQ7Mp2JNnL5k+bVeXTaVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XRysJpDIArzjEpYuE4F+Cus2EumrW7cX8I5K06PmSPE=;
- b=t2M8kvxLjDJ+ghbdUlqENbqK4zcCIx3J9FAeHoC/Y3A3DSK2NYQ2PdLUMJPYDoJIS+QAX7S+E+mxFXzs6I0HKCY9fUDoXD++IN2pcVd0WcnbDiYEq9Z4X5wOSuUCnKZSm4xAW5ailNNjVeb7DVK/gmHlItWvfz9lGXuIdty2O1w=
-Received: from CH2PR11CA0029.namprd11.prod.outlook.com (2603:10b6:610:54::39)
- by BL3PR12MB6619.namprd12.prod.outlook.com (2603:10b6:208:38e::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Thu, 15 Jan
- 2026 16:44:07 +0000
-Received: from CH1PEPF0000A345.namprd04.prod.outlook.com
- (2603:10b6:610:54:cafe::37) by CH2PR11CA0029.outlook.office365.com
- (2603:10b6:610:54::39) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.8 via Frontend Transport; Thu,
- 15 Jan 2026 16:44:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CH1PEPF0000A345.mail.protection.outlook.com (10.167.244.8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9542.4 via Frontend Transport; Thu, 15 Jan 2026 16:44:07 +0000
-Received: from xcbagarciav01.xilinx.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 15 Jan
- 2026 10:44:05 -0600
-From: Alejandro Vallejo <alejandro.garciavallejo@amd.com>
-To: <kvm@vger.kernel.org>
-CC: Alejandro Vallejo <alejandro.garciavallejo@amd.com>, Paolo Bonzini
-	<pbonzini@redhat.com>
-Subject: [kvm-unit-tests] x86: Add #PF test case for the SVM DecodeAssists feature
-Date: Thu, 15 Jan 2026 17:43:32 +0100
-Message-ID: <20260115164342.27736-1-alejandro.garciavallejo@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260115131739.25362-1-alejandro.garciavallejo@amd.com>
-References: <20260115131739.25362-1-alejandro.garciavallejo@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D543AE6E2
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768496108; cv=none; b=QYbRNXr8AXux5Ntk6r6ONKycbTPEMy/JUv5WRX8EteVEADfvOhXjPQ1JW3Fq16rAnMk8ALbDL8uo/tKgyE1kAC9/rPjYhOi1+I8UJugYmirHiUp1vZij3R9JtWr7hjI2Nix5vpfZDRC+hT7Q2iq0neOuQX3HnQJnUbKa/tr0WYM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768496108; c=relaxed/simple;
+	bh=vHJzNvUgrWMaqSEXYwJjvXoh/vXYEQ7TR+f/TbNG3c8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oWDjAYUJLz9bXTqh8vrqH/DKBf3ba84cY/oT4mv0cJ15Mo+qbTybfgdpoeIkFNcODotSeqo6wlUHkY6LhzNqIOY8n+z5fVXR18aQjRo461DqNrU9p5CXSeubMGzIhs2YspvY1U9mxkqWcpRjfx1anorph9jiidoNeeIp8BGuQ6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o98zpagQ; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29f27176aa7so17033205ad.2
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 08:55:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768496101; x=1769100901; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eL+E7/4JmScKJihcx95KMzbVjQVIxgRJYXFYqhlTPBQ=;
+        b=o98zpagQZjnhW8aF+YmJ7PiI4uOky8u79nmPt6eTgm4xg8KLMQeNy6b49S/nVpUFTb
+         9Pa+rUL+3CnPhz8losVkTk9mCWiWXrbwvRE7DxN7JTBajczZG2hGpEkRGO4oEM0q0X9/
+         x+QQUJD4BlQo2QeInkSrzGJKhLcH9zts+sckdwP9AqltIXlwQQXpGY7/NzLUDdg5sSYi
+         Dga/dc0hs1niaW8fJVSm2TP/F6AS9iQJwYV37upkvCQxbgXzkGGVDY31bFWpqZlEit/k
+         TbpQNppaVlqzf8F7v+rFVIdZp5sI685Bv2dyyYtQpC04lZvFeO7pC/T3EgXBy20Qw7NC
+         6HOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768496101; x=1769100901;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eL+E7/4JmScKJihcx95KMzbVjQVIxgRJYXFYqhlTPBQ=;
+        b=HzeE2DXTJMrjgAjnqUPE3HBp+InLe3J0Fv2lvV9dWa9Wm5e0TZaCZiC2MUQUdP2QtC
+         X3zFRJdk3p+Jr+4MQ8r/V786jO1YlYOFX1T0imKCStI4vszJ20eTSyGFnHdYT8qCbn+P
+         DdtqrpM+3loo8z+dozgZfvbPZntws/QT92oU+SS2vb9g7d2s0c4EujNVQy6eBBMHbQRf
+         GX0cdWltGIsJqXxxqOX6SxrNSJGXFGG4wdlEVWNnAP9bjayjHtyw+xWNFd+TiHkWxgV5
+         j4IytPqKimRVnD+60LhlipwkXxL2umeR+wpnRmaXe4DVh9wNISD+0UIcO4flPgS3Ckh/
+         uenw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3TmeiN+GS1LbAmcqBzH6gxB3lU+8JrK4ZyJ5S56aVSFuQ9pMPPr5T6gbiHMCg/Om1wl0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtXwTQwHvbB1tO3ADd/ct0xMiY79WRm/LrX16VmaCw/zWM7TLi
+	BjuzDjMMgVaw7iupH72LPjAq40KhUxLPmKvagBMbrtqOIUB+3tmI43RLdfPEarR9+UUQvEUOFD+
+	W3ogy+w==
+X-Received: from plog2.prod.google.com ([2002:a17:902:8682:b0:2a0:ad08:d949])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f685:b0:295:96bc:8699
+ with SMTP id d9443c01a7336-2a7175408damr1410685ad.20.1768496101557; Thu, 15
+ Jan 2026 08:55:01 -0800 (PST)
+Date: Thu, 15 Jan 2026 08:54:59 -0800
+In-Reply-To: <af8bbddc-fcf5-460b-9a6f-1418a0748f37@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A345:EE_|BL3PR12MB6619:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd66a704-b0e7-41eb-af08-08de54554d15
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dZb2TnuT2/jCe8OoujtG3BOqa6gs6BrSK6YAEdoc9JUekx8oaCfjac9t5xQ8?=
- =?us-ascii?Q?gvjJzpjCx1G/UPjD3ghBrdkFnWkx3BH1FAbuMcI2RoBjieVe5Hn1/YHKiaj4?=
- =?us-ascii?Q?rzkqZzjDUnt8RFi7bectxrDaIReHyHSHoxhCgt88g62gwiaq7ywkH1+HJmi3?=
- =?us-ascii?Q?sBtcu2og9TxY/e6ZCJdDBbXyUPTm8YaVcBlvKnZ9JIFsKZJiAVtvUTa8mVc8?=
- =?us-ascii?Q?Q4LrBmWBM5Xnc8Gog/n5nvUsLPWBa9BjlyseVdkUC5q+T8pkqBY+PyZKANQx?=
- =?us-ascii?Q?Ul+iW6WjlMK24TXHYQazayINWxSpJNxvj1CqLUS3h95hn2aRqKaA7YQ8BQ7C?=
- =?us-ascii?Q?t6VyjhOMSVMVJZIO1IjrQO0S/8laom8q9wsUEatpHLaqUmLbSXJanXXL+j7V?=
- =?us-ascii?Q?bRoORNfzUASgjsaT1fA8uDMj3ahMBev0QW+tHkFuNJElO0vwrbZ3htiEcE5J?=
- =?us-ascii?Q?KoQni8GpxrSsZVRcFjae1xyCZWySjImzYT47Yx9tzDHktu9dLuxFAi0P1bwI?=
- =?us-ascii?Q?1Lz1gL7a4LQ0Ax+g32LTUPIb44pdds0f9a97aY0UxpYV9pOWr2NPlXpTmSLi?=
- =?us-ascii?Q?FkFw1I9l81LP+MxKQpSJJb10olRaIrQcP+XBKn3hUwMyqNKdgPx0SYQtSvTg?=
- =?us-ascii?Q?OG1gcZLTG7v3Pgc+CH2fulXJCKYDyDLV9tzbgi499c61IbVpQXXlC9ShVLtn?=
- =?us-ascii?Q?PirCsZHA1ytCJcHlOHjYmhb+zt+F1UWr6MTU1ul9C4XVTV1n54NE4jRvYBHT?=
- =?us-ascii?Q?RH3vPP9re0Wo86SXRyiA7bA/E78lCVDqzB1S5NYgojdZl+6Fa5FQr+AY9yat?=
- =?us-ascii?Q?q6ME0GsCiPr+BRH8n5hom0msTtB8c459L0kJYolsGgR1a3VtF9+962MCXSfG?=
- =?us-ascii?Q?ymIMdswQ7ZRwk7Hf34Wng1jQhheurSzWQC7twVSVkz5iwTFtbR1AeqEGj8n2?=
- =?us-ascii?Q?t+3EYfAgU0Rbn8YDCOBbwwOIuytSs33zRKLJqH3xRaxujuIIEWMOnIGXdg1u?=
- =?us-ascii?Q?C0ByZqXrzwj0q5Hra/CQFoZqduzZjHxwfkm04sevBrYpnROBpKAbR2LHKKGu?=
- =?us-ascii?Q?GFgM6CFFMLkxQadWBLwixPBlJHXTV8ZWfUiRlLQVmMY1IZ5ZWUyTkKmD1aBX?=
- =?us-ascii?Q?1T3JNqfeyFB289NTQdOwfV24u2k0L/T8vVxgFSp9w/7zeE0cpK0mSeryt4c0?=
- =?us-ascii?Q?+ebEbQYscc+cIuBS6j8HQW6j0hckrH6oPy2b0Q2Jq8dTfvagZ4Jpac0KH9ZC?=
- =?us-ascii?Q?duc04xGXxJSWIYTTJ8NBKlHclDX/9hqqVmFPLswuVNqnv69bhKv+HG4RZMTS?=
- =?us-ascii?Q?6APExbgkBpWa8XYH9r27s0aun+jpbjtU0d9J88RVsspZkARpqSXqtjQ+Ad3Z?=
- =?us-ascii?Q?8u4BGBkjOCIN7w2tgWAwh4SIBD3l9/dICZLiQVGk2jDgmdUgmNdj+y/fW1Hg?=
- =?us-ascii?Q?P4a27hcgUoT64TfZy3ADdsPT6BYLNiFqDvduVmXg5H1DINRJX/zcFAV+Hxb8?=
- =?us-ascii?Q?uM6BWLNBtWTlUrmn4Pc6EFb8lPzZdc83EPBnCbeeTXOYQ1PCYT8zY0eLZgBI?=
- =?us-ascii?Q?dJfYgir0jA74nSvPRARZ2Hr80ssGVEyqF5g0as8bulHTTzp//oWf6vzQRPOD?=
- =?us-ascii?Q?dNl6wVPg8C8KJ/trTElK6lGDuwE0Ax/0HCKvMEIj6b51fwnSrEW0gwkcOfeY?=
- =?us-ascii?Q?uHUMOQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2026 16:44:07.4866
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd66a704-b0e7-41eb-af08-08de54554d15
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A345.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6619
+Mime-Version: 1.0
+References: <20260114003015.1386066-1-sagis@google.com> <43a0558a-4cca-4d9c-97dc-ffd085186fd9@intel.com>
+ <aWe8zESCJ0ZeAOT3@google.com> <CAAhR5DE=ypkYwqEGEJBZs5A2N9OCVaL_9Jxi5YN5X7rNpKSZTw@mail.gmail.com>
+ <af8bbddc-fcf5-460b-9a6f-1418a0748f37@intel.com>
+Message-ID: <aWkb41gbjs-cPX60@google.com>
+Subject: Re: [PATCH] KVM: TDX: Allow userspace to return errors to guest for MAPGPA
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Sagi Shahar <sagis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Kiryl Shutsemau <kas@kernel.org>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Thomas Gleixner <tglx@kernel.org>, 
+	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
+	Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tests an intercepted #PF accesing the last (unmapped) qword of the
-virtual address space. The assist ought provides a prefetched
-code stream starting at the offending instruction.
+On Thu, Jan 15, 2026, Xiaoyao Li wrote:
+> On 1/15/2026 9:21 AM, Sagi Shahar wrote:
+> > On Wed, Jan 14, 2026 at 9:57=E2=80=AFAM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > > On Wed, Jan 14, 2026, Xiaoyao Li wrote:
+> > > > The -EINVAL will eventually be returned to userspace for the VCPU_R=
+UN
+> > > > ioctl. It certainly breaks userspace.
+> > >=20
+> > > It _might_ break userspace.  It certainly changes KVM's ABI, but if n=
+o userspace
+> > > actually utilizes the existing ABI, then userspace hasn't been broken=
+.
+> > >=20
+> > > And unless I'm missing something, QEMU _still_ doesn't set hypercall.=
+ret.  E.g.
+> > > see this code in __tdx_map_gpa().
+> > >=20
+> > >          /*
+> > >           * In principle this should have been -KVM_ENOSYS, but users=
+pace (QEMU <=3D9.2)
+> > >           * assumed that vcpu->run->hypercall.ret is never changed by=
+ KVM and thus that
+> > >           * it was always zero on KVM_EXIT_HYPERCALL.  Since KVM is n=
+ow overwriting
+> > >           * vcpu->run->hypercall.ret, ensuring that it is zero to not=
+ break QEMU.
+> > >           */
+> > >          tdx->vcpu.run->hypercall.ret =3D 0;
+> > >=20
+> > > AFAICT, QEMU kills the VM if anything goes wrong.
+> > >=20
+> > > So while I initially had the exact same reaction of "this is a breaki=
+ng change
+> > > and needs to be opt-in", we might actually be able to get away with j=
+ust making
+> > > the change (assuming no other VMMs care, or are willing to change the=
+mselves).
+> >=20
+> > Is there a better source of truth for whether QEMU uses hypercall.ret
+> > or just point to this comment in the commit message.
+>=20
+> No version of QEMU touches hypercall.ret, from the source code.
+>=20
+> I suggest not mentioning the comment, because it only tells QEMU expects
+> vcpu->run->hypercall.ret to be 0 on KVM_EXIT_HYPERCALL. What matters is Q=
+EMU
+> never sets vcpu->run->hypercall.ret to a non-zero value after handling
+> KVM_EXIT_HYPERCALL. I think you can just describe the fact that QEMU neve=
+r
+> set vcpu->run->hypercall.ret to a non-zero value in the commit message.
 
-This is little more than a smoke test. There's more cases not covered.
-Namely, CR/DR MOVs, INTn, INVLPG, nested PFs, and fault-on-fetch.
-
-Signed-off-by: Alejandro Vallejo <alejandro.garciavallejo@amd.com>
----
-I'm not a big fan of using a literal -8ULL as "unbacked va", but I'm not
-sure how to instruct the harness to give me a hole. Likewise, some cases remain
-untested, with the interesting one (fault-on-fetch) requiring some cumbersome
-setup (put the codestream in the 14 bytes leading to a non-present NPT page.
-Happy to add such a case, but I'm not sure how.
-
-As for all other cases, KVM copies ext_info_1 unconditionally, which is where
-the decoded info goes. It's highly unlikely they would ever provide much value.
-Happy to add them too if they're deemed useful.
----
- lib/x86/processor.h |  1 +
- x86/svm_tests.c     | 33 +++++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+)
-
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 42dd2d2a..32ffd015 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -374,6 +374,7 @@ struct x86_cpu_feature {
- #define X86_FEATURE_LBRV		X86_CPU_FEATURE(0x8000000A, 0, EDX, 1)
- #define X86_FEATURE_NRIPS		X86_CPU_FEATURE(0x8000000A, 0, EDX, 3)
- #define X86_FEATURE_TSCRATEMSR		X86_CPU_FEATURE(0x8000000A, 0, EDX, 4)
-+#define X86_FEATURE_DECODE_ASSISTS		X86_CPU_FEATURE(0x8000000A, 0, EDX, 7)
- #define X86_FEATURE_PAUSEFILTER		X86_CPU_FEATURE(0x8000000A, 0, EDX, 10)
- #define X86_FEATURE_PFTHRESHOLD		X86_CPU_FEATURE(0x8000000A, 0, EDX, 12)
- #define X86_FEATURE_VGIF		X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 37616476..5c93d738 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -409,6 +409,36 @@ static bool check_next_rip(struct svm_test *test)
- 	return address == vmcb->control.next_rip;
- }
- 
-+static bool decode_assists_supported(void)
-+{
-+	return this_cpu_has(X86_FEATURE_DECODE_ASSISTS);
-+}
-+
-+static void prepare_decode_assists(struct svm_test *test)
-+{
-+	vmcb->control.intercept_exceptions |= (1ULL << PF_VECTOR);
-+}
-+
-+static void test_decode_assists(struct svm_test *test)
-+{
-+	asm volatile (".globl opcode_pre\n\t"
-+		      "opcode_pre:\n\t"
-+		      "mov %0, (%0)\n\t" /* #PF */
-+		      ".globl opcode_post\n\t"
-+		      "opcode_post:\n\t" :: "r"(-8ULL));
-+}
-+
-+static bool check_decode_assists(struct svm_test *test)
-+{
-+	extern unsigned char opcode_pre[], opcode_post[];
-+	unsigned len = (unsigned)(opcode_post - opcode_pre);
-+
-+	return vmcb->control.exit_code == (SVM_EXIT_EXCP_BASE + PF_VECTOR)) &&
-+		!memcmp(vmcb->control.insn_bytes, opcode_pre, len)          &&
-+		vmcb->control.insn_len >= len                               &&
-+		vmcb->control.insn_len <= ARRAY_SIZE(vmcb->control.insn_bytes);
-+}
-+
- extern u8 *msr_bitmap;
- 
- static bool is_x2apic;
-@@ -3628,6 +3658,9 @@ struct svm_test svm_tests[] = {
- 	{ "next_rip", next_rip_supported, prepare_next_rip,
- 	  default_prepare_gif_clear, test_next_rip,
- 	  default_finished, check_next_rip },
-+	{ "decode_assists", decode_assists_supported, prepare_decode_assists,
-+	  default_prepare_gif_clear, test_decode_assists,
-+	  default_finished, check_decode_assists },
- 	{ "msr intercept check", default_supported, prepare_msr_intercept,
- 	  default_prepare_gif_clear, test_msr_intercept,
- 	  msr_intercept_finished, check_msr_intercept },
-
-base-commit: 31d91f5c9b7546471b729491664b05c933d64a7a
--- 
-2.43.0
-
++1.  We can't _guarantee_ changing the behavior won't break userspace, e.g.=
+ in
+theory, someone could be running a fork of QEMU in production that explicit=
+ly
+sets hypercall.ret to some weird value.  Or someone could be running a VMM =
+we
+don't even know about.  I.e. there is no single source of truth, all we can=
+ do
+is explain why we have high confidence that the ABI change won't break anyt=
+hing.
 
