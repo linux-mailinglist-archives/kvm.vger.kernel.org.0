@@ -1,194 +1,153 @@
-Return-Path: <kvm+bounces-68194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68195-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2F1ED25B6C
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:23:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEDB8D25BDE
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:28:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F3D37302954F
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:22:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E6881302BAA5
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A5D3BB9E2;
-	Thu, 15 Jan 2026 16:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36373B9614;
+	Thu, 15 Jan 2026 16:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eS+Lgilq";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="raRg+2z+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1pUkNHI4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708DD3B95FB
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A1D3B9618
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768494159; cv=none; b=TDI36jHknVMUWFGQnceLFNfDB5KFaDXQJ+15GzF44/arH3Zdkz5sMGHEx8l4b5pN3/NkwrYrkbcu6X9VSyKmolqhOarZpoudgMpRd2oBiFpbbgPcK9/bOiqpcZhYUj43uo2QRGkiDbKgWl8V1uFn8OTTVYorSlAe7sh0WLmB1+c=
+	t=1768494389; cv=none; b=TyopzvG0c3JUAkuh+Qrtvn1E5lAWqRHCO8UoD5IStfMEpT0aoc8EIriNW8fXf9G1ZTpMwxy6WhyqMp2mfo9TPJVbh1q+RQF/47MvenFShKSAcFzsr19wGnyN/d6HxYtukPO6pH18ii+J3cEeNNwK3fLrcaVNQt9U1A7R9ssoAEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768494159; c=relaxed/simple;
-	bh=vW+wPZESCHcmV195EEVRxrooQk0oPEIVKKiKK3q5jlo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EBtWhaWMDDQSFSQhL2/YlgukA9v0tfs+L34vLIXb0MIib0/IpKEtgwwcg6ZOaderCDTibGSz7/S3hKB4spEL5ser1nDUJ5U6O4DzpaKjixhEmY7YkPNGJUAYeJ4W4bZBA+LkhDXfgDyvI25/5Zv969c3csv6Wf2F9BVB0Qh70XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eS+Lgilq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=raRg+2z+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768494155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=AGtT/c29PE+aFinqeoDHBaYGfiaOkvbQ97RcucMoLU0=;
-	b=eS+LgilqUH5/E2LvbydOBnLdjt4YsMHuLjF1DPDfDoahhvrtnC8XgeC4e5S/sQ8u3CU0mk
-	OLy6vco1cYaTGRNEHjmBfMI710eR0d8ltdlhwVuPZsykDKCao3o8cN662oZH/a/qHacKYO
-	GvpeEr+LsDQcarELshsuUf8aiTx30yw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-0mOayRvAM12YcGhrUQiHfQ-1; Thu, 15 Jan 2026 11:22:34 -0500
-X-MC-Unique: 0mOayRvAM12YcGhrUQiHfQ-1
-X-Mimecast-MFC-AGG-ID: 0mOayRvAM12YcGhrUQiHfQ_1768494153
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-64c7242a456so1856515a12.3
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 08:22:33 -0800 (PST)
+	s=arc-20240116; t=1768494389; c=relaxed/simple;
+	bh=O9Ec/dFOzt00Qe0E/Y4PV0oguKJYyQ+GkPJ3I10uCF0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oXKz5BNmIuXoyaGhn0pf18c4ikeNkSC5fw0tdQCr/wuHepotAnynF0kcczvfuCXtrpoHe/iaCGhEa1BQALG3PPNdMCXDHBFnabkOOp67bgbA4tqtIO8XR/HWQ6bLUg5E7hTBlH9QlTk+m4CYZToDcGP24kS2DJaBPSiqyHTRUTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1pUkNHI4; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34ab8693a2cso1822635a91.0
+        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 08:26:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768494153; x=1769098953; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AGtT/c29PE+aFinqeoDHBaYGfiaOkvbQ97RcucMoLU0=;
-        b=raRg+2z+iwJVY995rgZjeCMR8ILR4G4+anYLNKhA1s70DYlsOmc4dgR+ZUgWnA0iYT
-         TPww12PrNNAlSY3TjoKGcFPs9O5nojL9xxK4XdTmt77bjZ6jMq56LwJoIr4KqKD9Kepz
-         /9pnliv/Yjm09qoNadvHrr34/A0Wo5eZHO8rGgR8Z4kOhGlIKA17IsoueCHzzD9Vy9u3
-         mxaTVSPcwHXwHFdPn/P2q0vs/NGqLLYPYkIS7/tgEvnU6KUQSWzYOKJrRKn6WdCuVr5a
-         mWjhM815GoXyZuFEp0mbDUELiRRmUobTiaY/my7oO9KUg73e/vxyUF52OkVHH/T1fGP5
-         w5Nw==
+        d=google.com; s=20230601; t=1768494383; x=1769099183; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cqob1pqf/0CpEhvrUSjLUn32N0WxHoPxiFVd1xN70ko=;
+        b=1pUkNHI4EXfjH8G5Ha5E+hpouQfs1homgMGBOEFxyh8p0kiUSqKTBTNKAuiDhYpOy2
+         x5Y0Hcgamrv0PHIQEZ35lTa03M9b23StvcoHIKc06dJ6f4id03Wj7qej0qPFqQoBjAzY
+         sdnXUDSjEkYGMRToOAP1sq+Bysdx6kZ5roAiWHoJDY/VFyAlkUCQQus/1Fx7bYIIXii/
+         djjc7M0cCwky258xkzb9gnmGHP1THC3xCQJPNYXTrh59eb/guirmRxUw2ibVYCTfyOD7
+         DI0AqFjQxR1hXP2yOZjVUkz+QWTDV6Z1QSBmAjdzWlHmjhvX3xL5t+znSLAOmFfPpyTG
+         DGTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768494153; x=1769098953;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AGtT/c29PE+aFinqeoDHBaYGfiaOkvbQ97RcucMoLU0=;
-        b=jUygsSXZu8Kw3JYrSm2qzQBIr2QNzHDGvOx4Y5zR7LXzAzIAeXDHZUGNHL4+WfrAvf
-         Tfpa6fmdncSGwDQBKN6nZNFycFzWNKjv6MKg3H0Pa2uU2FJFxHwnMLwgDtzla3lqyUV2
-         aFCYjPDsnlBkjRlG7j1DIdBPl47bdBq/cj+lBJPaafwg9zCGbFV3B/EC3/S92NaLEWk4
-         Ar9wlKFs3FvRRz72BJwviIPnyh5vp+8ZrSXWA0Y2D6JMBcD6ij8sNbnPJ7nEspM7T9eK
-         cS4AfjOcGNwxvN5YfxTy1JHYrfn/TLwMvw9TJmh5bOzVePKhEFDPsAxhhUGKfLIhGxb6
-         FGLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWK2/YSocMEYT4ac6h8dCtC+sNU/b9IQdxIY+fLAJJ1rFwBA7fn2bRjs4g5kLAOpxUyygc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD7HeBMpYac08EyR0ff2OB9JI8V6Rgsero4YT5UyjAlKbF6FgR
-	HeeYo2kuDBXqJYcXPdYGxa5wEgnTt0cZhpBLKgGL7vhFACsYBpv/GxUB88tx3/KOjfe8lZVRZQB
-	miHu2DmfLtsnSGKu/K/3S+GRIgCeq1gxhIMX+wcHOKmtg1WtMdTnmmQ==
-X-Gm-Gg: AY/fxX6NmsG2CYKjX6IDWwTpNb+c036cVQsSt7YD4exxuwA4wx4M5+djY7/x6+d1wfW
-	4IXv2+Lq0zkBeqQmvBkBpjEkIBlVCaLRFzM13GgwCPhDmPtKKRAMTL7OlH04L5V7ACpfmu1qNQT
-	58RkRDaQc5BZnFhnELNJ9QFSvtj9Yvm8UX9iLM/2CXJF6W63CM/p9iV71zhsS+WOqF0HDJr5Uo0
-	4IScIuze1Q+SbX+t66PJNAUtzF51947hTO1uAy+70hbqNvUEh6FZqp4NSZzVk1gs+qYL/m11W4v
-	W+DA0x+4w56A+dPBTBDbXF+Th7Ls9oBOwrb76ZrgL9tOOSazZn55/oK9RwK3oFhj6Pkz2aDL1fl
-	hLejJrBVivJSyJVk0387srtSDed79kfvyY/BDkx4XzbFFRmbm+7djz4OOtblgevoE8u02VBC4je
-	r/I3QfSu8hH+Y=
-X-Received: by 2002:a17:907:97d5:b0:b87:6d6b:1353 with SMTP id a640c23a62f3a-b8792f9e523mr13090366b.28.1768494152757;
-        Thu, 15 Jan 2026 08:22:32 -0800 (PST)
-X-Received: by 2002:a17:907:97d5:b0:b87:6d6b:1353 with SMTP id a640c23a62f3a-b8792f9e523mr13089366b.28.1768494152392;
-        Thu, 15 Jan 2026 08:22:32 -0800 (PST)
-Received: from [192.168.1.84] ([93.56.161.93])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b8793c6bbf7sm18266b.19.2026.01.15.08.22.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jan 2026 08:22:31 -0800 (PST)
-Message-ID: <8ee84cb9-ef6d-43ac-b9d0-9c22e7d1ecd8@redhat.com>
-Date: Thu, 15 Jan 2026 17:22:30 +0100
+        d=1e100.net; s=20230601; t=1768494383; x=1769099183;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cqob1pqf/0CpEhvrUSjLUn32N0WxHoPxiFVd1xN70ko=;
+        b=Prtn+udNFnCjsYb0RpaI9Gy3pkXyWzVxHcWTsfWTfRcUj2CEuU+buUmLFdfQCRcmsz
+         624d+0mkQAgyU8gyUZddbN5md41q+b/HM7qI2cFCMO3NGVbO/TxDVFg2UEkGXAwufDkv
+         GUng30m//p2iW/gQdGMogus2M5Kcex4mCv4KpmUZZAoRuz61T9XAP5N1ACa9/MYyD0rH
+         aiWNJ+NwMrbldYVhFn+RqeCBHgmNsZba12dVKgppDiQP8ppjrlPPAazdf0KOp94vh+9T
+         s0kk1nSMsUtKuC0EgniDkyJdeC3JKHDy0nzHbJkdY97C4kyqnLIx/tK1iLWmOsVLh9he
+         BrAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVC9CaNwLSxy0/OQ41y229mt9lJbE34uQknQdZHNjErpx8UTZ7aEwnUfdNfWPZHkkE2E3M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVpeKsh7Jh4LBIpucVBLAsnhAAVD5lHn0LKdHRmEI1zHYTDmE5
+	/mewA8yb9hNPTRi/dkEZe1X7YiHc/UsTsPiJ53U+l7W4WE0ZKdnmnXTu38vD6MpUOF7zkH57lMt
+	Mby1fCQ==
+X-Received: from pjbft24.prod.google.com ([2002:a17:90b:f98:b0:347:76e2:5ff6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3943:b0:336:9dcf:ed14
+ with SMTP id 98e67ed59e1d1-3510911d394mr7062210a91.23.1768494382813; Thu, 15
+ Jan 2026 08:26:22 -0800 (PST)
+Date: Thu, 15 Jan 2026 08:26:21 -0800
+In-Reply-To: <aWhFwzlqqrnBLLiK@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] x86/fpu: Clear XSTATE_BV[i] in save state whenever
- XFD[i]=1
-To: Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: seanjc@google.com, x86@kernel.org, stable@vger.kernel.org
-References: <20260101090516.316883-1-pbonzini@redhat.com>
- <20260101090516.316883-2-pbonzini@redhat.com>
- <cd6721c7-0963-4f4f-89d9-6634b8b559ae@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <cd6721c7-0963-4f4f-89d9-6634b8b559ae@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <CAEvNRgGG+xYhsz62foOrTeAxUCYxpCKCJnNgTAMYMV=w2eq+6Q@mail.gmail.com>
+ <aV2A39fXgzuM4Toa@google.com> <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
+ <aV2eIalRLSEGozY0@google.com> <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
+ <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
+ <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com> <aWhFwzlqqrnBLLiK@yzhao56-desk.sh.intel.com>
+Message-ID: <aWkVLViKBgiVGgaI@google.com>
+Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org, 
+	rick.p.edgecombe@intel.com, dave.hansen@intel.com, kas@kernel.org, 
+	tabba@google.com, michael.roth@amd.com, david@kernel.org, sagis@google.com, 
+	vbabka@suse.cz, thomas.lendacky@amd.com, nik.borisov@suse.com, 
+	pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
+	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
+	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 1/15/26 16:54, Dave Hansen wrote:
-> On 1/1/26 01:05, Paolo Bonzini wrote:
->> When loading guest XSAVE state via KVM_SET_XSAVE, and when updating XFD in
->> response to a guest WRMSR, clear XFD-disabled features in the saved (or to
->> be restored) XSTATE_BV to ensure KVM doesn't attempt to load state for
->> features that are disabled via the guest's XFD.  Because the kernel
->> executes XRSTOR with the guest's XFD, saving XSTATE_BV[i]=1 with XFD[i]=1
->> will cause XRSTOR to #NM and panic the kernel.
+On Thu, Jan 15, 2026, Yan Zhao wrote:
+> On Wed, Jan 14, 2026 at 07:26:44AM -0800, Sean Christopherson wrote:
+> > Ok, with the disclaimer that I hadn't actually looked at the patches in this
+> > series before now...
+> > 
+> > TDX absolutely should not be doing _anything_ with folios.  I am *very* strongly
+> > opposed to TDX assuming that memory is backed by refcounted "struct page", and
+> > thus can use folios to glean the maximum mapping size.
+> > 
+> > guest_memfd is _the_ owner of that information.  guest_memfd needs to explicitly
+> > _tell_ the rest of KVM what the maximum mapping size is; arch code should not
+> > infer that size from a folio.
+> > 
+> > And that code+behavior already exists in the form of kvm_gmem_mapping_order() and
+> > its users, _and_ is plumbed all the way into tdx_mem_page_aug() as @level.  IIUC,
+> > the _only_ reason tdx_mem_page_aug() retrieves the page+folio is because
+> > tdx_clflush_page() ultimately requires a "struct page".  That is absolutely
+> > ridiculous and not acceptable.  CLFLUSH takes a virtual address, there is *zero*
+> > reason tdh_mem_page_aug() needs to require/assume a struct page.
+> Not really.
 > 
-> It would be really nice to see the actual ordering of events here. What
-> order do the KVM_SET_XSAVE, XFD[$FOO]=1 and kernel_fpu_begin() have to
-> happen in to trigger this?
+> Per my understanding, tdx_mem_page_aug() requires "struct page" (and checks
+> folios for huge pages) because the SEAMCALL wrapper APIs are not currently built
+> into KVM. Since they may have callers other than KVM, some sanity checking in
+> case the caller does something incorrect seems necessary (e.g., in case the
+> caller provides an out-of-range struct page or a page with !pfn_valid() PFN).
 
-The problematic case is described a couple paragraphs below: "This can 
-happen if the guest executes WRMSR(MSR_IA32_XFD) to set XFD[18] = 1, and 
-a host IRQ triggers kernel_fpu_begin() prior to the vmexit handler's 
-call to fpu_update_guest_xfd()."
+As a mentioned in my reply to Dave, I don't object to reasonable sanity checks.
 
-Or more in detail:
+> This is similar to "VM_WARN_ON_ONCE_FOLIO(!folio_test_large(folio), folio)" in
+> __folio_split().
 
-   Guest running with MSR_IA32_XFD = 0
-     WRMSR(MSR_IA32_XFD)
-     vmexit
-   Host:
-     enable IRQ
-     interrupt handler
-       kernel_fpu_begin() -> sets TIF_NEED_FPU_LOAD
-         XSAVE -> stores XINUSE[18] = 1
-         ...
-       kernel_fpu_end()
-     handle vmexit
-       fpu_update_guest_xfd() -> XFD[18] = 1
-     reenter guest
-       fpu_swap_kvm_fpstate()
-         XRSTOR -> XINUSE[18] = 1 && XFD[18] = 1 -> #NM and boom
+No, it's not.  __folio_split() is verifying that the input for the exact one thing
+it's doing, splitting a huge folio, matches what the function is being asked to do.
 
-With the patch, fpu_update_guest_xfd() sees TIF_NEED_FPU_LOAD set and 
-clears the bit from xinuse.
+TDX requiring guest_memfd to back everything with struct page, and to only use
+single, huge folios to map hugepages into the guest is making completely unnecessary
+about guest_memfd and KVM MMU implementation details.
 
-Paolo
+> With tdx_mem_page_aug() ensuring pages validity and contiguity,
 
+It absolutely does not.
+
+ - If guest_memfd unmaps the direct map[*], CLFLUSH will fault and panic the
+   kernel.
+ - If the PFN isn't backed by struct page, tdx_mem_page_aug() will hit a NULL
+   pointer deref.
+ - If the PFN is back by struct page, but the page is managed by something other
+   than guest_memfd or core MM, all bets are off.
+
+[*] https://lore.kernel.org/all/20260114134510.1835-1-kalyazin@amazon.com
+
+> invoking local static function tdx_clflush_page() page-per-page looks good to
+> me.  Alternatively, we could convert tdx_clflush_page() to
+> tdx_clflush_cache_range(), which receives VA.
+> 
+> However, I'm not sure if my understanding is correct now, especially since it
+> seems like everyone thinks the SEAMCALL wrapper APIs should trust the caller,
+> assuming they are KVM-specific.
+
+It's all kernel code.  Implying that KVM is somehow untrusted is absurd.
 
