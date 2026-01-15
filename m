@@ -1,144 +1,178 @@
-Return-Path: <kvm+bounces-68197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F8B2D25CD1
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:40:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2832D25CEC
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 17:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 83F503026BFA
-	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:39:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43E2730B557D
+	for <lists+kvm@lfdr.de>; Thu, 15 Jan 2026 16:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9081D3BC4E0;
-	Thu, 15 Jan 2026 16:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21213BB9FE;
+	Thu, 15 Jan 2026 16:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4x7Yf8OW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IQzHoeCN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DDA3B8BB1
-	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83F03B8D70
+	for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 16:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768495194; cv=none; b=EuObyiTFFHf7Er8Az2Hn8vE/o6ILbblP7qaSBSxB1pjJNopXaA/Um5kkK7tnyLCDLw6H4ksd1tyExy5CMh4gP9ZXxgZNF+YtytRg+3vPZkGAdBSrT4n4YWA6e4FFPM+68TDEMfQw7Wo28itnwewSU7OpxyenU+lNlm9X8/W2cWU=
+	t=1768495281; cv=none; b=LA5HvMTMBxU82CVHm7iahVg/NA33QpjhBnrZNDhmwWVieBvf+UYc/d+A3xn2kM/ecOaeQZTQKL4C5dMLs7Rc+/1ICHEm5LaBp+vIVsmIRP6wN7omzVm7qB0+iTJmUaRChlINosaNGha1WVaUV/uavWTp1FAwmRaAm3c5yzIO4rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768495194; c=relaxed/simple;
-	bh=1iriDoFQECqI5gx+5VUYCNs/AX7t++V1xszroDtDac4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=j9qhdIth/vA6U70++u4mSai0ULYnR+AomXvS0ysxV01slOZb6EruUtFipJnSdL61oBwD1fGGK4fvWgL/UCiIKw31nxaEnIcoPCxckOktroTL619lB5AH9K6mgmkGZ+ATURG/Rvw6MaP2fxW2x4Yhgn9n4/XoG8+A+UvG9Ihlcpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4x7Yf8OW; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c904a1168so997020a91.1
-        for <kvm@vger.kernel.org>; Thu, 15 Jan 2026 08:39:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768495193; x=1769099993; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4gTVZDa8gi4A4LKtgeOaQbZo1IPrByh19hL2H//zuzQ=;
-        b=4x7Yf8OWDJQr3mTO5E0fjuvGEDKmR2RRMgHd/jvZE0Jb44ns79hj+M3DUtyp0n92gF
-         ThiE762Ib9GC7sAajVeh28tjk9h41jFPk/3yfsi/BxM3EoimrXGzCf64WXWWxwfEB8zb
-         zyUGlaULgh6jjk8qjyQ//z/+hwM41v3eRgeAg+LxUhVQzGkC7PekVeLdhc6Dh0Snkdq9
-         PyY3jLEml3QQWVh8R7qCRsvzEf5oR9pJI6A93Rl5Tv9pjUsxnO8NoCoxXx4bDU86SoIO
-         2vGk7hZIuse2AWxHMM7mPkO/xeTnnrijICEACImkrV9QNI7mXi26uGWMLBcu8ovk6J/O
-         aVQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768495193; x=1769099993;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4gTVZDa8gi4A4LKtgeOaQbZo1IPrByh19hL2H//zuzQ=;
-        b=pzygm3pgMpfiUG1ld0XyC2UuVtMf9sU4+aGXyxXkiYgUovs22uxnHUboaBpU7Zap7R
-         QNCYZ20VDzy8rXRKPCzUDpvq9CR+D2bFlxK0WooMH/WXtdadzw++RBN6Z3uSUCQ3KvaQ
-         CwTIxJnxaAoO3yzpqqLy5PYpGHJGSPNfLuzAUlIXrKHbds8lf24hjnuTSfVqFpXQdqrp
-         C7GUUHcookyAnTKNN25FziTT0hFEFkpVH675mPkdTbBFccAQUPUuTC3w2K/iVP0ePtqZ
-         gov6+dAVXaIC0TLZ1OxKR7oeMsMpnLAYv2eLXL4p2uAfQX55cTFvqFqXo6AXc6DAVHy8
-         KXlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ/ht+N1taowmHvg6s82m0WFKFV1JOU8dz8W6MzTKNNQZ3Pxcmjw03kmKEWQsCIPLj5sY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxIGDS71owyCAG9jwiyDvwFdWco+/yJfFuZVq9wwna+KortbMp
-	a4cM+tPHA9HKd1e/1dSJ58PTnluQiPay3EhbdXk4Z0BJenOdWh9POOglRB5wV0SWY0HGWa/jDmk
-	MJGj+gg==
-X-Received: from pjbqx16.prod.google.com ([2002:a17:90b:3e50:b0:34f:96fa:45e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b42:b0:330:6d2f:1b5d
- with SMTP id 98e67ed59e1d1-35272f9baa0mr72a91.26.1768495192650; Thu, 15 Jan
- 2026 08:39:52 -0800 (PST)
-Date: Thu, 15 Jan 2026 08:39:51 -0800
-In-Reply-To: <CABgObfYk-PxxGOj3az26=tt-p7_qu=eFhgdjKFqva7Stui9HYA@mail.gmail.com>
+	s=arc-20240116; t=1768495281; c=relaxed/simple;
+	bh=EtqGFA2TgkqT7zMrghlWo8Lttz+ZV93Wp2MKPAFzHfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ETVZEaeRS9n0C+BvTM+WqNot/pmWpIvnMbB6tw7UPCUVzRpl+o+ES0uaBF8cApvB8CZ29yuSyFp0FxJ5S7npH1C54wzMh/t0lqr2QViAD1AtTtZH8yyW3nNdsv8Xav62P7P+jCBC/F2Qv6Ar4EQdf0F5g1cmXM7WeRQZWlzVkqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IQzHoeCN; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 15 Jan 2026 16:41:09 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768495277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Lt87JnvFdmh1Bqw9ySHApB4AuurghTdhAelm3BbQnI=;
+	b=IQzHoeCNonMUpXqLeXuJwm8TrtSy6QQ+Ld7bUdAOfoUdqfc5Ke0vY1SlBWy/rWUOEyCNGd
+	KKaUI7BczRtqKkULnA0JEtdxPE7DVOLwoh6Ftgbvb5+l+atQdtcR7VYQSSnuZyfnq4DBrn
+	6+3w9PwLaynWvuP+ARQNqAYbNUoZtzI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kevin Cheng <chengkev@google.com>, pbonzini@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 1/5] KVM: SVM: Move STGI and CLGI intercept handling
+Message-ID: <xndoethnkd2djh5zkemvgmuj6gc4hsnxur2uo5frl57ugxa2ql@c3k7cadxmr4u>
+References: <20260112174535.3132800-1-chengkev@google.com>
+ <20260112174535.3132800-2-chengkev@google.com>
+ <jmacawbcdorwi2y5ulh2l2mdpeulx5sj7qvjehvnhaa5cgdcs3@2tljlprwtl27>
+ <aWhFQcNa8SKd679a@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260101090516.316883-1-pbonzini@redhat.com> <20260115122204.GDaWjb7Npp80GK-mFn@fat_crate.local>
- <CABgObfYk-PxxGOj3az26=tt-p7_qu=eFhgdjKFqva7Stui9HYA@mail.gmail.com>
-Message-ID: <aWkYVwTyOPxnRgzN@google.com>
-Subject: Re: [PATCH v2 0/4] x86, fpu/kvm: fix crash with AMX
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>, 
-	"Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>, 
-	"the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWhFQcNa8SKd679a@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 15, 2026, Paolo Bonzini wrote:
-> Il gio 15 gen 2026, 13:22 Borislav Petkov <bp@alien8.de> ha scritto:
-> >
-> > On Thu, Jan 01, 2026 at 10:05:12AM +0100, Paolo Bonzini wrote:
-> > > Fix a possible host panic, due to an unexpected #NM, when a KVM guest
-> > > is using AMX features.
-> > >
-> > > The guest's XFD value, which is stored in fpstate->xfd, is used for both
-> > > guest execution and host XSAVE operations.
-> >
-> > This already sounds weird. Why?
+On Wed, Jan 14, 2026 at 05:39:13PM -0800, Sean Christopherson wrote:
+> On Mon, Jan 12, 2026, Yosry Ahmed wrote:
+> > On Mon, Jan 12, 2026 at 05:45:31PM +0000, Kevin Cheng wrote:
+> > > Similar to VMLOAD/VMSAVE intercept handling, move the STGI/CLGI
+> > > intercept handling to svm_recalc_instruction_intercepts().
+> > > ---
+> > >  arch/x86/kvm/svm/svm.c | 10 ++++++----
+> > >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index 24d59ccfa40d9..6373a25d85479 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -1010,6 +1010,11 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
+> > >  			svm_clr_intercept(svm, INTERCEPT_VMSAVE);
+> > >  			svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
+> > >  		}
+> > > +
+> > > +		if (vgif) {
+> > > +			svm_clr_intercept(svm, INTERCEPT_STGI);
+> > 
+> > Could this cause a problem with NMI window tracking?
 > 
-> Because the state of disabled components is undefined anyway. There's
-> no point in making all host XSAVEs more expensive, even when the TMM
-> registers aren't in use by the guest (which is going to be most of the
-> time, likely).
+> Yes.
 > 
-> > Why don't we carry separate XFD copies - guest and host - which we use for the
-> > guest and the host, respectively?
+> > svm_enable_nmi_window() sets INTERCEPT_STGI to detect when NMIs are
+> > enabled, and it's later cleared by svm_set_gif(). If we recalc
+> > intercepts in between we will clear the intercept here and miss NMI
+> > enablement.
+> > 
+> > We could move the logic to set/clear INTERCEPT_STGI for NMI window
+> > tracking here as well, but then we'll need to recalc intercepts in
+> > svm_enable_nmi_window() and svm_set_gif(), which could be expensive.
+> > 
+> > The alternative is perhaps setting a flag when INTERCEPT_STGI is set in
+> > svm_enable_nmi_window() and avoid clearing the intercept here if the
+> > flag is set.
+> > 
+> > Not sure what's the best way forward here.
 > 
-> That was exactly what I did in v1, but it's more code and less efficient too.
+> First things first, the changelog needs to state _why_ the code is being moved.
+> "To be like VMLOAD/VMSAVE" doesn't suffice, because my initial answer was going
+> to be "well just don't move the code" (I already forgot the context of v1).
+> 
+> But moving the code is needed to fix the missing #UD in "Recalc instructions
+> intercepts when EFER.SVME is toggled".
+> 
+> As for how to fix this, a few ideas:
+> 
+>  1. Set KVM_REQ_EVENT to force KVM to re-evulate all events.  kvm_check_and_inject_events()
+>     will see the pending NMI and/or SMI, that the NMI/SMI is not allowed, and
+>     re-call enable_{nmi,smi}_window().
+> 
+>  2. Manually check for pending+blocked NMI/SMIs.
+> 
+>  3. Combine parts of #1 and #2.  Set KVM_REQ_EVENT, but only if there's a pending
+>     NMI or SMI.
+> 
+>  4. Add flags to vcpu_svm to explicitly track if a vCPU has an NMI/SMI window,
+>     similar to what we're planning on doing for IRQs[*], and use that to more
+>     confidently do the right thing when recomputing intercepts.
+> 
+> I don't love any of those ideas.  Ah, at least not until I poke around KVM.  In
+> svm_set_gif() there's already this:
+> 
+> 		if (svm->vcpu.arch.smi_pending ||
+> 		    svm->vcpu.arch.nmi_pending ||
+> 		    kvm_cpu_has_injectable_intr(&svm->vcpu) ||
+> 		    kvm_apic_has_pending_init_or_sipi(&svm->vcpu))
+> 			kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+> 
+> So I think it makes sense to bundle that into a helper, e.g. (no idea what to
+> call it)
+> 
+> static bool svm_think_of_a_good_name(struct kvm_vcpu *vcpu)
+> {
+> 	if (svm->vcpu.arch.smi_pending ||
+> 	    svm->vcpu.arch.nmi_pending ||
+> 	    kvm_cpu_has_injectable_intr(&svm->vcpu) ||
+> 	    kvm_apic_has_pending_init_or_sipi(&svm->vcpu))
+> 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+> }
 
-And creates a weird ABI for KVM:
+Maybe svm_check_gif_events() or svm_check_gif_interrupts()?
 
- : This also creates a nasty, subtle asymmetry in KVM's ABI.  Notably, the comment
- : above is wrong.  XSAVE does NOT run with fpstate->xfd, it runs with whatever
- : happens to be in hardware.  For non-guest tasks, fpstate->xfd is guaranteed to
- : be resident in hardware when save_fpregs_to_fpstate() runs, but for guest tasks,
- : it will usually be the _guest's_ value.  So in the common case, KVM_GET_XSAVE2
- : would not return the same data set by KVM_SET_XSAVE.
- : 
- : In theory we could ensure KVM saved exactly what is resident in hardware, but
- : that's quite tricky (and costly!) as it would require doing xfd_update_state()
- : before _every_ save_fpregs_to_fpstate(), e.g. not just in fpu_swap_kvm_fpstate().
- : E.g. if the host kernel used the FPU from IRQ context (spoiler alert!), then KVM
- : wouldn't have a chance to swap in the maximal XFD[18]=0 value (i.e. the userspace
- : task's XFD).
+Or maybe it's clearer if we just put the checks in a helper like
+svm_waiting_for_gif() or svm_pending_gif_interrupt().
 
-And IMO papered over the true bug, which is that the xstate snapshot can become
-inconsistent relative to KVM's tracking of guest XFD:
 
- : Lastly, the fix is effectively papering over another bug, which I'm pretty sure
- : is the underlying issue that was originally encountered.  Assuming QEMU doesn't
- : intercept MSR_IA32_XFD for its own purposes, the only sequence I've come up with
- : that would result in KVM trying to load XTILE data with XFD[18]=1, without a
- : colluding userspace VMM (Paolo's selftest) is:
- : 
- :   1. vCPU loads non-init XTILE data without ever setting XFD to a non-zero value
- :      (KVM only disables XFD interception on writes with a non-zero value).
- :   2. Guest executes WRMSR(MSR_IA32_XFD) to set XFD[18] = 1
- :   3. VM-Exit due to the WRMSR
- :   4. Host IRQ arrives and triggers kernel_fpu_begin()
- :   5. save_fpregs_to_fpstate() saves guest FPU with XFD[18]=0
- :   6. fpu_update_guest_xfd() stuffs guest_fpu->fpstate->xfd = XFD[18]=1
- :   7. vcpu_enter_guest() attempts to load XTILE data with XFD[18]=1
- : 
- : Note!  There's no KVM_SET_XSAVE2 in the above, i.e. this doesn't require userspace
- : to trigger save/restore for live migration or whatever, the only timing condition
- : is the arrival of an IRQ that uses kernel FPU during the XFD 0=>1 VM-Exit.
+Then in svm_recalc_instruction_intercepts() we do:
 
-https://lore.kernel.org/all/aVMEcaZD_SzKzRvr@google.com
+	/*
+	 * If there is a pending interrupt controlled by GIF, set
+	 * KVM_REQ_EVENT to re-evaluate if the intercept needs to be set
+	 * again to track when GIF is re-enabled (e.g. for NMI
+	 * injection).
+	 */
+	svm_clr_intercept(svm, INTERCEPT_STGI);	
+	if (svm_pending_gif_interrupt())
+		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+
+and in svm_set_gif() it reads well semantically:
+	
+	enable_gif(svm);
+	if (svm_pending_gif_interrupt())
+		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+
+> 
+> And then call that from svm_recalc_instruction_intercepts().  That implements #3
+> in a fairly maintainable way (we'll hopefully notice sooner than later if we break
+> svm_set_gif()).
+> 
+> https://lore.kernel.org/all/26732815475bf1c5ba672bc3b1785265f1a994e6.1752819570.git.naveen@kernel.org
+> 
 
