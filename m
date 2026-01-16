@@ -1,176 +1,198 @@
-Return-Path: <kvm+bounces-68343-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 186FAD33BC0
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:13:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E98D33C1F
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B90DA30C7C72
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:07:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5307B302409B
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D679F340A67;
-	Fri, 16 Jan 2026 17:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A812234AAE2;
+	Fri, 16 Jan 2026 17:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="GFCcjZPG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oJUtK6/c"
+	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="DWNXtTIa"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E20F225760;
-	Fri, 16 Jan 2026 17:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF0633CE82
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768583248; cv=none; b=WpxhOr61ylMgkKqgk3K5ITyEyp6qgc67zwVIuwxbVVD9opWHcfN/MkFVKn3QC+l9knfR408gMTOcudG7hnsEWeR5ARS2qEu+nsNMnmM2b3vlj+dQ2tPk7vsydA8loZFvfWwJzzXE8yNNI6tF/G4QIcVou7xqtdRjiJ2Rz50EK+w=
+	t=1768583369; cv=none; b=hz06BcbpWUN8i5idUqDvDBY8Raw9xgf7jtJTdlWIJEaL3vxSsb7oxxwO5MFKc0Ftgv6kFnxDOBXJHXwAn417+YMSRkucX3a0X9vCjDCJMsWrFQvtRK1ZxPzO6wVeqSZt+BfTPjo1E9cyLN1Cvpmss8SBWL2nhTDL/D6sqlNSf5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768583248; c=relaxed/simple;
-	bh=7zvL/ewtx4ZhPc+58i7vApUSr0EHDK7NMcwOu+Lm63o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=frzxISveophdphd06LjqtV1PsmptJpSdhq7OJrf6ExvIkPpj74yI66fJFncWweUA1NLCVPDYYiu+G1nPiR5/2m8o6soKgJsOX7lDyGnx+gHNE18Q1q1WACAs6kmTOP9Mgl3s+cBNfURUeFnUGMREIgQzWhsiufbRk7P6faHFsAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=GFCcjZPG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oJUtK6/c; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id BFB471400083;
-	Fri, 16 Jan 2026 12:07:25 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Fri, 16 Jan 2026 12:07:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1768583245;
-	 x=1768669645; bh=fZfhcxUuRhh+8zxgSurwHPh1rKBn1eKgmHwxFyByx44=; b=
-	GFCcjZPGtgYvpfahB+xCAhgqw7nO4+dGJ8LaEeDAqTyO06OvXnc7ORpwQn5zLDKr
-	cEue67EP1YaBwx4YtJXO+/bN+VVQ8IOojEhpepOLYBzxF786w6w2wlTn0v4EpcR/
-	YtISVhhXqXLn/Es7RVkgq6Qc3fzEJq0RtVqXltIbuaacstB8ykYcNBS1VJMqAl2h
-	mSpIebbRtSnI9K1JHaXLrUWmYhQHSjzPfnUou2acwjCpPgt11k9WKE2enAz9CECl
-	WPWZpCvOJBw8ntNxoLDOd4OEtjmX3d3jazymrVtWtGZfVntkSbpfTd0F2TQfKYDv
-	nMXmKzit0uxTSm8RsHbE2A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768583245; x=
-	1768669645; bh=fZfhcxUuRhh+8zxgSurwHPh1rKBn1eKgmHwxFyByx44=; b=o
-	JUtK6/cy6LX8KG0eYdJ7Nj0HK7LhRmMvZGr4AidIraAy3NafFKnTtgGYH1jqqrha
-	g8H7sexRa6OX2oHGh/CeegnSCnTtcWuuIK8F7xl0rUP04GYiMPfzEpIdGA1WfSzf
-	iJT3ZVZrPElfThHGalo00jGVfQhsh2GBR2X7wARMmWVXn0B92k5eMhzRffgRMroL
-	r5mYm3mOR/07LyI1AyWwvQwxwjIxyR3SEoXXTp0r51qfQnOj4e/jL8CUGPOVmKS0
-	WiEi0izMluX8JIPEBgPzqQl3sHqdhLH2OfeCf1qz1UJ7ezj9nkiXPLna9pibAqCr
-	/5/BCKVLKh7OC+W0BkTXg==
-X-ME-Sender: <xms:TXBqaT3wD7funZF4DK5edR7ovQKX6nBAvmAciHdl1Xc0qhUp_vhcww>
-    <xme:TXBqabaHyYWXQoiZYiJpWzqa-DjkC_VjLtUogiBmsAW4-mvW50aCedu0gIxp_RXPR
-    aS1aFlfBoluzsdiRLHBQLhYfaeloS1hfXwu7D4J8XSYDHgedbuPnw>
-X-ME-Received: <xmr:TXBqabIb-lwWT-frYCRtXWXXlo1Et0IdvTUnVuY_85_aVXPsL31EGdY64OE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvdelhedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepiedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheplhhiuhhlohhnghhfrghngheshhhurgifvghirdgtoh
-    hmpdhrtghpthhtoheprghlvgigrdifihhllhhirghmshhonhesrhgvughhrghtrdgtohhm
-    pdhrtghpthhtohepjhhgghesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhonhgrth
-    hhrghnrdgtrghmvghrohhnsehhuhgrfigvihdrtghomhdprhgtphhtthhopehkvhhmsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:TXBqaaHVp76kBNmsi_UnNVPa-J9WD8oxYJZ9l9iy7afEqinYx8_tFg>
-    <xmx:TXBqaSsS2ZO4xP94ChtaARLMKNUo_Y7Rk7qtlFlG7EpR_fobJ0JeIA>
-    <xmx:TXBqaZtiMQKi9zwABFjF8NYgbBKpA8aPCIVA1CfonKecXpBaYzsvTA>
-    <xmx:TXBqaQAaxonVlzvYJzFuAj-AXUfB-c8TRIjT0D2aBzPzRYOFNvm_Qg>
-    <xmx:TXBqaVsHlqsOrgLokVS93syW0S_Uo-Pjxd_pk8kWrI6nD_o3T2S82b2U>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 16 Jan 2026 12:07:24 -0500 (EST)
-Date: Fri, 16 Jan 2026 10:07:22 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Longfang Liu <liulongfang@huawei.com>
-Cc: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
- <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 4/4] hisi_acc_vfio_pci: fix the queue parameter anomaly
- issue
-Message-ID: <20260116100722.5bdb30d4@shazbot.org>
-In-Reply-To: <20260104070706.4107994-5-liulongfang@huawei.com>
-References: <20260104070706.4107994-1-liulongfang@huawei.com>
-	<20260104070706.4107994-5-liulongfang@huawei.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1768583369; c=relaxed/simple;
+	bh=OgfGYzyoOo7LnR2rlb7Y0ATya0bhxed4yd8DBJmBSVk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=II1ldEC+lxeIqq9IZrHXoNBgjSXCJXBg6cLreSd1LzUTBIKUC8D7wjzjIavp0IJI5m8nBlD+oE0F1roOhumtEHK0oZt/AzqwUB6nGt0M1DZPdaqwzJVuFoCuXbuhcXEemCpWSNejTmADMnSFedLBe/6StlcDPA05003ssnctGEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=DWNXtTIa; arc=none smtp.client-ip=79.135.106.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
+	s=protonmail3; t=1768583364; x=1768842564;
+	bh=hgF1sC5w0nZhRl9CXrxpuRnpTJCUGr7J7j9UsMP7WBU=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=DWNXtTIayxOvHp4Sq0R+LiqaUQvG/qOVVK7VcxgSyVgrAIvJawhtepERoEqLfR7mK
+	 hFINzuMEkx9KiZ22uOYnI6cu+dXAGwb5yoWuAOQrC0EDciUnSwoZTSOqHh+iuHiobm
+	 j+ZkR17pkEgsfakpDgdxe6SeoxP89E2DzB3+gIu4mOgDj7OzXAK5N7HqZPob4J0uf5
+	 YxsQu5qJ6uK6BSMUkEkX7/pPV3RFlIxcsgWPe3jl/qO59j4y5ThHPjsR6KLk9DV9z/
+	 Ib9gLMeqFMpZphkBWOfm1ZGrCEA03kNTGt3qvaiJUTVPUnP3TcWnnXJvxWWkDGFzha
+	 lDxDws0+bUIMg==
+Date: Fri, 16 Jan 2026 17:09:17 +0000
+To: Sean Christopherson <seanjc@google.com>
+From: Maciej Wieczor-Retman <m.wieczorretman@pm.me>
+Cc: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Alexander Potapenko <glider@google.com>, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+Subject: Re: [PATCH v8 09/14] x86/mm: LAM compatible non-canonical definition
+Message-ID: <aWpv9MgPHMYR27I0@wieczorr-mobl1.localdomain>
+In-Reply-To: <aWpuuiuqZhkGRj2B@google.com>
+References: <cover.1768233085.git.m.wieczorretman@pm.me> <0347c61eccf739ad15ec62600f009c212d52e761.1768233085.git.m.wieczorretman@pm.me> <2968b97c-5d71-4c05-9013-f275bdbd9cd5@gmail.com> <19zLzHKb9uDih-eLthvMnb-TF7WvD5Dk7shNZvYqyzl7wAsyS6s_fXuZG7pMOR4XfouH8Tb1MT7LqHvV5RXQLw==@protonmail.internalid> <aWpRwJqjzBxOaRwi@google.com> <aWpb1AnRHW2yupZp@wieczorr-mobl1.localdomain> <aWpuuiuqZhkGRj2B@google.com>
+Feedback-ID: 164464600:user:proton
+X-Pm-Message-ID: 6407d752904376ac3bb2995fc8da4a870aabc55b
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 4 Jan 2026 15:07:06 +0800
-Longfang Liu <liulongfang@huawei.com> wrote:
+On 2026-01-16 at 09:00:42 -0800, Sean Christopherson wrote:
+>On Fri, Jan 16, 2026, Maciej Wieczor-Retman wrote:
+>> On 2026-01-16 at 06:57:04 -0800, Sean Christopherson wrote:
+>> >On Fri, Jan 16, 2026, Andrey Ryabinin wrote:
+>> >> On 1/12/26 6:28 PM, Maciej Wieczor-Retman wrote:
+>> >> > diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/pag=
+e.h
+>> >> > index bcf5cad3da36..b7940fa49e64 100644
+>> >> > --- a/arch/x86/include/asm/page.h
+>> >> > +++ b/arch/x86/include/asm/page.h
+>> >> > @@ -82,9 +82,22 @@ static __always_inline void *pfn_to_kaddr(unsign=
+ed long pfn)
+>> >> >  =09return __va(pfn << PAGE_SHIFT);
+>> >> >  }
+>> >> >
+>> >> > +#ifdef CONFIG_KASAN_SW_TAGS
+>> >> > +#define CANONICAL_MASK(vaddr_bits) (BIT_ULL(63) | BIT_ULL((vaddr_b=
+its) - 1))
+>> >>
+>> >> why is the choice of CANONICAL_MASK() gated at compile time? Shouldn=
+=E2=80=99t this be a
+>> >> runtime decision based on whether LAM is enabled or not on the runnin=
+g system?
+>>
+>> What would be appropriate for KVM? Instead of using #ifdefs checking
+>> if(cpu_feature_enabled(X86_FEATURE_LAM))?
+>
+>None of the above.  Practically speaking, the kernel APIs simply can't aut=
+omatically
+>handle the checks, because they are dependent on guest virtual CPU state, =
+_and_
+>on the exact operation.  E.g. LAM doesn't apply to inputs to TLB invalidat=
+ion
+>instructions like INVVPID and INVPCID.
+>
+>By the time KVM invokes __is_canonical_address(), KVM has already done the=
+ necessary
+>LAM unmasking.  E.g. having KVM pass in a flag saying it doesn't need LAM =
+masking
+>would be rather silly.
 
-> When the number of QPs initialized by the device, as read via vft, is zero,
-> it indicates either an abnormal device configuration or an abnormal read
-> result.
-> Returning 0 directly in this case would allow the live migration operation
-> to complete successfully, leading to incorrect parameter configuration after
-> migration and preventing the service from recovering normal functionality.
-> Therefore, in such situations, an error should be returned to roll back the
-> live migration operation.
-> 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 394f1952a7ed..e0cc20f5f38b 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -406,7 +406,7 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
->  	struct device *dev = &vf_qm->pdev->dev;
->  	u32 que_iso_state;
-> -	int ret;
-> +	int qp_num, ret;
->  
->  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
->  		return 0;
-> @@ -423,18 +423,18 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	}
->  
->  	/* VF qp num check */
-> -	ret = qm_get_vft(vf_qm, &vf_qm->qp_base);
-> -	if (ret <= 0) {
-> +	qp_num = qm_get_vft(vf_qm, &vf_qm->qp_base);
-> +	if (qp_num <= 0) {
->  		dev_err(dev, "failed to get vft qp nums\n");
-> -		return ret;
-> +		return -EINVAL;
->  	}
+Oh good, then I'll leave this function alone and try to work it out differe=
+ntly.
+Thanks!
 
-Do you really want to clobber the errno or should this be something
-like:
+>
+>> >> > +#else
+>> >> > +#define CANONICAL_MASK(vaddr_bits) GENMASK_ULL(63, vaddr_bits)
+>> >> > +#endif
+>> >> > +
+>> >> > +/*
+>> >> > + * To make an address canonical either set or clear the bits defin=
+ed by the
+>> >> > + * CANONICAL_MASK(). Clear the bits for userspace addresses if the=
+ top address
+>> >> > + * bit is a zero. Set the bits for kernel addresses if the top add=
+ress bit is a
+>> >> > + * one.
+>> >> > + */
+>> >> >  static __always_inline u64 __canonical_address(u64 vaddr, u8 vaddr=
+_bits)
+>> >>
+>> >> +Cc KVM
+>> >
+>> >Thanks!
+>> >
+>> >> This is used extensively in KVM code. As far as I can tell, it may be=
+ used to
+>> >> determine whether a guest virtual address is canonical or not.
+>> >
+>> >Yep, KVM uses this both to check canonical addresses and to force a can=
+onical
+>> >address (Intel and AMD disagree on the MSR_IA32_SYSENTER_{EIP,ESP} sema=
+ntics in
+>> >64-bit mode) for guest addresses.  This change will break KVM badly if =
+KASAN_SW_TAGS=3Dy.
+>>
+>> Oh, thanks! That's good to know.
+>>
+>> >
+>> >> case, the result should depend on whether LAM is enabled for the gues=
+t, not
+>> >> the host (and certainly not a host's compile-time option).
+>> >
+>> >Ya, KVM could roll its own versions, but IMO these super low level help=
+ers should
+>> >do exactly what they say.  E.g. at a glance, I'm not sure pt_event_addr=
+_filters_sync()
+>> >should be subjected to KASAN_SW_TAGS either.  If that's true, then AFAI=
+CT the
+>> >_only_ code that wants the LAM-aware behavior is copy_from_kernel_nofau=
+lt_allowed(),
+>> >so maybe just handle it there?  Not sure that's a great long-term maint=
+enance
+>> >story either though.
+>>
+>> Yes, longterm it's probably best to just get it right in here.
+>
+>As above, I don't think that's feasible, because the context of both the c=
+urrent
+>(virtual) CPU and the usage matters.  In other words, making __canonical_a=
+ddress()
+>itself LAM-aware feels wrong.
+>
+>Actually, the kernel already has to deal with masking LAM bits for userspa=
+ce
+>addresses, and this series needs to unmask kernel address in other flows t=
+hat
+>effectively consume virtual addresses in software, so why not just do some=
+thing
+>similar for copy_from_kernel_nofault_allowed()?
+>
+>diff --git a/arch/x86/mm/maccess.c b/arch/x86/mm/maccess.c
+>index 42115ac079cf..0b3c96f8902a 100644
+>--- a/arch/x86/mm/maccess.c
+>+++ b/arch/x86/mm/maccess.c
+>@@ -33,7 +33,8 @@ bool copy_from_kernel_nofault_allowed(const void *unsafe=
+_src, size_t size)
+>        if (!boot_cpu_data.x86_virt_bits)
+>                return true;
+>
+>-       return __is_canonical_address(vaddr, boot_cpu_data.x86_virt_bits);
+>+       return __is_canonical_address(__tag_reset(vaddr),
+>+                                     boot_cpu_data.x86_virt_bits);
+> }
+> #else
+> bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size=
+)
 
-		return qp_num < 0 ? qp_num : -EINVAL;
+Thanks! I'll try that :)
 
-And if you do that it might make sense to continue to use ret rather
-than add the new variable.  Thanks,
-
-Alex
-
->  
-> -	if (ret != vf_data->qp_num) {
-> +	if (qp_num != vf_data->qp_num) {
->  		dev_err(dev, "failed to match VF qp num\n");
->  		return -EINVAL;
->  	}
->  
-> -	vf_qm->qp_num = ret;
-> +	vf_qm->qp_num = qp_num;
->  
->  	/* VF isolation state check */
->  	ret = qm_read_regs(pf_qm, QM_QUE_ISO_CFG_V, &que_iso_state, 1);
+--=20
+Kind regards
+Maciej Wiecz=C3=B3r-Retman
 
 
