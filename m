@@ -1,238 +1,193 @@
-Return-Path: <kvm+bounces-68321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F47ED330F3
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 16:08:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE2D5D331D4
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 16:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E9FCF302D2FB
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:03:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E37DB3165227
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C683396FA;
-	Fri, 16 Jan 2026 15:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="q94thEUo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAE8339709;
+	Fri, 16 Jan 2026 15:08:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010033.outbound.protection.outlook.com [52.101.201.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91FF1E0E08;
-	Fri, 16 Jan 2026 15:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768575800; cv=fail; b=kPWRgpubr7XqaGGoqCdWGb2XRgOnmAXcXmZTkqPOs6/ZyX40/Ps3oCaDjgb7M6ipxTfnHWon34titK60MNZdpj5XOaxkzSNtCi0o2aKHUtS1RDZayIJ0FlDsBmRI4pXiWNdww6UmQRAfkwEJevy58/UbLzrs3nwhbTos2xXU6rw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768575800; c=relaxed/simple;
-	bh=W6oSMARwdxciS8k6kgwSszDcuHtnYStd8UxA/phDL6A=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=B906S2B++/QEmlZ02w3WbZwdiwbvti0kHtGCADQWuZ40ZVevx5GWe5Q5ajsqqr9H6t8f0ITmISw5uq5o1yJtGcuYZ5gGaowOkOklWSVSjFddmTVldfy07ekOFqi2Tt2RB8vFjuVouzyQgAuCpH3g5czJmCVJJERe7mok7hVket0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=q94thEUo; arc=fail smtp.client-ip=52.101.201.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QJtLRWr9vSdMvXCx5BUOPPzCm+h+BT+J13UZ7zb/gE2QUPU5EBixQDXanSC/WszlOzgzFJYPaAnZL4FGkapJw8jVwqh7mShEMF0/LK6UTqUpwtToA0aj0MZa8G2vfmuFtBJM+gDnG4covO51fP4gZVa9xPbX/yCE2t/ckSHpbkhQYiJD6vIyD2YuIBgQ2AjO+qeDRecLmFwX4J4vRfCtGTSpW8bOWD5/gk6/cH4n94LCRamTIPZ8LqorV6DckmddqKam9Q0idKWxv5GhkuPSUfh+a/dnriJN+9vn6cWFcYBZj54rld6qvks+xuW+2a6U79hLwIrK6jWZhbxvQ+cCgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rD4RrUQxCWzsRb6/Ad0aC7rLRyMC4U8yTzZ3prl9fgo=;
- b=AET1DXiQN8aef1rJlRSUx50AYBwg6r8/LDFIz0d7sQjYLzlxM/EmTQZPTv8BrFjdW0ySt3GzNQp98hjkTYI3xePB5jvx1AUVsJ+AGjnEK5eh0vDlS3GsouJjMwaHDFvmmrlxT9rnDisx0aM04tt/z4bEJrdlxQ851uJlCM2KOhHa6rr/Zve/Z6gEFnTB8ZCQi1zrTS110saqwreV/4ivSiFjUR6NGIfN9YST6cbzYrhxV+n6J5rv16z7uaToi8hwFv1GXh0e/A0qdATeBAoNhdNscVRwkcalMMt0HfLQ2j6xOozvEM60Uc7soRdZ0qRs4NpFyqPatFMG29Zjn07sVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
- dkim=pass header.d=nokia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rD4RrUQxCWzsRb6/Ad0aC7rLRyMC4U8yTzZ3prl9fgo=;
- b=q94thEUoD5qCNKSnulZhM083+/DcvFoJtNhNqAETFFTI+C+qEQS4/MtD/UafsL1uzQfssLnpAGNL/q8ekokX0QRMq9tr9RWMuz8wQ3lfvdUOpSDSWFwDP8dj8jNVXLimlQBr6+7ZQFpD10IS5aObiq1aJLc9plKuxAWi6LAyf5uJ/aoAexBke7wXb2doIPPXzdbPovB2sl2a4In+ArIhwNBcS264nDfQLF3vAxin6VKpQmyu3SOETmOb3ZF22il01V8eubwtfUXG1LxBrqko+ll3ENPHCngx0ZRR096NJQiBIxnYbZMIFsyAxddonj4EOae3B0o0Bhfj0n1eBK287Q==
-Received: from BN0PR08MB6951.namprd08.prod.outlook.com (2603:10b6:408:128::14)
- by DM6PR08MB6204.namprd08.prod.outlook.com (2603:10b6:5:1ec::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.7; Fri, 16 Jan
- 2026 15:03:12 +0000
-Received: from BN0PR08MB6951.namprd08.prod.outlook.com
- ([fe80::4dd1:e1e:56b0:b178]) by BN0PR08MB6951.namprd08.prod.outlook.com
- ([fe80::4dd1:e1e:56b0:b178%3]) with mapi id 15.20.9520.005; Fri, 16 Jan 2026
- 15:03:12 +0000
-From: "Anthony Pighin (Nokia)" <anthony.pighin@nokia.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, Alex Williamson <alex@shazbot.org>,
-	=?iso-8859-1?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v2] PCI: Lock upstream bridge for pci_try_reset_function()
-Thread-Topic: [PATCH v2] PCI: Lock upstream bridge for
- pci_try_reset_function()
-Thread-Index: AQHchvhedpRiG3PAoEapw2tMBME4FA==
-Date: Fri, 16 Jan 2026 15:03:11 +0000
-Message-ID:
- <BN0PR08MB69514F40B402A06902578DE5838DA@BN0PR08MB6951.namprd08.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR08MB6951:EE_|DM6PR08MB6204:EE_
-x-ms-office365-filtering-correlation-id: 7decfa08-ff61-4411-0ffc-08de55105e29
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?Uh/lQ7CCAZL0IO8nlMpyfnqlvX4JXddfSzLENWQ9D4LJt+x3j1PfphWhuK?=
- =?iso-8859-1?Q?xsyynyuCDqYmfGLnKgbzBppkDFRnufkorr4+mMJwjTsh/eccPGCFOGkBkq?=
- =?iso-8859-1?Q?vlbPH5NBju4k5aLHMIpg8nPkEOWVqY6lzNhgNkutXbCYnEp5yXYTjs/S3r?=
- =?iso-8859-1?Q?lQGansxtdnn5QbDxNRHTHChQbMP9EaYvTQb68RPqu4J+MXeMJq5N+F7dLL?=
- =?iso-8859-1?Q?0kOxauL1Y4YVqv0Eke3CpeQJqyP5og9YKnFo9FuJlT9nktEbbB9vHt03V0?=
- =?iso-8859-1?Q?Y9wTdglzB7yWTziYh3CHxb6z7yeifbAm0cJ/dBQ5rZQO8kYvgTNkxEpJNh?=
- =?iso-8859-1?Q?emTW5YF3UkbeY1gMPV3HGR8Egu6v74y9OsWbF1WPIdX3sNTQnfKeVuRKxR?=
- =?iso-8859-1?Q?UMSbJstn5sUIQN2yXo0CXdFHqXvvwFDroamT/B0tQKnjVgmTgTjpQcn3PH?=
- =?iso-8859-1?Q?tZegW/lcbpnN1NuTfe1rFOiaeJq0oGH4UAr+xTIE2RtBrlQ70GBYwLrVSd?=
- =?iso-8859-1?Q?5AsOweOM8armHUs28tJ0T9jgsp50aRaIYjm8b8Kkt38nvKiCdPilYsfVre?=
- =?iso-8859-1?Q?6yWQQv24is7G+niWnvB8AWPxs5liZgx9E8jghDFOtJjH/nA63aiv3LYzqf?=
- =?iso-8859-1?Q?DRhT0nDfaVE3tPzYTWMsX/vFlbT1jZPOhdZJVKpjUVl+AFnfMqXQat+vnb?=
- =?iso-8859-1?Q?IsXin1THZs4UoG4qMM24z/uA9vkirKgD+OSFgRdnRP1RwmyyevxEXpD9vw?=
- =?iso-8859-1?Q?P/thW6SVQcrQQU9P1Z682KGp2KlKCNwa/cStjW2K3zZmDSeFK3FGY78mXg?=
- =?iso-8859-1?Q?QUrfZx5yAOkN6ifypgzrWACRU9wOai+rcLR3XqaY9cR5pPrgPTl+PAscei?=
- =?iso-8859-1?Q?M4523B5u/FW8JTISMJe2fq3y6UMGCC1tzA3SVlVIgECYK3LUCXS88U9Zc6?=
- =?iso-8859-1?Q?eG96FKta8s6P/+vaq5KXsvrDllZxictEX2g8bgH2FrmGuyESsybIxPGAr4?=
- =?iso-8859-1?Q?piXVESOlrlHDU8l+jX2kpsDIQe6kcsgSxiq/Xg0/gjlU331y48bdb8AsnA?=
- =?iso-8859-1?Q?lYvjYRto2wdnIdJc198PYtgnTnxSaHKdzJt88Ic7vdRFLPx4O70g/Bioxv?=
- =?iso-8859-1?Q?Zp4YLkXAj/DqjiPd0Wab91Qs9XIClbkusWeS5pZVpJt+Qhyu4lbfln/r/j?=
- =?iso-8859-1?Q?ZVmzDlLJ02x36r/3J9xHTb8CQ5rQrjwDu0/IZzMeSfIgE27z6v+Iuh8AJT?=
- =?iso-8859-1?Q?uPjs22DSiaPvD6CHqj1NwEd2PMUXANWLh3XNvKK2Vu8EBprRfC7ciATJ8Y?=
- =?iso-8859-1?Q?P+fGITwlNyKDLrbCzJ3+EMYbude3NHJdQgemk8IOIhApZFnOS52C5Gj62B?=
- =?iso-8859-1?Q?hUL4icZSYk81+FkBCQOZ2MkzJor9OxSPYopzySv4EK1DrHxiHunjkDi6RO?=
- =?iso-8859-1?Q?RxO+T6xP37z/bYwz+B8tpVhoo/EsB9pwOcEcNk7slGdaGgIUogIjd89/fG?=
- =?iso-8859-1?Q?vqJ2z5fNFBAOCBilL4+O/nKjTYPZyRDQRQR929P8GvscFqROLoSuOvnAI0?=
- =?iso-8859-1?Q?WWCw7JhdoJ8kaldzDJnl4mQwkjUs3sBTxmFUUgQ8H+utxwwxKeg3tbq02K?=
- =?iso-8859-1?Q?O4VkJkD6dZYCgUTYNY8DMOv23vjlueYfalzKTzMW0JALX2kgTaNYr6hkNC?=
- =?iso-8859-1?Q?ZZC0g2xLoRkaLRhFKaQ=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR08MB6951.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?Deztr0vP+9X7CoucbrJPJZwyzYrdBDRBTrAS4bwn2j7dyP/XSUrdE263t6?=
- =?iso-8859-1?Q?p2cX0sTLpY1tikr/YYh7vsrx0hCoJRPi+2tNzlNCglauwssmUuiSQ+e0BT?=
- =?iso-8859-1?Q?JTOduY8QrIHuUYnqxVtmpGk5gXbgh2S4aB5TwDQ1ZXbCicWw1oQpsSQPeo?=
- =?iso-8859-1?Q?cRG58ddMuYOriehMsIpXqNYvWzScrwdQR/dXbXNRQsgRgYd3rQFuZwlJAg?=
- =?iso-8859-1?Q?4pT7R/+1qhVE43RrFH/0bdiYka/R7Eiej4Py1MkHflmhcvife71WuxWxWr?=
- =?iso-8859-1?Q?dJ3HNt6t2pCPalzVmi/KybJ70uIo4VxPtPuhkbLWud0cQptM5ji7jZZqCE?=
- =?iso-8859-1?Q?mkZ/tE70Ep/z7Syhbj8BfqRz6UaN+xJfgBAg+oq0OagatnaSyqmf2BxJiN?=
- =?iso-8859-1?Q?5rBKZEnyWytEMCZ02uUjctkBVSp98ICXqsxT5Q6a2CaPv274p/OZLHAWBa?=
- =?iso-8859-1?Q?hA68g7/6npYopzuYi5KKo53oNujtE9ssQuQIjyVoLvFgqrn6lbT3XK/SHz?=
- =?iso-8859-1?Q?BBsOS+7rV65bEGk/B6s32T+RvxqHOUeAgJmv4mSsfICvCo8BuGQ3IHdocO?=
- =?iso-8859-1?Q?6X2LxQ82XRAUT6HV/Jgkw7ryQsOU3PWU0v/ZYbUZTWeIu3ebKIe6ciF1Mh?=
- =?iso-8859-1?Q?taC3R1ORtDWDr9EVl8dTPtnKNCGNfn1aeNNfFxIo1H7k9uQc6btQ1pWvBQ?=
- =?iso-8859-1?Q?t9lamPXUfT6Gh+Q9lp6COzRmBFgdaarI8FWUTRzWXzsQLwobbcgzp3iU5w?=
- =?iso-8859-1?Q?pM1j7Te5Mx8FN3TIBA32ywxtjm4Ysrf/cCPUYxOb4JJfGYpJuluxmBAM4u?=
- =?iso-8859-1?Q?hJNdPB4R+7It/PpLm9ifppc8hESstpjh0Wvp99gTY3jGo0XQ5lm+PlOiAW?=
- =?iso-8859-1?Q?YXl1db+MqQ0ZbP4ZSjKVCy85LVoiRqFAc6Yjy2/WCzULFWj2P9oLyxi9JW?=
- =?iso-8859-1?Q?Wnf+3369lHuRFx1CccmurjXG9wBCvURlqXXeCDc6SKbDSH5LTA2sYd892j?=
- =?iso-8859-1?Q?WMcMf66yoVzibNgOuYRbvKBGZw+6i9tYAjvWajMy0raB3y5Kfz4z0HHcj9?=
- =?iso-8859-1?Q?COHaplcf/BPxQZS49xdBoeRfHVYFzLJ0mAZC4aDTyOY7UuX0bjWzGb91l0?=
- =?iso-8859-1?Q?K6ohq5MmUSTgBdd9qgSCgvgbaVVU1h1TmcONdOy4v8ccQf1rDeZYnn/3mh?=
- =?iso-8859-1?Q?eQs/tsKj6sLubgkFFgFSGe7sqYaaY/DUcAd7FPmVSmSxJiZJBFhJL7N6vW?=
- =?iso-8859-1?Q?Q4/I1jgoBqmD04y+zAUlRIl80P8Ko6k5avz3wLZ0ssg9NlYXJ1S+4AVoKv?=
- =?iso-8859-1?Q?h7aUKGvhzrK0OWPD2E3FzBJi1NWo7nYBdrVoRB0JOI3GzEGo/ONL3N4dzQ?=
- =?iso-8859-1?Q?r+ZZOgZnsKTMF0ffSITb1bWC8ulfRipNTJZAM8hf7NJ9F3UbhyH8G+UFU1?=
- =?iso-8859-1?Q?BoloiJ2g6x2YyhfAIyl4NXrwdR7txMTyrrK1wKZcW2+QsjJVpLBb4Bojyk?=
- =?iso-8859-1?Q?Ib2EYWzZNs4CXQJoUu7ROykzg7PvZT9WVkdYNzDTFaD7HvZGTAiH3zXUD+?=
- =?iso-8859-1?Q?jz5PV7P555GTPqQ3DHXGbHVMOPJL5J8flnhKsIY7cnGaaZGCMZF7v5gLeX?=
- =?iso-8859-1?Q?iFgqDeX1ZEDwnPLKKqPOUdGtlBBssK1YhU1zPCe5JusYRjZw/UyiIH+U+B?=
- =?iso-8859-1?Q?gQ6pkauQg+spMucTT805SDd23sAIwmumqq2FN0J0VKirgXqgnOc0EYPCve?=
- =?iso-8859-1?Q?YKuKkk8RDyXwrzKLzZs/CurppQDfWaArV14m+Q+NrsBz4lgXgPMnWySiVv?=
- =?iso-8859-1?Q?X9XTl/ggUQ=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E5F2248A0
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 15:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768576108; cv=none; b=NWKJnz6sOzusHKL8eNAGAat+pkIdMRobPC5ZLvGdXgGHNfGLzQHsjSVACeX/yqxq2sc9HbvGG0HC/Ar5btZx8xOVIz2nTw9G5vuE+kDYjHIjvUmKldso4myEgHFGiDys0M9o49T3nk5sM5vGdxLhCkTuLDsu4Iq+Dj/RLMLopkA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768576108; c=relaxed/simple;
+	bh=QHCCmEOoBzte3q9XY4I1SFPAtCOcoe5X79AiBhfHCrI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dVVDpXPbrB1UFGYeor4reQlJaRtNDMqmcbmIdz+nBpgoUAKLa/l0ZhfIh4Vj7EOMoZx0vI5VbvbPZkA+MOghdIZnu1L9r1QeEOJ2D6kv3+WPRJJzyhu2uJqQL3qBUbpkmrFMn7nDobqOpccvwc56kEmFhIyfm11DslTfD7VaHt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-661066bdfb9so5699933eaf.1
+        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 07:08:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768576106; x=1769180906;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X/LezpceeHMMjHuaLAScBWOUUdz81LThdVaEz3+rGqs=;
+        b=U4XPj4fV1DUvNQ/b8+1AmSJ1WR2p41X9/75rw9DCaLJ24nqH/MOAEseNmcm5/Kf8l4
+         byfZLFmfR8JoaLLnlIWBtyCow06HnU8RvJv7Y9QLSkGV2hqcFmaNq4wJZYJdCP7/O5UO
+         QxUw9h8YHWIfG7soCzC9Cw/DE7h+Murlhyz2bDNkEAqqDNIXY1R/KYYSjDjgDpeZbHvb
+         9mNOAzDDF4FFFyFlNQyOfuJerpQUbpIbfhfsj2UXZI+MioXXwFULDPoP+LlhR8owewa4
+         j5GDMNuclukJxy1S97yfG3J068pBS51Z80mi4Z7F8DlGhr+xwUk1jdHP6azoOxVslxvL
+         zIqA==
+X-Gm-Message-State: AOJu0YwILYx/aJ+FQLjfCSoZRLPaAU2v6w/mp/jzWDijkLwQRMhC9mq7
+	BY4GPtL4gk1dLYBVmwdBLZ4n4U4TA21/oMJNvlgPB7D7ix/EmwZ4OR2AgZvzj07L5l3dHVvEFJR
+	MsxhQOQSSCpudJAABMo5XUGNMRiWoruQ83zHO40Gp/TKRLl5VUMKRUEdwFPi2nQ==
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR08MB6951.namprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7decfa08-ff61-4411-0ffc-08de55105e29
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2026 15:03:11.9628
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wIxKGmN9IaOA9dAwAWEmHSlk5rNrh16gsOA0Gj3/YYfNqz5BoP0PjRYsDBVC6hAQ19eIMpxhrFyyntEhwZW6tYL5fE5DCAyQdgwvFHBpwYc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR08MB6204
+X-Received: by 2002:a05:6820:4def:b0:65b:2a82:d700 with SMTP id
+ 006d021491bc7-661179b64e5mr1501129eaf.44.1768576106248; Fri, 16 Jan 2026
+ 07:08:26 -0800 (PST)
+Date: Fri, 16 Jan 2026 07:08:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <696a546a.050a0220.58bed.0056.GAE@google.com>
+Subject: [syzbot] [kvm?] BUG: unable to handle kernel paging request in kvm_gmem_get_folio
+From: syzbot <syzbot+6f16df7b5a49f0e01b18@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The commit 7e89efc6e9e4 ("Lock upstream bridge for pci_reset_function()")=
-=0A=
-added locking of the upstream bridge to the reset function. To catch=0A=
-paths that are not properly locked, the commit 920f6468924f ("Warn on=0A=
-missing cfg_access_lock during secondary bus reset") added a warning=0A=
-if the PCI configuration space was not locked during a secondary bus reset=
-=0A=
-request.=0A=
-=0A=
-When opening a PCI device for VFIO userspace access (vfio_pci_open_device),=
-=0A=
-an attempt to reset the PCI device function is made. If the upstream=0A=
-bridge is not locked, the open request (esp. VFIO_GROUP_GET_DEVICE_FD)=0A=
-results in a warning:=0A=
-=0A=
-   pcieport 0000:00:00.0: unlocked secondary bus reset via:=0A=
-   pci_reset_bus_function+0x188/0x1b8=0A=
-=0A=
-Add missing upstream bridge locking to pci_try_reset_function().=0A=
-=0A=
-Fixes: 7e89efc6e9e4 ("PCI: Lock upstream bridge for pci_reset_function()")=
-=0A=
-Signed-off-by: Anthony Pighin <anthony.pighin@nokia.com>=0A=
----=0A=
-V1 -> V2:=0A=
-  - Reworked commit log for clarity=0A=
-  - Added a Fixes: tag=0A=
-=0A=
-=0A=
- drivers/pci/pci.c | 17 ++++++++++++++++-=0A=
- 1 file changed, 16 insertions(+), 1 deletion(-)=0A=
-=0A=
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c=0A=
-index 13dbb405dc31..ff3f2df7e9c8 100644=0A=
---- a/drivers/pci/pci.c=0A=
-+++ b/drivers/pci/pci.c=0A=
-@@ -5196,19 +5196,34 @@ EXPORT_SYMBOL_GPL(pci_reset_function_locked);=0A=
-  */=0A=
- int pci_try_reset_function(struct pci_dev *dev)=0A=
- {=0A=
-+	struct pci_dev *bridge;=0A=
- 	int rc;=0A=
- =0A=
- 	if (!pci_reset_supported(dev))=0A=
- 		return -ENOTTY;=0A=
- =0A=
--	if (!pci_dev_trylock(dev))=0A=
-+	/*=0A=
-+	 * If there's no upstream bridge, no locking is needed since there is=0A=
-+	 * no upstream bridge configuration to hold consistent.=0A=
-+	 */=0A=
-+	bridge =3D pci_upstream_bridge(dev);=0A=
-+	if (bridge && !pci_dev_trylock(bridge))=0A=
- 		return -EAGAIN;=0A=
- =0A=
-+	if (!pci_dev_trylock(dev)) {=0A=
-+		rc =3D -EAGAIN;=0A=
-+		goto out_unlock_bridge;=0A=
-+	}=0A=
-+=0A=
- 	pci_dev_save_and_disable(dev);=0A=
- 	rc =3D __pci_reset_function_locked(dev);=0A=
- 	pci_dev_restore(dev);=0A=
- 	pci_dev_unlock(dev);=0A=
- =0A=
-+out_unlock_bridge:=0A=
-+	if (bridge)=0A=
-+		pci_dev_unlock(bridge);=0A=
-+=0A=
- 	return rc;=0A=
- }=0A=
- EXPORT_SYMBOL_GPL(pci_try_reset_function);=0A=
--- =0A=
-2.43.0=0A=
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    9b7977f9e39b Add linux-next specific files for 20260115
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10585522580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9c0b39f55c418575
+dashboard link: https://syzkaller.appspot.com/bug?extid=6f16df7b5a49f0e01b18
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/32edced7b806/disk-9b7977f9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/dec5450e284a/vmlinux-9b7977f9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/65783c99fb65/bzImage-9b7977f9.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6f16df7b5a49f0e01b18@syzkaller.appspotmail.com
+
+BUG: unable to handle page fault for address: fffffffffffffffc
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD e143067 P4D e143067 PUD e145067 PMD 0 
+Oops: Oops: 0000 [#1] SMP KASAN PTI
+CPU: 0 UID: 0 PID: 10212 Comm: syz.7.1148 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:const_folio_flags include/linux/page-flags.h:351 [inline]
+RIP: 0010:folio_test_head include/linux/page-flags.h:844 [inline]
+RIP: 0010:folio_test_large include/linux/page-flags.h:865 [inline]
+RIP: 0010:folio_order include/linux/mm.h:1248 [inline]
+RIP: 0010:kvm_gmem_get_folio+0x12e/0x240 virt/kvm/guest_memfd.c:147
+Code: 00 eb 0d e8 a4 85 80 00 4c 89 f7 e8 6c bc e3 00 4c 8d 73 08 4c 89 f0 48 c1 e8 03 42 80 3c 28 00 74 08 4c 89 f7 e8 b2 5a e7 00 <4d> 8b 36 4c 89 f6 48 83 e6 01 31 ff e8 51 8a 80 00 49 83 e6 01 0f
+RSP: 0018:ffffc900031a7cc8 EFLAGS: 00010246
+RAX: 1fffffffffffffff RBX: fffffffffffffff4 RCX: 0000000000080000
+RDX: ffffc90013fee000 RSI: 000000000007ffff RDI: 0000000000080000
+RBP: 1ffff1100d33380f R08: ffff8880b8640dc3 R09: 1ffff110170c81b8
+R10: dffffc0000000000 R11: ffffed10170c81b9 R12: ffff88806999c078
+R13: dffffc0000000000 R14: fffffffffffffffc R15: 0000000000111e97
+FS:  00007fc8a8bb26c0(0000) GS:ffff8881259ad000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffffffffffffc CR3: 000000007db00000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000001
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ kvm_gmem_allocate virt/kvm/guest_memfd.c:276 [inline]
+ kvm_gmem_fallocate+0x396/0x840 virt/kvm/guest_memfd.c:316
+ vfs_fallocate+0x669/0x7e0 fs/open.c:340
+ ksys_fallocate fs/open.c:364 [inline]
+ __do_sys_fallocate fs/open.c:369 [inline]
+ __se_sys_fallocate fs/open.c:367 [inline]
+ __x64_sys_fallocate+0xc0/0x110 fs/open.c:367
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fc8a7d8f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc8a8bb2038 EFLAGS: 00000246 ORIG_RAX: 000000000000011d
+RAX: ffffffffffffffda RBX: 00007fc8a7fe6090 RCX: 00007fc8a7d8f749
+RDX: 0000000100000000 RSI: 0000000000000001 RDI: 0000000000000007
+RBP: 00007fc8a7e13f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fc8a7fe6128 R14: 00007fc8a7fe6090 R15: 00007ffeb4d2dde8
+ </TASK>
+Modules linked in:
+CR2: fffffffffffffffc
+---[ end trace 0000000000000000 ]---
+RIP: 0010:const_folio_flags include/linux/page-flags.h:351 [inline]
+RIP: 0010:folio_test_head include/linux/page-flags.h:844 [inline]
+RIP: 0010:folio_test_large include/linux/page-flags.h:865 [inline]
+RIP: 0010:folio_order include/linux/mm.h:1248 [inline]
+RIP: 0010:kvm_gmem_get_folio+0x12e/0x240 virt/kvm/guest_memfd.c:147
+Code: 00 eb 0d e8 a4 85 80 00 4c 89 f7 e8 6c bc e3 00 4c 8d 73 08 4c 89 f0 48 c1 e8 03 42 80 3c 28 00 74 08 4c 89 f7 e8 b2 5a e7 00 <4d> 8b 36 4c 89 f6 48 83 e6 01 31 ff e8 51 8a 80 00 49 83 e6 01 0f
+RSP: 0018:ffffc900031a7cc8 EFLAGS: 00010246
+RAX: 1fffffffffffffff RBX: fffffffffffffff4 RCX: 0000000000080000
+RDX: ffffc90013fee000 RSI: 000000000007ffff RDI: 0000000000080000
+RBP: 1ffff1100d33380f R08: ffff8880b8640dc3 R09: 1ffff110170c81b8
+R10: dffffc0000000000 R11: ffffed10170c81b9 R12: ffff88806999c078
+R13: dffffc0000000000 R14: fffffffffffffffc R15: 0000000000111e97
+FS:  00007fc8a8bb26c0(0000) GS:ffff8881259ad000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffffffffffffc CR3: 000000007db00000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000001
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	00 eb                	add    %ch,%bl
+   2:	0d e8 a4 85 80       	or     $0x8085a4e8,%eax
+   7:	00 4c 89 f7          	add    %cl,-0x9(%rcx,%rcx,4)
+   b:	e8 6c bc e3 00       	call   0xe3bc7c
+  10:	4c 8d 73 08          	lea    0x8(%rbx),%r14
+  14:	4c 89 f0             	mov    %r14,%rax
+  17:	48 c1 e8 03          	shr    $0x3,%rax
+  1b:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  20:	74 08                	je     0x2a
+  22:	4c 89 f7             	mov    %r14,%rdi
+  25:	e8 b2 5a e7 00       	call   0xe75adc
+* 2a:	4d 8b 36             	mov    (%r14),%r14 <-- trapping instruction
+  2d:	4c 89 f6             	mov    %r14,%rsi
+  30:	48 83 e6 01          	and    $0x1,%rsi
+  34:	31 ff                	xor    %edi,%edi
+  36:	e8 51 8a 80 00       	call   0x808a8c
+  3b:	49 83 e6 01          	and    $0x1,%r14
+  3f:	0f                   	.byte 0xf
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
