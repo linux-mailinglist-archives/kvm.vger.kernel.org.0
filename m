@@ -1,150 +1,167 @@
-Return-Path: <kvm+bounces-68388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1FCD3864F
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 20:59:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FD1D38736
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 21:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE1EB300268A
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 19:59:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2BC803139DAC
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 20:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BCD93A1E67;
-	Fri, 16 Jan 2026 19:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF493A4AC1;
+	Fri, 16 Jan 2026 20:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wMnVInOM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rip9RKY6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ervu5u3W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D1A345736
-	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 19:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3697E2F3624
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 20:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768593561; cv=none; b=mll1JKmP6xv6DqHmRK71epKJLE2ew10c2SlGvAnSx5pLCtleaijmnp88xrAgYWiEZ2p5RqJatM9GppJseUqepoD1NY9ZJyGrMz5wjtV3sItfKLkwDSmFaeevBp6nRbM+sHt8uAOJjBeI0DxZjNRm/KIAnJEjpXAYvoFDGXpfgGc=
+	t=1768594526; cv=none; b=VG37+qb76gG9aPyWumJXsRn9DV3kE3pRDraGP5Cm1f+QnFRqxSg7H1cuTTALjdyTi/rtj1mEK1Fm0sotGguo/GxWyzzxDLaaLGxfY64inz4BPgbrsDKmOQYA0oc6KJ2coBVrwypB6qfgbD9N31WcCb8rrfxRLRbJ/p+ImW0P0oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768593561; c=relaxed/simple;
-	bh=sm9bqjRyyBx1tfK/mmWy/rukH0wRuwoGD1nMV2WjmCE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q/dlbm/U5IA6JVGDN7akr6W8sbUWiIzGyvOka3F2/pVyKaaAkk4S1DhSiWhyAYXNKs0BD/jsO8Ak1TfB/MLSHGnc71K+0zFO3NFEG19N29Uo0WKkxBh4i1YFDFu4oJsxpNLakSpjbzHQ8cx/3/rmgPt7IHWK3b82VQme5X9WcDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wMnVInOM; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c56848e6f53so1365842a12.0
-        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 11:59:20 -0800 (PST)
+	s=arc-20240116; t=1768594526; c=relaxed/simple;
+	bh=ViVCTMWsZOBUvDZkBJy4R4gHYmuB/wp4Twq+n+RK/10=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=hIJGSMvN5FyEbAZAlxUCSI7B7ybPJTl6n44fHXS5jjFWxxU/nUZA+JBuZ75nc6er4syCIOo6Voj4c+sUgt2tDQ8qVs89tgJOjiKl4r1YAdOfI4T9W1KlTkVbeuGsBGJ0M23oHvXHOMslFgpWQgW129nHpHNcQ6Gx9rXOWJMIs+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rip9RKY6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ervu5u3W; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768594524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=aokF+MKwgeAstmCjHO7lVmWSXdkq7v/KNJPU3598T+g=;
+	b=Rip9RKY6H6XPuN0b3vaIsLJUa6Lz4Lzj6eMuO5Oro+qHXItj2nqjMnaBEOjDlIfccluIZ2
+	g6hUWr8OAnL6bYIQJD7JRPK8FvlJWqQT3XfikV6CJrHtBzzakUIl+YJyomNqgYh0UhdQl+
+	ETFZcYnv7i6pcVwQ5w1EP8YFtEO6Yfw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-411-3tS_Hz7gNauw8gkzPegs_w-1; Fri, 16 Jan 2026 15:15:22 -0500
+X-MC-Unique: 3tS_Hz7gNauw8gkzPegs_w-1
+X-Mimecast-MFC-AGG-ID: 3tS_Hz7gNauw8gkzPegs_w_1768594521
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47ee8808ffbso22825935e9.2
+        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 12:15:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768593560; x=1769198360; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CmVsGRS74zmdjEMM07LPVm6eWi6uP63Jcf4CCC+8B3s=;
-        b=wMnVInOMzuKu66V/7Gl6NWjMzI7mV9TFmmb/BVtCDr2GDa2InJTlGxGlVPbhIj96SZ
-         Tl5/7Z0ksW7h7gjGyXDH0umToCi4DYy1wl5kztv1fZCzhGO35Z67gZiCGbuh+Jd3q2qO
-         l7RvFy448uW7qkVqjkz0aBV9DnJ84Zt+W2z8y16JnEBQlkZlTnHK7rlZ/HlHO8MsJsos
-         AawRFpy3WephlnIND/kO6aD4ue0aLp5/a419YZosCV24cQMPts9f3r6DHpp2KQ7L06HN
-         vLbSwya+BEY84RVwxslx4zehAejxR3PXOLrUHKIaW5odX40sFU+KqnzAog6GT4JUw85v
-         Ienw==
+        d=redhat.com; s=google; t=1768594520; x=1769199320; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aokF+MKwgeAstmCjHO7lVmWSXdkq7v/KNJPU3598T+g=;
+        b=Ervu5u3WqeE00GZCKCJqNmQMRMCsg4Da+4+mti27TLgpxjLGWg2M1h2LMG/sK9GMCo
+         yjYBSExNEySC3LUHDmajGyjgXnX92DWZpZREKDBPU6fGcMFDZ18XIk/dT88zwO9GDAMx
+         L8T+SgunEG5YHXjLUdylnY8w1/zu6KYIwE/C0NE2uj8EiWTB7LCuNs5VvrlwLDfYvuLv
+         ec0aNnAns4p049ZdWn+VIbqa/Ed1b42RfQDOopQoPVJzp5l9jZibKtOsAlgHooHkL/YX
+         i5fNn2uBNx5rPmfcjPUJ55lBKF9Ms8XrgINMPNd96uSGcmokvghXTU7tcFkKZSCD88qI
+         UIgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768593560; x=1769198360;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CmVsGRS74zmdjEMM07LPVm6eWi6uP63Jcf4CCC+8B3s=;
-        b=JxNN0sga6+5ycwOqs3QWnCOFaKFK1UAix/05WXUC49JIdO+fJylHaK0LtiN7ojCb+U
-         FGaJJaJ80DCACkA0pbiZMFz6Re9AoESLTjK7oeRloGBTwsCwjIc2TjIQv/8T7Gqr+iG/
-         a3sPBNo64Qrx/zHkZgVegcEZbdOk9yzvaThS1YY5iz90K6bIRmuOdjpu5P3rTMbjBUzJ
-         ZJH1pk6iJ+MNIdSGfb/ftX6D3NeZxtiWFRIgZnBvaD9XcIC9n7EDqJRXZfJxki5wK8t3
-         owQ/7k7SChHd+5wJkzFMGuB+2fWmL8r2YiwSq0gJ5BMRTgkdDwlSlK4kSZl3cHFOWmvZ
-         O6Tw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJhnHxuKOWvKeG1tMuFM/Errby4Ss1tBKdm+GF4tB8bhN24Vqa4QtxdF7tPkFPRJo6TpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5guoyDwKItQctPH7JUbbRqouFbowRJiZNZWlqYmr4/u6T3ThX
-	rhJAd6lXxGBSEliCjV7TwBJ90iOgvMBq676m4lMiPISSUlyoUuv/I8QVopKLhlSkbrvPOgrcLMM
-	NZWfYyg==
-X-Received: from plko12.prod.google.com ([2002:a17:902:6b0c:b0:29e:fb92:99f6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2c0c:b0:2a0:9970:13fd
- with SMTP id d9443c01a7336-2a7176cda67mr43766535ad.43.1768593559703; Fri, 16
- Jan 2026 11:59:19 -0800 (PST)
-Date: Fri, 16 Jan 2026 11:59:17 -0800
-In-Reply-To: <1b236a64-d511-49a2-9962-55f4b1eb08e3@intel.com>
+        d=1e100.net; s=20230601; t=1768594520; x=1769199320;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aokF+MKwgeAstmCjHO7lVmWSXdkq7v/KNJPU3598T+g=;
+        b=gdBaN6VyEH7JAWnim2xsoyJbV6Tjx99HYNAuYPSdGBRcHdzQFgoTukwzPqD4Cpb0PN
+         YPi4PLCWf3ljSOSaQ1jBizvoLxrr8zptWje9DpVuUY0nUvRD1j1j4XIIbYI43k3OUn1s
+         e6qYBdQ6OpiCp3nDLF3n6YJTbvds78/gb17uKsRG35UBKpHVxxJYcBqsWKiSv7aoKHf/
+         caP2dws/KGCyoyBSHjdpgSoO6csGblU2HzTlCMpLuzkcffRCGNJvxa3MSzaKoernWfrQ
+         QClRxqRu/6HwG/KR0xPgJo2mRk3pUXZgJbgU1UQ66+82VKgjwq9JFfa3bH/RCwcVH1UI
+         WfjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWqs5WP9BmR6haJVE0ruG7vAePuDA1lHjd5vfAB1L9pLzYJ/91Q3W9M3/nDPgJW2yPCMik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVWl07XOfFqVnyQZcYqCsz7rRUSqjVc4h0Vr9j2BmqltYlWDzJ
+	9cDMe7cTQh7KJnYBGqub79jrBj7kYYH0yVYuSuYAePTchjoGny4/eSLc7tjQONU3oolf2WWJvLl
+	YIvfWY4E3DZiQPI++YlbarnLoQt+F0/fq1NcWTAV9UF+Qr/GslJNwqR5/AtYlpg==
+X-Gm-Gg: AY/fxX6d43lI25gArHyuOvUM570BxhhagwijT4sgkE9bhTjaJhMEFIz5KeEWvXJKzKC
+	e2c/b1sPPmzfW+JYRND4UU3fTf31Ye40z0XIA9DiV5toGGfxZhG4PxMpHke5Kxy8nPPcLafjDkF
+	EoXxP3Kbdvp+jKBJW53etTw+u6EEojbso32l5rk3HhJO6zIAqVDrnoaqgrK7j45FihAcr48l+Rg
+	q3lvxoWzdxuW0ZnBQnQXf00oCpWHTBkzwC7wtb3JVprlgQlaxsWTlxL8gZQn5VU4t1Qwg3qlpq4
+	XE+zREkV0FIIqqjDUwM71b9yhGC+CnqB3bDHeMwcSHmTmMoZaDFBAGZDnzjYTVFBrqA+uDAHKsB
+	6nDdyTDfshXxxBw6uTBISf5OEiKa7SR/GKH3rYoIqhXSjAZpSG3S6yvJjOxgd
+X-Received: by 2002:a05:600c:3494:b0:47e:e8de:7420 with SMTP id 5b1f17b1804b1-4801e33a85bmr58520575e9.22.1768594520524;
+        Fri, 16 Jan 2026 12:15:20 -0800 (PST)
+X-Received: by 2002:a05:600c:3494:b0:47e:e8de:7420 with SMTP id 5b1f17b1804b1-4801e33a85bmr58520355e9.22.1768594520094;
+        Fri, 16 Jan 2026 12:15:20 -0800 (PST)
+Received: from stex1.redhat.com (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435699271easm7009669f8f.14.2026.01.16.12.15.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 12:15:19 -0800 (PST)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: netdev@vger.kernel.org
+Cc: virtualization@lists.linux.dev,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	kvm@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	linux-kernel@vger.kernel.org,
+	Jason Wang <jasowang@redhat.com>,
+	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
+	Simon Horman <horms@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+	Asias He <asias@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH RESEND net v5 0/4] vsock/virtio: fix TX credit handling
+Date: Fri, 16 Jan 2026 21:15:13 +0100
+Message-ID: <20260116201517.273302-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.52.0
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
- <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
- <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com>
- <f4240495-120b-4124-b91a-b365e45bf50a@intel.com> <aWgyhmTJphGQqO0Y@google.com>
- <435b8d81-b4de-4933-b0ae-357dea311488@intel.com> <aWpyA0_r_yVewnfx@google.com>
- <1b236a64-d511-49a2-9962-55f4b1eb08e3@intel.com>
-Message-ID: <aWqYlXg4CS6vxS-o@google.com>
-Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
-From: Sean Christopherson <seanjc@google.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Yan Zhao <yan.y.zhao@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
-	kas@kernel.org, tabba@google.com, michael.roth@amd.com, david@kernel.org, 
-	sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com, 
-	nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 16, 2026, Dave Hansen wrote:
-> On 1/16/26 09:14, Sean Christopherson wrote:
-> > If you want to assert that the pfn is compatible with TDX, then by
-> > all means.  But I am NOT accepting any more KVM code that assumes
-> > TDX memory is backed by refcounted struct page.  If I had been
-> > paying more attention when the initial TDX series landed, I would
-> > have NAK'd that too.
-> I'm kinda surprised by that. The only memory we support handing into TDs
-> for private memory is refcounted struct page. I can imagine us being
-> able to do this with DAX pages in the near future, but those have
-> 'struct page' too, and I think they're refcounted pretty normally now as
-> well.
-> 
-> The TDX module initialization is pretty tied to NUMA nodes, too. If it's
-> in a NUMA node, the TDX module is told about it and it also universally
-> gets a 'struct page'.
-> 
-> Is there some kind of memory that I'm missing? What else *is* there? :)
+Resend with the right cc (sorry, a mistake on my env)
 
-I don't want to special case TDX on the backend of KVM's MMU.  There's already
-waaaay too much code and complexity in KVM that exists purely for S-EPT.  Baking
-in assumptions on how _exactly_ KVM is managing guest memory goes too far.
+The original series was posted by Melbin K Mathew <mlbnkm1@gmail.com> till
+v4: https://lore.kernel.org/netdev/20251217181206.3681159-1-mlbnkm1@gmail.com/
 
-The reason I'm so hostile towards struct page is that, as evidenced by this series
-and a ton of historical KVM code, assuming that memory is backed by struct page is
-a _very_ slippery slope towards code that is extremely nasty to unwind later on.
+Since it's a real issue and the original author seems busy, I'm sending
+the v5 fixing my comments but keeping the authorship (and restoring mine
+on patch 2 as reported on v4).
 
-E.g. see all of the effort that ended up going into commit ce7b5695397b ("KVM: TDX:
-Drop superfluous page pinning in S-EPT management").  And in this series, the
-constraints that will be placed on guest_memfd if TDX assumes hugepages will always
-be covered in a single folio.  Untangling KVM's historical (non-TDX) messes around
-struct page took us something like two years.
+From Melbin K Mathew <mlbnkm1@gmail.com>:
 
-And so to avoid introducing similar messes in the future, I don't want KVM's MMU
-to make _any_ references to struct page when it comes to mapping memory into the
-guest unless it's absolutely necessary, e.g. to put a reference when KVM _knows_
-it acquired a refcounted page via gup() (and ideally we'd kill even that, e.g.
-by telling gup() not to bump the refcount in the first place).
+This series fixes TX credit handling in virtio-vsock:
 
-> > tdh_mem_page_aug() is just an absurdly slow way of writing a PTE.  It doesn't
-> > _need_ the pfn to be backed a struct page, at all.  IMO, what you're asking for
-> > is akin to adding a pile of unnecessary assumptions to e.g. __set_spte() and
-> > __kvm_tdp_mmu_write_spte().  No thanks.
-> 
-> Which part is absurdly slow?
+Patch 1: Fix potential underflow in get_credit() using s64 arithmetic
+Patch 2: Fix vsock_test seqpacket bounds test
+Patch 3: Cap TX credit to local buffer size (security hardening)
+Patch 4: Add stream TX credit bounds regression test
 
-The SEAMCALL itself.  I'm saying that TDH_MEM_PAGE_AUG is really just the S-EPT
-version of "make this PTE PRESENT", and that piling on sanity checks that aren't
-fundamental to TDX shouldn't be done when KVM is writing PTEs.
+The core issue is that a malicious guest can advertise a huge buffer
+size via SO_VM_SOCKETS_BUFFER_SIZE, causing the host to allocate
+excessive sk_buff memory when sending data to that guest.
 
-In other words, something like this is totally fine:
+On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+32 guest vsock connections advertising 2 GiB each and reading slowly
+drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB; the system only
+recovered after killing the QEMU process.
 
-	KVM_MMU_WARN_ON(!tdx_is_convertible_pfn(pfn));
+With this series applied, the same PoC shows only ~35 MiB increase in
+Slab/SUnreclaim, no host OOM, and the guest remains responsive.
 
-but this is not:
+Melbin K Mathew (3):
+  vsock/virtio: fix potential underflow in virtio_transport_get_credit()
+  vsock/virtio: cap TX credit to local buffer size
+  vsock/test: add stream TX credit bounds test
 
-	WARN_ON_ONCE(!page_mapping(pfn_to_page(pfn)));
+Stefano Garzarella (1):
+  vsock/test: fix seqpacket message bounds test
+
+ net/vmw_vsock/virtio_transport_common.c |  30 +++++--
+ tools/testing/vsock/vsock_test.c        | 112 ++++++++++++++++++++++++
+ 2 files changed, 133 insertions(+), 9 deletions(-)
+
+-- 
+2.52.0
+
 
