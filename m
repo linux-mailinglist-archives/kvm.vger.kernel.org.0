@@ -1,238 +1,172 @@
-Return-Path: <kvm+bounces-68325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C81A4D333B0
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 16:37:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6964D333C5
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 16:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 48F3D30C77FB
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:31:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A62B6312B7CC
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1CF33A03D;
-	Fri, 16 Jan 2026 15:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662A133A00C;
+	Fri, 16 Jan 2026 15:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="OD5o8gVh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QPQlIZlt"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012033.outbound.protection.outlook.com [40.107.200.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4C533A038;
-	Fri, 16 Jan 2026 15:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768577493; cv=fail; b=B4zEEcMDKRN+A3arSkkwD2185dkOhiXegS2nmY8Ntb/hRNVDJfhCBAf/NPJRMSL1I3A8eD7hhs/VEnY1HaJaIZmzN7zbqKxDc42XpSb4hQVvg9e4l2AxYhDTUhz+Jez61e3eLXgWsyLALreExt0QADTJYsJSka3bveXUBav+Ay4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768577493; c=relaxed/simple;
-	bh=U17Z1HRyQq0QwplordLyhCTgKY+JE/mVfcnSMNKFBxg=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=FbBlxwFC53fVgHuO6pBWNa/dstaUej4Ua3cnq9Vf5az7UcADJ01SC2GLPSQ6j0isylOvkMqXyZLraweoVNkoxc2ELOzmj07zyCmqgWMUJjxgz+wsoyDLGyOIP5EBldH217s2qjwE0ZSJiSHFayxP5ih1sfVhAIttocD+1Ci5JhU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=OD5o8gVh; arc=fail smtp.client-ip=40.107.200.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AEWNb8sNmInCIYx/gcG5xJt9Hx3Pu+imsdquzaXQnARhIgxoCyun0/MgO71hF+hDLD3UW4r1f9crfs+99C6JhAJaR1pcgA34sb1tUMZOL07YDk8EC+KOvxvTfmgGdVmJS8V/ff9xX42h/d6gAntKBRboWvMUzlckvmKrf5m54qhEm7EoLsZNCyWYg56LHtEyR/FHbPahwQS5Czqv19Bkhh9F8ejZEn8M0mUVZ1H8X7tMavJtGTn8zbCW/bnsRdfUf6MIYw937Pqgi8aNvCQYwcIlENWPNKpxzAD/miqQQHrXIWdm23cEvj1qfLdJu/fUS10OoF8ZT3NW/vXPDQQQJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=muTy6jbis4Vzi6P9aw3kEl+gyWZCcxvp5xy5cGiC5mM=;
- b=wCrSQck3SSX0oIGJ8WcR7XJ/L19URp6fJlQLrOGpyHEpY7CsEKQEOWZsjYe1xdv74MmMa8Dcjvf/zFNQMCP2qLa8+QdcxmSBvGGp9WaiDMLf7AnD+cVIuqEYkg8YsjRytIOKrP965+4OI3Oiznh5l/NzW0gxEwKSvutxJnh0vJ1OkH1Oy3ivVjim43gtkwVjbi9WEYcRMAI/wtvOJg6UnizQ1JdvytdyJ32TUjM5PXJ1ZlvRpL8+ExthfiG0Dyxi9VIQFT1FhLPYhPnpMSQ7X5NE+5ubUt6Jd2mRK3H6bR6BPQacqU9rOGAbT1+HexYljvRIsYkmiMI9/a3nh/aBzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
- dkim=pass header.d=nokia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=muTy6jbis4Vzi6P9aw3kEl+gyWZCcxvp5xy5cGiC5mM=;
- b=OD5o8gVhDzQqnkLyA+hjLhvlDCu2gGhTXrjEK4RGjh/5iSstozNOSQUbjMcF1liNYTvANg2aDxnZA7hzrPgNSHH4q+YTNXRW9zlBpT4tY1G09zEbvEH4jFlhCietrVnljTnJ4myyd4rzxW0QtS6NL3tyWXSE8CcJwcF9XBN0KjpFoKccM2OP2iJNIPuKPwPs3E5qZZeZHDOQ9OlfnB9dJ8gguIRF/qwYvvTY6zAIDSVSfOnYuXoiSSKM3nnQKk6WKM4SbUTtwYmHq0xsAwKTzKtf7ELS7KnwbnpSNmxUs/eFWR36nUSV9XtbuO1OeD7kwCHsVNqHARjqEoXSD/2llg==
-Received: from BN0PR08MB6951.namprd08.prod.outlook.com (2603:10b6:408:128::14)
- by DS0PR08MB9517.namprd08.prod.outlook.com (2603:10b6:8:1a9::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.6; Fri, 16 Jan
- 2026 15:31:26 +0000
-Received: from BN0PR08MB6951.namprd08.prod.outlook.com
- ([fe80::4dd1:e1e:56b0:b178]) by BN0PR08MB6951.namprd08.prod.outlook.com
- ([fe80::4dd1:e1e:56b0:b178%3]) with mapi id 15.20.9520.005; Fri, 16 Jan 2026
- 15:31:26 +0000
-From: "Anthony Pighin (Nokia)" <anthony.pighin@nokia.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, =?iso-8859-1?Q?Ilpo_J=E4rvinen?=
-	<ilpo.jarvinen@linux.intel.com>, Alex Williamson <alex@shazbot.org>
-Subject: [PATCH v2] vfio/pci: Lock upstream bridge for
-  vfio_pci_core_disable()
-Thread-Topic: [PATCH v2] vfio/pci: Lock upstream bridge for
-  vfio_pci_core_disable()
-Thread-Index: AQHchvysmxF7Re29GUO2rbh988SUbA==
-Date: Fri, 16 Jan 2026 15:31:26 +0000
-Message-ID:
- <BN0PR08MB695171D3AB759C65B6438B5D838DA@BN0PR08MB6951.namprd08.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR08MB6951:EE_|DS0PR08MB9517:EE_
-x-ms-office365-filtering-correlation-id: 55c756a2-fe06-47d3-361a-08de55144ff1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?9GpeStp5KbmWphjEQVU7o+RKnuo0G3K2iVe40GW6nBcBZw27yvdumhxigx?=
- =?iso-8859-1?Q?mSZtGGZOCTrtQuP6FvWH1/rKylMbEZil/WWquwbi1pM2oHce4r3tlaqAkC?=
- =?iso-8859-1?Q?MkvfjQuE0T1H4sYxVLM5gnIcudXBBVe5ThcRdF0rTwcu5N70Y5qTHklax5?=
- =?iso-8859-1?Q?GXYSlyRv4guXDZrmG1MJEjRt1WMD94Z+6pLsfMk9uaC9ZPSdYvJvDYnF19?=
- =?iso-8859-1?Q?JPBGqGAbkp9WSvyaxKu3mm1oKanjEtCw+4g89EEH8Oy4+ELxw4/Nk0MgLP?=
- =?iso-8859-1?Q?3rFyIYbbC6xgCUXDp6CHuRuNDkxdEZpPn8YM9lbIRVFZQCAVio4lHnH2Ey?=
- =?iso-8859-1?Q?7PfyrNDBQ/30iqZdLHufj2ikigAF2l2IOB9TZOt7YUwEEIY/0W5EDKKv1g?=
- =?iso-8859-1?Q?K2Iv6sdQY6P64dqpA5GbvYZKcDAIc/jFKrH9UbzSn1RRkw5cR8FATWbq6/?=
- =?iso-8859-1?Q?GYXIPg+fyv59jho5XQbExEixlGK8w5crdCwua/G+BerGnmbbvKpF/JreWt?=
- =?iso-8859-1?Q?h0xy/P75C5Prrum/AIni54H53c9jfHAZ3OotCVLegP70i0KO/zRX37ijce?=
- =?iso-8859-1?Q?7tKxJi/0yLkP5YJautSp/uqC15T8+lchdc3Ni1vWJ402dlbyrQITpIR/G3?=
- =?iso-8859-1?Q?+4gCXVhJW3YVPlNAEAQ2NSr4c+MrO+1IsV4zxZYk4jLr7GHzPAgdGdF3Ym?=
- =?iso-8859-1?Q?1IO8Ux8k5mXXankTZK+lMtnPCXk+0IIBDWD3uBxKxg/+cLKCg0afcQzxsZ?=
- =?iso-8859-1?Q?SWa1or0qpL7AEF82mMI/ZsH64zzHahgOMMfndLEL0If89pGuq4oWnmR+tf?=
- =?iso-8859-1?Q?0trII2lrrcqw1ca2DrGYfDbEs2Yya6Z1nq+TlDVbaZlXR8uyLK2wxyUrvQ?=
- =?iso-8859-1?Q?unYZsUbiNcYooZT8x827ENbLhE8+6rFWsF6JJIf4nqpTHD7WgkjBn7pP6U?=
- =?iso-8859-1?Q?fglTcEJCGAvq09QosvNRyzlgEP0eWeEYVOEcEZ82D4dVBlXhA17hDe9vxk?=
- =?iso-8859-1?Q?kMJZQ9tXhTv09+VSI03OUVVBqQTJOf/tTUFk3Sfn7z6azfZSQDbKFxBapz?=
- =?iso-8859-1?Q?GjYeounn3LiCeBmy0oTiby3IbQ4fssXcUyycXCs9pHWQi2Xj4KvcADFot0?=
- =?iso-8859-1?Q?LHtnZaymIXCNWpizFATmsRfJNvgu3aSQ0wv1WwjY58M++KgzjPVEMfGSxs?=
- =?iso-8859-1?Q?2740wC+2P8txfiTFZVAuwP7TTRMOb/8NQy1E5EBfXwBW9QQQprehwRPEf9?=
- =?iso-8859-1?Q?XcZnwyAPIr7dVjhI3EG87grNs79eT5BoUogXtfriCvIjG7vWjiiOjleCQ9?=
- =?iso-8859-1?Q?3UdPsSZvgo30H5Xo1G3OTvUKSu5Xuvttg0CV/7HP55U7wGER6obca//DOu?=
- =?iso-8859-1?Q?Xtox88t2kb7G7G/iEYpXX94kpuDJXfQjJj0o6au9CDuixRMo05ESjRSBcp?=
- =?iso-8859-1?Q?x3zJyhcf4ITB6mMIvyRh/aXZXUDM1eivhCDibFaJ+4lX6NpSSRTo0q4TQP?=
- =?iso-8859-1?Q?Yf2pi0MpUJ9mE8wmnacmEWRRtRTNT7uzLtV8rHPWdysP9UAHZee1XxVqbK?=
- =?iso-8859-1?Q?sVsATi0oay4XNOROvho7YNc1FIrHEkEdzLaz5EJ/Ae5Xs0i7cR91hDX4cy?=
- =?iso-8859-1?Q?kuzjbVbE7iMt1OzIM7O1dxtnVMOyeNKATVhM6OCsYM4T/P1+yY1+Fjd2KB?=
- =?iso-8859-1?Q?VxSTjbFfSov3W+g9KWc=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR08MB6951.namprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?dhOFO4QMW8KMl431kY9gqGclOqF/AZDYkcCXdagA9gt+PGkY8G25oyLq12?=
- =?iso-8859-1?Q?Tkignqbnj2+EE++SY2Td9g6qj5zs5NG5Ulm8pVqjxk5vhfgOYbuKPqYd8p?=
- =?iso-8859-1?Q?8ouYI7yPalF/p1ZnHf4cPnRN9v6Bv8s3eNOTwsWgbY1suZaxzSqKGFZjs1?=
- =?iso-8859-1?Q?pYfWiEQxf0/K6gXe7Y6n+3HNMuYqIGz4cGJsR7PhZ/Xuh0XJdfj36gOju3?=
- =?iso-8859-1?Q?r5e66gvXRsa9pc1zxkUAdkROIqWXEIZZ6gPGScjDL3sHYyUG6stN/25P9v?=
- =?iso-8859-1?Q?87HX43BBSyrqNqLF2p1wy2H0HCO23owhMXtu1OUt8B82mwjO1LZXD81sx4?=
- =?iso-8859-1?Q?wjvgepQF+YDry1ZTRPAnL1W0kri8FSGIjM4a5cKuWkll8o6+wXs0V00Tvr?=
- =?iso-8859-1?Q?kbzHApe7y8URhrBKgw85ZZUagG/dkps19YRwEMCj4Vr3X0BbQgu63zSqOr?=
- =?iso-8859-1?Q?4ym62hetC8+9UKdEMcFI5otKaYUkf3nyO2PyHMfuTjQ4G2x8Wlp8RVG4d6?=
- =?iso-8859-1?Q?5XoDquRK5EvpYC4q+40TsJX0nrs0nYSXQBjvP4jlvjm3rJp2G5QDTunFEb?=
- =?iso-8859-1?Q?cHkJ02q+3lt0f4R2qx6m6KzzI4PVVvpAy8PFZgQu/m0YosFwHJLyFyguv7?=
- =?iso-8859-1?Q?PFRUeETgYlYDIdEHllfOUupQUU0xMgROybPyNqGk9PufslvbBug206+HKO?=
- =?iso-8859-1?Q?AtV8dl087EZrn1eNiNZvr88B+cXMP0XFaB4lC+OC/tbqTkDiEeF+icoJ+c?=
- =?iso-8859-1?Q?QFcS6srjZRUqasTpQwDqiqLtmkGvH0qAnDtUATQONFVLNbVZCJAQv3YwEP?=
- =?iso-8859-1?Q?1AaHEkf/UCVftXUchFDS2s9xY6UW67OHo1qhhdAviJI1gzje0EnsXQ3zjG?=
- =?iso-8859-1?Q?+DPq0j0SdW9ATB1sO8acyL8GRjUTkFjMlU1JHE9ThLDGLFy7zYWICAp56F?=
- =?iso-8859-1?Q?5vd0+kQS+zzKjWKwPWifKY7JrFV/aAbxkrn/95isQxqR5SNXGc0ZrOayCC?=
- =?iso-8859-1?Q?HZR8GhtfOVYCtNwzsoj6iGc+ySfkflKyyJCmDc+fUC8htF0V9ko/DGRNda?=
- =?iso-8859-1?Q?I8ZEA4i+DcJm6fzZh4jIZY2D+qXUt/Od5XPtlmqB5BXT7EE8dWqwrnzbSs?=
- =?iso-8859-1?Q?TqrmLHoRPonFWLSi8vBZahC28iXqq0HGBc/8+64qGDZku22jbhYUd8drhZ?=
- =?iso-8859-1?Q?zYZffQUHnn4g+jeZGWZ2sashY6QgmOHPTH3gB+u/wqknPPK8VSDJR7M7NO?=
- =?iso-8859-1?Q?pMwAhBjBXcuuHZKkCBKZL7OozlcwU+qsBMaL0KsCEuvAo8RrrjJGBT6lx3?=
- =?iso-8859-1?Q?VFgWSElaLB9IesXu9GGs8/si+PkUj0g6d/76vIcxtvJ/WHomp2IWnBTOXi?=
- =?iso-8859-1?Q?GtAlbHaC7a6aukjLD1LBosyzwS+qJ5xCPkVpXe9bxcKYMd5t9vZPQ8BjuM?=
- =?iso-8859-1?Q?s9D1mp8qHl2XVQ72DrU29W6c5DQTYE5c2wpevkw/j7ZoXqsjvSJRvKQvyP?=
- =?iso-8859-1?Q?GxZ8m++R37S1PzvPfV6VUC5pfHbmwmuJ9yeu6UWsQvAYP1lGyvcFVdFRMN?=
- =?iso-8859-1?Q?ZQf2NVoVLudyzljGxicfXfpLT48hd3W28kZQSywOtf+Pk8os8y2lFv3F9C?=
- =?iso-8859-1?Q?x6xoOtdbrhvwNwg7E+Ohrd1QmM8tNnsaZ5Zn6SzAG9XZzSuxAciC5N3GNH?=
- =?iso-8859-1?Q?3OZAgPLiCaUBfWxcQT/HzVLJLVBuYF0833h3dEjUL1DhsIM/WJf9XZ+7AR?=
- =?iso-8859-1?Q?mGVJDtcLB9m7C0S4+icb7xrIPUFILYeIQhgyg5NRxNLvE6UcpXsLyYgc7+?=
- =?iso-8859-1?Q?9Azepx4jnQ=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DE033A6F4
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 15:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768577610; cv=none; b=LYHbR5Ow19RAzM0e3Nbm/7jWPSE13KAKtLjMmRQ9daDzBTDWiin4YpMVLsCCTyfPD7HZISgw5TDj/p3tSE7RP+dAf/dloHTbU+L58WZX52/2aYjGMZWDtN/6SS3XphjNCWEy605TpOFpQTFrNqyP+cj9++hRNweEE8Ro6V69+Kk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768577610; c=relaxed/simple;
+	bh=oYQJjlZIpsIZF7YLAGKB4ZoezlcIQxYNhsIH/ahTxms=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UI7KmRTKpTFeNNLNmpz21oP3LoYkoipLlZRhr4uiBvwIhvbCRgQQi044Av8nQ5LP2s18fx9LdwF/OSe2PUfCRN0584BNWteIIMx+FlHE3uMSb8V+JrSsZVrpb5cAu7LdQvDOf0rubGvGdabDR7ei3pqZGOch22fC/tMWS8OIzko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QPQlIZlt; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c213419f5so1416562a91.2
+        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 07:33:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768577606; x=1769182406; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MFDMwcUB+g0lr3+O0uNE+y+KlNYemC0Uyu3/6hhSiCE=;
+        b=QPQlIZltlMacfSq+JUF2zmC7QUxM9RH0MPnqYQEsH6JnLgdE4dagHVjtoL0nLSrw9C
+         qPpNKwLAVgccJKks2nHxGq6DwuoLrmOY/wBZuSt8EArFeXZoudwJOCd+kN4zR09bC1hz
+         yFuowYhNMHKlMeRtY7bGDLw3wQPcLh1nwd6cYlm0lfEP8mUh3fkcn8AKhl7++ciT6BBw
+         Ji8hyaegUHGVzN7QmyQY9a94DrV9kzZbHwnAaImHn5EuGNAZRBMM7pdxcjxiV1cIePn3
+         Y/FF1wu8Z6JPiUFxHV/PqxVz6o8ws9KS7+813ZK61GNQ/N0yuicmRCGn4KoDF6TvmGgD
+         NAvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768577606; x=1769182406;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MFDMwcUB+g0lr3+O0uNE+y+KlNYemC0Uyu3/6hhSiCE=;
+        b=OhaP3T5+emobKIsXTU6FD72K1gKW12pBPP9ExCznVn2sC6RtGsNe6GrB7FzAXG+jM/
+         v+SH4o1I5tWVyg9zmO9XLsss1YrOVawiir5DAVeSozfVRrKsL+TcwJFWthMCpJLAQf56
+         ZntLNBEa1j63EgdLyp2Iuk7jheEj6sEpzfUMRBpuMDRArVjrzp+j+zR2L+mXe+ylY1hw
+         QUfCPwZm0wREL03l8kwZiMR9q1ILaiOh9/ZhL60t6LTpYv9JIJbW14E3oZNjhpPctqOR
+         4Lk/wSdnM0h6uSJJQmnuX8tBl1fKqhBDxUvZAWBMghcs6JtvqUYdrdcWjyJepuEuew1k
+         33kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtSJg8kuPOIBhf5S52tXWzEv+BxQF5+ygGlvdIAUC944t8U5VwlhQKjTmP0Hckbw5aU60=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz29Dy+z01ZraYiz9DqWJoZWvZtEHc5RwVixb4jsF8ycAew4LLM
+	CSKywHC5uiEC3AnR+Wrtd+kVR7FnbQ9kXASq4MZdh1cOd1Wf8UNlrUujDzJHWYu6rnTwQIGUNSB
+	vCvhgHw==
+X-Received: from pjbsh12.prod.google.com ([2002:a17:90b:524c:b0:34c:2156:9de7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5803:b0:32e:3829:a71c
+ with SMTP id 98e67ed59e1d1-35272efcc92mr2558426a91.16.1768577606439; Fri, 16
+ Jan 2026 07:33:26 -0800 (PST)
+Date: Fri, 16 Jan 2026 07:32:47 -0800
+In-Reply-To: <20251206001720.468579-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR08MB6951.namprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55c756a2-fe06-47d3-361a-08de55144ff1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2026 15:31:26.1811
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rZq/YQ33AxPNAybMh2udVucMASH3GxTqI0gCm2wq65QRGNbzS1K8fnD06xbMqsAIaCPqKygE6AFE1URKEbQ8Z9iGBU9Z09vPHJKIXi2rgVk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR08MB9517
+Mime-Version: 1.0
+References: <20251206001720.468579-1-seanjc@google.com>
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <176857711424.940905.14821355548518788463.b4-ty@google.com>
+Subject: Re: [PATCH v6 00/44] KVM: x86: Add support for mediated vPMUs
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Xudong Hao <xudong.hao@intel.com>, Sandipan Das <sandipan.das@amd.com>, 
+	Dapeng Mi <dapeng1.mi@linux.intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-The commit 7e89efc6e9e4 ("Lock upstream bridge for pci_reset_function()")=
-=0A=
-added locking of the upstream bridge to the reset function. To catch=0A=
-paths that are not properly locked, the commit 920f6468924f ("Warn on=0A=
-missing cfg_access_lock during secondary bus reset") added a warning=0A=
-if the PCI configuration space was not locked during a secondary bus reset=
-=0A=
-request.=0A=
-=0A=
-When a VFIO PCI device is released from userspace ownership, an attempt=0A=
-to reset the PCI device function may be made. If so, and the upstream bridg=
-e=0A=
-is not locked, the release request results in a warning:=0A=
-=0A=
-   pcieport 0000:00:00.0: unlocked secondary bus reset via:=0A=
-   pci_reset_bus_function+0x188/0x1b8=0A=
-=0A=
-Add missing upstream bridge locking to vfio_pci_core_disable().=0A=
-=0A=
-Fixes: 7e89efc6e9e4 ("PCI: Lock upstream bridge for pci_reset_function()")=
-=0A=
-Signed-off-by: Anthony Pighin <anthony.pighin@nokia.com>=0A=
----=0A=
-V1 -> V2:=0A=
-  - Reworked commit log for clarity=0A=
-  - Corrected indentation=0A=
-  - Added a Fixes: tag=0A=
-=0A=
-=0A=
- drivers/vfio/pci/vfio_pci_core.c | 17 +++++++++++++----=0A=
- 1 file changed, 13 insertions(+), 4 deletions(-)=0A=
-=0A=
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_c=
-ore.c=0A=
-index 3a11e6f450f7..72c33b399800 100644=0A=
---- a/drivers/vfio/pci/vfio_pci_core.c=0A=
-+++ b/drivers/vfio/pci/vfio_pci_core.c=0A=
-@@ -588,6 +588,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_enable);=0A=
- =0A=
- void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)=0A=
- {=0A=
-+	struct pci_dev *bridge;=0A=
- 	struct pci_dev *pdev =3D vdev->pdev;=0A=
- 	struct vfio_pci_dummy_resource *dummy_res, *tmp;=0A=
- 	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;=0A=
-@@ -694,12 +695,20 @@ void vfio_pci_core_disable(struct vfio_pci_core_devic=
-e *vdev)=0A=
- 	 * We can not use the "try" reset interface here, which will=0A=
- 	 * overwrite the previously restored configuration information.=0A=
- 	 */=0A=
--	if (vdev->reset_works && pci_dev_trylock(pdev)) {=0A=
--		if (!__pci_reset_function_locked(pdev))=0A=
--			vdev->needs_reset =3D false;=0A=
--		pci_dev_unlock(pdev);=0A=
-+	if (vdev->reset_works) {=0A=
-+		bridge =3D pci_upstream_bridge(pdev);=0A=
-+		if (bridge && !pci_dev_trylock(bridge))=0A=
-+			goto out_restore_state;=0A=
-+		if (pci_dev_trylock(pdev)) {=0A=
-+			if (!__pci_reset_function_locked(pdev))=0A=
-+				vdev->needs_reset =3D false;=0A=
-+			pci_dev_unlock(pdev);=0A=
-+		}=0A=
-+		if (bridge)=0A=
-+			pci_dev_unlock(bridge);=0A=
- 	}=0A=
- =0A=
-+out_restore_state:=0A=
- 	pci_restore_state(pdev);=0A=
- out:=0A=
- 	pci_disable_device(pdev);=0A=
--- =0A=
-2.43.0=0A=
+On Fri, 05 Dec 2025 16:16:36 -0800, Sean Christopherson wrote:
+> This series is based on 'https://github.com/kvm-x86/linux next', but except
+> for one minor conflict in perf should apply on Linus' tree once the KVM 6.19
+> pull request lands.  I considered waiting until 6.19-rc1 to post this, but
+> I've had this in a "ready" state for a few weeks and want to get it out there.
+> 
+> My hope/plan is that the perf changes will go through the tip tree with a
+> stable tag/branch, and the KVM changes will go the kvm-x86 tree.
+> 
+> [...]
+
+Applied the KVM patches to kvm-x86 pmu, thanks!
+
+[14/44] KVM: Add a simplified wrapper for registering perf callbacks
+        https://github.com/kvm-x86/linux/commit/4b24910c0569
+[15/44] KVM: Add a simplified wrapper for registering perf callbacks
+        [DROPPED - already merged (and then fixed)]
+[16/44] KVM: x86/pmu: Start stubbing in mediated PMU support
+        https://github.com/kvm-x86/linux/commit/3e51822b2fdf
+[17/44] KVM: x86/pmu: Implement Intel mediated PMU requirements and constraints
+        https://github.com/kvm-x86/linux/commit/bfee4f07d880
+[18/44] KVM: x86/pmu: Implement AMD mediated PMU requirements
+        https://github.com/kvm-x86/linux/commit/9ba0bb4ae76a
+[19/44] KVM: x86/pmu: Register PMI handler for mediated vPMU
+        https://github.com/kvm-x86/linux/commit/1c4ba7286afb
+[20/44] KVM: x86/pmu: Disable RDPMC interception for compatible mediated vPMU
+        https://github.com/kvm-x86/linux/commit/80624272129e
+[21/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via entry/exit fields for mediated PMU
+        https://github.com/kvm-x86/linux/commit/d3ba32d1ff2a
+[22/44] KVM: x86/pmu: Disable interception of select PMU MSRs for mediated vPMUs
+        https://github.com/kvm-x86/linux/commit/2904df6692f4
+[23/44] KVM: x86/pmu: Bypass perf checks when emulating mediated PMU counter accesses
+        https://github.com/kvm-x86/linux/commit/0ea0d6314870
+[24/44] KVM: x86/pmu: Introduce eventsel_hw to prepare for pmu event filtering
+        https://github.com/kvm-x86/linux/commit/02918f007792
+[25/44] KVM: x86/pmu: Reprogram mediated PMU event selectors on event filter updates
+        https://github.com/kvm-x86/linux/commit/3db871fe185b
+[26/44] KVM: x86/pmu: Always stuff GuestOnly=1,HostOnly=0 for mediated PMCs on AMD
+        https://github.com/kvm-x86/linux/commit/a2f4ba534cc5
+[27/44] KVM: x86/pmu: Load/put mediated PMU context when entering/exiting guest
+        https://github.com/kvm-x86/linux/commit/56bb27369750
+[28/44] KVM: x86/pmu: Disallow emulation in the fastpath if mediated PMCs are active
+        https://github.com/kvm-x86/linux/commit/f7a65e58d643
+[29/44] KVM: x86/pmu: Handle emulated instruction for mediated vPMU
+        https://github.com/kvm-x86/linux/commit/283a5aa57b22
+[30/44] KVM: nVMX: Add macros to simplify nested MSR interception setting
+        https://github.com/kvm-x86/linux/commit/cb58327c4c8a
+[31/44] KVM: nVMX: Disable PMU MSR interception as appropriate while running L2
+        https://github.com/kvm-x86/linux/commit/88ebc2a3199c
+[32/44] KVM: nSVM: Disable PMU MSR interception as appropriate while running L2
+        https://github.com/kvm-x86/linux/commit/3b36160d9406
+[33/44] KVM: x86/pmu: Expose enable_mediated_pmu parameter to user space
+        https://github.com/kvm-x86/linux/commit/860bcb1021f5
+[34/44] KVM: x86/pmu: Elide WRMSRs when loading guest PMCs if values already match
+        https://github.com/kvm-x86/linux/commit/b0b6a8d3be16
+[35/44] KVM: VMX: Drop intermediate "guest" field from msr_autostore
+        https://github.com/kvm-x86/linux/commit/462f092dc55c
+[36/44] KVM: nVMX: Don't update msr_autostore count when saving TSC for vmcs12
+        https://github.com/kvm-x86/linux/commit/58f21a01417f
+[37/44] KVM: VMX: Dedup code for removing MSR from VMCS's auto-load list
+        https://github.com/kvm-x86/linux/commit/0bd29379114b
+[38/44] KVM: VMX: Drop unused @entry_only param from add_atomic_switch_msr()
+        https://github.com/kvm-x86/linux/commit/84ac00042a28
+[39/44] KVM: VMX: Bug the VM if either MSR auto-load list is full
+        https://github.com/kvm-x86/linux/commit/2ed57bb89976
+[40/44] KVM: VMX: Set MSR index auto-load entry if and only if entry is "new"
+        https://github.com/kvm-x86/linux/commit/0c4ff0866fc1
+[41/44] KVM: VMX: Compartmentalize adding MSRs to host vs. guest auto-load list
+        https://github.com/kvm-x86/linux/commit/2239d137a71d
+[42/44] KVM: VMX: Dedup code for adding MSR to VMCS's auto list
+        https://github.com/kvm-x86/linux/commit/c3d6a7210a4d
+[43/44] KVM: VMX: Initialize vmcs01.VM_EXIT_MSR_STORE_ADDR with list address
+        https://github.com/kvm-x86/linux/commit/9757a5aebcd6
+[44/44] KVM: VMX: Add mediated PMU support for CPUs without "save perf global ctrl"
+        https://github.com/kvm-x86/linux/commit/d374b89edbb9
+
+--
+https://github.com/kvm-x86/linux/tree/next
 
