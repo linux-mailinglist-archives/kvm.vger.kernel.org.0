@@ -1,185 +1,149 @@
-Return-Path: <kvm+bounces-68351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68352-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38CDD37A54
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:37:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 407EAD37A5C
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A853314CAD6
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:33:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E32B316B719
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E93B39A81D;
-	Fri, 16 Jan 2026 17:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6961239526A;
+	Fri, 16 Jan 2026 17:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UBHJ8uP+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TQaE6naS"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.72.182.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423B63939BA;
-	Fri, 16 Jan 2026 17:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.72.182.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9D5338594
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768584811; cv=none; b=sZ2E4pYUu2YvjIXtGiclGY8EPvRSLtZ0P2AhIH2DD5xhm1GDDIP1Jdmt77KIDIilMx4HFu+BAQ4vvskowVLAwGXgBLeck1+UMJVJ8QE3tfQbSGQQEoDVwfUgdV9sap1XoE2mkqGvl5ZuOZ/jI2DDvDxKjOk8045d+7dirk1nDhU=
+	t=1768584853; cv=none; b=dVLCm3W/NuqTKKXYJlyGStnfjFwyhJ4gTes4qkAQmGyBm3/cYR7HjFm5hAx/csRXOhIqCSohjyukXvoGn+ZHUwdjzcpvTUQB0gz4NnHNIsY1+empJtFIcVL0IJbilirxxavp0CSs16fMttM7VJCKSoIhVl/VSEWQhaBhuROjTr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768584811; c=relaxed/simple;
-	bh=mGoAyClu4Fze9brVvI2Q/KcfW2zTB8DW0LfyoKMfjdA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RVj6eXmVxKYmjZM4Qec0ewjvcXOHmK0AK/89rTNXkKtfsQvyzt3f4pFPCUQS728GTdUcAAb0yjUhbRIQ6pguvdTNFQYmDbAdQH4tL7kY1FdrUTE7Md7pGW9dbZ0+Pqxv+FtiGBScqaF2XMivHAGq+nzhM9eihzd6IQ9EKPkjvpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UBHJ8uP+; arc=none smtp.client-ip=3.72.182.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1768584853; c=relaxed/simple;
+	bh=T6pKLN6msWa1JnbQayIcKy8zPrqf9eQVLDpB22ad/cc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UnGfwOxDRFW+uneGqT/O08dvOMrTIoi+FxtvqXfP+MbRJxyBlQN7z8NF82Ec45yjMoAwbFxHL4SuixlGnR7uOfcKOqc4DYcQK1FoJGS0YD6IvS8e9JwizE/q7oZELamrBA95Y1qZ7WdlXXVrTg9Vx6V0HGdLdF/74Jj42RZ99AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TQaE6naS; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34ea5074935so2200014a91.0
+        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 09:34:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1768584799; x=1800120799;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=JQ9fdAQPvfKL0BQ6nuE1OPJD9/1hgfxOsOgzcBIqcCo=;
-  b=UBHJ8uP+B/wTkAQ5kK2Du3OuXyQHb/xS648kXgvpuLvx3WgabKfDeSCF
-   QSt5X/GaeWHHAhG6OQSviP1RLB6wTyiwjVqkranDYrdPayZi1yB18yyC0
-   I5t0BUVkkbjAXdn+/Xgrx/tDtyKpUVdf7JbtEGCV4cht1+HFd61UC7A5g
-   RhpE+sfpU6Lar2p4cEysljQeB1gDAAclbt/QxNySkFjFLLj6BKc5E5ovo
-   rXQacBne16GCzAUWlgYgIEc5Kug+DOCImLiuxpRt7KRNcUIHGoNQRRSiv
-   xHEAmtKxUPadkrJFvGQtHpptik4qDNTI6G00gBrEBcbcdRhIIBS1mDtR3
-   Q==;
-X-CSE-ConnectionGUID: mXXvV+M+RuK453p+B3eBMQ==
-X-CSE-MsgGUID: MMzLzIdgRnuHEkpgLhJoQw==
-X-IronPort-AV: E=Sophos;i="6.21,231,1763424000"; 
-   d="scan'208";a="8021986"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:32:46 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:17904]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.6.3:2525] with esmtp (Farcaster)
- id 3abbcd19-66b6-49c8-82e3-6953c2e4c901; Fri, 16 Jan 2026 17:32:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 3abbcd19-66b6-49c8-82e3-6953c2e4c901
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Fri, 16 Jan 2026 17:32:40 +0000
-Received: from [192.168.12.13] (10.106.82.9) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Fri, 16 Jan 2026
- 17:32:36 +0000
-Message-ID: <31e7d93d-0e0f-4976-bff6-84f484a8a6f3@amazon.com>
-Date: Fri, 16 Jan 2026 17:32:35 +0000
+        d=google.com; s=20230601; t=1768584852; x=1769189652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=omt6t6gyNg/ahyDrqUD50qnP4xqrNa6EN8yZPVDHAws=;
+        b=TQaE6naScmt3EPwR80rxV5NpMbFHsHsFsmIM9n7uy/EVjFEr6C31DkyEEpQ+ahZvXS
+         phdqMb3XhYozS8N65kUjw0LXv93+8auqGgPhJ2+1ROdhtxovUNdKgboyA71+TX4w2zvU
+         1WndneNCLKOL6a9A4VtuiIqzvmv30pkvuXmMp/AR9XStwzRbaZxi0myGIXBzPqqLk8cy
+         /wqW26ruR7UZioy0HnSeyvnWhL7ZzY5VI6gupl0UeS10hw0q5QU32ofb87/fIJzP+mRy
+         /QcJglkPbfLXPc4BPzaCf66IMFnuH9/k5/PCoyiaoCffKtbpuLLKt1DH2GI5t2+rnsyA
+         gT8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768584852; x=1769189652;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=omt6t6gyNg/ahyDrqUD50qnP4xqrNa6EN8yZPVDHAws=;
+        b=GEC6m/gYbFcLlXCL4WlYEx/mYn2hoSSo/lbRy3+lFpMgTSlgXLhv9NDq92xqKwuOPX
+         3MArVImkm6BdbpUdjCTYf8XB/mS3nGSO0EY/PFMeo7Mzhf7aiDwsPS1pXV59SOOm063F
+         FNS7EyGQcXjJJwBSwAQiBh8MRRktmjsY3hzTzoPImj9x/gDoI3E5XNYDHSeqSrE7cTMj
+         arUzecaeNa3czc/FrD3ZC/A8a8SpE/lNOXSdUSQ3TBWqN9L6RZYy9keM9OqEHRJyKFeF
+         R0uFOztnCzx3pObPoBwRYJOQW9afckTN2zGvg2rHWucEif3fhNdLf7nXRP50tJkDPJyD
+         SG/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXF2zdpRFr767BN1KeqsR4JNA03UE68BfzYzXxnSOzA4XOmKEU02ABRsuPRJyj3E7Fm/6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya9NANmsvUAzK8H1N7MVdzo0D82wfmhXJsmy1f9IY0cSw8654K
+	LvmdMZfPnmS3QC5i6mxtIk9wCntr0xhiRJ08kkNsxo6My2w8ZZqHYQ01ZAXV1AJiCMQ832CwZTI
+	yegGURA==
+X-Received: from pjug18.prod.google.com ([2002:a17:90a:ce92:b0:34a:bd9b:7bb7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:f945:b0:349:8116:a2e1
+ with SMTP id 98e67ed59e1d1-35273255e65mr2763724a91.20.1768584851389; Fri, 16
+ Jan 2026 09:34:11 -0800 (PST)
+Date: Fri, 16 Jan 2026 09:34:10 -0800
+In-Reply-To: <E19BAC02-F4E4-4F66-A85D-A0D12D355E23@nutanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v9 07/13] KVM: guest_memfd: Add flag to remove from direct
- map
-To: Sean Christopherson <seanjc@google.com>, Rick P Edgecombe
-	<rick.p.edgecombe@intel.com>
-CC: "kalyazin@amazon.co.uk" <kalyazin@amazon.co.uk>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "kernel@xen0n.name" <kernel@xen0n.name>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "david@kernel.org" <david@kernel.org>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"jgross@suse.com" <jgross@suse.com>, "surenb@google.com" <surenb@google.com>,
-	"vbabka@suse.cz" <vbabka@suse.cz>, "riel@surriel.com" <riel@surriel.com>,
-	"pfalcato@suse.de" <pfalcato@suse.de>, "x86@kernel.org" <x86@kernel.org>,
-	"rppt@kernel.org" <rppt@kernel.org>, "thuth@redhat.com" <thuth@redhat.com>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "maz@kernel.org"
-	<maz@kernel.org>, "peterx@redhat.com" <peterx@redhat.com>, "ast@kernel.org"
-	<ast@kernel.org>, Vishal Annapurve <vannapurve@google.com>, "pjw@kernel.org"
-	<pjw@kernel.org>, "alex@ghiti.fr" <alex@ghiti.fr>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "hca@linux.ibm.com"
-	<hca@linux.ibm.com>, "willy@infradead.org" <willy@infradead.org>,
-	"wyihan@google.com" <wyihan@google.com>, "ryan.roberts@arm.com"
-	<ryan.roberts@arm.com>, "yang@os.amperecomputing.com"
-	<yang@os.amperecomputing.com>, "jolsa@kernel.org" <jolsa@kernel.org>,
-	"jmattson@google.com" <jmattson@google.com>, "luto@kernel.org"
-	<luto@kernel.org>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
-	"haoluo@google.com" <haoluo@google.com>, "patrick.roy@linux.dev"
-	<patrick.roy@linux.dev>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "mlevitsk@redhat.com"
-	<mlevitsk@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "hpa@zytor.com"
-	<hpa@zytor.com>, "song@kernel.org" <song@kernel.org>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "maobibo@loongson.cn"
-	<maobibo@loongson.cn>, "peterz@infradead.org" <peterz@infradead.org>,
-	"oupton@kernel.org" <oupton@kernel.org>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, "jthoughton@google.com"
-	<jthoughton@google.com>, "Jonathan.Cameron@huawei.com"
-	<Jonathan.Cameron@huawei.com>, "Yu, Yu-cheng" <yu-cheng.yu@intel.com>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "yonghong.song@linux.dev"
-	<yonghong.song@linux.dev>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"shuah@kernel.org" <shuah@kernel.org>, "prsampat@amd.com" <prsampat@amd.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>,
-	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
-	"itazur@amazon.co.uk" <itazur@amazon.co.uk>, "suzuki.poulose@arm.com"
-	<suzuki.poulose@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"dev.jain@arm.com" <dev.jain@arm.com>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>,
-	"jackabt@amazon.co.uk" <jackabt@amazon.co.uk>, "daniel@iogearbox.net"
-	<daniel@iogearbox.net>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-	"andrii@kernel.org" <andrii@kernel.org>, "mingo@redhat.com"
-	<mingo@redhat.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>, "derekmn@amazon.com"
-	<derekmn@amazon.com>, "xmarcalx@amazon.co.uk" <xmarcalx@amazon.co.uk>,
-	"kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
-	<sdf@fomichev.me>, "jackmanb@google.com" <jackmanb@google.com>,
-	"bp@alien8.de" <bp@alien8.de>, "corbet@lwn.net" <corbet@lwn.net>,
-	"ackerleytng@google.com" <ackerleytng@google.com>, "jannh@google.com"
-	<jannh@google.com>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"kas@kernel.org" <kas@kernel.org>, "will@kernel.org" <will@kernel.org>
-References: <20260114134510.1835-1-kalyazin@amazon.com>
- <20260114134510.1835-8-kalyazin@amazon.com>
- <ed01838830679880d3eadaf6f11c539b9c72c22d.camel@intel.com>
- <208b151b-f458-4327-94bc-eb3f32d20a68@amazon.com>
- <4781ba9c5d16394cdd785d008cf2a2d81c5cda35.camel@intel.com>
- <aWpcDrGVLrZOqdcg@google.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <aWpcDrGVLrZOqdcg@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D008EUC003.ant.amazon.com (10.252.51.205) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+Mime-Version: 1.0
+References: <20251229111708.59402-1-khushit.shah@nutanix.com>
+ <20251229111708.59402-2-khushit.shah@nutanix.com> <e09b6b6f623e98a2b21a1da83ff8071a0a87f021.camel@infradead.org>
+ <9CB80182-701E-4D28-A150-B3A0E774CD61@nutanix.com> <aWbe8Iut90J0tI1Q@google.com>
+ <cda9df77baa12272da735e739e132b2ac272cf9d.camel@infradead.org> <E19BAC02-F4E4-4F66-A85D-A0D12D355E23@nutanix.com>
+Message-ID: <aWp2kjvTFAw1wPt6@google.com>
+Subject: Re: [PATCH v5 1/3] KVM: x86: Refactor suppress EOI broadcast logic
+From: Sean Christopherson <seanjc@google.com>
+To: Khushit Shah <khushit.shah@nutanix.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"kai.huang@intel.com" <kai.huang@intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	Jon Kohler <jon@nutanix.com>, Shaju Abraham <shaju.abraham@nutanix.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jan 16, 2026, Khushit Shah wrote:
+> > On 16 Jan 2026, at 2:31=E2=80=AFPM, David Woodhouse <dwmw2@infradead.or=
+g> wrote:
+> >=20
+> > But KVM *will* notify listeners, surely? When the guest issues the EOI
+> > via the I/O APIC EOIR register.
+> >=20
+> > For that commit to have made any difference, Xen *has* to have been
+> > buggy, enabling directed EOI in the local APIC despite the I/O APIC not
+> > having the required support. Thus interrupts never got EOI'd at all,
+> > and sure, the notifiers didn't get called.
 
+Oh, I 100% agree there were bugs aplenty on both sides, but that's exactly =
+why I
+don't want to add support for the in-kernel I/O APIC without a strong reaso=
+n for
+doing so.
 
-On 16/01/2026 15:41, Sean Christopherson wrote:
-> On Fri, Jan 16, 2026, Rick P Edgecombe wrote:
->> On Fri, 2026-01-16 at 15:02 +0000, Nikita Kalyazin wrote:
->>>> TDX does some clearing at the direct map mapping for pages that
->>>> comes from gmem, using a special instruction. It also does some
->>>> clflushing at the direct map address for these pages. So I think we
->>>> need to make sure TDs don't pull from gmem fds with this flag.
->>>
->>> Would you be able to give a pointer on how we can do that?  I'm not
->>> very familiar with the TDX code.
->>
->> Uhh, that is a good question. Let me think.
-> 
-> Pass @kvm to kvm_arch_gmem_supports_no_direct_map() and then return %false if
-> it's a TDX VM.
+> You are describing=20
+> 0bcc3fb95b97 ("KVM: lapic: stop advertising DIRECTED_EOI when in-kernel I=
+OAPIC is in use=E2=80=9D)
+> Since then I guess this issue should have been fixed?!  As
+> c806a6ad35bf ("KVM: x86: call irq notifiers with directed EOI=E2=80=9D)  =
+was much earlier.
+>=20
+> > On 16 Jan 2026, at 2:31=E2=80=AFPM, David Woodhouse <dwmw2@infradead.or=
+g> wrote:
+> >=20
+> > If you're concerned about what to backport to stable, then arguably
+> > it's *only* KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST which should be
+> > backported, as that's the bug, and _ENABLE_ is a new feature?
+>=20
+> I think neither DISABLE or ENABLE is a new feature at least for split
+> IRQCHIP.  It=E2=80=99s just giving a way to user-space to fix a bug in a =
+way they
+> like, because that=E2=80=99s how it should have been from the beginning.
 
-Sounds good to me, thanks.
+Ya.  I don't see ENABLE (for split IRQCHIP) as a new feature, because it's =
+the
+only way for userspace to fix its setups without changing the virtual CPU m=
+odel
+exposed to the guest.
 
+For better or worse, the aforementioned commit 0bcc3fb95b97 ("KVM: lapic: s=
+top
+advertising DIRECTED_EOI when in-kernel IOAPIC is in use=E2=80=9D) already =
+clobbered the
+virtual model when using an in-kernel I/O APIC.  Even though KVM (AFAIK) go=
+t away
+with the switcheroo then, I am strongly opposed to _KVM_ changing the virtu=
+al CPU
+model.  I.e. I want to give userspace the ability to choose how to address =
+the
+issue, because only userspace (or rather, the platform owner) knows whether=
+ or
+not its I/O APIC implementation plays nice with ENABLE, whether it's risker=
+ to
+continue with QUIRK vs. DISABLE, etc.
 
