@@ -1,191 +1,217 @@
-Return-Path: <kvm+bounces-68347-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68348-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA61D37A15
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:29:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E73ED37A06
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:28:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C38B13065E3E
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:20:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 864A630700F3
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3D83939BA;
-	Fri, 16 Jan 2026 17:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="QuKoDwqp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD5536A01A;
+	Fri, 16 Jan 2026 17:27:41 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2163348479
-	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67C533CE80
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768584056; cv=none; b=hGs8VQNCBY/hjaWdqxhN9qDtJ5mreJjEf3FTgLKmQevKYFJ3n3A8/SDLSXpcxTJA+nIQ8SN4ox6hl2tilCRDLN/ZQ8S487HAHMZ1vK7L5yChRkXddMZyeNqCdoldSWbcGp3XxSLmG4Mwg682lkv8E3dxRkI4fkEx6eRDvZH5yfQ=
+	t=1768584461; cv=none; b=JoSRLDOhGn2BS2QSdifDiM2tueY53FWLiLLX7PwVTfxyAlJEgdKGcBrZOgcGytHR4tTIBvPDY0GpUXoejTNrScdksQ+ZoHIuwImt2YafJdfsh5cwUi+7XpY8qNEiV16KRcJhkvhCEO2+fqJ4llx4S8roxX5Yu7YfwT5Em8d4YwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768584056; c=relaxed/simple;
-	bh=490zkhRPTEVvWMTEcFUO0h1sLOGSaZthz/LSBKvRa+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ps8JeO7z6MJLaxOKdj0bwEffWpTQZjf6l7UefcZ/5A/IBtqFypZSUczNN5UZjS4eZXh6hnIZxT+99Ws0zrbgEmOfosnOi58eb64UZjCAv7dkN6zakY2s6APh2oASz8RLh89ktyvPsGgdVTR7jd0LrJpduOt9zoWsY11zbNbp1x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=QuKoDwqp; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-88a2f2e5445so27748776d6.1
-        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 09:20:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1768584053; x=1769188853; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ke97Rr0JZ7eY7fCVBJ0MTKU0b1sPJJtx1nolStxn4zc=;
-        b=QuKoDwqpq7rfVDLL63U7gs+6o6cUuw73iKJHUbroOh8zC+vPgWAaZtQI5/NlRs24Mw
-         8dydbp/XwFplbaabTNWQZxg6yO/0rhWpWRvXvBtURfMn2kqj1Hxj0NIsDhusEE0AtOyv
-         aixQBVVsO0HPa+z8eMZnQvsuFmEU5dtdnihlzNOHPXqNTJhR52WCkxRBZtWD+paHsKGr
-         Wd0jSHgppclaWB3DuRJ2wpEuMmY8dwlkphThA1yVWf2337W0Eksq3FNCKzX3xbvw5IWd
-         /6LwoTTe0p1oMq3PteX7uduxjRJtMGtx6RTBuTvNdYMUwycYov9MgerFrc5AI0Pr8BY/
-         vEKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768584053; x=1769188853;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ke97Rr0JZ7eY7fCVBJ0MTKU0b1sPJJtx1nolStxn4zc=;
-        b=W2HPJM2emhotBlU5nWj0cpHpMh1lRSuHDe0ZHtiw5NPlVvAqHl/oR8stE53CYNyJVr
-         w+RvAfqPMS9ZDlZFYk/JFmfdkfayHvg+x1FnOrHVcpRuhZALS59FM12vYUi9+HCXaDbw
-         bgEsnkjy6caqD2HCxOBtoYI8iwpM/UABN9JISWDFN1zLdgop/WicDnkbA4KMA1AHIGU+
-         AdxgM3y+bHAsy8Ikx6DaXrCEfEMo9MSjZQ7SN4I3kPNJIFAbDCAEhvYnx0/wUEqd/EkX
-         crmX11bIUAZEUsO8TNxl9COjgfBaTYRcKrpC/JgyS53KI5RJkuVNap+3cK6sU/hfOa08
-         IV3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVY2hz/OvyBlfrszc8VlnK4TLOFhQMnZJU7aCVVlz9MqJa4X0jbhuoYcRhKNJdDOEHwqT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTUiGtkZy5rv4m6MxRlnP79xAIEQoNic7C0YI6Ixeh6/5YuPuj
-	2n3Jvm4WsqcaYup7TWNqrigJFRPWNliBetSz5lbNQDmlWpzSUCvpyBYANpLgOQ864mM=
-X-Gm-Gg: AY/fxX6JXHDG6E/xKFdaZI2xOFh7YlhV4qtiYl4xV1YV6F28rKk4WvMzqtNGLDx+oDk
-	gdDnYXoxwH41VzU9zMdCRLbLQ3s+i5I2zJZ3fmDgrrR9CHP59hVEEiP95ARJxXamiM0i5BPHiOp
-	k9d1W8uT7K6ywQsq6nt9VLYlZoSn4GTd5G8Ve8/d67IobXUywoljcC2Vmeuep7ITObMJ9hRRUoe
-	/J4kNTUsEvtsUiC9pf2oIZ9scnapSry4Pdis/fwkh7Iv1o0uJSGvvXhlqi7MQcuifYmpkeDrq/c
-	8jVZvoLvnEg7rHOH4fkkxbBKRQiIe9Ps5neqTNwk7nz2sCQBq+3Vt0MwrcEEeuqREKMhC53MNV6
-	pXTHdpGnerg4BHPqhqIZJDkrvPYiL4HngD1HCXDmlXrKtwc91OnGCtQrSBZ5bsxhWXVyAm+AWf+
-	XcLfBpZju5e4CFMCkqs/EGVwM5USHh6Bv2XZC25hpf5xSSAQc9sxS7PSrktEoYFjnMx2E=
-X-Received: by 2002:a05:6214:d08:b0:88a:529a:a543 with SMTP id 6a1803df08f44-8942e543175mr46699756d6.69.1768584053510;
-        Fri, 16 Jan 2026 09:20:53 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e6ad606sm26895826d6.33.2026.01.16.09.20.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 09:20:52 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vgnVE-00000004kb4-0KMs;
-	Fri, 16 Jan 2026 13:20:52 -0400
-Date: Fri, 16 Jan 2026 13:20:52 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Francois Dugast <francois.dugast@intel.com>,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>, Zi Yan <ziy@nvidia.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	adhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, Balbir Singh <balbirs@nvidia.com>,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	nouveau@lists.freedesktop.org, linux-mm@kvack.org,
-	linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-Message-ID: <20260116172052.GC961572@ziepe.ca>
-References: <20260116111325.1736137-1-francois.dugast@intel.com>
- <20260116111325.1736137-2-francois.dugast@intel.com>
- <ed6ca250-67ee-4f7a-bc3b-66169494549a@suse.cz>
+	s=arc-20240116; t=1768584461; c=relaxed/simple;
+	bh=7XIX9nvu3afzXizq2XOPrRIVleTTBXYT+Fptez4iCgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U5hQyfWtXS6Ya3LyxRO1vEDFaDNenRWG62pyFjduEZaNm8byXiLQud5q267va0YnwvvM9QkEmYVxI5iqSjnnYdAdREdt8Xc+OGQJrcZSL1lb5jfOKl/wHzjU2+Ljb1SoTTY7pDkOGuO3Ol+NaGl6tugy8v3bZ2qSPNFQt4G+T5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 26A185BCEE;
+	Fri, 16 Jan 2026 17:27:38 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D33633EA63;
+	Fri, 16 Jan 2026 17:27:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /QGJMAl1ammlHgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 16 Jan 2026 17:27:37 +0000
+Message-ID: <4e100125-ed70-4ec9-a0fa-5214bccd7cf3@suse.cz>
+Date: Fri, 16 Jan 2026 18:27:37 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed6ca250-67ee-4f7a-bc3b-66169494549a@suse.cz>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
+ private folios
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Francois Dugast <francois.dugast@intel.com>,
+ intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ Matthew Brost <matthew.brost@intel.com>, Zi Yan <ziy@nvidia.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ adhavan Srinivasan <maddy@linux.ibm.com>, Nicholas Piggin
+ <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Felix Kuehling <Felix.Kuehling@amd.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+ David Hildenbrand <david@kernel.org>, Oscar Salvador <osalvador@suse.de>,
+ Andrew Morton <akpm@linux-foundation.org>, Leon Romanovsky
+ <leon@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport
+ <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
+ Michal Hocko <mhocko@suse.com>, Balbir Singh <balbirs@nvidia.com>,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+ nouveau@lists.freedesktop.org, linux-mm@kvack.org, linux-cxl@vger.kernel.org
+References: <20260116111325.1736137-1-francois.dugast@intel.com>
+ <20260116111325.1736137-2-francois.dugast@intel.com>
+ <ed6ca250-67ee-4f7a-bc3b-66169494549a@suse.cz>
+ <20260116172052.GC961572@ziepe.ca>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
+ KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
+ 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
+ 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
+ tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
+ Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
+ 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
+ LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
+ 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
+ BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
+ QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
+ AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJnyBr8BQka0IFQAAoJECJPp+fMgqZkqmMQ
+ AIbGN95ptUMUvo6aAdhxaOCHXp1DfIBuIOK/zpx8ylY4pOwu3GRe4dQ8u4XS9gaZ96Gj4bC+
+ jwWcSmn+TjtKW3rH1dRKopvC07tSJIGGVyw7ieV/5cbFffA8NL0ILowzVg8w1ipnz1VTkWDr
+ 2zcfslxJsJ6vhXw5/npcY0ldeC1E8f6UUoa4eyoskd70vO0wOAoGd02ZkJoox3F5ODM0kjHu
+ Y97VLOa3GG66lh+ZEelVZEujHfKceCw9G3PMvEzyLFbXvSOigZQMdKzQ8D/OChwqig8wFBmV
+ QCPS4yDdmZP3oeDHRjJ9jvMUKoYODiNKsl2F+xXwyRM2qoKRqFlhCn4usVd1+wmv9iLV8nPs
+ 2Db1ZIa49fJet3Sk3PN4bV1rAPuWvtbuTBN39Q/6MgkLTYHb84HyFKw14Rqe5YorrBLbF3rl
+ M51Dpf6Egu1yTJDHCTEwePWug4XI11FT8lK0LNnHNpbhTCYRjX73iWOnFraJNcURld1jL1nV
+ r/LRD+/e2gNtSTPK0Qkon6HcOBZnxRoqtazTU6YQRmGlT0v+rukj/cn5sToYibWLn+RoV1CE
+ Qj6tApOiHBkpEsCzHGu+iDQ1WT0Idtdynst738f/uCeCMkdRu4WMZjteQaqvARFwCy3P/jpK
+ uvzMtves5HvZw33ZwOtMCgbpce00DaET4y/UzsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
+ J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
+ /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
+ IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
+ X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
+ wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
+ PVAiT6fnzIKmZAUCZ8gcVAUJFhTonwAKCRAiT6fnzIKmZLY8D/9uo3Ut9yi2YCuASWxr7QQZ
+ lJCViArjymbxYB5NdOeC50/0gnhK4pgdHlE2MdwF6o34x7TPFGpjNFvycZqccSQPJ/gibwNA
+ zx3q9vJT4Vw+YbiyS53iSBLXMweeVV1Jd9IjAoL+EqB0cbxoFXvnjkvP1foiiF5r73jCd4PR
+ rD+GoX5BZ7AZmFYmuJYBm28STM2NA6LhT0X+2su16f/HtummENKcMwom0hNu3MBNPUOrujtW
+ khQrWcJNAAsy4yMoJ2Lw51T/5X5Hc7jQ9da9fyqu+phqlVtn70qpPvgWy4HRhr25fCAEXZDp
+ xG4RNmTm+pqorHOqhBkI7wA7P/nyPo7ZEc3L+ZkQ37u0nlOyrjbNUniPGxPxv1imVq8IyycG
+ AN5FaFxtiELK22gvudghLJaDiRBhn8/AhXc642/Z/yIpizE2xG4KU4AXzb6C+o7LX/WmmsWP
+ Ly6jamSg6tvrdo4/e87lUedEqCtrp2o1xpn5zongf6cQkaLZKQcBQnPmgHO5OG8+50u88D9I
+ rywqgzTUhHFKKF6/9L/lYtrNcHU8Z6Y4Ju/MLUiNYkmtrGIMnkjKCiRqlRrZE/v5YFHbayRD
+ dJKXobXTtCBYpLJM4ZYRpGZXne/FAtWNe4KbNJJqxMvrTOrnIatPj8NhBVI0RSJRsbilh6TE
+ m6M14QORSWTLRg==
+In-Reply-To: <20260116172052.GC961572@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Rspamd-Queue-Id: 26A185BCEE
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
 
-On Fri, Jan 16, 2026 at 05:07:09PM +0100, Vlastimil Babka wrote:
-> On 1/16/26 12:10, Francois Dugast wrote:
-> > From: Matthew Brost <matthew.brost@intel.com>
-> > diff --git a/mm/memremap.c b/mm/memremap.c
-> > index 63c6ab4fdf08..ac7be07e3361 100644
-> > --- a/mm/memremap.c
-> > +++ b/mm/memremap.c
-> > @@ -477,10 +477,43 @@ void free_zone_device_folio(struct folio *folio)
-> >  	}
-> >  }
-> >  
-> > -void zone_device_page_init(struct page *page, unsigned int order)
-> > +void zone_device_page_init(struct page *page, struct dev_pagemap *pgmap,
-> > +			   unsigned int order)
-> >  {
-> > +	struct page *new_page = page;
-> > +	unsigned int i;
-> > +
-> >  	VM_WARN_ON_ONCE(order > MAX_ORDER_NR_PAGES);
-> >  
-> > +	for (i = 0; i < (1UL << order); ++i, ++new_page) {
-> > +		struct folio *new_folio = (struct folio *)new_page;
-> > +
-> > +		/*
-> > +		 * new_page could have been part of previous higher order folio
-> > +		 * which encodes the order, in page + 1, in the flags bits. We
-> > +		 * blindly clear bits which could have set my order field here,
-> > +		 * including page head.
-> > +		 */
-> > +		new_page->flags.f &= ~0xffUL;	/* Clear possible order, page head */
-> > +
-> > +#ifdef NR_PAGES_IN_LARGE_FOLIO
-> > +		/*
-> > +		 * This pointer math looks odd, but new_page could have been
-> > +		 * part of a previous higher order folio, which sets _nr_pages
-> > +		 * in page + 1 (new_page). Therefore, we use pointer casting to
-> > +		 * correctly locate the _nr_pages bits within new_page which
-> > +		 * could have modified by previous higher order folio.
-> > +		 */
-> > +		((struct folio *)(new_page - 1))->_nr_pages = 0;
-> > +#endif
-> > +
-> > +		new_folio->mapping = NULL;
-> > +		new_folio->pgmap = pgmap;	/* Also clear compound head */
-> > +		new_folio->share = 0;   /* fsdax only, unused for device private */
-> > +		VM_WARN_ON_FOLIO(folio_ref_count(new_folio), new_folio);
-> > +		VM_WARN_ON_FOLIO(!folio_is_zone_device(new_folio), new_folio);
-> > +	}
-> > +
-> >  	/*
-> >  	 * Drivers shouldn't be allocating pages after calling
-> >  	 * memunmap_pages().
+On 1/16/26 18:20, Jason Gunthorpe wrote:
+> On Fri, Jan 16, 2026 at 05:07:09PM +0100, Vlastimil Babka wrote:
+>> On 1/16/26 12:10, Francois Dugast wrote:
+>> > From: Matthew Brost <matthew.brost@intel.com>
+>> > diff --git a/mm/memremap.c b/mm/memremap.c
+>> > index 63c6ab4fdf08..ac7be07e3361 100644
+>> > --- a/mm/memremap.c
+>> > +++ b/mm/memremap.c
+>> > @@ -477,10 +477,43 @@ void free_zone_device_folio(struct folio *folio)
+>> >  	}
+>> >  }
+>> >  
+>> > -void zone_device_page_init(struct page *page, unsigned int order)
+>> > +void zone_device_page_init(struct page *page, struct dev_pagemap *pgmap,
+>> > +			   unsigned int order)
+>> >  {
+>> > +	struct page *new_page = page;
+>> > +	unsigned int i;
+>> > +
+>> >  	VM_WARN_ON_ONCE(order > MAX_ORDER_NR_PAGES);
+>> >  
+>> > +	for (i = 0; i < (1UL << order); ++i, ++new_page) {
+>> > +		struct folio *new_folio = (struct folio *)new_page;
+>> > +
+>> > +		/*
+>> > +		 * new_page could have been part of previous higher order folio
+>> > +		 * which encodes the order, in page + 1, in the flags bits. We
+>> > +		 * blindly clear bits which could have set my order field here,
+>> > +		 * including page head.
+>> > +		 */
+>> > +		new_page->flags.f &= ~0xffUL;	/* Clear possible order, page head */
+>> > +
+>> > +#ifdef NR_PAGES_IN_LARGE_FOLIO
+>> > +		/*
+>> > +		 * This pointer math looks odd, but new_page could have been
+>> > +		 * part of a previous higher order folio, which sets _nr_pages
+>> > +		 * in page + 1 (new_page). Therefore, we use pointer casting to
+>> > +		 * correctly locate the _nr_pages bits within new_page which
+>> > +		 * could have modified by previous higher order folio.
+>> > +		 */
+>> > +		((struct folio *)(new_page - 1))->_nr_pages = 0;
+>> > +#endif
+>> > +
+>> > +		new_folio->mapping = NULL;
+>> > +		new_folio->pgmap = pgmap;	/* Also clear compound head */
+>> > +		new_folio->share = 0;   /* fsdax only, unused for device private */
+>> > +		VM_WARN_ON_FOLIO(folio_ref_count(new_folio), new_folio);
+>> > +		VM_WARN_ON_FOLIO(!folio_is_zone_device(new_folio), new_folio);
+>> > +	}
+>> > +
+>> >  	/*
+>> >  	 * Drivers shouldn't be allocating pages after calling
+>> >  	 * memunmap_pages().
+>> 
+>> Can't say I'm a fan of this. It probably works now (so I'm not nacking) but
+>> seems rather fragile. It seems likely to me somebody will try to change some
+>> implementation detail in the page allocator and not notice it breaks this,
+>> for example. I hope we can eventually get to something more robust.
 > 
-> Can't say I'm a fan of this. It probably works now (so I'm not nacking) but
-> seems rather fragile. It seems likely to me somebody will try to change some
-> implementation detail in the page allocator and not notice it breaks this,
-> for example. I hope we can eventually get to something more robust.
+> These pages shouldn't be in the buddy allocator at all? The driver
+> using the ZONE_DEVICE pages is responsible to provide its own
+> allocator.
+> 
+> Did you mean something else?
 
-These pages shouldn't be in the buddy allocator at all? The driver
-using the ZONE_DEVICE pages is responsible to provide its own
-allocator.
+Yeah sorry that was imprecise. I meant the struct page/folio layout
+implementation details (which may or may not be related to the page allocator).
 
-Did you mean something else?
+> Jason
+>  
 
-Jason
- 
 
