@@ -1,198 +1,154 @@
-Return-Path: <kvm+bounces-68344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E98D33C1F
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:16:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBDCBD378D4
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 18:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5307B302409B
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:09:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 85A3530A9094
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 17:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A812234AAE2;
-	Fri, 16 Jan 2026 17:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B574E2DF12F;
+	Fri, 16 Jan 2026 17:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b="DWNXtTIa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ym1ebSHF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-106121.protonmail.ch (mail-106121.protonmail.ch [79.135.106.121])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF0633CE82
-	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8DF18E1F
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768583369; cv=none; b=hz06BcbpWUN8i5idUqDvDBY8Raw9xgf7jtJTdlWIJEaL3vxSsb7oxxwO5MFKc0Ftgv6kFnxDOBXJHXwAn417+YMSRkucX3a0X9vCjDCJMsWrFQvtRK1ZxPzO6wVeqSZt+BfTPjo1E9cyLN1Cvpmss8SBWL2nhTDL/D6sqlNSf5k=
+	t=1768583686; cv=none; b=V7OZlj3EPdtybYQYxW2dNWoLzW1Nkq4OfUPVr3VyTzb74ntniaLEkNzDQDEnijhErMcnqhAdAe1t6l4URkhFMuG9+1ct1Zb2QCF0DWwdCg/O07/sqo8Iwm5aAyeBqQl9/q8q855HYdBYapxd4e6jWW5sfGFP0gOhx9AeH88i5aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768583369; c=relaxed/simple;
-	bh=OgfGYzyoOo7LnR2rlb7Y0ATya0bhxed4yd8DBJmBSVk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=II1ldEC+lxeIqq9IZrHXoNBgjSXCJXBg6cLreSd1LzUTBIKUC8D7wjzjIavp0IJI5m8nBlD+oE0F1roOhumtEHK0oZt/AzqwUB6nGt0M1DZPdaqwzJVuFoCuXbuhcXEemCpWSNejTmADMnSFedLBe/6StlcDPA05003ssnctGEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=DWNXtTIa; arc=none smtp.client-ip=79.135.106.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1768583364; x=1768842564;
-	bh=hgF1sC5w0nZhRl9CXrxpuRnpTJCUGr7J7j9UsMP7WBU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=DWNXtTIayxOvHp4Sq0R+LiqaUQvG/qOVVK7VcxgSyVgrAIvJawhtepERoEqLfR7mK
-	 hFINzuMEkx9KiZ22uOYnI6cu+dXAGwb5yoWuAOQrC0EDciUnSwoZTSOqHh+iuHiobm
-	 j+ZkR17pkEgsfakpDgdxe6SeoxP89E2DzB3+gIu4mOgDj7OzXAK5N7HqZPob4J0uf5
-	 YxsQu5qJ6uK6BSMUkEkX7/pPV3RFlIxcsgWPe3jl/qO59j4y5ThHPjsR6KLk9DV9z/
-	 Ib9gLMeqFMpZphkBWOfm1ZGrCEA03kNTGt3qvaiJUTVPUnP3TcWnnXJvxWWkDGFzha
-	 lDxDws0+bUIMg==
-Date: Fri, 16 Jan 2026 17:09:17 +0000
-To: Sean Christopherson <seanjc@google.com>
-From: Maciej Wieczor-Retman <m.wieczorretman@pm.me>
-Cc: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Alexander Potapenko <glider@google.com>, linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Subject: Re: [PATCH v8 09/14] x86/mm: LAM compatible non-canonical definition
-Message-ID: <aWpv9MgPHMYR27I0@wieczorr-mobl1.localdomain>
-In-Reply-To: <aWpuuiuqZhkGRj2B@google.com>
-References: <cover.1768233085.git.m.wieczorretman@pm.me> <0347c61eccf739ad15ec62600f009c212d52e761.1768233085.git.m.wieczorretman@pm.me> <2968b97c-5d71-4c05-9013-f275bdbd9cd5@gmail.com> <19zLzHKb9uDih-eLthvMnb-TF7WvD5Dk7shNZvYqyzl7wAsyS6s_fXuZG7pMOR4XfouH8Tb1MT7LqHvV5RXQLw==@protonmail.internalid> <aWpRwJqjzBxOaRwi@google.com> <aWpb1AnRHW2yupZp@wieczorr-mobl1.localdomain> <aWpuuiuqZhkGRj2B@google.com>
-Feedback-ID: 164464600:user:proton
-X-Pm-Message-ID: 6407d752904376ac3bb2995fc8da4a870aabc55b
+	s=arc-20240116; t=1768583686; c=relaxed/simple;
+	bh=HcsgQ8ddYvGnAaJjNR8u67lt5UzdJilH0JEzFChaOw4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KO0HuhBr3/yGNvgNDqQn4LU7ZJ3Gkv4BhFJC0GjyWeooSZY6h3qmcmQw/9AkQKFtK0xKvTPXMZ4ySGIJLUZAQFTHAyJNf0HidmNXLx/9XMJpC0DRLgRkCWWEPcZO0K2/22VFBBH4mzrtisPWTHGCb1x3SA6ooTMKp9kJTVencF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ym1ebSHF; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c704d5d15so3788999a91.1
+        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 09:14:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768583685; x=1769188485; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fkk10MiugYsvJrQTqX5exO07szvTrlf4fKKTid3Yj4c=;
+        b=Ym1ebSHF9KYm8qqvoSbNIrw0axtVQuruWtid3vlbLYKHfmH0o6SZhThdRqYnEfgAZf
+         37dVQrwXcSWW/ZVWPtEiVA9s1daY9d9D1jDw+EJULiv2OYKvI5BNTfe09L55oRLEBa3k
+         b298RZAialcoFIOAgT7y/cXdkV2yLpVf2ytE3uClNhBxzN1pwkiFuyk/XwKJzhx6wX6+
+         4UmEGMqvgyxrFP/4O1GAuNvEULKKEbtwjNSaPEVJxdTX1mZtXdMW3y4c/wBP0ADWbm29
+         corlseP0xkQMv/BuO29fmt7+MC+/8uNjNVifhbxokL7NbNS1uXYjvVvv6DpQCMihipFV
+         m9bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768583685; x=1769188485;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fkk10MiugYsvJrQTqX5exO07szvTrlf4fKKTid3Yj4c=;
+        b=RdX848zvnfyV2B1PNTvIzCMcMRCegFw58KzKtYKZ4AiKwBT/FfHqGUuBlca09Q6VIT
+         EdglQgcX2zUrJ+NznlHhR7cG5kvOyj8yT8N4oMGVtnHKv0ZgSKgomKLULtdGNoot9YxL
+         UEetFKKYYMwMZVIUiMyRlto0i7ps45c47CU12VRptPrIVW750utuzH7EEWklPmVSfdp1
+         9XGwcoZxjqVZHS0bNkeJzbAHsMOnZu7KmU8mwM4x+1KGoqb0IbETWKolw5VmhgYjZ1zg
+         lfPhjNOi2cNaoRbrhNXNrijSH9qb99Md80mWufT1FmfIOZ535NFQUnN3zmn57JOmgb7K
+         HzWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUanqFJ4auoqF9l/M0L4eVUtm0OfXJ/go0eoqQFGoRV8zPXe69scSo0kTCg45yEMoLUBEI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEJZH0yPqoDf4GOevvjprWfQNyexxJIB0uNA1dwsi0oB/5Tf7T
+	7QqYF7JBMZRcuWuCtDt48BCb7TBk+9pa0PDm87TGBHkpzFsk/NFVa5Zwozz/kngdzrxd+n3GrOc
+	4qs8xZA==
+X-Received: from pjxd20.prod.google.com ([2002:a17:90a:c254:b0:34a:4a21:bc22])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f86:b0:339:d03e:2a11
+ with SMTP id 98e67ed59e1d1-35272efccc2mr3274066a91.14.1768583684779; Fri, 16
+ Jan 2026 09:14:44 -0800 (PST)
+Date: Fri, 16 Jan 2026 09:14:43 -0800
+In-Reply-To: <435b8d81-b4de-4933-b0ae-357dea311488@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <CAEvNRgFOER_j61-3u2dEoYdFMPNKaVGEL_=o2WVHfBi8nN+T0A@mail.gmail.com>
+ <aV2eIalRLSEGozY0@google.com> <CAEvNRgHSm0k2hthxLPg8oXO_Y9juA9cxOBp2YdFFYOnDkxpv5g@mail.gmail.com>
+ <aWbkcRshLiL4NWZg@yzhao56-desk.sh.intel.com> <aWbwVG8aZupbHBh4@google.com>
+ <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com>
+ <f4240495-120b-4124-b91a-b365e45bf50a@intel.com> <aWgyhmTJphGQqO0Y@google.com>
+ <435b8d81-b4de-4933-b0ae-357dea311488@intel.com>
+Message-ID: <aWpyA0_r_yVewnfx@google.com>
+Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
+From: Sean Christopherson <seanjc@google.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Yan Zhao <yan.y.zhao@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, x86@kernel.org, rick.p.edgecombe@intel.com, 
+	kas@kernel.org, tabba@google.com, michael.roth@amd.com, david@kernel.org, 
+	sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com, 
+	nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
+	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
+	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 2026-01-16 at 09:00:42 -0800, Sean Christopherson wrote:
->On Fri, Jan 16, 2026, Maciej Wieczor-Retman wrote:
->> On 2026-01-16 at 06:57:04 -0800, Sean Christopherson wrote:
->> >On Fri, Jan 16, 2026, Andrey Ryabinin wrote:
->> >> On 1/12/26 6:28 PM, Maciej Wieczor-Retman wrote:
->> >> > diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/pag=
-e.h
->> >> > index bcf5cad3da36..b7940fa49e64 100644
->> >> > --- a/arch/x86/include/asm/page.h
->> >> > +++ b/arch/x86/include/asm/page.h
->> >> > @@ -82,9 +82,22 @@ static __always_inline void *pfn_to_kaddr(unsign=
-ed long pfn)
->> >> >  =09return __va(pfn << PAGE_SHIFT);
->> >> >  }
->> >> >
->> >> > +#ifdef CONFIG_KASAN_SW_TAGS
->> >> > +#define CANONICAL_MASK(vaddr_bits) (BIT_ULL(63) | BIT_ULL((vaddr_b=
-its) - 1))
->> >>
->> >> why is the choice of CANONICAL_MASK() gated at compile time? Shouldn=
-=E2=80=99t this be a
->> >> runtime decision based on whether LAM is enabled or not on the runnin=
-g system?
->>
->> What would be appropriate for KVM? Instead of using #ifdefs checking
->> if(cpu_feature_enabled(X86_FEATURE_LAM))?
+On Fri, Jan 16, 2026, Dave Hansen wrote:
+> On 1/14/26 16:19, Sean Christopherson wrote:
+> >> 'struct page' gives us two things: One is the type safety, but I'm
+> >> pretty flexible on how that's implemented as long as it's not a raw u64
+> >> getting passed around everywhere.
+> > I don't necessarily disagree on the type safety front, but for the specific code
+> > in question, any type safety is a facade.  Everything leading up to the TDX code
+> > is dealing with raw PFNs and/or PTEs.  Then the TDX code assumes that the PFN
+> > being mapped into the guest is backed by a struct page, and that the folio size
+> > is consistent with @level, without _any_ checks whatsover.  This is providing
+> > the exact opposite of safety.
+> > 
+> >   static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+> > 			    enum pg_level level, kvm_pfn_t pfn)
+> >   {
+> > 	int tdx_level = pg_level_to_tdx_sept_level(level);
+> > 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> > 	struct page *page = pfn_to_page(pfn);    <==================
+> 
+> I of course agree that this is fundamentally unsafe, it's just not
+> necessarily bad code.
+> 
+> I hope we both agree that this could be made _more_ safe by, for
+> instance, making sure the page is in a zone, pfn_valid(), and a few more
+> things.
 >
->None of the above.  Practically speaking, the kernel APIs simply can't aut=
-omatically
->handle the checks, because they are dependent on guest virtual CPU state, =
-_and_
->on the exact operation.  E.g. LAM doesn't apply to inputs to TLB invalidat=
-ion
->instructions like INVVPID and INVPCID.
->
->By the time KVM invokes __is_canonical_address(), KVM has already done the=
- necessary
->LAM unmasking.  E.g. having KVM pass in a flag saying it doesn't need LAM =
-masking
->would be rather silly.
-
-Oh good, then I'll leave this function alone and try to work it out differe=
-ntly.
-Thanks!
-
->
->> >> > +#else
->> >> > +#define CANONICAL_MASK(vaddr_bits) GENMASK_ULL(63, vaddr_bits)
->> >> > +#endif
->> >> > +
->> >> > +/*
->> >> > + * To make an address canonical either set or clear the bits defin=
-ed by the
->> >> > + * CANONICAL_MASK(). Clear the bits for userspace addresses if the=
- top address
->> >> > + * bit is a zero. Set the bits for kernel addresses if the top add=
-ress bit is a
->> >> > + * one.
->> >> > + */
->> >> >  static __always_inline u64 __canonical_address(u64 vaddr, u8 vaddr=
-_bits)
->> >>
->> >> +Cc KVM
->> >
->> >Thanks!
->> >
->> >> This is used extensively in KVM code. As far as I can tell, it may be=
- used to
->> >> determine whether a guest virtual address is canonical or not.
->> >
->> >Yep, KVM uses this both to check canonical addresses and to force a can=
-onical
->> >address (Intel and AMD disagree on the MSR_IA32_SYSENTER_{EIP,ESP} sema=
-ntics in
->> >64-bit mode) for guest addresses.  This change will break KVM badly if =
-KASAN_SW_TAGS=3Dy.
->>
->> Oh, thanks! That's good to know.
->>
->> >
->> >> case, the result should depend on whether LAM is enabled for the gues=
-t, not
->> >> the host (and certainly not a host's compile-time option).
->> >
->> >Ya, KVM could roll its own versions, but IMO these super low level help=
-ers should
->> >do exactly what they say.  E.g. at a glance, I'm not sure pt_event_addr=
-_filters_sync()
->> >should be subjected to KASAN_SW_TAGS either.  If that's true, then AFAI=
-CT the
->> >_only_ code that wants the LAM-aware behavior is copy_from_kernel_nofau=
-lt_allowed(),
->> >so maybe just handle it there?  Not sure that's a great long-term maint=
-enance
->> >story either though.
->>
->> Yes, longterm it's probably best to just get it right in here.
->
->As above, I don't think that's feasible, because the context of both the c=
-urrent
->(virtual) CPU and the usage matters.  In other words, making __canonical_a=
-ddress()
->itself LAM-aware feels wrong.
->
->Actually, the kernel already has to deal with masking LAM bits for userspa=
-ce
->addresses, and this series needs to unmask kernel address in other flows t=
-hat
->effectively consume virtual addresses in software, so why not just do some=
-thing
->similar for copy_from_kernel_nofault_allowed()?
->
->diff --git a/arch/x86/mm/maccess.c b/arch/x86/mm/maccess.c
->index 42115ac079cf..0b3c96f8902a 100644
->--- a/arch/x86/mm/maccess.c
->+++ b/arch/x86/mm/maccess.c
->@@ -33,7 +33,8 @@ bool copy_from_kernel_nofault_allowed(const void *unsafe=
-_src, size_t size)
->        if (!boot_cpu_data.x86_virt_bits)
->                return true;
->
->-       return __is_canonical_address(vaddr, boot_cpu_data.x86_virt_bits);
->+       return __is_canonical_address(__tag_reset(vaddr),
->+                                     boot_cpu_data.x86_virt_bits);
+> In a perfect world, these conversions would happen at a well-defined
+> layer (KVM=>TDX) and in relatively few places. That layer transition is
+> where the sanity checks happen. It's super useful to have:
+> 
+> struct page *kvm_pfn_to_tdx_private_page(kvm_pfn_t pfn)
+> {
+> 	struct page *page = pfn_to_page(pfn);
+> #ifdef DEBUG
+> 	WARN_ON_ONCE(pfn_valid(pfn));
+> 	// page must be from a "file"???
+> 	WARN_ON_ONCE(!page_mapping(page));
+> 	WARN_ON_ONCE(...);
+> #endif
+> 	return page;
 > }
-> #else
-> bool copy_from_kernel_nofault_allowed(const void *unsafe_src, size_t size=
-)
+> 
+> *EVEN* if the pfn_to_page() itself is unsafe, and even if the WARN()s
+> are compiled out, this explicitly lays out the assumptions and it means
+> someone reading TDX code has an easier idea comprehending it.
 
-Thanks! I'll try that :)
+I object to the existence of those assumptions.  Why the blazes does TDX care
+how KVM and guest_memfd manages memory?  If you want to assert that the pfn is
+compatible with TDX, then by all means.  But I am NOT accepting any more KVM code
+that assumes TDX memory is backed by refcounted struct page.  If I had been paying
+more attention when the initial TDX series landed, I would have NAK'd that too.
 
---=20
-Kind regards
-Maciej Wiecz=C3=B3r-Retman
+tdh_mem_page_aug() is just an absurdly slow way of writing a PTE.  It doesn't
+_need_ the pfn to be backed a struct page, at all.  IMO, what you're asking for
+is akin to adding a pile of unnecessary assumptions to e.g. __set_spte() and
+__kvm_tdp_mmu_write_spte().  No thanks.
 
+> It's also not a crime to do the *same* checking on kvm_pfn_t and not
+> have a type transition. I just like the idea of changing the type so
+> that the transition line is clear and the concept is carried (forced,
+> even) through the layers of helpers.
 
