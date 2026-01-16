@@ -1,135 +1,119 @@
-Return-Path: <kvm+bounces-68324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68323-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 254B6D332D8
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 16:28:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCF2ED332C9
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 16:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 85CE230142D3
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:25:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B2C3730FB4DC
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E8D337B84;
-	Fri, 16 Jan 2026 15:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052513385A2;
+	Fri, 16 Jan 2026 15:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ngrssDKo"
 X-Original-To: kvm@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68271EB5E3;
-	Fri, 16 Jan 2026 15:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03481EB5E3
+	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 15:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768577106; cv=none; b=Jpvv6ZT/zVA+cohuzPZxhiLGNfKQK6IZ+kgBlSuVfMC1/T+huVwkcrhiWnHH3sj0MYxrKAAPIEM+VGS8c9M8U16URLkLfn17KALrqAXE8vvjN/NAQlxCXHa5ItzFIrHLq7m5+EXbahHJrim17sVTpi2uWi3aFdNCppGQC4k/FTM=
+	t=1768577071; cv=none; b=crEi4FMyYimJbQtnQOwBZuA+wtWAghx5yX1bxUQ6edkI0RJxKi62o2Vgk5It0kNXbzxtCYzjl4QII2BoVHN6mjFSTQ4yWrRA2q5k8ly2Uoa5oQsClfhEcn6Pb40OpD34zKw9B3g8eG4yVjoKd1WjnafCyIby+9HAGP1d6Qo21sM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768577106; c=relaxed/simple;
-	bh=NnNILwwEf8q8gYNi0EH0hrKTeQ5anT8JQMysOCMTTqg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HBMk0ZZLg8HGeS81G7rio6+ncEwLN/ARgEJWehWGqAnNRbMCAziGrsjaHBxEep0C21IUCzgCLkUkjDbB3aYRSxCWAAaKf+8BSFDsPFzgzFa0wjafv7myNptiOWcckycCE5XKZ5Pq6SGe4uR6/ppCG8sI1lO77FkxYw9rqtYsxK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from altlinux.ipa.basealt.ru (unknown [193.43.11.2])
-	(Authenticated sender: kovalevvv)
-	by air.basealt.ru (Postfix) with ESMTPSA id D6E2723395;
-	Fri, 16 Jan 2026 18:15:23 +0300 (MSK)
-From: Vasiliy Kovalev <kovalev@altlinux.org>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: x86@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	kovalev@altlinux.org
-Subject: [PATCH] KVM: x86: Add SRCU protection for KVM_GET_SREGS2
-Date: Fri, 16 Jan 2026 18:15:23 +0300
-Message-Id: <20260116151523.291892-1-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
+	s=arc-20240116; t=1768577071; c=relaxed/simple;
+	bh=oGHJW+jnTTj5On4dCWmvTz4XTMHoxo4xHLBOqxCnxDk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=I3hnVNQbrZUOgf3AEQkbfkqR0IzxrFcFDeyZFdqLX0ICRjqiryo9AsF20rE3+i6aMcQofMEknApqG+82IAQFb2vwmVbGSCjgdWDpp44j6XcumCYljGQQdgAilSED4D/5hi5mxcUYVe6MemXh/VHJnpZCKvZM9rEZrG3wRU1sdNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ngrssDKo; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c52d37d346dso1178281a12.3
+        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 07:24:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768577069; x=1769181869; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fkO6UKtF7mzNzEDO3CLARWqWFPlA/ZmXFYMjyqf5Fqg=;
+        b=ngrssDKolM6vdAk12lEJgc4xQlsp/Tge9wd7nK19QJaDfHyUf+IXNhr7ZdM+ILSOpN
+         AwWIzqKIhfvmYfbfZ3ur3pdxRJ9x6XrNZMpFaVtlKyJjSu11gebgeiqpB9S0KRLhUiFb
+         g8zqKOgjv2kq2HNC6cF3oDMpK58fISNB0bKULPcKuNHaAbO5+tQZyhcAECffqBwUoHat
+         p2SbqPTPShsnrXOl0e4InpgIbTIIpjKKrMgRX3xRfNdNwtvw+BfJKaaCpFykICjU360K
+         gwP8DiBrroea3ISjrvMPVt1GsQcbttW5bBO4K2pwX9y0JBToljuK2zaY9zGyq2jUQJBt
+         4law==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768577069; x=1769181869;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fkO6UKtF7mzNzEDO3CLARWqWFPlA/ZmXFYMjyqf5Fqg=;
+        b=UpW+/xuzmqX4xme2nsakrlAsNXMsY6icUqW5WqSDPIzhuZioTkATe63jSAPgskjpya
+         ddj53AbmFl1Q9NGIMtomLnKXQMn4gmAMh6SX4YU5xjH6gyuEJhpQw3KaisDZF2LSZcNo
+         2cSosQUgC1KRe3dAyCEQK00T5hseK0plRvcF4+Ew/8awUtpjnJNgky6ZVYC2aEumEPnX
+         HFhsGMrBc8tFN9ZZy/ddr9C160ajV4vDhPD/qu6v1H/MIs+Iw5hJnG/J4PumUtbpsRxc
+         CuwkEC3ZtfXbDplqlUiYSF6WstOPxvtLs9Bp9J7Yd70/JHK2FWEP44TVN6GFQQZEOLRk
+         UGFg==
+X-Gm-Message-State: AOJu0Yy9GoFOnRjlrWak9WUIJFMcTlUdnwb8hyXo7296rRK9BT9OfgJa
+	HaMDr7DEgXGP+rEUXCJ7r3twnOguvHjudnmBLaSslNiU4ufXcGV8w3tgd81hILXPhQ/1MNoe72h
+	SYDIakg==
+X-Received: from pjbbx14.prod.google.com ([2002:a17:90a:f48e:b0:34c:3879:557a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3e45:b0:330:7ff5:2c58
+ with SMTP id 98e67ed59e1d1-35272ebb8ebmr2999216a91.7.1768577069179; Fri, 16
+ Jan 2026 07:24:29 -0800 (PST)
+Date: Fri, 16 Jan 2026 07:24:27 -0800
+In-Reply-To: <696a546a.050a0220.58bed.0056.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <696a546a.050a0220.58bed.0056.GAE@google.com>
+Message-ID: <aWpYK83klokXFuds@google.com>
+Subject: Re: [syzbot] [kvm?] BUG: unable to handle kernel paging request in kvm_gmem_get_folio
+From: Sean Christopherson <seanjc@google.com>
+To: syzbot <syzbot+6f16df7b5a49f0e01b18@syzkaller.appspotmail.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="us-ascii"
 
-Add SRCU read-side protection to KVM_GET_SREGS2 ioctl handler.
+On Fri, Jan 16, 2026, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    9b7977f9e39b Add linux-next specific files for 20260115
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10585522580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=9c0b39f55c418575
+> dashboard link: https://syzkaller.appspot.com/bug?extid=6f16df7b5a49f0e01b18
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/32edced7b806/disk-9b7977f9.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/dec5450e284a/vmlinux-9b7977f9.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/65783c99fb65/bzImage-9b7977f9.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+6f16df7b5a49f0e01b18@syzkaller.appspotmail.com
+> 
+> BUG: unable to handle page fault for address: fffffffffffffffc
+> #PF: supervisor read access in kernel mode
+> #PF: error_code(0x0000) - not-present page
+> PGD e143067 P4D e143067 PUD e145067 PMD 0 
+> Oops: Oops: 0000 [#1] SMP KASAN PTI
+> CPU: 0 UID: 0 PID: 10212 Comm: syz.7.1148 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+> Tainted: [L]=SOFTLOCKUP
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+> RIP: 0010:const_folio_flags include/linux/page-flags.h:351 [inline]
+> RIP: 0010:folio_test_head include/linux/page-flags.h:844 [inline]
+> RIP: 0010:folio_test_large include/linux/page-flags.h:865 [inline]
+> RIP: 0010:folio_order include/linux/mm.h:1248 [inline]
+> RIP: 0010:kvm_gmem_get_folio+0x12e/0x240 virt/kvm/guest_memfd.c:147
 
-__get_sregs2() may read guest memory when caching PDPTR registers:
-__get_sregs2() -> kvm_pdptr_read() -> svm_cache_reg() -> load_pdptrs()
--> kvm_vcpu_read_guest_page() -> kvm_vcpu_gfn_to_memslot()
+Too slow, syzbot!  https://lore.kernel.org/all/aWk9PusYNW0iADuD@google.com
 
-kvm_vcpu_gfn_to_memslot() dereferences memslots via __kvm_memslots(),
-which uses srcu_dereference_check() and requires either kvm->srcu or
-kvm->slots_lock to be held. Currently only vcpu->mutex is held,
-triggering lockdep warning:
-
-=============================
-WARNING: suspicious RCU usage in kvm_vcpu_gfn_to_memslot
-6.12.59+ #3 Not tainted
------------------------------
-include/linux/kvm_host.h:1062 suspicious rcu_dereference_check() usage!
-
-other info that might help us debug this:
-
-rcu_scheduler_active = 2, debug_locks = 1
-1 lock held by syz.5.1717/15100:
- #0: ff1100002f4b00b0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x1d5/0x1590
-
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0xf0/0x120 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x1e3/0x270 kernel/locking/lockdep.c:6824
- __kvm_memslots include/linux/kvm_host.h:1062 [inline]
- __kvm_memslots include/linux/kvm_host.h:1059 [inline]
- kvm_vcpu_memslots include/linux/kvm_host.h:1076 [inline]
- kvm_vcpu_gfn_to_memslot+0x518/0x5e0 virt/kvm/kvm_main.c:2617
- kvm_vcpu_read_guest_page+0x27/0x50 virt/kvm/kvm_main.c:3302
- load_pdptrs+0xff/0x4b0 arch/x86/kvm/x86.c:1065
- svm_cache_reg+0x1c9/0x230 arch/x86/kvm/svm/svm.c:1688
- kvm_pdptr_read arch/x86/kvm/kvm_cache_regs.h:141 [inline]
- __get_sregs2 arch/x86/kvm/x86.c:11784 [inline]
- kvm_arch_vcpu_ioctl+0x3e20/0x4aa0 arch/x86/kvm/x86.c:6279
- kvm_vcpu_ioctl+0x856/0x1590 virt/kvm/kvm_main.c:4663
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x18b/0x210 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xbd/0x1d0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Cc: stable@vger.kernel.org
-Fixes: 6dba94035203 ("KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2")
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
----
-Note 1: commit 85e5ba83c016 ("KVM: x86: Do all post-set CPUID processing
-during vCPU creation") in v6.14+ reduces the likelihood of hitting this
-path by ensuring proper MMU initialization, but does not eliminate the
-requirement for SRCU protection when accessing guest memory.
-
-Note 2: KVM_SET_SREGS2 is not modified because __set_sregs_common()
-already acquires SRCU when update_pdptrs=true, which covers the case
-when PDPTRs must be loaded from guest memory.
----
- arch/x86/kvm/x86.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8acfdfc583a1..73c900c72f31 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6619,7 +6619,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = -ENOMEM;
- 		if (!u.sregs2)
- 			goto out;
-+		kvm_vcpu_srcu_read_lock(vcpu);
- 		__get_sregs2(vcpu, u.sregs2);
-+		kvm_vcpu_srcu_read_unlock(vcpu);
- 		r = -EFAULT;
- 		if (copy_to_user(argp, u.sregs2, sizeof(struct kvm_sregs2)))
- 			goto out;
--- 
-2.50.1
-
+#syz invalid
 
