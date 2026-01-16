@@ -1,179 +1,584 @@
-Return-Path: <kvm+bounces-68311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC54D329AF
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:29:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15851D329DF
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 15:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7FD6430754C4
-	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 14:26:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 319FF3015185
+	for <lists+kvm@lfdr.de>; Fri, 16 Jan 2026 14:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AFD337118;
-	Fri, 16 Jan 2026 14:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C243E3375A7;
+	Fri, 16 Jan 2026 14:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eseynUaW"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ptsJUHpr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4316819AD5C
-	for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 14:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4919B3358CF;
+	Fri, 16 Jan 2026 14:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768573596; cv=none; b=p6BJSayHugX+bk82Ae5DtzdpMyIn52Sh0wjxg9Hv9Mg/SJdmL9LAn7tVCqvKszbR/iKtmGaosulyxI//4iSH5Sm7Um9CkcaDCkZC+1O1gesosZOlNaHRTDA/Kk9el9NZw8J0Ujao2+0NpuSRioMtqg5pMKJkjxfgQvRpwTPD2/o=
+	t=1768573797; cv=none; b=RMKDLbGB2TImH9uX3mIbMWvidhqYxAzdTjEZN6OgI8G7ucbmMk+iSOYns6858EVt3aycTpbrp4UyfQhJOO9rHJbT4d2ynnaoQ88h0/Y52hawKSHZnwxpLbMH2pv+1E5tzXhw3eFBrc7BttiaRU+7SuzYcMyqU4spUzdjiFeYtcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768573596; c=relaxed/simple;
-	bh=LtHpOhhSML+LKSk0z1CA1ruBS7MkRP4zu4zJa7j4/Aw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hUocgl46vMXpRrRqIZ2tnFl1I2tO4sHrFc+6WeI2FbK10yeVY69yWuDdQu95bfC/SHqnFxtlVdnS7Fv5+SaF8Q3jOaLcQmteI1zW7eZf16kYzmdlEc3uozjMOELtpM/hzCtDCO8otOn23w6rn0LLSI4d+yBo3afTpx/z2BnXEMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eseynUaW; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59b77ff32feso276831e87.0
-        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 06:26:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768573593; x=1769178393; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CovPvWzL9Wgw5DrqjAwztat3FcX1o7MgbClex8ex/tE=;
-        b=eseynUaW2Ls3wPVsuOWRyBSYzGfWJlk1XPM4TTyOC6Ss/8qgsQCKVlDmpltabiC/K4
-         W42Xz4rZJliEPTd8JzlwnayLvfaUXGT+gygrrgWErJSRy0GVWAr40fnsQ9+mVqY4MTYN
-         yl3gJpV6gIau55646UWoeuwPNGT9qntVuB5eyPyAR3YIB8W3Lu2sTlk27BVWzaXXrIQr
-         hJITjQWBHoPcdAW+RqQyjhd7VQ0iwlMHA/U9OTxDr/Js3/J/NhHcNtPd5T+hTgE4JSKP
-         381UxQfkYSb7NLoylG7Uaz031M5SRkxzPyp38MwWqk4GI2yA33rHAJLsv0OhUuR4x8x8
-         wHag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768573593; x=1769178393;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CovPvWzL9Wgw5DrqjAwztat3FcX1o7MgbClex8ex/tE=;
-        b=GTugnoY9Dnic5L7WrG4JoSfE2C94WYNFtgwnA5Au8ofDBuCneftAujOWp1hC5uqOve
-         W+0kcvbOTg8n8yLRXn0SM5UT1TFPN9/qaPouu+EfAE1nVaP7NTxI62i1Qh4/1yc0aASH
-         XvrcFlOx2fDwO75O3ZZFFQKnGlMIBvWuir5gxgll1e4lP5eEPCExmoA2K7dkc1Cg+7AF
-         SZFwHldzUOxPXZAC/HfBuokXAXQGu9V4/KQZuhYgqNwlfwyhz+sTEFK3SgE3vvDC7Jn1
-         XdvRglKZa3sZqVWMPiXkGAlKgvQrUR51Fh42PTDQ+tV6FE4dbx/N6ny/zlvsQ9wKbA0h
-         H/FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXyqDB7TWuzV8EnI5vgdZTj+oHvoEKhIVxn+ajNKMo2RWkd+7ceCMSwjZGLg0MsZ++Jt7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS6SQ0vAweWwDFVpLlcj/KwvreinipQF9AHIWkS1b65w/OtN6T
-	Cvg0saXuRdl313vQRsZ3eGik3/0MtMFMUwZN6GGZqLzEKGuCPJKDvCaY
-X-Gm-Gg: AY/fxX4agR6ddxxrOQlZYlQF5EOz9QLy0qf3iOisCUifWM4n/ofP0LLuC60asBP4BD6
-	G3L8TEv0C2JLNK34TX7PD04citbaeDyzI5wW2iJnWXXMgTFN4cdevP6TZIVRE4trvc8a449rpvQ
-	9OY84qYiTAXe/DjgquM8LTI20edxlQr5zFCvpYBMDt0sEi5yGABv7L4lev3Xm/Ut4KUxY48L93L
-	CKOrvv8q53u8AaHP7H3fRjt9vYipQ2kJ2HJLtI4pQ+m5eXN7c/oC4y+BMq7nIRBdp+0rIeYTt+R
-	svaCudZlur+LOVPmcKtRXaTjzx+fibe8J+ApDcy1X/eYf0zCEfVGSHViMQCbVzcVFc+ui8OPpMb
-	J8Xmc6fsURNZlfgm9lGUJUCJq8wGR5lMOktKg/DiA15HRAxco1PLQq0Y6bF6H24nQ9Wdja6SuIu
-	PCbrwjILGHrCI3olX2fg==
-X-Received: by 2002:a05:6512:2c93:b0:59b:af9e:a16c with SMTP id 2adb3069b0e04-59baf9ea1f2mr386637e87.0.1768573593262;
-        Fri, 16 Jan 2026 06:26:33 -0800 (PST)
-Received: from [10.214.35.248] ([80.93.240.68])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59baf33f00fsm826443e87.12.2026.01.16.06.26.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jan 2026 06:26:32 -0800 (PST)
-Message-ID: <2968b97c-5d71-4c05-9013-f275bdbd9cd5@gmail.com>
-Date: Fri, 16 Jan 2026 15:25:46 +0100
+	s=arc-20240116; t=1768573797; c=relaxed/simple;
+	bh=P5bWELZnx7HYKRLyJElIsQ45aniTXklzKdmwJZ7bIFs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=AWEUs4rHfjXrbxEPSZfCaEvOo3EIJ6FGNn4L7rrgfIHk09XJWbvvZzRtep0kO+n31QdNl8GvF1/CnBweNQTJymDLrj6F2pam2VHnuYSXZ2eouTroq97buIjpyHhsLYzDmR0I4JM0AGuJVAsQFwjEztTcF4CEaciiAERZgg/LYfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ptsJUHpr; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1768573787; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=SSFZKRDXOJaADb5rkCSYzMMDSCFhuQrEDCCYOkyHnFY=;
+	b=ptsJUHprdFYibIYfQ49CzYuO5jkXkeYadaSpSEegDoaenIqtvpTyOzxPCsW9c4oZmg7KogU5w0FCknQiTjcjU+i9+BfM+cDR5SbEmwIrC16s7ztuI6zxT+b1d0CzZKYzOyzQSX62jtNbxsRjqofRqIqo5fU/Ic8t6QfkgOBhBT4=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WxARS8i_1768573784 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 16 Jan 2026 22:29:45 +0800
+From: fangyu.yu@linux.alibaba.com
+To: andrew.jones@oss.qualcomm.com
+Cc: ajones@ventanamicro.com,
+	alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	corbet@lwn.net,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pbonzini@redhat.com,
+	pjw@kernel.org,
+	rkrcmar@ventanamicro.com
+Subject: Re: Re: [PATCH v2] RISC-V: KVM: Support runtime configuration for per-VM's HGATP mode
+Date: Fri, 16 Jan 2026 22:29:39 +0800
+Message-Id: <20260116142939.30503-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <7rxerhpw33mhucn2m563iersxfarcck67vcmm5o3u25tmcrahf@lsjqygd5jj4b>
+References: <7rxerhpw33mhucn2m563iersxfarcck67vcmm5o3u25tmcrahf@lsjqygd5jj4b>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 09/14] x86/mm: LAM compatible non-canonical definition
-To: Maciej Wieczor-Retman <m.wieczorretman@pm.me>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Cc: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
- Alexander Potapenko <glider@google.com>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, kvm <kvm@vger.kernel.org>
-References: <cover.1768233085.git.m.wieczorretman@pm.me>
- <0347c61eccf739ad15ec62600f009c212d52e761.1768233085.git.m.wieczorretman@pm.me>
-Content-Language: en-US
-From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-In-Reply-To: <0347c61eccf739ad15ec62600f009c212d52e761.1768233085.git.m.wieczorretman@pm.me>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+>> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>>
+>> Introduces two per-VM architecture-specific fields to support runtime
+>> configuration of the G-stage page table format:
+>>
+>> - kvm->arch.kvm_riscv_gstage_mode: specifies the HGATP mode used by the
+>>   current VM;
+>> - kvm->arch.kvm_riscv_gstage_pgd_levels: the corresponding number of page
+>>   table levels for the selected mode.
+>>
+>> These fields replace the previous global variables
+>> kvm_riscv_gstage_mode and kvm_riscv_gstage_pgd_levels, enabling different
+>> virtual machines to independently select their G-stage page table format
+>> instead of being forced to share the maximum mode detected by the kernel
+>> at boot time.
+>>
+>> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> ---
+>>  arch/riscv/include/asm/kvm_gstage.h | 12 ++---
+>>  arch/riscv/include/asm/kvm_host.h   |  4 ++
+>>  arch/riscv/kvm/gstage.c             | 82 +++++++++++++++++------------
+>>  arch/riscv/kvm/main.c               |  4 +-
+>>  arch/riscv/kvm/mmu.c                | 18 +++++--
+>>  arch/riscv/kvm/vm.c                 |  2 +-
+>>  arch/riscv/kvm/vmid.c               |  2 +-
+>>  7 files changed, 74 insertions(+), 50 deletions(-)
+>>
+>> diff --git a/arch/riscv/include/asm/kvm_gstage.h b/arch/riscv/include/asm/kvm_gstage.h
+>> index 595e2183173e..fdcada123b3f 100644
+>> --- a/arch/riscv/include/asm/kvm_gstage.h
+>> +++ b/arch/riscv/include/asm/kvm_gstage.h
+>> @@ -29,16 +29,11 @@ struct kvm_gstage_mapping {
+>>  #define kvm_riscv_gstage_index_bits	10
+>>  #endif
+>>
+>> -extern unsigned long kvm_riscv_gstage_mode;
+>> -extern unsigned long kvm_riscv_gstage_pgd_levels;
+>> +extern unsigned long kvm_riscv_gstage_max_mode;
+>> +extern unsigned long kvm_riscv_gstage_max_pgd_levels;
+>>
+>>  #define kvm_riscv_gstage_pgd_xbits	2
+>>  #define kvm_riscv_gstage_pgd_size	(1UL << (HGATP_PAGE_SHIFT + kvm_riscv_gstage_pgd_xbits))
+>> -#define kvm_riscv_gstage_gpa_bits	(HGATP_PAGE_SHIFT + \
+>> -					 (kvm_riscv_gstage_pgd_levels * \
+>> -					  kvm_riscv_gstage_index_bits) + \
+>> -					 kvm_riscv_gstage_pgd_xbits)
+>> -#define kvm_riscv_gstage_gpa_size	((gpa_t)(1ULL << kvm_riscv_gstage_gpa_bits))
+>>
+>>  bool kvm_riscv_gstage_get_leaf(struct kvm_gstage *gstage, gpa_t addr,
+>>  			       pte_t **ptepp, u32 *ptep_level);
+>> @@ -69,4 +64,7 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
+>>
+>>  void kvm_riscv_gstage_mode_detect(void);
+>>
+>> +gpa_t kvm_riscv_gstage_gpa_size(struct kvm_arch *k);
+>> +unsigned long kvm_riscv_gstage_gpa_bits(struct kvm_arch *k);
+>> +
+>>  #endif
+>> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+>> index 24585304c02b..27ea8e8fd5b0 100644
+>> --- a/arch/riscv/include/asm/kvm_host.h
+>> +++ b/arch/riscv/include/asm/kvm_host.h
+>> @@ -103,6 +103,10 @@ struct kvm_arch {
+>>
+>>  	/* KVM_CAP_RISCV_MP_STATE_RESET */
+>>  	bool mp_state_reset;
+>> +
+>> +	unsigned long kvm_riscv_gstage_mode;
+>
+>There's a 1:1 mapping for mode/levels, so we don't need to track both.
+>Since mode is rarely used, then I think something like this would still
+>provide enough convenience without requiring the storage allocation.
+>
+> static inline unsigned long kvm_riscv_gstage_mode(struct kvm_gstage *gstage)
+> {
+>     unsigned long modes[] = {
+>         [2] = HGATP_MODE_SV32X4,
+>         [3] = HGATP_MODE_SV39X4,
+>         [4] = HGATP_MODE_SV48X4,
+>         [5] = HGATP_MODE_SV57X4,
+>     };
+>
+>     return modes[gstage->kvm->arch.kvm_riscv_gstage_pgd_levels];
+> }
 
+Thanks for the suggestion.
 
-On 1/12/26 6:28 PM, Maciej Wieczor-Retman wrote:
-> From: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
-> 
-> For an address to be canonical it has to have its top bits equal to each
-> other. The number of bits depends on the paging level and whether
-> they're supposed to be ones or zeroes depends on whether the address
-> points to kernel or user space.
-> 
-> With Linear Address Masking (LAM) enabled, the definition of linear
-> address canonicality is modified. Not all of the previously required
-> bits need to be equal, only the first and last from the previously equal
-> bitmask. So for example a 5-level paging kernel address needs to have
-> bits [63] and [56] set.
-> 
-> Change the canonical checking function to use bit masks instead of bit
-> shifts.
-> 
-> Signed-off-by: Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>
-> Acked-by: Alexander Potapenko <glider@google.com>
-> ---
-> Changelog v7:
-> - Add Alexander's acked-by tag.
-> - Add parentheses around vaddr_bits as suggested by checkpatch.
-> - Apply the bitmasks to the __canonical_address() function which is used
->   in kvm code.
-> 
-> Changelog v6:
-> - Use bitmasks to check both kernel and userspace addresses in the
->   __is_canonical_address() (Dave Hansen and Samuel Holland).
-> 
-> Changelog v4:
-> - Add patch to the series.
-> 
->  arch/x86/include/asm/page.h | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/page.h b/arch/x86/include/asm/page.h
-> index bcf5cad3da36..b7940fa49e64 100644
-> --- a/arch/x86/include/asm/page.h
-> +++ b/arch/x86/include/asm/page.h
-> @@ -82,9 +82,22 @@ static __always_inline void *pfn_to_kaddr(unsigned long pfn)
->  	return __va(pfn << PAGE_SHIFT);
->  }
->  
-> +#ifdef CONFIG_KASAN_SW_TAGS
-> +#define CANONICAL_MASK(vaddr_bits) (BIT_ULL(63) | BIT_ULL((vaddr_bits) - 1))
+You're right that gstage mode has a 1:1 mapping with pgd_levels, so keeping
+both is redundant. In the next revision I'll drop kvm_riscv_gstage_mode and
+derive HGATP.MODE from kvm_riscv_gstage_pgd_levels via a small helper.
 
-why is the choice of CANONICAL_MASK() gated at compile time? Shouldn’t this be a
-runtime decision based on whether LAM is enabled or not on the running system?
- 
-> +#else
-> +#define CANONICAL_MASK(vaddr_bits) GENMASK_ULL(63, vaddr_bits)
-> +#endif
-> +
-> +/*
-> + * To make an address canonical either set or clear the bits defined by the
-> + * CANONICAL_MASK(). Clear the bits for userspace addresses if the top address
-> + * bit is a zero. Set the bits for kernel addresses if the top address bit is a
-> + * one.
-> + */
->  static __always_inline u64 __canonical_address(u64 vaddr, u8 vaddr_bits)
+>> +	unsigned long kvm_riscv_gstage_pgd_levels;
+>> +	bool gstage_mode_initialized;
+>>  };
+>>
+>>  struct kvm_cpu_trap {
+>> diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
+>> index b67d60d722c2..06452e4c2ab2 100644
+>> --- a/arch/riscv/kvm/gstage.c
+>> +++ b/arch/riscv/kvm/gstage.c
+>> @@ -12,22 +12,23 @@
+>>  #include <asm/kvm_gstage.h>
+>>
+>>  #ifdef CONFIG_64BIT
+>> -unsigned long kvm_riscv_gstage_mode __ro_after_init = HGATP_MODE_SV39X4;
+>> -unsigned long kvm_riscv_gstage_pgd_levels __ro_after_init = 3;
+>> +unsigned long kvm_riscv_gstage_max_mode __ro_after_init = HGATP_MODE_SV39X4;
+>
+>With a kvm_riscv_gstage_mode() function we don't need
+>kvm_riscv_gstage_max_mode either.
 
-+Cc KVM
+Thanks, agreed.
 
-This is used extensively in KVM code. As far as I can tell, it may be used to determine
-whether a guest virtual address is canonical or not. If that’s the case, the result should
-depend on whether LAM is enabled for the guest, not the host (and certainly not a host's compile-time option).
+>> +unsigned long kvm_riscv_gstage_max_pgd_levels __ro_after_init = 3;
+>>  #else
+>> -unsigned long kvm_riscv_gstage_mode __ro_after_init = HGATP_MODE_SV32X4;
+>> -unsigned long kvm_riscv_gstage_pgd_levels __ro_after_init = 2;
+>> +unsigned long kvm_riscv_gstage_max_mode __ro_after_init = HGATP_MODE_SV32X4;
+>> +unsigned long kvm_riscv_gstage_max_pgd_levels __ro_after_init = 2;
+>>  #endif
+>>
+>>  #define gstage_pte_leaf(__ptep)	\
+>>  	(pte_val(*(__ptep)) & (_PAGE_READ | _PAGE_WRITE | _PAGE_EXEC))
+>>
+>> -static inline unsigned long gstage_pte_index(gpa_t addr, u32 level)
+>> +static inline unsigned long gstage_pte_index(struct kvm_gstage *gstage,
+>> +					     gpa_t addr, u32 level)
+>>  {
+>>  	unsigned long mask;
+>>  	unsigned long shift = HGATP_PAGE_SHIFT + (kvm_riscv_gstage_index_bits * level);
+>>
+>> -	if (level == (kvm_riscv_gstage_pgd_levels - 1))
+>> +	if (level == (gstage->kvm->arch.kvm_riscv_gstage_pgd_levels - 1))
+>
+>nit: we can drop the unnecessary () while touching this line.
 
->  {
-> -	return ((s64)vaddr << (64 - vaddr_bits)) >> (64 - vaddr_bits);
-> +	return (vaddr & BIT_ULL(63)) ? vaddr | CANONICAL_MASK(vaddr_bits) :
-> +				       vaddr & ~CANONICAL_MASK(vaddr_bits);
->  }
->  
->  static __always_inline u64 __is_canonical_address(u64 vaddr, u8 vaddr_bits)
+Ack, will fix.
 
+>>  		mask = (PTRS_PER_PTE * (1UL << kvm_riscv_gstage_pgd_xbits)) - 1;
+>>  	else
+>>  		mask = PTRS_PER_PTE - 1;
+>> @@ -40,12 +41,13 @@ static inline unsigned long gstage_pte_page_vaddr(pte_t pte)
+>>  	return (unsigned long)pfn_to_virt(__page_val_to_pfn(pte_val(pte)));
+>>  }
+>>
+>> -static int gstage_page_size_to_level(unsigned long page_size, u32 *out_level)
+>> +static int gstage_page_size_to_level(struct kvm_gstage *gstage, unsigned long page_size,
+>> +				     u32 *out_level)
+>>  {
+>>  	u32 i;
+>>  	unsigned long psz = 1UL << 12;
+>>
+>> -	for (i = 0; i < kvm_riscv_gstage_pgd_levels; i++) {
+>> +	for (i = 0; i < gstage->kvm->arch.kvm_riscv_gstage_pgd_levels; i++) {
+>>  		if (page_size == (psz << (i * kvm_riscv_gstage_index_bits))) {
+>>  			*out_level = i;
+>>  			return 0;
+>> @@ -55,21 +57,23 @@ static int gstage_page_size_to_level(unsigned long page_size, u32 *out_level)
+>>  	return -EINVAL;
+>>  }
+>>
+>> -static int gstage_level_to_page_order(u32 level, unsigned long *out_pgorder)
+>> +static int gstage_level_to_page_order(struct kvm_gstage *gstage, u32 level,
+>> +				      unsigned long *out_pgorder)
+>>  {
+>> -	if (kvm_riscv_gstage_pgd_levels < level)
+>> +	if (gstage->kvm->arch.kvm_riscv_gstage_pgd_levels < level)
+>>  		return -EINVAL;
+>>
+>>  	*out_pgorder = 12 + (level * kvm_riscv_gstage_index_bits);
+>>  	return 0;
+>>  }
+>>
+>> -static int gstage_level_to_page_size(u32 level, unsigned long *out_pgsize)
+>> +static int gstage_level_to_page_size(struct kvm_gstage *gstage, u32 level,
+>> +				     unsigned long *out_pgsize)
+>>  {
+>>  	int rc;
+>>  	unsigned long page_order = PAGE_SHIFT;
+>>
+>> -	rc = gstage_level_to_page_order(level, &page_order);
+>> +	rc = gstage_level_to_page_order(gstage, level, &page_order);
+>>  	if (rc)
+>>  		return rc;
+>>
+>> @@ -81,11 +85,11 @@ bool kvm_riscv_gstage_get_leaf(struct kvm_gstage *gstage, gpa_t addr,
+>>  			       pte_t **ptepp, u32 *ptep_level)
+>>  {
+>>  	pte_t *ptep;
+>> -	u32 current_level = kvm_riscv_gstage_pgd_levels - 1;
+>> +	u32 current_level = gstage->kvm->arch.kvm_riscv_gstage_pgd_levels - 1;
+>>
+>>  	*ptep_level = current_level;
+>>  	ptep = (pte_t *)gstage->pgd;
+>> -	ptep = &ptep[gstage_pte_index(addr, current_level)];
+>> +	ptep = &ptep[gstage_pte_index(gstage, addr, current_level)];
+>>  	while (ptep && pte_val(ptep_get(ptep))) {
+>>  		if (gstage_pte_leaf(ptep)) {
+>>  			*ptep_level = current_level;
+>> @@ -97,7 +101,7 @@ bool kvm_riscv_gstage_get_leaf(struct kvm_gstage *gstage, gpa_t addr,
+>>  			current_level--;
+>>  			*ptep_level = current_level;
+>>  			ptep = (pte_t *)gstage_pte_page_vaddr(ptep_get(ptep));
+>> -			ptep = &ptep[gstage_pte_index(addr, current_level)];
+>> +			ptep = &ptep[gstage_pte_index(gstage, addr, current_level)];
+>>  		} else {
+>>  			ptep = NULL;
+>>  		}
+>> @@ -110,7 +114,7 @@ static void gstage_tlb_flush(struct kvm_gstage *gstage, u32 level, gpa_t addr)
+>>  {
+>>  	unsigned long order = PAGE_SHIFT;
+>>
+>> -	if (gstage_level_to_page_order(level, &order))
+>> +	if (gstage_level_to_page_order(gstage, level, &order))
+>>  		return;
+>>  	addr &= ~(BIT(order) - 1);
+>>
+>> @@ -125,9 +129,9 @@ int kvm_riscv_gstage_set_pte(struct kvm_gstage *gstage,
+>>  			     struct kvm_mmu_memory_cache *pcache,
+>>  			     const struct kvm_gstage_mapping *map)
+>>  {
+>> -	u32 current_level = kvm_riscv_gstage_pgd_levels - 1;
+>> +	u32 current_level = gstage->kvm->arch.kvm_riscv_gstage_pgd_levels - 1;
+>>  	pte_t *next_ptep = (pte_t *)gstage->pgd;
+>> -	pte_t *ptep = &next_ptep[gstage_pte_index(map->addr, current_level)];
+>> +	pte_t *ptep = &next_ptep[gstage_pte_index(gstage, map->addr, current_level)];
+>>
+>>  	if (current_level < map->level)
+>>  		return -EINVAL;
+>> @@ -151,7 +155,7 @@ int kvm_riscv_gstage_set_pte(struct kvm_gstage *gstage,
+>>  		}
+>>
+>>  		current_level--;
+>> -		ptep = &next_ptep[gstage_pte_index(map->addr, current_level)];
+>> +		ptep = &next_ptep[gstage_pte_index(gstage, map->addr, current_level)];
+>>  	}
+>>
+>>  	if (pte_val(*ptep) != pte_val(map->pte)) {
+>> @@ -175,7 +179,7 @@ int kvm_riscv_gstage_map_page(struct kvm_gstage *gstage,
+>>  	out_map->addr = gpa;
+>>  	out_map->level = 0;
+>>
+>> -	ret = gstage_page_size_to_level(page_size, &out_map->level);
+>> +	ret = gstage_page_size_to_level(gstage, page_size, &out_map->level);
+>>  	if (ret)
+>>  		return ret;
+>>
+>> @@ -217,7 +221,7 @@ void kvm_riscv_gstage_op_pte(struct kvm_gstage *gstage, gpa_t addr,
+>>  	u32 next_ptep_level;
+>>  	unsigned long next_page_size, page_size;
+>>
+>> -	ret = gstage_level_to_page_size(ptep_level, &page_size);
+>> +	ret = gstage_level_to_page_size(gstage, ptep_level, &page_size);
+>>  	if (ret)
+>>  		return;
+>>
+>> @@ -229,7 +233,7 @@ void kvm_riscv_gstage_op_pte(struct kvm_gstage *gstage, gpa_t addr,
+>>  	if (ptep_level && !gstage_pte_leaf(ptep)) {
+>>  		next_ptep = (pte_t *)gstage_pte_page_vaddr(ptep_get(ptep));
+>>  		next_ptep_level = ptep_level - 1;
+>> -		ret = gstage_level_to_page_size(next_ptep_level, &next_page_size);
+>> +		ret = gstage_level_to_page_size(gstage, next_ptep_level, &next_page_size);
+>>  		if (ret)
+>>  			return;
+>>
+>> @@ -263,7 +267,7 @@ void kvm_riscv_gstage_unmap_range(struct kvm_gstage *gstage,
+>>
+>>  	while (addr < end) {
+>>  		found_leaf = kvm_riscv_gstage_get_leaf(gstage, addr, &ptep, &ptep_level);
+>> -		ret = gstage_level_to_page_size(ptep_level, &page_size);
+>> +		ret = gstage_level_to_page_size(gstage, ptep_level, &page_size);
+>>  		if (ret)
+>>  			break;
+>>
+>> @@ -297,7 +301,7 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
+>>
+>>  	while (addr < end) {
+>>  		found_leaf = kvm_riscv_gstage_get_leaf(gstage, addr, &ptep, &ptep_level);
+>> -		ret = gstage_level_to_page_size(ptep_level, &page_size);
+>> +		ret = gstage_level_to_page_size(gstage, ptep_level, &page_size);
+>>  		if (ret)
+>>  			break;
+>>
+>> @@ -319,41 +323,51 @@ void __init kvm_riscv_gstage_mode_detect(void)
+>>  	/* Try Sv57x4 G-stage mode */
+>>  	csr_write(CSR_HGATP, HGATP_MODE_SV57X4 << HGATP_MODE_SHIFT);
+>>  	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV57X4) {
+>> -		kvm_riscv_gstage_mode = HGATP_MODE_SV57X4;
+>> -		kvm_riscv_gstage_pgd_levels = 5;
+>> +		kvm_riscv_gstage_max_mode = HGATP_MODE_SV57X4;
+>> +		kvm_riscv_gstage_max_pgd_levels = 5;
+>>  		goto done;
+>>  	}
+>>
+>>  	/* Try Sv48x4 G-stage mode */
+>>  	csr_write(CSR_HGATP, HGATP_MODE_SV48X4 << HGATP_MODE_SHIFT);
+>>  	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV48X4) {
+>> -		kvm_riscv_gstage_mode = HGATP_MODE_SV48X4;
+>> -		kvm_riscv_gstage_pgd_levels = 4;
+>> +		kvm_riscv_gstage_max_mode = HGATP_MODE_SV48X4;
+>> +		kvm_riscv_gstage_max_pgd_levels = 4;
+>>  		goto done;
+>>  	}
+>>
+>>  	/* Try Sv39x4 G-stage mode */
+>>  	csr_write(CSR_HGATP, HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
+>>  	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV39X4) {
+>> -		kvm_riscv_gstage_mode = HGATP_MODE_SV39X4;
+>> -		kvm_riscv_gstage_pgd_levels = 3;
+>> +		kvm_riscv_gstage_max_mode = HGATP_MODE_SV39X4;
+>> +		kvm_riscv_gstage_max_pgd_levels = 3;
+>>  		goto done;
+>>  	}
+>>  #else /* CONFIG_32BIT */
+>>  	/* Try Sv32x4 G-stage mode */
+>>  	csr_write(CSR_HGATP, HGATP_MODE_SV32X4 << HGATP_MODE_SHIFT);
+>>  	if ((csr_read(CSR_HGATP) >> HGATP_MODE_SHIFT) == HGATP_MODE_SV32X4) {
+>> -		kvm_riscv_gstage_mode = HGATP_MODE_SV32X4;
+>> -		kvm_riscv_gstage_pgd_levels = 2;
+>> +		kvm_riscv_gstage_max_mode = HGATP_MODE_SV32X4;
+>> +		kvm_riscv_gstage_max_pgd_levels = 2;
+>>  		goto done;
+>>  	}
+>>  #endif
+>>
+>>  	/* KVM depends on !HGATP_MODE_OFF */
+>> -	kvm_riscv_gstage_mode = HGATP_MODE_OFF;
+>> -	kvm_riscv_gstage_pgd_levels = 0;
+>> +	kvm_riscv_gstage_max_mode = HGATP_MODE_OFF;
+>> +	kvm_riscv_gstage_max_pgd_levels = 0;
+>>
+>>  done:
+>>  	csr_write(CSR_HGATP, 0);
+>>  	kvm_riscv_local_hfence_gvma_all();
+>>  }
+>> +
+>> +unsigned long kvm_riscv_gstage_gpa_bits(struct kvm_arch *k) {
+>
+>Did you run checkpatch? I think it requires '{' to be on its own line.
+>
+>nit: s/k/ka/ would be consistent with other archs, although I see k is
+>used in riscv's kvm_riscv_mmu_update_hgatp() but that can be fixed up
+>in this patch since there's a change in the same place too.
+
+Thanks for catching that.
+
+Yes, checkpatch complains about the opening brace placement here. I'll fix
+the style by moving '{' onto its own line. I'll also rename the argument
+from 'k' to 'ka' for consistency (and update the existing usage in
+kvm_riscv_mmu_update_hgatp() in the same patch since we're touching it
+anyway).
+
+I'll apply the same fixes to kvm_riscv_gstage_gpa_size() as well.
+
+>
+>> +	return (HGATP_PAGE_SHIFT + (k->kvm_riscv_gstage_pgd_levels *
+>> +		    kvm_riscv_gstage_index_bits) +
+>> +		    kvm_riscv_gstage_pgd_xbits);
+>> +}
+>> +
+>> +gpa_t kvm_riscv_gstage_gpa_size(struct kvm_arch *k) {
+>
+>same comments as above
+>
+>> +	return ((gpa_t)(1ULL << kvm_riscv_gstage_gpa_bits(k)));
+>
+> return BIT_ULL(kvm_riscv_gstage_gpa_bits(ka))
+>
+>(the cast is implicit from return type)
+>
+>> +}
+>> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+>> index 45536af521f0..56a246e0e791 100644
+>> --- a/arch/riscv/kvm/main.c
+>> +++ b/arch/riscv/kvm/main.c
+>> @@ -105,7 +105,7 @@ static int __init riscv_kvm_init(void)
+>>  		return rc;
+>>
+>>  	kvm_riscv_gstage_mode_detect();
+>> -	switch (kvm_riscv_gstage_mode) {
+>> +	switch (kvm_riscv_gstage_max_mode) {
+>>  	case HGATP_MODE_SV32X4:
+>>  		str = "Sv32x4";
+>>  		break;
+>> @@ -164,7 +164,7 @@ static int __init riscv_kvm_init(void)
+>>  			 (rc) ? slist : "no features");
+>>  	}
+>>
+>> -	kvm_info("using %s G-stage page table format\n", str);
+>> +	kvm_info("Max G-stage page table format %s \n", str);
+>>
+>>  	kvm_info("VMID %ld bits available\n", kvm_riscv_gstage_vmid_bits());
+>>
+>> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+>> index 4ab06697bfc0..574783907162 100644
+>> --- a/arch/riscv/kvm/mmu.c
+>> +++ b/arch/riscv/kvm/mmu.c
+>> @@ -67,7 +67,7 @@ int kvm_riscv_mmu_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
+>>  		if (!writable)
+>>  			map.pte = pte_wrprotect(map.pte);
+>>
+>> -		ret = kvm_mmu_topup_memory_cache(&pcache, kvm_riscv_gstage_pgd_levels);
+>> +		ret = kvm_mmu_topup_memory_cache(&pcache,kvm->arch.kvm_riscv_gstage_pgd_levels);
+>                                                         ^ missing space
+>
+>>  		if (ret)
+>>  			goto out;
+>>
+>> @@ -186,8 +186,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>  	 * space addressable by the KVM guest GPA space.
+>>  	 */
+>>  	if ((new->base_gfn + new->npages) >=
+>> -	    (kvm_riscv_gstage_gpa_size >> PAGE_SHIFT))
+>> +			(kvm_riscv_gstage_gpa_size(&kvm->arch) >> PAGE_SHIFT)) {
+>>  		return -EFAULT;
+>> +	}
+>
+>nit: Remove the unnecessary () and the '{' and the condition will fit on
+>one 100 char line.
+
+Ack.
+
+>>
+>>  	hva = new->userspace_addr;
+>>  	size = new->npages << PAGE_SHIFT;
+>> @@ -332,7 +333,7 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
+>>  	memset(out_map, 0, sizeof(*out_map));
+>>
+>>  	/* We need minimum second+third level pages */
+>> -	ret = kvm_mmu_topup_memory_cache(pcache, kvm_riscv_gstage_pgd_levels);
+>> +	ret = kvm_mmu_topup_memory_cache(pcache, kvm->arch.kvm_riscv_gstage_pgd_levels);
+>>  	if (ret) {
+>>  		kvm_err("Failed to topup G-stage cache\n");
+>>  		return ret;
+>> @@ -431,6 +432,11 @@ int kvm_riscv_mmu_alloc_pgd(struct kvm *kvm)
+>>  		return -ENOMEM;
+>>  	kvm->arch.pgd = page_to_virt(pgd_page);
+>>  	kvm->arch.pgd_phys = page_to_phys(pgd_page);
+>> +	if (!kvm->arch.gstage_mode_initialized) {
+>> +		/*user-space didn't set KVM_CAP_RISC_HGATP_MODE cap*/
+>                  ^ missing space                                  ^ missing space
+>> +		kvm->arch.kvm_riscv_gstage_mode = kvm_riscv_gstage_max_mode;
+>> +		kvm->arch.kvm_riscv_gstage_pgd_levels = kvm_riscv_gstage_max_pgd_levels;
+>
+>Missing 'kvm->arch.gstage_mode_initialized = true' statement.
+
+The initialization is done in the following commit of this series (patch 2/2)
+
+>> +	}
+>>
+>>  	return 0;
+>>  }
+>> @@ -446,10 +452,12 @@ void kvm_riscv_mmu_free_pgd(struct kvm *kvm)
+>>  		gstage.flags = 0;
+>>  		gstage.vmid = READ_ONCE(kvm->arch.vmid.vmid);
+>>  		gstage.pgd = kvm->arch.pgd;
+>> -		kvm_riscv_gstage_unmap_range(&gstage, 0UL, kvm_riscv_gstage_gpa_size, false);
+>> +		kvm_riscv_gstage_unmap_range(&gstage, 0UL, kvm_riscv_gstage_gpa_size(&kvm->arch), false);
+>>  		pgd = READ_ONCE(kvm->arch.pgd);
+>>  		kvm->arch.pgd = NULL;
+>>  		kvm->arch.pgd_phys = 0;
+>> +		kvm->arch.kvm_riscv_gstage_mode = HGATP_MODE_OFF;
+>> +		kvm->arch.kvm_riscv_gstage_pgd_levels = 0;
+>>  	}
+>>  	spin_unlock(&kvm->mmu_lock);
+>>
+>> @@ -459,8 +467,8 @@ void kvm_riscv_mmu_free_pgd(struct kvm *kvm)
+>>
+>>  void kvm_riscv_mmu_update_hgatp(struct kvm_vcpu *vcpu)
+>>  {
+>> -	unsigned long hgatp = kvm_riscv_gstage_mode << HGATP_MODE_SHIFT;
+>>  	struct kvm_arch *k = &vcpu->kvm->arch;
+>> +	unsigned long hgatp = k->kvm_riscv_gstage_mode << HGATP_MODE_SHIFT;
+>>
+>>  	hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) & HGATP_VMID;
+>>  	hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
+>> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+>> index 66d91ae6e9b2..4b2156df40fc 100644
+>> --- a/arch/riscv/kvm/vm.c
+>> +++ b/arch/riscv/kvm/vm.c
+>> @@ -200,7 +200,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  		r = KVM_USER_MEM_SLOTS;
+>>  		break;
+>>  	case KVM_CAP_VM_GPA_BITS:
+>> -		r = kvm_riscv_gstage_gpa_bits;
+>> +		r = kvm_riscv_gstage_gpa_bits(&kvm->arch);
+>>  		break;
+>>  	default:
+>>  		r = 0;
+>> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+>> index cf34d448289d..db27430f111e 100644
+>> --- a/arch/riscv/kvm/vmid.c
+>> +++ b/arch/riscv/kvm/vmid.c
+>> @@ -26,7 +26,7 @@ static DEFINE_SPINLOCK(vmid_lock);
+>>  void __init kvm_riscv_gstage_vmid_detect(void)
+>>  {
+>>  	/* Figure-out number of VMID bits in HW */
+>> -	csr_write(CSR_HGATP, (kvm_riscv_gstage_mode << HGATP_MODE_SHIFT) | HGATP_VMID);
+>> +	csr_write(CSR_HGATP, (kvm_riscv_gstage_max_mode << HGATP_MODE_SHIFT) | HGATP_VMID);
+>>  	vmid_bits = csr_read(CSR_HGATP);
+>>  	vmid_bits = (vmid_bits & HGATP_VMID) >> HGATP_VMID_SHIFT;
+>>  	vmid_bits = fls_long(vmid_bits);
+>> --
+>> 2.50.1
+>>
+>
+>Thanks,
+>drew
+>
+Thanks,
+Fangyu
 
