@@ -1,32 +1,32 @@
-Return-Path: <kvm+bounces-68424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C304D38B19
-	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 02:18:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D603D38B1B
+	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 02:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 65885301D13A
-	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 01:18:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4A476301F220
+	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 01:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54FD2236E5;
-	Sat, 17 Jan 2026 01:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42846228CB8;
+	Sat, 17 Jan 2026 01:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RJiwZa9I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d81ut/iu"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84348145B3F
-	for <kvm@vger.kernel.org>; Sat, 17 Jan 2026 01:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AECC21ABD0
+	for <kvm@vger.kernel.org>; Sat, 17 Jan 2026 01:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768612689; cv=none; b=QVHWhAPWg2X0kP9lZg62VHt/LSeWyYsDTCQFi6ElW/EmgJg7TfQjQbHtOErN3iioBlBk/J5KLEeRAhDts2izntPyV8qXra/iicKO/SG7vsfuO2RaVAShyhtxuS+iW9iTlYEXzvmNHyXlK5D4yVSxtTLuM/I687IXJ3o6/jtO5OY=
+	t=1768612690; cv=none; b=Q3ZGkO1c0VEF0vye8+wnahTEq2H3qMpDXKDLAosYcxbrIggLKKVQw/VICheImquxKdtXvUkhZmn3F7CrOCnCccGnC1GOW5lXpDJfxpZGQVr2qPxepWYpg5Hd52rf9mIhEFmvesWFd2U9M0eVM/4TCb/baqCVzbVS4KCu+TusEQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768612689; c=relaxed/simple;
-	bh=1YGD2m13b08g6ocSDICUbrUDqi3sC1hiqJxS0srsQNg=;
+	s=arc-20240116; t=1768612690; c=relaxed/simple;
+	bh=WVJQSNpNKHu3X0iUjOMBxv0QHS5KDEf9o+KQJ8gyVAQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q3NoTK3RwFJT/3v6IxpNIC6TrK0NkNLw9DaTK9dLOiKq+6Ouz6Z1x1P6b97OV2ypJp1blYug8uJVqzUhKk6rqGdVpCalyffW3OMWK0BjsQDGyU9dHqc7nH38CtvuyHZhVI1iDGxfrdFW47AglA7JY4P1UnRcpYNvK78/6TEDSjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RJiwZa9I; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=DZ5H+9D/FIohu5MqDYTfF2f3LwEE9gPJVB+ml1VLUxi/mjb9YFQtDW7zCkn78SDkz1ZkNHx+URD2esbrlgPWMxdRYTzqw/1aCifhHRY+wPKSNzTUJZPAp7gPUksemI2aQWt0rGjJQMO2GP9KETYYg1BGo7KSL1sqoa1Lur4/nKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d81ut/iu; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -34,23 +34,23 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1768612689; x=1800148689;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1YGD2m13b08g6ocSDICUbrUDqi3sC1hiqJxS0srsQNg=;
-  b=RJiwZa9IaeXHqToqKWWSGjZYEJudP3LFbAYlM4flN70hLCYOKyh6++rt
-   nsHBOJ/FGve5LkrPl9rst89aGb6jfVIZ0+8yDIdTdg1LVE5McRfPA2Tac
-   jqS1eXmf3S1+FnfNC02DytP3DB0rnjb2v4+MY6BhDKKMeAJ+6iZ5h9iO9
-   bYW/bUWHMVBfmqNEna2+hG2TM1NdMnVKQ0IAHHcQfzgrvRPjdgm+sRFWC
-   jIzrYj/DDRcI02e0CoU1vAAMBn7BFDW6TXY3cynWO2uyNE/SQvDDl1MK2
-   bf4SY1pdNx+AIAUTcyZuXgiXuheUfz2IGfjVnDiHY9UDjd3BQwBu7RI0k
-   g==;
-X-CSE-ConnectionGUID: QsTIeF80TV+LjLj41EJ5RA==
-X-CSE-MsgGUID: cXCFcqYzSqmvRFPEzaQkgw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="69131146"
+  bh=WVJQSNpNKHu3X0iUjOMBxv0QHS5KDEf9o+KQJ8gyVAQ=;
+  b=d81ut/iuKh8h1OH+mfFzd5GNEjRTcaH/u1vMR0p54jz8CHKYScFPd36o
+   T+TQtKKZ/YudGKVSsAqeQWM+RO5XlUDTaqf9mBRF23Jc3A/IJpzAdsJ+T
+   vl1/i77inQ5FXp+v+BD3W9NQY0xM00pKFXE0NzSJ/d1ZbRDJxCLrD9jfW
+   YwnsydCtn6v/BFCm3y5eQZ0FUzS1WuweuIsf9pbN3orMzYS9fK44mbLHX
+   OBHFDWMz8TFPZO3bz8KyMXddJF/sanbpHZPFnWjM9al5UzH0t2R92pxx/
+   bIAwxg7czU+xbNL04DKO7XMFXJIOCOK3ZGqhHaZ0d9eweup5kXzVGOfRN
+   Q==;
+X-CSE-ConnectionGUID: ogRZfwJiRdGkkom6/lBavg==
+X-CSE-MsgGUID: d+SDG5fZQOCTe/JPS8CXcg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="69131151"
 X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="69131146"
+   d="scan'208";a="69131151"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:07 -0800
-X-CSE-ConnectionGUID: 3gTCIqKOQNaUvL1gCEEEKw==
-X-CSE-MsgGUID: do0kuAd5TgW1OmLmWJblrA==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:08 -0800
+X-CSE-ConnectionGUID: /+z504YORU+VnwiO6lsoeA==
+X-CSE-MsgGUID: UW7hqU9YRR2jgIAvFDbxCg==
 X-ExtLoop1: 1
 Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
   by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:07 -0800
@@ -65,9 +65,9 @@ Cc: xiaoyao.li@intel.com,
 	Dongli Zhang <dongli.zhang@oracle.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Zide Chen <zide.chen@intel.com>
-Subject: [PATCH 1/7] target/i386: Disable unsupported BTS for guest
-Date: Fri, 16 Jan 2026 17:10:47 -0800
-Message-ID: <20260117011053.80723-2-zide.chen@intel.com>
+Subject: [PATCH 2/7] target/i386: Don't save/restore PERF_GLOBAL_OVF_CTRL MSR
+Date: Fri, 16 Jan 2026 17:10:48 -0800
+Message-ID: <20260117011053.80723-3-zide.chen@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260117011053.80723-1-zide.chen@intel.com>
 References: <20260117011053.80723-1-zide.chen@intel.com>
@@ -79,41 +79,89 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-BTS (Branch Trace Store), enumerated by IA32_MISC_ENABLE.BTS_UNAVAILABLE
-(bit 11), is deprecated and has been superseded by LBR and Intel PT.
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-KVM yields control of the above mentioned bit to userspace since KVM
-commit 9fc222967a39 ("KVM: x86: Give host userspace full control of
-MSR_IA32_MISC_ENABLES").
+MSR_CORE_PERF_GLOBAL_OVF_CTRL is a write-only MSR and reads always
+return zero.
 
-However, QEMU does not set this bit, which allows guests to write the
-BTS and BTINT bits in IA32_DEBUGCTL.  Since KVM doesn't support BTS,
-this may lead to unexpected MSR access errors.
+Saving and restoring this MSR is therefore unnecessary.  Replace
+VMSTATE_UINT64 with VMSTATE_UNUSED in the VMStateDescription to ignore
+env.msr_global_ovf_ctrl during migration.  This avoids the need to bump
+version_id and does not introduce any migration incompatibility.
 
-Setting this bit does not introduce migration compatibility issues, so
-the VMState version_id is not bumped.
-
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Zide Chen <zide.chen@intel.com>
 ---
- target/i386/cpu.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ target/i386/cpu.h     | 1 -
+ target/i386/kvm/kvm.c | 6 ------
+ target/i386/machine.c | 4 ++--
+ 3 files changed, 2 insertions(+), 9 deletions(-)
 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 2bbc977d9088..f2b79a8bf1dc 100644
+index f2b79a8bf1dc..0b480c631ed0 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -474,7 +474,10 @@ typedef enum X86Seg {
+@@ -2086,7 +2086,6 @@ typedef struct CPUArchState {
+     uint64_t msr_fixed_ctr_ctrl;
+     uint64_t msr_global_ctrl;
+     uint64_t msr_global_status;
+-    uint64_t msr_global_ovf_ctrl;
+     uint64_t msr_fixed_counters[MAX_FIXED_COUNTERS];
+     uint64_t msr_gp_counters[MAX_GP_COUNTERS];
+     uint64_t msr_gp_evtsel[MAX_GP_COUNTERS];
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 7b9b740a8e5a..cffbc90d1c50 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -4069,8 +4069,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
+             if (has_architectural_pmu_version > 1) {
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
+                                   env->msr_global_status);
+-                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+-                                  env->msr_global_ovf_ctrl);
  
- #define MSR_IA32_MISC_ENABLE            0x1a0
- /* Indicates good rep/movs microcode on some processors: */
--#define MSR_IA32_MISC_ENABLE_DEFAULT    1
-+#define MSR_IA32_MISC_ENABLE_FASTSTRING    1
-+#define MSR_IA32_MISC_ENABLE_BTS_UNAVAIL   (1ULL << 11)
-+#define MSR_IA32_MISC_ENABLE_DEFAULT       (MSR_IA32_MISC_ENABLE_FASTSTRING     |\
-+                                            MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
- #define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
+                 /* Now start the PMU.  */
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
+@@ -4588,7 +4586,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
+         }
+         for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+@@ -4917,9 +4914,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_CORE_PERF_GLOBAL_STATUS:
+             env->msr_global_status = msrs[i].data;
+             break;
+-        case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+-            env->msr_global_ovf_ctrl = msrs[i].data;
+-            break;
+         case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
+             env->msr_fixed_counters[index - MSR_CORE_PERF_FIXED_CTR0] = msrs[i].data;
+             break;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index c9139612813b..1125c8a64ec5 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -666,7 +666,7 @@ static bool pmu_enable_needed(void *opaque)
+     int i;
  
- #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
+     if (env->msr_fixed_ctr_ctrl || env->msr_global_ctrl ||
+-        env->msr_global_status || env->msr_global_ovf_ctrl) {
++        env->msr_global_status) {
+         return true;
+     }
+     for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
+@@ -692,7 +692,7 @@ static const VMStateDescription vmstate_msr_architectural_pmu = {
+         VMSTATE_UINT64(env.msr_fixed_ctr_ctrl, X86CPU),
+         VMSTATE_UINT64(env.msr_global_ctrl, X86CPU),
+         VMSTATE_UINT64(env.msr_global_status, X86CPU),
+-        VMSTATE_UINT64(env.msr_global_ovf_ctrl, X86CPU),
++        VMSTATE_UNUSED(sizeof(uint64_t)),
+         VMSTATE_UINT64_ARRAY(env.msr_fixed_counters, X86CPU, MAX_FIXED_COUNTERS),
+         VMSTATE_UINT64_ARRAY(env.msr_gp_counters, X86CPU, MAX_GP_COUNTERS),
+         VMSTATE_UINT64_ARRAY(env.msr_gp_evtsel, X86CPU, MAX_GP_COUNTERS),
 -- 
 2.52.0
 
