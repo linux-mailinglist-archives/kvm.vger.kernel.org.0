@@ -1,58 +1,59 @@
-Return-Path: <kvm+bounces-68423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6832FD38B17
-	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 02:18:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C304D38B19
+	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 02:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 86DC0301B8A4
-	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 01:18:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 65885301D13A
+	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 01:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18A421FF30;
-	Sat, 17 Jan 2026 01:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54FD2236E5;
+	Sat, 17 Jan 2026 01:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DkF/KUV0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RJiwZa9I"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9760B6D1A7
-	for <kvm@vger.kernel.org>; Sat, 17 Jan 2026 01:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84348145B3F
+	for <kvm@vger.kernel.org>; Sat, 17 Jan 2026 01:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768612689; cv=none; b=a568zh8Xkzwj6gO8OLT6UFvUPI9D4GnwefYBPtPfQFCDboJpzcnI9JQpZXvdHF1NLR04bsG5zRCmHyT8eDP3oZygzeOhI+tlZckH1PnRsXmAMeg/eKEHtQBN9zbQiY9KAMhblnO/aXPvxmi3r62/SotUl83jMd7hl8IeJsOrfJo=
+	t=1768612689; cv=none; b=QVHWhAPWg2X0kP9lZg62VHt/LSeWyYsDTCQFi6ElW/EmgJg7TfQjQbHtOErN3iioBlBk/J5KLEeRAhDts2izntPyV8qXra/iicKO/SG7vsfuO2RaVAShyhtxuS+iW9iTlYEXzvmNHyXlK5D4yVSxtTLuM/I687IXJ3o6/jtO5OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768612689; c=relaxed/simple;
-	bh=w7jOopBKAsOvzRXrsvabqYkwvIVcHNW6Lo4RVZLUNCw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mxDRLp9VXWYvpx+pYmP+xMZ16LTvSq3PXFDgO6ujxI+pcqbJiQmZK6+SKTES1YBuFu6rCWHh/cufgDOQc1IvMb7NpTrqCFGvvWaGiYzuxGgWSf3tSysGEsZZWeie2GIviL2YlHDkVXcIfHKxYlkHjtN38no5LBKlZtXltyPOMlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DkF/KUV0; arc=none smtp.client-ip=192.198.163.18
+	bh=1YGD2m13b08g6ocSDICUbrUDqi3sC1hiqJxS0srsQNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q3NoTK3RwFJT/3v6IxpNIC6TrK0NkNLw9DaTK9dLOiKq+6Ouz6Z1x1P6b97OV2ypJp1blYug8uJVqzUhKk6rqGdVpCalyffW3OMWK0BjsQDGyU9dHqc7nH38CtvuyHZhVI1iDGxfrdFW47AglA7JY4P1UnRcpYNvK78/6TEDSjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RJiwZa9I; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768612688; x=1800148688;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=w7jOopBKAsOvzRXrsvabqYkwvIVcHNW6Lo4RVZLUNCw=;
-  b=DkF/KUV0JzK8tECBjfPFOuwrfqjXL0K22V1fb18l1cqfdcckLRHFOzit
-   IhJP8JMSQ8Z66jpMlqMQPj0/AlogBncKcSRa9jhs3MLy1W5he1G+VK8O/
-   C3ClHCG0+cidJnaDTyPKo9TKLMpJk1FgsY3nYgn6wgbRplCHbRhZ/VDHj
-   tYKVcvbP6BrnhX4DxQlPbF1fXszVc/efICrC2G2iAXOuP7R4u+YPbov2A
-   QoYx8qa5j7XBNwMNgLWiyVFG15ptArGaf/KQZMMOBu0vzXatCJNgJpfx1
-   m6n1Hagf/8L+UiliMQxbEUWZc1Q9Tum3II+gSFSH/6I/YwAij1A69g92Y
-   w==;
-X-CSE-ConnectionGUID: 8wOGFe5yRz20k4x5TVGSGg==
-X-CSE-MsgGUID: i1hdi+McTWe6CKvTlX3UyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="69131142"
+  t=1768612689; x=1800148689;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=1YGD2m13b08g6ocSDICUbrUDqi3sC1hiqJxS0srsQNg=;
+  b=RJiwZa9IaeXHqToqKWWSGjZYEJudP3LFbAYlM4flN70hLCYOKyh6++rt
+   nsHBOJ/FGve5LkrPl9rst89aGb6jfVIZ0+8yDIdTdg1LVE5McRfPA2Tac
+   jqS1eXmf3S1+FnfNC02DytP3DB0rnjb2v4+MY6BhDKKMeAJ+6iZ5h9iO9
+   bYW/bUWHMVBfmqNEna2+hG2TM1NdMnVKQ0IAHHcQfzgrvRPjdgm+sRFWC
+   jIzrYj/DDRcI02e0CoU1vAAMBn7BFDW6TXY3cynWO2uyNE/SQvDDl1MK2
+   bf4SY1pdNx+AIAUTcyZuXgiXuheUfz2IGfjVnDiHY9UDjd3BQwBu7RI0k
+   g==;
+X-CSE-ConnectionGUID: QsTIeF80TV+LjLj41EJ5RA==
+X-CSE-MsgGUID: cXCFcqYzSqmvRFPEzaQkgw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="69131146"
 X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
-   d="scan'208";a="69131142"
+   d="scan'208";a="69131146"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
   by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:07 -0800
-X-CSE-ConnectionGUID: GiPwZMx5TkueL1hlMkFzwg==
-X-CSE-MsgGUID: OGVleIAPSyCX3IVDb2McVg==
+X-CSE-ConnectionGUID: 3gTCIqKOQNaUvL1gCEEEKw==
+X-CSE-MsgGUID: do0kuAd5TgW1OmLmWJblrA==
 X-ExtLoop1: 1
 Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:06 -0800
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:07 -0800
 From: Zide Chen <zide.chen@intel.com>
 To: qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
@@ -64,10 +65,12 @@ Cc: xiaoyao.li@intel.com,
 	Dongli Zhang <dongli.zhang@oracle.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Zide Chen <zide.chen@intel.com>
-Subject: [PATCH 0/7] target/i386: Misc PMU, PEBS, and MSR fixes and improvements
-Date: Fri, 16 Jan 2026 17:10:46 -0800
-Message-ID: <20260117011053.80723-1-zide.chen@intel.com>
+Subject: [PATCH 1/7] target/i386: Disable unsupported BTS for guest
+Date: Fri, 16 Jan 2026 17:10:47 -0800
+Message-ID: <20260117011053.80723-2-zide.chen@intel.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260117011053.80723-1-zide.chen@intel.com>
+References: <20260117011053.80723-1-zide.chen@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,29 +79,41 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series contains a set of mostly independent fixes and small
-improvements in target/i386 related to PMU, PEBS, and MSR handling.
+BTS (Branch Trace Store), enumerated by IA32_MISC_ENABLE.BTS_UNAVAILABLE
+(bit 11), is deprecated and has been superseded by LBR and Intel PT.
 
-The patches are grouped into a single series for review convenience;
-they are not tightly coupled and can be applied individually.
+KVM yields control of the above mentioned bit to userspace since KVM
+commit 9fc222967a39 ("KVM: x86: Give host userspace full control of
+MSR_IA32_MISC_ENABLES").
 
-Dapeng Mi (3):
-  target/i386: Don't save/restore PERF_GLOBAL_OVF_CTRL MSR
-  target/i386: Support full-width writes for perf counters
-  target/i386: Save/Restore DS based PEBS specfic MSRs
+However, QEMU does not set this bit, which allows guests to write the
+BTS and BTINT bits in IA32_DEBUGCTL.  Since KVM doesn't support BTS,
+this may lead to unexpected MSR access errors.
 
-Zide Chen (4):
-  target/i386: Disable unsupported BTS for guest
-  target/i386: Gate enable_pmu on kvm_enabled()
-  target/i386: Make some PEBS features user-visible
-  target/i386: Increase MSR_BUF_SIZE and split KVM_[GET/SET]_MSRS calls
+Setting this bit does not introduce migration compatibility issues, so
+the VMState version_id is not bumped.
 
- target/i386/cpu.c     |  15 ++--
- target/i386/cpu.h     |  20 +++++-
- target/i386/kvm/kvm.c | 162 +++++++++++++++++++++++++++++++++++-------
- target/i386/machine.c |  35 +++++++--
- 4 files changed, 191 insertions(+), 41 deletions(-)
+Signed-off-by: Zide Chen <zide.chen@intel.com>
+---
+ target/i386/cpu.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 2bbc977d9088..f2b79a8bf1dc 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -474,7 +474,10 @@ typedef enum X86Seg {
+ 
+ #define MSR_IA32_MISC_ENABLE            0x1a0
+ /* Indicates good rep/movs microcode on some processors: */
+-#define MSR_IA32_MISC_ENABLE_DEFAULT    1
++#define MSR_IA32_MISC_ENABLE_FASTSTRING    1
++#define MSR_IA32_MISC_ENABLE_BTS_UNAVAIL   (1ULL << 11)
++#define MSR_IA32_MISC_ENABLE_DEFAULT       (MSR_IA32_MISC_ENABLE_FASTSTRING     |\
++                                            MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
+ #define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
+ 
+ #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
 -- 
 2.52.0
 
