@@ -1,183 +1,105 @@
-Return-Path: <kvm+bounces-68422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE839D38AFB
-	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 02:02:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6832FD38B17
+	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 02:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61A59307B3A9
-	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 01:02:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 86DC0301B8A4
+	for <lists+kvm@lfdr.de>; Sat, 17 Jan 2026 01:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52991D90DF;
-	Sat, 17 Jan 2026 01:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18A421FF30;
+	Sat, 17 Jan 2026 01:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GWkhClwK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DkF/KUV0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4F5140E5F
-	for <kvm@vger.kernel.org>; Sat, 17 Jan 2026 01:02:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9760B6D1A7
+	for <kvm@vger.kernel.org>; Sat, 17 Jan 2026 01:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768611726; cv=none; b=e14A95p6u+S/gc8u6/RTTVKXYGF79sv+pVmQ8yJevG1q+wPNjUJmT0fSIcQO+UCXME9MWlqI/6uT5GhsLkTFDKoRy4B9ttlDrdZ82lZMDUl2+71EvprG7Ex38IzhM/0kFhKEXyQgQANC/YNT1XjscYtVUT3NQ5jpRgc2hPoZMXI=
+	t=1768612689; cv=none; b=a568zh8Xkzwj6gO8OLT6UFvUPI9D4GnwefYBPtPfQFCDboJpzcnI9JQpZXvdHF1NLR04bsG5zRCmHyT8eDP3oZygzeOhI+tlZckH1PnRsXmAMeg/eKEHtQBN9zbQiY9KAMhblnO/aXPvxmi3r62/SotUl83jMd7hl8IeJsOrfJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768611726; c=relaxed/simple;
-	bh=387TLTU83paT+jk/XoywCNBbbdR4aObP3kXaD1x/h9E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SsmYxib0wtXM+FS6RbjFmlpG5BWxrnozo/EXBaFHeAHCE9ZjJpLCycTGmCBG3SQdm9W/yu38roKc0z2W4Y7hAa2OGj2ZHiBihzwKWr4t0T9J/qjluvbra19v3mwLGN0EBVK7VCS7Qn/fVIXFxWn+KeaW77TviiYuAjLDXSpw9Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GWkhClwK; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ea5074935so2428056a91.0
-        for <kvm@vger.kernel.org>; Fri, 16 Jan 2026 17:02:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768611725; x=1769216525; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=33kwIywl/krx+QdnC8KwFooydqEwwakdHI97f7zntIM=;
-        b=GWkhClwKwL9zquNgNAPBDRCwL8UVQcdPdIOxHkqKEYCbiMFs6enE5Oec4z+7sdsBjJ
-         lqAV+icp2sM5quMs9nhYeIw2Yw1TJI2OUqSDziZZip10b74pyw7UFiq4N1o9l7D+NF0+
-         FepYcj61SOD3SJLrDmKnpBdJVgAaepIc2a1QE4US4rsVO+TQJBNfpOCnKsr/N9d4HfWh
-         WmJt24exxQ+ELkDOERYvSDscJfI04o5nLanZYEFCVeg08g1kcnKp2TVB7wf870tAS3QN
-         eiL+o+t8emhJljNuav21hDwWLyL68QBzyz4QQwyfuNN5rvNpSdQRHYD2VhCONMoRkTHK
-         LYPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768611725; x=1769216525;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=33kwIywl/krx+QdnC8KwFooydqEwwakdHI97f7zntIM=;
-        b=iPcY+RA/W5x7NEDd3XEEt3VQBuIiwfnde/ccB2KJqrjIUpbsqAOY0U6n79SogvdzmZ
-         tASVvZVRzDolW25X//UfJZ3RlrZjMgpCfy1TmqykTyxJQidBCQ5pRUUz139YJM5vqq7t
-         eGNV4wBwA3fNNW/GfsMOZ5BYdOLFdzjSPOoNdbkIaklZI0TsHz9fxq0BuGTfGCkKGVar
-         UCFnKo2tCfPINsdvKbYXaRjFAXsKDQBDNmm2jBPjqxlI9dbc8lPppmZAbbDkDgUHXgdO
-         w9OHModmxlF6GMUk1oa58bqjid71TIV90PabBi/h0yLJM5boU97Gnd6a+DYtWBtkb25+
-         OlMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtkBtqDpo5g07ffctZQwnE7J8GvxSNMfwsjS8O3ryQL5S6zFMKF1BNvHnBqmygljddzAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGjJ84XYgGfZhjgiNtL8eH+mskz46s4IcCth6AwtB7dQG52YmP
-	IhIgRrAw/CqxHnrEeAYLwaK1o1BX6C8MdaPgLqsWi/8oQpUyHdsIeMXVYqjoBTkfe3+/JdTh5Q2
-	6zizQoA==
-X-Received: from pjtn4.prod.google.com ([2002:a17:90a:c684:b0:340:c0e9:24b6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5101:b0:34a:8c77:d37b
- with SMTP id 98e67ed59e1d1-352731799d0mr4376642a91.16.1768611724820; Fri, 16
- Jan 2026 17:02:04 -0800 (PST)
-Date: Fri, 16 Jan 2026 17:02:03 -0800
-In-Reply-To: <20251121005125.417831-13-rick.p.edgecombe@intel.com>
+	s=arc-20240116; t=1768612689; c=relaxed/simple;
+	bh=w7jOopBKAsOvzRXrsvabqYkwvIVcHNW6Lo4RVZLUNCw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mxDRLp9VXWYvpx+pYmP+xMZ16LTvSq3PXFDgO6ujxI+pcqbJiQmZK6+SKTES1YBuFu6rCWHh/cufgDOQc1IvMb7NpTrqCFGvvWaGiYzuxGgWSf3tSysGEsZZWeie2GIviL2YlHDkVXcIfHKxYlkHjtN38no5LBKlZtXltyPOMlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DkF/KUV0; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768612688; x=1800148688;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=w7jOopBKAsOvzRXrsvabqYkwvIVcHNW6Lo4RVZLUNCw=;
+  b=DkF/KUV0JzK8tECBjfPFOuwrfqjXL0K22V1fb18l1cqfdcckLRHFOzit
+   IhJP8JMSQ8Z66jpMlqMQPj0/AlogBncKcSRa9jhs3MLy1W5he1G+VK8O/
+   C3ClHCG0+cidJnaDTyPKo9TKLMpJk1FgsY3nYgn6wgbRplCHbRhZ/VDHj
+   tYKVcvbP6BrnhX4DxQlPbF1fXszVc/efICrC2G2iAXOuP7R4u+YPbov2A
+   QoYx8qa5j7XBNwMNgLWiyVFG15ptArGaf/KQZMMOBu0vzXatCJNgJpfx1
+   m6n1Hagf/8L+UiliMQxbEUWZc1Q9Tum3II+gSFSH/6I/YwAij1A69g92Y
+   w==;
+X-CSE-ConnectionGUID: 8wOGFe5yRz20k4x5TVGSGg==
+X-CSE-MsgGUID: i1hdi+McTWe6CKvTlX3UyQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11673"; a="69131142"
+X-IronPort-AV: E=Sophos;i="6.21,232,1763452800"; 
+   d="scan'208";a="69131142"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:07 -0800
+X-CSE-ConnectionGUID: GiPwZMx5TkueL1hlMkFzwg==
+X-CSE-MsgGUID: OGVleIAPSyCX3IVDb2McVg==
+X-ExtLoop1: 1
+Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:18:06 -0800
+From: Zide Chen <zide.chen@intel.com>
+To: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Peter Xu <peterx@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>
+Cc: xiaoyao.li@intel.com,
+	Dongli Zhang <dongli.zhang@oracle.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Zide Chen <zide.chen@intel.com>
+Subject: [PATCH 0/7] target/i386: Misc PMU, PEBS, and MSR fixes and improvements
+Date: Fri, 16 Jan 2026 17:10:46 -0800
+Message-ID: <20260117011053.80723-1-zide.chen@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251121005125.417831-1-rick.p.edgecombe@intel.com> <20251121005125.417831-13-rick.p.edgecombe@intel.com>
-Message-ID: <aWrfi8Oy6WXhiNv1@google.com>
-Subject: Re: [PATCH v4 12/16] x86/virt/tdx: Add helpers to allow for
- pre-allocating pages
-From: Sean Christopherson <seanjc@google.com>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: bp@alien8.de, chao.gao@intel.com, dave.hansen@intel.com, 
-	isaku.yamahata@intel.com, kai.huang@intel.com, kas@kernel.org, 
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	mingo@redhat.com, pbonzini@redhat.com, tglx@linutronix.de, 
-	vannapurve@google.com, x86@kernel.org, yan.y.zhao@intel.com, 
-	xiaoyao.li@intel.com, binbin.wu@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 20, 2025, Rick Edgecombe wrote:
-> ---
-> v4:
->  - Change to GFP_KERNEL_ACCOUNT to match replaced kvm_mmu_memory_cache
->  - Add GFP_ATOMIC backup, like kvm_mmu_memory_cache has (Kiryl)
+This series contains a set of mostly independent fixes and small
+improvements in target/i386 related to PMU, PEBS, and MSR handling.
 
-LOL, having fun reinventing kvm_mmu_memory_cache? :-D
+The patches are grouped into a single series for review convenience;
+they are not tightly coupled and can be applied individually.
 
->  - Explain why not to use mempool (Dave)
->  - Tweak local vars to be more reverse christmas tree by deleting some
->    that were only added for reasons that go away in this patch anyway
-> ---
->  arch/x86/include/asm/tdx.h  | 43 ++++++++++++++++++++++++++++++++++++-
->  arch/x86/kvm/vmx/tdx.c      | 21 +++++++++++++-----
->  arch/x86/kvm/vmx/tdx.h      |  2 +-
->  arch/x86/virt/vmx/tdx/tdx.c | 22 +++++++++++++------
->  virt/kvm/kvm_main.c         |  3 ---
->  5 files changed, 75 insertions(+), 16 deletions(-)
+Dapeng Mi (3):
+  target/i386: Don't save/restore PERF_GLOBAL_OVF_CTRL MSR
+  target/i386: Support full-width writes for perf counters
+  target/i386: Save/Restore DS based PEBS specfic MSRs
 
-> +/*
-> + * Simple structure for pre-allocating Dynamic
-> + * PAMT pages outside of locks.
+Zide Chen (4):
+  target/i386: Disable unsupported BTS for guest
+  target/i386: Gate enable_pmu on kvm_enabled()
+  target/i386: Make some PEBS features user-visible
+  target/i386: Increase MSR_BUF_SIZE and split KVM_[GET/SET]_MSRS calls
 
-As called out in an earlier patch, it's not just PAMT pages.
+ target/i386/cpu.c     |  15 ++--
+ target/i386/cpu.h     |  20 +++++-
+ target/i386/kvm/kvm.c | 162 +++++++++++++++++++++++++++++++++++-------
+ target/i386/machine.c |  35 +++++++--
+ 4 files changed, 191 insertions(+), 41 deletions(-)
 
-> + */
-> +struct tdx_prealloc {
-> +	struct list_head page_list;
-> +	int cnt;
-> +};
-> +
-> +static inline struct page *get_tdx_prealloc_page(struct tdx_prealloc *prealloc)
-> +{
-> +	struct page *page;
-> +
-> +	page = list_first_entry_or_null(&prealloc->page_list, struct page, lru);
-> +	if (page) {
-> +		list_del(&page->lru);
-> +		prealloc->cnt--;
-> +	}
-> +
-> +	return page;
-> +}
-> +
-> +static inline int topup_tdx_prealloc_page(struct tdx_prealloc *prealloc, unsigned int min_size)
-> +{
-> +	while (prealloc->cnt < min_size) {
-> +		struct page *page = alloc_page(GFP_KERNEL_ACCOUNT);
-> +
-> +		if (!page)
-> +			return -ENOMEM;
-> +
-> +		list_add(&page->lru, &prealloc->page_list);
+-- 
+2.52.0
 
-Huh, TIL that page->lru is fair game for private usage when the page is kernel-
-allocated.  
-
-> +		prealloc->cnt++;
->
->  static int tdx_topup_external_fault_cache(struct kvm_vcpu *vcpu, unsigned int cnt)
->  {
-> -	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +	struct tdx_prealloc *prealloc = &to_tdx(vcpu)->prealloc;
-> +	int min_fault_cache_size;
->  
-> -	return kvm_mmu_topup_memory_cache(&tdx->mmu_external_spt_cache, cnt);
-> +	/* External page tables */
-> +	min_fault_cache_size = cnt;
-> +	/* Dynamic PAMT pages (if enabled) */
-> +	min_fault_cache_size += tdx_dpamt_entry_pages() * PT64_ROOT_MAX_LEVEL;
-> +
-> +	return topup_tdx_prealloc_page(prealloc, min_fault_cache_size);
->  }
->  
->  static void tdx_free_external_fault_cache(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +	struct page *page;
->  
-> -	kvm_mmu_free_memory_cache(&tdx->mmu_external_spt_cache);
-> +	while ((page = get_tdx_prealloc_page(&tdx->prealloc)))
-> +		__free_page(page);
-
-No.  Either put the ownership of the PAMT cache in arch/x86/virt/vmx/tdx/tdx.c
-or use kvm_mmu_memory_cache.  Don't add a custom caching scheme in KVM.
-  
->  /* Number PAMT pages to be provided to TDX module per 2M region of PA */
-> -static int tdx_dpamt_entry_pages(void)
-> +int tdx_dpamt_entry_pages(void)
->  {
->  	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
->  		return 0;
->  
-
-A comment here stating the "common" number of entries would be helper.  I have no
-clue as to the magnitude.  E.g. this could be 2 or it could be 200, I genuinely
-have no idea.
 
