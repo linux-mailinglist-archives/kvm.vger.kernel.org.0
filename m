@@ -1,317 +1,288 @@
-Return-Path: <kvm+bounces-68521-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 702D4D3B3C4
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 18:17:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6585D3B37E
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 18:11:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6CA29309008D
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 16:45:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5E66531B3C20
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 16:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8535D38F256;
-	Mon, 19 Jan 2026 16:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41BA3A1A42;
+	Mon, 19 Jan 2026 16:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zj1i8k90"
+	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="XMmufd0B"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.thorondor.fr (unknown [82.66.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAB732E126;
-	Mon, 19 Jan 2026 16:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1203803E2;
+	Mon, 19 Jan 2026 16:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768840661; cv=none; b=J5+sryMyEm6Ml5BjyzdMXRkdVe8ag9py5UJtcx4eqhIYlEjUAOB8xoxfXJ20nl5CMccSpUg2gOhMvJhUxHp0Q7tmVw+UCUt0aLnKQwBIMzvQGm3tzLaolPokayE9o4yXzRv40CxTMo4MeQMY8sZlwNR+JGoDYQ04G8/E7uy+K4E=
+	t=1768840963; cv=none; b=FzXo149oNKByjU4EmIokp+2yIHUPhVH0rFEmfdMd5gatanCKiAQiWvK3rsUmIEYjB1gUpP45UAIm4QB6pO45lfNbLwPdV+6FMoS+77V3w8md+eVGhfOxCyB22jABJNQY1n1Rx67+2EBD0R2Man8g2QIjAx5PRmIYwXGjvJjk3wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768840661; c=relaxed/simple;
-	bh=oSn6eeMjVt0BdckSdLlrBsRGgN6O4ooWNqYJ4Q6NUyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=emMgdDGMwOspwas1XTBBt6bls6HTNzxOO2Xe8JH56ZlIAVZNXbDE+H4DnhmNg+dizjpsY4wrsXSVQ9DZI2t2tqK3ktO7pI2sat2No+zHZNtIjYjZF2RSaE8TYNrhS3G7bmU+8gDuQNeC8LhJxLmhTEyGgf53e9qzNm2zwG/d8s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zj1i8k90; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE2FC116C6;
-	Mon, 19 Jan 2026 16:37:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768840661;
-	bh=oSn6eeMjVt0BdckSdLlrBsRGgN6O4ooWNqYJ4Q6NUyQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Zj1i8k90WEUW6SxcQ/g4vVNC85cl4uQEQOL0Ob6m3v6FIChZ2NAPoVxjf5hiyhxFe
-	 U+vnzci8BY8Lw0ecSrqIa+cIlqJjcyMlaXkFuGs179r2uOAmVEw3Tw0va566yEsSH2
-	 im0reOy9tcxZFXztZnzcFy/DY+B/1XqxdgJbN4SuA4wn3u45qnjdq3NHqijYEgktHu
-	 xPdul4mSnLMbjXq3CLvgDsX3hvgRekot1zqBe6jKQ/8c0hQat91jimlcxIfd0QjeZK
-	 87DaOV/B+WLHEs9IJsOBBYsuV7YFci0h9sJlUBJAlBmh8E5HDy4vzMFErHpTHmKvtN
-	 kFK0j5cnDGzPw==
-Date: Mon, 19 Jan 2026 16:37:33 +0000
-From: Will Deacon <will@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: catalin.marinas@arm.com, maz@kernel.org, broonie@kernel.org,
-	oliver.upton@linux.dev, miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
-	lpieralisi@kernel.org, yangyicong@hisilicon.com,
-	scott@os.amperecomputing.com, joey.gouly@arm.com,
-	yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org,
-	mark.rutland@arm.com, arnd@arndb.de,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 RESEND 6/9] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <aW5dzb0ldp8u8Rdm@willie-the-truck>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
- <20251214112248.901769-7-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1768840963; c=relaxed/simple;
+	bh=4rqFGZHNinZN6QODPORQOjo9IIVnqp2ut2fwotsVrZk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ljKgdIw/47fA3s7TxbDiYMkqNJ6wYeWAgv16nHtC8hGVApFvJjLaBnnY75ZBff/SgjNcc9f8aWE4g/5yRLHp3kqhNpTQp+oDdDqwipifDHWGCJN3fYmSvbECoZ8OYlu8a1o/nqoAW48PULhjMxJdoQmTwo0LWvvCmFzofgcBTqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=XMmufd0B; arc=none smtp.client-ip=82.66.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
+	t=1768840954; bh=4rqFGZHNinZN6QODPORQOjo9IIVnqp2ut2fwotsVrZk=;
+	h=From:To:Cc:Subject:In-Reply-To:References;
+	b=XMmufd0B7pcLBHWEBNrfrnclK8o+Ndi39oMK1WGORpW+aj4EE1bhCTIysVjyUty1q
+	 RsKP+zN0WgW6ErPR/KUYo6SPt1I1wr7irgtX2F1HXcWX03MHNSj7G9fR/3KlEau9VQ
+	 MQ/MKXos/xMw9xGh0X2o/STqqb7x/Te4jjc90V6953ZbuKFpWkxi7QF6F9fbKmSoaB
+	 B5f6WYE40+pu2pNxJj9jHmxE7QVocmCN0NTCp+Iqbn68RIemgagilxKsyVpcg+HnN/
+	 037zDip9s8qOq3LuYeKP1RQ0wLpIsp+BM/weZQHE4ejKbF9K2hrVJQXfcFHrDlZoqf
+	 nfZ0Tvs31GT4w==
+From: Thomas Courrege <thomas.courrege@thorondor.fr>
+To: ashish.kalra@amd.com,
+	corbet@lwn.net,
+	herbert@gondor.apana.org.au,
+	john.allen@amd.com,
+	nikunj@amd.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	Thomas Courrege <thomas.courrege@thorondor.fr>
+Subject: [PATCH v3 RESEND v3 1/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+Date: Mon, 19 Jan 2026 17:42:28 +0100
+Message-ID: <20260119164228.2108498-2-thomas.courrege@thorondor.fr>
+In-Reply-To: <20260119164228.2108498-1-thomas.courrege@thorondor.fr>
+References: <20260119164228.2108498-1-thomas.courrege@thorondor.fr>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251214112248.901769-7-yeoreum.yun@arm.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Dec 14, 2025 at 11:22:45AM +0000, Yeoreum Yun wrote:
-> Current futex atomic operations are implemented with ll/sc instructions
-> and clearing PSTATE.PAN.
-> 
-> Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
-> also atomic operation for user memory access in kernel it doesn't need
-> to clear PSTATE.PAN bit anymore.
-> 
-> With theses instructions some of futex atomic operations don't need to
-> be implmented with ldxr/stlxr pair instead can be implmented with
-> one atomic operation supplied by FEAT_LSUI.
-> 
-> However, some of futex atomic operation don't have matched
-> instructuion i.e) eor or cmpxchg with word size.
-> For those operation, uses cas{al}t to implement them.
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> ---
->  arch/arm64/include/asm/futex.h | 180 ++++++++++++++++++++++++++++++++-
->  1 file changed, 178 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index f8cb674bdb3f..6778ff7e1c0e 100644
-> --- a/arch/arm64/include/asm/futex.h
-> +++ b/arch/arm64/include/asm/futex.h
-> @@ -9,6 +9,8 @@
->  #include <linux/uaccess.h>
->  #include <linux/stringify.h>
-> 
-> +#include <asm/alternative.h>
-> +#include <asm/alternative-macros.h>
->  #include <asm/errno.h>
-> 
->  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
-> @@ -86,11 +88,185 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  	return ret;
->  }
-> 
-> +#ifdef CONFIG_AS_HAS_LSUI
-> +
-> +/*
-> + * When the LSUI feature is present, the CPU also implements PAN, because
-> + * FEAT_PAN has been mandatory since Armv8.1. Therefore, there is no need to
-> + * call uaccess_ttbr0_enable()/uaccess_ttbr0_disable() around each LSUI
-> + * operation.
-> + */
+Add support for retrieving the SEV-SNP attestation report via the
+SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
+ioctl for SNP guests.
 
-I'd prefer not to rely on these sorts of properties because:
+Signed-off-by: Thomas Courrege <thomas.courrege@thorondor.fr>
+---
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 27 +++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  9 +++
+ arch/x86/kvm/svm/sev.c                        | 60 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 ++++++++++
+ 5 files changed, 128 insertions(+)
 
-  - CPU bugs happen all the time
-  - Virtualisation and idreg overrides mean illegal feature combinations
-    can show up
-  - The architects sometimes change their mind
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 1ddb6a86ce7f..083ed487764e 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -572,6 +572,33 @@ Returns: 0 on success, -negative on error
+ See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
+ details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
+ 
++21. KVM_SEV_SNP_HV_REPORT_REQ
++-----------------------------
++
++The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
++SNP attestation report. This report is produced by the PSP using the
++HV-SIGNED key selected by the caller.
++
++The ``key_sel`` field indicates which key the platform will use to sign the
++report:
++  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
++  * ``1``: Sign with VCEK.
++  * ``2``: Sign with VLEK.
++  * Other values are reserved.
++
++Parameters (in): struct kvm_sev_snp_hv_report_req
++
++Returns:  0 on success, -negative on error
++
++::
++        struct kvm_sev_snp_hv_report_req {
++                __u64 report_uaddr;
++                __u64 report_len;
++                __u8 key_sel;
++                __u8 pad0[7];
++                __u64 pad1[4];
++        };
++
+ Device attribute API
+ ====================
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 7ceff6583652..464146bed784 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -743,6 +743,7 @@ enum sev_cmd_id {
+ 	KVM_SEV_SNP_LAUNCH_START = 100,
+ 	KVM_SEV_SNP_LAUNCH_UPDATE,
+ 	KVM_SEV_SNP_LAUNCH_FINISH,
++	KVM_SEV_SNP_HV_REPORT_REQ,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
+ 	__u32 pad2;
+ };
+ 
++struct kvm_sev_snp_hv_report_req {
++	__u64 report_uaddr;
++	__u64 report_len;
++	__u8 key_sel;
++	__u8 pad0[7];
++	__u64 pad1[4];
++};
++
+ struct kvm_sev_snp_launch_start {
+ 	__u64 policy;
+ 	__u8 gosvw[16];
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index f59c65abe3cf..ba7a07d132ff 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2261,6 +2261,63 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return rc;
+ }
+ 
++static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct sev_data_snp_msg_report_rsp *report_rsp = NULL;
++	struct sev_data_snp_hv_report_req data;
++	struct kvm_sev_snp_hv_report_req params;
++	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
++	void __user *u_report;
++	void __user *u_params = u64_to_user_ptr(argp->data);
++	size_t rsp_size = sizeof(*report_rsp);
++	int ret;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++	if (copy_from_user(&params, u_params, sizeof(params)))
++		return -EFAULT;
++
++	if (params.report_len < rsp_size)
++		return -ENOSPC;
++
++	u_report = u64_to_user_ptr(params.report_uaddr);
++	if (!u_report)
++		return -EINVAL;
++
++	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!report_rsp)
++		return -ENOMEM;
++
++	data.len = sizeof(data);
++	data.key_sel = params.key_sel;
++	data.gctx_addr = __psp_pa(sev->snp_context);
++	data.hv_report_paddr = __psp_pa(report_rsp);
++
++	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
++				&argp->error);
++	if (ret)
++		goto e_free_rsp;
++
++	if (!report_rsp->status)
++		rsp_size += report_rsp->report_size;
++
++	if (params.report_len < rsp_size) {
++		rsp_size = sizeof(*report_rsp);
++		ret = -ENOSPC;
++	}
++
++	if (copy_to_user(u_report, report_rsp, rsp_size))
++		ret = -EFAULT;
++
++	params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
++	if (copy_to_user(u_params, &params, sizeof(params)))
++		ret = -EFAULT;
++
++e_free_rsp:
++	snp_free_firmware_page(report_rsp);
++	return ret;
++}
++
+ struct sev_gmem_populate_args {
+ 	__u8 type;
+ 	int sev_fd;
+@@ -2672,6 +2729,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_SNP_LAUNCH_FINISH:
+ 		r = snp_launch_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_HV_REPORT_REQ:
++		r = sev_snp_hv_report_request(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 956ea609d0cc..5dd7c3f0d50d 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+ 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
+ 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
++	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
+ 	default:				return sev_tio_cmd_buffer_len(cmd);
+ 	}
+ 
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 69ffa4b4d1fa..c651a400d124 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -124,6 +124,7 @@ enum sev_cmd {
+ 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
+ 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
+ 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
++	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
+ 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
+ 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
+ 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
+@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
+ 	u32 len;				/* In/Out */
+ } __packed;
+ 
++/**
++ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
++ *
++ * @len: length of the command buffer in bytes
++ * @key_sel: Selects which key to use for generating the signature.
++ * @gctx_addr: System physical address of guest context page
++ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
++ */
++struct sev_data_snp_hv_report_req {
++	u32 len;		/* In */
++	u32 key_sel	:2,	/* In */
++	    rsvd	:30;
++	u64 gctx_addr;		/* In */
++	u64 hv_report_paddr;	/* In */
++} __packed;
++
++/**
++ * struct sev_data_snp_msg_export_rsp
++ *
++ * @status: Status : 0h: Success. 16h: Invalid parameters.
++ * @report_size: Size in bytes of the attestation report
++ * @report: attestation report
++ */
++struct sev_data_snp_msg_report_rsp {
++	u32 status;			/* Out */
++	u32 report_size;		/* Out */
++	u8 rsvd[24];
++	u8 report[];
++} __packed;
++
+ /**
+  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
+  *
+-- 
+2.52.0
 
-So let's either drop the assumption that we have PAN if LSUI *or* actually
-test that someplace during feature initialisation.
-
-> +
-> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> +
-> +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
-> +static __always_inline int						\
-> +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> +{									\
-> +	int ret = 0;							\
-> +	int oldval;							\
-> +									\
-> +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
-> +	__LSUI_PREAMBLE							\
-> +"1:	" #asm_op #mb "	%w3, %w2, %1\n"					\
-
-What's the point in separating the barrier suffix from the rest of the
-instruction mnemonic? All the callers use -AL.
-
-> +"2:\n"									\
-> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
-> +	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
-> +	: "r" (oparg)							\
-> +	: "memory");							\
-> +									\
-> +	if (!ret)							\
-> +		*oval = oldval;						\
-> +									\
-> +	return ret;							\
-> +}
-> +
-> +LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
-> +LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
-> +LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
-> +LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
-> +
-> +static __always_inline int
-> +__lsui_cmpxchg64(u64 __user *uaddr, u64 *oldval, u64 newval)
-> +{
-> +	int ret = 0;
-> +
-> +	asm volatile("// __lsui_cmpxchg64\n"
-> +	__LSUI_PREAMBLE
-> +"1:	casalt	%x2, %x3, %1\n"
-
-
-How bizarre, they changed the order of the AL and T compared to SWPTAL.
-Fair enough...
-
-Also, I don't think you need the 'x' prefix on the 64-bit variables.
-
-> +"2:\n"
-> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-> +	: "+r" (ret), "+Q" (*uaddr), "+r" (*oldval)
-> +	: "r" (newval)
-> +	: "memory");
-
-Don't you need to update *oldval here if the CAS didn't fault?
-
-> +
-> +	return ret;
-> +}
-> +
-> +static __always_inline int
-> +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	u64 __user *uaddr64;
-> +	bool futex_on_lo;
-> +	int ret = -EAGAIN, i;
-> +	u32 other, orig_other;
-> +	union {
-> +		struct futex_on_lo {
-> +			u32 val;
-> +			u32 other;
-> +		} lo_futex;
-> +
-> +		struct futex_on_hi {
-> +			u32 other;
-> +			u32 val;
-> +		} hi_futex;
-> +
-> +		u64 raw;
-> +	} oval64, orig64, nval64;
-> +
-> +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
-> +	futex_on_lo = (IS_ALIGNED((unsigned long)uaddr, sizeof(u64)) ==
-> +			IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN));
-
-Just make LSUI depend on !CPU_BIG_ENDIAN in Kconfig. The latter already
-depends on BROKEN and so we'll probably drop it soon anyway. There's
-certainly no need to care about it for new features and it should simplify
-the code you have here if you can assume little-endian.
-
-> +
-> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
-> +		if (get_user(oval64.raw, uaddr64))
-> +			return -EFAULT;
-
-Since oldval is passed to us as an argument, can we get away with a
-32-bit get_user() here?
-
-> +
-> +		nval64.raw = oval64.raw;
-> +
-> +		if (futex_on_lo) {
-> +			oval64.lo_futex.val = oldval;
-> +			nval64.lo_futex.val = newval;
-> +		} else {
-> +			oval64.hi_futex.val = oldval;
-> +			nval64.hi_futex.val = newval;
-> +		}
-> +
-> +		orig64.raw = oval64.raw;
-> +
-> +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
-> +			return -EFAULT;
-> +
-> +		if (futex_on_lo) {
-> +			oldval = oval64.lo_futex.val;
-> +			other = oval64.lo_futex.other;
-> +			orig_other = orig64.lo_futex.other;
-> +		} else {
-> +			oldval = oval64.hi_futex.val;
-> +			other = oval64.hi_futex.other;
-> +			orig_other = orig64.hi_futex.other;
-> +		}
-> +
-> +		if (other == orig_other) {
-> +			ret = 0;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!ret)
-> +		*oval = oldval;
-
-Shouldn't we set *oval to the value we got back from the CAS?
-
-> +
-> +	return ret;
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-
-Please a comment about the bitwise negation of oparg here as we're undoing
-the one from the caller.
-
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	u32 oldval, newval, val;
-> +	int ret, i;
-> +
-> +	/*
-> +	 * there are no ldteor/stteor instructions...
-> +	 */
-> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
-> +		if (get_user(oldval, uaddr))
-> +			return -EFAULT;
-> +
-> +		newval = oldval ^ oparg;
-> +
-> +		ret = __lsui_cmpxchg32(uaddr, oldval, newval, &val);
-> +		if (ret)
-> +			return ret;
-> +
-> +		if (val == oldval) {
-> +			*oval = val;
-> +			return 0;
-> +		}
-> +	}
-> +
-> +	return -EAGAIN;
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
-> +}
-> +
-> +#define __lsui_llsc_body(op, ...)					\
-> +({									\
-> +	alternative_has_cap_likely(ARM64_HAS_LSUI) ?			\
-
-This doesn't seem like it should be the "likely" case just yet?
-
-Will
 
