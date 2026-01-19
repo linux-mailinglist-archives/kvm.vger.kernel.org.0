@@ -1,99 +1,102 @@
-Return-Path: <kvm+bounces-68545-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68543-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97496D3B8AC
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 21:40:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D84D3B8B4
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 21:42:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 34636303D926
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 20:40:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2EDED30A752B
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 20:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F6B2DB7AF;
-	Mon, 19 Jan 2026 20:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C562F6574;
+	Mon, 19 Jan 2026 20:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="DqugQzcF";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="0YYnUgZC"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="VGf1EbRR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qpn9XrPj"
 X-Original-To: kvm@vger.kernel.org
 Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428E22F6900;
-	Mon, 19 Jan 2026 20:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D832F690D;
+	Mon, 19 Jan 2026 20:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768855203; cv=none; b=SXh6vKnjgGjOEkzy+oGLyyDqp/bR97zi7ak8shPZj+5Yz/vYvuBpxBUVTOEBsIchqmNhwNCmHxEXw79YZM0eAc1Wh4Y2B5cKWtLIHQ4e4w/kwzMrvz5yinEaoVq5OKdk8lkUUEHInfOyn2Uv3aeHLrIf9VOSmxBM5D0x62urmrU=
+	t=1768855195; cv=none; b=mWIX3PbN5+V/H6L5bPnCidEXAmT8INfY4e3omAiwZOfOI2SN5/1T5ROoSq/KAPoe+QGFuUBIwzU9nWuaXlB3tJm8HiHWfioqvxyPlJr4cYjT7mM22+3+RI/2H8y7qc8VFuQV7jCgXd/IPmnetniWpiO5oC5iGqhS1sGo8jrdzZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768855203; c=relaxed/simple;
-	bh=FknW2M970s7MUl7V9VDr8K/I/GxEA/gKZhSmLfuZsxs=;
+	s=arc-20240116; t=1768855195; c=relaxed/simple;
+	bh=/J/i1acOycNz8T4DELOF9HyT9o8g2mtdDpes6BLAQUc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ajVUXF7yFRbk8QSRc9DXf7fdZAOaQ64v4nXXqtqtex0sp0GhwpgI9pCiL+rTzObI3orzFwZY0tjZ3lO/GpR0T3nnhABGDRplFGN1VKW/tgo3BhtjvEISz1x/V8Lqkd03cD9Mybtp+fb7U+0EHVyURp7agNQTRiyHMIVXviZsbx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=DqugQzcF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=0YYnUgZC; arc=none smtp.client-ip=103.168.172.145
+	 MIME-Version:Content-Type; b=MRmXAJVlu2Eosqxz86MBewEUdkLiUmrHgE9dhOZuyJT/67dgex2ljAaUfiLLAkU2nElXfgrGnDmZhltXuQyGv9fjTxs+E3463SEYwB/9b3d4FFN+VW2aUyFRaQxejs/K/c4mtDExG0n26hu6B/yDZbQjgIRcsVrL+EKsYYkBdtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=VGf1EbRR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=qpn9XrPj; arc=none smtp.client-ip=103.168.172.145
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id DE2CBEC00CC;
-	Mon, 19 Jan 2026 15:39:48 -0500 (EST)
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id E52DCEC00D4;
+	Mon, 19 Jan 2026 15:39:44 -0500 (EST)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Mon, 19 Jan 2026 15:39:48 -0500
+  by phl-compute-05.internal (MEProxy); Mon, 19 Jan 2026 15:39:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1768855188;
-	 x=1768941588; bh=99J6Ru8E+YVFAgUBedh9KT02xWCUPTen4E35Kp8bBEU=; b=
-	DqugQzcFqY0Hrv+92vyVgahsQP39fAyc6dNEPZDcXT4+Mi4h3yNNUGr5PuXwFhSW
-	LsCuS4lXkk8WHr/8KZchXU5A6dV+MT9BkOGTl6dGnJ3DMbRxG8PPMLhqAgTToux5
-	jFbIAYFcFgCnydNGb1MMIOgdPG9PX3lzutHUaS9R6uSeLXvfhTrFRnIhaPFhZfo3
-	goT6JH0k722rmrITX+8dtKUTkYzAS+A1L5h0y3KJAqV0kEYJTvN8PV1wNtKq836+
-	zy2bcv2I3O18A3eZttzvN+9R3N+etoc9fSClJKr74PRzhd4IEltzrMuJOjocrmGe
-	GlFcn3W00IULgTFp6nkUlQ==
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1768855184;
+	 x=1768941584; bh=y8LiynsXSNIKWy1cthcnlLPIPiY4yXcDV0dK86wY0u4=; b=
+	VGf1EbRREbG88iFrXPTVbPLQnoOXfoLQ22WkFOBR3FtdrlugjqT0tuZQfP8uzV+s
+	xiIxcvSJB3Gy/z04XOv+nk0ciu1fd8mEsap1xAm+Yy0gIaNZcBI8s4SsNfLP/21g
+	xR8pq3/haS2zF5w+ycklbvqenLI4vFhJ/1pTsi33qV47mQpsCVqTBbMuBQ/xVcHZ
+	/mCj8T2PXuhhSfQ29y4xqXEMyWb0NJkvB8qbCMzgospFFrlf4NM3aCCl5Eic1iHR
+	qQjHqhiIGEbs5op06aCxaFfBgRkBQ/TSYbq919d7SK1G9pD9yRdXF2G7Yo0kcbaA
+	yuK7HeAPbrfoClXpdmMx3Q==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768855188; x=
-	1768941588; bh=99J6Ru8E+YVFAgUBedh9KT02xWCUPTen4E35Kp8bBEU=; b=0
-	YYnUgZCYr/VrZsgW2jOaM6O2UzljfIwT9RG4nvJVKdd4zsRbBoxUB1EI1TzAwxkZ
-	W2pXj4oX271jXeHbaaJ/SMRkkCz2vbS+uN3aJT1uoSDw+SBw2ABuTFnifQBr7K3K
-	M+8lAU51f2fBHEKO57G+eVUE2xIPoadJMxSuL6wj267YAjT1xJRnGnr8B4a9TwVT
-	wraRtd7gNw84ZMa5Miqk4cAk4pfdXN+QtwWf+Zd8YsY50+0irim8p2REpspjgVdi
-	y0zB4w8CHQDZ6W/oQzFlMjuMnhWwkjG3+lX8ue2cXXxYe9U3cJmPBcjyW8BARYeD
-	M66S28jjWh8LxZ4Zlfa7A==
-X-ME-Sender: <xms:lJZuaZmD-ubprdlfv4l3VZQT8-o0BQX2id1703ECP_6iZNvmMZYLVA>
-    <xme:lJZuaQTMh7hDkrKKm8s9I3bG3i56xYyVzQ--ViZ5Dq2BDxZmELpUXbrGawEXuLoIs
-    nOmv6cXqI5X-advaDhlPWLth4MMLdZtGn00IL9M8Y9BETFRKPTwnw>
-X-ME-Received: <xmr:lJZuaTKJuKZ92ROav0txsLKh546Qr_yEYp2vogHDdsByXsRE2W-4jr_3k0w>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768855184; x=
+	1768941584; bh=y8LiynsXSNIKWy1cthcnlLPIPiY4yXcDV0dK86wY0u4=; b=q
+	pn9XrPj6kXqnPyb8fcXT3ZOHkuPrbVqVpDMDpIYfxwoj+jP4vjr7RIs0674BcJiv
+	gG5OqQ0YAssDy/WJVbJ9wukvt6ioWcALcpLYGbnfrZsjRxeGxqRfikiY5YMhhbuZ
+	1/l6zAYJoestO2JHpwRvCKLNqmqIFUpOVnG65QezX4v1VzEVUa7VJFSd2mTy2PLe
+	tKrBZlkMG15ql3+PGn9hbp3ZI3wKtimHCfJx0LqdcSjkG1vYB4H0eTjCwSEz+av6
+	mcY/MmV9Wb894fKH2y8H6R2BPIKzvV5xx7/ELoabA7jXhJzbOd0v/Y9Qjt/l1FY2
+	cF2TaN+oivcwsO+n29x7w==
+X-ME-Sender: <xms:kJZuaT6KTM16_Rm_LiTc_CLD1G_ZSK73IJupfVaOb5iowYiiOu01Eg>
+    <xme:kJZuaU6OqkPJksPyVZ8Xoup2BBrnVzK5272facMfaUVUcVAlfCxBJSmkHFZN5Ib_b
+    tmgENAsp23yTLEqrquM9K9x3i-wHyk3K9OoY1qdZg7JxpiBYlHs-iU>
+X-ME-Received: <xmr:kJZuacr7I2LFzFSDbmSfb4VzussFpjiUAm85p0siunx-_Sle0XTg7e-BIHk>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddufeekheegucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
     hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheprghnthhhohhnhidrphhighhhihhnsehnohhkihgrrd
-    gtohhmpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehlihhnuhigqdhptghisehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epihhlphhordhjrghrvhhinhgvnheslhhinhhugidrihhnthgvlhdrtghomh
-X-ME-Proxy: <xmx:lJZuaeA8Grnqq--_oVmuwEghPcG_0RZSlROGWr6ryuk-sOnFAwKgew>
-    <xmx:lJZuaUC-b2TSoYPSKUnJKBbPC5prQuKXrc_bpgftYJy9D_rtCfsGqQ>
-    <xmx:lJZuaYCrIpHHx5FXQEWtbBJV_kHtUO97t_cH5mc6Xo8Xz4pW0qyYZA>
-    <xmx:lJZuaXrC7UCUW_UkYOwvgSVT9pou9oIAFd6O3h7Nk3gyjy5us9vhmQ>
-    <xmx:lJZuaWtS5Z_mC1G4ACj31yFAsrcInI9yhQJ2RAeZI5uAclD-bhK1r4L3>
+    htthgvrhhnpeekheejieetffefueeiteejtdejffdvleelvdeuvdffvdefteeghfevkeeu
+    vdefvdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhg
+    pdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrmh
+    grshhtrhhosehfsgdrtghomhdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgv
+    rdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epphgvthgvrhigsehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghr
+    nhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvhhmsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhhsvghlfhhtvghsthes
+    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjghhgseiiihgvphgvrdgtrg
+X-ME-Proxy: <xmx:kJZuaVORdZpWtdlycs58FrRCpRV41zcpyxcfTTwtCJnuijEGdsFr-A>
+    <xmx:kJZuaU1HQd7Sv3CEiag2mpaaF1_85xoTvJkkb44AyMEu7sE8srMkaA>
+    <xmx:kJZuaUA_Y9a4LFVM0WK5iqQnRa5Hv9QKXV16GTL8LTHRy7FIA0VYLA>
+    <xmx:kJZuaRKelcPF73_VBTuMiLvH-AsYkFd20wrw54IZlcktrjHoOfNurg>
+    <xmx:kJZuaTOdJzjUY5k4Q9-DcmkZv7ZiWXcwFZ9zezIXjUF8lM1_E-7PMc-x>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 19 Jan 2026 15:39:47 -0500 (EST)
-Date: Mon, 19 Jan 2026 13:38:14 -0700
+ 19 Jan 2026 15:39:44 -0500 (EST)
+Date: Mon, 19 Jan 2026 13:38:28 -0700
 From: Alex Williamson <alex@shazbot.org>
-To: "Anthony Pighin (Nokia)" <anthony.pighin@nokia.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-pci@vger.kernel.org"
- <linux-pci@vger.kernel.org>, Ilpo =?UTF-8?B?SsOkcnZpbmVu?=
- <ilpo.jarvinen@linux.intel.com>
-Subject: Re: [PATCH v2] vfio/pci: Lock upstream bridge for 
- vfio_pci_core_disable()
-Message-ID: <20260119133814.1e022a63@shazbot.org>
-In-Reply-To: <BN0PR08MB695171D3AB759C65B6438B5D838DA@BN0PR08MB6951.namprd08.prod.outlook.com>
-References: <BN0PR08MB695171D3AB759C65B6438B5D838DA@BN0PR08MB6951.namprd08.prod.outlook.com>
+To: Alex Mastro <amastro@fb.com>
+Cc: David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>,
+ Peter Xu <peterx@redhat.com>, <linux-kernel@vger.kernel.org>,
+ <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, Jason Gunthorpe
+ <jgg@ziepe.ca>
+Subject: Re: [PATCH v3 0/3] vfio: selftests: Add MMIO DMA mapping test
+Message-ID: <20260119133828.62b1150a@shazbot.org>
+In-Reply-To: <20260114-map-mmio-test-v3-0-44e036d95e64@fb.com>
+References: <20260114-map-mmio-test-v3-0-44e036d95e64@fb.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -104,77 +107,58 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 16 Jan 2026 15:31:26 +0000
-"Anthony Pighin (Nokia)" <anthony.pighin@nokia.com> wrote:
+On Wed, 14 Jan 2026 10:57:15 -0800
+Alex Mastro <amastro@fb.com> wrote:
 
-> The commit 7e89efc6e9e4 ("Lock upstream bridge for pci_reset_function()")
-> added locking of the upstream bridge to the reset function. To catch
-> paths that are not properly locked, the commit 920f6468924f ("Warn on
-> missing cfg_access_lock during secondary bus reset") added a warning
-> if the PCI configuration space was not locked during a secondary bus reset
-> request.
+> Test IOMMU mapping the BAR mmaps created during vfio_pci_device_setup().
 > 
-> When a VFIO PCI device is released from userspace ownership, an attempt
-> to reset the PCI device function may be made. If so, and the upstream bridge
-> is not locked, the release request results in a warning:
+> All IOMMU modes are tested: vfio_type1 variants are expected to succeed,
+> while non-type1 modes are expected to fail. iommufd compat mode can be
+> updated to expect success once kernel support lands. Native iommufd will
+> not support mapping vaddrs backed by MMIO (it will support dma-buf based
+> MMIO mapping instead).
 > 
->    pcieport 0000:00:00.0: unlocked secondary bus reset via:
->    pci_reset_bus_function+0x188/0x1b8
+> Changes in v3:
+> - Rename mmap_aligned() to mmap_reserve()
+> - Reorder variable declarations for reverse-fir-tree style
+> - Update patch 2 commit message to mention MADV_HUGEPAGE and MAP_FILE
+> - Move BAR size check into map_partial_bar test only
+> - Link to v2: https://lore.kernel.org/r/20260113-map-mmio-test-v2-0-e6d34f09c0bb@fb.com
 > 
-> Add missing upstream bridge locking to vfio_pci_core_disable().
+> Changes in v2:
+> - Split into patch series
+> - Factor out mmap_reserve() for vaddr alignment
+> - Align BAR mmaps to improve hugepage IOMMU mapping efficiency
+> - Centralize MODE_* string definitions
+> - Add is_power_of_2() assertion for BAR size
+> - Simplify align calculation to min(size, 1G)
+> - Add map_bar_misaligned test case
+> - Link to v1: https://lore.kernel.org/all/20260107-scratch-amastro-vfio-dma-mapping-mmio-test-v1-1-0cec5e9ec89b@fb.com
 > 
-> Fixes: 7e89efc6e9e4 ("PCI: Lock upstream bridge for pci_reset_function()")
-> Signed-off-by: Anthony Pighin <anthony.pighin@nokia.com>
+> Signed-off-by: Alex Mastro <amastro@fb.com>
+> 
 > ---
-> V1 -> V2:
->   - Reworked commit log for clarity
->   - Corrected indentation
->   - Added a Fixes: tag
+> Alex Mastro (3):
+>       vfio: selftests: Centralize IOMMU mode name definitions
+>       vfio: selftests: Align BAR mmaps for efficient IOMMU mapping
+>       vfio: selftests: Add vfio_dma_mapping_mmio_test
 > 
+>  tools/testing/selftests/vfio/Makefile              |   1 +
+>  tools/testing/selftests/vfio/lib/include/libvfio.h |   9 ++
+>  .../selftests/vfio/lib/include/libvfio/iommu.h     |   6 +
+>  tools/testing/selftests/vfio/lib/iommu.c           |  12 +-
+>  tools/testing/selftests/vfio/lib/libvfio.c         |  25 ++++
+>  tools/testing/selftests/vfio/lib/vfio_pci_device.c |  24 +++-
+>  .../selftests/vfio/vfio_dma_mapping_mmio_test.c    | 143 +++++++++++++++++++++
+>  .../testing/selftests/vfio/vfio_dma_mapping_test.c |   2 +-
+>  8 files changed, 214 insertions(+), 8 deletions(-)
+> ---
+> base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
+> change-id: 20260112-map-mmio-test-b4e4c2d917a9
 > 
->  drivers/vfio/pci/vfio_pci_core.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
+> Best regards,
 
 Applied to vfio next branch for v6.20/7.0.  Thanks,
 
 Alex
- 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 3a11e6f450f7..72c33b399800 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -588,6 +588,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_enable);
->  
->  void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  {
-> +	struct pci_dev *bridge;
->  	struct pci_dev *pdev = vdev->pdev;
->  	struct vfio_pci_dummy_resource *dummy_res, *tmp;
->  	struct vfio_pci_ioeventfd *ioeventfd, *ioeventfd_tmp;
-> @@ -694,12 +695,20 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  	 * We can not use the "try" reset interface here, which will
->  	 * overwrite the previously restored configuration information.
->  	 */
-> -	if (vdev->reset_works && pci_dev_trylock(pdev)) {
-> -		if (!__pci_reset_function_locked(pdev))
-> -			vdev->needs_reset = false;
-> -		pci_dev_unlock(pdev);
-> +	if (vdev->reset_works) {
-> +		bridge = pci_upstream_bridge(pdev);
-> +		if (bridge && !pci_dev_trylock(bridge))
-> +			goto out_restore_state;
-> +		if (pci_dev_trylock(pdev)) {
-> +			if (!__pci_reset_function_locked(pdev))
-> +				vdev->needs_reset = false;
-> +			pci_dev_unlock(pdev);
-> +		}
-> +		if (bridge)
-> +			pci_dev_unlock(bridge);
->  	}
->  
-> +out_restore_state:
->  	pci_restore_state(pdev);
->  out:
->  	pci_disable_device(pdev);
-
 
