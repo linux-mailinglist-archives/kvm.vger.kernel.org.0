@@ -1,173 +1,458 @@
-Return-Path: <kvm+bounces-68453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB08AD39C2E
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 03:02:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4413BD39C3A
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 03:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 92BF530057DE
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 02:02:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1309430019E1
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 02:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1654B21E091;
-	Mon, 19 Jan 2026 02:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8891E531;
+	Mon, 19 Jan 2026 02:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bS4Eg/u7"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="QlS/axA5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403F91DF26E
-	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 02:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFBB221FBD
+	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 02:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768788144; cv=none; b=jdihmL9BaLwSqHjMaVVEMUJQYwWPV0z7NVGgPYYZ7UbT5aDznYBorhfBfQK8lkHfuFgwLyuJln6uFCqzKeDmCMbZegqp18ffxXqHFUVNTBGuFQEM6K039R072/paieHHW94g5RETfQnnstVO5WmjekqtR1+QxmkhK3Swg5VATno=
+	t=1768788230; cv=none; b=gdy/jKIIo7XzL8G75I/ShZx9vvDLRDQ5D5sOYsSesoPpJF5L4LYgwWK6Cs9+E2XBbth3atEkYeWN55vFIS+537DeLHKwzMu2KAVkQhUadaXc2+V1wZYgTJQjqC5aE0N+YnNTB70ILgsMDtg6W8sbpLkUQnsPk6BaixrkBPGyjSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768788144; c=relaxed/simple;
-	bh=3wDWTskNBuEFL+W/N1MD6bW9dCDN1qyL975rH+2XUZs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P5TXjM3RAXXJU/3b4MhbEk43nA22Hs6dDdHEgKBXMOmXGViDdMKEVCK31mviv3hWPLZ/vkeZFw+JPKrpM96+EkGeCBSYmSd7j07fkWxgZs0ZLwLEJcevt5p59zLzik0j5pwLA7Na8zsknpW5TDNHd8b+RY8WK/V1b1CPV4QS37E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bS4Eg/u7; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768788142; x=1800324142;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=3wDWTskNBuEFL+W/N1MD6bW9dCDN1qyL975rH+2XUZs=;
-  b=bS4Eg/u7OJKRwPFHMWevzy6coBUV4c8Kypw17p43EQT2HVz3By3BwRVB
-   ImKfzOz6BvCh/DYcf+YMEtBS3swNYWXC8xShq0DJT5ncWcsKFlwFupz41
-   xgrS34DTFCduGRDJuasg3ijkMWV4ve3dOjM4Oxzjq3OJDNAx/oDMZVGGX
-   k/xhpEziV7W//ne2WGNAlCG66/7zx/vuu4sUzFc4E0E7TlELTm+dCdp6+
-   vPP8vGkqSSYH+tKekE5m9GddKL97E+kiwKazcCTo9GthDBaEUJJaFeEsF
-   KVAcngpT4eZZ9a2M9yb02x+gmp8XDNreoQuRHlwgcldItotK8zAmtz9Eq
-   w==;
-X-CSE-ConnectionGUID: YAYtzFgsSB+lQt8apBW96w==
-X-CSE-MsgGUID: 9yntsmhWQd2toWFzyERd1w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="70165192"
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="70165192"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 18:02:21 -0800
-X-CSE-ConnectionGUID: 8nzoHSV8RbeIbug7x0bmRg==
-X-CSE-MsgGUID: DCoGKgYZTRywTlZy0sNVFg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="210240722"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.14]) ([10.124.240.14])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 18:02:19 -0800
-Message-ID: <eb2c185b-9edc-4ef7-b71b-5cc3fed3827c@linux.intel.com>
-Date: Mon, 19 Jan 2026 10:02:15 +0800
+	s=arc-20240116; t=1768788230; c=relaxed/simple;
+	bh=g4c4GndvDhP8Hk1th/kLA7bGy5ojpNpCOxgg5G6y6XI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oCQQpVuW0TVIxVOenVsY6TZS3LjIGEiEE39OzPcgF3/AYdhqu7IKM2GCQjshoPSVhI7Ppd8DAlMzjVx1T6ijjkTowRcgGZeXLmsc75a7RFpH6sSw3bwH35Vqb64mdy+1CuhwSY7lnmhSXl1WzPeSN7jAHfJQaSmhKMOqfUKYWOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=QlS/axA5; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=78eqqM/Ivvh0sbPhGOXcjk1eqzXwIry2+Dfl3wq3Hew=; b=QlS/axA5ce8Y3/V+
+	Vv/MPienM/qGooUkLfH3c0X0uIJDguXrSPJQdQMMlNw5XQVYuuDE9gNONn5J3j3HmOuoj3J/kJN2c
+	FL4UxGzD59OdLDdmZ+AIOcAWdGjQBM8I3fx8qPcYkwKfVYtpEh5Q0tm4XHOGccdmijSJSm/d4mrDv
+	QryEai63Li4OWz1u/poBIzLXwxIB0c6ErsLNRPqjJ4nOd7fkMagRdw9GG6ULtyVjG1PfzZgFQcjG8
+	WdAgUDdGb5Ay5TnlXFYI1wX616X8SVg8fmxygiLqytu8A41aOsmo1+vFzi+ePSu5Ejm+IOHawDv3v
+	MzGXlT9JdGdejLTaNQ==;
+Received: from dg by mx.treblig.org with local (Exim 4.98.2)
+	(envelope-from <dg@treblig.org>)
+	id 1vheby-0000000Ff6o-0uIB;
+	Mon, 19 Jan 2026 02:03:22 +0000
+Date: Mon, 19 Jan 2026 02:03:22 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Chinmay Rath <rathc@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Weiwei Li <liwei1518@gmail.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	Yoshinori Sato <yoshinori.sato@nifty.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Max Filippov <jcmvbkbc@gmail.com>, kvm@vger.kernel.org,
+	qemu-ppc@nongnu.org, qemu-riscv@nongnu.org
+Subject: Re: [PATCH v2 8/8] monitor: Remove 'monitor/hmp-target.h' header
+Message-ID: <aW2Q6pjYU9UCQ0Ks@gallifrey>
+References: <20260117162926.74225-1-philmd@linaro.org>
+ <20260117162926.74225-9-philmd@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/7] target/i386: Gate enable_pmu on kvm_enabled()
-To: Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Zhao Liu <zhao1.liu@intel.com>, Peter Xu <peterx@redhat.com>,
- Fabiano Rosas <farosas@suse.de>
-Cc: xiaoyao.li@intel.com, Dongli Zhang <dongli.zhang@oracle.com>
-References: <20260117011053.80723-1-zide.chen@intel.com>
- <20260117011053.80723-4-zide.chen@intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20260117011053.80723-4-zide.chen@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260117162926.74225-9-philmd@linaro.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
+X-Uptime: 02:03:18 up 84 days,  1:39,  3 users,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
+* Philippe Mathieu-Daudé (philmd@linaro.org) wrote:
+> The "monitor/hmp-target.h" header doesn't contain any
+> target-specific declarations anymore. Merge it with
+> "monitor/hmp.h", its target-agnostic counterpart.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
-On 1/17/2026 9:10 AM, Zide Chen wrote:
-> Guest PMU support requires KVM.  Clear cpu->enable_pmu when KVM is not
-> enabled, so PMU-related code can rely solely on cpu->enable_pmu.
->
-> This reduces duplication and avoids bugs where one of the checks is
-> missed.  For example, cpu_x86_cpuid() enables CPUID.0AH when
-> cpu->enable_pmu is set but does not check kvm_enabled(). This is
-> implicitly fixed by this patch:
->
-> if (cpu->enable_pmu) {
-> 	x86_cpu_get_supported_cpuid(0xA, count, eax, ebx, ecx, edx);
-> }
->
-> Also fix two places that check kvm_enabled() but not cpu->enable_pmu.
->
-> Signed-off-by: Zide Chen <zide.chen@intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dave@treblig.org>
+
 > ---
->  target/i386/cpu.c     | 9 ++++++---
->  target/i386/kvm/kvm.c | 4 ++--
->  2 files changed, 8 insertions(+), 5 deletions(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 37803cd72490..f1ac98970d3e 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -8671,7 +8671,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          *ecx = 0;
->          *edx = 0;
->          if (!(env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) ||
-> -            !kvm_enabled()) {
-> +            !cpu->enable_pmu) {
->              break;
->          }
+>  MAINTAINERS                   |  2 +-
+>  include/monitor/hmp-target.h  | 60 -----------------------------------
+>  include/monitor/hmp.h         | 31 ++++++++++++++++++
+>  hw/i386/sgx-stub.c            |  2 +-
+>  hw/i386/sgx.c                 |  1 -
+>  monitor/hmp-cmds.c            |  1 -
+>  monitor/hmp-target.c          |  1 -
+>  monitor/hmp.c                 |  1 -
+>  stubs/target-monitor-defs.c   |  2 +-
+>  target/i386/cpu-apic.c        |  2 +-
+>  target/i386/monitor.c         |  1 -
+>  target/i386/sev-system-stub.c |  2 +-
+>  target/i386/sev.c             |  1 -
+>  target/m68k/monitor.c         |  2 +-
+>  target/ppc/ppc-qmp-cmds.c     |  1 -
+>  target/riscv/monitor.c        |  2 +-
+>  target/riscv/riscv-qmp-cmds.c |  1 -
+>  target/sh4/monitor.c          |  1 -
+>  target/sparc/monitor.c        |  1 -
+>  target/xtensa/monitor.c       |  1 -
+>  20 files changed, 38 insertions(+), 78 deletions(-)
+>  delete mode 100644 include/monitor/hmp-target.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index de8246c3ffd..1e0d71c7bb8 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3377,7 +3377,7 @@ F: monitor/monitor.c
+>  F: monitor/hmp*
+>  F: hmp.h
+>  F: hmp-commands*.hx
+> -F: include/monitor/hmp-target.h
+> +F: include/monitor/hmp.h
+>  F: tests/qtest/test-hmp.c
+>  F: include/qemu/qemu-print.h
+>  F: util/qemu-print.c
+> diff --git a/include/monitor/hmp-target.h b/include/monitor/hmp-target.h
+> deleted file mode 100644
+> index 713936c4523..00000000000
+> --- a/include/monitor/hmp-target.h
+> +++ /dev/null
+> @@ -1,60 +0,0 @@
+> -/*
+> - * QEMU monitor
+> - *
+> - * Copyright (c) 2003-2004 Fabrice Bellard
+> - *
+> - * Permission is hereby granted, free of charge, to any person obtaining a copy
+> - * of this software and associated documentation files (the "Software"), to deal
+> - * in the Software without restriction, including without limitation the rights
+> - * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> - * copies of the Software, and to permit persons to whom the Software is
+> - * furnished to do so, subject to the following conditions:
+> - *
+> - * The above copyright notice and this permission notice shall be included in
+> - * all copies or substantial portions of the Software.
+> - *
+> - * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> - * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> - * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> - * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> - * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> - * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> - * THE SOFTWARE.
+> - */
+> -
+> -#ifndef MONITOR_HMP_TARGET_H
+> -#define MONITOR_HMP_TARGET_H
+> -
+> -typedef struct MonitorDef MonitorDef;
+> -
+> -struct MonitorDef {
+> -    const char *name;
+> -    int offset;
+> -    uint64_t (*get_value)(Monitor *mon, const struct MonitorDef *md, int val);
+> -    int type;
+> -};
+> -
+> -#define MD_TLONG 0
+> -#define MD_I32   1
+> -
+> -const MonitorDef *target_monitor_defs(void);
+> -int target_get_monitor_def(CPUState *cs, const char *name, uint64_t *pval);
+> -
+> -CPUArchState *mon_get_cpu_env(Monitor *mon);
+> -CPUState *mon_get_cpu(Monitor *mon);
+> -
+> -void hmp_info_mem(Monitor *mon, const QDict *qdict);
+> -void hmp_info_tlb(Monitor *mon, const QDict *qdict);
+> -void hmp_mce(Monitor *mon, const QDict *qdict);
+> -void hmp_info_local_apic(Monitor *mon, const QDict *qdict);
+> -void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> -void hmp_info_sgx(Monitor *mon, const QDict *qdict);
+> -void hmp_info_via(Monitor *mon, const QDict *qdict);
+> -void hmp_memory_dump(Monitor *mon, const QDict *qdict);
+> -void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict);
+> -void hmp_info_registers(Monitor *mon, const QDict *qdict);
+> -void hmp_gva2gpa(Monitor *mon, const QDict *qdict);
+> -void hmp_gpa2hva(Monitor *mon, const QDict *qdict);
+> -void hmp_gpa2hpa(Monitor *mon, const QDict *qdict);
+> -
+> -#endif /* MONITOR_HMP_TARGET_H */
+> diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+> index 83721b5ffc6..fb678786101 100644
+> --- a/include/monitor/hmp.h
+> +++ b/include/monitor/hmp.h
+> @@ -17,6 +17,37 @@
+>  #include "qemu/readline.h"
+>  #include "qapi/qapi-types-common.h"
 >  
-> @@ -9018,7 +9018,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->      case 0x80000022:
->          *eax = *ebx = *ecx = *edx = 0;
->          /* AMD Extended Performance Monitoring and Debug */
-> -        if (kvm_enabled() && cpu->enable_pmu &&
-> +        if (cpu->enable_pmu &&
->              (env->features[FEAT_8000_0022_EAX] & CPUID_8000_0022_EAX_PERFMON_V2)) {
->              *eax |= CPUID_8000_0022_EAX_PERFMON_V2;
->              *ebx |= kvm_arch_get_supported_cpuid(cs->kvm_state, index, count,
-> @@ -9642,7 +9642,7 @@ static bool x86_cpu_filter_features(X86CPU *cpu, bool verbose)
->       * are advertised by cpu_x86_cpuid().  Keep these two in sync.
->       */
->      if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
-> -        kvm_enabled()) {
-> +        cpu->enable_pmu) {
->          x86_cpu_get_supported_cpuid(0x14, 0,
->                                      &eax_0, &ebx_0, &ecx_0, &edx_0);
->          x86_cpu_get_supported_cpuid(0x14, 1,
-> @@ -9790,6 +9790,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->      Error *local_err = NULL;
->      unsigned requested_lbr_fmt;
->  
-> +    if (!kvm_enabled())
-> +	    cpu->enable_pmu = false;
+> +typedef struct MonitorDef {
+> +    const char *name;
+> +    int offset;
+> +    uint64_t (*get_value)(Monitor *mon, const struct MonitorDef *md, int val);
+> +    int type;
+> +} MonitorDef;
 > +
->  #if defined(CONFIG_TCG) && !defined(CONFIG_USER_ONLY)
->      /* Use pc-relative instructions in system-mode */
->      tcg_cflags_set(cs, CF_PCREL);
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index cffbc90d1c50..e81fa46ed66c 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -4222,7 +4222,7 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
->                                env->msr_xfd_err);
->          }
+> +#define MD_TLONG 0
+> +#define MD_I32   1
+> +
+> +const MonitorDef *target_monitor_defs(void);
+> +
+> +int target_get_monitor_def(CPUState *cs, const char *name, uint64_t *pval);
+> +
+> +CPUArchState *mon_get_cpu_env(Monitor *mon);
+> +CPUState *mon_get_cpu(Monitor *mon);
+> +
+> +void hmp_info_mem(Monitor *mon, const QDict *qdict);
+> +void hmp_info_tlb(Monitor *mon, const QDict *qdict);
+> +void hmp_mce(Monitor *mon, const QDict *qdict);
+> +void hmp_info_local_apic(Monitor *mon, const QDict *qdict);
+> +void hmp_info_sev(Monitor *mon, const QDict *qdict);
+> +void hmp_info_sgx(Monitor *mon, const QDict *qdict);
+> +void hmp_info_via(Monitor *mon, const QDict *qdict);
+> +void hmp_memory_dump(Monitor *mon, const QDict *qdict);
+> +void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict);
+> +void hmp_info_registers(Monitor *mon, const QDict *qdict);
+> +void hmp_gva2gpa(Monitor *mon, const QDict *qdict);
+> +void hmp_gpa2hva(Monitor *mon, const QDict *qdict);
+> +void hmp_gpa2hpa(Monitor *mon, const QDict *qdict);
+> +
+>  bool hmp_handle_error(Monitor *mon, Error *err);
+>  void hmp_help_cmd(Monitor *mon, const char *name);
+>  strList *hmp_split_at_comma(const char *str);
+> diff --git a/hw/i386/sgx-stub.c b/hw/i386/sgx-stub.c
+> index d295e54d239..6e82773a86d 100644
+> --- a/hw/i386/sgx-stub.c
+> +++ b/hw/i386/sgx-stub.c
+> @@ -1,6 +1,6 @@
+>  #include "qemu/osdep.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+> +#include "monitor/hmp.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/i386/sgx-epc.h"
+>  #include "qapi/qapi-commands-misc-i386.h"
+> diff --git a/hw/i386/sgx.c b/hw/i386/sgx.c
+> index e2801546ad6..54d2cae36d8 100644
+> --- a/hw/i386/sgx.c
+> +++ b/hw/i386/sgx.c
+> @@ -16,7 +16,6 @@
+>  #include "hw/mem/memory-device.h"
+>  #include "monitor/qdev.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+>  #include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/qapi-commands-misc-i386.h"
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 5a673cddb2a..7c2b69dfa5b 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -21,7 +21,6 @@
+>  #include "gdbstub/enums.h"
+>  #include "monitor/hmp.h"
+>  #include "qemu/help_option.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/monitor-internal.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-commands-control.h"
+> diff --git a/monitor/hmp-target.c b/monitor/hmp-target.c
+> index a3306b69c93..2574c5d8b4b 100644
+> --- a/monitor/hmp-target.c
+> +++ b/monitor/hmp-target.c
+> @@ -27,7 +27,6 @@
+>  #include "monitor/qdev.h"
+>  #include "net/slirp.h"
+>  #include "system/device_tree.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/hmp.h"
+>  #include "block/block-hmp-cmds.h"
+>  #include "qapi/qapi-commands-control.h"
+> diff --git a/monitor/hmp.c b/monitor/hmp.c
+> index 82d2bbdf77d..4dc8c5f9364 100644
+> --- a/monitor/hmp.c
+> +++ b/monitor/hmp.c
+> @@ -27,7 +27,6 @@
+>  #include "hw/core/qdev.h"
+>  #include "monitor-internal.h"
+>  #include "monitor/hmp.h"
+> -#include "monitor/hmp-target.h"
+>  #include "qobject/qdict.h"
+>  #include "qobject/qnum.h"
+>  #include "qemu/bswap.h"
+> diff --git a/stubs/target-monitor-defs.c b/stubs/target-monitor-defs.c
+> index 35a0a342772..0dd4cdb34f6 100644
+> --- a/stubs/target-monitor-defs.c
+> +++ b/stubs/target-monitor-defs.c
+> @@ -1,5 +1,5 @@
+>  #include "qemu/osdep.h"
+> -#include "monitor/hmp-target.h"
+> +#include "monitor/hmp.h"
 >  
-> -        if (kvm_enabled() && cpu->enable_pmu &&
-> +        if (cpu->enable_pmu &&
->              (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_ARCH_LBR)) {
->              uint64_t depth;
->              int ret;
-> @@ -4698,7 +4698,7 @@ static int kvm_get_msrs(X86CPU *cpu)
->          kvm_msr_entry_add(cpu, MSR_IA32_XFD_ERR, 0);
->      }
+>  const MonitorDef *target_monitor_defs(void)
+>  {
+> diff --git a/target/i386/cpu-apic.c b/target/i386/cpu-apic.c
+> index eeee62b52a2..3b73a04597f 100644
+> --- a/target/i386/cpu-apic.c
+> +++ b/target/i386/cpu-apic.c
+> @@ -10,7 +10,7 @@
+>  #include "qobject/qdict.h"
+>  #include "qapi/error.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+> +#include "monitor/hmp.h"
+>  #include "system/hw_accel.h"
+>  #include "system/kvm.h"
+>  #include "system/xen.h"
+> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+> index cce23f987ef..1c16b003371 100644
+> --- a/target/i386/monitor.c
+> +++ b/target/i386/monitor.c
+> @@ -25,7 +25,6 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/hmp.h"
+>  #include "qobject/qdict.h"
+>  #include "qapi/error.h"
+> diff --git a/target/i386/sev-system-stub.c b/target/i386/sev-system-stub.c
+> index 7c5c02a5657..f799a338d60 100644
+> --- a/target/i386/sev-system-stub.c
+> +++ b/target/i386/sev-system-stub.c
+> @@ -13,7 +13,7 @@
 >  
-> -    if (kvm_enabled() && cpu->enable_pmu &&
-> +    if (cpu->enable_pmu &&
->          (env->features[FEAT_7_0_EDX] & CPUID_7_0_EDX_ARCH_LBR)) {
->          uint64_t depth;
+>  #include "qemu/osdep.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+> +#include "monitor/hmp.h"
+>  #include "qapi/error.h"
+>  #include "sev.h"
 >  
-
-LGTM.
-
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-
-
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 1d70f96ec1f..31dbabe4b51 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -36,7 +36,6 @@
+>  #include "migration/blocker.h"
+>  #include "qom/object.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+>  #include "qapi/qapi-commands-misc-i386.h"
+>  #include "confidential-guest.h"
+>  #include "hw/i386/pc.h"
+> diff --git a/target/m68k/monitor.c b/target/m68k/monitor.c
+> index 161f41853ec..05d05440f42 100644
+> --- a/target/m68k/monitor.c
+> +++ b/target/m68k/monitor.c
+> @@ -7,7 +7,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+> -#include "monitor/hmp-target.h"
+> +#include "monitor/hmp.h"
+>  #include "monitor/monitor.h"
+>  
+>  void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+> diff --git a/target/ppc/ppc-qmp-cmds.c b/target/ppc/ppc-qmp-cmds.c
+> index 07938abb15f..08314e3c1cd 100644
+> --- a/target/ppc/ppc-qmp-cmds.c
+> +++ b/target/ppc/ppc-qmp-cmds.c
+> @@ -26,7 +26,6 @@
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+>  #include "qemu/ctype.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/hmp.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-commands-machine.h"
+> diff --git a/target/riscv/monitor.c b/target/riscv/monitor.c
+> index 8a77476db93..bc176dd8771 100644
+> --- a/target/riscv/monitor.c
+> +++ b/target/riscv/monitor.c
+> @@ -22,7 +22,7 @@
+>  #include "cpu.h"
+>  #include "cpu_bits.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+> +#include "monitor/hmp.h"
+>  #include "system/memory.h"
+>  
+>  #ifdef TARGET_RISCV64
+> diff --git a/target/riscv/riscv-qmp-cmds.c b/target/riscv/riscv-qmp-cmds.c
+> index d5e9bec0f86..79232d34005 100644
+> --- a/target/riscv/riscv-qmp-cmds.c
+> +++ b/target/riscv/riscv-qmp-cmds.c
+> @@ -34,7 +34,6 @@
+>  #include "qemu/ctype.h"
+>  #include "qemu/qemu-print.h"
+>  #include "monitor/hmp.h"
+> -#include "monitor/hmp-target.h"
+>  #include "system/kvm.h"
+>  #include "system/tcg.h"
+>  #include "cpu-qom.h"
+> diff --git a/target/sh4/monitor.c b/target/sh4/monitor.c
+> index 2da6a5426eb..50324d3600c 100644
+> --- a/target/sh4/monitor.c
+> +++ b/target/sh4/monitor.c
+> @@ -24,7 +24,6 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/hmp.h"
+>  
+>  static void print_tlb(Monitor *mon, int idx, tlb_t *tlb)
+> diff --git a/target/sparc/monitor.c b/target/sparc/monitor.c
+> index 3e1f4dd5c9c..79f564c551a 100644
+> --- a/target/sparc/monitor.c
+> +++ b/target/sparc/monitor.c
+> @@ -24,7 +24,6 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/hmp.h"
+>  
+>  
+> diff --git a/target/xtensa/monitor.c b/target/xtensa/monitor.c
+> index fbf60d55530..2af84934f83 100644
+> --- a/target/xtensa/monitor.c
+> +++ b/target/xtensa/monitor.c
+> @@ -24,7 +24,6 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "monitor/monitor.h"
+> -#include "monitor/hmp-target.h"
+>  #include "monitor/hmp.h"
+>  
+>  void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+> -- 
+> 2.52.0
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
