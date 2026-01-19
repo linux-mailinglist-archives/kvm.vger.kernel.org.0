@@ -1,130 +1,128 @@
-Return-Path: <kvm+bounces-68473-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68474-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC0FD39E4A
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 07:18:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB12D39E51
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 07:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19577303830C
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 06:18:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16E81303CF7D
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 06:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4383026B77D;
-	Mon, 19 Jan 2026 06:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FAF26ED28;
+	Mon, 19 Jan 2026 06:21:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ffqe3/94"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZQeMIi37"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0278F1D6187;
-	Mon, 19 Jan 2026 06:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DC026C3A2;
+	Mon, 19 Jan 2026 06:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768803527; cv=fail; b=dn1SS1kfGOT//t1vdWIsbhXwS+EAmiubosAb2SmqDMD+pVsGikyFFmQDrJU+c04Q+T1PyMdB0ko16K7F7SZ1CBQeEplRI6NpnUGIjzJCrQbK1cHzoEXkM6oe77zdkdFXSBEYWwRAblHMsPJq+amGJ1GImuENuJlU2yCmrvvbf4s=
+	t=1768803689; cv=fail; b=UUCNuruC/SEJP0T7585AF2EEhZZnTCvahCK3TH7fJbON+2xmtl7sE9p3mztvqi8W3f5DMRmUnFAvU+TyEDuLkaMt+8Af73VTpIOlm1/haQXC4wO5VcS3XoZfX9uRH2lzpR9zSSzkdMYbmrlbsy3+lWW6oyHrYCM8x3bfFALGwZI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768803527; c=relaxed/simple;
-	bh=v/fB7Eq0qeSZC0LDpJBwN5jZioHJkBCJffJ2Qh9y6iI=;
+	s=arc-20240116; t=1768803689; c=relaxed/simple;
+	bh=ox0amW2x0SbnnL0gXhrpm/fTfBcut9i53wesSUN52gQ=;
 	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=faHu8CDNWJI9Pux3WVDXCdi4sJlN9Y5ebCrzGBr2KQqOHKDtqoyDgWP783A02j6QsCh+BJQoL7pbhhhliQs+lBxyUzj5VhusgsFErQ6K84JfclWErG19ugup3vCXfyZnuJZf0ooZ4h8DMDAfyPIpLp1XzJ80CJBnXea8WblZxq8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ffqe3/94; arc=fail smtp.client-ip=192.198.163.12
+	 Content-Disposition:In-Reply-To:MIME-Version; b=k8MSYqSWvdszisPqUHYOaLiVOkNerDgUIFa9dcRvIfCeBWi2fDG8XCsoAkeFbGpvsLA9UmxVvalL7Mre56yVYt7ezLB8ZVlYBpX2VEm2Afp5IDQrmS+631jSRo+oHKDv2yV1yT9V0ho83u8vs+EXRG9dCGs8Buci0LRwxD81g54=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZQeMIi37; arc=fail smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768803526; x=1800339526;
+  t=1768803678; x=1800339678;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    content-transfer-encoding:in-reply-to:mime-version;
-  bh=v/fB7Eq0qeSZC0LDpJBwN5jZioHJkBCJffJ2Qh9y6iI=;
-  b=Ffqe3/944zbC8fhq4XFy5OapqvnQfjPnths8kHKnGv1EaSgE9XXaZ0Z2
-   pSxrji9uIB0Cl1Xl0JiR+H/FaZHR6ckOvWgxwf8kaEHFx208sa1dTZaPp
-   jpvIj2Bxea+nrVp0jnaZdtloHD6QmxcHsZAmzLFcqmqAKV1S0RfUlDN0L
-   BlUm3lLJ3xvgONAUQ2hifYWFP3eT+kausemqhsXZwrt6gjHnslkzKY7s4
-   1bxQFpD9T8NkV8ph6l8WLk/B6zAb7outN8hEWOBl8501iwYgCxLQapwGk
-   BeD3Y3rGyBqvjNnKWpKLMzMrZE4wveuOkUDou5MnDJI7GESSSpHzZM1zp
-   g==;
-X-CSE-ConnectionGUID: eD3+sObQThGh207XAWs3tA==
-X-CSE-MsgGUID: IxHCvSbTStGm7rW04INhsg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="73868728"
+  bh=ox0amW2x0SbnnL0gXhrpm/fTfBcut9i53wesSUN52gQ=;
+  b=ZQeMIi37d/0jCKCdn/dLla1C9IQhNcHxsUWc/O8jp2eA2fNNfjZqL31r
+   oBgdyXbP3s4BHwqvXANZLx30xe6d+McmHopNO5IKCz4emimkEg8Kyf0b7
+   NDTBfKxoyCOaV/1GfrpKH+wE2+gip/jGdbKONoeS4vTIoLf64T+NStE/C
+   sYAsNf5L91j3kQ2wXc7804lsmQYfCpF53IW68H2s04fVEQC8Asc5JLbA4
+   ZpMyhnIRKnfgjKI4/2JqqNXQzAHX1suwF0BkXPh7E0rKhyySaAIoMnDf4
+   pPZW4cdDxe3LDJei0Kra4N6zS530+54eJu2ZSJRTCPL4B3aQV43C9VATO
+   w==;
+X-CSE-ConnectionGUID: GOCVADkgQ/29LBGnjfMSuA==
+X-CSE-MsgGUID: vtfOsabOTOCkWrBrCpN3qg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="69743186"
 X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="73868728"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 22:18:45 -0800
-X-CSE-ConnectionGUID: YfXne/m0R7aCarsdfsYNPg==
-X-CSE-MsgGUID: y/jV/1/0SmG8PaNAtOD0zg==
+   d="scan'208";a="69743186"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 22:21:15 -0800
+X-CSE-ConnectionGUID: i9MTHi6hQ9KJQCxZVNtdsA==
+X-CSE-MsgGUID: z57hHepdS2uS1dg1uF1o6Q==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="210268937"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 22:18:45 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 22:21:14 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Sun, 18 Jan 2026 22:18:44 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.2.2562.35; Sun, 18 Jan 2026 22:21:11 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Sun, 18 Jan 2026 22:18:44 -0800
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.14) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ 15.2.2562.35 via Frontend Transport; Sun, 18 Jan 2026 22:21:11 -0800
+Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.12) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Sun, 18 Jan 2026 22:18:44 -0800
+ 15.2.2562.29; Sun, 18 Jan 2026 22:21:11 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ud2SbIZ7ncA/Nh7fIeTZvZTqnSpH+ie2zhPGwB7rB2URrY9X15RRTKgxoRQ0ufBJ5drtkJOLd2j7YIQAh4wSmV4WmDLZRKL+1acR1OB3DVdGngl7rsFq/kBaE70Emo5UEgrWFiuQdxxAoOQ5FLnTSQiedZsyU2z/5FYvmLUn8N87HMQPy/0TcRQepmAk/VoKIw+36YSFQN3gB+SrnoX3VKjh7yfQGKA5nOM6XT5tsRsCG72CuxbtFGHofoFEMh6D3xzvb8URQxeTi5LTXkPHLHLHL8mFeECe+xHFG4QOR5auZjC/e1OdHfoH4zLRvszpHKr/KNneClXYcHwcpMHbbA==
+ b=hlm5Kl20M9l0J+MH0mAJ7PiqtOqx8VIvYgfP5bKYMGbfYfvLlNylpmpFv4+VJ3Q9LHsAAiuipavIJWgmATK0dATFui/FLGsbVIAyj6WVHnCRok41PYxNqOb7iKiPXM87qzOhtZDgmrsptWChnfAv1z4BQnG5IusQvrG5uM/8/izhS+eaRPt15OSkYsRG8K1j98LIHqxAImiGfnFr3gwBkC5ihbL49anHutaXlsSOsCPv1zOlrK/Mejkb8QvAE9p5N2zN3llVnBiOebcUrSFafRyxUeqrxnTnpbD9oejZ1mvV9+2agYkSWGhqWXpfTrxm/iWl5KdR4oWsJ8WIR/KebQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MQrToaZ75p+Al+b3pH9shDhA8EDOh1Acqefb8LGIrHg=;
- b=OaW8nOQCuXWf7DKtKklOBWebdCGOf4sapMcaW8Jn8FUO5W3FawvBoNVAXtDQU88QJaJGZi4D0jswEjWe5HcdTLzWcJq+wezy2uNw1t2Qm5GJTpNqKTehVIvVNrbpA8aCaxV5pEDCwGYcJ2Rk0zrDbVEffIONNq8Ds+r7VgsawAdNKuN2HAUf8d1VxEktEoL7jD2RhM4YwhnfXM+NrDmrHrnNiE2/Q2AN0/8BTVidkXBdi/l/yyjtZMFVqEncJorkueSkJ+41mU4YX1/xT+/g4Ds9lT1W0g/Vgh/He7NYl+BbeArbvs2FUA6G9ap49ZREeCLKPRp3rJuY/g06Nnih/A==
+ bh=GbJCHfI9XWeMmBbUexbFdyBvbtwDc3pe6WDrvGwLlTE=;
+ b=His1teDb81JoEbIWX3YuJtId3MiNPVpGOk0HNRqPyGQIq90/TbvgImqNYQpKaPf8ThY5JuGd7GBmJeGV92qU0tXncSvCmMiE756ad+/ykkgTPzOZySNMZbFyMdu1SoaLRBDQXgf0XY8uPztL/4dnmp36gj6XN1IWqGIz+US6ce9lPT7EZ6hBYFMNL3aY38tC+hmNQflTe1emRAc6p2A0T+lhr/VBtnbcTLR3gP0UMskweIOW+fJbKx083YAYnP5LPB66PzowVXOMutqgXr38MpLOa3nM42X66zIw1KrSZKxKfAM8zfP0ikQH/FxDJZ6ahpOysO3fgM70QvIvlgo1QQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SJ0PR11MB4992.namprd11.prod.outlook.com (2603:10b6:a03:2d4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.11; Mon, 19 Jan
- 2026 06:18:36 +0000
+ PH7PR11MB6793.namprd11.prod.outlook.com (2603:10b6:510:1b7::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.12; Mon, 19 Jan 2026 06:21:07 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::413f:aab:68fa:b1b2]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::413f:aab:68fa:b1b2%4]) with mapi id 15.20.9520.010; Mon, 19 Jan 2026
- 06:18:36 +0000
-Date: Mon, 19 Jan 2026 14:15:52 +0800
+ 06:21:07 +0000
+Date: Mon, 19 Jan 2026 14:18:49 +0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: "Huang, Kai" <kai.huang@intel.com>
 CC: "Du, Fan" <fan.du@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
 	"Li, Xiaoyao" <xiaoyao.li@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>,
 	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "tabba@google.com"
 	<tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "david@kernel.org"
-	<david@kernel.org>, "michael.roth@amd.com" <michael.roth@amd.com>,
+	<david@kernel.org>, "kas@kernel.org" <kas@kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
 	<pbonzini@redhat.com>, "binbin.wu@linux.intel.com"
 	<binbin.wu@linux.intel.com>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "nik.borisov@suse.com"
-	<nik.borisov@suse.com>, "ackerleytng@google.com" <ackerleytng@google.com>,
-	"Peng, Chao P" <chao.p.peng@intel.com>, "francescolavra.fl@gmail.com"
-	<francescolavra.fl@gmail.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"nik.borisov@suse.com" <nik.borisov@suse.com>, "Annapurve, Vishal"
+	<vannapurve@google.com>, "ackerleytng@google.com" <ackerleytng@google.com>,
+	"Peng, Chao P" <chao.p.peng@intel.com>, "michael.roth@amd.com"
+	<michael.roth@amd.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
 	"sagis@google.com" <sagis@google.com>, "Gao, Chao" <chao.gao@intel.com>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "Miao, Jun"
-	<jun.miao@intel.com>, "Annapurve, Vishal" <vannapurve@google.com>,
+	"francescolavra.fl@gmail.com" <francescolavra.fl@gmail.com>, "Miao, Jun"
+	<jun.miao@intel.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
 	"jgross@suse.com" <jgross@suse.com>, "pgonda@google.com" <pgonda@google.com>,
 	"x86@kernel.org" <x86@kernel.org>
 Subject: Re: [PATCH v3 02/24] x86/virt/tdx: Add SEAMCALL wrapper
  tdh_mem_page_demote()
-Message-ID: <aW3MGJxR3IuC/tDV@yzhao56-desk.sh.intel.com>
+Message-ID: <aW3MyZ3M0ugyfsLb@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20260106101646.24809-1-yan.y.zhao@intel.com>
  <20260106101849.24889-1-yan.y.zhao@intel.com>
  <ec1085b898566cc45311342ff7020904e5d19b2f.camel@intel.com>
  <aWn4P2zx1u+27ZPp@yzhao56-desk.sh.intel.com>
  <baf6df2cc63d8e897455168c1bf07180fc9c1db8.camel@intel.com>
+ <c9b7b375019873b4bf8fccd93b3b1b53778ca3c0.camel@intel.com>
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <baf6df2cc63d8e897455168c1bf07180fc9c1db8.camel@intel.com>
-X-ClientProxiedBy: TP0P295CA0019.TWNP295.PROD.OUTLOOK.COM
- (2603:1096:910:5::13) To DS7PR11MB5966.namprd11.prod.outlook.com
+In-Reply-To: <c9b7b375019873b4bf8fccd93b3b1b53778ca3c0.camel@intel.com>
+X-ClientProxiedBy: KU0P306CA0004.MYSP306.PROD.OUTLOOK.COM
+ (2603:1096:d10:17::7) To DS7PR11MB5966.namprd11.prod.outlook.com
  (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -133,222 +131,112 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ0PR11MB4992:EE_
-X-MS-Office365-Filtering-Correlation-Id: e1d823cb-8be1-4eed-eca5-08de57229474
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB6793:EE_
+X-MS-Office365-Filtering-Correlation-Id: 009343a7-bc1c-44cb-a77d-08de5722ee1e
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?uIhJWHSj2NQ+BzfetTNcGVQE5taluTFuR6HzZYmx232XRZNrJqB1uTA9d9?=
- =?iso-8859-1?Q?ZSAxkQeFHx+txOj86rxqw6QN270IQKrBUVKshyy7DN4WM9IXOBxtnaZLhI?=
- =?iso-8859-1?Q?2KlAzWNR6imttlH8srnjGaIOnmCXuxZ9fRxQuVa2gH3ZxlCkj9mnEVN9EX?=
- =?iso-8859-1?Q?8DxxHu3TflS8o0BbUUi+AW5N8XVAB8l2zvNdy52E9FIt+BT5SbSo6d5/kv?=
- =?iso-8859-1?Q?UPIyy8t2BOOaRZeniJwYd9vdyj0hSeN2Ar9EdkGFWNm2xJRL6GyoJooNeg?=
- =?iso-8859-1?Q?FBLQ8BBcdlUnf/cmm9yOkGUrgV6ajK+PUl9EEGKt0MM/NO3ZUfBKqfMVOB?=
- =?iso-8859-1?Q?0yVN38QrPl6ueieGUoRWEYsHLUZzMXUZkyVSyRvLv39ohV5s/THuo5vzDB?=
- =?iso-8859-1?Q?UzxlZem4PviiuNerZm4L6ufVjys6CXlTcFmdO83MrfeNT6hnpto/tRYNB0?=
- =?iso-8859-1?Q?PV0KkD6Hv85YA5p/0f2FXpV3DEO7JuDTGvOhtt8X3IkCqzZvDzNTBJd5FE?=
- =?iso-8859-1?Q?oCC4MPpO2URVHbx/mZrqGWJQ2X6Axuc8NDfL14ONFXCQObGwdR+IzbBWuZ?=
- =?iso-8859-1?Q?xd1thNNfI8sJwolPEW7hDai/IcrVeZs/t1GfcSqYsc51lcia+ZIsi09IQv?=
- =?iso-8859-1?Q?/p+kWjmcKzr9S7+q818HQA0G8vdwXpFE4TXKueyjlybXicyWTra9CGRiEO?=
- =?iso-8859-1?Q?TbjFo/wVQb2Hp8pZMdgyoZ/dvZhbk1IvpCtIFxz5gWP2wrrL3OnZPzuMm+?=
- =?iso-8859-1?Q?U5t6pguqgYHnt/BbgFa39leWQscioWhrw7K5tRufZtACBTQn/6ljmnH613?=
- =?iso-8859-1?Q?MlsSjbqmFXuAbPItOEqazpA+7vki1ZgSloT9O4ntE1VCoKlPk9/6NEzlUh?=
- =?iso-8859-1?Q?abUJOSVhGf8HxLD1t7bSxeCAq6z9YKqi7K4AODQB04oD8pRymXpgUKeEuw?=
- =?iso-8859-1?Q?EhMSB1QuakEB3tUO01c5HzrtxGhpkMqiBEVSG8UJExyctCZTX30MDNandk?=
- =?iso-8859-1?Q?pgsrDp91je2C7ODZhkDFvG7mgp2pBnyiRw6s9KOiF6m57AvgzWOJpDBRpn?=
- =?iso-8859-1?Q?iVSPIqRcSBQ3ynVO8StDWpROsPFGSRjC27kEC7arXmyP58it2SU/mjN8BZ?=
- =?iso-8859-1?Q?EnFtPyTtfsaMrgKC7Lj2+dM0eijFEsqZAc5sjnwV3oksZEgI4YnCgsGbF3?=
- =?iso-8859-1?Q?/FQP9d3cgM53OGt90luC+0V4gTwM0j3IftkQ2z8NDmIB4GGGRKAXOGxjug?=
- =?iso-8859-1?Q?yaRwMy0qik0m8zqz6+VwRAk0GmMBgID1tD8F6Qu6Zl2YyvKTDyPM/ZTRh7?=
- =?iso-8859-1?Q?FjGXoayx4XxKoht/IbNdWYINpHoYuePp/20ibbDZz+AQiseOEqAIxkTAbh?=
- =?iso-8859-1?Q?KzbegWFazy1COxmQqzBzypuu73X9fnUsbItQPIRYQ3evhXyvPNJhHnWiDx?=
- =?iso-8859-1?Q?QKk0NR12ratfKTki0E6Yx4aQ40lN/rBfHmQVYL3RMO4VA885nl6h+8Ud1O?=
- =?iso-8859-1?Q?OYK9unn+WcHLJEjsUwbbVTsblcPtKUV33/lRm9l6v+8o8IhruW7E66QRGj?=
- =?iso-8859-1?Q?7HEw6GR1ls4xda55DqrKF9Ry57fvdjMhnEp/5vFwvBPwi3HfOKzVNawzUi?=
- =?iso-8859-1?Q?SOKfKnVQTWtI4=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?iso-8859-1?Q?IalUZqcphoEPR0fEFOaBdYxKPWdC4NEa66ELMrWuA6RoU93RUT0gCi73iP?=
+ =?iso-8859-1?Q?Xk8UxBpfy4MyOPOu8LneyN8KhmwEu9do/kKmUPCSdG5YzBK2LShamxAokK?=
+ =?iso-8859-1?Q?aDDPjyhV6ZaqvkMblLoRjM/nh7BaCdQTAIC+3YqXqLSME8TbDmQj6CfW4v?=
+ =?iso-8859-1?Q?p3jvHDOoUlD1v0Rgq6NPgFgzhosCr1Z11xB/mcRPGVkNiVHRRKWht5XrxJ?=
+ =?iso-8859-1?Q?lRb+TWHv3C+QVVeJ4o5ZRifi/LhdclB/AeaWghR5kvxy/xCqSF5Yi9cMf5?=
+ =?iso-8859-1?Q?TDB53cPxlIxvOlfh4YcUZmOEWzkKfnP7NT+NrfMoVOqeA/hnPyVyYoyZVx?=
+ =?iso-8859-1?Q?CsCdtINVqLELyRTVhl9ROtE1htXaanNLf4biLwjPZMMmNB2Pi55u4n1UKp?=
+ =?iso-8859-1?Q?D/J54dfxau5H6j/to5IJILHVLlvooIo1UEP05f1aayN6oli57C4fOwR4Bu?=
+ =?iso-8859-1?Q?wp/Ibp2ZvL5AiGt9S7eX3jSNeoubdwPEj6MSjI74RIitbn9M6zZ3DtAvI8?=
+ =?iso-8859-1?Q?VDavfs73Gz3lRc3TE/h9toiyLAdWdt69JpjDEF7cnTAocI4CN5leJdmrln?=
+ =?iso-8859-1?Q?65N4rRo3r2VE8idl6Hl4gtBpFeL71W7h5FPbDBju065ejYVZsg6o1CwFx6?=
+ =?iso-8859-1?Q?b0mWGaO+/WM3bVT/xA0IwHxhrUFRZJpTdQmvXms5Xov0HkLLf3ZvOiTmDp?=
+ =?iso-8859-1?Q?CoyOkZkuT4AFNqpFnm5jhXIszuqgaEh35WFL5ILpZ9QentwoANHmNzo7TE?=
+ =?iso-8859-1?Q?eOfUZyOW2JAstNAZZJ7S0lDIn7oouUBPXjw48tvAP2qwmknSlNdoUP0kQq?=
+ =?iso-8859-1?Q?i6Sf0BjpxvlkKSYWyuDZkO/FEFSekuxaBjuZQD1CirYbZksqpVtn1Hn30V?=
+ =?iso-8859-1?Q?Vs/ZqzjHBE1Gm+NqUK/zLJTXFquejuo6oPUgwg/juFsTaA5Up96+RpkT9I?=
+ =?iso-8859-1?Q?m+VWGyi+OnlB6viGBBFcB+4AtZiS5/GawVpaQYolg54mzaxnX2g+3IjJcu?=
+ =?iso-8859-1?Q?TOrwJkYhYym/Nr1bRLzw8yBnH6g3uHmB9ncnPoMl9RFRjAkuCJCiW77Jap?=
+ =?iso-8859-1?Q?fjCoEWV94jgM6weFtXhA0zlCzlRTe1YzSACz1i9haxE+WbZ5vJ+A/31tUk?=
+ =?iso-8859-1?Q?mUphBpgcCg+fHqhdbclEjbpbhw1ITO/mUZCc3x+/qEXc3uRgcr7CXmK1TK?=
+ =?iso-8859-1?Q?OP0b6tqfvHPijoX706dljZpY9m0c5peh7zQJiioHubbXI21/Rrk7pr7frQ?=
+ =?iso-8859-1?Q?1yyptm0beskbS9o/lYCYF1nGVDvlLi2H3D1Le/xBEknswd3WDmpikZ+NAD?=
+ =?iso-8859-1?Q?hf6V6M+ZRpZGwJGbibE7RvR1s0uv+o0jsEWusKLDhJtxQ9iPcF8uwLGJrI?=
+ =?iso-8859-1?Q?ePtOV5uN0TNtg4E0pr3qos4YRzYZ8sVF28f75HcCD5XycVSsUQ40POZ+/R?=
+ =?iso-8859-1?Q?0gnNqdezkSUVxi9r3bIxSM96LJ+v/r8vumN0qC19BZBntCm6dhSMxeclnC?=
+ =?iso-8859-1?Q?KHntNbCxH3D2DAj6VsdSdSFHQ90Mnk6eeIWT2GcEZ6f4SOEr3MW+Y0cD6D?=
+ =?iso-8859-1?Q?4UvDaXMcMdQgv8MKQti99jAdo5Qr2QQOQ2t+Nw89To4g2jqiax+ku8ZIrW?=
+ =?iso-8859-1?Q?a27hamm1HJyD8=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?iaImqlXQYlN6bzc90UBsnm48+zXcS/KN0fULZ7R3NHLalmsC6EybNyz3kd?=
- =?iso-8859-1?Q?6AzWhihOKg4q7195jArEWEed1JnfS5G/zBlcxsh9613JuGznrc+3ZACOxP?=
- =?iso-8859-1?Q?j5n+o3pRMDJosCqClSlzzm9kJElpEYVkNQujJw5s7VKlaE0JeoJ+dPZyCG?=
- =?iso-8859-1?Q?zuoYO7iUz33OjinqoHBDQ0S7q301/+S2IO0PCbpBRAL5ANfzv8klgf0XDS?=
- =?iso-8859-1?Q?bx9trqMcGpNN6VnmH1buYzvLbG8aNArk1eNFdEJkvUTW8xTzkZ3+Qq1wpj?=
- =?iso-8859-1?Q?a+UwxXIdK5g4RWxe4kIR7XTcqjWgk9kkh07ur/umZtT21k6t7Ygr2IAtDK?=
- =?iso-8859-1?Q?/nj0I3Esv23UhnGkvxfCH07LIRJrfQs0HN3c14a3W//wLAXRmnn7F5c7Kf?=
- =?iso-8859-1?Q?ZzNWVOwtEHAlTwTdsI4qhsHiwm0VpjJ+GSAjli8Y8CVQguzfVYQY1uQ6In?=
- =?iso-8859-1?Q?4a+aIO0/2BetVKPQ3IOKvrABPQlrvJ4+oWYgPjeZJ1f3y4qqlnLLDY7+3Y?=
- =?iso-8859-1?Q?5JsxyIASjKZr+OAwW7xakR+oXgAj/D8rTCyzpZlNfdqlpNwBgeaqiXp1O9?=
- =?iso-8859-1?Q?+tzhJSnwJYnfF4OztbETHMk+D+RFPPIj+vf+X3zlT6d/tj8NSkpE9P52cp?=
- =?iso-8859-1?Q?Q+3GA6D8OX8DZQu3NSEX680chliIuavt4gdOMdFRaYMGQ23s6TT2jeZlDq?=
- =?iso-8859-1?Q?OLlVv7OKzX3/v63BCc2E9LLQMguwDzuD7AptaLqrlx5AwOcBzmQjPHyg3j?=
- =?iso-8859-1?Q?5Qi9yAkCbB4aqfy3Bfe6s9O6dc44F/bILZ1dk92L+vl0WzwK9+OsxPvpm8?=
- =?iso-8859-1?Q?fvItjuNg/0cxRKf4CWvi3NlQTF/s6rZnkzLIDmcju7EPP2UbDUltZ9bQE4?=
- =?iso-8859-1?Q?5DhWStYdbDt0aiIk6HjghDgnk4TZmkfCnIpKZcBwQ2fZz+w7n78P73eLCl?=
- =?iso-8859-1?Q?OYqETtDbOsmO8868RxnRTa65a00nCHgFwZghnMr+k4x58twLl8LPjJyKxQ?=
- =?iso-8859-1?Q?8txj615K2n/myZaM3or83YK1NJu/or8DL4F8ZsG5wvAfsJ9kC30lPOP4BI?=
- =?iso-8859-1?Q?z991Kt3q0BjIdoNZPWy2xhRewoyb60wnHFL6Hud6Gsv5f6B7qhz1a08KTn?=
- =?iso-8859-1?Q?rGEyn26jKZuOqNMuq4cl3Ae4C2siUmXhweoPG/bHr/5rTqKpEUeKQx6SDQ?=
- =?iso-8859-1?Q?l4AFmC+c466bNgavtJeCUYAjSAXEzfpRk8v1KsUmKoD3811m4Zw9I/qa+m?=
- =?iso-8859-1?Q?3vJGEJJoGK72hFz9K11Y5NLs7ua79DIeYLqaDkQFXr/TEt1PUOx0huqCzx?=
- =?iso-8859-1?Q?KYJUIx8DpdYJ7T+XIlaDdfdSAABbzn3g262V287PSzSfHiW31UqIVgKvEN?=
- =?iso-8859-1?Q?1neDwoG6Sbc+CA6cMMWgw/U9loMthZJWTwjVJuI9DFzKJOXFfiV8GpW2B7?=
- =?iso-8859-1?Q?x99iK24/1TtWyVf7VbHdrXGinkCHZc2QaKe8i2Pu9QIKIXQ+mk0PyVufL5?=
- =?iso-8859-1?Q?YO+BhDbE9dR8a7C6vf07WzSgq03wYwB1hcmVHWeBnK6verBwl8/Vx9VbQ2?=
- =?iso-8859-1?Q?tTd/UgA1zY2XF7UBWKsjVayNB02hV+mAUbWPrzeKCNH1I0FY3zd/4lXuQY?=
- =?iso-8859-1?Q?BdTCSRpsMlAnXSRltXtS5b5Q/wMPxnQqMz3VVSPyk7XsxVVbDy7Tz6qNAy?=
- =?iso-8859-1?Q?14Yi0he/IVGd/EMhVhOETjKinGLtFmAlmGOHOf0tbhpRF240wwyL3yhU7N?=
- =?iso-8859-1?Q?AFv+L37PBoGrDeX+LwDGovZmWoDI35RldYrxpSyUyQ42eCyr5h5O1GMvla?=
- =?iso-8859-1?Q?g2Tg6w9S6w=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1d823cb-8be1-4eed-eca5-08de57229474
+X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?RL0FOohzmzPVLi9FpQz3Sl8mkVIVcWWIC9uToknfgH/CY+aRTTqEc+Y7cY?=
+ =?iso-8859-1?Q?Vi2EduRHZiDLQUzuaKv6G3DIWj0KbFl6cJYyOADrKPoJR0Rym+PhSXvEXh?=
+ =?iso-8859-1?Q?6zao/lYoBb0YVGnWhbIz5z/OUt4p+K+vsl3pInKFUA0LbdhrCFeNkb+Pg9?=
+ =?iso-8859-1?Q?GxaFd61TR+0ksVcM5gaPBDHMKFrtDl+7w4qQSzGtY2VwJUAwJMxggrj5Uj?=
+ =?iso-8859-1?Q?lyYZjjuI8NTif05W6gHg0C0SeU3NGZmaZXD0VeEM1HOYenmDA9QyG7388c?=
+ =?iso-8859-1?Q?ZWPyuoEAiBlAOCvOTSvtVWJ+1qjwm2yeP8/bZy0Wlo0A5oA76QHeMO/wZ/?=
+ =?iso-8859-1?Q?R4J0hMbPPTd25D1yQWPs87tguP+A9QqzKkgz0sg5q65EEZzBlTRbKUohxj?=
+ =?iso-8859-1?Q?xhkKt/NtFDm7tDpoAai/JTq1f+DbHTBxtXR53KnTb7fnRg3XOoCn7JSH2a?=
+ =?iso-8859-1?Q?lAicQveeaZUGNsU8v5+hXiEs1aMEgD0pxHgFRlw4khSuG3I41VpuBNExH6?=
+ =?iso-8859-1?Q?mg6v2CE9ryqpSPZGx5hhTRj/7YqB7F1SCq4dzq/qgKSfNL58lh+3qpbyWE?=
+ =?iso-8859-1?Q?FzZMsRg1uFD/U110qhXaJ1R2X+gy7NzO3zmzAGGYPxPt8eOy/sPzmGxTy8?=
+ =?iso-8859-1?Q?AXmehQtUVP48A3q5wsb6VX7tXeFSI16ywVKHgRVHGwX9Li5n8ja6RBhiWw?=
+ =?iso-8859-1?Q?JPg/P7LcBKdOXvRTqsQSKN12kfPXtkRR45be3QPDFO8XC9HhA/omMaJdYp?=
+ =?iso-8859-1?Q?GQqk7CL3fpWHOClcTowXFRUloQkcV5CGqy64mBdKhVgA0g1M3WIjk33LPr?=
+ =?iso-8859-1?Q?UO6YStQhzbCiPIsz6Up2P8X22TuVwn+35aFHlBM3sKlySRX3x69fGq67Pj?=
+ =?iso-8859-1?Q?CGagSx5/JhqZQG2BfdlrysPigWN8BLA/8JF4KY/hxzISpYKHT3S8/mcGU8?=
+ =?iso-8859-1?Q?EuWJzzfKFPcidPNiOox2KFOJb/Le3VMID/ZTwnVANku7vjfb66EQCSddIf?=
+ =?iso-8859-1?Q?5e6TBy9vrdQvOcDZubg4VDG++VXB8GVk3/EGSE4U5eAqUNVj+ttDZe3s0c?=
+ =?iso-8859-1?Q?i8ZKJeos4fhiEp2GzcTcnqokkQojMK1jJf6KzNv67l2WgdDTLnSL3FLKtF?=
+ =?iso-8859-1?Q?WWLM96iNqPq/8GKwRGczW+TNeYYxq4QXrT6kZjH7in4aAnwNXanpi4yeEV?=
+ =?iso-8859-1?Q?u10bCJL4mU4YULGWezeAHa8qNIP4LflLW1i7aRIeBuwyE6X5bjrCCwFHyr?=
+ =?iso-8859-1?Q?uoG8gB2ilfrISwZdZIHnP7pZlB1NtF25WWI5UqueDwuClOgLAH0r7q9hbu?=
+ =?iso-8859-1?Q?Uw9AQt0b++lfYJSXkQ2N/xGn2ZhyRDBg8UAJ633Rbdo1P+gVNYMUWxGia9?=
+ =?iso-8859-1?Q?M6E0YEmlxEFZr2Gtj+iAtk+ucqhpV7WMYnu9zBjrEpB90AEhZGS3nXopqt?=
+ =?iso-8859-1?Q?T5eS2XkUAoH4JGAi8eQKlvKijQfk2RyTxTTYP9ixTIBI+TClEKy7rKLtey?=
+ =?iso-8859-1?Q?+1VA4B8ZsOC+yAD5G4dSjOomytYV1v8mvLrPWXXCXhpWe0lDBM6tFjqXVf?=
+ =?iso-8859-1?Q?Lus9aMxGPORzS2z7ZAAdWLmFtM+uguc8m5izY6Rcv4m9rbuPuwk+9tCzsd?=
+ =?iso-8859-1?Q?foUMTvcrpeIFgNMvkozP7fRcYnvrJMdV6vaieFt5d8LpXgSA0SBCyPEtHs?=
+ =?iso-8859-1?Q?I/CwwWI0MeBimpX/Eu9ibDePq4RqCzNP7R53NJ++90YmMS90TNGQBZ7GO5?=
+ =?iso-8859-1?Q?gtKLYG/PBQf+JuMdh8Lr+PBU51xwfHsJemq/592w0xYJccSsu6y37mVOmD?=
+ =?iso-8859-1?Q?DCjiwHOP5A=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 009343a7-bc1c-44cb-a77d-08de5722ee1e
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 06:18:36.5953
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 06:21:06.9607
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D1GQO6jX6MHCWWhhOO1QoZAubnk340jUSGITfgKyCcN9JWbb/yNgYZT5tuOfhhVt5OWa5IQr/fp1p2obGSGf4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4992
+X-MS-Exchange-CrossTenant-UserPrincipalName: bFrG8nUG1ZajIyg5p6whIS6OXmNWSsV1/LfvjuNaV8c3I3K8oPKxQ7yCct2gWMX8Pbd/X7GK8YNkqJ+i3nV4aA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6793
 X-OriginatorOrg: intel.com
 
-On Fri, Jan 16, 2026 at 07:10:05PM +0800, Huang, Kai wrote:
-> On Fri, 2026-01-16 at 16:35 +0800, Yan Zhao wrote:
-> > Hi Kai,
-> > Thanks for reviewing!
+On Fri, Jan 16, 2026 at 07:22:33PM +0800, Huang, Kai wrote:
+> On Fri, 2026-01-16 at 11:10 +0000, Huang, Kai wrote:
+> > W/o the WARN(), the caller _can_ call this wrapper (i.e., not a kernel
+> > bug) but it always get a SW-defined error.  Again, maybe it has value for
+> > the case where the caller wants to use this to tell whether DEMOTE is
+> > available.
 > > 
-> > On Fri, Jan 16, 2026 at 09:00:29AM +0800, Huang, Kai wrote:
-> > > 
-> > > > 
-> > > > Enable tdh_mem_page_demote() only on TDX modules that support feature
-> > > > TDX_FEATURES0.ENHANCE_DEMOTE_INTERRUPTIBILITY, which does not return error
-> > > > TDX_INTERRUPTED_RESTARTABLE on basic TDX (i.e., without TD partition) [2].
-> > > > 
-> > > > This is because error TDX_INTERRUPTED_RESTARTABLE is difficult to handle.
-> > > > The TDX module provides no guaranteed maximum retry count to ensure forward
-> > > > progress of the demotion. Interrupt storms could then result in a DoS if
-> > > > host simply retries endlessly for TDX_INTERRUPTED_RESTARTABLE. Disabling
-> > > > interrupts before invoking the SEAMCALL also doesn't work because NMIs can
-> > > > also trigger TDX_INTERRUPTED_RESTARTABLE. Therefore, the tradeoff for basic
-> > > > TDX is to disable the TDX_INTERRUPTED_RESTARTABLE error given the
-> > > > reasonable execution time for demotion. [1]
-> > > > 
-> > > 
-> > > [...]
-> > > 
-> > > > v3:
-> > > > - Use a var name that clearly tell that the page is used as a page table
-> > > >   page. (Binbin).
-> > > > - Check if TDX module supports feature ENHANCE_DEMOTE_INTERRUPTIBILITY.
-> > > >   (Kai).
-> > > > 
-> > > [...]
-> > > 
-> > > > +u64 tdh_mem_page_demote(struct tdx_td *td, u64 gpa, int level, struct page *new_sept_page,
-> > > > +			u64 *ext_err1, u64 *ext_err2)
-> > > > +{
-> > > > +	struct tdx_module_args args = {
-> > > > +		.rcx = gpa | level,
-> > > > +		.rdx = tdx_tdr_pa(td),
-> > > > +		.r8 = page_to_phys(new_sept_page),
-> > > > +	};
-> > > > +	u64 ret;
-> > > > +
-> > > > +	if (!tdx_supports_demote_nointerrupt(&tdx_sysinfo))
-> > > > +		return TDX_SW_ERROR;
-> > > > 
-> > > 
-> > > For the record, while I replied my suggestion [*] to this patch in v2, it
-> > > was basically because the discussion was already in that patch -- I didn't
-> > > mean to do this check inside tdh_mem_page_demote(), but do this check in
-> > > KVM page fault patch and return 4K as maximum mapping level.
-> > > 
-> > > The precise words were:
-> > > 
-> > >   So if the decision is to not use 2M page when TDH_MEM_PAGE_DEMOTE can 
-> > >   return TDX_INTERRUPTED_RESTARTABLE, maybe we can just check this 
-> > >   enumeration in fault handler and always make mapping level as 4K?
-> > Right. I followed it in the last patch (patch 24).
+> > With the WARN(), it's a kernel bug to call the wrapper, and the caller
+> > needs to use other way (i.e., tdx_supports_demote_nointerrupt()) to tell
+> > whether DEMOTE is available.
 > > 
-> > > Looking at this series, this is eventually done in your last patch.  But I
-> > > don't quite understand what's the additional value of doing such check and
-> > > return TDX_SW_ERROR in this SEAMCALL wrapper.
-> > > 
-> > > Currently in this series, it doesn't matter whether this wrapper returns
-> > > TDX_SW_ERROR or the real TDX_INTERRUPTED_RESTARTABLE -- KVM terminates the
-> > > TD anyway (see your patch 8) because this is unexpected as checked in your
-> > > last patch.
-> > > 
-> > > IMHO we should get rid of this check in this low level wrapper.
-> > You are right, the wrapper shouldn't hit this error after the last patch.
-> > 
-> > However, I found it's better to introduce the feature bit
-> > TDX_FEATURES0_ENHANCE_DEMOTE_INTERRUPTIBILITY and the helper
-> > tdx_supports_demote_nointerrupt() together with the demote SEAMCALL wrapper.
-> > This way, people can understand how the TDX_INTERRUPTED_RESTARTABLE error is
-> > handled for this SEAMCALL. 
-> > 
+> > So if you want the check, probably WARN() is a better idea since I suppose
+> > we always want users to use tdx_supports_demote_nointerrupt() to know
+> > whether DEMOTE can be done, and the WARN() is just to catch bug.
 > 
-> So the "handling" here is basically making DEMOTE SEAMCALL unavailable
-> when DEMOTE is interruptible at low SEAMCALL wrapper level.
+> Forgot to say, the name tdx_supports_demote_nointerrupt() somehow only
+> tells the TDX module *supports* non-interruptible DEMOTE, it doesn't tell
+> whether TDX module has *enabled* that.
 > 
-> I guess you can argue this has some value since it tells users "don't even
-> try to call me when I am interruptible because I am not available".  
-Right. The caller can understand the API usage by examining the code
-implementation.
-
-> However, IMHO this also implies the benefit is mostly for the case where
-> the user wants to use this wrapper to tell whether DEMOTE is available. 
-> E.g.,
+> So while we know for this DEMOTE case, there's no need to *enable* this
+> feature (i.e., DEMOTE is non-interruptible when this feature is reported
+> as *supported*), from kernel's point of view, is it better to just use a
+> clearer name?
 > 
-> 	err = tdh_mem_page_demote(...);
-> 	if (err == TDX_SW_ERROR)
-> 		enable_tdx_hugepage = false;
-This use case is not valid.
-When the caller invokes tdh_mem_page_demote(), it means huge pages have already
-been enabled, so turning huge pages off on error from splitting huge pages is
-self-contradictory.
-
-> But in this series you are using tdx_supports_demote_nointerrupt() for
-> this purpose, which is better IMHO.
+> E.g., tdx_huge_page_demote_uninterruptible()?
 > 
-> So maybe there's a *theoretical* value to have the check here, but I don't
-> see any *real* value.
-> 
-> But I don't have strong opinion either -- I guess I just don't like making
-> these low level SEAMCALL wrappers more complicated than what the SEAMCALL
-> does -- and it's up to you to decide. :-)
-Thanks. I added the checking in the SEAMCALL wrapper for two reasons:
-- Let the callers know what the wrapper is expected to work under. So, the
-  caller (e.g., KVM) can turn off huge pages upon detecting an incompatible TDX
-  module. And forgetting to turn off huge pages would yield at least a WARNING.
-
-- Give tdx_supports_demote_nointerrupt() a user in this patch which introduces
-  the helper.
-
-So, I'll keep the check unless someone has a strong opinion :)
-
-> > What do you think about changing it to a WARN_ON_ONCE()? i.e.,
-> > WARN_ON_ONCE(!tdx_supports_demote_nointerrupt(&tdx_sysinfo));
-> 
-> What's your intention?
-Hmm, either TDX_SW_ERROR or WARN_ON_ONCE() is fine with me.
-
-I've asked about it in [1]. Let's wait for the maintainers' reply.
-
-[1] https://lore.kernel.org/all/aW3G6yZuvclYABzP@yzhao56-desk.sh.intel.com
-
-> W/o the WARN(), the caller _can_ call this wrapper (i.e., not a kernel
-> bug) but it always get a SW-defined error.  Again, maybe it has value for
-> the case where the caller wants to use this to tell whether DEMOTE is
-> available.
-> 
-> With the WARN(), it's a kernel bug to call the wrapper, and the caller
-> needs to use other way (i.e., tdx_supports_demote_nointerrupt()) to tell
-> whether DEMOTE is available.
-> 
-> So if you want the check, probably WARN() is a better idea since I suppose
-> we always want users to use tdx_supports_demote_nointerrupt() to know
-> whether DEMOTE can be done, and the WARN() is just to catch bug.
-Agreed.
+> A bonus is the name contains "huge_page" so it's super clear what's the
+> demote about.
+LGTM. Thanks!
 
