@@ -1,319 +1,499 @@
-Return-Path: <kvm+bounces-68546-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68547-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E17B1D3BAA7
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 23:15:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C3AD3BAB7
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 23:19:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 16725302D8A8
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 22:15:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 56A4E300B35B
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 22:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6B02FDC4D;
-	Mon, 19 Jan 2026 22:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7BA301486;
+	Mon, 19 Jan 2026 22:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Qd7mmCOU"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SCSNWMfv";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SCSNWMfv"
 X-Original-To: kvm@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010028.outbound.protection.outlook.com [52.101.56.28])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010016.outbound.protection.outlook.com [52.101.84.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5C42E339B;
-	Mon, 19 Jan 2026 22:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.28
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768860921; cv=fail; b=frbX7E4m39fSdKyhYqUEKIhIYMDI4GlKAbA+zo7eyL6Glzi+nTh9I3Mg3Jd277zX+9P8T80YvwhX6ET6Jj+EcWGdjeU424YnxuQpkC8zO6FCvA1ieDqUTEYtvlxcmmhAubp4AtOUP1Bu9v271BAB5Ub+lV0Ww/ft9s/U0LNMj+k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768860921; c=relaxed/simple;
-	bh=EK1AvNw1yoj1fA8ktfTVJOGyEotmhRmwmLiTohsIlS8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qXIJqOulBwqGKoVz8eGoX5OyClxErRz2I5mZUgCQNcx6EPHDHxnRKudIq2q6GF3tAIeBESz8qvX8O8CjbHAFoSlX71DwlhTCzWhZv4ELLh4pVjHVipPRXa/KZINFxxKYJC2epVEDCHaQ2RIYiKqvq6UlHgOyu0S/744pA2EvPPs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Qd7mmCOU; arc=fail smtp.client-ip=52.101.56.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D7728489B;
+	Mon, 19 Jan 2026 22:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.16
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768861144; cv=fail; b=rOuNaGxkP37pGPIldzgufuxE2SxxzlQToLLZnhsL9gS+7M+lCp24n2CJ/DtXs1kPP+l1HaNW4weJRMc6bcA8ulgray2wmYvVwdKFQRrwG6rhisBMRDPV3Gl4RweiGJ4pCBiiOiBnkZ9ytqVgQ7eabxsUWDpPGccV55LEs4styW0=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768861144; c=relaxed/simple;
+	bh=KCxaRUTw6nmaRDc7ZibPl5wkjAA/HXO7NKmNNi0+jBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=GJvtNl8lgvfDrMtFoPkFiyvNOYVm9/KWgkhuotoIg49Yk2ZOmmdQor75hABY8OYHduWgchy5329VSZuA4hmmcbX8f91E9brF8/JMZkNV1OCM5Of5NFQfon3VtigLcg8lqLyQYwLRniiBGKyeJce5j/qGvQcw0b4Mslyp4cQoljk=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SCSNWMfv; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SCSNWMfv; arc=fail smtp.client-ip=52.101.84.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=kT5HGlvd/ZREC/0QfpAyvELi12l5Pso3T45EWmmEFUvsZWIv7Q0+USgKPjZy51x7x8SvzuOBP8/6glYzvyywBXPFes0rpx/8EmEzaI78i1nhuggLj9iYdLOw/XHPsB8PpKTviIISedhQNmrXJYj+a1zlKSbh2G5L+PZsC+PGcR57P8/X6EOwJDEoXDRL7/lb8o9A17r+0L101LTGW0KaAp3z28/lVf2HfO6hrRjK6UCReBV5lQXM9sUsj4TBoUve0NfDnC24Gclk6xUc0B51cf55I5ggkhFD9ACHxP0qknFaIKfYE21xVqx/gfA+WqNPMrI8EzyVahQiyr4Et7tnew==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=btOT3zliRUWHQ6mRDmrEXMZ+mdGCfyLUy5UYH2ERk7M=;
+ b=U1bDo+sY6ofsggQ+cSM/l1aaAbDl6K2qqE+U5AVFf/oUCNu2YPzW4IPpnvAbdO4NjMWnzy8MnOs7661V24JPqC7rnQkEKR8LGa9vM1w5xs0Eu+6ve3+sg8F7kOOWPplc6ja5x4MP21TGeyMXxgZfQwewDRSGrwjI3eU/EXN7W/EClb3Rmgg8MPApn93DWvzN3ZnJPO7B3OQwWgkC35jnpecCW4i/UpdDXNWa/bActgbJTVaaUuHAN7z8IJMI52oJgI+3K8svI4oNRwWIqRbleXyGTOXlJydaPO5I/MiK3q/SKjPIXIsalI1lY5l5BCtHz2nPLOSjs4m1SLqNgef81w==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=btOT3zliRUWHQ6mRDmrEXMZ+mdGCfyLUy5UYH2ERk7M=;
+ b=SCSNWMfv3/cKllbPOVCr6KNwzCGAvyJL1Ch+d8gA8fgZ45ThklvSE75u8C5E9IEppjfVSOF4/t97bct4pSLa4zxNQXnVfY6nv4CL7nNbyrjuQLylyr0fiinrEB7XETcceDqMLIw6UPIVh6qNvnIkmtp6xJTGv174Xk8aYdIKE/c=
+Received: from AS4P192CA0027.EURP192.PROD.OUTLOOK.COM (2603:10a6:20b:5e1::17)
+ by DB9PR08MB8358.eurprd08.prod.outlook.com (2603:10a6:10:3da::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
+ 2026 22:18:55 +0000
+Received: from AM3PEPF00009BA2.eurprd04.prod.outlook.com
+ (2603:10a6:20b:5e1:cafe::15) by AS4P192CA0027.outlook.office365.com
+ (2603:10a6:20b:5e1::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.13 via Frontend Transport; Mon,
+ 19 Jan 2026 22:18:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ AM3PEPF00009BA2.mail.protection.outlook.com (10.167.16.27) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.4
+ via Frontend Transport; Mon, 19 Jan 2026 22:18:54 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VUkxwL1LBBv/3CaFKtHF/8nLS3tQmBk3sAeijUlJoBvyxQ7VZWoa0NgWVD7ocGzAd1WZS1Lgm7hR0C2LtcOj6mEn1T5lpclKCD5uJX3oTyaai+hiVUPwqoO7c5sRO3I345A63OkDYWWR9XtH3Jbjuzyq/yQxpsKIQWsScvzxLS608D1YZ8/iWzdhK8VHo3AjhmXmWP751RAjEgZ+SlGyz9VXVQ30o4Wue6VruhsfMicOARAHZbNl/CE/vko/EV4rjHbVkxzrreO3KuY6oJj6imBokNfxkisDqTBARidgIp0OlUyB/1BG9f2c05exM91aAwBnAJZ1bXojf4aDVHUUhg==
+ b=xbxjsj56EuSBOyAZk27ynq7GB5KK11AuwdvB650yeEBxRx//vKxUFy18okCxZeNAAbKb4T+UrwRbzhuNNsaYDcjMw8IVt9jXcoLG//4BvlKdnewjJgHUzYATOsRjfKZleG/y+8bdkeBFc7xyEMcCiClBtin0EUSP7TepUdwTddLmckyvIdXc6eo5RxvxwxirzWIokAavbm2GNdCvHlGYSKaqKVOPYuRKwd5/6KbOvKI0qz7n6yMF6k//UEKyzY5XnNsn+tf7t0Bkb8jCubT46z58thxioIcTORaLMV4sev2ZPXjPmUN+5QYC4fni4buYee7/exZ2hXqxjr3bmwnXJQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MtePjGeMXIYcWbegumVLN0ub1lFDw2T9sNzA+3cugIA=;
- b=ZUtFaQemOCat0p4gzSzrWCZQ6uscI7jJG7Mt8SNlY263Jf0dNSf8cHkGi88LyMTtjxTizldMr41LBZvAE2FsP8JkzUwWYxTxUE+vzOxW3XrCbO+15ttctsh9a/pP24kfONrdRv/BjetPkB9qLlOLfBeJNH91NXbDoB2dnHv+BjzzuLWpIXpPS/3zvUOsStzomRYyz0290ZpTRsjhvkYJ8Y8o8aCdHzQSSjj4mesCo9JePU4fbeEttHX3vd7PDU+D018T+0LMhLsFkwYRoJtGaI1igF/oGOla+NoXhv1QqYjmkN0M0SnrD3dYD+zmDaOuVevjgzwkWDjZo8SFVlBGjg==
+ bh=btOT3zliRUWHQ6mRDmrEXMZ+mdGCfyLUy5UYH2ERk7M=;
+ b=Dljn8+rRVIiiDE7IL3OBB/5FwjrFJsTbEpCxB+ZkBZh1qt9iB1qQJRac02P6Aeiu2DY5BZteN+CnptY9bYt+Af7RqTplBoAjZQVKsAAROucRn10dGPPQmszKmRkMZ8u6ox3PG6ztY8pkFGA/4dr60EW0rNZJs3x6ov4dNStBQvVrVBzxk0Sx78SSHq7NPDJlP9xzUB7QG9FN528E2JN+i4Nvc+m6BBENwQtTdvxoIPynWfg+FGMNZ0MSi/7jjcT2oWvYcSPVitfGwItKfCXDXAtZLKy+x9Pr+mfXEFCOjvaB7vVEDNljbR/3AiCOx0r8ROzK/0MnY1fkPPluX1wUDQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MtePjGeMXIYcWbegumVLN0ub1lFDw2T9sNzA+3cugIA=;
- b=Qd7mmCOUQyIYcTLH410TDHT+7e88BvgDLr8Tzx+F3vppGgLiAs6WvkuNu5EW/TL9QuaiCzPEHl9TWunhKnbBvmnZf8qoWHjGqCZbR3/qcBPF2Gh+Apm4WVz8XGcAOlrZE6DzuUu0mEjpUhrWOv5Y7muEpDKSCRwKOCUgHD01J4IDPLQMbkOn5L8xwL943CxtM6MrpO4rO9+BYHtzotL2VTwNuFB6zJAk0M8CaeLUy+htoGoKved2k8+NrjZYlyCqIaBtHj8QY0teeHNgvL0QljYrOac+o0r1KsX9bqbH6/Xj6lqfBUNLviXWLyMj3dpi6TwBed18SORXWwWzEAlW9w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from PH8PR12MB7277.namprd12.prod.outlook.com (2603:10b6:510:223::13)
- by CH3PR12MB8880.namprd12.prod.outlook.com (2603:10b6:610:17b::18) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=btOT3zliRUWHQ6mRDmrEXMZ+mdGCfyLUy5UYH2ERk7M=;
+ b=SCSNWMfv3/cKllbPOVCr6KNwzCGAvyJL1Ch+d8gA8fgZ45ThklvSE75u8C5E9IEppjfVSOF4/t97bct4pSLa4zxNQXnVfY6nv4CL7nNbyrjuQLylyr0fiinrEB7XETcceDqMLIw6UPIVh6qNvnIkmtp6xJTGv174Xk8aYdIKE/c=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20) by PAXPR08MB6687.eurprd08.prod.outlook.com
+ (2603:10a6:102:132::6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
- 2026 22:15:14 +0000
-Received: from PH8PR12MB7277.namprd12.prod.outlook.com
- ([fe80::2920:e6d9:4461:e2b4]) by PH8PR12MB7277.namprd12.prod.outlook.com
- ([fe80::2920:e6d9:4461:e2b4%5]) with mapi id 15.20.9520.006; Mon, 19 Jan 2026
- 22:15:14 +0000
-Message-ID: <ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
-Date: Tue, 20 Jan 2026 09:15:04 +1100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-To: Jason Gunthorpe <jgg@nvidia.com>, Zi Yan <ziy@nvidia.com>
-Cc: Matthew Wilcox <willy@infradead.org>, Alistair Popple
- <apopple@nvidia.com>, Matthew Brost <matthew.brost@intel.com>,
- Vlastimil Babka <vbabka@suse.cz>, Francois Dugast
- <francois.dugast@intel.com>, intel-xe@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, adhavan Srinivasan <maddy@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Felix Kuehling <Felix.Kuehling@amd.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
- David Hildenbrand <david@kernel.org>, Oscar Salvador <osalvador@suse.de>,
- Andrew Morton <akpm@linux-foundation.org>, Leon Romanovsky
- <leon@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R . Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport
- <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
- Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
- linux-mm@kvack.org, linux-cxl@vger.kernel.org
-References: <20260116174947.GA1134434@nvidia.com>
- <8006ea5f-8845-436a-a2d7-125399428762@suse.cz>
- <aWqgHTZ5hjlRvlKU@lstrano-desk.jf.intel.com>
- <20260117005114.GC1134360@nvidia.com>
- <aWsIT8A2dLciFvhj@lstrano-desk.jf.intel.com>
- <eb94d115-18a6-455b-b020-f18f372e283a@nvidia.com>
- <aWsdv6dX2RgqajFQ@lstrano-desk.jf.intel.com>
- <4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
- <20260119142019.GG1134360@nvidia.com>
- <96926697-070C-45DE-AD26-559652625859@nvidia.com>
- <20260119203551.GQ1134360@nvidia.com>
-Content-Language: en-US
-From: Balbir Singh <balbirs@nvidia.com>
-In-Reply-To: <20260119203551.GQ1134360@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR17CA0068.namprd17.prod.outlook.com
- (2603:10b6:a03:167::45) To PH8PR12MB7277.namprd12.prod.outlook.com
- (2603:10b6:510:223::13)
+ 2026 22:17:51 +0000
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::8c9b:58d2:2080:eb98]) by GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::8c9b:58d2:2080:eb98%3]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
+ 22:17:50 +0000
+Date: Mon, 19 Jan 2026 22:17:47 +0000
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: catalin.marinas@arm.com, maz@kernel.org, broonie@kernel.org,
+	oliver.upton@linux.dev, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
+	lpieralisi@kernel.org, yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com, joey.gouly@arm.com,
+	yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org,
+	mark.rutland@arm.com, arnd@arndb.de,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 RESEND 6/9] arm64: futex: support futex with FEAT_LSUI
+Message-ID: <aW6tix/GeqgXpTUN@e129823.arm.com>
+References: <20251214112248.901769-1-yeoreum.yun@arm.com>
+ <20251214112248.901769-7-yeoreum.yun@arm.com>
+ <aW5dzb0ldp8u8Rdm@willie-the-truck>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aW5dzb0ldp8u8Rdm@willie-the-truck>
+X-ClientProxiedBy: LO4P123CA0266.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:194::19) To GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR12MB7277:EE_|CH3PR12MB8880:EE_
-X-MS-Office365-Filtering-Correlation-Id: bb93f5d7-21ae-4195-ba95-08de57a8384c
+X-MS-TrafficTypeDiagnostic:
+	GV1PR08MB10521:EE_|PAXPR08MB6687:EE_|AM3PEPF00009BA2:EE_|DB9PR08MB8358:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4560f5df-295a-43f8-e7a3-08de57a8bbbd
+x-checkrecipientrouted: true
+NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info-Original:
+ =?us-ascii?Q?jCZaHQlXuvgPIJPrC23Z4x054FG7zk1fr9+hJ2qyyovQS2X42xNFUFTHRanY?=
+ =?us-ascii?Q?buylLatPf6w+yYKmvaOdpixcumlJD3FdAGBy8deG7UU1vB8egLWTPPwjbN5z?=
+ =?us-ascii?Q?b5Wu9u9Sg5kwSEk0PIE8I1goG7/Wxcz5xDzaLlPvF4q1s293a8+pmGEfC2PQ?=
+ =?us-ascii?Q?aRSgoo5NRs44m8hCNE0Tl/piykmrJhOEiR5etQYGwvyZcsWwFlR5gKe9rfZ3?=
+ =?us-ascii?Q?bRjTNFsPa3DwA3lz48PVWJ6Cc0Gb+sMOjpO4y6s1S29BwFvPAmjtEoTyl0CS?=
+ =?us-ascii?Q?CNteqs96D5y4rwfVTki/NMZrXcYlzZKnz/5mn50YV5dl2gJQ6rLgnTupgfKf?=
+ =?us-ascii?Q?drZyttJZ/2Fd/aTccttc6TqD84hN7oTK0oBdzI7BShAYuUhAodlsc/I6C05l?=
+ =?us-ascii?Q?gD7I4cwKOakqHJARHJv1cUXtFugSTMFrZ+PXQV4P+HkBngWw5A605A1+yft+?=
+ =?us-ascii?Q?LAtDx23VLA6rWLbCVxl0+BmR4OHT9KGaEkKWhz8Pq2nwKwRzLWRj789yjZzl?=
+ =?us-ascii?Q?T/fCfKJcj85ayZPsf0NRKGXE8jo6nNl1uO8S2oqDtEVAzhb/s1eGJZVdkqPP?=
+ =?us-ascii?Q?DPCBnFzRD3D6oOo10V37PxZmcpJ9HJPcSONA4nIwIQRiGHQ7wRLjTez9IhGz?=
+ =?us-ascii?Q?Ps92kaz1Mi5OTg3B8+PHxfukwAHfNGfeboP6RPaoikiU2h8TLWrW5QoAhgkb?=
+ =?us-ascii?Q?4S04Z+Q50L4HpR62O3CMvK0usbggnHsmwm/gxFHL8AN+KKXZ1J7Vykiy+V+0?=
+ =?us-ascii?Q?xba3J78hLh+ZU2XygXT8HHQP0C4BHT5GHbUWa4b49mZ6T4Qwjj3HuBwTAxob?=
+ =?us-ascii?Q?cr0GGPyd6X4zP/wmwkrWzX+wVQfCb0i7U1ltw32SR/8aBuCpKbVpJDjL8nce?=
+ =?us-ascii?Q?RJ0gd78QG7NsGNQpncNC9eB5PviImZ+K0kr565YEANUfnquPRmeMIj801oeV?=
+ =?us-ascii?Q?NijMrQBtP2Pbq1BeRAILto++uyXRWNLk/bF2I9930HP7xDKdcwvDWn7in3C3?=
+ =?us-ascii?Q?6LyKfSK9Hv0qbKhfNExUv+Jz11cRjHIdAw0/4KHTmIH3xYIGZ2kxV2tMRcvC?=
+ =?us-ascii?Q?F65hB3GsuXQJ73z/gCru9bw3mIV/SZY4KO/GsOt8fHzBLDQ2VMWIjmDLIcia?=
+ =?us-ascii?Q?KV2Dhqx/15I+EK4JFKzWO59UlqlyRhJMhGQjsLPumhOoNukr83GFitCDM+U+?=
+ =?us-ascii?Q?uc7NuAE4m8Es78b5S7dmsNgvxt5kZ6x8tct11Aor+rWmRjcUdzEW0fV+sgMK?=
+ =?us-ascii?Q?WC7pb1d7WdzpQdeg+YiImcEJfmW7hxBZaolkw3dR52Kytn1IEacQVf3PfioZ?=
+ =?us-ascii?Q?dB6AxzW8w8mbkhCAGDeSi4tTOfHTEbstf/bqLc5aNl+fe768tUqdaglReEXL?=
+ =?us-ascii?Q?x04ge/Ph+kk6G79QEPF/yeZ8EX74VkHuGgfv9cxyNwu5UMok56BEelNIOoWp?=
+ =?us-ascii?Q?EA9Z2nTY55x50eOZj+/zxX6yEtNXVclIpg5iJzG9/CLVRdxunD0g8Nl0BPzJ?=
+ =?us-ascii?Q?8RfpREwcpPpv3agt3xtyYYWV0hxYuTYiPKfhnvH2PCWw7AO8fL8EguaHa4E3?=
+ =?us-ascii?Q?v07RznneqKnl4fJgSdQ=3D?=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB6687
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM3PEPF00009BA2.eurprd04.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	e97168a5-84ea-45cd-7e67-08de57a89563
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|10070799003|1800799024;
+	BCL:0;ARA:13230040|14060799003|1800799024|82310400026|35042699022|36860700013|376014|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cENyZEd1YjdVMmtCa1F2b1lVQWlUQmlqcSt5amRpSmxTWU5mZnRZK3ZRakNP?=
- =?utf-8?B?K0tzWEpIb0tsZ3ZiTDYxWlFYMjBETXVGeEpEZVppbU1WRUI2dnJjUUtvK043?=
- =?utf-8?B?YXFqSHZDOHRwaFZpNEFmNnczZnk5TVltVlkxMWlKU0x2QkZ1MFQ2Z3FKMldN?=
- =?utf-8?B?cGtzM21nNXFvcmprclFSc0tKYjlxbmNaUG1JY1FGeFg5ZE10Vi9Yc0NhUmk1?=
- =?utf-8?B?Y0t3RjBwcmJNdXQ2NVNUb2FVeDdtR3ppU3FIRHBjUnBjVS9WT3pBdFpINkxP?=
- =?utf-8?B?OW9ZNkRuc0d4dTRlb0N6T0VlalhHZFFCU3cwZTJRdnEvRU5aSnhYWmRhV1Va?=
- =?utf-8?B?N0VvUnVQbzd5cFdSMmtDa1J5QVJHZ3NjdDNpRmhMVnhuRG0rY0lGclVIUnRt?=
- =?utf-8?B?TXNRV3ZyaGJDNHR5VGlIZnlYN0lXOXNCZnp0VUFNQVBuODFzY1BObzAvZzZ3?=
- =?utf-8?B?bnVMR2lMQzVzN1dtY3l1bktQM28rVFVwdU5LZHFPZVg5QllMWlF2YnNPZVA0?=
- =?utf-8?B?RTdKdU9BaWNreml6K3orV00xM0pkLzBveUdwd1JXSTJlRHNlYzc1T21NanBM?=
- =?utf-8?B?NTFMSkY3aituUHFGNVVsbkE3bXFvQWc1UytaV3RQVkdRQk04VU45Y295N2RE?=
- =?utf-8?B?WnVXY0ZUTFU1UnliVk5xc0lsdno5aGs5MWRFU2w0U2k3cE9mdXhIeTJXWmtO?=
- =?utf-8?B?cm90Z2tjc3RyWTFJbk8rcDFwbXZ2UlMwYXM3eE91WTJ1d0k3MmY1d1U2MFpB?=
- =?utf-8?B?YnhoWDgxVjNBSFdiZVRjMkk5SExZOUhuWVNNSWV6YXBGRGZ6K1BKYzhkYk1n?=
- =?utf-8?B?cktSYml5TWYvdFVsTDhoUXVLSWFsN3l6VGlEZis2VjlBSnRBYmloM25sdDNI?=
- =?utf-8?B?NHYvd3cxT2lxbDhWdmVpK3lzQVNkT1VhSnRPUDFSZGk2bkxTM05qVnowT3Q5?=
- =?utf-8?B?T2IzWGVIMFRKM0YxTm5jNEM2bXJrV2RJR1ZONFBhYndYcXF1ZTJCc1NJaFJm?=
- =?utf-8?B?d1RuWWY1bXZnNGRnenZQeGtEcFo5dlRqSjh2QVY4aE81OHV6bVhKYzV0M25v?=
- =?utf-8?B?a1VWa1hWeFB5cWZBOG9kb2tMc2hqandVd01aLytFVEFtMFU3OGUwR2oxMnBr?=
- =?utf-8?B?dFlZVThnVHI3RmhrMndUWG9TK3NndGtrWkJMMTl5R2lzaXRIeUU1MnJuOEJE?=
- =?utf-8?B?U1Bpb0FFSm4zV0haWlk1elhDU3pXU3MzeVpoQWdiL3I2Y3V2T2FVTVlSKzh4?=
- =?utf-8?B?UlIyVnVLRnJaN05nR0FRRWVoRGIrdjRCdUI0L2pHdmVCSmdnaHZYMFc1ODhR?=
- =?utf-8?B?Tm44ellpYTV6UnF3U3NITHA0MExsK3NuYkk0dE93TDJCUjhqREVlMW9uYWxy?=
- =?utf-8?B?QmM5eHMvUzVpUjg5U0Y4ZUpuUTdGb25ENWZzUm5LbnlHNGljZTM2WUJPWFUx?=
- =?utf-8?B?V1hBSDdud2d6VmNQMm1qb0htOHlIQVl6SDhVcEg4NmJsRmJUVnpoL05SRGdm?=
- =?utf-8?B?VW5OUUczSnA3TkNITXQ2YWM1NjdiS1V1NlRFQUhsL0VjUEVaTHA0VDhMM2da?=
- =?utf-8?B?bmxLamRMREhZaENUTS9yQnN3TGZWWHNaR2NwSDlNWUxXSVRlMkt1KzN2djlW?=
- =?utf-8?B?MW5wdW1KSHg1eERMSHg1d0xtcFJITmlRSHI1eUo2cVhQMlJTTWtjNlU5NjU1?=
- =?utf-8?B?YXpHNjNON1RDWXpWWElXZnN5NWhyTktkbHRtY0RWVmJOaHFXQUxtS1pEZlRz?=
- =?utf-8?B?SW5lTlVtd3RYNzlCKzNYN0RDbmNNYlVzWlRac1JmcVpMZDlSS0NKd2puTFZu?=
- =?utf-8?B?OWx5MnpTTm8wYVBUTWJWRVlmQjA2QzZSbFN0cmd5QUNTNUVxREFXL3RONGJz?=
- =?utf-8?B?eEVhQmhQWG42Rmt6aXpZTmhWN1BHVnJGckVpTjZ5SG9ROFBkbTB0YzRRZ2Zy?=
- =?utf-8?B?NGxJVHBKbmNhU3NGWXB3R1BvMjEyT1JUenhBaEtjYndtL0dLNUlWZDlselI0?=
- =?utf-8?B?aGVPckdsM1FWT0hJVi8vZmdhRFpEdCtxVzhCWnczOU5yQzdJRmhFdmdVQ2hW?=
- =?utf-8?B?Ti9tcE1LU1VnNHlMaFlwTHNwTDFvclpkdmhYVjMwSXQ5eGZYK2VKdUs0d200?=
- =?utf-8?Q?/zMk=3D?=
+	=?us-ascii?Q?N9r0UmfVSjE/CJjiaCwr26kyhIV7U/HKC63Ohd6aSF3Qevt2I9uh9Bsyxssl?=
+ =?us-ascii?Q?hAIRqFLTfUhrFf/r4UWWxxFsVKPFjplnK84eQUMdSJwBdi5O1qxq9T8FIw4b?=
+ =?us-ascii?Q?gzgYHb6JbIMGaViRAQoKaGdyZX2BzsXU0daDdeZYf32bsBhFS1O+X5IPGoNQ?=
+ =?us-ascii?Q?aNZ12kN3ig9LQA/QAYQgeTDLYs4aAF1m5+H8Jmia5IaF3wfMSFSXxlJVQCg5?=
+ =?us-ascii?Q?pKId5mzgnHg20Nj9zlbLLVCl1rRpFNCJDjRcUByLv8IfrDx8sVVZf6Xwg0NT?=
+ =?us-ascii?Q?cZm08Fy7gtWhCGFxlgWwRHyYG6gj0x8Tt/Ch9v0JPB4yVoRvkOjMfLIGGzdi?=
+ =?us-ascii?Q?YifYIci2o1Ex3buyzuiJ7EjcBxmrrrGfB/PrQgVbVGK0EYlKodRFakLxRL7X?=
+ =?us-ascii?Q?AxiYTgI0scHgeDHFMJi2hZvg9LGOibzCAkhAZ3K1KIQaTRmpDRIpp54Rtgzw?=
+ =?us-ascii?Q?FpWvbyrbl3gOlMDq8aTjyzkbjaeBuYxw3bKh6eL/QHJGhrFVUpUU0qKghryR?=
+ =?us-ascii?Q?a21ARVnTCEodDbqKNHusLabaW3r2W7gNuJy2wg5WIhwCrofU4o+4Xs8aBj41?=
+ =?us-ascii?Q?Z9BfN+vpX8d6ba2+RmWXVaZaJ4pys2b2OLCAelJVyiLBkOym9fNUfHcAPla9?=
+ =?us-ascii?Q?C5iB28HtFr4+bGDFl02pt5CDuf3fPBCfWy6FBclYAO9yY10o35mu54Wv1Yal?=
+ =?us-ascii?Q?UnhF7tZ7kt6pbS87kli360hA123QWHcYUVw/GEtpB7e6mDGhdJALq+uocRml?=
+ =?us-ascii?Q?n/SUy9+gOHycTnuiN0wXsIMQSSy9aGwlnkjpkSlz0RkLmmrAsnUKVuxhdZ2M?=
+ =?us-ascii?Q?c//CSNhOe2DJ3647dEcDiMNKBfbOoCKPZxnIsGkfw7Lo8Eq8sUzvZ08BatP/?=
+ =?us-ascii?Q?V2H4OTbU+7bfzkUK/zvdqnLHVLn241bSve0fRM+Ks36OIZ4BZ+BPN0x93hK+?=
+ =?us-ascii?Q?1ltz3UrOoMc1lT5SxriNh8xJ2UJ+UuUtitEzPtr4R+zR+re3D9Nq9CHti/PC?=
+ =?us-ascii?Q?DL415EQsD3mpnLdhmIKAPHmbRSL9HeuJyOK++55y9FKra6bU+BP4KuPCFbZs?=
+ =?us-ascii?Q?YaYvTYI6GGl/7HabRTRoBhqFqGgmy1VOmtNy+uLkALAL4qFOE2KEnFzn26ds?=
+ =?us-ascii?Q?8wh4zsXQUABxoL35pZH98fokixA6RNRXKzrm/169h1Cqnt6VmQOGmthk9WCo?=
+ =?us-ascii?Q?Jr0J2421JW1B4POONlcJJonmrM3Mqx7vf/HzGNJyQ3wjyEP9FJj3ixpcZ6zG?=
+ =?us-ascii?Q?RqFt/3X5yHLIdpbpM8CJBbXM1s3UfILeqdtMm2lc/iei6XrFJr5fVST3G7WH?=
+ =?us-ascii?Q?WTYS5Yj9K4+8ezMEoxoP8fFrNTtlwS51kstv2q34YH/eQKLoZS6ZYnkc7Pj7?=
+ =?us-ascii?Q?lSoXsQtDlZnSPr6PrBhLO+txjI/+qI0oPfc4b+JWid55FpULGpgQikXCVdKt?=
+ =?us-ascii?Q?g3ZVxUNsFoacDH7RyfkWLIONehkUWvxJdXz8M7OgYZI3iTWQfzYPNRgIOVzU?=
+ =?us-ascii?Q?MMMVwUuRGZhCD+jUe/LG1MZQJpSubV4dmkxZgBWZtHVn+/GEW/JsA91YkBLM?=
+ =?us-ascii?Q?80KVy+IXnleuAYWY5Z4G5Yz1hwth1WR/Mf4I+YoM49+EuuMOKxz5nuzKprjg?=
+ =?us-ascii?Q?yGnvBeJ2950JqPS9JqYHDQyULh1j263/1ZeOo/5y08EfXhV0NXUlxWs1Txzp?=
+ =?us-ascii?Q?vUnw8g=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB7277.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(10070799003)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eHB0ZUZMSGprUllVVGV1dUEzR1ZMa1JseVdiTmFPa1RCNytoMXhiTjRPYUMw?=
- =?utf-8?B?T1piTzlwVC9UTFV1Z2l2ZHFaQUxKTWdYcmVDMHVFRDZkT1c4SmhjSFhjeDJz?=
- =?utf-8?B?cjJCTXM2b0lLejdSYUtTODZIeFJML1NXUHljT1p0M0JOMlFqanhsVHMzUFNZ?=
- =?utf-8?B?OTVKZGJaYXd0amlHYURWczN3OFZmMXBtRUt4clRvSFE0NmRYZnk5N2hpZ096?=
- =?utf-8?B?RFJWZkJDY0hFbjFSVmZvOHdoalNqQ2dNUnFHS2lOTHU1bEUxRkNKYzE1Tkp1?=
- =?utf-8?B?dXV6NVhLVWdpMzYyVlAyV3p2dnJrVk9tNU4xZk5XQTh0TWdVT1NndFg3cXp6?=
- =?utf-8?B?WmJkZUsycnVvbjk3RVgrT1dmK2JROVZoa0RmQUkwdFVqNUs1b0VGVzBaTzcv?=
- =?utf-8?B?Y1ZSbkZMYjU3Z05vY0k4QnpSc0dSRWpjQlBFWTV2d0JORHNncHE2NFkyMlBm?=
- =?utf-8?B?YnlhVjhzS1hOMDlPeEdTNVo0QUpsYU9QZ1V2ZTVGSFVlU0tyS0xZeUtTbExC?=
- =?utf-8?B?aXBsSW1kK1NvUTl0VDVDTzE3WjZGTktHSm1IcWs4STJ6bldJdTlQQUVZUzZB?=
- =?utf-8?B?eWlQclYxbWxCMVphdG1qdDF1bnduUXhwV3I3bDZUNXFwa0RiN1BKdllncFdx?=
- =?utf-8?B?NlZTL0NJY3ZMN3JsbUNzNUlPY3JWdlJaS2dCL0U4SURGSzZHcUl4QjJCbUov?=
- =?utf-8?B?MnVDRTBNMXpPQTJPa3dHN2JWUC93Z2ZCeERiemdRTTFTL3JsTERuM243cU5u?=
- =?utf-8?B?WlVOWEhJUlFkQzFZV09Va2dGa1lUaEQ4VkdDbkh2UXhESVkxbERxWC9HTTc4?=
- =?utf-8?B?Z0dTZW5kWUljcjhNeFBwZHRZczlYYnpMeC8yaFRuMWhNNEFraXA1ZWtMa2Zu?=
- =?utf-8?B?QjRmclpDTm4rRnp2d2w0TE1RK291Zm5KVGFUWmhGV3RZdWVuRXF6d2xaVUhW?=
- =?utf-8?B?eEpyQVM4eVJVczY3RktLK1k3dm1PWGJra0xEVjkrWFN0dzZ2ZGIxdSs2M0FE?=
- =?utf-8?B?KzIzQS81MndlaDBGcHgramwza3R1S0lsUmZ1SlNxQTMzNjZHNlI5eEh0NUxw?=
- =?utf-8?B?N0NFZ2tqdVUxS1ZrYzhSVHBUODd1a3hMaGhVc2VHdTlVNjlwdjFaM3ltY0pG?=
- =?utf-8?B?YkUxUUdiQU12K05sLzl5cWF0VlZlSGZjM0RxWGZMNjQrQXM0Z1BiT2J6cXM4?=
- =?utf-8?B?OFA3akQrSE9qYzc5ZEdwRTNJeHJXeFAxNThLNWhxNlNBaFQ0NzFWRnk3ajho?=
- =?utf-8?B?N1NTN2hiWkJwa0xZSE1PdTJEMFNHY0k2RHBhR1JZa3QwSW9pQ01jTXJTOWxk?=
- =?utf-8?B?UGlkaUJXMlNsQkE4dXJ5TVBkdFJvekt5WUJNdElrNHpQRWovdFhJWStaQnpw?=
- =?utf-8?B?RmF1VVRxYkxndGQrZ0drcVdGTE9kQTlwMVp0SmxYUlkrQ1ZiTUxCbzRHTXNR?=
- =?utf-8?B?a0NLb0VBb01ody9Xa2VscTc3aGw3SDNQUEpodFp5RGl5cTFBdWQ1NEw4SzJP?=
- =?utf-8?B?em0wLzZQaXpyMDVTazU4YS9EZ0V5WGlncWxUUng1Q1l6RmdNV3JCSTFZZll2?=
- =?utf-8?B?ZFBVMm9vTzEvNFJRejN1NDZsd24rZmt3MFZVeHMrNGE1R1dGMGk3SHBGWG9I?=
- =?utf-8?B?WSt3WXNpdWZNQjJ3eHZpZ3pxazZqUGt3WWdCWFJnc25WeGIxelNSNFdVdzIx?=
- =?utf-8?B?N25BMlVWK0lRT2hCMlBHMUEzSCtqQURFQVNEL1hvMnJlSHIrZWVQL3V1eGI5?=
- =?utf-8?B?R0o3a1A1MnA1YUNuZkZjbnE1L3MyOW5uaU5yWkhVUm5HTmZyUENCQnFtMTlT?=
- =?utf-8?B?YS8yUllid0xBQWtUQk5FS05xMTJqSHBIRlRiUnF1ai82cHlrVkNaWStJT2Fx?=
- =?utf-8?B?VVgzclV1cis5MVlmcXZNS002eWQ4UlErZzNEeXRCM1dwdVZ1R2xTcHF5VFk0?=
- =?utf-8?B?eDZCWUNoTWRGTXVDclk3SEg4Nzc1bnVEVkZCWElJdUNxWHllZHRoWXc2MWdS?=
- =?utf-8?B?ZERwcHJmUEI0eUFsL0doKzhoVHNIRkpOODNtVWVucFVjY0lJWUQxRFoyYnJi?=
- =?utf-8?B?M2VzNzFMS3kyWWxhamhzQzlqRW04NGt4WEprQ2NzUHVzYklIUmZrUGJMS3VR?=
- =?utf-8?B?NEwxSjF0dzVlWFRMTmtrYTRqSHFQUUl3YU5pS2ZnMlErOVNpeE96ZHdKak0z?=
- =?utf-8?B?dUg1WVZxRGQ1SDNtenJydTdEQ1V2NVE4UFBaVlFNNHc0c3lvSVdDcS9xRkty?=
- =?utf-8?B?bUszUms0UUtmcFdWMkNRVU44dkM3Y1dJNFdDTzZhMi9SL2NxR24wZlU1YXpF?=
- =?utf-8?B?akcxTU9pVFRwVm5SU1FFc1V0dWkwN3l0WHZ5MC9wd3dwTDd3bGxvR0hZQVdm?=
- =?utf-8?Q?QGSLUkEzon9HV+bobpiCxkxw79FLiAtxcpu8F?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb93f5d7-21ae-4195-ba95-08de57a8384c
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB7277.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 22:15:14.5436
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(1800799024)(82310400026)(35042699022)(36860700013)(376014)(7416014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 22:18:54.8190
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x6yiW5ctcLv968C3EMbtZ48hs0UU5r8g/2yLV1CXPAdu5NYzeRi+N6cgwZMhkhIoDTphl/otUG7TCJApdut9CA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8880
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4560f5df-295a-43f8-e7a3-08de57a8bbbd
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM3PEPF00009BA2.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB8358
 
-On 1/20/26 07:35, Jason Gunthorpe wrote:
-> On Mon, Jan 19, 2026 at 03:09:00PM -0500, Zi Yan wrote:
->>> diff --git a/mm/internal.h b/mm/internal.h
->>> index e430da900430a1..a7d3f5e4b85e49 100644
->>> --- a/mm/internal.h
->>> +++ b/mm/internal.h
->>> @@ -806,14 +806,21 @@ static inline void prep_compound_head(struct page *page, unsigned int order)
->>>  		atomic_set(&folio->_pincount, 0);
->>>  		atomic_set(&folio->_entire_mapcount, -1);
->>>  	}
->>> -	if (order > 1)
->>> +	if (order > 1) {
->>>  		INIT_LIST_HEAD(&folio->_deferred_list);
->>> +	} else {
->>> +		folio->mapping = NULL;
->>> +#ifdef CONFIG_MEMCG
->>> +		folio->memcg_data = 0;
->>> +#endif
->>> +	}
->>
->> prep_compound_head() is only called on >0 order pages. The above
->> code means when order == 1, folio->mapping and folio->memcg_data are
->> assigned NULL.
-> 
-> OK, fair enough, the conditionals would have to change and maybe it
-> shouldn't be called "compound_head" if it also cleans up normal pages.
-> 
->>>  static inline void prep_compound_tail(struct page *head, int tail_idx)
->>>  {
->>>  	struct page *p = head + tail_idx;
->>>
->>> +	p->flags.f &= ~0xffUL;	/* Clear possible order, page head */
->>
->> No one cares about tail page flags if it is not checked in check_new_page()
->> from mm/page_alloc.c.
-> 
-> At least page_fixed_fake_head() does check PG_head in some
-> configurations. It does seem safer to clear it. Possibly order is
-> never used, but it is free to clear it.
-> 
->>> -	if (order)
->>> -		prep_compound_page(page, order);
->>> +	prep_compound_page(page, order);
->>
->> prep_compound_page() should only be called for >0 order pages. This creates
->> another weirdness in device pages by assuming all pages are
->> compound.
-> 
-> OK
-> 
->>> +	folio = page_folio(page);
->>> +	folio->pgmap = pgmap;
->>> +	folio_lock(folio);
->>> +	folio_set_count(folio, 1);
->>
->> /* clear possible previous page->mapping */
->> folio->mapping = NULL;
->>
->> /* clear possible previous page->_nr_pages */
->> #ifdef CONFIG_MEMCG
->> 	folio->memcg_data = 0;
->> #endif
-> 
-> This is reasonable too, but prep_compound_head() was doing more than
-> that, it is also clearing the order, and this needs to clear the head
-> bit.  That's why it was apppealing to reuse those functions, but you
-> are right they are not ideal.
-> 
-> I suppose we want some prep_single_page(page) and some reorg to share
-> code with the other prep function.
-> 
+Hi Will,
 
-There is __init_zone_device_page() and __init_single_page(), 
-it does zero out the page and sets the zone, pfn, nid among other things.
-I propose we use the current version with zone_device_free_folio() as is.
+> On Sun, Dec 14, 2025 at 11:22:45AM +0000, Yeoreum Yun wrote:
+> > Current futex atomic operations are implemented with ll/sc instructions
+> > and clearing PSTATE.PAN.
+> >
+> > Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
+> > also atomic operation for user memory access in kernel it doesn't need
+> > to clear PSTATE.PAN bit anymore.
+> >
+> > With theses instructions some of futex atomic operations don't need to
+> > be implmented with ldxr/stlxr pair instead can be implmented with
+> > one atomic operation supplied by FEAT_LSUI.
+> >
+> > However, some of futex atomic operation don't have matched
+> > instructuion i.e) eor or cmpxchg with word size.
+> > For those operation, uses cas{al}t to implement them.
+> >
+> > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> > ---
+> >  arch/arm64/include/asm/futex.h | 180 ++++++++++++++++++++++++++++++++-
+> >  1 file changed, 178 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> > index f8cb674bdb3f..6778ff7e1c0e 100644
+> > --- a/arch/arm64/include/asm/futex.h
+> > +++ b/arch/arm64/include/asm/futex.h
+> > @@ -9,6 +9,8 @@
+> >  #include <linux/uaccess.h>
+> >  #include <linux/stringify.h>
+> >
+> > +#include <asm/alternative.h>
+> > +#include <asm/alternative-macros.h>
+> >  #include <asm/errno.h>
+> >
+> >  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> > @@ -86,11 +88,185 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> >  	return ret;
+> >  }
+> >
+> > +#ifdef CONFIG_AS_HAS_LSUI
+> > +
+> > +/*
+> > + * When the LSUI feature is present, the CPU also implements PAN, because
+> > + * FEAT_PAN has been mandatory since Armv8.1. Therefore, there is no need to
+> > + * call uaccess_ttbr0_enable()/uaccess_ttbr0_disable() around each LSUI
+> > + * operation.
+> > + */
+>
+> I'd prefer not to rely on these sorts of properties because:
+>
+>   - CPU bugs happen all the time
+>   - Virtualisation and idreg overrides mean illegal feature combinations
+>     can show up
+>   - The architects sometimes change their mind
+>
+> So let's either drop the assumption that we have PAN if LSUI *or* actually
+> test that someplace during feature initialisation.
 
-We can figure out if __init_zone_device_page() can be reused or refactored
-for the purposes to doing this with core MM API's
+Thanks for detail explain. I'll drop the my silly assumption and
+call the uaccess_ttbr0_enable()/disable() then.
 
+>
+> > +
+> > +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> > +
+> > +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
+> > +static __always_inline int						\
+> > +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> > +{									\
+> > +	int ret = 0;							\
+> > +	int oldval;							\
+> > +									\
+> > +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
+> > +	__LSUI_PREAMBLE							\
+> > +"1:	" #asm_op #mb "	%w3, %w2, %1\n"					\
+>
+> What's the point in separating the barrier suffix from the rest of the
+> instruction mnemonic? All the callers use -AL.
 
->> This patch mixed the concept of page and folio together, thus
->> causing confusion. Core MM sees page and folio two separate things:
->> 1. page is the smallest internal physical memory management unit,
->> 2. folio is an abstraction on top of pages, and other abstractions can be
->>    slab, ptdesc, and more (https://kernelnewbies.org/MatthewWilcox/Memdescs).
-> 
-> I think the users of zone_device_page_init() are principally trying to
-> create something that can be installed in a non-special PTE. Meaning
-> the output is always a folio because it is going to be read as a folio
-> in the page walkers.
-> 
-> Thus, the job of this function is to take the memory range starting at
-> page for 2^order and turn it into a single valid folio with refcount
-> of 1.
-> 
->> If device pages have to initialize on top of pages with obsolete states,
->> at least it should be first initialized as pages, then as folios to avoid
->> confusion.
-> 
-> I don't think so. It should do the above job efficiently and iterate
-> over the page list exactly once.
-> 
-> Jason
+Agree. I'll remove this.
 
-Agreed
+>
+> > +"2:\n"									\
+> > +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
+> > +	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
+> > +	: "r" (oparg)							\
+> > +	: "memory");							\
+> > +									\
+> > +	if (!ret)							\
+> > +		*oval = oldval;						\
+> > +									\
+> > +	return ret;							\
+> > +}
+> > +
+> > +LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
+> > +LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
+> > +LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
+> > +LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
+> > +
+> > +static __always_inline int
+> > +__lsui_cmpxchg64(u64 __user *uaddr, u64 *oldval, u64 newval)
+> > +{
+> > +	int ret = 0;
+> > +
+> > +	asm volatile("// __lsui_cmpxchg64\n"
+> > +	__LSUI_PREAMBLE
+> > +"1:	casalt	%x2, %x3, %1\n"
+>
+>
+> How bizarre, they changed the order of the AL and T compared to SWPTAL.
+> Fair enough...
+>
+> Also, I don't think you need the 'x' prefix on the 64-bit variables.
 
-Balbir
+Right. I'll remove useless prefix.
+
+>
+> > +"2:\n"
+> > +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
+> > +	: "+r" (ret), "+Q" (*uaddr), "+r" (*oldval)
+> > +	: "r" (newval)
+> > +	: "memory");
+>
+> Don't you need to update *oldval here if the CAS didn't fault?
+
+No. if CAS doesn't make fault the oldval update already.
+
+>
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static __always_inline int
+> > +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> > +{
+> > +	u64 __user *uaddr64;
+> > +	bool futex_on_lo;
+> > +	int ret = -EAGAIN, i;
+> > +	u32 other, orig_other;
+> > +	union {
+> > +		struct futex_on_lo {
+> > +			u32 val;
+> > +			u32 other;
+> > +		} lo_futex;
+> > +
+> > +		struct futex_on_hi {
+> > +			u32 other;
+> > +			u32 val;
+> > +		} hi_futex;
+> > +
+> > +		u64 raw;
+> > +	} oval64, orig64, nval64;
+> > +
+> > +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
+> > +	futex_on_lo = (IS_ALIGNED((unsigned long)uaddr, sizeof(u64)) ==
+> > +			IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN));
+>
+> Just make LSUI depend on !CPU_BIG_ENDIAN in Kconfig. The latter already
+> depends on BROKEN and so we'll probably drop it soon anyway. There's
+> certainly no need to care about it for new features and it should simplify
+> the code you have here if you can assume little-endian.
+
+Thanks. then I'll enable LSUI feature only !CPU_BIG_ENDIAN.
+
+>
+> > +
+> > +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+> > +		if (get_user(oval64.raw, uaddr64))
+> > +			return -EFAULT;
+>
+> Since oldval is passed to us as an argument, can we get away with a
+> 32-bit get_user() here?
+
+It's not a probelm. but is there any sigificant difference?
+
+>
+> > +
+> > +		nval64.raw = oval64.raw;
+> > +
+> > +		if (futex_on_lo) {
+> > +			oval64.lo_futex.val = oldval;
+> > +			nval64.lo_futex.val = newval;
+> > +		} else {
+> > +			oval64.hi_futex.val = oldval;
+> > +			nval64.hi_futex.val = newval;
+> > +		}
+> > +
+> > +		orig64.raw = oval64.raw;
+> > +
+> > +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
+> > +			return -EFAULT;
+> > +
+> > +		if (futex_on_lo) {
+> > +			oldval = oval64.lo_futex.val;
+> > +			other = oval64.lo_futex.other;
+> > +			orig_other = orig64.lo_futex.other;
+> > +		} else {
+> > +			oldval = oval64.hi_futex.val;
+> > +			other = oval64.hi_futex.other;
+> > +			orig_other = orig64.hi_futex.other;
+> > +		}
+> > +
+> > +		if (other == orig_other) {
+> > +			ret = 0;
+> > +			break;
+> > +		}
+> > +	}
+> > +
+> > +	if (!ret)
+> > +		*oval = oldval;
+>
+> Shouldn't we set *oval to the value we got back from the CAS?
+
+Since it's a "success" case, the CAS return and oldval must be the same.
+That's why it doesn't matter to use got back from the CAS.
+Otherwise, it returns error and *oval doesn't matter for
+futex_atomic_cmpxchg_inatomic().
+
+>
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static __always_inline int
+> > +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
+> > +{
+> > +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
+>
+> Please a comment about the bitwise negation of oparg here as we're undoing
+> the one from the caller.
+
+I see. Thanks!
+
+>
+> > +}
+> > +
+> > +static __always_inline int
+> > +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
+> > +{
+> > +	u32 oldval, newval, val;
+> > +	int ret, i;
+> > +
+> > +	/*
+> > +	 * there are no ldteor/stteor instructions...
+> > +	 */
+> > +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+> > +		if (get_user(oldval, uaddr))
+> > +			return -EFAULT;
+> > +
+> > +		newval = oldval ^ oparg;
+> > +
+> > +		ret = __lsui_cmpxchg32(uaddr, oldval, newval, &val);
+> > +		if (ret)
+> > +			return ret;
+> > +
+> > +		if (val == oldval) {
+> > +			*oval = val;
+> > +			return 0;
+> > +		}
+> > +	}
+> > +
+> > +	return -EAGAIN;
+> > +}
+> > +
+> > +static __always_inline int
+> > +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> > +{
+> > +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+> > +}
+> > +
+> > +#define __lsui_llsc_body(op, ...)					\
+> > +({									\
+> > +	alternative_has_cap_likely(ARM64_HAS_LSUI) ?			\
+>
+> This doesn't seem like it should be the "likely" case just yet?
+
+Okay. I'll change with "unlikely"
+
+--
+Sincerely,
+Yeoreum Yun
 
