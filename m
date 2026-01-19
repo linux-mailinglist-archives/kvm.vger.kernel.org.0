@@ -1,131 +1,182 @@
-Return-Path: <kvm+bounces-68531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828A9D3B594
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 19:23:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5BDD3B5CD
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 19:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 406063009D67
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 18:23:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 869343042FF2
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 18:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F66274B5C;
-	Mon, 19 Jan 2026 18:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126DF36A016;
+	Mon, 19 Jan 2026 18:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kODgE/7I"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="adGq2lDw";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="adGq2lDw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76D1327C08;
-	Mon, 19 Jan 2026 18:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA7136BCE0
+	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 18:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768846986; cv=none; b=m5pZGptnFxU/+JXqU0kMlFY+mV77jtuWv/qyA+Vc77e4Qv8hf6wGe3ILhjscJ/H8teXr/LndlRHA1F3btZZYyPdgkWHR5d42JoqELaZqcIcMHqXF6clRjtvQ3PENT3ojAbtlhrZNu1TtjsgCZ8xzpODMVR0zsDIhuyr1xKqUm94=
+	t=1768847201; cv=none; b=eDKsRqjyHBAXoNsQzGXPKvHpwrSwsNRjrdnUManfF2YmgJ+g+Osetdrdew+ICMsfCcz5G7xfwnjGQkr9mm5aJelamyD98KzULJAw5rGdAb3oWWv8FUCPLus1XBgakpzlbrXBDuUCwUa3w0609rkIgYe/OuIxJI1N6bXT0VsQPQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768846986; c=relaxed/simple;
-	bh=Lii9Wo3zMBgNZu8BfSOY2bf+6SIZLbGpUqMsnL7Mo1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GLicmvxJj9QjXPXJPoOCVfdgTdMo9VaUflCIvfAlXpXBo+lgTdmIy+Ownhw5McaTmXdlUEd2bs1Tm1vxLt83vBIe+Us3WKO0n1l/e9eQBhC+FkSgXt6Do5yOlwKVWqP6oQNwMYouvGB3Vr1e+lhJAqsdEO0ZI+5Mx9wke1MxBV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kODgE/7I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 104A7C116C6;
-	Mon, 19 Jan 2026 18:23:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768846985;
-	bh=Lii9Wo3zMBgNZu8BfSOY2bf+6SIZLbGpUqMsnL7Mo1g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kODgE/7I98Q5Jmc8h+EJtQ/PsgbfKxiuG7+i/OKTqySamVeiXJ1ev5n9Tu8e8+7Am
-	 eWcBTByTaCuS0pN4zKkZls5MedNPAn4I+Hsbq1SmcbRlCuZl8IS6k6KUcZhOQ5cwPq
-	 QEvQx8PMi6vRf/Cyws5p8kXrMKU7fcqSObgUcH6YasVT8Do8FUt//3CHGrsQYSZI57
-	 JjtDLmYAxiJIjWc5xqiuIHK7ya1LGuV3tOBOZ43uv2pzg/gzqVH+Fg7JPomEkrSv71
-	 pD+WzkHxHEeR8S/rk6YdY1H6mMFPgde202sJs+pg6vR5YElq7bO8BTz55Zfg/qynqM
-	 P7D/uGSD1I3oQ==
-Date: Mon, 19 Jan 2026 20:23:00 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex@shazbot.org>, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] iommufd: Require DMABUF revoke semantics
-Message-ID: <20260119182300.GO13201@unreal>
-References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
- <20260118-dmabuf-revoke-v2-3-a03bb27c0875@nvidia.com>
- <20260119165951.GI961572@ziepe.ca>
+	s=arc-20240116; t=1768847201; c=relaxed/simple;
+	bh=tr7TfSRZl/vr1EMw55Y8Odfg8JIqcA+4106PISBo9Lk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G8Lx06q3zG4UmEmvwVQYe6rcFxqLV3gLgvdrJWvy/5t0N63PogOSD2DmJcb2QYp5VMp+JFT5wdyZG2kTbxXYBR4rMVYWSXEMhOmZ9EibmQkWcfS3R7QVtnppcEoRr7ZyRp87FxS9VZanpX9bdIvqfVcL3ErE+qKek9R57Sfs9ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=adGq2lDw; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=adGq2lDw; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CDD235BCCE;
+	Mon, 19 Jan 2026 18:26:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1768847195; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=es6/9iazupCDI6/7lXEp32/GJOPok2cUpRLmpWvKLkM=;
+	b=adGq2lDw/ziTP/sy6wRsMUsI9ByF14hQ6d0dKFUjC3IKDHScmmeOQqchV3ghgQzs6QqArp
+	7Rq6Rh1gvW5LvZjxrzfFc2chPq5Ak1+BhW51vLfvoPWnTdC1j+0l05Ln6G2pjOcrIqPmr7
+	oNCARBaKZXFCT2zf+k1qE+41DTi8lMs=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=adGq2lDw
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1768847195; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=es6/9iazupCDI6/7lXEp32/GJOPok2cUpRLmpWvKLkM=;
+	b=adGq2lDw/ziTP/sy6wRsMUsI9ByF14hQ6d0dKFUjC3IKDHScmmeOQqchV3ghgQzs6QqArp
+	7Rq6Rh1gvW5LvZjxrzfFc2chPq5Ak1+BhW51vLfvoPWnTdC1j+0l05Ln6G2pjOcrIqPmr7
+	oNCARBaKZXFCT2zf+k1qE+41DTi8lMs=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 266903EA63;
+	Mon, 19 Jan 2026 18:26:35 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 1xrIB1t3bmmpaAAAD6G6ig
+	(envelope-from <jgross@suse.com>); Mon, 19 Jan 2026 18:26:35 +0000
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Juergen Gross <jgross@suse.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	xen-devel@lists.xenproject.org,
+	Denis Efremov <efremov@linux.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v4 0/6] x86: Cleanups around slow_down_io()
+Date: Mon, 19 Jan 2026 19:26:26 +0100
+Message-ID: <20260119182632.596369-1-jgross@suse.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260119165951.GI961572@ziepe.ca>
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[suse.com:dkim,suse.com:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:mid];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_TLS_ALL(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_TRACE(0.00)[suse.com:+]
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Rspamd-Queue-Id: CDD235BCCE
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
 
-On Mon, Jan 19, 2026 at 12:59:51PM -0400, Jason Gunthorpe wrote:
-> On Sun, Jan 18, 2026 at 02:08:47PM +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > IOMMUFD does not support page fault handling, and after a call to
-> > .invalidate_mappings() all mappings become invalid. Ensure that
-> > the IOMMUFD DMABUF importer is bound to a revoke‑aware DMABUF exporter
-> > (for example, VFIO).
-> > 
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  drivers/iommu/iommufd/pages.c | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
-> > index 76f900fa1687..a5eb2bc4ef48 100644
-> > --- a/drivers/iommu/iommufd/pages.c
-> > +++ b/drivers/iommu/iommufd/pages.c
-> > @@ -1501,16 +1501,22 @@ static int iopt_map_dmabuf(struct iommufd_ctx *ictx, struct iopt_pages *pages,
-> >  		mutex_unlock(&pages->mutex);
-> >  	}
-> >  
-> > -	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
-> > +	rc = dma_buf_pin(attach);
-> >  	if (rc)
-> >  		goto err_detach;
-> >  
-> > +	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
-> > +	if (rc)
-> > +		goto err_unpin;
-> > +
-> >  	dma_resv_unlock(dmabuf->resv);
-> >  
-> >  	/* On success iopt_release_pages() will detach and put the dmabuf. */
-> >  	pages->dmabuf.attach = attach;
-> >  	return 0;
-> 
-> Don't we need an explicit unpin after unmapping?
+While looking at paravirt cleanups I stumbled over slow_down_io() and
+the related REALLY_SLOW_IO define.
 
-Yes, but this patch is going to be dropped in v3 because of this
-suggestion.
-https://lore.kernel.org/all/a397ff1e-615f-4873-98a9-940f9c16f85c@amd.com
+Do several cleanups, resulting in a deletion of REALLY_SLOW_IO and the
+io_delay() paravirt function hook.
 
-Thanks
+Patch 4 is removing the config options for selecting the default delay
+mechanism and sets the default to "no delay". This is in preparation of
+removing the io_delay() functionality completely, as suggested by Ingo
+Molnar.
 
+Patch 5 is adding an additional config option allowing to avoid
+building io_delay.c (default is still to build it).
 
-> 
-> Jason
+Changes in V2:
+- patches 2 and 3 of V1 have been applied
+- new patches 4 and 5
+
+Changes in V3:
+- rebase to tip/master kernel branch
+
+Changes in V4:
+- add patch 1 as prereq patch to the series
+
+Juergen Gross (6):
+  x86/irqflags: Fix build failure
+  x86/paravirt: Replace io_delay() hook with a bool
+  block/floppy: Don't use REALLY_SLOW_IO for delays
+  x86/io: Remove REALLY_SLOW_IO handling
+  x86/io_delay: Switch io_delay() default mechanism to "none"
+  x86/io_delay: Add config option for controlling build of io_delay.
+
+ arch/x86/Kconfig                      |  8 +++
+ arch/x86/Kconfig.debug                | 30 ----------
+ arch/x86/include/asm/floppy.h         | 31 ++++++++--
+ arch/x86/include/asm/io.h             | 19 ++++---
+ arch/x86/include/asm/irqflags.h       |  6 +-
+ arch/x86/include/asm/paravirt-base.h  |  6 ++
+ arch/x86/include/asm/paravirt.h       | 11 ----
+ arch/x86/include/asm/paravirt_types.h |  2 -
+ arch/x86/kernel/Makefile              |  3 +-
+ arch/x86/kernel/cpu/vmware.c          |  2 +-
+ arch/x86/kernel/io_delay.c            | 81 +--------------------------
+ arch/x86/kernel/kvm.c                 |  8 +--
+ arch/x86/kernel/paravirt.c            |  3 +-
+ arch/x86/kernel/setup.c               |  4 +-
+ arch/x86/xen/enlighten_pv.c           |  6 +-
+ drivers/block/floppy.c                |  2 -
+ 16 files changed, 63 insertions(+), 159 deletions(-)
+
+-- 
+2.52.0
+
 
