@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-68459-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B8DAD39CB3
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 04:11:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F5D8D39CE9
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 04:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6C5230081A9
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 03:11:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0165F3009952
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 03:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F47023EAA4;
-	Mon, 19 Jan 2026 03:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185E727FD4B;
+	Mon, 19 Jan 2026 03:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VTx53R+x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WBkRICnE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7535B1E32CF
-	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 03:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0FC23EAB7
+	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 03:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768792287; cv=none; b=oYqII7dYWYHrmUQg89OvczT4Wm0oc1fmypZNvcbhyJR6bJs4Pz5/rVdoek/5Qi2nqCle77MXX4FEGyYcURnGgC6hs8LmhebhVot+6Rw7ab0H1PgLlMkjjBQoQmJensJ2qpqDdMK9D92NxVAn5IbwyIfeNT9zRI0ITHIQfXt7GMg=
+	t=1768793446; cv=none; b=fY1UMqzpGOqLOCoL4Xt6lpep2LC3jBcPW9An6WrrtckZYLswqSQqjY1lRxiaaw3EIE2vtfWX7bQWp63m1HX6YNMUj96v8eX+BNPm+cs3BV6DbCCUq/OET6sakqmw3mcdysBfo08SQTQp/PtM72IC9HwVqhiGrNa7NSzhJVmCzRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768792287; c=relaxed/simple;
-	bh=K1sx3BAKiFng90kP/ICSmlmjhduH54u+7BGcWd2QHFQ=;
+	s=arc-20240116; t=1768793446; c=relaxed/simple;
+	bh=OfXCEHYlRp+JTpvjm0NXTxZjdeirxLS3UZ4QDUM1bVQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T6v4mbIHWCSILUf9Inyh+lAfpzBJ5M91Tpo3dSGJv3WYp7teclhnYHkYGye3ypBFF9O/UhAFEcaYYWZ/DyWCyROkmdc7ozBJJkaHRtx2krT2SPqxzX1yvCoyGeMO71SWryCQ2HgqorP0qnCkG7ijx8bTd1FcQ/841QqiGFZqzDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VTx53R+x; arc=none smtp.client-ip=198.175.65.17
+	 In-Reply-To:Content-Type; b=B15pmF1QnxOIMVQ6NFiP3p1qBQixt9nYVlE5QTlMSiAepwiVHpnu8iNbztynYLP4t9Jiv6bIh9w25yj/JHZqEJKKH2buNS4xDmkFb0BVzI/EDsj5cTrTi7j5HBv0dsRsk6tUejc7k/V+mLBDVWW64onSfSXENGz02wxt4dt8y2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WBkRICnE; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768792285; x=1800328285;
+  t=1768793444; x=1800329444;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=K1sx3BAKiFng90kP/ICSmlmjhduH54u+7BGcWd2QHFQ=;
-  b=VTx53R+xvZc1z+Zg5Ol4AUmv0ZwlA5VaLTxuB2NQuLkoBbpMMiyOjAWV
-   FJw2hYTBkaiPqhR3pAsbLQjacOa0wB7k+AJuNS+jBRSn07/vIG/qckias
-   v8iKK9dtwoPzVKQM2YG4adnW8ewgv9kDHVDWBd/NGb7UanyeLDPcGFH+d
-   B+48OWBr68v5Kq/OGo/FjAcP/7Fv+OYrO3o6qenE9qKZiYEYqt8gSrRSe
-   IW+FRlgEDjGV407r3sj1Si+JSXc8Mybvb81IlkO7Nqc2o0L94qdbgXPsh
-   TMfhrb6klS5THUlJpZFZEgXs5DRsLpmrbTI0RdNr7JUJIJw0Fd81DAayf
-   g==;
-X-CSE-ConnectionGUID: TrfVXZ4uQ4i3wCJwUbJNMg==
-X-CSE-MsgGUID: tKYZhq/TSM2sq8v3BNfwBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="69976530"
+  bh=OfXCEHYlRp+JTpvjm0NXTxZjdeirxLS3UZ4QDUM1bVQ=;
+  b=WBkRICnEWvQHQiFSHSx2aF1px5QWp0bOYqmyL1KnsX2PkwjzeYx0wc2O
+   DB3GJk+W8lDjC08e7WsIrUmsvgjdEc/Y5gbW3z6xG15omnTL7xRaxFwPo
+   AlZQkTyaN/XTTRCmJjvxOicXN2SGV9A1Q0melMUX96LJYa8fS80dN3V36
+   MQUUKplfqi6ko0AJ6j402j/LG4qsO4wdsXSaOQt1LaUMsyFOMaryQOLuV
+   dBF0CLHtU3gfMT7A8GQNEppY7c7ykCP812vi6QjoAMyukGIZsUP6VrfNI
+   BtLhUOVALTcBMtHGmd8U13nXFWYK/O9qit6IAKMM2RE2l3OyXf64JewjH
+   w==;
+X-CSE-ConnectionGUID: BBcs8y5wQDab5Pzkf04EbA==
+X-CSE-MsgGUID: IPxMn0YwT56pptGbd1Craw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="70050152"
 X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="69976530"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 19:11:25 -0800
-X-CSE-ConnectionGUID: pq4w/BB0TdmRE9okeyn6Qg==
-X-CSE-MsgGUID: VXs1+OQFTb+HGudxMhdzlw==
+   d="scan'208";a="70050152"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 19:30:44 -0800
+X-CSE-ConnectionGUID: nvZgRvrQSauorqIvBYZZPQ==
+X-CSE-MsgGUID: GP7cXY/CRMSv47o2nKtxtA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="205366230"
+   d="scan'208";a="243324046"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.14]) ([10.124.240.14])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 19:11:22 -0800
-Message-ID: <be80ed86-1d4f-4115-bff8-812df7083b7f@linux.intel.com>
-Date: Mon, 19 Jan 2026 11:11:19 +0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2026 19:30:42 -0800
+Message-ID: <56dd6056-e3e2-46cd-9426-87c7889bed49@linux.intel.com>
+Date: Mon, 19 Jan 2026 11:30:39 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,164 +65,68 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] target/i386: Support full-width writes for perf
- counters
+Subject: Re: [PATCH 6/7] target/i386: Make some PEBS features user-visible
 To: Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org,
  kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  Zhao Liu <zhao1.liu@intel.com>, Peter Xu <peterx@redhat.com>,
  Fabiano Rosas <farosas@suse.de>
 Cc: xiaoyao.li@intel.com, Dongli Zhang <dongli.zhang@oracle.com>
 References: <20260117011053.80723-1-zide.chen@intel.com>
- <20260117011053.80723-5-zide.chen@intel.com>
+ <20260117011053.80723-7-zide.chen@intel.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20260117011053.80723-5-zide.chen@intel.com>
+In-Reply-To: <20260117011053.80723-7-zide.chen@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 On 1/17/2026 9:10 AM, Zide Chen wrote:
-> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Populate selected PEBS feature names in FEAT_PERF_CAPABILITIES to make
+> the corresponding bits user-visible CPU feature knobs, allowing them to
+> be explicitly enabled or disabled via -cpu +/-<feature>.
 >
-> If IA32_PERF_CAPABILITIES.FW_WRITE (bit 13) is set, each general-
-> purpose counter IA32_PMCi (starting at 0xc1) is accompanied by a
-> corresponding alias MSR starting at 0x4c1 (IA32_A_PMC0), which are
-> 64-bit wide.
+> Once named, these bits become part of the guest CPU configuration
+> contract.  If a VM is configured with such a feature enabled, migration
+> to a destination that does not support the feature may fail, as the
+> destination cannot honor the guest-visible CPU model.
 >
-> The legacy IA32_PMCi MSRs are not full-width and their effective width
-> is determined by CPUID.0AH:EAX[23:16].
+> The PEBS_FMT bits are intentionally not exposed. They are not meaningful
+> as user-visible features, and QEMU registers CPU features as boolean
+> QOM properties, which makes them unsuitable for representing and
+> checking numeric capabilities.
+
+Currently KVM supports user space sets PEBS_FMT (see vmx_set_msr()), but
+just requires the guest PEBS_FMT is identical with host PEBS_FMT.
+
+IIRC, many places in KVM judges whether guest PEBS is enabled by checking
+the guest PEBS_FMT. If we don't expose PEBS_FMT to user space, how does KVM
+get the guest PEBS_FMT?
+
+
 >
-> Since these two sets of MSRs are aliases, when IA32_A_PMCi is supported
-> it is safe to use it for save/restore instead of the legacy MSRs,
-> regardless of whether the hypervisor uses the legacy or the 64-bit
-> counterpart.
->
-> Full-width write is a user-visible feature and can be disabled
-> individually.
->
-> Reduce MAX_GP_COUNTERS from 18 to 15 to avoid conflicts between the
-> full-width MSR range and MSR_MCG_EXT_CTL.  Current CPUs support at most
-> 10 general-purpose counters, so 15 is sufficient for now and leaves room
-> for future expansion.
->
-> Bump minimum_version_id to avoid migration from older QEMU, as this may
-> otherwise cause VMState overflow. This also requires bumping version_id,
-> which prevents migration to older QEMU as well.
->
+> Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 > Signed-off-by: Zide Chen <zide.chen@intel.com>
 > ---
->  target/i386/cpu.h     |  5 ++++-
->  target/i386/kvm/kvm.c | 19 +++++++++++++++++--
->  target/i386/machine.c |  4 ++--
->  3 files changed, 23 insertions(+), 5 deletions(-)
+>  target/i386/cpu.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 0b480c631ed0..e7cf4a7bd594 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -421,6 +421,7 @@ typedef enum X86Seg {
->  
->  #define MSR_IA32_PERF_CAPABILITIES      0x345
->  #define PERF_CAP_LBR_FMT                0x3f
-> +#define PERF_CAP_FULL_WRITE             (1U << 13)
->  
->  #define MSR_IA32_TSX_CTRL		0x122
->  #define MSR_IA32_TSCDEADLINE            0x6e0
-> @@ -448,6 +449,8 @@ typedef enum X86Seg {
->  #define MSR_IA32_SGXLEPUBKEYHASH3       0x8f
->  
->  #define MSR_P6_PERFCTR0                 0xc1
-> +/* Alternative perfctr range with full access. */
-> +#define MSR_IA32_PMC0                   0x4c1
->  
->  #define MSR_IA32_SMBASE                 0x9e
->  #define MSR_SMI_COUNT                   0x34
-> @@ -1740,7 +1743,7 @@ typedef struct {
->  #endif
->  
->  #define MAX_FIXED_COUNTERS 3
-> -#define MAX_GP_COUNTERS    (MSR_IA32_PERF_STATUS - MSR_P6_EVNTSEL0)
-> +#define MAX_GP_COUNTERS    15
-
-I suppose this is good enough for AMD CPUs, but need AMD guys to double
-confirm. Thanks.
-
-
->  
->  #define NB_OPMASK_REGS 8
->  
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index e81fa46ed66c..530f50e4b218 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -4049,6 +4049,12 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
->          }
->  
->          if (has_architectural_pmu_version > 0) {
-> +            uint32_t perf_cntr_base = MSR_P6_PERFCTR0;
-> +
-> +            if (env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_FULL_WRITE) {
-> +                perf_cntr_base = MSR_IA32_PMC0;
-> +            }
-> +
->              if (has_architectural_pmu_version > 1) {
->                  /* Stop the counter.  */
->                  kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
-> @@ -4061,7 +4067,7 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
->                                    env->msr_fixed_counters[i]);
->              }
->              for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-> -                kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i,
-> +                kvm_msr_entry_add(cpu, perf_cntr_base + i,
->                                    env->msr_gp_counters[i]);
->                  kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i,
->                                    env->msr_gp_evtsel[i]);
-> @@ -4582,6 +4588,12 @@ static int kvm_get_msrs(X86CPU *cpu)
->          kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
->      }
->      if (has_architectural_pmu_version > 0) {
-> +        uint32_t perf_cntr_base = MSR_P6_PERFCTR0;
-> +
-> +        if (env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_FULL_WRITE) {
-> +            perf_cntr_base = MSR_IA32_PMC0;
-> +        }
-> +
->          if (has_architectural_pmu_version > 1) {
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-> @@ -4591,7 +4603,7 @@ static int kvm_get_msrs(X86CPU *cpu)
->              kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
->          }
->          for (i = 0; i < num_architectural_pmu_gp_counters; i++) {
-> -            kvm_msr_entry_add(cpu, MSR_P6_PERFCTR0 + i, 0);
-> +            kvm_msr_entry_add(cpu, perf_cntr_base + i, 0);
->              kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i, 0);
->          }
->      }
-> @@ -4920,6 +4932,9 @@ static int kvm_get_msrs(X86CPU *cpu)
->          case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR0 + MAX_GP_COUNTERS - 1:
->              env->msr_gp_counters[index - MSR_P6_PERFCTR0] = msrs[i].data;
->              break;
-> +        case MSR_IA32_PMC0 ... MSR_IA32_PMC0 + MAX_GP_COUNTERS - 1:
-> +            env->msr_gp_counters[index - MSR_IA32_PMC0] = msrs[i].data;
-> +            break;
->          case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL0 + MAX_GP_COUNTERS - 1:
->              env->msr_gp_evtsel[index - MSR_P6_EVNTSEL0] = msrs[i].data;
->              break;
-> diff --git a/target/i386/machine.c b/target/i386/machine.c
-> index 1125c8a64ec5..7d08a05835fc 100644
-> --- a/target/i386/machine.c
-> +++ b/target/i386/machine.c
-> @@ -685,8 +685,8 @@ static bool pmu_enable_needed(void *opaque)
->  
->  static const VMStateDescription vmstate_msr_architectural_pmu = {
->      .name = "cpu/msr_architectural_pmu",
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
->      .needed = pmu_enable_needed,
->      .fields = (const VMStateField[]) {
->          VMSTATE_UINT64(env.msr_fixed_ctr_ctrl, X86CPU),
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index f1ac98970d3e..fc6a64287415 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1618,10 +1618,10 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>          .type = MSR_FEATURE_WORD,
+>          .feat_names = {
+>              NULL, NULL, NULL, NULL,
+> +            NULL, NULL, "pebs-trap", "pebs-arch-reg"
+>              NULL, NULL, NULL, NULL,
+> -            NULL, NULL, NULL, NULL,
+> -            NULL, "full-width-write", NULL, NULL,
+> -            NULL, NULL, NULL, NULL,
+> +            NULL, "full-width-write", "pebs-baseline", NULL,
+> +            NULL, "pebs-timing-info", NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, NULL, NULL,
 
