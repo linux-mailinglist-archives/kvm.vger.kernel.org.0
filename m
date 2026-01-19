@@ -1,45 +1,45 @@
-Return-Path: <kvm+bounces-68508-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68509-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60AAAD3A936
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 13:42:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E61D3A9DB
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 14:03:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE8663099404
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 12:39:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65F6930B30B4
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 13:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636A235C1B2;
-	Mon, 19 Jan 2026 12:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E4536404E;
+	Mon, 19 Jan 2026 13:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9YcDKgs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="scELuI2G"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE28630BB91;
-	Mon, 19 Jan 2026 12:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2513A2D1911;
+	Mon, 19 Jan 2026 13:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826360; cv=none; b=K/l2aBq6/n5AyrnjWZAljigBs1N+9RViAJ26jxK8pjbHXpCAw41Db37mls03f+x/mFXk09jaqlNwNhaFCEUV+8jOv5ry4ZKo4X6TMGBv/qLovojh6e4sAZLahuPzMoY9N3ajtUHsOkYvOPUyA6j41viRk/9nzMFhpRi+8uD2b4g=
+	t=1768827769; cv=none; b=s0Y/7nYn/seoOic9UacZgbnI7CFrrJoPJh33Z/lmhrh/h4hwpXM8qNCuOG8EyQPcMPUiMGCOWzjwOHgTnaiK5Z/rFCNOl0/XityeBdCs8qNgdOfxdJCpkd+Bk13PJzzVmaklVYBKU7HoCgjNy7C70UjlJeTHwQ+SshPi0F7strI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826360; c=relaxed/simple;
-	bh=Xp09gWC1E9OCNc+qqpGNdGNtAiJK448gBZX2ws7J5IM=;
+	s=arc-20240116; t=1768827769; c=relaxed/simple;
+	bh=cCxg8035viPJsz2XBq1ifbK2lrZlRG1OCR5jkwA4Q7M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kbyxEF5SWjo3ihzPLm18f/akNLDmOaMETnCfwpWWSm+07NbzB5qVAryBBrHTeNLG1c07AxReBWRVI2DcnK76zwYjcbE2ffLRQQ/J9qaIZZgJARNz1kzZCs33J3WS1Z/AO0sXG8t5bLQtbykZ3wjgzkKAaxx+wSSpl7yTVACtXyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9YcDKgs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92B42C116C6;
-	Mon, 19 Jan 2026 12:39:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=c81fhG4ygYH+vT7YVCEqQcKyv0CP5uvWX3X7FcxshvXsWmsNiyWaILvKH79sv9TQK+U+23BEnfqdg043p5X5GZXNcYQcRFncGRCy0oMs/l8EhGf1sTGgy24DRgiLP43pgm+wVWn0H70pN6ZDVM+WCvYIaY5Qt+WvBRd4GlBhyyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=scELuI2G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F21C116C6;
+	Mon, 19 Jan 2026 13:02:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768826360;
-	bh=Xp09gWC1E9OCNc+qqpGNdGNtAiJK448gBZX2ws7J5IM=;
+	s=k20201202; t=1768827768;
+	bh=cCxg8035viPJsz2XBq1ifbK2lrZlRG1OCR5jkwA4Q7M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L9YcDKgs50KwJZGaXvzaVA0Yp3w/krSD3QMG7JsW5vxsmyEn0KUELJ1jYPQAp5Z/v
-	 VBkiVWlhhvj3yrBeFE7OhgwN3fQgMqwg2qM1wvugj+u7yU3hEHleIqcitM0AbAt5Hg
-	 cHFkr3rvhS1/zB8uke+f/4cSX2lIRpkTECfd3aI1gUWCCq4znqSoT/Z5/etfG8ugEc
-	 FVa+8T0LNTI/SUEp9uIilTCH56WTr/putQpQsFiaX2+G2yEq70O9WPgkiEiVHDqLl2
-	 7VKdZRo2xsyc43V7hwP2oLaeEnGeODjuXz4lvCbwuLkEsglYtbUJGLHhwIzvy1iXhw
-	 jKmui593JczFg==
-Date: Mon, 19 Jan 2026 14:39:15 +0200
+	b=scELuI2GW3wYYW2ZENuAuFSaCJYKTwxSRnj2LRAqiwezAEBgiUivhNWu7wR7lsvrp
+	 JMiPt96eHalhzJp6zdj/VOztYexbL9CNdValyZad3QIoRwUqy2SNCBXDS5ZUmr2r5B
+	 3Q2LYZFjRo+TpYc7rFstqRHfbtMAFjLvRsXdqreX7yo2gyOr+diw1+LoloRIJTcEFf
+	 H3YM1NaUjV02Jdtuy+J3LR9/YjENpaZ6LVp9bzMZphF9Lehv4mUuhwTkRGGGpb2kcJ
+	 Ej14CRJRVv6csc6KuHzgzAe+xhdGGLSRvHHCsaiwAmERVJ+yIM5atMLB3FZRNKxX/w
+	 fRLM6YcjAxsPA==
+Date: Mon, 19 Jan 2026 15:02:44 +0200
 From: Leon Romanovsky <leon@kernel.org>
 To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
 Cc: Sumit Semwal <sumit.semwal@linaro.org>,
@@ -64,14 +64,12 @@ Cc: Sumit Semwal <sumit.semwal@linaro.org>,
 	virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
 	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] dma-buf: Rename .move_notify() callback to a
- clearer identifier
-Message-ID: <20260119123915.GM13201@unreal>
+Subject: Re: [PATCH v2 4/4] vfio: Add pinned interface to perform revoke
+ semantics
+Message-ID: <20260119130244.GN13201@unreal>
 References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
- <20260118-dmabuf-revoke-v2-1-a03bb27c0875@nvidia.com>
- <345b8dcb-5015-4801-b263-0dca4d1b3fca@amd.com>
- <20260119113809.GK13201@unreal>
- <871628d8-14b6-4d38-b05e-a33822f8d71b@amd.com>
+ <20260118-dmabuf-revoke-v2-4-a03bb27c0875@nvidia.com>
+ <bd37adf0-afd0-49c4-b608-7f9aa5994f7b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,177 +79,104 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <871628d8-14b6-4d38-b05e-a33822f8d71b@amd.com>
+In-Reply-To: <bd37adf0-afd0-49c4-b608-7f9aa5994f7b@amd.com>
 
-On Mon, Jan 19, 2026 at 01:00:18PM +0100, Christian König wrote:
-> On 1/19/26 12:38, Leon Romanovsky wrote:
-> > On Mon, Jan 19, 2026 at 11:22:27AM +0100, Christian König wrote:
-> >> On 1/18/26 13:08, Leon Romanovsky wrote:
-> >>> From: Leon Romanovsky <leonro@nvidia.com>
-> >>>
-> >>> Rename the .move_notify() callback to .invalidate_mappings() to make its
-> >>> purpose explicit and highlight that it is responsible for invalidating
-> >>> existing mappings.
-> >>>
-> >>> Suggested-by: Christian König <christian.koenig@amd.com>
-> >>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> >>
-> >> Reviewed-by: Christian König <christian.koenig@amd.com>
+On Mon, Jan 19, 2026 at 01:12:45PM +0100, Christian König wrote:
+> On 1/18/26 13:08, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
 > > 
-> > Thanks,
+> > DMABUF ->pin() interface is called when the DMABUF importer perform
+> > its DMA mapping, so let's use this opportunity to check if DMABUF
+> > exporter revoked its buffer or not.
 > > 
-> > BTW, I didn't update the various xxx_move_notify() functions to use
-> > xxx_invalidate_mappings() names. Should those be converted as well?
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_dmabuf.c | 16 ++++++++++++++++
+> >  1 file changed, 16 insertions(+)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> > index d4d0f7d08c53..af9c315ddf71 100644
+> > --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+> > +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> > @@ -20,6 +20,20 @@ struct vfio_pci_dma_buf {
+> >  	u8 revoked : 1;
+> >  };
+> >  
+> > +static int vfio_pci_dma_buf_pin(struct dma_buf_attachment *attachment)
+> > +{
+> > +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> > +
+> > +	dma_resv_assert_held(priv->dmabuf->resv);
+> > +
+> > +	return dma_buf_attachment_is_revoke(attachment) ? 0 : -EOPNOTSUPP;
 > 
-> No, those importer specific functions can keep their name.
+> It's probably better to do that check in vfio_pci_dma_buf_attach.
+
+I assume you are proposing to add this check in both
+vfio_pci_dma_buf_attach() and vfio_pci_dma_buf_pin(). Otherwise,
+importers that lack .invalidate_mapping() will invoke dma_buf_pin()
+and will not fail.
+
 > 
-> More important is the config option. Haven't thought about that one.
+> And BTW the function vfio_pci_dma_buf_move() seems to be broken:
 > 
-> Probably best if we either rename or completely remove that one, it was to keep the MOVE_NOTIFY functionality separate for initial testing but we have clearly supassed this long time ago.
+> void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
+> {
+>         struct vfio_pci_dma_buf *priv;
+>         struct vfio_pci_dma_buf *tmp;
+> 
+>         lockdep_assert_held_write(&vdev->memory_lock);
+> 
+>         list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm) {
+>                 if (!get_file_active(&priv->dmabuf->file))
+>                         continue;
+> 
+>                 if (priv->revoked != revoked) {
+>                         dma_resv_lock(priv->dmabuf->resv, NULL);
+>                         priv->revoked = revoked;
+>                         dma_buf_move_notify(priv->dmabuf);
+> 
+> A dma_buf_move_notify() just triggers asynchronous invalidation of the mapping!
+> 
+> You need to use dma_resv_wait() to wait for that to finish.
 
-I removed it and will send in v3.
+We (VFIO and IOMMUFD) followed the same pattern used in  
+amdgpu_bo_move_notify(), which also does not wait.
 
-commit 05ad416fc0b8c9b07714f9b23dbb038c991b819d
-Author: Leon Romanovsky <leonro@nvidia.com>
-Date:   Mon Jan 19 07:24:26 2026 -0500
+I'll add wait here.
 
-    dma-buf: Always build with DMABUF_MOVE_NOTIFY
-    
-    DMABUF_MOVE_NOTIFY was introduced in 2018 and has been marked as
-    experimental and disabled by default ever since. Six years later,
-    all new importers implement this callback.
-    
-    It is therefore reasonable to drop CONFIG_DMABUF_MOVE_NOTIFY and
-    always build DMABUF with support for it enabled.
+Thanks
 
-    Suggested-by: Christian König <christian.koenig@amd.com>
-    Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-
-diff --git a/drivers/dma-buf/Kconfig b/drivers/dma-buf/Kconfig
-index b46eb8a552d7..84d5e9b24e20 100644
---- a/drivers/dma-buf/Kconfig
-+++ b/drivers/dma-buf/Kconfig
-@@ -40,18 +40,6 @@ config UDMABUF
-          A driver to let userspace turn memfd regions into dma-bufs.
-          Qemu can use this to create host dmabufs for guest framebuffers.
- 
--config DMABUF_MOVE_NOTIFY
--       bool "Move notify between drivers (EXPERIMENTAL)"
--       default n
--       depends on DMA_SHARED_BUFFER
--       help
--         Don't pin buffers if the dynamic DMA-buf interface is available on
--         both the exporter as well as the importer. This fixes a security
--         problem where userspace is able to pin unrestricted amounts of memory
--         through DMA-buf.
--         This is marked experimental because we don't yet have a consistent
--         execution context and memory management between drivers.
--
- config DMABUF_DEBUG
-        bool "DMA-BUF debug checks"
-        depends on DMA_SHARED_BUFFER
-diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-index 59cc647bf40e..cd3b60ce4863 100644
---- a/drivers/dma-buf/dma-buf.c
-+++ b/drivers/dma-buf/dma-buf.c
-@@ -837,18 +837,10 @@ static void mangle_sg_table(struct sg_table *sg_table)
- 
- }
- 
--static inline bool
--dma_buf_attachment_is_dynamic(struct dma_buf_attachment *attach)
--{
--       return !!attach->importer_ops;
--}
--
- static bool
- dma_buf_pin_on_map(struct dma_buf_attachment *attach)
- {
--       return attach->dmabuf->ops->pin &&
--               (!dma_buf_attachment_is_dynamic(attach) ||
--                !IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY));
-+       return attach->dmabuf->ops->pin && !attach->importer_ops;
- }
- 
- /**
-@@ -1124,7 +1116,7 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *attach,
-        /*
-         * Importers with static attachments don't wait for fences.
-         */
--       if (!dma_buf_attachment_is_dynamic(attach)) {
-+       if (!attach->importer_ops) {
-                ret = dma_resv_wait_timeout(attach->dmabuf->resv,
-                                            DMA_RESV_USAGE_KERNEL, true,
-                                            MAX_SCHEDULE_TIMEOUT);
-diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
-index 863454148b28..349215549e8f 100644
---- a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
-+++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
-@@ -145,13 +145,9 @@ static int amdgpu_dma_buf_pin(struct dma_buf_attachment *attach)
-         * notifiers are disabled, only allow pinning in VRAM when move
-         * notiers are enabled.
-         */
--       if (!IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY)) {
--               domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
--       } else {
--               list_for_each_entry(attach, &dmabuf->attachments, node)
--                       if (!attach->peer2peer)
--                               domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
--       }
-+       list_for_each_entry(attach, &dmabuf->attachments, node)
-+               if (!attach->peer2peer)
-+                       domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
- 
-        if (domains & AMDGPU_GEM_DOMAIN_VRAM)
-                bo->flags |= AMDGPU_GEM_CREATE_CPU_ACCESS_REQUIRED;
-diff --git a/drivers/gpu/drm/amd/amdkfd/Kconfig b/drivers/gpu/drm/amd/amdkfd/Kconfig
-index 16e12c9913f9..a5d7467c2f34 100644
---- a/drivers/gpu/drm/amd/amdkfd/Kconfig
-+++ b/drivers/gpu/drm/amd/amdkfd/Kconfig
-@@ -27,7 +27,7 @@ config HSA_AMD_SVM
- 
- config HSA_AMD_P2P
-        bool "HSA kernel driver support for peer-to-peer for AMD GPU devices"
--       depends on HSA_AMD && PCI_P2PDMA && DMABUF_MOVE_NOTIFY
-+       depends on HSA_AMD && PCI_P2PDMA
-        help
-          Enable peer-to-peer (P2P) communication between AMD GPUs over
-          the PCIe bus. This can improve performance of multi-GPU compute
-diff --git a/drivers/gpu/drm/xe/tests/xe_dma_buf.c b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
-index 1f2cca5c2f81..c107687ef3c0 100644
---- a/drivers/gpu/drm/xe/tests/xe_dma_buf.c
-+++ b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
-@@ -22,8 +22,7 @@ static bool p2p_enabled(struct dma_buf_test_params *params)
- 
- static bool is_dynamic(struct dma_buf_test_params *params)
- {
--       return IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY) && params->attach_ops &&
--               params->attach_ops->invalidate_mappings;
-+       return params->attach_ops && params->attach_ops->invalidate_mappings;
- }
- 
- static void check_residency(struct kunit *test, struct xe_bo *exported,
-diff --git a/drivers/gpu/drm/xe/xe_dma_buf.c b/drivers/gpu/drm/xe/xe_dma_buf.c
-index 1b9cd043e517..ea370cd373e9 100644
---- a/drivers/gpu/drm/xe/xe_dma_buf.c
-+++ b/drivers/gpu/drm/xe/xe_dma_buf.c
-@@ -56,14 +56,10 @@ static int xe_dma_buf_pin(struct dma_buf_attachment *attach)
-        bool allow_vram = true;
-        int ret;
- 
--       if (!IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY)) {
--               allow_vram = false;
--       } else {
--               list_for_each_entry(attach, &dmabuf->attachments, node) {
--                       if (!attach->peer2peer) {
--                               allow_vram = false;
--                               break;
--                       }
-+       list_for_each_entry(attach, &dmabuf->attachments, node) {
-+               if (!attach->peer2peer) {
-+                       allow_vram = false;
-+                       break;
-                }
-        }
- 
+> 
+>                         dma_resv_unlock(priv->dmabuf->resv);
+>                 }
+>                 fput(priv->dmabuf->file);
+>         }
+> }
+> 
+> Regards,
+> Christian.
+> 
+> 
+> > +}
+> > +
+> > +static void vfio_pci_dma_buf_unpin(struct dma_buf_attachment *attachment)
+> > +{
+> > +	/* Do nothing */
+> > +}
+> > +
+> >  static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
+> >  				   struct dma_buf_attachment *attachment)
+> >  {
+> > @@ -76,6 +90,8 @@ static void vfio_pci_dma_buf_release(struct dma_buf *dmabuf)
+> >  }
+> >  
+> >  static const struct dma_buf_ops vfio_pci_dmabuf_ops = {
+> > +	.pin = vfio_pci_dma_buf_pin,
+> > +	.unpin = vfio_pci_dma_buf_unpin,
+> >  	.attach = vfio_pci_dma_buf_attach,
+> >  	.map_dma_buf = vfio_pci_dma_buf_map,
+> >  	.unmap_dma_buf = vfio_pci_dma_buf_unmap,
+> > 
+> 
 
