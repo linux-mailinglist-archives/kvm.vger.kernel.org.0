@@ -1,242 +1,257 @@
-Return-Path: <kvm+bounces-68506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80946D3A8F7
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 13:35:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60AAAD3A936
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 13:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC01A30949D5
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 12:34:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE8663099404
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 12:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D576D35A951;
-	Mon, 19 Jan 2026 12:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636A235C1B2;
+	Mon, 19 Jan 2026 12:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGRfcg9L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9YcDKgs"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABAB314D26
-	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 12:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE28630BB91;
+	Mon, 19 Jan 2026 12:39:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826053; cv=none; b=tMVNyDvYRRAhyr8nzO3GaQZlbvNqqPOfl1U3wh2LUBwycH5BPNsoyxTLBPWnca3PO3aDoa1aqWIr1eEHniO4Biy+rM+vMbR9LuQQvTMXSDQFJ9aXoQM5ecitTitBzwkNeBGbmhTh17y62Xf+8+9u7fVynVPcG4Xj/7FFEPjdckI=
+	t=1768826360; cv=none; b=K/l2aBq6/n5AyrnjWZAljigBs1N+9RViAJ26jxK8pjbHXpCAw41Db37mls03f+x/mFXk09jaqlNwNhaFCEUV+8jOv5ry4ZKo4X6TMGBv/qLovojh6e4sAZLahuPzMoY9N3ajtUHsOkYvOPUyA6j41viRk/9nzMFhpRi+8uD2b4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826053; c=relaxed/simple;
-	bh=pYAfipF2N3lSeZnWjsUTOBncQpMrZB1CykRBZPYQ5xI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZkwN9E+N1YUY8jkAAGUW8d3Z2hMDblLDGRzrOSRrk3EKR1jzwWFQ/1XD60N+y/xAYNOjEj8Itc+RCq4Y/kVhTWdNOfuN9jkRKJP5O44s03l7TaTuDTNo7FpCzeQqlR/VeFb5ypMswanJcFnqHHWiIBP79IVHz3vaSpjX9m9e/nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aGRfcg9L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8DB3C19423;
-	Mon, 19 Jan 2026 12:34:09 +0000 (UTC)
+	s=arc-20240116; t=1768826360; c=relaxed/simple;
+	bh=Xp09gWC1E9OCNc+qqpGNdGNtAiJK448gBZX2ws7J5IM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kbyxEF5SWjo3ihzPLm18f/akNLDmOaMETnCfwpWWSm+07NbzB5qVAryBBrHTeNLG1c07AxReBWRVI2DcnK76zwYjcbE2ffLRQQ/J9qaIZZgJARNz1kzZCs33J3WS1Z/AO0sXG8t5bLQtbykZ3wjgzkKAaxx+wSSpl7yTVACtXyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9YcDKgs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92B42C116C6;
+	Mon, 19 Jan 2026 12:39:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768826052;
-	bh=pYAfipF2N3lSeZnWjsUTOBncQpMrZB1CykRBZPYQ5xI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aGRfcg9LIKTmNK6O6Tj/beTft+2gzpqEOFc7uboDAoG6SbYvr2jnscNOBmTO6OIgk
-	 pZxoJy/nWZRtAqeYy3t/uvllodqBCkjlUWbh3mZEkkII6/NPkVDNLt3X1V/wp0ttb1
-	 jiWaGpWdNssXQ9x5oLc5fF8dnCe3Ty+4cq8NXO1JKAd1/Jkcx97oBnUh3amUQ872i+
-	 4TfpDA8HlOSQVVq4WTsAGqqRPObjI1x7V0X6Gqg/noy6MhwwYv1gfY9VDFsaRmk/ac
-	 u6JHRhEOSdOUhNx4C+ZPtmFZ39dhaQlUB/Voilc2Le5ULRQatQp2XeTm22UBA2XNrG
-	 xkuCfvPuQXP/Q==
-Message-ID: <67b7e428-5ed3-4794-b8c4-dcebf724972d@kernel.org>
-Date: Mon, 19 Jan 2026 13:34:07 +0100
+	s=k20201202; t=1768826360;
+	bh=Xp09gWC1E9OCNc+qqpGNdGNtAiJK448gBZX2ws7J5IM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L9YcDKgs50KwJZGaXvzaVA0Yp3w/krSD3QMG7JsW5vxsmyEn0KUELJ1jYPQAp5Z/v
+	 VBkiVWlhhvj3yrBeFE7OhgwN3fQgMqwg2qM1wvugj+u7yU3hEHleIqcitM0AbAt5Hg
+	 cHFkr3rvhS1/zB8uke+f/4cSX2lIRpkTECfd3aI1gUWCCq4znqSoT/Z5/etfG8ugEc
+	 FVa+8T0LNTI/SUEp9uIilTCH56WTr/putQpQsFiaX2+G2yEq70O9WPgkiEiVHDqLl2
+	 7VKdZRo2xsyc43V7hwP2oLaeEnGeODjuXz4lvCbwuLkEsglYtbUJGLHhwIzvy1iXhw
+	 jKmui593JczFg==
+Date: Mon, 19 Jan 2026 14:39:15 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex@shazbot.org>, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] dma-buf: Rename .move_notify() callback to a
+ clearer identifier
+Message-ID: <20260119123915.GM13201@unreal>
+References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
+ <20260118-dmabuf-revoke-v2-1-a03bb27c0875@nvidia.com>
+ <345b8dcb-5015-4801-b263-0dca4d1b3fca@amd.com>
+ <20260119113809.GK13201@unreal>
+ <871628d8-14b6-4d38-b05e-a33822f8d71b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/2] KVM: pfncache: Use kvm_gmem_get_pfn() for
- guest_memfd-backed memslots
-To: Takahiro Itazuri <itazur@amazon.com>, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Fuad Tabba <tabba@google.com>,
- Brendan Jackman <jackmanb@google.com>, David Woodhouse
- <dwmw2@infradead.org>, Paul Durrant <pdurrant@amazon.com>,
- Nikita Kalyazin <kalyazin@amazon.com>,
- Patrick Roy <patrick.roy@campus.lmu.de>,
- Takahiro Itazuri <zulinx86@gmail.com>
-References: <20251203144159.6131-1-itazur@amazon.com>
- <20251203144159.6131-2-itazur@amazon.com>
-From: "David Hildenbrand (Red Hat)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
-In-Reply-To: <20251203144159.6131-2-itazur@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <871628d8-14b6-4d38-b05e-a33822f8d71b@amd.com>
 
-On 12/3/25 15:41, Takahiro Itazuri wrote:
-> gfn_to_pfn_cache currently relies on hva_to_pfn(), which resolves PFNs
-> through GUP.  GUP assumes that the page has a valid direct-map PTE,
-> which is not true for guest_memfd created with
-> GUEST_MEMFD_FLAG_NO_DIRECT_MAP, because their direct-map PTEs are
-> explicitly invalidated via set_direct_map_valid_noflush().
+On Mon, Jan 19, 2026 at 01:00:18PM +0100, Christian König wrote:
+> On 1/19/26 12:38, Leon Romanovsky wrote:
+> > On Mon, Jan 19, 2026 at 11:22:27AM +0100, Christian König wrote:
+> >> On 1/18/26 13:08, Leon Romanovsky wrote:
+> >>> From: Leon Romanovsky <leonro@nvidia.com>
+> >>>
+> >>> Rename the .move_notify() callback to .invalidate_mappings() to make its
+> >>> purpose explicit and highlight that it is responsible for invalidating
+> >>> existing mappings.
+> >>>
+> >>> Suggested-by: Christian König <christian.koenig@amd.com>
+> >>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> >>
+> >> Reviewed-by: Christian König <christian.koenig@amd.com>
+> > 
+> > Thanks,
+> > 
+> > BTW, I didn't update the various xxx_move_notify() functions to use
+> > xxx_invalidate_mappings() names. Should those be converted as well?
 > 
-> Introduce a helper function, gpc_to_pfn(), that routes PFN lookup to
-> kvm_gmem_get_pfn() for guest_memfd-backed memslots (regardless of
-> whether GUEST_MEMFD_FLAG_NO_DIRECT_MAP is set), and otherwise falls
-> back to the existing hva_to_pfn() path. Rename hva_to_pfn_retry() to
-> gpc_to_pfn_retry() accordingly.
-
-Let's look into some details:
-
-The pfncache looks up a page from the page tables through GUP.
-
-To make sure that the looked up PFN can be safely used, it must we very 
-careful: after it looked up the page through hva_to_pfn(), it marks the 
-entry as "valid" and drops the folio reference obtained through 
-hva_to_pfn().
-
-At this point, nothing stops the page from getting unmapped from the 
-page tables to be freed etc.
-
-Of course, that sounds very dangerous.
-
-That's why the pfncache uses the (KVM) mmu_notifier framework to get 
-notified when the page was just unmapped from the KVM mmu while it 
-prepared the cache entry (see mmu_notifier_retry_cache()).
-
-But it also has to deal with the page getting removed (+possibly freed) 
-from the KVM MMU later, after we already have a valid entry in the cache.
-
-For this reason, gfn_to_pfn_cache_invalidate_start() is used to 
-invalidate any entries as they get unmapped from page tables.
-
-Now the big question: how is this supposed to work with gmem? I would 
-have expected that we would need similar invalidations etc. from gmem code?
-
-Imagine ftruncate() targets the gmem folio we just looked up, would be 
-we get an appropriate invalidate notification?
-
+> No, those importer specific functions can keep their name.
 > 
-> Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
-> ---
->   virt/kvm/pfncache.c | 34 +++++++++++++++++++++++-----------
->   1 file changed, 23 insertions(+), 11 deletions(-)
+> More important is the config option. Haven't thought about that one.
 > 
-> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-> index 728d2c1b488a..bf8d6090e283 100644
-> --- a/virt/kvm/pfncache.c
-> +++ b/virt/kvm/pfncache.c
-> @@ -152,22 +152,34 @@ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_s
->   	return kvm->mmu_invalidate_seq != mmu_seq;
->   }
->   
-> -static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
-> +static kvm_pfn_t gpc_to_pfn(struct gfn_to_pfn_cache *gpc, struct page **page)
->   {
-> -	/* Note, the new page offset may be different than the old! */
-> -	void *old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
-> -	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
-> -	void *new_khva = NULL;
-> -	unsigned long mmu_seq;
-> -	struct page *page;
-> +	if (kvm_slot_has_gmem(gpc->memslot)) {
-> +		kvm_pfn_t pfn;
-> +
-> +		kvm_gmem_get_pfn(gpc->kvm, gpc->memslot, gpa_to_gfn(gpc->gpa),
-> +				 &pfn, page, NULL);
-> +		return pfn;
-> +	}
->   
->   	struct kvm_follow_pfn kfp = {
->   		.slot = gpc->memslot,
->   		.gfn = gpa_to_gfn(gpc->gpa),
->   		.flags = FOLL_WRITE,
->   		.hva = gpc->uhva,
-> -		.refcounted_page = &page,
-> +		.refcounted_page = page,
->   	};
-> +	return hva_to_pfn(&kfp);
-> +}
-> +
-> +static kvm_pfn_t gpc_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
-> +{
-> +	/* Note, the new page offset may be different than the old! */
-> +	void *old_khva = (void *)PAGE_ALIGN_DOWN((uintptr_t)gpc->khva);
-> +	kvm_pfn_t new_pfn = KVM_PFN_ERR_FAULT;
-> +	void *new_khva = NULL;
-> +	unsigned long mmu_seq;
-> +	struct page *page;
->   
->   	lockdep_assert_held(&gpc->refresh_lock);
->   
-> @@ -206,7 +218,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
->   			cond_resched();
->   		}
->   
-> -		new_pfn = hva_to_pfn(&kfp);
-> +		new_pfn = gpc_to_pfn(gpc, &page);
->   		if (is_error_noslot_pfn(new_pfn))
->   			goto out_error;
->   
-> @@ -319,7 +331,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
->   		}
->   	}
->   
-> -	/* Note: the offset must be correct before calling hva_to_pfn_retry() */
-> +	/* Note: the offset must be correct before calling gpc_to_pfn_retry() */
->   	gpc->uhva += page_offset;
->   
->   	/*
-> @@ -327,7 +339,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
->   	 * drop the lock and do the HVA to PFN lookup again.
->   	 */
->   	if (!gpc->valid || hva_change) {
-> -		ret = hva_to_pfn_retry(gpc);
-> +		ret = gpc_to_pfn_retry(gpc);
->   	} else {
->   		/*
->   		 * If the HVAâ†’PFN mapping was already valid, don't unmap it.
+> Probably best if we either rename or completely remove that one, it was to keep the MOVE_NOTIFY functionality separate for initial testing but we have clearly supassed this long time ago.
 
+I removed it and will send in v3.
 
--- 
-Cheers
+commit 05ad416fc0b8c9b07714f9b23dbb038c991b819d
+Author: Leon Romanovsky <leonro@nvidia.com>
+Date:   Mon Jan 19 07:24:26 2026 -0500
 
-David
+    dma-buf: Always build with DMABUF_MOVE_NOTIFY
+    
+    DMABUF_MOVE_NOTIFY was introduced in 2018 and has been marked as
+    experimental and disabled by default ever since. Six years later,
+    all new importers implement this callback.
+    
+    It is therefore reasonable to drop CONFIG_DMABUF_MOVE_NOTIFY and
+    always build DMABUF with support for it enabled.
+
+    Suggested-by: Christian König <christian.koenig@amd.com>
+    Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+
+diff --git a/drivers/dma-buf/Kconfig b/drivers/dma-buf/Kconfig
+index b46eb8a552d7..84d5e9b24e20 100644
+--- a/drivers/dma-buf/Kconfig
++++ b/drivers/dma-buf/Kconfig
+@@ -40,18 +40,6 @@ config UDMABUF
+          A driver to let userspace turn memfd regions into dma-bufs.
+          Qemu can use this to create host dmabufs for guest framebuffers.
+ 
+-config DMABUF_MOVE_NOTIFY
+-       bool "Move notify between drivers (EXPERIMENTAL)"
+-       default n
+-       depends on DMA_SHARED_BUFFER
+-       help
+-         Don't pin buffers if the dynamic DMA-buf interface is available on
+-         both the exporter as well as the importer. This fixes a security
+-         problem where userspace is able to pin unrestricted amounts of memory
+-         through DMA-buf.
+-         This is marked experimental because we don't yet have a consistent
+-         execution context and memory management between drivers.
+-
+ config DMABUF_DEBUG
+        bool "DMA-BUF debug checks"
+        depends on DMA_SHARED_BUFFER
+diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
+index 59cc647bf40e..cd3b60ce4863 100644
+--- a/drivers/dma-buf/dma-buf.c
++++ b/drivers/dma-buf/dma-buf.c
+@@ -837,18 +837,10 @@ static void mangle_sg_table(struct sg_table *sg_table)
+ 
+ }
+ 
+-static inline bool
+-dma_buf_attachment_is_dynamic(struct dma_buf_attachment *attach)
+-{
+-       return !!attach->importer_ops;
+-}
+-
+ static bool
+ dma_buf_pin_on_map(struct dma_buf_attachment *attach)
+ {
+-       return attach->dmabuf->ops->pin &&
+-               (!dma_buf_attachment_is_dynamic(attach) ||
+-                !IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY));
++       return attach->dmabuf->ops->pin && !attach->importer_ops;
+ }
+ 
+ /**
+@@ -1124,7 +1116,7 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *attach,
+        /*
+         * Importers with static attachments don't wait for fences.
+         */
+-       if (!dma_buf_attachment_is_dynamic(attach)) {
++       if (!attach->importer_ops) {
+                ret = dma_resv_wait_timeout(attach->dmabuf->resv,
+                                            DMA_RESV_USAGE_KERNEL, true,
+                                            MAX_SCHEDULE_TIMEOUT);
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
+index 863454148b28..349215549e8f 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
+@@ -145,13 +145,9 @@ static int amdgpu_dma_buf_pin(struct dma_buf_attachment *attach)
+         * notifiers are disabled, only allow pinning in VRAM when move
+         * notiers are enabled.
+         */
+-       if (!IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY)) {
+-               domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
+-       } else {
+-               list_for_each_entry(attach, &dmabuf->attachments, node)
+-                       if (!attach->peer2peer)
+-                               domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
+-       }
++       list_for_each_entry(attach, &dmabuf->attachments, node)
++               if (!attach->peer2peer)
++                       domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
+ 
+        if (domains & AMDGPU_GEM_DOMAIN_VRAM)
+                bo->flags |= AMDGPU_GEM_CREATE_CPU_ACCESS_REQUIRED;
+diff --git a/drivers/gpu/drm/amd/amdkfd/Kconfig b/drivers/gpu/drm/amd/amdkfd/Kconfig
+index 16e12c9913f9..a5d7467c2f34 100644
+--- a/drivers/gpu/drm/amd/amdkfd/Kconfig
++++ b/drivers/gpu/drm/amd/amdkfd/Kconfig
+@@ -27,7 +27,7 @@ config HSA_AMD_SVM
+ 
+ config HSA_AMD_P2P
+        bool "HSA kernel driver support for peer-to-peer for AMD GPU devices"
+-       depends on HSA_AMD && PCI_P2PDMA && DMABUF_MOVE_NOTIFY
++       depends on HSA_AMD && PCI_P2PDMA
+        help
+          Enable peer-to-peer (P2P) communication between AMD GPUs over
+          the PCIe bus. This can improve performance of multi-GPU compute
+diff --git a/drivers/gpu/drm/xe/tests/xe_dma_buf.c b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
+index 1f2cca5c2f81..c107687ef3c0 100644
+--- a/drivers/gpu/drm/xe/tests/xe_dma_buf.c
++++ b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
+@@ -22,8 +22,7 @@ static bool p2p_enabled(struct dma_buf_test_params *params)
+ 
+ static bool is_dynamic(struct dma_buf_test_params *params)
+ {
+-       return IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY) && params->attach_ops &&
+-               params->attach_ops->invalidate_mappings;
++       return params->attach_ops && params->attach_ops->invalidate_mappings;
+ }
+ 
+ static void check_residency(struct kunit *test, struct xe_bo *exported,
+diff --git a/drivers/gpu/drm/xe/xe_dma_buf.c b/drivers/gpu/drm/xe/xe_dma_buf.c
+index 1b9cd043e517..ea370cd373e9 100644
+--- a/drivers/gpu/drm/xe/xe_dma_buf.c
++++ b/drivers/gpu/drm/xe/xe_dma_buf.c
+@@ -56,14 +56,10 @@ static int xe_dma_buf_pin(struct dma_buf_attachment *attach)
+        bool allow_vram = true;
+        int ret;
+ 
+-       if (!IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY)) {
+-               allow_vram = false;
+-       } else {
+-               list_for_each_entry(attach, &dmabuf->attachments, node) {
+-                       if (!attach->peer2peer) {
+-                               allow_vram = false;
+-                               break;
+-                       }
++       list_for_each_entry(attach, &dmabuf->attachments, node) {
++               if (!attach->peer2peer) {
++                       allow_vram = false;
++                       break;
+                }
+        }
+ 
 
