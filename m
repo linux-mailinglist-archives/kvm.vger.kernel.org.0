@@ -1,66 +1,67 @@
-Return-Path: <kvm+bounces-68503-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68504-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 019E1D3A7A5
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 13:00:42 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DAED3A7EE
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 13:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DD8383007F11
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 12:00:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B1523301332D
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 12:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB5235970D;
-	Mon, 19 Jan 2026 12:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FEF0358D3B;
+	Mon, 19 Jan 2026 12:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="R+ptTWj5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JBLu8mfz"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013003.outbound.protection.outlook.com [40.107.201.3])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013028.outbound.protection.outlook.com [40.107.201.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0631219E8D;
-	Mon, 19 Jan 2026 12:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6503590C7;
+	Mon, 19 Jan 2026 12:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768824037; cv=fail; b=VV/2y3DVNxDbnTTT8xvo4mhX5OeCwLZp+4G13il/4L6mWDP45kfcW8aYIZbD8DmPrKdqbpWrF+V+g2AMxR3/HI67urR3riXed+8vjBA98ieFdwlfHhkB823APv65JRxyrvBJWnW2r2DF0mxlego7/NrXoZloG2IIx1843DexjrA=
+	t=1768824343; cv=fail; b=YJOyXyBbk2RWoNHPm3Wy/wsTl7bTR/MmOMoE9FPV46DcFe8xeGb0GVqOEhEjMTaHXvdV5Qp2m0k60W35+NsW2YY3DUQsMKVY97J6n6Kk0cOqKM6zkIPcfON+RaHemPwJ7xBDG/wZ5fy7yqPIoCzVqt7+sXFlzlxYfignd7zx06Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768824037; c=relaxed/simple;
-	bh=2X0TCw35kjLOm0hXSEEL6dyb+8t05fbHduy+900mkS8=;
+	s=arc-20240116; t=1768824343; c=relaxed/simple;
+	bh=y8+s+H/K+YcEQ0ssoOW79YGBOxFhTnOUngxo9nsTyCY=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RmEsli51NhX1T01c+EO8URXUV8NBgVVbGOppzNUbIaduoP0ke8t37xSC2Hmms88RtQ7UUXiWz5I5h8WgZ9FN3ryQHbINBlYOiBJc9NJe2XM1SSIl6y0uS87KoD1VlGWWZnjoPGmS56Zt9wfIZVcIwnTDrXDqhdSPOheB3rLin8s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=R+ptTWj5; arc=fail smtp.client-ip=40.107.201.3
+	 Content-Type:MIME-Version; b=brCMq8gabM2lUjiWA52lTy4/3z4GcQuGTUjjT6nnQXGjAgnIhAZ6dvjNvuGzdiNBhxAsV2sbfzFZPurSHc4eF9JemPCHPJH0IawwFvkMueJdT2b1nOTeiXVFoDokTBxwSeK0egrOgOwophPLfEUud18R578E/zL3M3u7PnDY/pI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JBLu8mfz; arc=fail smtp.client-ip=40.107.201.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w0fWz2YfkskrGX20ZtdLnmWcrIh5j80FI9TuEsh+BZGITArp4dm/3a+Yzlg0ZvVG6MWwDx+Fzp+OSmFvpEGGRNatgDmxSUsQSvz7GnbEn9aJLH+4pulS8KtdagED4qymx01uNKtwSPBATyArEZGpJ8geMMgvaedS0Iwxnj0TCkVSjkpr0xK9m2G0uNGsu3QyvrVIg5e6/fWA0cBwmPvJKLZZKwBC3GOGzNf9z8EGVC2jjMOaV6hs272CF5zgZmvV1dSvWcWl79mMhDeP63L7paBsFOiYuoqmogn6Bi1Z2+wxqDl+mZ5f7tpw77xJUCUSIHfmrS8+yS/iUE0TSVVtCw==
+ b=RlcG7xK621qWHzLdrFeZJI6yVYRkSDEUNUxcUUE/KGvrnpw+/m4G6d58VJQDCHHPs1UiM3a6fsLlwsDxGcx9VrsRvPdxsQpphbKbkbaItoE8I9xwEE0Ktz+aw6UoUY0k6VIXDGag7tWZpiRxy8rNwfESdGbQHNhnttz5H97FMLBeBmOXn9LD4C45c8A3J0h/mpVdIAyQmnSFKbOZGwCZVN/rjXlu60+7ifBdj4uY/Blp/FCKOeeACAV4mAO9jEhQdzC9ItFoE2QuBJSMjo7ai+iGvycmqkfVK5CIwcAjTY5fncFy42VRP85xc4fWdqMQsrSu6t4EI9Rr6mHRulPxlA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5rfPvKdeeK9HEq4Dyv+PlsBML6DyBWf0kelS2/V7CBI=;
- b=TFlcHpvhxDIfAywVQyBjappOzH3Lr+oaHcuWzCdyTC1bRFRT8zbZN0xTQYQdZpTZfuSHgf3A9sRTLr2I8/9kF1WXha7nxNSveUseUmZBwsf0RRnQ//pOZGZgm/XT7baUn/ABiMugTyYk0kDVIi5L07DhWxoVdAsky3WAPk0CV42b013CX1zN9LsUOV2PYVbwCV3/5TYKJpMXyiPIEzMXSmPFkrzln9R70OixlzwBaheeAPRLSL5HPPXttnCl2OhNiz46oVd11hISBQl9GszpWRiFCz7aUz+hOFqwMojRocGwGCl2Pg7UzmV+/fBp5wVuco5Nv5SuCFEt+CkQsiXITA==
+ bh=LFGbtM6Cu+F1q64Xe8wN40Gbs2kH0E9XObanYXYnxuo=;
+ b=sIAS/lQhg1TKbqc1yNPILrv7s5ij22c30dBe+MXdXOHgjWWCnluxFVQWIiqYPk2utjnPUsign0/Ci/PtLeeYADKY6y44znnOjl93sTGoW2zauKFcigj1ssliJe6nq7ItXewYC0/0vVYqOwLrPJ62TxfbtUmAHFegyJVuKuoMndaauxHKJbWjPEbbX1g5lxQAVUaHSUsiIHYnXXVlKq4seCgjpP+PVzTMSuUg6HazDafT3t+QGHEXNJSthBgFrx6cKG7xpwOIxOnCL4lZXMURc3G7cITyFv1LFD2OUJSXqv9bNut4kdIEF74vYqIN/Ad6QNOsww5yyakEJODUlIVMZQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5rfPvKdeeK9HEq4Dyv+PlsBML6DyBWf0kelS2/V7CBI=;
- b=R+ptTWj5LcePumySFTEKXqSq1HkF+ZySWIAfgZSbA/kFb4aha5MuPEQ8oUARLKI6AtSGV0eVdx+Jgm5VC/zbpM5TPTWUQYmZPFFpzC1UgnXSaO7JwrgSW+xv4fVmxipyJE+RosNgAoKxEFwEIDJL48JN+Zk8gWpoa6/dTRKbipw=
+ bh=LFGbtM6Cu+F1q64Xe8wN40Gbs2kH0E9XObanYXYnxuo=;
+ b=JBLu8mfzXhivAsqg0BnCtaKsvcKCmWLN70PhsYAtwM7xmOjbeLNWDxUQGwK1JEHYQTgCYoJrKpcncZMoLCKPvpVXkrw9zvK08zQ6ZstjrdRqwAlJgbJJw2TzqBn5laTsdFMIxgmjct/OaTI1G9t9SOO/2lkuFds6IDPdFLzrwQw=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
  by SJ2PR12MB7845.namprd12.prod.outlook.com (2603:10b6:a03:4ce::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Mon, 19 Jan
- 2026 12:00:31 +0000
+ 2026 12:05:35 +0000
 Received: from PH7PR12MB5685.namprd12.prod.outlook.com
  ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
  ([fe80::46fb:96f2:7667:7ca5%4]) with mapi id 15.20.9520.011; Mon, 19 Jan 2026
- 12:00:31 +0000
-Message-ID: <871628d8-14b6-4d38-b05e-a33822f8d71b@amd.com>
-Date: Mon, 19 Jan 2026 13:00:18 +0100
+ 12:05:35 +0000
+Message-ID: <30ec9e80-f5a8-4b30-a55a-965f20f62125@amd.com>
+Date: Mon, 19 Jan 2026 13:05:26 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] dma-buf: Rename .move_notify() callback to a
- clearer identifier
+Subject: Re: [PATCH v2 0/4] dma-buf: document revoke mechanism to invalidate
+ shared buffers
 To: Leon Romanovsky <leon@kernel.org>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+Cc: =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
  Alex Deucher <alexander.deucher@amd.com>, David Airlie <airlied@gmail.com>,
  Simona Vetter <simona@ffwll.ch>, Gerd Hoffmann <kraxel@redhat.com>,
  Dmitry Osipenko <dmitry.osipenko@collabora.com>,
@@ -68,7 +69,6 @@ Cc: Sumit Semwal <sumit.semwal@linaro.org>,
  <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
  Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
  Lucas De Marchi <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
  Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
  Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
  Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
@@ -78,16 +78,18 @@ Cc: Sumit Semwal <sumit.semwal@linaro.org>,
  virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
  linux-rdma@vger.kernel.org, iommu@lists.linux.dev, kvm@vger.kernel.org
 References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
- <20260118-dmabuf-revoke-v2-1-a03bb27c0875@nvidia.com>
- <345b8dcb-5015-4801-b263-0dca4d1b3fca@amd.com>
- <20260119113809.GK13201@unreal>
+ <f115c91bbc9c6087d8b32917b9e24e3363a91f33.camel@linux.intel.com>
+ <20260119075229.GE13201@unreal>
+ <9112a605d2ee382e83b84b50c052dd9e4a79a364.camel@linux.intel.com>
+ <78035892-758d-4104-9dd5-aed9a045d481@amd.com>
+ <20260119105312.GJ13201@unreal>
 Content-Language: en-US
 From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20260119113809.GK13201@unreal>
+In-Reply-To: <20260119105312.GJ13201@unreal>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0116.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:bb::16) To PH7PR12MB5685.namprd12.prod.outlook.com
+X-ClientProxiedBy: FR2P281CA0086.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::14) To PH7PR12MB5685.namprd12.prod.outlook.com
  (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -97,333 +99,310 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SJ2PR12MB7845:EE_
-X-MS-Office365-Filtering-Correlation-Id: 62855fee-56a3-4df1-282d-08de57525806
+X-MS-Office365-Filtering-Correlation-Id: afe5e338-ed8f-46b2-2eac-08de57530d92
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Z0E4b2duY2dBOTdFbzhpOVZDc1lwVUZZQVh3TWFQeVI3QXpQMVQ5a3RCeVht?=
- =?utf-8?B?anhRdUJjcXZaeDNTcU5Td3JyOXhEM3JiL1JDallhc002T2dKK0t4L3BqZXBD?=
- =?utf-8?B?c0d6ak9CL2M0MXdHMVhvMk5iT1N5bE5URzd1UXh3ZjJENnR3aDFwQ0ZOUnhZ?=
- =?utf-8?B?WUwyUlViUWRBYzhnSE5ISjlucGxEeWVkcnkvMzJxTmtGeDFTUm5JN0dzSW1L?=
- =?utf-8?B?eXltUDJXOEFJUzFFemFxTjhxcFo1WCs3bklJQ3l2OFM2cVVDeFVSVkxPd08v?=
- =?utf-8?B?N29UVXhFdElqL1lXbG9hREp1Uzg3RGpYbzF0WU1abEgreGJvTi9ZRXVWMlVR?=
- =?utf-8?B?NjdoVmZWdjdicHduUnpLSXFDQ2UzS2d3M20yMFBVaU9GakVsVTlmV011bVNY?=
- =?utf-8?B?aWF3WXcrblo2N1lvRXNuZXA3RHIrRG0zK0ptYmR6MVlEcmo1L2lJT2F5UXNQ?=
- =?utf-8?B?cGI2S2ZZdUc2cFBMWGVlWnQ2c0djM0twRHFEUmt2NnVhL3RRRWxkMWMrUUpr?=
- =?utf-8?B?NUYrWDlXMTN6Q2UwRU5qeHU1RktLWXpEUWRKVzh1QThlZXh2dGoxU21uR2RT?=
- =?utf-8?B?ZjdiY3REMXdxYTM5Sk56MkRZaHFtNUlicDlDOEdWY2s2Y3d3WTE5MU9tRzhW?=
- =?utf-8?B?cUJISjd2QzUrTGIwODlYbjA1bDhLb096MktBUnhGdHRQV05sRWg3dXVUb1dm?=
- =?utf-8?B?OGQ1VlZLZjRWUVpiSElPeUtCNDhvV2svUmYzMEhsaWF0WERVWUcrdHRYZ2M5?=
- =?utf-8?B?bWVqcFV4SitqMGNzVzlmSFBXeXBNUElERWp3bFkrV1FSZStobTNPSzN5cHlM?=
- =?utf-8?B?alVtQytyVjB2dWE5TEZvQW9DUXR0OGhPbWVQNWNTMXNMMVptKzlPSGVNdkNU?=
- =?utf-8?B?NzgrVmtQVHVTZHNGbUYzUlpSSmtPY1BwWVJrekdJaDFyeWozQWZIblROUkli?=
- =?utf-8?B?SlhlMGt2OXFmb0YrWWtqWDVJbVVpMmdOUkJtRnYwbTJ2YmFBT0VwZFFIb1Jz?=
- =?utf-8?B?eHRISk1FbWMyNHFEZWxhSTVFQm01SFFWNjE4RkJQUllvQU04STZCZ0Y4L0dK?=
- =?utf-8?B?TU5NZ21FQjNOeENHZHZoVVQ3bXFVRXpVbmpBSlM0VzFVUGJuWURpNHRzTnZ0?=
- =?utf-8?B?bVNCeklab3I1WW8yMzIwL21pN1lUZzFuc1haTXVHZ1ozZ3NzN0E1Yml3T1BI?=
- =?utf-8?B?bTduRDNxd1diaWtacHh1M2VPV0JOT3owZysvaFI1ZEN3Wm1FYlErcXJvaDlU?=
- =?utf-8?B?cGdselEyS0tBOVNFeVIrbVpqRjZTRWxVc0ovVmxnU0xMczBpMCtDaG1Ib0JB?=
- =?utf-8?B?a0FJMk5mSFhIWitFUlg3ckRRbjFlMVlXSGlzL2pCYk9FSHEvcTVnbjZkSHF4?=
- =?utf-8?B?V0hqcG1Pek9vemZES2ZRT2thWnFVVmc3d0ZuUk5qN0hLZWh3RlhJS255Z1lY?=
- =?utf-8?B?UDMyOWJBSCtiS0lvYjMyZ2tUQmdXd0xjd2VnT1BpNTVabzJDZlNLcHk2M1M1?=
- =?utf-8?B?blFMRFF1RjFqTlFYWm9Ic21kUGxIcUtQTkJHV05aY2NKV0lNU3c2NzZaM2Y1?=
- =?utf-8?B?V09QcTBZSmduaTNHenRaWWdmN3dZM0dRRDdtS1FHYlNCWWo3UHRiK010Z2Mx?=
- =?utf-8?B?dk95cjVBUWlJekJnNyt1c0dDSWcydXN2SVlxaG93L21IZWZScFlPUXdweG1G?=
- =?utf-8?B?VWU2RnI3MmpWaDhNVzkzM29JVmx4WXdWdW8zUDRyaHVybU9NNkZreTNILzdm?=
- =?utf-8?B?YjdLL2NoZGtma01zRVZGL052clFESVorYWQraUxiaEhGSnFIK1ZObnBmNHYz?=
- =?utf-8?B?aFE2RVhqdWZPL2pCTEhtVXVlbmwwZ1AwdmhBUFFnUHVWUVlUcmRVM3o5ZDRT?=
- =?utf-8?B?UGNFYkpiS1VWemFpZWIwMExuSjlkRmJoN1gveWZwd0kzL1BDMll6Q0liRmYy?=
- =?utf-8?B?N1MwOVFGbDBzVXBDQVdNeUVxeWFDTXZaQXZuNzI1Wm5mNEswc0sxWXl3RWtZ?=
- =?utf-8?B?eHRabnRmSzVKNWlJVm0wOUVUOTZBeGxQcGxqT2tyazE2WktjT0NJa2NrNHFq?=
- =?utf-8?B?NGhvR01lUEFDSTlGZFcrVlVYNDdyR0dqRVZMS0hoN2E0UFdFZTNSeU9TVmRx?=
- =?utf-8?Q?BKH4=3D?=
+	=?utf-8?B?OVczMzNrQ3ZqellyUGZPaDRJQVc1eUo3VlRqcnAzc3pKcmZRZEQyWGhWaHp4?=
+ =?utf-8?B?aFMza05xeWllZW5mZXZsdXh1UDNGeDFhS0hLeTY1KzB2RExzWmFtWktRWVRh?=
+ =?utf-8?B?WWFRNDVMUmxmYVJ6SEJldW9hekpld3lXdVVDK1lxSzBvS3NxS09LRlpnU3Bl?=
+ =?utf-8?B?RnR0bEhYcndGaDBHdHJ6TWVZdm5aRzRjeFduNXJIMlBObURoQ2pPcExmWGgy?=
+ =?utf-8?B?c2E2SzJVWXYxZVJOMWlvSFFMeGw3V2RLWW1VNVBaQkxtMGoxa3NGT1FrZkdi?=
+ =?utf-8?B?OUlnY3pjbVo4Z2lZZHkrRVlaWFEwdXdhN0E0Um4vdkVORzcwWExEWDBFSmVM?=
+ =?utf-8?B?dFRnUWxLT25mYStkcVAwem5LaEZOLzhkNTkwSUJ0aTg2azFPODU5emJqNlNt?=
+ =?utf-8?B?NEp5a3dCaSsvOWJzWjd1WmtZMWJBWFA4NFVwMjB2R3Z6SEpzbFA4cWFndk9R?=
+ =?utf-8?B?S0YwUUMrNWNEUGhNbk1VS3FXUmU3QmRSYVhXYVBjb01adHhnSk55MVdzRkhD?=
+ =?utf-8?B?dGdsdFhVejhySE9zeTR5NmxaRmFIbG9rczlmckdPYnd3N0dxL2JyMkk0VzBG?=
+ =?utf-8?B?QWI4K3dyeTFYRXVqdTNtejFmcDN4cHJLNFVYRmNXS0MzNTFVTmVuR0pzZXg5?=
+ =?utf-8?B?K1lJTVVqWEY5c3JKQXlwWm1TaDdWK21UQjFtYWRqTjhzcG8yd0ZQVWwxVXU5?=
+ =?utf-8?B?d1RLVExBcHowR0NVck5SYThmMGorQWoyUHR3em9BOWhma0dZSm1sN1Uyd0Jq?=
+ =?utf-8?B?ZGFncUlPS3AvWGFTZG9iTnc1b09qcS9ZMjcxOENla2N0QXJRTzlVOWVKcHpG?=
+ =?utf-8?B?VlpYTUhhS0RYSXZPQjRlMy9NZzgray85bzZDdUQ5ZE96RFprRTVTRkcyeW9o?=
+ =?utf-8?B?bEp4cElXV3Z2dXBMS0ZoTmhVdFJFQXZRZmw0OVlQZ25uRnlVT2NBWG42b0VW?=
+ =?utf-8?B?OWdPcnVyYVBhaVM3MGcxQTRleEtOUFlVNDBnL2lHZVNzcjV2NnFiamRKRE5I?=
+ =?utf-8?B?VmplejZIZEdFUlAxaWtUNC9sdTZrRmVzUDFiVVBBK25lZ1hnUFZNUjFDZUJL?=
+ =?utf-8?B?WDU3cVYyKytIRjZlV1ZXYkpwdEMyaVdLYy9BTEcyanJORjZDNjcyWGxZS0Ju?=
+ =?utf-8?B?SlB1MVc0M3FzakE3YWl6d3ZjYVBRTG1KbEFFZHJnV0hpYWhSb1l3MmszZDg5?=
+ =?utf-8?B?bm8rOEJsQ3RzVnN6dURtTHQzRzZGV0FGZTY5RHVJYitOODlYU2MvL3Nkamds?=
+ =?utf-8?B?Y2JzUjkzVVBKaVVGczdIaTk0cy93T0IyNEdNVFBCOTV5dEVTRzJHcmtZajlI?=
+ =?utf-8?B?K1NNeUlFS1VJWlpNeGt3OUx5Qkp4NXl6aEp0dExnRXhpT0NnUVRmRnZieW5B?=
+ =?utf-8?B?dHJyVlhNU203dDN2aC9xMERYRnZNWkJJMTR1T2Vld0VpcnJsSTVkR0tuMEZj?=
+ =?utf-8?B?aG5JQ1VxRjhjWVg3U245SXVSRURtRmZ4Z1V5ZlBHaStMdUtKWVdJdzdydjMv?=
+ =?utf-8?B?bTJpMzlDOVNqVndJc1o3bXRTR0JKbjQwMnlVY1NNZ3QvZVF3M3QwTm9ORm1I?=
+ =?utf-8?B?QllqREg2U040aTJuR1hocWNlby9aRW5LUzRtYmlSQ2doNkk4L2hZcGdGU0dn?=
+ =?utf-8?B?dzBza29OT2QwK1BnNFRZbksxb0VIZUhxYVhYeFRMbC9ESUVFMWg5Y2lmckRs?=
+ =?utf-8?B?MjVKVG9WR3E3MUlzSEdMakYrT2RoSk03cE0wRzFndFkzTHd5cXRRbVNMNlh2?=
+ =?utf-8?B?SCt5MjN0QnJXWHZ4amJQY1Bxekd3cE9tc2ZMQzMwd2dYYU1wWjBpZE1xWm4y?=
+ =?utf-8?B?Wmd4THBldWVVV01mMWwrek1BYnNEODM2dHRHc1JscTlRdzdHMkFsYkdpR2FV?=
+ =?utf-8?B?WlNHbVBRWlU0WVFRWGFDVFR4dllvdlQ5TzQrdHREQkJvQnpuQjI0REt3bGFV?=
+ =?utf-8?B?WTFwTHQ2RzBQQUY0bng4MktWa0hBWFVPTU5hKzhMZXExVU9SN1pGNUhqSTJW?=
+ =?utf-8?B?eFFnWFY1WUFZdURuVzFRcVgwQTNqV2RBV0xHcERZVzFva2ZveUR0UXZ0NEVQ?=
+ =?utf-8?Q?TvttPY?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M25lNWJVYUdFYWZNWmRSMHI1c1Q0UWdET3NmVkNKSHpackxjWmc1OHBpZ1By?=
- =?utf-8?B?ZytVS3JoTVk0Snh6L1M2Uk5zYjlESjFWblJOUVdwL0dDZVJJQ0lXenVUeEVN?=
- =?utf-8?B?TUpHMFZhKzBBNGxxLzY1ZXY3RUQ5aXg2b1lGT2F5K1paSUZKWjVZelphUS81?=
- =?utf-8?B?NWdCUjFUVHZpdWk1YlQxSzdDMmUyZ3JlNWo0TU9XRDd0OGQxM0FRNE1zTTZM?=
- =?utf-8?B?cWo1b2IxVlB6djFQdVJKSXNNQll2NTV4YlpLT2dDejhQZFhnQzRSbmhxSkU3?=
- =?utf-8?B?allSNnM1alFHQUo4QTRoTFp6VWhSQmZFbEhEZ29UdmJGQlJ6V3RXTUxVbk9u?=
- =?utf-8?B?WENSL3l5TzhSQmR5ak1kNCtVOHFXa29Tb1BLSm1lNEMvdlBLN1U2WU5ISmVo?=
- =?utf-8?B?RHQ5cysvM1FybStzV3BjU3VYaDl1ZVNSZkpleElva1NnZk9HNll1L3JwT1Js?=
- =?utf-8?B?aEFYellVU09XWkw2dE5US3AxRGFHSlVuVklOalNmVG1hK0wyOUYySjFYL1hQ?=
- =?utf-8?B?SmlWTmRSazdZQk1kOXZWenJhSmVNVktZTE1XVXFSaWNIVjN0TXlKZ3gvTDhO?=
- =?utf-8?B?czF2ajEyRHc1aHFBS3dKZmpGb2dYbmxacmE0VmErN052K0R6ZDVwYUIvbmUr?=
- =?utf-8?B?K0srZnhEdWorbCtRZFVPVUxvWFJkczRwRkdDbE9pY2NTaTBBaEJTdncva21L?=
- =?utf-8?B?cG9kUnJ6YzFLZnMwMDFSbWVDdnFJVlhTcUpFd0M0YmJHWm1KNXZSMHRpQTNm?=
- =?utf-8?B?UmFRR1V4aVJtdEZ1c3A4bnovbmxKL3FNNjlWNmhxaEk1QWR4L3g0Z3VSMytO?=
- =?utf-8?B?SWxpVkF2UHBWdGFmSkhabm9BU3RjME5JZXNVY1hZSFVFQkdyaDdtK2FtdzZT?=
- =?utf-8?B?QnJKaGFZVmdrWkd1ckZEbzZHYis2Q1E2UlBKNGowWVZycFJ1bmsrY2J4dzJh?=
- =?utf-8?B?NDhXVlBrZnYxdTQ0TGlMOUVUVWJRY2puWnA4TDd3TjgwSkYraC93OGFKdmlZ?=
- =?utf-8?B?bUM2bmJNT2JhSWRhTDJydjc5c2w3aW5xaXh6c1Y4SG1FYWdpY3cwMVNraWdV?=
- =?utf-8?B?L3h1a0lhd2c3YXMxL2Z2M0UvZVVYaEFMQ0NMdlVWcFNTNkd6dm9MSDZvZGNm?=
- =?utf-8?B?bThqV1VaTkd6Yjkxb3FyaXVmWFVGZGdTZjBLSFdYczFueEc1R2dLYms3Qk9P?=
- =?utf-8?B?ZlpDRS90UWdSOEZ4TSt1REE3RVJzRHhNQUVlNmNVdnkxUVZLamp1d0JXZHp1?=
- =?utf-8?B?Vy91bUFXUWtnWkhTL09qN1Rwb01xbzBrcGlHdEh0R0NpUUEwS3VDVHF5cCtk?=
- =?utf-8?B?cWhVdTBXazdRbWtDVkVSclRlWEhITGJnc3oyakZqdzRxaG02aDlzYW9uSGU3?=
- =?utf-8?B?YjRqTURicWluZTd1QkNoMFdES3UxWGxSYWdacFNWTGlncVF0Z0daYXFrOTlB?=
- =?utf-8?B?RXlzQW1Cei9WaHpqVjdVS2MzMytFVURVVGlrQXkyKzhHREhOWkxEQ000QzZR?=
- =?utf-8?B?UnBYaWZsc1ZvcXErNUR6Q2ZDS0QvakEwNkhad29pcitoZTJpNDczR3pMTDNl?=
- =?utf-8?B?LzIrTk9TWXdDZ3hVazBySnVpY3Q4U2wwR1BnbnhwcTRwSFZqaTJ6dGQyY0Na?=
- =?utf-8?B?MVcwZFlDNi9SekhscDBmSVBNTkg2Q3MwRkdyMzNUMzNBTFRFNDJyVEQwZmln?=
- =?utf-8?B?S0dLaWFsa3V0WXpMZXNCRk8zclNBcG5Yc21QKzFqYlRIOTdKMjdiOU9xNTVK?=
- =?utf-8?B?dVp4VkNHTWVNMW9zZDZQL0lEQ3RKcU1nODVWM1A2K1l3QzcyVjRObW9xMkJQ?=
- =?utf-8?B?ZVRRYUgyVHVkZkxqN3JWeFk1NzduYjErVHl3Y1AydzZaU2tDWlZIZDZNdXUv?=
- =?utf-8?B?aXRWRmlyQ2ZwNzZSVHhCSUhhcGF5cTNRVmFPVFl1di9jcTBPY3dFOUJqcFdG?=
- =?utf-8?B?M0NMNjF6T2lqa2RpNmlySmZydk5wcXUyTktOanMxV2c0aWxCa2FFQ2RLOEJL?=
- =?utf-8?B?N2EvUGVoRXJDbWRaL3NwT3E5eDBiaC91QStjVHBPWDN6M2NKWlAwcDd6MGE4?=
- =?utf-8?B?REJFcUhLQUlLWC92dmNVaEVXLzZaZU9BQVZubG5pYlZyZGw4MXFWbFUvRU5Y?=
- =?utf-8?B?TGYzZ2tQSVRYUnU0L2lUWDhiWitpTitVdXE5RHNmaUp2SEpJVTFVY0RNcGdD?=
- =?utf-8?B?UnIwSzAwMG9qeTNiQXNkaEIyM3Jwbkp5NGZxbG94dTZwMitlZEI0cklHVHVo?=
- =?utf-8?B?M3AwRXN2M0duMVFPeWxXOWhEdTNmUW95QStkajBOak5wNU5wbk5Eayt4RzV4?=
- =?utf-8?Q?8x174mCkvz3PMzlSE5?=
+	=?utf-8?B?ZlBnQkJ0Z0ZNR2RtcW15RUwzN3Z0R2dFaDhYNmowb1dzeTJZRVM4VUh6dElK?=
+ =?utf-8?B?WjlHWm1oUmVzMWloUXl5YjIxWWk2MHQvaVNNVXA5WHVPd2U2NWxmNW5Rdnky?=
+ =?utf-8?B?UE9lbW1RaVd5MDBoL1RrLzlPSktmT3pkVzBuMmx0L1ZhMDA3OVBUd1RyZ2pR?=
+ =?utf-8?B?dFBMQkZZWVZ3dTlPczh6WEgySmpYVXFxSlVXVTVwWVEzUDFRenE4RTc1aEdD?=
+ =?utf-8?B?RVRha0E2a2t2U3FQWjBzMkFSWkVoK0JybHVYaHl2WnhzMHhLY1NYRHcwSXhx?=
+ =?utf-8?B?UmRoOGRwRE1Fdkl1VkxMUzVoeEl6c2ZyQlhMYXhmSDhibk04aXcrUmpyeWRY?=
+ =?utf-8?B?SFJBSGdZRzd2RjdUQ0hMQ0U5ZGx6SHlWZFZSbjFiSkk0QjE3ZHhvbnZtY3ph?=
+ =?utf-8?B?NllncWgxZkRWbTRMcHdiTm5KQ3l0WnRINWh5VVJ5QytZYTVudEpIMkdBRGsw?=
+ =?utf-8?B?bmxTZmZ2cDJwaUdyOWlmRUk0bU1xbW5NVXpocmVjcUdNeGh5cytoaWxjK2F1?=
+ =?utf-8?B?eVhjMDl3TUYwZHhQUnE1RDBiQkdZQ3pJb0NCYlozZEJ6elNLQzYwLzkzTVVz?=
+ =?utf-8?B?QndMdDF4MWFrSUdkN1VDd251ZE1EYnR4OHJ3QTZYTmpRclVWNERWamVrc1RC?=
+ =?utf-8?B?WndiZllQS0VBUTZUYnhXU2xobDdtelcxUzBUYVZTMnk5aXFTMy9rcEh0Ynps?=
+ =?utf-8?B?QmpaNVM2T0NWWEdWbHBEUDdENElTaEFMc01kdUsvWnBiYVVYT20yUFRsQy9l?=
+ =?utf-8?B?YnY5TlhGb1lreG43Rm1EWlhkeWNVUGtjZDdoTW9wR0JoUFdCNzJ3WHFEZFM4?=
+ =?utf-8?B?MDZqWCt4aDVraS9UM0V5dG5nUDlzZ3hNaUk2cU5NMllUS1prck0xTUZkSllL?=
+ =?utf-8?B?SkR4WkFCVWhQbGMzcTdWU0NUVXpVdVBrSWVuNElhRTlBTTV0ZG9IT1Q2OUs1?=
+ =?utf-8?B?a3QyR292c0t4NnlKNTJaNjdwb0JSSHcrbVdkRmdDUCtWZzB3SFN4clMzcDVH?=
+ =?utf-8?B?M1k2blU3K1JUeFprb3pQWjgrVjNyemtVNGVyMkJRNTRsYWxFeUhLSHpuWTdZ?=
+ =?utf-8?B?cmlZVjFtbDVzN0RwTVd5b29TREV0M2xudXRoTjlxd3RHbVVEUTFXVmZKYitD?=
+ =?utf-8?B?eVE2Vkg1WlVZODFUWTRzSDRibURYV1phYm5CSW5NdnE0QVdENFc4ZWpDRUZm?=
+ =?utf-8?B?OUJXNHlGRGkxRHZCOHNHbERXVS9Eb1FENVJFL1FkRDdjcWhndTYzYy83UXFZ?=
+ =?utf-8?B?V1RZYXlIQ1J1RjJBcEpDZHE3UWlvcm1CY3M1TEFpaEZPdld2Wmd5VVVYUW9N?=
+ =?utf-8?B?cVp6TUNseTVzU2ZlYW42S3YwV2VIVlRsaHdMSHBTZzhmamNTam9nRjRNdFVk?=
+ =?utf-8?B?Z1VpY1Z5a0hTVUNSUng5dER4MVk5NGV1d0ZPR3haUFV0Q01OVWY1aldxUlp4?=
+ =?utf-8?B?djF5Mmx4TU1jWVNFa3RmbTluOERSRTMzcUZlZEJEZFJ6UHBrcFdaWDUyb1dE?=
+ =?utf-8?B?MFpINTZScUR1dHhrd1VoRkVFRXhBWDROOFo2L1VjeDdGTzVQQ3B3VW82Q1pV?=
+ =?utf-8?B?ZG1xdmUzTWZDTGRFbGxHRkdTa0dvb1V3QUxHVmtIa3Q2eWN0VjRWQXZIQ0Ju?=
+ =?utf-8?B?OFQ5RHhXTzJhODFxc25GL0tOSXVldzNIaEtvSlFXcEE0STRoZDJFN3pPa2RI?=
+ =?utf-8?B?VzRPcVNsY1ZZb2tNYy9ZSnpFdzZ6RStuN29CdXVTaWxnTkNxeDF5K253aHVu?=
+ =?utf-8?B?c3BhMjhkUXZWSkVzck90VElIcVpTK0RZMTAxUnRVaExyNElLMm1BTGlkUERU?=
+ =?utf-8?B?MmJBOUR5VXZPQ3dXYWhuaEYvNUdOZm9yanIrTzUwRm9ZeXE4YkdwZExxRm9M?=
+ =?utf-8?B?MjdMSHlacndTREIwa3gvQTF3SUVva1N0MUxkWFovN2tUdzhrS1NraTMzamJJ?=
+ =?utf-8?B?WHVDYUdYMHJLMGI4dS9hOHlZYlZEMEhMMGNwV3R3KzNMOExwakRhZnE1ZUpT?=
+ =?utf-8?B?R3orVXp2bUhGeC9Wc0NReGpFVkM3SGNsR1YzK2grTkNOd3JOZGZVeU1Xa3Yv?=
+ =?utf-8?B?Z1lUL3Z3bFloZzhRMVlHQS80WjdKMFpjUkhkeDEyenlQSmh3V2hsNGx0RXZH?=
+ =?utf-8?B?TWl0MzlTRC9yWS94TGlSZ014WnhpaWZPVHJlNzFoZnRvYjl4aEpLVVVuNU5U?=
+ =?utf-8?B?UU1GS3hzMlp3aW9VNmNzOGVhbzdFTHJBR05YWWFDSElzOVdDVjVnMVlQbjhE?=
+ =?utf-8?B?THBmOUg2d1FGRlJtNkM2Wk1rU1MvdFZFblI4S0RjbnN1QUZCVkZNdVpTMDYz?=
+ =?utf-8?Q?9w+TCgbwEbvUnIqKiI?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62855fee-56a3-4df1-282d-08de57525806
+X-MS-Exchange-CrossTenant-Network-Message-Id: afe5e338-ed8f-46b2-2eac-08de57530d92
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 12:00:31.1423
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 12:05:35.6031
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CO7pfaIHX5QpStNnnGCYXeTrkOTgsuZyWSSJPYCXP88UlhR7R2xwQYUM9pgikRWO
+X-MS-Exchange-CrossTenant-UserPrincipalName: NTDS9BnJjN5tQ97lCZeoyr6cKBegr+48fbRNqQnykQEBIAbI7M1Vgl9phxCHp6t6
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7845
 
-On 1/19/26 12:38, Leon Romanovsky wrote:
-> On Mon, Jan 19, 2026 at 11:22:27AM +0100, Christian König wrote:
->> On 1/18/26 13:08, Leon Romanovsky wrote:
->>> From: Leon Romanovsky <leonro@nvidia.com>
->>>
->>> Rename the .move_notify() callback to .invalidate_mappings() to make its
->>> purpose explicit and highlight that it is responsible for invalidating
->>> existing mappings.
->>>
->>> Suggested-by: Christian König <christian.koenig@amd.com>
->>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+On 1/19/26 11:53, Leon Romanovsky wrote:
+> On Mon, Jan 19, 2026 at 11:20:46AM +0100, Christian König wrote:
+>> On 1/19/26 10:27, Thomas Hellström wrote:
+>>> On Mon, 2026-01-19 at 09:52 +0200, Leon Romanovsky wrote:
+>>>> On Sun, Jan 18, 2026 at 03:16:25PM +0100, Thomas Hellström wrote:
+>>>>> Hi, Leon,
+>>>>>
+>>>>> On Sun, 2026-01-18 at 14:08 +0200, Leon Romanovsky wrote:
+>>>>>> Changelog:
+>>>>>> v2:
+>>>>>>  * Changed series to document the revoke semantics instead of
+>>>>>>    implementing it.
+>>>>>> v1:
+>>>>>> https://patch.msgid.link/20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvidia.com
+>>>>>>
+>>>>>> -----------------------------------------------------------------
+>>>>>> ----
+>>>>>> ----
+>>>>>> This series documents a dma-buf “revoke” mechanism: to allow a
+>>>>>> dma-
+>>>>>> buf
+>>>>>> exporter to explicitly invalidate (“kill”) a shared buffer after
+>>>>>> it
+>>>>>> has
+>>>>>> been distributed to importers, so that further CPU and device
+>>>>>> access
+>>>>>> is
+>>>>>> prevented and importers reliably observe failure.
+>>>>>>
+>>>>>> The change in this series is to properly document and use
+>>>>>> existing
+>>>>>> core
+>>>>>> “revoked” state on the dma-buf object and a corresponding
+>>>>>> exporter-
+>>>>>> triggered
+>>>>>> revoke operation. Once a dma-buf is revoked, new access paths are
+>>>>>> blocked so
+>>>>>> that attempts to DMA-map, vmap, or mmap the buffer fail in a
+>>>>>> consistent way.
+>>>>>
+>>>>> This sounds like it does not match how many GPU-drivers use the
+>>>>> move_notify() callback.
+>>>>
+>>>> No change for them.
+>>>>
+>>>>>
+>>>>> move_notify() would typically invalidate any device maps and any
+>>>>> asynchronous part of that invalidation would be complete when the
+>>>>> dma-
+>>>>> buf's reservation object becomes idle WRT DMA_RESV_USAGE_BOOKKEEP
+>>>>> fences.
+>>>>
+>>>> This part has not changed and remains the same for the revocation
+>>>> flow as well.
+>>>>
+>>>>>
+>>>>> However, the importer could, after obtaining the resv lock, obtain
+>>>>> a
+>>>>> new map using dma_buf_map_attachment(), and I'd assume the CPU maps
+>>>>> work in the same way, I.E. move_notify() does not *permanently*
+>>>>> revoke
+>>>>> importer access.
+>>>>
+>>>> This part diverges by design and is documented to match revoke
+>>>> semantics.  
 >>
->> Reviewed-by: Christian König <christian.koenig@amd.com>
+>> Please don't document that. This is specific exporter behavior and doesn't belong into DMA-buf at all.
+>>
+>>>> It defines what must occur after the exporter requests that the
+>>>> buffer be  
+>>>> "killed". An importer that follows revoke semantics will not attempt
+>>>> to call  
+>>>> dma_buf_map_attachment(), and the exporter will block any remapping
+>>>> attempts  
+>>>> regardless. See the priv->revoked flag in the VFIO exporter.
+>>
+>> I have to clearly reject that.
+>>
+>> It's the job of the exporter to reject such calls with an appropriate error and not the importer to not make them.
 > 
-> Thanks,
+> Current code behaves as expected: the exporter rejects mapping attempts after
+> .invalidate_mapping is called, and handles the logic internally.
 > 
-> BTW, I didn't update the various xxx_move_notify() functions to use
-> xxx_invalidate_mappings() names. Should those be converted as well?
+> However, it is not clear what exactly you are proposing. In v1 — which you
+> objected to — I suggested negotiating revoke support along with the logic for
+> rejecting mappings in the dma-buf core. In this version, you object to placing
+> the rejection logic in the exporter.
 
-No, those importer specific functions can keep their name.
+Sorry I probably wasn't explaining this correctly.
 
-More important is the config option. Haven't thought about that one.
+I was rejecting the idea of doing this in the framework, e.g. the middle layer, or that importers would be force to drop their references.
 
-Probably best if we either rename or completely remove that one, it was to keep the MOVE_NOTIFY functionality separate for initial testing but we have clearly supassed this long time ago.
+That an exporter rejects attempts to attach or map a resource is perfectly valid.
 
 Regards,
 Christian.
 
 > 
 >>
->>> ---
->>>  drivers/dma-buf/dma-buf.c                   | 6 +++---
->>>  drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c | 4 ++--
->>>  drivers/gpu/drm/virtio/virtgpu_prime.c      | 2 +-
->>>  drivers/gpu/drm/xe/tests/xe_dma_buf.c       | 6 +++---
->>>  drivers/gpu/drm/xe/xe_dma_buf.c             | 2 +-
->>>  drivers/infiniband/core/umem_dmabuf.c       | 4 ++--
->>>  drivers/infiniband/hw/mlx5/mr.c             | 2 +-
->>>  drivers/iommu/iommufd/pages.c               | 2 +-
->>>  include/linux/dma-buf.h                     | 6 +++---
->>>  9 files changed, 17 insertions(+), 17 deletions(-)
+>>>> In addition, in this email thread, Christian explains that revoke
+>>>> semantics already exists, with the combination of dma_buf_pin and
+>>>> dma_buf_move_notify, just not documented:
+>>>> https://lore.kernel.org/all/f7f1856a-44fa-44af-b496-eb1267a05d11@amd.com/
 >>>
->>> diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
->>> index edaa9e4ee4ae..59cc647bf40e 100644
->>> --- a/drivers/dma-buf/dma-buf.c
->>> +++ b/drivers/dma-buf/dma-buf.c
->>> @@ -948,7 +948,7 @@ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
->>>  	if (WARN_ON(!dmabuf || !dev))
->>>  		return ERR_PTR(-EINVAL);
->>>  
->>> -	if (WARN_ON(importer_ops && !importer_ops->move_notify))
->>> +	if (WARN_ON(importer_ops && !importer_ops->invalidate_mappings))
->>>  		return ERR_PTR(-EINVAL);
->>>  
->>>  	attach = kzalloc(sizeof(*attach), GFP_KERNEL);
->>> @@ -1055,7 +1055,7 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_pin, "DMA_BUF");
->>>   *
->>>   * This unpins a buffer pinned by dma_buf_pin() and allows the exporter to move
->>>   * any mapping of @attach again and inform the importer through
->>> - * &dma_buf_attach_ops.move_notify.
->>> + * &dma_buf_attach_ops.invalidate_mappings.
->>>   */
->>>  void dma_buf_unpin(struct dma_buf_attachment *attach)
->>>  {
->>> @@ -1262,7 +1262,7 @@ void dma_buf_move_notify(struct dma_buf *dmabuf)
->>>  
->>>  	list_for_each_entry(attach, &dmabuf->attachments, node)
->>>  		if (attach->importer_ops)
->>> -			attach->importer_ops->move_notify(attach);
->>> +			attach->importer_ops->invalidate_mappings(attach);
->>>  }
->>>  EXPORT_SYMBOL_NS_GPL(dma_buf_move_notify, "DMA_BUF");
->>>  
->>> diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
->>> index e22cfa7c6d32..863454148b28 100644
->>> --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
->>> +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
->>> @@ -450,7 +450,7 @@ amdgpu_dma_buf_create_obj(struct drm_device *dev, struct dma_buf *dma_buf)
->>>  }
->>>  
->>>  /**
->>> - * amdgpu_dma_buf_move_notify - &attach.move_notify implementation
->>> + * amdgpu_dma_buf_move_notify - &attach.invalidate_mappings implementation
->>>   *
->>>   * @attach: the DMA-buf attachment
->>>   *
->>> @@ -521,7 +521,7 @@ amdgpu_dma_buf_move_notify(struct dma_buf_attachment *attach)
->>>  
->>>  static const struct dma_buf_attach_ops amdgpu_dma_buf_attach_ops = {
->>>  	.allow_peer2peer = true,
->>> -	.move_notify = amdgpu_dma_buf_move_notify
->>> +	.invalidate_mappings = amdgpu_dma_buf_move_notify
->>>  };
->>>  
->>>  /**
->>> diff --git a/drivers/gpu/drm/virtio/virtgpu_prime.c b/drivers/gpu/drm/virtio/virtgpu_prime.c
->>> index ce49282198cb..19c78dd2ca77 100644
->>> --- a/drivers/gpu/drm/virtio/virtgpu_prime.c
->>> +++ b/drivers/gpu/drm/virtio/virtgpu_prime.c
->>> @@ -288,7 +288,7 @@ static void virtgpu_dma_buf_move_notify(struct dma_buf_attachment *attach)
->>>  
->>>  static const struct dma_buf_attach_ops virtgpu_dma_buf_attach_ops = {
->>>  	.allow_peer2peer = true,
->>> -	.move_notify = virtgpu_dma_buf_move_notify
->>> +	.invalidate_mappings = virtgpu_dma_buf_move_notify
->>>  };
->>>  
->>>  struct drm_gem_object *virtgpu_gem_prime_import(struct drm_device *dev,
->>> diff --git a/drivers/gpu/drm/xe/tests/xe_dma_buf.c b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
->>> index 5df98de5ba3c..1f2cca5c2f81 100644
->>> --- a/drivers/gpu/drm/xe/tests/xe_dma_buf.c
->>> +++ b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
->>> @@ -23,7 +23,7 @@ static bool p2p_enabled(struct dma_buf_test_params *params)
->>>  static bool is_dynamic(struct dma_buf_test_params *params)
->>>  {
->>>  	return IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY) && params->attach_ops &&
->>> -		params->attach_ops->move_notify;
->>> +		params->attach_ops->invalidate_mappings;
->>>  }
->>>  
->>>  static void check_residency(struct kunit *test, struct xe_bo *exported,
->>> @@ -60,7 +60,7 @@ static void check_residency(struct kunit *test, struct xe_bo *exported,
->>>  
->>>  	/*
->>>  	 * Evict exporter. Evicting the exported bo will
->>> -	 * evict also the imported bo through the move_notify() functionality if
->>> +	 * evict also the imported bo through the invalidate_mappings() functionality if
->>>  	 * importer is on a different device. If they're on the same device,
->>>  	 * the exporter and the importer should be the same bo.
->>>  	 */
->>> @@ -198,7 +198,7 @@ static void xe_test_dmabuf_import_same_driver(struct xe_device *xe)
->>>  
->>>  static const struct dma_buf_attach_ops nop2p_attach_ops = {
->>>  	.allow_peer2peer = false,
->>> -	.move_notify = xe_dma_buf_move_notify
->>> +	.invalidate_mappings = xe_dma_buf_move_notify
->>>  };
->>>  
->>>  /*
->>> diff --git a/drivers/gpu/drm/xe/xe_dma_buf.c b/drivers/gpu/drm/xe/xe_dma_buf.c
->>> index 7c74a31d4486..1b9cd043e517 100644
->>> --- a/drivers/gpu/drm/xe/xe_dma_buf.c
->>> +++ b/drivers/gpu/drm/xe/xe_dma_buf.c
->>> @@ -287,7 +287,7 @@ static void xe_dma_buf_move_notify(struct dma_buf_attachment *attach)
->>>  
->>>  static const struct dma_buf_attach_ops xe_dma_buf_attach_ops = {
->>>  	.allow_peer2peer = true,
->>> -	.move_notify = xe_dma_buf_move_notify
->>> +	.invalidate_mappings = xe_dma_buf_move_notify
->>>  };
->>>  
->>>  #if IS_ENABLED(CONFIG_DRM_XE_KUNIT_TEST)
->>> diff --git a/drivers/infiniband/core/umem_dmabuf.c b/drivers/infiniband/core/umem_dmabuf.c
->>> index 0ec2e4120cc9..d77a739cfe7a 100644
->>> --- a/drivers/infiniband/core/umem_dmabuf.c
->>> +++ b/drivers/infiniband/core/umem_dmabuf.c
->>> @@ -129,7 +129,7 @@ ib_umem_dmabuf_get_with_dma_device(struct ib_device *device,
->>>  	if (check_add_overflow(offset, (unsigned long)size, &end))
->>>  		return ret;
->>>  
->>> -	if (unlikely(!ops || !ops->move_notify))
->>> +	if (unlikely(!ops || !ops->invalidate_mappings))
->>>  		return ret;
->>>  
->>>  	dmabuf = dma_buf_get(fd);
->>> @@ -195,7 +195,7 @@ ib_umem_dmabuf_unsupported_move_notify(struct dma_buf_attachment *attach)
->>>  
->>>  static struct dma_buf_attach_ops ib_umem_dmabuf_attach_pinned_ops = {
->>>  	.allow_peer2peer = true,
->>> -	.move_notify = ib_umem_dmabuf_unsupported_move_notify,
->>> +	.invalidate_mappings = ib_umem_dmabuf_unsupported_move_notify,
->>>  };
->>>  
->>>  struct ib_umem_dmabuf *
->>> diff --git a/drivers/infiniband/hw/mlx5/mr.c b/drivers/infiniband/hw/mlx5/mr.c
->>> index 325fa04cbe8a..97099d3b1688 100644
->>> --- a/drivers/infiniband/hw/mlx5/mr.c
->>> +++ b/drivers/infiniband/hw/mlx5/mr.c
->>> @@ -1620,7 +1620,7 @@ static void mlx5_ib_dmabuf_invalidate_cb(struct dma_buf_attachment *attach)
->>>  
->>>  static struct dma_buf_attach_ops mlx5_ib_dmabuf_attach_ops = {
->>>  	.allow_peer2peer = 1,
->>> -	.move_notify = mlx5_ib_dmabuf_invalidate_cb,
->>> +	.invalidate_mappings = mlx5_ib_dmabuf_invalidate_cb,
->>>  };
->>>  
->>>  static struct ib_mr *
->>> diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
->>> index dbe51ecb9a20..76f900fa1687 100644
->>> --- a/drivers/iommu/iommufd/pages.c
->>> +++ b/drivers/iommu/iommufd/pages.c
->>> @@ -1451,7 +1451,7 @@ static void iopt_revoke_notify(struct dma_buf_attachment *attach)
->>>  
->>>  static struct dma_buf_attach_ops iopt_dmabuf_attach_revoke_ops = {
->>>  	.allow_peer2peer = true,
->>> -	.move_notify = iopt_revoke_notify,
->>> +	.invalidate_mappings = iopt_revoke_notify,
->>>  };
->>>  
->>>  /*
->>> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
->>> index 0bc492090237..1b397635c793 100644
->>> --- a/include/linux/dma-buf.h
->>> +++ b/include/linux/dma-buf.h
->>> @@ -407,7 +407,7 @@ struct dma_buf {
->>>  	 *   through the device.
->>>  	 *
->>>  	 * - Dynamic importers should set fences for any access that they can't
->>> -	 *   disable immediately from their &dma_buf_attach_ops.move_notify
->>> +	 *   disable immediately from their &dma_buf_attach_ops.invalidate_mappings
->>>  	 *   callback.
->>>  	 *
->>>  	 * IMPORTANT:
->>> @@ -458,7 +458,7 @@ struct dma_buf_attach_ops {
->>>  	bool allow_peer2peer;
->>>  
->>>  	/**
->>> -	 * @move_notify: [optional] notification that the DMA-buf is moving
->>> +	 * @invalidate_mappings: [optional] notification that the DMA-buf is moving
->>>  	 *
->>>  	 * If this callback is provided the framework can avoid pinning the
->>>  	 * backing store while mappings exists.
->>> @@ -475,7 +475,7 @@ struct dma_buf_attach_ops {
->>>  	 * New mappings can be created after this callback returns, and will
->>>  	 * point to the new location of the DMA-buf.
->>>  	 */
->>> -	void (*move_notify)(struct dma_buf_attachment *attach);
->>> +	void (*invalidate_mappings)(struct dma_buf_attachment *attach);
->>>  };
->>>  
->>>  /**
+>>>
+>>> Hmm,
+>>>
+>>> Considering 
+>>>
+>>> https://elixir.bootlin.com/linux/v6.19-rc5/source/drivers/infiniband/core/umem_dmabuf.c#L192
+>>
+>> Yes, that case is well known.
+>>
+>>> this sounds like it's not just undocumented but also in some cases
+>>> unimplemented. The xe driver for one doesn't expect move_notify() to be
+>>> called on pinned buffers,
+>>
+>> And that is what we need to change. See move_notify can happen on pinned buffers currently as well.
+>>
+>> For example in the case of PCI hot unplug. After pinning we just don't call it for memory management needs any more.
+>>
+>> We just haven't documented that properly.
+>>
+>>> so if that is indeed going to be part of the
+>>> dma-buf protocol,  wouldn't support for that need to be advertised by
+>>> the importer?
+>>
+>> That's what this patch set here should do, yes.
+>>
+>> Regards,
+>> Christian.
+>>
+>>>
+>>> Thanks,
+>>> Thomas
+>>>
+>>>>
+>>>> Thanks
+>>>>
+>>>>>
+>>>>> /Thomas
+>>>>>
+>>>>>
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>> Cc: linux-media@vger.kernel.org
+>>>>>> Cc: dri-devel@lists.freedesktop.org
+>>>>>> Cc: linaro-mm-sig@lists.linaro.org
+>>>>>> Cc: linux-kernel@vger.kernel.org
+>>>>>> Cc: amd-gfx@lists.freedesktop.org
+>>>>>> Cc: virtualization@lists.linux.dev
+>>>>>> Cc: intel-xe@lists.freedesktop.org
+>>>>>> Cc: linux-rdma@vger.kernel.org
+>>>>>> Cc: iommu@lists.linux.dev
+>>>>>> Cc: kvm@vger.kernel.org
+>>>>>> To: Sumit Semwal <sumit.semwal@linaro.org>
+>>>>>> To: Christian König <christian.koenig@amd.com>
+>>>>>> To: Alex Deucher <alexander.deucher@amd.com>
+>>>>>> To: David Airlie <airlied@gmail.com>
+>>>>>> To: Simona Vetter <simona@ffwll.ch>
+>>>>>> To: Gerd Hoffmann <kraxel@redhat.com>
+>>>>>> To: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+>>>>>> To: Gurchetan Singh <gurchetansingh@chromium.org>
+>>>>>> To: Chia-I Wu <olvaffe@gmail.com>
+>>>>>> To: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
+>>>>>> To: Maxime Ripard <mripard@kernel.org>
+>>>>>> To: Thomas Zimmermann <tzimmermann@suse.de>
+>>>>>> To: Lucas De Marchi <lucas.demarchi@intel.com>
+>>>>>> To: Thomas Hellström <thomas.hellstrom@linux.intel.com>
+>>>>>> To: Rodrigo Vivi <rodrigo.vivi@intel.com>
+>>>>>> To: Jason Gunthorpe <jgg@ziepe.ca>
+>>>>>> To: Leon Romanovsky <leon@kernel.org>
+>>>>>> To: Kevin Tian <kevin.tian@intel.com>
+>>>>>> To: Joerg Roedel <joro@8bytes.org>
+>>>>>> To: Will Deacon <will@kernel.org>
+>>>>>> To: Robin Murphy <robin.murphy@arm.com>
+>>>>>> To: Alex Williamson <alex@shazbot.org>
+>>>>>>
+>>>>>> ---
+>>>>>> Leon Romanovsky (4):
+>>>>>>       dma-buf: Rename .move_notify() callback to a clearer
+>>>>>> identifier
+>>>>>>       dma-buf: Document revoke semantics
+>>>>>>       iommufd: Require DMABUF revoke semantics
+>>>>>>       vfio: Add pinned interface to perform revoke semantics
+>>>>>>
+>>>>>>  drivers/dma-buf/dma-buf.c                   |  6 +++---
+>>>>>>  drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c |  4 ++--
+>>>>>>  drivers/gpu/drm/virtio/virtgpu_prime.c      |  2 +-
+>>>>>>  drivers/gpu/drm/xe/tests/xe_dma_buf.c       |  6 +++---
+>>>>>>  drivers/gpu/drm/xe/xe_dma_buf.c             |  2 +-
+>>>>>>  drivers/infiniband/core/umem_dmabuf.c       |  4 ++--
+>>>>>>  drivers/infiniband/hw/mlx5/mr.c             |  2 +-
+>>>>>>  drivers/iommu/iommufd/pages.c               | 11 +++++++++--
+>>>>>>  drivers/vfio/pci/vfio_pci_dmabuf.c          | 16
+>>>>>> ++++++++++++++++
+>>>>>>  include/linux/dma-buf.h                     | 25
+>>>>>> ++++++++++++++++++++++---
+>>>>>>  10 files changed, 60 insertions(+), 18 deletions(-)
+>>>>>> ---
+>>>>>> base-commit: 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb
+>>>>>> change-id: 20251221-dmabuf-revoke-b90ef16e4236
+>>>>>>
+>>>>>> Best regards,
+>>>>>> --  
+>>>>>> Leon Romanovsky <leonro@nvidia.com>
+>>>>>>
+>>>>>
 >>>
 >>
 
