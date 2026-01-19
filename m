@@ -1,78 +1,74 @@
-Return-Path: <kvm+bounces-68535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C38D3B705
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 20:13:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB917D3B709
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 20:14:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09F9830A2109
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 19:12:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D07E230D8F26
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 19:12:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAE83904E8;
-	Mon, 19 Jan 2026 19:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C163392B84;
+	Mon, 19 Jan 2026 19:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fortanix.com header.i=@fortanix.com header.b="pn25cHRY"
+	dkim=pass (1024-bit key) header.d=fortanix.com header.i=@fortanix.com header.b="oMMDIUsI"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11022094.outbound.protection.outlook.com [40.107.209.94])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11020101.outbound.protection.outlook.com [52.101.61.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBB131197E;
-	Mon, 19 Jan 2026 19:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1787A32FA20;
+	Mon, 19 Jan 2026 19:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.101
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768849938; cv=fail; b=XhPy1IT1rCcM4zI306/x9kuJGv/9ZoHQYRqmXGIYsjqBHKjiH6vfnIVUtacMYHot1hFpoMkglDLYIeIcE/C0FyuECShZU7RLPdMTnasGQrqxB+CnKgmZk8kJlkfwcNl7j08SPyvbe2unJzu60x/JhC7QXFISzvPDz+dNfM/4Y9U=
+	t=1768849950; cv=fail; b=mdxyJEoEYZuXbyN85QUPlUI1Nvh2f6CWeXkTNfaL4vRhni/3qBaxlvs3HUauzGhO9NdNBi2QAB/lr5q7W9vaqnw4eI32f4XOgXjqe+Qxu3XimcN/rsFPUs11+He22iedNzB1r5jO4uURyhLQnoD7qLOMDFBP4prFPR1Zrq4M65E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768849938; c=relaxed/simple;
-	bh=WMtigM6vXxWgNbCiFmTPTTVpjGS8oWkwpkhAlvVJf2k=;
-	h=Message-ID:Date:Subject:From:To:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BTmJrXzbcZDkfRfNgiliI3Bj3eid9DjM9/9J1qwqhrKQB2DAFpdazMOlYalvNDoiXBZplU9vYXKsGiOBMpyqQIahhQN3bbykgaVu9ad8oK2tmk/U4zQfHbBndcPJTsF0nJfMD22ES6A9CaC7TKxHgZysQTJE6pqfNP+zWrmIza4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fortanix.com; spf=pass smtp.mailfrom=fortanix.com; dkim=pass (1024-bit key) header.d=fortanix.com header.i=@fortanix.com header.b=pn25cHRY; arc=fail smtp.client-ip=40.107.209.94
+	s=arc-20240116; t=1768849950; c=relaxed/simple;
+	bh=SGbLIbfdb+6xsQ4TpDZdVKELxUjU3l9Z+2Kji5iVyt0=;
+	h=Message-ID:Date:From:Subject:To:Content-Type:MIME-Version; b=aZ9kcgX2YEHqI1Er7JyJH1O50JcXzpcuAHxHNvZqghLUpggKQZAHoEjIsfHUUyEh8Dh2P9KBZGUffDqUmgy2TuBwXewzrB911PN95eVEqZYNa3cS9LOj9LjOkiAS5yVk/E+BLS8ElDfuZbuhUXtWOdfmBBPl+zoCJ9xnuAxGExI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fortanix.com; spf=pass smtp.mailfrom=fortanix.com; dkim=pass (1024-bit key) header.d=fortanix.com header.i=@fortanix.com header.b=oMMDIUsI; arc=fail smtp.client-ip=52.101.61.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fortanix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fortanix.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W7sbo5gUeZ3XNtP73X9BvKkPjbsX76lff39YP1Ek70ls/KkwY7rYv6ttJaPjl4j75KZxAjmxe0M9yVsO7Gvyx0LTUkUYv/c9UmRYO4HTLRc8zIKO3x4jb2B1l/SSTXiLAefgdq3J1G+t78kqHH7BHknBM3xvpIHc+bsfCqaGjAxY6myLTk9fb9bWBHlB7ZgOuh2vcTKySFEnCsVYXvclwFzFX/2JlKcd/VMia74aIR9pnmCgAiHZ8LlxeXC8iXTT+uk2AHblQvrWRkC0tXXQCyjZm657zEm5+g7yBFykbSdHiWDKBHFOJMNVfkVbXjXpkkau1WTu/wI5mXbCNWZi7g==
+ b=FFhMrKUegKKxsKgT2s+eK4zSLEQMsDCUBspGgPCNNXuuyvszi/okoxItuLRJbavTyGhwrspfYi6yqyeW/rHO6dqHRY2gmxm4zsiyEejz1ZJFaOOCeoqbJsqmv4gn1WYBqGRrntgQA69s4JFZP0WY/UmGv67QmcVQ4U91MO1h1e95gg0QPeqrIn8ChsN5VSid8AcagzvDJ1SZfvrdKoki2Y0VzArJXH/rXZVBSVq8Cvf9eVtikvqZCHjnqMK75vBO4+IiMF2fjxTPtv/sbIJx0N9A0s1P4uasgnt3XfiCDncw+pE0tdsGtr68mUDv6ktylRxPnaUQliX2+ex7uOfRww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/f05MYHYL/H8jDN3ZLVLSsNpcxNWXc3hs81jJyWmqeU=;
- b=E79gaAyp/MT9ZzM9/anxrkm+otUZSajrDh7ylUYgrttiwZijV5QUjUGSj+ztYntxF8qpvaKLdQG6HWoClV4Y/zGw/hRFyaIkJmBH5eiAHqM3M4CHfDkn2cb/Dx67E/fok0NcKNyY8KGb3vvTCagok6g63yKqAKh6AeOF3J23UWNKEJRKSqNUGf3TYSEOrdxOuxuX2NCoRqz0kuB5VtkvUSRdxvOjFelYHR45Mrrk0ZVEMqHeE35xoUki7OPZqCyt2P9FB/UcqpT9et6Klt+kavAqfGECOXY0DsF4TH8luOC6lKCB1QsaOGk0WzS63ofMDfHw8PJljV+QbkRhDJfH5w==
+ bh=Gh0kaH7qXT7Z/AWXDtjkCWlUyCZWq8cY1a5ByIaAg8s=;
+ b=JkGZnChQOMJ0xqI+kQrGevlxNjkGPgIDy7CLuLTQKsdK1z35QMf3B3XFlVwXzjLZvMA50iTBj3lVvo6UKljR7K4gGRXNjF1iiIoqlgC1PNZLFeVYsvU/2ZMXQWxp/UmnPbhRfuVwJYXhdKQPqM+qjIIiopszhu14R2SgkkvcqGHqlCMVfurx5nqTsCqSHK7TkEbMJOO4TklaUJ07JNtQJu7m9mdf9jG4lD5I4/Lwq47n7o7NPO8k8fY98VumvWIdlfC+vBUTeemoG5m5Z0U15Gxa4odgHfAEok6bmSuFEZwEHiYDI9AZQMyaTXgidHV6wBsbHQ2CiipypWRax9ObLg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=fortanix.com; dmarc=pass action=none header.from=fortanix.com;
  dkim=pass header.d=fortanix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fortanix.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/f05MYHYL/H8jDN3ZLVLSsNpcxNWXc3hs81jJyWmqeU=;
- b=pn25cHRYhge5E93ObtSRzdqWuSAh3VauNuD26r6N0tdvOsS4Krftbi03BhWbNE26h6leG8By8Wx9FBTzUhJZnbPHisRZXLq4rr4cBo2v5mYz5M7zd5QOkcp4n6vfvO3BSc8eVVcyR4n0IDINlfHSXh+kMuJsjt+BPxtK6IvSRr0=
+ bh=Gh0kaH7qXT7Z/AWXDtjkCWlUyCZWq8cY1a5ByIaAg8s=;
+ b=oMMDIUsIvmGqwvqem4gqF07UiC9P2rkLWClbUGt1WT8V4jI3EZsUQlQkHLjckKJfS2qs6ZaaH8B3OftuaIVhurbd4COBM4pKPOBp1SGbMviMw6xk3W/xdwVygQObK9GI8fgA9V9pxYSCzad0Ni4hMknCBVIALgkej1p4TG2sy7Y=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=fortanix.com;
 Received: from CO6PR11MB5619.namprd11.prod.outlook.com (2603:10b6:5:358::12)
- by IA0PR11MB8333.namprd11.prod.outlook.com (2603:10b6:208:491::16) with
+ by DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
- 2026 19:12:13 +0000
+ 2026 19:12:25 +0000
 Received: from CO6PR11MB5619.namprd11.prod.outlook.com
  ([fe80::729c:2dc:b1a5:ff6]) by CO6PR11MB5619.namprd11.prod.outlook.com
  ([fe80::729c:2dc:b1a5:ff6%7]) with mapi id 15.20.9520.006; Mon, 19 Jan 2026
- 19:12:07 +0000
-Message-ID: <b31f7c6e-2807-4662-bcdd-eea2c1e132fa@fortanix.com>
-Date: Mon, 19 Jan 2026 20:12:01 +0100
+ 19:12:24 +0000
+Message-ID: <82c78d1b-116c-4456-bf8f-a441a97b3def@fortanix.com>
+Date: Mon, 19 Jan 2026 20:12:16 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: SEV: Track SNP launch state and disallow invalid
- userspace interactions
 From: Jethro Beekman <jethro@fortanix.com>
+Subject: [PATCH] KVM: SEV: Enable SNP AP CPU hotplug
+Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
  "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev
-References: <d98692e2-d96b-4c36-8089-4bc1e5cc3d57@fortanix.com>
-Content-Language: en-US
-In-Reply-To: <d98692e2-d96b-4c36-8089-4bc1e5cc3d57@fortanix.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms000701060202080606030008"
-X-ClientProxiedBy: AM8P251CA0006.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:21b::11) To CO6PR11MB5619.namprd11.prod.outlook.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms000405040403040907020203"
+X-ClientProxiedBy: AM8P251CA0008.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21b::13) To CO6PR11MB5619.namprd11.prod.outlook.com
  (2603:10b6:5:358::12)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -81,272 +77,222 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR11MB5619:EE_|IA0PR11MB8333:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9e7b9557-6cd5-4518-6b6f-08de578ea2c0
+X-MS-TrafficTypeDiagnostic: CO6PR11MB5619:EE_|DM3PR11MB8735:EE_
+X-MS-Office365-Filtering-Correlation-Id: 553dc3b8-a5aa-4f58-564b-08de578ead02
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Rk5rcDZHUVBPOE9NT0lrT0VLTFZscWhBSUxrVWp0eDNtQmRzWnBsNkJjNHdn?=
- =?utf-8?B?ZkVRR1ZjdGxhbmlUZUFMSDlVNjRpOXUvTU13QzNXRFdzaHJiYm1uSnlIUWEw?=
- =?utf-8?B?YndrV0VKcHFZY1NjdlJCSFQ2NW9HUm1iQjZEVFhyUDluT01meC80WUJxdCsr?=
- =?utf-8?B?RlJnRGVlR0tvazVGWVdQV3hxUEpFZ0VCTjJrUVEzb1E2aVd1OWE4NTF6ZlY5?=
- =?utf-8?B?VXZtQVVqS1RBRFR2N2owYVpEcDFqT0k4ZHJnRCt1bUVuUHhKdDhUQ2tBNjE0?=
- =?utf-8?B?U1k0ai9rQy9aUE4zenRnRzdkZm1vL2V6YitGbkMxQTY1djI0TmhFY2JJajBU?=
- =?utf-8?B?RmJDblM2bHZVTVJCeXBBMVR0SFFjNk5tYXpaMnJQS1ZMeGR0THRBSGN1ZC93?=
- =?utf-8?B?NFFYdHJxK3hhdkQzY0xZa0V3YXpqSXYvSm50eWhmQ2o1bnJsT2cvNlp2bVZC?=
- =?utf-8?B?Qk9JbUxjakJ1TDZ3R0pZVEd4OUFja1p3NTYzOGJPMXVXLzVEVjcwM1FKZGIw?=
- =?utf-8?B?ZDA5ZWNlOTlkakxXL2FKSmdHT3A0aXg5ZWxjSzVZRlBmbUQ4VThXR0Z4V2Vy?=
- =?utf-8?B?KzNxMmYvREtNdFhNZ2lEVGhtOWdBR3BuYlg2UGV3WDA5UlRVTGFWNDJ3WXYz?=
- =?utf-8?B?QWE1cUR5RU9xaURXNEZHcnpicXN1TzJwalFmSjczcnRFM3BFWFN4eDNLdnpN?=
- =?utf-8?B?SldLUEt1UGwwRTFFazNiNlVhckg3SSs2WXZVRVZ0ZytrS3duSVpYWDRFNEtX?=
- =?utf-8?B?MmF5TjRoclA0ZWoxU1pjT08xVWVLS1BPREluajhiR0xOdldkM09tRUdrMlpV?=
- =?utf-8?B?T3FITG5xMmhiUVprY2FPS1JUSHZCMFpPL0E4RmJvdm8rWFl6L1lvbWhlR3Uz?=
- =?utf-8?B?MTlNcWlqZWhKMWFHYi94Zm1xU2NQUGowMFB4OFZZTUU0TGlnS0k4cHV5RFEx?=
- =?utf-8?B?TnJhT3B4TWo1dkM3THpxS2h4b3FXbFNoY1BEb2hZRnZNVW1IeTl1TkhXN3Ny?=
- =?utf-8?B?VlkrM01iYVdKd1RRa2luTXU0emtCS1dPNUxTNW9VcFhDQ1hET1A2eXh6blBT?=
- =?utf-8?B?OU0vL1gvTDRJeVFXUjhncG5CUk1OeHRWUVRjS1pjUFNETHBZSXJTMWdLVlIx?=
- =?utf-8?B?T2VRQldxSXVMZ2FIRDRUWFFwa0dHRnEzZDFoVjRQd1ZsRkFWSDl5Q09WanJq?=
- =?utf-8?B?R0lVOCtpbnJMOGxUekFGblJQZml6M29BR0hySHkyNDhLSWU5UFFBT3VWRVM5?=
- =?utf-8?B?WEE3TkloSjBnNlpLbWdFV3E4MDZlaFlaeDdzNEgycHBCcEtLVk5mbU5TWnNs?=
- =?utf-8?B?d0pPajNwYVBsZFlrWnU4aE9raTFDbWpnRm9iY2RIV0xNT3krYVRCNXRmZC9E?=
- =?utf-8?B?ZWg4RGM5b0FrYklqdmk0QWtuOE9Ucmt1WkFMeWx0N2FKdy9sYXAyTU40UnVi?=
- =?utf-8?B?UW5aRkcyOEJpQnJDL2FMeWtZTiswalNpRlhnZVc4TVgxQmxseFlpcUltMWlj?=
- =?utf-8?B?dHhCWDZkZE9KSWFNd0tOQlREWlBsc3Y2amZWR25YOThLME1NcHMyditjRkFl?=
- =?utf-8?B?TzZJcTIwS3A5cG10UnQ3UXI1cFh0ZFdYWTBOcHdyanIxa2ZXRWg4bXZURmFP?=
- =?utf-8?B?UVdQZ3E1NUR0ck9uZjJMaHNxQkZJaVJxVG83MkxsRk84ZUFwYVd4ZHpHby9s?=
- =?utf-8?B?Yll2ZTNBZjE5NHY3RUdHTCtBSWlZZzg5VHhMT0F6ek4vWWd1Qzg1L1BsdWpr?=
- =?utf-8?B?QXBGd1V3QjlpbE1BSDdRZXNHYVJDNGtoVW1JY2JkSTBIelVobHcxZXVhK200?=
- =?utf-8?B?Z0pvUkpMS2hBUUZlWFR1cW11OXNOTENseUUvOCtVMExVd2VVSUJPS3ZPckV0?=
- =?utf-8?B?VjJSMFloQml4Tm1Ed2pEUFlsNWdZbTg4dm8wYWtpakhwVEdGbFhLdTlrOEI0?=
- =?utf-8?B?czhJTkJNd3h4YlRMbHFHR3lhVXZTS201VDJIeUFlYyt0b25mWVZwdzZPcUY1?=
- =?utf-8?B?MjE0VDBGN1hlSVQwbUZ1TThYMXY3TmIwdjhHOTJDeE1sdy83YXdXZzYvMUYx?=
- =?utf-8?B?UmVJclJSdkZOQzdGRGpvTSs1a0lqVzFlR0MwOGVIWVR3ZWhnM2RSeFJtM2F6?=
- =?utf-8?B?QXl5eXNpaGpPMTBDQmdaWU5sOC9MY0kyZXFDd094dmlzcjcvSXIxUzI3RUJT?=
- =?utf-8?B?a2c9PQ==?=
+	=?utf-8?B?RFNlR01UMG5EbEhTWWtkUEtFNzlIQUZ3eEJNRGtnMFFFUmo4dlh6czlodUUz?=
+ =?utf-8?B?UElwZHlmbDZRTC9ESzBFTHFtUkdRV2VtbUIvYTVFUkVZZ1hmY1gwWlRtTm5X?=
+ =?utf-8?B?WUFsakR6NWpVZ0p1SzU0LysrT2FWZ2VnOG5XLzJwRUNTTUMzTC8rOStocy8y?=
+ =?utf-8?B?bzlKN1RTemdZRGwvd2hEM3NOem1rNEc0N1pkbEdpYmtwdmZCSEw3ZTBPTmNL?=
+ =?utf-8?B?dlpLTWUxV2t4RFhtNjJPNVA1ekpzaUZzNjhmcjRUaEFad3M0dW5ReVdOMGV4?=
+ =?utf-8?B?MzlUamx0YjlEb3FSdDlCL3pVVkJuUTRpaWR0bzFpNStVL3htRCtBZG1sUUZR?=
+ =?utf-8?B?K0ExWXlkRUpiTU5qYTRveEVXWklVVGs3a3ZpYTlHbWxwS1dDS0R0blpHK1h0?=
+ =?utf-8?B?MWdZemliTTFDUE1rTVAvY2szRmVtRWFyZy9PeDIwbXM2eHY2MUZNZ1dTdFR2?=
+ =?utf-8?B?VnkzOWp2Q2JKTm9SS2dVenIybk9oVTF6ZUZIRjBFNHZEU1Rlc0hpd2FHWkVI?=
+ =?utf-8?B?WXkxazdaYWsvWkVKQisxT0RjelQ2d2p5blNHejNHNnpwNVlWWXJFUmlyZTdz?=
+ =?utf-8?B?RE5hOEg4T2RiRFptOW5ycEFzYkdqdFlaR0hwSjEzTWt5VUtYM1RwaFErUEZl?=
+ =?utf-8?B?K1hwdXZ3M2pkcloxVlArQTkxSDZWRDZIRjVYc1BSUldaMlhhZXJhamIvZ0Iw?=
+ =?utf-8?B?WDdQSHlyMVhDdlJ3S3B2R0VNZExGUUx2UGplSlN4K2o4SmIwbjNQZ1hrdkdM?=
+ =?utf-8?B?WHNsR3VMRkMxOG1nNUFwRk5ka2QvQmlRRWw4YUVyYWRwb2JKT2doc1NTcmQ4?=
+ =?utf-8?B?dmdhNWttVEhocjFhVyt2WXd0REhaWXB0dlRGVzFXaU5CWFhIMU1hMExFUXI2?=
+ =?utf-8?B?QTRBb2E5bGd2Z3ZhaTM2bjRHbGYwRWt5VWRheVpTeXQ0ZlZ4ZHV4RGN6MFJn?=
+ =?utf-8?B?MGZsTzI5eG8rSlYxR0V6dlFObjZpcDFmWnZUOVkrWkJFdTR4L0tvYnhpWjJl?=
+ =?utf-8?B?QUhJYXkrdXFEYk1ZbGVhbGhsM1J4MXhtWkVLdnR4enQ0WGc3M2Z1Z0lJNEtB?=
+ =?utf-8?B?NnJJZkRZaFdWSmtNSXpMRVdwZkpQYTJ4RzNPcXhjTFRHNnZZSVhSY0pXd3R1?=
+ =?utf-8?B?ajJjNXlNYVZnSXg2SnlxK2V5VUlHU1BnVkd6UHZYTnh1Q3AyL2x2VUlZcFV3?=
+ =?utf-8?B?WkJFRHRBcGFZcGFkUktWckE3SklwMDEydm5uVERGZUZieFdOUFVlT1JUcGM0?=
+ =?utf-8?B?NmE2TzhJaHVUUzQwalVtZGlCZXVxakhBNzZEVjB3cFRXUWtzUElIenBIc3RT?=
+ =?utf-8?B?aXNTNXNtNmdxeFV1Wkh3dUk2dUNiR2hFTWtSK3A0VVJ0Y3BiZm5aVGJHd2lk?=
+ =?utf-8?B?TFRNeDhiY05MejFCUkJoN3VLcFh2WVhPL2Y1MGxZWmdTbDBST0Y0SUg3eWFI?=
+ =?utf-8?B?LzAyeDhMTitZVi9iWjBUTmFmZGV2SjRtUG8raE96ekNoWnp5UjFQa2M0TUx5?=
+ =?utf-8?B?WGNva1VCQ2NOVExWdldCZk16N2dORHdTaG1UVWtmMUpEV2ZjSDczMVhNVUxi?=
+ =?utf-8?B?VmRENXhqVkROSURzNzcrR1VvWlVDd2llL2lyMkgwVjB2Z29nY2hOWkZhNXNv?=
+ =?utf-8?B?Nmp1MDdYQXh2ZnZHNEdlSEpYTkZza0dlZXZvcWpjV1QyV0xrclV0MWZiVG1X?=
+ =?utf-8?B?OVBnZUFWSmNNVDdOM1c0b0x2ei9FeWRDVjQyNUhVSkNTbHVraDhDcGs0ZXlM?=
+ =?utf-8?B?Y0xEaWtMMXgrcjIrS05ieXcrY1k3RzhNMHV5bnpETjl3aGZiWWw5WmdOQkF6?=
+ =?utf-8?B?WjdCMlYwODBMbDJKVDQzSzIwaFBsV0g2ZHpwRjBhUndta3o2UHF6c1FhTTB1?=
+ =?utf-8?B?d2tPb21Xa1dpSXV5VTNPVStJVmNlcDdSSjdJOEFLL1VkUmZmbmFES3VuYkhY?=
+ =?utf-8?B?R1kxNDRFNlU5SkhKNjJ6UXJVTkFzSjRmeVJQL3dlZkNDMnRwUzFSUTg1Zzg0?=
+ =?utf-8?B?OGphRlJpVHR1eFFRdlY0T29jWU1GaU1RYXY5M25OY3lTSGF5b0lJOUxkY0lW?=
+ =?utf-8?B?MS9La083eTRicFhPeTlDVG83U1JyZ2NRalNNejVtYUR1Z1JacndubjhaYWFY?=
+ =?utf-8?B?N2xOMVlUR0J4dHA1UUVXbnJORlBpQjdGVWtJL3loNDRRcVlzL0hybGx3NzJG?=
+ =?utf-8?B?MVE9PQ==?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR11MB5619.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZE1UOUo0QVh4RXdkSXVjV3poYXRzbGVvbm9sb0tpWGhiQ0tMN2RnWk1td1Rv?=
- =?utf-8?B?YU82UmhWNGlhVTFyWDRhcmNUSXB1VG5VVUFTekt5blZsL3BqcVJUQjgyYWlL?=
- =?utf-8?B?S1FBL3l3TXJicGlmNW1KWmFhc3JxQmU1SlkrSlRmM3prRmdjTmU5RXlqeHlL?=
- =?utf-8?B?RWVDN3ZTc1ovYTdsVDVqc3F2SDcyaWNQU2w5TjZEb0lna0VQdHBZalhITU50?=
- =?utf-8?B?WmFlZEZLLzRLQkVnRjBkVC9wL1pTU3RMM2FIN1hTVE5Fc1BXaStyNWxiVjlw?=
- =?utf-8?B?bG9YL1pMRmswVUVGSTk4VW42QU1QTTVNaW9tVW05MG9TNkdEOUhEYVZpNWV0?=
- =?utf-8?B?SDlrSllBMjgwMFVjajBidnMwdmdLMjljOGxxT2lZald4M3l4aEFOcktwcFp4?=
- =?utf-8?B?ZUdwWlNIU3dTOXU0ZUxEajJqWDFMQmxDZVdRSUQ1Mmp3KzBjekdJSFNja0Fv?=
- =?utf-8?B?QUNnVXZqN2lONmxIVHRETGFVSnQ5OE56T0FieWREejVNL0NyQmdjWmV4TzNT?=
- =?utf-8?B?UkczQzFrQkFUNDZFQ2liQW9ra1dUbHJ0NU9KRy9hM0lKNWNId1ZSdm9ZOUdx?=
- =?utf-8?B?YTZ5MXN2eGFEajgxU2ZNWWZYRDNpenk1L2JNODc2QlNDL1RwdFJBR21YQmd5?=
- =?utf-8?B?c2l2MUx2cGF4R1cvOTRhWk8xTDloUERtYXlvdElJcXI0UHlmT01oZmcyYUg5?=
- =?utf-8?B?bUJrVmlaY2VDRkxXYnNUSzVWVE5FUEw2MmpvVzdaYTJZeXlIYk9yaWtUUjJT?=
- =?utf-8?B?Q3RPR1JIWkJ3YXVNQWdYYzZENk8rVWF6VUY1NDNaY0tDS0VGT04wYnFwbVg1?=
- =?utf-8?B?WDBrN3VDc29WbEhWWXJtUXdYRVlhT1VWeUxRUkp3bkhmT2JOVlNwN0c5eFQ2?=
- =?utf-8?B?VUdlRXFnMytCQU5JT1BsSmRCTHdEVmJMSjlLcGhKd2UwSm4rcGJlYUVhKys5?=
- =?utf-8?B?Mmw5YVdnM3lzdk1icnVLR2dJdFhaVkdPSEhNSm5iZVpxZWUxMjJZNWd3NGJv?=
- =?utf-8?B?YktsYnREdXFmS1k5Ujd4YnVVeU5UNXdTVythWFdXaVYzVThhNkU4UFlDOUVz?=
- =?utf-8?B?T05nT3BTT0w4TWlROE04dUpQbTBPSE8ybFpYcjAzQmpPYUV2UUc0QkJKMElM?=
- =?utf-8?B?V3ZRRjBldWtiSk5NSDFaSDYvRUhRbVJ4SVNsWkkrT2dpbEo2WGV1K21BdlEz?=
- =?utf-8?B?YXF1MGlzLzZrTzFVMWd5TmVsMVhwem5kdUhNQTBKRWhwcWVvZGxEVWtmM1JM?=
- =?utf-8?B?SjVMZGtYNDNhenpvem4rSGJUL3NPUjNXNzQrVXc0Qzl1UlhudHNONFRSNFht?=
- =?utf-8?B?d2EzcmJiS3BtOS85WUlQT3Vxdjc1Z2NhNXlnYllGdzRmZ0N2SFlETlhOeUVY?=
- =?utf-8?B?ZVdraVRIVnNtSGgwZFFoSnlLbG1jU1llU3NZYUFnM0g2b3FsRWNQNmtzU1Ry?=
- =?utf-8?B?UG54YmlLMk5FV0M0OWcrek1ZMVhjdFB4bktmUFBjOWFhbHA1QjhJV0J0U0d3?=
- =?utf-8?B?Mkx5eHJOejQwVjRQMW5ubGhaY01lYkhMVFNZZTkwZVdpUnBpdC9CbU1zV25j?=
- =?utf-8?B?WEp4S2N3cUV1Yk93blROOURDVVZuVzByOGdDQ2dlU3ZaVjVBWDNROHhGVTdm?=
- =?utf-8?B?NWN1Yk5sRTJReWVVVkJFTXlSZWE5WE1CYXFHYU56VTNSY0lQeE1XcUZzVjdB?=
- =?utf-8?B?bUxmcTRFK2VFN3ZybjZkbG9MWHBTbHNQK3V5N1FESWM0U3AwNWVOOGtXeWpa?=
- =?utf-8?B?NWgwVjIyQUJPZ2xmWkN3RTBqVy81N2c3TTJaUVRWQ2E3Y056VjczS1hmWDFm?=
- =?utf-8?B?bmhKVldDWmVidHZmSVl1RVFocC95bk5uN09lb2RJT1hNa3RpQTZoQ0U2Zm5m?=
- =?utf-8?B?WGZxRk1nVjFtVTJaVmZzSW9JS1JKYy9OZFdaRHFENkNOMEcxNTNwVmF3cXZr?=
- =?utf-8?B?UTZhRjBsZXRPMWxkM0JPTkM0VVQra2JjSWVLNllUbVRENmVmeENNYU9rY1RN?=
- =?utf-8?B?L01qWmVtSmExdzdJTmRsb1JDOXpadzdPdTFHbXAwTmZucFAwdjNBb3lIMHJO?=
- =?utf-8?B?YXdyb3YzWXhlZXdRYnpmUTlzMzM1d2oxTVA3Q2pUTTZBMmZnWitkUVFycVB5?=
- =?utf-8?B?akR6Y0RZUGFvaUJOZDJ1dFJaTFRlbVN5akwxS3ZLQWp0cE03YlRJcHpzUUd0?=
- =?utf-8?B?eUZ5a0lMbHZhU3RyYTAyZUtYcE5ycGYySFU1a3crLzl6cXJUSkYwaGo3SWtR?=
- =?utf-8?B?djA4c3UwMGVIOUxCV3NJcWp2aVZ3WDJnbUxpVWcyWXVpaVdReENjVUdCNisw?=
- =?utf-8?B?ajk2U0U1UDRLdGY3cFd1YkF1a1luMFBPRUtwZHFBN2pyTGFOamhxZz09?=
+	=?utf-8?B?MUFPS0ZjSDc0K3I3ck1rQi9vVERNbXVLUFcyTFc5QzRveHVSM1dhaW00VXVk?=
+ =?utf-8?B?c2NxLzVvbStmelM1N2x6cHJvTnordTYvaXRZWm9xK1IwTDRpWTRibkNRYWFJ?=
+ =?utf-8?B?MnhLd0pPNlo0ZjFjWkRHc0tUY2FOQS9kbXNmclFXNi9aTzRZeHdlQkZ3UXlm?=
+ =?utf-8?B?b0w1bnRNYjViUUZLQ3JRWlJlRlNCRDJlclFadWpiWHlIT2MyU2pabi9Uc2hG?=
+ =?utf-8?B?M1dpN1JoVE4vZ0tWeTZOczRidlZHK3JOMnE4eVJUdnM1aklyc21iM01JR29R?=
+ =?utf-8?B?dlIzZlU3QTI3ODA2Ri9oNmZMeG1naSsrNEhLREJLSERvMFRkSVJkT2tuYXRs?=
+ =?utf-8?B?OEtTSzJBN0hieUhVQmQ2aTUycFpTUlk1UmpmRGZjVGdZTlNFdDlJK0F3MnM2?=
+ =?utf-8?B?cThjaG9CczYyeVVDU0FlYXJpeGNtbE9QUEhrM3BjWUJ3OG9TRW1tanVGT2NZ?=
+ =?utf-8?B?M2hTeFhNWlIvc3VwYVRsSm9FUlp1VmcrSEN3VnlOdDZNT09wVituZUI0dU41?=
+ =?utf-8?B?VHh0ektCRk9IRjhhb2tyMmpGTXBtRTV0K1RMc3liNjlnbENDSm54V3E2d1pl?=
+ =?utf-8?B?VjNJVXMwTnNWRFpDRGhXZWZwUEwrZGs0Tis4R0cyaGptemwydWdwMEhML2Np?=
+ =?utf-8?B?S1luS2NQOTNwdFdnL0d3bHBTbDdYY2MwUmRGZE41YjI3Qm44RW1SWjVjdnNk?=
+ =?utf-8?B?TERsRHlPc1JNRFFuMHIwS2lpRkQ1ejIxdWtIV0lvU2YyR2grY25SR2VqTnJw?=
+ =?utf-8?B?UGJqWG94bi8xTWpxZ2VzeVdnbVQ4TmhrOEQ2OXBwVzdESlBVNmdzRTljQ2J5?=
+ =?utf-8?B?dmZIc3VBNTNrTm9BRzlnNFZQRkFXaHpiWjhnNnNET0I0bGQzNHZzdGFVUlpn?=
+ =?utf-8?B?aFhkY3RRUUN0SVNrTlRhcGtVaWJGcEh1Rkhka215Z3hxQm9iMUpCWS9tSzho?=
+ =?utf-8?B?OUNPaHkyVE9XNkovTVlOdVVRd1U2dTU4QlpOSTRIcW5VN09vQk15N3pWekRX?=
+ =?utf-8?B?dXVnYUMrMjRWanM5VERwM0tvZW1YNzVqd2RYNHhpR0tkRDd3OFpRdW9rV21p?=
+ =?utf-8?B?N3VxNWFwRCtmaDZkQ2FEVkFXS0gzL05JTU5TdWlvdWhTQjJCSXBJZGUvU2lJ?=
+ =?utf-8?B?NXVtZ1NWQTBOdUU2NG1jNDNRSHFyMitqakhhTjZpbyt2QXVDNGpld1RNSjJR?=
+ =?utf-8?B?dFRIRm1WNkFNUkxvNWM3Ti9kbGZuTEJKYzM5dDJNRERqVFlWVU1QaUVqdzBH?=
+ =?utf-8?B?c2lCOUd1eHJJNjl5RzJ4TVdNT3RuTnl3amJpUW50Zm1jRFlUWUxEa0lKbTBK?=
+ =?utf-8?B?MGxjWUk0dlJ1TzFidyswS3J1aWhjQkxTZjZNWUxmNzErQmZKY0ZQN3o3NWJ2?=
+ =?utf-8?B?d0ZuTXZHaHhIeGd5OUV1OC9GVzI1N2hyaVNEY1FaaXhqSGJZVWd3ajB0NitV?=
+ =?utf-8?B?Sm9vS2Q2SGhxKzV2dWU5U0pXSUVWTURyT0lyaDQ3MWV2cTgwYjFKY2dFRVkx?=
+ =?utf-8?B?N05ybXhCWUNpVElzSUpvVXlkdjlYUWtSMWI5eVVTaEh6K3JmUngra0U5RDZP?=
+ =?utf-8?B?NlI2Q2t1alZtc3MvbHhReVVKR21reHMrNlF1U09vaGU2QlYxeHJ0RjgwSmlF?=
+ =?utf-8?B?WkdXSjNSWXg5cXZQcXpiNzNYTCtJMk9QN1BxMEVPZGJWb2RMY3ZsRWpjdCsv?=
+ =?utf-8?B?M0l2eUtzVm50QU52VzZIRnNhTjVhVStBcWFUeWFUY2FTRnZBbTg4WXhzZnM0?=
+ =?utf-8?B?MHMwVGR4OE1zYkFiTEttc0U5RVkwMWxIbzhQUlVXdHVCYm5mZnQyMkNlZUZm?=
+ =?utf-8?B?Z095eVl2L01YbGFzNTNYWXFYVGJYTHFUK05UM1pMQ3h4UlhsY1JhdzNRV3Ez?=
+ =?utf-8?B?R2NDNkJiOTVDbW9CZlVyYkZiQk82RmowTnhVUHZuQkFINnlkMDdqZ3lmREZE?=
+ =?utf-8?B?SEtyODZkR3JCSmxkQjNZb1Q1U0hzbHF6SUkwWlhNY21VcnBjd0lBOUFEREZk?=
+ =?utf-8?B?c0lZdlFrRXh3bmNwWmdEdWM4RzczZkxGMXpCUzNNcGl0cXVrTGVLWGVod09G?=
+ =?utf-8?B?c21FZTNxU1NmV1FlTWhxMTVCb1VsMzFtdTZsL0ZrU1ZiQlVVcmdDRnZzQVlV?=
+ =?utf-8?B?NXhWcUVqMkVRd0l5VFZTcHhwMm1GaWpiTDhxQU1DOTlQTXFmUmpsM0g4VFJn?=
+ =?utf-8?B?OTRHakdQUGlTQUFlZkNsMjFnQ3dmMHczNkZNM2xNNHAxK2VTK1BnbytKdWYv?=
+ =?utf-8?B?ZFhtWmZSNnhaS25mTFh6dnNWWnBYZ0Z3Wld1dGoyaU9PRTVTMGhhcXR5emxR?=
+ =?utf-8?B?N1V0eXl1aWRuTVlHMmdKcGdnRU0ybnlRcWRtdHZXN21XQTU2cXB6QT09?=
 X-OriginatorOrg: fortanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e7b9557-6cd5-4518-6b6f-08de578ea2c0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 553dc3b8-a5aa-4f58-564b-08de578ead02
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR11MB5619.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 19:12:07.4462
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 19:12:24.1807
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: de7becae-4883-43e8-82c7-7dbdbb988ae6
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1jF70nkgAqDzevNRo07GUFsoHSywW5BLlR6XhWnW5KBgMXHIkXbiNd/rxseE2jbVCv3sntDvZOZk56DJboziUQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8333
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xn4u+fbkXoQvifnfkpIJC5vNTvd9FU6fO7akFW3jkYNZyd4PU2AtGao3PHXPh2iIOrJZTxryZAoxsR7+CETW2A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8735
 
---------------ms000701060202080606030008
+--------------ms000405040403040907020203
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2026-01-19 20:06, Jethro Beekman wrote:
-> Calling any of the SNP_LAUNCH_ ioctls after SNP_LAUNCH_FINISH results i=
-n a
-> kernel page fault due to RMP violation. Track SNP launch state and exit=
- early.
->=20
-> vCPUs created after SNP_LAUNCH_FINISH won't have a guest VMSA automatic=
-ally
-> created during SNP_LAUNCH_FINISH by converting the kernel-allocated VMS=
-A. Don't
-> allocate a VMSA page, so that the vCPU is in a state similar to what it=
- would
-> be after SNP AP destroy. This ensures pre_sev_run() prevents the vCPU f=
-rom
-> running even if userspace makes the vCPU runnable.
->=20
-> Signed-off-by: Jethro Beekman <jethro@fortanix.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 43 ++++++++++++++++++++++++++----------------=
+The GHCB protocol states that after AP CREATE (as opposed to CREATE_ON_IN=
+IT),
+the hypervisor must immediately proceed to VMRUN. Update vCPU state on AP=
 
->  arch/x86/kvm/svm/svm.h |  1 +
->  2 files changed, 28 insertions(+), 16 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index f59c65abe3cf..cdaca10b8773 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2205,6 +2205,9 @@ static int snp_launch_start(struct kvm *kvm, stru=
-ct kvm_sev_cmd *argp)
->  	if (!sev_snp_guest(kvm))
->  		return -ENOTTY;
-> =20
-> +	if (sev->snp_finished)
-> +		return -EINVAL;
-> +
->  	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(param=
-s)))
->  		return -EFAULT;
-> =20
-> @@ -2369,7 +2372,7 @@ static int snp_launch_update(struct kvm *kvm, str=
-uct kvm_sev_cmd *argp)
->  	void __user *src;
->  	int ret =3D 0;
-> =20
-> -	if (!sev_snp_guest(kvm) || !sev->snp_context)
-> +	if (!sev_snp_guest(kvm) || !sev->snp_context || sev->snp_finished)
->  		return -EINVAL;
-> =20
->  	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(param=
-s)))
-> @@ -2502,7 +2505,7 @@ static int snp_launch_finish(struct kvm *kvm, str=
-uct kvm_sev_cmd *argp)
->  	if (!sev_snp_guest(kvm))
->  		return -ENOTTY;
-> =20
-> -	if (!sev->snp_context)
-> +	if (!sev->snp_context || sev->snp_finished)
->  		return -EINVAL;
-> =20
->  	if (copy_from_user(&params, u64_to_user_ptr(argp->data), sizeof(param=
-s)))
-> @@ -2548,13 +2551,15 @@ static int snp_launch_finish(struct kvm *kvm, s=
-truct kvm_sev_cmd *argp)
->  	data->gctx_paddr =3D __psp_pa(sev->snp_context);
->  	ret =3D sev_issue_cmd(kvm, SEV_CMD_SNP_LAUNCH_FINISH, data, &argp->er=
-ror);
-> =20
-> -	/*
-> -	 * Now that there will be no more SNP_LAUNCH_UPDATE ioctls, private p=
-ages
-> -	 * can be given to the guest simply by marking the RMP entry as priva=
-te.
-> -	 * This can happen on first access and also with KVM_PRE_FAULT_MEMORY=
-=2E
-> -	 */
-> -	if (!ret)
-> +	if (!ret) {
-> +		sev->snp_finished =3D true;
-> +		/*
-> +		 * Now that there will be no more SNP_LAUNCH_UPDATE ioctls, private =
-pages
-> +		 * can be given to the guest simply by marking the RMP entry as priv=
-ate.
-> +		 * This can happen on first access and also with KVM_PRE_FAULT_MEMOR=
-Y.
-> +		 */
->  		kvm->arch.pre_fault_allowed =3D true;
-> +	}
-> =20
->  	kfree(id_auth);
-> =20
-> @@ -3253,6 +3258,9 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
-> =20
->  	svm =3D to_svm(vcpu);
-> =20
-> +	if (!svm->sev_es.vmsa)
-> +		goto skip_vmsa_free;
-> +
->  	/*
->  	 * If it's an SNP guest, then the VMSA was marked in the RMP table as=
+CREATE so this happens.
 
->  	 * a guest-owned page. Transition the page to hypervisor state before=
+vCPUs created after SNP_LAUNCH_FINISH don't go through snp_launch_update_=
+vmsa.
+Ensure the vCPU state is updated properly during VMCB initialization.
 
-> @@ -4653,6 +4661,7 @@ void sev_init_vmcb(struct vcpu_svm *svm, bool ini=
-t_event)
-> =20
->  int sev_vcpu_create(struct kvm_vcpu *vcpu)
->  {
-> +	struct kvm_sev_info *sev =3D to_kvm_sev_info(vcpu->kvm);
->  	struct vcpu_svm *svm =3D to_svm(vcpu);
->  	struct page *vmsa_page;
-> =20
-> @@ -4661,15 +4670,17 @@ int sev_vcpu_create(struct kvm_vcpu *vcpu)
->  	if (!sev_es_guest(vcpu->kvm))
->  		return 0;
-> =20
-> -	/*
-> -	 * SEV-ES guests require a separate (from the VMCB) VMSA page used to=
+Signed-off-by: Jethro Beekman <jethro@fortanix.com>
+---
+ arch/x86/kvm/svm/sev.c | 43 ++++++++++++++++++++++++------------------
+ 1 file changed, 25 insertions(+), 18 deletions(-)
 
-> -	 * contain the encrypted register state of the guest.
-> -	 */
-> -	vmsa_page =3D snp_safe_alloc_page();
-> -	if (!vmsa_page)
-> -		return -ENOMEM;
-> +	if (!sev->snp_finished) {
-> +		/*
-> +		 * SEV-ES guests require a separate (from the VMCB) VMSA page used t=
-o
-> +		 * contain the encrypted register state of the guest.
-> +		 */
-> +		vmsa_page =3D snp_safe_alloc_page();
-> +		if (!vmsa_page)
-> +			return -ENOMEM;
-> =20
-> -	svm->sev_es.vmsa =3D page_address(vmsa_page);
-> +		svm->sev_es.vmsa =3D page_address(vmsa_page);
-> +	}
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index cdaca10b8773..9af1bd5b2071 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -960,6 +960,19 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+ 	return 0;
+ }
+=20
++static void sev_es_finalize_vcpu(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.guest_state_protected =3D true;
++	/*
++	 * SEV-ES (and thus SNP) guest mandates LBR Virtualization to
++	 * be _always_ ON. Enable it only after setting
++	 * guest_state_protected because KVM_SET_MSRS allows dynamic
++	 * toggling of LBRV (for performance reason) on write access to
++	 * MSR_IA32_DEBUGCTLMSR when guest_state_protected is not set.
++	 */
++	svm_enable_lbrv(vcpu);
++}
++
+ static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vc=
+pu,
+ 				    int *error)
+ {
+@@ -999,15 +1012,9 @@ static int __sev_launch_update_vmsa(struct kvm *kvm=
+, struct kvm_vcpu *vcpu,
+ 	 * do xsave/xrstor on it.
+ 	 */
+ 	fpstate_set_confidential(&vcpu->arch.guest_fpu);
+-	vcpu->arch.guest_state_protected =3D true;
+=20
+-	/*
+-	 * SEV-ES guest mandates LBR Virtualization to be _always_ ON. Enable i=
+t
+-	 * only after setting guest_state_protected because KVM_SET_MSRS allows=
 
-I think there may be a race between this creation of a vCPU and the kvm_f=
-or_each_vcpu() loop in snp_launch_update_vmsa(). What should happen is th=
-at every vCPU that wasn't considered in snp_launch_update_vmsa() must not=
- have a VMSA allocated here. If there is a race, I'm not sure what the be=
-st way is to prevent it.
+-	 * dynamic toggling of LBRV (for performance reason) on write access to=
 
-> =20
->  	vcpu->arch.guest_tsc_protected =3D snp_is_secure_tsc_enabled(vcpu->kv=
-m);
-> =20
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 01be93a53d07..59c328c13b2a 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -96,6 +96,7 @@ struct kvm_sev_info {
->  	bool active;		/* SEV enabled guest */
->  	bool es_active;		/* SEV-ES enabled guest */
->  	bool need_init;		/* waiting for SEV_INIT2 */
-> +	bool snp_finished;	/* SNP guest measurement has been finalized */
->  	unsigned int asid;	/* ASID used for this guest */
->  	unsigned int handle;	/* SEV firmware handle */
->  	int fd;			/* SEV device fd */
+-	 * MSR_IA32_DEBUGCTLMSR when guest_state_protected is not set.
+-	 */
+-	svm_enable_lbrv(vcpu);
++	sev_es_finalize_vcpu(vcpu);
++
+ 	return 0;
+ }
+=20
+@@ -2480,15 +2487,7 @@ static int snp_launch_update_vmsa(struct kvm *kvm,=
+ struct kvm_sev_cmd *argp)
+ 			return ret;
+ 		}
+=20
+-		svm->vcpu.arch.guest_state_protected =3D true;
+-		/*
+-		 * SEV-ES (and thus SNP) guest mandates LBR Virtualization to
+-		 * be _always_ ON. Enable it only after setting
+-		 * guest_state_protected because KVM_SET_MSRS allows dynamic
+-		 * toggling of LBRV (for performance reason) on write access to
+-		 * MSR_IA32_DEBUGCTLMSR when guest_state_protected is not set.
+-		 */
+-		svm_enable_lbrv(vcpu);
++		sev_es_finalize_vcpu(vcpu);
+ 	}
+=20
+ 	return 0;
+@@ -4030,6 +4029,10 @@ static void sev_snp_init_protected_guest_state(str=
+uct kvm_vcpu *vcpu)
+ 	/* Use the new VMSA */
+ 	svm->vmcb->control.vmsa_pa =3D pfn_to_hpa(pfn);
+=20
++	/* vCPU was added after SNP_LAUNCH_FINISH */
++	if (!vcpu->arch.guest_state_protected)
++		sev_es_finalize_vcpu(vcpu);
++
+ 	/* Mark the vCPU as runnable */
+ 	kvm_set_mp_state(vcpu, KVM_MP_STATE_RUNNABLE);
+=20
+@@ -4111,8 +4114,12 @@ static int sev_snp_ap_creation(struct vcpu_svm *sv=
+m)
+ 	 * Unless Creation is deferred until INIT, signal the vCPU to update
+ 	 * its state.
+ 	 */
+-	if (request !=3D SVM_VMGEXIT_AP_CREATE_ON_INIT)
++	if (request !=3D SVM_VMGEXIT_AP_CREATE_ON_INIT) {
++		if (target_vcpu->arch.mp_state =3D=3D KVM_MP_STATE_UNINITIALIZED ||
++			target_vcpu->arch.mp_state =3D=3D KVM_MP_STATE_INIT_RECEIVED)
++				kvm_set_mp_state(target_vcpu, KVM_MP_STATE_RUNNABLE);
+ 		kvm_make_request_and_kick(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target=
+_vcpu);
++	}
+=20
+ 	return 0;
+ }
+--=20
+2.43.0
 
 
---------------ms000701060202080606030008
+--------------ms000405040403040907020203
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -420,8 +366,8 @@ tahwHP7IqOHOMYIFVDCCBVACAQEwgZIwfjELMAkGA1UEBhMCVVMxDjAMBgNVBAgMBVRleGFz
 MRAwDgYDVQQHDAdIb3VzdG9uMREwDwYDVQQKDAhTU0wgQ29ycDE6MDgGA1UEAwwxU1NMLmNv
 bSBDbGllbnQgQ2VydGlmaWNhdGUgSW50ZXJtZWRpYXRlIENBIFJTQSBSMgIQNfphqrZnvSlG
 TcM/9wjbxjANBglghkgBZQMEAgEFAKCCAxIwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAc
-BgkqhkiG9w0BCQUxDxcNMjYwMTE5MTkxMjAxWjAvBgkqhkiG9w0BCQQxIgQgIsGbDc/gKFnJ
-v6SQWmPfMpkEU/IIeWlunpSN1Evf1O4wgaMGCSsGAQQBgjcQBDGBlTCBkjB+MQswCQYDVQQG
+BgkqhkiG9w0BCQUxDxcNMjYwMTE5MTkxMjE2WjAvBgkqhkiG9w0BCQQxIgQglnhFFBxBKMJ7
+VDdzPVJVYIc/f5w/3yJjteDnrBJv2ikwgaMGCSsGAQQBgjcQBDGBlTCBkjB+MQswCQYDVQQG
 EwJVUzEOMAwGA1UECAwFVGV4YXMxEDAOBgNVBAcMB0hvdXN0b24xETAPBgNVBAoMCFNTTCBD
 b3JwMTowOAYDVQQDDDFTU0wuY29tIENsaWVudCBDZXJ0aWZpY2F0ZSBJbnRlcm1lZGlhdGUg
 Q0EgUlNBIFIyAhA1+mGqtme9KUZNwz/3CNvGMIGlBgsqhkiG9w0BCRACCzGBlaCBkjB+MQsw
@@ -434,14 +380,14 @@ hkgBZQMEAgEwCwYJYIZIAWUDBAICMAsGCWCGSAFlAwQCAzALBglghkgBZQMEAgQwCwYJYIZI
 AWUDBAIHMAsGCWCGSAFlAwQCCDALBglghkgBZQMEAgkwCwYJYIZIAWUDBAIKMAsGCSqGSIb3
 DQEBATALBgkrgQUQhkg/AAIwCAYGK4EEAQsAMAgGBiuBBAELATAIBgYrgQQBCwIwCAYGK4EE
 AQsDMAsGCSuBBRCGSD8AAzAIBgYrgQQBDgAwCAYGK4EEAQ4BMAgGBiuBBAEOAjAIBgYrgQQB
-DgMwDQYJKoZIhvcNAQEBBQAEggGADyvE8ySvRWhjfHb9DmxSRW4E4hvrt9If2AVEdPoTRp8/
-m3QgDyxDEnqLGSn8Zrpv+6jfckH0KmZ4SPk+Xo4dn3kY1ORlGzm3WcloTu2nIFIdcgEH1HPl
-RdtJiK/FH0ON4fxJam+34eNh0s53YpYo7Y06yKc1tGg0d9AXbdQySL7JNGYdn6aOyOTzdolm
-cyVWOV4hPOr4ck0AIueJfjaS8HvL6GgFoqKhcREvoF9KtdK6c5w9APmIDxlVWrkvO7XjHQ6+
-mIsk9bjB6WhbHzDgGvCJ+b11N6TB8jY4CfjegbEIOGbu/GLiPaCLNgBnz/p2Mj8w5d+mwdAy
-WeQV1/xht1qvCXmNtEunzLDR20MivG9TyaMVP2XY2L7uUrnuLt4XBg4RL4Gui5kJv+9hLvEi
-M6Oc4H8UE3DQd1sFW387lEkbTwH6E+FUd6q4JoqO+AX5LDniCNTVuTszIPrc9FuGrtDV8hRS
-UrcrMgjh1WszpYQnRsOHOeYVVu/LkR6iglRVAAAAAAAA
+DgMwDQYJKoZIhvcNAQEBBQAEggGAm6XIu9sUES+U68g2NCkm+1b/SGbs0F3wnj1qa8kmi1Pk
+N29Y3B+pzf1da8uzjYUjKjbgKuv9bVNjtnmPIv+AhhBZdgdtqYmZijV/eWE9KkwrEmQ2gff9
+8sJsZHkxF1RnwaeMH4JslsmFJhZEXAxsXDw5LXZ+MUcqKEuZDP6OmXxMBgWlc1WlLZ2EFkuM
+Enr0zUOPeXx9w9TNtI1gW/huM2wnTX7yrYhZ4sFqCpKLtoPUsCVRRyqEiIqWV92It4NNmfwj
+63i7NPUmj/Epmj2nIwnKOLecSjZdmd4ug8Xq9jwPTG9j7MWL3I1fFxchSMQtg9cfuohLEnp3
+Xhme2yQiOmzCtpEgnrSCvfrcoADmALtYJUJVkqAea2vza0x3uUv9MjgUBQRCdwD8eDYv8iNf
+43QFXKrl8RzdthzRjKHWC6U5fh5XD51280WWwgtjhhT24yf43PnUCJfSxTYFYFRPckOJx8Fp
+cgYkn+E5xVnMITGwvkAfh/mQQVMkn1cpNb12AAAAAAAA
 
---------------ms000701060202080606030008--
+--------------ms000405040403040907020203--
 
