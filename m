@@ -1,111 +1,61 @@
-Return-Path: <kvm+bounces-68528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A50D3B32A
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 18:04:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 702D4D3B3C4
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 18:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6057E300FEDA
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 17:03:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6CA29309008D
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 16:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4FB2BF001;
-	Mon, 19 Jan 2026 17:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8535D38F256;
+	Mon, 19 Jan 2026 16:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="njIjwbMY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zj1i8k90"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D255217F2E
-	for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 17:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAB732E126;
+	Mon, 19 Jan 2026 16:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768842216; cv=none; b=qZlMxW0TArT1ZLl2wbKglAB+6n97uEWL35wnHP8pzmqXrGPNDpmge6RId5JzNxJMCHvzX87WhBV3XdgGuY1OLyHHNvpdESN4B6nqN93c51TwW+hAKYf8xvAf4JZ2XZ8HqHhQcDt55NrRemCSi6mOwSOgxurH6v/DbioIH/QX3vE=
+	t=1768840661; cv=none; b=J5+sryMyEm6Ml5BjyzdMXRkdVe8ag9py5UJtcx4eqhIYlEjUAOB8xoxfXJ20nl5CMccSpUg2gOhMvJhUxHp0Q7tmVw+UCUt0aLnKQwBIMzvQGm3tzLaolPokayE9o4yXzRv40CxTMo4MeQMY8sZlwNR+JGoDYQ04G8/E7uy+K4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768842216; c=relaxed/simple;
-	bh=rf6zLo4HMSx3jjTOpNOmyUHF2Og5rRAkebiZTxcDcUQ=;
+	s=arc-20240116; t=1768840661; c=relaxed/simple;
+	bh=oSn6eeMjVt0BdckSdLlrBsRGgN6O4ooWNqYJ4Q6NUyQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHC8cEyOj1S8hwziAEQGFwd6cUSpR+O69kScrBBp3++5QTXrIitgFPigHYdBT9hsNoRXBz2OjnVhTInLM3lL3mPxBsEHIAtjMdk+C3oNLdANoljqc4bb45fEaa77FDex5VT9ttW7EwgHiDnQFhWdwtoofe3RIF/SAaB+RoL7HPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=njIjwbMY; arc=none smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-93f5905e60eso2568457241.0
-        for <kvm@vger.kernel.org>; Mon, 19 Jan 2026 09:03:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1768842214; x=1769447014; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xPF37M4OZRPT3BtJHYXM5EEOm0b3fHdtNnzMGWb7xcQ=;
-        b=njIjwbMYYxpN/nZjTfqw0ZlvGqNzdiD7cVaRqtfNiIwzowDBE111KsGg/eJ979Nj1E
-         cBb6K0t6GSbh/cKrI78GNEE+cil+xIFTz6Bogo42/gfzuuiNyCHyIcCmrjadpmPZAWIm
-         kwDUJwv5qC0xfLWc6zjCmoumBSj/GAsFWJkJ3nFyyPXbmM7lRx8U1iLnxC1vOn5pBruQ
-         5o4ghFmRoZHj9vmtufocfIY6JuWdIKBlDW8L/DdizF/Jtand/HzZprHoECeqnzmfxd+Q
-         zP0eMBCvnqeeSZZcx2prjHK3OoqUDn4pDSL4rj1kPkbUcteYON83SDaBxaqLpwWkzxUD
-         Qqig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768842214; x=1769447014;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xPF37M4OZRPT3BtJHYXM5EEOm0b3fHdtNnzMGWb7xcQ=;
-        b=tgFe0b40LxU6IKuta0NbNhsSCNIH6uSZ5DdRZhU6e+zHT9Ug14Jf7s1eK+6ncE0JHq
-         XNRYQXRzMG9ukfquECvYD62nKz0DsajPDrrrx9YG6ciszGBQsL5Ihp1UvlroGeVZSYWG
-         Zl9PvRLFzSRQMuU7MO2cX2xHGUcOkSRCOLQeEW5Pi1CIfISkOUa2vLZCf7aLAqiKbMvI
-         e4nVKJuzPLQxZeziscZHIRtswI573O+vFnzx0iMv2vIkNP10Ct0ZYEd5XdGwSYrTTSlj
-         XZwwvNZikxCH2+35tLrikHqbxctFdvBG4ExlMOdJv6PihtuIHBgroj/0d2y5KbypdiCx
-         +fXA==
-X-Forwarded-Encrypted: i=1; AJvYcCULmLynGw7J7siWTQ2LqYStZWhCTdmJZ0W40sNgFwNoTSGTf13kW4xwDw4GcnCk/e9Up+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/u+yST8pTA0+0vq15gOtupGaxpVJCyfkOOvjMmWYl9JzInvc3
-	WpnHMgp4+jFu9Jx1BsM7mJV2Plm+565oh6s90O82qblXxuFdJwiYeZJ80uVIVP/oggM=
-X-Gm-Gg: AY/fxX50typzcinHEqLtwpuqm6ZqLFVxL4+Z6iuFP4sFTwezoM6MZxw3B08wueExZBr
-	A0aGqegtBtQxKvaoWj2vJ5B9eSScq6mm4M/htHq/LuSss9GtrefG6lVM+LUP6JENc2r1nDmIygY
-	G/zuN2WJu1SZResfyZH/OjDfpcYYxwCTb+KRSKk0qEc+Q8MueH7tFuLfNgo7O2C54DY6kQtHOwd
-	fp9nywhgSiLNxkMqdTkoRJtpUGyiKucqvNpeJLxrJsll8lufiHiaJyT3x+3LMr9596dqdCr6LBi
-	I2la7KkrT6jAjl46mrDt/y0el6sEp3hgrJdlq+seqtw1Ppyk0/bhHqSwG70LEv+AzBgt5oD4rG1
-	aUcy93AI4CMK1pa3tjEJptOFLK2j1W60NoloJvSJ4F2iUeyMeiiwcQlqq3nUBUIERCnR0FEhMaj
-	6fl+N+3bNbRx+hh6nYVW+mbMEbPKqJyiFejGguFg/cj4MdJuq3pwnu7s1ts8GU0/qHd9M=
-X-Received: by 2002:a05:6102:2ac9:b0:5db:d07c:218f with SMTP id ada2fe7eead31-5f1a55dacc2mr3505780137.40.1768842212920;
-        Mon, 19 Jan 2026 09:03:32 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e6027c9sm90833946d6.13.2026.01.19.09.03.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jan 2026 09:03:32 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vhsf5-00000005ITl-3vB3;
-	Mon, 19 Jan 2026 13:03:31 -0400
-Date: Mon, 19 Jan 2026 13:03:31 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex@shazbot.org>, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] vfio: Add pinned interface to perform revoke
- semantics
-Message-ID: <20260119170331.GJ961572@ziepe.ca>
-References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
- <20260118-dmabuf-revoke-v2-4-a03bb27c0875@nvidia.com>
- <bd37adf0-afd0-49c4-b608-7f9aa5994f7b@amd.com>
- <20260119130244.GN13201@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=emMgdDGMwOspwas1XTBBt6bls6HTNzxOO2Xe8JH56ZlIAVZNXbDE+H4DnhmNg+dizjpsY4wrsXSVQ9DZI2t2tqK3ktO7pI2sat2No+zHZNtIjYjZF2RSaE8TYNrhS3G7bmU+8gDuQNeC8LhJxLmhTEyGgf53e9qzNm2zwG/d8s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zj1i8k90; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE2FC116C6;
+	Mon, 19 Jan 2026 16:37:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768840661;
+	bh=oSn6eeMjVt0BdckSdLlrBsRGgN6O4ooWNqYJ4Q6NUyQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Zj1i8k90WEUW6SxcQ/g4vVNC85cl4uQEQOL0Ob6m3v6FIChZ2NAPoVxjf5hiyhxFe
+	 U+vnzci8BY8Lw0ecSrqIa+cIlqJjcyMlaXkFuGs179r2uOAmVEw3Tw0va566yEsSH2
+	 im0reOy9tcxZFXztZnzcFy/DY+B/1XqxdgJbN4SuA4wn3u45qnjdq3NHqijYEgktHu
+	 xPdul4mSnLMbjXq3CLvgDsX3hvgRekot1zqBe6jKQ/8c0hQat91jimlcxIfd0QjeZK
+	 87DaOV/B+WLHEs9IJsOBBYsuV7YFci0h9sJlUBJAlBmh8E5HDy4vzMFErHpTHmKvtN
+	 kFK0j5cnDGzPw==
+Date: Mon, 19 Jan 2026 16:37:33 +0000
+From: Will Deacon <will@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: catalin.marinas@arm.com, maz@kernel.org, broonie@kernel.org,
+	oliver.upton@linux.dev, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
+	lpieralisi@kernel.org, yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com, joey.gouly@arm.com,
+	yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org,
+	mark.rutland@arm.com, arnd@arndb.de,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 RESEND 6/9] arm64: futex: support futex with FEAT_LSUI
+Message-ID: <aW5dzb0ldp8u8Rdm@willie-the-truck>
+References: <20251214112248.901769-1-yeoreum.yun@arm.com>
+ <20251214112248.901769-7-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -114,16 +64,254 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260119130244.GN13201@unreal>
+In-Reply-To: <20251214112248.901769-7-yeoreum.yun@arm.com>
 
-On Mon, Jan 19, 2026 at 03:02:44PM +0200, Leon Romanovsky wrote:
+On Sun, Dec 14, 2025 at 11:22:45AM +0000, Yeoreum Yun wrote:
+> Current futex atomic operations are implemented with ll/sc instructions
+> and clearing PSTATE.PAN.
+> 
+> Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
+> also atomic operation for user memory access in kernel it doesn't need
+> to clear PSTATE.PAN bit anymore.
+> 
+> With theses instructions some of futex atomic operations don't need to
+> be implmented with ldxr/stlxr pair instead can be implmented with
+> one atomic operation supplied by FEAT_LSUI.
+> 
+> However, some of futex atomic operation don't have matched
+> instructuion i.e) eor or cmpxchg with word size.
+> For those operation, uses cas{al}t to implement them.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/include/asm/futex.h | 180 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 178 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index f8cb674bdb3f..6778ff7e1c0e 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -9,6 +9,8 @@
+>  #include <linux/uaccess.h>
+>  #include <linux/stringify.h>
+> 
+> +#include <asm/alternative.h>
+> +#include <asm/alternative-macros.h>
+>  #include <asm/errno.h>
+> 
+>  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> @@ -86,11 +88,185 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  	return ret;
+>  }
+> 
+> +#ifdef CONFIG_AS_HAS_LSUI
+> +
+> +/*
+> + * When the LSUI feature is present, the CPU also implements PAN, because
+> + * FEAT_PAN has been mandatory since Armv8.1. Therefore, there is no need to
+> + * call uaccess_ttbr0_enable()/uaccess_ttbr0_disable() around each LSUI
+> + * operation.
+> + */
 
-> We (VFIO and IOMMUFD) followed the same pattern used in  
-> amdgpu_bo_move_notify(), which also does not wait.
+I'd prefer not to rely on these sorts of properties because:
 
-You have to be really careful copying anything from the GPU drivers as
-they have these waits hidden and batched in other parts of their
-operations..
+  - CPU bugs happen all the time
+  - Virtualisation and idreg overrides mean illegal feature combinations
+    can show up
+  - The architects sometimes change their mind
 
-Jason
+So let's either drop the assumption that we have PAN if LSUI *or* actually
+test that someplace during feature initialisation.
+
+> +
+> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> +
+> +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
+> +static __always_inline int						\
+> +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> +{									\
+> +	int ret = 0;							\
+> +	int oldval;							\
+> +									\
+> +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
+> +	__LSUI_PREAMBLE							\
+> +"1:	" #asm_op #mb "	%w3, %w2, %1\n"					\
+
+What's the point in separating the barrier suffix from the rest of the
+instruction mnemonic? All the callers use -AL.
+
+> +"2:\n"									\
+> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
+> +	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
+> +	: "r" (oparg)							\
+> +	: "memory");							\
+> +									\
+> +	if (!ret)							\
+> +		*oval = oldval;						\
+> +									\
+> +	return ret;							\
+> +}
+> +
+> +LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
+> +LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
+> +LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
+> +LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
+> +
+> +static __always_inline int
+> +__lsui_cmpxchg64(u64 __user *uaddr, u64 *oldval, u64 newval)
+> +{
+> +	int ret = 0;
+> +
+> +	asm volatile("// __lsui_cmpxchg64\n"
+> +	__LSUI_PREAMBLE
+> +"1:	casalt	%x2, %x3, %1\n"
+
+
+How bizarre, they changed the order of the AL and T compared to SWPTAL.
+Fair enough...
+
+Also, I don't think you need the 'x' prefix on the 64-bit variables.
+
+> +"2:\n"
+> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
+> +	: "+r" (ret), "+Q" (*uaddr), "+r" (*oldval)
+> +	: "r" (newval)
+> +	: "memory");
+
+Don't you need to update *oldval here if the CAS didn't fault?
+
+> +
+> +	return ret;
+> +}
+> +
+> +static __always_inline int
+> +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> +{
+> +	u64 __user *uaddr64;
+> +	bool futex_on_lo;
+> +	int ret = -EAGAIN, i;
+> +	u32 other, orig_other;
+> +	union {
+> +		struct futex_on_lo {
+> +			u32 val;
+> +			u32 other;
+> +		} lo_futex;
+> +
+> +		struct futex_on_hi {
+> +			u32 other;
+> +			u32 val;
+> +		} hi_futex;
+> +
+> +		u64 raw;
+> +	} oval64, orig64, nval64;
+> +
+> +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
+> +	futex_on_lo = (IS_ALIGNED((unsigned long)uaddr, sizeof(u64)) ==
+> +			IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN));
+
+Just make LSUI depend on !CPU_BIG_ENDIAN in Kconfig. The latter already
+depends on BROKEN and so we'll probably drop it soon anyway. There's
+certainly no need to care about it for new features and it should simplify
+the code you have here if you can assume little-endian.
+
+> +
+> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+> +		if (get_user(oval64.raw, uaddr64))
+> +			return -EFAULT;
+
+Since oldval is passed to us as an argument, can we get away with a
+32-bit get_user() here?
+
+> +
+> +		nval64.raw = oval64.raw;
+> +
+> +		if (futex_on_lo) {
+> +			oval64.lo_futex.val = oldval;
+> +			nval64.lo_futex.val = newval;
+> +		} else {
+> +			oval64.hi_futex.val = oldval;
+> +			nval64.hi_futex.val = newval;
+> +		}
+> +
+> +		orig64.raw = oval64.raw;
+> +
+> +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
+> +			return -EFAULT;
+> +
+> +		if (futex_on_lo) {
+> +			oldval = oval64.lo_futex.val;
+> +			other = oval64.lo_futex.other;
+> +			orig_other = orig64.lo_futex.other;
+> +		} else {
+> +			oldval = oval64.hi_futex.val;
+> +			other = oval64.hi_futex.other;
+> +			orig_other = orig64.hi_futex.other;
+> +		}
+> +
+> +		if (other == orig_other) {
+> +			ret = 0;
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!ret)
+> +		*oval = oldval;
+
+Shouldn't we set *oval to the value we got back from the CAS?
+
+> +
+> +	return ret;
+> +}
+> +
+> +static __always_inline int
+> +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
+> +{
+> +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
+
+Please a comment about the bitwise negation of oparg here as we're undoing
+the one from the caller.
+
+> +}
+> +
+> +static __always_inline int
+> +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
+> +{
+> +	u32 oldval, newval, val;
+> +	int ret, i;
+> +
+> +	/*
+> +	 * there are no ldteor/stteor instructions...
+> +	 */
+> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+> +		if (get_user(oldval, uaddr))
+> +			return -EFAULT;
+> +
+> +		newval = oldval ^ oparg;
+> +
+> +		ret = __lsui_cmpxchg32(uaddr, oldval, newval, &val);
+> +		if (ret)
+> +			return ret;
+> +
+> +		if (val == oldval) {
+> +			*oval = val;
+> +			return 0;
+> +		}
+> +	}
+> +
+> +	return -EAGAIN;
+> +}
+> +
+> +static __always_inline int
+> +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> +{
+> +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+> +}
+> +
+> +#define __lsui_llsc_body(op, ...)					\
+> +({									\
+> +	alternative_has_cap_likely(ARM64_HAS_LSUI) ?			\
+
+This doesn't seem like it should be the "likely" case just yet?
+
+Will
 
