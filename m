@@ -1,281 +1,142 @@
-Return-Path: <kvm+bounces-68488-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68489-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53888D3A2F0
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 10:28:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191E6D3A355
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 10:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E60463035F76
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 09:27:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68BE43096181
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 09:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473473559C3;
-	Mon, 19 Jan 2026 09:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B81350D4D;
+	Mon, 19 Jan 2026 09:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lCUcN4om"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXmDqQ/x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDC02DC762;
-	Mon, 19 Jan 2026 09:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FEE350280;
+	Mon, 19 Jan 2026 09:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768814841; cv=none; b=bxxJb1P+9cxFVWR0IKSpaaayxH2yONz7cQhdR2C/huq3wtRevfPqNT9vD7lhsycGG5PSJDCrKKvIYxxoeAGGjWbgcOjT9HkAwEL0ZstE3qQ+MOYeIRmrq7VDQOsH9kP5Q8PhRtpcDyOMgEBbvDeDSNMmCkIcsWGWDiVvPnXOZ5k=
+	t=1768815541; cv=none; b=YcDtS1CJO2UYNn3snhllEGCo5cHKeNbg6Jze2Ie/VOSDp5yiEPVHfgvy3ooNzNFRqFo5kk1j2nlbYoT97Rjs/1U3WdguyITzs/XJfCel6EqwJmXgMj9cWqLxgsbwT9TJ1Z7Ahg97tJDnhASerS3AUpyrON7TetiTQEvRl9EWWBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768814841; c=relaxed/simple;
-	bh=1LWdKy0wxcp3AbNhZv5YgZA5HhjEKmlwhhAIxDXEKnI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rSiVBb02I61goujlGPCug/xLruhlUgvSXIWxYVbJpQHmKdHdyzykKLFM3ax9KZlddbykCM0UAidb2p1L8GhcMbA+eeCZszWMhSINM3uWbKLbFj8/caCkRoLHCVx2S35vtUP+pseRO6RXG+HrvMZcJP0LExTcVKpdqAG73o7wqIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lCUcN4om; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768814840; x=1800350840;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=1LWdKy0wxcp3AbNhZv5YgZA5HhjEKmlwhhAIxDXEKnI=;
-  b=lCUcN4omlnVLN9ToWQL+8Os53D1o+igys0Zvkj+AmwYNh3yNMpzITGQ9
-   LKVVm536jQWElFYBWjbDRfuTyXh8OGHIuiEU4bfBL6AEgip3PsMOtekuC
-   UgkHnxyiVSuOIpqeUBcCsxK9d5CPOjflvWtNcls+sM3quly4iT2X1QmXD
-   +Uj3JsByIjomPs5SNQnPZjQmmNNb9N4sdMNQmASFP0ncAl+HjbB6R/vXS
-   9iX11OmRwFl2xgdnPcKoWGJNm3gXpMRhePV3RghoSVq8E/DzsF6o8DxVS
-   CpVh4kTALyT5kciHzRfGdvTeWBvfCg85VGKs26DYKE4dLnnbLhnKByW2B
-   A==;
-X-CSE-ConnectionGUID: SmUbgZjFTyuSf5xnL+fz2A==
-X-CSE-MsgGUID: KBMgKT0NRE+QJ+3hTh2J/Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11675"; a="69223449"
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="69223449"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2026 01:27:19 -0800
-X-CSE-ConnectionGUID: wVDcltDLQGSQ0FDWpueWJw==
-X-CSE-MsgGUID: rdbnuLpiR2SkFhlwu7xzJw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,237,1763452800"; 
-   d="scan'208";a="210835738"
-Received: from egrumbac-mobl6.ger.corp.intel.com (HELO [10.245.244.32]) ([10.245.244.32])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2026 01:27:11 -0800
-Message-ID: <9112a605d2ee382e83b84b50c052dd9e4a79a364.camel@linux.intel.com>
-Subject: Re: [PATCH v2 0/4] dma-buf: document revoke mechanism to invalidate
- shared buffers
-From: Thomas =?ISO-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>, Christian
- =?ISO-8859-1?Q?K=F6nig?=	 <christian.koenig@amd.com>, Alex Deucher
- <alexander.deucher@amd.com>, David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, Gerd Hoffmann <kraxel@redhat.com>,  Dmitry
- Osipenko <dmitry.osipenko@collabora.com>, Gurchetan Singh
- <gurchetansingh@chromium.org>, Chia-I Wu	 <olvaffe@gmail.com>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>,  Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, Lucas De
- Marchi	 <lucas.demarchi@intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Joerg
- Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy
- <robin.murphy@arm.com>, Alex Williamson <alex@shazbot.org>, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org, 
-	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev, 
-	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org
-Date: Mon, 19 Jan 2026 10:27:00 +0100
-In-Reply-To: <20260119075229.GE13201@unreal>
-References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
-	 <f115c91bbc9c6087d8b32917b9e24e3363a91f33.camel@linux.intel.com>
-	 <20260119075229.GE13201@unreal>
-Organization: Intel Sweden AB, Registration Number: 556189-6027
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-2.fc41) 
+	s=arc-20240116; t=1768815541; c=relaxed/simple;
+	bh=A1HF+c89D77043i9Z2YC3U06/ILbBibQS8Yb/UCStdI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cVCO3NOSQs/q97OwuiEJky/+EOMwHLMV2LCz3h6oMk8MuL4Wc3uCQ2jTH7n6+CqGywWTqCl8iCNH9/QmfxNhgysiDswovpv4bVEBrYxyvq5ge1+7uKOIRzZbm+d7ChALRQsDnSrNaknH9i27qlvXg9l08eVmLGH2M/VIG+Bn3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXmDqQ/x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD2AC116C6;
+	Mon, 19 Jan 2026 09:39:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768815541;
+	bh=A1HF+c89D77043i9Z2YC3U06/ILbBibQS8Yb/UCStdI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FXmDqQ/xcE7jFSyt+rW9m8C3jgFKnw1SMkYYkNv26nPYeJEPiAZEzgEvE3Wshrb+b
+	 yFVnLJU1YZu23fyZpFrBJII+QHi695VOpIlwjEWoFRNKr/1ywOydjbG64mgWycHaPt
+	 c7C9u8h9kP/4S6nV17KqVxK2L1NQmH4tqF+S+QKXSytAuZrnp339Ltmp0tdcXVqKu3
+	 t/KCGkgrlj+XzsB3FGSITAcoRyod4ct2xGf+wtuKFSF7FWj1J38w1of2BprSg7yI65
+	 uz56vhpcyLSvC/NIPOq6IEYxPbKjtM6iiS+05zHJRAmFaFQSH13qnGQtC1+6lzyORP
+	 z23iQWefG1o4A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vhlit-00000003Wfc-0NBv;
+	Mon, 19 Jan 2026 09:38:59 +0000
+Date: Mon, 19 Jan 2026 09:38:58 +0000
+Message-ID: <867btec571.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>,
+	"will@kernel.org"
+	<will@kernel.org>,
+	"julien.thierry.kdev@gmail.com"
+	<julien.thierry.kdev@gmail.com>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Alexandru Elisei <Alexandru.Elisei@arm.com>,
+	nd <nd@arm.com>
+Subject: Re: [PATCH kvmtool v4 5/7] arm64: Add FEAT_E2H0 support
+In-Reply-To: <c83e97aec2fd95548a5c4d2aa395b7fc09a9f38d.camel@arm.com>
+References: <20250924134511.4109935-1-andre.przywara@arm.com>
+	<20250924134511.4109935-6-andre.przywara@arm.com>
+	<c83e97aec2fd95548a5c4d2aa395b7fc09a9f38d.camel@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, Andre.Przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, Alexandru.Elisei@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 2026-01-19 at 09:52 +0200, Leon Romanovsky wrote:
-> On Sun, Jan 18, 2026 at 03:16:25PM +0100, Thomas Hellstr=C3=B6m wrote:
-> > Hi, Leon,
+On Fri, 16 Jan 2026 18:12:40 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+>=20
+> On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
+> > From: Marc Zyngier <maz@kernel.org>
 > >=20
-> > On Sun, 2026-01-18 at 14:08 +0200, Leon Romanovsky wrote:
-> > > Changelog:
-> > > v2:
-> > > =C2=A0* Changed series to document the revoke semantics instead of
-> > > =C2=A0=C2=A0 implementing it.
-> > > v1:
-> > > https://patch.msgid.link/20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvi=
-dia.com
-> > >=20
-> > > -----------------------------------------------------------------
-> > > ----
-> > > ----
-> > > This series documents a dma-buf =E2=80=9Crevoke=E2=80=9D mechanism: t=
-o allow a
-> > > dma-
-> > > buf
-> > > exporter to explicitly invalidate (=E2=80=9Ckill=E2=80=9D) a shared b=
-uffer after
-> > > it
-> > > has
-> > > been distributed to importers, so that further CPU and device
-> > > access
-> > > is
-> > > prevented and importers reliably observe failure.
-> > >=20
-> > > The change in this series is to properly document and use
-> > > existing
-> > > core
-> > > =E2=80=9Crevoked=E2=80=9D state on the dma-buf object and a correspon=
-ding
-> > > exporter-
-> > > triggered
-> > > revoke operation. Once a dma-buf is revoked, new access paths are
-> > > blocked so
-> > > that attempts to DMA-map, vmap, or mmap the buffer fail in a
-> > > consistent way.
+> > The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+> > (i.e. mandating VHE support). While this is great for "modern"
+> > operating
+> > systems and hypervisors, a few legacy guests are stuck in a distant
+> > past.
 > >=20
-> > This sounds like it does not match how many GPU-drivers use the
-> > move_notify() callback.
->=20
-> No change for them.
->=20
+> > To support those, add the --e2h0 command line option, that exposes
+> > FEAT_E2H0 to the guest, at the expense of a number of other features,
+> > such
+> > as FEAT_NV2. This is conditioned on the host itself supporting
+> > FEAT_E2H0.
 > >=20
-> > move_notify() would typically invalidate any device maps and any
-> > asynchronous part of that invalidation would be complete when the
-> > dma-
-> > buf's reservation object becomes idle WRT DMA_RESV_USAGE_BOOKKEEP
-> > fences.
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >=20
-> This part has not changed and remains the same for the revocation
-> flow as well.
+> One inline comment below, but irrespective:
 >=20
-> >=20
-> > However, the importer could, after obtaining the resv lock, obtain
-> > a
-> > new map using dma_buf_map_attachment(), and I'd assume the CPU maps
-> > work in the same way, I.E. move_notify() does not *permanently*
-> > revoke
-> > importer access.
+> Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
+[...]
+
+> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> > index 42dc11dad..5e4f3a7dd 100644
+> > --- a/arm64/kvm-cpu.c
+> > +++ b/arm64/kvm-cpu.c
+> > @@ -76,6 +76,11 @@ static void kvm_cpu__select_features(struct kvm
+> > *kvm, struct kvm_vcpu_init *init
+> > =C2=A0		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+> > =C2=A0			die("EL2 (nested virt) is not supported");
+> > =C2=A0		init->features[0] |=3D 1UL << KVM_ARM_VCPU_HAS_EL2;
+> > +		if (kvm->cfg.arch.e2h0) {
+> > +			if (!kvm__supports_extension(kvm,
+> > KVM_CAP_ARM_EL2_E2H0))
+> > +				die("FEAT_E2H0 is not supported");
+> > +			init->features[0] |=3D 1UL <<
+> > KVM_ARM_VCPU_HAS_EL2_E2H0;
+> > +		}
 >=20
-> This part diverges by design and is documented to match revoke
-> semantics.=C2=A0=20
-> It defines what must occur after the exporter requests that the
-> buffer be=C2=A0=20
-> "killed". An importer that follows revoke semantics will not attempt
-> to call=C2=A0=20
-> dma_buf_map_attachment(), and the exporter will block any remapping
-> attempts=C2=A0=20
-> regardless. See the priv->revoked flag in the VFIO exporter.
+> --e2h0 is only consumed if --nested is also set (correctly so, by my
+> understanding & the KVM docs).
 >=20
-> In addition, in this email thread, Christian explains that revoke
-> semantics already exists, with the combination of dma_buf_pin and
-> dma_buf_move_notify, just not documented:
-> https://lore.kernel.org/all/f7f1856a-44fa-44af-b496-eb1267a05d11@amd.com/
+> Maybe it is worth printing that it isn't consumed without --nested if
+> only --e2h0 is supplied? Avoids the user thinking that it has an effect
+> when it doesn't. (Alternatively, make --e2h0 imply --nested, but I'm
+> not a fan of that, personally.)
 
-
-Hmm,
-
-Considering=20
-
-https://elixir.bootlin.com/linux/v6.19-rc5/source/drivers/infiniband/core/u=
-mem_dmabuf.c#L192
-
-this sounds like it's not just undocumented but also in some cases
-unimplemented. The xe driver for one doesn't expect move_notify() to be
-called on pinned buffers, so if that is indeed going to be part of the
-dma-buf protocol,  wouldn't support for that need to be advertised by
-the importer?
+Sure, I can add a warning indicating that the option is ignored.
 
 Thanks,
-Thomas
 
->=20
-> Thanks
->=20
-> >=20
-> > /Thomas
-> >=20
-> >=20
-> > >=20
-> > > Thanks
-> > >=20
-> > > Cc: linux-media@vger.kernel.org
-> > > Cc: dri-devel@lists.freedesktop.org
-> > > Cc: linaro-mm-sig@lists.linaro.org
-> > > Cc: linux-kernel@vger.kernel.org
-> > > Cc: amd-gfx@lists.freedesktop.org
-> > > Cc: virtualization@lists.linux.dev
-> > > Cc: intel-xe@lists.freedesktop.org
-> > > Cc: linux-rdma@vger.kernel.org
-> > > Cc: iommu@lists.linux.dev
-> > > Cc: kvm@vger.kernel.org
-> > > To: Sumit Semwal <sumit.semwal@linaro.org>
-> > > To: Christian K=C3=B6nig <christian.koenig@amd.com>
-> > > To: Alex Deucher <alexander.deucher@amd.com>
-> > > To: David Airlie <airlied@gmail.com>
-> > > To: Simona Vetter <simona@ffwll.ch>
-> > > To: Gerd Hoffmann <kraxel@redhat.com>
-> > > To: Dmitry Osipenko <dmitry.osipenko@collabora.com>
-> > > To: Gurchetan Singh <gurchetansingh@chromium.org>
-> > > To: Chia-I Wu <olvaffe@gmail.com>
-> > > To: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-> > > To: Maxime Ripard <mripard@kernel.org>
-> > > To: Thomas Zimmermann <tzimmermann@suse.de>
-> > > To: Lucas De Marchi <lucas.demarchi@intel.com>
-> > > To: Thomas Hellstr=C3=B6m <thomas.hellstrom@linux.intel.com>
-> > > To: Rodrigo Vivi <rodrigo.vivi@intel.com>
-> > > To: Jason Gunthorpe <jgg@ziepe.ca>
-> > > To: Leon Romanovsky <leon@kernel.org>
-> > > To: Kevin Tian <kevin.tian@intel.com>
-> > > To: Joerg Roedel <joro@8bytes.org>
-> > > To: Will Deacon <will@kernel.org>
-> > > To: Robin Murphy <robin.murphy@arm.com>
-> > > To: Alex Williamson <alex@shazbot.org>
-> > >=20
-> > > ---
-> > > Leon Romanovsky (4):
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dma-buf: Rename .move_notify() callbac=
-k to a clearer
-> > > identifier
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dma-buf: Document revoke semantics
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iommufd: Require DMABUF revoke semanti=
-cs
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vfio: Add pinned interface to perform =
-revoke semantics
-> > >=20
-> > > =C2=A0drivers/dma-buf/dma-buf.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 6 +++---
-> > > =C2=A0drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c |=C2=A0 4 ++--
-> > > =C2=A0drivers/gpu/drm/virtio/virtgpu_prime.c=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/gpu/drm/xe/tests/xe_dma_buf.c=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 6 +++---
-> > > =C2=A0drivers/gpu/drm/xe/xe_dma_buf.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/infiniband/core/umem_dmabuf.c=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 4 ++--
-> > > =C2=A0drivers/infiniband/hw/mlx5/mr.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/iommu/iommufd/pages.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 11 +++++++++--
-> > > =C2=A0drivers/vfio/pci/vfio_pci_dmabuf.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 16
-> > > ++++++++++++++++
-> > > =C2=A0include/linux/dma-buf.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 25
-> > > ++++++++++++++++++++++---
-> > > =C2=A010 files changed, 60 insertions(+), 18 deletions(-)
-> > > ---
-> > > base-commit: 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb
-> > > change-id: 20251221-dmabuf-revoke-b90ef16e4236
-> > >=20
-> > > Best regards,
-> > > --=C2=A0=20
-> > > Leon Romanovsky <leonro@nvidia.com>
-> > >=20
-> >=20
+	M.
 
+--=20
+Without deviation from the norm, progress is not possible.
 
