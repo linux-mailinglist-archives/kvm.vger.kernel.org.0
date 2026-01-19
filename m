@@ -1,464 +1,319 @@
-Return-Path: <kvm+bounces-68540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68546-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2420BD3B8AF
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 21:41:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E17B1D3BAA7
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 23:15:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77BCF3062D49
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 20:39:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 16725302D8A8
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 22:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73E82F6900;
-	Mon, 19 Jan 2026 20:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6B02FDC4D;
+	Mon, 19 Jan 2026 22:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="P1XnC/36";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ub2M62RE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Qd7mmCOU"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010028.outbound.protection.outlook.com [52.101.56.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF2E27E05F;
-	Mon, 19 Jan 2026 20:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768855184; cv=none; b=EXEtU4Rwh0UQW7Y+nDuaKDb1EFM0IV+fLgzsI66J8vNWFI1SND7Jky9hsgdvV+Zr3+SYGa+LT6sTO9wLSfSJrBYosM8p6fd7OzFKPGvSecpXMbNUq8WlijP8JOBLjCbjpzobeLFUpBmlkN8uFsrpn3LiKQgmot49YWZ/ZAFlz9o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768855184; c=relaxed/simple;
-	bh=2ZHQG5QysP8GWCkJkDWOynJhD7gEi5uzjEoljrqGN1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dJomM2pcrBruARS/Rfaq8jVSWOkFL/bhxKax9OEKEAkwPSC2cPyrLm0XDIUfLlYhaLCd2FmL0Ts3Udy0CXN5xRdvFQu2thDfXUjyVdN9cfzFcGoz+xCOedNcxQHVrDhwwOsP5SeerZYCVSOnmxCSnjylWX4VrDXWcFC7r/BFvzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=P1XnC/36; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ub2M62RE; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 0641114003D8;
-	Mon, 19 Jan 2026 15:39:41 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Mon, 19 Jan 2026 15:39:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1768855181;
-	 x=1768941581; bh=FBdWTk6CLd7WzHVr+BniKWIMiLwjgEIx9h33mejtkC4=; b=
-	P1XnC/36fYykJJ9hnqqSF7UNj0QHCjJgtc8y3GJ6ukEpTAJqf56qB0vn4rQdanq/
-	ofjcBtKyivy1Km7zJZYqh9Zp5VXsG1knNw2ILGRIiuKRz4AeO0+i/yIsTJER3fWp
-	CjeX4jMzosIIICpTRnolIew+Ew/06hKDsFVgcazeS6/Dl4+bTBfa2hmJyU5Mf9hs
-	4THLLOq5lg+WVCwHIdvFK45O+I12DJ4OuSu6kW1nflmCl2ilYHwM7EbQXTYW4gR4
-	7p8tefrcMbcrc0YnW8JstgfX9dScl/jwqyi+gKdmsO3L6rnL+A2lgBz0zzG68F4K
-	9YcRVwhbBNq76aXa5M6Vkw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1768855181; x=
-	1768941581; bh=FBdWTk6CLd7WzHVr+BniKWIMiLwjgEIx9h33mejtkC4=; b=U
-	b2M62REKHprj2NiRN7bNn/j7uYcseRMwk/iE7FqETvSL8QPL8fWor1aqIiZfT0vi
-	pkHbIm0ydLrQdMkr7ECyMdeWa/3dNWYklYMAufrzZUzb7w/yxw8AbmN6vu6sGwJ3
-	v2eS7eXk+YH8FtTQezbtgvmtwLZzmmZdYN9YbZnME2P0BMa+eo0qTzeEj3ewf9uA
-	knfSQtuGOm7SdAK8q70kAmlBcXUE7qyDwgGl1kkGGKb3k3kfZh2VWYZOHHYTLhX3
-	d5qUCEmTc3S/Q1Ea8jg1X9nPe4kUuXeBfxUVOm6I0xrHtlLHup9cJOs6QyiVx/7o
-	iUphbhdNvvNSmKwmLs75w==
-X-ME-Sender: <xms:i5ZuafTUgcayBDnaDZ8yDTipSw_jpQebmpIGZZLmXkFXWppyWBZgdA>
-    <xme:i5ZuaVq7XJDTnZZ7v2BbwMlv4oBszoWhusrocVsnkZEFnlg0fdlvesIaiT8mx4lHe
-    LsTaqweB6LSC2T2-8GJZzbdpVEhq81yFAlta-SXK4knx-F-gE-MHA>
-X-ME-Received: <xmr:i5ZuadbpEr4MLpr4RVFVKR8cig5phbMu9010vXXUbNhDA7uXnG3ujsX4It0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddufeekheegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeetuefgleefhfdvueegffdtffevhfffgfffiedutdetgffhheejtdekfeek
-    ieehgfenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhg
-    pdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplh
-    gvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmvgguihgrsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughrihdquggvvhgvlheslhhish
-    htshdrfhhrvggvuggvshhkthhophdrohhrghdprhgtphhtthhopehlihhnrghrohdqmhhm
-    qdhsihhgsehlihhsthhsrdhlihhnrghrohdrohhrghdprhgtphhtthhopehlihhnuhigqd
-    hkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehiohhmmhhu
-    sehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohepkhhvmhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehsuhhmihhtrdhsvghmfigrlheslhhinhgrrhho
-    rdhorhhgpdhrtghpthhtoheptghhrhhishhtihgrnhdrkhhovghnihhgsegrmhgurdgtoh
-    hm
-X-ME-Proxy: <xmx:i5ZuaQQjb-1iZXZxx1XoHH3oBltF_1jZw1Uy74MVDv4Tx3SNVeQk2A>
-    <xmx:i5Zuabdni7r3rs7uS6cXUPkdvZDTtpYo7_QmJaG6qi9KXhEi6ZOZ2g>
-    <xmx:i5Zuafl8sE7RC1vxkqw9TpG6v9zgIXmZQydq7x8z2MeThz34ntXLeA>
-    <xmx:i5ZuaQilZLD1rPx47evUb8GhlOIopeOC1mJTBX-cqbxpd3WFlZEkkA>
-    <xmx:jZZuaYE6MQFViaKOq8g2Z3Bl3liKI28dVxcFL6GsTsdDSO9ji5U-6dwm>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 19 Jan 2026 15:39:38 -0500 (EST)
-Date: Mon, 19 Jan 2026 13:38:38 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
- iommu@lists.linux.dev, kvm@vger.kernel.org, Sumit Semwal
- <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian
- <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
- <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Yishai Hadas
- <yishaih@nvidia.com>, Shameer Kolothum <skolothumtho@nvidia.com>, Ankit
- Agrawal <ankita@nvidia.com>, Matthew Wilcox <willy@infradead.org>, Jens
- Axboe <axboe@kernel.dk>
-Subject: Re: types: reuse common phys_vec type instead of DMABUF
- =?UTF-8?B?b3BlbuKAkWNvZGVk?= variant
-Message-ID: <20260119133838.66203b01@shazbot.org>
-In-Reply-To: <20260107-convert-to-pvec-v1-1-6e3ab8079708@nvidia.com>
-References: <20260107-convert-to-pvec-v1-1-6e3ab8079708@nvidia.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5C42E339B;
+	Mon, 19 Jan 2026 22:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.28
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768860921; cv=fail; b=frbX7E4m39fSdKyhYqUEKIhIYMDI4GlKAbA+zo7eyL6Glzi+nTh9I3Mg3Jd277zX+9P8T80YvwhX6ET6Jj+EcWGdjeU424YnxuQpkC8zO6FCvA1ieDqUTEYtvlxcmmhAubp4AtOUP1Bu9v271BAB5Ub+lV0Ww/ft9s/U0LNMj+k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768860921; c=relaxed/simple;
+	bh=EK1AvNw1yoj1fA8ktfTVJOGyEotmhRmwmLiTohsIlS8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qXIJqOulBwqGKoVz8eGoX5OyClxErRz2I5mZUgCQNcx6EPHDHxnRKudIq2q6GF3tAIeBESz8qvX8O8CjbHAFoSlX71DwlhTCzWhZv4ELLh4pVjHVipPRXa/KZINFxxKYJC2epVEDCHaQ2RIYiKqvq6UlHgOyu0S/744pA2EvPPs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Qd7mmCOU; arc=fail smtp.client-ip=52.101.56.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VUkxwL1LBBv/3CaFKtHF/8nLS3tQmBk3sAeijUlJoBvyxQ7VZWoa0NgWVD7ocGzAd1WZS1Lgm7hR0C2LtcOj6mEn1T5lpclKCD5uJX3oTyaai+hiVUPwqoO7c5sRO3I345A63OkDYWWR9XtH3Jbjuzyq/yQxpsKIQWsScvzxLS608D1YZ8/iWzdhK8VHo3AjhmXmWP751RAjEgZ+SlGyz9VXVQ30o4Wue6VruhsfMicOARAHZbNl/CE/vko/EV4rjHbVkxzrreO3KuY6oJj6imBokNfxkisDqTBARidgIp0OlUyB/1BG9f2c05exM91aAwBnAJZ1bXojf4aDVHUUhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MtePjGeMXIYcWbegumVLN0ub1lFDw2T9sNzA+3cugIA=;
+ b=ZUtFaQemOCat0p4gzSzrWCZQ6uscI7jJG7Mt8SNlY263Jf0dNSf8cHkGi88LyMTtjxTizldMr41LBZvAE2FsP8JkzUwWYxTxUE+vzOxW3XrCbO+15ttctsh9a/pP24kfONrdRv/BjetPkB9qLlOLfBeJNH91NXbDoB2dnHv+BjzzuLWpIXpPS/3zvUOsStzomRYyz0290ZpTRsjhvkYJ8Y8o8aCdHzQSSjj4mesCo9JePU4fbeEttHX3vd7PDU+D018T+0LMhLsFkwYRoJtGaI1igF/oGOla+NoXhv1QqYjmkN0M0SnrD3dYD+zmDaOuVevjgzwkWDjZo8SFVlBGjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MtePjGeMXIYcWbegumVLN0ub1lFDw2T9sNzA+3cugIA=;
+ b=Qd7mmCOUQyIYcTLH410TDHT+7e88BvgDLr8Tzx+F3vppGgLiAs6WvkuNu5EW/TL9QuaiCzPEHl9TWunhKnbBvmnZf8qoWHjGqCZbR3/qcBPF2Gh+Apm4WVz8XGcAOlrZE6DzuUu0mEjpUhrWOv5Y7muEpDKSCRwKOCUgHD01J4IDPLQMbkOn5L8xwL943CxtM6MrpO4rO9+BYHtzotL2VTwNuFB6zJAk0M8CaeLUy+htoGoKved2k8+NrjZYlyCqIaBtHj8QY0teeHNgvL0QljYrOac+o0r1KsX9bqbH6/Xj6lqfBUNLviXWLyMj3dpi6TwBed18SORXWwWzEAlW9w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from PH8PR12MB7277.namprd12.prod.outlook.com (2603:10b6:510:223::13)
+ by CH3PR12MB8880.namprd12.prod.outlook.com (2603:10b6:610:17b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Mon, 19 Jan
+ 2026 22:15:14 +0000
+Received: from PH8PR12MB7277.namprd12.prod.outlook.com
+ ([fe80::2920:e6d9:4461:e2b4]) by PH8PR12MB7277.namprd12.prod.outlook.com
+ ([fe80::2920:e6d9:4461:e2b4%5]) with mapi id 15.20.9520.006; Mon, 19 Jan 2026
+ 22:15:14 +0000
+Message-ID: <ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
+Date: Tue, 20 Jan 2026 09:15:04 +1100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
+ private folios
+To: Jason Gunthorpe <jgg@nvidia.com>, Zi Yan <ziy@nvidia.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Alistair Popple
+ <apopple@nvidia.com>, Matthew Brost <matthew.brost@intel.com>,
+ Vlastimil Babka <vbabka@suse.cz>, Francois Dugast
+ <francois.dugast@intel.com>, intel-xe@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, adhavan Srinivasan <maddy@linux.ibm.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Felix Kuehling <Felix.Kuehling@amd.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+ David Hildenbrand <david@kernel.org>, Oscar Salvador <osalvador@suse.de>,
+ Andrew Morton <akpm@linux-foundation.org>, Leon Romanovsky
+ <leon@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport
+ <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
+ Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+ linux-mm@kvack.org, linux-cxl@vger.kernel.org
+References: <20260116174947.GA1134434@nvidia.com>
+ <8006ea5f-8845-436a-a2d7-125399428762@suse.cz>
+ <aWqgHTZ5hjlRvlKU@lstrano-desk.jf.intel.com>
+ <20260117005114.GC1134360@nvidia.com>
+ <aWsIT8A2dLciFvhj@lstrano-desk.jf.intel.com>
+ <eb94d115-18a6-455b-b020-f18f372e283a@nvidia.com>
+ <aWsdv6dX2RgqajFQ@lstrano-desk.jf.intel.com>
+ <4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
+ <20260119142019.GG1134360@nvidia.com>
+ <96926697-070C-45DE-AD26-559652625859@nvidia.com>
+ <20260119203551.GQ1134360@nvidia.com>
+Content-Language: en-US
+From: Balbir Singh <balbirs@nvidia.com>
+In-Reply-To: <20260119203551.GQ1134360@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR17CA0068.namprd17.prod.outlook.com
+ (2603:10b6:a03:167::45) To PH8PR12MB7277.namprd12.prod.outlook.com
+ (2603:10b6:510:223::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR12MB7277:EE_|CH3PR12MB8880:EE_
+X-MS-Office365-Filtering-Correlation-Id: bb93f5d7-21ae-4195-ba95-08de57a8384c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|10070799003|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cENyZEd1YjdVMmtCa1F2b1lVQWlUQmlqcSt5amRpSmxTWU5mZnRZK3ZRakNP?=
+ =?utf-8?B?K0tzWEpIb0tsZ3ZiTDYxWlFYMjBETXVGeEpEZVppbU1WRUI2dnJjUUtvK043?=
+ =?utf-8?B?YXFqSHZDOHRwaFZpNEFmNnczZnk5TVltVlkxMWlKU0x2QkZ1MFQ2Z3FKMldN?=
+ =?utf-8?B?cGtzM21nNXFvcmprclFSc0tKYjlxbmNaUG1JY1FGeFg5ZE10Vi9Yc0NhUmk1?=
+ =?utf-8?B?Y0t3RjBwcmJNdXQ2NVNUb2FVeDdtR3ppU3FIRHBjUnBjVS9WT3pBdFpINkxP?=
+ =?utf-8?B?OW9ZNkRuc0d4dTRlb0N6T0VlalhHZFFCU3cwZTJRdnEvRU5aSnhYWmRhV1Va?=
+ =?utf-8?B?N0VvUnVQbzd5cFdSMmtDa1J5QVJHZ3NjdDNpRmhMVnhuRG0rY0lGclVIUnRt?=
+ =?utf-8?B?TXNRV3ZyaGJDNHR5VGlIZnlYN0lXOXNCZnp0VUFNQVBuODFzY1BObzAvZzZ3?=
+ =?utf-8?B?bnVMR2lMQzVzN1dtY3l1bktQM28rVFVwdU5LZHFPZVg5QllMWlF2YnNPZVA0?=
+ =?utf-8?B?RTdKdU9BaWNreml6K3orV00xM0pkLzBveUdwd1JXSTJlRHNlYzc1T21NanBM?=
+ =?utf-8?B?NTFMSkY3aituUHFGNVVsbkE3bXFvQWc1UytaV3RQVkdRQk04VU45Y295N2RE?=
+ =?utf-8?B?WnVXY0ZUTFU1UnliVk5xc0lsdno5aGs5MWRFU2w0U2k3cE9mdXhIeTJXWmtO?=
+ =?utf-8?B?cm90Z2tjc3RyWTFJbk8rcDFwbXZ2UlMwYXM3eE91WTJ1d0k3MmY1d1U2MFpB?=
+ =?utf-8?B?YnhoWDgxVjNBSFdiZVRjMkk5SExZOUhuWVNNSWV6YXBGRGZ6K1BKYzhkYk1n?=
+ =?utf-8?B?cktSYml5TWYvdFVsTDhoUXVLSWFsN3l6VGlEZis2VjlBSnRBYmloM25sdDNI?=
+ =?utf-8?B?NHYvd3cxT2lxbDhWdmVpK3lzQVNkT1VhSnRPUDFSZGk2bkxTM05qVnowT3Q5?=
+ =?utf-8?B?T2IzWGVIMFRKM0YxTm5jNEM2bXJrV2RJR1ZONFBhYndYcXF1ZTJCc1NJaFJm?=
+ =?utf-8?B?d1RuWWY1bXZnNGRnenZQeGtEcFo5dlRqSjh2QVY4aE81OHV6bVhKYzV0M25v?=
+ =?utf-8?B?a1VWa1hWeFB5cWZBOG9kb2tMc2hqandVd01aLytFVEFtMFU3OGUwR2oxMnBr?=
+ =?utf-8?B?dFlZVThnVHI3RmhrMndUWG9TK3NndGtrWkJMMTl5R2lzaXRIeUU1MnJuOEJE?=
+ =?utf-8?B?U1Bpb0FFSm4zV0haWlk1elhDU3pXU3MzeVpoQWdiL3I2Y3V2T2FVTVlSKzh4?=
+ =?utf-8?B?UlIyVnVLRnJaN05nR0FRRWVoRGIrdjRCdUI0L2pHdmVCSmdnaHZYMFc1ODhR?=
+ =?utf-8?B?Tm44ellpYTV6UnF3U3NITHA0MExsK3NuYkk0dE93TDJCUjhqREVlMW9uYWxy?=
+ =?utf-8?B?QmM5eHMvUzVpUjg5U0Y4ZUpuUTdGb25ENWZzUm5LbnlHNGljZTM2WUJPWFUx?=
+ =?utf-8?B?V1hBSDdud2d6VmNQMm1qb0htOHlIQVl6SDhVcEg4NmJsRmJUVnpoL05SRGdm?=
+ =?utf-8?B?VW5OUUczSnA3TkNITXQ2YWM1NjdiS1V1NlRFQUhsL0VjUEVaTHA0VDhMM2da?=
+ =?utf-8?B?bmxLamRMREhZaENUTS9yQnN3TGZWWHNaR2NwSDlNWUxXSVRlMkt1KzN2djlW?=
+ =?utf-8?B?MW5wdW1KSHg1eERMSHg1d0xtcFJITmlRSHI1eUo2cVhQMlJTTWtjNlU5NjU1?=
+ =?utf-8?B?YXpHNjNON1RDWXpWWElXZnN5NWhyTktkbHRtY0RWVmJOaHFXQUxtS1pEZlRz?=
+ =?utf-8?B?SW5lTlVtd3RYNzlCKzNYN0RDbmNNYlVzWlRac1JmcVpMZDlSS0NKd2puTFZu?=
+ =?utf-8?B?OWx5MnpTTm8wYVBUTWJWRVlmQjA2QzZSbFN0cmd5QUNTNUVxREFXL3RONGJz?=
+ =?utf-8?B?eEVhQmhQWG42Rmt6aXpZTmhWN1BHVnJGckVpTjZ5SG9ROFBkbTB0YzRRZ2Zy?=
+ =?utf-8?B?NGxJVHBKbmNhU3NGWXB3R1BvMjEyT1JUenhBaEtjYndtL0dLNUlWZDlselI0?=
+ =?utf-8?B?aGVPckdsM1FWT0hJVi8vZmdhRFpEdCtxVzhCWnczOU5yQzdJRmhFdmdVQ2hW?=
+ =?utf-8?B?Ti9tcE1LU1VnNHlMaFlwTHNwTDFvclpkdmhYVjMwSXQ5eGZYK2VKdUs0d200?=
+ =?utf-8?Q?/zMk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB7277.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(10070799003)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eHB0ZUZMSGprUllVVGV1dUEzR1ZMa1JseVdiTmFPa1RCNytoMXhiTjRPYUMw?=
+ =?utf-8?B?T1piTzlwVC9UTFV1Z2l2ZHFaQUxKTWdYcmVDMHVFRDZkT1c4SmhjSFhjeDJz?=
+ =?utf-8?B?cjJCTXM2b0lLejdSYUtTODZIeFJML1NXUHljT1p0M0JOMlFqanhsVHMzUFNZ?=
+ =?utf-8?B?OTVKZGJaYXd0amlHYURWczN3OFZmMXBtRUt4clRvSFE0NmRYZnk5N2hpZ096?=
+ =?utf-8?B?RFJWZkJDY0hFbjFSVmZvOHdoalNqQ2dNUnFHS2lOTHU1bEUxRkNKYzE1Tkp1?=
+ =?utf-8?B?dXV6NVhLVWdpMzYyVlAyV3p2dnJrVk9tNU4xZk5XQTh0TWdVT1NndFg3cXp6?=
+ =?utf-8?B?WmJkZUsycnVvbjk3RVgrT1dmK2JROVZoa0RmQUkwdFVqNUs1b0VGVzBaTzcv?=
+ =?utf-8?B?Y1ZSbkZMYjU3Z05vY0k4QnpSc0dSRWpjQlBFWTV2d0JORHNncHE2NFkyMlBm?=
+ =?utf-8?B?YnlhVjhzS1hOMDlPeEdTNVo0QUpsYU9QZ1V2ZTVGSFVlU0tyS0xZeUtTbExC?=
+ =?utf-8?B?aXBsSW1kK1NvUTl0VDVDTzE3WjZGTktHSm1IcWs4STJ6bldJdTlQQUVZUzZB?=
+ =?utf-8?B?eWlQclYxbWxCMVphdG1qdDF1bnduUXhwV3I3bDZUNXFwa0RiN1BKdllncFdx?=
+ =?utf-8?B?NlZTL0NJY3ZMN3JsbUNzNUlPY3JWdlJaS2dCL0U4SURGSzZHcUl4QjJCbUov?=
+ =?utf-8?B?MnVDRTBNMXpPQTJPa3dHN2JWUC93Z2ZCeERiemdRTTFTL3JsTERuM243cU5u?=
+ =?utf-8?B?WlVOWEhJUlFkQzFZV09Va2dGa1lUaEQ4VkdDbkh2UXhESVkxbERxWC9HTTc4?=
+ =?utf-8?B?Z0dTZW5kWUljcjhNeFBwZHRZczlYYnpMeC8yaFRuMWhNNEFraXA1ZWtMa2Zu?=
+ =?utf-8?B?QjRmclpDTm4rRnp2d2w0TE1RK291Zm5KVGFUWmhGV3RZdWVuRXF6d2xaVUhW?=
+ =?utf-8?B?eEpyQVM4eVJVczY3RktLK1k3dm1PWGJra0xEVjkrWFN0dzZ2ZGIxdSs2M0FE?=
+ =?utf-8?B?KzIzQS81MndlaDBGcHgramwza3R1S0lsUmZ1SlNxQTMzNjZHNlI5eEh0NUxw?=
+ =?utf-8?B?N0NFZ2tqdVUxS1ZrYzhSVHBUODd1a3hMaGhVc2VHdTlVNjlwdjFaM3ltY0pG?=
+ =?utf-8?B?YkUxUUdiQU12K05sLzl5cWF0VlZlSGZjM0RxWGZMNjQrQXM0Z1BiT2J6cXM4?=
+ =?utf-8?B?OFA3akQrSE9qYzc5ZEdwRTNJeHJXeFAxNThLNWhxNlNBaFQ0NzFWRnk3ajho?=
+ =?utf-8?B?N1NTN2hiWkJwa0xZSE1PdTJEMFNHY0k2RHBhR1JZa3QwSW9pQ01jTXJTOWxk?=
+ =?utf-8?B?UGlkaUJXMlNsQkE4dXJ5TVBkdFJvekt5WUJNdElrNHpQRWovdFhJWStaQnpw?=
+ =?utf-8?B?RmF1VVRxYkxndGQrZ0drcVdGTE9kQTlwMVp0SmxYUlkrQ1ZiTUxCbzRHTXNR?=
+ =?utf-8?B?a0NLb0VBb01ody9Xa2VscTc3aGw3SDNQUEpodFp5RGl5cTFBdWQ1NEw4SzJP?=
+ =?utf-8?B?em0wLzZQaXpyMDVTazU4YS9EZ0V5WGlncWxUUng1Q1l6RmdNV3JCSTFZZll2?=
+ =?utf-8?B?ZFBVMm9vTzEvNFJRejN1NDZsd24rZmt3MFZVeHMrNGE1R1dGMGk3SHBGWG9I?=
+ =?utf-8?B?WSt3WXNpdWZNQjJ3eHZpZ3pxazZqUGt3WWdCWFJnc25WeGIxelNSNFdVdzIx?=
+ =?utf-8?B?N25BMlVWK0lRT2hCMlBHMUEzSCtqQURFQVNEL1hvMnJlSHIrZWVQL3V1eGI5?=
+ =?utf-8?B?R0o3a1A1MnA1YUNuZkZjbnE1L3MyOW5uaU5yWkhVUm5HTmZyUENCQnFtMTlT?=
+ =?utf-8?B?YS8yUllid0xBQWtUQk5FS05xMTJqSHBIRlRiUnF1ai82cHlrVkNaWStJT2Fx?=
+ =?utf-8?B?VVgzclV1cis5MVlmcXZNS002eWQ4UlErZzNEeXRCM1dwdVZ1R2xTcHF5VFk0?=
+ =?utf-8?B?eDZCWUNoTWRGTXVDclk3SEg4Nzc1bnVEVkZCWElJdUNxWHllZHRoWXc2MWdS?=
+ =?utf-8?B?ZERwcHJmUEI0eUFsL0doKzhoVHNIRkpOODNtVWVucFVjY0lJWUQxRFoyYnJi?=
+ =?utf-8?B?M2VzNzFMS3kyWWxhamhzQzlqRW04NGt4WEprQ2NzUHVzYklIUmZrUGJMS3VR?=
+ =?utf-8?B?NEwxSjF0dzVlWFRMTmtrYTRqSHFQUUl3YU5pS2ZnMlErOVNpeE96ZHdKak0z?=
+ =?utf-8?B?dUg1WVZxRGQ1SDNtenJydTdEQ1V2NVE4UFBaVlFNNHc0c3lvSVdDcS9xRkty?=
+ =?utf-8?B?bUszUms0UUtmcFdWMkNRVU44dkM3Y1dJNFdDTzZhMi9SL2NxR24wZlU1YXpF?=
+ =?utf-8?B?akcxTU9pVFRwVm5SU1FFc1V0dWkwN3l0WHZ5MC9wd3dwTDd3bGxvR0hZQVdm?=
+ =?utf-8?Q?QGSLUkEzon9HV+bobpiCxkxw79FLiAtxcpu8F?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb93f5d7-21ae-4195-ba95-08de57a8384c
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB7277.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2026 22:15:14.5436
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x6yiW5ctcLv968C3EMbtZ48hs0UU5r8g/2yLV1CXPAdu5NYzeRi+N6cgwZMhkhIoDTphl/otUG7TCJApdut9CA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8880
 
-On Wed,  7 Jan 2026 11:14:14 +0200
-Leon Romanovsky <leon@kernel.org> wrote:
+On 1/20/26 07:35, Jason Gunthorpe wrote:
+> On Mon, Jan 19, 2026 at 03:09:00PM -0500, Zi Yan wrote:
+>>> diff --git a/mm/internal.h b/mm/internal.h
+>>> index e430da900430a1..a7d3f5e4b85e49 100644
+>>> --- a/mm/internal.h
+>>> +++ b/mm/internal.h
+>>> @@ -806,14 +806,21 @@ static inline void prep_compound_head(struct page *page, unsigned int order)
+>>>  		atomic_set(&folio->_pincount, 0);
+>>>  		atomic_set(&folio->_entire_mapcount, -1);
+>>>  	}
+>>> -	if (order > 1)
+>>> +	if (order > 1) {
+>>>  		INIT_LIST_HEAD(&folio->_deferred_list);
+>>> +	} else {
+>>> +		folio->mapping = NULL;
+>>> +#ifdef CONFIG_MEMCG
+>>> +		folio->memcg_data = 0;
+>>> +#endif
+>>> +	}
+>>
+>> prep_compound_head() is only called on >0 order pages. The above
+>> code means when order == 1, folio->mapping and folio->memcg_data are
+>> assigned NULL.
+> 
+> OK, fair enough, the conditionals would have to change and maybe it
+> shouldn't be called "compound_head" if it also cleans up normal pages.
+> 
+>>>  static inline void prep_compound_tail(struct page *head, int tail_idx)
+>>>  {
+>>>  	struct page *p = head + tail_idx;
+>>>
+>>> +	p->flags.f &= ~0xffUL;	/* Clear possible order, page head */
+>>
+>> No one cares about tail page flags if it is not checked in check_new_page()
+>> from mm/page_alloc.c.
+> 
+> At least page_fixed_fake_head() does check PG_head in some
+> configurations. It does seem safer to clear it. Possibly order is
+> never used, but it is free to clear it.
+> 
+>>> -	if (order)
+>>> -		prep_compound_page(page, order);
+>>> +	prep_compound_page(page, order);
+>>
+>> prep_compound_page() should only be called for >0 order pages. This creates
+>> another weirdness in device pages by assuming all pages are
+>> compound.
+> 
+> OK
+> 
+>>> +	folio = page_folio(page);
+>>> +	folio->pgmap = pgmap;
+>>> +	folio_lock(folio);
+>>> +	folio_set_count(folio, 1);
+>>
+>> /* clear possible previous page->mapping */
+>> folio->mapping = NULL;
+>>
+>> /* clear possible previous page->_nr_pages */
+>> #ifdef CONFIG_MEMCG
+>> 	folio->memcg_data = 0;
+>> #endif
+> 
+> This is reasonable too, but prep_compound_head() was doing more than
+> that, it is also clearing the order, and this needs to clear the head
+> bit.  That's why it was apppealing to reuse those functions, but you
+> are right they are not ideal.
+> 
+> I suppose we want some prep_single_page(page) and some reorg to share
+> code with the other prep function.
+> 
 
-> From: Leon Romanovsky <leonro@nvidia.com>
->=20
-> After commit fcf463b92a08 ("types: move phys_vec definition to common hea=
-der"),
-> we can use the shared phys_vec type instead of the DMABUF=E2=80=91specific
-> dma_buf_phys_vec, which duplicated the same structure and semantics.
->=20
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
-> Alex,
->=20
-> According to diffstat, VFIO is the subsystem with the largest set of chan=
-ges,
-> so it would be great if you could take it through your tree.
->=20
-> The series is based on the for-7.0/blk-pvec shared branch from Jens:
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=3D=
-for-7.0/blk-pvec
+There is __init_zone_device_page() and __init_single_page(), 
+it does zero out the page and sets the zone, pfn, nid among other things.
+I propose we use the current version with zone_device_free_folio() as is.
 
-Applied to vfio next branch for v6.20/7.0 and pushed tag
-common_phys_vec_via_vfio including this commit and dependency.
-Thanks,
-
-Alex
+We can figure out if __init_zone_device_page() can be reused or refactored
+for the purposes to doing this with core MM API's
 
 
-> ---
-> Cc: linux-media@vger.kernel.org
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: linaro-mm-sig@lists.linaro.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: iommu@lists.linux.dev
-> Cc: kvm@vger.kernel.org
-> To: Sumit Semwal <sumit.semwal@linaro.org>
-> To: Christian K=C3=B6nig <christian.koenig@amd.com>
-> To: Jason Gunthorpe <jgg@ziepe.ca>
-> To: Kevin Tian <kevin.tian@intel.com>
-> To: Joerg Roedel <joro@8bytes.org>
-> To: Will Deacon <will@kernel.org>
-> To: Robin Murphy <robin.murphy@arm.com>
-> To: Yishai Hadas <yishaih@nvidia.com>
-> To: Shameer Kolothum <skolothumtho@nvidia.com>
-> To: Ankit Agrawal <ankita@nvidia.com>
-> To: Alex Williamson <alex@shazbot.org>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> ---
->  drivers/dma-buf/dma-buf-mapping.c       |  6 +++---
->  drivers/iommu/iommufd/io_pagetable.h    |  2 +-
->  drivers/iommu/iommufd/iommufd_private.h |  5 ++---
->  drivers/iommu/iommufd/pages.c           |  4 ++--
->  drivers/iommu/iommufd/selftest.c        |  2 +-
->  drivers/vfio/pci/nvgrace-gpu/main.c     |  2 +-
->  drivers/vfio/pci/vfio_pci_dmabuf.c      |  8 ++++----
->  include/linux/dma-buf-mapping.h         |  2 +-
->  include/linux/dma-buf.h                 | 10 ----------
->  include/linux/vfio_pci_core.h           | 13 ++++++-------
->  10 files changed, 21 insertions(+), 33 deletions(-)
->=20
-> diff --git a/drivers/dma-buf/dma-buf-mapping.c b/drivers/dma-buf/dma-buf-=
-mapping.c
-> index b7352e609fbd..174677faa577 100644
-> --- a/drivers/dma-buf/dma-buf-mapping.c
-> +++ b/drivers/dma-buf/dma-buf-mapping.c
-> @@ -33,8 +33,8 @@ static struct scatterlist *fill_sg_entry(struct scatter=
-list *sgl, size_t length,
->  }
-> =20
->  static unsigned int calc_sg_nents(struct dma_iova_state *state,
-> -				  struct dma_buf_phys_vec *phys_vec,
-> -				  size_t nr_ranges, size_t size)
-> +				  struct phys_vec *phys_vec, size_t nr_ranges,
-> +				  size_t size)
->  {
->  	unsigned int nents =3D 0;
->  	size_t i;
-> @@ -91,7 +91,7 @@ struct dma_buf_dma {
->   */
->  struct sg_table *dma_buf_phys_vec_to_sgt(struct dma_buf_attachment *atta=
-ch,
->  					 struct p2pdma_provider *provider,
-> -					 struct dma_buf_phys_vec *phys_vec,
-> +					 struct phys_vec *phys_vec,
->  					 size_t nr_ranges, size_t size,
->  					 enum dma_data_direction dir)
->  {
-> diff --git a/drivers/iommu/iommufd/io_pagetable.h b/drivers/iommu/iommufd=
-/io_pagetable.h
-> index 14cd052fd320..27e3e311d395 100644
-> --- a/drivers/iommu/iommufd/io_pagetable.h
-> +++ b/drivers/iommu/iommufd/io_pagetable.h
-> @@ -202,7 +202,7 @@ struct iopt_pages_dmabuf_track {
-> =20
->  struct iopt_pages_dmabuf {
->  	struct dma_buf_attachment *attach;
-> -	struct dma_buf_phys_vec phys;
-> +	struct phys_vec phys;
->  	/* Always PAGE_SIZE aligned */
->  	unsigned long start;
->  	struct list_head tracker;
-> diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iomm=
-ufd/iommufd_private.h
-> index eb6d1a70f673..6ac1965199e9 100644
-> --- a/drivers/iommu/iommufd/iommufd_private.h
-> +++ b/drivers/iommu/iommufd/iommufd_private.h
-> @@ -20,7 +20,6 @@ struct iommu_group;
->  struct iommu_option;
->  struct iommufd_device;
->  struct dma_buf_attachment;
-> -struct dma_buf_phys_vec;
-> =20
->  struct iommufd_sw_msi_map {
->  	struct list_head sw_msi_item;
-> @@ -718,7 +717,7 @@ int __init iommufd_test_init(void);
->  void iommufd_test_exit(void);
->  bool iommufd_selftest_is_mock_dev(struct device *dev);
->  int iommufd_test_dma_buf_iommufd_map(struct dma_buf_attachment *attachme=
-nt,
-> -				     struct dma_buf_phys_vec *phys);
-> +				     struct phys_vec *phys);
->  #else
->  static inline void iommufd_test_syz_conv_iova_id(struct iommufd_ucmd *uc=
-md,
->  						 unsigned int ioas_id,
-> @@ -742,7 +741,7 @@ static inline bool iommufd_selftest_is_mock_dev(struc=
-t device *dev)
->  }
->  static inline int
->  iommufd_test_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
-> -				 struct dma_buf_phys_vec *phys)
-> +				 struct phys_vec *phys)
->  {
->  	return -EOPNOTSUPP;
->  }
-> diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
-> index dbe51ecb9a20..bababd564cf9 100644
-> --- a/drivers/iommu/iommufd/pages.c
-> +++ b/drivers/iommu/iommufd/pages.c
-> @@ -1077,7 +1077,7 @@ static int pfn_reader_user_update_pinned(struct pfn=
-_reader_user *user,
->  }
-> =20
->  struct pfn_reader_dmabuf {
-> -	struct dma_buf_phys_vec phys;
-> +	struct phys_vec phys;
->  	unsigned long start_offset;
->  };
-> =20
-> @@ -1460,7 +1460,7 @@ static struct dma_buf_attach_ops iopt_dmabuf_attach=
-_revoke_ops =3D {
->   */
->  static int
->  sym_vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
-> -				 struct dma_buf_phys_vec *phys)
-> +				 struct phys_vec *phys)
->  {
->  	typeof(&vfio_pci_dma_buf_iommufd_map) fn;
->  	int rc;
-> diff --git a/drivers/iommu/iommufd/selftest.c b/drivers/iommu/iommufd/sel=
-ftest.c
-> index 550ff36dec3a..989d8c4c60a7 100644
-> --- a/drivers/iommu/iommufd/selftest.c
-> +++ b/drivers/iommu/iommufd/selftest.c
-> @@ -2002,7 +2002,7 @@ static const struct dma_buf_ops iommufd_test_dmabuf=
-_ops =3D {
->  };
-> =20
->  int iommufd_test_dma_buf_iommufd_map(struct dma_buf_attachment *attachme=
-nt,
-> -				     struct dma_buf_phys_vec *phys)
-> +				     struct phys_vec *phys)
->  {
->  	struct iommufd_test_dma_buf *priv =3D attachment->dmabuf->priv;
-> =20
-> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgra=
-ce-gpu/main.c
-> index 84d142a47ec6..a0f4edd6a30b 100644
-> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
-> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-> @@ -784,7 +784,7 @@ nvgrace_gpu_write(struct vfio_device *core_vdev,
->  static int nvgrace_get_dmabuf_phys(struct vfio_pci_core_device *core_vde=
-v,
->  				   struct p2pdma_provider **provider,
->  				   unsigned int region_index,
-> -				   struct dma_buf_phys_vec *phys_vec,
-> +				   struct phys_vec *phys_vec,
->  				   struct vfio_region_dma_range *dma_ranges,
->  				   size_t nr_ranges)
->  {
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_p=
-ci_dmabuf.c
-> index d4d0f7d08c53..9a84c238c013 100644
-> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> @@ -14,7 +14,7 @@ struct vfio_pci_dma_buf {
->  	struct vfio_pci_core_device *vdev;
->  	struct list_head dmabufs_elm;
->  	size_t size;
-> -	struct dma_buf_phys_vec *phys_vec;
-> +	struct phys_vec *phys_vec;
->  	struct p2pdma_provider *provider;
->  	u32 nr_ranges;
->  	u8 revoked : 1;
-> @@ -94,7 +94,7 @@ static const struct dma_buf_ops vfio_pci_dmabuf_ops =3D=
- {
->   *    will fail if it is currently revoked
->   */
->  int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
-> -				 struct dma_buf_phys_vec *phys)
-> +				 struct phys_vec *phys)
->  {
->  	struct vfio_pci_dma_buf *priv;
-> =20
-> @@ -116,7 +116,7 @@ int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attac=
-hment *attachment,
->  }
->  EXPORT_SYMBOL_FOR_MODULES(vfio_pci_dma_buf_iommufd_map, "iommufd");
-> =20
-> -int vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,
-> +int vfio_pci_core_fill_phys_vec(struct phys_vec *phys_vec,
->  				struct vfio_region_dma_range *dma_ranges,
->  				size_t nr_ranges, phys_addr_t start,
->  				phys_addr_t len)
-> @@ -148,7 +148,7 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_fill_phys_vec);
->  int vfio_pci_core_get_dmabuf_phys(struct vfio_pci_core_device *vdev,
->  				  struct p2pdma_provider **provider,
->  				  unsigned int region_index,
-> -				  struct dma_buf_phys_vec *phys_vec,
-> +				  struct phys_vec *phys_vec,
->  				  struct vfio_region_dma_range *dma_ranges,
->  				  size_t nr_ranges)
->  {
-> diff --git a/include/linux/dma-buf-mapping.h b/include/linux/dma-buf-mapp=
-ing.h
-> index a3c0ce2d3a42..09bde3f748e4 100644
-> --- a/include/linux/dma-buf-mapping.h
-> +++ b/include/linux/dma-buf-mapping.h
-> @@ -9,7 +9,7 @@
-> =20
->  struct sg_table *dma_buf_phys_vec_to_sgt(struct dma_buf_attachment *atta=
-ch,
->  					 struct p2pdma_provider *provider,
-> -					 struct dma_buf_phys_vec *phys_vec,
-> +					 struct phys_vec *phys_vec,
->  					 size_t nr_ranges, size_t size,
->  					 enum dma_data_direction dir);
->  void dma_buf_free_sgt(struct dma_buf_attachment *attach, struct sg_table=
- *sgt,
-> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-> index 0bc492090237..400a5311368e 100644
-> --- a/include/linux/dma-buf.h
-> +++ b/include/linux/dma-buf.h
-> @@ -531,16 +531,6 @@ struct dma_buf_export_info {
->  	void *priv;
->  };
-> =20
-> -/**
-> - * struct dma_buf_phys_vec - describe continuous chunk of memory
-> - * @paddr:   physical address of that chunk
-> - * @len:     Length of this chunk
-> - */
-> -struct dma_buf_phys_vec {
-> -	phys_addr_t paddr;
-> -	size_t len;
-> -};
-> -
->  /**
->   * DEFINE_DMA_BUF_EXPORT_INFO - helper macro for exporters
->   * @name: export-info name
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 706877f998ff..2ac288bb2c60 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -28,7 +28,6 @@
->  struct vfio_pci_core_device;
->  struct vfio_pci_region;
->  struct p2pdma_provider;
-> -struct dma_buf_phys_vec;
->  struct dma_buf_attachment;
-> =20
->  struct vfio_pci_eventfd {
-> @@ -62,25 +61,25 @@ struct vfio_pci_device_ops {
->  	int (*get_dmabuf_phys)(struct vfio_pci_core_device *vdev,
->  			       struct p2pdma_provider **provider,
->  			       unsigned int region_index,
-> -			       struct dma_buf_phys_vec *phys_vec,
-> +			       struct phys_vec *phys_vec,
->  			       struct vfio_region_dma_range *dma_ranges,
->  			       size_t nr_ranges);
->  };
-> =20
->  #if IS_ENABLED(CONFIG_VFIO_PCI_DMABUF)
-> -int vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,
-> +int vfio_pci_core_fill_phys_vec(struct phys_vec *phys_vec,
->  				struct vfio_region_dma_range *dma_ranges,
->  				size_t nr_ranges, phys_addr_t start,
->  				phys_addr_t len);
->  int vfio_pci_core_get_dmabuf_phys(struct vfio_pci_core_device *vdev,
->  				  struct p2pdma_provider **provider,
->  				  unsigned int region_index,
-> -				  struct dma_buf_phys_vec *phys_vec,
-> +				  struct phys_vec *phys_vec,
->  				  struct vfio_region_dma_range *dma_ranges,
->  				  size_t nr_ranges);
->  #else
->  static inline int
-> -vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,
-> +vfio_pci_core_fill_phys_vec(struct phys_vec *phys_vec,
->  			    struct vfio_region_dma_range *dma_ranges,
->  			    size_t nr_ranges, phys_addr_t start,
->  			    phys_addr_t len)
-> @@ -89,7 +88,7 @@ vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *ph=
-ys_vec,
->  }
->  static inline int vfio_pci_core_get_dmabuf_phys(
->  	struct vfio_pci_core_device *vdev, struct p2pdma_provider **provider,
-> -	unsigned int region_index, struct dma_buf_phys_vec *phys_vec,
-> +	unsigned int region_index, struct phys_vec *phys_vec,
->  	struct vfio_region_dma_range *dma_ranges, size_t nr_ranges)
->  {
->  	return -EOPNOTSUPP;
-> @@ -228,6 +227,6 @@ static inline bool is_aligned_for_order(struct vm_are=
-a_struct *vma,
->  }
-> =20
->  int vfio_pci_dma_buf_iommufd_map(struct dma_buf_attachment *attachment,
-> -				 struct dma_buf_phys_vec *phys);
-> +				 struct phys_vec *phys);
-> =20
->  #endif /* VFIO_PCI_CORE_H */
->=20
-> ---
-> base-commit: fcf463b92a08686d1aeb1e66674a72eb7a8bfb9b
-> change-id: 20260107-convert-to-pvec-bf04dfcf3d12
->=20
-> Best regards,
-> -- =20
-> Leon Romanovsky <leonro@nvidia.com>
->=20
->=20
+>> This patch mixed the concept of page and folio together, thus
+>> causing confusion. Core MM sees page and folio two separate things:
+>> 1. page is the smallest internal physical memory management unit,
+>> 2. folio is an abstraction on top of pages, and other abstractions can be
+>>    slab, ptdesc, and more (https://kernelnewbies.org/MatthewWilcox/Memdescs).
+> 
+> I think the users of zone_device_page_init() are principally trying to
+> create something that can be installed in a non-special PTE. Meaning
+> the output is always a folio because it is going to be read as a folio
+> in the page walkers.
+> 
+> Thus, the job of this function is to take the memory range starting at
+> page for 2^order and turn it into a single valid folio with refcount
+> of 1.
+> 
+>> If device pages have to initialize on top of pages with obsolete states,
+>> at least it should be first initialized as pages, then as folios to avoid
+>> confusion.
+> 
+> I don't think so. It should do the above job efficiently and iterate
+> over the page list exactly once.
+> 
+> Jason
 
+Agreed
+
+Balbir
 
