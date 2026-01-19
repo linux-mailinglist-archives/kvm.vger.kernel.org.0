@@ -1,125 +1,174 @@
-Return-Path: <kvm+bounces-68486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 850A6D3A262
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 10:05:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E6D5D3A296
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 10:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 458B33046F86
-	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 09:04:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A3A85301FA78
+	for <lists+kvm@lfdr.de>; Mon, 19 Jan 2026 09:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4E7352F9B;
-	Mon, 19 Jan 2026 09:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69003354AD6;
+	Mon, 19 Jan 2026 09:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e33bUuuF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkvNbbQn"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E772268690;
-	Mon, 19 Jan 2026 09:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DA1338905;
+	Mon, 19 Jan 2026 09:13:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768813486; cv=none; b=dyyOpKoY0D0GxBc+ubDj78Ck7iGEUgscMyaKbo3XEfsNSJhpVo8HHZeY8UpRgsG8x2XboFM67AZ4+A+xhxc3wfGA8pHUzNwj2j/bxy7LczL6w2CjIXmgcNcdkwlxyUpSW4rHJjOM+t6qgJIqfmIpU9guOFHLWcdNfxOLmMuu56U=
+	t=1768814034; cv=none; b=rimuapYJAiJtvQd9PihdQmkRhqeZybThQ4FhRG6e3Ur2SF6tHAkRmCibN+bjX2BbxYbcPuXixX7gdobWDO39HmjDiWiCIrYxEyDRcqLLmAQcqrpg/rbs9zi66pH0aSfWMcpQUAOfrMHmVSQTh2YG/c88FKJlRHCSNizmh3lUXgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768813486; c=relaxed/simple;
-	bh=9ibwmwir6DNuwcFVFVRMrnxNeKv3ejBMBmArbCsPm6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ulNqcjZifh7FE+kgl4iklgsazgLEbHAgKrccydKsAp5ffL1n0QznoNIRbnLkqV2AuuQbNfXt7wTz/a1CUDKxbygQ4Ef6G3l7VxTdyS7lhWom046aX56xUW/D92XZ7ZGgzZwqo67ir5ZtpeINQuTCBVfwr5QieFvRI0doILUyrEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e33bUuuF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B57CC116C6;
-	Mon, 19 Jan 2026 09:04:45 +0000 (UTC)
+	s=arc-20240116; t=1768814034; c=relaxed/simple;
+	bh=57hVyZc6Qb6WqXaX1b7Nwyn01w3kd+um+ve1XNKrtUg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VIpM6vew7bP1nZOVvWThXN7vlD8fuDGddwfd3OMQ7fzrh9yHfWk4uxUFF9HGcaksIjLRw0Tkr+141vEERhuFWn0FmPj9WVWH3MchAmhgbUpDS2sVH+gs+OwC+D/bujX41kDk85aB78MN8WNJ0VrSC2udoYywPLhIa8Qgnu0g9dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkvNbbQn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B77AC16AAE;
+	Mon, 19 Jan 2026 09:13:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768813486;
-	bh=9ibwmwir6DNuwcFVFVRMrnxNeKv3ejBMBmArbCsPm6s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e33bUuuFuYAfNmaAVBINTTMiHDitg3Ewo284Wv30/72Z5sl3bIG03XiqzmmtksV2N
-	 E9d2cJoHjdjKYaYooTlSPB4iJpWVL91L1AN491690/uRHfcmT6wUBbopZdfCbx77Px
-	 Q3HC1qDJGA9Pt3HYbxuqrUGdEozMHTi5LrmTjFyJYKE+R+M0iAaeaStvmIivkeGtTZ
-	 mxhJNSrhHrd2zaHDTg7GSf/GrHIQaeet8ghZgUq43q6WrWChlkPf5q6E/9m4Skchfc
-	 5l1Di/szMWkD2gAlw1okBT15wo+lo6dJX8Dgm6WcIx/IrIDWLVWHnzHUEXQ9299Wj5
-	 PA/zo+uxfkTlQ==
-Date: Mon, 19 Jan 2026 11:04:40 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Alex Williamson <alex@shazbot.org>, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
-	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/4] dma-buf: Document revoke semantics
-Message-ID: <20260119090440.GG13201@unreal>
-References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
- <20260118-dmabuf-revoke-v2-2-a03bb27c0875@nvidia.com>
- <8bc75706c18c410f9564805c487907aba0aab627.camel@linux.intel.com>
+	s=k20201202; t=1768814034;
+	bh=57hVyZc6Qb6WqXaX1b7Nwyn01w3kd+um+ve1XNKrtUg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IkvNbbQnnX+8pbedE00vceSUSIo9oHdhXGFRTVSIQy07FfIIKMSh2lqx4fnIdXtzP
+	 EBkBGpwkY9FX6jpGiSNNs5Qm7K+XVnMkb6yns5hWW6TXrKSIUdwmyo3/hBHA4NnHxi
+	 q1Ku/IV9DBpLkifKm7fmeaOjhKtucVg/I0HEButv3WiqZ+e9wM7Qb3gkhGKZR59FY8
+	 ePR8PTuTCXU9XHd7WWJZQyKBn2cBvxdCb+8b79Phd02/ECBy82rtAiVILyS1NlrLFn
+	 /NX6IoJAoLxLlJh++0yyUKKNIBDTcK0bs6o122pBtchVz0vEZx51AEGgY19iT7sqNx
+	 8t9y3h0Cs8OqQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vhlKZ-00000003WE1-3wA0;
+	Mon, 19 Jan 2026 09:13:52 +0000
+Date: Mon, 19 Jan 2026 09:13:51 +0000
+Message-ID: <868qduc6cw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>,
+	"will@kernel.org"
+	<will@kernel.org>,
+	"julien.thierry.kdev@gmail.com"
+	<julien.thierry.kdev@gmail.com>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Alexandru Elisei <Alexandru.Elisei@arm.com>,
+	nd <nd@arm.com>
+Subject: Re: [PATCH kvmtool v4 3/7] arm64: nested: Add support for setting maintenance IRQ
+In-Reply-To: <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
+References: <20250924134511.4109935-1-andre.przywara@arm.com>
+	<20250924134511.4109935-4-andre.przywara@arm.com>
+	<3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8bc75706c18c410f9564805c487907aba0aab627.camel@linux.intel.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, Andre.Przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, Alexandru.Elisei@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Jan 18, 2026 at 03:29:02PM +0100, Thomas Hellström wrote:
-> On Sun, 2026-01-18 at 14:08 +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Document a DMA-buf revoke mechanism that allows an exporter to
-> > explicitly
-> > invalidate ("kill") a shared buffer after it has been handed out to
-> > importers. Once revoked, all further CPU and device access is
-> > blocked, and
-> > importers consistently observe failure.
-> 
-> See previous comment WRT this.
-> 
-> > 
-> > This requires both importers and exporters to honor the revoke
-> > contract.
-> > 
-> > For importers, this means implementing .invalidate_mappings() and
-> > calling
-> > dma_buf_pin() after the DMA‑buf is attached to verify the exporter’s
-> > support
-> > for revocation.
-> 
-> Why would the importer want to verify the exporter's support for
-> revocation? If the exporter doesn't support it, the only consequence
-> would be that invalidate_mappings() would never be called, and that
-> dma_buf_pin() is a NOP. Besides, dma_buf_pin() would not return an
-> error if the exporter doesn't implement the pin() callback?
+On Fri, 16 Jan 2026 18:10:11 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+>=20
+> On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
+> > Uses the new VGIC KVM device attribute to set the maintenance IRQ.
+> > This is fixed to use PPI 9, as a platform decision made by kvmtool,
+> > matching the SBSA recommendation.
+> > Use the opportunity to pass the kvm pointer to
+> > gic__generate_fdt_nodes(),
+> > as this simplifies the call and allows us access to the nested_virt
+> > on
+> > the way.
+> >=20
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> > =C2=A0arm64/arm-cpu.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 2 +-
+> > =C2=A0arm64/gic.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++--
+> > =C2=A0arm64/include/kvm/gic.h |=C2=A0 2 +-
+> > =C2=A03 files changed, 26 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
+> > index 69bb2cb2c..0843ac051 100644
+> > --- a/arm64/arm-cpu.c
+> > +++ b/arm64/arm-cpu.c
+> > @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct
+> > kvm *kvm)
+> > =C2=A0{
+> > =C2=A0	int timer_interrupts[4] =3D {13, 14, 11, 10};
+> > =C2=A0
+> > -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+> > +	gic__generate_fdt_nodes(fdt, kvm);
+> > =C2=A0	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+> > =C2=A0	pmu__generate_fdt_nodes(fdt, kvm);
+> > =C2=A0}
+> > diff --git a/arm64/gic.c b/arm64/gic.c
+> > index b0d3a1abb..e35986c06 100644
+> > --- a/arm64/gic.c
+> > +++ b/arm64/gic.c
+> > @@ -11,6 +11,8 @@
+> > =C2=A0
+> > =C2=A0#define IRQCHIP_GIC 0
+> > =C2=A0
+> > +#define GIC_MAINT_IRQ	9
+> > +
+> > =C2=A0static int gic_fd =3D -1;
+> > =C2=A0static u64 gic_redists_base;
+> > =C2=A0static u64 gic_redists_size;
+> > @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
+> > =C2=A0
+> > =C2=A0	int lines =3D irq__get_nr_allocated_lines();
+> > =C2=A0	u32 nr_irqs =3D ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
+> > +	u32 maint_irq =3D GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
+> > =C2=A0	struct kvm_device_attr nr_irqs_attr =3D {
+> > =C2=A0		.group	=3D KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> > =C2=A0		.addr	=3D (u64)(unsigned long)&nr_irqs,
+> > =C2=A0	};
+> > +	struct kvm_device_attr maint_irq_attr =3D {
+> > +		.group	=3D KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
+> > +		.addr	=3D (u64)(unsigned long)&maint_irq,
+> > +	};
+> > =C2=A0	struct kvm_device_attr vgic_init_attr =3D {
+> > =C2=A0		.group	=3D KVM_DEV_ARM_VGIC_GRP_CTRL,
+> > =C2=A0		.attr	=3D KVM_DEV_ARM_VGIC_CTRL_INIT,
+> > @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
+> > =C2=A0			return ret;
+> > =C2=A0	}
+> > =C2=A0
+> > +	if (kvm->cfg.arch.nested_virt &&
+> > +	=C2=A0=C2=A0=C2=A0 !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_att=
+r)) {
+> > +		ret =3D ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
+> > &maint_irq_attr);
+> > +		if (ret)
+> > +			return ret;
+> > +	}
+>=20
+> With GICv3 are things not a little broken if we're trying to do nested
+> but don't have the ability to set the maint IRQ? It feels to me as if
+> an error should be returned if the attr doesn't exist.
+>=20
+> Also, the way that the FDT is generated means that we'd still generate
+> the property for the maint IRQ, even if we can't set it here.
 
-The idea is that both should do revoke and there is a need to indicate
-that this exporter has some expectations from the importers. One of them
-is that invalidate_mappings exists.
+Yup, this definitely need fixing. Thanks for catching this.
 
-Thanks
+	M.
 
-> 
-> Or perhaps I missed a prereq patch?
-> 
-> Thanks,
-> Thomas
-> 
-> 
+--=20
+Without deviation from the norm, progress is not possible.
 
