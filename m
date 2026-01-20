@@ -1,44 +1,45 @@
-Return-Path: <kvm+bounces-68598-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F6FD3C3AC
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 10:35:28 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7445D3C353
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 10:22:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CF57166984E
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 09:17:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BE9DE501C94
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 09:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131323D1CBA;
-	Tue, 20 Jan 2026 09:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C5E3D2FE5;
+	Tue, 20 Jan 2026 09:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="VV+mjZl/"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IDkxIKqk"
 X-Original-To: kvm@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB703C1FD0;
-	Tue, 20 Jan 2026 09:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29252FFDF4;
+	Tue, 20 Jan 2026 09:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768900572; cv=none; b=BCFNgM4ailV9Wx3wvciZsw2qtiU70jhuVRxo6Z2mX6r5Her7rLua6fTiqGsQOh+mfmoZw1OEWvAcjlCwRBBVWNWUZeqv6nHIKC8So5bu3bMY4G7giJrxsKYFiMtpAwS1+2erBGukmqAatObADzMRTPqAnBUCaHlo1DkWrXL81Gk=
+	t=1768900570; cv=none; b=mVbJd2FYQWjI4linLtAMlZpfJUDhLGvW7RXB5kb3k7UgdYkUlMsWEkSYC8BOvu0E79+GGxk7ffGeo50p2SeXqJkh6Wx8cxXOhEUPQLGR9gapCiGtzMJRVQom/T7UhdcMKsbeOoeoDykV/ca7OfCvBftzj8mIY+D5QQQba+CqYMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768900572; c=relaxed/simple;
-	bh=ixi0ifNzeSEQiJ9LZmwbscXKZV1WcE6SXBdPX85b2JM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X8g7EwZbGH/hYPusQwzoiKGHUrigjc/jv80dwTEwiX4ZTGz5Za8aKJQEmE2lkYfOlgGzfFVpTI3Z0rGwBwTldn4PoKN4AaeNYDlq+qNdyc/EB97SNQhAj66J7EXGWyEO3SeenwL+DErvmvPE34SJ++oAE0EU6Ria6cKDNuZN5tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=VV+mjZl/; arc=none smtp.client-ip=220.197.31.2
+	s=arc-20240116; t=1768900570; c=relaxed/simple;
+	bh=C52bEq3TH6+WHwZGbu1J0ND/tgmNrbDcmiG6ddcdr3g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uikzVvAscaWb7DSStO/jvKayLijvdEKKrYwrCstltlOvjZjbd56a72yC8H+avIbwm66n7o+j814F7rI7k3C8ETL4jHRF9TMqKtjCJVmtWeb9B3TZHndnALT+28Ip+AalyOzxqgVw7ZJRogc9vAP6RGeKdTxIN6UqOCFzyb2uty0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IDkxIKqk; arc=none smtp.client-ip=220.197.31.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=R3
-	GG1uTsBaw7wJyjOqUBIPzVK+svny+NQUgMCT4+cv4=; b=VV+mjZl/DyW5Tt/gaO
-	x3v41d+HStxuIKmqgyxxv8p47EhvPuCVFzuWG2YhImD9K1KlA5JrUGeZRISnLFhz
-	+195oMKgLF1Snj+msbYfup0dtJzJ8Os4z3xyvTLbHWKOMDrPO1sqUTJNSAinNsqQ
-	zWzMH5AGEZlEc72k+etiKNoA0=
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=7Z
+	X6gO4s1/g6DTK9BvrcJ2ewwGz0oC37XJnSwSguWaE=; b=IDkxIKqkehwn+oTOWM
+	cnDSdutlOLh0dhotRPwJTvS25O0xdfodJ31fZvyCOTUUKJqJ8NGSQB5EfKVYmWCu
+	E6frdMIy9TVjf++bteTZzd7srLFKKtD3drIKk+2zsPYHFXpRYuWfsAwa4+afM0e2
+	+Hm2K9ZkeZECN0yWBEF85iGR4=
 Received: from 163.com (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wCn5zu4R29pIOfPGw--.26432S2;
-	Tue, 20 Jan 2026 17:15:37 +0800 (CST)
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wCn5zu4R29pIOfPGw--.26432S3;
+	Tue, 20 Jan 2026 17:15:41 +0800 (CST)
 From: Zhiquan Li <zhiquan_li@163.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -46,10 +47,12 @@ To: seanjc@google.com,
 Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	zhiquan_li@163.com
-Subject: [PATCH 0/5] KVM: x86: selftests: Add Hygon CPUs support and fix failures
-Date: Tue, 20 Jan 2026 17:14:43 +0800
-Message-ID: <20260120091449.526798-1-zhiquan_li@163.com>
+Subject: [PATCH 1/5] KVM: x86: selftests: Add CPU vendor detection for Hygon
+Date: Tue, 20 Jan 2026 17:14:44 +0800
+Message-ID: <20260120091449.526798-2-zhiquan_li@163.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260120091449.526798-1-zhiquan_li@163.com>
+References: <20260120091449.526798-1-zhiquan_li@163.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,57 +60,78 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCn5zu4R29pIOfPGw--.26432S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tr1DAF4fJr15Wry3GFykZrb_yoW8ArWxpa
-	93Jw4YkFZ7Ja4SkayfJF1kAr1xAFn3CF4UWr1Yyw47ZrW5G3Wxtw4Iga18X3WfCr4vvr15
-	Za9rGFnrWw4DJFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piBMKLUUUUU=
-X-CM-SenderInfo: 52kl13xdqbzxi6rwjhhfrp/xtbCwho2H2lvR7q98QAA3G
+X-CM-TRANSID:_____wCn5zu4R29pIOfPGw--.26432S3
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWFW5Zw48Zr1xJF4kWr1fCrg_yoW5Jw45pF
+	ykAr1rKF10gFnxta4xXr4ktryxWrZ7Wa10q3yUZry3Aa12yry7Xrs7Ka4jvrZI9FWrW3s8
+	Zas7tF4YgFsrZaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRVVb-UUUUU=
+X-CM-SenderInfo: 52kl13xdqbzxi6rwjhhfrp/xtbC6h43IGlvR77HQgAA3Z
 
-This series to add support for Hygon CPUs and fix some test failures.
+Currently some KVM selftests are failed on Hygon CPUs due to missing
+vendor detection and edge-case handling specific to Hygon's
+architecture.
 
-Patch 1 add CPU vendor detection for Hygon and add a global variable
-"host_cpu_is_hygon" to identify if the test is running on a Hygon CPU.
-It is the prerequisite for the following fixes.
+Add CPU vendor detection for Hygon and add a global variable
+"host_cpu_is_hygon" as the basic facility for the following fixes.
 
-Patch 2 fix x86/fix_hypercall_test test failure by altering the instruction
-of hypercall on Hygon CPUs.
+Signed-off-by: Zhiquan Li <zhiquan_li@163.com>
+---
+ tools/testing/selftests/kvm/include/x86/processor.h | 6 ++++++
+ tools/testing/selftests/kvm/lib/x86/processor.c     | 3 +++
+ 2 files changed, 9 insertions(+)
 
-Patch 3 fix following test failures by avoiding using the reserved memory
-regions on Hygon CPUs.
-- access_tracking_perf_test
-- demand_paging_test
-- dirty_log_perf_test
-- dirty_log_test
-- kvm_page_table_test
-- memslot_modification_stress_test
-- pre_fault_memory_test
-- x86/dirty_log_page_splitting_test
-
-Patch 4 fix x86/pmu_event_filter_test test failure by allowing the tests
-for Hygon CPUs.
-
-Patch 5 fix x86/msrs_test test failure by fixing the expectation while
-writing the MSR_TSC_AUX reserved bits without RDPID support.
-
-Zhiquan Li (5):
-  KVM: x86: selftests: Add CPU vendor detection for Hygon
-  KVM: x86: selftests: Alter the hypercall instruction on Hygon
-  KVM: x86: selftests: Avoid failures due to reserved memory address
-    regions on Hygon
-  KVM: x86: selftests: Allow the PMU event filter test for Hygon
-  KVM: x86: selftests: Fix write MSR_TSC_AUX reserved bits test failure
-    on Hygon
-
- .../selftests/kvm/include/x86/processor.h     |  6 +++++
- .../testing/selftests/kvm/lib/x86/processor.c | 12 ++++++---
- .../selftests/kvm/x86/fix_hypercall_test.c    |  2 +-
- tools/testing/selftests/kvm/x86/msrs_test.c   | 26 +++++++++++++++----
- .../selftests/kvm/x86/pmu_event_filter_test.c |  6 ++---
- 5 files changed, 39 insertions(+), 13 deletions(-)
-
-
-base-commit: 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
+diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+index 57d62a425109..9ac18e0fca54 100644
+--- a/tools/testing/selftests/kvm/include/x86/processor.h
++++ b/tools/testing/selftests/kvm/include/x86/processor.h
+@@ -21,6 +21,7 @@
+ 
+ extern bool host_cpu_is_intel;
+ extern bool host_cpu_is_amd;
++extern bool host_cpu_is_hygon;
+ extern uint64_t guest_tsc_khz;
+ 
+ #ifndef MAX_NR_CPUID_ENTRIES
+@@ -701,6 +702,11 @@ static inline bool this_cpu_is_amd(void)
+ 	return this_cpu_vendor_string_is("AuthenticAMD");
+ }
+ 
++static inline bool this_cpu_is_hygon(void)
++{
++	return this_cpu_vendor_string_is("HygonGenuine");
++}
++
+ static inline uint32_t __this_cpu_has(uint32_t function, uint32_t index,
+ 				      uint8_t reg, uint8_t lo, uint8_t hi)
+ {
+diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+index 36104d27f3d9..bbd3336f22eb 100644
+--- a/tools/testing/selftests/kvm/lib/x86/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+@@ -21,6 +21,7 @@
+ vm_vaddr_t exception_handlers;
+ bool host_cpu_is_amd;
+ bool host_cpu_is_intel;
++bool host_cpu_is_hygon;
+ bool is_forced_emulation_enabled;
+ uint64_t guest_tsc_khz;
+ 
+@@ -671,6 +672,7 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm, unsigned int nr_vcpus)
+ 
+ 	sync_global_to_guest(vm, host_cpu_is_intel);
+ 	sync_global_to_guest(vm, host_cpu_is_amd);
++	sync_global_to_guest(vm, host_cpu_is_hygon);
+ 	sync_global_to_guest(vm, is_forced_emulation_enabled);
+ 	sync_global_to_guest(vm, pmu_errata_mask);
+ 
+@@ -1303,6 +1305,7 @@ void kvm_selftest_arch_init(void)
+ {
+ 	host_cpu_is_intel = this_cpu_is_intel();
+ 	host_cpu_is_amd = this_cpu_is_amd();
++	host_cpu_is_hygon = this_cpu_is_hygon();
+ 	is_forced_emulation_enabled = kvm_is_forced_emulation_enabled();
+ 
+ 	kvm_init_pmu_errata();
 -- 
 2.43.0
 
