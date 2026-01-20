@@ -1,184 +1,199 @@
-Return-Path: <kvm+bounces-68603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BF2BD3C474
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 11:03:12 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFA58D3C498
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 11:07:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 48C0A560701
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 09:43:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A30685644AE
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 09:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2663D1CDB;
-	Tue, 20 Jan 2026 09:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26AA3BF305;
+	Tue, 20 Jan 2026 09:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8+JF6mM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="clDBS6kH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dLp9ReyQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A2935FF66
-	for <kvm@vger.kernel.org>; Tue, 20 Jan 2026 09:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8DA1DF736;
+	Tue, 20 Jan 2026 09:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768901862; cv=none; b=Vt+7lADSbZwBI0QOD4D+JVbzisF9My2aXVAEfy2alEqLriisRk4BtkXVB/FxG7gLPkCQJyBN6Xu4/k6uMy9sxoapAtbdf0Lbv/qT3UPWG1a4gTsn7rp9BzOxkxYdXUqDp49Z0uLoUSBLAZDtXiRpiA9pa8gNimdCO0gpwASGQaQ=
+	t=1768902365; cv=none; b=Os9wYKzHfRYTuiE1aP5Yp3GgBe6gRfJw7U8qeP1p48DvEfSXNlCED4SAjWMUhJhaqT6mgh9yO32lyZE1yssJRqgOymqqYvevaMPMB+xlcgqd84I6AdjO4sQW2P0RPHIFS7jA/0gRuOQHkgHMTIiAjeD96tzs2WFdUIwkcOrHUgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768901862; c=relaxed/simple;
-	bh=gJ8LRdePpGdfZIJ/xvuV9faBPChp54PHBmUoMXirzAw=;
+	s=arc-20240116; t=1768902365; c=relaxed/simple;
+	bh=xwqfvmhHmuW9plUqJwJFOo0A9JPdncx7ymGaNl95+yo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l2ynJQaU4zvwbHSiuWZeA+bKQAgo4Neuo2A0GtC0P8OuCROte7pW2he34FrASW/CoFbyVhXe7pqYsGeR6AQQE8W1AhA+fbgJj5HQh7qOh2eXJQCcQNrukKrqZywIUAfBjlxon+GOH10+yWiHhA3ykXkHr8MyBEUPAmpJqRNOIdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K8+JF6mM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=clDBS6kH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768901859;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
-	b=K8+JF6mMHL76bZxS+ci6CY7KEnR5jdjxJGutZ+fuCfQlF0fbr47SzwJjAOKJRQ0ugF1xb0
-	2Y71nRwmVtTchM1c6Un9PoE5UDZrtlTG8co6aH7HiMY+vimmGji2SprwxZjyjaG8yEzvWS
-	uC2gzmgydR7cJT0JMc9UHzoDT7IdtXQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-340-iu5cgXQ3O8Cexy2sk6E8hQ-1; Tue, 20 Jan 2026 04:37:37 -0500
-X-MC-Unique: iu5cgXQ3O8Cexy2sk6E8hQ-1
-X-Mimecast-MFC-AGG-ID: iu5cgXQ3O8Cexy2sk6E8hQ_1768901856
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430f57cd2caso4293341f8f.0
-        for <kvm@vger.kernel.org>; Tue, 20 Jan 2026 01:37:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768901856; x=1769506656; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
-        b=clDBS6kHuU02e+svmRR7saf/d/7sXPtTCBrZqdainfUer3Ca8mC7vbq2mu+aFLdw3Q
-         I8aR/8hdlZSmln8sl3WNdIz6E+GzjWZGfvs9g7rMcQj1tic2Lr9Y+iJ9JE/ydbWCuKp5
-         gbADY0103aGNyrfR/uFtF7+cZsOAaT0Q4eUlF3cIawQK/LLEZVlDzsdJMwO5niDelrC/
-         iBthyFfxBDJdzuBix0iny0V/TJ0PUXFbcQrRrVd6BC4ZaN9b0lw9iOlovBcjTklRd0pp
-         93gLowV0g6E+Oiz9wnlUStpTnPpaVnj7b5r1xJWDeDWXtdwk7hkGkVwDtRJo5oapXJHG
-         4HhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768901856; x=1769506656;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1riUelQkHubbog4Pig/nehvQm9nmVpndQsv6Cs1UVao=;
-        b=EX/gjbEgv1h9sEzzG7JuL8xboiSwBh4C4q1vyVifETqaAxQ+28nVh6gnY6d+TrHNQ2
-         IhmWC/IZZSDUx1YFZGOXzgNsqsBlmemfnmnunM7x3xGd+nWIsiQVnmnNjN316xBIIb6L
-         5EWTkAtgJiLiKjQoBIaPHfjJsKLXow73ZSaKfihxyjvuYHm26W/H4Gmyp3+KFzHzgxXY
-         tahK5EeljWrxPMqZJc47qa25EtsptSPZn/rguShnj1YqrbG1FqjYs2urcvksgOf2Y/IQ
-         nwibs6+APABNHiRzPrxiy1UhBL0WFcgtEwuSUHe1cZNG4UZ3OSmaCtRiBaoCWBmgefU/
-         GmNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdYaAb+c6WPFN9uAbVzuwrbk1krorISt65oS1+11M25CCH7v7qxCO/0qWW//x7VzI6XXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/bn8lQLiEkxiLYhhErDKCAUcL8S1v+hCvvD0YBFm5giDuZDOX
-	D6BDcy8QPk0762L7072OgCe5lh36uVWLiflZxuBSANfdABugoMPlvJvnu+rBoj7YwBoTaiVCgC7
-	A9nVV0oImKmj4Q6YyP1ODUoeVuAUKD/MyHk8AtQcHBhaXwHh0nc7amQ==
-X-Gm-Gg: AZuq6aLdKzviTmOFIHOdI67/umEu1VLbVejBOWsCv17lDnubIdRsobZxOg/7e0LexFY
-	yC40gUr6+ARDPBdU0EUGG6zzYRFX4Hwp34/4/DP1OtevkcKAfAucARmiX17bvFp5Lu4U46E4kWr
-	bzdQg0ulT1Nbd2njygVkAELk1ZlKgP8PoH6P+pUzE4kjPN+7b8gly8sL4QnZ+x4nuDAujvX6T4o
-	hvXNiSOsUr3XLNxE9xmcfYMxReD2k7ygNgJcxdiP8U9/HbPyLLOHBQVAVADRorxvxewTi7IaD0k
-	xZakAoisNF6Q2sCmhTCINteJMjPMwXqk0tqPS1t3/lL3JzGT/QcrXyga/HTrzFynjp8uiDoNqus
-	sJttgXD4taLbZ0fOGL0veIfxxGt6sHGX7J1UMFzQ+YDwkBojhL9z0VVPMBjc=
-X-Received: by 2002:a05:6000:2f83:b0:432:5b81:480 with SMTP id ffacd0b85a97d-4356a03d2demr19167506f8f.24.1768901855982;
-        Tue, 20 Jan 2026 01:37:35 -0800 (PST)
-X-Received: by 2002:a05:6000:2f83:b0:432:5b81:480 with SMTP id ffacd0b85a97d-4356a03d2demr19167470f8f.24.1768901855514;
-        Tue, 20 Jan 2026 01:37:35 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4356996cefdsm27663754f8f.24.2026.01.20.01.37.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 01:37:34 -0800 (PST)
-Date: Tue, 20 Jan 2026 10:37:12 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>, 
-	Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Simon Horman <horms@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Arseniy Krasnov <AVKrasnov@sberdevices.ru>, 
-	Asias He <asias@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH RESEND net v5 0/4] vsock/virtio: fix TX credit handling
-Message-ID: <aW9L0xiwotBnRMw2@sgarzare-redhat>
-References: <20260116201517.273302-1-sgarzare@redhat.com>
- <20260119101734.01cbe934@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nroogO/3HRp/VoyM6bgFdytpivsnGKdcxq8MANBBr4bGVUHuRZ37UzyVehhMOZoM4LNItHR12e3l1RuLiEaS2YoZtL9CPx3R1dJMyu4peRxjjrRg7u80fHjtUKai21lnUpnXJ2u9jQ/uJkFSVDoh6d+FCygKdEny8/0hV7DiDG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dLp9ReyQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B94BC16AAE;
+	Tue, 20 Jan 2026 09:46:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768902365;
+	bh=xwqfvmhHmuW9plUqJwJFOo0A9JPdncx7ymGaNl95+yo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dLp9ReyQRpZBQ1HsP4UfwVvklS8InFrF5hZROHOsUQf2ANERezVMKk+6yLg6Ao4g3
+	 bLcG3imT0sMt+H8fCaljcj6H6q3C49oKM5UFuq9mCGfKKoc58e7IfUyEjHp9yyDWly
+	 YIKTxAK65ASJJqdGUsUzRrjLdUxxrZkSb5a45Yin99EzC3KcC/KU54U44uAJoCTHCk
+	 /GXbSQK/AWWMtHtI6tfkHgvO0RI0YfUByVjh5FRuPknr3l7QRpVrbBG7WUGy8+TysZ
+	 sOw9jD1XrRQTSSUqXvrM/yMlG1kzWM8fP+8vKPFCkbcyIu4rYCttJvTje8CuUxTa6t
+	 RL0gf/JISbozw==
+Date: Tue, 20 Jan 2026 11:45:59 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Alex Williamson <alex@shazbot.org>, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] dma-buf: Document revoke semantics
+Message-ID: <20260120094559.GR13201@unreal>
+References: <20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com>
+ <20260118-dmabuf-revoke-v2-2-a03bb27c0875@nvidia.com>
+ <20260119164421.GF961572@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260119101734.01cbe934@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260119164421.GF961572@ziepe.ca>
 
-On Mon, Jan 19, 2026 at 10:17:34AM -0800, Jakub Kicinski wrote:
->On Fri, 16 Jan 2026 21:15:13 +0100 Stefano Garzarella wrote:
->> Resend with the right cc (sorry, a mistake on my env)
->
->Please don't resend within 24h unless asked to:
->https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
+On Mon, Jan 19, 2026 at 12:44:21PM -0400, Jason Gunthorpe wrote:
+> On Sun, Jan 18, 2026 at 02:08:46PM +0200, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Document a DMA-buf revoke mechanism that allows an exporter to explicitly
+> > invalidate ("kill") a shared buffer after it has been handed out to
+> > importers. Once revoked, all further CPU and device access is blocked, and
+> > importers consistently observe failure.
+> > 
+> > This requires both importers and exporters to honor the revoke contract.
+> > 
+> > For importers, this means implementing .invalidate_mappings() and calling
+> > dma_buf_pin() after the DMA‑buf is attached to verify the exporter’s support
+> > for revocation.
+> > 
+> > For exporters, this means implementing the .pin() callback, which checks
+> > the DMA‑buf attachment for a valid revoke implementation.
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  include/linux/dma-buf.h | 19 +++++++++++++++++++
+> >  1 file changed, 19 insertions(+)
+> > 
+> > diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+> > index 1b397635c793..e0bc0b7119f5 100644
+> > --- a/include/linux/dma-buf.h
+> > +++ b/include/linux/dma-buf.h
+> > @@ -579,6 +579,25 @@ static inline bool dma_buf_is_dynamic(struct dma_buf *dmabuf)
+> >  	return !!dmabuf->ops->pin;
+> >  }
+> >  
+> > +/**
+> > + * dma_buf_attachment_is_revoke - check if a DMA-buf importer implements
+> > + * revoke semantics.
+> > + * @attach: the DMA-buf attachment to check
+> > + *
+> > + * Returns true if DMA-buf importer honors revoke semantics, which is
+> > + * negotiated with the exporter, by making sure that importer implements
+> > + * .invalidate_mappings() callback and calls to dma_buf_pin() after
+> > + * DMA-buf attach.
+> > + */
+> 
+> I think this clarification should also have comment to
+> dma_buf_move_notify(). Maybe like this:
+> 
+> @@ -1324,7 +1324,18 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_sgt_unmap_attachment_unlocked, "DMA_BUF");
+>   * @dmabuf:    [in]    buffer which is moving
+>   *
+>   * Informs all attachments that they need to destroy and recreate all their
+> - * mappings.
+> + * mappings. If the attachment is dynamic then the dynamic importer is expected
+> + * to invalidate any caches it has of the mapping result and perform a new
+> + * mapping request before allowing HW to do any further DMA.
+> + *
+> + * If the attachment is pinned then this informs the pinned importer that
+> + * the underlying mapping is no longer available. Pinned importers may take
+> + * this is as a permanent revocation so exporters should not trigger it
+> + * lightly.
+> + *
+> + * For legacy pinned importers that cannot support invalidation this is a NOP.
+> + * Drivers can call dma_buf_attachment_is_revoke() to determine if the
+> + * importer supports this.
+>   */
+> 
+> Also it would be nice to document what Christian pointed out regarding
+> fences after move_notify.
 
-Sorry for that, I'll avoid in the future.
+I added this comment too:
+diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
+index 6dd70f7b992d..478127dc63e9 100644
+--- a/drivers/dma-buf/dma-buf.c
++++ b/drivers/dma-buf/dma-buf.c
+@@ -1253,6 +1253,10 @@ EXPORT_SYMBOL_NS_GPL(dma_buf_unmap_attachment_unlocked, "DMA_BUF");
+  * For legacy pinned importers that cannot support invalidation this is a NOP.
+  * Drivers can call dma_buf_attach_revocable() to determine if the importer
+  * supports this.
++ *
++ * NOTE: The invalidation triggers asynchronous HW operation and the callers
++ * need to wait for this operation to complete by calling
++ * to dma_resv_wait_timeout().
+  */
+ void dma_buf_move_notify(struct dma_buf *dmabuf)
+ {
 
->
->> The original series was posted by Melbin K Mathew <mlbnkm1@gmail.com> till
->> v4: https://lore.kernel.org/netdev/20251217181206.3681159-1-mlbnkm1@gmail.com/
->>
->> Since it's a real issue and the original author seems busy, I'm sending
->> the v5 fixing my comments but keeping the authorship (and restoring mine
->> on patch 2 as reported on v4).
->
->Does not apply to net:
->
->Switched to a new branch 'vsock-virtio-fix-tx-credit-handling'
->Applying: vsock/virtio: fix potential underflow in virtio_transport_get_credit()
->Applying: vsock/test: fix seqpacket message bounds test
->Applying: vsock/virtio: cap TX credit to local buffer size
->Applying: vsock/test: add stream TX credit bounds test
->error: patch failed: tools/testing/vsock/vsock_test.c:2414
->error: tools/testing/vsock/vsock_test.c: patch does not apply
->Patch failed at 0004 vsock/test: add stream TX credit bounds test
->hint: Use 'git am --show-current-patch=diff' to see the failed patch
->hint: When you have resolved this problem, run "git am --continue".
->hint: If you prefer to skip this patch, run "git am --skip" instead.
->hint: To restore the original branch and stop patching, run "git am --abort".
->hint: Disable this message with "git config set advice.mergeConflict false"
->
->Did you generate against net-next or there's some mid-air collision?
->(if the former please share the resolution for the resulting conflict;))
+> 
+> > +static inline bool
+> > +dma_buf_attachment_is_revoke(struct dma_buf_attachment *attach)
+> > +{
+> > +	return IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY) &&
+> > +	       dma_buf_is_dynamic(attach->dmabuf) &&
+> > +	       (attach->importer_ops &&
+> > +		attach->importer_ops->invalidate_mappings);
+> > +}
+> 
+> And I don't think we should use a NULL invalidate_mappings function
+> pointer to signal this.
+> 
+> It sounds like the direction is to require importers to support
+> move_notify, so we should not make it easy to just drop a NULL in the
+> ops struct to get out of the desired configuration.
+> 
+> I suggest defining a function
+> "dma_buf_unsupported_invalidate_mappings" and use
+> EXPORT_SYMBOL_FOR_MODULES so only RDMA can use it. Then check for that
+> along with NULL importer_ops to cover the two cases where it is not
+> allowed.
+> 
+> The only reason RDMA has to use dma_buf_dynamic_attach() is to set the
+> allow_p2p=true ..
 
-Ooops, a new test landed in net, this should be the resolution:
+Will do.
 
-diff --cc tools/testing/vsock/vsock_test.c
-index 668fbe9eb3cc,6933f986ef2a..000000000000
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@@ -2414,11 -2510,11 +2510,16 @@@ static struct test_case test_cases[] =
-                 .run_client = test_stream_accepted_setsockopt_client,
-                 .run_server = test_stream_accepted_setsockopt_server,
-         },
-  +      {
-  +              .name = "SOCK_STREAM virtio MSG_ZEROCOPY coalescence corruption",
-  +              .run_client = test_stream_msgzcopy_mangle_client,
-  +              .run_server = test_stream_msgzcopy_mangle_server,
-  +      },
-+       {
-+               .name = "SOCK_STREAM TX credit bounds",
-+               .run_client = test_stream_tx_credit_bounds_client,
-+               .run_server = test_stream_tx_credit_bounds_server,
-+       },
-         {},
-   };
-
-
-If you prefer I can send a v6. In the mean time I pushed the branch 
-here: 
-https://github.com/stefano-garzarella/linux/tree/vsock_virtio_fix_tx_credit
-
-Thanks,
-Stefano
-
+> 
+> Jason
 
