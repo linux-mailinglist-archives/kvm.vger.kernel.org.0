@@ -1,120 +1,128 @@
-Return-Path: <kvm+bounces-68605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68606-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFE9D3C44D
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 10:57:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446AFD3C459
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 10:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 082F37062CF
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 09:49:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5E679565A30
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 09:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0CBF3E959C;
-	Tue, 20 Jan 2026 09:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D06F3D6697;
+	Tue, 20 Jan 2026 09:46:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DS4C70GB"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F47D3E9588;
-	Tue, 20 Jan 2026 09:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AF93E959E;
+	Tue, 20 Jan 2026 09:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768902392; cv=none; b=B9RyHYXv37lIvldFEL31TxIxGvXonn36Dlfy7oNt9tc3ajpkOEaggso2Pe83zJiDFO4OhwLBXhD5jUTli7Eh4krVy5msYmnX0fynyo1uj3HU2VeE8XlO8IcNy2HZXFd1+W3N5/u3bHTngWTboGvK0w0n9DAwV2n2MBcQcoiMz4w=
+	t=1768902394; cv=none; b=ZFaGa5BjZRFXi0LPRirvoKNpXF7Mj4+Fb0U9dVMMCUzUFVRBqEisMABx6QUWGpE9o0gX/HNq/SRfPI3wVl88YT/cdl7eLT6F/fYZg5MACX9OuVUiD1GlwrJqzLyEfjSBHkImbe6oQ1YpLBPWBGsPlcm0aolP1dVIZTK31zHddZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768902392; c=relaxed/simple;
-	bh=s186feiGqLJdCOT95+dzTzDvIWpSmFlsuahAR4E9xWY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SruIP4wDZZKj/Re4CqNKouYFk8DjJ/6PnJpMVtPMSoT++w5Wg1PdRl/uAQld6zxrJKQAkIqtLN6oowa7907S+3wpKVbd8P0LJMuTNPhu+ChJbh9pS9JyhnSOmhaJcJp/GD74QElWvsiy1siAY4HZDSJT/vZgJMyQrUBnt04HCzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37A801476;
-	Tue, 20 Jan 2026 01:46:22 -0800 (PST)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04FE43F740;
-	Tue, 20 Jan 2026 01:46:23 -0800 (PST)
-Date: Tue, 20 Jan 2026 09:46:17 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	catalin.marinas@arm.com, broonie@kernel.org, oliver.upton@linux.dev,
-	miko.lenczewski@arm.com, kevin.brodsky@arm.com, ardb@kernel.org,
-	suzuki.poulose@arm.com, lpieralisi@kernel.org,
-	yangyicong@hisilicon.com, scott@os.amperecomputing.com,
-	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
-	shuah@kernel.org, arnd@arndb.de,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI
- for swpX emulation.
-Message-ID: <aW9O6R7v-ybhrm66@J2N7QTR9R3>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
- <20251214112248.901769-10-yeoreum.yun@arm.com>
- <86ms3knl6s.wl-maz@kernel.org>
- <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
- <aW5O714hfl7DCl04@willie-the-truck>
- <aW6w6+B21NbUuszA@e129823.arm.com>
+	s=arc-20240116; t=1768902394; c=relaxed/simple;
+	bh=XE/5lRHO3RRDkKA4ZWEYEm62Xqa6rg6Ol6TX+aF/914=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sGj5pF9N04NprslDPC3hVVKwJKpXd1gRBs503wxLMGwEs3oxYZSKkc2vTy2CB7VUW1Y/UXx2LetM5a34XedCicXNqiax/mqv2F7nhIqWZrDce8gcUGu4uFUKS4PLGF/vjGKJunIo9AekD+qCDr3P4YDkaFYcaZWWMpx5iJYLnI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DS4C70GB; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768902392; x=1800438392;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=XE/5lRHO3RRDkKA4ZWEYEm62Xqa6rg6Ol6TX+aF/914=;
+  b=DS4C70GBuqoPUSt+x1rLwTVNt7sXv8TAdHrDYrXFb8QaD1WbZ4k/jzuA
+   oOijOdRMe5sSuUrKsftqD3ZBrbV28aqowGhRPEIXfdizcr2pbTHKYRpMn
+   emEP4HHMX3tuzXkZEYflu/mCRf5fo4/U8FoweW1JhE+p86Q2wI9dE/Xub
+   HTaXGyxD6pHE/gF/qaayrG7AMm5Suoa01+2oEFLZ9hcdjlGoQrQ7aoSNl
+   YjseMdiDI8fp3V4erxIwEQvvHEVxd58398+r8wDLGWB3omVEQIX9S968B
+   I7RbLzHhnWENdNtRajd/0QpYzGn2LnVxuvU44Z0YiXSuFQULdP0wei2J4
+   A==;
+X-CSE-ConnectionGUID: ZnMAwDqmSoqg4rB1nWhvZQ==
+X-CSE-MsgGUID: WiG6r8SDR1KNtQnVHyXIdA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11676"; a="80408620"
+X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
+   d="scan'208";a="80408620"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 01:46:32 -0800
+X-CSE-ConnectionGUID: XT3laMBvQ9SDnpIwDFME7A==
+X-CSE-MsgGUID: ydQTzoflQAiSBKs09vppBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,240,1763452800"; 
+   d="scan'208";a="206337139"
+Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 01:46:28 -0800
+Message-ID: <04d96812-f74a-4f43-9ea4-c4f2723251c5@linux.intel.com>
+Date: Tue, 20 Jan 2026 17:46:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aW6w6+B21NbUuszA@e129823.arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 17/22] KVM: x86: Advertise support for FRED
+To: Xin Li <xin@zytor.com>, Chao Gao <chao.gao@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+ corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+ peterz@infradead.org, andrew.cooper3@citrix.com, hch@infradead.org,
+ sohil.mehta@intel.com
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-18-xin@zytor.com> <aRQ3ngRvif/0QRTC@intel.com>
+ <71F2B269-4D29-4B23-9111-E43CDD09CF13@zytor.com> <aW83vbC2KB6CZDvl@intel.com>
+ <C3F658E2-BB0D-4461-8412-F4BC5BCB2298@zytor.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <C3F658E2-BB0D-4461-8412-F4BC5BCB2298@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 19, 2026 at 10:32:11PM +0000, Yeoreum Yun wrote:
-> > On Mon, Dec 15, 2025 at 09:56:04AM +0000, Yeoreum Yun wrote:
-> > > > On Sun, 14 Dec 2025 11:22:48 +0000,
-> > > > Yeoreum Yun <yeoreum.yun@arm.com> wrote:
-> > > > >
-> > > > > Apply the FEAT_LSUI instruction to emulate the deprecated swpX
-> > > > > instruction, so that toggling of the PSTATE.PAN bit can be removed when
-> > > > > LSUI-related instructions are used.
-> > > > >
-> > > > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> > > >
-> > > > It really begs the question: what are the odds of ever seeing a CPU
-> > > > that implements both LSUI and AArch32?
-> > > >
-> > > > This seems extremely unlikely to me.
-> > >
-> > > Well, I'm not sure how many CPU will have
-> > > both ID_AA64PFR0_EL1.EL0 bit as 0b0010 and FEAT_LSUI
-> > > (except FVP currently) -- at least the CPU what I saw,
-> > > most of them set ID_AA64PFR0_EL1.EL0 as 0b0010.
-> >
-> > Just to make sure I understand you, you're saying that you have seen
-> > a real CPU that implements both 32-bit EL0 *and* FEAT_LSUI?
-> >
-> > > If you this seems useless, I don't have any strong comments
-> > > whether drop patches related to deprecated swp instruction parts
-> > > (patch 8-9 only) or not.
-> > > (But, I hope to pass this decision to maintaining perspective...)
-> >
-> > I think it depends on whether or not the hardware exists. Marc thinks
-> > that it's extremely unlikely whereas you appear to have seen some (but
-> > please confirm).
+
+
+On 1/20/2026 5:09 PM, Xin Li wrote:
 > 
-> What I meant was not a 32-bit CPU with LSUI, but a CPU that supports
-> 32-bit EL0 compatibility (i.e. ID_AA64PFR0_EL1.EL0 = 0b0010).
-> My point was that if CPUs implementing LSUI do appear, most of them will likely
-> continue to support the existing 32-bit EL0 compatibility that
-> the majority of current CPUs already have.
+> 
+>> On Jan 20, 2026, at 12:07 AM, Chao Gao <chao.gao@intel.com> wrote:
+>>
+>> On Mon, Jan 19, 2026 at 10:56:29PM -0800, Xin Li wrote:
+>>>
+>>>
+>>>> On Nov 11, 2025, at 11:30 PM, Chao Gao <chao.gao@intel.com> wrote:
+>>>>
+>>>> I'm not sure if AMD CPUs support FRED, but just in case, we can clear FRED
+>>>> i.e., kvm_cpu_cap_clear(X86_FEATURE_FRED) in svm_set_cpu_caps().
+>>>
+>>> AMD will support FRED, with ISA level compatibility:
+>>>
+>>> https://www.amd.com/en/blogs/2025/amd-and-intel-celebrate-first-anniversary-of-x86-ecosys.html
+>>>
+>>> Thus we don’t need to clear the bit.
+>>
+>> In this case, we need to clear FRED for AMD.
+>>
+>> The concern is that before AMD's FRED KVM support is implemented, FRED will be
+>> exposed to userspace on AMD FRED-capable hardware. This may cause issues.
+> 
+> Hmm, I think it’s Qemu does that.
+> 
+> We have 2 filters, one in Qemu and one in KVM, only both are set a feature is enabled.
+> 
+> What I have missed?
 
-That doesn't really answer Will's question. Will asked:
+If a newer QEMU (with AMD's FRED support patch) + an older KVM (without AMD's
+FRED support, but KVM advertises it), it may cause issues.
 
-  Just to make sure I understand you, you're saying that you have seen a
-  real CPU that implements both 32-bit EL0 *and* FEAT_LSUI?
+I guess it's no safety issue for host though, AMD should also require some
+control bit(s) to be set to allow guests to use the feature.
 
-IIUC you have NOT seen any specific real CPU that supports this, and you
-have been testing on an FVP AEM model (which can be configured to
-support this combination of features). Can you please confirm?
-
-I don't beleive it's likely that we'll see hardware that supports
-both FEAT_LSUI and AArch32 (at EL0).
-
-Mark.
+I agree with Chao that it should be cleared for AMD before AMD's FRED KVM
+support is implemented.
 
