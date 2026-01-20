@@ -1,281 +1,169 @@
-Return-Path: <kvm+bounces-68617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68625-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6H5qH2Ckb2n0DgAAu9opvQ
-	(envelope-from <kvm+bounces-68617-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 16:50:56 +0100
+	id SNdmAcGlb2kfEgAAu9opvQ
+	(envelope-from <kvm+bounces-68625-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 16:56:49 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4367F46BC3
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 16:50:56 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D3246DD9
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 16:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B00E060C44B
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 14:12:06 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4B5793CBD94
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 14:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399A6441039;
-	Tue, 20 Jan 2026 14:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED1043636B;
+	Tue, 20 Jan 2026 14:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRlTBMJh"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="i+ZhZaGJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1964A43E9F7;
-	Tue, 20 Jan 2026 14:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030BB1F1304;
+	Tue, 20 Jan 2026 14:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768918042; cv=none; b=BBHqB3fI3D/KiyrGw4IU8zJYELM7IPBcsYCY6AlTmLabXmTaUBC7SW6NQVe4MNKgDhBNYDxqZqBe9CJ6EYrUoDaMbdr8AD+dFRQHH50WlvIfY9cpQF00dJK8EouR6sGnUCrFF5QfbiUHW9sBOm6Q5z85YkqfW2razqcO1vRU4D0=
+	t=1768918991; cv=none; b=uo6GxvSZfppDMl3HfHVgxAWeAe5HwamjgevApYW3JxKMNj73IFxzzAvzJyeRL/oUVt6tu+12X5l5hjvi2ZmBrM4IK+reN2PujNOyOZw4kgj3CSCPavDxjCwIZFugfrjnWTMoHT9JkqMoqKIvBgshw025hCJo9mM6QAa96w7GWyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768918042; c=relaxed/simple;
-	bh=1hYHYQMvghzNsWmwvxu8DztgpWMwQVcDwD8L4qNzSFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NSBH4ltsCXKtOlm5JBnIQFqt46NiQpIFrK70Itd0YgKAhXhXhvNC9Ax6VsPtXfTGUjKRfWiK5olV4KEwOaUNX37pn6jevORjIcIQ3z3+FlLyQimif6T3zdjtXkJJ/Q58MM7gc2/vJ3wZutQaByUNrZg8XfOu5ogLW5fwwGNwLIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRlTBMJh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A9D2C16AAE;
-	Tue, 20 Jan 2026 14:07:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768918041;
-	bh=1hYHYQMvghzNsWmwvxu8DztgpWMwQVcDwD8L4qNzSFs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QRlTBMJhHmgjJfRLZFugcge3ItgdIDWL7IepDxcq9jS7Pmnp9SZe/HWs+cDKDZB+i
-	 nUuCzOMeJsQabH0oG1eBHIfmwy8tJG8zd24hjV2hNiliRYS6FxL7SYQPI7x1u1pNr5
-	 8b6JRNtS+TuokQxelcA/64PVpwWACS1LR1/bVtpwCRop0qeh1af5mf3HH/L5MrOkuU
-	 bFvU+NmThWYFuWapDRNns9vD/Y9C7Je8c45M3BkGXWJDMuFNJOlIIEupIvm2wVMJL9
-	 b8KmKjJBBFnQTnREVzTzXg4iSZjjRf/LJq3Mbcvh2ZOG6w0gdKBicov3TKvpb497a+
-	 oevri4eLFs6HQ==
-From: Leon Romanovsky <leon@kernel.org>
-To: Sumit Semwal <sumit.semwal@linaro.org>,
-	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>
-Cc: linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
+	s=arc-20240116; t=1768918991; c=relaxed/simple;
+	bh=rW+LTZp/ZJIVdrB3i/54PJ5maH4AYyK2KAerEMHjQlI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=gxjKR3NySvsSii2hGy3dpYs6RHP/8yKV6oPYU44hYCgWk5XyuzKQDbljIZZnMhHIw5bnaJ3ZKnBTSM0rjcZC58yz7vuM5wo7Fulu5EHz7ClpkZBDzdoeIGahpkN7YScEAZhS+ZwHjT+mCq6YiM2/3CmSenaXjZpw0eTsOyOdHno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=i+ZhZaGJ; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1768918980; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=XjFJwiZwKYWRxhHb7L7H6Uqg4/HCRCOm2ZcJ0CPggm0=;
+	b=i+ZhZaGJhTHdIIQ9CEqq17/RUo2bY/2Tw9Q1qsN9LEJyGlxFMalJVkM4x2A0Dr/p+5+p7y4ED1rIsT5hhX6FPm00u5e88BH5AK3zeEemJOysFflE6gd5KbxZvHC5FkQijw0IpVxxC/cXahpUL1LUPoq4jHs5MGoEWD/QQD2pHdg=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WxUghn7_1768918976 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 20 Jan 2026 22:22:58 +0800
+From: fangyu.yu@linux.alibaba.com
+To: radim.krcmar@oss.qualcomm.com
+Cc: ajones@ventanamicro.com,
+	alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	corbet@lwn.net,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org,
-	virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [PATCH v3 2/7] dma-buf: Always build with DMABUF_MOVE_NOTIFY
-Date: Tue, 20 Jan 2026 16:07:02 +0200
-Message-ID: <20260120-dmabuf-revoke-v3-2-b7e0b07b8214@nvidia.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
-References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pbonzini@redhat.com,
+	pjw@kernel.org,
+	rkrcmar@ventanamicro.com
+Subject: Re: Re: [PATCH v2] RISC-V: KVM: add KVM_CAP_RISCV_SET_HGATP_MODE
+Date: Tue, 20 Jan 2026 22:22:56 +0800
+Message-Id: <20260120142256.9968-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <DFSM9IHXY24S.3W4T39VHEH420@oss.qualcomm.com>
+References: <DFSM9IHXY24S.3W4T39VHEH420@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-a6db3
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Spamd-Result: default: False [-7.46 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[linux.alibaba.com,none];
+	TAGGED_FROM(0.00)[bounces-68625-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68617-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[fangyu.yu@linux.alibaba.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,amd.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 4367F46BC3
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,alibaba.com:email]
+X-Rspamd-Queue-Id: 98D3246DD9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Leon Romanovsky <leonro@nvidia.com>
+>> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>>
+>> This capability allows userspace to explicitly select the HGATP mode
+>> for the VM. The selected mode must be less than or equal to the max
+>> HGATP mode supported by the hardware. This capability must be enabled
+>> before creating any vCPUs, and can only be set once per VM.
+>>
+>> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> ---
+>> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+>> @@ -212,12 +219,27 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  
+>>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>>  {
+>> +	if (cap->flags)
+>> +		return -EINVAL;
+>>  	switch (cap->cap) {
+>> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
+>> +#ifdef CONFIG_64BIT
+>> +		if (cap->args[0] < HGATP_MODE_SV39X4 ||
+>> +			cap->args[0] > kvm_riscv_gstage_max_mode)
+>> +			return -EINVAL;
+>> +		if (kvm->arch.gstage_mode_initialized)
+>> +			return 0;
+>
+>"must be enabled before creating any vCPUs" check is missing.
 
-DMABUF_MOVE_NOTIFY was introduced in 2018 and has been marked as
-experimental and disabled by default ever since. Six years later,
-all new importers implement this callback.
+Agreed, I'll add the missing "must be enabled before creating any vCPUs" check by
+rejecting the capability once kvm->created_vcpus is non-zero.
 
-It is therefore reasonable to drop CONFIG_DMABUF_MOVE_NOTIFY and
-always build DMABUF with support for it enabled.
+>
+>> +		kvm->arch.gstage_mode_initialized = true;
+>> +		kvm->arch.kvm_riscv_gstage_mode = cap->args[0];
+>> +		kvm->arch.kvm_riscv_gstage_pgd_levels = 3 +
+>> +		    kvm->arch.kvm_riscv_gstage_mode - HGATP_MODE_SV39X4;
+>
+>Even before creating VCPUs, I don't see enough protections to make this
+>work.
+>
+>Userspace can only provide a hint about the physical address space size
+>before any other KVM code could have acted on the information.
+>It would be a serious issue if some code would operate on hgatp as if it
+>were X and others as Y.
+>
+>The simplest solution would be to ensure that the CAP_SET VM ioctl can
+>only be executed before any other IOCTL, but a change in generic code to
+>achieve it would be frowned upon...
+>I would recommend looking at kvm_are_all_memslots_empty() first, as it's
+>quite likely that it could be sufficient for the purposes of changing
+>hgatp.
 
-Suggested-by: Christian König <christian.koenig@amd.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/dma-buf/Kconfig                     | 12 ------------
- drivers/dma-buf/dma-buf.c                   | 12 ++----------
- drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c | 10 +++-------
- drivers/gpu/drm/amd/amdkfd/Kconfig          |  2 +-
- drivers/gpu/drm/xe/tests/xe_dma_buf.c       |  3 +--
- drivers/gpu/drm/xe/xe_dma_buf.c             | 12 ++++--------
- 6 files changed, 11 insertions(+), 40 deletions(-)
+Using kvm_are_all_memslots_empty might be a good idea, and I will add a
+check for this function in the v2.
 
-diff --git a/drivers/dma-buf/Kconfig b/drivers/dma-buf/Kconfig
-index b46eb8a552d7..84d5e9b24e20 100644
---- a/drivers/dma-buf/Kconfig
-+++ b/drivers/dma-buf/Kconfig
-@@ -40,18 +40,6 @@ config UDMABUF
- 	  A driver to let userspace turn memfd regions into dma-bufs.
- 	  Qemu can use this to create host dmabufs for guest framebuffers.
- 
--config DMABUF_MOVE_NOTIFY
--	bool "Move notify between drivers (EXPERIMENTAL)"
--	default n
--	depends on DMA_SHARED_BUFFER
--	help
--	  Don't pin buffers if the dynamic DMA-buf interface is available on
--	  both the exporter as well as the importer. This fixes a security
--	  problem where userspace is able to pin unrestricted amounts of memory
--	  through DMA-buf.
--	  This is marked experimental because we don't yet have a consistent
--	  execution context and memory management between drivers.
--
- config DMABUF_DEBUG
- 	bool "DMA-BUF debug checks"
- 	depends on DMA_SHARED_BUFFER
-diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-index 59cc647bf40e..cd3b60ce4863 100644
---- a/drivers/dma-buf/dma-buf.c
-+++ b/drivers/dma-buf/dma-buf.c
-@@ -837,18 +837,10 @@ static void mangle_sg_table(struct sg_table *sg_table)
- 
- }
- 
--static inline bool
--dma_buf_attachment_is_dynamic(struct dma_buf_attachment *attach)
--{
--	return !!attach->importer_ops;
--}
--
- static bool
- dma_buf_pin_on_map(struct dma_buf_attachment *attach)
- {
--	return attach->dmabuf->ops->pin &&
--		(!dma_buf_attachment_is_dynamic(attach) ||
--		 !IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY));
-+	return attach->dmabuf->ops->pin && !attach->importer_ops;
- }
- 
- /**
-@@ -1124,7 +1116,7 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *attach,
- 	/*
- 	 * Importers with static attachments don't wait for fences.
- 	 */
--	if (!dma_buf_attachment_is_dynamic(attach)) {
-+	if (!attach->importer_ops) {
- 		ret = dma_resv_wait_timeout(attach->dmabuf->resv,
- 					    DMA_RESV_USAGE_KERNEL, true,
- 					    MAX_SCHEDULE_TIMEOUT);
-diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
-index 863454148b28..349215549e8f 100644
---- a/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
-+++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c
-@@ -145,13 +145,9 @@ static int amdgpu_dma_buf_pin(struct dma_buf_attachment *attach)
- 	 * notifiers are disabled, only allow pinning in VRAM when move
- 	 * notiers are enabled.
- 	 */
--	if (!IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY)) {
--		domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
--	} else {
--		list_for_each_entry(attach, &dmabuf->attachments, node)
--			if (!attach->peer2peer)
--				domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
--	}
-+	list_for_each_entry(attach, &dmabuf->attachments, node)
-+		if (!attach->peer2peer)
-+			domains &= ~AMDGPU_GEM_DOMAIN_VRAM;
- 
- 	if (domains & AMDGPU_GEM_DOMAIN_VRAM)
- 		bo->flags |= AMDGPU_GEM_CREATE_CPU_ACCESS_REQUIRED;
-diff --git a/drivers/gpu/drm/amd/amdkfd/Kconfig b/drivers/gpu/drm/amd/amdkfd/Kconfig
-index 16e12c9913f9..a5d7467c2f34 100644
---- a/drivers/gpu/drm/amd/amdkfd/Kconfig
-+++ b/drivers/gpu/drm/amd/amdkfd/Kconfig
-@@ -27,7 +27,7 @@ config HSA_AMD_SVM
- 
- config HSA_AMD_P2P
- 	bool "HSA kernel driver support for peer-to-peer for AMD GPU devices"
--	depends on HSA_AMD && PCI_P2PDMA && DMABUF_MOVE_NOTIFY
-+	depends on HSA_AMD && PCI_P2PDMA
- 	help
- 	  Enable peer-to-peer (P2P) communication between AMD GPUs over
- 	  the PCIe bus. This can improve performance of multi-GPU compute
-diff --git a/drivers/gpu/drm/xe/tests/xe_dma_buf.c b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
-index 1f2cca5c2f81..c107687ef3c0 100644
---- a/drivers/gpu/drm/xe/tests/xe_dma_buf.c
-+++ b/drivers/gpu/drm/xe/tests/xe_dma_buf.c
-@@ -22,8 +22,7 @@ static bool p2p_enabled(struct dma_buf_test_params *params)
- 
- static bool is_dynamic(struct dma_buf_test_params *params)
- {
--	return IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY) && params->attach_ops &&
--		params->attach_ops->invalidate_mappings;
-+	return params->attach_ops && params->attach_ops->invalidate_mappings;
- }
- 
- static void check_residency(struct kunit *test, struct xe_bo *exported,
-diff --git a/drivers/gpu/drm/xe/xe_dma_buf.c b/drivers/gpu/drm/xe/xe_dma_buf.c
-index 1b9cd043e517..ea370cd373e9 100644
---- a/drivers/gpu/drm/xe/xe_dma_buf.c
-+++ b/drivers/gpu/drm/xe/xe_dma_buf.c
-@@ -56,14 +56,10 @@ static int xe_dma_buf_pin(struct dma_buf_attachment *attach)
- 	bool allow_vram = true;
- 	int ret;
- 
--	if (!IS_ENABLED(CONFIG_DMABUF_MOVE_NOTIFY)) {
--		allow_vram = false;
--	} else {
--		list_for_each_entry(attach, &dmabuf->attachments, node) {
--			if (!attach->peer2peer) {
--				allow_vram = false;
--				break;
--			}
-+	list_for_each_entry(attach, &dmabuf->attachments, node) {
-+		if (!attach->peer2peer) {
-+			allow_vram = false;
-+			break;
- 		}
- 	}
- 
+>
+>Thanks.
 
--- 
-2.52.0
-
+Thanks,
+Fangyu
 
