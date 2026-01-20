@@ -1,154 +1,133 @@
-Return-Path: <kvm+bounces-68558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68559-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4D9ED3C0F4
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 08:53:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FCB6D3C130
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 08:57:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DBAC64271A9
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 07:51:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 86E054428C1
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 07:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21D63ACEFA;
-	Tue, 20 Jan 2026 07:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44E43B8BDA;
+	Tue, 20 Jan 2026 07:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="l9ONDIly"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="Oq3G10X1"
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from out28-101.mail.aliyun.com (out28-101.mail.aliyun.com [115.124.28.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAB650095A;
-	Tue, 20 Jan 2026 07:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E863B530B;
+	Tue, 20 Jan 2026 07:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768895473; cv=none; b=BP+EdIPl1xjwZO7xS7ud4YrEcoT3bMmLDcv4tribNorr0yUmHW7+adcupJaAyqcXnsADP+KeOjx+l2vQrXqS/T8owahJkKfAkA6tRw8EhALrL5l0sWlBTcN45uJQ0Pl58NnhyOpPmEDxAQNdw3cs8Kjn3MmACTVfCgzZbqtkfZw=
+	t=1768895715; cv=none; b=aZzgTrxSqEhgpp7MxrYwdkVEJqLH7cuamxJfDmRIb6HWCTSefY77C6YLg0m1wJ5JcfaWFspKlzYla30cUbfQOaucem9N+/9Vp/Y/xfI3mSAOm1bNVpLq8RnU4EtFPCR0VOYF40gN06K6InQxEsibUv05I97rzM0jjFbM+NIvN1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768895473; c=relaxed/simple;
-	bh=E/gybQK9/xbN+LH/lKyRmvgNqgdQThbTehYuuD826iY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=cFSbyiiUiLVDkqEDetgkhTs6l9ycYGhq7XQmKdnXdMR2pwMHYoCnHf1rrreC2jemGklv/fQlFj54aNISNbovp55XnXKPH41g9CK0G9SMbomjuHHBhFzqoHR58aDHXPQcloQM6eetIBzH3JKBcQEq///XnnJkMVthENiIexxt97E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=l9ONDIly; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=J8RCzY1a0oCoAgeopL3nueqwZdcIAvhUx9HBvAsry3c=;
-	b=l9ONDIly0/57jK4JFqyvM685xSgnFX5GqQYD2ABO7urxW67BKJ1/bVxJnbkvKoJNOUkCHYBuJ
-	wD1VlurKfvorKI91w+AeFeaCp5nfCAWDvoFIob5Qn123k2HAYsk3TW7bUQvFW9gbjGUrHuLRyU+
-	3gyzvuzr8ce9h8zZRDNhDRY=
-Received: from mail.maildlp.com (unknown [172.19.162.92])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4dwKDW26VMzLlt3;
-	Tue, 20 Jan 2026 15:47:39 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id C74A940565;
-	Tue, 20 Jan 2026 15:51:01 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 20 Jan 2026 15:51:01 +0800
-Subject: Re: [PATCH 4/4] hisi_acc_vfio_pci: fix the queue parameter anomaly
- issue
-To: Alex Williamson <alex@shazbot.org>
-CC: <alex.williamson@redhat.com>, <jgg@nvidia.com>,
-	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20260104070706.4107994-1-liulongfang@huawei.com>
- <20260104070706.4107994-5-liulongfang@huawei.com>
- <20260116100722.5bdb30d4@shazbot.org>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <5095fcc5-502f-ec07-8a6f-cb6112ca9bcd@huawei.com>
-Date: Tue, 20 Jan 2026 15:51:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1768895715; c=relaxed/simple;
+	bh=2ekVgjWfH/AsWv7REPqcE3vg44dQfi/IXR4Yf1HWf3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Euem3ZIK5udlKt3wy6RfHMbmDRzAx4GvNUyTMPV4le3h7xrraGgUSTER65hRtyZJYzrD5eDpftoQUnpjcIwyxDYbA4Ixc8h2RVoXhQYHpGWUbJnSGEjnPQ7WzH5qKUUq6esy1eBxHaatN732YYXXfg0uXFbTsNtk4m8v2VfXtNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=Oq3G10X1; arc=none smtp.client-ip=115.124.28.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=antgroup.com; s=default;
+	t=1768895708; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=DR7Rbxu7fFj/VSsyrXMKreBjbgZsM4uK/wXVjs/Jb5s=;
+	b=Oq3G10X1y0JKSiXevnPPZWRyL94WPFNdrFfVnkXyR9iGwIfxQiqHDijcewQ8xHv+BpMFilznx/lT5xkNrHeMIG2ZOINnTkk0lI+lDLS92HMZ41C6d1M41QTwKnEFaicCD0/BRRs9itWuKLw+bhM38417EgRwt9ZhkWTHSiuvYBU=
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.gAyIShv_1768895707 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 20 Jan 2026 15:55:07 +0800
+Date: Tue, 20 Jan 2026 15:55:07 +0800
+From: Hou Wenlong <houwenlong.hwl@antgroup.com>
+To: =?iso-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>
+Cc: linux-kernel@vger.kernel.org,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH RESEND v2] x86/xen/pvh: Enable PAE mode for 32-bit guest
+ only when CONFIG_X86_PAE is set
+Message-ID: <20260120075507.GA2071@k08j02272.eu95sqa>
+References: <d09ce9a134eb9cbc16928a5b316969f8ba606b81.1768017442.git.houwenlong.hwl@antgroup.com>
+ <20260120073927.GA119722@k08j02272.eu95sqa>
+ <409f5119-7dc1-4f45-a099-281db82254f3@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260116100722.5bdb30d4@shazbot.org>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <409f5119-7dc1-4f45-a099-281db82254f3@suse.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-
-On 2026/1/17 1:07, Alex Williamson wrote:
-> On Sun, 4 Jan 2026 15:07:06 +0800
-> Longfang Liu <liulongfang@huawei.com> wrote:
+On Tue, Jan 20, 2026 at 08:48:43AM +0100, Jürgen Groß wrote:
+> On 20.01.26 08:39, Hou Wenlong wrote:
+> >+kvm, I'm not sure whether it is needed.
 > 
->> When the number of QPs initialized by the device, as read via vft, is zero,
->> it indicates either an abnormal device configuration or an abnormal read
->> result.
->> Returning 0 directly in this case would allow the live migration operation
->> to complete successfully, leading to incorrect parameter configuration after
->> migration and preventing the service from recovering normal functionality.
->> Therefore, in such situations, an error should be returned to roll back the
->> live migration operation.
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 12 ++++++------
->>  1 file changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> index 394f1952a7ed..e0cc20f5f38b 100644
->> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
->> @@ -406,7 +406,7 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	struct hisi_qm *pf_qm = hisi_acc_vdev->pf_qm;
->>  	struct device *dev = &vf_qm->pdev->dev;
->>  	u32 que_iso_state;
->> -	int ret;
->> +	int qp_num, ret;
->>  
->>  	if (migf->total_length < QM_MATCH_SIZE || hisi_acc_vdev->match_done)
->>  		return 0;
->> @@ -423,18 +423,18 @@ static int vf_qm_check_match(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->>  	}
->>  
->>  	/* VF qp num check */
->> -	ret = qm_get_vft(vf_qm, &vf_qm->qp_base);
->> -	if (ret <= 0) {
->> +	qp_num = qm_get_vft(vf_qm, &vf_qm->qp_base);
->> +	if (qp_num <= 0) {
->>  		dev_err(dev, "failed to get vft qp nums\n");
->> -		return ret;
->> +		return -EINVAL;
->>  	}
-> 
-> Do you really want to clobber the errno or should this be something
-> like:
-> 
-> 		return qp_num < 0 ? qp_num : -EINVAL;
-> 
-> And if you do that it might make sense to continue to use ret rather
-> than add the new variable.  Thanks,
+> I have queued it in the Xen tree for the next merge window.
 >
-
-OK, your proposed fix doesn't require introducing a new variable.
-I'll address these issues in the next version.
-
-Thanks.
-Longfang.
-
-> Alex
+Thanks for the notification.
+ 
 > 
->>  
->> -	if (ret != vf_data->qp_num) {
->> +	if (qp_num != vf_data->qp_num) {
->>  		dev_err(dev, "failed to match VF qp num\n");
->>  		return -EINVAL;
->>  	}
->>  
->> -	vf_qm->qp_num = ret;
->> +	vf_qm->qp_num = qp_num;
->>  
->>  	/* VF isolation state check */
->>  	ret = qm_read_regs(pf_qm, QM_QUE_ISO_CFG_V, &que_iso_state, 1);
+> Juergen
 > 
-> .
+> >
+> >On Sat, Jan 10, 2026 at 12:00:08PM +0800, Hou Wenlong wrote:
+> >>The PVH entry is available for 32-bit KVM guests, and 32-bit KVM guests
+> >>do not depend on CONFIG_X86_PAE. However, mk_early_pgtbl_32() builds
+> >>different pagetables depending on whether CONFIG_X86_PAE is set.
+> >>Therefore, enabling PAE mode for 32-bit KVM guests without
+> >>CONFIG_X86_PAE being set would result in a boot failure during CR3
+> >>loading.
+> >>
+> >>Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> >>Reviewed-by: Juergen Gross <jgross@suse.com>
+> >>---
+> >>I resend this because I encountered the 32-bit KVM guest PVH booting failure again. I
+> >>hope this can be fixed.
+> >>original v2:
+> >>https://lore.kernel.org/all/0469c27833be58aa66471920aa77922489d86c63.1713873613.git.houwenlong.hwl@antgroup.com
+> >>---
+> >>  arch/x86/platform/pvh/head.S | 2 ++
+> >>  1 file changed, 2 insertions(+)
+> >>
+> >>diff --git a/arch/x86/platform/pvh/head.S b/arch/x86/platform/pvh/head.S
+> >>index 344030c1a81d..53ee2d53fcf8 100644
+> >>--- a/arch/x86/platform/pvh/head.S
+> >>+++ b/arch/x86/platform/pvh/head.S
+> >>@@ -91,10 +91,12 @@ SYM_CODE_START(pvh_start_xen)
+> >>  	leal rva(early_stack_end)(%ebp), %esp
+> >>+#if defined(CONFIG_X86_64) || defined(CONFIG_X86_PAE)
+> >>  	/* Enable PAE mode. */
+> >>  	mov %cr4, %eax
+> >>  	orl $X86_CR4_PAE, %eax
+> >>  	mov %eax, %cr4
+> >>+#endif
+> >>  #ifdef CONFIG_X86_64
+> >>  	/* Enable Long mode. */
+> >>
+> >>base-commit: b7dccac786071bba98b0d834c517fd44a22c50f9
+> >>prerequisite-patch-id: 590fa7e96c6bb8e0b9d15017cfa5ce1eb314957a
+> >>-- 
+> >>2.31.1
+> >>
+> >>
 > 
+
+> pub  2048R/28BF132F 2014-06-02 Juergen Gross <jg@pfupf.net>
+> uid                            Juergen Gross <jgross@suse.com>
+> uid                            Juergen Gross <jgross@novell.com>
+> uid                            Juergen Gross <jgross@suse.de>
+> sub  2048R/16375B53 2014-06-02
+
+
+
+
 
