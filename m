@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-68616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68618-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCRlLEpFcWn2fgAAu9opvQ
-	(envelope-from <kvm+bounces-68616-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 22:29:46 +0100
+	id MLjUAexwcGktYAAAu9opvQ
+	(envelope-from <kvm+bounces-68618-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 07:23:40 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2235E10E
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 22:29:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39D15201F
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 07:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C17D92C260
-	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 14:11:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8A49F7055A8
+	for <lists+kvm@lfdr.de>; Tue, 20 Jan 2026 14:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A18443E9D7;
-	Tue, 20 Jan 2026 14:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E848E44104D;
+	Tue, 20 Jan 2026 14:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9FPLJNH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSnGk9XF"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DB042EEDE;
-	Tue, 20 Jan 2026 14:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7C9439015;
+	Tue, 20 Jan 2026 14:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768918038; cv=none; b=sP/XpyfF4vVWds77KSc8ImTl9YWkoJZBrQRkqTY/PG6t/15We+fOKPvRqUSOO8gKBcWESXJ72Rpph62dtlUHMYOT8SV3fdQ6yfK0/k5XhAANW77aiEbuzQ9Z7uuy2hmPKVVZbMA1Q7Yxbdhpy+GUkC03vAqSABVCfMA3dgyWgqo=
+	t=1768918045; cv=none; b=fTpw8bmTNYtgVBF8RHtlE7FHocA54mCUi3yQZDaLkBuqPe3ehTQuVVnTNtksr99xVjW0pAQjpYwujmcVovf4rzAe1X7BBEjQXcgW1pR+/BN1pFaq2iryxUc/TBkl1QFBLYvufHeDO2T+gQJrsyxm5SJGd90XsoI9Dn6JaCZrZnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768918038; c=relaxed/simple;
-	bh=ROKkB0mIS7khlsv4KQDOsZjX4a+rHO4aJnOw0MFmrm0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QhjteGRkiu+XR4fC1LCwMdmswioFFca1vvqs7R9wmNpuxO912BgsXlze1oW0ACbZLdIZ4s5HSFEANjnbPRB4+8uGKpAd3sshRAnAwSo5irxL4bZcray06BxJ7n15KIueztg4k1MWF7cgIAiC3qpAA+0AqxQ5Xv+zuO552c5J5bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9FPLJNH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 347A2C16AAE;
-	Tue, 20 Jan 2026 14:07:17 +0000 (UTC)
+	s=arc-20240116; t=1768918045; c=relaxed/simple;
+	bh=3eb1V4Rv6TEPo/iUbHVsGnBY7mv0aXK8Ke6NEm2PaJk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jqnFlA/XeqzI+OSCs8gwb2jp+Hz7bR9x43QJx6ehDGphiRcOYMmPKV/3jvqrTq7S1Be8QBUvOn+rRXHV69Xxf9kBFlILHASm8CeQJHzlIT4Cm2npePYU3CnhUnrDzSjL7DrfaGG/G6GM8aWxUspxVEuE7/udeCvFPMNHSMFmC8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HSnGk9XF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81CDFC19423;
+	Tue, 20 Jan 2026 14:07:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768918037;
-	bh=ROKkB0mIS7khlsv4KQDOsZjX4a+rHO4aJnOw0MFmrm0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Z9FPLJNHtjmg+g+XBBXJHq1bk31q3tuCG8U641sPe5PuEyRi4qoevHZQgLWvE3BeV
-	 NHcVnzAv548oIrOaPpNs4fPlzIzY8D6OAgDy24afQIILoJ5sUJRw4C9U44GL1Jk1Gs
-	 6mqU9Gb2bBQDbKFny5CeMgMjvN3hpdZnU3hUFMqdq7O8rVtRv92lUsTZvkNBoFIycl
-	 RYDK/SoQiG5vtv2N1Wn7zoWr52yIAtUVuf58teP6LzB3tVY3Xrzd0h81xYeR4xRJwD
-	 Brafxmuv73RoqMNIrYdIQvZy7BhjYWgDSpoh6V83F3ly/524nRWpBY6F66Y2zu5aT3
-	 /oAR4obsvM6mA==
+	s=k20201202; t=1768918045;
+	bh=3eb1V4Rv6TEPo/iUbHVsGnBY7mv0aXK8Ke6NEm2PaJk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HSnGk9XFDR4LcBjJZ3PdWo/nLxtHrZYRrbNJIbATZmIMl/oIgDp7Zv3+Iv2FgU217
+	 XVf93XW9pO75mbYU7+mCrG3kSK0it+Br0MlfELbZ31oz+qTMUvDB5n3yGI2SnV3Qrp
+	 D1WvGs3G3WGDLykWT09F9nPjulEAfUuV/7wykEKRBV2yJ7E0cEX5M0sYZgxlnc8sNd
+	 /ouz/Bj0hGmYAAt2OyWdPAEJ9C/gT46X3HvhPjEKYLZSKETXF88S2ATjiB1BsX/IX8
+	 3NXeM8d2pcUK4R9/jjKU8NFqyvNjGSef59Q10YMOdntmwc0NzsTIIUYhhfhlHlaozG
+	 g5RqxzB/E0aRw==
 From: Leon Romanovsky <leon@kernel.org>
 To: Sumit Semwal <sumit.semwal@linaro.org>,
 	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
@@ -81,10 +82,12 @@ Cc: linux-media@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	iommu@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: [PATCH v3 0/7] dma-buf: Use revoke mechanism to invalidate shared buffers
-Date: Tue, 20 Jan 2026 16:07:00 +0200
-Message-ID: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
+Subject: [PATCH v3 3/7] dma-buf: Document RDMA non-ODP invalidate_mapping() special case
+Date: Tue, 20 Jan 2026 16:07:03 +0200
+Message-ID: <20260120-dmabuf-revoke-v3-3-b7e0b07b8214@nvidia.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
+References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,23 +95,21 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Change-ID: 20251221-dmabuf-revoke-b90ef16e4236
 X-Mailer: b4 0.15-dev-a6db3
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.96 / 15.00];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DATE_IN_PAST(1.00)[31];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68616-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-68618-lists,kvm=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
@@ -120,105 +121,107 @@ X-Spamd-Result: default: False [-0.96 / 15.00];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 3D2235E10E
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,nvidia.com:email,nvidia.com:mid]
+X-Rspamd-Queue-Id: A39D15201F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Changelog:
-v3:
- * Used Jason's wordings for commits and cover letter.
- * Removed IOMMUFD patch.
- * Renamed dma_buf_attachment_is_revoke() to be dma_buf_attach_revocable().
- * Added patch to remove CONFIG_DMABUF_MOVE_NOTIFY.
- * Added Reviewed-by tags.
- * Called to dma_resv_wait_timeout() after dma_buf_move_notify() in VFIO.
- * Added dma_buf_attach_revocable() check to VFIO DMABUF attach function.
- * Slightly changed commit messages.
-v2: https://patch.msgid.link/20260118-dmabuf-revoke-v2-0-a03bb27c0875@nvidia.com
- * Changed series to document the revoke semantics instead of
-   implementing it.
-v1: https://patch.msgid.link/20260111-dmabuf-revoke-v1-0-fb4bcc8c259b@nvidia.com
+From: Leon Romanovsky <leonro@nvidia.com>
 
--------------------------------------------------------------------------
-This series documents a dma-buf “revoke” mechanism: to allow a dma-buf
-exporter to explicitly invalidate (“kill”) a shared buffer after it has
-been distributed to importers, so that further CPU and device access is
-prevented and importers reliably observe failure.
+The .invalidate_mapping() callback is documented as optional, yet it
+effectively became mandatory whenever importer_ops were provided. This
+led to cases where RDMA non-ODP code had to supply an empty stub just to
+provide allow_peer2peer.
 
-The change in this series is to properly document and use existing core
-“revoked” state on the dma-buf object and a corresponding exporter-triggered
-revoke operation.
+Document this behavior by creating a dedicated export for the
+dma_buf_unsupported_invalidate_mappings() function. This function is
+intended solely for the RDMA non-ODP case and must not be used by any
+other dma-buf importer.
 
-dma-buf has quietly allowed calling move_notify on pinned dma-bufs, even
-though legacy importers using dma_buf_attach() would simply ignore
-these calls.
-
-RDMA saw this and needed to use allow_peer2peer=true, so implemented a
-new-style pinned importer with an explicitly non-working move_notify()
-callback.
-
-This has been tolerable because the existing exporters are thought to
-only call move_notify() on a pinned DMABUF under RAS events and we
-have been willing to tolerate the UAF that results by allowing the
-importer to continue to use the mapping in this rare case.
-
-VFIO wants to implement a pin supporting exporter that will issue a
-revoking move_notify() around FLRs and a few other user triggerable
-operations. Since this is much more common we are not willing to
-tolerate the security UAF caused by interworking with non-move_notify()
-supporting drivers. Thus till now VFIO has required dynamic importers,
-even though it never actually moves the buffer location.
-
-To allow VFIO to work with pinned importers, according to how dma-buf
-was intended, we need to allow VFIO to detect if an importer is legacy
-or RDMA and does not actually implement move_notify().
-
-Introduce a new function that exporters can call to detect these less
-capable importers. VFIO can then refuse to accept them during attach.
-
-In theory all exporters that call move_notify() on pinned dma-buf's
-should call this function, however that would break a number of widely
-used NIC/GPU flows. Thus for now do not spread this further than VFIO
-until we can understand how much of RDMA can implement the full
-semantic.
-
-In the process clarify how move_notify is intended to be used with
-pinned dma-bufs.
-
-Thanks
+This makes it possible to rely on a valid .invalidate_mappings()
+callback to determine whether an importer supports revocation.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
-Leon Romanovsky (7):
-      dma-buf: Rename .move_notify() callback to a clearer identifier
-      dma-buf: Always build with DMABUF_MOVE_NOTIFY
-      dma-buf: Document RDMA non-ODP invalidate_mapping() special case
-      dma-buf: Add check function for revoke semantics
-      iommufd: Pin dma-buf importer for revoke semantics
-      vfio: Wait for dma-buf invalidation to complete
-      vfio: Validate dma-buf revocation semantics
+ drivers/dma-buf/dma-buf.c             | 14 ++++++++++++++
+ drivers/infiniband/core/umem_dmabuf.c | 11 +----------
+ include/linux/dma-buf.h               |  4 +++-
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
- drivers/dma-buf/Kconfig                     | 12 -----
- drivers/dma-buf/dma-buf.c                   | 69 +++++++++++++++++++++++------
- drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c | 14 +++---
- drivers/gpu/drm/amd/amdkfd/Kconfig          |  2 +-
- drivers/gpu/drm/virtio/virtgpu_prime.c      |  2 +-
- drivers/gpu/drm/xe/tests/xe_dma_buf.c       |  7 ++-
- drivers/gpu/drm/xe/xe_dma_buf.c             | 14 +++---
- drivers/infiniband/core/umem_dmabuf.c       | 13 +-----
- drivers/infiniband/hw/mlx5/mr.c             |  2 +-
- drivers/iommu/iommufd/pages.c               | 11 ++++-
- drivers/vfio/pci/vfio_pci_dmabuf.c          |  8 ++++
- include/linux/dma-buf.h                     |  9 ++--
- 12 files changed, 96 insertions(+), 67 deletions(-)
----
-base-commit: 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb
-change-id: 20251221-dmabuf-revoke-b90ef16e4236
+diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
+index cd3b60ce4863..c4fa35034b92 100644
+--- a/drivers/dma-buf/dma-buf.c
++++ b/drivers/dma-buf/dma-buf.c
+@@ -1238,6 +1238,20 @@ void dma_buf_unmap_attachment_unlocked(struct dma_buf_attachment *attach,
+ }
+ EXPORT_SYMBOL_NS_GPL(dma_buf_unmap_attachment_unlocked, "DMA_BUF");
+ 
++/*
++ * This function shouldn't be used by anyone except RDMA non-ODP case.
++ * The reason to it is UAPI mistake where dma-buf was exported to the
++ * userspace without knowing that .invalidate_mappings() can be called
++ * for pinned memory too.
++ *
++ * This warning shouldn't be seen in real production scenario.
++ */
++void dma_buf_unsupported_invalidate_mappings(struct dma_buf_attachment *attach)
++{
++	pr_warn("Invalidate callback should not be called when memory is pinned\n");
++}
++EXPORT_SYMBOL_FOR_MODULES(dma_buf_unsupported_invalidate_mappings, "ib_uverbs");
++
+ /**
+  * dma_buf_move_notify - notify attachments that DMA-buf is moving
+  *
+diff --git a/drivers/infiniband/core/umem_dmabuf.c b/drivers/infiniband/core/umem_dmabuf.c
+index d77a739cfe7a..81442a887b48 100644
+--- a/drivers/infiniband/core/umem_dmabuf.c
++++ b/drivers/infiniband/core/umem_dmabuf.c
+@@ -184,18 +184,9 @@ struct ib_umem_dmabuf *ib_umem_dmabuf_get(struct ib_device *device,
+ }
+ EXPORT_SYMBOL(ib_umem_dmabuf_get);
+ 
+-static void
+-ib_umem_dmabuf_unsupported_move_notify(struct dma_buf_attachment *attach)
+-{
+-	struct ib_umem_dmabuf *umem_dmabuf = attach->importer_priv;
+-
+-	ibdev_warn_ratelimited(umem_dmabuf->umem.ibdev,
+-			       "Invalidate callback should not be called when memory is pinned\n");
+-}
+-
+ static struct dma_buf_attach_ops ib_umem_dmabuf_attach_pinned_ops = {
+ 	.allow_peer2peer = true,
+-	.invalidate_mappings = ib_umem_dmabuf_unsupported_move_notify,
++	.invalidate_mappings = dma_buf_unsupported_invalidate_mappings,
+ };
+ 
+ struct ib_umem_dmabuf *
+diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+index 1b397635c793..7d7d0a4fb762 100644
+--- a/include/linux/dma-buf.h
++++ b/include/linux/dma-buf.h
+@@ -458,7 +458,7 @@ struct dma_buf_attach_ops {
+ 	bool allow_peer2peer;
+ 
+ 	/**
+-	 * @invalidate_mappings: [optional] notification that the DMA-buf is moving
++	 * @invalidate_mappings: notification that the DMA-buf is moving
+ 	 *
+ 	 * If this callback is provided the framework can avoid pinning the
+ 	 * backing store while mappings exists.
+@@ -601,6 +601,8 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
+ void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
+ 				enum dma_data_direction);
+ void dma_buf_move_notify(struct dma_buf *dma_buf);
++void dma_buf_unsupported_invalidate_mappings(struct dma_buf_attachment *attach);
++
+ int dma_buf_begin_cpu_access(struct dma_buf *dma_buf,
+ 			     enum dma_data_direction dir);
+ int dma_buf_end_cpu_access(struct dma_buf *dma_buf,
 
-Best regards,
---  
-Leon Romanovsky <leonro@nvidia.com>
+-- 
+2.52.0
 
 
