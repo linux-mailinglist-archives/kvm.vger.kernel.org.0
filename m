@@ -1,56 +1,55 @@
-Return-Path: <kvm+bounces-68734-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68735-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kE4jIVbvcGk+awAAu9opvQ
-	(envelope-from <kvm+bounces-68734-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 16:23:02 +0100
+	id kIxlN6L1cGmgbAAAu9opvQ
+	(envelope-from <kvm+bounces-68735-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 16:49:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FC05591D9
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 16:23:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F555976A
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 16:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 817E972D12F
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 14:33:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 104CBA4C04E
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 14:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5F94A1383;
-	Wed, 21 Jan 2026 14:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4552494A1D;
+	Wed, 21 Jan 2026 14:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ge0gfH42"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqhQkB0H"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E1147DFB5;
-	Wed, 21 Jan 2026 14:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE504949E8;
+	Wed, 21 Jan 2026 14:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769005533; cv=none; b=Xhjc2T1RxFVplSiyRUqqdMas8R+d9CDO9F9NwFAVT7hQlOnYf0ufEvCftG5ZuNMXGqeHpM0qdnFrV3s+GR0sJLfgu7ElaoVN+A6t99i3k4t6DJ75fZzpOHBJr+VlS7qWyUgmsSQHuuH5Wx1UexHcPfqT0bSDMhn48pl2BAuRdH0=
+	t=1769005914; cv=none; b=p9qyc78i0CtCIOusEQTzUg87wRaS+IAir1SXxjRRdcHmFJhR85xEWqJm9mKaCezs5zpL4x0TjsNgDiidDJ/TGlHPhet0dKknF+PXtpcBxXIfCiUIxKDIzsfpsITs0GDdATM4X2EqLIN67IKQOBuCFFxDc+ZfTYMBWvB4Pj4XfwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769005533; c=relaxed/simple;
-	bh=Z1b1OV+NsXvKxZL5y0yjDvYw+BPD/t+tNec7lO1yOeQ=;
+	s=arc-20240116; t=1769005914; c=relaxed/simple;
+	bh=PeR5g4KP8x/lJhIeGe2dDKX2Op8R7HIZRzZ9ayHsJco=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rlYBbiXpHBP4VkDo7QRz+wGZ1hmlMPbGueKdb0/Lowk5brr75T5p1988U4RyZXRZZLa6DPmP20Snkg7f41lej3H+ZZ5CSals23AfVhxCoPNa2Ll/c4tQs2em1N4+SH1fPH6U7+nJMOn7wNMUuX4xQb5ISgydAFIi8KJW/0X7N+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ge0gfH42; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B46B1C4CEF1;
-	Wed, 21 Jan 2026 14:25:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=AslVuI0aRbLVvFM9DRUeEnTvhQrw03T6UfGosytyPJjlGJJHUPfeMvJLOLsS5ChyAlD6ypgSPyEZ5BanW+jlilpZjPVLmVe1dIdEraMEst6Qk+ArM7E/BVH5QHezpJCL6RLva21cm0HHhdik+lxhNd2+NF14ma7syZFzYSTyFFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqhQkB0H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2629C4CEF1;
+	Wed, 21 Jan 2026 14:31:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769005533;
-	bh=Z1b1OV+NsXvKxZL5y0yjDvYw+BPD/t+tNec7lO1yOeQ=;
+	s=k20201202; t=1769005914;
+	bh=PeR5g4KP8x/lJhIeGe2dDKX2Op8R7HIZRzZ9ayHsJco=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ge0gfH42x3ObIVHqMUppthrzucjXvd0sKFBBGu4TSY+DEJrnvIfuVNOm/mqKYdhDY
-	 yRDoNVy9wGFl4Ut19lSeYJrZe1wCJhZj8ub12kLqzIUXGFSWsV2rP3hdPPT/s+/Bzd
-	 CNaQbyUxt0oTU0nSQY9kuHTyvAqfiinywrhwtEMUV9GHruLOW8ZAKWIwXf2aeNTpP2
-	 re5/XOlW/nicBV4K88fU1PWmqnjNVT5UYqPTrWW4KLfK4zZvyO+aP+i6vFjcIWCD3y
-	 /TbHj97MVtfL42yJ9golJbaNDyXRlaBRj2ChbMR7xPn3wzQIArZQpFbMw80UjQAQRs
-	 hWPGykweNH8jA==
-Date: Wed, 21 Jan 2026 16:25:28 +0200
+	b=KqhQkB0HZ1m+DKmEb4iOkwxeDGvAPNkuGn61XTxaCqhuL9qVbUQfxtrTwPujoAdVb
+	 VrWiUmPtEeUvE9nGyKANKxMoUIMS0e5nHQ31T+VEQXUu37yer/5Hzj5XuurNOilyo2
+	 +YYGfaIa3Dbj0S4Qd6g3VaXA17/1wzg6rpzqnlrG4nsV8pQRcJ1G7Oj+N6BLxO/rpy
+	 nVcDdV+4eAHtYRPFNU2TGJOODjbr6a9NoxnTowpmmzFAyZbPWVMuabJ0YV3hjf1iNz
+	 8aDY8IqPHmmGAsQTtHkqpxZzOBU4w+H2paxEDwGUBatWmmBD4eAn1X2NjKOH85/uBz
+	 eYXBSWhDgDLeQ==
+Date: Wed, 21 Jan 2026 16:31:50 +0200
 From: Leon Romanovsky <leon@kernel.org>
-To: Pranjal Shrivastava <praan@google.com>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
 Cc: Jason Gunthorpe <jgg@ziepe.ca>, Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
 	Alex Deucher <alexander.deucher@amd.com>,
 	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
 	Gerd Hoffmann <kraxel@redhat.com>,
@@ -74,21 +73,28 @@ Cc: Jason Gunthorpe <jgg@ziepe.ca>, Sumit Semwal <sumit.semwal@linaro.org>,
 	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
 	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
 	iommu@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v4 8/8] vfio: Validate dma-buf revocation semantics
-Message-ID: <20260121142528.GC13201@unreal>
-References: <20260121-dmabuf-revoke-v4-0-d311cbc8633d@nvidia.com>
- <20260121-dmabuf-revoke-v4-8-d311cbc8633d@nvidia.com>
- <20260121134712.GZ961572@ziepe.ca>
- <aXDhJ89Yru577jeY@google.com>
+Subject: Re: [PATCH v3 3/7] dma-buf: Document RDMA non-ODP
+ invalidate_mapping() special case
+Message-ID: <20260121143150.GD13201@unreal>
+References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
+ <20260120-dmabuf-revoke-v3-3-b7e0b07b8214@nvidia.com>
+ <4fe42e7e-846c-4aae-8274-3e9a5e7f9a6d@amd.com>
+ <20260121091423.GY13201@unreal>
+ <7cfe0495-f654-4f9d-8194-fa5717eeafff@amd.com>
+ <20260121131852.GX961572@ziepe.ca>
+ <8a8ba092-6cfa-41d2-8137-e5e9d917e914@amd.com>
+ <20260121135948.GB961572@ziepe.ca>
+ <8689345b-241a-47f4-8e9a-61cde285bf8b@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <aXDhJ89Yru577jeY@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8689345b-241a-47f4-8e9a-61cde285bf8b@amd.com>
 X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
@@ -97,13 +103,13 @@ X-Spamd-Result: default: False [-1.46 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68734-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68735-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[ziepe.ca,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -113,75 +119,72 @@ X-Spamd-Result: default: False [-1.46 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: 2FC05591D9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 85F555976A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 02:22:31PM +0000, Pranjal Shrivastava wrote:
-> On Wed, Jan 21, 2026 at 09:47:12AM -0400, Jason Gunthorpe wrote:
-> > On Wed, Jan 21, 2026 at 02:59:16PM +0200, Leon Romanovsky wrote:
-> > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > 
-> > > Use the new dma_buf_attach_revocable() helper to restrict attachments to
-> > > importers that support mapping invalidation.
-> > > 
-> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > ---
-> > >  drivers/vfio/pci/vfio_pci_dmabuf.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > > index 5fceefc40e27..85056a5a3faf 100644
-> > > --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > > +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > > @@ -31,6 +31,9 @@ static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
-> > >  	if (priv->revoked)
-> > >  		return -ENODEV;
-> > >  
-> > > +	if (!dma_buf_attach_revocable(attachment))
-> > > +		return -EOPNOTSUPP;
-> > > +
-> > >  	return 0;
-> > >  }
+On Wed, Jan 21, 2026 at 03:15:46PM +0100, Christian König wrote:
+> On 1/21/26 14:59, Jason Gunthorpe wrote:
+> > On Wed, Jan 21, 2026 at 02:52:53PM +0100, Christian König wrote:
+> >> On 1/21/26 14:18, Jason Gunthorpe wrote:
+> >>> On Wed, Jan 21, 2026 at 10:17:16AM +0100, Christian König wrote:
+> >>>> The whole idea is to make invalidate_mappings truly optional.
+> >>>
+> >>> But it's not really optional! It's absence means we are ignoring UAF
+> >>> security issues when the exporters do their move_notify() and nothing
+> >>> happens.
+> >>
+> >> No that is unproblematic.
+> >>
+> >> See the invalidate_mappings callback just tells the importer that
+> >> the mapping in question can't be relied on any more.
+> >>
+> >> But the mapping is truly freed only by the importer calling
+> >> dma_buf_unmap_attachment().
+> >>
+> >> In other words the invalidate_mappings give the signal to the
+> >> importer to disable all operations and the
+> >> dma_buf_unmap_attachment() is the signal from the importer that the
+> >> housekeeping structures can be freed and the underlying address
+> >> space or backing object re-used.
 > > 
-> > We need to push an urgent -rc fix to implement a pin function here
-> > that always fails. That was missed and it means things like rdma can
-> > import vfio when the intention was to block that. It would be bad for
-> > that uAPI mistake to reach a released kernel.
+> > I see
 > > 
-> > It's tricky that NULL pin ops means "I support pin" :|
+> > Can we document this please, I haven't seen this scheme described
+> > anyhwere.
 > > 
+> > And let's clarify what I said in my other email that this new revoke
+> > semantic is not just a signal to maybe someday unmap but a hard
+> > barrier that it must be done once the fences complete, similar to
+> > non-pinned importers.
 > 
-> I've been wondering about this for a while now, I've been sitting on the
-> following:
+> Well, I would avoid that semantics.
 > 
-> diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-> index a4d8f2ff94e4..962bce959366 100644
-> --- a/drivers/dma-buf/dma-buf.c
-> +++ b/drivers/dma-buf/dma-buf.c
-> @@ -1133,6 +1133,8 @@ int dma_buf_pin(struct dma_buf_attachment *attach)
+> Even when the exporter requests the mapping to be invalidated it does not mean that the mapping can go away immediately.
 > 
->         if (dmabuf->ops->pin)
->                 ret = dmabuf->ops->pin(attach);
-> +       else
-> +               ret = -EOPNOTSUPP;
+> It's fine when accesses initiated after an invalidation and then waiting for fences go into nirvana and have undefined results, but they should not trigger PCI AER, warnings from the IOMMU or even worse end up in some MMIO BAR of a newly attached devices.
 > 
->         return ret;
->  }
+> So if the exporter wants to be 100% sure that nobody is using the mapping any more then it needs to wait for the importer to call dma_buf_unmap_attachment().
 > 
-> But didn't get a chance to dive in the history yet. I thought there's a
-> good reason we didn't have it? Would it break exisitng dmabuf users?
+> > The cover letter should be clarified with this understanding too.
+> 
+> Yeah, completely agree. We really need to flash out that semantics in the documentation.
 
-Probably every importer which called to dma_buf_pin() while connecting
-to existing exporters as many in tree implementation don't have ->pin()
-implemented.
+Someone knowledgeable needs to document this properly, either in the code  
+or in the official documentation. A cover letter is not the right place for  
+subtle design decisions.
 
 Thanks
 
 > 
-> Praan
+> Regards,
+> Christian.
+> 
+> > 
+> > Jason
+> 
 
