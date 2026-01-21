@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-68764-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68765-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +P6+EpwycWlQfQAAu9opvQ
-	(envelope-from <kvm+bounces-68764-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 21:10:04 +0100
+	id 8LbaFKwlcWl8eQAAu9opvQ
+	(envelope-from <kvm+bounces-68765-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 20:14:52 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2475CDF6
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 21:10:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E77AC5BEDA
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 20:14:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 810AAB2B596
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 19:07:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E6A437EF880
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 19:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09ED3C1FCC;
-	Wed, 21 Jan 2026 19:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EACA3D3016;
+	Wed, 21 Jan 2026 19:06:38 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786953B5307;
-	Wed, 21 Jan 2026 19:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05053C199E;
+	Wed, 21 Jan 2026 19:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769022393; cv=none; b=to1JT9QDluJo75hnsCsQWfvy1ct8PHuQGHSNtJ3H7Q05E5DXT9vASwrvHN0D9ox6WBJ5dsE6I+7yFLnAfeUp4SmiZBcjOpwEtWWarKFA7G5lzoYIrf3fHViJbilGwfCzrqqNdVIQbnpBG+RqaLIM+fMlcmjp9DaSxttNO2JU724=
+	t=1769022397; cv=none; b=MfxH0KqlSIrZMefLOXkRr18O4thC9z6QujDUEpr737fdUMN058fy6Y3wTTJwGnO4dXM/IsCppCqA/5DOY+nzJlfuuxLKgQk1iNnyw3ANhe7QRzuFlKZnngi1/LVYDffL7rhTjwWc9EM/pYuIyghoe5o1hJh95LI07u5wU7vMO80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769022393; c=relaxed/simple;
-	bh=MZnThagcHoDkBHkLwYwU8cyCFk/bJtijp3WhNIBWamQ=;
+	s=arc-20240116; t=1769022397; c=relaxed/simple;
+	bh=6TOl+ancS3QXn338RWCqLR4HIk4+OJ77QHGJPreqdi0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PbRoVN41xAfF/wD5baz2glNpnAYBE3yEVnMw6yqB4wayhx84mcvoHg2J43qAaCPAFSMEA6yY60u60JN4lQVqx2J0C0DTk9O415Fe4tab6LDGy7yMbwUk9XGS1zcM/lkobtjxNfUFjQY9jU4x5WHqGRrytlSHWtehcKTgnTU+zjU=
+	 MIME-Version; b=o/UtJR5xyPexswhCUoawIFbo7jKTVeNb52AQkxA0yBuCqloX1APVE02cMdqfbuzKFbzKE+y7MkePx6AZFHzcGqEc6DR5NbZQtLz4fi7gynVCgRYySykgPnkQWt8IQktGXzV4Jt44YhopowvdRhNbts4WPy42HAr2hm61Bd71yXY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14AD91515;
-	Wed, 21 Jan 2026 11:06:24 -0800 (PST)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 89E8A3F632;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 77C641516;
 	Wed, 21 Jan 2026 11:06:27 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 055F13F632;
+	Wed, 21 Jan 2026 11:06:30 -0800 (PST)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc: catalin.marinas@arm.com,
 	mark.rutland@arm.com,
 	arnd@arndb.de,
 	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v12 1/7] arm64: Kconfig: add support for LSUI
-Date: Wed, 21 Jan 2026 19:06:16 +0000
-Message-Id: <20260121190622.2218669-2-yeoreum.yun@arm.com>
+Subject: [PATCH v12 2/7] arm64: cpufeature: add FEAT_LSUI
+Date: Wed, 21 Jan 2026 19:06:17 +0000
+Message-Id: <20260121190622.2218669-3-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260121190622.2218669-1-yeoreum.yun@arm.com>
 References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
@@ -76,76 +76,110 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : No valid SPF, No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : No valid SPF, No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-68764-lists,kvm=lfdr.de];
-	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	FROM_NEQ_ENVFROM(0.00)[yeoreum.yun@arm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_RCPT(0.00)[kvm];
 	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: EE2475CDF6
+	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yeoreum.yun@arm.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	TAGGED_FROM(0.00)[bounces-68765-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: E77AC5BEDA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
-previleged level to access to access user memory without clearing
-PSTATE.PAN bit.
+Since Armv9.6, FEAT_LSUI introduces load/store instructions that allow
+privileged code to access user memory without clearing the PSTATE.PAN bit.
 
-Add Kconfig option entry for FEAT_LSUI.
+Add CPU feature detection for FEAT_LSUI and enable its use
+when FEAT_PAN is present so that removes the need for SW_PAN handling
+when using LSUI instructions.
 
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 ---
- arch/arm64/Kconfig | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 27 +++++++++++++++++++++++++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 2 files changed, 28 insertions(+)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 93173f0a09c7..af70778e966c 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2227,6 +2227,26 @@ config ARM64_GCS
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c840a93b9ef9..b41ea479c868 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -280,6 +280,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
  
- endmenu # "ARMv9.4 architectural features"
+ static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_FPRCVT_SHIFT, 4, 0),
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_LSUI_SHIFT, 4, ID_AA64ISAR3_EL1_LSUI_NI),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_LSFE_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_FAMINMAX_SHIFT, 4, 0),
+ 	ARM64_FTR_END,
+@@ -2509,6 +2510,23 @@ test_has_gicv5_legacy(const struct arm64_cpu_capabilities *entry, int scope)
+ 	return !!(read_sysreg_s(SYS_ICC_IDR0_EL1) & ICC_IDR0_EL1_GCIE_LEGACY);
+ }
  
-+config AS_HAS_LSUI
-+	def_bool $(as-instr,.arch_extension lsui)
-+	help
-+	  Supported by LLVM 20+ and binutils 2.45+.
++#ifdef CONFIG_ARM64_LSUI
++static bool has_lsui(const struct arm64_cpu_capabilities *entry, int scope)
++{
++	if (!has_cpuid_feature(entry, scope))
++		return false;
 +
-+menu "ARMv9.6 architectural features"
++	/*
++	 * A CPU that supports LSUI should also support FEAT_PAN,
++	 * so that SW_PAN handling is not required.
++	 */
++	if (WARN_ON(!__system_matches_cap(ARM64_HAS_PAN)))
++		return false;
 +
-+config ARM64_LSUI
-+	bool "Support Unprivileged Load Store Instructions (LSUI)"
-+	default y
-+	depends on AS_HAS_LSUI && !CPU_BIG_ENDIAN
-+	help
-+	  The Unprivileged Load Store Instructions (LSUI) provides
-+	  variants load/store instructions that access user-space memory
-+	  from the kernel without clearing PSTATE.PAN bit.
++	return true;
++}
++#endif
 +
-+	  This feature is supported by LLVM 20+ and binutils 2.45+.
-+
-+endmenu # "ARMv9.6 architectural feature"
-+
- config ARM64_SVE
- 	bool "ARM Scalable Vector Extension support"
- 	default y
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.capability = ARM64_ALWAYS_BOOT,
+@@ -3148,6 +3166,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, XNX, IMP)
+ 	},
++#ifdef CONFIG_ARM64_LSUI
++	{
++		.desc = "Unprivileged Load Store Instructions (LSUI)",
++		.capability = ARM64_HAS_LSUI,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_lsui,
++		ARM64_CPUID_FIELDS(ID_AA64ISAR3_EL1, LSUI, IMP)
++	},
++#endif
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 0fac75f01534..4b2f7f3f2b80 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -46,6 +46,7 @@ HAS_HCX
+ HAS_LDAPR
+ HAS_LPA2
+ HAS_LSE_ATOMICS
++HAS_LSUI
+ HAS_MOPS
+ HAS_NESTED_VIRT
+ HAS_BBML2_NOABORT
 -- 
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
