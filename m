@@ -1,197 +1,250 @@
-Return-Path: <kvm+bounces-68704-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68705-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPXhDHC1cGndZAAAu9opvQ
-	(envelope-from <kvm+bounces-68704-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:16:00 +0100
+	id yLbkACiycGndZAAAu9opvQ
+	(envelope-from <kvm+bounces-68705-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:02:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8BF55D92
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:15:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA9D955A82
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:01:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D1580943D3A
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:45:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 01623664374
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EF147AF63;
-	Wed, 21 Jan 2026 10:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D3641C30E;
+	Wed, 21 Jan 2026 10:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahf9kV1w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="laLO8FnW"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73A4328627;
-	Wed, 21 Jan 2026 10:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED2C2C375E;
+	Wed, 21 Jan 2026 10:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768992298; cv=none; b=D0roNdeeTndorU8uyZBE5KCCo/oOfkvPvCcj1EL0KdXPRUT8Sd/a6YzHEGhq3CqmALIpsQ4n3J5qG/tGgKk4IMpoojm8n2aR5OyRukxnQktpB4vh0D7B3CTJD/lJe4rWKB0vtW9xGR0K/QJRPWceOWBdua7tRE30hHOgYZo3HAY=
+	t=1768992648; cv=none; b=hh83C98HESOzjdssIJZZPr20ELgx4/Q0bF7UuSeBRRzBKz0la357dYqKzs+FjvRm6RBq5ds+1GyePh/2HI0OVdek1Uav11r8aT00vhbdWeFPTjYE0QIzZ2z7dHo6nm1wjT6tLB9tgSEySAWBa1qU+DaQiDMTCKaWuKciC6GaNac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768992298; c=relaxed/simple;
-	bh=RigXg4DjlKaa6QSDWIT9y5XHQBoImXr5kkVisbqD/oo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GlYPAmTxqnXRCrNZDbCl5UN1tOCZ8Balzi6CfKS7y4VI2Y8cXhvutw1jr8bBRJczn6lp1BpNfJPZPeSJSAluhLrJ8UgHw0lwWp64ug0Mtbt6eHf+9zBJARnjz1SxLH9X3hZe+P50fMx4vuByyieL8h/sjEIErSKTh40iqKMiDT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahf9kV1w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A48E4C19422;
-	Wed, 21 Jan 2026 10:44:56 +0000 (UTC)
+	s=arc-20240116; t=1768992648; c=relaxed/simple;
+	bh=CfWWd4eTZ7SIvAFdgkWvswQfPdfwTP4jeQ6wPYFjh1o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CyuQNx9Yweew8DRUWTxEsbAtTKWkC7piz0vGOPCu/layDlX4znrU7br1crlw1saEF6Y3RYB5WFXK9UrYOkZUFwOcEsRXDkoQ6ZpfZoUqFanEKyBnZMRFvcTaDbr1SAL2xVX119axKsrvS+mEe6KN0UE3QmF31xWwb90w3C9ZiJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=laLO8FnW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC326C116D0;
+	Wed, 21 Jan 2026 10:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768992297;
-	bh=RigXg4DjlKaa6QSDWIT9y5XHQBoImXr5kkVisbqD/oo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ahf9kV1wXXoMLiaqKsEIG/UGwy2yJvAEXz5UxYeAn6pkL831lX1ZtGjzdM4txxSl1
-	 +pazqTL82uZnQR/lq02Yn0CUkkNx6m62sJz3qFQSjt3RIKYoYgKzUpz5lHm96KWki2
-	 lmsN5dz7M653itHr9/W+0ss34jWO2MVE8dhc3c/FeCtc5OBbvW5B+k0z0x7Smb10PS
-	 VwfwFR44T9j4X0/96SNufS4CdrK0pHdr3x0K0nzSLYdvqVKJsFLhcJuJ55fqOJHgg5
-	 qtCGWFawYOKxqtFbbgwBon7CZ1Vxj1ZFn3irlF7uz7KqZV/1nipJWzsYg1FuwX9EH3
-	 B0W/jyyKakLIQ==
-Date: Wed, 21 Jan 2026 12:44:51 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Matthew Brost <matthew.brost@intel.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 6/7] vfio: Wait for dma-buf invalidation to complete
-Message-ID: <20260121104451.GB13201@unreal>
-References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
- <20260120-dmabuf-revoke-v3-6-b7e0b07b8214@nvidia.com>
- <aW/pQmOO8komCgOK@lstrano-desk.jf.intel.com>
- <015b25e6-cfe1-4110-963f-5f8dc4720d1b@amd.com>
+	s=k20201202; t=1768992647;
+	bh=CfWWd4eTZ7SIvAFdgkWvswQfPdfwTP4jeQ6wPYFjh1o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=laLO8FnWyyK8MtpwGzmwWyciuntO3Rup/T85ja0myQmL46b8N413Bbvq6LyRXfwHp
+	 nVOca27zcoxzQAA4eLhyaPdrQoQaa9PulWCGI3/ZouvXpI2AAcHynevgy151ZLE9eu
+	 INhmN9DQUJhIaffOlnhBg6JhhPTqRkiBgNPSeGDyqFe06PHmQuSabsK1tNhnnhnaf9
+	 lPcunAeH/9XixAVOXdaTA1TK7DrbhlX/IpeZokjzWof3T+4u6t7xKos+lrzg1aStSz
+	 04GLDK0nlwoVRxFgLYGvS+77+10oXNG4D1AchkGl1HbZgDvrx1z+f7oWKir5z+gyXp
+	 sVSSKSRmkl8iA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1viVnR-00000004HPP-2D8L;
+	Wed, 21 Jan 2026 10:50:45 +0000
+Date: Wed, 21 Jan 2026 10:50:45 +0000
+Message-ID: <86zf67b5oa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
+In-Reply-To: <20260120211558.GA834868@ax162>
+References: <20251210173024.561160-1-maz@kernel.org>
+	<20251210173024.561160-5-maz@kernel.org>
+	<20260120211558.GA834868@ax162>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <015b25e6-cfe1-4110-963f-5f8dc4720d1b@amd.com>
-X-Spamd-Result: default: False [-1.46 / 15.00];
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: nathan@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68704-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68705-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: AF8BF55D92
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,c0e0000:email,framework-amd-ryzen-maxplus-395:email]
+X-Rspamd-Queue-Id: BA9D955A82
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 11:41:48AM +0100, Christian König wrote:
-> On 1/20/26 21:44, Matthew Brost wrote:
-> > On Tue, Jan 20, 2026 at 04:07:06PM +0200, Leon Romanovsky wrote:
-> >> From: Leon Romanovsky <leonro@nvidia.com>
-> >>
-> >> dma-buf invalidation is performed asynchronously by hardware, so VFIO must
-> >> wait until all affected objects have been fully invalidated.
-> >>
-> >> Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO regions")
-> >> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> >> ---
-> >>  drivers/vfio/pci/vfio_pci_dmabuf.c | 5 +++++
-> >>  1 file changed, 5 insertions(+)
-> >>
-> >> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> >> index d4d0f7d08c53..33bc6a1909dd 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> >> @@ -321,6 +321,9 @@ void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
-> >>  			dma_resv_lock(priv->dmabuf->resv, NULL);
-> >>  			priv->revoked = revoked;
-> >>  			dma_buf_move_notify(priv->dmabuf);
-> >> +			dma_resv_wait_timeout(priv->dmabuf->resv,
-> >> +					      DMA_RESV_USAGE_KERNEL, false,
-> >> +					      MAX_SCHEDULE_TIMEOUT);
-> > 
-> > Should we explicitly call out in the dma_buf_move_notify() /
-> > invalidate_mappings kernel-doc that KERNEL slots are the mechanism
-> > for communicating asynchronous dma_buf_move_notify /
-> > invalidate_mappings events via fences?
-> 
-> Oh, I missed that! And no that is not correct.
-> 
-> This should be DMA_RESV_USAGE_BOOKKEEP so that we wait for everything.
+Hi Nathan,
 
-Will change.
+Thanks for reporting this.
 
+On Tue, 20 Jan 2026 21:15:58 +0000,
+Nathan Chancellor <nathan@kernel.org> wrote:
 > 
-> Regards,
-> Christian.
+> Hi Marc,
 > 
+> On Wed, Dec 10, 2025 at 05:30:22PM +0000, Marc Zyngier wrote:
+> > None of the registers we manage in the feature dependency infrastructure
+> > so far has any RES1 bit. This is about to change, as VTCR_EL2 has
+> > its bit 31 being RES1.
 > > 
-> > Yes, this is probably implied, but it wouldn’t hurt to state this
-> > explicitly as part of the cross-driver contract.
+> > In order to not fail the consistency checks by not describing a bit,
+> > add RES1 bits to the set of immutable bits. This requires some extra
+> > surgery for the FGT handling, as we now need to track RES1 bits there
+> > as well.
 > > 
-> > Here is what we have now:
+> > There are no RES1 FGT bits *yet*. Watch this space.
 > > 
-> >  	 * - Dynamic importers should set fences for any access that they can't
-> > 	 *   disable immediately from their &dma_buf_attach_ops.invalidate_mappings
-> >  	 *   callback.
-> > 
-> > Matt
-> > 
-> >>  			dma_resv_unlock(priv->dmabuf->resv);
-> >>  		}
-> >>  		fput(priv->dmabuf->file);
-> >> @@ -342,6 +345,8 @@ void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev)
-> >>  		priv->vdev = NULL;
-> >>  		priv->revoked = true;
-> >>  		dma_buf_move_notify(priv->dmabuf);
-> >> +		dma_resv_wait_timeout(priv->dmabuf->resv, DMA_RESV_USAGE_KERNEL,
-> >> +				      false, MAX_SCHEDULE_TIMEOUT);
-> >>  		dma_resv_unlock(priv->dmabuf->resv);
-> >>  		vfio_device_put_registration(&vdev->vdev);
-> >>  		fput(priv->dmabuf->file);
-> >>
-> >> -- 
-> >> 2.52.0
-> >>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > 
+> After this change in -next as commit c259d763e6b0 ("KVM: arm64: Account
+> for RES1 bits in DECLARE_FEAT_MAP() and co"), I am seeing several
+> "undefined behavior" errors on my two arm64 boxes.
 > 
+>   $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
+>   Linux version 6.19.0-rc4-00014-gc259d763e6b0 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 13:59:52 MST 2026
+>   kvm [1]: nv: 568 coarse grained trap handlers
+>   kvm [1]: Undefined hfgrtr_masks behaviour, bits fff7ffffffffffff
+>   kvm [1]: Undefined hfgwtr_masks behaviour, bits fff7baffe9db39fb
+>   kvm [1]: Undefined hfgitr_masks behaviour, bits dfffffffffffffff
+>   kvm [1]: Undefined hdfgrtr_masks behaviour, bits fffdfb3fffcffeff
+>   kvm [1]: Undefined hdfgwtr_masks behaviour, bits 73f7763bbfbffdbf
+>   kvm [1]: Undefined hafgrtr_masks behaviour, bits 0003fffffffe001f
+>   kvm [1]: Undefined hfgrtr2_masks behaviour, bits 0000000000007fff
+>   kvm [1]: Undefined hfgwtr2_masks behaviour, bits 0000000000007ffd
+>   kvm [1]: Undefined hfgitr2_masks behaviour, bits 0000000000000003
+>   kvm [1]: Undefined hdfgrtr2_masks behaviour, bits 0000000001dfffff
+>   kvm [1]: Undefined hdfgwtr2_masks behaviour, bits 0000000001f9ffbf
+>   kvm [1]: IPA Size Limit: 44 bits
+>   kvm [1]: vgic-v2@c0e0000
+>   kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
+>   kvm [1]: GIC system register CPU interface enabled
+>   kvm [1]: vgic interrupt IRQ9
+>   kvm [1]: Hyp nVHE mode initialized successfully
+
+Let me guess: Cortex-A72 or similarly ancient ARM-designed CPUs, as
+hinted by the lack of GICv3 TDIR control? Then these do not have
+FEAT_FGT.
+
+The issue stems from the fact that as an optimisation, we skip the
+parsing of the FGT trap table on such hardware, which also results in
+the FGT masks of known bits not being updated. We then compute the
+effective feature map, and discover that the two don't match.
+
+It was harmless so far, as we were only dealing with RES0 bits, and
+assuming that anything that wasn't a RES0 bit was a stateful bit. With
+the introduction of RES1 handling, we've run out of luck. To be clear,
+that's just a warning, not a functional issue.
+
+At this point, I don't think the above "optimisation" is worth having.
+This is only done *once*, at boot time, so the gain is extremely
+small. I'd like the checks to be effective irrespective of the HW the
+kernel runs on, which is consistent with what we do for other tables
+describing the architectural state.
+
+Anyway, I came up with the following hack, which performs the checks,
+but avoid inserting the FGT information in the sysreg xarray if the HW
+doesn't support it, as a memory saving measure. Please let me know if
+that helps (it does on my old boxes).
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 88336336efc9f..fa8fa09de67dc 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2284,9 +2284,6 @@ int __init populate_nv_trap_config(void)
+ 	kvm_info("nv: %ld coarse grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_cgt));
+ 
+-	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+-		goto check_mcb;
+-
+ 	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+ 		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
+ 		union trap_config tc;
+@@ -2306,6 +2303,15 @@ int __init populate_nv_trap_config(void)
+ 			}
+ 
+ 			tc.val |= fgt->tc.val;
++
++			if (!aggregate_fgt(tc)) {
++				ret = -EINVAL;
++				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
++			}
++
++			if (!cpus_have_final_cap(ARM64_HAS_FGT))
++				continue;
++
+ 			prev = xa_store(&sr_forward_xa, enc,
+ 					xa_mk_value(tc.val), GFP_KERNEL);
+ 
+@@ -2313,11 +2319,6 @@ int __init populate_nv_trap_config(void)
+ 				ret = xa_err(prev);
+ 				print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+ 			}
+-
+-			if (!aggregate_fgt(tc)) {
+-				ret = -EINVAL;
+-				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+-			}
+ 		}
+ 	}
+ 
+@@ -2333,7 +2334,6 @@ int __init populate_nv_trap_config(void)
+ 	kvm_info("nv: %ld fine grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_fgt));
+ 
+-check_mcb:
+ 	for (int id = __MULTIPLE_CONTROL_BITS__; id < __COMPLEX_CONDITIONS__; id++) {
+ 		const enum cgt_group_id *cgids;
+ 
+
+-- 
+Without deviation from the norm, progress is not possible.
 
