@@ -1,171 +1,218 @@
-Return-Path: <kvm+bounces-68760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68761-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IIT2FCwwcWmcfAAAu9opvQ
-	(envelope-from <kvm+bounces-68760-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 20:59:40 +0100
+	id YJp4CkUtcWmcfAAAu9opvQ
+	(envelope-from <kvm+bounces-68761-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 20:47:17 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152685CB56
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 20:59:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6ADE5C7D6
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 20:47:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 43026807100
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 17:54:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 473986ADEBA
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 18:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7CE037F8B9;
-	Wed, 21 Jan 2026 17:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD933644A3;
+	Wed, 21 Jan 2026 18:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Aotg10NH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKaNLIrL";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jho8CDq+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6845731A7E1;
-	Wed, 21 Jan 2026 17:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68CE530F7F8
+	for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 18:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769017834; cv=none; b=FVJ8e+n8GLRYySJKMhDR+4vWqLuZZLJW3fGtGy41zPU+aIUkUXRAX+HsvOvizgod7hVFuNzovqirpcbOnr3HiHMicG8aJtNzlZ1KOatiRtkU6AUutiu/eP9uhL2op024SOekkNjiyVspIUwIu7cG8156kNdHHsP2ar0u0849ffk=
+	t=1769019238; cv=none; b=WzcdKvj/sQzqmXknEQQcgxmwqpEpHnMGHxPd8W1Sd+Fgil0nL0YNYvk75IxwF3p/kfqu5WK54GLLQrunJlRaWnrc2IBqWXmsshddrMRh2e0rVlqiD3Xpp1wJSsrJvFqxi3KXeR+pV32mhSnnaooT8DSb+ztABoPz3f/Snrf9hbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769017834; c=relaxed/simple;
-	bh=9aYwxws7ZCc9YL7osroT+LHl6v3IlVsB+RYFfQ3l3Nw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y1I31MdL1C+DOlK6j5ZGXrGxUIDWgfgUoqhpB6qFtDI8to76z+zQnEbeIDuvCXvlVhomiXkfbNe+LCeCCgPdO9sPffYfVeF8TS6ZnIFqroeG0cMGIfwU2ewmzlMx0p9xedKov4qD2hv+fv6YWs8N5ieFxu538amhNw8UWkbMxD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Aotg10NH; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769017833; x=1800553833;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9aYwxws7ZCc9YL7osroT+LHl6v3IlVsB+RYFfQ3l3Nw=;
-  b=Aotg10NHuUL4GkXfX8OzoM7yIBzu50ZxRjpOIyUaAIez7Qj5i3ejH19T
-   SR1v6BY/icnEIjVI9sbKECsaFOXA2Cc+Tqfsf7rw6i5sZww8trALCSj8q
-   xjDIHY4nQ71EI1XUwtSziM4+QGMAsV9c1IEvVXYWtDggOGZl+mOI7tORt
-   6C5fCuDLK2RVRCehlyg/8KPGHtZ6D0E1EWFMUw5UlAm2GQ9BfkizINVZQ
-   jKOboWGx73K169GVNCYtwLk0Eg9gebc/Qt0ejiv+eKxuLrPFyMiN1ITec
-   BIw005TEb2Hf2lfBA1GRwpMPyZ8RgmhrHJeNtp63F64wML8fRSBHPTZzx
-   A==;
-X-CSE-ConnectionGUID: Uc9SBzUvS0+7qX/7l0ha/Q==
-X-CSE-MsgGUID: Wrjg2VstRc+1J9KlxsnEjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="70345588"
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="70345588"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 09:50:31 -0800
-X-CSE-ConnectionGUID: Pxbka8IERJ+8sfHy8hfWPA==
-X-CSE-MsgGUID: /E8qZgKSTn+mKVBO9/q1Iw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="206410301"
-Received: from igk-lkp-server01.igk.intel.com (HELO afc5bfd7f602) ([10.211.93.152])
-  by fmviesa006.fm.intel.com with ESMTP; 21 Jan 2026 09:50:28 -0800
-Received: from kbuild by afc5bfd7f602 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vicLa-000000000LN-0JxW;
-	Wed, 21 Jan 2026 17:50:26 +0000
-Date: Wed, 21 Jan 2026 18:50:15 +0100
-From: kernel test robot <lkp@intel.com>
-To: Thomas Courrege <thomas.courrege@thorondor.fr>, ashish.kalra@amd.com,
-	corbet@lwn.net, herbert@gondor.apana.org.au, john.allen@amd.com,
-	nikunj@amd.com, pbonzini@redhat.com, seanjc@google.com,
-	thomas.lendacky@amd.com
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	x86@kernel.org, Thomas Courrege <thomas.courrege@thorondor.fr>
-Subject: Re: [PATCH v3 RESEND v3 1/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ
- command
-Message-ID: <202601211817.KSIaB5Gc-lkp@intel.com>
-References: <20260119164228.2108498-2-thomas.courrege@thorondor.fr>
+	s=arc-20240116; t=1769019238; c=relaxed/simple;
+	bh=C28c/EW5CuQsoDdUsx8dGqG9K8fs0K81D2a2muNH+l8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rPaER4NXpy/KFLW8CfB9J8ljzOcepIPdKlZHlFFyMnCuHXmGintt6hB3yIp6RzlpMju2lBFFjKUtIOqXUiYpv4C9tNuKz1wuid85Hg2XwB8dGe+aH11qjZtSlAngMd8h31lqAkc3SUM16vFWm2zQ0vKvzuvORCGW0VaKAL9vn1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PKaNLIrL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jho8CDq+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769019235;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ynpg/cJ+vd3nqyV8BLe/SIqtaIrKy7cylnYrcUttxQg=;
+	b=PKaNLIrLnItiqRK8XHE4OKV/+0CovEskO/8FrTFXxXs3XpiaNJXm4jJ/1WB4kXbfIxit7n
+	NYxP15wQl389Ccl5iDnTa7WUnPlf+2E+IdwnKL/6G7zFyii5PtUQ7C7oM2EeMw/wCxH6Aq
+	0LgTg+PZrkZCaOaJTm2gqe6LKVkuYrY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-dMbnOZvfOh2c-OfcW-ZJFg-1; Wed, 21 Jan 2026 13:13:52 -0500
+X-MC-Unique: dMbnOZvfOh2c-OfcW-ZJFg-1
+X-Mimecast-MFC-AGG-ID: dMbnOZvfOh2c-OfcW-ZJFg_1769019231
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4325b81081aso83804f8f.3
+        for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 10:13:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769019231; x=1769624031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ynpg/cJ+vd3nqyV8BLe/SIqtaIrKy7cylnYrcUttxQg=;
+        b=jho8CDq+PeZcjS/nSY9XrSc5iVXaebdV6mQPtnJrFRnrhgOAuMr/arUsuVWGO0o8By
+         byNQas67i5oic58YInoEFtrbi2kmBT4AxIGatxkC3SswNwwe7DuOgrj+hfkmJOYvUtfY
+         SdZUk+UNQAnZ5U8bQHx5GGf0I9mxO5aR1174tUJNECQQZJmC53I5YDrN0eyYNtEKQVaY
+         R8XDBY3Q3PrDmQ6pDU2zlEWltNy9HZJ/x4uwD0NBhivdTs6cepzJnJbLDaHiTRXNA2LJ
+         EEuLMDP+A4nL8mZ9G7hIEsGkHj97o+ijCR0EdbXDgni5C3oZmjqYTjziZGUBBtLpuxKY
+         L4rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769019231; x=1769624031;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ynpg/cJ+vd3nqyV8BLe/SIqtaIrKy7cylnYrcUttxQg=;
+        b=qMAfcavT1pYtHLWwdNVLX0/m5P1ZsqrVccjvX+5zzRwHjbaLxpmD6zl1atMUst53Gf
+         ZG80g2nBQ7rwsjHGK+Q473/sPD4WmyHXlyhyu4sSeMAqPaSScogk/d4ROCZ6ouHygrMY
+         ZBTxlCJKmksfDlCJqYyccQTjg3+BPfdO1uItpJmiyqYpMmAQ4/B5pXEfgZ2hLWHfUnUS
+         omZsDeFB8ZL6ZKQdJhDoC73kXGLpz1wXMEqHV3ypxuHI2jXk+sQdvHscMDPLbl9ZzPsp
+         RHhwce34IQL4E5jQpjNPSAiuBKewtmsl98mmKPITAOY9gOzArq5usPeJE76Ex95fraYM
+         vHXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcGI1d7h1GqNFEbfJcNvsjb0RJ30jOAVeYV2H6R5R0E9TjcsYMuBj0ZDvkfqYirUVdob0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9B6IsYPa0tI7f+QO8SngWK2Z607OvCCuMs/F3bUiHTTLZIQEj
+	9uz9fuwtCj8aDJj6gzW2NdUy25SSw66W1XYPe7yVwuXYuT+LGlNmBm/84/yW1fCabjgeSzXVRYn
+	XVshnvzS4WQQkFbtilSk8SqFFYV6CaB9K2MfVFBdQi6wjs9X+1ANzyw==
+X-Gm-Gg: AZuq6aIx3CJl+yEbGwSxrFnd3OBrRdL2yfk59GXafpXTvROet/kXBSx8HemadmkWNeg
+	JaNxfS7uu5HxUX+e3Jouncbl1FQzTjAhqyyjVA/eyni0t8kaWSd8oobpqGLl0JQlV/WPn4A7ZuO
+	LRgcgT8ND7ufTDaCoNLm5/mr8oS3m4+HP0YKfkCLOFcr1zTKX/kH8Cqumq0iO6DeOYRSNSlTygQ
+	G4b3r/SRHOxtZs+S7ucy6kWVhtq4vgEU5PqjUUZK/BBw/bpxqnwZAoxD/NAmJyKBXkB4TT7sHAG
+	XvDTK4ZNPRoBuGWc17l6r2W5JfPgZd+GLd8w5G58H2ApGxGJZH1ISMes68+eFV1FR8aj56PyyGI
+	RHiYzo2NxlXdWJWXsBtVWYUSl3BPDrsZnuySbEI3zdR4QXBXCpGufsKj4AwIVce+32Tf1yOkcZB
+	wxAgOoYfsYEWDP2w==
+X-Received: by 2002:a5d:4688:0:b0:435:95c9:6891 with SMTP id ffacd0b85a97d-43595c96bcamr7351141f8f.42.1769019231263;
+        Wed, 21 Jan 2026 10:13:51 -0800 (PST)
+X-Received: by 2002:a5d:4688:0:b0:435:95c9:6891 with SMTP id ffacd0b85a97d-43595c96bcamr7351114f8f.42.1769019230831;
+        Wed, 21 Jan 2026 10:13:50 -0800 (PST)
+Received: from [192.168.10.48] ([151.61.26.160])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-43569921da2sm38550536f8f.1.2026.01.21.10.13.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jan 2026 10:13:49 -0800 (PST)
+Message-ID: <5bea843b-dec8-4f15-bb7c-1d0550542034@redhat.com>
+Date: Wed, 21 Jan 2026 19:13:43 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260119164228.2108498-2-thomas.courrege@thorondor.fr>
-X-Spamd-Result: default: False [0.54 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: possible deadlock due to irq_set_thread_affinity() calling into
+ the scheduler (was Re: [PATCH v3 38/62] KVM: SVM: Take and hold ir_list_lock
+ across IRTE updates in IOMMU)
+To: Thomas Gleixner <tglx@kernel.org>, Ankit Soni <Ankit.Soni@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Joerg Roedel <joro@8bytes.org>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Joao Martins <joao.m.martins@oracle.com>,
+ Francesco Lavra <francescolavra.fl@gmail.com>,
+ David Matlack <dmatlack@google.com>, Naveen Rao <Naveen.Rao@amd.com>,
+ Crystal Wood <crwood@redhat.com>
+References: <20250611224604.313496-2-seanjc@google.com>
+ <20250611224604.313496-40-seanjc@google.com>
+ <njhjud3e6wbdftzr3ziyuh5bhyvc5ndt5qvmg7rlvh5isoop2l@f2uxctws2c7d>
+ <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com> <874iovu742.ffs@tglx>
+ <87pl7jsrdg.ffs@tglx>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+In-Reply-To: <87pl7jsrdg.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[linux.dev,8bytes.org,infradead.org,linux.intel.com,lists.infradead.org,lists.linux.dev,vger.kernel.org,amd.com,redhat.com,oracle.com,gmail.com,google.com];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-68760-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68761-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
-	DKIM_TRACE(0.00)[intel.com:+];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,01.org:url,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,git-scm.com:url]
-X-Rspamd-Queue-Id: 152685CB56
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: C6ADE5C7D6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Thomas,
+Sorry, not sure how the previous email ended up encrypted.
 
-kernel test robot noticed the following build warnings:
+On 1/8/26 22:53, Thomas Gleixner wrote:
+> On Thu, Jan 08 2026 at 22:28, Thomas Gleixner wrote:
+>> On Mon, Dec 22 2025 at 15:09, Paolo Bonzini wrote:
+>>> Of the three, the most sketchy is (a); notably, __setup_irq() calls
+>>> wake_up_process outside desc->lock.  Therefore I'd like so much to treat
+>>> it as a kernel/irq/ bug; and the simplest (perhaps too simple...) fix is
+>>
+>> It's not more sketchy than VIRT assuming that it can do what it wants
+>> under rq->lock. 🙂
+>
+> And just for the record, that's not the only place in the irq core which
+> has that lock chain.
+>
+> irq_set_affinity_locked()       // invoked with desc::lock held
+>     if (desc->affinity_notify)
+>        schedule_work()           // Ends up taking rq::lock
+>
+> and that's the case since cd7eab44e994 ("genirq: Add IRQ affinity
+> notifiers"), which was added 15 years ago.
+>
+> Are you still claiming that this is a kernel/irq bug?
 
-[auto build test WARNING on kvm/queue]
-[also build test WARNING on kvm/next herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.19-rc6 next-20260120]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Not really, I did say I'd like to treat it as a kernel/irq bug...
+but certainly didn't have hopes high enough to "claim" that.
+I do think that it's ugly to have locks that are internal,
+non-leaf and held around callbacks; but people smarter than
+me have thought about it and you can't call it a bug anyway.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Thomas-Courrege/KVM-SEV-Add-KVM_SEV_SNP_HV_REPORT_REQ-command/20260120-005438
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20260119164228.2108498-2-thomas.courrege%40thorondor.fr
-patch subject: [PATCH v3 RESEND v3 1/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
-reproduce: (https://download.01.org/0day-ci/archive/20260121/202601211817.KSIaB5Gc-lkp@intel.com/reproduce)
+For x86/AMD we have a way to fix it, so that part is not a problem.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601211817.KSIaB5Gc-lkp@intel.com/
+For the call(*) to irq_set_affinity() in arch/arm64/kvm/'s
+vgic_v4_load() I think it can be solved as well.
+kvm_make_request(KVM_REQ_RELOAD_GICv4) will delay vgic_v4_load()
+to a safe spot, so just cache the previous smp_processor_id() and,
+if it is different, do the kvm_make_request() and return instead
+of calling irq_set_affinity().
 
-All warnings (new ones prefixed by >>):
+vgic_v3_load() is the only place that calls it from the preempt
+notifier, so this behavior can be tied to a "bool delay_set_affinity"
+argument to vgic_v4_load() or placed in a different function.
 
-   ERROR: Cannot find file ./include/linux/mutex.h
-   WARNING: No kernel-doc for file ./include/linux/mutex.h
-   ERROR: Cannot find file ./include/linux/fwctl.h
-   WARNING: No kernel-doc for file ./include/linux/fwctl.h
-   Documentation/virt/kvm/x86/amd-memory-encryption.rst:584: ERROR: Unexpected indentation. [docutils]
->> Documentation/virt/kvm/x86/amd-memory-encryption.rst:600: WARNING: Definition list ends without a blank line; unexpected unindent. [docutils]
+Marc/Oliver, does that sound doable?
 
+Paolo
 
-vim +600 Documentation/virt/kvm/x86/amd-memory-encryption.rst
+(*) kvm_sched_in() preempt notifier -> kvm_arch_vcpu_load() ->
+     kvm_vgic_load() -> vgic_v3_load() -> vgic_v4_load()
 
-   592	
-   593	::
-   594	        struct kvm_sev_snp_hv_report_req {
-   595	                __u64 report_uaddr;
-   596	                __u64 report_len;
-   597	                __u8 key_sel;
-   598	                __u8 pad0[7];
-   599	                __u64 pad1[4];
- > 600	        };
-   601	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
