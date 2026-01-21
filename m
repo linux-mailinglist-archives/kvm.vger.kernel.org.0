@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-68718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68721-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oMpOFF/UcGkOaAAAu9opvQ
-	(envelope-from <kvm+bounces-68718-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 14:27:59 +0100
+	id 0NCOAu/TcGkOaAAAu9opvQ
+	(envelope-from <kvm+bounces-68721-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 14:26:07 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37FC57845
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 14:27:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36A7577FB
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 14:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7AD23608ABC
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 13:03:24 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7A332669503
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 13:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D86048C412;
-	Wed, 21 Jan 2026 12:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA550492511;
+	Wed, 21 Jan 2026 13:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oHr3E4VO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XiD5Mw8d"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7917848C3F3;
-	Wed, 21 Jan 2026 12:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D5349219D;
+	Wed, 21 Jan 2026 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769000390; cv=none; b=ZM8NQECxBunVaX4OL4bcKh/Bq8mtZqrpg6qFmJKCn05mBNzqk7Y7F7dfFyvlI0ngx18HpSO7rYHaivyx5dJZRsvLRstIn1TGXIrMWs2DPAeWhOaSMDbbLOCvehDDPwE0MgV46Pp4f/PGFRtjnyu7cG+ZJEA5ukyVxBSOY0SOlXo=
+	t=1769000405; cv=none; b=mJ7mNPvtR2KuJ4lWEdCKOm566euP9/SzC9eh3/yQ49kFrWyzA+Vrx+xliCQZqmhrNbjDjtIKHQz7n4FmqgUvSWzAjcPLGtYzkNPwzifk9sz4Lz1hJacm/sqqKJuO2C/DTVRqu4TTMzFnnA3leYXN3yDZlDGdhABKcA2P/z2SaJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769000390; c=relaxed/simple;
-	bh=58tlcanDY9T+aBkaQ7vWfXy+++XD4LOLW2oAbnjGDH0=;
+	s=arc-20240116; t=1769000405; c=relaxed/simple;
+	bh=tkBWbuPcCcp/u7j2SLPWnxsR4yn6Id6uZvGXefafQVg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jnHPTJgLgfxHqgC+Er2RX1LE9TpPcj0JMruCV1IQX/tFAuGzrwBNQCSsU3AnR39bqsaRsbTfY5ECbyGNkSlElq/LqcAbJf+gzxUxJRkrDvgmmY0ZpFgtHvOTcHf+Dkahsmiehdbf/FRQIDSycgi4DPvWrMXwa0SF/oAWpVdGczE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oHr3E4VO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C20CC19421;
-	Wed, 21 Jan 2026 12:59:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Y06dINdi0ZZvOGfsKjLCCphrqnZ6Ub1amL3OSbVjogyWrraW/nVk0xBigkKsEIbeh5GBovKAHnh0et2suzAY8moRYH+M4k5Med3Lu5qu4hB7F3jyvotMJ8IPifOU1/KUCe+P2VJ/ITOoE/5r4ieywhzuiI2fSrkK8BsbG0ntf0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XiD5Mw8d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE989C116D0;
+	Wed, 21 Jan 2026 13:00:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769000390;
-	bh=58tlcanDY9T+aBkaQ7vWfXy+++XD4LOLW2oAbnjGDH0=;
+	s=k20201202; t=1769000405;
+	bh=tkBWbuPcCcp/u7j2SLPWnxsR4yn6Id6uZvGXefafQVg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oHr3E4VO5+kpQrrHbqPjTJNKxsFH965nx3z+HGEKVzNi9Z46nDUJ3e+zN65x7aq4g
-	 0AYI4kFliWoK103IScu/8h1MlBmeLHpzVrXHj6im/8sP87EFc9h+YDPyu7DDu/Vxkv
-	 Xb+DSYCK/LecthYvxo+0fV3b1dbDv+KO5UAGJnm/WfAMELvAQtHHqfc4kSGbYc1gDx
-	 oXWcxFpc/uPK6T1m5LO/70qgrjK6E8xkm9TrTso2N6+6wEVeWERTKJusLLY5fR4RCM
-	 SBb/OTT0IL9T102lhwc+slhv49nnNQlOllpzQw8rES2gqbrI0TM5sCZerrsJmS8D0o
-	 vdQcB72KWVxyA==
+	b=XiD5Mw8d/xml0FH5gdmZRlHA4aqR6JveYCrrTDcuzyZ8kXqorfmqTk0E2cd2aFlBt
+	 IlyaERqz/4+Csnj0W4X3sPWUI0vbrjrgEL0V0anU1ZWHg3tzvQ51QR6kUlpeWNHigz
+	 /6RxVyfBlfEh48rUkNs9u4d+7M8ZsMYk4KBuyFSmmNeFgcNiBYRQFbz4vz8RuQrqKY
+	 auHzS5OkYP2LlC6XzGHo2c9H1BmRrxt6eMjDollxj61ne6mII8UwDp3yRoV+SqJ9s8
+	 rxCQH4EJGsUoAN6qzjYdeDerw+95p8+z+ILF5ZfB9wY+I1YInEeUO4Awvob9xoaXY2
+	 4zfXVFobpIydg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Sumit Semwal <sumit.semwal@linaro.org>,
 	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
@@ -82,9 +82,9 @@ Cc: linux-media@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	iommu@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: [PATCH v4 6/8] iommufd: Pin dma-buf importer for revoke semantics
-Date: Wed, 21 Jan 2026 14:59:14 +0200
-Message-ID: <20260121-dmabuf-revoke-v4-6-d311cbc8633d@nvidia.com>
+Subject: [PATCH v4 7/8] vfio: Wait for dma-buf invalidation to complete
+Date: Wed, 21 Jan 2026 14:59:15 +0200
+Message-ID: <20260121-dmabuf-revoke-v4-7-d311cbc8633d@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260121-dmabuf-revoke-v4-0-d311cbc8633d@nvidia.com>
 References: <20260121-dmabuf-revoke-v4-0-d311cbc8633d@nvidia.com>
@@ -109,7 +109,7 @@ X-Spamd-Result: default: False [-1.96 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68718-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68721-lists,kvm=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
 	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
@@ -121,61 +121,47 @@ X-Spamd-Result: default: False [-1.96 / 15.00];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,amd.com:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: B37FC57845
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,nvidia.com:email,nvidia.com:mid]
+X-Rspamd-Queue-Id: C36A7577FB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-IOMMUFD does not support page fault handling, and after a call to
-.invalidate_mappings() all mappings become invalid. Ensure that
-the IOMMUFD dma-buf importer is bound to a revoke‑aware dma-buf
-exporter (for example, VFIO).
+dma-buf invalidation is performed asynchronously by hardware, so VFIO must
+wait until all affected objects have been fully invalidated.
 
-Acked-by: Christian König <christian.koenig@amd.com>
+Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO regions")
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/iommu/iommufd/pages.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/vfio_pci_dmabuf.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
-index 76f900fa1687..a5eb2bc4ef48 100644
---- a/drivers/iommu/iommufd/pages.c
-+++ b/drivers/iommu/iommufd/pages.c
-@@ -1501,16 +1501,22 @@ static int iopt_map_dmabuf(struct iommufd_ctx *ictx, struct iopt_pages *pages,
- 		mutex_unlock(&pages->mutex);
- 	}
- 
--	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
-+	rc = dma_buf_pin(attach);
- 	if (rc)
- 		goto err_detach;
- 
-+	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
-+	if (rc)
-+		goto err_unpin;
-+
- 	dma_resv_unlock(dmabuf->resv);
- 
- 	/* On success iopt_release_pages() will detach and put the dmabuf. */
- 	pages->dmabuf.attach = attach;
- 	return 0;
- 
-+err_unpin:
-+	dma_buf_unpin(attach);
- err_detach:
- 	dma_resv_unlock(dmabuf->resv);
- 	dma_buf_detach(dmabuf, attach);
-@@ -1656,6 +1662,7 @@ void iopt_release_pages(struct kref *kref)
- 	if (iopt_is_dmabuf(pages) && pages->dmabuf.attach) {
- 		struct dma_buf *dmabuf = pages->dmabuf.attach->dmabuf;
- 
-+		dma_buf_unpin(pages->dmabuf.attach);
- 		dma_buf_detach(dmabuf, pages->dmabuf.attach);
- 		dma_buf_put(dmabuf);
- 		WARN_ON(!list_empty(&pages->dmabuf.tracker));
+diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+index 362e3d149817..5fceefc40e27 100644
+--- a/drivers/vfio/pci/vfio_pci_dmabuf.c
++++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+@@ -321,6 +321,9 @@ void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
+ 			dma_resv_lock(priv->dmabuf->resv, NULL);
+ 			priv->revoked = revoked;
+ 			dma_buf_invalidate_mappings(priv->dmabuf);
++			dma_resv_wait_timeout(priv->dmabuf->resv,
++					      DMA_RESV_USAGE_BOOKKEEP, false,
++					      MAX_SCHEDULE_TIMEOUT);
+ 			dma_resv_unlock(priv->dmabuf->resv);
+ 		}
+ 		fput(priv->dmabuf->file);
+@@ -342,6 +345,9 @@ void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev)
+ 		priv->vdev = NULL;
+ 		priv->revoked = true;
+ 		dma_buf_invalidate_mappings(priv->dmabuf);
++		dma_resv_wait_timeout(priv->dmabuf->resv,
++				      DMA_RESV_USAGE_BOOKKEEP, false,
++				      MAX_SCHEDULE_TIMEOUT);
+ 		dma_resv_unlock(priv->dmabuf->resv);
+ 		vfio_device_put_registration(&vdev->vdev);
+ 		fput(priv->dmabuf->file);
 
 -- 
 2.52.0
