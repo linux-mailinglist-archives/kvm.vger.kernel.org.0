@@ -1,250 +1,313 @@
-Return-Path: <kvm+bounces-68705-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68706-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLbkACiycGndZAAAu9opvQ
-	(envelope-from <kvm+bounces-68705-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:02:00 +0100
+	id IMKqGMO0cGndZAAAu9opvQ
+	(envelope-from <kvm+bounces-68706-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:13:07 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9D955A82
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:01:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8CD755C7F
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 12:13:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 01623664374
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:50:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 89B615EC56A
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D3641C30E;
-	Wed, 21 Jan 2026 10:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D4B43CEF7;
+	Wed, 21 Jan 2026 10:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="laLO8FnW"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="eyVf66sd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012007.outbound.protection.outlook.com [40.93.195.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED2C2C375E;
-	Wed, 21 Jan 2026 10:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768992648; cv=none; b=hh83C98HESOzjdssIJZZPr20ELgx4/Q0bF7UuSeBRRzBKz0la357dYqKzs+FjvRm6RBq5ds+1GyePh/2HI0OVdek1Uav11r8aT00vhbdWeFPTjYE0QIzZ2z7dHo6nm1wjT6tLB9tgSEySAWBa1qU+DaQiDMTCKaWuKciC6GaNac=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768992648; c=relaxed/simple;
-	bh=CfWWd4eTZ7SIvAFdgkWvswQfPdfwTP4jeQ6wPYFjh1o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CyuQNx9Yweew8DRUWTxEsbAtTKWkC7piz0vGOPCu/layDlX4znrU7br1crlw1saEF6Y3RYB5WFXK9UrYOkZUFwOcEsRXDkoQ6ZpfZoUqFanEKyBnZMRFvcTaDbr1SAL2xVX119axKsrvS+mEe6KN0UE3QmF31xWwb90w3C9ZiJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=laLO8FnW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC326C116D0;
-	Wed, 21 Jan 2026 10:50:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768992647;
-	bh=CfWWd4eTZ7SIvAFdgkWvswQfPdfwTP4jeQ6wPYFjh1o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=laLO8FnWyyK8MtpwGzmwWyciuntO3Rup/T85ja0myQmL46b8N413Bbvq6LyRXfwHp
-	 nVOca27zcoxzQAA4eLhyaPdrQoQaa9PulWCGI3/ZouvXpI2AAcHynevgy151ZLE9eu
-	 INhmN9DQUJhIaffOlnhBg6JhhPTqRkiBgNPSeGDyqFe06PHmQuSabsK1tNhnnhnaf9
-	 lPcunAeH/9XixAVOXdaTA1TK7DrbhlX/IpeZokjzWof3T+4u6t7xKos+lrzg1aStSz
-	 04GLDK0nlwoVRxFgLYGvS+77+10oXNG4D1AchkGl1HbZgDvrx1z+f7oWKir5z+gyXp
-	 sVSSKSRmkl8iA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1viVnR-00000004HPP-2D8L;
-	Wed, 21 Jan 2026 10:50:45 +0000
-Date: Wed, 21 Jan 2026 10:50:45 +0000
-Message-ID: <86zf67b5oa.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
-In-Reply-To: <20260120211558.GA834868@ax162>
-References: <20251210173024.561160-1-maz@kernel.org>
-	<20251210173024.561160-5-maz@kernel.org>
-	<20260120211558.GA834868@ax162>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0201333A9F3;
+	Wed, 21 Jan 2026 10:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768992971; cv=fail; b=D8oJcKF83kXcEs2RLv6n8aQOCgUmGWRt+GpfEHzhU5kqjmb9NbHuf6vQDn6fF+SVsEAiro8yD6B00uilbaoI2d87kbjKmVs5hvEbaPf9LCB0RGipfpgjT23fjSZABGguhN1Qsk+4sqY7HT7vhu58CqoCgKskMkp3Slkurjc/Gcw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768992971; c=relaxed/simple;
+	bh=/3hVT8up7l4LWDvX8GFIPeGKghrwhdhdQx6m3RKWhUA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=NHfXackzio9Uos/aF2RBjBZwSQlluPFgOu5FQhdUMOwY/RW1KliXl9Eoxs0tWsShLg2/o6e0L+UyqW8DqiVFx2UnWbJWZVHpDsffkPPGrtdO8XNwANvRofH40eVm6ICVOgh04uhoXYFESLqxyranzrM8+PshkpuI0qB9ny5uXBY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=eyVf66sd; arc=fail smtp.client-ip=40.93.195.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rbCgdjg3TrjxzzjMR9dLSFuDzC7Lz0oy1vTvup0iigkBWH3eN4QO9EY+4gMpCQttXKgIaVy6CeeBUdRSzYNAaXNkMYsmwo9MaiuNIGnudUSp4bbCFGY2OZy9s/bij8acFpafj37mo9siLKM/EwoOhEbFX3fbQPesSbIuz9Lnzf57SjkOdD1X0N0Iqf/ysk1l8tWkUNMWKQ3L2aa5vgftgOuXxotVUvr7nAhuZRsISYvlcmMMfww9PiWwZ2RXpRaGfnFnfoxKiwr0EQNVV/nH/9hirbDQYboYBXOouJDbgs1Xs1OIlRmFF2HzoezUqv+84oe2BDTTZDwoPrVGw3lwdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aEnz8/ze/UdUk/2Tw8vdu/RVtx3fezY8F3DIGsBauV0=;
+ b=nfTeUjEcQPXKh3OxOQM6o9hmPMUMH2cYnRGsR8lKN83bU1LMPlDKCyYeGieLNaYpBbZi/hAJqHUz92IUekda3MY0kiKrI52+ohMkDR+cKLq1DhbQXJqjfCkkGTHUxaMqjSI3OQy2S/Lzy5T+hEGM0GUnSwKxcbJAelMCgj13KCtUlGtNgM1a7oqpluuvhQ+iXnZFmsbMPWfpk264gEWPhlA6gUpBkVlyAh4PrfCnJgy5jwwrYoqMEPXd4fHdrZxTEfELJodhIolqNx0sKx36TXBsKzOeQX4DQ+tMUjsJ+n5UNc6E7TN900MzVgs8+225B+a6xC3kr/MIQz51yJWC/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aEnz8/ze/UdUk/2Tw8vdu/RVtx3fezY8F3DIGsBauV0=;
+ b=eyVf66sdlrMSRkXZ2b8CA/2MpRgq7DaBEUeeVmSi8pFY8B9pBBwhisD15EFMEACGDgjpvWlimlnUvp/7tkAL2EdrDwVl3ddTqsGuuIhpjvahqFGFU7cs/hrZqt/JGL4H05TJr2dfAkddKHA4QOXgB1/bO1mo7qzMAQekVDpkpMY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by PH7PR12MB5736.namprd12.prod.outlook.com (2603:10b6:510:1e3::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Wed, 21 Jan
+ 2026 10:56:04 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%4]) with mapi id 15.20.9542.008; Wed, 21 Jan 2026
+ 10:56:04 +0000
+Message-ID: <09d2f623-18e7-4fcb-bae4-823c77cc0d5e@amd.com>
+Date: Wed, 21 Jan 2026 11:55:46 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 6/7] vfio: Wait for dma-buf invalidation to complete
+To: =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Leon Romanovsky <leon@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Alex Deucher <alexander.deucher@amd.com>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Gerd Hoffmann <kraxel@redhat.com>,
+ Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
+ <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Felix Kuehling <Felix.Kuehling@amd.com>, Alex Williamson <alex@shazbot.org>,
+ Ankit Agrawal <ankita@nvidia.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>
+Cc: linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+ intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org
+References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
+ <20260120-dmabuf-revoke-v3-6-b7e0b07b8214@nvidia.com>
+ <b129f0c1-b61e-4efb-9e25-d8cdadaca1b3@amd.com>
+ <107464758df9444a465a3a9e387f5a42827aff51.camel@linux.intel.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <107464758df9444a465a3a9e387f5a42827aff51.camel@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0258.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e8::12) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: nathan@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|PH7PR12MB5736:EE_
+X-MS-Office365-Filtering-Correlation-Id: 58050f0f-192d-4ed7-4865-08de58dbac3c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aDBoMERRT1FUMS9xcjVtc1FzMkRzUk85SE9FTkNGRVpYZjlvZmpqR09zTTk1?=
+ =?utf-8?B?dGVYdmVxWmZER3Vua0JvM01NWSs3NnFFWWFYc1kzMXc5dDIvbEIyNlgwN2Fj?=
+ =?utf-8?B?bkFWcVlWWnJySllJOGwwa2hVQklpOS92MTVBbDRRcEhuT1h2emttZnNleGZZ?=
+ =?utf-8?B?cHNDOWYvcS9WcW93YWxTZWNONUpJak0yb1pHdTdBRnVrMlN0N2p0clltTk5L?=
+ =?utf-8?B?dGkvbHJHUlVqYkFjeVF2Wm90Q0lhNVpIWHhscnN1VGovQlJJWXBQOHVnMXQr?=
+ =?utf-8?B?Nklud01LaWY5T1JZMEpQZmJYMFVRd3Izd0V0Tk9mVEY3ZU5zR1JGU2xQUzNj?=
+ =?utf-8?B?MlJBUnJDYmQvT2RsTGppalVKL1B4WXpkcGVYdnBoQ0JFWWRQQmsrUlNCVFpx?=
+ =?utf-8?B?eElmeW5nd2lRVFp3SlBaMU9hb2xlNGlzVmFqT2dubW1neVI2U1lraEJXYWZO?=
+ =?utf-8?B?ODBQRndxVTNXc0tOK2tReXhNbjdHWTFKeVg3NVllaERPWWsyTmtITWFSMWJy?=
+ =?utf-8?B?azQ0Ry95Q3AreTlzQkg1bTk5ZnBWT1BqSit5dVM1a3RDVk54bFMwSUtyejVC?=
+ =?utf-8?B?NDlzTHFYNzJ5VHBwV011VG5SeCtNeFhXd3FmVkxtT1I1Q3R1Ynpud2lZQ2V3?=
+ =?utf-8?B?UThEcUNJYXZlWFFwZE5HYnNlMjlrR2VEd1NWRWdQTW85TmFaTnZPL0tleTJ6?=
+ =?utf-8?B?Y2lWOUVyeDZMN0loRWVBeVVkWERVRVRWWXhvcThFMU5WUXdiUUhoUlRrMWRx?=
+ =?utf-8?B?N1lFb3J3SndrNnE2RE8zdUduTFB4dXRIRS9yNnkxZHhxS0NQV29ORHZ5OWVp?=
+ =?utf-8?B?a1ZoUmdHdmF4aTNybWhPalRjQ0RFZlBzNGE3Nmp2Z1RBdi81b2hBRmFPcDFZ?=
+ =?utf-8?B?SDN2QWcxMWVIVUZ0bStnM05NUEloY003RDg4M2htVS9BSjRMMmlIZUF1K2ZP?=
+ =?utf-8?B?Mmt4OFQzUW8velplbmZhSFVFRDFZYnV1ZmRjTlh2M0dOeWtjUmNzcEs4ckt6?=
+ =?utf-8?B?S0FvOERieWlZVFZLMHJnNWptRTlFV05rZ0dWMlkyS0FJRHpXMWkyYUJLV250?=
+ =?utf-8?B?ZnBIVXVNK2haS2E3Mlh6ZXlUeVl5NmEvSTdqclVPRUV2SjFacWkwTThHcDJr?=
+ =?utf-8?B?RnU1QXlSczYyQXZibjB6Nk1zTG9SdU1XSXJLSE5vUS85RmRxZ3ZBRStvMHhz?=
+ =?utf-8?B?UHpaakViSlJFL0RUR04wR2wvNk9CdFBOMUJiZVJPTXBPNVhSNDZVeGp3UHNl?=
+ =?utf-8?B?ckx5NDRZSCtuUjJoMSs4c3lzbzNWeUxiY2Y1NlNMYVplWDVPNkg5b1JwM0xM?=
+ =?utf-8?B?QW1kdHp2RGVvMWtuaTRvcjdPOGVHSjE3UnhiQWNJQ1Z3UTBQbFN4TlRTK3Yr?=
+ =?utf-8?B?dnVsYVViaFBvUWo3a0hIU3VhdVNvd2haYUJIT0xGMGR2dGh1NzBBcTd6cENx?=
+ =?utf-8?B?MVpPZXorWlJEeG1DS1A3aURwVzF2YVlCdHE2djZrRUxnSkNOeno5YUZ4RlpD?=
+ =?utf-8?B?dDcvMnh6d25pU3ZkOTZFWWJBcUlITGNmWjR5anc5VTdvTm9TNm9NempTL3l3?=
+ =?utf-8?B?MHgvOEJDTkxKaGhrVG9zWno0aDBIeXUxR1E5Wk56K28zVTkzUUZTTnlZbVM0?=
+ =?utf-8?B?eHMvUXhCZStJQjJMZng3M2xHVGI3SUF3cnJSS3dGcUhxcEd5OHdJVXY0U1FD?=
+ =?utf-8?B?TGhZUGlaUkwzcUxNQXJVcFJhdXJPMUtLL1V0V09EK1BMdFpzanZ0MCtjaUIv?=
+ =?utf-8?B?V3hoeTZqeUdwa2tuUUdiVWI1YmU1bGtkRFFvWUtka1VZWDhoRFNpZkljUUVt?=
+ =?utf-8?B?b2xHM1hiYk1aZTg0cHdHcHNKQnIxM2xmOU9MVWlPcmV0dmV1WmhjczVxRTJJ?=
+ =?utf-8?B?by8xSWg3bTY0dldTc0RJNWxXdXpVNDV2V2tIL3lwa1JTS0xUOXBjRU93TzJC?=
+ =?utf-8?B?cnMrTTNjeTNVQVRQWFZIclc5WGE0NU5lT3NqRGlaZ3EzWk5ua1dRSXc1M1JS?=
+ =?utf-8?B?RlpsZWlNN3hiL2gyaHJYdFBxL2lnYThWb1JRUE5FVE90aTUvL1M1eFpOMXJ6?=
+ =?utf-8?B?a0REcmZ6aFNvWWpCZy9pRlpNVmRlMllhOUExY0g3Q0tuRmlHVHlYTmNZeTBP?=
+ =?utf-8?B?MC92aWYzcHQ1cmd4MlBWRHp5akMvbUk2WElRWERmZ1FWUW0yUHRTdkFSencw?=
+ =?utf-8?B?UUE9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?T0ZveDFwMU44V0lHVlYvUDFVSDFpQURtOVpmNDE4a3Y1UWhaYktpdXJsVXJC?=
+ =?utf-8?B?cWRGZjEzZDNzOU9ZNGxKVlkwYmFKb21rV3FOZDVOYzRXTmpaZm1vbjRySVVh?=
+ =?utf-8?B?MCtwQkliZC81TVVTZElNK3FlbXZyZ056U3BIOUJwY0c1MHQyNW12MDdvcnJk?=
+ =?utf-8?B?cWVTcWRVSGkyQ2Zvd3A4SzEzMGVVQ1ZBRUN2OUdpckNmUkZRQWNVay9pZ3U5?=
+ =?utf-8?B?end2d1MxQTVtN3BxSkNmQTlMdWdiYURpeVdNRzFrMG93REFvRVk1Ymx1RG1v?=
+ =?utf-8?B?NjVJMjdlK2R1TDBLd2t3eDJvZmV5MFFwbDhQSmFaSWZNdS9JdXIrUjlLTFdw?=
+ =?utf-8?B?SG93S1doMFc5cVkydnJFUC9kaXVqTXFqVVNBRk1lM3o1c1Z5WkVJNjl2SnZE?=
+ =?utf-8?B?R1VUUnI4bXNuUVNYNzJXSDh6eENhdlBuV21pb3BzZlc4OEhMTmJJQjNtd0Yy?=
+ =?utf-8?B?RUxWcUxXY1E4aDMxM2JGaW4zTVAzTWpwTHBRc0RZNkt4aXNoRnVKM04ya2Fl?=
+ =?utf-8?B?RU5WdE4xaTZaWnM1Ky9sVHVSbHJJSk4zcVZaV1FIU084Yk9VRmdTMnl2SHZh?=
+ =?utf-8?B?L0N6MEJRN0lIWTh1Uk1Qa2NGSUt2c0g2OEJmMlpFOSt5R2dmbkpqWU9MWk1M?=
+ =?utf-8?B?MHBqaUNLYUl0S2lISkh3ekp1YXpDeUtkbm1iYVpCK1IyeVlRSXYzbHBSMUxI?=
+ =?utf-8?B?Y2dNNVRLSTVhbXB0Q3VtbWUraUt0Y1ZFYUpGWk9tTDNmK1hLSUlXZU1ySi91?=
+ =?utf-8?B?STU4cXJrR0xUdDd5OXhsbnF0SFB1b0t3ZWQzV0dHMkkyVytNdy9UNk44YnQy?=
+ =?utf-8?B?NHgwd1FiVWZSalhnQWllaGNrSEhqQ2lhR2FBSERyM1hibU5jOVZzU0NSZTNr?=
+ =?utf-8?B?VGxGTSs4WCtZVUZjaUVuSS9MMU5MVlUxZ3lkbnFmcEdLazhvRlZEZEVoZGFj?=
+ =?utf-8?B?eEhWVUF5b3dOTUdyM0dlc3kyNVJUQTVFR01oTHpRYmk5WnVmVlVrdEx0VHQw?=
+ =?utf-8?B?TU54dDJTemJ3Z2tvajNXYzNuODdraWp3VFhoajBWaUkyd1prU3NRUlR2NDVs?=
+ =?utf-8?B?a2JCUWFIcGtoR3BVUWxZVVYwRXNSQTNNOStMYnRUUHBkY2xwd1dSczgxcHFY?=
+ =?utf-8?B?emt6ZHdJS1FJR1N5dUFmK1BZdjJqOEFWL1BETjNGbStDcnRBRnpQb1NtWUxh?=
+ =?utf-8?B?QmpvTW9wZGpEUDg5cGZyRmtqNko4eW91NlorOXlWeXh3TytIcHFSbVhmNXZK?=
+ =?utf-8?B?b2s1bGVXZ1IyVldUR1lQbmQzeVRydWFvanhJY241WFplUjRackdJdmF2SG43?=
+ =?utf-8?B?OVFxQy9EZEx2M3dhS01pYXZCODF6MEg2Q3RwaWRNZityM1NRZ2NleGNGQ1Zr?=
+ =?utf-8?B?eWl6ZFJCb1FETjlnN0c2YUYvem43cU1JU1FyZVZhSGNUdm5TUG1MRDNGc1ZN?=
+ =?utf-8?B?Rk5tR1k2Um1meXVzK1BOMFVoTTM2eGgzTU5EUFZkWlQ4aDJnOUpqS21vYVVT?=
+ =?utf-8?B?citWNjhkMzV3THhrNENlY2drMDJscmNuY01iMDE2V0VwL0I5WVNBY1o5SmJV?=
+ =?utf-8?B?dEZKU0ZEbTRDcUxnVUVwTmJDTDNHSmFiTU9ia2tKQ21SMjE3d0UwbVFkWFFu?=
+ =?utf-8?B?NlRaNUs0SUFSell0MzZTcVBLeXgrK0ZvSm00ZjE0dFN6eDBSMWl6YXl4NGJ1?=
+ =?utf-8?B?R2ZWaHc0YldxU0lvRVdML1RPdkZ3Y0JJZXFQbDR5dWYvSy9mUlhSY0FZVmNu?=
+ =?utf-8?B?eTlMY0lkN0cyWnBEanoyWUdzTm16WmtnMnM3bnNqN2Y1c0lYRW8zNnhxbGE2?=
+ =?utf-8?B?MjNDampOUzBQbkxlelIzS0VpVVdOWXJsQ2tTcGNtSnl6SWZXQWNrT1h5QWRF?=
+ =?utf-8?B?YTVocXlkNHNOdk9kQTdvMThpbTBGc05nNlQzVVdrY0xSWVhyZi9sSU5ySmN0?=
+ =?utf-8?B?dFh6VUNpUW9qVGdqQ0VoVGRTTk1MYmpZSHlMR1lyRHp1b3NPdmM3N1NrWmx3?=
+ =?utf-8?B?eGZhQytzYkN4ZmxZNlZBUUhrdzBmRWJIYi9mMUtsVDJVWXlJRk5kRGhOSTFp?=
+ =?utf-8?B?ditmdllUazJ4a2tXbDc1eWFtbGgraElkTjNsbmlEbCtCOW9aamhLMVl2emth?=
+ =?utf-8?B?Ri8zRjhzZCtQUCtBUlU2Q2dmaTA2bDFiSXNTVmhML2VtblJRU3BQQzE5SWht?=
+ =?utf-8?B?aWFCN0NWdFJORys0RDlTR0N3SEJGa3JRME9LMUpYZGpNUXFtampsMG85bjg1?=
+ =?utf-8?B?dXZWcmR3MG12bGJMVXIxNERuVDNzM3BVMUVLSWk0aHNnNkNDZWtXTkFQVzZK?=
+ =?utf-8?Q?dhnxv5CeyPw1CXjPPH?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58050f0f-192d-4ed7-4865-08de58dbac3c
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2026 10:56:04.5579
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: na44b0LLc2ibn4ZTZiVPxI3CNA+JkkFdqXk8Bfxn7Jw234il+mCW7pO4ESuKyfzS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5736
+X-Spamd-Result: default: False [0.04 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
-	TAGGED_FROM(0.00)[bounces-68705-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68706-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[linux.intel.com,kernel.org,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[amd.com,quarantine];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[amd.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,c0e0000:email,framework-amd-ryzen-maxplus-395:email]
-X-Rspamd-Queue-Id: BA9D955A82
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,nvidia.com:email,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: E8CD755C7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Nathan,
-
-Thanks for reporting this.
-
-On Tue, 20 Jan 2026 21:15:58 +0000,
-Nathan Chancellor <nathan@kernel.org> wrote:
+On 1/21/26 10:36, Thomas Hellström wrote:
+> Hi, Christian,
 > 
-> Hi Marc,
+> On Wed, 2026-01-21 at 10:20 +0100, Christian König wrote:
+>> On 1/20/26 15:07, Leon Romanovsky wrote:
+>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>
+>>> dma-buf invalidation is performed asynchronously by hardware, so
+>>> VFIO must
+>>> wait until all affected objects have been fully invalidated.
+>>>
+>>> Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO
+>>> regions")
+>>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+>>
+>> Reviewed-by: Christian König <christian.koenig@amd.com>
+>>
+>> Please also keep in mind that the while this wait for all fences for
+>> correctness you also need to keep the mapping valid until
+>> dma_buf_unmap_attachment() was called.
 > 
-> On Wed, Dec 10, 2025 at 05:30:22PM +0000, Marc Zyngier wrote:
-> > None of the registers we manage in the feature dependency infrastructure
-> > so far has any RES1 bit. This is about to change, as VTCR_EL2 has
-> > its bit 31 being RES1.
-> > 
-> > In order to not fail the consistency checks by not describing a bit,
-> > add RES1 bits to the set of immutable bits. This requires some extra
-> > surgery for the FGT handling, as we now need to track RES1 bits there
-> > as well.
-> > 
-> > There are no RES1 FGT bits *yet*. Watch this space.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> I'm wondering shouldn't we require DMA_RESV_USAGE_BOOKKEEP here, as
+> *any* unsignaled fence could indicate access through the map?
+
+Yes, exactly that. I totally missed this detail.
+
+Thanks a lot to Matthew and you to pointing this out.
+
+Regards,
+Christian.
+
 > 
-> After this change in -next as commit c259d763e6b0 ("KVM: arm64: Account
-> for RES1 bits in DECLARE_FEAT_MAP() and co"), I am seeing several
-> "undefined behavior" errors on my two arm64 boxes.
+> /Thomas
 > 
->   $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
->   Linux version 6.19.0-rc4-00014-gc259d763e6b0 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 13:59:52 MST 2026
->   kvm [1]: nv: 568 coarse grained trap handlers
->   kvm [1]: Undefined hfgrtr_masks behaviour, bits fff7ffffffffffff
->   kvm [1]: Undefined hfgwtr_masks behaviour, bits fff7baffe9db39fb
->   kvm [1]: Undefined hfgitr_masks behaviour, bits dfffffffffffffff
->   kvm [1]: Undefined hdfgrtr_masks behaviour, bits fffdfb3fffcffeff
->   kvm [1]: Undefined hdfgwtr_masks behaviour, bits 73f7763bbfbffdbf
->   kvm [1]: Undefined hafgrtr_masks behaviour, bits 0003fffffffe001f
->   kvm [1]: Undefined hfgrtr2_masks behaviour, bits 0000000000007fff
->   kvm [1]: Undefined hfgwtr2_masks behaviour, bits 0000000000007ffd
->   kvm [1]: Undefined hfgitr2_masks behaviour, bits 0000000000000003
->   kvm [1]: Undefined hdfgrtr2_masks behaviour, bits 0000000001dfffff
->   kvm [1]: Undefined hdfgwtr2_masks behaviour, bits 0000000001f9ffbf
->   kvm [1]: IPA Size Limit: 44 bits
->   kvm [1]: vgic-v2@c0e0000
->   kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
->   kvm [1]: GIC system register CPU interface enabled
->   kvm [1]: vgic interrupt IRQ9
->   kvm [1]: Hyp nVHE mode initialized successfully
+>>
+>> In other words you can only redirect the DMA-addresses previously
+>> given out into nirvana (or a dummy memory or similar), but you still
+>> need to avoid re-using them for something else.
+>>
+>> Regards,
+>> Christian.
+>>
+>>> ---
+>>>  drivers/vfio/pci/vfio_pci_dmabuf.c | 5 +++++
+>>>  1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c
+>>> b/drivers/vfio/pci/vfio_pci_dmabuf.c
+>>> index d4d0f7d08c53..33bc6a1909dd 100644
+>>> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+>>> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+>>> @@ -321,6 +321,9 @@ void vfio_pci_dma_buf_move(struct
+>>> vfio_pci_core_device *vdev, bool revoked)
+>>>  			dma_resv_lock(priv->dmabuf->resv, NULL);
+>>>  			priv->revoked = revoked;
+>>>  			dma_buf_move_notify(priv->dmabuf);
+>>> +			dma_resv_wait_timeout(priv->dmabuf->resv,
+>>> +					     
+>>> DMA_RESV_USAGE_KERNEL, false,
+>>> +					     
+>>> MAX_SCHEDULE_TIMEOUT);
+>>>  			dma_resv_unlock(priv->dmabuf->resv);
+>>>  		}
+>>>  		fput(priv->dmabuf->file);
+>>> @@ -342,6 +345,8 @@ void vfio_pci_dma_buf_cleanup(struct
+>>> vfio_pci_core_device *vdev)
+>>>  		priv->vdev = NULL;
+>>>  		priv->revoked = true;
+>>>  		dma_buf_move_notify(priv->dmabuf);
+>>> +		dma_resv_wait_timeout(priv->dmabuf->resv,
+>>> DMA_RESV_USAGE_KERNEL,
+>>> +				      false,
+>>> MAX_SCHEDULE_TIMEOUT);
+>>>  		dma_resv_unlock(priv->dmabuf->resv);
+>>>  		vfio_device_put_registration(&vdev->vdev);
+>>>  		fput(priv->dmabuf->file);
+>>>
 
-Let me guess: Cortex-A72 or similarly ancient ARM-designed CPUs, as
-hinted by the lack of GICv3 TDIR control? Then these do not have
-FEAT_FGT.
-
-The issue stems from the fact that as an optimisation, we skip the
-parsing of the FGT trap table on such hardware, which also results in
-the FGT masks of known bits not being updated. We then compute the
-effective feature map, and discover that the two don't match.
-
-It was harmless so far, as we were only dealing with RES0 bits, and
-assuming that anything that wasn't a RES0 bit was a stateful bit. With
-the introduction of RES1 handling, we've run out of luck. To be clear,
-that's just a warning, not a functional issue.
-
-At this point, I don't think the above "optimisation" is worth having.
-This is only done *once*, at boot time, so the gain is extremely
-small. I'd like the checks to be effective irrespective of the HW the
-kernel runs on, which is consistent with what we do for other tables
-describing the architectural state.
-
-Anyway, I came up with the following hack, which performs the checks,
-but avoid inserting the FGT information in the sysreg xarray if the HW
-doesn't support it, as a memory saving measure. Please let me know if
-that helps (it does on my old boxes).
-
-Thanks,
-
-	M.
-
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 88336336efc9f..fa8fa09de67dc 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2284,9 +2284,6 @@ int __init populate_nv_trap_config(void)
- 	kvm_info("nv: %ld coarse grained trap handlers\n",
- 		 ARRAY_SIZE(encoding_to_cgt));
- 
--	if (!cpus_have_final_cap(ARM64_HAS_FGT))
--		goto check_mcb;
--
- 	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
- 		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
- 		union trap_config tc;
-@@ -2306,6 +2303,15 @@ int __init populate_nv_trap_config(void)
- 			}
- 
- 			tc.val |= fgt->tc.val;
-+
-+			if (!aggregate_fgt(tc)) {
-+				ret = -EINVAL;
-+				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
-+			}
-+
-+			if (!cpus_have_final_cap(ARM64_HAS_FGT))
-+				continue;
-+
- 			prev = xa_store(&sr_forward_xa, enc,
- 					xa_mk_value(tc.val), GFP_KERNEL);
- 
-@@ -2313,11 +2319,6 @@ int __init populate_nv_trap_config(void)
- 				ret = xa_err(prev);
- 				print_nv_trap_error(fgt, "Failed FGT insertion", ret);
- 			}
--
--			if (!aggregate_fgt(tc)) {
--				ret = -EINVAL;
--				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
--			}
- 		}
- 	}
- 
-@@ -2333,7 +2334,6 @@ int __init populate_nv_trap_config(void)
- 	kvm_info("nv: %ld fine grained trap handlers\n",
- 		 ARRAY_SIZE(encoding_to_fgt));
- 
--check_mcb:
- 	for (int id = __MULTIPLE_CONTROL_BITS__; id < __COMPLEX_CONDITIONS__; id++) {
- 		const enum cgt_group_id *cgids;
- 
-
--- 
-Without deviation from the norm, progress is not possible.
 
