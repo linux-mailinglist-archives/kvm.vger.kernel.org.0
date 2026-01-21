@@ -1,82 +1,84 @@
-Return-Path: <kvm+bounces-68666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68667-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6HIgApsicGlRVwAAu9opvQ
-	(envelope-from <kvm+bounces-68666-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 01:49:31 +0100
+	id uNC3HqwicGlRVwAAu9opvQ
+	(envelope-from <kvm+bounces-68667-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 01:49:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2024EB0C
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 01:49:30 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1938A4EB1B
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 01:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 60D225489C8
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 00:49:28 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 60CFA9ADB58
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 00:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB5F2D063E;
-	Wed, 21 Jan 2026 00:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115B32DB7AC;
+	Wed, 21 Jan 2026 00:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y54rM0ox"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="371Bvvnt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBD9273D6F
-	for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 00:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6ED277CBF
+	for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 00:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768956552; cv=none; b=EEc0n2uAt2iDBliOcwDz2urstgjlHum65C6cVDIZYgHWQskus6D4leTbcnwAfKoPb2/nypC/2TxFCUp09smynLbqN4+D3vOpBw+0ywqst8Un0uYPukTMqKdr7dBgJ+q84Pq8d1wRMta25ztPX1fmHbtWEbDFWSQDk45R+6PHjNk=
+	t=1768956554; cv=none; b=MZKuKDl7YCsAFN2JLIhr4WdX7ANh3BMtVAzPD2q6PbumTIzEw63aYZ0HTQF902NDXyFxWyYQ5t61gOUxo1/SdUkuYcdDm1jNouo8GL7XnQ9leM1OWqKzW46z21w8J9PezlQWkMSAXRk98qDfBt9K2Okn43V+WuWOEiDpsElw3yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768956552; c=relaxed/simple;
-	bh=9j2viwc1zDrFmOD8zGiRuaIRwVAFEMbh/MRAdfXkeGo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=esAYVWv0X7yuhmC+XQmSC0ot+nRz9oayHt8EJg/8j6sZ1/aw6qab67SZ9Syvx7yd7abfbDqdb/NS4kCAYYvHyXWjVTYzHBy/7/PhLsdpny/vX/O6+8gOEEXJ8zZ7dF6LcTC0DZtq/R+CjbfR+BCAb1EgSFPY+Y2sJFfo+ESEuL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y54rM0ox; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1768956554; c=relaxed/simple;
+	bh=YRfX9Q0a0jQNu704pRguyi2Mmku9HkppIDZwldLPdlo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=W7IxVEB4PseMCmBdzk7k0kjnZb0Z8UluhNEschBXOuwC0eFvjeDLdaD1us9H5dDKZ1k1YUgD1wdtEFVa1YPp6tqusiT1E2vul2JA9xkcoKJ6VxuAbBNVMv5dOBw457efLDVXzyRY1NsfFSs4oVP+LBOugj5JnY6aqKlzqgQSMho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=371Bvvnt; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0d43fcb2fso134035395ad.3
-        for <kvm@vger.kernel.org>; Tue, 20 Jan 2026 16:49:11 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0d43fcb2fso134037025ad.3
+        for <kvm@vger.kernel.org>; Tue, 20 Jan 2026 16:49:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768956550; x=1769561350; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bqs8q2npJfseM6OyP1kL552rWw1NXKbYV/GgcDPI09A=;
-        b=y54rM0oxkVCJ1ZrLjPbgpYqLW8TT1WmFjWsZFy33/9Gly6BB7BWqZbduKEYDdzNuA2
-         9bqIz0reNcPgDFDAyIZQ+vL1xvOpcl6h8LJ8FXx5KgiZ44Ow7bZWlZDMqzt8SQp6v/Ih
-         cv8t7WqGXrEzUpi2nmy4Es2hyUfTD9gC45TjAp7Wl8AKEXQqIaTvPD9RLp16XqVIlXX+
-         too0FO9gd+IAqpmjVV22sl1p4V7sfwEWDJ+Tk+H2BsQ7QzxpPWItIhjx+zSem3koVNBK
-         7m8t6hYFk21gMOxNmDBRMp1QDffZN97niAz3azMNtfix9x6YV4FjDyHu0LVdq4ABoYnh
-         rELw==
+        d=google.com; s=20230601; t=1768956552; x=1769561352; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Si4ixKO/dBgwRmsNU8E+S8GgZCzFW5296/aB45rRxK8=;
+        b=371Bvvnt4UJIdt5MguXnWvGhJiHZFXPEoEY4qb/bj3iHp+qQN5pu2Kg+n3tsX/dgKk
+         Z1bB3B3Fiy35i+VlQVS5u6G0c9zdfvBLu0mLWjNaLVdE02EvgdboycAkRfc37YR4Xcxm
+         F+h8QAp26jwrm/+ViT1CkQVc6GxhlNCUaBd6XuREVzP5dIrnJBhrM86q08zUteUI6LZC
+         X5QeGAKuxpqIQZTugYtpOzIiqWYZ6biVUyeySibhMuAIw2Ij/VQcmzgC0VEp2cZmmf5g
+         glg32m3wglZh7pL9i0SPmjKAUp2dV54UI0Itn5SFzAOaYLh4SnHvX751HuwHxHOBqzQG
+         pW4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768956550; x=1769561350;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bqs8q2npJfseM6OyP1kL552rWw1NXKbYV/GgcDPI09A=;
-        b=cRAwDXcVPrshlXNcht1WxsdI1ippA4vMYJnEfRC4rnspFJSTtdeWD/ImumYPxFIw21
-         gsQRSdYafrSI3b4regn0E1FtLy/co1gRJQv95+AVjD/EH7LyX1S9293UQtFoofslhY8v
-         7CvdoxPracwNUuguGgDZuICDYJStV14NorUFLho3XklIKk1Eo5ZhQLQYoA4RyX5tV8VY
-         uGgU8OhVmNRYRqve1pc+Uavf1Dl6lZgLlKtuwC0nQcKAlee+c4iE2PnBWLxtEl4s4cQ+
-         oDlGYpxJ5sG1CDoSnyWK3PCPAkb+yRHBBL0edUTERfTLjsXQRq2m5cAHHtlhKqogJzeP
-         0WnQ==
-X-Gm-Message-State: AOJu0Yy+A2QIdAFjIu5uHodd/FMjFDHmYHfVPN9U/BmDGqcODaBMLVDV
-	K4IboKuAye31tmn1f7G0MdAn42AyqbXYtpOSLX8MpZfVjKj8q0NkH9JHQnsKauPJekVEJGbqIk/
-	/fcRvatEmRqR37Q==
-X-Received: from pjbmp11.prod.google.com ([2002:a17:90b:190b:b0:352:e2af:ed76])
+        d=1e100.net; s=20230601; t=1768956552; x=1769561352;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Si4ixKO/dBgwRmsNU8E+S8GgZCzFW5296/aB45rRxK8=;
+        b=b37+0UFzon1NnIkbRRrqFt3QUEtQ8Yw4l3sH2bQgItY0CFq1ym1lweBMbnmk8Bvs0i
+         PZC4gPap7qlBXyEj1J7elDt20+DISOPsHCtHBm42ZNLN9Zzi4FeiJvQx2kPkYy0IIt1e
+         uoYWmDMYx47o10L9FiJy14tJl+CSzveqVZuMN/1c4PHj1eYbfLWHKySdPBkPTAW7O/mi
+         IWfZgSw2fCUQc0+BDKyG58+Gd8Yl6gAoLQ6OoKw4dbEU11K9x8PhbqQJSdF3YoUbOInQ
+         Tt69df9E2GhDa0jCWjQ7Ai1B6hDSkhabPRxSZ6jhaq1slxOz4I33cNICYPG4cS/qY8wI
+         gFEA==
+X-Gm-Message-State: AOJu0YzIMB22Dcq1TTpqdWYuaYzszMDIrepXHY+QQtTS9Y6snWZqBd1s
+	C+neVdNhaHzWsrVUBmgf7Dd026qR+hTvXWjUTi3oJ6GvBGq+fytJ7feFTe/J3jn6wltjYt6Qjb8
+	KVtYMYS6JMxlD8A==
+X-Received: from plse9.prod.google.com ([2002:a17:902:b789:b0:2a7:63e0:6039])
  (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:1aab:b0:29e:e925:1abb with SMTP id d9443c01a7336-2a7698f853fmr31175025ad.27.1768956550644;
- Tue, 20 Jan 2026 16:49:10 -0800 (PST)
-Date: Wed, 21 Jan 2026 00:49:03 +0000
+ 2002:a17:903:22d1:b0:2a0:d05d:e4f with SMTP id d9443c01a7336-2a76b055c8cmr33982245ad.45.1768956551900;
+ Tue, 20 Jan 2026 16:49:11 -0800 (PST)
+Date: Wed, 21 Jan 2026 00:49:04 +0000
+In-Reply-To: <20260121004906.2373989-1-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260121004906.2373989-1-chengkev@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260121004906.2373989-1-chengkev@google.com>
-Subject: [PATCH 0/3] KVM: SVM: Set PFERR_GUEST_{PAGE,FINAL}_MASK for nested
- NPF and add selftest
+Message-ID: <20260121004906.2373989-2-chengkev@google.com>
+Subject: [PATCH 1/3] KVM: SVM: Fix nested NPF injection to set PFERR_GUEST_{PAGE,FINAL}_MASK
 From: Kevin Cheng <chengkev@google.com>
 To: seanjc@google.com, pbonzini@redhat.com
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yosry.ahmed@linux.dev, 
@@ -96,7 +98,7 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68666-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68667-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
@@ -104,62 +106,125 @@ X-Spamd-Result: default: False [-0.46 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[chengkev@google.com,kvm@vger.kernel.org];
 	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_FIVE(0.00)[6];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo]
-X-Rspamd-Queue-Id: AB2024EB0C
+X-Rspamd-Queue-Id: 1938A4EB1B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This series fixes the setting of PFERR_GUEST_PAGE_MASK and
-PFERR_GUEST_FINAL_MASK when injecting a nested page fault to L1,
-and adds a selftest to verify the behavior.
+When KVM emulates an instruction for L2 and encounters a nested page
+fault (e.g., during string I/O emulation), nested_svm_inject_npf_exit()
+injects an NPF to L1. However, the code incorrectly hardcodes
+(1ULL << 32) for exit_info_1's upper bits when the original exit was
+not an NPF. This always sets PFERR_GUEST_FINAL_MASK even when the fault
+occurred on a page table page, preventing L1 from correctly identifying
+the cause of the fault.
 
-When a nested page fault occurs, L1 needs to know whether the fault
-happened during the page table walk (on a PT page) or on the final
-data page translation. This information is conveyed through
-PFERR_GUEST_PAGE_MASK (bit 33) and PFERR_GUEST_FINAL_MASK (bit 32)
-in exit_info_1.
+Set PFERR_GUEST_PAGE_MASK in the error code when a nested page fault
+occurs during a guest page table walk, and PFERR_GUEST_FINAL_MASK when
+the fault occurs on the final GPA-to-HPA translation.
 
-Currently, these bits are not set when an NPF is injected during
-instruction emulation where the original exit reason was not NPF
-(e.g., during string I/O emulation). This series fixes that and adds
-test coverage.
+Widen error_code in struct x86_exception from u16 to u64 to accommodate
+the PFERR_GUEST_* bits (bits 32 and 33).
 
-Patch 1 adds the PFERR_GUEST_{PAGE,FINAL}_MASK bits to the fault error
-code in paging_tmpl.h when the GPA->HPA translation fails during a
-guest page table walk or final page translation.
+Update nested_svm_inject_npf_exit() to use fault->error_code directly
+instead of hardcoding the upper bits. Also add a WARN_ON_ONCE if neither
+PFERR_GUEST_FINAL_MASK nor PFERR_GUEST_PAGE_MASK is set, as this would
+indicate a bug in the page fault handling code.
 
-Patch 2 adds TDP unmap helper functions to the selftest library,
-enabling tests to selectively unmap pages from the NPT to trigger
-nested page faults.
+Signed-off-by: Kevin Cheng <chengkev@google.com>
+---
+ arch/x86/kvm/kvm_emulate.h     |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h | 22 ++++++++++------------
+ arch/x86/kvm/svm/nested.c      | 11 +++++------
+ 3 files changed, 16 insertions(+), 19 deletions(-)
 
-Patch 3 adds a selftest that exercises the nested NPF injection path
-by having L2 execute an OUTS instruction with the source address
-unmapped from L1's NPT. The test verifies that the correct
-PFERR_GUEST_* bit is set and that exit_info_2 contains the faulting
-GPA.
-
-Kevin Cheng (3):
-  KVM: SVM: Fix nested NPF injection to set
-    PFERR_GUEST_{PAGE,FINAL}_MASK
-  KVM: selftests: Add TDP unmap helpers
-  KVM: selftests: Add nested NPF injection test for SVM
-
- arch/x86/kvm/kvm_emulate.h                    |   2 +-
- arch/x86/kvm/mmu/paging_tmpl.h                |  22 ++-
- arch/x86/kvm/svm/nested.c                     |  11 +-
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/include/x86/processor.h     |   6 +
- .../testing/selftests/kvm/lib/x86/processor.c |  53 ++++++
- .../selftests/kvm/x86/svm_nested_npf_test.c   | 154 ++++++++++++++++++
- 7 files changed, 230 insertions(+), 19 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_npf_test.c
-
-
-base-commit: 38f626812b20ad22ab6dc9cfe6d811850f2d8244
---
+diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+index fb3dab4b5a53e..ff4f9b0a01ff7 100644
+--- a/arch/x86/kvm/kvm_emulate.h
++++ b/arch/x86/kvm/kvm_emulate.h
+@@ -22,7 +22,7 @@ enum x86_intercept_stage;
+ struct x86_exception {
+ 	u8 vector;
+ 	bool error_code_valid;
+-	u16 error_code;
++	u64 error_code;
+ 	bool nested_page_fault;
+ 	u64 address; /* cr2 or nested page fault gpa */
+ 	u8 async_page_fault;
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 901cd2bd40b84..923179bfd5c74 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -379,18 +379,12 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 		real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(table_gfn),
+ 					     nested_access, &walker->fault);
+ 
+-		/*
+-		 * FIXME: This can happen if emulation (for of an INS/OUTS
+-		 * instruction) triggers a nested page fault.  The exit
+-		 * qualification / exit info field will incorrectly have
+-		 * "guest page access" as the nested page fault's cause,
+-		 * instead of "guest page structure access".  To fix this,
+-		 * the x86_exception struct should be augmented with enough
+-		 * information to fix the exit_qualification or exit_info_1
+-		 * fields.
+-		 */
+-		if (unlikely(real_gpa == INVALID_GPA))
++		if (unlikely(real_gpa == INVALID_GPA)) {
++#if PTTYPE != PTTYPE_EPT
++			walker->fault.error_code |= PFERR_GUEST_PAGE_MASK;
++#endif
+ 			return 0;
++		}
+ 
+ 		slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(real_gpa));
+ 		if (!kvm_is_visible_memslot(slot))
+@@ -446,8 +440,12 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ #endif
+ 
+ 	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn), access, &walker->fault);
+-	if (real_gpa == INVALID_GPA)
++	if (real_gpa == INVALID_GPA) {
++#if PTTYPE != PTTYPE_EPT
++		walker->fault.error_code |= PFERR_GUEST_FINAL_MASK;
++#endif
+ 		return 0;
++	}
+ 
+ 	walker->gfn = real_gpa >> PAGE_SHIFT;
+ 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index de90b104a0dd5..f8dfd5c333023 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -40,18 +40,17 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+ 	struct vmcb *vmcb = svm->vmcb;
+ 
+ 	if (vmcb->control.exit_code != SVM_EXIT_NPF) {
+-		/*
+-		 * TODO: track the cause of the nested page fault, and
+-		 * correctly fill in the high bits of exit_info_1.
+-		 */
+-		vmcb->control.exit_code = SVM_EXIT_NPF;
+-		vmcb->control.exit_info_1 = (1ULL << 32);
++		vmcb->control.exit_info_1 = fault->error_code;
+ 		vmcb->control.exit_info_2 = fault->address;
+ 	}
+ 
++	vmcb->control.exit_code = SVM_EXIT_NPF;
+ 	vmcb->control.exit_info_1 &= ~0xffffffffULL;
+ 	vmcb->control.exit_info_1 |= fault->error_code;
+ 
++	WARN_ON_ONCE(!(vmcb->control.exit_info_1 &
++		       (PFERR_GUEST_FINAL_MASK | PFERR_GUEST_PAGE_MASK)));
++
+ 	nested_svm_vmexit(svm);
+ }
+ 
+-- 
 2.52.0.457.g6b5491de43-goog
 
 
