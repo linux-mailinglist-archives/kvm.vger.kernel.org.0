@@ -1,281 +1,303 @@
-Return-Path: <kvm+bounces-68692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68693-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMhRHY+ccGlyYgAAu9opvQ
-	(envelope-from <kvm+bounces-68692-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:29:51 +0100
+	id 2OHQH+2gcGlyYgAAu9opvQ
+	(envelope-from <kvm+bounces-68693-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:48:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3578954663
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:29:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF93554A8C
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 10:48:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1AA485C22ED
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 09:22:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0A97D8890F0
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 09:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98266451077;
-	Wed, 21 Jan 2026 09:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1315343637F;
+	Wed, 21 Jan 2026 09:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WZrBwJ3P"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="oLPc+O2a"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012027.outbound.protection.outlook.com [40.107.200.27])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165D13563F0;
-	Wed, 21 Jan 2026 09:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768987266; cv=fail; b=jwt7B9h6HihI4JYyNzRYhmHfFX3g2tadWhi/CM2RGHC/getMc+uo5XyzFuPzwayjMvH8YSFWnj/qE0wxEAFFt3HZBtmmmMXnrBhydLawCHWwLbgHNiX629Bwq7m7471hKanmq1Np9xLV1aLiHtjPqmWlWXX4o7D3zv56vzaasYs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768987266; c=relaxed/simple;
-	bh=jFiH0qdTMsoqqdQjLuT00nD1oCRnS64Af9PsSTFxMHk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GCWsDlHVDUkTkAxDkPqCLVURN+XS8w70bPnbAvbHKcTG66UEwi9Lc4ykxsSZd8wR8BCswQ3IANFzPaL8rExS7PeqTRM7ffcrWbb4doyme68KoYRquIpCuT98txioeD9JKUAQLUG9KuQXmTveZziR8yGQ4UUBgdEQivrlhI8SPrY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WZrBwJ3P; arc=fail smtp.client-ip=40.107.200.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MR0eobPTNM/GFFBB5T+jh0526GKg+0YnGhp21PNGoLMBiWYPID0D1eXK7M+7l2AC3T0k9vTTNGH2RBEAEWjjRyAYYKouzpScJ4Pf2vsaSlBO0uGZlMMNO5Utf8bU/Mpe1GjRFA1KqaVQyQszGctXkfq45qpEkbIfE/UFC/SqOFf9H72awMV7nzNOM9lOz+EZRMJ/WF2RHBfmNXuHr0rNlfu9OrZ/yIw6wS+E5Xzewj8L6uYruGK1nMk58lTyhyzDblLhD/DDeIwMUWa1T/uY5fLErDYWcBzu7ZnTBtDK8OtJYpIs35CUa3jCRF7xJ7fvaGZM/jiBgDsYpEfsIBIEsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VBdVVc00gX6DwmK7nGDf/MmpFSpx4YcH6yme/DoxmCA=;
- b=FdGWt3gkAcqR5OQA2esqCtBPtywH+0SbKRCCA+VGOMIY29PXzru/7CzuZyHVNGOO0CxZZx5io0DdZCg7wsHlpWzxLUyylk0mojTWCfN7ZrZ9edV9hQqwr2YmJf0S2epKibyEF69XmwBXJfDTHi4KGGa/BITcSlw+6SPMtM72FbOKfSWKE4IZUOMNzRgYRlKCVDKUgYAJSTxBJBHbF7QucAtvmdVEPHhTMStEmHqwBWFTHv1vyL24ILP2a48GZH27AUtGGR/sj8LKAer0P0Fj2pdXrwmDMPLd3DIZ9S5ULfTsbHdL4poayn9OSLBtK+xL1wS0wI+LQCnMMMGp54ja2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VBdVVc00gX6DwmK7nGDf/MmpFSpx4YcH6yme/DoxmCA=;
- b=WZrBwJ3P5WF5HpcAbMTp91768A2fEDKkCqnLxVfvZFbrkNueL3USDZU+YuNf4mgIcA//jk/hBimTkSxnU7UV0QAeoM1jkpWgLxKcY1UUp6aVNGLNgM52J2GNsnww5yoVCMVhG0RznUQJU0PNMYIvUdbmGU4DPCIoIbMvyBWVF70=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by MW4PR12MB7191.namprd12.prod.outlook.com (2603:10b6:303:22d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Wed, 21 Jan
- 2026 09:21:01 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5%4]) with mapi id 15.20.9542.008; Wed, 21 Jan 2026
- 09:21:00 +0000
-Message-ID: <b129f0c1-b61e-4efb-9e25-d8cdadaca1b3@amd.com>
-Date: Wed, 21 Jan 2026 10:20:51 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 6/7] vfio: Wait for dma-buf invalidation to complete
-To: Leon Romanovsky <leon@kernel.org>, Sumit Semwal
- <sumit.semwal@linaro.org>, Alex Deucher <alexander.deucher@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Gerd Hoffmann <kraxel@redhat.com>,
- Dmitry Osipenko <dmitry.osipenko@collabora.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Lucas De Marchi <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
- Felix Kuehling <Felix.Kuehling@amd.com>, Alex Williamson <alex@shazbot.org>,
- Ankit Agrawal <ankita@nvidia.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>
-Cc: linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
- intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
- iommu@lists.linux.dev, kvm@vger.kernel.org
-References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
- <20260120-dmabuf-revoke-v3-6-b7e0b07b8214@nvidia.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20260120-dmabuf-revoke-v3-6-b7e0b07b8214@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BN0PR04CA0088.namprd04.prod.outlook.com
- (2603:10b6:408:ea::33) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B2E3ACEE8;
+	Wed, 21 Jan 2026 09:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768987967; cv=none; b=DhrXnnzPXB/AWjSm+Bd1Inibd3llfIP40w+adTw16L40Zvz6jiu4ZejqDTTQjralJzj/ExArnUNqYXkVJhFJNG2S2fmgkr7ABKu4FW+Bzls+BVlRKXdtum7dKtqCeqtd1xONjXGmcMnuCegJVVmzGlkuAvkKiFEXJl1kWkCA/LI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768987967; c=relaxed/simple;
+	bh=S6Jsr9iC1GnVhpjf+bKMgc9kqfY4K5WhFGlPiUf4D5c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=neufYmS2FbM9EJiHMukk0ypHuGSmnrCyOhDUAgIxsJeFZRmH6JQ/mY84wAbEJEQbVgC0aZ3JXDHuBI2cCpSJFAlSFcJ4t6lgxvAr4M9jN4nn32JEr5RX+sSbZAbU1pnS6ZcZg9weLmAeEXLTUH6E9rVaMDowk958ow9dLFAWelM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=oLPc+O2a; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.154] ([129.217.186.154])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60L9WTZn002712
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 21 Jan 2026 10:32:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1768987950;
+	bh=S6Jsr9iC1GnVhpjf+bKMgc9kqfY4K5WhFGlPiUf4D5c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=oLPc+O2a+imba04rEJKdoffOHEI3asOVNiGnLpMjfxgrQvT/+R5Wxp6keF24mbA26
+	 aH6sY8FA3gQ6Gq4JT5v8QeONQnluxk7jCFygUmvE4sroDo4KYMibV5g8Wb0DdGQtGW
+	 VeHETgZHaQkMGedV1/x8YlYBotJSzhkj3fMpuSQk=
+Message-ID: <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
+Date: Wed, 21 Jan 2026 10:32:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|MW4PR12MB7191:EE_
-X-MS-Office365-Filtering-Correlation-Id: d83a5719-8f57-4dd9-021d-08de58ce6474
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?d1ozMks5Q2tub1RXZm9LQWgzQmhpdkRFNmdVdE5MWGVDUmFja0RZejFXYis5?=
- =?utf-8?B?UE9RcUxXeHBPbldpZHBieFdLSTVhTFd1WHNXVytoUEtRbDV3dzQ0ZUVlSVR1?=
- =?utf-8?B?V3NPRnlDRU1sUGd1N21TQzZGVGM5VTlMbmYrSUZ6bEUrVFl2RWlKREtTd2cy?=
- =?utf-8?B?OUxoWko1ZmZSeVBSSzZDbkhaT1Jkeko1TmxJUjliSmJUUjNocU01NWxrSDBZ?=
- =?utf-8?B?QWh0TE9EVjRsTlJrQlExNXNiN0kzR2l3d0lWNHNqTE1sNFVNNzI5K0loSmtO?=
- =?utf-8?B?Ym1sQ3FVZmNJdHpXbGVSOE5JZE9FUFRMV09TaGxhVTNDYitFcDB3a096d0lI?=
- =?utf-8?B?amsvVjBvNW1iUVBnZS9VSHVCWTFFYnJPcFk0NUJlK1BMcWowVENyMVdUMVBP?=
- =?utf-8?B?T1pqWlFPYTM2Z0pnYW9uUlNjUHNPTFdGcmJIS0FkZ01UdUNmZEkyS3Uranpv?=
- =?utf-8?B?Qzg2eFVqVG1NOGtwdWY1NFdla2lDOEMzK0VlWGhZd1B6MitLcG9BSlpUVE80?=
- =?utf-8?B?b3hNb2FKL0lKNW9OMitmYzNRMytEbmFObXl2OHVjSXplc2w2TmRjcFJ1UnBB?=
- =?utf-8?B?Zm9YRkxBZmllYVA2Slg1YU1XZndYNXUvMUx1THVLUzZxc0FpMkJHQk5obWVs?=
- =?utf-8?B?bkttSkhwVXlzU2RPZXVOQnJFZmExSlpXcXlDbDJDYTlsSWpGM09xSkJVT0kw?=
- =?utf-8?B?Mm1rVHpzVFRudXFkTkU3SkU5d280YzhER1lIdGxNb3lzSlhrN21USHlDZGZz?=
- =?utf-8?B?bE5acFE0OHlmeVd6VERzZWVBQk9PbFNrZjFvQ1RLeTk2UVNvaE5seU4rUjZZ?=
- =?utf-8?B?Qmtob2tnMUpSY0ZNNm9PdFo0ZTQyNmR2QXhFN3FFVUdWdUoyT0ZqdnBUMlJJ?=
- =?utf-8?B?NUI1Z2J5TEFBNmRRaXhjeTJZVElqL3J0UGtaQ1dnS2VvZTZLK3NLYUdrQjRh?=
- =?utf-8?B?c0hJQkJrY2padHdYRTlpbDVQU3BJSlZSQmpKTE9OYXhVK2xmZkpBNFVJTm0y?=
- =?utf-8?B?RlpGUnhYWjc5Kzl3bG92bDhmaEFoNysrQ1gwQi80OS95VU53MU80WnlmZXBx?=
- =?utf-8?B?alFqNXphamFxWmxMdmk4NXM5REZNRVJ6SW9uMVVvNEUya0U5ajJBSlQxbmNI?=
- =?utf-8?B?bTE4QS9yZmRIYzdFMVJQWlQzOGI1Q3J0VW9BVlNCQXRoaEFGeHVXQS9vQXRy?=
- =?utf-8?B?TWF3RnBPbmJtai84aGkzd2V6Q25wZ0o5ZTJDdktZSUxET2R5ZHVrYm1VbGFp?=
- =?utf-8?B?N1dsczJ4RkFxWjRjQnBsak9jdThXOGkrUXpmUmJtbStIeWIrVmZnTEUxSmZt?=
- =?utf-8?B?K0Q3WUlETVc2VTREU0pjLzNZVk1EVDFiUHZoNFE3a1N1endrb1BhSzd6ZnhH?=
- =?utf-8?B?R3BYd3ZyQWQxNGVxOERaemwxSGRXUDBtR0tuNHdYMGNxUXljRmFYcGFJa0Rw?=
- =?utf-8?B?WG5FSzVhTW5VOVVvcUJaTFRBY2V4aWJYalN5aExPL3hzNjVJRzNrMTFyR2xo?=
- =?utf-8?B?Y1M0N25GSG5EWVlvOWtmVjdPQTlYalViaG45YlU2SS8zSFQ4OW45cCswQVpT?=
- =?utf-8?B?M1hzUGhUTVRMbmpTR2pGVnpIamg4ZDNwN1U5OWZ3YVVSY0FlelhmVUwxVGxG?=
- =?utf-8?B?WmIzSHF2M3dFMWg2VW9zQkZKdVplUWpTK1M0UGtySmlJZWdzN3E3WldWTDJS?=
- =?utf-8?B?UVptTkQ1VEJvZ1RGT2xpcVEwVUNsOGQxNUpZNS9JU3huUDhlOHdnNklWbVk4?=
- =?utf-8?B?WmxpYURRSDFacjlBTGFZUGRQY2xhVFcwSjA2NTJERkk3OFpJQmt6QUpKL3ZN?=
- =?utf-8?B?M1N3eFQ1bEhISys2V05rSGNKVmRLSXc3RzZqWGVlT0dTdHY1MURDWkJSU2tK?=
- =?utf-8?B?aWtIZFk2VjhTOThUenQrVUMydWFzRkRXMWRlQ2FoLzlDaEd3NjdIQ21JZmFC?=
- =?utf-8?B?K25BRWR1d09UN084cGJjeXJpNnlnMGY0VHV5Q3NvUG9sM1ZpbTZCVXU4M2RJ?=
- =?utf-8?B?bi9RamVhQy9YNncwdHpNcGZYMW0rNDhlYi9rYTVQQUVZSFJHYUt0THZOY3Nk?=
- =?utf-8?B?MWpUK3cyK2c2Zm9XWkJZaGJPRVNYRUtjajlnTkZWcFpkUzFyWlB4MDJIRTJE?=
- =?utf-8?B?TmFiUVJXWkg5Y0ZQVU15em5ELzZnckhtMnVpY3dKMmNCQlZieDY4aEMyTFo5?=
- =?utf-8?B?L0E9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZWhBOHU2djF6djZKOWQwYk9ObnVXQy9GMVhQWnVaMFVXTGtXdGllbGV4ejha?=
- =?utf-8?B?UVlGdjdDL0lTQjRXNmJtb0I4bk8wNFMyQml5MDVlRGN2WDB2ZG5xbVVyWlV5?=
- =?utf-8?B?V1dnWFJ0S09RbGc2eGY1d3E1ZGw0eTVOd1grb29hWVBaY25seVp0YisrcmZq?=
- =?utf-8?B?dVp4NEFLVkwwSDBKMUNPV1BWR3lNN2puQm94VmNhTUpxK2p1RkFNZUNBbzhB?=
- =?utf-8?B?djg4aXM2QXl0WWp1Q0FUdkFnQzNQbWJvaWkvTUF5WDFSV21NU1NmOXFtcjFo?=
- =?utf-8?B?RTJGU2gxZFRZZVQvVVowa0UySXJFaXRmWUlySFhBTGdMTTEvV01jUXRibW1T?=
- =?utf-8?B?dmJNK3hySURNbFlFTDBSWWxyQzRheGRtVGszeEJFV3VENnZuY3phUXQyMndD?=
- =?utf-8?B?aWxLa0RIck11eUNOamphMVJ2MFRQbzhGTjFFOFZuOFZFNUg5UXc3b2swNU9s?=
- =?utf-8?B?TUxDcWVhVVRab1AvTGh3VlFwTzBKTGd0SUU0UmduZTAxOHZBNU81WFlwWTFD?=
- =?utf-8?B?ZU5LZzZ5VzltNFJoaDgrZWlrQ3pENWh6ZjFFN096UXlrRUN1M21LMnQ5NGVw?=
- =?utf-8?B?VnJYQjRIaFh3M1dONDY5NkdNbm5WMmxJcUsxUEtVWDZWenNDZml4Vk9RYk0r?=
- =?utf-8?B?eEE1TkkvSEVTWnlFekNXb2JscG9kYTdQRzNTUGZLRW1ScVJreDBSVXJ0aWlH?=
- =?utf-8?B?dnJMTDFFWG5SOERuNUJvZHQ5SFNmeGNkUlowYlpkOGY5cElIdEUxK2g4bmNT?=
- =?utf-8?B?QVhZdHgvUmFYMncwdk5JMDhsWkh5TWw3UDFDb2ZEdllnZXFtOHgrQkNYREFP?=
- =?utf-8?B?cnZyYVhZNDdFajc3M2p5bnJSZW5mWDQ0Qll4Zm5VaDZzRnJLMWhFQmk5N2xG?=
- =?utf-8?B?Zm9qUFhRN2FyK0hmYk5Id3Z1NGE5VHVXYTFJUy9lYW1EM2lmbWQxaGJUNzdI?=
- =?utf-8?B?eW00ZGJabTlScXZmeFR4M0lRTHFpMVdxdXhiS2NGVnQ4TDAxN2FUWWY0dkto?=
- =?utf-8?B?cnljeDNYRTV1Q1FVSGJvclZwTStJYW1NKzBXUGNldDgxUzJYTVR3UFI4Q0Vo?=
- =?utf-8?B?d29qOE5PUWQwRk9zUjN3M3JXM1E1a1Rvb1JOK2sycmludnVjenV2VlZtNWlN?=
- =?utf-8?B?WmN1ZlV2Ui9xQS8wQWtCaXQrRkpTZzJMSms2aTVpQWN5WXhHWkNjb0xCajRV?=
- =?utf-8?B?aDNaRWRIYWEzZ0dHWUtlbmFMRWNFTkk5SDJRbFdydlJWRFkvK2lCVXREWHNQ?=
- =?utf-8?B?aEhWcGZuckVZMjBDOXBHeG1BWkVsY0tEL1lTWUIxRXNRcHZjbVZTbEFEZVBJ?=
- =?utf-8?B?UWZrUXYxVWFhNjdISHFpYVBVNmhCK1gvcHdFUWdnakhLZExYWXVuVDZUdGdk?=
- =?utf-8?B?NkF4b1dWZUw1anZSK2xmOXMwMjlJbTVKcC9MNEJpU2JxS0plUFdzQ3BVcEpC?=
- =?utf-8?B?TWtNb3g0aXJkZklIbFBOUWR4dFNlVUVoNk5FK0JBQnF1RVJtRW1YNDc2bWdp?=
- =?utf-8?B?NFgxZXkrbEIyaEJ0aWQrc0NiMHFYVzhpSzBJc3NaM2ZQcjl2Z1lmK0dxeVFo?=
- =?utf-8?B?ZHdCQVI4YUNXYzB5ZDhaR1NjMHp2UlRZTWlibThUbGxVYWhuejZBSnhMTW9M?=
- =?utf-8?B?cCtiVTJjN3FhOGIrRWNyS2wzdFFQR2YyV0xvWXBvWkllUFN2TkJRVmwydmt1?=
- =?utf-8?B?NkM1UUdSeVF3UXZRVmxMZkdMWExvUlp4VEFNUWEwSUNlcE4vVHdwKzlkQ1BQ?=
- =?utf-8?B?bm96eXEzcE9SL2VqU2lrNEJ2UkFDUDNvUkFnamlCQjRMclR6MHNQNVMrdFpk?=
- =?utf-8?B?Z2kyWHgreVA4RmdkR2hrNm9BRW5jN0MwdC9iM0p5RE92ZTVNM2hLUVFtMm96?=
- =?utf-8?B?cEN0WEtWOGl1VHY5NjJibSsybnhaemg0S3NKby9WRm4zT3UrL1puMGdzejhN?=
- =?utf-8?B?TjFCTEdVVUZRaHlPaVBHRFNXWGFpVXdLS2FiZGpyVC9BdzhMTk96dlYxck8v?=
- =?utf-8?B?M3hUSTdaTkkyaHF1dUFqNGNDTzBSTHNEdlQ3bGdPUkhyM2FFWlBXVGFCaE5Z?=
- =?utf-8?B?b2JYRHQvWWlrR2ZOa2FXWlpEdlUrRGFGWFZydUpkTkQ0d3k5YnEvaHppNE5x?=
- =?utf-8?B?ZzZaNVQ0ZThqenNRdk9zczRKa09sakhLNVdZZFNTWGgxQkZ6T05ETDRMaEY0?=
- =?utf-8?B?c2xiZ0d2cmNCUDhrWFJOVnFPNFh5aWI2SDBGUHVGdy9LeFowc0c2eHFWSDFJ?=
- =?utf-8?B?TXo4YWZmZXluaGk3bUtTU2lKNGc0Y05LbEN0bHhtYjZqWVRPaG55OG8zVWxz?=
- =?utf-8?Q?QjAngc+lInXudE7zbj?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d83a5719-8f57-4dd9-021d-08de58ce6474
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2026 09:21:00.6398
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bra59grin7YIMmP/yPIE6r8GXoxLUg/9io6vkUo7zj2o1bQkSTgswc2VAGJW0vpa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7191
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
+ netdev queue wakeup
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-4-simon.schippers@tu-dortmund.de>
+ <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
+ <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
+ <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68692-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68693-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[amd.com,quarantine];
+	DMARC_POLICY_ALLOW(0.00)[tu-dortmund.de,none];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[amd.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,amd.com:email,amd.com:dkim,amd.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: 3578954663
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm,netdev];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid,dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: DF93554A8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 1/20/26 15:07, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On 1/9/26 07:02, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> On 1/8/26 04:38, Jason Wang wrote:
+>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>
+>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
+>>>> and wake the corresponding netdev subqueue when consuming an entry frees
+>>>> space in the underlying ptr_ring.
+>>>>
+>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
+>>>> in an upcoming commit.
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
+>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
+>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>>>> index 1197f245e873..2442cf7ac385 100644
+>>>> --- a/drivers/net/tap.c
+>>>> +++ b/drivers/net/tap.c
+>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>>>         return ret ? ret : total;
+>>>>  }
+>>>>
+>>>> +static void *tap_ring_consume(struct tap_queue *q)
+>>>> +{
+>>>> +       struct ptr_ring *ring = &q->ring;
+>>>> +       struct net_device *dev;
+>>>> +       void *ptr;
+>>>> +
+>>>> +       spin_lock(&ring->consumer_lock);
+>>>> +
+>>>> +       ptr = __ptr_ring_consume(ring);
+>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
+>>>> +               rcu_read_lock();
+>>>> +               dev = rcu_dereference(q->tap)->dev;
+>>>> +               netif_wake_subqueue(dev, q->queue_index);
+>>>> +               rcu_read_unlock();
+>>>> +       }
+>>>> +
+>>>> +       spin_unlock(&ring->consumer_lock);
+>>>> +
+>>>> +       return ptr;
+>>>> +}
+>>>> +
+>>>>  static ssize_t tap_do_read(struct tap_queue *q,
+>>>>                            struct iov_iter *to,
+>>>>                            int noblock, struct sk_buff *skb)
+>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
+>>>>                                         TASK_INTERRUPTIBLE);
+>>>>
+>>>>                 /* Read frames from the queue */
+>>>> -               skb = ptr_ring_consume(&q->ring);
+>>>> +               skb = tap_ring_consume(q);
+>>>>                 if (skb)
+>>>>                         break;
+>>>>                 if (noblock) {
+>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>> index 8192740357a0..7148f9a844a4 100644
+>>>> --- a/drivers/net/tun.c
+>>>> +++ b/drivers/net/tun.c
+>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>>>         return total;
+>>>>  }
+>>>>
+>>>> +static void *tun_ring_consume(struct tun_file *tfile)
+>>>> +{
+>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
+>>>> +       struct net_device *dev;
+>>>> +       void *ptr;
+>>>> +
+>>>> +       spin_lock(&ring->consumer_lock);
+>>>> +
+>>>> +       ptr = __ptr_ring_consume(ring);
+>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
+>>>
+>>> I guess it's the "bug" I mentioned in the previous patch that leads to
+>>> the check of __ptr_ring_consume_created_space() here. If it's true,
+>>> another call to tweak the current API.
+>>>
+>>>> +               rcu_read_lock();
+>>>> +               dev = rcu_dereference(tfile->tun)->dev;
+>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
+>>>
+>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
+>>> I'm not sure is what we want.
+>>
+>> What else would you suggest calling to wake the queue?
 > 
-> dma-buf invalidation is performed asynchronously by hardware, so VFIO must
-> wait until all affected objects have been fully invalidated.
+> I don't have a good method in my mind, just want to point out its implications.
+
+I have to admit I'm a bit stuck at this point, particularly with this
+aspect.
+
+What is the correct way to pass the producer CPU ID to the consumer?
+Would it make sense to store smp_processor_id() in the tfile inside
+tun_net_xmit(), or should it instead be stored in the skb (similar to the
+XDP bit)? In the latter case, my concern is that this information may
+already be significantly outdated by the time it is used.
+
+Based on that, my idea would be for the consumer to wake the producer by
+invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
+smp_call_function_single().
+Is this a reasonable approach?
+
+More generally, would triggering TX_SOFTIRQ on the consumer CPU be
+considered a deal-breaker for the patch set?
+
+Thanks!
+
 > 
-> Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO regions")
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-
-Reviewed-by: Christian König <christian.koenig@amd.com>
-
-Please also keep in mind that the while this wait for all fences for correctness you also need to keep the mapping valid until dma_buf_unmap_attachment() was called.
-
-In other words you can only redirect the DMA-addresses previously given out into nirvana (or a dummy memory or similar), but you still need to avoid re-using them for something else.
-
-Regards,
-Christian.
-
-> ---
->  drivers/vfio/pci/vfio_pci_dmabuf.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>>
+>>>
+>>>> +               rcu_read_unlock();
+>>>> +       }
+>>>
+>>> Btw, this function duplicates a lot of logic of tap_ring_consume() we
+>>> should consider to merge the logic.
+>>
+>> Yes, it is largely the same approach, but it would require accessing the
+>> net_device each time.
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> index d4d0f7d08c53..33bc6a1909dd 100644
-> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> @@ -321,6 +321,9 @@ void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
->  			dma_resv_lock(priv->dmabuf->resv, NULL);
->  			priv->revoked = revoked;
->  			dma_buf_move_notify(priv->dmabuf);
-> +			dma_resv_wait_timeout(priv->dmabuf->resv,
-> +					      DMA_RESV_USAGE_KERNEL, false,
-> +					      MAX_SCHEDULE_TIMEOUT);
->  			dma_resv_unlock(priv->dmabuf->resv);
->  		}
->  		fput(priv->dmabuf->file);
-> @@ -342,6 +345,8 @@ void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev)
->  		priv->vdev = NULL;
->  		priv->revoked = true;
->  		dma_buf_move_notify(priv->dmabuf);
-> +		dma_resv_wait_timeout(priv->dmabuf->resv, DMA_RESV_USAGE_KERNEL,
-> +				      false, MAX_SCHEDULE_TIMEOUT);
->  		dma_resv_unlock(priv->dmabuf->resv);
->  		vfio_device_put_registration(&vdev->vdev);
->  		fput(priv->dmabuf->file);
+> The problem is that, at least for TUN, the socket is loosely coupled
+> with the netdev. It means the netdev can go away while the socket
+> might still exist. That's why vhost only talks to the socket, not the
+> netdev. If we really want to go this way, here, we should at least
+> check the existence of tun->dev first.
 > 
-
+>>
+>>>
+>>>> +
+>>>> +       spin_unlock(&ring->consumer_lock);
+>>>> +
+>>>> +       return ptr;
+>>>> +}
+>>>> +
+>>>>  static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>  {
+>>>>         DECLARE_WAITQUEUE(wait, current);
+>>>>         void *ptr = NULL;
+>>>>         int error = 0;
+>>>>
+>>>> -       ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>> +       ptr = tun_ring_consume(tfile);
+>>>
+>>> I'm not sure having a separate patch like this may help. For example,
+>>> it will introduce performance regression.
+>>
+>> I ran benchmarks for the whole patch set with noqueue (where the queue is
+>> not stopped to preserve the old behavior), as described in the cover
+>> letter, and observed no performance regression. This leads me to conclude
+>> that there is no performance impact because of this patch when the queue
+>> is not stopped.
+> 
+> Have you run a benchmark per patch? Or it might just be because the
+> regression is not obvious. But at least this patch would introduce
+> more atomic operations or it might just because the TUN doesn't
+> support burst so pktgen can't have the best PPS.
+> 
+> Thanks
+> 
+> 
+>>
+>>>
+>>>>         if (ptr)
+>>>>                 goto out;
+>>>>         if (noblock) {
+>>>> @@ -2131,7 +2152,7 @@ static void *tun_ring_recv(struct tun_file *tfile, int noblock, int *err)
+>>>>
+>>>>         while (1) {
+>>>>                 set_current_state(TASK_INTERRUPTIBLE);
+>>>> -               ptr = ptr_ring_consume(&tfile->tx_ring);
+>>>> +               ptr = tun_ring_consume(tfile);
+>>>>                 if (ptr)
+>>>>                         break;
+>>>>                 if (signal_pending(current)) {
+>>>> --
+>>>> 2.43.0
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
 
