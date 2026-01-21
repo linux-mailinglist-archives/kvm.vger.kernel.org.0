@@ -1,158 +1,149 @@
-Return-Path: <kvm+bounces-68750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68751-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJWcGDURcWlEcgAAu9opvQ
-	(envelope-from <kvm+bounces-68750-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 18:47:33 +0100
+	id iFd7NtsNcWlEcgAAu9opvQ
+	(envelope-from <kvm+bounces-68751-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 18:33:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C315ABBF
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 18:47:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EE955A95A
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 18:33:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B023540CA2C
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 16:10:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B58B7EF9BD
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 16:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3DE421A0A;
-	Wed, 21 Jan 2026 16:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17242C3254;
+	Wed, 21 Jan 2026 16:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Kd5NBcBe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QISwPij8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f65.google.com (mail-qv1-f65.google.com [209.85.219.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCF740B6EF
-	for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 16:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7357F37F757;
+	Wed, 21 Jan 2026 16:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769011396; cv=none; b=h1LlX26pRnGP0FmcEDGnNTxIwcondnRTjFZEksunUYMzqzmW5AAFP+Ik1ofaRuu1b7HihKmgincF8bqrFfkjcelSvzgseMnc2k1KPJpPVzb+WKHjItZg9cSk053w1AtKYB5Qrc9lRFybfV/6m9DZ/9N3fCAzLFIGUgghmPVLklQ=
+	t=1769012444; cv=none; b=G4Rt76zdL6kJczs5tQ+TSEmV65WUD8bY51qvZIqfQvHw/+b1YTWcqKTv6LVCXF8KfAEZcjUJ2Z1EDBJDKHHynOW3ZoZKMDIlpqMbNcBs9GGdPjzL1q8SV+J+m0C6x65ZOgXqglYZ7UlB0jsr6YtUcIBib1OkWt1QV8EiZXN4LhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769011396; c=relaxed/simple;
-	bh=WmOj1k/W+8wJRLPGCBJTRRoghXStyisti26Y9JQPCO4=;
+	s=arc-20240116; t=1769012444; c=relaxed/simple;
+	bh=1zrLB9YYiuSPiB+hTb+W3k1yLnlV8BF5PevPGnV9vcs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e2ykKUgKWWhVB2+D7rtvip00hrQcyG7ncysIfPsHNWuUClNij7a6L1iKxmG49HOHqYWwth4ect198oADy80YtQPdYRwyImS8NZ3GsSjZKOKi0V6DyLhMJu/Rz/OhvLIWtfSCZlVmy++Hm6jxqk2TTfLrO32Labkc79IuMqSZXMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Kd5NBcBe; arc=none smtp.client-ip=209.85.219.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f65.google.com with SMTP id 6a1803df08f44-88a2b99d8c5so362536d6.1
-        for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 08:03:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1769011392; x=1769616192; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DTcZwFv0TOIi/+PikXqo456K3Zrkr8L5jZsufkB+rbI=;
-        b=Kd5NBcBeT6j5j9mK3ZVCrUGMznJO1F6vCumvX3AFSdWMbepjxg6W4UuPqaLuauvVDr
-         FcBvpjCirs1KaaLoDODVjhsGtfoP6AT3G9AfAF337zSc0/W4b7IR1wnBiB99ons8HIRG
-         FuRAtCnO0n9FGCiFtWtS3irr/PF1snxWVL9Zbqm7ALFMsp8+96tTu+FLyMDTMdvoCByI
-         YbdWvsvrbfrBmtEwnxSJTniBYwAV0M+j6HheEwDuKnOQKcLWYaVw35zUB4aVL7oqm1wN
-         YcUxYlEdLbYNiMI5RLHYLJxBBj5JJmcVBaiO5JsmBk4qoxUSyDQkrJwEJeCdzEpnjo3p
-         ci/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769011392; x=1769616192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DTcZwFv0TOIi/+PikXqo456K3Zrkr8L5jZsufkB+rbI=;
-        b=cA4MFKyI5+fG2A+to6NCEHogzUPNt6xru2vPhQcxyihzv4NsWfuOG2XNE8CMVTyHqd
-         A9BNgBTQN1c9QADFdM/2x7TwdQQpZXxT4aQ2sTN22WHt6F74ZLRcrPb/SzpnbS1ZamaA
-         D05jDuHN0nxl6pqFJCHBx9JTUtqfaPMh/vLC65ruyg1Umy97UYO/HBW08EjD8vGXK0pV
-         bTNBQUyeN6mYkeG6dCVeQlydEvpssL9JYEN4ovKgHY4iPVYZHaPi1hsThYJZMMlRYMmn
-         WLGCnIDKZDLyaEYpMNfHIsUYD5qR0MRvuT50zgIHqxaNt5tIU6XkSubx3QWB/4mvjlF/
-         0diQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWwaDj0p8IhL/l7I1vnw97rr5wr+qncauPHIOyGm8PtXxqmjBkwrXEVr1qKuvFOHCLS2Rw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3ezux0m2ZFCd3aVAt4efe1CJwPTeVVGkoXzE2fUaajvYaGPrN
-	lzpkZLeoo5Jj7yNRSiQXgWum4mRABziYX4GqpLqDvHOESITkdgoinOOlieCY4Hw+ZW+nBGqFgaP
-	KVTTO
-X-Gm-Gg: AZuq6aL665xOCa3yHLKexb5JCA9beyYIE1M8fPeIDa7EQq8fxKFU9WKgTJattpVid9U
-	lQPqrDya9iDorayt81Ysw43LcXydmYe/LTH+jC4YRot8/6AqVpV9UF/Ob+lEdUsDTbBoz3ECyei
-	1aWvUmF+9smJ5+zAb4oEL3V01UbfKWZxqr+v8JWJga334v5PbZ5+MorZ4Zd6+5lfZbMOy5I8mIi
-	C7WlCSF93V3ckRIUC6GgZDSm3+8sSQf5diwHF4zBd5Z21nxAqqrWtDXEKMW8ISVvvNUEexuPDlQ
-	CYbQSQS+oyDdy7e/1HkkSsftS5sHYzowAxl6OyXwhlr1RScdrcJdLUf0OGuLZuIildY07V7+dLl
-	ZFfk35hiKvDP9AYZzK8/tKTHEkOU7uMWPlOu1dgA/j4uU9oLo3TAAW+RUgzl49JQ8RoECNtgyyq
-	r7Im1FBZL3UTw/ewfgppou/M8vWlo46vbRCHwwU78niuKPgAbdBblL8+rCdeOjiIYlAQI=
-X-Received: by 2002:ad4:4ea1:0:b0:894:73b3:a5e3 with SMTP id 6a1803df08f44-89473b3a756mr29385326d6.11.1769011389720;
-        Wed, 21 Jan 2026 08:03:09 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-894655aea20sm35183896d6.3.2026.01.21.08.03.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 08:03:08 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1viafj-00000006Est-3jER;
-	Wed, 21 Jan 2026 12:03:07 -0400
-Date: Wed, 21 Jan 2026 12:03:07 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex@shazbot.org>, Ankit Agrawal <ankita@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH vfio-rc] vfio: Prevent from pinned DMABUF importers to
- attach to VFIO DMABUF
-Message-ID: <20260121160307.GG961572@ziepe.ca>
-References: <20260121-vfio-add-pin-v1-1-4e04916b17f1@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SZzqopF9Vk5EoULr1awQL68uyjOcF4w8VVdtGH2zRHLuf4UcDm+FSmV00AacglkYNq1wYwx7XkBIZ2+OKuxWfJ5eKXTLYlF86n5fF7V0hZ1ZzHkOxEAIpM+T9f1dKgA/NIYlinY0uz0edSY9YP7TNzbnyoErEaxD8StA7HHuJuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QISwPij8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0DF4C4CEF1;
+	Wed, 21 Jan 2026 16:20:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769012443;
+	bh=1zrLB9YYiuSPiB+hTb+W3k1yLnlV8BF5PevPGnV9vcs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QISwPij8Wrto3Bs19w6vqe3S2S5wUbzZBIkAYoW3q5GKX1oPPXFRUPe1kitED+Afh
+	 P+qH1izc6yuCkE0EYlusxPbZ7hCHHqf21r/qBEdXvqXF7UAgd857zey6uVJ4Xgt/MW
+	 MHMDvGAh7sXRHkbMW23lVMUlAD63w1vI8ZhNW+nG3uarIrZdYR0P6xaGU2GzL7GNZg
+	 cXkfdI3oNMKE4jw8heAnjacEfhDglbXo4tELdNeXigasbn2JhCOYWFkj90bCGBAPGe
+	 9slvHJrZgYXFftd3CHOiTy1JaF86l5T1y3z2zhubcNAzg1QVOy2RVW+DMnR6EoBJqZ
+	 MUA+ohMHg8Qrw==
+Date: Wed, 21 Jan 2026 16:20:36 +0000
+From: Will Deacon <will@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
+	catalin.marinas@arm.com, broonie@kernel.org, oliver.upton@linux.dev,
+	miko.lenczewski@arm.com, kevin.brodsky@arm.com, ardb@kernel.org,
+	suzuki.poulose@arm.com, lpieralisi@kernel.org,
+	yangyicong@hisilicon.com, scott@os.amperecomputing.com,
+	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
+	shuah@kernel.org, arnd@arndb.de,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI
+ for swpX emulation.
+Message-ID: <aXD81LT6TX32vlTS@willie-the-truck>
+References: <86ms3knl6s.wl-maz@kernel.org>
+ <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
+ <aW5O714hfl7DCl04@willie-the-truck>
+ <aW6w6+B21NbUuszA@e129823.arm.com>
+ <aW9O6R7v-ybhrm66@J2N7QTR9R3>
+ <aW9T5b+Y2b2JOZHk@e129823.arm.com>
+ <aW9sBkUVnpAkPkxN@willie-the-truck>
+ <aW/Ck3M3Xg02DpQX@e129823.arm.com>
+ <aXDbBKhE1SdCW6q4@willie-the-truck>
+ <aXDn3iRXEtgaUtnp@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260121-vfio-add-pin-v1-1-4e04916b17f1@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXDn3iRXEtgaUtnp@e129823.arm.com>
 X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68750-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68751-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[ziepe.ca];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[will@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,ams.mirrors.kernel.org:rdns,ams.mirrors.kernel.org:helo,ziepe.ca:mid,ziepe.ca:dkim]
-X-Rspamd-Queue-Id: 21C315ABBF
+	ASN(0.00)[asn:7979, ipnet:142.0.200.0/24, country:US];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo]
+X-Rspamd-Queue-Id: 4EE955A95A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Jan 21, 2026 at 05:45:02PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On Wed, Jan 21, 2026 at 02:51:10PM +0000, Yeoreum Yun wrote:
+> > On Tue, Jan 20, 2026 at 05:59:47PM +0000, Yeoreum Yun wrote:
+> > > On second thought, while a CPU that implements LSUI is unlikely to
+> > > support AArch32 compatibility,
+> > > I don't think LSUI requires the absence of AArch32.
+> > > These two are independent features (and in fact our FVP reports/supports both).
+> >
+> > Did you have to configure the FVP specially for this or that a "default"
+> > configuration?
+> >
+> > > Given that, I'm not sure a WARN is really necessary.
+> > > Would it be sufficient to just drop the patch for swpX instead?
+> >
+> > Given that the whole point of LSUI is to remove the PAN toggling, I think
+> > we should make an effort to make sure that we don't retain PAN toggling
+> > paths at runtime that could potentially be targetted by attackers. If we
+> > drop the SWP emulation patch and then see that we have AArch32 at runtime,
+> > we should forcefully disable the SWP emulation but, since we don't actually
+> > think we're going to see this in practice, the WARN seemed simpler.
 > 
-> Some pinned importers, such as non-ODP RDMA ones, cannot invalidate their
-> mappings and therefore must be prevented from attaching to this exporter.
-> 
-> Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO regions")
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
-> This is an outcome of this discussion about revoke functionality.
-> https://lore.kernel.org/all/20260121134712.GZ961572@ziepe.ca
-> 
-> Thanks
-> ---
->  drivers/vfio/pci/vfio_pci_dmabuf.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> TBH, I missed the FVP configuration option clusterX.max_32bit_el, which
+> can disable AArch32 support by setting it to -1 (default: 3).
+> Given this, I think it’s reasonable to emit a WARN when LSUI is enabled and
+> drop the SWP emulation path under that condition.
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+I'm asking about the default value.
 
-Alex this is quite important to pick up this cycle.
+If Arm are going to provide models that default to having both LSUI and
+AArch32 EL0 supported, then the WARN is just going to annoy people.
 
-Thanks,
-Jason
+Please can you find out whether or not that's the case?
+
+Will
 
