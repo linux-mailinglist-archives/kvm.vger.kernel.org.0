@@ -1,293 +1,209 @@
-Return-Path: <kvm+bounces-68812-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68810-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOx+N39RcWkKCQAAu9opvQ
-	(envelope-from <kvm+bounces-68812-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 23:21:51 +0100
+	id WO0kCTJRcWkKCQAAu9opvQ
+	(envelope-from <kvm+bounces-68810-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 23:20:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8928C5EB60
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 23:21:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10A865EB3B
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 23:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8B9E5869449
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 22:17:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 97B03802076
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 22:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4B0441035;
-	Wed, 21 Jan 2026 22:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEFF450905;
+	Wed, 21 Jan 2026 22:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHjsEK28"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kCTbJJ1F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C01143E9E2
-	for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 22:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1740743E485
+	for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 22:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769033547; cv=none; b=slRZeqAZr5dysz7heDpnuTKFomHuVMJ++rhiLahTt0mrWT2FWUSxKFOMaVM9gUKwdFpn3ZiOY1fUpjIhEjvakpUj4H0mvH4eiZBMtghrfeVKg1nhbhvBsM6+05KNIXiFIF0huYKUfb+J2bSX62g2DmPei2FtzV1bAbMKmf+WfKA=
+	t=1769033538; cv=none; b=XKEFEGsOspEzU1hCZqzu+9U+4GXFPeVH9lvykaDM+7A9cyeLdqHRMSC1ZdeBjBnYi6Y50y6pPiSct+4SqQ8Ft9oiFV0foAoV29JJlZvC+av4w9XxHFjPOf3gyt2fvfJIoc38KFmbQZU9J6qfGoT/g6pkCaVMxS+VfFuH27i0ORM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769033547; c=relaxed/simple;
-	bh=JAQQN7P77tr97fU7vyuVMrvCiNP4sSFAq43cZhTlmi0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NZwGhSpA0hQPP1Awaw1iIQzasoefZpAe8hDhVbHzAsNXmYOgtYj03PYTDUe08FEtMMPvqGjUks0r0ldds4tUrOIrgE46n70FD0NYepGB104gVgTnR/yx84zbvCg9EEsNHKqPNttH/eBbnPBHmECYoYs2NJ/Tdlz4+I2Kytq6jEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EHjsEK28; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6446d7a8eadso401904d50.0
-        for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 14:12:13 -0800 (PST)
+	s=arc-20240116; t=1769033538; c=relaxed/simple;
+	bh=tWIojze7Uj2EM7vNRu2AjQDw+wemuXBR7n+CBdw4tjY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Y/OCtzkWSmg1M65GqUZ+Ts0RzX0jYEbRuX4BUJ+fWKi2bQV8mtAdtne6xEF3ALUryqapE8tz8q4SexIbXgSW3bedGtHK3rwOBTKBY0PXdmRyBQJP5sLesjTnrK1V3Z1NOn3IULc9RzGbiovlYzsiu8d5xmeCN17Y1O6uKkqkG+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kCTbJJ1F; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0bb1192cbso2090085ad.1
+        for <kvm@vger.kernel.org>; Wed, 21 Jan 2026 14:12:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769033530; x=1769638330; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1769033527; x=1769638327; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2mpdsMRuLW1cRrssyJH9GNY+tfbuaJ3H6voxC/Fdtqg=;
-        b=EHjsEK28MO6BZ3JsqhVJmLDyEWLSWbkF9pNAa34jS5BeY9tLpZcpMEeX279xsvLjhw
-         e7e527ca9P3bStmp5w40AHBT5GTOyRY8eyHMQWDXr/GrKiqcnzI0/CtT7tf9PCIQW586
-         3XNnihqOCXsd+Z3PMFWnvh76nMQfVEm1tDdZdOIwCmJB9MCDfGXEpqYkAkp3edZbjArs
-         jBRej2Ac5y6gIheucYSdMpBIFToHvgAQkCfTZUeh4QaWCKG9nPKyyMFxbAgpnCEbfmXD
-         z7E1c8FIQEf2Hn1FyRU0ALXCaesSwSQ9Bakjm75EWXV9gA5hpjd1BB84YozeV5uc1oel
-         RBCg==
+        bh=C6X4IkRQuNjfo8L0KHGq4+kOsjjdeSYBGnFI9g0tePg=;
+        b=kCTbJJ1FCYTKxQGXh8Bq+ttAkMCMNGcpB0f9ZhxT/KBQEqZ47cpn/kz+2FPqX7zEV+
+         xRvBaPhvAmCYbJyAzcOYi356Z3xS7B6ORyTcui5L5K3xkjCNIY2MseF1lWldwAMQnDZI
+         TyVYr/S1UnKzbQ5huatI3x04H3Wqs+AmNlAx+NXXQ0jjTJf0Hk+AM76mQYiVK8kG/0/I
+         EoOYpGL1rebs86RlNzmQwgl4doQdSZkCZXn7qpsv6MXbwwKfR/QIr4f2KM3bfuGPJ14L
+         4MxaWn7RvAP1UBYoI3z6C6ZidkoeISKcT5xu0g9IDsEmYAYtxK1GngUKxwv2E/sE9K81
+         yKOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769033530; x=1769638330;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2mpdsMRuLW1cRrssyJH9GNY+tfbuaJ3H6voxC/Fdtqg=;
-        b=Bt4Mmb1oIvrmoWc//8Z9YMe9d4nS5zF8Alv3aUC/pHTOXcDGIIu9otis2mVyL4RC/E
-         XNXtrWuuTdlJ8kptHVqmKNrC1epONz4KbFWSn7zFfeE2nPrnf4U5m0sK6N6PyTml9SUY
-         BonXspmciFBPlTMnoXJnLqzwvZBZjCW+Fu+H6+VRZW3Io84dEp0RjnuKP01rvfaolixn
-         VjzlxJ+39dmupOF1VltUzMBo5o2iaUD+PUPpLd/56qA0G4oUjFjXIe0gNeaGRVPvgstY
-         NIdP1JoEQrfccAcI3m0E7TwpRRzMRBPoMDGIYOzxNDm6JvNV6GaoMl645mqWm2JG3TAk
-         2xcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX1kuFsAw4Sky0ViOPj0Y2U7g+uw9efpb6I9yBw7559TSrT5k/yBanD1B+x8q8kdQNAu0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYolZQNhjDyBgzG9KIXeeW580zSC52o7bNPrYV4Yf+eVxOooCU
-	p2lV/kMw/A3MZSHmkT0GZLMRMO7rVOVvcoOS2d0ksu+kU8oNGREQpveK
-X-Gm-Gg: AZuq6aLM2yh4xOOXefGwKlaCdC7JdIHhj9tkptshCWX6D9NmDfcyEOhlaYiwAiEB+bk
-	jTAl1uUTNxe1rFqHViyVyFijAFQvoYCadPR6hzwQUzn7B5Ffax0jC2nKihzerOoZFBxvymt1z5L
-	0ugf4xuFaxB/77Gh6yOqEyVL2yTVVEvQOMx/aCRDcmej5erW07sdS6lPvBMkw/zf/XYNLAjHpqo
-	T7zmDX5lgwQqqmsatwYJ4ic6ozFQNR+CpZCxsPK7sn/2rleHaM7gfo9xOaqhIOqw5bqsNXFtXbq
-	3kOtpv5OzquWbrd6a1GPIAdxovihpnqvDfyo7yoWILXyteGsrtsWCPCe6pTLyjdnoHE574q6Qpw
-	ahTlzOVe7N1ecR7SEQPInTgtnjMdDiOYRPA8wfH1pTiJhE9CJSfPFiog88C7h3tZdRlNf6nqqPY
-	RKUuoMC2dK
-X-Received: by 2002:a53:d013:0:b0:644:472d:db04 with SMTP id 956f58d0204a3-6493c84922emr5253487d50.55.1769033529707;
-        Wed, 21 Jan 2026 14:12:09 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:2::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6494080138fsm2463523d50.20.2026.01.21.14.12.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jan 2026 14:12:09 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Wed, 21 Jan 2026 14:11:52 -0800
-Subject: [PATCH net-next v16 12/12] selftests/vsock: add tests for
- namespace deletion
+        d=1e100.net; s=20230601; t=1769033527; x=1769638327;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C6X4IkRQuNjfo8L0KHGq4+kOsjjdeSYBGnFI9g0tePg=;
+        b=JCyrEuTsTwcz2qEBqiulu6r32KklqmWv4sNYI6AAVFF15OiLT4JpL6d7wNkK/8WORm
+         vGX90J/4X1ZDlw46raX26WVysWqKJs9g38MUbysjqCSC8+T10J00U4kvgqHNHrzGS02L
+         H3an9hFxFHPsw1+PbqARdnWbFyKd9Upha9Fc/BOCNr8L+S1/4frgmPV9gA3W0gMvRBJV
+         vKbbd33WLTLBa4my/Br9oJIGiaTCFlI3QLvT+wYIAtAEDrP60mGgr5pNDt3c6zWiGsUr
+         10ObFIdxU0S/UmAWxm/iZKYni0XRMUpIjFSgz+IQFpa+SI++tMq023vOUg37F9E7Ar/8
+         ZggQ==
+X-Gm-Message-State: AOJu0YxTDUsmnupCnuICYeeVKi/V7eX3wVlfFN6vD1GXeanLLjXHFVkw
+	/dCHCbhECjIrjUPcbEllRUQhD+/FpAocdWfOLsAAZ6MHi3TenG8GBPw0clJCFuFMZ+pZrDwJ1nP
+	1UqlisA==
+X-Received: from plch11.prod.google.com ([2002:a17:902:f2cb:b0:2a7:61b8:be8d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:9ce:b0:295:fc0:5a32
+ with SMTP id d9443c01a7336-2a717518e27mr198109225ad.3.1769033526812; Wed, 21
+ Jan 2026 14:12:06 -0800 (PST)
+Date: Wed, 21 Jan 2026 14:12:05 -0800
+In-Reply-To: <24665176b1e6b169441c9f6db9b5d02d073377a4.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20251121005125.417831-1-rick.p.edgecombe@intel.com>
+ <20251121005125.417831-12-rick.p.edgecombe@intel.com> <aWrdpZCCDDAffZRM@google.com>
+ <24665176b1e6b169441c9f6db9b5d02d073377a4.camel@intel.com>
+Message-ID: <aXFPNbCvKURxby1q@google.com>
+Subject: Re: [PATCH v4 11/16] KVM: TDX: Add x86 ops for external spt cache
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Kai Huang <kai.huang@intel.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
+	Yan Y Zhao <yan.y.zhao@intel.com>, Binbin Wu <binbin.wu@intel.com>, 
+	"kas@kernel.org" <kas@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Chao Gao <chao.gao@intel.com>, "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260121-vsock-vmtest-v16-12-2859a7512097@meta.com>
-References: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
-In-Reply-To: <20260121-vsock-vmtest-v16-0-2859a7512097@meta.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
- Vishnu Dasa <vishnu.dasa@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, berrange@redhat.com, 
- Sargun Dhillon <sargun@sargun.me>, linux-doc@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@gmail.com>, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.96 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-68810-lists,kvm=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[google.com,reject];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68812-lists,kvm=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,redhat.com,sargun.me,gmail.com,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[32];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[gmail.com,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:email,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8928C5EB60
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 10A865EB3B
 X-Rspamd-Action: no action
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Tue, Jan 20, 2026, Rick P Edgecombe wrote:
+> Sean, really appreciate you taking a look despite being overbooked.
+>=20
+> On Fri, 2026-01-16 at 16:53 -0800, Sean Christopherson wrote:
+> > NAK.=C2=A0 I kinda sorta get why you did this?=C2=A0 But the pages KVM =
+uses for page tables
+> > are KVM's, not to be mixed with PAMT pages.
+> >=20
+> > Eww.=C2=A0 Definitely a hard "no".=C2=A0 In tdp_mmu_alloc_sp_for_split(=
+), the allocation
+> > comes from KVM:
+> >=20
+> > 	if (mirror) {
+> > 		sp->external_spt =3D (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> > 		if (!sp->external_spt) {
+> > 			free_page((unsigned long)sp->spt);
+> > 			kmem_cache_free(mmu_page_header_cache, sp);
+> > 			return NULL;
+> > 		}
+> > 	}
+>=20
+> Ah, this is from the TDX huge pages series. There is a bit of fallout fro=
+m TDX=20
+> /coco's eternal nemesis: stacks of code all being co-designed at once.
+>=20
+> Dave has been directing us recently to focus on only the needs of the cur=
+rent
+> series. Now that we can test at each incremental step we don't have the s=
+ame
+> problems as before. But of course there is still desire for updated TDX h=
+uge
+> pages, etc to help with development of all the other WIP stuff.
+>=20
+> For this design aspect of how the topup caches work for DPAMT, he asked
+> specifically for the DPAMT patches to *not* consider how TDX huge pages w=
+ill use
+> them.
+>=20
+> Now the TDX huge pages coverletter asked you to look at some aspects of t=
+hat,
+> and traditionally KVM side has preferred to=C2=A0look at how the code is =
+all going to
+> work together. The presentation of this was a bit rushed and confused, bu=
+t
+> looking forward, how do you want to do this?
+>=20
+> After the 130 patches ordeal, I'm a bit amenable to Dave's view. What do =
+you
+> think?
 
-Add tests that validate vsock sockets are resilient to deleting
-namespaces. The vsock sockets should still function normally.
+IMO, it's largely irrelevant for this discussion.  Bluntly, the code propos=
+ed
+here is simply bad.  S-EPT hugepage support just makes it worse.
 
-The function check_ns_delete_doesnt_break_connection() is added to
-re-use the step-by-step logic of 1) setup connections, 2) delete ns,
-3) check that the connections are still ok.
+The core issue is that the ownership of the pre-allocation cache is split a=
+cross
+KVM and the TDX subsystem (and within KVM, between tdx.c and the MMU), whic=
+h makes
+it extremely difficult to understand who is responsible for what, which in =
+turn
+leads to brittle code, and sets the hugepage series up to fail, e.g. by unn=
+ecessarily
+mixing S-EPT page allocation with PAMT maintenance.q
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
-Changes in v13:
-- remove tests that change the mode after socket creation (this is not
-  supported behavior now and the immutability property is tested in other
-  tests)
-- remove "change_mode" behavior of
-  check_ns_changes_dont_break_connection() and rename to
-  check_ns_delete_doesnt_break_connection() because we only need to test
-  namespace deletion (other tests confirm that the mode cannot change)
-
-Changes in v11:
-- remove pipefile (Stefano)
-
-Changes in v9:
-- more consistent shell style
-- clarify -u usage comment for pipefile
----
- tools/testing/selftests/vsock/vmtest.sh | 84 +++++++++++++++++++++++++++++++++
- 1 file changed, 84 insertions(+)
-
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-index a9eaf37bc31b..dc8dbe74a6d0 100755
---- a/tools/testing/selftests/vsock/vmtest.sh
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -68,6 +68,9 @@ readonly TEST_NAMES=(
- 	ns_same_local_loopback_ok
- 	ns_same_local_host_connect_to_local_vm_ok
- 	ns_same_local_vm_connect_to_local_host_ok
-+	ns_delete_vm_ok
-+	ns_delete_host_ok
-+	ns_delete_both_ok
- )
- readonly TEST_DESCS=(
- 	# vm_server_host_client
-@@ -135,6 +138,15 @@ readonly TEST_DESCS=(
- 
- 	# ns_same_local_vm_connect_to_local_host_ok
- 	"Run vsock_test client in VM in a local ns with server in same ns."
-+
-+	# ns_delete_vm_ok
-+	"Check that deleting the VM's namespace does not break the socket connection"
-+
-+	# ns_delete_host_ok
-+	"Check that deleting the host's namespace does not break the socket connection"
-+
-+	# ns_delete_both_ok
-+	"Check that deleting the VM and host's namespaces does not break the socket connection"
- )
- 
- readonly USE_SHARED_VM=(
-@@ -1287,6 +1299,78 @@ test_vm_loopback() {
- 	return "${KSFT_PASS}"
- }
- 
-+check_ns_delete_doesnt_break_connection() {
-+	local pipefile pidfile outfile
-+	local ns0="global0"
-+	local ns1="global1"
-+	local port=12345
-+	local pids=()
-+	local rc=0
-+
-+	init_namespaces
-+
-+	pidfile="$(create_pidfile)"
-+	if ! vm_start "${pidfile}" "${ns0}"; then
-+		return "${KSFT_FAIL}"
-+	fi
-+	vm_wait_for_ssh "${ns0}"
-+
-+	outfile=$(mktemp)
-+	vm_ssh "${ns0}" -- \
-+		socat VSOCK-LISTEN:"${port}",fork STDOUT > "${outfile}" 2>/dev/null &
-+	pids+=($!)
-+	vm_wait_for_listener "${ns0}" "${port}" "vsock"
-+
-+	# We use a pipe here so that we can echo into the pipe instead of using
-+	# socat and a unix socket file. We just need a name for the pipe (not a
-+	# regular file) so use -u.
-+	pipefile=$(mktemp -u /tmp/vmtest_pipe_XXXX)
-+	ip netns exec "${ns1}" \
-+		socat PIPE:"${pipefile}" VSOCK-CONNECT:"${VSOCK_CID}":"${port}" &
-+	pids+=($!)
-+
-+	timeout "${WAIT_PERIOD}" \
-+		bash -c 'while [[ ! -e '"${pipefile}"' ]]; do sleep 1; done; exit 0'
-+
-+	if [[ "$1" == "vm" ]]; then
-+		ip netns del "${ns0}"
-+	elif [[ "$1" == "host" ]]; then
-+		ip netns del "${ns1}"
-+	elif [[ "$1" == "both" ]]; then
-+		ip netns del "${ns0}"
-+		ip netns del "${ns1}"
-+	fi
-+
-+	echo "TEST" > "${pipefile}"
-+
-+	timeout "${WAIT_PERIOD}" \
-+		bash -c 'while [[ ! -s '"${outfile}"' ]]; do sleep 1; done; exit 0'
-+
-+	if grep -q "TEST" "${outfile}"; then
-+		rc="${KSFT_PASS}"
-+	else
-+		rc="${KSFT_FAIL}"
-+	fi
-+
-+	terminate_pidfiles "${pidfile}"
-+	terminate_pids "${pids[@]}"
-+	rm -f "${outfile}" "${pipefile}"
-+
-+	return "${rc}"
-+}
-+
-+test_ns_delete_vm_ok() {
-+	check_ns_delete_doesnt_break_connection "vm"
-+}
-+
-+test_ns_delete_host_ok() {
-+	check_ns_delete_doesnt_break_connection "host"
-+}
-+
-+test_ns_delete_both_ok() {
-+	check_ns_delete_doesnt_break_connection "both"
-+}
-+
- shared_vm_test() {
- 	local tname
- 
-
--- 
-2.47.3
-
+That aside, I generally agree with Dave.  The only caveat I'll throw in is =
+that
+I do think we need to _at least_ consider how things will likely play out w=
+hen
+all is said and done, otherwise we'll probably paint ourselves into a corne=
+r.
+E.g. we don't need to know exactly how S-EPT hugepage support will interact=
+ with
+DPAMT, but IMO we do need to be aware that KVM will need to demote pages ou=
+tside
+of vCPU context, and thus will need to pre-allocate pages for PAMT without =
+having
+a loaded/running vCPU.  That knowledge doesn't require active support in th=
+e
+DPAMT series, but it most definitely influences design decisions.
 
