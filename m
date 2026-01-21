@@ -1,70 +1,68 @@
-Return-Path: <kvm+bounces-68680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68682-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHobId93cGktYAAAu9opvQ
-	(envelope-from <kvm+bounces-68680-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 07:53:19 +0100
+	id yDiGKCp/cGktYAAAu9opvQ
+	(envelope-from <kvm+bounces-68682-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 08:24:26 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E621552667
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 07:53:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AED352C4A
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 08:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0AC39742A72
-	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 06:47:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9053D4EAEA9
+	for <lists+kvm@lfdr.de>; Wed, 21 Jan 2026 07:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574563328FC;
-	Wed, 21 Jan 2026 06:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE9244DB90;
+	Wed, 21 Jan 2026 07:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nVGzQRda"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jd7DjhKB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA2D311C15;
-	Wed, 21 Jan 2026 06:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15793AEF2D;
+	Wed, 21 Jan 2026 07:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768977908; cv=none; b=CqY6gT5IZuxv7+mZpxcU9rJkO5k8QjGxuEuamFv8tgrpaftWx2werBkB25L0PjXWBgbc7HBEi2fvfJOUZ/0W2UPwAtj8nh2ETfmMUMXB1t2oh7qTD07qbtAFc27plTAehMiFZAh43yww51XMSHQctblC3HUqTHZGP/ZgKI68CRE=
+	t=1768980245; cv=none; b=qLw4E6WG/zaHVL11v2xg4a17p4UNx1Y0egUTqJOg4q1qElThO0G6JQHfMOKjX4hdHDVaCdn1Co9nuYtemamFnvr3JoYGxOTtlrkMnTE94aU/0FzcWtH1LXzIVmogDyVkAg4tY6S6x41mDw7c5xPZXEoeMuZIfrjRP56I5+hSD40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768977908; c=relaxed/simple;
-	bh=emFmtGjBh2YKCKjrMYKM35tuLZPSVERmIvEJbX2hJ18=;
+	s=arc-20240116; t=1768980245; c=relaxed/simple;
+	bh=OgMupP7U2Hhvx4lMbkzEIs76qr0+Su37AyQKBA6RlA8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=twNswR3nsx63RBDsdedg4WnEVadiVu575cxhozKwooDb6evA4wQcouelv5MID5JKvxrz+oCHJICyRMs8T7+oXHfxf7CZuWW06+zotAv7LFGNvsloHs9Xpx+XzDVmD/Su/jOR5oDEFF4BlRmTNghmsBDtr+de2nuvh7GflnEhpOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nVGzQRda; arc=none smtp.client-ip=198.175.65.12
+	 In-Reply-To:Content-Type; b=RSvmAkkUnc+3+gQTjG1xbUyrKHG8B+6uo6L0MpC55hE1J9BneYpQ5qVX1L6Pj0tuuidhN0YIxuySCcYIvD0Rf7biX/3hHNKXt3/zEyzTtvU4qZMGYYkUDmQ4KXdDssDPrZ6KrLa9cwhzL91m9jUUrcV4pn5C3XELSkaJF5EqpR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jd7DjhKB; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768977906; x=1800513906;
+  t=1768980243; x=1800516243;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=emFmtGjBh2YKCKjrMYKM35tuLZPSVERmIvEJbX2hJ18=;
-  b=nVGzQRda+1CHEK9EekqLyp5OqlibYwFJul60zdLf9jEUSjMgqwaUEiHo
-   usu4dvxECuh9UB/QD9Hy5XGESYk/6I0076NxYvjC5OoGnpjB5Mm4ajOnT
-   SVxku5EtQoaZ0HJCh5kjHjkBBSHlMWkcI4lg9OGQrEHow5HkpnfuS8oei
-   rc6V9kG17piVF3x7mMoR8v5ttwzEmQ60m2WBOSFaF06TGizY/fXNTuE/s
-   xVOklr+PVt6YlI4BCTF2kZlkUuR1nV7MGrxIJcHqlxSfOPS6n6h0VSkV/
-   EU1Q3ZZ1EvMlFIZU7caf9e0ipcYQV6oPYN/LM4krwKJkOtGUq8qp9Vkrm
+  bh=OgMupP7U2Hhvx4lMbkzEIs76qr0+Su37AyQKBA6RlA8=;
+  b=jd7DjhKBgH4uNixJfV+id2rY1T6uS1gYtluUqWpwtB5Y+jGT8QrsVBYv
+   rfRDTDhEJI7fcGAC2Md6+/S0XRW03FRyoQfbcd8drYVarIXLVgqQDbLkI
+   TB1dRKYUpM05/f2xZnoId2JaEQsQkkvRTUB7beHromi09kzaOo6vuyRNJ
+   5/Olj7YzVLwtmRqeUWSLSFKP/927D7anetaqymWPwGfwTRglypHPD2Z+8
+   wDXo4MTHoia4U2iOTr/K+nvu4amgbL/nl2w442xanPEr3wBZmiy2M2asu
+   mDCesUHmABLpw0e512d6fbVzw17RrzhfIzZOgszIPXbXTyhe8ihV9uKVg
    A==;
-X-CSE-ConnectionGUID: /m3vWnOlQAim0az8PAaI0w==
-X-CSE-MsgGUID: mW+s9bpOTE6o1NiCeBOvFQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11677"; a="81644458"
+X-CSE-ConnectionGUID: lBs18XChQq6JCxtUvFJiiw==
+X-CSE-MsgGUID: KFkYHrHYRhOzUStqLeDhWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11677"; a="81311241"
 X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="81644458"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 22:45:05 -0800
-X-CSE-ConnectionGUID: /EJRXMFXR7iCgu3yICXfYw==
-X-CSE-MsgGUID: yg/ujrYvSdGYG75C7dU65A==
+   d="scan'208";a="81311241"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 23:24:03 -0800
+X-CSE-ConnectionGUID: UiYlb34rThK5ejrQgR7crg==
+X-CSE-MsgGUID: /N5Rt8HkT5ugVNwzke/HJQ==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,242,1763452800"; 
-   d="scan'208";a="206415896"
 Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 22:45:00 -0800
-Message-ID: <8731e234-22b8-4ccf-89ef-63feed09e9c5@linux.intel.com>
-Date: Wed, 21 Jan 2026 14:44:58 +0800
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2026 23:23:58 -0800
+Message-ID: <79adfc1f-6a0c-404d-aa3d-10efd788615a@linux.intel.com>
+Date: Wed, 21 Jan 2026 15:23:56 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,7 +70,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 07/22] KVM: VMX: Initialize VMCS FRED fields
+Subject: Re: [PATCH v9 09/22] KVM: VMX: Save/restore guest FRED RSP0
 To: "Xin Li (Intel)" <xin@zytor.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
@@ -81,10 +79,10 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
  peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
  hch@infradead.org, sohil.mehta@intel.com
 References: <20251026201911.505204-1-xin@zytor.com>
- <20251026201911.505204-8-xin@zytor.com>
+ <20251026201911.505204-10-xin@zytor.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251026201911.505204-8-xin@zytor.com>
+In-Reply-To: <20251026201911.505204-10-xin@zytor.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-1.96 / 15.00];
@@ -94,7 +92,7 @@ X-Spamd-Result: default: False [-1.96 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68680-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68682-lists,kvm=lfdr.de];
 	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -111,8 +109,8 @@ X-Spamd-Result: default: False [-1.96 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,linux.intel.com:mid,intel.com:email,intel.com:dkim]
-X-Rspamd-Queue-Id: E621552667
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:rdns,dfw.mirrors.kernel.org:helo,intel.com:email,intel.com:dkim,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 2AED352C4A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -121,133 +119,85 @@ X-Rspamd-Server: lfdr
 On 10/27/2025 4:18 AM, Xin Li (Intel) wrote:
 > From: Xin Li <xin3.li@intel.com>
 > 
-> Initialize host VMCS FRED fields with host FRED MSRs' value and
-> guest VMCS FRED fields to 0.
+> Save guest FRED RSP0 in vmx_prepare_switch_to_host() and restore it
+> in vmx_prepare_switch_to_guest() because MSR_IA32_FRED_RSP0 is passed
+> through to the guest, thus is volatile/unknown.
 > 
-> FRED CPU state is managed in 9 new FRED MSRs:
->         IA32_FRED_CONFIG,
->         IA32_FRED_STKLVLS,
->         IA32_FRED_RSP0,
->         IA32_FRED_RSP1,
->         IA32_FRED_RSP2,
->         IA32_FRED_RSP3,
->         IA32_FRED_SSP1,
->         IA32_FRED_SSP2,
->         IA32_FRED_SSP3,
-> as well as a few existing CPU registers and MSRs:
->         CR4.FRED,
->         IA32_STAR,
->         IA32_KERNEL_GS_BASE,
->         IA32_PL0_SSP (also known as IA32_FRED_SSP0).
+> Note, host FRED RSP0 is restored in arch_exit_to_user_mode_prepare(),
+> regardless of whether it is modified in KVM.
 > 
-> CR4, IA32_KERNEL_GS_BASE and IA32_STAR are already well managed.
-> Except IA32_FRED_RSP0 and IA32_FRED_SSP0, all other FRED CPU state
-> MSRs have corresponding VMCS fields in both the host-state and
-> guest-state areas.  So KVM just needs to initialize them, and with
-> proper VM entry/exit FRED controls, a FRED CPU will keep tracking
-> host and guest FRED CPU state in VMCS automatically.
-> 
+> Signed-off-by: Xin Li <xin3.li@intel.com>
+> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Tested-by: Xuelian Guo <xuelian.guo@intel.com>
 
 Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-One nit below.
-
-[...]
-
+> ---
+> 
+> Changes in v5:
+> * Remove the cpu_feature_enabled() check when set/get guest
+>   MSR_IA32_FRED_RSP0, as guest_cpu_cap_has() should suffice (Sean).
+> * Add a comment when synchronizing current MSR_IA32_FRED_RSP0 MSR to
+>   the kernel's local cache, because its handling is different from
+>   the MSR_KERNEL_GS_BASE handling (Sean).
+> * Add TB from Xuelian Guo.
+> 
+> Changes in v3:
+> * KVM only needs to save/restore guest FRED RSP0 now as host FRED RSP0
+>   is restored in arch_exit_to_user_mode_prepare() (Sean Christopherson).
+> 
+> Changes in v2:
+> * Don't use guest_cpuid_has() in vmx_prepare_switch_to_{host,guest}(),
+>   which are called from IRQ-disabled context (Chao Gao).
+> * Reset msr_guest_fred_rsp0 in __vmx_vcpu_reset() (Chao Gao).
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 13 +++++++++++++
+>  arch/x86/kvm/vmx/vmx.h |  1 +
+>  2 files changed, 14 insertions(+)
+> 
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index fcfa99160018..c8b5359123bf 100644
+> index ef9765779884..c1fb3745247c 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1459,6 +1459,15 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
->  				    (unsigned long)(cpu_entry_stack(cpu) + 1));
->  		}
->  
-> +		/* Per-CPU FRED MSRs */
-> +		if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
-> +#ifdef CONFIG_X86_64
-
-Nit:
-
-Is this needed?
-
-FRED is initialized by X86_64_F(), if CONFIG_X86_64 is not enabled, this
-path is not reachable.
-There should be no compilation issue without #ifdef CONFIG_X86_64 / #endif.
-
-There are several similar patterns in this patch, using  #ifdef CONFIG_X86_64 / 
-#endif or not seems not consistent. E.g. __vmx_vcpu_reset() and init_vmcs()
-doesn't check the config, but here does.
-
-> +			vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(ESTACK_DB));
-> +			vmcs_write64(HOST_IA32_FRED_RSP2, __this_cpu_ist_top_va(ESTACK_NMI));
-> +			vmcs_write64(HOST_IA32_FRED_RSP3, __this_cpu_ist_top_va(ESTACK_DF));
-> +#endif
-> +		}
-> +
->  		vmx->loaded_vmcs->cpu = cpu;
+> @@ -1292,6 +1292,9 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
 >  	}
->  }
-> @@ -4330,6 +4339,17 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
->  	 */
->  	vmcs_write16(HOST_DS_SELECTOR, 0);
->  	vmcs_write16(HOST_ES_SELECTOR, 0);
+>  
+>  	wrmsrq(MSR_KERNEL_GS_BASE, vmx->msr_guest_kernel_gs_base);
 > +
-> +	if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
-> +		/* FRED CONFIG and STKLVLS are the same on all CPUs */
-> +		vmcs_write64(HOST_IA32_FRED_CONFIG, kvm_host.fred_config);
-> +		vmcs_write64(HOST_IA32_FRED_STKLVLS, kvm_host.fred_stklvls);
-> +
-> +		/* Linux doesn't support kernel shadow stacks, thus SSPs are 0s */
-> +		vmcs_write64(HOST_IA32_FRED_SSP1, 0);
-> +		vmcs_write64(HOST_IA32_FRED_SSP2, 0);
-> +		vmcs_write64(HOST_IA32_FRED_SSP3, 0);
-> +	}
+> +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
+> +		wrmsrns(MSR_IA32_FRED_RSP0, vmx->msr_guest_fred_rsp0);
 >  #else
->  	vmcs_write16(HOST_DS_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
->  	vmcs_write16(HOST_ES_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
-> @@ -4841,6 +4861,17 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->  	}
->  
->  	vmx_setup_uret_msrs(vmx);
+>  	savesegment(fs, fs_sel);
+>  	savesegment(gs, gs_sel);
+> @@ -1336,6 +1339,16 @@ static void vmx_prepare_switch_to_host(struct vcpu_vmx *vmx)
+>  	invalidate_tss_limit();
+>  #ifdef CONFIG_X86_64
+>  	wrmsrq(MSR_KERNEL_GS_BASE, vmx->vt.msr_host_kernel_gs_base);
 > +
-> +	if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
-> +		vmcs_write64(GUEST_IA32_FRED_CONFIG, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_RSP1, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_RSP2, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_RSP3, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_STKLVLS, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_SSP1, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_SSP2, 0);
-> +		vmcs_write64(GUEST_IA32_FRED_SSP3, 0);
+> +	if (guest_cpu_cap_has(&vmx->vcpu, X86_FEATURE_FRED)) {
+> +		vmx->msr_guest_fred_rsp0 = read_msr(MSR_IA32_FRED_RSP0);
+> +		/*
+> +		 * Synchronize the current value in hardware to the kernel's
+> +		 * local cache.  The desired host RSP0 will be set when the
+> +		 * CPU exits to userspace (RSP0 is a per-task value).
+> +		 */
+> +		fred_sync_rsp0(vmx->msr_guest_fred_rsp0);
 > +	}
->  }
+>  #endif
+>  	load_fixmap_gdt(raw_smp_processor_id());
+>  	vmx->vt.guest_state_loaded = false;
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 645b0343e88c..48a5ab12cccf 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -227,6 +227,7 @@ struct vcpu_vmx {
+>  	bool                  guest_uret_msrs_loaded;
+>  #ifdef CONFIG_X86_64
+>  	u64		      msr_guest_kernel_gs_base;
+> +	u64		      msr_guest_fred_rsp0;
+>  #endif
 >  
->  static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
-> @@ -8717,6 +8748,11 @@ __init int vmx_hardware_setup(void)
->  
->  	kvm_caps.inapplicable_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
->  
-> +	if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
-> +		rdmsrl(MSR_IA32_FRED_CONFIG, kvm_host.fred_config);
-> +		rdmsrl(MSR_IA32_FRED_STKLVLS, kvm_host.fred_stklvls);
-> +	}
-> +
->  	return r;
->  }
->  
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index f3dc77f006f9..0c1fbf75442b 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -52,6 +52,9 @@ struct kvm_host_values {
->  	u64 xss;
->  	u64 s_cet;
->  	u64 arch_capabilities;
-> +
-> +	u64 fred_config;
-> +	u64 fred_stklvls;
->  };
->  
->  void kvm_spurious_fault(void);
+>  	u64		      spec_ctrl;
 
 
