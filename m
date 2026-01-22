@@ -1,285 +1,245 @@
-Return-Path: <kvm+bounces-68897-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68900-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OC8RMjRBcmnpfAAAu9opvQ
-	(envelope-from <kvm+bounces-68897-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:24:36 +0100
+	id oNMyDjpIcmnpfAAAu9opvQ
+	(envelope-from <kvm+bounces-68900-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:54:34 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 752C468B1E
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:24:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF94669491
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:54:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C82D97C16E0
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 14:31:02 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4C0137CC231
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 14:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E61352931;
-	Thu, 22 Jan 2026 14:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6A734FF75;
+	Thu, 22 Jan 2026 14:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lkA8fI+m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BGybcmTY"
 X-Original-To: kvm@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010048.outbound.protection.outlook.com [52.101.85.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589ED34D383;
-	Thu, 22 Jan 2026 14:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769092211; cv=fail; b=u3vyfB6l32fZdnJU5o9/1IJSLFwyKj1nj2sf3KET6fP5E3bjtJvM1Vj/u1qTRsIHQR2u93tXOFpuGZs349rJkoOyCsNg53wDH55ODQag8wx82R894V9ouxBIXSoMH4HTaXkaH7s2SaQ0Qa9mvEPD/UQG4ee6g86eoZDqcAAek/s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769092211; c=relaxed/simple;
-	bh=ybXwTzIz5Oud/TybGyiq4TGmG2xjLhUDqnOm3cpWCk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=g/NGe/lfXvLAsvOzrEroPPIGWUn/xPnekWhaZGOpUCYYNQWaEuhfjPRNSQJMJnhVAKNpsGS8Q5PQZWR2BxP4FGKuuPq8SmptkURyeCwKf5pHrFovdIZdVZN+1rAfROl+tFmVnoYmFIrgLbcAyc9iOb3s1mYpxM3u5vnsMGuiWQA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lkA8fI+m; arc=fail smtp.client-ip=52.101.85.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=caX409E7m1QqncXi9jgbd/UJkeh7FBjxBT1VBEfAJF1RvVUGfDiCn+acDYn5y3s0Fo8cNmH/26pRNxBIzw/GHyuKH8jrx07nCGANN4yf9OczaMgBbQ2StAm11XJos1LhCeiXGhSeyeufK6G1KbufGkYMQGKGnqUGjMQN4RhZlXrjZ7br1CG704zUdJb/UFUSO5o17B7sKMQjct0qhyO2a0GczeqBPDIfwxbuD3fEnFrVL692Y9nuRMCJreSaYP2iifaCXxHtyX3P55yYb6mYZstbaYpNq6sO3HeRhx9CbnyiRR5hlaz61vj3RknLFV2PG/ZCjpX8OVQzNsHALYum3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2QaUP5GqYvOIp6c/Vutnl+kWuxjmaAMD80HBgyVxwYw=;
- b=G86kDG4vXsQAj3F4XDkYMvUVzLTZ9SKlKUjf4HU5NoNZQlne2Rr/CIKnNCyxuhtpn86lh4z1TOs9wvUGtZHLqlpQA+lBcBRjyE2zFH6lW34rL8BObUFObt6nKfPRKM3ogFxa8n2YBSXikgxUdANAzP6R2IyMQ5pwL88HfgnmWnW2kNmF1iQx5oVqIKTlnXI4u/25jMPKk7G3cDz8xFOGFPspcmIobkdm5AJyqZh1DQsP8Job1ISCtJPM3zuCkaE5AtUGLNHLVqcEV/H3iztH6zM7DyDzxCXGv8pDa/2nqNLhUHCAeelVIioCwyy09yYGS8B/FvlB8a7fnjAkIXrIKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2QaUP5GqYvOIp6c/Vutnl+kWuxjmaAMD80HBgyVxwYw=;
- b=lkA8fI+m+AtmPWyAoGlGeRvtD3k4aUiQxhdE6+MPbjtWpo92vdLLoPZSeMcpvJua23h6iXhXArhw6AdjWlzcSotJf3AYhsQeN+eUo4K2HcqSqAJAbCopi+wWQN/dM1qdD77GHnn31nAO+Yrmmf4UuXz8RJeX7wjA+GJ0pl6xLjWmX8z1RtmBgQjndw3sXrkMrWGRaaCLYMqAgfSBFYw8dk8lEolWbCCahXnTusmdVZ/GRBa5ck6Ti/AuTSFxfN914aIghm5/Oy1PEcuz1XoafnXS13JeNgMzKFR0SRSo2/gW5jA1weixPBYZnCA6uX1S00zY/ewhgfzZdUfp328Qrg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
- by IA0PR12MB8279.namprd12.prod.outlook.com (2603:10b6:208:40c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.9; Thu, 22 Jan
- 2026 14:30:01 +0000
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::1b59:c8a2:4c00:8a2c]) by LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::1b59:c8a2:4c00:8a2c%3]) with mapi id 15.20.9542.010; Thu, 22 Jan 2026
- 14:30:01 +0000
-Date: Thu, 22 Jan 2026 10:29:59 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Matthew Brost <matthew.brost@intel.com>
-Cc: Zi Yan <ziy@nvidia.com>, Balbir Singh <balbirs@nvidia.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Alistair Popple <apopple@nvidia.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Francois Dugast <francois.dugast@intel.com>,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	adhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-	linux-mm@kvack.org, linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-Message-ID: <20260122142959.GA1569362@nvidia.com>
-References: <aWsdv6dX2RgqajFQ@lstrano-desk.jf.intel.com>
- <4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
- <20260119142019.GG1134360@nvidia.com>
- <96926697-070C-45DE-AD26-559652625859@nvidia.com>
- <20260119203551.GQ1134360@nvidia.com>
- <ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
- <EE2956E3-CCEA-4EF9-A1A4-A483245091FC@nvidia.com>
- <20260120135340.GA1134360@nvidia.com>
- <F7E3DF24-A37B-40A0-A507-CEF4AB76C44D@nvidia.com>
- <aXHPkQfwhMHU/oP6@lstrano-desk.jf.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXHPkQfwhMHU/oP6@lstrano-desk.jf.intel.com>
-X-ClientProxiedBy: BL0PR02CA0104.namprd02.prod.outlook.com
- (2603:10b6:208:51::45) To LV8PR12MB9620.namprd12.prod.outlook.com
- (2603:10b6:408:2a1::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08B130BB83;
+	Thu, 22 Jan 2026 14:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769093636; cv=none; b=VT3Rbvcra1Qya2FYnk6wMxA+t8arkCTt8cwPtZW2ZbCLlghMez0zOvwYkAVxb8WnBfPtiNzhQKwIFtif5kjI3Mms+Rme/qF6gUOeLm49/37Y94aGtEp8SOQwpcFY0jflpk7NuKhS//CWuqkORHqYkgs7dbi0Zzbo9LA835UOFW8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769093636; c=relaxed/simple;
+	bh=H6gTOF+DyDj27GbSd5bl3JAxET7cibneMu2y65c/FqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZIQPbjLBB5a4qONmRO825OFKGT5sqTnFI7v8Fb+6PjzywjVUmyAdfHhgp1wzfhPuWxOak3MKy6LXW255acvn6VDoGgqfi4IJIRtFqn9NBn2j4DfzVNvYblkI+pBOSiU2F7ge4xFXa9TVtHH74seXa3XEzfgDCMfxQS+tKR5QbIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BGybcmTY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03277C116C6;
+	Thu, 22 Jan 2026 14:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769093636;
+	bh=H6gTOF+DyDj27GbSd5bl3JAxET7cibneMu2y65c/FqY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BGybcmTY925gF+7wqr9qE8CUyFtb6tQpxGNFDS9dM8dwTOeAceLBUtBh+cWt/9x4H
+	 BkmCpC/Vg9UcwjwriAnyLxalX1R+EOqRBrwsUvzTv9/tNVJpQUh8olv3v72E0oe8cX
+	 BOGt4VtyM/UmwMhX9nI9FJ2jExU6btOOEbHh8L1UzLdNwKTSVog8Td9BXb8BlnZF8E
+	 gOaQajl4BiYd9a5vnA/XBOU47NN/9yrMQvE7e6/TjOG9IVjlVMb8Ckz9rptyYKfMaZ
+	 o/pRcjAM5s+I91LS6V1a4ZBy88Mg1aD3W0/VeGOs1EuhoJ5SPoxUtlzoX/DJ6b1Q9C
+	 1f7mmJ/BrGVZA==
+Date: Thu, 22 Jan 2026 20:19:30 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>, 
+	Vasant Hegde <vasant.hegde@amd.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [RFC PATCH 2/3] KVM: SVM: Fix IRQ window inhibit handling across
+ multiple vCPUs
+Message-ID: <aXI1EAolDjVbp_9W@blrnaveerao1>
+References: <cover.1752819570.git.naveen@kernel.org>
+ <26732815475bf1c5ba672bc3b1785265f1a994e6.1752819570.git.naveen@kernel.org>
+ <aWf0zQ6vA0Hmon2r@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|IA0PR12MB8279:EE_
-X-MS-Office365-Filtering-Correlation-Id: af31d2c5-35a7-45b9-15e3-08de59c2b988
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VmgvWEQ5TWU2VlZtTTVqOW9VcXNjN1NCbnI1aVJHTE5KQWdkNEF6Rlg5TnZY?=
- =?utf-8?B?d2lZV2MrVkVkeWJ4R1JEQmVub0pTN2pYT2xPM2JxT1EwOHU0aEdUR1RXK2cv?=
- =?utf-8?B?ZUpUOEl6T1F6L3ExK1ZYL21EZUJoWUs5NXJ3bW9sY2piV2RoMDBTbEp6c0FC?=
- =?utf-8?B?aDhaZUFsazQ4TERQaFE3SWJLUEpGMEN0TGlhemI1L2Ywb090UWpTdG5oSmlk?=
- =?utf-8?B?YXkxVThGbzlyMllXK2JzTEI3eVJVNzBaYWROcG51MlVibnFBdzNqNTB1RlQ3?=
- =?utf-8?B?b003Umx6WnhVL0hrY3NIcDIwYmtSQTdaZ0lQMkRSYjRkNi90d1J3ajVQbk5X?=
- =?utf-8?B?c09UMWxESjgvcEhLLzF1UW5WTWFhQlpLS2ZmV3NqdytKQmNkcUlLVFVYR1pW?=
- =?utf-8?B?U2FUMzZxRkVHT0ltaDdXMytJL1A3ZG9NREkxMXhuQXU0ckdWZ085MHVFakRL?=
- =?utf-8?B?Z2F1V3ZJbWp4QTYxV0ZWbVBYZXYxcU9QRldNQ1RJOFI4ek9tcFN4a3ZwM3lM?=
- =?utf-8?B?T1ZBK3dqeXhDcGx6eGRDR1JhdldRdURjMlp3S2NneFJ0SWNmYU1ldFdVb1N3?=
- =?utf-8?B?TWZkL1ovUmhxRnZpNzR5cm1rb3Vjb0lNbTFSOTVYenZhaHhhdldBdWtRc2Fw?=
- =?utf-8?B?TUQrY2svWU9GNkdDbTNGa0U0Nm1rWjVYNElDZUlYSXh4MGFiRFBWNElCWnlo?=
- =?utf-8?B?SDMrRzIyTmZnalBCbmhUdXlZL09xQ0hjcktTdlJsUk9IMnJvTk0xSnJ1b3Zh?=
- =?utf-8?B?OTBMWmc0M2p1bHRVMWc0aG1wNHdpMCswa3hTNFhCUnIwK2ZKL1BxckNzR1pa?=
- =?utf-8?B?cmZNQTdQSE85Tkd4NzFqUXRlUmoyNnh2MnhZU2JVeUcyMUhEamN0WWV2d1pt?=
- =?utf-8?B?YmpQcnRkRVl1QkVkYzRvRm4wdjQrekMvTy91M0hoVEpscGxxcUpSalZoT3N3?=
- =?utf-8?B?TEFPSVpnNWt6WUt4ckdUWkNjNElLbVFnZG0wOWxVaDlRNnJpOE96MEdrK0tW?=
- =?utf-8?B?TExHMzBPaldEaDZibDdadDhvTXFxa0p3KzVUdjFYQjhkMlViRW55eUhCb2lS?=
- =?utf-8?B?eGtYZC82bkpRelJFZTZGdm4ycEZqZjluSUFzMWdFZ2ZOT25iUnlGMVhhZ0JU?=
- =?utf-8?B?WEdKZm81S2RiOG5xQVJvOUkrWXZmazJXTGYrUitoYlh3ampuSlZhWkV0S2xj?=
- =?utf-8?B?R2hoVjlRVFpGMUgzUXFHUW5jc3ZWUXVBYlJscXRzSzhaK1lqTFFuRW04T1Iy?=
- =?utf-8?B?YjVjSzdsNW1IclBPa1JnQ2h1azRTeXAxQi9TVHdmNkRZZFVHMS93eGJRbUFw?=
- =?utf-8?B?czJPQml0YlhpTFVVWU5CZGt1NW5HUWRSQnZxT2FXb2NnSHVZenhoMldLc0FB?=
- =?utf-8?B?VFhwT0xkemZnaXh5bjVmaEorVmRid2JUWjhoZ2RZMEN0eDY5UnpLQ0RSWi94?=
- =?utf-8?B?UG54dDdkMUZSand6VUd1ZkhIRS90UVVVOUhnY0NieU1aUnF6ZW9ja2ZCL1FN?=
- =?utf-8?B?Nmx3S2RrdUtabXZJWEorZHpwOEZVZUdMcVo4Tms4TDVuM3RjSk50WjM2bHVk?=
- =?utf-8?B?SDR3N0RyVVlzSW1sSzNZeUhMTWErQTdYc2NaaUhBdTJxREVJMjdFWWMrekZv?=
- =?utf-8?B?NTRsM0k2ZW1jYW9vcExOUEFHOG1zNC9kOUxWUUZnaG4yV0o0dnhNYWNydWZz?=
- =?utf-8?B?VTBveEN4TTN2YmZDejU3aWhZSmRkZmFTRkZPTHB4aUI0a0R6SjhFQXhCRnpl?=
- =?utf-8?B?bUFHandxUDVVOEQ5ZlVkMUEwRVFpS1FocWtXaWZLOWVVUHB0U2dsUnRQWU1T?=
- =?utf-8?B?WUdpeVBSWXNyT3JQYXI5QzVYZ2xIOWpieCt2R3l2alZFRGFXNldRTmtEaC9Q?=
- =?utf-8?B?WFdGdFVBLzhENlpkNTQveVpjRi9kZVNZS293ZVI5aW80aTgvcGU3aTdWTE9U?=
- =?utf-8?B?cjIxcHFKTmJ6ay9nY1ZSR3VZMUR2bDlVYnEwTVhJVThwOTVnUGZoZzdrR25w?=
- =?utf-8?B?OEI4WkJmTGtvNlVhK3lwdW5GclhlYVdyZzh0ejNLcFpKeDNUYzdDdnVnRjlu?=
- =?utf-8?B?WnoxY2c2RVFwR0NYdmR5ZzNiTU45ZWsvbnc1NUp3YVE4ZzdWdHkwdXE0dWR5?=
- =?utf-8?Q?Q6tk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y1R3N1duV1d2MVJNSitWaERWMUV1RzVQVzl5NE9oYjRqYkMzSFJDK3g2LzJt?=
- =?utf-8?B?UFJ6NTZRMnhpV3ZsTWtXNzVjOC80aGJrWENhRjdpY2hBWDYyREFCYnd2UWNY?=
- =?utf-8?B?Q29YdC9kNTNxTDlBRTkvaHNtbllLUkhnWVFScTQ1TTlzWnpLOEorek0zSmdZ?=
- =?utf-8?B?Nko5Qis1YlZKUWNTb1Nma2lxTnpJUUVaTWR0MkdnNXdWU0ZrdGdoLzA3UjVp?=
- =?utf-8?B?U1Vsbml1cU5FWXY2Q2R0T0ppQW0zOUozbHBDT1ZEYStWOGYvQWdGcFpiWjlQ?=
- =?utf-8?B?aFNpVG44RmJ6MzNCSEh3czJDSCtxd2xPQzlHU0txMUthWGpCdkRvN2tlZDln?=
- =?utf-8?B?QTBZSkwxamp4eDVWNGRTOUU0R3FVT1RNMGdDWkl3YzdoVlVDUEhjY2kraUlJ?=
- =?utf-8?B?QzlzdTIvYnJmUkk5RDV4SDZMdzNUbFAvcC9sTkxkdnFzc29ndmt6T1oyNjlv?=
- =?utf-8?B?UlQralk1dUh0Mm9XanNhNktjUUd2TEtmaEVxak1NNXByMi93Qjh0VHF5UUNL?=
- =?utf-8?B?dm05MmtCMnZHcVc2eHZNSmhCVGtKUE5POWhRdWV1UnVoU3Y2WG9PQVlXbHRL?=
- =?utf-8?B?emh2Znk4UDVST09HTExYQkI2aGU4bVdYaENGZDlDRHpoZ0drTDJtMUNGWnM3?=
- =?utf-8?B?ME9tSnU1cUxUMkxGTlRKREFlWmQ4bHVLby9yM21yODJMUFVDL0R6SHdpTkE1?=
- =?utf-8?B?WkJJYnI2V1F6YVVLTCsxU044QmEybnhFQmc0emwyaS9PMWpmb09TU2dkSjlT?=
- =?utf-8?B?MGZKeGNDQlI3ZlRwU3dBRHlrNVJHMy8wdE5tMzI1dTVpaFFOVFFUT0tzZStk?=
- =?utf-8?B?M2RWZDJ6cjc2cFB2b0U1QU9Rc1phR0J0UnVZT3ZQOStRSEVIQ1dzQlB1d3J3?=
- =?utf-8?B?NXJjWHcvZ2JLemt0QWFBT3A2TlVDMFhFWlBBZnZFRG5mUCs5cW5DSkpSblNx?=
- =?utf-8?B?Q3RtcG1jSHFReWhPVTJxOEN3TVFqcE9uMlNPdmdvTUlQVXlJMGVFZ3o0OU9L?=
- =?utf-8?B?dzZYZ1d0RjVMQUJlZnlMVXlLTmE3SWU3K2NRVExzVm5MNHJhaEQwbks1VWsr?=
- =?utf-8?B?QjhaQXFmTDB1cXZySGVpaldSOVdHeHNnWWoxRWN4aTltMDZ2M1pyRzM3RXl0?=
- =?utf-8?B?NUxvV21YcUNPaDc1UVY5VXRLK2ZJTFdSWFlhR3Z6Z2NEazkvSkk3ZFVnL0hX?=
- =?utf-8?B?T1RkUTk5UzNLSENyMFlCaWdxeCtFV2I2MnF4VHIrVVMyVVFEMzIydFpDa04z?=
- =?utf-8?B?TERtdGFVL3lXSTlWTUFXdzIxRmU0bmNFZHM2MHJoSCtSZUNvS0k4cllsV0NO?=
- =?utf-8?B?a0cyUEYrQTMvRzNVdzZNSC8zUk94dzY3UnMzbHJOVTZRS2Z4S3NsYWsvRXZX?=
- =?utf-8?B?Qm9XN0xta2RwRWZPL2liVXBGc1dSeDhxMXpQaGdCYjA0QldmTWZsNFlKSU1L?=
- =?utf-8?B?c2lxRStrRjQ3VldCMzBkRkZ5K1dsVzlhS2tnYkRQVVMyV0hWQjlVSzluRm51?=
- =?utf-8?B?UWJzN1Mzbk1WK0N4VnpxYTMxakJXZVRHdHE3TFZndG42QkhKR1ZsdjJHMU0y?=
- =?utf-8?B?aS8rNmoremxpZkpPMFh5ZE92cnRUVFNWa3BWMm5oR1l6N1BuTVduWHVqTGVl?=
- =?utf-8?B?a0xHUzhMMmZkcW52cHpoc1hhSnNOYWJPN3FncCtMSWRvOXdUNGJOakFNdjlr?=
- =?utf-8?B?ck1VMGRkM2tjMm5EN2FMRWpBQ2JQU3ZPMEVnSjcxRHRDVWl0dHBBTDFKQjBQ?=
- =?utf-8?B?cnB1Vk1ZZXU1cW5MeWJlUjM2dFNIeWxQOGsrUFI2TUUvVjZqSjllQlByTVZ1?=
- =?utf-8?B?MDBRUzFBNEJZS3VnTFV6TVBXdWR6aGIzTU16Zm5ZSHpLeWp0UlkzUEJyMUcz?=
- =?utf-8?B?bzJETlAxWk0rNVAzWDNpWWZSWGZqazN0b1NqVGUzWTlGZi9PZFdySHJxQ2lD?=
- =?utf-8?B?aWs3em9oaDIvWDJ3VTIyRVYyQnZqZGRwUUtKY0NXUTU4cXZ6Rnp5WTBMNmxw?=
- =?utf-8?B?ZGFkZjJVaE1ZTVdBWktEU0hLdFlnZE56S2hlWUlyTzB2M08xcUtTeWpWYURt?=
- =?utf-8?B?aVA5VkE0VFhqcEZDRGxaajRCMzRvRlpHYmhIckpYVFpQNVQ5NkZQTk50TkJK?=
- =?utf-8?B?MzFHUHpQTzdnSE80VVNLelB1V2E2cUpZL0JSNnJrUk4vOVNEREtpbm1Cc0NP?=
- =?utf-8?B?OTZuYXdaM2szRmxaVklWMThESHdsb1lmSlRyRHZOZGJoVGVaSFVwRzZTV21C?=
- =?utf-8?B?UzhSUHF0T1lzWEs5L013Tlp4MktCMXhXWjZiSkVLSEFUOTk5U3hXV3FkOE1N?=
- =?utf-8?B?eGJsWHROMjNoRER6Vk1lRHpUVjN2dW5MUk84NmJWWHVzOHl1S1BXQT09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af31d2c5-35a7-45b9-15e3-08de59c2b988
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 14:30:00.6878
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WMJPdEw0D7v0Xt9DFJ40B5SBzLyBkd4jPHbbNmeJ1FIITNVOyhXQVoaQ9ArhPrKx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8279
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWf0zQ6vA0Hmon2r@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[39];
-	FREEMAIL_CC(0.00)[nvidia.com,infradead.org,suse.cz,intel.com,lists.freedesktop.org,linux.ibm.com,gmail.com,ellerman.id.au,kernel.org,amd.com,ffwll.ch,linux.intel.com,suse.de,redhat.com,linux-foundation.org,oracle.com,google.com,suse.com,lists.ozlabs.org,vger.kernel.org,kvack.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68897-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	TAGGED_FROM(0.00)[bounces-68900-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[nvidia.com,reject];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[naveen@kernel.org,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,nvidia.com:mid]
-X-Rspamd-Queue-Id: 752C468B1E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: EF94669491
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026 at 11:19:45PM -0800, Matthew Brost wrote:
-> - Why is Intel the only one proving this stuff works? We can debate all
->   day about what should or should not work — but someone else needs to
->   actually prove it.i, rather than type hypotheticals.
+On Wed, Jan 14, 2026 at 11:55:57AM -0800, Sean Christopherson wrote:
+> Finally mustered up the brainpower to land this series :-)
 
-Oh come on, NVIDIA has done an *enormous* amount of work to get these
-things to this point where they are actually getting close to
-functional and usable.
+Yay! :)
 
-Don't "Oh poor intel" me :P
+> 
+> On Fri, Jul 18, 2025, Naveen N Rao (AMD) wrote:
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index f19a76d3ca0e..b781b4f1d304 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1395,6 +1395,10 @@ struct kvm_arch {
+> >  	struct kvm_pit *vpit;
+> >  #endif
+> >  	atomic_t vapics_in_nmi_mode;
+> > +
+> > +	/* Keep this in a cacheline separate from apicv_update_lock */
+> 
+> A comment won't suffice.  To isolate what we want to isolate, tag things with
+> __aligned().  Ideally we would use __cacheline_aligned_in_smp, but AFAIK that
+> can't be used within a struct as it uses .section tags, :-(
+> 
+> And revisiting your analysis from
+> https://lore.kernel.org/all/evszbck4u7afiu7lkafwcu3rs6a7io2zkv53rygrgz544op4ur@m2bugote2wdl:
+> 
+>  : Also, note that introducing apicv_irq_window after apicv_inhibit_reasons 
+>  : is degrading performance in the AVIC disabled case too. So, it is likely 
+>  : that some other cacheline below apicv_inhibit_reasons in kvm_arch may 
+>  : also be contributing to this.
+> 
+> I strongly suspect past-you were correct: the problem isn't that apicv_nr_irq_window_req
+> is in the same cacheline with apicv_update_lock, it's that apicv_nr_irq_window_req
+> landed in the same cachline as _other_ stuff.
+> 
+> Looking at the struct layout from kvm-x86-next-2025.01.14, putting apicv_irq_window
+> after apicv_inhibit_reasons _did_ put it on a separate cacheline from
+> apicv_update_lock:
 
-> - Intel has demonstrated that this works and is still getting blocked.
+I suppose you meant kvm-x86-next-2026.01.14 (2026 and not 2025). I'm 
+fairly certain that when I tested this, all three of apicv_update_lock, 
+apicv_inhibit_reasons and the irq_window count were ending up in the 
+same cacheline. I specifically tested moving each of those out to a 
+separate cacheline (including apicv_inhibit_reasons), but as far as I 
+remember, the only time I noticed a difference was when moving the 
+irq_window count elsewhere.
+> 
+> 	/* --- cacheline 517 boundary (33088 bytes) was 24 bytes ago --- */
+> 	struct kvm_apic_map *      apic_map;             /* 33112     8 */
+> 	atomic_t                   apic_map_dirty;       /* 33120     4 */
+> 	bool                       apic_access_memslot_enabled; /* 33124     1 */
+> 	bool                       apic_access_memslot_inhibited; /* 33125     1 */
+> 
+> 	/* XXX 2 bytes hole, try to pack */
+> 
+> 	struct rw_semaphore        apicv_update_lock;    /* 33128   152 */
+> 
+> 	/* XXX last struct has 1 hole */
+> 
+> 	/* --- cacheline 520 boundary (33280 bytes) --- */
+> 	unsigned long              apicv_inhibit_reasons; /* 33280     8 */
+> 	atomic_t                   apicv_irq_window;     /* 33288     4 */
+> 
+> 	/* XXX 4 bytes hole, try to pack */
+> 
+> 	gpa_t                      wall_clock;           /* 33296     8 */
+> 	bool                       mwait_in_guest;       /* 33304     1 */
+> 	bool                       hlt_in_guest;         /* 33305     1 */
+> 	bool                       pause_in_guest;       /* 33306     1 
+> 	*/
+> 	bool                       cstate_in_guest;      /* 33307     1 */
+> 
+> 	/* XXX 4 bytes hole, try to pack */
+> 
+> 	unsigned long              irq_sources_bitmap;   /* 33312     8 */
+> 	s64                        kvmclock_offset;      /* 33320     8 */
+> 	raw_spinlock_t             tsc_write_lock;       /* 33328    64 */
+> 	/* --- cacheline 521 boundary (33344 bytes) was 48 bytes ago --- */
+> 
+> 
+> Which fits with my reaction that the irq_window counter being in the same cachline
+> as apicv_update_lock shouldn't be problematic, because the counter is only ever
+> written while holding the lock.  I.e. the counter is written only when the lock
+> cacheline is likely already pulled in in an exclusive state.
 
-We generally don't merge patches because they "works for me". The
-issue is the thing you presented is very ugly and inefficient, and
-when we start talking about the right way to do it you get all
-defensive and disappear.
+Indeed.
 
-> - Given the current state of the discussion, I don’t think large device
->   pages should be in 6.19. And if so, why didn’t the entire device pages
->   series receive this level of scrutiny earlier? It’s my mistake for not
->   saying “no” until the reallocation at different sizes issue was resolved.
+> 
+> What appears to be problematic is that the counter is in the same cacheline as
+> several relatively hot read-mostly fields:
+> 
+>   apicv_inhibit_reasons - read by every vCPU on every VM-Enter
+>   xxx_in_guest (now disabled_exits) - read on page faults, if a vCPU 
+>   takes a PAUSE exit, if a vCPU is scheduled out, etc.
+>   kvmclock_offset - read every time a vCPU needs to refresh kvmclock
+> 
+> So I actually think we want apicv_update_lock and apicv_nr_irq_window_req to
+> _share_ a cacheline, and then isolate that cacheline from everything else.  Because
+> those two fields are effectively write-mostly, whereas most things in kvm-arch are
+> read-mostly.  I.e. end up with this:
+> 
+> 	/*
+> 	 * Protects apicv_inhibit_reasons and apicv_nr_irq_window_req (with an
+> 	 * asterisk, see kvm_inc_or_dec_irq_window_inhibit() for details).
+> 	 *
+> 	 * Force apicv_update_lock and apicv_nr_irq_window_req to reside in a
+> 	 * dedicated cacheline.  They are write-mostly, whereas most everything
+> 	 * else in kvm_arch is read-mostly.
+> 	 */
+> 	struct rw_semaphore apicv_update_lock __aligned(L1_CACHE_BYTES);
+> 	atomic_t apicv_nr_irq_window_req;
+> 
+> 	/*
+> 	 * As above, isolate apicv_update_lock and apicv_nr_irq_window_req on
+> 	 * their own cacheline.  Note that apicv_inhibit_reasons is read-mostly
+> 	 * even though it's protected by apicv_update_lock (toggling VM-wide
+> 	 * inhibits is rare; _checking_ for inhibits is common).
+> 	 */
+> 	unsigned long apicv_inhibit_reasons __aligned(L1_CACHE_BYTES);
 
-It did, nobody noticed this bug or post something so obviously ugly :P
+Nice, isolating those in a separate cacheline looks to be helping.
 
-> @Andrew. - I'd revert large device pages in 6.19 as it doesn't work and
-> we seemly cannot close on this.
+> 
+> I also want to land the optimization separately, so that it can be properly
+> documented, justified, and analyzed by others.
+> 
+> I pushed a rebased version (compile-tested only at this time) with the above change to:
+> 
+>   https://github.com/sean-jc/linux.git svm/avic_irq_window
+> 
+> Can you run you perf tests to see if that aproach also eliminates the degredation
+> relative to avic=0 that you observed?
 
-What's the issue here? You said you were going to go ahead with the
-ugly thing, go do it and come back with something better. That's what
-you wanted, right?
+Yes, this definitely seems to be helping get rid of that odd performance 
+drop I was seeing earlier. I'll run a couple more tests and report back 
+by next week if I see anything off. Otherwise, this is looking good to 
+me and if you want to apply this to -next, I'm fine with that:
+Tested-by: Naveen N Rao (AMD) <naveen@kernel.org>
 
-Jason
+
+Thanks for all your help with this (and Paolo)!
+
+
+- Naveen
+
 
