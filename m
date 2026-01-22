@@ -1,256 +1,191 @@
-Return-Path: <kvm+bounces-68906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68907-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DJsOCFXcmlUiwAAu9opvQ
-	(envelope-from <kvm+bounces-68906-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 17:58:09 +0100
+	id KMWcIC9ZcmkpiwAAu9opvQ
+	(envelope-from <kvm+bounces-68907-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 18:06:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 210286A805
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 17:58:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A2D6AC74
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 18:06:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B192A307F7CD
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:52:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1B2113055665
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:51:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236A93542E7;
-	Thu, 22 Jan 2026 15:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E295A3D649A;
+	Thu, 22 Jan 2026 16:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hD1TXWNG"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F298F1A9F88
-	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 15:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7881E3D647A
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 16:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769097280; cv=none; b=GgE1nEvBndzX+y87yn8t+rTm1P1w/M4KgyNp4h7AT0FPGBHdjw2ZRcr55luSJ7RPLBoSkBBgfyAr+TavNyb0PoDgkxeodt0rCFkIdkOZlHgcAy+qG1NN6mtz2VJKsvIKbRFygtrHYEr+77fg3TGumgA0UY/9iiDXhyVwwgvSGwY=
+	t=1769097638; cv=none; b=pmN09+EC+mNJjGayf0dHgwRHGAi4h7bNMQT9ZZzOvysdXhu5S+nezb9mxFMjS/ox7CkqvWSe2HRQ6/Q6TQhVEonkyebw3RH9hTn9st5n9u5rCE32RBqghtUcUCkiYCQQFWSWiR6DuoTPt/w32APkqXCED7m2TbEUpBoZP282IEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769097280; c=relaxed/simple;
-	bh=pmZ573aErmXEJQfvpdj39t6Luwct0Y4/EMwrSrD2q8g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OrIwL2Dyi5ibOpTrtlq/pZb2hspvH3GZFbSRjZ3h7V2XJn4ubXp0epCjkrcTD0o71Rf1Wf/F9WxwP5Cvc75QLEkP2AcC/7rVTuhCP8uW8gwqxgqt0h2vi+oh2hsCkTwZ+SZyCzDqm8EhSPTW1HeYKgPMIqK4NBawmeMg+WnxlW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9620B1476;
-	Thu, 22 Jan 2026 07:54:21 -0800 (PST)
-Received: from [10.1.39.184] (e134369.arm.com [10.1.39.184])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A3DC3F694;
-	Thu, 22 Jan 2026 07:54:26 -0800 (PST)
-Message-ID: <a8e44aea-89a3-40d0-82e8-295d5f315065@arm.com>
-Date: Thu, 22 Jan 2026 15:54:24 +0000
+	s=arc-20240116; t=1769097638; c=relaxed/simple;
+	bh=XnKAwO0yUTasmFWNWowWhkvsk3AGb+0t6qJNdQnFUe4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wx6IlbSMIpSmGeAruxf8IUGIPMnJNFZJhQx9LX3mu1wJrWM5P+J2hwxnn6QgXcTAoVWwCpdi2pG6FUOb0Bl1FJDGmELk+V6njW+2moxFwBgbYRpW2oo6f7qzMGo/O4UBWGxus8nYlSrEA4D6sQZ6XCHmISzqxavtEV6Zll1BlG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hD1TXWNG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769097630;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=jHh0MFWSMKz2Mm8GLTGEiKUH5WEgc8+dxDyDtFMoWFE=;
+	b=hD1TXWNGkWXHw4v3i6iTRO+q5kgbmnAjZ47sg79jYk/dM621MjOxky3eZust4kApWdrOJX
+	TwioGOiXdCfexOD8w29B+vikIgsLNjqr72gjphVH7eYjY6xeTO7GhR0/8kQTUgqI+qyFiw
+	K4kmg1njsfFV4sBtQIJk2qOwy1COu3g=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-231-CWeYt54yN8yqA20RDrVH-w-1; Thu,
+ 22 Jan 2026 11:00:27 -0500
+X-MC-Unique: CWeYt54yN8yqA20RDrVH-w-1
+X-Mimecast-MFC-AGG-ID: CWeYt54yN8yqA20RDrVH-w_1769097626
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B39F118002CC;
+	Thu, 22 Jan 2026 16:00:25 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.63])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B339918004D8;
+	Thu, 22 Jan 2026 16:00:20 +0000 (UTC)
+Date: Thu, 22 Jan 2026 16:00:17 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Fabiano Rosas <farosas@suse.de>
+Cc: Markus Armbruster <armbru@redhat.com>,
+	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+	Stefan Hajnoczi <stefanha@gmail.com>,
+	qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
+	Kevin Wolf <kwolf@redhat.com>,
+	German Maglione <gmaglione@redhat.com>,
+	Hanna Reitz <hreitz@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Thomas Huth <thuth@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Alex Bennee <alex.bennee@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: Re: Modern HMP
+Message-ID: <aXJJkd8g0AGZ3EVv@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+ <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
+ <871pjigf6z.fsf_-_@pond.sub.org>
+ <aXH1ECZ1Nchui9ED@redhat.com>
+ <87ikctg8a8.fsf@pond.sub.org>
+ <aXIWLi656H8VbrPE@redhat.com>
+ <87ikctk5ss.fsf@suse.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v4 3/7] arm64: nested: Add support for setting
- maintenance IRQ
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
- "will@kernel.org" <will@kernel.org>,
- "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>
-Cc: "maz@kernel.org" <maz@kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- Alexandru Elisei <Alexandru.Elisei@arm.com>
-References: <20250924134511.4109935-1-andre.przywara@arm.com>
- <20250924134511.4109935-4-andre.przywara@arm.com>
- <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
-Content-Language: en-US
-From: Andre Przywara <andre.przywara@arm.com>
-In-Reply-To: <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87ikctk5ss.fsf@suse.de>
+User-Agent: Mutt/2.2.14 (2025-02-20)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.45 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MIXED_CHARSET(0.71)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68906-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[arm.com,kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-68907-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,nongnu.org,vger.kernel.org,gmx.de,linaro.org,ilande.co.uk];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[instagram.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,libvirt.org:url,berrange.com:url];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[berrange@redhat.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andre.przywara@arm.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:mid,arm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 210286A805
+	MID_RHS_MATCH_FROM(0.00)[];
+	HAS_REPLYTO(0.00)[berrange@redhat.com];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: 24A2D6AC74
 X-Rspamd-Action: no action
 
-Hi Sascha,
+On Thu, Jan 22, 2026 at 12:47:47PM -0300, Fabiano Rosas wrote:
+> One question I have is what exactly gets (eventually) removed from QEMU
+> and what benefits we expect from it. Is it the entire "manual"
+> interaction that's undesirable? Or just that to maintain HMP there is a
+> certain amount of duplication? Or even the less-than-perfect
+> readline/completion aspects?
 
-many thanks for having a look!
+Over time we've been gradually separating our human targetted code from
+our machine targetted code, whether that's command line argument parsing,
+or monitor parsing. Maintaining two ways todo the same thing is always
+going to be a maint burden, and in QEMU it has been especially burdensome
+as they were parallel impls in many cases, rather than one being exclusively
+built on top of the other.
 
-On 16/01/2026 18:10, Sascha Bischoff wrote:
-> On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
->> Uses the new VGIC KVM device attribute to set the maintenance IRQ.
->> This is fixed to use PPI 9, as a platform decision made by kvmtool,
->> matching the SBSA recommendation.
->> Use the opportunity to pass the kvm pointer to
->> gic__generate_fdt_nodes(),
->> as this simplifies the call and allows us access to the nested_virt
->> on
->> the way.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>   arm64/arm-cpu.c         |  2 +-
->>   arm64/gic.c             | 26 ++++++++++++++++++++++++--
->>   arm64/include/kvm/gic.h |  2 +-
->>   3 files changed, 26 insertions(+), 4 deletions(-)
->>
->> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
->> index 69bb2cb2c..0843ac051 100644
->> --- a/arm64/arm-cpu.c
->> +++ b/arm64/arm-cpu.c
->> @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct
->> kvm *kvm)
->>   {
->>   	int timer_interrupts[4] = {13, 14, 11, 10};
->>   
->> -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
->> +	gic__generate_fdt_nodes(fdt, kvm);
->>   	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->>   	pmu__generate_fdt_nodes(fdt, kvm);
->>   }
->> diff --git a/arm64/gic.c b/arm64/gic.c
->> index b0d3a1abb..e35986c06 100644
->> --- a/arm64/gic.c
->> +++ b/arm64/gic.c
->> @@ -11,6 +11,8 @@
->>   
->>   #define IRQCHIP_GIC 0
->>   
->> +#define GIC_MAINT_IRQ	9
->> +
->>   static int gic_fd = -1;
->>   static u64 gic_redists_base;
->>   static u64 gic_redists_size;
->> @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
->>   
->>   	int lines = irq__get_nr_allocated_lines();
->>   	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
->> +	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
->>   	struct kvm_device_attr nr_irqs_attr = {
->>   		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->>   		.addr	= (u64)(unsigned long)&nr_irqs,
->>   	};
->> +	struct kvm_device_attr maint_irq_attr = {
->> +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
->> +		.addr	= (u64)(unsigned long)&maint_irq,
->> +	};
->>   	struct kvm_device_attr vgic_init_attr = {
->>   		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
->>   		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
->> @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
->>   			return ret;
->>   	}
->>   
->> +	if (kvm->cfg.arch.nested_virt &&
->> +	    !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr)) {
->> +		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
->> &maint_irq_attr);
->> +		if (ret)
->> +			return ret;
->> +	}
-> 
-> With GICv3 are things not a little broken if we're trying to do nested
-> but don't have the ability to set the maint IRQ? It feels to me as if
-> an error should be returned if the attr doesn't exist.
+Even today we still get contributors sending patches which only impl
+HMP code and not QMP code. Separating HMP fully from QMP so that it
+was mandatory to create QMP first gets contributors going down the
+right path, and should reduce the burden on maint.
 
-OK, I changed it slightly to return an error now if either the HAS call 
-or the SET call fails.
+At some point we are likely to introduce a new non-backwards compatible
+QEMU binary. Perhaps when Philippe completes his "all targets/machines
+in one binary" work. That would be an opportunity to carve HMP off
+into a separate out of process facade talking over QMP.
 
-> Also, the way that the FDT is generated means that we'd still generate
-> the property for the maint IRQ, even if we can't set it here.
+That's only possible though if we get existing HMP into being a layer
+over QMP with no backdoor parallel impls. So anything we can do today
+to better separate QMP/HMP will give us more flexibility when the time
+arrives to create a new QEMU binary without backwards compat cruft.
 
-That should now be solved automatically, because the DT addition depends 
-on --nested, but that fails above now if the kernel doesn't support the 
-device ATTR.
+NB, introducing a new binary does not imply that the old binaries
+go away. They would probably stick around for legacy compat for a
+good while. For anything using libvirt though, we would be able to
+switch to the new binaries pretty fast without, as libvirt can
+translate app XML config to either the new or old QEMU dynamically.
 
-Does that sound okay? Or do you want more refactoring to make things 
-more explicit, to accommodate GICv5 better?
+> Does the new program becomes basically an external project unrelated to
+> QEMU, that simply talks to QMP like libvirt does?
 
-Cheers,
-Andre
+It could be a separate project under QEMU on github, or it could just be
+binary in qemu.git. What matters is that it is out of the main QEMU process
+eventually.
 
-> 
-> Thanks,
-> Sascha
-> 
->> +
->>   	irq__routing_init(kvm);
->>   
->>   	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
->> @@ -342,7 +356,7 @@ static int gic__init_gic(struct kvm *kvm)
->>   }
->>   late_init(gic__init_gic)
->>   
->> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
->> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->>   {
->>   	const char *compatible, *msi_compatible = NULL;
->>   	u64 msi_prop[2];
->> @@ -350,8 +364,12 @@ void gic__generate_fdt_nodes(void *fdt, enum
->> irqchip_type type)
->>   		cpu_to_fdt64(ARM_GIC_DIST_BASE),
->> cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->>   		0, 0,				/* to be filled */
->>   	};
->> +	u32 maint_irq[] = {
->> +		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
->> cpu_to_fdt32(GIC_MAINT_IRQ),
->> +		gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH
->> +	};
->>   
->> -	switch (type) {
->> +	switch (kvm->cfg.arch.irqchip) {
->>   	case IRQCHIP_GICV2M:
->>   		msi_compatible = "arm,gic-v2m-frame";
->>   		/* fall-through */
->> @@ -377,6 +395,10 @@ void gic__generate_fdt_nodes(void *fdt, enum
->> irqchip_type type)
->>   	_FDT(fdt_property_cell(fdt, "#interrupt-cells",
->> GIC_FDT_IRQ_NUM_CELLS));
->>   	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
->>   	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
->> +	if (kvm->cfg.arch.nested_virt) {
->> +		_FDT(fdt_property(fdt, "interrupts", maint_irq,
->> +				  sizeof(maint_irq)));
->> +	}
->>   	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
->>   	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
->>   	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
->> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
->> index ad8bcbf21..8490cca60 100644
->> --- a/arm64/include/kvm/gic.h
->> +++ b/arm64/include/kvm/gic.h
->> @@ -36,7 +36,7 @@ struct kvm;
->>   int gic__alloc_irqnum(void);
->>   int gic__create(struct kvm *kvm, enum irqchip_type type);
->>   int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
->> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
->> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm);
->>   u32 gic__get_fdt_irq_cpumask(struct kvm *kvm);
->>   
->>   int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int
->> trigger_fd,
-> 
+> I wonder how close to tools like qmp-shell, qmp-tui, etc that would
+> become and whether we might actually be looking at a substitute of
+> qemu.qmp.
+
+qmp-shell is rather too crude in terms of its data input/output - have
+to switch to JSON way too much, and there's no mechanism for formatting
+complex QMP replies into pretty human friendly data.
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
