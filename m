@@ -1,196 +1,257 @@
-Return-Path: <kvm+bounces-68940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68941-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +D4BInK2cmk4owAAu9opvQ
-	(envelope-from <kvm+bounces-68940-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 00:44:50 +0100
+	id AGigGiu4cmlKowAAu9opvQ
+	(envelope-from <kvm+bounces-68941-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 00:52:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32FC06E936
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 00:44:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528336EA08
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 00:52:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B1DD3023370
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 23:44:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 743D2300C488
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 23:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069753DC5A4;
-	Thu, 22 Jan 2026 23:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFAD3DC995;
+	Thu, 22 Jan 2026 23:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ZDfKOZYl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Anddpwk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9695310652
-	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 23:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650BE3DA7EA
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 23:51:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769125457; cv=none; b=u48puTUobuwyLRnerZ7HOTIPctnIPNCtvtJoU72pBKouwPAYP5TQi0UAWxSEG7R+e2XVIA60ull4VNqhpTqm92eQRWGX1JWwI4kipbDpK0GWMzyhs9iux2dQXXNvOuJ5tFIHN/Ed1Ew6Dmr++SDqie7xoalBi/Svf3ExOHK5lnM=
+	t=1769125918; cv=none; b=tC1QCQWsAvixjl97b+/BJbRlAG06+93z/SYe57S0MMhvDpCbDR5Yyj/wtBEa8e58aOLWKN4EZsD0HCwwMfqg/fpY+hLF25WyefAa1xEGrbikeGueAxnoMQPS9GEEl60d3n/Og9ywkjr4VuzvTFc69yIrncgd8+i7D3sDO+oa+KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769125457; c=relaxed/simple;
-	bh=tD5f+h84ofqnK09ZH5j1acZDqC2EpodfEzB0D4Jj1p0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BcTDEFLEREEaDGFPkj10uLCKcqE0MygJJSg3dbRTRN/p66YarpqAE75tDEGhTCSbuIknV1bqieRA/0rZvef3uKxcg7CG6KS5uauBwYwDMn33+Gi/DJHj1FrV9mqww+yn4ZJgmHUJ7e5gz/QleezzTVyzgfZeOqVW5AfIH4CPaP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ZDfKOZYl; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-894703956b8so24751196d6.1
-        for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 15:44:09 -0800 (PST)
+	s=arc-20240116; t=1769125918; c=relaxed/simple;
+	bh=eg/uF2a/r4RV0wMUdb2r4rz1ahydy14nqiUDK71upgI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VQPBg86NeyscxpdRywLbr/s3GNNfQsCgd/Rvlqn0NHP/xkwo+HQFT93lxzbfJvRKubWqzyDvcdiO2CQ9zw4jEUHcN53wjeiAdGNXzYzf+fNF5EDUFrVrdtx7qQHMlxSxvf1AZagPSEyODXQk78WDgEf+iinxl3kArWjLsJRa9cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Anddpwk; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ac819b2f2so1379986a91.0
+        for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 15:51:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1769125446; x=1769730246; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Udk1T2MTSGRhmMtQ3jtc9BpxDT02wAcqHYT9NWJE+U4=;
-        b=ZDfKOZYlbtc9e45Oa3sa1G7jUMTTapbJ6M5R1c9Wv5Hr9dhqqOYNk3GWFL6qT5RooY
-         QECtTwO60TgTg8cxbTwE3Er6g+0bPKh5ablKSUxfxlDm6QFthJT11cFz/iG273fyZjaf
-         avZMMJOmsZDjP0WBBupWp4wYZsoXAoE51jUmQqcbkOrGT2uh1AcXLxyyZ7b6qWxCoJwO
-         TgtuYU7L0seUT4rOWSC4kTkRxn8HxNt2DhlCdQU3pIxt7/9nGJksqSV+hZYpxmDaNj4C
-         Re3vmbgh+CxxPpwIC2hokIpOoeoGrOXLCeAfSW11mktw/rGGXhYkfYoePkh7oz1JInot
-         O1LQ==
+        d=google.com; s=20230601; t=1769125905; x=1769730705; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5JvuW//joH48qvnygxaY0rXMq+dLySISFF3AXf42AjY=;
+        b=1Anddpwkmc3idNJUtqUmplnCmDgf2pUTKguk/Y/Eqdlu2aGPErJNcleORevZrR/N72
+         JVUXDejWWwjoFWjxfqwkx+zbAhcl092M1zUYxQPxzG6jtkTv2HZ43giflBbQCDfxyqi3
+         2iEItji2xkNdgWwwrFGNfc6xRwl0apLYd3is5lDwOLyecT0Fre5wIRjQ2I9F1PvynsVG
+         5RW+OVn3ZYBeQQ5UgLxSh6+1bQ1sFzGJs2wqkCIO94qFG0Q4uiGg1DEZL9aActAegz42
+         axBLeX7mUYpOSz315Py0jaHai+Rnl3nMY0IBqm/py3vwclYc07RIyOIQmOpEoxKkuXPm
+         QQrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769125446; x=1769730246;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Udk1T2MTSGRhmMtQ3jtc9BpxDT02wAcqHYT9NWJE+U4=;
-        b=r62P3R8ssPErscRXq8RpIPkV80zopOwVSuESQbjADLLtW/dnT6iq+nkjPS7RIVrGWG
-         EzJ599oMd60L0CsYzmusAj0TEkwUrG3r6IOs8IIfS8QwbEmP9OLdctPlre6itCP0DfR/
-         20L7ckBAj5kn6T7DnA+M1cKVh+srm3HEuTACyNTUNG0+KmGSxtHBg/i5b4TltsLa5B4u
-         yW0UY5xflxvtU5xOSoWXdPsG/Tx9MXdW7xs7qW4YikwPsK8suRqpVTwCfHiMCsjDhuso
-         AhZbVSIsZkRwkaJEkMYeXlGl2z7i0O28PfqphI95OizidLZyLpduw1fS2RE2/CYUfA2+
-         E2dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnRmQoUZ4FD6FBhzHUfTX2/lPDNeVQrm1nGXxhE3fz8HdtNrqart2Pj28a+1gSGtVX5Bk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzu71ZGpexP3wzL6FsnKZEWnq2BtLzhTds8AWCcxkpy1uabnrs1
-	qV/Ac+auvXqLQOXNDSRW9aKNZJ6iDDuyuwWzsf1AdVkeIzMEcflrfU9MgfqZgGRJXa4=
-X-Gm-Gg: AZuq6aK9wrsrI0CvQY3FsaVSgYwwNvauz9fnTqJeW0Rwst0UTA/eea3wBvjwiAt3BvZ
-	LiwupL3KhYrIGVgo+XdBWRdfwh8ljGJqTXfxt/80+BG+kj81a1INCKK8IdOH2N/dcROlkHUpXx+
-	ObLknYZ/4RDLSaKFG7dvIr7fy2x8Ld85UXBtvlu9yvVX6xyvRu9Pi5i1b7cCm9bzVsXAw5VoXtF
-	Bi3msAe8/T2O4z2rrM3tm/HBRuS1tXNcmEOcv7AWrM/Xmutf5tkrd4xOluf9h742EQ3UO2feRuP
-	z61s0s6taP8xd5s1kADwoP8mLbnYGVO1rQaRBNf6pTQ6AyfamVlobTkbMSsEz6L38VlH/SVPKB+
-	y5wU89jtcAHuCwBpdZ5a3Jv2FXUHtZ1WVLj4ZwNyoUTiS+ANLG9Jd53ktP33A1RahuBBxks4wFu
-	BGgU7gUb4XAcayzjc9H0IrBZYq9sDDj6vZkClXTfg/EVzXhGA5YtLfDujoz9s4Z5Czlpg=
-X-Received: by 2002:a05:6214:2269:b0:894:6530:efd1 with SMTP id 6a1803df08f44-894901ac85dmr20677696d6.19.1769125446269;
-        Thu, 22 Jan 2026 15:44:06 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c6e3854a6csm44128885a.41.2026.01.22.15.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jan 2026 15:44:05 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vj4LM-00000006gRo-0Lke;
-	Thu, 22 Jan 2026 19:44:04 -0400
-Date: Thu, 22 Jan 2026 19:44:04 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 6/7] vfio: Wait for dma-buf invalidation to complete
-Message-ID: <20260122234404.GB1589888@ziepe.ca>
-References: <20260120-dmabuf-revoke-v3-0-b7e0b07b8214@nvidia.com>
- <20260120-dmabuf-revoke-v3-6-b7e0b07b8214@nvidia.com>
- <b129f0c1-b61e-4efb-9e25-d8cdadaca1b3@amd.com>
- <20260121133146.GY961572@ziepe.ca>
- <b88b500c-bacc-483d-9d1a-725d4158302a@amd.com>
- <20260121160140.GF961572@ziepe.ca>
- <a1c55bd8-9891-4064-83fe-ac56141e586f@amd.com>
+        d=1e100.net; s=20230601; t=1769125905; x=1769730705;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5JvuW//joH48qvnygxaY0rXMq+dLySISFF3AXf42AjY=;
+        b=SVgJmmPgTiLNRaUHakoCIM6n7loRElTcNts/EpL1TFAc9328L+HYxft7ZHSgsCfeqz
+         7qq9dRtOTUPupL+LYYWN5H9GI2tYxEjXy9YQ1XgOgz2WhBEoyWj58j9EUP4EY9aGukmm
+         XPW89Q6GOB7inz/mvFgvSKN3exqud8JszCR+GNFdCSKbpnTs8z1NqoE47rLs+u8ECYJd
+         yjhXVtpk88rJ8Fe+pWmAkBkkzOBQ3bbgyWTHvumhwnglaB9iz9d5BDlNN9cjoxrfdCzc
+         jfCPx/38TOOc43z53COaxe/857fMD0B1dQ11pvM9p02Tr7SsmcBAmm1A8Hdfcb9Gkpvh
+         i/9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXRObN3YM9TPh5L9mSVgAtRomKX9/k8Xi0CT105g+lHCO/n/qRXDjdM5uTGgjqp58BTdLU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFgMO1ljbRMCzWVVeJkqWPPTESSHmbSvBIfhlGJVe5we35AeWz
+	IIyYfwlPZHDMOrdeFzaP6/lxQ7BKUY206PsBJldwI6lkkJQo9ufp3aI5QH+HrwddAQo8skXlBhZ
+	e7Q6LAA==
+X-Received: from pjbpv11.prod.google.com ([2002:a17:90b:3c8b:b0:34c:489a:f4c9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:57e6:b0:34c:c866:81f2
+ with SMTP id 98e67ed59e1d1-35367015003mr843153a91.4.1769125905538; Thu, 22
+ Jan 2026 15:51:45 -0800 (PST)
+Date: Thu, 22 Jan 2026 15:51:43 -0800
+In-Reply-To: <CALMp9eRGj3rNeNN82H12f=XO5iXi5s2ri2K71CnjoVp9eKzz1w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a1c55bd8-9891-4064-83fe-ac56141e586f@amd.com>
+Mime-Version: 1.0
+References: <20260121225438.3908422-1-jmattson@google.com> <20260121225438.3908422-3-jmattson@google.com>
+ <aXJRWtdzjcb8_APA@google.com> <CALMp9eRGj3rNeNN82H12f=XO5iXi5s2ri2K71CnjoVp9eKzz1w@mail.gmail.com>
+Message-ID: <aXK4DzweZLy9O8n1@google.com>
+Subject: Re: [PATCH 2/6] KVM: x86/pmu: Disable HG_ONLY events as appropriate
+ for current vCPU state
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	James Clark <james.clark@linaro.org>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-68940-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68941-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.977];
-	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ziepe.ca:mid,ziepe.ca:dkim]
-X-Rspamd-Queue-Id: 32FC06E936
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 528336EA08
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 12:32:03PM +0100, Christian König wrote:
-> >> What roughly happens is that each DMA-buf mapping through a couple
-> >> of hoops keeps a reference on the device, so even after a hotplug
-> >> event the device can only fully go away after all housekeeping
-> >> structures are destroyed and buffers freed.
-> > 
-> > A simple reference on the device means nothing for these kinds of
-> > questions. It does not stop unloading and reloading a driver.
-> 
-> Well as far as I know it stops the PCIe address space from being re-used.
-> 
-> So when you do an "echo 1 > remove" and then an re-scan on the
-> upstream bridge that works, but you get different addresses for your
-> MMIO BARs!
+On Thu, Jan 22, 2026, Jim Mattson wrote:
+> On Thu, Jan 22, 2026 at 8:33=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > On Wed, Jan 21, 2026, Jim Mattson wrote:
+> > > Introduce amd_pmu_dormant_hg_event(), which determines whether an AMD=
+ PMC
+> > > should be dormant (i.e. not count) based on the guest's Host-Only and
+> > > Guest-Only event selector bits and the current vCPU state.
+> > >
+> > > Update amd_pmu_set_eventsel_hw() to clear the event selector's enable=
+ bit
+> > > when the event is dormant.
+> > >
+> > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > > ---
+> > >  arch/x86/include/asm/perf_event.h |  2 ++
+> > >  arch/x86/kvm/svm/pmu.c            | 23 +++++++++++++++++++++++
+> > >  2 files changed, 25 insertions(+)
+> > >
+> > > diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm=
+/perf_event.h
+> > > index 0d9af4135e0a..7649d79d91a6 100644
+> > > --- a/arch/x86/include/asm/perf_event.h
+> > > +++ b/arch/x86/include/asm/perf_event.h
+> > > @@ -58,6 +58,8 @@
+> > >  #define AMD64_EVENTSEL_INT_CORE_ENABLE                       (1ULL <=
+< 36)
+> > >  #define AMD64_EVENTSEL_GUESTONLY                     (1ULL << 40)
+> > >  #define AMD64_EVENTSEL_HOSTONLY                              (1ULL <=
+< 41)
+> > > +#define AMD64_EVENTSEL_HG_ONLY                               \
+> >
+> > I would strongly prefer to avoid the HG acronym, as it's not immediatel=
+y obvious
+> > that it's HOST_GUEST, and avoiding long lines even with the full HOST_G=
+UEST is
+> > pretty easy.
+>=20
+> In this instance, I'm happy to make the suggested change, but I think
+> your overall distaste for HG_ONLY is unwarranted.
+> These bits are documented in the APM as:
+>=20
+> > HG_ONLY (Host/Guest Only)=E2=80=94Bits 41:40, read/write
 
-That's pretty a niche scenario.. Most people don't rescan their PCI
-bus. If you just do rmmod/insmod then it will be re-used, there is no
-rescan to move the MMIO around on that case.
+Ugh, stupid APM.  That makes me hate it a little less, but still, ugh.
 
-> Oh, well I never looked to deeply into that.
-> 
-> As far as I know it doesn't block, but rather the last drm_dev_put()
-> just cleans things up.
-> 
-> And we have a CI test system which exercises that stuff over and
-> over again because we have a big customer depending on that.
+> > Maybe amd_pmc_is_active() or amd_pmc_counts_in_current_mode()?
+>=20
+> I think amd_pmc_is_active() is a much stronger statement, implying
+> that both enable bits are also set.
 
-I doubt a CI would detect a UAF like we are discussing here..
+Ooh, good point.
 
-Connect a RDMA pinned importer. Do rmmod. If rmmod doesn't hang the
-driver has a UAF on some RAS cases. Not great, but is unlikely to
-actually trouble any real user.
+> Similarly, amd_pmc_counts_in_current_mode() sounds like it looks at
+> OS/USR bits as well.
 
-Jason
+Yeah, I didn't like that collision either.  :-/
+
+> I'll see if I can think of a better name that isn't misleading. I
+> actually went with this polarity because of the naming problem. But, I
+> agree that the reverse polarity is marginally better.
+>=20
+> > > +{
+> > > +     u64 hg_only =3D pmc->eventsel & AMD64_EVENTSEL_HG_ONLY;
+> > > +     struct kvm_vcpu *vcpu =3D pmc->vcpu;
+> > > +
+> > > +     if (hg_only =3D=3D 0)
+> >
+> > !hg_only
+>=20
+> Now, you're just being petty. But, okay.
+
+Eh, that's a very standard kernel style thing.
+
+> > In the spirit of avoiding the "hg" acronym, what if we do something lik=
+e this?
+> >
+> >         const u64 HOST_GUEST_MASK =3D AMD64_EVENTSEL_HOST_GUEST_MASK;
+>=20
+> Ugh. No. You can't both prefer the longer name and yet avoid it like
+> the plague. If you need to introduce a shorter alias, the longer name
+> is a bad choice.
+
+IMO, there's a big difference between a global macro that may be read in a =
+variety
+of contexts, and a variable that's scoped to a function and consumed within=
+ a few
+lines of its definition.
+
+That said, I'm definitely open to other ways to write this code that don't =
+require
+a local const, it's HG_ONLY that I really dislike.
+
+> >         struct kvm_vcpu *vcpu =3D pmc->vcpu;
+> >         u64 eventsel =3D pmc->eventsel;
+> >
+> >         /*
+> >          * PMCs count in both host and guest if neither {HOST,GUEST}_ON=
+LY flags
+> >          * are set, or if both flags are set.
+> >          */
+> >         if (!(eventsel & HOST_GUEST_MASK) ||
+> >             ((eventsel & HOST_GUEST_MASK) =3D=3D HOST_GUEST_MASK))
+> >                 return true;
+> >
+> >         /* {HOST,GUEST}_ONLY bits are ignored when SVME is clear. */
+> >         if (!(vcpu->arch.efer & EFER_SVME))
+> >                 return true;
+> >
+> >         return !!(eventsel & AMD64_EVENTSEL_GUESTONLY) =3D=3D is_guest_=
+mode(vcpu);
+> >
+> > > +             /* Not an HG_ONLY event */
+> >
+> > Please don't put comments inside single-line if-statements.  99% of the=
+ time
+> > it's easy to put the comment outside of the if-statement, and doing so =
+encourages
+> > a more verbose comment and avoids a "does this if-statement need curly-=
+braces"
+> > debate.
+>=20
+> There is no debate. A comment is not a statement. But, okay.
+
+LOL, dollars to donuts says I can find someone to debate you on the "correc=
+t"
+style. :-D
 
