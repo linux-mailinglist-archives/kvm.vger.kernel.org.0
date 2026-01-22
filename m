@@ -1,285 +1,325 @@
-Return-Path: <kvm+bounces-68904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68905-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KxxChlPcmnpfAAAu9opvQ
-	(envelope-from <kvm+bounces-68904-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 17:23:53 +0100
+	id wBuIAK1ZcmkpiwAAu9opvQ
+	(envelope-from <kvm+bounces-68905-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 18:09:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A7369D65
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 17:23:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A556AD32
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 18:09:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E8F73037D51
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:11:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C636E300832C
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 16:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FE24BC022;
-	Thu, 22 Jan 2026 15:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9C94C9013;
+	Thu, 22 Jan 2026 15:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NeztxjFf"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1exX3P/m";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LC5deoz6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1exX3P/m";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LC5deoz6"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012046.outbound.protection.outlook.com [40.107.200.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1ED40FDBA;
-	Thu, 22 Jan 2026 15:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769096831; cv=fail; b=Jf1+KRHLUp40Ku5qI7CKNSrzmk1vmhaBwAyeO1mIGfLmn3PeMclCjRZvli0thP8d9IDbffdU/CByYwmmxR13eiD8KhjsYTGYDXqe6cQ6sZDZvQD2qfbK7onV4MGZs6PpGFH+fIOBC+pKmuLlCNed9+eDHvbNX5sYtC4711za09E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769096831; c=relaxed/simple;
-	bh=UhTPAjb2uL1OfZL3JFLxZLhMsT9CTG+/MEctwxLgVrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=jTAKkgHY6d70x9Enxap0YyDMUCIZjo9B6zRlSp48UVnuyDuNcHOsRnWPAkfxAlhG+AHFyjDKaTpmEihCSoYVvfI+OP5QEO3hhZ3PEmXs3Vc9qi4VTeyBo88XZuv3IKHBYXzpMbxDDUgtn337OFTJb8o56jqeCDAGv6unOYMrZ0w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NeztxjFf; arc=fail smtp.client-ip=40.107.200.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Y1hntf+J10Wc+3Hv7poOapR5c8+zLAhhvTiisk8s5Q06AvLBI4+Q+q5xSw0qb+ph5634Y4PP5bnf/ddv6MS+GgxiO5N7/q0wenCky9fmpblNSFiSFaXwARw+f1TKJeKK95u/1qY+UHqiDXt0SHhc3+tnbVSdoUnHYngsULkOUZgLQwYFhUEVRnFo5Gaohf0tOfxh1OCw5zqVvZZQLvLmLLY7ppkcaBgRNImiSj7Dmtdqmk7RXrRcUlEKjEj01LnbHCng0ZMDercma8b3Vda/uJtuSFlBcbXk54D9MCpnObIoEUdQiO9bWI5rhdlIikkTUKPZqh63bSD1sxMRbhOdNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=urLRoIBEUIKjiUtuMX6/RhXFrlQUu0ljUyUgyCTDCgI=;
- b=zBWm1JAqg/d96H6sksdKd4YBdInKj8eUU6/NSPZ0gtcArmTaDNMpeh7oG8Ue/FcPSJbJo0tOZveibmPfYFlfsIfw5GgJJGPS3WykAVXAZhjer4MppHajUBWf3AfAUJEEBU+90y6LVFYi7HOUmIAFqaqL1Puo8D8I7Vh1leGn1gJ+NTB8cNoGoF6GSi4+5sjlqo8PsU+zT2Tq9pknb5WxbEsyW1CtdZus8fbHLCIePJe+kJxv8f4brkAi9jgaHtavUQ56PUxiEpICihXYX13Wzb94HMBzRl0Lg4QAG7PAxi74fbpoosBduPeQWMceT4dOGWrGtMgltKQYLxVSWTX25w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=urLRoIBEUIKjiUtuMX6/RhXFrlQUu0ljUyUgyCTDCgI=;
- b=NeztxjFfb/XCKZywgF1ikrJGBwwFfT6XHaov7k8FJ4XH2JOScFhCxjUfVsbdAsXEY1WzQz38Ze9r5020u+EM6FwhDw9Rdcs1S015xHLv4YMgdwdPnj1c9GjTktDPRoIi5oP21+AST9VjoiPoBRvbtCI93yxDur+FNFkveMbVpoxp1FcOGTP3OrOb4Z3zFidocNRyCp8+WOLaOL5EEzDeLywzVMOPW7KkYBdhg2PsP+b5etRuXkvpQBzBgqGkEhvccGtRmGu0QxeDRXKleXIfJ/nXXltmPLi407y9Xba2atb+0Ikj3WQt4XJjXoOo2xlSTIi/5KD7W65sfMhpkf8Dug==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
- by IA1PR12MB6556.namprd12.prod.outlook.com (2603:10b6:208:3a0::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Thu, 22 Jan
- 2026 15:46:50 +0000
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::1b59:c8a2:4c00:8a2c]) by LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::1b59:c8a2:4c00:8a2c%3]) with mapi id 15.20.9542.010; Thu, 22 Jan 2026
- 15:46:47 +0000
-Date: Thu, 22 Jan 2026 11:46:46 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Balbir Singh <balbirs@nvidia.com>, Matthew Wilcox <willy@infradead.org>,
-	Alistair Popple <apopple@nvidia.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Francois Dugast <francois.dugast@intel.com>,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	adhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-	linux-mm@kvack.org, linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-Message-ID: <20260122154646.GQ1134360@nvidia.com>
-References: <eb94d115-18a6-455b-b020-f18f372e283a@nvidia.com>
- <aWsdv6dX2RgqajFQ@lstrano-desk.jf.intel.com>
- <4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
- <20260119142019.GG1134360@nvidia.com>
- <96926697-070C-45DE-AD26-559652625859@nvidia.com>
- <20260119203551.GQ1134360@nvidia.com>
- <ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
- <EE2956E3-CCEA-4EF9-A1A4-A483245091FC@nvidia.com>
- <20260120135340.GA1134360@nvidia.com>
- <F7E3DF24-A37B-40A0-A507-CEF4AB76C44D@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <F7E3DF24-A37B-40A0-A507-CEF4AB76C44D@nvidia.com>
-X-ClientProxiedBy: BL1PR13CA0363.namprd13.prod.outlook.com
- (2603:10b6:208:2c0::8) To LV8PR12MB9620.namprd12.prod.outlook.com
- (2603:10b6:408:2a1::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C39A4C043A
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 15:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769096881; cv=none; b=loQTI73RCNtJbmJv6YYr/ykB5Ztnyv/MSI+XolipaLZqmZ6yEsBPhLF6kucXmoLg2US3z9BonI5xGwq6ecWNrlK99KTiq/NGBBv45RIq0i0THkWHA35Ndh1/kT04Zn6VZk6BPG+CGSrip/ZL7kGCwowhp07MdNLGZhpnN+bi3jk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769096881; c=relaxed/simple;
+	bh=fl8ZoqQARI6Y28bGy/JJNEaaLgVMjWUOzv1nnM0OGo4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Qo74uBB/tMhP8cBzv95VWudEPDOELswX9+ppxiUwso0qIhEwhbNn/uy+6A0hS8wT45SnmdTCGxaAlw83OqhCE+B0LgvDHh/fKbWF32Y3d6TtuSvOV67ibXe3+FJvGVpBLicPSnGhKMNtNGSVq0X9zrkvhZzPJK/WW4dd2mxgkuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1exX3P/m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LC5deoz6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1exX3P/m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LC5deoz6; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id BB37F5BCD3;
+	Thu, 22 Jan 2026 15:47:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769096870; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BpxyDjvnhTGZD1UGyN78pEBg0d5ITPh/BmizeskZCjk=;
+	b=1exX3P/m3ycRcu6n3K6QZU9e+5Hz1bypUNwV2VqC8A2mnjVMHtkL7ydqxd8CjZ0Usbt3lI
+	blB6KnG4HWrhAUZAVZAsWviw9lT4iPOINSGg1eefuueoJF89Expaya0aD7/dasmJLhN+b9
+	aKFdnZopMV9JirF3mC26CCW/8SaR824=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769096870;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BpxyDjvnhTGZD1UGyN78pEBg0d5ITPh/BmizeskZCjk=;
+	b=LC5deoz6GgCNBUp3TEQwj+bs0CtJg65GfVs0I2epXxj/hcANGzsH/0j7Y9qYFgf2nHP0mO
+	vsSIgL6e4VNzQeBQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="1exX3P/m";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=LC5deoz6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769096870; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BpxyDjvnhTGZD1UGyN78pEBg0d5ITPh/BmizeskZCjk=;
+	b=1exX3P/m3ycRcu6n3K6QZU9e+5Hz1bypUNwV2VqC8A2mnjVMHtkL7ydqxd8CjZ0Usbt3lI
+	blB6KnG4HWrhAUZAVZAsWviw9lT4iPOINSGg1eefuueoJF89Expaya0aD7/dasmJLhN+b9
+	aKFdnZopMV9JirF3mC26CCW/8SaR824=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769096870;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BpxyDjvnhTGZD1UGyN78pEBg0d5ITPh/BmizeskZCjk=;
+	b=LC5deoz6GgCNBUp3TEQwj+bs0CtJg65GfVs0I2epXxj/hcANGzsH/0j7Y9qYFgf2nHP0mO
+	vsSIgL6e4VNzQeBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2120F13533;
+	Thu, 22 Jan 2026 15:47:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 2jrINKVGcmk5dAAAD6G6ig
+	(envelope-from <farosas@suse.de>); Thu, 22 Jan 2026 15:47:49 +0000
+From: Fabiano Rosas <farosas@suse.de>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Markus
+ Armbruster
+ <armbru@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Stefan
+ Hajnoczi
+ <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, kvm
+ <kvm@vger.kernel.org>, Helge Deller <deller@gmx.de>, Oliver Steffen
+ <osteffen@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Matias
+ Ezequiel Vara Larsen <mvaralar@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ German Maglione <gmaglione@redhat.com>, Hanna Reitz <hreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud?=
+ =?utf-8?Q?=C3=A9?=
+ <philmd@linaro.org>, Thomas Huth <thuth@redhat.com>, Mark Cave-Ayland
+ <mark.cave-ayland@ilande.co.uk>, Alex Bennee <alex.bennee@linaro.org>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Subject: Re: Modern HMP
+In-Reply-To: <aXIWLi656H8VbrPE@redhat.com>
+References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+ <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
+ <871pjigf6z.fsf_-_@pond.sub.org> <aXH1ECZ1Nchui9ED@redhat.com>
+ <87ikctg8a8.fsf@pond.sub.org> <aXIWLi656H8VbrPE@redhat.com>
+Date: Thu, 22 Jan 2026 12:47:47 -0300
+Message-ID: <87ikctk5ss.fsf@suse.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|IA1PR12MB6556:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6619fffa-3efd-4f3b-38fc-08de59cd739e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Ohj6vJhRcoQx0d14rJ+KUVn630uJ0OjyBmRLufFHoNPDUq9wqhGhBsSWCyHs?=
- =?us-ascii?Q?5YPxYiPGzbTI95G/Tosh/PEWY4YIxyKqM9P0/QFhWN9H+mAkzdX7BMLUzDCH?=
- =?us-ascii?Q?Wn91BCJnDrMXYm4EUJICmdzS0aQofZS16JC0sAQDjt3qTv2N1wtbBCHiNw8I?=
- =?us-ascii?Q?vUhWQIIWF8Qiwf13QX48aeQf61Lr0T7AN4a+nofJnV68KFlMU/1H3sp/tVf7?=
- =?us-ascii?Q?6Uj1NmizFTB6/cO7bWwvKufbN0o64Zi/dul0yyQFl6IZ8hnMBo/nafS5FpZJ?=
- =?us-ascii?Q?eNzuVqNsk9mIUOLmxZwJICLZBZZ6jmjD3HO2LPkxRt/lsRjmVERA6FLE71FP?=
- =?us-ascii?Q?WsPStBDbYELQ/N0BdXyKRV29LLI7Ny8/L12N8NJMqUY3gOw6ka3j3UQUgVHF?=
- =?us-ascii?Q?YHxYfwN8u9zgOznfORp3xh4K/EDQLFIw2qUYuEOwIEdbpNTBkP4xwXw3yzuw?=
- =?us-ascii?Q?qI0NjfzKRhBQtRStUetRK+QZJjHOgAPtSA6wPc8JH5oEqClCOcstWw4WcWpW?=
- =?us-ascii?Q?PwmIAogOgXtCUpr2Qp6CP9X0TufJOp+VkIm1uj9PHuFFeU1+0R8Y93g1qIpN?=
- =?us-ascii?Q?vwbDHpKbKdypgBOD5MHFvFX4JOfc5KHLAVcrcBrIvDi2pOHUNSbPZKKAe0TI?=
- =?us-ascii?Q?/4h8CXIhFPf7em/wcWgkmMaG0Ig9RlvoIWz1XRm+JfytRqhoiLD4gYIJzXKP?=
- =?us-ascii?Q?ZsGRoSSt+WAe4lCSy2sbG6rTCZIuIAKRsdDmh5MwHUy5FbQBmJ67RRgAx36+?=
- =?us-ascii?Q?0j4uuTs7j2ZNJPJbkbDV6b9dFyG4m8Rdm2UL8rbKf+7/wldoB+jStJJ8h9ic?=
- =?us-ascii?Q?kuIKwaz7Q9ZkUL0ih5rIeFisPLf5vWZ6O7V06+TlbqMD+5oYJZCDxoBf9aam?=
- =?us-ascii?Q?3FENRWgqoE/vnsMO9aWgfpckUgP3Kar6EDVCY3AjCbFAZVMb2oyqeA9udkyN?=
- =?us-ascii?Q?m7w2Scy42T4M0KsrKK8Y8XDe5hHecvKaIku5etlKUV4uNiFdw2bULmVVAncB?=
- =?us-ascii?Q?CPbRGF3S+Cw0jWbeTi3fixQWx559sCNbqikUUBAVmsw8RBKSPI+JVPUV7RwF?=
- =?us-ascii?Q?pLWJxni5bB3uZGd3a1aiTPnhrFsrKnZvkZoYpNhiJ1NMLBQ85sd67DH53YY5?=
- =?us-ascii?Q?lB/odiXJhICIDrK0EtAdUy1aCwQsNF8PTI519VIVKDJ+GXZXlDKofSWT0YUd?=
- =?us-ascii?Q?caerQEosFEqZdm6lJGmJkwPet3yllCN3LyPobXKRrxRpgVq6oc/zkPLu6QCC?=
- =?us-ascii?Q?vHGm1ZmSd2yUOaN6VIjjcX+l1kzEfSUJCWYH4hue+IhHpbJKQQBMdfEvqtGc?=
- =?us-ascii?Q?UHlmvKsPF8bHftyzqnCIbTF2UjTAqIoXDw7jEvRWhGFzitJP2y+Tq0v15Gux?=
- =?us-ascii?Q?YKbjfR6F+ylGNATaeXrun93eJzhM+prGXaa+LX6BxtWaQWgV/K35688NF7l2?=
- =?us-ascii?Q?gqailK2Dwl6I8WBRCvmNfYjBvQeCAEx0diyWoLUmt8QGMKB7BvxY1CCRSRQX?=
- =?us-ascii?Q?Ym2O2PVDDKSItKO9pjcjE7WutgsoqKtfGagKU0I/HWLx1s4U0xuQyJmEOue6?=
- =?us-ascii?Q?ftfkYvUaRqSr/VDgWQA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?E5Fs5KJqLjfrfdCxIzohuRce/HV8FgniJIFkYD4lqISS7ma6j3xVErWMm4CA?=
- =?us-ascii?Q?ssbKy8+xYyEDheYDEu80czgFZxfyxrCGnOe4YLJiVD3saDbtU3wdoZIfzEJK?=
- =?us-ascii?Q?asGVYAMLbvgvkVHLwvKGAVcTj+RArzJcSO5Yo+jKmBTRpmI0DMWMVH1H6pjk?=
- =?us-ascii?Q?aQGXK6fP7MLASzuS2r6OQNYaS7UTM8CR/xppROWd5BfDUYoAGBSo928klec7?=
- =?us-ascii?Q?sg9Z1LsIhaxCAvEGpcvZc6FEjQnMUJpCBTIZ4Gxj1FDNRX/OgHXHGkkgC6Cp?=
- =?us-ascii?Q?lt22OYx5eidO7HBBhnNhIapEQh0asyouPbFl/sJ1qtyEszYnEKWtSNSukJNW?=
- =?us-ascii?Q?btraflU4GZHy1R2uf4IQCd/MyMwCy0YTGOGK3UbjK03wAemqq19PiBR33huS?=
- =?us-ascii?Q?bll0+Sx0umj5xU4zHM5rc5JdMFMsBvEyTkW6TesZNmYiMGwqFr7riOLCOgx1?=
- =?us-ascii?Q?j5sFdHv291N95kv/WbpI6jooA6wRHJAS36NE15piwyju3PznC4+OSEQ4lTfc?=
- =?us-ascii?Q?q9PH01RHNZJNHQhbRzeibQPKyAx6Y3FtyT34VGCL9NmIKBBA//AbHVJsES85?=
- =?us-ascii?Q?fCEhtl3+D6P1kAS7RjSKqu9WRGaCNtmTydxJKeEOUQn+l5vuX7ePYXBhsaEM?=
- =?us-ascii?Q?1d4dmhNSOyaPSAkwDbhs6m0VA1Ko4UvhrXJ0FhZe5kW2qX0sU/wD5K+mvAeD?=
- =?us-ascii?Q?kuB7jBYx84y+NQng2Sx6r2qNMDAqPiAyLnKxZGwjySK7ztDNgBIBNOpeicmn?=
- =?us-ascii?Q?LBPsd2axGHGIVKY1cQpjIcVU5ubYaefwmdu043WIg6ijffnoyM4BTSzlJSzE?=
- =?us-ascii?Q?XY8OE+gItu8mNXewXzCtjOIP49xs3i62bmGaHRQRxNB0Uq5A+JzKBS1ARlkG?=
- =?us-ascii?Q?ogGzN13BMsneyWgQWsfEvnXGedVUeG7Q4exZDQcSXAeD7GmG8aXdBKdNj6+U?=
- =?us-ascii?Q?q+oqISKb0MS9aJSMPE1WzS24VrlXCgqCHV2CptoOYdWQ6/iSon6dAe0fQl69?=
- =?us-ascii?Q?RG4Bq0wpjUn6hYYwxWE6VnHiBWQEXOoAZZaXRoY9Z6LZMMRhC4hYAjeJ8lr+?=
- =?us-ascii?Q?ek/Cn18vYZRORri6SiD85LkClJ46PklsEVu3DURgFXwLa2tfHga5C4XUneoV?=
- =?us-ascii?Q?y1vcsuK0Cg6CMBzsKTwjbHyc5FyXcsW+KgPZjNzTAkHeJEERtvOxvDlXTMv6?=
- =?us-ascii?Q?gVsR3469y3KZlcLoTM/661eHBBCkLO6n/sHjqLoSSWorSOEgkCMfSapewc6Q?=
- =?us-ascii?Q?Xnvc7JHSh6hOgM+Sgs9JcIb6XkLx1soLqWQoZa/GI5tgaMQXRYesLe0/hJfq?=
- =?us-ascii?Q?1aOk43ByRVAGMl1vxoXr2+3FO4h4hDwF43F0gyEj7UiwLoLOe5vZEhEHwlHy?=
- =?us-ascii?Q?5rLL/6oxihjaRSog6zrqgBgIKXpui9eerb17ERs5CEgYAIblX34y2dZNAnEC?=
- =?us-ascii?Q?HSL3iFY3eYBZcXjKflIW1BWVpPYpNht1//WJnyaKMDVqYpolMqwNCFM3YOnc?=
- =?us-ascii?Q?+Ce9SmKXLd8f+VV7WoYMuSCUMHcs8ZS4iZRmtYNLbn0msHoyavh7EzGsgKA0?=
- =?us-ascii?Q?pqHgZzRRVm/wJUBb1L/wA7vvQBwEWkkzcv8sG9rjxNx25haKT3hnCQgzMrYD?=
- =?us-ascii?Q?iOH+A5Z98zU3GUJPipZaNiaaxcex0BAvP9+tB1icCV871OqXSjYUvWY1RRtT?=
- =?us-ascii?Q?x+blK5vG4fjOVBDIvK445VpbdQrH3qG+obXZwRJ1iuQcXOfIlUtTQyTAhN3T?=
- =?us-ascii?Q?lUMOZfpMqQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6619fffa-3efd-4f3b-38fc-08de59cd739e
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2026 15:46:47.7886
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 61UuDPbnbQgYaKMW5ue6PUb8TuV9NI6UMg7dVvAEh1C4w7RgdricARs5c63CAC1w
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6556
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68904-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[39];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,infradead.org,intel.com,suse.cz,lists.freedesktop.org,linux.ibm.com,gmail.com,ellerman.id.au,kernel.org,amd.com,ffwll.ch,linux.intel.com,suse.de,redhat.com,linux-foundation.org,oracle.com,google.com,suse.com,lists.ozlabs.org,vger.kernel.org,kvack.org];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,nongnu.org,vger.kernel.org,gmx.de,linaro.org,ilande.co.uk];
+	TAGGED_FROM(0.00)[bounces-68905-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[suse.de:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:mid]
-X-Rspamd-Queue-Id: 94A7369D65
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[farosas@suse.de,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B4A556AD32
 X-Rspamd-Action: no action
 
-On Tue, Jan 20, 2026 at 10:01:18PM -0500, Zi Yan wrote:
-> On 20 Jan 2026, at 8:53, Jason Gunthorpe wrote:
-> 
-> > On Mon, Jan 19, 2026 at 09:50:16PM -0500, Zi Yan wrote:
-> >>>> I suppose we want some prep_single_page(page) and some reorg to share
-> >>>> code with the other prep function.
-> >>
-> >> This is just an unnecessary need due to lack of knowledge of/do not want
-> >> to investigate core MM page and folio initialization code.
-> >
-> > It will be better to keep this related code together, not spread all
-> > around.
-> 
-> Or clarify what code is for preparing pages, which would go away at memdesc
-> time, and what code is for preparing folios, which would stay.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-That comes back to the question of 'what are the rules for frozen
-pages'
+> On Thu, Jan 22, 2026 at 01:07:43PM +0100, Markus Armbruster wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>=20
+>> > On Thu, Jan 22, 2026 at 10:38:28AM +0100, Markus Armbruster wrote:
+>> >> Let's start the discussion with your nicely written Wiki page:
+>> >>=20
+>> >>     =3D=3D=3D External HMP Implementation via QMP =3D=3D=3D
+>> >>=20
+>> >>     '''Summary:''' Implement a standalone HMP-compatible monitor as an
+>> >>     external binary (Python or Rust) that communicates with QEMU
+>> >>     exclusively through QMP, enabling future decoupling of the built-=
+in
+>> >>     HMP from QEMU core.
+>> >>=20
+>> >>     QEMU provides two monitor interfaces:
+>> >>     * '''QMP''' (QEMU Machine Protocol): A JSON-based machine-readable
+>> >>       protocol for programmatic control
+>> >>     * '''HMP''' (Human Monitor Protocol): A text-based interactive
+>> >>       interface for human operators
+>> >>=20
+>> >>     Currently, HMP is tightly integrated into QEMU, with commands
+>> >>     defined in `hmp-commands.hx` and `hmp-commands-info.hx`. Most HMP
+>> >>     commands already delegate to QMP internally (e.g., `hmp_quit()`
+>> >>     calls `qmp_quit()`), but HMP parsing, formatting, and command
+>> >>     dispatch are compiled into the QEMU binary.
+>> >
+>> > First of all, I love the idea. An external HMP impl that consumes
+>> > QMP from outside QEMU so a concept I've suggested many times over
+>> > 10+ years hoping someone would take the bait and impl it :-)
+>> >
+>> >> Also line editing and completion.
+>> >>=20
+>> >> Most HMP commands cleanly wrap around QMP command handlers such as
+>> >> qmp_quit().  Wrapping them around QMP commands instead is a
+>> >> straightforward problem.  I'm more concerned about HMP stuff that uses
+>> >> other internal interfaces.  Replacing them may require new QMP
+>> >> interfaces, or maybe a careful culling of inessential HMP features.
+>> >> Known such stuff: completion does not wrap around QMP command handler=
+s.
+>> >> It is provided by the HMP core.
+>> >>=20
+>> >> Risk: this can easily become the 10% that take the other 90% of the
+>> >> time, or even the 5% that sink the project.
+>> >
+>> > IMHO this is essentially guaranteed.
+>> >
+>> > 4 years ago I tried to move us closer to this world by introducing
+>> > "HumanReadableText" and documenting that all remaining & future
+>> > "info xxx" commands should be backed by a QMP command that just
+>> > returns human formatted text. The intent was to eliminate the
+>> > roadblock of having to define formal QAPI types for all the
+>> > complex data.
+>> >
+>> > I converted a bunch of commands, but that indeed became do 90%
+>> > of the work, leave the other 90% of the work for later victim^H^H^H
+>> > contributor.
+>> >
+>> > None of this means that the GSoc project idea is invalid. We just
+>> > have to figure out a credible end goal is for the project, ideally
+>> > with staged delivery.
+>>=20
+>> Makes sense.
+>>=20
+>> If we see the GSoC project as a first step towards replacing the
+>> built-in HMP by an standalone program talking QMP ("Modern HMP"), we
+>> better scope it carefully, so it (1) has achievable success criteria,
+>> and (2) makes real progress towards the actual finish line.
+>>=20
+>> >> Risk: serious code duplication until we can get rid of built-in HMP.
+>> >> Fine if the goal is to explore and learn by building a prototype, and=
+ we
+>> >> simply throw away the prototype afterwards.
+>> >
+>> > IMHO that isn't a risk, that's a guarantee. I can't imagine converting
+>> > all remaining HMP commands to have a QMP backing, AND doing an external
+>> > HMP impl all within the GSoc timeline.  That's two largely independent
+>> > projects, each of which are probably longer than the GSoC time wnidow.
+>> >
+>> > Again that doesn't mean the idea is invalid for GSoc, just that we must
+>> > be honest about likely deliverables, and how follow up work will happen
+>> > after GSoc to maximise benefit for QEMU.
+>> >
+>> > What I would not want to see is a bunch of work done that is then
+>> > abandoned because it couldn't get used as it wasn't feature complete.
+>> > Whatever subset is achieved ought to be intended as a stepping stone
+>> > we can integrate and carry on working with.
+>>=20
+>> Does the GSoC project make sense without a firm commitment to followup
+>> work to finish the job?
+>>=20
+>> Specifically, commitment by whom to do what?
+>>=20
+>> >>     '''Add `CONFIG_HMP` build option''':
+>> >>     * Create a new Meson configuration option to disable built-in HMP
+>> >>     * Allow QEMU to be built without HMP
+>> >>     * Facilitate testing of external HMP as a replacement
+>> >>=20
+>> >>     '''Create an external HMP implementation''' in Python or Rust tha=
+t:
+>> >>     * Connects to QEMU via QMP socket
+>> >>     * Parses HMP command syntax and translates to QMP calls
+>> >>     * Formats QMP responses as human-readable HMP output
+>> >>     * Supports command completion and help text
+>> >>=20
+>> >>     '''Use `hmp-commands.hx` for code generation''':
+>> >>     * Parse the existing `.hx` files to extract command definitions
+>> >>     * Generate boilerplate code (command tables, argument parsing, he=
+lp
+>> >>       text)
+>> >>     * Produce a report of implemented vs. unimplemented commands
+>> >>     * Enable tracking of HMP/QMP parity
+>> >>=20
+>> >> .hx is C source code with ReST snippets.  scripts/hxtool strips out t=
+he
+>> >> ReST.  docs/sphinx/hxtool.py ignores the C source code, and processes
+>> >> the ReST.  It works.  Not a fan.
+>> >>=20
+>> >> If we succeed in replacing built-in HMP by an external one, and the
+>> >> external one isn't written in C, then having C source code in .hx no
+>> >> longer makes sense.  Parsing it will be wasted effort.  It may still
+>> >> make sense initially.
+>> >
+>> > Indeed, we should clarify language intended as it would influence
+>> > the approach for the project.  If it is a clean room Rust impl,
+>> > then it would be completely independent of existing HMP C code.
+>> > More work initially to ensure we retain the same data formatting
+>> > of each command, but likely nicer long term, and saying Rust will
+>> > probably attract more candidates to the idea.
+>>=20
+>> In theory, we could make the same HMP code work in both contexts,
+>> built-in HMP and standaline HMP.  I doubt this is feasible, at least not
+>> at reasonable cost.  Too much disentangling.  I could be wrong.
+>>=20
+>> If we use separate HMP code, i.e. accept code duplication until we
+>> retire built-in HMP, then picking a different language for the new copy
+>> won't add all that much to the bother of having to maintain two copies.
+>>=20
+>> HMP is not a stable interface.  We make reasonable efforts not to change
+>> the output without a good reason.  I don't think identical data
+>> formatting is a requirement.  Just make a reasonable effort.
+>>=20
+>> Marc-Andr=C3=A9 proposed Python or Rust.  Anyone got a preference backed=
+ by
+>> reasons?
+>
+> My suggestion would be Rust, as it allows the possibility to embed
+> that Rust impl inside the current QEMU binaries, to fully replace
+> the C code and retain broadly the same functionality.
+>
 
-Now that we have frozen pages where the frozen owner can use some of
-the struct page memory however it likes that memory needs to be reset
-before the page is thawed and converted back to a folio.
+One question I have is what exactly gets (eventually) removed from QEMU
+and what benefits we expect from it. Is it the entire "manual"
+interaction that's undesirable? Or just that to maintain HMP there is a
+certain amount of duplication? Or even the less-than-perfect
+readline/completion aspects?
 
-memdesc time is only useful for memory that is not writable by frozen
-owners - basically must be constant forever.
+Does the new program becomes basically an external project unrelated to
+QEMU, that simply talks to QMP like libvirt does?
 
-> >
-> >>>> I don't think so. It should do the above job efficiently and iterate
-> >>>> over the page list exactly once.
-> >>
-> >> folio initialization should not iterate over any page list, since folio is
-> >> supposed to be treated as a whole instead of individual pages.
-> >
-> > The tail pages need to have the right data in them or compound_head
-> > won't work.
-> 
-> That is done by set_compound_head() in prep_compound_tail().
-
-Inside a page loop :)
-
-	__SetPageHead(page);
-	for (i = 1; i < nr_pages; i++)
-		prep_compound_tail(page, i);
-
-> Yes. One of the issues is that device private code used to only handles
-> order-0 pages and was converted to use high order folio directly without
-> using high order page (namely compound page) as an intermediate step.
-> This two-step-in-one caused confusion. But the key thing to avoid the
-> confusion is that to form a high order folio, a list of contiguous pages
-> would become a compound page by calling prep_compound_page(), then
-> the compound page becomes a folio by calling folio_set_large_rmappable().
-
-That seems logical to me.
-
-Jason
+I wonder how close to tools like qmp-shell, qmp-tui, etc that would
+become and whether we might actually be looking at a substitute of
+qemu.qmp.
 
