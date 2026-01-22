@@ -1,237 +1,177 @@
-Return-Path: <kvm+bounces-68875-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68876-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uM51MPEDcmmvZwAAu9opvQ
-	(envelope-from <kvm+bounces-68875-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 12:03:13 +0100
+	id gLgxLPAFcmmvZwAAu9opvQ
+	(envelope-from <kvm+bounces-68876-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 12:11:44 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA5665ABB
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 12:03:12 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC4165C53
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 12:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0761D8A9696
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 10:51:26 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 11FFF5ABF86
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 10:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D793930E0F8;
-	Thu, 22 Jan 2026 10:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41BF37E31D;
+	Thu, 22 Jan 2026 10:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqhzdSoQ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QU2/B6PS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T8vC8utP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9017E41C2E9
-	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 10:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769078985; cv=none; b=BkNA+uUTHmeyuBL38UutWGfzf0tp6gQd5g88QfGCBUH5Ba0q2xoPfDVwkkhXbbMjjLF4bYqhlx7LnozvH/HsXmmYbE8dEO+8a+yRmMgvXy7v8lAaa7soBh+0KuF1WnbEcwaAmTwEr0ztsr9KWw7xzZG5dFFKuxMsJ5XdYsG/bg0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769078985; c=relaxed/simple;
-	bh=9pHa7bLyMeTGpz6H02mZHd7zcpWoymcyT8XHTqQtuFM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hCv+Fm8PxkdnNzoIzOKQ/Rc97WxDXXQ8ZddmyZWkb3U2Lk3JK5uL+sbZwgMImGx1Yb2NDXtpaVwn/dj6yWFFbhFoknBJUEkkhsvl0HHEz3qLeEiDYzPehlbDUagih9Ot0LITuPvJ53Vizd+NimCZRI01qbS1BeOVRdpftkCHVYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EqhzdSoQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QU2/B6PS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769078982;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jgIPM8OpxHeNCGRc0vlcUybvvkTGH2w92IIDkMB7o/4=;
-	b=EqhzdSoQ6sUxpio/6YAntji9VLkPjX0s5navw9CtskpfR/oQFpr21assim0Upmg3jEVbUi
-	cgfoBuh8jP9fmVkV8Jl6tb+mNbGPsz2Cxwa0zFqRk3kIJAqXuYkfXl0vTFotddogTXKdrs
-	VhDPT6xgXeTK22OceXq6i7MrQvr5v1k=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-9-oV1XeICVPk23Y5e5uC-k_Q-1; Thu, 22 Jan 2026 05:49:41 -0500
-X-MC-Unique: oV1XeICVPk23Y5e5uC-k_Q-1
-X-Mimecast-MFC-AGG-ID: oV1XeICVPk23Y5e5uC-k_Q_1769078980
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430fcb6b2ebso593165f8f.2
-        for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 02:49:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9989E15746E
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 10:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769079297; cv=pass; b=W1iiyQCFI4RLDMJE30J44pCcGU9Jd+VE5rgZqvRllw2O/qGzK90wLC0zb2QQv/fCuG6GPzRyVtLBbHzxs5RgA5TnBbbFW5oDPQdHn4juQGNKYiLdMWFmrvadTDbAuxoyuwy6kdrgiyWAdWgYqBd0gyf6qkaG/AZrpPRTztGnNKg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769079297; c=relaxed/simple;
+	bh=KBLZUlYPi9OL0gX4++Jxct32vanQpImbAVqWFhCNfPQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h6ZypOTTq4yqaKWriKSZXhKuiyGjnFSOB0b1FSoyZFDljD8C0PMCq/R1kHlf413fx3aBBW6WcaSyIz/dx9sEBwrpgsc7rydpYDQKXvimkNmouYLeJscfxUWa+zcBpudtem6Jfhobg7OUzO7gRzlmJMXWkjiwv0hyYZ7HME7uOPw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=T8vC8utP; arc=pass smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-78fdb90b670so7217237b3.2
+        for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 02:54:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769079294; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k/gw0SJYKdwrK8NzpYRmTBSDq8UO0ZdqaDhzKVDuvb3Jyfk/JBsONYOOP+iLYzdYDB
+         OZyifY/255aCGfuqjv13yFqHm7RDUEuWqC+d8TFVFufdxxHzddiwpro3BVSTXzwhD71R
+         lHg5oQYKtS9nrJlNkQEOLXeW0JGg3Zr8Gki5Etldcbr0eUt3ixnsAVIyhQPOOX/ET2Mq
+         6iuCVFiPyYo3GqPMxj60f8dzKYeV3hFVa/elfB0hI16HnEXvXGOaxFQJ5rSMEaSOLdz9
+         5bekeDtL3Y1TbDoNpJMXtDB5KvKfJPPH8+ZS4C1Jh8gm0+u6SQ8beuidJVmdqnEe8vpl
+         lt8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KBLZUlYPi9OL0gX4++Jxct32vanQpImbAVqWFhCNfPQ=;
+        fh=smTL7QBzxxdtwbB9OswdoJv5NKAgNtpZPEQNaeOGjhY=;
+        b=auDN0kw0r2A/TaEOYK0EKJXEUwXXMNaGoxJY1eGZ7CbfAyhgKYuqG9Ety8OGbf1G7Z
+         ye3QDCoSUpHkUTgLmR/pguP4WbO75IwsOdjdm7WgZZcnC/JtZnXQRehEFNELeAlivKPy
+         6gDp8ULldzQNdr9EmHftzgFO/foEt69CBT2osToWFQtoBrr1XoWm5CVQW6ZF49v6R2Jc
+         VPG6CP8QLWnLLFEO2YajzUDAbOWTIstgWDDPsCVEKEuMZ0rIomBh7OuMBipybrcgroPY
+         gAiPhArZefrn7VJkXG+NHf8dLNo3Y+REMjRISoyISvLNijhKWf5cGPCNgV++9zJ4VYpc
+         5n5w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769078980; x=1769683780; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jgIPM8OpxHeNCGRc0vlcUybvvkTGH2w92IIDkMB7o/4=;
-        b=QU2/B6PShOkLwjdi8TMaeLLpdv82t97G2Do4RWGZTJHclZA6Ni17A1doAMACe+U1tT
-         8WYUIHePCvBNOT5iWQaeBXRduGBOmzu0e03t3BFVEWmT2BUhkx5W/BPWVr7dn819ybfX
-         OP99kqDFUrXgvMjn4y93KtUOhu4otonxYiysA6HtfQS1FxphBy3vQHOC9AbcJZkdHJDu
-         U8PayWKz2TPViQoZEv79cHE4VZ/egnrd7W5EcHnE595Fe+JuFqjb8ApAatlKRp3vTrXZ
-         YrIaJxy7lPCdqAg0EDjxMwEz7OdF/FD2AXuZCS25MHnZRRJ1Yn+7bAJBfKzG/nyeDcRJ
-         ZFpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769078980; x=1769683780;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1769079294; x=1769684094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jgIPM8OpxHeNCGRc0vlcUybvvkTGH2w92IIDkMB7o/4=;
-        b=HIPGAEytdJTaGcz8LRxK4kJzXONuYR3yC0ICgjYSRI4bnULKGrGYM0pj728hS5B3Je
-         ntbS/hfoAPWfs30fqjIH3roc8OK4ronkwTEh2lmFPjyhg2saTNLjXIrXlRi84X5nOLg0
-         iAU4qQiWh69OZb5jVY14DBuvyDDf7NtbL5sM1P/a9n1zYVT50s81VvJKnYmqzSXu5nHN
-         x9EtmB9tP3GlnXYgcLtSPeimILRyK89PeW6pj+5sBnZMppGplE35S97UY4Ac9XzYSTeo
-         Q9tu/VTxGcoQ958XMR3N5KxGhL7oU/7/AnE7Nyj5V+8qKiwlbwG7AP0DWkdqShqcuH6g
-         Vi2A==
-X-Forwarded-Encrypted: i=1; AJvYcCX5AaIdIXd9XJAtBvnnm4O9Rv5vIeabxgjl0tpzA+Lr6UZWBILeIi9ueTrPurM9JqbIuGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9EJZ/advZ9F1+wnb27/DTwVbVE6dEelxh9JYkkSUeG1+iDWND
-	+Gd0UK/fOwku6qxh7Nf9oL9mKK7LKjh9fIR2nsF1cPboxJW0i9NQBF+tZN+TJseA2l24+ZHXYJ5
-	VO74CIVYquk5BFBjfzRM//Ht2Of7BSZ7FwY2IrWGtcW/qgQQLaMdwEKc8ZLxNaQ==
-X-Gm-Gg: AZuq6aKss8wb7qjcj9xU3zvXyTfR0RGZeo9GM6/GLLKheS984dGa3NdT/4YJCmI53M1
-	TL65+vpf6bo83z7SGYuV4utQZwvF8zhWhWw/A5wvXGZdCV4K8GGDRCtiqm+yqoZXJnlaZ1tWaRE
-	Tgwkgq9gr/U4qoadwZp0396x2SUJzynOIDMcJTr/Jlk6i+c3DWopjcNeEqVIgDuDTGyfEKTv+fJ
-	qxaNq4D88orcSNjMyghaSGBY+q4yVOctnd0vjqkF7PGw1yqUkUDG8NyomR9QaLLEVfwCvMGKl6l
-	EZ/OZWhB2qCVLJrkYmts72288EvyyAcv8+muwxmvpglj4WPPXKR1pQMi/PA1orY0KXwPBpSHB4T
-	pg/YlY+w=
-X-Received: by 2002:a05:6000:4021:b0:430:f1e8:ed86 with SMTP id ffacd0b85a97d-43569972babmr29574161f8f.4.1769078979819;
-        Thu, 22 Jan 2026 02:49:39 -0800 (PST)
-X-Received: by 2002:a05:6000:4021:b0:430:f1e8:ed86 with SMTP id ffacd0b85a97d-43569972babmr29574099f8f.4.1769078979369;
-        Thu, 22 Jan 2026 02:49:39 -0800 (PST)
-Received: from [192.168.0.9] ([47.64.112.255])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43595609c8asm16397866f8f.34.2026.01.22.02.49.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jan 2026 02:49:38 -0800 (PST)
-Message-ID: <05fd4f96-9a91-4459-9166-8af2e5db9539@redhat.com>
-Date: Thu, 22 Jan 2026 11:49:37 +0100
+        bh=KBLZUlYPi9OL0gX4++Jxct32vanQpImbAVqWFhCNfPQ=;
+        b=T8vC8utPD2FsmUJkarapsAU9pbnwyJq+dU5x94DIZXKYBGZFFTToHFXVGxY6rEc8Ag
+         fMCSzi4iMw2H6T94CNLtODsI4S+vB5O7vQaP5XaP54GLXmbEH5LQt/K3JVB6tvTYcNKy
+         8Jw+kloAtwe625s3frbU6Y3Eq1l2cXf8Df7KAP0oAB6DMizuGm+dRb3/yqVPUMA3CmJJ
+         vzFOOtRxeN0taQNE1TqStUntZhS+Wns5YtQYpVvV3u6d07rmr39tjPN/ud69Ml3D5ir0
+         hpLopdjnS5ZO+Zro7VuxMOgkUDosu80EMOAlBC8SXah24aJe70d5xVRdCz7h9uERCWeO
+         KkNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769079294; x=1769684094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KBLZUlYPi9OL0gX4++Jxct32vanQpImbAVqWFhCNfPQ=;
+        b=ds8JaKrxQO8h8cvxFrgwlEEF9XY6fFtEbGaqtVjWftMTOfOfe9JvDjHDjVgVCxntyP
+         Z+02SVhW+pm/dxcg0MT/A/H+PZeYHi7mRTpGHs2o68iYVhhtl2rJ1L+aRQLUcfjJZvIU
+         INpL6+j7/RvDv7fNpmaW232a2EhEJ2R+h9NvOWrOxkSxxvAaijt7MG+ufoxkDEx7ssnx
+         uj+GDx58CZfZWkytoumz5+pQXI/svhpVs7Of/Uk0qLXYFkSdwAl/yUnY2tBPa1z6Agr2
+         dpVyEdri4YGzvs1MQFDEMd8AAGkG2Q6HDk0IqM4S9pM7rAOM1Zff6yPHen/DeN5lD+Cg
+         NPCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUU74eYRvIfrVHYrZaehpDw3Do/Jd6kN1nU24bM/F2FR7o0X/5iXmKiZaiT4fxFDq7htm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3BVRcos7G0bhd6mdCHRrDty8Hgh/MdTszcYZ5MRPxjSRTO9gZ
+	Kjphpj78rko/SPo1FIGPgbCMrTrWGAam2AAx4WAfwRSmnre+ys5d4dFZq1zMpbPzp5Q2ppCby0q
+	T9vvCDCuvk8h1nafClGhwUSvvBJRi7+klOR4r2eg99w==
+X-Gm-Gg: AZuq6aLsPAbJlHPnAcFFEbekFOBPfwg74ILMH6eWSH68kzbK44kNCcJsikLpNBmHWgk
+	4ZM1B74XxSKkXx7fzhiirxTqZvqR1OfrpL+OAUWRzULJrRuykxrR61Vs1770a0/a0VumH2zZVDv
+	pet/8hxTB/oWAjqCntOY0rX49Tbw7uTYQWoOtdpBToSNRkyRYi/A/ueC+0Gxxp0RLuohGrlFCxX
+	PoF6INGHYaFZIBt+SZkliEej7N9nSHDpAirM/62yWvWVfS18v2Op7AbaMUbGZP1C0YBAQ==
+X-Received: by 2002:a05:690c:6612:b0:78c:5c75:c4a4 with SMTP id
+ 00721157ae682-793c523afa0mr186863137b3.4.1769079294240; Thu, 22 Jan 2026
+ 02:54:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Call for GSoC internship project ideas
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
-Cc: =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
- Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>,
- Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, German Maglione <gmaglione@redhat.com>,
- Hanna Reitz <hreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Alex Bennee <alex.bennee@linaro.org>,
- Pierrick Bouvier <pierrick.bouvier@linaro.org>,
- John Levon <john.levon@nutanix.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
 References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
  <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
  <CAJSP0QVQNExn01ipcu4KTQJrmnXGVmvFyKzXe5m9P3_jQwJ6cA@mail.gmail.com>
  <CAJSP0QW4bMO8-iYODO_6oaDn44efPeV6e00AfD5A42pQ9d+REQ@mail.gmail.com>
- <aW_4p65WIEuQO4UQ@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <aW_4p65WIEuQO4UQ@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ <aXH4PpkC4AtccsOE@redhat.com> <CAMxuvaw04pDNzHyw5+Qcv_KfrhDTiyp+MNxpECp+HfTa5iLOGw@mail.gmail.com>
+ <aXH-TlzxZ1gDvPH2@redhat.com>
+In-Reply-To: <aXH-TlzxZ1gDvPH2@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Jan 2026 10:54:42 +0000
+X-Gm-Features: AZwV_Qg8al33RpykEsKfUtlazBeorOsv3iS7Irhtzt5-pkGepdY89pm5xR88IRo
+Message-ID: <CAFEAcA_u6QUhs+6-cyYm_qttsDiV2zHbsc-_FbTb8QzWXk6+tw@mail.gmail.com>
+Subject: Re: Call for GSoC internship project ideas
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, 
+	Stefan Hajnoczi <stefanha@gmail.com>, Thomas Huth <thuth@redhat.com>, 
+	qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
+	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Matias Ezequiel Vara Larsen <mvaralar@redhat.com>, Kevin Wolf <kwolf@redhat.com>, 
+	German Maglione <gmaglione@redhat.com>, Hanna Reitz <hreitz@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Bennee <alex.bennee@linaro.org>, 
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>, John Levon <john.levon@nutanix.com>, 
+	Thanos Makatos <thanos.makatos@nutanix.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.96 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,nongnu.org,vger.kernel.org,gmx.de,linaro.org,ilande.co.uk,nutanix.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-68875-lists,kvm=lfdr.de];
-	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[redhat.com,gmail.com];
-	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-68876-lists,kvm=lfdr.de];
+	TO_DN_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thuth@redhat.com,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,nongnu.org,vger.kernel.org,gmx.de,linaro.org,ilande.co.uk,nutanix.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[linaro.org,none];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	R_SPF_SOFTFAIL(0.00)[~all:c];
+	ASN(0.00)[asn:7979, ipnet:2a01:60a::/32, country:US];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7DA5665ABB
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,linaro.org:dkim]
+X-Rspamd-Queue-Id: 9CC4165C53
 X-Rspamd-Action: no action
 
-On 20/01/2026 22.50, Daniel P. Berrangé wrote:
-> On Tue, Jan 20, 2026 at 04:42:38PM -0500, Stefan Hajnoczi wrote:
->> Hi Marc-André,
->> I haven't seen discussion about the project ideas you posted, so I'll
->> try to kick it off here for the mkosi idea here.
->>
->> Thomas: Would you like to co-mentor the following project with
->> Marc-André? Also, do you have any concerns about the project idea from
->> the maintainer perspective?
-> 
-> The idea of being able to build test images is very attractive,
-> however, actual deployment of any impl will run into the same
-> constraint we've always had. If we host disk images, then we
-> have the responsibility to host the complete & corresponding
-> source. This is a significant undertaking that we've never been
-> wished to take on. IMHO publishing images in GitLab CI won't
-> satisfy the license requireemnts.
-I agree, and I think if we go ahead with this project, we should not use the 
-gitlab-CI to build and provide these images. It would be better to build the 
-images on the host that runs "make check", similar to the precaching for 
-assets that we currently do. The built images could then be stored in the 
-local asset cache so you don't have to rebuild them again the next time your 
-run "make check". Does that sound practicable to you?
+On Thu, 22 Jan 2026 at 10:40, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+> Once we have written some scripts that can build gcc, binutils, linux,
+> busybox we've opened the door to be able to support every machine type
+> on every target, provided there has been a gcc/binutils/linux port at
+> some time (which covers practically everything). Adding new machines
+> becomes cheap then - just a matter of identifying the Linux Kconfig
+> settings, and everything else stays the same. Adding new targets means
+> adding a new binutils build target, which should again we relatively
+> cheap, and also infrequent. This has potential to be massively more
+> sustainable than a reliance on distros, and should put us on a pathway
+> that would let us cover almost everything we ship.
 
-  Thomas
+Isn't that essentially reimplementing half of buildroot, or the
+system image builder that Rob Landley uses to produce toybox
+test images ?
 
+thanks
+-- PMM
 
