@@ -1,250 +1,158 @@
-Return-Path: <kvm+bounces-68934-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68935-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHVQL3aWcmmSmwAAu9opvQ
-	(envelope-from <kvm+bounces-68934-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 22:28:22 +0100
+	id eJJDDIiZcmnBmwAAu9opvQ
+	(envelope-from <kvm+bounces-68935-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 22:41:28 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1EE6DC21
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 22:28:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07CC6DE03
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 22:41:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 50F733038AE5
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 21:27:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B155E30059A7
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 21:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486A93C0879;
-	Thu, 22 Jan 2026 21:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419443D1CA3;
+	Thu, 22 Jan 2026 21:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BCJ0AjLn"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="nbhvWI6F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A918A3C0870
-	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 21:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769117217; cv=pass; b=PrDrOWbH7a6gNSAvFPmA9nNNwKbWRxsIY4xrxvw/ij984shEzmUacvBdmOHLxelsJ6ANQIRlXO5TvsvqRGI+4qWBplqFH9fHzLsT1+7GNsZ4f67bnFKhYK7tiI3Tg4ylguno9qYr7RnWeHeLnMxdYuUiwuWURciLQJ7PkyOEzDI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769117217; c=relaxed/simple;
-	bh=BC8nFTG86vfd/JV3Ur3Vnv61JQ8TQGgb2hnHokTdwfs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cMcbDBF28+wkL61X3bAgJiKYk74VgYUx44t6PopWkLX5f+UzAHq7CofBJmIo+n/NBzYyzfjjy6KVGU6tpaeoU05MtdW/TbyKYIp+LFhxxNi7jh04FIYOatvxlEib3uTToxd6VDbTaZkt+rxtjRxBcnhTpI+UAiAMIL396K+MaLk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BCJ0AjLn; arc=pass smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-64baa44df99so3157a12.0
-        for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 13:26:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769117205; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MmZxI+StIctLURF0rq7CF2dhKNzUlaufHImPkMkO/ZEY9GoyKS0EGhyDOaTWcODuEr
-         Ezf2xud+rstU3z3sR8Z+SYDnarors+Olpm8u+OJzAvG/AF/SISK5NCss9ZKRDmk/Ssu8
-         lgLQcPCY1O1sFmt7/vfbIhv10cHGPce7sc3BD+3Vsk74kusbD9ho2zMwN6lAFx4QdLUe
-         jmZluxrKokifVIWy6BgXR3lC+047QMxRVZTTiiewb8J00xC10HRedemwrwZD7zOb1WA9
-         LscuxJgdBAMjNvUGwN+zJqZY2+KWkO5cOOnVXkxlTrcCVqPSgXm2bmRGaXDulAqHZZk9
-         O66A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=e/+D/s4bwsqNNaSjIaXHNf2UcfLo5UUZymlR0tqKlbQ=;
-        fh=RNX2nad/6Mm1xA8i3rmUeCLag6zJ0Ws5xmHdKiuKYv0=;
-        b=BH2MSTnP2dNEoPD8wZ5S6/X3jBjndUhZBTeWGRS5wkXPYQpfdmhOxi1sygGHrpK/Pi
-         yaruZQpLoodtq3idkV8Mg0AAU5thajz07jXvBSAmMBwiu82I3oIf1ly6cFfkrll+c9dP
-         oQalb1zAeBAdEI0UAJXnOzfyaBuwaDVb4tVS9Z2IDMZ8Lq62ewhcD+6XnDEMHNFlsZDs
-         hd/YxDJ+j+rI7UX34fzna2UcJG9PswsLtDOdO4GDr4ZniKFZ4A61csP7xISD9VLbeoLk
-         FxryA9eFAWPE2k6M/mNCfbvLpz/cUJFrRjy9Khicl7V2vAasQTjaTRcHlOAsuRQjcQSB
-         d06w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769117205; x=1769722005; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e/+D/s4bwsqNNaSjIaXHNf2UcfLo5UUZymlR0tqKlbQ=;
-        b=BCJ0AjLn3+m4uTzW+3XHgZBfCM+s/Cdo4me9s8vFGRnzyWkS21yZBz2RJqPFJljAc1
-         DXO93QcdFh7XW3k9p6DPz+k3W4qx5NNtpdU1arYFW6y/P+CtpRs2xsqezHnLtmYZ3RZi
-         GmY9WLZdG8FSGvbnt6/kyEJNQbqpiuY+seIb2HpR53l9K9QjNAnt+PkmAUwWyQlf2A7J
-         JytiEWoBrQqaQKpYS36u9WORYuP73TfbRczcUX4PPlPdQ+0zjTqpMA5JR4taiFYXk+x/
-         atV0APikoAFqQhpWuaKgfp/f6Yj4iug6w0b2sKeKx5Uj3t8qtyzud4O71a/nchQcWdi7
-         hsLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769117205; x=1769722005;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=e/+D/s4bwsqNNaSjIaXHNf2UcfLo5UUZymlR0tqKlbQ=;
-        b=Pf4IrXSr7NHKyh/1DhaP/8FbWY7mwEG7u55LueP3i56I3XNec9fCa+FXRqEpype8Rf
-         WMEmkgRToG03+eybSycLIKRs0TO4kDf6K07cI5jpGoKQwrMHqNnWNbXR1JFAprwXAv3G
-         DKUHLtZF5oW2IFT2tFg1cTvN+lTqfCwPxcH/3D66pfE0Eqr4oSpTFkTyJJJZdrQfnLEF
-         iPNYdH+dYA8lNe3pQrqmg2sDQAaip5E0hIN4nAalfUL4fjlvsEbeKa1tssSpwsbtHDgQ
-         x/a0O02zvPdmccXbQpIHkHhDzRtUdOA9l6Oj9wbK/jGBC5MfI4ecTO2V9B5tF/fTqtkh
-         n/XA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAPSOLCzv4kaRUKJCOT9ehgc/xVEVIzn9ISigfcEgK15EszOTF63PwjMmd3psoAlLbTbY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFIZXfg7yEkSrpg5EZOpVZxnxjOfnSTpJd9W2RnqnLscuuTjaH
-	aNX3v7Tas/ttDU/xvLrepDF24o9SXMCBdG7FUdjHlCPSrADCaGH7UROsnESO8Z/A6USXhB5mO2D
-	wAQ0SrLSLCwkk1fZIBFk/BZE06ohiWkC/v7c1TsCT
-X-Gm-Gg: AZuq6aI+OIX02AaZDzR+VeFxB69SfNfM7flRd0ABoXAL7v82IBWP6KxWXtE64Un+Y23
-	N+gQ+ue1G/tovhfBtDrXkTYn5JBlir4hQ8vAtuHhzDszUDu8U46DUzwrvUDWiPw5W3WlQ7lXah0
-	whh1DV6+TGleqmBWBxfOeD8uTIq01+y9qweXHerJ28IeV5kqx4+Usm20rCMVRNltx1XXbHiw69D
-	GVkw8bSJTXu6KxuPPaQxD8T7ngtXTnXlqfc7lQSjOdeuCdN2nbEsSX8IoAd8tc3qXvAoJwWA6zZ
-	sfmlMw==
-X-Received: by 2002:aa7:c606:0:b0:658:e7a:6fa7 with SMTP id
- 4fb4d7f45d1cf-6584bfcad65mr10888a12.4.1769117205288; Thu, 22 Jan 2026
- 13:26:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456223C196E;
+	Thu, 22 Jan 2026 21:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769118077; cv=none; b=p9bv1i7V9+hTqegbkBMW/26qltv+j2/1oaM9k0H17CwTVfSvrm5kxec8SoofPu5br4Bgh8cBzDZtiYxNTnPG/asHlAWZJVPAI6LswzC+CBnu5IuzxjEpcAgqnAPxM4Tig1d9jzKNyNMyjx8xDirULYng4HsRIH//FJWej+jFwew=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769118077; c=relaxed/simple;
+	bh=o3gdWNkDSd9Vm/DMgr4/ykIAOvt43+NsJA/Imw15e/A=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=Gj/WxZidYAT7bv4N9ogHx7SGTkmiICpSeorLW++5Y41fjPdxnB6CBSBb7DIUv79LHwOtLyzHaQAVTBfAqABt/mMpvpASi5KL7J4Vtj/3zVv6zE3lsLLoBiMTWN5bkBtlmh68XM2diae/sBCLbpVLZK9msCTjC00qHvSmFml+6mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=nbhvWI6F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 482E1C116C6;
+	Thu, 22 Jan 2026 21:41:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1769118076;
+	bh=o3gdWNkDSd9Vm/DMgr4/ykIAOvt43+NsJA/Imw15e/A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nbhvWI6FsmrV2v6DkoSqN8213V2yIRhOd6eP75LypoUaN54UBoDiDxVp1akq7FG3f
+	 CVLIelPV0CkF4x7Juc3HDczRCXMl0AOZY4EUYaiK0pNhQfi7cbwzUhOkV6AnNppJ9U
+	 SqiE6hXL+nm2nlnc5o4hmp73evXdLpeOeMX2qi64=
+Date: Thu, 22 Jan 2026 13:41:14 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Balbir Singh <balbirs@nvidia.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Matthew Brost
+ <matthew.brost@intel.com>, Zi Yan <ziy@nvidia.com>, Jason Gunthorpe
+ <jgg@nvidia.com>, Matthew Wilcox <willy@infradead.org>, Alistair Popple
+ <apopple@nvidia.com>, Francois Dugast <francois.dugast@intel.com>,
+ intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org, adhavan
+ Srinivasan <maddy@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, "Christophe Leroy (CS GROUP)"
+ <chleroy@kernel.org>, Felix Kuehling <Felix.Kuehling@amd.com>, Alex Deucher
+ <alexander.deucher@amd.com>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, Simona Vetter
+ <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
+ <tzimmermann@suse.de>, Lyude Paul <lyude@redhat.com>, Danilo Krummrich
+ <dakr@kernel.org>, David Hildenbrand <david@kernel.org>, Oscar Salvador
+ <osalvador@suse.de>, Leon Romanovsky <leon@kernel.org>, Lorenzo Stoakes
+ <lorenzo.stoakes@oracle.com>, "Liam R . Howlett" <Liam.Howlett@oracle.com>,
+ Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
+ Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+ linux-mm@kvack.org, linux-cxl@vger.kernel.org
+Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
+ private folios
+Message-Id: <20260122134114.a04ddf4c34a4b926d057032f@linux-foundation.org>
+In-Reply-To: <626c34fc-34df-4629-baf3-fbebc9abafbb@nvidia.com>
+References: <eb94d115-18a6-455b-b020-f18f372e283a@nvidia.com>
+	<aWsdv6dX2RgqajFQ@lstrano-desk.jf.intel.com>
+	<4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
+	<20260119142019.GG1134360@nvidia.com>
+	<96926697-070C-45DE-AD26-559652625859@nvidia.com>
+	<20260119203551.GQ1134360@nvidia.com>
+	<ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
+	<EE2956E3-CCEA-4EF9-A1A4-A483245091FC@nvidia.com>
+	<20260120135340.GA1134360@nvidia.com>
+	<F7E3DF24-A37B-40A0-A507-CEF4AB76C44D@nvidia.com>
+	<aXHPkQfwhMHU/oP6@lstrano-desk.jf.intel.com>
+	<9077ab5b-f2c8-4c8d-8441-631e7c2cf384@suse.cz>
+	<626c34fc-34df-4629-baf3-fbebc9abafbb@nvidia.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260113225406.273373-1-jmattson@google.com> <aWbmXTJdZDO_tnvE@google.com>
- <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
-In-Reply-To: <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 22 Jan 2026 13:26:32 -0800
-X-Gm-Features: AZwV_QhQTOem4BLVo53HKT58urNX60REF_SUeJPvF_yxD4XbcC-SDKdt9bRc4xc
-Message-ID: <CALMp9eQx7EVim4iYGbAhoHrei2YmTra6oxtdmKaY7bw-M0PHbw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Add quirk to allow L1 to set FREEZE_IN_SMM in vmcs12
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68934-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68935-lists,kvm=lfdr.de];
+	DMARC_NA(0.00)[linux-foundation.org];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[suse.cz,intel.com,nvidia.com,infradead.org,lists.freedesktop.org,linux.ibm.com,gmail.com,ellerman.id.au,kernel.org,amd.com,ffwll.ch,linux.intel.com,suse.de,redhat.com,oracle.com,google.com,suse.com,lists.ozlabs.org,vger.kernel.org,kvack.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3A1EE6DC21
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:email]
+X-Rspamd-Queue-Id: E07CC6DE03
 X-Rspamd-Action: no action
 
-On Tue, Jan 13, 2026 at 7:47=E2=80=AFPM Jim Mattson <jmattson@google.com> w=
-rote:
->
-> On Tue, Jan 13, 2026 at 4:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Tue, Jan 13, 2026, Jim Mattson wrote:
-> > > Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM to allow L1 to set
-> > > IA32_DEBUGCTL.FREEZE_IN_SMM in vmcs12 when using nested VMX.  Prior t=
-o
-> > > commit 6b1dd26544d0 ("KVM: VMX: Preserve host's
-> > > DEBUGCTLMSR_FREEZE_IN_SMM while running the guest"), L1 could set
-> > > FREEZE_IN_SMM in vmcs12 to freeze PMCs during physical SMM coincident
-> > > with L2's execution.  The quirk is enabled by default for backwards
-> > > compatibility; userspace can disable it via KVM_CAP_DISABLE_QUIRKS2 i=
-f
-> > > consistency with WRMSR(IA32_DEBUGCTL) is desired.
-> >
-> > It's probably worth calling out that KVM will still drop FREEZE_IN_SMM =
-in vmcs02
-> >
-> >         if (vmx->nested.nested_run_pending &&
-> >             (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))=
- {
-> >                 kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
-> >                 vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia32_debug=
-ctl &
-> >                                                vmx_get_supported_debugc=
-tl(vcpu, false)); <=3D=3D=3D=3D
-> >         } else {
-> >                 kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
-> >                 vmx_guest_debugctl_write(vcpu, vmx->nested.pre_vmenter_=
-debugctl);
-> >         }
-> >
-> > both from a correctness standpoint and so that users aren't mislead int=
-o thinking
-> > the quirk lets L1 control of FREEZE_IN_SMM while running L2.
->
-> Yes, it's probably worth pointing out that the VM is now subject to
-> the whims of the L0 administrators.
->
-> While that makes some sense for the legacy vPMU, where KVM is just
-> another client of host perf, perhaps the decision should be revisited
-> in the case of the MPT vPMU, where KVM owns the PMU while the vCPU is
-> in VMX non-root operation.
->
-> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > index 0521b55d47a5..bc8f0b3aa70b 100644
-> > > --- a/arch/x86/kvm/vmx/nested.c
-> > > +++ b/arch/x86/kvm/vmx/nested.c
-> > > @@ -3298,10 +3298,24 @@ static int nested_vmx_check_guest_state(struc=
-t kvm_vcpu *vcpu,
-> > >       if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 &=
- X86_CR0_WP)))
-> > >               return -EINVAL;
-> > >
-> > > -     if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) =
-&&
-> > > -         (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-> > > -          CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugct=
-l, false))))
-> > > -             return -EINVAL;
-> > > +     if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) {
-> > > +             u64 debugctl =3D vmcs12->guest_ia32_debugctl;
-> > > +
-> > > +             /*
-> > > +              * FREEZE_IN_SMM is not virtualized, but allow L1 to se=
-t it in
-> > > +              * L2's DEBUGCTL under a quirk for backwards compatibil=
-ity.
-> > > +              * Prior to KVM taking ownership of the bit to ensure P=
-MCs are
-> > > +              * frozen during physical SMM, L1 could set FREEZE_IN_S=
-MM in
-> > > +              * vmcs12 to freeze PMCs during physical SMM coincident=
- with
-> > > +              * L2's execution.
-> > > +              */
-> > > +             if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_VMCS12=
-_FREEZE_IN_SMM))
-> > > +                     debugctl &=3D ~DEBUGCTLMSR_FREEZE_IN_SMM;
-> > > +
-> > > +             if (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-> > > +                 CC(!vmx_is_valid_debugctl(vcpu, debugctl, false)))
-> >
-> > I'm mildly tempted to say we should quirk the entire consistency check =
-instead of
-> > limiting it to FREEZE_IN_SMM, purely so that we don't have to add yet a=
-nother quirk
-> > if a different setup breaks on a different bit.  I suppose we could lim=
-it the quirk
-> > to bits that could have been plausibly set in hardware, because otherwi=
-se VM-Entry
-> > using L2 would VM-Fail, but that's still quite a few bits.
-> >
-> > I'm definitely not opposed to a targeted quirk though.
->
-> I have no preference.
->
-Sean -
+On Thu, 22 Jan 2026 20:10:44 +1100 Balbir Singh <balbirs@nvidia.com> wrote:
 
-Would you like me to post a v2?
+> >> - Intel has demonstrated that this works and is still getting blocked.
+> >>
+> >> - This entire thread is about a fixes patch for large device pages.
+> >>   Changing prep_compound_page is completely out of scope for a fixes
+> >>   patch, and honestly so is most of the rest of what’s being proposed.
+> > 
+> > FWIW I'm ok if this lands as a fix patch, and perceived the discussion to be
+> > about how refactor things more properly afterwards, going forward.
+> > 
+> 
+> I've said the same thing and I concur, we can use the patch as-is and
+> change this to set the relevant identified fields after 6.19
+
+So the plan is to add this patch to 6.19-rc and take another look at
+patches [2-5] during next -rc cycle?
+
+I think the plan is to take Matthew's work via the DRM tree?  But if people
+want me to patchbunny this fix then please lmk.
+
+I presently have
+
+Signed-off-by: Matthew Brost <matthew.brost@intel.com>
+Signed-off-by: Francois Dugast <francois.dugast@intel.com>
+Acked-by: Felix Kuehling <felix.kuehling@amd.com>
+Reviewed-by: Balbir Singh <balbirs@nvidia.com>
+
+If people wish to add to this then please do so.
+
+I'll restore this patch into mm.git's hotfix branch (and hence
+linux-next) because testing.
 
