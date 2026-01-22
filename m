@@ -1,181 +1,179 @@
-Return-Path: <kvm+bounces-68830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68829-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LPdB7NzcWm3HAAAu9opvQ
-	(envelope-from <kvm+bounces-68830-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 01:47:47 +0100
+	id iEFKI05zcWkPHAAAu9opvQ
+	(envelope-from <kvm+bounces-68829-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 01:46:06 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 669A0600A6
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 01:47:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ECC160088
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 01:46:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5D45A5C0D36
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 00:47:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1296A5A5CDC
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 00:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22CB30DD25;
-	Thu, 22 Jan 2026 00:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78052C11C6;
+	Thu, 22 Jan 2026 00:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="LwF9xtUv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mjJpvstC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E985B290D81;
-	Thu, 22 Jan 2026 00:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8F21BDCF
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 00:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769042848; cv=none; b=Uvw+h0UxDb+F/FG4u9kcT5BHRG6dcFi69C9Ap8ze0cDC6mjQvxBAOCwhnWRCB2Eb5ulnQOvMCXwClSCse+wIe3mkMCUZpDc5m7GeChoSd1VG/78U/mAEVyu9OYCzmH4i4ex9oZuhEeYZy8jiVRirUwY/WXDYb/R5m7Jpn+ZTnOk=
+	t=1769042748; cv=none; b=NslUnVFCTqmXDmhtlPLUVHryvD25oER08CSDNCzE/cm5qcrUYz7EsVwtvz9DwegCy4Ax0f/93c90Ix9QMbhWvza0eqWrT+UyYyhcHUIB4X9KCWpkHYJJfAOPmCb1QHH/1DiG1HzNC6r7FYCCJ1eksYqHf/6T+W45LbgWWTkAZ7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769042848; c=relaxed/simple;
-	bh=N2xP6KUJmkMZLeWioXcdg35K94T8ZBwbdanXSZ5fixs=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=ous+NykQP9/fw6MDSbkFEA4d7RytaQDJyz79C27lDXgT8DeHHGC6ToxLC/xh34bc6SUwbwiRfth+Ye4b8Y6sCoE6j06onmQRSh+i1hz/233PtK2t607NQ8DyEtioBpFNSxNIBBXke1EwYxdQJ+tijKKyh5lDHHoH2X0UJNAeqo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=LwF9xtUv; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from smtpclient.apple (c-24-130-165-117.hsd1.ca.comcast.net [24.130.165.117])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 60M0jW4L2677546
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 21 Jan 2026 16:45:33 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 60M0jW4L2677546
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025122301; t=1769042734;
-	bh=gMd/j23jxUftJoE3BU7jv5A6dzONw2jQ0KVJSKYr330=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=LwF9xtUvW/4gIhLaoTVw/+wJFm5fNc2CAyd3Ol4K+n+u/IfhNncAT5Ke0NF6UoCsN
-	 yx8TzuSFmrFixA4pdbCDG277PH6yVgnYa6qDi2TU5TIEbcNIOlTosc54Q6jCvyPCYt
-	 v1i7bih80mI3+y6F6+aFtSKbIdSRsgtD0TxFzwqUaL8RKtznRVprNQ7GGYZsuKiuoL
-	 4T80pAfEJbhAoiQdKmb+tyyTfXaD5nEupNiIr8IGgsExUkBKD8N524TcZlpX2B0z3S
-	 aY2orsr8GiMSqnGv4sckzeZLtjgXqEuIKxhB7Fljs1LV05A57tuZE1nTt0htOFGomo
-	 +B2B+h2nRJ7iw==
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1769042748; c=relaxed/simple;
+	bh=Yn18zfPoq4N5AAZKJXKiCqBF0ZyJRKNF/4t09DPLZcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dPfOjtwMWMvS/R1ha5jQMGZuN82t9sh3hu1z/ZFZ2BrHym10p2x9wuVD4D1KHAUrbJ99qfpmzPYecNvOSB+oooHbjspyRpFETlHRvBkK+XJ12MgacgxEHgqd/xCPIZ49iu9eGhVSSgw9qQ51xXEUQieue1Jl1YBjYM/+XMZ1MDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mjJpvstC; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 22 Jan 2026 00:45:23 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769042727;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E2i8hEOCXJm/GacmjdxeHPzmYdIqKcfkzTGRR5hVmdA=;
+	b=mjJpvstClUP6/IUBCC2HESp8kLrAT0Xyq/6ZmmYwfNvjazTeaxDrhzzXJTkv6Xsynl9a9q
+	kiDXjLcwj9Es2/pOtb9tTXAaK0PenQyJlNMwpkyYcAL9bFGerCDfa2GDroDuelUuwCV6F7
+	11MPrm3JIUZ7IGU9luDmNl8rFZGevkY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kevin Cheng <chengkev@google.com>, pbonzini@redhat.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: SVM: Fix nested NPF injection to set
+ PFERR_GUEST_{PAGE,FINAL}_MASK
+Message-ID: <sdyb3l4ihmcd7uxb6wivkyknmzy4bcctqyyidxq7hr2d2jfs6e@iz3fhfp6t4ss>
+References: <20260121004906.2373989-1-chengkev@google.com>
+ <20260121004906.2373989-2-chengkev@google.com>
+ <aXFOPP3P-HE6YbEZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
-Subject: Re: [PATCH v9 07/22] KVM: VMX: Initialize VMCS FRED fields
-From: Xin Li <xin@zytor.com>
-In-Reply-To: <9F630202-905B-43D7-9DBF-6E4551BAF082@zytor.com>
-Date: Wed, 21 Jan 2026 16:45:22 -0800
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
-        chao.gao@intel.com, hch@infradead.org, sohil.mehta@intel.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B01C8160-4999-43B9-B89C-45913E94DA55@zytor.com>
-References: <20251026201911.505204-1-xin@zytor.com>
- <20251026201911.505204-8-xin@zytor.com>
- <8731e234-22b8-4ccf-89ef-63feed09e9c5@linux.intel.com>
- <9F630202-905B-43D7-9DBF-6E4551BAF082@zytor.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-X-Mailer: Apple Mail (2.3864.300.41.1.7)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aXFOPP3P-HE6YbEZ@google.com>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[zytor.com:s=2025122301];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68830-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DMARC_POLICY_ALLOW(0.00)[zytor.com,none];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[zytor.com:+];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_FROM(0.00)[bounces-68829-lists,kvm=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xin@zytor.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,zytor.com:email,zytor.com:dkim,zytor.com:mid,intel.com:email]
-X-Rspamd-Queue-Id: 669A0600A6
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1ECC160088
 X-Rspamd-Action: no action
 
+On Wed, Jan 21, 2026 at 02:07:56PM -0800, Sean Christopherson wrote:
+> On Wed, Jan 21, 2026, Kevin Cheng wrote:
+> > When KVM emulates an instruction for L2 and encounters a nested page
+> > fault (e.g., during string I/O emulation), nested_svm_inject_npf_exit()
+> > injects an NPF to L1. However, the code incorrectly hardcodes
+> > (1ULL << 32) for exit_info_1's upper bits when the original exit was
+> > not an NPF. This always sets PFERR_GUEST_FINAL_MASK even when the fault
+> > occurred on a page table page, preventing L1 from correctly identifying
+> > the cause of the fault.
+> > 
+> > Set PFERR_GUEST_PAGE_MASK in the error code when a nested page fault
+> > occurs during a guest page table walk, and PFERR_GUEST_FINAL_MASK when
+> > the fault occurs on the final GPA-to-HPA translation.
+> > 
+> > Widen error_code in struct x86_exception from u16 to u64 to accommodate
+> > the PFERR_GUEST_* bits (bits 32 and 33).
+> 
+> Please do this in a separate patch.  Intel CPUs straight up don't support 32-bit
+> error codes, let alone 64-bit error codes, so this seemingly innocuous change
+> needs to be accompanied by a lengthy changelog that effectively audits all usage
+> to "prove" this change is ok.
 
+Semi-jokingly, we can add error_code_hi to track the high bits and
+side-step the problem for Intel (dejavu?).
 
-> On Jan 21, 2026, at 10:14=E2=80=AFAM, Xin Li <xin@zytor.com> wrote:
->=20
->=20
->=20
->> On Jan 20, 2026, at 10:44=E2=80=AFPM, Binbin Wu =
-<binbin.wu@linux.intel.com> wrote:
->>=20
->>> +#ifdef CONFIG_X86_64
->>=20
->> Nit:
->>=20
->> Is this needed?
->>=20
->> FRED is initialized by X86_64_F(), if CONFIG_X86_64 is not enabled, =
-this
->> path is not reachable.
->> There should be no compilation issue without #ifdef CONFIG_X86_64 / =
-#endif.
->>=20
->> There are several similar patterns in this patch, using  #ifdef =
-CONFIG_X86_64 /=20
->> #endif or not seems not consistent. E.g. __vmx_vcpu_reset() and =
-init_vmcs()
->> doesn't check the config, but here does.
->=20
->=20
-> I tried removing all such #ifdef, and it turned out that I had to keep =
-this
-> per the last round of build checks.
->=20
-> Anyway, I will do another build check on x86_32.
->=20
+> 
+> > Update nested_svm_inject_npf_exit() to use fault->error_code directly
+> > instead of hardcoding the upper bits. Also add a WARN_ON_ONCE if neither
+> > PFERR_GUEST_FINAL_MASK nor PFERR_GUEST_PAGE_MASK is set, as this would
+> > indicate a bug in the page fault handling code.
+> > 
+> > Signed-off-by: Kevin Cheng <chengkev@google.com>
+[..]
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index de90b104a0dd5..f8dfd5c333023 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -40,18 +40,17 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
+> >  	struct vmcb *vmcb = svm->vmcb;
+> >  
+> >  	if (vmcb->control.exit_code != SVM_EXIT_NPF) {
+> > -		/*
+> > -		 * TODO: track the cause of the nested page fault, and
+> > -		 * correctly fill in the high bits of exit_info_1.
+> > -		 */
+> > -		vmcb->control.exit_code = SVM_EXIT_NPF;
+> > -		vmcb->control.exit_info_1 = (1ULL << 32);
+> > +		vmcb->control.exit_info_1 = fault->error_code;
+> >  		vmcb->control.exit_info_2 = fault->address;
+> >  	}
+> >  
+> > +	vmcb->control.exit_code = SVM_EXIT_NPF;
+> >  	vmcb->control.exit_info_1 &= ~0xffffffffULL;
+> >  	vmcb->control.exit_info_1 |= fault->error_code;
+> 
+> So... what happens when exit_info_1 already has PFERR_GUEST_PAGE_MASK, and then
+> @fault sets PFERR_GUEST_FINAL_MASK?  Presumably that can't/shouldn't happen,
+> but nothing in the changelog explains why such a scenario is
+> impossible, and nothing in the code hardens KVM against such goofs.
 
+I guess we can update the WARN below to check for that as well, and
+fallback to the current behavior (set PFERR_GUEST_FINAL_MASK):
 
-The trouble comes from __this_cpu_ist_top_va():
+	fault_stage = vmcb->control.exit_info_1 &
+			(PFERR_GUEST_FINAL_MASK | PFERR_GUEST_PAGE_MASK);
+	if (WARN_ON_ONCE(fault_stage != PFERR_GUEST_FINAL_MASK &&
+			 fault_stage != PFERR_GUEST_PAGE_MASK))
+		vmcb->control.exit_info_1 |= PFERR_GUEST_FINAL_MASK;
 
-arch/x86/kvm/vmx/vmx.c: In function =E2=80=98vmx_vcpu_load_vmcs=E2=80=99:
-arch/x86/kvm/vmx/vmx.c:1608:59: error: implicit declaration of function =
-=E2=80=98__this_cpu_ist_top_va=E2=80=99 =
-[-Werror=3Dimplicit-function-declaration]
- 1608 |                         vmcs_write64(HOST_IA32_FRED_RSP1, =
-__this_cpu_ist_top_va(ESTACK_DB));
-      |                                                           =
-^~~~~~~~~~~~~~~~~~~~~
-arch/x86/kvm/vmx/vmx.c:1608:81: error: =E2=80=98ESTACK_DB=E2=80=99 =
-undeclared (first use in this function)
- 1608 |                         vmcs_write64(HOST_IA32_FRED_RSP1, =
-__this_cpu_ist_top_va(ESTACK_DB));
-      |                                                                  =
-               ^~~~~~~~~
-arch/x86/kvm/vmx/vmx.c:1608:81: note: each undeclared identifier is =
-reported only once for each function it appears in
-  CC [M]  crypto/md4.o
-  CC      lib/crypto/sha512.o
-arch/x86/kvm/vmx/vmx.c:1609:81: error: =E2=80=98ESTACK_NMI=E2=80=99 =
-undeclared (first use in this function)
- 1609 |                         vmcs_write64(HOST_IA32_FRED_RSP2, =
-__this_cpu_ist_top_va(ESTACK_NMI));
-      |                                                                  =
-               ^~~~~~~~~~
-arch/x86/kvm/vmx/vmx.c:1610:81: error: =E2=80=98ESTACK_DF=E2=80=99 =
-undeclared (first use in this function)
- 1610 |                         vmcs_write64(HOST_IA32_FRED_RSP3, =
-__this_cpu_ist_top_va(ESTACK_DF));
-      |                                                                  =
-               ^~~~~~~~~
-
+> 
+> > +	WARN_ON_ONCE(!(vmcb->control.exit_info_1 &
+> > +		       (PFERR_GUEST_FINAL_MASK | PFERR_GUEST_PAGE_MASK)));
+> > +
+> >  	nested_svm_vmexit(svm);
+> >  }
+> >  
+> > -- 
+> > 2.52.0.457.g6b5491de43-goog
+> > 
 
