@@ -1,231 +1,207 @@
-Return-Path: <kvm+bounces-68883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68884-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QMDOMFMJcmmOagAAu9opvQ
-	(envelope-from <kvm+bounces-68883-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 12:26:11 +0100
+	id sKILEIsTcmksawAAu9opvQ
+	(envelope-from <kvm+bounces-68884-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 13:09:47 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D8165F71
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 12:26:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0288666D9
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 13:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 12B8F76BA4C
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 11:19:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4277F7AC9E2
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 11:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555E444D6BE;
-	Thu, 22 Jan 2026 11:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09AA357729;
+	Thu, 22 Jan 2026 11:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L+5oloap"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5762F5472;
-	Thu, 22 Jan 2026 11:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F361728AAEB
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 11:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769080489; cv=none; b=G1s4KS/U+wXQIlKJe080EWnFQ+dYIwksRAXZc+4/9M0wBicAZOQy0jF2GTKISw+nfXx1XX1Ec+lIK1XEBZ5oGIEXndtapn3xklUZeZkIJRRY4T0/PcHVi8XYPW20Us6y3DxWJDxehYqJ0BCNmv1Hqj6BWqv3w1XO3ojga4RYr5A=
+	t=1769081082; cv=none; b=AvdrONsWVKYnXnAb5PHYhcxkqyhMTUiOUiP8svWt3oJgjF1UP83rei0vJPJ2Y0C7OIcXLy//LRpZVpokuMfgGb/9bXT+iexHlX85YJDE9LtH2pBN8XP/oFeFuPBF0M0NDIhPes9vK5AWv/UCk3QOGZThvkMKK9uLJGoFjbu48Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769080489; c=relaxed/simple;
-	bh=ZM9jMKC1FNU2vUL0nu3IkQWKCp/IJS9VWWAFmMpqNOM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Re+OyNSWEMqBR2RS/dNiloTMKVt4EwqWSjh3L2HTMEtRxJ9zEtaGE4XHHOiMTN9NOYojbRdBwQFout3+uRhmlCdjbUkzFKtGdU1EySyw6Pzq5KXNzFKHQcPnkHPKvthvei2Ia8I7mGy4Ljf/1111DvYY2JKLDfpozMtKvzU/3nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8CxVvCdBnJpz3sLAA--.38163S3;
-	Thu, 22 Jan 2026 19:14:37 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJDxquCbBnJpwR4rAA--.21397S5;
-	Thu, 22 Jan 2026 19:14:37 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>
-Cc: loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [PATCH 3/3] LoongArch: KVM: Add FPU delay load support
-Date: Thu, 22 Jan 2026 19:14:33 +0800
-Message-Id: <20260122111434.1737872-4-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20260122111434.1737872-1-maobibo@loongson.cn>
-References: <20260122111434.1737872-1-maobibo@loongson.cn>
+	s=arc-20240116; t=1769081082; c=relaxed/simple;
+	bh=qasutVXztcJ9HM+CyZWPrta1Bb08m8CU95TnRr2C528=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SK+7abSolVg9h2s/RJWu6338NLCaBKBnx/FVy+zc2Av1NJQAb4x8v7K9cS11iU44n0Ji52t7JTdJbABh56QoGfP+7CNPhwsK39Ts6dJaxr5/XM7NkkwFu8dJe3FZl6ZH2uGNm32EMUA+qo6liizDOw9zJtRJ0UKCee9NVP0Vs0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L+5oloap; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769081079;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9NgMyyWJCfzd8YQ/Mm3GEt0/9k5YoUbFP0YSsx5ZSgg=;
+	b=L+5oloapRZFs9xIyNQUrnfl4ejSIBljmJBvOmaonL1ZPaA5XRHRDiTykxBbPTACtSCJSHu
+	qYIU1J09weLGgi4okfw7tbGwdexmGiAl7of3do1OhWKmEE7SdxPhsgmrE0RAeMzDd5/F0j
+	VRWv6LbLhRJq/kS03bcjsSu1TZmhozo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-261-7nFwJM6DOSO-uDud0z3tKQ-1; Thu,
+ 22 Jan 2026 06:24:36 -0500
+X-MC-Unique: 7nFwJM6DOSO-uDud0z3tKQ-1
+X-Mimecast-MFC-AGG-ID: 7nFwJM6DOSO-uDud0z3tKQ_1769081075
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0AAC218003FC;
+	Thu, 22 Jan 2026 11:24:35 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.63])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 648C31800109;
+	Thu, 22 Jan 2026 11:24:27 +0000 (UTC)
+Date: Thu, 22 Jan 2026 11:24:24 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>,
+	=?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
+	Kevin Wolf <kwolf@redhat.com>,
+	German Maglione <gmaglione@redhat.com>,
+	Hanna Reitz <hreitz@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Alex Bennee <alex.bennee@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	John Levon <john.levon@nutanix.com>,
+	Thanos Makatos <thanos.makatos@nutanix.com>,
+	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>
+Subject: Re: Call for GSoC internship project ideas
+Message-ID: <aXII6EfQ3D4fkWLg@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+ <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
+ <CAJSP0QVQNExn01ipcu4KTQJrmnXGVmvFyKzXe5m9P3_jQwJ6cA@mail.gmail.com>
+ <CAJSP0QW4bMO8-iYODO_6oaDn44efPeV6e00AfD5A42pQ9d+REQ@mail.gmail.com>
+ <aXH4PpkC4AtccsOE@redhat.com>
+ <130b8f26-2369-48f5-bbd6-e27210707b9f@redhat.com>
+ <aXIAmeEWMFjQM84o@redhat.com>
+ <995d4aaf-bbff-42be-9114-1f04bb51e37c@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxquCbBnJpwR4rAA--.21397S5
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+In-Reply-To: <995d4aaf-bbff-42be-9114-1f04bb51e37c@redhat.com>
+User-Agent: Mutt/2.2.14 (2025-02-20)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.24 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	R_SPF_SOFTFAIL(0.00)[~all:c];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[loongson.cn];
-	TAGGED_FROM(0.00)[bounces-68883-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[gmail.com,redhat.com,nongnu.org,vger.kernel.org,gmx.de,linaro.org,ilande.co.uk,nutanix.com];
+	TAGGED_FROM(0.00)[bounces-68884-lists,kvm=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[redhat.com,quarantine];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qemu.org:url,dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,buildroot.org:url,instagram.com:url,berrange.com:url,libvirt.org:url];
+	HAS_REPLYTO(0.00)[berrange@redhat.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[berrange@redhat.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dfw.mirrors.kernel.org:helo,dfw.mirrors.kernel.org:rdns,loongson.cn:mid,loongson.cn:email]
-X-Rspamd-Queue-Id: 65D8165F71
+	R_SPF_SOFTFAIL(0.00)[~all];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:7979, ipnet:2605:f480::/32, country:US];
+	TAGGED_RCPT(0.00)[kvm];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: B0288666D9
 X-Rspamd-Action: no action
 
-FPU is lazy enabled with KVM hypervisor. After FPU is enabled and
-loaded, vCPU can be preempted and FPU will be lost again. Here FPU
-is delay load until guest enter entry.
+On Thu, Jan 22, 2026 at 12:05:14PM +0100, Thomas Huth wrote:
+> On 22/01/2026 11.48, Daniel P. Berrangé wrote:
+> > On Thu, Jan 22, 2026 at 11:43:35AM +0100, Thomas Huth wrote:
+> > > On 22/01/2026 11.14, Daniel P. Berrangé wrote:
+> > > > On Tue, Jan 20, 2026 at 04:42:38PM -0500, Stefan Hajnoczi wrote:
+> > > > > Hi Marc-André,
+> > > > > I haven't seen discussion about the project ideas you posted, so I'll
+> > > > > try to kick it off here for the mkosi idea here.
+> > > > > 
+> > > > > Thomas: Would you like to co-mentor the following project with
+> > > > > Marc-André? Also, do you have any concerns about the project idea from
+> > > > > the maintainer perspective?
+> > > 
+> > > I'm fine with co-mentoring the project, but could you do me a favour and add
+> > > some wording about AI tools to
+> > > https://wiki.qemu.org/Google_Summer_of_Code_2026 to set the expectations
+> > > right? Since we don't allow AI generated code in QEMU, I'd appreciate if we
+> > > could state this in a prominent place here to avoid that some people think
+> > > they could get some quick money here by using AI tools, just to finally
+> > > discover that AI generated code is not allowed in the QEMU project. Thanks!
+> > > 
+> > > > IMHO, our baseline for functional testing images ought to be
+> > > > a Linux Kconfig recipe used to build a dedicate kernel, plus
+> > > > a busybox build for the target.
+> > > 
+> > > Not sure if we want to add kernel compilation time to the functional tests
+> > > (even if it's only done once during the initial build)...? That could easily
+> > > sum up to a couple of hours for a fresh checkout of QEMU...
+> > 
+> > That's absolutely *NOT* what I was suggesting.
+> > 
+> > We should have a 'qemu-test-images.git' repository that maintains all
+> > the recipes, with CI jobs to build and publish them (along with corresponding
+> > source). Those prebuilt images would be consumed by QEMU functional tests.
+> > This would be quicker than what we have today, as the images downloaded by
+> > functional tests could be an order of magnitude smaller, and boot more
+> > quickly too.
+> 
+> Ah, sorry for getting that wrong!
+> 
+> Ok, so this sounds basically just like a gitlab-CI wrapper around what
+> buildroot.org already provides. ... not sure whether that's challenging
+> enough for a GSoC project?
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/include/asm/kvm_host.h |  3 +++
- arch/loongarch/kvm/exit.c             |  6 +++---
- arch/loongarch/kvm/vcpu.c             | 24 +++++++++---------------
- 3 files changed, 15 insertions(+), 18 deletions(-)
+Given the number of machines we have, it is certainly time consuming
+enough to figure out the build for each one, and integrate it with
+the functional test. Not massively mentally challenging, but that's
+not a bad thing for GSoC.
 
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index e4fe5b8e8149..2ad61f2dc3a9 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -37,6 +37,9 @@
- #define KVM_REQ_TLB_FLUSH_GPA		KVM_ARCH_REQ(0)
- #define KVM_REQ_STEAL_UPDATE		KVM_ARCH_REQ(1)
- #define KVM_REQ_PMU			KVM_ARCH_REQ(2)
-+#define KVM_REQ_FPU_LOAD		KVM_ARCH_REQ(3)
-+#define KVM_REQ_LSX_LOAD		KVM_ARCH_REQ(4)
-+#define KVM_REQ_LASX_LOAD		KVM_ARCH_REQ(5)
- 
- #define KVM_GUESTDBG_SW_BP_MASK		\
- 	(KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
-diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-index 74b427287e96..f979e70da7c3 100644
---- a/arch/loongarch/kvm/exit.c
-+++ b/arch/loongarch/kvm/exit.c
-@@ -754,7 +754,7 @@ static int kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu, int ecode)
- 		return RESUME_HOST;
- 	}
- 
--	kvm_own_fpu(vcpu);
-+	kvm_make_request(KVM_REQ_FPU_LOAD, vcpu);
- 
- 	return RESUME_GUEST;
- }
-@@ -795,7 +795,7 @@ static int kvm_handle_lsx_disabled(struct kvm_vcpu *vcpu, int ecode)
- 	if (!kvm_guest_has_lsx(&vcpu->arch))
- 		kvm_queue_exception(vcpu, EXCCODE_INE, 0);
- 	else
--		kvm_own_lsx(vcpu);
-+		kvm_make_request(KVM_REQ_LSX_LOAD, vcpu);
- 
- 	return RESUME_GUEST;
- }
-@@ -813,7 +813,7 @@ static int kvm_handle_lasx_disabled(struct kvm_vcpu *vcpu, int ecode)
- 	if (!kvm_guest_has_lasx(&vcpu->arch))
- 		kvm_queue_exception(vcpu, EXCCODE_INE, 0);
- 	else
--		kvm_own_lasx(vcpu);
-+		kvm_make_request(KVM_REQ_LASX_LOAD, vcpu);
- 
- 	return RESUME_GUEST;
- }
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index d91a1160a309..572cae4f7882 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -232,6 +232,15 @@ static void kvm_late_check_requests(struct kvm_vcpu *vcpu)
- 			kvm_flush_tlb_gpa(vcpu, vcpu->arch.flush_gpa);
- 			vcpu->arch.flush_gpa = INVALID_GPA;
- 		}
-+
-+	if (kvm_check_request(KVM_REQ_FPU_LOAD, vcpu))
-+		kvm_own_fpu(vcpu);
-+
-+	if (kvm_check_request(KVM_REQ_LSX_LOAD, vcpu))
-+		kvm_own_lsx(vcpu);
-+
-+	if (kvm_check_request(KVM_REQ_LASX_LOAD, vcpu))
-+		kvm_own_lasx(vcpu);
- }
- 
- /*
-@@ -1338,8 +1347,6 @@ static inline void kvm_check_fcsr_alive(struct kvm_vcpu *vcpu) { }
- /* Enable FPU and restore context */
- void kvm_own_fpu(struct kvm_vcpu *vcpu)
- {
--	preempt_disable();
--
- 	/*
- 	 * Enable FPU for guest
- 	 * Set FR and FRE according to guest context
-@@ -1349,17 +1356,12 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
- 
- 	kvm_restore_fpu(&vcpu->arch.fpu);
- 	vcpu->arch.aux_inuse |= KVM_LARCH_FPU;
--	trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_FPU);
--
--	preempt_enable();
- }
- 
- #ifdef CONFIG_CPU_HAS_LSX
- /* Enable LSX and restore context */
- int kvm_own_lsx(struct kvm_vcpu *vcpu)
- {
--	preempt_disable();
--
- 	/* Enable LSX for guest */
- 	kvm_check_fcsr(vcpu, vcpu->arch.fpu.fcsr);
- 	set_csr_euen(CSR_EUEN_LSXEN | CSR_EUEN_FPEN);
-@@ -1379,10 +1381,7 @@ int kvm_own_lsx(struct kvm_vcpu *vcpu)
- 		break;
- 	}
- 
--	trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LSX);
- 	vcpu->arch.aux_inuse |= KVM_LARCH_LSX | KVM_LARCH_FPU;
--	preempt_enable();
--
- 	return 0;
- }
- #endif
-@@ -1391,8 +1390,6 @@ int kvm_own_lsx(struct kvm_vcpu *vcpu)
- /* Enable LASX and restore context */
- int kvm_own_lasx(struct kvm_vcpu *vcpu)
- {
--	preempt_disable();
--
- 	kvm_check_fcsr(vcpu, vcpu->arch.fpu.fcsr);
- 	set_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN);
- 	switch (vcpu->arch.aux_inuse & (KVM_LARCH_FPU | KVM_LARCH_LSX)) {
-@@ -1412,10 +1409,7 @@ int kvm_own_lasx(struct kvm_vcpu *vcpu)
- 		break;
- 	}
- 
--	trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LASX);
- 	vcpu->arch.aux_inuse |= KVM_LARCH_LASX | KVM_LARCH_LSX | KVM_LARCH_FPU;
--	preempt_enable();
--
- 	return 0;
- }
- #endif
+> Also, adding this as a separate repository will easily burn your gitlab-CI
+> minutes if you don't have a dedicated runner for this, so developing this
+> feature might be no fun at all...
+
+I'd expect most of the work would be on a local machine to construct and
+test images for all the different machines and validate them in functional
+tests. The integration into GitLab CI is a small-ish part which could be
+validated with just a couple of images, so you'd only burn major CI credits
+towards the end when needing to do a full run across all images.
+
+With regards,
+Daniel
 -- 
-2.39.3
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
