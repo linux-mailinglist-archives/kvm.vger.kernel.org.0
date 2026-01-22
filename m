@@ -1,252 +1,250 @@
-Return-Path: <kvm+bounces-68933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68934-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cIF3BdKLcmlJmAAAu9opvQ
-	(envelope-from <kvm+bounces-68933-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 21:42:58 +0100
+	id EHVQL3aWcmmSmwAAu9opvQ
+	(envelope-from <kvm+bounces-68934-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 22:28:22 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D9D6D7DC
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 21:42:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A1EE6DC21
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 22:28:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8EA83035A94
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 20:41:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 50F733038AE5
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 21:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBF83A703F;
-	Thu, 22 Jan 2026 20:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486A93C0879;
+	Thu, 22 Jan 2026 21:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="SCmRGBJh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BCJ0AjLn"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08824389440;
-	Thu, 22 Jan 2026 20:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769114486; cv=none; b=Wi0uEkevEO1aWPnf2y6HYYxiGqkXTQtxRewbOagjY/urlbtPTXLuG1gQB9MAVBriQc9PQhtRRvw3yOWB1VpBXwfh5TME9nTZPF4jf+Pb5s466qUMuUuqPbeRtAm6aMRfPV8PR5cOan+WM7z3YSTFDAzc5x/nQQpsg2QjVRrpXE8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769114486; c=relaxed/simple;
-	bh=LonPtWha4x8xuSmcztKfYqypFSPHpLZl16paREdrt8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tBpsHwoZwG1JMuNnjGbIy3cGGHuTSiGvk3VHQDz/gP7Lj3ksdYwrird8jLrvr7g/3ZR5jcD3JHlof3KqoMyzxRLRfprJ366Xxkw1W6dVIKLNEBnyDKC5ej98cFO3OHZB/6DpOZWbyPMMrNiMoIj7fR8NcYfUTnTSI9IUhasSIeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=SCmRGBJh; arc=none smtp.client-ip=3.74.81.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A918A3C0870
+	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 21:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769117217; cv=pass; b=PrDrOWbH7a6gNSAvFPmA9nNNwKbWRxsIY4xrxvw/ij984shEzmUacvBdmOHLxelsJ6ANQIRlXO5TvsvqRGI+4qWBplqFH9fHzLsT1+7GNsZ4f67bnFKhYK7tiI3Tg4ylguno9qYr7RnWeHeLnMxdYuUiwuWURciLQJ7PkyOEzDI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769117217; c=relaxed/simple;
+	bh=BC8nFTG86vfd/JV3Ur3Vnv61JQ8TQGgb2hnHokTdwfs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cMcbDBF28+wkL61X3bAgJiKYk74VgYUx44t6PopWkLX5f+UzAHq7CofBJmIo+n/NBzYyzfjjy6KVGU6tpaeoU05MtdW/TbyKYIp+LFhxxNi7jh04FIYOatvxlEib3uTToxd6VDbTaZkt+rxtjRxBcnhTpI+UAiAMIL396K+MaLk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BCJ0AjLn; arc=pass smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-64baa44df99so3157a12.0
+        for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 13:26:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769117205; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MmZxI+StIctLURF0rq7CF2dhKNzUlaufHImPkMkO/ZEY9GoyKS0EGhyDOaTWcODuEr
+         Ezf2xud+rstU3z3sR8Z+SYDnarors+Olpm8u+OJzAvG/AF/SISK5NCss9ZKRDmk/Ssu8
+         lgLQcPCY1O1sFmt7/vfbIhv10cHGPce7sc3BD+3Vsk74kusbD9ho2zMwN6lAFx4QdLUe
+         jmZluxrKokifVIWy6BgXR3lC+047QMxRVZTTiiewb8J00xC10HRedemwrwZD7zOb1WA9
+         LscuxJgdBAMjNvUGwN+zJqZY2+KWkO5cOOnVXkxlTrcCVqPSgXm2bmRGaXDulAqHZZk9
+         O66A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=e/+D/s4bwsqNNaSjIaXHNf2UcfLo5UUZymlR0tqKlbQ=;
+        fh=RNX2nad/6Mm1xA8i3rmUeCLag6zJ0Ws5xmHdKiuKYv0=;
+        b=BH2MSTnP2dNEoPD8wZ5S6/X3jBjndUhZBTeWGRS5wkXPYQpfdmhOxi1sygGHrpK/Pi
+         yaruZQpLoodtq3idkV8Mg0AAU5thajz07jXvBSAmMBwiu82I3oIf1ly6cFfkrll+c9dP
+         oQalb1zAeBAdEI0UAJXnOzfyaBuwaDVb4tVS9Z2IDMZ8Lq62ewhcD+6XnDEMHNFlsZDs
+         hd/YxDJ+j+rI7UX34fzna2UcJG9PswsLtDOdO4GDr4ZniKFZ4A61csP7xISD9VLbeoLk
+         FxryA9eFAWPE2k6M/mNCfbvLpz/cUJFrRjy9Khicl7V2vAasQTjaTRcHlOAsuRQjcQSB
+         d06w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1769114480; x=1800650480;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=L060fUvGttxYBIHa6eLU8Z48SLaOwnhKGvQs72E5QZs=;
-  b=SCmRGBJhNyXtpYiJKtHywhQ3vlbN3/T3F4Y2L8whBJAfJcCtGq59YV6k
-   IfqNX+2Vn+zqIr//fQgpfpFFODHMyhzTkK6ZkSHqfDuc7h0xmV1gOjxKU
-   QIr11WoHQLZsS5AQSJ8mo7LoHjYlJy64VBfs9Cmq2B9RNNWtQcT5lNaa6
-   rhzQVZ6KsnsqpBLe58WbTq5NKK9zpwbmgPirLsNvw6kGNb71qmhe/9eDS
-   VvZSgTS4E4jenFoFB36tW1/nVrZzCCt8apbYolXuBRdLuTib+eudUNLrV
-   g5ogb6vDyGAfxksDqAOswDYU2obRaB8qGKvR7lvLxr8L6otMmcTM6VdA/
-   A==;
-X-CSE-ConnectionGUID: Eq/qtYVnSJqlAvEbKUczXA==
-X-CSE-MsgGUID: JuRcDWNSTV2iEyPOM5D09w==
-X-IronPort-AV: E=Sophos;i="6.21,246,1763424000"; 
-   d="scan'208";a="8319239"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 20:40:53 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:3034]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.29.47:2525] with esmtp (Farcaster)
- id a5dd7989-855e-4510-b2e9-5fd9107a3c02; Thu, 22 Jan 2026 20:40:52 +0000 (UTC)
-X-Farcaster-Flow-ID: a5dd7989-855e-4510-b2e9-5fd9107a3c02
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 22 Jan 2026 20:40:51 +0000
-Received: from [192.168.23.186] (10.106.82.17) by
- EX19D005EUB003.ant.amazon.com (10.252.51.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 22 Jan 2026 20:40:47 +0000
-Message-ID: <0635e64a-2194-4a6c-b772-28af54d58e3b@amazon.com>
-Date: Thu, 22 Jan 2026 20:40:46 +0000
+        d=google.com; s=20230601; t=1769117205; x=1769722005; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e/+D/s4bwsqNNaSjIaXHNf2UcfLo5UUZymlR0tqKlbQ=;
+        b=BCJ0AjLn3+m4uTzW+3XHgZBfCM+s/Cdo4me9s8vFGRnzyWkS21yZBz2RJqPFJljAc1
+         DXO93QcdFh7XW3k9p6DPz+k3W4qx5NNtpdU1arYFW6y/P+CtpRs2xsqezHnLtmYZ3RZi
+         GmY9WLZdG8FSGvbnt6/kyEJNQbqpiuY+seIb2HpR53l9K9QjNAnt+PkmAUwWyQlf2A7J
+         JytiEWoBrQqaQKpYS36u9WORYuP73TfbRczcUX4PPlPdQ+0zjTqpMA5JR4taiFYXk+x/
+         atV0APikoAFqQhpWuaKgfp/f6Yj4iug6w0b2sKeKx5Uj3t8qtyzud4O71a/nchQcWdi7
+         hsLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769117205; x=1769722005;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=e/+D/s4bwsqNNaSjIaXHNf2UcfLo5UUZymlR0tqKlbQ=;
+        b=Pf4IrXSr7NHKyh/1DhaP/8FbWY7mwEG7u55LueP3i56I3XNec9fCa+FXRqEpype8Rf
+         WMEmkgRToG03+eybSycLIKRs0TO4kDf6K07cI5jpGoKQwrMHqNnWNbXR1JFAprwXAv3G
+         DKUHLtZF5oW2IFT2tFg1cTvN+lTqfCwPxcH/3D66pfE0Eqr4oSpTFkTyJJJZdrQfnLEF
+         iPNYdH+dYA8lNe3pQrqmg2sDQAaip5E0hIN4nAalfUL4fjlvsEbeKa1tssSpwsbtHDgQ
+         x/a0O02zvPdmccXbQpIHkHhDzRtUdOA9l6Oj9wbK/jGBC5MfI4ecTO2V9B5tF/fTqtkh
+         n/XA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAPSOLCzv4kaRUKJCOT9ehgc/xVEVIzn9ISigfcEgK15EszOTF63PwjMmd3psoAlLbTbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFIZXfg7yEkSrpg5EZOpVZxnxjOfnSTpJd9W2RnqnLscuuTjaH
+	aNX3v7Tas/ttDU/xvLrepDF24o9SXMCBdG7FUdjHlCPSrADCaGH7UROsnESO8Z/A6USXhB5mO2D
+	wAQ0SrLSLCwkk1fZIBFk/BZE06ohiWkC/v7c1TsCT
+X-Gm-Gg: AZuq6aI+OIX02AaZDzR+VeFxB69SfNfM7flRd0ABoXAL7v82IBWP6KxWXtE64Un+Y23
+	N+gQ+ue1G/tovhfBtDrXkTYn5JBlir4hQ8vAtuHhzDszUDu8U46DUzwrvUDWiPw5W3WlQ7lXah0
+	whh1DV6+TGleqmBWBxfOeD8uTIq01+y9qweXHerJ28IeV5kqx4+Usm20rCMVRNltx1XXbHiw69D
+	GVkw8bSJTXu6KxuPPaQxD8T7ngtXTnXlqfc7lQSjOdeuCdN2nbEsSX8IoAd8tc3qXvAoJwWA6zZ
+	sfmlMw==
+X-Received: by 2002:aa7:c606:0:b0:658:e7a:6fa7 with SMTP id
+ 4fb4d7f45d1cf-6584bfcad65mr10888a12.4.1769117205288; Thu, 22 Jan 2026
+ 13:26:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v9 07/13] KVM: guest_memfd: Add flag to remove from direct
- map
-To: Ackerley Tng <ackerleytng@google.com>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
-	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
-	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org"
-	<luto@kernel.org>, "peterz@infradead.org" <peterz@infradead.org>,
-	"willy@infradead.org" <willy@infradead.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>,
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz"
-	<vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com"
-	<surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org"
-	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
-	<martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
-	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
-	<yonghong.song@linux.dev>, "john.fastabend@gmail.com"
-	<john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
-	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "jannh@google.com" <jannh@google.com>,
-	"pfalcato@suse.de" <pfalcato@suse.de>, "shuah@kernel.org" <shuah@kernel.org>,
-	"riel@surriel.com" <riel@surriel.com>, "ryan.roberts@arm.com"
-	<ryan.roberts@arm.com>, "jgross@suse.com" <jgross@suse.com>,
-	"yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>, "kas@kernel.org"
-	<kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "maobibo@loongson.cn"
-	<maobibo@loongson.cn>, "prsampat@amd.com" <prsampat@amd.com>,
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "jmattson@google.com"
-	<jmattson@google.com>, "jthoughton@google.com" <jthoughton@google.com>,
-	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, "alex@ghiti.fr"
-	<alex@ghiti.fr>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, "dev.jain@arm.com"
-	<dev.jain@arm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>,
-	"hca@linux.ibm.com" <hca@linux.ibm.com>, "Jonathan.Cameron@huawei.com"
-	<Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
-	<shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>,
-	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com"
-	<wyihan@google.com>, "yang@os.amperecomputing.com"
-	<yang@os.amperecomputing.com>, "vannapurve@google.com"
-	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
-	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
-	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
- Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-References: <20260114134510.1835-1-kalyazin@amazon.com>
- <20260114134510.1835-8-kalyazin@amazon.com>
- <CAEvNRgEzVhEzr-3GWTsE7GSBsPdvVLq7WFEeLHzcmMe=R9S51w@mail.gmail.com>
- <a2b79af7-e5d1-4668-bff3-606f57d32dfc@amazon.com>
- <CAEvNRgF46M1jp0+eBu2wQMO7P1afyo00SOkENFwvB2KYX3dnFA@mail.gmail.com>
- <f2f2a6bd-5cb4-46c9-a0f8-3240670094b5@amazon.com>
- <CAEvNRgEd=Uh09dU_P7_vvzRpOyMYd=OKazpkxzr=VLe5HcQhGw@mail.gmail.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <CAEvNRgEd=Uh09dU_P7_vvzRpOyMYd=OKazpkxzr=VLe5HcQhGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D004EUC003.ant.amazon.com (10.252.51.249) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+References: <20260113225406.273373-1-jmattson@google.com> <aWbmXTJdZDO_tnvE@google.com>
+ <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
+In-Reply-To: <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 22 Jan 2026 13:26:32 -0800
+X-Gm-Features: AZwV_QhQTOem4BLVo53HKT58urNX60REF_SUeJPvF_yxD4XbcC-SDKdt9bRc4xc
+Message-ID: <CALMp9eQx7EVim4iYGbAhoHrei2YmTra6oxtdmKaY7bw-M0PHbw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Add quirk to allow L1 to set FREEZE_IN_SMM in vmcs12
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68933-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FREEMAIL_CC(0.00)[redhat.com,lwn.net,kernel.org,arm.com,huawei.com,google.com,linutronix.de,alien8.de,linux.intel.com,zytor.com,infradead.org,linux-foundation.org,oracle.com,suse.cz,suse.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,ziepe.ca,nvidia.com,suse.de,surriel.com,intel.com,loongson.cn,amd.com,linux.ibm.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,os.amperecomputing.com,amazon.co.uk,amazon.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68934-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[96];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	HAS_REPLYTO(0.00)[kalyazin@amazon.com];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: A8D9D6D7DC
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3A1EE6DC21
 X-Rspamd-Action: no action
 
+On Tue, Jan 13, 2026 at 7:47=E2=80=AFPM Jim Mattson <jmattson@google.com> w=
+rote:
+>
+> On Tue, Jan 13, 2026 at 4:42=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Tue, Jan 13, 2026, Jim Mattson wrote:
+> > > Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM to allow L1 to set
+> > > IA32_DEBUGCTL.FREEZE_IN_SMM in vmcs12 when using nested VMX.  Prior t=
+o
+> > > commit 6b1dd26544d0 ("KVM: VMX: Preserve host's
+> > > DEBUGCTLMSR_FREEZE_IN_SMM while running the guest"), L1 could set
+> > > FREEZE_IN_SMM in vmcs12 to freeze PMCs during physical SMM coincident
+> > > with L2's execution.  The quirk is enabled by default for backwards
+> > > compatibility; userspace can disable it via KVM_CAP_DISABLE_QUIRKS2 i=
+f
+> > > consistency with WRMSR(IA32_DEBUGCTL) is desired.
+> >
+> > It's probably worth calling out that KVM will still drop FREEZE_IN_SMM =
+in vmcs02
+> >
+> >         if (vmx->nested.nested_run_pending &&
+> >             (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS))=
+ {
+> >                 kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
+> >                 vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia32_debug=
+ctl &
+> >                                                vmx_get_supported_debugc=
+tl(vcpu, false)); <=3D=3D=3D=3D
+> >         } else {
+> >                 kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
+> >                 vmx_guest_debugctl_write(vcpu, vmx->nested.pre_vmenter_=
+debugctl);
+> >         }
+> >
+> > both from a correctness standpoint and so that users aren't mislead int=
+o thinking
+> > the quirk lets L1 control of FREEZE_IN_SMM while running L2.
+>
+> Yes, it's probably worth pointing out that the VM is now subject to
+> the whims of the L0 administrators.
+>
+> While that makes some sense for the legacy vPMU, where KVM is just
+> another client of host perf, perhaps the decision should be revisited
+> in the case of the MPT vPMU, where KVM owns the PMU while the vCPU is
+> in VMX non-root operation.
+>
+> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > index 0521b55d47a5..bc8f0b3aa70b 100644
+> > > --- a/arch/x86/kvm/vmx/nested.c
+> > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > @@ -3298,10 +3298,24 @@ static int nested_vmx_check_guest_state(struc=
+t kvm_vcpu *vcpu,
+> > >       if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 &=
+ X86_CR0_WP)))
+> > >               return -EINVAL;
+> > >
+> > > -     if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) =
+&&
+> > > -         (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
+> > > -          CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugct=
+l, false))))
+> > > -             return -EINVAL;
+> > > +     if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) {
+> > > +             u64 debugctl =3D vmcs12->guest_ia32_debugctl;
+> > > +
+> > > +             /*
+> > > +              * FREEZE_IN_SMM is not virtualized, but allow L1 to se=
+t it in
+> > > +              * L2's DEBUGCTL under a quirk for backwards compatibil=
+ity.
+> > > +              * Prior to KVM taking ownership of the bit to ensure P=
+MCs are
+> > > +              * frozen during physical SMM, L1 could set FREEZE_IN_S=
+MM in
+> > > +              * vmcs12 to freeze PMCs during physical SMM coincident=
+ with
+> > > +              * L2's execution.
+> > > +              */
+> > > +             if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_VMCS12=
+_FREEZE_IN_SMM))
+> > > +                     debugctl &=3D ~DEBUGCTLMSR_FREEZE_IN_SMM;
+> > > +
+> > > +             if (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
+> > > +                 CC(!vmx_is_valid_debugctl(vcpu, debugctl, false)))
+> >
+> > I'm mildly tempted to say we should quirk the entire consistency check =
+instead of
+> > limiting it to FREEZE_IN_SMM, purely so that we don't have to add yet a=
+nother quirk
+> > if a different setup breaks on a different bit.  I suppose we could lim=
+it the quirk
+> > to bits that could have been plausibly set in hardware, because otherwi=
+se VM-Entry
+> > using L2 would VM-Fail, but that's still quite a few bits.
+> >
+> > I'm definitely not opposed to a targeted quirk though.
+>
+> I have no preference.
+>
+Sean -
 
-
-On 22/01/2026 20:30, Ackerley Tng wrote:
-> Nikita Kalyazin <kalyazin@amazon.com> writes:
-> 
->>
->> [...snip...]
->>
->>>>>> @@ -533,6 +580,8 @@ static void kvm_gmem_free_folio(struct folio *folio)
->>>>>>          kvm_pfn_t pfn = page_to_pfn(page);
->>>>>>          int order = folio_order(folio);
->>>>>>
->>>>>> +     kvm_gmem_folio_restore_direct_map(folio);
->>>>>> +
->>>>>
->>>>> I can't decide if the kvm_gmem_folio_no_direct_map(folio) should be in
->>>>> the caller or within kvm_gmem_folio_restore_direct_map(), since this
->>>>> time it's a folio-specific property being checked.
->>>>
->>>> I'm tempted to keep it similar to the kvm_gmem_folio_zap_direct_map()
->>>> case.  How does the fact it's a folio-speicific property change your
->>>> reasoning?
->>>>
->>>
->>> This is good too:
->>>
->>>     if (kvm_gmem_folio_no_direct_map(folio))
->>>             kvm_gmem_folio_restore_direct_map(folio)
->>
->> It turns out we can't do that because folio->mapping is gone by the time
->> filemap_free_folio() is called so we can't inspect the flags.  Are you
->> ok with only having this check when zapping (but not when restoring)?
->> Do you think we should add a comment saying it's conditional here?
->>
-> 
-> I thought kvm_gmem_folio_no_direct_map() only reads folio->private,
-> which I think should still be there at the point of
-> filemap_free_folio().
-
-Oh, I misread your last reply.  What you're proposing would work indeed.
-
-> 
->>>
->>> [...snip...]
->>>
-
+Would you like me to post a v2?
 
