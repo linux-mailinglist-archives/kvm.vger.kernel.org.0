@@ -1,159 +1,180 @@
-Return-Path: <kvm+bounces-68837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68838-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJbQJTaEcWk1IAAAu9opvQ
-	(envelope-from <kvm+bounces-68837-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 02:58:14 +0100
+	id QNP3OsOEcWk1IAAAu9opvQ
+	(envelope-from <kvm+bounces-68838-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 03:00:35 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A2776099B
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 02:58:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 963B060A1C
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 03:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6576C422C44
-	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 01:55:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id F257F441D70
+	for <lists+kvm@lfdr.de>; Thu, 22 Jan 2026 01:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAEA366DD3;
-	Thu, 22 Jan 2026 01:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D7F324B23;
+	Thu, 22 Jan 2026 01:56:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tqSlSD5q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RBbdOv3G"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1785B328B56
-	for <kvm@vger.kernel.org>; Thu, 22 Jan 2026 01:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CA921FF2A;
+	Thu, 22 Jan 2026 01:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769046890; cv=none; b=hk9baFDp36vithUkA4AHPTmsukWanC3aAhgAMhnNLwvAoKSf17S8HY+kzrAKUNeodCPyudBBEGBta2zkMIc1uQM8XMEIHBGSYbJUzipJfL3AXQ9vPcQgpOyXwH1hgaRsHlCY4DE35m8YcD+V4rVus1zo9oi+Bo5hR4duZ+TivAg=
+	t=1769046999; cv=none; b=WeFlcsGvVb4UwdP6lu8aduoH1XmvuIWlpF6hnNTH1za0Ag9nergLPQx4+FwMQZvzy0Vi88bRQm+f30M9sImX+lNTa5aNKaLriLtjvfcklkyNBVH6XtA8aWG4WgA//obdJcTwDwgEouIVIbEoDyol2KiSNE5Sd4MuiLr34V/MI9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769046890; c=relaxed/simple;
-	bh=9CHejTIkSvIOr8hdKUWa4ZQwIJO3qAcjD9z3ijURVgA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mlAICKL4edOIs0SOIJ8kAu8VR5JqPal3pWSpDfGvp+Ptrstx0tEp10lJY7jh9VpWxHzTm93YhOZQ5oN9XY+ZOYtXqrGDNrMrXAV69CqvwnMFnR79XckBS4rs+XX71On4+BIFkQ8foVDmc+Lo+EqxEiiJGOXtQyCKC5ccoSdluag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tqSlSD5q; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 22 Jan 2026 01:54:42 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769046887;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3FADtjDRNC5Zb8yoHTgprxMeVlzMfpAC0C5YPyUk0hY=;
-	b=tqSlSD5qC6eR5CO7mvLWvwW841rsSAbWCOydAYbBrJd6eS9QoQZoLECgSm6hBXkD0CVv1s
-	fKoyRhnCGnc+CGgC2FRBlgjyGbJ5JbfQhUYHAz9epSXoruIP2r3OVHZQQ2f1nEeDGjpKNQ
-	AG8Ynvtz5f00Qyp9zwLuagFltW5MeCU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 4/8] KVM: x86: nSVM: Set vmcb02.g_pat correctly for
- nested NPT
-Message-ID: <kj7lqm5dsyaywgbpykat5iuy6lr25xb4myxuw73zrekgo6fdzk@pfvq24hkexyx>
-References: <20260115232154.3021475-1-jmattson@google.com>
- <20260115232154.3021475-5-jmattson@google.com>
+	s=arc-20240116; t=1769046999; c=relaxed/simple;
+	bh=K8POTX/EWrtUBQC7e/W+tjYHRymC+sx3FmIKBhfwxJE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=njszXKy65XNlsWbgBuGP0T6f/eIyHiJ46p8ztNiNNxK0eCcSI6I4OncJPBtiSdwt3K56R25dmspOEagSPD+9gXsv/3Dk1NjRkwtpIc8i1FcWiViCoC7grI+Sp4P8aRtqR2WXAR2TnteA98gTfeXCnRDs88lhSvef//9CWypJQB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RBbdOv3G; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769046998; x=1800582998;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=K8POTX/EWrtUBQC7e/W+tjYHRymC+sx3FmIKBhfwxJE=;
+  b=RBbdOv3GH9gadwAWezxxQerr0K9VgSPc0azNXbcqXgIMYbRloX+YDnYI
+   BEoxL1/C8LXfitd5nIUO9rcXi1PckS5ghTjpZwSgU707jShkcHxDUe2x4
+   9/y6/ZbTt9z8czKk0xWEvAIdtAwb7xtu9MCRi83qOayjRHEIvlTc9BKsl
+   G5vaWK4FsbAaNoftYG7ruqDm4u77CRzEPFZ7YrAKL2yjYUbmOUAwW+sHW
+   Ln3AGq9JAeMYj+LrkFJHGMPvRJd1pxqLUg4XtPf2AihClMNcMcOENqmjg
+   MjKDvAmUguopOMwcnWCq5zI2urEqIfhpxbX7+u9aAf3ml+zvvX5RhBy94
+   Q==;
+X-CSE-ConnectionGUID: eIKrghMaTaSd1HSacH1bSw==
+X-CSE-MsgGUID: L/TUnMneRL2Q/Iy/dCigcA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11678"; a="74146761"
+X-IronPort-AV: E=Sophos;i="6.21,244,1763452800"; 
+   d="scan'208";a="74146761"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 17:56:37 -0800
+X-CSE-ConnectionGUID: Wk5B67w1Tg+yq9WpDLNriw==
+X-CSE-MsgGUID: ePIcLA5xRqOUhJ7HSxtT4Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,244,1763452800"; 
+   d="scan'208";a="244195330"
+Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2026 17:56:32 -0800
+Message-ID: <c0d27d52-ae86-4a48-a942-980280542985@linux.intel.com>
+Date: Thu, 22 Jan 2026 09:56:30 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260115232154.3021475-5-jmattson@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 07/22] KVM: VMX: Initialize VMCS FRED fields
+To: Xin Li <xin@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+ corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org,
+ peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com,
+ hch@infradead.org, sohil.mehta@intel.com
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-8-xin@zytor.com>
+ <8731e234-22b8-4ccf-89ef-63feed09e9c5@linux.intel.com>
+ <9F630202-905B-43D7-9DBF-6E4551BAF082@zytor.com>
+ <B01C8160-4999-43B9-B89C-45913E94DA55@zytor.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <B01C8160-4999-43B9-B89C-45913E94DA55@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-1.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-68838-lists,kvm=lfdr.de];
+	DMARC_POLICY_ALLOW(0.00)[intel.com,none];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-68837-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_POLICY_ALLOW(0.00)[linux.dev,none];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	R_SPF_SOFTFAIL(0.00)[~all:c];
-	ASN(0.00)[asn:7979, ipnet:213.196.21.0/24, country:US];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4A2776099B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,ams.mirrors.kernel.org:helo,ams.mirrors.kernel.org:rdns,zytor.com:email,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 963B060A1C
 X-Rspamd-Action: no action
 
-On Thu, Jan 15, 2026 at 03:21:43PM -0800, Jim Mattson wrote:
-> When nested NPT is enabled in vmcb12, copy the (cached and validated)
-> vmcb12 g_pat field to the guest PAT register. Under KVM, the guest PAT
-> register lives in the vmcb02 g_pat field.
-> 
-> When NPT is enabled, but nested NPT is disabled, copy L1's IA32_PAT MSR to
-> the vmcb02 g_pat field, since L2 shares the IA32_PAT MSR with L1,
-> 
-> When NPT is disabled, the vmcb02 g_pat field is ignored by hardware.
-> 
-> Fixes: 15038e147247 ("KVM: SVM: obey guest PAT")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/svm/nested.c | 16 +++++++++++++---
->  1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index e65291434be9..b0c0184e6e24 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -656,9 +656,6 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->  	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
->  
-> -	nested_vmcb02_compute_g_pat(svm);
 
-This is last use of the function, right? Should we drop it now?
 
-> -	vmcb_mark_dirty(vmcb02, VMCB_NPT);
-> -
->  	/* Load the nested guest state */
->  	if (svm->nested.vmcb12_gpa != svm->nested.last_vmcb12_gpa) {
->  		new_vmcb12 = true;
-> @@ -666,6 +663,19 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->  		svm->nested.force_msr_bitmap_recalc = true;
->  	}
->  
-> +	if (npt_enabled) {
-> +		if (nested_npt_enabled(svm)) {
-> +			if (unlikely(new_vmcb12 ||
-> +				     vmcb_is_dirty(vmcb12, VMCB_NPT))) {
-> +				vmcb02->save.g_pat = svm->nested.save.g_pat;
-> +				vmcb_mark_dirty(vmcb02, VMCB_NPT);
-> +			}
-> +		} else {
-> +			vmcb02->save.g_pat = vcpu->arch.pat;
-> +			vmcb_mark_dirty(vmcb02, VMCB_NPT);
-> +		}
-> +	}
-> +
->  	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_SEG))) {
->  		vmcb02->save.es = vmcb12->save.es;
->  		vmcb02->save.cs = vmcb12->save.cs;
-> -- 
-> 2.52.0.457.g6b5491de43-goog
+On 1/22/2026 8:45 AM, Xin Li wrote:
 > 
+> 
+>> On Jan 21, 2026, at 10:14 AM, Xin Li <xin@zytor.com> wrote:
+>>
+>>
+>>
+>>> On Jan 20, 2026, at 10:44 PM, Binbin Wu <binbin.wu@linux.intel.com> wrote:
+>>>
+>>>> +#ifdef CONFIG_X86_64
+>>>
+>>> Nit:
+>>>
+>>> Is this needed?
+>>>
+>>> FRED is initialized by X86_64_F(), if CONFIG_X86_64 is not enabled, this
+>>> path is not reachable.
+>>> There should be no compilation issue without #ifdef CONFIG_X86_64 / #endif.
+>>>
+>>> There are several similar patterns in this patch, using  #ifdef CONFIG_X86_64 / 
+>>> #endif or not seems not consistent. E.g. __vmx_vcpu_reset() and init_vmcs()
+>>> doesn't check the config, but here does.
+>>
+>>
+>> I tried removing all such #ifdef, and it turned out that I had to keep this
+>> per the last round of build checks.
+>>
+>> Anyway, I will do another build check on x86_32.
+>>
+> 
+> 
+> The trouble comes from __this_cpu_ist_top_va():
+
+Oh, right! 
+Sorry for the noise.
+
+
+> 
+> arch/x86/kvm/vmx/vmx.c: In function ‘vmx_vcpu_load_vmcs’:
+> arch/x86/kvm/vmx/vmx.c:1608:59: error: implicit declaration of function ‘__this_cpu_ist_top_va’ [-Werror=implicit-function-declaration]
+>  1608 |                         vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(ESTACK_DB));
+>       |                                                           ^~~~~~~~~~~~~~~~~~~~~
+> arch/x86/kvm/vmx/vmx.c:1608:81: error: ‘ESTACK_DB’ undeclared (first use in this function)
+>  1608 |                         vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(ESTACK_DB));
+>       |                                                                                 ^~~~~~~~~
+> arch/x86/kvm/vmx/vmx.c:1608:81: note: each undeclared identifier is reported only once for each function it appears in
+>   CC [M]  crypto/md4.o
+>   CC      lib/crypto/sha512.o
+> arch/x86/kvm/vmx/vmx.c:1609:81: error: ‘ESTACK_NMI’ undeclared (first use in this function)
+>  1609 |                         vmcs_write64(HOST_IA32_FRED_RSP2, __this_cpu_ist_top_va(ESTACK_NMI));
+>       |                                                                                 ^~~~~~~~~~
+> arch/x86/kvm/vmx/vmx.c:1610:81: error: ‘ESTACK_DF’ undeclared (first use in this function)
+>  1610 |                         vmcs_write64(HOST_IA32_FRED_RSP3, __this_cpu_ist_top_va(ESTACK_DF));
+>       |                                                                                 ^~~~~~~~~
+> 
+
 
