@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-69014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69015-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFGfCRC4c2n/yAAAu9opvQ
-	(envelope-from <kvm+bounces-69014-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 19:04:00 +0100
+	id wFiFJV+5c2n/yAAAu9opvQ
+	(envelope-from <kvm+bounces-69015-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 19:09:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A2379545
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 19:03:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E82A79617
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 19:09:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6CAD3022574
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 18:03:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 72E413073DCA
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 18:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EB11F3BA4;
-	Fri, 23 Jan 2026 18:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7545542048;
+	Fri, 23 Jan 2026 18:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iVGwNKZl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3CRGvG/s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6A4260592
-	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 18:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB892652B0
+	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 18:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769191434; cv=none; b=FriLihfNpa1xjIKGWYFUK1X9w2tswnt01rsirBaqk2dUv3lvdMQTwtka7s8ZcdlXY4EkvcdmtvC8hlNfWyhy1Epj+NuBWRdXuymg8iESEMMbfan86bCjUvO2+iJDuvvON6is0SjEgr4s6GX+1p3lY/FPpU6MYhyokasJWQWyKKE=
+	t=1769191596; cv=none; b=IM2WApu56VfCzU3OBCrqgmC+sDggUr8nJEJwWfdBJYSydfcjP94GWcMz1D/pU/RKnodii5x9gTDXikXcnIH6pyEEbC1Qd4oIvZqCHpNV7twGQHP72zAiDW8KmcQw3jsbxeaa0J9mi5IqBlKWZ3ggBZXLLBcYWEAnFq6KgQndBKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769191434; c=relaxed/simple;
-	bh=csK3wY7bomyICAtsjZxPNjTHEv+oqWqGuHEZUYxiwGo=;
+	s=arc-20240116; t=1769191596; c=relaxed/simple;
+	bh=HBMBI2gTN3EKvqTY78cLZchezunqrr5qT9xDj/LI76M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bq/uG08sj326lKyGw6B7WjBFqhj0iu4MQE9HuiGGVNsfWnzI99wXrPx04g5CJ428FRYzrG2goem02Ve9rdHv70qelyMge4dqJB+v7/VBOrF5rdum8iJUuU4lWIPnxAokbGFpEoPbk0H36NdVCtM4xVbcTQIlWjoxUsQbNLE6x8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iVGwNKZl; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=c+9W08DKoIfVuiKI7KEzap3Y6CG1MthMObJb0MelxlN0Jyhxb5GDBp3x/w5gKv9FVfAuD+W2C0PE/BQb5bSxZxg7Ub5EOrFKS8oxq1w3sIK0udektDKaf0Zdj/miju4lZwVa4vhywY70DakoT/AuehTUVvPZdd/WKbuKfRRKlWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3CRGvG/s; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c54e81eeab9so1546428a12.3
-        for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 10:03:51 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-352e214cce9so1792679a91.1
+        for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 10:06:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769191431; x=1769796231; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769191594; x=1769796394; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QG6tBJ7Idtw9yE2G4FRQD7GOi3h3G6wNLsDk6lYZf1I=;
-        b=iVGwNKZlCCpNlCDMjxSjSpoVMIP5+01dE4MLutcvVRxYeT9IKQpwpANKAGJQg89xfz
-         DzCDv7rkIZ5Jz0gAu6wJdRRpocz32a6MgYBICUQbzXbNRpanW9SbkFJNXXf1uzO7B1ox
-         MOHthga9BDk29aBcBqWGJQEjxGjo0taY8Fl1/hI9Wt+wWhaMlnjmuZ35IsaJtM1q3nYr
-         8i50zcW6VeGgHvYXQlJzg7dxVOh1VVxdX2Qx+FZ3YPBOB0cg3sWTIZqw2ZBcEWchuMMj
-         H/E9ISu7jQ9iphm90g1yE+XnwHLcSkXlZljkQ3tqbGybgSWa6JQILy3P+aPVAD6CgJ+0
-         7IcQ==
+        bh=5kWxxolVgEbWZqXlOySF2Dt4v7LfEshZxevNTBFqVG4=;
+        b=3CRGvG/sSI7df3oq12VtjLJqMwHqmRpkF+4jTwEQvyOO0URokXcvYxH6GdxP9fr/Gc
+         sTL8mama97DYoqPkOtO8rjF1REAaen2dlshfosSMNqfQ71SzXEZ8DdPTjTGjZ63JNEjK
+         1aUtqjpyBIoVM295vUkeegKoN6IJFa6UCj0p/cHFrKMVjsawRl5/eE5flQ8XaPaYlkpC
+         AnhYHgDjIXpIv7by2aHRLusNP6CwMLWrPn3XH00RTODhTvgObietY4Wcvmt9ciwu4Yx1
+         osh3OUfSoKcbRh1IqxgnovRhV+9RDyYgShBclshzf7VcM3UfO8uTglUuK0JdjDvkmGW9
+         wXow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769191431; x=1769796231;
+        d=1e100.net; s=20230601; t=1769191594; x=1769796394;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QG6tBJ7Idtw9yE2G4FRQD7GOi3h3G6wNLsDk6lYZf1I=;
-        b=H4DFhyN84RlAyeMaF/SxT/x5GzWvxHDsdo+E1l5wwg649c/0sW/i4VgBfkVBZeayhX
-         vYTJsl047TzeQ/Hy+mqIoE4usvoe//naMHmUovWC4t7UbNl085gwvI5SqvVttQ0yrNPt
-         ScO9Zf1IdrRxkZ1iTerkBX1fdQ7iTT/Azoa5J0c1+yN119vvOGWtxwfQrY2/vOzOhy78
-         Bq8VfsvjP3xMeUmQ5LYrFzja6D2lrVXL9g0dKCn704WDBSNgShKdoYvHYuZz5g+fuBlC
-         eCkEzk/jQgzYSLboCJ3kXiypVfX3gsbeUZ93qH2DUAYxEp5OoI8j9jFlATtpGuCD5XKL
-         z3kA==
-X-Forwarded-Encrypted: i=1; AJvYcCWm6t4gNZigA8lTkQPN/el7CB16VeYhg2BxgrqevO8+HIWHJxJJMXIksADyyzKq+F2pQgY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdLJdIPhNyRz64TsvAeB+AGm13uPb94Sty8tu+b+EOiFhLMASj
-	FOTnGvpmj8q1BhfR3ghHOukpRKH5XHir8PaVGjFYDkQE6wnUW4pcBUzUaVlhktCez20IGkecxma
-	UXXQkEA==
-X-Received: from plek6.prod.google.com ([2002:a17:903:4506:b0:29f:1c3a:7fed])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d485:b0:2a7:c340:4c3d
- with SMTP id d9443c01a7336-2a80ebd16dbmr18180395ad.13.1769191430597; Fri, 23
- Jan 2026 10:03:50 -0800 (PST)
-Date: Fri, 23 Jan 2026 10:03:49 -0800
-In-Reply-To: <20251120050720.931449-2-zhao1.liu@intel.com>
+        bh=5kWxxolVgEbWZqXlOySF2Dt4v7LfEshZxevNTBFqVG4=;
+        b=JTNcG/nd91DFEAuxtAu0Kv0f7dk4fnNLenAcTpaOe1lKbpZMPHV0cb0frnCYTtcgcW
+         8jlTK50LK8xRrsQwk1tlsGkJqcsZVP2QCoguV0qRWBaVDuCgA8zoJ842utk9/wPlF3xB
+         Suid7qIIpg74xsrpKtT2/DlewbhK9XcL7y2TDb8fItMcUMee3EPZNEIfVEzC4Np2U/XO
+         0l9MJjtnF0qaEtyqA39c5C9O98mGag875lMapxpUAzWAZ/F+y6HAobr/Mw90dvw329wy
+         RpMjHMHpvBnPpyaDXDlDBhTxj7MYXoPY8478iXjITxMVE3cc3x4hw+0bqluag4i8iRUO
+         Ku1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWk/VmxHh1spFDI98KDcctEJeQuGDUU4SOP9kusBSPejy0am64i2PjZ2FMvJbe1VM09Awo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL4z0OuZKdGvvPlIMtLPDfXzeDCgVA6DYdiHrSG0+puF2abG4y
+	ti1tJNZ/JNeo0d8T8crfBPCiS18HGrNKBu2X5W6u525h1kf5teJWCs6Z3Ijyi6lgvcN4GqV/Y8F
+	0A4CGoQ==
+X-Received: from pjbcp7.prod.google.com ([2002:a17:90a:fb87:b0:34c:567d:ede4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d85:b0:341:8ad7:5f7a
+ with SMTP id 98e67ed59e1d1-35368b470d3mr3144376a91.18.1769191594234; Fri, 23
+ Jan 2026 10:06:34 -0800 (PST)
+Date: Fri, 23 Jan 2026 10:06:32 -0800
+In-Reply-To: <20251120050720.931449-3-zhao1.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251120050720.931449-1-zhao1.liu@intel.com> <20251120050720.931449-2-zhao1.liu@intel.com>
-Message-ID: <aXO4BVo9nVaK7Nx0@google.com>
-Subject: Re: [PATCH 1/4] KVM: x86: Advertise MOVRS CPUID to userspace
+References: <20251120050720.931449-1-zhao1.liu@intel.com> <20251120050720.931449-3-zhao1.liu@intel.com>
+Message-ID: <aXO4qPQlkqKeW6Sz@google.com>
+Subject: Re: [PATCH 2/4] KVM: x86: Advertise AMX CPUIDs in subleaf 0x1E.0x1 to userspace
 From: Sean Christopherson <seanjc@google.com>
 To: Zhao Liu <zhao1.liu@intel.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -90,12 +90,12 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69014-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69015-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -112,16 +112,18 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 88A2379545
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3E82A79617
 X-Rspamd-Action: no action
 
 On Thu, Nov 20, 2025, Zhao Liu wrote:
-> Define and pass MOVRS CPUID through to userspace.
+> Define and pass AMX CPUIDs (0x1E.0x1) through to userspace.
 
-The feature isn't passed through, per KVM's terminology.  PASSTHROUGH_F() is
-specifically for features where KVM deliberately ignores host kernel manipuation
-and looks only at the raw CPUID output.
+Similar to the PASSTHROUGH_F() thing in the first patch, these aren't strictly
+being passed through.  In practice, they are passed through as of the current
+code base due to the features residing in KVM-only words, but I'd like to avoid
+stating that features are being passed through unless KVM very deliberately wants
+to ignore the kernel.
 
-I'll tweak the wording when applying.
+As before, I'll tweak when applying.  Same goes for patches 3 and 4.
 
