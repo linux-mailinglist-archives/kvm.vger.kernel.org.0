@@ -1,296 +1,170 @@
-Return-Path: <kvm+bounces-68964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68965-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cE+DNZmDc2kDxAAAu9opvQ
-	(envelope-from <kvm+bounces-68964-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:20:09 +0100
+	id 8P2tHa+Fc2krxAAAu9opvQ
+	(envelope-from <kvm+bounces-68965-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:29:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8249576EC2
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:20:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE095770FC
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:29:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E7DFF300988C
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 14:20:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1770A300A5B0
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 14:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B180F24C676;
-	Fri, 23 Jan 2026 14:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="el7vGzH0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3347B32ABFE;
+	Fri, 23 Jan 2026 14:28:13 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010005.outbound.protection.outlook.com [52.101.61.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742D1301493;
-	Fri, 23 Jan 2026 14:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.5
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769178006; cv=fail; b=Mb2yr3sunOI/pYuRwJBVNG+s+b+w8u3FVUftpbk0xFk90zUxQiEsvSbevXpHASn9zkBzvBfXxsJhKrB0rrba5sby4R+EEmP+4h7ICLZbEIQS3k6N22W2QlLMirpOGoFBr0sTD7diX3VJURp2l6FA+Br7odixwro7rY2OnHATSiY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769178006; c=relaxed/simple;
-	bh=oAxfwFoZ7/2gzeWJKX6DSq9N495qOfRHXG3J6NcA9+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iIj1LuhOSTIzTggggZZIBL/dOKrodqK0E7ChpJ+o2Rk6iRH/PsNtfzN4UfCt23C6l/zmNIYh+M48zeLfa2egTyMi09uYr+AhOEQK8cFDJWXqryGAvXgmyS+0MrNKBYcxdCnI6Ua/UMNIqVarfS+TzLOqHbYsJE+37DWo8hzy364=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=el7vGzH0; arc=fail smtp.client-ip=52.101.61.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p8SO+JMQwEqTjgmDXJFNi5nW4kAIjY8jCG5P2YqmLgqJtGPSwmQ97KEhq1smDrxbnfkytcqAumb7fet+uzf0bLzymVRudDYNILai0Oo21EDpXjWjcUGNMHTBxrcx0cdC8abjmHvfItou0wn+IuuOvqFnrmQ8CqaefbzzIWazYIZRHgcgBS1s/KtbvXeb+/jIbBPGdpBF7vWoYe0J1g+XZi7RDztgEy0hsE6BnI3jNXKJV4CJlAx3ntAPp2Ufw+dUA3ZfXZ7o/Z8CjVpTfXI9jiJcY2GFu6H8YYg0NMQaMXNSbSnyqCAZdxd+Y139M0MuM+NAvzNtQcSVZzAkqfcJnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8JTaNeQL/J3Ep2HYkEXMoLwLL3wNRp+4crnhYhLek/Y=;
- b=WWI9TKBqw+QuSVFM6cFcAeat8S9kEBp8qIwozYnVCf3x8MuVBfvN+QcSPwxXLAX0B0HgXEZKj1wYWRfOCCJus+6xNZq3I0jzt13TeD4B2GxBxUtkA7KC1TijfJHlJ8HGYj9iG0lLC1aNcPQOCZwHU2iFfvo36ezvb4Zr8X8ih2CwcIxWuPKWhn5wxsiYjJDWO0sML3QiSrS2ndE7gZQXVviT6lEXKcukCdVgqVoHkTVhBjS2XfddnRxGYMoFJJAVCq7lU94aa4tsC+LNgAiDTM8IRLhuNw3p38Ba2Q9YfoopU8PZOL+hgl5vtKAcbhNO5porG2ZPD08VeQLkEr3VQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8JTaNeQL/J3Ep2HYkEXMoLwLL3wNRp+4crnhYhLek/Y=;
- b=el7vGzH0seoDPX5Tseb3Y+Y5unxv8q9f7dXRrgQhQw/B4IPvWeX102ztEeH6hBk7/Nk2ULkUVW40DjMCnBaLYq6iBZPQemb8MbDHPnh4dLQkNSLAMCBRFk4ZOQYvH9wZqteBvYFHurH7z9Q2GX5ZGZbZ3BYgBmeaI+7czXnUr3f2xnyTd1wDAWeNqO1ZxUI+p37Qt2hQzmFUUyKqyjcEGCyEGgqIQYJ+PiDDw12M6ZNd7lW1I5toQuckiSySBNFBEhIZ0g8GKp9EbX1cb4NhcQwzq00acVO8Y1R4/mo8olflCqQaJSvWtHtP1tZbCHhZQmKRylxM+dBFjWmadu0Cbw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
- by BL4PR12MB9481.namprd12.prod.outlook.com (2603:10b6:208:591::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.11; Fri, 23 Jan
- 2026 14:19:57 +0000
-Received: from LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::1b59:c8a2:4c00:8a2c]) by LV8PR12MB9620.namprd12.prod.outlook.com
- ([fe80::1b59:c8a2:4c00:8a2c%3]) with mapi id 15.20.9542.010; Fri, 23 Jan 2026
- 14:19:57 +0000
-Date: Fri, 23 Jan 2026 10:19:56 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Zi Yan <ziy@nvidia.com>
-Cc: Balbir Singh <balbirs@nvidia.com>, Matthew Wilcox <willy@infradead.org>,
-	Alistair Popple <apopple@nvidia.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Francois Dugast <francois.dugast@intel.com>,
-	intel-xe@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	adhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
-	David Hildenbrand <david@kernel.org>,
-	Oscar Salvador <osalvador@suse.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-	linux-mm@kvack.org, linux-cxl@vger.kernel.org
-Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
- private folios
-Message-ID: <20260123141956.GZ1134360@nvidia.com>
-References: <4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
- <20260119142019.GG1134360@nvidia.com>
- <96926697-070C-45DE-AD26-559652625859@nvidia.com>
- <20260119203551.GQ1134360@nvidia.com>
- <ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
- <EE2956E3-CCEA-4EF9-A1A4-A483245091FC@nvidia.com>
- <20260120135340.GA1134360@nvidia.com>
- <F7E3DF24-A37B-40A0-A507-CEF4AB76C44D@nvidia.com>
- <20260122154646.GQ1134360@nvidia.com>
- <1EA077E1-DDF1-4356-B8F8-CB13F0D6D8B5@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1EA077E1-DDF1-4356-B8F8-CB13F0D6D8B5@nvidia.com>
-X-ClientProxiedBy: MN2PR15CA0064.namprd15.prod.outlook.com
- (2603:10b6:208:237::33) To LV8PR12MB9620.namprd12.prod.outlook.com
- (2603:10b6:408:2a1::19)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D017B328243
+	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 14:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769178492; cv=none; b=LHVNN9+b+ROjDbJx+ZL+sTBVdHeiS5jbMqUamx5YQqg/kzK6kNXrUPwPyPHC1miuG580K37HIKcjIqzUlYqsrx2B8EBrMu3eJzez1KdNufQPJtI3QMV3KHrisHchWNfg2edqhT91umbIOr8X6gcmm61frTiWfCvJiI9P1RL1rLQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769178492; c=relaxed/simple;
+	bh=7exSPU/9YuSl/Ghj8YV45sMiot1CADmGgiuc1SLjWMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uFbNAG5VXNB1TtuYYCc8IbM3biHFWzEeWYLgltGLCzn9ZYLW6fp5tg1AAsP8QhFXZeJ29cd95kIfwjDURlUUNszKWfXBlmdQ9Kwh29GsaHzbziRu+TM2lwB+FCRuZHlbNjVSCwKYpdA//fHo77cWWQ1SrM42vEUmvmPjWQ92Ko8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84A461476;
+	Fri, 23 Jan 2026 06:28:03 -0800 (PST)
+Received: from e134369.cambridge.arm.com (e134369.arm.com [10.1.34.161])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4B7AC3F740;
+	Fri, 23 Jan 2026 06:28:08 -0800 (PST)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Subject: [PATCH kvmtool v5 0/7] arm64: Nested virtualization support
+Date: Fri, 23 Jan 2026 14:27:22 +0000
+Message-ID: <20260123142729.604737-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|BL4PR12MB9481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6790f142-049b-4a0b-522c-08de5a8a7c95
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XfBziRKFhuczKRhhH1F43GrarGdbnQ8CbriBGShPP3aaqfOFTq86iS/kqfmk?=
- =?us-ascii?Q?dU77II+Q7PPlwQdir7YxXwlNSVQeSMJFcsKuyUUiDi251J3btSOubaqIP01N?=
- =?us-ascii?Q?nr0FZwOWq7+TUOyxvX3CyLJr/jF4oCMLuRNKkjBzT1zKr+g3vKs7nHbrbARe?=
- =?us-ascii?Q?VyWyg/w+h5fea4fgwg0ReNn3/cqVEitlAgBcUJfZo/Aubhy0OCPXYZkbd7Ln?=
- =?us-ascii?Q?km0mMbTxA/agzIuVEjWWtxusUzGdgmxg575Sa93ZxaTSKPIRDf+XsYy3cssy?=
- =?us-ascii?Q?ynSfAHdt76Wa9T26ZRCtbl4/kcLRvYmHRYDg9YZB8V63K0cjWJBchX8IOYtB?=
- =?us-ascii?Q?gG2APC0B4lKJrvmi8v/AnHoiRgZvgL/NBwBL+DcDfFtL0fJAD4qoLI4tQNX+?=
- =?us-ascii?Q?GNYdaOiABCG8kkShjIaKg90rED5KGeEgFymzqBGmuyUoemwcIoDPo420a1Fv?=
- =?us-ascii?Q?WvCyhMxk0Am5w18G6KBdg2t5iIrP5U/ilKBhXOSpGtm/ljBZ2mW6uq8z4baI?=
- =?us-ascii?Q?JgNba3Ig1Lck2fea1iib83mUaXlIc5Djc0FUCJa5m9GfhdZFywLOdxj0uIHY?=
- =?us-ascii?Q?wt+bKvRiMgs3UD/P3HoFw6Rs2Kd7WtFR4GR2tGdl8H/EfkhMfe5BrEsRGPuu?=
- =?us-ascii?Q?9g+ky4S3Ghz+lnz9edIPao10It3CfnC/SI/ScXhDuIf33F8b7aLGKZCHQJxH?=
- =?us-ascii?Q?6R2a+MqR7RFgMDzeqKuaV7KbfLlpomVXIhTo4YYLgMwlbQuiBJ2Lt2WNWZsg?=
- =?us-ascii?Q?7CYBrGGbJ20+r7FM4vLCr3cMjQ3msOYmrTub7AOjqurKBFRcpEZT1BKiZ9kP?=
- =?us-ascii?Q?XK6vxoHoxkrrmfdj5gXASOQdx5OyEKShLYsqsUoPq4Ha6YJmob01hgnZgO5k?=
- =?us-ascii?Q?yQeLodpOIghNI3q4BfphZqgKKKwmNj6bnJr310LEmNaPrjE64bZsD9WAx6pK?=
- =?us-ascii?Q?QBVLGeDYdj3KDV3JXBHZz2Mf1t9J+M+iSl3KCEsG1KDyIahPXNcqW47XgoP7?=
- =?us-ascii?Q?mGlIWUagkpJ+VHUdWSFBEIQXxfSYIuBHdAh7JO3sQH5oo2kJmjW79TSP0H5e?=
- =?us-ascii?Q?GvvZn3JvrfkAkWOu0weSljQfUyflvmpCj3uW2JwBYBo8AwrbdJXShBuOIaIU?=
- =?us-ascii?Q?RanVes5lUXk8qM+998/vsi/Hub2YVt5blAyw3AHPzZzDXHsSWveHj5wZzZWA?=
- =?us-ascii?Q?3BHDhIMrH8U3cEcpe1coArAf0/WVX/qkTmr3HUsEEsNYaL7oZoCYikdSzik+?=
- =?us-ascii?Q?l3EzjqMScWwQIB/ZJQnRKej+uQo12tQ3LmivopnPKSXj3j06l+ff6AHv/UZM?=
- =?us-ascii?Q?I6xu9B8rBDyPq31VSC2tGLmQQ/GvvXZYFVhq1mFhQT0qa8Rit9qnNGEJrR9g?=
- =?us-ascii?Q?f2yYvp0jJWoFX1j9AGz9IkncYf6NDfhmYndmOB8po22N5rlU4ms/CPIfD/H/?=
- =?us-ascii?Q?duNe0wR7R+Zw9j2irsNDpMJ67e9JFohLPkVeA8P66F/1EL1WktwdAxi8duf/?=
- =?us-ascii?Q?dgfuL3wkm2JSiAXg2LptzsTJa2SQTI4hAG1SjwptdmpGyF3/4NaAn3amBUBo?=
- =?us-ascii?Q?uBnhl46UVJFgb7kdAnE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/ECCzDQIfPEf/trEg2ai9Iy+ukyqfClFGgWoTJJmVq8s/pawJsDpT0H3MQns?=
- =?us-ascii?Q?D2sccYTbhBrEFPvvNpNno8YzvO5uKrRkJBytKZKT+5RQ8mjGz2j2jlAlpsJ+?=
- =?us-ascii?Q?mt5uL91tzKDnNSWClx0lO0UXSRFY9SiTomzRnY3Tdub6numocR9Dbsgy4SNi?=
- =?us-ascii?Q?OMzQw+cC2lC+31/JO6d5sV+Y1VyAoqjStxfxnr35P0+v9csImst3H6Oq+e+j?=
- =?us-ascii?Q?OuCyjwO8+wD8TK9fRYjbc4tYy4P17Mhz0fL/2bQq57KX8CAcP2VezN/rVE4U?=
- =?us-ascii?Q?e0gDxktG4lEnO1fjoKRsL3GKQc8eCXlAZB6H+bBdtXl4cFbJEkXPRKPn+XeW?=
- =?us-ascii?Q?2UOjsK7iQwrJ0fAb1hcCxVDMC1OfsF4lLtqlYn86vIZ/Uoc5RF5YxCC0MqW1?=
- =?us-ascii?Q?6c+VN8ps6fHK1bkhHl4NP9orjIUYf8S7hiajtAmUwSPNqAzt5CxZCk5cJsYN?=
- =?us-ascii?Q?3MHZe4RqmbvW13AXsl2Ip4618W83hgOFcgTieRgBC/JM+wiAPUxHcP1ZwwoI?=
- =?us-ascii?Q?19YT1p3MGRJsZf5o1Nkbs2GSF+FG9vQQVaoSCHZPD+wBChZ3qyxaAY70YE8r?=
- =?us-ascii?Q?uOAVu2DJ3pPbABRHrKXmGPX6DIYoLP5ZBnSn+A3D3ilugvUtZOtHCzYNUHz5?=
- =?us-ascii?Q?2BEhh5vcdW6scd69X27CyeDWar8pCD3fy8WqQRQFmzM1ClFPJiauJdsRbIYz?=
- =?us-ascii?Q?cnAIuYvtvToQjuCyOPDPrOaE89ZHMkFw1FFLAgQepCMENuEJnfxezYZ7CQhp?=
- =?us-ascii?Q?o9YXfHvp5LWKK1xKBSXFEgEj6DKyfoHf4575UByNVwlzB8dVGXDQpH7iBvf3?=
- =?us-ascii?Q?KZ22l7M7M2zQOTJFwhrp+FUIvlOVpx5z/4vJTm70U3yTegFsIkt+DJX1A4sC?=
- =?us-ascii?Q?aXa9yNnkBETDZwhcWcd8pxUXwsA2aUQVFUDAHA2JtBTxqO2OHm4ZOjZUWKiW?=
- =?us-ascii?Q?2/XicguuG2HD/DORs1XY2Jl4KoaY/UuZCWWgCrYsL8lM7rjRaMYtgcYHPPKd?=
- =?us-ascii?Q?p5+Z6QD0pmHbzqlZdV9GgS8WNf1fsR20t+YR9GGr90rFC9ZohtSlMXyirvcb?=
- =?us-ascii?Q?2If4IeNU9aFUCszZYEA7yKflIeHrAnPCIEhiZB9WWCzpR+enPOYRNldeOaXp?=
- =?us-ascii?Q?4UGi/mfRTRTuKAAOEc/CXRuR1ljWNXiDeRgIUpUbpz0rOoLNLrJ6DnUm5MtP?=
- =?us-ascii?Q?TSWmdM850XS9FfNu13HUi/uPQCtcIoty8z5noOI6Aj58y+PSXVLf0OwNmART?=
- =?us-ascii?Q?ZiNCce6fePR7WGuAAgvlMZjTBCxQOtQ2gUypfrqIKqhWfjVhZTo1q5D/ZjjB?=
- =?us-ascii?Q?lhBVnAghj4pZRxRi/VGw8FTr271/n3nZc+OmozCOa/Fh2H84VNUt3901ZH2C?=
- =?us-ascii?Q?ZY6vLuwwXNTHwzCL1YgYWr+WEC1qhaEKrSLErQWZOhhkvWEmvHAC1aZIyZNj?=
- =?us-ascii?Q?H7NHMfq9g8RJ8oQeF84Xv5Du6Z/J9ueJmoIQWkGLqk/laRoHankHQNjj64fO?=
- =?us-ascii?Q?3gXhodTx5q1XzweWqjnbuyAYWvXsb5lEqeo6sTnLnNZXlIvO1dIbA4Unh3WR?=
- =?us-ascii?Q?Wq4LSpez09xiWUNbyLt8dfKKUe/F/XZBdQkLZ99Mp76dBZPccPY/6aYaNDGx?=
- =?us-ascii?Q?caDAKxXAnULgVC5sVBRLdq7lc6kJfTIOU7iXLqVKiwPB87oawCIypEO7fMmn?=
- =?us-ascii?Q?8OTQC27vo0IBVraZAc7Z9UGpMeRB9bAEwFPY4rXK1U7bgKmOHzX1bECF1ZGM?=
- =?us-ascii?Q?AP3FubL0tg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6790f142-049b-4a0b-522c-08de5a8a7c95
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2026 14:19:57.6850
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ytA8cwVr6uqEbBQxOXFHPRG6mHdoLzdJt57p1SQNj8L17g9G6amd5O6EYhkKe2pe
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9481
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+X-Spamd-Result: default: False [1.64 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,infradead.org,intel.com,suse.cz,lists.freedesktop.org,linux.ibm.com,gmail.com,ellerman.id.au,kernel.org,amd.com,ffwll.ch,linux.intel.com,suse.de,redhat.com,linux-foundation.org,oracle.com,google.com,suse.com,lists.ozlabs.org,vger.kernel.org,kvack.org];
-	TAGGED_FROM(0.00)[bounces-68964-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[39];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-68965-lists,kvm=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andre.przywara@arm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.978];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8249576EC2
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arm.com:mid]
+X-Rspamd-Queue-Id: DE095770FC
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 09:41:03PM -0500, Zi Yan wrote:
-> > Now that we have frozen pages where the frozen owner can use some of
-> > the struct page memory however it likes that memory needs to be reset
-> > before the page is thawed and converted back to a folio.
-> 
-> Based on my understanding, a frozen folio cannot be changed however the
-> owner wants, since the modification needs to prevent parallel scanner
-> from misusing the folio. For example, PFN scanners like memory compaction
-> needs to know this is a frozen folio with a certain order, so that it
-> will skip it as a whole. But if you change the frozen folio in a way
-> that a parallel scanner cannot recognize the right order (e.g., the frozen
-> folio order becomes lower) and finds some of the subpages have non-zero
-> refcount, it can cause issues.
+This is v5 of the nested virt support series, fixing a corner case when
+some maintenance IRQ setup fails. Also there is now a warning if --e2h0
+is specified without --nested. Many thanks to Sascha for the review!
+========================================================
 
-Yes, and this is part of the rules of what bits in the struct page
-memory you can use for frozen pages. I've never seen it clearly
-written unfortunately.
+Thanks to the imperturbable efforts from Marc, arm64 support for nested
+virtualization has now reached the mainline kernel, which means the
+respective kvmtool support should now be ready as well.
 
-> But I assume device private pages do not have such a parallel scanner
-> looking at each struct page one by one and examining their state.
+Patch 1 updates the kernel headers, to get the new EL2 capability, and
+the VGIC device control to setup the maintenance IRQ.
+Patch 2 introduces the new "--nested" command line option, to let the
+VCPUs start in EL2. To allow KVM guests running in such a guest, we also
+need VGIC support, which patch 3 allows by setting the maintenance IRQ.
+Patch 4 to 6 are picked from Marc's repo, and allow to set the arch
+timer offset, enable non-VHE guests (at the cost of losing recursive
+nested virtualisation), and also advertise the virtual EL2 timer IRQ.
 
-I hope not!
- 
-> BTW, it seems that you treat frozen folio and free folio interchangeable
-> in this device private folio discussion. To me, they are different,
-> since frozen folio is transient to prevent others from touching the folio,
+Tested on the FVP (with some good deal of patience), and some commercial
+(non-fruity) hardware, down to a guest's guest's guest.
 
-Yes, but really it is the same issue. Once the folio is frozen either
-for free or any other use case it must follow a certain set of rules
-to be compatible with the parallel scanners and things that may still
-inspect the page without taking any refcounts.
+Cheers,
+Andre
 
-The scanner can't tell if the refcount is 0 because it is frozen or
-because it is free.
+Changelog v4 ... v5:
+- bump kernel headers to v6.19-rc6
+- print a warning if --e2h0 is given without --nested
+- fail if the maintenance IRQ setting attribute is not supported
 
-> >>>>>> I don't think so. It should do the above job efficiently and iterate
-> >>>>>> over the page list exactly once.
-> >>>>
-> >>>> folio initialization should not iterate over any page list, since folio is
-> >>>> supposed to be treated as a whole instead of individual pages.
-> >>>
-> >>> The tail pages need to have the right data in them or compound_head
-> >>> won't work.
-> >>
-> >> That is done by set_compound_head() in prep_compound_tail().
-> >
-> > Inside a page loop :)
-> >
-> > 	__SetPageHead(page);
-> > 	for (i = 1; i < nr_pages; i++)
-> > 		prep_compound_tail(page, i);
-> 
-> Yes, but to a folio, the fields of tail page 1 and 2 are used because
-> we do not want to inflate struct folio for high order folios. In this
-> loop, all tail pages are processed in the same way. To follow your method,
-> there will be some ifs for tail page 1 to clear _nr_pages and tail page 2
-> to clear other fields. It feels to me that we are clearly mixing
-> struct page and struct folio.
+Changelog v3 ... v4:
+- pass kvm pointer to gic__generate_fdt_nodes()
+- use macros for PPI offset and DT type identifier
+- properly calculate DT interrupt flags value
+- add patch 7 to fix virtio endianess issues
+- CAPITALISE verbs in commit message
 
-I'm not saying mixing, I'm just pointing out we have to clean up the
-tail pages by writing to every one. This can also adjust the flags and
-order if required on tail pages. Initing the folio is a seperate step,
-and you already showed the right way to code that.
+Changelog v2 ... v3:
+- adjust^Wreplace commit messages for E2H0 and counter-offset patch
+- check for KVM_CAP_ARM_EL2_E2H0 when --e2h0 is requested
+- update kernel headers to v6.16 release
 
-Jason
+Changelog v1 ... 2:
+- add three patches from Marc:
+  - add --e2h0 command line option
+  - add --counter-offset command line option
+  - advertise all five arch timer interrupts in DT
+
+Andre Przywara (3):
+  Sync kernel UAPI headers with v6.19-rc6
+  arm64: Initial nested virt support
+  arm64: nested: Add support for setting maintenance IRQ
+
+Marc Zyngier (4):
+  arm64: Add counter offset control
+  arm64: Add FEAT_E2H0 support
+  arm64: Generate HYP timer interrupt specifiers
+  arm64: Handle virtio endianness reset when running nested
+
+ arm64/arm-cpu.c                     |   6 +-
+ arm64/fdt.c                         |   5 +-
+ arm64/gic.c                         |  29 ++++++-
+ arm64/include/asm/kvm.h             |  25 ++++--
+ arm64/include/kvm/gic.h             |   2 +-
+ arm64/include/kvm/kvm-config-arch.h |  11 ++-
+ arm64/include/kvm/kvm-cpu-arch.h    |   5 +-
+ arm64/include/kvm/timer.h           |   2 +-
+ arm64/kvm-cpu.c                     |  64 ++++++++++++---
+ arm64/kvm.c                         |  19 +++++
+ arm64/timer.c                       |  29 +++----
+ include/linux/kvm.h                 |  47 +++++++++++
+ include/linux/virtio_ids.h          |   1 +
+ include/linux/virtio_net.h          |  49 +++++++++++-
+ include/linux/virtio_pci.h          |   3 +-
+ powerpc/include/asm/kvm.h           |  13 ----
+ riscv/include/asm/kvm.h             |  29 ++++++-
+ x86/include/asm/kvm.h               | 116 ++++++++++++++++++++++++++++
+ 18 files changed, 394 insertions(+), 61 deletions(-)
+
+-- 
+2.43.0
+
 
