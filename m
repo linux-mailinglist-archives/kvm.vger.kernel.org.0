@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-68973-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68974-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENzpJNmMc2l0xAAAu9opvQ
-	(envelope-from <kvm+bounces-68973-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:59:37 +0100
+	id qPHEBRONc2l0xAAAu9opvQ
+	(envelope-from <kvm+bounces-68974-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 16:00:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00915775F6
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:59:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8061E77650
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 16:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A9471300A272
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 14:59:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D4203302DE1A
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 15:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B095D30EF91;
-	Fri, 23 Jan 2026 14:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCC3336EDD;
+	Fri, 23 Jan 2026 15:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xvBd880c"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011036.outbound.protection.outlook.com [52.101.62.36])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011068.outbound.protection.outlook.com [40.93.194.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020F03358D9;
-	Fri, 23 Jan 2026 14:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF731330640;
+	Fri, 23 Jan 2026 15:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769180346; cv=fail; b=IUMIzyaIoeDUjkZ6iJ5VPXJZqZB4Gtd/so6HntjvuoXKXBIlL7xNRyN3T2OUGtXnatt4WxWMlVy0cTwqErQT/UTkfsuPTE2uWowuDpvWsVybm1z1DFiF6NuP2NNQ9dZpU0JIuxH5IFA+OPrB5eIshV2EA2iCDFhC7B3/b/KTK30=
+	t=1769180405; cv=fail; b=HiyTOB2FWrjlvYTDrbRfzQtbEe/9KjOAb7tThxepG1QntJBWOhen4ukYT/6oxMhi4V1AZ/nW83tmTOB5tkHuOTJkO102bZkqe92Jmq1G9/DgieoHiCWFNafG2J12hpLMR6GhQ+lBWb72Ct6L+b1m/eHFDqr+q7MtQlSeq6xI5s4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769180346; c=relaxed/simple;
+	s=arc-20240116; t=1769180405; c=relaxed/simple;
 	bh=vTViHFEEbRyvtcpCs+mKgvASwjQr1zJzCdkcD6q+tmk=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iw/bhMvUzwdc8QCKl0M8hyha4A/b/hHkDsBY6hOTcgIiu4Bvm+lXXB5ZmVdMGTiRxUoust8b8fr+lNZUiOjSx4jsDfFAP83rZzidfU6AjqxDOiH5nAthqpChb1q9JsQTcysOB6BSqsur6jcCnaKILy2ZF2zbIHZAuhB9PsNBwD8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xvBd880c; arc=fail smtp.client-ip=52.101.62.36
+	 Content-Type:MIME-Version; b=m6GzflZCN9V5b0Xbo18rqttgnd59qchI+SE4xZWeaDPwWc7sSEVkq9lxh849Fk114jKx4D+APfwyGH9HKwfc2B2q0B3zTHF3eELjo57hrjYNfftT9VgQ4woLQ5CgbGPrR1lwdk+HV/eaxkZo1mQu40Cb11EO9o3gzzF8BJdOij0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xvBd880c; arc=fail smtp.client-ip=40.93.194.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
@@ -229,18 +229,18 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68973-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-68974-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[thomas.lendacky@amd.com,kvm@vger.kernel.org];
@@ -249,8 +249,8 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 00915775F6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim]
+X-Rspamd-Queue-Id: 8061E77650
 X-Rspamd-Action: no action
 
 On 1/23/26 05:53, Thomas Courrege wrote:
