@@ -1,246 +1,246 @@
-Return-Path: <kvm+bounces-68951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68952-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gJuIBiI1c2lItAAAu9opvQ
-	(envelope-from <kvm+bounces-68951-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 09:45:22 +0100
+	id oHf0DO44c2l/tQAAu9opvQ
+	(envelope-from <kvm+bounces-68952-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 10:01:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64AE672B16
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 09:45:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938D872E56
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 10:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 16EB53009807
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 08:44:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD4DD3059333
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 08:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3848338584;
-	Fri, 23 Jan 2026 08:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D1D358D06;
+	Fri, 23 Jan 2026 08:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6giiCqT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lHiUoaIk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93E63242A3
-	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 08:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769157883; cv=pass; b=tqdqk42b34sANcIggsTF0dp7imL5cg90sjkE3SBiXG9tR65Y8K06pVbw6s1F8spdgSIq4vdNBZsvi6grNghk3r3yF04KGZDHu2QBBssBkrFjvnWOl2vpXOOTtsSh3LNpgmL4rrvflSZQ/Rjh17lo1tweYndRLyWhq/QbcOy/O8s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769157883; c=relaxed/simple;
-	bh=q0ix+xmFBGS5x5j4yOBrivR5GZGMnHUrvI1gZx8ZGr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MHkUK8s0/mQaUqlX79lHr5rHWKVS6m6QHVSVJYOsI1m+GazL/B2natz/oaYyGLykIwWwZ/UTDg94UNI8bdpGlAIDPbsbegoOtLz3+hFQrTRCwqH47rJtAzfj23O7LUcX7X7sybURj3b29WAWiktZ1Nq6qVkcP17pR1ANHjPia9I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C6giiCqT; arc=pass smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86269352C2D
+	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 08:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769158734; cv=none; b=fIvfZbqIOIf8jdRAQ1Pryii8KrYdbQxZLL2owAPDF/pbMvsK3vOWha5N3G9zKfb2trPYH+jex9BUS9eCNYzlcJDHH5SXpA99k3zqsH2fDmzSm0uPM3w5loQCwVtpM/6RsRIqpAN6J4jPgbGIfSC/r1VyRgFPsfheOGP9GGciFHA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769158734; c=relaxed/simple;
+	bh=H3kIgqZ1fpIQgO5dvj4uCp4+YHfpl+70b9+j6uz199k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tUVriSuzeEqJ/TV90aPhpxb0yQ+nkv0xIAyMNm9gcuTqdZbaL1fjHIYiWimQqFuQAIk9vTkuPCJvaWfFqOYhjUi9oI+vynB0MgYCyIE7KxqSXbByQGmlPtIijKdOccO7oCsNlDlR6BFg6OlezFLvqQi4QwsuPTbN2GnLUFT0YRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lHiUoaIk; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5018ec2ae21so25560241cf.0
-        for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 00:44:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769157880; cv=none;
-        d=google.com; s=arc-20240605;
-        b=h5O1Q/sQPqADe4A6GYcrvX7X5l7SblAHUAp7Ku3osXB66UL1HJlEuA3bNO7m8qn0+1
-         s27y16W0DNr6FKwXXqvULOgZU3moU6iiOuBib59dfTjNUpoj+r+nMh7AZmvPiaALcbkH
-         XI3pBxux9tT9abAP6BjViXevD488C70UsgOHTvvEHWccdZ8kjH1KKdsToF0/grWwbkXe
-         9co4tSfvuZMKO1wrCH4RiTHaYy7wO9f+Cz6d1zWCi8tnlhB6JWrtjcsOncZKg+IscPON
-         JC2QP2leg69W0bLkix+ug3XXVAd7p3fOn/zBx9sD8xvUVt1sI3YbmZUCds1I1GDdn/9Z
-         YE4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=q0ix+xmFBGS5x5j4yOBrivR5GZGMnHUrvI1gZx8ZGr4=;
-        fh=VQDDmZSzeo8Y9DERSBv35XDj6IzERDLfHUEmOx16aiI=;
-        b=ZafjoEMkgd93Pg+Bt2l5FsZpZs7w0BNqagDDTxD9PYA5Ox60k83vMIuUDi/oetAGo5
-         x1398JjF/fU6+la3PEOvH+JUOha5duTeZKaxuU26DeAYR/tnsU+bLyTq5iYfKAjthXR1
-         nngZ+oNxtIO14exwc9so/lBt9VeWFe8jhZtjPaYUSx+8tawz5YrrsECXIIKBMmTykRPH
-         Czb+RXmDj+k5ao5+JEzqiOBYVhqUJzlHnYzuQ4DwEtzHk4hDeVNNghfT0/HkApAXNZyV
-         /SHM+dL1hn+I8/mjy6mszqkuUaik8JiZSaRbppY5pfpyNfzdI6bLXXp0WWr4Pkd4sP3G
-         5cew==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a0c09bb78cso13558125ad.0
+        for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 00:58:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769157880; x=1769762680; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q0ix+xmFBGS5x5j4yOBrivR5GZGMnHUrvI1gZx8ZGr4=;
-        b=C6giiCqT5K1n+PFJstRqqSytqzmkroYqUs8fFBf1Fedr45gRLZi28f7PTy8TOpvN3q
-         DOtLC0N6K7K1D2A8nyvlFgJTs4I04Mn3If81mQ5p7FyZe5zkk8J8aWdV6b6ROkTepV6H
-         2Ty/MB+i83/QZ8XLIPP8qDHKxGY29FVQ6DWQwNcMAIM/8CAtoNvU1XaY8Ve/A113lgq7
-         iYDqEz3kYAVupHhTGux+U2pK/U9RdMvMRNHU+QdWD2KHstR/E9Xsuts6IrYvsNaRNEub
-         AHRrtbfcr4GLdYdaaZhtxqwBOMjNNMtJtbHbfN7Z2fTcckxxddBWWUK3Ef8g/iYQZQAV
-         wvzA==
+        d=gmail.com; s=20230601; t=1769158730; x=1769763530; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tw87ncFPvx87YF4rRJcW420dhLX4aAoK8XINI/y7618=;
+        b=lHiUoaIkHquSC2uXFusOL3zGCxZ6PzvXBOsCAirwNVY343UC3TesL1evpXOTpsi+Ch
+         14/WNDhXYgek6+okFntIkcjyNgom8geIsulVkQvCczgVVnUMwHVJD7EwK/3AgzxRjjvE
+         gG5BxXsjs3vduH/lCPg24WRAbOi0JM3bef8vWmq69a2A9ESIq38XXttXDqwZc2KfbXCH
+         VuQzWYAs95y9vl/cXzZVytx5LrFlczG2LqeY5+nRBg12zLRiqls/dNJomViFmEYv9pnr
+         6m76O66cqk97hhanjlAD5GGQ6osIvHjJvYAqXm73VKkuwelCxzI9SOSImGhz1/RixzhD
+         cTLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769157880; x=1769762680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=q0ix+xmFBGS5x5j4yOBrivR5GZGMnHUrvI1gZx8ZGr4=;
-        b=DgRZzFE/UUmpkXGAFoT96/U5BrEjyCFsJBTajK/yhANdGEUMVu9k5qHF6m05rwetXK
-         82/7/0eVXYmT0uH9AFgQwSFN/hpYvktyDf7+uMqNuBVIj8mm6DF589U2snORPfFFyx6I
-         Z0XNG0IjAe6c/ooC6PksaTZikUAEfuXkXblJ/9XfBMC3P3SyUvbh5VG1nxTOtu5jE4cM
-         ONwc257FXcb24wRmxaZZHYAddwO5y+RD2GFs+dBYXMcUtNd2nGHzdRh8ty+Q483nDibp
-         bgJ2wrnxicqbGSPCEL4u4QQDdfq1J0n8m1TWtYRBRIPdoutwcrn5EF7eAVOvQAMVB7uF
-         8M4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW+9JSY4yYtlnLCG2NdC5eBLGlTsoci29rTtGq1yrDC1Xgv1714UIoJm7qrZspX41rGkx4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJZKo6wgUgKuf8Erpshb0DPJZWtvy2iD7L6tIsCWBCIkk3E8cp
-	o9GUdtPpVaGz2VGBo/VtYP7lNGMuDMciixpVAhSXCTNilcxL+Z2y9+DUNboBOcL9a2x4U8566Zf
-	zGRpM6s/GI+DC8JA7hzKJ6PQLNXlZLVL2PQ==
-X-Gm-Gg: AZuq6aKpc2w42UVC/+4pRsynLuiNPvulDuPFbmd6gz0d7+nzNbwWatacRXsFDTMd0ua
-	CCtuX0WLL29c83gz0nXRtDOvhxg00u+DCRGYSAdP+vXHeyjYtYaCSkUABKi44hxYvKkiohToB9a
-	cVaZF1zvaIx5bK0z+242Di1hW84JjHT2SRZlsHIhYbx1v1GYJ85BJs9IRpYY5n52fHoM4BzmTPL
-	fPfbXbA7Vw229Trl9wgpCwIZPcJiVu1vrgVm08D1bSv0oZzN+17qTW9luO0eCJ+DFaPDR8xWQNg
-	fsMw4nxwicz8lkhA9TmuNuiwxmc=
-X-Received: by 2002:a05:622a:1a93:b0:501:498e:5c29 with SMTP id
- d75a77b69052e-502f77d4a37mr30458991cf.59.1769157880449; Fri, 23 Jan 2026
- 00:44:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769158730; x=1769763530;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tw87ncFPvx87YF4rRJcW420dhLX4aAoK8XINI/y7618=;
+        b=HAKCDvnMV9nxWUYVeaoGx/LjzLKj0qnCFDIp7O4eFwDhaTID4f5ckPnsdYfBIVr3ls
+         1L/tKfLQMa3QcwdnbQeq+EfX5oJ/MkbAaagYjq3Texhp0s5JXusfQs5RqO9DL//gsbU2
+         xKmJu6jxDp2ZJx1OmPiw/qzmvJMbfqr1gYWMZ7MBx8u0hfIhEJBOD0+WFxLJb2VEpVy1
+         ZHgdqNweek6JCUUY7Bdg38i+6/YIWut7ahQ2B6NyxGISRXgl4ke9Xn1nPBY5mOIPxeYe
+         BTAb6dxIRlr8XdZVejh2RCaW4Ivb8mE0JyrjFPuv9s3hDisDCYK0OaUiA8GzWNMGKm7j
+         iaSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcbVyrnY9XytX286wphkCHDU8wQr3F0FqS+fxk1O6qT+d4FFB8ydEXtiY8XgMG3g/9yDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTLkA1QKw1fV01up86lijjebpvdvMOBU1rYx9XbmLoI1YNO2EA
+	F/pTmAiO7Y9aNbecpe83a4TI7FWuvjG07mBkKv3wy6a6oB/0zb7Ebr4R
+X-Gm-Gg: AZuq6aJ6zaP8E0MTspm9UkqXwXzBV7OUc4VWIOXv+EhD7dG5Wbw+gBTbhRVQ5+OX7YY
+	4Si98nwHoIbXy/7h1h/niZZiH1QvfnwDZkmWDNOOUiM0jH4heAUojReX0hBN9YK4Y2JogWP0OvP
+	kFYui+a3XmpPOgb1ESRiEmgP+XXgIn61rn6UuY7oU+c3+3s3ZJ5ZZtA0PfOFqSGPqTxO6GFYXW1
+	ePorqRivUgItTGEx3tlzZ57IjpwSdw/6m3H3hzSRvcG38YkMzSDSoFgBAU2VZ+T1GIp3Ds/tLq+
+	WDWSZRvxJ4f6bkdABopNKxMVUacurb5S8Jr+VelxXLtgqwtqc63o6l845b9zmmD/7zxQISjAWOa
+	cxfF7pyojSLoBZwCTRRIpep/KJMnTZylC3VeWVwtewxs1G2aFC7REvDB/Ix86bImbQcOg9+F0eZ
+	6Bv73ia4NnP1U=
+X-Received: by 2002:a17:903:4b0d:b0:2a0:eaf5:5cd8 with SMTP id d9443c01a7336-2a7d2f17f93mr46191495ad.9.1769158730217;
+        Fri, 23 Jan 2026 00:58:50 -0800 (PST)
+Received: from localhost ([240b:4000:bb:1700:7b36:494d:5625:5a0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802dcd776sm13937155ad.26.2026.01.23.00.58.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Jan 2026 00:58:49 -0800 (PST)
+From: Lai Jiangshan <jiangshanlai@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	kvm@vger.kernel.org
+Subject: [PATCH 1/2] KVM: x86/mmu: Don't check old SPTE permissions when trying to unsync
+Date: Fri, 23 Jan 2026 17:03:02 +0800
+Message-Id: <20260123090304.32286-1-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
- <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
- <CAJSP0QVQNExn01ipcu4KTQJrmnXGVmvFyKzXe5m9P3_jQwJ6cA@mail.gmail.com>
- <CAJSP0QW4bMO8-iYODO_6oaDn44efPeV6e00AfD5A42pQ9d+REQ@mail.gmail.com>
- <aXH4PpkC4AtccsOE@redhat.com> <CAMxuvaw04pDNzHyw5+Qcv_KfrhDTiyp+MNxpECp+HfTa5iLOGw@mail.gmail.com>
- <aXH-TlzxZ1gDvPH2@redhat.com> <CAFEAcA_u6QUhs+6-cyYm_qttsDiV2zHbsc-_FbTb8QzWXk6+tw@mail.gmail.com>
- <aXICpFZuNM9GG4Kv@redhat.com> <CAMxuvawgOvQbwoyCzFBLw++JqR0vFbVUhbv1AJWU6VqK1MM_Og@mail.gmail.com>
- <82f74c82-c572-4ab9-b527-11ea287056d1@linaro.org>
-In-Reply-To: <82f74c82-c572-4ab9-b527-11ea287056d1@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 23 Jan 2026 12:44:28 +0400
-X-Gm-Features: AZwV_Qi1gRi5xeDyNeB35CIP8lzUToeOVoLKCjAlrhjdcWtWqqH7vcnQjXP73Kc
-Message-ID: <CAJ+F1CJtrv9YgDbiekVmDD2yT+6nUe39nLwLsKxvFOtMc1kUGA@mail.gmail.com>
-Subject: Re: Call for GSoC internship project ideas
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, 
-	Thomas Huth <thuth@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
-	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Matias Ezequiel Vara Larsen <mvaralar@redhat.com>, Kevin Wolf <kwolf@redhat.com>, 
-	German Maglione <gmaglione@redhat.com>, Hanna Reitz <hreitz@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Bennee <alex.bennee@linaro.org>, 
-	John Levon <john.levon@nutanix.com>, Thanos Makatos <thanos.makatos@nutanix.com>, 
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-68951-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-68952-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,linaro.org,gmail.com,nongnu.org,vger.kernel.org,gmx.de,ilande.co.uk,nutanix.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiangshanlai@gmail.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcandrelureau@gmail.com,kvm@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 64AE672B16
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[antgroup.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 938D872E56
 X-Rspamd-Action: no action
 
-Hi
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-On Thu, Jan 22, 2026 at 7:46=E2=80=AFPM Pierrick Bouvier
-<pierrick.bouvier@linaro.org> wrote:
->
-> On 1/22/26 3:28 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Thu, Jan 22, 2026 at 2:57=E2=80=AFPM Daniel P. Berrang=C3=A9 <berran=
-ge@redhat.com> wrote:
-> >>
-> >> On Thu, Jan 22, 2026 at 10:54:42AM +0000, Peter Maydell wrote:
-> >>> On Thu, 22 Jan 2026 at 10:40, Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
-> >>>> Once we have written some scripts that can build gcc, binutils, linu=
-x,
-> >>>> busybox we've opened the door to be able to support every machine ty=
-pe
-> >>>> on every target, provided there has been a gcc/binutils/linux port a=
-t
-> >>>> some time (which covers practically everything). Adding new machines
-> >>>> becomes cheap then - just a matter of identifying the Linux Kconfig
-> >>>> settings, and everything else stays the same. Adding new targets mea=
-ns
-> >>>> adding a new binutils build target, which should again we relatively
-> >>>> cheap, and also infrequent. This has potential to be massively more
-> >>>> sustainable than a reliance on distros, and should put us on a pathw=
-ay
-> >>>> that would let us cover almost everything we ship.
-> >>>
-> >>> Isn't that essentially reimplementing half of buildroot, or the
-> >>> system image builder that Rob Landley uses to produce toybox
-> >>> test images ?
-> >>
-> >> If we can use existing tools to achieve this, that's fine.
-> >>
-> >
-> > Imho, both approaches are complementary. Building images from scratch,
-> > like toybox, to cover esoteric minimal systems. And more complete and
-> > common OSes with mkosi which allows you to have things like python,
-> > mesa, networking, systemd, tpm tools, etc for testing.. We don't want
-> > to build that from scratch, do we?
-> >
->
-> I ran into this need recently, and simply used podman (or docker) for
-> this purpose.
->
-> $ podman build -t rootfs - < Dockerfile
-> $ container=3D$(podman create rootfs)
-> $ podman export -o /dev/stdout $container |
-> /sbin/mke2fs -t ext4 -d - out.ext4 10g
-> $ podman rm -f $container
->
-> It allows to create image for any distro (used it for alpine and
-> debian), as long as they publish a docker container. As well, it gives
-> flexibility to have a custom init, skipping a lengthy emulated boot with
-> a full system. As a bonus, it's quick to build, and does not require
-> recompiling the world to get something.
->
-> You can debug things too by running the container on your host machine,
-> which is convenient.
->
+Commit ecc5589f19a5 ("KVM: MMU: optimize set_spte for page sync") added
+a writable permission check on the old SPTE to avoid unnecessary calls
+to mmu_try_to_unsync_pages() when syncing SPTEs.
 
-Very nice! I didn't realize you could export and reuse a container that way=
-.
+Later, commit e6722d9211b2 ("KVM: x86/mmu: Reduce the update to the spte
+in FNAME(sync_spte)") indirectly achieves it by avoiding some SPTE
+updates altogether, which makes the writable permission check in
+make_spte() much less useful.
 
-I wonder how this workflow can be extended and compare to mkosi
-(beside the limitation to produce tar/fs image)
+Remove the old-SPTE writable permission check from make_spte() to
+simplify the code.
 
-For qemu VM testing, it would fit better along with our Dockerfile &
-lcitool usage.
+This may cause mmu_try_to_unsync_pages() to be called in a few
+additional cases not covered by commit e6722d9211b2, such as when the
+guest toggles the execute bit, which is expected to be rare.
 
-I wish a tool would help to (cross) create & boot such (reproducible)
-images & vm easily.
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+---
+ arch/x86/kvm/mmu/mmu.c         |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ arch/x86/kvm/mmu/spte.c        | 12 ++----------
+ arch/x86/kvm/mmu/spte.h        |  2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c     |  2 +-
+ 5 files changed, 6 insertions(+), 14 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 02c450686b4a..4535d2836004 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3073,7 +3073,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 			was_rmapped = 1;
+ 	}
+ 
+-	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
++	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, prefetch,
+ 			   false, host_writable, &spte);
+ 
+ 	if (*sptep == spte) {
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 901cd2bd40b8..95fccee63563 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -954,7 +954,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
+ 	host_writable = spte & shadow_host_writable_mask;
+ 	slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+ 	make_spte(vcpu, sp, slot, pte_access, gfn,
+-		  spte_to_pfn(spte), spte, true, true,
++		  spte_to_pfn(spte), true, true,
+ 		  host_writable, &spte);
+ 
+ 	/*
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 85a0473809b0..a8e2606ccd22 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -186,7 +186,7 @@ bool spte_needs_atomic_update(u64 spte)
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+-	       u64 old_spte, bool prefetch, bool synchronizing,
++	       bool prefetch, bool synchronizing,
+ 	       bool host_writable, u64 *new_spte)
+ {
+ 	int level = sp->role.level;
+@@ -258,16 +258,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 		 * SPTE.  Write-protect the SPTE if the page can't be unsync'd,
+ 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
+ 		 * shadow pages and unsync'ing pages is not allowed.
+-		 *
+-		 * When overwriting an existing leaf SPTE, and the old SPTE was
+-		 * writable, skip trying to unsync shadow pages as any relevant
+-		 * shadow pages must already be unsync, i.e. the hash lookup is
+-		 * unnecessary (and expensive).  Note, this relies on KVM not
+-		 * changing PFNs without first zapping the old SPTE, which is
+-		 * guaranteed by both the shadow MMU and the TDP MMU.
+ 		 */
+-		if ((!is_last_spte(old_spte, level) || !is_writable_pte(old_spte)) &&
+-		    mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, synchronizing, prefetch))
++		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, synchronizing, prefetch))
+ 			wrprot = true;
+ 		else
+ 			spte |= PT_WRITABLE_MASK | shadow_mmu_writable_mask |
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 91ce29fd6f1b..cf9cd27bcd4f 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -543,7 +543,7 @@ bool spte_needs_atomic_update(u64 spte);
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       const struct kvm_memory_slot *slot,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+-	       u64 old_spte, bool prefetch, bool synchronizing,
++	       bool prefetch, bool synchronizing,
+ 	       bool host_writable, u64 *new_spte);
+ u64 make_small_spte(struct kvm *kvm, u64 huge_spte,
+ 		    union kvm_mmu_page_role role, int index);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 9c26038f6b77..8dfaab2a4fd9 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1188,7 +1188,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+ 	else
+ 		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+-				   fault->pfn, iter->old_spte, fault->prefetch,
++				   fault->pfn, fault->prefetch,
+ 				   false, fault->map_writable, &new_spte);
+ 
+ 	if (new_spte == iter->old_spte)
+-- 
+2.19.1.6.gb485710b
 
-> I took a look at bootc, but was not really convinced of what it added
-> for my use case compared to the 4 commands above.
->
-
-Having a regular VM bootable image could be desirable for some cases
-(tpm, secure boot testing for ex).
-
---
-Marc-Andr=C3=A9 Lureau
 
