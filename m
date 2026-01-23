@@ -1,168 +1,156 @@
-Return-Path: <kvm+bounces-69023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69024-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODD4CBr2c2nG0QAAu9opvQ
-	(envelope-from <kvm+bounces-69023-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 23:28:42 +0100
+	id MDt6EAL6c2mf0gAAu9opvQ
+	(envelope-from <kvm+bounces-69024-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 23:45:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B097B27A
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 23:28:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05317B388
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 23:45:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2D0483028348
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 22:28:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3B24330066A1
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 22:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90982D8DDF;
-	Fri, 23 Jan 2026 22:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA8E2D94A3;
+	Fri, 23 Jan 2026 22:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IoCQE/gH"
 X-Original-To: kvm@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C55133985;
-	Fri, 23 Jan 2026 22:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3465D2BE03B
+	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 22:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769207296; cv=none; b=QoZNJsTFTh9T0C65whZ3lZoIA9gsg6IdKbp8VYU+WQJsWU9++C3YFYXnRlJ5fN8sz53KU8ZtdR/SVb5jfOxzScT6ltYfGbN2pbwo77c8uIQ0L70YP3upgl+NW63mcJC1n0XSzfaEm6jcBZYiXolvmevYdRR1iaeA9/JT7O7w9bw=
+	t=1769208319; cv=none; b=frdwCttvxu4srkAcxl04cof4G8/NE3vRhzLpKjuZwkD6/mawb+3ft7w5owNOUV16zIysQ7WTn5/YKXG8DuGM6EzFV6yWr0QPI7IMHPWa8OtxEb+5KGMdXcLAJpEzg/uyk7MBUYzqT+JqPpNGtzAtRGFr6uKwFp478RUY9gvDs88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769207296; c=relaxed/simple;
-	bh=VWRZeQ56cAdk8X0xitzdlPQGNbd378aNkZE0Bh8Vb64=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k/RlM+YumA4ifOqe6lRbOUe1mxK3/oDk3C1uRdSCN5HYbGjvpkEvIvYxO/F1L0QoZB27UenO7pIpU71WeV/rBtPIUb/4cxg6ayvZdChAeZLjtz0K/yHv3NTQH8PHsJhfueIQw19a3zC9sM2ZKyKdiAQd8JfmX5FS1BKkYg6Wcsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from altlinux.ipa.basealt.ru (unknown [193.43.11.2])
-	(Authenticated sender: kovalevvv)
-	by air.basealt.ru (Postfix) with ESMTPSA id C56912339E;
-	Sat, 24 Jan 2026 01:28:02 +0300 (MSK)
-From: Vasiliy Kovalev <kovalev@altlinux.org>
-To: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: x86@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	kovalev@altlinux.org
-Subject: [PATCH v2] KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()
-Date: Sat, 24 Jan 2026 01:28:01 +0300
-Message-Id: <20260123222801.646123-1-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
+	s=arc-20240116; t=1769208319; c=relaxed/simple;
+	bh=v/E1aIUaWVgBzmsteMHSbPl1m3HH9Sfm6pjuj4LnzQY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Et5N5V+KtREXVcJ5+QHfj32DhNZQZYRKuaTEyaMqQC+yDIo+McbkfbgKHGCCmzPI57L/vue2hr67CFlarEqtNi+wo2v1JhMB4L1QZL/pwKB38rLS31oShKNtLehwLkZ0V5TqibDIfVheNj2rSBIvGmQpQHum8T/nIun+KfQJVJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IoCQE/gH; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34e5a9de94bso5038377a91.0
+        for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 14:45:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769208317; x=1769813117; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VXA12E7mvF+SS7aKiDQN5dITsXHbb3FBTFXDK5xphl8=;
+        b=IoCQE/gHBUGAGwcIPXG3qVpGNR2+RUMFbO4Elq6kVBuF+DZu33aNGkZwBVhVs9HgiY
+         svkIQvLdaRbJu+uS12cS9NLnOv/YCbf6qfl+9Zi5g4vfGHLnvyN/z47TrRUzAFxMliMD
+         5QTnk0MgK8au03vjjjmNhpDfwBC/qCaBGWnQYXuUc6T2lEfddnLVzUDMr6qPbDODFtTA
+         MAIcJ2j22lLLfdOeH/7VR4zdQ5B81gGAabUp4WXDShPaTYHvp8xfc23CrOha757o/lqb
+         vCy4s5mthmqIeFJJzM6fO2yF35onzhyMw+5iRiFdfrS2WAoXw4YZvgv/X0YBfWL5bGUt
+         ia+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769208317; x=1769813117;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VXA12E7mvF+SS7aKiDQN5dITsXHbb3FBTFXDK5xphl8=;
+        b=irnSURpzf1VWJfi/jpVv+vOG7ue6kIqd86YI4YvqjBjfBsZE1Xp06NENH3Koj+c6PJ
+         7GhknYrK4iJ/JJk1Kg9GceSP9mMwEgOhipezgRh5cjOdc9rcfpgLpW0gFlxS493iPS7T
+         q+qPYDPRVIifAZJDbJi+1uMeXGRKY0HbIdaTGBp6A9SUAwoThdTsObY9B1hzxB0S3wSz
+         /JtzZW6GtbJvGpKPM39Q/RQhnnuOqooXvADnLy/45M4djlnkcwbYjVi5ItnCl+Wxrw75
+         IbDkCYxgWiV7DCJ5pWdxHCPpxS6A9H1fZlfS8Cq2kkUU4n8pxBGE/IVvzta45zfPWw84
+         sgww==
+X-Gm-Message-State: AOJu0YyBD4TyEnVDBW37G2AimYLod1YKfTqfjRIdl/vNTalY0/c9D52J
+	yop9Ye/yfp5TsBt7qz2nkhGMTH2JT4dE6+3/WZKQyTuZnr6Y26Jjs6/m/GzjiAeN/pO/0072bRK
+	TOdYk0g==
+X-Received: from pjbsf1.prod.google.com ([2002:a17:90b:51c1:b0:352:c761:3cf])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1b47:b0:352:c34a:342c
+ with SMTP id 98e67ed59e1d1-35368b44660mr3641377a91.29.1769208317606; Fri, 23
+ Jan 2026 14:45:17 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 23 Jan 2026 14:45:10 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260123224514.2509129-1-seanjc@google.com>
+Subject: [PATCH v2 0/4] KVM: SVM: Fix IRQ window inhibit handling
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Naveen N Rao <naveen@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69023-lists,kvm=lfdr.de];
-	DMARC_NA(0.00)[altlinux.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69024-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	FROM_NEQ_ENVFROM(0.00)[kovalev@altlinux.org,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[altlinux.org:mid,altlinux.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linuxtesting.org:url]
-X-Rspamd-Queue-Id: C0B097B27A
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	HAS_REPLYTO(0.00)[seanjc@google.com];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: D05317B388
 X-Rspamd-Action: no action
 
-Add SRCU read-side protection when reading PDPTR registers in
-__get_sregs2().
+Patch 1 fixes a bugs where KVM will keep AVIC inhibit for too long when
+running a nested guest and AVIC is inhibited to open an IRQ window.
 
-Reading PDPTRs may trigger access to guest memory:
-kvm_pdptr_read() -> svm_cache_reg() -> load_pdptrs() ->
-kvm_vcpu_read_guest_page() -> kvm_vcpu_gfn_to_memslot()
+Patch 2 refcounts IRQ window inhibits so that "closing" an IRQ window on
+one vCPU doesn't clobber other vCPUs' windows when AVIC is enabled.
 
-kvm_vcpu_gfn_to_memslot() dereferences memslots via __kvm_memslots(),
-which uses srcu_dereference_check() and requires either kvm->srcu or
-kvm->slots_lock to be held. Currently only vcpu->mutex is held,
-triggering lockdep warning:
+Patch 3 optimizes IRQ window inhibits by avoiding contention on
+apicv_update_lock when KVM wants to inhibit AVIC to open an IRQ windows
+because AVIC is _already_ inhibited.
 
-=============================
-WARNING: suspicious RCU usage in kvm_vcpu_gfn_to_memslot
-6.12.59+ #3 Not tainted
+Patch 4 further optimizes IRQ window inhibits by isolating the refcount
+and the lock in their own cacheline, e.g. to avoid false sharing and cache
+line contention with things like apicv_inhibit_reasons, which is read on
+every VM-Enter.
 
-include/linux/kvm_host.h:1062 suspicious rcu_dereference_check() usage!
+v2:
+ - Formalize the SoB chains (thanks Naveen!)
+ - Explicitly isolate the write-mostly fields with ____cacheline_aligned.
+ - Add Naveen's Tested-by tags.
 
-other info that might help us debug this:
+v1 / RFC: https://lore.kernel.org/all/cover.1752819570.git.naveen@kernel.org
 
-rcu_scheduler_active = 2, debug_locks = 1
-1 lock held by syz.5.1717/15100:
- #0: ff1100002f4b00b0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x1d5/0x1590
+Original: https://lore.kernel.org/all/cover.1738595289.git.naveen@kernel.org
 
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0xf0/0x120 lib/dump_stack.c:120
- lockdep_rcu_suspicious+0x1e3/0x270 kernel/locking/lockdep.c:6824
- __kvm_memslots include/linux/kvm_host.h:1062 [inline]
- __kvm_memslots include/linux/kvm_host.h:1059 [inline]
- kvm_vcpu_memslots include/linux/kvm_host.h:1076 [inline]
- kvm_vcpu_gfn_to_memslot+0x518/0x5e0 virt/kvm/kvm_main.c:2617
- kvm_vcpu_read_guest_page+0x27/0x50 virt/kvm/kvm_main.c:3302
- load_pdptrs+0xff/0x4b0 arch/x86/kvm/x86.c:1065
- svm_cache_reg+0x1c9/0x230 arch/x86/kvm/svm/svm.c:1688
- kvm_pdptr_read arch/x86/kvm/kvm_cache_regs.h:141 [inline]
- __get_sregs2 arch/x86/kvm/x86.c:11784 [inline]
- kvm_arch_vcpu_ioctl+0x3e20/0x4aa0 arch/x86/kvm/x86.c:6279
- kvm_vcpu_ioctl+0x856/0x1590 virt/kvm/kvm_main.c:4663
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x18b/0x210 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xbd/0x1d0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Sean Christopherson (4):
+  KVM: SVM: Fix clearing IRQ window inhibit with nested guests
+  KVM: SVM: Fix IRQ window inhibit handling across multiple vCPUs
+  KVM: SVM: Optimize IRQ window inhibit handling
+  KVM: Isolate apicv_update_lock and apicv_nr_irq_window_req in a
+    cacheline
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+ arch/x86/include/asm/kvm_host.h | 29 +++++++++++++++-
+ arch/x86/kvm/svm/svm.c          | 60 ++++++++++++++++++++-------------
+ arch/x86/kvm/svm/svm.h          |  1 +
+ arch/x86/kvm/x86.c              | 45 ++++++++++++++++++++++++-
+ 4 files changed, 110 insertions(+), 25 deletions(-)
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Cc: stable@vger.kernel.org
-Fixes: 6dba94035203 ("KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2")
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
----
-v2: Move SRCU lock inside __get_sregs2() as suggested by Sean Christopherson
 
-v1: https://lore.kernel.org/all/20260116151523.291892-1-kovalev@altlinux.org/
----
- arch/x86/kvm/x86.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8acfdfc583a1..f2aa2986df86 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12166,9 +12166,11 @@ static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
- 		return;
- 
- 	if (is_pae_paging(vcpu)) {
-+		kvm_vcpu_srcu_read_lock(vcpu);
- 		for (i = 0 ; i < 4 ; i++)
- 			sregs2->pdptrs[i] = kvm_pdptr_read(vcpu, i);
- 		sregs2->flags |= KVM_SREGS2_FLAGS_PDPTRS_VALID;
-+		kvm_vcpu_srcu_read_unlock(vcpu);
- 	}
- }
- 
+base-commit: e81f7c908e1664233974b9f20beead78cde6343a
 -- 
-2.50.1
+2.52.0.457.g6b5491de43-goog
 
 
