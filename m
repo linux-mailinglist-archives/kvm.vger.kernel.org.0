@@ -1,68 +1,57 @@
-Return-Path: <kvm+bounces-68949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-68950-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULQJM1wPc2ntrwAAu9opvQ
-	(envelope-from <kvm+bounces-68949-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 07:04:12 +0100
+	id kLQkHlAac2mwsAAAu9opvQ
+	(envelope-from <kvm+bounces-68950-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 07:50:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C8170B77
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 07:04:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F1571269
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 07:50:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12E43301B72D
-	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 06:03:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 102BF301693D
+	for <lists+kvm@lfdr.de>; Fri, 23 Jan 2026 06:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94DD39F8A3;
-	Fri, 23 Jan 2026 06:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f6Y8fC3z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E892032B99A;
+	Fri, 23 Jan 2026 06:50:34 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F1B35DCE9;
-	Fri, 23 Jan 2026 06:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E77D30F52C
+	for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 06:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769148221; cv=none; b=aOO8344U03BDsr3mgjgjUrebgJ4juX2+NAmp2sWPO5jCjV4UOJ9/gUhqGDiqtJ4nhPhzDNsjKsWfWURrisFIQz43xPleVbW8csjvoriKAW1ifDHNZ13U+7FOz4yNwKbPUkXQtjYQbNDSfMrjF3k/ITV3RsFFJSUF8z58KmLEwDc=
+	t=1769151034; cv=none; b=W6clPXMa/vyeChOn9SO8gRK4NZJ/Xp5YyMap/XW3Ual8oTLt+HvOv6FOd527nRHnp9jToeBFAFvkkbdZ6ih8ViCdSGBBSKRD5Fx4sYCl48yhyHy+KQJTn6IHyCoRyd3gAFGRnocsnXajEMqzhS78uow/px8kVT3da4FHJ+GiCt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769148221; c=relaxed/simple;
-	bh=Huws0kh82G4zxZfZT98FP53TxBbpAbPUXlVXqbKA4p4=;
+	s=arc-20240116; t=1769151034; c=relaxed/simple;
+	bh=OzlUiGoAhUkZHtqw0H4WpFodleNdkNUpFBkSrztcMZY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qw9nnhccAw0zC3oFDKRfC2gPaWxheSxL8eqlZVYiN9gZj0oM1y/eISgqA9UWpgMs+82yUKenwHf3LKURfVP0BM8n2vXh1boDQXT8KOKZnFvdcxU5ORaaAwGgI+c3kWKg5CP1e2s0GeiQX+ZIFKoAFjxWkfJjvpGy4jHXkNHwkyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f6Y8fC3z; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769148216; x=1800684216;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Huws0kh82G4zxZfZT98FP53TxBbpAbPUXlVXqbKA4p4=;
-  b=f6Y8fC3zU51KqNdihVkPcb2F2MvmmglnOZkZBeFCXcZzGNnEwiA7DAgI
-   QOvvC10NxOAN13CU+O2KnD+iHJ1EqIJ4kLAQ/2IYmYRgNRwzy+mXZgsB6
-   UWAm5vXOXDdNAAvncY7EsMA2onPSuetlHTfC54VmCpfslWIhFxZCNamY9
-   JGCYuDuM850uG+lNYCw/OSGJAJgWPlfDU6O7vAjkvSzyM6iPtBl/WMQGS
-   6QFR9+UPC7f1rq3+ev0HRRxIFmaJji2W9vN5zKmgtKY6HIJ1n+UeKzFUz
-   Pm6vUKsCPSwopoWi2CdThpBL0J7WHsM2uBGsjJ8nvohK2y5Et93PE2MnA
-   w==;
-X-CSE-ConnectionGUID: hoKvT+OvT/ux9PPuNC0OlA==
-X-CSE-MsgGUID: px7G81S4Q4ionKuoZf2Rtw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11679"; a="69417453"
-X-IronPort-AV: E=Sophos;i="6.21,247,1763452800"; 
-   d="scan'208";a="69417453"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 22:03:31 -0800
-X-CSE-ConnectionGUID: F4eexOaKSnyJy0t+cH4BXQ==
-X-CSE-MsgGUID: mEn6+Vn1RnOMV8gh9MhNrw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,247,1763452800"; 
-   d="scan'208";a="211398679"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.173]) ([10.124.240.173])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2026 22:03:28 -0800
-Message-ID: <9acca03d-5ec4-41ba-83b4-3505435b1e1b@intel.com>
-Date: Fri, 23 Jan 2026 14:03:25 +0800
+	 In-Reply-To:Content-Type; b=t+cCCNXT67zwz20MeDL/i8i8NIkPHfka7syYs8JMsImZgeaIeKKPkGwQmsmY016ZTSQX1r3uzt50tv9HiP+yoL8kHu+TUCNuuuOZQAPr3nRTj3P4Kw4RDZ6UApHNQXaenllz+lVxQ4tmG//ocDeVpqQgDr6thfy2rYWSdxnoJ/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 98E255BCCA;
+	Fri, 23 Jan 2026 06:45:02 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 48E4A1395E;
+	Fri, 23 Jan 2026 06:45:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id CdrNEO4Yc2noWgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 23 Jan 2026 06:45:02 +0000
+Message-ID: <840481e9-d7d1-4063-8772-b717ca915ea2@suse.cz>
+Date: Fri, 23 Jan 2026 07:45:01 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,77 +59,166 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] KVM: x86: Advertise new instruction CPUIDs for Intel
- Diamond Rapids
-To: Zhao Liu <zhao1.liu@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H . Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Chao Gao <chao.gao@intel.com>
-References: <20251120050720.931449-1-zhao1.liu@intel.com>
+Subject: Re: [PATCH v6 1/5] mm/zone_device: Reinitialize large zone device
+ private folios
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20251120050720.931449-1-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: Andrew Morton <akpm@linux-foundation.org>,
+ Balbir Singh <balbirs@nvidia.com>
+Cc: Matthew Brost <matthew.brost@intel.com>, Zi Yan <ziy@nvidia.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Matthew Wilcox <willy@infradead.org>,
+ Alistair Popple <apopple@nvidia.com>,
+ Francois Dugast <francois.dugast@intel.com>, intel-xe@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, adhavan Srinivasan <maddy@linux.ibm.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Felix Kuehling <Felix.Kuehling@amd.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+ David Hildenbrand <david@kernel.org>, Oscar Salvador <osalvador@suse.de>,
+ Leon Romanovsky <leon@kernel.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport
+ <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
+ Michal Hocko <mhocko@suse.com>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+ linux-mm@kvack.org, linux-cxl@vger.kernel.org
+References: <eb94d115-18a6-455b-b020-f18f372e283a@nvidia.com>
+ <aWsdv6dX2RgqajFQ@lstrano-desk.jf.intel.com>
+ <4k72r4n5poss2glrof5fsapczkpcrnpokposeikw5wjvtodbto@wpqsxoxzpvy6>
+ <20260119142019.GG1134360@nvidia.com>
+ <96926697-070C-45DE-AD26-559652625859@nvidia.com>
+ <20260119203551.GQ1134360@nvidia.com>
+ <ef6ef1e2-25f1-4f1b-a8d4-98c0d7b4ad0c@nvidia.com>
+ <EE2956E3-CCEA-4EF9-A1A4-A483245091FC@nvidia.com>
+ <20260120135340.GA1134360@nvidia.com>
+ <F7E3DF24-A37B-40A0-A507-CEF4AB76C44D@nvidia.com>
+ <aXHPkQfwhMHU/oP6@lstrano-desk.jf.intel.com>
+ <9077ab5b-f2c8-4c8d-8441-631e7c2cf384@suse.cz>
+ <626c34fc-34df-4629-baf3-fbebc9abafbb@nvidia.com>
+ <20260122134114.a04ddf4c34a4b926d057032f@linux-foundation.org>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20260122134114.a04ddf4c34a4b926d057032f@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Level: 
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-68949-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,nvidia.com,infradead.org,lists.freedesktop.org,linux.ibm.com,gmail.com,ellerman.id.au,kernel.org,amd.com,ffwll.ch,linux.intel.com,suse.de,redhat.com,oracle.com,google.com,suse.com,lists.ozlabs.org,vger.kernel.org,kvack.org];
+	TAGGED_FROM(0.00)[bounces-68950-lists,kvm=lfdr.de];
+	DMARC_NA(0.00)[suse.cz];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xiaoyao.li@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_TWELVE(0.00)[39];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
-X-Rspamd-Queue-Id: 46C8170B77
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.cz,kvm@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.993];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,nvidia.com:email,suse.cz:mid,suse.cz:email]
+X-Rspamd-Queue-Id: C8F1571269
 X-Rspamd-Action: no action
 
-On 11/20/2025 1:07 PM, Zhao Liu wrote:
-> Hi,
+On 1/22/26 22:41, Andrew Morton wrote:
+> On Thu, 22 Jan 2026 20:10:44 +1100 Balbir Singh <balbirs@nvidia.com> wrote:
 > 
-> This series advertises new instruction CPUIDs to userspace, which are
-> supported by Intel Diamond Rapids platform.
+>> >> - Intel has demonstrated that this works and is still getting blocked.
+>> >>
+>> >> - This entire thread is about a fixes patch for large device pages.
+>> >>   Changing prep_compound_page is completely out of scope for a fixes
+>> >>   patch, and honestly so is most of the rest of what’s being proposed.
+>> > 
+>> > FWIW I'm ok if this lands as a fix patch, and perceived the discussion to be
+>> > about how refactor things more properly afterwards, going forward.
+>> > 
+>> 
+>> I've said the same thing and I concur, we can use the patch as-is and
+>> change this to set the relevant identified fields after 6.19
 > 
-> I've attached the spec link for each (family of) instruction in each
-> patch. Since the instructions included in this series don't require
-> additional enabling work, pass them through to guests directly.
+> So the plan is to add this patch to 6.19-rc and take another look at
+> patches [2-5] during next -rc cycle?
 > 
-> This series is based on the master branch at the commit 23cb64fb7625
-> ("Merge tag 'soc-fixes-6.18-3' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc").
+> I think the plan is to take Matthew's work via the DRM tree?  But if people
+> want me to patchbunny this fix then please lmk.
 > 
-> Thanks for your review!
+> I presently have
 > 
-> Best Regards,
-> Zhao
-> ---
-> Zhao Liu (4):
->    KVM: x86: Advertise MOVRS CPUID to userspace
->    KVM: x86: Advertise AMX CPUIDs in subleaf 0x1E.0x1 to userspace
->    KVM: x86: Advertise AVX10.2 CPUID to userspace
->    KVM: x86: Advertise AVX10_VNNI_INT CPUID to userspace
+> Signed-off-by: Matthew Brost <matthew.brost@intel.com>
+> Signed-off-by: Francois Dugast <francois.dugast@intel.com>
+> Acked-by: Felix Kuehling <felix.kuehling@amd.com>
+> Reviewed-by: Balbir Singh <balbirs@nvidia.com>
+> 
+> If people wish to add to this then please do so.
 
-For the series,
+I did too.
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
 
+> I'll restore this patch into mm.git's hotfix branch (and hence
+> linux-next) because testing.
 
 
