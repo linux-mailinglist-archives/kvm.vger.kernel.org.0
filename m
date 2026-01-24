@@ -1,233 +1,223 @@
-Return-Path: <kvm+bounces-69033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69034-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLFLCxwhdGmE2QAAu9opvQ
-	(envelope-from <kvm+bounces-69033-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 02:32:12 +0100
+	id sK9ALZIsdGkV2wAAu9opvQ
+	(envelope-from <kvm+bounces-69034-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 03:21:06 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821AE7BF9D
-	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 02:32:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E057C35C
+	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 03:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96CFC3021E83
-	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 01:31:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9ADB53022977
+	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 02:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950AB1D7E42;
-	Sat, 24 Jan 2026 01:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837BB21C16A;
+	Sat, 24 Jan 2026 02:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mv0z379R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCw5aOd4"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EC44A35;
-	Sat, 24 Jan 2026 01:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8173D9443
+	for <kvm@vger.kernel.org>; Sat, 24 Jan 2026 02:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769218312; cv=none; b=P3jUxwZm0DclTWa2IVKagCv8DkjV3thAy3w9irrUK4+xMdPeDp3Uzn4LZtcQyE874dvghqGyQmqGCsgJV09zDAUqMeBk9rj7tzfKC5djmRnXpLHd+qnv47qy3eC5EJuSzKGvgamx/wGSRO027IxuTVJiDYythnWo0pi3nZ8km2I=
+	t=1769221255; cv=none; b=su3ggbDWWuSsDt3zNmusMLO36fiiCq4gXDe2vjCDIvjZGwOOh2iupNcD8gk7FxeCiUpZMDUpLHlots/HwJPPEjz3Cu4oOqJY+vD88Fub1hy5rVFltJQWAyFlsnCYQw2YMqVPVc8SqK84avgae5oSeEYSjkqwZw38weUiWlHec9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769218312; c=relaxed/simple;
-	bh=Z1Cr3VHZ2N5IQ8CUi2xKvTg3Y8erVu0IcZEsJQQswaY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ao54Hzid+kxt808k7oksQYVLFH+9PIO3neo5XpSCXTTamDH2bdbB6EITa2RuNFS1HQygW50pZadRV72PvVK6UK9ikM2kuwc625+PM5nicGLBbdVR8t5RenRAOyT+MSWNG36PmICIDeMu3klHHki6wZpwu18g3oVdDoCiMHz83Uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mv0z379R; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Z1Cr3VHZ2N5IQ8CUi2xKvTg3Y8erVu0IcZEsJQQswaY=; b=mv0z379RkB27IkO+P/y4veCLUs
-	wp9AsKikdKINVJcE1S8BPGUn2fI6uHmEWzum4/qW95iFOv6EJr4qMS8vX3RDaXrcv2LP3k+1BzMuj
-	T+oR3NTcG0lCqwgDssOvSOfUbj0E9ModlKR0OtLg5r+cSVGVrACBhLsyxOQXfDaDdVprSQgTApKX4
-	jvZDsIKOfcIXasCLrVePZrHSIutFc72rbhdNdU8BTvybdxHX2+8tB0PQz9u4QOvL1FAGwbJ84GNKQ
-	UmUkWogpD43blH0UP4kI5fT2QF9I5Xis7FC2tHGXGKj+OzTzePU2IUg4oCi3gCys2mfGDKLoLUoWj
-	wukrsG9A==;
-Received: from [2001:8b0:10b::4] (helo=u09cd745991455d.ant.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vjSV7-00000003DOr-3CGt;
-	Sat, 24 Jan 2026 01:31:46 +0000
-Message-ID: <41b50e06dab5cb6195b20016c372cdcaa56f1943.camel@infradead.org>
-Subject: Re: [PATCH 0/3] KVM: x86: Mitigate kvm-clock drift caused by
- masterclock update
-From: David Woodhouse <dwmw2@infradead.org>
-To: Dongli Zhang <dongli.zhang@oracle.com>, kvm@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, paul@xen.org, tglx@kernel.org, 
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org,  hpa@zytor.com, linux-kernel@vger.kernel.org,
- joe.jin@oracle.com
-Date: Fri, 23 Jan 2026 17:31:40 -0800
-In-Reply-To: <4ed7a646-707a-40c9-93f9-2289fedf5709@oracle.com>
-References: <20260115202256.119820-1-dongli.zhang@oracle.com>
-	 <cea56100-9c43-4246-912b-234c6cfdc876@oracle.com>
-	 <285e30927dad5736df58aad5d957448e93b2d047.camel@infradead.org>
-	 <4ed7a646-707a-40c9-93f9-2289fedf5709@oracle.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-PmeCQUV37iEo8ytnwEMh"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1769221255; c=relaxed/simple;
+	bh=9oYgGuPPTlkjkxoArV9D46eocnrUl3z1VuBba5FrjPk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dhrxWEeWkBGZj368BoBZTXSBCaZUgxPeLUOhr95rzFy9j8CnJEpupKeE4RMuXnAN5v2Q1eNA2yp9kaLv2C5pq/9PxltO6qMzyMTcC1AHajpf0KkqmwUHiY8ktEg3+pKOUrwLKpwSQFoToH+xjaktUPYLcOvqZ84bHSJlUZWoNcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCw5aOd4; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2a75a4a140eso14438475ad.3
+        for <kvm@vger.kernel.org>; Fri, 23 Jan 2026 18:20:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769221254; x=1769826054; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p8kRNbAvCBcU6i7e683KXYAQzk2DTUU7+Egyrm6jhp8=;
+        b=KCw5aOd42eyZuitg5eyc1n8XHDKNO6WmUs024ECCYIAuqLTqrSn213HGGkXhMeNslN
+         B5CZ6R52fBGNYjfHFzidOCZR8fKWgY2/P5zw2/hMbouejJAxM6ekXifIobZSEUddAd7Z
+         Ucuoyzx/1nEvo75Ruh/Vy0Eeu6LykP8fqYoEZqlQdUzSpKTIJe2/M1zHOocTxK7Wi/ej
+         mHY6mu2PDf0fValdDbyZuYaen8cytcvje3tUcEohDAD87QdkWC0dSRo36LMpAVwscc+P
+         Ysfx2twGmsEsL4m7qO1W3iJFeCjzdLTDXanj/QO9zhKYgeFmzWJhmX8w8Mh+7NEgOCqS
+         1ZPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769221254; x=1769826054;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p8kRNbAvCBcU6i7e683KXYAQzk2DTUU7+Egyrm6jhp8=;
+        b=hBn4clZyxBVcz6r9NL4DpxDygKJolOvfcjAljynOru7D9yvHGxsEgQJtAHMGOYkW04
+         2RiZhlvYcGjHuYqLJlOuCPaVXgA9LqDJpC26JetYC4sg/S49kAh6MAN+y5c5qP6Jzu6j
+         nd8+WufxRFcyZuKYKLyKacxFcyNj1YoO5e+X6jaNXYx1zogHDcTZLgtia5YIfRyKvwrb
+         8mbHXa6YbdRlQKlzWUCg5p1eLQenmXS0jqJgErcK9NWeZBhiMA9z6Rn6BCNuIWV50j+K
+         hxuJFi7WpqqYyNMFbG+qNtSnV9TeTmpSXQGFGfbaqT4voAtwSfSGH97ITqz8T2tuwfMZ
+         UWVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUV/QRbTY/kzDiVsmbZRUlgAL9+ycXKQlimfVHZFs33dI5lTUbOwdXM6Wos+Kv4DqqV9yI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2pYkQ+1gMEVUpH55q1fJnPa4mOuoYfXxbQEMRL8uAUcDkyqEh
+	H6SmnpS8qWrl4HVjg4VMUUFD5BEJn02NgvmhKvpwZnJONn9wooHklKUsnvwHBlRI
+X-Gm-Gg: AZuq6aJsPqFWEHKvJWbGO4q/0YjOA42ZO5JoGbiDCjqYQTD3KX2gYW+kt4FufLlJ/Iy
+	DdX5erIoWCBwoSe6YTD1skMZ/C1o2GGk9vacSds3Q9bZYOwHomhehsn0yXYrxcW/bowiF8YxIhu
+	qlatEWEKuH4Joe3BNjwJ4GmVWvzcXB+IvBamX64uSauaM6L4HtDal4fBm1azel5OPuStQBYthsh
+	Tg1cSyWZf2zMNUr4DvaGmHJ/y4oEM+ikY0tB6rnIgvR+sHMbtGxizRtQ3IyCe9zgS5+48EXuokp
+	EFTWaYCzFtRpWojCCurRYOGWg9iPw3kQJ563YsJoFWEyzhykrrM50edPwj9sZMAkl+95AbMlcif
+	ny1BxRYiB9ixQv0yp4jAlyGHJgtZ6jrtHtKsU203CL9ORILV99imHeXAmD9UQKrniVCMHtPBBTt
+	O3o6jGzBBCOdzT0jY4Qs9yNag5AOcCW6TWk9IzxWAI
+X-Received: by 2002:a17:903:98d:b0:2a0:d05c:7dde with SMTP id d9443c01a7336-2a7fe73fac6mr41209565ad.44.1769221253788;
+        Fri, 23 Jan 2026 18:20:53 -0800 (PST)
+Received: from fric.. ([210.73.43.101])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802dcd781sm30926135ad.24.2026.01.23.18.20.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jan 2026 18:20:53 -0800 (PST)
+From: Jiakai Xu <jiakaipeanut@gmail.com>
+X-Google-Original-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Alexandre Ghiti <alex@ghiti.fr>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <pjw@kernel.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
+	Jiakai Xu <jiakaiPeanut@gmail.com>
+Subject: [PATCH] RISC-V: KVM: Validate SBI STA shmem alignment in kvm_sbi_ext_sta_set_reg
+Date: Sat, 24 Jan 2026 02:20:42 +0000
+Message-Id: <20260124022042.2168136-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_SMIME(-2.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-69034-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[ghiti.fr,eecs.berkeley.edu,dabbelt.com,kernel.org,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69033-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiakaipeanut@gmail.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 821AE7BF9D
+X-Rspamd-Queue-Id: 27E057C35C
 X-Rspamd-Action: no action
 
+The RISC-V SBI Steal-Time Accounting (STA) extension requires the shared
+memory physical address to be 64-byte aligned, and the shared memory size
+to be at least 64 bytes.
 
---=-PmeCQUV37iEo8ytnwEMh
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+KVM exposes the SBI STA shared memory configuration to userspace via
+KVM_SET_ONE_REG. However, the current implementation of
+kvm_sbi_ext_sta_set_reg() does not validate the alignment of the configured
+shared memory address. As a result, userspace can install a misaligned
+shared memory address that violates the SBI specification.
 
-On Fri, 2026-01-16 at 01:31 -0800, Dongli Zhang wrote:
->=20
-> With above changes in both QEMU and KVM, a same-host live migration of a =
-4-vCPU
-> VM with approximately 10 seconds of downtime (introduced on purpose) resu=
-lts in
-> only about 4 nanoseconds of backward drift in my test environment. We may=
- even
-> be able to make more improvement from QEMU to rule out the remaining 4 na=
-noseconds.
+Such an invalid configuration may later reach runtime code paths that
+assume a valid and properly aligned shared memory region. In particular,
+KVM_RUN can trigger the following WARN_ON in
+kvm_riscv_vcpu_record_steal_time():
 
-On the same host, even with TSC scaling, there is no excuse for *any*
-errors on live migration.
+  WARNING: arch/riscv/kvm/vcpu_sbi_sta.c:49 at
+  kvm_riscv_vcpu_record_steal_time
 
-The *offset* of the host =E2=86=92 guest TSC should remain precisely the sa=
-me.
-And the calculation of KVM clock from guest TSC should remain precisely the=
- same.
+WARN_ON paths are not expected to be reachable during normal runtime
+execution, and may result in a kernel panic when panic_on_warn is enabled.
 
-Absolutely *zero* error.
+Fix this by validating the shared memory alignment at the
+KVM_SET_ONE_REG boundary and rejecting misaligned configurations with
+-EINVAL. The validation is performed on a temporary computed address and
+only committed to vcpu->arch.sta.shmem once it is known to be valid, 
+similar to the existing logic in kvm_sbi_sta_steal_time_set_shmem() and
+kvm_sbi_ext_sta_handler().
 
-Don't bother with "improvements" which still don't get that right.
+With this change, invalid userspace state is rejected early and cannot
+reach runtime code paths that rely on the SBI specification invariants.
 
---=-PmeCQUV37iEo8ytnwEMh
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+A reproducer triggering the WARN_ON and the complete kernel log are
+available at: https://github.com/j1akai/temp/tree/main/20260124
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDEyNDAxMzE0
-MFowLwYJKoZIhvcNAQkEMSIEIK6cmJkMlsI54waVDypFsaOkV/jeAD58onAypOwZ8SD9MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAMOO02h1lnqqC
-f4GrRrLXsTFsBxBIhGueAESfKxttcfiWpv9yjM7M+y1XZu6WwFaI3/jW34YRAmDv5EutIYmLctJF
-1zBrp+DZajWtfcI4y54HBIUV+70iikHo4Yfm9Qk7wr8mZJ/tvc1cBmKYnN0om8847GH5C+Wplh26
-OedmjCo3hBD76WyJuOSO4/ECrQkWPvjkbNyqnDLtTjn54EIt6R2NXwg0MiJVWoZyD04PFfHkqSTn
-bFlkz4JNobzbsa8stIMARLd/dt8w1NphsGJxZRaJHz0w/2vl56Nctt/Tc6qmaOy3pq+NsXH1AgXu
-x5vJ6bfE3sh1hYfCppqjweZ54BKl3sObtPzC6MiTBO5oG2DsBNEEppgJBkQsqfvnA3F4dN0TjGB+
-kX4450KWnUAp5LBYJEJmzf/0NNJlGiFi1W8dzy5ik72JiRZVc5+0SEdkonwac1b8k1ILvbkbemHZ
-kIMUnyUtUYC4Xn9rmsFdjENO1xiNYatjxOYmnQjII6LQ82SNhPRAujgIWGpotN+zvQafP5p/P8zs
-UDvMHQiiV4qFfeQ7Puq6+lqwpoLeJsmoOb0kbk+9KVxyazzVXyDQWG8B06OJ8iDsSSfz85Ec5f1o
-HjBT3tZXWnGRdk7+oYjgtxFA6bfkI0lwm+5/bGE5PfQnfgXkB6OOb8BqcA88NAsAAAAAAAA=
+Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+---
+ arch/riscv/kvm/vcpu_sbi_sta.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
+diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.c
+index afa0545c3bcfc..7dfe671c42eaa 100644
+--- a/arch/riscv/kvm/vcpu_sbi_sta.c
++++ b/arch/riscv/kvm/vcpu_sbi_sta.c
+@@ -186,23 +186,25 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
+ 		return -EINVAL;
+ 	value = *(const unsigned long *)reg_val;
+ 
++	gpa_t new_shmem = vcpu->arch.sta.shmem;
++
+ 	switch (reg_num) {
+ 	case KVM_REG_RISCV_SBI_STA_REG(shmem_lo):
+ 		if (IS_ENABLED(CONFIG_32BIT)) {
+ 			gpa_t hi = upper_32_bits(vcpu->arch.sta.shmem);
+ 
+-			vcpu->arch.sta.shmem = value;
+-			vcpu->arch.sta.shmem |= hi << 32;
++			new_shmem = value;
++			new_shmem |= hi << 32;
+ 		} else {
+-			vcpu->arch.sta.shmem = value;
++			new_shmem = value;
+ 		}
+ 		break;
+ 	case KVM_REG_RISCV_SBI_STA_REG(shmem_hi):
+ 		if (IS_ENABLED(CONFIG_32BIT)) {
+ 			gpa_t lo = lower_32_bits(vcpu->arch.sta.shmem);
+ 
+-			vcpu->arch.sta.shmem = ((gpa_t)value << 32);
+-			vcpu->arch.sta.shmem |= lo;
++			new_shmem = ((gpa_t)value << 32);
++			new_shmem |= lo;
+ 		} else if (value != 0) {
+ 			return -EINVAL;
+ 		}
+@@ -210,7 +212,10 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
+ 	default:
+ 		return -ENOENT;
+ 	}
++	if (new_shmem && !IS_ALIGNED(new_shmem, 64))
++		return -EINVAL;
+ 
++	vcpu->arch.sta.shmem = new_shmem;
+ 	return 0;
+ }
+ 
+-- 
+2.34.1
 
---=-PmeCQUV37iEo8ytnwEMh--
 
