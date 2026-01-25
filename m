@@ -1,165 +1,252 @@
-Return-Path: <kvm+bounces-69052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69053-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBmoFTA5dWmUCQEAu9opvQ
-	(envelope-from <kvm+bounces-69052-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 22:27:12 +0100
+	id AG9NOaivdWm2HgEAu9opvQ
+	(envelope-from <kvm+bounces-69053-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 06:52:40 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA0A97F0D4
-	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 22:27:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 724737FD8E
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 06:52:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B85C300C019
-	for <lists+kvm@lfdr.de>; Sat, 24 Jan 2026 21:26:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 582C63003810
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 05:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A6528314C;
-	Sat, 24 Jan 2026 21:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F1C3112DD;
+	Sun, 25 Jan 2026 05:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="NGTR6LGu"
+	dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b="BUZHRdST"
 X-Original-To: kvm@vger.kernel.org
-Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+Received: from relay-us1.mymailcheap.com (relay-us1.mymailcheap.com [51.81.35.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A505D233723;
-	Sat, 24 Jan 2026 21:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FD2311960;
+	Sun, 25 Jan 2026 05:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.81.35.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769290017; cv=none; b=QgItPtVRFOzSx3ZKWcWjFvqZKsRj5qq7Rta2dzDVo+t8gOsXvlqR9oydyuPsKM8QZKQ2MxpUqPyAmZctW0i93Bl3JLBOf0nfJKqojbXRI5QsOTh8e9fgKOK/JwTcz4kkubNUU5RfchNiwCJJ83bnExt5eKjHKcxA9Bn9HGvPfZk=
+	t=1769320355; cv=none; b=RBctnoGXXyYWbEj8ekdo86PNqta6K2NJcGm/IFAa5qjXu0wnYoDaPCu8L2mvgeGABg4hHID1KdfiWTJ48sjCRn+wwQFytMPQpEdPmKEyIzpuJWygWnWTZj45QR09RmD1FeHJUEKfWQ1VtdS/rqrQd1Dc+WH0Ii8piKat/k0Htu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769290017; c=relaxed/simple;
-	bh=KhKfOzQAwRIB82NPQ1/iYVH/6XtXC0fC5zpZwYM9CSg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Ll6JBS4OSwwmL2oPexXeIjmRvSv3niTcHR4NE/1XMVdsehdvmke3uInayCVJrQcVQ0g0Z11piUQE7sb5e9y3iQ83lcgoKpwE9YGxZjkeYchHLaEuyMTiX9lWYE1UTJZN2sOhesKNfAhBq7vubs0qWQsHosMnwsvscTLnj5fl/ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=NGTR6LGu; arc=none smtp.client-ip=52.12.53.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1769290015; x=1800826015;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KhKfOzQAwRIB82NPQ1/iYVH/6XtXC0fC5zpZwYM9CSg=;
-  b=NGTR6LGuylG9TcFrYhwMd+0/Ir1O/7oEbFUiikh/zwn+Zna7/RDkEVdL
-   VA/NVrYnoDlShRdSR9fL2QphRz5OjOX9u8vE8UThv989UQ9xnip6FuDkR
-   5J0jSIqdDNh//SzASiUSAyyjdi6sHWKwMd8Q4sYH/1teWGQ5ub0P8zMc2
-   ZeoFTvghCI9GTFL9KfN5vCfZbroSIeWrt/npD125cHoiFNQUL4zKw5wjH
-   UsWE9VdIInG2BHpdu4WmaWziWIFMVtlluU7ktRc05GhhEfmmHarv1nJ+y
-   LRTiuepODIMD1y3lIFxCkmHOB3BZx+BrH7j3C3JkVg4PpP0EiMgN3nA4y
-   Q==;
-X-CSE-ConnectionGUID: ev2ixXzSTtOTAeZFL/hDKg==
-X-CSE-MsgGUID: DOZRryG+T7+TDyz7PtuOkw==
-X-IronPort-AV: E=Sophos;i="6.21,251,1763424000"; 
-   d="scan'208";a="11413957"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2026 21:26:53 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:27676]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.113:2525] with esmtp (Farcaster)
- id 68df5e67-7a21-4482-abc6-cb6f84042839; Sat, 24 Jan 2026 21:26:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 68df5e67-7a21-4482-abc6-cb6f84042839
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Sat, 24 Jan 2026 21:26:52 +0000
-Received: from [0.0.0.0] (172.19.99.218) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Sat, 24 Jan 2026
- 21:26:49 +0000
-Message-ID: <769f538d-dd42-4d36-a4c5-7e6e48b209f6@amazon.com>
-Date: Sat, 24 Jan 2026 22:26:47 +0100
+	s=arc-20240116; t=1769320355; c=relaxed/simple;
+	bh=Vm3XpbxQjg8eNNf05oSuTwoCh2D+UTbeYUaTvqCtz/0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cp5ENtpBrL5N2GUakXqPKL+Py9IBNn+1BZjiXgZBX+83mPAkooaB8x8vqiC4L/LQIQapR6zokgPgzaO0KMYK+Qd1hb8XbJEujWYan2xvS5JIHXxZ3rGiU1WMLPV9kZqS4iciSkta6NUL6yA1ff0EVBHJb7t3jmMs3iLYklkNOvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io; spf=pass smtp.mailfrom=aosc.io; dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b=BUZHRdST; arc=none smtp.client-ip=51.81.35.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aosc.io
+Received: from relay5.mymailcheap.com (relay5.mymailcheap.com [159.100.241.64])
+	by relay-us1.mymailcheap.com (Postfix) with ESMTPS id 0DF9D2021B;
+	Sun, 25 Jan 2026 05:44:09 +0000 (UTC)
+Received: from relay4.mymailcheap.com (relay4.mymailcheap.com [137.74.80.156])
+	by relay5.mymailcheap.com (Postfix) with ESMTPS id 2414720233;
+	Sun, 25 Jan 2026 05:44:00 +0000 (UTC)
+Received: from nf2.mymailcheap.com (nf2.mymailcheap.com [54.39.180.165])
+	by relay4.mymailcheap.com (Postfix) with ESMTPS id 2614F2073A;
+	Sun, 25 Jan 2026 05:43:51 +0000 (UTC)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+	by nf2.mymailcheap.com (Postfix) with ESMTPSA id 1CBC540073;
+	Sun, 25 Jan 2026 05:43:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=aosc.io; s=default;
+	t=1769319828; bh=Vm3XpbxQjg8eNNf05oSuTwoCh2D+UTbeYUaTvqCtz/0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BUZHRdSTk9aVp5GdKTYJNz5juygpyljFqCUvnAZAnFzJl/VmPjln88e3Nlw+N+FnC
+	 kvrU1actQ4DJsx9Ea7YHCWSLtLS0cVvdvcDNkTfJrLAXbL0J6EzcJQkOdyFyYPdESd
+	 NmnufOu/yHhemlfXPlOC9k5lh7/Iwqei8snTjCJg=
+Received: from liushuyu-p15 (unknown [117.151.124.108])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail20.mymailcheap.com (Postfix) with ESMTPSA id BDBE24097F;
+	Sun, 25 Jan 2026 05:43:35 +0000 (UTC)
+From: Zixing Liu <liushuyu@aosc.io>
+To: WANG Xuerui <kernel@xen0n.name>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Bibo Mao <maobibo@loongson.cn>
+Cc: Kexy Biscuit <kexybiscuit@aosc.io>,
+	Mingcong Bai <jeffbai@aosc.io>,
+	Zixing Liu <liushuyu@aosc.io>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	rust-for-linux@vger.kernel.org
+Subject: [PATCH 1/1] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
+Date: Sun, 25 Jan 2026 13:43:22 +0800
+Message-ID: <20260125054322.1237687-1-liushuyu@aosc.io>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] kvm: hyper-v: Delay firing of expired stimers
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <hpa@zytor.com>,
-	<x86@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
-	<vkuznets@redhat.com>, <nh-open-source@amazon.com>, <gurugubs@amazon.com>,
-	<jalliste@amazon.co.uk>, Michael Kelley <mhklinux@outlook.com>, John Starks
-	<jostarks@microsoft.com>
-References: <20260115141520.24176-1-graf@amazon.com>
- <aXO8I6xuZyZB7CxV@google.com>
-Content-Language: en-US
-From: Alexander Graf <graf@amazon.com>
-In-Reply-To: <aXO8I6xuZyZB7CxV@google.com>
-X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.06 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[aosc.io:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-69052-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,zytor.com,kernel.org,redhat.com,amazon.com,amazon.co.uk,outlook.com,microsoft.com];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_FROM(0.00)[bounces-69053-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[aosc.io,redhat.com,lwn.net,loongson.cn,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,garyguo.net,protonmail.com,google.com,umich.edu,vger.kernel.org,lists.linux.dev,lists.infradead.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DMARC_NA(0.00)[aosc.io];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[liushuyu@aosc.io,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[aosc.io:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.970];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: BA0A97F0D4
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 724737FD8E
 X-Rspamd-Action: no action
 
-Ck9uIDIzLjAxLjI2IDE5OjIxLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3RlOgo+IE9uIFRodSwg
-SmFuIDE1LCAyMDI2LCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPj4gRHVyaW5nIFdpbmRvd3MgU2Vy
-dmVyIDIwMjUgaGliZXJuYXRpb24sIEkgaGF2ZSBzZWVuIFdpbmRvd3MnIGNhbGN1bGF0aW9uCj4+
-IG9mIGludGVycnVwdCB0YXJnZXQgdGltZSBnZXQgc2tld2VkIG92ZXIgdGhlIGh5cGVydmlzb3Ig
-dmlldyBvZiB0aGUgc2FtZS4KPj4gVGhpcyBjYW4gY2F1c2UgV2luZG93cyB0byBlbWl0IHRpbWVy
-IGV2ZW50cyBpbiB0aGUgcGFzdCBmb3IgZXZlbnRzIHRoYXQKPj4gZG8gbm90IGZpcmUgeWV0IGFj
-Y29yZGluZyB0byB0aGUgcmVhbCB0aW1lIHNvdXJjZS4gVGhpcyB0aGVuIGxlYWRzIHRvCj4+IGlu
-dGVycnVwdCBzdG9ybXMgaW4gdGhlIGd1ZXN0IHdoaWNoIHNsb3cgZG93biBleGVjdXRpb24gdG8g
-YSBwb2ludCB3aGVyZQo+PiB3YXRjaGRvZ3MgdHJpZ2dlci4gVGhvc2UgbWFuaWZlc3QgYXMgYnVn
-Y2hlY2tzIDB4OWYgYW5kIDB4YTAgZHVyaW5nCj4+IGhpYmVybmF0aW9uLCB0eXBpY2FsbHkgaW4g
-dGhlIHJlc3VtZSBwYXRoLgo+Pgo+PiBUbyB3b3JrIGFyb3VuZCB0aGlzIHByb2JsZW0sIHdlIGNh
-biBkZWxheSB0aW1lcnMgdGhhdCBnZXQgY3JlYXRlZCB3aXRoIGEKPj4gdGFyZ2V0IHRpbWUgaW4g
-dGhlIHBhc3QgYnkgYSB0aW55IGJpdCAoMTDCtXMpIHRvIGdpdmUgdGhlIGd1ZXN0IENQVSB0aW1l
-Cj4+IHRvIHByb2Nlc3MgcmVhbCB3b3JrIGFuZCBtYWtlIGZvcndhcmQgcHJvZ3Jlc3MsIGhvcGVm
-dWxseSByZWNvdmVyaW5nIGl0cwo+PiBpbnRlcnJ1cHQgbG9naWMgaW4gdGhlIHByb2Nlc3MuIFdo
-aWxlIHRoaXMgc21hbGwgZGVsYXkgY2FuIG1hcmdpbmFsbHkKPj4gcmVkdWNlIGFjY3VyYWN5IG9m
-IGd1ZXN0IHRpbWVycywgMTDCtXMgYXJlIHdpdGhpbiB0aGUgbm9pc2Ugb2YgVk0KPj4gZW50cnkv
-ZXhpdCBvdmVyaGVhZCAofjEtMiDCtXMpIHNvIEkgZG8gbm90IGV4cGVjdCB0byBzZWUgcmVhbCB3
-b3JsZCBpbXBhY3QuCj4gVGhlcmUgaXMgYSBsb3Qgb2YgaG9wZSBwaWxlZCBpbnRvIHRoaXMuICBB
-bmQgKmFsd2F5cyogcGFkZGluZyB0aGUgY291bnQgbWFrZXMgbWUKPiBtb3JlIHRoYW4gYSBiaXQg
-dW5jb21mb3J0YWJsZS4gIElmIHRoZSBza2V3IGlzIHJlYWxseSBkdWUgdG8gYSBndWVzdCBidWcg
-YW5kIG5vdAo+IHNvbWV0aGluZyBvbiB0aGUgaG9zdCdzIHNpZGUsIGkuZS4gaWYgdGhpcyBpc24n
-dCBqdXN0IGEgc3ltcHRvbSBvZiBhIHJlYWwgYnVnIHRoYXQKPiBjYW4gYmUgZml4ZWQgYW5kIHRo
-ZSBfb25seV8gb3B0aW9uIGlzIHRvIGNodWNrIGluIGEgd29ya2Fyb3VuZCwgdGhlbiBJIHdvdWxk
-Cj4gc3Ryb25nbHkgcHJlZmVyIHRvIGJlIGFzIGNvbnNlcnZhdGl2ZSBhcyBwb3NzaWJsZS4gIEUu
-Zy4gaXMgaXQgcG9zc2libGUgdG8KPiBwcmVjaXNlbHkgZGV0ZWN0IHRoaXMgc2NlbmFyaW8gYW5k
-IG9ubHkgYWRkIHRoZSBkZWxheSB3aGVuIHRoZSBndWVzdCBhcHBlYXJzIHRvCj4gYmUgc3R1Y2s/
-CgoKVGhpcyBwYXRjaCBvbmx5IHBhZHMgd2hlbiBhIHRpbWVyIGlzIGluIHRoZSBwYXN0LCB3aGlj
-aCBJIGhhdmUgbm90IHNlZW4gCmhhcHBlbiBtdWNoIG9uIHJlYWwgc3lzdGVtcy4gVXN1YWxseSB5
-b3UncmUgdHJ5aW5nIHRvIGNvbmZpZ3VyZSBhIHRpbWVyIApmb3IgdGhlIGZ1dHVyZSA6KS4KClRo
-YXQgc2FpZCwgSSBoYXZlIGNvbnRpbnVlZCBkaWdnaW5nIGRlZXBlciBzaW5jZSBJIHBvc3RlZCB0
-aGlzIHBhdGNoIGFuZCAKSSdtIHN0aWxsIHRyeWluZyB0byB3cmFwIG15IGhlYWQgYXJvdW5kIHVu
-ZGVyIHdoaWNoIGV4YWN0IGNvbmRpdGlvbnMgYW55IApvZiB0aGlzIHJlYWxseSBkb2VzIGhhcHBl
-bi4gTGV0J3MgcHV0IHRoaXMgcGF0Y2ggb24gaG9sZCB1bnRpbCBJIGhhdmUgYSAKbW9yZSByZWxp
-YWJsZSByZXByb2R1Y2VyLgoKCkFsZXgKCgoKCkFtYXpvbiBXZWIgU2VydmljZXMgRGV2ZWxvcG1l
-bnQgQ2VudGVyIEdlcm1hbnkgR21iSApUYW1hcmEtRGFuei1TdHIuIDEzCjEwMjQzIEJlcmxpbgpH
-ZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdG9mIEhlbGxtaXMsIEFuZHJlYXMgU3RpZWdlcgpFaW5n
-ZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMjU3NzY0IEIK
-U2l0ejogQmVybGluClVzdC1JRDogREUgMzY1IDUzOCA1OTcK
+This ioctl can be used by userspace applications to determine which
+(special) registers are get/set-able.
+
+This can be very useful for cross-platform VMMs so that they do not have
+to hardcode register indices for each supported architectures.
+
+Signed-off-by: Zixing Liu <liushuyu@aosc.io>
+---
+
+For example, this ioctl could be used by rust-vmm/rust-kvm or maybe
+VirtualBox-kvm in the future.
+
+ Documentation/virt/kvm/api.rst |  2 +-
+ arch/loongarch/kvm/vcpu.c      | 69 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 70 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 01a3abef8abb..f46dd8be282f 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3603,7 +3603,7 @@ VCPU matching underlying host.
+ ---------------------
+ 
+ :Capability: basic
+-:Architectures: arm64, mips, riscv, x86 (if KVM_CAP_ONE_REG)
++:Architectures: arm64, loongarch, mips, riscv, x86 (if KVM_CAP_ONE_REG)
+ :Type: vcpu ioctl
+ :Parameters: struct kvm_reg_list (in/out)
+ :Returns: 0 on success; -1 on error
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 656b954c1134..b884eb9c76aa 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -1186,6 +1186,57 @@ static int kvm_loongarch_vcpu_set_attr(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++static unsigned long kvm_loongarch_num_lbt_regs(void)
++{
++	/* +1 for the LBT_FTOP flag (inside arch.fpu) */
++	return sizeof(struct loongarch_lbt) / sizeof(unsigned long) + 1;
++}
++
++static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
++{
++	/* +1 for the KVM_REG_LOONGARCH_COUNTER register */
++	unsigned long res = CSR_MAX_NUMS + KVM_MAX_CPUCFG_REGS + 1;
++
++	if (kvm_guest_has_lbt(&vcpu->arch))
++		res += kvm_loongarch_num_lbt_regs();
++
++	return res;
++}
++
++static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
++					  u64 __user *uindices)
++{
++	u64 reg;
++	unsigned int i;
++
++	for (i = 0; i < CSR_MAX_NUMS; i++) {
++		reg = KVM_IOC_CSRID(i);
++		if (put_user(reg, uindices++))
++			return -EFAULT;
++	}
++
++	for (i = 0; i < KVM_MAX_CPUCFG_REGS; i++) {
++		reg = KVM_IOC_CPUCFG(i);
++		if (put_user(reg, uindices++))
++			return -EFAULT;
++	}
++
++	reg = KVM_REG_LOONGARCH_COUNTER;
++	if (put_user(reg, uindices++))
++		return -EFAULT;
++
++	if (!kvm_guest_has_lbt(&vcpu->arch))
++		return 0;
++
++	for (i = 1; i <= kvm_loongarch_num_lbt_regs(); i++) {
++		reg = (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | i);
++		if (put_user(reg, uindices++))
++			return -EFAULT;
++	}
++
++	return 0;
++}
++
+ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 			 unsigned int ioctl, unsigned long arg)
+ {
+@@ -1251,6 +1302,24 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = kvm_loongarch_vcpu_set_attr(vcpu, &attr);
+ 		break;
+ 	}
++	case KVM_GET_REG_LIST: {
++		struct kvm_reg_list __user *user_list = argp;
++		struct kvm_reg_list reg_list;
++		unsigned n;
++
++		r = -EFAULT;
++		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
++			break;
++		n = reg_list.n;
++		reg_list.n = kvm_loongarch_num_regs(vcpu);
++		if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
++			break;
++		r = -E2BIG;
++		if (n < reg_list.n)
++			break;
++		r = kvm_loongarch_copy_reg_indices(vcpu, user_list->reg);
++		break;
++	}
+ 	default:
+ 		r = -ENOIOCTLCMD;
+ 		break;
+-- 
+2.52.0
 
 
