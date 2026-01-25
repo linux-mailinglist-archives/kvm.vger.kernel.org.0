@@ -1,328 +1,211 @@
-Return-Path: <kvm+bounces-69061-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69062-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMQIIo35dWmwKAEAu9opvQ
-	(envelope-from <kvm+bounces-69061-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 12:07:57 +0100
+	id rYR7Jn8AdmnEKQEAu9opvQ
+	(envelope-from <kvm+bounces-69062-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 12:37:35 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF88980268
-	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 12:07:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18894805B1
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 12:37:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D0033019BAD
-	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 11:07:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F45130238EE
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 11:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB84B319877;
-	Sun, 25 Jan 2026 11:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FB731A7F7;
+	Sun, 25 Jan 2026 11:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="LsIhEn4G"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="fvJ+EEyS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.thorondor.fr (unknown [82.66.128.71])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FE1E55C;
-	Sun, 25 Jan 2026 11:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF0842AA9;
+	Sun, 25 Jan 2026 11:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769339222; cv=none; b=tWpt9ztRZ9cz9h9wt0qVJ6MuJwK0+Dg/M7GrUmNYUFB7K4glKHNd0HCdjsDxYgZlqM3PExKreuvKudvh/rhd5xA0T//lUuDcWJ7JNWc4fF7vk3kqfRV/YYWoHb+pFmZXCqHstq80jRZ/9p0ZEtuP3Ti7B0e/arDHE7DaJKyeBcw=
+	t=1769340971; cv=none; b=bDzjxm6YHR/TcD6HFpXSYEaSdKLdzTntGAfIn3/xEVNxBVtTCerHMvbpT0j0Zmst69N17H0uVvK3SynWwEgq/vIUKLgMEo994qEa6Ww9tPOYOyg1ksVlgjLFCiC8IiZpKzEMPTmV+DuoQTQNyj/xQOGGkfgZzEQU05QFhbHuiNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769339222; c=relaxed/simple;
-	bh=hNYbYZde/EX3kkrznie2VHQIPWyYXPAvkCchlsCgE+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UWGdPVTUPCuONV69+/swTl0CIcvncwG5JW+xsb8xZR9MWZOTnuBgnHrUN2VwPCu5AcgSoYY0pv+gtT/6nCOx3Ev9ubC8f3hJupJogA0SSgdOv7VojMe3EuZMX5gEm9qwJGIAhJHb228Jkfmk5MHLXaJb90SC9Y3otPmCGZ5TT5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=LsIhEn4G; arc=none smtp.client-ip=82.66.128.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
-	t=1769339218; bh=hNYbYZde/EX3kkrznie2VHQIPWyYXPAvkCchlsCgE+k=;
-	h=From:To:Cc:Subject:In-Reply-To:References;
-	b=LsIhEn4GRZJS7Xhr+SSAnW9pfsMilj8CE+6QarTsd1oQAyftJguwmuA+wrj8Zvpo6
-	 10CEMHue5lN43Dx/AwcGBIyE5Xgrb66NUopTe/wBNsw1l2WgSY44WvW/HV/QP18wCM
-	 7UYdPBMRfDywIsum91cNhEXJGHOnK6/GEWlUyctCzcAMRYS5wSQo2DxaCnrHuiaBF0
-	 Yyt4LNM853LeLH3jQXjcUkylqh6rkqlVDD9ivRMKwMPa3N4zV2tyoF0StiShODGxDp
-	 uYdlnVWKfLHRqPx/aqy5maMfBa55GiMWLt2AQ1oxiB2vDQ4rwFCWH6r5FdkWmipaXB
-	 hZXAv7EEJfIfQ==
-From: Thomas Courrege <thomas.courrege@thorondor.fr>
-To: ashish.kalra@amd.com,
-	corbet@lwn.net,
-	herbert@gondor.apana.org.au,
-	john.allen@amd.com,
-	nikunj@amd.com,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	thomas.lendacky@amd.com
-Cc: kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	Thomas Courrege <thomas.courrege@thorondor.fr>
-Subject: [PATCH v5] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
-Date: Sun, 25 Jan 2026 12:06:29 +0100
-Message-ID: <20260125110629.43096-2-thomas.courrege@thorondor.fr>
-In-Reply-To: <20260125110629.43096-1-thomas.courrege@thorondor.fr>
-References: <20260125110629.43096-1-thomas.courrege@thorondor.fr>
+	s=arc-20240116; t=1769340971; c=relaxed/simple;
+	bh=tdtiBF4T91dfh0BQrU6+nIC8DtSKwATIf7f2cvsu8+4=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=c6Ov5GacRilqsudm+5qxVGIyZQXG0edk0ECK16B1LvCRyVi4akjbQbuv7zlBslBJQkP5480P4pMfBXHRpKj3D+LLI4J5z4TY2waCwubgQrM0Ymm+OGcoe8FNJPGwjdsErJF2VGVIMmsrSgEIT8+sbArTjECXLfSI6D7/HHzG4V0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=fvJ+EEyS; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1769340967; x=1769945767; i=markus.elfring@web.de;
+	bh=tdtiBF4T91dfh0BQrU6+nIC8DtSKwATIf7f2cvsu8+4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=fvJ+EEySZ/j3Apf9qlu2uvAkQ+Y7e+b5E2ga8eMHhMkRnO2WYX8gWgkuhzN1iwIu
+	 xBIOXlxSP9FjaiMhyb2OUBfSZPfZBEpDu82kZrf0hryUb9FGheICgCxomCEeqAHuP
+	 J5KADHibGIttXumIsyY6QS9u2Cl90eNNNHnFCKwDJrvJ1MYrwfOfGkK2mVwf1b74i
+	 9O37cr21gBQWQJCcePyllAtuVuEjFRCCHxxoGmygFV9TwItFtG1PUu0JEmP0Y7xEI
+	 5rDzBNrM6UJdTkz6wur3bBimUBQaMYmXdVoS7uLYiOA/TX9YcRUVs4ZQ+ZNcXTsuO
+	 ORz0mx4Hv0C/1+PTSw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.92.242]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N943B-1vnHbG02KN-00x6UE; Sun, 25
+ Jan 2026 12:30:13 +0100
+Message-ID: <9a818ca6-04fc-434c-b8eb-8380d5bb2293@web.de>
+Date: Sun, 25 Jan 2026 12:30:08 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: Jiakai Xu <xujiakai2025@iscas.ac.cn>, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Cc: Jiakai Xu <jiakaipeanut@gmail.com>, LKML <linux-kernel@vger.kernel.org>,
+ Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>
+References: <20260125085157.2462296-1-xujiakai2025@iscas.ac.cn>
+Subject: Re: [PATCH v2] RISC-V: KVM: Fix null pointer dereference in
+ kvm_riscv_aia_imsic_has_attr
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260125085157.2462296-1-xujiakai2025@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:vmKBZwfSFE7bkYKLyzwaV/BhZpt9Y51fIuVJ7ZJXaL0aq83Q8uF
+ yhXWZMaOHqw11F92ojK2NTN/KlmKt7W3hRW/wxHKrdYq8+5U1in7C1oUUZVNVAMPtXe+wKO
+ Kk6WHXkFHKeqDv1stOJEdij1INlFZmFW49etRBld3H1BfSNztrFbNOgIuwx6K6KxJNCpNp2
+ Fg69XD2HPdrWoHnnrmBLQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:6isMi4krcLs=;0O1UqakaCW4S2IR45yz/u01dbAG
+ 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
+ Xe7CnFZg=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[thorondor.fr,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[web.de,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[thorondor.fr:s=mail];
+	R_DKIM_ALLOW(-0.20)[web.de:s=s29768273];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69061-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-69062-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[web.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,eecs.berkeley.edu,ghiti.fr,brainfault.org,linux.dev,dabbelt.com,kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.courrege@thorondor.fr,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[thorondor.fr:+];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[Markus.Elfring@web.de,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[web.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CF88980268
+X-Rspamd-Queue-Id: 18894805B1
 X-Rspamd-Action: no action
 
-Add support for retrieving the SEV-SNP attestation report via the
-SNP_HV_REPORT_REQ firmware command and expose it through a new KVM
-ioctl for SNP guests.
+=E2=80=A6
+> The fix adds a check to return -ENODEV if imsic_state is NULL, which
+> is consistent with other error handling in the function and prevents
+> the null pointer dereference.
 
-Signed-off-by: Thomas Courrege <thomas.courrege@thorondor.fr>
----
- .../virt/kvm/x86/amd-memory-encryption.rst    | 28 +++++++++
- arch/x86/include/uapi/asm/kvm.h               |  9 +++
- arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
- drivers/crypto/ccp/sev-dev.c                  |  1 +
- include/linux/psp-sev.h                       | 31 +++++++++
- 5 files changed, 132 insertions(+)
+How do you think about to move the assignment for the local variable =E2=
+=80=9Cisel=E2=80=9D
+behind this check by another update step?
+https://elixir.bootlin.com/linux/v6.19-rc5/source/arch/riscv/kvm/aia_imsic=
+.c#L982-L999
 
-diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-index 1ddb6a86ce7f..78b59c91f21c 100644
---- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-+++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
-@@ -572,6 +572,34 @@ Returns: 0 on success, -negative on error
- See SNP_LAUNCH_FINISH in the SEV-SNP specification [snp-fw-abi]_ for further
- details on the input parameters in ``struct kvm_sev_snp_launch_finish``.
- 
-+21. KVM_SEV_SNP_HV_REPORT_REQ
-+-----------------------------
-+
-+The KVM_SEV_SNP_HV_REPORT_REQ command requests the hypervisor-generated
-+SNP attestation report. This report is produced by the PSP using the
-+HV-SIGNED key selected by the caller.
-+
-+The ``key_sel`` field indicates which key the platform will use to sign the
-+report:
-+  * ``0``: If VLEK is installed, sign with VLEK. Otherwise, sign with VCEK.
-+  * ``1``: Sign with VCEK.
-+  * ``2``: Sign with VLEK.
-+  * Other values are reserved.
-+
-+Parameters (in): struct kvm_sev_snp_hv_report_req
-+
-+Returns:  0 on success, -negative on error
-+
-+::
-+        struct kvm_sev_snp_hv_report_req {
-+                __u64 report_uaddr;
-+                __u64 report_len;
-+                __u8 key_sel;
-+                __u8 pad0[7];
-+                __u64 pad1[4];
-+        };
-+
-+
- Device attribute API
- ====================
- 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 7ceff6583652..464146bed784 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -743,6 +743,7 @@ enum sev_cmd_id {
- 	KVM_SEV_SNP_LAUNCH_START = 100,
- 	KVM_SEV_SNP_LAUNCH_UPDATE,
- 	KVM_SEV_SNP_LAUNCH_FINISH,
-+	KVM_SEV_SNP_HV_REPORT_REQ,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -871,6 +872,14 @@ struct kvm_sev_receive_update_data {
- 	__u32 pad2;
- };
- 
-+struct kvm_sev_snp_hv_report_req {
-+	__u64 report_uaddr;
-+	__u64 report_len;
-+	__u8 key_sel;
-+	__u8 pad0[7];
-+	__u64 pad1[4];
-+};
-+
- struct kvm_sev_snp_launch_start {
- 	__u64 policy;
- 	__u8 gosvw[16];
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f59c65abe3cf..63026d254ab1 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2261,6 +2261,66 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 	return rc;
- }
- 
-+static int sev_snp_hv_report_request(struct kvm *kvm, struct kvm_sev_cmd *argp)
-+{
-+	struct kvm_sev_info *sev = to_kvm_sev_info(kvm);
-+	struct sev_data_snp_msg_report_rsp *report_rsp;
-+	struct kvm_sev_snp_hv_report_req params;
-+	struct sev_data_snp_hv_report_req data;
-+	size_t rsp_size = sizeof(*report_rsp);
-+	void __user *u_report;
-+	void __user *u_params;
-+	int ret;
-+
-+	if (!sev_snp_guest(kvm))
-+		return -ENOTTY;
-+
-+	u_params = u64_to_user_ptr(argp->data);
-+	if (copy_from_user(&params, u_params, sizeof(params)))
-+		return -EFAULT;
-+
-+	if (params.report_len < rsp_size)
-+		return -ENOSPC;
-+
-+	u_report = u64_to_user_ptr(params.report_uaddr);
-+	if (!u_report)
-+		return -EINVAL;
-+
-+	report_rsp = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (!report_rsp)
-+		return -ENOMEM;
-+
-+	data.len = sizeof(data);
-+	data.key_sel = params.key_sel;
-+	data.gctx_addr = __psp_pa(sev->snp_context);
-+	data.hv_report_paddr = __psp_pa(report_rsp);
-+	data.rsvd = 0;
-+
-+	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_HV_REPORT_REQ, &data,
-+			    &argp->error);
-+	if (ret)
-+		goto e_free_rsp;
-+
-+	if (!report_rsp->status) {
-+		if (params.report_len < (rsp_size + report_rsp->report_size))
-+			ret = -ENOSPC;
-+		else
-+			rsp_size += report_rsp->report_size;
-+
-+		params.report_len = sizeof(*report_rsp) + report_rsp->report_size;
-+	}
-+
-+	if (copy_to_user(u_report, report_rsp, rsp_size))
-+		ret = -EFAULT;
-+
-+	if (copy_to_user(u_params, &params, sizeof(params)))
-+		ret = -EFAULT;
-+
-+e_free_rsp:
-+	snp_free_firmware_page(report_rsp);
-+	return ret;
-+}
-+
- struct sev_gmem_populate_args {
- 	__u8 type;
- 	int sev_fd;
-@@ -2672,6 +2732,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
- 	case KVM_SEV_SNP_LAUNCH_FINISH:
- 		r = snp_launch_finish(kvm, &sev_cmd);
- 		break;
-+	case KVM_SEV_SNP_HV_REPORT_REQ:
-+		r = sev_snp_hv_report_request(kvm, &sev_cmd);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 956ea609d0cc..5dd7c3f0d50d 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -259,6 +259,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
- 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
- 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
-+	case SEV_CMD_SNP_HV_REPORT_REQ:		return sizeof(struct sev_data_snp_hv_report_req);
- 	default:				return sev_tio_cmd_buffer_len(cmd);
- 	}
- 
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 69ffa4b4d1fa..c651a400d124 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -124,6 +124,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_GCTX_CREATE		= 0x093,
- 	SEV_CMD_SNP_GUEST_REQUEST	= 0x094,
- 	SEV_CMD_SNP_ACTIVATE_EX		= 0x095,
-+	SEV_CMD_SNP_HV_REPORT_REQ	= 0x096,
- 	SEV_CMD_SNP_LAUNCH_START	= 0x0A0,
- 	SEV_CMD_SNP_LAUNCH_UPDATE	= 0x0A1,
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
-@@ -594,6 +595,36 @@ struct sev_data_attestation_report {
- 	u32 len;				/* In/Out */
- } __packed;
- 
-+/**
-+ * struct sev_data_snp_hv_report_req - SNP_HV_REPORT_REQ command params
-+ *
-+ * @len: length of the command buffer in bytes
-+ * @key_sel: Selects which key to use for generating the signature.
-+ * @gctx_addr: System physical address of guest context page
-+ * @hv_report_paddr: System physical address where MSG_EXPORT_RSP will be written
-+ */
-+struct sev_data_snp_hv_report_req {
-+	u32 len;		/* In */
-+	u32 key_sel	:2,	/* In */
-+	    rsvd	:30;
-+	u64 gctx_addr;		/* In */
-+	u64 hv_report_paddr;	/* In */
-+} __packed;
-+
-+/**
-+ * struct sev_data_snp_msg_export_rsp
-+ *
-+ * @status: Status : 0h: Success. 16h: Invalid parameters.
-+ * @report_size: Size in bytes of the attestation report
-+ * @report: attestation report
-+ */
-+struct sev_data_snp_msg_report_rsp {
-+	u32 status;			/* Out */
-+	u32 report_size;		/* Out */
-+	u8 rsvd[24];
-+	u8 report[];
-+} __packed;
-+
- /**
-  * struct sev_data_snp_download_firmware - SNP_DOWNLOAD_FIRMWARE command params
-  *
 
-base-commit: e89f0e9a0a007e8c3afb8ecd739c0b3255422b00
--- 
-2.52.0
+> v2: add Fixes tag and drop external link as suggested.
 
+Please move a patch version description behind the marker line.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.19-rc6#n785
+
+
+Would it be helpful to append parentheses to a function name also in the s=
+ummary phrase?
+
+Regards,
+Markus
 
