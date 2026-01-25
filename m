@@ -1,198 +1,182 @@
-Return-Path: <kvm+bounces-69058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69059-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id F+yzGpXQdWlTIwEAu9opvQ
-	(envelope-from <kvm+bounces-69058-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 09:13:09 +0100
+	id AlE0J8PZdWmbJAEAu9opvQ
+	(envelope-from <kvm+bounces-69059-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 09:52:19 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5446F8000E
-	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 09:13:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1791F80099
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 09:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DBDAB3002509
-	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 08:13:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAADB300C59D
+	for <lists+kvm@lfdr.de>; Sun, 25 Jan 2026 08:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3D73161B2;
-	Sun, 25 Jan 2026 08:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6413168E1;
+	Sun, 25 Jan 2026 08:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e9uwZuuH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q6Lxv7+7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C670D226CEB
-	for <kvm@vger.kernel.org>; Sun, 25 Jan 2026 08:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CD7171C9
+	for <kvm@vger.kernel.org>; Sun, 25 Jan 2026 08:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769328782; cv=none; b=HnkclGhE+mxeX8piglb4ZbbJZL84M7Oso26ZrKXIutty4GQzNv442HmmFBPPows9wcJNMP0WHkRJeWu9J3BH7jLzi7VHsN+7zxzxuu3QjcTzqi9taj8WMzRFYb0lYejnQSAaGTuCV5UIqYFpIboCev+9V5RfgV0KtHfZz4BZiqw=
+	t=1769331126; cv=none; b=hQME5Kd6Zf434p/tVB1gE3VLhcDsUIH1J+xVJj9Qd9umqrLV8NalAicCQauycpl8qk7imAHEAIIbBv6bo46OnHKwThEB70jJHHIbERuUbmrPtVh1iGMsuMrltAfD/3SsOXdIpB4C2PHyf+341RCkq9z/z+LTGcAkCVDvXCA1cB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769328782; c=relaxed/simple;
-	bh=Jn8uqfx7qSGHxVBxgUF6hCOAJlmyJYwvFLs0epqJEVI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iG67rzfrakM5efMVRgOVvYWqwUyr5ExtCTROVT5wHjdNvXDBesFNbNfXlHITqb8Ge1nz7QK9cdDlYrkEQ14nRHmqQ4zPfMDWVYl04lBOeJ+tyy5nMYGnUOTWWTNBA7pY1f2HOA9CcrVwK1WpKRz87GUd41hURtsDp7EjEwU4w4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e9uwZuuH; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769328780; x=1800864780;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Jn8uqfx7qSGHxVBxgUF6hCOAJlmyJYwvFLs0epqJEVI=;
-  b=e9uwZuuH4tPTy3B0cA2lwutkZJOdBzH/kiI/ggV3T5AZXxvsQOTM12z0
-   6P1eIn7syUqibpdwIin0kFhDxq5Q8+hCIpMOrDE+X3N/YxLJl9ms1q6Jg
-   MR7ox8Ohsl0Axqa8HCAGjHHZ9Vjujtn2d8JZAPonRPumVSube0Ard5z9d
-   yvmgr2zsS5M3H7bO3LOnglhm89qx+fc0e8jcP72KpXI5uqSDqi02leyoc
-   WSEgzyyn/42mIQ8aDZgSUDyFqOpMOT2rJdC5m89/RWyg3qBqyvMb2ZqA4
-   hm2+0thMhaXM6ek/LawZCwaIbQepffaYr7ezi+HNkHqXhVF9sA+ccZA53
-   g==;
-X-CSE-ConnectionGUID: SJrcGxwzQKiHTcgYBR5T+w==
-X-CSE-MsgGUID: F87QosObTtiokUGFPsyGtg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11681"; a="73114045"
-X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="73114045"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2026 00:12:59 -0800
-X-CSE-ConnectionGUID: ZGNQJYr6S9ijwnHjVJpHAQ==
-X-CSE-MsgGUID: 6TvzgI8YR9iGQ+vdvlFsiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,252,1763452800"; 
-   d="scan'208";a="207303516"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.39])
-  by fmviesa006.fm.intel.com with ESMTP; 25 Jan 2026 00:12:57 -0800
-Date: Sun, 25 Jan 2026 16:38:30 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: "Chen, Zide" <zide.chen@intel.com>,
-	"Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>, xiaoyao.li@intel.com,
-	Dongli Zhang <dongli.zhang@oracle.com>
-Subject: Re: [PATCH 6/7] target/i386: Make some PEBS features user-visible
-Message-ID: <aXXWhqUuPQaxDKCV@intel.com>
-References: <20260117011053.80723-1-zide.chen@intel.com>
- <20260117011053.80723-7-zide.chen@intel.com>
- <56dd6056-e3e2-46cd-9426-87c7889bed49@linux.intel.com>
- <513c6944-b80a-46f2-ad6c-4de77dac4b09@intel.com>
+	s=arc-20240116; t=1769331126; c=relaxed/simple;
+	bh=7GIpaZcPG0qpaUGgCkh2hKi4S2JRE+KitID/fdVMKPk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y4daEknA3N2fytWhmljtzrltkoLNLGcznegeNMgOUHCT6oVWMI0RjL5e/3TD+0RrA9cALU5vPoMsa8IZICsQzKEyE33GblbqqKWFeZ4fGyIZWF/Mtsi5LMEhK+Rbt8/zeGhN8XKHEcxMM7y+sGGjRR8qZytrxInJOthbLZVwTTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q6Lxv7+7; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-81dab89f286so1766704b3a.2
+        for <kvm@vger.kernel.org>; Sun, 25 Jan 2026 00:52:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769331125; x=1769935925; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iT5OFvQeF8zMVf/PxrofZtaIbAS6SSbifWcBi3L0Yu0=;
+        b=Q6Lxv7+7hfziCoiGwRhPiBLnRO4D24jmkTkQR2+PPOIOaxyWOD8UOucH6ERbhMzTM7
+         mb4GDfSHXULp1lqS3lA+Cksi+1pdc462c+zGxF1mSEJoo5fLDJjV4jINQVf34/HUYiww
+         perjxQPMtmCexFuGHgo6eAoa6WwsrGHFl6oOt2ka6rBUoF+reibKo0Ir3R3EVEg+fg4P
+         CfaGzKHlwPGfPdgNe9oWqR510g75OIF17IjNUSTM+RZ9zi1T+sxtctvuRZtSEBs/IzYH
+         j5/tBKu6z5b1F3/nMZh66xfTTOe/gTBiqo+aYho5gir9jEkepuBtRWDjU9dlMrbNt0Da
+         t0Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769331125; x=1769935925;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iT5OFvQeF8zMVf/PxrofZtaIbAS6SSbifWcBi3L0Yu0=;
+        b=nGUpf02Hk/WUHpLSgwxTDpjrmDBNxV8u3TyvAOesfmxXS+MXyxhY/WG6Uz5UHKf8nT
+         1r9zay0UZr9puInoyjhfvxeGNWR+hoy4HemEzbpwN0Gohr6rW1hkG90QLuMRQ9V86XQg
+         VuLUT4vaHWgany+Nhp8noLtgO9KnQQj+Mgh0qAXFX3oc0wym1gkb77ermzRyVl9DsU9t
+         2nhMTurizxuqN8L+MhS8vhNpF21fxzn6IDBzKyyDAaHqK912Y2XS1c4BwqPxZENNxwfI
+         WWd/4inkQ8kkFJR5do2fwwztPPyEy6QPCPRKX5buBzGp0xrbQd/XcruM82vjF1fz9X25
+         MMVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIPVu+a0sCJc/PJ9ON/MTv9B/hqiFNk9vcTlUSMxaG7VnP/LQUzONfi8SBNnV+I6z70GU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6yjLqYQrLwleRrcewT9KPIRCUK2RcdQ4D9SN22+6RiARJnPKy
+	0xVGHhHdcLbro8FcibIu+NZM/eU7Qa9FQGzgDkgPTMxcHyQV7/h+leTs84z9m9zzFVA=
+X-Gm-Gg: AZuq6aKnU7ZraRfKEpmK/1e4hv1iWQGNT4hGh0zq3yhr7xJomocnKDSAUHWoQSKWAqU
+	ZIxv0I7o2zBFLZ53VP6dyN4EbA9XFG79XUeIdBdyEscZfR/rn/x2ygg6ioqD62MqDYAsL1d020B
+	mL6u9hpEFkQFdQ04CG/5evYY8LGko13SYHi0moUbTelM/1l4kJj67mz4u5SqDtwQnWj1keYTV6f
+	PHFsPb1CAO2QARLda47fFmQYexEYszOMQSbivtxVKqqaR/+yT4zBuuIWArXkwRwM8CkuzaNaFgI
+	Tv3c2OeRJPLM1mloN3Pk4ARo5yLVbDseXahQXjAVgcMVjEPPs+66NPuCaNeiUUxrnNClpeRU+FW
+	IAijAm9t7mFfTR0tZt8rdzeWzPKfw/iGoYD6OKNdyNLHzRkFfoleizVWDEaiKH0sHzWbd1MLGFg
+	YLcusCiT+wFk8Y4ZVuCWNmKDvBwZhEdz9dn0LKUTwdYOtkpjwr0Mc=
+X-Received: by 2002:a05:6a00:3d48:b0:81f:44bb:8aa with SMTP id d2e1a72fcca58-823411dba60mr877844b3a.8.1769331125018;
+        Sun, 25 Jan 2026 00:52:05 -0800 (PST)
+Received: from fric.. ([210.73.43.101])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8231876e5d0sm6442072b3a.61.2026.01.25.00.52.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jan 2026 00:52:04 -0800 (PST)
+From: Jiakai Xu <jiakaipeanut@gmail.com>
+X-Google-Original-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Alexandre Ghiti <alex@ghiti.fr>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <pjw@kernel.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Subject: [PATCH v2] RISC-V: KVM: Fix null pointer dereference in kvm_riscv_aia_imsic_has_attr
+Date: Sun, 25 Jan 2026 08:51:57 +0000
+Message-Id: <20260125085157.2462296-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <513c6944-b80a-46f2-ad6c-4de77dac4b09@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69059-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69058-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhao1.liu@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jiakaipeanut@gmail.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim]
-X-Rspamd-Queue-Id: 5446F8000E
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 1791F80099
 X-Rspamd-Action: no action
 
-Hi Zide & Dapeng,
+Add a null pointer check for imsic_state before dereferencing it in
+kvm_riscv_aia_imsic_has_attr(). While the function checks that the
+vcpu exists, it doesn't verify that the vcpu's imsic_state has been
+initialized, leading to a null pointer dereference when accessed.
 
-> On 1/18/2026 7:30 PM, Mi, Dapeng wrote:
-> > 
-> > On 1/17/2026 9:10 AM, Zide Chen wrote:
-> >> Populate selected PEBS feature names in FEAT_PERF_CAPABILITIES to make
-> >> the corresponding bits user-visible CPU feature knobs, allowing them to
-> >> be explicitly enabled or disabled via -cpu +/-<feature>.
-> >>
-> >> Once named, these bits become part of the guest CPU configuration
-> >> contract.  If a VM is configured with such a feature enabled, migration
-> >> to a destination that does not support the feature may fail, as the
-> >> destination cannot honor the guest-visible CPU model.
-> >>
-> >> The PEBS_FMT bits are intentionally not exposed. They are not meaningful
-> >> as user-visible features, and QEMU registers CPU features as boolean
-> >> QOM properties, which makes them unsuitable for representing and
-> >> checking numeric capabilities.
-> > 
-> > Currently KVM supports user space sets PEBS_FMT (see vmx_set_msr()), but
-> > just requires the guest PEBS_FMT is identical with host PEBS_FMT.
-> 
-> My mistake — this is indeed problematic.
-> 
-> There are four possible ways to expose pebs_fmt to the guest when
-> cpu->migratable = true:
-> 
-> 1. Add a pebs_fmt option similar to lbr_fmt.
-> This may work, but is not user-friendly and adds unnecessary complexity.
-> 
-> 2. Set feat_names[8] = feat_names[9] = ... = "pebs-fmt".
-> This violates the implicit rule that feat_names[] entries should be
-> unique, and target/i386 does not support numeric features.
-> 
-> 3. Use feat_names[8..11] = "pebs-fmt[1/2/3/4]".
-> This has two issues:
-> - It exposes pebs-fmt[1/2/3/4] as independent features, which is
-> semantically incorrect.
-> - Migration may fail incorrectly; e.g., migrating from pebs_fmt=2 to a
-> more capable host (pebs_fmt=4) would be reported as missing pebs-fmt2.
+This issue was discovered during fuzzing of RISC-V KVM code. The
+crash occurs when userspace calls KVM_HAS_DEVICE_ATTR ioctl on an
+AIA IMSIC device before the IMSIC state has been fully initialized
+for a vcpu.
 
-For 2) & 3), I think if it's necessary, maybe it's time to re-consider
-the previous multi-bits property:
+The crash manifests as:
+  Unable to handle kernel paging request at virtual address
+  dfffffff00000001
+  ...
+  epc : kvm_riscv_aia_imsic_has_attr+0x464/0x50e
+  arch/riscv/kvm/aia_imsic.c:998
+  ...
+  kvm_riscv_aia_imsic_has_attr+0x464/0x50e arch/riscv/kvm/aia_imsic.c:998
+  aia_has_attr+0x128/0x2bc arch/riscv/kvm/aia_device.c:471
+  kvm_device_ioctl_attr virt/kvm/kvm_main.c:4722 [inline]
+  kvm_device_ioctl+0x296/0x374 virt/kvm/kvm_main.c:4739
+  ...
 
-https://lore.kernel.org/qemu-devel/20230106083826.5384-4-lei4.wang@intel.com/
+The fix adds a check to return -ENODEV if imsic_state is NULL, which
+is consistent with other error handling in the function and prevents
+the null pointer dereference.
 
-But as for now, I think 1) is also okay. Since lbr-fmt seems very
-similar to pebs-fmt, it's best to have them handle these fmt things in a
-similar manner, otherwise it can make code maintenance troublesome.
+v2: add Fixes tag and drop external link as suggested.
 
-> Given this, I propose the below changes. This may allow migration to a
-> less capable destination, which is not ideal, but it avoids false
-> “missing feature” bug and preserves the expectation that ensuring
-> destination compatibility is the responsibility of the management
-> application or the user.
-> 
-> BTW, I am not proposing a generic “x86 CPU numeric feature” mechanism at
-> this time, as it is unclear whether lbr_fmt and pebs_fmt alone justify
-> such a change.
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 015ba3fc9c7b..b6c95d5ceb31 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1629,6 +1629,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->          .msr = {
->              .index = MSR_IA32_PERF_CAPABILITIES,
->          },
-> +       .migratable_flags = PERF_CAP_PEBS_FMT,
+Fixes: 5463091a51cf ("RISC-V: KVM: Expose IMSIC registers as attributes of AIA irqchip")
+Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+---
+ arch/riscv/kvm/aia_imsic.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-About the migration issue, I wonder whether it's necessary to migrate
-pebs-fmt? IIUC, it seems not necessary: the guest's pebs-fmt depends on
-host's pebs-fmt, but I'm sure what will happens when guest migrates to
-a mahince with different pebs-fmt.
-
-note, lbr-fmt seems not be migrated.
-
-Thanks,
-Zhao
+diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+index e597e86491c3b..9c58a66068447 100644
+--- a/arch/riscv/kvm/aia_imsic.c
++++ b/arch/riscv/kvm/aia_imsic.c
+@@ -995,6 +995,9 @@ int kvm_riscv_aia_imsic_has_attr(struct kvm *kvm, unsigned long type)
+ 
+ 	isel = KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
+ 	imsic = vcpu->arch.aia_context.imsic_state;
++	if (!imsic)
++		return -ENODEV;
++
+ 	return imsic_mrif_isel_check(imsic->nr_eix, isel);
+ }
+ 
+-- 
+2.34.1
 
 
