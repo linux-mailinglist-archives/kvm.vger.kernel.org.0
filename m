@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-69133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69134-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yNTwEopbd2maeQEAu9opvQ
-	(envelope-from <kvm+bounces-69133-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:18:18 +0100
+	id 8NdsG+pbd2maeQEAu9opvQ
+	(envelope-from <kvm+bounces-69134-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:19:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B2A881B7
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:18:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEB2D881EB
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:19:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B1A133022928
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:17:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76D9130715FE
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4173382F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F023382FE;
 	Mon, 26 Jan 2026 12:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jp0srujU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uwmCywmB"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D4E3375A7;
-	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D3C33769C;
+	Mon, 26 Jan 2026 12:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769429855; cv=none; b=i1Hn1rp4Gpg1MZe4K0+ya+6+aiHzCX/ihyhzHA2rViW1nhPUGh7xxu8ijJU7UzoXzqpuB8WCGbZkyIW/d82+qCqB/yzzcozg+lMVcgrwO5XNHvEVTFwDIlQVp/qNN+YbQPtxcw8m613ZF72YMBB2Dxl4W76tBJvK1O/cVDym2bk=
+	t=1769429856; cv=none; b=AKN+zdp0R5y9jFKO9jTW1PLP/3SZ4hHy8rKA3Yr8Fs+W5JLhpANT+EZL94jnCbK6O7q02bqydvne69R6LFDfIyfxzodF45W9+xNO5Ik8P6ITueyV2bqNrYhNmH/JlPY/3Izaj8JEgg5Zf3T0zYunCnX0DqdSC2R5nHFowXxECAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769429855; c=relaxed/simple;
-	bh=2fNLbpIMTieSxhVd/JeBgbtntBg/16cEnx0+aEDwMXc=;
+	s=arc-20240116; t=1769429856; c=relaxed/simple;
+	bh=8SV61IKVNDuBON1I84focVHa2lv7M39kP3v6fPZu3JA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rAWQ3U3Bo0p4xM8wbb5EVBxt4SWEt7X1schTs6kcx7BqdWKKq4DAltPFP569Prd/plUcIWaFnmgblpaN9r5YdFOJJaLDGzRXaD8EXNcDNkBwe+bzDfwippZ2rsmn4pQSpqhcKCO/V6mhhRuVJ95dAV2JjbwECdtcki5qc1oeKxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jp0srujU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD714C19422;
-	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
+	 MIME-Version; b=QJ4qCooVhXH2+LM7sLVFss5QcJOgXw5s0tC5hXU/3uuNtzG3CHdaezisMCB6eDREFrm+LWlBwYKCbDRYlVKoTzY7Ai0AUX5bwc4W5M2LoVR/fMPUCnGaJh7jQBhlYu2UjAPlzopXB0vFI7k5UiO6yTbuuawizT3DfIzJ/kKL+0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uwmCywmB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02FA6C116C6;
+	Mon, 26 Jan 2026 12:17:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769429855;
-	bh=2fNLbpIMTieSxhVd/JeBgbtntBg/16cEnx0+aEDwMXc=;
+	s=k20201202; t=1769429856;
+	bh=8SV61IKVNDuBON1I84focVHa2lv7M39kP3v6fPZu3JA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jp0srujUeAZsXiP2QHLcccl7nqnuxnR6RZIqenhuyHFb5QkAt9XZHxgTHde3qbNc+
-	 GWTL35gCmttG8Hs2yY07c5DTv9XmIWCbGdMR5n8Qe28dSdm8Sqor3YfZxgNIDlaJrC
-	 1tAeIOz164Aa3NTgJWc/iOIwLVaN4hKeUghAUOdQ1AjilppACH9ipCPo0CDBxyjvWW
-	 ONrYK6wdLxMtuR02nb+TyUcUubx3Bm0agjX4eCmrMQOJtv9viXct63PSLIsG2FtOeQ
-	 T4//gc9jANVqRbJLgH6ZnJAaojpsFO8TGhMWMeLovMUTNiQP8F34cRTDD6p157/ylM
-	 mAvReoyfBvdHw==
+	b=uwmCywmBeOqUkDvwaFxkcv3P2+JzMNVAlUFtKpcC/frkzYMZ8THUj285oQsllGPqk
+	 dACnddUhBocioeDIOypVLCnyASnyBUfG/f6R8ife8l++SFWy/+cC+hrVHaEI9sSssE
+	 exRFPPdgHOfOP2atGqL2XCnp0rjk4E0NAEBTNFFyQ9AHiicMtmt0relPlwdsRWGd41
+	 p+6kF/I/xougHcBNa37MMQGzec39hIZcE0Gv6S1b3jj1gRJI+WlhWIV514jLO0A1fD
+	 gOnJ/xJKA8WBRqlO1aeG3O3n8frMqY2F3hAqt68GOqgJ728kHhByjKeqbFjFguYjPl
+	 EGGQNFjYe8zgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vkLXB-00000005hx6-46po;
+	id 1vkLXC-00000005hx6-0yYK;
 	Mon, 26 Jan 2026 12:17:34 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -61,9 +61,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 10/20] KVM: arm64: Simplify FIXED_VALUE handling
-Date: Mon, 26 Jan 2026 12:16:44 +0000
-Message-ID: <20260126121655.1641736-11-maz@kernel.org>
+Subject: [PATCH 11/20] KVM: arm64: Add REQUIRES_E2H1 constraint as configuration flags
+Date: Mon, 26 Jan 2026 12:16:45 +0000
+Message-ID: <20260126121655.1641736-12-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260126121655.1641736-1-maz@kernel.org>
 References: <20260126121655.1641736-1-maz@kernel.org>
@@ -84,7 +84,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69133-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69134-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -100,161 +100,107 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C2B2A881B7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DEB2D881EB
 X-Rspamd-Action: no action
 
-The FIXED_VALUE qualifier (mostly used for HCR_EL2) is pointlessly
-complicated, as it tries to piggy-back on the previous RES0 handling
-while being done in a different phase, on different data.
+A bunch of EL2 configuration are very similar to their EL1 counterpart,
+with the added constraint that HCR_EL2.E2H being 1.
 
-Instead, make it an integral part of the RESx computation, and allow
-it to directly set RESx bits. This is much easier to understand.
+For us, this means HCR_EL2.E2H being RES1, which is something we can
+statically evaluate.
 
-It also paves the way for some additional changes to that will allow
-the full removal of the FIXED_VALUE handling.
+Add a REQUIRES_E2H1 constraint, which allows us to express conditions
+in a much simpler way (without extra code). Existing occurrences are
+converted, before we add a lot more.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/config.c | 67 ++++++++++++++---------------------------
- 1 file changed, 22 insertions(+), 45 deletions(-)
+ arch/arm64/kvm/config.c | 38 ++++++++++++++------------------------
+ 1 file changed, 14 insertions(+), 24 deletions(-)
 
 diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 39487182057a3..4fac04d3132c0 100644
+index 4fac04d3132c0..1990cebc77c66 100644
 --- a/arch/arm64/kvm/config.c
 +++ b/arch/arm64/kvm/config.c
-@@ -37,7 +37,7 @@ struct reg_bits_to_feat_map {
- 			s8	lo_lim;
- 		};
- 		bool	(*match)(struct kvm *);
--		bool	(*fval)(struct kvm *, u64 *);
-+		bool	(*fval)(struct kvm *, struct resx *);
- 	};
- };
+@@ -25,6 +25,7 @@ struct reg_bits_to_feat_map {
+ #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
+ #define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bits */
+ #define	AS_RES1		BIT(4)	/* RES1 when not supported */
++#define	REQUIRES_E2H1	BIT(5)	/* Add HCR_EL2.E2H RES1 as a pre-condition */
  
-@@ -389,14 +389,12 @@ static bool feat_vmid16(struct kvm *kvm)
- 	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
+ 	unsigned long	flags;
+ 
+@@ -311,21 +312,6 @@ static bool feat_trbe_mpam(struct kvm *kvm)
+ 		(read_sysreg_s(SYS_TRBIDR_EL1) & TRBIDR_EL1_MPAM));
  }
  
--static bool compute_hcr_e2h(struct kvm *kvm, u64 *bits)
-+static bool compute_hcr_e2h(struct kvm *kvm, struct resx *bits)
+-static bool feat_asid2_e2h1(struct kvm *kvm)
+-{
+-	return kvm_has_feat(kvm, FEAT_ASID2) && !kvm_has_feat(kvm, FEAT_E2H0);
+-}
+-
+-static bool feat_d128_e2h1(struct kvm *kvm)
+-{
+-	return kvm_has_feat(kvm, FEAT_D128) && !kvm_has_feat(kvm, FEAT_E2H0);
+-}
+-
+-static bool feat_mec_e2h1(struct kvm *kvm)
+-{
+-	return kvm_has_feat(kvm, FEAT_MEC) && !kvm_has_feat(kvm, FEAT_E2H0);
+-}
+-
+ static bool feat_ebep_pmuv3_ss(struct kvm *kvm)
  {
--	if (bits) {
--		if (kvm_has_feat(kvm, FEAT_E2H0))
--			*bits &= ~HCR_EL2_E2H;
--		else
--			*bits |= HCR_EL2_E2H;
--	}
-+	if (kvm_has_feat(kvm, FEAT_E2H0))
-+		bits->res0 |= HCR_EL2_E2H;
-+	else
-+		bits->res1 |= HCR_EL2_E2H;
+ 	return kvm_has_feat(kvm, FEAT_EBEP) || kvm_has_feat(kvm, FEAT_PMUv3_SS);
+@@ -1045,15 +1031,15 @@ static const DECLARE_FEAT_MAP(sctlr2_desc, SCTLR2_EL1,
+ 			      sctlr2_feat_map, FEAT_SCTLR2);
  
- 	return true;
- }
-@@ -1281,12 +1279,11 @@ static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map
- }
- 
- static
--struct resx __compute_fixed_bits(struct kvm *kvm,
--				const struct reg_bits_to_feat_map *map,
--				int map_size,
--				u64 *fixed_bits,
--				unsigned long require,
--				unsigned long exclude)
-+struct resx compute_resx_bits(struct kvm *kvm,
-+			      const struct reg_bits_to_feat_map *map,
-+			      int map_size,
-+			      unsigned long require,
-+			      unsigned long exclude)
+ static const struct reg_bits_to_feat_map tcr2_el2_feat_map[] = {
+-	NEEDS_FEAT(TCR2_EL2_FNG1	|
+-		   TCR2_EL2_FNG0	|
+-		   TCR2_EL2_A2,
+-		   feat_asid2_e2h1),
+-	NEEDS_FEAT(TCR2_EL2_DisCH1	|
+-		   TCR2_EL2_DisCH0	|
+-		   TCR2_EL2_D128,
+-		   feat_d128_e2h1),
+-	NEEDS_FEAT(TCR2_EL2_AMEC1, feat_mec_e2h1),
++	NEEDS_FEAT_FLAG(TCR2_EL2_FNG1	|
++			TCR2_EL2_FNG0	|
++			TCR2_EL2_A2,
++			REQUIRES_E2H1, FEAT_ASID2),
++	NEEDS_FEAT_FLAG(TCR2_EL2_DisCH1	|
++			TCR2_EL2_DisCH0	|
++			TCR2_EL2_D128,
++			REQUIRES_E2H1, FEAT_D128),
++	NEEDS_FEAT_FLAG(TCR2_EL2_AMEC1, REQUIRES_E2H1, FEAT_MEC),
+ 	NEEDS_FEAT(TCR2_EL2_AMEC0, FEAT_MEC),
+ 	NEEDS_FEAT(TCR2_EL2_HAFT, FEAT_HAFT),
+ 	NEEDS_FEAT(TCR2_EL2_PTTWI	|
+@@ -1285,6 +1271,7 @@ struct resx compute_resx_bits(struct kvm *kvm,
+ 			      unsigned long require,
+ 			      unsigned long exclude)
  {
++	bool e2h0 = kvm_has_feat(kvm, FEAT_E2H0);
  	struct resx resx = {};
  
-@@ -1299,14 +1296,18 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
- 		if (map[i].flags & exclude)
- 			continue;
- 
--		if (map[i].flags & CALL_FUNC)
--			match = (map[i].flags & FIXED_VALUE) ?
--				map[i].fval(kvm, fixed_bits) :
--				map[i].match(kvm);
--		else
-+		switch (map[i].flags & (CALL_FUNC | FIXED_VALUE)) {
-+		case CALL_FUNC | FIXED_VALUE:
-+			map[i].fval(kvm, &resx);
-+			continue;
-+		case CALL_FUNC:
-+			match = map[i].match(kvm);
-+			break;
-+		default:
+ 	for (int i = 0; i < map_size; i++) {
+@@ -1307,6 +1294,9 @@ struct resx compute_resx_bits(struct kvm *kvm,
  			match = idreg_feat_match(kvm, &map[i]);
-+		}
+ 		}
  
--		if (!match || (map[i].flags & FIXED_VALUE)) {
-+		if (!match) {
++		if (map[i].flags & REQUIRES_E2H1)
++			match &= !e2h0;
++		
+ 		if (!match) {
  			if (map[i].flags & AS_RES1)
   				resx.res1 |= reg_feat_map_bits(&map[i]);
- 			else
-@@ -1317,17 +1318,6 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
- 	return resx;
- }
- 
--static
--struct resx compute_resx_bits(struct kvm *kvm,
--			     const struct reg_bits_to_feat_map *map,
--			     int map_size,
--			     unsigned long require,
--			     unsigned long exclude)
--{
--	return __compute_fixed_bits(kvm, map, map_size, NULL,
--				    require, exclude | FIXED_VALUE);
--}
--
- static
- struct resx compute_reg_resx_bits(struct kvm *kvm,
- 				 const struct reg_feat_map_desc *r,
-@@ -1368,16 +1358,6 @@ static u64 compute_fgu_bits(struct kvm *kvm, const struct reg_feat_map_desc *r)
- 	return resx.res0 | resx.res1;
- }
- 
--static
--struct resx compute_reg_fixed_bits(struct kvm *kvm,
--				  const struct reg_feat_map_desc *r,
--				  u64 *fixed_bits, unsigned long require,
--				  unsigned long exclude)
--{
--	return __compute_fixed_bits(kvm, r->bit_feat_map, r->bit_feat_map_sz,
--				    fixed_bits, require | FIXED_VALUE, exclude);
--}
--
- void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
- {
- 	u64 val = 0;
-@@ -1417,7 +1397,6 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
- 
- struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
- {
--	u64 fixed = 0, mask;
- 	struct resx resx;
- 
- 	switch (reg) {
-@@ -1459,10 +1438,8 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
- 		resx.res1 |= __HCRX_EL2_RES1;
- 		break;
- 	case HCR_EL2:
--		mask = compute_reg_fixed_bits(kvm, &hcr_desc, &fixed, 0, 0).res0;
- 		resx = compute_reg_resx_bits(kvm, &hcr_desc, 0, 0);
--		resx.res0 |= (mask & ~fixed);
--		resx.res1 |= HCR_EL2_RES1 | (mask & fixed);
-+		resx.res1 |= HCR_EL2_RES1;
- 		break;
- 	case SCTLR2_EL1:
- 	case SCTLR2_EL2:
 -- 
 2.47.3
 
