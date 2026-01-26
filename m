@@ -1,257 +1,224 @@
-Return-Path: <kvm+bounces-69176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69177-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Lo0K8Lqd2nSmQEAu9opvQ
-	(envelope-from <kvm+bounces-69176-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 23:29:22 +0100
+	id cMtkFOTtd2kVmgEAu9opvQ
+	(envelope-from <kvm+bounces-69177-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 23:42:44 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C3638DEF2
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 23:29:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E51D18DFF8
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 23:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0EEB7302797A
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 22:29:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 472AE302A6EA
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 22:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D58306B21;
-	Mon, 26 Jan 2026 22:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA0430AAD7;
+	Mon, 26 Jan 2026 22:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBJMJYOg"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wGTKTLW+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013011.outbound.protection.outlook.com [40.107.201.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520BF258EDB
-	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 22:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0B32F549C;
+	Mon, 26 Jan 2026 22:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.11
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769466555; cv=pass; b=MwJCvwGuU1XFtEyNFkQfSQpXCAooZ7ufpLk+RtPKBPucZGlm86zECDPcVayoB7GqYXylf49UT5/U/8yE4S/O+7CNTNMFomFs/n3rLqT2QWx3iyppvRr1HOE6HzV/v70Iqoem2G3jyYfB4t2i1vugrihswlFGaiQhpWCpCtJyBUA=
+	t=1769467348; cv=fail; b=B5jJiq2P+boc459x8hKUs1BdVGtY3j/8fX9vA6k0AWNnJU+NqHFpaXxkI7m8tHP8qxmG5Aq0Er2Jf+yBBONRx+4f5U+Bi7LkbkyEh6gIg2p1+cg2FQUOcLX5ku0uf6JJ2ixiIu2aJdOTV84G6pkutVWirdy5r/+/4Y7efZVjCIk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769466555; c=relaxed/simple;
-	bh=pZbdeT1pWT2TN4VkrBX4R8t3vE9qLa6Bt2GMpVsv/LY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=miWISy2cg6CpE2RrKLXHMEAbnoKHCiblEEkORVsmPl2UUGYaj77WqFXVeigyrRhg8guqoiD9Q9cyxlJQeRGCI2I00DOFXfTkZqMvMK30ZoxfPvEIoclLVtwUmowoS2RyxDZUhe+q/+HlfszE6zzgjgbqAXMgm/ZMjAFz/uj3bP4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBJMJYOg; arc=pass smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-65819e75691so8742324a12.3
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 14:29:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769466553; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MJp2GOdhBas+h2JvzjY8L/qk5rqHT8m+r/dr+y+Jyb7vgxPNb52Z7Ti8MONN8OOJY/
-         8hEns9SxZd6dh1hHszzr/Hc6kyXA2PaU/DiHRWG/jF22YDfIQYvVvAlKQZo3OmrLYzvf
-         mT0J50QWwPpcC9O5D+GPq9RTnzBsYIrtlYxMev3OFHhrx++4tnEvwzwkTUmUwt3a7+jc
-         ycTZhC8n5S/c0HsoyUECgZjP/4esEEmUaMu/LBNZmeRU9/AFpnw02/5RacFqyGy1U1tx
-         V+pci2t4YVXvw+1YyujpEs3TuWpsrNmHK7H+/cfaBcOhH03nUSgaElI2eju5aCSl4dnw
-         MHXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=pZbdeT1pWT2TN4VkrBX4R8t3vE9qLa6Bt2GMpVsv/LY=;
-        fh=2kYYSjs940XmnsVkD8u/OLSfu7Wgk9mVX6av8bem1Co=;
-        b=ku5XqsXvMWatSNGSWbUcPobzKIVGbb6SeofKD9kGhFHN7hFLJPA5/hxMX44pcK5Q1p
-         EdKh7NlhrThR/ijts+OQNfZkQ1pvcKwDUn1wXnWw6oxXUVaCZOFiE544MCt9p+34bBta
-         ilt2hHUB3eSGCuUsWDB98Sjt1slzIILRehbJMXYUR7XLrUma/DrpWZLQcb5kYRAS35x6
-         rHdRP3sHtXthv3YfwO8BWJNRFMoSIbwl7jCL8vGwYPvu+dggl3SstwPsL57xzebGFFnX
-         xtA8lBxhp+FdghA1PhojjUHCEskU+WEweHS/fXqkeEmRMcGrQeSC5tRXjaQ45arMwEhm
-         +TRg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769466553; x=1770071353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pZbdeT1pWT2TN4VkrBX4R8t3vE9qLa6Bt2GMpVsv/LY=;
-        b=gBJMJYOg/pMzu6RgmXKcNmAZFIur9V1Gn2qgQYWhbRn026brXiqAuB6qhxcgaPDjfe
-         1z2dR5zaRkmU/3YwkIAYzVuuqgUY3lsUlHFRJmysSlVCfGM+CxOxQt3Hyk8Pp9Y1jgfB
-         oqNPZjwEpsXZDKHI9PDnep4HRQT25usumK8L2UMWAbTPEeuB+wUETxwkKTLA3pGzp/fM
-         lXOe84tilQBK2zwWrwBmHU2WA6flKHfARmWu6TeJ/U+LLJJhYliNWbe9827CgY2T05c2
-         icYTXzQeVmQfJ9bcTlkxuU/vv9x6g5M+bfmDhcd7wq9jYuFnIf197r3n6O+mFYVPirVF
-         g9Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769466553; x=1770071353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pZbdeT1pWT2TN4VkrBX4R8t3vE9qLa6Bt2GMpVsv/LY=;
-        b=oiEXYUcHBw5Ocyuu48kbyKgy9VDUGLvhZWia/hKjQ8+++yeNvp3hovkFNw2Ot/Ob0Q
-         6Ur6Vd4ARD1bKD9EECb5CVo9RtpYGkJdwDEImZ4b7tmhNJ0diH+sXzhGywenpRXscGpx
-         uSQFVKv8s7R2iUkcM1gWhIQASQlqdxw1yPWex860RYIpHbV0a6GAjxZtzKtlhSruW+wH
-         qMJsl4HXEnii4Sh1wOj+XRNrvCC7rJCDIQS/dsB1NH6swY9/+nKNBXjaDmqG/OV+SRge
-         FBVes/SJa078u3WxfnhKfL4hrCZ2Mtfs6UB06Whw00u4l5G7xdeT8jzPYwLky9GwTBLm
-         O4sg==
-X-Forwarded-Encrypted: i=1; AJvYcCWF70M9K6hUgi2dztKKwmgNSdcS5g5MwRkMx73fUcC8q4FA5VyRGwVeXOmlRWKIJ8xscW8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxACpApsWsm1ipRS7OLUo/tvoxo0CR5FkY5VVSPVWVXu3PH0o06
-	zXmTTobTVeO3LchTM+9VfwEIVMvXvJv3aqy2yDMm6tUMc+/q2ziLK7W8rgOhC7srrfwdEVl+R4t
-	DddL+E38rO3FD9dr6LcZU+Bd8i40rRyM=
-X-Gm-Gg: AZuq6aItDiXF24kjgZny0EQGh2GcXTfVxvtdUMDSkkdc7yQZ4LhKn7N4wVEbG/101S+
-	EKkdzLrGBG4YNaLeTX1ul8WBY5L/A7GeYrAn583eVz+YBHaSqPbTvyjr5Mrnw2TnsUm8D3AjX7g
-	QumjP+4nkbTnVjFVANt05i1MBXpsQCPiOXEipgNwt0ilV2/P40n9E2jiaZ8Y/xKPrFO9z4dIiBc
-	0zPoJzx867mIEhZxoP2euWQrkA90QWe3h8wJi6Cu8S5Gv9ryp2iuMyipDvqH3I+wqhMy9ZnxiwJ
-	BRIM
-X-Received: by 2002:a05:6402:510e:b0:658:1689:3f66 with SMTP id
- 4fb4d7f45d1cf-658706aa5cemr4017010a12.11.1769466552605; Mon, 26 Jan 2026
- 14:29:12 -0800 (PST)
+	s=arc-20240116; t=1769467348; c=relaxed/simple;
+	bh=m5iZ9atl2TXjAYTmuVZBC0BF7Dq82Skn4LxZPPdKGE0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tV8CzXQNgNcw4sRmqDfeUpZ+SZBLFNiiwPsb/f6XEahMUso59tijqQc/U/D/p1e5cnzxYFuMJQZgRgFeVNake3blejfXLQt3nTMGgbBQoEEvEVUbHvcqRnNvQsKUYBCprD7bW96G1ARfFV/q1GvOEnE7yRTKdq7+/Kl2U4a7Sk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wGTKTLW+; arc=fail smtp.client-ip=40.107.201.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=I3kMp0D6YDCMNGsz1hAO061CJRFuSUrnuIZeIlLynf1Z1fOObA6/UDTcn3f/CoJf1fM0Rn5vY0AeA0hC+lNlwaECzrA3+av0DfRvjqN22Z9+vQLZ1K2lcNKUV0ziQmxkKSxkvNpXZLFsvH2lPOqvt9wIO7xmqdrsGOsYkGr2Os0WarCu8F8rFvcnTnAh2dJOdEbmwpFJdRL0QPu9Gw4W9PL+xziL+HjiNcaAWaClrZJo0G2hRZskvM2Un9NIA2zsCxo6apQG7IjnI0CcO2mRB2sNVy2BAo4LskrL2Qj9fh0YAXaMuR25eXoNxPCh294EIDDRylu2GysW9jlSGx2obA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sKn9V449gghH/entdm1UFsWvj9I/XJLtcu7oujF6llY=;
+ b=q9Cqrb6EJFn375id8ZzwVig/klPqKKv21JIm/vyQ0KLleYfgtzAK0qjTrRd7GmzwUcQx3MngavaSycjovFF25fAljyZvaFE5VlGviR9oclkEtxPFneVuOUt65RwQLKGmLOZc6E9UjG2R3cdWZz34ByW/ZErPXBpUSf9XdH/3NpJ+DycIFDUNoBTQGC397yXjOR4FGZr990M5p1v2jI6hHyRL8u8GtCg4LvchgoMrG9PzFeto3DUE9ob7NXtzk8+fqW+DlGMNoTJY9lgs5VqUbiMkDNDhGkL6d+kG96Y929XY5KMSHKfnquqemz8WPIpe6+1t5zDDRqF+HVcoXrd2Tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sKn9V449gghH/entdm1UFsWvj9I/XJLtcu7oujF6llY=;
+ b=wGTKTLW+3re58FAzmqoijHFqZIxcNOoXyb6GbLC0loqz/gP78CEVwf6pGShvjvrPTKURhqtgiqB4IP64I5tfl9yllM5TbVGyMRzXXon135ardJk5DHf58x9/fszjKg9Gzb+zH5aRTEKBkrgb+SDfkypu1Ggrk0LvhboGNjpuLnM=
+Received: from BN9PR03CA0752.namprd03.prod.outlook.com (2603:10b6:408:13a::7)
+ by IA1PR12MB6067.namprd12.prod.outlook.com (2603:10b6:208:3ed::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.16; Mon, 26 Jan
+ 2026 22:42:20 +0000
+Received: from BN2PEPF00004FBE.namprd04.prod.outlook.com
+ (2603:10b6:408:13a:cafe::d8) by BN9PR03CA0752.outlook.office365.com
+ (2603:10b6:408:13a::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.16 via Frontend Transport; Mon,
+ 26 Jan 2026 22:42:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BN2PEPF00004FBE.mail.protection.outlook.com (10.167.243.184) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9564.3 via Frontend Transport; Mon, 26 Jan 2026 22:42:20 +0000
+Received: from gaul.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 26 Jan
+ 2026 16:42:18 -0600
+From: Kim Phillips <kim.phillips@amd.com>
+To: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <x86@kernel.org>
+CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, K Prateek Nayak <kprateek.nayak@amd.com>, "Nikunj A
+ Dadhania" <nikunj@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, "Michael
+ Roth" <michael.roth@amd.com>, Borislav Petkov <borislav.petkov@amd.com>,
+	Borislav Petkov <bp@alien8.de>, Naveen Rao <naveen.rao@amd.com>, David Kaplan
+	<david.kaplan@amd.com>, Kim Phillips <kim.phillips@amd.com>
+Subject: [PATCH 0/2] KVM: SEV: Add support for IBPB-on-Entry
+Date: Mon, 26 Jan 2026 16:42:03 -0600
+Message-ID: <20260126224205.1442196-1-kim.phillips@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
- <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
- <CAJSP0QVQNExn01ipcu4KTQJrmnXGVmvFyKzXe5m9P3_jQwJ6cA@mail.gmail.com>
- <CAJSP0QW4bMO8-iYODO_6oaDn44efPeV6e00AfD5A42pQ9d+REQ@mail.gmail.com>
- <aXH4PpkC4AtccsOE@redhat.com> <CAMxuvaw04pDNzHyw5+Qcv_KfrhDTiyp+MNxpECp+HfTa5iLOGw@mail.gmail.com>
- <aXH-TlzxZ1gDvPH2@redhat.com> <CAFEAcA_u6QUhs+6-cyYm_qttsDiV2zHbsc-_FbTb8QzWXk6+tw@mail.gmail.com>
- <aXICpFZuNM9GG4Kv@redhat.com> <CAMxuvawgOvQbwoyCzFBLw++JqR0vFbVUhbv1AJWU6VqK1MM_Og@mail.gmail.com>
- <82f74c82-c572-4ab9-b527-11ea287056d1@linaro.org> <CAJ+F1CJtrv9YgDbiekVmDD2yT+6nUe39nLwLsKxvFOtMc1kUGA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CJtrv9YgDbiekVmDD2yT+6nUe39nLwLsKxvFOtMc1kUGA@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Mon, 26 Jan 2026 17:29:00 -0500
-X-Gm-Features: AZwV_QjeiSGE9qOfd4lomdCKhHJfL1YgEOBHoSe8fPGKDAlY3x6Z0UbEfLbcn0M
-Message-ID: <CAJSP0QUCQ8LkHEPNPb75XZmo46xxvP3uA373fzAZTwn=bo_bdg@mail.gmail.com>
-Subject: Re: Call for GSoC internship project ideas
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: Pierrick Bouvier <pierrick.bouvier@linaro.org>, 
-	=?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, 
-	qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>, 
-	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Matias Ezequiel Vara Larsen <mvaralar@redhat.com>, Kevin Wolf <kwolf@redhat.com>, 
-	German Maglione <gmaglione@redhat.com>, Hanna Reitz <hreitz@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Alex Bennee <alex.bennee@linaro.org>, 
-	John Levon <john.levon@nutanix.com>, Thanos Makatos <thanos.makatos@nutanix.com>, 
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBE:EE_|IA1PR12MB6067:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6b1d79f-6a8e-435d-0fc9-08de5d2c2a76
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eRn4uMQLHUeRpdOSJ0aRiaEWY+4MgMw6aZ0xG0ZuG+VlE3htk1D9iMfEcsqP?=
+ =?us-ascii?Q?ASgjS2HqMlkBZyc6d+RHTDc71OBjkiJdrZxVZQy8DWfedHkLx75CXktmQ3pB?=
+ =?us-ascii?Q?zD3xEDhBv9+hxt8tngXfL5LJxdjz1EE/MxsQSEaLwu4jsJs/3+w6g/JgGTQc?=
+ =?us-ascii?Q?W6xlnqHQMFOjv9dTnK0IhcaioQgKC54hdKUaTk7mF6zbL/mDypA7UVHJFUkx?=
+ =?us-ascii?Q?RtihfhothDoSqL8seSOms5JIt8WLeIMoHr76L6V42xcUXEf5834fMif/IQXb?=
+ =?us-ascii?Q?ZuVjvkl9QiwjDtcN3+EgsAmbXrM38waaPp4zljqUjbXQ1rsKZPmxkzWNtlcz?=
+ =?us-ascii?Q?V5Zjhjl6aFntkOX8cEMiwABI6Hpw91Hey4tXEDt39AduoWmoqeqtleXONJ6w?=
+ =?us-ascii?Q?P+Q//BHdiY7eE8SSSELZtUzRRpJ2r4ql9lZtcSpVxagfbs6UPDMrgUuwlHPg?=
+ =?us-ascii?Q?WLe8y5kdVWTOn7OfGu6gDYafg4wEEh2YKnp2rWh9ofRET8RxYJUCmYvKhDzr?=
+ =?us-ascii?Q?bpu2frsSsb90Aju88T9nRMGgsjL3Bau5SPg8vb5t8W0ykRZqcSEhX0GSvA3H?=
+ =?us-ascii?Q?5tJf1JMWKyzAdG3klV3rwt5FckKZYhPnoqz2FyWu0d2CN/5i8rSjb/E9PlKr?=
+ =?us-ascii?Q?E0XXvCYAd7PStuzNfjHbHv61sr4kgUBw5mwjf2DShaNdAf/x5AiKtohjzB6T?=
+ =?us-ascii?Q?fv7NOGBh9R/jCNRyIB+KxNaXk8A2hmuIM4MQs5se9SxQkBBCglJlHZRhU174?=
+ =?us-ascii?Q?+KRc0nNxIl3s5zJZKUtRAdSfXTAB/dXGuZYvmEF0JXIVOFj+d2f1ipV8KGAy?=
+ =?us-ascii?Q?A1dIfKBWouHo19MWI8O+Pj5v3XI3aA79W9sfvSWhj1Hj8IkmCqNFunHXhCMR?=
+ =?us-ascii?Q?BMdnV4auQE8QIPoZsAF4HzUmYe2QqMniiLOJN6F5lAHFHxmnOAofo9d04rf2?=
+ =?us-ascii?Q?O8kinzSUz9eIA3hPDWrGYa/ymBhJ2W+Kcvmm4XR/iPtEYz45ChiRvNrrPrRU?=
+ =?us-ascii?Q?BpnayO6IPzYPkLdPjly4WbBV7axbkehIXKB4YOqKkllc2WkRZ1AbF+zu4smc?=
+ =?us-ascii?Q?x+dw7DWAq5GxoOHhz57W5T0gZa6g85t67qZg7zmfoNtlV1nr+es/dRdbl3lc?=
+ =?us-ascii?Q?ZbKYt6HEmn6VhhSTuHpE+vAsrqVb55xoysLYAjTuJqhrHQ+kz3VlW+UNSkse?=
+ =?us-ascii?Q?fPLBuK7CfvhLvtUp9Spm8Vu4zOVc0SK4JAsIzFwlfsxctMfKL6bDGl1wSs7c?=
+ =?us-ascii?Q?IwmlQR0cZP/xOrYOT6ObCE3lZ7NtCPFD0Nu4eUoywfZ2odJscFN5VYlIINZ/?=
+ =?us-ascii?Q?UqIcNblXDx1UleJZsmOPj/ZeF3ZbPWxIkOwjh8zpD3/nyZQs/a2zYovC+U1i?=
+ =?us-ascii?Q?1j0iVzCpvFvUYCDqksyTHq3BKLTHGQdjvZCsIhur+NmLx/4Ray0t7XNN66tz?=
+ =?us-ascii?Q?ZHvFogG9xPAU8Q0jwMtg8KmncOL3P6CBskzp8GlFyitFFeRaHVLYavhg+rQD?=
+ =?us-ascii?Q?8NuR3vBZa9uiIAgt1IkuN35GtTvsneWT+nth2P9FPrIKDQEBMkrdpwoyJBQt?=
+ =?us-ascii?Q?oYyoffttssCrsK+4Y86l3LojbIM1CSXF+bCF+5iWW8AHr4wImwnxLIRnLv0y?=
+ =?us-ascii?Q?RY66y98tnwmlSg7zCUXyumq4bq4+Q76qB/YrZPRO3BiRqrxbZtQUGtFPeBzx?=
+ =?us-ascii?Q?9KC9YecLQ1spoIyke/XBxkpNR/M=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2026 22:42:20.5090
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6b1d79f-6a8e-435d-0fc9-08de5d2c2a76
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF00004FBE.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6067
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69176-lists,kvm=lfdr.de];
-	TO_DN_ALL(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stefanha@gmail.com,kvm@vger.kernel.org];
-	FREEMAIL_CC(0.00)[linaro.org,redhat.com,nongnu.org,vger.kernel.org,gmx.de,ilande.co.uk,nutanix.com];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69177-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qemu.org:url,linaro.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 0C3638DEF2
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kim.phillips@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: E51D18DFF8
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 3:44=E2=80=AFAM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Thu, Jan 22, 2026 at 7:46=E2=80=AFPM Pierrick Bouvier
-> <pierrick.bouvier@linaro.org> wrote:
-> >
-> > On 1/22/26 3:28 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > > Hi
-> > >
-> > > On Thu, Jan 22, 2026 at 2:57=E2=80=AFPM Daniel P. Berrang=C3=A9 <berr=
-ange@redhat.com> wrote:
-> > >>
-> > >> On Thu, Jan 22, 2026 at 10:54:42AM +0000, Peter Maydell wrote:
-> > >>> On Thu, 22 Jan 2026 at 10:40, Daniel P. Berrang=C3=A9 <berrange@red=
-hat.com> wrote:
-> > >>>> Once we have written some scripts that can build gcc, binutils, li=
-nux,
-> > >>>> busybox we've opened the door to be able to support every machine =
-type
-> > >>>> on every target, provided there has been a gcc/binutils/linux port=
- at
-> > >>>> some time (which covers practically everything). Adding new machin=
-es
-> > >>>> becomes cheap then - just a matter of identifying the Linux Kconfi=
-g
-> > >>>> settings, and everything else stays the same. Adding new targets m=
-eans
-> > >>>> adding a new binutils build target, which should again we relative=
-ly
-> > >>>> cheap, and also infrequent. This has potential to be massively mor=
-e
-> > >>>> sustainable than a reliance on distros, and should put us on a pat=
-hway
-> > >>>> that would let us cover almost everything we ship.
-> > >>>
-> > >>> Isn't that essentially reimplementing half of buildroot, or the
-> > >>> system image builder that Rob Landley uses to produce toybox
-> > >>> test images ?
-> > >>
-> > >> If we can use existing tools to achieve this, that's fine.
-> > >>
-> > >
-> > > Imho, both approaches are complementary. Building images from scratch=
-,
-> > > like toybox, to cover esoteric minimal systems. And more complete and
-> > > common OSes with mkosi which allows you to have things like python,
-> > > mesa, networking, systemd, tpm tools, etc for testing.. We don't want
-> > > to build that from scratch, do we?
-> > >
-> >
-> > I ran into this need recently, and simply used podman (or docker) for
-> > this purpose.
-> >
-> > $ podman build -t rootfs - < Dockerfile
-> > $ container=3D$(podman create rootfs)
-> > $ podman export -o /dev/stdout $container |
-> > /sbin/mke2fs -t ext4 -d - out.ext4 10g
-> > $ podman rm -f $container
-> >
-> > It allows to create image for any distro (used it for alpine and
-> > debian), as long as they publish a docker container. As well, it gives
-> > flexibility to have a custom init, skipping a lengthy emulated boot wit=
-h
-> > a full system. As a bonus, it's quick to build, and does not require
-> > recompiling the world to get something.
-> >
-> > You can debug things too by running the container on your host machine,
-> > which is convenient.
-> >
->
-> Very nice! I didn't realize you could export and reuse a container that w=
-ay.
->
-> I wonder how this workflow can be extended and compare to mkosi
-> (beside the limitation to produce tar/fs image)
->
-> For qemu VM testing, it would fit better along with our Dockerfile &
-> lcitool usage.
->
-> I wish a tool would help to (cross) create & boot such (reproducible)
-> images & vm easily.
+AMD EPYC 5th generation and above processors support IBPB-on-Entry
+for SNP guests.  By invoking an Indirect Branch Prediction Barrier
+(IBPB) on VMRUN, old indirect branch predictions are prevented
+from influencing indirect branches within the guest.
 
-Hi Marc-Andr=C3=A9,
-I would like to submit QEMU's GSoC application in the next day or two.
-A minimum of 4 project ideas is mentioned in the latest guidelines
-from Google and we're currently at 3 ideas. Do you want to update the
-project idea based on the feedback so we can add it to the list?
-https://wiki.qemu.org/Internships/ProjectIdeas/mkosiTestAssets
+The first patch is guest-side support which unmasks the Zen5+ feature
+bit to allow kernel guests to set the feature.
 
-Thanks,
-Stefan
+The second patch is host-side support that checks the CPUID and
+then sets the feature bit in the VMSA supported features mask.
+
+Based on https://github.com/kvm-x86/linux kvm-x86/next
+(kvm-x86-next-2026.01.23, e81f7c908e16).
+
+This series also available here:
+
+https://github.com/AMDESE/linux/tree/ibpb-on-entry-latest
+
+Advance qemu bits (to add ibpb-on-entry=on/off switch) available here:
+
+https://github.com/AMDESE/qemu/tree/ibpb-on-entry-latest
+
+Qemu bits will be posted upstream once kernel bits are merged.
+They depend on Naveen Rao's "target/i386: SEV: Add support for
+enabling VMSA SEV features":
+
+https://lore.kernel.org/qemu-devel/cover.1761648149.git.naveen@kernel.org/
+
+Kim Phillips (2):
+  KVM: SEV: IBPB-on-Entry guest support
+  KVM: SEV: Add support for IBPB-on-Entry
+
+ arch/x86/boot/compressed/sev.c     | 1 +
+ arch/x86/coco/sev/core.c           | 1 +
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ arch/x86/include/asm/msr-index.h   | 5 ++++-
+ arch/x86/include/asm/svm.h         | 1 +
+ arch/x86/kvm/svm/sev.c             | 9 ++++++++-
+ 6 files changed, 16 insertions(+), 2 deletions(-)
+
+
+base-commit: e81f7c908e1664233974b9f20beead78cde6343a
+-- 
+2.43.0
+
 
