@@ -1,222 +1,273 @@
-Return-Path: <kvm+bounces-69115-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69116-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0B4/Is5Jd2mLdwEAu9opvQ
-	(envelope-from <kvm+bounces-69115-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:02:38 +0100
+	id AC7NIulKd2msdwEAu9opvQ
+	(envelope-from <kvm+bounces-69116-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:07:21 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E099B87740
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:02:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFCB877D0
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C39613024116
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:01:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 81D8630143E5
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9C63321A5;
-	Mon, 26 Jan 2026 11:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA383314B9;
+	Mon, 26 Jan 2026 11:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="mdGSIquF"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eFaTZb1g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57CB32ED4C
-	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 11:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC913002DC
+	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 11:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769425308; cv=pass; b=QjTykYZJ7vAmfLS/9AJnAYqqNiphfnnkHfLyUvvhkTZAxHvUTp5YZfvHPLlFaHfWbQKghc//YpgW86MNbfBtBMRJtM+sqHVioGDS+WR3K/NF2fshaLvi67AvqH24RfXS/vLV/mUBzmKfzDAbs+czFsaBLFlO4ZMj91qVNscKjVg=
+	t=1769425636; cv=pass; b=M1wQU10pdaIqW7Z+hoaWTiYJeUIz4DJo68wRMP5CwAtfDmLelCTMEYoJlmBfFEhxskaA+4tZT1oIhJ8hH61xcu7rdDZWHaDWPGjgdrF8/Sb2n2YopH12w0sPA8F4aQI7rnTYnwX9PDqrs1PdOtkEeKIRG2uU5TMweOupq9osnZU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769425308; c=relaxed/simple;
-	bh=qLctU6SvVR1jLtU8xijHCqW+3sEv+VWsnAikdIL7wxg=;
+	s=arc-20240116; t=1769425636; c=relaxed/simple;
+	bh=PvATDH7VSpfQ+pLct5J4149cOMCdeRyJf8+mE+EjVfI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=knSpTbeikOfUDBjJ4p2zQhLkZS4gCTXNXQ6YhLXNDa2phh9zfuDN4u6nU6z9U7FakQaftvOMJNwpHrC5hBQhNrLxAA6hYAmZbZYt5ZuDm1GbxNiHAPP7BYtHctHm4pyHoEGrk7a730eulWisxrD8HAts2ZMB3jtXDK7rvGLIAi8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=mdGSIquF; arc=pass smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-6610c5b014cso2206637eaf.0
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 03:01:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769425306; cv=none;
+	 To:Cc:Content-Type; b=XWKlBjOL9jHKmlFSSjIlEUBro9Wq9Fi8JeSllBdR8VFDTyxOb0YI09nx3Lc+NwRZFFcMhjfOVfdImDuYe2hlsCRRdzrX2VICkRE1f5f7bw0YjTNuw5D9Fui2eDSiEo113akukZ+AFgb0OgntpBNejmRwPIihCS6Rv7zsDXl1GxU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eFaTZb1g; arc=pass smtp.client-ip=209.85.222.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-93f69720a7cso2422494241.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 03:07:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769425634; cv=none;
         d=google.com; s=arc-20240605;
-        b=ZasuFS8W+llLlySG1hCWyxRrQNwSzJ/g0tKAO5jIzRvBhpCmgE0Oxd8Wapno+31Y25
-         uPTR+BQPYkgsO6wULuqULQAo7X06M+ZE8BKVLEgH/INFYAFQ/WSpX/rb/iUapaBGx/dn
-         P/PUMo/KRLeBRyzxSL9tUpl5Fq8SscmZSCU6YjAqbjHweieX0Jja0WhBjj0Rn79jNRro
-         797GQOUNdgRhKu3aX8K1IqLhGFPyPH70RPG1FVJ00JI78mcyO2NXOZGD6GORGaG8EEES
-         FAoF1nXi55iiYkwPN7e9u5AyKH+I9UpMdMSCq+yrUvnd3dFg+zajBLyym0ESzh2MCv+Q
-         OUYw==
+        b=IGFXezyEnvjrG4lA6vbCs02VjiL7vh5wFBOd7T9RKsTIog1bnMVnjwFeq3OP+AiSt/
+         e+18F220YV7YGCEFO023+/E12W0SF1ImGCXB0sNDKRcx6jb0/paWVYwIqeoGZjIpE5uI
+         hw3DLgM5t0L3TV5XixJzdo3M2ChbL0fTzbGYdTk9qUP6kZ9MByAFB/bvgZwEPhdmGk5/
+         4mCyYNKUketB01teXYq81El7plyUAp4nm1kC2RkXs/bTarGIfJTJpkedLCKpwDRDPqbc
+         YZeKnck7b/6QcbV4/toUD5XeiJsaGh2d4YIJa6bXbYJEiI51F40eaqLzKBaJL4ZPAok7
+         YCnA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=yNQC2GhUUe78LWTdamvuxQ+2JSUG6qZ/+66tSASqYfI=;
-        fh=MH976/6sy9F8cCCIXCvah76WWgb7Lm/NbL1zaZ/exnM=;
-        b=PFioT45cKPpd8fmXc0tl7BqaceJ2VVNOSxuYhOBRMPdzeuac/bw8BVJneKILTF48bQ
-         IS/r9AlEolf3Wh1oxy/jMgdSXj9TQDOAjqJB2ACCPC+YwaUlGy8du/V1oKOz7Bjpicm3
-         CVhlLiZYYL0KT1tMwcDLPN3euDw7O3nXYCCG1/XbMkhdCGfvI3otNsRm+GWF68MqvZap
-         gllbnDBCeo0PXHf/Tl3e6jCLgPiTA0l+tM3fUC3NBQvB78X1U1S6bPE1aHQTEJP4xDux
-         876aBflheLW4FkvuwS6+hAFQq9OgBEOz+stzINM3EJuY6i7lHPWv7NfCwCtm3sbE9hvr
-         l9VQ==;
+        bh=Jikz4suWiAmlsF3qFodUwFSeL7ZT9eIQaxTBBzP1rbc=;
+        fh=cvAiybB2okJytE5ZlPJu/0RHusL4Q4lzx9hns8FfF0k=;
+        b=YMHrC1VnBIKsJnlnRA6H86zRva/yG4xy7jwI5im3lpgGbtJduwYSVj3uz9/Tu8QKKf
+         17rWubFYEt2S61yBYlVWvjqB+k0HtXtrc6z+PNq62keHPoER4gG/W4y0V42qYsupQXwZ
+         AKg8G46Np/5+moyprrn1kuO58MNDVJ7BuyvGTeAHe78DNkMNZJYdiT+Ga2jcl6qbVQzv
+         9qDxEkoT55sF85zojbSGFOawVjziiqm71Y2GQu2AQOFdNgeZKUyaVVIVj9SZirMc6VFO
+         reN2SlrGVA3yLh/GBHuG4NgvMRSKRIAQ6LbE8lqNZFJfOWHFZF87gyioqZuWSrrgtcSf
+         z65Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1769425306; x=1770030106; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1769425634; x=1770030434; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yNQC2GhUUe78LWTdamvuxQ+2JSUG6qZ/+66tSASqYfI=;
-        b=mdGSIquFQnaiB1qf9cua31fLpfK2tGzr56Vgm91KU/4OQ7hKKVawmk0ux0pHgczrpt
-         Gc2YsRdBn5oeIj7UtrGBBAoazbrDmXbEkYVjiIT0jGnY8OkUUdEinUHO6gDAmrVVNQ2l
-         Rxwrcjjncjv4uUlqOda2hiwpqVUIRga+QFdre1aO92M02m5XdxjMNpDxEi1gxhBgPzxB
-         QCALaP1eRzHGX46Yjnq5gDGYn2aUhAWphMtCrRqZVoLE51SEpA415JNsfJ3eIcH7rO1A
-         M+n7dlvIoptxDmlMRVO9rnEvO1xc1B1IwYP0d3OVr/gjR9ZJhGUofhUOOJQElEMBIwFO
-         B4jQ==
+        bh=Jikz4suWiAmlsF3qFodUwFSeL7ZT9eIQaxTBBzP1rbc=;
+        b=eFaTZb1gT5l6X0sQX680K6ahRy91omnXSDdv4OFt5QsNkaeZUY98L01xql+jTASJkJ
+         AZDrf+7/XUicAAeqIMwWNnvHA4RFFmesZesA7Q3MHWKB8Sto5KQfu0ajijRkNiqls/ji
+         9/r3z7AR5tyQS/jNRe3cqWebgCSultGrLvcfyFjzsN4e4fA3NXhG2AgUORyzC1MDzEOz
+         pfVn80Fr3LHKrIT+UWKqUkONo8TUj3+O4Gm4wJRTz7rmasUAh449DJpXvmEYvrBoeWoT
+         Bm6cJq9F7kMSc8ms/lfrwIcj0K0VxqfMj8lceFnyxXGN5AliWwTzFim6d7YxVw5eiD7J
+         gkSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769425306; x=1770030106;
+        d=1e100.net; s=20230601; t=1769425634; x=1770030434;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=yNQC2GhUUe78LWTdamvuxQ+2JSUG6qZ/+66tSASqYfI=;
-        b=ZscGa0m5a3ZmJGd6uZlVuNxtCcHPInT30Za2KEE8uN6eWVDFU1fbwkOvPMsS7sbrIe
-         zhoDXfAWg2bB9nTx3xkOvLwV+XKxfs2+W1HzgOIwWviSd4kLcLEuitcxARMsgG+Advyj
-         oqZi3u4JKk3nkUbDCE4GItf7RKdyL3FhONv0XiIKAAweSv0KOmgQEWKz/PEqQA11GYnR
-         CX9KOAXvRgnrvLClQhZCerAgadJk7DlyFbFCnz+mMkGBJsNFxwLlyjHzAIkgNuZBMTLh
-         E7WIdKB82gSbbGNvbDXLn+NsZ9RVlMvlyPsqUHDeV3LcXRDj3LYgFx7iZqd3Hy8OHEWT
-         Arrg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+KxM8VRqQ6BD2IiI76iTMrHrvpkkEa9c6RfRzJCvKhCkFn6QfqQID0ewrgvyiLEiYBWA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2JTQNp2Q4JHlvu/yYNVV78yV9CZ/0NdhcinEnHhhYwYdod2CI
-	LB78eY1Vfm3Wta5OYzECpNWNxYniJntv9NDezD44nWGhm3GOqn7r8PWV7So4EK5DmvBoyg+Dzq+
-	ZN52FumLrOLgTUqzXEMilVlVLGwTGHwGPw3lx1aAi9g==
-X-Gm-Gg: AZuq6aKXQGr77fdDL37Dr84ed5I3OMsQHqJycjXtTVkideknVgOyipX6+rdLGmWzERT
-	0P6MrPlY83nff2LtDnZ9gSncpsX1kbT0xqY5EF1Q5FMnLk2fDWSzgnRSAYB6efYsCnzSpKz+Zum
-	VVJFxggfncTjiqiuUzODxXQfiJnR/6q8jGB1Cznp126pfBxs5ejwA0cK3JsmqpmmcXDx6iCjajT
-	5N39+THgClo/6hTSdhAglkG+Uqf3W3gKbve6Kd/M5rY6H8hd3k//SIJO4MBc2fRTML8RseP8eQB
-	IbCkbUdD9RUYT0MGE/+dpXaWC3QJytQZjKcGblVX1zcp72f7za3DJ7yb6A==
-X-Received: by 2002:a4a:e84a:0:b0:659:9a49:8f99 with SMTP id
- 006d021491bc7-662e03daedamr1690050eaf.18.1769425305682; Mon, 26 Jan 2026
- 03:01:45 -0800 (PST)
+        bh=Jikz4suWiAmlsF3qFodUwFSeL7ZT9eIQaxTBBzP1rbc=;
+        b=YxWyrjZYb7/ON4II2VMtvcDdkIPenqLdn3rsvu0lgQgaqtBCWMwqUr2zznsjm3ONkQ
+         AiOgQOdStRX3wZyWMUimhaOYpzCcikBCGN/ynmxyx9i+NfunCM38ZG7j+1unkjcfqZby
+         xjjdTV23W6/ztkoVnxn+Y/SQpP0Kxv9RJ19KOtyRh/K3TSam546ETnBUBSBsrFOcQot5
+         +xMe3Uga0RORizM2kIdAy4IExFJGPv2aa6t4PLaxWoN+QEG+qr7fkbwlD+cKuPo1U5fH
+         FDtMM6FI6QKCZBeZIXLwoYty90PuF193qL4gE4GM7eIYHzydgwPaVqt1IxEi/ADEZ9QX
+         WHpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVj3VYV9Qnwyt5H2JtfoZG8/MaWT4XUpwY48ie33rQ5qZO63rvFgC3zh/tXHwS5kjtzqjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/JtNHVzFcCHnIJI0/vx3hzsCxK3LwAXgmDLAGx4Fph4sMSk3f
+	++w7Kplt6W3X+eFsR2Jd2EQMPeP7HEoVlhsIYpkk6qbrIS+sTpok55kOlcT7pyG9ZVhb5TPV8br
+	Dg+CHvdBYp9S7Dm2AI4NGiJ8Dxa0wjX5ckawRBLdFcoEvN6NgPYHMTvCOUV3n
+X-Gm-Gg: AZuq6aIFmWmBZuj0l2lwjLQzWas1/vSf7iT3FhsozTQKCnmiuaLYJDFYxIDe02AIlqi
+	jLWAEmyJuerHoWGEhSlJmzpHqs/O48inGrXtZoLvyvnpUNDoyyWfK6lhzNE10xXKzB68154ErFY
+	AlRKkO1n2C+sLVnQBD4ek27zf5fEPen6u1b5p6pzLlKPcaJ/JsI2rFouAb5S3fwo+X/fiyQOWTR
+	D0K0+08ZH+RBolN0yJTgwt47KAM6T+KJj6gsWK03aKhNwYFLLAEeZT7ElHsASLNhLLkVMh1l7La
+	kDFgZBmR
+X-Received: by 2002:a05:6102:508d:b0:5f5:4d1c:89bd with SMTP id
+ ada2fe7eead31-5f5762c8c17mr1115604137.1.1769425633883; Mon, 26 Jan 2026
+ 03:07:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260125143344.2515451-1-xujiakai2025@iscas.ac.cn>
-In-Reply-To: <20260125143344.2515451-1-xujiakai2025@iscas.ac.cn>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 26 Jan 2026 16:31:32 +0530
-X-Gm-Features: AZwV_QhwclxTcj0A8174pE-hkh_gKAJoKfsUQlzQMfllaSIpHrjIxI6lcFRhMeg
-Message-ID: <CAAhSdy03Ujgn0K7xQNFoydWDiohU5PE6bbSt=tPLCBHd7BaZYw@mail.gmail.com>
-Subject: Re: [PATCH v4] RISC-V: KVM: Fix null pointer dereference in kvm_riscv_aia_imsic_has_attr()
-To: Jiakai Xu <jiakaipeanut@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	Alexandre Ghiti <alex@ghiti.fr>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, Atish Patra <atish.patra@linux.dev>, 
-	Jiakai Xu <xujiakai2025@iscas.ac.cn>
+References: <20260104133457.57742-1-luxu.kernel@bytedance.com> <CAAhSdy0krY4ou9TpGV=SKUKPNwgweB58QetUajb3HE5Jfy_RbA@mail.gmail.com>
+In-Reply-To: <CAAhSdy0krY4ou9TpGV=SKUKPNwgweB58QetUajb3HE5Jfy_RbA@mail.gmail.com>
+From: Xu Lu <luxu.kernel@bytedance.com>
+Date: Mon, 26 Jan 2026 19:07:03 +0800
+X-Gm-Features: AZwV_Qg9Lpwqzh241-drclbSZB5_WXa_xHTaLQJyXwpF4Hv4QYndrPF9zzxEs0w
+Message-ID: <CAPYmKFsAcik3YjO19K1aoGHeqaq9qsx-JeHjoqLLAXp9-t-pKg@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH v5] irqchip/riscv-imsic: Adjust the number
+ of available guest irq files
+To: Anup Patel <anup@brainfault.org>
+Cc: atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, tglx@linutronix.de, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[bytedance.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[bytedance.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-69116-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[brainfault.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-69115-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[bytedance.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[luxu.kernel@bytedance.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,iscas.ac.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,brainfault.org:email]
-X-Rspamd-Queue-Id: E099B87740
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[brainfault.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bytedance.com:email,bytedance.com:dkim,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: DEFCB877D0
 X-Rspamd-Action: no action
 
-On Sun, Jan 25, 2026 at 8:03=E2=80=AFPM Jiakai Xu <jiakaipeanut@gmail.com> =
+On Mon, Jan 26, 2026 at 6:54=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
+ote:
+>
+> On Sun, Jan 4, 2026 at 7:05=E2=80=AFPM Xu Lu <luxu.kernel@bytedance.com> =
 wrote:
+> >
+> > Currently, KVM assumes the minimum of implemented HGEIE bits and
+> > "BIT(gc->guest_index_bits) - 1" as the number of guest files available
+> > across all CPUs. This will not work when CPUs have different number
+> > of guest files because KVM may incorrectly allocate a guest file on a
+> > CPU with fewer guest files.
+> >
+> > To address above, during initialization, calculate the number of
+> > available guest interrupt files according to MMIO resources and
+> > constrain the number of guest interrupt files that can be allocated
+> > by KVM.
+> >
+> > Signed-off-by: Xu Lu <luxu.kernel@bytedance.com>
 >
-> Add a null pointer check for imsic_state before dereferencing it in
-> kvm_riscv_aia_imsic_has_attr(). While the function checks that the
-> vcpu exists, it doesn't verify that the vcpu's imsic_state has been
-> initialized, leading to a null pointer dereference when accessed.
->
-> This issue was discovered during fuzzing of RISC-V KVM code. The
-> crash occurs when userspace calls KVM_HAS_DEVICE_ATTR ioctl on an
-> AIA IMSIC device before the IMSIC state has been fully initialized
-> for a vcpu.
->
-> The crash manifests as:
->   Unable to handle kernel paging request at virtual address
->   dfffffff00000001
->   ...
->   epc : kvm_riscv_aia_imsic_has_attr+0x464/0x50e
->   arch/riscv/kvm/aia_imsic.c:998
->   ...
->   kvm_riscv_aia_imsic_has_attr+0x464/0x50e arch/riscv/kvm/aia_imsic.c:998
->   aia_has_attr+0x128/0x2bc arch/riscv/kvm/aia_device.c:471
->   kvm_device_ioctl_attr virt/kvm/kvm_main.c:4722 [inline]
->   kvm_device_ioctl+0x296/0x374 virt/kvm/kvm_main.c:4739
->   ...
->
-> The fix adds a check to return -ENODEV if imsic_state is NULL, which
-> is consistent with other error handling in the function and prevents
-> the null pointer dereference.
->
-> Fixes: 5463091a51cf ("RISC-V: KVM: Expose IMSIC registers as attributes o=
-f AIA irqchip")
-> Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-> Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+> Please carry Reviewed-by and Acked-by tags obtained in previous
+> revisions. Next time, I will not take the patch if previous tags are
+> missing.
 
-LGTM.
+Sorry about that. I thought the Reviewed-by and Acked-by tags belong
+to the previous version so didn't carry them.
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
+>
+> Queued this patch for Linux-6.20.
 
-Queued this patch for Linux-6.20
+Do I still need to resend the patch with Reviewed-by and Acked-by tags?
 
-Regards,
-Anup
+Best regards,
+Xu Lu
 
-> ---
-> V3 -> V4: Fix typo in Signed-off-by email address.
-> V2 -> V3: Moved isel assignment after imsic_state NULL check.
->           Placed patch version history after '---' separator.
->           Added parentheses to function name in subject.
-> V1 -> V2: Added Fixes tag and drop external link as suggested.
 >
->  arch/riscv/kvm/aia_imsic.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> Regards,
+> Anup
 >
-> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
-> index e597e86491c3b..cd070d83663a9 100644
-> --- a/arch/riscv/kvm/aia_imsic.c
-> +++ b/arch/riscv/kvm/aia_imsic.c
-> @@ -993,8 +993,11 @@ int kvm_riscv_aia_imsic_has_attr(struct kvm *kvm, un=
-signed long type)
->         if (!vcpu)
->                 return -ENODEV;
->
-> -       isel =3D KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
->         imsic =3D vcpu->arch.aia_context.imsic_state;
-> +       if (!imsic)
-> +               return -ENODEV;
-> +
-> +       isel =3D KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
->         return imsic_mrif_isel_check(imsic->nr_eix, isel);
->  }
->
-> --
-> 2.34.1
->
+> > ---
+> >  arch/riscv/kvm/aia.c                    |  2 +-
+> >  drivers/irqchip/irq-riscv-imsic-state.c | 12 +++++++++++-
+> >  include/linux/irqchip/riscv-imsic.h     |  3 +++
+> >  3 files changed, 15 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
+> > index dad3181856600..cac3c2b51d724 100644
+> > --- a/arch/riscv/kvm/aia.c
+> > +++ b/arch/riscv/kvm/aia.c
+> > @@ -630,7 +630,7 @@ int kvm_riscv_aia_init(void)
+> >          */
+> >         if (gc)
+> >                 kvm_riscv_aia_nr_hgei =3D min((ulong)kvm_riscv_aia_nr_h=
+gei,
+> > -                                           BIT(gc->guest_index_bits) -=
+ 1);
+> > +                                           gc->nr_guest_files);
+> >         else
+> >                 kvm_riscv_aia_nr_hgei =3D 0;
+> >
+> > diff --git a/drivers/irqchip/irq-riscv-imsic-state.c b/drivers/irqchip/=
+irq-riscv-imsic-state.c
+> > index dc95ad856d80a..e8f20efb028be 100644
+> > --- a/drivers/irqchip/irq-riscv-imsic-state.c
+> > +++ b/drivers/irqchip/irq-riscv-imsic-state.c
+> > @@ -794,7 +794,7 @@ static int __init imsic_parse_fwnode(struct fwnode_=
+handle *fwnode,
+> >
+> >  int __init imsic_setup_state(struct fwnode_handle *fwnode, void *opaqu=
+e)
+> >  {
+> > -       u32 i, j, index, nr_parent_irqs, nr_mmios, nr_handlers =3D 0;
+> > +       u32 i, j, index, nr_parent_irqs, nr_mmios, nr_guest_files, nr_h=
+andlers =3D 0;
+> >         struct imsic_global_config *global;
+> >         struct imsic_local_config *local;
+> >         void __iomem **mmios_va =3D NULL;
+> > @@ -888,6 +888,7 @@ int __init imsic_setup_state(struct fwnode_handle *=
+fwnode, void *opaque)
+> >         }
+> >
+> >         /* Configure handlers for target CPUs */
+> > +       global->nr_guest_files =3D BIT(global->guest_index_bits) - 1;
+> >         for (i =3D 0; i < nr_parent_irqs; i++) {
+> >                 rc =3D imsic_get_parent_hartid(fwnode, i, &hartid);
+> >                 if (rc) {
+> > @@ -928,6 +929,15 @@ int __init imsic_setup_state(struct fwnode_handle =
+*fwnode, void *opaque)
+> >                 local->msi_pa =3D mmios[index].start + reloff;
+> >                 local->msi_va =3D mmios_va[index] + reloff;
+> >
+> > +               /*
+> > +                * KVM uses global->nr_guest_files to determine the ava=
+ilable guest
+> > +                * interrupt files on each CPU. Take the minimum number=
+ of guest
+> > +                * interrupt files across all CPUs to avoid KVM incorre=
+ctly allocating
+> > +                * an unexisted or unmapped guest interrupt file on som=
+e CPUs.
+> > +                */
+> > +               nr_guest_files =3D (resource_size(&mmios[index]) - relo=
+ff) / IMSIC_MMIO_PAGE_SZ - 1;
+> > +               global->nr_guest_files =3D min(global->nr_guest_files, =
+nr_guest_files);
+> > +
+> >                 nr_handlers++;
+> >         }
+> >
+> > diff --git a/include/linux/irqchip/riscv-imsic.h b/include/linux/irqchi=
+p/riscv-imsic.h
+> > index 7494952c55187..43aed52385008 100644
+> > --- a/include/linux/irqchip/riscv-imsic.h
+> > +++ b/include/linux/irqchip/riscv-imsic.h
+> > @@ -69,6 +69,9 @@ struct imsic_global_config {
+> >         /* Number of guest interrupt identities */
+> >         u32                                     nr_guest_ids;
+> >
+> > +       /* Number of guest interrupt files per core */
+> > +       u32                                     nr_guest_files;
+> > +
+> >         /* Per-CPU IMSIC addresses */
+> >         struct imsic_local_config __percpu      *local;
+> >  };
+> > --
+> > 2.20.1
+> >
+> >
 
