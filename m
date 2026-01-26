@@ -1,277 +1,226 @@
-Return-Path: <kvm+bounces-69075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69076-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PRAAOLmdmlxYgEAu9opvQ
-	(envelope-from <kvm+bounces-69075-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 05:00:34 +0100
+	id KB60MvnrdmldYwEAu9opvQ
+	(envelope-from <kvm+bounces-69076-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 05:22:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AFB83CD0
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 05:00:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777EE83DA4
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 05:22:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CE0033009B2F
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 04:00:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 561FB30010CD
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 04:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69593090C9;
-	Mon, 26 Jan 2026 04:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF18A30B535;
+	Mon, 26 Jan 2026 04:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hyuh4+2O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C8F2BB17;
-	Mon, 26 Jan 2026 04:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907A529A33E
+	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 04:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769400027; cv=none; b=ZxgvJ2+G0DlqAZu67lCmcxTIoNa03F8ik2zgo4suTVrwwcy16Xr1rwTXeC9KkPgTpa8VQP1F7I2HLoZwx4BtoZO/sEgdHoapNDmrBm2mdzwPZZ8TwuESD0s+/G4Bew5PfrvJzW3dLeT/o3xZ1nNToKySk0RjVtHrQsBBbKMPiPI=
+	t=1769401334; cv=none; b=WGlT/V3e11wLZrYs8zXNNsBPvB0PsfucrJGUwrHeU58Os1KeOd5saWgswnhK58Q3d9HMHxcnaFVT1LSkov56zB1izwbmiW8IYgbkir7mJTLUuz43drDk9H3pHcudGl5y/bxrJhKTXgYmNYCghwhGI9qev6sSOyyM871+OqM4Vgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769400027; c=relaxed/simple;
-	bh=r/hU7H+WlM01gB6KHVku+qtCFvFZp5WiIiuu9jeoop4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ZzG6b1f5JDTGxJvA+Ka438EzpwkJq0VZwBceVHv4FrS8kMcCs3dqXxPVOQ9tXvtTaLNmPjqAgtbwiO6hoAGIDP87fFZSyzgsEz6XgjU62eXvnuFG44HdxXPgNegmXb+ewJiCVwAtMjKJZ91W1lqNVBXdJ1/Fg1cfDyfOwWQ22tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8BxHMPU5nZpWJoMAA--.40831S3;
-	Mon, 26 Jan 2026 12:00:20 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJCx+8HF5nZpb1kxAA--.31227S3;
-	Mon, 26 Jan 2026 12:00:07 +0800 (CST)
-Subject: Re: [PATCH 1/1] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
-To: liushuyu <liushuyu@aosc.io>, WANG Xuerui <kernel@xen0n.name>,
- Huacai Chen <chenhuacai@kernel.org>
-Cc: Kexy Biscuit <kexybiscuit@aosc.io>, Mingcong Bai <jeffbai@aosc.io>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Paul Walmsley <pjw@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Miguel Ojeda <ojeda@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
- =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
- rust-for-linux@vger.kernel.org
-References: <20260125054322.1237687-1-liushuyu@aosc.io>
- <4b504274-4241-0e3e-3ed3-7804b72b7ee8@loongson.cn>
- <972430be-d2f3-49b6-851b-a057ddfcafec@aosc.io>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <29565e27-f153-c2c5-cbc3-e0457d45f094@loongson.cn>
-Date: Mon, 26 Jan 2026 11:57:31 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1769401334; c=relaxed/simple;
+	bh=b7vzXhNZ344WsXhALdtWAycQWLse+ilx7mZmjlgIEdk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DwgRdHn2CwVB+zeYn2ecTbNTOhwFt7Goc0jm1NyrOpKPHmJbJUOOPVCcDE7Bfic+ugnqF60tgIZ3i69GsFlvCz0iAwIcCAOwFbYNyPt+cUW240HGQbfNckEgC/BDnIZV8Dp8KJ/K8DXOFTe/bv1zy2lfvh1qxjf6amPbMWscOxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hyuh4+2O; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-29f2676bb21so42114265ad.0
+        for <kvm@vger.kernel.org>; Sun, 25 Jan 2026 20:22:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769401331; x=1770006131; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MXMmWr4x1kiDa10LjI5HvINcv2KnVZhp4gqQTuAdZ/M=;
+        b=Hyuh4+2OpQMCcpedrWvGd2RbMOLMO6d+k5FhuIzFIpg6xFJekS1fkjLp2qawH+Tzgb
+         jFnb/CCftSf/flBZOuTYTTrXDg6unW0UqQdGPOPL4gx4QVy687DDEkkM+H4/++byGEZh
+         DieIAsnfdVfq8L2qBD27nWIWZZ07Gfqs9qBXevhLuKJ1saqiCpwGz9nWV07h8tHfZvWG
+         DK5h/q0t0j41lSfeOWDVpKUqZhHHQ0cW7Jpce+o4kHFRpj6iznUq0ErBo7a91vw0heuZ
+         bI4Mga2SHrOP6HpZHHSSFGNP6RGj1OrFiCqh7QmNicHjvDjQHhyHrQquvt9yoyzH5NZI
+         U9cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769401331; x=1770006131;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MXMmWr4x1kiDa10LjI5HvINcv2KnVZhp4gqQTuAdZ/M=;
+        b=PmAMDWjL7oOX5gEC583mtnuL3nrldNQQJOe1d+A5zPIv2UQg+x65nbsBLFKwUOzzDH
+         fch69w+0yNnviwUMkJ2Ec2PXX8eEu0aPMYUjTInYBRuPhLsJkD0bZfv5G6Ik8J/TS1wS
+         CSRf0j5fRrLSXJgznkCQwc++XuJFwCbBmjdu2rdzaeI/0XUMnmDoLg1zOtuX3GkozIsX
+         D+JzBcpVHJAPs2a4SPIIGHu5f6YUoOw9THJO0eDdgZa13p6SgIXk0QJbE1VXLvhBZ/YC
+         u1dI6vdLBXBjtJMEBBBgGgok5l2DcRPMPuqUD96kO0peOdP5hlE7K3G54VGklahHqvD1
+         aa+w==
+X-Forwarded-Encrypted: i=1; AJvYcCV24lY/w/HtBsOI994WCdOVz3emAr/Nnqu0kAxElS82Y6y9Fpso/RrMRrE+SAmvGV5mzDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7lPWf4S48DbsdEIM2K7zsgT/c8jOm9s82HbKR2xd9OXNEcLlo
+	cevZLiZY5utplOKPBbb7I+pduAOD9vRWNQ4v4slYEgP7usfu8LP0v75o
+X-Gm-Gg: AZuq6aJ3J2tFqvQXsUWuqacINZxkip47nWg61iWA93CFW7iIG22IVMM9Fsbi2+W6t8k
+	2/TbFK9d3z4XxpW+tO83eJqODN9VC6U6JmICYB0y5vIRnsxZlgaxoUTZf49/RPTQNiJpIBVq+mV
+	kL6jujStm3axWaGeLXIJbq8de2ncoKy8Qv2EtBgjnNolhtT9ar/8t1Y1eLkBoq8r7sJVZP7/0S8
+	298Iu6Je4i8W4wpS4RdvpBmEBtd2Srx2aDL4tuniA3+XTMDPYBQKPl497LCGox7V+M+cg6oYoRj
+	qSsmuboIWPr3cvtt2DxrimI4fB0LrhYA1veq4o9wpODsUB3XRYqFOhFb6/yBXqqgIAmxMTGNMRt
+	AwRD+3XCDTVbh4pK3HSK/yEs2WNPyFidNQwJEgbXi8aYPy92XtWssrjpyrojRqLeUGPoZLfz+oz
+	/9xjpdQySpYnQYlImhL/wd/v6BZrpIG1X82pxqlqBX
+X-Received: by 2002:a17:902:c949:b0:298:616a:ba93 with SMTP id d9443c01a7336-2a84523fa9fmr27665945ad.9.1769401330672;
+        Sun, 25 Jan 2026 20:22:10 -0800 (PST)
+Received: from fric.. ([210.73.43.101])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a802fdd0c9sm78875965ad.95.2026.01.25.20.22.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jan 2026 20:22:10 -0800 (PST)
+From: Jiakai Xu <jiakaipeanut@gmail.com>
+X-Google-Original-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Alexandre Ghiti <alex@ghiti.fr>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <pjw@kernel.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
+	Jiakai Xu <jiakaiPeanut@gmail.com>
+Subject: [PATCH v2] RISC-V: KVM: Validate SBI STA shmem alignment in kvm_sbi_ext_sta_set_reg
+Date: Mon, 26 Jan 2026 04:22:01 +0000
+Message-Id: <20260126042201.2804148-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <972430be-d2f3-49b6-851b-a057ddfcafec@aosc.io>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCx+8HF5nZpb1kxAA--.31227S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GFW5ZryfGrWkCF1fAw1fuFX_yoW7trWkpr
-	ykAFW5Jry5Jrn3Jr1jgw15WFyUAr18J3ZrZrn3XF18ArsFyr12gr18WryqgF1UJ3y8JF40
-	vr1UXrnxZrs8J3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUA529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxG
-	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVW8ZVWrXwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jCMKZUUU
-	UU=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-69076-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[ghiti.fr,eecs.berkeley.edu,dabbelt.com,kernel.org,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	TAGGED_FROM(0.00)[bounces-69075-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[loongson.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[aosc.io,redhat.com,lwn.net,loongson.cn,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,garyguo.net,protonmail.com,google.com,umich.edu,vger.kernel.org,lists.linux.dev,lists.infradead.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-0.995];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiakaipeanut@gmail.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,aosc.io:email]
-X-Rspamd-Queue-Id: 20AFB83CD0
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: 777EE83DA4
 X-Rspamd-Action: no action
 
+The RISC-V SBI Steal-Time Accounting (STA) extension requires the shared
+memory physical address to be 64-byte aligned, and the shared memory size
+to be at least 64 bytes.
 
+KVM exposes the SBI STA shared memory configuration to userspace via
+KVM_SET_ONE_REG. However, the current implementation of
+kvm_sbi_ext_sta_set_reg() does not validate the alignment of the configured
+shared memory address. As a result, userspace can install a misaligned
+shared memory address that violates the SBI specification.
 
-On 2026/1/26 上午11:38, liushuyu wrote:
-> Hi Bibo,
->>
->>
->> On 2026/1/25 下午1:43, Zixing Liu wrote:
->>> This ioctl can be used by userspace applications to determine which
->>> (special) registers are get/set-able.
->>>
->>> This can be very useful for cross-platform VMMs so that they do not have
->>> to hardcode register indices for each supported architectures.
->>>
->>> Signed-off-by: Zixing Liu <liushuyu@aosc.io>
->>> ---
->>>
->>> For example, this ioctl could be used by rust-vmm/rust-kvm or maybe
->>> VirtualBox-kvm in the future.
->>>
->>>    Documentation/virt/kvm/api.rst |  2 +-
->>>    arch/loongarch/kvm/vcpu.c      | 69 ++++++++++++++++++++++++++++++++++
->>>    2 files changed, 70 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/Documentation/virt/kvm/api.rst
->>> b/Documentation/virt/kvm/api.rst
->>> index 01a3abef8abb..f46dd8be282f 100644
->>> --- a/Documentation/virt/kvm/api.rst
->>> +++ b/Documentation/virt/kvm/api.rst
->>> @@ -3603,7 +3603,7 @@ VCPU matching underlying host.
->>>    ---------------------
->>>      :Capability: basic
->>> -:Architectures: arm64, mips, riscv, x86 (if KVM_CAP_ONE_REG)
->>> +:Architectures: arm64, loongarch, mips, riscv, x86 (if KVM_CAP_ONE_REG)
->>>    :Type: vcpu ioctl
->>>    :Parameters: struct kvm_reg_list (in/out)
->>>    :Returns: 0 on success; -1 on error
->>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->>> index 656b954c1134..b884eb9c76aa 100644
->>> --- a/arch/loongarch/kvm/vcpu.c
->>> +++ b/arch/loongarch/kvm/vcpu.c
->>> @@ -1186,6 +1186,57 @@ static int kvm_loongarch_vcpu_set_attr(struct
->>> kvm_vcpu *vcpu,
->>>        return ret;
->>>    }
->>>    +static unsigned long kvm_loongarch_num_lbt_regs(void)
->>> +{
->>> +    /* +1 for the LBT_FTOP flag (inside arch.fpu) */
->>> +    return sizeof(struct loongarch_lbt) / sizeof(unsigned long) + 1;
->>> +}
->>> +
->>> +static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
->>> +{
->>> +    /* +1 for the KVM_REG_LOONGARCH_COUNTER register */
->>> +    unsigned long res = CSR_MAX_NUMS + KVM_MAX_CPUCFG_REGS + 1;
->>> +
->>> +    if (kvm_guest_has_lbt(&vcpu->arch))
->>> +        res += kvm_loongarch_num_lbt_regs();
->>> +
->>> +    return res;
->>> +}
->>> +
->>> +static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
->>> +                      u64 __user *uindices)
->>> +{
->>> +    u64 reg;
->>> +    unsigned int i;
->>> +
->>> +    for (i = 0; i < CSR_MAX_NUMS; i++) {
->>> +        reg = KVM_IOC_CSRID(i);
->>> +        if (put_user(reg, uindices++))
->>> +            return -EFAULT;
->>> +    }
->> CSR_MAX_NUMS is max number of accessible CSR registers, instead only
->> part of them is used by vCPU model. By my understanding, there will be
->> no much meaning if CSR_MAX_NUMS is returned. And I think it will be
->> better if real CSR register id and number is returned.
->>
-> Did you mean we should only return the CSR registers initialized in this
-> function
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/loongarch/kvm/main.c?id=63804fed149a6750ffd28610c5c1c98cce6bd377#n48
-> ?
-> 
-> That looks like a very large list and the values of the register IDs are
-> not fully continuous. If that is the case, how do we maintain the
-> get/set-able CSR register list?
-It will be better if CSR register list can be categorized, for example 
-with LoongArch CPU manual CSR register is split into 8 types from 
-chapter 7.4 -- 7.11
+Such an invalid configuration may later reach runtime code paths that
+assume a valid and properly aligned shared memory region. In particular,
+KVM_RUN can trigger the following WARN_ON in
+kvm_riscv_vcpu_record_steal_time():
 
-At the beginning, there is big array with size CSR_MAX_NUMS without any 
-category, it can be fine-gained in late.
+  WARNING: arch/riscv/kvm/vcpu_sbi_sta.c:49 at
+  kvm_riscv_vcpu_record_steal_time
 
-Regards
-Bibo Mao
-> 
->> Regards
->> Bibo Mao
->>> +
->>> +    for (i = 0; i < KVM_MAX_CPUCFG_REGS; i++) {
->>> +        reg = KVM_IOC_CPUCFG(i);
->>> +        if (put_user(reg, uindices++))
->>> +            return -EFAULT;
->>> +    }
->>> +
->>> +    reg = KVM_REG_LOONGARCH_COUNTER;
->>> +    if (put_user(reg, uindices++))
->>> +        return -EFAULT;
->>> +
->>> +    if (!kvm_guest_has_lbt(&vcpu->arch))
->>> +        return 0;
->>> +
->>> +    for (i = 1; i <= kvm_loongarch_num_lbt_regs(); i++) {
->>> +        reg = (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | i);
->>> +        if (put_user(reg, uindices++))
->>> +            return -EFAULT;
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>>    long kvm_arch_vcpu_ioctl(struct file *filp,
->>>                 unsigned int ioctl, unsigned long arg)
->>>    {
->>> @@ -1251,6 +1302,24 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>>            r = kvm_loongarch_vcpu_set_attr(vcpu, &attr);
->>>            break;
->>>        }
->>> +    case KVM_GET_REG_LIST: {
->>> +        struct kvm_reg_list __user *user_list = argp;
->>> +        struct kvm_reg_list reg_list;
->>> +        unsigned n;
->>> +
->>> +        r = -EFAULT;
->>> +        if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
->>> +            break;
->>> +        n = reg_list.n;
->>> +        reg_list.n = kvm_loongarch_num_regs(vcpu);
->>> +        if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
->>> +            break;
->>> +        r = -E2BIG;
->>> +        if (n < reg_list.n)
->>> +            break;
->>> +        r = kvm_loongarch_copy_reg_indices(vcpu, user_list->reg);
->>> +        break;
->>> +    }
->>>        default:
->>>            r = -ENOIOCTLCMD;
->>>            break;
->>>
->>
-> Thanks,
-> Zixing
-> 
+WARN_ON paths are not expected to be reachable during normal runtime
+execution, and may result in a kernel panic when panic_on_warn is enabled.
+
+Fix this by validating the shared memory alignment at the
+KVM_SET_ONE_REG boundary and rejecting misaligned configurations with
+-EINVAL. The validation is performed on a temporary computed address and
+only committed to vcpu->arch.sta.shmem once it is known to be valid, 
+similar to the existing logic in kvm_sbi_sta_steal_time_set_shmem() and
+kvm_sbi_ext_sta_handler().
+
+With this change, invalid userspace state is rejected early and cannot
+reach runtime code paths that rely on the SBI specification invariants.
+
+A reproducer triggering the WARN_ON and the complete kernel log are
+available at: https://github.com/j1akai/temp/tree/main/20260124
+
+Fixes: f61ce890b1f074 ("RISC-V: KVM: Add support for SBI STA registers")
+Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+---
+V1 -> V2: Added Fixes tag.
+
+ arch/riscv/kvm/vcpu_sbi_sta.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.c
+index afa0545c3bcfc..7dfe671c42eaa 100644
+--- a/arch/riscv/kvm/vcpu_sbi_sta.c
++++ b/arch/riscv/kvm/vcpu_sbi_sta.c
+@@ -186,23 +186,25 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
+ 		return -EINVAL;
+ 	value = *(const unsigned long *)reg_val;
+ 
++	gpa_t new_shmem = vcpu->arch.sta.shmem;
++
+ 	switch (reg_num) {
+ 	case KVM_REG_RISCV_SBI_STA_REG(shmem_lo):
+ 		if (IS_ENABLED(CONFIG_32BIT)) {
+ 			gpa_t hi = upper_32_bits(vcpu->arch.sta.shmem);
+ 
+-			vcpu->arch.sta.shmem = value;
+-			vcpu->arch.sta.shmem |= hi << 32;
++			new_shmem = value;
++			new_shmem |= hi << 32;
+ 		} else {
+-			vcpu->arch.sta.shmem = value;
++			new_shmem = value;
+ 		}
+ 		break;
+ 	case KVM_REG_RISCV_SBI_STA_REG(shmem_hi):
+ 		if (IS_ENABLED(CONFIG_32BIT)) {
+ 			gpa_t lo = lower_32_bits(vcpu->arch.sta.shmem);
+ 
+-			vcpu->arch.sta.shmem = ((gpa_t)value << 32);
+-			vcpu->arch.sta.shmem |= lo;
++			new_shmem = ((gpa_t)value << 32);
++			new_shmem |= lo;
+ 		} else if (value != 0) {
+ 			return -EINVAL;
+ 		}
+@@ -210,7 +212,10 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
+ 	default:
+ 		return -ENOENT;
+ 	}
++	if (new_shmem && !IS_ALIGNED(new_shmem, 64))
++		return -EINVAL;
+ 
++	vcpu->arch.sta.shmem = new_shmem;
+ 	return 0;
+ }
+ 
+-- 
+2.34.1
 
 
