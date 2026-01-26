@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-69120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69121-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONjDIX5Pd2n0dwEAu9opvQ
-	(envelope-from <kvm+bounces-69120-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:26:54 +0100
+	id qCT/LtFPd2n0dwEAu9opvQ
+	(envelope-from <kvm+bounces-69121-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:28:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33A6887A25
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:26:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3649F87A53
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 55C723043BEC
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:23:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2338E3013A71
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDB3332ED1;
-	Mon, 26 Jan 2026 11:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F39332ECB;
+	Mon, 26 Jan 2026 11:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CLWFDvCS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hkKOtzru"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D52E33290B;
-	Mon, 26 Jan 2026 11:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBE62BEC2B;
+	Mon, 26 Jan 2026 11:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769426626; cv=none; b=OsP4sSRw47ne82S5JsM54KxtXAx0ZIJUI8NuHdhhct7nrKKexLgDyu1pTcVPOzFJR4/gLwjzBYuS+pvr7bpmIEnRSzNmqvHgB47Vx5kmw8R9/L9TvERUBowg1KFhiJ7/9PP2PqQak+ouSJX0+YeyJ46cBycujxga2woUjyvfvag=
+	t=1769426893; cv=none; b=eRYW0Z6dJaeVAN7ddpUSSpn4Gdu0FXLJHXtMn159lcso2FwEr0tLkkJkIDxwzaEN0CrQnE8Ap/yXvbcIF4X+c9apSZKVjb2fRwVF6yJxwGytZtZYvtnqP4Zuu8RXw3SFMqFShEu05/q+epivdx42Zt0W0lEDjK3l62UE0YZLxpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769426626; c=relaxed/simple;
-	bh=y6PyvejjwSHp9VlYpUYAzRrqv8mXYtVgIAU6C9381yU=;
+	s=arc-20240116; t=1769426893; c=relaxed/simple;
+	bh=k3XR1MT5Vahum7lTIJiF6OhzMhBXDH+X36hEo9UNNiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=toS9zsEwxMkmWall2qpqCxRgabZ4m678SqGQ0+j4l7TdWJuOXSEVLEnYs6wWnMjC4ykAu83QMoaMWtywaoCYaVHsJRMa4eekt0XyHCIwpVP/ea2Nn7+aJGTMVEBB5By1U2vg+RnNtaP6a/TmD2MBizwrg4PMAKnpESdNblot7+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CLWFDvCS; arc=none smtp.client-ip=192.198.163.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=D5sEz50EDu1PKPcc817zcj7Nk1twom3jKRIpIZ+uc4PSzcRvOlJnoM7xZksuNKcV6OijavP6GQGQGWBUTqAhPmTKXCVPOKNQub2hS3yG5h7yscvQprmSlBpML+n+m+5lWqsFIjP2Ye1wJWTkhKkRax4hcXYCpza71ix8RQeZgVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hkKOtzru; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769426626; x=1800962626;
+  t=1769426891; x=1800962891;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=y6PyvejjwSHp9VlYpUYAzRrqv8mXYtVgIAU6C9381yU=;
-  b=CLWFDvCSXvXrzDVdGor75bgvgCwWf4rcCPS/JEGmbwn/5bob5sFhTZwu
-   fqNs12Niy5SBXMLLHwPxCDaeiCaIP2+tbOI7ZdvyRUpDvsfrYeb5OMgdC
-   g2qyfPCtLyofQGSAch5S22f7zIoDx7xmQShrHoiiBM6kw+fZYjZkEDfp0
-   PN2YLOUlqlbynwzEq0MOKnaRtkR0oCuR4fCI6gxsx6UN6R+/yzsjsDLQ3
-   IR2ZUPUNCadLWWu8TZnCb5rlCdQyhiFQJMu2FIpwzXyetEi/vg4NnQpWi
-   hB4mEWp/b3B2rvGOSkWu6KqHwl1ef5t96WRfRWF37lRfr9nsXFXrW68lS
-   A==;
-X-CSE-ConnectionGUID: rc+Fe9tJTBGMrkDYgGYvxQ==
-X-CSE-MsgGUID: KzRCC8YdQKG1IvBGM37uUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="69625133"
+  bh=k3XR1MT5Vahum7lTIJiF6OhzMhBXDH+X36hEo9UNNiA=;
+  b=hkKOtzrugiGFrUmvbN36BmHIpPITtdv+337eJpy60kZEUm9bsC/lxy/W
+   dC3OCCH/JeWA9WCu4eLSn6dCwRrNpkrXK1vUbmpPiVt+HyAFtlvq7RTMe
+   ji0tsu1D8rTkzfGrAQUgA7GQ71y1wRw5B966ZGs8py1uwthbhKuzJiO3o
+   xz98rZMTlJJOn6yhVZjLtz1NNo+l8s4ItsEOnaRdxG5ZBO8NOYOoNEPO7
+   02/fPEEBTCmdR9r1iYyZ3vaBHntc0LLnxhi/P9CipLMnjtHPJBU4RfJzw
+   IJ4z+SM7m0pMRSk8OqCtb/UomlRz4AtzJY0Cnl4aOs/b2Wg6xSpRfgKYg
+   g==;
+X-CSE-ConnectionGUID: z7cyAr9GSryWZHSP/aKwKA==
+X-CSE-MsgGUID: fOP39w+5S/aJnp2VJziRmg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="58176432"
 X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
-   d="scan'208";a="69625133"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 03:23:45 -0800
-X-CSE-ConnectionGUID: VXV4wnSJSPmKmgG3cqjoPQ==
-X-CSE-MsgGUID: VwWEqut1RVmWtpLIJ/uM0A==
+   d="scan'208";a="58176432"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 03:28:10 -0800
+X-CSE-ConnectionGUID: QxIAn7LDS+SbVBcYWTrFaA==
+X-CSE-MsgGUID: JdqJE326RReXEfKaccWuWA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
-   d="scan'208";a="208084654"
+   d="scan'208";a="207258561"
 Received: from krybak-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.55])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 03:23:38 -0800
-Date: Mon, 26 Jan 2026 13:23:35 +0200
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 03:28:04 -0800
+Date: Mon, 26 Jan 2026 13:28:01 +0200
 From: Tony Lindgren <tony.lindgren@linux.intel.com>
 To: Chao Gao <chao.gao@intel.com>
 Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
@@ -70,16 +70,12 @@ Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
 	yilun.xu@linux.intel.com, sagis@google.com, vannapurve@google.com,
 	paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
 	seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
-	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 25/26] x86/virt/tdx: Avoid updates during
- update-sensitive operations
-Message-ID: <aXdOt8Vo5zM18gdR@tlindgre-MOBL1>
+	dave.hansen@linux.intel.com, vishal.l.verma@intel.com
+Subject: Re: [PATCH v3 26/26] coco/tdx-host: Set and document TDX Module
+ update expectations
+Message-ID: <aXdPwRtsj1Qj9VLi@tlindgre-MOBL1>
 References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-26-chao.gao@intel.com>
+ <20260123145645.90444-27-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,23 +84,23 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260123145645.90444-26-chao.gao@intel.com>
+In-Reply-To: <20260123145645.90444-27-chao.gao@intel.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69120-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69121-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -114,48 +110,27 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim]
-X-Rspamd-Queue-Id: 33A6887A25
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3649F87A53
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 06:55:33AM -0800, Chao Gao wrote:
-> TDX Module updates may cause TD management operations to fail if they
-> occur during phases of the TD lifecycle that are sensitive to update
-> compatibility.
+On Fri, Jan 23, 2026 at 06:55:34AM -0800, Chao Gao wrote:
+> In rare cases, TDX Module updates may cause TD management operations to
+> fail if they occur during phases of the TD lifecycle that are sensitive
+> to update compatibility.
 > 
-> Currently, there are two update-sensitive scenarios:
->  - TD build, where TD Measurement Register (TDMR) accumulates over multiple
->    TDH.MEM.PAGE.ADD, TDH.MR.EXTEND and TDH.MR.FINALIZE calls.
+> But not all combinations of P-SEAMLDR, kernel, and TDX Module have the
+> capability to detect and prevent said incompatibilities. Completely
+> disabling TDX Module updates on platforms without the capability would
+> be overkill, as these incompatibility cases are rare and can be
+> addressed by userspace through coordinated scheduling of updates and TD
+> management operations.
 > 
->  - TD migration, where an intermediate crypto state is saved if a state
->    migration function (TDH.EXPORT.STATE.* or TDH.IMPORT.STATE.*) is
->    interrupted and restored when the function is resumed.
-> 
-> For example, if an update races with TD build operations, the TD
-> Measurement Register will become incorrect, causing the TD to fail
-> attestation.
-> 
-> The TDX Module offers two solutions:
-> 
-> 1. Avoid updates during update-sensitive times
-> 
->    The host VMM can instruct TDH.SYS.SHUTDOWN to fail if any of the TDs
->    are currently in any update-sensitive cases.
-> 
-> 2. Detect incompatibility after updates
-> 
->    On TDH.SYS.UPDATE, the host VMM can configure the TDX Module to detect
->    actual incompatibility cases. The TDX Module will then return a special
->    error to signal the incompatibility, allowing the host VMM to restart
->    the update-sensitive operations.
-> 
-> Implement option #1 to fail updates if the feature is available. Also,
-> distinguish this update failure from other failures by returning -EBUSY,
-> which will be converted to a firmware update error code indicating that the
-> firmware is busy.
-
-Looks good to me:
+> To set clear expectations for TDX Module updates, expose the capability
+> to detect and prevent these incompatibility cases via sysfs and
+> document the compatibility criteria and indications when those criteria
+> are violated.
 
 Reviewed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 
