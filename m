@@ -1,237 +1,186 @@
-Return-Path: <kvm+bounces-69166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69167-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iD1EMpCsd2kZkAEAu9opvQ
-	(envelope-from <kvm+bounces-69166-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 19:04:00 +0100
+	id 4E1VLACtd2kZkAEAu9opvQ
+	(envelope-from <kvm+bounces-69167-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 19:05:52 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CEB48BE22
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 19:04:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FEAA8BE7F
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 19:05:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6025C300644C
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 18:03:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 379693036D7C
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 18:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E8A34D4F3;
-	Mon, 26 Jan 2026 18:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5073534D4D2;
+	Mon, 26 Jan 2026 18:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C7KHMn4I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O4aXRYxk"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787BC239E7F;
-	Mon, 26 Jan 2026 18:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769450637; cv=none; b=PLJ66x/60pzYy/NB67h6AdEERyJUGmQlMcA6BEQ9hn5gIZ5vfNdZzt/7XuvGvO46vNo/VTxh4g/VFJqKbBtJ02TFi676cI9usFJIPwchXz81erwThfD4T6zgN5rsPwPhitN/vPsNuirTkVj9xhBFevkjAgQFt9jXN5buSUkKN8Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769450637; c=relaxed/simple;
-	bh=KMFnnNyFC51sjGsObSY8Tq+SsOjbUUw5VxgjSrZ7lOM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kl+rRWKa0IQk/r5gNXj40qBf3aS7YEMiKCpUHhdMF2xDEHKaIqTaagVB0aG/kEXLTVJQmMWUiBgdNe3YgGm+D0kDBvxLcm6jcsY5SKtcbOg3fQwnw6kkPlCjmLvG4B7SLvy1UNPYfvAT1BFgacUNc3fRb4g33MPrXlCvNHDDWwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C7KHMn4I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C08C116C6;
-	Mon, 26 Jan 2026 18:03:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769450637;
-	bh=KMFnnNyFC51sjGsObSY8Tq+SsOjbUUw5VxgjSrZ7lOM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C7KHMn4IpvIuUA0as2B1uqMzWkDpAI2tO6dQa7lKr1ox9dj6rD/UYXDbkn6T16gYG
-	 s5MQAhNPeARJ6XlUbhjQzJtQWrHs1sTR3jwRqiO9fP/GPcFyNSGhPKZrboif4ctcwq
-	 fyMOrbFOUGBlvMKDjhGRW6EW4TYB3RJoOW3CVAu1LmP5qlhZdsywFj5CcslPskOAPT
-	 S2dr3xAqJRWCab/eIqvii+suEkrAQd2drqweE+f5hmzfZ05lr3IhGZJinCSc5ZAkPm
-	 IjIw1nnW4JSK5RwCUwAPBTsR3a7yGIDeWz9c2EnAnSODUIbYgTsYVich+MLRQy8hBN
-	 gxXHBls/Sijvg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vkQwM-00000005oDl-3WsK;
-	Mon, 26 Jan 2026 18:03:54 +0000
-Date: Mon, 26 Jan 2026 18:03:54 +0000
-Message-ID: <86fr7sb69h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: Re: [PATCH kvmtool v5 3/7] arm64: nested: Add support for setting maintenance IRQ
-In-Reply-To: <20260123142729.604737-4-andre.przywara@arm.com>
-References: <20260123142729.604737-1-andre.przywara@arm.com>
-	<20260123142729.604737-4-andre.przywara@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5136434A790
+	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 18:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769450729; cv=pass; b=AgYxnXB903+DzNkw1GPeTdSyBYLra3yvkjTe9f41o+blhcgt2zzPwnPUxNgPyjsCtUnArZtE7WjNo/5A7LbZCoDDhLknjCt2GOe0FrlPD5gkUWrtna+FUWDLFDWezlGZ+RPkE+2MMxjhysBIAIRfIQVkRs+kfSLFezL9VoWYgS0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769450729; c=relaxed/simple;
+	bh=v+f8FvwBFg7dDGHKP/QYFcL4Q1S4zs4FWdHw639SGDY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hk9DYonK2vUtxSyMUJOFb7zMVa1DVI+FQNYqzx2cDnAvsjEUDgocx5lc6t+YolsFKBc1RqM7ZjmHBT8jd0Uu0JY5hEXn/1zmYApJqUE7c8Z6kLJAeS22zrX/4GzViBccg/M+Hanvus4mxQyZvpE9fM1HVfkOHOFvDNNMcgUXQJA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O4aXRYxk; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5014acad6f2so12041cf.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 10:05:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769450727; cv=none;
+        d=google.com; s=arc-20240605;
+        b=f2o0ZvDU2seogYC1CqnpvrNObuO1q4+S/q7BzT96pMWsYZKwNKUJrE5TlcucdyH5y3
+         E9VgO5Qo/K3xMvDGSSf6O2Hr/CAmU1VSAjRHQLJzevtLNEemZ0Xf4FZ8kOUEAChh14xO
+         oPYKsVLhZ2hU0j6kkM0gkLG8ObMy8q3pHpjirHpn9KYwPjwggDtJIm70SSMQhVEXZJle
+         H/Qxuuh164Xj4Nnljwfy4uafL4Oq1ZXRaYgNXG0Yx47qjChbaJqx8KvKYWYrX05bFpa4
+         ckRxlV32LH53k6QsCeexxZqNttjqgx524pyWHV/0MHl5Feh115N8IjJkhxs85Z9WAV9f
+         bojQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=k9sW7exYhXYo5b3X/iX8Xd4kSUfKtlhUjch+6299QS8=;
+        fh=/EROn/9hs24EkwfXw/to2vHJWqNAZ/tbBZCIG6TgKCI=;
+        b=eulN0fGWG4vFYHAz9FBzpiTsxKW48jGKgPub/7KhxnGxusXcjrrCjJv1AwUaIjYp0a
+         mgMoLFFR69g+FhiroNeLJPvXmy8jnb5A6TTWT9mYg0MHNctlQ9JAV5Ob1opVGoNGw87e
+         9Y9vHn7ITjAYzOXoZBZLkPxL5cJlduaQOnpxIHEnRaOqunZjYKfPX/XxZy87cERNm27M
+         N9DCyKlIgrYGNZZaW1FKqm0DsJav6pD+WFqKxTnuRbCq7r4735Ii55XAJPrmocFAijo0
+         cT8wHFkZp0yaLuz2iv1WLm0o/aJfvD7wmwZCxGvyC4SoQT1naO6XTxqUAzQhDpOe3X+2
+         wZiw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769450727; x=1770055527; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=k9sW7exYhXYo5b3X/iX8Xd4kSUfKtlhUjch+6299QS8=;
+        b=O4aXRYxkvuVRcFhDhlBshnPjXMTZeQHqXgVNE9AfzObGgzvCFiWg6OTUT8EZQmnXTe
+         eP2vN6v2trg/PwWnfDPmhPHPEmq8AfBKO1zLZIfNNxUJJoV4JobgysolGSuSHaIMumDS
+         H4utBBnTVrWIZFUfGP8pRJ5pf/jEizFz7Y20smjRi5ICPpc5CmY7A8vIQt6VfH68k2T1
+         Q825M392/4DDm6J+uvGLtu0K5ETItkPCVTf2EeXs5KNybhYM1QLc0LyL/I2dH7nH7GZt
+         hgCEgdJBX3ugEYm5BnR6qEY6AhTtlv+Amq6DHyOexnWMF9qsePH4Ov9ImoRXBNdT63OW
+         Ni+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769450727; x=1770055527;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k9sW7exYhXYo5b3X/iX8Xd4kSUfKtlhUjch+6299QS8=;
+        b=sp/qAllnXfFErDsVGw9QtR3WF3xAFd/7PPAhUUKgjxIOK3VjoPHxjWTJHGAudUF/o9
+         nojKbhrI8iqI75OhbIff8PWjZ9cP1MDS/viAUxf/k7exXjj1RDnd3RCKSk1Y9kWSQIGK
+         UGkIxaFNna3Q7dexPXvnlcZ9mRMcdezNjguDBQPGv/VsWez42Rj//v0giYt7XGr/1aVH
+         P/HwkGKPawLGljkthRf7WqoL/ROVXmCaq9Epb1y1Qj/8g5C+4e7NCjg1yIqo6L9zCzhl
+         7abFCMVsyLOaXclChHqMgn1SS3WY8Z8P6bU1Ecqb/hK9uSK9A7zL2PJ5gUkVlCwIQ7u/
+         Royg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYvbNY/J9mnfUU7/I3Rr2GYVzP00X89rMzDcFa3RLN8iAEM0AHAuIcwDX6HSheP3ym6xA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyBbC2VtyUG5xQx/96uVDbSGs5VMRETCfFvRyjAh8m6YAU+v1/
+	/com2hRro3vTnMgYzwljO669as+KW6B46Ps0fEDrWaW/cm77ABdZuKo/zsRn0JcSXOjZcyNe9aL
+	JgI9AURrRCylD7Q2QSAa2Wws18hkHqRWPYEvWyhbe
+X-Gm-Gg: AZuq6aJo8jWLqZ+YGnJ5bRzXMRw9qcl1M5Wt6lz7ohynITVNkU2jOCiE3hkGFCKDBtD
+	BhN6PWjE1m9U/eZ7MM3QVtsiNk/gx7Gg+WucqAI52pr/vQDMetzMuZ6Wvy4ZZ7HTY7fuS2Vtkvd
+	Nm92mlRHn0fd7iHmgoD+0kLcosLVPCmNVvYNdgkYdPU2yt9JrzJ+5rKoAiRdMzpsN5D/WjBKPOf
+	ct4RaQ0EORlnCtRLgFjhP+V9Hn4rm+lE/hW4U6DTW2VWHMn9q2qWKUhDNSMAl8B38YahqXTleFp
+	QDNRTUg=
+X-Received: by 2002:a05:622a:1214:b0:4fb:e3b0:aae6 with SMTP id
+ d75a77b69052e-503142cc142mr12796471cf.1.1769450726757; Mon, 26 Jan 2026
+ 10:05:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, julien.thierry.kdev@gmail.com, will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, sascha.bischoff@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-3-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-3-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 26 Jan 2026 18:04:00 +0000
+X-Gm-Features: AZwV_Qgr9raUBYRUZBfOH_mHnPcBMFzt0yhWhO3RKbwtE7BDMNNTotzOUCwDyNg
+Message-ID: <CA+EHjTynFzZK5APC3LRzNbTC8RrtcavBE5=aqwg5a8CCp+oBhw@mail.gmail.com>
+Subject: Re: [PATCH 02/20] KVM: arm64: Remove duplicate configuration for SCTLR_EL1.{EE,E0E}
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,arm.com];
+	TAGGED_FROM(0.00)[bounces-69167-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69166-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,arm.com:email]
-X-Rspamd-Queue-Id: 3CEB48BE22
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 1FEAA8BE7F
 X-Rspamd-Action: no action
 
-On Fri, 23 Jan 2026 14:27:25 +0000,
-Andre Przywara <andre.przywara@arm.com> wrote:
-> 
-> Uses the new VGIC KVM device attribute to set the maintenance IRQ.
-> This is fixed to use PPI 9, as a platform decision made by kvmtool,
-> matching the SBSA recommendation.
-> Use the opportunity to pass the kvm pointer to gic__generate_fdt_nodes(),
-> as this simplifies the call and allows us access to the nested_virt
-> config variable on the way.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
+>
+> We already have specific constraints for SCTLR_EL1.{EE,E0E}, and
+> making them depend on FEAT_AA64EL1 is just buggy.
+
+Looking at the spec, I see that they depend on FEAT_MixedEnd and
+FEAT_MixedEndEL0, not on FEAT_AA64EL1. They are already in the right
+place in config.c.
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+
+
+
+>
+> Fixes: 6bd4a274b026e ("KVM: arm64: Convert SCTLR_EL1 to config-driven sanitisation")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arm64/arm-cpu.c         |  2 +-
->  arm64/gic.c             | 29 +++++++++++++++++++++++++++--
->  arm64/include/kvm/gic.h |  2 +-
->  3 files changed, 29 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-> index 69bb2cb2..0843ac05 100644
-> --- a/arm64/arm-cpu.c
-> +++ b/arm64/arm-cpu.c
-> @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  {
->  	int timer_interrupts[4] = {13, 14, 11, 10};
->  
-> -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
-> +	gic__generate_fdt_nodes(fdt, kvm);
->  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->  	pmu__generate_fdt_nodes(fdt, kvm);
->  }
-> diff --git a/arm64/gic.c b/arm64/gic.c
-> index b0d3a1ab..2a595184 100644
-> --- a/arm64/gic.c
-> +++ b/arm64/gic.c
-> @@ -11,6 +11,8 @@
->  
->  #define IRQCHIP_GIC 0
->  
-> +#define GIC_MAINT_IRQ	9
-> +
->  static int gic_fd = -1;
->  static u64 gic_redists_base;
->  static u64 gic_redists_size;
-> @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
->  
->  	int lines = irq__get_nr_allocated_lines();
->  	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
-> +	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
->  	struct kvm_device_attr nr_irqs_attr = {
->  		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->  		.addr	= (u64)(unsigned long)&nr_irqs,
->  	};
-> +	struct kvm_device_attr maint_irq_attr = {
-> +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
-> +		.addr	= (u64)(unsigned long)&maint_irq,
-> +	};
->  	struct kvm_device_attr vgic_init_attr = {
->  		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
->  		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-> @@ -325,6 +332,16 @@ static int gic__init_gic(struct kvm *kvm)
->  			return ret;
->  	}
->  
-> +	if (kvm->cfg.arch.nested_virt) {
-> +		ret = ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr);
-> +		if (!ret)
-> +			ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &maint_irq_attr);
-> +		if (ret) {
-> +			pr_err("could not set maintenance IRQ\n");
-> +			return ret;
-> +		}
-> +	}
-> +
->  	irq__routing_init(kvm);
->  
->  	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
-> @@ -342,7 +359,7 @@ static int gic__init_gic(struct kvm *kvm)
->  }
->  late_init(gic__init_gic)
->  
-> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
-> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  {
->  	const char *compatible, *msi_compatible = NULL;
->  	u64 msi_prop[2];
-> @@ -350,8 +367,12 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
->  		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->  		0, 0,				/* to be filled */
->  	};
-> +	u32 maint_irq[] = {
-> +		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI), cpu_to_fdt32(GIC_MAINT_IRQ),
-> +		gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH
-> +	};
-
-This looks utterly broken, and my guests barf on this:
-
-        intc {  
-                compatible = "arm,gic-v3";
-                #interrupt-cells = <0x03>;
-                interrupt-controller;
-                reg = <0x00 0x3fff0000 0x00 0x10000 0x00 0x3fef0000 0x00 0x100000>;
-                interrupts = <0x01 0x09 0x4000000>;
-                                        ^^^^^^^^^^^
-Are you testing on a big-endian box??? I fixed it with the patchlet
-below, but I also wonder why you added gic__get_fdt_irq_cpumask()...
-
-	M.
-
-diff --git a/arm64/gic.c b/arm64/gic.c
-index 2a59518..640ff35 100644
---- a/arm64/gic.c
-+++ b/arm64/gic.c
-@@ -369,7 +369,7 @@ void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	};
- 	u32 maint_irq[] = {
- 		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI), cpu_to_fdt32(GIC_MAINT_IRQ),
--		gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH
-+		cpu_to_fdt32(gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH),
- 	};
- 
- 	switch (kvm->cfg.arch.irqchip) {
-
--- 
-Without deviation from the norm, progress is not possible.
+>  arch/arm64/kvm/config.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 9c04f895d3769..0bcdb39885734 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -1140,8 +1140,6 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
+>                    SCTLR_EL1_TWEDEn,
+>                    FEAT_TWED),
+>         NEEDS_FEAT(SCTLR_EL1_UCI        |
+> -                  SCTLR_EL1_EE         |
+> -                  SCTLR_EL1_E0E        |
+>                    SCTLR_EL1_WXN        |
+>                    SCTLR_EL1_nTWE       |
+>                    SCTLR_EL1_nTWI       |
+> --
+> 2.47.3
+>
 
