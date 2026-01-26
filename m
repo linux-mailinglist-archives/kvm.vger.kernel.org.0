@@ -1,181 +1,147 @@
-Return-Path: <kvm+bounces-69072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69073-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0CURJtDPdmlWXAEAu9opvQ
-	(envelope-from <kvm+bounces-69072-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 03:22:08 +0100
+	id KEG9Mx/WdmlRXgEAu9opvQ
+	(envelope-from <kvm+bounces-69073-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 03:49:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D6A837E3
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 03:22:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D1F83956
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 03:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8967B30028FD
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 02:22:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BFF1D3008D09
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 02:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB8C2877CD;
-	Mon, 26 Jan 2026 02:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TR2o3w9P"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8FB296BD0;
+	Mon, 26 Jan 2026 02:48:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA35138D;
-	Mon, 26 Jan 2026 02:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4501BD9CE;
+	Mon, 26 Jan 2026 02:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769394114; cv=none; b=QMpJ8JmldNQ7HrTlnLn8TDd9rahWSiSv9Qzf+qFU+Am9CwHK1xb3veOu+sKcWQOHbHvIINa496GiqhBEeRof6FR4A5r+vgSIkuzmf9Jj4+UKvL67fEbtwZ9WVdQ6+MLFgj/2S0bBUHPe80WOndM338B5lVwkpkli+PfMRSqNkt0=
+	t=1769395727; cv=none; b=eIbXowh7Oo3juZlqyRLOansMAo0uIdZjIzlKXgnsYd8NNRu4J6c0CHjqcZmSZFHJNauPv6iHb3Ej5oV4S8MWnfVn0uUKUfkUEpBtzTlD90BOAtpjXmd3RTcSETm6nt+I11Zmu8spqKGzmKEGqLtQrLLSH6hew6WKRdvhxnEomHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769394114; c=relaxed/simple;
-	bh=PXX80CT/S292WRWoCN59+BZhT6xQXxTstHEXrjq77dE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GXePxEQKz7NlLME0sLEM1xD3ZW3hcW4ipITd80KAyEDRURkjtRJPAD2NVHMxqbdEbQ0tdeDiP03hhTLYdP1OzO4oaSpnqeQXSjcbTgGvwRGdgALBFiKZwMrIBc8wqmUGgMy158rDejT/8/Fh1MgeenALra0rUS12g47AIxBW+YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TR2o3w9P; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=LMRIcTRXNYBl6/YI3AO8HtkyX3snsSlrz/DhK+R8TBQ=;
-	b=TR2o3w9PakzlTu3q+5SaIa459DX4tP6hjZUdnNRWlMKW7sSLscsYet2i9zkhny4L6wvrhzWou
-	taZ+dp154MFldv0siFqJN82MGWX1ty08Go1a9c38NQ3JsLqzgtZk5pNnsoEWyQw7QXyRekyx3xi
-	bKEcJUUWvIXScx6hPwI37fw=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dzsdf4d2kz1prL2;
-	Mon, 26 Jan 2026 10:18:14 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 26C574056A;
-	Mon, 26 Jan 2026 10:21:43 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Mon, 26 Jan 2026 10:21:42 +0800
-Message-ID: <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
-Date: Mon, 26 Jan 2026 10:21:42 +0800
+	s=arc-20240116; t=1769395727; c=relaxed/simple;
+	bh=PjZ8K0McQdNe8F8SMKmXiuTZmYmqd+zIPV/1WD6KVY0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZkQeCUvcxQ0+ugkSK92Prr7IKUPaJz7i0+9FtByYxsVbR4oTy/ruovnQVGy8sCcffodWe7hNblfFUXfwW142Ai8n21eXwse7jYHoJJWkozdQr6PfPyUkji/FqRUKcuut13CJA5w828ZfTQxja8hPDTsb3D1lcdr8IZs1prMBjP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8DxPMMK1nZpPJcMAA--.41044S3;
+	Mon, 26 Jan 2026 10:48:42 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowJCx98AJ1nZp+0AxAA--.18313S2;
+	Mon, 26 Jan 2026 10:48:42 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>
+Cc: loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH v2] LoongArch: KVM: Add more CPUCFG mask bit
+Date: Mon, 26 Jan 2026 10:48:40 +0800
+Message-Id: <20260126024840.2308379-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register
- information
-To: Leonardo Bras <leo.bras@arm.com>, Marc Zyngier <maz@kernel.org>
-CC: Tian Zheng <zhengtian10@huawei.com>, <oliver.upton@linux.dev>,
-	<catalin.marinas@arm.com>, <corbet@lwn.net>, <pbonzini@redhat.com>,
-	<will@kernel.org>, <linux-kernel@vger.kernel.org>, <yuzenghui@huawei.com>,
-	<wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>, <xiexiangyou@huawei.com>,
-	<zhengchuan@huawei.com>, <joey.gouly@arm.com>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-doc@vger.kernel.org>, <suzuki.poulose@arm.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
- <20251121092342.3393318-2-zhengtian10@huawei.com>
- <86wm3iqlz8.wl-maz@kernel.org> <aXI-XHF2jz7arOwg@devkitleo>
-From: Tian Zheng <zhengtian10@huawei.com>
-In-Reply-To: <aXI-XHF2jz7arOwg@devkitleo>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCx98AJ1nZp+0AxAA--.18313S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhengtian10@huawei.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[loongson.cn];
+	TAGGED_FROM(0.00)[bounces-69073-lists,kvm=lfdr.de];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69072-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[huawei.com:+]
-X-Rspamd-Queue-Id: 88D6A837E3
+	RCPT_COUNT_FIVE(0.00)[6];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,loongson.cn:mid,loongson.cn:email]
+X-Rspamd-Queue-Id: 24D1F83956
 X-Rspamd-Action: no action
 
+With LA664 CPU there are more features supported which are indicated
+in CPUCFG2 bit24:30 and CPUCFG3 bit17 and bit 23. KVM hypervisor can
+not enable or disable these features and there is no KVM exception
+when instructions of these features are used in guest mode.
 
+Here add more CPUCFG mask support with LA664 CPU type.
 
-On 1/22/2026 11:12 PM, Leonardo Bras wrote:
-> On Sat, Nov 22, 2025 at 12:40:27PM +0000, Marc Zyngier wrote:
->> On Fri, 21 Nov 2025 09:23:38 +0000,
->> Tian Zheng <zhengtian10@huawei.com> wrote:
->>>
->>> From: eillon <yezhenyu2@huawei.com>
->>>
->>> The ARM architecture added the HDBSS feature and descriptions of
->>> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
->>> add them to Linux.
->>>
->>> Signed-off-by: eillon <yezhenyu2@huawei.com>
->>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->>> ---
->>>   arch/arm64/include/asm/esr.h     |  2 ++
->>>   arch/arm64/include/asm/kvm_arm.h |  1 +
->>>   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
->>>   3 files changed, 31 insertions(+)
->>>
->>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
->>> index e1deed824464..a6f3cf0b9b86 100644
->>> --- a/arch/arm64/include/asm/esr.h
->>> +++ b/arch/arm64/include/asm/esr.h
->>> @@ -159,6 +159,8 @@
->>>   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
->>>
->>>   /* ISS2 field definitions for Data Aborts */
->>> +#define ESR_ELx_HDBSSF_SHIFT	(11)
->>> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
->>>   #define ESR_ELx_TnD_SHIFT	(10)
->>>   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
->>>   #define ESR_ELx_TagAccess_SHIFT	(9)
->>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
->>> index 1da290aeedce..b71122680a03 100644
->>> --- a/arch/arm64/include/asm/kvm_arm.h
->>> +++ b/arch/arm64/include/asm/kvm_arm.h
->>> @@ -124,6 +124,7 @@
->>>   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
->>>
->>>   /* VTCR_EL2 Registers bits */
->>> +#define VTCR_EL2_HDBSS		(1UL << 45)
->>
->> I think it is time to convert VTCR_EL2 to the sysreg infrastructure
->> instead of adding extra bits here.
-> 
-> 
-> Hi Marc, Tian,
-> 
-> Marc, IIUC the above was implemented by
-> https://lore.kernel.org/all/20251210173024.561160-1-maz@kernel.org
-> 
-> Which was recently applied to next, and it its way to mainstream.
-> 
-> Tian, I think it's worth rebasing this patchset on top of the above.
-> 
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+---
+  1. Rebase on the latest version since some common CPUCFG bit macro
+     definitions are merged.
+  2. Modifiy the comments explaining why it comes from feature detect
+     of host CPU.
+---
+ arch/loongarch/kvm/vcpu.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Indeed, I've been following Marc's VTCR_EL2 patch and will rebase my
-changes on top of it.
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 656b954c1134..a9608469fa7a 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -652,6 +652,8 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
+ 
+ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+ {
++	unsigned int config;
++
+ 	if (id < 0 || id >= KVM_MAX_CPUCFG_REGS)
+ 		return -EINVAL;
+ 
+@@ -684,9 +686,22 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+ 		if (cpu_has_ptw)
+ 			*v |= CPUCFG2_PTW;
+ 
++		/*
++		 * The capability indication of some features are the same
++		 * between host CPU and guest vCPU, and there is no special
++		 * feature detect method with vCPU. Also KVM hypervisor can
++		 * not enable or disable these features.
++		 *
++		 * Here use host CPU detected features for vCPU
++		 */
++		config = read_cpucfg(LOONGARCH_CPUCFG2);
++		*v |= config & (CPUCFG2_FRECIPE | CPUCFG2_DIV32 | CPUCFG2_LAM_BH);
++		*v |= config & (CPUCFG2_LAMCAS | CPUCFG2_LLACQ_SCREL | CPUCFG2_SCQ);
+ 		return 0;
+ 	case LOONGARCH_CPUCFG3:
+ 		*v = GENMASK(16, 0);
++		config = read_cpucfg(LOONGARCH_CPUCFG3);
++		*v |= config & (CPUCFG3_DBAR_HINTS | CPUCFG3_SLDORDER_STA);
+ 		return 0;
+ 	case LOONGARCH_CPUCFG4:
+ 	case LOONGARCH_CPUCFG5:
 
-> BTW, I am working on using the feature enabled by this patchset on a new
-> optimization, so please include me on any new release.
-
-Sure, I'll make sure you're on the Cc list for the next revision.
-
-> 
-> Thanks!
-> Leo
-> 
+base-commit: 63804fed149a6750ffd28610c5c1c98cce6bd377
+-- 
+2.39.3
 
 
