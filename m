@@ -1,222 +1,248 @@
-Return-Path: <kvm+bounces-69070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69071-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WISFG7/CdmlFVwEAu9opvQ
-	(envelope-from <kvm+bounces-69070-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 02:26:23 +0100
+	id WJr+IqzNdmktWwEAu9opvQ
+	(envelope-from <kvm+bounces-69071-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 03:13:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E08AE834D8
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 02:26:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC0D8376C
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 03:12:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 11B7F30038FD
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 01:26:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E3FD930015B8
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 02:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62E51D435F;
-	Mon, 26 Jan 2026 01:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mT9+RuJ+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74E523EA89;
+	Mon, 26 Jan 2026 02:12:52 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C65038DF9;
-	Mon, 26 Jan 2026 01:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB2224113D;
+	Mon, 26 Jan 2026 02:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769390767; cv=none; b=TwXkZpg3cc0po5IIyLcWTDCo9eMFhuSxe82kuAwYOOGkdd9H3qw9eRSBbYA+WzJa2+V98OAChYEiusJupet+45/4Yt0+diiLbwOgy5fG0hLUt3c/X59q+nO6rTbNNzZJfH2dAVLB7WbN0ACIAVqWPSeLxx2J7Xj+aulsQBipN7Q=
+	t=1769393569; cv=none; b=QcU9thf9xkVFEeSC3Tmoxbks3cTK73xCiXZpD5mtB9unXCteMcjrVH9MXNRke2HUi8iKCuUiK2w0bHT6qhTqbeXSY5jqJ5S8qXfdrZA6B6Ad8dB9GSsZW7g6dn6aYG0RDu5cIh2OQ8kG2qAf8GBPIPAfJyeQS1HG+ULCntX9Wcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769390767; c=relaxed/simple;
-	bh=Yb+JP07ijQn7cCb91p7u5ScNQqG1qvqytVfflQQb5SE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=td8TYE9olcPBM+cEA+J2keS9aYJjmS6sh8EbHCV2CknslQVN+scI17xT8u6FyQOyfqJEPl4sspTbOcBA5NeZDAtCK1huYpvb/UN3X60kFliZrqmPvKPB7rbG/SwA6BevjfEH6dh1+xMmhRQOlJhrnuzWQOIikZa7+Px5d+gTMkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mT9+RuJ+; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769390756; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	bh=gCARNgGUNLhCd1rBcVoXKGTchR8utjxKY5PDBVlWowc=;
-	b=mT9+RuJ+dE2lBCVbMGH1jgRMsyN8jLeg5/XdxzWjfqp6V3dy8SV6E9im1q9/XX5+pHqMJg3uTaD6m6Z6s46iC7zn28DoCJ1r5mqPj7Rti1gY9vjsX33+yNgX/UxBEp7ni++/jHb2dsbZrRafg6xHj0USifklf19p0we2CIJsY84=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WxmmVCv_1769390752 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 26 Jan 2026 09:25:54 +0800
-From: fangyu.yu@linux.alibaba.com
-To: fangyu.yu@linux.alibaba.com
-Cc: ajones@ventanamicro.com,
-	alex@ghiti.fr,
-	andrew.jones@oss.qualcomm.com,
-	anup@brainfault.org,
-	aou@eecs.berkeley.edu,
-	atish.patra@linux.dev,
-	corbet@lwn.net,
-	guoren@kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	palmer@dabbelt.com,
-	pbonzini@redhat.com,
-	pjw@kernel.org,
-	radim.krcmar@oss.qualcomm.com
-Subject: Re: [PATCH v3 2/2] RISC-V: KVM: add KVM_CAP_RISCV_SET_HGATP_MODE 
-Date: Mon, 26 Jan 2026 09:25:50 +0800
-Message-Id: <20260126012550.38206-1-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20260125150450.27068-3-fangyu.yu@linux.alibaba.com>
-References: <20260125150450.27068-3-fangyu.yu@linux.alibaba.com>
+	s=arc-20240116; t=1769393569; c=relaxed/simple;
+	bh=BUM8C9hkjEGzOYKfxRu8J1XeZ8xVDt4sjCeOZKvu4Ww=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CG8EMLxt3MgYA1EWJpkfZwQkKLxJneNAc0J/03SyPHlpkbAMI9qvemiAI/xZSBLfnsOujs1LJ4S/uUtmMVNcm6zSC57+iMjWrhk5ANlLcVp/FmV1vfCCKrKlC78v2FVMoFeDxpJccdEQHqiXzIX8wX3NSbvXLKOqZLRPWA2gFKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Axz8OQzXZpgJUMAA--.41370S3;
+	Mon, 26 Jan 2026 10:12:32 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJCxfcKFzXZp7TQxAA--.30120S3;
+	Mon, 26 Jan 2026 10:12:23 +0800 (CST)
+Subject: Re: [PATCH 1/1] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
+To: Zixing Liu <liushuyu@aosc.io>, WANG Xuerui <kernel@xen0n.name>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: Kexy Biscuit <kexybiscuit@aosc.io>, Mingcong Bai <jeffbai@aosc.io>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Paul Walmsley <pjw@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Miguel Ojeda <ojeda@kernel.org>,
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
+ rust-for-linux@vger.kernel.org
+References: <20260125054322.1237687-1-liushuyu@aosc.io>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <4b504274-4241-0e3e-3ed3-7804b72b7ee8@loongson.cn>
+Date: Mon, 26 Jan 2026 10:09:47 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
+In-Reply-To: <20260125054322.1237687-1-liushuyu@aosc.io>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxfcKFzXZp7TQxAA--.30120S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxXr4rurW3ArW7KF47ZryxJFc_yoWrGFyDpF
+	W3C3ZIqrWFyr1Ik343ZwnxuF98Xrs2gw47ZFy3Ga4xAr4Yyr4FvF40krZrXFWrJ348CF40
+	vF10gFyY9FWqv3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUA529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
+	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUShiSDUUUU
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	SUBJECT_ENDS_SPACES(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69070-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_FROM(0.00)[bounces-69071-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[loongson.cn];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fangyu.yu@linux.alibaba.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FREEMAIL_CC(0.00)[aosc.io,redhat.com,lwn.net,loongson.cn,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,garyguo.net,protonmail.com,google.com,umich.edu,vger.kernel.org,lists.linux.dev,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.982];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,linux.alibaba.com:mid,linux.alibaba.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E08AE834D8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,aosc.io:email,loongson.cn:mid]
+X-Rspamd-Queue-Id: AAC0D8376C
 X-Rspamd-Action: no action
 
->From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->
->This capability allows userspace to explicitly select the HGATP mode
->for the VM. The selected mode must be less than or equal to the max
->HGATP mode supported by the hardware. This capability must be enabled
->before creating any vCPUs, and can only be set once per VM.
->
->Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->---
-> Documentation/virt/kvm/api.rst | 18 ++++++++++++++++++
-> arch/riscv/kvm/vm.c            | 26 ++++++++++++++++++++++++--
-> include/uapi/linux/kvm.h       |  1 +
-> 3 files changed, 43 insertions(+), 2 deletions(-)
->
->diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->index 01a3abef8abb..9d0794b174c7 100644
->--- a/Documentation/virt/kvm/api.rst
->+++ b/Documentation/virt/kvm/api.rst
->@@ -8765,6 +8765,24 @@ helpful if user space wants to emulate instructions which are not
-> This capability can be enabled dynamically even if VCPUs were already
-> created and are running.
-> 
->+7.47 KVM_CAP_RISCV_SET_HGATP_MODE
->+---------------------------------
->+
->+:Architectures: riscv
->+:Type: VM
->+:Parameters: args[0] contains the requested HGATP mode
->+:Returns:
->+  - 0 on success.
->+  - -EINVAL if args[0] is outside the range of HGATP modes supported by the
->+    hardware.
->+  - -EBUSY if vCPUs have already been created for the VM, if the VM has any
->+    non-empty memslots, or if the capability has already been set for the VM.
->+
->+This capability allows userspace to explicitly select the HGATP mode for
->+the VM. The selected mode must be less than or equal to the maximum HGATP
->+mode supported by the hardware. This capability must be enabled before
->+creating any vCPUs, and can only be set once per VM.
->+
-Hi Andrew:
 
-In v3，no changes were made here, as KVM_CAP_RISCV_SET_HGATP_MODE might be
-appropriate, just like the no5lvl and no4lvl in the kernel.
-If you think it's needed, I'm happy to discuss this further.
 
-Thanks,
-Fangyu
-> 8. Other capabilities.
-> ======================
+On 2026/1/25 下午1:43, Zixing Liu wrote:
+> This ioctl can be used by userspace applications to determine which
+> (special) registers are get/set-able.
 > 
->diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
->index 4b2156df40fc..7bc9b193dcaa 100644
->--- a/arch/riscv/kvm/vm.c
->+++ b/arch/riscv/kvm/vm.c
->@@ -202,6 +202,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> 	case KVM_CAP_VM_GPA_BITS:
-> 		r = kvm_riscv_gstage_gpa_bits(&kvm->arch);
-> 		break;
->+	case KVM_CAP_RISCV_SET_HGATP_MODE:
->+		r = IS_ENABLED(CONFIG_64BIT) ? 1 : 0;
->+		break;
-> 	default:
-> 		r = 0;
-> 		break;
->@@ -212,12 +215,31 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> This can be very useful for cross-platform VMMs so that they do not have
+> to hardcode register indices for each supported architectures.
 > 
-> int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
-> {
->+	if (cap->flags)
->+		return -EINVAL;
->+
-> 	switch (cap->cap) {
-> 	case KVM_CAP_RISCV_MP_STATE_RESET:
->-		if (cap->flags)
->-			return -EINVAL;
-> 		kvm->arch.mp_state_reset = true;
-> 		return 0;
->+	case KVM_CAP_RISCV_SET_HGATP_MODE:
->+#ifdef CONFIG_64BIT
->+		if (cap->args[0] < HGATP_MODE_SV39X4 ||
->+		    cap->args[0] > kvm_riscv_gstage_mode(kvm_riscv_gstage_max_pgd_levels))
->+			return -EINVAL;
->+
->+		if (kvm->arch.gstage_mode_user_initialized || kvm->created_vcpus ||
->+		    !kvm_are_all_memslots_empty(kvm))
->+			return -EBUSY;
->+
->+		kvm->arch.gstage_mode_user_initialized = true;
->+		kvm->arch.kvm_riscv_gstage_pgd_levels =
->+				3 + cap->args[0] - HGATP_MODE_SV39X4;
->+		kvm_debug("VM (vmid:%lu) using SV%lluX4 G-stage page table format\n",
->+			  kvm->arch.vmid.vmid,
->+			  39 + (cap->args[0] - HGATP_MODE_SV39X4) * 9);
->+#endif
->+		return 0;
-> 	default:
-> 		return -EINVAL;
-> 	}
->diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->index dddb781b0507..00c02a880518 100644
->--- a/include/uapi/linux/kvm.h
->+++ b/include/uapi/linux/kvm.h
->@@ -974,6 +974,7 @@ struct kvm_enable_cap {
-> #define KVM_CAP_GUEST_MEMFD_FLAGS 244
-> #define KVM_CAP_ARM_SEA_TO_USER 245
-> #define KVM_CAP_S390_USER_OPEREXEC 246
->+#define KVM_CAP_RISCV_SET_HGATP_MODE 247
+> Signed-off-by: Zixing Liu <liushuyu@aosc.io>
+> ---
 > 
-> struct kvm_irq_routing_irqchip {
-> 	__u32 irqchip;
->-- 
->2.50.1
+> For example, this ioctl could be used by rust-vmm/rust-kvm or maybe
+> VirtualBox-kvm in the future.
+> 
+>   Documentation/virt/kvm/api.rst |  2 +-
+>   arch/loongarch/kvm/vcpu.c      | 69 ++++++++++++++++++++++++++++++++++
+>   2 files changed, 70 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 01a3abef8abb..f46dd8be282f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3603,7 +3603,7 @@ VCPU matching underlying host.
+>   ---------------------
+>   
+>   :Capability: basic
+> -:Architectures: arm64, mips, riscv, x86 (if KVM_CAP_ONE_REG)
+> +:Architectures: arm64, loongarch, mips, riscv, x86 (if KVM_CAP_ONE_REG)
+>   :Type: vcpu ioctl
+>   :Parameters: struct kvm_reg_list (in/out)
+>   :Returns: 0 on success; -1 on error
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 656b954c1134..b884eb9c76aa 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -1186,6 +1186,57 @@ static int kvm_loongarch_vcpu_set_attr(struct kvm_vcpu *vcpu,
+>   	return ret;
+>   }
+>   
+> +static unsigned long kvm_loongarch_num_lbt_regs(void)
+> +{
+> +	/* +1 for the LBT_FTOP flag (inside arch.fpu) */
+> +	return sizeof(struct loongarch_lbt) / sizeof(unsigned long) + 1;
+> +}
+> +
+> +static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
+> +{
+> +	/* +1 for the KVM_REG_LOONGARCH_COUNTER register */
+> +	unsigned long res = CSR_MAX_NUMS + KVM_MAX_CPUCFG_REGS + 1;
+> +
+> +	if (kvm_guest_has_lbt(&vcpu->arch))
+> +		res += kvm_loongarch_num_lbt_regs();
+> +
+> +	return res;
+> +}
+> +
+> +static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
+> +					  u64 __user *uindices)
+> +{
+> +	u64 reg;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < CSR_MAX_NUMS; i++) {
+> +		reg = KVM_IOC_CSRID(i);
+> +		if (put_user(reg, uindices++))
+> +			return -EFAULT;
+> +	}
+CSR_MAX_NUMS is max number of accessible CSR registers, instead only 
+part of them is used by vCPU model. By my understanding, there will be 
+no much meaning if CSR_MAX_NUMS is returned. And I think it will be 
+better if real CSR register id and number is returned.
+
+Regards
+Bibo Mao
+> +
+> +	for (i = 0; i < KVM_MAX_CPUCFG_REGS; i++) {
+> +		reg = KVM_IOC_CPUCFG(i);
+> +		if (put_user(reg, uindices++))
+> +			return -EFAULT;
+> +	}
+> +
+> +	reg = KVM_REG_LOONGARCH_COUNTER;
+> +	if (put_user(reg, uindices++))
+> +		return -EFAULT;
+> +
+> +	if (!kvm_guest_has_lbt(&vcpu->arch))
+> +		return 0;
+> +
+> +	for (i = 1; i <= kvm_loongarch_num_lbt_regs(); i++) {
+> +		reg = (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | i);
+> +		if (put_user(reg, uindices++))
+> +			return -EFAULT;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   long kvm_arch_vcpu_ioctl(struct file *filp,
+>   			 unsigned int ioctl, unsigned long arg)
+>   {
+> @@ -1251,6 +1302,24 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>   		r = kvm_loongarch_vcpu_set_attr(vcpu, &attr);
+>   		break;
+>   	}
+> +	case KVM_GET_REG_LIST: {
+> +		struct kvm_reg_list __user *user_list = argp;
+> +		struct kvm_reg_list reg_list;
+> +		unsigned n;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
+> +			break;
+> +		n = reg_list.n;
+> +		reg_list.n = kvm_loongarch_num_regs(vcpu);
+> +		if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
+> +			break;
+> +		r = -E2BIG;
+> +		if (n < reg_list.n)
+> +			break;
+> +		r = kvm_loongarch_copy_reg_indices(vcpu, user_list->reg);
+> +		break;
+> +	}
+>   	default:
+>   		r = -ENOIOCTLCMD;
+>   		break;
+> 
+
 
