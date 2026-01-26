@@ -1,81 +1,68 @@
-Return-Path: <kvm+bounces-69121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69122-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCT/LtFPd2n0dwEAu9opvQ
-	(envelope-from <kvm+bounces-69121-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:28:17 +0100
+	id 8DNwEZtWd2nMeAEAu9opvQ
+	(envelope-from <kvm+bounces-69122-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:57:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3649F87A53
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:28:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC79A87E77
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:57:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2338E3013A71
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:28:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3633A307B2E7
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F39332ECB;
-	Mon, 26 Jan 2026 11:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hkKOtzru"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00B8334368;
+	Mon, 26 Jan 2026 11:52:09 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBE62BEC2B;
-	Mon, 26 Jan 2026 11:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568A6332EBF;
+	Mon, 26 Jan 2026 11:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769426893; cv=none; b=eRYW0Z6dJaeVAN7ddpUSSpn4Gdu0FXLJHXtMn159lcso2FwEr0tLkkJkIDxwzaEN0CrQnE8Ap/yXvbcIF4X+c9apSZKVjb2fRwVF6yJxwGytZtZYvtnqP4Zuu8RXw3SFMqFShEu05/q+epivdx42Zt0W0lEDjK3l62UE0YZLxpI=
+	t=1769428329; cv=none; b=r68WS48V2a2NHJkF0jg2FIz35Is3FRR7YaisdY6CZvlxywPL/KEuPyPSNahCr0RhICR/LlfBMc0JzmVE0uX9L2XsUUngPUi/kMP7EQ9Gkj+X4G+16HCz6SQv7UgaLP27oiDMKKjdWbwrtKGyOdryarSpGVJ0dk8Hq8VcaqQr8Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769426893; c=relaxed/simple;
-	bh=k3XR1MT5Vahum7lTIJiF6OhzMhBXDH+X36hEo9UNNiA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5sEz50EDu1PKPcc817zcj7Nk1twom3jKRIpIZ+uc4PSzcRvOlJnoM7xZksuNKcV6OijavP6GQGQGWBUTqAhPmTKXCVPOKNQub2hS3yG5h7yscvQprmSlBpML+n+m+5lWqsFIjP2Ye1wJWTkhKkRax4hcXYCpza71ix8RQeZgVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hkKOtzru; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769426891; x=1800962891;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=k3XR1MT5Vahum7lTIJiF6OhzMhBXDH+X36hEo9UNNiA=;
-  b=hkKOtzrugiGFrUmvbN36BmHIpPITtdv+337eJpy60kZEUm9bsC/lxy/W
-   dC3OCCH/JeWA9WCu4eLSn6dCwRrNpkrXK1vUbmpPiVt+HyAFtlvq7RTMe
-   ji0tsu1D8rTkzfGrAQUgA7GQ71y1wRw5B966ZGs8py1uwthbhKuzJiO3o
-   xz98rZMTlJJOn6yhVZjLtz1NNo+l8s4ItsEOnaRdxG5ZBO8NOYOoNEPO7
-   02/fPEEBTCmdR9r1iYyZ3vaBHntc0LLnxhi/P9CipLMnjtHPJBU4RfJzw
-   IJ4z+SM7m0pMRSk8OqCtb/UomlRz4AtzJY0Cnl4aOs/b2Wg6xSpRfgKYg
-   g==;
-X-CSE-ConnectionGUID: z7cyAr9GSryWZHSP/aKwKA==
-X-CSE-MsgGUID: fOP39w+5S/aJnp2VJziRmg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="58176432"
-X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
-   d="scan'208";a="58176432"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 03:28:10 -0800
-X-CSE-ConnectionGUID: QxIAn7LDS+SbVBcYWTrFaA==
-X-CSE-MsgGUID: JdqJE326RReXEfKaccWuWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
-   d="scan'208";a="207258561"
-Received: from krybak-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.55])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 03:28:04 -0800
-Date: Mon, 26 Jan 2026 13:28:01 +0200
-From: Tony Lindgren <tony.lindgren@linux.intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
-	ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
-	yilun.xu@linux.intel.com, sagis@google.com, vannapurve@google.com,
-	paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
-	seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
-	dave.hansen@linux.intel.com, vishal.l.verma@intel.com
-Subject: Re: [PATCH v3 26/26] coco/tdx-host: Set and document TDX Module
- update expectations
-Message-ID: <aXdPwRtsj1Qj9VLi@tlindgre-MOBL1>
-References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-27-chao.gao@intel.com>
+	s=arc-20240116; t=1769428329; c=relaxed/simple;
+	bh=hDMw340cZtDwIbgpEB1NZTb0kT4vbQHIOuSlQj+2tpw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=eV+wlkNDUUJlcySgoyt5bp9NV6EbXM0TgGgw1Jp2MaM6zhEqaXzaZGEV6/OTozN+treXrCrX9eMcjqcgMJ36TYh86JJtt9NSEj6SO1RJ/nCmW98faPHeYBnyIePf5eepsvON0SRv5BwLIsg+8IW7EoYk7qggSPHQbfiV4m2X3lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD7C4339;
+	Mon, 26 Jan 2026 03:51:59 -0800 (PST)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 207E73F5CA;
+	Mon, 26 Jan 2026 03:52:04 -0800 (PST)
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	linux-kernel@vger.kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yezhenyu2@huawei.com,
+	xiexiangyou@huawei.com,
+	zhengchuan@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
+Date: Mon, 26 Jan 2026 11:50:35 +0000
+Message-ID: <aXdVCla1wV3sfcJd@devkitleo>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com> <20251121092342.3393318-2-zhengtian10@huawei.com> <86wm3iqlz8.wl-maz@kernel.org> <aXI-XHF2jz7arOwg@devkitleo> <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,53 +71,103 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260123145645.90444-27-chao.gao@intel.com>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.86 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69121-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69122-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tony.lindgren@linux.intel.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leo.bras@arm.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3649F87A53
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email]
+X-Rspamd-Queue-Id: DC79A87E77
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 06:55:34AM -0800, Chao Gao wrote:
-> In rare cases, TDX Module updates may cause TD management operations to
-> fail if they occur during phases of the TD lifecycle that are sensitive
-> to update compatibility.
+On Mon, Jan 26, 2026 at 10:21:42AM +0800, Tian Zheng wrote:
 > 
-> But not all combinations of P-SEAMLDR, kernel, and TDX Module have the
-> capability to detect and prevent said incompatibilities. Completely
-> disabling TDX Module updates on platforms without the capability would
-> be overkill, as these incompatibility cases are rare and can be
-> addressed by userspace through coordinated scheduling of updates and TD
-> management operations.
 > 
-> To set clear expectations for TDX Module updates, expose the capability
-> to detect and prevent these incompatibility cases via sysfs and
-> document the compatibility criteria and indications when those criteria
-> are violated.
+> On 1/22/2026 11:12 PM, Leonardo Bras wrote:
+> > On Sat, Nov 22, 2025 at 12:40:27PM +0000, Marc Zyngier wrote:
+> > > On Fri, 21 Nov 2025 09:23:38 +0000,
+> > > Tian Zheng <zhengtian10@huawei.com> wrote:
+> > > > 
+> > > > From: eillon <yezhenyu2@huawei.com>
+> > > > 
+> > > > The ARM architecture added the HDBSS feature and descriptions of
+> > > > related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+> > > > add them to Linux.
+> > > > 
+> > > > Signed-off-by: eillon <yezhenyu2@huawei.com>
+> > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > > > ---
+> > > >   arch/arm64/include/asm/esr.h     |  2 ++
+> > > >   arch/arm64/include/asm/kvm_arm.h |  1 +
+> > > >   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+> > > >   3 files changed, 31 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > > > index e1deed824464..a6f3cf0b9b86 100644
+> > > > --- a/arch/arm64/include/asm/esr.h
+> > > > +++ b/arch/arm64/include/asm/esr.h
+> > > > @@ -159,6 +159,8 @@
+> > > >   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+> > > > 
+> > > >   /* ISS2 field definitions for Data Aborts */
+> > > > +#define ESR_ELx_HDBSSF_SHIFT	(11)
+> > > > +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+> > > >   #define ESR_ELx_TnD_SHIFT	(10)
+> > > >   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+> > > >   #define ESR_ELx_TagAccess_SHIFT	(9)
+> > > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > > > index 1da290aeedce..b71122680a03 100644
+> > > > --- a/arch/arm64/include/asm/kvm_arm.h
+> > > > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > > > @@ -124,6 +124,7 @@
+> > > >   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+> > > > 
+> > > >   /* VTCR_EL2 Registers bits */
+> > > > +#define VTCR_EL2_HDBSS		(1UL << 45)
+> > > 
+> > > I think it is time to convert VTCR_EL2 to the sysreg infrastructure
+> > > instead of adding extra bits here.
+> > 
+> > 
+> > Hi Marc, Tian,
+> > 
+> > Marc, IIUC the above was implemented by
+> > https://lore.kernel.org/all/20251210173024.561160-1-maz@kernel.org
+> > 
+> > Which was recently applied to next, and it its way to mainstream.
+> > 
+> > Tian, I think it's worth rebasing this patchset on top of the above.
+> > 
+> 
+> Indeed, I've been following Marc's VTCR_EL2 patch and will rebase my
+> changes on top of it.
+> 
+> > BTW, I am working on using the feature enabled by this patchset on a new
+> > optimization, so please include me on any new release.
+> 
+> Sure, I'll make sure you're on the Cc list for the next revision.
 
-Reviewed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
+Thanks!
+
 
