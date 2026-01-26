@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-69130-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69128-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDVYE8Jbd2maeQEAu9opvQ
-	(envelope-from <kvm+bounces-69130-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:19:14 +0100
+	id gBlIN8Bbd2maeQEAu9opvQ
+	(envelope-from <kvm+bounces-69128-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:19:12 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B6A881DC
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:19:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41B92881D5
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 13:19:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC820305818A
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA2C430579E5
 	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 12:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45511337B84;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418E3337B82;
 	Mon, 26 Jan 2026 12:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AmQ+qLuW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lynbX/MK"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B16E3358DA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4035D336ED8;
 	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769429855; cv=none; b=bbuJ46rFYrxzhUfPbOBuxQimtQnQ8YkUJo3GoBgBvFodRjbBKxzQRGHmJkvEqBMQf4+K48jKwgGSnfcXmUXe8XZw+ntIUwNGNAUJJlN4oTfAXpB99kuWSqw9OYKLWR3a8C52NXC6RskSCkslWakKzoN/7WLigiRv+NC+GYrJl90=
+	t=1769429855; cv=none; b=EGC100mTRqCuAdW6zTtxQSJqCTWmKwL3gmABxfXCPvYIBZ6TMtyiu/M2VPBmF87JNzckKE2+PIaeZppjtSG3DYNwxsKRg/wMPhY4NCIG5nN/1yt5DE8/4hk7P5a8DU87pG9j5GISOLh6FewpBmbd8hCNeXImCzz/djshYcFJlJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769429855; c=relaxed/simple;
-	bh=oBYAGLow77dO0fWYfBQJjR0bVNFLQFasCbUMJ19cc4k=;
+	bh=cjSjGxnYioTuTQkGGQeoMXFPLKV/lqjRqjCssEI4KVc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=umDvtbGuvBEgfkv+NSTJ0m+oXijXRAsUDrMoOSlCKyWUpok/7tGpL8oydwDBYta7F1JTssmU+5MPTRf6p5DPtM/Co8HFLBBNWclZmGnwq03pu+5OgTqR096iFW5FjNGJQ1FMiQ0L/tRn8HSoSwGRvmovABqADcfbFHyO+p8KD0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AmQ+qLuW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA77C116C6;
-	Mon, 26 Jan 2026 12:17:34 +0000 (UTC)
+	 MIME-Version; b=rwvOIu/HrMvut1WOEi8YDVko/wmEsPgqPINXUbBEzsemFlL1ihvzjB2WjQyafsXHWujF1YYlScovdrzzj3J9ERA0ANraDwTVWIG96xtdu6sjN0Z7dHcijPjWq6e4078pxYeJYqFlkK48bmQ7wlM1gf/UqG2kAiCoxquq54CWZQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lynbX/MK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E827C2BC87;
+	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769429854;
-	bh=oBYAGLow77dO0fWYfBQJjR0bVNFLQFasCbUMJ19cc4k=;
+	s=k20201202; t=1769429855;
+	bh=cjSjGxnYioTuTQkGGQeoMXFPLKV/lqjRqjCssEI4KVc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AmQ+qLuWOcv+C8wQTt+Bu1KLM99h1dRUWh7B6iw66A4vS3B3Iiv6nmpfAUWxOQt8Y
-	 l1FErAK8gva6TvNHCe0BuJZbPXLPt2ZkeUhOwWhtpAHfWqtI6pUl20rZRYupcUikd0
-	 2X47w8bORNXCFRDXruSNF12WD15as3KBcYLxnloMv9TmIjd+L6WpAHsQj58KVTZDUj
-	 49EM6Wr4Iww0Mx8EClrpyu44sRLipjRXBAJPn9DLv61X4+GDEdtK7s45GYmsEabQ8i
-	 SZnvQAMURc2r7/EwgwQZdtbLWLmIHlv2o4JHI9HCHlvPhMlC/d/C7J2XSZDPSXwAou
-	 a//W1XGGkha1Q==
+	b=lynbX/MKrusm4/GddjW2C1EcTeaJQuHw8aiCSS7Qb59DG6haFmWjqQv91Lne9rOhP
+	 Xm18Ia8UBL0QVFeo1MfGDe9D8Lwyf8SXJH/WRy0VR/DKFE/5yW7OaVrnKc7M1H5fAG
+	 Fu0GoabENZb4J/VHE6F1CDaQ4ehq0QWkWTi/BFZJhtW7kIv7ler9nUPwTSrRcqhKRx
+	 dnEKDXMz1SnjJQjSNYriyxl5pRJw4kYydCYPwQLevyeSyDhUSyXsDEH7BrZudkIxGH
+	 X5MsVIOYwrWag99XWz8r9hSQxBY+pilf79P3e5Jhdt+mGIN/sgPLv/fLteN5azlCD5
+	 LOUN+L8P/YP2g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vkLXB-00000005hx6-0DPL;
+	id 1vkLXB-00000005hx6-1Ahu;
 	Mon, 26 Jan 2026 12:17:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -61,9 +61,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 06/20] KVM: arm64: Inherit RESx bits from FGT register descriptors
-Date: Mon, 26 Jan 2026 12:16:40 +0000
-Message-ID: <20260126121655.1641736-7-maz@kernel.org>
+Subject: [PATCH 07/20] KVM: arm64: Allow RES1 bits to be inferred from configuration
+Date: Mon, 26 Jan 2026 12:16:41 +0000
+Message-ID: <20260126121655.1641736-8-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260126121655.1641736-1-maz@kernel.org>
 References: <20260126121655.1641736-1-maz@kernel.org>
@@ -84,7 +84,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69130-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69128-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -100,90 +100,54 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E1B6A881DC
+X-Rspamd-Queue-Id: 41B92881D5
 X-Rspamd-Action: no action
 
-The FGT registers have their computed RESx bits stashed in specific
-descriptors, which we can easily use when computing the masks used
-for the guest.
+So far, when a bit field is tied to an unsupported feature, we set
+it as RES0. This is almost forrect, but there are a few exceptions
+where the bits become RES1.
 
-This removes a bit of boilerplate code.
+Add a AS_RES1 qualifier that instruct the RESx computing code to
+simply do that.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/config.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/config.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index a907195bd44b6..8d152605999ba 100644
+index 8d152605999ba..6a4674fabf865 100644
 --- a/arch/arm64/kvm/config.c
 +++ b/arch/arm64/kvm/config.c
-@@ -1344,6 +1344,11 @@ struct resx compute_reg_resx_bits(struct kvm *kvm,
- 	resx = compute_resx_bits(kvm, r->bit_feat_map, r->bit_feat_map_sz,
- 				 require, exclude);
+@@ -24,6 +24,7 @@ struct reg_bits_to_feat_map {
+ #define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
+ #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
+ #define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bits */
++#define	AS_RES1		BIT(4)	/* RES1 when not supported */
  
-+	if (r->feat_map.flags & MASKS_POINTER) {
-+		resx.res0 |= r->feat_map.masks->res0;
-+		resx.res1 |= r->feat_map.masks->res1;
-+	}
-+
- 	tmp = compute_resx_bits(kvm, &r->feat_map, 1, require, exclude);
+ 	unsigned long	flags;
  
- 	resx.res0 |= tmp.res0;
-@@ -1424,47 +1429,36 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
- 	switch (reg) {
- 	case HFGRTR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hfgrtr_desc, 0, 0);
--		resx.res1 |= HFGRTR_EL2_RES1;
- 		break;
- 	case HFGWTR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hfgwtr_desc, 0, 0);
--		resx.res1 |= HFGWTR_EL2_RES1;
- 		break;
- 	case HFGITR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hfgitr_desc, 0, 0);
--		resx.res1 |= HFGITR_EL2_RES1;
- 		break;
- 	case HDFGRTR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hdfgrtr_desc, 0, 0);
--		resx.res1 |= HDFGRTR_EL2_RES1;
- 		break;
- 	case HDFGWTR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hdfgwtr_desc, 0, 0);
--		resx.res1 |= HDFGWTR_EL2_RES1;
- 		break;
- 	case HAFGRTR_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hafgrtr_desc, 0, 0);
--		resx.res1 |= HAFGRTR_EL2_RES1;
- 		break;
- 	case HFGRTR2_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hfgrtr2_desc, 0, 0);
--		resx.res1 |= HFGRTR2_EL2_RES1;
- 		break;
- 	case HFGWTR2_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hfgwtr2_desc, 0, 0);
--		resx.res1 |= HFGWTR2_EL2_RES1;
- 		break;
- 	case HFGITR2_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hfgitr2_desc, 0, 0);
--		resx.res1 |= HFGITR2_EL2_RES1;
- 		break;
- 	case HDFGRTR2_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hdfgrtr2_desc, 0, 0);
--		resx.res1 |= HDFGRTR2_EL2_RES1;
- 		break;
- 	case HDFGWTR2_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hdfgwtr2_desc, 0, 0);
--		resx.res1 |= HDFGWTR2_EL2_RES1;
- 		break;
- 	case HCRX_EL2:
- 		resx = compute_reg_resx_bits(kvm, &hcrx_desc, 0, 0);
+@@ -1316,8 +1317,12 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
+ 		else
+ 			match = idreg_feat_match(kvm, &map[i]);
+ 
+-		if (!match || (map[i].flags & FIXED_VALUE))
+-			resx.res0 |= reg_feat_map_bits(&map[i]);
++		if (!match || (map[i].flags & FIXED_VALUE)) {
++			if (map[i].flags & AS_RES1)
++ 				resx.res1 |= reg_feat_map_bits(&map[i]);
++			else
++				resx.res0 |= reg_feat_map_bits(&map[i]);
++		}
+ 	}
+ 
+ 	return resx;
 -- 
 2.47.3
 
