@@ -1,261 +1,352 @@
-Return-Path: <kvm+bounces-69080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69081-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPxpMwwgd2ntcQEAu9opvQ
-	(envelope-from <kvm+bounces-69080-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 09:04:28 +0100
+	id 8LNPDGsod2lzcwEAu9opvQ
+	(envelope-from <kvm+bounces-69081-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 09:40:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555AF85400
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 09:04:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B63E5858C3
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 09:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 400FE300CC3E
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 08:04:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F6073013000
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 08:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6C52F7462;
-	Mon, 26 Jan 2026 08:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYR+TB61";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuDWv+bc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEFD31353C;
+	Mon, 26 Jan 2026 08:39:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417BD2BEFF8
-	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 08:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769414649; cv=pass; b=Bqg/aqqJwKAdjBMGgxvz61EgXpej40NOdFOvVAPtidDWu7cLjruF0B3mibEWjwW9mGqP+aE0eL78Vq6KauFuStj2wIen9xeqxtf3OzdQ4gdDLRshLYDcYyZDlrPpcNfSSFcUPBREOE3/4vifPpRNBG8l88Ktzh4v3gk99pBkrdg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769414649; c=relaxed/simple;
-	bh=CWGx5SwOqaT/YlaB3Ps9+tQ+33m439GlJ4rNP6yIH50=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cpk/w8GC/eTdDbcHX3oR+HeqrXYjhXmkEnx8lydZaLWjrWrx0ibB9JEvD4AHMa66/4lzOjXv/sBd5QdeJRAPC7P3Uk+eA+GjTJYB/2tKz8tmV7/MmzaKmXxkHGv1bggvQn8odFs8gG4P3X6uw08bQwu7XGJ5+3a9wcAI92/7o7U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cYR+TB61; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuDWv+bc; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769414646;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZQZQO2mxRCQriV7DA3Ln3qIIcNBZotCw5GdvUiDLcg=;
-	b=cYR+TB61whsrhpPlhsZdy82K6780alQ8kRZ1tPoHvFhbuq+Tw4qSDlumGeP+K0VVrXGOdf
-	ZJoY2B/UDatUdcamIr0MokrBQAwT14egFZQ8W/DQ9zteblys+vAxbBcriEbmzeYsRLLO8I
-	7NlRCT2iZZvhV7LT6zw6/nFFUASc6qk=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-iBy0aPevNtyW621133ffjQ-1; Mon, 26 Jan 2026 03:04:04 -0500
-X-MC-Unique: iBy0aPevNtyW621133ffjQ-1
-X-Mimecast-MFC-AGG-ID: iBy0aPevNtyW621133ffjQ_1769414644
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-9483c03078cso9297402241.2
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 00:04:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769414644; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dzeWWsehg6XGewsgM9kGS01QIkTWM7s7nooiXT3g4VayNOWXrnAJX1m5fabkP0LBnB
-         QAFDzqjgqOn/pFQ9pc6LGoCW/Plua1nOryU6ZJni8rUoQNkmEGRTNUkOU+BrfX/6pK4Z
-         ZkLlY12L22CVlFDOHspERiXpNOt18z2cI9MThhrQsFj6TWwmA470NMPK8LWB0NVjc3iP
-         AT1VcO5KqR77M2LVHGGjS6+YJulmbTXeEYCikTp0R3MHwiMXau3xMdcVaVYFq8x9JQ7f
-         jRG+MmKI2hiTman8TWPrUxW0zBkIy659UuhtgqLGWJuh2VehbMwaQ4viWAUiJm2baiJ7
-         idCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=sZQZQO2mxRCQriV7DA3Ln3qIIcNBZotCw5GdvUiDLcg=;
-        fh=FY2Iq8OyEdiDXv5vw0tXKb3FYFaKgZqj10DGlpgvdE0=;
-        b=gTatOcFHztUYqQ0EAGXMyoTAVHyImgKj1IejCIT2B+Ymln9YxK5Kj/RihlLN17hR9X
-         LNPgvXDGPoUlr+u8lafUlgCP7xoZEi+J+aeFrd37FQGJdZ8/D0kmOS86T1aHXJpz+wQ1
-         ooTt1A1SuG0vnPKNnRVxhkc8ROcz5xtSLbzA7TKvVIgkvXIupDZ5gBwKCp0aYF5I8TEL
-         q0A2Jzh83BNdl3UXjkp3sUDSCUPQtdN2jZ+ESBZwDyRHdp/EXiHz2aqAMHc8sbYF9mH0
-         wynY99WTVvOrPeeb3+Bd7idFLH6XFfyZJKeuKm++kZuGLCRiXsHRcXx/Lp6ro2hMP4Br
-         xLTw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769414644; x=1770019444; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZQZQO2mxRCQriV7DA3Ln3qIIcNBZotCw5GdvUiDLcg=;
-        b=JuDWv+bcP6ADImm1z8JAVSCcOI2wd5SS1rB5j/KuS+1M5SMp/7gii+JRTBiJuRxhLe
-         JCfg4d9KNLsAgGGskKh3M15TyT3hMqV/uG+RlQqIpCHWkuLJboZMZx8TZjkVvTFe/5Zg
-         2bk0Qu4kxS53vv/FxcQnLA8zMGcwR6n06snz+VInpBbVx2M+IxiBvq1YIAIgZeCkTk5o
-         p2+DPyQkl/c0ZgPxRGQ3idpqXinaPqwIeVwHT4Ep1koPly0p26s1egHX10T0AXTujktg
-         ANb65p9bAPFfeDlZconLDzkjmv8akbKMPwHdYege/mAt0EFXovawsMwqNImtPu1oF5bx
-         ntrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769414644; x=1770019444;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sZQZQO2mxRCQriV7DA3Ln3qIIcNBZotCw5GdvUiDLcg=;
-        b=xUFfoKQGqmZ/p8Hd2AcVqB5MWf6QOUscCPe7dOfnbp5QdBd1y8OI3fpPt883yC7fWT
-         rrvUppU+ScAw6qKht8b1h5LGBPOlYlz7A37h6h2YXVAQcHvO00o8ExQ2tGgofmatkJP/
-         OWmvDHlV5xRV15I7HoBRnsUXF4ewyivIB2JII3b1dCSzAQk241fCkE2DZrsRqTOR0T2U
-         PpWl/Vv4VjVci47F3VcYoEiNNaz/9Q5YDAZCi6eRlekdwB2TtoLRIKPuEwdouE5SO4Vh
-         KLnCFY6f7MKCCxuiPtH9WhRI/CRp9bw8ZLSBNcIPzZmnMHx88G0ohzADn09gNG9rx3Bx
-         zQGg==
-X-Forwarded-Encrypted: i=1; AJvYcCV//oxM4GLTOUmqAJjonyby3DQL3eJ6dCEJW7Bb9xsP0OnGn9UFKr/CVBsAEzXBaraRUGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxddv35muU5HId+/ERJm/aSeV/jB4o0IWxpTYcU0ERONCG71DXr
-	sL5MSg58zx3Xc53rN9rLgNsGDmrjgCBzznqMvIwtoI0YXIy/sUfgUXO+hmIaekHw204qpigDiE3
-	hjP9POLS/ziDtKmu+OAOADJZH4UBG199uGbaoY3B4KNz30r4jOmAoNMF+5V0IjL7cgDy1fUK4QF
-	PADn4L83GqakOEq3mXLcAF6RRTLN2P
-X-Gm-Gg: AZuq6aK8G1GTFbP6iGoWsE63c8ygeAPwn93pYZ/3jRcUIi8oeUl7xitquuhI1R3r0iF
-	zef/nBIMofVN1a9IEWGPBm/CGUcC2BLjXgVzefGkGVxFKpnePo3btDXhJiGCF+C1TjhUL0l4/o9
-	y//uAYCSduZ8FmI6FzwY1Uq5odbxfxf5lET+1H6udaefygNhmb4HhvCXtmKU78/GLUMvU=
-X-Received: by 2002:a05:6102:32d1:b0:5f5:48df:b869 with SMTP id ada2fe7eead31-5f57651cce8mr1098108137.44.1769414643919;
-        Mon, 26 Jan 2026 00:04:03 -0800 (PST)
-X-Received: by 2002:a05:6102:32d1:b0:5f5:48df:b869 with SMTP id
- ada2fe7eead31-5f57651cce8mr1098098137.44.1769414643588; Mon, 26 Jan 2026
- 00:04:03 -0800 (PST)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F892BEC27;
+	Mon, 26 Jan 2026 08:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769416796; cv=none; b=Pcm1MhIo+TmohEyn4gEKswhBd0NAVgreJGHjLLz6ILF9/r0VDHZZvz6Vt1k7bzcxXRvq5C11vUlLofgZLg53Wogg4oZKpiAFKY03J7qwmed0c0eRMimaeXznqzNo1O8YQbE4YULTRF837WOhCJxMg+8Qt0IYEdienv8j+WK6//Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769416796; c=relaxed/simple;
+	bh=Z+5dKRYi+B3DHUXM1cr54CFqwfBXTNTdCZwJAXx+vNU=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=htu3yh8GOPsPvRR0Fe0zZhJ3PRSzX0hGytsIaki0q6QauOs03YuoZQ7+HQVKBw9F3uxK4ITsi2Us9NGhCepwLIYywKLR/MqZsvB89qawcgICKL/vJFn7hvEenbqKgmPEoKLNiMTpdpz/0O23fvBar9jB7O+JzE7jde/tT8zAxOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8DxAfFUKHdpf6cMAA--.41579S3;
+	Mon, 26 Jan 2026 16:39:48 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJDxTMJDKHdpCLoxAA--.30815S3;
+	Mon, 26 Jan 2026 16:39:33 +0800 (CST)
+Subject: Re: [PATCH 1/1] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
+To: liushuyu <liushuyu@aosc.io>, WANG Xuerui <kernel@xen0n.name>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: Kexy Biscuit <kexybiscuit@aosc.io>, Mingcong Bai <jeffbai@aosc.io>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Paul Walmsley <pjw@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Miguel Ojeda <ojeda@kernel.org>,
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-riscv@lists.infradead.org,
+ rust-for-linux@vger.kernel.org
+References: <20260125054322.1237687-1-liushuyu@aosc.io>
+ <4b504274-4241-0e3e-3ed3-7804b72b7ee8@loongson.cn>
+ <972430be-d2f3-49b6-851b-a057ddfcafec@aosc.io>
+ <29565e27-f153-c2c5-cbc3-e0457d45f094@loongson.cn>
+ <2fa2dc72-b24e-4504-8c8e-e4ecacda02c4@aosc.io>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <13746394-1a33-894a-d325-8125743f7906@loongson.cn>
+Date: Mon, 26 Jan 2026 16:36:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260119055447.229772-1-lulu@redhat.com> <20260119055447.229772-3-lulu@redhat.com>
- <aW3JstEHDXjj80OL@test-OptiPlex-Tower-Plus-7010>
-In-Reply-To: <aW3JstEHDXjj80OL@test-OptiPlex-Tower-Plus-7010>
-From: Cindy Lu <lulu@redhat.com>
-Date: Mon, 26 Jan 2026 16:03:24 +0800
-X-Gm-Features: AZwV_Qixdd4SbLBwLRkXMVFpsz1u-BKiGH2rTPLdxtlyFEEtvuaiAvDni2PEalU
-Message-ID: <CACLfguVXA6mpx6FUS-gwuXs0treNn_-D_-cxxAnwUD=mmztccw@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] vdpa/mlx5: reuse common function for MAC address updates
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, 
-	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <2fa2dc72-b24e-4504-8c8e-e4ecacda02c4@aosc.io>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJDxTMJDKHdpCLoxAA--.30815S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3WFy7Cw1rur15GFWxJw45XFc_yoW3Cw48pr
+	ykCFW5JrW5Jrn3Jr1j9w15WF9Fyr1UJ3WDXr1fXFyUAr4Dtr12qr18XryqgF18J3y8JF40
+	qr1UXr17urs8A3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUA529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUShiSDU
+	UUU
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_FROM(0.00)[bounces-69081-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69080-lists,kvm=lfdr.de];
+	DMARC_NA(0.00)[loongson.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[aosc.io,redhat.com,lwn.net,loongson.cn,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com,garyguo.net,protonmail.com,google.com,umich.edu,vger.kernel.org,lists.linux.dev,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lulu@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.995];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[marvell.com:email,mail.gmail.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 555AF85400
+	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B63E5858C3
 X-Rspamd-Action: no action
 
-On Mon, Jan 19, 2026 at 2:05=E2=80=AFPM Hariprasad Kelam <hkelam@marvell.co=
-m> wrote:
->
-> On 2026-01-19 at 11:23:52, Cindy Lu (lulu@redhat.com) wrote:
-> > Factor out MAC address update logic and reuse it from handle_ctrl_mac()=
-.
-> >
-> > This ensures that old MAC entries are removed from the MPFS table
-> > before adding a new one and that the forwarding rules are updated
-> > accordingly. If updating the flow table fails, the original MAC and
-> > rules are restored as much as possible to keep the software and
-> > hardware state consistent.
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> >
-> > Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > ---
-> >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 131 ++++++++++++++++--------------
-> >  1 file changed, 71 insertions(+), 60 deletions(-)
-> >
-> > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/=
-mlx5_vnet.c
-> > index 6e42bae7c9a1..7a39843de243 100644
-> > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > @@ -2125,86 +2125,97 @@ static void teardown_steering(struct mlx5_vdpa_=
-net *ndev)
-> >       mlx5_destroy_flow_table(ndev->rxft);
-> >  }
-> >
-> > -static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev=
-, u8 cmd)
-> > +static int mlx5_vdpa_change_mac(struct mlx5_vdpa_net *ndev,
-> > +                             struct mlx5_core_dev *pfmdev,
-> > +                             const u8 *new_mac)
-> >  {
-> > -     struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
-> > -     struct mlx5_control_vq *cvq =3D &mvdev->cvq;
-> > -     virtio_net_ctrl_ack status =3D VIRTIO_NET_ERR;
-> > -     struct mlx5_core_dev *pfmdev;
-> > -     size_t read;
-> > -     u8 mac[ETH_ALEN], mac_back[ETH_ALEN];
-> > +     struct mlx5_vdpa_dev *mvdev =3D &ndev->mvdev;
-> > +     u8 old_mac[ETH_ALEN];
-> >
-> > -     pfmdev =3D pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
-> > -     switch (cmd) {
-> > -     case VIRTIO_NET_CTRL_MAC_ADDR_SET:
-> > -             read =3D vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov, (=
-void *)mac, ETH_ALEN);
-> > -             if (read !=3D ETH_ALEN)
-> > -                     break;
-> > +     if (is_zero_ether_addr(new_mac))
-> > +             return -EINVAL;
-> >
-> > -             if (!memcmp(ndev->config.mac, mac, 6)) {
-> > -                     status =3D VIRTIO_NET_OK;
-> > -                     break;
-> > +     if (!is_zero_ether_addr(ndev->config.mac)) {
-> > +             if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
-> > +                     mlx5_vdpa_warn(mvdev, "failed to delete old MAC %=
-pM from MPFS table\n",
-> > +                                    ndev->config.mac);
-> > +                     return -EIO;
-> >               }
-> > +     }
-> >
-> > -             if (is_zero_ether_addr(mac))
-> > -                     break;
-> > +     if (mlx5_mpfs_add_mac(pfmdev, (u8 *)new_mac)) {
-> > +             mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into =
-MPFS table\n",
-> > +                            new_mac);
-> > +             return -EIO;
-> > +     }
-> >
-> > -             if (!is_zero_ether_addr(ndev->config.mac)) {
-> > -                     if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) =
+
+
+On 2026/1/26 下午12:22, liushuyu wrote:
+> Hi Bibo,
+> 
+>>
+>>
+>> On 2026/1/26 上午11:38, liushuyu wrote:
+>>> Hi Bibo,
+>>>>
+>>>>
+>>>> On 2026/1/25 下午1:43, Zixing Liu wrote:
+>>>>> This ioctl can be used by userspace applications to determine which
+>>>>> (special) registers are get/set-able.
+>>>>>
+>>>>> This can be very useful for cross-platform VMMs so that they do not
+>>>>> have
+>>>>> to hardcode register indices for each supported architectures.
+>>>>>
+>>>>> Signed-off-by: Zixing Liu <liushuyu@aosc.io>
+>>>>> ---
+>>>>>
+>>>>> For example, this ioctl could be used by rust-vmm/rust-kvm or maybe
+>>>>> VirtualBox-kvm in the future.
+>>>>>
+>>>>>     Documentation/virt/kvm/api.rst |  2 +-
+>>>>>     arch/loongarch/kvm/vcpu.c      | 69
+>>>>> ++++++++++++++++++++++++++++++++++
+>>>>>     2 files changed, 70 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/Documentation/virt/kvm/api.rst
+>>>>> b/Documentation/virt/kvm/api.rst
+>>>>> index 01a3abef8abb..f46dd8be282f 100644
+>>>>> --- a/Documentation/virt/kvm/api.rst
+>>>>> +++ b/Documentation/virt/kvm/api.rst
+>>>>> @@ -3603,7 +3603,7 @@ VCPU matching underlying host.
+>>>>>     ---------------------
+>>>>>       :Capability: basic
+>>>>> -:Architectures: arm64, mips, riscv, x86 (if KVM_CAP_ONE_REG)
+>>>>> +:Architectures: arm64, loongarch, mips, riscv, x86 (if
+>>>>> KVM_CAP_ONE_REG)
+>>>>>     :Type: vcpu ioctl
+>>>>>     :Parameters: struct kvm_reg_list (in/out)
+>>>>>     :Returns: 0 on success; -1 on error
+>>>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>>>>> index 656b954c1134..b884eb9c76aa 100644
+>>>>> --- a/arch/loongarch/kvm/vcpu.c
+>>>>> +++ b/arch/loongarch/kvm/vcpu.c
+>>>>> @@ -1186,6 +1186,57 @@ static int kvm_loongarch_vcpu_set_attr(struct
+>>>>> kvm_vcpu *vcpu,
+>>>>>         return ret;
+>>>>>     }
+>>>>>     +static unsigned long kvm_loongarch_num_lbt_regs(void)
+>>>>> +{
+>>>>> +    /* +1 for the LBT_FTOP flag (inside arch.fpu) */
+>>>>> +    return sizeof(struct loongarch_lbt) / sizeof(unsigned long) + 1;
+>>>>> +}
+>>>>> +
+>>>>> +static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +    /* +1 for the KVM_REG_LOONGARCH_COUNTER register */
+>>>>> +    unsigned long res = CSR_MAX_NUMS + KVM_MAX_CPUCFG_REGS + 1;
+>>>>> +
+>>>>> +    if (kvm_guest_has_lbt(&vcpu->arch))
+>>>>> +        res += kvm_loongarch_num_lbt_regs();
+>>>>> +
+>>>>> +    return res;
+>>>>> +}
+>>>>> +
+>>>>> +static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
+>>>>> +                      u64 __user *uindices)
+>>>>> +{
+>>>>> +    u64 reg;
+>>>>> +    unsigned int i;
+>>>>> +
+>>>>> +    for (i = 0; i < CSR_MAX_NUMS; i++) {
+>>>>> +        reg = KVM_IOC_CSRID(i);
+>>>>> +        if (put_user(reg, uindices++))
+>>>>> +            return -EFAULT;
+>>>>> +    }
+>>>> CSR_MAX_NUMS is max number of accessible CSR registers, instead only
+>>>> part of them is used by vCPU model. By my understanding, there will be
+>>>> no much meaning if CSR_MAX_NUMS is returned. And I think it will be
+>>>> better if real CSR register id and number is returned.
+>>>>
+>>> Did you mean we should only return the CSR registers initialized in this
+>>> function
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/loongarch/kvm/main.c?id=63804fed149a6750ffd28610c5c1c98cce6bd377#n48
+>>>
+>>> ?
+>>>
+>>> That looks like a very large list and the values of the register IDs are
+>>> not fully continuous. If that is the case, how do we maintain the
+>>> get/set-able CSR register list?
+>> It will be better if CSR register list can be categorized, for example
+>> with LoongArch CPU manual CSR register is split into 8 types from
+>> chapter 7.4 -- 7.11
+>>
+>> At the beginning, there is big array with size CSR_MAX_NUMS without
+>> any category, it can be fine-gained in late.
+> 
+> Does that mean in the new `kvm_loongarch_copy_reg_indices` function, it
+> is also okay to embed this big list in there?
+Firstly I do not know how to use ioctl command KVM_GET_REG_LIST in VMM 
+actually.
+
+At the second from the word "determine which (special) registers are 
+get/set-able", I think that it is better to set accessible CSR register 
+number and ID rather than the total number CSR_MAX_NUMS.
+
++static int kvm_loongarch_num_csr_regs(struct kvm_vcpu *vcpu)
++{
++	unsigned int i, count;
++
++	count = 0
++	for (i = 0; i < CSR_MAX_NUMS; i++) {
++		if (!(get_gcsr_flag(i) & (SW_GCSR | HW_GCSR)))
++			continue;
++		count++;
++	}
++	return count;
++}
+
+static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
 {
-> > -                             mlx5_vdpa_warn(mvdev, "failed to delete o=
-ld MAC %pM from MPFS table\n",
-> > -                                            ndev->config.mac);
-> > -                             break;
-> > -                     }
-> > -             }
-> > +     /* backup the original mac address so that if failed to add the f=
-orward rules
-> > +      * we could restore it
-> > +      */
-> > +     memcpy(old_mac, ndev->config.mac, ETH_ALEN);
->         can we use "ether_addr_copy" instead of memcpy?
+	/* +1 for the KVM_REG_LOONGARCH_COUNTER register */
++	unsigned long res = kvm_loongarch_num_csr_regs + KVM_MAX_CPUCFG_REGS + 1;
+
+	if (kvm_guest_has_lbt(&vcpu->arch))
+		res += kvm_loongarch_num_lbt_regs();
+
+	return res;
+}
+
+static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
+					  u64 __user *uindices)
+{
+	u64 reg;
+	unsigned int i;
+
+	for (i = 0; i < CSR_MAX_NUMS; i++) {
++                if (!(get_gcsr_flag(i) & (SW_GCSR | HW_GCSR)))
++                    continue;
+		reg = KVM_IOC_CSRID(i);
+		if (put_user(reg, uindices++))
+			return -EFAULT;
+	}
+
+Regards
+Bibo Mao
+> 
+> Or do you want to extract the list from the `kvm_init_gcsr_flag`
+> function and refactor both functions to share one single big list
+> (probably in the kvm_host.h header)?
+> 
+> Because from what I could understand, your previous messages point to
+> that we need to use this list to make out what CSR registers to return
+> to the user space VMMs.
+
+> 
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>>> Regards
+>>>> Bibo Mao
+>>>>> +
+>>>>> +    for (i = 0; i < KVM_MAX_CPUCFG_REGS; i++) {
+>>>>> +        reg = KVM_IOC_CPUCFG(i);
+>>>>> +        if (put_user(reg, uindices++))
+>>>>> +            return -EFAULT;
+>>>>> +    }
+>>>>> +
+>>>>> +    reg = KVM_REG_LOONGARCH_COUNTER;
+>>>>> +    if (put_user(reg, uindices++))
+>>>>> +        return -EFAULT;
+>>>>> +
+>>>>> +    if (!kvm_guest_has_lbt(&vcpu->arch))
+>>>>> +        return 0;
+>>>>> +
+>>>>> +    for (i = 1; i <= kvm_loongarch_num_lbt_regs(); i++) {
+>>>>> +        reg = (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | i);
+>>>>> +        if (put_user(reg, uindices++))
+>>>>> +            return -EFAULT;
+>>>>> +    }
+>>>>> +
+>>>>> +    return 0;
+>>>>> +}
+>>>>> +
+>>>>>     long kvm_arch_vcpu_ioctl(struct file *filp,
+>>>>>                  unsigned int ioctl, unsigned long arg)
+>>>>>     {
+>>>>> @@ -1251,6 +1302,24 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>>>>>             r = kvm_loongarch_vcpu_set_attr(vcpu, &attr);
+>>>>>             break;
+>>>>>         }
+>>>>> +    case KVM_GET_REG_LIST: {
+>>>>> +        struct kvm_reg_list __user *user_list = argp;
+>>>>> +        struct kvm_reg_list reg_list;
+>>>>> +        unsigned n;
+>>>>> +
+>>>>> +        r = -EFAULT;
+>>>>> +        if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
+>>>>> +            break;
+>>>>> +        n = reg_list.n;
+>>>>> +        reg_list.n = kvm_loongarch_num_regs(vcpu);
+>>>>> +        if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
+>>>>> +            break;
+>>>>> +        r = -E2BIG;
+>>>>> +        if (n < reg_list.n)
+>>>>> +            break;
+>>>>> +        r = kvm_loongarch_copy_reg_indices(vcpu, user_list->reg);
+>>>>> +        break;
+>>>>> +    }
+>>>>>         default:
+>>>>>             r = -ENOIOCTLCMD;
+>>>>>             break;
+>>>>>
+>>>>
+>>> Thanks,
+>>> Zixing
+>>>
+>>
 > Thanks,
-> Hariprasad k
->
-Thanks  Hariprasad, will change this
-Thanks
-cindy
+> Zixing
+> 
 
 
