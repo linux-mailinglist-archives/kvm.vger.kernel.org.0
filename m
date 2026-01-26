@@ -1,273 +1,323 @@
-Return-Path: <kvm+bounces-69147-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69148-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKmPCZORd2m9hgEAu9opvQ
-	(envelope-from <kvm+bounces-69147-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 17:08:51 +0100
+	id 8FS7Dvmbd2nOjAEAu9opvQ
+	(envelope-from <kvm+bounces-69148-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 17:53:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40578A7EC
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 17:08:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813D28AFCA
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 17:53:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AC3C43008D5D
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 16:08:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68301309927B
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 16:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A1A2D7810;
-	Mon, 26 Jan 2026 16:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313E0348862;
+	Mon, 26 Jan 2026 16:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WLJuCO/x"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="pKcZSazx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-009.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-009.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.64.237.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7BF2D248D
-	for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 16:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2DD348458;
+	Mon, 26 Jan 2026 16:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.64.237.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769443715; cv=none; b=ouW3R9oLn/5g3+zdmRcUjy5lvQIY/ObotRVBxUDPg2iz+1qS1Ta2rwZ/yeAmHRmoBgQ3UsllJ9VP3dEvvTVQkP/A50R02Pj9zIGkYCX/d4yZ5PgzN+Zrz0EhX51fBysJBlg6m82j+vgUJN5wHy+NPs0RcJhJZScJ0jbcXutNJz8=
+	t=1769446033; cv=none; b=XF+MSj8zoB1MeJZ61T6uVXhLnbXiofQmLU2aCAM9Eny/kd8OtrCbkW4Eii0gmIljUiY0Oa3/zds+d66Z28I5yvtwCMgkHjYz1x/GgEbrc6FX8ziScj5K6cE20dLGP5cz4SDozys98PQWZV0NPrZKLYnhgK39yqzV9J003wagatc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769443715; c=relaxed/simple;
-	bh=i0/13UOjqh0H3hZJeMeCEeSDxzFDhYSRZibCgyJD3Mg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F3BFD1vXWgH8n3d+a7LqLQnrZ1Hl+YND8FUB3KleitI9VXnWOFwdbT+4BI7pPuYBxnv5qOs9QIvkqd3nUIOhhpPqs4dfsoaJxeDWLYmkvZjhYpokpj6MI4zUUYe7A/vn7X73MXaXxImnn32QY15XMj7I7A+3G/BRophNjnGi0Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WLJuCO/x; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0b7eb0a56so40709135ad.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 08:08:33 -0800 (PST)
+	s=arc-20240116; t=1769446033; c=relaxed/simple;
+	bh=Jj2MWM7REKjQ3mCzvIc3KbcDhzOgxwLiYIXs/egsra4=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=V+pS8v09uCEwYEEd6eWYHtNt3fsVKPnlCEWhSlXw37iZ/YBOqtrMXX2l6zv6LlB+cB9eJrGlux3ziDw67MagTAAbkBf5xmnwGDBx92t90QuphiB+A5akj6FL5FqLliZqOR3azAYaHE5jg9vbb+cneiFa1BOBHeDeKB3KweDr4d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=pKcZSazx; arc=none smtp.client-ip=3.64.237.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769443713; x=1770048513; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=alAqfZOV4sw1YlCowUnVJaN2ywOCmoZakqxs5MHjFzo=;
-        b=WLJuCO/xm3vJQ9x4Xp78aMC8+8F58hufBFu7vHBSfO/HarDorOmEvJMMi6i2a9N9bk
-         nfpASEkgcz0MEICEKRmtzOjdXhaTrk6/58tnvtOIleRs+OiurNxwIlLk4346pDFvvg/r
-         nQCNB42aMvPw2tIbmR3x/6Eu1qWnoZOYCOmPmpfAAPKzqlduC84N+gvxl5RKLxvLZdHu
-         GStF1IiEdlwWW4LOC0Le979Kt9z5Gz9gBHAJ0FJbyx00up2M9JXLmrNm15owAdk0dIeB
-         /zJvbLsBvRJ65f0R+0hWEf43qi90aJp1GiuRC9WsGv/QV0t6/mNvYSast/ibUNqH5T6Q
-         es/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769443713; x=1770048513;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=alAqfZOV4sw1YlCowUnVJaN2ywOCmoZakqxs5MHjFzo=;
-        b=MJxfaT81K8q7ov1+CN2hR3ob2pTHQY8JM/Fz8ZDMznDyynNIOifIqjb15aKXKNwCEh
-         FqLMWpFe1rwCAyOE28loCF5y7UYf66gV5bPRFTaOxx2Oh9ssrPeF0NpXx77ggt8NjPq8
-         0UoYYyvPb8NWxp9oQur/UaKxzeF2w4LhEHSAiEmFiRrvNl3zjXcme7vDgM+5jbTz2OE1
-         nMZOcRL5d0hY+27e2b0uYhcUbR5oBPYAsVaM1DYF20xGOeMZZaJSSaZYZ4dvBmm1p1/L
-         q66vDW5rsjGJX2ZkyOlvyZGiwgsc2qrWKy8ph8Sj1j+8HaL3ZHsR/ZfxQga7lQ+u2GJI
-         9+uQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXjQgy99aY4cXOHRtyMfG+4BF9OinVg2/1eoDpm+t/O1CnC07zT9z/AgE597E3WnvPr3aw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwetfvpWCFn6eBzcKrMIteOLbFz8pgx1MlTkvnxC0+LrwNbA/41
-	CBwt5HbDVrrYbMrQHo9qIEH8+FinoocmV0UYWmdAQvNKS773cfS7/Ex+/Qo0ihpj0Lvmxkw3KJd
-	XLKunqg==
-X-Received: from pgcv7.prod.google.com ([2002:a05:6a02:5307:b0:c63:4c04:8201])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2443:b0:38d:ef23:12d1
- with SMTP id adf61e73a8af0-38e9f2470efmr4284684637.74.1769443713399; Mon, 26
- Jan 2026 08:08:33 -0800 (PST)
-Date: Mon, 26 Jan 2026 08:08:31 -0800
-In-Reply-To: <aWnuwb/2TrPAOrbu@yzhao56-desk.sh.intel.com>
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1769446029; x=1800982029;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=tbv/MTwQoTKHu7Ejd3vLaiU5iszGht/IvO/yWSvhW4o=;
+  b=pKcZSazxJzC/PmBxPNy6WOccDoCCl86D+PPFANf66eX1ot6JC5ZZ76P/
+   0Afi8x3WN4r/rI3rhAtg/63BPEsUQUcczIUS4WOCcJJhQubt0L6O/tn22
+   u/70/x7BSITn6XzNwe72ZQTkLjfZ1utaje3KrMMAgkX2xwVkqJyIQEUJ9
+   psA5rwV4M7nvrvwOPse+EefGt9obsagTfBrHLx58Ck8/OR/rRsPfIvy/J
+   b6T74DiPssvwgHhcfa0zyudTOj6tsbsHZc+s0oDUEDfnmID+8gKkO0qNs
+   NsLVzfAw5lx/dhUJqa1qdQJpermH+w7SGgA41bYeZVvr+6E6zTOb5S1gZ
+   w==;
+X-CSE-ConnectionGUID: 6IHftKH7SsOlKU7AyD1EnA==
+X-CSE-MsgGUID: kMm4jjHORlWTkE3xuKVThA==
+X-IronPort-AV: E=Sophos;i="6.21,255,1763424000"; 
+   d="scan'208";a="8361622"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-009.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 16:46:49 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.233:30081]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.13.191:2525] with esmtp (Farcaster)
+ id 867ddae6-4aab-4228-9189-c90a4ffe3bcf; Mon, 26 Jan 2026 16:46:48 +0000 (UTC)
+X-Farcaster-Flow-ID: 867ddae6-4aab-4228-9189-c90a4ffe3bcf
+Received: from EX19D005EUB004.ant.amazon.com (10.252.51.126) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Mon, 26 Jan 2026 16:46:48 +0000
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19D005EUB004.ant.amazon.com (10.252.51.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Mon, 26 Jan 2026 16:46:48 +0000
+Received: from EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c]) by
+ EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c%3]) with mapi id
+ 15.02.2562.035; Mon, 26 Jan 2026 16:46:48 +0000
+From: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>
+CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
+	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
+	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org"
+	<willy@infradead.org>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>,
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, "vbabka@suse.cz"
+	<vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com"
+	<surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org"
+	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
+	<martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
+	<yonghong.song@linux.dev>, "john.fastabend@gmail.com"
+	<john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "jannh@google.com" <jannh@google.com>,
+	"pfalcato@suse.de" <pfalcato@suse.de>, "shuah@kernel.org" <shuah@kernel.org>,
+	"riel@surriel.com" <riel@surriel.com>, "ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>, "jgross@suse.com" <jgross@suse.com>,
+	"yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>, "kas@kernel.org"
+	<kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
+	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
+	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
+	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
+	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
+	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
+	<gor@linux.ibm.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pjw@kernel.org" <pjw@kernel.org>,
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
+	"svens@linux.ibm.com" <svens@linux.ibm.com>, "thuth@redhat.com"
+	<thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>,
+	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
+	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
+	<urezki@gmail.com>, "zhengqi.arch@bytedance.com"
+	<zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
+	<gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
+	<jiayuan.chen@shopee.com>, "lenb@kernel.org" <lenb@kernel.org>,
+	"osalvador@suse.de" <osalvador@suse.de>, "pavel@kernel.org"
+	<pavel@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
+	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
+	<jackmanb@google.com>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
+	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
+	<xmarcalx@amazon.co.uk>, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
+Subject: [PATCH v10 00/15] Direct Map Removal Support for guest_memfd
+Thread-Topic: [PATCH v10 00/15] Direct Map Removal Support for guest_memfd
+Thread-Index: AQHcjuMVKu9EzWzx90GD17TC625r+Q==
+Date: Mon, 26 Jan 2026 16:46:47 +0000
+Message-ID: <20260126164445.11867-1-kalyazin@amazon.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260106101646.24809-1-yan.y.zhao@intel.com> <20260106102024.25023-1-yan.y.zhao@intel.com>
- <aWlvF2rld0Nz3nRz@google.com> <aWnuwb/2TrPAOrbu@yzhao56-desk.sh.intel.com>
-Message-ID: <aXeRf4Jw6-Sl1JCe@google.com>
-Subject: Re: [PATCH v3 06/24] KVM: x86/mmu: Disallow page merging (huge page
- adjustment) for mirror root
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	x86@kernel.org, rick.p.edgecombe@intel.com, dave.hansen@intel.com, 
-	kas@kernel.org, tabba@google.com, ackerleytng@google.com, 
-	michael.roth@amd.com, david@kernel.org, vannapurve@google.com, 
-	sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com, 
-	nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.co.uk:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.co.uk,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[amazon.co.uk:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[redhat.com,lwn.net,kernel.org,arm.com,huawei.com,google.com,alien8.de,linux.intel.com,zytor.com,infradead.org,linux-foundation.org,oracle.com,suse.cz,suse.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,ziepe.ca,nvidia.com,suse.de,surriel.com,intel.com,loongson.cn,amd.com,linux.ibm.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,os.amperecomputing.com,bytedance.com,shopee.com,amazon.co.uk,amazon.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amazon.co.uk:dkim,vusec.net:url];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69147-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,kernel.org,intel.com,google.com,amd.com,suse.cz,suse.com,gmail.com,linux.intel.com];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69148-lists,kvm=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: B40578A7EC
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[amazon.co.uk:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.co.uk,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[104];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 813D28AFCA
 X-Rspamd-Action: no action
 
-On Fri, Jan 16, 2026, Yan Zhao wrote:
-> Hi Sean,
-> Thanks for the review!
-> 
-> On Thu, Jan 15, 2026 at 02:49:59PM -0800, Sean Christopherson wrote:
-> > On Tue, Jan 06, 2026, Yan Zhao wrote:
-> > > From: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-> > > 
-> > > Disallow page merging (huge page adjustment) for the mirror root by
-> > > utilizing disallowed_hugepage_adjust().
-> > 
-> > Why?  What is this actually doing?  The below explains "how" but I'm baffled as
-> > to the purpose.  I'm guessing there are hints in the surrounding patches, but I
-> > haven't read them in depth, and shouldn't need to in order to understand the
-> > primary reason behind a change.
-> Sorry for missing the background. I will explain the "why" in the patch log in
-> the next version.
-> 
-> The reason for introducing this patch is to disallow page merging for TDX. I
-> explained the reasons to disallow page merging in the cover letter:
-> 
-> "
-> 7. Page merging (page promotion)
-> 
->    Promotion is disallowed, because:
-> 
->    - The current TDX module requires all 4KB leafs to be either all PENDING
->      or all ACCEPTED before a successful promotion to 2MB. This requirement
->      prevents successful page merging after partially converting a 2MB
->      range from private to shared and then back to private, which is the
->      primary scenario necessitating page promotion.
-> 
->    - tdh_mem_page_promote() depends on tdh_mem_range_block() in the current
->      TDX module. Consequently, handling BUSY errors is complex, as page
->      merging typically occurs in the fault path under shared mmu_lock.
-> 
->    - Limited amount of initial private memory (typically ~4MB) means the
->      need for page merging during TD build time is minimal.
-> "
-
-> However, we currently don't support page merging yet. Specifically for the above
-> scenariol, the purpose is to avoid handling the error from
-> tdh_mem_page_promote(), which SEAMCALL currently needs to be preceded by
-> tdh_mem_range_block(). To handle the promotion error (e.g., due to busy) under
-> read mmu_lock, we may need to introduce several spinlocks and guarantees from
-> the guest to ensure the success of tdh_mem_range_unblock() to restore the S-EPT
-> status. 
-> 
-> Therefore, we introduced this patch for simplicity, and because the promotion
-> scenario is not common.
-
-Say that in the changelog!  Describing the "how" in detail is completely unnecessary,
-or at least it should be.  Because I strongly disagree with Rick's opinion from
-the RFC that kvm_tdp_mmu_map() should check kvm_has_mirrored_tdp()[*].
-
- : I think part of the thing that is bugging me is that
- : nx_huge_page_workaround_enabled is not conceptually about whether the specific
- : fault/level needs to disallow huge page adjustments, it's whether it needs to
- : check if it does. Then disallowed_hugepage_adjust() does the actual specific
- : checking. But for the mirror logic the check is the same for both. It's
- : asymmetric with NX huge pages, and just sort of jammed in. It would be easier to
- : follow if the kvm_tdp_mmu_map() conditional checked wither mirror TDP was
- : "active", rather than the mirror role.
-
-[*] http://lore.kernel.org/all/eea0bf7925c3b9c16573be8e144ddcc77b54cc92.camel@intel.com
-
-If the changelog explains _why_, and the code is actually commented, then calling
-into disallowed_hugepage_adjust() for all faults in a VM with mirrored roots is
-nonsensical, because the code won't match the comment.
-
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Date: Tue, 22 Apr 2025 10:21:12 +0800
-Subject: [PATCH] KVM: x86/mmu: Prevent hugepage promotion for mirror roots in
- fault path
-
-Disallow hugepage promotion in the TDP MMU for mirror roots as KVM doesn't
-currently support promoting S-EPT entries due to the complexity incurred
-by the TDX-Module's rules for hugepage promotion.
-
- - The current TDX-Module requires all 4KB leafs to be either all PENDING
-   or all ACCEPTED before a successful promotion to 2MB. This requirement
-   prevents successful page merging after partially converting a 2MB
-   range from private to shared and then back to private, which is the
-   primary scenario necessitating page promotion.
-
- - The TDX-Module effectively requires a break-before-make sequence (to
-   satisfy its TLB flushing rules), i.e. creates a window of time where a
-   different vCPU can encounter faults on a SPTE that KVM is trying to
-   promote to a hugepage.  To avoid unexpected BUSY errors, KVM would need
-   to FREEZE the non-leaf SPTE before replacing it with a huge SPTE.
-
-Disable hugepage promotion for all map() operations, as supporting page
-promotion when building the initial image is still non-trivial, and the
-vast majority of images are ~4MB or less, i.e. the benefit of creating
-hugepages during TD build time is minimal.
-
-Signed-off-by: Edgecombe, Rick P <rick.p.edgecombe@intel.com>
-Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-[sean: check root, add comment, rewrite changelog]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c     |  3 ++-
- arch/x86/kvm/mmu/tdp_mmu.c | 12 +++++++++++-
- 2 files changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4ecbf216d96f..45650f70eeab 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3419,7 +3419,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
- 	    cur_level == fault->goal_level &&
- 	    is_shadow_present_pte(spte) &&
- 	    !is_large_pte(spte) &&
--	    spte_to_child_sp(spte)->nx_huge_page_disallowed) {
-+	    ((spte_to_child_sp(spte)->nx_huge_page_disallowed) ||
-+	     is_mirror_sp(spte_to_child_sp(spte)))) {
- 		/*
- 		 * A small SPTE exists for this pfn, but FNAME(fetch),
- 		 * direct_map(), or kvm_tdp_mmu_map() would like to create a
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 321dbde77d3f..0fe3be41594f 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1232,7 +1232,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	for_each_tdp_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
- 		int r;
- 
--		if (fault->nx_huge_page_workaround_enabled)
-+		/*
-+		 * Don't replace a page table (non-leaf) SPTE with a huge SPTE
-+		 * (a.k.a. hugepage promotion) if the NX hugepage workaround is
-+		 * enabled, as doing so will cause significant thrashing if one
-+		 * or more leaf SPTEs needs to be executable.
-+		 *
-+		 * Disallow hugepage promotion for mirror roots as KVM doesn't
-+		 * (yet) support promoting S-EPT entries while holding mmu_lock
-+		 * for read (due to complexity induced by the TDX-Module APIs).
-+		 */
-+		if (fault->nx_huge_page_workaround_enabled || is_mirror_sp(root))
- 			disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
- 
- 		/*
-
-base-commit: 914ea33c797e95e5fa7a0803e44b621a9e70a90f
--- 
+[ based on kvm/next ]=0A=
+=0A=
+Unmapping virtual machine guest memory from the host kernel's direct map=0A=
+is a successful mitigation against Spectre-style transient execution=0A=
+issues: if the kernel page tables do not contain entries pointing to=0A=
+guest memory, then any attempted speculative read through the direct map=0A=
+will necessarily be blocked by the MMU before any observable=0A=
+microarchitectural side-effects happen.  This means that Spectre-gadgets=0A=
+and similar cannot be used to target virtual machine memory.  Roughly=0A=
+60% of speculative execution issues fall into this category [1, Table=0A=
+1].=0A=
+=0A=
+This patch series extends guest_memfd with the ability to remove its=0A=
+memory from the host kernel's direct map, to be able to attain the above=0A=
+protection for KVM guests running inside guest_memfd.=0A=
+=0A=
+Additionally, a Firecracker branch with support for these VMs can be=0A=
+found on GitHub [2].=0A=
+=0A=
+For more details, please refer to the v5 cover letter.  No substantial=0A=
+changes in design have taken place since.=0A=
+=0A=
+See also related write() syscall support in guest_memfd [3] where=0A=
+the interoperation between the two features is described.=0A=
+=0A=
+Changes since v9:=0A=
+ - Huacai/Ackerley: formatting and error handling fixes=0A=
+ - Heiko: remove TLB flushing from folio_zap_direct_map() on s390=0A=
+ - Willy: set_direct_map_valid_noflush() to take const void * instead of=0A=
+   struct page *page=0A=
+ - Ackerley: remove reject_file_backed variable in=0A=
+   gup_fast_folio_allowed()=0A=
+ - Ackerley: avoid referencing memfd_secret in doc=0A=
+ - Ackerley: make calls to kvm_gmem_folio_zap_direct_map() conditional=0A=
+   to GUEST_MEMFD_FLAG_NO_DIRECT_MAP=0A=
+ - Rick: Exclude TDX from direct map removal=0A=
+ - Rick: Add a comment about current impossibility of zapping at=0A=
+   non-base page granularity.=0A=
+=0A=
+v9: https://lore.kernel.org/kvm/20260114134510.1835-1-kalyazin@amazon.com=
+=0A=
+v8: https://lore.kernel.org/kvm/20251205165743.9341-1-kalyazin@amazon.com=
+=0A=
+v7: https://lore.kernel.org/kvm/20250924151101.2225820-1-patrick.roy@campus=
+.lmu.de=0A=
+v6: https://lore.kernel.org/kvm/20250912091708.17502-1-roypat@amazon.co.uk=
+=0A=
+v5: https://lore.kernel.org/kvm/20250828093902.2719-1-roypat@amazon.co.uk=
+=0A=
+v4: https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.u=
+k=0A=
+RFCv3: https://lore.kernel.org/kvm/20241030134912.515725-1-roypat@amazon.co=
+.uk=0A=
+RFCv2: https://lore.kernel.org/kvm/20240910163038.1298452-1-roypat@amazon.c=
+o.uk=0A=
+RFCv1: https://lore.kernel.org/kvm/20240709132041.3625501-1-roypat@amazon.c=
+o.uk=0A=
+=0A=
+[1] https://download.vusec.net/papers/quarantine_raid23.pdf=0A=
+[2] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-=
+hiding=0A=
+[3] https://lore.kernel.org/kvm/20251114151828.98165-1-kalyazin@amazon.com=
+=0A=
+=0A=
+Nikita Kalyazin (3):=0A=
+  set_memory: set_direct_map_* to take address=0A=
+  set_memory: add folio_{zap,restore}_direct_map helpers=0A=
+  mm/gup: drop local variable in gup_fast_folio_allowed=0A=
+=0A=
+Patrick Roy (12):=0A=
+  mm/gup: drop secretmem optimization from gup_fast_folio_allowed=0A=
+  mm: introduce AS_NO_DIRECT_MAP=0A=
+  KVM: guest_memfd: Add stub for kvm_arch_gmem_invalidate=0A=
+  KVM: x86: define kvm_arch_gmem_supports_no_direct_map()=0A=
+  KVM: arm64: define kvm_arch_gmem_supports_no_direct_map()=0A=
+  KVM: guest_memfd: Add flag to remove from direct map=0A=
+  KVM: selftests: load elf via bounce buffer=0A=
+  KVM: selftests: set KVM_MEM_GUEST_MEMFD in vm_mem_add() if guest_memfd=0A=
+    !=3D -1=0A=
+  KVM: selftests: Add guest_memfd based vm_mem_backing_src_types=0A=
+  KVM: selftests: cover GUEST_MEMFD_FLAG_NO_DIRECT_MAP in existing=0A=
+    selftests=0A=
+  KVM: selftests: stuff vm_mem_backing_src_type into vm_shape=0A=
+  KVM: selftests: Test guest execution from direct map removed gmem=0A=
+=0A=
+ Documentation/virt/kvm/api.rst                | 21 +++--=0A=
+ arch/arm64/include/asm/kvm_host.h             | 13 +++=0A=
+ arch/arm64/include/asm/set_memory.h           |  9 +-=0A=
+ arch/arm64/mm/pageattr.c                      | 31 ++++---=0A=
+ arch/loongarch/include/asm/set_memory.h       |  9 +-=0A=
+ arch/loongarch/mm/pageattr.c                  | 37 +++++---=0A=
+ arch/riscv/include/asm/set_memory.h           |  9 +-=0A=
+ arch/riscv/mm/pageattr.c                      | 29 +++++--=0A=
+ arch/s390/include/asm/set_memory.h            |  9 +-=0A=
+ arch/s390/mm/pageattr.c                       | 25 ++++--=0A=
+ arch/x86/include/asm/kvm_host.h               |  6 ++=0A=
+ arch/x86/include/asm/set_memory.h             |  9 +-=0A=
+ arch/x86/kvm/x86.c                            |  5 ++=0A=
+ arch/x86/mm/pat/set_memory.c                  | 43 +++++++---=0A=
+ include/linux/kvm_host.h                      | 14 ++++=0A=
+ include/linux/pagemap.h                       | 16 ++++=0A=
+ include/linux/secretmem.h                     | 18 ----=0A=
+ include/linux/set_memory.h                    | 19 ++++-=0A=
+ include/uapi/linux/kvm.h                      |  1 +=0A=
+ kernel/power/snapshot.c                       |  4 +-=0A=
+ lib/buildid.c                                 |  4 +-=0A=
+ mm/execmem.c                                  |  6 +-=0A=
+ mm/gup.c                                      | 37 +++-----=0A=
+ mm/mlock.c                                    |  2 +-=0A=
+ mm/secretmem.c                                | 14 ++--=0A=
+ mm/vmalloc.c                                  | 11 ++-=0A=
+ .../testing/selftests/kvm/guest_memfd_test.c  | 17 +++-=0A=
+ .../testing/selftests/kvm/include/kvm_util.h  | 37 ++++++--=0A=
+ .../testing/selftests/kvm/include/test_util.h |  8 ++=0A=
+ tools/testing/selftests/kvm/lib/elf.c         |  8 +-=0A=
+ tools/testing/selftests/kvm/lib/io.c          | 23 +++++=0A=
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 59 +++++++------=0A=
+ tools/testing/selftests/kvm/lib/test_util.c   |  8 ++=0A=
+ tools/testing/selftests/kvm/lib/x86/sev.c     |  1 +=0A=
+ .../selftests/kvm/pre_fault_memory_test.c     |  1 +=0A=
+ .../selftests/kvm/set_memory_region_test.c    | 52 +++++++++++-=0A=
+ .../kvm/x86/private_mem_conversions_test.c    |  7 +-=0A=
+ virt/kvm/guest_memfd.c                        | 84 +++++++++++++++++--=0A=
+ 38 files changed, 511 insertions(+), 195 deletions(-)=0A=
+=0A=
+=0A=
+base-commit: 0499add8efd72456514c6218c062911ccc922a99=0A=
+-- =0A=
+2.50.1=0A=
+=0A=
 
