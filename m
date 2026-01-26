@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-69108-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69109-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yI4MMzNFd2mMdQEAu9opvQ
-	(envelope-from <kvm+bounces-69108-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:42:59 +0100
+	id IDYZO4NFd2mMdQEAu9opvQ
+	(envelope-from <kvm+bounces-69109-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:44:19 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7850187260
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:42:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A92687277
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 11:44:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AEAD0302D082
-	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 10:42:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE429301D692
+	for <lists+kvm@lfdr.de>; Mon, 26 Jan 2026 10:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F02532E724;
-	Mon, 26 Jan 2026 10:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95E8330660;
+	Mon, 26 Jan 2026 10:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G8TX+pIj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ddVCVCO9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D48E19C566;
-	Mon, 26 Jan 2026 10:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF78221FDE;
+	Mon, 26 Jan 2026 10:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769424132; cv=none; b=ZMEeH85/0FXUkeEUPDbYBalzbO7xvuWqDQlzQ6Onc/0H9SZbtd0R8sxap5zkafmN6wT1btYvTWEJSU4zWavMBMJ6wNBBnJBHVW5SYzq7I4N5h1LweWeiFf7vO0R88rBjzdELgBVp2tOGVLDbOkb6wIhwsWxz38+rx8P4gdUrmGw=
+	t=1769424246; cv=none; b=dPJMTnDgWW5QdLtkKj3H584iAk603i32/Fo0tSN/V22DImC7B/Bii6G+AkLuq/vGPUdlVo5MzP/7nvkuAoaQu6aslO/e2XfBHrhIMDIyq2HHcOCDGMtxiAxSWyEIdDGVcK8/WecuEgCN53P5aLEd5zrSSXf3dmu2DAxEWyuvfts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769424132; c=relaxed/simple;
-	bh=Sqda4WcgVYeoXlyqk1sjfMryqHnxe7/HsO4wgJuPIoE=;
+	s=arc-20240116; t=1769424246; c=relaxed/simple;
+	bh=U2UTPE8HWyvKd7zXMUADMYjgA7PLSffTGeUQ8cgJlvQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kly5vGxIYRCISkoE07U0iazWI3Pe3c21b3g4msiGQTgw2VrgNWr4yby+AUs2dxZ9lVC1pLni62N8T6nKjNBUtHLofGXVEdGCBvwdYN7SmI9aAkMLurCBgViN4n1WDb2eelBL+yN9YNoF1GbJADeSRv/jlNQM2f68txqLjM8xs8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G8TX+pIj; arc=none smtp.client-ip=192.198.163.14
+	 Content-Type:Content-Disposition:In-Reply-To; b=cau9oWO/CmJaLFsCm/RNCmBIKpyxFx+39EECleQw53TS6XBn/vCW9gavHDK6LI2IKsuYKoPnZD/nRoKYpLJUQZaeY3TQZe4ETG6F6NaT8FUdeMfqHpvxV2Ev3qBgMpg/JQ0sAMwKBXUgy23/aWYxNBAvCKbULoxz1MTDNZoadDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ddVCVCO9; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769424131; x=1800960131;
+  t=1769424245; x=1800960245;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=Sqda4WcgVYeoXlyqk1sjfMryqHnxe7/HsO4wgJuPIoE=;
-  b=G8TX+pIji62jg7xIaG9ztWYUZwFoRFHycMqJW+9zJgJZTCqcWZfrNgMh
-   Ti7PPXEdLiud32vnBWzbsIx/2tQLOr3S0XS7nJScR3pOKGkj+jHUkCyxj
-   LQImjsPrphQ+kvOvQNYVS+gkiZP4/QlLeWeMJmFSQZvsr2msO5ASxO9LW
-   pRs2ZME3KkSHjZfY054JF670hllz6lakiNCcDiN2yqS3LjovQiXc6CK5d
-   JhMUOvTWm7ZLFEm6k+B58FF4sD0nT5YmgH/Yc/vqjXoq8PDImp278sgog
-   WuRFMV9jY3rzMsf5ur3SRrswL6usTS5Z//dMvHrh3u0P1WTx1b0Ipf817
+  bh=U2UTPE8HWyvKd7zXMUADMYjgA7PLSffTGeUQ8cgJlvQ=;
+  b=ddVCVCO9fv509fZUt2TxglOECF2OAwlI4BDSVRNee5cv8ZCBalf6RpUQ
+   OK6I51xzcrDmJMU2keAlCFbOX+Spd7k0Gr0FIgEzunCK9XGtgn47760lK
+   fJCoZuwNxV6kak4sYiQUAfF0aRD2UsF7xjaRTDamN6YSSUOnSI3wgcRcA
+   7nvr+6yJsrkFaAKSJ7/TvvBQVdYMD2vA5MC9Mg6iAu61dstb50CyhcgLt
+   p4qbdevO8diwfpLvcgi6eOWmq78IQ6l7YixGGRncyP3HhzY8HFAtaCN8w
+   1RbqR5rgFED5FBGr0+U42r19QufoWQ3Ku8wQElCx90KhSwBw10e5m1MCI
    w==;
-X-CSE-ConnectionGUID: ha7j6UnETDSdD/BKO0tOmw==
-X-CSE-MsgGUID: PaMeF2d9T2ybdwdF1IaAbg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="70654707"
-X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
-   d="scan'208";a="70654707"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:42:10 -0800
-X-CSE-ConnectionGUID: cWLhThS4SNua6Tv7jFiq9w==
-X-CSE-MsgGUID: 1NsHtn2iTOiTvVA2oMaTqQ==
+X-CSE-ConnectionGUID: Y6W5A3GKQyWZebq9jw3I3A==
+X-CSE-MsgGUID: o5uvQphSQZKG2C36X12Dzg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11682"; a="70503428"
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="70503428"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:44:04 -0800
+X-CSE-ConnectionGUID: IYG1ntXhSFGVsXE3YH6Hhg==
+X-CSE-MsgGUID: 7YQHbNZ6QPOJgAb8TSXsxw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,254,1763452800"; 
-   d="scan'208";a="212507611"
+X-IronPort-AV: E=Sophos;i="6.21,255,1763452800"; 
+   d="scan'208";a="211740554"
 Received: from krybak-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.55])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:42:03 -0800
-Date: Mon, 26 Jan 2026 12:42:00 +0200
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2026 02:43:56 -0800
+Date: Mon, 26 Jan 2026 12:43:52 +0200
 From: Tony Lindgren <tony.lindgren@linux.intel.com>
 To: Chao Gao <chao.gao@intel.com>
 Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
@@ -75,11 +75,11 @@ Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v3 16/26] x86/virt/seamldr: Shut down the current TDX
- module
-Message-ID: <aXdE-BjIHZ9aYC6a@tlindgre-MOBL1>
+Subject: Re: [PATCH v3 17/26] x86/virt/tdx: Reset software states after TDX
+ module shutdown
+Message-ID: <aXdFaITue7OiVaHH@tlindgre-MOBL1>
 References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-17-chao.gao@intel.com>
+ <20260123145645.90444-18-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260123145645.90444-17-chao.gao@intel.com>
+In-Reply-To: <20260123145645.90444-18-chao.gao@intel.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69108-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69109-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -116,20 +116,20 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim]
-X-Rspamd-Queue-Id: 7850187260
+X-Rspamd-Queue-Id: 9A92687277
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 06:55:24AM -0800, Chao Gao wrote:
-> TDX Module updates request shutting down the existing TDX module.
-> During this shutdown, the module generates hand-off data, which captures
-> the module's states essential for preserving running TDs. The new TDX
-> Module can utilize this hand-off data to establish its states.
+On Fri, Jan 23, 2026 at 06:55:25AM -0800, Chao Gao wrote:
+> The TDX module requires a one-time global initialization (TDH.SYS.INIT) and
+> per-CPU initialization (TDH.SYS.LP.INIT) before use. These initializations
+> are guarded by software flags to prevent repetition.
 > 
-> Invoke the TDH_SYS_SHUTDOWN SEAMCALL on one CPU to perform the shutdown.
-> This SEAMCALL requires a hand-off module version. Use the module's own
-> hand-off version, as it is the highest version the module can produce and
-> is more likely to be compatible with new modules as new modules likely have
-> higher hand-off version.
+> After TDX module updates, the new TDX module requires the same global and
+> per-CPU initializations, but the existing software flags prevent
+> re-initialization.
+> 
+> Reset all software flags guarding the initialization flows to allow the
+> global and per-CPU initializations to be triggered again after updates.
 
 Reviewed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 
