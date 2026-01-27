@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-69192-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69193-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GNwcA1ZKeGn2pAEAu9opvQ
-	(envelope-from <kvm+bounces-69192-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:17:10 +0100
+	id sCVLL5lKeGn2pAEAu9opvQ
+	(envelope-from <kvm+bounces-69193-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:18:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EEF48FFD9
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:17:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9989005E
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:18:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8C0FA300D356
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70B8C30440BD
 	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 05:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B527329C70;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65765329C71;
 	Tue, 27 Jan 2026 05:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bnTeN/sR";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cf5lI/LC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TfVDmuFX";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OLDb76J6"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE4315B971
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6166B242925
+	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769491026; cv=none; b=YJ7pApUqWX6nC955/dOVDrJbmjovCoHM1EBmt1c/xr2CXNtTrqcfXABH+Mb/WfgmT2GW3R50WVGlYYUg9nzeTWMAlus/7fIy+g4SbaQwSdCnvJtpRMOlTDDq41QBnywWzvNwc5ESw4AmyjWPUXJeZB1CJpmX6t7f2xhHwW2abc8=
+	t=1769491026; cv=none; b=bGkGpe5p53ylQ0ikbWpjxsY/sIfjohTlSK4J9HMsctoRGnSsks9djc0RZGqNPo6b5nFRL7dSvf9D7OZa66DA2Wopkqew/qc/8kfqX6yUUa5Jd3XIu6m73raZemE4UJ54BSg3jKCDg0pK7pckeUAl83X51mKyiwC8FZb9FDmV8uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769491026; c=relaxed/simple;
-	bh=f5mfUZfEK8aNd/nVoG2S7pNE9ZlMs33Kft2+f2t1jsg=;
+	bh=P1hLO6AuUWl9mnlg6xVBkthXhZ5n49Tg+jMbbX/0smg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LnQOpIL9ujaU5yFlgvodhuWjfzC2V5lOBDSAAup4F8v9NXt8U7j1lNaATWPOeZGBpChHEip49bUfaIZuiDTlb4aVWecup2Abj0c1hjxakf31ViMrn0YNNB/Yb8nAThBm83xl1H8JLJ2595gzIESdA6MJeg4a6iasqgXjQwqiJ1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bnTeN/sR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cf5lI/LC; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=b2ZqnukL2NG38YIA/IQOY/q6zyJog3LuqiWyVDmuyLwnPNSnBw+4gEd/1HNnLtlkTyQr2ZrXjIonV8GhJ6L8C0+siyknLch+NTUNzgwugHIk4dgzUiJ93gblSPQ5cps1+WO+/ML+/o883wKtQ98aOhcVxE1KOByD5uRunZMOrPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TfVDmuFX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OLDb76J6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -41,69 +41,69 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ekxz0EEyBOQMVYi/GjNSmeh3FZ184pWI8lFYWcurNPM=;
-	b=bnTeN/sRggopahrQjLxVRvPankNsIk7HCPdNopOMZ2KTcVq7slDkyA4aw7D46fYkV0bRZ/
-	rWXlB4stK73e1pzG4iZdDh8V3QHY3EG/xyYqEIhTVYsrVCm6tbBjNwQ3h7blkFEZNy+7sW
-	6AP1ccyfiok2njXmpVyH3Kp34eP8Ug0=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gdNlCVdePrLQZM93WRK6oLwv5KTpdxmb5b92LGcPxUQ=;
+	b=TfVDmuFXdpOnjgCrlKEsw3fv7Cm5jBylQ1bKaJqcI5qNrbhZOSuzB1k5kds11bJdDjUJPR
+	zJt5bXJHftOiaW+aakMLunEXmaenEZfJBS3+WVAGCvknBvqYl7JhyI5IbPATv6PM4diCOG
+	4ZoiSeYX3KYzMfIKgAfQKhSkRMHI8OU=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-546-py58LzzoMF-fAS2upaV74Q-1; Tue, 27 Jan 2026 00:16:59 -0500
-X-MC-Unique: py58LzzoMF-fAS2upaV74Q-1
-X-Mimecast-MFC-AGG-ID: py58LzzoMF-fAS2upaV74Q_1769491019
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-34cc88eca7eso4780637a91.2
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:16:59 -0800 (PST)
+ us-mta-554-0uajNtLXMqieQy1oJ_CIEQ-1; Tue, 27 Jan 2026 00:17:02 -0500
+X-MC-Unique: 0uajNtLXMqieQy1oJ_CIEQ-1
+X-Mimecast-MFC-AGG-ID: 0uajNtLXMqieQy1oJ_CIEQ_1769491021
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-c6124a9fb86so8242409a12.3
+        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:17:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769491018; x=1770095818; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1769491021; x=1770095821; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ekxz0EEyBOQMVYi/GjNSmeh3FZ184pWI8lFYWcurNPM=;
-        b=Cf5lI/LC8h3TeSgxIzraTD0EVEJKdMmTquEwNgIN82Gvxu2/+C6RdZXNs9er0tgC63
-         mSWy43MtnIpWbIqncfvNli4qIA7hX6AbbG+hJ9ea/jgV15NqT1QKalfxADUyQDCzdsAU
-         Anr5fZ1BLUyuVUIcPyL2IZuWWV6Em4AI4aL8cqQFW8z2Vi1Jm0DRCswADWZ6AQ+nt4FP
-         X2cJZJKWhCngQ7GcDqJhg68z30rKS4lSuUraCodtWLqMvqufodoIpoCDqgNcNmLDfHDB
-         4MykbqG1NYGAFeu8/9iY3UFZ0ttP0lGHEzSptMZYsVZ/lxUKRbPW3drxDMnzsbSZcKLr
-         8TNg==
+        bh=gdNlCVdePrLQZM93WRK6oLwv5KTpdxmb5b92LGcPxUQ=;
+        b=OLDb76J6ojs3voNNSkT+XM1etBiOxKNW5DGkRla2qFPNaz38xEjtmDKa4r8lOMrcR1
+         tyVUPPiN1L1p83nE0JX+63K1XLADv+pUd68CNmvh9Qnci+M6qhrgoFGXXAcfBIx/RXbo
+         bZulFgX2ob6H9GmBCu5nro3s6XGb/fbqpeOr+/1n+CjUophNOtjPl3MAyP1YlgzcMmaU
+         J8Nt80orkrnaeNN2D0/AVQZfytZOkdL1lpydbBNqb8ld6udrjslfE9TChh7dsEiPCBcJ
+         1lGeCcwjzShkivdvWnRMUjXZWOyDFQ5j3z8gP1aM6isiI4cPldZpLjLtvf/8GQCQ/H2+
+         x5Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769491018; x=1770095818;
+        d=1e100.net; s=20230601; t=1769491021; x=1770095821;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ekxz0EEyBOQMVYi/GjNSmeh3FZ184pWI8lFYWcurNPM=;
-        b=J41zah4uNQDm3cTPpn1WAvcSCVdNZ2IoZVdVkne5+1/yK0S0ERsL96hSznFWSZcUDy
-         G0Yj16wZycQaXXlF4RRBU9eGhRQ0fFV0bcFpfpS4lxRPCZSViNDeviVbu8D9wSHCVPc9
-         S5VcouaTDKS9r6xXkl45RjiGSRQ8TNtCEBFGbHCj8MZWhmkOv8aLbupxdeg2xpSlSkSw
-         P9jwiinYCWGHb55nIGc9SFvvOi7YlfxrXbchERZrPdOm50i0irvVgK75l5wdcGVQZQ3E
-         r5h4K4qKnOKA41OzhtzkSZoFakT3lPHn8Wjt3sSLDy0oZs8Uc4RX6B5h1FimSfSDJECi
-         zZrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0Gw6mPQ5dHCWg7IbJyesPKYieUjpdvdPy2g34EW1fgs91plZxS23EhMpwvLVNat9Mbzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFA4Jf4/qyRRSk9S///AtopehsJjKg/esgDUtIZ6UbiKBiIhi1
-	Z17rAxO6xE5OphaZJj8TtCC9T/MGweyqqqAw0Z5P7i+8BAjojlOVkIrc4YFNseN+tkOpuPKBNxW
-	VYtQUwzeou9J7QK0r+VWtf9gNI3dH5avVm9Ar6FI9f4nxoMyI4h5i/nlx/wjFrA==
-X-Gm-Gg: AZuq6aJjJkeSPmQyn0XWFcpiMahQIzBowsIqk6iqziNzUnQu1jWQDFfMObJOGWIWW95
-	I6wedYAlzBw9y6aLqQwRtjsFbHRgL9bPpoIMma0Hrz9qGoKoNPOiJI2kWZwgZ9POM+JwlEYZQp7
-	Q0cGAB0aTmY7FltayBKLbWMELNMyKwv3993fMIs7V2pB1hb+s8tlwSqlhfsiyXDYJW/GkiShcvn
-	fceOSLMq514HTqsJP2PvTDu+FXAIUo0na5SuZ/LUFFipQYFthrDtgiTQND1qsuUK4YyNK3zUMGH
-	BBUNlduQyVerh1f6C2mrWoR3i68eIHls1pUCjLAZbcDHm6aWN5+SDuDb66zS+dsNhtgSn5JASa1
-	QXMMhFyAiSwYaixLIaEBGXu5BsMNUqKkdTn5Om5j1sw==
-X-Received: by 2002:a17:90b:3c88:b0:341:88c9:aefb with SMTP id 98e67ed59e1d1-353fecc6679mr585033a91.5.1769491018475;
-        Mon, 26 Jan 2026 21:16:58 -0800 (PST)
-X-Received: by 2002:a17:90b:3c88:b0:341:88c9:aefb with SMTP id 98e67ed59e1d1-353fecc6679mr585022a91.5.1769491018057;
-        Mon, 26 Jan 2026 21:16:58 -0800 (PST)
+        bh=gdNlCVdePrLQZM93WRK6oLwv5KTpdxmb5b92LGcPxUQ=;
+        b=WPS0BKlr97R0CkYyenacCKB0XgUtnHpt4S0Gzq9vyPrnGOFlhIkhVrSabv/6LJdlnA
+         6VPG+dmIcaIlwrP0B/bW1Dx4lIaH3BS0CEN9hzjChu+wUG97USWh6w2mRK0A0nzUJEgZ
+         8A6f7NwEIK+lEX3/PDc8+x04AaMqgI7LDamb59/29hNtSHtO4I2DAKs2yDHju3QJUApA
+         MShUfsnP8KkhPnzcx7nxrJJj6Zco0hKAp2Ha2lIdKO64zvoqz+rxKZ0vowA3OnEYyosj
+         D5k/qOprHBfNLNuLRdrhcD8j/EsRrFCMEuQllaWEqzb5QdzYkr1yALw8FWAzSS6+yWh2
+         IIQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJcT/IEPUvwwibUIGf+0L8BoClT58uJxSTX+5WY9I0N2bx30oL0y1GS7WUHD2ZEPlQjEs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2FkcitpGy45VkrLjLDj+t6AYxdEyNuS3TIX1nd3qK7j568p5L
+	RWHwXL9r1LSkWi4EjM4dqMLl4JFtVUzJ7oHolsIz2WO3CQAVhbG70MuulAKxw2Tlun3vko9J4DU
+	yqn8Dev9Zq99dh4P4Zwyfohbduw5r6PBIcaJAJc9oKKWWemcXnaUfgg==
+X-Gm-Gg: AZuq6aKWvyoRIilUF6DVho8kWOTPzLOWrkzX3UUygaoiKoiZPxSisKABW/LJDy8jVJP
+	94Z4N9WR2unDuGl4G9szJmpFYyFoLsrP9kfWEZdyYU3ZzX6hrPQTiLh+JwKxY4bBEd1c7GOMkQB
+	tVjnXPrlaCmMgRtY3QfwnmMSG0GTlq02LinpW9z+g406cOf2dzDoPhPZfUM91do/zmetclvWIS5
+	zscXJbbQkbRiguowjCpArmHvrnWBpEEfE/7ZAOYy++b92GKF3IYVgBnhvBTEpnzd7H5fPc4iFRl
+	PWLCPEnA/SRubw7Gum17Wc2ufoqVhDUIVZ2UCmjVGhPQm55aBwlAo0XRoQ2+dC5L3SrcUxEIjcw
+	QE6RIZtgkcJeP/9hOdSm03l8X17fgNJk1NHx4BmC9Nw==
+X-Received: by 2002:a05:6a21:118:b0:38b:ebaa:c167 with SMTP id adf61e73a8af0-38ec629e677mr543681637.20.1769491021021;
+        Mon, 26 Jan 2026 21:17:01 -0800 (PST)
+X-Received: by 2002:a05:6a21:118:b0:38b:ebaa:c167 with SMTP id adf61e73a8af0-38ec629e677mr543656637.20.1769491020586;
+        Mon, 26 Jan 2026 21:17:00 -0800 (PST)
 Received: from rhel9-box.lan ([122.163.48.79])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.16.56
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.16.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 21:16:57 -0800 (PST)
+        Mon, 26 Jan 2026 21:17:00 -0800 (PST)
 From: Ani Sinha <anisinha@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kraxel@redhat.com,
 	Ani Sinha <anisinha@redhat.com>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 07/33] accel/kvm: add a notifier to indicate KVM VM file descriptor has changed
-Date: Tue, 27 Jan 2026 10:45:35 +0530
-Message-ID: <20260127051612.219475-8-anisinha@redhat.com>
+Subject: [PATCH v3 08/33] accel/kvm: notify when KVM VM file fd is about to be changed
+Date: Tue, 27 Jan 2026 10:45:36 +0530
+Message-ID: <20260127051612.219475-9-anisinha@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20260127051612.219475-1-anisinha@redhat.com>
 References: <20260127051612.219475-1-anisinha@redhat.com>
@@ -120,13 +120,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69192-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69193-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	MIME_TRACE(0.00)[0:+];
@@ -139,144 +139,77 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9EEF48FFD9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4E9989005E
 X-Rspamd-Action: no action
 
-A notifier callback can be used by various subsystems to perform actions when
-KVM file descriptor for a virtual machine changes as a part of confidential
-guest reset process. This change adds this notifier mechanism. Subsequent
-patches will add specific implementations for various notifier callbacks
-corresponding to various subsystems that need to take action when KVM VM file
-descriptor changed.
+Various subsystems might need to take some steps before the KVM file descriptor
+for a virtual machine is changed. So a new boolean attribute is added to the
+vmfd_notifier structure which is passed to the notifier callbacks.
+vmfd_notifer.pre is true for pre-notification of vmfd change and false for
+post notification. Notifier callback implementations can simply check
+the boolean value for (vmfd_notifer*)->pre and can take actions for pre or
+post vmfd change based on the value.
+
+Subsequent patches will add callback implementations for specific components
+that need this pre-notification.
 
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- accel/kvm/kvm-all.c    | 30 ++++++++++++++++++++++++++++++
- accel/stubs/kvm-stub.c |  8 ++++++++
- include/system/kvm.h   | 21 +++++++++++++++++++++
- 3 files changed, 59 insertions(+)
+ accel/kvm/kvm-all.c  | 9 +++++++++
+ include/system/kvm.h | 6 ++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 834df61c31..06d72111e2 100644
+index 06d72111e2..538a4cc731 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -90,6 +90,7 @@ struct KVMParkedVcpu {
- };
+@@ -2654,6 +2654,13 @@ static int kvm_reset_vmfd(MachineState *ms)
+     memory_listener_unregister(&kml->listener);
+     memory_listener_unregister(&kvm_io_listener);
  
- KVMState *kvm_state;
-+VmfdChangeNotifier vmfd_notifier;
- bool kvm_kernel_irqchip;
- bool kvm_split_irqchip;
- bool kvm_async_interrupts_allowed;
-@@ -123,6 +124,9 @@ static const KVMCapabilityInfo kvm_required_capabilites[] = {
- static NotifierList kvm_irqchip_change_notifiers =
-     NOTIFIER_LIST_INITIALIZER(kvm_irqchip_change_notifiers);
- 
-+static NotifierWithReturnList register_vmfd_changed_notifiers =
-+    NOTIFIER_WITH_RETURN_LIST_INITIALIZER(register_vmfd_changed_notifiers);
-+
- struct KVMResampleFd {
-     int gsi;
-     EventNotifier *resample_event;
-@@ -2173,6 +2177,22 @@ void kvm_irqchip_change_notify(void)
-     notifier_list_notify(&kvm_irqchip_change_notifiers, NULL);
- }
- 
-+void kvm_vmfd_add_change_notifier(NotifierWithReturn *n)
-+{
-+    notifier_with_return_list_add(&register_vmfd_changed_notifiers, n);
-+}
-+
-+void kvm_vmfd_remove_change_notifier(NotifierWithReturn *n)
-+{
-+    notifier_with_return_remove(n);
-+}
-+
-+static int kvm_vmfd_change_notify(Error **errp)
-+{
-+    return notifier_with_return_list_notify(&register_vmfd_changed_notifiers,
-+                                            &vmfd_notifier, errp);
-+}
-+
- int kvm_irqchip_get_virq(KVMState *s)
- {
-     int next_virq;
-@@ -2671,6 +2691,16 @@ static int kvm_reset_vmfd(MachineState *ms)
-         do_kvm_irqchip_create(s);
-     }
- 
-+    /*
-+     * notify everyone that vmfd has changed.
-+     */
-+    vmfd_notifier.vmfd = s->vmfd;
++    vmfd_notifier.pre = true;
 +    ret = kvm_vmfd_change_notify(&err);
 +    if (ret < 0) {
 +        return ret;
 +    }
 +    assert(!err);
 +
-     /* these can be only called after ram_block_rebind() */
-     memory_listener_register(&kml->listener, &address_space_memory);
-     memory_listener_register(&kvm_io_listener, &address_space_io);
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 68cd33ba97..a6e8a6e16c 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -79,6 +79,14 @@ void kvm_irqchip_change_notify(void)
- {
- }
- 
-+void kvm_vmfd_add_change_notifier(NotifierWithReturn *n)
-+{
-+}
+     if (s->vmfd >= 0) {
+         close(s->vmfd);
+     }
+@@ -2695,6 +2702,8 @@ static int kvm_reset_vmfd(MachineState *ms)
+      * notify everyone that vmfd has changed.
+      */
+     vmfd_notifier.vmfd = s->vmfd;
++    vmfd_notifier.pre = false;
 +
-+void kvm_vmfd_remove_change_notifier(NotifierWithReturn *n)
-+{
-+}
-+
- int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-                                        EventNotifier *rn, int virq)
- {
+     ret = kvm_vmfd_change_notify(&err);
+     if (ret < 0) {
+         return ret;
 diff --git a/include/system/kvm.h b/include/system/kvm.h
-index d40cc9750c..6ab37fd440 100644
+index 6ab37fd440..a17cd368ca 100644
 --- a/include/system/kvm.h
 +++ b/include/system/kvm.h
-@@ -181,6 +181,7 @@ DECLARE_INSTANCE_CHECKER(KVMState, KVM_STATE,
+@@ -570,12 +570,14 @@ int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private);
+ /* argument to vmfd change notifier */
+ typedef struct VmfdChangeNotifier {
+     int vmfd;
++    bool pre;
+ } VmfdChangeNotifier;
  
- extern KVMState *kvm_state;
- typedef struct Notifier Notifier;
-+typedef struct NotifierWithReturn NotifierWithReturn;
- 
- typedef struct KVMRouteChange {
-      KVMState *s;
-@@ -566,4 +567,24 @@ int kvm_set_memory_attributes_shared(hwaddr start, uint64_t size);
- 
- int kvm_convert_memory(hwaddr start, hwaddr size, bool to_private);
- 
-+/* argument to vmfd change notifier */
-+typedef struct VmfdChangeNotifier {
-+    int vmfd;
-+} VmfdChangeNotifier;
-+
-+/**
-+ * kvm_vmfd_add_change_notifier - register a notifier to get notified when
-+ * a KVM vm file descriptor changes as a part of the confidential guest "reset"
-+ * process. Various subsystems should use this mechanism to take actions such
-+ * as creating new fds against this new vm file descriptor.
-+ * @n: notifier with return value.
-+ */
-+void kvm_vmfd_add_change_notifier(NotifierWithReturn *n);
-+/**
-+ * kvm_vmfd_remove_change_notifier - de-register a notifer previously
-+ * registered with kvm_vmfd_add_change_notifier call.
-+ * @n: notifier that was previously registered.
-+ */
-+void kvm_vmfd_remove_change_notifier(NotifierWithReturn *n);
-+
- #endif
+ /**
+  * kvm_vmfd_add_change_notifier - register a notifier to get notified when
+- * a KVM vm file descriptor changes as a part of the confidential guest "reset"
+- * process. Various subsystems should use this mechanism to take actions such
++ * a KVM vm file descriptor changes or about to be changed as a part of the
++ * confidential guest "reset" process.
++ * Various subsystems should use this mechanism to take actions such
+  * as creating new fds against this new vm file descriptor.
+  * @n: notifier with return value.
+  */
 -- 
 2.42.0
 
