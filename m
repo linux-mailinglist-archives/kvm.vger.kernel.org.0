@@ -1,48 +1,49 @@
-Return-Path: <kvm+bounces-69270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69271-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJQzCD0SeWkcvAEAu9opvQ
-	(envelope-from <kvm+bounces-69270-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:30:05 +0100
+	id 0HW2K18TeWkcvAEAu9opvQ
+	(envelope-from <kvm+bounces-69271-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:34:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B7D99DC8
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:30:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6BE999EFA
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:34:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1240B300DF59
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:29:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DB0FF300E5DC
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC47D36D4F8;
-	Tue, 27 Jan 2026 19:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D229536D4FC;
+	Tue, 27 Jan 2026 19:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SKv6WAS+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzu2dY0F"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F0136C5BB;
-	Tue, 27 Jan 2026 19:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0D036CDEC;
+	Tue, 27 Jan 2026 19:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769542187; cv=none; b=UfqtiqLgU+8W1Ps38IX+7YllQm/1o0mGj9maKNDO3WiZtX7gRDl7ZgLV/FgcxuNVLLvPqCFI1Vva711Jfcpuo7aE8bkPaH4kRa5AmxPNKsxQOgiud0BHx5Cb9XMxhqXEKT8aauiNh97RJxDS59Z9ox4UTD3p5Ed+EPnHkJfEh0c=
+	t=1769542194; cv=none; b=bQrlHwzaLAgznD3apDxfTQpOEJfdfOEscFxVprHJsaVCbLfqm3KEZ0M79r5XGm8RsH8I84ulA4oCF6MsWRUjexqPM4G3cQPbKAVxL8RX4RLBpPd62NdNTRtEzw8PlE1RJ8DhBYCzGahxSZ4wgMqwc+CNmVh44W7Y4brOa6yRar4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769542187; c=relaxed/simple;
-	bh=mpVeGCYsLiNY/UK6lKg9GGRaTRVOTOvc32/dwDOYLMA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PwEDJxdgfB0/qyvv+I5c87rGpYQSt9cWRXE8tQxYtKKI4aGFFoGYcbzA+Np6lXaCTnrby1rVBKCX8fLFKuUfvX+t3FzXmhgtYoUJiaw8vYhJAiYdeJEerQd5Ca11EUtoxnTJESr5qirp3SsI4Az6Xy+VYOaOC0bpvYeDcNlYV0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKv6WAS+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CDA1C116C6;
-	Tue, 27 Jan 2026 19:29:41 +0000 (UTC)
+	s=arc-20240116; t=1769542194; c=relaxed/simple;
+	bh=aI4WO62kph2VvKe2gJ7QoMhXLXNy49H9C+58Y9P8ebA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WvVRdeaox9scboCyy5t7aqpE9t6uNAgUwq7ZxyIX9O50FDbnwreznFwf64Tb6SbPNvW68wKjrja3pmDwFHStPMGOJU6IQpdPxUC+BI/w9CLtNmNlY7/oQMhKSlnAcdXoaD1w8pGHNuwIQ3z1K7CjEJaK22dnU/IJ1nebjQPHbzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzu2dY0F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D53D3C19425;
+	Tue, 27 Jan 2026 19:29:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769542187;
-	bh=mpVeGCYsLiNY/UK6lKg9GGRaTRVOTOvc32/dwDOYLMA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=SKv6WAS+1yy/6CAdsN6erxvRRsIsbUo+OGhqi4iWXCmDkaR33qEO5lAk4xu5teO2O
-	 +J7lknBZban67bcny3JrQNfctgd7R3Lhl4ej+2uTLVXE1PDaxncoEM9TPfXZGXALSZ
-	 FDNoZ2b18Z38m9F1hQGvR8xECcIlWnUqmMD1w0f1lK6vuP9rxfFuHYDPSIc8H5OwEs
-	 9auA6iIlZNyevSsNBPW+B/2kSH+bmVO40izpG/ivDprGyAGssi1G8I2uFXnyRgSaXg
-	 p7FE6FSu6eRBYHJNHa23BPrU5iySD+4/tktqLRfXkiBOyPwPi0OIbQmV4ggh/FhMKz
-	 REg8RZsU6xmRg==
+	s=k20201202; t=1769542193;
+	bh=aI4WO62kph2VvKe2gJ7QoMhXLXNy49H9C+58Y9P8ebA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uzu2dY0FD8NP7vGfp5IudjeX8x6QiJOSfV1oxxuPXDUvu4rBKpUTNA49h5T9Wohpy
+	 pfEABMoxK6o/yC7roNa0yXjcHxBqwtIkm+UYpNDDQd1qRNy4ch60sgcDSqaVtG27wK
+	 K+UqBFc5dhddJewp0K/vzuLPF2PxpQi8HyATmV0Xi9XEzGTqVFNmA9w4LSuWcFXoVg
+	 QrYaAotmrdV0CDUshJOjvcVA2VrJFYEjysfOFyw5eFeR2wtvfX00eoewjFdNTtWcua
+	 +mBnHhBZ1o53N7kxZ4CnCivm92wleRp8YgLjcWxCGw1GfNjWI6wCViPGzu/VwKzk7f
+	 /HCrBMvTm8PjQ==
 From: Mike Rapoport <rppt@kernel.org>
 To: linux-mm@kvack.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>,
@@ -68,10 +69,12 @@ Cc: Andrea Arcangeli <aarcange@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH RFC 00/17] mm, kvm: allow uffd suppot in guest_memfd
-Date: Tue, 27 Jan 2026 21:29:19 +0200
-Message-ID: <20260127192936.1250096-1-rppt@kernel.org>
+Subject: [PATCH RFC 01/17] userfaultfd: introduce mfill_copy_folio_locked() helper
+Date: Tue, 27 Jan 2026 21:29:20 +0200
+Message-ID: <20260127192936.1250096-2-rppt@kernel.org>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260127192936.1250096-1-rppt@kernel.org>
+References: <20260127192936.1250096-1-rppt@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,11 +89,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69270-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69271-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,81 +107,118 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: C9B7D99DC8
+X-Rspamd-Queue-Id: D6BE999EFA
 X-Rspamd-Action: no action
 
 From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
 
-Hi,
+Split copying of data when locks held from mfill_atomic_pte_copy() into
+a helper function mfill_copy_folio_locked().
 
-These patches enable support for userfaultfd in guest_memfd.
-They are quite different from the latest posting [1] so I'm restarting the
-versioning. As there was a lot of tension around the topic, this is an RFC
-to get some feedback and see how we can move forward.
+This makes improves code readability and makes complex
+mfill_atomic_pte_copy() function easier to comprehend.
 
-As the ground work I refactored userfaultfd handling of PTE-based memory types
-(anonymous and shmem) and converted them to use vm_uffd_ops for allocating a
-folio or getting an existing folio from the page cache. shmem also implements
-callbacks that add a folio to the page cache after the data passed in
-UFFDIO_COPY was copied and remove the folio from the page cache if page table
-update fails.
+No functional change.
 
-In order for guest_memfd to notify userspace about page faults, there are new
-VM_FAULT_UFFD_MINOR and VM_FAULT_UFFD_MISSING that a ->fault() handler can
-return to inform the page fault handler that it needs to call
-handle_userfault() to complete the fault.
+Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+---
+ mm/userfaultfd.c | 59 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 35 insertions(+), 24 deletions(-)
 
-Nikita helped to plumb these new goodies into guest_memfd and provided basic
-tests to verify that guest_memfd works with userfaultfd.
-
-I deliberately left hugetlb out, at least for the most part.
-hugetlb handles acquisition of VMA and more importantly establishing of parent
-page table entry differently than PTE-based memory types. This is a different
-abstraction level than what vm_uffd_ops provides and people objected to
-exposing such low level APIs as a part of VMA operations.
-
-Also, to enable uffd in guest_memfd refactoring of hugetlb is not needed and I
-prefer to delay it until the dust settles after the changes in this set.
-
-[1] https://lore.kernel.org/all/20251130111812.699259-1-rppt@kernel.org
-
-Mike Rapoport (Microsoft) (12):
-  userfaultfd: introduce mfill_copy_folio_locked() helper
-  userfaultfd: introduce struct mfill_state
-  userfaultfd: introduce mfill_get_pmd() helper.
-  userfaultfd: introduce mfill_get_vma() and mfill_put_vma()
-  userfaultfd: retry copying with locks dropped in mfill_atomic_pte_copy()
-  userfaultfd: move vma_can_userfault out of line
-  userfaultfd: introduce vm_uffd_ops
-  userfaultfd, shmem: use a VMA callback to handle UFFDIO_CONTINUE
-  userfaultfd: introduce vm_uffd_ops->alloc_folio()
-  shmem, userfaultfd: implement shmem uffd operations using vm_uffd_ops
-  userfaultfd: mfill_atomic() remove retry logic
-  mm: introduce VM_FAULT_UFFD_MINOR fault reason
-
-Nikita Kalyazin (5):
-  mm: introduce VM_FAULT_UFFD_MISSING fault reason
-  KVM: guest_memfd: implement userfaultfd minor mode
-  KVM: guest_memfd: implement userfaultfd missing mode
-  KVM: selftests: test userfaultfd minor for guest_memfd
-  KVM: selftests: test userfaultfd missing for guest_memfd
-
- include/linux/mm.h                            |   5 +
- include/linux/mm_types.h                      |  15 +-
- include/linux/shmem_fs.h                      |  14 -
- include/linux/userfaultfd_k.h                 |  74 +-
- mm/hugetlb.c                                  |  21 +
- mm/memory.c                                   |   8 +-
- mm/shmem.c                                    | 188 +++--
- mm/userfaultfd.c                              | 671 ++++++++++--------
- .../testing/selftests/kvm/guest_memfd_test.c  | 191 +++++
- virt/kvm/guest_memfd.c                        | 134 +++-
- 10 files changed, 871 insertions(+), 450 deletions(-)
-
-
-base-commit: f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da
---
+diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
+index e6dfd5f28acd..a0885d543f22 100644
+--- a/mm/userfaultfd.c
++++ b/mm/userfaultfd.c
+@@ -238,6 +238,40 @@ int mfill_atomic_install_pte(pmd_t *dst_pmd,
+ 	return ret;
+ }
+ 
++static int mfill_copy_folio_locked(struct folio *folio, unsigned long src_addr)
++{
++	void *kaddr;
++	int ret;
++
++	kaddr = kmap_local_folio(folio, 0);
++	/*
++	 * The read mmap_lock is held here.  Despite the
++	 * mmap_lock being read recursive a deadlock is still
++	 * possible if a writer has taken a lock.  For example:
++	 *
++	 * process A thread 1 takes read lock on own mmap_lock
++	 * process A thread 2 calls mmap, blocks taking write lock
++	 * process B thread 1 takes page fault, read lock on own mmap lock
++	 * process B thread 2 calls mmap, blocks taking write lock
++	 * process A thread 1 blocks taking read lock on process B
++	 * process B thread 1 blocks taking read lock on process A
++	 *
++	 * Disable page faults to prevent potential deadlock
++	 * and retry the copy outside the mmap_lock.
++	 */
++	pagefault_disable();
++	ret = copy_from_user(kaddr, (const void __user *) src_addr,
++			     PAGE_SIZE);
++	pagefault_enable();
++	kunmap_local(kaddr);
++
++	if (ret)
++		return -EFAULT;
++
++	flush_dcache_folio(folio);
++	return ret;
++}
++
+ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
+ 				 struct vm_area_struct *dst_vma,
+ 				 unsigned long dst_addr,
+@@ -245,7 +279,6 @@ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
+ 				 uffd_flags_t flags,
+ 				 struct folio **foliop)
+ {
+-	void *kaddr;
+ 	int ret;
+ 	struct folio *folio;
+ 
+@@ -256,27 +289,7 @@ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
+ 		if (!folio)
+ 			goto out;
+ 
+-		kaddr = kmap_local_folio(folio, 0);
+-		/*
+-		 * The read mmap_lock is held here.  Despite the
+-		 * mmap_lock being read recursive a deadlock is still
+-		 * possible if a writer has taken a lock.  For example:
+-		 *
+-		 * process A thread 1 takes read lock on own mmap_lock
+-		 * process A thread 2 calls mmap, blocks taking write lock
+-		 * process B thread 1 takes page fault, read lock on own mmap lock
+-		 * process B thread 2 calls mmap, blocks taking write lock
+-		 * process A thread 1 blocks taking read lock on process B
+-		 * process B thread 1 blocks taking read lock on process A
+-		 *
+-		 * Disable page faults to prevent potential deadlock
+-		 * and retry the copy outside the mmap_lock.
+-		 */
+-		pagefault_disable();
+-		ret = copy_from_user(kaddr, (const void __user *) src_addr,
+-				     PAGE_SIZE);
+-		pagefault_enable();
+-		kunmap_local(kaddr);
++		ret = mfill_copy_folio_locked(folio, src_addr);
+ 
+ 		/* fallback to copy_from_user outside mmap_lock */
+ 		if (unlikely(ret)) {
+@@ -285,8 +298,6 @@ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
+ 			/* don't free the page */
+ 			goto out;
+ 		}
+-
+-		flush_dcache_folio(folio);
+ 	} else {
+ 		folio = *foliop;
+ 		*foliop = NULL;
+-- 
 2.51.0
+
 
