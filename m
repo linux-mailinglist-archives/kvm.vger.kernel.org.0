@@ -1,224 +1,151 @@
-Return-Path: <kvm+bounces-69220-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69221-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGZBKRaFeGmqqgEAu9opvQ
-	(envelope-from <kvm+bounces-69220-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 10:27:50 +0100
+	id eGH6HJuMeGmqqwEAu9opvQ
+	(envelope-from <kvm+bounces-69221-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 10:59:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C493591B1D
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 10:27:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1984D92483
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 10:59:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 25E74300468A
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 09:27:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3CD7F300D767
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 09:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025052DB7A9;
-	Tue, 27 Jan 2026 09:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4388F33C1B2;
+	Tue, 27 Jan 2026 09:58:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NCqz1RWT";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ta+TX/WF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXyeIUrw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3042D59E8
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 09:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8B6338584;
+	Tue, 27 Jan 2026 09:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769506065; cv=none; b=Luyw0qU9OUPCTbJ4k+BwKdQqMuSEYhYay2vU/qQLAs+SvYae28s2ls5Sq6ugmzQitNHVcvGHbrlS+Gz3G1Emu3/zKnKO5Jx5T5rstX2irWxOz+nlKNQWknlnGPUVqbL0l3LmXUnpw2h16RMB3z+5FSw8txYN7muSZpH4qhhIE4M=
+	t=1769507917; cv=none; b=I96HquQ+Vxq1oYZEyfdAE4hl/TxpJpjUOqFVYcEsY5816nxw2gQJnahWW4Hv31KMBfQiGkMkhcKmK5mDXpdDJk0Q0Y6Aqr4H5GK8veeLVTBDEci4YOJLurwau3J7WQlVSpSBQItryQi1VWJqRic3RqOSEVOM13xkwolWky8hQ8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769506065; c=relaxed/simple;
-	bh=tLsY/tyc7yc8TndHHQBV6iZzg25eTDZlZKoX4qBHov8=;
+	s=arc-20240116; t=1769507917; c=relaxed/simple;
+	bh=e43WCMmXKqoQ1viplvp1q9BvjTcDlq2o9m6+FYicNOs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xc8bBFu95mztl5KreLP1rjsfcMtO2er9tVKfIYQpWRK9GG7c5KWxnggCtc9bwxoSPpdZ34Naib13mOxpHBNXpzb8O3WP1dUCuKEKOSau62PxdIbw8+rXyOSULZO7L/XQNaOI0w/iCm4IVYQ3Xn6MDNi8KCDm3gPwX5VxiXvAf5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NCqz1RWT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ta+TX/WF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769506062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G5bG6PKsqEtorcKsG2IjxGd9y3gQfMI+PkhENIjujEs=;
-	b=NCqz1RWT99L+SGIcXPKpC+E9IGG4q3eeTq01xEW25eRb+4e0UmN9SOcetyU57YsrW5qwVz
-	PikjGyQJiQuh5skan8g2eBmzs9PNALozZeTkaYYuxjAcbstdy+pm5Ry3jnGSHSUI2FJWjz
-	wCpbBouIZVpNV9nSSV9rzGhaK9eUno0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-417-UtMU0JghN66y2IjwPzP07A-1; Tue, 27 Jan 2026 04:27:39 -0500
-X-MC-Unique: UtMU0JghN66y2IjwPzP07A-1
-X-Mimecast-MFC-AGG-ID: UtMU0JghN66y2IjwPzP07A_1769506059
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47edf8ba319so51184285e9.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 01:27:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769506058; x=1770110858; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G5bG6PKsqEtorcKsG2IjxGd9y3gQfMI+PkhENIjujEs=;
-        b=ta+TX/WF1vcbWVuXv2dFsH1WSCSfCSZ3nbh8Zoft1oz7o+nqG4cx4NueksJ1hONv9C
-         Cfmth6/d9PVREpnDk00KTOP7ebawUbo6bJAA5TjQ2VWxSw5C6K6JXNe110Q2zInFkTbT
-         vp4gRJVm4tGDP5l7Jg82hxigj5zRq84kVaSZWveCnnYG289x3DMyoFWSwMaFj30iYQFx
-         xK0A1FdFKfu0XVik53xuUhJ8ZPbaYia8ZtHReX+g0jIan8YwR73vLCKFjHTv4yhaf5Vf
-         J4wA2z4azHJnRWgKU+XNz+Y2QproOJYOcTgCXI+DJu71wFoMKzt2+w4V/EPz8FQxQ89c
-         REpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769506058; x=1770110858;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G5bG6PKsqEtorcKsG2IjxGd9y3gQfMI+PkhENIjujEs=;
-        b=V4K7zbmnk5k1i8gL6PwEUoOp2H8EANLcZpLhLj8B7aT9sOmnwPY+a0/Ny63ySWnzWJ
-         JAI9zqG7HZNDDnhEPX2hcsdsdspD+UWy/Snb7pqnOgwvSY9G635gCw57c2HtxUsjLd/Y
-         f1j65aUTqj744aGNmQO6nbO9lCfPtGiHnwHyhWYyXzoY5aZbLWTWyo79gU9q2vv07ieX
-         heg5UCuPNd4oWXTlmbUdtkj/q3ct2N7C6XuOQT0SCrFl4SJUSRjNExoGXnctTpssEUdK
-         EDHYKuyl7LM86gxb0qJ9nTDlgDuOa4tA1JZ5xR33arokz4sXwp722cr6p0oJf1aWiJvo
-         LUVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXi9IhO82M2J8r0DXr7+nk7dMWRjqYxHdt6FiyNMeBK2ghFFi5u0y00SEqkN6HaRcE6dpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvgQlrvPQfnSKjkR0+1UxuNCbB9Mvj+n8yN+K/Y9gpUiieCs39
-	NtDOFeeFIyeu78U/3wrNoQuvFwk+IcA8mW5L4YEPUzOdyCjV1BEQr+2/PH1aJbwTAwaId3cHbiA
-	kPwqx+GINdH1/ILFY8NPxQ3QsLutqC4MockVSeuALEDn5OrWJxs9bbA==
-X-Gm-Gg: AZuq6aKyJy8QxKAIc8Hi6M0EJisbUFxaJIjoSAVheRkY1C0N+BnNCxdvCvbx1bLfRyG
-	UepiXigy2lehmsKarpGcdcrjGxaMmsWUqdRSzThoFHu2mR7/iSzGzLHnQEsxv2QLPKD5yXeS/2t
-	pO0LTWQmq7L2r4AeMip+HRMt+J5YWjRH6F247XuXbFK13o0JSVPNE/CCHPcTFXtv4SMNo/JvrzX
-	FP9uY3gYWRm1iQqmS4lDdJ2usJ14T0CkmrLeIi1aH9PGXlfIODXgEGnlgSbY6EED2nMnUXzl+rs
-	867F0E1pc+tJFr50Tngu6o5THhBBGde7aYRNFj7zbf6k1V6d9/vgpzqqpxyw/9OF+hBzzeseJgZ
-	JbT0=
-X-Received: by 2002:a05:600c:8b24:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-48069c20e88mr15110045e9.10.1769506058541;
-        Tue, 27 Jan 2026 01:27:38 -0800 (PST)
-X-Received: by 2002:a05:600c:8b24:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-48069c20e88mr15109675e9.10.1769506058129;
-        Tue, 27 Jan 2026 01:27:38 -0800 (PST)
-Received: from fedora ([2a01:e0a:257:8c60:80f1:cdf8:48d0:b0a1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066be7623sm47204815e9.2.2026.01.27.01.27.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jan 2026 01:27:37 -0800 (PST)
-Date: Tue, 27 Jan 2026 10:27:35 +0100
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>,
-	German Maglione <gmaglione@redhat.com>,
-	Hanna Reitz <hreitz@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, danpb@redhat.com,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Alex Bennee <alex.bennee@linaro.org>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Francesco Valla <francesco@valla.it>
-Subject: Re: Call for GSoC internship project ideas
-Message-ID: <aXiFBwcLg4PQ/4m7@fedora>
-References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dQBUW8SMEsilQTNppVvtXka4e1MyXdSxxgb2gqUmopjEB01GtOjj7I23KAHqaO/T9lXXiPh/qmHNGSuFp83OQu0hqyA7C6iDYeOO7SBv3dQTF4yEoTlJGjaNO5znmEmenI3SKGK2XsWz06PuvdFRb93I9YyyStMC0GEbSuhIJ10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nXyeIUrw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6682CC116C6;
+	Tue, 27 Jan 2026 09:58:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769507917;
+	bh=e43WCMmXKqoQ1viplvp1q9BvjTcDlq2o9m6+FYicNOs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nXyeIUrwYH9Bvocj5q0H1KwuQq1u/sKXPPVIw9K2PpvUG9LoSqsRH6xT3lsT4xr+c
+	 9y8emVYoVXxF3LwoCELy+invYwnX6zrkTk8R+d4CKR0mOVEMciyCy8BMUnrTC4KNj6
+	 wdsO0lOvxpF6uI6g0uapcxuA0/8EZtzYAOupfFrf9C3S9aB8yRSbZ6DmR7hO4du9i+
+	 QKRbzayg5NAafG3KIt7x2i73nJnOMWFOFi2hWGbKkXaCIbn4d2cfK6YZNTMJ/1qj17
+	 Ooquo9YVpyBgYu3vzrWdY/ETm3IIOGXeiP+EUsNCvPgRA/cVf0jujyumqucigd0Fit
+	 w5UegsPWQTs/w==
+Date: Tue, 27 Jan 2026 11:58:31 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 3/8] dma-buf: Always build with DMABUF_MOVE_NOTIFY
+Message-ID: <20260127095831.GR13967@unreal>
+References: <20260124-dmabuf-revoke-v5-0-f98fca917e96@nvidia.com>
+ <20260124-dmabuf-revoke-v5-3-f98fca917e96@nvidia.com>
+ <0d2ec2d6-c999-45d8-a2bd-b5b21883db47@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0d2ec2d6-c999-45d8-a2bd-b5b21883db47@amd.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69220-lists,kvm=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-69221-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nongnu.org,vger.kernel.org,gmx.de,redhat.com,linaro.org,ilande.co.uk,valla.it];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mvaralar@redhat.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C493591B1D
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1984D92483
 X-Rspamd-Action: no action
 
-On Mon, Jan 05, 2026 at 04:47:22PM -0500, Stefan Hajnoczi wrote:
-> Dear QEMU and KVM communities,
-> QEMU will apply for the Google Summer of Code internship
-> program again this year. Regular contributors can submit project
-> ideas that they'd like to mentor by replying to this email by
-> January 30th.
+On Tue, Jan 27, 2026 at 10:26:26AM +0100, Christian König wrote:
+> On 1/24/26 20:14, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > DMABUF_MOVE_NOTIFY was introduced in 2018 and has been marked as
+> > experimental and disabled by default ever since. Six years later,
+> > all new importers implement this callback.
+> > 
+> > It is therefore reasonable to drop CONFIG_DMABUF_MOVE_NOTIFY and
+> > always build DMABUF with support for it enabled.
+> > 
+> > Suggested-by: Christian König <christian.koenig@amd.com>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 > 
+> Reviewed-by: Christian König <christian.koenig@amd.com>
+> 
+> As long as nobody starts screaming in the last second or I encounter some other problem I'm going to push the first three patches to drm-misc-next now.
 
-Hello,
+How do you see progress of other patches?
+Can they be queued for that tree as well?
 
-We came up with the following idea.
+Thanks
 
-Thanks.
-
-=== virtio-rtc vhost-user device ===
-
-'''Summary:''' Implement virtio-rtc device as a vhost-device-user
-
-Implement virtio-rtc device using the vhost-user-device framework.
-
-The goal of this project is to implement a virtio-rtc device as a
-vhost-user-device. At the moment, there is no open implementation of a
-virtio-rtc device, even though a virtio-rtc driver exists and appears to
-be tested against a closed device implementation. This project aims to
-fill that gap by providing a fully open and spec-aligned device.
-
-The virtio-rtc device provides access to real-time clocks, such as UTC
-or TAI, or physical time elapsed since a given epoch. The driver can
-read the time using simple or more accurate methods and may optionally
-set an alarm.
-
-The work starts with understanding the virtio-rtc device as described in
-the virtio specification, as well as studying the existing virtio-rtc
-driver. In parallel, an existing vhost-user-device implementation can be
-used as a reference to design and write the new device. The device will
-be implemented in Rust and must follow the virtio specification closely.
-
-The project also includes debugging interoperability issues, identifying
-possible mismatches between the driver and the specification, and
-submitting the final implementation to the vhost-device project.
-
-High-level tasks:
-- Study the virtio-rtc specification and understand the existing
-  virtio-rtc driver. Also, it may help study the QEMU implementation of
-  the rtc clock.
-- Design and implement the virtio-rtc device as a vhost-user-device in
-  Rust. Existing vhost-user-devices may help to get inspiration. This
-  step also requires adding the glue code in QEMU to support this
-  device.
-- Build and test the virtio-rtc driver.
-- Test, debug, and submit the new device to the vhost-device project.
-
-'''Links:'''
-* Linux Driver Series:
-  https://lore.kernel.org/all/20250509160734.1772-1-quic_philber@quicinc.com/
-* vhost-device repo: https://github.com/rust-vmm/vhost-device
-* VirtIO 1.4 specification:
-  https://github.com/oasis-tcs/virtio-spec/tree/virtio-1.4/device-types/rtc
-
-'''Details:'''
-* Skill level: intermediate
-* Language: C/Rust
-* Mentors: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
-  Francesco Valla <francesco@valla.it> and Stefano Garzarella
-  <garzare@redhat.com>
-
+> 
+> They are basically just cleanups we should have done a long time ago.
+> 
+> Regards,
+> Christian.
+> 
 
