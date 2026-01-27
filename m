@@ -1,307 +1,347 @@
-Return-Path: <kvm+bounces-69257-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69258-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WC+PNEPseGkCuAEAu9opvQ
-	(envelope-from <kvm+bounces-69257-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 17:48:03 +0100
+	id 178UO7H0eGnYuAEAu9opvQ
+	(envelope-from <kvm+bounces-69258-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 18:24:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77BC797F04
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 17:48:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D7698640
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 18:24:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 614903002331
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 16:48:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8CD193031335
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 17:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FF436214F;
-	Tue, 27 Jan 2026 16:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFA82E9759;
+	Tue, 27 Jan 2026 17:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="bWJfd73r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kKJwyC9B"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6771436074D;
-	Tue, 27 Jan 2026 16:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769532474; cv=none; b=TyMM/vKKZ7JSZ1sNY4pxXr9s4aFOC3OquWeZbbPtp7tYnRpttZjqtqBnA+sNNo9ZyRLMyGQokH81KVaDBZnRO9am1BnowElNRqslH+AnbEqNjOf2KrVUh4OO95jdEAy4NSDS4WYJClcQXbLUUYDWaPr3Q9+q/SLMyTEeH9RHDVU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769532474; c=relaxed/simple;
-	bh=XK4NldxnrmNFyYoe4tFSDQOd8+EZGjIVoCf7QhQESiY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pZvbVEGYUhMIw4uFKnQHvVI+BOoCG6GZ9+8PbRXjzqleVMjfaroB3aGoJ+6mMWhq7slT/ZmVQAKQKVwwj+fW4h836PaFv/RtufPbo3bcWM3DNHOi7f9KdPSuO4S7mGj3BenWnkt2dSIMA7oFtREvyt+fOXmRomzPQO+shTVnzgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=bWJfd73r; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.38] ([129.217.186.38])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60RGlcvK018197
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 27 Jan 2026 17:47:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1769532459;
-	bh=XK4NldxnrmNFyYoe4tFSDQOd8+EZGjIVoCf7QhQESiY=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=bWJfd73rP/VRoOkqucSD2r/PV7VTDmqrhQdkjGf85G9N4lZWrU1ukqmfSgl8pW+Fh
-	 UoHtI2tL8Ayh6VGhzWWmYoJH8Y+V32S90j8GCFE7SA/1UOQilM1xU/lvw/57uULVdS
-	 4KKjf+sGseDvNjuW+oTaTwhSO1y7MI7Y0rg5udsU=
-Message-ID: <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
-Date: Tue, 27 Jan 2026 17:47:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7208139D;
+	Tue, 27 Jan 2026 17:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769534629; cv=fail; b=l+5D7BPlY+CEIgq2VNKjE3VIqVCaEAmGfNpvLcxk9MCLlWsc7lO+k6SYIFn2qeBBHwxg6XZHXwcmbb2Fs35Iy2gn6kktUlgC6Hp7nV2f8HUq+Wv77gFs+wPr4Dvh4UPNM3tcdSI62kB+VRS9AYkbRJujx2EkL7R/8ZlOgYT6xTo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769534629; c=relaxed/simple;
+	bh=1wzb+YwWrRUfj8ihC9zZMjAw92NDJ/ZIX0cnP8UaOYw=;
+	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
+	 Content-Type:MIME-Version; b=k5PLYZRbqOgSJb4sS0RuG8OEt44XMQInLT8JdCmDCykuFGrrJCaA3k/tw46CupBC7Y1vAiBfu5p+VkCF9aWIUPWa1px+rjEfdcPtPFq4gZgRGfvTuGeUp8UUxEtHzBGA1Lwc54b+dKS/VLdfubhbrKr0OJitGOwoDJMiK7kUaWg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kKJwyC9B; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769534628; x=1801070628;
+  h=from:date:to:cc:message-id:in-reply-to:references:
+   subject:content-transfer-encoding:mime-version;
+  bh=1wzb+YwWrRUfj8ihC9zZMjAw92NDJ/ZIX0cnP8UaOYw=;
+  b=kKJwyC9BzSV1ODerx9caA6vFensnKsbZPbVSx5GCpjfbs0zkgB8zexcD
+   uHr2m8EKu7AUrzv29LxZ/bbSyDNpXFtxPneBXRUat6RyHtNUj1kS4uIGk
+   leGxQfS/LtZYTHovEwOlAGrOoiK20xgUGiiCAnGG/mnG790tvIl0KvfwL
+   DbsT2Rl87RcNGhPgglnu96l79DQVoLosjkOObbdDdLz/eumucCyj2xz4N
+   1KkLzq1rhN4LpGxI8gu6JjU9KnQ3YyGa8Sf7cUh25CvBhCaNSHcnXOIUE
+   nA2XXmbmIHf9j0o42Iae47UJGkARYMffwCxagw68tmn0Mk7xh5tW7klDH
+   Q==;
+X-CSE-ConnectionGUID: b+BYg+AARBqWPeF34zENzA==
+X-CSE-MsgGUID: SDbPtyNeTvWQXfM64OU2eA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11684"; a="74599333"
+X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
+   d="scan'208";a="74599333"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 09:23:46 -0800
+X-CSE-ConnectionGUID: 97DPZC2xSSGmAlnlPich+A==
+X-CSE-MsgGUID: d78rYPlDQBiCTVs/YMVWwQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,257,1763452800"; 
+   d="scan'208";a="245657258"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2026 09:23:46 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 27 Jan 2026 09:23:44 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Tue, 27 Jan 2026 09:23:44 -0800
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.29)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Tue, 27 Jan 2026 09:23:44 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gtKSeBrp7aPn6ytm1WJdRv20gguvvY7Dt2dsNSdt2+9i+8TScogzOu6FfDzy14SQk0bUXY3/OcFaLB0D3ovEKe8gaZ01AqnJxhPYy7FfaOfATVFIJpKZytkrwMLehjoK0ygC6V6hStqJToYkGm1t6g83cMvIL4Fxd2x3kVfsA7F00FalYymBRCH/qdvN+0VbKeET01+ZdW6Jsu6yYRi4IGD2/MM2YU/qqYlgpFTMC5Xd9PICNVj7iqJ2hSNRSQvydNkFSMdzgdmx6awZkKsudoP+Ib6/lujwEQ39XaVKgHhfUHaumz6rHgiMAPtSCeeiuWLdt1jxeDD8lcHDtbzXNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iwjMKOx+bRxbtvHyReU71mYlvo94c7G6k+lWtG18exU=;
+ b=WxpF6WjV2bk1PHZh5AnK5kparfzgWf+EsXBg1cGsYFPjEFOOD7uT6c6BpgFo84ouYh4dkE+TwbWM6/a2kcMFISKVlwsvXR/rakr53nzy20ezrjSfCtoZTcD6+WcYin+wC3SK0ZwyUHPRGaNDUp4kQ7IpaNv8YN4v3iWdTwzr2ZdsaP3Sd3IriGXl+bZL6qlokQRCnCmN4ThBo8jyt3ZUQZfRpxQVJSiI7u7AIqqM8Tv6y7G0tCEHiFYRomfBk2krIzXtU2I9qjrMgaRZhEXjBpMtBbFez5YS6rdPcpi5QHy8emc2ThZVG4338EDQBuS/kbJOPCOCtLdZUHSJOAt50w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by BN9PR11MB5243.namprd11.prod.outlook.com (2603:10b6:408:134::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.14; Tue, 27 Jan
+ 2026 17:23:40 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::1ff:1e09:994b:21ff]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::1ff:1e09:994b:21ff%6]) with mapi id 15.20.9564.006; Tue, 27 Jan 2026
+ 17:23:39 +0000
+From: <dan.j.williams@intel.com>
+Date: Tue, 27 Jan 2026 09:23:37 -0800
+To: Chao Gao <chao.gao@intel.com>, <dan.j.williams@intel.com>
+CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <x86@kernel.org>, <reinette.chatre@intel.com>,
+	<ira.weiny@intel.com>, <kai.huang@intel.com>, <yilun.xu@linux.intel.com>,
+	<sagis@google.com>, <vannapurve@google.com>, <paulmck@kernel.org>,
+	<nik.borisov@suse.com>, <zhenzhong.duan@intel.com>, <seanjc@google.com>,
+	<rick.p.edgecombe@intel.com>, <kas@kernel.org>,
+	<dave.hansen@linux.intel.com>, <vishal.l.verma@intel.com>
+Message-ID: <6978f4999af8c_1d331006e@dwillia2-mobl4.notmuch>
+In-Reply-To: <aXis76vQhWi3RvEB@intel.com>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-27-chao.gao@intel.com>
+ <6977e73a7a121_30951002f@dwillia2-mobl4.notmuch>
+ <aXis76vQhWi3RvEB@intel.com>
+Subject: Re: [PATCH v3 26/26] coco/tdx-host: Set and document TDX Module
+ update expectations
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR05CA0017.namprd05.prod.outlook.com
+ (2603:10b6:a03:c0::30) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-4-simon.schippers@tu-dortmund.de>
- <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
- <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
- <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
- <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
- <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
-Content-Language: en-US
-In-Reply-To: <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|BN9PR11MB5243:EE_
+X-MS-Office365-Filtering-Correlation-Id: f884812e-ecae-408f-cc8d-08de5dc8cf71
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WDg1dTlMcTF3dmZONnpFRE51bFVGR1NkdFpUYVFXNk1qTnVCeGFKRVQrTXNU?=
+ =?utf-8?B?NnJHcVkrT0ttaEtzU2JkcFFLTjJ2Q1VZeDAvS0h1RnlON2pvQ3drc1Fzc0RB?=
+ =?utf-8?B?bzJyOGloVUhkLzVPdng1RjA3YjlGNDI2UVEvZTFZTG1paUl5ck5mclNmditp?=
+ =?utf-8?B?WlRvR0Z3Zy8yaTR4b2g0c1MzZld0am4rWkVXZkZrcjR5WGxRTmJFMEJFOUxa?=
+ =?utf-8?B?OEFRTVBwS2pVMHFpaTBwb2xLS3lFcjV5cUhyV2JzYzdKSy9ENXpOSUozOFRw?=
+ =?utf-8?B?bVVIRTI1VG5ObitTUllwZEV4WU82aGlwWjdsNDhZS1ZzSUFjTXljK3dLMjBs?=
+ =?utf-8?B?STBhTzlaaVBuVFB3NFNFR1dRTlMzcld3WGs0YWM2T1poQ3R0YXdKTVptZHZa?=
+ =?utf-8?B?aUJDT1p2TW9zS2NDQ2ZNWEdrRDB2aEZ0bHpXMzcvRHVFazFKcm5iQlJsbHhp?=
+ =?utf-8?B?ZnpjRVBSVlF5Qmt4dEZxbXdMektRcWIrMjNHUGo5NWE4YUlMTzNlNzlXYzAw?=
+ =?utf-8?B?Q2dZVUhLTWVGOGhzZnRoQWhrM09tbzhGVmZ3U3hJVWhIRVM1SzFVSkVGMkZy?=
+ =?utf-8?B?MnI1aHhUYU03Z3ZBQ0dQQndxY1lvakpIVU96bzQ2aUxhVFZqTUwzQWNBYXJU?=
+ =?utf-8?B?Ui9yUUNIU2FPbDBVUE1JZ3g0VVRQeW95R01ZVVdsYXpLVDFySXp1VHdGUHZ4?=
+ =?utf-8?B?M081VFZXYUd2SjBjankrZ0EwZUdHOVJTTTBxajVRNE5KaEFxOE16b0dFQTJk?=
+ =?utf-8?B?L3E4NkpmMkNqZXljTlFDdzhHV0IrWGV0TnlSRUFyWHVBR05rMFV1czYvdlVE?=
+ =?utf-8?B?NnAzUFRTeVJRM1pUczlkZDRHKy9MQkxaS1hEOGE5aFlKdElTZHM0TGVVUEpa?=
+ =?utf-8?B?TmVDeFhXRTVZQjJZazg4WG9XUHVWVXkvQmJEbUZ1R0VxVlRVQkpqeDVjMkFD?=
+ =?utf-8?B?NjhpQjZUSEVMRXZjY0JZb0JNRGxXaHExdU1VVFdKdDNuMVNzYVE2WVRlVjBm?=
+ =?utf-8?B?Y0NBcVZMSVJ6RmhHeWN4VlBMMTQvTTdXckZkRHl0WXg2ZEF0MnRXTk9KMzdC?=
+ =?utf-8?B?aHE4eUl3SkNzTnFlNTM4eWsydmVKVHZxQ3pKbDU5TUtieS9hNmxDY0wrbDY4?=
+ =?utf-8?B?Q2Q1WFZkZFlSQ3NKeUVTdEgzOWFnQS8rb0prK1pmU1VpR2RNb1J2YkFEUVNO?=
+ =?utf-8?B?TWMrMVZPWE9QbkhleGxTeWE4c0pHdy9nY0FwVUtyZitrTXhTVHN5alVWV0Z0?=
+ =?utf-8?B?VXpJUUt2Ykw1Y2ZPR3ZkZDExTHNEUEtucHkwd0xpbUE4a0thdWUwM3Zic2Rl?=
+ =?utf-8?B?VTRVMHNVMkF2NG1xM2lMRTkrOFFIbWMyRGdtb0kxT1hraVZiQUgyc0hBZkk2?=
+ =?utf-8?B?RUdEc3pGbGJSRHZTaW8xVjhxbnVsMW1TVmtWVGlTdFU5bTFSN2QzakZpRFh0?=
+ =?utf-8?B?RGNVTU02cC9JUUVxT3NaKzZVSXdjQUZ0Q1FkWnFvQUt3ZXdCRkx3U2lDTWhC?=
+ =?utf-8?B?OXRvWVYzR2hQeFc0Y043MWNDVTlPay8xYjFtR0ozSmFKdmpVOEMyb21BL0VQ?=
+ =?utf-8?B?MWs1cjVSMFVqMGgxazNSOEZyMERpMmQ2V2hjUzA0L2tVUHFNUTZ5M3YraFdV?=
+ =?utf-8?B?Z3dueTJUMmFoVzl4OFBETGdVSUFwUnRTZmQyS1lwUWE1V2FsdXlueDg1WE5Z?=
+ =?utf-8?B?MTZHS01tRWppN0d5L1dNWE9XMzlXQVVKaUxraWx2OUx2UU5hL2wzcUlRM2lG?=
+ =?utf-8?B?YkhWR2I5cWlldmcwWC8wbFNxQWxMcVZ5eG5URnlvbWI0RExiVjdFRisvZzZ1?=
+ =?utf-8?B?NThROWE0RVBscnV3Y2g1M0t2UkhWWTkyR0Z0MEY3eGQ5emdRcHEvTTJ5NllY?=
+ =?utf-8?B?T3ZNNmNWUFN4eUhjWlJyd3NYdmhyZUxUTWsyTitXOEVlbHpnZzlSMEY3OW1x?=
+ =?utf-8?B?aVZ1cTN6WHRMT3N5eUZaMnprTDF1Wk5lQ1RTWm9qTWE0TVBGYlVldTR1Z1lX?=
+ =?utf-8?B?ZVdsdmtJQVQ1dGk3YUJwY29sTitZdW9RMHZMdHFZREpibHJTN3VUUlJ6TEt2?=
+ =?utf-8?B?aHdoNGMydTJNMXgvYTB3UEhyVk5mQkFIUlo3QT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R3RyMmNjMjJUUnpPSU42MVNNRTZTM3VZT0o0TlpaMjhxSDNnQ1hFWE52TEVa?=
+ =?utf-8?B?Q3hFQXk4WFBTL2xpbklyM293dENLMzZJdjdRZXVmR01nYWs4SWVVL21sMUNL?=
+ =?utf-8?B?M1ZBejFzTEdSWWRLL044ZnVtR3JwZzZQYlJZSHBQa1ZTTTNUZTFVd3dMeVlE?=
+ =?utf-8?B?YjJpWkRsbGx1aEVKZHlNVlJuSHNpeWk3WTVyRWM0NG9Jc0hhcnJwaU9IU255?=
+ =?utf-8?B?ZEsreE1rSkxBNjM1OXNOY2l2TXk3ZkwxTXZ1R1VxSkpEVWR5c3hiZVVsSURQ?=
+ =?utf-8?B?S2t1RkRTMTMxdk93QTRnOFM1MGdnOWRoWDZJNThGdldvSXRwczI5czNxc2M2?=
+ =?utf-8?B?M253cGFGcGllWXp1bGhLUUJHTFU4ajRSbGlUZDJjR21nYUlpamhmYUpMckpM?=
+ =?utf-8?B?bmJDbk5mejZqeENmaUMyb0NVVmh3RWVPTG94VXpBRjFRL3R1TXVYYjFMNldL?=
+ =?utf-8?B?RFJCOURua0JUM3JMdEVBQ2ZzdFpadUpGdTZEbEh4b3g0QkhLNG5KcTlaVGUy?=
+ =?utf-8?B?dURzY2tGY21nVVN4V05MOGlpM21CUnY3NDJJcmR5TjZKbWcyRTBrRzNXNzB5?=
+ =?utf-8?B?eDRtY1pwcVhSVjlWRld3clVJOTNmUUliT3Y1dXdZdmhheHBrVjdWaDB6TGo4?=
+ =?utf-8?B?eXZteHBRUlN5ZHpva3hyZm1Ib0lGUUJUNnNkWFVONkNCdnpFWnAyek4yS0RL?=
+ =?utf-8?B?b0pHTlNBRUo4MFFVTjllcEwvbHhNZlJEbDNlRE5xU3NzWE8vTUIva00wbzA5?=
+ =?utf-8?B?UmdCaWlDT2p5SWtocFh6MW5ZN21tU2d2RE14MWdIY09JdTdsVjZTcjRNWGxn?=
+ =?utf-8?B?VkxxSWJlN2gzN1crMmh4VFF1ZGowK29TYzVKQVlFVUhuTlhoaGVvN2oybW9y?=
+ =?utf-8?B?cWtWV0xTcFIxQTdoMlBuM0xvZlJ5UnphRjVIVXJmRndsT0x4alk2UlhGZXoy?=
+ =?utf-8?B?S2pBMnp4UVV2VDRQdEk3Q3M0VHc3dTc4MlY1TTJ5eDNJL3BxcEJuOEI3TVZm?=
+ =?utf-8?B?T2lGTXBwRHFqdVlkRFBaSFBUWll3YlJhdkFKK1VVckdjTXVWb3RRU25FRVJ3?=
+ =?utf-8?B?SkxacWF3TlhMVXpsMGRxQ08ydnpqOStQY05TZ1R2WmN4aFNkVlhaN3lGbWRV?=
+ =?utf-8?B?WjRLWi9QeXE1M29HMFp2U3JFM1ErbjVpQi8vakMwVTk5bGNTazZBcWJIOFlX?=
+ =?utf-8?B?WnJOWG5NNktyWVhXYVRvM3MzM1pZOXBwMzJQT2ZqaXlQek9qMFh5OG5ONGNB?=
+ =?utf-8?B?OVZzWlBxMWpYaXRxa2FQUDdZWXVsQXliRklCbXdmK2JnYmR4RkI3VXZLejIw?=
+ =?utf-8?B?UE9vNDBsMXA2UEN1K1F2OGxQVnBqc1dWQkVvckFHSmk3cUVHNDZuN1RLajhK?=
+ =?utf-8?B?VFVER256QTYvWStMUHhwVDU3dllvb2JQUFFYVFU1NlhXU0dZWTJQcUIvaXp0?=
+ =?utf-8?B?WktYY2xUVEsxazBEWStWdVQrWHFTZDdwUVFVM3RwL3Nva0czR3Z5SVJiSmh3?=
+ =?utf-8?B?d0dsY2pkVG1UNWxia1hUL2s1TkRpUGR6Y1lBMGRuRWtSbUs0ZkFtYzhOM0hD?=
+ =?utf-8?B?UFp6ckNSdmhtb3RtWWFmYUVKVzhVT0xWYWR3U2Y3MmpNL1RVUHZMb0lncXY5?=
+ =?utf-8?B?QzRucWJrOUpSY3VXVWduaEYrTjJnNG9vaXpRQjg3WEF2TFF2UmVyNFB5YnlM?=
+ =?utf-8?B?N0pQMmNVblhDTmhlWDF5cnJ3YlB2NTdMMzRjdXpwNFViZW8xbWxaZWU5TFdJ?=
+ =?utf-8?B?WHVtNDZiWG9Qdnc5MmRjc3dXcXFva1VhQzZrdXB6dllyUHRyVFVTazVRQ2tZ?=
+ =?utf-8?B?ZG5ScDlTVkg1clZxMEJ5Zkp0K2VjTWZlRjd6cmU4blB4bS81dVFWb3p4RUZI?=
+ =?utf-8?B?UklhZWorMWlBNGhtWkZIN0lCTVpyVkVudXhKSE9HQ3dWK2NBZitQODVBditK?=
+ =?utf-8?B?SGFwNG9xUnZHOEx0RTRqWVA1VFNsZ2I2KzBna01FVC9SdGR3SVRoZzlNMmha?=
+ =?utf-8?B?YUZHRDdsYmxUTGROSWV2ZzZPT1NPSTdjaWpjQjJkL29UN0NxWWRSMWk1UHZN?=
+ =?utf-8?B?Q2tjSktidHlUOUVnVy9Mbjg4Q3FGelZzOHpkcTkvaS9UTllmenBxd21vNTFL?=
+ =?utf-8?B?dklzNUY2di90WllwZWpWUGx2NTF6L0dXZ1h1OE1zVTU5ZUpraGtaQXlYaFV0?=
+ =?utf-8?B?YklkYVpscmp6WDBqM3l6QVpoYzVlOEo2YXpnblpKU1gxL3JsNjY5eWh0eDVw?=
+ =?utf-8?B?cklDVCtKVEppRUVzT0pXSXMxaUhVdm5sY3luaDgwZDdTQWNFcFdmWGRlbng5?=
+ =?utf-8?B?eldWTmtzSVlsaloyY2RybUk5SU15dnRCY1NIOFBrY2xKTzA3R3VaejgrNjJB?=
+ =?utf-8?Q?2hs6lyoVU634aMDU=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f884812e-ecae-408f-cc8d-08de5dc8cf71
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2026 17:23:38.9860
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FugRdwRXl+dmCH7FNf+6TsFKRcDb4PFYp583EjdfpjRMfdU64Jyc+id5hQukbTnT6e/shuTcCyEYa3z1AtfqSV2jM90ODOcIqWNqRobOQxs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5243
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69257-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:url,intel.com:dkim,linux.dev:email,dwillia2-mobl4.notmuch:mid];
+	TAGGED_FROM(0.00)[bounces-69258-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid]
-X-Rspamd-Queue-Id: 77BC797F04
+	FROM_NEQ_ENVFROM(0.00)[dan.j.williams@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 35D7698640
 X-Rspamd-Action: no action
 
-On 1/23/26 10:54, Simon Schippers wrote:
-> On 1/23/26 04:05, Jason Wang wrote:
->> On Thu, Jan 22, 2026 at 1:35 PM Jason Wang <jasowang@redhat.com> wrote:
->>>
->>> On Wed, Jan 21, 2026 at 5:33 PM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> On 1/9/26 07:02, Jason Wang wrote:
->>>>> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> On 1/8/26 04:38, Jason Wang wrote:
->>>>>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
->>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>
->>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
->>>>>>>> and wake the corresponding netdev subqueue when consuming an entry frees
->>>>>>>> space in the underlying ptr_ring.
->>>>>>>>
->>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
->>>>>>>> in an upcoming commit.
->>>>>>>>
->>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>> ---
->>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
->>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
->>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->>>>>>>> index 1197f245e873..2442cf7ac385 100644
->>>>>>>> --- a/drivers/net/tap.c
->>>>>>>> +++ b/drivers/net/tap.c
->>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
->>>>>>>>         return ret ? ret : total;
->>>>>>>>  }
->>>>>>>>
->>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
->>>>>>>> +{
->>>>>>>> +       struct ptr_ring *ring = &q->ring;
->>>>>>>> +       struct net_device *dev;
->>>>>>>> +       void *ptr;
->>>>>>>> +
->>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>> +
->>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>> +               rcu_read_lock();
->>>>>>>> +               dev = rcu_dereference(q->tap)->dev;
->>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
->>>>>>>> +               rcu_read_unlock();
->>>>>>>> +       }
->>>>>>>> +
->>>>>>>> +       spin_unlock(&ring->consumer_lock);
->>>>>>>> +
->>>>>>>> +       return ptr;
->>>>>>>> +}
->>>>>>>> +
->>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>                            struct iov_iter *to,
->>>>>>>>                            int noblock, struct sk_buff *skb)
->>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>                                         TASK_INTERRUPTIBLE);
->>>>>>>>
->>>>>>>>                 /* Read frames from the queue */
->>>>>>>> -               skb = ptr_ring_consume(&q->ring);
->>>>>>>> +               skb = tap_ring_consume(q);
->>>>>>>>                 if (skb)
->>>>>>>>                         break;
->>>>>>>>                 if (noblock) {
->>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>>>>> index 8192740357a0..7148f9a844a4 100644
->>>>>>>> --- a/drivers/net/tun.c
->>>>>>>> +++ b/drivers/net/tun.c
->>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>>>>>         return total;
->>>>>>>>  }
->>>>>>>>
->>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
->>>>>>>> +{
->>>>>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
->>>>>>>> +       struct net_device *dev;
->>>>>>>> +       void *ptr;
->>>>>>>> +
->>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>> +
->>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>
->>>>>>> I guess it's the "bug" I mentioned in the previous patch that leads to
->>>>>>> the check of __ptr_ring_consume_created_space() here. If it's true,
->>>>>>> another call to tweak the current API.
->>>>>>>
->>>>>>>> +               rcu_read_lock();
->>>>>>>> +               dev = rcu_dereference(tfile->tun)->dev;
->>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
->>>>>>>
->>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
->>>>>>> I'm not sure is what we want.
->>>>>>
->>>>>> What else would you suggest calling to wake the queue?
->>>>>
->>>>> I don't have a good method in my mind, just want to point out its implications.
->>>>
->>>> I have to admit I'm a bit stuck at this point, particularly with this
->>>> aspect.
->>>>
->>>> What is the correct way to pass the producer CPU ID to the consumer?
->>>> Would it make sense to store smp_processor_id() in the tfile inside
->>>> tun_net_xmit(), or should it instead be stored in the skb (similar to the
->>>> XDP bit)? In the latter case, my concern is that this information may
->>>> already be significantly outdated by the time it is used.
->>>>
->>>> Based on that, my idea would be for the consumer to wake the producer by
->>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
->>>> smp_call_function_single().
->>>> Is this a reasonable approach?
->>>
->>> I'm not sure but it would introduce costs like IPI.
->>>
->>>>
->>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
->>>> considered a deal-breaker for the patch set?
->>>
->>> It depends on whether or not it has effects on the performance.
->>> Especially when vhost is pinned.
->>
->> I meant we can benchmark to see the impact. For example, pin vhost to
->> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
->>
->> Thanks
->>
+Chao Gao wrote:
+[..]
+> >So, remove "compat_capable" ABI. Amend the "error" ABI documentation
+> >with the details for avoiding failures and the risk of running updates
+> >on configurations that support update but not collision avoidance.
 > 
-> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
-> for both the stock and patched versions. The benchmarks were run with
-> the full patch series applied, since testing only patches 1-3 would not
-> be meaningful - the queue is never stopped in that case, so no
-> TX_SOFTIRQ is triggered.
-> 
-> Compared to the non-pinned CPU benchmarks in the cover letter,
-> performance is lower for pktgen with a single thread but higher with
-> four threads. The results show no regression for the patched version,
-> with even slight performance improvements observed:
-> 
-> +-------------------------+-----------+----------------+
-> | pktgen benchmarks to    | Stock     | Patched with   |
-> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
-> | 100M packets            |           |                |
-> | vhost pinned to core 0  |           |                |
-> +-----------+-------------+-----------+----------------+
-> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
-> |  +        +-------------+-----------+----------------+
-> | vhost-net | Lost        | 1154 Kpps | 0              |
-> +-----------+-------------+-----------+----------------+
-> 
-> +-------------------------+-----------+----------------+
-> | pktgen benchmarks to    | Stock     | Patched with   |
-> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
-> | 100M packets            |           |                |
-> | vhost pinned to core 0  |           |                |
-> | *4 threads*             |           |                |
-> +-----------+-------------+-----------+----------------+
-> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
-> |  +        +-------------+-----------+----------------+
-> | vhost-net | Lost        | 1527 Kpps | 0              |
-> +-----------+-------------+-----------+----------------+
-> 
-> +------------------------+-------------+----------------+
-> | iperf3 TCP benchmarks  | Stock       | Patched with   |
-> | to Debian VM 120s      |             | fq_codel qdisc |
-> | vhost pinned to core 0 |             |                |
-> +------------------------+-------------+----------------+
-> | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
-> |  +                     |             |                |
-> | vhost-net              |             |                |
-> +------------------------+-------------+----------------+
-> 
-> +---------------------------+-------------+----------------+
-> | iperf3 TCP benchmarks     | Stock       | Patched with   |
-> | to Debian VM 120s         |             | fq_codel qdisc |
-> | vhost pinned to core 0    |             |                |
-> | *4 iperf3 client threads* |             |                |
-> +---------------------------+-------------+----------------+
-> | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
-> |  +                        |             |                |
-> | vhost-net                 |             |                |
-> +---------------------------+-------------+----------------+
+> Got it. I will modify this patch as follows:
 
-What are your thoughts on this?
+Overall, looks good to me. You can add:
 
-Thanks!
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 
+...after a few additional fixups below:
+
+> diff --git a/Documentation/ABI/testing/sysfs-devices-faux-tdx-host b/Documentation/ABI/testing/sysfs-devices-faux-tdx-host
+> index a3f155977016..0a68e68375fa 100644
+> --- a/Documentation/ABI/testing/sysfs-devices-faux-tdx-host
+> +++ b/Documentation/ABI/testing/sysfs-devices-faux-tdx-host
+> @@ -29,3 +29,57 @@ Description:	(RO) Report the number of remaining updates that can be performed.
+> 		4.2 "SEAMLDR.INSTALL" for more information. The documentation is
+> 		available at:
+> 		https://cdrdv2-public.intel.com/739045/intel-tdx-seamldr-interface-specification.pdf
+> +
+> +What:		/sys/devices/faux/tdx_host/firmware/seamldr_upload
+> +Contact:	linux-coco@lists.linux.dev
+> +Description:	(Directory) The seamldr_upload directory implements the
+> +		fw_upload sysfs ABI, see
+> +		Documentation/ABI/testing/sysfs-class-firmware for the general
+> +		description of the attributes @data, @cancel, @error, @loading,
+> +		@remaining_size, and @status. This ABI facilitates "Compatible
+> +		TDX Module Updates". A compatible update is one that meets the
+> +		following criteria:
+> +
+> +		   Does not interrupt or interfere with any current TDX
+> +		   operation or TD VM.
+> +
+> +		   Does not invalidate any previously consumed Module metadata
+> +		   values outside of the TEE_TCB_SVN_2 field (updated Security
+> +		   Version Number) in TD Quotes.
+> +
+> +		   Does not require validation of new Module metadata fields. By
+> +		   implication, new Module features and capabilities are only
+> +		   available by installing the Module at reboot (BIOS or EFI
+> +		   helper loaded).
+> +
+> +		See tdx_host/firmware/seamldr_upload/error for more details.
+> +
+> +What:		/sys/devices/faux/tdx_host/firmware/seamldr_upload/error
+> +Contact:	linux-coco@lists.linux.dev
+> +Description:	(RO) See Documentation/ABI/testing/sysfs-class-firmware for
+> +		baseline expectations for this file. The <ERROR> part in the
+> +		<STATUS>:<ERROR> format can be:
+> +
+> +		   "device-busy": Compatibility checks failed or not all CPUs
+> +		                  are online
+> +		   "flash-wearout": the number of updates reached the limit.
+> +		   "read-write-error": Memory allocation failed.
+> +		   "hw-error": Cannot communicate with P-SEAMLDR or TDX Module
+> +		   "firmware-invalid": The TDX Module to be installed is invalid
+> +		                       or other unexpected errors occurred.
+> +
+> +		"hw-error" or "firmware-invalid" may be fatal, causing all TDs
+> +		and the TDX Module to be lost and preventing further TDX
+> +		operations. This occurs when /sys/devices/faux/tdx_host/version
+> +		becomes unreadable after update failures.
+
+I would specify the exact unambiguous errno value that gets returned on
+read when the version become indeterminate, like ENXIO.
+
+> +		and the (previous) TDX Module stay running.
+> +
+> +		On certain earlier TDX Module versions, incompatible updates may
+> +		not trigger "device-busy" errors but instead cause TD
+> +		attestation failures.
+
+I would just leave this out. It bitrots quickly and does not provide
+any actionable information. This is not the kernel's responsibility...
+
+> +
+> +		See version_select_and_load.py [1] documentation for how to
+> +		detect compatible updates and whether the current platform
+> +		components catch errors or let them leak and cause potential TD
+> +		attestation failures.
+> +		[1]: https://github.com/intel/confidential-computing.tdx.tdx-module.binaries/blob/main/version_select_and_load.py
+
+...that detail about what happens when compat detection is missing
+belongs in the tooling documentation. That documentation does not exist
+yet, so this link needs to be replaced with a pointer to documentation
+before this goes upstream. I am assuming that we want to create an
+actual package that distributions can pick up as project? It might be
+worth going through the exercise of packaging the binaries and the tool
+as an rpm or deb to get that work bootstrapped.
+"version_select_and_load" probably wants a better name like "tdxctl" or
+similar.
+
+Note that a tdxctl project would also attract features related to TDX
+Connect to wrap common flows around the tdx_host device sysfs ABIs.
 
