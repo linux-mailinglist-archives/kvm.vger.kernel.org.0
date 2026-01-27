@@ -1,109 +1,109 @@
-Return-Path: <kvm+bounces-69263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69264-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eE4kGrD/eGmOuQEAu9opvQ
-	(envelope-from <kvm+bounces-69263-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:10:56 +0100
+	id ECO9LTICeWmOuQEAu9opvQ
+	(envelope-from <kvm+bounces-69264-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:21:38 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB67298D29
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:10:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3068C98F36
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B847B3073405
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 18:09:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F0D3B3044088
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 18:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888B43254A5;
-	Tue, 27 Jan 2026 18:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F749326945;
+	Tue, 27 Jan 2026 18:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CWhOHDcb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qWHm0fXn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8400921ADB7
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 18:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC6132693C
+	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 18:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769537393; cv=pass; b=iY8/DQzW9aiCPItI/w7Gue8W2mKNe/eyJnh1/+Is6wH9+gT95jVePvddpJmYaygfQ+6lBd3/WKbMoK/4jUjNpv1gDLKiOi477zJ1tZCE1NsSZOpC78RxapPvTzF5w/49sov2iJaV+5m8VfuWEp4yVzQTllBdaU0tEnX6MKPT+K0=
+	t=1769538087; cv=pass; b=Cp+iJTeyV7NIn40NRtmsqCmbo1x8y12SQHP9GG7NGxLewNO1xIRo9RtkWhgXOZqjtJjiJYHHd8J6X3lQ+DraZnNNchlBpG/czZh00b+DgapytW0H6X4Tlw3Rc6jrAglVOUnEOo39i4XYHeOD/fgcbpYBp/4IGxTuCZY7Urfq9eM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769537393; c=relaxed/simple;
-	bh=QhsDz6emSteQN6HE837EJTl9yLXUpogqzdkgXhKPUOc=;
+	s=arc-20240116; t=1769538087; c=relaxed/simple;
+	bh=g/5hkAwC8K8uuKp+mUsVYSQJdxRY3jyLmOOMHdLbhsw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W8XaE86EMKtJ7T32tekbPBRH9ryBMVcTVsJO49nvVRtPjh1x4P1TPaBUacei8iAQT7N/ht6gLRny0hSUzR9y4hH5yDWxAGdH3owdd5mpKi3Z017E4FhWb+2JKoCFgKBOBPgP+fYEZ1XhZdPqEeXLcaFFwdQFvbXV12An3h0gMqk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CWhOHDcb; arc=pass smtp.client-ip=209.85.160.178
+	 To:Cc:Content-Type; b=ohYnJsnnOdRzibpEcJ6lEFtexwego48x763D92d1KuAX4fD5nbUWdGmOami5w5kJgYerY+JHTa6BdsTsQaHcCr+dLwCgE4r07gTAd7cJ8lVH1kSYI4UM89rwVYMbl0T3j8ZnGv5eSXKg0dPVjDBjmB5BgXTc6t4XbJeprb72J8k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qWHm0fXn; arc=pass smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-501511aa012so28381cf.0
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 10:09:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769537390; cv=none;
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-501511aa012so34391cf.0
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 10:21:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769538085; cv=none;
         d=google.com; s=arc-20240605;
-        b=OSSjaMF6oYArEZy88NoH7latZOte0/R2myzuHffB0wuCDviobg2hVdXK/ild0MYiGB
-         +EB0SoqaJfUlI7BqB7cMqQSqP3SUC6s/p6MiqguB1JymLqEfzznWXosLVrBKjddbtm0L
-         q0kS9TqyAvd4fkx+OTjPY5hNSkwy97hH0lgQH8fuDNtdA32P9aQVqaM7m7xdePzgpk2J
-         YzLOy64W2DO1d/LnAM/QxF8vqUbFMawros8XkPE0uGJZyGCfxXSanO1kARvThePVEYRY
-         xjA6rvuwXWhRA7htc9oLoWdAySrlMwL/AKmTxYWnUe58qwzk9ENfyfXS0yAWc0wwjPF4
-         5PzA==
+        b=QDQhZXwLAkoJ/PT9kCGWgJNk0c6oBh7JWFw+C99dm0p/8JB0TSzHQTVvCG+LbnHWPG
+         nEQFMgotsIT/HARHqQAk1p4JIuhI4/axSUEhxHBvyBvdIH7Kwnf223Z9RHBUF3gFajna
+         9M1ljVAMf41UkLT6EFQ0zlubxExUcgVlbrP6bcEkmP33x0AG4AedSoMBec8T1bKiLIHb
+         Tt+bc2aFIJYSJxXcdW/BmttOgHFi7uucAVuXIqjcCbJYG1Bso/ohTmA8gbWyHAS8ExV+
+         Fx/TOl72kkAfepi9W9XKg1MMkMI6shlvBAUu7Rwy7LVHu07yH8unkPaXVDvBebveCqrf
+         gngA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=A/fdw3HSB7m2kNlxcxEsVX9/NQhTkjGaXcMCpnvtKt0=;
-        fh=B0TkPySAzKMznom74ao23DVWpPlKbHUzy/KKvRh5N34=;
-        b=dLFphlJGOZkWNGsnvMpmkRQBIfXWvbCDCPaf1l6p02ZH+J6YpAEc72ypMYLPfrDzTJ
-         vbMasxumzqevPRD3XIQ449gmAQf5jI2va2UhDU6qRX2g2ZSkXtj2WsCM5VPUn9hrjWq0
-         JtrXwTDu/nvEBlmXlSBpOxRnPpVepEy8LsBQ8QFl0GuYepvIGj6CA7vuzTAfHjpx1ZRW
-         JKUC+Rmsm0CEzmAKn0vSTdKRmVjaTXrhieXfTfei9oXQTsVpWk2Grc/eZbPNQh+28cjm
-         3rsYGGAWTueLeZyjWj0gnTnxcjYXchAoQyjXlhenYYPPexfqVq6lw1qUl3BBfnhV+6lt
-         CZeg==;
+        bh=v38EWj5h/QCAdjN/pQcmdZuKsr9ZCCkUgpYACTXDljc=;
+        fh=8DpXGBMUhHPl0ZMuZrRpNVdILxmFl69pymPOYzWNlaU=;
+        b=A4M8ub240+b3H0/CSqJB+jzW5v05xvf2p76zkJM1EmWbXqk/llATuhZTwk7ykI+pT7
+         trFZpHGD17ZnrjFBZ81DBAKO8UVn+mG66BnPp1cVdoYqoyCG5e2ocDFEymcYaSNThNGp
+         p9KxtY2ICKtFBztag5+wpoahH3uwR3hPn30mGrOvgdcMZBBmoYrMPGMH1uFCbyltGuJc
+         DNdSN0jUefImN9F8FVmxl1twZLnsfIPdpgcUil9Qd5TTwvMp/YDnceEvUBLvatH30Lm+
+         XNp8V2EMS2rpxCrwKjuIFmaAtpkLN+MKzOHgCE7jM8YBM2ErkhRWBemF8Jg8h6aYe7XB
+         w+ug==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769537390; x=1770142190; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769538085; x=1770142885; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=A/fdw3HSB7m2kNlxcxEsVX9/NQhTkjGaXcMCpnvtKt0=;
-        b=CWhOHDcbVBLd50Vm3h1xD74ZRgaCWuJ3V6p+7d0hwOq9FHPH34vinvHabGO94Tlx/x
-         x2o5Uzf2p23wEVmTTduJx8VJl5C61VuQG2+t/fN29SElL5G+51q5rR9iXeaOZ7elgaKn
-         sPYJSrLPGPE4wRzSRBOBp4iuOcvn+a6IJR6Qm20TG1w6/uZDv6dAvk4QZ0kapsiQ5xJb
-         kB9K9Lh9rUI9Mk8QGqannOfot0v/9o4c6GBaRtJPNfIdHZ4ZdaZGxZI90uc4hLI5ZT1D
-         UBpV+RImweH5xxgTcS8QoKe2p/G0AD0CeSTwjtSuv+2QMlU61hXN8rdxx41/ngeD+xkx
-         CLyQ==
+        bh=v38EWj5h/QCAdjN/pQcmdZuKsr9ZCCkUgpYACTXDljc=;
+        b=qWHm0fXnaGf93z/hcMVLVU2FQRj3OPlx4h25fxa/kxdEvcXJdeeQuB3l3QbAFUyjUD
+         tV5pxWfjrxd64Oz5CXH34VrlSTu9EwSRrHtwJMmBUFfmdO+lTBsu2IzfsPF6ojc3+8su
+         XTlpDhwULvkTpr5rHqTmz9m14OXlwL2z2AQSesYsIBjsCoFu/ew2YjQn6MwJRKFhb59m
+         8wYRxPoJiNY2Gb5QudVVkNF4YjOLCO1Oj8UOgthh1b3AS8/mvC0vDT+brrx+QzVYl354
+         Lnu2crL4kR07EwrZfp0SsgENYAJBmfr9pn1x8AJcYITC2E6G8vRZpEEvVtaIwuDIfmKA
+         zE3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769537390; x=1770142190;
+        d=1e100.net; s=20230601; t=1769538085; x=1770142885;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A/fdw3HSB7m2kNlxcxEsVX9/NQhTkjGaXcMCpnvtKt0=;
-        b=G+cvtY8ITAjIyu4k6aHj1giQVWzG8W7F7xkSrD9fLLBjsyyqjNwlzyYWAsYi9bgzKL
-         jDp/SiIorS/81mTA7B8Hb6DDDZw0aFB3AszRQtT8EfSQn86HCyypLa4eIokaR2IEiHNv
-         Bk/WkMdizsXWF2YozBkGehp+GZ3PgbmJommZ0Imib4LFm3y2zk/R4h77u8XUxAjyTij8
-         c/KF4pHqblYlOwZqKDCDXlENmmwCBf/FMNV4+l07Tjs2yLGbU3t4oc4bPeTEHmLKEbcz
-         vVPh0Dov/K6KJtLEHbKPEVnTsoZ8cMYjfrxtin9WhJrQoCATy9BSG+J9UbwymCxTNyuf
-         D5qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXICc4o33zKY1V3lWmMPtPWHCtoGqvKIG8xxcsxt3XxR9PX6RPZ8rELETACFJPlk8TDgJ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcE1ItYm1pO6k9QU/lgCk2bbXeqc7VQhLvmUZqBqqnV1iMx1fA
-	g3QW6HVdZpJP4UFDl2aKZF+R+dndctAwKxq2PB+pLH9m0tvjEDg1zaH3DBP2nBTNZGEGrAQNC/c
-	n9QEs05PuIUnSECDiTdtK/2SGVyuEVZhSpi+2ojE/zos/NkhXzuLsZu2Nnx8=
-X-Gm-Gg: AZuq6aKkwFnJ74Vk52OnKOB7+xIuJaRG3LtwzU0KdSfyF9pGIndio/RosTukIdRIxJo
-	MTrR57OetO2aOeHr3ga/q7y4uxU+69qFlDQZpGnCjZZtI8mn5t7GLb4ztD9w48fffAek+dJE+fW
-	fCLj6GQKk2OCFAvdfhCRcpLFiqWoO46RWxFVHC7hlN86x1dArYYYqUR/qd1zxEgA0DP73/hbSs3
-	mJi0a/qrWbIbAraVi+Yjxuioekbl8byLMfTLlyhGvoupPwiOyVs/Bmk/Wx/gMAyJdEEcrjM
-X-Received: by 2002:ac8:7d55:0:b0:4ed:8103:8c37 with SMTP id
- d75a77b69052e-5032f4c7f16mr11147521cf.12.1769537389984; Tue, 27 Jan 2026
- 10:09:49 -0800 (PST)
+        bh=v38EWj5h/QCAdjN/pQcmdZuKsr9ZCCkUgpYACTXDljc=;
+        b=FdPDm2sQZL4+FidM0BeD14yEb2wBK6cbx78L0b3aM6QpmSmR4y3HHj4Xt8mvj2ohFo
+         P8D8aqOCzsJ0cTi4kXaT8JgZwywSuW0FLHGTmvBIeAG7IDzOM/YXUdg6Y3lLwb6E2VVr
+         8lpNa2pCxdr3y27wL0ITO70TO/P+4v5+1z+bK1dl2gAqYUH+q+ugoSIG4v+KPfvE+MjS
+         EqlWuSuOF+/Ew+J+HMxkveZtQGtOBZr0GkLWUIERqN+39dbQ4AhgGJm2NXv3twhT0yR+
+         7pDN0HXmhE0MNmhJKZAx3/+s0O6kfCE786UkyqMkfK5E0QKcca7iCGW1wDRMRPsUhV+g
+         qTcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHhmy+n409IepKU9Z8reZsrVVR8BOHFLa7b8+YijR//tGySLMoZg2UIDV/L/jmaej0Qc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd9nHzJ3bI1RtitrWzgHpiVkBSu1HO+wyjX6UCgr4NXOFMiCNm
+	3tTqLSuSa8f4WsByuo2YyIPfaOUz7ZksO8a+1gAgNZ4CZNjuXHyev1ew6b714OtSVQ7MF+glkpm
+	fxaLo8Y1itHkI8Lhai3j9mrzeNLQcH+nY9TtNWEMD
+X-Gm-Gg: AZuq6aIbTt29R+nHY5bpd3NH0QvZT3vtikN/HrCpUHylLg8b/qxfchBZpWjoBam0run
+	u0jXbr5cfamG8nAAOgrQqVXMI+5X/M7gi3QyXcefMCJD09qI21aovgDOn2jWCnSwLU/F9AJTrwk
+	0sUDt7jzQX8C/g/PHsO14clyeAc7PZeGY6+tK0NB5C0XXKWxSBZRdnEYmrhDv9z+jhdKYAcCFIx
+	GmPKUPPV5+OqkbxzZjYfg/PqjWVmQ6DGJO61dOCs4lOGBP7FGUmCpSKvU56ElWsNUQZQYRg
+X-Received: by 2002:ac8:5f11:0:b0:4ed:ff79:e678 with SMTP id
+ d75a77b69052e-5032f52b23cmr10650801cf.18.1769538084451; Tue, 27 Jan 2026
+ 10:21:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-10-maz@kernel.org>
-In-Reply-To: <20260126121655.1641736-10-maz@kernel.org>
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-11-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-11-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 27 Jan 2026 18:09:13 +0000
-X-Gm-Features: AZwV_QheZWlu-Uzsp1OFbCkpBH6_EN7Esc-S0xm2N0aOTBYMl0RK4FXDHy6Zuj0
-Message-ID: <CA+EHjTyQdLO3pk2yqDDptXemRSFJmt674P_H2-VtWC967o-c3g@mail.gmail.com>
-Subject: Re: [PATCH 09/20] KVM: arm64: Convert HCR_EL2.RW to AS_RES1
+Date: Tue, 27 Jan 2026 18:20:47 +0000
+X-Gm-Features: AZwV_QgHSiyi6-Py8aoEMg3B72DbuTR2OJAKTX59HorEV0HuWAtLNErLntzE9YA
+Message-ID: <CA+EHjTzjRHXJMDKc8GY=8aQ3KJeLYSQYMH_tA03XMav=0VQ7RQ@mail.gmail.com>
+Subject: Re: [PATCH 10/20] KVM: arm64: Simplify FIXED_VALUE handling
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -120,7 +120,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69263-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69264-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -136,59 +136,167 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[hcr_el2.rw:url,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BB67298D29
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3068C98F36
 X-Rspamd-Action: no action
 
 On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
 >
-> Now that we have the AS_RES1 constraint, it becomes trivial to express
-> the HCR_EL2.RW behaviour.
+> The FIXED_VALUE qualifier (mostly used for HCR_EL2) is pointlessly
+> complicated, as it tries to piggy-back on the previous RES0 handling
+> while being done in a different phase, on different data.
+>
+> Instead, make it an integral part of the RESx computation, and allow
+> it to directly set RESx bits. This is much easier to understand.
+>
+> It also paves the way for some additional changes to that will allow
+> the full removal of the FIXED_VALUE handling.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+The new code preserves the logic, and is easier to understand.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
+
 > ---
->  arch/arm64/kvm/config.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
+>  arch/arm64/kvm/config.c | 67 ++++++++++++++---------------------------
+>  1 file changed, 22 insertions(+), 45 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 68ed5af2b4d53..39487182057a3 100644
+> index 39487182057a3..4fac04d3132c0 100644
 > --- a/arch/arm64/kvm/config.c
 > +++ b/arch/arm64/kvm/config.c
-> @@ -389,19 +389,6 @@ static bool feat_vmid16(struct kvm *kvm)
+> @@ -37,7 +37,7 @@ struct reg_bits_to_feat_map {
+>                         s8      lo_lim;
+>                 };
+>                 bool    (*match)(struct kvm *);
+> -               bool    (*fval)(struct kvm *, u64 *);
+> +               bool    (*fval)(struct kvm *, struct resx *);
+>         };
+>  };
+>
+> @@ -389,14 +389,12 @@ static bool feat_vmid16(struct kvm *kvm)
 >         return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
 >  }
 >
-> -static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
-> -{
-> -       /* This is purely academic: AArch32 and NV are mutually exclusive */
+> -static bool compute_hcr_e2h(struct kvm *kvm, u64 *bits)
+> +static bool compute_hcr_e2h(struct kvm *kvm, struct resx *bits)
+>  {
 > -       if (bits) {
-> -               if (kvm_has_feat(kvm, FEAT_AA32EL1))
-> -                       *bits &= ~HCR_EL2_RW;
+> -               if (kvm_has_feat(kvm, FEAT_E2H0))
+> -                       *bits &= ~HCR_EL2_E2H;
 > -               else
-> -                       *bits |= HCR_EL2_RW;
+> -                       *bits |= HCR_EL2_E2H;
 > -       }
-> -
-> -       return true;
+> +       if (kvm_has_feat(kvm, FEAT_E2H0))
+> +               bits->res0 |= HCR_EL2_E2H;
+> +       else
+> +               bits->res1 |= HCR_EL2_E2H;
+>
+>         return true;
+>  }
+> @@ -1281,12 +1279,11 @@ static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map
+>  }
+>
+>  static
+> -struct resx __compute_fixed_bits(struct kvm *kvm,
+> -                               const struct reg_bits_to_feat_map *map,
+> -                               int map_size,
+> -                               u64 *fixed_bits,
+> -                               unsigned long require,
+> -                               unsigned long exclude)
+> +struct resx compute_resx_bits(struct kvm *kvm,
+> +                             const struct reg_bits_to_feat_map *map,
+> +                             int map_size,
+> +                             unsigned long require,
+> +                             unsigned long exclude)
+>  {
+>         struct resx resx = {};
+>
+> @@ -1299,14 +1296,18 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
+>                 if (map[i].flags & exclude)
+>                         continue;
+>
+> -               if (map[i].flags & CALL_FUNC)
+> -                       match = (map[i].flags & FIXED_VALUE) ?
+> -                               map[i].fval(kvm, fixed_bits) :
+> -                               map[i].match(kvm);
+> -               else
+> +               switch (map[i].flags & (CALL_FUNC | FIXED_VALUE)) {
+> +               case CALL_FUNC | FIXED_VALUE:
+> +                       map[i].fval(kvm, &resx);
+> +                       continue;
+> +               case CALL_FUNC:
+> +                       match = map[i].match(kvm);
+> +                       break;
+> +               default:
+>                         match = idreg_feat_match(kvm, &map[i]);
+> +               }
+>
+> -               if (!match || (map[i].flags & FIXED_VALUE)) {
+> +               if (!match) {
+>                         if (map[i].flags & AS_RES1)
+>                                 resx.res1 |= reg_feat_map_bits(&map[i]);
+>                         else
+> @@ -1317,17 +1318,6 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
+>         return resx;
+>  }
+>
+> -static
+> -struct resx compute_resx_bits(struct kvm *kvm,
+> -                            const struct reg_bits_to_feat_map *map,
+> -                            int map_size,
+> -                            unsigned long require,
+> -                            unsigned long exclude)
+> -{
+> -       return __compute_fixed_bits(kvm, map, map_size, NULL,
+> -                                   require, exclude | FIXED_VALUE);
 > -}
 > -
->  static bool compute_hcr_e2h(struct kvm *kvm, u64 *bits)
->  {
->         if (bits) {
-> @@ -967,7 +954,7 @@ static const DECLARE_FEAT_MAP(hcrx_desc, __HCRX_EL2,
+>  static
+>  struct resx compute_reg_resx_bits(struct kvm *kvm,
+>                                  const struct reg_feat_map_desc *r,
+> @@ -1368,16 +1358,6 @@ static u64 compute_fgu_bits(struct kvm *kvm, const struct reg_feat_map_desc *r)
+>         return resx.res0 | resx.res1;
+>  }
 >
->  static const struct reg_bits_to_feat_map hcr_feat_map[] = {
->         NEEDS_FEAT(HCR_EL2_TID0, FEAT_AA32EL0),
-> -       NEEDS_FEAT_FIXED(HCR_EL2_RW, compute_hcr_rw),
-> +       NEEDS_FEAT_FLAG(HCR_EL2_RW, AS_RES1, FEAT_AA32EL1),
->         NEEDS_FEAT(HCR_EL2_HCD, not_feat_aa64el3),
->         NEEDS_FEAT(HCR_EL2_AMO          |
->                    HCR_EL2_BSU          |
+> -static
+> -struct resx compute_reg_fixed_bits(struct kvm *kvm,
+> -                                 const struct reg_feat_map_desc *r,
+> -                                 u64 *fixed_bits, unsigned long require,
+> -                                 unsigned long exclude)
+> -{
+> -       return __compute_fixed_bits(kvm, r->bit_feat_map, r->bit_feat_map_sz,
+> -                                   fixed_bits, require | FIXED_VALUE, exclude);
+> -}
+> -
+>  void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
+>  {
+>         u64 val = 0;
+> @@ -1417,7 +1397,6 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id fgt)
+>
+>  struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
+>  {
+> -       u64 fixed = 0, mask;
+>         struct resx resx;
+>
+>         switch (reg) {
+> @@ -1459,10 +1438,8 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
+>                 resx.res1 |= __HCRX_EL2_RES1;
+>                 break;
+>         case HCR_EL2:
+> -               mask = compute_reg_fixed_bits(kvm, &hcr_desc, &fixed, 0, 0).res0;
+>                 resx = compute_reg_resx_bits(kvm, &hcr_desc, 0, 0);
+> -               resx.res0 |= (mask & ~fixed);
+> -               resx.res1 |= HCR_EL2_RES1 | (mask & fixed);
+> +               resx.res1 |= HCR_EL2_RES1;
+>                 break;
+>         case SCTLR2_EL1:
+>         case SCTLR2_EL2:
 > --
 > 2.47.3
 >
