@@ -1,100 +1,100 @@
-Return-Path: <kvm+bounces-69202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69203-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBFvHDFLeGn2pAEAu9opvQ
-	(envelope-from <kvm+bounces-69202-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:20:49 +0100
+	id 0J7zODxLeGkKpQEAu9opvQ
+	(envelope-from <kvm+bounces-69203-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:21:00 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D926790129
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:20:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6439690148
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:21:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6B0C307C952
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 05:17:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 421CB3081153
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 05:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B828329387;
-	Tue, 27 Jan 2026 05:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C42329365;
+	Tue, 27 Jan 2026 05:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dp/nYSdT";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nSHVcdrs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOVPUB11";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRObSBOD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B9F15B971
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94F332939B
+	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769491058; cv=none; b=R6iC/fkdXw3y5rasWPMQ7KMTLNqmTWiTNfkRnfKW6wHt53LBLp/+mv+LCcQiPHIu4ZJuTxErJZnK/2lmsjFpfu9pr1YBadaxla4kDIEtzUQ70c1OmV8A5Plz0hL2h651UDmcMYZyeFgxlPp/yWPcoLo1G5vMu5ByfDITmIbwUus=
+	t=1769491061; cv=none; b=DVIt8gQOLujDJUUS4ghXRDl4flMUlqb9ZqTP4X28SNfSREYjfa+i3gAz4VK79h1Ican8Gwf128hMLRGpYRFXgvhrv34XcHMGQVgu3NbyjdPrYL1LAkcbCFTviPn8HeflsIwr9KUVRJ6XJjYgfMCzEGfEIH+OhkmhpFOj0U1trWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769491058; c=relaxed/simple;
-	bh=MMPQOtueYyfYAi9/YwX1kbumpTMHJ9Frd2WB8qYubdw=;
+	s=arc-20240116; t=1769491061; c=relaxed/simple;
+	bh=CwwCQBfgmsy4lULSaNzO3/8DRYgmLOKxOKf50gomfJ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dXUDeQ1CJT00VFCU4SLUU7sRIpjbP359qaxkSuajYjxlKzzTWJhtUqHyLYrPUtBfy1hkYQVWuIbphJA8xoR4kHgLyAuvz52nN/8TFy2ZHFs36E1uZzeQxlq6qPgZwmEQYldy8hu+AJImBDJcvJ+K2FU8O99JW/DRrKEKmEI1URI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dp/nYSdT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nSHVcdrs; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=RbqaXJNDoaIaQqR+UI4PEvuJIgwNJD3+5FL4wzk0Ge5CQHFtCJceP9VAv3QG5y6OtyQBl2Ybj+Z4yk14iy57g9EVuqZ3gbYB12BhcdeJSrLSu+lVnJrEvw+v80dHYyBIxTZJllXIpZzdnrTE19KbCoCu3DzL/TgYeLRhgkFE2Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QOVPUB11; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jRObSBOD; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769491056;
+	s=mimecast20190719; t=1769491059;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IsqW2ttd3J7072Zyk2vnpxdf7DB+tWB3Z4Y7tUzOjnk=;
-	b=dp/nYSdTZYlgV+GZ+dTmeQ+tlHf3iknMzfCq4zonaVbcOJpN6C/gBO+d7FNxZOkh+4CMb9
-	t6QvfWjQaSfSOmHAs5O1ntFE96XCcUSoepgxdov/iATGDvPUR9GbiJUgiD3+CvqNZchmpi
-	2CeQHSrbFKUAe34v9FXV65S6U6kNhWE=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0WZvtS1qnQEpVvyt8WDpPuTWCq46G5+n4cXSJcdfvKs=;
+	b=QOVPUB11cOgJXa3MzZOb7BRb+2LqDEkpRhFHsRI2ZGZRytHGnwyQML9hGvol3Nl/xzYtVu
+	MLkZpQbPwPgBdOCKr2b6RXtPLhdSwyZCZf5z9J67GasYmuqJ+UUvWXRuH0AxtZPVfMTW6U
+	nEA2zie89w/KOvEgCiNOTIsRFKj4Gu8=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-VJ382GGzMSqIuWTcp0bxuQ-1; Tue, 27 Jan 2026 00:17:33 -0500
-X-MC-Unique: VJ382GGzMSqIuWTcp0bxuQ-1
-X-Mimecast-MFC-AGG-ID: VJ382GGzMSqIuWTcp0bxuQ_1769491053
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c2f670a06so5171792a91.3
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:17:33 -0800 (PST)
+ us-mta-639-wbW_6aVsPhSdmQp4I8UgxQ-1; Tue, 27 Jan 2026 00:17:36 -0500
+X-MC-Unique: wbW_6aVsPhSdmQp4I8UgxQ-1
+X-Mimecast-MFC-AGG-ID: wbW_6aVsPhSdmQp4I8UgxQ_1769491056
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c613426e8dcso8167565a12.1
+        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:17:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769491052; x=1770095852; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1769491055; x=1770095855; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IsqW2ttd3J7072Zyk2vnpxdf7DB+tWB3Z4Y7tUzOjnk=;
-        b=nSHVcdrspdpXMAc2nIiXll/4y/mxDHZoTgFfwt2I2siaukyCCp0amvh30TDoYgpRA+
-         8A0KwI9oQuTwt2aIAja05tPseY0lGBN+a/QCiKITk+2wAGoqzbNkTgAZNd5uLfEQR+Bv
-         tMhZZMpRaEY77JzdWkImVqQ4/xPvGT+NRu5/DX9Pi+eENjP17CTrVzaGaykmkujUByRV
-         Rc2tY+1IuVwCUvtDWRLft92dgS8AaOsR7v+WpIxAtre9yTEoGn4yAwBj0nt8nn45T7JI
-         x+s2260CbYczwWPGscoSA8BI2RRbPcJKWaokhQvvK1I5R4VUbPd7Gl+mXLLMx78H73oW
-         9nbg==
+        bh=0WZvtS1qnQEpVvyt8WDpPuTWCq46G5+n4cXSJcdfvKs=;
+        b=jRObSBODN+M4EA5Mwmbt/3w7+g336fda+AeKPi9sPOclxoFSrotLrwoShdleWYxNn4
+         PWyFjHKw+WfeCsYEkc5IbLRt0tVqDEkWqNfVJwX1XNUcdQm4UoYMemoynwg8jd6S/2Xl
+         Hdhbz9areXTaOVHpotwNBBXYmepIM82N/Pl8NjAlPN0SYYVXR3nmNkrPMBnqSajJA7p7
+         dYYk6+CVFJbx6wjjbs7WboYGjPDpS5xnuQYm23S+U+rKh81KNcblp3bl0macMb5PLeJp
+         5CLni80sawXezgDOPrLGbRnSRky1+ak56QZ60LoYhrjAiE7tnnAfliMIZ46eyr8Hkku+
+         7HBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769491052; x=1770095852;
+        d=1e100.net; s=20230601; t=1769491055; x=1770095855;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=IsqW2ttd3J7072Zyk2vnpxdf7DB+tWB3Z4Y7tUzOjnk=;
-        b=BYr8zigmzuGho6VQRTB39QBWFGXT+XqaXaM4ne2PiE5jerMyD3XyC4QyrhPo6+lhGp
-         ikArO/CvRztr7Dg8Ix01T6gn1fvITVYKjYk6yINbnus1DRLD+2retDvJMWK764/4ojkc
-         /PxtW58WQSHaBChWPQAptBzO8/Qfu4M0O2sBa/M9ADCtP5K8K3Rc4pp8C0yqY9IkELhl
-         gaY1J1YNZ4YsewnvdWojUo7yWpklf8DIcbZePOHQRPHs11Nhhp8eJ8nxMgov3/pisUj6
-         zMF9JXdSqHHC+V4yQgeyPUc/5/Np1xNDoEYeI41m1UHY4LBmXl6JKlXbb3mBg+r4jKaS
-         9h3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU75ysdj3VZQ4A74TALlZU0KALJrEHYRpUG42hR4GkYtpdDvQx48UjXTrryy+jjNeSv5h4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzl38jRwLN3arC0YX3YbAvW3Kup2JyhtiIkwEtvSlT4A/zEFMvP
-	Hq2v7Nnbog4On/U8vKpHVeELXhP41Fz1OW9AZzGInWCK0XL1Cr+MRSUZRDHESwV19jTqfNdh1Mf
-	uIJXI/D3Gmw5H4JtoM/AjGQqP7Fhdrc0czeQqg4EciT/jftdnrB/QHQ==
-X-Gm-Gg: AZuq6aKeK0sdjPUtzN+R8NyhhfYCF3xN1y64lWYatnxEqNnlqhGrTqhYzThRveU9qkb
-	tIbpzF+/Vt7YQCbzej49kkCkwZ8X5Ezs6jQGPNUAd3tFfnvzhwcKPXnoGsIyuN0jmBjmcQmqHlX
-	TF+xq/m2TrCdYFsEbLGXWffP9MDWQSCUKipo0cwcenSWZmQeJbY0zVTiQvr9f6e8PBeEqc4RSS7
-	ArIDPRY9Prcigkp7KtebSEYjujRTIIyCDg2M9FA42F6IS6DaPCVmQ4c09Y93WROWGv6kDkCfFcg
-	UN0kN7i0Nj0+DVihr51U90Gmn0fjCj1sgKMQi4FPAbSqttj6tvaXk+JdJpIuopytIUEaNRhER3K
-	/tZFUgq+O8a5vRrmwtnKpp4CtUajqKJbrHt4FVYhzzQ==
-X-Received: by 2002:a17:90b:57d0:b0:321:9366:5865 with SMTP id 98e67ed59e1d1-353feda367cmr685550a91.33.1769491052474;
-        Mon, 26 Jan 2026 21:17:32 -0800 (PST)
-X-Received: by 2002:a17:90b:57d0:b0:321:9366:5865 with SMTP id 98e67ed59e1d1-353feda367cmr685537a91.33.1769491052087;
-        Mon, 26 Jan 2026 21:17:32 -0800 (PST)
+        bh=0WZvtS1qnQEpVvyt8WDpPuTWCq46G5+n4cXSJcdfvKs=;
+        b=wZz3hPNAys+oV0GMGcRZ6eUSjdT3WvlnitlMXxmbuPL53gNF97woIZz3lVvqgUsOQQ
+         ortNez9UD4eW1ZuJAjWhbY5FEEM0m2QdU3wgER9sL9jhEz3kg9JXM9xExomH921GNyoM
+         R9KeYvHWctrI0beROUm8Lxj2YdNDRQXhlTj0L9fxUF3GUH3+zghOfb6D2XGOfYxPgWdB
+         I0U/UsWhIVdn3vtYjse4G0toZzCFJ2BUrMZPNwKrd0URwFFkp0SGZQNNBmsICB2YIBl0
+         H4dKsjGeX8Je6wLfiW11tWjWj29AyoIllx8QvzhUpH9/qmRtmJOQHp+0KxmUfF+U8Mjf
+         FgRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEdjxyhjd9dRqrSGoXGm1L6vRYaTdSMFX8ACmdUTGLsF443OuzoNyT/HBaXTnCReOUG74=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRzE0GaAhll/5SPOjZ19k/LCZ0UFDFzcxUACm1FowxFW3g/Ke/
+	sM4uQ/iB5yoqgzOmz4/havQ8lGGLwY2vs/VBtbRXtsNUDAEJ3kGNttb7Ve8B2sXT5Qwqt7IntOf
+	2OlhNUzBuSjhvvsJaqt2B59y111zrf6d8ZJ61Fvs3WyMEqd8XpUFO8A==
+X-Gm-Gg: AZuq6aK0xLnnKgEI7igTs002jKMDHSy+9PkTyePTyQwR8UMXlYFGyIEEJlWwCB0VlFV
+	iqHkEm8uFGWY+LHID3RSGL9mL8YVgGoUnD9DJvmRSSuz983jyGpZI7Ku0VWBcvdVkmdpColTtT7
+	7BT+dRKGe0faVbV6u7XEA4x8A3mrUMjhDVb+nXqmFtqTmdBX/tK0ETaC9plxFF3+Papq6xWhKYN
+	CJ5ZoU5V+DAQqHrockVpdyS5IeBqcvQfQhgkCQnMbPWjXjCdS4TWTEKvm3edAiomdEsxtFmhwq0
+	meGE/EW02nQoalv5C+ZXepg/Cc748dpxKYYqNrGkSHBbB0lo1B4DPufgnNy5CssJpU2APLwGhXH
+	4YdGsJBdh1TFjkeWRjJAHnqgHOYyPHiq58hZKNR9eeQ==
+X-Received: by 2002:a05:6a21:7a90:b0:384:f573:42bf with SMTP id adf61e73a8af0-38ec63fb1d9mr471153637.53.1769491055551;
+        Mon, 26 Jan 2026 21:17:35 -0800 (PST)
+X-Received: by 2002:a05:6a21:7a90:b0:384:f573:42bf with SMTP id adf61e73a8af0-38ec63fb1d9mr471146637.53.1769491055207;
+        Mon, 26 Jan 2026 21:17:35 -0800 (PST)
 Received: from rhel9-box.lan ([122.163.48.79])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.17.29
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.17.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 21:17:31 -0800 (PST)
+        Mon, 26 Jan 2026 21:17:34 -0800 (PST)
 From: Ani Sinha <anisinha@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
@@ -103,9 +103,9 @@ Cc: kraxel@redhat.com,
 	Ani Sinha <anisinha@redhat.com>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 19/33] i386/sev: add notifiers only once
-Date: Tue, 27 Jan 2026 10:45:47 +0530
-Message-ID: <20260127051612.219475-20-anisinha@redhat.com>
+Subject: [PATCH v3 20/33] i386/sev: free existing launch update data and kernel hashes data on init
+Date: Tue, 27 Jan 2026 10:45:48 +0530
+Message-ID: <20260127051612.219475-21-anisinha@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20260127051612.219475-1-anisinha@redhat.com>
 References: <20260127051612.219475-1-anisinha@redhat.com>
@@ -130,7 +130,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69202-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69203-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -144,71 +144,59 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D926790129
+X-Rspamd-Queue-Id: 6439690148
 X-Rspamd-Action: no action
 
-The various notifiers that are used needs to be installed only once not on
-every initialization. This includes the vm state change notifier and others.
-This change uses 'cgs->ready' flag to install the notifiers only one time,
-the first time.
+If there is existing launch update data and kernel hashes data, they need to be
+freed when initialization code is executed. This is important for resettable
+confidential guests where the initialization happens once every reset.
 
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- target/i386/sev.c | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+ target/i386/sev.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 5524e7142d..a65a924fb3 100644
+index a65a924fb3..d1dc0f3c1d 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -1920,8 +1920,9 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+@@ -1772,6 +1772,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     uint32_t ebx;
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
++    SevLaunchUpdateData *data, *next_elm;
+     SevCommonState *sev_common = SEV_COMMON(cgs);
+     SevCommonStateClass *klass = SEV_COMMON_GET_CLASS(cgs);
+     X86ConfidentialGuestClass *x86_klass =
+@@ -1779,6 +1780,11 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+ 
+     sev_common->state = SEV_STATE_UNINIT;
+ 
++    /* free existing launch update data if any */
++    QTAILQ_FOREACH_SAFE(data, &launch_update, next, next_elm) {
++        g_free(data);
++    }
++
+     host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
+     host_cbitpos = ebx & 0x3f;
+ 
+@@ -1968,6 +1974,8 @@ static int sev_snp_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+ {
+     MachineState *ms = MACHINE(qdev_get_machine());
+     X86MachineState *x86ms = X86_MACHINE(ms);
++    SevCommonState *sev_common = SEV_COMMON(cgs);
++    SevSnpGuestState *sev_snp_guest = SEV_SNP_GUEST(sev_common);
+ 
+     if (x86ms->smm == ON_OFF_AUTO_AUTO) {
+         x86ms->smm = ON_OFF_AUTO_OFF;
+@@ -1976,6 +1984,10 @@ static int sev_snp_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
          return -1;
      }
  
--    qemu_add_vm_change_state_handler(sev_vm_state_change, sev_common);
--
-+    if (!cgs->ready) {
-+        qemu_add_vm_change_state_handler(sev_vm_state_change, sev_common);
-+    }
-     cgs->ready = true;
- 
-     return 0;
-@@ -1943,22 +1944,23 @@ static int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-         return -1;
-     }
- 
--    /*
--     * SEV uses these notifiers to register/pin pages prior to guest use,
--     * but SNP relies on guest_memfd for private pages, which has its
--     * own internal mechanisms for registering/pinning private memory.
--     */
--    ram_block_notifier_add(&sev_ram_notifier);
--
--    /*
--     * The machine done notify event is used for SEV guests to get the
--     * measurement of the encrypted images. When SEV-SNP is enabled, the
--     * measurement is part of the guest attestation process where it can
--     * be collected without any reliance on the VMM. So skip registering
--     * the notifier for SNP in favor of using guest attestation instead.
--     */
--    qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
-+    if (!cgs->ready) {
-+        /*
-+         * SEV uses these notifiers to register/pin pages prior to guest use,
-+         * but SNP relies on guest_memfd for private pages, which has its
-+         * own internal mechanisms for registering/pinning private memory.
-+         */
-+        ram_block_notifier_add(&sev_ram_notifier);
- 
-+        /*
-+         * The machine done notify event is used for SEV guests to get the
-+         * measurement of the encrypted images. When SEV-SNP is enabled, the
-+         * measurement is part of the guest attestation process where it can
-+         * be collected without any reliance on the VMM. So skip registering
-+         * the notifier for SNP in favor of using guest attestation instead.
-+         */
-+        qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
-+    }
++    /* free existing kernel hashes data if any */
++    g_free(sev_snp_guest->kernel_hashes_data);
++    sev_snp_guest->kernel_hashes_data = NULL;
++
      return 0;
  }
  
