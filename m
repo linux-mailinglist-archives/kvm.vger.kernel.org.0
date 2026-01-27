@@ -1,100 +1,100 @@
-Return-Path: <kvm+bounces-69199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69200-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IA8xBPBKeGkKpQEAu9opvQ
-	(envelope-from <kvm+bounces-69199-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:19:44 +0100
+	id iHmJEB9LeGn2pAEAu9opvQ
+	(envelope-from <kvm+bounces-69200-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:20:31 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69079900F6
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A422C9011A
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DEE743064E9B
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 05:17:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C93B1307340D
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 05:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B77329C5F;
-	Tue, 27 Jan 2026 05:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE29329C49;
+	Tue, 27 Jan 2026 05:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chTyUbKB";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AjeoGv7s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fvfYz+Y9";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NHBKUj/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F87329C57
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DEB329387
+	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769491049; cv=none; b=TReAOTtAw7tU9uacDHSgTXAeORY5q94GDQS0j1tvVbBTR5lFa8X0DZ4RoxXKiV40J0+vSppwZeo70vMHfiMb9GCIn0Bd0eZeSzi4TmjKYVx9wKIWfmaUf3uY3Q1QkMeHDx5Ab9PucUfW/65zF2ND4XIAdMCEm5p5M/wBZCHGwh0=
+	t=1769491052; cv=none; b=qfxUajvXGV5CK1hLd4/eVfzXUd+4tMjrp6eU0I8P+OWmEB3QgiTa0H+JQ0vN3z8ojLQjcCrOvjcq7QBe3olr10TE67cztbi3Vv0eGwCjxc24Wxzy/DWfaEAqOSIj1swmtbd0JRgaQeyIFkDgqmYzsXRO3C6uXYoMtXAJdfQF1Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769491049; c=relaxed/simple;
-	bh=1OPqNKYK0GBDdFNv0UA1AxrDPe8UTJl+SOD1wUKIsTw=;
+	s=arc-20240116; t=1769491052; c=relaxed/simple;
+	bh=mYHykGSeRol6qPb0O2RCz5WVhoAbFlEQQPuIWA8vy2o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ohgc1+KrVNRZKpuDuc4c95UJckAXSb2ge8LMkIz8xz6jJMu8w6O5Hkwc0UxEr4VPvlH2Nv4StIyNYdeQr2uikQDGRXBh3dIB3rBU6aIBSFZX8CKhgW4CKl5Mwwm0JTc3QpBtmu39GZctH/yPbhOKDYKUjlb/HTmv2i1g5XCNzgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chTyUbKB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AjeoGv7s; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=blGC5wYQhd1me/Ad/UNzfLRq2Hdtf8hjUUWQm1iEjOiI/OEPw5U26jOYioH75ae9K3df3NINzkUXdrX5iFK/nIoN6jAnvGAPUm0dFbasv3I6w0E/a4LWGOqTPiYLgJFFi/Mq4ic+ujSg9KQCKwSwz3zPDAZdmWQ39Fa03eUzYaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fvfYz+Y9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NHBKUj/C; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769491047;
+	s=mimecast20190719; t=1769491050;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OnOtqZFQnQ7z67Y/wwL5FaGuBGKBCde67NUJiikFzaU=;
-	b=chTyUbKBQFBYjapSH5z9KfQOu8vDe+T5y2MMUG4eLgncvYr+pU3wqSl3mHkzDNDDhDPzPj
-	ggrLhHWbuVkH1KisVaroSl04zdKFqx8IJ8vqlMmt5VZOCt/ikw6P1VuhGQKPn2ilIwXry3
-	MDt8sUYOnr8hfq1ow8rqvLUeT/hmyb4=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bPhZf11AJ6OznTneTjtivFAiVtwbcW8pDml41uWPO3Y=;
+	b=fvfYz+Y9MwdWc3x4DZJeSXEXneEIYugl14iYoiRuS1hPj0uR11Aupi/PplTtq2Luca5whE
+	Jr5oBl9fn9hC+8pyH//rCvADO0tP0LjGOVz0D1eFb331OmJuJu7nq48YQ63DBtsAW49bsl
+	U+DuoH96VAhZLXMfe7uRhJn8wLO0Qdw=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-eOsshHtNNDqGgHx8xAVJ-g-1; Tue, 27 Jan 2026 00:17:24 -0500
-X-MC-Unique: eOsshHtNNDqGgHx8xAVJ-g-1
-X-Mimecast-MFC-AGG-ID: eOsshHtNNDqGgHx8xAVJ-g_1769491044
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c64cd48a8so5491950a91.0
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:17:24 -0800 (PST)
+ us-mta-627-68ftm4uaO2eeJnRKU8lEaA-1; Tue, 27 Jan 2026 00:17:27 -0500
+X-MC-Unique: 68ftm4uaO2eeJnRKU8lEaA-1
+X-Mimecast-MFC-AGG-ID: 68ftm4uaO2eeJnRKU8lEaA_1769491047
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-34c38781efcso4921074a91.2
+        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:17:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769491044; x=1770095844; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1769491046; x=1770095846; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OnOtqZFQnQ7z67Y/wwL5FaGuBGKBCde67NUJiikFzaU=;
-        b=AjeoGv7szH5r+JY8riVVfe0sth6ZFqkDASOu9Piy6vA830Ttb0NrgleEKyCeOXL4ox
-         vKyPPnXOdooov6/jeHL6ZxrPP/axN7stQeqeuy386mQqljc3iZ/zVKU4o17TZAxh1wAs
-         fXSLo5TIExw9eCdcB+ope8rcSwXcz8Q81B6BE2vvEpa1FKo536XvPEeyEgl8fqOo776E
-         M8mYbN6t9zKzN78Sapm2XADVtEH4qEYEGPTN3JV4IZpYcQ6jWeeAaReum0EuDjif1bVE
-         GUYAQIeCW3ZH+7f7cTRyrPjPj99Hh4JlcGfYg/V7DiK6aaSlnP4Mzaj47Kh/x7mPpZzL
-         LUAA==
+        bh=bPhZf11AJ6OznTneTjtivFAiVtwbcW8pDml41uWPO3Y=;
+        b=NHBKUj/CUCxnTpH3gUnYxQqKDajAhOTxj6IY5mAaSEH6QPHAQT5Cr7Vv+tjKHRx39X
+         D2dT7EW9+0aP1IX/xEY+DOWbXJx9Ew7AkrpgcxSu4C4Z1fBK70m7lddl5MoSUoQcNqPB
+         6QKk7jZTeY2JERCpKwSgQwppSDK5tBY9Vit0H0j06rM4itw1YZuU8ahGdHM3humijvly
+         FIWDramd+lMT/Mg94C5WxJP4GXH4Vf2YRWYKW0MIkNlRkud6qFZKJevJ1J1zVofO9Fwz
+         93y9rBKMuVE4561iqvOrqGhcWwhnvyjJp8Aw7r+qaYboZcRVBE8r7R5HcN+yj+6adH8q
+         4GgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769491044; x=1770095844;
+        d=1e100.net; s=20230601; t=1769491046; x=1770095846;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=OnOtqZFQnQ7z67Y/wwL5FaGuBGKBCde67NUJiikFzaU=;
-        b=LpPuPfeAGwUSSPUBfHUKR+sc3ezqQktkcYPXyip2jRkhpBHBEuP3Uc8fysUC9Ejc7c
-         96kCfzIfBAUvQeYw1/ioJHxRrDv3tEs8EI7XBV3EkGpS7wGpeXbWT86034o72cyrF47o
-         L+EnSKi0p8RsZ3F/SQYKTAlREB2KffBT3RzjVaIIiq0Jn2xp/s5sVAiCy1p9KnteQfrj
-         Nx+fuXNJ1rKxlZZI0Pycl8yhNV4xhJrZ5IA3yNUDUI8YjtmjtWFPRKo8dgydahDkyAmc
-         9tNr/Bdap1sMcYV2es/LvvOhgsYh/BMX0wXYv6k9mGxU4IALT6oKUT1k3B+7GPNdFCmC
-         OrRw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfdslL4yU7u+oZTJLA6eU/zonnOZgos2KYMI4lORmPNlO5E45dL80Ul1ElkVYlVTVPwkI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFUiSDVQUuRvyDAtpVdEUt9CCBR2YMfgCcnNip/PqDWvnuqGB4
-	RFPJffyhnk/vH7nznwfKQyT2o1jYBk0XzINWLxeL0YgAodPb4XI+GCIA0jQIXknJ62W7QHXV6kv
-	DfJrdeZ1Z/BmqdOwAi8V72acL5RKpJHnlBTE5PIZM5dPrLbaFSpIkkA==
-X-Gm-Gg: AZuq6aJyX6jIbP214+qXyRwwXCqS9QtgyMiCuNA8EEsk7BI2LxSTkqew6iztbO+FjFr
-	sVC1hVQy/yKrfv4DSLut69kI2O1ncrya9TSpVZmW+Fl8hk5hzmeRGU1nzop9Vkb12vVyaBYInsv
-	ntMEHVevwY6ItzUTrxdmwyWimYrpjm/OS1rqizUXlV3Ld2yvBqVx9ENvGWhfDOVjrlqMmzMRHEN
-	CPrDHra23bBu33vhV7hEiMdvoQ563J5UaYxSrhZ0mCxqH5R3ek4vR5DriZzucz93de7IWwuR3Ug
-	j5GVYeqWwBsXmr3y5hhtS6EaxfMXI8PoT0eUVi4KfDWa89692MgEYWjAe0LJ6p7XQLLwDfRlMPg
-	Oh3iDtozEAFnS1nYYxt6HN8pD7l0WrCiPCzyKiprz1g==
-X-Received: by 2002:a17:90a:ee88:b0:353:3f04:1b78 with SMTP id 98e67ed59e1d1-353fecd096emr470471a91.4.1769491043810;
-        Mon, 26 Jan 2026 21:17:23 -0800 (PST)
-X-Received: by 2002:a17:90a:ee88:b0:353:3f04:1b78 with SMTP id 98e67ed59e1d1-353fecd096emr470454a91.4.1769491043445;
-        Mon, 26 Jan 2026 21:17:23 -0800 (PST)
+        bh=bPhZf11AJ6OznTneTjtivFAiVtwbcW8pDml41uWPO3Y=;
+        b=LAqZQA7S88Mu25BYf703US7JGEpKTkfVHkzt3IscAphAouui/bP/x6FuOMFoRQJKf+
+         FgQrueXTmRNc8CVEJH5j9WMFK2BpcQFaY4wd4T6yIZ6VG1CeIqmR55Fpc83+RSceRJn6
+         6YFEGOq4ioCwxwPCdOTpOzAVxpBau/qUhi65VhMFHnOtpxg05m1kO70gQWTpiMpKBJMN
+         fKwAmqa+XEIZSbsvwUTPTATlNlrqp1HifTcbPa9Ft00YTBxdjxZagLsPTAvLPxCt0quh
+         WxSyBI/d9N+TSo72OehBHqsKp/XvkwpV6W7yJ50ypL9NRQIcGtHeOa7mZFXqPDQOntE1
+         lrEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUtp/ftL2vmRxSusXwBiKhzyEvJ7hi/aNmNRcvLGvKiVzlS0ATI3IC50+FpsRo6hw4IIUA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwluAQPMGXaNDverYUfZE+DgMLVgARcWvJYnITdTljLzh+5k043
+	L7cczDFRiK7Xqt5VER+Vx/ukfy0FAPOKst/uGhJ7OR6w/NTnG/Xq0acTHeckxuvoSXtIuupHhkf
+	icZ6+CfdI2GEYHbt3IC2eGBg8Oj1Gr0Zvx9MhCtygAmZs/FoGX2KTAA==
+X-Gm-Gg: AZuq6aJfcyxEEFb0A54rfbjWVhCLvoyrgAIOh/GTT7I1A3kk3NA5OXwV/Fus6SNnQ3n
+	/QjF6BpNHgHXLY8KZ6CYGuEW3LLsQirjqbvJJ+71QViMzqyN1XOEMQQjGtGfrFkYNNcNXnP0Em7
+	ppVFVwG2goMv0Np1M4amWjtiGWQDF9AlEow2oOIyRQz0KS128aOOpdgtxFyWULKCX2335oI5HK3
+	6vt7q2GMbIP7sqIdq2bEQvxUefajO/aqkB7Jv7OVmj1cPkR5TkXHCmy8aBtuDaLW+0XwTfoKMg/
+	/UEHf1d8u6b47vXfEZs18Jp0Go0iYlyW4nBH1zix19xmyNQpxVcawKR2lDc3i25pcOIevA6YmwC
+	YAl3WFOYpsSyRSVCYkuKPNCxRwcv6kAsqgL7g4nDhXQ==
+X-Received: by 2002:a17:90b:3a4f:b0:352:e27e:79c5 with SMTP id 98e67ed59e1d1-353feda98damr596443a91.31.1769491046555;
+        Mon, 26 Jan 2026 21:17:26 -0800 (PST)
+X-Received: by 2002:a17:90b:3a4f:b0:352:e27e:79c5 with SMTP id 98e67ed59e1d1-353feda98damr596430a91.31.1769491046173;
+        Mon, 26 Jan 2026 21:17:26 -0800 (PST)
 Received: from rhel9-box.lan ([122.163.48.79])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.17.21
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.17.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 21:17:23 -0800 (PST)
+        Mon, 26 Jan 2026 21:17:25 -0800 (PST)
 From: Ani Sinha <anisinha@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
@@ -102,9 +102,9 @@ Cc: kraxel@redhat.com,
 	Ani Sinha <anisinha@redhat.com>,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 16/33] i386/tdx: finalize TDX guest state upon reset
-Date: Tue, 27 Jan 2026 10:45:44 +0530
-Message-ID: <20260127051612.219475-17-anisinha@redhat.com>
+Subject: [PATCH v3 17/33] i386/tdx: add a pre-vmfd change notifier to reset tdx state
+Date: Tue, 27 Jan 2026 10:45:45 +0530
+Message-ID: <20260127051612.219475-18-anisinha@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20260127051612.219475-1-anisinha@redhat.com>
 References: <20260127051612.219475-1-anisinha@redhat.com>
@@ -127,7 +127,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69199-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69200-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	MIME_TRACE(0.00)[0:+];
@@ -143,146 +143,68 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_FIVE(0.00)[6];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 69079900F6
+X-Rspamd-Queue-Id: A422C9011A
 X-Rspamd-Action: no action
 
-When the confidential virtual machine KVM file descriptor changes due to the
-guest reset, some TDX specific setup steps needs to be done again. This
-includes finalizing the inital guest launch state again. This change
-re-executes some parts of the TDX setup during the device reset phaze using a
-resettable interface. This finalizes the guest launch state again and locks
-it in. Machine done notifier which was previously used is no longer needed as
-the same code is now executed as a part of VM reset.
+During reset, when the VM file descriptor is changed, the TDX state needs to be
+re-initialized. A notifier callback is implemented to reset the old
+state and free memory before the new state is initialized post VM file
+descriptor change.
 
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- target/i386/kvm/tdx.c        | 38 +++++++++++++++++++++++++++++++-----
- target/i386/kvm/tdx.h        |  1 +
- target/i386/kvm/trace-events |  3 +++
- 3 files changed, 37 insertions(+), 5 deletions(-)
+ target/i386/kvm/tdx.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index fd8e3de969..37e91d95e1 100644
+index 37e91d95e1..4cae99c281 100644
 --- a/target/i386/kvm/tdx.c
 +++ b/target/i386/kvm/tdx.c
-@@ -19,6 +19,7 @@
- #include "crypto/hash.h"
- #include "system/kvm_int.h"
- #include "system/runstate.h"
-+#include "system/reset.h"
- #include "system/system.h"
- #include "system/ramblock.h"
- #include "system/address-spaces.h"
-@@ -38,6 +39,7 @@
- #include "kvm_i386.h"
- #include "tdx.h"
- #include "tdx-quote-generator.h"
-+#include "trace.h"
- 
- #include "standard-headers/asm-x86/kvm_para.h"
- 
-@@ -389,9 +391,19 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
-     CONFIDENTIAL_GUEST_SUPPORT(tdx_guest)->ready = true;
+@@ -405,6 +405,36 @@ static void tdx_handle_reset(Object *obj, ResetType type)
+     trace_tdx_handle_reset();
  }
  
--static Notifier tdx_machine_done_notify = {
--    .notify = tdx_finalize_vm,
--};
-+static void tdx_handle_reset(Object *obj, ResetType type)
++/* TDX guest reset will require us to reinitialize some of tdx guest state. */
++static int set_tdx_vm_uninitialized(NotifierWithReturn *notifier,
++                                    void *data, Error** errp)
 +{
-+    if (!runstate_is_running() && !phase_check(PHASE_MACHINE_READY)) {
-+        return;
++    TdxFirmware *fw = &tdx_guest->tdvf;
++
++    if (!((VmfdChangeNotifier *)data)->pre) {
++        return 0;
 +    }
 +
-+    if (!kvm_enable_hypercall(BIT_ULL(KVM_HC_MAP_GPA_RANGE))) {
-+        error_setg(&error_fatal, "KVM_HC_MAP_GPA_RANGE not enabled for guest");
++    if (tdx_guest->initialized) {
++        tdx_guest->initialized = false;
 +    }
 +
-+    tdx_finalize_vm(NULL, NULL);
-+    trace_tdx_handle_reset();
++    g_free(tdx_guest->ram_entries);
++
++    /*
++     * the firmware entries will be parsed again, see
++     * x86_firmware_configure() -> tdx_parse_tdvf()
++     */
++    fw->entries = 0;
++    g_free(fw->entries);
++
++    return 0;
 +}
- 
++
++static NotifierWithReturn tdx_vmfd_change_notifier = {
++    .notify = set_tdx_vm_uninitialized,
++};
++
  /*
   * Some CPUID bits change from fixed1 to configurable bits when TDX module
-@@ -738,8 +750,6 @@ static int tdx_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-      */
-     kvm_readonly_mem_allowed = false;
- 
--    qemu_add_machine_init_done_notifier(&tdx_machine_done_notify);
--
-     tdx_guest = tdx;
-     return 0;
- }
-@@ -1505,6 +1515,7 @@ OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
-                                    TDX_GUEST,
-                                    X86_CONFIDENTIAL_GUEST,
-                                    { TYPE_USER_CREATABLE },
-+                                   { TYPE_RESETTABLE_INTERFACE },
-                                    { NULL })
- 
- static void tdx_guest_init(Object *obj)
-@@ -1538,16 +1549,24 @@ static void tdx_guest_init(Object *obj)
+  * supports TDX_FEATURES0.VE_REDUCTION. e.g., MCA/MCE/MTRR/CORE_CAPABILITY.
+@@ -1549,6 +1579,7 @@ static void tdx_guest_init(Object *obj)
  
      tdx->event_notify_vector = -1;
      tdx->event_notify_apicid = -1;
-+    qemu_register_resettable(obj);
++    kvm_vmfd_add_change_notifier(&tdx_vmfd_change_notifier);
+     qemu_register_resettable(obj);
  }
  
- static void tdx_guest_finalize(Object *obj)
- {
- }
- 
-+static ResettableState *tdx_reset_state(Object *obj)
-+{
-+    TdxGuest *tdx = TDX_GUEST(obj);
-+    return &tdx->reset_state;
-+}
-+
- static void tdx_guest_class_init(ObjectClass *oc, const void *data)
- {
-     ConfidentialGuestSupportClass *klass = CONFIDENTIAL_GUEST_SUPPORT_CLASS(oc);
-     X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
-+    ResettableClass *rc = RESETTABLE_CLASS(oc);
- 
-     klass->kvm_init = tdx_kvm_init;
-     klass->can_rebuild_guest_state = true;
-@@ -1555,4 +1574,13 @@ static void tdx_guest_class_init(ObjectClass *oc, const void *data)
-     x86_klass->cpu_instance_init = tdx_cpu_instance_init;
-     x86_klass->adjust_cpuid_features = tdx_adjust_cpuid_features;
-     x86_klass->check_features = tdx_check_features;
-+
-+    /*
-+     * the exit phase makes sure sev handles reset after all legacy resets
-+     * have taken place (in the hold phase) and IGVM has also properly
-+     * set up the boot state.
-+     */
-+    rc->phases.exit = tdx_handle_reset;
-+    rc->get_state = tdx_reset_state;
-+
- }
-diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
-index 1c38faf983..264fbe530c 100644
---- a/target/i386/kvm/tdx.h
-+++ b/target/i386/kvm/tdx.h
-@@ -70,6 +70,7 @@ typedef struct TdxGuest {
- 
-     uint32_t event_notify_vector;
-     uint32_t event_notify_apicid;
-+    ResettableState reset_state;
- } TdxGuest;
- 
- #ifdef CONFIG_TDX
-diff --git a/target/i386/kvm/trace-events b/target/i386/kvm/trace-events
-index 2d213c9f9b..a386234571 100644
---- a/target/i386/kvm/trace-events
-+++ b/target/i386/kvm/trace-events
-@@ -14,3 +14,6 @@ kvm_xen_soft_reset(void) ""
- kvm_xen_set_shared_info(uint64_t gfn) "shared info at gfn 0x%" PRIx64
- kvm_xen_set_vcpu_attr(int cpu, int type, uint64_t gpa) "vcpu attr cpu %d type %d gpa 0x%" PRIx64
- kvm_xen_set_vcpu_callback(int cpu, int vector) "callback vcpu %d vector %d"
-+
-+# tdx.c
-+tdx_handle_reset(void) ""
 -- 
 2.42.0
 
