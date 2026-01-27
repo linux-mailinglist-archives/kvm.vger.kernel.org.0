@@ -1,110 +1,109 @@
-Return-Path: <kvm+bounces-69262-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69263-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2CQ0Hzf/eGmOuQEAu9opvQ
-	(envelope-from <kvm+bounces-69262-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:08:55 +0100
+	id eE4kGrD/eGmOuQEAu9opvQ
+	(envelope-from <kvm+bounces-69263-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:10:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D121598CD0
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:08:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB67298D29
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:10:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2DD3307D2BE
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 18:06:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B847B3073405
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 18:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A92325492;
-	Tue, 27 Jan 2026 18:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888B43254A5;
+	Tue, 27 Jan 2026 18:09:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2uWuWKww"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CWhOHDcb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1A63254A8
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 18:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8400921ADB7
+	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 18:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769537216; cv=pass; b=W//75vBGI4vHP89/1UpuUiVzezdfK/sU6XRJlRBxbwMLqr4eIXccl4VFI3nAAXB+NeVN0aM7UM8rs4cUaFp4BAOpYi9OrhuHRN+H7bGWCaGUBCNOr+G3WfMnWhVUkAqAYIMfN+Nfar3jsfkwNrYdyVPAdo4AeIYqhk2QhqTys+M=
+	t=1769537393; cv=pass; b=iY8/DQzW9aiCPItI/w7Gue8W2mKNe/eyJnh1/+Is6wH9+gT95jVePvddpJmYaygfQ+6lBd3/WKbMoK/4jUjNpv1gDLKiOi477zJ1tZCE1NsSZOpC78RxapPvTzF5w/49sov2iJaV+5m8VfuWEp4yVzQTllBdaU0tEnX6MKPT+K0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769537216; c=relaxed/simple;
-	bh=FdDMKZN5A9ilbMPhYJZHvxzQCJptewoM58zrvbTDYAA=;
+	s=arc-20240116; t=1769537393; c=relaxed/simple;
+	bh=QhsDz6emSteQN6HE837EJTl9yLXUpogqzdkgXhKPUOc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dFnon1qxqprX/bZJNvp75qgbNKDMiOhvvh1CfhFmaWsawub+KVPm7Y/VyqU8lgn1gLYCw9IGismkJwNvdLQAk/Wxkp0WIJ6EdAiPTK13TbVzgcuZsIk+X6sXATmGtjpu7iavGoQkjV962VAhMIloD+e5YUf1k9fdwcPt3ZgZJRU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2uWuWKww; arc=pass smtp.client-ip=209.85.160.177
+	 To:Cc:Content-Type; b=W8XaE86EMKtJ7T32tekbPBRH9ryBMVcTVsJO49nvVRtPjh1x4P1TPaBUacei8iAQT7N/ht6gLRny0hSUzR9y4hH5yDWxAGdH3owdd5mpKi3Z017E4FhWb+2JKoCFgKBOBPgP+fYEZ1XhZdPqEeXLcaFFwdQFvbXV12An3h0gMqk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CWhOHDcb; arc=pass smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5014b5d8551so22941cf.0
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 10:06:55 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769537214; cv=none;
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-501511aa012so28381cf.0
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 10:09:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769537390; cv=none;
         d=google.com; s=arc-20240605;
-        b=HPpFFo6QIKCghSg7cUb1SGnsIdok09NH36GrSKshi/tJB7XlKEmbRKWA4AteTnVA2D
-         /auYqSFXK8mHqMrlc0nRh0K5JCRtnpySAt+DbS/CGMEUDshE815XjRNz8eHdgsSg3aHc
-         Nyzz7wgtjnN90nFDG+Y3lqCvmx7NdwSgSEy9ApNlC1eW3fszXFLXF1nKz6wzJA7vNPPT
-         0TaD8Fkka+aW38FuVP3XB+rPz6BC6lgU1dsgzQof9e2uLxFmb/jcUPXjtWF70LgbJEwr
-         2hYBNwtN/zYVPQiSC6RKVYVSgeRc2C/evm0L2ote8IOjxWJB64D299HsgQJTxPXo5tLy
-         BVfw==
+        b=OSSjaMF6oYArEZy88NoH7latZOte0/R2myzuHffB0wuCDviobg2hVdXK/ild0MYiGB
+         +EB0SoqaJfUlI7BqB7cMqQSqP3SUC6s/p6MiqguB1JymLqEfzznWXosLVrBKjddbtm0L
+         q0kS9TqyAvd4fkx+OTjPY5hNSkwy97hH0lgQH8fuDNtdA32P9aQVqaM7m7xdePzgpk2J
+         YzLOy64W2DO1d/LnAM/QxF8vqUbFMawros8XkPE0uGJZyGCfxXSanO1kARvThePVEYRY
+         xjA6rvuwXWhRA7htc9oLoWdAySrlMwL/AKmTxYWnUe58qwzk9ENfyfXS0yAWc0wwjPF4
+         5PzA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=fxlVnf19hj6wgXG/633VtKF1hJb/wU2Bd3Aj6hrMbwA=;
-        fh=B9egXdpSQWgA2BTgZGkSqm/36LiVY2bpg6DK2eV/WIY=;
-        b=ghbMjb7KF8jU0TX0QwgKqGXWNt1NvlOjrS9yJsMI8Wp/UjQgYDIIFS+UH4PhyYV8z9
-         9EJcBZcOH9BxMRRtdoqZL3oJmaBYaLCTEBCKN875JcK/dSbxs0mY9J1o8IYcYXLGFbCf
-         i//kx4JN1kxvnQDb1lI6FCf5eYXUwKhhp6dBPy6h57A4N3aflq4h4s2ORNMt225g6ETP
-         WhTCV3kJBqSBBRSzEyHJpRLe55wPaYeXcRETLP4r/l1WudMWDEwEIfMf98PPfK1PjtPx
-         5Pu7coSSklqTTZwP8HKnIQ1049pQS8k5S8U56RiGoqcwxPxx+VOXtyVLXz6tRD/WsMsx
-         kiDg==;
+        bh=A/fdw3HSB7m2kNlxcxEsVX9/NQhTkjGaXcMCpnvtKt0=;
+        fh=B0TkPySAzKMznom74ao23DVWpPlKbHUzy/KKvRh5N34=;
+        b=dLFphlJGOZkWNGsnvMpmkRQBIfXWvbCDCPaf1l6p02ZH+J6YpAEc72ypMYLPfrDzTJ
+         vbMasxumzqevPRD3XIQ449gmAQf5jI2va2UhDU6qRX2g2ZSkXtj2WsCM5VPUn9hrjWq0
+         JtrXwTDu/nvEBlmXlSBpOxRnPpVepEy8LsBQ8QFl0GuYepvIGj6CA7vuzTAfHjpx1ZRW
+         JKUC+Rmsm0CEzmAKn0vSTdKRmVjaTXrhieXfTfei9oXQTsVpWk2Grc/eZbPNQh+28cjm
+         3rsYGGAWTueLeZyjWj0gnTnxcjYXchAoQyjXlhenYYPPexfqVq6lw1qUl3BBfnhV+6lt
+         CZeg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769537214; x=1770142014; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769537390; x=1770142190; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxlVnf19hj6wgXG/633VtKF1hJb/wU2Bd3Aj6hrMbwA=;
-        b=2uWuWKww74CHA9qPTOy6mF5ku3qDkj1siLC4uicyUsrGS0iunq7kJFKez453bmA+Wf
-         hjJZ21fm5tF2kh2y8zIe34SEfDLSeuT84JnmE3In/148hk2+eII1FNMf8FyWTv0/5sCG
-         KeyFVRO24XdomMUB3lT8DFG7uRQif22JySZj3xlgMKbPfwrTLgdS24pNl66uNY7zMNwd
-         fGCjbKYpo/GeeCGxnD5cWUSsQGrN4nvDNq+AxGy6BdaIlbtPSq5xnaWWkbwOaXvQivar
-         vFMzJ4NX3er0NMczbWCtTednv33R/KqyDTH1KNmjUasKbGpcBsrmGQfMRGVmok7HfdlJ
-         +1mg==
+        bh=A/fdw3HSB7m2kNlxcxEsVX9/NQhTkjGaXcMCpnvtKt0=;
+        b=CWhOHDcbVBLd50Vm3h1xD74ZRgaCWuJ3V6p+7d0hwOq9FHPH34vinvHabGO94Tlx/x
+         x2o5Uzf2p23wEVmTTduJx8VJl5C61VuQG2+t/fN29SElL5G+51q5rR9iXeaOZ7elgaKn
+         sPYJSrLPGPE4wRzSRBOBp4iuOcvn+a6IJR6Qm20TG1w6/uZDv6dAvk4QZ0kapsiQ5xJb
+         kB9K9Lh9rUI9Mk8QGqannOfot0v/9o4c6GBaRtJPNfIdHZ4ZdaZGxZI90uc4hLI5ZT1D
+         UBpV+RImweH5xxgTcS8QoKe2p/G0AD0CeSTwjtSuv+2QMlU61hXN8rdxx41/ngeD+xkx
+         CLyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769537214; x=1770142014;
+        d=1e100.net; s=20230601; t=1769537390; x=1770142190;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fxlVnf19hj6wgXG/633VtKF1hJb/wU2Bd3Aj6hrMbwA=;
-        b=xDME4ytRlKjDwRaS1M/2tERLojp9X+aka8WFeNsJPo5xjVpAoR2wpLljVk1qnLe0Oz
-         EllLNV9M0PKYLZXLu+jmC75wQwJR3gTd+wGTMX5I4j4wfKHeVV+s3KwJhr4/joL0j0vn
-         IlVrkbA4RbB9TvzZESfsDscdc3VGZ6fZ8Dnt+qtFfo53+D3AzofBjU2feaqKNQHYYEZi
-         MkfEtnzQOt2gyA8XMGVq1QswZHdPq/tBIRsLXoNogSp0OG/UUNfHr/ZqQc6zWqKpDLcO
-         zcbQpO5OKIz13owSYsnjadQQBZObq7coImpC+P5ZVTnLUG54SBEz3wpliywlQGa82nMK
-         mT1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUaOejPAswZOc+lHQhJwOQm2tkUHxJ3oCdcn+mwUtzQztL26UYzjqOL66o3zwVV8nTxDEg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGqtu1GI+/MK4LLTJdspSrt/5d0XWT51UNYRpZz5M05hZKQok3
-	v3XXUIbDLfYcPR7LlrXAdZVBh4GfgP3K/73CC7Flom8T+plVBsR070IV46G1RtR8er3dVx/I4iM
-	YVo3Ia12b/SJp1/2wU3QAOxIeAh7rARR5hMEa3its
-X-Gm-Gg: AZuq6aLkfr/9aNRxMBHJxJ8Lem7CW9RFGb+lfJeN8UpgUWpDwRRGyCPnsPPoZhEVE+g
-	95jxYuGs3VSWE+/ZogtuIeOpfYspHn/AKlkb5uWhcjemTcoSmmFigKnqruLdfYClPkbFpa5WGB/
-	Ac3JnFG6FWijrKBxAUzLCUOtkb3h1PJg6E3YEHxSi5y1q1wwe3i/BwxFQ8wswqUehWm0JmqdBdQ
-	NgWn2EMleCeihwMP637kMUm4rUtLxQtE19BftZIFig85m1Zk38ajj5jdi2+PBO6plRP/o5Q
-X-Received: by 2002:ac8:5702:0:b0:4ed:70d6:6618 with SMTP id
- d75a77b69052e-503340e2460mr5795521cf.10.1769537213238; Tue, 27 Jan 2026
- 10:06:53 -0800 (PST)
+        bh=A/fdw3HSB7m2kNlxcxEsVX9/NQhTkjGaXcMCpnvtKt0=;
+        b=G+cvtY8ITAjIyu4k6aHj1giQVWzG8W7F7xkSrD9fLLBjsyyqjNwlzyYWAsYi9bgzKL
+         jDp/SiIorS/81mTA7B8Hb6DDDZw0aFB3AszRQtT8EfSQn86HCyypLa4eIokaR2IEiHNv
+         Bk/WkMdizsXWF2YozBkGehp+GZ3PgbmJommZ0Imib4LFm3y2zk/R4h77u8XUxAjyTij8
+         c/KF4pHqblYlOwZqKDCDXlENmmwCBf/FMNV4+l07Tjs2yLGbU3t4oc4bPeTEHmLKEbcz
+         vVPh0Dov/K6KJtLEHbKPEVnTsoZ8cMYjfrxtin9WhJrQoCATy9BSG+J9UbwymCxTNyuf
+         D5qQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXICc4o33zKY1V3lWmMPtPWHCtoGqvKIG8xxcsxt3XxR9PX6RPZ8rELETACFJPlk8TDgJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcE1ItYm1pO6k9QU/lgCk2bbXeqc7VQhLvmUZqBqqnV1iMx1fA
+	g3QW6HVdZpJP4UFDl2aKZF+R+dndctAwKxq2PB+pLH9m0tvjEDg1zaH3DBP2nBTNZGEGrAQNC/c
+	n9QEs05PuIUnSECDiTdtK/2SGVyuEVZhSpi+2ojE/zos/NkhXzuLsZu2Nnx8=
+X-Gm-Gg: AZuq6aKkwFnJ74Vk52OnKOB7+xIuJaRG3LtwzU0KdSfyF9pGIndio/RosTukIdRIxJo
+	MTrR57OetO2aOeHr3ga/q7y4uxU+69qFlDQZpGnCjZZtI8mn5t7GLb4ztD9w48fffAek+dJE+fW
+	fCLj6GQKk2OCFAvdfhCRcpLFiqWoO46RWxFVHC7hlN86x1dArYYYqUR/qd1zxEgA0DP73/hbSs3
+	mJi0a/qrWbIbAraVi+Yjxuioekbl8byLMfTLlyhGvoupPwiOyVs/Bmk/Wx/gMAyJdEEcrjM
+X-Received: by 2002:ac8:7d55:0:b0:4ed:8103:8c37 with SMTP id
+ d75a77b69052e-5032f4c7f16mr11147521cf.12.1769537389984; Tue, 27 Jan 2026
+ 10:09:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-9-maz@kernel.org>
-In-Reply-To: <20260126121655.1641736-9-maz@kernel.org>
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-10-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-10-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 27 Jan 2026 18:06:16 +0000
-X-Gm-Features: AZwV_QjgCatYzl0uSF32P0svXsC6cgFGj2o9l3SKTnzzzCjPpV9QVQWXrqlbFrM
-Message-ID: <CA+EHjTzCpT4VYQkcmmn7AOAyROA9e=ohKfj53kSvf804DWWODg@mail.gmail.com>
-Subject: Re: [PATCH 08/20] KVM: arm64: Correctly handle SCTLR_EL1 RES1 bits
- for unsupported features
+Date: Tue, 27 Jan 2026 18:09:13 +0000
+X-Gm-Features: AZwV_QheZWlu-Uzsp1OFbCkpBH6_EN7Esc-S0xm2N0aOTBYMl0RK4FXDHy6Zuj0
+Message-ID: <CA+EHjTyQdLO3pk2yqDDptXemRSFJmt674P_H2-VtWC967o-c3g@mail.gmail.com>
+Subject: Re: [PATCH 09/20] KVM: arm64: Convert HCR_EL2.RW to AS_RES1
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -116,19 +115,19 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69262-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69263-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
@@ -137,89 +136,59 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D121598CD0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[hcr_el2.rw:url,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BB67298D29
 X-Rspamd-Action: no action
-
-Hi Marc,
 
 On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
 >
-> A bunch of SCTLR_EL1 bits must be set to RES1 when the controlling
-
-nit: controlling
-
-> feature is not present. Add the AS_RES1 qualifier where needed.
+> Now that we have the AS_RES1 constraint, it becomes trivial to express
+> the HCR_EL2.RW behaviour.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Otherwise, it matches the Arm Arm.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
-
-
 > ---
->  arch/arm64/kvm/config.c | 26 ++++++++++++++------------
->  1 file changed, 14 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/config.c | 15 +--------------
+>  1 file changed, 1 insertion(+), 14 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 6a4674fabf865..68ed5af2b4d53 100644
+> index 68ed5af2b4d53..39487182057a3 100644
 > --- a/arch/arm64/kvm/config.c
 > +++ b/arch/arm64/kvm/config.c
-> @@ -1085,27 +1085,28 @@ static const DECLARE_FEAT_MAP(tcr2_el2_desc, TCR2_EL2,
->                               tcr2_el2_feat_map, FEAT_TCR2);
+> @@ -389,19 +389,6 @@ static bool feat_vmid16(struct kvm *kvm)
+>         return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
+>  }
 >
->  static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
-> -       NEEDS_FEAT(SCTLR_EL1_CP15BEN    |
-> -                  SCTLR_EL1_ITD        |
-> -                  SCTLR_EL1_SED,
-> -                  FEAT_AA32EL0),
-> +       NEEDS_FEAT(SCTLR_EL1_CP15BEN, FEAT_AA32EL0),
-> +       NEEDS_FEAT_FLAG(SCTLR_EL1_ITD   |
-> +                       SCTLR_EL1_SED,
-> +                       AS_RES1, FEAT_AA32EL0),
->         NEEDS_FEAT(SCTLR_EL1_BT0        |
->                    SCTLR_EL1_BT1,
->                    FEAT_BTI),
->         NEEDS_FEAT(SCTLR_EL1_CMOW, FEAT_CMOW),
-> -       NEEDS_FEAT(SCTLR_EL1_TSCXT, feat_csv2_2_csv2_1p2),
-> -       NEEDS_FEAT(SCTLR_EL1_EIS        |
-> -                  SCTLR_EL1_EOS,
-> -                  FEAT_ExS),
-> +       NEEDS_FEAT_FLAG(SCTLR_EL1_TSCXT,
-> +                       AS_RES1, feat_csv2_2_csv2_1p2),
-> +       NEEDS_FEAT_FLAG(SCTLR_EL1_EIS   |
-> +                       SCTLR_EL1_EOS,
-> +                       AS_RES1, FEAT_ExS),
->         NEEDS_FEAT(SCTLR_EL1_EnFPM, FEAT_FPMR),
->         NEEDS_FEAT(SCTLR_EL1_IESB, FEAT_IESB),
->         NEEDS_FEAT(SCTLR_EL1_EnALS, FEAT_LS64),
->         NEEDS_FEAT(SCTLR_EL1_EnAS0, FEAT_LS64_ACCDATA),
->         NEEDS_FEAT(SCTLR_EL1_EnASR, FEAT_LS64_V),
->         NEEDS_FEAT(SCTLR_EL1_nAA, FEAT_LSE2),
-> -       NEEDS_FEAT(SCTLR_EL1_LSMAOE     |
-> -                  SCTLR_EL1_nTLSMD,
-> -                  FEAT_LSMAOC),
-> +       NEEDS_FEAT_FLAG(SCTLR_EL1_LSMAOE        |
-> +                       SCTLR_EL1_nTLSMD,
-> +                       AS_RES1, FEAT_LSMAOC),
->         NEEDS_FEAT(SCTLR_EL1_EE, FEAT_MixedEnd),
->         NEEDS_FEAT(SCTLR_EL1_E0E, feat_mixedendel0),
->         NEEDS_FEAT(SCTLR_EL1_MSCEn, FEAT_MOPS),
-> @@ -1121,7 +1122,8 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
->         NEEDS_FEAT(SCTLR_EL1_NMI        |
->                    SCTLR_EL1_SPINTMASK,
->                    FEAT_NMI),
-> -       NEEDS_FEAT(SCTLR_EL1_SPAN, FEAT_PAN),
-> +       NEEDS_FEAT_FLAG(SCTLR_EL1_SPAN,
-> +                       AS_RES1, FEAT_PAN),
->         NEEDS_FEAT(SCTLR_EL1_EPAN, FEAT_PAN3),
->         NEEDS_FEAT(SCTLR_EL1_EnDA       |
->                    SCTLR_EL1_EnDB       |
+> -static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
+> -{
+> -       /* This is purely academic: AArch32 and NV are mutually exclusive */
+> -       if (bits) {
+> -               if (kvm_has_feat(kvm, FEAT_AA32EL1))
+> -                       *bits &= ~HCR_EL2_RW;
+> -               else
+> -                       *bits |= HCR_EL2_RW;
+> -       }
+> -
+> -       return true;
+> -}
+> -
+>  static bool compute_hcr_e2h(struct kvm *kvm, u64 *bits)
+>  {
+>         if (bits) {
+> @@ -967,7 +954,7 @@ static const DECLARE_FEAT_MAP(hcrx_desc, __HCRX_EL2,
+>
+>  static const struct reg_bits_to_feat_map hcr_feat_map[] = {
+>         NEEDS_FEAT(HCR_EL2_TID0, FEAT_AA32EL0),
+> -       NEEDS_FEAT_FIXED(HCR_EL2_RW, compute_hcr_rw),
+> +       NEEDS_FEAT_FLAG(HCR_EL2_RW, AS_RES1, FEAT_AA32EL1),
+>         NEEDS_FEAT(HCR_EL2_HCD, not_feat_aa64el3),
+>         NEEDS_FEAT(HCR_EL2_AMO          |
+>                    HCR_EL2_BSU          |
 > --
 > 2.47.3
 >
