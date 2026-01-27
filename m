@@ -1,263 +1,280 @@
-Return-Path: <kvm+bounces-69206-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69207-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SNdwKVpLeGkKpQEAu9opvQ
-	(envelope-from <kvm+bounces-69206-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:21:30 +0100
+	id GLc3A+9YeGkNpgEAu9opvQ
+	(envelope-from <kvm+bounces-69207-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 07:19:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D6D90187
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:21:30 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 241F990579
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 07:19:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4AC75308DB11
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 05:18:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F0E283008C83
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 06:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1632329387;
-	Tue, 27 Jan 2026 05:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4851732A3FE;
+	Tue, 27 Jan 2026 06:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HleKLDgk";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lr5+QHLx"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NycfoDEq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012042.outbound.protection.outlook.com [52.101.53.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B131A15B971
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 05:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769491087; cv=none; b=N8bCWEwxBYApH1a9cu7jijklcHU38FhGBIUtcf85DoZnUCwEjYq9BOfpGPxeDDc7TtwlSCncXeIUg5f2womBI5yH2f+FISEb7nLzXtEBfUCucF7S++AmAIE8nzxA/f3B15Z0lmGOQmLRwcnP8aAusuZZJmFKduCXEPZpJKRvXHA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769491087; c=relaxed/simple;
-	bh=0SzeZ9KA2vvNrf/uLWsbg6EXdicxRvCE9P4vKsk0Rbs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AGn+uCRFygSkrYqcHDWQ2XPryTIq6np3fNj3lbR3aHllceZPX9xTNaiQypGyPaC5jqJkFLsTOZenlsz+gsMP3jX10sNpVgd0PR2RNwfgqbiykPnKmjMzWikozQDjYueIR8MQzVTdHTaxhTc9cn6vpv5YNFHMpKMOA/A1gTst0cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HleKLDgk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lr5+QHLx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769491084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bEDYSbwkzm3iHaRebY1agUkwYGBShvhOSyrbmVbxi+E=;
-	b=HleKLDgkylfMiYRYEEP4VNBlm1NZ2gXZ1AQryNFUQTEFBcDLj0wFDq1Jli7s4IxkK+U9ww
-	HMB0TBan8t+iPub70J5iwdzfJTjM4L54IP9LN8L/PQu+s6z54ajLzWY/sHwQy0iatuVRFM
-	Lg5llOScvtbAJsk2dJApZSzu8tdMVpU=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-30-JxgCRJDTNKyVMMfx9ufURg-1; Tue, 27 Jan 2026 00:18:02 -0500
-X-MC-Unique: JxgCRJDTNKyVMMfx9ufURg-1
-X-Mimecast-MFC-AGG-ID: JxgCRJDTNKyVMMfx9ufURg_1769491082
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-bce224720d8so2937821a12.1
-        for <kvm@vger.kernel.org>; Mon, 26 Jan 2026 21:18:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769491082; x=1770095882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bEDYSbwkzm3iHaRebY1agUkwYGBShvhOSyrbmVbxi+E=;
-        b=Lr5+QHLxr6/fgucvAPZERik7kzk6TMyH70gfX+m8Q3ZEkiEO8eq8JDZOqgsyPld8B4
-         GkjpiSilV8dUUlUfarWitRkIkzEiS0Lr2u63FnkoJ0s8AyMu6n7tGXvqj1/6JOGfBhxr
-         amPzkqKISBqrZ91KUHC45rLFEjCL1zvHs9v3+ZqKvhv39qpgc/sbtM8F4jY3e6StBRbT
-         Mw8MtcutbfkYkOAAmVZf6EXj+jiDEeS1yC+G2x2HiOgRIHNu2xrDHMauBY+grqm8zVow
-         OFAb1b09iHze9oZCzsW4I1oes6ffiU3DSKYNazbprQ9mV0920zRlpMuOSjLV3y+t2NHE
-         gVLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769491082; x=1770095882;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bEDYSbwkzm3iHaRebY1agUkwYGBShvhOSyrbmVbxi+E=;
-        b=JFZpaFWZ4fefTmPIqt+Tmt+WG/sMqcqfewpjLB3gzSTvYCxtEhtKxGUQO6oQd2T/aA
-         b/Gh3Qx0DNVf6BZkpzsB3slVjtCUqN1t4ZkpObShWj60M/EuZ9DckQs1JATk0kiR0umi
-         3EX1Sfe1SlH6FB5h69NEJNlgB1cdtI1gMOW/bq7Tb49Hdsokqu4ggzXg5uov8reuS93X
-         aulf3YevpL4dpGBrr6RkTx0c+qJLPCd5+RDxoEW8xnxR8+btsOCrbEe7pOLMRLwvVw5p
-         gC9Y/dLARywsAYoDfzyKz8mxTYssGrBADRyn10bqdQcyl3HER6N1NxY1D8jTPzThgBPp
-         H3zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUsGd8X35ho5qncNtqj+NGAAJKnpSPSbhdw2CrnhjwSPSfeZ+mmxKfYpQgBptXqQJO3BUA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfbBwIyG/3GpjVqwQCFNpdnXN2Cp0Na+xstUZ0OW9efP5Zxro1
-	ofAGgliKr204hujl1E9optSDmTGEgk0hhCCD0PPT1Fa0Xn3Vz+9yXhvy+3mIrNvKzHr/S5466DJ
-	Hy+/pcoAWjNdJybddnSJHwMKhAQr0Z1/DdeaYs/VB+Vpa6guWiTPkiA==
-X-Gm-Gg: AZuq6aKmMVo1SgYA22qTy6/+KXZec/Ou+XEMGj11TlkNGJ4sYJTVR6U2BB5SgnvQgID
-	P8xbdkNcuzml/etOIz1DcwokYxfG8cbh5QTUPSk1391Xey6HRVAmgryG+UFAsbyD44AjkxXk3vm
-	5G0jnu4bI29TMkeEwo4U0iz+UFIyvDj3fwtkRCd3bRC/x4//jfUVn8DeTNy+Pku83w5up0wVYu7
-	2MsZ7RA2ZdbobnF7FeeocRfFFdVhhvAlR+R0YaNTKWJZwmdZvOUVVXZfMN1jNb8vUD/Tys1o+cL
-	96AvP8xXkf6DqmmLwHwbBbeHug7gTY/5PBcZ8WFJec4vhqgXMlI3X82+5DdpnosO5t2tkXpAmEJ
-	YNKn+iwsoMK++bnIppRmcVlMu50OeiVMjlEBbJNkEVA==
-X-Received: by 2002:a05:6a20:918e:b0:366:18b3:85c3 with SMTP id adf61e73a8af0-38ec62899cdmr496033637.1.1769491081802;
-        Mon, 26 Jan 2026 21:18:01 -0800 (PST)
-X-Received: by 2002:a05:6a20:918e:b0:366:18b3:85c3 with SMTP id adf61e73a8af0-38ec62899cdmr496015637.1.1769491081377;
-        Mon, 26 Jan 2026 21:18:01 -0800 (PST)
-Received: from rhel9-box.lan ([122.163.48.79])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-353f6230d5dsm1110925a91.17.2026.01.26.21.17.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 21:18:01 -0800 (PST)
-From: Ani Sinha <anisinha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kraxel@redhat.com,
-	Ani Sinha <anisinha@redhat.com>,
-	kvm@vger.kernel.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v3 29/33] kvm/vcpu: add notifiers to inform vcpu file descriptor change
-Date: Tue, 27 Jan 2026 10:45:57 +0530
-Message-ID: <20260127051612.219475-30-anisinha@redhat.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20260127051612.219475-1-anisinha@redhat.com>
-References: <20260127051612.219475-1-anisinha@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DD21F3FED;
+	Tue, 27 Jan 2026 06:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769494759; cv=fail; b=T7HnXdZ13ewUrGrzhWpIEKIqU07OrZDsNeP6LFbqhhqcdhfieqPZaMr/NCPSjR8DjGtTEuu6hPzq9JaO4RHCS08EO/jqwuBaaCjqfHgpwNgvaUOyh1hv1TJL1ZUhO27Can0qMOL/NA0Qx4CwY99jeLxUViRlHMxKV0sl3mCEVs0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769494759; c=relaxed/simple;
+	bh=aENSTiRG3EiZHbnJyLc1UeuKFNWImFSDCXkE+dWynFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=KR/Q3QtFd7gQ8BtlfRE92qXQ9vdvmYyIodZQNqvthYYHFlr7YClSpjiq+lyfIA8P+H91MdCdJFlyq7eEV9+RXY/uXbVsxalA95Hai8+cRGAkMewEyXw+26dJ9HbVYUzfBwDMP06FanQhvl1oR9Q9Vd7kWLTtRxB1Tbz7XnP2UbM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NycfoDEq; arc=fail smtp.client-ip=52.101.53.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kSwB2BACs9ehp/nv/7je/qpw2nfy8jSnVVEfDQZCQJ0/6qqIrqx8FCbcj68PMD0LhIy1o59H3L1YCbgbL6EZ/9wS5GUlKhDzv1cm7qpNJiDG//DZbnfFZ9iK8bGuArmnOfJr/lsRvPJ3x24ZWUd3pC9gbRIvQsa2iAouIGtKWsleSuCF22PEvsNI7FnWZEpY8Ze1LgL4Hdd8JVIQ1FBTMDWAgizmoq2ucHBxCzL6b/aDA2ji6aPFHfkUk64x4r9D80uDJanq99mJ9y6AW1byshzdHUej7AOcQvcG/QRnrUA+aEvLHcU2OPqX+KfG4NLB0ljZAKGQps2WeUihBRdlJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r1cKXjASM+WKk3hsz3ldmrWUWtgtQuc1+08oCDRjS78=;
+ b=LHC/47ztyZG67ag1L6W1DJPFZZMNkA1dCcmEBZBx8B37xFntD28MaRltzk4B4UBVPx8fAVEoHUNx2R3k/aF+xDYRCKZsSelIyXbeEqTBiSgnLEnStmDvuFQeoRRrNW+vg+qn+7gUaJ00Cx5PnnKDm6YXiObBVL+uwBfrKy2TFiBxF7M6D88CEldaV7uzXu8id8d9ii13KOO8ORAWm3jq7NRo3lSs/5cGo3MAd9GhHlRvqq8jUBDpTEmXr4zfeAsl+Eyn/Yq1xI05ZQ7J5/0rp75dcgtfDtZmhFjWb5MnxbikVQD0kmGwf3JKe343TR9/8GYjBy7IN3XkjGxhbdEN6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r1cKXjASM+WKk3hsz3ldmrWUWtgtQuc1+08oCDRjS78=;
+ b=NycfoDEqi2bLMTSBJao34goOJnj/elaCCkHbuG3NF9mCrnEim8brSTs2ucSKhBbmeCg1U+wcDrXHj5BvezGF5zuKdKGKtxf6vm4YBufhf1778zMeUwZSjfiiJuhMjA6DGRWI4lFaO83gQbaxSZCjcycJKljHXJwseb13jFR31GA=
+Received: from BYAPR05CA0008.namprd05.prod.outlook.com (2603:10b6:a03:c0::21)
+ by SN7PR12MB6839.namprd12.prod.outlook.com (2603:10b6:806:265::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.15; Tue, 27 Jan
+ 2026 06:19:13 +0000
+Received: from MWH0EPF000A672E.namprd04.prod.outlook.com
+ (2603:10b6:a03:c0:cafe::58) by BYAPR05CA0008.outlook.office365.com
+ (2603:10b6:a03:c0::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.7 via Frontend Transport; Tue,
+ 27 Jan 2026 06:19:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ MWH0EPF000A672E.mail.protection.outlook.com (10.167.249.20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9564.3 via Frontend Transport; Tue, 27 Jan 2026 06:19:13 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Tue, 27 Jan
+ 2026 00:19:12 -0600
+Received: from satlexmb08.amd.com (10.181.42.217) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 27 Jan
+ 2026 00:19:12 -0600
+Received: from [10.136.47.140] (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Tue, 27 Jan 2026 00:19:08 -0600
+Message-ID: <80187820-8e0d-4b3a-87bf-fd7be238dd26@amd.com>
+Date: Tue, 27 Jan 2026 11:49:07 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: SEV: IBPB-on-Entry guest support
+To: Kim Phillips <kim.phillips@amd.com>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <x86@kernel.org>
+CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, K Prateek Nayak <kprateek.nayak@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, "Borislav
+ Petkov" <borislav.petkov@amd.com>, Borislav Petkov <bp@alien8.de>, Naveen Rao
+	<naveen.rao@amd.com>, David Kaplan <david.kaplan@amd.com>,
+	<stable@kernel.org>
+References: <20260126224205.1442196-1-kim.phillips@amd.com>
+ <20260126224205.1442196-2-kim.phillips@amd.com>
+Content-Language: en-US
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20260126224205.1442196-2-kim.phillips@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: None (SATLEXMB04.amd.com: nikunj@amd.com does not designate
+ permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A672E:EE_|SN7PR12MB6839:EE_
+X-MS-Office365-Filtering-Correlation-Id: 73f3c29d-80e0-48f5-d0a6-08de5d6bfdae
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Y0V5ZVgyWVhKRCtOckZXVTI2Q2xCVXBWZ05nMk00dkpsVG1Yc0Q3eEhKVXh1?=
+ =?utf-8?B?UmdPQ2pzTTZTMU91SlVhNkFMMnVuZkYxTFlCRHBDYjVsRyt1elVsRUFTT2tj?=
+ =?utf-8?B?cmIwWTExUUFWaXVFS1RQdGxHL1ZtVGJvZzh2VDFwdGJMLzBZYUpTTFZQd1FH?=
+ =?utf-8?B?U3h5QlcycDlxOHlwbXM1SGx6aTl0TDVqeTFEYloyVlZ4Smo2cWJ6bDB3dGZ3?=
+ =?utf-8?B?UFZSbFhPaGdLM3dwZ2tqYk8wOU5GMTYrcHRnOWFGWTZIMmlGVkJ6YW10aVlm?=
+ =?utf-8?B?RXI0d1djdkkycG5mSkx3ZW1ZdFRUWEVNMUMxbnZCTGY1VjlkSE8rOENPaEZh?=
+ =?utf-8?B?TkwxdEhkMHFWTkdRcVhLblgyVDd3elV1RmdrYnprVk5iYTJ0NUV2cEdPc2V6?=
+ =?utf-8?B?OHlRZmNYa3JUQ0hEN3BxQThmQ1FjVUdzelV6UkQ2cWNJZmxUdWd5WFFNVWlW?=
+ =?utf-8?B?OHZmNjIvYzJUWmRNTXdBbjVDUXlKeXF1MjdhM0IzbzFOMmZBMTNLS2lpeHBL?=
+ =?utf-8?B?aFdCQmZoVnpaUW9kS3Z0T3VnWUhNUlpKT1l2dkovVlZ2WE1DRUxNNzFPcVEx?=
+ =?utf-8?B?OGJmNStCZG9rR0J4MHZNdWRlL0VhUE5nQktUN09DUkJnZmxyT2RLTVVIUWgz?=
+ =?utf-8?B?akFzU3BLNllKK0NiWDY5aUw4MUNMb0N6cTZBcWJOcGQwS1I5UzAxNzFDYXp6?=
+ =?utf-8?B?ZmgvWFR6T2NnTTU0RUpMZzV1WlIwUlZhdVpUQ1lRQm1aaUtVcEdhM0lraVBT?=
+ =?utf-8?B?eGtzOW5xdWhVd0V6TTVSMWpjdG1xdytyajhJalpRd1JNOGx2bWJkZGtWYThW?=
+ =?utf-8?B?TWIrcjlvQ2M4bUZwdjg4TFBQNjRVbWRBYnlSZVRYUFlUbGdsRTR3dlc1ZGhq?=
+ =?utf-8?B?RWFrVloxemhUWi9RUSt3RTZSMXBsTHE1RlRpa1ovSGJvNnRieXJxblRZV2dK?=
+ =?utf-8?B?UmljRUFZSmRSUzFNeTN5aHB0R2lKd1daU2pnclpGVTVuN1VJMHRYc0g2aFhY?=
+ =?utf-8?B?aWV0dnFoMXVJNGRrWVZjZ3NnWnBrYi9LTjkwbkRVVi9YYWozMHVyZ29TSmpt?=
+ =?utf-8?B?T1JPNDJuN0pVNTNlamk1N1NrZk5PRkEyRWk0R3crdE5wL1lCd3lienkzQmVI?=
+ =?utf-8?B?empQYXJFd3RiSmlVRmJzOUN1ZzFpcTdZZ2c1RU9PLytEOFMvelhmak1DM2Vq?=
+ =?utf-8?B?UnM0ZUFEMi9zTnovZjNYM1VPWXpXdXRLaUJwb2JoYmc2cjRrdmowb3l3Q1VX?=
+ =?utf-8?B?RlZPbkN3UXJVaGZob0l4Y05uZVJRem9WZVVadDNqT0I5V1RId3hyOGp6WXhR?=
+ =?utf-8?B?SUhBRFRybXNHQWxlbjFEU280Y0JxWUt6Y0ZsQ0VyeSsxblBYZE1RRnJidm9C?=
+ =?utf-8?B?ZVFLVk9WaGN5UXh6VWcvTm1QNzZRR3R4ZmdIeUlOVmwvbFVOV1AvenNBVGdn?=
+ =?utf-8?B?R3R1N3d0My9ySWd4L1doejdoMllhMXVia3RZWkR4OE1ub0Q5VkU3UWNiSlNm?=
+ =?utf-8?B?OXg1MEc1eDJ5TjRFQ0txb2hVZmYvZUZPamU1V09JMTZoZ3lxclVVVFNCY25s?=
+ =?utf-8?B?Y1E2YVY4NnFFU005NHJIMXRJZEd5TzJMRFRGZlJNUEhac1NtQksyb0ZLK1FX?=
+ =?utf-8?B?NFRXeGp3V1JRUFBvVHEwWHVYQ1kwR1hScGtwbjFMQy9BVktaYzU3QTdZaUlK?=
+ =?utf-8?B?bmRGWTY3aVRydGpzKzJkN09nR04rbXgxUkNHR2VscXh4T2F6TlJ3aWc1RFU3?=
+ =?utf-8?B?NWdnYTBQcFNheWFEMlE4YjJSZzJpbWthOGp4V3craXdCY2UybFhCVENUUjla?=
+ =?utf-8?B?MnJXODAxUmRaNDhlVDcrdXlLb2hlMTVXVjR5MXIyeGJaekt3Y2xpTGdmOGlC?=
+ =?utf-8?B?Wk91WHZvRDBOSHZwNi9WZzFjZk1iaXBKQk05RnozTk9GOGZsK01BOG5kYS9L?=
+ =?utf-8?B?bmM1d1FDMGMrbTFFcFE2T1NvL0l4VTVjU0tMeEY5ekZrTmVFNmV2WU5OaE9O?=
+ =?utf-8?B?cThBNndCM3V3V3RrM0hiMUtsZENidzZ5ekRpVEtTZFo3TXpTdVBraytXWnZx?=
+ =?utf-8?B?TmhqL0ZlOTRDUXFOTGRLRGt6U2JVbk9zNVM0bDVvdzg3VXJkRnhMVFNsRGQr?=
+ =?utf-8?B?TkwwWHBmSUxtb1QveFovbGZDMGdiRmNxTXRhOFkzZmxaREEvMUJFRDBUdlVN?=
+ =?utf-8?B?dVlFQVN5S2taZEZRZ0xLaUd5ZTZNU0h4eWszaTBKMk5ycVo5M1V5NjhtMHht?=
+ =?utf-8?B?OVBjMk1xR1pETkk5MU5NczN4ZEtnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2026 06:19:13.0836
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 73f3c29d-80e0-48f5-d0a6-08de5d6bfdae
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000A672E.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6839
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-69207-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69206-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,amd.com:email,amd.com:dkim,amd.com:mid,alien8.de:email];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anisinha@redhat.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[nikunj@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 48D6D90187
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 241F990579
 X-Rspamd-Action: no action
 
-When new vcpu file descriptors are created and bound to the new kvm file
-descriptor as a part of the confidential guest reset mechanism, various
-subsystems needs to know about it. This change adds notifiers so that various
-subsystems can take appropriate actions when vcpu fds change by registering
-their handlers to this notifier.
-Subsequent changes will register specific handlers to this notifier.
 
-Signed-off-by: Ani Sinha <anisinha@redhat.com>
----
- accel/kvm/kvm-all.c    | 26 ++++++++++++++++++++++++++
- accel/stubs/kvm-stub.c | 10 ++++++++++
- include/system/kvm.h   | 17 +++++++++++++++++
- 3 files changed, 53 insertions(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index d43a363488..a28b0edade 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -127,6 +127,9 @@ static NotifierList kvm_irqchip_change_notifiers =
- static NotifierWithReturnList register_vmfd_changed_notifiers =
-     NOTIFIER_WITH_RETURN_LIST_INITIALIZER(register_vmfd_changed_notifiers);
- 
-+static NotifierWithReturnList register_vcpufd_changed_notifiers =
-+    NOTIFIER_WITH_RETURN_LIST_INITIALIZER(register_vcpufd_changed_notifiers);
-+
- static int map_kvm_run(KVMState *s, CPUState *cpu, Error **errp);
- static int map_kvm_dirty_gfns(KVMState *s, CPUState *cpu, Error **errp);
- static int vcpu_unmap_regions(KVMState *s, CPUState *cpu);
-@@ -2313,6 +2316,22 @@ static int kvm_vmfd_change_notify(Error **errp)
-                                             &vmfd_notifier, errp);
- }
- 
-+void kvm_vcpufd_add_change_notifier(NotifierWithReturn *n)
-+{
-+    notifier_with_return_list_add(&register_vcpufd_changed_notifiers, n);
-+}
-+
-+void kvm_vcpufd_remove_change_notifier(NotifierWithReturn *n)
-+{
-+    notifier_with_return_remove(n);
-+}
-+
-+static int kvm_vcpufd_change_notify(Error **errp)
-+{
-+    return notifier_with_return_list_notify(&register_vcpufd_changed_notifiers,
-+                                            &vmfd_notifier, errp);
-+}
-+
- int kvm_irqchip_get_virq(KVMState *s)
- {
-     int next_virq;
-@@ -2840,6 +2859,13 @@ static int kvm_reset_vmfd(MachineState *ms)
-     }
-     assert(!err);
- 
-+    /* notify everyone that vcpu fd has changed. */
-+    ret = kvm_vcpufd_change_notify(&err);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+    assert(!err);
-+
-     /* these can be only called after ram_block_rebind() */
-     memory_listener_register(&kml->listener, &address_space_memory);
-     memory_listener_register(&kvm_io_listener, &address_space_io);
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index a6e8a6e16c..c4617caac6 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -87,6 +87,16 @@ void kvm_vmfd_remove_change_notifier(NotifierWithReturn *n)
- {
- }
- 
-+void kvm_vcpufd_add_change_notifier(NotifierWithReturn *n)
-+{
-+    return;
-+}
-+
-+void kvm_vcpufd_remove_change_notifier(NotifierWithReturn *n)
-+{
-+    return;
-+}
-+
- int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-                                        EventNotifier *rn, int virq)
- {
-diff --git a/include/system/kvm.h b/include/system/kvm.h
-index a17cd368ca..8265d0ff4e 100644
---- a/include/system/kvm.h
-+++ b/include/system/kvm.h
-@@ -589,4 +589,21 @@ void kvm_vmfd_add_change_notifier(NotifierWithReturn *n);
-  */
- void kvm_vmfd_remove_change_notifier(NotifierWithReturn *n);
- 
-+/**
-+ * kvm_vcpufd_add_change_notifier - register a notifier to get notified when
-+ * a KVM vcpu file descriptors changes as a part of the confidential guest
-+ * "reset" process. Various subsystems should use this mechanism to take
-+ * actions such as re-issuing vcpu ioctls as a part of setting up vcpu
-+ * features.
-+ * @n: notifier with return value.
-+ */
-+void kvm_vcpufd_add_change_notifier(NotifierWithReturn *n);
-+
-+/**
-+ * kvm_vcpufd_remove_change_notifier - de-register a notifer previously
-+ * registered with kvm_vcpufd_add_change_notifier call.
-+ * @n: notifier that was previously registered.
-+ */
-+void kvm_vcpufd_remove_change_notifier(NotifierWithReturn *n);
-+
- #endif
--- 
-2.42.0
+On 1/27/2026 4:12 AM, Kim Phillips wrote:
+>  KVM: SEV: IBPB-on-Entry guest support
+
+The subject line should have the prefix "x86/sev" instead
+of "KVM: SEV". The below subject line would be more appropriate:
+
+x86/sev: Allow IBPB-on-Entry feature for SNP guests
+
+> The SEV-SNP IBPB-on-Entry feature does not require a guest-side
+> implementation. The feature was added in Zen5 h/w, after the first
+> SNP Zen implementation, and thus was not accounted for when the
+> initial set of SNP features were added to the kernel.
+> 
+> In its abundant precaution, commit 8c29f0165405 ("x86/sev: Add SEV-SNP
+> guest feature negotiation support") included SEV_STATUS' IBPB-on-Entry
+> bit as a reserved bit, thereby masking guests from using the feature.
+> 
+> Unmask the bit, to allow guests to take advantage of the feature on
+> hypervisor kernel versions that support it: Amend the SEV_STATUS MSR
+> SNP_RESERVED_MASK to exclude bit 23 (IbpbOnEntry).
+> 
+> Fixes: 8c29f0165405 ("x86/sev: Add SEV-SNP guest feature negotiation support")> Cc: Nikunj A Dadhania <nikunj@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> CC: Borislav Petkov (AMD) <bp@alien8.de>
+> CC: Michael Roth <michael.roth@amd.com>
+> Cc: stable@kernel.org
+> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+
+Apart from the above comments:
+
+Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
+
+> ---
+>  arch/x86/boot/compressed/sev.c   | 1 +
+>  arch/x86/coco/sev/core.c         | 1 +
+>  arch/x86/include/asm/msr-index.h | 5 ++++-
+>  3 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+> index c8c1464b3a56..2b639703b8dd 100644
+> --- a/arch/x86/boot/compressed/sev.c
+> +++ b/arch/x86/boot/compressed/sev.c
+> @@ -188,6 +188,7 @@ bool sev_es_check_ghcb_fault(unsigned long address)
+>  				 MSR_AMD64_SNP_RESERVED_BIT13 |		\
+>  				 MSR_AMD64_SNP_RESERVED_BIT15 |		\
+>  				 MSR_AMD64_SNP_SECURE_AVIC |		\
+> +				 MSR_AMD64_SNP_RESERVED_BITS19_22 |	\
+>  				 MSR_AMD64_SNP_RESERVED_MASK)
+>  
+>  #ifdef CONFIG_AMD_SECURE_AVIC
+> diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+> index 9ae3b11754e6..13f608117411 100644
+> --- a/arch/x86/coco/sev/core.c
+> +++ b/arch/x86/coco/sev/core.c
+> @@ -122,6 +122,7 @@ static const char * const sev_status_feat_names[] = {
+>  	[MSR_AMD64_SNP_VMSA_REG_PROT_BIT]	= "VMSARegProt",
+>  	[MSR_AMD64_SNP_SMT_PROT_BIT]		= "SMTProt",
+>  	[MSR_AMD64_SNP_SECURE_AVIC_BIT]		= "SecureAVIC",
+> +	[MSR_AMD64_SNP_IBPB_ON_ENTRY_BIT]	= "IBPBOnEntry",
+>  };
+>  
+>  /*
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index 4d3566bb1a93..9016a6b00bc7 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -735,7 +735,10 @@
+>  #define MSR_AMD64_SNP_SMT_PROT		BIT_ULL(MSR_AMD64_SNP_SMT_PROT_BIT)
+>  #define MSR_AMD64_SNP_SECURE_AVIC_BIT	18
+>  #define MSR_AMD64_SNP_SECURE_AVIC	BIT_ULL(MSR_AMD64_SNP_SECURE_AVIC_BIT)
+> -#define MSR_AMD64_SNP_RESV_BIT		19
+> +#define MSR_AMD64_SNP_RESERVED_BITS19_22 GENMASK_ULL(22, 19)
+> +#define MSR_AMD64_SNP_IBPB_ON_ENTRY_BIT	23
+> +#define MSR_AMD64_SNP_IBPB_ON_ENTRY	BIT_ULL(MSR_AMD64_SNP_IBPB_ON_ENTRY_BIT)
+> +#define MSR_AMD64_SNP_RESV_BIT		24
+>  #define MSR_AMD64_SNP_RESERVED_MASK	GENMASK_ULL(63, MSR_AMD64_SNP_RESV_BIT)
+>  #define MSR_AMD64_SAVIC_CONTROL		0xc0010138
+>  #define MSR_AMD64_SAVIC_EN_BIT		0
 
 
