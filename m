@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-69234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69235-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AC+3N82OeGmqqwEAu9opvQ
-	(envelope-from <kvm+bounces-69234-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 11:09:17 +0100
+	id uGNVIFqOeGmqqwEAu9opvQ
+	(envelope-from <kvm+bounces-69235-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 11:07:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F799278B
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 11:09:17 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A21C0926F5
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 11:07:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 194B230923FC
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 10:03:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CDC7D301D24F
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 10:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B262E7621;
-	Tue, 27 Jan 2026 10:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF922E6CC8;
+	Tue, 27 Jan 2026 10:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TaZir3ni"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ao+Kr3wZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1792E62AC
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 10:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7AF22DB7A4
+	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 10:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769508221; cv=none; b=jThKWChY+6LVW0rupIInLfRpNcCfcPEyGUvLn1x2IPnpt80vvfdzHgBV0Q2YQaPTz+VAdMC2MUVjNkgyUAXup/mmXXebfNijqpOqkwUKjI9KDNZS8WMMBPuOFpSw3R5Oj668OXCHaxv0Dn+qjzH/NJiXtJ3Bf0EyPYbS3PcWjsA=
+	t=1769508240; cv=none; b=YD0KKuKiB9Igagc+h3hwGHj+5MX7FggsD3vSDrU+Q+uGfKEUnCnsuKB8gn5ba/w7e/17geRWuk19wiX/Y+TAigs9tgAxcGtkzXbmn7yKgsrq6f6O++pNKgR3z50t5uOjNEmjmvEWJDSeE7yEQA6431vjYOtGkzRVm0Nm7luVo18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769508221; c=relaxed/simple;
-	bh=C7wTOcDWIRSdt7osTfCq8IP4Oz7mE5/3BXkAFgCYI3I=;
+	s=arc-20240116; t=1769508240; c=relaxed/simple;
+	bh=bAt515GjteXmABY8GIFIJAUUw7sYBBmvJliD8A0VHX4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XCAHVyyXOsiAyCM5vFyAN2WaIbNsmX3aeLN4rtx4Vp13T5Wc6PjqrqT2DvqL/ybpDRphzyVD90pI6V/pJx4s1ZPGVPeGCQ++pMchlDasTQniUM0Lbd/NIwqj8TRp+Bo0QWh1ZvvtnffHAnivXOqpzHzCjxonTD/t4LI96xJU/yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TaZir3ni; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=iWzqpv0V8Xgg24ezaNLVuXJJxbK5+5xLtyknXoil5JqiJ/8Pn/BKED85jiaY68Q/rO9btwhFOe6EvKzZ/obGuNw+ZSjvzPdYkvuLGtsmb+aF5pSuKX40GCOg0zXtmSNo2kitmtSJEqxrBwDyqg4vWOHLTVQkrxEDgGmLKgTtGRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ao+Kr3wZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769508219;
+	s=mimecast20190719; t=1769508237;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QIN8rvBpewCUVKXyhBPq2fE6uRIvtT3wSywvie+gvME=;
-	b=TaZir3niBjtjIgRNHB4TarVMUrOZ2p4BOApBZpD+2qV6t8SfNhngt4ZUyCq/io1OXt9mXP
-	47dbgx+vHE6tLEPu85IWSobv9xDS1U3STzmVPKjMwgGa6FVg993GxHih6A3gYYBl+kjE1+
-	JP+D66pKWSVHNZ1ekpBg7ZR8tPAMKnw=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=78qEYGxPGWEZJXeutuZiOnK8kpP41OBXgXR3DQZ5n0c=;
+	b=ao+Kr3wZYr9rd+lyRfuqxp2ust/ckFk9DLj1wrp/ELndoxjUgO1DwOEseOwF75nCsHboq9
+	edwDLOODMR4le34W1YwuM+i4sJWyfzCewfl6WumL+6LaAW4VpnJl/uPCsLKl+PWTSe7SOl
+	cxZuzxNh6swN8O34+A/U89iNEUxB5us=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-E2h6qf6SOcqj7atksG45Rg-1; Tue,
- 27 Jan 2026 05:03:35 -0500
-X-MC-Unique: E2h6qf6SOcqj7atksG45Rg-1
-X-Mimecast-MFC-AGG-ID: E2h6qf6SOcqj7atksG45Rg_1769508214
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-29-iPqbXcF-PBmbKc4lB7fTYg-1; Tue,
+ 27 Jan 2026 05:03:42 -0500
+X-MC-Unique: iPqbXcF-PBmbKc4lB7fTYg-1
+X-Mimecast-MFC-AGG-ID: iPqbXcF-PBmbKc4lB7fTYg_1769508221
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76CC21955D84;
-	Tue, 27 Jan 2026 10:03:34 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 14D521800365;
+	Tue, 27 Jan 2026 10:03:41 +0000 (UTC)
 Received: from osteffen-thinkpadx1carbongen12.rmtde.csb (unknown [10.44.34.174])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8C3B1180066A;
-	Tue, 27 Jan 2026 10:03:29 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2BB4A180049F;
+	Tue, 27 Jan 2026 10:03:34 +0000 (UTC)
 From: Oliver Steffen <osteffen@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -77,9 +77,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Luigi Leonardi <leonardi@redhat.com>,
 	Joerg Roedel <joerg.roedel@amd.com>,
 	Oliver Steffen <osteffen@redhat.com>
-Subject: [PATCH v5 5/6] igvm: Pass machine state to IGVM file processing
-Date: Tue, 27 Jan 2026 11:02:56 +0100
-Message-ID: <20260127100257.1074104-6-osteffen@redhat.com>
+Subject: [PATCH v5 6/6] igvm: Fill MADT IGVM parameter field
+Date: Tue, 27 Jan 2026 11:02:57 +0100
+Message-ID: <20260127100257.1074104-7-osteffen@redhat.com>
 In-Reply-To: <20260127100257.1074104-1-osteffen@redhat.com>
 References: <20260127100257.1074104-1-osteffen@redhat.com>
 Precedence: bulk
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[redhat.com,habkost.net,intel.com,gmail.com,linaro.org,vger.kernel.org,amd.com];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-69234-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69235-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -118,228 +118,107 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 86F799278B
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A21C0926F5
 X-Rspamd-Action: no action
 
-Pass the full MachineState to the IGVM backend during file processing,
-instead of just the ConfidentialGuestSupport struct (which is a member
-of the MachineState).
-This replaces the cgs parameter of qigvm_process_file() with the machine
-state to make it available in the IGVM processing context.
+Use the new acpi_build_madt_standalone() function to fill the MADT
+parameter field.
 
-We will use it later to generate MADT data there to pass to the guest
-as IGVM parameter.
+The IGVM parameter can be consumed by Coconut SVSM [1], instead of
+relying on the fw_cfg interface, which has caused problems before due to
+unexpected access [2,3]. Using IGVM parameters is the default way for
+Coconut SVSM across hypervisors; switching over would allow removing
+specialized code paths for QEMU in Coconut.
 
-Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+Coconut SVSM needs to know the SMP configuration, but does not look at
+any other ACPI data, nor does it interact with the PCI bus settings.
+Since the MADT is static and not linked with other ACPI tables, it can
+be supplied stand-alone like this.
+
+Generating the MADT twice (during ACPI table building and IGVM processing)
+seems acceptable, since there is no infrastructure to obtain the MADT
+out of the ACPI table memory area.
+
+In any case OVMF, which runs after SVSM has already been initialized,
+will continue reading all ACPI tables via fw_cfg and provide fixed up
+ACPI data to the OS as before without any changes.
+
+[1] https://github.com/coconut-svsm/svsm/pull/858
+[2] https://gitlab.com/qemu-project/qemu/-/issues/2882
+[3] https://github.com/coconut-svsm/svsm/issues/646
+
 Signed-off-by: Oliver Steffen <osteffen@redhat.com>
 ---
- backends/igvm-cfg.c       |  2 +-
- backends/igvm.c           | 31 ++++++++++++++++++-------------
- include/system/igvm-cfg.h |  3 ++-
- include/system/igvm.h     |  5 +++--
- target/i386/sev.c         |  3 +--
- 5 files changed, 25 insertions(+), 19 deletions(-)
+ backends/igvm.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/backends/igvm-cfg.c b/backends/igvm-cfg.c
-index f236b523df..64589ca34f 100644
---- a/backends/igvm-cfg.c
-+++ b/backends/igvm-cfg.c
-@@ -52,7 +52,7 @@ static void igvm_reset_hold(Object *obj, ResetType type)
- 
-     trace_igvm_reset_hold(type);
- 
--    qigvm_process_file(igvm, ms->cgs, false, &error_fatal);
-+    qigvm_process_file(igvm, ms, false, &error_fatal);
- }
- 
- static void igvm_reset_exit(Object *obj, ResetType type)
 diff --git a/backends/igvm.c b/backends/igvm.c
-index 0a0092fb55..f26eb633f8 100644
+index f26eb633f8..1d8f807cf6 100644
 --- a/backends/igvm.c
 +++ b/backends/igvm.c
-@@ -11,6 +11,7 @@
+@@ -21,6 +21,7 @@
+ #include "system/memory.h"
+ #include "system/address-spaces.h"
+ #include "hw/core/cpu.h"
++#include "hw/i386/acpi-build.h"
  
- #include "qemu/osdep.h"
+ #include "trace.h"
  
-+#include "hw/core/boards.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/target-info-qapi.h"
-@@ -73,7 +74,7 @@ struct QEMU_PACKED sev_id_authentication {
-  */
- typedef struct QIgvm {
-     IgvmHandle file;
--    ConfidentialGuestSupport *cgs;
-+    MachineState *machine_state;
-     ConfidentialGuestSupportClass *cgsc;
-     uint32_t compatibility_mask;
-     unsigned current_header_index;
-@@ -239,7 +240,8 @@ static void *qigvm_prepare_memory(QIgvm *ctx, uint64_t addr, uint64_t size,
-         g_autofree char *region_name =
-             g_strdup_printf("igvm.%X", region_identifier);
-         igvm_pages = g_new0(MemoryRegion, 1);
--        if (ctx->cgs && ctx->cgs->require_guest_memfd) {
-+        if (ctx->machine_state->cgs &&
-+            ctx->machine_state->cgs->require_guest_memfd) {
-             if (!memory_region_init_ram_guest_memfd(igvm_pages, NULL,
-                                                     region_name, size, errp)) {
-                 return NULL;
-@@ -359,7 +361,7 @@ static int qigvm_process_mem_region(QIgvm *ctx, unsigned start_index,
-      * If a confidential guest support object is provided then use it to set the
-      * guest state.
-      */
--    if (ctx->cgs) {
-+    if (ctx->machine_state->cgs) {
-         cgs_page_type =
-             qigvm_type_to_cgs_type(page_type, flags->unmeasured, zero);
-         if (cgs_page_type < 0) {
-@@ -461,7 +463,7 @@ static int qigvm_directive_vp_context(QIgvm *ctx, const uint8_t *header_data,
+@@ -138,6 +139,8 @@ static int qigvm_directive_snp_id_block(QIgvm *ctx, const uint8_t *header_data,
+ static int qigvm_initialization_guest_policy(QIgvm *ctx,
+                                        const uint8_t *header_data,
+                                        Error **errp);
++static int qigvm_directive_madt(QIgvm *ctx, const uint8_t *header_data,
++                                Error **errp);
  
-     data = (uint8_t *)igvm_get_buffer(ctx->file, data_handle);
+ struct QIGVMHandler {
+     uint32_t type;
+@@ -166,6 +169,8 @@ static struct QIGVMHandler handlers[] = {
+       qigvm_directive_snp_id_block },
+     { IGVM_VHT_GUEST_POLICY, IGVM_HEADER_SECTION_INITIALIZATION,
+       qigvm_initialization_guest_policy },
++    { IGVM_VHT_MADT, IGVM_HEADER_SECTION_DIRECTIVE,
++      qigvm_directive_madt },
+ };
  
--    if (ctx->cgs) {
-+    if (ctx->machine_state->cgs) {
-         result = ctx->cgsc->set_guest_state(
-             vp_context->gpa, data, igvm_get_buffer_size(ctx->file, data_handle),
-             CGS_PAGE_TYPE_VMSA, vp_context->vp_index, errp);
-@@ -531,7 +533,7 @@ static int qigvm_directive_parameter_insert(QIgvm *ctx,
-      * If a confidential guest support object is provided then use it to
-      * set the guest state.
-      */
--    if (ctx->cgs) {
-+    if (ctx->machine_state->cgs) {
-         result = ctx->cgsc->set_guest_state(param->gpa, region,
-                                             param_entry->size,
-                                             CGS_PAGE_TYPE_UNMEASURED, 0,
-@@ -572,7 +574,7 @@ static int qigvm_directive_memory_map(QIgvm *ctx, const uint8_t *header_data,
-     ConfidentialGuestMemoryMapEntry cgmm_entry;
-     int retval = 0;
- 
--    if (ctx->cgs && ctx->cgsc->get_mem_map_entry) {
-+    if (ctx->machine_state->cgs && ctx->cgsc->get_mem_map_entry) {
-         get_mem_map_entry = ctx->cgsc->get_mem_map_entry;
- 
-     } else if (target_arch() == SYS_EMU_TARGET_X86_64) {
-@@ -698,7 +700,7 @@ static int qigvm_directive_required_memory(QIgvm *ctx,
-     if (!region) {
-         return -1;
-     }
--    if (ctx->cgs) {
-+    if (ctx->machine_state->cgs) {
-         result =
-             ctx->cgsc->set_guest_state(mem->gpa, region, mem->number_of_bytes,
-                                        CGS_PAGE_TYPE_REQUIRED_MEMORY, 0, errp);
-@@ -816,14 +818,14 @@ static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **errp)
-                                                 sizeof(
-                                                     IGVM_VHS_VARIABLE_HEADER));
-             if ((platform->platform_type == IGVM_PLATFORM_TYPE_SEV_ES) &&
--                ctx->cgs) {
-+                ctx->machine_state->cgs) {
-                 if (ctx->cgsc->check_support(
-                         CGS_PLATFORM_SEV_ES, platform->platform_version,
-                         platform->highest_vtl, platform->shared_gpa_boundary)) {
-                     compatibility_mask_sev_es = platform->compatibility_mask;
-                 }
-             } else if ((platform->platform_type == IGVM_PLATFORM_TYPE_SEV) &&
--                       ctx->cgs) {
-+                       ctx->machine_state->cgs) {
-                 if (ctx->cgsc->check_support(
-                         CGS_PLATFORM_SEV, platform->platform_version,
-                         platform->highest_vtl, platform->shared_gpa_boundary)) {
-@@ -831,7 +833,7 @@ static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **errp)
-                 }
-             } else if ((platform->platform_type ==
-                         IGVM_PLATFORM_TYPE_SEV_SNP) &&
--                       ctx->cgs) {
-+                       ctx->machine_state->cgs) {
-                 if (ctx->cgsc->check_support(
-                         CGS_PLATFORM_SEV_SNP, platform->platform_version,
-                         platform->highest_vtl, platform->shared_gpa_boundary)) {
-@@ -904,7 +906,7 @@ IgvmHandle qigvm_file_init(char *filename, Error **errp)
-     return igvm;
+ static int qigvm_handler(QIgvm *ctx, uint32_t type, Error **errp)
+@@ -779,6 +784,34 @@ static int qigvm_initialization_guest_policy(QIgvm *ctx,
+     return 0;
  }
  
--int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
-+int qigvm_process_file(IgvmCfg *cfg, MachineState *machine_state,
-                        bool onlyVpContext, Error **errp)
++static int qigvm_directive_madt(QIgvm *ctx, const uint8_t *header_data,
++                                Error **errp)
++{
++    const IGVM_VHS_PARAMETER *param = (const IGVM_VHS_PARAMETER *)header_data;
++    QIgvmParameterData *param_entry;
++    int result = 0;
++
++    /* Find the parameter area that should hold the MADT data */
++    param_entry = qigvm_find_param_entry(ctx, param->parameter_area_index);
++    if (param_entry == NULL) {
++        return 0;
++    }
++
++    GArray *madt = acpi_build_madt_standalone(ctx->machine_state);
++
++    if (madt->len <= param_entry->size) {
++        memcpy(param_entry->data, madt->data, madt->len);
++    } else {
++        error_setg(
++            errp,
++            "IGVM: MADT size exceeds parameter area defined in IGVM file");
++        result = -1;
++    }
++
++    g_array_free(madt, true);
++    return result;
++}
++
+ static int qigvm_supported_platform_compat_mask(QIgvm *ctx, Error **errp)
  {
      int32_t header_count;
-@@ -920,13 +922,16 @@ int qigvm_process_file(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
-     ctx.file = cfg->file;
-     trace_igvm_process_file(cfg->file, onlyVpContext);
- 
-+    ctx.machine_state = machine_state;
-+
-     /*
-      * The ConfidentialGuestSupport object is optional and allows a confidential
-      * guest platform to perform extra processing, such as page measurement, on
-      * IGVM directives.
-      */
--    ctx.cgs = cgs;
--    ctx.cgsc = cgs ? CONFIDENTIAL_GUEST_SUPPORT_GET_CLASS(cgs) : NULL;
-+    ctx.cgsc = machine_state->cgs ?
-+                   CONFIDENTIAL_GUEST_SUPPORT_GET_CLASS(machine_state->cgs) :
-+                   NULL;
- 
-     /*
-      * Check that the IGVM file provides configuration for the current
-diff --git a/include/system/igvm-cfg.h b/include/system/igvm-cfg.h
-index 6c07f30840..e06d611f74 100644
---- a/include/system/igvm-cfg.h
-+++ b/include/system/igvm-cfg.h
-@@ -12,6 +12,7 @@
- #ifndef QEMU_IGVM_CFG_H
- #define QEMU_IGVM_CFG_H
- 
-+#include "hw/core/boards.h"
- #include "qemu/typedefs.h"
- #include "qom/object.h"
- 
-@@ -27,7 +28,7 @@ typedef struct IgvmCfgClass {
-      *
-      * Returns 0 for ok and -1 on error.
-      */
--    int (*process)(IgvmCfg *cfg, ConfidentialGuestSupport *cgs,
-+    int (*process)(IgvmCfg *cfg, MachineState *machine_state,
-                    bool onlyVpContext, Error **errp);
- 
- } IgvmCfgClass;
-diff --git a/include/system/igvm.h b/include/system/igvm.h
-index 8355e54e95..5573a6111a 100644
---- a/include/system/igvm.h
-+++ b/include/system/igvm.h
-@@ -12,12 +12,13 @@
- #ifndef BACKENDS_IGVM_H
- #define BACKENDS_IGVM_H
- 
-+#include "hw/core/boards.h"
- #include "qemu/typedefs.h"
- #include "system/confidential-guest-support.h"
- #include "qapi/error.h"
- 
--int qigvm_process_file(IgvmCfg *igvm, ConfidentialGuestSupport *cgs,
--                      bool onlyVpContext, Error **errp);
-+int qigvm_process_file(IgvmCfg *igvm, MachineState *machine_state,
-+                       bool onlyVpContext, Error **errp);
- 
- /* x86 native */
- int qigvm_x86_get_mem_map_entry(int index,
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 1d70f96ec1..6f86dd710b 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -1891,8 +1891,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-          */
-         if (x86machine->igvm) {
-             if (IGVM_CFG_GET_CLASS(x86machine->igvm)
--                    ->process(x86machine->igvm, machine->cgs, true, errp) ==
--                -1) {
-+                    ->process(x86machine->igvm, machine, true, errp) == -1) {
-                 return -1;
-             }
-             /*
 -- 
 2.52.0
 
