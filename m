@@ -1,228 +1,179 @@
-Return-Path: <kvm+bounces-69287-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69288-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qF/VIkYUeWl3vAEAu9opvQ
-	(envelope-from <kvm+bounces-69287-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:38:46 +0100
+	id SMtyKQgkeWnmvgEAu9opvQ
+	(envelope-from <kvm+bounces-69288-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 21:46:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F4A9A033
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:38:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65DE69A704
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 21:46:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA0F0312B50D
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:32:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 61F583025E44
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:45:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240FD372B32;
-	Tue, 27 Jan 2026 19:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5D9288C08;
+	Tue, 27 Jan 2026 20:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ER3jWOY0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B23TEVsJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B2936EA98;
-	Tue, 27 Jan 2026 19:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F084AEAC7;
+	Tue, 27 Jan 2026 20:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769542294; cv=none; b=DE8HjDDmNTVK71HM51sFYSH56jss0gVwEtR+b6cEf7QkZYFInirq34VPlYlCcdRPlrgPmMrJn7bV/NqzcvdaaCPMeSoMio1X1mRWVC6yvtIzxRj30EtzwMUOhp5yegBf/f6TN9wR+BOojfuOVEFL6VTqyFYul9DWMK6BqZBlonI=
+	t=1769546735; cv=none; b=unKvMGuU3EH+E8DmBgqgFW8i/H7L77PYtKfXl6BQ2GTdchIHBPQcSDKWbjtwHpWdDJbM2OpMqtBnNd8e0HVUyZcXk8GmY3T2JUnXg669Xod6x73A9bNbCsLPtEGnseRK34MG2d2ZFwyxsoWMxjhryqa3E431D+6zeuIQUz147qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769542294; c=relaxed/simple;
-	bh=Z7I33Hc39huXt1KMAEv+ORYc+prBLTGLG9GW3dkBprM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=korIdqBcwmri/+I5K0zI/hmlDhmgo/WWFwb2YCaPZFjccvBN3LH1Dmk7/K7yEuEXDv8Z3djgQPdtRBj82ba1QyITOClGF7BAuwMUZT5m6J9aZvrnc5wnBsnDQ/dwx0B8LhZrbyYJWEWJYK2Wqbx0OO/AeYijEovOOwQyTe1zzfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ER3jWOY0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 773CEC19425;
-	Tue, 27 Jan 2026 19:31:28 +0000 (UTC)
+	s=arc-20240116; t=1769546735; c=relaxed/simple;
+	bh=kWJnczCRjQfP3+mri2axksFFudA/BEKhqvdeAp2MhAU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=edsSGT7EuxKAHQQWZZpRvL0oOtGLpo4tDc1gFhwINb1FYHG/Fh2sKyYqrCnNzUwzvCLR5CjuJndJOkVJP5SIeZ7e/WNc+fwf/OB2CN9VbF7q+Shs6F6th4kWjtjTY/NCxB2gkLwDgQpNK4jD6LCnJwVUdSvev3UHbE9H/wtXl/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B23TEVsJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B6BC116C6;
+	Tue, 27 Jan 2026 20:45:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769542294;
-	bh=Z7I33Hc39huXt1KMAEv+ORYc+prBLTGLG9GW3dkBprM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ER3jWOY07iJPn8qyjNDfRFyRgYxyWuJjiSMp41SKhB+56SWGzeoPq6P1kW90+cWm2
-	 QTgYAemvCk1w7t5MUfY/l0AkuHfpYBmxwUxPvAWGQI5l5EHWj6aTOFV/Mchq0bEU1C
-	 GOG2+qDG6uH2kXDzBlf4UO9UjRz8htNgAuMPwMN0aahfUJeQTxTlfEXYNXD30QDooW
-	 GIQamzOkF/J2WRu+6WATk/bFSXVaEhzYGRMmf6YewptxAR1UuZgiZRX7f8snoWqCcS
-	 hqMRCqk877/SG5QpuI75iQgPpzMJR/b+46TGplSy9dBIwKC6NM543/hW0GLCkk9KJW
-	 IoFmt7fkcyLwQ==
-From: Mike Rapoport <rppt@kernel.org>
-To: linux-mm@kvack.org
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	David Hildenbrand <david@redhat.com>,
-	Hugh Dickins <hughd@google.com>,
-	James Houghton <jthoughton@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Mike Rapoport <rppt@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH RFC 17/17] KVM: selftests: test userfaultfd missing for guest_memfd
-Date: Tue, 27 Jan 2026 21:29:36 +0200
-Message-ID: <20260127192936.1250096-18-rppt@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260127192936.1250096-1-rppt@kernel.org>
-References: <20260127192936.1250096-1-rppt@kernel.org>
+	s=k20201202; t=1769546734;
+	bh=kWJnczCRjQfP3+mri2axksFFudA/BEKhqvdeAp2MhAU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B23TEVsJccWQDX9Mjx22xVlETkMrrPsVBBGPzr1/qClDRQwwIBUEpOC/B3atxGcBl
+	 s1GNk7zvmuHc8Ak8BzI57RVpONP9viPDQ9AUq4FK45Mh9JRYYIuCMLbbwyCrKLuUy2
+	 3aLWXhw79ygY0VefybeyuREyCYmCj2aKCHAwuwZhODd1oUQnKU0/D5zUmNMPWwzGhS
+	 VccjJRVDi7QyNxVnNABics3aPJZgWOd2TGAtA390Bkrtkg6RWzFHRZfK9zJpPGzack
+	 wBItE/Q3nIcFifOKrFXt7u9v+WwsoBkT+i0QyYk4WRkirXYn1QmRecC+jpiFNhqN5u
+	 ri0eOMMXGeg9w==
+Date: Tue, 27 Jan 2026 22:45:30 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 3/8] dma-buf: Always build with DMABUF_MOVE_NOTIFY
+Message-ID: <20260127204530.GX13967@unreal>
+References: <20260124-dmabuf-revoke-v5-0-f98fca917e96@nvidia.com>
+ <20260124-dmabuf-revoke-v5-3-f98fca917e96@nvidia.com>
+ <0d2ec2d6-c999-45d8-a2bd-b5b21883db47@amd.com>
+ <20260127095831.GR13967@unreal>
+ <83cd911c-99ea-4fab-821e-fcf703209731@amd.com>
+ <20260127114243.GS13967@unreal>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260127114243.GS13967@unreal>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69287-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-69288-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rppt@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: E8F4A9A033
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,amd.com:email]
+X-Rspamd-Queue-Id: 65DE69A704
 X-Rspamd-Action: no action
 
-From: Nikita Kalyazin <kalyazin@amazon.com>
+On Tue, Jan 27, 2026 at 01:42:43PM +0200, Leon Romanovsky wrote:
+> On Tue, Jan 27, 2026 at 11:02:03AM +0100, Christian König wrote:
+> > On 1/27/26 10:58, Leon Romanovsky wrote:
+> > > On Tue, Jan 27, 2026 at 10:26:26AM +0100, Christian König wrote:
+> > >> On 1/24/26 20:14, Leon Romanovsky wrote:
+> > >>> From: Leon Romanovsky <leonro@nvidia.com>
+> > >>>
+> > >>> DMABUF_MOVE_NOTIFY was introduced in 2018 and has been marked as
+> > >>> experimental and disabled by default ever since. Six years later,
+> > >>> all new importers implement this callback.
+> > >>>
+> > >>> It is therefore reasonable to drop CONFIG_DMABUF_MOVE_NOTIFY and
+> > >>> always build DMABUF with support for it enabled.
+> > >>>
+> > >>> Suggested-by: Christian König <christian.koenig@amd.com>
+> > >>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > >>
+> > >> Reviewed-by: Christian König <christian.koenig@amd.com>
+> > >>
+> > >> As long as nobody starts screaming in the last second or I encounter some other problem I'm going to push the first three patches to drm-misc-next now.
+> > > 
+> > > How do you see progress of other patches?
+> > > Can they be queued for that tree as well?
+> > 
+> > I was hoping to get through them by the end of the week.
+> > 
+> > Just wanted to make sure that CI systems start to see the first three patches (who affect everybody), so that we get early feedback should we have missed something.
+> 
+> Perfect, I based my patches on these two commits:
+> 61ceaf236115 (vfio/for-linus) vfio: Prevent from pinned DMABUF importers to attach to VFIO DMABUF
+> 24d479d26b25 (tag: v6.19-rc6) Linux 6.19-rc6
 
-The test demonstrates that a missing userfaultfd event in guest_memfd
-can be resolved via a UFFDIO_COPY ioctl.
+The fix was merged https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=1f97d9dcf53649c41c33227b345a36902cbb08ad
 
-Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
-Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
----
- .../testing/selftests/kvm/guest_memfd_test.c  | 80 ++++++++++++++++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
+Thanks
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 7612819e340a..f77e70d22175 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -439,6 +439,82 @@ static void test_uffd_minor(int fd, size_t total_size)
- 	close(uffd);
- }
- 
-+static void test_uffd_missing(int fd, size_t total_size)
-+{
-+	struct uffdio_register uffd_reg;
-+	struct uffdio_copy uffd_copy;
-+	struct uffd_msg msg;
-+	struct fault_args args;
-+	pthread_t fault_thread;
-+	void *mem, *buf = NULL;
-+	int uffd, ret;
-+	off_t offset = page_size;
-+	void *fault_addr;
-+	const char test_val = 0xab;
-+
-+	ret = posix_memalign(&buf, page_size, total_size);
-+	TEST_ASSERT_EQ(ret, 0);
-+	memset(buf, test_val, total_size);
-+
-+	uffd = syscall(__NR_userfaultfd, O_CLOEXEC);
-+	TEST_ASSERT(uffd != -1, "userfaultfd creation should succeed");
-+
-+	struct uffdio_api uffdio_api = {
-+		.api = UFFD_API,
-+		.features = 0,
-+	};
-+	ret = ioctl(uffd, UFFDIO_API, &uffdio_api);
-+	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_API) should succeed");
-+
-+	mem = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+	TEST_ASSERT(mem != MAP_FAILED, "mmap should succeed");
-+
-+	uffd_reg.range.start = (unsigned long)mem;
-+	uffd_reg.range.len = total_size;
-+	uffd_reg.mode = UFFDIO_REGISTER_MODE_MISSING;
-+	ret = ioctl(uffd, UFFDIO_REGISTER, &uffd_reg);
-+	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_REGISTER) should succeed");
-+
-+	fault_addr = mem + offset;
-+	args.addr = fault_addr;
-+
-+	ret = pthread_create(&fault_thread, NULL, fault_thread_fn, &args);
-+	TEST_ASSERT(ret == 0, "pthread_create should succeed");
-+
-+	ret = read(uffd, &msg, sizeof(msg));
-+	TEST_ASSERT(ret != -1, "read from userfaultfd should succeed");
-+	TEST_ASSERT(msg.event == UFFD_EVENT_PAGEFAULT, "event type should be pagefault");
-+	TEST_ASSERT((void *)(msg.arg.pagefault.address & ~(page_size - 1)) == fault_addr,
-+		    "pagefault should occur at expected address");
-+	TEST_ASSERT(!(msg.arg.pagefault.flags & UFFD_PAGEFAULT_FLAG_WP),
-+		    "pagefault should not be write-protect");
-+
-+	uffd_copy.dst = (unsigned long)fault_addr;
-+	uffd_copy.src = (unsigned long)(buf + offset);
-+	uffd_copy.len = page_size;
-+	uffd_copy.mode = 0;
-+	ret = ioctl(uffd, UFFDIO_COPY, &uffd_copy);
-+	TEST_ASSERT(ret != -1, "ioctl(UFFDIO_COPY) should succeed");
-+
-+	/* Wait for the faulting thread to complete - this provides the memory barrier */
-+	ret = pthread_join(fault_thread, NULL);
-+	TEST_ASSERT(ret == 0, "pthread_join should succeed");
-+
-+	/*
-+	 * Now it's safe to check args.value - the thread has completed
-+	 * and memory is synchronized
-+	 */
-+	TEST_ASSERT(args.value == test_val,
-+		    "memory should contain the value that was copied");
-+	TEST_ASSERT(*(char *)(mem + offset) == test_val,
-+		    "no further fault is expected");
-+
-+	ret = munmap(mem, total_size);
-+	TEST_ASSERT(!ret, "munmap should succeed");
-+	free(buf);
-+	close(uffd);
-+}
-+
- static void test_guest_memfd_flags(struct kvm_vm *vm)
- {
- 	uint64_t valid_flags = vm_check_cap(vm, KVM_CAP_GUEST_MEMFD_FLAGS);
-@@ -494,8 +570,10 @@ static void __test_guest_memfd(struct kvm_vm *vm, uint64_t flags)
- 	gmem_test(fallocate, vm, flags);
- 	gmem_test(invalid_punch_hole, vm, flags);
- 
--	if (flags & GUEST_MEMFD_FLAG_INIT_SHARED)
-+	if (flags & GUEST_MEMFD_FLAG_INIT_SHARED) {
- 		gmem_test(uffd_minor, vm, flags);
-+		gmem_test(uffd_missing, vm, flags);
-+	}
- }
- 
- static void test_guest_memfd(unsigned long vm_type)
--- 
-2.51.0
-
+> 
+> Thanks
+> 
+> > 
+> > Regards,
+> > Christian.
+> > 
+> > > 
+> > > Thanks
+> > > 
+> > >>
+> > >> They are basically just cleanups we should have done a long time ago.
+> > >>
+> > >> Regards,
+> > >> Christian.
+> > >>
+> > 
+> 
 
