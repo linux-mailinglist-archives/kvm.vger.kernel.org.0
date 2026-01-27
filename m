@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-69281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69282-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id LzF4CwIUeWl2vAEAu9opvQ
-	(envelope-from <kvm+bounces-69281-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:37:38 +0100
+	id QG0EEswTeWkcvAEAu9opvQ
+	(envelope-from <kvm+bounces-69282-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:36:44 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4989E99FC7
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:37:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB65099F88
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 20:36:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B986C307DFDD
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:31:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5B6A308B98B
+	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 19:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A863836EABE;
-	Tue, 27 Jan 2026 19:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D505636F413;
+	Tue, 27 Jan 2026 19:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwfokdNa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2UsiRPu"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B5232695F;
-	Tue, 27 Jan 2026 19:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2DB2BCF7F;
+	Tue, 27 Jan 2026 19:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769542256; cv=none; b=gcTlqUSIv6uYqdeYm6Tdg5fh2Ot2duKp++gyrFe/VnsNBBL2q/QH5caPFUQns+nyV5ghuqNXah+DZUkeAuG3vzOH/7Ye+eAe4/iipvwBnYOqxElPKvyUFIhh7DIRYuj7s4BNURaYRnZ2R7wPr+NfLb3PB3vA8dMmjPDX5Gi8VOU=
+	t=1769542263; cv=none; b=X04DsPDIwsdAoA7HU/u/h0O37C8c/x/vH48iGJe7ex+Y+uJQcS9PhAHKUjgi3TS7ZsCGRWgSmFHsZqAJYzemE5+edu200QrJ4vBTaxFarpZJwsotE8p8uqiXJCLK6IJnGcg6gQs3OJaHYX87uqP03F2tCRaejwEdR0e2deVXr3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769542256; c=relaxed/simple;
-	bh=dAICMUfnaufCCr/AJKZx+mvFFt/TvpVz3/Hz00SDDT0=;
+	s=arc-20240116; t=1769542263; c=relaxed/simple;
+	bh=h+TcgWCVPD30aK45h+wpUIJypZftXhAg5ucXDIazF9Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jhQ8iQcjnJLOpK5sENQAPiVamVwusXDkljlZ+dcRpiIXaf6rj48nCDpHGsWaNUxOi0QrZPOG7ZaMjvYms/ygcW0DOVMdT6tZjJd2CaioJt7L62fPUv20TIl8+9a+JePfBPsntUzILpT48e9QQoYocx2hRiDI0VUfwygFZbJOx5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwfokdNa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3A4CC116C6;
-	Tue, 27 Jan 2026 19:30:50 +0000 (UTC)
+	 MIME-Version; b=D1B83Sg6OZEo5j58Fw/L9NN270Vzf/hmSuUmjTERsSUmidldnyQlWRlw1FotSUAOjy4TQN9jD8/DkZEldk0RTa6bvlr1+YstJzVf52n7uq1AZyY3gHE6jxDljHxZNE7esaveZERCOhPLXkO9La/skurdh7Y+AG3114L/1qcHXpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2UsiRPu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19B2C116C6;
+	Tue, 27 Jan 2026 19:30:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769542256;
-	bh=dAICMUfnaufCCr/AJKZx+mvFFt/TvpVz3/Hz00SDDT0=;
+	s=k20201202; t=1769542262;
+	bh=h+TcgWCVPD30aK45h+wpUIJypZftXhAg5ucXDIazF9Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gwfokdNanFjWz8h5LlR+icqZBH0klOoYnKAr1LNi95YICtl63fsrIcY8NnT+EiRGe
-	 yWtnqTwr+5yZpeYTvJL+8lRdpKwuDymh+P32EIO7DBV2T1c59DdkBL1R/WUsNWgMjo
-	 lwiKT5FEt89BPbSUwIaq5DpMdSJP8rTXn1u4K7DWOR24Jk6vMPpdim08J8mSngmaUC
-	 SPR+4MGDgZLIL7Ui9/esE9aoXfCdTxImkuayPuQIrY/yHzrePZ7E3MShe2i3YI3kJQ
-	 X9XKKQQ96ySvXVHKpmqecHcxy28t+t+LDSTtQZT/ngMyhyrkh3tbjgj2uPuiHiqjkZ
-	 T57CGZrW7YBBA==
+	b=q2UsiRPuaj/8L0lU3PZimX+KdU+NnUJ4T6kgHnK7oKJ7dnF20S1Wu60dtz3r+KU1H
+	 0T+7qAEjj3JbVgEGy3R0Hx3DRfjX2B6I9PzRs1e6vap8/WGmkswqz84raN0EuooQAV
+	 5E4A1pVzNprdPWdgwAmWXAr69bCVgPHlBxziKewff7xctTxCeA2TMO1wQzD8XqEI6f
+	 Ed4jSaIIhYNV6/OJpzSKzJ1lZMwUBOT5T1blV/qYiHyC03fgIpcZ1vmjVxxtXEnaon
+	 0hSCYpfGeJVTvH9YpHOBZSgxib2aLHu9IQ7ZrqCo73Rgfq3eGnPiCbchrIFCt6eypg
+	 1wteWBH/FqJkQ==
 From: Mike Rapoport <rppt@kernel.org>
 To: linux-mm@kvack.org
 Cc: Andrea Arcangeli <aarcange@redhat.com>,
@@ -68,10 +68,11 @@ Cc: Andrea Arcangeli <aarcange@redhat.com>,
 	Vlastimil Babka <vbabka@suse.cz>,
 	linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH RFC 11/17] userfaultfd: mfill_atomic() remove retry logic
-Date: Tue, 27 Jan 2026 21:29:30 +0200
-Message-ID: <20260127192936.1250096-12-rppt@kernel.org>
+	linux-kselftest@vger.kernel.org,
+	"David Hildenbrand (Red Hat)" <david@kernel.org>
+Subject: [PATCH RFC 12/17] mm: introduce VM_FAULT_UFFD_MINOR fault reason
+Date: Tue, 27 Jan 2026 21:29:31 +0200
+Message-ID: <20260127192936.1250096-13-rppt@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260127192936.1250096-1-rppt@kernel.org>
 References: <20260127192936.1250096-1-rppt@kernel.org>
@@ -89,15 +90,15 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69281-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69282-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -107,80 +108,102 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 4989E99FC7
+X-Rspamd-Queue-Id: DB65099F88
 X-Rspamd-Action: no action
 
 From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
 
-Since __mfill_atomic_pte() handles the retry for both anonymous and
-shmem, there is no need to retry copying the date from the userspace in
-the loop in mfill_atomic().
+When a VMA is registered with userfaulfd in minor mode, its ->fault()
+method should check if a folio exists in the page cache and if yes
+->fault() should call handle_userfault(VM_UFFD_MINOR).
 
-Drop the retry logic from mfill_atomic().
+Instead of calling handle_userfault() directly from a specific ->fault()
+implementation introduce new fault reason VM_FAULT_UFFD_MINOR that will
+notify the core page fault handler that it should call
+handle_userfaultfd(VM_UFFD_MINOR) to complete a page fault.
 
+Replace a call to handle_userfault(VM_UFFD_MINOR) in shmem and use the
+new VM_FAULT_UFFD_MINOR there instead.
+
+For configurations that don't enable CONFIG_USERFAULTFD,
+VM_FAULT_UFFD_MINOR is set to 0.
+
+Suggested-by: David Hildenbrand (Red Hat) <david@kernel.org>
+Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
 Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 ---
- mm/userfaultfd.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+ include/linux/mm_types.h | 10 +++++++++-
+ mm/memory.c              |  5 ++++-
+ mm/shmem.c               |  2 +-
+ 3 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
-index 54aa195237ba..1bd7631463c6 100644
---- a/mm/userfaultfd.c
-+++ b/mm/userfaultfd.c
-@@ -29,7 +29,6 @@ struct mfill_state {
- 	struct vm_area_struct *vma;
- 	unsigned long src_addr;
- 	unsigned long dst_addr;
--	struct folio *folio;
- 	pmd_t *pmd;
+diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+index 42af2292951d..b25ac322bfbf 100644
+--- a/include/linux/mm_types.h
++++ b/include/linux/mm_types.h
+@@ -1555,6 +1555,8 @@ typedef __bitwise unsigned int vm_fault_t;
+  *				fsync() to complete (for synchronous page faults
+  *				in DAX)
+  * @VM_FAULT_COMPLETED:		->fault completed, meanwhile mmap lock released
++ * @VM_FAULT_UFFD_MINOR:	->fault did not modify page tables and needs
++ *				handle_userfault(VM_UFFD_MINOR) to complete
+  * @VM_FAULT_HINDEX_MASK:	mask HINDEX value
+  *
+  */
+@@ -1572,6 +1574,11 @@ enum vm_fault_reason {
+ 	VM_FAULT_DONE_COW       = (__force vm_fault_t)0x001000,
+ 	VM_FAULT_NEEDDSYNC      = (__force vm_fault_t)0x002000,
+ 	VM_FAULT_COMPLETED      = (__force vm_fault_t)0x004000,
++#ifdef CONFIG_USERFAULTFD
++	VM_FAULT_UFFD_MINOR	= (__force vm_fault_t)0x008000,
++#else
++	VM_FAULT_UFFD_MINOR	= (__force vm_fault_t)0x000000,
++#endif
+ 	VM_FAULT_HINDEX_MASK    = (__force vm_fault_t)0x0f0000,
  };
  
-@@ -889,7 +888,6 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
- 	VM_WARN_ON_ONCE(src_start + len <= src_start);
- 	VM_WARN_ON_ONCE(dst_start + len <= dst_start);
+@@ -1596,7 +1603,8 @@ enum vm_fault_reason {
+ 	{ VM_FAULT_FALLBACK,            "FALLBACK" },	\
+ 	{ VM_FAULT_DONE_COW,            "DONE_COW" },	\
+ 	{ VM_FAULT_NEEDDSYNC,           "NEEDDSYNC" },	\
+-	{ VM_FAULT_COMPLETED,           "COMPLETED" }
++	{ VM_FAULT_COMPLETED,           "COMPLETED" },	\
++	{ VM_FAULT_UFFD_MINOR,		"UFFD_MINOR" }
  
--retry:
- 	err = mfill_get_vma(&state);
- 	if (err)
- 		goto out;
-@@ -916,26 +914,6 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
- 		err = mfill_atomic_pte(&state);
- 		cond_resched();
+ struct vm_special_mapping {
+ 	const char *name;	/* The name, e.g. "[vdso]". */
+diff --git a/mm/memory.c b/mm/memory.c
+index 2a55edc48a65..fcb3e0c3113e 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -5319,8 +5319,11 @@ static vm_fault_t __do_fault(struct vm_fault *vmf)
  
--		if (unlikely(err == -ENOENT)) {
--			void *kaddr;
--
--			mfill_put_vma(&state);
--			VM_WARN_ON_ONCE(!state.folio);
--
--			kaddr = kmap_local_folio(state.folio, 0);
--			err = copy_from_user(kaddr,
--					     (const void __user *)state.src_addr,
--					     PAGE_SIZE);
--			kunmap_local(kaddr);
--			if (unlikely(err)) {
--				err = -EFAULT;
--				goto out;
--			}
--			flush_dcache_folio(state.folio);
--			goto retry;
--		} else
--			VM_WARN_ON_ONCE(state.folio);
--
- 		if (!err) {
- 			state.dst_addr += PAGE_SIZE;
- 			state.src_addr += PAGE_SIZE;
-@@ -951,8 +929,6 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
- 	if (state.vma)
- 		mfill_put_vma(&state);
- out:
--	if (state.folio)
--		folio_put(state.folio);
- 	VM_WARN_ON_ONCE(copied < 0);
- 	VM_WARN_ON_ONCE(err > 0);
- 	VM_WARN_ON_ONCE(!copied && !err);
+ 	ret = vma->vm_ops->fault(vmf);
+ 	if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY |
+-			    VM_FAULT_DONE_COW)))
++			    VM_FAULT_DONE_COW | VM_FAULT_UFFD_MINOR))) {
++		if (ret & VM_FAULT_UFFD_MINOR)
++			return handle_userfault(vmf, VM_UFFD_MINOR);
+ 		return ret;
++	}
+ 
+ 	folio = page_folio(vmf->page);
+ 	if (unlikely(PageHWPoison(vmf->page))) {
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 6f0485f76cb8..6aa905147c0c 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -2481,7 +2481,7 @@ static int shmem_get_folio_gfp(struct inode *inode, pgoff_t index,
+ 	if (folio && vma && userfaultfd_minor(vma)) {
+ 		if (!xa_is_value(folio))
+ 			folio_put(folio);
+-		*fault_type = handle_userfault(vmf, VM_UFFD_MINOR);
++		*fault_type = VM_FAULT_UFFD_MINOR;
+ 		return 0;
+ 	}
+ 
 -- 
 2.51.0
 
