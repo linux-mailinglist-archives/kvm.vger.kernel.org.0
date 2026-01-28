@@ -1,51 +1,80 @@
-Return-Path: <kvm+bounces-69335-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69336-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0JmZGtDqeWkF1AEAu9opvQ
-	(envelope-from <kvm+bounces-69335-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:54:08 +0100
+	id QEyULxrxeWnT1AEAu9opvQ
+	(envelope-from <kvm+bounces-69336-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 12:20:58 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A069FBF8
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:54:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFD4A036D
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 12:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BEA243007AD9
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 10:53:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A448D303FFEA
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9F833892C;
-	Wed, 28 Jan 2026 10:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D016733DEF7;
+	Wed, 28 Jan 2026 11:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ieDlm7c7"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jLnNsach"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010054.outbound.protection.outlook.com [52.101.46.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189F0334C00;
-	Wed, 28 Jan 2026 10:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769597634; cv=none; b=qZmAc/7JPMaxPIF6hg1oladqWcCLrzk3Xryw2KEUOgXX13SFgl79tpu118Lj1JHW5Uha1HyETzYQV+ssuCbEcFCS8juFAwfhLzyUjm0BwLZmmNO+5SIePT5AZZSqERP1DvWU+1bdIXYvjT5IenpZTGRYfk+ZbHbdnQ8YcwaYuD0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769597634; c=relaxed/simple;
-	bh=IH7dlVvX0BrqfneedFEsGx+dBrFkBFmcPSu9v6mmRIs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nS2JUPN5W2Zbni8CtWF2xOj8IEWounzi2sc0af9oAWWmy1SEZMy7Zza+8MEyUE3x/yg2KjquuUf7H/4NRyBTsL7Q0aW/V5weYf2Wh0l6/CqklflRmaU8AvX0KCbPv6or9RcbjcU/e+edwZGHvedjPGbpx4xnLWw9/TNMe4d5gUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ieDlm7c7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB76C4CEF1;
-	Wed, 28 Jan 2026 10:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769597633;
-	bh=IH7dlVvX0BrqfneedFEsGx+dBrFkBFmcPSu9v6mmRIs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ieDlm7c7z1+wcL2GPnKAcTeCaOHZjTtVQyew0L7UsQLDiKu9YfUIsog1Xt6mlUWsa
-	 IUipjRuz6mYReMZbQp8s8+8tTeVlFB0ZYE4uVyFG1vr+V54ea2kcwdxZteFCb/4pki
-	 FVlL5hyG5B9SR/ziVllFR31zNRRj7cRsHo/nBEcyrrN19UHorgySlMtEoxzFNC8OxX
-	 Ao36nyBXh6XdvIBiIb1fPFBXUH+VZr2X8rq7ctTECa3uyieIV/VtNyn72AMpra3UKh
-	 E8BHqaq+T5V/+xiROTO2b/T8gbmYBC5dVuggJ26IwT8decyHqyRfdE1jFcnsMiCmL4
-	 Lfwav9PHcD+Ng==
-Message-ID: <974a95d4-0ae5-400a-992f-9e468a0666d6@kernel.org>
-Date: Wed, 28 Jan 2026 11:53:48 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FF72FD697
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 11:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769599194; cv=fail; b=HsfJNNq+DGV+iXmUI+X2ZL12Jkqw7+407XbnFA/SzUgcvpPcaQIPaJwUhuXUJaNdw+YATArZxxfPCTKCtE9Gmrnmj9e4+6mg3FaRrpsnYJc0C8nDvrFOiLQ9Dmw+IS6EZIRqjORlIzX46kbYNnWModcXP84U7uVRSurV2IGPaus=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769599194; c=relaxed/simple;
+	bh=g3q6I3UTANsPPTGcTNkVyG/YdBWqEdiTzxRDtMXriTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rDC/GYpmWmF+lvotLEHYHucijP/LPYIuO2jNtBVaX/m3hmCbwsP+yZQruXla2tKnxWqb+Y8bf5pK7mpjZUFZQ3cUaL4yeGhM29enkY+lq99HspUnrG2h30WOe3XpNW9znjmZF1R0JotTt6H6KmyLSw8+sZwE14BUCeQsvqlqJVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jLnNsach; arc=fail smtp.client-ip=52.101.46.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=C8k4fYWm4L5wJgdkIxPoTsZNRehChATWWz7cIKufn1GGM5YsES99QhPCyb3ehsTAMA6EAw5cpGa+IcLoVcZnQhYNkAPFilG0o+9+i0YsKmNJ3aQkoB+vyN5M1CrXYgS4kMDOje4MSMdoZjZV+J0GQdlRwDLb5Ie4oICI7JprX2eqJ2V/B5LLpIrx22guzusGG1hTVpIYEK8BBvLqtbkuQati1o67JqgHbq+P9H3/9gfdJx+mNyMDjHntm1u6jgux+ilGchIdK9ZNGURfS/H8oy4z9nJ6zLVQCJzDxYlnFTZmmzPdT8FzUc4vUw9l1GYJZpd/ekv49X5+SfsmRfGQCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=t6INM0p9r2IP6i8sUlfh5jz1XwT1/o729QvGKqs92sE=;
+ b=bshEMr3ZCD3Dm3CpIs0hHKn3g1h95bJAR1Sr59bLXwySH/bFwJH73D4yL+Ph52V/IEzPtLFQ1GrGGK7vFIIW+UTuLuX76i3fHP5IPItMF5TDipjTX4JwUXtJPhr+lul+DtPgDg0xiTshOwXvDGdBCgLj7IDC3Gt7w9bLf5EhOzVqzq1uBsewE9DCdEcVntoDKDyCZeeH8g5ELl94wfMaVh+rBvj5LdHqZGCoNfWktrvD3hMlO4MKUO/OrNdUlBuNnwJ9qMSkL8wg4XcKCXPM5JI2o762LF5qcCE9ELaSUASRT561lkcyevIj/yknVK/uzH6D65FO4TwMIV4B0d+TXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=oracle.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t6INM0p9r2IP6i8sUlfh5jz1XwT1/o729QvGKqs92sE=;
+ b=jLnNsachtdMaJXoRZGYCcnOnZo7hRu4WHlZV3GYA0f+0pZF9PBN3FmSS0dXAa88qTGi7MAI9vPdFTHh4OEU4uOxF6zjGm+i/8D4oy4/ajxjBQQvc42tw+aH84diDFsyP2umfTqLvjM0D9qATShd4NqQAlHfZpzTKjYlCljgBbk8=
+Received: from BYAPR11CA0073.namprd11.prod.outlook.com (2603:10b6:a03:f4::14)
+ by IA1PR12MB9061.namprd12.prod.outlook.com (2603:10b6:208:3ab::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Wed, 28 Jan
+ 2026 11:19:47 +0000
+Received: from SJ1PEPF000023D1.namprd02.prod.outlook.com
+ (2603:10b6:a03:f4:cafe::32) by BYAPR11CA0073.outlook.office365.com
+ (2603:10b6:a03:f4::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.7 via Frontend Transport; Wed,
+ 28 Jan 2026 11:19:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF000023D1.mail.protection.outlook.com (10.167.244.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9564.3 via Frontend Transport; Wed, 28 Jan 2026 11:19:46 +0000
+Received: from [10.252.204.230] (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 28 Jan
+ 2026 05:19:41 -0600
+Message-ID: <ef5f77ac-e633-4c68-a83f-7fa978545fad@amd.com>
+Date: Wed, 28 Jan 2026 16:49:35 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -53,476 +82,324 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] powerpc: iommu: Initial IOMMUFD support for PPC64
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>, linux-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, iommu@lists.linux.dev
-Cc: mpe@ellerman.id.au, maddy@linux.ibm.com, npiggin@gmail.com,
- alex@shazbot.org, joerg.roedel@amd.com, kevin.tian@intel.com,
- gbatra@linux.ibm.com, jgg@nvidia.com, clg@kaod.org, vaibhav@linux.ibm.com,
- brking@linux.vnet.ibm.com, nnmlinux@linux.ibm.com, amachhiw@linux.ibm.com,
- tpearson@raptorengineering.com
-References: <176953894915.725.1102545144304639827.stgit@linux.ibm.com>
-Content-Language: fr-FR
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <176953894915.725.1102545144304639827.stgit@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [RFC PATCH RESEND 3/5] amd-iommu: Add support for set/unset IOMMU
+ for VFIO PCI devices
+Content-Language: en-US
+To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <vasant.hegde@amd.com>,
+	<suravee.suthikulpanit@amd.com>
+CC: <mst@redhat.com>, <imammedo@redhat.com>, <anisinha@redhat.com>,
+	<marcel.apfelbaum@gmail.com>, <pbonzini@redhat.com>,
+	<richard.henderson@linaro.org>, <eduardo@habkost.net>, <yi.l.liu@intel.com>,
+	<eric.auger@redhat.com>, <zhenzhong.duan@intel.com>, <cohuck@redhat.com>,
+	<seanjc@google.com>, <iommu@lists.linux.dev>, <kevin.tian@intel.com>,
+	<joro@8bytes.org>
+References: <20251118101532.4315-1-sarunkod@amd.com>
+ <20251118101532.4315-4-sarunkod@amd.com>
+ <f7097f24-6c4e-42eb-a2ab-968b6814e969@oracle.com>
+From: Sairaj Kodilkar <sarunkod@amd.com>
+In-Reply-To: <f7097f24-6c4e-42eb-a2ab-968b6814e969@oracle.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D1:EE_|IA1PR12MB9061:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1cb8048-c8b5-413e-ff14-08de5e5f250a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024|7142099003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?U01LeHpESGw0MCtxOU1QUjg3L05YNzZzRTVYUzBtKzg3eDZ2cmZQVGt3bTg3?=
+ =?utf-8?B?eDdzZHhXTDFaa2hodEpaZ1I3Nmw3MjM1REgxYkVrVXVTekZVV2Y5bGZVbEty?=
+ =?utf-8?B?OHJ3RzRYSlc4NmxPdGNjK3lub01hbDhlcmdLQWJoTExQTmZvdDVUSTVKOSth?=
+ =?utf-8?B?c1Uwb2YzenNJWkVLQXhYeW5RUmluc2JsK1RzTW9ZMU92SEo0UFhEcWtWQjky?=
+ =?utf-8?B?RWhOU2FnQzJFZmRSb0RBQnpWaERFcEVLdUdpRmZQS3h1OVlweXN1YXBlSFlE?=
+ =?utf-8?B?S09tc1ZmbHJ0SVBUdVdJcTB4SzRINHFUTlM2WXZFT2ZCZ2VGSmJ2NXdhZk5L?=
+ =?utf-8?B?UDE4M2ZyODZ4NWN4THdmS3A2MDJ6dnRrNWdYNDhtM0V0RzRjaTZMTWxSSE1X?=
+ =?utf-8?B?bFVKZUl0RTNITWtwSmx5M3pHTHppVWF4OEw0dE9ZeHZEYkNhYzdlbEdDV2tN?=
+ =?utf-8?B?Skw3U3NKWCtCc0NUcXBybnZTbUtvNFVET3hzckhIYXFjbHhDWURvcXRkOVdM?=
+ =?utf-8?B?aWR5QUhsOW5paXd5anZpZ1RsaW54cTYyN2s4Vm84SVdST0RDY2cvNnRLS3hP?=
+ =?utf-8?B?bnV1dFBxR2Y2K0NvS2JVWFBZZmFCQ05tNUFLSkN2eUZ5cUtTdlovMlp4bkpY?=
+ =?utf-8?B?TXhoRld6UVN3NDY1bzNGYzB1anRnU041UlYwbXE0TXluYkkxdmk2MGtCTFVE?=
+ =?utf-8?B?YWMvVEFIczkwV2JLWm9FZ2lHaHU3dmtzMnNkNDNzMTczdjRGT1dPdTZNODRr?=
+ =?utf-8?B?SmVRRXRKOEUxMklyZkpZVGx4NnBaUlZkWXZyTDFWS0dzanBzeTkrRmNMUlcz?=
+ =?utf-8?B?YUxRMUhKbkRxdTBuaE5RS0VUbUpuc0pIdVdwRGpqNGRxeWRpNUZBTXFvVmxC?=
+ =?utf-8?B?VnZ2VkNleWxFWnowZmdnZFEvRG9XRWdYU0piRnVkVEt2eGU1OEV4MFBaNk5k?=
+ =?utf-8?B?TWxnVVJYMldncXQ5ZUF1ZUZtZGZPeHNqdHZmTnBTRUx4QzZnTnBxZHNKWmhJ?=
+ =?utf-8?B?Yk41eDYyMDEzRnhvdlZ3b0hSVS9BVnYrWnBTZE5ULytCLzZWM2plNkVKM21G?=
+ =?utf-8?B?MlY1clRDenBEdGdmbUNtcFA0ZklhbVFndi9sdHlyQ2JvUEQyUVZjTFk0ME4y?=
+ =?utf-8?B?Wm0rYncwV0FxT1orTkdmSGxTQ1FwcDR3Q3p1dHZVczRvTlVMdit1aFpNZkxG?=
+ =?utf-8?B?dkk5RVQ0UGF4RkxJVzhvZnNiZ2tWdFN3N1Bld29PM2pLNkowU29nZTZoM2Q2?=
+ =?utf-8?B?N25VdE5GYlZSU0xFZSt6WG54RHJXVDdMa0Zrbm5QdXV5UCthclJOTzVVOUtx?=
+ =?utf-8?B?NFdoeUptcW9HTDJuajdzTlc4UkhiRmJTUDUzcEJQWUg4YkQvOUFtczFEZFRR?=
+ =?utf-8?B?U2pXREVSazNmV1pYdEVvdTVIcnplcXNiVDVLMHYvc2MyZitKVkQ4RjlwM2d0?=
+ =?utf-8?B?d2VLRUE4NitVTS8wWjUwVXZPbGpUVFg0OHJHMG1lWnhXSHFvWWlTblQ3RytL?=
+ =?utf-8?B?VGhjMC91L1hFU1hURENIVHQ3L2g3bmRYUThMWERGRjJrREZEWW5lbXQwOHNs?=
+ =?utf-8?B?R3lFdUZwTFB1OXNVdUJ0Z2F6U1RpdHlNZUp4UXNlZlVrMDRMTTl0OVZjaFRB?=
+ =?utf-8?B?enA3VElXa1J3SVA5SFdsNENoazFLQnVXUjA0S2FJYU5EZU56aExYR1JLcVBa?=
+ =?utf-8?B?M1BPRzBPV1k0NytjNHpyczZ2eTNmU2pvOXhlYmNNekxJbDhHczJGZ09ML3A2?=
+ =?utf-8?B?by9BSCs4VUJTQkpnd3R3VWVLRklUYlMwTXFhK0VrZ0QwQkFhTlZrZnVheEdj?=
+ =?utf-8?B?b3VTTDZCMmxrVk9EVitRQ1c5MnBFeEROdmhhVGEySE9PYmtSY1Q3cmRORVY4?=
+ =?utf-8?B?ZGh5M2tnL1JzaldZYnVYMEFEQnh5YVdHZ0RzWURmeUJDeGVRZ3k5NlB6Uk1N?=
+ =?utf-8?B?K1JscW4xSng2TnEzMW1tWUNOWm5VYlh1SmMxUDNvRkt2QnNBby82R2dSWFpL?=
+ =?utf-8?B?Q3V5akIrTmVKNlpqY0ZCQWFreElBcHk0aTZ6ZzZkeDFyZ2lMUE5WSGNWU0Jq?=
+ =?utf-8?B?dDRTUUx4OC92TUJ2cHhzU2dKakNRQjBheG42eUp2bEx1UkhqRjIzY3BJWWhZ?=
+ =?utf-8?B?akN0dWovWWMxQmZMY3FpY3NtUXd3QVhqS1JpZng3U1VpNTdTS1F4Zjk5WG1Q?=
+ =?utf-8?B?dndPR2dZTWZIWlBJMlFDclhuNStJTWgyblpudVNjbzd0WG5UVllvRzNVVzdk?=
+ =?utf-8?B?VnJ3V0tUbWhzRW9BNkUvcUZpalJBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024)(7142099003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 11:19:46.8224
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1cb8048-c8b5-413e-ff14-08de5e5f250a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000023D1.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9061
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69335-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-69336-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[ellerman.id.au,linux.ibm.com,gmail.com,shazbot.org,amd.com,intel.com,nvidia.com,kaod.org,linux.vnet.ibm.com,raptorengineering.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FREEMAIL_CC(0.00)[redhat.com,gmail.com,linaro.org,habkost.net,intel.com,google.com,lists.linux.dev,8bytes.org];
+	DKIM_TRACE(0.00)[amd.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[sarunkod@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 77A069FBF8
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 0FFD4A036D
 X-Rspamd-Action: no action
 
 
 
-Le 27/01/2026 à 19:35, Shivaprasad G Bhat a écrit :
-> The RFC attempts to implement the IOMMUFD support on PPC64 by
-> adding new iommu_ops for paging domain. The existing platform
-> domain continues to be the default domain for in-kernel use.
-> The domain ownership transfer ensures the reset of iommu states
-> for the new paging domain and in-kernel usage.
-> 
-> On PPC64, IOVA ranges are based on the type of the DMA window
-> and their properties. Currently, there is no way to expose the
-> attributes of the non-default 64-bit DMA window, which the platform
-> supports. The platform allows the operating system to select the
-> starting offset(at 4GiB or 512PiB default offset), pagesize and
-> window size for the non-default 64-bit DMA window. For example,
-> with VFIO, this is handled via VFIO_IOMMU_SPAPR_TCE_GET_INFO
-> and VFIO_IOMMU_SPAPR_TCE_CREATE|REMOVE ioctls. While I am exploring
-> the ways to expose and configure these DMA window attributes as
-> per user input, any suggestions in this regard will be very helpful.
-> 
-> Currently existing vfio type1 specific vfio-compat driver even
-> with this patch will not work for PPC64. I believe we need to have
-> a separate "vfio-spapr-compat" driver to make it work.
-> 
-> So brief list of current open problems and ongoing reworks:
->   - Second DMA window support as mentioned above.
->   - KVM support.
->   - EEH support.
->   - The vfio compat driver for the spapr tce iommu.
->   - Multiple devices (multifunction, same/different iommu group checks,
->     SRIOV VF assignment) support.
->   - Race conditions, device plug/unplug.
->   - self|tests.
-> 
-> The patch currently works for single device and exposes only the
-> default DMA window of 1GB to the user. It has been tested for
-> both PowerNV and pSeries machine tce iommu backends. The testing
-> was done using a Qemu[1] and TCG guest having a NVME device
-> passthrough. One can use the command like below to try:
-> 
-> qemu-system-ppc64 -machine pseries -accel tcg \
-> -device spapr-pci-host-bridge,index=1,id=pci.1,ddw=off \
-> -device vfio-pci,host=<hostdev>,id=hostdev0,\
-> bus=pci.1.0,addr=0x1,iommufd=iommufd0 \
-> -object iommufd,id=iommufd0 <...>
-> ...
-> root:localhost# mount /dev/nvme0n1 /mnt
-> root:localhost# ls /mnt
-> ...
-> 
-> The current patch is based on linux kernel 6.19-rc6 tree.
+On 1/28/2026 7:10 AM, Alejandro Jimenez wrote:
+> Hi,
+>
+> On 11/18/25 5:15 AM, Sairaj Kodilkar wrote:
+>> From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+>>
+>> "Set" function tracks VFIO devices in the hash table. This is useful when
+>> looking up per-device host IOMMU information later on.
+>>
+>> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+>> Signed-off-by: Sairaj Kodilkar <sarunkod@amd.com>
+>> ---
+>>   hw/i386/amd_iommu.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
+>>   hw/i386/amd_iommu.h |  8 +++++
+>>   2 files changed, 79 insertions(+)
+>>
+>> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+>> index 378e0cb55eab..8b146f4d33d2 100644
+>> --- a/hw/i386/amd_iommu.c
+>> +++ b/hw/i386/amd_iommu.c
+>> @@ -382,6 +382,22 @@ static guint amdvi_uint64_hash(gconstpointer v)
+>>       return (guint)*(const uint64_t *)v;
+>>   }
+>>   
+>> +static guint amdvi_dte_hash(gconstpointer v)
+>> +{
+>> +    const struct AMDVI_dte_key *key = v;
+>> +    guint value = (guint)(uintptr_t)key->bus;
+>> +
+>> +    return (guint)(value << 8 | key->devfn);
+>> +}
+>> +
+>> +static gboolean amdvi_dte_equal(gconstpointer v1, gconstpointer v2)
+>> +{
+>> +    const struct AMDVI_dte_key *key1 = v1;
+>> +    const struct AMDVI_dte_key *key2 = v2;
+>> +
+>> +    return (key1->bus == key2->bus) && (key1->devfn == key2->devfn);
+>> +}
+>> +
+>>   static AMDVIIOTLBEntry *amdvi_iotlb_lookup(AMDVIState *s, hwaddr addr,
+>>                                              uint64_t devid)
+>>   {
+>> @@ -2291,8 +2307,60 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+>>       return &iommu_as[devfn]->as;
+>>   }
+>>   
+>> +static bool amdvi_set_iommu_device(PCIBus *bus, void *opaque, int devfn,
+>> +                                   HostIOMMUDevice *hiod, Error **errp)
+>> +{
+>> +    AMDVIState *s = opaque;
+>> +    struct AMDVI_dte_key *new_key;
+>> +    struct AMDVI_dte_key key = {
+>> +        .bus = bus,
+>> +        .devfn = devfn,
+>> +    };
+>> +
+>> +    assert(hiod);
+>> +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+>> +
+>> +    if (g_hash_table_lookup(s->hiod_hash, &key)) {
+>> +        error_setg(errp, "Host IOMMU device already exist");
+> nit: s/exist/exists/
 
-Getting the following build failure on linuxppc-dev patchwork with 
-g5_defconfig or ppc64_defconfig:
+Sure
 
-Error: /linux/arch/powerpc/sysdev/dart_iommu.c:325:9: error: 
-initialization of 'int (*)(struct iommu_table *, long int,  long int, 
-long unsigned int,  enum dma_data_direction,  long unsigned int,  bool)' 
-{aka 'int (*)(struct iommu_table *, long int,  long int,  long unsigned 
-int,  enum dma_data_direction,  long unsigned int,  _Bool)'} from 
-incompatible pointer type 'int (*)(struct iommu_table *, long int,  long 
-int,  long unsigned int,  enum dma_data_direction,  long unsigned int)' 
-[-Werror=incompatible-pointer-types]
-   .set = dart_build,
-          ^~~~~~~~~~
-/linux/arch/powerpc/sysdev/dart_iommu.c:325:9: note: (near 
-initialization for 'iommu_dart_ops.set')
-cc1: all warnings being treated as errors
-make[5]: *** [/linux/scripts/Makefile.build:287: 
-arch/powerpc/sysdev/dart_iommu.o] Error 1
-make[4]: *** [/linux/scripts/Makefile.build:544: arch/powerpc/sysdev] 
-Error 2
+>> +        return false;
+>> +    }
+>> +
+>> +    if (hiod->caps.type != IOMMU_HW_INFO_TYPE_AMD &&
+>> +        hiod->caps.type != IOMMU_HW_INFO_TYPE_DEFAULT) {
+>> +        error_setg(errp, "IOMMU hardware is not compatible");
+>> +        return false;
+>> +    }
+>> +
+>> +    new_key = g_malloc(sizeof(*new_key));
+> When allocating the new key, use g_new0() instead of g_malloc(), matches
+> the current code better e.g.
+>
+> new_key = g_new0(AMDVIHIODKey, 1);
+>
+> *the AMDVIHIODKey type comes from a suggestion I make later.
 
-Christophe
+Right
 
-> 
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> 
-> References:
-> 1 : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fshivaprasadbhat%2Fqemu%2Ftree%2Fiommufd-wip&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C4b6054524dcf4d42f24308de5dd2fc27%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639051357920885715%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=NBGzjiMaEskySEDGCZHhPwQ5VzADQXPCpH45d5p4Cuk%3D&reserved=0
-> ---
->   arch/powerpc/include/asm/iommu.h              |    2
->   arch/powerpc/kernel/iommu.c                   |  181 +++++++++++++++++++++++++
->   arch/powerpc/platforms/powernv/pci-ioda-tce.c |    4 -
->   arch/powerpc/platforms/powernv/pci-ioda.c     |    4 -
->   arch/powerpc/platforms/powernv/pci.h          |    2
->   arch/powerpc/platforms/pseries/iommu.c        |    6 -
->   drivers/vfio/Kconfig                          |    4 -
->   7 files changed, 190 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/powerpc/include/asm/iommu.h b/arch/powerpc/include/asm/iommu.h
-> index eafdd63cd6c4..1dc72fbb89e7 100644
-> --- a/arch/powerpc/include/asm/iommu.h
-> +++ b/arch/powerpc/include/asm/iommu.h
-> @@ -46,7 +46,7 @@ struct iommu_table_ops {
->   			long index, long npages,
->   			unsigned long uaddr,
->   			enum dma_data_direction direction,
-> -			unsigned long attrs);
-> +			unsigned long attrs, bool is_phys);
->   #ifdef CONFIG_IOMMU_API
->   	/*
->   	 * Exchanges existing TCE with new TCE plus direction bits;
-> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
-> index 0ce71310b7d9..e6543480c461 100644
-> --- a/arch/powerpc/kernel/iommu.c
-> +++ b/arch/powerpc/kernel/iommu.c
-> @@ -365,7 +365,7 @@ static dma_addr_t iommu_alloc(struct device *dev, struct iommu_table *tbl,
->   	/* Put the TCEs in the HW table */
->   	build_fail = tbl->it_ops->set(tbl, entry, npages,
->   				      (unsigned long)page &
-> -				      IOMMU_PAGE_MASK(tbl), direction, attrs);
-> +				      IOMMU_PAGE_MASK(tbl), direction, attrs, false);
->   
->   	/* tbl->it_ops->set() only returns non-zero for transient errors.
->   	 * Clean up the table bitmap in this case and return
-> @@ -539,7 +539,7 @@ int ppc_iommu_map_sg(struct device *dev, struct iommu_table *tbl,
->   		/* Insert into HW table */
->   		build_fail = tbl->it_ops->set(tbl, entry, npages,
->   					      vaddr & IOMMU_PAGE_MASK(tbl),
-> -					      direction, attrs);
-> +					      direction, attrs, false);
->   		if(unlikely(build_fail))
->   			goto failure;
->   
-> @@ -1201,7 +1201,15 @@ spapr_tce_blocked_iommu_attach_dev(struct iommu_domain *platform_domain,
->   	 * also sets the dma_api ops
->   	 */
->   	table_group = iommu_group_get_iommudata(grp);
-> +
-> +	if (old && old->type == IOMMU_DOMAIN_DMA) {
-> +		ret = table_group->ops->unset_window(table_group, 0);
-> +		if (ret)
-> +			goto exit;
-> +	}
-> +
->   	ret = table_group->ops->take_ownership(table_group, dev);
-> +exit:
->   	iommu_group_put(grp);
->   
->   	return ret;
-> @@ -1260,6 +1268,167 @@ static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
->   	return hose->controller_ops.device_group(hose, pdev);
->   }
->   
-> +struct ppc64_domain {
-> +	struct iommu_domain  domain;
-> +	struct device        *device; /* Make it a list */
-> +	struct iommu_table   *table;
-> +	spinlock_t           list_lock;
-> +	struct rcu_head      rcu;
-> +};
-> +
-> +static struct ppc64_domain *to_ppc64_domain(struct iommu_domain *dom)
-> +{
-> +	return container_of(dom, struct ppc64_domain, domain);
-> +}
-> +
-> +static void spapr_tce_domain_free(struct iommu_domain *domain)
-> +{
-> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
-> +
-> +	kfree(ppc64_domain);
-> +}
-> +
-> +static const struct iommu_ops spapr_tce_iommu_ops;
-> +static struct iommu_domain *spapr_tce_domain_alloc_paging(struct device *dev)
-> +{
-> +	struct iommu_group *grp = iommu_group_get(dev);
-> +	struct iommu_table_group *table_group;
-> +	struct ppc64_domain *ppc64_domain;
-> +	struct iommu_table *ptbl;
-> +	int ret = -1;
-> +
-> +	table_group = iommu_group_get_iommudata(grp);
-> +	ppc64_domain = kzalloc(sizeof(*ppc64_domain), GFP_KERNEL);
-> +	if (!ppc64_domain)
-> +		return NULL;
-> +
-> +	/* Just the default window hardcode for now */
-> +	ret = table_group->ops->create_table(table_group, 0, 0xc, 0x40000000, 1, &ptbl);
-> +	iommu_tce_table_get(ptbl);
-> +	ppc64_domain->table = ptbl; /* REVISIT: Single device for now */
-> +	if (!ppc64_domain->table) {
-> +		kfree(ppc64_domain);
-> +		iommu_tce_table_put(ptbl);
-> +		iommu_group_put(grp);
-> +		return NULL;
-> +	}
-> +
-> +	table_group->ops->set_window(table_group, 0, ptbl);
-> +	iommu_group_put(grp);
-> +
-> +	ppc64_domain->domain.pgsize_bitmap = SZ_4K;
-> +	ppc64_domain->domain.geometry.force_aperture = true;
-> +	ppc64_domain->domain.geometry.aperture_start = 0;
-> +	ppc64_domain->domain.geometry.aperture_end = 0x40000000; /*default window */
-> +	ppc64_domain->domain.ops = spapr_tce_iommu_ops.default_domain_ops;
-> +
-> +	spin_lock_init(&ppc64_domain->list_lock);
-> +
-> +	return &ppc64_domain->domain;
-> +}
-> +
-> +static size_t spapr_tce_iommu_unmap_pages(struct iommu_domain *domain,
-> +				unsigned long iova,
-> +				size_t pgsize, size_t pgcount,
-> +				struct iommu_iotlb_gather *gather)
-> +{
-> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
-> +	struct iommu_table *tbl = ppc64_domain->table;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	size_t size = pgcount << pgshift;
-> +	size_t mapped = 0;
-> +	unsigned int tcenum;
-> +	int  mask;
-> +
-> +	if (pgsize != SZ_4K)
-> +		return -EINVAL;
-> +
-> +	size = PAGE_ALIGN(size);
-> +
-> +	mask = IOMMU_PAGE_MASK(tbl);
-> +	tcenum = iova >> tbl->it_page_shift;
-> +
-> +	tbl->it_ops->clear(tbl, tcenum, pgcount);
-> +
-> +	mapped = pgsize * pgcount;
-> +
-> +	return mapped;
-> +}
-> +
-> +static phys_addr_t spapr_tce_iommu_iova_to_phys(struct iommu_domain *domain, dma_addr_t iova)
-> +{
-> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
-> +	struct iommu_table *tbl = ppc64_domain->table;
-> +	phys_addr_t paddr, rpn, tceval;
-> +	unsigned int tcenum;
-> +
-> +	tcenum = iova >> tbl->it_page_shift;
-> +	tceval = tbl->it_ops->get(tbl, tcenum);
-> +
-> +	/* Ignore the direction bits */
-> +	rpn = tceval >> tbl->it_page_shift;
-> +	paddr = rpn << tbl->it_page_shift;
-> +
-> +	return paddr;
-> +}
-> +
-> +static int spapr_tce_iommu_map_pages(struct iommu_domain *domain,
-> +				unsigned long iova, phys_addr_t paddr,
-> +				size_t pgsize, size_t pgcount,
-> +				int prot, gfp_t gfp, size_t *mapped)
-> +{
-> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
-> +	enum dma_data_direction direction = DMA_BIDIRECTIONAL;
-> +	struct iommu_table *tbl = ppc64_domain->table;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	size_t size = pgcount << pgshift;
-> +	unsigned int tcenum;
-> +	int ret;
-> +
-> +	if (pgsize != SZ_4K)
-> +		return -EINVAL;
-> +
-> +	if (iova < ppc64_domain->domain.geometry.aperture_start ||
-> +	    (iova + size - 1) > ppc64_domain->domain.geometry.aperture_end)
-> +		return -EINVAL;
-> +
-> +	if (!IS_ALIGNED(iova | paddr, pgsize))
-> +		return -EINVAL;
-> +
-> +	if (!(prot & IOMMU_WRITE))
-> +		direction = DMA_FROM_DEVICE;
-> +
-> +	if (!(prot & IOMMU_READ))
-> +		direction = DMA_TO_DEVICE;
-> +
-> +	size = PAGE_ALIGN(size);
-> +	tcenum = iova >> tbl->it_page_shift;
-> +
-> +	/* Put the TCEs in the HW table */
-> +	ret = tbl->it_ops->set(tbl, tcenum, pgcount,
-> +				paddr, direction, 0, true);
-> +	if (!ret && mapped)
-> +		*mapped = pgsize;
-> +
-> +	return 0;
-> +}
-> +
-> +static int spapr_tce_iommu_attach_device(struct iommu_domain *domain,
-> +				    struct device *dev, struct iommu_domain *old)
-> +{
-> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
-> +
-> +	/* REVISIT */
-> +	if (!domain)
-> +		return 0;
-> +
-> +	/* REVISIT: Check table group, list handling */
-> +	ppc64_domain->device = dev;
-> +
-> +	return 0;
-> +}
-> +
-> +
->   static const struct iommu_ops spapr_tce_iommu_ops = {
->   	.default_domain = &spapr_tce_platform_domain,
->   	.blocked_domain = &spapr_tce_blocked_domain,
-> @@ -1267,6 +1436,14 @@ static const struct iommu_ops spapr_tce_iommu_ops = {
->   	.probe_device = spapr_tce_iommu_probe_device,
->   	.release_device = spapr_tce_iommu_release_device,
->   	.device_group = spapr_tce_iommu_device_group,
-> +	.domain_alloc_paging = spapr_tce_domain_alloc_paging,
-> +	.default_domain_ops = &(const struct iommu_domain_ops) {
-> +		.attach_dev     = spapr_tce_iommu_attach_device,
-> +		.map_pages      = spapr_tce_iommu_map_pages,
-> +		.unmap_pages    = spapr_tce_iommu_unmap_pages,
-> +		.iova_to_phys   = spapr_tce_iommu_iova_to_phys,
-> +		.free           = spapr_tce_domain_free,
-> +	}
->   };
->   
->   static struct attribute *spapr_tce_iommu_attrs[] = {
-> diff --git a/arch/powerpc/platforms/powernv/pci-ioda-tce.c b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
-> index e96324502db0..8800bf86d17a 100644
-> --- a/arch/powerpc/platforms/powernv/pci-ioda-tce.c
-> +++ b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
-> @@ -123,10 +123,10 @@ static __be64 *pnv_tce(struct iommu_table *tbl, bool user, long idx, bool alloc)
->   
->   int pnv_tce_build(struct iommu_table *tbl, long index, long npages,
->   		unsigned long uaddr, enum dma_data_direction direction,
-> -		unsigned long attrs)
-> +		unsigned long attrs, bool is_phys)
->   {
->   	u64 proto_tce = iommu_direction_to_tce_perm(direction);
-> -	u64 rpn = __pa(uaddr) >> tbl->it_page_shift;
-> +	u64 rpn = !is_phys ? __pa(uaddr) >> tbl->it_page_shift : uaddr >> tbl->it_page_shift;
->   	long i;
->   
->   	if (proto_tce & TCE_PCI_WRITE)
-> diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
-> index b0c1d9d16fb5..610146a63e3b 100644
-> --- a/arch/powerpc/platforms/powernv/pci-ioda.c
-> +++ b/arch/powerpc/platforms/powernv/pci-ioda.c
-> @@ -1241,10 +1241,10 @@ static void pnv_pci_ioda2_tce_invalidate(struct iommu_table *tbl,
->   static int pnv_ioda2_tce_build(struct iommu_table *tbl, long index,
->   		long npages, unsigned long uaddr,
->   		enum dma_data_direction direction,
-> -		unsigned long attrs)
-> +		unsigned long attrs, bool is_phys)
->   {
->   	int ret = pnv_tce_build(tbl, index, npages, uaddr, direction,
-> -			attrs);
-> +			attrs, is_phys);
->   
->   	if (!ret)
->   		pnv_pci_ioda2_tce_invalidate(tbl, index, npages);
-> diff --git a/arch/powerpc/platforms/powernv/pci.h b/arch/powerpc/platforms/powernv/pci.h
-> index 42075501663b..3579ecd55d00 100644
-> --- a/arch/powerpc/platforms/powernv/pci.h
-> +++ b/arch/powerpc/platforms/powernv/pci.h
-> @@ -300,7 +300,7 @@ extern void pe_level_printk(const struct pnv_ioda_pe *pe, const char *level,
->   
->   extern int pnv_tce_build(struct iommu_table *tbl, long index, long npages,
->   		unsigned long uaddr, enum dma_data_direction direction,
-> -		unsigned long attrs);
-> +		unsigned long attrs, bool is_phys);
->   extern void pnv_tce_free(struct iommu_table *tbl, long index, long npages);
->   extern int pnv_tce_xchg(struct iommu_table *tbl, long index,
->   		unsigned long *hpa, enum dma_data_direction *direction);
-> diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
-> index eec333dd2e59..8c6f9f18e462 100644
-> --- a/arch/powerpc/platforms/pseries/iommu.c
-> +++ b/arch/powerpc/platforms/pseries/iommu.c
-> @@ -122,7 +122,7 @@ static void iommu_pseries_free_group(struct iommu_table_group *table_group,
->   static int tce_build_pSeries(struct iommu_table *tbl, long index,
->   			      long npages, unsigned long uaddr,
->   			      enum dma_data_direction direction,
-> -			      unsigned long attrs)
-> +			      unsigned long attrs, bool false)
->   {
->   	u64 proto_tce;
->   	__be64 *tcep;
-> @@ -250,7 +250,7 @@ static DEFINE_PER_CPU(__be64 *, tce_page);
->   static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
->   				     long npages, unsigned long uaddr,
->   				     enum dma_data_direction direction,
-> -				     unsigned long attrs)
-> +				     unsigned long attrs, bool is_phys)
->   {
->   	u64 rc = 0;
->   	u64 proto_tce;
-> @@ -287,7 +287,7 @@ static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
->   		__this_cpu_write(tce_page, tcep);
->   	}
->   
-> -	rpn = __pa(uaddr) >> tceshift;
-> +	rpn = !is_phys ? __pa(uaddr) >> tceshift : uaddr >> tceshift;
->   	proto_tce = TCE_PCI_READ;
->   	if (direction != DMA_TO_DEVICE)
->   		proto_tce |= TCE_PCI_WRITE;
-> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
-> index ceae52fd7586..9929aa78a5da 100644
-> --- a/drivers/vfio/Kconfig
-> +++ b/drivers/vfio/Kconfig
-> @@ -4,7 +4,7 @@ menuconfig VFIO
->   	select IOMMU_API
->   	depends on IOMMUFD || !IOMMUFD
->   	select INTERVAL_TREE
-> -	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=n
-> +	select VFIO_GROUP if IOMMUFD=n
->   	select VFIO_DEVICE_CDEV if !VFIO_GROUP
->   	select VFIO_CONTAINER if IOMMUFD=n
->   	help
-> @@ -16,7 +16,7 @@ menuconfig VFIO
->   if VFIO
->   config VFIO_DEVICE_CDEV
->   	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
-> -	depends on IOMMUFD && !SPAPR_TCE_IOMMU
-> +	depends on IOMMUFD
->   	default !VFIO_GROUP
->   	help
->   	  The VFIO device cdev is another way for userspace to get device
-> 
-> 
+>> +    new_key->bus = bus;
+>> +    new_key->devfn = devfn;
+>> +
+>> +    object_ref(hiod);
+>> +    g_hash_table_insert(s->hiod_hash, new_key, hiod);
+>> +
+>> +    return true;
+>> +}
+>> +
+>> +static void amdvi_unset_iommu_device(PCIBus *bus, void *opaque,
+>> +                                     int devfn)
+>> +{
+>> +    AMDVIState *s = opaque;
+>> +    struct AMDVI_dte_key key = {
+>> +        .bus = bus,
+>> +        .devfn = devfn,
+>> +    };
+>> +
+>> +    if (!g_hash_table_lookup(s->hiod_hash, &key)) {
+>> +        return;
+>> +    }
+>> +
+>> +    g_hash_table_remove(s->hiod_hash, &key);
+>> +}
+>> +
+> I think we have to explicitly decrement the reference count for the hiod
+> object when removing the last entry from s->hiod_hash.
+>
+> It looks like the best approach is to pass a custom value_destroy_func
+> callback for it when calling g_hash_table_new_full() to create the table.
+> Both the VT-d and virtio IOMMU implementations do it via that method.
+
+Good catch, Will do this !
+
+>
+>>   static const PCIIOMMUOps amdvi_iommu_ops = {
+>>       .get_address_space = amdvi_host_dma_iommu,
+>> +    .set_iommu_device = amdvi_set_iommu_device,
+>> +    .unset_iommu_device = amdvi_unset_iommu_device,
+>>   };
+>>   
+>>   static const MemoryRegionOps mmio_mem_ops = {
+>> @@ -2510,6 +2578,9 @@ static void amdvi_sysbus_realize(DeviceState *dev, Error **errp)
+>>       s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
+>>                                        amdvi_uint64_equal, g_free, g_free);
+>>   
+>> +    s->hiod_hash = g_hash_table_new_full(amdvi_dte_hash,
+>> +                                         amdvi_dte_equal, g_free, g_free);
+>> +
+> As I mentioned above, I think the last parameter to g_hash_table_new_full()
+> should be a custom destroy function with a call to:
+>
+> object_unref((HostIOMMUDevice *)v);
+>
+>
+>>       /* set up MMIO */
+>>       memory_region_init_io(&s->mr_mmio, OBJECT(s), &mmio_mem_ops, s,
+>>                             "amdvi-mmio", AMDVI_MMIO_SIZE);
+>> diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+>> index daf82fc85f96..e6f6902fe06d 100644
+>> --- a/hw/i386/amd_iommu.h
+>> +++ b/hw/i386/amd_iommu.h
+>> @@ -358,6 +358,11 @@ struct AMDVIPCIState {
+>>       uint32_t capab_offset;       /* capability offset pointer    */
+>>   };
+>>   
+>> +struct AMDVI_dte_key {
+>> +    PCIBus *bus;
+>> +    uint8_t devfn;
+>> +};
+>> +
+> For consistency with earlier usage, use a typedef and CamelCase for the new
+> AMDVI_dte_key definition i.e.
+>
+> typedef struct AMDVIDTEKey {
+>      PCIBus *bus;
+>      uint8_t devfn;
+> } AMDVIDTEKey;
+>
+> having it in the header file is best I think. I will send a patch moving
+> other definitions to amd_iommu.h as well.
+>
+> But I am not sure that using "dte" in this case is the best choice. I had
+> this comment written for another section, fits better here:
+>
+> hiod_hash and amdvi_dte_hash() should probably use a similar naming to
+> signal their relationship. Maybe they can all be 'hiod' based i.e.
+> amdvi_hiod_hash().
+> This seems to be the choice the VT-d implementation made, and it also
+> signals we are using the same HostIOMMUDevice abstraction/model. I get that
+> the device the HostIOMMUDevice represents is identified by a unique DTE on
+> the host side IOMMU structures, so I am not arguing the naming is
+> incorrect, but since we also have many places in the code that act on the
+> guest DTE (e.g. amdvi_get_dte()), it would be better to avoid overloading
+> 'dte' to avoid confusion.
+>
+> If the above makes sense, then we should also use `typedef struct
+> AMDVIHIODKey` instead...
+>
+> Thank you,
+> Alejandro
+
+Yeah I am in favour of HIOD base naming, will update it in V2
+
+Thanks
+Sairaj
+
+>
+>>   struct AMDVIState {
+>>       X86IOMMUState iommu;        /* IOMMU bus device             */
+>>       AMDVIPCIState *pci;         /* IOMMU PCI device             */
+>> @@ -416,6 +421,9 @@ struct AMDVIState {
+>>       /* IOTLB */
+>>       GHashTable *iotlb;
+>>   
+>> +    /* HostIOMMUDevice hash table*/
+>> +    GHashTable *hiod_hash;
+>> +
+>>       /* Interrupt remapping */
+>>       bool ga_enabled;
+>>       bool xtsup;
 
 
