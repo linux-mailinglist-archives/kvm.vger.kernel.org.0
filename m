@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-69351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69352-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAbeFHM7emlB4wEAu9opvQ
-	(envelope-from <kvm+bounces-69351-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 17:38:11 +0100
+	id KCaQHGo8emlB4wEAu9opvQ
+	(envelope-from <kvm+bounces-69352-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 17:42:18 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 072C0A5EBC
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 17:38:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 355E3A6047
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 17:42:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6B0403088B00
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 16:31:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A22833063B88
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 16:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7D6314D1F;
-	Wed, 28 Jan 2026 16:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD28318B91;
+	Wed, 28 Jan 2026 16:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XZJZ0Q9B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UWnzk1Sd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F893314B6F;
-	Wed, 28 Jan 2026 16:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EED225390;
+	Wed, 28 Jan 2026 16:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769617892; cv=none; b=ewDaTP/bxCSywHphHPrijk8Y20PkMVe7IAL00vBb5heT0P5vUa0Ep72ZnDyv5iAgaMLapOOCLkTwvqkNzhXla+ZABzEl/SJHRQnggs8/aKIzXaXL+prTurmGY3psUfBYjKJN0hyBR2TmTC4dt1Bnbd/HwLirf0Rk3LmnEUZtFpo=
+	t=1769618259; cv=none; b=tLz4rh+gXixICijRpznNbzR+R0BA+IOT7Y6GsyUgxEUXOryLIR+YBPqt22QBhCVWmScOyz+1yAGC0qhcTbBnrzD45lHwMbzj8aCoZo0wG/jkVykCLwGv+mGXueapcXvdacqpOc14vKnQP6dpZcmEEGtokyXAUHw0pglijvAM/8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769617892; c=relaxed/simple;
-	bh=hz8QaNcGeik+L39GLOZVhrGqemUkvuPZ4D10aM+Hgwo=;
+	s=arc-20240116; t=1769618259; c=relaxed/simple;
+	bh=5VQnCDuQCkhhh77yB7Rf7FJQ809hnPwjNbATcTV4KbQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FByXo/NQ2eyk+4SfMyusk89ri1dt0qH2p63Besp7u1hyu9eVnjl/8SZjutVxip74Babv7jIadpqWy1Uo/QVXfJWy2EZ921Sjv4DqW3jE2GtEFQ1goefWM2/aEgwWTmK21W4BhaeJwDKc0GFWKoJJ95LLPWMrPah4OdL7soulfKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XZJZ0Q9B; arc=none smtp.client-ip=192.198.163.10
+	 In-Reply-To:Content-Type; b=Zt/kCmlDQ6q/DFkNuWmDJd5fsW2ws/ufI46K/UN8keaJXCkRwrREbGj3LjsZ0hFPb2MQ6vhkKp7jQeGLmGMCncIPpdLPy8UMxldSIVyerJRqMV/LNbkyNpQSHnB8FvLH5j29VUFV7RiVPZ7Bpy0oPjmf5tQnhPRjatW2fryDfmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UWnzk1Sd; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769617890; x=1801153890;
+  t=1769618258; x=1801154258;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=hz8QaNcGeik+L39GLOZVhrGqemUkvuPZ4D10aM+Hgwo=;
-  b=XZJZ0Q9BV7//nQPmzlOM2MMGwRhgTMz8eYiHhZ+Mwjfl4zo2Gsc6QTAe
-   dtIgIvs7r9NHpdHFZLdcwWk6Ck888jK9pKIDyJukKGQXn67GrRo8f3x2w
-   ap4I3obahI5s3fEK8+WnDbEi/19oLg+Fp6rj7K50hJodgqQUlWU9jr3yg
-   h53NWerCKTK8vvLBqSLiAsyVTwR/YlCWw50vHzUhU6ITu1QfvYBCbDTCo
-   ZqwxrO3yVtcsQmsosgEIiq4J4LKivo9oKcSdet/yAET7aSYy0wSpCdWqv
-   qhzCL0sviC+zpaqOROz+UdXORIb1e8mM5t7VNhwG22T9Qyai52sLVVEnl
-   g==;
-X-CSE-ConnectionGUID: vciGruJSSiy2WeTit/rwiQ==
-X-CSE-MsgGUID: eU6QGcGYRo+b2dVwBvUMGg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="82206455"
+  bh=5VQnCDuQCkhhh77yB7Rf7FJQ809hnPwjNbATcTV4KbQ=;
+  b=UWnzk1SdsuVq6C6HdVQP7B/bZXRvmXVwQp8uM7e+f8cGE37i5+McnFPl
+   4ZXKmSUPa83zjBWNQbIaGpEIcSdV4vOfXWa0qDVD/n9RmXCYASePUnr5l
+   48rnMU3GkHJ0KWWbnGIkAX1rdyVAI1ic9WUDXzSbf/SEUMGXkmsCBkskq
+   jJ1sfz7EEKqy4C2p1ksoMjNpm3STHjyeiYrKcjBOEk7kmdsDCEiqk8MQ3
+   EBKs+CcfEkmOnH4CwEReQOhnUkZ3i9sHlQT0evuo4vEJEd4gGgVWUOJr3
+   gLzk671Tz89bTYdhReVgK+4g7sPRZ9UuCH3KV64wArTVCSLMwgDmq50w1
+   Q==;
+X-CSE-ConnectionGUID: 472RLwbxSY2ywP8ByOMlHw==
+X-CSE-MsgGUID: OUQcrraHSXKbzor7qJzm2A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="71003365"
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="82206455"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 08:31:28 -0800
-X-CSE-ConnectionGUID: ng0V/3+iS+mIZVZDDXQl3A==
-X-CSE-MsgGUID: 1EPv5mlRQKSganndF1rYvg==
+   d="scan'208";a="71003365"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 08:37:37 -0800
+X-CSE-ConnectionGUID: iMfP6wB7QiC7KUsTAdJPxw==
+X-CSE-MsgGUID: 1ww5TM6MSB2VnCAjm4b6tA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="208682076"
+   d="scan'208";a="208388872"
 Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.190]) ([10.125.109.190])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 08:31:27 -0800
-Message-ID: <1bd9bdcb-6dca-4496-945c-526abee46059@intel.com>
-Date: Wed, 28 Jan 2026 08:31:26 -0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 08:37:37 -0800
+Message-ID: <3e134fb9-95c0-442b-8a25-834ffd8d87f9@intel.com>
+Date: Wed, 28 Jan 2026 08:37:35 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,20 +72,17 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 03/26] x86/virt/tdx: Move low level SEAMCALL helpers
  out of <asm/tdx.h>
-To: Chao Gao <chao.gao@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
- ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
- yilun.xu@linux.intel.com, sagis@google.com, vannapurve@google.com,
- paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
- seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
- dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+To: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc: reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
+ dan.j.williams@intel.com, yilun.xu@linux.intel.com, sagis@google.com,
+ vannapurve@google.com, paulmck@kernel.org, nik.borisov@suse.com,
+ zhenzhong.duan@intel.com, seanjc@google.com, rick.p.edgecombe@intel.com,
+ kas@kernel.org, dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
  Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
  Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
 References: <20260123145645.90444-1-chao.gao@intel.com>
  <20260123145645.90444-4-chao.gao@intel.com>
- <f8329aaf-7074-4bcc-b05b-b50a639cc970@linux.intel.com>
- <aXoEQP0jyXgR6ohs@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -131,7 +128,7 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <aXoEQP0jyXgR6ohs@intel.com>
+In-Reply-To: <20260123145645.90444-4-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
@@ -144,8 +141,8 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-69351-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-69352-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
@@ -159,29 +156,29 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim]
-X-Rspamd-Queue-Id: 072C0A5EBC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 355E3A6047
 X-Rspamd-Action: no action
 
-On 1/28/26 04:42, Chao Gao wrote:
->>> diff --git a/arch/x86/virt/vmx/tdx/seamcall.h b/arch/x86/virt/vmx/tdx/seamcall.h
->>> new file mode 100644
->>> index 000000000000..0912e03fabfe
->>> --- /dev/null
->>> +++ b/arch/x86/virt/vmx/tdx/seamcall.h
->>> @@ -0,0 +1,99 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +/* Copyright (C) 2025 Intel Corporation */
->> Should this be updated to 2026?
-> Yes. And I may drop the copyright notice if it is not necessary.
+On 1/23/26 06:55, Chao Gao wrote:
+> +++ b/arch/x86/virt/vmx/tdx/seamcall.h
 
-No.
+Moving the code to a local header is a good thing. The more private
+these things are, the better.
 
-The copyright is to document the timing of a creative action. Moving
-code is not a creative action.
+I _do_ like when I see these things have a label in the filename like:
 
-If you want to remove it, do it in another patch. If you move code, just
-_move_ _the_ _code_. You can _maybe_ clean up whitespace if you want to
-along the way. But that's it. Don't muck with it unless you have a
-reason. A *good* reason.
+	internal.h
+
+or even:
+
+	seamcall_internal.h
+
+That really catches your eye. It would also be ideal to have a small
+blurb at the top of the file to say what its scope is, just to explain
+what folks should be adding to it or not.
+
+If you get a chance to add those, all the better. But either way:
+
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 
