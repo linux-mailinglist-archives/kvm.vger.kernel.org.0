@@ -1,53 +1,51 @@
-Return-Path: <kvm+bounces-69334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69335-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aM7QEcbAeWl/ywEAu9opvQ
-	(envelope-from <kvm+bounces-69334-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 08:54:46 +0100
+	id 0JmZGtDqeWkF1AEAu9opvQ
+	(envelope-from <kvm+bounces-69335-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:54:08 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A70B9DE36
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 08:54:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A069FBF8
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E3893022627
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 07:54:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BEA243007AD9
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 10:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF3432BF42;
-	Wed, 28 Jan 2026 07:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9F833892C;
+	Wed, 28 Jan 2026 10:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="JKfJAniW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ieDlm7c7"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5B232AAD6;
-	Wed, 28 Jan 2026 07:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189F0334C00;
+	Wed, 28 Jan 2026 10:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769586845; cv=none; b=uTPIR6Oz97Vp77f4uEHi2SD7kyX1WTm9QrUN0OfN0218e52pMS964imd40wMglUEFvIybw3Ki4HcJhh0X8swbSzLchydCYkgUqXTO8Csyh7nBJMtiOGKFovuQQuuVXXzQfeTBzNpO3m12k2Nj7ImpuMFFNE6xprgUCOXgaZSwE8=
+	t=1769597634; cv=none; b=qZmAc/7JPMaxPIF6hg1oladqWcCLrzk3Xryw2KEUOgXX13SFgl79tpu118Lj1JHW5Uha1HyETzYQV+ssuCbEcFCS8juFAwfhLzyUjm0BwLZmmNO+5SIePT5AZZSqERP1DvWU+1bdIXYvjT5IenpZTGRYfk+ZbHbdnQ8YcwaYuD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769586845; c=relaxed/simple;
-	bh=RJpZbsGqYhQMnwJL6cFQDDTzLA15QLu6kSCexH+vLQM=;
+	s=arc-20240116; t=1769597634; c=relaxed/simple;
+	bh=IH7dlVvX0BrqfneedFEsGx+dBrFkBFmcPSu9v6mmRIs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QXfkUV/n0uCXBXtbd/ntI5zhXDmqA5/QjDGBy491/W69Ia1qWd1Zwx+b7j/iYWynqtFYN+lIa6xtWp5Q/5hThGAUOBZo+vw+hsnsT7r4QkngAmAyxs2av29jpRiRIr4zUbWmkHukLOUeqT/rwi/30aex0VNA+LnTjyJViTW3LVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=JKfJAniW; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.38] ([129.217.186.38])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60S7rpqT026743
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 28 Jan 2026 08:53:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1769586832;
-	bh=RJpZbsGqYhQMnwJL6cFQDDTzLA15QLu6kSCexH+vLQM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=JKfJAniWA0VqNwLZyYUe74fLrCCYzysB56Ucdi6Pe1pSmfCbpEJfvHKLKGiaTa3JF
-	 jSaTA4EPvuJS3CxoNjJWL3t0IeY3dj8N/EwoN17EQaN8xBXhn8MmgTbDiJ7f/Ee9NA
-	 ehNTZPE1mxecu+orQ1vrQXnFlm8jzmPRXMgHAMFw=
-Message-ID: <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
-Date: Wed, 28 Jan 2026 08:53:51 +0100
+	 In-Reply-To:Content-Type; b=nS2JUPN5W2Zbni8CtWF2xOj8IEWounzi2sc0af9oAWWmy1SEZMy7Zza+8MEyUE3x/yg2KjquuUf7H/4NRyBTsL7Q0aW/V5weYf2Wh0l6/CqklflRmaU8AvX0KCbPv6or9RcbjcU/e+edwZGHvedjPGbpx4xnLWw9/TNMe4d5gUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ieDlm7c7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB76C4CEF1;
+	Wed, 28 Jan 2026 10:53:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769597633;
+	bh=IH7dlVvX0BrqfneedFEsGx+dBrFkBFmcPSu9v6mmRIs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ieDlm7c7z1+wcL2GPnKAcTeCaOHZjTtVQyew0L7UsQLDiKu9YfUIsog1Xt6mlUWsa
+	 IUipjRuz6mYReMZbQp8s8+8tTeVlFB0ZYE4uVyFG1vr+V54ea2kcwdxZteFCb/4pki
+	 FVlL5hyG5B9SR/ziVllFR31zNRRj7cRsHo/nBEcyrrN19UHorgySlMtEoxzFNC8OxX
+	 Ao36nyBXh6XdvIBiIb1fPFBXUH+VZr2X8rq7ctTECa3uyieIV/VtNyn72AMpra3UKh
+	 E8BHqaq+T5V/+xiROTO2b/T8gbmYBC5dVuggJ26IwT8decyHqyRfdE1jFcnsMiCmL4
+	 Lfwav9PHcD+Ng==
+Message-ID: <974a95d4-0ae5-400a-992f-9e468a0666d6@kernel.org>
+Date: Wed, 28 Jan 2026 11:53:48 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,282 +53,476 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-4-simon.schippers@tu-dortmund.de>
- <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
- <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
- <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
- <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
- <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
- <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
- <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC PATCH] powerpc: iommu: Initial IOMMUFD support for PPC64
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>, linux-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, iommu@lists.linux.dev
+Cc: mpe@ellerman.id.au, maddy@linux.ibm.com, npiggin@gmail.com,
+ alex@shazbot.org, joerg.roedel@amd.com, kevin.tian@intel.com,
+ gbatra@linux.ibm.com, jgg@nvidia.com, clg@kaod.org, vaibhav@linux.ibm.com,
+ brking@linux.vnet.ibm.com, nnmlinux@linux.ibm.com, amachhiw@linux.ibm.com,
+ tpearson@raptorengineering.com
+References: <176953894915.725.1102545144304639827.stgit@linux.ibm.com>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <176953894915.725.1102545144304639827.stgit@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69334-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69335-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[ellerman.id.au,linux.ibm.com,gmail.com,shazbot.org,amd.com,intel.com,nvidia.com,kaod.org,linux.vnet.ibm.com,raptorengineering.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	FROM_NEQ_ENVFROM(0.00)[chleroy@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9A70B9DE36
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 77A069FBF8
 X-Rspamd-Action: no action
 
-On 1/28/26 08:03, Jason Wang wrote:
-> On Wed, Jan 28, 2026 at 12:48 AM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 1/23/26 10:54, Simon Schippers wrote:
->>> On 1/23/26 04:05, Jason Wang wrote:
->>>> On Thu, Jan 22, 2026 at 1:35 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>
->>>>> On Wed, Jan 21, 2026 at 5:33 PM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> On 1/9/26 07:02, Jason Wang wrote:
->>>>>>> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
->>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>
->>>>>>>> On 1/8/26 04:38, Jason Wang wrote:
->>>>>>>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
->>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>
->>>>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
->>>>>>>>>> and wake the corresponding netdev subqueue when consuming an entry frees
->>>>>>>>>> space in the underlying ptr_ring.
->>>>>>>>>>
->>>>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
->>>>>>>>>> in an upcoming commit.
->>>>>>>>>>
->>>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>>>> ---
->>>>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
->>>>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
->>>>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
->>>>>>>>>>
->>>>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->>>>>>>>>> index 1197f245e873..2442cf7ac385 100644
->>>>>>>>>> --- a/drivers/net/tap.c
->>>>>>>>>> +++ b/drivers/net/tap.c
->>>>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
->>>>>>>>>>         return ret ? ret : total;
->>>>>>>>>>  }
->>>>>>>>>>
->>>>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
->>>>>>>>>> +{
->>>>>>>>>> +       struct ptr_ring *ring = &q->ring;
->>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>> +       void *ptr;
->>>>>>>>>> +
->>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>> +
->>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>> +               dev = rcu_dereference(q->tap)->dev;
->>>>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
->>>>>>>>>> +               rcu_read_unlock();
->>>>>>>>>> +       }
->>>>>>>>>> +
->>>>>>>>>> +       spin_unlock(&ring->consumer_lock);
->>>>>>>>>> +
->>>>>>>>>> +       return ptr;
->>>>>>>>>> +}
->>>>>>>>>> +
->>>>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>                            struct iov_iter *to,
->>>>>>>>>>                            int noblock, struct sk_buff *skb)
->>>>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>                                         TASK_INTERRUPTIBLE);
->>>>>>>>>>
->>>>>>>>>>                 /* Read frames from the queue */
->>>>>>>>>> -               skb = ptr_ring_consume(&q->ring);
->>>>>>>>>> +               skb = tap_ring_consume(q);
->>>>>>>>>>                 if (skb)
->>>>>>>>>>                         break;
->>>>>>>>>>                 if (noblock) {
->>>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>>>>>>> index 8192740357a0..7148f9a844a4 100644
->>>>>>>>>> --- a/drivers/net/tun.c
->>>>>>>>>> +++ b/drivers/net/tun.c
->>>>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>>>>>>>         return total;
->>>>>>>>>>  }
->>>>>>>>>>
->>>>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
->>>>>>>>>> +{
->>>>>>>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
->>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>> +       void *ptr;
->>>>>>>>>> +
->>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>> +
->>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>
->>>>>>>>> I guess it's the "bug" I mentioned in the previous patch that leads to
->>>>>>>>> the check of __ptr_ring_consume_created_space() here. If it's true,
->>>>>>>>> another call to tweak the current API.
->>>>>>>>>
->>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>> +               dev = rcu_dereference(tfile->tun)->dev;
->>>>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
->>>>>>>>>
->>>>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
->>>>>>>>> I'm not sure is what we want.
->>>>>>>>
->>>>>>>> What else would you suggest calling to wake the queue?
->>>>>>>
->>>>>>> I don't have a good method in my mind, just want to point out its implications.
->>>>>>
->>>>>> I have to admit I'm a bit stuck at this point, particularly with this
->>>>>> aspect.
->>>>>>
->>>>>> What is the correct way to pass the producer CPU ID to the consumer?
->>>>>> Would it make sense to store smp_processor_id() in the tfile inside
->>>>>> tun_net_xmit(), or should it instead be stored in the skb (similar to the
->>>>>> XDP bit)? In the latter case, my concern is that this information may
->>>>>> already be significantly outdated by the time it is used.
->>>>>>
->>>>>> Based on that, my idea would be for the consumer to wake the producer by
->>>>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
->>>>>> smp_call_function_single().
->>>>>> Is this a reasonable approach?
->>>>>
->>>>> I'm not sure but it would introduce costs like IPI.
->>>>>
->>>>>>
->>>>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
->>>>>> considered a deal-breaker for the patch set?
->>>>>
->>>>> It depends on whether or not it has effects on the performance.
->>>>> Especially when vhost is pinned.
->>>>
->>>> I meant we can benchmark to see the impact. For example, pin vhost to
->>>> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
->>>>
->>>> Thanks
->>>>
->>>
->>> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
->>> for both the stock and patched versions. The benchmarks were run with
->>> the full patch series applied, since testing only patches 1-3 would not
->>> be meaningful - the queue is never stopped in that case, so no
->>> TX_SOFTIRQ is triggered.
->>>
->>> Compared to the non-pinned CPU benchmarks in the cover letter,
->>> performance is lower for pktgen with a single thread but higher with
->>> four threads. The results show no regression for the patched version,
->>> with even slight performance improvements observed:
->>>
->>> +-------------------------+-----------+----------------+
->>> | pktgen benchmarks to    | Stock     | Patched with   |
->>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>> | 100M packets            |           |                |
->>> | vhost pinned to core 0  |           |                |
->>> +-----------+-------------+-----------+----------------+
->>> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
->>> |  +        +-------------+-----------+----------------+
->>> | vhost-net | Lost        | 1154 Kpps | 0              |
->>> +-----------+-------------+-----------+----------------+
->>>
->>> +-------------------------+-----------+----------------+
->>> | pktgen benchmarks to    | Stock     | Patched with   |
->>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>> | 100M packets            |           |                |
->>> | vhost pinned to core 0  |           |                |
->>> | *4 threads*             |           |                |
->>> +-----------+-------------+-----------+----------------+
->>> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
->>> |  +        +-------------+-----------+----------------+
->>> | vhost-net | Lost        | 1527 Kpps | 0              |
->>> +-----------+-------------+-----------+----------------+
+
+
+Le 27/01/2026 à 19:35, Shivaprasad G Bhat a écrit :
+> The RFC attempts to implement the IOMMUFD support on PPC64 by
+> adding new iommu_ops for paging domain. The existing platform
+> domain continues to be the default domain for in-kernel use.
+> The domain ownership transfer ensures the reset of iommu states
+> for the new paging domain and in-kernel usage.
 > 
-> The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
-> the guest or an xdp program that did XDP_DROP in the guest.
+> On PPC64, IOVA ranges are based on the type of the DMA window
+> and their properties. Currently, there is no way to expose the
+> attributes of the non-default 64-bit DMA window, which the platform
+> supports. The platform allows the operating system to select the
+> starting offset(at 4GiB or 512PiB default offset), pagesize and
+> window size for the non-default 64-bit DMA window. For example,
+> with VFIO, this is handled via VFIO_IOMMU_SPAPR_TCE_GET_INFO
+> and VFIO_IOMMU_SPAPR_TCE_CREATE|REMOVE ioctls. While I am exploring
+> the ways to expose and configure these DMA window attributes as
+> per user input, any suggestions in this regard will be very helpful.
+> 
+> Currently existing vfio type1 specific vfio-compat driver even
+> with this patch will not work for PPC64. I believe we need to have
+> a separate "vfio-spapr-compat" driver to make it work.
+> 
+> So brief list of current open problems and ongoing reworks:
+>   - Second DMA window support as mentioned above.
+>   - KVM support.
+>   - EEH support.
+>   - The vfio compat driver for the spapr tce iommu.
+>   - Multiple devices (multifunction, same/different iommu group checks,
+>     SRIOV VF assignment) support.
+>   - Race conditions, device plug/unplug.
+>   - self|tests.
+> 
+> The patch currently works for single device and exposes only the
+> default DMA window of 1GB to the user. It has been tested for
+> both PowerNV and pSeries machine tce iommu backends. The testing
+> was done using a Qemu[1] and TCG guest having a NVME device
+> passthrough. One can use the command like below to try:
+> 
+> qemu-system-ppc64 -machine pseries -accel tcg \
+> -device spapr-pci-host-bridge,index=1,id=pci.1,ddw=off \
+> -device vfio-pci,host=<hostdev>,id=hostdev0,\
+> bus=pci.1.0,addr=0x1,iommufd=iommufd0 \
+> -object iommufd,id=iommufd0 <...>
+> ...
+> root:localhost# mount /dev/nvme0n1 /mnt
+> root:localhost# ls /mnt
+> ...
+> 
+> The current patch is based on linux kernel 6.19-rc6 tree.
 
-I forgot to mention that these PPS values are per thread.
-So overall we have 71 Kpps * 4 = 284 Kpps and 79 Kpps * 4 = 326 Kpps,
-respectively. For packet loss, that comes out to 1154 Kpps * 4 =
-4616 Kpps and 0, respectively.
+Getting the following build failure on linuxppc-dev patchwork with 
+g5_defconfig or ppc64_defconfig:
 
-Sorry about that!
+Error: /linux/arch/powerpc/sysdev/dart_iommu.c:325:9: error: 
+initialization of 'int (*)(struct iommu_table *, long int,  long int, 
+long unsigned int,  enum dma_data_direction,  long unsigned int,  bool)' 
+{aka 'int (*)(struct iommu_table *, long int,  long int,  long unsigned 
+int,  enum dma_data_direction,  long unsigned int,  _Bool)'} from 
+incompatible pointer type 'int (*)(struct iommu_table *, long int,  long 
+int,  long unsigned int,  enum dma_data_direction,  long unsigned int)' 
+[-Werror=incompatible-pointer-types]
+   .set = dart_build,
+          ^~~~~~~~~~
+/linux/arch/powerpc/sysdev/dart_iommu.c:325:9: note: (near 
+initialization for 'iommu_dart_ops.set')
+cc1: all warnings being treated as errors
+make[5]: *** [/linux/scripts/Makefile.build:287: 
+arch/powerpc/sysdev/dart_iommu.o] Error 1
+make[4]: *** [/linux/scripts/Makefile.build:544: arch/powerpc/sysdev] 
+Error 2
 
-The pktgen benchmarks with a single thread look fine, right?
-
-I'll still look into using an XDP program that does XDP_DROP in the
-guest.
-
-Thanks!
+Christophe
 
 > 
->>>
->>> +------------------------+-------------+----------------+
->>> | iperf3 TCP benchmarks  | Stock       | Patched with   |
->>> | to Debian VM 120s      |             | fq_codel qdisc |
->>> | vhost pinned to core 0 |             |                |
->>> +------------------------+-------------+----------------+
->>> | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
->>> |  +                     |             |                |
->>> | vhost-net              |             |                |
->>> +------------------------+-------------+----------------+
->>>
->>> +---------------------------+-------------+----------------+
->>> | iperf3 TCP benchmarks     | Stock       | Patched with   |
->>> | to Debian VM 120s         |             | fq_codel qdisc |
->>> | vhost pinned to core 0    |             |                |
->>> | *4 iperf3 client threads* |             |                |
->>> +---------------------------+-------------+----------------+
->>> | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
->>> |  +                        |             |                |
->>> | vhost-net                 |             |                |
->>> +---------------------------+-------------+----------------+
->>
->> What are your thoughts on this?
->>
->> Thanks!
->>
->>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 > 
-> Thanks
+> References:
+> 1 : https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fshivaprasadbhat%2Fqemu%2Ftree%2Fiommufd-wip&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C4b6054524dcf4d42f24308de5dd2fc27%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639051357920885715%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=NBGzjiMaEskySEDGCZHhPwQ5VzADQXPCpH45d5p4Cuk%3D&reserved=0
+> ---
+>   arch/powerpc/include/asm/iommu.h              |    2
+>   arch/powerpc/kernel/iommu.c                   |  181 +++++++++++++++++++++++++
+>   arch/powerpc/platforms/powernv/pci-ioda-tce.c |    4 -
+>   arch/powerpc/platforms/powernv/pci-ioda.c     |    4 -
+>   arch/powerpc/platforms/powernv/pci.h          |    2
+>   arch/powerpc/platforms/pseries/iommu.c        |    6 -
+>   drivers/vfio/Kconfig                          |    4 -
+>   7 files changed, 190 insertions(+), 13 deletions(-)
 > 
+> diff --git a/arch/powerpc/include/asm/iommu.h b/arch/powerpc/include/asm/iommu.h
+> index eafdd63cd6c4..1dc72fbb89e7 100644
+> --- a/arch/powerpc/include/asm/iommu.h
+> +++ b/arch/powerpc/include/asm/iommu.h
+> @@ -46,7 +46,7 @@ struct iommu_table_ops {
+>   			long index, long npages,
+>   			unsigned long uaddr,
+>   			enum dma_data_direction direction,
+> -			unsigned long attrs);
+> +			unsigned long attrs, bool is_phys);
+>   #ifdef CONFIG_IOMMU_API
+>   	/*
+>   	 * Exchanges existing TCE with new TCE plus direction bits;
+> diff --git a/arch/powerpc/kernel/iommu.c b/arch/powerpc/kernel/iommu.c
+> index 0ce71310b7d9..e6543480c461 100644
+> --- a/arch/powerpc/kernel/iommu.c
+> +++ b/arch/powerpc/kernel/iommu.c
+> @@ -365,7 +365,7 @@ static dma_addr_t iommu_alloc(struct device *dev, struct iommu_table *tbl,
+>   	/* Put the TCEs in the HW table */
+>   	build_fail = tbl->it_ops->set(tbl, entry, npages,
+>   				      (unsigned long)page &
+> -				      IOMMU_PAGE_MASK(tbl), direction, attrs);
+> +				      IOMMU_PAGE_MASK(tbl), direction, attrs, false);
+>   
+>   	/* tbl->it_ops->set() only returns non-zero for transient errors.
+>   	 * Clean up the table bitmap in this case and return
+> @@ -539,7 +539,7 @@ int ppc_iommu_map_sg(struct device *dev, struct iommu_table *tbl,
+>   		/* Insert into HW table */
+>   		build_fail = tbl->it_ops->set(tbl, entry, npages,
+>   					      vaddr & IOMMU_PAGE_MASK(tbl),
+> -					      direction, attrs);
+> +					      direction, attrs, false);
+>   		if(unlikely(build_fail))
+>   			goto failure;
+>   
+> @@ -1201,7 +1201,15 @@ spapr_tce_blocked_iommu_attach_dev(struct iommu_domain *platform_domain,
+>   	 * also sets the dma_api ops
+>   	 */
+>   	table_group = iommu_group_get_iommudata(grp);
+> +
+> +	if (old && old->type == IOMMU_DOMAIN_DMA) {
+> +		ret = table_group->ops->unset_window(table_group, 0);
+> +		if (ret)
+> +			goto exit;
+> +	}
+> +
+>   	ret = table_group->ops->take_ownership(table_group, dev);
+> +exit:
+>   	iommu_group_put(grp);
+>   
+>   	return ret;
+> @@ -1260,6 +1268,167 @@ static struct iommu_group *spapr_tce_iommu_device_group(struct device *dev)
+>   	return hose->controller_ops.device_group(hose, pdev);
+>   }
+>   
+> +struct ppc64_domain {
+> +	struct iommu_domain  domain;
+> +	struct device        *device; /* Make it a list */
+> +	struct iommu_table   *table;
+> +	spinlock_t           list_lock;
+> +	struct rcu_head      rcu;
+> +};
+> +
+> +static struct ppc64_domain *to_ppc64_domain(struct iommu_domain *dom)
+> +{
+> +	return container_of(dom, struct ppc64_domain, domain);
+> +}
+> +
+> +static void spapr_tce_domain_free(struct iommu_domain *domain)
+> +{
+> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
+> +
+> +	kfree(ppc64_domain);
+> +}
+> +
+> +static const struct iommu_ops spapr_tce_iommu_ops;
+> +static struct iommu_domain *spapr_tce_domain_alloc_paging(struct device *dev)
+> +{
+> +	struct iommu_group *grp = iommu_group_get(dev);
+> +	struct iommu_table_group *table_group;
+> +	struct ppc64_domain *ppc64_domain;
+> +	struct iommu_table *ptbl;
+> +	int ret = -1;
+> +
+> +	table_group = iommu_group_get_iommudata(grp);
+> +	ppc64_domain = kzalloc(sizeof(*ppc64_domain), GFP_KERNEL);
+> +	if (!ppc64_domain)
+> +		return NULL;
+> +
+> +	/* Just the default window hardcode for now */
+> +	ret = table_group->ops->create_table(table_group, 0, 0xc, 0x40000000, 1, &ptbl);
+> +	iommu_tce_table_get(ptbl);
+> +	ppc64_domain->table = ptbl; /* REVISIT: Single device for now */
+> +	if (!ppc64_domain->table) {
+> +		kfree(ppc64_domain);
+> +		iommu_tce_table_put(ptbl);
+> +		iommu_group_put(grp);
+> +		return NULL;
+> +	}
+> +
+> +	table_group->ops->set_window(table_group, 0, ptbl);
+> +	iommu_group_put(grp);
+> +
+> +	ppc64_domain->domain.pgsize_bitmap = SZ_4K;
+> +	ppc64_domain->domain.geometry.force_aperture = true;
+> +	ppc64_domain->domain.geometry.aperture_start = 0;
+> +	ppc64_domain->domain.geometry.aperture_end = 0x40000000; /*default window */
+> +	ppc64_domain->domain.ops = spapr_tce_iommu_ops.default_domain_ops;
+> +
+> +	spin_lock_init(&ppc64_domain->list_lock);
+> +
+> +	return &ppc64_domain->domain;
+> +}
+> +
+> +static size_t spapr_tce_iommu_unmap_pages(struct iommu_domain *domain,
+> +				unsigned long iova,
+> +				size_t pgsize, size_t pgcount,
+> +				struct iommu_iotlb_gather *gather)
+> +{
+> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
+> +	struct iommu_table *tbl = ppc64_domain->table;
+> +	unsigned long pgshift = __ffs(pgsize);
+> +	size_t size = pgcount << pgshift;
+> +	size_t mapped = 0;
+> +	unsigned int tcenum;
+> +	int  mask;
+> +
+> +	if (pgsize != SZ_4K)
+> +		return -EINVAL;
+> +
+> +	size = PAGE_ALIGN(size);
+> +
+> +	mask = IOMMU_PAGE_MASK(tbl);
+> +	tcenum = iova >> tbl->it_page_shift;
+> +
+> +	tbl->it_ops->clear(tbl, tcenum, pgcount);
+> +
+> +	mapped = pgsize * pgcount;
+> +
+> +	return mapped;
+> +}
+> +
+> +static phys_addr_t spapr_tce_iommu_iova_to_phys(struct iommu_domain *domain, dma_addr_t iova)
+> +{
+> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
+> +	struct iommu_table *tbl = ppc64_domain->table;
+> +	phys_addr_t paddr, rpn, tceval;
+> +	unsigned int tcenum;
+> +
+> +	tcenum = iova >> tbl->it_page_shift;
+> +	tceval = tbl->it_ops->get(tbl, tcenum);
+> +
+> +	/* Ignore the direction bits */
+> +	rpn = tceval >> tbl->it_page_shift;
+> +	paddr = rpn << tbl->it_page_shift;
+> +
+> +	return paddr;
+> +}
+> +
+> +static int spapr_tce_iommu_map_pages(struct iommu_domain *domain,
+> +				unsigned long iova, phys_addr_t paddr,
+> +				size_t pgsize, size_t pgcount,
+> +				int prot, gfp_t gfp, size_t *mapped)
+> +{
+> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
+> +	enum dma_data_direction direction = DMA_BIDIRECTIONAL;
+> +	struct iommu_table *tbl = ppc64_domain->table;
+> +	unsigned long pgshift = __ffs(pgsize);
+> +	size_t size = pgcount << pgshift;
+> +	unsigned int tcenum;
+> +	int ret;
+> +
+> +	if (pgsize != SZ_4K)
+> +		return -EINVAL;
+> +
+> +	if (iova < ppc64_domain->domain.geometry.aperture_start ||
+> +	    (iova + size - 1) > ppc64_domain->domain.geometry.aperture_end)
+> +		return -EINVAL;
+> +
+> +	if (!IS_ALIGNED(iova | paddr, pgsize))
+> +		return -EINVAL;
+> +
+> +	if (!(prot & IOMMU_WRITE))
+> +		direction = DMA_FROM_DEVICE;
+> +
+> +	if (!(prot & IOMMU_READ))
+> +		direction = DMA_TO_DEVICE;
+> +
+> +	size = PAGE_ALIGN(size);
+> +	tcenum = iova >> tbl->it_page_shift;
+> +
+> +	/* Put the TCEs in the HW table */
+> +	ret = tbl->it_ops->set(tbl, tcenum, pgcount,
+> +				paddr, direction, 0, true);
+> +	if (!ret && mapped)
+> +		*mapped = pgsize;
+> +
+> +	return 0;
+> +}
+> +
+> +static int spapr_tce_iommu_attach_device(struct iommu_domain *domain,
+> +				    struct device *dev, struct iommu_domain *old)
+> +{
+> +	struct ppc64_domain *ppc64_domain = to_ppc64_domain(domain);
+> +
+> +	/* REVISIT */
+> +	if (!domain)
+> +		return 0;
+> +
+> +	/* REVISIT: Check table group, list handling */
+> +	ppc64_domain->device = dev;
+> +
+> +	return 0;
+> +}
+> +
+> +
+>   static const struct iommu_ops spapr_tce_iommu_ops = {
+>   	.default_domain = &spapr_tce_platform_domain,
+>   	.blocked_domain = &spapr_tce_blocked_domain,
+> @@ -1267,6 +1436,14 @@ static const struct iommu_ops spapr_tce_iommu_ops = {
+>   	.probe_device = spapr_tce_iommu_probe_device,
+>   	.release_device = spapr_tce_iommu_release_device,
+>   	.device_group = spapr_tce_iommu_device_group,
+> +	.domain_alloc_paging = spapr_tce_domain_alloc_paging,
+> +	.default_domain_ops = &(const struct iommu_domain_ops) {
+> +		.attach_dev     = spapr_tce_iommu_attach_device,
+> +		.map_pages      = spapr_tce_iommu_map_pages,
+> +		.unmap_pages    = spapr_tce_iommu_unmap_pages,
+> +		.iova_to_phys   = spapr_tce_iommu_iova_to_phys,
+> +		.free           = spapr_tce_domain_free,
+> +	}
+>   };
+>   
+>   static struct attribute *spapr_tce_iommu_attrs[] = {
+> diff --git a/arch/powerpc/platforms/powernv/pci-ioda-tce.c b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
+> index e96324502db0..8800bf86d17a 100644
+> --- a/arch/powerpc/platforms/powernv/pci-ioda-tce.c
+> +++ b/arch/powerpc/platforms/powernv/pci-ioda-tce.c
+> @@ -123,10 +123,10 @@ static __be64 *pnv_tce(struct iommu_table *tbl, bool user, long idx, bool alloc)
+>   
+>   int pnv_tce_build(struct iommu_table *tbl, long index, long npages,
+>   		unsigned long uaddr, enum dma_data_direction direction,
+> -		unsigned long attrs)
+> +		unsigned long attrs, bool is_phys)
+>   {
+>   	u64 proto_tce = iommu_direction_to_tce_perm(direction);
+> -	u64 rpn = __pa(uaddr) >> tbl->it_page_shift;
+> +	u64 rpn = !is_phys ? __pa(uaddr) >> tbl->it_page_shift : uaddr >> tbl->it_page_shift;
+>   	long i;
+>   
+>   	if (proto_tce & TCE_PCI_WRITE)
+> diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/platforms/powernv/pci-ioda.c
+> index b0c1d9d16fb5..610146a63e3b 100644
+> --- a/arch/powerpc/platforms/powernv/pci-ioda.c
+> +++ b/arch/powerpc/platforms/powernv/pci-ioda.c
+> @@ -1241,10 +1241,10 @@ static void pnv_pci_ioda2_tce_invalidate(struct iommu_table *tbl,
+>   static int pnv_ioda2_tce_build(struct iommu_table *tbl, long index,
+>   		long npages, unsigned long uaddr,
+>   		enum dma_data_direction direction,
+> -		unsigned long attrs)
+> +		unsigned long attrs, bool is_phys)
+>   {
+>   	int ret = pnv_tce_build(tbl, index, npages, uaddr, direction,
+> -			attrs);
+> +			attrs, is_phys);
+>   
+>   	if (!ret)
+>   		pnv_pci_ioda2_tce_invalidate(tbl, index, npages);
+> diff --git a/arch/powerpc/platforms/powernv/pci.h b/arch/powerpc/platforms/powernv/pci.h
+> index 42075501663b..3579ecd55d00 100644
+> --- a/arch/powerpc/platforms/powernv/pci.h
+> +++ b/arch/powerpc/platforms/powernv/pci.h
+> @@ -300,7 +300,7 @@ extern void pe_level_printk(const struct pnv_ioda_pe *pe, const char *level,
+>   
+>   extern int pnv_tce_build(struct iommu_table *tbl, long index, long npages,
+>   		unsigned long uaddr, enum dma_data_direction direction,
+> -		unsigned long attrs);
+> +		unsigned long attrs, bool is_phys);
+>   extern void pnv_tce_free(struct iommu_table *tbl, long index, long npages);
+>   extern int pnv_tce_xchg(struct iommu_table *tbl, long index,
+>   		unsigned long *hpa, enum dma_data_direction *direction);
+> diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
+> index eec333dd2e59..8c6f9f18e462 100644
+> --- a/arch/powerpc/platforms/pseries/iommu.c
+> +++ b/arch/powerpc/platforms/pseries/iommu.c
+> @@ -122,7 +122,7 @@ static void iommu_pseries_free_group(struct iommu_table_group *table_group,
+>   static int tce_build_pSeries(struct iommu_table *tbl, long index,
+>   			      long npages, unsigned long uaddr,
+>   			      enum dma_data_direction direction,
+> -			      unsigned long attrs)
+> +			      unsigned long attrs, bool false)
+>   {
+>   	u64 proto_tce;
+>   	__be64 *tcep;
+> @@ -250,7 +250,7 @@ static DEFINE_PER_CPU(__be64 *, tce_page);
+>   static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
+>   				     long npages, unsigned long uaddr,
+>   				     enum dma_data_direction direction,
+> -				     unsigned long attrs)
+> +				     unsigned long attrs, bool is_phys)
+>   {
+>   	u64 rc = 0;
+>   	u64 proto_tce;
+> @@ -287,7 +287,7 @@ static int tce_buildmulti_pSeriesLP(struct iommu_table *tbl, long tcenum,
+>   		__this_cpu_write(tce_page, tcep);
+>   	}
+>   
+> -	rpn = __pa(uaddr) >> tceshift;
+> +	rpn = !is_phys ? __pa(uaddr) >> tceshift : uaddr >> tceshift;
+>   	proto_tce = TCE_PCI_READ;
+>   	if (direction != DMA_TO_DEVICE)
+>   		proto_tce |= TCE_PCI_WRITE;
+> diff --git a/drivers/vfio/Kconfig b/drivers/vfio/Kconfig
+> index ceae52fd7586..9929aa78a5da 100644
+> --- a/drivers/vfio/Kconfig
+> +++ b/drivers/vfio/Kconfig
+> @@ -4,7 +4,7 @@ menuconfig VFIO
+>   	select IOMMU_API
+>   	depends on IOMMUFD || !IOMMUFD
+>   	select INTERVAL_TREE
+> -	select VFIO_GROUP if SPAPR_TCE_IOMMU || IOMMUFD=n
+> +	select VFIO_GROUP if IOMMUFD=n
+>   	select VFIO_DEVICE_CDEV if !VFIO_GROUP
+>   	select VFIO_CONTAINER if IOMMUFD=n
+>   	help
+> @@ -16,7 +16,7 @@ menuconfig VFIO
+>   if VFIO
+>   config VFIO_DEVICE_CDEV
+>   	bool "Support for the VFIO cdev /dev/vfio/devices/vfioX"
+> -	depends on IOMMUFD && !SPAPR_TCE_IOMMU
+> +	depends on IOMMUFD
+>   	default !VFIO_GROUP
+>   	help
+>   	  The VFIO device cdev is another way for userspace to get device
+> 
+> 
+
 
