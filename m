@@ -1,175 +1,163 @@
-Return-Path: <kvm+bounces-69426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69428-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPwcFCGWemku8QEAu9opvQ
-	(envelope-from <kvm+bounces-69426-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:05:05 +0100
+	id QBNIHhaZemms8QEAu9opvQ
+	(envelope-from <kvm+bounces-69428-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:17:42 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C01FEA9D37
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:05:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2418A9E51
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:17:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D3594301945B
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:05:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D562D301913A
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F61F326D62;
-	Wed, 28 Jan 2026 23:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EC9342C9E;
+	Wed, 28 Jan 2026 23:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FGHF5vfi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VrepqyyD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CB02D6E72;
-	Wed, 28 Jan 2026 23:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B39B5B5AB
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 23:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769641498; cv=none; b=DaI1HxSBmT8rl8rKXm9eaPjn6NdgZV7KYXrCvFqaYdf91VttgOR+4E7FaXmhFJjKuLt89xawGlAYdwoyvgtcU9VclSjfkXoKATLEGsseP5e8+EaDay86VncWlPfeG2laELzPlEIqEozc594ununV8K3D+gTFwra5GwlBO65Iqpw=
+	t=1769642259; cv=none; b=klB9BNUnc0Opa8bdXq4slDWTssAA4W/wT//XpXcJkBSyspcpdDJiD9/KT3y3BzK4z3YyKmz6WrXNbK74eQ4lWRyOQ5tJ6Ls4ifQ+O/5ISsayTm+aoREwsF73yD00XMu8F8ZCfg8gOKki39qKVPwONfDIdhZY/S9iqOhH7an0Bbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769641498; c=relaxed/simple;
-	bh=YXIladQXtmk2BOPFwfiVc3EQ+NvAHvM8j4ho7oTtXD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=apl9byUnPorndlVN6rYMxTd/EKJPT8pl36RlgZj0sAqYV6E2cDarC/3hO53aMfTDjQymsNR2jxV1ev1jnWwMoljG3VO34CuTDcEZj0IUKSNb/N2S3HiB94cslLuHJGaSDEtA1QvnV8/8wbH/IUPGPAeCtD3/UeBm+v2LQ8oE93Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FGHF5vfi; arc=none smtp.client-ip=192.198.163.11
+	s=arc-20240116; t=1769642259; c=relaxed/simple;
+	bh=gku6ATXVmNaAWbvDHzX9sEE21VzxY5sWy4J0/A/R56M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tKTBxLI5Mssu/65xedEJ35i6B8fzQFTKaWcceAG1G3OHNb6aCEJxEvU5BHNy9qRJIt939OlmSbrwXLo0wNaVkvf2ljz7dvBRDhwhHOkv5BeaiEm18HZpxP2KyHyPUQS1DwADREYHSDBvXuasHGQeG7pEJUFaYpR9c3xALU5sgcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VrepqyyD; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769641498; x=1801177498;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=YXIladQXtmk2BOPFwfiVc3EQ+NvAHvM8j4ho7oTtXD4=;
-  b=FGHF5vfismGzxO+iGHgj7R+UqQ3uIV55wmWjHCCrmMcanLQTXO2hf5j5
-   N0uxzwNThr9C9iOBdJ2oMxVK2m4hjgtX3wYwQWFWM8DABv+2pPr0BzlNp
-   438bBFoQ6uWZzW1joFpKTBkfGSPjmOy3w3s9031Y0EwjFvWNuDtbiIGXP
-   D+H/1rXw0z0nwHrXkUwf/kUdCB7G6AwXatK/hQ6fDLCsydWAq5xzaMr7Q
-   jEO4c2Fe4hSOGoBSSIFYSYNQ6YCAY5sbeBngT4pnOnKrQxqKVwfahRaSo
-   wRw40UP4+reEyoYL90WD42/cEjuFoWqDbnoM83JTs59Yo9pNRciCVEie4
+  t=1769642257; x=1801178257;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gku6ATXVmNaAWbvDHzX9sEE21VzxY5sWy4J0/A/R56M=;
+  b=VrepqyyDm905mLCQMKCT1H/jEvgMlwHxu0q3iYByYg6WCyLSVnIVLR01
+   Rsh9+a6dZqKbZuLQrA9h095dtSYTG+0+5RFIXyP0WCCRPeQ//n3X9FdFF
+   ZO3GDGYlO2N71NwOZJ3wYk+8nLJ+Q6IZA0ISB3c+F6Ntm+0fCrAxFKaIx
+   qsTIXfDEt5RmWloN3jgFovzdEDOlcQR95ycPTIv6zrQr7pXJer+zhDNn6
+   lwZEJvvtjCgwXoYysAnXq/HdhugAE1gYOXZ4gp0w6xrQjBUsb7jCzZ5gb
+   9l1G9ZuFPSEd7ae4gVFIcpUge1YWQ4o1EJiytE6a8ChIs//cIacs7l/gL
    A==;
-X-CSE-ConnectionGUID: IdMBS87lS4KPaV35Ei8gbQ==
-X-CSE-MsgGUID: IG+ryNtuRhGAiAAnjctY5g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="81504738"
+X-CSE-ConnectionGUID: vyK+gFypQOC4oGRT9yCHHg==
+X-CSE-MsgGUID: AGiYspgpRiO20SxjxconKw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="73462305"
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="81504738"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:04:57 -0800
-X-CSE-ConnectionGUID: XgcEeVAARnCQUTjBFEzo3Q==
-X-CSE-MsgGUID: VcuLdTFjTGClJ8yQyj8x4A==
+   d="scan'208";a="73462305"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:17:37 -0800
+X-CSE-ConnectionGUID: 0d9s5027QpCpyH0E/PDyLw==
+X-CSE-MsgGUID: vkpbL/btRZGQR82jzvLBLA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="231335323"
-Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.190]) ([10.125.109.190])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:04:56 -0800
-Message-ID: <04f9a748-fe61-439c-af80-59c498970580@intel.com>
-Date: Wed, 28 Jan 2026 15:04:55 -0800
+   d="scan'208";a="208001757"
+Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:17:36 -0800
+From: Zide Chen <zide.chen@intel.com>
+To: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Zhao Liu <zhao1.liu@intel.com>,
+	Peter Xu <peterx@redhat.com>,
+	Fabiano Rosas <farosas@suse.de>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
+	Dongli Zhang <dongli.zhang@oracle.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Zide Chen <zide.chen@intel.com>
+Subject: [PATCH V2 00/11] target/i386: Misc PMU, PEBS, and MSR fixes and improvements
+Date: Wed, 28 Jan 2026 15:09:37 -0800
+Message-ID: <20260128231003.268981-1-zide.chen@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/26] x86/virt/seamldr: Introduce a wrapper for
- P-SEAMLDR SEAMCALLs
-To: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc: reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
- dan.j.williams@intel.com, yilun.xu@linux.intel.com, sagis@google.com,
- vannapurve@google.com, paulmck@kernel.org, nik.borisov@suse.com,
- zhenzhong.duan@intel.com, seanjc@google.com, rick.p.edgecombe@intel.com,
- kas@kernel.org, dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
- Farrah Chen <farrah.chen@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- "H. Peter Anvin" <hpa@zytor.com>
-References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-8-chao.gao@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20260123145645.90444-8-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69426-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: C01FEA9D37
+	TAGGED_FROM(0.00)[bounces-69428-lists,kvm=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zide.chen@intel.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: F2418A9E51
 X-Rspamd-Action: no action
 
-On 1/23/26 06:55, Chao Gao wrote:
-> SEAMRET from the P-SEAMLDR clears the current VMCS structure pointed 
-> to by the current-VMCS pointer. A VMM that invokes the P-SEAMLDR
-> using SEAMCALL must reload the current-VMCS, if required, using the
-> VMPTRLD instruction.
+This series contains a set of fixes, cleanups, and improvements in
+target/i386 related to PMU, legacy PEBS, and MSR handling.
 
-That seems pretty mean.
+The patches are grouped into a single series for review convenience.
+Smoe of them are not tightly coupled and can be reviewed and applied
+individually.
 
-This is going to need a lot more justification for why this is an
-absolutely necessary requirement.
+Technically, the PEBS-related changes could be split into a separate
+series.  However, they touch closely related PMU and MSR code paths,
+and keeping them together here makes review easier and helps avoid
+potential merge conflicts.
 
-KVM folks, are you OK with this?
+Patch series overview:
+Patches 1–5: Miscellaneous PMU/MSR fixes and cleanups.
+Patches 8–9: Refactoring in preparation for pebs-fmt support.
+Patches 6–7, 10–11: Complete legacy PEBS support in QEMU.
+
+Changes since v1:
+- Add two new patches to clean up and refactor LBR format handling.
+- Introduce a new pebs-fmt command-line option.
+- Add a patch to avoid exposing PEBS capabilities when not enabled.
+- Trivial fixes and cleanups.
+
+Dapeng Mi (3):
+  target/i386: Don't save/restore PERF_GLOBAL_OVF_CTRL MSR
+  target/i386: Support full-width writes for perf counters
+  target/i386: Save/Restore DS based PEBS specfic MSRs
+
+Zide Chen (8):
+  target/i386: Disable unsupported BTS for guest
+  target/i386: Gate enable_pmu on kvm_enabled()
+  target/i386: Increase MSR_BUF_SIZE and split KVM_[GET/SET]_MSRS calls
+  target/i386: Make some PEBS features user-visible
+  target/i386: Clean up LBR format handling
+  target/i386: Refactor LBR format handling
+  target/i386: Add pebs-fmt CPU option
+  target/i386: Disable guest PEBS capability when not enabled
+
+ target/i386/cpu.c         | 130 ++++++++++++++++++++----------
+ target/i386/cpu.h         |  29 ++++++-
+ target/i386/kvm/kvm-cpu.c |   3 +
+ target/i386/kvm/kvm.c     | 163 +++++++++++++++++++++++++++++++-------
+ target/i386/machine.c     |  35 ++++++--
+ 5 files changed, 281 insertions(+), 79 deletions(-)
+
+-- 
+2.52.0
+
 
