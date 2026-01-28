@@ -1,488 +1,283 @@
-Return-Path: <kvm+bounces-69442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69443-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wI4EOVegemmn8gEAu9opvQ
-	(envelope-from <kvm+bounces-69442-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:48:39 +0100
+	id OEcTMc+hemnu8gEAu9opvQ
+	(envelope-from <kvm+bounces-69443-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:54:55 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE6AAA07D
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:48:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA99AA0E3
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:54:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9419D3022954
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:48:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC2BC3019B94
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CD7344DAD;
-	Wed, 28 Jan 2026 23:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2603345757;
+	Wed, 28 Jan 2026 23:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wggXsJph"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lrr1nAbR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3F533B6E0
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 23:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769644095; cv=pass; b=hQRQ91a9i+4xtqsh2EwOX5/JFBmNP0doWftKHJAEEm3W6Of2Me3gepjN7qf3ZcPo8XXxJpH7Ly8s2IZOpTjgPc4MHX5sXy9tKO1uaP+adibETwVHegGfOrwWNLLtNj7O6oP1n9i/lf3LaY0U4VHd7C75w9HxdCzJPWJWMIAwMIs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769644095; c=relaxed/simple;
-	bh=QKP+AdSSsiB4D0SD1pkOBdxVF5JubvIxOCIWfnhFTQg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=seXekQmVj08EomoyIdIgp059460k9d/Fkdx1JWYMxB4zW2ebkRjSzbD424VLjnBpxhtJ/dP2vPr4Cvb/3dqoPvkS208sVn7k7+PL+7UsysdmXqCzpvh4rfQb7S8ESOumbi1ZUNwPI9H31t+HI9yTGkH+evFy9nZ0ZaugasUz748=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wggXsJph; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5033b0b6eabso98741cf.1
-        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 15:48:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769644092; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NW2QiD3MqrUnKwqjX4+vnH1PgVcojKyyurgvz2p0b4VFPVKDCGJK8qtz6hH5gJbnXe
-         owDRWD8faAIVFVxKuod6GcmGtdTwY5mNlRrMlk+rHDgSzZaKzTlrfHf3gn4GxNVr8m0M
-         LKDbUgIdwUdlPfJTokYSVC1i+4P5xzznpcAXBdM/FKV7zVngMF0kH3Gx+3dJCWn+k1W2
-         IFZbSemBILM8FvghOo0EybBPgsxhm1NPih89697RF7ILvvsoia5VIGo99x3ADJ/D+JES
-         bzwrQNgcgmp/D4ECo/QdHsJqJ7/Pd/PqC29DEK019caoA/Ud0Axhd0GYFQA7c3Mco1jT
-         TIOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=wjvvUYK/4dE39UgAFnedAHeaRm7dJ/+QUmhTTPYz9t4=;
-        fh=k889PupdFjRJS3dwfb1q62s5tWO/mlM9wPecpHJLL/4=;
-        b=GzWjj5wbrMqVvriJWrkKuP9/R5NjirhhnXu589pRaOkY/Zbml6mE5coNW2XRxSW3eE
-         hpMFgGb5YEECedR8fV1YzZ8KXLImtKEpsCBvePv1jtCPmIaayaW88aVHMnlL7rVIRfZc
-         uVbs/ocueLhCrHD7m1xA6e5jE8DjxzoNkBYf4+Oc5LIFaHbytIeSJJ79jph8CxhfwSMa
-         eqswXSIWOr0o6fd+9psOTdpD+Plat+yVuoujZyuI96LxngC3rhyeEBlQmGmYjDh8MBdk
-         NbJyvA60VwHXHW7qKIwM72X11MwMzrPlJNPW5znEH8GvfI8pEoXkzNFRDACv8l4oTI50
-         TJDA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769644092; x=1770248892; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wjvvUYK/4dE39UgAFnedAHeaRm7dJ/+QUmhTTPYz9t4=;
-        b=wggXsJphagb/bSpj3IRsUGTXWgTMrE6SFYOybk+9pnBhkLoCWdphWLqnQ0gniyantv
-         m5TcrWoMvcp2am9alIjwnJT1XPZxf9trslYOW3hjy1UaPny1Hopfj5KRVxBdv4U/GkAk
-         g+W/y2p5UHxvjSIN5/ibYGkdYkqlWzPv29KYla/Feqv2d4NIr3bBeUP5lz8he+Jfet9t
-         747JXMN9vXd4kLoSWRCPyClmkc1m5QPt4cwuk2ANgV1wS6ZiZEGJO0iUMP4WGjnHe05+
-         VZcaETw8dNRDx1h0li/Wbl7oGD+6njjDBVMUH/yo2Nc/1isQ9lgVliEo2F7NJi8M4qSP
-         X0Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769644092; x=1770248892;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wjvvUYK/4dE39UgAFnedAHeaRm7dJ/+QUmhTTPYz9t4=;
-        b=HWBeJDSvk4lXTtKEH+XQsTikrSXRwbpXYNHASd7gLWpahHov+hKV40iI4BJSC9Fvpr
-         qwlOEMGe4m61eS5Q+1N5I3cITcBaTfWq1+b9WhGp0KmVb0VSMOKvPHb01od/YsUrG2am
-         AnwQMYDhxYsymQ5NuFbD9EfBsr+fF44yJqkDsBHmahrL1ywRotfYAIt7XpmK00fWE29r
-         C/MjGQNyKdkdw44nI69JM3Q0ne0Wlo0PB1uNzYRNHH+Mx4VZMQfCaRz+w10NDVMv2yy6
-         qieR/3jBbZhn91kTeV33h5e/K0vQBL2LiJ4wrzr4wQ2rI+1F2EqiqYJkx328epjzfiNm
-         8Bww==
-X-Forwarded-Encrypted: i=1; AJvYcCVKOnPmF3Yjqpbz6Prd9B/SUA7yF3Nr5g/yfltwrfgQHx3Fej1iXvg1YLlTAzpcfA1+6Og=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk2NdJWd2FV2qL3Xi1rD+WKQ7z0DJF1eT2JT3J4bIh7bgSfh39
-	mTjdqzzIz0EPpInxSExDgztaTlTiTPvTX7/bTy9c9XaNkVe7ZVxXHSQApSADTmu/yG0gUW4W3oX
-	8H6qFMie/czm+AnZh3T2Cgxr5mWhuAq7mcw5J1J0B
-X-Gm-Gg: AZuq6aL9l2MUwBP/xukRA76LTh0gMiUTF4AxwkGfWeQbMRZIIlrRU+LkQ6MVbpUiqim
-	V12F3vi+AaUhux5VtpywJPlLm0tWBJgUmN9GsRlPQu0XU7KBTtaZAnvRnsqmZWcw5AFDM9ITk3w
-	L4FYoq3Mn6cTeSeZXbnlNF9H5q03I7n004B1Q2Jnnoyv0DW/2+YCREqj774+Z7W0fN7uiCtV4Yn
-	ZMjUrycKMpQTRbNDrVqyUk1tRH2fmZPbWXwk+I4QKCu/oJBhYdcC8Yd7HtkoHCvVZ9582TiPqIw
-	n5O6Rg==
-X-Received: by 2002:ac8:59cd:0:b0:4ed:ff79:e678 with SMTP id
- d75a77b69052e-503b672c559mr4281001cf.18.1769644091830; Wed, 28 Jan 2026
- 15:48:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5380833B6E0;
+	Wed, 28 Jan 2026 23:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769644482; cv=none; b=PQf9XNnNwmqPdLK01HthJ3Jag4JeUao351yEBUbcR2LwliZZm5U1MhQsKEDpxsEDUoQZdLdl0C+nOCq3o34oi4pjg5jlSmsUN0t35/vZiAS/ux58NVy0oxy9lVnMhBg5haAOeGEyBrbtoYmuk1M4tWwR15gbrPqTHmulHRM1O1g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769644482; c=relaxed/simple;
+	bh=0Cps4VFJ+P+DErVNWpvKHm3iAAy6qEtS67CdVWyN6oI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J/Eppx6cEb/cO/YtK+3fpqrgm1LR30vnXcRUssjV0/D3uCYsqH4Pg75n+SsTrHnMBAi06lY5to2Chqcsg3zFUPzfaS2dwMb7bB57h4KoNGQMfMpM0g/qEbp+kHwDomqQ8rG5ukpECk6pKEBchhC/uwkpV3L9ZqpdSO5qnzWvjK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lrr1nAbR; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769644481; x=1801180481;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=0Cps4VFJ+P+DErVNWpvKHm3iAAy6qEtS67CdVWyN6oI=;
+  b=Lrr1nAbR6v2XDulcdGsxkER0z1vUoJZ8NMugAN9F1NzZs1A7hdOY//Yu
+   4rbfw6Dsv/TyQCee7Pc2cVASnXvkzHQm9nuQJ3abbyUQ/nP2lz1ZVgrOd
+   QCTKaSHrQVgsXYjxw66kw05PzlkkBBp+NRwxoTu9yina0LyKoMMbqJJFO
+   eIz0Pv147g+aXI6HgUUMYeFoKcCMpn8b2a0VCUfIw7ln/w3N5cj1uavBc
+   k2w+i78BOS+0spg49oOSglh7VYSYZN1cITcqYsBWG+zi/h1iUWMxlmfGm
+   xN31W4nG3A2iF+hREUZixnMqZcAzuRO06SqpMeqbMOqNkiWr+oZZNIQLb
+   A==;
+X-CSE-ConnectionGUID: HhWRVrkfR02ccO3Vslz0KA==
+X-CSE-MsgGUID: y8autz/1Taqi6lWMaShsyQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="70774998"
+X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
+   d="scan'208";a="70774998"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:54:40 -0800
+X-CSE-ConnectionGUID: sG4t/9zyQ9SSLWRMcMXrIw==
+X-CSE-MsgGUID: MSApCQ3MSUmS7ixGrnbxNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
+   d="scan'208";a="212951292"
+Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.190]) ([10.125.109.190])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:54:39 -0800
+Message-ID: <b2e2fd5e-8aff-4eda-a648-9ae9f8234d25@intel.com>
+Date: Wed, 28 Jan 2026 15:54:38 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121225438.3908422-1-jmattson@google.com> <20260121225438.3908422-7-jmattson@google.com>
- <aXJal3srw2-3J5Dm@google.com>
-In-Reply-To: <aXJal3srw2-3J5Dm@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 28 Jan 2026 15:47:59 -0800
-X-Gm-Features: AZwV_Qi8faW06eVjZbFN4XkaAx91ISh9qtySVVj5Bkz3ATD0YuSAA9PlyfyxKGM
-Message-ID: <CALMp9eQm2fW=jbcBSZK9hO9p_Lec67B4gFsio2BBcsJfP1jtRg@mail.gmail.com>
-Subject: Re: [PATCH 6/6] KVM: selftests: x86: Add svm_pmu_hg_test for HG_ONLY bits
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	James Clark <james.clark@linaro.org>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 08/26] x86/virt/seamldr: Retrieve P-SEAMLDR information
+To: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc: reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
+ dan.j.williams@intel.com, yilun.xu@linux.intel.com, sagis@google.com,
+ vannapurve@google.com, paulmck@kernel.org, nik.borisov@suse.com,
+ zhenzhong.duan@intel.com, seanjc@google.com, rick.p.edgecombe@intel.com,
+ kas@kernel.org, dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+ Farrah Chen <farrah.chen@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ "H. Peter Anvin" <hpa@zytor.com>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-9-chao.gao@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20260123145645.90444-9-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69442-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	TAGGED_FROM(0.00)[bounces-69443-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 4AE6AAA07D
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[seamldr.info:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6DA99AA0E3
 X-Rspamd-Action: no action
 
-On Thu, Jan 22, 2026 at 9:12=E2=80=AFAM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Wed, Jan 21, 2026, Jim Mattson wrote:
-> > Add a selftest to verify KVM correctly virtualizes the AMD PMU Host-Onl=
-y
-> > (bit 41) and Guest-Only (bit 40) event selector bits across all relevan=
-t
-> > SVM state transitions.
-> >
-> > For both Guest-Only and Host-Only counters, verify that:
-> >   1. SVME=3D0: counter counts (HG_ONLY bits ignored)
-> >   2. Set SVME=3D1: counter behavior changes based on HG_ONLY bit
-> >   3. VMRUN to L2: counter behavior switches (guest vs host mode)
-> >   4. VMEXIT to L1: counter behavior switches back
-> >   5. Clear SVME=3D0: counter counts (HG_ONLY bits ignored again)
-> >
-> > Also confirm that setting both bits is the same as setting neither bit.
-> >
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
-> >  .../selftests/kvm/x86/svm_pmu_hg_test.c       | 297 ++++++++++++++++++
-> >  2 files changed, 298 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/x86/svm_pmu_hg_test.c
-> >
-> > diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/s=
-elftests/kvm/Makefile.kvm
-> > index e88699e227dd..06ba85d97618 100644
-> > --- a/tools/testing/selftests/kvm/Makefile.kvm
-> > +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> > @@ -112,6 +112,7 @@ TEST_GEN_PROGS_x86 +=3D x86/svm_vmcall_test
-> >  TEST_GEN_PROGS_x86 +=3D x86/svm_int_ctl_test
-> >  TEST_GEN_PROGS_x86 +=3D x86/svm_nested_shutdown_test
-> >  TEST_GEN_PROGS_x86 +=3D x86/svm_nested_soft_inject_test
-> > +TEST_GEN_PROGS_x86 +=3D x86/svm_pmu_hg_test
->
-> Maybe svm_nested_pmu_test?  Hmm, that makes it sound like "nested PMU" th=
-ough.
->
-> svm_pmu_host_guest_test?
+On 1/23/26 06:55, Chao Gao wrote:
+> P-SEAMLDR returns its information e.g., version and supported features, in
+> response to the SEAMLDR.INFO SEAMCALL.
+> 
+> This information is useful for userspace. For example, the admin can decide
+> which TDX module versions are compatible with the P-SEAMLDR according to
+> the P-SEAMLDR version.
+> 
+> Add and export seamldr_get_info() which retrieves P-SEAMLDR information by
 
-Sounds good.
+I don't need to know what the function name is. That's in the code.
 
-> > +#define MSR_F15H_PERF_CTL0   0xc0010200
-> > +#define MSR_F15H_PERF_CTR0   0xc0010201
-> > +
-> > +#define AMD64_EVENTSEL_GUESTONLY     BIT_ULL(40)
-> > +#define AMD64_EVENTSEL_HOSTONLY              BIT_ULL(41)
->
-> Please put architectural definitions in pmu.h (or whatever library header=
- we
-> have).
+> invoking SEAMLDR.INFO SEAMCALL in preparation for exposing P-SEAMLDR
+> version and other necessary information to userspace.
 
-These should be redundant. I will confirm.
+I also want to know what spec you are getting this out of.
 
-> > +struct hg_test_data {
->
-> Please drop "hg" (I keep reading it as "mercury").
->
-> > +     uint64_t l2_delta;
-> > +     bool l2_done;
-> > +};
-> > +
-> > +static struct hg_test_data *hg_data;
-> > +
-> > +static void l2_guest_code(void)
-> > +{
-> > +     hg_data->l2_delta =3D run_and_measure();
-> > +     hg_data->l2_done =3D true;
-> > +     vmmcall();
-> > +}
-> > +
-> > +/*
-> > + * Test Guest-Only counter across all relevant state transitions.
-> > + */
-> > +static void l1_guest_code_guestonly(struct svm_test_data *svm,
-> > +                                 struct hg_test_data *data)
-> > +{
-> > +     unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-> > +     struct vmcb *vmcb =3D svm->vmcb;
-> > +     uint64_t eventsel, delta;
-> > +
-> > +     hg_data =3D data;
-> > +
-> > +     eventsel =3D EVENTSEL_RETIRED_INSNS | AMD64_EVENTSEL_GUESTONLY;
-> > +     wrmsr(MSR_F15H_PERF_CTL0, eventsel);
-> > +     wrmsr(MSR_F15H_PERF_CTR0, 0);
-> > +
-> > +     /* Step 1: SVME=3D0; HG_ONLY ignored */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 2: Set SVME=3D1; Guest-Only counter stops */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_EQ(delta, 0);
-> > +
-> > +     /* Step 3: VMRUN to L2; Guest-Only counter counts */
-> > +     generic_svm_setup(svm, l2_guest_code,
-> > +                       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> > +     vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_MSR_PROT);
-> > +
-> > +     run_guest(vmcb, svm->vmcb_gpa);
-> > +
-> > +     GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-> > +     GUEST_ASSERT(data->l2_done);
-> > +     GUEST_ASSERT_NE(data->l2_delta, 0);
-> > +
-> > +     /* Step 4: After VMEXIT to L1; Guest-Only counter stops */
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_EQ(delta, 0);
-> > +
-> > +     /* Step 5: Clear SVME; HG_ONLY ignored */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +/*
-> > + * Test Host-Only counter across all relevant state transitions.
-> > + */
-> > +static void l1_guest_code_hostonly(struct svm_test_data *svm,
-> > +                                struct hg_test_data *data)
-> > +{
-> > +     unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-> > +     struct vmcb *vmcb =3D svm->vmcb;
-> > +     uint64_t eventsel, delta;
-> > +
-> > +     hg_data =3D data;
-> > +
-> > +     eventsel =3D EVENTSEL_RETIRED_INSNS | AMD64_EVENTSEL_HOSTONLY;
-> > +     wrmsr(MSR_F15H_PERF_CTL0, eventsel);
-> > +     wrmsr(MSR_F15H_PERF_CTR0, 0);
-> > +
-> > +
-> > +     /* Step 1: SVME=3D0; HG_ONLY ignored */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 2: Set SVME=3D1; Host-Only counter still counts */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 3: VMRUN to L2; Host-Only counter stops */
-> > +     generic_svm_setup(svm, l2_guest_code,
-> > +                       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> > +     vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_MSR_PROT);
-> > +
-> > +     run_guest(vmcb, svm->vmcb_gpa);
-> > +
-> > +     GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-> > +     GUEST_ASSERT(data->l2_done);
-> > +     GUEST_ASSERT_EQ(data->l2_delta, 0);
-> > +
-> > +     /* Step 4: After VMEXIT to L1; Host-Only counter counts */
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 5: Clear SVME; HG_ONLY ignored */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +/*
-> > + * Test that both bits set is the same as neither bit set (always coun=
-ts).
-> > + */
-> > +static void l1_guest_code_both_bits(struct svm_test_data *svm,
->
-> l1_guest_code gets somewhat redundant.  What about these to be more descr=
-iptive
-> about the salient points, without creating monstrous names?
->
->         l1_test_no_filtering // very open to suggestions for a better nam=
-e
->         l1_test_guestonly
->         l1_test_hostonly
->         l1_test_host_and_guest
->
-> Actually, why are there even separate helpers?  Very off the cuff, but th=
-is seems
-> trivial to dedup:
->
-> static void l1_guest_code(struct svm_test_data *svm, u64 host_guest_mask)
-> {
->         const bool count_in_host =3D !host_guest_mask ||
->                                    (host_guest_mask & AMD64_EVENTSEL_HOST=
-ONLY);
->         const bool count_in_guest =3D !host_guest_mask ||
->                                     (host_guest_mask & AMD64_EVENTSEL_GUE=
-STONLY);
->         unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
->         struct vmcb *vmcb =3D svm->vmcb;
->         uint64_t eventsel, delta;
->
->         wrmsr(MSR_F15H_PERF_CTL0, EVENTSEL_RETIRED_INSNS | host_guest_mas=
-k);
->         wrmsr(MSR_F15H_PERF_CTR0, 0);
->
->         /* Step 1: SVME=3D0; host always counts */
->         wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
->         delta =3D run_and_measure();
->         GUEST_ASSERT_NE(delta, 0);
->
->         /* Step 2: Set SVME=3D1; Guest-Only counter stops */
->         wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
->         delta =3D run_and_measure();
->         GUEST_ASSERT(!!delta =3D=3D count_in_host);
->
->         /* Step 3: VMRUN to L2; Guest-Only counter counts */
->         generic_svm_setup(svm, l2_guest_code,
->                           &l2_guest_stack[L2_GUEST_STACK_SIZE]);
->         vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_MSR_PROT);
->
->         run_guest(vmcb, svm->vmcb_gpa);
->
->         GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
->         GUEST_ASSERT(data->l2_done);
->         GUEST_ASSERT(!!data->l2_delta =3D=3D count_in_guest);
->
->         /* Step 4: After VMEXIT to L1; Guest-Only counter stops */
->         delta =3D run_and_measure();
->         GUEST_ASSERT(!!delta =3D=3D count_in_host);
->
->         /* Step 5: Clear SVME; HG_ONLY ignored */
->         wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
->         delta =3D run_and_measure();
->         GUEST_ASSERT_NE(delta, 0);
->
->         GUEST_DONE();
-> }
+I think it's also worth calling out that there are SEAMLDR calls for both:
 
-Even better, I will fold this all into one test flow with 4 PMCs
-covering the bit permutations.
+	SEAMLDR_INFO
+and
+	SEAMLDR_SEAMINFO
 
-> > +                                 struct hg_test_data *data)
-> > +{
-> > +     unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-> > +     struct vmcb *vmcb =3D svm->vmcb;
-> > +     uint64_t eventsel, delta;
-> > +
-> > +     hg_data =3D data;
-> > +
-> > +     eventsel =3D EVENTSEL_RETIRED_INSNS |
-> > +             AMD64_EVENTSEL_HOSTONLY | AMD64_EVENTSEL_GUESTONLY;
-> > +     wrmsr(MSR_F15H_PERF_CTL0, eventsel);
-> > +     wrmsr(MSR_F15H_PERF_CTR0, 0);
-> > +
-> > +     /* Step 1: SVME=3D0 */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 2: Set SVME=3D1 */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 3: VMRUN to L2 */
-> > +     generic_svm_setup(svm, l2_guest_code,
-> > +                       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-> > +     vmcb->control.intercept &=3D ~(1ULL << INTERCEPT_MSR_PROT);
-> > +
-> > +     run_guest(vmcb, svm->vmcb_gpa);
-> > +
-> > +     GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-> > +     GUEST_ASSERT(data->l2_done);
-> > +     GUEST_ASSERT_NE(data->l2_delta, 0);
-> > +
-> > +     /* Step 4: After VMEXIT to L1 */
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     /* Step 5: Clear SVME */
-> > +     wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-> > +     delta =3D run_and_measure();
-> > +     GUEST_ASSERT_NE(delta, 0);
-> > +
-> > +     GUEST_DONE();
-> > +}
-> > +
-> > +static void l1_guest_code(struct svm_test_data *svm, struct hg_test_da=
-ta *data,
-> > +                       int test_num)
-> > +{
-> > +     switch (test_num) {
-> > +     case 0:
->
-> As above, I would much rather pass in the mask of GUEST_HOST bits to set,=
- and
-> then react accordingly, as opposed to passing in a magic/arbitrary @test_=
-num.
-> Then I'm pretty sure we don't need a dispatch function, just run the test=
-case
-> using the passed in mask.
->
-> > +             l1_guest_code_guestonly(svm, data);
-> > +             break;
-> > +     case 1:
-> > +             l1_guest_code_hostonly(svm, data);
-> > +             break;
-> > +     case 2:
-> > +             l1_guest_code_both_bits(svm, data);
-> > +             break;
-> > +     }
-> > +}
->
-> ...
->
-> > +int main(int argc, char *argv[])
-> > +{
-> > +     TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-> > +     TEST_REQUIRE(kvm_is_pmu_enabled());
-> > +     TEST_REQUIRE(get_kvm_amd_param_bool("enable_mediated_pmu"));
-> > +
-> > +     run_test(0, "Guest-Only counter across all transitions");
-> > +     run_test(1, "Host-Only counter across all transitions");
-> > +     run_test(2, "Both HG_ONLY bits set (always count)");
->
-> As alluded to above, shouldn't we also test "no bits set"?
-> > +
-> > +     return 0;
-> > +}
-> > --
-> > 2.52.0.457.g6b5491de43-goog
-> >
+Which is astonishingly confusing. Please have mercy on folks that are
+looking through the docs for the first time and explain this.
+
+> diff --git a/arch/x86/include/asm/seamldr.h b/arch/x86/include/asm/seamldr.h
+> new file mode 100644
+> index 000000000000..d1e9f6e16e8d
+> --- /dev/null
+> +++ b/arch/x86/include/asm/seamldr.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _ASM_X86_SEAMLDR_H
+> +#define _ASM_X86_SEAMLDR_H
+> +
+> +#include <linux/types.h>
+> +
+> +struct seamldr_info {
+
+/*
+ * This called the "SEAMLDR_INFO" data structure and is defined
+ * in "SEAM Loader (SEAMLDR) Interface Specification".
+ */
+
+
+> +	u32	version;
+> +	u32	attributes;
+> +	u32	vendor_id;
+> +	u32	build_date;
+> +	u16	build_num;
+> +	u16	minor_version;
+> +	u16	major_version;
+> +	u16	update_version;
+> +	u8	reserved0[4];
+
+Why not label this:
+
+	u32	acm_x2apicid: /* unused by kernel */
+
+?
+
+> +	u32	num_remaining_updates;
+> +	u8	reserved1[224];
+> +} __packed;
+> +
+> +#ifdef CONFIG_INTEL_TDX_MODULE_UPDATE
+> +const struct seamldr_info *seamldr_get_info(void);
+> +#else
+> +static inline const struct seamldr_info *seamldr_get_info(void) { return NULL; }
+> +#endif
+> +
+> +#endif
+> diff --git a/arch/x86/virt/vmx/tdx/seamldr.c b/arch/x86/virt/vmx/tdx/seamldr.c
+> index b99d73f7bb08..6a83ae405fac 100644
+> --- a/arch/x86/virt/vmx/tdx/seamldr.c
+> +++ b/arch/x86/virt/vmx/tdx/seamldr.c
+> @@ -9,9 +9,16 @@
+>  #include <linux/irqflags.h>
+>  #include <linux/types.h>
+>  
+> +#include <asm/seamldr.h>
+> +
+>  #include "seamcall.h"
+>  
+> -static __maybe_unused int seamldr_call(u64 fn, struct tdx_module_args *args)
+> +/* P-SEAMLDR SEAMCALL leaf function */
+> +#define P_SEAMLDR_INFO			0x8000000000000000
+
+
+/*
+ * The SEAMLDR.INFO documentation requires
+ * this to be aligned to a 256-byte boundary.
+ */
+> +static struct seamldr_info seamldr_info __aligned(256);
+> +
+> +static inline int seamldr_call(u64 fn, struct tdx_module_args *args)
+>  {
+>  	unsigned long flags;
+>  	u64 vmcs;
+> @@ -54,3 +61,11 @@ static __maybe_unused int seamldr_call(u64 fn, struct tdx_module_args *args)
+>  	WARN_ONCE(1, "Failed to save/restore the current VMCS");
+>  	return -EIO;
+>  }
+> +
+> +const struct seamldr_info *seamldr_get_info(void)
+> +{
+> +	struct tdx_module_args args = { .rcx = __pa(&seamldr_info) };
+> +
+> +	return seamldr_call(P_SEAMLDR_INFO, &args) ? NULL : &seamldr_info;
+> +}
+> +EXPORT_SYMBOL_FOR_MODULES(seamldr_get_info, "tdx-host");
+
+I'd also prefer a
+
+	BUILD_BUG_ON(sizeof(struct seamldr_info) != 2048);
+
+just as a sanity check. It doesn't cost anything and it makes sure that
+as you muck around with reserved fields and padding that there's at
+least one check making sure it's OK.
 
