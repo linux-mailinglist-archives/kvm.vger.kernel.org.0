@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-69433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69434-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kM8MAmWZemnY8QEAu9opvQ
-	(envelope-from <kvm+bounces-69433-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:19:01 +0100
+	id 8Ox4DmmZemnZ8QEAu9opvQ
+	(envelope-from <kvm+bounces-69434-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:19:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD8FA9EB9
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:19:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9E1A9ED1
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E2CC305B084
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:17:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12385305C8DF
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58E4345CAB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3877344D8B;
 	Wed, 28 Jan 2026 23:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cweOEL/6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="es4azEx7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B8D344D97
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 23:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549DE344DB7
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 23:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769642262; cv=none; b=jP9XZZkuo7uGEqLqI6I8aPDCSoQTxRoYpMBEJdQZlEojVPeLqBV7yBKjXqpNGzyNZN6YNo/TyMUBx0wwIFwwd9tDV/oS0/MQC//RzyHNBF3JR6lypE+9haoN+VHPLuo/hVatvjy/yYfXY4DS8eWZoSkeIsbfKbJQ82eijI4y9oc=
+	t=1769642262; cv=none; b=sx0DogaMes5+GqRNXYFKEUcD205QRwm+bN9HM218ciIIwpBeXSQe91uBcPEt0q4a+KMoD2WjJC8cmclzc9b4UCKh84m6FYDU2BStcfViwfr5wXs4PHakk4SZ/0l2njaOmCcU5nYOW7gzCwifdfynnfJLmsyK1YiNnzw92ysjtlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769642262; c=relaxed/simple;
-	bh=dXXuYielLArLkKTiUC0lRPqxcDUr9Mf6KgxmVaxmn9Q=;
+	bh=Nqtv2gWxm8W+8gxjUvMBaqTGy6CDVIMjftYYH4JtDuY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PmgS+lO4Rs2hLJ8E9TvYJ9ER2LF++E+Uzc9N71R2lkEfeMj+fIuKrf0G7tkcMU5Bz+hm/UbOLlrqfu+pDBPGQfTLHFJi/Vo4suECtWp4SEd6uN5eFvAKDp+IqqetmC8Bc/AT+lH6oD9vH0M0c70loGAqHlv/rjLXrrgFU7SsAug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cweOEL/6; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=q6boJ3WY9sf97Z6UxqNwx5d1MS216GkJvY46pZyQTsJqWU3I/S3UqGjwxlQ4UrmSFismYoJ8w4c6nFLXBwisspQMl+qj/kpRTVDXLRuNweh/vgpB00UnE7sytCO7PNUarQmZ1Y/OoG4L2ogirGHwi8ijo5MF7yJgAFOX/4P+KSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=es4azEx7; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -39,26 +39,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1769642261; x=1801178261;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dXXuYielLArLkKTiUC0lRPqxcDUr9Mf6KgxmVaxmn9Q=;
-  b=cweOEL/6Cjq6QgQWPy8FEGI53Mn9AOs+AdmZl0unbo3dsQe1MLikKlMs
-   OcbVGA3zKFez7fo7wWIwSfvCaZds0AoINN7uZPuyDqilN36ntcW/0ojjb
-   uONNs0KYS4b5138g/6bjo7EhinGZaicT9XS1XylqnOBhs9p16C/Y86y4I
-   B+YiA2zvhi8cZCd9Ue/hWYeM2a3fp3A2OsmbiZWzs9n9ED+PxeUwGCuHx
-   WEGEjwU4XA1x13JrHicNTYCtQyVzJJVSTp8M6oqQpUTHryoa1s8NV/ySA
-   X1zK6F3wcDUaT9aVxqBhPD+zNVTjp09RD70G1+6UdWN2M9/dRR82EnUKz
-   g==;
-X-CSE-ConnectionGUID: SGMeP4TIT9OoFWDEhrGa6g==
-X-CSE-MsgGUID: 5mmQJ92/SWOPiMss7exuMg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="73462325"
+  bh=Nqtv2gWxm8W+8gxjUvMBaqTGy6CDVIMjftYYH4JtDuY=;
+  b=es4azEx7p+kI9/zyQ5Fox0exWkUmBrjrKCQOERCo0PSPGDkrtqoqBAGP
+   Apao63xC1jYoA4qwxX/6acqdW3dtSrBBt2KD19yKzfIWCPZ4Fv1K2Jty/
+   RkgimlF/cl7NtHfZkroo+nO4NeQKQJbxlTL8Rd20haZeC+AIP7D7lEAQT
+   mLFsgcL+rlsgaP5Jx3krMOZRPXVDoAWcqAgZ9/xpXeJFPHsgIV7+tphNe
+   5kYdUU1K3LlnsJDAT5NbXwfPNX8c7B1YovtGm34OjvwWUHt2BvtbEJe2P
+   U9t3bZDlugccxkbNURxQ2Aar1YhjKFa94cTva4ASaTb+XPqefdxlshVom
+   w==;
+X-CSE-ConnectionGUID: 8vG4PtEVSKajlWFUVhFWRA==
+X-CSE-MsgGUID: dSY73bJ3TP+xYObZ1kHUWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="73462329"
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="73462325"
+   d="scan'208";a="73462329"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:17:40 -0800
-X-CSE-ConnectionGUID: S8V0gTKVTJaYi3+Ex6y0aQ==
-X-CSE-MsgGUID: /Xg2E5e2QX2Ab9HiyaQl0g==
+X-CSE-ConnectionGUID: gD39TRv0RxC2vmW5Pk31AA==
+X-CSE-MsgGUID: U5A0iZnPTZ2eh10rtiNbUQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="208001772"
+   d="scan'208";a="208001775"
 Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
   by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:17:39 -0800
 From: Zide Chen <zide.chen@intel.com>
@@ -72,9 +72,9 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
 	Dongli Zhang <dongli.zhang@oracle.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Zide Chen <zide.chen@intel.com>
-Subject: [PATCH V2 05/11] target/i386: Increase MSR_BUF_SIZE and split KVM_[GET/SET]_MSRS calls
-Date: Wed, 28 Jan 2026 15:09:42 -0800
-Message-ID: <20260128231003.268981-6-zide.chen@intel.com>
+Subject: [PATCH V2 06/11] target/i386: Save/Restore DS based PEBS specfic MSRs
+Date: Wed, 28 Jan 2026 15:09:43 -0800
+Message-ID: <20260128231003.268981-7-zide.chen@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260128231003.268981-1-zide.chen@intel.com>
 References: <20260128231003.268981-1-zide.chen@intel.com>
@@ -91,13 +91,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69433-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69434-lists,kvm=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -109,190 +109,158 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[intel.com:+];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7FD8FA9EB9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: CF9E1A9ED1
 X-Rspamd-Action: no action
 
-Newer Intel server CPUs support a large number of PMU MSRs.  Currently,
-QEMU allocates cpu->kvm_msr_buf as a single-page buffer, which is not
-sufficient to hold all possible MSRs.
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-Increase MSR_BUF_SIZE to 8192 bytes, providing space for up to 511 MSRs.
-This is sufficient even for the theoretical worst case, such as
-architectural LBR with a depth of 64.
+DS-based PEBS introduces three MSRs: MSR_IA32_DS_AREA, MSR_PEBS_DATA_CFG,
+and MSR_IA32_PEBS_ENABLE. Save and restore these MSRs when legacy DS
+PEBS is enabled.
 
-KVM_[GET/SET]_MSRS is limited to 255 MSRs per call.  Raising this limit
-to 511 would require changes in KVM and would introduce backward
-compatibility issues.  Instead, split requests into multiple
-KVM_[GET/SET]_MSRS calls when the number of MSRs exceeds the API limit.
-
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Zide Chen <zide.chen@intel.com>
 ---
 V2:
 - No changes.
 
- target/i386/kvm/kvm.c | 109 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 92 insertions(+), 17 deletions(-)
+ target/i386/cpu.h     |  9 +++++++++
+ target/i386/kvm/kvm.c | 25 +++++++++++++++++++++++++
+ target/i386/machine.c | 27 ++++++++++++++++++++++++++-
+ 3 files changed, 60 insertions(+), 1 deletion(-)
 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 812d53e22c41..3e2222e105bc 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -422,6 +422,7 @@ typedef enum X86Seg {
+ #define MSR_IA32_PERF_CAPABILITIES      0x345
+ #define PERF_CAP_LBR_FMT                0x3f
+ #define PERF_CAP_FULL_WRITE             (1U << 13)
++#define PERF_CAP_PEBS_BASELINE          (1U << 14)
+ 
+ #define MSR_IA32_TSX_CTRL		0x122
+ #define MSR_IA32_TSCDEADLINE            0x6e0
+@@ -512,6 +513,11 @@ typedef enum X86Seg {
+ #define MSR_CORE_PERF_GLOBAL_CTRL       0x38f
+ #define MSR_CORE_PERF_GLOBAL_OVF_CTRL   0x390
+ 
++/* Legacy DS based PEBS MSRs */
++#define MSR_IA32_PEBS_ENABLE            0x3f1
++#define MSR_PEBS_DATA_CFG               0x3f2
++#define MSR_IA32_DS_AREA                0x600
++
+ #define MSR_MC0_CTL                     0x400
+ #define MSR_MC0_STATUS                  0x401
+ #define MSR_MC0_ADDR                    0x402
+@@ -2089,6 +2095,9 @@ typedef struct CPUArchState {
+     uint64_t msr_fixed_ctr_ctrl;
+     uint64_t msr_global_ctrl;
+     uint64_t msr_global_status;
++    uint64_t msr_ds_area;
++    uint64_t msr_pebs_data_cfg;
++    uint64_t msr_pebs_enable;
+     uint64_t msr_fixed_counters[MAX_FIXED_COUNTERS];
+     uint64_t msr_gp_counters[MAX_GP_COUNTERS];
+     uint64_t msr_gp_evtsel[MAX_GP_COUNTERS];
 diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 530f50e4b218..a2cf9b5df35d 100644
+index a2cf9b5df35d..a72e4d60dfa2 100644
 --- a/target/i386/kvm/kvm.c
 +++ b/target/i386/kvm/kvm.c
-@@ -98,9 +98,12 @@
- #define KVM_APIC_BUS_CYCLE_NS       1
- #define KVM_APIC_BUS_FREQUENCY      (1000000000ULL / KVM_APIC_BUS_CYCLE_NS)
+@@ -4143,6 +4143,15 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+             }
  
--/* A 4096-byte buffer can hold the 8-byte kvm_msrs header, plus
-- * 255 kvm_msr_entry structs */
--#define MSR_BUF_SIZE 4096
-+/* A 8192-byte buffer can hold the 8-byte kvm_msrs header, plus
-+ * 511 kvm_msr_entry structs */
-+#define MSR_BUF_SIZE      8192
++            if (env->features[FEAT_1_EDX] & CPUID_DTS) {
++                kvm_msr_entry_add(cpu, MSR_IA32_DS_AREA, env->msr_ds_area);
++            }
 +
-+/* Maximum number of MSRs in one single KVM_[GET/SET]_MSRS call. */
-+#define KVM_MAX_IO_MSRS   255
- 
- typedef bool QEMURDMSRHandler(X86CPU *cpu, uint32_t msr, uint64_t *val);
- typedef bool QEMUWRMSRHandler(X86CPU *cpu, uint32_t msr, uint64_t val);
-@@ -3878,23 +3881,102 @@ static void kvm_msr_entry_add_perf(X86CPU *cpu, FeatureWordArray f)
-     }
- }
- 
--static int kvm_buf_set_msrs(X86CPU *cpu)
-+static int __kvm_buf_set_msrs(X86CPU *cpu, struct kvm_msrs *msrs)
- {
--    int ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MSRS, cpu->kvm_msr_buf);
-+    int ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MSRS, msrs);
-     if (ret < 0) {
-         return ret;
-     }
- 
--    if (ret < cpu->kvm_msr_buf->nmsrs) {
--        struct kvm_msr_entry *e = &cpu->kvm_msr_buf->entries[ret];
-+    if (ret < msrs->nmsrs) {
-+        struct kvm_msr_entry *e = &msrs->entries[ret];
-         error_report("error: failed to set MSR 0x%" PRIx32 " to 0x%" PRIx64,
-                      (uint32_t)e->index, (uint64_t)e->data);
-     }
- 
--    assert(ret == cpu->kvm_msr_buf->nmsrs);
-+    assert(ret == msrs->nmsrs);
-+    return ret;
-+}
++            if (env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_PEBS_BASELINE) {
++                kvm_msr_entry_add(cpu, MSR_IA32_PEBS_ENABLE, env->msr_pebs_enable);
++                kvm_msr_entry_add(cpu, MSR_PEBS_DATA_CFG, env->msr_pebs_data_cfg);
++            }
 +
-+static int __kvm_buf_get_msrs(X86CPU *cpu, struct kvm_msrs *msrs)
-+{
-+    int ret;
-+
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, msrs);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (ret < msrs->nmsrs) {
-+        struct kvm_msr_entry *e = &msrs->entries[ret];
-+        error_report("error: failed to get MSR 0x%" PRIx32,
-+                     (uint32_t)e->index);
-+    }
-+
-+    assert(ret == msrs->nmsrs);
-+    return ret;
-+}
-+
-+static int kvm_buf_set_or_get_msrs(X86CPU *cpu, bool is_write)
-+{
-+    struct kvm_msr_entry *entries = cpu->kvm_msr_buf->entries;
-+    struct kvm_msrs *buf = NULL;
-+    int current, remaining, ret = 0;
-+    size_t buf_size;
-+
-+    buf_size = KVM_MAX_IO_MSRS * sizeof(struct kvm_msr_entry) +
-+               sizeof(struct kvm_msrs);
-+    buf = g_malloc(buf_size);
-+
-+    remaining = cpu->kvm_msr_buf->nmsrs;
-+    current = 0;
-+    while (remaining) {
-+        size_t size;
-+
-+        memset(buf, 0, buf_size);
-+
-+        if (remaining > KVM_MAX_IO_MSRS) {
-+            buf->nmsrs = KVM_MAX_IO_MSRS;
-+        } else {
-+            buf->nmsrs = remaining;
-+        }
-+
-+        size = buf->nmsrs * sizeof(entries[0]);
-+        memcpy(buf->entries, &entries[current], size);
-+
-+        if (is_write) {
-+            ret = __kvm_buf_set_msrs(cpu, buf);
-+        } else {
-+            ret = __kvm_buf_get_msrs(cpu, buf);
-+        }
-+
-+        if (ret < 0) {
-+            goto out;
-+        }
-+
-+        if (!is_write)
-+            memcpy(&entries[current], buf->entries, size);
-+
-+        current += buf->nmsrs;
-+        remaining -= buf->nmsrs;
-+    }
-+
-+out:
-+    g_free(buf);
-+    return ret < 0 ? ret : cpu->kvm_msr_buf->nmsrs;
-+}
-+
-+static int kvm_buf_set_msrs(X86CPU *cpu)
-+{
-+    kvm_buf_set_or_get_msrs(cpu, true);
-     return 0;
- }
- 
-+static int kvm_buf_get_msrs(X86CPU *cpu)
-+{
-+    return kvm_buf_set_or_get_msrs(cpu, false);
-+}
-+
- static void kvm_init_msrs(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
-@@ -3928,7 +4010,7 @@ static void kvm_init_msrs(X86CPU *cpu)
-     if (has_msr_ucode_rev) {
-         kvm_msr_entry_add(cpu, MSR_IA32_UCODE_REV, cpu->ucode_rev);
-     }
--    assert(kvm_buf_set_msrs(cpu) == 0);
-+    kvm_buf_set_msrs(cpu);
- }
- 
- static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-@@ -4746,18 +4828,11 @@ static int kvm_get_msrs(X86CPU *cpu)
+             /* Set the counter values.  */
+             for (i = 0; i < num_architectural_pmu_fixed_counters; i++) {
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
+@@ -4688,6 +4697,13 @@ static int kvm_get_msrs(X86CPU *cpu)
+             kvm_msr_entry_add(cpu, perf_cntr_base + i, 0);
+             kvm_msr_entry_add(cpu, MSR_P6_EVNTSEL0 + i, 0);
          }
++        if (env->features[FEAT_1_EDX] & CPUID_DTS) {
++            kvm_msr_entry_add(cpu, MSR_IA32_DS_AREA, 0);
++        }
++        if (env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_PEBS_BASELINE) {
++            kvm_msr_entry_add(cpu, MSR_IA32_PEBS_ENABLE, 0);
++            kvm_msr_entry_add(cpu, MSR_PEBS_DATA_CFG, 0);
++        }
      }
  
--    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-+    ret = kvm_buf_get_msrs(cpu);
-     if (ret < 0) {
-         return ret;
+     if (env->mcg_cap) {
+@@ -5013,6 +5029,15 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL0 + MAX_GP_COUNTERS - 1:
+             env->msr_gp_evtsel[index - MSR_P6_EVNTSEL0] = msrs[i].data;
+             break;
++        case MSR_IA32_DS_AREA:
++            env->msr_ds_area = msrs[i].data;
++            break;
++        case MSR_PEBS_DATA_CFG:
++            env->msr_pebs_data_cfg = msrs[i].data;
++            break;
++        case MSR_IA32_PEBS_ENABLE:
++            env->msr_pebs_enable = msrs[i].data;
++            break;
+         case HV_X64_MSR_HYPERCALL:
+             env->msr_hv_hypercall = msrs[i].data;
+             break;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 7d08a05835fc..7f45db1247b1 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -659,6 +659,27 @@ static const VMStateDescription vmstate_msr_ia32_feature_control = {
      }
+ };
  
--    if (ret < cpu->kvm_msr_buf->nmsrs) {
--        struct kvm_msr_entry *e = &cpu->kvm_msr_buf->entries[ret];
--        error_report("error: failed to get MSR 0x%" PRIx32,
--                     (uint32_t)e->index);
++static bool ds_pebs_enabled(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return (env->msr_ds_area || env->msr_pebs_enable ||
++            env->msr_pebs_data_cfg);
++}
++
++static const VMStateDescription vmstate_msr_ds_pebs = {
++    .name = "cpu/msr_ds_pebs",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = ds_pebs_enabled,
++    .fields = (const VMStateField[]){
++        VMSTATE_UINT64(env.msr_ds_area, X86CPU),
++        VMSTATE_UINT64(env.msr_pebs_data_cfg, X86CPU),
++        VMSTATE_UINT64(env.msr_pebs_enable, X86CPU),
++        VMSTATE_END_OF_LIST()}
++};
++
+ static bool pmu_enable_needed(void *opaque)
+ {
+     X86CPU *cpu = opaque;
+@@ -697,7 +718,11 @@ static const VMStateDescription vmstate_msr_architectural_pmu = {
+         VMSTATE_UINT64_ARRAY(env.msr_gp_counters, X86CPU, MAX_GP_COUNTERS),
+         VMSTATE_UINT64_ARRAY(env.msr_gp_evtsel, X86CPU, MAX_GP_COUNTERS),
+         VMSTATE_END_OF_LIST()
 -    }
--
--    assert(ret == cpu->kvm_msr_buf->nmsrs);
-     /*
-      * MTRR masks: Each mask consists of 5 parts
-      * a  10..0: must be zero
++    },
++    .subsections = (const VMStateDescription * const []) {
++        &vmstate_msr_ds_pebs,
++        NULL,
++    },
+ };
+ 
+ static bool mpx_needed(void *opaque)
 -- 
 2.52.0
 
