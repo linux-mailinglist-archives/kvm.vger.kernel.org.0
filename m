@@ -1,395 +1,317 @@
-Return-Path: <kvm+bounces-69332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69333-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aMT0Lsm0eWk0ygEAu9opvQ
-	(envelope-from <kvm+bounces-69332-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 08:03:37 +0100
+	id 2EDXChG9eWnoygEAu9opvQ
+	(envelope-from <kvm+bounces-69333-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 08:38:57 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 479DA9D91B
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 08:03:37 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C79D9DCDF
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 08:38:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EA53A30071E9
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 07:03:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 506F93008449
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 07:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3AA3271E0;
-	Wed, 28 Jan 2026 07:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F47E2FFDFA;
+	Wed, 28 Jan 2026 07:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BeOb9bek";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YOEM4+gn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXPqWOiV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F36246BC6
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 07:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769583814; cv=pass; b=TFhU54nZjyoK18dtbyXjeq2LjAuqeXlMJJpJ/oPFf9YhitxN3IBJH9kZTWjPqJ0+JA1c6oPtJVXEYFTYkcLcRU25D7OvnxjgnAnoxchi+I/kNoAPjJHdsn8Wu2yCtepybo69kctIX1lr1YTr+w8ThkatALIubd8qXvHLANSbhxQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769583814; c=relaxed/simple;
-	bh=Cg45hZ0q54h2bhG/P3fSulN0EvcFY+v0s3Ih49jJOI8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525FE2E9759
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 07:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769585919; cv=none; b=Rw4uIF3kwXpWw8KWsYJW4faurMZawxZ4hDJec2urJzwPzQHjvo6uITFVpTlsf/hFgyYKOqM3Y0y03qukeR4WiW2INzluD+Ux0bHXet+5s6Z4OZVro7F0EER1zEE6Nmtof1IjNhK6ydzbV151UD9uLjsK1yj9sFgAc3hf6/51seo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769585919; c=relaxed/simple;
+	bh=Mzp9wMskEJoYx+SCw1f62NEMWhMKWaBnd1C+k1e26gg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ivic6oStgvormg45a7u1k0n3tMMV/mKxsoGB4fRALIa2i5rrlEAfkqclsGo8dzYjV1LNSPGESKttLJId3nPF60jNymx6Jl6pSnFTHeoDBwiS9N6Fhr2RMvZXNTb+oW+XU0b1uIagyQaEbYkzppIgD7WyMfphBp046MnuDymJLYQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BeOb9bek; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YOEM4+gn; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769583812;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xuKStyX4gBGrd4NIad9hOrKnHqdXGE6jzr0Ewri1egY=;
-	b=BeOb9bekh3Cemze6ouJA9pQGfrBwm18cZSccw9bPJSJtxi8UsGg2++WXXvfXatxKz75/Cn
-	7FBimmBIbXTEjQTkqAdinu+s541T7bRCzHMIwo/nh3qQumhOG8WJ9pZFFb3dAXi9KnKGNw
-	C9dRyZ/QlLE2+scvfL4y2ij7sKO3qE4=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-ZtdU5vHuOQCnecjXbLwFLg-1; Wed, 28 Jan 2026 02:03:30 -0500
-X-MC-Unique: ZtdU5vHuOQCnecjXbLwFLg-1
-X-Mimecast-MFC-AGG-ID: ZtdU5vHuOQCnecjXbLwFLg_1769583809
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c61334ba4d3so3402504a12.0
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 23:03:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769583807; cv=none;
-        d=google.com; s=arc-20240605;
-        b=SYXDKmiHd8uBbf2UDCIRDqXqsTRfnwtVBAUs4/y6vt9tdk405YBLvEiXfBC1Ty6Z9X
-         f79zUXXcu31ftdVciBQ/zJaP8h63hizTYc0QwYg/8SGaM/s/oFFRF/XgcxLncGWbixph
-         qc6OmXEofzEdRE0AvhTfLoeZK5qd6F48ClbDqoQmq0J/Tr7RTxlxviQXH5R0kyDzjO2N
-         X3BgruMvm0qhe5SKgnfJwZVgV50ec6xQo/bnginQ9smwZL2rGe0FkWzznxzz/5/CwI1Q
-         SXqTszqbG6YhfpiXq0tVAdHnG3QuDesa45W2Mc1JnT/b1gPNWA3RhXa+NAZjoephH87c
-         uGsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=xuKStyX4gBGrd4NIad9hOrKnHqdXGE6jzr0Ewri1egY=;
-        fh=0QzeH0iZIMoE4w0V7bajeKZIsd+EsOXWx9+iK+TmHQU=;
-        b=PvnOGZT2YMF6dnta71PV1GqSamZLantvikk2eDMiJXsi+13DVvH53UyI8KxA/1Hzfh
-         oebzbJ9oUJxt+NlViioXaBSJ/h3iJANuItXXWo4xOZs/66Hq6EMysomGDv4KSU3rI8YU
-         sWLL25B7hrXoHuU9dUbGEbDaYuk0MqSicSDsKfKrkMUZf6ApHMQw9VBMdaYa9cSQobCr
-         8HmFFSFt7957Yxp3xKaiuXfctnrdFpKX80NnAkvuRlv1wkLw0gl/zMtDlsZ/buS7NnrL
-         i0MBaqFWLPefL1TLEF6qcmtZeaP9YiEriVgHSW4oAa9FBGDa2wKNVmWeHmiyekBpPaSt
-         fgcg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769583807; x=1770188607; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xuKStyX4gBGrd4NIad9hOrKnHqdXGE6jzr0Ewri1egY=;
-        b=YOEM4+gnJZUk30LUPLwLrlFKtK+Y6MLBmsx6mHfzbvg9tCn2h3cdA3OSsB83ftVhDo
-         W7REoM6jGoVG2qv67oUorc6F+RQSCC4C+bXv3dpuQp/UAuUh2K7EekJ9Y0soUYZ4dvUW
-         q+rwUOL8PuOBcHe+oueDgExV93EEg+uoRrC6f8w1BqztuVyrsz/hrtZx2dP393PDL0pP
-         w9jQqWuTWlxovUmMKkDUIkYZ9Nbla33KFVca6fHxbM55mPWqQ5BrVqJw02SPd4reKGgV
-         RQhtn1jTqcSSh0OxbmEWZUOqVGYLv2UJEgnxw7nZeDlOH/oOoZHlD+ekbbTTO4qKFM3k
-         ad1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769583807; x=1770188607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xuKStyX4gBGrd4NIad9hOrKnHqdXGE6jzr0Ewri1egY=;
-        b=W5pvVKKbHE8YBb0PCT6iNUWjb1IIqyDMriEV4OYhXztDn1iqQS3fG6gO5gT8oPale2
-         fuhxkMV27gjPwr54JdQJCbHvUgbUkhTusZb8FHN1G8qQMCrsl2biEUf5L5wCyeAkF34v
-         eDuSDyk5tb+tnAHjwPuLJgzRKN5RIv9BS+kDxPP6kmmvwNPB/JyeWFmGp1B5qMHTb5d0
-         ERWWyxCug09Cbx8liE+CottA4HQHEX5D0TXGXSnnHH9VFvyv6ZPvoZRlwNNO+RpZTEGb
-         M0xRY8dStDrnZ6rNnlq4rpaB97XkQ/VKrOIpjLt0j30MtbVLWN2cQFMGRVAYnEFnIInF
-         pt8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVge7urq1AkqdbKliqz/yYpma3YnrYr+LRa2e5NLWiyGZgtf/k2dCX4JwJg1zFewK3nq1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywynbcxq0ipiNB+498b+hPCT2c1LM722Ew6r0loeiArR/q1IbiT
-	6VFXhdPqQ3Pv5YtlJUmzs2v646p1+P+gMxKG3C5C0GQwvm0jSl/Z/+xIUeaTlLR5HD7z6AUZDX+
-	XsVKVKOVOrJekbwhasZ9BDF2JKyv8+0cI0EIJIwGMfzGc5gEehbAkPhuZ2a4BAjELI6KTJkqrjt
-	epkUpNmNu0hYPtfFUX5S85/jOo4Kmb
-X-Gm-Gg: AZuq6aJP0i2UsRiHlwwtgVJh5TpH6KOvoyySsJV87/ZaeG+YJf+J4oKPFA8n0p39rkQ
-	Smfgd64avumLDPG7ac+V3w0oIInIcPWZtpZe9D/OysPua0ypDRo8tgvRzCVHK4mPCjRlxGrtGce
-	+xhzu7Z/1yHYz0Wtpc9WLHFW50Enro1oZqC07LK1EZluL5c9qU/7RJbO3wt3cnTXbD
-X-Received: by 2002:a05:6a21:3388:b0:38d:ee4a:e833 with SMTP id adf61e73a8af0-38ec6549c19mr3702321637.62.1769583806881;
-        Tue, 27 Jan 2026 23:03:26 -0800 (PST)
-X-Received: by 2002:a05:6a21:3388:b0:38d:ee4a:e833 with SMTP id
- adf61e73a8af0-38ec6549c19mr3702286637.62.1769583806348; Tue, 27 Jan 2026
- 23:03:26 -0800 (PST)
+	 To:Cc:Content-Type; b=pLqYbIebl6TaaxO1G96FZIq5wmRXghJ5rXnGm425n2RFInWtJaDM6nSkWTbi3hZ/m8Del7lnfPASU4ywpcr/PVpwRq5RXsLsoC7kiZSeLBj8rMeV8uS3JaWj7AZVq8bZgQYlRjfBBcFVxIKwbOBubIjO3BuGN8G4WVQ4+3QvJ5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXPqWOiV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 368A4C16AAE
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 07:38:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769585919;
+	bh=Mzp9wMskEJoYx+SCw1f62NEMWhMKWaBnd1C+k1e26gg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GXPqWOiVRU25Bg9mnHI7uVSFxNBa/HtSnFROzhl0unyL8mwoAsVfL1IbWdNOcib7x
+	 31j7sLXr9efkdZ4Smd5LsK+Wp1df9pAdm6pc6I8YZ5YYS85ltuNlQXvTOIlgC78gEi
+	 rKD8Gzj04G0tMZtHHcuZFMtyVzER9li/5rPT9gf1rCKbedFzeVR8US3gjzsRXMXyNn
+	 bd2ABDBoyYOf+6GqHGQPKjKIujwVvPYPH32MTUT78ghWKIwlMymF/LQEGy0qP5tAjL
+	 d1sEjXZk9fED3A5pNrp2MvDHJyoj3NJQ8cceHs8qoiDnu03sjchH0rO6ujoq7aRYXL
+	 4PTw92C7KNkfA==
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b8838339fc6so131224966b.0
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 23:38:39 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXQThLOMiLXUFcQO6Xs/c4vK4r8uQsDIKuVrhvugcGimLME8ReWBTLjb8yfRiox49yGnQQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGVsLUy5Qycdzn+XCP2RI1AA1KswT9My6gvb8eFNH07aNxD8ns
+	ZV4qo2w7575F33EIQGQt67Gq1iAjjPeiZoYNKtI2Gz8OYH5cZHN8RymoYvc8P9Q+BUQ20b4180m
+	9AQtx9jGEWroiQQuXuW78M3n54yBhZ4g=
+X-Received: by 2002:a17:907:3f8c:b0:b88:4f25:81da with SMTP id
+ a640c23a62f3a-b8dac636e70mr368718566b.0.1769585917717; Tue, 27 Jan 2026
+ 23:38:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-4-simon.schippers@tu-dortmund.de> <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
- <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de> <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
- <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de> <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de> <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
-In-Reply-To: <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 28 Jan 2026 15:03:11 +0800
-X-Gm-Features: AZwV_QhDC_bWR-juret8NZb1IfXLfm23zEjia-LWh6nai9zCNajkiH0ao9SG7CE
-Message-ID: <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mst@redhat.com, eperezma@redhat.com, leiyang@redhat.com, 
-	stephen@networkplumber.org, jon@nutanix.com, tim.gebauer@tu-dortmund.de, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
+References: <20260127125124.3234252-1-maobibo@loongson.cn> <20260127125124.3234252-4-maobibo@loongson.cn>
+ <CAAhV-H69F2T-PbewFqch5Sp+xhBP9Lsy74C6yVhp90r4GSYEsQ@mail.gmail.com> <67db8a93-eb62-7278-ae3f-a46a62365b20@loongson.cn>
+In-Reply-To: <67db8a93-eb62-7278-ae3f-a46a62365b20@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Wed, 28 Jan 2026 15:38:26 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5T6kHyYigy3P92Az1mum_vKf8Kd3e-hNGT5k_VZ+pF_Q@mail.gmail.com>
+X-Gm-Features: AZwV_QgVLaf7Ini1fLCztktYs0KCBuhslxP7X0Vu-NPNGyhsCI4qpN0GfPcNLTQ
+Message-ID: <CAAhV-H5T6kHyYigy3P92Az1mum_vKf8Kd3e-hNGT5k_VZ+pF_Q@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] LoongArch: KVM: Add FPU delay load support
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: WANG Xuerui <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69332-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-69333-lists,kvm=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jasowang@redhat.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm,netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 479DA9D91B
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4C79D9DCDF
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 12:48=E2=80=AFAM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
+On Wed, Jan 28, 2026 at 2:35=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
+e:
 >
-> On 1/23/26 10:54, Simon Schippers wrote:
-> > On 1/23/26 04:05, Jason Wang wrote:
-> >> On Thu, Jan 22, 2026 at 1:35=E2=80=AFPM Jason Wang <jasowang@redhat.co=
-m> wrote:
-> >>>
-> >>> On Wed, Jan 21, 2026 at 5:33=E2=80=AFPM Simon Schippers
-> >>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>
-> >>>> On 1/9/26 07:02, Jason Wang wrote:
-> >>>>> On Thu, Jan 8, 2026 at 3:41=E2=80=AFPM Simon Schippers
-> >>>>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>>>
-> >>>>>> On 1/8/26 04:38, Jason Wang wrote:
-> >>>>>>> On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
-> >>>>>>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>>>>>
-> >>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_=
-consume()
-> >>>>>>>> and wake the corresponding netdev subqueue when consuming an ent=
-ry frees
-> >>>>>>>> space in the underlying ptr_ring.
-> >>>>>>>>
-> >>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be i=
-ntroduced
-> >>>>>>>> in an upcoming commit.
-> >>>>>>>>
-> >>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> >>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> >>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> >>>>>>>> ---
-> >>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
-> >>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
-> >>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
-> >>>>>>>>
-> >>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> >>>>>>>> index 1197f245e873..2442cf7ac385 100644
-> >>>>>>>> --- a/drivers/net/tap.c
-> >>>>>>>> +++ b/drivers/net/tap.c
-> >>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queu=
-e *q,
-> >>>>>>>>         return ret ? ret : total;
-> >>>>>>>>  }
-> >>>>>>>>
-> >>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
-> >>>>>>>> +{
-> >>>>>>>> +       struct ptr_ring *ring =3D &q->ring;
-> >>>>>>>> +       struct net_device *dev;
-> >>>>>>>> +       void *ptr;
-> >>>>>>>> +
-> >>>>>>>> +       spin_lock(&ring->consumer_lock);
-> >>>>>>>> +
-> >>>>>>>> +       ptr =3D __ptr_ring_consume(ring);
-> >>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(rin=
-g, 1))) {
-> >>>>>>>> +               rcu_read_lock();
-> >>>>>>>> +               dev =3D rcu_dereference(q->tap)->dev;
-> >>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
-> >>>>>>>> +               rcu_read_unlock();
-> >>>>>>>> +       }
-> >>>>>>>> +
-> >>>>>>>> +       spin_unlock(&ring->consumer_lock);
-> >>>>>>>> +
-> >>>>>>>> +       return ptr;
-> >>>>>>>> +}
-> >>>>>>>> +
-> >>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
-> >>>>>>>>                            struct iov_iter *to,
-> >>>>>>>>                            int noblock, struct sk_buff *skb)
-> >>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue =
-*q,
-> >>>>>>>>                                         TASK_INTERRUPTIBLE);
-> >>>>>>>>
-> >>>>>>>>                 /* Read frames from the queue */
-> >>>>>>>> -               skb =3D ptr_ring_consume(&q->ring);
-> >>>>>>>> +               skb =3D tap_ring_consume(q);
-> >>>>>>>>                 if (skb)
-> >>>>>>>>                         break;
-> >>>>>>>>                 if (noblock) {
-> >>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> >>>>>>>> index 8192740357a0..7148f9a844a4 100644
-> >>>>>>>> --- a/drivers/net/tun.c
-> >>>>>>>> +++ b/drivers/net/tun.c
-> >>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_s=
-truct *tun,
-> >>>>>>>>         return total;
-> >>>>>>>>  }
-> >>>>>>>>
-> >>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
-> >>>>>>>> +{
-> >>>>>>>> +       struct ptr_ring *ring =3D &tfile->tx_ring;
-> >>>>>>>> +       struct net_device *dev;
-> >>>>>>>> +       void *ptr;
-> >>>>>>>> +
-> >>>>>>>> +       spin_lock(&ring->consumer_lock);
-> >>>>>>>> +
-> >>>>>>>> +       ptr =3D __ptr_ring_consume(ring);
-> >>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(rin=
-g, 1))) {
-> >>>>>>>
-> >>>>>>> I guess it's the "bug" I mentioned in the previous patch that lea=
-ds to
-> >>>>>>> the check of __ptr_ring_consume_created_space() here. If it's tru=
-e,
-> >>>>>>> another call to tweak the current API.
-> >>>>>>>
-> >>>>>>>> +               rcu_read_lock();
-> >>>>>>>> +               dev =3D rcu_dereference(tfile->tun)->dev;
-> >>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
-> >>>>>>>
-> >>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu w=
-hich
-> >>>>>>> I'm not sure is what we want.
-> >>>>>>
-> >>>>>> What else would you suggest calling to wake the queue?
-> >>>>>
-> >>>>> I don't have a good method in my mind, just want to point out its i=
-mplications.
-> >>>>
-> >>>> I have to admit I'm a bit stuck at this point, particularly with thi=
-s
-> >>>> aspect.
-> >>>>
-> >>>> What is the correct way to pass the producer CPU ID to the consumer?
-> >>>> Would it make sense to store smp_processor_id() in the tfile inside
-> >>>> tun_net_xmit(), or should it instead be stored in the skb (similar t=
-o the
-> >>>> XDP bit)? In the latter case, my concern is that this information ma=
-y
-> >>>> already be significantly outdated by the time it is used.
-> >>>>
-> >>>> Based on that, my idea would be for the consumer to wake the produce=
-r by
-> >>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU=
- via
-> >>>> smp_call_function_single().
-> >>>> Is this a reasonable approach?
-> >>>
-> >>> I'm not sure but it would introduce costs like IPI.
-> >>>
-> >>>>
-> >>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
-> >>>> considered a deal-breaker for the patch set?
-> >>>
-> >>> It depends on whether or not it has effects on the performance.
-> >>> Especially when vhost is pinned.
+>
+>
+> On 2026/1/28 =E4=B8=8B=E5=8D=8812:05, Huacai Chen wrote:
+> > Hi, Bibo,
+> >
+> > On Tue, Jan 27, 2026 at 8:51=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> =
+wrote:
 > >>
-> >> I meant we can benchmark to see the impact. For example, pin vhost to
-> >> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
+> >> FPU is lazy enabled with KVM hypervisor. After FPU is enabled and
+> >> loaded, vCPU can be preempted and FPU will be lost again. Here FPU
+> >> is delay load until guest enter entry.
 > >>
-> >> Thanks
+> >> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> >> ---
+> >>   arch/loongarch/include/asm/kvm_host.h |  2 ++
+> >>   arch/loongarch/kvm/exit.c             | 15 ++++++++----
+> >>   arch/loongarch/kvm/vcpu.c             | 33 +++++++++++++++++--------=
+--
+> >>   3 files changed, 33 insertions(+), 17 deletions(-)
 > >>
-> >
-> > I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
-> > for both the stock and patched versions. The benchmarks were run with
-> > the full patch series applied, since testing only patches 1-3 would not
-> > be meaningful - the queue is never stopped in that case, so no
-> > TX_SOFTIRQ is triggered.
-> >
-> > Compared to the non-pinned CPU benchmarks in the cover letter,
-> > performance is lower for pktgen with a single thread but higher with
-> > four threads. The results show no regression for the patched version,
-> > with even slight performance improvements observed:
-> >
-> > +-------------------------+-----------+----------------+
-> > | pktgen benchmarks to    | Stock     | Patched with   |
-> > | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
-> > | 100M packets            |           |                |
-> > | vhost pinned to core 0  |           |                |
-> > +-----------+-------------+-----------+----------------+
-> > | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
-> > |  +        +-------------+-----------+----------------+
-> > | vhost-net | Lost        | 1154 Kpps | 0              |
-> > +-----------+-------------+-----------+----------------+
-> >
-> > +-------------------------+-----------+----------------+
-> > | pktgen benchmarks to    | Stock     | Patched with   |
-> > | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
-> > | 100M packets            |           |                |
-> > | vhost pinned to core 0  |           |                |
-> > | *4 threads*             |           |                |
-> > +-----------+-------------+-----------+----------------+
-> > | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
-> > |  +        +-------------+-----------+----------------+
-> > | vhost-net | Lost        | 1527 Kpps | 0              |
-> > +-----------+-------------+-----------+----------------+
-
-The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
-the guest or an xdp program that did XDP_DROP in the guest.
-
-> >
-> > +------------------------+-------------+----------------+
-> > | iperf3 TCP benchmarks  | Stock       | Patched with   |
-> > | to Debian VM 120s      |             | fq_codel qdisc |
-> > | vhost pinned to core 0 |             |                |
-> > +------------------------+-------------+----------------+
-> > | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
-> > |  +                     |             |                |
-> > | vhost-net              |             |                |
-> > +------------------------+-------------+----------------+
-> >
-> > +---------------------------+-------------+----------------+
-> > | iperf3 TCP benchmarks     | Stock       | Patched with   |
-> > | to Debian VM 120s         |             | fq_codel qdisc |
-> > | vhost pinned to core 0    |             |                |
-> > | *4 iperf3 client threads* |             |                |
-> > +---------------------------+-------------+----------------+
-> > | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
-> > |  +                        |             |                |
-> > | vhost-net                 |             |                |
-> > +---------------------------+-------------+----------------+
+> >> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/in=
+clude/asm/kvm_host.h
+> >> index e4fe5b8e8149..902ff7bc0e35 100644
+> >> --- a/arch/loongarch/include/asm/kvm_host.h
+> >> +++ b/arch/loongarch/include/asm/kvm_host.h
+> >> @@ -37,6 +37,7 @@
+> >>   #define KVM_REQ_TLB_FLUSH_GPA          KVM_ARCH_REQ(0)
+> >>   #define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(1)
+> >>   #define KVM_REQ_PMU                    KVM_ARCH_REQ(2)
+> >> +#define KVM_REQ_FPU_LOAD               KVM_ARCH_REQ(3)
+> >>
+> >>   #define KVM_GUESTDBG_SW_BP_MASK                \
+> >>          (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
+> >> @@ -234,6 +235,7 @@ struct kvm_vcpu_arch {
+> >>          u64 vpid;
+> >>          gpa_t flush_gpa;
+> >>
+> >> +       int fpu_load_type;
+> > I think the logic of V1 is better, it doesn't increase the size of
+> > kvm_vcpu_arch, and the constant checking is a little faster than
+> > variable checking.
+> The main reason is that FPU_LOAD request is not so frequent, there is
+> atomic instruction in kvm_check_request() and the unconditional
+> kvm_check_request() may be unnecessary, also there will LBT LOAD check
+> in later version.
 >
-> What are your thoughts on this?
+> So I think one unconditional atomic test_and_clear may be better than
+> three/four atomic test_and_clear.
+>      kvm_check_request(KVM_REQ_FPU_LOAD,vcpu)
+>      kvm_check_request(KVM_REQ_FPU_LSX, vcpu)
+>      kvm_check_request(KVM_REQ_FPU_LASX, vcpu)
 >
-> Thanks!
->
->
+> Actually different people have different view about this :)
+Depends on how complex kvm_check_request() is. If it is very complex,
+checking once and following a switch-case is better.
 
-Thanks
+Huacai
 
+>
+> Regards
+> Bibo Mao
+> >
+> > Huacai
+> >
+> >>          /* Frequency of stable timer in Hz */
+> >>          u64 timer_mhz;
+> >>          ktime_t expire;
+> >> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> >> index 74b427287e96..b6f08df8fedb 100644
+> >> --- a/arch/loongarch/kvm/exit.c
+> >> +++ b/arch/loongarch/kvm/exit.c
+> >> @@ -754,7 +754,8 @@ static int kvm_handle_fpu_disabled(struct kvm_vcpu=
+ *vcpu, int ecode)
+> >>                  return RESUME_HOST;
+> >>          }
+> >>
+> >> -       kvm_own_fpu(vcpu);
+> >> +       vcpu->arch.fpu_load_type =3D KVM_LARCH_FPU;
+> >> +       kvm_make_request(KVM_REQ_FPU_LOAD, vcpu);
+> >>
+> >>          return RESUME_GUEST;
+> >>   }
+> >> @@ -794,8 +795,10 @@ static int kvm_handle_lsx_disabled(struct kvm_vcp=
+u *vcpu, int ecode)
+> >>   {
+> >>          if (!kvm_guest_has_lsx(&vcpu->arch))
+> >>                  kvm_queue_exception(vcpu, EXCCODE_INE, 0);
+> >> -       else
+> >> -               kvm_own_lsx(vcpu);
+> >> +       else {
+> >> +               vcpu->arch.fpu_load_type =3D KVM_LARCH_LSX;
+> >> +               kvm_make_request(KVM_REQ_FPU_LOAD, vcpu);
+> >> +       }
+> >>
+> >>          return RESUME_GUEST;
+> >>   }
+> >> @@ -812,8 +815,10 @@ static int kvm_handle_lasx_disabled(struct kvm_vc=
+pu *vcpu, int ecode)
+> >>   {
+> >>          if (!kvm_guest_has_lasx(&vcpu->arch))
+> >>                  kvm_queue_exception(vcpu, EXCCODE_INE, 0);
+> >> -       else
+> >> -               kvm_own_lasx(vcpu);
+> >> +       else {
+> >> +               vcpu->arch.fpu_load_type =3D KVM_LARCH_LASX;
+> >> +               kvm_make_request(KVM_REQ_FPU_LOAD, vcpu);
+> >> +       }
+> >>
+> >>          return RESUME_GUEST;
+> >>   }
+> >> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> >> index d91a1160a309..3e749e9738b2 100644
+> >> --- a/arch/loongarch/kvm/vcpu.c
+> >> +++ b/arch/loongarch/kvm/vcpu.c
+> >> @@ -232,6 +232,27 @@ static void kvm_late_check_requests(struct kvm_vc=
+pu *vcpu)
+> >>                          kvm_flush_tlb_gpa(vcpu, vcpu->arch.flush_gpa)=
+;
+> >>                          vcpu->arch.flush_gpa =3D INVALID_GPA;
+> >>                  }
+> >> +
+> >> +       if (kvm_check_request(KVM_REQ_FPU_LOAD, vcpu)) {
+> >> +               switch (vcpu->arch.fpu_load_type) {
+> >> +               case KVM_LARCH_FPU:
+> >> +                       kvm_own_fpu(vcpu);
+> >> +                       break;
+> >> +
+> >> +               case KVM_LARCH_LSX:
+> >> +                       kvm_own_lsx(vcpu);
+> >> +                       break;
+> >> +
+> >> +               case KVM_LARCH_LASX:
+> >> +                       kvm_own_lasx(vcpu);
+> >> +                       break;
+> >> +
+> >> +               default:
+> >> +                       break;
+> >> +               }
+> >> +
+> >> +               vcpu->arch.fpu_load_type =3D 0;
+> >> +       }
+> >>   }
+> >>
+> >>   /*
+> >> @@ -1338,8 +1359,6 @@ static inline void kvm_check_fcsr_alive(struct k=
+vm_vcpu *vcpu) { }
+> >>   /* Enable FPU and restore context */
+> >>   void kvm_own_fpu(struct kvm_vcpu *vcpu)
+> >>   {
+> >> -       preempt_disable();
+> >> -
+> >>          /*
+> >>           * Enable FPU for guest
+> >>           * Set FR and FRE according to guest context
+> >> @@ -1350,16 +1369,12 @@ void kvm_own_fpu(struct kvm_vcpu *vcpu)
+> >>          kvm_restore_fpu(&vcpu->arch.fpu);
+> >>          vcpu->arch.aux_inuse |=3D KVM_LARCH_FPU;
+> >>          trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_FPU)=
+;
+> >> -
+> >> -       preempt_enable();
+> >>   }
+> >>
+> >>   #ifdef CONFIG_CPU_HAS_LSX
+> >>   /* Enable LSX and restore context */
+> >>   int kvm_own_lsx(struct kvm_vcpu *vcpu)
+> >>   {
+> >> -       preempt_disable();
+> >> -
+> >>          /* Enable LSX for guest */
+> >>          kvm_check_fcsr(vcpu, vcpu->arch.fpu.fcsr);
+> >>          set_csr_euen(CSR_EUEN_LSXEN | CSR_EUEN_FPEN);
+> >> @@ -1381,8 +1396,6 @@ int kvm_own_lsx(struct kvm_vcpu *vcpu)
+> >>
+> >>          trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LSX)=
+;
+> >>          vcpu->arch.aux_inuse |=3D KVM_LARCH_LSX | KVM_LARCH_FPU;
+> >> -       preempt_enable();
+> >> -
+> >>          return 0;
+> >>   }
+> >>   #endif
+> >> @@ -1391,8 +1404,6 @@ int kvm_own_lsx(struct kvm_vcpu *vcpu)
+> >>   /* Enable LASX and restore context */
+> >>   int kvm_own_lasx(struct kvm_vcpu *vcpu)
+> >>   {
+> >> -       preempt_disable();
+> >> -
+> >>          kvm_check_fcsr(vcpu, vcpu->arch.fpu.fcsr);
+> >>          set_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN=
+);
+> >>          switch (vcpu->arch.aux_inuse & (KVM_LARCH_FPU | KVM_LARCH_LSX=
+)) {
+> >> @@ -1414,8 +1425,6 @@ int kvm_own_lasx(struct kvm_vcpu *vcpu)
+> >>
+> >>          trace_kvm_aux(vcpu, KVM_TRACE_AUX_RESTORE, KVM_TRACE_AUX_LASX=
+);
+> >>          vcpu->arch.aux_inuse |=3D KVM_LARCH_LASX | KVM_LARCH_LSX | KV=
+M_LARCH_FPU;
+> >> -       preempt_enable();
+> >> -
+> >>          return 0;
+> >>   }
+> >>   #endif
+> >> --
+> >> 2.39.3
+> >>
+> >>
+>
 
