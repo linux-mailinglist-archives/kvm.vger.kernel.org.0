@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-69307-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69308-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oPx7GdFpeWmPwwEAu9opvQ
-	(envelope-from <kvm+bounces-69307-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:45 +0100
+	id CL3rA9ppeWmPwwEAu9opvQ
+	(envelope-from <kvm+bounces-69308-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264B09BFFE
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 509AF9C006
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 468F4302C652
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:43:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8E8E8300BE9B
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EA926560A;
-	Wed, 28 Jan 2026 01:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A4026E16C;
+	Wed, 28 Jan 2026 01:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jg+/PQQs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4TVi2q01"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7704258CE7
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 01:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91175262FF8
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 01:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769564596; cv=none; b=ncoPHUV7j/1uoaqYw3lmdeR0NS4wIR5C6xpEJU/nxs5cn++K1gpcomb8qGIaPiIRufLbWvtxQlT5zbvWtgiBk4TBDKqESSPuE3rfq65tEK98QPX2rDpwzcZXs+hM1w4Oz6D0fek7EVragWrEBUmLejKms511JhQebP/SaLoWBWw=
+	t=1769564597; cv=none; b=V1/fygVsh5Cdumu69TChDXwHj2A6meUw4DwbqxuJjaSvOVxG78OefxEepz5F4C8jqtkPQ/3cvUPS0KAQtqRvAxLldGmemCAO94zFsb45a3LQroNYIHZ1VRNz+ygech+wMGvbrepRjlsKmwQd5BTndBVzV+ApwSwvHOjyFwkecJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769564596; c=relaxed/simple;
-	bh=eavUFYdilWC4NDM0QmP02+ef9dX8BH7Zs1ktMcFbyJM=;
+	s=arc-20240116; t=1769564597; c=relaxed/simple;
+	bh=gjNPSqmL0Tbn8NDFbPUIQp/fE+kR/OlsEcl9q9Y4XdU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IVGecd8K/E1kJ52gGaJxLyeyxggEl7G2MiGn8s2jf/rXxI4f2NmSnnYKBvkiavrrdE+kQCz0ewt0abJNsX1ULxMGyGUTEqSttnezGQQciNzqcvGl+wvIi8dxyFswBN+K2aqE8tlR6yugO97QaIf02ppamxyolMUZmkczTc8KQ0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jg+/PQQs; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=EGOEOYiTcBKgNNGTKGK15OmYuMYBGfkd9EHBekbPxq2kBVjb93KIW4dc2ekU7cIvYM9+amQ4UKBhQ9Gr4H7ht9D0GXzletV11dcNngMO4MCqvpNbqYCKREHN1+R+r4fRI5Q5ZcAVkLpZqJeW7K0kgU3h8Z59drfIfR17/z6wkCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4TVi2q01; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a76f2d7744so60407975ad.3
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 17:43:14 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c337375d953so3997834a12.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 17:43:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769564594; x=1770169394; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769564596; x=1770169396; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dycno8xrJTeHUt9FVeo8HJWayzqn06ym8ZC4RBKnLqw=;
-        b=Jg+/PQQsPFcksCp4Sxk9n/l7dLzMp0V6YM3xC+1AsMm94qmCcp8bYOTTqZWicOp7Bp
-         YgPk9ujK0hbU6bsvh5E9mv8j8PVceJwBVJ/0j/UYLq1St1QQySZVzBnrCpXVNNjV97/L
-         gm3dPVemUkR/djAjWfZD+thEBsy4xhYUaTwNFARYZqDeiP7FYJCHshE51xYSB8l79p0Q
-         txXRuzznAJoqhT6J/l013ZODKMv6PFcUq0wXl5PP4tAJq+YCXOCYuNnAWwWJ+rOVFzRv
-         PKlxJLa4WW6I/RKmm8DyShBYSRCt1/tGwWYCSit9Ur/mbrxNE9LTwPuL+kC2Cg6YvCmn
-         vFnQ==
+        bh=4DtlW/gC7gteJd+CFkna93VzdyPdpEl+ULoZd8O0aTU=;
+        b=4TVi2q01ibw3AppQkC2naOJRq24+WuBTUqehM7HQyLyI+WT6DKiHr5z1stQDGK9/HJ
+         e7p5+3KdIrvl5c3KbQu2VeMy9GCCKedlccNqkNK1sCE+LLr7PU0js+lyVsQin18bl142
+         tCNmvfCz11RyplfsaHVVADP9VgS5LQUclCM7Tpg/mFTRqBp8SoHKv9iB3tdoVkXqOgHd
+         P02btg8rvRY3dqZlFPspYUXxXql0fMshGX9fZhOLptfU60ydJ7FZ0iBgDAPP2SIhpsix
+         r1H7NI+bGV/3P/e+eISDOc67v7y12Iegk9aWDsYKOmqTsSsDcWCOM8r+QF7u//FqGNMS
+         9laA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769564594; x=1770169394;
+        d=1e100.net; s=20230601; t=1769564596; x=1770169396;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Dycno8xrJTeHUt9FVeo8HJWayzqn06ym8ZC4RBKnLqw=;
-        b=TAtBFu58+YxBDvfNOPhTzWfFIi2zZ/fLSgWr2YF5PpKLUg2UBL9o6abiK7vtnH9DJi
-         cIlmtRqGqiqiYs9XgAdeLfmZ5gq9dS1fVIgmK1ovx/YMHts0/uWWXKJcZMflfLitC4kU
-         HdfnzNK56sZE6v3cChTYlqx4GXphprL/Momp+YmNVq54P0tFxRYjYCeJqR2umaot3yyh
-         9BYV1ykr10ZU1X9q8BgfRs10H3t86h3g7bez4i1zV/jH3lFfH3uFQkfuPnEhPYKxOVR0
-         XS+oY54vYPoyO6VxgJ+Ta+GA0dbLUlYM6+r1j32tLeRyFqpo2vMFwy+lPm+UXDcxy7Oy
-         K5EA==
-X-Gm-Message-State: AOJu0YzPHUJvj+mBtZKZubZAC8Y9USeT2nDWL9VzsjobJjklbcJ3WXuM
-	UwzN63I1f8bh3xLZhj0HLGMmzaulO15vWRlW2Nu9PL0/+BrX+GCt1aFfc6AMjy1pqZG1SdtlLxc
-	9NnBC5A==
-X-Received: from plbmj14.prod.google.com ([2002:a17:903:2b8e:b0:2a0:de6a:ac6c])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2291:b0:2a1:5f23:7ddf
- with SMTP id d9443c01a7336-2a870d452d6mr30868615ad.6.1769564594217; Tue, 27
- Jan 2026 17:43:14 -0800 (PST)
+        bh=4DtlW/gC7gteJd+CFkna93VzdyPdpEl+ULoZd8O0aTU=;
+        b=WlPDxEiXaiB2T/6zAfqEMiQJajwYp86N1E3EXRwcV70pvQ8/6lw6F4kqNlvuYfcADb
+         D/Q3XeBvMZiHM4JwJJSFIAYrzh9qshQh72L1K5TURnxvdqYMJGduuQpIQpdG8i39pjLS
+         MB0NCc+XvGRv5UraCuInwOm4oV0sljBCuFHFwUUbY0scLa33T5ovIhXoSxRmvvWhM0OZ
+         7LhEvV8RktKqBwmLoX5b43OW5cm8I5zPALX9TlD71rycJOudef8yPBGFhGO3R7kBzc+P
+         fXVoKU0JZwsM4VnR0Gd2cJz4bG8KuMhBmmKVyRlJoZq3IQHZTtWFIXOctBg5QMdyiXWq
+         z1+w==
+X-Gm-Message-State: AOJu0Yz70AklzLLc+404ZiXZX1B3ed7cqlwrzubC0WctdT7L7G61jMzB
+	7DumtNDM+Y4AJ8wm7zh/f2vY4Yd7IT4g8l0aaiAJdTHCWAskaD3De1BnfJHHdKAE0MkQ880tZBv
+	YqKjD/w==
+X-Received: from pgah16.prod.google.com ([2002:a05:6a02:4e90:b0:c1e:18e8:e532])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:498:b0:38d:e6f8:fd96
+ with SMTP id adf61e73a8af0-38ec6428c3dmr3264203637.60.1769564595826; Tue, 27
+ Jan 2026 17:43:15 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 27 Jan 2026 17:43:08 -0800
+Date: Tue, 27 Jan 2026 17:43:09 -0800
 In-Reply-To: <20260128014310.3255561-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,8 +77,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260128014310.3255561-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260128014310.3255561-2-seanjc@google.com>
-Subject: [PATCH v2 1/3] KVM: x86: Explicitly configure supported XSS from {svm,vmx}_set_cpu_caps()
+Message-ID: <20260128014310.3255561-3-seanjc@google.com>
+Subject: [PATCH v2 2/3] KVM: x86: Harden against unexpected adjustments to kvm_cpu_caps
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -89,22 +89,23 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69307-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69308-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:email,intel.com:email,grsecurity.net:email];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -115,126 +116,146 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 264B09BFFE
+X-Rspamd-Queue-Id: 509AF9C006
 X-Rspamd-Action: no action
 
-Explicitly configure KVM's supported XSS as part of each vendor's setup
-flow to fix a bug where clearing SHSTK and IBT in kvm_cpu_caps, e.g. due
-to lack of CET XFEATURE support, makes kvm-intel.ko unloadable when nested
-VMX is enabled, i.e. when nested=1.  The late clearing results in
-nested_vmx_setup_{entry,exit}_ctls() clearing VM_{ENTRY,EXIT}_LOAD_CET_STATE
-when nested_vmx_setup_ctls_msrs() runs during the CPU compatibility checks,
-ultimately leading to a mismatched VMCS config due to the reference config
-having the CET bits set, but every CPU's "local" config having the bits
-cleared.
+Add a flag to track when KVM is actively configuring its CPU caps, and
+WARN if a cap is set or cleared if KVM isn't in its configuration stage.
+Modifying CPU caps after {svm,vmx}_set_cpu_caps() can be fatal to KVM, as
+vendor setup code expects the CPU caps to be frozen at that point, e.g.
+will do additional configuration based on the caps.
 
-Note, kvm_caps.supported_{xcr0,xss} are unconditionally initialized by
-kvm_x86_vendor_init(), before calling into vendor code, and not referenced
-between ops->hardware_setup() and their current/old location.
+Rename kvm_set_cpu_caps() to kvm_initialize_cpu_caps() to pair with the
+new "finalize", and to make it more obvious that KVM's CPU caps aren't
+fully configured within the function.
 
-Fixes: 69cc3e886582 ("KVM: x86: Add XSS support for CET_KERNEL and CET_USER")
-Cc: stable@vger.kernel.org
-Cc: Mathias Krause <minipli@grsecurity.net>
-Cc: John Allen <john.allen@amd.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c |  2 ++
- arch/x86/kvm/vmx/vmx.c |  2 ++
- arch/x86/kvm/x86.c     | 30 +++++++++++++++++-------------
- arch/x86/kvm/x86.h     |  2 ++
- 4 files changed, 23 insertions(+), 13 deletions(-)
+ arch/x86/kvm/cpuid.c   | 10 ++++++++--
+ arch/x86/kvm/cpuid.h   | 12 +++++++++++-
+ arch/x86/kvm/svm/svm.c |  4 +++-
+ arch/x86/kvm/vmx/vmx.c |  4 +++-
+ 4 files changed, 25 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 575244af9c9f..7fe4e58a6ebf 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -36,6 +36,9 @@
+ u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_cpu_caps);
+ 
++bool kvm_is_configuring_cpu_caps __read_mostly;
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_is_configuring_cpu_caps);
++
+ struct cpuid_xstate_sizes {
+ 	u32 eax;
+ 	u32 ebx;
+@@ -826,10 +829,13 @@ do {									\
+ /* DS is defined by ptrace-abi.h on 32-bit builds. */
+ #undef DS
+ 
+-void kvm_set_cpu_caps(void)
++void kvm_initialize_cpu_caps(void)
+ {
+ 	memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
+ 
++	WARN_ON_ONCE(kvm_is_configuring_cpu_caps);
++	kvm_is_configuring_cpu_caps = true;
++
+ 	BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
+ 		     sizeof(boot_cpu_data.x86_capability));
+ 
+@@ -1289,7 +1295,7 @@ void kvm_set_cpu_caps(void)
+ 		kvm_cpu_cap_clear(X86_FEATURE_RDPID);
+ 	}
+ }
+-EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_set_cpu_caps);
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_initialize_cpu_caps);
+ 
+ #undef F
+ #undef SCATTERED_F
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index d3f5ae15a7ca..039b8e6f40ba 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -8,7 +8,15 @@
+ #include <uapi/asm/kvm_para.h>
+ 
+ extern u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+-void kvm_set_cpu_caps(void);
++extern bool kvm_is_configuring_cpu_caps __read_mostly;
++
++void kvm_initialize_cpu_caps(void);
++
++static inline void kvm_finalize_cpu_caps(void)
++{
++	WARN_ON_ONCE(!kvm_is_configuring_cpu_caps);
++	kvm_is_configuring_cpu_caps = false;
++}
+ 
+ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
+ struct kvm_cpuid_entry2 *kvm_find_cpuid_entry2(struct kvm_cpuid_entry2 *entries,
+@@ -188,6 +196,7 @@ static __always_inline void kvm_cpu_cap_clear(unsigned int x86_feature)
+ {
+ 	unsigned int x86_leaf = __feature_leaf(x86_feature);
+ 
++	WARN_ON_ONCE(!kvm_is_configuring_cpu_caps);
+ 	kvm_cpu_caps[x86_leaf] &= ~__feature_bit(x86_feature);
+ }
+ 
+@@ -195,6 +204,7 @@ static __always_inline void kvm_cpu_cap_set(unsigned int x86_feature)
+ {
+ 	unsigned int x86_leaf = __feature_leaf(x86_feature);
+ 
++	WARN_ON_ONCE(!kvm_is_configuring_cpu_caps);
+ 	kvm_cpu_caps[x86_leaf] |= __feature_bit(x86_feature);
+ }
+ 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7803d2781144..c00a696dacfc 100644
+index c00a696dacfc..5f0136dbdde6 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -5387,6 +5387,8 @@ static __init void svm_set_cpu_caps(void)
- 	 */
- 	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
+@@ -5305,7 +5305,7 @@ static __init void svm_adjust_mmio_mask(void)
+ 
+ static __init void svm_set_cpu_caps(void)
+ {
+-	kvm_set_cpu_caps();
++	kvm_initialize_cpu_caps();
+ 
+ 	kvm_caps.supported_perf_cap = 0;
+ 
+@@ -5389,6 +5389,8 @@ static __init void svm_set_cpu_caps(void)
  	kvm_cpu_cap_clear(X86_FEATURE_MSR_IMM);
+ 
+ 	kvm_setup_xss_caps();
 +
-+	kvm_setup_xss_caps();
++	kvm_finalize_cpu_caps();
  }
  
  static __init int svm_hardware_setup(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 27acafd03381..9f85c3829890 100644
+index 9f85c3829890..93ec1e6181e4 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8230,6 +8230,8 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
- 		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+@@ -8173,7 +8173,7 @@ static __init u64 vmx_get_perf_capabilities(void)
+ 
+ static __init void vmx_set_cpu_caps(void)
+ {
+-	kvm_set_cpu_caps();
++	kvm_initialize_cpu_caps();
+ 
+ 	/* CPUID 0x1 */
+ 	if (nested)
+@@ -8232,6 +8232,8 @@ static __init void vmx_set_cpu_caps(void)
  	}
+ 
+ 	kvm_setup_xss_caps();
 +
-+	kvm_setup_xss_caps();
++	kvm_finalize_cpu_caps();
  }
  
  static bool vmx_is_io_intercepted(struct kvm_vcpu *vcpu,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8acfdfc583a1..cac1d6a67b49 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9965,6 +9965,23 @@ static struct notifier_block pvclock_gtod_notifier = {
- };
- #endif
- 
-+void kvm_setup_xss_caps(void)
-+{
-+	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
-+		kvm_caps.supported_xss = 0;
-+
-+	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
-+	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
-+		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
-+
-+	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
-+		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
-+		kvm_cpu_cap_clear(X86_FEATURE_IBT);
-+		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
-+	}
-+}
-+EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_setup_xss_caps);
-+
- static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
- {
- 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
-@@ -10138,19 +10155,6 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
- 	if (!tdp_enabled)
- 		kvm_caps.supported_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
- 
--	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
--		kvm_caps.supported_xss = 0;
--
--	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
--	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
--		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
--
--	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
--		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
--		kvm_cpu_cap_clear(X86_FEATURE_IBT);
--		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
--	}
--
- 	if (kvm_caps.has_tsc_control) {
- 		/*
- 		 * Make sure the user can only configure tsc_khz values that
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 70e81f008030..94d4f07aaaa0 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -483,6 +483,8 @@ extern struct kvm_host_values kvm_host;
- extern bool enable_pmu;
- extern bool enable_mediated_pmu;
- 
-+void kvm_setup_xss_caps(void);
-+
- /*
-  * Get a filtered version of KVM's supported XCR0 that strips out dynamic
-  * features for which the current process doesn't (yet) have permission to use.
 -- 
 2.52.0.457.g6b5491de43-goog
 
