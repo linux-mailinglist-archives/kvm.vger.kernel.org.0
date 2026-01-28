@@ -1,209 +1,224 @@
-Return-Path: <kvm+bounces-69413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69414-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2NVgMlBpemmB5gEAu9opvQ
-	(envelope-from <kvm+bounces-69413-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 20:53:52 +0100
+	id cAwKEJVyemlI6QEAu9opvQ
+	(envelope-from <kvm+bounces-69414-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 21:33:25 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A403A8504
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 20:53:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6DD0A89A4
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 21:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B364E301BCBC
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 19:51:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4244B303A854
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 20:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3AA376468;
-	Wed, 28 Jan 2026 19:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89C437647C;
+	Wed, 28 Jan 2026 20:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U/aDg1bC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUXXe7xE";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwcBGGuw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1165E374748
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 19:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165623168E6
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 20:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769629897; cv=none; b=DCcTTT1OO7o5JgNaxBxQYkrsOnQPnB7pSO1ZKZ5tc4Tljf+irqetfPK+xtb22+hitkCgx2kwVWfnbQ9PbHQj34RoluX5igHWQgiKoy87vv/7ycdKe3cE4W+BZY57VR4okZY9mcKIq8kmvrNNM46SOqWsFEik2LUKiMQqeCzVdFE=
+	t=1769632290; cv=none; b=tu4qBGl4CqkWmwQbZePFfb316ErvRVNl4Fmu25owcCj6aPcUA9/FAILUvjoXHGU4ko3ZWWcoK62rzSVvexjEpoUSlWfMqTfe9CYzvvX/jV5kqxWZj/FQWYqfhvZznwEB+K66OTmUdAerqfTMccnebaL7hK2jSAJigvH6D2oYiPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769629897; c=relaxed/simple;
-	bh=DoY7z2AtHFkvOI3egT97zlHiNsmzFKz8EJ6ByjjVdYw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RVtdsPQmOZx4uDl/KJzE9icSvYBzNya/ymV9K4umzf6z5wG8zpd08NKUQ12jszDQpZTDn6jMSEN6QX4JhwCIzhVeFXBxuI9UtVa+V0VIZeyNyhFaDUaR3Mob3vJCUOHPRLhlvwz5CM22dk2Z9f2Wvk/bVJOTawJxL8+H/Bn9cCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U/aDg1bC; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0bae9acd4so1697965ad.3
-        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 11:51:33 -0800 (PST)
+	s=arc-20240116; t=1769632290; c=relaxed/simple;
+	bh=2qvxf/62yttfNIZNAODh63qlXVSL99Ksrx5/ufwbejY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=SKM/eJ136IbqrPVScDj1N77+6A9htV3/oXo5u7MkpVNJPam/x7ZH8uj1T56jRf6gqZoZ9mHTTtPLAWNsc82f7+YXHOv87bCDFb7zYt7WATSlOa/0YKxfzrtMjW8bl/Xi5u3iDit6t/seCougN42Zm+2sI9T0jE6KgRn7cVLgFMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUXXe7xE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fwcBGGuw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769632288;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
+	b=XUXXe7xETErab3wRuyukJ0+lVBhbKkaCcNv8QLKZwc4IIIOHcz3YCrmR6f3vNH/wlZJpjk
+	RnC4h+hm/NmAXYcWToR0nweZcgFZTxuS7xUNA6G2dCk/ERzre7e1N9gkt+KnsEx7+IwE5O
+	OR9QHTRzknUlppVd6rQJVsvP5dNvT5I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-164-VwfWOSnJP_mSCNjtWcd8Hw-1; Wed, 28 Jan 2026 15:31:26 -0500
+X-MC-Unique: VwfWOSnJP_mSCNjtWcd8Hw-1
+X-Mimecast-MFC-AGG-ID: VwfWOSnJP_mSCNjtWcd8Hw_1769632285
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47ee432070aso1721185e9.1
+        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 12:31:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769629893; x=1770234693; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bn9lJXHqEiscK/LgfNH9l+HtQHGcpdsiMU6EHRGmE3Q=;
-        b=U/aDg1bCip37l30tGfqGeI1ZM+DuK541Rcz9jpMLuV6a0BgUqQbSyhkOAVVDJbu+4f
-         8mL/ss/vowprY/yRIuCzl7QSLYDPf/uqFUPkhNi4WYvxJta1FhspjIWIo7S0uANIXlSH
-         CXJAH2L37o/E2wX2c076N38nFDzuUv4ediozzgT4gmGfW7N4xXMGuZH0y2PIMocX9B4j
-         Murp9mmOunkxrGXRHUI1lcweh/BMrjQ6phI5dXnuvmV25coyYfbjT9mStyea1WPE5/FI
-         /SHqBOha2x3et5zPkopMgpvmqMub5cVSW/T5393UFvpT6oc7T/Z1AiM5VEbumli9qnk0
-         OEJw==
+        d=redhat.com; s=google; t=1769632285; x=1770237085; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
+        b=fwcBGGuw7IqQDPevelrNI5mPPr97koUxkOdPBeevIRXEdn2WQmQxRqzM4vbWV5CQ1K
+         GzG9MFQtT4t1UxM8me4DW4lGDGZMEMK2FdX8SYol2akxmRNKL/MKMwIty3VtcOZAXl9Y
+         wWS67ozLZW0GAsRqnPn39uwB0neig513SYS7rQ4feyTLBzJhhqABshCSXW7vNqJZmDFf
+         A4TdMWerNpSOIlJWmzAwR31lzurm2R3U59p0qiXMV54wKq1LH3nxg60LZ94v/n0WM/10
+         YOFMpQJ7sMCG/fIm2pvP57/YDw7JqNTudoYipg0ZAcyARnfbopdd6agIeA4ATotjkCEM
+         Kigg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769629893; x=1770234693;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bn9lJXHqEiscK/LgfNH9l+HtQHGcpdsiMU6EHRGmE3Q=;
-        b=Gr75sNFjNd1MjNlj0uiYnBZuOR3dtHoHfS98luJ5TXF7Zay2Oqxd/00yy5wwOnHTUJ
-         5s9PKCLlCZvQpqX5Sygt6taDL7ckVi3lMxsWS7p8T+C7SapbeqormZxIBIRBnnJOACym
-         WY1aqtsTlpDmV93WSB0rp47XWyMmVmqyDT5YGF4uZx9PAFugDB0z3E4+/bUlrJU79sbh
-         RZXNnt/V8Owsg+w6atcKYDXpVlZKF1ifLaRmZF4Q4qUL7RphMeVV/mIaBddZKB6K49d1
-         iM1d8o/y5h9Qdl2nT2J+QkBcLSedOgqyepheWb+mr1YC2yVVLVAJccarkgUd8k5UMhMv
-         wM3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVAfPiuIhVjgrn3kwF5R+lP+CM2WCz1uZYm+yXFsqfhZbsdD0+SyDm0q2Xn0Pt2c15JvTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbKngMVFciNAX95GWJ+U9d8lJWzNMuSKei74xkF7rKTnyjjoSe
-	AyDSqWdePlrOvFReSPFE1eH6xwHvEVObPwtsnBdPRncjtT94rvy5I/NrE/cDqiO79MIbgK+211E
-	Yv2Eqmg==
-X-Received: from plnx15.prod.google.com ([2002:a17:902:820f:b0:2a1:4625:795])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3545:b0:297:c048:fb60
- with SMTP id d9443c01a7336-2a870d5d5e3mr58149345ad.25.1769629893346; Wed, 28
- Jan 2026 11:51:33 -0800 (PST)
-Date: Wed, 28 Jan 2026 11:51:31 -0800
-In-Reply-To: <aXgzlo1BsTjUIVzc@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1769632285; x=1770237085;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6AqTWTOgRm78zpGWundx5DPK3QN0XJ8tGQTS1p8e64k=;
+        b=wicUaK6bLZz32Ttj/JvCPM8NBGRUCGsdrrfCmgcRy573E/mAeaPWppuLbwxhhZ/0Mw
+         O47qR54LAYIfV4wY/meFrJ6iLZ0qi+67krqUIFnISoDm1kaZOWVrV2IQhUqFscv6M1gx
+         /cO4+EHPQYxmQvGcTTH3XvnMvuDWs0cEpaJirj6letaVS/aSxgJVuXTUHmEyFgUBNjwr
+         8LbDBpp/pJku8ZdSh7ed3sCCsJWMokP+IaTDHurq44nld5p8vYR0Fb4TX5GdnF+e+srX
+         QK7F86mHiIDPxT7XNugtk2LYLuVaoNFShoFMfNiuKuXbYJXZjatX4rI9B9mJ03VIyiBE
+         DisA==
+X-Forwarded-Encrypted: i=1; AJvYcCVDbBrMbev7yD4M4c1FJ73xO0T1TvtVLgaENvEEsR7JuqFAXTfzzLyS98qAtcfCSjP6Ypg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwezZGwkfplTtv8wGKV7uCBCjysBEmwgs+pQ6WqWwyyhhmKEtY2
+	3653N64MyZDVCwMaKPwDyCS/3QA7p0MGXKEk8800anuHQx8FaICbO1t98De6uWJRjgk2ls1eosk
+	CfAtCqXQZRA2cI5h5uO1b+ZcjXXYfrV8nJ8fmmmwq5PAn2atjcx6ceg==
+X-Gm-Gg: AZuq6aLpmFo/6ORBqDkCP97+Yl7Y0JQZP+gIovzCJE8oM847TtDFaeW8A4SAUZtgi0V
+	dIgCsYK+lP8bc+RpZ3nJgTVQ0qqFQu5m7AyfQcpoQQalmgibmY0UE3BeC8hMkk1sv2MjGzyz03J
+	jfr9mZE/9ZBPShVUIWAmtA5pEEGiP0Zn5Z4XZMGZuLyA6Gm5+s8nCbO15feOwlmZVrphwkfLZFq
+	YPr3BP0c/6KZoRczFIHinoSfTO0DIElJQp9eB5jp6o+A32ddN6N0Vv+RBFZjLZG/Vf8isTEUmIT
+	FhQlxVmNCuvzGyAo0zkDIXu6RbPKfTphDsCIrFUk3WoMa3voVa2XFyRbC/ulRezejU9EoEWZFYV
+	aU571SvQLpbU9wLIK2lMOFTVJAC/t/Qc3nA==
+X-Received: by 2002:a05:600c:6995:b0:477:7af8:c8ad with SMTP id 5b1f17b1804b1-48069c92c03mr93433895e9.31.1769632285344;
+        Wed, 28 Jan 2026 12:31:25 -0800 (PST)
+X-Received: by 2002:a05:600c:6995:b0:477:7af8:c8ad with SMTP id 5b1f17b1804b1-48069c92c03mr93433305e9.31.1769632284808;
+        Wed, 28 Jan 2026 12:31:24 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066beeaf9sm161529595e9.6.2026.01.28.12.31.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 12:31:24 -0800 (PST)
+Date: Wed, 28 Jan 2026 15:31:21 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v3 15/15] vsock/virtio: reorder fields to reduce padding
+Message-ID: <ce44f61af415521e00ab7492aa16d3d19f00bd5e.1769632071.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260106101646.24809-1-yan.y.zhao@intel.com> <20260106102024.25023-1-yan.y.zhao@intel.com>
- <aWlvF2rld0Nz3nRz@google.com> <aWnuwb/2TrPAOrbu@yzhao56-desk.sh.intel.com>
- <aXeRf4Jw6-Sl1JCe@google.com> <aXgzlo1BsTjUIVzc@yzhao56-desk.sh.intel.com>
-Message-ID: <aXpow-fzaII6RW_q@google.com>
-Subject: Re: [PATCH v3 06/24] KVM: x86/mmu: Disallow page merging (huge page
- adjustment) for mirror root
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	x86@kernel.org, rick.p.edgecombe@intel.com, dave.hansen@intel.com, 
-	kas@kernel.org, tabba@google.com, ackerleytng@google.com, 
-	michael.roth@amd.com, david@kernel.org, vannapurve@google.com, 
-	sagis@google.com, vbabka@suse.cz, thomas.lendacky@amd.com, 
-	nik.borisov@suse.com, pgonda@google.com, fan.du@intel.com, jun.miao@intel.com, 
-	francescolavra.fl@gmail.com, jgross@suse.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, kai.huang@intel.com, 
-	binbin.wu@linux.intel.com, chao.p.peng@intel.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1221bbc120df6adaba9006710a517f1e84a10b2.1767601130.git.mst@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69413-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,vger.kernel.org,kernel.org,intel.com,google.com,amd.com,suse.cz,suse.com,gmail.com,linux.intel.com];
-	RCPT_COUNT_TWELVE(0.00)[29];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,lwn.net,selenic.com,gondor.apana.org.au,redhat.com,hansenpartnership.com,oracle.com,linux.alibaba.com,samsung.com,arm.com,davemloft.net,google.com,kernel.org,suse.com,ziepe.ca,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-69414-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A403A8504
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C6DD0A89A4
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026, Yan Zhao wrote:
-> On Mon, Jan 26, 2026 at 08:08:31AM -0800, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 321dbde77d3f..0fe3be41594f 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -1232,7 +1232,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  	for_each_tdp_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
-> >  		int r;
-> >  
-> > -		if (fault->nx_huge_page_workaround_enabled)
-> > +		/*
-> > +		 * Don't replace a page table (non-leaf) SPTE with a huge SPTE
-> > +		 * (a.k.a. hugepage promotion) if the NX hugepage workaround is
-> > +		 * enabled, as doing so will cause significant thrashing if one
-> > +		 * or more leaf SPTEs needs to be executable.
-> > +		 *
-> > +		 * Disallow hugepage promotion for mirror roots as KVM doesn't
-> > +		 * (yet) support promoting S-EPT entries while holding mmu_lock
-> > +		 * for read (due to complexity induced by the TDX-Module APIs).
-> > +		 */
-> > +		if (fault->nx_huge_page_workaround_enabled || is_mirror_sp(root))
-> A small nit:
-> Here, we check is_mirror_sp(root).
-> However, not far from here,  in kvm_tdp_mmu_map(), we have another check of
-> is_mirror_sp(), which should get the same result since sp->role.is_mirror is
-> inherited from its parent.
-> 
->                if (is_mirror_sp(sp))
->                        kvm_mmu_alloc_external_spt(vcpu, sp);
-> 
-> So, do you think we can save the is_mirror status in a local variable?
+Reorder struct virtio_vsock fields to place the DMA buffer (event_list)
+last. This eliminates the padding from aligning the struct size on
+ARCH_DMA_MINALIGN.
 
-Eh, I vote "no".  From a performance perspective, it's basically meaningless.
-The check is a single uop to test a flag that is all but guaranteed to be
-cache-hot, and any halfway decent CPU be able to predict the branch.
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
 
-From a code perspective, I'd rather have the explicit is_mirror_sp(root) check,
-as opposed to having to go look at the origins of is_mirror.
+changes from v2:
+	move event_lock and event_run too, to keep
+	event things logically together, as suggested by
+	Stefano Garzarella.
 
-> Like this:
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index b524b44733b8..c54befec3042 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1300,6 +1300,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
->  int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  {
->         struct kvm_mmu_page *root = tdp_mmu_get_root_for_fault(vcpu, fault);
-> +       bool is_mirror = root && is_mirror_sp(root);
->         struct kvm *kvm = vcpu->kvm;
->         struct tdp_iter iter;
->         struct kvm_mmu_page *sp;
-> @@ -1316,7 +1317,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->         for_each_tdp_pte(iter, kvm, root, fault->gfn, fault->gfn + 1) {
->                 int r;
-> 
-> -               if (fault->nx_huge_page_workaround_enabled)
-> +               /*
-> +                * Don't replace a page table (non-leaf) SPTE with a huge SPTE
-> +                * (a.k.a. hugepage promotion) if the NX hugepage workaround is
-> +                * enabled, as doing so will cause significant thrashing if one
-> +                * or more leaf SPTEs needs to be executable.
-> +                *
-> +                * Disallow hugepage promotion for mirror roots as KVM doesn't
-> +                * (yet) support promoting S-EPT entries while holding mmu_lock
-> +                * for read (due to complexity induced by the TDX-Module APIs).
-> +                */
-> +               if (fault->nx_huge_page_workaround_enabled || is_mirror)
->                         disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
-> 
->                 /*
-> @@ -1340,7 +1351,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->                  */
->                 sp = tdp_mmu_alloc_sp(vcpu);
->                 tdp_mmu_init_child_sp(sp, &iter);
-> -               if (is_mirror_sp(sp))
-> +               if (is_mirror)
->                         kvm_mmu_alloc_external_spt(vcpu, sp);
-> 
+Note: this is the only change in v3 and it's cosmetic, so I am
+not reposting the whole patchset.
+
+
+ net/vmw_vsock/virtio_transport.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 999a0839726a..b333a7591b26 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -55,15 +55,6 @@ struct virtio_vsock {
+ 	int rx_buf_nr;
+ 	int rx_buf_max_nr;
+ 
+-	/* The following fields are protected by event_lock.
+-	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
+-	 */
+-	struct mutex event_lock;
+-	bool event_run;
+-	__dma_from_device_group_begin();
+-	struct virtio_vsock_event event_list[8];
+-	__dma_from_device_group_end();
+-
+ 	u32 guest_cid;
+ 	bool seqpacket_allow;
+ 
+@@ -77,6 +68,15 @@ struct virtio_vsock {
+ 	 */
+ 	struct scatterlist *out_sgs[MAX_SKB_FRAGS + 1];
+ 	struct scatterlist out_bufs[MAX_SKB_FRAGS + 1];
++
++	/* The following fields are protected by event_lock.
++	 * vqs[VSOCK_VQ_EVENT] must be accessed with event_lock held.
++	 */
++	struct mutex event_lock;
++	bool event_run;
++	__dma_from_device_group_begin();
++	struct virtio_vsock_event event_list[8];
++	__dma_from_device_group_end();
+ };
+ 
+ static u32 virtio_transport_get_local_cid(void)
+-- 
+MST
+
 
