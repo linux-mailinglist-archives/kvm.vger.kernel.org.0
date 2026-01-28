@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-69336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69337-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEyULxrxeWnT1AEAu9opvQ
-	(envelope-from <kvm+bounces-69336-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 12:20:58 +0100
+	id MDFFJ97xeWnT1AEAu9opvQ
+	(envelope-from <kvm+bounces-69337-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 12:24:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFD4A036D
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 12:20:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12769A044D
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 12:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A448D303FFEA
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:19:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5E18F300F177
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 11:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D016733DEF7;
-	Wed, 28 Jan 2026 11:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C473451B5;
+	Wed, 28 Jan 2026 11:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jLnNsach"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vpLS0wS7"
 X-Original-To: kvm@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010054.outbound.protection.outlook.com [52.101.46.54])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010015.outbound.protection.outlook.com [52.101.193.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FF72FD697
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 11:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C40344DB5
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 11:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769599194; cv=fail; b=HsfJNNq+DGV+iXmUI+X2ZL12Jkqw7+407XbnFA/SzUgcvpPcaQIPaJwUhuXUJaNdw+YATArZxxfPCTKCtE9Gmrnmj9e4+6mg3FaRrpsnYJc0C8nDvrFOiLQ9Dmw+IS6EZIRqjORlIzX46kbYNnWModcXP84U7uVRSurV2IGPaus=
+	t=1769599446; cv=fail; b=FeIFLMKoXqzxGlu/5qUQzj4H7ddwvDl6nea/fPcPVSNdRYTv464CbF8F8ib0ghcW0QYY4dEM9hDKaoe2BeGmhXbgJnCe58BSmKXT5hqcNFY5lEEqgvf4W04OnpxK5QfbFM8qxxT4mf827mrmmd2NrJsVhJ6MAGd7sd8flSdwJPg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769599194; c=relaxed/simple;
-	bh=g3q6I3UTANsPPTGcTNkVyG/YdBWqEdiTzxRDtMXriTE=;
+	s=arc-20240116; t=1769599446; c=relaxed/simple;
+	bh=Z+36HqHSg0i3Qm7Crw2OFHkBiQ/aRG70R/3L0iWjFAI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rDC/GYpmWmF+lvotLEHYHucijP/LPYIuO2jNtBVaX/m3hmCbwsP+yZQruXla2tKnxWqb+Y8bf5pK7mpjZUFZQ3cUaL4yeGhM29enkY+lq99HspUnrG2h30WOe3XpNW9znjmZF1R0JotTt6H6KmyLSw8+sZwE14BUCeQsvqlqJVI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jLnNsach; arc=fail smtp.client-ip=52.101.46.54
+	 In-Reply-To:Content-Type; b=lJ/WyVycqMtaQDFvDETTA9qxQL32ILhCFpx5LpbU50u/GP6oxWGS2ggdzi5w6BED0BrhNSck4Rx2CEBvn0BS3/NJ5I/PvhIIGfxQqSYrnULyZV2BHHPTucyR4/V1eIlaC5dsN3Vvo6O+f41B1a1EanQfH4uYxNC7T2ZJmvxLuho=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vpLS0wS7; arc=fail smtp.client-ip=52.101.193.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C8k4fYWm4L5wJgdkIxPoTsZNRehChATWWz7cIKufn1GGM5YsES99QhPCyb3ehsTAMA6EAw5cpGa+IcLoVcZnQhYNkAPFilG0o+9+i0YsKmNJ3aQkoB+vyN5M1CrXYgS4kMDOje4MSMdoZjZV+J0GQdlRwDLb5Ie4oICI7JprX2eqJ2V/B5LLpIrx22guzusGG1hTVpIYEK8BBvLqtbkuQati1o67JqgHbq+P9H3/9gfdJx+mNyMDjHntm1u6jgux+ilGchIdK9ZNGURfS/H8oy4z9nJ6zLVQCJzDxYlnFTZmmzPdT8FzUc4vUw9l1GYJZpd/ekv49X5+SfsmRfGQCA==
+ b=zTgq90VTmb5vuajJNGRTdPysLUjaRnR1hwJF/AP7NxbYMZP6aPf1nlz6kDhp9mhNPfsBM9NufOEcMweHxTdD+rVCvLLFi6v6Q4EjkZgIORtFguEc9WmfQyhRaDk4f5BQ//eyWFz3juWlHCqBQ4E9123MxVBHb1eesL66pQmgOyFJcXdkPZl5c5Lv1PWUNeTr01FtEfGzEFx5v+Gh0oFZduZKBLpFr8cfCcD8NREmrW5oYzJm8yMClHAD+nhB8v9VU938XXg2vtAsdaSfW+Nsamg0OLOqvzSthZGo7i+sB+aKYx1s5LR3ParI9OGNP60iPZQ2exvrBpS36FGhBQtDyA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t6INM0p9r2IP6i8sUlfh5jz1XwT1/o729QvGKqs92sE=;
- b=bshEMr3ZCD3Dm3CpIs0hHKn3g1h95bJAR1Sr59bLXwySH/bFwJH73D4yL+Ph52V/IEzPtLFQ1GrGGK7vFIIW+UTuLuX76i3fHP5IPItMF5TDipjTX4JwUXtJPhr+lul+DtPgDg0xiTshOwXvDGdBCgLj7IDC3Gt7w9bLf5EhOzVqzq1uBsewE9DCdEcVntoDKDyCZeeH8g5ELl94wfMaVh+rBvj5LdHqZGCoNfWktrvD3hMlO4MKUO/OrNdUlBuNnwJ9qMSkL8wg4XcKCXPM5JI2o762LF5qcCE9ELaSUASRT561lkcyevIj/yknVK/uzH6D65FO4TwMIV4B0d+TXg==
+ bh=K01XKBan2s8SSdhI7tQSzvBSWvGCZ1BqtySh7Ed3NhQ=;
+ b=s3rByu7ve+RsVjaow9vjEzTy7Kh+JnbejUfdEkx1GOEz7Pg3ehAyfLXgt4RHx9phZwik8wQXCctBXJgaBMHGSmbJaNjefwPHUOzS/xqsDg1nTV/SI/QSCRjkqGngUUV6YFHgpp5niTJ3NiRDHeA1wp74TiN19R1rmXXdDd73Ft0XZkMd/IkXgWknWar34jliVT1Y2h/RFmFllakwfGnYlXtIfLTueXSZfpDeyqVwDFCwm42EHPIoJk4A6Ts/xRKTw9vaLXNorgmPrbFHxS8IpZIHH8maKHmeiKvpq9PdqkYtpBPyWBISUQfLkCmasEemlRzf22LiTAkskcEb1+JmLQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=oracle.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t6INM0p9r2IP6i8sUlfh5jz1XwT1/o729QvGKqs92sE=;
- b=jLnNsachtdMaJXoRZGYCcnOnZo7hRu4WHlZV3GYA0f+0pZF9PBN3FmSS0dXAa88qTGi7MAI9vPdFTHh4OEU4uOxF6zjGm+i/8D4oy4/ajxjBQQvc42tw+aH84diDFsyP2umfTqLvjM0D9qATShd4NqQAlHfZpzTKjYlCljgBbk8=
-Received: from BYAPR11CA0073.namprd11.prod.outlook.com (2603:10b6:a03:f4::14)
- by IA1PR12MB9061.namprd12.prod.outlook.com (2603:10b6:208:3ab::6) with
+ bh=K01XKBan2s8SSdhI7tQSzvBSWvGCZ1BqtySh7Ed3NhQ=;
+ b=vpLS0wS7ojYaQtAo3KlYtKUNfci0A+Nv8ukWexYJyZ+18feh4L7sKTuFeZ1lPFa5gmPbh2W5HDBxkSNaYgbSFojhDgkdOTDAbhBb2sTf/jeLSk7/hIOJwPBBb6w3ky9E+mqiV5yOOL0I67ia9pgpDGsJVBXMHWrH9nzSOs++CDI=
+Received: from BYAPR07CA0071.namprd07.prod.outlook.com (2603:10b6:a03:60::48)
+ by MN6PR12MB8470.namprd12.prod.outlook.com (2603:10b6:208:46d::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Wed, 28 Jan
- 2026 11:19:47 +0000
-Received: from SJ1PEPF000023D1.namprd02.prod.outlook.com
- (2603:10b6:a03:f4:cafe::32) by BYAPR11CA0073.outlook.office365.com
- (2603:10b6:a03:f4::14) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 11:23:56 +0000
+Received: from SJ5PEPF000001C9.namprd05.prod.outlook.com
+ (2603:10b6:a03:60:cafe::a1) by BYAPR07CA0071.outlook.office365.com
+ (2603:10b6:a03:60::48) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.7 via Frontend Transport; Wed,
- 28 Jan 2026 11:19:47 +0000
+ 28 Jan 2026 11:23:56 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,15 +66,15 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ1PEPF000023D1.mail.protection.outlook.com (10.167.244.7) with Microsoft
+ SJ5PEPF000001C9.mail.protection.outlook.com (10.167.242.37) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.3 via Frontend Transport; Wed, 28 Jan 2026 11:19:46 +0000
+ 15.20.9564.3 via Frontend Transport; Wed, 28 Jan 2026 11:23:56 +0000
 Received: from [10.252.204.230] (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 28 Jan
- 2026 05:19:41 -0600
-Message-ID: <ef5f77ac-e633-4c68-a83f-7fa978545fad@amd.com>
-Date: Wed, 28 Jan 2026 16:49:35 +0530
+ 2026 05:23:51 -0600
+Message-ID: <4bfbff72-aff8-417b-9672-b7a1740e476e@amd.com>
+Date: Wed, 28 Jan 2026 16:53:48 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH RESEND 3/5] amd-iommu: Add support for set/unset IOMMU
- for VFIO PCI devices
+Subject: Re: [RFC PATCH RESEND 5/5] amd_iommu: Add support for upto 2048
+ interrupts per IRT
 Content-Language: en-US
 To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
 	<qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <vasant.hegde@amd.com>,
@@ -95,311 +95,339 @@ CC: <mst@redhat.com>, <imammedo@redhat.com>, <anisinha@redhat.com>,
 	<seanjc@google.com>, <iommu@lists.linux.dev>, <kevin.tian@intel.com>,
 	<joro@8bytes.org>
 References: <20251118101532.4315-1-sarunkod@amd.com>
- <20251118101532.4315-4-sarunkod@amd.com>
- <f7097f24-6c4e-42eb-a2ab-968b6814e969@oracle.com>
+ <20251118101532.4315-6-sarunkod@amd.com>
+ <c22ec7f4-4f49-4c39-89cf-be20429bb387@oracle.com>
 From: Sairaj Kodilkar <sarunkod@amd.com>
-In-Reply-To: <f7097f24-6c4e-42eb-a2ab-968b6814e969@oracle.com>
+In-Reply-To: <c22ec7f4-4f49-4c39-89cf-be20429bb387@oracle.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D1:EE_|IA1PR12MB9061:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1cb8048-c8b5-413e-ff14-08de5e5f250a
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C9:EE_|MN6PR12MB8470:EE_
+X-MS-Office365-Filtering-Correlation-Id: de03a3ed-35aa-49fa-2d1b-08de5e5fb996
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|7416014|1800799024|7142099003;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?U01LeHpESGw0MCtxOU1QUjg3L05YNzZzRTVYUzBtKzg3eDZ2cmZQVGt3bTg3?=
- =?utf-8?B?eDdzZHhXTDFaa2hodEpaZ1I3Nmw3MjM1REgxYkVrVXVTekZVV2Y5bGZVbEty?=
- =?utf-8?B?OHJ3RzRYSlc4NmxPdGNjK3lub01hbDhlcmdLQWJoTExQTmZvdDVUSTVKOSth?=
- =?utf-8?B?c1Uwb2YzenNJWkVLQXhYeW5RUmluc2JsK1RzTW9ZMU92SEo0UFhEcWtWQjky?=
- =?utf-8?B?RWhOU2FnQzJFZmRSb0RBQnpWaERFcEVLdUdpRmZQS3h1OVlweXN1YXBlSFlE?=
- =?utf-8?B?S09tc1ZmbHJ0SVBUdVdJcTB4SzRINHFUTlM2WXZFT2ZCZ2VGSmJ2NXdhZk5L?=
- =?utf-8?B?UDE4M2ZyODZ4NWN4THdmS3A2MDJ6dnRrNWdYNDhtM0V0RzRjaTZMTWxSSE1X?=
- =?utf-8?B?bFVKZUl0RTNITWtwSmx5M3pHTHppVWF4OEw0dE9ZeHZEYkNhYzdlbEdDV2tN?=
- =?utf-8?B?Skw3U3NKWCtCc0NUcXBybnZTbUtvNFVET3hzckhIYXFjbHhDWURvcXRkOVdM?=
- =?utf-8?B?aWR5QUhsOW5paXd5anZpZ1RsaW54cTYyN2s4Vm84SVdST0RDY2cvNnRLS3hP?=
- =?utf-8?B?bnV1dFBxR2Y2K0NvS2JVWFBZZmFCQ05tNUFLSkN2eUZ5cUtTdlovMlp4bkpY?=
- =?utf-8?B?TXhoRld6UVN3NDY1bzNGYzB1anRnU041UlYwbXE0TXluYkkxdmk2MGtCTFVE?=
- =?utf-8?B?YWMvVEFIczkwV2JLWm9FZ2lHaHU3dmtzMnNkNDNzMTczdjRGT1dPdTZNODRr?=
- =?utf-8?B?SmVRRXRKOEUxMklyZkpZVGx4NnBaUlZkWXZyTDFWS0dzanBzeTkrRmNMUlcz?=
- =?utf-8?B?YUxRMUhKbkRxdTBuaE5RS0VUbUpuc0pIdVdwRGpqNGRxeWRpNUZBTXFvVmxC?=
- =?utf-8?B?VnZ2VkNleWxFWnowZmdnZFEvRG9XRWdYU0piRnVkVEt2eGU1OEV4MFBaNk5k?=
- =?utf-8?B?TWxnVVJYMldncXQ5ZUF1ZUZtZGZPeHNqdHZmTnBTRUx4QzZnTnBxZHNKWmhJ?=
- =?utf-8?B?Yk41eDYyMDEzRnhvdlZ3b0hSVS9BVnYrWnBTZE5ULytCLzZWM2plNkVKM21G?=
- =?utf-8?B?MlY1clRDenBEdGdmbUNtcFA0ZklhbVFndi9sdHlyQ2JvUEQyUVZjTFk0ME4y?=
- =?utf-8?B?Wm0rYncwV0FxT1orTkdmSGxTQ1FwcDR3Q3p1dHZVczRvTlVMdit1aFpNZkxG?=
- =?utf-8?B?dkk5RVQ0UGF4RkxJVzhvZnNiZ2tWdFN3N1Bld29PM2pLNkowU29nZTZoM2Q2?=
- =?utf-8?B?N25VdE5GYlZSU0xFZSt6WG54RHJXVDdMa0Zrbm5QdXV5UCthclJOTzVVOUtx?=
- =?utf-8?B?NFdoeUptcW9HTDJuajdzTlc4UkhiRmJTUDUzcEJQWUg4YkQvOUFtczFEZFRR?=
- =?utf-8?B?U2pXREVSazNmV1pYdEVvdTVIcnplcXNiVDVLMHYvc2MyZitKVkQ4RjlwM2d0?=
- =?utf-8?B?d2VLRUE4NitVTS8wWjUwVXZPbGpUVFg0OHJHMG1lWnhXSHFvWWlTblQ3RytL?=
- =?utf-8?B?VGhjMC91L1hFU1hURENIVHQ3L2g3bmRYUThMWERGRjJrREZEWW5lbXQwOHNs?=
- =?utf-8?B?R3lFdUZwTFB1OXNVdUJ0Z2F6U1RpdHlNZUp4UXNlZlVrMDRMTTl0OVZjaFRB?=
- =?utf-8?B?enA3VElXa1J3SVA5SFdsNENoazFLQnVXUjA0S2FJYU5EZU56aExYR1JLcVBa?=
- =?utf-8?B?M1BPRzBPV1k0NytjNHpyczZ2eTNmU2pvOXhlYmNNekxJbDhHczJGZ09ML3A2?=
- =?utf-8?B?by9BSCs4VUJTQkpnd3R3VWVLRklUYlMwTXFhK0VrZ0QwQkFhTlZrZnVheEdj?=
- =?utf-8?B?b3VTTDZCMmxrVk9EVitRQ1c5MnBFeEROdmhhVGEySE9PYmtSY1Q3cmRORVY4?=
- =?utf-8?B?ZGh5M2tnL1JzaldZYnVYMEFEQnh5YVdHZ0RzWURmeUJDeGVRZ3k5NlB6Uk1N?=
- =?utf-8?B?K1JscW4xSng2TnEzMW1tWUNOWm5VYlh1SmMxUDNvRkt2QnNBby82R2dSWFpL?=
- =?utf-8?B?Q3V5akIrTmVKNlpqY0ZCQWFreElBcHk0aTZ6ZzZkeDFyZ2lMUE5WSGNWU0Jq?=
- =?utf-8?B?dDRTUUx4OC92TUJ2cHhzU2dKakNRQjBheG42eUp2bEx1UkhqRjIzY3BJWWhZ?=
- =?utf-8?B?akN0dWovWWMxQmZMY3FpY3NtUXd3QVhqS1JpZng3U1VpNTdTS1F4Zjk5WG1Q?=
- =?utf-8?B?dndPR2dZTWZIWlBJMlFDclhuNStJTWgyblpudVNjbzd0WG5UVllvRzNVVzdk?=
- =?utf-8?B?VnJ3V0tUbWhzRW9BNkUvcUZpalJBPT0=?=
+	=?utf-8?B?UHJQc1QzL29Jd2RjbSsxOXkrV3J1aFBHRUJzMkJlQkRHZmYwZ3ljSkpBZjZw?=
+ =?utf-8?B?eHFKamFwYVBxaFd5eEhhaTVjYkIySHRaOUZBTm9VZXc5NDAwZS9qUWdxYTlw?=
+ =?utf-8?B?WEVVTFd3MUhHQ2I3RGhpNGovaDNKTEhMLzdydkNBb3JOWS9qdG5FUlVaM09u?=
+ =?utf-8?B?WWFSSmhMQk1UMlVyZ2JUVTBCN1Z2eVNhQkE1Y1NuTUpCMlVFL1F0b0lCNnpD?=
+ =?utf-8?B?bUdQODA1N21lWm1yMjE1Rzd1WGZ2UzBJM1lqdm1MSlJLZFIxUE1CN09ocWdx?=
+ =?utf-8?B?ZVRZcGVSMWdZVlpTSXR2OFJ6dW9oZWhtRkF0cERzTW83QlFrbG9YNFF2RXlB?=
+ =?utf-8?B?ek5lcE1QYlM5SUd0WGRNeU5CWmRXUTNJQ1BiNEd5ZFYwcHVVOUpNQnlvRERi?=
+ =?utf-8?B?WmdsR3hoOHJQNXdaVXJNYSs4L0FrdHduT3pCQXJWd2N5RWpFZ1dJUlEya09O?=
+ =?utf-8?B?ekVRM0dIYVpldWxUdzhrVy9rS0ppVFZOT1Q3MFU3TnVOZmNQSUNqcXNqMU1G?=
+ =?utf-8?B?OUprRzlxN214NnB5WmZ5Z3E2SGh5VTBxR1luaUlXNWpSR0gwZTZ6RDVFdHBL?=
+ =?utf-8?B?cTVxeWQ0cHZQV1lvMTZNbVAwenpHWkd0N3N5Tm1GQWpLK3pCbUNUT1VTZ0ND?=
+ =?utf-8?B?U1BuR0JlMVNZNitpWkNlV0dTRTJyQU1ucVdHcXRacnJXMW1qblJGcDZDaGoz?=
+ =?utf-8?B?cWZ0ODhpdlBWU01aVnUxZ1JpYlY5L0ZMNS9rc3AvY0hGcktJZWJqdkFhVExs?=
+ =?utf-8?B?My9UQjloaWszMFlNUElPRUNVUzY3TnBGYktPczJXZjVwYy9RYnI3bm85dzhG?=
+ =?utf-8?B?UUhSdFVrUFMvT1liR2ZKTm1UcnVGWnRtU3NDbVlCUEkyUXNSa04yMS9pQi9L?=
+ =?utf-8?B?WERkV0gyRmNick93NytsSVRWOUlrU0dPaEVZYi9IczI4SjlxMU5UZjJUYmJS?=
+ =?utf-8?B?TlorajhNeXFJRWxtUFF4aHVQS1c0WmR2YStxdzkyYzJVaEtQUU5ZcjVVNjJi?=
+ =?utf-8?B?RGFETGMva3BQOHNzNHlUVE1VTG5GME01SGhDd3oyZmNvQXBxc0l2RzVOd2V5?=
+ =?utf-8?B?STJrT2JpNFRjT3Y5L0RxOXpQaTdjcUt0QWtJdTFjdXRwSGxMUHExZmU5aWNM?=
+ =?utf-8?B?TTVkTUNBbmZWSVd0M1g5c01PWExFRFd2cmtBOGZPV2hZTTRJc01icGpHbEhM?=
+ =?utf-8?B?cDFiNnlBTHJvT2xiTGF5NzVBRVpHN0wxY3lTeGZOWjRudWFHK0tNbWpaang4?=
+ =?utf-8?B?WlYyQVM2NUlqM2JZWFRzZE83RGppc1ZPQit4RlVkMlZiV0lmTWFkTDh3d1ow?=
+ =?utf-8?B?UmorMXpoYlNaUFF4ZTh6UE1NdUZZdkdVMUh5ejlJM1I2L0pVamFqM3BRM0FI?=
+ =?utf-8?B?ckxOUFVtQ0V2bWI0NlFZcDJJZlRESXFKNHN0SXVCQTlDTzgzWEdwYzFsQTRK?=
+ =?utf-8?B?S1hPMHpCL2hqcTZ6ZHE3eW1LbTN4TjRmZ1RUbTBZeXlsWWpKMWMzdmN5SzNG?=
+ =?utf-8?B?amIzTmxJTnd1c1JhdkhPUUN6K1RRclpLSk9SNGxXcEpFYmU5MkV0aTZZenB3?=
+ =?utf-8?B?ZjhDdXA2RjRZNmNOVkpRVzVGcmR0aERUZG9LQmI5UEZLS1JIR2Nzbzdya1Vh?=
+ =?utf-8?B?dFR5WVR5QVBtVWF6TEU5aEZGSFNwM21vUDVaNVFkaGo2bDVyMkt5TS9id3Mv?=
+ =?utf-8?B?MnpyY1RWVWx1VXZVV3R5S3h0MjlsUjdnbGpzcHUrT1dqb0JNUlE3clovdFhO?=
+ =?utf-8?B?WVFDWGpMVjlxeDB5VEF0cjBsdkRUbzNDOFc0STRGSXpGK3ZOSzczSjlzMHRx?=
+ =?utf-8?B?VWlwVFp1aEw0bER5M2dPVVJyczBwY2FvREd3Zk1ZREJQTW5hWlpHRFB1STNQ?=
+ =?utf-8?B?eXU4b1J6ZGoxZmZXRE5CejRLTURkRHI1em43L2VrK1Iyb1kyMEtwekFRblF5?=
+ =?utf-8?B?WjlmTzRmL05YSFNXUlVKUFlMYk92bDhPbU5ic1NlK2V0Ym1rTkJDdTBPOG94?=
+ =?utf-8?B?dTRaYUpoNmJnMXkyL2d6eWJmMnRjR011ZDNZcmUvbjFWMEtWVlRvT3hsWjJl?=
+ =?utf-8?B?UHcwclpaMGNFdmFWTDRYZnRmWVV2bWgyR01MdVNwTFlKZi94eWN6NUVlZ3By?=
+ =?utf-8?B?aGN1TFFCa3dQZTd4elY3WDhpRzFIMXR2YkFoYlMwcWl2ZlBSMVpQdlF3LzdM?=
+ =?utf-8?B?T29xeW9XZCtrMm00UzQzcURFWTVMMHMzNy9TYmsrdWR5UndNZGRYR2xNMHFK?=
+ =?utf-8?B?RTQxL3RKQWdRRXEzRkhRZW93RDJBPT0=?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(7416014)(1800799024)(7142099003);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 11:19:46.8224
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 11:23:56.0704
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1cb8048-c8b5-413e-ff14-08de5e5f250a
+X-MS-Exchange-CrossTenant-Network-Message-Id: de03a3ed-35aa-49fa-2d1b-08de5e5fb996
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D1.namprd02.prod.outlook.com
+	SJ5PEPF000001C9.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9061
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8470
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69336-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69337-lists,kvm=lfdr.de];
 	FREEMAIL_CC(0.00)[redhat.com,gmail.com,linaro.org,habkost.net,intel.com,google.com,lists.linux.dev,8bytes.org];
-	DKIM_TRACE(0.00)[amd.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sarunkod@amd.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sarunkod@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 0FFD4A036D
+X-Rspamd-Queue-Id: 12769A044D
 X-Rspamd-Action: no action
 
 
 
-On 1/28/2026 7:10 AM, Alejandro Jimenez wrote:
-> Hi,
+On 1/28/2026 7:29 AM, Alejandro Jimenez wrote:
 >
 > On 11/18/25 5:15 AM, Sairaj Kodilkar wrote:
->> From: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+>> AMD IOMMU supports upto 2048 MSIs for a single device function
+>> when NUM_INT_REMAP_SUP Extended-Feature-Register-2 bit is set to one.
+>> Software can enable this feature by writing one to NUM_INT_REMAP_MODE
+>> in the control register. MSI address destination mode (DM) bit decides
+>> how many MSI data bits are used by IOMMU to index into IRT. When DM = 0,
+>> IOMMU uses bits 8:0 (max 512) for the index, otherwise (DM = 1)
+>> IOMMU uses bits 10:0 (max 2048) for IRT index.
 >>
->> "Set" function tracks VFIO devices in the hash table. This is useful when
->> looking up per-device host IOMMU information later on.
+>> This feature can be enabled with flag `numint2k=on`. In case of
+>> passhthrough devices viommu uses control register provided by vendor
+>> capabilites to determine if host IOMMU has enabled 2048 MSIs. If host
+>> IOMMU has not enabled it then the guest feature is disabled.
 >>
->> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+>> example command line
+>> '''
+>> -object iommufd,id=fd0 \
+>> -device amd_iommu,dma-remap=on,numint2k=on \
+>> -device vfio-host,host=<DEVID>,iommufd=fd0 \
+>> '''
+>>
+>> NOTE: In case of legacy VFIO container the guest will always fall back
+>> to 512 MSIs.
+>>
 >> Signed-off-by: Sairaj Kodilkar <sarunkod@amd.com>
 >> ---
->>   hw/i386/amd_iommu.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
->>   hw/i386/amd_iommu.h |  8 +++++
->>   2 files changed, 79 insertions(+)
+>>   hw/i386/amd_iommu.c | 74 ++++++++++++++++++++++++++++++++++++++++-----
+>>   hw/i386/amd_iommu.h | 12 ++++++++
+>>   2 files changed, 79 insertions(+), 7 deletions(-)
 >>
 >> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
->> index 378e0cb55eab..8b146f4d33d2 100644
+>> index 3221bf5a0303..4f62c4ee3671 100644
 >> --- a/hw/i386/amd_iommu.c
 >> +++ b/hw/i386/amd_iommu.c
->> @@ -382,6 +382,22 @@ static guint amdvi_uint64_hash(gconstpointer v)
->>       return (guint)*(const uint64_t *)v;
+>> @@ -116,7 +116,12 @@ uint64_t amdvi_extended_feature_register(AMDVIState *s)
+>>   
+>>   uint64_t amdvi_extended_feature_register2(AMDVIState *s)
+>>   {
+>> -    return AMDVI_DEFAULT_EXT_FEATURES2;
+>> +    uint64_t feature = AMDVI_DEFAULT_EXT_FEATURES2;
+>> +    if (s->num_int_sup_2k) {
+>> +        feature |= AMDVI_FEATURE_NUM_INT_REMAP_SUP;
+>> +    }
+>> +
+>> +    return feature;
 >>   }
 >>   
->> +static guint amdvi_dte_hash(gconstpointer v)
->> +{
->> +    const struct AMDVI_dte_key *key = v;
->> +    guint value = (guint)(uintptr_t)key->bus;
+>>   /* configure MMIO registers at startup/reset */
+>> @@ -1538,6 +1543,9 @@ static void amdvi_handle_control_write(AMDVIState *s)
+>>                           AMDVI_MMIO_CONTROL_CMDBUFLEN);
+>>       s->ga_enabled = !!(control & AMDVI_MMIO_CONTROL_GAEN);
+>>   
+>> +    s->num_int_enabled = (control >> AMDVI_MMIO_CONTROL_NUM_INT_REMAP_SHIFT) &
+>> +                         AMDVI_MMIO_CONTROL_NUM_INT_REMAP_MASK;
 >> +
->> +    return (guint)(value << 8 | key->devfn);
->> +}
+>>       /* update the flags depending on the control register */
+>>       if (s->cmdbuf_enabled) {
+>>           amdvi_assign_orq(s, AMDVI_MMIO_STATUS, AMDVI_MMIO_STATUS_CMDBUF_RUN);
+>> @@ -2119,6 +2127,25 @@ static int amdvi_int_remap_msi(AMDVIState *iommu,
+>>        * (page 5)
+>>        */
+>>       delivery_mode = (origin->data >> MSI_DATA_DELIVERY_MODE_SHIFT) & 7;
+>> +    /*
+>> +     * The MSI address register bit[2] is used to get the destination
+>> +     * mode. The dest_mode 1 is valid for fixed and arbitrated interrupts
+>> +     * and when IOMMU supports upto 2048 interrupts.
+>> +     */
+>> +    dest_mode = (origin->address >> MSI_ADDR_DEST_MODE_SHIFT) & 1;
 >> +
->> +static gboolean amdvi_dte_equal(gconstpointer v1, gconstpointer v2)
->> +{
->> +    const struct AMDVI_dte_key *key1 = v1;
->> +    const struct AMDVI_dte_key *key2 = v2;
+>> +    if (dest_mode &&
+>> +        iommu->num_int_enabled == AMDVI_MMIO_CONTROL_NUM_INT_REMAP_2K) {
 >> +
->> +    return (key1->bus == key2->bus) && (key1->devfn == key2->devfn);
->> +}
->> +
->>   static AMDVIIOTLBEntry *amdvi_iotlb_lookup(AMDVIState *s, hwaddr addr,
->>                                              uint64_t devid)
->>   {
->> @@ -2291,8 +2307,60 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
+>> +        trace_amdvi_ir_delivery_mode("2K interrupt mode");
+>> +        ret = __amdvi_int_remap_msi(iommu, origin, translated, dte, &irq, sid);
+>> +        if (ret < 0) {
+>> +            goto remap_fail;
+>> +        }
+>> +        /* Translate IRQ to MSI messages */
+>> +        x86_iommu_irq_to_msi_message(&irq, translated);
+>> +        goto out;
+>> +    }
+>>   
+>>       switch (delivery_mode) {
+>>       case AMDVI_IOAPIC_INT_TYPE_FIXED:
+>> @@ -2159,12 +2186,6 @@ static int amdvi_int_remap_msi(AMDVIState *iommu,
+>>           goto remap_fail;
+>>       }
+>>   
+>> -    /*
+>> -     * The MSI address register bit[2] is used to get the destination
+>> -     * mode. The dest_mode 1 is valid for fixed and arbitrated interrupts
+>> -     * only.
+>> -     */
+>> -    dest_mode = (origin->address >> MSI_ADDR_DEST_MODE_SHIFT) & 1;
+>>       if (dest_mode) {
+>>           trace_amdvi_ir_err("invalid dest_mode");
+>>           ret = -AMDVI_IR_ERR;
+>> @@ -2322,6 +2343,30 @@ static AddressSpace *amdvi_host_dma_iommu(PCIBus *bus, void *opaque, int devfn)
 >>       return &iommu_as[devfn]->as;
 >>   }
 >>   
->> +static bool amdvi_set_iommu_device(PCIBus *bus, void *opaque, int devfn,
->> +                                   HostIOMMUDevice *hiod, Error **errp)
+>> +static void amdvi_refresh_efrs_hwinfo(struct AMDVIState *s,
+>> +                                      struct iommu_hw_info_amd *hwinfo)
 >> +{
->> +    AMDVIState *s = opaque;
->> +    struct AMDVI_dte_key *new_key;
->> +    struct AMDVI_dte_key key = {
->> +        .bus = bus,
->> +        .devfn = devfn,
->> +    };
+>> +    /* Check if host OS has enabled 2K interrupts */
+>> +    bool hwinfo_ctrl_2k;
 >> +
->> +    assert(hiod);
->> +    assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
->> +
->> +    if (g_hash_table_lookup(s->hiod_hash, &key)) {
->> +        error_setg(errp, "Host IOMMU device already exist");
-> nit: s/exist/exists/
-
-Sure
-
->> +        return false;
+>> +    if (s->num_int_sup_2k && !hwinfo) {
+>> +        warn_report("AMDVI: Disabling 2048 MSI for guest, "
+>> +                    "use IOMMUFD for device passthrough to support it");
+>> +        s->num_int_sup_2k = 0;
 >> +    }
 >> +
->> +    if (hiod->caps.type != IOMMU_HW_INFO_TYPE_AMD &&
->> +        hiod->caps.type != IOMMU_HW_INFO_TYPE_DEFAULT) {
->> +        error_setg(errp, "IOMMU hardware is not compatible");
->> +        return false;
+>> +    hwinfo_ctrl_2k = ((hwinfo->control_register
+> We need to check that hwinfo is a valid pointer before attempting to access
+> any of its fields. The code in the line above causes a segfault in the
+> common case where we are just using the default VFIO legacy backend and no
+> new options.
+> Even when trying to use the new feature (numint2k=on) and iommufd backend
+> in QEMU, if the host kernel was built with CONFIG_AMD_IOMMU_IOMMUFD=n
+> (which is currently the default), the ioctl IOMMU_GET_HW_INFO will always
+> return NULL data and hwinfo is also NULL at this point, so we crash and burn.
+>
+>> +                       >> AMDVI_MMIO_CONTROL_NUM_INT_REMAP_SHIFT)
+>> +                      & AMDVI_MMIO_CONTROL_NUM_INT_REMAP_2K);
+>> +
+>> +    if (s->num_int_sup_2k && !hwinfo_ctrl_2k) {
+>> +        warn_report("AMDVI: Disabling 2048 MSIs for guest, "
+>> +                    "as host kernel does not support this feature");
+>> +        s->num_int_sup_2k = 0;
 >> +    }
 >> +
->> +    new_key = g_malloc(sizeof(*new_key));
-> When allocating the new key, use g_new0() instead of g_malloc(), matches
-> the current code better e.g.
->
-> new_key = g_new0(AMDVIHIODKey, 1);
->
-> *the AMDVIHIODKey type comes from a suggestion I make later.
-
-Right
-
->> +    new_key->bus = bus;
->> +    new_key->devfn = devfn;
->> +
->> +    object_ref(hiod);
->> +    g_hash_table_insert(s->hiod_hash, new_key, hiod);
->> +
->> +    return true;
+>> +    amdvi_refresh_efrs(s);
 >> +}
->> +
->> +static void amdvi_unset_iommu_device(PCIBus *bus, void *opaque,
->> +                                     int devfn)
->> +{
->> +    AMDVIState *s = opaque;
->> +    struct AMDVI_dte_key key = {
->> +        .bus = bus,
->> +        .devfn = devfn,
->> +    };
->> +
->> +    if (!g_hash_table_lookup(s->hiod_hash, &key)) {
->> +        return;
->> +    }
->> +
->> +    g_hash_table_remove(s->hiod_hash, &key);
->> +}
->> +
-> I think we have to explicitly decrement the reference count for the hiod
-> object when removing the last entry from s->hiod_hash.
->
-> It looks like the best approach is to pass a custom value_destroy_func
-> callback for it when calling g_hash_table_new_full() to create the table.
-> Both the VT-d and virtio IOMMU implementations do it via that method.
-
-Good catch, Will do this !
-
->
->>   static const PCIIOMMUOps amdvi_iommu_ops = {
->>       .get_address_space = amdvi_host_dma_iommu,
->> +    .set_iommu_device = amdvi_set_iommu_device,
->> +    .unset_iommu_device = amdvi_unset_iommu_device,
->>   };
 >>   
->>   static const MemoryRegionOps mmio_mem_ops = {
->> @@ -2510,6 +2578,9 @@ static void amdvi_sysbus_realize(DeviceState *dev, Error **errp)
->>       s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
->>                                        amdvi_uint64_equal, g_free, g_free);
+>>   static bool amdvi_set_iommu_device(PCIBus *bus, void *opaque, int devfn,
+>>                                      HostIOMMUDevice *hiod, Error **errp)
+>> @@ -2354,6 +2399,20 @@ static bool amdvi_set_iommu_device(PCIBus *bus, void *opaque, int devfn,
+>>       object_ref(hiod);
+>>       g_hash_table_insert(s->hiod_hash, new_key, hiod);
 >>   
->> +    s->hiod_hash = g_hash_table_new_full(amdvi_dte_hash,
->> +                                         amdvi_dte_equal, g_free, g_free);
->> +
-> As I mentioned above, I think the last parameter to g_hash_table_new_full()
-> should be a custom destroy function with a call to:
->
-> object_unref((HostIOMMUDevice *)v);
->
->
->>       /* set up MMIO */
->>       memory_region_init_io(&s->mr_mmio, OBJECT(s), &mmio_mem_ops, s,
->>                             "amdvi-mmio", AMDVI_MMIO_SIZE);
->> diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
->> index daf82fc85f96..e6f6902fe06d 100644
->> --- a/hw/i386/amd_iommu.h
->> +++ b/hw/i386/amd_iommu.h
->> @@ -358,6 +358,11 @@ struct AMDVIPCIState {
->>       uint32_t capab_offset;       /* capability offset pointer    */
->>   };
->>   
->> +struct AMDVI_dte_key {
->> +    PCIBus *bus;
->> +    uint8_t devfn;
->> +};
->> +
-> For consistency with earlier usage, use a typedef and CamelCase for the new
-> AMDVI_dte_key definition i.e.
->
-> typedef struct AMDVIDTEKey {
->      PCIBus *bus;
->      uint8_t devfn;
-> } AMDVIDTEKey;
->
-> having it in the header file is best I think. I will send a patch moving
-> other definitions to amd_iommu.h as well.
->
-> But I am not sure that using "dte" in this case is the best choice. I had
-> this comment written for another section, fits better here:
->
-> hiod_hash and amdvi_dte_hash() should probably use a similar naming to
-> signal their relationship. Maybe they can all be 'hiod' based i.e.
-> amdvi_hiod_hash().
-> This seems to be the choice the VT-d implementation made, and it also
-> signals we are using the same HostIOMMUDevice abstraction/model. I get that
-> the device the HostIOMMUDevice represents is identified by a unique DTE on
-> the host side IOMMU structures, so I am not arguing the naming is
-> incorrect, but since we also have many places in the code that act on the
-> guest DTE (e.g. amdvi_get_dte()), it would be better to avoid overloading
-> 'dte' to avoid confusion.
->
-> If the above makes sense, then we should also use `typedef struct
-> AMDVIHIODKey` instead...
+>> +    if (hiod->caps.type == IOMMU_HW_INFO_TYPE_AMD) {
+>> +        /*
+>> +         * Refresh the MMIO efr registers so that changes are visible to the
+>> +         * guest.
+>> +         */
+>> +        amdvi_refresh_efrs_hwinfo(s, &hiod->caps.vendor_caps.amd);
+>> +    } else {
+>> +        /*
+>> +         * Pass NULL hardware registers when we have non-IOMMUFD
+>> +         * passthrough device
+>> +         */
+>> +        amdvi_refresh_efrs_hwinfo(s, NULL);
+> This call with hwinfo = NULL causes a segfault as I mentioned above. The
+> code in amdvi_refresh_efrs_hwinfo() needs to be hardened.
 >
 > Thank you,
 > Alejandro
 
-Yeah I am in favour of HIOD base naming, will update it in V2
+Hi Alejandro
+
+Good catch, I caught this but somehow forgot to fix.
+Thanks for pointing it out
 
 Thanks
 Sairaj
 
->
->>   struct AMDVIState {
->>       X86IOMMUState iommu;        /* IOMMU bus device             */
->>       AMDVIPCIState *pci;         /* IOMMU PCI device             */
->> @@ -416,6 +421,9 @@ struct AMDVIState {
->>       /* IOTLB */
->>       GHashTable *iotlb;
->>   
->> +    /* HostIOMMUDevice hash table*/
->> +    GHashTable *hiod_hash;
+>> +    }
 >> +
->>       /* Interrupt remapping */
->>       bool ga_enabled;
->>       bool xtsup;
+>>       return true;
+>>   }
+>>   
+>> @@ -2641,6 +2700,7 @@ static const Property amdvi_properties[] = {
+>>       DEFINE_PROP_BOOL("xtsup", AMDVIState, xtsup, false),
+>>       DEFINE_PROP_STRING("pci-id", AMDVIState, pci_id),
+>>       DEFINE_PROP_BOOL("dma-remap", AMDVIState, dma_remap, false),
+>> +    DEFINE_PROP_BOOL("numint2k", AMDVIState, num_int_sup_2k, false),
+>>   };
+>>   
+>>   static const VMStateDescription vmstate_amdvi_sysbus = {
+>> diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
+>> index c8eaf229b50e..588725fe0c25 100644
+>> --- a/hw/i386/amd_iommu.h
+>> +++ b/hw/i386/amd_iommu.h
+>> @@ -107,6 +107,9 @@
+>>   #define AMDVI_MMIO_CONTROL_COMWAITINTEN   (1ULL << 4)
+>>   #define AMDVI_MMIO_CONTROL_CMDBUFLEN      (1ULL << 12)
+>>   #define AMDVI_MMIO_CONTROL_GAEN           (1ULL << 17)
+>> +#define AMDVI_MMIO_CONTROL_NUM_INT_REMAP_MASK        (0x3)
+>> +#define AMDVI_MMIO_CONTROL_NUM_INT_REMAP_SHIFT       (43)
+>> +#define AMDVI_MMIO_CONTROL_NUM_INT_REMAP_2K          (0x1)
+>>   
+>>   /* MMIO status register bits */
+>>   #define AMDVI_MMIO_STATUS_CMDBUF_RUN  (1 << 4)
+>> @@ -160,6 +163,7 @@
+>>   #define AMDVI_PERM_READ             (1 << 0)
+>>   #define AMDVI_PERM_WRITE            (1 << 1)
+>>   
+>> +/* EFR */
+>>   #define AMDVI_FEATURE_PREFETCH            (1ULL << 0) /* page prefetch       */
+>>   #define AMDVI_FEATURE_PPR                 (1ULL << 1) /* PPR Support         */
+>>   #define AMDVI_FEATURE_XT                  (1ULL << 2) /* x2APIC Support      */
+>> @@ -169,6 +173,9 @@
+>>   #define AMDVI_FEATURE_HE                  (1ULL << 8) /* hardware error regs */
+>>   #define AMDVI_FEATURE_PC                  (1ULL << 9) /* Perf counters       */
+>>   
+>> +/* EFR2 */
+>> +#define AMDVI_FEATURE_NUM_INT_REMAP_SUP   (1ULL << 8) /* 2K int support      */
+>> +
+>>   /* reserved DTE bits */
+>>   #define AMDVI_DTE_QUAD0_RESERVED        (GENMASK64(6, 2) | GENMASK64(63, 63))
+>>   #define AMDVI_DTE_QUAD1_RESERVED        0
+>> @@ -380,6 +387,8 @@ struct AMDVIState {
+>>       bool evtlog_enabled;         /* event log enabled            */
+>>       bool excl_enabled;
+>>   
+>> +    uint8_t num_int_enabled;
+>> +
+>>       hwaddr devtab;               /* base address device table    */
+>>       uint64_t devtab_len;         /* device table length          */
+>>   
+>> @@ -433,6 +442,9 @@ struct AMDVIState {
+>>   
+>>       /* DMA address translation */
+>>       bool dma_remap;
+>> +
+>> +    /* upto 2048 interrupt support */
+>> +    bool num_int_sup_2k;
+>>   };
+>>   
+>>   uint64_t amdvi_extended_feature_register(AMDVIState *s);
 
 
