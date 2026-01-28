@@ -1,184 +1,224 @@
-Return-Path: <kvm+bounces-69352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69353-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KCaQHGo8emlB4wEAu9opvQ
-	(envelope-from <kvm+bounces-69352-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 17:42:18 +0100
+	id wPYHBQhEemn34wEAu9opvQ
+	(envelope-from <kvm+bounces-69353-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 18:14:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355E3A6047
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 17:42:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6747FA6A46
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 18:14:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A22833063B88
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 16:37:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 446CA30E7125
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 16:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD28318B91;
-	Wed, 28 Jan 2026 16:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9546A30F94D;
+	Wed, 28 Jan 2026 16:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UWnzk1Sd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aUcelpKq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EED225390;
-	Wed, 28 Jan 2026 16:37:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F322F25EF;
+	Wed, 28 Jan 2026 16:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769618259; cv=none; b=tLz4rh+gXixICijRpznNbzR+R0BA+IOT7Y6GsyUgxEUXOryLIR+YBPqt22QBhCVWmScOyz+1yAGC0qhcTbBnrzD45lHwMbzj8aCoZo0wG/jkVykCLwGv+mGXueapcXvdacqpOc14vKnQP6dpZcmEEGtokyXAUHw0pglijvAM/8w=
+	t=1769618871; cv=none; b=fMXXvA1v0Zcx/TsU9STJppq3fj+ZBreZFPGUcxJuah2QxVDON4YccL53as1EsOLMGWyQikaJjOw2KjJYBxyPXxZudLmcFYXEM026X/0lIRHn9/cRCCx5gA73yY3Tk3xorYeTBF4ObbrYf1pZjoAJ1acm/jMFUC1TrXkrhYAKGg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769618259; c=relaxed/simple;
-	bh=5VQnCDuQCkhhh77yB7Rf7FJQ809hnPwjNbATcTV4KbQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zt/kCmlDQ6q/DFkNuWmDJd5fsW2ws/ufI46K/UN8keaJXCkRwrREbGj3LjsZ0hFPb2MQ6vhkKp7jQeGLmGMCncIPpdLPy8UMxldSIVyerJRqMV/LNbkyNpQSHnB8FvLH5j29VUFV7RiVPZ7Bpy0oPjmf5tQnhPRjatW2fryDfmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UWnzk1Sd; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769618258; x=1801154258;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5VQnCDuQCkhhh77yB7Rf7FJQ809hnPwjNbATcTV4KbQ=;
-  b=UWnzk1SdsuVq6C6HdVQP7B/bZXRvmXVwQp8uM7e+f8cGE37i5+McnFPl
-   4ZXKmSUPa83zjBWNQbIaGpEIcSdV4vOfXWa0qDVD/n9RmXCYASePUnr5l
-   48rnMU3GkHJ0KWWbnGIkAX1rdyVAI1ic9WUDXzSbf/SEUMGXkmsCBkskq
-   jJ1sfz7EEKqy4C2p1ksoMjNpm3STHjyeiYrKcjBOEk7kmdsDCEiqk8MQ3
-   EBKs+CcfEkmOnH4CwEReQOhnUkZ3i9sHlQT0evuo4vEJEd4gGgVWUOJr3
-   gLzk671Tz89bTYdhReVgK+4g7sPRZ9UuCH3KV64wArTVCSLMwgDmq50w1
-   Q==;
-X-CSE-ConnectionGUID: 472RLwbxSY2ywP8ByOMlHw==
-X-CSE-MsgGUID: OUQcrraHSXKbzor7qJzm2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="71003365"
-X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="71003365"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 08:37:37 -0800
-X-CSE-ConnectionGUID: iMfP6wB7QiC7KUsTAdJPxw==
-X-CSE-MsgGUID: 1ww5TM6MSB2VnCAjm4b6tA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="208388872"
-Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.190]) ([10.125.109.190])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 08:37:37 -0800
-Message-ID: <3e134fb9-95c0-442b-8a25-834ffd8d87f9@intel.com>
-Date: Wed, 28 Jan 2026 08:37:35 -0800
+	s=arc-20240116; t=1769618871; c=relaxed/simple;
+	bh=khVIv1qokt8EydR+iWBqZYjiiVSQkftreadhBsB8SBY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XxWfdL6Z7KODAMpU6gJJUwgPEdkCyowejBoZSnVmbX/JwazI4u5iDoI7roCoC8IB0VN5ns2Kb4RPSw1QqWxFgihnbQedQzq7oq8faN3FDo4w75AaV2eCo/QVwynN1yL8yGmQzlzK/5B1nWjMueAaBkR2gU5f7byGXe2/KLP5BVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aUcelpKq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63E13C116C6;
+	Wed, 28 Jan 2026 16:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769618871;
+	bh=khVIv1qokt8EydR+iWBqZYjiiVSQkftreadhBsB8SBY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aUcelpKqkT3/iXgxoD3lhQhBWBXwBiNiil4AkxSvO/XrNFqYQXlfA5LzT+9WPi8bo
+	 yuFJdHBd14kamuk11R6PxEGYcVE9o5pREU5FlUgZZf2+OcX7D/8NJ+rFJ0NLbpbqaU
+	 a4E4+InHd1SYdgJSU5L1v/GrJs2YPMVSNlHIZEVh+YPwoy3uxsVYeOaqxukolI6prO
+	 Zq9T83LroW3qeOMpp66lMALimg46NDDofXY4KnnwGxkBHMf8EgnqDUO/ixuTchvAay
+	 qYG7IWLySWO69Uor6OjwH5+fc22FpvjUVexQ4qKw/GnmP7V/VpxMJqcOscqa6OHvmV
+	 NzWnhaB+UGeTg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vl8ho-00000006T2w-46sY;
+	Wed, 28 Jan 2026 16:47:49 +0000
+Date: Wed, 28 Jan 2026 16:47:48 +0000
+Message-ID: <86cy2tbs5n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Mingwei Zhang <mizhang@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 0/3] KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
+In-Reply-To: <20251113052452.975081-1-rananta@google.com>
+References: <20251113052452.975081-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/26] x86/virt/tdx: Move low level SEAMCALL helpers
- out of <asm/tdx.h>
-To: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc: reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
- dan.j.williams@intel.com, yilun.xu@linux.intel.com, sagis@google.com,
- vannapurve@google.com, paulmck@kernel.org, nik.borisov@suse.com,
- zhenzhong.duan@intel.com, seanjc@google.com, rick.p.edgecombe@intel.com,
- kas@kernel.org, dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
-References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-4-chao.gao@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20260123145645.90444-4-chao.gao@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oupton@kernel.org, mizhang@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-69352-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-69353-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 355E3A6047
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6747FA6A46
 X-Rspamd-Action: no action
 
-On 1/23/26 06:55, Chao Gao wrote:
-> +++ b/arch/x86/virt/vmx/tdx/seamcall.h
+On Thu, 13 Nov 2025 05:24:49 +0000,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> Hello,
+> 
+> When destroying a fully-mapped 128G VM abruptly, the following scheduler
+> warning is observed:
+> 
+>   sched: CPU 0 need_resched set for > 100018840 ns (100 ticks) without schedule
+>   CPU: 0 UID: 0 PID: 9617 Comm: kvm_page_table_ Tainted: G O 6.16.0-smp-DEV #3 NONE
+>   Tainted: [O]=OOT_MODULE
+>   Call trace:
+>       show_stack+0x20/0x38 (C)
+>       dump_stack_lvl+0x3c/0xb8
+>       dump_stack+0x18/0x30
+>       resched_latency_warn+0x7c/0x88
+>       sched_tick+0x1c4/0x268
+>       update_process_times+0xa8/0xd8
+>       tick_nohz_handler+0xc8/0x168
+>       __hrtimer_run_queues+0x11c/0x338
+>       hrtimer_interrupt+0x104/0x308
+>       arch_timer_handler_phys+0x40/0x58
+>       handle_percpu_devid_irq+0x8c/0x1b0
+>       generic_handle_domain_irq+0x48/0x78
+>       gic_handle_irq+0x1b8/0x408
+>       call_on_irq_stack+0x24/0x30
+>       do_interrupt_handler+0x54/0x78
+>       el1_interrupt+0x44/0x88
+>       el1h_64_irq_handler+0x18/0x28
+>       el1h_64_irq+0x84/0x88
+>       stage2_free_walker+0x30/0xa0 (P)
+>       __kvm_pgtable_walk+0x11c/0x258
+>       __kvm_pgtable_walk+0x180/0x258
+>       __kvm_pgtable_walk+0x180/0x258
+>       __kvm_pgtable_walk+0x180/0x258
+>       kvm_pgtable_walk+0xc4/0x140
+>       kvm_pgtable_stage2_destroy+0x5c/0xf0
+>       kvm_free_stage2_pgd+0x6c/0xe8
+>       kvm_uninit_stage2_mmu+0x24/0x48
+>       kvm_arch_flush_shadow_all+0x80/0xa0
+>       kvm_mmu_notifier_release+0x38/0x78
+>       __mmu_notifier_release+0x15c/0x250
+>       exit_mmap+0x68/0x400
+>       __mmput+0x38/0x1c8
+>       mmput+0x30/0x68
+>       exit_mm+0xd4/0x198
+>       do_exit+0x1a4/0xb00
+>       do_group_exit+0x8c/0x120
+>       get_signal+0x6d4/0x778
+>       do_signal+0x90/0x718
+>       do_notify_resume+0x70/0x170
+>       el0_svc+0x74/0xd8
+>       el0t_64_sync_handler+0x60/0xc8
+>       el0t_64_sync+0x1b0/0x1b8
+> 
+> The host kernel was running with CONFIG_PREEMPT_NONE=y, and since the
+> page-table walk operation takes considerable amount of time for a VM
+> with such a large number of PTEs mapped, the warning is seen.
+> 
+> To mitigate this, split the walk into smaller ranges, by checking for
+> cond_resched() between each range. Since the path is executed during
+> VM destruction, after the page-table structure is unlinked from the
+> KVM MMU, relying on cond_resched_rwlock_write() isn't necessary.
+> 
+> Patch-1 kills the assumption that the page-table hierarchy under the
+> table is free (in stage2_free_walker()). Instead, drop and clear the
+> references only on empty tables.
+> 
+> Patch-2 splits the kvm_pgtable_stage2_destroy() function into separate
+> 'walk' and 'free PGD' parts.
+> 
+> Patch-3 leverages the split and performs the walk periodically over
+> smaller ranges and calls cond_resched() between them.
+> 
+> The series was originally posted and merged [1], but was later reverted
+> due to syzkaller catching a UAF bug [2]. This series fixes the issue, and
+> the original need_resched warning is addressed.
+> 
+> [1]: https://lore.kernel.org/all/175582091313.1266576.4329884314263043118.b4-ty@linux.dev/
+> [2]: https://lore.kernel.org/all/20250910180930.3679473-1-oliver.upton@linux.dev/ 
+> 
+> Oliver Upton (1):
+>   KVM: arm64: Only drop references on empty tables in stage2_free_walker
+> 
+> Raghavendra Rao Ananta (2):
+>   KVM: arm64: Split kvm_pgtable_stage2_destroy()
+>   KVM: arm64: Reschedule as needed when destroying the stage-2
+>     page-tables
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h | 30 +++++++++++++
+>  arch/arm64/include/asm/kvm_pkvm.h    |  4 +-
+>  arch/arm64/kvm/hyp/pgtable.c         | 63 +++++++++++++++++++++++-----
+>  arch/arm64/kvm/mmu.c                 | 36 +++++++++++++++-
+>  arch/arm64/kvm/pkvm.c                | 11 ++++-
+>  5 files changed, 129 insertions(+), 15 deletions(-)
+> 
+> 
+> base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
 
-Moving the code to a local header is a good thing. The more private
-these things are, the better.
+As a heads-up: I am suspecting this series to break my NV guests in a
+pretty bad way. L2 and L3 guests are getting stuck, L0 and L1 barf on
+S2 PTs that are being destroyed. This stinks of TLB invalidation going
+very wrong, which would result in S2 management going similarly
+sideways.  I still need to work out whether that is just triggering
+something bad somewhere else.
 
-I _do_ like when I see these things have a label in the filename like:
+For what it is worth, this reproduces on both M2 and QC machines.
 
-	internal.h
+Thanks,
 
-or even:
+	M.
 
-	seamcall_internal.h
-
-That really catches your eye. It would also be ideal to have a small
-blurb at the top of the file to say what its scope is, just to explain
-what folks should be adding to it or not.
-
-If you get a chance to add those, all the better. But either way:
-
-Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+-- 
+Without deviation from the norm, progress is not possible.
 
