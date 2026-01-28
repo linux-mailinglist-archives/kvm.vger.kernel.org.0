@@ -1,260 +1,285 @@
-Return-Path: <kvm+bounces-69294-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69295-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLWuD3NOeWnFwQEAu9opvQ
-	(envelope-from <kvm+bounces-69294-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 00:46:59 +0100
+	id KAjhOZpWeWlIwgEAu9opvQ
+	(envelope-from <kvm+bounces-69295-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:21:46 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E96749B7D0
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 00:46:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88CDB9BA03
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:21:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF54F302F6B3
-	for <lists+kvm@lfdr.de>; Tue, 27 Jan 2026 23:46:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF7F4302294E
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 00:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4112F617D;
-	Tue, 27 Jan 2026 23:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26231DF723;
+	Wed, 28 Jan 2026 00:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q0aMp+cV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zLxVLiLw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B654B2F3C13
-	for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 23:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D068199949
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 00:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769557604; cv=pass; b=iyrIrgJ4YD2ETRyu9Czkgk+rWOVp865rmDHaXu4ViMk53Or4Y7ce2AFZLf/tQFqFVWWs7JJmRp1xSKP+gmfhgQNHf4VeRWTae5hgslbWcqRHAwT6UGsSJRbhB6lRYHW2FAZtJMhyioKpAGog2ok3Y/fuIsfIpXpkoNW7BfjBRhI=
+	t=1769559676; cv=pass; b=Z8nfkWIlXwu/00WaQvKF9wcxrQBZayUkIP8gS3j61RhRweNaXZJajfCsy4Xmx9cVdXOyx/MpExJIQ0CGeDU2sAn3zCkajGfZaJPcWB+SCs6MLlTnZu6xPVeIQ3QnU/VIsCOBq0kURL9GGKRCeqVJtziVsFzoYduHRbdY612XUQw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769557604; c=relaxed/simple;
-	bh=vst6t4peh/JV4Zuhoe6fbMyUDr/jcG7JxMjC1bUj/HY=;
+	s=arc-20240116; t=1769559676; c=relaxed/simple;
+	bh=/kA8M2mqA273+dmaL09+/9pRCOJMn38c8HSeLt8VdYo=;
 	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a9K2DgfCXwlKD3wCeUK2o/FFJS0em9GEtk81rU4p8Ol2AyuaeVJgUIRHhKm+D77kXRU7+mOkHlYYGiAuvf9d/VQalhDcCliZmXlQcEbQX6jvx3bWGg47jjU83L0YWMelmaKdNdqZcAhHrX1ELuJ3hNsuF7TuRuz8RvYX3/AD6vc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q0aMp+cV; arc=pass smtp.client-ip=209.85.221.178
+	 To:Cc:Content-Type; b=mJqpBLpRTaFRkIZPHD8H3vwYOO/zWWJqjE8bsQO63IoCzk2gJvTEYuI9NMPpCtLMekQkqtZOf9Z6QeKu0SJR5NRnYa0L6ozVuxAoyYLOuj9BzE5J8mG6hpxU+WyKP1HGY3XlTISweQa945Kvn2x97LG5PLvphzMN6P8zQTOmTns=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zLxVLiLw; arc=pass smtp.client-ip=209.85.222.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-56636dc53a6so1308794e0c.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 15:46:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769557600; cv=none;
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-94801cf4bb8so1813553241.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 16:21:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769559673; cv=none;
         d=google.com; s=arc-20240605;
-        b=SIEyRKs6sPsxB2VdtVPyZZDR/tm2+jN72arrTVdaPlJOCAJWCayowdPOvD7Ud5D5HG
-         YyaQFbI+sl14wkG7b6jNx3GX/5L+VwmlZOAnQDLzaJ3PxxeYn1PBhE7W67QqHTL7GU1A
-         zSqHlUhEiaHevikL+lEB6N4NlkJhumiSj4cPE4mhYXpO221vCQQSFBlZ16XrnD8Ub1sD
-         kDrNU9vbCy9fryR6n3yUCogrs5APbqbJZoevLnLHeB/ZLCpsB36xwaamk9J2WwxLcIOS
-         banSZKC8QTTDirPwfCJDX5Xldb6KrsSepYxmAv2X3bppz5WnOv0VwwrZk7SWxBkLiMEl
-         tRlg==
+        b=fCQuURkZCUvlDDK3GGVKVj6qKmzZyV2CpOJxN/Uf10nwUXYgFv7UDgfEafIb2BSEN0
+         Y368lrcwxQ6qm3WEVwBR8k4FDJxxJWHy6+37orAV2vDlGk5EPJY6C0bk0k69VbEK+Rne
+         +y3Ret+OsZpvrXfPHH9N1ZPGxvITMy60zKVTEM1wkq8o/Mllpk3w0OGvL54pi9HurcV9
+         eNbGj195DTJF5AXwpgQdVkYmx9hImtz2SAfy6HD/CSujWS/s1336YieSu59JylUZRtmE
+         jQYzkSZQB8uGcV0CoMzOmjVGdnGcdDCCXZiSlX2VB0ogybb7p9I831RM6EAGmKNVzEuJ
+         SUTA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:dkim-signature;
-        bh=3+EqNzQT9TNRk9U4Wm8Lp51VnBAV17bgK1qxop8j5Is=;
-        fh=6ItGIrbuvluW1b9G+WNb+WNU4pF9AiXMBcoEuFgdF4Y=;
-        b=Ml91uo8F0kQ2DIpQCXFGtsVMShtflMLATck5ATXLmvzd/uEkbLXxFRKyk9+qaYx0BU
-         w1z0ek1hQvDr0ZeUZxFgTTOlpJOqakQIBK0ry9ZumTGYBemM8BIN3F+uEd3K13Uf/ABY
-         I+cEtzbYS66ZwWxtdkxPL9G7aTy4Rdlj2NY6ao8mLja+eA8zBkIA8Y3BZkurRBrHMXQB
-         LwMtyq23P7H6BRaPanqp3hS7z5T20fisNmH1xFxupvAKS3jPqDH2BmUd1+F9kwsw/QyS
-         o94YF7tgNH70wlGNFiXGOccWn34pmEYlkR9jdoScoWPkHjXpPyGE1urNS+F6HX1ct3j9
-         kl5g==;
+        bh=dtv6l5aP4r9bRMzqX9oNvs3QGYC/8h1s4fLDq3qnO1s=;
+        fh=02H3o/IShUL77ERvOiOtMzJW/SnPx9axWSLvAFccl2E=;
+        b=by1mqXN6eJqYIM4Mefm4MYWaPfxH/bMT4VGStszMUzQwizQw42kn6QWcq8lZKWxXpq
+         GIDWdunY67UwDYvZd6BRElbQ+Lvl3GMgCg/Bvc2Vy9tO7Iops/qQ7z22NDZhJYNoJ3l/
+         GmG9Ky0Ya2x+tGag4jSsfVQ0/1vvXMT/q4MP1xGBGp/Lxx5fHR5pdUJh5iL0Mp4naA4t
+         Bd9FvtDweBK8uaOMmurfJAk/rShiRKTcxeUHMTfonWbzhToFqCxCM2/hi/0UktMV+Hnw
+         qloEr1LciZ2+8f8ZaF25HgrgQZxAE6YmmqTjFbLmajXBGaH+mlgeQj7pxfy4EXnGwq0v
+         w+zw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769557600; x=1770162400; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769559673; x=1770164473; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3+EqNzQT9TNRk9U4Wm8Lp51VnBAV17bgK1qxop8j5Is=;
-        b=q0aMp+cVQgIaUs+GKsnXsbB8/OBQGmUP7zTFWK6YuIMa/8RpGMvXMR/6bZPWJUz+Ax
-         u/t64RKqMcpebPRbhQ1M6biN4IVbKs9gzGNSNkMp1uOAxFoKkJ3J2aIai8hAjHoef+oO
-         yGAQYLHOusadvqilAz8Cq8+gSfOtTAksoE5xOrb8XOmbpk7FoWeBVa3hH5MKs834fYOA
-         CLJ/rTfq30ymSa+kz+gatTy0HfxXCxyYv7Eitpa5Lcrq6+NC0vv4ZfQJ6bRsUKrik2+u
-         PKDb6B/ERV/ZDxO60V/G5dT8DoTygTVKTspVy7XBm6gYY5wd3EUNYV8jaV8k+Y2+l26V
-         yrdw==
+        bh=dtv6l5aP4r9bRMzqX9oNvs3QGYC/8h1s4fLDq3qnO1s=;
+        b=zLxVLiLwCl5TKZ5w6lbIQfLz95YzQ9rWelKRMBVskh1IgN7IUZ8J905zocwnkYbB12
+         9IU3w5q8ykIbETiMbYDppF4hkTGp5dovsYCfaTHfWxGp8uzY5bPUz2tlynmhUdtQJv8g
+         f0VIG5tCeMpqSwtNoOU4C1uoE/62uPwPPxImfNlXRHraU30DSQXQoR7lBjwCmPOu3f/f
+         b36LINQUU6r2jPZCumEMEduX+RkzSd/6zn4EDfmJl5j94rYPh08sDC5JymGyJkEPDkrq
+         7fHX+/BL2kTemKMa8JuCcxvLlTs46VgX32V4qAue126JYDenFRLX+3HXBmPdvqkpwcTB
+         VQog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769557600; x=1770162400;
+        d=1e100.net; s=20230601; t=1769559673; x=1770164473;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3+EqNzQT9TNRk9U4Wm8Lp51VnBAV17bgK1qxop8j5Is=;
-        b=t7Y4PegjyjMhhcnmrlK19+H1bBhKjAoHbIWKH5LMuUQKMtTLH7oX7DDAHHV5GtnmT/
-         V4PMk8ijc6RAVmj6UJT0jZk9BnImI+evgH8BCsu0HDZUd5l2kOpvZmByEISoB/VNd1CS
-         g7br5zXySisslLppsu44aPPV9oQzaWZDtLD0maoDnKlKwXKKCBKEV8DYODemqVtv3Znw
-         xsi2oF2Q2VVOuS9gL2qAmq+rlxIAG299JqDl3OGs1RQeH0xrrVn9+pMq8DIOw1q5oUPK
-         +0XHrRaXdfK7AZCQr/VOkdqu8NjjxEKil5/fHYs9FtD85OzxKMYu956hYbSdc2yWnab+
-         nj0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUCsen13zAXP2hGqQYBVkZ9e7crDg9MxyXiKwPcQs7b1rYGOs02PE0oyxK8ZLjYrp6l5co=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2a3D+PJMlJWVJkXlGm0Ge76D6IsOM48vl+bDjhQ0MibReS1dd
-	puYzvJ/EoKEn2/Iz2krrJ4frlX0FxDD74GOKnziRH7VYhpMno/kT3S5hL9jguSl+W8nefVmXbe1
-	0ve2z17ztbxRh6pWPACTM9dhR3h7KINubb6LCCOME
-X-Gm-Gg: AZuq6aIQ5sJczx3xOMwN2TvIOp1bZCO8YMhP91NHqpvrPq4gM910TN+HazYfbwt1Ny7
-	4bpB5XpE0nXS+sxmZV74dvbmsTkJ6CzOGCoqxhmKrptN3arqH6mhvXkgOzmcHMIj4IJzKikTnCl
-	ZdXkUcPOjCD0Qa0in7QAIphMw9+5CbkvSG7dKLlNA41wGwMt1u3eU0e2RKoTI+wv6wSoRcI+FyY
-	odO4kNKzBF1l+yWjJY36+eGWk9kv92APIsfOTxyZgR5EFodv4EpyQLpfyHBrKjsV0BWx/CafSK2
-	h1FjGsZyBPJXwRv3SSrh1AUzNQ==
-X-Received: by 2002:a05:6122:488a:b0:566:36e7:8934 with SMTP id
- 71dfb90a1353d-566795c5856mr1161633e0c.16.1769557600050; Tue, 27 Jan 2026
- 15:46:40 -0800 (PST)
+        bh=dtv6l5aP4r9bRMzqX9oNvs3QGYC/8h1s4fLDq3qnO1s=;
+        b=gwX/mPlQVAQ2TnSGBkI9BIBO+iwJgh97sI5JtzIrk83KtJUTkUNDPMdEsWhOLAetjy
+         CvgVVNJgdUk/PLx2YoBGknUuJVqDJmUdGcnbncs975Ah5eaTi2rGmR0QJu1YaJjtbl9o
+         FuiTqbhVtOu4rf7Shbgm8/O/ssVOvLZe1LwPOHAHYTNRRWe78qYNS7UxjfnsY5IXrXXt
+         btM3fS7IP78y7Kr6FHjNLsxIqlmO+DUqAXBh1k8VMrN5XJ3PZbcisJQBQacLoZ/EZcWL
+         63jMzHL1jihFkwpKumlwyBaiCFOq2sCHQvXtNQkcqhTxgmLXfhg3rnzoSnXN9BmMqRyc
+         oO4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUF5OUe6EPV6Q2oVqGJMKyd3Br4nMtit+tByKWXHvokhqLhVAdx4/idFAE9DFqA2OdJS8I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5bI9JdxpUiRDsWUcQb6IIYtzNcWYgkksXn4tEqSrSIdfO28e8
+	11Y5maTuFrSAhla/GlUviMbKFTSJdkwZb8UBYO/tnEHA9cjHiKuG0LgnpbkcfQdDi+55IjMexA6
+	1rrCKsOUeBRwZulOTdcSqlujwbArkgcIbOK0S99xB
+X-Gm-Gg: AZuq6aItmuqj/ZyGt+UJ3bErTZ0/JkDmRqeYbYcsO+Dt8fJDkNWeYLaWo2o0r9WGhBs
+	Ix73Khk9tsGiWnIYitTwRybFKG8aFMvrAn5k4vcARgp50qWZDGzLJ7GthsrSayCFedDKkbSTJuz
+	Bpeq28xP1P45zM+OMmfYDn1i3RhqX45lEU4XPmetZHtnr0uAtuD4MJnjNGJBBezEBPqwtd1KSnA
+	gbpJYzg7rRI1PkZc70OzScVmAWiKDIOSpMjQKHSbOabZsbrWpa1XTJMpdsberKumF4oVUbEY+P+
+	PYhCto53SjRHeh9ECYCAkp6C/A==
+X-Received: by 2002:a05:6102:2926:b0:5f5:2ab7:cef4 with SMTP id
+ ada2fe7eead31-5f7236280c7mr1308564137.12.1769559672438; Tue, 27 Jan 2026
+ 16:21:12 -0800 (PST)
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 27 Jan 2026 15:46:39 -0800
+ HTTPREST; Tue, 27 Jan 2026 16:21:11 -0800
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 27 Jan 2026 15:46:39 -0800
+ HTTPREST; Tue, 27 Jan 2026 16:21:11 -0800
 From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <ce78da49-2525-44af-9cb8-301bf6a4658a@suse.cz>
-References: <cover.1760731772.git.ackerleytng@google.com> <02aad35b728f4918e62dc6eb1d1d5546487b099e.1760731772.git.ackerleytng@google.com>
- <ce78da49-2525-44af-9cb8-301bf6a4658a@suse.cz>
+In-Reply-To: <afddc163-4b1e-46ee-920a-85de3b347291@amazon.com>
+References: <20260114134510.1835-1-kalyazin@amazon.com> <20260114134510.1835-8-kalyazin@amazon.com>
+ <e619ded526a2f9a4cec4f74383cef31519624935.camel@intel.com>
+ <294bca75-2f3e-46db-bb24-7c471a779cc1@amazon.com> <CAEvNRgEvd9tSwrkaYrQyibO2DP99vgVj6_zr=jBH5+zMnJwYbA@mail.gmail.com>
+ <afddc163-4b1e-46ee-920a-85de3b347291@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 27 Jan 2026 15:46:39 -0800
-X-Gm-Features: AZwV_QjMPyTn9KuYIeoCwzon32JStKYHl7N-mpSbapwuTdPZlfrcWu1xEKHINOw
-Message-ID: <CAEvNRgE07d_TaSVpkWO8gMfGgPsP9sBzrqMPCte8PET0THF=QA@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 09/37] KVM: guest_memfd: Skip LRU for guest_memfd folios
-To: Vlastimil Babka <vbabka@suse.cz>, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org
-Cc: akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgg@ziepe.ca, jgowans@amazon.com, jhubbard@nvidia.com, 
-	jroedel@suse.de, jthoughton@google.com, jun.miao@intel.com, 
-	kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, 
-	mail@maciej.szmigiero.name, maobibo@loongson.cn, 
-	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org, 
-	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, mingo@redhat.com, 
-	mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, 
-	peterx@redhat.com, pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, 
-	qperret@google.com, richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, 
-	rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
-	rppt@kernel.org, seanjc@google.com, shakeel.butt@linux.dev, shuah@kernel.org, 
-	steven.price@arm.com, steven.sistare@oracle.com, suzuki.poulose@arm.com, 
-	tabba@google.com, tglx@linutronix.de, thomas.lendacky@amd.com, 
-	vannapurve@google.com, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
+Date: Tue, 27 Jan 2026 16:21:11 -0800
+X-Gm-Features: AZwV_QgCVtca03XgnQCypNXAbjgX301aeAGuQByaW4GAjqTre8UeoPpevsc7bzA
+Message-ID: <CAEvNRgFCwU7ezDV4Spj=H1JZohG9CSQRKMh_h1OGY1GrR2=7Eg@mail.gmail.com>
+Subject: Re: [PATCH v9 07/13] KVM: guest_memfd: Add flag to remove from direct map
+To: kalyazin@amazon.com, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
+	"kalyazin@amazon.co.uk" <kalyazin@amazon.co.uk>, "kernel@xen0n.name" <kernel@xen0n.name>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, 
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
+Cc: "david@kernel.org" <david@kernel.org>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>, 
+	"jgross@suse.com" <jgross@suse.com>, "surenb@google.com" <surenb@google.com>, 
+	"riel@surriel.com" <riel@surriel.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
+	"peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, "rppt@kernel.org" <rppt@kernel.org>, 
+	"thuth@redhat.com" <thuth@redhat.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "ast@kernel.org" <ast@kernel.org>, 
+	"vbabka@suse.cz" <vbabka@suse.cz>, "Annapurve, Vishal" <vannapurve@google.com>, 
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>, 
+	"pjw@kernel.org" <pjw@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"willy@infradead.org" <willy@infradead.org>, "hca@linux.ibm.com" <hca@linux.ibm.com>, 
+	"wyihan@google.com" <wyihan@google.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
+	"jolsa@kernel.org" <jolsa@kernel.org>, 
+	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>, "jmattson@google.com" <jmattson@google.com>, 
+	"luto@kernel.org" <luto@kernel.org>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, 
+	"haoluo@google.com" <haoluo@google.com>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "coxu@redhat.com" <coxu@redhat.com>, 
+	"mhocko@suse.com" <mhocko@suse.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "song@kernel.org" <song@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "jthoughton@google.com" <jthoughton@google.com>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, 
+	"Yu, Yu-cheng" <yu-cheng.yu@intel.com>, 
+	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "prsampat@amd.com" <prsampat@amd.com>, 
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, 
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>, 
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "itazur@amazon.co.uk" <itazur@amazon.co.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>, 
+	"jackabt@amazon.co.uk" <jackabt@amazon.co.uk>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
+	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "derekmn@amazon.com" <derekmn@amazon.com>, 
+	"xmarcalx@amazon.co.uk" <xmarcalx@amazon.co.uk>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@fomichev.me" <sdf@fomichev.me>, "jackmanb@google.com" <jackmanb@google.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"corbet@lwn.net" <corbet@lwn.net>, "jannh@google.com" <jannh@google.com>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kas@kernel.org" <kas@kernel.org>, 
+	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,linux.intel.com,alien8.de,kernel.org,intel.com,lwn.net,redhat.com,google.com,cmpxchg.org,infradead.org,zytor.com,suse.cz,arm.com,ziepe.ca,amazon.com,nvidia.com,suse.de,linux.dev,oracle.com,maciej.szmigiero.name,loongson.cn,efficios.com,digikod.net,amd.com,ellerman.id.au,amazon.es,dabbelt.com,sifive.com,gmail.com,goodmis.org,amazon.co.uk,linutronix.de,zeniv.linux.org.uk,huawei.com];
+	FREEMAIL_CC(0.00)[kernel.org,dabbelt.com,arm.com,linux.ibm.com,suse.com,google.com,surriel.com,suse.de,redhat.com,linux.intel.com,suse.cz,ghiti.fr,linutronix.de,infradead.org,os.amperecomputing.com,linux.dev,linux-foundation.org,ziepe.ca,zytor.com,loongson.cn,oracle.com,nvidia.com,intel.com,huawei.com,gmail.com,amd.com,amazon.co.uk,iogearbox.net,eecs.berkeley.edu,amazon.com,fomichev.me,alien8.de,lwn.net];
+	TAGGED_FROM(0.00)[bounces-69295-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69294-lists,kvm=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[96];
+	RCPT_COUNT_GT_50(0.00)[97];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: E96749B7D0
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 88CDB9BA03
 X-Rspamd-Action: no action
 
-Vlastimil Babka <vbabka@suse.cz> writes:
+Nikita Kalyazin <kalyazin@amazon.com> writes:
 
-> On 10/17/25 22:11, Ackerley Tng wrote:
->> filemap_add_folio(), called from filemap_grab_folio(), adds folios to
->> an LRU list. This is unnecessary for guest_memfd, which does not
->> participate in swapping.
+> On 22/01/2026 18:37, Ackerley Tng wrote:
+>> Nikita Kalyazin <kalyazin@amazon.com> writes:
+>>
+>>> On 16/01/2026 00:00, Edgecombe, Rick P wrote:
+>>>> On Wed, 2026-01-14 at 13:46 +0000, Kalyazin, Nikita wrote:
+>>>>> +static void kvm_gmem_folio_restore_direct_map(struct folio *folio)
+>>>>> +{
+>>>>> +     /*
+>>>>> +      * Direct map restoration cannot fail, as the only error condition
+>>>>> +      * for direct map manipulation is failure to allocate page tables
+>>>>> +      * when splitting huge pages, but this split would have already
+>>>>> +      * happened in folio_zap_direct_map() in kvm_gmem_folio_zap_direct_map().
+>>
+>> Do you know if folio_restore_direct_map() will also end up merging page
+>> table entries to a higher level?
+>>
+>>>>> +      * Thus folio_restore_direct_map() here only updates prot bits.
+>>>>> +      */
+>>>>> +     if (kvm_gmem_folio_no_direct_map(folio)) {
+>>>>> +             WARN_ON_ONCE(folio_restore_direct_map(folio));
+>>>>> +             folio->private = (void *)((u64)folio->private & ~KVM_GMEM_FOLIO_NO_DIRECT_MAP);
+>>>>> +     }
+>>>>> +}
+>>>>> +
+>>>>
+>>>> Does this assume the folio would not have been split after it was zapped? As in,
+>>>> if it was zapped at 2MB granularity (no 4KB direct map split required) but then
+>>>> restored at 4KB (split required)? Or it gets merged somehow before this?
+>>
+>> I agree with the rest of the discussion that this will probably land
+>> before huge page support, so I will have to figure out the intersection
+>> of the two later.
+>>
+>>>
+>>> AFAIK it can't be zapped at 2MB granularity as the zapping code will
+>>> inevitably cause splitting because guest_memfd faults occur at the base
+>>> page granularity as of now.
+>>
+>> Here's what I'm thinking for now:
+>>
+>> [HugeTLB, no conversions]
+>> With initial HugeTLB support (no conversions), host userspace
+>> guest_memfd faults will be:
+>>
+>> + For guest_memfd with PUD-sized pages
+>>      + At PUD level or PTE level
+>> + For guest_memfd with PMD-sized pages
+>>      + At PMD level or PTE level
+>>
+>> Since this guest_memfd doesn't support conversions, the folio is never
+>> split/merged, so the direct map is restored at whatever level it was
+>> zapped. I think this works out well.
+>>
+>> [HugeTLB + conversions]
+>> For a guest_memfd with HugeTLB support and conversions, host userspace
+>> guest_memfd faults will always be at PTE level, so the direct map will
+>> be split and the faulted pages have the direct map zapped in 4K chunks
+>> as they are faulted.
+>>
+>> On conversion back to private, put those back into the direct map
+>> (putting aside whether to merge the direct map PTEs for now).
 >
-> IIRC guest_memfd mappings are unevictable. That should mean they are not
-> ultimately added to a list (see lruvec_add_folio()).
+> Makes sense to me.
 >
->> In addition, the LRU list takes a reference count on the folio. With
->
-> IIUC the refcount is temporary while being on the percpu
-> &cpu_fbatches.lru_add, added by __folio_batch_add_and_move().
-
-Thanks for pointing this out. You're right about this, I misunderstood
-this refcounting earlier.
-
-> When flushed
-> via folio_batch_move_lru(), the refcount is removed and there's only the LRU
-> folio flag that remains. The fbatch flushing can be triggered if you see an
-> unexpected refcount increase.
-
-The new plan is, to update kvm_gmem_is_safe_for_conversion() to drain
-the fbatch if it some elevated refcount is found:
-
-static bool kvm_gmem_is_safe_for_conversion(struct inode *inode,
-					    pgoff_t start, size_t nr_pages,
-					    pgoff_t *err_index)
-{
-	struct address_space *mapping = inode->i_mapping;
-	const int filemap_get_folios_refcount = 1;
-	pgoff_t last = start + nr_pages - 1;
-	struct folio_batch fbatch;
-	bool lru_drained = false;
-	bool safe = true;
-	int i;
-
-	folio_batch_init(&fbatch);
-	while (safe && filemap_get_folios(mapping, &start, last, &fbatch)) {
-
-		for (i = 0; i < folio_batch_count(&fbatch);) {
-			struct folio *folio = fbatch.folios[i];
-
-			safe = (folio_ref_count(folio) ==
-				folio_nr_pages(folio) +
-				filemap_get_folios_refcount);
-
-			if (safe) {
-				++i;
-			} else if (!lru_drained) {
-				lru_add_drain_all();
-				lru_drained = true;
-			} else {
-				*err_index = folio->index;
-				break;
-			}
-		}
-
-		folio_batch_release(&fbatch);
-	}
-
-	return safe;
-}
-
-I hope this is what you meant!
-
-> So it might be feasible to do without this
-> patch (maybe it was already tried and there were substantial issues, in
-> which case should be mentioned).
->
-
-The patch "KVM: guest_memfd: Skip LRU for guest_memfd folios" will be
-dropped from the next revision, and "KVM: guest_memfd: Don't set
-FGP_ACCESSED when getting folios" is no longer a requirement for this
-patch series.
-
->> shared-to-private memory conversions for KVM guests dependent on folio
->> refcounts, this extra reference can cause conversions to fail due to
->> unexpected refcounts.
 >>
 >>
->> [...snip...]
->>
+>> Unfortunately there's no unmapping callback for guest_memfd to use, so
+>> perhaps the principle should be to put the folios back into the direct
+>> map ASAP - at unmapping if guest_memfd is doing the unmapping, otherwise
+>> at freeing time?
+>
+> I'm not sure I fully understand what you mean here.  What would be the
+> purpose for hooking up to unmapping?  Why would making sure we put
+> folios back into the direct map whenever they are freed or converted to
+> private not be sufficient?
+
+I think putting the folios back into the direct map when the folios are
+freed or converted to private should cover all cases.
+
+I was just thinking that being able to hook up to unmapping is nice
+since unmapping is the counterpart to mapping when the folios are
+removed from the direct map.
 
