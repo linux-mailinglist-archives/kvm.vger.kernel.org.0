@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-69367-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69368-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GE+4IQ9Pemnk5AEAu9opvQ
-	(envelope-from <kvm+bounces-69367-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 19:01:51 +0100
+	id cN4zLUVPemnk5AEAu9opvQ
+	(envelope-from <kvm+bounces-69368-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 19:02:45 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7C7A7689
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 19:01:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC49A76A8
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 19:02:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9AD4F30405C0
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 18:00:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5963D302DF61
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 18:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D3736F43C;
-	Wed, 28 Jan 2026 18:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A908B371059;
+	Wed, 28 Jan 2026 18:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PrMLShHK";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PrMLShHK"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I16lfvCr";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I16lfvCr"
 X-Original-To: kvm@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011052.outbound.protection.outlook.com [52.101.65.52])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011067.outbound.protection.outlook.com [52.101.65.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D39212F98
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 18:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E36284890
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 18:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.67
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769623245; cv=fail; b=cXnY0Jq8WJhO4tkmd91CEmf3PuqlwNW3R2cAhU5xuTHm0Qv77cwxqW2S2FdGIaHUXU/NSHwbpx+eqh5aKRrfp7SFiBE5K2L3p/jHrcrUxcUlJkOcRpockRNKN2qaSpQ+CrU9P1rBUkX7ot7ZgOxtNgnsikUeWL9/mqmoS10S9VU=
+	t=1769623264; cv=fail; b=k7Dfh0oGtpygX9FhUxGe4+tlfen30yaWG+iwa8hMB+NuUBMOzuAVXTpBv4oVQPXb9VS/4ls6fY8ZOIKhhog8yvoV07aWxOfLlIUBpXO4WzbtUoCKZs+xlpLwSkIwKFdS1qzdUmrlSlbly3OU4s14kzRlnr1jocex8IjRl8sNZxM=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769623245; c=relaxed/simple;
-	bh=cXBZo4AEF0PJemmyuTjBQcrXdhNAAgVbwDgiz5oOKMI=;
+	s=arc-20240116; t=1769623264; c=relaxed/simple;
+	bh=KyGPfe6KXEB0P1aukHpULSnNRb0sXONmZsS0pgEIICM=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=upB8tQStFvSgLd+1RmPzit3pk5j9ZiT+4YRmRu7FZ72218ZTyJmfOYWQ4p7jUQeLJwgBPw6SoS5XrWJbuVzMjNUHeati/83HsmpuSfcHO9lZkJQymBZkaZPJRZduiMbcPr3B85Y9u0r6ehKMN87QEsUxhn/hGv4W3nBmxW9IMc8=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PrMLShHK; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PrMLShHK; arc=fail smtp.client-ip=52.101.65.52
+	 Content-Type:MIME-Version; b=HjAKgU8UOkV6UO3CXvIGI/ij5XIFs/VKN+J2XQjAYcObSm9ceuN/x/xDQolarajGCay+0NodPhYnmy8T9ebBqLqEBYZjr2LZL1eaVvgXDsxOhwRyp4+XdzYafZX3Se5nnG6sjCHeuOWmSnmTSZBX83ZtKhOLfaTgcjQxxTYY324=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I16lfvCr; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I16lfvCr; arc=fail smtp.client-ip=52.101.65.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=RG/L4RAGXLOkmx7f3bKfd4PlyDqI2A99EYi7o4lpx51lZzufcitq3ZtP9H+gafunoM+iCnl1j17i1tV/JyOM+Bl5UVig0bZzsuOTky8PJ68rHU9e4ta1X48VrOIrOOlVH7OwiRJqhlopkR01KZ0qMM/c21DIiCzyuQCZ5JCh2jqruUSlw/kIyvvaMv+XAXg9GbYz8cTtKMQDay/Y2TbC/TEfygplrQHAyXxlyo9YcNt8DxCPjNUuDvDAZp+Lr7rxPUZ+/XivvWq0ONOlSrORjTgJFWXNkGvcheggTvJzpF33n9QAJBc7QjFy8RBazlLfckyHJ3TvQC6Dg2rPkCJ84w==
+ b=wLl8UkjYJPsaRU01d95WyHByelAe+36URvBzZemhGQNsZ9p+NWIxockPy2+YbJ6D7D2gGR4/sb9jHcrVUO+sQeTMKeGB6Bjzpol27nnbwTmrDVyRSLuLiirCi1DpDY8A6mTIHmwU2pW/iI+Do4puhsrenfnQuZ3JQcT9nDR/dCgb50gpxeVrO84oJ5DWnXXzhPfYPRtQQXlHm558YW5xtllABTf2QGFmDLFb2AZikRe0VJ9RHaXNry0HJSCh55pY9jnLNA85ycJoPW8emhMvSU5ofY5m9oBl3TrKPr94jtWQ0/RlK8F4YAvf8tAd7unqrPgQfY/e48CiH59h79OK+w==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DPZRfy7Q+wPFRd0rxvCxyctlcdMjxDg3w9/sXvmxR/M=;
- b=EWmefRwbHOdpTX4IthNkyhj2Yjv+ZSqkzf1HTUbqfDE++ls0lfQfwKTgK6WAOsjp12Oxrhdlar9I7G2h7vKj0MhtI34VntFZcYeqWrzgM134y4Bn3AivomMfBktGtGFQO1R/mBbJWFk9UQaNpWASjTQRjwi/iDOfJJhDv6EdAjQvn0l0PmKUqN7rWs/M7nO5zBdFQIokyxZTljrK0kDP1jveqgbBB72LOFCZo6wbmqk4Ojwab5LdZ30wNh6x1rhd17YobfRLVUBAEmNCotdoktgh6EAdb3oCcOCTeRD+W1/wNojQ7hBIAPygYgWh5krUEw4zCRyDoZnT38nYtALiqA==
+ bh=PVwFxJstObeZm4hLrlzsstf+CgrSngxKkqzr2SZDJ7A=;
+ b=ipXTSiNP4dJg8fN/nhCn/FZTp+Kauxk7Gmw+w++5/OT0fjSxZNy0UUUoBZ6bFNbBj1QoPvMOS/WHiEH5AbS67o3HZPFTye3Z9EuAT/djbuShEuPry4mtAJOZCNQISir4ZcZI9n4iKG6VKKkrZbaspoOGgaWzejOhKOlFuqeyCu06JuhOCGPxZxKvLlexF56xzr8KaByVXH8iIbPaa24cmaQnb4RcxeWVhqijbuFp33tzdRgd/ddbIKRSZ5y2pa9iFUu2f7g4O5hp4v5CPXt2NsYX7nnUR+l6a75O4kIZ7B/cNCYslQpLQz9v2D5tzgEI/UIiLKWhrhv0KD4Mo6tXVg==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -50,18 +50,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DPZRfy7Q+wPFRd0rxvCxyctlcdMjxDg3w9/sXvmxR/M=;
- b=PrMLShHK7M4hXf32Gpf46yibfs5zkCD+qXZq9TzDvI2LUdFcgHmqgeVwYpsMh/RfS6kQMROG8EG5AGkbKyD+7rbGliuyMj9v05ykrLFzg1Icjom/mDbcy+ol3x+3ax5gvw1V2ewWtUro3ckzn5hj+eNdq/gFT3utM2ov+LVfyQQ=
-Received: from DU2P251CA0016.EURP251.PROD.OUTLOOK.COM (2603:10a6:10:230::18)
- by AM9PR08MB6243.eurprd08.prod.outlook.com (2603:10a6:20b:2db::5) with
+ bh=PVwFxJstObeZm4hLrlzsstf+CgrSngxKkqzr2SZDJ7A=;
+ b=I16lfvCr4TDIkxC4HxHWHGqfImMKgOlpuoTalhUkZpMtoNo1D3B01Ip1qk7tHXL7kNcx9JzbQ2vBvcBv/GtQGpY32h/SbmadSXr4GNm+cX8ss2GisOkpIEIrv3g9MMZgBOjzv9Yr4hiGJNkte4Wsgpc0wlUBjJ0BFsPevKrqXLA=
+Received: from AS4P191CA0020.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:5d9::8)
+ by AMDPR08MB11527.eurprd08.prod.outlook.com (2603:10a6:20b:716::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.8; Wed, 28 Jan
- 2026 18:00:38 +0000
-Received: from DB5PEPF00014B8B.eurprd02.prod.outlook.com
- (2603:10a6:10:230:cafe::34) by DU2P251CA0016.outlook.office365.com
- (2603:10a6:10:230::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Wed, 28 Jan
+ 2026 18:00:53 +0000
+Received: from AMS1EPF0000004C.eurprd04.prod.outlook.com
+ (2603:10a6:20b:5d9:cafe::8b) by AS4P191CA0020.outlook.office365.com
+ (2603:10a6:20b:5d9::8) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.8 via Frontend Transport; Wed,
- 28 Jan 2026 18:00:33 +0000
+ 28 Jan 2026 18:00:52 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -69,32 +69,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB5PEPF00014B8B.mail.protection.outlook.com (10.167.8.199) with Microsoft
+ AMS1EPF0000004C.mail.protection.outlook.com (10.167.16.137) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.3
- via Frontend Transport; Wed, 28 Jan 2026 18:00:37 +0000
+ via Frontend Transport; Wed, 28 Jan 2026 18:00:53 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bkCZ+CFo9EWa1mpUx0yetxHTMC49KKAXhHlfVHnnNYGPbTuL3rY879Yo0UDKeBQVIYww275iyTZZva8rpmONjF7vzWKfbm9rDDbCM2d//E2QJip90dwieROA4zOKLbU8BNSdkqZWK1MFe9XK8Svj8KIeeuy3BpVWfTSEW9O/JuqUumwn2Uf9XEk6hw0PgtwN7vbqOJWhjd85XiDGX0Ja/1LzPpr7l8n1ZM+TW1blcvyVLdfHHE8FrYd0Urzel6ufTZZs8YR+kkZCXLbzO0L5XBTgcZIfc2Q8NRsORvjbbqHpg9XviACZgXOdZ/FdA7NppciLspGMpykHQnkLndL1Fw==
+ b=lneMBIPc/1dBOU+tNSr9brzsahyr/P7Acg1Rlg2pYniRXXfypea7yOWwEMPF4Ww32npnC6w/JvI5P9KDnMZVe3OQhWwmEdXYwIZb1+4A92viPYqsAey9G1PZGSugHbQFBDLChV79HFEgzCEZVawRhLyH/yuFnbwbMD9N+eFxiX3fvheH5/c7qiXgjFPCQmITiPEycEBg2T7ACv81ZRZQk0cZHgaYIpGKBbhK/6mFpoFOgH158wSIvo7cNnqeZK3Vxq7JbVMbaukxLJrgy48IlM3fuJrcpPdKAuTHYycfmLDN6IzapQn+aJjKcMnfYrofL4PQlZaeeqzR1PstsF5kgQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DPZRfy7Q+wPFRd0rxvCxyctlcdMjxDg3w9/sXvmxR/M=;
- b=la+sTS9JpIwxVHGKAh8ZdiT/j2GLAwTzw2TzRgPVGMpmctbtS6ukbWkpHAOWFLbyHqyY/3Z+CnAZSX+6k64CeHD/Rl/umV09Ku2Sw7dmgu9W0ASRfzK8B3kDztp4lhklrCy1ld28ZP0qPa0KGb1Te8hGDCkyLJBX74+AdaEUg/RUZd5tQihn121tT8w2R/a1YoGO204Nrytk2a996F6LojpDeHwE+/8wkpyDEMbYjxaGqAOej0+5/v1XSHWnpwAFTRYIde3djXNJgjxpZKD0IrfuNSTFwqC3fO61vUheYYVE4cz5FFX9+Tn2Zk7SQ9sNX7jaBJoNeLhD/HglDzGNsA==
+ bh=PVwFxJstObeZm4hLrlzsstf+CgrSngxKkqzr2SZDJ7A=;
+ b=nVHZwl4UhE1SSrmFCYrBCsF0UvJ5vaKfQp4StJYEZgYLTmsQI6DtjdPRgK5G42QofSLUnG2Vy0/gjpOrJmA7eYkeI0cH3tiktTV2XPDOZBcQH9MTEGq3ervqTwPzElzggGkMPCvWhLPDfVo8z2xXCb+CVZo68gwLE9jM6XuPKzSU8DeZ8imXJpYJz2ZVbthSwBEj14dlobljgsBi4HdJywqgxR2NcS3kWC54Zvlz5UHaoigqJadlKvIhh1Nnb6CngmeBxonzg9JUg1JooXADTXRNZAzg5l1vizMKDCxffWtt6YR8b5T8161PVbSpss/0CG2g3+6kRpyrDChA+jBS4w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DPZRfy7Q+wPFRd0rxvCxyctlcdMjxDg3w9/sXvmxR/M=;
- b=PrMLShHK7M4hXf32Gpf46yibfs5zkCD+qXZq9TzDvI2LUdFcgHmqgeVwYpsMh/RfS6kQMROG8EG5AGkbKyD+7rbGliuyMj9v05ykrLFzg1Icjom/mDbcy+ol3x+3ax5gvw1V2ewWtUro3ckzn5hj+eNdq/gFT3utM2ov+LVfyQQ=
+ bh=PVwFxJstObeZm4hLrlzsstf+CgrSngxKkqzr2SZDJ7A=;
+ b=I16lfvCr4TDIkxC4HxHWHGqfImMKgOlpuoTalhUkZpMtoNo1D3B01Ip1qk7tHXL7kNcx9JzbQ2vBvcBv/GtQGpY32h/SbmadSXr4GNm+cX8ss2GisOkpIEIrv3g9MMZgBOjzv9Yr4hiGJNkte4Wsgpc0wlUBjJ0BFsPevKrqXLA=
 Received: from AS8PR08MB6744.eurprd08.prod.outlook.com (2603:10a6:20b:397::10)
  by VI0PR08MB10537.eurprd08.prod.outlook.com (2603:10a6:800:204::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.15; Wed, 28 Jan
- 2026 17:59:35 +0000
+ 2026 17:59:50 +0000
 Received: from AS8PR08MB6744.eurprd08.prod.outlook.com
  ([fe80::c07d:23d6:efa7:7ddb]) by AS8PR08MB6744.eurprd08.prod.outlook.com
  ([fe80::c07d:23d6:efa7:7ddb%6]) with mapi id 15.20.9564.006; Wed, 28 Jan 2026
- 17:59:35 +0000
+ 17:59:50 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -105,14 +105,14 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "peter.maydell@linaro.org"
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>, "jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: [PATCH v4 01/36] KVM: arm64: Account for RES1 bits in
- DECLARE_FEAT_MAP() and co
-Thread-Topic: [PATCH v4 01/36] KVM: arm64: Account for RES1 bits in
- DECLARE_FEAT_MAP() and co
-Thread-Index: AQHckH/c0Uv319w4HUO4T1cOSM0ljA==
-Date: Wed, 28 Jan 2026 17:59:35 +0000
-Message-ID: <20260128175919.3828384-2-sascha.bischoff@arm.com>
+	<jonathan.cameron@huawei.com>, Sascha Bischoff <Sascha.Bischoff@arm.com>
+Subject: [PATCH v4 02/36] KVM: arm64: gic-v3: Switch vGIC-v3 to use generated
+ ICH_VMCR_EL2
+Thread-Topic: [PATCH v4 02/36] KVM: arm64: gic-v3: Switch vGIC-v3 to use
+ generated ICH_VMCR_EL2
+Thread-Index: AQHckH/lxJcBSHpIy06YC6AewwBwJQ==
+Date: Wed, 28 Jan 2026 17:59:50 +0000
+Message-ID: <20260128175919.3828384-3-sascha.bischoff@arm.com>
 References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260128175919.3828384-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -123,8 +123,8 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	AS8PR08MB6744:EE_|VI0PR08MB10537:EE_|DB5PEPF00014B8B:EE_|AM9PR08MB6243:EE_
-X-MS-Office365-Filtering-Correlation-Id: fcd7b4b1-6c5f-4541-69ae-08de5e97247e
+	AS8PR08MB6744:EE_|VI0PR08MB10537:EE_|AMS1EPF0000004C:EE_|AMDPR08MB11527:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb4d7ede-0d67-4cdb-f4b3-08de5e972de9
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
@@ -132,35 +132,35 @@ X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
  BCL:0;ARA:13230040|1800799024|376014|366016|38070700021;
 X-Microsoft-Antispam-Message-Info-Original:
- =?iso-8859-1?Q?fAzrznG/k1PMj+hWUQbeJb/SGjppK8BYXK+Xle4LTwpmvSYOrhx43j+qzH?=
- =?iso-8859-1?Q?Bc+oixa+dbP8X/bOqRT7VrAxpZuLfG9uvavXOi942KCCe7ivlOTsnuCSqj?=
- =?iso-8859-1?Q?F0Mmsmm6xk1Eu04h/N0hlg4GD/q44OlERUfJzUZpjycuFQe+J8wgA3ZnzA?=
- =?iso-8859-1?Q?AAgR9NS/qJl75KGNJyy1JL2XT7iVu39FQ2mtTx7PK5xk1zgsIMiX9Ir2+y?=
- =?iso-8859-1?Q?VlPSAnySOxwk516RQekkGgcL1sKLJ8owvKgCBjJXYt7GbNx6AFa4/9ogg4?=
- =?iso-8859-1?Q?h9bCNNYdJDNdlCw6eNtK/UhTq4j/b+pgNfH8mSmzqo+jYw3bAHsOgm56F8?=
- =?iso-8859-1?Q?UvvORCkt5ZKIVTLMVx+YF8HpyEV1v+wKoW4fR6gBpz59Bu1dpJ4zogBhGb?=
- =?iso-8859-1?Q?Lx9upaGaITb+55ToEJ7GdIcTebGXSa5mfVsCzDEZeGhkFvPmTkySfehU2+?=
- =?iso-8859-1?Q?UKGiB5+ttHpgtQqYhoy9uXB9y8GpZ+C3zIo4y7Bh6C+iiG7uI4yxRszGSm?=
- =?iso-8859-1?Q?9wz4JGjokvA8C1p5iSSW78bqIk6OioPUKc5pFgXa+D7am070A2+4IUaXF0?=
- =?iso-8859-1?Q?d3tysi8wefJaqmIVkJl56ZTTdSdBXt/FwmTw/Pgz+d4IMgSytWS4/ZJfNR?=
- =?iso-8859-1?Q?MceF13qJxG5bzamtENsN6jnrOG8Vg5QiC7hb4LkMyablY5d+SDZk8OFpeo?=
- =?iso-8859-1?Q?3a3NQvWaYMuprMtUFoPM6UQyZfqVHeT3ZnDPhA89DFUQMa0E7/m/BxNsvT?=
- =?iso-8859-1?Q?e3nnWgEM/TZMNzjmpy6z6vAL1ILQj4d0CSHvU59+B8NLrkuzcljUJ7RDiy?=
- =?iso-8859-1?Q?6r+kqp/Bc9s8Gf0/ZIp600FXYe98WWgSPDT9/WI0yR8MMXzkpgR+FrUtj5?=
- =?iso-8859-1?Q?AGMG+dCQekmTY7PfvXneZPDZmjnvw+ub5a+8ZUl6YJKrJez8qGfULp1SzP?=
- =?iso-8859-1?Q?pfiYnRg1P3NfxRby7Zwkl+0+BeHePxS4fjfeOygC7uicwgp0cQ+fT9RZ79?=
- =?iso-8859-1?Q?uI0QnAT4dgBaGd3v+PYzeYQdff4yKVSHphn+UYChmDnLfNBLUfqseT/t3A?=
- =?iso-8859-1?Q?+niHlHfA3UCh34N0yljXnmU7YJzGjSpaDn6500LIWy7O3vUEQXV7cpWm3V?=
- =?iso-8859-1?Q?4wRoPTmFzE0V7bRrWoy8w0vtAH5BJGCIKfj4Ao0J6bw3YizNcElWd1P7Hl?=
- =?iso-8859-1?Q?ZtnjSpYduQN15nviPv4SLkHC6YKIO9Y0QI9piG4kxcIMrs0+Ov6GSeqy5J?=
- =?iso-8859-1?Q?NxIu7LhZtA94B9rnUFeubO1DFlPBrGD5ETkN/SYXfcNar0d55V7z/bnWym?=
- =?iso-8859-1?Q?839Tun2EBKSf9AoEBu6ShaY1VWP/ALGIi+LLgDjpAi8eZDixAwQ2OD5u0h?=
- =?iso-8859-1?Q?tloomR4OBjH2gv/Fgkro1/dQyD0VUZP4aNkWlJ0G2UKD8GSF89+nbQ8X3c?=
- =?iso-8859-1?Q?KHBGJcyy/fuDZc2xxwUeDtwJ0VlM4QeQAgS4bRBqwax0pOX8gQHpfJRMlQ?=
- =?iso-8859-1?Q?pir8xnllW6mmwWP5VtX2X0Gjht1VYIwND4gJKcxWcjm5r3zmNnCYq0qaQ9?=
- =?iso-8859-1?Q?NjWDo7ql72birWhqqj3xIR5WvVMtw4rl9SyBZN1rGgsrtkqryoyd0EKReA?=
- =?iso-8859-1?Q?ZBJgD5AW6b9LOvdHYsEGORH6fbenCBD5C9+pWt7eTqP5dbrLENiKAlC1nx?=
- =?iso-8859-1?Q?dPfqzEZts8Mm6+VEzzc=3D?=
+ =?iso-8859-1?Q?35HoCG60E6118obX+ysgRXjuh+5pVXD8p/0HDtlhzL2SVu3xSvMZlDjnvQ?=
+ =?iso-8859-1?Q?r2von76mdT038QrYQBZFHFdcxs1agyu1UQ9BWR/9fDc19Vgt4nW9Hyjk3B?=
+ =?iso-8859-1?Q?EjHi7YAnuREEGIiiGlSm/u0rPOFDU5Mfs46XUnqtcKl17lvbGVTPTaBTr/?=
+ =?iso-8859-1?Q?vNui9AVjjcQTL5D9FAm6jko6Mh3E+2fU0ylqdRgQmoRS0l7DTGzSBT+hGa?=
+ =?iso-8859-1?Q?S5SMmtpJYo0jJQBFD7U9j6ubb2tiFec5V5Kfomvl/fcs3J6/WNFAGSs5xS?=
+ =?iso-8859-1?Q?bf663Sp+LOAbbx3vwLOd0SUQCqBh5VpFME2N1n8I03MumRXdSWDBgXwBGA?=
+ =?iso-8859-1?Q?A7glrX7Xx/bY7shUOS0rNdQ81eIKj1bOImtDrvQ+3W6ZuLbN/scU0hvWkH?=
+ =?iso-8859-1?Q?GdaeJ3MzsSHJMFsxwzZ3tX7ndkGKHJg0QEDy3eNBYfmUhS03Fg8NHfLV8R?=
+ =?iso-8859-1?Q?UhtP3NXsk5ZwQJ9HAhMnTWzBnUQaFeFSrMbZb/FJJnE4aGf8tSwj1dYcHa?=
+ =?iso-8859-1?Q?hIRmdAeAa84HvrGy2qPjSOKKzC9K9apWIb2ypBL1+2g/BiobcvvaSf8b1F?=
+ =?iso-8859-1?Q?I+5lim2+tGoJr4igvxxHEyFZ2UmgCuQeWjtaG0nNYQGLrnnpN1OLCTQNed?=
+ =?iso-8859-1?Q?4UrcQROj6OLCTbBnkQOashQfQWvOIt4apu6jfbtHgm+S3omEDMyjWVXvDF?=
+ =?iso-8859-1?Q?6moXAlsLEpmxnUMkJTxO566m0d86lursajn5YsiXTJ9AeYvHF5tEgE2C8C?=
+ =?iso-8859-1?Q?pmKh3QM6HLxLnvSBGFoclWoe7pfbScW5KcbmmaPuTF2Yhe/1MSe6eyRaKj?=
+ =?iso-8859-1?Q?Z78BUiRPGEdX3BshecexIr6m4LTzoP+xOOMp9XULupSPhZSgRGz88s5Rnp?=
+ =?iso-8859-1?Q?SFW1atbQBZ2+JgTncSo+cw6VMfurls5cuaeXDN4sKteiJKKdnafn6EqUK/?=
+ =?iso-8859-1?Q?Z/3OVrGMGCbOI9gw33StTj0sj9y2H7Jk0g3U2l99UVV9qRLcog0BVfzEN5?=
+ =?iso-8859-1?Q?1DRBzgIcN3s+4vPpReoGnOjgVpfRAOjj9RAzrv6q2yNWbXAcPG4A3cGODh?=
+ =?iso-8859-1?Q?4A0TWqLtiJSa0Ynzaf0fS4x15U9wRUQXPWQPdjUh+XG5wz2zD4Bztf4PsZ?=
+ =?iso-8859-1?Q?zZQw/SMRHoFC57tJW/p674VbCODVcL6QJb3ktEnI4mes2CMIv4YS8F0uWE?=
+ =?iso-8859-1?Q?jVfmpcMwnV8BOYaKpxjU/r71vFr588H7LicmWRTuPzi3mv6O4FAnL1o6ll?=
+ =?iso-8859-1?Q?O+SkscSDALmVIElXkQ5rtHJdVAgUq2ufmyR5/kkNv5bfMqjm3s/nA55jia?=
+ =?iso-8859-1?Q?O0Ejjg8md4kwe8Tg1uj9dqSRRwPlnk2u3g83W6UJPNuGgU6EOMYZpM5ra0?=
+ =?iso-8859-1?Q?RAUrXWFsufInBzRFt7h7cOpvLzpzb4eJgxcukgL05aCU9Ipy4zsijNlAX3?=
+ =?iso-8859-1?Q?tLZUv2eo7G6IqHJogp4/rzJjPW5Lr06ZnfDDM79mScP/ErPCRGGyCbEd8g?=
+ =?iso-8859-1?Q?lwfjltQzc/ScBAutJN1xvYO3IoujHAjRjCAEkIQx8aYTIr9+P+f/ypWVK8?=
+ =?iso-8859-1?Q?DDK5UQowx3/tvMIGd2T6Pr1n3pYPgkU9cXlDX1PQvgLYHoBEh/XneyXgwp?=
+ =?iso-8859-1?Q?3lfzOL/n80dZXxrrqH6oYjrkua+fqhWkixtzEVOWwuMljwGpVeZ+811oOx?=
+ =?iso-8859-1?Q?qxM3SFHcWHA0FsxuoV4=3D?=
 X-Forefront-Antispam-Report-Untrusted:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB6744.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
@@ -174,72 +174,72 @@ MIME-Version: 1.0
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB10537
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB5PEPF00014B8B.eurprd02.prod.outlook.com
+ AMS1EPF0000004C.eurprd04.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	a41ffd3f-65b6-4cf3-2bcd-08de5e96ff3b
+	316640d7-2eec-4cbe-6d97-08de5e970865
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|14060799003|82310400026|376014|1800799024|35042699022|36860700013;
+	BCL:0;ARA:13230040|36860700013|14060799003|35042699022|82310400026|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?/avoJQuKx2amQG72RKTNzTHPx3kh82Aiqq+B8Jt79QmFRf1axz5NnCyPph?=
- =?iso-8859-1?Q?F9nfOIMKAOpZmrClPJlrFwXLEfavBSjNUGqyDqhiMpmr19jtbAROEGbKe4?=
- =?iso-8859-1?Q?23TRC2AlMVLbsiZCcKucrud9uDf/4bI0S3zH5qCzAhifj72JYiMMCLAcC5?=
- =?iso-8859-1?Q?njHarTVExmgfBbex/tQwD9yvifwQ7r/bPDntf+xGuWdkhGJmvxEVTd4fcg?=
- =?iso-8859-1?Q?hm8LgqPF4yaqRpWZZIqt5WqsgfKNmQ+lJYuOICNWrTzJcVzIstf8B1jIGB?=
- =?iso-8859-1?Q?7D+obvIz/npmBnH5+QSj4RBYbCiYQsgC/1fY+aqMN/2AAlSiQ05Cf9owao?=
- =?iso-8859-1?Q?dJ1N7y+GGter9g4PCnUdnUXr+/2WiQHpzRM2gp/hmYdRt7rDUTOCIkdIp2?=
- =?iso-8859-1?Q?8p8p2ZdTEZRvRNdusiXWw1PcAyZGwzXQeWgeyLyDeXVSzz2pN9BUCJ8gMy?=
- =?iso-8859-1?Q?9I3ousNl/9SfRbFJ+5zaREIJCz3tJlWycyoV70p+1et3OaF7IYNiSqPq1V?=
- =?iso-8859-1?Q?MAj/GhVxmhhNveWwgraRf2dm8AAqwFWWR5GZSCy+B+3Knnk7mKJNdHz9ar?=
- =?iso-8859-1?Q?BJO/JjK5lJEdykTs7LhxYdH0Hj0HTwCaN0TlnDoinFLl2C/ltujaC6uPu6?=
- =?iso-8859-1?Q?uSDjT2XoUa18v2Q3+MjzBM5lHzLopK6sCnb9jsdmKOhPWhlyoCFT1c1Tl0?=
- =?iso-8859-1?Q?GIym610T9xnhYm/6hmNp9lzjm6YSRiSlKf8mJ5m93LbSKFK7I+f4gmmXy/?=
- =?iso-8859-1?Q?rFO98y8E/14YTy2Fs9LjFzILIgXlsxMWxxtQXRx/dpYMtX4wbWAQdGDxPU?=
- =?iso-8859-1?Q?zOoKZ9Ozpf7Z48Zz/fDhSBIQUMtsr7Can6Uk8QpbmaLom3xntZ3VnmHFOJ?=
- =?iso-8859-1?Q?+IgZSy8xfviHptIImcJlkR4erC5ULkMCMi0YEFwdZ5ez4tJ6zN3siN2Qw0?=
- =?iso-8859-1?Q?wZ/hqhoOeJKSD3UUQnjOAivg6D5jMt9kSDpsYo21cgfzjh90gvbe8kUhEh?=
- =?iso-8859-1?Q?bpF7v6tnLnsG67tKxsSSaVuUrM7ckNni7yb/TfFr87//7loprQ34d5nxx1?=
- =?iso-8859-1?Q?XE9Kq/eSZWFYU4BaB3XS/PBkinYyfH+2AjjCb6KuPqlQ907cgUzkK0d2lm?=
- =?iso-8859-1?Q?S7rZoPibayW1lQicAtOpPSqDdaVqhta2dxU7YBZIBQ+Ev2zExfseV6SmTn?=
- =?iso-8859-1?Q?1sQsqUylq8ca/jZcTh075M6HzD/cZmCjNigmGodMtbmz4/0ZhyOXgwjmDn?=
- =?iso-8859-1?Q?kuliPvzGA5gYZGGgwdxd5ZEqUcKJJn2Ao/8V6336cCKiGRn1J5gUzo0+E+?=
- =?iso-8859-1?Q?oBb6x3+nNvWny8XQc/v6H4L3w33fA6J57Ii97DHvrGSEtg1x/1xGehjPav?=
- =?iso-8859-1?Q?4NoVkZ0VoznWTfQYzTR0ujd9OQETRdL8I27Hoa7R2ZAJUKufajqvkYlQe9?=
- =?iso-8859-1?Q?gWiJsNVYRnifs490cvP6ksLPXgZi12mc/pSMKObjn62Ebm3cA+bT15HSuK?=
- =?iso-8859-1?Q?YQl7PFBCSZuFm9Ogo6GMZXciOiywFjbpVdZFapTpMOLPrzqsFgA13Bo01x?=
- =?iso-8859-1?Q?izgo0i3s0WAbMvMY70nWxrOpUeY79JM0BKg6CMKccMXHWT+QQnbXiYF9TS?=
- =?iso-8859-1?Q?odcAGKMEHrRILyWsMZufehU53A7iV6DIUv7TW9CKVxkTDUafHwMjYkbZZ6?=
- =?iso-8859-1?Q?A0+3Ig5LhpseHUOziBSBJMO99I1txxsBYlYr1k74HEIxpFUw/8uPsBiJKx?=
- =?iso-8859-1?Q?UdqQ=3D=3D?=
+	=?iso-8859-1?Q?649ZNfZQu+8pN9fQPu8YhvMwUptlu7CfcTz5T9qiatWs248F/luHpNwaxX?=
+ =?iso-8859-1?Q?isSS1nlqJuy1m0coNM9oWdN7zcev5KzAXAWkQ1gcXA8e9MZ06JQHamFlm9?=
+ =?iso-8859-1?Q?fvTdNOA8uvyc8HVInosYRrdLtOyEIEzbCYkl8wdthUALnkTzYq5OhXVrF3?=
+ =?iso-8859-1?Q?k1ySsglsr5DlWpKaufjFLWuVmoAe6V5NZr0CXbPHvOUL4BUCSwJeCTufiW?=
+ =?iso-8859-1?Q?L1kq8L4Jj/JyeD0ojlvIku7i0HwAMwa95zL9Y+xPTMgdUayxxmwkc3pwiF?=
+ =?iso-8859-1?Q?9WTNxXQmd6Gt90/NXI1QYreKdY0HfCsYBSseMhMVqgWCsi3Cy+VU9GjSKb?=
+ =?iso-8859-1?Q?dqwwztZd4ZfrbrhUYC2d1O4UbSgA+FsN0MoVjpgk33ZHJfBKyDEksCVpx1?=
+ =?iso-8859-1?Q?caYcTUEnrIcRL7ZOdEHT6bUHHDcMmyHrRsCbour8EYlx5VmoudsF4Akzgk?=
+ =?iso-8859-1?Q?xNi1r+WLiGbNKI/wbZ0TJH3K6iEYxH/qivgvjn6XdZypRClClD4Xl8wUsa?=
+ =?iso-8859-1?Q?iMBHirf8JI+N6YbUVbc0YNdtzPcUXrcDLtpd/ssiFd1l6/5uD5E3KUg7ft?=
+ =?iso-8859-1?Q?62G/HgENgKHrHOku08jALCAmob1u31QmmpnLYusWVYPfzHrE7uHTfVK86z?=
+ =?iso-8859-1?Q?aoL7EteqXM/IN5RGux/q9wr7GULvHW7O7EKWIV3JC8HmAaLw5JSokmwDZv?=
+ =?iso-8859-1?Q?2AdlubtqY130zHZwQ/T/3S+fdXiBe6Qf7qS/rWEadzgtBFQORP+at7mgE8?=
+ =?iso-8859-1?Q?b64zeAUIF4YPeHCc4syHy0TOBodNvlANKm3j5fwO3faahMsSDlIQlJJnIN?=
+ =?iso-8859-1?Q?SOygcgb7pJuO8VN/qJ75QK/Qrz9AXC3bqoKC1XGElLSesYo5sAk4Fe1+rn?=
+ =?iso-8859-1?Q?Oa5ozbhg3JdUOqJMQcbENCg+D3WsK3/9XJKsh665Pngh6qPY8Hfxr6TTjU?=
+ =?iso-8859-1?Q?GV3r4Ns1vhy4B8SrRKBHrr2jXjXYeRDGYukwcDNQHBOU9nYUmDsbrubzyX?=
+ =?iso-8859-1?Q?vITxnxT9hk/xa6uNXIIBFnCHyZcv7GVWTDKA7bRBq3uoRG0jky/9Ulz0Vf?=
+ =?iso-8859-1?Q?B2BHVH5ALmHrX7NvSPVlTm0hYaxs3H6OoIORV/LHzTs3tI8y9Zelb4YeO3?=
+ =?iso-8859-1?Q?Z/0ya40VQtI6bY/ugi5Ol2Q3Eqfu4cNECy18QXAOx+VUACHPxqbJWqEZuQ?=
+ =?iso-8859-1?Q?VS2USUO40So3XXpYR69GJVyGD8QoNEczhkuwKNOysYWf0fQgvLPSkv5fjq?=
+ =?iso-8859-1?Q?Qx9wrb8rlQ2BN9QKO0RzpyY5bARZZl0d83WmeXk5rLupwRAk3O9UfQ21Fz?=
+ =?iso-8859-1?Q?DKGeKWrNMECVyVeo1RcIdFbhKWOh4Rh6ZiwSTg7hDatBLovJ4z1riIGDr6?=
+ =?iso-8859-1?Q?B8Q7e7mG3DgxLQsSQ1sHm+12msYX/eY157zpS6Sx6MaH/JbRQXLP5y0NuD?=
+ =?iso-8859-1?Q?lWR9ayiD02DnDpi45/P9wie9UKgHbRwvxeh2cBb5yt/tCz1NJbyA2lQ9Y8?=
+ =?iso-8859-1?Q?+cE9pE2FCvlg6D6ovqE6vTElQkLoLYwV2NqUba0jlDshrm7cjALUYhsskE?=
+ =?iso-8859-1?Q?QYwvH5PWSypREkNOVvhFJ3doo1Pco/gatENVdu+0MT9g/OGW13UV00zAkT?=
+ =?iso-8859-1?Q?QOxzIoh9bYk/EVfepAJu/9taP+uU0l/shDcv3GHY+XCX59RORHw79Ptj5Q?=
+ =?iso-8859-1?Q?N6GuTEd4VorHAci9WEsN+VLKQ5069k2TqB5Uq9pbP+SqLVIqSxjF4gE513?=
+ =?iso-8859-1?Q?wVsA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(82310400026)(376014)(1800799024)(35042699022)(36860700013);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(14060799003)(35042699022)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 18:00:37.7449
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2026 18:00:53.5613
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: fcd7b4b1-6c5f-4541-69ae-08de5e97247e
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb4d7ede-0d67-4cdb-f4b3-08de5e972de9
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB5PEPF00014B8B.eurprd02.prod.outlook.com
+	AMS1EPF0000004C.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR08MB6243
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMDPR08MB11527
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_REJECT(1.00)[cv is fail on i=3];
 	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[arm.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69367-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arm.com:email,arm.com:dkim,arm.com:mid];
+	TAGGED_FROM(0.00)[bounces-69368-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email,arm.com:email,arm.com:dkim,arm.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -249,242 +249,405 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: DF7C7A7689
+X-Rspamd-Queue-Id: 1FC49A76A8
 X-Rspamd-Action: no action
 
-From: Marc Zyngier <maz@kernel.org>
+From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 
-None of the registers we manage in the feature dependency infrastructure
-so far has any RES1 bit. This is about to change, as VTCR_EL2 has
-its bit 31 being RES1.
+The VGIC-v3 code relied on hand-written definitions for the
+ICH_VMCR_EL2 register. This register, and the associated fields, is
+now generated as part of the sysreg framework. Move to using the
+generated definitions instead of the hand-written ones.
 
-In order to not fail the consistency checks by not describing a bit,
-add RES1 bits to the set of immutable bits. This requires some extra
-surgery for the FGT handling, as we now need to track RES1 bits there
-as well.
+There are no functional changes as part of this change.
 
-There are no RES1 FGT bits *yet*. Watch this space.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/config.c           | 25 +++++++-------
- arch/arm64/kvm/emulate-nested.c   | 55 +++++++++++++++++--------------
- 3 files changed, 45 insertions(+), 36 deletions(-)
+ arch/arm64/include/asm/sysreg.h      | 21 ---------
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      | 69 ++++++++++------------------
+ arch/arm64/kvm/vgic/vgic-v3-nested.c |  8 ++--
+ arch/arm64/kvm/vgic/vgic-v3.c        | 48 +++++++++----------
+ 4 files changed, 51 insertions(+), 95 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
-_host.h
-index ac7f970c7883..b552a1e03848 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -638,6 +638,7 @@ struct fgt_masks {
- 	u64		mask;
- 	u64		nmask;
- 	u64		res0;
-+	u64		res1;
- };
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysre=
+g.h
+index 106b15eb232a..c547a14bb6aa 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -561,7 +561,6 @@
+ #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
+ #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
+ #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
+-#define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
 =20
- extern struct fgt_masks hfgrtr_masks;
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 24bb3f36e9d5..3845b188551b 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -16,14 +16,14 @@
-  */
- struct reg_bits_to_feat_map {
- 	union {
--		u64	bits;
--		u64	*res0p;
-+		u64		 bits;
-+		struct fgt_masks *masks;
- 	};
+ #define __SYS__LR0_EL2(x)		sys_reg(3, 4, 12, 12, x)
+ #define SYS_ICH_LR0_EL2			__SYS__LR0_EL2(0)
+@@ -989,26 +988,6 @@
+ #define ICH_LR_PRIORITY_SHIFT	48
+ #define ICH_LR_PRIORITY_MASK	(0xffULL << ICH_LR_PRIORITY_SHIFT)
 =20
- #define	NEVER_FGU	BIT(0)	/* Can trap, but never UNDEF */
- #define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
- #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
--#define	RES0_POINTER	BIT(3)	/* Pointer to RES0 value instead of bits */
-+#define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bit=
-s */
-=20
- 	unsigned long	flags;
-=20
-@@ -92,8 +92,8 @@ struct reg_feat_map_desc {
- #define NEEDS_FEAT_FIXED(m, ...)			\
- 	__NEEDS_FEAT_FLAG(m, FIXED_VALUE, bits, __VA_ARGS__, 0)
-=20
--#define NEEDS_FEAT_RES0(p, ...)				\
--	__NEEDS_FEAT_FLAG(p, RES0_POINTER, res0p, __VA_ARGS__)
-+#define NEEDS_FEAT_MASKS(p, ...)				\
-+	__NEEDS_FEAT_FLAG(p, MASKS_POINTER, masks, __VA_ARGS__)
-=20
- /*
-  * Declare the dependency between a set of bits and a set of features,
-@@ -109,19 +109,20 @@ struct reg_feat_map_desc {
- #define DECLARE_FEAT_MAP(n, r, m, f)					\
- 	struct reg_feat_map_desc n =3D {					\
- 		.name			=3D #r,				\
--		.feat_map		=3D NEEDS_FEAT(~r##_RES0, f), 	\
-+		.feat_map		=3D NEEDS_FEAT(~(r##_RES0 |	\
-+						       r##_RES1), f),	\
- 		.bit_feat_map		=3D m,				\
- 		.bit_feat_map_sz	=3D ARRAY_SIZE(m),		\
- 	}
-=20
- /*
-  * Specialised version of the above for FGT registers that have their
-- * RES0 masks described as struct fgt_masks.
-+ * RESx masks described as struct fgt_masks.
-  */
- #define DECLARE_FEAT_MAP_FGT(n, msk, m, f)				\
- 	struct reg_feat_map_desc n =3D {					\
- 		.name			=3D #msk,				\
--		.feat_map		=3D NEEDS_FEAT_RES0(&msk.res0, f),\
-+		.feat_map		=3D NEEDS_FEAT_MASKS(&msk, f),	\
- 		.bit_feat_map		=3D m,				\
- 		.bit_feat_map_sz	=3D ARRAY_SIZE(m),		\
- 	}
-@@ -1168,21 +1169,21 @@ static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_E=
-L2,
- 			      mdcr_el2_feat_map, FEAT_AA64EL2);
-=20
- static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
--				  int map_size, u64 res0, const char *str)
-+				  int map_size, u64 resx, const char *str)
- {
- 	u64 mask =3D 0;
-=20
- 	for (int i =3D 0; i < map_size; i++)
- 		mask |=3D map[i].bits;
-=20
--	if (mask !=3D ~res0)
-+	if (mask !=3D ~resx)
- 		kvm_err("Undefined %s behaviour, bits %016llx\n",
--			str, mask ^ ~res0);
-+			str, mask ^ ~resx);
- }
-=20
- static u64 reg_feat_map_bits(const struct reg_bits_to_feat_map *map)
- {
--	return map->flags & RES0_POINTER ? ~(*map->res0p) : map->bits;
-+	return map->flags & MASKS_POINTER ? (map->masks->mask | map->masks->nmask=
-) : map->bits;
- }
-=20
- static void __init check_reg_desc(const struct reg_feat_map_desc *r)
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-neste=
-d.c
-index 834f13fb1fb7..75d49f83342a 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2105,23 +2105,24 @@ static u32 encoding_next(u32 encoding)
- }
-=20
- #define FGT_MASKS(__n, __m)						\
--	struct fgt_masks __n =3D { .str =3D #__m, .res0 =3D __m, }
+-/* ICH_VMCR_EL2 bit definitions */
+-#define ICH_VMCR_ACK_CTL_SHIFT	2
+-#define ICH_VMCR_ACK_CTL_MASK	(1 << ICH_VMCR_ACK_CTL_SHIFT)
+-#define ICH_VMCR_FIQ_EN_SHIFT	3
+-#define ICH_VMCR_FIQ_EN_MASK	(1 << ICH_VMCR_FIQ_EN_SHIFT)
+-#define ICH_VMCR_CBPR_SHIFT	4
+-#define ICH_VMCR_CBPR_MASK	(1 << ICH_VMCR_CBPR_SHIFT)
+-#define ICH_VMCR_EOIM_SHIFT	9
+-#define ICH_VMCR_EOIM_MASK	(1 << ICH_VMCR_EOIM_SHIFT)
+-#define ICH_VMCR_BPR1_SHIFT	18
+-#define ICH_VMCR_BPR1_MASK	(7 << ICH_VMCR_BPR1_SHIFT)
+-#define ICH_VMCR_BPR0_SHIFT	21
+-#define ICH_VMCR_BPR0_MASK	(7 << ICH_VMCR_BPR0_SHIFT)
+-#define ICH_VMCR_PMR_SHIFT	24
+-#define ICH_VMCR_PMR_MASK	(0xffUL << ICH_VMCR_PMR_SHIFT)
+-#define ICH_VMCR_ENG0_SHIFT	0
+-#define ICH_VMCR_ENG0_MASK	(1 << ICH_VMCR_ENG0_SHIFT)
+-#define ICH_VMCR_ENG1_SHIFT	1
+-#define ICH_VMCR_ENG1_MASK	(1 << ICH_VMCR_ENG1_SHIFT)
 -
--FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
--FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
--FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
--FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
--FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
--FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
--FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2_RES0);
--FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2_RES0);
--FGT_MASKS(hfgitr2_masks, HFGITR2_EL2_RES0);
--FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2_RES0);
--FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2_RES0);
-+	struct fgt_masks __n =3D { .str =3D #__m, .res0 =3D __m ## _RES0, .res1 =
-=3D __m ## _RES1 }
-+
-+FGT_MASKS(hfgrtr_masks, HFGRTR_EL2);
-+FGT_MASKS(hfgwtr_masks, HFGWTR_EL2);
-+FGT_MASKS(hfgitr_masks, HFGITR_EL2);
-+FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2);
-+FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2);
-+FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2);
-+FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2);
-+FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2);
-+FGT_MASKS(hfgitr2_masks, HFGITR2_EL2);
-+FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2);
-+FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2);
+ /*
+  * Permission Indirection Extension (PIE) permission encodings.
+  * Encodings with the _O suffix, have overlays applied (Permission Overlay=
+ Extension).
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-s=
+r.c
+index 0b670a033fd8..c4d2f1feea8b 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -569,11 +569,11 @@ static int __vgic_v3_highest_priority_lr(struct kvm_v=
+cpu *vcpu, u32 vmcr,
+ 			continue;
 =20
- static __init bool aggregate_fgt(union trap_config tc)
- {
- 	struct fgt_masks *rmasks, *wmasks;
-+	u64 rresx, wresx;
+ 		/* Group-0 interrupt, but Group-0 disabled? */
+-		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG0_MASK))
++		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_EL2_VENG0_MASK))
+ 			continue;
 =20
- 	switch (tc.fgt) {
- 	case HFGRTR_GROUP:
-@@ -2154,24 +2155,27 @@ static __init bool aggregate_fgt(union trap_config =
-tc)
- 		break;
- 	}
+ 		/* Group-1 interrupt, but Group-1 disabled? */
+-		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG1_MASK))
++		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_EL2_VENG1_MASK))
+ 			continue;
 =20
-+	rresx =3D rmasks->res0 | rmasks->res1;
-+	if (wmasks)
-+		wresx =3D wmasks->res0 | wmasks->res1;
-+
- 	/*
- 	 * A bit can be reserved in either the R or W register, but
- 	 * not both.
- 	 */
--	if ((BIT(tc.bit) & rmasks->res0) &&
--	    (!wmasks || (BIT(tc.bit) & wmasks->res0)))
-+	if ((BIT(tc.bit) & rresx) && (!wmasks || (BIT(tc.bit) & wresx)))
- 		return false;
-=20
- 	if (tc.pol)
--		rmasks->mask |=3D BIT(tc.bit) & ~rmasks->res0;
-+		rmasks->mask |=3D BIT(tc.bit) & ~rresx;
- 	else
--		rmasks->nmask |=3D BIT(tc.bit) & ~rmasks->res0;
-+		rmasks->nmask |=3D BIT(tc.bit) & ~rresx;
-=20
- 	if (wmasks) {
- 		if (tc.pol)
--			wmasks->mask |=3D BIT(tc.bit) & ~wmasks->res0;
-+			wmasks->mask |=3D BIT(tc.bit) & ~wresx;
- 		else
--			wmasks->nmask |=3D BIT(tc.bit) & ~wmasks->res0;
-+			wmasks->nmask |=3D BIT(tc.bit) & ~wresx;
- 	}
-=20
- 	return true;
-@@ -2180,7 +2184,6 @@ static __init bool aggregate_fgt(union trap_config tc=
+ 		/* Not the highest priority? */
+@@ -646,19 +646,19 @@ static int __vgic_v3_get_highest_active_priority(void=
 )
- static __init int check_fgt_masks(struct fgt_masks *masks)
- {
- 	unsigned long duplicate =3D masks->mask & masks->nmask;
--	u64 res0 =3D masks->res0;
- 	int ret =3D 0;
 =20
- 	if (duplicate) {
-@@ -2194,10 +2197,14 @@ static __init int check_fgt_masks(struct fgt_masks =
-*masks)
- 		ret =3D -EINVAL;
+ static unsigned int __vgic_v3_get_bpr0(u32 vmcr)
+ {
+-	return (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
++	return FIELD_GET(ICH_VMCR_EL2_VBPR0, vmcr);
+ }
+=20
+ static unsigned int __vgic_v3_get_bpr1(u32 vmcr)
+ {
+ 	unsigned int bpr;
+=20
+-	if (vmcr & ICH_VMCR_CBPR_MASK) {
++	if (vmcr & ICH_VMCR_EL2_VCBPR_MASK) {
+ 		bpr =3D __vgic_v3_get_bpr0(vmcr);
+ 		if (bpr < 7)
+ 			bpr++;
+ 	} else {
+-		bpr =3D (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
++		bpr =3D FIELD_GET(ICH_VMCR_EL2_VBPR1, vmcr);
  	}
 =20
--	masks->res0 =3D ~(masks->mask | masks->nmask);
--	if (masks->res0 !=3D res0)
--		kvm_info("Implicit %s =3D %016llx, expecting %016llx\n",
--			 masks->str, masks->res0, res0);
-+	if ((masks->res0 | masks->res1 | masks->mask | masks->nmask) !=3D GENMASK=
-(63, 0) ||
-+	    (masks->res0 & masks->res1)  || (masks->res0 & masks->mask) ||
-+	    (masks->res0 & masks->nmask) || (masks->res1 & masks->mask)  ||
-+	    (masks->res1 & masks->nmask) || (masks->mask & masks->nmask)) {
-+		kvm_info("Inconsistent masks for %s (%016llx, %016llx, %016llx, %016llx)=
-\n",
-+			 masks->str, masks->res0, masks->res1, masks->mask, masks->nmask);
-+		masks->res0 =3D ~(masks->res1 | masks->mask | masks->nmask);
-+	}
+ 	return bpr;
+@@ -758,7 +758,7 @@ static void __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u=
+32 vmcr, int rt)
+ 	if (grp !=3D !!(lr_val & ICH_LR_GROUP))
+ 		goto spurious;
 =20
- 	return ret;
+-	pmr =3D (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
++	pmr =3D FIELD_GET(ICH_VMCR_EL2_VPMR, vmcr);
+ 	lr_prio =3D (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
+ 	if (pmr <=3D lr_prio)
+ 		goto spurious;
+@@ -806,7 +806,7 @@ static int ___vgic_v3_write_dir(struct kvm_vcpu *vcpu, =
+u32 vmcr, int rt)
+ 	int lr;
+=20
+ 	/* EOImode =3D=3D 0, nothing to be done here */
+-	if (!(vmcr & ICH_VMCR_EOIM_MASK))
++	if (!(vmcr & ICH_VMCR_EL2_VEOIM_MASK))
+ 		return 1;
+=20
+ 	/* No deactivate to be performed on an LPI */
+@@ -849,7 +849,7 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu,=
+ u32 vmcr, int rt)
+ 	}
+=20
+ 	/* EOImode =3D=3D 1 and not an LPI, nothing to be done here */
+-	if ((vmcr & ICH_VMCR_EOIM_MASK) && !(vid >=3D VGIC_MIN_LPI))
++	if ((vmcr & ICH_VMCR_EL2_VEOIM_MASK) && !(vid >=3D VGIC_MIN_LPI))
+ 		return;
+=20
+ 	lr_prio =3D (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
+@@ -865,22 +865,19 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcp=
+u, u32 vmcr, int rt)
+=20
+ static void __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt=
+)
+ {
+-	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
++	vcpu_set_reg(vcpu, rt, FIELD_GET(ICH_VMCR_EL2_VENG0, vmcr));
  }
+=20
+ static void __vgic_v3_read_igrpen1(struct kvm_vcpu *vcpu, u32 vmcr, int rt=
+)
+ {
+-	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG1_MASK));
++	vcpu_set_reg(vcpu, rt, FIELD_GET(ICH_VMCR_EL2_VENG1, vmcr));
+ }
+=20
+ static void __vgic_v3_write_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int r=
+t)
+ {
+ 	u64 val =3D vcpu_get_reg(vcpu, rt);
+=20
+-	if (val & 1)
+-		vmcr |=3D ICH_VMCR_ENG0_MASK;
+-	else
+-		vmcr &=3D ~ICH_VMCR_ENG0_MASK;
++	FIELD_MODIFY(ICH_VMCR_EL2_VENG0, &vmcr, val & 1);
+=20
+ 	__vgic_v3_write_vmcr(vmcr);
+ }
+@@ -889,10 +886,7 @@ static void __vgic_v3_write_igrpen1(struct kvm_vcpu *v=
+cpu, u32 vmcr, int rt)
+ {
+ 	u64 val =3D vcpu_get_reg(vcpu, rt);
+=20
+-	if (val & 1)
+-		vmcr |=3D ICH_VMCR_ENG1_MASK;
+-	else
+-		vmcr &=3D ~ICH_VMCR_ENG1_MASK;
++	FIELD_MODIFY(ICH_VMCR_EL2_VENG1, &vmcr, val & 1);
+=20
+ 	__vgic_v3_write_vmcr(vmcr);
+ }
+@@ -916,10 +910,7 @@ static void __vgic_v3_write_bpr0(struct kvm_vcpu *vcpu=
+, u32 vmcr, int rt)
+ 	if (val < bpr_min)
+ 		val =3D bpr_min;
+=20
+-	val <<=3D ICH_VMCR_BPR0_SHIFT;
+-	val &=3D ICH_VMCR_BPR0_MASK;
+-	vmcr &=3D ~ICH_VMCR_BPR0_MASK;
+-	vmcr |=3D val;
++	FIELD_MODIFY(ICH_VMCR_EL2_VBPR0, &vmcr, val);
+=20
+ 	__vgic_v3_write_vmcr(vmcr);
+ }
+@@ -929,17 +920,14 @@ static void __vgic_v3_write_bpr1(struct kvm_vcpu *vcp=
+u, u32 vmcr, int rt)
+ 	u64 val =3D vcpu_get_reg(vcpu, rt);
+ 	u8 bpr_min =3D __vgic_v3_bpr_min();
+=20
+-	if (vmcr & ICH_VMCR_CBPR_MASK)
++	if (FIELD_GET(ICH_VMCR_EL2_VCBPR, val))
+ 		return;
+=20
+ 	/* Enforce BPR limiting */
+ 	if (val < bpr_min)
+ 		val =3D bpr_min;
+=20
+-	val <<=3D ICH_VMCR_BPR1_SHIFT;
+-	val &=3D ICH_VMCR_BPR1_MASK;
+-	vmcr &=3D ~ICH_VMCR_BPR1_MASK;
+-	vmcr |=3D val;
++	FIELD_MODIFY(ICH_VMCR_EL2_VBPR1, &vmcr, val);
+=20
+ 	__vgic_v3_write_vmcr(vmcr);
+ }
+@@ -1029,19 +1017,14 @@ static void __vgic_v3_read_hppir(struct kvm_vcpu *v=
+cpu, u32 vmcr, int rt)
+=20
+ static void __vgic_v3_read_pmr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ {
+-	vmcr &=3D ICH_VMCR_PMR_MASK;
+-	vmcr >>=3D ICH_VMCR_PMR_SHIFT;
+-	vcpu_set_reg(vcpu, rt, vmcr);
++	vcpu_set_reg(vcpu, rt, FIELD_GET(ICH_VMCR_EL2_VPMR, vmcr));
+ }
+=20
+ static void __vgic_v3_write_pmr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ {
+ 	u32 val =3D vcpu_get_reg(vcpu, rt);
+=20
+-	val <<=3D ICH_VMCR_PMR_SHIFT;
+-	val &=3D ICH_VMCR_PMR_MASK;
+-	vmcr &=3D ~ICH_VMCR_PMR_MASK;
+-	vmcr |=3D val;
++	FIELD_MODIFY(ICH_VMCR_EL2_VPMR, &vmcr, val);
+=20
+ 	write_gicreg(vmcr, ICH_VMCR_EL2);
+ }
+@@ -1064,9 +1047,11 @@ static void __vgic_v3_read_ctlr(struct kvm_vcpu *vcp=
+u, u32 vmcr, int rt)
+ 	/* A3V */
+ 	val |=3D ((vtr >> 21) & 1) << ICC_CTLR_EL1_A3V_SHIFT;
+ 	/* EOImode */
+-	val |=3D ((vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT) << ICC_CTLR=
+_EL1_EOImode_SHIFT;
++	val |=3D FIELD_PREP(ICC_CTLR_EL1_EOImode_MASK,
++			  FIELD_GET(ICH_VMCR_EL2_VEOIM, vmcr));
+ 	/* CBPR */
+-	val |=3D (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
++	val |=3D FIELD_PREP(ICC_CTLR_EL1_CBPR_MASK,
++			FIELD_GET(ICH_VMCR_EL2_VCBPR, vmcr));
+=20
+ 	vcpu_set_reg(vcpu, rt, val);
+ }
+@@ -1075,15 +1060,11 @@ static void __vgic_v3_write_ctlr(struct kvm_vcpu *v=
+cpu, u32 vmcr, int rt)
+ {
+ 	u32 val =3D vcpu_get_reg(vcpu, rt);
+=20
+-	if (val & ICC_CTLR_EL1_CBPR_MASK)
+-		vmcr |=3D ICH_VMCR_CBPR_MASK;
+-	else
+-		vmcr &=3D ~ICH_VMCR_CBPR_MASK;
++	FIELD_MODIFY(ICH_VMCR_EL2_VCBPR, &vmcr,
++		     FIELD_GET(ICC_CTLR_EL1_CBPR_MASK, val));
+=20
+-	if (val & ICC_CTLR_EL1_EOImode_MASK)
+-		vmcr |=3D ICH_VMCR_EOIM_MASK;
+-	else
+-		vmcr &=3D ~ICH_VMCR_EOIM_MASK;
++	FIELD_MODIFY(ICH_VMCR_EL2_VEOIM, &vmcr,
++		     FIELD_GET(ICC_CTLR_EL1_EOImode_MASK, val));
+=20
+ 	write_gicreg(vmcr, ICH_VMCR_EL2);
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgi=
+c-v3-nested.c
+index 61b44f3f2bf1..c9e35ec67117 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -202,16 +202,16 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu)
+ 	if ((hcr & ICH_HCR_EL2_NPIE) && !mi_state.pend)
+ 		reg |=3D ICH_MISR_EL2_NP;
+=20
+-	if ((hcr & ICH_HCR_EL2_VGrp0EIE) && (vmcr & ICH_VMCR_ENG0_MASK))
++	if ((hcr & ICH_HCR_EL2_VGrp0EIE) && (vmcr & ICH_VMCR_EL2_VENG0_MASK))
+ 		reg |=3D ICH_MISR_EL2_VGrp0E;
+=20
+-	if ((hcr & ICH_HCR_EL2_VGrp0DIE) && !(vmcr & ICH_VMCR_ENG0_MASK))
++	if ((hcr & ICH_HCR_EL2_VGrp0DIE) && !(vmcr & ICH_VMCR_EL2_VENG0_MASK))
+ 		reg |=3D ICH_MISR_EL2_VGrp0D;
+=20
+-	if ((hcr & ICH_HCR_EL2_VGrp1EIE) && (vmcr & ICH_VMCR_ENG1_MASK))
++	if ((hcr & ICH_HCR_EL2_VGrp1EIE) && (vmcr & ICH_VMCR_EL2_VENG1_MASK))
+ 		reg |=3D ICH_MISR_EL2_VGrp1E;
+=20
+-	if ((hcr & ICH_HCR_EL2_VGrp1DIE) && !(vmcr & ICH_VMCR_ENG1_MASK))
++	if ((hcr & ICH_HCR_EL2_VGrp1DIE) && !(vmcr & ICH_VMCR_EL2_VENG1_MASK))
+ 		reg |=3D ICH_MISR_EL2_VGrp1D;
+=20
+ 	return reg;
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 1d6dd1b545bd..2afc04167231 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -41,9 +41,9 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
+ 	if (!als->nr_sgi)
+ 		cpuif->vgic_hcr |=3D ICH_HCR_EL2_vSGIEOICount;
+=20
+-	cpuif->vgic_hcr |=3D (cpuif->vgic_vmcr & ICH_VMCR_ENG0_MASK) ?
++	cpuif->vgic_hcr |=3D (cpuif->vgic_vmcr & ICH_VMCR_EL2_VENG0_MASK) ?
+ 		ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
+-	cpuif->vgic_hcr |=3D (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
++	cpuif->vgic_hcr |=3D (cpuif->vgic_vmcr & ICH_VMCR_EL2_VENG1_MASK) ?
+ 		ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
+=20
+ 	/*
+@@ -215,7 +215,7 @@ void vgic_v3_deactivate(struct kvm_vcpu *vcpu, u64 val)
+ 	 * We only deal with DIR when EOIMode=3D=3D1, and only for SGI,
+ 	 * PPI or SPI.
+ 	 */
+-	if (!(cpuif->vgic_vmcr & ICH_VMCR_EOIM_MASK) ||
++	if (!(cpuif->vgic_vmcr & ICH_VMCR_EL2_VEOIM_MASK) ||
+ 	    val >=3D vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS)
+ 		return;
+=20
+@@ -408,25 +408,23 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct v=
+gic_vmcr *vmcrp)
+ 	u32 vmcr;
+=20
+ 	if (model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V2) {
+-		vmcr =3D (vmcrp->ackctl << ICH_VMCR_ACK_CTL_SHIFT) &
+-			ICH_VMCR_ACK_CTL_MASK;
+-		vmcr |=3D (vmcrp->fiqen << ICH_VMCR_FIQ_EN_SHIFT) &
+-			ICH_VMCR_FIQ_EN_MASK;
++		vmcr =3D FIELD_PREP(ICH_VMCR_EL2_VAckCtl, vmcrp->ackctl);
++		vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VFIQEn, vmcrp->fiqen);
+ 	} else {
+ 		/*
+ 		 * When emulating GICv3 on GICv3 with SRE=3D1 on the
+ 		 * VFIQEn bit is RES1 and the VAckCtl bit is RES0.
+ 		 */
+-		vmcr =3D ICH_VMCR_FIQ_EN_MASK;
++		vmcr =3D ICH_VMCR_EL2_VFIQEn_MASK;
+ 	}
+=20
+-	vmcr |=3D (vmcrp->cbpr << ICH_VMCR_CBPR_SHIFT) & ICH_VMCR_CBPR_MASK;
+-	vmcr |=3D (vmcrp->eoim << ICH_VMCR_EOIM_SHIFT) & ICH_VMCR_EOIM_MASK;
+-	vmcr |=3D (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
+-	vmcr |=3D (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
+-	vmcr |=3D (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
+-	vmcr |=3D (vmcrp->grpen0 << ICH_VMCR_ENG0_SHIFT) & ICH_VMCR_ENG0_MASK;
+-	vmcr |=3D (vmcrp->grpen1 << ICH_VMCR_ENG1_SHIFT) & ICH_VMCR_ENG1_MASK;
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VCBPR, vmcrp->cbpr);
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VEOIM, vmcrp->eoim);
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VBPR1, vmcrp->abpr);
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VBPR0, vmcrp->bpr);
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VPMR, vmcrp->pmr);
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VENG0, vmcrp->grpen0);
++	vmcr |=3D FIELD_PREP(ICH_VMCR_EL2_VENG1, vmcrp->grpen1);
+=20
+ 	cpu_if->vgic_vmcr =3D vmcr;
+ }
+@@ -440,10 +438,8 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vg=
+ic_vmcr *vmcrp)
+ 	vmcr =3D cpu_if->vgic_vmcr;
+=20
+ 	if (model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V2) {
+-		vmcrp->ackctl =3D (vmcr & ICH_VMCR_ACK_CTL_MASK) >>
+-			ICH_VMCR_ACK_CTL_SHIFT;
+-		vmcrp->fiqen =3D (vmcr & ICH_VMCR_FIQ_EN_MASK) >>
+-			ICH_VMCR_FIQ_EN_SHIFT;
++		vmcrp->ackctl =3D FIELD_GET(ICH_VMCR_EL2_VAckCtl, vmcr);
++		vmcrp->fiqen =3D FIELD_GET(ICH_VMCR_EL2_VFIQEn, vmcr);
+ 	} else {
+ 		/*
+ 		 * When emulating GICv3 on GICv3 with SRE=3D1 on the
+@@ -453,13 +449,13 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct v=
+gic_vmcr *vmcrp)
+ 		vmcrp->ackctl =3D 0;
+ 	}
+=20
+-	vmcrp->cbpr =3D (vmcr & ICH_VMCR_CBPR_MASK) >> ICH_VMCR_CBPR_SHIFT;
+-	vmcrp->eoim =3D (vmcr & ICH_VMCR_EOIM_MASK) >> ICH_VMCR_EOIM_SHIFT;
+-	vmcrp->abpr =3D (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
+-	vmcrp->bpr  =3D (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
+-	vmcrp->pmr  =3D (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+-	vmcrp->grpen0 =3D (vmcr & ICH_VMCR_ENG0_MASK) >> ICH_VMCR_ENG0_SHIFT;
+-	vmcrp->grpen1 =3D (vmcr & ICH_VMCR_ENG1_MASK) >> ICH_VMCR_ENG1_SHIFT;
++	vmcrp->cbpr =3D FIELD_GET(ICH_VMCR_EL2_VCBPR, vmcr);
++	vmcrp->eoim =3D FIELD_GET(ICH_VMCR_EL2_VEOIM, vmcr);
++	vmcrp->abpr =3D FIELD_GET(ICH_VMCR_EL2_VBPR1, vmcr);
++	vmcrp->bpr  =3D FIELD_GET(ICH_VMCR_EL2_VBPR0, vmcr);
++	vmcrp->pmr  =3D FIELD_GET(ICH_VMCR_EL2_VPMR, vmcr);
++	vmcrp->grpen0 =3D FIELD_GET(ICH_VMCR_EL2_VENG0, vmcr);
++	vmcrp->grpen1 =3D FIELD_GET(ICH_VMCR_EL2_VENG1, vmcr);
+ }
+=20
+ #define INITIAL_PENDBASER_VALUE						  \
 --=20
 2.34.1
 
