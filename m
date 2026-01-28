@@ -1,80 +1,84 @@
-Return-Path: <kvm+bounces-69306-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69307-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLXyCbppeWmPwwEAu9opvQ
-	(envelope-from <kvm+bounces-69306-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:22 +0100
+	id oPx7GdFpeWmPwwEAu9opvQ
+	(envelope-from <kvm+bounces-69307-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:45 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8309BFE7
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264B09BFFE
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:43:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C18C1300D5F4
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:43:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 468F4302C652
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D5425A2B4;
-	Wed, 28 Jan 2026 01:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EA926560A;
+	Wed, 28 Jan 2026 01:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UCPC9bjb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jg+/PQQs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3038E254B19
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 01:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7704258CE7
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 01:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769564594; cv=none; b=qrbUcY7V84x5V4Ypp6Rl2qfFgw2M7aDTk9ZFXqIPGBYhVqQ9edT9dqOeXLMBs0he1pzImRp5v2iX07wHC82aU8k8B/I+6dYhZwZAqbevIB6HwiBQbqTUd36ftp3uMWSep63UZ9H51VI8dCxIAYWfT/bXNsnjYvRmTG6ht5wPBXQ=
+	t=1769564596; cv=none; b=ncoPHUV7j/1uoaqYw3lmdeR0NS4wIR5C6xpEJU/nxs5cn++K1gpcomb8qGIaPiIRufLbWvtxQlT5zbvWtgiBk4TBDKqESSPuE3rfq65tEK98QPX2rDpwzcZXs+hM1w4Oz6D0fek7EVragWrEBUmLejKms511JhQebP/SaLoWBWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769564594; c=relaxed/simple;
-	bh=j0s1qIzuHKm1Dt5CuSHj15PHrJ3Ost58ZGpP/cKvDbk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eTbj+jJmtaEogswsHFnGAT53EDEahblfREc5PDijv/IzREcdpmFQkAjpPONAcM9bp8o0ti8MKzOVdo3vuRStGfWCpPtulywDU2To1QrAxsywOFTR55AccT8IV7odrr1IL1slpqHN3U51zxd6whcMtdRi2HcjPVIcEZ3f1Ga4lJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UCPC9bjb; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1769564596; c=relaxed/simple;
+	bh=eavUFYdilWC4NDM0QmP02+ef9dX8BH7Zs1ktMcFbyJM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=IVGecd8K/E1kJ52gGaJxLyeyxggEl7G2MiGn8s2jf/rXxI4f2NmSnnYKBvkiavrrdE+kQCz0ewt0abJNsX1ULxMGyGUTEqSttnezGQQciNzqcvGl+wvIi8dxyFswBN+K2aqE8tlR6yugO97QaIf02ppamxyolMUZmkczTc8KQ0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jg+/PQQs; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-352ec74a925so2226738a91.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 17:43:13 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a76f2d7744so60407975ad.3
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 17:43:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769564592; x=1770169392; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vJtM9RKlKBtslM9posblyhDH9U56GZnbtFwtuNq2ynE=;
-        b=UCPC9bjbs+4WHilB9klEFXlxC8y1XF1xD7GjEkXsGkP5JyaHzEsw3VzLuIn+YMlMoE
-         dRLNBQn/WZWLgk59RIxc8rDf6WZ0nQOmCZSANuCf86cpBUMpdtODILINGdKbwN/gVEun
-         wIW7dqzaLdSM76KQrFHO5QRKC7qjQUqj7gX0mjn2ZV1Cb6muzIZt6Wz+XraImR5fJYyM
-         0UuD9qhbrB8ypyQuXPHgPe4EqAzsRFpxd5lQNxFKeA44S+eYHXzJfDRyxsyMmDCnAW1L
-         P38P4qRyAB3A4ld/ZBbR8DSQGE1R33T0VflKhwIs9QZL2WcbPt4wh1TIvO/8xKvcWvu2
-         +CEA==
+        d=google.com; s=20230601; t=1769564594; x=1770169394; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dycno8xrJTeHUt9FVeo8HJWayzqn06ym8ZC4RBKnLqw=;
+        b=Jg+/PQQsPFcksCp4Sxk9n/l7dLzMp0V6YM3xC+1AsMm94qmCcp8bYOTTqZWicOp7Bp
+         YgPk9ujK0hbU6bsvh5E9mv8j8PVceJwBVJ/0j/UYLq1St1QQySZVzBnrCpXVNNjV97/L
+         gm3dPVemUkR/djAjWfZD+thEBsy4xhYUaTwNFARYZqDeiP7FYJCHshE51xYSB8l79p0Q
+         txXRuzznAJoqhT6J/l013ZODKMv6PFcUq0wXl5PP4tAJq+YCXOCYuNnAWwWJ+rOVFzRv
+         PKlxJLa4WW6I/RKmm8DyShBYSRCt1/tGwWYCSit9Ur/mbrxNE9LTwPuL+kC2Cg6YvCmn
+         vFnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769564592; x=1770169392;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vJtM9RKlKBtslM9posblyhDH9U56GZnbtFwtuNq2ynE=;
-        b=I0jL5OZLv6KcQEfBgl+frlR7cOa7O6aY8YAby1V7yZAzxznvIqE3mTEHdmrij4IxWb
-         cXDkX8WHWlL35MC/8Hyo6WDhlPEH2WdW9UMMuzsysn9cTYK7Tq8Fdhmfm90fDDAa7Vm3
-         J4U05PdZGSr/NbBkmrfS6iv4Vc/NK3+H7ScG7icz2JcZMgRviBjmmQkV5fSRUB4U0fec
-         j+yAkC7f9OSuqceptQYHtIs/R4R1YlXcoA9KUzPDVSR35wplHqsO+hEGoxYIzQJc7LG2
-         g0ahgyQkD7hfIOeu02gGD/cD3SNujQLWbADAtKjEW3QWmOhPr36aXV05PRKRRJYMI+ov
-         TwwQ==
-X-Gm-Message-State: AOJu0YxgpaIRiU4IUGoKKcQgICWkOSpUA2ZB8BEOgiZK4wDo7r72mEDT
-	BJbsFz22KmnK2wxtfKH4tWyr6eKzBJO1Vd9tdtOxTGBVEMnslrNOQuB4qcdfz/qE0/XcoCGjIZ+
-	9B/rvUQ==
-X-Received: from pgbee1.prod.google.com ([2002:a05:6a02:4581:b0:c1d:2c61:149a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6300:8d:b0:366:2360:8f7
- with SMTP id adf61e73a8af0-38ec628988fmr3941038637.14.1769564592551; Tue, 27
- Jan 2026 17:43:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769564594; x=1770169394;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dycno8xrJTeHUt9FVeo8HJWayzqn06ym8ZC4RBKnLqw=;
+        b=TAtBFu58+YxBDvfNOPhTzWfFIi2zZ/fLSgWr2YF5PpKLUg2UBL9o6abiK7vtnH9DJi
+         cIlmtRqGqiqiYs9XgAdeLfmZ5gq9dS1fVIgmK1ovx/YMHts0/uWWXKJcZMflfLitC4kU
+         HdfnzNK56sZE6v3cChTYlqx4GXphprL/Momp+YmNVq54P0tFxRYjYCeJqR2umaot3yyh
+         9BYV1ykr10ZU1X9q8BgfRs10H3t86h3g7bez4i1zV/jH3lFfH3uFQkfuPnEhPYKxOVR0
+         XS+oY54vYPoyO6VxgJ+Ta+GA0dbLUlYM6+r1j32tLeRyFqpo2vMFwy+lPm+UXDcxy7Oy
+         K5EA==
+X-Gm-Message-State: AOJu0YzPHUJvj+mBtZKZubZAC8Y9USeT2nDWL9VzsjobJjklbcJ3WXuM
+	UwzN63I1f8bh3xLZhj0HLGMmzaulO15vWRlW2Nu9PL0/+BrX+GCt1aFfc6AMjy1pqZG1SdtlLxc
+	9NnBC5A==
+X-Received: from plbmj14.prod.google.com ([2002:a17:903:2b8e:b0:2a0:de6a:ac6c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2291:b0:2a1:5f23:7ddf
+ with SMTP id d9443c01a7336-2a870d452d6mr30868615ad.6.1769564594217; Tue, 27
+ Jan 2026 17:43:14 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 27 Jan 2026 17:43:07 -0800
+Date: Tue, 27 Jan 2026 17:43:08 -0800
+In-Reply-To: <20260128014310.3255561-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260128014310.3255561-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260128014310.3255561-1-seanjc@google.com>
-Subject: [PATCH v2 0/3] KVM: x86: CET vs. nVMX fix and hardening
+Message-ID: <20260128014310.3255561-2-seanjc@google.com>
+Subject: [PATCH v2 1/3] KVM: x86: Explicitly configure supported XSS from {svm,vmx}_set_cpu_caps()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -90,17 +94,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69306-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69307-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:email,intel.com:email,grsecurity.net:email];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -111,48 +115,126 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: AC8309BFE7
+X-Rspamd-Queue-Id: 264B09BFFE
 X-Rspamd-Action: no action
 
-Fix a bug where KVM will clear IBT and SHSTK bits after nested VMX MSRs
-have been configured, e.g. if the kernel is built with CONFIG_X86_CET=y
-but CONFIG_X86_KERNEL_IBT=n.  The late clearing results in kvm-intel.ko
-refusing to load as the CPU compatible checks generate their VMCS configs
-with IBT=n and SHSTK=n, ultimately causing a mismatch on the CET entry
-and exit controls.
+Explicitly configure KVM's supported XSS as part of each vendor's setup
+flow to fix a bug where clearing SHSTK and IBT in kvm_cpu_caps, e.g. due
+to lack of CET XFEATURE support, makes kvm-intel.ko unloadable when nested
+VMX is enabled, i.e. when nested=1.  The late clearing results in
+nested_vmx_setup_{entry,exit}_ctls() clearing VM_{ENTRY,EXIT}_LOAD_CET_STATE
+when nested_vmx_setup_ctls_msrs() runs during the CPU compatibility checks,
+ultimately leading to a mismatched VMCS config due to the reference config
+having the CET bits set, but every CPU's "local" config having the bits
+cleared.
 
-Patch 2 hardens against similar bugs in the future by adding a flag and
-WARNs to yell if KVM sets or clear feature flags outside of the dedicated
-flow.
+Note, kvm_caps.supported_{xcr0,xss} are unconditionally initialized by
+kvm_x86_vendor_init(), before calling into vendor code, and not referenced
+between ops->hardware_setup() and their current/old location.
 
-Patch 3 adds (very, very) long overdue printing of the mistmatching offsets
-in the VMCS configs.
-
-Chao, I didn't include any of your Reviewed-by's, as every patch changed
-quite a bit from v1.
-
-v2:
- - Isolate kvm_setup_xss_caps() from kvm_finalize_cpu_caps(). [Xiaoyao]
- - Fix the pr_cont() printing. [Chao]
-
-v1: https://lore.kernel.org/all/20260123221542.2498217-1-seanjc@google.com
-
-Sean Christopherson (3):
-  KVM: x86: Explicitly configure supported XSS from
-    {svm,vmx}_set_cpu_caps()
-  KVM: x86: Harden against unexpected adjustments to kvm_cpu_caps
-  KVM: VMX: Print out "bad" offsets+value on VMCS config mismatch
-
- arch/x86/kvm/cpuid.c   | 10 ++++++++--
- arch/x86/kvm/cpuid.h   | 12 +++++++++++-
- arch/x86/kvm/svm/svm.c |  6 +++++-
- arch/x86/kvm/vmx/vmx.c | 23 +++++++++++++++++++++--
+Fixes: 69cc3e886582 ("KVM: x86: Add XSS support for CET_KERNEL and CET_USER")
+Cc: stable@vger.kernel.org
+Cc: Mathias Krause <minipli@grsecurity.net>
+Cc: John Allen <john.allen@amd.com>
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c |  2 ++
+ arch/x86/kvm/vmx/vmx.c |  2 ++
  arch/x86/kvm/x86.c     | 30 +++++++++++++++++-------------
  arch/x86/kvm/x86.h     |  2 ++
- 6 files changed, 64 insertions(+), 19 deletions(-)
+ 4 files changed, 23 insertions(+), 13 deletions(-)
 
-
-base-commit: e81f7c908e1664233974b9f20beead78cde6343a
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7803d2781144..c00a696dacfc 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5387,6 +5387,8 @@ static __init void svm_set_cpu_caps(void)
+ 	 */
+ 	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
+ 	kvm_cpu_cap_clear(X86_FEATURE_MSR_IMM);
++
++	kvm_setup_xss_caps();
+ }
+ 
+ static __init int svm_hardware_setup(void)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 27acafd03381..9f85c3829890 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8230,6 +8230,8 @@ static __init void vmx_set_cpu_caps(void)
+ 		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+ 		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+ 	}
++
++	kvm_setup_xss_caps();
+ }
+ 
+ static bool vmx_is_io_intercepted(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8acfdfc583a1..cac1d6a67b49 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9965,6 +9965,23 @@ static struct notifier_block pvclock_gtod_notifier = {
+ };
+ #endif
+ 
++void kvm_setup_xss_caps(void)
++{
++	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
++		kvm_caps.supported_xss = 0;
++
++	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
++	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
++		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
++
++	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
++		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
++		kvm_cpu_cap_clear(X86_FEATURE_IBT);
++		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
++	}
++}
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_setup_xss_caps);
++
+ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+ {
+ 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+@@ -10138,19 +10155,6 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 	if (!tdp_enabled)
+ 		kvm_caps.supported_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
+ 
+-	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+-		kvm_caps.supported_xss = 0;
+-
+-	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+-	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+-		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+-
+-	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
+-		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+-		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+-		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+-	}
+-
+ 	if (kvm_caps.has_tsc_control) {
+ 		/*
+ 		 * Make sure the user can only configure tsc_khz values that
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 70e81f008030..94d4f07aaaa0 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -483,6 +483,8 @@ extern struct kvm_host_values kvm_host;
+ extern bool enable_pmu;
+ extern bool enable_mediated_pmu;
+ 
++void kvm_setup_xss_caps(void);
++
+ /*
+  * Get a filtered version of KVM's supported XCR0 that strips out dynamic
+  * features for which the current process doesn't (yet) have permission to use.
 -- 
 2.52.0.457.g6b5491de43-goog
 
