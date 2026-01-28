@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-69302-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69303-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBdIB9VneWmPwwEAu9opvQ
-	(envelope-from <kvm+bounces-69302-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:35:17 +0100
+	id QGqiF+5neWmPwwEAu9opvQ
+	(envelope-from <kvm+bounces-69303-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:35:42 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538359BEEC
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:35:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32E29BF0C
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 02:35:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8EAB302A6DE
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:34:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A1ED3037D4E
+	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 01:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1089A238178;
-	Wed, 28 Jan 2026 01:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68F723EA8D;
+	Wed, 28 Jan 2026 01:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UAcSfLNG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Kn1lalxB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D495D22652D
-	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 01:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3EF2135B8
+	for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 01:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769564079; cv=none; b=AlItzn4d6/yAKVjlukR5sMI7zcPTt6G/MdwYoYjaEkXqw/mgNkZ0RbP0okPgfKdp/5NmmDA+Smd2OPNBDRRzvg0ilZMTHEuJGNpGUVabMngLP7m+zSBgAKQufLB95O4rqchJpd09cMxeh5cLLzZ9p0IWEpdksqWsfS8mhWX+TJ8=
+	t=1769564080; cv=none; b=EcwsrRs2mKFEYQKCehvjedOKz/0dqOr4ClTUYGTFVp1pFbGC/sXbyKBixuhDheNFrpjVkxbJVKzKk4tdlNNuyMXodcvvr5KDQBwIe2sDwf80xIHE6yP7lRXBj3OQHCITuWhY+UO8LWkysXPTCQI8DHZ1F4e6P7v+gmZoJk35yNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769564079; c=relaxed/simple;
-	bh=80qQLVQ5jJzLtpnLzVFm9M9H2UbAiPmAYz+2rzEoNUo=;
+	s=arc-20240116; t=1769564080; c=relaxed/simple;
+	bh=R13kez/KFVrfJYieeBKxhtp8/CpHkd4vcp7L1n+2ofo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qcfrU3tEMmX0Qg6EfDuvpWra/peC1I4pvcSmgaSvdAIquL7oQCbKhbB80k28EXxw/V0pzpxv6KLYDZZVVFAaIh4hSn8h9RDScDMAeE0v17QXiNL81uLzhVL1CC+rlg54O5LSJN3GyNW6Utx8UX0R+oCvLm3EJmqHCq78kaZ/v2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UAcSfLNG; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=VNpCTpgOEQcv2HgGKZUTrgY9uL3VsD2sSfqMHPASiH+tjLg32sjl9hcRZt4GI5jij8DyEm3uy5+ZvqBatyczwcE++Xy/BLrbm8reSQZbap/VB2v5JCq0xY3hhcbEUMVE6rd9N+eqh7J4Nt/bzKi4ZFPo3g+OHTuylx0vDRRSHpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Kn1lalxB; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-352c79abf36so5270673a91.2
-        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 17:34:37 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c3dfa080662so268108a12.1
+        for <kvm@vger.kernel.org>; Tue, 27 Jan 2026 17:34:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769564077; x=1770168877; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769564079; x=1770168879; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BUVUKuSQV+U+8gsuswu6Brp9Cg3f+EwR6/8UYrViixw=;
-        b=UAcSfLNGiwZhcqxv0RkRsZvSz/t3tvroGAMaBprXVOWTk0qhO0qnAhRy47ygpf6k3m
-         HpzAJdD5kLyN9Gr/Wovwg/6j8p4qUhZjcDRkRzPj+J3G/0WJGg99anneF6lVx5i8wKZp
-         pLF9BEEAi8LqO7wsN7f4HHij0nnc33MA+SdeQU7vuUZPOhykIv6zRaEWp0UPZV8eiteG
-         /XHQYIwrdwis/QQDJop3WI3bwx/vO8BW6ikjH08cekyPJ5uWjfGrRS6wJFLn4In1zOc/
-         oXoHB+U/VYp2bsUjQG0+QVs5iJmN43ZaNa/EFs+KDHPc/Ir+O1xngDkrvM15QKvbmdZL
-         r3cA==
+        bh=1VryWUi83hnS06/n+x/xjvRCvWKYQoklYztPIe61o0Y=;
+        b=Kn1lalxBIeHpxC5M89NL6c9SRuRtCQnLaCPxwShwDwuhAaeosvogloLT9pd7DskWlk
+         znTckx24+CT3bDLWZH50bBThpSI8h0uCYQK9M+R8nSYQRo4MZtdr1jkvPoNqn8FXMepu
+         lNjrpS1btbxlKnelDW0TuE3Vt4mXDKnuQwBsId84p/uvWa0xfsNv86wskoWkSs4o9GJ+
+         ti2BqcV9EcrS8YagHN5UJsxDijl700i1pmo4OGg5yXljgDqXwJYzf1riZsrWFs0kKoOl
+         Jvj5SWYIiKqpxunIeqaSHq9dO0nFUpmfCaFuvd1aYBaoH/mcx6c1JChpu59w9TLxALTh
+         PlXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769564077; x=1770168877;
+        d=1e100.net; s=20230601; t=1769564079; x=1770168879;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BUVUKuSQV+U+8gsuswu6Brp9Cg3f+EwR6/8UYrViixw=;
-        b=bzvDU4J/EeRxCNmRS7avGpIUI2nUybRgoSc3xGiyG1oRie6x5kBzK2JFfZb65oT98z
-         M0gCnM32y2ccbTNAS1Zq2YGuENjQ575Jq8wSEM0UcALDyCEin2dezRBsAMuOLibl07j4
-         iN/MsuFPKB52DqLhApuTEwO/icdAFNs82KgFwS3JZj3Jcg9u/RDJmitCO+VICgv2HOOZ
-         M7/GnxRJlInDcHP1HZEOHopUI3kxOYnD42oet8DL/rycrvBh7PnDHLknSv5YMRvRChk2
-         Y8PdeLdxEQQ1YF6S60mBtqvRR9yPGcXFc/oM9eGbvBmg0TuamWxJzBo8gMGjHSfl26ik
-         NheA==
-X-Gm-Message-State: AOJu0YxwMaTsutJXZfLyQKkA2YnRlMqhopRRZHWR6f3C+AmGI/e6EeTQ
-	kPRR1Orgamh6QEc/R5lgofk6BWDuaNEs2A2xozWXc/k6veKkdQoJnzGxcNGiipoib8cKR17SY2S
-	SQ5OQLA==
-X-Received: from pja13.prod.google.com ([2002:a17:90b:548d:b0:352:ba50:2819])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:270e:b0:34a:b459:bd10
- with SMTP id 98e67ed59e1d1-353fed7104bmr3202540a91.24.1769564077205; Tue, 27
- Jan 2026 17:34:37 -0800 (PST)
+        bh=1VryWUi83hnS06/n+x/xjvRCvWKYQoklYztPIe61o0Y=;
+        b=UNMkFTHRuZW0MRpbHc3oQeWAvVpvM66Eb8SjCwszFzljin1vrf/nv2rKsawqx/pwa2
+         H3b2D0yBcgwQ+aToqZfsezQZpcfVNwBQV5WdlG7ty7JmU/BaHUup4N1TCLRcfSI5VIPu
+         x3z+ubur4jmGR8vvHHWm99P/JXBaaLDdLgzdHCO30Zm+YHEEC/6hR5ihBSGQkE+GTJCb
+         tK/VCSzhdYvEhcJ7x8DV/Qe1NusPX6XfctpTGfoaPUK4/rqcj7W98Y9rzKptIz1Q5K+S
+         7c2YfdnfTy1+vYifNCLucWs7VBU2m1cy/3QTfzMxwIe5NAdcRA9KSWXq+uLgIXsCgKCN
+         zeZg==
+X-Gm-Message-State: AOJu0YxgAqNSFnkpCXeGmQl9k0NXxhZT72A9cGoA6Gef4VJDNc+tADuz
+	yuSKEOikvnXEcPmy2xbG0XPa20diDpEihrGcWlKHGqiv9R/bxFHVPxSomXMzqJ1Dmhc0zezSKkV
+	q5CDm3g==
+X-Received: from pgct8.prod.google.com ([2002:a05:6a02:5288:b0:c61:277a:16af])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:497:b0:38e:6774:382d
+ with SMTP id adf61e73a8af0-38ec5cf9c32mr3498880637.8.1769564078792; Tue, 27
+ Jan 2026 17:34:38 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 27 Jan 2026 17:34:31 -0800
+Date: Tue, 27 Jan 2026 17:34:32 -0800
 In-Reply-To: <20260128013432.3250805-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,9 +77,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260128013432.3250805-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260128013432.3250805-2-seanjc@google.com>
-Subject: [PATCH 1/2] KVM: x86: Defer IBPBs for vCPU and nested transitions
- until core run loop
+Message-ID: <20260128013432.3250805-3-seanjc@google.com>
+Subject: [PATCH 2/2] KVM: x86: Emit IBPB on pCPU migration if IBPB is
+ advertised to guest
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -88,22 +88,23 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69302-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69303-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -114,78 +115,61 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 538359BEEC
+X-Rspamd-Queue-Id: F32E29BF0C
 X-Rspamd-Action: no action
 
-When emitting an Indirect Branch Prediction Barrier to isolate different
-guest security domains (different vCPUs or L1 vs. L2 in the same vCPU),
-defer the IBPB until VM-Enter is imminent to avoid redundant and/or
-unnecessary IBPBs.  E.g. if a vCPU is loaded on a CPU without ever doing
-VM-Enter, then _KVM_ isn't responsible for doing an IBPB as KVM's job is
-purely to mitigate guests<=>guest attacks; guest=>host attacks are covered
-by IBRS.
+Emit an Indirect Branch Prediction Barrier if a vCPU is migrated to a
+different pCPU and IBPB support is advertised to the guest, to ensure any
+IBPBs performed by the guest are effective across pCPUs.  Ideally, KVM
+would only emit IBPB if the guest performed an IBPB since the vCPU last
+ran on the "new" pCPU, but pCPU migration is a relatively rare/slow path,
+and so the cost of tracking which pCPUs a vCPUs has run on, let alone
+intercepting PRED_CMD writes, outweighs the potential benefits of
+avoiding IBPBs on pCPU migration.
 
+E.g. if a single vCPU is bouncing between pCPUs A and B, and the guest is
+doing IBPBs on context switches to mitigate cross-task attacks, then the
+following scenario can occur and needs to be mitigated by KVM:
+
+ 1. vCPU starts on pCPU A.  It runs a userspace task (task #1) which
+    installs various branch predictions into pCPU A's BTB.
+ 2. The vCPU is migrated to pCPU B.
+ 3. The guest switches to userspace task #2 and emits an IBPB, on pCPU B.
+ 4. The vCPU is migrated back to pCPU A.  Userspace task (task #2) in the
+    guest now consumes the potentially dangerous branch predictions
+    installed in step 1 from task #1.
+
+Reported-by: David Kaplan <david.kaplan@amd.com>
 Cc: stable@vger.kernel.org
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: David Kaplan <david.kaplan@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/x86.c              | 7 ++++++-
- arch/x86/kvm/x86.h              | 2 +-
- 3 files changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e441f270f354..76bbc80a2d1d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -826,6 +826,7 @@ struct kvm_vcpu_arch {
- 	u64 smbase;
- 	u64 smi_count;
- 	bool at_instruction_boundary;
-+	bool need_ibpb;
- 	bool tpr_access_reporting;
- 	bool xfd_no_write_intercept;
- 	u64 microcode_version;
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8acfdfc583a1..e5ae655702b4 100644
+index e5ae655702b4..9d1641c2d83c 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -5187,7 +5187,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		 * is handled on the nested VM-Exit path.
- 		 */
- 		if (static_branch_likely(&switch_vcpu_ibpb))
--			indirect_branch_prediction_barrier();
-+			vcpu->arch.need_ibpb = true;
- 		per_cpu(last_vcpu, cpu) = vcpu;
+@@ -5201,6 +5201,19 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
  	}
  
-@@ -11315,6 +11315,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		kvm_make_request(KVM_REQ_EVENT, vcpu);
- 	}
- 
-+	if (unlikely(vcpu->arch.need_ibpb)) {
-+		indirect_branch_prediction_barrier();
-+		vcpu->arch.need_ibpb = false;
-+	}
-+
- 	fpregs_assert_state_consistent();
- 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
- 		switch_fpu_return();
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 70e81f008030..6708142d051d 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -169,7 +169,7 @@ static inline void kvm_nested_vmexit_handle_ibrs(struct kvm_vcpu *vcpu)
- 
- 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
- 	    guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_IBRS))
--		indirect_branch_prediction_barrier();
++	/*
++	 * If the vCPU is migrated to a different pCPU than the one on which
++	 * the vCPU last ran, and IBPB is advertised to the vCPU, then flush
++	 * indirect branch predictors before the next VM-Enter to ensure the
++	 * vCPU doesn't consume prediction information from a previous run on
++	 * the "new" pCPU.
++	 */
++	if (unlikely(vcpu->arch.last_vmentry_cpu != cpu &&
++		     vcpu->arch.last_vmentry_cpu >= 0) &&
++	    (guest_cpu_cap_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
++	     guest_cpu_cap_has(vcpu, X86_FEATURE_AMD_IBPB)))
 +		vcpu->arch.need_ibpb = true;
- }
- 
- /*
++
+ 	if (unlikely(vcpu->cpu != cpu) || kvm_check_tsc_unstable()) {
+ 		s64 tsc_delta = !vcpu->arch.last_host_tsc ? 0 :
+ 				rdtsc() - vcpu->arch.last_host_tsc;
 -- 
 2.52.0.457.g6b5491de43-goog
 
