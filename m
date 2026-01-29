@@ -1,202 +1,362 @@
-Return-Path: <kvm+bounces-69535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69536-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4N6mF+M/e2mNCwIAu9opvQ
-	(envelope-from <kvm+bounces-69535-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 12:09:23 +0100
+	id OKAVCAJAe2mNCwIAu9opvQ
+	(envelope-from <kvm+bounces-69536-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 12:09:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC847AF6D6
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 12:09:22 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A00AF6EE
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 12:09:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8B0E30120F9
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 11:09:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 725303007488
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 11:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B493D385EFB;
-	Thu, 29 Jan 2026 11:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38280385EC3;
+	Thu, 29 Jan 2026 11:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G7eIyCHQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ue2yBGOv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLBuKwbJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8CE385EC6
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 11:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE1838550B
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 11:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769684941; cv=none; b=BlFqTk+6elJM88BiYKOJkZe9nIAly/AplnzlRTJxRx5dxndWLVVomBoi/FdyOK4aVw1gLDbDMNC2Z29QLOKMVWUBYt4RgIalyW7ksB4D0l+zlo3DanDXV9Lh1uJOwcDEQGon8aSiTqIWQj4JfqZUTA52Q5ZiWhXndqaKN/1+BPI=
+	t=1769684990; cv=none; b=fZ/oQYYTJrcR3/KIhFng2o8yqOUr8aW0Uo88xknBj/jX2VkhpjdAhJpsTbEdUMHUpjG4u8T7G86WaMPGLrnxsQzBF/eyvKujSFjR9vuyWIZRqSg56DiHiZuuCKq608m6N8Ub2SzYX6vZ5AdtxgAXdKtQgDFthkj2fCBA7QpoJas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769684941; c=relaxed/simple;
-	bh=Zm5nVaUmDomhelfJ0OOFh2uwBMUINqvX7H9mQHWFywQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G1rbLfgXZKoWA7K3ovsrsLr6oG0NUn/jePaZzv1ndxQMaGeP9Dds8VePdTLGCzqhUfgPEZJJBPhmBboIZCpjnxURJuLHtbes8CLju3Lr/7NU1u9tF8P25rJDeuc1schFdOw6AHzlewABB63+5O87paJW70l0iSEwFrTP7TyMukE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G7eIyCHQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C216C2BC87
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 11:09:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769684941;
-	bh=Zm5nVaUmDomhelfJ0OOFh2uwBMUINqvX7H9mQHWFywQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=G7eIyCHQmVhnPUOp8Nlblqdw5C6qRjMvrmZreXtXXWsjFXsiKr6RxaACaP/yQoayh
-	 1L42nTvJT7OgxQj2TfCLjH47JcYboHJ8A5L+C8aTjfnMgjJD6gpa89aY56yYAIJZ/P
-	 5kyhRbJNsleFR6fYHBGSv+XejHw+LYZfW+D6jFRF7X07THkxnYEmsnczWlypzFKhmX
-	 F5z2LXRnCFM8dZNK6jW9PvHtEVLyVSngzSn2Q9xhIhao5BcJ745iLB8H9DUlcLG+Xp
-	 qtYGBjio1AG7dE7NR0WIjlXKY4ToBE9CDHbzgcPX7s7A8UqFVxE+I4UwKNXskL0GBS
-	 lilku0yiEMzsA==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b884a84e622so125071366b.1
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 03:09:01 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXTT8lmvNdsXm8KdruUdbfFxaPZq+O5cG+E77eqaMNyZJP4/rOlnJl9p6ARTEbBiIgvesg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhZZRUhCE7moiAWIKIJdlVPBvXltPwg9BFKp2NL+JDPJZEq3sX
-	uQLt0tHIgJcfaMSdJuKznlvz5m2L7qhvFEnANwC59WpN+4m3T5bDwhfu1jd9P8nVNFxTO9K+/cO
-	gx4gF/h6DHhqJaoSrQrz+4kWFIqoJKJ4=
-X-Received: by 2002:a17:907:7207:b0:b73:a2ce:540f with SMTP id
- a640c23a62f3a-b8dab2da697mr545573566b.17.1769684940063; Thu, 29 Jan 2026
- 03:09:00 -0800 (PST)
+	s=arc-20240116; t=1769684990; c=relaxed/simple;
+	bh=rWaHL/+Aa4jJNN4A3anGYGHsLCdOxfo24cK2Eyqyj10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GcS998zIICD0RL4tWtTceKSrVukksN02lotuEixcAX8vLArYK2GL6yPOYkJEXX8LvIVTcuPwC3z/MqYUb2WPlyMPla999X46pkEbTnMcc413NaeuZEPiaUXfBVjP6liKkwM7Mhw6Y/sC8xNH+Ff/ydYyB2LWiNTkY60DXlp+9OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ue2yBGOv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BLBuKwbJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769684987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TkHgRwXBNoQjtv8jea8xR991tHIKZLt4Po4JRLHOOp8=;
+	b=Ue2yBGOvGu4N9/ZDZTyWrqh6lbhupYkXBhO/3Fqhav5MCB/3phwZpfmbLM8+lvWv7PH2XZ
+	n1kPtG0UeLeuWJYrLW3S3FIN3uw2GGiqvIaCctVWikGYtCSrYXnWc/XvLpjAUNCbJtBbpb
+	Hho/GvKpyr5nRGzdZuWX2G+2Fu99OUY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-513-CSnWXIFGN1638LeD2938ow-1; Thu, 29 Jan 2026 06:09:46 -0500
+X-MC-Unique: CSnWXIFGN1638LeD2938ow-1
+X-Mimecast-MFC-AGG-ID: CSnWXIFGN1638LeD2938ow_1769684985
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-48069a43217so7918625e9.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 03:09:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1769684985; x=1770289785; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TkHgRwXBNoQjtv8jea8xR991tHIKZLt4Po4JRLHOOp8=;
+        b=BLBuKwbJaet8OCZiBwRsLc5tDUGBf8kb4xkA+KKAk1A+l4TFtZ+kJujxmkNcuRWqAO
+         8CtEnQSTZA0NwAwaQmbUL1WBm3hFCUCP5KLPVBkjJqFlloLvAmwkOhEoSdATMDL9PTjp
+         2V0aFxlfZktW+ZutvPgpS5o/b9bQJO/6/Tf0ETYwjiCXX8nDz5X+EnZhDONdp2NIkWBN
+         /mKULJOWN9dOgzFZVRBvHaKbZ0KEDm3uHf32LjrgZCmsNBDKCpov/CFkAoz7ziHub6vF
+         GNXUyCejMX+V9r5SHxSrUnde4fqIg6Dgep0X4zNThMVjl1qtNHtqURTlO7vdab85wmXG
+         tCcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769684985; x=1770289785;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TkHgRwXBNoQjtv8jea8xR991tHIKZLt4Po4JRLHOOp8=;
+        b=lZgFxXog11UHdStOu6wc34HMtadL7cHAmUGiSl/BD29sP1oAsHQ+OqeUdqutkcEYEE
+         X6PsKahmfYUWNlcgZ/+HaosqOGDM2gujCV8nGsAvQ0k/xy7lvY/28IbUATTsrewASsXn
+         MI3TQ/qdheZi8628EJAloAjkVHRUZNun4gSEezXpKmuFMauQvqmP2EEpG1mOUzA6GDLS
+         YwUzF737mbt3A5l+4wsin9A93WeWpS2vKkiE6n96PkHX4Rx7pRe55sG0c+gsx2b3ZhTa
+         FuH2fgOkzhPNnMRjNx2ZGHbNJehqwOO7VSwPxwC9LyHw4WtOX/hlI3FSnYGWyP56a28b
+         u/dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUfc97CQx7Qq+AG9AsnCgcLH43ok3MqqXv57zkXeZ6REqTZ67F6Edzj7AVvX5t6y4T88IU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7k7/Au45tcqyfy9Hvo+7esunyzKBS3fPejCw+EwRJ5834m1kC
+	VCxpdQoIrSJkDiOH0Rc87RA5HVG2CpXnAn43pqE14Eh7bZtBtjnB/yweYD2x64swGzcoK3msGoi
+	OUbri8CMhIMzrgEVTpN+yPqFrAWplIPxUdIo7DIEmaHZRHAj4/kL44A==
+X-Gm-Gg: AZuq6aJOHkSlgDoPZkHGz4K+AbtAWxI6MouxW+cGM1Iq86EzkMeZGUeXAVQWJ7QR0s5
+	vCKgQiIS3KUWsiuaL8FviwyhWNd9trzNz/XYHCcQOhzyuRdX1hxP9oLaGy7SSGnid3l706ifQ6O
+	dbgH/Ru+gc0yeecnBFD9bAVCClkY0+hBdYVPvzETo7jd+P2aLrYX2xxo5ljVIVFGDScjLihoY61
+	8v6cGUpJyhWJu/wrvLSNI6x/rwOavEOsiq8jsuP4AVy4O80s0weUGNK+1HXmPBMNbr3mwV+qJIm
+	RULEMYdHBU8xxcKmHGisofahVrjNoPy7M1frFU7QfDDPgO5jK68tS1HgH/w5ck4Ddt7oSvJdZ30
+	/wH/DbO/T9N4mzg==
+X-Received: by 2002:a05:600c:c83:b0:476:d494:41d2 with SMTP id 5b1f17b1804b1-48069c9a4e2mr100868875e9.29.1769684985037;
+        Thu, 29 Jan 2026 03:09:45 -0800 (PST)
+X-Received: by 2002:a05:600c:c83:b0:476:d494:41d2 with SMTP id 5b1f17b1804b1-48069c9a4e2mr100868495e9.29.1769684984536;
+        Thu, 29 Jan 2026 03:09:44 -0800 (PST)
+Received: from leonardi-redhat ([176.206.38.57])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10ee562sm13967057f8f.18.2026.01.29.03.09.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 03:09:43 -0800 (PST)
+Date: Thu, 29 Jan 2026 12:09:41 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Oliver Steffen <osteffen@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Eduardo Habkost <eduardo@habkost.net>, Gerd Hoffmann <kraxel@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Zhao Liu <zhao1.liu@intel.com>, 
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Igor Mammedov <imammedo@redhat.com>, 
+	Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ani Sinha <anisinha@redhat.com>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Joerg Roedel <joerg.roedel@amd.com>
+Subject: Re: [PATCH v5 3/6] igvm: Add common function for finding parameter
+ entries
+Message-ID: <aXs_30LoEwVjCSg1@leonardi-redhat>
+References: <20260127100257.1074104-1-osteffen@redhat.com>
+ <20260127100257.1074104-4-osteffen@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126024840.2308379-1-maobibo@loongson.cn> <CAAhV-H66uH1TpaKTsqNtSqKYUDatJWj+zAuw-MYE88BqOF0XTA@mail.gmail.com>
- <60b5e543-226c-3c15-09ed-c3c5ccfeb699@loongson.cn>
-In-Reply-To: <60b5e543-226c-3c15-09ed-c3c5ccfeb699@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 29 Jan 2026 19:08:48 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H57b14qY+5jqe+Fd5FTQq6jrhurfNBCqBqwG6SUpKFhTw@mail.gmail.com>
-X-Gm-Features: AZwV_QhJQXt51VkJgg5i8ghAZ4okSd3PtkuyELjz24byOkoUjHxF1C1KSBtz5vk
-Message-ID: <CAAhV-H57b14qY+5jqe+Fd5FTQq6jrhurfNBCqBqwG6SUpKFhTw@mail.gmail.com>
-Subject: Re: [PATCH v2] LoongArch: KVM: Add more CPUCFG mask bit
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: WANG Xuerui <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260127100257.1074104-4-osteffen@redhat.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69535-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69536-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,kvm@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[nongnu.org,redhat.com,habkost.net,intel.com,gmail.com,linaro.org,vger.kernel.org,amd.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,loongson.cn:email]
-X-Rspamd-Queue-Id: BC847AF6D6
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B2A00AF6EE
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 6:00=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
+On Tue, Jan 27, 2026 at 11:02:54AM +0100, Oliver Steffen wrote:
+>Move repeating code for finding the parameter entries in the IGVM
+>backend out of the parameter handlers into a common function.
 >
+>A warning message is emitted in case a no parameter entry can be found
+>for a given index.
 >
+>Signed-off-by: Oliver Steffen <osteffen@redhat.com>
+>---
+> backends/igvm.c | 143 ++++++++++++++++++++++++++----------------------
+> 1 file changed, 77 insertions(+), 66 deletions(-)
 >
-> On 2026/1/29 =E4=B8=8B=E5=8D=885:26, Huacai Chen wrote:
-> > Hi, Bibo,
-> >
-> > On Mon, Jan 26, 2026 at 10:48=E2=80=AFAM Bibo Mao <maobibo@loongson.cn>=
- wrote:
-> >>
-> >> With LA664 CPU there are more features supported which are indicated
-> >> in CPUCFG2 bit24:30 and CPUCFG3 bit17 and bit 23. KVM hypervisor can
-> >> not enable or disable these features and there is no KVM exception
-> >> when instructions of these features are used in guest mode.
-> >>
-> >> Here add more CPUCFG mask support with LA664 CPU type.
-> >>
-> >> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> >> ---
-> >>    1. Rebase on the latest version since some common CPUCFG bit macro
-> >>       definitions are merged.
-> >>    2. Modifiy the comments explaining why it comes from feature detect
-> >>       of host CPU.
-> >> ---
-> >>   arch/loongarch/kvm/vcpu.c | 15 +++++++++++++++
-> >>   1 file changed, 15 insertions(+)
-> >>
-> >> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> >> index 656b954c1134..a9608469fa7a 100644
-> >> --- a/arch/loongarch/kvm/vcpu.c
-> >> +++ b/arch/loongarch/kvm/vcpu.c
-> >> @@ -652,6 +652,8 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsi=
-gned int id, u64 val)
-> >>
-> >>   static int _kvm_get_cpucfg_mask(int id, u64 *v)
-> >>   {
-> >> +       unsigned int config;
-> >> +
-> >>          if (id < 0 || id >=3D KVM_MAX_CPUCFG_REGS)
-> >>                  return -EINVAL;
-> >>
-> >> @@ -684,9 +686,22 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
-> >>                  if (cpu_has_ptw)
-> >>                          *v |=3D CPUCFG2_PTW;
-> >>
-> >> +               /*
-> >> +                * The capability indication of some features are the =
-same
-> >> +                * between host CPU and guest vCPU, and there is no sp=
-ecial
-> >> +                * feature detect method with vCPU. Also KVM hyperviso=
-r can
-> >> +                * not enable or disable these features.
-> >> +                *
-> >> +                * Here use host CPU detected features for vCPU
-> >> +                */
-> >> +               config =3D read_cpucfg(LOONGARCH_CPUCFG2);
-> >> +               *v |=3D config & (CPUCFG2_FRECIPE | CPUCFG2_DIV32 | CP=
-UCFG2_LAM_BH);
-> >> +               *v |=3D config & (CPUCFG2_LAMCAS | CPUCFG2_LLACQ_SCREL=
- | CPUCFG2_SCQ);
-> >>                  return 0;
-> >>          case LOONGARCH_CPUCFG3:
-> >>                  *v =3D GENMASK(16, 0);
-> >> +               config =3D read_cpucfg(LOONGARCH_CPUCFG3);
-> >> +               *v |=3D config & (CPUCFG3_DBAR_HINTS | CPUCFG3_SLDORDE=
-R_STA);
-> > What about adding CPUCFG3_ALDORDER_STA and CPUCFG3_ASTORDER_STA here, t=
-oo?
-> I am ok to add these bits.
+>diff --git a/backends/igvm.c b/backends/igvm.c
+>index 4cf7b57234..213c9d337e 100644
+>--- a/backends/igvm.c
+>+++ b/backends/igvm.c
+>@@ -12,6 +12,7 @@
+> #include "qemu/osdep.h"
 >
-> It is strange that there is both capability bit and status bit. AFAIK
-> cpucfg is read-only, status bit means that it will change at runtime. I
-> will negotiate with HW guys about these bits.
-OK, then maybe capability bits should also be added here.
+> #include "qapi/error.h"
+>+#include "qemu/error-report.h"
+> #include "qemu/target-info-qapi.h"
+> #include "system/igvm.h"
+> #include "system/igvm-cfg.h"
+>@@ -97,6 +98,20 @@ typedef struct QIgvm {
+>     unsigned region_page_count;
+> } QIgvm;
+>
+>+static QIgvmParameterData*
+>+qigvm_find_param_entry(QIgvm *igvm, uint32_t parameter_area_index)
+>+{
+>+    QIgvmParameterData *param_entry;
+>+    QTAILQ_FOREACH(param_entry, &igvm->parameter_data, next)
+>+    {
+>+        if (param_entry->index == parameter_area_index) {
+>+            return param_entry;
+>+        }
+>+    }
+>+    warn_report("IGVM: No parameter area for index %u", parameter_area_index);
+>+    return NULL;
+>+}
+>+
+> static int qigvm_directive_page_data(QIgvm *ctx, const uint8_t *header_data,
+>                                      Error **errp);
+> static int qigvm_directive_vp_context(QIgvm *ctx, const uint8_t *header_data,
+>@@ -571,58 +586,54 @@ static int qigvm_directive_memory_map(QIgvm *ctx, const uint8_t *header_data,
+>     }
+>
+>     /* Find the parameter area that should hold the memory map */
+>-    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
+>-    {
+>-        if (param_entry->index == param->parameter_area_index) {
+>-            max_entry_count =
+>-                param_entry->size / sizeof(IGVM_VHS_MEMORY_MAP_ENTRY);
+>-            mm_entry = (IGVM_VHS_MEMORY_MAP_ENTRY *)param_entry->data;
+>-
+>-            retval = get_mem_map_entry(entry, &cgmm_entry, errp);
+>-            while (retval == 0) {
+>-                if (entry >= max_entry_count) {
+>-                    error_setg(
+>-                        errp,
+>-                        "IGVM: guest memory map size exceeds parameter area defined in IGVM file");
+>-                    return -1;
+>-                }
+>-                mm_entry[entry].starting_gpa_page_number = cgmm_entry.gpa >> 12;
+>-                mm_entry[entry].number_of_pages = cgmm_entry.size >> 12;
+>-
+>-                switch (cgmm_entry.type) {
+>-                case CGS_MEM_RAM:
+>-                    mm_entry[entry].entry_type =
+>-                        IGVM_MEMORY_MAP_ENTRY_TYPE_MEMORY;
+>-                    break;
+>-                case CGS_MEM_RESERVED:
+>-                    mm_entry[entry].entry_type =
+>-                        IGVM_MEMORY_MAP_ENTRY_TYPE_PLATFORM_RESERVED;
+>-                    break;
+>-                case CGS_MEM_ACPI:
+>-                    mm_entry[entry].entry_type =
+>-                        IGVM_MEMORY_MAP_ENTRY_TYPE_PLATFORM_RESERVED;
+>-                    break;
+>-                case CGS_MEM_NVS:
+>-                    mm_entry[entry].entry_type =
+>-                        IGVM_MEMORY_MAP_ENTRY_TYPE_PERSISTENT;
+>-                    break;
+>-                case CGS_MEM_UNUSABLE:
+>-                    mm_entry[entry].entry_type =
+>-                        IGVM_MEMORY_MAP_ENTRY_TYPE_PLATFORM_RESERVED;
+>-                    break;
+>-                }
+>-                retval = get_mem_map_entry(++entry, &cgmm_entry, errp);
+>-            }
+>-            if (retval < 0) {
+>-                return retval;
+>-            }
+>-            /* The entries need to be sorted */
+>-            qsort(mm_entry, entry, sizeof(IGVM_VHS_MEMORY_MAP_ENTRY),
+>-                  qigvm_cmp_mm_entry);
+>+    param_entry = qigvm_find_param_entry(ctx, param->parameter_area_index);
+>+    if (param_entry == NULL) {
+>+        return 0;
+>+    }
+>+
+>+    max_entry_count = param_entry->size / sizeof(IGVM_VHS_MEMORY_MAP_ENTRY);
+>+    mm_entry = (IGVM_VHS_MEMORY_MAP_ENTRY *)param_entry->data;
+>+
+>+    retval = get_mem_map_entry(entry, &cgmm_entry, errp);
+>+    while (retval == 0) {
+>+        if (entry >= max_entry_count) {
+>+            error_setg(
+>+                errp,
+>+                "IGVM: guest memory map size exceeds parameter area defined "
+>+                "in IGVM file");
+>+            return -1;
+>+        }
+>+        mm_entry[entry].starting_gpa_page_number = cgmm_entry.gpa >> 12;
+>+        mm_entry[entry].number_of_pages = cgmm_entry.size >> 12;
+>
+>+        switch (cgmm_entry.type) {
+>+        case CGS_MEM_RAM:
+>+            mm_entry[entry].entry_type = IGVM_MEMORY_MAP_ENTRY_TYPE_MEMORY;
+>+            break;
+>+        case CGS_MEM_RESERVED:
+>+            mm_entry[entry].entry_type =
+>+                IGVM_MEMORY_MAP_ENTRY_TYPE_PLATFORM_RESERVED;
+>+            break;
+>+        case CGS_MEM_ACPI:
+>+            mm_entry[entry].entry_type =
+>+                IGVM_MEMORY_MAP_ENTRY_TYPE_PLATFORM_RESERVED;
+>+            break;
+>+        case CGS_MEM_NVS:
+>+            mm_entry[entry].entry_type = IGVM_MEMORY_MAP_ENTRY_TYPE_PERSISTENT;
+>+            break;
+>+        case CGS_MEM_UNUSABLE:
+>+            mm_entry[entry].entry_type =
+>+                IGVM_MEMORY_MAP_ENTRY_TYPE_PLATFORM_RESERVED;
+>             break;
+>         }
+>+        retval = get_mem_map_entry(++entry, &cgmm_entry, errp);
+>+    }
+>+    if (retval < 0) {
+>+        return retval;
+>     }
+>+    /* The entries need to be sorted */
+>+    qsort(mm_entry, entry, sizeof(IGVM_VHS_MEMORY_MAP_ENTRY),
+>+          qigvm_cmp_mm_entry);
+>     return 0;
+> }
+>
+>@@ -634,18 +645,18 @@ static int qigvm_directive_vp_count(QIgvm *ctx, const uint8_t *header_data,
+>     uint32_t *vp_count;
+>     CPUState *cpu;
+>
+>-    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
+>+    param_entry = qigvm_find_param_entry(ctx, param->parameter_area_index);
+>+    if (param_entry == NULL) {
+>+        return 0;
+>+    }
+>+
+>+    vp_count = (uint32_t *)(param_entry->data + param->byte_offset);
+>+    *vp_count = 0;
+>+    CPU_FOREACH(cpu)
+>     {
+>-        if (param_entry->index == param->parameter_area_index) {
+>-            vp_count = (uint32_t *)(param_entry->data + param->byte_offset);
+>-            *vp_count = 0;
+>-            CPU_FOREACH(cpu)
+>-            {
+>-                (*vp_count)++;
+>-            }
+>-            break;
+>-        }
+>+        (*vp_count)++;
+>     }
+>+
+>     return 0;
+> }
+>
+>@@ -657,15 +668,15 @@ static int qigvm_directive_environment_info(QIgvm *ctx,
+>     QIgvmParameterData *param_entry;
+>     IgvmEnvironmentInfo *environmental_state;
+>
+>-    QTAILQ_FOREACH(param_entry, &ctx->parameter_data, next)
+>-    {
+>-        if (param_entry->index == param->parameter_area_index) {
+>-            environmental_state =
+>-                (IgvmEnvironmentInfo *)(param_entry->data + param->byte_offset);
+>-            environmental_state->memory_is_shared = 1;
+>-            break;
+>-        }
+>+    param_entry = qigvm_find_param_entry(ctx, param->parameter_area_index);
+>+    if (param_entry == NULL) {
+>+        return 0;
+>     }
+>+
+>+    environmental_state =
+>+        (IgvmEnvironmentInfo *)(param_entry->data + param->byte_offset);
+>+    environmental_state->memory_is_shared = 1;
+>+
+>     return 0;
+> }
+>
+>-- 
+>2.52.0
+>
 
-Huacai
+LGTM!
 
->
-> Regards
-> Bibo Mao
-> >
-> > Huacai
-> >
-> >>                  return 0;
-> >>          case LOONGARCH_CPUCFG4:
-> >>          case LOONGARCH_CPUCFG5:
-> >>
-> >> base-commit: 63804fed149a6750ffd28610c5c1c98cce6bd377
-> >> --
-> >> 2.39.3
-> >>
-> >>
->
->
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+
 
