@@ -1,806 +1,247 @@
-Return-Path: <kvm+bounces-69504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69505-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJi6FPjmemlk/QEAu9opvQ
-	(envelope-from <kvm+bounces-69504-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 05:50:00 +0100
+	id VJjJFdjzemnDAAIAu9opvQ
+	(envelope-from <kvm+bounces-69505-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 06:44:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD23ABBE4
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 05:49:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0A69AC016
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 06:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2FA6B301B71B
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 04:49:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DA8B53008992
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 05:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818852D2397;
-	Thu, 29 Jan 2026 04:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F272EB860;
+	Thu, 29 Jan 2026 05:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="V69I6N/7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kKelQ9cC"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DDB1E5B63;
-	Thu, 29 Jan 2026 04:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769662187; cv=none; b=n7wBrqsUNRLujWo+92cut4NlYAUd9KQCSoZl1BudjGwRqKwUlNKIXVuRs0QhUUkPTtCdUVHC0CldU2698fWT2ENFadpjzg6teuwc44JyOUyqxrRRVp0E2fjQvcECPrQrOo0h6ShDKC2KOOz4cJI1oRd0LDKSH9akWXAEXjfQahU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769662187; c=relaxed/simple;
-	bh=xb1fwZd4ilqnTaBLLYUh8xH+V26qKIuPacDrWqOvWYY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=R36zkveOG300qfoPp/h5m0niTBXnHKLwmkpag7mWo9a8eQgLl8KXap4V2Hef+9Q3UoAYG64xOBSyNK9nvw1Kml3RW7ZxE3CvzBwmbT9K8zKD131nOsBlsJ2ikkbaova6HucflkTXsKc6FecTi5bxFk9pW197evwZxTOWw5F4ko0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=V69I6N/7; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=yNr+14WAIKKE+qWrCubJeb4YGk57O/SiGwlTnAYtt50=; b=V69I6N/7y8SVqnglIXEqaSpbpk
-	va4UYG1D6Bzn43JC7WXYga9mqPyGfv8OMy/eYrdZaxPt0jix/Ew0soUA4xYqdmb5MhbgmnvL/9jKB
-	RcuBbH/3MzmzKIfP1KEnUKLvcQcgYJt/NCIMULIZqWbiEoKYbuu9Jwl3zvl+KI4ux6ohzZGB+Zhep
-	r20H4BB4dvmFeTNaAi0bxAzVr7+jyyVX/gUOwQsyYkYp1O3zQB5C9iTGCPv7ZqvChmvm/Koqps2Nf
-	mr3p7yZzgRk9+b61hvM6aSEL/E455IOQkugfmc2dZObh3n0PVtltW9H06wZhtlEQimBCYfqn0lTyh
-	IASOSbeA==;
-Received: from [2001:8b0:10b::4] (helo=u09cd745991455d.ant.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vlJy3-00000009nr6-0eI2;
-	Thu, 29 Jan 2026 04:49:27 +0000
-Message-ID: <83f9b0a5dd0bc1de9d1e61954f6dd5211df45163.camel@infradead.org>
-Subject: [PATCH v5 4/3] KVM: selftests: Add test cases for EOI suppression
- modes
-From: David Woodhouse <dwmw2@infradead.org>
-To: Khushit Shah <khushit.shah@nutanix.com>, seanjc@google.com, 
-	pbonzini@redhat.com, kai.huang@intel.com
-Cc: mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com, 
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- dave.hansen@linux.intel.com,  tglx@linutronix.de, jon@nutanix.com,
- shaju.abraham@nutanix.com
-Date: Wed, 28 Jan 2026 20:49:12 -0800
-In-Reply-To: <20251229111708.59402-1-khushit.shah@nutanix.com>
-References: <20251229111708.59402-1-khushit.shah@nutanix.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-XM1aDuSYUJFjYLXU6f31"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906512E8B66;
+	Thu, 29 Jan 2026 05:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769665493; cv=fail; b=dfbIYAxH8+p4fC7cHh/pHHKt/I7NCIn0ZG8p1MVp71ex88tLIGdoQHEnoX9hXuCTBPg3DEgQeIa1e+kyYcpFZ2lflS6UES+Ik48kTAZvfddKPjj9jSs8ckqcafpYCl42KdfoU6VZpgUzWm+GtmKXY+Wez60wddNrq+jUEE5yF1M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769665493; c=relaxed/simple;
+	bh=a33bqKqs+8woSuovqNg1QQ7W3DpiQCc/byAT+ipI5dw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Izf1sMJlLmTvtKDS+nzLeuk06Jo1IBShblEwM56XTPnFt96Jlwqlxxy/cG1uaIARurqdWCyBqcPA6UpDjoDe+Hle0sakzE7rKGhIignPeh2MICH8CvOuhQij/SLxi7OF8AzEIWsfTYEePyyMvZAio93Ogox18GN3+lI9fusAsks=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kKelQ9cC; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769665492; x=1801201492;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=a33bqKqs+8woSuovqNg1QQ7W3DpiQCc/byAT+ipI5dw=;
+  b=kKelQ9cCjggJ9SnOmh3NIE8VutmUrbqe36JAvtIkn3FfUvmCLqn82vWR
+   jckxn3yP1SgN3VuGC9Ayy+CauHIv8Kw4Cmi1ne4XAYn6mkdB45wYKvr/c
+   jAUcaY8al4JbRkfSvmrovus5qKJGgiLsVntcPDB6CcO+trVZvgQ/Jew/D
+   cpAFSBwR5UBxvg5WJp4daAd+tXoHupDhz7tYN4BGQchjj2MuYVQ7TJY0q
+   76NGeMcJ8kLhxwdhG7fJjVO72CFaa25xCpJ0L/1DIUswycyRlyU9CeUq4
+   v+NqqIwEvsG11X6ejhtybraG7VCpkIQWx8dTbez3QQ9OjKMF4Q0YuWl0O
+   g==;
+X-CSE-ConnectionGUID: RPd23Wa+Qd6XLHcAUdG7SA==
+X-CSE-MsgGUID: cvkSjfMEQe2BLt1w+AiXCA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="88465849"
+X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
+   d="scan'208";a="88465849"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 21:44:51 -0800
+X-CSE-ConnectionGUID: b3r1OvyvRcK31tmBzX/lCg==
+X-CSE-MsgGUID: SuD3UBAXTNOQCMBXT1gWWA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
+   d="scan'208";a="239722704"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 21:44:50 -0800
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Wed, 28 Jan 2026 21:44:50 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Wed, 28 Jan 2026 21:44:50 -0800
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.58) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Wed, 28 Jan 2026 21:44:50 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cPLKtfO3Y5ptVejILipjExQmamM/isNw/tX3v3xF4MsIFnOza2ekNOi/33Gu1Xa3lztiTxecHSQFylF1OPjlx7LqKtSNpKam0ym3KhdzJwLJttAyBUfhGs5R1D99GHCrKOpBnycc7+qk+GbJk90uclzstTh/Vft201vX60gAoKRKfwMm+e9M+jRx0jzNub8NVyJevJLHsz6oFOvRPcfEoYqRGNIAAu7l9mrh+m6CxWRjWTPGTUgdFR7ZEzpju7u+mo04i0MIY8o4nCrFMVAu3UYwCopAKTJGwRjWzbfsyo7nDqAxitDtJLhkru/kzb7sE1Q9oSMJYTtOogsfJQSdsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=a33bqKqs+8woSuovqNg1QQ7W3DpiQCc/byAT+ipI5dw=;
+ b=VTXOxRmfLd7DJmhJfVYhCZHT7gBHfuyVGBo+nlQHrEDSK/1G0S/jRQnIxAifgckBotxunwDvaWS1Nl66FIQLqZF2Qked9k9dEk/BhP3cpOTT7FB6kL1M6r3XdIZKP87yqVj0udA7htuNYYV4bXewX0UtPbNj7nUQqOuZJ14uwGEp6Ms6UmzH7kw02rbaQw3epthTUl/OgztxAe8bE8Fvg1WuG67hu6qEbG8og8WVdHBCEQ02GXh6DM89qLeQM4LsvPaxi5o7Dq1Bk2rhT45kyHDTlCQSVCh7eNa/+Hhl0hEXqWXgsdWnQVwewZr4bqwcV/e6HYp2apWhPGlNvmSeFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by PH0PR11MB9523.namprd11.prod.outlook.com (2603:10b6:510:3b0::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.11; Thu, 29 Jan
+ 2026 05:44:42 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf%6]) with mapi id 15.20.9564.006; Thu, 29 Jan 2026
+ 05:44:41 +0000
+Date: Thu, 29 Jan 2026 13:44:27 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <x86@kernel.org>, <reinette.chatre@intel.com>,
+	<ira.weiny@intel.com>, <kai.huang@intel.com>, <dan.j.williams@intel.com>,
+	<yilun.xu@linux.intel.com>, <sagis@google.com>, <vannapurve@google.com>,
+	<paulmck@kernel.org>, <nik.borisov@suse.com>, <zhenzhong.duan@intel.com>,
+	<seanjc@google.com>, <rick.p.edgecombe@intel.com>, <kas@kernel.org>,
+	<dave.hansen@linux.intel.com>, <vishal.l.verma@intel.com>, "Kirill A.
+ Shutemov" <kirill.shutemov@linux.intel.com>, Farrah Chen
+	<farrah.chen@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin"
+	<hpa@zytor.com>
+Subject: Re: [PATCH v3 01/26] x86/virt/tdx: Print SEAMCALL leaf numbers in
+ decimal
+Message-ID: <aXrzu53C1PCEHtcU@intel.com>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-2-chao.gao@intel.com>
+ <fafd9381-b8be-40eb-a68f-da4c81e2653c@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <fafd9381-b8be-40eb-a68f-da4c81e2653c@intel.com>
+X-ClientProxiedBy: SI2PR01CA0002.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::21) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|PH0PR11MB9523:EE_
+X-MS-Office365-Filtering-Correlation-Id: 92212857-5807-44d1-5f8e-08de5ef97fc6
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?YeZNOg4G/YzaIW3iPaxVK6LLIuISrcilLUqMA7O+9WX1FyRW58WuMHxT2zYt?=
+ =?us-ascii?Q?5ltwZ6sKUuRY4aIcYktbV6o5i4fxwSCE1yAclpsyLHOjU4ONQW7Xai66h9Hp?=
+ =?us-ascii?Q?hxng9Q9yjBOkmn/WaoFD479NEcCbmR4oI0GZ0QBcxa4EJ0ezAUJ/7y97lJ7v?=
+ =?us-ascii?Q?/yl9pYIJ8MiciuoSR2WLdo81ZbsvH/BwWo0hydBoH4CUsxoAMI22ttz69zrQ?=
+ =?us-ascii?Q?XEw56uDiRWNKeyYBON31XfaJL8qrBrHFZy/FKknmiQ0SxvZoq5/v7kmn+t0y?=
+ =?us-ascii?Q?XfBvCjWrX4cfnSIPTYiLiXmYZLqwTe5r/7A8HzntPd6zwm6t5SMXaN7Xk8g6?=
+ =?us-ascii?Q?4NGFQTmq0FSohDNHUx9W6+qI+TORmNK3AFW/QWx51jItVlkx9ikhXjDVE3UK?=
+ =?us-ascii?Q?cog0DavHJwp/73NoSVuextxfeeKxpy5AKnxpw/EzBNtfKPRa/6G4nSVRBkI7?=
+ =?us-ascii?Q?Fsv98mw450MnroBKzUOB9ee3D2nvokhB5aANTULcPUbvxc4YGv/LSl93XVbB?=
+ =?us-ascii?Q?6Jw1AXXjV1rK2Bz7empI4BERfnGR/n07NSVKxQe1MwkMSjsyJ901MZ0mjp1b?=
+ =?us-ascii?Q?n2XsEMYAmFeSTd+Lksf2lBnwNdGBS+ydc0r1WrTrZ5p4VbaNZ9BvIFXfbZus?=
+ =?us-ascii?Q?NTq4y1nxSBgrLBDBIWg6S1QvYOHMRgitjBdQunyr+eFJOr5XbL+J2HaSlGCu?=
+ =?us-ascii?Q?6Z+sjn/YdhyVsyT1hSE+HzVemvDQNGIXSWR6WGggpPRVAK3FtBl5tVXFK0xB?=
+ =?us-ascii?Q?PKYY/eHfd3Qk87uFMHzO0XQVUixf0nihqe79YYW+b0z+/n5RB/hvm3GAUO0x?=
+ =?us-ascii?Q?JI+9OaRTJqcxxMmkABvgvoKuFBy00oScGwsIdE0Xlit4AY7qx3uffNLrfgfm?=
+ =?us-ascii?Q?Oyos2c4swYOgOXY1O+LEvd+wmXBhdPswogmaxhpM7Olafamh8PJJsc0WgFCH?=
+ =?us-ascii?Q?jKjSRd0PP1Y1ra1lc9v+zx29viCEPXWzk1mH9vra3ENBh1kijlKLlH7e1HHl?=
+ =?us-ascii?Q?RV9dAZjWO7WPjkGomXDl0s4A/ip2v3X5jW0nlE+WQxT6ZpT9vnrl/9HPeeHx?=
+ =?us-ascii?Q?ZGVbesWVXcQIzlWe4qNUafEIoQ2DUB8inO/r7tHcwSqzJbCdsm4uY/xMjVxV?=
+ =?us-ascii?Q?dngeKgv56VoDw6IT6LTccyF8ZpXJf2KfRKfmHmHdH5WaxIUKCguuuRV2CKfz?=
+ =?us-ascii?Q?SdDQo1xYAJg3/Sxk1BuYDvW4t68roNOCGM/YKfPRnl73CqMZDIPN809a2sAF?=
+ =?us-ascii?Q?fDX+Vqsj5i4jfV0bAkzDWM0ikpQ3z8Hkn6wSh7io7k6TCGoARO0WImZQBIXR?=
+ =?us-ascii?Q?ULQd8eHRkbtIDd3xEF8qy5PZ1qdg9KEo6VDOIm3F4xvSwiJKSFHzPd406Kk/?=
+ =?us-ascii?Q?+W3QXF9f49TNguOD3lAjVHTbPUlcy+UeWUD7STeoP2sb60IcyvUf+redoOee?=
+ =?us-ascii?Q?iQ4BvHWVgb2BG9b4mvSijLzNENTMfy+UJQz1GN7oWD94cHDwxUJj4tZiAXa0?=
+ =?us-ascii?Q?n1561P6unooJzi0Sihm7qQm3p6HqkXgwvm6Kq+YQ4Bvbtxp03U8c3jX43zkM?=
+ =?us-ascii?Q?Wn0fH8SlhScxXRZNetk=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2b8+t5omCiuAlSUSPsxddQi5HKPygITTi/sWi+l2ZKu8nrmi1Tctb+lqGqe6?=
+ =?us-ascii?Q?1Gw9orfT2+F6G9U4HQ8SeM2d8x0EFdUZgd3YWrVvpjagQALkQ3iPumEJ4BQH?=
+ =?us-ascii?Q?9qcRuBmCB6grCcLKDonfCb0o9pqDgOt8t6ily0O7Zh6PBnrLvAIh7XICNoZD?=
+ =?us-ascii?Q?paE+93ecapbkmbK1s4/m4h1EfRzb5V5fMYOwXc6Tw93E4eYtZGjxgxAPf2+B?=
+ =?us-ascii?Q?ekC7lDz6mNQXIkwfcH3YyORG7L+yaqaudnvgbzIC1iv++skzwVmgAxSTehWE?=
+ =?us-ascii?Q?epqIfuEHI/OWTu8xAqe97niFFtIew6b96buTs7zbjguoQ21YTkWQozloUyvv?=
+ =?us-ascii?Q?o8ZVI81OmPN/kOOXoekhn+XVIbftbTuESkul8yXn0AahGIKkUd0DXY78sRgd?=
+ =?us-ascii?Q?mFho1y0Cw6g96avfugREjTesSnHCE5SDMBC01G7DjYKd6VSvAoe3eRY0ns+M?=
+ =?us-ascii?Q?a4AZOmrhiN6idy1szeorsuFvVPkGUDOr6PXrFBuKuLOTo39lvDBrjW7FPKh9?=
+ =?us-ascii?Q?PLaFlEhAPZyL8iUFt8fodqN8k/F4+so6HruVTlJFcVeYidS6iewbrtycAii5?=
+ =?us-ascii?Q?f1MzZkQNAUPqu2jXLd3DMzgGnrj1tEA8dTuvjEmH4nY2dlif9S0onRYiuu6H?=
+ =?us-ascii?Q?3ATrn73y1gRrrsmVh2deLJ2ZAc/MC3gEiSq7EYEZNWwtuCHNd/aOEK1NkSMb?=
+ =?us-ascii?Q?YBSzbaoBHcaW4RqlXYO2aXJMygrr1fvAy9mjM6OEYoTtTOrLLVjJnAosMcq1?=
+ =?us-ascii?Q?GOz7e3Z9D8fbq4PWA7BC0t4ip3IzBcrhm9A/VF32RtOGOo5qyaV9c1L3CMZo?=
+ =?us-ascii?Q?cepQ08Z3aESbHIdgb3Jy/k1GP29lhUcXf2vfT7SrGdKwajhouJTU2CwDygax?=
+ =?us-ascii?Q?p2PkvH9V3B2xF4a0mGijit74lT6X0A7ArRFLbFtJgfsM++4zA4mjgYUOQYMc?=
+ =?us-ascii?Q?MIq1J9UySqJhCf/mbGisPtGwlUygZBFQBzGm1oto5V//9I2WXac7zYSxTFQg?=
+ =?us-ascii?Q?Xd2/SBBTuQ/3kpNP7CcbUKMLbl8Opc4DDBEnt6CfCMWMCp0bvRkM2DRHTK/V?=
+ =?us-ascii?Q?5XdnWpQFLh83ohUgQyYqLbLbrbdaPmocgBok0f/znjfzO1ec0Rv4KzjdLf+1?=
+ =?us-ascii?Q?ynh7ZZfXci/S9sxUHLghjMLLQjPXNbc/bXH3CHwMor1VIcpkKznzZM7+i78W?=
+ =?us-ascii?Q?a6Ox4EuDhqVeMwYL1GhOoOQkc2TOVJ2r6UVZlwLu5/IeLU4sGVbctdM2mwPa?=
+ =?us-ascii?Q?hOGYirzAsdInbG5fw7zaMjNdGmaMJyfu0h5Ek5TLzT4wDCxyoQkfjYm7Zc3G?=
+ =?us-ascii?Q?5cPA+xPZ5GdV/OX/wHMhrKnIMwZ0yvcY5HIZiVvLsIAjSQ10SitSs6FQAY0q?=
+ =?us-ascii?Q?9Me240qUOP49uqwvGvjNDklL1d6MNz75TKLRAk9dyQuR55EjP0KTm5NTFLEm?=
+ =?us-ascii?Q?f93TgKDjv+yzTQVpDw4qIzmMnJOOL9E0rOo99gsR2YXZvFQETlfazNeET0lw?=
+ =?us-ascii?Q?KicOPixp0S1/CmRw7CkQ7VDzudn9GkfKlyR7Y16eMZktJOi075x7flh0S8BT?=
+ =?us-ascii?Q?XKFWwHRTBrTYFTbxypSmz5Vk9T320fxEhJLEc/FCpOx5ox3xxihYIaLp+VyB?=
+ =?us-ascii?Q?zaHdWuJqQqt9V2jHuCZy0UqR1BRMSWfmAb52QRTMS2B/gFoPcQeIQuEb+Hg4?=
+ =?us-ascii?Q?ckOm0HdtAGU8lceIxud2XxzYwbX2u65iwyseCe3V8Lv3BU73mFKcFcbFMofb?=
+ =?us-ascii?Q?9+kzmTiHFw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92212857-5807-44d1-5f8e-08de5ef97fc6
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 05:44:41.8805
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AObKvhpHWVheVoTwiRTNfmDhUHQOfOzF6xQJytn4mDKbTQhO/t6kzL9atNFwLSFXcV75hKpEvEBxpP7AAznvWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB9523
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_SMIME(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-69505-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69504-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chao.gao@intel.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BBD23ABBE4
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: E0A69AC016
 X-Rspamd-Action: no action
 
+On Wed, Jan 28, 2026 at 08:26:43AM -0800, Dave Hansen wrote:
+>On 1/23/26 06:55, Chao Gao wrote:
+>> Both TDX spec and kernel defines SEAMCALL leaf numbers as decimal. Printing
+>> them in hex makes no sense. Correct it.
+>
+>This patch has zero to do with "Runtime TDX Module update support". Why
+>is it in this series?
 
---=-XM1aDuSYUJFjYLXU6f31
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Will drop it.
 
-From: David Woodhouse <dwmw@amazon.co.uk>
-
-Rather than being frightened of doing the right thing for the in-kernel
-I/O APIC because "there might be bugs", let's add selftests for it to
-make sure it behaves correctly. For both in-kernel I/O APIC and
-userspace, exercise the following modes:
-
- =E2=80=A2 Legacy "quirk" behaviour (this test shows the same results on bo=
-th
-   old kernels and on kernels with this patch series in default mode).
- =E2=80=A2 KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST mode, both with the gue=
-st
-   enabling APIC_SPIV_DIRECTED_EOI and without.
- =E2=80=A2 KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST mode.
-
-Testing quirk mode (no flags)...
-  IOAPIC v0x11, LVR directed_eoi=3D0, SPIV directed_eoi=3D0, remote_irr=3D0
-Testing explicit enable...
-  IOAPIC v0x20, LVR directed_eoi=3D1, SPIV directed_eoi=3D1, remote_irr=3D1
-Testing explicit enable (guest doesn't use)...
-  IOAPIC v0x20, LVR directed_eoi=3D1, SPIV directed_eoi=3D0, remote_irr=3D0
-Testing explicit disable...
-  IOAPIC v0x11, LVR directed_eoi=3D0, SPIV directed_eoi=3D0, remote_irr=3D0
-All tests passed
-
-=3D=3D=3D Testing split IRQCHIP mode =3D=3D=3D
-Testing quirk mode (no flags)...
-  Split IRQCHIP: LVR directed_eoi=3D1, SPIV directed_eoi=3D0, got_eoi_exit=
-=3D1
-Testing explicit enable...
-  Split IRQCHIP: LVR directed_eoi=3D1, SPIV directed_eoi=3D1, got_eoi_exit=
-=3D0
-Testing explicit enable (guest doesn't use)...
-  Split IRQCHIP: LVR directed_eoi=3D1, SPIV directed_eoi=3D0, got_eoi_exit=
-=3D1
-Testing explicit disable...
-  Split IRQCHIP: LVR directed_eoi=3D0, SPIV directed_eoi=3D0, got_eoi_exit=
-=3D1
-All tests passed
-
-There didn't seem to be a way for selftests to use split irqchip mode
-until now, so this adds vm_irqchip_mode modelled on the existing
-vm_guest_mode enum.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selft=
-ests/kvm/Makefile.kvm
-index 148d427ff24b..01c59bf8b79f 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -122,6 +122,7 @@ TEST_GEN_PROGS_x86 +=3D x86/vmx_nested_tsc_scaling_test
- TEST_GEN_PROGS_x86 +=3D x86/apic_bus_clock_test
- TEST_GEN_PROGS_x86 +=3D x86/xapic_ipi_test
- TEST_GEN_PROGS_x86 +=3D x86/xapic_state_test
-+TEST_GEN_PROGS_x86 +=3D x86/suppress_eoi_test
- TEST_GEN_PROGS_x86 +=3D x86/xcr0_cpuid_test
- TEST_GEN_PROGS_x86 +=3D x86/xss_msr_test
- TEST_GEN_PROGS_x86 +=3D x86/debug_regs
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing=
-/selftests/kvm/include/kvm_util.h
-index d3f3e455c031..c4eb0e95bae9 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -209,6 +209,14 @@ kvm_static_assert(sizeof(struct vm_shape) =3D=3D sizeo=
-f(uint64_t));
- 	shape;					\
- })
-=20
-+enum vm_irqchip_mode {
-+	VM_IRQCHIP_AUTO,
-+	VM_IRQCHIP_KERNEL,
-+	VM_IRQCHIP_SPLIT,
-+};
-+
-+extern enum vm_irqchip_mode vm_irqchip_mode;
-+
- #if defined(__aarch64__)
-=20
- extern enum vm_guest_mode vm_mode_default;
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/sel=
-ftests/kvm/lib/kvm_util.c
-index 1a93d6361671..4858c10f7530 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1687,21 +1687,34 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t =
-gpa)
- 	return (void *) ((uintptr_t) region->host_alias + offset);
- }
-=20
-+enum vm_irqchip_mode vm_irqchip_mode =3D VM_IRQCHIP_AUTO;
-+
- /* Create an interrupt controller chip for the specified VM. */
- void vm_create_irqchip(struct kvm_vm *vm)
- {
- 	int r;
-=20
- 	/*
--	 * Allocate a fully in-kernel IRQ chip by default, but fall back to a
--	 * split model (x86 only) if that fails (KVM x86 allows compiling out
--	 * support for KVM_CREATE_IRQCHIP).
-+	 * Create IRQ chip based on vm_irqchip_mode:
-+	 * - VM_IRQCHIP_AUTO: Try in-kernel, fall back to split if not supported
-+	 * - VM_IRQCHIP_KERNEL: Force in-kernel IRQ chip
-+	 * - VM_IRQCHIP_SPLIT: Force split IRQ chip (x86 only)
- 	 */
--	r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
--	if (r && errno =3D=3D ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
-+	if (vm_irqchip_mode =3D=3D VM_IRQCHIP_SPLIT) {
-+		TEST_ASSERT(kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP),
-+			    "Split IRQ chip not supported");
- 		vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
--	else
-+	} else if (vm_irqchip_mode =3D=3D VM_IRQCHIP_KERNEL) {
-+		r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
- 		TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
-+	} else {
-+		/* VM_IRQCHIP_AUTO */
-+		r =3D __vm_ioctl(vm, KVM_CREATE_IRQCHIP, NULL);
-+		if (r && errno =3D=3D ENOTTY && kvm_has_cap(KVM_CAP_SPLIT_IRQCHIP))
-+			vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
-+		else
-+			TEST_ASSERT_VM_VCPU_IOCTL(!r, KVM_CREATE_IRQCHIP, r, vm);
-+	}
-=20
- 	vm->has_irqchip =3D true;
- }
-diff --git a/tools/testing/selftests/kvm/x86/suppress_eoi_test.c b/tools/te=
-sting/selftests/kvm/x86/suppress_eoi_test.c
-new file mode 100644
-index 000000000000..ea14690b3116
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/suppress_eoi_test.c
-@@ -0,0 +1,441 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Test KVM's handling of Suppress EOI Broadcast in x2APIC mode.
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "apic.h"
-+
-+#define TEST_VECTOR		0xa2
-+#define TEST_IRQ		5
-+#define APIC_LVR_DIRECTED_EOI	(1 << 24)
-+#define APIC_SPIV_DIRECTED_EOI	(1 << 12)
-+
-+#define APIC_ISR	0x100
-+#define APIC_LVTPC	0x340
-+#define APIC_LVT0	0x350
-+#define APIC_LVT1	0x360
-+#define APIC_LVTERR	0x370
-+
-+#define IOAPIC_BASE_GPA		0xfec00000
-+#define IOAPIC_REG_SELECT	0x00
-+#define IOAPIC_REG_WINDOW	0x10
-+#define IOAPIC_REG_VERSION	0x01
-+#define IOAPIC_REG_EOI		0x40
-+
-+static uint32_t ioapic_version;
-+
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+}
-+
-+static uint32_t ioapic_read_reg(uint32_t reg)
-+{
-+	volatile uint32_t *ioapic =3D (volatile uint32_t *)IOAPIC_BASE_GPA;
-+	ioapic[0] =3D reg;
-+	return ioapic[4];
-+}
-+
-+static void ioapic_write_reg(uint32_t reg, uint32_t val)
-+{
-+	volatile uint32_t *ioapic =3D (volatile uint32_t *)IOAPIC_BASE_GPA;
-+	ioapic[0] =3D reg;
-+	ioapic[4] =3D val;
-+}
-+
-+static void guest_code(uint64_t use_directed)
-+{
-+	uint64_t apic_base;
-+	uint32_t spiv;
-+
-+	/* Enable x2APIC mode */
-+	apic_base =3D rdmsr(MSR_IA32_APICBASE);
-+	wrmsr(MSR_IA32_APICBASE, apic_base | X2APIC_ENABLE);
-+
-+	/* Mask all LVT entries to prevent spurious interrupts/NMIs */
-+	x2apic_write_reg(APIC_LVTT, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVTPC, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVT0, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVT1, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVTERR, APIC_LVT_MASKED);
-+
-+	/* Enable APIC */
-+	x2apic_write_reg(APIC_SPIV, APIC_SPIV_APIC_ENABLED | TEST_VECTOR);
-+
-+	/* Read IOAPIC version */
-+	ioapic_version =3D ioapic_read_reg(IOAPIC_REG_VERSION);
-+
-+	/* Conditionally set APIC_SPIV_DIRECTED_EOI based on flag */
-+	if (use_directed) {
-+		spiv =3D x2apic_read_reg(APIC_SPIV);
-+		x2apic_write_reg(APIC_SPIV, spiv | APIC_SPIV_DIRECTED_EOI);
-+	}
-+	spiv =3D x2apic_read_reg(APIC_SPIV);
-+
-+	GUEST_SYNC(ioapic_version | (spiv << 16));
-+
-+	/* Enable interrupts and wait for interrupt to be delivered */
-+	asm volatile("sti; hlt");
-+
-+	/* Write EOI to trigger broadcast (or not) */
-+	x2apic_write_reg(APIC_EOI, 0);
-+
-+	GUEST_SYNC(0);
-+
-+	/* If IOAPIC v0x20, write directed EOI to clear remote_irr */
-+	if ((ioapic_version & 0xff) =3D=3D 0x20) {
-+		ioapic_write_reg(IOAPIC_REG_EOI, TEST_VECTOR);
-+		GUEST_SYNC(1);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void test_suppress_eoi(uint64_t x2apic_flags, bool expect_advertise=
-d, bool expect_implemented,
-+			      bool use_directed)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct kvm_lapic_state lapic;
-+	struct kvm_irqchip chip;
-+	struct kvm_irq_level irq_level;
-+	struct ucall uc;
-+	uint32_t lvr, ioapic_ver, spiv_after;
-+	bool remote_irr_set;
-+
-+	use_directed =3D use_directed;
-+
-+	vm =3D vm_create(1);
-+
-+	if (x2apic_flags)
-+		vm_enable_cap(vm, KVM_CAP_X2APIC_API, x2apic_flags);
-+
-+	if (!vm->has_irqchip)
-+		vm_create_irqchip(vm);
-+
-+	vcpu =3D vm_vcpu_add(vm, 0, guest_code);
-+	vcpu_args_set(vcpu, 1, use_directed);
-+
-+	vm_install_exception_handler(vm, TEST_VECTOR, guest_irq_handler);
-+
-+	/* Map IOAPIC for guest access */
-+	virt_map(vm, IOAPIC_BASE_GPA, IOAPIC_BASE_GPA, 1);
-+
-+	/* Configure level-triggered interrupt in IOAPIC */
-+	chip.chip_id =3D KVM_IRQCHIP_IOAPIC;
-+	vm_ioctl(vm, KVM_GET_IRQCHIP, &chip);
-+
-+	chip.chip.ioapic.redirtbl[TEST_IRQ].fields.vector =3D TEST_VECTOR;
-+	chip.chip.ioapic.redirtbl[TEST_IRQ].fields.delivery_mode =3D 0; /* fixed =
-*/
-+	chip.chip.ioapic.redirtbl[TEST_IRQ].fields.dest_mode =3D 0; /* physical *=
-/
-+	chip.chip.ioapic.redirtbl[TEST_IRQ].fields.mask =3D 0; /* unmasked */
-+	chip.chip.ioapic.redirtbl[TEST_IRQ].fields.trig_mode =3D 1; /* level */
-+	chip.chip.ioapic.redirtbl[TEST_IRQ].fields.dest_id =3D vcpu->id;
-+
-+	vm_ioctl(vm, KVM_SET_IRQCHIP, &chip);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
-+	ioapic_ver =3D uc.args[1] & 0xff;
-+	spiv_after =3D (uc.args[1] >> 16) & 0xffff;
-+
-+	/* Inject level-triggered interrupt */
-+	irq_level.irq =3D TEST_IRQ;
-+	irq_level.level =3D 1;
-+	vm_ioctl(vm, KVM_IRQ_LINE, &irq_level);
-+
-+	/* De-assert immediately so we only get one interrupt */
-+	irq_level.level =3D 0;
-+	vm_ioctl(vm, KVM_IRQ_LINE, &irq_level);
-+
-+	/* Guest receives interrupt and writes EOI */
-+	vcpu_run(vcpu);
-+
-+	/* Check what ucall we got */
-+	int ucall_type =3D get_ucall(vcpu, &uc);
-+
-+	/* Handle guest completion based on what it did */
-+	if (ucall_type =3D=3D UCALL_SYNC) {
-+		/* Guest has more to do */
-+		vcpu_run(vcpu);
-+		ucall_type =3D get_ucall(vcpu, &uc);
-+
-+		if (ucall_type =3D=3D UCALL_SYNC) {
-+			/* Guest wrote EOIR */
-+			vcpu_run(vcpu);
-+			TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_DONE);
-+		} else {
-+			TEST_ASSERT_EQ(ucall_type, UCALL_DONE);
-+		}
-+	} else {
-+		TEST_ASSERT_EQ(ucall_type, UCALL_DONE);
-+	}
-+
-+	/* Check remote_irr after all guest EOI activity */
-+	chip.chip_id =3D KVM_IRQCHIP_IOAPIC;
-+	vm_ioctl(vm, KVM_GET_IRQCHIP, &chip);
-+	remote_irr_set =3D chip.chip.ioapic.redirtbl[TEST_IRQ].fields.remote_irr;
-+
-+	/* De-assert IRQ line */
-+	irq_level.level =3D 0;
-+	vm_ioctl(vm, KVM_IRQ_LINE, &irq_level);
-+
-+	/* Check LAPIC LVR */
-+	vcpu_ioctl(vcpu, KVM_GET_LAPIC, &lapic);
-+	lvr =3D *(u32 *)&lapic.regs[APIC_LVR];
-+
-+	printf("  IOAPIC v0x%x, LVR directed_eoi=3D%d, SPIV directed_eoi=3D%d, re=
-mote_irr=3D%d\n",
-+	       ioapic_ver, !!(lvr & APIC_LVR_DIRECTED_EOI),
-+	       !!(spiv_after & APIC_SPIV_DIRECTED_EOI), remote_irr_set);
-+
-+	if (expect_advertised) {
-+		TEST_ASSERT(lvr & APIC_LVR_DIRECTED_EOI,
-+			    "Expected APIC_LVR_DIRECTED_EOI, got LVR=3D0x%x", lvr);
-+	} else {
-+		TEST_ASSERT(!(lvr & APIC_LVR_DIRECTED_EOI),
-+			    "Expected no APIC_LVR_DIRECTED_EOI, got LVR=3D0x%x", lvr);
-+	}
-+
-+	/* Check IOAPIC version */
-+	if (expect_implemented) {
-+		TEST_ASSERT(ioapic_ver =3D=3D 0x20,
-+			    "Expected IOAPIC v0x20 (with EOIR), got 0x%x", ioapic_ver);
-+	} else {
-+		TEST_ASSERT(ioapic_ver =3D=3D 0x11,
-+			    "Expected IOAPIC v0x11 (no EOIR), got 0x%x", ioapic_ver);
-+	}
-+
-+	/* Check SPIV and remote_irr based on whether guest used directed EOI */
-+	if (use_directed) {
-+		TEST_ASSERT(spiv_after & APIC_SPIV_DIRECTED_EOI,
-+			    "Expected APIC_SPIV_DIRECTED_EOI set, got SPIV=3D0x%x", spiv_after)=
-;
-+		TEST_ASSERT(remote_irr_set,
-+			    "Expected remote_irr set (EOI suppressed), got cleared");
-+	} else {
-+		TEST_ASSERT(!(spiv_after & APIC_SPIV_DIRECTED_EOI),
-+			    "Expected APIC_SPIV_DIRECTED_EOI clear, got SPIV=3D0x%x", spiv_afte=
-r);
-+		TEST_ASSERT(!remote_irr_set,
-+			    "Expected remote_irr cleared (EOI broadcast), got set");
-+	}
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static void guest_code_split(uint64_t use_directed)
-+{
-+	uint64_t apic_base;
-+	uint32_t spiv;
-+
-+	/* Enable x2APIC mode */
-+	apic_base =3D rdmsr(MSR_IA32_APICBASE);
-+	wrmsr(MSR_IA32_APICBASE, apic_base | X2APIC_ENABLE);
-+
-+	/* Mask all LVT entries */
-+	x2apic_write_reg(APIC_LVTT, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVTPC, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVT0, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVT1, APIC_LVT_MASKED);
-+	x2apic_write_reg(APIC_LVTERR, APIC_LVT_MASKED);
-+
-+	/* Enable APIC */
-+	x2apic_write_reg(APIC_SPIV, APIC_SPIV_APIC_ENABLED | TEST_VECTOR);
-+
-+	/* Conditionally set APIC_SPIV_DIRECTED_EOI */
-+	if (use_directed) {
-+		spiv =3D x2apic_read_reg(APIC_SPIV);
-+		x2apic_write_reg(APIC_SPIV, spiv | APIC_SPIV_DIRECTED_EOI);
-+	}
-+	spiv =3D x2apic_read_reg(APIC_SPIV);
-+
-+	GUEST_SYNC(spiv);
-+
-+	/* Enable interrupts and wait for interrupt */
-+	asm volatile("sti; hlt");
-+
-+	/* Write EOI */
-+	x2apic_write_reg(APIC_EOI, 0);
-+
-+	GUEST_DONE();
-+}
-+
-+static void test_suppress_eoi_split(uint64_t x2apic_flags, bool expect_adv=
-ertised, bool use_directed)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct kvm_lapic_state lapic;
-+	struct ucall uc;
-+	uint32_t lvr, spiv_after;
-+	bool got_eoi_exit;
-+	enum vm_irqchip_mode saved_mode =3D vm_irqchip_mode;
-+
-+	vm_irqchip_mode =3D VM_IRQCHIP_SPLIT;
-+	vm =3D vm_create(1);
-+	vm_irqchip_mode =3D saved_mode;
-+
-+	if (x2apic_flags)
-+		vm_enable_cap(vm, KVM_CAP_X2APIC_API, x2apic_flags);
-+
-+	vcpu =3D vm_vcpu_add(vm, 0, guest_code_split);
-+	vcpu_args_set(vcpu, 1, use_directed);
-+
-+	/* Set up IRQ routing so kernel knows userspace IOAPIC handles TEST_IRQ *=
-/
-+	struct kvm_irq_routing *routing =3D calloc(1, sizeof(*routing) + sizeof(r=
-outing->entries[0]));
-+	routing->nr =3D 1;
-+	routing->entries[0].gsi =3D TEST_IRQ;
-+	routing->entries[0].type =3D KVM_IRQ_ROUTING_MSI;
-+	routing->entries[0].u.msi.address_lo =3D 0xfee00000;  /* Dest ID 0 */
-+	routing->entries[0].u.msi.address_hi =3D 0;
-+	routing->entries[0].u.msi.data =3D TEST_VECTOR | (1 << 15);  /* Level-tri=
-ggered */
-+	__vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
-+	free(routing);
-+
-+	vm_install_exception_handler(vm, TEST_VECTOR, guest_irq_handler);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
-+	spiv_after =3D uc.args[1];
-+
-+	/* Inject via GSI (which routes to MSI) */
-+	struct kvm_irq_level irq_level =3D {
-+		.irq =3D TEST_IRQ,
-+		.level =3D 1,
-+	};
-+	vm_ioctl(vm, KVM_IRQ_LINE, &irq_level);
-+	irq_level.level =3D 0;
-+	vm_ioctl(vm, KVM_IRQ_LINE, &irq_level);
-+
-+	/* Guest receives interrupt and writes EOI */
-+	vcpu_run(vcpu);
-+
-+
-+	/* Check if we got KVM_EXIT_IOAPIC_EOI */
-+	got_eoi_exit =3D (vcpu->run->exit_reason =3D=3D KVM_EXIT_IOAPIC_EOI &&
-+			vcpu->run->eoi.vector =3D=3D TEST_VECTOR);
-+
-+	/* If we got EOI exit, continue guest to finish */
-+	if (got_eoi_exit) {
-+		vcpu_run(vcpu);
-+	}
-+
-+	/* Let guest finish */
-+	int ucall_type =3D get_ucall(vcpu, &uc);
-+	if (ucall_type =3D=3D UCALL_SYNC) {
-+		vcpu_run(vcpu);
-+		ucall_type =3D get_ucall(vcpu, &uc);
-+		if (ucall_type =3D=3D UCALL_SYNC) {
-+			vcpu_run(vcpu);
-+			TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_DONE);
-+		} else {
-+			TEST_ASSERT_EQ(ucall_type, UCALL_DONE);
-+		}
-+	} else {
-+		TEST_ASSERT_EQ(ucall_type, UCALL_DONE);
-+	}
-+
-+	/* Check LAPIC LVR */
-+	vcpu_ioctl(vcpu, KVM_GET_LAPIC, &lapic);
-+	lvr =3D *(u32 *)&lapic.regs[APIC_LVR];
-+
-+	printf("  Split IRQCHIP: LVR directed_eoi=3D%d, SPIV directed_eoi=3D%d, g=
-ot_eoi_exit=3D%d\n",
-+	       !!(lvr & APIC_LVR_DIRECTED_EOI),
-+	       !!(spiv_after & APIC_SPIV_DIRECTED_EOI), got_eoi_exit);
-+
-+	if (expect_advertised) {
-+		TEST_ASSERT(lvr & APIC_LVR_DIRECTED_EOI,
-+			    "Expected APIC_LVR_DIRECTED_EOI, got LVR=3D0x%x", lvr);
-+	} else {
-+		TEST_ASSERT(!(lvr & APIC_LVR_DIRECTED_EOI),
-+			    "Expected no APIC_LVR_DIRECTED_EOI, got LVR=3D0x%x", lvr);
-+	}
-+
-+	/* Check EOI exit based on whether guest used directed EOI */
-+	if (use_directed) {
-+		TEST_ASSERT(spiv_after & APIC_SPIV_DIRECTED_EOI,
-+			    "Expected APIC_SPIV_DIRECTED_EOI set, got SPIV=3D0x%x", spiv_after)=
-;
-+		TEST_ASSERT(!got_eoi_exit,
-+			    "Expected no EOI exit (suppressed), but got one");
-+	} else {
-+		TEST_ASSERT(!(spiv_after & APIC_SPIV_DIRECTED_EOI),
-+			    "Expected APIC_SPIV_DIRECTED_EOI clear, got SPIV=3D0x%x", spiv_afte=
-r);
-+		if (expect_advertised) {
-+			/* Quirk mode: advertised but should still broadcast */
-+			if (!got_eoi_exit) {
-+				printf("  Note: No EOI exit in quirk mode (old kernel behavior)\n");
-+			}
-+		} else {
-+			/* Feature not advertised, no EOI exits expected */
-+		}
-+	}
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(void)
-+{
-+	int cap;
-+
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X2APIC_API));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_IRQCHIP));
-+
-+	cap =3D kvm_check_cap(KVM_CAP_X2APIC_API);
-+
-+	/*
-+	 * Test that KVM correctly handles the suppress EOI broadcast flags.
-+	 * Note: The actual behavior depends on the kernel implementation.
-+	 * This test documents the expected behavior per the commit messages.
-+	 *
-+	 * Quirk mode: Don't advertise or implement (legacy behavior)
-+	 * Explicit enable: Advertise and implement
-+	 * Explicit disable: Don't advertise or implement
-+	 */
-+
-+	printf("Testing quirk mode (no flags)...\n");
-+	test_suppress_eoi(0, false, false, false);
-+
-+	if (cap & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST) {
-+		printf("Testing explicit enable...\n");
-+		test_suppress_eoi(KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST, true, true, =
-true);
-+
-+		printf("Testing explicit enable (guest doesn't use)...\n");
-+		test_suppress_eoi(KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST, true, true, =
-false);
-+	} else {
-+		printf("Skipping explicit enable (not supported)...\n");
-+	}
-+
-+	if (cap & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST) {
-+		printf("Testing explicit disable...\n");
-+		test_suppress_eoi(KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST, false, fals=
-e, false);
-+	} else {
-+		printf("Skipping explicit disable (not supported)...\n");
-+	}
-+
-+	printf("All tests passed\n");
-+
-+	/* Test split irqchip mode */
-+	printf("\n=3D=3D=3D Testing split IRQCHIP mode =3D=3D=3D\n");
-+
-+	printf("Testing quirk mode (no flags)...\n");
-+	test_suppress_eoi_split(0, true, false);  /* Quirk: advertised in split m=
-ode */
-+
-+	if (cap & KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST) {
-+		printf("Testing explicit enable...\n");
-+		test_suppress_eoi_split(KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST, true, =
-true);
-+
-+		printf("Testing explicit enable (guest doesn't use)...\n");
-+		test_suppress_eoi_split(KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST, true, =
-false);
-+	} else {
-+		printf("Skipping explicit enable (not supported)...\n");
-+	}
-+
-+	if (cap & KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST) {
-+		printf("Testing explicit disable...\n");
-+		test_suppress_eoi_split(KVM_X2APIC_DISABLE_SUPPRESS_EOI_BROADCAST, false=
-, false);
-+	} else {
-+		printf("Skipping explicit disable (not supported)...\n");
-+	}
-+
-+	printf("All tests passed\n");
-+	return 0;
-+}
-+
-
-
---=-XM1aDuSYUJFjYLXU6f31
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDEyOTA0NDkx
-M1owLwYJKoZIhvcNAQkEMSIEIEE0SARrRzgx5rK+g2F6lxfptoX3QrCJAK1mCeSoGCJ5MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAbzw/sGzIoC+i
-qBOHIhLDQ97buWMIujP/XnP0k7frECp5em87FicOt58zNn/GzFJGoa2JIWGREN+va7/lmkV/4dSG
-Mc/wGQ7UxlnheUHqlnmgsJxkeS/f3HNMMCmN2LYjsz3z5H05iYRC9FS5Q/yis6yjE/SH0Ii85+jI
-ZRohz8QE4DJG+Kl/8PcqyNDN9h6YWdcAnRN6T5aXwTDfNEr/+5/1npu+feaXMhIT6dTUkVnuUHUT
-07WP3vnmkVwtLp+kZQFkdfOilANLK1Dy4mr/2Bz808/7JRnyaT8iBK7o0cvOIB6fPnUWrN611WKe
-kP04MdxidiTcsyIQjAesOKsne83Sqq8FVuPmJKCp9vrpiutIO4mrkQ1aUCW8ViGDImlJ2jyagWDt
-cAlPk+K407dhVSZSekcndozX//mK/+YenNXHjfb/fC5WQkkpbkhiXLqHKIymjkx4kDYDLD390PvT
-SvkCdJp1j+2Au2tJ9y3q+0LGj+Lc1ZzhEtZERMIfp8/MX21X6dD3aZOgAka/7GV7jvTuuNeElxyI
-q4FJ/avdectDtAEpYGOTUHSO/O8mQm1DS5YwxpRUtBQJQErWfyLlWervnMkbMHjCZULnAqx7/Pxi
-6iZBezxcKBFvyUd9WVu9Ch5G4y24Rugncu8zpEtkdOVaXbd6toL4LKxg4UOYiGIAAAAAAAA=
-
-
---=-XM1aDuSYUJFjYLXU6f31--
+It was included because it came up during review of previous versions.
 
