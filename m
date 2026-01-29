@@ -1,265 +1,192 @@
-Return-Path: <kvm+bounces-69577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69578-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPucJXeXe2nOGAIAu9opvQ
-	(envelope-from <kvm+bounces-69577-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:23:03 +0100
+	id CMTIGhWYe2nOGAIAu9opvQ
+	(envelope-from <kvm+bounces-69578-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:25:41 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B81B2CA6
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:23:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE87B2D0E
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C05F4307518D
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:20:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE7CD307DBC5
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D271834B183;
-	Thu, 29 Jan 2026 17:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81646346E6A;
+	Thu, 29 Jan 2026 17:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDuDsdZ9"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="LHzqE9T1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942434847E;
-	Thu, 29 Jan 2026 17:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE0C346ACB;
+	Thu, 29 Jan 2026 17:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769707199; cv=none; b=tY0ClcZRm2yCL34bPgQIB+h5Bm17hZNf5GhtXx3Up1P2cGimhoRDIL7bqMZ/lGtOO8bUYbz8Jb6GWBLjR2NEgang/ta4tr/UTxH8pTe81BQZvG3YSOsjaDP83hFKao6mKprWS9BXLMqSVsfBEylvlQfXgYpSXfqefUlQ2zQmpJY=
+	t=1769707308; cv=none; b=PU/ZIKCw19BMFv1CXRMPqpGfT14mPEIoIVBbh1YL56uXKIO1+K3eYbCbKN1ddsMbpDwx0nzbQEQsQH6jv0BMogGohebMpDpkqmai/y1ZQRmM/AhdHiqS6AYHKntiN7yrLAey1YrffCveDbtgNildmVaXeZjO4pxftIjlCLirohk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769707199; c=relaxed/simple;
-	bh=M9zkkp8wM7E5ap5HjR0KwRMMUfIjyulNEqM+9VTZ+4A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gySHYrFN8Jy8shy+YjieLPhuYegBertReJgciSohf3dvVi/kPtjdPweibXsjb8lF2S7haMJz6c8lbWMU9FiyDJtdKePI1wSbIP0M8EI8Zs7QbghEvhTsZta5Wq0/EH0t42ozWcT7/0i5jQbscLAmJLSUuN0LSBvmhI8RP/aee68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDuDsdZ9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FC41C19425;
-	Thu, 29 Jan 2026 17:19:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769707198;
-	bh=M9zkkp8wM7E5ap5HjR0KwRMMUfIjyulNEqM+9VTZ+4A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nDuDsdZ9A1/96t9ZUiZauKtQ7g8FJhcHgJ9UltI/Q5noxZUxpZ3D0gR9G8rTo16JZ
-	 6o9YG3w5lA6wIagaYKTsXNhq1Xy99pJlnWWPFfO+YQIr5kvy8NichSX0SwrTO94nw0
-	 SltOwC9HvtvIGJYcqju/Ya1bsAy7rVinewblSOy3k2QcWb6TUMeuWpvxC4dhzot55Z
-	 c6Rj4zIwzNfdJB+vAt6k9OlvI/CzPHQH2dH6l7/3K5LuRkSr/EcXSXAWHan1A1z2um
-	 ACynIevFS4ED4bgVfpK1JcG6/HUhBt+jOAYKnELv/8F08fJhOYI9u9i3VQXjPu8ecY
-	 CkAQ5uwyD3CxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlVgS-00000006pTF-0Nzd;
-	Thu, 29 Jan 2026 17:19:56 +0000
-Date: Thu, 29 Jan 2026 17:19:55 +0000
-Message-ID: <86a4xwbakk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 13/20] KVM: arm64: Move RESx into individual register descriptors
-In-Reply-To: <CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
-References: <20260126121655.1641736-1-maz@kernel.org>
-	<20260126121655.1641736-14-maz@kernel.org>
-	<CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769707308; c=relaxed/simple;
+	bh=KCsvuJ4268xvvg8O2Y/qGpJlqbGioEqbrDMyCCszPoo=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=kGxGMB1IRu/+jN6Ep/qzhzB1TQfYOAnTbDzHpMmg7yKoYt+BP5yZFX2ayrOZjbMDo724HqwVNGVmja66m2fc3sYBGp3WZWZU70wL9ODq3YlsT0ctInurmasEfYUY+q97nu6X6BIaRxur7o7yeQ/LD1sjc0JNVerNqwP3dHlLTYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=LHzqE9T1; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 60THL9sn764745
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 29 Jan 2026 09:21:09 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 60THL9sn764745
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026012301; t=1769707270;
+	bh=tRqvK8QwDvRngEmRElZ+1rKciD8GlRfJYTefwoLXjE0=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=LHzqE9T1ZpYBmpxxWjpYQYMxD60ixIka/spIvn6gIPyItlXrgXrxVy2zsTnqLu4J5
+	 ieZc1hbjTRwwINbLk2GNyAsNfEsFOCGlt4nDqSeEQ3ObaKBf+KOwMbcOIzv9iU3gmD
+	 6Q8HfJHthxWftE8E/nXThcmVqNCHE7di2IdjMgs9Z8vMRoqDoD78CwechPjW8AtUFN
+	 6rQ0Az7KSUILOsGdw835CcD/+J5q+WSXqsXYAeWnycPyBPJoWvesjlqeDseYHDONFL
+	 o4J1QHacllxkonbIcQ8eu1cBSJ348RNNsupP9sx8bEOxr2sUNkJgFd+qFDcau5WyPh
+	 EhGMxgPu6Ea4w==
+Date: Thu, 29 Jan 2026 09:21:02 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Xin Li <xin@zytor.com>, Chao Gao <chao.gao@intel.com>
+CC: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, luto@kernel.org,
+        peterz@infradead.org, andrew.cooper3@citrix.com, hch@infradead.org,
+        sohil.mehta@intel.com
+Subject: Re: [PATCH v9 12/22] KVM: VMX: Virtualize FRED event_data
+User-Agent: K-9 Mail for Android
+In-Reply-To: <60C180BF-AD13-48EF-9BA8-CEACF57965EF@zytor.com>
+References: <20251026201911.505204-1-xin@zytor.com> <20251026201911.505204-13-xin@zytor.com> <aR04V4VVg+p4RsdT@intel.com> <60C180BF-AD13-48EF-9BA8-CEACF57965EF@zytor.com>
+Message-ID: <1EA97017-82D2-4C43-B617-D39C68D7BC6F@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[zytor.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[zytor.com:s=2026012301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69577-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69578-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[zytor.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hpa@zytor.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 19B81B2CA6
+	DBL_BLOCKED_OPENRESOLVER(0.00)[zytor.com:email,zytor.com:dkim,zytor.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: 0BE87B2D0E
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 16:29:39 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Instead of hacking the RES1 bits at runtime, move them into the
-> > register descriptors. This makes it significantly nicer.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/config.c | 36 +++++++++++++++++++++++++++++-------
-> >  1 file changed, 29 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index 7063fffc22799..d5871758f1fcc 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -30,6 +30,7 @@ struct reg_bits_to_feat_map {
-> >  #define        RES0_WHEN_E2H1  BIT(7)  /* RES0 when E2H=1 and not supported */
-> >  #define        RES1_WHEN_E2H0  BIT(8)  /* RES1 when E2H=0 and not supported */
-> >  #define        RES1_WHEN_E2H1  BIT(9)  /* RES1 when E2H=1 and not supported */
-> > +#define        FORCE_RESx      BIT(10) /* Unconditional RESx */
-> >
-> >         unsigned long   flags;
-> >
-> > @@ -107,6 +108,11 @@ struct reg_feat_map_desc {
-> >   */
-> >  #define NEEDS_FEAT(m, ...)     NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
-> >
-> > +/* Declare fixed RESx bits */
-> > +#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
-> > +#define FORCE_RES1(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
-> > +                                               enforce_resx)
-> > +
-> >  /*
-> >   * Declare the dependency between a non-FGT register, a set of
-> >   * feature, and the set of individual bits it contains. This generates
-> 
-> nit: features
-> 
-> > @@ -230,6 +236,15 @@ struct reg_feat_map_desc {
-> >  #define FEAT_HCX               ID_AA64MMFR1_EL1, HCX, IMP
-> >  #define FEAT_S2PIE             ID_AA64MMFR3_EL1, S2PIE, IMP
-> >
-> > +static bool enforce_resx(struct kvm *kvm)
-> > +{
-> > +       /*
-> > +        * Returning false here means that the RESx bits will be always
-> > +        * addded to the fixed set bit. Yes, this is counter-intuitive.
-> 
-> nit: added
-> 
-> > +        */
-> > +       return false;
-> > +}
-> 
-> I see what you're doing here, but it took me a while to get it and
-> convince myself that there aren't any bugs (my self couldn't find any
-> bugs, but I wouldn't trust him that much). You already introduce a new
-> flag, FORCE_RESx. Why not just check that directly in the
-> compute_resx_bits() loop, before the check for CALL_FUNC?
-> 
-> + if (map[i].flags & FORCE_RESx)
-> +     match = false;
-> + else if (map[i].flags & CALL_FUNC)
-> ...
-> 
-> The way it is now, to understand FORCE_RES0, you must trace a flag, a
-> macro expansion, and a function pointer, just to set a boolean to
-> false.
+On January 29, 2026 9:12:02 AM PST, Xin Li <xin@zytor=2Ecom> wrote:
+>
+>> On Nov 18, 2025, at 7:24=E2=80=AFPM, Chao Gao <chao=2Egao@intel=2Ecom> =
+wrote:
+>>=20
+>>> diff --git a/arch/x86/kvm/vmx/vmx=2Ec b/arch/x86/kvm/vmx/vmx=2Ec
+>>> index 4a74c9f64f90=2E=2E0b5d04c863a8 100644
+>>> --- a/arch/x86/kvm/vmx/vmx=2Ec
+>>> +++ b/arch/x86/kvm/vmx/vmx=2Ec
+>>> @@ -1860,6 +1860,9 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
+>>>=20
+>>> vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
+>>>=20
+>>> + if (is_fred_enabled(vcpu))
+>>> + vmcs_write64(INJECTED_EVENT_DATA, ex->event_data);
+>>=20
+>> I think event_data should be reset to 0 in kvm_clear_exception_queue()=
+=2E
+>> Otherwise, ex->event_data may be stale here, i=2Ee=2E, the event_data f=
+rom the
+>> previous event may be injected along with the next event=2E
+>
+>It=E2=80=99s no harm to reset it, although it shouldn=E2=80=99t be stale =
+when an event that
+>uses event data is being injected (otherwise it=E2=80=99s a bug)=2E
+>
+>
+>>=20
+>>> +
+>>> vmx_clear_hlt(vcpu);
+>>> }
+>>>=20
+>>=20
+>>> /*
+>>> @@ -950,6 +963,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, =
+unsigned int nr,
+>>> vcpu->arch=2Eexception=2Eerror_code =3D error_code;
+>>> vcpu->arch=2Eexception=2Ehas_payload =3D false;
+>>> vcpu->arch=2Eexception=2Epayload =3D 0;
+>>> + vcpu->arch=2Eexception=2Eevent_data =3D event_data;
+>>=20
+>> If userspace saves guest events (via kvm_vcpu_ioctl_x86_get_vcpu_events=
+())
+>> right after an event is requeued, event_data will be lost (as that uAPI=
+ only
+>> saves the payload and KVM doesn't convert the event_data back to a payl=
+oad
+>> there)=2E So this event will be delivered with incorrect event_data if =
+the
+>> event is restored on another system after migration=2E
+>
+>Nice catch!
+>
+>Just to confirm, you are referring to requeueing an original event
+>via vmx_complete_interrupts(), right?
+>
+>Regardless of whether FRED or IDT is in use, the event payload is deliver=
+ed
+>into the appropriate guest state and then invalidated in
+>kvm_deliver_exception_payload():
+>
+>        1) CR2 for #PF
+>
+>        2) DR6 for #DB
+>
+>        3) guest_fpu=2Exfd_err for #NM (in handle_nm_fault_irqoff())
+>
+>We should be able to recover the FRED event data from there=2E
+>
+>Alternatively, we could drop the original event and allow the hardware to
+>regenerate it upon resuming the guest=2E  However, this breaks #DB delive=
+ry,
+>as debug exceptions sometimes are triggered post-instruction=2E
+>
+>
+>Sean, does it make sense to recover the FRED event data from guest CPU st=
+ate?
+>
+>
+>
 
-With that scheme, you'd write something like:
-
-+#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx)
-
-This construct would need a new __NEEDS_FEAT_0() macro that doesn't
-take any argument other than flags. Something like below (untested).
-
-	M.
-
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 9485e1f2dc0b7..364bdd1e5be51 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -79,6 +79,12 @@ struct reg_feat_map_desc {
- 		.match = (fun),				\
- 	}
- 
-+#define __NEEDS_FEAT_0(m, f, w, ...)			\
-+	{						\
-+		.w	= (m),				\
-+		.flags = (f),				\
-+	}
-+
- #define __NEEDS_FEAT_FLAG(m, f, w, ...)			\
- 	CONCATENATE(__NEEDS_FEAT_, COUNT_ARGS(__VA_ARGS__))(m, f, w, __VA_ARGS__)
- 
-@@ -95,9 +101,8 @@ struct reg_feat_map_desc {
- #define NEEDS_FEAT(m, ...)	NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
- 
- /* Declare fixed RESx bits */
--#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
--#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
--						enforce_resx)
-+#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx)
-+#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1)
- 
- /*
-  * Declare the dependency between a non-FGT register, a set of
-@@ -221,15 +226,6 @@ struct reg_feat_map_desc {
- #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
- #define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
- 
--static bool enforce_resx(struct kvm *kvm)
--{
--	/*
--	 * Returning false here means that the RESx bits will be always
--	 * addded to the fixed set bit. Yes, this is counter-intuitive.
--	 */
--	return false;
--}
--
- static bool not_feat_aa64el3(struct kvm *kvm)
- {
- 	return !kvm_has_feat(kvm, FEAT_AA64EL3);
-@@ -996,7 +992,7 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
- 	NEEDS_FEAT(HCR_EL2_TWEDEL	|
- 		   HCR_EL2_TWEDEn,
- 		   FEAT_TWED),
--	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1, enforce_resx),
-+	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1 | FORCE_RESx),
- 	FORCE_RES0(HCR_EL2_RES0),
- 	FORCE_RES1(HCR_EL2_RES1),
- };
-@@ -1362,7 +1358,9 @@ struct resx compute_resx_bits(struct kvm *kvm,
- 		if (map[i].flags & exclude)
- 			continue;
- 
--		if (map[i].flags & CALL_FUNC)
-+		if (map[i].flags & FORCE_RESx)
-+			match = false;
-+		else if (map[i].flags & CALL_FUNC)
- 			match = map[i].match(kvm);
- 		else
- 			match = idreg_feat_match(kvm, &map[i]);
-
--- 
-Without deviation from the norm, progress is not possible.
+I think some bits in DR6 are "sticky", and so unless the guest has explici=
+tly cleared DR6 the event data isn't necessarily derivable from DR6=2E Howe=
+ver, the FRED event data for #DB is directly based on the data already repo=
+rted by VTx (for exactly the same reason =E2=80=93 knowing what the *curren=
+tly taken* trap represents=2E)
 
