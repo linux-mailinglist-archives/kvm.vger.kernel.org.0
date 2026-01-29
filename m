@@ -1,222 +1,267 @@
-Return-Path: <kvm+bounces-69516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69517-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPy3BmgNe2nqAwIAu9opvQ
-	(envelope-from <kvm+bounces-69516-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 08:34:00 +0100
+	id sG+eLXUPe2nqAwIAu9opvQ
+	(envelope-from <kvm+bounces-69517-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 08:42:45 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF6BACBD4
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 08:33:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47C3ACDD8
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 08:42:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6F96302B827
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 07:33:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC3163023430
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 07:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A965337AA95;
-	Thu, 29 Jan 2026 07:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537D437AA9D;
+	Thu, 29 Jan 2026 07:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nd7XKBpW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ezFCwAVQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED13374170;
-	Thu, 29 Jan 2026 07:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CFD37AA75;
+	Thu, 29 Jan 2026 07:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769672016; cv=none; b=HeXZJzUp9JBT6RhFVTw4Yx/nA98yUJErs6p9y87tSnrCCG7AgDmjFytts+BmVEuwnQmSa6PMcrVlq1zmQbZXQq06EhaMPQE+uyNJqNv1AVNBjdcPUfRYqHP1DkHV6GLM4rxtqw+57TYL5M03l5vZZrulsTc0FwWjHSemrhS6PJU=
+	t=1769672073; cv=none; b=NWIYA35ir/Pr6opMe0FdKnt1EvsFJGlZsRRUOjbKeVkiJXeVfRxOp6J6Uyz/4kc43bFF58ST7xHjDS1S8J2yR0R1SuK8Kq22g2xtnricfJ4tNqTapOv8FeEcN/a1pFYgu622C1Qb4rHq1BWx6PQQ09CDK2J3i6zVGr02Gq25AfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769672016; c=relaxed/simple;
-	bh=QBIwpAtD3x2QlngJHpmtfy+I0xZag8/IoNN2nefvD44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ap6ZPucrVd8bYEJOz3V8Ac1frBzcgzzhZLhplUdqIAhGeGiDAh2QRxoNS20oykH/4qHAURyIzUWWYFcdwR0Ys+sBZ3OsI0D2uJDEH74wUcCk1EZVGQNmpehnm7e0w1CTWL+mg6YPMJOGXOhfJy/xkJOMBAhEetzgwBodAmvo4fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nd7XKBpW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81028C4CEF7;
-	Thu, 29 Jan 2026 07:33:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769672016;
-	bh=QBIwpAtD3x2QlngJHpmtfy+I0xZag8/IoNN2nefvD44=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nd7XKBpWVASqj2PQ5+O26lNzR2owwrjZ+UFhzwzV5C7rfonAJCymlbkRGjNsekjom
-	 he9rYeseZjNSy/0uUsYtu2rE0V9B2obwvYr84gMEMsIXfMHbRpIOLQG8VKcUj1EDWG
-	 RCL32sfCprWk7ujIe52D/CGmaJLCftvBy9NNCh9toQxOiXhsAaRnM3ffpkajAH1ZpM
-	 fXNq2C3mRiG9ylqGldO5M8PS6KozilVEFN97LtMCnv+QZPbZmSb3kvTLNumwZq3+2a
-	 cXHUw1JolJPAOY7ZZE4cbJzciDN3W68iIBcC3s0kcCkl9sD9ehst1O+sHirdqoPJBu
-	 OQUMpJRWtxn7A==
-Date: Thu, 29 Jan 2026 09:33:31 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Pranjal Shrivastava <praan@google.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	"Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"intel-xe@lists.freedesktop.org" <intel-xe@lists.freedesktop.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v5 4/8] vfio: Wait for dma-buf invalidation to complete
-Message-ID: <20260129073331.GB10992@unreal>
-References: <20260124-dmabuf-revoke-v5-0-f98fca917e96@nvidia.com>
- <20260124-dmabuf-revoke-v5-4-f98fca917e96@nvidia.com>
- <aXfUZcSEr9N18o6w@google.com>
- <20260127085835.GQ13967@unreal>
- <20260127162754.GH1641016@ziepe.ca>
- <BN9PR11MB5276B99D4E8C6496B0C447888C9EA@BN9PR11MB5276.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1769672073; c=relaxed/simple;
+	bh=fMAM2Ptbace67bnh+e9XNC7RXdmal+j6GaqUtBA5rXs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lQCYpllR9C6cbbti7wKLB/bIMiXB6Pvk+wLajhZKyw5KvO/7vwkhvhGgrvVs7FXMzy7QXxWJ/PyNHRZAFuYFg9eHgXaDb0ThRtCKSR24URPmkuoaPZULKDHf9J4uF5FzJO9JtlcIiQJkkbyQTQzvgLVKvA+Str9nAYWbVbcis/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ezFCwAVQ; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769672069; x=1801208069;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fMAM2Ptbace67bnh+e9XNC7RXdmal+j6GaqUtBA5rXs=;
+  b=ezFCwAVQiig6BZj5//pF2xM8C+zf2V/h7iPcVbQuekr9QSQNEFvlweVc
+   kTRx3M5xAILHNOp75HgCuKVYE2v+S2F3cZ9fmCLxA4/m8X+ICJWS7zTOZ
+   gG+/F0YPQfsgKd68co1O9y0/yLRsPc0ely06vz0XnUZT4Zp4Ry58O7p3X
+   YdYtl3woXU0oijykT2PNlkutUmbQRGW7jkv/3J/jCQPncQDRUhtF6VBB7
+   k2wlRoSf4CszOAbEZbTGc2w+/7zQ0pF17hDi3L0PAfKDx82xbPN8gRsUH
+   uzO8U78QbeeWIyehQN1bd4gdu04DHIMl0Ykqx0qmek3D3zeE8MUQWLg1E
+   A==;
+X-CSE-ConnectionGUID: phRscrShQj+dFXrra/U7Tg==
+X-CSE-MsgGUID: EEQMzHSATE20iKZtePdZRw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="70990631"
+X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
+   d="scan'208";a="70990631"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 23:34:28 -0800
+X-CSE-ConnectionGUID: uZyrDRk0S9adOGFeAmyzTg==
+X-CSE-MsgGUID: QNymu16OQDWwgKmY9VlEZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
+   d="scan'208";a="208737121"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.240.233]) ([10.124.240.233])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 23:34:25 -0800
+Message-ID: <9856fb02-b72a-4626-b34a-16a7adb55fc6@linux.intel.com>
+Date: Thu, 29 Jan 2026 15:34:23 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BN9PR11MB5276B99D4E8C6496B0C447888C9EA@BN9PR11MB5276.namprd11.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] KVM: x86: Explicitly configure supported XSS from
+ {svm,vmx}_set_cpu_caps()
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Mathias Krause <minipli@grsecurity.net>,
+ John Allen <john.allen@amd.com>, Rick Edgecombe
+ <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Jim Mattson <jmattson@google.com>
+References: <20260128014310.3255561-1-seanjc@google.com>
+ <20260128014310.3255561-2-seanjc@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20260128014310.3255561-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69516-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[ziepe.ca,google.com,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69517-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7BF6BACBD4
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[grsecurity.net:email,intel.com:email,intel.com:dkim,amd.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.intel.com:mid]
+X-Rspamd-Queue-Id: E47C3ACDD8
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 07:06:37AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@ziepe.ca>
-> > Sent: Wednesday, January 28, 2026 12:28 AM
-> > 
-> > On Tue, Jan 27, 2026 at 10:58:35AM +0200, Leon Romanovsky wrote:
-> > > > > @@ -333,7 +359,37 @@ void vfio_pci_dma_buf_move(struct
-> > vfio_pci_core_device *vdev, bool revoked)
-> > > > >  			dma_resv_lock(priv->dmabuf->resv, NULL);
-> > > > >  			priv->revoked = revoked;
-> > > > >  			dma_buf_invalidate_mappings(priv->dmabuf);
-> > > > > +			dma_resv_wait_timeout(priv->dmabuf->resv,
-> > > > > +					      DMA_RESV_USAGE_BOOKKEEP,
-> > false,
-> > > > > +					      MAX_SCHEDULE_TIMEOUT);
-> > > > >  			dma_resv_unlock(priv->dmabuf->resv);
-> > > > > +			if (revoked) {
-> > > > > +				kref_put(&priv->kref,
-> > vfio_pci_dma_buf_done);
-> > > > > +				/* Let's wait till all DMA unmap are
-> > completed. */
-> > > > > +				wait = wait_for_completion_timeout(
-> > > > > +					&priv->comp, secs_to_jiffies(1));
-> > > >
-> > > > Is the 1-second constant sufficient for all hardware, or should the
-> > > > invalidate_mappings() contract require the callback to block until
-> > > > speculative reads are strictly fenced? I'm wondering about a case where
-> > > > a device's firmware has a high response latency, perhaps due to internal
-> > > > management tasks like error recovery or thermal and it exceeds the 1s
-> > > > timeout.
-> > > >
-> > > > If the device is in the middle of a large DMA burst and the firmware is
-> > > > slow to flush the internal pipelines to a fully "quiesced"
-> > > > read-and-discard state, reclaiming the memory at exactly 1.001 seconds
-> > > > risks triggering platform-level faults..
-> > > >
-> > > > Since the wen explicitly permit these speculative reads until unmap is
-> > > > complete, relying on a hardcoded timeout in the exporter seems to
-> > > > introduce a hardware-dependent race condition that could compromise
-> > > > system stability via IOMMU errors or AER faults.
-> > > >
-> > > > Should the importer instead be required to guarantee that all
-> > > > speculative access has ceased before the invalidation call returns?
-> > >
-> > > It is guaranteed by the dma_resv_wait_timeout() call above. That call
-> > ensures
-> > > that the hardware has completed all pending operations. The 1‑second
-> > delay is
-> > > meant to catch cases where an in-kernel DMA unmap call is missing, which
-> > should
-> > > not trigger any DMA activity at that point.
-> > 
-> > Christian may know actual examples, but my general feeling is he was
-> > worrying about drivers that have pushed the DMABUF to visibility on
-> > the GPU and the move notify & fences only shoot down some access. So
-> > it has to wait until the DMABUF is finally unmapped.
-> > 
-> > Pranjal's example should be covered by the driver adding a fence and
-> > then the unbounded fence wait will complete it.
-> > 
-> 
-> Bear me if it's an ignorant question.
-> 
-> The commit msg of patch6 says that VFIO doesn't tolerate unbounded
-> wait, which is the reason behind the 2nd timeout wait here.
 
-It is not accurate. A second timeout is present both in the
-description of patch 6 and in VFIO implementation. The difference is
-that the timeout is enforced within VFIO.
+
+On 1/28/2026 9:43 AM, Sean Christopherson wrote:
+> Explicitly configure KVM's supported XSS as part of each vendor's setup
+> flow to fix a bug where clearing SHSTK and IBT in kvm_cpu_caps, e.g. due
+> to lack of CET XFEATURE support, makes kvm-intel.ko unloadable when nested
+> VMX is enabled, i.e. when nested=1.  The late clearing results in
+> nested_vmx_setup_{entry,exit}_ctls() clearing VM_{ENTRY,EXIT}_LOAD_CET_STATE
+> when nested_vmx_setup_ctls_msrs() runs during the CPU compatibility checks,
+> ultimately leading to a mismatched VMCS config due to the reference config
+> having the CET bits set, but every CPU's "local" config having the bits
+> cleared.
+
+A bit confuse about the description.
+
+Before this patch:
+
+kvm_x86_vendor_init
+| vmx_hardware_setup
+|   nested_vmx_hardware_setup
+|     nested_vmx_setup_ctls_msrs
+| ...
+| for_each_online_cpu(cpu)
+|   smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &r, 1)
+|                                 | kvm_x86_check_processor_compatibility
+|                                 |   kvm_x86_call(check_processor_compatibility)()
+|                                 |     vmx_check_processor_compatibility
+|                                 |       setup_vmcs_config
+|                                 |         nested_vmx_setup_ctls_msrs
+| ...
+| //late clearing of SHSTK and IBT
+
+If we don't consider CPU hotplug case, both the setup of reference VMCS and the
+local config are before the late clearing of SHSTK and IBT. They should be
+consistent.
+
+So you are referring the mismatch situation during CPU hotplug?
+
+But if it's hotplug case, it shouldn't make kvm-intel.ko unloadable?
+
 
 > 
-> Then why is "the unbounded fence wait" not a problem in the same
-> code path? the use of MAX_SCHEDULE_TIMEOUT imply a worst-case
-> timeout in hundreds of years...
-
-"An unbounded fence wait" is a different class of wait. It indicates broken
-hardware that continues to issue DMA transactions even after it has been told to
-stop.
-
-The second wait exists to catch software bugs or misuse, where the dma-buf
-importer has misrepresented its capabilities.
-
+> Note, kvm_caps.supported_{xcr0,xss} are unconditionally initialized by
+> kvm_x86_vendor_init(), before calling into vendor code, and not referenced
+> between ops->hardware_setup() and their current/old location.
 > 
-> and it'd be helpful to put some words in the code based on what's
-> discussed here.
+> Fixes: 69cc3e886582 ("KVM: x86: Add XSS support for CET_KERNEL and CET_USER")
+> Cc: stable@vger.kernel.org
+> Cc: Mathias Krause <minipli@grsecurity.net>
+> Cc: John Allen <john.allen@amd.com>
+> Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Cc: Chao Gao <chao.gao@intel.com>
+> Cc: Binbin Wu <binbin.wu@linux.intel.com>
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/svm.c |  2 ++
+>  arch/x86/kvm/vmx/vmx.c |  2 ++
+>  arch/x86/kvm/x86.c     | 30 +++++++++++++++++-------------
+>  arch/x86/kvm/x86.h     |  2 ++
+>  4 files changed, 23 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 7803d2781144..c00a696dacfc 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5387,6 +5387,8 @@ static __init void svm_set_cpu_caps(void)
+>  	 */
+>  	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
+>  	kvm_cpu_cap_clear(X86_FEATURE_MSR_IMM);
+> +
+> +	kvm_setup_xss_caps();
+>  }
+>  
+>  static __init int svm_hardware_setup(void)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 27acafd03381..9f85c3829890 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8230,6 +8230,8 @@ static __init void vmx_set_cpu_caps(void)
+>  		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+>  		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+>  	}
+> +
+> +	kvm_setup_xss_caps();
+>  }
+>  
+>  static bool vmx_is_io_intercepted(struct kvm_vcpu *vcpu,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 8acfdfc583a1..cac1d6a67b49 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9965,6 +9965,23 @@ static struct notifier_block pvclock_gtod_notifier = {
+>  };
+>  #endif
+>  
+> +void kvm_setup_xss_caps(void)
+> +{
+> +	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> +		kvm_caps.supported_xss = 0;
+> +
+> +	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> +	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> +		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> +
+> +	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
+> +		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> +		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+> +		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> +	}
+> +}
+> +EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_setup_xss_caps);
+> +
+>  static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+>  {
+>  	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+> @@ -10138,19 +10155,6 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	if (!tdp_enabled)
+>  		kvm_caps.supported_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
+>  
+> -	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> -		kvm_caps.supported_xss = 0;
+> -
+> -	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> -	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> -		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> -
+> -	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
+> -		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> -		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+> -		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> -	}
+> -
+>  	if (kvm_caps.has_tsc_control) {
+>  		/*
+>  		 * Make sure the user can only configure tsc_khz values that
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 70e81f008030..94d4f07aaaa0 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -483,6 +483,8 @@ extern struct kvm_host_values kvm_host;
+>  extern bool enable_pmu;
+>  extern bool enable_mediated_pmu;
+>  
+> +void kvm_setup_xss_caps(void);
+> +
+>  /*
+>   * Get a filtered version of KVM's supported XCR0 that strips out dynamic
+>   * features for which the current process doesn't (yet) have permission to use.
 
-We've documented as much as we can in dma_buf_attach_revocable() and
-dma_buf_invalidate_mappings(). Do you have any suggestions on what else
-should be added here?
-
-Thanks
 
