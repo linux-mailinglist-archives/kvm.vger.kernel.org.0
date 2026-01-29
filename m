@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-69462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69464-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJGzKTa2emma9QEAu9opvQ
-	(envelope-from <kvm+bounces-69462-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:21:58 +0100
+	id 6KdlN3y1emma9QEAu9opvQ
+	(envelope-from <kvm+bounces-69464-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:18:52 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5B9AAA2A
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:21:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 585D0AA9AB
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:18:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4CCDE304E0C2
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:16:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 613863043D78
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9F133509E;
-	Thu, 29 Jan 2026 01:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA50131AAA3;
+	Thu, 29 Jan 2026 01:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EfcR20IN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XZO2dMZL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD5331AAA3
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 01:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1920E32ED39
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 01:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769649358; cv=none; b=pxrnD8pT9gktDclfyELuTRIAsYPpnUT0S4XALiQT//zjwKG16/YY4einmT9Mv0TdQ2uFHx2YadxsWfGTqcPurrau3FBzCPPparC0HryygFEJWyrBL3PDHiHGNjtC4XY22h0mcHAYkU/7+vz80eynRVhXXi7dVPVh17JmQ4Mc0i0=
+	t=1769649359; cv=none; b=XHJCshG5rd5tMNpchBkxMWrZiRG166MLoD8bZA19vdaqEkMw95hHEHfWaTHA5o9crZgIHk/lhpnVHb8cfAaGlPNaoEahYg1l/c3wS6zrA3086mkXQWEXVJJv+oHmIGshCO9vyXLTFUZGTFelrEafBP9Rp3lFw9zMFbHynW2nS+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769649358; c=relaxed/simple;
-	bh=oX2MlvAYx4zmch8f356wAzFlhGp0Ab7gNL2eHuy2Vxo=;
+	s=arc-20240116; t=1769649359; c=relaxed/simple;
+	bh=esb0FgEarAvzd7he3f1yhhOtX7p49PRyk0uclVgGx9Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DeLzWud8A5etIseEhX4OX1crz0uz+W4RZdFzf5vYbysDc3ueRCVMM6wTyV2cpIO1T0pM5M3sdvtZbGFW7uEw1e20zac+XzQyVEi7lPJhA7aGc6frBx0RqHJXwOTHez7+yOsU4V3jb2Ep9Jh8f5f+PPHEoco2K6yswy/PlbUTrGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EfcR20IN; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=nGn6K1c7AUO6cNck8IxuOHjUAh3MalB+XZZ/YEVuI3OC3Lu4pqTYJEG3KYe3kZyaTPdfHpRJ6jNeQKnsaf6dq3tf60V85W1R5YxEnGyGLrTQAIfEIXBwtk0CsCjfgzjessvPI2PN0N0yLZmg7YAWSbxgaYnCCTCdFQ6N4oXYMog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XZO2dMZL; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c5d6193daso1063677a91.1
-        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 17:15:53 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a871c32cdbso3794755ad.2
+        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 17:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769649353; x=1770254153; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769649354; x=1770254154; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWQPx27FCugyzao24/tqQ+m62u9m5MfQopgQbQNuj2c=;
-        b=EfcR20INHGl6b5V3cdxngj/R6SNDzNA/VG+pBDsMrlYdEawTii/UPokRW5d4SixfgR
-         RusxoZ/K/fZSnkg2LslZrrsqBkFTCXImRRDYKIOYTw71mKFj7+D+pHVWVBfdc2RBi3jO
-         igQzmcO50Mf9GCFDXEl433ICdhpZ5oD8mUztTSAOyhEnABGw4kmbS0Rf7P061uS9zelL
-         /hmcDOkfHBNAUprXoQxZRx9+zHVAYyR4+fvvE2hv6aDEWRJHs5CGXxj/3X1e+VD6CWhQ
-         cs15jjaokaKpOS8LpnM6BUEHCHm+pa7n3pIJyqLx4vNgNOqCQQO1nzX274Ul0ZU25R7+
-         Kbbg==
+        bh=UlFOBu5FArwUjFk9bCGxsyWYTTpURccpKRpfejh6JpM=;
+        b=XZO2dMZLp55RudMI1Rh6X7k3WvSlotfaJEGCYw6RBXr0Sj2sysggcmKVZ2DL0eaicx
+         kah2lVeKPcSfE+9YLS3ayAewbGnIB7zq7BU+LDOQy2UW9bBKlqBqYxb1FdZKdyTlselT
+         3yOCqJJegmd08bAUBopFX7VXR5ThZQTxvwy+QljuyYd94FmYZH7QlckyD9WSwCyG6+RF
+         nadJQRYEyTED/f41s2n7SXTQ3AucSpsA2a1RnDCpbtu+LBDvsxxEamxxWIvB+F4+WzzV
+         +DqDfRcaWfQ8qhMb2E0THN9FRk4oCPtBcXtTv9sRsnKopEYM0xQevELWXlADvA5pMDIW
+         r4qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769649353; x=1770254153;
+        d=1e100.net; s=20230601; t=1769649354; x=1770254154;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oWQPx27FCugyzao24/tqQ+m62u9m5MfQopgQbQNuj2c=;
-        b=sT4j1qhRcottORKGTVQO1+pqgly7/5GkxErYRvmPcLath6qlUHgAAGbeBoziE+0rtP
-         WT7loKxxry/HrkXIO7+qxXWuqv6iCJk62nNae0qwP60jnrS3+ez7Q1KnmVQ/iaoE4th6
-         M0+IbfSSy9p0GxaegaWnn2HCPk3VHlF99/ZW6kq4MZ0PXjBUAtrDX50/1ifIHdbHKhoe
-         HSU+xsR1iXzDghyl+SrAR27n4KjIMj0LwGSRSZKVSogobWmJ+R9tFSvUrk/ws+yKx7Vd
-         41OA6Zu84IWBE9tjLkiToWxdIl70JiqRlBOyPhueBUPGHrGZqcS3Un1f/2dkwTJpg859
-         u+Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCXEj/Hdf9oxQfR1Qkwe/GVyRGnUydwm5QW4uOgAaydHWMKplX4KWNxtriI7qWQfnSKOoMI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvIGuJ8srNTikRY5LaEQ4x9v8CFXR8oBZFZNjSVFGUVqPSOKwO
-	TFNFn841TSCJqPOGXQhG79eoXBLdt+jQViFK3ztPM6tOJRABBaalCFs1vXh5aqf5Iw3dln24gtw
-	aGTw42Q==
-X-Received: from pjyd6.prod.google.com ([2002:a17:90a:dfc6:b0:353:8d2b:682])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5183:b0:352:ccae:fe65
- with SMTP id 98e67ed59e1d1-353fecba611mr6392881a91.4.1769649352912; Wed, 28
- Jan 2026 17:15:52 -0800 (PST)
+        bh=UlFOBu5FArwUjFk9bCGxsyWYTTpURccpKRpfejh6JpM=;
+        b=SfFMsKODJEK7fOYOyxR+dkvei0JXHFiAREEECji7SKtXoF3MUGaVQ4j1jDYzBSxk0L
+         vRPFbf5cojcQhwuNaFlwcAZRjZavLSu8KMRq6psl4/AOKNhE5YTMD3B4xOP5ghbKeNDC
+         uQSUGw1XO4LR0asC6K8Oq8bCUpx8b9mZM5ovjhlV30XwLKCwC2OEe3CL81Nuc+ezYCDh
+         Vh6/XyRZTFo/ldVfWFhCr+VcZu3niMEpo/cB3MPmsd0G5UCU262QZXNKab+iFC3fFwg8
+         SzklBbL3X9tNVpzQukMb05LDelyQ9y6iIuHbS6lc1p+Rl9R6P8u5U0ZbBJWeqBMXw2BV
+         4wfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRJUv9Sm40aJrJbABXBF/s4xUZEHbspX/fvVtwHNnhxVpadebo7hHhWNHmpJlyVKib1Io=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvs1b8H6mZ5BaQPjFyuQnbwspt584CF4ySxi3qixX4T2Kieh4J
+	oJfQutR+Q5qlaAm+a+3RgAqYMjq5gWRakNtP32790DKxpF5M3Rdu9tiV1d1u2gZKdeaSkQHWv0n
+	md+3/cg==
+X-Received: from plbd1.prod.google.com ([2002:a17:902:f141:b0:29d:5afa:2d9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ca0f:b0:2a0:9fc8:a98b
+ with SMTP id d9443c01a7336-2a870ddc60amr49753935ad.40.1769649354439; Wed, 28
+ Jan 2026 17:15:54 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 28 Jan 2026 17:14:45 -0800
+Date: Wed, 28 Jan 2026 17:14:46 -0800
 In-Reply-To: <20260129011517.3545883-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -78,8 +78,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260129011517.3545883-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
-Message-ID: <20260129011517.3545883-14-seanjc@google.com>
-Subject: [RFC PATCH v5 13/45] x86/virt/tdx: Allocate page bitmap for Dynamic PAMT
+Message-ID: <20260129011517.3545883-15-seanjc@google.com>
+Subject: [RFC PATCH v5 14/45] x86/virt/tdx: Allocate reference counters for
+ PAMT memory
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -97,19 +98,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69462-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69464-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -118,141 +119,133 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 4F5B9AAA2A
+X-Rspamd-Queue-Id: 585D0AA9AB
 X-Rspamd-Action: no action
 
 From: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 
-The Physical Address Metadata Table (PAMT) holds TDX metadata for physical
-memory and must be allocated by the kernel during TDX module
-initialization.
+The PAMT memory holds metadata for TDX protected memory. With Dynamic
+PAMT, the 4KB range of PAMT is allocated on demand. The kernel supplies
+the TDX module with a page pair that covers 2MB of host physical memory.
 
-The exact size of the required PAMT memory is determined by the TDX module
-and may vary between TDX module versions. Currently it is approximately
-0.4% of the system memory. This is a significant commitment, especially if
-it is not known upfront whether the machine will run any TDX guests.
+The kernel must provide this page pair before using pages from the range
+for TDX. If this is not done, any SEAMCALL that attempts to use the memory
+will fail.
 
-For normal PAMT, each memory region that the TDX module might use (TDMR)
-needs three separate PAMT allocations. One for each supported page size
-(1GB, 2MB, 4KB).
+Allocate reference counters for every 2MB range to track PAMT memory usage.
+This is necessary to accurately determine when PAMT memory needs to be
+allocated and when it can be freed.
 
-At a high level, Dynamic PAMT still has the 1GB and 2MB levels allocated
-on TDX module initialization, but the 4KB level allocated dynamically at
-TD runtime. However, in the details, the TDX module still needs some per
-4KB page data. The TDX module exposed how many bits per page need to be
-allocated (currently it is 1). The bits-per-page value can then be used to
-calculate the size to pass in place of the 4KB allocations in the TDMR,
-which TDX specs call "PAMT_PAGE_BITMAP".
+This allocation will currently consume 2 MB for every 1 TB of address
+space from 0 to max_pfn (highest pfn of RAM). The allocation size will
+depend on how the ram is physically laid out. In a worse case scenario
+where the entire 52 bit address space is covered this would be 8GB. Then
+the DPAMT refcount allocations could hypothetically exceed the savings
+from Dynamic PAMT, which is 4GB per TB. This is probably unlikely.
 
-So in effect, Dynamic PAMT just needs a different (smaller) size
-allocation for the 4KB level part of the allocation. Although it is
-functionally something different, it is passed in the same way the 4KB page
-size PAMT allocation is.
-
-Begin to implement Dynamic PAMT in the kernel by reading the bits-per-page
-needed for Dynamic PAMT. Calculate the size needed for the bitmap,
-and use it instead of the 4KB size determined for normal PAMT, in the case
-of Dynamic PAMT. In doing so, reduce the static allocations to
-approximately 0.004%, a 100x improvement.
+However, future changes will reduce this refcount overhead to make DPAMT
+always a net win.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-[Enhanced log]
+[Add feedback, update log]
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Tested-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/tdx.h                  |  5 +++++
- arch/x86/include/asm/tdx_global_metadata.h  |  1 +
- arch/x86/virt/vmx/tdx/tdx.c                 | 19 ++++++++++++++++++-
- arch/x86/virt/vmx/tdx/tdx_global_metadata.c |  7 +++++++
- 4 files changed, 31 insertions(+), 1 deletion(-)
+ arch/x86/virt/vmx/tdx/tdx.c | 47 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 441a26988d3b..57d5f07e3735 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -130,6 +130,11 @@ int tdx_enable(void);
- const char *tdx_dump_mce_info(struct mce *m);
- const struct tdx_sys_info *tdx_get_sysinfo(void);
- 
-+static inline bool tdx_supports_dynamic_pamt(const struct tdx_sys_info *sysinfo)
-+{
-+	return false; /* To be enabled when kernel is ready */
-+}
-+
- int tdx_guest_keyid_alloc(void);
- u32 tdx_get_nr_guest_keyids(void);
- void tdx_guest_keyid_free(unsigned int keyid);
-diff --git a/arch/x86/include/asm/tdx_global_metadata.h b/arch/x86/include/asm/tdx_global_metadata.h
-index 060a2ad744bf..5eb808b23997 100644
---- a/arch/x86/include/asm/tdx_global_metadata.h
-+++ b/arch/x86/include/asm/tdx_global_metadata.h
-@@ -15,6 +15,7 @@ struct tdx_sys_info_tdmr {
- 	u16 pamt_4k_entry_size;
- 	u16 pamt_2m_entry_size;
- 	u16 pamt_1g_entry_size;
-+	u8  pamt_page_bitmap_entry_bits;
- };
- 
- struct tdx_sys_info_td_ctrl {
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 0c4c873bff80..517c6759c3ca 100644
+index 517c6759c3ca..db48bf2ce601 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -441,6 +441,18 @@ static int fill_out_tdmrs(struct list_head *tmb_list,
- 	return 0;
- }
+@@ -30,6 +30,7 @@
+ #include <linux/suspend.h>
+ #include <linux/idr.h>
+ #include <linux/kvm_types.h>
++#include <linux/vmalloc.h>
+ #include <asm/page.h>
+ #include <asm/special_insns.h>
+ #include <asm/msr-index.h>
+@@ -51,6 +52,16 @@ static DEFINE_PER_CPU(bool, tdx_lp_initialized);
  
-+static unsigned long tdmr_get_pamt_bitmap_sz(struct tdmr_info *tdmr)
+ static struct tdmr_info_list tdx_tdmr_list;
+ 
++/*
++ * On a machine with Dynamic PAMT, the kernel maintains a reference counter
++ * for every 2M range. The counter indicates how many users there are for
++ * the PAMT memory of the 2M range.
++ *
++ * The kernel allocates PAMT memory when the first user arrives and
++ * frees it when the last user has left.
++ */
++static atomic_t *pamt_refcounts;
++
+ static enum tdx_module_status_t tdx_module_status;
+ static DEFINE_MUTEX(tdx_module_lock);
+ 
+@@ -184,6 +195,34 @@ int tdx_cpu_enable(void)
+ }
+ EXPORT_SYMBOL_FOR_KVM(tdx_cpu_enable);
+ 
++/*
++ * Allocate PAMT reference counters for all physical memory.
++ *
++ * It consumes 2MiB for every 1TiB of physical memory.
++ */
++static int init_pamt_metadata(void)
 +{
-+	unsigned long pamt_sz, nr_pamt_entries;
-+	int bits_per_entry;
++	size_t size = DIV_ROUND_UP(max_pfn, PTRS_PER_PTE) * sizeof(*pamt_refcounts);
 +
-+	bits_per_entry = tdx_sysinfo.tdmr.pamt_page_bitmap_entry_bits;
-+	nr_pamt_entries = tdmr->size >> PAGE_SHIFT;
-+	pamt_sz = DIV_ROUND_UP(nr_pamt_entries * bits_per_entry, BITS_PER_BYTE);
++	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
++		return 0;
 +
-+	return PAGE_ALIGN(pamt_sz);
++	pamt_refcounts = __vmalloc(size, GFP_KERNEL | __GFP_ZERO);
++	if (!pamt_refcounts)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void free_pamt_metadata(void)
++{
++	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
++		return;
++
++	vfree(pamt_refcounts);
++	pamt_refcounts = NULL;
 +}
 +
  /*
-  * Calculate PAMT size given a TDMR and a page size.  The returned
-  * PAMT size is always aligned up to 4K page boundary.
-@@ -508,7 +520,12 @@ static int tdmr_set_up_pamt(struct tdmr_info *tdmr,
- 	 * Calculate the PAMT size for each TDX supported page size
- 	 * and the total PAMT size.
+  * Add a memory region as a TDX memory block.  The caller must make sure
+  * all memory regions are added in address ascending order and don't
+@@ -1083,10 +1122,14 @@ static int init_tdx_module(void)
  	 */
--	tdmr->pamt_4k_size = tdmr_get_pamt_sz(tdmr, TDX_PS_4K);
-+	if (tdx_supports_dynamic_pamt(&tdx_sysinfo)) {
-+		/* With Dynamic PAMT, PAMT_4K is replaced with a bitmap */
-+		tdmr->pamt_4k_size = tdmr_get_pamt_bitmap_sz(tdmr);
-+	} else {
-+		tdmr->pamt_4k_size = tdmr_get_pamt_sz(tdmr, TDX_PS_4K);
-+	}
- 	tdmr->pamt_2m_size = tdmr_get_pamt_sz(tdmr, TDX_PS_2M);
- 	tdmr->pamt_1g_size = tdmr_get_pamt_sz(tdmr, TDX_PS_1G);
- 	tdmr_pamt_size = tdmr->pamt_4k_size + tdmr->pamt_2m_size + tdmr->pamt_1g_size;
-diff --git a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-index 13ad2663488b..00ab0e550636 100644
---- a/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-+++ b/arch/x86/virt/vmx/tdx/tdx_global_metadata.c
-@@ -33,6 +33,13 @@ static int get_tdx_sys_info_tdmr(struct tdx_sys_info_tdmr *sysinfo_tdmr)
- 		sysinfo_tdmr->pamt_2m_entry_size = val;
- 	if (!ret && !(ret = read_sys_metadata_field(0x9100000100000012, &val)))
- 		sysinfo_tdmr->pamt_1g_entry_size = val;
-+	/*
-+	 * Don't fail here if tdx_supports_dynamic_pamt() isn't supported. The
-+	 * TDX code can fallback to normal PAMT if it's not supported.
-+	 */
-+	if (!ret && tdx_supports_dynamic_pamt(&tdx_sysinfo) &&
-+	    !(ret = read_sys_metadata_field(0x9100000100000013, &val)))
-+		sysinfo_tdmr->pamt_page_bitmap_entry_bits = val;
+ 	get_online_mems();
  
- 	return ret;
+-	ret = build_tdx_memlist(&tdx_memlist);
++	ret = init_pamt_metadata();
+ 	if (ret)
+ 		goto out_put_tdxmem;
+ 
++	ret = build_tdx_memlist(&tdx_memlist);
++	if (ret)
++		goto err_free_pamt_metadata;
++
+ 	/* Allocate enough space for constructing TDMRs */
+ 	ret = alloc_tdmr_list(&tdx_tdmr_list, &tdx_sysinfo.tdmr);
+ 	if (ret)
+@@ -1136,6 +1179,8 @@ static int init_tdx_module(void)
+ 	free_tdmr_list(&tdx_tdmr_list);
+ err_free_tdxmem:
+ 	free_tdx_memlist(&tdx_memlist);
++err_free_pamt_metadata:
++	free_pamt_metadata();
+ 	goto out_put_tdxmem;
  }
+ 
 -- 
 2.53.0.rc1.217.geba53bf80e-goog
 
