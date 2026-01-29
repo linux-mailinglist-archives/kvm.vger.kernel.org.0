@@ -1,301 +1,188 @@
-Return-Path: <kvm+bounces-69572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69573-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKbpNeCUe2nOGAIAu9opvQ
-	(envelope-from <kvm+bounces-69572-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:12:00 +0100
+	id +FRRG/GVe2nOGAIAu9opvQ
+	(envelope-from <kvm+bounces-69573-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:16:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54577B2ACF
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:12:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CCFDB2BA2
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 82A2F300B462
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:08:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 333E53034666
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6422D346792;
-	Thu, 29 Jan 2026 17:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A14346E4C;
+	Thu, 29 Jan 2026 17:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="ydDEOhoM"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D07F32AAA9
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 17:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD3B3314C4;
+	Thu, 29 Jan 2026 17:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769706519; cv=none; b=Uu1fyufNaFen4CTyh8VYtV/MNJx2gHu8axnd8Wt04tWqBw0NQKa16JLg6O/UgACYCTZHPpKRFVsDjj88IoQWYKQs9Tw7bEN5cua00ao65IWjovFkVrbW0KvuAxNwygeK5k72KO5gxxQTcfskzVpxDQ5jlRP2pR7nrHyM9Iycvnc=
+	t=1769706811; cv=none; b=Nibjya41fgtLlS6g0olDvJWFWjAVczhkx+dkBhzKnS/Itwi0EVpxnbl17RmKd2dlvwP12kie/uqp7klKMdr6Brx5FH4/fvnM/LXm54fSS9DgmLT9CfnsL820J1a155ihk+0NmNRwKmKtyJTEZitoQqTendNQtEWqdxV9n344cd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769706519; c=relaxed/simple;
-	bh=sjXedIJ+gNEaYne2+kbU2h/1PxdCwRR1/VQWvqT3CGE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nHhgKPoI6DzDghHu+nimrwxpdEHoAqw9AR0Inj2p/8WkoIdBgEKRchY9jNP/XwQrnpF9dgF0ux2n69y2t1LuBWzVZiJd1/0JiCohQBz+tDQ8ZwYriABzLN8VVbmTIt+q3ZS3bU6Y8SA2yaOz02Zw2tAHELmdaI3YBtPcxnOtQwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CFF6153B;
-	Thu, 29 Jan 2026 09:08:31 -0800 (PST)
-Received: from [10.33.50.63] (e142021.arm.com [10.33.50.63])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B5653F73F;
-	Thu, 29 Jan 2026 09:08:36 -0800 (PST)
-Message-ID: <15de1a60-1dfb-41fd-a747-bd9564572d22@arm.com>
-Date: Thu, 29 Jan 2026 18:08:25 +0100
+	s=arc-20240116; t=1769706811; c=relaxed/simple;
+	bh=wfmd5TygDnWuNh7atnI1L66vLy96JcLCy+2CqYgZcYA=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=BKi0Pkt+FB2La41v8R/nTvBS/uxYJq9bdPabBANubecForEmZnULK7tjQt9i4N4U4LpxR/VgzRyviqMkuSSSVaSCQ1IvQSNMUHE+arYz3FiIYVvV9ySBhXYc6YAB4YM61UuviwJQT3XApnKc9w1yJ65JfbWjyc7RiisfUp/YaEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=ydDEOhoM; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from smtpclient.apple ([192.19.161.250])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 60THCITI760106
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 29 Jan 2026 09:12:18 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 60THCITI760106
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026012301; t=1769706740;
+	bh=QIyDvQ8ozjjtQ0qFg/hKPuh0+BnC9DM6EKOxMJUk0I4=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=ydDEOhoM/sDFyXanc+Qgg70WtpoD0LI636/mI1iXstHVV1Vop223o8x9iKinqXrNu
+	 gDlmn0Hhdm0Y3blqyD1p6Y053HBvmN2N4+rCg+Wvb7XcGJSVY1gTC6fmusLWcCGuTl
+	 63Y529/DA9ww9IcA5POu4h8+Z50WBDZsmBZ5mVfzhWikEsGOPun/q+Eq4es2mUfjL4
+	 +BI7jN3vZTnZq01HL8G3PWLBsZt1znF8AknTF02rJ4yYrlr2m8Ck/j41Fzb7Lcj3O5
+	 tTh52vjIgoW/vWz8cyeMB6eXqK1TEzeOMGIpfW2hkRYf6tYGmGc7laewBcMCJdyKyh
+	 YJE3qXzDHpp8A==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v5 3/7] arm64: nested: Add support for setting
- maintenance IRQ
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>, "maz@kernel.org"
- <maz@kernel.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- Alexandru Elisei <Alexandru.Elisei@arm.com>,
- "will@kernel.org" <will@kernel.org>, nd <nd@arm.com>,
- "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>
-References: <20260123142729.604737-1-andre.przywara@arm.com>
- <20260123142729.604737-4-andre.przywara@arm.com>
- <86fr7sb69h.wl-maz@kernel.org> <8db77da0-4772-499d-b140-350e4470e30d@arm.com>
- <c3b611b88e47c534ac050d02a8b4706111d679da.camel@arm.com>
-Content-Language: en-US
-From: Andre Przywara <andre.przywara@arm.com>
-In-Reply-To: <c3b611b88e47c534ac050d02a8b4706111d679da.camel@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.300.41.1.7\))
+Subject: Re: [PATCH v9 12/22] KVM: VMX: Virtualize FRED event_data
+From: Xin Li <xin@zytor.com>
+In-Reply-To: <aR04V4VVg+p4RsdT@intel.com>
+Date: Thu, 29 Jan 2026 09:12:02 -0800
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
+        hch@infradead.org, sohil.mehta@intel.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <60C180BF-AD13-48EF-9BA8-CEACF57965EF@zytor.com>
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-13-xin@zytor.com> <aR04V4VVg+p4RsdT@intel.com>
+To: Chao Gao <chao.gao@intel.com>
+X-Mailer: Apple Mail (2.3864.300.41.1.7)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[zytor.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[zytor.com:s=2026012301];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,arm.com,kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-69572-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69573-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[zytor.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xin@zytor.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andre.przywara@arm.com,kvm@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.972];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid,arm.com:email]
-X-Rspamd-Queue-Id: 54577B2ACF
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[zytor.com:mid,zytor.com:dkim,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0CCFDB2BA2
 X-Rspamd-Action: no action
 
-Hi Sascha,
 
-On 1/27/26 14:23, Sascha Bischoff wrote:
-> On Tue, 2026-01-27 at 12:07 +0000, Andre Przywara wrote:
->> Hi Marc,
->>
->> On 26/01/2026 18:03, Marc Zyngier wrote:
->>> On Fri, 23 Jan 2026 14:27:25 +0000,
->>> Andre Przywara <andre.przywara@arm.com> wrote:
->>>>
->>>> Uses the new VGIC KVM device attribute to set the maintenance
->>>> IRQ.
->>>> This is fixed to use PPI 9, as a platform decision made by
->>>> kvmtool,
->>>> matching the SBSA recommendation.
->>>> Use the opportunity to pass the kvm pointer to
->>>> gic__generate_fdt_nodes(),
->>>> as this simplifies the call and allows us access to the
->>>> nested_virt
->>>> config variable on the way.
->>>>
->>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>> ---
->>>>    arm64/arm-cpu.c         |  2 +-
->>>>    arm64/gic.c             | 29 +++++++++++++++++++++++++++--
->>>>    arm64/include/kvm/gic.h |  2 +-
->>>>    3 files changed, 29 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
->>>> index 69bb2cb2..0843ac05 100644
->>>> --- a/arm64/arm-cpu.c
->>>> +++ b/arm64/arm-cpu.c
->>>> @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt,
->>>> struct kvm *kvm)
->>>>    {
->>>>    	int timer_interrupts[4] = {13, 14, 11, 10};
->>>>    
->>>> -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
->>>> +	gic__generate_fdt_nodes(fdt, kvm);
->>>>    	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->>>>    	pmu__generate_fdt_nodes(fdt, kvm);
->>>>    }
->>>> diff --git a/arm64/gic.c b/arm64/gic.c
->>>> index b0d3a1ab..2a595184 100644
->>>> --- a/arm64/gic.c
->>>> +++ b/arm64/gic.c
->>>> @@ -11,6 +11,8 @@
->>>>    
->>>>    #define IRQCHIP_GIC 0
->>>>    
->>>> +#define GIC_MAINT_IRQ	9
->>>> +
->>>>    static int gic_fd = -1;
->>>>    static u64 gic_redists_base;
->>>>    static u64 gic_redists_size;
->>>> @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
->>>>    
->>>>    	int lines = irq__get_nr_allocated_lines();
->>>>    	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
->>>> +	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
->>>>    	struct kvm_device_attr nr_irqs_attr = {
->>>>    		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->>>>    		.addr	= (u64)(unsigned long)&nr_irqs,
->>>>    	};
->>>> +	struct kvm_device_attr maint_irq_attr = {
->>>> +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
->>>> +		.addr	= (u64)(unsigned long)&maint_irq,
->>>> +	};
->>>>    	struct kvm_device_attr vgic_init_attr = {
->>>>    		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
->>>>    		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
->>>> @@ -325,6 +332,16 @@ static int gic__init_gic(struct kvm *kvm)
->>>>    			return ret;
->>>>    	}
->>>>    
->>>> +	if (kvm->cfg.arch.nested_virt) {
->>>> +		ret = ioctl(gic_fd, KVM_HAS_DEVICE_ATTR,
->>>> &maint_irq_attr);
->>>> +		if (!ret)
->>>> +			ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
->>>> &maint_irq_attr);
->>>> +		if (ret) {
->>>> +			pr_err("could not set maintenance
->>>> IRQ\n");
->>>> +			return ret;
->>>> +		}
->>>> +	}
->>>> +
->>>>    	irq__routing_init(kvm);
->>>>    
->>>>    	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR,
->>>> &vgic_init_attr)) {
->>>> @@ -342,7 +359,7 @@ static int gic__init_gic(struct kvm *kvm)
->>>>    }
->>>>    late_init(gic__init_gic)
->>>>    
->>>> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
->>>> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->>>>    {
->>>>    	const char *compatible, *msi_compatible = NULL;
->>>>    	u64 msi_prop[2];
->>>> @@ -350,8 +367,12 @@ void gic__generate_fdt_nodes(void *fdt, enum
->>>> irqchip_type type)
->>>>    		cpu_to_fdt64(ARM_GIC_DIST_BASE),
->>>> cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->>>>    		0, 0,				/* to be filled
->>>> */
->>>>    	};
->>>> +	u32 maint_irq[] = {
->>>> +		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
->>>> cpu_to_fdt32(GIC_MAINT_IRQ),
->>>> +		gic__get_fdt_irq_cpumask(kvm) |
->>>> IRQ_TYPE_LEVEL_HIGH
->>>> +	};
->>>
->>> This looks utterly broken, and my guests barf on this:
->>>
->>>           intc {
->>>                   compatible = "arm,gic-v3";
->>>                   #interrupt-cells = <0x03>;
->>>                   interrupt-controller;
->>>                   reg = <0x00 0x3fff0000 0x00 0x10000 0x00
->>> 0x3fef0000 0x00 0x100000>;
->>>                   interrupts = <0x01 0x09 0x4000000>;
->>
->> Ah yeah, sorry, that's of course complete blunder, this got lost in
->> translation between v3 and v4.
->>                                             ^^^^^^^^^^^
->>> Are you testing on a big-endian box??? I fixed it with the patchlet
->>> below, but I also wonder why you added
->>> gic__get_fdt_irq_cpumask()...
->>
->> this was to accommodate GICv2 (it returns 0 for GICv3), and was the
->> equivalent of the hardcoded 0xff04 we had before. And though I guess
->> there would be no overlap between machines supporting nested virt and
->> having a GICv2 or a GICv2 emulation capable GICv3, I added this for
->> the
->> sake of completeness anyway, as it didn't feel right to make this
->> assumption in the otherwise generic code.
->>
->> Consider this fixed.
->>
->> Cheers,
->> Andre
-> 
-> Seems I'd missed this in v4. Sorry!
-> 
-> However, this made me think about GICv5 guests. Right now one can try
-> and create a nested guest with GICv2. Attempting to do so fails a
-> little ungracefully:
-> 
->    Error: could not set maintenance IRQ
-> 
->    Warning: Failed init: gic__init_gic
-> 
->    Fatal: Initialisation failed
-> 
-> It might be worth catching the v2 + nested combo explicitly and
-> returning a slightly more useful error.
+> On Nov 18, 2025, at 7:24=E2=80=AFPM, Chao Gao <chao.gao@intel.com> =
+wrote:
+>=20
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 4a74c9f64f90..0b5d04c863a8 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -1860,6 +1860,9 @@ void vmx_inject_exception(struct kvm_vcpu =
+*vcpu)
+>>=20
+>> vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
+>>=20
+>> + if (is_fred_enabled(vcpu))
+>> + vmcs_write64(INJECTED_EVENT_DATA, ex->event_data);
+>=20
+> I think event_data should be reset to 0 in =
+kvm_clear_exception_queue().
+> Otherwise, ex->event_data may be stale here, i.e., the event_data from =
+the
+> previous event may be injected along with the next event.
 
-Mmmh, would that be really useful? You created that situation on the 
-model, right? I don't think it's a common scenario to run a guest in EL2 
-while having a GICv2 interrupt controller. And while we cannot 
-completely rule this out (as you have shown), I don't think it's common 
-enough to warrant an explicit check or message. At least it failed 
-(because the vGICv2 device doesn't implement 
-KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ), and barfed about the GIC, which should 
-give people that tinker with the GIC enough clues, right?
+It=E2=80=99s no harm to reset it, although it shouldn=E2=80=99t be stale =
+when an event that
+uses event data is being injected (otherwise it=E2=80=99s a bug).
 
-Please let me know what you think!
 
-Cheers,
-Andre
+>=20
+>> +
+>> vmx_clear_hlt(vcpu);
+>> }
+>>=20
+>=20
+>> /*
+>> @@ -950,6 +963,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, =
+unsigned int nr,
+>> vcpu->arch.exception.error_code =3D error_code;
+>> vcpu->arch.exception.has_payload =3D false;
+>> vcpu->arch.exception.payload =3D 0;
+>> + vcpu->arch.exception.event_data =3D event_data;
+>=20
+> If userspace saves guest events (via =
+kvm_vcpu_ioctl_x86_get_vcpu_events())
+> right after an event is requeued, event_data will be lost (as that =
+uAPI only
+> saves the payload and KVM doesn't convert the event_data back to a =
+payload
+> there). So this event will be delivered with incorrect event_data if =
+the
+> event is restored on another system after migration.
 
-> 
-> Thanks,
-> Sascha
-> 
->>
->>>
->>> 	M.
->>>
->>> diff --git a/arm64/gic.c b/arm64/gic.c
->>> index 2a59518..640ff35 100644
->>> --- a/arm64/gic.c
->>> +++ b/arm64/gic.c
->>> @@ -369,7 +369,7 @@ void gic__generate_fdt_nodes(void *fdt, struct
->>> kvm *kvm)
->>>    	};
->>>    	u32 maint_irq[] = {
->>>    		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
->>> cpu_to_fdt32(GIC_MAINT_IRQ),
->>> -		gic__get_fdt_irq_cpumask(kvm) |
->>> IRQ_TYPE_LEVEL_HIGH
->>> +		cpu_to_fdt32(gic__get_fdt_irq_cpumask(kvm) |
->>> IRQ_TYPE_LEVEL_HIGH),
->>>    	};
->>>    
->>>    	switch (kvm->cfg.arch.irqchip) {
->>>
->>
-> 
+Nice catch!
+
+Just to confirm, you are referring to requeueing an original event
+via vmx_complete_interrupts(), right?
+
+Regardless of whether FRED or IDT is in use, the event payload is =
+delivered
+into the appropriate guest state and then invalidated in
+kvm_deliver_exception_payload():
+
+        1) CR2 for #PF
+
+        2) DR6 for #DB
+
+        3) guest_fpu.xfd_err for #NM (in handle_nm_fault_irqoff())
+
+We should be able to recover the FRED event data from there.
+
+Alternatively, we could drop the original event and allow the hardware =
+to
+regenerate it upon resuming the guest.  However, this breaks #DB =
+delivery,
+as debug exceptions sometimes are triggered post-instruction.
+
+
+Sean, does it make sense to recover the FRED event data from guest CPU =
+state?
+
 
 
