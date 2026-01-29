@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-69480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69481-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6JczJOG1emma9QEAu9opvQ
-	(envelope-from <kvm+bounces-69480-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:20:33 +0100
+	id oPdmLpu3emkr9gEAu9opvQ
+	(envelope-from <kvm+bounces-69481-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:27:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 569B7AA9ED
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:20:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1837AABCB
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DD7CF30228FF
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:18:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E3B1D308B575
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E0E31B114;
-	Thu, 29 Jan 2026 01:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0444E36405A;
+	Thu, 29 Jan 2026 01:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rCtonWXg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tYewLBo8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A76534FF78
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 01:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127E134FF4C
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 01:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769649385; cv=none; b=cP4EiurWiqC9iTiBu8UIVpr2+AeCBG4PFwswOAQh1MfGRB6Fng4sKrAVi5c/KySTlNnrLHKbOYAg/CLH6Gu4OjmXGmzCU/Bv9HvzWWlGffeLQgUIU7DqeOcPpjgmFbCZmGqe4UDfpufZSSwhkb5R4ulkefMamx37GU/qQZxMkAc=
+	t=1769649387; cv=none; b=pq99chQTltz3EeL9Qg9PAoxo+iPIF82En3EWbAn60LnthB8HTJYYrEjZv8Z3coCpoujnIsUPdR9Zn4zEVBf1s8zo9+sC3jg6onhjysxqqwn8ukfIxF5f8qRrS2xEbi8O3WWdrTeWbtgC5CKkOf4IvMK9zCZOw3dp7w7KeU9NwcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769649385; c=relaxed/simple;
-	bh=E/p9aO3ZAiwSbYiHC1+ljXC/97KIVcZ8eXjeNv4DXak=;
+	s=arc-20240116; t=1769649387; c=relaxed/simple;
+	bh=w/nijrur6jKEFCzBZzrCq8D2hM1PQMnPJT4Mk6V/KUw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d3mHrL5E3zX8T5XR7jOfu8qEirx8Wo+MvuxGuJGmZz5aT04FUM+a0ndhEtRkxSzjvmcytxbVKI8esd72cuS2Sb8RCxTxos/dPAtdUYqxqMZTOlMwZhqTxiohWvPkEFneh+nhmXN/O+kf7lHqMQ45eFaGF3wBEVU4RNE+fnp8KtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rCtonWXg; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=ML+W/BzoHxPnTqBdnkEN/P+RbkP/yBoT8pttQZ17rtjLt88A8MT9HpHSR+/nJ//PGWvzO4M+Uc8qApBbhnCJGz0N/gYEnZdabSb44j6Z+tUveV90asK8El7sT5nSVaTwymGb8Pqk/WbNrerDQ+XWYwoXtXGH2ZyyRVOYXEWCUzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tYewLBo8; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c617e59845dso287520a12.1
-        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 17:16:23 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34e5a9f0d6aso427072a91.0
+        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 17:16:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769649382; x=1770254182; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769649384; x=1770254184; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=EhyaETaO3z5ZObA+zH7KzPZSfmMP5O9GD9W3Xs6375s=;
-        b=rCtonWXglPMNfbMBrtvIsNS2wcNHpKUx1ASA1lzUbb0/0eJnM7JW5A5SvVhMBe/XvF
-         qcSMQjEq9PBdxdZ4JMOujIQyAOrkqYOgL5wTVZo6cWPkOjxdJyd+1O6f3HJlIlwetye7
-         3Wu469+to6KJyG1mXzt+DYxJ5mLB2RYo2hzP/Z9/mcyLAyQB/k2h4zJ9pT/QRHD7iMwB
-         H/XCYVhHMsBxRkS3K6NfGeKCZ48In6xGru2ZRvXuP+uyC8EovBdk2IY08BdJe+btspUa
-         K/WctJuqr0OvbhDTRbwxrxLeFeykj9jwciUknkW+t6/OQ5Jrx60Bd/6DpOmn6Vyy/IXH
-         3XLw==
+        bh=WpiUmsPu8uA5hilip45Z70pJh5rqhfxSEKqO7V+kAwg=;
+        b=tYewLBo8XzGaATkK7wHfDeOSKsmQ7niTxv1tSAQNaRDcSCQ33p0V7Pr6QeQlXfxhyE
+         xhuogJAXL5sz0hBv5uYzPFodLsYvs9eMHR1lvD/YjX944qqKFx7obE6f9XtAROrNhE01
+         njwuLkt2N8jfFewUGKoucgeLoeONJThzLT9WIpXaJ2ALnInFtCgt2VX8EIzUVKnjqxJF
+         fHE6RYUP3PIX1+ay93Z/E42PdyVwURHOg3zxqONRojgyOOX8l4O4iCdYEqFFy/P7PYHh
+         rIa31KghUMTFPKeZAP3aQ9fZX5Wf2c8d7JgugnAV2I/0GeEPC8qYUTdJD4fuN7xY1l+M
+         c2yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769649382; x=1770254182;
+        d=1e100.net; s=20230601; t=1769649384; x=1770254184;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EhyaETaO3z5ZObA+zH7KzPZSfmMP5O9GD9W3Xs6375s=;
-        b=BeNghlFpX/1BbW7amkkE9i5dI6KSiEMYCgwnRe1EHaqokpZfme/XuJQ5hSo2QKLoZQ
-         s0L+sr/jl7waG9BeHG/yfIHMCkTnqVM2dro8zTaDLUQXaGe/IBF0BbujK4Wm2HHLW1OK
-         w0Lp9ImG9NcBr4nG2kLL0hSiTPzKlIaeqsghmCozsq2OzFtzLBzW5SJUvPt9UrsZVVCH
-         WyS9UxKArI/fiDOOx5aCTrnJaK5FI3qDTrKh3mmupuFhiVPOJ9hUh8bxQ7g4xZaD8ROp
-         U53DxLpBqOdwdpVeCRdVHh6RzSH2htBgTlQFSCWReOmmEd/mw8bMAZasiLKe3CoLCdZl
-         G2ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWkDyUreAvXw1t4OxJ4SHesmpXHqsL8sEVjgmfFb+xKSQQDl2CgmHpUsOKnsw966+PjFi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzE5a61BkJOhBRXpoNeCkk40jrPn6TUEg5KR78Y1Y99sBzJspEV
-	XZtEtbcyMFoTwAvo+1WY1dkw+xy+BdONLQL1G2A6L3+avmClggpfkU3vCio90/naIEdpbgSBiqy
-	Y/0URcQ==
-X-Received: from pggk18.prod.google.com ([2002:a63:d112:0:b0:c5e:9fe:7560])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6300:2206:b0:350:b8e:f99b
- with SMTP id adf61e73a8af0-38ec64182ccmr7501037637.45.1769649382397; Wed, 28
- Jan 2026 17:16:22 -0800 (PST)
+        bh=WpiUmsPu8uA5hilip45Z70pJh5rqhfxSEKqO7V+kAwg=;
+        b=W0ZeX0yWtQHf7AMgfojHmslW9z/pd9F/XS0zDWISLkIzFVf1PqKsQViKmsC8alPgMK
+         FwaUYtNUeUOo0Q4fep/q2T3iqSJNxOvzAZ/tDOeab87gXXzjWQiC6fMrenedWvoI0Vg9
+         J9Ia+5n4zagkIZHVwusbdwDOGunuk1NpbR8UPS/Ouh8nnsb9VjpvN5YYHzauxPnagrac
+         U9wqky7hTsakSVg83SBTrD9yn62paus9BW2zSZToUbFPCZYALSCk12E2I4bT2zbx2tem
+         efBDbEt8+4RYhMLRVsHNaXY5Y309SeRJyVm1jikyhonYCzYN1Cs7c55qwFe4Xe4xqwMF
+         uRFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdhKkKZphsWn6FmASsBCIElUu29OyIg8+hJd2lTgoPs9jZ5+luN3Z+Y8nAHSiEx/DrKRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpqTFzGh/Zt+KK4tBrn9gqQzTCFyO6TCSo4EtLzcs50+aF/KBi
+	fBDyhHy+rQsGt58RQlGEzRBb/WZlf2eEo1AxonkQXrZJz6v7lBo5q67MNR/6EheNBaBDc+YQ10V
+	2FbB8Xw==
+X-Received: from pjbbo7.prod.google.com ([2002:a17:90b:907:b0:34a:b143:87d3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51c2:b0:352:dbcc:d74c
+ with SMTP id 98e67ed59e1d1-35429a8deb5mr979193a91.15.1769649384396; Wed, 28
+ Jan 2026 17:16:24 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 28 Jan 2026 17:15:01 -0800
+Date: Wed, 28 Jan 2026 17:15:02 -0800
 In-Reply-To: <20260129011517.3545883-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -78,9 +78,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260129011517.3545883-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
-Message-ID: <20260129011517.3545883-30-seanjc@google.com>
-Subject: [RFC PATCH v5 29/45] x86/virt/tdx: Get/Put DPAMT page pair if and
- only if mapping size is 4KB
+Message-ID: <20260129011517.3545883-31-seanjc@google.com>
+Subject: [RFC PATCH v5 30/45] x86/virt/tdx: Add API to demote a 2MB mapping to
+ 512 4KB mappings
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -98,19 +98,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69480-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69481-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[20];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -119,142 +119,194 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 569B7AA9ED
+X-Rspamd-Queue-Id: B1837AABCB
 X-Rspamd-Action: no action
 
-From: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-Elide the guts of getting/putting a Dynamic PAMT entry when the associated
-mapping is greater than 4KiB, in which case static PAMT pages are used and
-there's no need to (un)install extra PAMT pages.
+Introduce SEAMCALL wrapper tdh_mem_page_demote() to invoke
+TDH_MEM_PAGE_DEMOTE, which splits a 2MB or a 1GB mapping in S-EPT into
+512 4KB or 2MB mappings respectively.  TDH_MEM_PAGE_DEMOTE walks the
+S-EPT to locate the huge entry/mapping to split, and replaces the huge
+entry with a new S-EPT page table containing the equivalent 512 smaller
+mappings.
 
+Parameters "gpa" and "level" specify the huge mapping to split, and
+parameter "new_sept_page" specifies the 4KB page to be added as the S-EPT
+page. Invoke tdx_clflush_page() before adding the new S-EPT page
+conservatively to prevent dirty cache lines from writing back later and
+corrupting TD memory.
+
+tdh_mem_page_demote() may fail, e.g., due to S-EPT walk error. Callers must
+check function return value and can retrieve the extended error info from
+the output parameters "ext_err1", and "ext_err2".
+
+The TDX module has many internal locks. To avoid staying in SEAM mode for
+too long, SEAMCALLs return a BUSY error code to the kernel instead of
+spinning on the locks. Depending on the specific SEAMCALL, the caller may
+need to handle this error in specific ways (e.g., retry). Therefore, return
+the SEAMCALL error code directly to the caller without attempting to handle
+it in the core kernel.
+
+Enable tdh_mem_page_demote() only on TDX modules that support feature
+TDX_FEATURES0.ENHANCE_DEMOTE_INTERRUPTIBILITY, which does not return error
+TDX_INTERRUPTED_RESTARTABLE on basic TDX (i.e., without TD partition) [2].
+
+This is because error TDX_INTERRUPTED_RESTARTABLE is difficult to handle.
+The TDX module provides no guaranteed maximum retry count to ensure forward
+progress of the demotion. Interrupt storms could then result in a DoS if
+host simply retries endlessly for TDX_INTERRUPTED_RESTARTABLE. Disabling
+interrupts before invoking the SEAMCALL also doesn't work because NMIs can
+also trigger TDX_INTERRUPTED_RESTARTABLE. Therefore, the tradeoff for basic
+TDX is to disable the TDX_INTERRUPTED_RESTARTABLE error given the
+reasonable execution time for demotion. [1]
+
+Allocate (or dequeue from the cache) PAMT pages when Dynamic PAMT is
+enabled, as TDH.MEM.PAGE.DEMOTE takes a DPAMT page pair in R12 and R13, to
+store physical memory metadata for the 2MB guest private memory (after a
+successful split).  Take care to use seamcall_saved_ret() to handle
+registers above R11.
+
+Free the Dynamic PAMT pages after SEAMCALL TDH_MEM_PAGE_DEMOTE fails since
+the guest private memory is still mapped at 2MB level.
+
+Link: https://lore.kernel.org/kvm/99f5585d759328db973403be0713f68e492b492a.camel@intel.com [1]
+Link: https://lore.kernel.org/all/fbf04b09f13bc2ce004ac97ee9c1f2c965f44fdf.camel@intel.com [2]
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Co-developed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-[Yan: Move level checking to callers of tdx_pamt_{get/put}()]
+Co-developed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-[sean: move level checking back to tdx_pamt_{get/put}()]
+[sean: squash all demote support into a single patch]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/tdx.h  | 16 ++++++++++++++--
- arch/x86/kvm/vmx/tdx.c      |  6 +++---
- arch/x86/virt/vmx/tdx/tdx.c | 12 ++++++------
- 3 files changed, 23 insertions(+), 11 deletions(-)
+ arch/x86/include/asm/tdx.h  |  9 +++++++
+ arch/x86/virt/vmx/tdx/tdx.c | 54 +++++++++++++++++++++++++++++++++++++
+ arch/x86/virt/vmx/tdx/tdx.h |  1 +
+ 3 files changed, 64 insertions(+)
 
 diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index e61b0b3cc403..50feea01b066 100644
+index 50feea01b066..483441de7fe0 100644
 --- a/arch/x86/include/asm/tdx.h
 +++ b/arch/x86/include/asm/tdx.h
-@@ -154,8 +154,20 @@ static inline void tdx_init_pamt_cache(struct tdx_pamt_cache *cache)
+@@ -15,6 +15,7 @@
+ /* Bit definitions of TDX_FEATURES0 metadata field */
+ #define TDX_FEATURES0_NO_RBP_MOD		BIT_ULL(18)
+ #define TDX_FEATURES0_DYNAMIC_PAMT		BIT_ULL(36)
++#define TDX_FEATURES0_ENHANCE_DEMOTE_INTERRUPTIBILITY	BIT_ULL(51)
  
- void tdx_free_pamt_cache(struct tdx_pamt_cache *cache);
- int tdx_topup_pamt_cache(struct tdx_pamt_cache *cache, unsigned long npages);
--int tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache);
--void tdx_pamt_put(u64 pfn);
-+int __tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache);
-+void __tdx_pamt_put(u64 pfn);
-+
-+static inline int tdx_pamt_get(u64 pfn, enum pg_level level,
-+			       struct tdx_pamt_cache *cache)
-+{
-+	return level == PG_LEVEL_4K ? __tdx_pamt_get(pfn, cache) : 0;
-+}
-+
-+static inline void tdx_pamt_put(u64 pfn, enum pg_level level)
-+{
-+	if (level == PG_LEVEL_4K)
-+		__tdx_pamt_put(pfn);
-+}
+ #ifndef __ASSEMBLER__
  
- void __tdx_quirk_reset_page(u64 pfn, enum pg_level level);
- 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index aca556923822..bd5d902da303 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1729,7 +1729,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 
- 	WARN_ON_ONCE((mirror_spte & VMX_EPT_RWX_MASK) != VMX_EPT_RWX_MASK);
- 
--	ret = tdx_pamt_get(pfn, &tdx->pamt_cache);
-+	ret = tdx_pamt_get(pfn, level, &tdx->pamt_cache);
- 	if (ret)
- 		return ret;
- 
-@@ -1751,7 +1751,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 		ret = tdx_mem_page_add(kvm, gfn, level, pfn);
- 
- 	if (ret)
--		tdx_pamt_put(pfn);
-+		tdx_pamt_put(pfn, level);
- 
- 	return ret;
- }
-@@ -1872,7 +1872,7 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 		return;
- 
- 	__tdx_quirk_reset_page(pfn, level);
--	tdx_pamt_put(pfn);
-+	tdx_pamt_put(pfn, level);
+@@ -140,6 +141,11 @@ static inline bool tdx_supports_dynamic_pamt(const struct tdx_sys_info *sysinfo)
+ 	return sysinfo->features.tdx_features0 & TDX_FEATURES0_DYNAMIC_PAMT;
  }
  
- void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
++static inline bool tdx_supports_demote_nointerrupt(const struct tdx_sys_info *sysinfo)
++{
++	return sysinfo->features.tdx_features0 & TDX_FEATURES0_ENHANCE_DEMOTE_INTERRUPTIBILITY;
++}
++
+ /* Simple structure for pre-allocating Dynamic PAMT pages outside of locks. */
+ struct tdx_pamt_cache {
+ 	struct list_head page_list;
+@@ -240,6 +246,9 @@ u64 tdh_mng_key_config(struct tdx_td *td);
+ u64 tdh_mng_create(struct tdx_td *td, u16 hkid);
+ u64 tdh_vp_create(struct tdx_td *td, struct tdx_vp *vp);
+ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data);
++u64 tdh_mem_page_demote(struct tdx_td *td, u64 gpa, enum pg_level level, u64 pfn,
++			struct page *new_sp, struct tdx_pamt_cache *pamt_cache,
++			u64 *ext_err1, u64 *ext_err2);
+ u64 tdh_mr_extend(struct tdx_td *td, u64 gpa, u64 *ext_err1, u64 *ext_err2);
+ u64 tdh_mr_finalize(struct tdx_td *td);
+ u64 tdh_vp_flush(struct tdx_vp *vp);
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index 411e5feef39f..cff325fdec79 100644
+index cff325fdec79..823ec092b4e4 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -2195,7 +2195,7 @@ static u64 tdh_phymem_pamt_remove(u64 pfn, u64 *pamt_pa_array)
- static DEFINE_SPINLOCK(pamt_lock);
- 
- /* Bump PAMT refcount for the given page and allocate PAMT memory if needed */
--int tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache)
-+int __tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache)
- {
- 	u64 pamt_pa_array[MAX_NR_DPAMT_ARGS];
- 	atomic_t *pamt_refcount;
-@@ -2266,13 +2266,13 @@ int tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache)
- 	free_pamt_array(pamt_pa_array);
- 	return ret;
+@@ -1841,6 +1841,9 @@ u64 tdh_mng_rd(struct tdx_td *td, u64 field, u64 *data)
  }
--EXPORT_SYMBOL_FOR_KVM(tdx_pamt_get);
-+EXPORT_SYMBOL_FOR_KVM(__tdx_pamt_get);
+ EXPORT_SYMBOL_FOR_KVM(tdh_mng_rd);
  
- /*
-  * Drop PAMT refcount for the given page and free PAMT memory if it is no
-  * longer needed.
++static int alloc_pamt_array(u64 *pa_array, struct tdx_pamt_cache *cache);
++static void free_pamt_array(u64 *pa_array);
++
+ /* Number PAMT pages to be provided to TDX module per 2M region of PA */
+ static int tdx_dpamt_entry_pages(void)
+ {
+@@ -1885,6 +1888,57 @@ static void dpamt_copy_regs_array(struct tdx_module_args *args, void *reg,
   */
--void tdx_pamt_put(u64 pfn)
-+void __tdx_pamt_put(u64 pfn)
+ #define MAX_NR_DPAMT_ARGS (sizeof(struct tdx_module_args) / sizeof(u64))
+ 
++u64 tdh_mem_page_demote(struct tdx_td *td, u64 gpa, enum pg_level level, u64 pfn,
++			struct page *new_sp, struct tdx_pamt_cache *pamt_cache,
++			u64 *ext_err1, u64 *ext_err2)
++{
++	bool dpamt = tdx_supports_dynamic_pamt(&tdx_sysinfo) && level == PG_LEVEL_2M;
++	u64 pamt_pa_array[MAX_NR_DPAMT_ARGS];
++	struct tdx_module_args args = {
++		.rcx = gpa | pg_level_to_tdx_sept_level(level),
++		.rdx = tdx_tdr_pa(td),
++		.r8 = page_to_phys(new_sp),
++	};
++	u64 ret;
++
++	if (!tdx_supports_demote_nointerrupt(&tdx_sysinfo))
++		return TDX_SW_ERROR;
++
++	if (dpamt) {
++		if (alloc_pamt_array(pamt_pa_array, pamt_cache))
++			return TDX_SW_ERROR;
++
++		dpamt_copy_to_regs(&args, r12, pamt_pa_array);
++	}
++
++	/* Flush the new S-EPT page to be added */
++	tdx_clflush_page(new_sp);
++
++	ret = seamcall_saved_ret(TDH_MEM_PAGE_DEMOTE, &args);
++
++	*ext_err1 = args.rcx;
++	*ext_err2 = args.rdx;
++
++	if (dpamt) {
++		if (ret) {
++			free_pamt_array(pamt_pa_array);
++		} else {
++			/*
++			 * Set the PAMT refcount for the guest private memory,
++			 * i.e. for the hugepage that was just demoted to 512
++			 * smaller pages.
++			 */
++			atomic_t *pamt_refcount;
++
++			pamt_refcount = tdx_find_pamt_refcount(pfn);
++			WARN_ON_ONCE(atomic_cmpxchg_release(pamt_refcount, 0,
++							    PTRS_PER_PMD));
++		}
++	}
++	return ret;
++}
++EXPORT_SYMBOL_FOR_KVM(tdh_mem_page_demote);
++
+ u64 tdh_mr_extend(struct tdx_td *td, u64 gpa, u64 *ext_err1, u64 *ext_err2)
  {
- 	u64 pamt_pa_array[MAX_NR_DPAMT_ARGS];
- 	atomic_t *pamt_refcount;
-@@ -2326,7 +2326,7 @@ void tdx_pamt_put(u64 pfn)
- 	 */
- 	free_pamt_array(pamt_pa_array);
- }
--EXPORT_SYMBOL_FOR_KVM(tdx_pamt_put);
-+EXPORT_SYMBOL_FOR_KVM(__tdx_pamt_put);
- 
- void tdx_free_pamt_cache(struct tdx_pamt_cache *cache)
- {
-@@ -2372,7 +2372,7 @@ struct page *__tdx_alloc_control_page(gfp_t gfp)
- 	if (!page)
- 		return NULL;
- 
--	if (tdx_pamt_get(page_to_pfn(page), NULL)) {
-+	if (__tdx_pamt_get(page_to_pfn(page), NULL)) {
- 		__free_page(page);
- 		return NULL;
- 	}
-@@ -2390,7 +2390,7 @@ void __tdx_free_control_page(struct page *page)
- 	if (!page)
- 		return;
- 
--	tdx_pamt_put(page_to_pfn(page));
-+	__tdx_pamt_put(page_to_pfn(page));
- 	__free_page(page);
- }
- EXPORT_SYMBOL_FOR_KVM(__tdx_free_control_page);
+ 	struct tdx_module_args args = {
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index 096c78a1d438..a6c0fa53ece9 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -24,6 +24,7 @@
+ #define TDH_MNG_KEY_CONFIG		8
+ #define TDH_MNG_CREATE			9
+ #define TDH_MNG_RD			11
++#define TDH_MEM_PAGE_DEMOTE		15
+ #define TDH_MR_EXTEND			16
+ #define TDH_MR_FINALIZE			17
+ #define TDH_VP_FLUSH			18
 -- 
 2.53.0.rc1.217.geba53bf80e-goog
 
