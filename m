@@ -1,213 +1,187 @@
-Return-Path: <kvm+bounces-69636-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69637-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AKEnNxvhe2lyJAIAu9opvQ
-	(envelope-from <kvm+bounces-69636-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 23:37:15 +0100
+	id eAfHJ4bge2lyJAIAu9opvQ
+	(envelope-from <kvm+bounces-69637-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 23:34:46 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FABEB56CE
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 23:37:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C257CB563E
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 23:34:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC5293057487
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 22:33:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 427DD3005159
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 22:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB0836B042;
-	Thu, 29 Jan 2026 22:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A614C36B042;
+	Thu, 29 Jan 2026 22:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ByDLftJw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EJR+5PkT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC2836683F
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 22:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E31A353EE6
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 22:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769726002; cv=none; b=X3ZVE25xng/qP/zNvzUnzrki7C0r+xZgTtq1KvrhWFEwsbUXQGGdhR1XWtGyYh4cfl+pgDs5MsTsEKagpZhgKQL2PH8qGASFX1qFMAHWrv88ABLkRjqZ1EdL4ETopTQv3gq+7j3Va/uRhr/L1IMbP836rTsgv+a5+EqnPPiPdkg=
+	t=1769726079; cv=none; b=YYFbWVksrduMrNfhAlAI5V6LkCre+oAfi0Kk5n/tKrOsahk0zYxFn8ilBO+MCH28sBfEVjTQ1Lo/Z1OH/c/lvLpiROuSM4COuNlaotbplG92Nl8V3UA+m+Bp9LtzFNj+ziTmN8e4Jzd2sXA2EvYwewCakwoQjAHw6LS1U3CcuoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769726002; c=relaxed/simple;
-	bh=v63/Q89R1FZp3eIace6yEluQWPmCvUnvUR/7uDkLuXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ASTEl6m6ZuRswvv195LtduE8dsoKKpWkjsyVRKjON50bjkcsrRqK603h5NzrgGBNVsxUeqzMUVU5RRbNtX52BIR5y1sWhoBmH8vsALmwVYY9VTFiXLzLt6oFPOMgvGVJgtdBkaCQdMIAs0sQ/aWrX3CDbwAgdZU/YKcycSy32IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ByDLftJw; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1769726079; c=relaxed/simple;
+	bh=43Ly5LWavxsYLv7+7HKrp2ONar5UElIvRsFu7sD3WhA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=lUMZR294Wp0kaHpD1va1V0Hc9UoLTPI/i4mS7rPPqBCCqdOZS/H6SO78JCnikBERoSDwQpa4dYIBjJCGeLngyoEarksFlfiFnOkXy4KCTxTzFmjZ6jkkYKJ3tzhWCqwr4lvqH+6y0ctReVSKEUGUX5O+8/4jypZd0mMWBqyTrWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EJR+5PkT; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-81f47610542so876054b3a.0
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 14:33:20 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a871c32cdbso14223155ad.2
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 14:34:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769726000; x=1770330800; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dBZ3PFz9KqTT7KdM5e4cMtXwD446xZIZixlzxugjwak=;
-        b=ByDLftJwm+ggKAtpqCU9sPZffMWsEUrPGlXYxLmcxXvEW2byFmmvqfi2d01fyEQEMb
-         MwhFVh3cp4Y5o0bKokJMPdnGLYqEXcrActt5hjA6Zte2xnVh0jf/E3MPQ2Z6fRih8t1m
-         lxR4LUyDfzoBoC5OH0lWEf6RuUHQpGHPtiHoOiZpgaWlOfdFQZ3hiJoXZ0VsorP7VNwt
-         zbXj9JvDROjUvSKfSMLwr9R0sIDSR1JipmmZRm5xbVwZnNbvyQYg9vZt4NRHkezN3bEs
-         qm9OC7jqRQeTcAdtpZgNSTOUzwAwWzJgmACaT4toFUT5eFZrRiThC4MtKcUDKYWSt7we
-         VK/A==
+        d=google.com; s=20230601; t=1769726078; x=1770330878; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ifjZWXm6aQNqPteQIXl3MjOTMh03FfJVJJb/Dejs7KQ=;
+        b=EJR+5PkTP3o+HAh5EwpAqIioY+7+swZsKiEEWLEuUj+T7Co0a0wtotANZzidFOOoUl
+         PfOAChSW8iAVBW96YoPvHY6fVjacQt94S0axQXbPFthYh/5Xg3Vdis6gfYbZiEqv0aYn
+         /i4jZXQ9A6b8k5U4u2gE7CQGIdcH/TybXbfO7TJXCBpUY+eEVryltx1KbxBFZP/vYfln
+         VcpSfeowWdKbW9MgAsiXLHEPrgTWaJW/t2dnnUwBiaQeawJXznHvWkXZxpKr00Fz+FwH
+         tu1mJRaS2gWmD527PQI5suc7vR7FyVGFpEeg/7C8tmvvDqZBcnCOpezRI9R6FH5uEH6F
+         6RvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769726000; x=1770330800;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dBZ3PFz9KqTT7KdM5e4cMtXwD446xZIZixlzxugjwak=;
-        b=D2g9IPQOgvbUnnTRfdWU5VQzRONcotMSjflce7rionMVi45pUYzBC+bM+fzlHw7zEk
-         4RkKtQszBl1VIJu5+7XxGnCqHRSZcEOnPktgQCzQboYMQ8WExUwRsy4aQisejhD0+kWJ
-         WsU1H68rvKuu7Wfa3fmN+FQ8lStP9Wxm3JKttn3HcMup16l3IeDk8Il87368jqpeUK6m
-         VGXLaBCPfqNlZyi6HXuYwHV6sWruXnKFnqa7ie1p/Y39lQzfvK/0t7up5DYZDO2w2dAw
-         POwnLasjxq+cDAk+F3TMTmsnJcO+9BgE5FoIAtr8rQPuV0hrVxVZ4Lo27MhTLxSzSsGu
-         oE6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXnt7GxV5pu+8uQD0qcD+hZQtdfm+bKiBHaNW2fCnBvyHCWJvsGnu9vwsI/vxM+fudAQjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf2iWD6Ti37DS+PipZPJGr5jLv5D89ar0hZPcvifYThigovEwH
-	M+vZvSeXLIdI+gRUsV18i85kDG2DTV4JyxxRfhtEda4V5xldj9WZE6Hs+7q9JSA/5Q==
-X-Gm-Gg: AZuq6aLWij/eWQInoeYvvCpxYU+/pLy+yqiwRwsEyd8SJ7/vh+3cngaXrbwwI2oFF2K
-	myWTPkA3PbiFPil1wbhED8oDT1SxHPMQNsin5pWJWhM3fWCnHcdaeUGP6xxr5r7yUChwApcbE09
-	+mlYC4e0k4nyW8+v+jUylccjErO/6vepn2rImagCcL4F0sTv94M0d2zXsn9eKnlMkXrXiMV+7kh
-	8/TawCm11lfQBXe06Vh6xlTnKDvc9+LuB+aNTxBQzwjynKUXMZes0yLCi4X6iFWaS2nW+v+A/gM
-	b29KoQ2xelUrLQ2J3WqUN0tH3C66efyFHTBYg3qlshuC08XbAv4T3OC2LRGerHffTIoraesiQVe
-	s1NaWMIt6mH8znRiJwWx7lLcIyhltvtSvPSVK6/DF1CmY9Ea8Y/8XvwRL0snxX9XpX0dc3noT0L
-	NN2Do5jWEWvPn4wQ1D4P9qmC6Z4OSQBCfIiY94i3iDcbspBvY0Yg==
-X-Received: by 2002:a05:6a00:1f0d:b0:81f:5ec1:8bcd with SMTP id d2e1a72fcca58-823ab684bffmr621422b3a.20.1769726000049;
-        Thu, 29 Jan 2026 14:33:20 -0800 (PST)
-Received: from google.com (79.217.168.34.bc.googleusercontent.com. [34.168.217.79])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82379bfd797sm6165100b3a.43.2026.01.29.14.33.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 14:33:17 -0800 (PST)
-Date: Thu, 29 Jan 2026 22:33:13 +0000
-From: David Matlack <dmatlack@google.com>
-To: Jacob Pan <jacob.pan@linux.microsoft.com>
-Cc: Alex Williamson <alex@shazbot.org>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
-	Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
-	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>,
-	=?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>,
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pranjal Shrivastava <praan@google.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Tomita Moeko <tomitamoeko@gmail.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH v2 10/22] vfio/pci: Skip reset of preserved device after
- Live Update
-Message-ID: <aXvgKRrbfymW5NKb@google.com>
-References: <20260129212510.967611-1-dmatlack@google.com>
- <20260129212510.967611-11-dmatlack@google.com>
- <20260129142158.00004cdc@linux.microsoft.com>
+        d=1e100.net; s=20230601; t=1769726078; x=1770330878;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ifjZWXm6aQNqPteQIXl3MjOTMh03FfJVJJb/Dejs7KQ=;
+        b=vwCwGJ2ap07/VS8N3t52PghtXamkCHu2QI+yR5PwO1gsCshjywTGlVF3hyR+f2R/Hf
+         c+OghZEDWrj61mnsFTlllJ5XTgptXe+rzEJd8HgYS9/mpJ3OPtRJHsczTGcDpKAeuV+6
+         AJ+vQPR71HVA/CBTRsEn3sYtAtQhN3ktGFF7Q0hM6z9GZNtTkj9K8WHUSG35ns+k92oA
+         WxID1w69/2bG65EY9Ytr50+NSY5Q51oH5atiXOQsS8zGVnex/5aMNa66vLgHjaROcH7o
+         Rw2v1n1OV+YfcmTbBFdpeQXwtZ5mqpjNPA9E5Bt357zXwTAped2thGFMdbnA05m2zfUk
+         kD4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVISqwZtgQMC/UD9b8PRVZcw5CdrZWe0MD/voQzBahDMlyK89CfyrQgd2hMokWKg3SDUpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNqN1zAeBU89zAxfF/6L8kGMQtAqN47aADNl1T0U+aEWvxKtHs
+	YK/MiAGG7cWIjHDAr5uz+4UxWRy9+eDVI4gD0rVUBVRXm9rPb71bsFsxFlAVJZWdL4ydfvX51M1
+	/6+bo7Q==
+X-Received: from plbba3.prod.google.com ([2002:a17:902:7203:b0:298:465f:129])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d504:b0:2a0:92a6:955
+ with SMTP id d9443c01a7336-2a8d7ee71f3mr8272895ad.23.1769726077924; Thu, 29
+ Jan 2026 14:34:37 -0800 (PST)
+Date: Thu, 29 Jan 2026 14:34:36 -0800
+In-Reply-To: <CALMp9eSryGLaHfH0fWeQco1rTY57q=pskB5H50u2z4nxBuPqYA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260129142158.00004cdc@linux.microsoft.com>
+Mime-Version: 1.0
+References: <20260121225438.3908422-1-jmattson@google.com> <20260121225438.3908422-5-jmattson@google.com>
+ <aXJWkIw0oSzOmxLS@google.com> <CALMp9eSryGLaHfH0fWeQco1rTY57q=pskB5H50u2z4nxBuPqYA@mail.gmail.com>
+Message-ID: <aXvgfM_rPNmmXDwn@google.com>
+Subject: Re: [PATCH 4/6] KVM: x86/pmu: [De]activate HG_ONLY PMCs at SVME
+ changes and nested transitions
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
+	James Clark <james.clark@linaro.org>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
-	TAGGED_FROM(0.00)[bounces-69636-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[44];
+	TAGGED_FROM(0.00)[bounces-69637-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7FABEB56CE
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C257CB563E
 X-Rspamd-Action: no action
 
-On 2026-01-29 02:21 PM, Jacob Pan wrote:
-> On Thu, 29 Jan 2026 21:24:57 +0000 David Matlack <dmatlack@google.com> wrote:
+On Wed, Jan 28, 2026, Jim Mattson wrote:
+> On Thu, Jan 22, 2026 at 8:55=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Wed, Jan 21, 2026, Jim Mattson wrote:
+> > > diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/includ=
+e/asm/kvm-x86-pmu-ops.h
+> > > index f0aa6996811f..7b32796213a0 100644
+> > > --- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> > > +++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+> > > @@ -26,6 +26,7 @@ KVM_X86_PMU_OP_OPTIONAL(cleanup)
+> > >  KVM_X86_PMU_OP_OPTIONAL(write_global_ctrl)
+> > >  KVM_X86_PMU_OP(mediated_load)
+> > >  KVM_X86_PMU_OP(mediated_put)
+> > > +KVM_X86_PMU_OP_OPTIONAL(set_pmc_eventsel_hw_enable)
+> > >
+> > >  #undef KVM_X86_PMU_OP
+> > >  #undef KVM_X86_PMU_OP_OPTIONAL
+> > > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > > index 833ee2ecd43f..1541c201285b 100644
+> > > --- a/arch/x86/kvm/pmu.c
+> > > +++ b/arch/x86/kvm/pmu.c
+> > > @@ -1142,6 +1142,13 @@ void kvm_pmu_branch_retired(struct kvm_vcpu *v=
+cpu)
+> > >  }
+> > >  EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_pmu_branch_retired);
+> > >
+> > > +void kvm_pmu_set_pmc_eventsel_hw_enable(struct kvm_vcpu *vcpu,
+> > > +                                    unsigned long *bitmap, bool enab=
+le)
+> > > +{
+> > > +     kvm_pmu_call(set_pmc_eventsel_hw_enable)(vcpu, bitmap, enable);
+> > > +}
+> > > +EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_pmu_set_pmc_eventsel_hw_enable);
+> >
+> > Why bounce through a PMU op just to go from nested.c to pmu.c?  AFAICT,=
+ common
+> > x86 code never calls kvm_pmu_set_pmc_eventsel_hw_enable(), just wire up=
+ calls
+> > directly to amd_pmu_refresh_host_guest_eventsels().
+>=20
+> It seemed that pmu.c deliberately didn't export anything. All accesses
+> were via virtual function table. But maybe that was just happenstance.
 
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c
-> > b/drivers/vfio/pci/vfio_pci_core.c index b01b94d81e28..c9f73f597797
-> > 100644 --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -515,12 +515,24 @@ int vfio_pci_core_enable(struct
-> > vfio_pci_core_device *vdev) if (ret)
-> >  		goto out_power;
-> >  
-> > -	/* If reset fails because of the device lock, fail this path
-> > entirely */
-> > -	ret = pci_try_reset_function(pdev);
-> > -	if (ret == -EAGAIN)
-> > -		goto out_disable_device;
-> > +	if (vdev->liveupdate_incoming_state) {
-> > +		/*
-> > +		 * This device was preserved by the previous kernel
-> > across a
-> > +		 * Live Update, so it does not need to be reset.
-> > +		 */
-> > +		vdev->reset_works =
-> > vdev->liveupdate_incoming_state->reset_works;
->
-> Just wondering what happened to skipping the bus master clearing. I
-> understand this version does not preserve the device itself yet; I’m
-> just curious whether there were specific difficulties that led to
-> dropping the earlier patch which skipped clearing bus master.
+Probably just happenstance?
 
-Hi Jacob,
+> Should I create a separate pmu.h, or just throw the prototype into
+> svm.h?
 
-There's several places where bus master gets cleared that we need to
-eventually eliminate to fully preserve the device.
+I say just throw it in svm.h.  We've had pmu_intel.h for a long time, and t=
+here's
+hardly anything in there.  And somewhat surprisingly, only two things in vm=
+x.h
+that obviously could go in pmu_intel.h.
 
- 1. vfio_pci_liveupdate_freeze() clears it during shutdown when it
-    restores vdev->pci_saved_state.
- 2. pci_device_shutdown() clears it during shutdown.
- 3. vfio_pci_core_enable() clears it when the preserved device file
-    is bound to an iommufd after the Live Update (in
-    vfio_pci_core_enable()).
-
-I think it would be safe to skip (3) in this series, since that's very
-similar to how this series skips resets during vfio_pci_core_enable()
-for preserved devices.
-
-But I don't think it would be safe to skip (1) or (2) until the attached
-iommufd is fully preserved.
-
-If you are just asking about (3) then I agree it could be skipped and I
-can include that in the next version.
+  void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu);
+  int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
 
