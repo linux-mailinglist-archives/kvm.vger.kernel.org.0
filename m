@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-69599-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69600-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFzALPO1e2kNIAIAu9opvQ
-	(envelope-from <kvm+bounces-69599-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 20:33:07 +0100
+	id eFmhMiy4e2k0IAIAu9opvQ
+	(envelope-from <kvm+bounces-69600-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 20:42:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D2FCB404A
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 20:33:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D6D7B40F8
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 20:42:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F301303DAB4
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 19:31:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8A2EF301915C
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 19:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30123271EB;
-	Thu, 29 Jan 2026 19:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6659E329E67;
+	Thu, 29 Jan 2026 19:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="L6abealG"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="t98xmY0N"
 X-Original-To: kvm@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010027.outbound.protection.outlook.com [52.101.56.27])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013028.outbound.protection.outlook.com [40.93.196.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968232D0601;
-	Thu, 29 Jan 2026 19:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454EF2D8796;
+	Thu, 29 Jan 2026 19:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769715096; cv=fail; b=NiNmqjXCG41NyhrrT+SWTuDpeL7n+Sxrl+zpfIHEIL1xeOKr9SaUlmBXt/94zFmXGMuknvtswazhEUPSwJ2lk2oT7ZvHnacJphMnSwCV8xBAPXeMq2zTDPNyFUDnZQeFl5df17jYuQeAPiGorrXYg1nDoVlKp883gQE3GreaWbQ=
+	t=1769715752; cv=fail; b=FhkRSMa67EBE9sjLy5IOKKItdXploIk9PoS6Jfes1rTrcqgH4BI+itD2TMAD1AbPoChZDB6uEFEo51MwEKFcSeqSnA/z+auH16puT2c5sTAzk3/NoGx5Dl8HDMbmVz+pwHzVODT3DFCQoCrHDv2s9+W/FjaKHyJ/2eeMP0S5fKs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769715096; c=relaxed/simple;
-	bh=69psov2bu8FwLTwF6tfhrQqun/LJ2mCPmmXVu76DaVM=;
+	s=arc-20240116; t=1769715752; c=relaxed/simple;
+	bh=oqmPkVgrKDlsVAD5mGM/mMnrWFZKP2nmw2GtoYK4s70=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lJkq7n8e1lL+iQhupfj5W10tOtpWZ1A2xLI/b7ou5IkJuupMSE8b/zRB7t6UEX/GsY3rm9FKQHh1d2l6Ahp/1NjoO0SSRipeN4ftqJhJ/VWHac0fUDM0QYhWNzkjmSn0n+7OaCAlvuUOjfVVMJP+nD5VMUklbHdny7bDxL+ZVYg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=L6abealG; arc=fail smtp.client-ip=52.101.56.27
+	 Content-Type:MIME-Version; b=e5oUED8UMUJF2DE0enGYJSiKC/foG1iWh+6f0gIiTGNRxiw+oFJjreBxsZ1NQ5yU0gp+MsUp0IsB2PN2Lk1du6i6qe4tq9AAseBejxgHgCEgZIiRjqepH8Ayr2wYIx3C5WWIgQDAqiaohqNieaDFqfVcSLkdYS4OeKOjUXVG/8w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=t98xmY0N; arc=fail smtp.client-ip=40.93.196.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qAFRx74pTn5LJfx590kaDSuzol1pQS7AaLGufLNlxEFHxIycugj6cUNaieSFU7qvZzD4bWEyhrrWm7IsbYgGODlxRgbq9F89fPVBhXXbdyOWoZQYN/oQGxZhwVYeqihB6gs1+tWk0Bah9clk+H0Xc9WUrYFHtStYrmluoKKPDldvH1av3qQrun6IpPHuNm1o26WY/NhCmwa4s+g4/3LWjI2fCodb1SlgSUxC6x9PRg/+hSf8Ce8y6zNu6/eYHU79M2IOwDVjxtXxX1kEc3HfS2IJH6ubXwS6Y4zemMxNfqA+hgcHuRJg/QAn/O0MV8PRUr67nxcnWfL3shnBszL9sA==
+ b=qw1LFNotwwQKKSRSa//+iaux+i4L2aezXfPvPYBh/zsolYQ/oN2CEt0hq3e+qHwU7ncNEci/toqgCespJ63PdCNP1FxbVq7AzqB8GWcpN9GIZ8Eebd6X/MTwnLouSN66E9Pfd2C4eGTQplTc4cyLcyZe9AzhqyYim9AsiCFq19gAHbmtaww0hSYLwBaQtvskC6yLHmNSAczXV0oBzYtkt+ZyS4uj8bWAMuWkRdXFe9tSqsnzCzCfmP/FS5/nFvXE7TwW0zRFkyCoBmqF+DhtQD7e4WNxL4HqG1YikX6y8nhyYOuUPeD7e6SZuKcjUJw5hoUchG2tXm5Id2QJTZIhCg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QybeqSe28vhAS93MCYOQk+ADH2V22r0BC+tOXPrvZIA=;
- b=S4IOi2snV+R1H0iW3SyAZ6pZXg4qUzvAzu464vug2XPMKHws7AgglGFx5l4rAxRGgNrYAMXLI7eJavv7ggNu2/MbhLHH1Ox/Ea8/nJ2izT4ht8V34EurVN22LYwgbIp+8XWZ7LiQhIj6dQSaQiMOlu2svVdckBfOusy+p/V6tqcJlT+5Ciw27VxxT5rdecoKA7fBPF53RUoNTbCe0ctsABV+Q3SfmgP3OA4Omhe0HY77B3Hogs2ALWC1oVbYnYOJHQi+do3XtYIFGJiYKtJ1IHa7jN8K7DJEM0n4D9L/uZDHxP4Yt8pZyageSOUa+14ghlKy9IJD0tQo8MsyvmoOfw==
+ bh=Q0eO5uV5BA5YJLedvdaE8uDRr2IcYhTp/8PKYVNv19U=;
+ b=QaKVXKU69rZii8Oj5AtVsgiSiu/xW/WD82peULvepvPqvTFw8uDOUUKsfWWQh4xuIwViaX0BuzwwVhmHFXpBYcOXt08OVAYVQEgvT9S78Z/z52xvwei0y4kJVM+TZXXJ1vbTAA6EzPtL+S9TSIuSLZ8sADb0kojiq0PYSRt3K6Kp16bUVf/kS9fLpxArmB4yVjy/kfYTr4YsWxF7PAJk9q8WLfbmPety4fuX+Xt574MGVgd3r59ORlitYem606Q95XEGvPbSd0oe+bbfzCo8gZ16FA3Nt2UPuD08R2SXeI2d4bm9BkRDYIlXdFVi8iu9JQPyoUtN7rM2eYK3bxPZ4g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QybeqSe28vhAS93MCYOQk+ADH2V22r0BC+tOXPrvZIA=;
- b=L6abealG0h+EtVvDaxuW19bLJ53g4MNd6xAaagGpRvSIZ0zGKocZDxHvQjAeGRQ/5QDvBTWt4EW9b7/l8Krwfo7wsVHY1UYRLF99yfuedENgiUR4W5vLnp2XJQISmBBb6l6cs9ke9gYY3bxvV/W/f0eiLQy4ER+jlhb9kzI3CXA=
+ bh=Q0eO5uV5BA5YJLedvdaE8uDRr2IcYhTp/8PKYVNv19U=;
+ b=t98xmY0NwaV1T1GEC5ruBk80D6UdsxwSsfFDaxsgvIM8wed7s2NLKSTKyoj77b029jUxYyifWvISuTENAPglCDvNypff0be68Qi5CMoFkIrUEwlUO4b2FbBJMcDqow3QCcmvkzicrkDNkzYRg1K/rpeLojJFX0WCefEaDGMrjqQ=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc) by IA1PR12MB6090.namprd12.prod.outlook.com
- (2603:10b6:208:3ee::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.8; Thu, 29 Jan
- 2026 19:31:30 +0000
+ (2603:10b6:20f:fc04::bdc) by PH0PR12MB999112.namprd12.prod.outlook.com
+ (2603:10b6:510:38c::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Thu, 29 Jan
+ 2026 19:42:28 +0000
 Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
  ([fe80::4d0e:603a:42fc:7c0]) by IA0PPF9A76BB3A6.namprd12.prod.outlook.com
  ([fe80::4d0e:603a:42fc:7c0%3]) with mapi id 15.20.9542.015; Thu, 29 Jan 2026
- 19:31:29 +0000
-Message-ID: <53abadfa-a429-401d-b9c8-71149b0b960d@amd.com>
-Date: Thu, 29 Jan 2026 13:31:26 -0600
+ 19:42:27 +0000
+Message-ID: <57d7a46a-c3d6-4c7c-bed1-ee61d6d690fb@amd.com>
+Date: Thu, 29 Jan 2026 13:42:24 -0600
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH 16/19] fs/resctrl: Implement rdtgroup_plza_write() to
  configure PLZA in a group
@@ -82,14 +82,14 @@ Cc: corbet@lwn.net, reinette.chatre@intel.com, Dave.Martin@arm.com,
  eranian@google.com, gautham.shenoy@amd.com
 References: <cover.1769029977.git.babu.moger@amd.com>
  <a54bb4c58ee1bf44284af0a9f50ce32dd15383b0.1769029977.git.babu.moger@amd.com>
- <aXqHs0Mm5F9_R4Q6@agluck-desk3> <aXus-rG1BX8QWh_G@agluck-desk3>
+ <aXqHs0Mm5F9_R4Q6@agluck-desk3>
 Content-Language: en-US
 From: Babu Moger <bmoger@amd.com>
-In-Reply-To: <aXus-rG1BX8QWh_G@agluck-desk3>
+In-Reply-To: <aXqHs0Mm5F9_R4Q6@agluck-desk3>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA0PR13CA0025.namprd13.prod.outlook.com
- (2603:10b6:806:130::30) To IA0PPF9A76BB3A6.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN6PR05CA0016.namprd05.prod.outlook.com
+ (2603:10b6:805:de::29) To IA0PPF9A76BB3A6.namprd12.prod.outlook.com
  (2603:10b6:20f:fc04::bdc)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -98,119 +98,120 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PPF9A76BB3A6:EE_|IA1PR12MB6090:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a0a49f1-60c7-42e6-28d9-08de5f6d0073
+X-MS-TrafficTypeDiagnostic: IA0PPF9A76BB3A6:EE_|PH0PR12MB999112:EE_
+X-MS-Office365-Filtering-Correlation-Id: fb76c555-e300-4e6d-e307-08de5f6e88a7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|19052099003;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MkhkS2J6NXJZQUVwMHE4T0NseWZOenRYbmNwajJlZlJiRGYwOTJvSWxoUGFD?=
- =?utf-8?B?RmZJaXhZdkw2Zlh3Wm54VDVKc0E2WnVmVVMxWVB6RzVhZDJzTm5zWVBxU1J0?=
- =?utf-8?B?eUQzSGUzUFFxKzRiWUJUamJNZkZnZFB4cldIOXBMK2dCOE9wYkF3MHRkblVp?=
- =?utf-8?B?K2xIbGxGKzlndmNVTVhJL2tQc0tQMUpPQkJRVnllajlPY054eXVSQ3NOeTY4?=
- =?utf-8?B?d0kyRUxXd0lmb24xbFB3MFBMaHNnWU5Fdzc4Rmt4aTR3VWRuYWpCam1RWW9J?=
- =?utf-8?B?S1dRZ1pYajFNczUvckFKWks4Zmt5cXlrbllRbGNOTThaTExybEtHRW1MSDgw?=
- =?utf-8?B?TUNmOThndzMraHUvS3VQWVIzQ1gvbmJrRkZkWFdaV21OK1Jtd2s2VmtSOEZQ?=
- =?utf-8?B?VjNvdUpiZHhTNXhJMGR5NDg4eWRKN1ZSRGh1akhNTkNueUVEcVR4aG85SURJ?=
- =?utf-8?B?U0xyNHBIajdZTUJ2SjhPb1RZMlp6b1RadGExUzFkeVZ3eENBaU84c29KMUwz?=
- =?utf-8?B?eGIxbGVxelI3L0ZLbVIxRXB6KzRrUUYrRzBtdk5IeFQ0VUw4QllESEZhcC9M?=
- =?utf-8?B?VnV5UXg3NUh2cG91dmwrWEV2U1VhbmUrby8wcHVpMVNRd2dmd3dYVkE3Ympq?=
- =?utf-8?B?KzBXZ3k2UDlFdDBnMG15MUZWREs2ZXpBQytIRUl3R3RXRTRyTlEyczdnVWs4?=
- =?utf-8?B?VWlTaEhkR0NTdktITFlZVkkwZVZQZXV2UGdHVTQ0Sko3OEZJRFM2RDRmcnhw?=
- =?utf-8?B?QlRGakN0NU9ldXgzbTFKNTVYUU5WNEwyQ2tBK1hPUExHcC80TTl0VjlYVVdl?=
- =?utf-8?B?MTRudFcrL3BaNmtQb1B1RlJ1alMwWnQ3TE9sZDIxdXZuY3k0TlcyTzNCeXo0?=
- =?utf-8?B?dVhFOVQ2SU82RE9NOUpqWTNiT2JwSUtRbmFZVXJpbTgraEF5MS9vb3BjMXUr?=
- =?utf-8?B?WlB4TjRPdTJEM08rRmp1Q1ZVUktPMStYUFJxY0lIUWdJK2JaaS9IelVKWWJW?=
- =?utf-8?B?M2VSNmliQzVvdngzeWtIQ0VKeVliQllZMElaSXJaaW11SC9qOXY3R2xqRFBG?=
- =?utf-8?B?TDZrTTF1L2pnbWEyaXRpL3RrTGpqUXpkWHJqSnpvQ0RyYlZUUkVuSEhURmxG?=
- =?utf-8?B?UDNUMitudThCUGpsdUczTTN2K2VUQ0p6V1oxUWpUYms1NEdJYlRteVRIT1Nh?=
- =?utf-8?B?V0k1YTl6eFBxT0Q3aGhIUVlXdHlaeHg1T3V2QkpjMkp5UkJyc2lDWjRaQ3J4?=
- =?utf-8?B?NnFzK1JjV0JDeFN1UlUzUXAwNnV5WGdhZ3Y2RzNVZnBXbTVSZjFWb1oxL3NU?=
- =?utf-8?B?YnkyUE1LUHVkR1NYQmVzOWhMdnhrZ3B0dzlabHArSGRraEdZRU5QUVdISFhh?=
- =?utf-8?B?UUlBSFpZVGUzbmdCQkhMUk1ENlI2RE14SW5jYUF4UGtoVTMrSzZkOVVWalUy?=
- =?utf-8?B?YWo0SGtKT215TGthbWVxRjZNYWdtdkdaRUE4ZXVUNVJ1Z1U3MldKeVMyUGpT?=
- =?utf-8?B?RjhNZ0duNFd4azJmcWhOc1I1NTJsRS9XcWhHcVZwdWVxNWpQRENOUzhhUEJy?=
- =?utf-8?B?TnF2a1ZjcHk0U05VdE9ZZjg4Z09YQlVLdno4bHkvRU84czlUUXZncWVFNXlY?=
- =?utf-8?B?Rkp2UitPeUZSdkwxaVpxcjQrVEVQL1IzOXJIVVNtbitBQjJuNWc3ZzNXa2Nz?=
- =?utf-8?B?MzhVbm1MQUx1NlkrWUJxdllNWmh4WEVLMWYyOEM2R1h0cm5KWU1hR1dUMmo5?=
- =?utf-8?B?dkwwZHBnLzhtVVhSQVlzUFZMT1ZkcXp1RmMwVDBIL3hQUGNVUXdISnZVMnJM?=
- =?utf-8?B?cjIrN0F0aUVOOEdOOCt2cmRucXNlWnFLNGx6YzlSakFZS3FvNFdiRlJnK05n?=
- =?utf-8?B?NnJheGtxMWh1eURSN0Z1citSNGZ6eGtQYUZnTFA4Smphc2VkQmQ2K0ZhUDRE?=
- =?utf-8?B?aEk1RVhQb0s4bDZEckY2K2RHOWU0ak14aHpKYzI0UVBLWCsvckM1d0ZFbVBs?=
- =?utf-8?B?cWE1SjVJK0p6RWppblMwVk9mL2JvM25NWWk2MXNNaTF0bzJyZkY1NUhhMEFy?=
- =?utf-8?B?dWVZUStPMlgrc2VMQnlTYWlFd1pRbnlBL1V0SWw3OVZIZEJzWmxlRHFBTmVn?=
- =?utf-8?Q?hYac=3D?=
+	=?utf-8?B?L1c3bDhOM0FtOGJVTituamhOVGU4dzMweC9jdzV4dGtvNDRzNWVnSHJTQ3pF?=
+ =?utf-8?B?SWdTaDlhMlZHUlp5dmVuZVA0dzE3UVloUFZhdWRta1VLY3pwN1JIVUtHeGFC?=
+ =?utf-8?B?SjI4ejRuNm5USFk2YnAwejdLNXhmQ0RCMUdjeUFFUUFNbFJiUVViWEQyNURM?=
+ =?utf-8?B?VjAvYkx0UGdSeEV0Z2YyMjdCMEpWK1lqVnd6RXNmODVNQjd1UmpkNVZZbUpO?=
+ =?utf-8?B?TWhQVUxoc0UwMGxmN3VYeWI0SUhpME9RSStEcjNXSDJQWmx2ZnBYcGdDQTdF?=
+ =?utf-8?B?M3ZaUng2VGt3cmFtOElEY2tkcy9aRWdKMDJxRjF4VXpuTThsN00vRllHWEtm?=
+ =?utf-8?B?a0lRaTB2dHZ3SlNkNXJmeWhSZjVrazVzaHdYMWVydW95MHBkNjRudFlmYVMx?=
+ =?utf-8?B?RUo2dmVKM3hkNDJOVm5ZcGR3OW96eTR4Ym5zQ2ZOQ29QSXFYNU1MOWt0RVla?=
+ =?utf-8?B?N05FK011YlRCSEdVRUlDN2hvZGR3WXQwVkxqVnNYdHRiOVZYalo0UXowaElk?=
+ =?utf-8?B?SThlT1kvRjQ4ZktzNTdUWGpYOERaZWE3YmRjWGZybjgvdXJOTjA1aVBWeGF0?=
+ =?utf-8?B?QjhuTUxxSElmZkN4RDVGbUdncDJsMTJ6OGlvcmpuZWRldk5ZclNtcXRSY0Jw?=
+ =?utf-8?B?YmNkZ3RBQUZTQWl0eWU0Q0lBc2Z1SFdVbWppVVJLT21QMXMwMFpVQnJFQUor?=
+ =?utf-8?B?bHo4TGUyd2Z4VkNwbUZEMWg1V0pGYm1MYUhrUmRFMGV5VTM1ejhLZXYrQXNh?=
+ =?utf-8?B?MkZ0QUxGYmdBTExIQkVwaTgrdnJQVW1hcHF5M1ZFTWRwemRRZzZLSGZhWXE1?=
+ =?utf-8?B?dUtzZWVTdlB0dUxITmQ3SmJhdXI2K2sraEJaRStWdnRJT09uSXhiVjRpVkxZ?=
+ =?utf-8?B?VE1MbVVkUVY0Uzd1cE1RQUJYc1RQV3pyM244UE5WdWRLa0dGRmpQVlVhT0sx?=
+ =?utf-8?B?RmpBdGhiWWFYTG56Y1VmYVVtemtOSEdJWU1GT2oyZVVqV3Z3eUtuQVpNYmVV?=
+ =?utf-8?B?MGYxajc3ZUpnNTR6S2xseXcyQWg5M0dLc1BhTmlCdmNLMVkwdERvdEgvZzc4?=
+ =?utf-8?B?OW5NVGNWL085NlBON2NuQXZGNXRITzRwNmNrbHFEK1FyYUZKZXBqNDY0eVpI?=
+ =?utf-8?B?NGZHMjAvZG9QWDJHZ2dFYkFNS3lvajNVV3IzcGMxNFhaMUp3T0RHYzQxTHlr?=
+ =?utf-8?B?MUlqMnhqMjRRMXE5S2NyTjJxbGxYR0twUXZxWFNTZE5SUWs4b25sZ0xWaGUv?=
+ =?utf-8?B?M2xkcE1CVzZqKzJhaDJyTzNYaWV1N0g2RmZGN09XZElzNkZVeXVIb0RudzNH?=
+ =?utf-8?B?Q0FxK0Vsa1pETC8xN0xXMk92OG9Nek55Qlo5RFoyV2tvRmtuTXQwZW1xaGVa?=
+ =?utf-8?B?VHZJSndjK1hMK0lSN0lYSG5wQ3JqMEVtaCtycE9OTkNLZUo2amp1czFMUHl4?=
+ =?utf-8?B?T0ZoYlhoSjU0bnlHV1o5WmxFWUErNzVQYjYzMURUcWU2NFhzZmpGMkJlZk5K?=
+ =?utf-8?B?K0FJZElTNFRYcldSSVpBb1IwY3NkMXVlOFFRdjFFbzY2YmR2aVBYRTFVaDMv?=
+ =?utf-8?B?dDZLWHFpdmV5Y2J5Y0Q1MzJQYVJ2NVo3VTNlQnRKRi9Va2hXZVNubGt0elgv?=
+ =?utf-8?B?eGNXNEJhWkJBcTR5YVdoNkNMQUlFL1lmMnZyRHpPZDBNRXpqbGt1WWJaTkEr?=
+ =?utf-8?B?ZWoxZUVzdHd4OTl0b2tvRGdxcTd0MGdmTDZEcjJ3WUh6b3lMdFBZdy9CYWlO?=
+ =?utf-8?B?cnlFQi9NTkRMbERwcWZlOTY4VzMzejJDSFk1dE5xOFo4dXNVZFpsUVpJRDZh?=
+ =?utf-8?B?OEVtMURHUzVDTXRFaXJXOG1Nd1hsUDFhV2JVNkUyZDJwM1hUQU40Y1IzK0ZC?=
+ =?utf-8?B?NkFIYUh1c2s2djVzVjU2Y0loTlN0R0F1VFEzOWluV1hiOWdiaFdFZVBwdnl3?=
+ =?utf-8?B?SG1BcTU1NjU2ejV5OUV6YzkvZ0REZ3NpcnVzY01IeGovVzE2YlE1Uk1XZ29C?=
+ =?utf-8?B?aHZ6WVhHcEk3M0xJcUxmTXcyK2syZlNGazh0RzFRcllwSkNJUXlMMzBZQmFy?=
+ =?utf-8?B?TlluTnRMUCtSZE9jMEF3cmg1Mmt5aUhidjFacUwyd054eU83ejM0bW1XV0Zq?=
+ =?utf-8?Q?A+oY=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PPF9A76BB3A6.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PPF9A76BB3A6.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(19052099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YUJnYzNOSGE1T2cvUm9wNDhUQlQzdEowNWVVdXp3eUtxWUptNDllS1dCeWE2?=
- =?utf-8?B?c04xRC9NSVVEUHpYWVEvWjFGTkFMWFpyWVhtU0IwYW9yblptbTlOL0VtT3J2?=
- =?utf-8?B?cG80anlpTE01ZjVXSXVuakJ0dGtNM1JJdG9lTmxiYTIvRFdzWVIwVW95TjVM?=
- =?utf-8?B?TUwyOW90U2hnN1RvaWxKdmRWTzVKcEh4WGc3NDhoWk5DZlJaWjI3ZkplVXlV?=
- =?utf-8?B?dDF0dWN6MXN3a0t4UjdUai9LWkpmVGxHbXBaT3JYSTBJelRxekl0ZmUyVGV6?=
- =?utf-8?B?RFpCTS9Gem1YQTN3T25nZWN4R1BRRkhyeEp6c3J1MFZNWTU1alpkQ0hUUGdS?=
- =?utf-8?B?bHp1dmEwSEtPT3JzZWpNYWYxZ2RHV3VxUEUra3RaUC8wSk15OGVtVXBGZHZj?=
- =?utf-8?B?NEhWZENab0VzVUtLTnowa2dwNXd0YitCQS9HZEVPZnY1blZ0YkZhTGhUWkNW?=
- =?utf-8?B?VzM2c01NSitXZlVTaGRub0RERUxBMFpkNkw3RGpwdXpmaDlRbHZHeUFjenIz?=
- =?utf-8?B?N1lMd0ZEdk5BZTBDK0JNZ0h4ako4Q1lITW44UHNSMnY4QVl2SWdoWllMNkZl?=
- =?utf-8?B?NGxFRmxPTTZSQlh2VGh6TmRhNzF2TDJWUVh4ZHQyNXcvOHFOU0lLOG9Lc20y?=
- =?utf-8?B?bnhTYkJFNVFQemtZVHZrQ2pzRjZZcG10ZFR6K1AzaGdxVVN6bDdEMlZWcWEv?=
- =?utf-8?B?NE52WnpKU3A0TXg2M001RDM0SEpDblJpTjFUZ0lUaWFJY1BUdFU3YnZBa3ln?=
- =?utf-8?B?NE91clh3ZXg0YmIvZ1JOdS8yVjJ5L05FNlBQVThIM3Nkd0cwVjlmTy9wQlVz?=
- =?utf-8?B?VjhLcTJmdlVkV2hISWlXKzRVQ2VOaERETEJrOXlRdE9ZNy8wUkMyQndzOHU5?=
- =?utf-8?B?aVVtMEhWUEZ5Mm0wTTFMdHVVMGJKbi9TUE1NdGI0eXVQMHZ1WlZJSm1TbGxy?=
- =?utf-8?B?Ny9tUy8vL1h5dGsvWm1ZZDUyeSsxMldUZVpKYmswR1FEYTZ4S1dLWml4UGEr?=
- =?utf-8?B?Mi9acWpKSUpkblU1ME1RQTFrNWRnenRVenRzWXp4ZWxMamNabDRLYVdHUkhK?=
- =?utf-8?B?Vndtd0dwQzBsNWpYd2hlOTJSclYzaDF0bFozS1duKzJRb2dWU2cxR3lvUGdY?=
- =?utf-8?B?TUszUnA2clowZkdJRUIxYjdzYzBqbDl6NmFJbmVCc3ZpbXg4MDJlOWVVOHM1?=
- =?utf-8?B?YXAwYitMRFNoZjlRUDlyTnRQd0ZTN3hhdGlDYURzNlRnZmI0Yk5WWGxlNjFI?=
- =?utf-8?B?WlRoeS9GRkFPbXhFYlk2Njk5ZC9pZGgvY1pQRzZQYTJwVzNydTNoa1lpYUdK?=
- =?utf-8?B?aWZBOCtpZUYyS0h1ejR4aXNSbWRiUnQ0K2xMZW9DakRlYnFEOWNnaEF2a2Iv?=
- =?utf-8?B?NnJGWGlvcUkzL3BVMWw0cUlPQUw5Z0ZaZHY1RDhlQWZOdTBRcGZiZHZ6NXI1?=
- =?utf-8?B?N0Mrd0FLSVJZeTFybWpYWlZOQ0FIRFVERmQ3WmczUWQ2dGQxdUFPZWFPdXF5?=
- =?utf-8?B?a2FLOFkzelBUQmRPYmZLR2xGVHlrSFJrQ3VGYkV3bHVhckZrQXVBa2FGWE9o?=
- =?utf-8?B?M3g2Q0IybUNwVVNzNzI1Q1JmSkFCUFBvUVBNU0loZ2JPbGdPUk1sMnhwazhT?=
- =?utf-8?B?TzZQMDNHWjlaVWkwRnUvTVJoQ1hQT1RCMUZXMVA0dmF2cEliamNrbEdjOExm?=
- =?utf-8?B?RFpHZlV2WTZxNzdKRysrc3h0cEtpdi9DWW1HL3RjeHMzUEJ1MlVRTEs0bUs3?=
- =?utf-8?B?WlVYNVgrK200UE5uUHVFSWdGTC83bW42S1EwMUxaeERtZUNoVHlvenc3ajdT?=
- =?utf-8?B?TkFoMlJNV0o1L2dQQ0doUFlndjB1QmloWEZ1d05OTlp6Zm1OT3pET2QzcENm?=
- =?utf-8?B?M3FHbHR2UDNwQTdKdHhCT2Qwa3YrWWxUZGY5TncwbzZIUnJTZHltSjFCNjZw?=
- =?utf-8?B?a1ZhUjdCN1NtRlN6UERXSTkxQmE1bzlTcHBpVERtOWk5ODdOUnU2N3FaakNq?=
- =?utf-8?B?QUVoUUJQVDRzREFsY2FUU3FyektHamN5YnF1UjZsMTVzUEpDWVhXNzlDQlBz?=
- =?utf-8?B?WG1EWjFOR2JQakFNUFNGd1ZVY1dIV1RzcWlkWXZObmpvbGNrTzNkMlRLd0dD?=
- =?utf-8?B?bklBNXZrM05JTU5sR1lCN2x4RFRodmRIdzJ3a0tIVEVVQk9yVjRGZXR1ZzVI?=
- =?utf-8?B?YldzdFRkK0JjQUxJREM4c3hmWnVod3hFN3V6MXNNRVd2Qktvby9ndEdobFNS?=
- =?utf-8?B?VHluZGRScFlhTGkzcTJLTk5Za0NxTEdzNHVFRjRYSDJZY1dPeVM3SENlT0J5?=
- =?utf-8?Q?Xyw9LHPZH7uIkbX3iS?=
+	=?utf-8?B?ZU9WY1BHdi91K21aRUFBdFZ0R2FHM0JjZ3F0Rkg0VnBxWVlGYXh5Z2V6Rit5?=
+ =?utf-8?B?WGFKbUN2bktSZjNOUnZqWUNGK2FXMFNqU2VOa1p0SkQ0TWtVVGJWbDVnemwv?=
+ =?utf-8?B?NFdGbzJlUkdHUTJsRFhOTjAxc2ZwUDZsOFdScjhzUGxwNEIxMmdJajVJMUdO?=
+ =?utf-8?B?OEZvV3diVlF1L0xKOGdTUjFaZUlIQ3dEV3hqNDJjZ1BhWHB3WjFxenVDcm85?=
+ =?utf-8?B?bURJdGF1UU1ZL21vQzhkazMzY3Y1ZjZwVlo3VjNOMStwdFZ2bk9VSVNZcEVX?=
+ =?utf-8?B?cWszVWtmR29uTWliVGtiMG1tejRxcGc0NUcydmwvWksxbUk1RzZILzVXM0wz?=
+ =?utf-8?B?a2htYW9qSVZaRFo0OTBNSStGR25BOHZQME1hMGtNWkt6dSs5aUNHc2ViZjJm?=
+ =?utf-8?B?NnhUUlo1TEpiZ2U5MWZpRC9wRGlsQ2gwd0tmY2Rzd1pISjZkcG16T0UzclAw?=
+ =?utf-8?B?bWNuVjhsVjJIMkhxbk81VGhUQk5pdjg1OTFIaUtrUzMwcjhPd1Ftbno0dXRm?=
+ =?utf-8?B?VEM0NXgzUEk3cDVqWGVSK0pFY2d5M29lSUdBckxtcDNuNkpEWDhuL0I1cXhK?=
+ =?utf-8?B?QlB4YXFoK3VmSXBIeDcvdjluWS92YXllQUFwWTFCMW45WE9XQTBUbnBxTk9F?=
+ =?utf-8?B?bFlvYnkzRGd3UDVBSDZGeFliRWhxYVdsbWNKdVdLZDZXd0tXOUtrQWdrM29P?=
+ =?utf-8?B?UFprVS9nemFiSFFQbmZPQWxuRllUTUYvc28xWjZLclRNMU1QR21kTmVGSFlh?=
+ =?utf-8?B?MlVhdk11WEtWV1Vkcy84UnVhUmxvaWZFZ2RWZytsYmE1eDdTVVp6amxGQ1A3?=
+ =?utf-8?B?OE1VL0JGWEVUWVkxUUJUWThpOHF5WERla0ZGNm1LY2ZwSkFsMHNrTzhjaStp?=
+ =?utf-8?B?NzNuc211blgrZzAzMmhTWmwwQTZBOGtQSUJzZTRmMTBRWWVKZVRqdWFITW9x?=
+ =?utf-8?B?aVNxL0hkenJCZ1ZtaGhhbTRlR0NYL1hnRjVzbkdlcnhaZW9jemROaGVLR2Ew?=
+ =?utf-8?B?OElsVk9VOWZudzZRWmhJc1ZENk5kZjRvRkp6b3d3VXpkRVZHZFRvWm5vM01o?=
+ =?utf-8?B?aEg5UGxvNzJlVUN4b1VBUDg3bUpSREh1K0p6MStJMnljYXIybmozVVNZR04y?=
+ =?utf-8?B?Z2t4NEFJZ09NRnluUGdzZXQrOEhRYmJpWXNpTnMrMEpBazB1a0JoUlh0aWpr?=
+ =?utf-8?B?TkcyWC9MVE45Zkg3KytpR29ZWHcxcUtCWkI3Tnd0a3N4ZnlNajgwVVBpK1do?=
+ =?utf-8?B?RW5aSS93c2FQQkg4TlZlTndOV2x3ZVp4Ynp6Tk56WG1uSWt4UXV1L2t6cm8z?=
+ =?utf-8?B?cFA1MGQ5bXhXRS9FL0U3WE1UbEtBWnVReExzK2VGVzRCZUg4SlpVdGJLVVFG?=
+ =?utf-8?B?ZnVqNVplbDkzOEo2bkp2VnNyamJkZzBiRTlMWktkUENOVEdnOGxnbDg5bXRD?=
+ =?utf-8?B?Z3ZkNjcrblQ5OVg1b0FDT0l6OVQrblVsY2k4b2pvbm5zZlB6TjkyNW45bE5a?=
+ =?utf-8?B?eTBxWnZkZGNuWlZyZkdueXdtUmIwSDFhYjhZYUFzM2UrNng4Q1Ezc1BhU1pk?=
+ =?utf-8?B?a3hQWG94RTNDNjU5S2x1emg4WmJUTlc5WThINFFpWE81SnM0ZW9uOXNFWmZt?=
+ =?utf-8?B?TnBlWEE1OTJFMzZQUndaSGMvUTMxbll0aHFoa2N3Wk44aTQxdDMyUXhQMXYx?=
+ =?utf-8?B?Z3lML1FsWm8rUnc4V2FNOHJzWlpRVlRkRTRWY0FxZ2tvc01SWjVkMGwrY2NY?=
+ =?utf-8?B?TU01QzNIczRCTTB2T2lCdE9md0QvTmZBNTNudmo1OEJ1SlF0TmN5NHlCZFNO?=
+ =?utf-8?B?N3VpTkhEMHlQSWdkZTh0VWw1cDJydHNzanhJWHQ2a2NTNDlOU0R1WFhGSVA5?=
+ =?utf-8?B?azdNdGVQaDRDaktBTDdXUENld0IyeEFzNW5nKzdVRGlGMkdCRS9sY2VXRmo5?=
+ =?utf-8?B?MVhZbTRncExGQ2VXY3p1TGU4UnBha29UMUJZZmNlM0d4TWJmbVJlYm5qVWlq?=
+ =?utf-8?B?MTBXTGNtQUFmNHozWHkwR2pOQWZZNFdzdlRZSVAzVm9PLzMrekRpWGI2QWZW?=
+ =?utf-8?B?dlo0OGRHQnI3STRQeDVKY3J0eE1Od3BsQWlGNFhIcm0xNzRsemRxYnB5eW54?=
+ =?utf-8?B?WEtUemFtU3ZzSlJlWVI4YWQ3K2l0UzBxdFd4aUVYNTFXUmdlNTh3SVpmS3kz?=
+ =?utf-8?B?dldpM1M5eXBBN0hkaCt4bmhuOWpnTnN3N2FSQTlqWDlabW93ZW02L2NCaFI5?=
+ =?utf-8?B?MWZlMVpGN1ZkVU83aUhqYitsclpQNnBCak5PenFlc0lxOS95QndQUWcxSFY0?=
+ =?utf-8?Q?1DAABw/r3UW4xFqYlr?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a0a49f1-60c7-42e6-28d9-08de5f6d0073
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb76c555-e300-4e6d-e307-08de5f6e88a7
 X-MS-Exchange-CrossTenant-AuthSource: IA0PPF9A76BB3A6.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 19:31:29.8512
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 19:42:27.8594
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jVQpuu7PRiodymErFEGK875yPExZ5NFIR8ibrVXl7yMwzZt6Tlf4RiqjWbWHDgYe
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6090
+X-MS-Exchange-CrossTenant-UserPrincipalName: w2GrU9mUtZsmW5IlwlVY5GhtiYvZqD53I19KUoF04tgngE/u7usT3g21TwJuphxR
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB999112
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69599-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69600-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[44];
 	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[bmoger@amd.com,kvm@vger.kernel.org];
@@ -219,105 +220,91 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim]
-X-Rspamd-Queue-Id: 1D2FCB404A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim]
+X-Rspamd-Queue-Id: 8D6D7B40F8
 X-Rspamd-Action: no action
 
 Hi Tony,
 
-
-On 1/29/26 12:54, Luck, Tony wrote:
-> On Wed, Jan 28, 2026 at 02:03:31PM -0800, Luck, Tony wrote:
->> On Wed, Jan 21, 2026 at 03:12:54PM -0600, Babu Moger wrote:
->>> Introduce rdtgroup_plza_write() group which enables per group control of
->>> PLZA through the resctrl filesystem and ensure that enabling or disabling
->>> PLZA is propagated consistently across all CPUs belonging to the group.
->>>
->>> Enforce the capability checks, exclude default, pseudo-locked and CTRL_MON
->>> groups with sub monitors. Also, ensure that only one group can have PLZA
->>> enabled at a time.
->>>
->> ...
+On 1/28/26 16:03, Luck, Tony wrote:
+> On Wed, Jan 21, 2026 at 03:12:54PM -0600, Babu Moger wrote:
+>> Introduce rdtgroup_plza_write() group which enables per group control of
+>> PLZA through the resctrl filesystem and ensure that enabling or disabling
+>> PLZA is propagated consistently across all CPUs belonging to the group.
 >>
->>> +static ssize_t rdtgroup_plza_write(struct kernfs_open_file *of, char *buf,
->>> +				   size_t nbytes, loff_t off)
->>> +{
->>> +	struct rdt_resource *r = resctrl_arch_get_resource(RDT_RESOURCE_L3);
->>> +	struct rdtgroup *rdtgrp, *prgrp;
->>> +	int cpu, ret = 0;
->>> +	bool enable;
->> ...
+>> Enforce the capability checks, exclude default, pseudo-locked and CTRL_MON
+>> groups with sub monitors. Also, ensure that only one group can have PLZA
+>> enabled at a time.
 >>
->>> +	/* Enable or disable PLZA state and update per CPU state if there is a change */
->>> +	if (enable != rdtgrp->plza) {
->>> +		resctrl_arch_plza_setup(r, rdtgrp->closid, rdtgrp->mon.rmid);
->> What is this for? If I've just created a group with no tasks, and empty
->> CPU mask ... it seems that this writes the MSR_IA32_PQR_PLZA_ASSOC on
->> every CPU in every domain.
-
-Here is the reason.
-
-Some fields of PQR_PLZA_ASSOC must be set to the same value for all HW 
-threads in the QOS domain for consistent operation (Per-QosDomain).
-
-  The user should use the following sequence to set these values to a 
-consistent state.
-
- 1.
-
-    Set PQR_PLZA_ASSOC[PLZA_EN]=0 for all HW threads in the QOS Domain
-
- 2.
-
-    Set the COS_EN, COS, RMID_EN, and RMID fields of PQR_PLZA_ASSOC to
-    the desired configuration on all HW threads in the QOS Domain
-
- 3.
-
-    Set PQR_PLZA_ASSOC[PLZA_EN]=1 for all HW threads in the QOS Domain
-    where PLZA should be enabled.
-
-      *
-
-        The user should perform this as a read-modify-write to avoid
-        changing the value of COS_EN, COS, RMID_EN, and RMID fields of
-        PQR_PLZA_ASSOC.
-
-
-Basically, we have to set all the fields to consistent state to setup 
-the PLZA first.   Then setup PLZA_EN bit on each thread based on current 
-association.
-
-> I think I see now. There are THREE enable bits in your
-> MSR_IA32_PQR_PLZA_ASSOC.
-> One each for CLOSID and RMID, and an overall PLZA_EN in the high bit.
+> ...
 >
-> At this step you setup the CLOSID/RMID with their enable bits, but
-> leaving the PLZA_EN off.
+>> +static ssize_t rdtgroup_plza_write(struct kernfs_open_file *of, char *buf,
+>> +				   size_t nbytes, loff_t off)
+>> +{
+>> +	struct rdt_resource *r = resctrl_arch_get_resource(RDT_RESOURCE_L3);
+>> +	struct rdtgroup *rdtgrp, *prgrp;
+>> +	int cpu, ret = 0;
+>> +	bool enable;
+> ...
 >
-> Is this a subtle optimzation for the context switch? Is the WRMSR
-> faster if it only toggle PLZA_EN leaving all the other bits unchanged?
+>> +	/* Enable or disable PLZA state and update per CPU state if there is a change */
+>> +	if (enable != rdtgrp->plza) {
+>> +		resctrl_arch_plza_setup(r, rdtgrp->closid, rdtgrp->mon.rmid);
+> What is this for? If I've just created a group with no tasks, and empty
+> CPU mask ... it seems that this writes the MSR_IA32_PQR_PLZA_ASSOC on
+> every CPU in every domain.
+>
+>> +		for_each_cpu(cpu, &rdtgrp->cpu_mask)
+>> +			resctrl_arch_set_cpu_plza(cpu, rdtgrp->closid,
+>> +						  rdtgrp->mon.rmid, enable);
+>> +		rdtgrp->plza = enable;
+>> +	}
+>> +
+>> +unlock:
+>> +	rdtgroup_kn_unlock(of->kn);
+>> +
+>> +	return ret ?: nbytes;
+>> +}
+> It also appears that marking a task as PLZA is permanent. Moving it to
+> another group doesn't unmark it. Is this intentional?
+>
+> # mkdir group1 group2 plza_group
+> # echo 1 > plza_group/plza
+> # echo $$ > group1/tasks
+> # echo $$ > plza_group/tasks
+>
+> My shell is now in group1 and in the plza_group
+> # grep $$ */tasks
+> group1/tasks:4125
+> plza_group/tasks:4125
+>
+> Move shell to group2
+> # echo $$ > group2/tasks
+> # grep $$ */tasks
+> group2/tasks:4125
+> plza_group/tasks:4125
+>
+> Succcess in moving to group2, but still in plza_group
+
+You are moving the task from group1 to group2. This basically changes 
+the association in
+
+MSR_IA32_PQR_ASSOC register,  It does not change the PLZA association.
+
+To change it:
+
+a. You either remove task from plza group which triggers task update (tsk->plza = 0)
+    
+    echo >> /sys/fs/resctrl/plza_group/tasks
+
+b. Or you can change the group as regular group.
+
+   echo 0 > /sys/fs/resctrl/plza_group/plza
 
 
-I really did not think of optimization here. Mostly followed the spec.
+Thanks for the trying it out.
+
+- Babu
 
 
->
-> This might not be working as expected. The context switch code does:
->
-> 		wrmsr(MSR_IA32_PQR_PLZA_ASSOC,
-> 		      RMID_EN | state->plza_rmid,
-> 		      (plza ? PLZA_EN : 0) | CLOSID_EN | state->plza_closid);
->
-> This doesn't just clear the PLZA_EN bit, it zeroes the high dword of the MSR.
->
->> It also appears that marking a task as PLZA is permanent. Moving it to
->> another group doesn't unmark it. Is this intentional?
-> Ditto assigning a CPU to the PLZA group. Once done it can't be undone
-> (except by turing off PLZA?).
->
-> -Tony
->
-> [More comments about this coming against patch 16]
->
 
