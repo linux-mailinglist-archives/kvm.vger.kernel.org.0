@@ -1,211 +1,243 @@
-Return-Path: <kvm+bounces-69499-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69500-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKXLN5nDemk3+QEAu9opvQ
-	(envelope-from <kvm+bounces-69499-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 03:19:05 +0100
+	id CHYnN0LMemmu+gEAu9opvQ
+	(envelope-from <kvm+bounces-69500-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 03:56:02 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B34FAB148
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 03:19:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8866AB466
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 03:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60B683025294
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:18:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12911301DADB
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2034035581D;
-	Thu, 29 Jan 2026 02:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2582F3570D0;
+	Thu, 29 Jan 2026 02:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l7tw3YQR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EA5190473;
-	Thu, 29 Jan 2026 02:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE46264602;
+	Thu, 29 Jan 2026 02:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769653129; cv=none; b=YrbjU6y/gwHhE0YnQ4q4itoAmvtaVHqAiNYLDChPmH5bGR/v0iM0VB31MhPziRYa+K+QhcScCbEgkfQN8HL/ZYok9h9IMiv0GX+qiu4cyqFvlZgdiMSANj4CgE9nlTIWVGg3BkAPgabhppQ3z6WcnoJjmczyQZF8G0zPNsvc8fE=
+	t=1769655347; cv=none; b=PhD7anh/aitN3jjoa1ocI9q6EUBCrrWqiGIK1zteGcjAjULujgSeg7YAXeh+3fDfAQGK2UZHA7bwz99Igtg5o6pQdmyns+QSQ8EuQ+lNN6Dys2CMva4UbKU4CSHuksXTMI6VjH/n48/Xm4Ua+TQqM+L3EF3JxERqDSp3gQNMCNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769653129; c=relaxed/simple;
-	bh=imWLegyaJny/1vo5iBqEUMVnSnATp/GFw0mOfGqOTBs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=alB6nY5PgV/C1NydPYXh3HWc5wkjSTI+NxznaHAlodqHWpdKP334zcDknvahvAN8odJEiUaO7CKC7BivS548jo/r61Hs1/qWy3AqLt6ToaXt2J0F7ZhC0j52nJeQb+1MFQ9//9k7vYnQ3HVFNfcXwHdYoaXaIzV/LbJBaxDFZ5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8Cx68KBw3ppNcUNAA--.44781S3;
-	Thu, 29 Jan 2026 10:18:41 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by front1 (Coremail) with SMTP id qMiowJBxbcKAw3pp0504AA--.40872S2;
-	Thu, 29 Jan 2026 10:18:41 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Huacai Chen <chenhuacai@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: LoongArch: selftests: Add steal time test case
-Date: Thu, 29 Jan 2026 10:18:39 +0800
-Message-Id: <20260129021839.3674879-1-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1769655347; c=relaxed/simple;
+	bh=BJjXZCZnv3j5oTHj+A7V+Py7z+aKrAN5yPJ56CHDN1o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ePmPvhUYV34q2h53uxi0PKrT8p0Ux69qG3RNaEntpZx6pGJqd4yGS1Ycpwi4S5n3wulBqMiCYUFxQFgz/MegQ5UmUkujAc/yRQ9WR3TdhpD8MT6JsPMCKz1y96e6rHmYpHCq8xkw7wysgJ0znfzEoJWn/nms+gHVhu6rYbfoLp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l7tw3YQR; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769655341; x=1801191341;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=BJjXZCZnv3j5oTHj+A7V+Py7z+aKrAN5yPJ56CHDN1o=;
+  b=l7tw3YQRI7JOANBMa0podUIqwn+wXbr0IAF4Hi9mbemkUdqF3QCP3vj8
+   IcgBjh7yXgSn940d7D1hrsBFzylF671zwJjVnd4R4A6rnDq4IqOovu9qy
+   NeqeMQc2z3RGRzI4Eev/WpDxLC4qcjqb+++MJf8oZISxjFvQ291Tkwk/y
+   s6s0O5c8u0zTaXepgASdLDs5tFuid13dsqa1qgbMkPsXUxvRvDyAki/13
+   VnMNmJB7ivYSCAEgg7u6x0XLp1KOXbHHXAI4azcS1lFyyeaEUOOx/mFPl
+   IgcDfDgL8uMV2H5Iowo38MQIW8mp5gTZJSTGji+sJ1IxQ0gu42xDp62aQ
+   w==;
+X-CSE-ConnectionGUID: ZT08Ao4+Q3++y7jPetKozw==
+X-CSE-MsgGUID: theqoMljSOKB5F+5px/JPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="82252489"
+X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
+   d="scan'208";a="82252489"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 18:55:34 -0800
+X-CSE-ConnectionGUID: ROyvVfRPTuCbV6vhOcRPvA==
+X-CSE-MsgGUID: 1GQLGSycTWCqMkJmSo8bxA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,260,1763452800"; 
+   d="scan'208";a="208460589"
+Received: from unknown (HELO [10.238.3.203]) ([10.238.3.203])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 18:55:31 -0800
+Message-ID: <0eff82fe-e3e9-43bb-907f-3279163489f0@intel.com>
+Date: Thu, 29 Jan 2026 10:55:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBxbcKAw3pp0504AA--.40872S2
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] KVM: x86: Explicitly configure supported XSS from
+ {svm,vmx}_set_cpu_caps()
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Jim Mattson <jmattson@google.com>
+References: <20260128014310.3255561-1-seanjc@google.com>
+ <20260128014310.3255561-2-seanjc@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20260128014310.3255561-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
-	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[loongson.cn];
-	TAGGED_FROM(0.00)[bounces-69499-lists,kvm=lfdr.de];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 6B34FAB148
+	FROM_NEQ_ENVFROM(0.00)[xiaoyao.li@intel.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69500-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+]
+X-Rspamd-Queue-Id: A8866AB466
 X-Rspamd-Action: no action
 
-LoongArch KVM supports steal time accounting now, here add steal time
-test case on LoongArch.
+On 1/28/2026 9:43 AM, Sean Christopherson wrote:
+> Explicitly configure KVM's supported XSS as part of each vendor's setup
+> flow to fix a bug where clearing SHSTK and IBT in kvm_cpu_caps, e.g. due
+> to lack of CET XFEATURE support, makes kvm-intel.ko unloadable when nested
+> VMX is enabled, i.e. when nested=1.  The late clearing results in
+> nested_vmx_setup_{entry,exit}_ctls() clearing VM_{ENTRY,EXIT}_LOAD_CET_STATE
+> when nested_vmx_setup_ctls_msrs() runs during the CPU compatibility checks,
+> ultimately leading to a mismatched VMCS config due to the reference config
+> having the CET bits set, but every CPU's "local" config having the bits
+> cleared.
+> 
+> Note, kvm_caps.supported_{xcr0,xss} are unconditionally initialized by
+> kvm_x86_vendor_init(), before calling into vendor code, and not referenced
+> between ops->hardware_setup() and their current/old location.
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- tools/testing/selftests/kvm/Makefile.kvm |  1 +
- tools/testing/selftests/kvm/steal_time.c | 85 ++++++++++++++++++++++++
- 2 files changed, 86 insertions(+)
+I'm thinking whether to move the initialization of supported_xss from 
+kvm_x86_vendor_init() to kvm_setup_xss_caps(). Anyway it can be a 
+separate patch, if we agree to make the change.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index ba5c2b643efa..a18c00f1a4fa 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -228,6 +228,7 @@ TEST_GEN_PROGS_loongarch += kvm_page_table_test
- TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
- TEST_GEN_PROGS_loongarch += memslot_perf_test
- TEST_GEN_PROGS_loongarch += set_memory_region_test
-+TEST_GEN_PROGS_loongarch += steal_time
- 
- SPLIT_TESTS += arch_timer
- SPLIT_TESTS += get-reg-list
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index 8edc1fca345b..ee13e8973c45 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -301,6 +301,91 @@ static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
- 	pr_info("\n");
- }
- 
-+#elif defined(__loongarch__)
-+/* steal_time must have 64-byte alignment */
-+#define STEAL_TIME_SIZE		((sizeof(struct kvm_steal_time) + 63) & ~63)
-+#define KVM_STEAL_PHYS_VALID	BIT_ULL(0)
-+
-+struct kvm_steal_time {
-+	__u64 steal;
-+	__u32 version;
-+	__u32 flags;
-+	__u32 pad[12];
-+};
-+
-+static bool is_steal_time_supported(struct kvm_vcpu *vcpu)
-+{
-+	int err;
-+	uint64_t val;
-+	struct kvm_device_attr attr = {
-+		.group = KVM_LOONGARCH_VCPU_CPUCFG,
-+		.attr = CPUCFG_KVM_FEATURE,
-+		.addr = (uint64_t)&val,
-+	};
-+
-+	err = __vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &attr);
-+	if (err)
-+		return false;
-+
-+	err = __vcpu_ioctl(vcpu, KVM_GET_DEVICE_ATTR, &attr);
-+	if (err)
-+		return false;
-+
-+	return val & BIT(KVM_FEATURE_STEAL_TIME);
-+}
-+
-+static void steal_time_init(struct kvm_vcpu *vcpu, uint32_t i)
-+{
-+	struct kvm_vm *vm = vcpu->vm;
-+	uint64_t st_gpa;
-+	int err;
-+	struct kvm_device_attr attr = {
-+		.group = KVM_LOONGARCH_VCPU_PVTIME_CTRL,
-+		.attr = KVM_LOONGARCH_VCPU_PVTIME_GPA,
-+		.addr = (uint64_t)&st_gpa,
-+	};
-+
-+	/* ST_GPA_BASE is identity mapped */
-+	st_gva[i] = (void *)(ST_GPA_BASE + i * STEAL_TIME_SIZE);
-+	sync_global_to_guest(vm, st_gva[i]);
-+
-+	err = __vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &attr);
-+	TEST_ASSERT(err == 0, "No PV stealtime Feature");
-+
-+	st_gpa = (unsigned long)st_gva[i] | KVM_STEAL_PHYS_VALID;
-+	err = __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &attr);
-+	TEST_ASSERT(err == 0, "Fail to set PV stealtime GPA");
-+}
-+
-+static void guest_code(int cpu)
-+{
-+	struct kvm_steal_time *st = st_gva[cpu];
-+	uint32_t version;
-+
-+	memset(st, 0, sizeof(*st));
-+	GUEST_SYNC(0);
-+
-+	GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
-+	WRITE_ONCE(guest_stolen_time[cpu], st->steal);
-+	version = READ_ONCE(st->version);
-+	GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
-+	GUEST_SYNC(1);
-+
-+	GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
-+	GUEST_ASSERT(version < READ_ONCE(st->version));
-+	WRITE_ONCE(guest_stolen_time[cpu], st->steal);
-+	GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
-+	GUEST_DONE();
-+}
-+
-+static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
-+{
-+	struct kvm_steal_time *st = addr_gva2hva(vm, (ulong)st_gva[vcpu_idx]);
-+
-+	ksft_print_msg("VCPU%d:\n", vcpu_idx);
-+	ksft_print_msg("    steal:     %lld\n", st->steal);
-+	ksft_print_msg("    version:   %d\n", st->version);
-+}
- #endif
- 
- static void *do_steal_time(void *arg)
+For this fixing patch,
 
-base-commit: 8dfce8991b95d8625d0a1d2896e42f93b9d7f68d
--- 
-2.39.3
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+> Fixes: 69cc3e886582 ("KVM: x86: Add XSS support for CET_KERNEL and CET_USER")
+> Cc: stable@vger.kernel.org
+> Cc: Mathias Krause <minipli@grsecurity.net>
+> Cc: John Allen <john.allen@amd.com>
+> Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Cc: Chao Gao <chao.gao@intel.com>
+> Cc: Binbin Wu <binbin.wu@linux.intel.com>
+> Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/svm/svm.c |  2 ++
+>   arch/x86/kvm/vmx/vmx.c |  2 ++
+>   arch/x86/kvm/x86.c     | 30 +++++++++++++++++-------------
+>   arch/x86/kvm/x86.h     |  2 ++
+>   4 files changed, 23 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 7803d2781144..c00a696dacfc 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5387,6 +5387,8 @@ static __init void svm_set_cpu_caps(void)
+>   	 */
+>   	kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
+>   	kvm_cpu_cap_clear(X86_FEATURE_MSR_IMM);
+> +
+> +	kvm_setup_xss_caps();
+>   }
+>   
+>   static __init int svm_hardware_setup(void)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 27acafd03381..9f85c3829890 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8230,6 +8230,8 @@ static __init void vmx_set_cpu_caps(void)
+>   		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+>   		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+>   	}
+> +
+> +	kvm_setup_xss_caps();
+>   }
+>   
+>   static bool vmx_is_io_intercepted(struct kvm_vcpu *vcpu,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 8acfdfc583a1..cac1d6a67b49 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9965,6 +9965,23 @@ static struct notifier_block pvclock_gtod_notifier = {
+>   };
+>   #endif
+>   
+> +void kvm_setup_xss_caps(void)
+> +{
+> +	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> +		kvm_caps.supported_xss = 0;
+> +
+> +	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> +	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> +		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> +
+> +	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
+> +		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> +		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+> +		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> +	}
+> +}
+> +EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_setup_xss_caps);
+> +
+>   static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+>   {
+>   	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+> @@ -10138,19 +10155,6 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>   	if (!tdp_enabled)
+>   		kvm_caps.supported_quirks &= ~KVM_X86_QUIRK_IGNORE_GUEST_PAT;
+>   
+> -	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+> -		kvm_caps.supported_xss = 0;
+> -
+> -	if (!kvm_cpu_cap_has(X86_FEATURE_SHSTK) &&
+> -	    !kvm_cpu_cap_has(X86_FEATURE_IBT))
+> -		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> -
+> -	if ((kvm_caps.supported_xss & XFEATURE_MASK_CET_ALL) != XFEATURE_MASK_CET_ALL) {
+> -		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> -		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+> -		kvm_caps.supported_xss &= ~XFEATURE_MASK_CET_ALL;
+> -	}
+> -
+>   	if (kvm_caps.has_tsc_control) {
+>   		/*
+>   		 * Make sure the user can only configure tsc_khz values that
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 70e81f008030..94d4f07aaaa0 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -483,6 +483,8 @@ extern struct kvm_host_values kvm_host;
+>   extern bool enable_pmu;
+>   extern bool enable_mediated_pmu;
+>   
+> +void kvm_setup_xss_caps(void);
+> +
+>   /*
+>    * Get a filtered version of KVM's supported XCR0 that strips out dynamic
+>    * features for which the current process doesn't (yet) have permission to use.
 
 
