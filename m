@@ -1,186 +1,292 @@
-Return-Path: <kvm+bounces-69527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69529-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMTwOa4ve2n2CAIAu9opvQ
-	(envelope-from <kvm+bounces-69527-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 11:00:14 +0100
+	id wPn7Ohcze2lJCQIAu9opvQ
+	(envelope-from <kvm+bounces-69529-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 11:14:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54C1DAE4F3
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 11:00:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DED2AE717
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 11:14:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D6DAD30254CE
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 10:00:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6021630177B8
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 10:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142033803DB;
-	Thu, 29 Jan 2026 10:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D19B3806DD;
+	Thu, 29 Jan 2026 10:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sjhhhedW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4B937FF74;
-	Thu, 29 Jan 2026 10:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925E830AAA9;
+	Thu, 29 Jan 2026 10:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769680808; cv=none; b=SKtR2K3wkw4s2kbZBSPohmzak1XbXUAM93BoEvV3VwBCeB0CooJoCBMj0QzwtN0we0MpDQWq9+AJCmR2yKBSK10jQjMB64RkOaQWJ7fFUJbYfq+nO8tvmIV8PEdDzVqDIqzgEydt9s7RRaHbb9r/1h2bUDW62kWbDBuDn6lhVpA=
+	t=1769681679; cv=none; b=KPBkEEg2Cbqso0hLVLaS31tlfBX7NW3wkgoMlIJFtLHQVxbyTQLb/6st0GrF1WUWA1QXpeqvVDHJ+gkhZAPYtlNp0uJqDlNIZrSxmO+XHzirbdrFWhoEW04xQSzay2p/dwx4kJYaCWAHi72VMs4+CDUVAEz1wwF2GXOyVCNOrOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769680808; c=relaxed/simple;
-	bh=QhjPT8u9EMDvaJX1Xa39xagGJLKCosmoYbIBrDlUvvU=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=fiQ45E+vLRtd0GivfsBhNixyRZQJ3WOfd+sL8wIVR6HWaGAonB1TyAXw8letP9pNkHFESNH205lkPOMD8nXzsHXAGryMPeiF0ykSaGHgjQRNJUDTEDhKCZS6MWs8rKK+W8UgCnOsd0x9E4edioqjSGw42jF+9GA67uYU5EaHSrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8CxMvGiL3tpvNwNAA--.45715S3;
-	Thu, 29 Jan 2026 18:00:02 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJDxTMKeL3tp5Sc5AA--.41408S3;
-	Thu, 29 Jan 2026 18:00:01 +0800 (CST)
-Subject: Re: [PATCH v2] LoongArch: KVM: Add more CPUCFG mask bit
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20260126024840.2308379-1-maobibo@loongson.cn>
- <CAAhV-H66uH1TpaKTsqNtSqKYUDatJWj+zAuw-MYE88BqOF0XTA@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <60b5e543-226c-3c15-09ed-c3c5ccfeb699@loongson.cn>
-Date: Thu, 29 Jan 2026 17:57:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1769681679; c=relaxed/simple;
+	bh=iQvMrDyasksTllCjdfeh6A5zWB6EVZnl+Zr/KX7IDw8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J+jTMLgqHoZ/sJlduPBZMe85YODkBwipKJaiCH6GmFJzUdOOJosQ6mnU9OVHr9Jxr5o4WvQLBHVewE29NaS4XDAfZu91gmlmZPiXfF7FF2M70uUYH+aoBP7fRsrSHvbcH9P+sGhxhYtHYv/gChJmi/kvrhFhJEeohGhu2SH4CuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sjhhhedW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1B84C4CEF7;
+	Thu, 29 Jan 2026 10:14:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769681679;
+	bh=iQvMrDyasksTllCjdfeh6A5zWB6EVZnl+Zr/KX7IDw8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sjhhhedW3IMVefMoFUpZ9k0oX5+2HHGarbL4dqBcb8BsftFFHGFhPXGxV0ufOeSpG
+	 1zFCx/xvfwgk99K95SmOED30KufKAAzY+NjnglJJ1lggiKUX4B4XPMoTI0QBZIu+MC
+	 lrSny8tvEcY+I+kaMNyxYPu3fCaIQSju+2ZN5FbHx/3nr0npaJhXewW4z2VHY/O3m2
+	 tHc7aqqgSLeBoQHuhGmFefc/DJXV9Pb9FPD76At1V3dQn68DNdg/AOtOCNMMut5Zz5
+	 YV5vDf82x4YJwuLdKQZbCz9ao1FUtLa6hGdDtj4WrDLCejvF8mgkc/qENju8VR+Xke
+	 qFewpsNjfxpQg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vlP2q-00000006i5m-1uFn;
+	Thu, 29 Jan 2026 10:14:36 +0000
+Date: Thu, 29 Jan 2026 10:14:36 +0000
+Message-ID: <86bjicbu9f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 12/20] KVM: arm64: Add RESx_WHEN_E2Hx constraints as configuration flags
+In-Reply-To: <CA+EHjTzL6bNZ=sZoub3GY=VZ2bJ+4bFr4jkuiMMBCEqXuAkQPA@mail.gmail.com>
+References: <20260126121655.1641736-1-maz@kernel.org>
+	<20260126121655.1641736-13-maz@kernel.org>
+	<CA+EHjTzL6bNZ=sZoub3GY=VZ2bJ+4bFr4jkuiMMBCEqXuAkQPA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAhV-H66uH1TpaKTsqNtSqKYUDatJWj+zAuw-MYE88BqOF0XTA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxTMKeL3tp5Sc5AA--.41408S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxJFWrtFyfurW5Xw47GF15Awc_yoW5Gr1kpr
-	Z29F4q9r4rKr4I9an2qrWDCr4ayrs7KFW7ZF92ya4DAFn8u3WxJr48KFWavFy5A348WF18
-	uan5Ja4q9Fn8XacCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9ab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
-	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C2
-	67AKxVWUXVWUAwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
-	8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWU
-	CwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r
-	1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsG
-	vfC2KfnxnUUI43ZEXa7IU8j-e5UUUUU==
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[loongson.cn];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-69529-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69527-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,loongson.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54C1DAE4F3
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4DED2AE717
 X-Rspamd-Action: no action
 
+Hey Fuad,
 
-
-On 2026/1/29 下午5:26, Huacai Chen wrote:
-> Hi, Bibo,
+On Wed, 28 Jan 2026 17:43:40 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> On Mon, Jan 26, 2026 at 10:48 AM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->> With LA664 CPU there are more features supported which are indicated
->> in CPUCFG2 bit24:30 and CPUCFG3 bit17 and bit 23. KVM hypervisor can
->> not enable or disable these features and there is no KVM exception
->> when instructions of these features are used in guest mode.
->>
->> Here add more CPUCFG mask support with LA664 CPU type.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> ---
->>    1. Rebase on the latest version since some common CPUCFG bit macro
->>       definitions are merged.
->>    2. Modifiy the comments explaining why it comes from feature detect
->>       of host CPU.
->> ---
->>   arch/loongarch/kvm/vcpu.c | 15 +++++++++++++++
->>   1 file changed, 15 insertions(+)
->>
->> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->> index 656b954c1134..a9608469fa7a 100644
->> --- a/arch/loongarch/kvm/vcpu.c
->> +++ b/arch/loongarch/kvm/vcpu.c
->> @@ -652,6 +652,8 @@ static int _kvm_setcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 val)
->>
->>   static int _kvm_get_cpucfg_mask(int id, u64 *v)
->>   {
->> +       unsigned int config;
->> +
->>          if (id < 0 || id >= KVM_MAX_CPUCFG_REGS)
->>                  return -EINVAL;
->>
->> @@ -684,9 +686,22 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
->>                  if (cpu_has_ptw)
->>                          *v |= CPUCFG2_PTW;
->>
->> +               /*
->> +                * The capability indication of some features are the same
->> +                * between host CPU and guest vCPU, and there is no special
->> +                * feature detect method with vCPU. Also KVM hypervisor can
->> +                * not enable or disable these features.
->> +                *
->> +                * Here use host CPU detected features for vCPU
->> +                */
->> +               config = read_cpucfg(LOONGARCH_CPUCFG2);
->> +               *v |= config & (CPUCFG2_FRECIPE | CPUCFG2_DIV32 | CPUCFG2_LAM_BH);
->> +               *v |= config & (CPUCFG2_LAMCAS | CPUCFG2_LLACQ_SCREL | CPUCFG2_SCQ);
->>                  return 0;
->>          case LOONGARCH_CPUCFG3:
->>                  *v = GENMASK(16, 0);
->> +               config = read_cpucfg(LOONGARCH_CPUCFG3);
->> +               *v |= config & (CPUCFG3_DBAR_HINTS | CPUCFG3_SLDORDER_STA);
-> What about adding CPUCFG3_ALDORDER_STA and CPUCFG3_ASTORDER_STA here, too?
-I am ok to add these bits.
-
-It is strange that there is both capability bit and status bit. AFAIK 
-cpucfg is read-only, status bit means that it will change at runtime. I 
-will negotiate with HW guys about these bits.
-
-Regards
-Bibo Mao
+> Hi Marc,
 > 
-> Huacai
+> On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > "Thanks" to VHE, SCTLR_EL2 radically changes shape depending on the
+> > value of HCR_EL2.E2H, as a lot of the bits that didn't have much
+> > meaning with E2H=0 start impacting EL0 with E2H=1.
+> >
+> > This has a direct impact on the RESx behaviour of these bits, and
+> > we need a way to express them.
+> >
+> > For this purpose, introduce a set of 4 new constaints that, when
+> > the controlling feature is not present, force the RESx value to
+> > be either 0 or 1 depending on the value of E2H.
+> >
+> > This allows diverging RESx values depending on the value of E2H,
+> > something that is required by a bunch of SCTLR_EL2 bits.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/config.c | 24 +++++++++++++++++++++---
+> >  1 file changed, 21 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > index 1990cebc77c66..7063fffc22799 100644
+> > --- a/arch/arm64/kvm/config.c
+> > +++ b/arch/arm64/kvm/config.c
+> > @@ -26,6 +26,10 @@ struct reg_bits_to_feat_map {
+> >  #define        MASKS_POINTER   BIT(3)  /* Pointer to fgt_masks struct instead of bits */
+> >  #define        AS_RES1         BIT(4)  /* RES1 when not supported */
+> >  #define        REQUIRES_E2H1   BIT(5)  /* Add HCR_EL2.E2H RES1 as a pre-condition */
+> > +#define        RES0_WHEN_E2H0  BIT(6)  /* RES0 when E2H=0 and not supported */
+> > +#define        RES0_WHEN_E2H1  BIT(7)  /* RES0 when E2H=1 and not supported */
+> > +#define        RES1_WHEN_E2H0  BIT(8)  /* RES1 when E2H=0 and not supported */
+> > +#define        RES1_WHEN_E2H1  BIT(9)  /* RES1 when E2H=1 and not supported */
+> >
+> >         unsigned long   flags;
+> >
+> > @@ -1298,10 +1302,24 @@ struct resx compute_resx_bits(struct kvm *kvm,
+> >                         match &= !e2h0;
+> >
+> >                 if (!match) {
+> > +                       u64 bits = reg_feat_map_bits(&map[i]);
+> > +
+> > +                       if (e2h0) {
+> > +                               if      (map[i].flags & RES1_WHEN_E2H0)
+> > +                                       resx.res1 |= bits;
+> > +                               else if (map[i].flags & RES0_WHEN_E2H0)
+> > +                                       resx.res0 |= bits;
+> > +                       } else {
+> > +                               if      (map[i].flags & RES1_WHEN_E2H1)
+> > +                                       resx.res1 |= bits;
+> > +                               else if (map[i].flags & RES0_WHEN_E2H1)
+> > +                                       resx.res0 |= bits;
+> > +                       }
+> > +
+> >                         if (map[i].flags & AS_RES1)
+> > -                               resx.res1 |= reg_feat_map_bits(&map[i]);
+> > -                       else
+> > -                               resx.res0 |= reg_feat_map_bits(&map[i]);
+> > +                               resx.res1 |= bits;
+> > +                       else if (!(resx.res1 & bits))
+> > +                               resx.res0 |= bits;
 > 
->>                  return 0;
->>          case LOONGARCH_CPUCFG4:
->>          case LOONGARCH_CPUCFG5:
->>
->> base-commit: 63804fed149a6750ffd28610c5c1c98cce6bd377
->> --
->> 2.39.3
->>
->>
+> The logic here feels a bit more complex than necessary, specifically
+> regarding the interaction between the E2H checks and the fallthrough
+> to AS_RES1.
+> 
+> Although AS_RES1 and RES0_WHEN_E2H0 are mutually exclusive in
+> practice, the current structure technically permits a scenario where
+> both res0 and res1 get set if the flags are mixed (the e2h0 block sets
+> res0, and the AS_RES1 block falls through and sets res1). This cannot
+> be ruled out by looking at this function alone.
+> 
+>   It might be cleaner (and safer) to determine the res1 first, and
+> then apply the masks. Something like:
+> 
+> +                       bool is_res1 = false;
+> +
+> +                       if (map[i].flags & AS_RES1)
+> +                               is_res1 = true;
+> +                       else if (e2h0)
+> +                               is_res1 = (map[i].flags & RES1_WHEN_E2H0);
+> +                       else
+> +                               is_res1 = (map[i].flags & RES1_WHEN_E2H1);
+> ...
 
+I think you have just put your finger on something that escaped me so
+far. You are totally right that the code as written today is ugly, and
+the trick to work out that we need to account the bits as RES0 is
+awful.
+
+But it additionally outlines something else: since RES0 is an implicit
+property (we don't specify a flag for it), RES0_WHEN_E2Hx could also
+be implicit properties. I couldn't find an example where anything
+would break. This would also avoid the combination with AS_RES1 by
+construction.
+
+> 
+> This also brings up a side point: given the visual similarity of these
+> flags, it is quite easy to make a typo and accidentally combine
+> incompatible flags (e.g., AS_RES1 | RESx_WHEN_E2Hx, or RES0_WHEN_E2H0
+> | RES1_WHEN_E2H0), would it be worth adding a check to warn on
+> obviously invalid combinations?
+> 
+> Or maybe even redefining AS_RES1 to be
+> (RES1_WHEN_E2H1|RES1_WHEN_E2H0), which is what it is conceptually.
+> That could simplify this code even further:
+> 
+> +                       if (e2h0)
+> +                               is_res1 = (map[i].flags & RES1_WHEN_E2H0);
+> +                       else
+> +                               is_res1 = (map[i].flags & RES1_WHEN_E2H1);
+
+While that would work, I think this is a step too far. Eventually, we
+should be able to sanitise things outside of NV, and RES1 should not
+depend on E2H at all in this case.
+
+I ended up with the following hack, completely untested (needs
+renumbering, and the rest of SCTLR_EL2 repainted). Let me know what
+you think.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 562513a4683e2..204e5aeda4d24 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -26,8 +26,6 @@ struct reg_bits_to_feat_map {
+ #define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bits */
+ #define	AS_RES1		BIT(4)	/* RES1 when not supported */
+ #define	REQUIRES_E2H1	BIT(5)	/* Add HCR_EL2.E2H RES1 as a pre-condition */
+-#define	RES0_WHEN_E2H0	BIT(6)	/* RES0 when E2H=0 and not supported */
+-#define	RES0_WHEN_E2H1	BIT(7)	/* RES0 when E2H=1 and not supported */
+ #define	RES1_WHEN_E2H0	BIT(8)	/* RES1 when E2H=0 and not supported */
+ #define	RES1_WHEN_E2H1	BIT(9)	/* RES1 when E2H=1 and not supported */
+ 
+@@ -1375,22 +1373,15 @@ struct resx compute_resx_bits(struct kvm *kvm,
+ 		
+ 		if (!match) {
+ 			u64 bits = reg_feat_map_bits(&map[i]);
++			bool res1;
+ 
+-			if (e2h0) {
+-				if      (map[i].flags & RES1_WHEN_E2H0)
+-					resx.res1 |= bits;
+-				else if (map[i].flags & RES0_WHEN_E2H0)
+-					resx.res0 |= bits;
+-			} else {
+-				if      (map[i].flags & RES1_WHEN_E2H1)
+-					resx.res1 |= bits;
+-				else if (map[i].flags & RES0_WHEN_E2H1)
+-					resx.res0 |= bits;
+-			}
+-
+-			if (map[i].flags & AS_RES1)
++			res1  = (map[i].flags & AS_RES1);
++			res1 |= e2h0 && (map[i].flags & RES1_WHEN_E2H0);
++			res1 |= !e2h0 && (map[i].flags & RES1_WHEN_E2H1);
++
++			if (res1)
+ 				resx.res1 |= bits;
+-			else if (!(resx.res1 & bits))
++			else
+ 				resx.res0 |= bits;
+ 		}
+ 	}
+
+-- 
+Without deviation from the norm, progress is not possible.
 
