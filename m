@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-69507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69508-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHBkEVYAe2nKAQIAu9opvQ
-	(envelope-from <kvm+bounces-69507-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 07:38:14 +0100
+	id SI6qEHkAe2nKAQIAu9opvQ
+	(envelope-from <kvm+bounces-69508-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 07:38:49 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8AA3AC431
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 07:38:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A89CFAC449
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 07:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BD27301F332
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 06:37:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88E9A301D6AD
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 06:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E2A3793B6;
-	Thu, 29 Jan 2026 06:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F653793B6;
+	Thu, 29 Jan 2026 06:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dpc0bYwj"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jwNq9kqE"
 X-Original-To: kvm@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010063.outbound.protection.outlook.com [52.101.46.63])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013061.outbound.protection.outlook.com [40.93.201.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE602E6CC0;
-	Thu, 29 Jan 2026 06:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED271E1DE9;
+	Thu, 29 Jan 2026 06:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769668665; cv=fail; b=fhix0Z47oyM1dkGFBmOckAhXVLcWsxr6IHT4mDJm9QdYisOcLEW8/u2hBTFlRJB32GoRB4UGtuFsKITr3zs6e/2J/3T+QMIIHUhMA6ZK4t798zB1vvllBjSnzVmcAX4CLVI6rZWWgRvIR0h2wLCH7Gir7YOYSXo8ou/yekTgssc=
+	t=1769668699; cv=fail; b=gQUNQogthBN7DB9kzCmLABzhrLYwHg2sM5/RQychQqtF5zS0I/wxNabDkltHg1GUUhzReAHF2q4qlEkW400YXvxqCUckuMoAy9LUKngfZlrFNDb41No3VHyD+Ad/e7uaCwjp2+dN3vSlO+EB7Zteu0lNFgSAIy8EkpYKLWe1UNw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769668665; c=relaxed/simple;
-	bh=f6xCj9BUada2H5U3ZH+PiIWjdZ/ywRpSMFLrJGbzSv0=;
+	s=arc-20240116; t=1769668699; c=relaxed/simple;
+	bh=IaEmFIXFCQpENsA3Qj+qos/+7PLWZrZ5frojW0JQHV8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZrUbkGRUjE/ckXHcpxy8Vo4neJlKiw6HG/wBbzW0n/aqGHUfBLhEiKb3RxUXxQw/dfou2BmD0hINISnbiPU2rITah4a/bizd1PZoL+csRhD85b2EojnfBtZ/va9ywfyU2G3q3aVeS1QHH+aHz/ag+fPOK+iMbVwljEWd/Iy+zJE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dpc0bYwj; arc=fail smtp.client-ip=52.101.46.63
+	 MIME-Version:Content-Type; b=CuFviSMc9I6QHvRau7rPcFOSfbEh4jhvA+ko53jst/xKbeYkrPhmeO2DmCgo7dNmlTWrQ/T7XN2KS0qOzj8QwVDFgrnH6SNRtQMwbJrd8o1HHE4IWhYeRtP5I+wqPU9qhzNmJVTO7S14zrJG+kpw9xShYD/SXECXaPZROdJ+Lzk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jwNq9kqE; arc=fail smtp.client-ip=40.93.201.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Twlf5W7fwu3FlE/Tf5HdTNRWO3M30Y8+b6Dqc29SQRWYWd/SfvLXDL4yByJ0gSP86AC2UarZl+DQ1x+UFuwv6qlc/6PdOBBBctBPI0C00aeQceahNTXg9B4/yyKcSBoixdG39SU+mJQD2kWwJAGCvt87SoCkv9ZDc6m/dDAYYIh/93pgrBSSGjIS7PdqXD2D2XRgys0CpZUxEiPofXPwzFqux9WooeggaeEuBLPj4dk1gIcvRIVsuRrZCaR4py0u+9zGzDVAvgAhCj0SY+k34bb6XjAzVmUAiNzY+wRmKNUmTDlHxG0ElORGVFSMlZwLPdIERN+pKjqp77sHGhjegg==
+ b=o6yuSLt15+t4yWKn/2Nhm68f/KBQvA86risRjbGkxmQ7ICgp6T5PEJqT06gizpCxbgNwMpXWcYEXlw0BkfM43xv1QDJE6jHWitfOcckXgdcN3v3Q/q96jyWMJn7A5Jtl41kEWls5lHvj1tl1fMBVFUvrtdPjviYQsiRPINhyq+bb1Bsfo7HW3zfA4xqsSlO90Wwge2oC44TckTeS/caSVL0kP0CncQZ+uJbGaDBbM30ZLMHGtPxuIve/XUtSfaEc46zW3XA7+xXoV6TvABSuPBTGpFZbCRvsmByC3FzbuIVi/Paj/X3jl3wgFH6nXwx0shSSkwe7pG+KxVoUmam0rA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vJGu1Ag9pdgB9vosUGAIPstl2H5/S6CAoNI0oM6yPbo=;
- b=rDEoiZk2UqFnG5g3FQju9qFPNC+gPhDTWSJu8+HUE3GyKLD5h+lkzSwxmzcihc0jkjrmD2BXC+5tojuUlSqJCVXHOHsl8c7u3GptLFPtkHrVuu4lxOMwGyEYKb/oNnxJdXszIs1huHh+kQVqX0glstMcsJupQhv/w7npr1DZ2q1GmQXxxJ/JeMG3psKvvlW1GqZOSiHTTSW5ycWbJ5dlGgfRI8uYHf5bjXdr2EY4HGaF5wMFCGM8VDZCcu+kRwEE/quXnSv0iH+9A3PtAK1YO4pFLsyx/qUR/RDtZG1O1U+cVSJRvpKJeoH2s80vb1GbE9DNOka/p6ApmQtxRM68bA==
+ bh=xcy35tWQGczlKeHXhwXuzkWNoAILDCyX3iQOLbUzims=;
+ b=S3cH/y5/GXNiTLhUAN9kBV7v5o95Tt+DUqIPpEVcXvoApmlC1AH/igxmCUs4T0MPL/vvTXvKfsNv2Ne9E4ijstPCEbkDqqXaE8r+CJ/V3XrRURcA14TgZTEccQnBuCbvBZI76KObhmNq7TYUn1bByhv5blBEZC99TpMZhUp1sQLdjnddKwGdYYLiowMArb9AjZA0pQ4XITbiYicOCo2fx8KYIqkxolttsoeV549bPo7VcuekK/LFW6CQmfZJRzmoRef6t7YHvUSAVG7xUKcIC7qTj8WO1ARphzsERkV1eCkBPkU17eyleKJm+XKb41gPBwANBfv2xFL/6nm18I3M6g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vJGu1Ag9pdgB9vosUGAIPstl2H5/S6CAoNI0oM6yPbo=;
- b=Dpc0bYwj2sDYuPhHrJ8w8Tg3dyFVXciU+tUqWEGNF9MuJ0bVqJhrrwpK2Y6v4gubUMLkTUBGd/sTF9DZUE5h2CdeSISfuABwIaizTeIJVHUCryW+qVQZnkqdYm+kKwdoMuynEx8KywwAphwhCKCxBgKugtItIckym8OYihrKF0Y=
-Received: from BN9PR03CA0577.namprd03.prod.outlook.com (2603:10b6:408:10d::12)
- by LV9PR12MB9782.namprd12.prod.outlook.com (2603:10b6:408:2f2::21) with
+ bh=xcy35tWQGczlKeHXhwXuzkWNoAILDCyX3iQOLbUzims=;
+ b=jwNq9kqE8edVJIx4bHd6daZfmJViOQRf1+U7Nx5kr2sZMkARm6rsBBCe+pOx4kMZCgLYwuZ5otXqYTeRLjZOMg+wNC7lzacsTzYeEbB5yJ62oUVXZDWOCBLsFP7RoLZVeeX2fB2qrzZgVPVksi+co39+Od6sToSLr7m/BcgJ5Bw=
+Received: from BL1PR13CA0080.namprd13.prod.outlook.com (2603:10b6:208:2b8::25)
+ by BN5PR12MB9463.namprd12.prod.outlook.com (2603:10b6:408:2a9::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.8; Thu, 29 Jan
- 2026 06:37:40 +0000
-Received: from BN2PEPF00004FC0.namprd04.prod.outlook.com
- (2603:10b6:408:10d:cafe::c7) by BN9PR03CA0577.outlook.office365.com
- (2603:10b6:408:10d::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9564.8 via Frontend Transport; Thu,
- 29 Jan 2026 06:37:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Thu, 29 Jan
+ 2026 06:38:12 +0000
+Received: from BN2PEPF00004FC1.namprd04.prod.outlook.com
+ (2603:10b6:208:2b8:cafe::8e) by BL1PR13CA0080.outlook.office365.com
+ (2603:10b6:208:2b8::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9587.2 via Frontend Transport; Thu,
+ 29 Jan 2026 06:38:03 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,22 +66,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- BN2PEPF00004FC0.mail.protection.outlook.com (10.167.243.186) with Microsoft
+ BN2PEPF00004FC1.mail.protection.outlook.com (10.167.243.187) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9564.3 via Frontend Transport; Thu, 29 Jan 2026 06:37:40 +0000
+ 15.20.9564.3 via Frontend Transport; Thu, 29 Jan 2026 06:38:12 +0000
 Received: from purico-abeahost.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 29 Jan
- 2026 00:37:34 -0600
+ 2026 00:38:08 -0600
 From: Shivansh Dhiman <shivansh.dhiman@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>,
 	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
 CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
 	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
 	<xin@zytor.com>, <nikunj.dadhania@amd.com>, <santosh.shukla@amd.com>
-Subject: [PATCH 1/7] KVM: SVM: Initialize FRED VMCB fields
-Date: Thu, 29 Jan 2026 06:36:47 +0000
-Message-ID: <20260129063653.3553076-2-shivansh.dhiman@amd.com>
+Subject: [PATCH 2/7] KVM: SVM: Disable interception of FRED MSRs for FRED supported guests
+Date: Thu, 29 Jan 2026 06:36:48 +0000
+Message-ID: <20260129063653.3553076-3-shivansh.dhiman@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
 References: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
@@ -97,67 +97,67 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF00004FC0:EE_|LV9PR12MB9782:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7bb00716-48ff-4603-cdb9-08de5f00e671
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FC1:EE_|BN5PR12MB9463:EE_
+X-MS-Office365-Filtering-Correlation-Id: d86ad019-ad29-4b9c-02f5-08de5f00f97b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|7416014|1800799024;
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lra9LwmpfmO620oVtv0bQLzBbyKmtq9JWzpzZI16omDe8YED/B8i8tIUGEm0?=
- =?us-ascii?Q?B3JiH3Lhh7jTtuYobwrm27jOeMWrwU/xiXkZRJ2/kK5lma5fyNS2bzLMjKWS?=
- =?us-ascii?Q?vXjVmuIQA0donYeKkPOed2d4y1jmHlTt+fxWbbe2qaghAKnBiqek0KZcfhhk?=
- =?us-ascii?Q?HPgD6a6wuAMNgvKHsbWfsPJlokhKXilVuYLGApygaj5FX4e5G6Daw9gFOzWk?=
- =?us-ascii?Q?diH2vIvXYtEhzfWz+X2+h5NPaLmVBCAYtp4i9tSAxqHG4l/fs7Q2vM68t+oW?=
- =?us-ascii?Q?mIUbnaz0b+1ZOwd9CuyoRXJtli/onfHEhqRxmvYnQdp7VtaOo1UddCVcdOvy?=
- =?us-ascii?Q?qG4fkWyTVD1TDBDCsYgqfu3Qoqt21WASVDMAi10FpbOL+huW1QVoU+BewGh8?=
- =?us-ascii?Q?lqUhkPxBonDb5BC2zLJ7iDzHyT5YqejbocHo3ucGCGGKox8yBaxy+Hf/gBPq?=
- =?us-ascii?Q?eU5Viz/XKPZP7OUVnSTHANNbSxUTcfaOJ/GB2CHqBjpF10KR7G/c0nyXrXg2?=
- =?us-ascii?Q?ce50NIbX6MUDkIj3azFYp5sDFN5ypFJ1Z1iJBLsCh29YWrnBwOUYWFuWHyzW?=
- =?us-ascii?Q?HEBjvjiiNjCbK8fifW0Dz/acWlZwRctpGWWpFx7eRwonirWMfb0BUyTGU9q0?=
- =?us-ascii?Q?9fYYGUV5KEqvjUUQSPZP8adnxaK0xFlBq+t47DRfIIcnFOZgalxm32LI8bYs?=
- =?us-ascii?Q?LQt0iIm+gOkGzYQGEhevyG0ZheSeu06Yz09xbxiTAokGDQvmyBDRMepEnRNF?=
- =?us-ascii?Q?D4FfL1njNqXWg5AU8vG30k7Bk/5ZTCpUGEzFqOS0G3i1ZcLvLv9uKcHGibFG?=
- =?us-ascii?Q?Vo1IguNokiOE6VNtEN2L/Z9XvgfZGfaiqhtyXMYZvz27UcuhVzCZDZ2oYsRu?=
- =?us-ascii?Q?fIb4sSArbuHYG+exeYf1KfqjIZaUmcAS9Gn5qIxR5YNhfzgEs6L1fR3EZqHc?=
- =?us-ascii?Q?zz1h5Uj0HLRzv/A+37dXkBEkzTMkgsgpz6GgGuZTC/9lBtjLaFQ7uenX9OtO?=
- =?us-ascii?Q?GPqeioY6doxvMAkbvYXDvadpIPfuh8sJW1z0IutjzMyCE4uVv3NCiPshY/G9?=
- =?us-ascii?Q?e9GQoC6ldeKOl7gBqtq41n1ooSJHpIwaOs+o7hcsAOb1tXjtSsXqZ6D0GT+x?=
- =?us-ascii?Q?Vl8fPWFapfsZ7Vf68uZFJyC77T9qyrJyfLSqJ9MlmNKp8AcWFaNsOqLlewi2?=
- =?us-ascii?Q?RgJO11L/1ZTw5pptHU64uVNpBaz3f9r7trGXtuZcgW0N3sxfiG51LpJNNB3U?=
- =?us-ascii?Q?1i87fJUcUUDy9TsVC8c7B1gt2pldfVIUXz58ms0ffDHfyrNUDr8ZJ4dNyZBr?=
- =?us-ascii?Q?lPvhR2Ork3IeLILRe47YiibKjahoHInK5oU8wnjtpu3Su192bHvDcpzFsms+?=
- =?us-ascii?Q?7EYZXsjckO0M8dC6f4dPvCGU3Q7qlpssvCKhZTVfG+tjxkTuWaEq1bBh5+S5?=
- =?us-ascii?Q?nOLFv9YllJ96iHKWno+OKUe+ftVaQ1yf0tgmBJxoQg77sQL6LoH0jdlF7xZZ?=
- =?us-ascii?Q?+Mn5jT7UETnL+9zjWdPsdLmdFtCzwq9FphsAWYzcPlvPDDrABKcOgHuX6tXP?=
- =?us-ascii?Q?hSWFWV2OnGewcQ5EMdYo+tlnbLXnecRDJtkeqB5DxH1nA0H/q0KkSrB8YU4U?=
- =?us-ascii?Q?TLPLefZ/7sUKMuLCsomXbtWXP9PdWKLDYeiyn0aXq9BM//io1ftFa+DTPLe7?=
- =?us-ascii?Q?mHR2wg=3D=3D?=
+	=?us-ascii?Q?WGXmgsz7aGlFV3s0RGKw6cg8T1EjSjLM0oXIhW7ieTkbfeamKx/YPAedyp1z?=
+ =?us-ascii?Q?AouMk2N3ZpZGN/2QUd/Qbgs23I3ove6vAiLnnakI2tYl706ADCG/Qwbtk5VJ?=
+ =?us-ascii?Q?HPLH+Gewebxxfywk+kAQxRCkHhppJyT6gNqikbhSwEQWOm3yC/Y0SxQDCjlL?=
+ =?us-ascii?Q?HPxLcAywjLavwGfVi0v3lo2AofdoQ55EXPx7QiGLnInkBbSrflwqarYyKYvc?=
+ =?us-ascii?Q?6EP1M2+3JnqtGDlAhBM+Lo6UPqejggN2/ruIitb9Nwxkfv+nCi/EmK2BK39O?=
+ =?us-ascii?Q?WrFaGqSz1CrVw+trtw4eqcaPjYyHP89HXmYMX+Zi6BkP18ZCIqMVyGyG8qCl?=
+ =?us-ascii?Q?wugs65dmBfFQHKwf54oOmP2ncPbC5+jt6B50+QPsqj+WjhjcHGFiVQd9i6Qu?=
+ =?us-ascii?Q?oRvs3I1FvojKZWnWsEOTfPocg9GJNqvkklWWWTN2j94muYheSsOQjwrVMQ0n?=
+ =?us-ascii?Q?Rp8X6jPEta9Qs4J9+hCjBFHPwTqsZGv5WUfplo/bZxHPUatW+tRJCM9I8Ppu?=
+ =?us-ascii?Q?gj5KAtOoifVWMW5fdPw/t+Kcz9jhO/s/AyHg+pWVUrD2Om+FV3JULt5AIe0p?=
+ =?us-ascii?Q?Peor1jIbRwgqvKtmk2iw6Hng0GO6rk3zSQX4v34nMAef4BAFmmo6MvNeEf6F?=
+ =?us-ascii?Q?DYOhCUXk2AsFDhPYtZp0tQ/JbsbCKb+d8I3Nm13YeCFIztiycYU/NQoTPF5p?=
+ =?us-ascii?Q?2/nDYWamviSe3zgM+uWVWcSAHknEnUnoSzjw7NIjXG67OzpCmGUj9EdZF9E3?=
+ =?us-ascii?Q?QdrlwzrDLG2R0rzWvZ8SQbar9Xk+18CAMvWLYYg8Pgro0Qhz7aVun8XGYRjv?=
+ =?us-ascii?Q?e0FHksCu914TSesUvPo9C1/Ro+tt1dnLkRFzptO6O1Mjan/mJW7iSsjkBVwF?=
+ =?us-ascii?Q?T+ZsJyp9OP9FLSTuOKUDAKYfhBfRk0pUHNHVCaUQbY2BifiKYjCu3HuHjhoy?=
+ =?us-ascii?Q?F6z5a78ynHS4rQFMi6RfugXSh7enn5om3rycwZIspqxPwQ4e44urq98UdctI?=
+ =?us-ascii?Q?fRomh2awMK5RlSmxzhM/BQOEuef1bTxODss7tMI8DecSL1E+yfqUjd/rrEcJ?=
+ =?us-ascii?Q?oQIFI9lvJdlxcWc5noG5EAleeW9iP4Dgwvf16jhUb/b+IOmlFdQMUfRCFD45?=
+ =?us-ascii?Q?r/GJ+HM4LVU4huKW9hTELpsriBDKoEY+eGX9qbZ37OJ1YOgRlL3Np75WLGhA?=
+ =?us-ascii?Q?Zt5g5GjFNphEf1apBDwOff4r5kyiZxJEgFqhWBWH7PvJ2s0GNMXKbetwqFXg?=
+ =?us-ascii?Q?IASJb6rdxwadOsl5ZClfwq3v2+FoQMsVpEHKJ53rYrXH/u6aojqG5ZLi4C68?=
+ =?us-ascii?Q?SpaAB8LVQNOI6m3PakrV/09OQqNvBgggRhx6TGwewxNheew75o8ig0FXpAXZ?=
+ =?us-ascii?Q?62p5OpTaDQwBwcrxak4oDrjmgGqrfRb+igs2YkKkBfUjvxgD/dEMYOL2iIEE?=
+ =?us-ascii?Q?NLwP0YQICKgL0zHfN0m5m4yGLBjRJNlMzKmgrIuT5I9KI9LzQ+cZgbuB2TUH?=
+ =?us-ascii?Q?F/BPfGJGnhD/BwvbyGMcc0zaDwIAdcYKxqZ0i1Y+PAhKWGuMoSIG4chN16rx?=
+ =?us-ascii?Q?uBand6Gpaq1HlkrVlomJ5jp74udWLCx5X4ZG1XyJ0bm9m+sk00/D6pdbXMRD?=
+ =?us-ascii?Q?+55bKotsH+yvBa/1r7Ifo348Dc1G0YnKDhmRvmp991Wvb10CY+RkH0VgE/7o?=
+ =?us-ascii?Q?5W1xMA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 06:37:40.3352
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2026 06:38:12.2635
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bb00716-48ff-4603-cdb9-08de5f00e671
+X-MS-Exchange-CrossTenant-Network-Message-Id: d86ad019-ad29-4b9c-02f5-08de5f00f97b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF00004FC0.namprd04.prod.outlook.com
+	BN2PEPF00004FC1.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR12MB9782
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9463
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69507-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69508-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -173,115 +173,78 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: B8AA3AC431
+X-Rspamd-Queue-Id: A89CFAC449
 X-Rspamd-Action: no action
 
 From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 
-The upcoming AMD FRED (Flexible Return and Event Delivery) feature
-introduces several new fields to the VMCB save area. These fields include
-FRED-specific stack pointers (fred_rsp[0-3], fred_ssp[1-3]), stack level
-tracking (fred_stklvls), and configuration (fred_config).
+The FRED (Flexible Return and Event Delivery) feature introduces a new set
+of MSRs for managing its state, such as MSR_IA32_FRED_CONFIG and the
+various stack pointer MSRs.
 
-Ensure that a vCPU starts with a clean and valid FRED state on
-capable hardware. Also update the size of save areas of VMCB.
+For a guest that has FRED enabled via its CPUID bits, the guest OS
+expects to be able to directly read and write these MSRs. Intercepting
+these accesses would cause unnecessary VM-Exits and performance overhead.
+In addition, the state of the MSRs at any point should always correspond
+to the context (host or guest) which is running. Otherwise, the event
+delivery could refer to wrong MSR values.
 
 Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
 Co-developed-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
 Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
-Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
 ---
- arch/x86/include/asm/svm.h | 33 ++++++++++++++++++++++++++++++---
- arch/x86/kvm/svm/svm.c     | 10 ++++++++++
- 2 files changed, 40 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/svm.h |  1 +
+ arch/x86/kvm/svm/svm.c     | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 17f6c3fedeee..a42ed39aa8fb 100644
+index a42ed39aa8fb..c2f3e03e1f4b 100644
 --- a/arch/x86/include/asm/svm.h
 +++ b/arch/x86/include/asm/svm.h
-@@ -165,7 +165,10 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u8 reserved_9[22];
- 	u64 allowed_sev_features;	/* Offset 0x138 */
- 	u64 guest_sev_features;		/* Offset 0x140 */
--	u8 reserved_10[664];
-+	u8 reserved_10[40];
-+	u64 exit_int_data;		/* Offset 0x170 */
-+	u64 event_inj_data;
-+	u8 reserved_11[608];
- 	/*
- 	 * Offset 0x3e0, 32 bytes reserved
- 	 * for use by hypervisor/software.
-@@ -360,6 +363,18 @@ struct vmcb_save_area {
- 	u64 last_excp_to;
- 	u8 reserved_0x298[72];
- 	u64 spec_ctrl;		/* Guest version of SPEC_CTRL at 0x2E0 */
-+	u8 reserved_0x2e8[448];
-+	u64 guest_exit_int_data;        /* GUEST_EXITINTDATA 0x4A8 */
-+	u64 guest_event_inj_data;
-+	u64 fred_rsp0;
-+	u64 fred_rsp1;
-+	u64 fred_rsp2;
-+	u64 fred_rsp3;
-+	u64 fred_stklvls;
-+	u64 fred_ssp1;
-+	u64 fred_ssp2;
-+	u64 fred_ssp3;
-+	u64 fred_config;
- } __packed;
+@@ -224,6 +224,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
  
- /* Save area definition for SEV-ES and SEV-SNP guests */
-@@ -472,6 +487,18 @@ struct sev_es_save_area {
- 	u8 fpreg_x87[80];
- 	u8 fpreg_xmm[256];
- 	u8 fpreg_ymm[256];
-+	u8 reserved_0x670[568];
-+	u64 guest_exit_int_data;        /* GUEST_EXITINTDATA 0x8A8 */
-+	u64 guest_event_inj_data;
-+	u64 fred_rsp0;
-+	u64 fred_rsp1;
-+	u64 fred_rsp2;
-+	u64 fred_rsp3;
-+	u64 fred_stklvls;
-+	u64 fred_ssp1;
-+	u64 fred_ssp2;
-+	u64 fred_ssp3;
-+	u64 fred_config;
- } __packed;
+ #define LBR_CTL_ENABLE_MASK BIT_ULL(0)
+ #define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
++#define FRED_VIRT_ENABLE_MASK BIT_ULL(4)
  
- struct ghcb_save_area {
-@@ -542,9 +569,9 @@ struct vmcb {
- 	};
- } __packed;
- 
--#define EXPECTED_VMCB_SAVE_AREA_SIZE		744
-+#define EXPECTED_VMCB_SAVE_AREA_SIZE		1280
- #define EXPECTED_GHCB_SAVE_AREA_SIZE		1032
--#define EXPECTED_SEV_ES_SAVE_AREA_SIZE		1648
-+#define EXPECTED_SEV_ES_SAVE_AREA_SIZE		2304
- #define EXPECTED_VMCB_CONTROL_AREA_SIZE		1024
- #define EXPECTED_GHCB_SIZE			PAGE_SIZE
- 
+ #define SVM_INTERRUPT_SHADOW_MASK	BIT_ULL(0)
+ #define SVM_GUEST_INTERRUPT_MASK	BIT_ULL(1)
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f4ccb3e66635..5cec971a1f5a 100644
+index 5cec971a1f5a..05e44e804aba 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -1110,6 +1110,16 @@ static void init_vmcb(struct kvm_vcpu *vcpu, bool init_event)
- 	save->idtr.base = 0;
- 	save->idtr.limit = 0xffff;
+@@ -727,6 +727,22 @@ void svm_vcpu_free_msrpm(void *msrpm)
+ 	__free_pages(virt_to_page(msrpm), get_order(MSRPM_SIZE));
+ }
  
-+	save->fred_rsp0 = 0;
-+	save->fred_rsp1 = 0;
-+	save->fred_rsp2 = 0;
-+	save->fred_rsp3 = 0;
-+	save->fred_stklvls = 0;
-+	save->fred_ssp1 = 0;
-+	save->fred_ssp2 = 0;
-+	save->fred_ssp3 = 0;
-+	save->fred_config = 0;
++static void svm_recalc_fred_msr_intercepts(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	bool fred_enabled = svm->vmcb->control.virt_ext & FRED_VIRT_ENABLE_MASK;
 +
- 	init_sys_seg(&save->ldtr, SEG_TYPE_LDT);
- 	init_sys_seg(&save->tr, SEG_TYPE_BUSY_TSS16);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP1, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP2, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP3, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_STKLVLS, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP1, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP2, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP3, MSR_TYPE_RW, !fred_enabled);
++	svm_set_intercept_for_msr(vcpu, MSR_IA32_FRED_CONFIG, MSR_TYPE_RW, !fred_enabled);
++}
++
+ static void svm_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -795,6 +811,8 @@ static void svm_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+ 	if (sev_es_guest(vcpu->kvm))
+ 		sev_es_recalc_msr_intercepts(vcpu);
  
++	svm_recalc_fred_msr_intercepts(vcpu);
++
+ 	/*
+ 	 * x2APIC intercepts are modified on-demand and cannot be filtered by
+ 	 * userspace.
 -- 
 2.43.0
 
