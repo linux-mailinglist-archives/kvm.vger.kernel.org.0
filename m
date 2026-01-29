@@ -1,239 +1,190 @@
-Return-Path: <kvm+bounces-69550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69551-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MBqrKIpwe2mMEgIAu9opvQ
-	(envelope-from <kvm+bounces-69550-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 15:36:58 +0100
+	id mMXxD8xwe2mMEgIAu9opvQ
+	(envelope-from <kvm+bounces-69551-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 15:38:04 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CA80B108B
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 15:36:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9369DB10B7
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 15:38:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 08D543020840
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 14:36:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5C9CB304288A
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 14:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AD93168E8;
-	Thu, 29 Jan 2026 14:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930C11F9F70;
+	Thu, 29 Jan 2026 14:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZxwqYsgc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="02+0m23J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f65.google.com (mail-lf1-f65.google.com [209.85.167.65])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAAE2FFDF7
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 14:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE422C3256
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 14:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769697383; cv=none; b=TOFPEI0wOu0lK+S8/liNYrq8UYl3w7leNp2R/xSFIOBEKARdCUd96z8qxcM4/WlkfTkDvLQhdCqOA0KAYC5p/KDjcGmoBGhwjWZt7oh+5Xzjg4FO3lZilagcVFHk1Ata85BExdjEsMT9wqNdc/Kx/FcmzYjBod3lhz22peVi4GE=
+	t=1769697406; cv=none; b=UDZi9me2BvVmaM3FUcKumGtTig3wmeNxA87NEdzMJyQ38DikIBBG+hUQk/88ZAZNQGlfpGv9vt2a9OTsHsUq2byoGV4RZ9rOoh2RvMJRlhKi8qxQOm6Be+67aN6N7hObAoBEJYYbuDL7L8r6bgOvvWCoGSKaqMtKP7d2aiT0MMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769697383; c=relaxed/simple;
-	bh=ANQwl8weniEr3yhzdlhVQGQZ449UNTL3DKFoQ/EudaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ajwbNahT67wcnk/2iJNx3khvNIaEW/DhL87gI8qiFlOfysn2LB4AHdbgBmg+IoDeM21Vtrd09W559z4UQBh0Yk23YTdT2CgCahaUOKQkU9EgDF7TssiqG1z+whf/ye3rM0FZHsivyI5IAHXfgPhjHxfmmBH77gNw9J05+GTCMq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZxwqYsgc; arc=none smtp.client-ip=209.85.167.65
+	s=arc-20240116; t=1769697406; c=relaxed/simple;
+	bh=znwZloF/bqh5zsvZiN44nSWQB16aALxNizfmVX+WlRw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DfQMGyLO5nupFMljeocqKB0IRC/RqDzuUrWUsd3H2cjzmXZ2x12CHV1Hy1tYZpdJIBgCwGNYJOnESh/rI2xj0pUMHTfDTla4MrKAsiMhHuOCXXJ11csFruHkcJxslSbcg7d/BKDMf1KOCWv3bcBokQikGz5BTUIGmtWDOTZFSg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=02+0m23J; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f65.google.com with SMTP id 2adb3069b0e04-59de0b7c28aso1154760e87.1
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 06:36:20 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34ab459c051so1863776a91.0
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 06:36:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769697379; x=1770302179; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GCBf85o7m+LpjtZO2vby61ve+5QD+ZPBxgo311Kvx5c=;
-        b=ZxwqYsgcsRDpg8P+2CkVnKIa97Uuw8sHfUjPyK68xS1ikxzYlgpEErT5jowzRYVqFV
-         bOnW3UrliNORNnOSTzYOkB0XBdj4BDSCFDd1KJQimcesEZkaU4luEzsncxgxUJBzly37
-         G8iOaMW8VaoAi/DQNkj/FNgz9cP8/ueEsIbrzXdXzGO9dhO6LVH7eW2iPMIEs7tX3EJg
-         4IPh5xmLvIYUEbrIZ0oPl45abJRk2h/k70ogrQ5+H2/3/eH9qTG4jztKc0eC96oKtrWT
-         AdT9SZUC3336ycSg+WnHuwhoqwvYtgnwxDbbem+CiWZe+UyzfzoM64QgdcjZfDatX8cx
-         4JZg==
+        d=google.com; s=20230601; t=1769697403; x=1770302203; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fc8ELM/gTsPjpCHlht3R3Sj8sQv9T3iDgJmyY1+bv10=;
+        b=02+0m23JQKEJTkyNwefQedtPAH4wx78VBGXTZBbL9HqFoF1xbClZwV/PxJ+vGTzwIw
+         1n4e9XHXlVs0QDKo5nlord1ir4r6lUQOa7h0gKNDlSetoVwopoyxogrnUxcuCxPWR/mD
+         wP1H0IQmWwnv9WB6J3FolwIjAJV9SDLlppOFakqTfEpdup5Vxs4ZrQTY3NDuV7tFlckt
+         Gv4UGA/9Y4dL/7mH8LSc6uOY1cAuxFnlS2ZMIAu5w64FigkIyNZVunxtbix54WC6E9pn
+         Jvj+71jwq36KpsD9tAHsXwsxmVguu7yJYSNu2PhIQJvjmxA1DwKgCYSSChKxaRN4EuL4
+         3YAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769697379; x=1770302179;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GCBf85o7m+LpjtZO2vby61ve+5QD+ZPBxgo311Kvx5c=;
-        b=PUSh5e050uNvArZLzL5B501B7gmgwvS3PVdS/86XNjRQKETcTQthPEeKQflLv5HihG
-         axf01oTif7usTM2NAj8TkBljvkiSOgEjJ9/L4gW6jGx7gIFyIgZZPFZy9BGYLQv+NXA0
-         nQj0ZtHI2cnasxSks80yO/RUms8kX4apg+mGFJ54S79NwwWtQQGsq3RfOd9d+QNwteCl
-         IB0dtPYM+vR/Khahq/PgqHqoYMUCxe8Y8gttTKxSyywtH9ChhWtVFjXTvTTLigFPN5ur
-         hxuGLFhGF0FtfihI9uSzbNZgYQakJdYBA7CJNNL7fYag6/Q7omXcSuZBuW5HhxomIoDc
-         YLMg==
-X-Forwarded-Encrypted: i=1; AJvYcCV47KZEm80foTe4/N+8clY7cxTMNRLG6GpzN5YmErpZ00lFamapVOVyO7szsn+XtPEKhXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytVzBatA+dQIa0OB5jot/LTNWRdPotkzslBnMV0kzC/HAVOtIe
-	v2vqE+Hl14D0DLEQaZMSKRRf2dI6fshxrb9KqeteOJ8Kcd9uBKt9XSex7bpd1bBeDQinjXMx+cH
-	i2S84dUaX
-X-Gm-Gg: AZuq6aLRdXu1xKDNJ/Tutsaq39sG+1b/Pd7JHX+I4eKOBqouWkY8zYGnNKzOaQVlkht
-	5njMExJDiHlFph8BMwnoC7R8gtIfnWknmsaGRGXjdG9bObL0/9Inqc1QlV1HvMcCgFTKkfc+5Kk
-	gPBTrr0GuK/0mgXbusPQC80413FXQXwF7A5m27XnXMbpTj+8O6/WEl/981EhrjUsXC5rnS50uTp
-	XzYptaCtRlvs570X7g8fJL6Ww4ABR6d0EUKKEi14rbAqvLX0e4oVBBkS4Ms5PBmhI2Ll39eABxb
-	Tz55PY7f2PycfnAGbrHwd1/Cwdl9IaCe5Le5E42t580gXngrWg1xypPl+LX14+h6AYUnAeJSotZ
-	0cVOJUNVfTm8vRO6HOuSUT5VGkvVNBXHOKDwDovJhEeX3U4w4DXjnPCu8g3blWuRULZgkDMNouw
-	t7pIPU0Wsl50zUVuieInd2q0YyB5WYElXdbUcPws8OYEArqw==
-X-Received: by 2002:a05:6512:10c1:b0:59d:f4b8:c3ac with SMTP id 2adb3069b0e04-59e0401702cmr4088944e87.18.1769697378667;
-        Thu, 29 Jan 2026 06:36:18 -0800 (PST)
-Received: from google.com (133.23.88.34.bc.googleusercontent.com. [34.88.23.133])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59e074bbe0bsm1156180e87.83.2026.01.29.06.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 06:36:17 -0800 (PST)
-Date: Thu, 29 Jan 2026 14:36:14 +0000
-From: Quentin Perret <qperret@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Alexey Kardashevskiy <aik@amd.com>, cgroups@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org, akpm@linux-foundation.org, 
-	binbin.wu@linux.intel.com, bp@alien8.de, brauner@kernel.org, chao.p.peng@intel.com, 
-	chenhuacai@kernel.org, corbet@lwn.net, dave.hansen@intel.com, 
-	dave.hansen@linux.intel.com, david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, jarkko@kernel.org, 
-	jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de, jthoughton@google.com, 
-	jun.miao@intel.com, kai.huang@intel.com, keirf@google.com, kent.overstreet@linux.dev, 
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
-	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
-	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, muchun.song@linux.dev, 
-	nikunj@amd.com, nsaenz@amazon.es, oliver.upton@linux.dev, palmer@dabbelt.com, 
-	pankaj.gupta@amd.com, paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, richard.weiyang@gmail.com, 
-	rick.p.edgecombe@intel.com, rientjes@google.com, rostedt@goodmis.org, roypat@amazon.co.uk, 
-	rppt@kernel.org, shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, tglx@linutronix.de, 
-	thomas.lendacky@amd.com, vannapurve@google.com, vbabka@suse.cz, viro@zeniv.linux.org.uk, 
-	vkuznets@redhat.com, wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, 
-	wyihan@google.com, xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v1 05/37] KVM: guest_memfd: Wire up
- kvm_get_memory_attributes() to per-gmem attributes
-Message-ID: <od4dx6snqsl2qiocgf3jxm4dndxhrlvsfr22eveuno6nskgfdj@mxsywvku2jk5>
-References: <cover.1760731772.git.ackerleytng@google.com>
- <071a3c6603809186e914fe5fed939edee4e11988.1760731772.git.ackerleytng@google.com>
- <07836b1d-d0d8-40f2-8f7b-7805beca31d0@amd.com>
- <CAEvNRgEuez=JbArRf2SApLAL0usv5-Q6q=nBPOFMHrHGaKAtMw@mail.gmail.com>
- <20260129003753.GZ1641016@ziepe.ca>
- <aXqx3_eE0rNh6nP0@google.com>
- <20260129011618.GA2307128@ziepe.ca>
- <i22yykvttpc2e4expluuzucczqnetdnpee2wx2fzqwg7cnt45x@ovx7e7hok5iz>
- <20260129134245.GD2307128@ziepe.ca>
+        d=1e100.net; s=20230601; t=1769697403; x=1770302203;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fc8ELM/gTsPjpCHlht3R3Sj8sQv9T3iDgJmyY1+bv10=;
+        b=Fmf0NWj05B9vk2BCXXk7fhHvGc6MTqzOlpoCV6QH9+Ny81YiQ73Fccs3cbTwFhIqEW
+         PMiiJQK5l/LIWyqoxF3Ebtf3H1abLE9GiOP1KyA+Jk3szZpFw8jNzgDUIDZe5t/7w/94
+         pL9WD8Aj7TbZFTbx6xYB7tLHccrT5GBLGdv9ZzBOleoL0n1u1XIA4d1/7u7kmT3y4Erk
+         yhd51BsaxtNMZyqAI86F241EpTk3JuNCX6WB/9apdviUVmXjV/Bt4/6XhT/YU7kF2V7j
+         nKwji1oGdEQNyunODRZJno99wfSaxmXG4pUfFrROvKCLxFPqD61fYVQQC241HCbRx0I0
+         H4lw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmCa+xvfQFDjOVp33qFXgRy1gTeuK/K8rI81hPulIXE2ZcksgEGhvwjjAcvFaTdwg5qus=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVwlCfwbgg7+590VPxhhrS6AQcnaydauJq9IKDbXs63lSic+Xi
+	GK9LFe0oLjz/7/KAribPPMRJVYMWmmfW4/ozv1VwdBjwPXgF59nKU3c5ZI6XVRnv0hQQUKMwzsH
+	zFkXiDQ==
+X-Received: from pjbmp8.prod.google.com ([2002:a17:90b:1908:b0:353:2f4:eaf9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3901:b0:353:e91:9b2f
+ with SMTP id 98e67ed59e1d1-353fedcc422mr8402350a91.37.1769697402792; Thu, 29
+ Jan 2026 06:36:42 -0800 (PST)
+Date: Thu, 29 Jan 2026 06:36:41 -0800
+In-Reply-To: <aW4kd4nCjP+9Akva@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260129134245.GD2307128@ziepe.ca>
+Mime-Version: 1.0
+References: <20260106102136.25108-1-yan.y.zhao@intel.com> <2906b4d3b789985917a063d095c4063ee6ab7b72.camel@intel.com>
+ <aWrMIeCw2eaTbK5Z@google.com> <aW2Iwpuwoyod8eQc@yzhao56-desk.sh.intel.com>
+ <3ef110f63cbbc65d6d4cbf737b26c09cb7b44e7c.camel@intel.com>
+ <e69815db698474e113dec16bd33116e54cb21c2a.camel@intel.com>
+ <aW4DXajAzC9nn3aJ@yzhao56-desk.sh.intel.com> <d9b677b4f4cbbf8a8c3dadb056077aa55feb5c30.camel@intel.com>
+ <aW4QGYQ+qMytZ4Jq@yzhao56-desk.sh.intel.com> <aW4kd4nCjP+9Akva@yzhao56-desk.sh.intel.com>
+Message-ID: <aXtweWFELioEZLzv@google.com>
+Subject: Re: [PATCH v3 11/24] KVM: x86/mmu: Introduce kvm_split_cross_boundary_leafs()
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, Fan Du <fan.du@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Dave Hansen <dave.hansen@intel.com>, "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, 
+	"tabba@google.com" <tabba@google.com>, "vbabka@suse.cz" <vbabka@suse.cz>, "david@kernel.org" <david@kernel.org>, 
+	"michael.roth@amd.com" <michael.roth@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Chao P Peng <chao.p.peng@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "ackerleytng@google.com" <ackerleytng@google.com>, 
+	"kas@kernel.org" <kas@kernel.org>, "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>, 
+	"francescolavra.fl@gmail.com" <francescolavra.fl@gmail.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"sagis@google.com" <sagis@google.com>, Chao Gao <chao.gao@intel.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Jun Miao <jun.miao@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, "jgross@suse.com" <jgross@suse.com>, 
+	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,amd.com,vger.kernel.org,kvack.org,kernel.org,linux-foundation.org,linux.intel.com,alien8.de,intel.com,lwn.net,redhat.com,cmpxchg.org,infradead.org,zytor.com,suse.cz,arm.com,amazon.com,nvidia.com,suse.de,linux.dev,oracle.com,maciej.szmigiero.name,loongson.cn,efficios.com,digikod.net,ellerman.id.au,amazon.es,dabbelt.com,sifive.com,gmail.com,goodmis.org,amazon.co.uk,linutronix.de,zeniv.linux.org.uk,huawei.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69551-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69550-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,amd.com,google.com,suse.cz,kernel.org,redhat.com,linux.intel.com,suse.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qperret@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[97];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3CA80B108B
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9369DB10B7
 X-Rspamd-Action: no action
 
-On Thursday 29 Jan 2026 at 09:42:45 (-0400), Jason Gunthorpe wrote:
-> On Thu, Jan 29, 2026 at 11:10:12AM +0000, Quentin Perret wrote:
+On Mon, Jan 19, 2026, Yan Zhao wrote:
+> On Mon, Jan 19, 2026 at 07:06:01PM +0800, Yan Zhao wrote:
+> > On Mon, Jan 19, 2026 at 06:40:50PM +0800, Huang, Kai wrote:
+> > > Similar handling to 'end'.  An additional thing is if one to-be-split-
+> > > range calculated from 'start' overlaps one calculated from 'end', the
+> > > split is only needed once. 
+> > > 
+> > > Wouldn't this work?
+> > It can work. But I don't think the calculations are necessary if the length
+> > of [start, end) is less than 1G or 2MB.
+> > 
+> > e.g., if both start and end are just 4KB-aligned, of a length 8KB, the current
+> > implementation can invoke a single tdp_mmu_split_huge_pages_root() to split
+> > a 1GB mapping to 4KB directly. Why bother splitting twice for start or end?
+> I think I get your point now.
+> It's a good idea if introducing only_cross_boundary is undesirable.
 > 
-> > A not-fully-thought-through-and-possibly-ridiculous idea that crossed
-> > my mind some time ago was to make KVM itself a proper dmabuf
-> > importer. 
+> So, the remaining question (as I asked at the bottom of [1]) is whether we could
+> create a specific function for this split use case, rather than reusing
+> tdp_mmu_split_huge_pages_root() which allocates pages outside of mmu_lock. 
+
+Belatedly, yes.  What I want to avoid is modifying core MMU functionality to add
+edge-case handling for TDX.  Inevitably, TDX will require invasive changes, but
+in this case they're completely unjustified.
+
+FWIW, if __for_each_tdp_mmu_root_yield_safe() were visible outside of tdp_mmu.c,
+all of the x86 code guarded by CONFIG_HAVE_KVM_ARCH_GMEM_CONVERT[*] could live in
+tdx.c.
+
+Hmm, actually, looking at that again, it's totally doable to bury the majority of
+the logic in tdx.c, the TDP MMU just needs to expose an API to split hugepages in
+mirror roots.  Which is effectively what tdx_handle_mismatched_accept() needs as
+well, since there can only be one mirror root in practice.
+
+Oof, and kvm_tdp_mmu_split_huge_pages() used by tdx_handle_mismatched_accept()
+is wrong; it operates on the "normal" root, not the mirror root.
+
+Let me respond to those patches.
+
+[*] https://lore.kernel.org/all/20260129011517.3545883-45-seanjc@google.com
+
+> This
+> way, we don't need to introduce a spinlock to protect the page enqueuing/
+> dequeueing of the per-VM external cache (see prealloc_split_cache_lock in patch
+> 20 [2]).
 > 
-> AFAIK this is already the plan. Since Intel cannot tolerate having the
-> private MMIO mapped into a VMA *at all* there is no other choice.
-> 
-> Since Intel has to build it it I figured everyone would want to use it
-> because it is probably going to be much faster than reading VMAs.
+> Then we would disallow mirror_root for tdp_mmu_split_huge_pages_root(), which is
+> currently called for dirty page tracking in upstream code. Would this be
+> acceptable for TDX migration?
 
-Ack.
+Honestly, I have no idea.  That's so far in the future.
 
-> Especially in the modern world of MMIO BARs in the 512GB range.
-> 
-> > You'd essentially see a guest as a 'device' (probably with an
-> > actual struct dev representing it), and the stage-2 MMU in front of it
-> > as its IOMMU. That could potentially allow KVM to implement dma_map_ops
-> > for that guest 'device' by mapping/unmapping pages into its stage-2 and
-> > such. 
-> 
-> The plan isn't something so wild..
-
-I'll take that as a compliment ;-)
-
-Not dying on that hill, but it didn't feel _that_ horrible after
-thinking about it for a little while. From the host's PoV, a guest is
-just another thing that can address memory, which has its own address
-space and a page-table that we control in front. If you squint hard
-enough it doesn't look _that_ different from a device from that angle.
-Oh well.
-
-> https://github.com/jgunthorpe/linux/commits/dmabuf_map_type/
-> 
-> The "Physical Address List" mapping type will let KVM just get a
-> normal phys_addr_t list and do its normal stuff with it. No need for
-> hacky DMA API things.
-
-Thanks, I'll read up.
-
-> Probably what will be hard for KVM is that it gets the entire 512GB in
-> one shot and will have to chop it up to install the whole thing into
-> the PTE sizes available in the S2. I don't think it even has logic
-> like that right now??
-
-The closest thing I can think of is the KVM_PRE_FAULT_MEMORY stuff in
-the KVM API that forces it to fault in an arbitrarily range of guest
-IPA space. There should at least be bits of infrastructure that can be
-re-used for that I guess.
-
-> > It gets really funny when a CoCo guest decides to share back a subset of
-> > that dmabuf with the host, and I'm still wrapping my head around how
-> > we'd make that work, but at this point I'm ready to be told how all the
-> > above already doesn't work and that I should go back to the peanut
-> > gallery :-)
-> 
-> Oh, I don't actually know how that ends up working but I suppose it
-> could be meaningfully done :\
-
-For mobile/pKVM we'll want to use dmabufs for more than just passing
-MMIO to guests FWIW, it'll likely be used for memory in certain cases
-too. There are examples in the KVM Forum talk I linked in the previous
-email, but being able to feed guests with dmabuf-backed memory regions
-is very helpful. That's useful to e.g. get physically contiguous memory
-allocated from a CMA-backed dmabuf heap on systems that don't tolerate
-scattered private memory well for example (either for functional or
-performance reasons). I certainly wish we could ignore this type of
-hardware, but we don't have that luxury sadly.
-
-In cases like that, we certainly expect that the guest will be sharing
-back parts of memory it's been given (at least a swiotlb bounce buffer
-so it can do virtio etc), and that may very well be in the middle of a
-dmabuf-backed memslot. In fact the guest has no clue what is backing
-it's memory region, so we can't really expect it _not_ to do that :/
+> [1] https://lore.kernel.org/all/aW2Iwpuwoyod8eQc@yzhao56-desk.sh.intel.com/
+> [2] https://lore.kernel.org/all/20260106102345.25261-1-yan.y.zhao@intel.com/
 
