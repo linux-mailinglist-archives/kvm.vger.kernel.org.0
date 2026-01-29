@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-69619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69624-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAb1IfDQe2m0IgIAu9opvQ
-	(envelope-from <kvm+bounces-69619-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 22:28:16 +0100
+	id 0GIzMJDSe2m0IgIAu9opvQ
+	(envelope-from <kvm+bounces-69624-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 22:35:12 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71FE0B4A92
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 22:28:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27F29B4D4E
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 22:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3EF2C3011B54
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 21:27:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4822D3066423
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 21:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB22366816;
-	Thu, 29 Jan 2026 21:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AAF3612FF;
+	Thu, 29 Jan 2026 21:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jeUpRM1U"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oqTfR/f3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9645736606E
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 21:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837AD366049
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 21:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769721961; cv=none; b=Km51v4cjEtgZRVstiEamB8LR2vzzaFFYoAsWafcJIRW+uIK3Pkniw+ORRuaWF4xHeCxncWT/HysRVsb5i20WMSj9g7JGsVmZqMQNVwXt/Rg0HQHgPSlAvNn/YgtgKj7CvV8m7SLCr+ipufPLgk3aWbWiab0MQrGJK5pWkev9llM=
+	t=1769721971; cv=none; b=IoJDVYlfIWutQZ+V3kv1ppQYi0wIx/vSlJUuuiVgKvB1MC9zYehJQx+NoOUQ6pVTA/Y2JpQUF0XkCaG//CPD4N6cH0g7on9UdqSnY6CjKKSy7SC57KEgVLK+pBXqt4dKFDV5vRlagW9ztbg+tQ8GHbSQuvytxyb+2KadX0CQ3YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769721961; c=relaxed/simple;
-	bh=FPm4HNnNzdGsASTEmXYmmsAPSB4aul9GWDReAyxeCCY=;
+	s=arc-20240116; t=1769721971; c=relaxed/simple;
+	bh=Jis9QmSRTC6AxZZguKb1BxVkXKYzE5EgFNnbHekO2IA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R1h8MWs0ZkMFOKY3mVm67BiqhwGv+At9oNanuA0N6V5ZUeqi3VjRpwHCg8vwTXzpQGPUB54+YZMnn7S3+zXtEhqtMWgRzh2o2wQeXBpaCJ0jcnbjGCC7IZFT8/LKtY+oO3I9tOFSeCij/yEPAYzxucaOrMVf0YXxnlIbgJ5j08E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jeUpRM1U; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=XjuLVZELaVNm1x6Yw7phNedwxWvaDaQQhynGCWfdApKDMT9qy/nxob1bRMhay6cVf1YLo9N42CaG1ueuBgDPIyd9Ows95Lj9JmTPRJu6b3d1u5Hg7jXNaTGAY5wShD0t2o55i+drDSp3d2iqjk9zPiYbUO3VagN0AYACE0mDK1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oqTfR/f3; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c54e81eeab9so902436a12.3
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 13:25:59 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a79164b686so15015985ad.0
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 13:26:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769721959; x=1770326759; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769721961; x=1770326761; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=idHpW3SDccKJdv6+7GcWw8jBEpKmDKEMPgP0EwwfxqU=;
-        b=jeUpRM1UNmTsBxYdioDrYyaaBwCFGiaoczwyCBJZM67st2YYKUK208OKLs7RYsr+D1
-         BJBExVhnR5YILu3UlQ3Ik9nU/V3io0yTjFysavSShZS6Zi83Moo6S/iiOg9okaftHKTG
-         /OCM7VqwrAJ1caIGChnC1gcg4HOBFTLLhphWpuY3BACjk3dqIz/7O6mFsy/A6PPjLunC
-         ObFwNqzIUX+EtQiMLStK0f3Zvp+ugXw9XHCOG10iSBdzrs/04Mf0Pl994mDUK0jvpWBt
-         kA1Dh67dlTNA3ioHsoQdQlnsjWivaZ3NzH7oihtDOml5t+98mMjV8eXnd9FeNtdw6B7p
-         xneA==
+        bh=dy0UJfAzqC2Uv0TXXgbyaGP8I7SQ7WbjV2I2sUTFK/o=;
+        b=oqTfR/f3sqqiJ4FsX88tf5lJRqyrnV9wLcLhcRoljtXnLfCrOFKWavxNkiKmIH6Lf/
+         obTwP9dc1q9yI06Uco2+Eio3WlraRyysYY2O1uiNFNel7ZR8K2xJkeTcWT6n1paa9OUt
+         bwLmvpaxrIo4e7NtHZrSikfRWtxgW2mSE2an0DyCG61PBkn4A3SJsMaLPSAjagp70Ce1
+         NZys+z5B4PRKdU4v+k+MjDrJzXE/10hNDhraM2qxClOrwvsY76Ye99wMUCNaZSLLKDTk
+         Kz2D44wxl29hiOchwksRPp9xMSXXOvAS6xY4a/qelLonzm6D3VybaFCyDqQCUzD0p+xA
+         c9Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769721959; x=1770326759;
+        d=1e100.net; s=20230601; t=1769721961; x=1770326761;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=idHpW3SDccKJdv6+7GcWw8jBEpKmDKEMPgP0EwwfxqU=;
-        b=BnbVJ/jaY45Sok6oktE+T94Li2mpICrnvG8STY/n0h2FHm2RmWY1LMqKMwUZfCTCCx
-         wZVtiM7a791lpJ+XrAtYWnHiXsBLDESJ5NC4QzptDuVDYFFYhd0S7stfGOzLPp+raF2m
-         b4plDmvCFNvVSSoo2YkV4MtNDKThMBIZXFXO6sQPen9vBs1BWCFraAseP6MAsEJno81T
-         g8XmxGY3XDgnEiwE7bS61Bk8yznI1zs30W8xBqAnZOWoR01JDUPDWqbbynQY5u0m91Di
-         KRrNhO1Vhz4MCCUiQpJ6beqZMwmg7oxgduP7Hpcghglg4FCvNDHuWCaKu9E0iINMuDMH
-         uDrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUj9EfTGgAXg2P5741UrXMpyyvCZ2xF++MgIj61UzQm4St5rAsYRoBn/hxN5Eh4apdQceE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfHPPZmvzIcKJWQGo1+rT8VM9nRLxND3Noatk6Q8OvgzbTxplo
-	aZNYWJfmP6AZMItbBdWxxd5klrOwppAwAqpbGJbP6DHnh1IRes3Tf0UmxqZJsN+5suryI+qrNaw
-	thZm6+qUP6aW7tQ==
-X-Received: from pgdj29.prod.google.com ([2002:a05:6a02:521d:b0:c5e:d16c:917e])
+        bh=dy0UJfAzqC2Uv0TXXgbyaGP8I7SQ7WbjV2I2sUTFK/o=;
+        b=L3sME2L3ED3r1zYAnBGCzvdT+c8wEbpQs6ObcrvplFDQsu2EfZpPL8YCq7Q6mN4vid
+         laiLU+4CS2BZd0I912kgtp6iQoLVHDDc8jhyMtqkOpZT+JUhEZRZdEMQ7Feaqk34C7Dh
+         LRvCjwD/O1ghTn1fdwPyCLsNb0wjPVy/G/9uIJyoXL9WVyLcqT9irb/GdMc89o6i2vDZ
+         Bz/mTIHmo17xYmByoUPE1jjukfZXmvkiZLasRK+BzkoKcMKR3JQ99C+/LPQm2jPFEAWY
+         cLh4IlKo2CnoYhzdCZt5X12ZeTlh+iLpLjd49amUWiJox3u5UCZCDMymjUKWv3CQRB0g
+         j+uw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvzPP+O/aJ75OiZjcSGQnZvELFYnk2Io/pUgDXleNQPs+RoRjTp0V0oyx48C/uhy9mHVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKMQJ832tschw1OTK5MBN1tttjl15XWJn1ZGH9+PrWVuYdVLDh
+	q12vZqs5TR1e47wuH51JMFWZx9i6TI+JU712fgccgGENZAFQXe5cJh7ZjZzUohB9Rtc+SSSzjuV
+	ipdieBaFuJCJcjg==
+X-Received: from plrp10.prod.google.com ([2002:a17:902:b08a:b0:2a0:8ca0:1e55])
  (user=dmatlack job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:3392:b0:366:581e:1a11 with SMTP id adf61e73a8af0-392e0148145mr472290637.57.1769721958852;
- Thu, 29 Jan 2026 13:25:58 -0800 (PST)
-Date: Thu, 29 Jan 2026 21:25:00 +0000
+ 2002:a17:903:290d:b0:2a0:dabc:1388 with SMTP id d9443c01a7336-2a8d990adfcmr3786725ad.28.1769721960616;
+ Thu, 29 Jan 2026 13:26:00 -0800 (PST)
+Date: Thu, 29 Jan 2026 21:25:01 +0000
 In-Reply-To: <20260129212510.967611-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260129212510.967611-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260129212510.967611-14-dmatlack@google.com>
-Subject: [PATCH v2 13/22] selftests/liveupdate: Add helpers to
- preserve/retrieve FDs
+Message-ID: <20260129212510.967611-15-dmatlack@google.com>
+Subject: [PATCH v2 14/22] vfio: selftests: Build liveupdate library in VFIO selftests
 From: David Matlack <dmatlack@google.com>
 To: Alex Williamson <alex@shazbot.org>
 Cc: Adithya Jayachandran <ajayachandra@nvidia.com>, Alexander Graf <graf@amazon.com>, 
@@ -108,13 +107,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69619-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69624-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -127,114 +126,55 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 71FE0B4A92
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 27F29B4D4E
 X-Rspamd-Action: no action
 
 From: Vipin Sharma <vipinsh@google.com>
 
-Add helper functions to preserve and retrieve file descriptors from an
-LUO session. These will be used be used in subsequent commits to
-preserve FDs other than memfd.
+Import and build liveupdate selftest library in VFIO selftests.
 
-No functional change intended.
+It allows to use liveupdate ioctls in VFIO selftests
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Co-developed-by: David Matlack <dmatlack@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../liveupdate/lib/include/libliveupdate.h    |  3 ++
- .../selftests/liveupdate/lib/liveupdate.c     | 41 +++++++++++++++----
- 2 files changed, 35 insertions(+), 9 deletions(-)
+ tools/testing/selftests/vfio/Makefile | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/liveupdate/lib/include/libliveupdate.h b/tools/testing/selftests/liveupdate/lib/include/libliveupdate.h
-index 4390a2737930..4c93d043d2b3 100644
---- a/tools/testing/selftests/liveupdate/lib/include/libliveupdate.h
-+++ b/tools/testing/selftests/liveupdate/lib/include/libliveupdate.h
-@@ -26,6 +26,9 @@ int luo_create_session(int luo_fd, const char *name);
- int luo_retrieve_session(int luo_fd, const char *name);
- int luo_session_finish(int session_fd);
+diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+index 3c796ca99a50..1e50998529fd 100644
+--- a/tools/testing/selftests/vfio/Makefile
++++ b/tools/testing/selftests/vfio/Makefile
+@@ -12,6 +12,7 @@ TEST_FILES += scripts/setup.sh
  
-+int luo_session_preserve_fd(int session_fd, int fd, int token);
-+int luo_session_retrieve_fd(int session_fd, int token);
-+
- int create_and_preserve_memfd(int session_fd, int token, const char *data);
- int restore_and_verify_memfd(int session_fd, int token, const char *expected_data);
+ include ../lib.mk
+ include lib/libvfio.mk
++include ../liveupdate/lib/libliveupdate.mk
  
-diff --git a/tools/testing/selftests/liveupdate/lib/liveupdate.c b/tools/testing/selftests/liveupdate/lib/liveupdate.c
-index 60121873f685..9bf4f16ca0a4 100644
---- a/tools/testing/selftests/liveupdate/lib/liveupdate.c
-+++ b/tools/testing/selftests/liveupdate/lib/liveupdate.c
-@@ -54,9 +54,35 @@ int luo_retrieve_session(int luo_fd, const char *name)
- 	return arg.fd;
- }
+ CFLAGS += -I$(top_srcdir)/tools/include
+ CFLAGS += -MD
+@@ -19,11 +20,15 @@ CFLAGS += $(EXTRA_CFLAGS)
  
-+int luo_session_preserve_fd(int session_fd, int fd, int token)
-+{
-+	struct liveupdate_session_preserve_fd arg = {
-+		.size = sizeof(arg),
-+		.fd = fd,
-+		.token = token,
-+	};
-+
-+	if (ioctl(session_fd, LIVEUPDATE_SESSION_PRESERVE_FD, &arg))
-+		return -errno;
-+
-+	return 0;
-+}
-+
-+int luo_session_retrieve_fd(int session_fd, int token)
-+{
-+	struct liveupdate_session_retrieve_fd arg = {
-+		.size = sizeof(arg),
-+		.token = token,
-+	};
-+
-+	if (ioctl(session_fd, LIVEUPDATE_SESSION_RETRIEVE_FD, &arg))
-+		return -errno;
-+
-+	return arg.fd;
-+}
-+
- int create_and_preserve_memfd(int session_fd, int token, const char *data)
- {
--	struct liveupdate_session_preserve_fd arg = { .size = sizeof(arg) };
- 	long page_size = sysconf(_SC_PAGE_SIZE);
- 	void *map = MAP_FAILED;
- 	int mfd = -1, ret = -1;
-@@ -75,9 +101,8 @@ int create_and_preserve_memfd(int session_fd, int token, const char *data)
- 	snprintf(map, page_size, "%s", data);
- 	munmap(map, page_size);
+ LDFLAGS += -pthread
  
--	arg.fd = mfd;
--	arg.token = token;
--	if (ioctl(session_fd, LIVEUPDATE_SESSION_PRESERVE_FD, &arg) < 0)
-+	ret = luo_session_preserve_fd(session_fd, mfd, token);
-+	if (ret)
- 		goto out;
+-$(TEST_GEN_PROGS): %: %.o $(LIBVFIO_O)
+-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $< $(LIBVFIO_O) $(LDLIBS) -o $@
++LIBS_O := $(LIBVFIO_O)
++LIBS_O += $(LIBLIVEUPDATE_O)
++
++$(TEST_GEN_PROGS): %: %.o $(LIBS_O)
++	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBS_O) $(LDLIBS) -o $@
  
- 	ret = 0;
-@@ -92,15 +117,13 @@ int create_and_preserve_memfd(int session_fd, int token, const char *data)
- int restore_and_verify_memfd(int session_fd, int token,
- 			     const char *expected_data)
- {
--	struct liveupdate_session_retrieve_fd arg = { .size = sizeof(arg) };
- 	long page_size = sysconf(_SC_PAGE_SIZE);
- 	void *map = MAP_FAILED;
- 	int mfd = -1, ret = -1;
+ TEST_GEN_PROGS_O = $(patsubst %, %.o, $(TEST_GEN_PROGS))
+-TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_PROGS_O) $(LIBVFIO_O))
++TEST_DEP_FILES := $(patsubst %.o, %.d, $(TEST_GEN_PROGS_O))
++TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBS_O))
+ -include $(TEST_DEP_FILES)
  
--	arg.token = token;
--	if (ioctl(session_fd, LIVEUPDATE_SESSION_RETRIEVE_FD, &arg) < 0)
--		return -errno;
--	mfd = arg.fd;
-+	mfd = luo_session_retrieve_fd(session_fd, token);
-+	if (mfd < 0)
-+		return mfd;
- 
- 	map = mmap(NULL, page_size, PROT_READ, MAP_SHARED, mfd, 0);
- 	if (map == MAP_FAILED)
+ EXTRA_CLEAN += $(TEST_GEN_PROGS_O) $(TEST_DEP_FILES)
 -- 
 2.53.0.rc1.225.gd81095ad13-goog
 
