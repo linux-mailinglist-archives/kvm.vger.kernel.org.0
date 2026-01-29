@@ -1,109 +1,109 @@
-Return-Path: <kvm+bounces-69585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69586-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFVfK0mde2nOGAIAu9opvQ
-	(envelope-from <kvm+bounces-69585-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:47:53 +0100
+	id EEmOGGKee2nOGAIAu9opvQ
+	(envelope-from <kvm+bounces-69586-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:52:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A657B331A
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:47:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8888DB33F1
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:52:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B7D5830777B2
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:44:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5370300D0D7
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DFEE354AC7;
-	Thu, 29 Jan 2026 17:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F1F3559E3;
+	Thu, 29 Jan 2026 17:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tRHKENYT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L3jYyhN0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BD32C15BA
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 17:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DA5347BA5
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 17:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769708642; cv=pass; b=X3pUPXqm9603yECUjcNzI2lAcAOxXqijpH8i1WAJUEXYsZHZhEQ8UH+5Qjz4KLIUCoBMWfcp/aa7D4Zoe7Df0FChUA8iQ1wtUlII/yhnNozLu1XXjIAo9hVUfjDHksngWaQBxwEFgNaovUU/1q7FxR5XK23YG2Tm9OpWwzfx8f0=
+	t=1769709134; cv=pass; b=JVnPnUbKh4YjlyceuTjSxcP+3qu3TUconmM2uuO/mzyv/6XnADVe2twddgsEZXixUxi1xEZw764eU8rW4Uz+oA0onR4PZxlV8NoG90uRTvgxYI4vTe8BT1ZgW00BHvZmp6Nz5MMsc+iXeyL/REZkXMCCx9E7f7MZVbC+iDzCzhI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769708642; c=relaxed/simple;
-	bh=Qm7IrBwcroMf4JNK902e+KjqQCbztMqp90GzMr7Ke1U=;
+	s=arc-20240116; t=1769709134; c=relaxed/simple;
+	bh=9Ak46LEVCwhOJ4dFCTIpVOefYezUL+JMSUS/w3aykog=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uEoM51VDUerOEzdPYTx/+pvAmqqQxmXedDnzOPACpq6iK3Nqlro324iTH7kddUPiQUsx0mc3KLIGk3ZaoFOZ/Xx5Tp0Kuj1kuT2bdW7+C0ZnLcn3FQNKpYGlnWSiXJieez7hzwPRVAMawjohO1EEIs/OWgg/1CUvhvxasWvpQ24=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tRHKENYT; arc=pass smtp.client-ip=209.85.160.173
+	 To:Cc:Content-Type; b=nXkr3+VKkHCpVEcsBca/+Cp89Y31ShJRQ/FvkHctvHMvmWfeS9hLxCKNy54rYxQwBZeIdSI3dQGetCMz97/WPz/LbEXsLXD6cwlXlDidrjzIf34Dgqh9tP53wb9lfIYhpogC/zplgoRA1LvKGPmm7a0O2I4ilRY+foBU7Gj3duM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L3jYyhN0; arc=pass smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-5033b64256dso6391cf.0
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 09:44:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769708640; cv=none;
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-5033b64256dso1851cf.0
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 09:52:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769709131; cv=none;
         d=google.com; s=arc-20240605;
-        b=I3O5f72mEB7WWW3yGVeR7fmMvywZDDi3AhroH+6Jpx+macye/cnDjypYdh1xInnIBM
-         NMUGK1fITBFUD0ojC1NrtRd/OEywINgtFouYHhoC9ehSy6pYAB+XkAwfoUUPwnOJ4Cx5
-         tjt8kTvv+vQnu19alN5xvePZE7WszSi5jIfXsIMk1UVQAO4YV1X81rispn2kE/3Am4Jo
-         3c/nZWCthtBUxK7PIiT2att119gjCbPkGDLniyGnttB0utZR+TJ65EX9E3T9+fkitVb+
-         0AYYB5t4ijtenSYen3ctj25sbMnuz9VSn1xDJjRhbrr9NbQecjzL5FYQO9JZxdk+ASZk
-         GjpA==
+        b=kxYC8BZCrTID55g0YWjMHh2wF1X2O7YKLOnOchfpaJN5ex52/SJ1ngxyLvAHV2ZMoH
+         d2u7ETyKl0TNa3qrLL/SnxG5+3Ca/+nBbt3u0hyyTohCrqnz6SFzvgJvAG0vr47mIRro
+         3Cw0HPuEYcGxXeTVLJBqLvmJwsU71ZZh6tLCAP3QWMZSmmn6/EePARPE5Hi7taUpWAm7
+         TaiUKWXc6clMiDKPiRvYrv3rOBgHijLknBTtkS19xAXYP4oCvgbpQRNVwbf2hc5zbItj
+         mXxNnKGoGBQSVTOoAttQ/sIaL6XxLxjJuXhDfXE/5ILbtRcsBCd25+nFjTi3Usv1w4BH
+         T2BQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=BPx3FQm16cHh/4wjy/zL7AjgWXFPiOJBez90RRz9q3A=;
-        fh=mRkmCxwEUPekh2SimShOtBjKmIjUH6DuGreq/iReAzs=;
-        b=Azei/tNk0jaAf3B8YROMogyMG0XEKJRWmM2FAD9lBaW+OujQb9VN4O/UEuwD6XGiYH
-         apPGroJbjpf7QlpbM/5z5usu0Nt76gTlQRsGgHfBFNBjGKI4zm8hJf3OdsaiCW0K4Pft
-         GCnmSnTR5+m++dYynmmhbmBwzxo3rgwsEWWWrxKJo2UAsx3ss24cxCk5Q08ESONRk7Kt
-         K4ZZV3nkmpo93Gx5Qzc2vU9VWHpQXBuoAW5xZTCGPmBlDZBUQxaDkjI1NkkU81Zzc1SN
-         pq01EYU1ihhzk6R32irJbo/vKMuqTMxjTIowbHlGZJ12xtkVQwfDjwqowvt+Resc4Glu
-         BRtw==;
+        bh=rFkUGWSSI69uP0vyiVno+p+O/XXB1AsOCXVbUdPg2U0=;
+        fh=MiZ/0JnhaR1a8cHpvJjTisDse3CgQ+uPswvI4cfw5Jw=;
+        b=b2AuFNZYEFek5nnQTt4n4jchJe2j7O/hcoWZCE+AugqNboZDoJWCQLqdzpKwJT8ET0
+         vg9cIXFY8ej0Qg+9Lr3T7TWgB0z4Vs+F2cCf+LxeSOyxxCzgB10+rTla3HOp+GHHjOme
+         c2othgwzeQJ8BQzdQYg8UafDx30TCrQplQixRD0G1jQSayoP+Hs9hUSpDaDM33MpIwf7
+         D+5rtE3GvabDWGYz6NdfeFCwZqhDiG1w42uOkmZEqyRcW3ZGl4YFs5Oq3HHy7xoLr5E2
+         vmrgJFol/8Oo+YK/H8BzzxRUKVZWKKqYv0OZAo5DoYMHHtJp7FRRsmhuNL6iymhiGq1i
+         b1mQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769708640; x=1770313440; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1769709131; x=1770313931; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BPx3FQm16cHh/4wjy/zL7AjgWXFPiOJBez90RRz9q3A=;
-        b=tRHKENYTvwEM9fh9ZehZhWvgW9BmTfpCi/kk7OJaVI2BwlGeviVOFXTgXp0k3FFJ+T
-         sNiCac5RuiVeZWD1BlmkUBGK1Vc7Thodo6Ye1xbrRP+KJ8Isk98cIzBCfzfv7/QbMUnB
-         eACMy8BuYaS4jzxkVqc3dRl97e/j+btB5V/tY8wi1Ip9Jwe7KmpRI0Bg5q7TEcK9kxrj
-         l9NFBrGBG70O3FqKJ5YxAGj5pKNzA18z27TnHFO02ufMyRFzC6Z8oiDex+q9rWKhrGWj
-         7iiXTZF4OlblZqpADSdOd5FER6Mswmy+lq9qpsKMVXS8EFsm2UFd+GWCCWiCN9tqmEIh
-         D3ZQ==
+        bh=rFkUGWSSI69uP0vyiVno+p+O/XXB1AsOCXVbUdPg2U0=;
+        b=L3jYyhN0nMEjLbb8d5sOa74TFfvX3cFSQtm0waBJvyYaCHS03Ty7/pPelzVCWNmxX6
+         wUI3U9s8LXYa6A7kBvJaAkktbtHrIJgpKeELrsxA9cMQ+QgrQx8Dd5BFPuorVv04/7xr
+         SscENUrmyXgJpHlA63LlEErx56bLf9QbDtvYLsknVBrAMEZSxSyZ2VrQbkO4awl0FLN4
+         hvj8u0UncwRP/ECTYoPFvk7GBFGthq/u1uk7Tpi8+edzUH0TN9P+wEpGBp/ZKzWYE0gy
+         d9jGo+cTqhWoN6otDw+QD6A+uKy19wd/jOV7hZ2ioJfCMOzmqNmaKWuI9JOx5j19LhGw
+         QTvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769708640; x=1770313440;
+        d=1e100.net; s=20230601; t=1769709131; x=1770313931;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BPx3FQm16cHh/4wjy/zL7AjgWXFPiOJBez90RRz9q3A=;
-        b=kMn7AxRwQeOSGiW6nABmuxnpGfqyFrIeP03ldUBAB5oC97QbR4sQQVYNl/n34f4/5Z
-         gjneEiHu2yqU/HiN/AKc6EunFLOO0t76z6tQYM49ZO16myB0jaTh7nhzcspkzsM5NIbA
-         1HynlCX+ofEH4/+MkCc4n9X5/hqDZD0VRTh8CLv2jHRyyPDXitF602MZxbivepim+6jx
-         UWLO0FU/xyGZv8GQqVEHVTFgx3BXsqlDUfXLwOyDjQbtwDC9bqYsn6j/eEklIvs2Ji3A
-         /yLnY8ovNXN06bW9hSy8GK2zZJjgPM5uk+Qufct7Eo5AvSCfVmIWNL4MCSIiQb/3X7kH
-         uUNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWl6K7A8jLjEl9YHZMelNFdKlqkdyjlC5K/YBUfpWkaosWg6h3y0kv/h71V7HXvEqvgIK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMdeFkzxJEWIBvQtfOHcEP7fvrwBv39QFdqmIPpZQ3gtiZFxE+
-	+JNu+4wT1aga3a6Hi8admIF13dW2UnwLkWZdmm+91B9dwD3trLBt+SeDS6RALZQ5COj6EjQ77MJ
-	hTxjDzJggkKZ0GMNxiRh+YeDwHKzsDbGgFe13dCQt
-X-Gm-Gg: AZuq6aL8WxQe4C0CK0jB5QEOcRbA8KSzUS5n0tPwzqbh3COHLeg0tn969V7Qy0oDLSg
-	NfAoMwX8SfVFKKnuQMS+Cic+1eo1FDLM88txe8Lp+kYS7tSZTdA+DUavsJ3TnkCFBZixy7zg0aP
-	bukBJlmG1jRtrTw3436nfQTpVP9BZSifu8cmQ21sgikgNSI351e5pat5jR311lCzkAUrNLkEVEJ
-	32BJvQK3ZDJMb4Z0lbavik0+/ztqt2vttmsa3qvRQr/SHtabYbZ1I4Cex+vQuvzsQo6ze8s
-X-Received: by 2002:ac8:7c45:0:b0:4ff:bfdd:3f46 with SMTP id
- d75a77b69052e-504310ac4a2mr11679881cf.15.1769708639982; Thu, 29 Jan 2026
- 09:43:59 -0800 (PST)
+        bh=rFkUGWSSI69uP0vyiVno+p+O/XXB1AsOCXVbUdPg2U0=;
+        b=ZjPzdXcgrKarKekSr4Q54rP7OXFaQyI9tn7A5k1TdilsAW9cGEHCblIqO/Pc2CMvs1
+         lVVyHN6VJUQGILrUFV4TpFrFBjUCPLNKoljS8cLIgKaiNrJ8pRL0oD1Rvbgc0eoDRuVq
+         KIvMhbDoCxi1j5/UQbWSFHsh/EvW9EcbzuUqEkmD55ybCZozH+jdxMr1I1jvehiUJf+B
+         B18kG5cKfee78izPkGEVADAQJ1aJhtOw/gDRQxSeqiuURUTLTa1niUKp8PrMaKM3+a5/
+         dVO+lmaJr58sJwHABpsnDfJxHj1gHov1vizxGonWjKFbgVlTnDP0A3lMO1SxMi1b6tvU
+         lTdg==
+X-Forwarded-Encrypted: i=1; AJvYcCX6FFFyr6aIrJGAsZ35UkMcDtWkomDr9uORKc4PTFXPzjr5bE0/aW/QHoir/ml8CVgO8EE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwH54ik4fvxXkQ9GeDf2wPvgWo1SE3rY1n6WWgeO5RKGTR9S67h
+	ZXxPvv9KRmp/JYOJvZ9smHDfRmHWT1zzbP57LIOxS1yk/boW31FT25iSfhHjnwLB1wrmHGbxMCo
+	c0NZkWU9eAgUEV4DmroDeZY3/u5zLPKDYvueIArUE
+X-Gm-Gg: AZuq6aLdYT8f++NHkV83zKp6oFeJ+JTVIHdpEDZIsduzg1uIAi6qVLmL2QG5GCYbQT9
+	wdi0SMKQPj//crAAqIZ8ceMtTOW05DeUr7FoYsgDM4wK5xobw3JFB0WkhCkPWxxUoAYutiRhDAE
+	ce4/M0QZBBQvSNXzCUL/1qht4clZYrWziGJQZuR+KqScnjWEhH+/Ky26hJNJh1iLUcztQGdhxPn
+	EMFKlorloxRJQmEl5yJW0TIZbv8B9ZVCxYasnMSB9e2VBphZrGTMhapxat/1Lw+ZZn/fx5c
+X-Received: by 2002:ac8:7fcd:0:b0:4ed:8103:8c37 with SMTP id
+ d75a77b69052e-503b6705a55mr15283421cf.12.1769709129198; Thu, 29 Jan 2026
+ 09:52:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-18-maz@kernel.org>
-In-Reply-To: <20260126121655.1641736-18-maz@kernel.org>
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-19-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-19-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 29 Jan 2026 17:43:23 +0000
-X-Gm-Features: AZwV_QhgZBr5ml0xnQ-vrwj2DQaUpUwkeGPKKe1ptuTmjpFjMzKIrzIPGRs2pns
-Message-ID: <CA+EHjTzvwhu4zkLmn4AtA0GZuUy85LDnZ-YUesw1PeoJPqdt_A@mail.gmail.com>
-Subject: Re: [PATCH 17/20] KVM: arm64: Remove all traces of FEAT_TME
+Date: Thu, 29 Jan 2026 17:51:32 +0000
+X-Gm-Features: AZwV_QhPQvIsUhtu0m4Xb8tRLlQCeNpAfaZsDAJefW0mGcGoCi3YrpM0LthDHFU
+Message-ID: <CA+EHjTxJbWkCcNimSGYHSgjYSp4xGuEk1cwf4Dc5giQAM74Bhg@mail.gmail.com>
+Subject: Re: [PATCH 18/20] KVM: arm64: Remove all traces of HCR_EL2.MIOCNCE
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -115,19 +115,19 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69585-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69586-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
@@ -136,28 +136,23 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1A657B331A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8888DB33F1
 X-Rspamd-Action: no action
 
 On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
 >
-> FEAT_TME has been dropped from the architecture. Retrospectively.
-> I'm sure someone is crying somewhere, but most of us won't.
-
-:'-(
-
-Please don't do a web search for my name and "Transactional Memory".
-
-> Clean-up time.
+> MIOCNCE had the potential to eat your data, and also was never
+> implemented by anyone. It's been retrospectively removed from
+> the architecture, and we're happy to follow that lead.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-I checked and it is indeed withdrawn. So with a heavy heart:
+The field HCR_EL2.MIOCNCE is deprecated and made RES0.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 
-RIP,
+Cheers,
 /fuad
 
 
@@ -165,124 +160,37 @@ RIP,
 
 
 
-
 > ---
->  arch/arm64/kvm/config.c                         |  7 -------
->  arch/arm64/kvm/nested.c                         |  5 -----
->  arch/arm64/tools/sysreg                         | 12 +++---------
->  tools/perf/Documentation/perf-arm-spe.txt       |  1 -
->  tools/testing/selftests/kvm/arm64/set_id_regs.c |  1 -
->  5 files changed, 3 insertions(+), 23 deletions(-)
+>  arch/arm64/kvm/config.c | 1 -
+>  arch/arm64/tools/sysreg | 3 +--
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 0c037742215ac..f892098b70c0b 100644
+> index f892098b70c0b..eebafb90bcf62 100644
 > --- a/arch/arm64/kvm/config.c
 > +++ b/arch/arm64/kvm/config.c
-> @@ -184,7 +184,6 @@ struct reg_feat_map_desc {
->  #define FEAT_RME               ID_AA64PFR0_EL1, RME, IMP
->  #define FEAT_MPAM              ID_AA64PFR0_EL1, MPAM, 1
->  #define FEAT_S2FWB             ID_AA64MMFR2_EL1, FWB, IMP
-> -#define FEAT_TME               ID_AA64ISAR0_EL1, TME, IMP
->  #define FEAT_TWED              ID_AA64MMFR1_EL1, TWED, IMP
->  #define FEAT_E2H0              ID_AA64MMFR4_EL1, E2H0, IMP
->  #define FEAT_SRMASK            ID_AA64MMFR4_EL1, SRMASK, IMP
-> @@ -997,7 +996,6 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
->         NEEDS_FEAT(HCR_EL2_FIEN, feat_rasv1p1),
->         NEEDS_FEAT(HCR_EL2_GPF, FEAT_RME),
->         NEEDS_FEAT(HCR_EL2_FWB, FEAT_S2FWB),
-> -       NEEDS_FEAT(HCR_EL2_TME, FEAT_TME),
->         NEEDS_FEAT(HCR_EL2_TWEDEL       |
->                    HCR_EL2_TWEDEn,
->                    FEAT_TWED),
-> @@ -1109,11 +1107,6 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
->         NEEDS_FEAT(SCTLR_EL1_EnRCTX, FEAT_SPECRES),
->         NEEDS_FEAT(SCTLR_EL1_DSSBS, FEAT_SSBS),
->         NEEDS_FEAT(SCTLR_EL1_TIDCP, FEAT_TIDCP1),
-> -       NEEDS_FEAT(SCTLR_EL1_TME0       |
-> -                  SCTLR_EL1_TME        |
-> -                  SCTLR_EL1_TMT0       |
-> -                  SCTLR_EL1_TMT,
-> -                  FEAT_TME),
->         NEEDS_FEAT(SCTLR_EL1_TWEDEL     |
->                    SCTLR_EL1_TWEDEn,
->                    FEAT_TWED),
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 75a23f1c56d13..96e899dbd9192 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1505,11 +1505,6 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
->         u64 orig_val = val;
->
->         switch (reg) {
-> -       case SYS_ID_AA64ISAR0_EL1:
-> -               /* Support everything but TME */
-> -               val &= ~ID_AA64ISAR0_EL1_TME;
-> -               break;
-> -
->         case SYS_ID_AA64ISAR1_EL1:
->                 /* Support everything but LS64 and Spec Invalidation */
->                 val &= ~(ID_AA64ISAR1_EL1_LS64  |
+> @@ -944,7 +944,6 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
+>                    HCR_EL2_FMO          |
+>                    HCR_EL2_ID           |
+>                    HCR_EL2_IMO          |
+> -                  HCR_EL2_MIOCNCE      |
+>                    HCR_EL2_PTW          |
+>                    HCR_EL2_SWIO         |
+>                    HCR_EL2_TACR         |
 > diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 969a75615d612..650d7d477087e 100644
+> index 650d7d477087e..724e6ad966c20 100644
 > --- a/arch/arm64/tools/sysreg
 > +++ b/arch/arm64/tools/sysreg
-> @@ -1856,10 +1856,7 @@ UnsignedEnum     31:28   RDM
->         0b0000  NI
->         0b0001  IMP
->  EndEnum
-> -UnsignedEnum   27:24   TME
-> -       0b0000  NI
-> -       0b0001  IMP
-> -EndEnum
-> +Res0   27:24
->  UnsignedEnum   23:20   ATOMIC
->         0b0000  NI
->         0b0010  IMP
-> @@ -2432,10 +2429,7 @@ Field    57      EPAN
->  Field  56      EnALS
->  Field  55      EnAS0
->  Field  54      EnASR
-> -Field  53      TME
-> -Field  52      TME0
-> -Field  51      TMT
-> -Field  50      TMT0
-> +Res0   53:50
->  Field  49:46   TWEDEL
->  Field  45      TWEDEn
->  Field  44      DSSBS
-> @@ -3840,7 +3834,7 @@ Field     43      NV1
+> @@ -3834,8 +3834,7 @@ Field     43      NV1
 >  Field  42      NV
 >  Field  41      API
 >  Field  40      APK
-> -Field  39      TME
-> +Res0   39
->  Field  38      MIOCNCE
+> -Res0   39
+> -Field  38      MIOCNCE
+> +Res0   39:38
 >  Field  37      TEA
 >  Field  36      TERR
-> diff --git a/tools/perf/Documentation/perf-arm-spe.txt b/tools/perf/Documentation/perf-arm-spe.txt
-> index 8b02e5b983fa9..201a82bec0de4 100644
-> --- a/tools/perf/Documentation/perf-arm-spe.txt
-> +++ b/tools/perf/Documentation/perf-arm-spe.txt
-> @@ -176,7 +176,6 @@ and inv_event_filter are:
->    bit 10    - Remote access (FEAT_SPEv1p4)
->    bit 11    - Misaligned access (FEAT_SPEv1p1)
->    bit 12-15 - IMPLEMENTATION DEFINED events (when implemented)
-> -  bit 16    - Transaction (FEAT_TME)
->    bit 17    - Partial or empty SME or SVE predicate (FEAT_SPEv1p1)
->    bit 18    - Empty SME or SVE predicate (FEAT_SPEv1p1)
->    bit 19    - L2D access (FEAT_SPEv1p4)
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> index c4815d3658167..73de5be58bab0 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -91,7 +91,6 @@ static const struct reg_ftr_bits ftr_id_aa64isar0_el1[] = {
->         REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SM3, 0),
->         REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA3, 0),
->         REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, RDM, 0),
-> -       REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, TME, 0),
->         REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, ATOMIC, 0),
->         REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, CRC32, 0),
->         REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA2, 0),
+>  Field  35      TLOR
 > --
 > 2.47.3
 >
