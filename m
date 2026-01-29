@@ -1,233 +1,274 @@
-Return-Path: <kvm+bounces-69448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69450-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ABEELPexemk79QEAu9opvQ
-	(envelope-from <kvm+bounces-69448-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:03:51 +0100
+	id YIxXAr+0emma9QEAu9opvQ
+	(envelope-from <kvm+bounces-69450-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:15:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70523AA7D6
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:03:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A3D8AA8BE
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 02:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 327A23002E48
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:03:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B406A3034E1C
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4431F313534;
-	Thu, 29 Jan 2026 01:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484F8317701;
+	Thu, 29 Jan 2026 01:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SxM9HG+X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O0AFbcfY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAC7322A
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 01:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972AA1FBEB0
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 01:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769648611; cv=none; b=Sx/lzkghyvgDahFSPBvkjE0nEQC31aUV/uC6WtT1/nsfP6Q0RupkR/hu4YXVtIAoOfASrxalTPYG0QwNq+DkpF+1MK/xbx6tTIq2bR8nNaVmwW1JKJHvIPRvaPDPpDH50ywR4Cpjsho52h2VfEkfIVnW6H392GEn7eaHYEJYCTQ=
+	t=1769649331; cv=none; b=n/53mDK6Fsbr87fY8eHqE3AbeP85BtI54mztmkNqyk8M3GmR4SAflzyAtdb6KTH8q8q/G3q7v2NF0lc6fA+GjIy9iOTR1QunHjOuH3o9O20IHrRviuIoxWRL7//WsIRyqkTwHzl2u7iFP+hz/wdaOux03P30vfA5mU8xQKKlLXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769648611; c=relaxed/simple;
-	bh=LycvwrEt9FiYCojoBJvkidjYu1wB89lVriZlQuiRjLU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jO35ShUQC6/gHgC6Tc1z2cHaEUqcRP7EVflBESgAgOgOn2i6IHZiBEhpr7FyYQFd5v4UftrMVYS+TLR6AslqhZwW45Zzih6NKLApjMrUFteRaUaHa7v9v2tclI3ksCjiY7tRVzLK+vfoodxUuqHSPVDer/o1oJH5R50SQnJXmzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SxM9HG+X; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1769649331; c=relaxed/simple;
+	bh=77MNUmXLsSVzn3BT77shrDIB5ujNFeevJfDJ8rWmJzk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=rVps1bt8hZyGesHrNoW4MQxtJCsJxE+jgGctqtMpy2seds6e1foBftEf8jbKuB7GGFwer3qLopj36TbSlRqG9tkYGdl0P3luzSHuu/bwaGMrvWWR1DdzVAddP6LZSpi93TWjkU7OHuQOKYzraBNGsiIgCTgAPJGM9pmQ/DvSP6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O0AFbcfY; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a863be8508so4479805ad.2
-        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 17:03:29 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34e5a9de94bso947766a91.0
+        for <kvm@vger.kernel.org>; Wed, 28 Jan 2026 17:15:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769648609; x=1770253409; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=19yGyDu7FA79ZAJBhihksbqQH2oSVrmD3QatKOHHT0Q=;
-        b=SxM9HG+XCbluVUI9hhaJPoAGO9A4weGXrDN1WkEGXQkijuxtuAjaNEYFx+SLCqf0Vc
-         DKo+wzbFJwA6yw7xBSyJwqQpAsDR6yb7FZU74TcmQYFFTPOeEhgrhdR6MUWIFp7qAG3f
-         jS6sEPMQU+UK3viVxx6z7fZ+5qAIL8KBye4cTl21BAAmPZKUYXNqeHrwxKvvRjD3dSBb
-         wBk8pa2mDMfo9JnWph33h5v8eIxV9BJIuCrP+bVCeNYlC4GG3+fX4/NgZnKzBPhJJpGu
-         2J5KSfLSi5sExTVcHHRzagEuMknn+FWrhRQKbztN3EF1NO9VCtOojet9vcwtssGjZ0mv
-         B/Ng==
+        d=google.com; s=20230601; t=1769649328; x=1770254128; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dICzvWEdfBrtCh6Zy3BTwzQLU0rts7VP3KdYtqIFj2w=;
+        b=O0AFbcfYIuqGNPzlFkLvp5SoF4BZpAK7nb19e7t38QXGaO2qfsvwTBYKrvHEWyXm5C
+         A4zmRZsRNYZMG8ol4QRWb8yQmOciKKDGpMbK5o7FgpiEYtqYd4uAs0YYEe/xXbD4yWA9
+         /SsarHs+C0qeYCNdZVOLj64DYKKuK9w88fsLBa2II+F5FhbjSa4EDPqrEwD9RglOrhpz
+         lzR/xsEEZ7sflfPgTbyyYZhTDJeIQdaW0/4OCxURuO+fHwzfjSCNI5rJwNa32t0x3QtH
+         3FkIzpVkObqPT32LcwtkAcAj2jtaxC8O3UHJ306lAw+sNIj+pN9kCVn/T5aNir4yNwD3
+         zZZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769648609; x=1770253409;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=19yGyDu7FA79ZAJBhihksbqQH2oSVrmD3QatKOHHT0Q=;
-        b=iVivh3/0Xw5WzU42iOEVMp3/Vts98RvGkJNWoTYbKFOMGoIDDgVUMjIId8Byvxje0c
-         BI0sMBmn168YbCuNh1o08GiA+Xp9kS+Telz+ijb+I2PVQ2pXRrNUnMkAc6NkbZZJX2u8
-         spNYfjt53KIO1JFvU0CGn43Y3s2lZMxQtbpPxH5K2h7aofDri1GyqDOPXJt3tAAKEOT3
-         hmFsMbiJNA4zCmDY5ZH4OzRCmB6hLg57u425FZGQk3DU2ayHAyXfo2S0n4R5dRU0Zz3n
-         b8W46UgD5wk7DYOJduMwOuwqV5zbEuOCABqYjrIPt8KsXWg37k4kPdDyry2SYfTROZGp
-         Vg7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWgBLjuj+UjYBYU2wSbnK86nLPCAbFmPKJN9qvU98PAiRNmajfVhuFOSiERkhI15PelSaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzlpx/pO5gBXHYZivu8Ez3ehH0UYeZd2iHkh5Oo3IOr7jolJ/rw
-	oreymotIUpXqcTs/MdmlHwa5B7qLNG3ExHRNSdax6iTzIUAnDHGu20G2orPgrQkOZaVDm+Xa7Rz
-	/VwNwIg==
-X-Received: from plbky6.prod.google.com ([2002:a17:902:f986:b0:2a0:84dc:a82f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cf:b0:2a7:dd37:6e20
- with SMTP id d9443c01a7336-2a870e34d04mr70308785ad.30.1769648609015; Wed, 28
- Jan 2026 17:03:29 -0800 (PST)
-Date: Wed, 28 Jan 2026 17:03:27 -0800
-In-Reply-To: <20260129003753.GZ1641016@ziepe.ca>
+        d=1e100.net; s=20230601; t=1769649328; x=1770254128;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dICzvWEdfBrtCh6Zy3BTwzQLU0rts7VP3KdYtqIFj2w=;
+        b=dtz4h8H/NB4jwkJ0tqnT3DZAfWs3rb2bS/FHQwjKyzkaPZp060IUTnERBTUg7Nx1gn
+         FHkJcPQ/+TEPgJg+sAsVBGDTkWlFRyn13pbHWA2mdZz5wmIys/LOjviLbhTNZf3vrnfZ
+         55emvHVghnJLg1TerNnCJpY0p1x8uN9GQdj4xLHQ6a0kwIFQLIo3ii3+8IUuwHDnizBv
+         arLVpIxCWVfNjnHe0E4E/OF9a90xQ0ZhJkSu6nsp4R/OJt0oxJqt4vkAj7KbI6zxiEC7
+         wE8Fz5Mjn8PzAoRMX21lJSkenr/rLFwtSi1qb09Ws3HUMMDw1mkPUXPsb5KzHGTpSQD7
+         8isw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9vazkHr157FLwY4XqBifpvk07hrd+yoWtCnD/Ilg+qcZ3ytZgt25M3jNEuAfTwzsOFPg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG38elguQhOpeN3xGG7Omw4wiWUiRxHe5GwBenSqbNVD3EOfdo
+	VWhgyWPOTd5Sxrvqgvsz9lo1KK0NHLnusYZGDy9X3L4DIGBBcfmGCmlnTxQUlSsRLC4l+iyHo28
+	qOBJ1cA==
+X-Received: from pjee4.prod.google.com ([2002:a17:90b:5784:b0:353:3177:9547])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:dfc4:b0:352:d168:fc4
+ with SMTP id 98e67ed59e1d1-353fed88b65mr5574963a91.32.1769649327950; Wed, 28
+ Jan 2026 17:15:27 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 28 Jan 2026 17:14:32 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1760731772.git.ackerleytng@google.com> <071a3c6603809186e914fe5fed939edee4e11988.1760731772.git.ackerleytng@google.com>
- <07836b1d-d0d8-40f2-8f7b-7805beca31d0@amd.com> <CAEvNRgEuez=JbArRf2SApLAL0usv5-Q6q=nBPOFMHrHGaKAtMw@mail.gmail.com>
- <20260129003753.GZ1641016@ziepe.ca>
-Message-ID: <aXqx3_eE0rNh6nP0@google.com>
-Subject: Re: [RFC PATCH v1 05/37] KVM: guest_memfd: Wire up
- kvm_get_memory_attributes() to per-gmem attributes
+X-Mailer: git-send-email 2.53.0.rc1.217.geba53bf80e-goog
+Message-ID: <20260129011517.3545883-1-seanjc@google.com>
+Subject: [RFC PATCH v5 00/45] TDX: Dynamic PAMT + S-EPT Hugepage
 From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Ackerley Tng <ackerleytng@google.com>, Alexey Kardashevskiy <aik@amd.com>, cgroups@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, x86@kernel.org, 
-	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de, 
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org, 
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com, 
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com, 
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com, hannes@cmpxchg.org, 
-	hch@infradead.org, hpa@zytor.com, hughd@google.com, ira.weiny@intel.com, 
-	isaku.yamahata@intel.com, jack@suse.cz, james.morse@arm.com, 
-	jarkko@kernel.org, jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de, 
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com, 
-	keirf@google.com, kent.overstreet@linux.dev, liam.merwick@oracle.com, 
-	maciej.wieczor-retman@intel.com, mail@maciej.szmigiero.name, 
-	maobibo@loongson.cn, mathieu.desnoyers@efficios.com, maz@kernel.org, 
-	mhiramat@kernel.org, mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com, 
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au, 
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es, 
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com, 
-	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com, 
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz, qperret@google.com, 
-	richard.weiyang@gmail.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
-	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org, 
-	shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com, 
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com, 
-	tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com, 
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com, 
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org, wyihan@google.com, 
-	xiaoyao.li@intel.com, yan.y.zhao@intel.com, yilun.xu@intel.com, 
-	yuzenghui@huawei.com, zhiquan1.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Kiryl Shutsemau <kas@kernel.org>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
+	kvm@vger.kernel.org, Kai Huang <kai.huang@intel.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Yan Zhao <yan.y.zhao@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Sagi Shahar <sagis@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,amd.com,vger.kernel.org,kvack.org,kernel.org,linux-foundation.org,linux.intel.com,alien8.de,intel.com,lwn.net,redhat.com,cmpxchg.org,infradead.org,zytor.com,suse.cz,arm.com,amazon.com,nvidia.com,suse.de,linux.dev,oracle.com,maciej.szmigiero.name,loongson.cn,efficios.com,digikod.net,ellerman.id.au,amazon.es,dabbelt.com,sifive.com,gmail.com,goodmis.org,amazon.co.uk,linutronix.de,zeniv.linux.org.uk,huawei.com];
-	TAGGED_FROM(0.00)[bounces-69448-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-69450-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[97];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	HAS_REPLYTO(0.00)[seanjc@google.com];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:email]
-X-Rspamd-Queue-Id: 70523AA7D6
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: 5A3D8AA8BE
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026, Jason Gunthorpe wrote:
-> On Wed, Jan 28, 2026 at 01:47:50PM -0800, Ackerley Tng wrote:
-> > Alexey Kardashevskiy <aik@amd.com> writes:
-> > 
-> > >
-> > > [...snip...]
-> > >
-> > >
-> > 
-> > Thanks for bringing this up!
-> > 
-> > > I am trying to make it work with TEE-IO where fd of VFIO MMIO is a dmabuf
-> > > fd while the rest (guest RAM) is gmemfd. The above suggests that if there
-> > > is gmemfd - then the memory attributes are handled by gmemfd which is...
-> > > expected?
-> > >
-> > 
-> > I think this is not expected.
-> > 
-> > IIUC MMIO guest physical addresses don't have an associated memslot, but
-> > if you managed to get to that line in kvm_gmem_get_memory_attributes(),
-> > then there is an associated memslot (slot != NULL)?
-> 
-> I think they should have a memslot, shouldn't they? I imagine creating
-> a memslot from a FD and the FD can be memfd, guestmemfd, dmabuf, etc,
-> etc ?
+This is a combined series of Dynamic PAMT (from Rick), and S-EPT hugepage
+support (from Yan).  Except for some last minute tweaks to the DPAMT array
+args stuff, a version of this based on a Google-internal kernel has been
+moderately well tested (thanks Vishal!).  But overall it's still firmly RFC
+as I have deliberately NOT addressed others feedback from v4 of DPAMT and v3
+of S-EPT hugepage (mostly lack of cycles), and there's at least one patch in
+here that shouldn't be merged as-is (the quick-and-dirty switch from struct
+page to raw pfns).
 
-Yeah, there are two flavors of MMIO for KVM guests.  Emulated MMIO, which is
-what Ackerley is thinking of, and "host" MMIO (for lack of a better term), which
-is what I assume "fd of VFIO MMIO" is referring to.
+My immediate goal is to solidify the designs for DPAMT and S-EPT hugepage.
+Given the substantial design changes I am proposing, posting an end-to-end
+RFC seemed like a much better method than trying to communicate my thoughts
+piecemeal.
 
-Emulated MMIO does NOT have memslots[*].  There are some wrinkles and technical
-exceptions, e.g. read-only memslots for emulating option ROMs, but by and large,
-lack of a memslot means Emulated MMIO.
+As for landing these series, I think the fastest overall approach would be
+to land patches 1-4 asap (tangentially related cleanups and fixes), agree
+on a design (hopefully), and then hand control back to Rick and Yan to polish
+their respective series for merge.
 
-Host MMIO isn't something KVM really cares about, in the sense that, for the most
-part, it's "just another memslot".  KVM x86 does need to identify host MMIO for
-vendor specific reasons, e.g. to ensure UC memory stays UC when using EPT (MTRRs
-are ignored), to create shared mappings when SME is enabled, and to mitigate the
-lovely MMIO Stale Data vulnerability.
+I also want to land the VMXON series[*] before DPAMT, because there's a nasty
+wart where KVM wires up a DPAMT-specific hook even if DPAMT is disabled,
+because KVM's ordering needs to set the vendor hooks before tdx_sysinfo is
+ready.  Decoupling VMXON from KVM solves that problem, because it lets the
+TDX subsystem parse sysinfo before TDX is loaded.
 
-But those Host MMIO edge cases are almost entirely contained to make_spte() (see
-the kvm_is_mmio_pfn() calls).  And so the vast, vast majority of "MMIO" code in
-KVM is dealing with Emulated MMIO, and when most people talk about MMIO in KVM,
-they're also talking about Emulated MMIO.
+Beyond that dependency, I am comfortable landing both DPAMT and S-EPT hugepage
+support without any other prereqs, i.e. without an in-tree way to light up
+the S-EPT hugepage code due to lack of hugepage support in guest_memfd.
+Outside of the guest_memfd arch hook for in-place conversion, S-EPT hugepage
+support doesn't have any direction dependencies/conflicts with guest_memfd
+hugepage or in-place conversion support (which is great, because it means we
+didn't totally botch the design!).  E.g. Vishal's been able to test this code
+precisely because it applies relatively cleanly on an internal branch with a
+whole pile of guest_memfd changes.
 
-> > Either way, guest_memfd shouldn't store attributes for guest physical
-> > addresses that don't belong to some guest_memfd memslot.
-> > 
-> > I think we need a broader discussion for this on where to store memory
-> > attributes for MMIO addresses.
-> > 
-> > I think we should at least have line of sight to storing memory
-> > attributes for MMIO addresses, in case we want to design something else,
-> > since we're putting vm_memory_attributes on a deprecation path with this
-> > series.
-> 
-> I don't know where you want to store them in KVM long term, but they
-> need to come from the dmabuf itself (probably via a struct
-> p2pdma_provider) and currently it is OK to assume all DMABUFs are
-> uncachable MMIO that is safe for the VM to convert into "write
-> combining" (eg Normal-NC on ARM)
+Applies on kvm-x86 next (specifically kvm-x86-next-2026.01.23).
 
-+1.  For guest_memfd, we initially defined per-VM memory attributes to track
-private vs. shared.  But as Ackerley noted, we are in the process of deprecating
-that support, e.g. by making it incompatible with various guest_memfd features,
-in favor of having each guest_memfd instance track the state of a given page.
+[*] https://lore.kernel.org/all/20251206011054.494190-1-seanjc@google.com
 
-The original guest_memfd design was that it would _only_ hold private pages, and
-so tracking private vs. shared in guest_memfd didn't make any sense.  As we've
-pivoted to in-place conversion, tracking private vs. shared in the guest_memfd
-has basically become mandatory.  We could maaaaaybe make it work with per-VM
-attributes, but it would be insanely complex.
+P.S. I apologize if I clobbered any of the Author attribution or SoBs.  I
+     was moving patches around and synchronizing between an internal tree
+     and this upstream version, so things may have gotten a bit wonky.
 
-For a dmabuf fd, the story is the same as guest_memfd.  Unless private vs. shared
-is all or nothing, and can never change, then the only entity that can track that
-info is the owner of the dmabuf.  And even if the private vs. shared attributes
-are constant, tracking it external to KVM makes sense, because then the provider
-can simply hardcode %true/%false.
+Isaku Yamahata (1):
+  KVM: x86/tdp_mmu: Alloc external_spt page for mirror page table
+    splitting
 
-As for _how_ to do that, no matter where the attributes are stored, we're going
-to have to teach KVM to play nice with a non-guest_memfd provider of private
-memory.
+Kiryl Shutsemau (12):
+  x86/tdx: Move all TDX error defines into <asm/shared/tdx_errno.h>
+  x86/tdx: Add helpers to check return status codes
+  x86/virt/tdx: Allocate page bitmap for Dynamic PAMT
+  x86/virt/tdx: Allocate reference counters for PAMT memory
+  x86/virt/tdx: Improve PAMT refcounts allocation for sparse memory
+  x86/virt/tdx: Add tdx_alloc/free_control_page() helpers
+  x86/virt/tdx: Optimize tdx_alloc/free_control_page() helpers
+  KVM: TDX: Allocate PAMT memory for TD and vCPU control structures
+  KVM: TDX: Get/put PAMT pages when (un)mapping private memory
+  x86/virt/tdx: Enable Dynamic PAMT
+  Documentation/x86: Add documentation for TDX's Dynamic PAMT
+  x86/virt/tdx: Get/Put DPAMT page pair if and only if mapping size is
+    4KB
+
+Rick Edgecombe (3):
+  x86/virt/tdx: Simplify tdmr_get_pamt_sz()
+  x86/tdx: Add APIs to support get/put of DPAMT entries from KVM, under
+    spinlock
+  KVM: x86/mmu: Prevent hugepage promotion for mirror roots in fault
+    path
+
+Sean Christopherson (22):
+  x86/tdx: Use pg_level in TDX APIs, not the TDX-Module's 0-based level
+  KVM: x86/mmu: Update iter->old_spte if cmpxchg64 on mirror SPTE
+    "fails"
+  KVM: TDX: Account all non-transient page allocations for per-TD
+    structures
+  KVM: x86: Make "external SPTE" ops that can fail RET0 static calls
+  KVM: TDX: Drop kvm_x86_ops.link_external_spt(), use
+    .set_external_spte() for all
+  KVM: x86/mmu: Fold set_external_spte_present() into its sole caller
+  KVM: x86/mmu: Plumb the SPTE _pointer_ into the TDP MMU's
+    handle_changed_spte()
+  KVM: x86/mmu: Propagate mirror SPTE removal to S-EPT in
+    handle_changed_spte()
+  KVM: x86: Rework .free_external_spt() into .reclaim_external_sp()
+  KVM: Allow owner of kvm_mmu_memory_cache to provide a custom page
+    allocator
+  KVM: x86/mmu: Allocate/free S-EPT pages using
+    tdx_{alloc,free}_control_page()
+  *** DO NOT MERGE *** x86/virt/tdx: Don't assume guest memory is backed
+    by struct page
+  x86/virt/tdx: Extend "reset page" quirk to support huge pages
+  KVM: x86/mmu: Plumb the old_spte into kvm_x86_ops.set_external_spte()
+  KVM: TDX: Hoist tdx_sept_remove_private_spte() above
+    set_private_spte()
+  KVM: TDX: Handle removal of leaf SPTEs in .set_private_spte()
+  KVM: TDX: Add helper to handle mapping leaf SPTE into S-EPT
+  KVM: TDX: Move S-EPT page demotion TODO to tdx_sept_set_private_spte()
+  KVM: x86/mmu: Add Dynamic PAMT support in TDP MMU for vCPU-induced
+    page split
+  KVM: guest_memfd: Add helpers to get start/end gfns give
+    gmem+slot+pgoff
+  *** DO NOT MERGE *** KVM: guest_memfd: Add pre-zap arch hook for
+    shared<=>private conversion
+  KVM: x86/mmu: Add support for splitting S-EPT hugepages on conversion
+
+Xiaoyao Li (1):
+  x86/virt/tdx: Add API to demote a 2MB mapping to 512 4KB mappings
+
+Yan Zhao (6):
+  x86/virt/tdx: Enhance tdh_mem_page_aug() to support huge pages
+  x86/virt/tdx: Enhance tdh_phymem_page_wbinvd_hkid() to invalidate huge
+    pages
+  KVM: TDX: Add core support for splitting/demoting 2MiB S-EPT to 4KiB
+  KVM: x86: Introduce hugepage_set_guest_inhibit()
+  KVM: TDX: Honor the guest's accept level contained in an EPT violation
+  KVM: TDX: Turn on PG_LEVEL_2M
+
+ Documentation/arch/x86/tdx.rst              |  21 +
+ arch/x86/coco/tdx/tdx.c                     |  10 +-
+ arch/x86/include/asm/kvm-x86-ops.h          |   9 +-
+ arch/x86/include/asm/kvm_host.h             |  36 +-
+ arch/x86/include/asm/shared/tdx.h           |   1 +
+ arch/x86/include/asm/shared/tdx_errno.h     | 104 +++
+ arch/x86/include/asm/tdx.h                  | 127 ++--
+ arch/x86/include/asm/tdx_global_metadata.h  |   1 +
+ arch/x86/kvm/Kconfig                        |   1 +
+ arch/x86/kvm/mmu.h                          |   4 +
+ arch/x86/kvm/mmu/mmu.c                      |  34 +-
+ arch/x86/kvm/mmu/mmu_internal.h             |  11 -
+ arch/x86/kvm/mmu/tdp_mmu.c                  | 315 ++++----
+ arch/x86/kvm/mmu/tdp_mmu.h                  |   2 +
+ arch/x86/kvm/vmx/tdx.c                      | 468 +++++++++---
+ arch/x86/kvm/vmx/tdx.h                      |   5 +-
+ arch/x86/kvm/vmx/tdx_arch.h                 |   3 +
+ arch/x86/kvm/vmx/tdx_errno.h                |  40 -
+ arch/x86/virt/vmx/tdx/tdx.c                 | 762 +++++++++++++++++---
+ arch/x86/virt/vmx/tdx/tdx.h                 |   6 +-
+ arch/x86/virt/vmx/tdx/tdx_global_metadata.c |   7 +
+ include/linux/kvm_host.h                    |   5 +
+ include/linux/kvm_types.h                   |   2 +
+ virt/kvm/Kconfig                            |   4 +
+ virt/kvm/guest_memfd.c                      |  71 +-
+ virt/kvm/kvm_main.c                         |   7 +-
+ 26 files changed, 1576 insertions(+), 480 deletions(-)
+ create mode 100644 arch/x86/include/asm/shared/tdx_errno.h
+ delete mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+
+
+base-commit: e81f7c908e1664233974b9f20beead78cde6343a
+-- 
+2.53.0.rc1.217.geba53bf80e-goog
+
 
