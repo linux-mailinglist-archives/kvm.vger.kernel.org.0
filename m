@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-69444-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69445-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCGFIX6iemkz8wEAu9opvQ
-	(envelope-from <kvm+bounces-69444-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:57:50 +0100
+	id eAGyASulemmN8wEAu9opvQ
+	(envelope-from <kvm+bounces-69445-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:09:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 302E7AA0FC
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:57:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F838AA1A0
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 01:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F05D53019B85
-	for <lists+kvm@lfdr.de>; Wed, 28 Jan 2026 23:57:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 63F383018092
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 00:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB57345CA2;
-	Wed, 28 Jan 2026 23:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19082A1BF;
+	Thu, 29 Jan 2026 00:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fj3uYSCe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N6KAbIop"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F6933BBBD;
-	Wed, 28 Jan 2026 23:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871EAB67E;
+	Thu, 29 Jan 2026 00:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769644654; cv=none; b=mMrW2D+yR9+x+qZ0CsN6q0F6HGN4zwnE47t6ayQcQZO4dqlpRwZ/pIEhBbeZdyVVWeNDWjN5Z7rWO4+dI3lWIlluKxTBNWt6WpEDPeohqyT3Mazh7yKTgPVLt5j1Hgi2KUbdC54lB45moBxBcdLXctCvcLUx/DppjsttsT5+1Og=
+	t=1769645340; cv=none; b=AgorBcRxE1S5Xu2Wt7eqxVvhj8M4rtWodkmwIte9p8NWKGq/mnVJ643UZpjwtAEzrhI17n+PfXob8Nq4E4MCvY0Jg1Yw4IxqECMcga3ZPN5iUDFlPAMoIGZcS9tN+hbLx09qmklaf+0AefP1Gmv+dIah982So5+Box3BUVFI9Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769644654; c=relaxed/simple;
-	bh=4I66uo2SFYL6SgULgsnPuIZ38gcsOPSgvSgR4E1VQtI=;
+	s=arc-20240116; t=1769645340; c=relaxed/simple;
+	bh=9LYr8Fxu212VdsYBhWkSdj37mqiggQ5RrjlkUbQdIxU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n04gm6nYkZfyAqRLHHlogREkZ5ukmcpaAU82FkETGFJXecQ0/rW7fvC5eFE7Y6M1rkt9GM+/OtPvVhVcJcKZP7g7MjSHJkssCEsIkBOZtszO4rEFIDVD90tGUb9s8jLkZSkBUTRMqs2p1hL3+OdhOyf9yXJ63G3dM2PMAUH69mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fj3uYSCe; arc=none smtp.client-ip=198.175.65.17
+	 In-Reply-To:Content-Type; b=qDLiClX4jbPJI3EjUWWV3eersdajgVrQimQWgKQ471QqIlcrZyLh0hxyRJVQuRcSRPXiI8P0PXQki9BGNDnWVndYd99g4YkKe0tTiKyqHpHog3kjdCBE9cBI50hxFrc3onnJZm2vrd6JwNnUhnmZULB9zpyg0+WKHCllvEG8aqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N6KAbIop; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769644653; x=1801180653;
+  t=1769645339; x=1801181339;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=4I66uo2SFYL6SgULgsnPuIZ38gcsOPSgvSgR4E1VQtI=;
-  b=Fj3uYSCeOakO2kydlLfMvywXdKdHLY/ujIi3NqWSTwCIK/QTz94WwXMf
-   9c9ruLhEgsJAYKcUWHgdLuLO6iaI6cuiLQdQXSrxYpTOdz1JJ1Dydhoyv
-   gK1G2ESOGpk9+83mlCm3ioiy08xwuzKDNqV3NIV21Z/jPRWFtKPhh7pFR
-   z7BSOBdnfAl/gfXo8Bh6+Voce5FSRjLxX2mIrURZgnNkT+7I0KGBH2JbK
-   yl7rsi2UHsog8v5vYca3npDJ/ha2b77eMS9qwCjnEICO4zWYn2Ckbxacn
-   ZTSzewymHISj+hBasljp6RxxaWP8O38km+qMPL2+nKx0mP18BGPwU4zaN
-   w==;
-X-CSE-ConnectionGUID: rGKRHeVbSDuX/KYBTQVQXQ==
-X-CSE-MsgGUID: hsmYDBNIQDyBtEPQL6Wv9Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="70845949"
+  bh=9LYr8Fxu212VdsYBhWkSdj37mqiggQ5RrjlkUbQdIxU=;
+  b=N6KAbIop3OIm/k/1ktGVUOwNREsED9527zUUAOy9Bkzuu0O2zJsXmTfE
+   PDssyMccHpJJuZ+xN0r5IlJmTeHOQQiQL1THMM8GF9+5RfITTbtlmpjRz
+   O9TJW7b7vNp3I4KnvQxYGyvVK9brubMVBPlLzmmjY87KvVk0SOSX2Fn6H
+   047JlSKKnN8P8i7ZOqcFRORmYVXko6oHEZonB1PbuFlNk8//KrdezS5Fz
+   7bVsiAzT+sxTFarjyPXop+Uya/mEEuuN0UjjLZiGx7lmSk0qhC3o/U2ay
+   0CLmkjLNCyuK1jk6Q8qlr7LSiqDqy7x82kqwqiGPLlakYYpNX4iRq3ifh
+   g==;
+X-CSE-ConnectionGUID: vuAe4/B6Sq2myvJjyCVpgw==
+X-CSE-MsgGUID: oZz31BrRSaS1BlSUduaU9Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11685"; a="70846504"
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="70845949"
+   d="scan'208";a="70846504"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:57:32 -0800
-X-CSE-ConnectionGUID: 0I8HuvEiQ8Oh7dGGzhv2JA==
-X-CSE-MsgGUID: 9JbfvOZCSpyvt1Q0Yz9ZyQ==
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 16:08:58 -0800
+X-CSE-ConnectionGUID: zbavyxq5QbGi7CH5NYz7pg==
+X-CSE-MsgGUID: VsJfNMmzS+6Euqw96iQTyg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="208006651"
+   d="scan'208";a="208008127"
 Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.190]) ([10.125.109.190])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 15:57:31 -0800
-Message-ID: <7e981cd1-cfd5-4bc3-a87d-0a187c510dc2@intel.com>
-Date: Wed, 28 Jan 2026 15:57:30 -0800
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 16:08:57 -0800
+Message-ID: <9fb1bbf3-0623-447e-86d7-d48ef20fb42c@intel.com>
+Date: Wed, 28 Jan 2026 16:08:56 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,7 +70,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 08/26] x86/virt/seamldr: Retrieve P-SEAMLDR information
+Subject: Re: [PATCH v3 09/26] coco/tdx-host: Expose P-SEAMLDR information via
+ sysfs
 To: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc: reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
@@ -78,13 +79,11 @@ Cc: reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
  vannapurve@google.com, paulmck@kernel.org, nik.borisov@suse.com,
  zhenzhong.duan@intel.com, seanjc@google.com, rick.p.edgecombe@intel.com,
  kas@kernel.org, dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
- Farrah Chen <farrah.chen@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- "H. Peter Anvin" <hpa@zytor.com>
+ Farrah Chen <farrah.chen@intel.com>
 References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-9-chao.gao@intel.com>
-Content-Language: en-US
+ <20260123145645.90444-10-chao.gao@intel.com>
 From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
  oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
@@ -128,41 +127,124 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20260123145645.90444-9-chao.gao@intel.com>
+In-Reply-To: <20260123145645.90444-10-chao.gao@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-69444-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim]
-X-Rspamd-Queue-Id: 302E7AA0FC
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69445-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+]
+X-Rspamd-Queue-Id: 6F838AA1A0
 X-Rspamd-Action: no action
 
 On 1/23/26 06:55, Chao Gao wrote:
-> +static struct seamldr_info seamldr_info __aligned(256);
+...
+> diff --git a/Documentation/ABI/testing/sysfs-devices-faux-tdx-host b/Documentation/ABI/testing/sysfs-devices-faux-tdx-host
+> index 901abbae2e61..a3f155977016 100644
+> --- a/Documentation/ABI/testing/sysfs-devices-faux-tdx-host
+> +++ b/Documentation/ABI/testing/sysfs-devices-faux-tdx-host
+> @@ -4,3 +4,28 @@ Description:	(RO) Report the version of the loaded TDX Module. The TDX Module
+>  		version is formatted as x.y.z, where "x" is the major version,
+>  		"y" is the minor version and "z" is the update version. Versions
+>  		are used for bug reporting, TDX Module updates and etc.
+> +
+> +What:		/sys/devices/faux/tdx_host/seamldr/version
+> +Contact:	linux-coco@lists.linux.dev
+> +Description:	(RO) Report the version of the loaded SEAM loader. The SEAM
+> +		loader version is formatted as x.y.z, where "x" is the major
+> +		version, "y" is the minor version and "z" is the update version.
+> +		Versions are used for bug reporting and compatibility check.
 
-I also wonder if this should be __read_mostly or even read-only after
-boot. Is it ever modified?
+								checks ^
+
+> +What:		/sys/devices/faux/tdx_host/seamldr/num_remaining_updates
+> +Contact:	linux-coco@lists.linux.dev
+> +Description:	(RO) Report the number of remaining updates that can be performed.
+> +		The CPU keeps track of TCB versions for each TDX Module that
+> +		has been loaded. Since this tracking database has finite
+> +		capacity, there's a maximum number of Module updates that can
+> +		be performed.
+
+Is it really the CPU? Or some SEAM software construct?
+
+> +		After each successful update, the number reduces by one. Once it
+> +		reaches zero, further updates will fail until next reboot. The
+> +		number is always zero if P-SEAMLDR doesn't support updates.
+> +
+> +		See Intel® Trust Domain Extensions - SEAM Loader (SEAMLDR)
+> +		Interface Specification Chapter 3.3 "SEAMLDR_INFO" and Chapter
+> +		4.2 "SEAMLDR.INSTALL" for more information. The documentation is
+> +		available at:
+> +		https://cdrdv2-public.intel.com/739045/intel-tdx-seamldr-interface-specification.pdf
+
+Zap the URL. It's just going bit rot. Keep the document name. That's
+googleable.
+
+> diff --git a/drivers/virt/coco/tdx-host/tdx-host.c b/drivers/virt/coco/tdx-host/tdx-host.c
+> index 0424933b2560..f4ce89522806 100644
+> --- a/drivers/virt/coco/tdx-host/tdx-host.c
+> +++ b/drivers/virt/coco/tdx-host/tdx-host.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/sysfs.h>
+>  
+>  #include <asm/cpu_device_id.h>
+> +#include <asm/seamldr.h>
+>  #include <asm/tdx.h>
+>  
+>  static const struct x86_cpu_id tdx_host_ids[] = {
+> @@ -40,7 +41,64 @@ static struct attribute *tdx_host_attrs[] = {
+>  	&dev_attr_version.attr,
+>  	NULL,
+>  };
+> -ATTRIBUTE_GROUPS(tdx_host);
+> +
+> +struct attribute_group tdx_host_group = {
+> +	.attrs = tdx_host_attrs,
+> +};
+> +
+> +#ifdef CONFIG_INTEL_TDX_MODULE_UPDATE
+> +static ssize_t seamldr_version_show(struct device *dev, struct device_attribute *attr,
+> +				    char *buf)
+> +{
+> +	const struct seamldr_info *info = seamldr_get_info();
+
+Uhh... seamldr_get_info() calls down into the SEAMLDR. It happily zaps
+the VMCS and this is surely a slow thing. This also has 0444 permissions
+which means *ANYONE* can call this. Constantly. As fast as they can make
+a few syscalls.
+
+Right?
+
+Are there any concerns about making SEAMLDR calls? Are there any
+system-wide performance implications? How long of an interrupt-blocking
+blip is there for this?
+
+Also, what's the locking around seamldr_get_info()? It writes into a
+global, shared structure. I guess you disabled interrupts so it's
+preempt safe at least. <sigh>
+
+I guess it won't change *that* much. But, sheesh, it seems like an
+awfully bad idea to have lots of CPUs writing into a common data
+structure all at the same time.
 
