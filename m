@@ -1,168 +1,200 @@
-Return-Path: <kvm+bounces-69580-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69581-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHTKBC+ae2nOGAIAu9opvQ
-	(envelope-from <kvm+bounces-69580-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:34:39 +0100
+	id 8AHWMjWbe2nOGAIAu9opvQ
+	(envelope-from <kvm+bounces-69581-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:39:01 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E79DB2F60
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:34:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34839B3038
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:39:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A21E230581AF
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:29:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 857223052637
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 17:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5F734DB7F;
-	Thu, 29 Jan 2026 17:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E99353ED7;
+	Thu, 29 Jan 2026 17:34:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wHwIu2Vl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XgDfcssl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E0034D903
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 17:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769707788; cv=none; b=dTj9BAuqrBC/Rm4EwWYJw9XOP2BEXxWJfDPAOQrIZrZmkZtPA8Tz/KlMTGyeRrAlQBccHGoJ1SebtgIVuP4VzVd38vkUSwynwYIjtpc4Bo3rpXrgZ82wEbaS0msm4AVlFxY8nOE1gsFURJHJnLJZOgJH+J8sf4ch4JCWDkMBvFk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769707788; c=relaxed/simple;
-	bh=be866/Yp5BAQJMoBK98y8dBJLQ2gHvccZfOQ5Qw+jAY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EDDVQ062v2VILgQDux2vqgwkFL8lJWv5nAizMa0CqHlO/hENeVvl+eCPJLHNP34oNcoJrkfFFYooOu6l6emkbGZT+7E+ipE6xY7rJOfrSlA5InpMb26knU4oI2n1zagMaTyA40PFIOIZ35m7IHf4ZOpcFSaoFpG8V1ChFH+QNg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wHwIu2Vl; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4806d23e9f1so14181875e9.2
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 09:29:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63514350D4F
+	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 17:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769708093; cv=pass; b=FDBYWMCcoc0/cilAdMnC69hTUCeUaGOBYDISe/7QoDlVAci8RQWgxpvcp7g87h07dbCXOWn6ZLTQ/XyumbnRa/9mIU+XwSBrJAbcN06yp9LzGAqDJjNlgaDB79M6weOub3vpTZ7VRoBklu9Wg338pdYZCyXs6olCWCbpWOMlT2A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769708093; c=relaxed/simple;
+	bh=UaPo9BsXw41+UwtF89c2dJMBz8qHAJ6NArRn59ehYok=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dyHD+JmLg0QRSEbFNG7ww+q2Tev76wTkju7KFT+XBPaP1ScC0rXyB9425KPQMD0xwxySQq3h7pcjAWkqttRwMBDnAxd/e0OGlKIHbAAA6d5XZ3uGV7njxKI+yn84uS/GLoaK/VvoaCNPlePiihJIYHelqHUSfGXgMMLuEGE9qPA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XgDfcssl; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50299648ae9so591151cf.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 09:34:52 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769708091; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZDUtQrUeqaSVzVAUUPqE/u+8BUX6qjErBvtg42sPsv5bgA3R7ALeH6oO06ZBx/iA8N
+         tF2kVEIBf+jW17XoCWCpz2f19JUqnn63PDv8FLYU+2YrxYOHiBFhzRsUVMLDK2sw2zP4
+         EdsuBBFvol5lb5fVFt5/zAzlXiRC4R4lj+t4y1cYzsGUXolNAR+fiR2DHtng0xpK3egS
+         GcGE8025ndl8KmFMMiNx9TMFs4mlRZZwBI++7CL3NFWxTy8qJhzfF8l1a+PhkIH3dXO0
+         cTICEznyIp3uAO8C3ZI5nK7J3xl7rlkMxNV0sB7KY5NMcdn73tcrkP6b2Wh7MrW1wKX4
+         ch5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=OCjRmeNlyKGhmHNcoMiPz9wOGxIE7UrMLqkSTeQIzDw=;
+        fh=/fEK2aW0mXMU1TL934aC3vyk017M2XDMYs2ug3nKmg8=;
+        b=V2bomK1hASu2y+CoqAvTU4ENTABZAyIM/eLxp23vfbz5L9rbFu1UqKUCGg6A0fJ9dF
+         KaoN8jPupp/StJCWsHAMQ7TuIEDHDK+F3FK7tPp3P696H7WS5w41d/XY0NZXylygCVa+
+         +1kq4e6hncy08EUj6ZyyQ83MmJVk0EJ8nZvdmkCDQNZ3BXVUh/KprZHZLPTEonD3bbJz
+         665OlamTXSb9sstpulYlofRLyHJAsKrRNVpTaw45m6vOz5g1h6FRY2EdhlFCmLpbOmih
+         UBcA4CmMoNEXmTilDHlHmi4P50aS4GsWyJNmrXHZo30xTgfyJpLuID+Tc7g1Vwt5e6SE
+         f+sg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1769707785; x=1770312585; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=be866/Yp5BAQJMoBK98y8dBJLQ2gHvccZfOQ5Qw+jAY=;
-        b=wHwIu2VlC51zeYSWrFup//yLPuyf8rJC3TBNiTTLUi0VzqQrupIgBaCJ/AzM2VxAmw
-         Zg1Xi0BlHaY/jdGN8iIeD2Rydh/xwPBTyM/STgtUm8+90oPOJJNXvvG72yJfnKVUB5nE
-         p8ZOBFbd34St+Ip0pfYaPSUEpFxBTY9pdfhF3+XBsB1amjfdtVK/8UjhRPue+rnh51ur
-         FflmD70zt4F2+5ZZBcN163zATMyhb8zTFn47J1Zok6xknh1nHlH/WjTZ2S4b2leHxWLM
-         bM4dLlD92K6ZDAdLyNddhrbwye141vcvymhr7mqc3BrBJPy3km2AfQNFEBJaZBTY9ypa
-         bKqw==
+        d=google.com; s=20230601; t=1769708091; x=1770312891; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCjRmeNlyKGhmHNcoMiPz9wOGxIE7UrMLqkSTeQIzDw=;
+        b=XgDfcsslWRxI4y/mlEUqaUtdGdWfZ56YmlJLbTlFCKl3XopI0cm9ShSoYfaeKFgYWA
+         tZjah32vWAWvXD2m6npQD5oYKCoW/87RqWvenkSvSXdvbjQ0868w0Omc1SAwGWEHRVAl
+         7dYSICCiNhHnCN0rtl2ahPvESEA7AAkS2v0cI0NOfpTjbXVKOeKDiQm/58HFfKUUJxUy
+         mpvmzWvONntu3ukmG6C6gBCXPnXOfU95Nwyj+JR+hgsz+9n6hmQ+3Y3Id4U53/dZWMCC
+         VdozLNZMOL4bqortEgY9JyiMgoeqHRHyZCkR87NnhiBgrBq7umXqmlkr/HLQSzi2jSx8
+         r3UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769707785; x=1770312585;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=be866/Yp5BAQJMoBK98y8dBJLQ2gHvccZfOQ5Qw+jAY=;
-        b=RvQsEXk0psZGNBEW1WmuprDJo/urxbQ9chXFORvAFn5UqRocSf960DrmrYth0aSGqA
-         8Mnn3Hiv9kYH8BNZk/uqtk3D/llNWIgbEyLaNofcT7ljPxp4IJwxEoKpFxjC9FFQHsfH
-         Dwu0XIKwNmsAMZBuAS+NNb+XBFJDoDkbmNpVgvM2OCP7wZgkCLYZ+PVS+Xey08EKFwlO
-         Sz/ILhgrnfeNYqcZ0Via8sOOC3dilzWGRA6raL4U/R/lO7ltQAizvit4g/fYArnVyOwG
-         pTkEQfi+iYjl/esecKtC43fGi/LRhCGc40TxMI2hAQE/InzfVLuTpbnBiZxx5FgA4ZcQ
-         5x9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXbEOWhUTqLzhqLyMt1nmArgj6m9uv6O3+EGO+XMtEjbvHyyZr4vbH/CtanSDbmoMsZpLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpcNOOuyzmuX2mUZ3WCQGNeKeuT2KI2RcgmZn05n1UGft1bMgb
-	qppyddRL/uBcOk/ajy87Y4DdZx4P1cIHXiOLi3o6XYGb7eoedah8pvDTEOqzb7QyhC8=
-X-Gm-Gg: AZuq6aKccMGn5TReX8klII3z05KMvrF3FwpwaYL3tTMK/BdXp3fnQjqCSpuz3mSAWzR
-	ZZoliofJoMq/dqZh6N+PzcQ9lvpFcKo8j+W5r2281xVxEB+HvHdY8/zD6ioNv7ruu/vKXhS18eV
-	ZiZceO7z3OnKK0SRNeDMcyYyh81ASsepLLhgxk/r8fLtcT+laG548Jmy1CaVU/yjmu/M735hkb2
-	xPDEaDbew5Ia7atBJDhSgnhmO1kDpdl7/67jLL+zcvpUMjqpmcKMUKV+ySTOq8I8qX9p5771+f+
-	YLDV7/SuBN2aJXWP7aq7S2tD4Xyynkj292tLP1UzFi48IzXuZ5oLNm1n602Gx4EN4dwpkS9a5tN
-	nBpirARrDR6NCLe281AY3xAMjPWatzHwdRmaXXyUaBqhgSCR7ANPuiHKOiUXQYHxxBgPe5TGE6D
-	OKUVCwf69MkG4=
-X-Received: by 2002:a05:600c:350b:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-48069b9a017mr121874905e9.0.1769707784613;
-        Thu, 29 Jan 2026 09:29:44 -0800 (PST)
-Received: from draig.lan ([185.124.0.126])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482da8eba27sm66755e9.6.2026.01.29.09.29.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 09:29:43 -0800 (PST)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 067175F878;
-	Thu, 29 Jan 2026 17:29:43 +0000 (GMT)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>,  Joey Gouly <joey.gouly@arm.com>,
-  Catalin Marinas <catalin.marinas@arm.com>,  Suzuki K Poulose
- <suzuki.poulose@arm.com>,  Will Deacon <will@kernel.org>,  Paolo Bonzini
- <pbonzini@redhat.com>,  Jonathan Corbet <corbet@lwn.net>,  Shuah Khan
- <shuah@kernel.org>,  Oliver Upton <oupton@kernel.org>,  Dave Martin
- <Dave.Martin@arm.com>,  Fuad Tabba <tabba@google.com>,  Mark Rutland
- <mark.rutland@arm.com>,  Ben Horgan <ben.horgan@arm.com>,
-  linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
-  linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
-  linux-doc@vger.kernel.org,  linux-kselftest@vger.kernel.org,  Peter
- Maydell <peter.maydell@linaro.org>,  Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 04/30] arm64/fpsimd: Check enable bit for FA64 when
- saving EFI state
-In-Reply-To: <76bf33a0-968d-4b99-a157-3eef076af69d@sirena.org.uk> (Mark
-	Brown's message of "Thu, 29 Jan 2026 16:41:05 +0000")
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
-	<20251223-kvm-arm64-sme-v9-4-8be3867cb883@kernel.org>
-	<87343o8jay.fsf@draig.linaro.org>
-	<76bf33a0-968d-4b99-a157-3eef076af69d@sirena.org.uk>
-User-Agent: mu4e 1.14.0-pre1; emacs 30.1
-Date: Thu, 29 Jan 2026 17:29:42 +0000
-Message-ID: <87wm1072ex.fsf@draig.linaro.org>
+        d=1e100.net; s=20230601; t=1769708091; x=1770312891;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OCjRmeNlyKGhmHNcoMiPz9wOGxIE7UrMLqkSTeQIzDw=;
+        b=Mw2zEURjz5UYBsLsZs07LDB7sedvRCM7sC8T/fb60Bg3n8qlXCWy4P+cnX647f1R/E
+         3JBgTLW5B74Ho+UazbMK9swcvvv+gxFpSwnJ5KzhGmy0G3n5E11Bpr6mnP/7l2t/Haws
+         KM0Kud/K8H27SQIkmCC5oMgHuVtYkwUg1YRflfOt5fdkk+51SN4gQTYzjqA8FaRj7J0C
+         KrP/uT/ZmktIKEhV1PpDSFmlUa1A9NIGqH6yD3JfdcSr/9esqEuNCccHgauiR2TfiSvh
+         NnwLP/nSpodp2SThb6rEJoZquBsaUJ7s1KW2NrBES/LD2uw/ec8qN4zimsdA/bh9pAXa
+         h6CA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+Dr8Q5kB3q/vszLEkKNZQyvNxclzeYYjfIisHJ5ZXhQ9Q9GErdRTBJHAbTdbQ3batXrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTjxtCJraED3sc4ctAPdEHIYjZn0ec9ovHYF32PVWE4gW6sIjQ
+	BS/aKXZo9xb2m2MX7chtBeGEZP8Rk18MMi2v1rHttkiJhkkRgFUziZxTi3fZ6+nvamFLNVkIdP8
+	KhbrJZW7DNdws1GjYBdywz6uQQZ6zwVgf9rC0v5qI
+X-Gm-Gg: AZuq6aJLP/FkPx7hUNMT8XVbL6luMuhXQqG97eZ1f/uTsoWVnQwL2w5Xr1KnNmhja1+
+	kNkeycgM5yo7/N3Jiy3yHBnmIIKdheHAfw/8vGb6oCoxPVHKqIsj8AkZfYam6l4Hga9Jt+ZiGzS
+	EbAmCkKyQXfW8XBQtVTX9NQ6QPPIHdo+6gN1ztvz+TDd44k4W4WF7Bl9Sltvs/ra17YbPghzA8h
+	rdWIIRodE+X5+ZSPskna9gCo6VAKOx5c1Fyo3YPk4OQTE9a7tGzAYl5zlSIb5+GLCX8Pqzu
+X-Received: by 2002:ac8:5dc7:0:b0:4ed:ff77:1a85 with SMTP id
+ d75a77b69052e-504310c6a76mr11415131cf.17.1769708090725; Thu, 29 Jan 2026
+ 09:34:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-17-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-17-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 29 Jan 2026 17:34:13 +0000
+X-Gm-Features: AZwV_QiTE6QZNIoj8DOQzS5LJpafanXH_brsaCuAk8_cVjfPbm_tEiXo0cJUCrM
+Message-ID: <CA+EHjTxS-TVNzFdENTa3F3V1Z5+grxx7x5MO1YJGrZJEY+kUaQ@mail.gmail.com>
+Subject: Re: [PATCH 16/20] KVM: arm64: Simplify handling of full register
+ invalid constraint
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-69580-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69581-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex.bennee@linaro.org,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,draig.linaro.org:mid]
-X-Rspamd-Queue-Id: 6E79DB2F60
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 34839B3038
 X-Rspamd-Action: no action
 
-Mark Brown <broonie@kernel.org> writes:
-
-> On Thu, Jan 29, 2026 at 04:39:33PM +0000, Alex Benn=C3=A9e wrote:
->> Mark Brown <broonie@kernel.org> writes:
+On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
 >
->> > Currently when deciding if we need to save FFR when in streaming mode =
-prior
->> > to EFI calls we check if FA64 is supported by the system. Since KVM gu=
-est
->> > support will mean that FA64 might be enabled and disabled at runtime s=
-witch
->> > to checking if traps for FA64 are enabled in SMCR_EL1 instead.
+> Now that we embed the RESx bits in the register description, it becomes
+> easier to deal with registers that are simply not valid, as their
+> existence is not satisfied by the configuration (SCTLR2_ELx without
+> FEAT_SCTLR2, for example). Such registers essentially become RES0 for
+> any bit that wasn't already advertised as RESx.
 >
->> This is conflicting with the now merged 63de2b3859ba1 (arm64/efi: Remove
->> unneeded SVE/SME fallback preserve/store handling) so I think this patch
->> can now be dropped?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+> ---
+>  arch/arm64/kvm/config.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 >
-> Yes, this should go away in the next rebase.
-
-Everything else applies cleanly though so thats good ;-)
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 28e534f2850ea..0c037742215ac 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -1332,7 +1332,7 @@ struct resx compute_reg_resx_bits(struct kvm *kvm,
+>                                  const struct reg_feat_map_desc *r,
+>                                  unsigned long require, unsigned long exclude)
+>  {
+> -       struct resx resx, tmp;
+> +       struct resx resx;
+>
+>         resx = compute_resx_bits(kvm, r->bit_feat_map, r->bit_feat_map_sz,
+>                                  require, exclude);
+> @@ -1342,11 +1342,14 @@ struct resx compute_reg_resx_bits(struct kvm *kvm,
+>                 resx.res1 |= r->feat_map.masks->res1;
+>         }
+>
+> -       tmp = compute_resx_bits(kvm, &r->feat_map, 1, require, exclude);
+> -
+> -       resx.res0 |= tmp.res0;
+> -       resx.res0 |= ~reg_feat_map_bits(&r->feat_map);
+> -       resx.res1 |= tmp.res1;
+> +       /*
+> +        * If the register itself was not valid, all the non-RESx bits are
+> +        * now considered RES0 (this matches the behaviour of registers such
+> +        * as SCTLR2 and TCR2). Weed out any potential (though unlikely)
+> +        * overlap with RES1 bits coming from the previous computation.
+> +        */
+> +       resx.res0 |= compute_resx_bits(kvm, &r->feat_map, 1, require, exclude).res0;
+> +       resx.res1 &= ~resx.res0;
+>
+>         return resx;
+>  }
+> --
+> 2.47.3
+>
 
