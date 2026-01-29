@@ -1,231 +1,193 @@
-Return-Path: <kvm+bounces-69592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69593-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ACe1AKmre2kAHwIAu9opvQ
-	(envelope-from <kvm+bounces-69592-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 19:49:13 +0100
+	id gOiUL02se2kAHwIAu9opvQ
+	(envelope-from <kvm+bounces-69593-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 19:51:57 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8C2B3B4F
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 19:49:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600BEB3B9C
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 19:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73070302837B
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:48:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04300305A6E4
+	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 18:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E3A309EF9;
-	Thu, 29 Jan 2026 18:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7122630AAAE;
+	Thu, 29 Jan 2026 18:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMjgQdwz"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="PfFwAT9U";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NCNU3++S"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860862C11ED;
-	Thu, 29 Jan 2026 18:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418D43090C2;
+	Thu, 29 Jan 2026 18:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769712535; cv=none; b=JvKdZAOUfWGgsXI/K/TYcyxZojJBcRR2rJxkMYV223lZwPE1zXiv7uwSSDX5NVuTA45LJmdtR4Dymr67cm266peLbtFKiYgAqE18zPnZgZy8JXONwosIQ4QrLmP9yrVyNHR2eMqrzE6+90KdUKaewNyBxuVxKMoB8I0PZaYOA9Y=
+	t=1769712646; cv=none; b=VAyCYtw6uJ5V/8NBXZcAdCr1oksxtAgI3ezaw9Lbro28cOT1Rmjq2QveIOPVvU/CnddcuKhPx1rLw9bEoYF7WKrzH0A4HHQPfjlcJ30oZCi3HlhLEt0xSoAWxHwPo4N4Ld2BxVDOiRFUC37C2cblpIV2C3HnGuZVGkoW61laJzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769712535; c=relaxed/simple;
-	bh=LUYBJJ3lyDfHxOh1C1isUaHVHRqXOl1euZswCzoh/5Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TeGWH68ezt+EWfql0AFCefH4dp+pHfgShX4XvDBmBITN+QDggn49//JOj17xVj89smykYavNb3JqI4LBpuqblqblHpvIOTDUHHT3t88RR2xbXpY9RV+iydITlSistSSd4KN1PlSaZKUQbKnnJP7x9hhQB0ebFtMZuoGWstvKVho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMjgQdwz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F5ECC4CEF7;
-	Thu, 29 Jan 2026 18:48:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769712535;
-	bh=LUYBJJ3lyDfHxOh1C1isUaHVHRqXOl1euZswCzoh/5Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dMjgQdwzQoA1Jbom8FiLnA8jIzHd1e5VrhfcrERSmABIaGsxDi6xSYWLFXTk8ldI8
-	 b+D36Oj9UTwRaO9bWRfLXZxpWWdB/8BkBLhfUhGbCITh8Lnsu4xGiTC27/zUVQadQ9
-	 kD38fkRSP48UEUGZhUZo60xBacKZJt0WbGvoNpuFK7z4pV2Edl98lrKUVdkhFMO+7e
-	 LYkf4j0q95KGTB3+cx8BeTZz8WW48pAT0VUfRFv5stMzSCWAFVbWLklCI1CyYnng7R
-	 XoH/pklZOaaYUB0MeL0Ptl94YRpXB8Aig/QGPgubp6NKsFb0n1jbICrUf829UU0GAQ
-	 yheTI/bAMUkUA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlX4W-00000006r7k-0y5v;
-	Thu, 29 Jan 2026 18:48:52 +0000
-Date: Thu, 29 Jan 2026 18:48:51 +0000
-Message-ID: <867bt0b6gc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Tian Zheng <zhengtian10@huawei.com>,
-	oliver.upton@linux.dev,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	linux-kernel@vger.kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yezhenyu2@huawei.com,
-	xiexiangyou@huawei.com,
-	zhengchuan@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Support set the DBM attr during memory abort
-In-Reply-To: <aXuSsVKtXBcffzo2@devkitleo>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
-	<20251121092342.3393318-3-zhengtian10@huawei.com>
-	<aXuSsVKtXBcffzo2@devkitleo>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769712646; c=relaxed/simple;
+	bh=WKec3arCCMNRrGJBEnRE3sLK4j3onPSV3T75MrOsaWI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u3YM5BSGZd9EPLVs5ASWYQXQLUTwBMbH+Kqb45QbC7X4+z2YjdvQXOicXwp+1KNgiJ4cn54mjelVDX1be30HpL0q0HGw0JHtwEw0E0tTBlZr6he6Gszxpd6YJcLcJR+x/RVkNgbqcJTm1GcsXebgvkzrAGIWC5a5ijRktV79n8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=PfFwAT9U; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NCNU3++S; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id 524CBEC0602;
+	Thu, 29 Jan 2026 13:50:42 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Thu, 29 Jan 2026 13:50:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1769712642;
+	 x=1769799042; bh=ufj3Z5ElDLmJd7fO42cOWXMjtgm9/Nt9Eiy1rxbPIFA=; b=
+	PfFwAT9UUE0dhiSQ+h5829y3AIAqVryHRhItnAQG8NX5AWay1xdQRd6N+Zs0TEDM
+	OZL47WwTcitp9t7kJGba6BJqXNj41Utpa+Vwl/iW47uqyM95G55HYUxLVXJpiH1h
+	JfXeMSfLdXJYcu2MIhR45hBLekrJyDTr2ubaY/4Cq+CTdv9Ndjf08z3AZkz82Wz6
+	Yh8Ep7wUMm3vaQpUCDu7+b2XFgt9EyiTeXoAo6NN0Rko0nf3g8rI9Ky5wh0tD+PU
+	i65XgYlM3GdVCwChHE42KXbEgZ9iTNJSPHNK6ycnvSuaOnW2idX4dtRpuzz0BP7o
+	/MsDUVJnLucLaVpFFWI/7Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1769712642; x=
+	1769799042; bh=ufj3Z5ElDLmJd7fO42cOWXMjtgm9/Nt9Eiy1rxbPIFA=; b=N
+	CNU3++SMvVM12tD6bZal5g6l4UDt3lkFDWZVeIG3afquAlzVvse1GPZ4zMgEYUeR
+	rpMFhoxLQykllbI+h4hZaS2/8FjXZFOp2UO4Xks6bty41UiYwNpWgH9Nwlkgu/FU
+	R2GpdJhS+6qGk/tdAL+iMKlh0lnVdSW51dH9SQxJDkA3oy1t7+1PwJ0G+C97b9uP
+	H9PH9CNLRvGpUj/L1U1c+3ijL7GqoxN9IuAyKNoCq+g0dSsspArY9BAAQoY0IDGZ
+	aMUIcYqAsPduqP/1q/d44e4WmJp5eGk7Ybu2GehVKcwqtwnUkITZinc8x6I1uuOH
+	yqRuOcLEnWYL8ODZVNJkg==
+X-ME-Sender: <xms:Aax7aeWS-lIvTJN2WFNH-JLygTLYjfzWr_LPUwvHHTeGI7WKHxOglA>
+    <xme:Aax7aQnByE7SA_ChI5cZ10Y75OqJZ4U5ywItwvklFQhcAbTs7MZKRN8vI57uUQLJ7
+    RRHDf5N5ThKPYD1tpXkerCJjtcv8W6ExDDn50E4iZim5JkKOqELug>
+X-ME-Received: <xmr:Aax7adOv9D6PTYAKA3cIs749ROzqde0UwDkgcX44bU8ArNDe67ezW-pry6M>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduieeileeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpeetlhgvgicu
+    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
+    htthgvrhhnpeetuefgleefhfdvueegffdtffevhfffgfffiedutdetgffhheejtdekfeek
+    ieehgfenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhg
+    pdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepug
+    hmrghtlhgrtghksehgohhoghhlvgdrtghomhdprhgtphhtthhopehrughunhhlrghpsehi
+    nhhfrhgruggvrggurdhorhhgpdhrtghpthhtohepthgvughlohhgrghnsehfsgdrtghomh
+    dprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrrghn
+    rghnthgrsehgohhoghhlvgdrtghomhdprhgtphhtthhopegrmhgrshhtrhhosehfsgdrtg
+    homhdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheplhhinhhugidqkhhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:Aax7aYJ_HHdpOwnUcx3pM__qj8vWsJWR7-9MmuB9ptXphqJayxXv_Q>
+    <xmx:Aax7aX3YAyPX45O0OaCPFUbT24K1PnR4f52bm9Yr4m-KCJFHKNxzEw>
+    <xmx:Aax7aUUB2LioUGNPEx92oplF9ZTTrNEcEWrQZlXfGto5SGlQoeY_TA>
+    <xmx:Aax7aRPMBr62WZQJTQutZa3_uwndURAe1rpe2D5YhA5XYk-3jukGUA>
+    <xmx:Aqx7aXHY0v-Z3_2ZWr_yDsuMNCLPkovj3iODpi1O3-b3zXJwLDJc0PmU>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 29 Jan 2026 13:50:41 -0500 (EST)
+Date: Thu, 29 Jan 2026 11:50:39 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Ted Logan <tedlogan@fb.com>, Shuah
+ Khan <shuah@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, Alex
+ Mastro <amastro@fb.com>, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kernel test
+ robot <lkp@intel.com>
+Subject: Re: [PATCH] vfio: selftests: fix format conversion compiler warning
+Message-ID: <20260129115039.10fe3c76@shazbot.org>
+In-Reply-To: <CALzav=cWEoydGBpf4j5gPWy0TzLoAPP3YeG3VocbeEzytHTFrw@mail.gmail.com>
+References: <20260128183750.1240176-1-tedlogan@fb.com>
+	<CALzav=dMhycS2iBxkhPCz3tMUKxkfgr1dCLFGYzGuXZCeYhijw@mail.gmail.com>
+	<9d992d4a-1aea-42a7-aa79-4ede80293f9b@infradead.org>
+	<CALzav=cWEoydGBpf4j5gPWy0TzLoAPP3YeG3VocbeEzytHTFrw@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org, linux-kernel@vger.kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com, zhengchuan@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69592-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69593-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:email]
-X-Rspamd-Queue-Id: 9F8C2B3B4F
+	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,infradead.org:email,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 600BEB3B9C
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 17:02:41 +0000,
-Leonardo Bras <leo.bras@arm.com> wrote:
-> 
-> On Fri, Nov 21, 2025 at 05:23:39PM +0800, Tian Zheng wrote:
-> > From: eillon <yezhenyu2@huawei.com>
-> > 
-> > Add DBM support to automatically promote write-clean pages to
-> > write-dirty, preventing users from being trapped in EL2 due to
-> > missing write permissions.
-> > 
-> > Since the DBM attribute was introduced in ARMv8.1 and remains
-> > optional in later architecture revisions, including ARMv9.5.
-> > 
-> > Support set the DBM attr during user_mem_abort().
-> > 
-> > Signed-off-by: eillon <yezhenyu2@huawei.com>
-> > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 4 ++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++++
-> >  2 files changed, 10 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 2888b5d03757..2fa24953d1a6 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -91,6 +91,8 @@ typedef u64 kvm_pte_t;
-> > 
-> >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
-> > 
-> > +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
-> > +
-> >  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
-> > 
-> >  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-> > @@ -245,6 +247,7 @@ enum kvm_pgtable_stage2_flags {
-> >   * @KVM_PGTABLE_PROT_R:		Read permission.
-> >   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
-> >   * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
-> > + * @KVM_PGTABLE_PROT_DBM:	Dirty bit management attribute.
-> >   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
-> >   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
-> >   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
-> > @@ -257,6 +260,7 @@ enum kvm_pgtable_prot {
-> > 
-> >  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
-> >  	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
-> > +	KVM_PGTABLE_PROT_DBM			= BIT(5),
-> > 
-> >  	KVM_PGTABLE_PROT_SW0			= BIT(55),
-> >  	KVM_PGTABLE_PROT_SW1			= BIT(56),
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index c351b4abd5db..ce41c6924ebe 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -694,6 +694,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
-> >  	if (prot & KVM_PGTABLE_PROT_W)
-> >  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > 
-> > +	if (prot & KVM_PGTABLE_PROT_DBM)
-> > +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > +
-> >  	if (!kvm_lpa2_is_enabled())
-> >  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-> > 
-> > @@ -1303,6 +1306,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
-> >  	if (prot & KVM_PGTABLE_PROT_W)
-> >  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> > 
-> > +	if (prot & KVM_PGTABLE_PROT_DBM)
-> > +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
-> > +
-> >  	if (prot & KVM_PGTABLE_PROT_X)
-> >  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-> > 
-> 
-> 
-> Hi Tian,
-> 
-> I was re-reading this series while planning the other feature I am working 
-> on top of this one.
-> 
-> This patch, IMHO, is unrelated to the HDBSS feature.
-> I get that HDBSS feature needs this bit being set in the page descriptor
-> but it was not introduced in this feature.
-> 
-> It was actually introduced in HAFDBS.
-> 
-> So maybe it's worth to split this series in:
-> - Enable HAFDBS for KVM, and
+On Wed, 28 Jan 2026 11:21:52 -0800
+David Matlack <dmatlack@google.com> wrote:
 
-TBH, just enabling the dirty bit at S2 is pretty pointless for KVM. It
-would require scanning the S2 PTs looking for a dirty bit, and
-transfer that to whatever userspace is using, be it dirty bitmap or
-ring.
+> On Wed, Jan 28, 2026 at 11:12=E2=80=AFAM Randy Dunlap <rdunlap@infradead.=
+org> wrote:
+> > On 1/28/26 11:06 AM, David Matlack wrote: =20
+> > > On Wed, Jan 28, 2026 at 10:38=E2=80=AFAM Ted Logan <tedlogan@fb.com> =
+wrote: =20
+> > >>
+> > >> Use the standard format conversion macro PRIx64 to generate the
+> > >> appropriate format conversion for 64-bit integers. Fixes a compiler
+> > >> warning with -Wformat on i386.
+> > >>
+> > >> Signed-off-by: Ted Logan <tedlogan@fb.com>
+> > >> Reported-by: kernel test robot <lkp@intel.com>
+> > >> Closes: https://lore.kernel.org/oe-kbuild-all/202601211830.aBEjmEFD-=
+lkp@intel.com/ =20
+> > >
+> > > Thanks for the patch.
+> > >
+> > > I've been seeing these i386 reports as well. I find the PRIx64, etc.
+> > > format specifiers make format strings very hard to read. And I think
+> > > there were some other issues when building VFIO selftests with i386
+> > > the last time I tried.
+> > >
+> > > I was thinking instead we should just not support i386 builds of VFIO
+> > > selftests. But I hadn't gotten around to figuring out the right
+> > > Makefile magic to make that happen. =20
+> >
+> > There are other 32-bit CPUs besides i386.
+> > Or do only support X86? =20
+>=20
+> At this point I would only call x86_64 and arm64 as supported. At
+> least that is all I have access to and tested.
+>=20
+> If there is legitimate desire to run these tests on 32-bit CPUs, then
+> we can support it.
+>=20
+> Alex, do you test on 32-bit CPUs?
 
-It has been tried before, and it was absolutely disgusting. So let's
-not enable this standalone, this is a dead end. It only makes sense
-with HDBSS (that's why we have this extension the first place).
+No, I haven't tested 32-bit in a very long time.  I'd like to think it
+works, but I'm not aware of any worthwhile use case.  Thanks,
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Alex
 
