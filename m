@@ -1,189 +1,180 @@
-Return-Path: <kvm+bounces-69724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69727-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GP1bAuG5fGk0OgIAu9opvQ
-	(envelope-from <kvm+bounces-69724-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 15:02:09 +0100
+	id qA+sMo2/fGlVOgIAu9opvQ
+	(envelope-from <kvm+bounces-69727-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 15:26:21 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7A0BB70B
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 15:02:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A31CBB96C
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 15:26:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D410C3034E04
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:01:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FC25303351A
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919BC320A0A;
-	Fri, 30 Jan 2026 14:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCAD319855;
+	Fri, 30 Jan 2026 14:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="RPXkfxnK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bOZX1Rdw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C17311C31
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 14:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDB130EF9B;
+	Fri, 30 Jan 2026 14:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769781681; cv=none; b=f3zmlqkWxpDl4WEt6ON4D0pXq+FO+Xz76/4HXwnJBY/lJi0RT7HozmqXH0jmySAwm5ieJPg6Fd2pYf5QSek+yDGPnLvJwIirY3426H6vUda+FbXBfpytBQbvD7POngYc1Rll7AlBPYkxK1TX61At2i1rOPGtGFTRoPl6Q7dBIu8=
+	t=1769783141; cv=none; b=a8GnEI8u1p6oJZaS0MYrfCa06x5fcSzltBpBHqfbO9Yx0eb7Jpr7vh9rJ5z+JtdR1aDyK70lCrhFDMro4m0OkwyxsxxdwXJmLSwixfvJNu2HBGWMxgc7897B6nBbbixrNTk4spFeECrJUYFakCHLonRBCSdzLhMLp4izPHXBvl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769781681; c=relaxed/simple;
-	bh=B2BjUDXErJP5w+VRNup6GLKty66RY3PW3GzWxgahGUw=;
+	s=arc-20240116; t=1769783141; c=relaxed/simple;
+	bh=wlIEF5Jo3bz9SPk/4gkEUeNy6rbBrlP5v2SRrMJhK1g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HmN9hKa3HdrWRdB9Lm5gvCyJ0hQCdp/kJM88R/7F2ws1n6xFd9cMTV5lya2t0Ux563MCq7ycxLRWpLPrG00vKu4AScWZbJ6fjuZQbA2eoKi2YebQOQWq9wDVUMk0GgI2EB37sE4UHJ7myNNTrYQd1HvRORSc9to2jtiQD9olx9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=RPXkfxnK; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8c533228383so134623185a.3
-        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 06:01:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1769781679; x=1770386479; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RZzJd1rUXnKgbbFoik2J/HwA+Mcwjh2UI/kxMGq+fms=;
-        b=RPXkfxnKERVpanY6KK8kMqA92D1aCsm0leVXLFCXjOhb2U3nX2ibmil5e1rKJjRbmZ
-         f9DLF2ispAd3BC5/e/B7PIP41q9T7cXh+rFnMjLhQTQVOAwPscRHX0yuVltxMo+SX0va
-         xizd3lnopuOyDgwqxrfBFFPETq8K7uDdD1AiHlNN/WTPGOisvesviEelnt4KuWRuvyRg
-         C1fgBVRD7H2M7lHZPygk3VfxwbCekxUo86H7EPdB+A5bCR3cOm6bbT7bRiRKk5cUFTZ8
-         6U8v+ce+eW1niOc5yZS8lVBKLeRT4st0EvTSZ8FDC2mKySNBjdyDwdy1kxq6nDeMR7Sh
-         lduw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769781679; x=1770386479;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RZzJd1rUXnKgbbFoik2J/HwA+Mcwjh2UI/kxMGq+fms=;
-        b=Acv25L750TSgUYvhKqGffFCn/4ZflGjYmpVsF239HcNBkD8HPzfnoeJUmRm44/txRO
-         lQPW/U0Gy/9AJ3tLa6sDHYY9E7Ds7jv3bmVS+AraqkXn6AQ2jBUwC50Qhb5uqmxUfOA7
-         QC1wi+lZZ9j61WbQtuezN5Cfsh9/ySihD6witW2Pv1He554VfRUaY/I/PxdGgPpi2fpe
-         YGdpvz/wbQa6IAQIwkSen4HBDROnBaPF8zf04FhzSzsU7gwfG7FiVRpgbLiZnc7nOyk0
-         UBk7FUPECcgJ6ZknjyEoMkMg9/uVVB/wVAJl80hTSAI6PMQo1I1A7zK9OK6CK4AYhm2F
-         3ONA==
-X-Forwarded-Encrypted: i=1; AJvYcCXk/6seBIzhPb75l4xQ6XfnEqmbd3DoBAOLujrdG4g7iFQ3WdvIMT+gBQKaZOQwNxLm9AE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF59eefNsjr1/o+mskeXrYPIENQlmmcIXFmKPzOzEXS8hwHsu7
-	We5q6i2+L349Unoxuvo5bwFXNYWYmEyPYDE6zHV7jDidIZ4rPrM0vUp+srm3ocrIS2c=
-X-Gm-Gg: AZuq6aIi7Zlq7qhUGSHC9y/TNIVUIiq3/DBQLmW2+A4TCg+zLEfJepshA1bfSGA99Ie
-	JYpS4yN9NmPN/QJuCoVTUaOhF84h4kiK69TZYO9LTpiZ7WLHVcUqVDtz/Z2DgrX0ySbKNfL8dyr
-	20LX8buDfPePzQFe+aeLY3faLs4gm7RmyZ4rQYpZ/jkP1qQYVR3b4tmAzCbShpZCcII64ZisdT1
-	FkH149ni706WRoECqHqNPOuAJUqQ9EFGqXghr3kCPWpRCNh0DlBWdTvasbH8bfgwdtBywdJWksI
-	kJXOwdP+8W32xVmL7JrnPG2uXT8gJ26iTvehBUwmsPKJg/JQzQAA5Ed+hCDzYKeWsTLXUpVJ3xY
-	rHgEn/oPeishshulToI9pRpj93+EWPuTjlR/k6edL0yJrA2jKNII27UtbQB0ZZcM8xtjV/sv0YI
-	ShwtdRgVgbGbOykXExr3Jz8PZajHz2yPIqmKsAev12k35zmCVsoeEqdnEUYNy6x9yJ9h4truArW
-	JogpQ==
-X-Received: by 2002:a05:620a:290f:b0:8c3:650d:577e with SMTP id af79cd13be357-8c9eb224827mr368793585a.4.1769781649371;
-        Fri, 30 Jan 2026 06:00:49 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c711b95e4esm700915485a.15.2026.01.30.06.00.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 06:00:48 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vlp3H-0000000Annc-1AWG;
-	Fri, 30 Jan 2026 10:00:47 -0400
-Date: Fri, 30 Jan 2026 10:00:47 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 6/8] dma-buf: Add dma_buf_attach_revocable()
-Message-ID: <20260130140047.GD2328995@ziepe.ca>
-References: <20260124-dmabuf-revoke-v5-0-f98fca917e96@nvidia.com>
- <20260124-dmabuf-revoke-v5-6-f98fca917e96@nvidia.com>
- <b4cf1379-d68b-45da-866b-c461d6feb51b@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dsb2aFO2GxOfOwX7mFOvUELJ3pkQSg87aU1LOnqXh6vUYUU3o7ArEhmXqLYlraHkLLLIqTGFMVUiWrDBXiP8Lrw6oNgWbTiAKjCy/u0wvRk92vRObbT0RcDZWGG6IpcPIfQonpNz05FTjHlM8nJXPGcTXgFf26QsgUyM5WBFiLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bOZX1Rdw; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769783138; x=1801319138;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wlIEF5Jo3bz9SPk/4gkEUeNy6rbBrlP5v2SRrMJhK1g=;
+  b=bOZX1RdweEby068EBnvqN5SwoWm39hRLuxxLXWdDXcd+MaXW8y/69L1+
+   FeFYON5OJkyME5vr8wLNWPKkxWa8rZIG1z/pArUuKjLu3NzNsunSf9FsA
+   oTERo5i6HeVQ1DH0WpMo9+uFS17ZKt78svbJQGLT6mHNI4X+f/7el1mfH
+   MXx+31S6lxYEWwkG9aTPygJbofg0ol8VoI8z4cGg9FvkS+PZgIu0WyGxy
+   wegPs4yQbN0msgyg5xmIYTu6tycnUYDt4DdRsDxi3GFCxJYoeZ6BM5mEr
+   WoH3mfNDlUqo8YzXTWQo5lmYiaiyIUb94KbmhGPZDoNBOD1EhkkhtxhhM
+   Q==;
+X-CSE-ConnectionGUID: c2gkfwVEQDioeRjycswYxw==
+X-CSE-MsgGUID: HvIILaEhRUawWsTIE6Vr1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="82458399"
+X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
+   d="scan'208";a="82458399"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 06:25:37 -0800
+X-CSE-ConnectionGUID: JrY8CnCkSFqu0MIvcbv6hg==
+X-CSE-MsgGUID: P0tzny3USouHXQWhjxOdAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
+   d="scan'208";a="213396410"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa004.jf.intel.com with ESMTP; 30 Jan 2026 06:25:34 -0800
+Date: Fri, 30 Jan 2026 22:07:17 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
+	ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+	sagis@google.com, vannapurve@google.com, paulmck@kernel.org,
+	nik.borisov@suse.com, zhenzhong.duan@intel.com, seanjc@google.com,
+	rick.p.edgecombe@intel.com, kas@kernel.org,
+	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+	Farrah Chen <farrah.chen@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v3 10/26] coco/tdx-host: Implement FW_UPLOAD sysfs ABI
+ for TDX Module updates
+Message-ID: <aXy7FTKDBfZ4jXt1@yilunxu-OptiPlex-7050>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-11-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b4cf1379-d68b-45da-866b-c461d6feb51b@amd.com>
+In-Reply-To: <20260123145645.90444-11-chao.gao@intel.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-69724-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	RCPT_COUNT_TWELVE(0.00)[34];
+	TAGGED_FROM(0.00)[bounces-69727-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 9D7A0BB70B
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5A31CBB96C
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 09:43:22AM +0100, Christian König wrote:
-> On 1/24/26 20:14, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > Some exporters need a flow to synchronously revoke access to the DMA-buf
-> > by importers. Once revoke is completed the importer is not permitted to
-> > touch the memory otherwise they may get IOMMU faults, AERs, or worse.
-> 
-> That approach is seriously not going to fly.
-> 
-> You can use the invalidate_mappings approach to trigger the importer
-> to give back the mapping, but when the mapping is really given back
-> is still completely on the importer side.
+> +static enum fw_upload_err tdx_fw_write(struct fw_upload *fwl, const u8 *data,
+> +				       u32 offset, u32 size, u32 *written)
+> +{
+> +	struct tdx_fw_upload_status *status = fwl->dd_handle;
+> +	int ret;
+> +
+> +	if (status->cancel_request) {
+> +		status->cancel_request = false;
+> +		return FW_UPLOAD_ERR_CANCELED;
 
-Yes, and that is what this is all doing, there is the wait for the
-importer's unmap to happen in the sequence.
+We don't allow partial write, we stop_machine while writing, so we
+cannot possibly cancel the update in progress, so we only check the
+cancel_request once before first write. That means cancel is useless for
+our case. Is it better we delete all the cancel logic &
+struct tdx_fw_upload_status?
 
-> In other words you can't do the shot down revoke semantics you are
-> trying to establish here.
+> +	}
+> +
+> +	/*
+> +	 * tdx_fw_write() always processes all data on the first call with
+> +	 * offset == 0. Since it never returns partial success (it either
+> +	 * succeeds completely or fails), there is no subsequent call with
+> +	 * non-zero offsets.
+> +	 */
+> +	WARN_ON_ONCE(offset);
+> +	ret = seamldr_install_module(data, size);
 
-All this is doing is saying if dma_buf_attach_revocable() == true then
-the importer will call unmap within bounded time after
-dma_buf_invalidate_mappings().
+...
 
-That's it. If the importing driver doesn't want to do that then it
-should make dma_buf_attach_revocable()=false.
+> +static void tdx_fw_cancel(struct fw_upload *fwl)
+> +{
 
-VFIO/etc only want to interwork with importers that can do this.
+Unfortunately fw_upload core doesn't allow .cancel unimplemented, leave
+it as a dummy stub is OK, since this callback just request cancel,
+doesn't care whether the cancel succeeds or fails in the end.
 
-Jason
+If you agree, add some comments in this function.
+
+> +}
+> +
+> +static const struct fw_upload_ops tdx_fw_ops = {
+> +	.prepare = tdx_fw_prepare,
+> +	.write = tdx_fw_write,
+> +	.poll_complete = tdx_fw_poll_complete,
+> +	.cancel = tdx_fw_cancel,
+> +};
+> +
+> +static void seamldr_init(struct device *dev)
+> +{
+> +	const struct tdx_sys_info *tdx_sysinfo = tdx_get_sysinfo();
+> +	int ret;
+> +
+> +	if (WARN_ON_ONCE(!tdx_sysinfo))
+> +		return;
+
+We already does tdx_get_sysinfo() on module_init, is it better we have
+a global tdx_sysinfo pointer in this driver, so that we don't have to
+retrieve it again and again.
 
