@@ -1,161 +1,216 @@
-Return-Path: <kvm+bounces-69695-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69696-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNVHFPaEfGmINgIAu9opvQ
-	(envelope-from <kvm+bounces-69695-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:16:22 +0100
+	id wCznCGmRfGkQNwIAu9opvQ
+	(envelope-from <kvm+bounces-69696-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:09:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4B9AB9445
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:16:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747BEB9D30
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3FF8630304B5
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:16:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C869D3059F25
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AED32F75B;
-	Fri, 30 Jan 2026 10:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63FC378D6A;
+	Fri, 30 Jan 2026 11:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/cRYyPI"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0A82C08D1;
-	Fri, 30 Jan 2026 10:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC29379979;
+	Fri, 30 Jan 2026 11:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769768171; cv=none; b=vBTVjI42d3o9b96wNhMF2CGjJPIW3/jVgjgp7m/5FzQbs0athzMbVlnS7SEE1HanyZZcYt5pFrugAY/8EDs87XqanA/IVeC7cS/aNcZy1TknYmPIAOS77c41Rhxd37dT9fQwUs3nFu3572BPGvN3/f3Y0g3SWQdw6UWLm3ByTcA=
+	t=1769771026; cv=none; b=gAY8oWVA8qiN5C0gywZtQh9mab5Xw3T2FXxA5EjNZYLQ6QfJ+pvhVGdWhhBsA11T0v6ZsfLhLhwFk8j+B6RxkIgLJa6uvtCM8cCT+0v3lvwGL8S9Ub5Fm+vkxQ1kFqAgCBhhkLaKxf9m2Rg15DXNG57AZIlNxybWTKZsdPw42jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769768171; c=relaxed/simple;
-	bh=NVZkMVRP7w7AL4VA+KY868nZa3icm5G5UfK98g25YDE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BKuH3yLfD9behST6Tp62b3wsUv30koETZFgrF1bKXqdtxKKs1+/zq0KK5nEaIjXwZOvXV+LXmM3+T+BPTjtOSJUqxbZOWEAh3X3Zmekd9SFPpejyadOslyrwpVbf0zFazOAvjU0MHMejk8VxlQIp2oJp08CblwL/qq51zQhdezw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from fric.. (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowAA3zRDehHxpX_wMBw--.48711S2;
-	Fri, 30 Jan 2026 18:15:58 +0800 (CST)
-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-To: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Alexandre Ghiti <alex@ghiti.fr>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Atish Patra <atish.patra@linux.dev>,
-	Anup Patel <anup@brainfault.org>,
-	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
-	Jiakai Xu <jiakaiPeanut@gmail.com>
-Subject: [PATCH] RISC-V: KVM: Fix null pointer dereference in kvm_riscv_vcpu_aia_rmw_topei()
-Date: Fri, 30 Jan 2026 10:15:57 +0000
-Message-Id: <20260130101557.1314385-1-xujiakai2025@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1769771026; c=relaxed/simple;
+	bh=b38Rv5/cdNrq8B4fEOLBB08SrNNsLGpLWY/NWYJxCBI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Cuo+hXjM9ACaldnwNch4HOrunN/eIoFcMqkDtqAR/95hHlqdZ6rC4xWD71gWBF9bG+0y6HPF8N12cZrzylL/McZS1HmAVirbzwctZODnGEI1kYDLRd8+QdtrakNC/p3CfvBJteaKvzoeNdfaGJrh2QhHu4vkL7CwgtCQFZpLtLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/cRYyPI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486BFC4CEF7;
+	Fri, 30 Jan 2026 11:03:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769771026;
+	bh=b38Rv5/cdNrq8B4fEOLBB08SrNNsLGpLWY/NWYJxCBI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U/cRYyPIeNk+mH9kkKHgfKuinAWpbwOQUwLhRpYwMe3nwakojxxYtZ0GovQ4hc8KM
+	 1AarUWS9JEJjy1u/b4b2y8easykMTJKLZwLKQZ2s53RquSCVtNjdR9OxubxMkKn9ZL
+	 0D4lUahnDxu0XQBkxRbCKZuQbKIYKw3iDLahXACjVar7eiFjr9s3MsjOE5o6sey2VQ
+	 jC5Wzp8iDeDQ+24c53Apwo9rM8hUfoj7sQRqoXeD6lc+SDRRJ8QpShc0ZmjC6MyWOb
+	 Mty396Zom/TerG1J7OhAdRnyAQfATcxrKwh5LSvEtXxSGmsQL43OGdgERMtYa5YJKM
+	 Y4orVhX1/+zEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vlmHv-000000072Q6-3FVG;
+	Fri, 30 Jan 2026 11:03:43 +0000
+Date: Fri, 30 Jan 2026 11:03:43 +0000
+Message-ID: <864io3bbw0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v4 10/36] KVM: arm64: gic-v5: Detect implemented PPIs on boot
+In-Reply-To: <20260128175919.3828384-11-sascha.bischoff@arm.com>
+References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
+	<20260128175919.3828384-11-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAA3zRDehHxpX_wMBw--.48711S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFyUuryxKr4Dtr47Cry5twb_yoW8Zw45pF
-	sxCrsa9r48XFWxCasIywn7Xr40gr4vkF1aqr98urW5Gr4UKFWFyr1vgay7XFW8JF10vwn2
-	yr4UCFW8uF1UJw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr0_Cr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14
-	v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
-	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
-	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
-	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU5o7KDUUU
-	U
-X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiBgwDCWl8VkKsNAAAsZ
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69695-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[ghiti.fr,eecs.berkeley.edu,dabbelt.com,sifive.com,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69696-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D4B9AB9445
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 747BEB9D30
 X-Rspamd-Action: no action
 
-kvm_riscv_vcpu_aia_rmw_topei() assumes that the per-vCPU IMSIC state has
-been initialized once AIA is reported as available and initialized at
-the VM level. This assumption does not always hold.
+On Wed, 28 Jan 2026 18:01:54 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> As part of booting the system and initialising KVM, create and
+> populate a mask of the implemented PPIs. This mask allows future PPI
+> operations (such as save/restore or state, or syncing back into the
+> shadow state) to only consider PPIs that are actually implemented on
+> the host.
+> 
+> The set of implemented virtual PPIs matches the set of implemented
+> physical PPIs for a GICv5 host. Therefore, this mask represents all
+> PPIs that could ever by used by a GICv5-based guest on a specific
+> host.
+> 
+> Only architected PPIs are currently supported in KVM with
+> GICv5. Moreover, as KVM only supports a subset of all possible PPIS
+> (Timers, PMU, GICv5 SW_PPI) the PPI mask only includes these PPIs, if
+> present. The timers are always assumed to be present; if we have KVM
+> we have EL2, which means that we have the EL1 & EL2 Timer PPIs. If we
+> have a PMU (v3), then the PMUIRQ is present. The GICv5 SW_PPI is
+> always assumed to be present.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c    |  4 ++++
+>  arch/arm64/kvm/vgic/vgic-v5.c      | 33 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.h         |  1 +
+>  include/kvm/arm_vgic.h             |  5 +++++
+>  include/linux/irqchip/arm-gic-v5.h | 10 +++++++++
+>  5 files changed, 53 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 86c149537493..653364299154 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -750,5 +750,9 @@ int kvm_vgic_hyp_init(void)
+>  	}
+>  
+>  	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
+> +
+> +	/* Always safe to call */
+> +	vgic_v5_get_implemented_ppis();
 
-Under fuzzed ioctl sequences, a guest may access the IMSIC TOPEI CSR
-before the vCPU IMSIC state is set up. In this case,
-vcpu->arch.aia_context.imsic_state is still NULL, and the TOPEI RMW path
-dereferences it unconditionally, leading to a host kernel crash.
+What is the reason for calling this from the generic code, while it is
+v5-specific? I'd have expected this to be entirely contained in the v5
+subsystem.
 
-The crash manifests as:
-  Unable to handle kernel paging request at virtual address
-  dfffffff0000000e
-  ...
-  kvm_riscv_vcpu_aia_imsic_rmw arch/riscv/kvm/aia_imsic.c:909
-  kvm_riscv_vcpu_aia_rmw_topei arch/riscv/kvm/aia.c:231
-  csr_insn arch/riscv/kvm/vcpu_insn.c:208
-  system_opcode_insn arch/riscv/kvm/vcpu_insn.c:281
-  kvm_riscv_vcpu_virtual_insn arch/riscv/kvm/vcpu_insn.c:355
-  kvm_riscv_vcpu_exit arch/riscv/kvm/vcpu_exit.c:230
-  kvm_arch_vcpu_ioctl_run arch/riscv/kvm/vcpu.c:1008
-  ...
 
-Fix this by explicitly checking whether the vCPU IMSIC state has been
-initialized before handling TOPEI CSR accesses. If not, forward the CSR
-emulation to user space.
+> +
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 23d0a495d855..9bd5a85ba203 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -8,6 +8,8 @@
+>  
+>  #include "vgic.h"
+>  
+> +static struct vgic_v5_ppi_caps *ppi_caps;
+> +
+>  /*
+>   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
+>   * Currently only supports GICv3-based VMs on a GICv5 host, and hence only
+> @@ -53,3 +55,34 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  
+>  	return 0;
+>  }
+> +
+> +/*
+> + * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
+> + * ones are, and generate a mask.
+> + */
+> +void vgic_v5_get_implemented_ppis(void)
+> +{
+> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
+> +		return;
+> +
+> +	/* Never freed again */
+> +	ppi_caps = kzalloc(sizeof(*ppi_caps), GFP_KERNEL);
+> +	if (!ppi_caps)
+> +		return;
 
-Fixes: 2f4d58f7635ae ("RISC-V: KVM: Virtualize per-HART AIA CSRs")
-Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
----
- arch/riscv/kvm/aia.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Maybe we can spare the call by statically allocating the PPI
+structure? Just the code calling kzalloc() costs us more than the 128
+bits required by the structure.
 
-diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-index dad3181856600..c176b960d8a40 100644
---- a/arch/riscv/kvm/aia.c
-+++ b/arch/riscv/kvm/aia.c
-@@ -228,6 +228,10 @@ int kvm_riscv_vcpu_aia_rmw_topei(struct kvm_vcpu *vcpu,
- 	if (!kvm_riscv_aia_initialized(vcpu->kvm))
- 		return KVM_INSN_EXIT_TO_USER_SPACE;
- 
-+	/* If IMSIC vCPU state not initialized then forward to user space */
-+	if (!vcpu->arch.aia_context.imsic_state)
-+		return KVM_INSN_EXIT_TO_USER_SPACE;
-+
- 	return kvm_riscv_vcpu_aia_imsic_rmw(vcpu, KVM_RISCV_AIA_IMSIC_TOPEI,
- 					    val, new_val, wr_mask);
- }
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
 
