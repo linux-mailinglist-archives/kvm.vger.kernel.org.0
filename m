@@ -1,155 +1,184 @@
-Return-Path: <kvm+bounces-69666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69667-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLE1BX8xfGlVLQIAu9opvQ
-	(envelope-from <kvm+bounces-69666-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 05:20:15 +0100
+	id GPAFKYI8fGkXLgIAu9opvQ
+	(envelope-from <kvm+bounces-69667-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 06:07:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B085AB70F2
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 05:20:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6481EB7306
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 06:07:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AA2B93018BD9
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 04:20:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B30A63015896
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 05:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522C733C507;
-	Fri, 30 Jan 2026 04:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19D83346A5;
+	Fri, 30 Jan 2026 05:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OsrepXs3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lU7NoxE7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7CD1607A4;
-	Fri, 30 Jan 2026 04:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DDC2F7468;
+	Fri, 30 Jan 2026 05:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769746798; cv=none; b=tWDVSmkih5XFJWHsgNM+BybXC8QTUC0kXuzJSpiFet9lCbSONLdey/AYHURUgTw1J90TeVy3XPP+j/mZxy9r7nAzTfqLopjLRzvHdS4XtLMedUWTfFvomw4EDshnxVgc2UgMnS228avzSj3VwN2LA38DiiIFueuNMlUeDDOGfac=
+	t=1769749622; cv=none; b=ENzzFsPLO+Lr59ejzkeImVq3Wf+HVp6zoiz2jly1QxILhtfs16FKKQQPerIyYqG3E89shhrzAOf6QUpWUKETII9ThdVuQHxiJySoKBgt2zUAp8Ccf4+zSK2kiPd+WYArNtIuM/JPheltlvUGMHQ+3sflnxuEOUK6oGDs7WvmlIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769746798; c=relaxed/simple;
-	bh=ox/deh2PiJbxGr7yh4KNQDHHU3XJkCnzWZSOESwWuUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GnnXNlXQsVHDItVndSwjltIWw2GX2rypJeu1nd8Z7tZxNpxZkITrj4LnHZyrljCL5NenLaDOE4YrA8yER97j/DZZOFHZHLlzhYe62axl41GjNmDW7uP1Pp0P1T9EhRtK0xzFzugnfiwwgZkVeyTaxY9td8X1vLkuZoJmHgKraYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OsrepXs3; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1769749622; c=relaxed/simple;
+	bh=NJqIde6aEff1nOWpd3liyCuz1VExEkEigsoV5duKsjk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U2ON3HYgwCKIaI98YaSiuKAo4kWeDx602ZgUlwPlOVO10RRGFRPNjsFBDrQLDVW79a3Gj+0umwDhxMRdUwVyf34UTj6cDsTQ8ago+ZrVbeE3lIiqL4avV4L9Ih3JldazHQtDJsZeBzhfud3MTYhFa48SuvUSGHstA09Lw2StJu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lU7NoxE7; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769746797; x=1801282797;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ox/deh2PiJbxGr7yh4KNQDHHU3XJkCnzWZSOESwWuUE=;
-  b=OsrepXs3KwxzzRzyPIHX3/wSPMA7Zai6w7lXMtlo5Y97+9vlLq2WUB8C
-   fBnDrFxqJfataTL+z/Fwbymu3uY2ep/gUegDvMqP2aSXhqktKwfxkDt7x
-   hwlsUm+gNYFS9m2SfeypWwo/GBb5Tt2PqrSfSViVcgXZOc3nXISmRHCRs
-   WlSGKp+0P19U5VStkRIlXmvwq7d0d8/OMKLTONtk6i/MsLoU8YO9CezUT
-   rjNHASH3jPVwPYnVDsXzUTjI8OJP+QItuigl8eKmmbN7mOHMXFo7kpNPa
-   sdKTA02DbqqV6scBVzkYkw9bvuN4Qi16wyJfZNa3O7IHqkjwrA/AZ7Jrg
-   Q==;
-X-CSE-ConnectionGUID: KC3aiOTTTIWPltnvCf+7GA==
-X-CSE-MsgGUID: dUhbs332RDCtgUTCUtPK0Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="70014360"
+  t=1769749620; x=1801285620;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=NJqIde6aEff1nOWpd3liyCuz1VExEkEigsoV5duKsjk=;
+  b=lU7NoxE73FcXpifvB7Dcym7cLmSCuDabqjqfdC701ftyGScPezkE7ntq
+   LOY+pfeYPo17T0YgdXWCg2k5C7CMeNNiRErxZI7IjhzYxUUQ/HLilkkj3
+   32YIyrG8wqOk93g+BoheDpMo2Q96ytn4vWFRvWxC6kYikPhE4inPuP8XG
+   Tnw0DPENXsm7/r2zr0YTSSpgULcvxZfJIlr2UZeAKqU8A+c3dmgY1tAeR
+   RomNg6jc6KKjh4oztCcRq/NvGYPEs5t+B/v4IvjYVScTr643quQlFcArx
+   XKtEGPEu8GktmkXevOZVJZf5c0RBbnxW6+LdVsbxtS9AxH5gtnmlTlroN
+   g==;
+X-CSE-ConnectionGUID: xnl9IQ6JQ8uX8LCg+iX5lg==
+X-CSE-MsgGUID: oMGT8xgRS5SA2v6p7xRzPw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="93657204"
 X-IronPort-AV: E=Sophos;i="6.21,262,1763452800"; 
-   d="scan'208";a="70014360"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 20:19:56 -0800
-X-CSE-ConnectionGUID: OSkzCLsHQIyvYwVTXpq2jg==
-X-CSE-MsgGUID: bGKzNJ2JRbiQswS8AGjCIg==
+   d="scan'208";a="93657204"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 21:06:59 -0800
+X-CSE-ConnectionGUID: bXozd89WQveo1jsTDMdQmg==
+X-CSE-MsgGUID: D1QbWXANTf63Byvvu1B1NA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,262,1763452800"; 
-   d="scan'208";a="208670775"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa006.fm.intel.com with ESMTP; 29 Jan 2026 20:19:51 -0800
-Date: Fri, 30 Jan 2026 12:01:36 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-	reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
-	dan.j.williams@intel.com, sagis@google.com, vannapurve@google.com,
-	paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
-	seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
-	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
-	Farrah Chen <farrah.chen@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v3 08/26] x86/virt/seamldr: Retrieve P-SEAMLDR information
-Message-ID: <aXwtILdwb/KMX9uH@yilunxu-OptiPlex-7050>
-References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-9-chao.gao@intel.com>
- <b2e2fd5e-8aff-4eda-a648-9ae9f8234d25@intel.com>
+   d="scan'208";a="213666601"
+Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2026 21:06:56 -0800
+Message-ID: <ccad59aa-d1b0-475a-a838-e705d7dc446a@linux.intel.com>
+Date: Fri, 30 Jan 2026 13:06:54 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2e2fd5e-8aff-4eda-a648-9ae9f8234d25@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] KVM: x86: Explicitly configure supported XSS from
+ {svm,vmx}_set_cpu_caps()
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Mathias Krause <minipli@grsecurity.net>,
+ John Allen <john.allen@amd.com>, Rick Edgecombe
+ <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Jim Mattson <jmattson@google.com>
+References: <20260128014310.3255561-1-seanjc@google.com>
+ <20260128014310.3255561-2-seanjc@google.com>
+ <9856fb02-b72a-4626-b34a-16a7adb55fc6@linux.intel.com>
+ <e4e52215-3160-4f67-877b-16b9d6cba210@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <e4e52215-3160-4f67-877b-16b9d6cba210@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69666-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
 	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69667-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim]
-X-Rspamd-Queue-Id: B085AB70F2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6481EB7306
 X-Rspamd-Action: no action
 
-> I'd also prefer a
+
+
+On 1/30/2026 11:23 AM, Xiaoyao Li wrote:
+> On 1/29/2026 3:34 PM, Binbin Wu wrote:
+>>
+>>
+>> On 1/28/2026 9:43 AM, Sean Christopherson wrote:
+>>> Explicitly configure KVM's supported XSS as part of each vendor's setup
+>>> flow to fix a bug where clearing SHSTK and IBT in kvm_cpu_caps, e.g. due
+>>> to lack of CET XFEATURE support, makes kvm-intel.ko unloadable when nested
+>>> VMX is enabled, i.e. when nested=1.  The late clearing results in
+>>> nested_vmx_setup_{entry,exit}_ctls() clearing VM_{ENTRY,EXIT}_LOAD_CET_STATE
+>>> when nested_vmx_setup_ctls_msrs() runs during the CPU compatibility checks,
+>>> ultimately leading to a mismatched VMCS config due to the reference config
+>>> having the CET bits set, but every CPU's "local" config having the bits
+>>> cleared.
+>>
+>> A bit confuse about the description.
+>>
+>> Before this patch:
+>>
+>> kvm_x86_vendor_init
+>> | vmx_hardware_setup
+>> |   nested_vmx_hardware_setup
+>> |     nested_vmx_setup_ctls_msrs
+>> | ...
+>> | for_each_online_cpu(cpu)
+>> |   smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &r, 1)
+>> |                                 | kvm_x86_check_processor_compatibility
+>> |                                 |   kvm_x86_call(check_processor_compatibility)()
+>> |                                 |     vmx_check_processor_compatibility
+>> |                                 |       setup_vmcs_config
+>> |                                 |         nested_vmx_setup_ctls_msrs
+>> | ...
+>> | //late clearing of SHSTK and IBT
+>>
+>> If we don't consider CPU hotplug case, both the setup of reference VMCS and the
+>> local config are before the late clearing of SHSTK and IBT. They should be
+>> consistent.
+>>
+>> So you are referring the mismatch situation during CPU hotplug?
 > 
-> 	BUILD_BUG_ON(sizeof(struct seamldr_info) != 2048);
-                                                    ^
-BUILD_BUG_ON(sizeof(struct seamldr_info) != 256);   is it?
-
+> I guess it's triggered the path
 > 
-> just as a sanity check. It doesn't cost anything and it makes sure that
-> as you muck around with reserved fields and padding that there's at
-> least one check making sure it's OK.
+>   kvm_init()
+>     kvm_init_virtualization()
+>       kvm_enable_virtualization()
+>         cpuhp_setup_state()
+>           kvm_online_cpu()
+>             ...
+> 
+>   (note, it requires enable_virt_at_load to be true)
+> 
+> which is after
+>   vmx_init()
+>     kvm_x86_vendor_init()
+> 
 
-And I recently received a comments that "never __packed for naturally
-aligned structures cause it leads to bad generated code and hurts
-performance", but I really want to highlight nearby it is for a
-formatted binary blob, so:
+Oh, right.
+Forgot about that by default KVM enables virtualization when KVM is loaded,
+which trigger the cpuhp framework to do per-CPU enabling.
 
-  struct seamldr_info {
-	u32     version;
-	u32     attributes;
-	u32     vendor_id;
-	u32     build_date;
-	u16     build_num;
-	u16     minor_version;
-	u16     major_version;
-	u16     update_version;
-	u8      reserved0[4];
-	u32     num_remaining_updates;
-	u8      reserved1[224];
-  };   //delete __packed here
+Thanks!
 
- static_assert(sizeof(struct seamldr_info) == 256);
-
-Is it better?
 
