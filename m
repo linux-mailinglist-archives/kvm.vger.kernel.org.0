@@ -1,256 +1,241 @@
-Return-Path: <kvm+bounces-69750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69751-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kkbhF18YfWkhQQIAu9opvQ
-	(envelope-from <kvm+bounces-69750-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 21:45:19 +0100
+	id aGYbORMZfWkhQQIAu9opvQ
+	(envelope-from <kvm+bounces-69751-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 21:48:19 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C47E9BE7FF
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 21:45:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29304BE872
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 21:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 829493013EC4
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 20:45:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 485E8301FFBD
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 20:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BBD308F36;
-	Fri, 30 Jan 2026 20:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADAD352921;
+	Fri, 30 Jan 2026 20:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dXGSsY+h";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Nrv4q/VW"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.baidu.com (mx24.baidu.com [111.206.215.185])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2025D1BD9D0
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 20:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1432E6CA0
+	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 20:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769805915; cv=none; b=o+TCjYlNYhijIK35HEqvap4+OHSc0vDVf5bWZgZNjK5PirqoecJAAN4Tki9o0spef2LxZU2U25BzxT/8YwhfROsyxGVxJg2PPVXHALrsQjzoFKZaX/zEfcNuh9FmQd4Q7anCJ2trjV7jd6QFVPjorjjLMTEndB5QgHuMoQ9jZOA=
+	t=1769806086; cv=none; b=KlOA8/d6k/1Lv2TXEvkdRnwcaT4EykLKcjN1sv5LWb2PRjBAfuH5LY+iWPsMX1PlZU/xHizfD3CGYxDGK6ZHWy09qTshvUPYzIoM7q9RG+btzqaAPZHvuzanEgSB8p14lLdwUIBS1PNjOECg6mRizqQY/5eJtCVhjRLIeUHyKEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769805915; c=relaxed/simple;
-	bh=aYATo5PS6wJFJRcHZb47jQM00+BcYp7tyw7OKc8IqIQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=POgFkgyLgIFR2e+d+SFjd7nuiHd0PYiUhNUKkzX8MKM67Nr1i4mCHfvGbCgq08ydjJhGPXi1NA6bxURh68zcVSj672+0e+f+89iCSN8/BA+iBCJRCj09XGYz3QnxwN8ucKeHdtqzx+TKvVwA6c1209eGqjbyU43GCGZXbv4PaXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: lirongqing <lirongqing@baidu.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H . Peter Anvin"
-	<hpa@zytor.com>, <kvm@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] KVM: SVM: Add __read_mostly to frequently read module parameters
-Date: Fri, 30 Jan 2026 15:44:24 -0500
-Message-ID: <20260130204424.1867-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1769806086; c=relaxed/simple;
+	bh=E8YzsbkCcsy5Kf9JTj7IxzfDcepCNQOBDNJuJSlrldU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YcnyKuectSc8PVful+zELjgQItBd35bhmre6oC+7sJmlXIfb2i67wE+PT9xzVJ2uN3sHDjx76v4X/8ji3TsRhHNaA5p6CYYlkhqM83qrtMuCoMI1H3wJ32B1hQRfbhxWR2iegUrJc7wPQb0oja2Y+cOi5a6qhmBoiCcK7gZMi3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dXGSsY+h; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Nrv4q/VW; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60UK1hdP1022153
+	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 20:48:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=nX+GGcv58sT3+6A/ukn6uGr+
+	PmhTbKUYkNYsXb8LOA0=; b=dXGSsY+hqRrbv8uy3gXwlzkQquz4q7A/7+sVeh3e
+	nX8WJvsbcVFnGDcZJIj7ud6qWqx7iABDzrIi1nv3BefikVOd5wkvFYNVHTrgecLe
+	Ctwfl6nZorKuaOpWe+sDzuuuwry9hcKsV4VcP7IDLus1gyXpciZ/heo61UvnC7Vb
+	yAJ8rkTnnD+GMitvFkFG5RJotv11bKlIZDak4/6SCXN3Y6a/eSgi5vFkIl6yYC1B
+	LOubGkAHI12SZrGeu9/C+Pex1I5qpasESHiysC7RzAGuUCAw3CRRGmUQVDfIYYcw
+	asaJh2+/uNgLcistcwBM1jMCPqk8EORuWQm/RmWIVDk2QA==
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c0e3kc3tw-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 20:48:04 +0000 (GMT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2b6b9c1249fso4053643eec.1
+        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 12:48:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1769806083; x=1770410883; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nX+GGcv58sT3+6A/ukn6uGr+PmhTbKUYkNYsXb8LOA0=;
+        b=Nrv4q/VWNmzsnP+6ndXCO90bJbG5AO7utxcURiuCwlaCGTQyJrHLC+Y9K/vDHYhGSC
+         q3URj4YLHEaVKaLrOXzFehJsjFXMvbt29Prl54CCHbxVmwhq5MPzoZi/J6gXD6oYBubu
+         dkEoiJ/WW9nis5Qb9voJXadPWiN+kkj0xVDXMByyziVoQnHQZasmgmom12YX1lsHE+Qi
+         zMNft+xoWlcHxrAWXbhbF3ynkJ/wqIaiAfZVcC9z22rmbkDglJndCadMIpwzp5fO7ILU
+         LcUCowU2q+IJoRCx+sIhhkBdIrW4zof2ZEHd21YTwoJFNi+8JgQYMeqFdIOnewl1sOyp
+         NQGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769806083; x=1770410883;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nX+GGcv58sT3+6A/ukn6uGr+PmhTbKUYkNYsXb8LOA0=;
+        b=UoegwGOYKzXIr2i9+s+y9IsMkm6xmbPkUmaABduvp4YWbYisviWW84XvpqMsMbyl77
+         z3x3gYqW/WV9TrjM0EQp3l2mtqSSlc7nZthYvO+Qe1SiDbAOxaTYri8kJYiOd7o7DpRe
+         CBEOxqCN68uAfG+HKXEp/q/R1FwQjZXThlugYB7wDdkf/10gFM4G6h8dbDNWzeMpglhP
+         Uka3I6NUA6N81UWK2+FFAYAOXYvGa9n6vMmtdFYta1G3c1kokvTNdvVCDwbw4g3yH6PG
+         QMD3bPb6kvde3gkBNDKroGA9MygwPzD0C0YSO6R9oYblD62jZTPvHmfYKrqstr+O/d28
+         3wUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVENwQOix55P4rvVhg7FyrpXwA2dPPZa4gwejblkuJgzY1xdcyMCoq7UKTHXYMmz4QQMIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLft66X+wDoba8cG/yc2VGyBIzeONMiYEAx7BDQF/mC8uge31T
+	AmkIl0wiaV8ud5F2eZhh7V5i/Y0tqGrAnBNiU784x0BmNptSlGwDom12yUgAD4sEIwIDUdTeQcA
+	QielGTTMlfV2w9goo+fiPstQUq9DMPfvZ5IOYg7/J+k8LaXtp+YQh65w=
+X-Gm-Gg: AZuq6aI8Km2GqUFO1B1t76GdF+/Llb+OB7bpw/GNFps71H0E6J4qlcj63OXEE9ddZLg
+	wWBSKu1URwY/hc0pQlBSwMSQvkJ10QRXMSDIse6IX85QDtCGf6oEloWQ9bpcSEmSDaq6JRtTN8H
+	mv4X8l9wE76WJ8vpq5Nuye92X86LDeJi92wS8Dd7j1n0t7ZQxqwb7F9FnKo/hp2dBYTZDZIzdE/
+	drpUqhk/TZ5Cylp6koU60W8iy4UjOifzEzSCiItMdMUL2fvOfy6WEuF3gD+FijolzQp2sWXcqDg
+	/Ua4h3MaNTpV/MjdoHUkcLZWbJTJMb1TbGBihX7P12D35x+wA8rnPDfKMhkJydIhkD0gsO7W+yB
+	ulQUDjC0PZ8Pfjrhp7+g=
+X-Received: by 2002:a05:7300:4302:b0:2b7:1d38:3596 with SMTP id 5a478bee46e88-2b7c863300amr2186692eec.4.1769806082980;
+        Fri, 30 Jan 2026 12:48:02 -0800 (PST)
+X-Received: by 2002:a05:7300:4302:b0:2b7:1d38:3596 with SMTP id 5a478bee46e88-2b7c863300amr2186680eec.4.1769806082432;
+        Fri, 30 Jan 2026 12:48:02 -0800 (PST)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-124a9d6b906sm12831536c88.4.2026.01.30.12.48.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 12:48:02 -0800 (PST)
+Date: Fri, 30 Jan 2026 14:48:00 -0600
+From: Andrew Jones <andrew.jones@oss.qualcomm.com>
+To: Jiakai Xu <jiakaipeanut@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        Alexandre Ghiti <alex@ghiti.fr>, Albert Ou <aou@eecs.berkeley.edu>,
+        Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
+        Atish Patra <atish.patra@linux.dev>, Anup Patel <anup@brainfault.org>,
+        Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Subject: Re: [PATCH] RISC-V: KVM: Validate SBI STA shmem alignment in
+ kvm_sbi_ext_sta_set_reg
+Message-ID: <ydibz63oh6tj66utjlemeikxg7iateqoox3bwg7r4pdvbwijoj@5zxhlhesvv2t>
+References: <20260124022042.2168136-1-xujiakai2025@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjhj-exc2.internal.baidu.com (172.31.3.12) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-X-FEAS-Client-IP: 172.31.50.47
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260124022042.2168136-1-xujiakai2025@iscas.ac.cn>
+X-Authority-Analysis: v=2.4 cv=VI3QXtPX c=1 sm=1 tr=0 ts=697d1904 cx=c_pps
+ a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=cvcws7F5//HeuvjG1O1erQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=ZDiY3XfEgKCrtrtHt9QA:9 a=CjuIK1q_8ugA:10
+ a=6Ab_bkdmUrQuMsNx7PHu:22
+X-Proofpoint-GUID: efa2-oE7xJYDNy6dvfFoj9VVrFXjw4hJ
+X-Proofpoint-ORIG-GUID: efa2-oE7xJYDNy6dvfFoj9VVrFXjw4hJ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMwMDE3MSBTYWx0ZWRfXwRZASpgEEk6u
+ TeyxDK3OKsxqHcvWAnqzzN3cs0zjGO32p+f8NrhYuBsu4hUiOQ7ZyXtNAd1vMXHTHA/n4cVcrPe
+ xxIXduAKUgKo+sBDpmerDGjc59EUG0UxtMa57sQR3QPSHAVpI7/gKynOg9D86fBIng87CRmKRAn
+ VBGJbKxl/2eFywoon8DgmsPRjIm63qB5NmvIo1vQ9QMqHa0NZjq3h0MbWYgIN0VdXdhiz+1yRTM
+ ohAr3rQpX1uj6tcOu4qFYg+FsPEVu/Kt7h4q1vrttRrX5En0bzYw3mwOfy9yo934RPZ33vButyq
+ 5PKDZ9JwRXy7b4hESN8xQAFzh9YuCmYX//0PwLiAiUZuI5Non/Kxr/AgTgO4jVxzIHQykZGh+yg
+ dQ/ZQJ1zaMNut/XdsikFzdMJyUPQCDqGzBRIOkWCEbafB4woC2OMFi2G/SpRPF0Rta2gaRd6cYz
+ TqnxoQalgoIOT2XIQ0Q==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-01-30_03,2026-01-30_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 phishscore=0 bulkscore=0 priorityscore=1501
+ adultscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601300171
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.54 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[baidu.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-69750-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,kvm@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-69751-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,oss.qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew.jones@oss.qualcomm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C47E9BE7FF
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 29304BE872
 X-Rspamd-Action: no action
 
-From: Li RongQing <lirongqing@baidu.com>
+On Sat, Jan 24, 2026 at 02:20:42AM +0000, Jiakai Xu wrote:
+...
+> diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.c
+> index afa0545c3bcfc..7dfe671c42eaa 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_sta.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_sta.c
+> @@ -186,23 +186,25 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
+>  		return -EINVAL;
+>  	value = *(const unsigned long *)reg_val;
+>  
+> +	gpa_t new_shmem = vcpu->arch.sta.shmem;
 
-Mark static global variables that are primarily read-only with
-__read_mostly to optimize cache utilization and performance.
+Please declare new_shmem at the top of the function and there's no
+need to initialize it to vcpu->arch.sta.shmem. Actually it appears you
+meant to initialize it to NULL, based on the 'if (new_shmem ...)' check
+below.
 
-The modified variables are module parameters and configuration
-flags that are:
-- Initialized at boot time
-- Rarely modified during runtime
-- Frequently accessed by multiple CPUs
+> +
+>  	switch (reg_num) {
+>  	case KVM_REG_RISCV_SBI_STA_REG(shmem_lo):
+>  		if (IS_ENABLED(CONFIG_32BIT)) {
+>  			gpa_t hi = upper_32_bits(vcpu->arch.sta.shmem);
+>  
+> -			vcpu->arch.sta.shmem = value;
+> -			vcpu->arch.sta.shmem |= hi << 32;
+> +			new_shmem = value;
+> +			new_shmem |= hi << 32;
+>  		} else {
+> -			vcpu->arch.sta.shmem = value;
+> +			new_shmem = value;
+>  		}
+>  		break;
+>  	case KVM_REG_RISCV_SBI_STA_REG(shmem_hi):
+>  		if (IS_ENABLED(CONFIG_32BIT)) {
+>  			gpa_t lo = lower_32_bits(vcpu->arch.sta.shmem);
+>  
+> -			vcpu->arch.sta.shmem = ((gpa_t)value << 32);
+> -			vcpu->arch.sta.shmem |= lo;
+> +			new_shmem = ((gpa_t)value << 32);
+> +			new_shmem |= lo;
+>  		} else if (value != 0) {
+>  			return -EINVAL;
+>  		}
+> @@ -210,7 +212,10 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
+>  	default:
+>  		return -ENOENT;
+>  	}
 
-By grouping these frequently read variables together, we reduce
-cache line bouncing in SMP systems and improve overall performance
-of the SVM module.
+Please add a blank line here.
 
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- arch/x86/kvm/svm/avic.c |  4 ++--
- arch/x86/kvm/svm/sev.c  | 12 ++++++------
- arch/x86/kvm/svm/svm.c  | 34 +++++++++++++++++-----------------
- 3 files changed, 25 insertions(+), 25 deletions(-)
+> +	if (new_shmem && !IS_ALIGNED(new_shmem, 64))
+> +		return -EINVAL;
+>  
+> +	vcpu->arch.sta.shmem = new_shmem;
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 6b77b20..af440f4 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -86,13 +86,13 @@ static const struct kernel_param_ops avic_ops = {
-  * Enable / disable AVIC.  In "auto" mode (default behavior), AVIC is enabled
-  * for Zen4+ CPUs with x2AVIC (and all other criteria for enablement are met).
-  */
--static int avic = AVIC_AUTO_MODE;
-+static int __read_mostly avic = AVIC_AUTO_MODE;
- module_param_cb(avic, &avic_ops, &avic, 0444);
- __MODULE_PARM_TYPE(avic, "bool");
- 
- module_param(enable_ipiv, bool, 0444);
- 
--static bool force_avic;
-+static bool __read_mostly force_avic;
- module_param_unsafe(force_avic, bool, 0444);
- 
- /* Note:
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f59c65a..a33edc8 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -42,23 +42,23 @@
- #define GHCB_HV_FT_SUPPORTED	(GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
- 
- /* enable/disable SEV support */
--static bool sev_enabled = true;
-+static bool __read_mostly sev_enabled = true;
- module_param_named(sev, sev_enabled, bool, 0444);
- 
- /* enable/disable SEV-ES support */
--static bool sev_es_enabled = true;
-+static bool __read_mostly sev_es_enabled = true;
- module_param_named(sev_es, sev_es_enabled, bool, 0444);
- 
- /* enable/disable SEV-SNP support */
--static bool sev_snp_enabled = true;
-+static bool __read_mostly sev_snp_enabled = true;
- module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
- 
- /* enable/disable SEV-ES DebugSwap support */
--static bool sev_es_debug_swap_enabled = true;
-+static bool __read_mostly sev_es_debug_swap_enabled = true;
- module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
--static u64 sev_supported_vmsa_features;
-+static u64 __read_mostly sev_supported_vmsa_features;
- 
--static unsigned int nr_ciphertext_hiding_asids;
-+static unsigned int __read_mostly nr_ciphertext_hiding_asids;
- module_param_named(ciphertext_hiding_asids, nr_ciphertext_hiding_asids, uint, 0444);
- 
- #define AP_RESET_HOLD_NONE		0
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 24d59cc..e960275 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -110,52 +110,52 @@ static DEFINE_PER_CPU(u64, current_tsc_ratio);
-  *	count only mode.
-  */
- 
--static unsigned short pause_filter_thresh = KVM_DEFAULT_PLE_GAP;
-+static unsigned short __read_mostly pause_filter_thresh = KVM_DEFAULT_PLE_GAP;
- module_param(pause_filter_thresh, ushort, 0444);
- 
--static unsigned short pause_filter_count = KVM_SVM_DEFAULT_PLE_WINDOW;
-+static unsigned short __read_mostly pause_filter_count = KVM_SVM_DEFAULT_PLE_WINDOW;
- module_param(pause_filter_count, ushort, 0444);
- 
- /* Default doubles per-vcpu window every exit. */
--static unsigned short pause_filter_count_grow = KVM_DEFAULT_PLE_WINDOW_GROW;
-+static unsigned short __read_mostly pause_filter_count_grow = KVM_DEFAULT_PLE_WINDOW_GROW;
- module_param(pause_filter_count_grow, ushort, 0444);
- 
- /* Default resets per-vcpu window every exit to pause_filter_count. */
--static unsigned short pause_filter_count_shrink = KVM_DEFAULT_PLE_WINDOW_SHRINK;
-+static unsigned short __read_mostly pause_filter_count_shrink = KVM_DEFAULT_PLE_WINDOW_SHRINK;
- module_param(pause_filter_count_shrink, ushort, 0444);
- 
- /* Default is to compute the maximum so we can never overflow. */
--static unsigned short pause_filter_count_max = KVM_SVM_DEFAULT_PLE_WINDOW_MAX;
-+static unsigned short __read_mostly pause_filter_count_max = KVM_SVM_DEFAULT_PLE_WINDOW_MAX;
- module_param(pause_filter_count_max, ushort, 0444);
- 
- /*
-  * Use nested page tables by default.  Note, NPT may get forced off by
-  * svm_hardware_setup() if it's unsupported by hardware or the host kernel.
-  */
--bool npt_enabled = true;
-+bool __read_mostly npt_enabled = true;
- module_param_named(npt, npt_enabled, bool, 0444);
- 
- /* allow nested virtualization in KVM/SVM */
--static int nested = true;
-+static int __read_mostly nested = true;
- module_param(nested, int, 0444);
- 
- /* enable/disable Next RIP Save */
--int nrips = true;
-+int __read_mostly nrips = true;
- module_param(nrips, int, 0444);
- 
- /* enable/disable Virtual VMLOAD VMSAVE */
--static int vls = true;
-+static int __read_mostly vls = true;
- module_param(vls, int, 0444);
- 
- /* enable/disable Virtual GIF */
--int vgif = true;
-+int __read_mostly vgif = true;
- module_param(vgif, int, 0444);
- 
- /* enable/disable LBR virtualization */
--int lbrv = true;
-+int __read_mostly lbrv = true;
- module_param(lbrv, int, 0444);
- 
--static int tsc_scaling = true;
-+static int __read_mostly tsc_scaling = true;
- module_param(tsc_scaling, int, 0444);
- 
- module_param(enable_device_posted_irqs, bool, 0444);
-@@ -164,17 +164,17 @@ bool __read_mostly dump_invalid_vmcb;
- module_param(dump_invalid_vmcb, bool, 0644);
- 
- 
--bool intercept_smi = true;
-+bool __read_mostly intercept_smi = true;
- module_param(intercept_smi, bool, 0444);
- 
--bool vnmi = true;
-+bool __read_mostly vnmi = true;
- module_param(vnmi, bool, 0444);
- 
--static bool svm_gp_erratum_intercept = true;
-+static bool __read_mostly svm_gp_erratum_intercept = true;
- 
--static u8 rsm_ins_bytes[] = "\x0f\xaa";
-+static u8 __read_mostly rsm_ins_bytes[] = "\x0f\xaa";
- 
--static unsigned long iopm_base;
-+static unsigned long __read_mostly iopm_base;
- 
- DEFINE_PER_CPU(struct svm_cpu_data, svm_data);
- 
--- 
-2.9.4
+And another blank line here.
 
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.34.1
+>
+
+Thanks,
+drew
 
