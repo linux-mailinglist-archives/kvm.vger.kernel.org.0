@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-69739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69740-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0McrMinbfGlbOwIAu9opvQ
-	(envelope-from <kvm+bounces-69739-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 17:24:09 +0100
+	id uHS1E9DdfGl1PAIAu9opvQ
+	(envelope-from <kvm+bounces-69740-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 17:35:28 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86730BC802
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 17:24:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC95DBC8FB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 17:35:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7A1633024443
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 16:24:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 79ACF3031ACE
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 16:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E803234E767;
-	Fri, 30 Jan 2026 16:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7C934F25C;
+	Fri, 30 Jan 2026 16:35:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PDE/6sRa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jGmybhuY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF00534D3B1;
-	Fri, 30 Jan 2026 16:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED8D33A9E0;
+	Fri, 30 Jan 2026 16:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769790237; cv=none; b=MCf80kelR5pfm1W/1uu+1gFt7LxMjvZlJkOI9PRrJLcGFnTDT2N5EFbM+WHy7TCjKzLm4om4YscgZdznxQrylG7PLmSJE4hfZuo1Hd2nAtcDAoCi6UtBe8183ftfiDaAxT2ryYjK5KLcHJz6lfxqfDr8+5vPDQWBJES4KpRLQj8=
+	t=1769790914; cv=none; b=hWa93WLOybyVTJh8LS2GByzDsbASFZU8CKZ9llW1hhQ1UW/M5Pm8JPuUZ0b4A7ogYx7DjtISueIn2ucOhCwy/MxTpOChqt38UNfWCLhRTDlef48V1liQ6aSVbmdQruBg87c21wOyvLxJhuaemBDDSgfbedgc4a+joAq/JyO/KVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769790237; c=relaxed/simple;
-	bh=VZYq48p4VD/9cXYz+K2LIYUtQbYbmUT5fn1etEXkxMI=;
+	s=arc-20240116; t=1769790914; c=relaxed/simple;
+	bh=mrAJptSB9JCiQxBe1yemLalZlD1MxMTQO0epbrNexOg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j9xFlqZu7d6lYSLgrtc2Tbs8keG8sBp5t5sAfn55gyl6TLKs9dRQtIlZN8m5n0hVUH4171vhvD4W8ezWoGXxiJFCv0BVrbumwlidY02s0KZ/o/f14sk+zqEfL18UODEAbirfV+bpic3xrINDdBQ9a0p0vwzz69xjVvaGCc0GB9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PDE/6sRa; arc=none smtp.client-ip=198.175.65.21
+	 In-Reply-To:Content-Type; b=BJOdVySmRd/+u1H5Y9AoBIKporjGUqvtuXfyZLWGix/w0Lp/oGAnYv1qT9QUt/JyhukpK+T0+MC/0BEgoQhen22P4JvUbXa3yL6+s+tW2CkHU0toGydlPO2Mq8FSm4XiKnBPZpUHqdElOiDSOW9bgy8QKThtclTZfGyUeW64xF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jGmybhuY; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769790236; x=1801326236;
+  t=1769790914; x=1801326914;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=VZYq48p4VD/9cXYz+K2LIYUtQbYbmUT5fn1etEXkxMI=;
-  b=PDE/6sRaLED27vfuaOkkiohkVCQoDd19ywd45AnuizXWR9xPi1Hyu8w9
-   kQiyRTT839+XFjUdgtWlbIaHmm0akRE7HF7nyzSJtBWCM7s5TTVDW1FHk
-   3QaStTN+CLprUhcoEkJaefH5rUycwKLdnY7cgs+07ehGL/17/LC9ZcTTF
-   f8tOnGx3NeU8lIa59uEM/5h2Y8NwG8mgpaq1YFx3u4G87uC8rkw2EFXC7
-   D6av2OGFehlA83m+5ubxAIolMSHR/w33p2c1GmRsRcEdOFaAVUsmh0TFj
-   A9T+oO0B2k1VHgsKWYbwlm5ZWSntfIl9+8Cl1Xdy5LrtxlNkAw3hYp838
-   w==;
-X-CSE-ConnectionGUID: vkDfi2FVRWKy3R1e6JqUqQ==
-X-CSE-MsgGUID: HNO0fk5aQxSPbalVuEYj/A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="70951873"
+  bh=mrAJptSB9JCiQxBe1yemLalZlD1MxMTQO0epbrNexOg=;
+  b=jGmybhuYK33k3Nc/D+FECtadfG/T5Cqq5bCZB87w1/FTmPqiPpTMcZ4f
+   45NWTgG2DdJHDKFI0FtmGwpJDseFvjrZH0frtFwVts6vFOvsSLnecKnk4
+   C76rChatfPOEqMEluzlZ2YRN3sDfEHmfLpFPQyGwwOriDLNvugmCtAekf
+   b4NfWhNkEKI9CTScNw66mhuhAOrpmmw3TLUZzlJB4drfZJ8zSO/o+8ZkZ
+   +Q+hr+LkhL3eQroPdRVaDWXPh0dMEKRcdh2hzZSCZJSFcJwan6UQ8J4Qw
+   AEVX/upcjjxSju9jIxPo6uPdPM5IU0qJ3cIk+HMPJV0b/NAwa+FNwubZT
+   A==;
+X-CSE-ConnectionGUID: mCr8ghMRTcaXa6HLIOhvkg==
+X-CSE-MsgGUID: DGJgPj8DTGa7ASJREQVVlw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11687"; a="74666690"
 X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
-   d="scan'208";a="70951873"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 08:23:47 -0800
-X-CSE-ConnectionGUID: 4gWs5LWaSQqMdVan/GnPYA==
-X-CSE-MsgGUID: uZC3MlcSRcSxF4G9KP5wsQ==
+   d="scan'208";a="74666690"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 08:35:13 -0800
+X-CSE-ConnectionGUID: ISFOB53aSryXiS3FBmmp2w==
+X-CSE-MsgGUID: aoXY/OmoQbeovt7xPcttNw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
-   d="scan'208";a="208882313"
+   d="scan'208";a="213790102"
 Received: from cjhill-mobl.amr.corp.intel.com (HELO [10.125.110.58]) ([10.125.110.58])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 08:23:48 -0800
-Message-ID: <9b814880-242b-4401-90e1-6704cbdd0751@intel.com>
-Date: Fri, 30 Jan 2026 08:23:46 -0800
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 08:35:11 -0800
+Message-ID: <1b1a2fe7-d225-414c-9055-8ad06938a0bf@intel.com>
+Date: Fri, 30 Jan 2026 08:35:09 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,13 +70,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 07/26] x86/virt/seamldr: Introduce a wrapper for
- P-SEAMLDR SEAMCALLs
-To: Chao Gao <chao.gao@intel.com>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
- ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
- yilun.xu@linux.intel.com, sagis@google.com, vannapurve@google.com,
+Subject: Re: [PATCH v3 08/26] x86/virt/seamldr: Retrieve P-SEAMLDR information
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+ reinette.chatre@intel.com, ira.weiny@intel.com, kai.huang@intel.com,
+ dan.j.williams@intel.com, sagis@google.com, vannapurve@google.com,
  paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
  seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
  dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
@@ -84,8 +83,9 @@ Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  "H. Peter Anvin" <hpa@zytor.com>
 References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-8-chao.gao@intel.com>
- <04f9a748-fe61-439c-af80-59c498970580@intel.com> <aXxm+ezJvwUQ4sfD@intel.com>
+ <20260123145645.90444-9-chao.gao@intel.com>
+ <b2e2fd5e-8aff-4eda-a648-9ae9f8234d25@intel.com>
+ <aXwtILdwb/KMX9uH@yilunxu-OptiPlex-7050>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -131,21 +131,21 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <aXxm+ezJvwUQ4sfD@intel.com>
+In-Reply-To: <aXwtILdwb/KMX9uH@yilunxu-OptiPlex-7050>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-69739-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69740-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
@@ -154,35 +154,65 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 86730BC802
+X-Rspamd-Queue-Id: EC95DBC8FB
 X-Rspamd-Action: no action
 
-On 1/30/26 00:08, Chao Gao wrote:
-> On Wed, Jan 28, 2026 at 03:04:55PM -0800, Dave Hansen wrote:
->> On 1/23/26 06:55, Chao Gao wrote:
->>> SEAMRET from the P-SEAMLDR clears the current VMCS structure pointed 
->>> to by the current-VMCS pointer. A VMM that invokes the P-SEAMLDR
->>> using SEAMCALL must reload the current-VMCS, if required, using the
->>> VMPTRLD instruction.
+On 1/29/26 20:01, Xu Yilun wrote:
+>> I'd also prefer a
 >>
->> That seems pretty mean.
->>
->> This is going to need a lot more justification for why this is an
->> absolutely necessary requirement.
+>> 	BUILD_BUG_ON(sizeof(struct seamldr_info) != 2048);
+>                                                     ^
+> BUILD_BUG_ON(sizeof(struct seamldr_info) != 256);   is it?
+Whatever the documentation says. I might have been looking at the
+seamldr_seaminfo.
+
+>> just as a sanity check. It doesn't cost anything and it makes sure that
+>> as you muck around with reserved fields and padding that there's at
+>> least one check making sure it's OK.
 > 
-> AFAIK, this is a CPU implementation issue. The actual requirement is to
-> evict (flush and invalidate) all VMCSs __cached in SEAM mode__, but big
-> cores implement this by evicting the __entire__ VMCS cache. So, the
-> current VMCS is invalidated and cleared.
+> And I recently received a comments that "never __packed for naturally
+> aligned structures cause it leads to bad generated code and hurts
+> performance", but I really want to highlight nearby it is for a
+> formatted binary blob, so:
+> 
+>   struct seamldr_info {
+> 	u32     version;
+> 	u32     attributes;
+> 	u32     vendor_id;
+> 	u32     build_date;
+> 	u16     build_num;
+> 	u16     minor_version;
+> 	u16     major_version;
+> 	u16     update_version;
+> 	u8      reserved0[4];
+> 	u32     num_remaining_updates;
+> 	u8      reserved1[224];
+>   };   //delete __packed here
+> 
+>  static_assert(sizeof(struct seamldr_info) == 256);
+> 
+> Is it better?
 
-But why is this a P-SEAMLDR thing and not a TDX module thing?
+I'm pretty sure __packed is used all over the place.
 
-It seems like a bug, or at least a P-SEAMLDR implementation issue the
-needs to get fixed.
+I'd be shocked if access to a __packed structure generated different
+code than a non-packed one for the same layout. But it wouldn't be the
+first time I was shocked by a compiler.
+
+I think you might be confusing the fact that access to unaligned data
+can really stink on some architectures. The code generation for *that*
+can be garbage. But not on x86 really and not for data that's already
+naturally aligned.
+
+Plus, *this* data structure is far, far from being performance sensitive
+anyway. So it doubly or triply doesn't matter here.
+
+If nothing else, __packed is a good indicator that WYSIWYG for structure
+layout because it's an ABI. I honestly don't see a lot of downsides.
 
