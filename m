@@ -1,118 +1,85 @@
-Return-Path: <kvm+bounces-69647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69648-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mG0LHJr4e2n4JgIAu9opvQ
-	(envelope-from <kvm+bounces-69647-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:17:30 +0100
+	id YABEEA38e2n4JgIAu9opvQ
+	(envelope-from <kvm+bounces-69648-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:32:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A5ECB5D6F
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:17:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00C56B5EE9
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 247C5300CA0B
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 00:17:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D1F97302B51B
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 00:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6246627FD7D;
-	Fri, 30 Jan 2026 00:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1891D296BBF;
+	Fri, 30 Jan 2026 00:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="KA7biT7z"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="eEaDTQq+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9410E2222B2
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 00:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD1DD27E;
+	Fri, 30 Jan 2026 00:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769732236; cv=none; b=DXzvVKzY/bEEnHUzq+Pr73x3tjTCo2ORyV6GaC3DvFtVuYqHBFQWXrToPNPNBmkL/YkQehtK6FD5hiJNi0Wcv9ZszDCkLSRUa1fZXYAj7wcnI78JmrhewwFbrA1ulqYcGc5GmQDfvS+yX4f3oe8qWnDFz9/ejodZi5Pc5pp52Fg=
+	t=1769733116; cv=none; b=Ku1jTlPE9hz4bJCP0t6gzwYjFwvjHd7g/oVY/IOUaBWpojhHWgUTW6dFhf2wh0EcgR7/UOKrqTekBCrBynqTwg1Ul4X3JHuU1VbBnCs6fyfunqbKBY1EO2oltAQx3Acdvadoc8UbbLnRxL37FmJu9NtNvuFuIAWyIYiMGD4bGQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769732236; c=relaxed/simple;
-	bh=PgxWXxtJeqUdvgjP5KxrfenUWVrCXmnl/Ip3hY3gzr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kHufKybpIwYfcUotPTv1PI+x+pRazx2R8J9Gj+dT91eg4okioE5LCf6PlLH5dzdoRSn+cE5Gj0K2/E2zQKiMgJM1Z/rWmHBW7iH0+sRyo1MYrP5/N68hFxRm7GcONLIBFLsRBYDdix4m4cVW7WoQQY6wkIqXogvGot+JxAnjlkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=KA7biT7z; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8c5349ba802so152791785a.1
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 16:17:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1769732232; x=1770337032; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JQnCcQDZjp9U0R1Q7JCyNDeekOxxS8phMo1p2crcsis=;
-        b=KA7biT7z2WPIJqn1yWtupwtFpuiVSND6sCJuDPiqtvlV/udtpzWhHBdHKHzdXfdrt9
-         s5ff0uj0MnRJ2qUUQNgrd0lk2LV/u1TJUfKQTbzPIGnBZoQoPXVw92tOcr4jJ+o6LTsh
-         pmrSmwNEYgAYmP11U4AzdudTpUbSJ/6lGl2fTB0tpVVeZ5pwjPdB10zBv03zrqTMm32F
-         XRxwdujmIDrabfqlhXdKEogyduDcZ/LafEpZu5i5+k5xCZIZggCdPOPnVishQAaKjj5E
-         KENQjSUQFCVdWDnSRyM99hu8FmY0ffQviK954nkYYxdhylaquDPwhk4OhuIA+A5fqMJJ
-         rp/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769732232; x=1770337032;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JQnCcQDZjp9U0R1Q7JCyNDeekOxxS8phMo1p2crcsis=;
-        b=W5vYDnjoS7OuVqNayK78S1VAaGFH4fTyCgduaf8GSK4AgqUt7weSqjnu7rHmunc8Xn
-         DNjcqrbTZnzdbN0PPwUCe71oqiVbiwqgbNWMc9K8fLlREIFzQUlKcVYt3Qp8v0kPc+B7
-         Sg8F3X6S8MrFPhtUewVU59aelaYWQGb5jpp5po5bzZNwaQ+bLvZKEvtK61I5udc4xv0T
-         OwKC+O4kZ1ON5cpH2Gn6/g4fb1B00GsYc2qOqXFRH3JIxqBQVVjwPZMbcqqhLOpBORXR
-         tzTTf5QhrzN+KJMTmvj0aN0ngk3mr8oMtI8Nf/j3mu7S9sP8GE6Yw+TwDTtkjrVFNM4m
-         jE2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXcD2CJFrSdDVKmQi1VbBafi7+JdMPk2Dh5WL8e9Liv/6MPpMGYK4NqPv0nNRMf9P3PnLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycvI3E4jetPWITEa+n1Yjtbw5n3vYjVOd+G+qq6cO7xffqtCIz
-	6zj3ijVdSXBul1ejt+rMrmkBR8wdt/lYT67MLQzDFMUodSfLFVAVRhU4bSgfsSxu5J0=
-X-Gm-Gg: AZuq6aJVxkjRfnlLiqfHqGYY3dkEyXw2RZpv3hJPo8eWdHS5X5AjRssNljp1d2P0irL
-	U8qsP0+OJHnXZJc8N5sI9VhNoEgUtlnL5IPLgUc/0/ajNeaGL4/QOoEE89CaCc3mxVodTKoPpuj
-	Z7OFpHaa8kqVdFlB2O7hC7xEz2jan2YxVG5s+pwUt0em+mUBjHuylEyetEvIlcD/DocgXZEWGby
-	GSMPtaceuAprpl1F3FxBIxyCBkcmyibzmuoS+YMGqZVcKmgIczKT+evFLmDuSsP9R9qWyi/8qYW
-	7u183ITIvyZDjmco/aKWlH0jNwPwE4DwR+CXoG/QLfyxLz4j3IhrDsCCN6x3gsCA7PK6lyR46vS
-	JcQgbLjB660unqO03PYP7Wmq+64IiPW1Aoydk9yeQmquDILe1BVV5yEecRI+KYmLGMIyRtDTNwO
-	MQqE+Oqkq4uklvG+sO+XOMNOIjYPY0lPtKBeyyRmSc31yAbJ6Urnfkphj/dXe+nX3dPL46XOEvJ
-	cuCUg==
-X-Received: by 2002:ac8:5781:0:b0:4f3:5f7b:cc1d with SMTP id d75a77b69052e-505d21846b4mr19549181cf.34.1769732232444;
-        Thu, 29 Jan 2026 16:17:12 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50337cc19d7sm45008611cf.35.2026.01.29.16.17.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 16:17:11 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vlcCE-0000000AQZD-13C4;
-	Thu, 29 Jan 2026 20:17:10 -0400
-Date: Thu, 29 Jan 2026 20:17:10 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v5 8/8] iommufd: Add dma_buf_pin()
-Message-ID: <20260130001710.GB2328995@ziepe.ca>
-References: <20260124-dmabuf-revoke-v5-0-f98fca917e96@nvidia.com>
- <20260124-dmabuf-revoke-v5-8-f98fca917e96@nvidia.com>
+	s=arc-20240116; t=1769733116; c=relaxed/simple;
+	bh=iKHyY2AgpsoE57kanXCC6ExkTSdYkPtSVMy6708F8GM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q+5swqGJfwKwXxHaVCNinYXLUbOgXNujYI5bMkxpZh5rsWDUmwC8W2aS6ION9MTJHIcXmLm08QwPqB7iTmjlg3PzLUYfCrFMQ9/AxOFFi/g3LM1Yc3ZIoainHxHDOkh3rsFqxDcskPBkBs+8JXB2kGkVgGSV5rPSjaYCP8XpfIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=eEaDTQq+; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from localhost (unknown [52.148.140.42])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 02ED820B7167;
+	Thu, 29 Jan 2026 16:31:52 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 02ED820B7167
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1769733114;
+	bh=5QTLnbHZvfOsZm6P1XTvKuZKL+X4Zqmm8W+hY1sTkg8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eEaDTQq+Esr/RUhilvTOCceWy537iSweTVrOCQF87LN7ewfzzEyzyd4RUlTpzT2bW
+	 kg7uIcbs9tYpacoilvpa5mW4vUKyQ+xSa6CjgGAzcB47rSlnza3XRXVmL0xeyblupb
+	 26ODqz1MAroYBEfMeqzG7EalDwPpbFYk2tLsdDZs=
+Date: Thu, 29 Jan 2026 16:31:50 -0800
+From: Jacob Pan <jacob.pan@linux.microsoft.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, Adithya Jayachandran
+ <ajayachandra@nvidia.com>, Alexander Graf <graf@amazon.com>, Alex Mastro
+ <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Ankit Agrawal <ankita@nvidia.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, David Rientjes
+ <rientjes@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Josh Hilke
+ <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+ kexec@lists.infradead.org, kvm@vger.kernel.org, Leon Romanovsky
+ <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
+ linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, =?utf-8?Q?Mich?=
+ =?utf-8?Q?a=C5=82?= Winiarski <michal.winiarski@intel.com>, Mike Rapoport
+ <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, Pasha Tatashin
+ <pasha.tatashin@soleen.com>, Pranjal Shrivastava <praan@google.com>,
+ Pratyush Yadav <pratyush@kernel.org>, Raghavendra Rao Ananta
+ <rananta@google.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>, Shuah Khan
+ <skhan@linuxfoundation.org>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
+ <thomas.hellstrom@linux.intel.com>, Tomita Moeko <tomitamoeko@gmail.com>,
+ Vipin Sharma <vipinsh@google.com>, Vivek Kasireddy
+ <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>, Yi Liu
+ <yi.l.liu@intel.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: Re: [PATCH v2 10/22] vfio/pci: Skip reset of preserved device after
+ Live Update
+Message-ID: <20260129163150.000059a2@linux.microsoft.com>
+In-Reply-To: <aXvgKRrbfymW5NKb@google.com>
+References: <20260129212510.967611-1-dmatlack@google.com>
+	<20260129212510.967611-11-dmatlack@google.com>
+	<20260129142158.00004cdc@linux.microsoft.com>
+	<aXvgKRrbfymW5NKb@google.com>
+Organization: LSG
+X-Mailer: Claws Mail 3.21.0 (GTK+ 2.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -120,68 +87,107 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260124-dmabuf-revoke-v5-8-f98fca917e96@nvidia.com>
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	TAGGED_FROM(0.00)[bounces-69647-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	RCPT_COUNT_TWELVE(0.00)[34];
+	TAGGED_FROM(0.00)[bounces-69648-lists,kvm=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jacob.pan@linux.microsoft.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,nvidia.com:email,amd.com:email]
-X-Rspamd-Queue-Id: 0A5ECB5D6F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.microsoft.com:mid,linux.microsoft.com:dkim]
+X-Rspamd-Queue-Id: 00C56B5EE9
 X-Rspamd-Action: no action
 
-On Sat, Jan 24, 2026 at 09:14:20PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> IOMMUFD relies on a private protocol with VFIO, and this always operated
-> in pinned mode.
-> 
-> Now that VFIO can support pinned importers update IOMMUFD to invoke the
-> normal dma-buf flow to request pin.
-> 
-> This isn't enough to allow IOMMUFD to work with other exporters, it still
-> needs a way to get the physical address list which is another series.
-> 
-> IOMMUFD supports the defined revoke semantics. It immediately stops and
-> fences access to the memory inside it's invalidate_mappings() callback,
-> and it currently doesn't use scatterlists so doesn't call map/unmap at
-> all.
-> 
-> It is expected that a future revision can synchronously call unmap from
-> the move_notify callback as well.
-> 
-> Acked-by: Christian König <christian.koenig@amd.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->  drivers/iommu/iommufd/pages.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+Hi David,
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+On Thu, 29 Jan 2026 22:33:13 +0000
+David Matlack <dmatlack@google.com> wrote:
 
-Jason
+> On 2026-01-29 02:21 PM, Jacob Pan wrote:
+> > On Thu, 29 Jan 2026 21:24:57 +0000 David Matlack
+> > <dmatlack@google.com> wrote: =20
+>=20
+> > > diff --git a/drivers/vfio/pci/vfio_pci_core.c
+> > > b/drivers/vfio/pci/vfio_pci_core.c index
+> > > b01b94d81e28..c9f73f597797 100644 ---
+> > > a/drivers/vfio/pci/vfio_pci_core.c +++
+> > > b/drivers/vfio/pci/vfio_pci_core.c @@ -515,12 +515,24 @@ int
+> > > vfio_pci_core_enable(struct vfio_pci_core_device *vdev) if (ret)
+> > >  		goto out_power;
+> > > =20
+> > > -	/* If reset fails because of the device lock, fail this
+> > > path entirely */
+> > > -	ret =3D pci_try_reset_function(pdev);
+> > > -	if (ret =3D=3D -EAGAIN)
+> > > -		goto out_disable_device;
+> > > +	if (vdev->liveupdate_incoming_state) {
+> > > +		/*
+> > > +		 * This device was preserved by the previous
+> > > kernel across a
+> > > +		 * Live Update, so it does not need to be reset.
+> > > +		 */
+> > > +		vdev->reset_works =3D
+> > > vdev->liveupdate_incoming_state->reset_works; =20
+> >
+> > Just wondering what happened to skipping the bus master clearing. I
+> > understand this version does not preserve the device itself yet; I=E2=
+=80=99m
+> > just curious whether there were specific difficulties that led to
+> > dropping the earlier patch which skipped clearing bus master. =20
+>=20
+> Hi Jacob,
+>=20
+> There's several places where bus master gets cleared that we need to
+> eventually eliminate to fully preserve the device.
+>=20
+>  1. vfio_pci_liveupdate_freeze() clears it during shutdown when it
+>     restores vdev->pci_saved_state.
+>  2. pci_device_shutdown() clears it during shutdown.
+>  3. vfio_pci_core_enable() clears it when the preserved device file
+>     is bound to an iommufd after the Live Update (in
+>     vfio_pci_core_enable()).
+>=20
+> I think it would be safe to skip (3) in this series, since that's very
+> similar to how this series skips resets during vfio_pci_core_enable()
+> for preserved devices.
+>=20
+> But I don't think it would be safe to skip (1) or (2) until the
+> attached iommufd is fully preserved.
+>=20
+> If you are just asking about (3) then I agree it could be skipped and
+> I can include that in the next version.
+
+I was just asking about (3) and trying to understand the asymmetric
+handling compared to reset. I don=E2=80=99t have a strong preference since =
+this
+is temporary=E2=80=94thanks for the explanation.
+
+I=E2=80=99ve been testing my noiommu cdev patches on top of yours, and so f=
+ar
+they behave the same as with a real IOMMU. As you noted, however, final
+device preservation still depends on iommufd.
+
 
