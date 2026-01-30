@@ -1,241 +1,139 @@
-Return-Path: <kvm+bounces-69699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69700-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAOYNiSYfGmJNwIAu9opvQ
-	(envelope-from <kvm+bounces-69699-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:38:12 +0100
+	id 6AmYJSKlfGnCOAIAu9opvQ
+	(envelope-from <kvm+bounces-69700-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 13:33:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457D9BA21B
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:38:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D30BA8DB
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 13:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3AC5C3011782
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:38:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC2013038A6C
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6F736C598;
-	Fri, 30 Jan 2026 11:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710EE378D9D;
+	Fri, 30 Jan 2026 12:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E2rKCyBx"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jIrEqhmt"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06642F745D;
-	Fri, 30 Jan 2026 11:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC1C23EAA1;
+	Fri, 30 Jan 2026 12:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769773084; cv=none; b=B57IGltEcT8c+0z3skCrDYfVYm4arvaceQpUUBisVHaBV4KXaiJBg0AXlIvprA8dz+dtWB3VDWZgU4gWwHTS/k4MHnvvL6TfGZ7WwpaN7CX2w/nT4xzANby29+vzJt8DMshJYSwm8p19/tIcwt70Zl3j/xvf6Oh9C4aDuQA5BRo=
+	t=1769776397; cv=none; b=JhxNGuj/zMfPTlCcOZazLVXsr2LVRQDSDxtcmi8EIq9mO7e/uP8razTx+ifNOEJD3h2q6u4p1ZHd/YjEJwVQYm1YTjqJTfP5djVj7WDLULbfPp75pEJO2ce9nYNcnPhvwtPkmQlh9flQplFJcNfN8h4HZRCDttFG+T3Z/IJzkMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769773084; c=relaxed/simple;
-	bh=FF3Xw6u2vV5Q8XssxCyE4krJu70B6ir0Eoa3b81i4pQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FAKKtbSkEsMx1FLSKNKM4SRPAH5cxwDqxOCw5vNlVGzeGZI38gchVtEP3AeCc3MAFL0E+88t8LdWc9QxvDqTqTecsCZseE+Lfu4/6aFx6Bm/vdxSF4UbFz9WAVk1FeL0QUw88vGav3akJY2IHX3koQLJnZvWDi7xDNv/SP2YoKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E2rKCyBx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3A9C116D0;
-	Fri, 30 Jan 2026 11:38:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769773083;
-	bh=FF3Xw6u2vV5Q8XssxCyE4krJu70B6ir0Eoa3b81i4pQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E2rKCyBxcoDdTIVLU6FgQYzTHPoJ1KTNccZkfttJV04mxlsMMfYr2iJRETA+Bt8t8
-	 4NtMAJW/XRiKrKaz17sFCKlObjjLnb0yAfeTsz7zm7al/kdsbcVSR2x/qW+EAvlsLL
-	 RluQWaArAHe8RTCEZEIjStGbJDniXlkaJ2crtokFRKKFwEaRRtOLIi+3XxJTqXE+mb
-	 0WbAaIlTJzs4vjXMlEAX3GSubNTR8U7zubwuMx0YEAL04rY07GCbErhYfJ8ieb3LrB
-	 O4lzBFYus0rGyQH5LXcQEtJUmFU1QSs4pxFjje/dVD4etSC6gydZmrDFieZxZ4g6V/
-	 Jk04S93NVK4HA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlmp7-0000000737G-1KMo;
-	Fri, 30 Jan 2026 11:38:01 +0000
-Date: Fri, 30 Jan 2026 11:38:00 +0000
-Message-ID: <861pj7baav.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v4 11/36] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
-In-Reply-To: <20260128175919.3828384-12-sascha.bischoff@arm.com>
-References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-	<20260128175919.3828384-12-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769776397; c=relaxed/simple;
+	bh=jJnTKRus1VH9ByRP4dCVWUmlwN8Ml9AobfbOzad7QIg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jDE6L6uycV83iG5O3wLU1ddAaoHL63NrrRqHC+1jiBjIDcHAGKIlXedfP2Bl1eOIiEDM0x2uTb9PzwQqFWDZPE7KGy6MYQ1fxVrDG++NDvdz/L/4/TJw5lGsQmU1Ai8qp4QfIgqocN8pSG7U8oxVy5Ojej/fVJ8zyC+zdSAaeBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=jIrEqhmt; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 247D340E0028;
+	Fri, 30 Jan 2026 12:33:11 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id uRJQ7lZ5xULN; Fri, 30 Jan 2026 12:33:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1769776387; bh=i5i6PvjHca4PxvY6snJ+kbO8pp9maV47C3kOX6ifmzY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jIrEqhmtYUks/uW1gx/QvKBABSi4kWxojyTs6Fi0kBHkGuQQpUEh9iqC5t+0/81Kq
+	 Af0wB4yeI6JC30CPirGKzDLjXzh+d4eniu8TB3pmEsFxf1ohMJqi5wuQTAAlPUdnlg
+	 HeGNaAC9KRl09omdxLVj7R8qyWdaQovGZqdaEgYvkx5T5z0JqYf7OrrZGpzXSd308Y
+	 HnVlyEVhNWpYmVuiuadpM3has0rhCs8epJ7iFTwpHcFOdNVNfPOQK1lL40+JyksIOx
+	 ges2jFyqXosHB/SnAlgCN79t9VHUHnnnKUgDw1DGg4waTALOJXPdkNUVqWy9cJ+Yqb
+	 wsxih1HaTZ+s0fgg9UhgseDFlMb675VLxktUKNSS3jBIqwi4VdvujVt70goG4TQuWc
+	 EaZbJCVttmKAJwN307Uzd+TPBBb+E+WQSQ7S/IwG7Yop0phi6Wuao/9IhXqR9rUy0/
+	 5G/r5s9n/LXQSoM5V3SrfpSBlKxGx22W9iQ8BM2gySZA4ha4opgJF+PyQTHQ4vKtbl
+	 KJOkSaa44yUF4NX9qMTvf0LZjaVW/24c8yh4NfHnbJvzmDh2SMLiYQ9Go+v5RqR3vD
+	 c6REsjbbpMo8FMuYZzHEzaPOKUZkKrTWWjOep/TBKfiMSczn+MliHWhRKPEN7AskY0
+	 ldM9XaPDx0b+TkXCrgN9huR4=
+Received: from zn.tnic (pd953023b.dip0.t-ipconnect.de [217.83.2.59])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 2849240E00DE;
+	Fri, 30 Jan 2026 12:32:53 +0000 (UTC)
+Date: Fri, 30 Jan 2026 13:32:52 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Kim Phillips <kim.phillips@amd.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev, x86@kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Naveen Rao <naveen.rao@amd.com>,
+	David Kaplan <david.kaplan@amd.com>, stable@kernel.org
+Subject: Re: [PATCH 1/2] KVM: SEV: IBPB-on-Entry guest support
+Message-ID: <20260130123252.GAaXyk9DJEAiQeDyeh@fat_crate.local>
+References: <20260126224205.1442196-1-kim.phillips@amd.com>
+ <20260126224205.1442196-2-kim.phillips@amd.com>
+ <20260128192312.GQaXpiIL4YFmQB2LKL@fat_crate.local>
+ <e7acf7ed-103b-46aa-a1f6-35bb6292d30f@amd.com>
+ <20260129105116.GBaXs7pBF-k4x_5_W1@fat_crate.local>
+ <f42e878a-d56f-413d-87e1-19acdc6de690@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f42e878a-d56f-413d-87e1-19acdc6de690@amd.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69700-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69699-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:email,arm.com:email]
-X-Rspamd-Queue-Id: 457D9BA21B
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alien8.de:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fat_crate.local:mid]
+X-Rspamd-Queue-Id: 41D30BA8DB
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 18:02:09 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> Set the guest's view of the GCIE field to IMP when running a GICv5 VM,
-> NI otherwise. Reject any writes to the register that try to do
-> anything but set GCIE to IMP when running a GICv5 VM.
-> 
-> As part of this change, we're also required to extend
-> vgic_is_v3_compat() to check for the actual vgic_model. This has one
-> potential issue - if any of the vgic_is_v*() checks are used prior to
-> setting the vgic_model (that is, before kvm_vgic_create) then
-> vgic_model will be set to 0, which can result in a false-positive.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  arch/arm64/kvm/sys_regs.c  | 42 ++++++++++++++++++++++++++++++--------
->  arch/arm64/kvm/vgic/vgic.h | 10 ++++++++-
->  2 files changed, 43 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 88a57ca36d96..73dd2bd85c4f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->  
->  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
-> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> @@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
->  		val = sanitise_id_aa64pfr1_el1(vcpu, val);
->  		break;
->  	case SYS_ID_AA64PFR2_EL1:
-> -		val &= ID_AA64PFR2_EL1_FPMR |
-> -			(kvm_has_mte(vcpu->kvm) ?
-> -			 ID_AA64PFR2_EL1_MTEFAR | ID_AA64PFR2_EL1_MTESTOREONLY :
-> -			 0);
-> +		val = sanitise_id_aa64pfr2_el1(vcpu, val);
->  		break;
->  	case SYS_ID_AA64ISAR1_EL1:
->  		if (!vcpu_has_ptrauth(vcpu))
-> @@ -2024,6 +2022,23 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
->  	return val;
->  }
->  
-> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	val &= ID_AA64PFR2_EL1_FPMR |
-> +	       ID_AA64PFR2_EL1_MTEFAR |
-> +	       ID_AA64PFR2_EL1_MTESTOREONLY;
-> +
-> +	if (!kvm_has_mte(vcpu->kvm)) {
-> +		val &= ~ID_AA64PFR2_EL1_MTEFAR;
-> +		val &= ~ID_AA64PFR2_EL1_MTESTOREONLY;
-> +	}
-> +
-> +	if (vgic_is_v5(vcpu->kvm))
-> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+On Thu, Jan 29, 2026 at 04:32:49PM -0600, Kim Phillips wrote:
+> Not *all* SNP features are implemented in all guest kernel versions, and,
+> well, for those that don't require explicit guest code support, perhaps it's
+> because they aren't necessarily well defined and validated in all hardware
+> versions...
 
-You probably want to clear the field before or'ing something in, or
-you may be promising more than we'd expect.
-
-> +
-> +	return val;
-> +}
-> +
->  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
->  {
->  	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
-> @@ -2221,6 +2236,16 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
->  	return set_id_reg(vcpu, rd, user_val);
->  }
->  
-> +static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-> +			       const struct sys_reg_desc *rd, u64 user_val)
-> +{
-> +	if (vgic_is_v5(vcpu->kvm) &&
-> +	    FIELD_GET(ID_AA64PFR2_EL1_GCIE_MASK, user_val) != ID_AA64PFR2_EL1_GCIE_IMP)
-> +		return -EINVAL;
-> +
-> +	return set_id_reg(vcpu, rd, user_val);
-> +}
-> +
->  /*
->   * Allow userspace to de-feature a stage-2 translation granule but prevent it
->   * from claiming the impossible.
-> @@ -3202,10 +3227,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  				       ID_AA64PFR1_EL1_RES0 |
->  				       ID_AA64PFR1_EL1_MPAM_frac |
->  				       ID_AA64PFR1_EL1_MTE)),
-> -	ID_WRITABLE(ID_AA64PFR2_EL1,
-> -		    ID_AA64PFR2_EL1_FPMR |
-> -		    ID_AA64PFR2_EL1_MTEFAR |
-> -		    ID_AA64PFR2_EL1_MTESTOREONLY),
-> +	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
-> +		    ~(ID_AA64PFR2_EL1_FPMR |
-> +		      ID_AA64PFR2_EL1_MTEFAR |
-> +		      ID_AA64PFR2_EL1_MTESTOREONLY |
-> +		      ID_AA64PFR2_EL1_GCIE)),
->  	ID_UNALLOCATED(4,3),
->  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
->  	ID_HIDDEN(ID_AA64SMFR0_EL1),
-
-Don't you also need something in kvm_finalize_sys_regs() to hide GICv5
-altogether if no irqchip has been instantiated? It'd be worth
-extending the "no-vgic-v3" test to also cover GICv5.
-
-Thanks,
-
-	M.
+Ok, can you add *this* feature to SNP_FEATURES_PRESENT? If not, why not?
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
