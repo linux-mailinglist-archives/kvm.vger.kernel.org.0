@@ -1,222 +1,242 @@
-Return-Path: <kvm+bounces-69707-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69708-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mM9tAuixfGmbOQIAu9opvQ
-	(envelope-from <kvm+bounces-69707-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:28:08 +0100
+	id eHG7LbyyfGmbOQIAu9opvQ
+	(envelope-from <kvm+bounces-69708-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:31:40 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55628BB004
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:28:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62076BB0B1
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:31:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02F60305CF77
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 13:25:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DD301300E0F5
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 13:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13FA2E4258;
-	Fri, 30 Jan 2026 13:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A645929E101;
+	Fri, 30 Jan 2026 13:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TuammyZb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YIdi6SPC"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A44821257F;
-	Fri, 30 Jan 2026 13:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769779527; cv=none; b=qRoHTfQm3hH/xBO0PW0pSX2xiFLYRQ3LVYclUr41sZ2rJXdWHT9o0rxTH/6OhlszW8foLPhpu/HK8Sw5NzTtmbivfqp++G7hqP86sA01SB5lhToZmK1TA97lc0dKRxswJg7IS70nUjaSOJqP7hiWlUcPGZx8RYelnpdmBcmanVM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769779527; c=relaxed/simple;
-	bh=MvGMSADanzB7x+q+EqopZ7kfWA1qw4bC+aLY+a4Q7D4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RRYOwlnPV9uYEj2l/7lx9s9L6zQICKZpkhXp7zeBoKVrJfVr6FWZtcuqrogcu8z4v8wktBOfQCnRXpAal2qS+eEohu4m4VHXMqWUEMZeYqsjQGPcR64ubkHjqxE/Qtsl++xWwP2GNLjt32Lu6CqefAmZ8Y5jby0WMgV9iIcl3mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TuammyZb; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1769779518; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	bh=NP4C/8iS3LZQ05EAXyUJq46Gw0HsoTqfjGkTOKLW1mk=;
-	b=TuammyZb4RFji8XLQFPYnDia8IMrXDnp4Li5+X/xlzfKh7wqFw6PatmmwYXCaBNllIPqeWizy1PICDcQtXFxDh9gnhIqXQge7N9omJCcajE1mtR+hzyapMuNHEMWwozpXLIkUr6RraJNuuTIZ/xvqHtTEEiOQ9YK51dBLDUn62o=
-Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WyAwpf6_1769779515 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 30 Jan 2026 21:25:16 +0800
-From: fangyu.yu@linux.alibaba.com
-To: radim.krcmar@oss.qualcomm.com
-Cc: ajones@ventanamicro.com,
-	alex@ghiti.fr,
-	andrew.jones@oss.qualcomm.com,
-	anup@brainfault.org,
-	aou@eecs.berkeley.edu,
-	atish.patra@linux.dev,
-	corbet@lwn.net,
-	fangyu.yu@linux.alibaba.com,
-	guoren@kernel.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	palmer@dabbelt.com,
-	pbonzini@redhat.com,
-	pjw@kernel.org
-Subject: Re: Re: [PATCH v3 2/2] RISC-V: KVM: add KVM_CAP_RISCV_SET_HGATP_MODE 
-Date: Fri, 30 Jan 2026 21:25:14 +0800
-Message-Id: <20260130132514.16432-1-fangyu.yu@linux.alibaba.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <DG199ZOUMRND.1RTVHMI6L9U5L@oss.qualcomm.com>
-References: <DG199ZOUMRND.1RTVHMI6L9U5L@oss.qualcomm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38542E03F5;
+	Fri, 30 Jan 2026 13:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769779846; cv=fail; b=n/rJQIDVAxYt01eh9cFjMevWhSxYwjFCzWAvy1ajd5O0/OsXdh1dSa6o9QE40T1KxZFjfFI17dwlq5X2z/j8iBrT1CVd4UYllQHDYFr6FKk9xZDBX6u3+udJAjC4HEBCOr2dUqsWJU4By08qL9EthvlJAQHL7QKxOOmeqer0fF0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769779846; c=relaxed/simple;
+	bh=Gv1ddsQFbdzCFEV/6no6GVZXoF4z7zuootWIEbi+Y+U=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=GOmX8KJg3TX6VpiC0bIqHr7784LCrMCUTZao/lGV7SIBk9BaJrmFe6lNThYNL+5VdtyMjCcNzd3d6YLJhuxxm0oTSXx7PFh2HncK1aBYE+ndmzCLgaNU9x5CP6K3SZJPramPB09qAUOQBCPGlio66gmeOc31TRrIRtCaW6pvE9I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YIdi6SPC; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769779845; x=1801315845;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Gv1ddsQFbdzCFEV/6no6GVZXoF4z7zuootWIEbi+Y+U=;
+  b=YIdi6SPChLAdivdZMYTArd1qgrzDzRACg1Ibre8qrWw0RqhNATsynCCF
+   4Vu8Fiuj1ZQ3ywh91PwDKDcAJQhG4FftdkaUpvamikcZYyTpR9QwJIi2A
+   EJTUuwa5Srj5LMfOwo7Ef/ryVe0qx6CpzlBuXCXrnKkUnq31rT9SH3ZWn
+   ZYcnHM9dJcjFuLKBXxo8ISNr+byQSLwv5Kd2gKCcBki/lfifAjOQmu4Jh
+   5p4BVLNd6byG39Ox1aS4Ihjkf2ru2Uqw7UtD3c+wikn783fU+NFEBjNoB
+   O5JrFIt7C9VI/0EydGcSB9J3ixRRcjPFbQ/i3EXQBC95vhVf6hSXnYv4w
+   A==;
+X-CSE-ConnectionGUID: vWFJUxFgRqKLNj+0nvgO7w==
+X-CSE-MsgGUID: w5ZcwqbRRxuCvFQ4XSrj8g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="82454233"
+X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
+   d="scan'208";a="82454233"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 05:30:45 -0800
+X-CSE-ConnectionGUID: gsEEX8VCSEizit2b0xHAEg==
+X-CSE-MsgGUID: H4AZKb1jQ3W/dtJD3a2HTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
+   d="scan'208";a="213751486"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 05:30:45 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 30 Jan 2026 05:30:44 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Fri, 30 Jan 2026 05:30:44 -0800
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.68) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Fri, 30 Jan 2026 05:30:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WS5ZVHjpPsin5bhYbODbbbAeino9AEtrGB0pbGpBxLaRtO3teCAE0/82LNWU5KndkPnpeW98PFyxXmeMYk9URb3m9XRBSDeMgza7vBvx3TR7c1H2IjmzwFjf9SAJBvnJiXkXqnq0Au7WGlioYtC/7uOOP6x9iKg8Mpd2tCnaB1lmGDVxpgsd6s/D0mNDJO4JD0SHHciAvGKzb7ZuzQm3IzPVcZvdYzevqG42E5VD445SOkOdJYDr2/kiXkxidq213cAWw3FaKnknUZTIYNFXdS3Q/krmQSFtuDPAO1UmBLiT+Pm5PB81eGR5MLrFsonozPcZkA9kEfTBbvAKD37taw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Gv1ddsQFbdzCFEV/6no6GVZXoF4z7zuootWIEbi+Y+U=;
+ b=oAxJrS47qps5vXVnPIm6rBjnYZ5axoo9I/47rMvoX+/zL7x8vg7hB1y5DP2U492eM9glDgd5NLWZC0vOLAtb4c/ylyrCOyBHvEBafHiaCe4K8WtzuooWD7G2YPMBpsLyg1G+XWUTYhDiNgEiuIRxrvY8yz0g9icO5o5pDMh8HtqLgF111iGkaexScM0P0na3TIHMJ0MnpPMKmHNDjTQ/M3bcb4Pj5+1lSAhBSmsF6KCoSojwImYnq0JHBoUTjmDEtzlchEiSieaipUSEIeJNG+mc53oQxQsBnMz3j0GEt4NpJGa9ZCyCqQI3gJBnnpNJFkNWCbtSlWn5rMYf/Hd/jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by MW4PR11MB5824.namprd11.prod.outlook.com (2603:10b6:303:187::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.15; Fri, 30 Jan
+ 2026 13:30:36 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf%6]) with mapi id 15.20.9564.006; Fri, 30 Jan 2026
+ 13:30:36 +0000
+Date: Fri, 30 Jan 2026 21:30:21 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <x86@kernel.org>, <reinette.chatre@intel.com>,
+	<ira.weiny@intel.com>, <kai.huang@intel.com>, <dan.j.williams@intel.com>,
+	<yilun.xu@linux.intel.com>, <sagis@google.com>, <vannapurve@google.com>,
+	<paulmck@kernel.org>, <nik.borisov@suse.com>, <zhenzhong.duan@intel.com>,
+	<seanjc@google.com>, <rick.p.edgecombe@intel.com>, <kas@kernel.org>,
+	<dave.hansen@linux.intel.com>, <vishal.l.verma@intel.com>, Farrah Chen
+	<farrah.chen@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin"
+	<hpa@zytor.com>
+Subject: Re: [PATCH v3 08/26] x86/virt/seamldr: Retrieve P-SEAMLDR information
+Message-ID: <aXyybZc1wi1KQmL5@intel.com>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-9-chao.gao@intel.com>
+ <7e981cd1-cfd5-4bc3-a87d-0a187c510dc2@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <7e981cd1-cfd5-4bc3-a87d-0a187c510dc2@intel.com>
+X-ClientProxiedBy: SGBP274CA0011.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::23)
+ To CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|MW4PR11MB5824:EE_
+X-MS-Office365-Filtering-Correlation-Id: 249feb6c-7203-4610-4ec1-08de6003c02c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?8pANBxQ/Tj180bh1GqYVZsYNNGLOIv817SNvnghAVwn+MAbb7CSriXPufxen?=
+ =?us-ascii?Q?dXOc5TXerpp1/dikY8oe2HTHxNYduRhsLW08NWjJztaUU3qG+B/yKle4QVQh?=
+ =?us-ascii?Q?6f6XQV9G2VA/FuPVJlSIZrgpZr3gnQZQ9KMuFWRPF6umnRiIN0RRU8jgxJGf?=
+ =?us-ascii?Q?I9yfDUfugkbIMWsCoP4mwLVdpHgStFxIR4HHvlGUkPGC1deBbxJta/Xji8dC?=
+ =?us-ascii?Q?bOhX990kYiaCK0b3ozCPlLzLThrymZkl+mugZq+Y8vDDVpE4BaBk6aaaehak?=
+ =?us-ascii?Q?2jRU44y1INQLnUhRi4RvPdYXEsk2bRKQoEfcSRvktLi78OY29N7EPrYeZpl/?=
+ =?us-ascii?Q?v6iqSYUmPZ33M3U2QpDWAAdad5N8/yohQ3QmnaJU2fvpw54QOWGufRRWNebO?=
+ =?us-ascii?Q?UYXSU8tkFPFKtqArkST8j5rC41IG0IIwtzBXteXMd96548UYyEP1rO8QRkL1?=
+ =?us-ascii?Q?T8YQaHPOpfGk8F388IHMCQ2y/nW7McSn/AtrxE7dfZlKZmjTea2zDUATNemT?=
+ =?us-ascii?Q?xt1EfAewb8CugahOzoFcoFpK1XBX0mc0rPVsSw+kqNr+RJWeK6xlsVy+rIui?=
+ =?us-ascii?Q?t7nNz/IG5kbYMn+tTfuwSTSzeY+lsQNNaKT6NMa8uYehgpmUOB59J4I611FY?=
+ =?us-ascii?Q?uKLMjvthUZysvldyS5bJCJggCxnI4+bq0ejee8g5rYEZO2oMr4Z+XOTjKTZh?=
+ =?us-ascii?Q?vVgyztnfBQCy5IvDsoYDvwPzFZV+nbrFhIRO5+fNvoJMkAmDplgP0YoOH3Qt?=
+ =?us-ascii?Q?NZMUJCymTm1d+rWmQiTm3szo8usq041gYqXVynUC8Rr+xxeC/tdo0P6zSTvr?=
+ =?us-ascii?Q?+uhBIq3g1wQ9rBIProczbksT6nXl7mc5ARkOWkSfyvzUDHkqu6fVsGopPvlo?=
+ =?us-ascii?Q?m9OEOTg8MNpDxk7Aex1fWBaE4r06NitB2qYSj0eyFdJ6I/wBGLKVuD1ThpiJ?=
+ =?us-ascii?Q?FQKm2W+g8E8A0vSmPH666SOg25Alm+myj75leBUpBp9wudsGBUIDTf/NyBJm?=
+ =?us-ascii?Q?SaVwgCVB1nOLbzU/SBdy0Gb9nV5Ll9JSqMDUoaxMdV6lohAtDtbjnRsgyQN5?=
+ =?us-ascii?Q?aJqtrMNTkn8+tyexYlIsrCQKqLCMfN053YxEbzdOnWpqeNWVYTzuuE0u3tyk?=
+ =?us-ascii?Q?bmyQldlDNl7JH89T4pX5Qy4gfYbtTS4G8zkOAWjrR1Z2EV1gh+1s5nXwfhHS?=
+ =?us-ascii?Q?4Bj2Stv058T6fO6TWF0Fcj22PxixbH69gWQeTYe/tQm43jz6gJSllJ4vhMuQ?=
+ =?us-ascii?Q?Sessme9P9h/AfY1mZfBntTImNwjvvimGf64b4IbKh2LUMU4Gag6Kw4fKmR/O?=
+ =?us-ascii?Q?JxhcZlEiFKvgvbIv87tmik+IbwvRTHl8ssBezw/skYia0yCGn4oFOLp7I9ZT?=
+ =?us-ascii?Q?aJn8fENlzom0IbauzDcAs+xSU2QLiNk37egNcGXvrpaNseyqku4J/+Kqs80t?=
+ =?us-ascii?Q?ohSWNk1fro2MWgGFDPmbrZ29Bdm6ydLgp2yfum/+jh8SFZASNKCtHnI23M+R?=
+ =?us-ascii?Q?wV1EEr0AL11wkORy9Two+Ji3lJqiwo8sa3MiaqK6VJdVgT4l9xVq0KQGkle3?=
+ =?us-ascii?Q?tm9gLB1XD0vPht46VWc=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NRcWHhUeuFOrISXxlyGA8y8IX7E6IDyylU3PEnzIFUdzWnTEB/pdsTOeRs7W?=
+ =?us-ascii?Q?HlVjzz1XHQ2fAcr9UAn2y0DxpP9Dd79xHjgFPD3aiW1pEO3WT7GZp14DKB+e?=
+ =?us-ascii?Q?NSe3dEE96YQtV33Hg/zCyZa6KVVnZMvaftMghwd09W3y3Y2zIBhK+qNQfppc?=
+ =?us-ascii?Q?yLVMqsxr9igilhqaAv6V3CAya/M75PPZCtXowk7Tk8Kf1BeAUpQIzQtRD1x4?=
+ =?us-ascii?Q?NMHH8wjnCBgCQotJzlkonkHa1tkniPQbmy1YwFdlXxOz6rwPOsVE7tHssZGD?=
+ =?us-ascii?Q?vTUUzQ4QCm3MFoOqz1/6hB4v39crPLRz4P3mVRoSmLCB0kFVvTaV3jYqms4H?=
+ =?us-ascii?Q?TS7SIF2Dyg8lIwaOL+Dvi3nRZFHG3RwYQhUwN8f3unHeX+6nmBn6mVhP++Vo?=
+ =?us-ascii?Q?fhOeWTLd0VaUK5/uxtsT2QWo1TGYsC7qhVfUX6g93PsVRV06qRF1P9tKc2VL?=
+ =?us-ascii?Q?nDhlsVQUd0sYjSdos8wg1LsSuvXUUsB8kM+zoGfwrOeowss5UiQAgMDHETKV?=
+ =?us-ascii?Q?1ZYLXPjVzX+ElqdPyYwSc186NYjFM4D4gMIVJ2emFffUVhgsVQ4XeeSpbYXN?=
+ =?us-ascii?Q?0k3/DQkLbNNUwgWm06qI2a/h8ahiSurHsZfm44G2U4SqcBDvVMVo7+uXLiVi?=
+ =?us-ascii?Q?fOxvTP4W0ch7ZECxhWkwPtBUgksePjBaVYO1h/zE4Oa6f1VdLKEvMrOzkMDU?=
+ =?us-ascii?Q?UJx3lrMzBM3AcLh8AWpQqZkBkA33HRzV8phmraPfU0lNmIOaFVUJsbHKMboC?=
+ =?us-ascii?Q?K7niPJa+xRCqu4KKL2oqyBqNj4GpGTyp5uF+ja/iZk2U9pwv2aWFHyPclMsM?=
+ =?us-ascii?Q?tTO+7gJ80kQbNX23vP16LyNxPsV4quEsmNIa/54lzwuGHgRTnX1GujkIZvgj?=
+ =?us-ascii?Q?zQTBpBjUSSt5WIYLPtgiv+tCjYx7RJafu/yK/XbfI+TW+N1ZAJ620iDbTR7u?=
+ =?us-ascii?Q?SnYtwJc36RbxjSZwnV2LjzsH5wqr92gJid+6KsJTLQCxxaKLA7Z6TWOE5/3r?=
+ =?us-ascii?Q?xINclptHOqueNlEL2qRbtrpzMmjXVmrwAyyd97MrkaxLVhLAPIHraePVujpy?=
+ =?us-ascii?Q?rzzrLazt5XjMiV76kebDo/rR36iXJ9zQwOxZAgqTsmWnDSpuOsbtZ2AZwjZp?=
+ =?us-ascii?Q?6VRK50bKHd72Cxn58mxuOCDynjQCyS8d0Jkufa5OsAsgckkYF/veEUJN48gM?=
+ =?us-ascii?Q?pG4bXggEBGVxIiMqGVpaxPqvTEi7qU5K4k/b9b8QR9wxsDoYOHyvZqJMw4gZ?=
+ =?us-ascii?Q?XU+FxwlnVTXLZPphoIhc+nMr8csVgig51fVB1tvhXB9UUlJxEWT5/qBHzg5B?=
+ =?us-ascii?Q?arzdqmtMIdEXu7OBMu33BZ4fr01dRf3bVPtPWSr1ogTCpJjtawd+ctZbcB11?=
+ =?us-ascii?Q?O1HIyTxawZba461CrBhnqcSixi5T0rQVdYDMNnCC/iKjgTUZG5Wldhl3dh5e?=
+ =?us-ascii?Q?7XEXWBF0Tf6SNgB/tKvezxyR/Hc7v6/JLx3bLikTG/lqOKHgwdDS4YeMrTak?=
+ =?us-ascii?Q?xQBMBSml2yQc8QLU1ShcAzJRjjPk5C34PWRn7lPKzrhiZ8LsrurIIeOOpiIj?=
+ =?us-ascii?Q?UNdBa34baC13QFcu63REdzHtMut0aIlRzzuRQlgRpNiVQHVohH+GHykiQyK9?=
+ =?us-ascii?Q?Yw/jfPYJ2I6KyB4vhJE+mFivdy6tZcZNSOU3pUMPbVWAz9/RJhCCJn95AhCA?=
+ =?us-ascii?Q?qkZHkiR/IRgIOJDjhLCnpT0aBQGLlPkp6eX9+e+bqwnIXIbwmQGMYBz/1VKa?=
+ =?us-ascii?Q?oPDW3KndmQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 249feb6c-7203-4610-4ec1-08de6003c02c
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2026 13:30:36.1226
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wN30XnBDJyY1fqV8u6on0OBCsq86Bk8p3lr0BNy5SCRbjfKx/p7Cl4C4cyB9c2pvMhYhkk0zph3AJ3cLStg6sQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5824
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	SUBJECT_ENDS_SPACES(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69707-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69708-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fangyu.yu@linux.alibaba.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_NEQ_ENVFROM(0.00)[chao.gao@intel.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 55628BB004
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 62076BB0B1
 X-Rspamd-Action: no action
 
->> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->>
->> This capability allows userspace to explicitly select the HGATP mode
->> for the VM. The selected mode must be less than or equal to the max
->> HGATP mode supported by the hardware. This capability must be enabled
->> before creating any vCPUs, and can only be set once per VM.
->>
->> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->> ---
->>  Documentation/virt/kvm/api.rst | 18 ++++++++++++++++++
->>  arch/riscv/kvm/vm.c            | 26 ++++++++++++++++++++++++--
->>  include/uapi/linux/kvm.h       |  1 +
->>  3 files changed, 43 insertions(+), 2 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> @@ -8765,6 +8765,24 @@ helpful if user space wants to emulate instructions which are not
->> +7.47 KVM_CAP_RISCV_SET_HGATP_MODE
->> +---------------------------------
->> +
->> +:Architectures: riscv
->> +:Type: VM
->> +:Parameters: args[0] contains the requested HGATP mode
->> +:Returns:
->> +  - 0 on success.
->> +  - -EINVAL if args[0] is outside the range of HGATP modes supported by the
->> +    hardware.
->> +  - -EBUSY if vCPUs have already been created for the VM, if the VM has any
->> +    non-empty memslots, or if the capability has already been set for the VM.
->> +
->> +This capability allows userspace to explicitly select the HGATP mode for
->> +the VM. The selected mode must be less than or equal to the maximum HGATP
->> +mode supported by the hardware.
+On Wed, Jan 28, 2026 at 03:57:30PM -0800, Dave Hansen wrote:
+>On 1/23/26 06:55, Chao Gao wrote:
+>> +static struct seamldr_info seamldr_info __aligned(256);
 >
->"The selected mode must be supported by both KVM and hardware."
+>I also wonder if this should be __read_mostly or even read-only after
+>boot. Is it ever modified?
 
-This description is clear, Agreed.
-
->(The comparison is a technical detail, and incorrect too since the value
-> is bouded from the bottom as well.)
->
->>                                  This capability must be enabled before
->> +creating any vCPUs, and can only be set once per VM.
->
->                     ^ "or memslots"
-
-Right, thanks for catching that.
-
->
->> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
->> @@ -202,6 +202,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  	case KVM_CAP_VM_GPA_BITS:
->>  		r = kvm_riscv_gstage_gpa_bits(&kvm->arch);
->>  		break;
->> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
->> +		r = IS_ENABLED(CONFIG_64BIT) ? 1 : 0;
->
->Maybe we can return the currently selected mode for a bit of extra info?
->Another nice option would be to return a bitmask of all supported modes.
->
->I think userspace has otherwise no reason to call it, since it's fine to
->just try enable and handle the -EINVAL as "don't care".
->1 syscall instead of 2.
-
-I’d prefer to keep an explicit KVM_CHECK_EXTENSION implementation for
-KVM_CAP_RISCV_SET_HGATP_MODE. Userspace commonly uses CHECK_EXTENSION for
-capability discovery, and returning 0 would make it assume the capability is
-unsupported even though KVM_ENABLE_CAP works.
-
-Returning 1/0 should be sufficient here, as the actual mode support is
-validated by KVM_ENABLE_CAP itself (with -EINVAL for unsupported modes).
-
->> @@ -212,12 +215,31 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>  
->>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->>  {
->> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
->> +#ifdef CONFIG_64BIT
->> +		if (cap->args[0] < HGATP_MODE_SV39X4 ||
->> +		    cap->args[0] > kvm_riscv_gstage_mode(kvm_riscv_gstage_max_pgd_levels))
->> +			return -EINVAL;
->> +
->> +		if (kvm->arch.gstage_mode_user_initialized || kvm->created_vcpus ||
->> +		    !kvm_are_all_memslots_empty(kvm))
->> +			return -EBUSY;
->> +
->> +		kvm->arch.gstage_mode_user_initialized = true;
->
->No need to have gstage_mode_user_initialized, since if the user could
->have changed it once, there shouldn't be an issue in changing it again.
->It's the other protections that must work.
-
-Agreed — I'll drop gstage_mode_user_initialized. Userspace can change the
-mode multiple times before the VM is committed, and updates will be gated
-by the existing protections (i.e. once <vcpus created/ran | memslots active>,
-the mode change will be rejected).
-
->> +		kvm->arch.kvm_riscv_gstage_pgd_levels =
->> +				3 + cap->args[0] - HGATP_MODE_SV39X4;
->> +		kvm_debug("VM (vmid:%lu) using SV%lluX4 G-stage page table format\n",
->> +			  kvm->arch.vmid.vmid,
->> +			  39 + (cap->args[0] - HGATP_MODE_SV39X4) * 9);
->
->(I don't think this debug message is going to be useful after a short
-> debugging period, and it would clog the log on each VM launch, so I'd
-> rather get rid of it.)
-
-I'll drop this kvm_debug() from the capability path to avoid spamming the
-log on each VM creation.
-
->Thanks.
-
-Thanks,
-Fangyu
+This should be __read_mostly. num_remaining_updates changes after successful
+updates.
 
