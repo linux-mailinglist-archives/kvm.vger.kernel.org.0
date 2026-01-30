@@ -1,196 +1,133 @@
-Return-Path: <kvm+bounces-69717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69719-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLOdBJm0fGm7OQIAu9opvQ
-	(envelope-from <kvm+bounces-69717-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:39:37 +0100
+	id mIS4Amq2fGm7OQIAu9opvQ
+	(envelope-from <kvm+bounces-69719-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:47:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55F5BB36A
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:39:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DFABB521
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 14:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6D9E13016341
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 13:39:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9A32430106BA
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 13:42:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C69D34DCD2;
-	Fri, 30 Jan 2026 13:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684D330F957;
+	Fri, 30 Jan 2026 13:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0ogsA2n"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Wc+3DTR9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E94E2EFD91;
-	Fri, 30 Jan 2026 13:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC322ECD34;
+	Fri, 30 Jan 2026 13:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769780280; cv=none; b=GnKsQIL1RqC68X/kMxWni90DMsM0gQxppEsGniTlaUIlrzYAI0VW2ujm92tVXIl+UBbiIfuH93DdHS8qus/Tj2nz44CKHtRmp586VGPWnjMDtUM+Lyy1YoUQ+/R0cIbgPgI56bQ4V1LT2zhLiuHSaELzQcF/T9iOBMJyL1dyYyY=
+	t=1769780564; cv=none; b=UurHtHi/a8sfiefgavCH+pPq70aVbCDGBQzMHNOn+4iQW3pgJjzAdR+vVBgC/50+ImL/xaOYDXi/Nv7VTJsPH0YmZQIrOPimi1LO5D70JDPIMr4nokpZc2p0uXVtZYIRdx5eagOLdTaJfOMmhjGUd0iY1zvBdjJLZx5hpoCdDps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769780280; c=relaxed/simple;
-	bh=xc+xbxZ3oNBD2JuFMoUcoiVyL/l5Ver5G6iPoq8UFrM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ERGFrMcVpsATYICOWD7ZKOVHwc7j13VnfSbD0e+0gd15XH6bsCZPl5EZJ2YLl8w1hIJOixO/92PTgX1IAeylPop06e78qRaG/xprruJAlJiDJWn6jx2DF+5a+6JAjf0sZ5MsjsncGEq3xABaEIf6ZIKH505S0O2IBOPv/Q35ArM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0ogsA2n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 775F2C16AAE;
-	Fri, 30 Jan 2026 13:37:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769780280;
-	bh=xc+xbxZ3oNBD2JuFMoUcoiVyL/l5Ver5G6iPoq8UFrM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q0ogsA2nGpR8nklaG4pEkRkeI6hb46F+eL/oUPNazRxlwqrUfQORu5NNxJpb6qXeT
-	 QlBTP87FQkuQ2AZZvBVJW/eRMaOa4JnMSrMCYPek+tU36FLeT0W+7vWjFjxzuGyupi
-	 PZWpL4RGCLcgJcjn9u+0R2hXCx19b5DYP5nTC/arAD7qYxvIR6M/sojIbVmuzmyDhS
-	 Scf29wyOvPNUh8uqGVfv9qk0qu182PCsE19BpnhH+flk2j7RfBUNEeB2HWJB6ApKR1
-	 /5wguQpJlppcGNx0IjsanCiyy8O3ztNnj5T53ThxeOMye5EwtgnefDKguy20AZAbYM
-	 jNlmzujQtm4Rg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Sumit Semwal <sumit.semwal@linaro.org>,
-	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>
-Cc: linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
-	linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org,
-	virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v6 8/8] iommufd: Add dma_buf_pin()
-Date: Fri, 30 Jan 2026 15:37:24 +0200
-Message-ID: <20260130-dmabuf-revoke-v6-8-06278f9b7bf0@nvidia.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260130-dmabuf-revoke-v6-0-06278f9b7bf0@nvidia.com>
-References: <20260130-dmabuf-revoke-v6-0-06278f9b7bf0@nvidia.com>
+	s=arc-20240116; t=1769780564; c=relaxed/simple;
+	bh=ZdwfXVDKrptF6zEBnycSM2xt2oyuwZwAE3tj/VXJTDw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixF3u0IjcYowjZuWl1ZN1s87O73GEDmaMiCTPGG02+UeOJM8UWYi/ZJUKLppM/DcKyXjMVhSRQZycukLyjXw4e0gojYjk6NZeKevIW6R3+Xu3TYm66jwqaoHwvAVvph29jRs8xIUYmXnkAS8XMZPdXQktRe0bXXUAA4M6zfbxzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Wc+3DTR9; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9307440E01AC;
+	Fri, 30 Jan 2026 13:42:39 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id HGucyxo1SEAf; Fri, 30 Jan 2026 13:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1769780556; bh=80KzFPZyd2K++cpKjokXAKYgQ1cNBdJ37gjAwS22QHE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Wc+3DTR9Z1ohoGrqoLyNftmnXVoKLQdwgFMi5ITZt/U6akuVpZ13goXx+qZy+Hd/Q
+	 /Ryxs7q6Tkl7QGXmvBxPJDKhZgxQFKe4lTiGroq9fWhUW9XfjX9VMfhWOzCwVH6D5B
+	 LVsfJuf5xEKgRwwFrli7+BUFIWVA5x4D5y7UkxZkxML3kJ5Uxffua7WjgZ/qd1nFev
+	 MAYUJ50T5hh8Z3hTKTm35gHBGcu/GonLsQAw5G5loeC3zqRO7ehL1ArpMR5T3p4SsH
+	 Jwoi9LjDIukf/q2Gq9VeYnKBmFFKjWjYBNrvGn/MgdiBoWrTUOrZydJPyIiRDpJkrS
+	 tZxdZNkzUa0vv4VupEi2qyJvlN4EeGhTOma0CA8AsDTv8rXlhamIzVjrGz0CbpHzaO
+	 n3h1vJzYTiW4f3Zvfc0k5xl5OpKWYtdDeb7RtCzj5y0ovXFwZIzTKusDQNPgSeZQAv
+	 5lLMAJAukJBFoY/OxACc+0a+SeTvSOE55XIE9oZaZ9nfJ1vHM1VH6d6AvA7mrxjO/p
+	 ON2rgClkNW7r6Y1i5OujGBLIWiGRNRoqplVrWF4ezpuFFs+cxAVILZ3Et1vc/wu8zj
+	 ppmielMxovDY070NlD2FWLzaITDT2ckBk7qnrWyuLAHdQOudHNUqx2KG6MPd9H8ZHp
+	 pcVA0aYEvSakm86Mp82dPIA8=
+Received: from zn.tnic (pd953023b.dip0.t-ipconnect.de [217.83.2.59])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id D1C1F40E00DE;
+	Fri, 30 Jan 2026 13:42:17 +0000 (UTC)
+Date: Fri, 30 Jan 2026 14:42:11 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: "Xin Li (Intel)" <xin@zytor.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
+	chao.gao@intel.com, hch@infradead.org, sohil.mehta@intel.com
+Subject: Re: [PATCH v9 05/22] x86/cea: Use array indexing to simplify
+ exception stack access
+Message-ID: <20260130134211.GTaXy1M4oB2R7rvTfF@fat_crate.local>
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-6-xin@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-47773
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251026201911.505204-6-xin@zytor.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-69719-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69717-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:email]
-X-Rspamd-Queue-Id: A55F5BB36A
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alien8.de:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,fat_crate.local:mid]
+X-Rspamd-Queue-Id: 23DFABB521
 X-Rspamd-Action: no action
 
-From: Leon Romanovsky <leonro@nvidia.com>
+On Sun, Oct 26, 2025 at 01:18:53PM -0700, Xin Li (Intel) wrote:
+> +noinstr unsigned long __this_cpu_ist_top_va(enum exception_stack_ordering stack)
+> +{
 
-IOMMUFD relies on a private protocol with VFIO, and this always operated
-in pinned mode.
+You better check this @stack is within the array bounds of event_stacks[].
 
-Now that VFIO can support pinned importers update IOMMUFD to invoke the
-normal dma-buf flow to request pin.
-
-This isn't enough to allow IOMMUFD to work with other exporters, it still
-needs a way to get the physical address list which is another series.
-
-IOMMUFD supports the defined revoke semantics. It immediately stops and
-fences access to the memory inside it's invalidate_mappings() callback,
-and it currently doesn't use scatterlists so doesn't call map/unmap at
-all.
-
-It is expected that a future revision can synchronously call unmap from
-the move_notify callback as well.
-
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Acked-by: Christian König <christian.koenig@amd.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/iommu/iommufd/pages.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
-index 76f900fa1687..a5eb2bc4ef48 100644
---- a/drivers/iommu/iommufd/pages.c
-+++ b/drivers/iommu/iommufd/pages.c
-@@ -1501,16 +1501,22 @@ static int iopt_map_dmabuf(struct iommufd_ctx *ictx, struct iopt_pages *pages,
- 		mutex_unlock(&pages->mutex);
- 	}
- 
--	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
-+	rc = dma_buf_pin(attach);
- 	if (rc)
- 		goto err_detach;
- 
-+	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
-+	if (rc)
-+		goto err_unpin;
-+
- 	dma_resv_unlock(dmabuf->resv);
- 
- 	/* On success iopt_release_pages() will detach and put the dmabuf. */
- 	pages->dmabuf.attach = attach;
- 	return 0;
- 
-+err_unpin:
-+	dma_buf_unpin(attach);
- err_detach:
- 	dma_resv_unlock(dmabuf->resv);
- 	dma_buf_detach(dmabuf, attach);
-@@ -1656,6 +1662,7 @@ void iopt_release_pages(struct kref *kref)
- 	if (iopt_is_dmabuf(pages) && pages->dmabuf.attach) {
- 		struct dma_buf *dmabuf = pages->dmabuf.attach->dmabuf;
- 
-+		dma_buf_unpin(pages->dmabuf.attach);
- 		dma_buf_detach(dmabuf, pages->dmabuf.attach);
- 		dma_buf_put(dmabuf);
- 		WARN_ON(!list_empty(&pages->dmabuf.tracker));
+> +	return __this_cpu_ist_bottom_va(stack) + EXCEPTION_STKSZ;
+> +}
 
 -- 
-2.52.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
