@@ -1,306 +1,192 @@
-Return-Path: <kvm+bounces-69748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69749-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KDm6EX8GfWmpPwIAu9opvQ
-	(envelope-from <kvm+bounces-69748-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 20:29:03 +0100
+	id GAkvHnoRfWmiQAIAu9opvQ
+	(envelope-from <kvm+bounces-69749-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 21:15:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F5CBE237
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 20:29:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 177DABE59F
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 21:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B0FC730417AD
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 19:28:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE530302E79C
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 20:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6326A388851;
-	Fri, 30 Jan 2026 19:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bn1+XZmM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52AD34FF59;
+	Fri, 30 Jan 2026 20:15:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3492C387596
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 19:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29012ED16D
+	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 20:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769801323; cv=none; b=RufsASMm0iX8O5R1nN/xlaxCY/OK4Evxa1SjAIQIaYyHfA0n4wDoSEhb6XRSCMORRaxtwcUTJ77jZkHtukPoa1hPR4TPGQOPksXkPlBda86wea9MIqbJotxKTNW3OkCn1FxpGcdDtsxFyJ4agbKNJj34VJSqYkvPwcbDptxl4gY=
+	t=1769804125; cv=none; b=Zkt609+ZTd3xe9/RtaWaTVGhvPMnqE0q9i49K5BeMMfWATWVPLHwd9wLATJphb3EsNen72dX08lCc3LlX941sZMThdLs71Kf5bp1rM33bQnDoQgTizaChYOdWQ9DE67vPwDPVqYj6w8k5GqUM8wmQeZQr0sxFXEEMhPhVgoDDlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769801323; c=relaxed/simple;
-	bh=xha2tKLV6loVZapX6DrV2TpHDlxU/QfYCAu+9gTx3UM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=laUFOjXpuF6enIXI0ahNmAHiaXAh6mC8mvUNgqCNly+tf/Jtj1qypalOghwLsoQLiKBRDIIehzbmfisbjjeB8jGQ2UPeogni7Ln/B3cQirNXYXmgbmdJuqm0E/kuDdm6XayPMjrp3JEHlawROCzaXwriW67tzBHV4gJqRebM16s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bn1+XZmM; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c503d6be76fso4718425a12.0
-        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 11:28:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769801321; x=1770406121; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rjy71wms5szan9FXTuTPKKlYyd/zTVsqWF/S5ag+Qgc=;
-        b=Bn1+XZmM4yCpFLf3ngU8Q7fgoD+jgdcNYJ4UGxvD4K80SbUs3jNXMwh9hztVmurzG/
-         sY7/PybZq/hw6lRjkdKzTiMq2t8ZwW3+GU6xLyVQkSyM3L1SoQl4fouqsvfMUuWNARcQ
-         A7H4UXMeoyZk+cN6KmU0yIuu5Lb6rw0h0FxHTtb2O40QXT+rNpuq16y9w0aoVgdGEmXz
-         h9fM3lj0lCe5o/0pYSZwa4JYs7MVscyppP/BK6lMnP/RSdUiGm15JJtGyPqQuYgfWi5E
-         ChSfS9tpfqGxa5xyfFLznE8z1tUadQOfOjhW+5K2nnoQS4sCh5A6FMC4GgtnQD+SQ3OX
-         cUvg==
+	s=arc-20240116; t=1769804125; c=relaxed/simple;
+	bh=nCQpHolX2VVXRZ/6OcafXjN3xWnmFBsrueucrWMexOk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=N1sJn3M10I83wppsaB23lvG7UIjjBazwrkb3JeCakN8twSPAUUidN5Tq9HaK6ogtqv2LBclHdAP1gKof0JTT/48M7Kh+L9L10cUnYOrMM5ucJamxsrFAkIPuMCxne/iqySs7Ss8yNLrgXaxFarFu1wJNRhyMx1Bop0jchTzFlHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-40450320b4fso5082707fac.0
+        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 12:15:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769801321; x=1770406121;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1769804122; x=1770408922;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rjy71wms5szan9FXTuTPKKlYyd/zTVsqWF/S5ag+Qgc=;
-        b=EPtPkwDA5MaLDY7K2W/NErXstbRlAYVKzaoLCOJZx7CJ66KatFcfJOUcreX62t2Evc
-         8dcxSLX1JdTCcAexg5ZxIOPeECVaBBWiOP0pc76PeeP0amUes0I5yvDtd3ZNgviLvq/t
-         fWrignFjqbudrRHDnEcg1qRhqIOS0hC+85OaQAPkhfrG43XFVy29OrhrxV3pFXr7PuwU
-         vTD9jyZFMra5ChhPCm20nBTpJrCcfJspAxfwWhymBhOrH2D4VCnRgkuhwV9qQEhtHmjp
-         lx7ojdkLZQ8tK7KXt4l41prSf9iiCKV8BykOwAXgcVIEtEUmHMCkrnSNLWNUV+buVR6+
-         e7Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCXl5V7PWWvNTqD3hyyDdzhafegkDl/8bkKmap5a7CKQ39vgkQhPaqwqX8XUaGjT9uapwIc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9vyoVWKwhbN6nzS/TBDiidjDU3MGCbBgIVRjQ5UdYwwRy0Pkv
-	qy1ojan61L2fX43/45pMe7E+6dd8Xm35dPOJwPAfFMbSwo8xnK0cFbhrjC3/J8liHDJp0QYhHoC
-	5KS370qXEH7J6zQ==
-X-Received: from pgct22.prod.google.com ([2002:a05:6a02:5296:b0:bd9:19be:503c])
- (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:a11c:b0:38e:9d3b:470b with SMTP id adf61e73a8af0-392e01096dbmr3663945637.42.1769801321501;
- Fri, 30 Jan 2026 11:28:41 -0800 (PST)
-Date: Fri, 30 Jan 2026 19:28:37 +0000
+        bh=QBOwVcVDIwDPCuFNjIKM4GdZe1vtv87d1N+gKHzASkY=;
+        b=X4EpM+Zb790zltkmafdbnXAcEcg1F2DgniTUQhDGfls4tSa208HtXXZe+ej3HMxCRq
+         c4pFeuOf/HAdERDlC2UUwLfRMu6z7GaXoknhH1i2ubydBP/tbgRSAeKCWZaCeqYKa5Ef
+         +Tg+DBYWBEjh1M8c1S5s+PMVVL38flZm3pliY6JLwhUmYFX+IFQSKvadclXgFJLGHdIg
+         gIXtR+6DRzyBXDVOx3VExftZz0SCBBOwAgiFO+nTgNaRX7M4qdLl9WcreP/5DPj9lh2+
+         YqQCkCU+Ucw3910ql1xwbotHh7ESXyhfo3K1ITVHdajw24OnDRhzLblGi2KN7fiBtC2O
+         mELg==
+X-Gm-Message-State: AOJu0Yzohv3McmkWEmwCjiYQB9EMVeUAF7GvPcwu7c3NaU4Fwo3R+Lsm
+	YCTnXfqIpwrfQDsK5nuJAeSCcAtWya+suR6ETAjBWJsRRiN1X9vqKM0qE7kfI/jkz0+2+mzVezv
+	ROOhqqKV+uYPTUMKd6S+VnB2LUhTcj7lAzk9TM8yv0dop2VnYDZbvVdOtaxPKdw==
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260130192837.890688-1-jiaqiyan@google.com>
-Subject: [PATCH v1] KVM: selftests: Improve sea_to_user test
-From: Jiaqi Yan <jiaqiyan@google.com>
-To: oupton@kernel.org
-Cc: sebott@redhat.com, gshan@redhat.com, yuzenghui@huawei.com, maz@kernel.org, 
-	rananta@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jiaqi Yan <jiaqiyan@google.com>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6820:f015:b0:662:c9d0:c8fd with SMTP id
+ 006d021491bc7-6630f385496mr2067118eaf.57.1769804122595; Fri, 30 Jan 2026
+ 12:15:22 -0800 (PST)
+Date: Fri, 30 Jan 2026 12:15:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <697d115a.050a0220.1d61ec.0004.GAE@google.com>
+Subject: [syzbot] [kvm?] WARNING in kvm_gmem_fault_user_mapping
+From: syzbot <syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com>
+To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=f1fac0919970b671];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69748-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-69749-lists,kvm=lfdr.de,33a04338019ac7e43a44];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiaqiyan@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B4F5CBE237
+	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,storage.googleapis.com:url,goo.gl:url,appspotmail.com:email,googlegroups.com:email]
+X-Rspamd-Queue-Id: 177DABE59F
 X-Rspamd-Action: no action
 
-Several improvments to the test for KVM_EXIT_ARM_SEA:
+Hello,
 
-- Refactor run_vm to catch GUEST_FAIL, instead of causing confusing
-  unhandled MMIO kvm exit.
+syzbot found the following issue on:
 
-- Sync far_invalid to guest.
+HEAD commit:    1f97d9dcf536 Merge tag 'vfio-v6.19-rc8' of https://github...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b3e322580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f1fac0919970b671
+dashboard link: https://syzkaller.appspot.com/bug?extid=33a04338019ac7e43a44
+compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e5ebfa580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13eef85a580000
 
-- Exit test with KSFT_SKIP or KSFT_FAIL when should.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f898291c4b7b/disk-1f97d9dc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cac48e20323c/vmlinux-1f97d9dc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d2e60d34b7e7/bzImage-1f97d9dc.xz
 
-- Add comment about VM backing memory type.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com
 
-Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+------------[ cut here ]------------
+folio_test_large(folio)
+WARNING: arch/x86/kvm/../../../virt/kvm/guest_memfd.c:416 at kvm_gmem_fault_user_mapping+0x4b5/0x6e0 virt/kvm/guest_memfd.c:416, CPU#1: syz.3.124/6406
+Modules linked in:
+CPU: 1 UID: 0 PID: 6406 Comm: syz.3.124 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/13/2026
+RIP: 0010:kvm_gmem_fault_user_mapping+0x4b5/0x6e0 virt/kvm/guest_memfd.c:416
+Code: 00 e9 a1 fe ff ff bd 00 04 00 00 eb d9 e8 43 b8 83 00 48 c7 c6 e0 9f 82 8b 48 89 df e8 d4 f8 ce 00 90 0f 0b e8 2c b8 83 00 90 <0f> 0b 90 48 8d 6b 34 48 89 df e8 ec f6 bb 00 be 04 00 00 00 48 89
+RSP: 0018:ffffc90004ab7848 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffea00018a0000 RCX: ffffffff81834070
+RDX: ffff888028b124c0 RSI: ffffffff81834334 RDI: ffff888028b124c0
+RBP: ffffc90004ab79f8 R08: 0000000000000007 R09: 0000000000000000
+R10: 0000000000000040 R11: 0000000000000000 R12: ffffea00018a0000
+R13: ffffc90004ab7a08 R14: 0000000000000040 R15: ffffea00018a0008
+FS:  00007fb8562ce6c0(0000) GS:ffff8881246db000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f89fb863d58 CR3: 000000006060a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __do_fault+0x10d/0x550 mm/memory.c:5323
+ do_read_fault mm/memory.c:5758 [inline]
+ do_fault+0xaf9/0x1990 mm/memory.c:5892
+ do_pte_missing mm/memory.c:4404 [inline]
+ handle_pte_fault mm/memory.c:6276 [inline]
+ __handle_mm_fault+0x1807/0x2b50 mm/memory.c:6414
+ handle_mm_fault+0x36d/0xa20 mm/memory.c:6583
+ faultin_page mm/gup.c:1126 [inline]
+ __get_user_pages+0xf9c/0x34d0 mm/gup.c:1428
+ populate_vma_page_range+0x267/0x3f0 mm/gup.c:1860
+ __mm_populate+0x107/0x3a0 mm/gup.c:1963
+ do_mlock+0x3f0/0x7f0 mm/mlock.c:653
+ __do_sys_mlock mm/mlock.c:661 [inline]
+ __se_sys_mlock mm/mlock.c:659 [inline]
+ __x64_sys_mlock+0x59/0x80 mm/mlock.c:659
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xc9/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb85539aeb9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fb8562ce028 EFLAGS: 00000246 ORIG_RAX: 0000000000000095
+RAX: ffffffffffffffda RBX: 00007fb855615fa0 RCX: 00007fb85539aeb9
+RDX: 0000000000000000 RSI: 0000000000800000 RDI: 0000200000000000
+RBP: 00007fb855408c1f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fb855616038 R14: 00007fb855615fa0 R15: 00007ffcc1750088
+ </TASK>
+
+
 ---
- .../testing/selftests/kvm/arm64/sea_to_user.c | 94 +++++++++++--------
- 1 file changed, 53 insertions(+), 41 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-index 573dd790aeb8e..4a3511fa1f940 100644
---- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
-+++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-@@ -12,6 +12,11 @@
-  * including the notrigger feature. Otherwise the test will be skipped.
-  * The under-test platform's APEI should be unable to claim SEA. Otherwise
-  * the test will also be skipped.
-+ *
-+ * The VM backing memory is tied to HugeTLB 1G hugepage so far. Make sure
-+ * there are more than 4 1G hugepage on the system. They can be allocated
-+ * at runtime by:
-+ *   echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
-  */
- 
- #include <signal.h>
-@@ -98,11 +103,15 @@ static void write_einj_entry(const char *einj_path, uint64_t val)
- 
- static void inject_uer(uint64_t paddr)
- {
--	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1)
--		ksft_test_result_skip("EINJ table no available in firmware");
-+	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1) {
-+		ksft_test_result_skip("EINJ table not available in firmware\n");
-+		exit(KSFT_SKIP);
-+	}
- 
--	if (access(EINJ_ETYPE, R_OK | W_OK) == -1)
--		ksft_test_result_skip("EINJ module probably not loaded?");
-+	if (access(EINJ_ETYPE, R_OK | W_OK) == -1) {
-+		ksft_test_result_skip("EINJ module probably not loaded?\n");
-+		exit(KSFT_SKIP);
-+	}
- 
- 	write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
- 	write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
-@@ -123,12 +132,13 @@ static void sigbus_signal_handler(int sig, siginfo_t *si, void *v)
- 	ksft_print_msg("SIGBUS (%d) received, dumping siginfo...\n", sig);
- 	ksft_print_msg("si_signo=%d, si_errno=%d, si_code=%d, si_addr=%p\n",
- 		       si->si_signo, si->si_errno, si->si_code, si->si_addr);
--	if (si->si_code == BUS_MCEERR_AR)
-+	if (si->si_code == BUS_MCEERR_AR) {
- 		ksft_test_result_skip("SEA is claimed by host APEI\n");
--	else
-+		exit(KSFT_SKIP);
-+	} else {
- 		ksft_test_result_fail("Exit with signal unhandled\n");
--
--	exit(0);
-+		exit(KSFT_FAIL);
-+	}
- }
- 
- static void setup_sigbus_handler(void)
-@@ -158,7 +168,6 @@ static void expect_sea_handler(struct ex_regs *regs)
- {
- 	u64 esr = read_sysreg(esr_el1);
- 	u64 far = read_sysreg(far_el1);
--	bool expect_far_invalid = far_invalid;
- 
- 	GUEST_PRINTF("Handling Guest SEA\n");
- 	GUEST_PRINTF("ESR_EL1=%#lx, FAR_EL1=%#lx\n", esr, far);
-@@ -166,7 +175,7 @@ static void expect_sea_handler(struct ex_regs *regs)
- 	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
- 	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
- 
--	if (expect_far_invalid) {
-+	if (far_invalid) {
- 		GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, ESR_ELx_FnV);
- 		GUEST_PRINTF("Guest observed garbage value in FAR\n");
- 	} else {
-@@ -185,25 +194,19 @@ static void vcpu_inject_sea(struct kvm_vcpu *vcpu)
- 	vcpu_events_set(vcpu, &events);
- }
- 
--static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+static void validate_kvm_exit_arm_sea(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- {
--	struct ucall uc;
--	bool guest_done = false;
- 	struct kvm_run *run = vcpu->run;
- 	u64 esr;
- 
--	/* Resume the vCPU after error injection to consume the error. */
--	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
- 
--	ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
--		       exit_reason_str(run->exit_reason));
-+	ksft_print_msg("Dumping kvm_run as arm_sea:\n");
- 	ksft_print_msg("kvm_run.arm_sea: esr=%#llx, flags=%#llx\n",
- 		       run->arm_sea.esr, run->arm_sea.flags);
- 	ksft_print_msg("kvm_run.arm_sea: gva=%#llx, gpa=%#llx\n",
- 		       run->arm_sea.gva, run->arm_sea.gpa);
- 
--	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
--
- 	esr = run->arm_sea.esr;
- 	TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
- 	TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
-@@ -211,39 +214,48 @@ static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- 	TEST_ASSERT_EQ((esr & ESR_ELx_INST_SYNDROME), 0);
- 	TEST_ASSERT_EQ(esr & ESR_ELx_VNCR, 0);
- 
--	if (!(esr & ESR_ELx_FnV)) {
--		ksft_print_msg("Expect gva to match given FnV bit is 0\n");
-+	far_invalid = esr & ESR_ELx_FnV;
-+	sync_global_to_guest(vm, far_invalid);
-+
-+	if (!far_invalid) {
-+		ksft_print_msg("Expect gva to match\n");
- 		TEST_ASSERT_EQ(run->arm_sea.gva, EINJ_GVA);
- 	}
- 
- 	if (run->arm_sea.flags & KVM_EXIT_ARM_SEA_FLAG_GPA_VALID) {
--		ksft_print_msg("Expect gpa to match given KVM_EXIT_ARM_SEA_FLAG_GPA_VALID is set\n");
-+		ksft_print_msg("Expect gpa to match\n");
- 		TEST_ASSERT_EQ(run->arm_sea.gpa, einj_gpa & PAGE_ADDR_MASK);
- 	}
-+}
- 
--	far_invalid = esr & ESR_ELx_FnV;
--
--	/* Inject a SEA into guest and expect handled in SEA handler. */
--	vcpu_inject_sea(vcpu);
-+static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+	bool guest_done = false;
- 
- 	/* Expect the guest to reach GUEST_DONE gracefully. */
- 	do {
- 		vcpu_run(vcpu);
--		switch (get_ucall(vcpu, &uc)) {
--		case UCALL_PRINTF:
--			ksft_print_msg("From guest: %s", uc.buffer);
--			break;
--		case UCALL_DONE:
--			ksft_print_msg("Guest done gracefully!\n");
--			guest_done = 1;
--			break;
--		case UCALL_ABORT:
--			ksft_print_msg("Guest aborted!\n");
--			guest_done = 1;
--			REPORT_GUEST_ASSERT(uc);
--			break;
--		default:
--			TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
-+		if (vcpu->run->exit_reason == KVM_EXIT_ARM_SEA) {
-+			validate_kvm_exit_arm_sea(vm, vcpu);
-+			vcpu_inject_sea(vcpu);
-+		} else {
-+			switch (get_ucall(vcpu, &uc)) {
-+			case UCALL_PRINTF:
-+				ksft_print_msg("From guest: %s", uc.buffer);
-+				break;
-+			case UCALL_DONE:
-+				ksft_print_msg("Guest done gracefully!\n");
-+				guest_done = 1;
-+				break;
-+			case UCALL_ABORT:
-+				ksft_print_msg("Guest aborted!\n");
-+				guest_done = 1;
-+				REPORT_GUEST_ASSERT(uc);
-+				break;
-+			default:
-+				TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
-+			}
- 		}
- 	} while (!guest_done);
- }
--- 
-2.53.0.rc2.204.g2597b5adb4-goog
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
