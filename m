@@ -1,250 +1,177 @@
-Return-Path: <kvm+bounces-69693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69694-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gIMHMWiAfGlVNgIAu9opvQ
-	(envelope-from <kvm+bounces-69693-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:56:56 +0100
+	id YLERHtSEfGmINgIAu9opvQ
+	(envelope-from <kvm+bounces-69694-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:15:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256B4B919F
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:56:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F6AB9421
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0D5C3012E8F
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 09:56:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C37F30292DA
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68879354AC0;
-	Fri, 30 Jan 2026 09:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fr6APXSf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CE5313276;
+	Fri, 30 Jan 2026 10:15:43 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F87B2E9ED6
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 09:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97E11F09A8;
+	Fri, 30 Jan 2026 10:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769766988; cv=none; b=D0ll6EEJanBClFC/Fxm8x4NFXRmYdG0X2R1VhPjUd7HDnAY667S4zv6UMItirZ9Obvx9PuSKAQvnetKywCXkQRfkyuEu86SBQH3QgTDgu8MIuFtNhaTHV9mflu33rIvohIzmQXQLWClUwsD6CQfF/AyiyP1p4GBs0YqakQuYNPA=
+	t=1769768142; cv=none; b=Pe3d6ZWROLyW0DqAk4fSsc8De5PHnPpQvMepramcaYra27SvyqI3UJNuEQphSAUknkZ9ME/aBSONaN97OFXUZB9KpMug/LnQ1D6jT51wi+ptA2Oio3KQshmQs12+GapY74YMfku6CmyR3U2fiEho9mtLJEkzY2EwlL9EnxaSwm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769766988; c=relaxed/simple;
-	bh=q1MGHcKNLKWY6WX1PfR4cD0oAkIYyEboz713lGUVThQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZCnSL06v4ft76378ApDePfiW9ZzR8ochSy3ggfzgkS3rqLFLt7bhHVYtw4/EVn9DG3M82zzw4ez3yDqYetOW02/J2xTvibrWXHNd6Oa09v5dVthe6MKcdrqbEGZqc/0ijdJfTyFtVSX96Yhf9Vp5U+fHAMpxC7osJIj645d+htw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fr6APXSf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77046C2BC86
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 09:56:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769766988;
-	bh=q1MGHcKNLKWY6WX1PfR4cD0oAkIYyEboz713lGUVThQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=fr6APXSfOB2dciWo76uVFKphtqqg6ZuZRJdh5pFM/xv2huEQDR+wCF27/B/Z9ii0q
-	 aFO6cZQDDsBaVk9+izUW7pu4xkEV9MppZL0tC89ymrd1DM5clIuEDhkKqjqn4EPpH1
-	 k2owqn1hLbJTvVFhOG03JYh57BRZ0AjU6cL0kZfBdhMq/h1Ags2JcGBXbpRfbCwPvN
-	 xA6hv4aaj6ZaBcmWoWOrKT0eDb5I4sdCuYKe273w2r5eJUlZGsNoCGlYaWaxaOvhea
-	 uUR7kz0dia/gouD64Fbtlfs1q2O1lSXV87kK0Xj3xtPOMqKFgCRDqVqQh2z9sj4CXs
-	 pwlnzd1AZGnFQ==
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-658078d6655so3962562a12.3
-        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 01:56:28 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU39yhGVLJ+RJUkt7SukfsFwu7OIHLABPGvADjrjczwo19MrkudwYHW0qgtzpwXO19J3Y8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza1msM0aj9TkJeKfIQ2BPoVWruxZN3bQ66+1tjFwXCcpx4oMsA
-	p/eYMe9kgEf9jJsdhlMh9X6T6+TdOLU8nFe40iC6lx0ilYgjXkVUypTfopbJdjwuuB5WZAM++Ei
-	6H5eCSWWvrVDgoACnSPolnUh/oeww76Y=
-X-Received: by 2002:a17:907:e989:b0:b87:12d2:fa1a with SMTP id
- a640c23a62f3a-b8dff528aaemr130589766b.12.1769766987032; Fri, 30 Jan 2026
- 01:56:27 -0800 (PST)
+	s=arc-20240116; t=1769768142; c=relaxed/simple;
+	bh=PZuljLuawC6Q0ycJomnrZQnxgiXcT31C1kuc0BfSIXA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pl8ONq8C1s7/7GhMkdDlk7K07S7BNTXvxgWcL9vVRbmgN2wnBtKH/NMZw8RxxolnGVIcf2wvB0SgnHgMvWqNhmpkoZib2bYNX+QV5hoXhjSloQM9rFfqK/cAKirL0tfyv1vvKKnArRA5k3QA2GlHkeP0O4IOG4zBYYxrEqEVG7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from fric.. (unknown [210.73.43.101])
+	by APP-05 (Coremail) with SMTP id zQCowADXaw+8hHxpTvkMBw--.50196S2;
+	Fri, 30 Jan 2026 18:15:24 +0800 (CST)
+From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Alexandre Ghiti <alex@ghiti.fr>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
+	Jiakai Xu <jiakaiPeanut@gmail.com>
+Subject: [PATCH] RISC-V: KVM: Fix use-after-free in kvm_riscv_gstage_get_leaf()
+Date: Fri, 30 Jan 2026 10:15:23 +0000
+Message-Id: <20260130101523.1314053-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251219063021.1778659-1-maobibo@loongson.cn> <20251219063021.1778659-3-maobibo@loongson.cn>
- <CAAhV-H7N1uXzK6Fu4x4Mrq4j1P95119HP87_spxU_E6WLxN6TQ@mail.gmail.com> <f0d2671a-1ce7-d499-47cf-8dc9163f1e17@loongson.cn>
-In-Reply-To: <f0d2671a-1ce7-d499-47cf-8dc9163f1e17@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Fri, 30 Jan 2026 17:56:16 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6mD1OxeVDaAXw_y6+1mHBwgGzS4OpsX4aezxV0SP8KLw@mail.gmail.com>
-X-Gm-Features: AZwV_Qi-uT5-JW7WztFAIBiANsWfzC-6b6HYQshyEGcQjdI1rIYP6iNqEXV5ZgE
-Message-ID: <CAAhV-H6mD1OxeVDaAXw_y6+1mHBwgGzS4OpsX4aezxV0SP8KLw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] LoongArch: Add paravirt support with
- vcpu_is_preempted() in guest side
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Juergen Gross <jgross@suse.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowADXaw+8hHxpTvkMBw--.50196S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCF43XF47Gw4rCF13uF4kZwb_yoW5XF4kpF
+	W5GrZxCryrJrs7CFy7tr1kZrsruw48Wr97Ca45CF98GFnIqrs7Zrn29as2qr15Ar18Zry3
+	ZFyDKa4rCr4Fya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr0_Cr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14
+	v_Gw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU5o7KDUUU
+	U
+X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiDAYBCWl6JcUB-gABsP
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-69694-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69693-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[ghiti.fr,eecs.berkeley.edu,dabbelt.com,sifive.com,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	R_DKIM_NA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 256B4B919F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: E6F6AB9421
 X-Rspamd-Action: no action
 
-On Fri, Jan 30, 2026 at 9:24=E2=80=AFAM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
->
->
-> On 2026/1/29 =E4=B8=8B=E5=8D=888:55, Huacai Chen wrote:
-> > Hi, Bibo,
-> >
-> > On Fri, Dec 19, 2025 at 2:30=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> =
-wrote:
-> >>
-> >> Function vcpu_is_preempted() is used to check whether vCPU is preempte=
-d
-> >> or not. Here add implementation with vcpu_is_preempted() when option
-> >> CONFIG_PARAVIRT is enabled.
-> >>
-> >> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> >> Acked-by: Juergen Gross <jgross@suse.com>
-> >> ---
-> >>   arch/loongarch/include/asm/qspinlock.h |  3 +++
-> >>   arch/loongarch/kernel/paravirt.c       | 21 ++++++++++++++++++++-
-> >>   2 files changed, 23 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/arch/loongarch/include/asm/qspinlock.h b/arch/loongarch/i=
-nclude/asm/qspinlock.h
-> >> index e76d3aa1e1eb..fa3eaf7e48f2 100644
-> >> --- a/arch/loongarch/include/asm/qspinlock.h
-> >> +++ b/arch/loongarch/include/asm/qspinlock.h
-> >> @@ -34,6 +34,9 @@ static inline bool virt_spin_lock(struct qspinlock *=
-lock)
-> >>          return true;
-> >>   }
-> >>
-> >> +#define vcpu_is_preempted      vcpu_is_preempted
-> >> +bool vcpu_is_preempted(int cpu);
-> >> +
-> >>   #endif /* CONFIG_PARAVIRT */
-> >>
-> >>   #include <asm-generic/qspinlock.h>
-> >> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/=
-paravirt.c
-> >> index b1b51f920b23..a81a3e871dd1 100644
-> >> --- a/arch/loongarch/kernel/paravirt.c
-> >> +++ b/arch/loongarch/kernel/paravirt.c
-> >> @@ -12,6 +12,7 @@ static int has_steal_clock;
-> >>   struct static_key paravirt_steal_enabled;
-> >>   struct static_key paravirt_steal_rq_enabled;
-> >>   static DEFINE_PER_CPU(struct kvm_steal_time, steal_time) __aligned(6=
-4);
-> >> +static DEFINE_STATIC_KEY_FALSE(virt_preempt_key);
-> >>   DEFINE_STATIC_KEY_FALSE(virt_spin_lock_key);
-> >>
-> >>   static u64 native_steal_clock(int cpu)
-> >> @@ -267,6 +268,18 @@ static int pv_time_cpu_down_prepare(unsigned int =
-cpu)
-> >>
-> >>          return 0;
-> >>   }
-> >> +
-> >> +bool notrace vcpu_is_preempted(int cpu)
-> > Is "notrace" really needed? Only S390 do this.
->
-> The prefix "notrace" is copied from S390, it is inline function on x86.
->
-> Here is git log information with arch/s390/kernel/smp.c
-> commit 8ebf6da9db1b2a20bb86cc1bee2552e894d03308
-> Author: Philipp Rudo <prudo@linux.ibm.com>
-> Date:   Mon Apr 6 20:47:48 2020
->
->      s390/ftrace: fix potential crashes when switching tracers
->
->      Switching tracers include instruction patching. To prevent that a
->      instruction is patched while it's read the instruction patching is d=
-one
->      in stop_machine 'context'. This also means that any function called
->      during stop_machine must not be traced. Thus add 'notrace' to all
->      functions called within stop_machine.
->
->      Fixes: 1ec2772e0c3c ("s390/diag: add a statistic for diagnose calls"=
-)
->      Fixes: 38f2c691a4b3 ("s390: improve wait logic of stop_machine")
->      Fixes: 4ecf0a43e729 ("processor: get rid of cpu_relax_yield")
->      Signed-off-by: Philipp Rudo <prudo@linux.ibm.com>
->      Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
->
-> However I am not familiar with tracer and have no idea about this, that
-> is both OK to me. You are Linux kernel expert, what is your opinion
-> about notrace prefix?
-It seems only S390 calls vcpu_is_preempted() in stop_machine(), and on
-X86 both __kvm_vcpu_is_preempted() and __native_vcpu_is_preempted()
-have no "notrace", so I applied this patch and drop "notrace".
+While fuzzing KVM on RISC-V, a use-after-free was observed in
+kvm_riscv_gstage_get_leaf(),  where ptep_get() dereferences a
+freed gstage page table page during gfn unmap.
 
-Huacai
+The crash manifests as:
+  use-after-free in ptep_get include/linux/pgtable.h:340 [inline]
+  use-after-free in kvm_riscv_gstage_get_leaf arch/riscv/kvm/gstage.c:89
+  Call Trace:
+    ptep_get include/linux/pgtable.h:340 [inline]
+    kvm_riscv_gstage_get_leaf+0x2ea/0x358 arch/riscv/kvm/gstage.c:89
+    kvm_riscv_gstage_unmap_range+0xf0/0x308 arch/riscv/kvm/gstage.c:265
+    kvm_unmap_gfn_range+0x168/0x1fc arch/riscv/kvm/mmu.c:256
+    kvm_mmu_unmap_gfn_range virt/kvm/kvm_main.c:724 [inline]
+  page last free pid 808 tgid 808 stack trace:
+    kvm_riscv_mmu_free_pgd+0x1b6/0x26a arch/riscv/kvm/mmu.c:457
+    kvm_arch_flush_shadow_all+0x1a/0x24 arch/riscv/kvm/mmu.c:134
+    kvm_flush_shadow_all virt/kvm/kvm_main.c:344 [inline]
 
->
-> Regards
-> Bibo Mao
-> >
-> > Huacai
-> >
-> >> +{
-> >> +       struct kvm_steal_time *src;
-> >> +
-> >> +       if (!static_branch_unlikely(&virt_preempt_key))
-> >> +               return false;
-> >> +
-> >> +       src =3D &per_cpu(steal_time, cpu);
-> >> +       return !!(src->preempted & KVM_VCPU_PREEMPTED);
-> >> +}
-> >> +EXPORT_SYMBOL(vcpu_is_preempted);
-> >>   #endif
-> >>
-> >>   static void pv_cpu_reboot(void *unused)
-> >> @@ -308,6 +321,9 @@ int __init pv_time_init(void)
-> >>                  pr_err("Failed to install cpu hotplug callbacks\n");
-> >>                  return r;
-> >>          }
-> >> +
-> >> +       if (kvm_para_has_feature(KVM_FEATURE_PREEMPT))
-> >> +               static_branch_enable(&virt_preempt_key);
-> >>   #endif
-> >>
-> >>          static_call_update(pv_steal_clock, paravt_steal_clock);
-> >> @@ -318,7 +334,10 @@ int __init pv_time_init(void)
-> >>                  static_key_slow_inc(&paravirt_steal_rq_enabled);
-> >>   #endif
-> >>
-> >> -       pr_info("Using paravirt steal-time\n");
-> >> +       if (static_key_enabled(&virt_preempt_key))
-> >> +               pr_info("Using paravirt steal-time with preempt enable=
-d\n");
-> >> +       else
-> >> +               pr_info("Using paravirt steal-time with preempt disabl=
-ed\n");
-> >>
-> >>          return 0;
-> >>   }
-> >> --
-> >> 2.39.3
-> >>
->
->
+The UAF is caused by gstage page table walks running concurrently with
+gstage pgd teardown. In particular, kvm_unmap_gfn_range() can traverse
+gstage page tables while kvm_arch_flush_shadow_all() frees the pgd,
+leading to use-after-free of page table pages.
+
+Fix the issue by serializing gstage unmap and pgd teardown with
+kvm->mmu_lock. Holding mmu_lock ensures that gstage page tables
+remain valid for the duration of unmap operations and prevents
+concurrent frees.
+
+This matches existing RISC-V KVM usage of mmu_lock to protect gstage
+map/unmap operations, e.g. kvm_riscv_mmu_iounmap.
+
+Fixes: dd82e35638d67f ("RISC-V: KVM: Factor-out g-stage page table management")
+Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+---
+ arch/riscv/kvm/mmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index a1c3b2ec1dde5..08316e433d729 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -128,7 +128,9 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
+ 
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
++	spin_lock(&kvm->mmu_lock);
+ 	kvm_riscv_mmu_free_pgd(kvm);
++	spin_unlock(&kvm->mmu_lock);
+ }
+ 
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+@@ -268,9 +270,11 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	gstage.flags = 0;
+ 	gstage.vmid = READ_ONCE(kvm->arch.vmid.vmid);
+ 	gstage.pgd = kvm->arch.pgd;
++	spin_lock(&kvm->mmu_lock);
+ 	kvm_riscv_gstage_unmap_range(&gstage, range->start << PAGE_SHIFT,
+ 				     (range->end - range->start) << PAGE_SHIFT,
+ 				     range->may_block);
++	spin_unlock(&kvm->mmu_lock);
+ 	return false;
+ }
+ 
+-- 
+2.34.1
+
 
