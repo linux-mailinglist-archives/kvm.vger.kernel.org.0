@@ -1,167 +1,151 @@
-Return-Path: <kvm+bounces-69688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69689-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CV+xIY50fGkmNAIAu9opvQ
-	(envelope-from <kvm+bounces-69688-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:06:22 +0100
+	id EHa6Bc13fGmWNAIAu9opvQ
+	(envelope-from <kvm+bounces-69689-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:20:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ABEEB8B8C
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:06:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC366B8D36
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 10:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 15712301FCBE
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 09:06:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 691033055CBD
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 09:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02FF434DCFD;
-	Fri, 30 Jan 2026 09:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9B6352F82;
+	Fri, 30 Jan 2026 09:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sh53Uw8t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EUxZsG6I"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3622C2E62A8;
-	Fri, 30 Jan 2026 09:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C346244665;
+	Fri, 30 Jan 2026 09:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769763964; cv=none; b=fKl6xWGIle+O8I6L1VCpICGrex0c0rm7NZ+zcZx8hrIesF3GxugJ9p7Vur63srWHCfhadSwQ63c6J9YYgsXJTjvelOVRVf9yzsQmScYK+QSu6COE/xvzHn4c6Bl83m62gJxfLDLQzwJd2Co/SmcMQt77u0F2zUQYnB8ZCpO4EKE=
+	t=1769764658; cv=none; b=gMC84s44ZbAPVvlKkjTCjN2GB4hGGIHaEa91YY4p7sO2xdFEE25eEbx6Wbq2F1t9UD+Swv3j67nHAzRw8Hq/wTLdU9tRdna820YEwic+82h4uuiuH4/q4NC8mjrya8sNzA07ldmAX0V+rWAnfZ27fIByhQwY51noo1Se8hqVEpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769763964; c=relaxed/simple;
-	bh=erZr1SdZTgF5sEQIzfWMwLeEQcYanAg+WcIEqOMQJa4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eBWnp65gnXD3sUdiG8YSaJCkQT9Vc/FZXa4ioB5oznEnliCb2neY5VUKs0qDk+GxjitsQ/2ArQkVGOr4FhEv6MXb+eYmdk9YnpVDPL1e8ys1yZlXjgKeWJgM8hi/NfWw9v0sY4dFUTuQVF8qnfEPW304/UI2P/G8dbTpxRuWunM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sh53Uw8t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC0F5C4CEF7;
-	Fri, 30 Jan 2026 09:06:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769763963;
-	bh=erZr1SdZTgF5sEQIzfWMwLeEQcYanAg+WcIEqOMQJa4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sh53Uw8tC5HGPL7NM2neDnTDeghB2QouD1SzWo0ogaaQL7T70ttVfjyoa1BAAlq5q
-	 autxbAnEErbqPPamNs6OL/J3QBK9s5/hicX1ujzdgrif6VabJYINsZ0DHRo4mGxY3w
-	 xmUqhbi4x/vuwHLX4Ee0P3v/DmuTEZAcI22udUkb0E2pta4MUHV6p8sOpwEeY483hz
-	 o+CrJWTO+068siydv3MilzopH85GmUfiq3vxjzQZ/G3GQS9C/eHqF6hmsUXUvlXcax
-	 EiV9zZaaap53GlDOqt35jGWdj0j80Ph0xdHChxC7PnPixKccM2Cv3cij25p3eq2vt2
-	 xKANiqr958PUw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlkS1-000000070dv-0pgr;
-	Fri, 30 Jan 2026 09:06:01 +0000
-Date: Fri, 30 Jan 2026 09:06:00 +0000
-Message-ID: <865x8jbhc7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 13/20] KVM: arm64: Move RESx into individual register descriptors
-In-Reply-To: <CA+EHjTwxS_xvQqsOJw7PzZBD5Z-oM14z1VwSTC5dCS+79DEpfQ@mail.gmail.com>
-References: <20260126121655.1641736-1-maz@kernel.org>
-	<20260126121655.1641736-14-maz@kernel.org>
-	<CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
-	<86a4xwbakk.wl-maz@kernel.org>
-	<868qdgb8ct.wl-maz@kernel.org>
-	<CA+EHjTwxS_xvQqsOJw7PzZBD5Z-oM14z1VwSTC5dCS+79DEpfQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769764658; c=relaxed/simple;
+	bh=EPuY6wLnY+AZQgYYdbUv0uOYsNBKYd29w++7kcaibi0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dmJ21VDeJt2kGlEMMlwm687BP3FTuo5VNvferbvCQ2wvyULMPZ+ifPq69AeoJJGWTnHwiKJVEeWgc1UgdIL44k6/nqbtClxkZeiTc+8qcvz2IaFhY4D9POTR6gJiSsRdObFH7LUHMUc+BBUjAejyc2dD/h5jKFBPyrtlJvgvoJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EUxZsG6I; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769764658; x=1801300658;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=EPuY6wLnY+AZQgYYdbUv0uOYsNBKYd29w++7kcaibi0=;
+  b=EUxZsG6I+EjlU7j6l3HsvDNnhDCC37yfOuEK4xarizectK9kiPBHCAhP
+   1KX14g3GSFZyDXs7R/25oMQg92Q31XgTAWbb7HpSgoIj7vHGy+9mzqGwN
+   7i+WWx8TbFaiNthICKtRlq9IbcqVuYl1Tu6JoS6jldRQQrK7+n6nxqenX
+   2zHGQKnJu6hpSSpwO7/jDtCzZa2nc75BZmHO1zLlpCwcTHDk/WifuzM6U
+   lUddfinbvEeQZ6f0oG3wAI8u+180zUnmO0HjXNypnp/AqL1uY1Y43nX5A
+   cAwo9lRcLb6GUpSRmnnex8D9+u3HvYPBdBrJ0T2D61QPmFoWarHIcif2v
+   w==;
+X-CSE-ConnectionGUID: NMX6LCKRRVe/Eakmt0zENQ==
+X-CSE-MsgGUID: MlJpFVJSTpOyyRw64thvLQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="71050577"
+X-IronPort-AV: E=Sophos;i="6.21,262,1763452800"; 
+   d="scan'208";a="71050577"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 01:17:37 -0800
+X-CSE-ConnectionGUID: RbE1IDiNR8uLz2R8uUA4Sg==
+X-CSE-MsgGUID: FqQ2j6vWROaFaU/KcVaZCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,262,1763452800"; 
+   d="scan'208";a="213711225"
+Received: from unknown (HELO [10.238.1.231]) ([10.238.1.231])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 01:17:34 -0800
+Message-ID: <775f7a7b-b658-43cc-b1f6-e95bca3f0fc5@linux.intel.com>
+Date: Fri, 30 Jan 2026 17:17:31 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] KVM: VMX: Print out "bad" offsets+value on VMCS
+ config mismatch
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Mathias Krause <minipli@grsecurity.net>,
+ John Allen <john.allen@amd.com>, Rick Edgecombe
+ <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, Jim Mattson <jmattson@google.com>
+References: <20260128014310.3255561-1-seanjc@google.com>
+ <20260128014310.3255561-4-seanjc@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20260128014310.3255561-4-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69688-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69689-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3ABEEB8B8C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,linux.intel.com:mid]
+X-Rspamd-Queue-Id: AC366B8D36
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 18:13:18 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+
+
+On 1/28/2026 9:43 AM, Sean Christopherson wrote:
+> When kvm-intel.ko refuses to load due to a mismatched VMCS config, print
+> all mismatching offsets+values to make it easier to debug goofs during
+> development, and it to make it at least feasible to triage failures that
+> occur during production.  E.g. if a physical core is flaky or is running
+> with the "wrong" microcode patch loaded, then a CPU can get a legitimate
+> mismatch even without KVM bugs.
 > 
-> >
-> > Actually, this interacts badly with check_feat_map(), which tries to
-> > find whether we have fully populated the registers, excluding the RESx
-> > bits. But since we consider E2H to be a reserved but, we end-up with:
-> >
-> > [    0.141317] kvm [1]: Undefined HCR_EL2 behaviour, bits 0000000400000000
-> >
-> > With my approach, it was possible to distinguish the architecturally
-> > RESx bits (defined as RES0 or RES1), as they were the only ones with
-> > the FORCE_RESx attribute.
-> >
-> > I can work around it with
-> >
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index 364bdd1e5be51..398458f4a6b7b 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -1283,7 +1283,7 @@ static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
-> >         u64 mask = 0;
-> >
-> >         for (int i = 0; i < map_size; i++)
-> > -               if (!(map[i].flags & FORCE_RESx))
-> > +               if (!(map[i].flags & FORCE_RESx) || !(map[i].bits & resx))
-> >                         mask |= map[i].bits;
-> >
-> >         if (mask != ~resx)
-> >
-> > but it becomes a bit awkward...
+> Print the mismatches as 32-bit values as a compromise between hand coding
+> every field (to provide precise information) and printing individual bytes
+> (requires more effort to deduce the mismatch bit(s)).  All fields in the
+> VMCS config are either 32-bit or 64-bit values, i.e. in many cases,
+> printing 32-bit values will be 100% precise, and in the others it's close
+> enough, especially when considering that MSR values are split into EDX:EAX
+> anyways.
 > 
-> If it becomes more complicated than the original, then what's the
-> point. Up to you whether you want to try to pursue this or not.
-
-Not more complicated, just moving the complexity somewhere else. I'll
-add a comment explaining the logic at this point. Overall, this is a
-net cleanup, I think.
-
-> From my part:
+> E.g. on mismatch CET entry/exit controls, KVM will print:
 > 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
+>   kvm_intel: VMCS config on CPU 0 doesn't match reference config:
+>     Offset 76 REF = 0x107fffff, CPU0 = 0x007fffff, mismatch = 0x10000000
+>     Offset 84 REF = 0x0010f3ff, CPU0 = 0x0000f3ff, mismatch = 0x00100000
+> 
+> Opportunistically tweak the wording on the initial error message to say
+> "mismatch" instead of "inconsistent", as the VMCS config itself isn't
+> inconsistent, and the wording conflates the cross-CPU compatibility check
+> with the error_on_inconsistent_vmcs_config knob that treats inconsistent
+> VMCS configurations as errors (e.g. if a CPU supports CET entry controls
+> but no CET exit controls).
+> 
 
-Thank you!
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
