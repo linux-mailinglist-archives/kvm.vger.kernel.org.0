@@ -1,384 +1,187 @@
-Return-Path: <kvm+bounces-69644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69647-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mO3vKl7te2kMJgIAu9opvQ
-	(envelope-from <kvm+bounces-69644-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 00:29:34 +0100
+	id mG0LHJr4e2n4JgIAu9opvQ
+	(envelope-from <kvm+bounces-69647-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:17:30 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F42DB5B07
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 00:29:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A5ECB5D6F
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 58DC23022927
-	for <lists+kvm@lfdr.de>; Thu, 29 Jan 2026 23:29:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 247C5300CA0B
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 00:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2264C376BD1;
-	Thu, 29 Jan 2026 23:29:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6246627FD7D;
+	Fri, 30 Jan 2026 00:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jCt5UihO"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="KA7biT7z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F26378806
-	for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 23:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9410E2222B2
+	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 00:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769729351; cv=none; b=c+S+ic4WkFF8peDOWZVhpY3fxxNCLhoXam6fP1O8drH50sc2KhQZArdg5FJyS3u8nsjjNAaXobuJQElgSnhT6paRZO8PPR9zacjS4doLfAKOt+kMtYTARyk14Gct6elz1+vZsPDpmZzI6MYDb09eAGh3Y3me2i6trCSpYVbn6/Y=
+	t=1769732236; cv=none; b=DXzvVKzY/bEEnHUzq+Pr73x3tjTCo2ORyV6GaC3DvFtVuYqHBFQWXrToPNPNBmkL/YkQehtK6FD5hiJNi0Wcv9ZszDCkLSRUa1fZXYAj7wcnI78JmrhewwFbrA1ulqYcGc5GmQDfvS+yX4f3oe8qWnDFz9/ejodZi5Pc5pp52Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769729351; c=relaxed/simple;
-	bh=qHC+qM9vQzWPKnzn+tAYv5l+c6MskpPE+ePAinyKV/8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sOXy2Wuhvor0jSg7xAIwiRG9B3wPHfugEO4Trd4fxSOYP3X2xkKnN2PhhmM+SWXXA0enLOrXs6wGBRIQ8npB8OARcytmB14UPd41JVN8wOjV7E7TtR54jL+vLCZnxiqnWdeCiF0OdilqtcIggG4RAuopqzN6PNlOXfVSNcJIAwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jCt5UihO; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a863be8508so18110765ad.2
-        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 15:29:08 -0800 (PST)
+	s=arc-20240116; t=1769732236; c=relaxed/simple;
+	bh=PgxWXxtJeqUdvgjP5KxrfenUWVrCXmnl/Ip3hY3gzr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kHufKybpIwYfcUotPTv1PI+x+pRazx2R8J9Gj+dT91eg4okioE5LCf6PlLH5dzdoRSn+cE5Gj0K2/E2zQKiMgJM1Z/rWmHBW7iH0+sRyo1MYrP5/N68hFxRm7GcONLIBFLsRBYDdix4m4cVW7WoQQY6wkIqXogvGot+JxAnjlkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=KA7biT7z; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-8c5349ba802so152791785a.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 16:17:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769729348; x=1770334148; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xtsoUbDwfLvbtoHg4zrUnWjIjv/OwLA41WjzQfN669k=;
-        b=jCt5UihO9r9IARniuWCApkNgKvVzKiLlXfNFmDZf+nISmwEBmqqxItrvpTStJ1fwwf
-         BA4zr7rLU2XUxKs2naH9sCVS8fw6ZBU0rn2spJKlnA90QO1v+qAj4WUkiqLjvIYk5F79
-         gYXf9GB+XxxXSx0DTVv5ItctoQIk0uYaxE2kLLwaIUkiHDaXeKsD25b2Jd9SOSl92Zhz
-         I5cuX7iGZMg/gQPATRIQBmYxsF1fz1UsKHM6AqtYs1vV7QJsP0ZxbPgKaE+eFuDNcnBG
-         XMH5zzOmZdlFC9ai2FlVaeUUijcxnFzW9YlThFpP2TAb5Wv8xIHhfTyvaXq2feiMYuQT
-         uApA==
+        d=ziepe.ca; s=google; t=1769732232; x=1770337032; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JQnCcQDZjp9U0R1Q7JCyNDeekOxxS8phMo1p2crcsis=;
+        b=KA7biT7z2WPIJqn1yWtupwtFpuiVSND6sCJuDPiqtvlV/udtpzWhHBdHKHzdXfdrt9
+         s5ff0uj0MnRJ2qUUQNgrd0lk2LV/u1TJUfKQTbzPIGnBZoQoPXVw92tOcr4jJ+o6LTsh
+         pmrSmwNEYgAYmP11U4AzdudTpUbSJ/6lGl2fTB0tpVVeZ5pwjPdB10zBv03zrqTMm32F
+         XRxwdujmIDrabfqlhXdKEogyduDcZ/LafEpZu5i5+k5xCZIZggCdPOPnVishQAaKjj5E
+         KENQjSUQFCVdWDnSRyM99hu8FmY0ffQviK954nkYYxdhylaquDPwhk4OhuIA+A5fqMJJ
+         rp/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769729348; x=1770334148;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xtsoUbDwfLvbtoHg4zrUnWjIjv/OwLA41WjzQfN669k=;
-        b=mVSeA/A4O0kIAEdLi8bOoUDYlFGUQbSr2MBxHW6GOLnjgM81uVGbtqv/bL/OR2qmGh
-         hg9jUI3s1MHSKCsnVVGZfgPYcNmNQUAnGyx3tn8rzrYI/NrO9BGFDyUJ8wfAIv+XtrCL
-         LNc3tQFlIYjYbUAMfqshN+a9sfplJtoBpZMA9Thwc8f1C9fcii3UYXzAJJADYrIcKx0l
-         khomRK9Yu74y8qzLe6uXtKUF3UfrRrEHmRlKz0S2v5RerGe7Mo7NmoHrmo8aeQKGoJK9
-         3bmoh1ZYjNNU6LJ0Ag38+YwLV442FKcSdabzd9yENV+bIGHbBaRamsbiwrKuPYTiox9F
-         RByA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZXkhi67cj7yc+jWbpJDdnI0ftmebfZnzGSH4/CbGLAeI3fC4xRZ/08fqi8I2HxN3VAeI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4V6GNY++HaOmqiB+07qndeOauWSWDYPn1nsHjwcJmER+2Lu3E
-	dXUwi4jI9yw+Lb6/IPDEipjzC2sfP6amI4P6KkLVPYmeVsQ9AjrEN8SEfre1R5+Y/E2G60AfATx
-	mVqOpAL4v9gXuSQ==
-X-Received: from plgf14.prod.google.com ([2002:a17:902:ce8e:b0:2a5:9a03:d0b2])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:d50e:b0:2a4:8cd:c3cf with SMTP id d9443c01a7336-2a8d8181601mr10004875ad.49.1769729347764;
- Thu, 29 Jan 2026 15:29:07 -0800 (PST)
-Date: Thu, 29 Jan 2026 15:28:10 -0800
-In-Reply-To: <20260129232835.3710773-1-jmattson@google.com>
+        d=1e100.net; s=20230601; t=1769732232; x=1770337032;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JQnCcQDZjp9U0R1Q7JCyNDeekOxxS8phMo1p2crcsis=;
+        b=W5vYDnjoS7OuVqNayK78S1VAaGFH4fTyCgduaf8GSK4AgqUt7weSqjnu7rHmunc8Xn
+         DNjcqrbTZnzdbN0PPwUCe71oqiVbiwqgbNWMc9K8fLlREIFzQUlKcVYt3Qp8v0kPc+B7
+         Sg8F3X6S8MrFPhtUewVU59aelaYWQGb5jpp5po5bzZNwaQ+bLvZKEvtK61I5udc4xv0T
+         OwKC+O4kZ1ON5cpH2Gn6/g4fb1B00GsYc2qOqXFRH3JIxqBQVVjwPZMbcqqhLOpBORXR
+         tzTTf5QhrzN+KJMTmvj0aN0ngk3mr8oMtI8Nf/j3mu7S9sP8GE6Yw+TwDTtkjrVFNM4m
+         jE2w==
+X-Forwarded-Encrypted: i=1; AJvYcCXcD2CJFrSdDVKmQi1VbBafi7+JdMPk2Dh5WL8e9Liv/6MPpMGYK4NqPv0nNRMf9P3PnLM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycvI3E4jetPWITEa+n1Yjtbw5n3vYjVOd+G+qq6cO7xffqtCIz
+	6zj3ijVdSXBul1ejt+rMrmkBR8wdt/lYT67MLQzDFMUodSfLFVAVRhU4bSgfsSxu5J0=
+X-Gm-Gg: AZuq6aJVxkjRfnlLiqfHqGYY3dkEyXw2RZpv3hJPo8eWdHS5X5AjRssNljp1d2P0irL
+	U8qsP0+OJHnXZJc8N5sI9VhNoEgUtlnL5IPLgUc/0/ajNeaGL4/QOoEE89CaCc3mxVodTKoPpuj
+	Z7OFpHaa8kqVdFlB2O7hC7xEz2jan2YxVG5s+pwUt0em+mUBjHuylEyetEvIlcD/DocgXZEWGby
+	GSMPtaceuAprpl1F3FxBIxyCBkcmyibzmuoS+YMGqZVcKmgIczKT+evFLmDuSsP9R9qWyi/8qYW
+	7u183ITIvyZDjmco/aKWlH0jNwPwE4DwR+CXoG/QLfyxLz4j3IhrDsCCN6x3gsCA7PK6lyR46vS
+	JcQgbLjB660unqO03PYP7Wmq+64IiPW1Aoydk9yeQmquDILe1BVV5yEecRI+KYmLGMIyRtDTNwO
+	MQqE+Oqkq4uklvG+sO+XOMNOIjYPY0lPtKBeyyRmSc31yAbJ6Urnfkphj/dXe+nX3dPL46XOEvJ
+	cuCUg==
+X-Received: by 2002:ac8:5781:0:b0:4f3:5f7b:cc1d with SMTP id d75a77b69052e-505d21846b4mr19549181cf.34.1769732232444;
+        Thu, 29 Jan 2026 16:17:12 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50337cc19d7sm45008611cf.35.2026.01.29.16.17.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 16:17:11 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vlcCE-0000000AQZD-13C4;
+	Thu, 29 Jan 2026 20:17:10 -0400
+Date: Thu, 29 Jan 2026 20:17:10 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 8/8] iommufd: Add dma_buf_pin()
+Message-ID: <20260130001710.GB2328995@ziepe.ca>
+References: <20260124-dmabuf-revoke-v5-0-f98fca917e96@nvidia.com>
+ <20260124-dmabuf-revoke-v5-8-f98fca917e96@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260129232835.3710773-1-jmattson@google.com>
-X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260129232835.3710773-6-jmattson@google.com>
-Subject: [PATCH v2 5/5] KVM: selftests: x86: Add svm_pmu_host_guest_test for
- Host-Only/Guest-Only bits
-From: Jim Mattson <jmattson@google.com>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	James Clark <james.clark@linaro.org>, Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: mizhang@google.com, yosryahmed@google.com, sandipan.das@amd.com, 
-	Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260124-dmabuf-revoke-v5-8-f98fca917e96@nvidia.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69644-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-69647-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[ziepe.ca];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5F42DB5B07
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,nvidia.com:email,amd.com:email]
+X-Rspamd-Queue-Id: 0A5ECB5D6F
 X-Rspamd-Action: no action
 
-Add a selftest to verify KVM correctly virtualizes the AMD PMU Host-Only
-(bit 41) and Guest-Only (bit 40) event selector bits across all relevant
-SVM state transitions.
+On Sat, Jan 24, 2026 at 09:14:20PM +0200, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> IOMMUFD relies on a private protocol with VFIO, and this always operated
+> in pinned mode.
+> 
+> Now that VFIO can support pinned importers update IOMMUFD to invoke the
+> normal dma-buf flow to request pin.
+> 
+> This isn't enough to allow IOMMUFD to work with other exporters, it still
+> needs a way to get the physical address list which is another series.
+> 
+> IOMMUFD supports the defined revoke semantics. It immediately stops and
+> fences access to the memory inside it's invalidate_mappings() callback,
+> and it currently doesn't use scatterlists so doesn't call map/unmap at
+> all.
+> 
+> It is expected that a future revision can synchronously call unmap from
+> the move_notify callback as well.
+> 
+> Acked-by: Christian König <christian.koenig@amd.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/iommu/iommufd/pages.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-The test programs 4 PMCs simultaneously with all combinations of the
-Host-Only and Guest-Only bits, then verifies correct counting behavior:
-  1. SVME=0: all counters count (Host-Only/Guest-Only bits ignored)
-  2. Set SVME=1: Host-Only and neither/both count; Guest-Only stops
-  3. VMRUN to L2: Guest-Only and neither/both count; Host-Only stops
-  4. VMEXIT to L1: Host-Only and neither/both count; Guest-Only stops
-  5. Clear SVME=0: all counters count (bits ignored again)
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/include/x86/pmu.h |   6 +
- .../kvm/x86/svm_pmu_host_guest_test.c         | 199 ++++++++++++++++++
- 3 files changed, 206 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 58eee0474db6..f20ddd58ee81 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -112,6 +112,7 @@ TEST_GEN_PROGS_x86 += x86/svm_vmcall_test
- TEST_GEN_PROGS_x86 += x86/svm_int_ctl_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_shutdown_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_soft_inject_test
-+TEST_GEN_PROGS_x86 += x86/svm_pmu_host_guest_test
- TEST_GEN_PROGS_x86 += x86/tsc_scaling_sync
- TEST_GEN_PROGS_x86 += x86/sync_regs_test
- TEST_GEN_PROGS_x86 += x86/ucna_injection_test
-diff --git a/tools/testing/selftests/kvm/include/x86/pmu.h b/tools/testing/selftests/kvm/include/x86/pmu.h
-index 72575eadb63a..af9b279c78df 100644
---- a/tools/testing/selftests/kvm/include/x86/pmu.h
-+++ b/tools/testing/selftests/kvm/include/x86/pmu.h
-@@ -38,6 +38,12 @@
- #define ARCH_PERFMON_EVENTSEL_INV		BIT_ULL(23)
- #define ARCH_PERFMON_EVENTSEL_CMASK		GENMASK_ULL(31, 24)
- 
-+/*
-+ * These are AMD-specific bits.
-+ */
-+#define AMD64_EVENTSEL_GUESTONLY		BIT_ULL(40)
-+#define AMD64_EVENTSEL_HOSTONLY			BIT_ULL(41)
-+
- /* RDPMC control flags, Intel only. */
- #define INTEL_RDPMC_METRICS			BIT_ULL(29)
- #define INTEL_RDPMC_FIXED			BIT_ULL(30)
-diff --git a/tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c b/tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c
-new file mode 100644
-index 000000000000..0536c0d96255
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c
-@@ -0,0 +1,199 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM nested SVM PMU Host-Only/Guest-Only test
-+ *
-+ * Copyright (C) 2026, Google LLC.
-+ *
-+ * Test that KVM correctly virtualizes the AMD PMU Host-Only (bit 41) and
-+ * Guest-Only (bit 40) event selector bits across all SVM state
-+ * transitions.
-+ *
-+ * Programs 4 PMCs simultaneously with all combinations of Host-Only and
-+ * Guest-Only bits, then verifies correct counting behavior through:
-+ *   1. SVME=0: all counters count (Host-Only/Guest-Only bits ignored)
-+ *   2. Set SVME=1: Host-Only and neither/both count; Guest-Only stops
-+ *   3. VMRUN to L2: Guest-Only and neither/both count; Host-Only stops
-+ *   4. VMEXIT to L1: Host-Only and neither/both count; Guest-Only stops
-+ *   5. Clear SVME=0: all counters count (bits ignored again)
-+ */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+#include "pmu.h"
-+
-+#define L2_GUEST_STACK_SIZE	256
-+
-+#define EVENTSEL_RETIRED_INSNS	(ARCH_PERFMON_EVENTSEL_OS |	\
-+				 ARCH_PERFMON_EVENTSEL_USR |	\
-+				 ARCH_PERFMON_EVENTSEL_ENABLE |	\
-+				 AMD_ZEN_INSTRUCTIONS_RETIRED)
-+
-+/* PMC configurations: index corresponds to Host-Only | Guest-Only bits */
-+#define PMC_NEITHER	0  /* Neither bit set */
-+#define PMC_GUESTONLY	1  /* Guest-Only bit set */
-+#define PMC_HOSTONLY	2  /* Host-Only bit set */
-+#define PMC_BOTH	3  /* Both bits set */
-+#define NR_PMCS		4
-+
-+/* Bitmasks for which PMCs should be counting in each state */
-+#define COUNTS_ALL	(BIT(PMC_NEITHER) | BIT(PMC_GUESTONLY) | \
-+			 BIT(PMC_HOSTONLY) | BIT(PMC_BOTH))
-+#define COUNTS_L1	(BIT(PMC_NEITHER) | BIT(PMC_HOSTONLY) | BIT(PMC_BOTH))
-+#define COUNTS_L2	(BIT(PMC_NEITHER) | BIT(PMC_GUESTONLY) | BIT(PMC_BOTH))
-+
-+#define LOOP_INSNS	1000
-+
-+static __always_inline void run_instruction_loop(void)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < LOOP_INSNS; i++)
-+		__asm__ __volatile__("nop");
-+}
-+
-+static __always_inline void read_counters(uint64_t *counts)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_PMCS; i++)
-+		counts[i] = rdmsr(MSR_F15H_PERF_CTR + 2 * i);
-+}
-+
-+static __always_inline void run_and_measure(uint64_t *deltas)
-+{
-+	uint64_t before[NR_PMCS], after[NR_PMCS];
-+	int i;
-+
-+	read_counters(before);
-+	run_instruction_loop();
-+	read_counters(after);
-+
-+	for (i = 0; i < NR_PMCS; i++)
-+		deltas[i] = after[i] - before[i];
-+}
-+
-+static void assert_pmc_counts(uint64_t *deltas, unsigned int expected_counting)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_PMCS; i++) {
-+		if (expected_counting & BIT(i))
-+			GUEST_ASSERT_NE(deltas[i], 0);
-+		else
-+			GUEST_ASSERT_EQ(deltas[i], 0);
-+	}
-+}
-+
-+struct test_data {
-+	uint64_t l2_deltas[NR_PMCS];
-+	bool l2_done;
-+};
-+
-+static struct test_data *test_data;
-+
-+static void l2_guest_code(void)
-+{
-+	run_and_measure(test_data->l2_deltas);
-+	test_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static void l1_guest_code(struct svm_test_data *svm, struct test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb = svm->vmcb;
-+	uint64_t deltas[NR_PMCS];
-+	uint64_t eventsel;
-+	int i;
-+
-+	test_data = data;
-+
-+	/* Program 4 PMCs with all combinations of Host-Only/Guest-Only bits */
-+	for (i = 0; i < NR_PMCS; i++) {
-+		eventsel = EVENTSEL_RETIRED_INSNS;
-+		if (i & PMC_GUESTONLY)
-+			eventsel |= AMD64_EVENTSEL_GUESTONLY;
-+		if (i & PMC_HOSTONLY)
-+			eventsel |= AMD64_EVENTSEL_HOSTONLY;
-+		wrmsr(MSR_F15H_PERF_CTL + 2 * i, eventsel);
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, 0);
-+	}
-+
-+	/* Step 1: SVME=0 - Host-Only/Guest-Only bits ignored; all count */
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_ALL);
-+
-+	/* Step 2: Set SVME=1 - In L1 "host mode"; Guest-Only stops */
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_L1);
-+
-+	/* Step 3: VMRUN to L2 - In "guest mode"; Host-Only stops */
-+	generic_svm_setup(svm, l2_guest_code,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+	vmcb->control.intercept &= ~(1ULL << INTERCEPT_MSR_PROT);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT(data->l2_done);
-+	assert_pmc_counts(data->l2_deltas, COUNTS_L2);
-+
-+	/* Step 4: After VMEXIT to L1 - Back in "host mode"; Guest-Only stops */
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_L1);
-+
-+	/* Step 5: Clear SVME - Host-Only/Guest-Only bits ignored; all count */
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_ALL);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t svm_gva, data_gva;
-+	struct test_data *data_hva;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-+	TEST_REQUIRE(kvm_is_pmu_enabled());
-+	TEST_REQUIRE(get_kvm_amd_param_bool("enable_mediated_pmu"));
-+	TEST_REQUIRE(host_cpu_is_amd && kvm_cpu_family() >= 0x17);
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
-+
-+	vcpu_alloc_svm(vm, &svm_gva);
-+
-+	data_gva = vm_vaddr_alloc_page(vm);
-+	data_hva = addr_gva2hva(vm, data_gva);
-+	memset(data_hva, 0, sizeof(*data_hva));
-+
-+	vcpu_args_set(vcpu, 2, svm_gva, data_gva);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.53.0.rc1.225.gd81095ad13-goog
-
+Jason
 
