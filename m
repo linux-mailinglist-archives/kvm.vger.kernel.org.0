@@ -1,220 +1,209 @@
-Return-Path: <kvm+bounces-69735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69736-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UAsGEjvVfGlbOwIAu9opvQ
-	(envelope-from <kvm+bounces-69735-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 16:58:51 +0100
+	id QP7iJBbWfGlbOwIAu9opvQ
+	(envelope-from <kvm+bounces-69736-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 17:02:30 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80DF8BC4FF
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 16:58:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB10BC59D
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 17:02:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 66C4F300B29E
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 15:58:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4D2573007AC9
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 16:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5C63451C6;
-	Fri, 30 Jan 2026 15:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E09E346AE6;
+	Fri, 30 Jan 2026 16:02:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WrHHYB5I";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Q605g9Sl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kGF2+QCd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09BE2D97BA
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 15:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA39230F531;
+	Fri, 30 Jan 2026 16:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769788718; cv=none; b=L5e4rYdjZNCkmLzYmfX1FvWZ+lD6asw10HSv9nV64lMWDfv/+clyEJ6n9SqrEw743RKhbEKczRqwA7Sw0EsYvd0X5ywQnZhBAVdc9vIQWDLzrSFxgWj5lkt/H1fUMg4VTZduprC+vYbe/1laZTkHhPqnAEKMXpkzGpQSxgWKq4E=
+	t=1769788940; cv=none; b=VOyr6elpnkuQnbE6n50J8m78d1o9OzAYObQufDvaWHxbzyPndW+NHsAUUZ4nZ47STZGi8zZ2SM9fSqMkdlSaPfdjM8Luayap5sNf4KlvqiHtlT/9FxRePs4sHFAA5Q3zCLLvch0f65XEhCsC/1s4ZzUVtjc4tD78fRt4ggPhq4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769788718; c=relaxed/simple;
-	bh=JHNaQF/tDX4f6NrSy7kAELk8akXPiqvpv6QvjBz8r8I=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
-	 References:In-Reply-To; b=tMDrP5ubouaR29MQ3q4qlsLcHHoEUyBEwCgO0amVryxDBzuvD6c/Z2PmWJUOvKRRRWuVSfpQaXCwMYxDUUZS5SywqTIZYI7ENTW37f2xy6oA6Nq5LKjj5qBaCuJI3dCZsgbWgmERjcu15SMI1mtnm+JTbhjLljUiGxZFQevG4xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WrHHYB5I; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Q605g9Sl; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60U9V1TD2675395
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 15:58:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	lQNZhRVTVABmpgTnG4Zg3cj198URaNvQKUlnGCClzJk=; b=WrHHYB5IUzWk3xSd
-	mLrptX3mVqYwutQLOSwiXhQDrtxyCqpRwXE7pmXSQIcVZbUQ3UZqG95BoFl1cLUD
-	HTgyb5Rjht5SrPoMzWK9ewSHsHjSjBxrHAtRCurs3zg9qAZU4ykYiTOmXSM2BR9W
-	dsFgwrbdg3Rs59TzFLEzQ4HcXl9cwwG7SVPQM3FfrHgGAHs5TRWJd5a49dFZpbhy
-	giU/zPpIAMQKCggL8MRs/Y713kfc8P/ZMn28fVUqbY/RZkFS4IX8jyHaupnarTPP
-	SYDvZec8LT6XzlVCY7kDchqY9m5f8rIndL3rQle4aDC3HcshG19AQr8Q2/cnUe+y
-	jpyktA==
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c0t341642-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 15:58:36 +0000 (GMT)
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8bb9f029f31so644395185a.2
-        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 07:58:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1769788716; x=1770393516; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lQNZhRVTVABmpgTnG4Zg3cj198URaNvQKUlnGCClzJk=;
-        b=Q605g9Sli7o3GQC1T05Ku+k47c42bcuQhd9g8zqJqpevLD9hKhWW1fDSB11ZXpi26K
-         1NQes3V4DkTnhciHEguIpPUnU+heEx+N3JFoAAm3DJ+8T2VkDtCrm1uugsmNJs8aREnK
-         06PgJR0W+q57TV0CZEdnicxnrQZgnaBqbatbJxOIA2fMV9zJne0JxHmCW7FMiIetWvt4
-         OR55hk/QPrflZsJJM7ZXFFqVIcrRW/6deu085XCXFY/zZ9Yg3XzYiePhZFR+eWRYCXPa
-         bzSCkq/kXXDZyTZGjk4ZKXouJ2QLLVoVM9KTRlhyMBZyrs1cNTmGzv/V7+oVrG93Pcuq
-         ifWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769788716; x=1770393516;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lQNZhRVTVABmpgTnG4Zg3cj198URaNvQKUlnGCClzJk=;
-        b=V7wRgB/pQ/eHgX6o/Pl5YwwWs1YhQhSwI9UQkGyNjOtiiIy4+lrZD+GqeWyA53w+ZV
-         bVn+On/r9YNNiLKmm9q0BjfRFss7rChOf91s0BaaM29r7CrDOvvji7S1yxLrka0CCNH8
-         /euxYNALSK4d/qdCMM23CTk4vZnFssaztmUhnG4BUW6I1To7armlxxoVa2+b/SbK4IGO
-         OsGCrl8MQ1TPyVa6LXSApqswT3/P2bLuIpeA8ykfkOydRWalfY1jcjH1ifIgwaYpo65v
-         QNnBgHnK9bn3+QgOd1ljk+1qThnpZeVNRKKlHcKzuibK8deg800d9lqt+7zTVCqiDyNR
-         WAzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzuvatSlAF2Ch+C8cgdMA0wBftqtlfrYx1llujxVUAf6m4XyMUDrlPurSq3+J/klew/9Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnG5KveKgBiI14NgTxY3u7iIE9rICQHnKIMUZEsqZwQBlSd3/u
-	RhoynMDzBYAFeMAkH1NdaDGWaxdL3x/UUP79/S6duDBoVr6a09WNGymzQqmzddG/5d9gVy04TO5
-	BBizQgQcIiyHdw9MYuxDARfy4A660C5eILmCZUwk7Ar5pNq5xIb2XBls=
-X-Gm-Gg: AZuq6aLVrG/TckJFaC3AJnimCt3o1e55676WQ3fImEOXhY1+JGadzif21PP6Mf2keda
-	j2WZBy+QMOcCgbrHMUMf6Kq9tW7IQYIECWpIaz1kTVMsGGx+0eJonEQNneBNObLnr3W2xpfFLwv
-	ZZWPj5sv3SiSyRZDgpXFgXh5yjll7nLsaw1fbz7qv+/r8FSvCSPThRtTK7gEEaDIiaJ4jjdB7/w
-	9fvWej2Q7SCgGoRbfsjLCjUJa15uDth5Zl2Vuw9xrQjlUNTkl260Q2Rp6HVxw0qaNljbBiEIkzn
-	zF0MrBVFoAAPiF6vplOS12JwyhaVGUvVjMH4hM5XksX/Sb4QCoBBGS5kRcyrBAdhS863QHT0kmu
-	TpA1z2D+1QU1atZIwOqYbj1mywR6WSnrRMZIQzM0HpNWkpig/
-X-Received: by 2002:a05:620a:29d2:b0:8c5:36be:41fe with SMTP id af79cd13be357-8c9eb32be89mr429757185a.60.1769788715897;
-        Fri, 30 Jan 2026 07:58:35 -0800 (PST)
-X-Received: by 2002:a05:620a:29d2:b0:8c5:36be:41fe with SMTP id af79cd13be357-8c9eb32be89mr429754485a.60.1769788715467;
-        Fri, 30 Jan 2026 07:58:35 -0800 (PST)
-Received: from localhost (ip-86-49-253-11.bb.vodafone.cz. [86.49.253.11])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482dbd4a5b8sm27030845e9.5.2026.01.30.07.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 07:58:33 -0800 (PST)
+	s=arc-20240116; t=1769788940; c=relaxed/simple;
+	bh=HlLzocwn2cmFJ01TJHaLhKDNqJIA0cfTgrV8mXCe9Ns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kb7T9RdfvxuJKqVnCeMwY03XRcXl+VqBMdiLCd7wiXib2nUOc/8SXb13QV+wZ8q+Exp5zaaKs7iRip9S0wLxkUec3mhoZNJfRQE4qVNDxWs/YgpVctSK6IljixghAo+pAxj1e0C1UT/ueoLgdoVk+5tuQxH3ZpZXcUhtXh22Pm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kGF2+QCd; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1769788938; x=1801324938;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HlLzocwn2cmFJ01TJHaLhKDNqJIA0cfTgrV8mXCe9Ns=;
+  b=kGF2+QCdUqZuPLbl91yIHOdQ/9SRXLVbmta0pf75I9ilreGMjO2RgzxP
+   L8ID+fECWgh7bXp8BFR9PXxEIfOCiLUoEp/5S/Kl2QFOSwX6ce8N3Csk3
+   PxAirEdMhbj3QdhJqfPSV4Z24KqUUAUWQCqLvgsGrrUTwxpJSgeiXAQhb
+   pgJi6kHa1zxnl68f4hMYBmTd+Lm9fnnfqOBnrKTRXCQigXhoUFdNYVWMF
+   2WNUaHz9EM406aJl721mCpdFteCrcjOogyqMQoLHPZNjxsmx8TO9KiX8D
+   k2RYHQByqcmWzWBPrEvsOYUkSj9lllHBgKfhke71miz/0eTggwx1Z29Pa
+   Q==;
+X-CSE-ConnectionGUID: itrvgqm3SReilVOycVQT3g==
+X-CSE-MsgGUID: BI3/mnjgRm6urolgGTB2Yg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11686"; a="58619297"
+X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
+   d="scan'208";a="58619297"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 08:02:17 -0800
+X-CSE-ConnectionGUID: 9QbDEhyDTVaanvwau77IEQ==
+X-CSE-MsgGUID: VTnVV3Y+T8eXE+VTy3ITlg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,263,1763452800"; 
+   d="scan'208";a="208993848"
+Received: from cjhill-mobl.amr.corp.intel.com (HELO [10.125.110.58]) ([10.125.110.58])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2026 08:02:16 -0800
+Message-ID: <56a62e54-59f7-4423-9f01-4472d5c3815d@intel.com>
+Date: Fri, 30 Jan 2026 08:02:15 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 09/26] coco/tdx-host: Expose P-SEAMLDR information via
+ sysfs
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
+ ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+ yilun.xu@linux.intel.com, sagis@google.com, vannapurve@google.com,
+ paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
+ seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
+ dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+ Farrah Chen <farrah.chen@intel.com>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-10-chao.gao@intel.com>
+ <9fb1bbf3-0623-447e-86d7-d48ef20fb42c@intel.com> <aXzD5nOW0NhCHG7+@intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
+ oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
+ 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
+ ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
+ VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
+ iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
+ c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
+ pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
+ ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
+ QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzUVEYXZpZCBDaHJp
+ c3RvcGhlciBIYW5zZW4gKEludGVsIFdvcmsgQWRkcmVzcykgPGRhdmUuaGFuc2VuQGludGVs
+ LmNvbT7CwXgEEwECACIFAlQ+9J0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEGg1
+ lTBwyZKwLZUP/0dnbhDc229u2u6WtK1s1cSd9WsflGXGagkR6liJ4um3XCfYWDHvIdkHYC1t
+ MNcVHFBwmQkawxsYvgO8kXT3SaFZe4ISfB4K4CL2qp4JO+nJdlFUbZI7cz/Td9z8nHjMcWYF
+ IQuTsWOLs/LBMTs+ANumibtw6UkiGVD3dfHJAOPNApjVr+M0P/lVmTeP8w0uVcd2syiaU5jB
+ aht9CYATn+ytFGWZnBEEQFnqcibIaOrmoBLu2b3fKJEd8Jp7NHDSIdrvrMjYynmc6sZKUqH2
+ I1qOevaa8jUg7wlLJAWGfIqnu85kkqrVOkbNbk4TPub7VOqA6qG5GCNEIv6ZY7HLYd/vAkVY
+ E8Plzq/NwLAuOWxvGrOl7OPuwVeR4hBDfcrNb990MFPpjGgACzAZyjdmYoMu8j3/MAEW4P0z
+ F5+EYJAOZ+z212y1pchNNauehORXgjrNKsZwxwKpPY9qb84E3O9KYpwfATsqOoQ6tTgr+1BR
+ CCwP712H+E9U5HJ0iibN/CDZFVPL1bRerHziuwuQuvE0qWg0+0SChFe9oq0KAwEkVs6ZDMB2
+ P16MieEEQ6StQRlvy2YBv80L1TMl3T90Bo1UUn6ARXEpcbFE0/aORH/jEXcRteb+vuik5UGY
+ 5TsyLYdPur3TXm7XDBdmmyQVJjnJKYK9AQxj95KlXLVO38lczsFNBFRjzmoBEACyAxbvUEhd
+ GDGNg0JhDdezyTdN8C9BFsdxyTLnSH31NRiyp1QtuxvcqGZjb2trDVuCbIzRrgMZLVgo3upr
+ MIOx1CXEgmn23Zhh0EpdVHM8IKx9Z7V0r+rrpRWFE8/wQZngKYVi49PGoZj50ZEifEJ5qn/H
+ Nsp2+Y+bTUjDdgWMATg9DiFMyv8fvoqgNsNyrrZTnSgoLzdxr89FGHZCoSoAK8gfgFHuO54B
+ lI8QOfPDG9WDPJ66HCodjTlBEr/Cwq6GruxS5i2Y33YVqxvFvDa1tUtl+iJ2SWKS9kCai2DR
+ 3BwVONJEYSDQaven/EHMlY1q8Vln3lGPsS11vSUK3QcNJjmrgYxH5KsVsf6PNRj9mp8Z1kIG
+ qjRx08+nnyStWC0gZH6NrYyS9rpqH3j+hA2WcI7De51L4Rv9pFwzp161mvtc6eC/GxaiUGuH
+ BNAVP0PY0fqvIC68p3rLIAW3f97uv4ce2RSQ7LbsPsimOeCo/5vgS6YQsj83E+AipPr09Caj
+ 0hloj+hFoqiticNpmsxdWKoOsV0PftcQvBCCYuhKbZV9s5hjt9qn8CE86A5g5KqDf83Fxqm/
+ vXKgHNFHE5zgXGZnrmaf6resQzbvJHO0Fb0CcIohzrpPaL3YepcLDoCCgElGMGQjdCcSQ+Ci
+ FCRl0Bvyj1YZUql+ZkptgGjikQARAQABwsFfBBgBAgAJBQJUY85qAhsMAAoJEGg1lTBwyZKw
+ l4IQAIKHs/9po4spZDFyfDjunimEhVHqlUt7ggR1Hsl/tkvTSze8pI1P6dGp2XW6AnH1iayn
+ yRcoyT0ZJ+Zmm4xAH1zqKjWplzqdb/dO28qk0bPso8+1oPO8oDhLm1+tY+cOvufXkBTm+whm
+ +AyNTjaCRt6aSMnA/QHVGSJ8grrTJCoACVNhnXg/R0g90g8iV8Q+IBZyDkG0tBThaDdw1B2l
+ asInUTeb9EiVfL/Zjdg5VWiF9LL7iS+9hTeVdR09vThQ/DhVbCNxVk+DtyBHsjOKifrVsYep
+ WpRGBIAu3bK8eXtyvrw1igWTNs2wazJ71+0z2jMzbclKAyRHKU9JdN6Hkkgr2nPb561yjcB8
+ sIq1pFXKyO+nKy6SZYxOvHxCcjk2fkw6UmPU6/j/nQlj2lfOAgNVKuDLothIxzi8pndB8Jju
+ KktE5HJqUUMXePkAYIxEQ0mMc8Po7tuXdejgPMwgP7x65xtfEqI0RuzbUioFltsp1jUaRwQZ
+ MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
+ hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
+ vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
+In-Reply-To: <aXzD5nOW0NhCHG7+@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Fri, 30 Jan 2026 15:58:32 +0000
-Message-Id: <DG21QMIKJS7W.1OUK0OFL8S3A8@oss.qualcomm.com>
-To: <fangyu.yu@linux.alibaba.com>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?=
- <radim.krcmar@oss.qualcomm.com>
-Subject: Re: [PATCH v3 1/2] RISC-V: KVM: Support runtime configuration for
- per-VM's HGATP mode
-Cc: <ajones@ventanamicro.com>, <alex@ghiti.fr>,
-        <andrew.jones@oss.qualcomm.com>, <anup@brainfault.org>,
-        <aou@eecs.berkeley.edu>, <atish.patra@linux.dev>, <corbet@lwn.net>,
-        <guoren@kernel.org>, <kvm-riscv@lists.infradead.org>,
-        <kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-        <palmer@dabbelt.com>, <pbonzini@redhat.com>, <pjw@kernel.org>
-References: <DG16GDMKZOBM.2QH3ZYM2WH7RO@oss.qualcomm.com>
- <20260130132458.16367-1-fangyu.yu@linux.alibaba.com>
-In-Reply-To: <20260130132458.16367-1-fangyu.yu@linux.alibaba.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTMwMDEyOSBTYWx0ZWRfXxzxz/1bIC5Bc
- 3iub+hKlacHmwr/0JWcLmURx/Mak6BHiHGKFD5qvNn4RR8O4x5RXj/N9p/O108AimOzkosKYr/W
- R6YV5AET8ejYpW9rj1auW6QOfKrcma5DzY1c344w4OTHd+QgpRIMYkqQ13N9UT3M48bEH6o+VlJ
- X9OKbkzLCz5V1z8B7Zn8oo1Vot7H77uqEYkTZncoLYjSmvaIoyUgKanbZBJd6WCXXdKLH0jlY3p
- fQdXejMlr1mIWmQUTw/7sf+Zblsd9k8qdHfazW1WoC2vnORTlVh1mYc834y8OMiMJ1ywFeeuKTp
- HVNAbTkwMnjsJRdMC7V8RUGe0w1ZF56gtbNbf7GyTqx18M/Anp7sSZOUn0rHviiHcEZT5roOFis
- TV3v3W5/6NjaMMG775hEucTOPS6PejTDLGBNNR4qZ9+2PHvOHDMS/Sd8X8mcw2YlGnWajP6cLfe
- DO3r/XXBZmSWB7azPkg==
-X-Proofpoint-ORIG-GUID: BPS3r_TLlPIXNCRZSF8MQKbkgVgKf2Ko
-X-Authority-Analysis: v=2.4 cv=QfFrf8bv c=1 sm=1 tr=0 ts=697cd52c cx=c_pps
- a=50t2pK5VMbmlHzFWWp8p/g==:117 a=HFCiZzTCIv7qJCpyeE1rag==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=M51BFTxLslgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=NEAV23lmAAAA:8 a=SRrdq9N9AAAA:8
- a=655hpoqrAi3NGJe9dLIA:9 a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
-X-Proofpoint-GUID: BPS3r_TLlPIXNCRZSF8MQKbkgVgKf2Ko
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-30_02,2026-01-30_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 impostorscore=0 adultscore=0 phishscore=0
- spamscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2601300129
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.87 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.79)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69735-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	TAGGED_FROM(0.00)[bounces-69736-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[linux.dev:query timed out];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[radim.krcmar@oss.qualcomm.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 80DF8BC4FF
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,intel.com:mid,intel.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ECB10BC59D
 X-Rspamd-Action: no action
 
-2026-01-30T21:24:58+08:00, <fangyu.yu@linux.alibaba.com>:
->>> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
->>> -	kvm_info("using %s G-stage page table format\n", str);
->>> +	kvm_info("Max G-stage page table format %s\n", str);
+On 1/30/26 06:44, Chao Gao wrote:
+>>> +What:		/sys/devices/faux/tdx_host/seamldr/num_remaining_updates
+>>> +Contact:	linux-coco@lists.linux.dev
+>>> +Description:	(RO) Report the number of remaining updates that can be performed.
+>>> +		The CPU keeps track of TCB versions for each TDX Module that
+>>> +		has been loaded. Since this tracking database has finite
+>>> +		capacity, there's a maximum number of Module updates that can
+>>> +		be performed.
 >>
->>Fun fact: the ISA doesn't define the same hierarchy for hgatp modes as
->>it does for satp modes, so we could have just Sv57x4 and nothing below.
->>
->>We could do just with a code comment that we're assuming vendors will do
->>better, but I'd rather not introduce more assumptions...
->>I think the easiest would be to kvm_riscv_gstage_mode_detect() levels in
->>reverse and stop on the first one that is not supported.
->>(I'll reply with a patch later.)
->
-> Please refer to the discussion here:
-> https://github.com/riscv/riscv-isa-manual/issues/2208
-> If Sv57x4 is implemented, then Sv48x4 and Sv39x4 must also be implemented=
-.
+>> Is it really the CPU? Or some SEAM software construct?
+> 
+> It is the CPU. The CPU provides the database and gives instructions to
+> P-SEAMLDR for adding records or cleaning up the entire database.
 
-I don't think so, sadly, but we're mostly dealing with technicalities
-here.  As Andrew pointed out:
+Either way, it's an implementation detail that doesn't need to be
+litigated in the OS ABI docs.
 
-  "The H extension itself does not impose this requirement, so
-  technically Sv57x4 without Sv48x4 conforms to the H extension spec."
+	TDX maintains a log about each TDX module which has been loaded.
+	This log has a finite size which limits the number of TDX module
+	updates which can be performed.
 
-This means it's completely valid to support {Bare, Sv39x4, Sv57x4}.
-The RVA23 profile imposes additional constraints via Shgatpa:
+	Report the number of updates remaining.
 
-  "For each supported virtual memory scheme SvNN supported in satp, the
-  corresponding hgatp SvNNx4 mode must be supported.
-  The hgatp mode Bare must also be supported."
+>>> +#ifdef CONFIG_INTEL_TDX_MODULE_UPDATE
 
-The requirement only goes one way, so an RVA23 implementation with just
-{Bare, Sv39} in satp could support {Bare, Sv39x4, Sv57x4} in hgatp,
-because RVA23 nor ISA prevent Sv57x4 to be there.
-Not that I expect any sensible implementation to do this...
+...
+> /facepalm. Sorry for missing these important considerations.
+> 
+> I overlooked a critical constraint: only one CPU can call P-SEAMLDR at a time;
+> any second CPU gets VMFailInvalid. Patch 19 adds a lock for SEAMLDR.INSTALL
+> serialization, but we actually need to serialize all P-SEAMLDR calls or handle
+> VMFailInvalid with retries.
+> 
+> I will make the following changes to see how they look:
+> 
+> 1. Move the lock from patch 19 to seamldr_call() to serialize all P-SEAMLDR calls
 
-Btw. do we target only RVA23 with KVM?
+Ack, yes, this is obviously required.
 
-Thanks.
+> 2. Cache seamldr_info and only update it after successful updates
+> 3. Make seamldr_get_info() return cached data instead of calling P-SEAMLDR every time
+
+To be honest, I'm not sure we need a cache. Why don't we just make the
+permissions 400 and keep the info structure on the stack?
 
