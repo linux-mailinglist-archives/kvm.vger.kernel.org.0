@@ -1,231 +1,234 @@
-Return-Path: <kvm+bounces-69650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69651-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AGZAMXoIfGnqKAIAu9opvQ
-	(envelope-from <kvm+bounces-69650-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 02:25:14 +0100
+	id WIgUCy0JfGn1KAIAu9opvQ
+	(envelope-from <kvm+bounces-69651-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 02:28:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7063CB625B
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 02:25:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CA5B627E
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 02:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9762E301DAD1
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:24:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F304B3004052
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 01:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA78D330320;
-	Fri, 30 Jan 2026 01:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EDEB330320;
+	Fri, 30 Jan 2026 01:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q6F/Bw4f"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC0530F7E2;
-	Fri, 30 Jan 2026 01:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309AF215F42
+	for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 01:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769736287; cv=none; b=Eep6TCiw9R9EZz5oxjfV9Y0RTPD5p6ARyEsQFvx4MP/dZeOkmHdt2X0TiZiGXfkQbXn5nh1qv51J4ISKo+Gf04UinZxroggjDPWL3aXDCO33bXwaBhsuKwFY4N8z8rn21d4dpwq00+r/QaFB9ir/VvrLCmcim+1lHav4lE5h/C0=
+	t=1769736486; cv=none; b=E//BEf+JG+HHXxT3of1JcxtNlErS5TFTeL4QWSpLrULR+Terlj7LdgPrnd+UvfEu+jOaxYNC7YNuGqF8uTVbsb8nxk+8N91cP3KHegGMX0dIp80giJNvfsw2MPlfQ6ocyomC7vrrh4CK4zSFuyb86UN6b59IEbebE9ZTAC+QTT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769736287; c=relaxed/simple;
-	bh=+/YP9xBL//FAZcBWX1nSK8KrUC7hfGfloYZQ0w3mkZs=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=AAZeVDLT0pOuXAZgzFwLRWLnf50HVbjHyyhnirbzswcA81lLd6pMvripusfFw8K+9B+0XtdmOit7cZ1h0a00O768zvq8Qttcs7myolJHp+nOe2oWkvl0XW0VT7RzsdCZ9yjBy8F94uy9YAuRGRQFX9OscJggexZn1mcpEbd79qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxisJYCHxpkh0OAA--.46175S3;
-	Fri, 30 Jan 2026 09:24:40 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAxGMFUCHxpV985AA--.30825S3;
-	Fri, 30 Jan 2026 09:24:39 +0800 (CST)
-Subject: Re: [PATCH v4 2/2] LoongArch: Add paravirt support with
- vcpu_is_preempted() in guest side
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Juergen Gross <jgross@suse.com>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20251219063021.1778659-1-maobibo@loongson.cn>
- <20251219063021.1778659-3-maobibo@loongson.cn>
- <CAAhV-H7N1uXzK6Fu4x4Mrq4j1P95119HP87_spxU_E6WLxN6TQ@mail.gmail.com>
-From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <f0d2671a-1ce7-d499-47cf-8dc9163f1e17@loongson.cn>
-Date: Fri, 30 Jan 2026 09:22:01 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1769736486; c=relaxed/simple;
+	bh=3taJYbZdCbrpWbXI7XIdYXHLYZ3hNlpBVda8BMbduFE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FCsgRK131IHjetXKpOY0RDI2cyPKfqWlxGzbuTSoXYrcCffRxmsn3vNCg7lhhgOVKihZBtlmboRCreXS7CJJyVGqw039Ltz6kh8xN3dDBr54VXmPBNXP1dy2soD97pa1SmljnHkGbauW6lBWF6jI9IMcur5fzICFi7fiJKQATWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q6F/Bw4f; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-822f926eff5so769524b3a.1
+        for <kvm@vger.kernel.org>; Thu, 29 Jan 2026 17:28:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769736484; x=1770341284; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Go9/SPH+2Gh6etMrbpw5IFO/ov1QdlQoCkDEqINUYds=;
+        b=Q6F/Bw4fHY/M6k88jL+KHGi9SOH2idIJMvMec7UyMWbZJETTY/aRIBmi0M08Qi8Glq
+         bzwVo7TSXdAT75iBaDFh/G+MK2ZN0zo+qGwRm99R8DNNzfz+cRT1ZV70htii2/b8DQVm
+         YJZfGBd9XhiUzXagd2bZm3j/ftEODaS+yNcW116ImUlCbgo2WtONstkE9fEeFUc/Gwg4
+         BbOpAThfbTzV4TEi26Tu5KofRfE/P13fYUkdDFY7mAiQ8zF/jpvcE4MZC+8RG9J9WxZA
+         FAR7jUqctnEeHTlfzzK6uBqIEEEvQ4Mxl0V6PgWim+Mt7uEY/U8/OMIrwqZWHerMuafv
+         iYxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769736484; x=1770341284;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Go9/SPH+2Gh6etMrbpw5IFO/ov1QdlQoCkDEqINUYds=;
+        b=iAoSWxrhStSo8d89PdzDefrgrUKKQ5kOkS+bq9l982ABiy30Qqt0uc4/d0PrkPujHC
+         QxxN0ztctDDf3iaef+KnkDK9CThnJ9ILYyyN5wIfYe3uH/at7o22gCM1Z95FoBsZ3xB0
+         to5BygU/ws7f+SQQrSwsvIY3fZC/HVNvq/46BfbAHCMgX8EpH/zlt1QYWkhaSD1cfj83
+         pTZO/CA1/dSk8wK50JM8LMqby/KC8UiOQNdNDx3GcEz4YwCdb5nRRLpuL5JCunLgupXW
+         1Kyrsyyw0iqGlWOTF+YrtF+qr/mpSy3OH7lGGHOoWrUfL/jORRN5kM1mrQb4J8wyHYCh
+         mR4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWKLWYKRycIkh5R9aoNFNEoJwGQz08rB93oNlZVtmBEA4TZWO6CJG1nkzE047PRGZ/gvBY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTr2Vh9y9hCHClG9397XMLOTl9ywnYLv+W3Hia8lj8ZSAY+5y5
+	kDyIaiDsBuwdaRPdHs9XVbU02Mzkc/upPWLUcqUqeE9NcTP91lSF+fj1XMYdL2PORkDIOJ1IPpG
+	l0IOD9A==
+X-Received: from pfbgi12.prod.google.com ([2002:a05:6a00:63cc:b0:7dd:8bba:6393])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:aa89:b0:821:8569:7f19
+ with SMTP id d2e1a72fcca58-823ab9853fdmr1132825b3a.59.1769736484397; Thu, 29
+ Jan 2026 17:28:04 -0800 (PST)
+Date: Thu, 29 Jan 2026 17:28:02 -0800
+In-Reply-To: <f9f65b0fad57db12e21d2168d02bac036615fb7f.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7N1uXzK6Fu4x4Mrq4j1P95119HP87_spxU_E6WLxN6TQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxGMFUCHxpV985AA--.30825S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxGFWUtw47Kr1DKw47AF4rCrX_yoWrAw13pF
-	yDAFnYva1xGayxC39Fqr48ur15Jr4kG3WIqF9rWa4rAa1DXrnFyr18K34Y9Fyvv3s7Wa4I
-	qrn5WF4aganrAagCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zwZ7UU
-	UUU==
+Mime-Version: 1.0
+References: <20260129011517.3545883-1-seanjc@google.com> <20260129011517.3545883-5-seanjc@google.com>
+ <f9f65b0fad57db12e21d2168d02bac036615fb7f.camel@intel.com>
+Message-ID: <aXwJIkFJw_4mRl70@google.com>
+Subject: Re: [RFC PATCH v5 04/45] KVM: x86: Make "external SPTE" ops that can
+ fail RET0 static calls
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "x86@kernel.org" <x86@kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "kas@kernel.org" <kas@kernel.org>, 
+	"bp@alien8.de" <bp@alien8.de>, "mingo@redhat.com" <mingo@redhat.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@kernel.org" <tglx@kernel.org>, Kai Huang <kai.huang@intel.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "sagis@google.com" <sagis@google.com>, 
+	Vishal Annapurve <vannapurve@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.46 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,loongson.cn:email,suse.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69651-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
-	DMARC_NA(0.00)[loongson.cn];
-	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69650-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 7063CB625B
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[104.64.211.4:from];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 56CA5B627E
 X-Rspamd-Action: no action
 
-
-
-On 2026/1/29 下午8:55, Huacai Chen wrote:
-> Hi, Bibo,
+On Thu, Jan 29, 2026, Rick P Edgecombe wrote:
+> On Wed, 2026-01-28 at 17:14 -0800, Sean Christopherson wrote:
+> > Define kvm_x86_ops .link_external_spt(), .set_external_spte(), and
+> > .free_external_spt() as RET0 static calls so that an unexpected call to a
+> > a default operation doesn't consume garbage.
+> > 
+> > Fixes: 77ac7079e66d ("KVM: x86/tdp_mmu: Propagate building mirror page tables")
+> > Fixes: 94faba8999b9 ("KVM: x86/tdp_mmu: Propagate tearing down mirror page tables")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > 
-> On Fri, Dec 19, 2025 at 2:30 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>
->> Function vcpu_is_preempted() is used to check whether vCPU is preempted
->> or not. Here add implementation with vcpu_is_preempted() when option
->> CONFIG_PARAVIRT is enabled.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> Acked-by: Juergen Gross <jgross@suse.com>
->> ---
->>   arch/loongarch/include/asm/qspinlock.h |  3 +++
->>   arch/loongarch/kernel/paravirt.c       | 21 ++++++++++++++++++++-
->>   2 files changed, 23 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/loongarch/include/asm/qspinlock.h b/arch/loongarch/include/asm/qspinlock.h
->> index e76d3aa1e1eb..fa3eaf7e48f2 100644
->> --- a/arch/loongarch/include/asm/qspinlock.h
->> +++ b/arch/loongarch/include/asm/qspinlock.h
->> @@ -34,6 +34,9 @@ static inline bool virt_spin_lock(struct qspinlock *lock)
->>          return true;
->>   }
->>
->> +#define vcpu_is_preempted      vcpu_is_preempted
->> +bool vcpu_is_preempted(int cpu);
->> +
->>   #endif /* CONFIG_PARAVIRT */
->>
->>   #include <asm-generic/qspinlock.h>
->> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/paravirt.c
->> index b1b51f920b23..a81a3e871dd1 100644
->> --- a/arch/loongarch/kernel/paravirt.c
->> +++ b/arch/loongarch/kernel/paravirt.c
->> @@ -12,6 +12,7 @@ static int has_steal_clock;
->>   struct static_key paravirt_steal_enabled;
->>   struct static_key paravirt_steal_rq_enabled;
->>   static DEFINE_PER_CPU(struct kvm_steal_time, steal_time) __aligned(64);
->> +static DEFINE_STATIC_KEY_FALSE(virt_preempt_key);
->>   DEFINE_STATIC_KEY_FALSE(virt_spin_lock_key);
->>
->>   static u64 native_steal_clock(int cpu)
->> @@ -267,6 +268,18 @@ static int pv_time_cpu_down_prepare(unsigned int cpu)
->>
->>          return 0;
->>   }
->> +
->> +bool notrace vcpu_is_preempted(int cpu)
-> Is "notrace" really needed? Only S390 do this.
+> We don't want to crash unnecessarily, but do we want to get some sort of notice?
 
-The prefix "notrace" is copied from S390, it is inline function on x86.
+Hmm, that's probably doable, but definitely in a separate patch.  E.g. something
+like:
 
-Here is git log information with arch/s390/kernel/smp.c
-commit 8ebf6da9db1b2a20bb86cc1bee2552e894d03308
-Author: Philipp Rudo <prudo@linux.ibm.com>
-Date:   Mon Apr 6 20:47:48 2020
-
-     s390/ftrace: fix potential crashes when switching tracers
-
-     Switching tracers include instruction patching. To prevent that a
-     instruction is patched while it's read the instruction patching is done
-     in stop_machine 'context'. This also means that any function called
-     during stop_machine must not be traced. Thus add 'notrace' to all
-     functions called within stop_machine.
-
-     Fixes: 1ec2772e0c3c ("s390/diag: add a statistic for diagnose calls")
-     Fixes: 38f2c691a4b3 ("s390: improve wait logic of stop_machine")
-     Fixes: 4ecf0a43e729 ("processor: get rid of cpu_relax_yield")
-     Signed-off-by: Philipp Rudo <prudo@linux.ibm.com>
-     Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
-
-However I am not familiar with tracer and have no idea about this, that 
-is both OK to me. You are Linux kernel expert, what is your opinion 
-about notrace prefix?
-
-Regards
-Bibo Mao
-> 
-> Huacai
-> 
->> +{
->> +       struct kvm_steal_time *src;
->> +
->> +       if (!static_branch_unlikely(&virt_preempt_key))
->> +               return false;
->> +
->> +       src = &per_cpu(steal_time, cpu);
->> +       return !!(src->preempted & KVM_VCPU_PREEMPTED);
->> +}
->> +EXPORT_SYMBOL(vcpu_is_preempted);
->>   #endif
->>
->>   static void pv_cpu_reboot(void *unused)
->> @@ -308,6 +321,9 @@ int __init pv_time_init(void)
->>                  pr_err("Failed to install cpu hotplug callbacks\n");
->>                  return r;
->>          }
->> +
->> +       if (kvm_para_has_feature(KVM_FEATURE_PREEMPT))
->> +               static_branch_enable(&virt_preempt_key);
->>   #endif
->>
->>          static_call_update(pv_steal_clock, paravt_steal_clock);
->> @@ -318,7 +334,10 @@ int __init pv_time_init(void)
->>                  static_key_slow_inc(&paravirt_steal_rq_enabled);
->>   #endif
->>
->> -       pr_info("Using paravirt steal-time\n");
->> +       if (static_key_enabled(&virt_preempt_key))
->> +               pr_info("Using paravirt steal-time with preempt enabled\n");
->> +       else
->> +               pr_info("Using paravirt steal-time with preempt disabled\n");
->>
->>          return 0;
->>   }
->> --
->> 2.39.3
->>
-
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 6083fb07cd3b..270149f84bb4 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -3,6 +3,13 @@
+ BUILD_BUG_ON(1)
+ #endif
+ 
++#ifndef KVM_X86_OP_OPTIONAL
++#define KVM_X86_OP_OPTIONAL KVM_X86_OP
++#define KVM_X86_OP_OPTIONAL_RET0 KVM_X86_OP
++#define KVM_X86_OP_OPTIONAL_WARN KVM_X86_OP
++#define KVM_X86_OP_OPTIONAL_RET0_WARN KVM_X86_OP
++#endif
++
+ /*
+  * KVM_X86_OP() and KVM_X86_OP_OPTIONAL() are used to help generate
+  * both DECLARE/DEFINE_STATIC_CALL() invocations and
+@@ -94,11 +101,11 @@ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
+ KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
+ KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+ KVM_X86_OP(load_mmu_pgd)
+-KVM_X86_OP_OPTIONAL(alloc_external_sp)
+-KVM_X86_OP_OPTIONAL(free_external_sp)
+-KVM_X86_OP_OPTIONAL_RET0(set_external_spte)
+-KVM_X86_OP_OPTIONAL(reclaim_external_sp)
+-KVM_X86_OP_OPTIONAL_RET0(topup_external_cache)
++KVM_X86_OP_OPTIONAL_WARN(alloc_external_sp)
++KVM_X86_OP_OPTIONAL_WARN(free_external_sp)
++KVM_X86_OP_OPTIONAL_RET0_WARN(set_external_spte)
++KVM_X86_OP_OPTIONAL_WARN(reclaim_external_sp)
++KVM_X86_OP_OPTIONAL_RET0_WARN(topup_external_cache)
+ KVM_X86_OP(has_wbinvd_exit)
+ KVM_X86_OP(get_l2_tsc_offset)
+ KVM_X86_OP(get_l2_tsc_multiplier)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index cd3e7dc6ab9b..663c9943c0dd 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2004,8 +2004,6 @@ extern struct kvm_x86_ops kvm_x86_ops;
+ 
+ #define KVM_X86_OP(func) \
+        DECLARE_STATIC_CALL(kvm_x86_##func, *(((struct kvm_x86_ops *)0)->func));
+-#define KVM_X86_OP_OPTIONAL KVM_X86_OP
+-#define KVM_X86_OP_OPTIONAL_RET0 KVM_X86_OP
+ #include <asm/kvm-x86-ops.h>
+ 
+ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c3d71ba9a1dc..1748f44c81c0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -143,8 +143,6 @@ struct kvm_x86_ops kvm_x86_ops __read_mostly;
+ #define KVM_X86_OP(func)                                            \
+        DEFINE_STATIC_CALL_NULL(kvm_x86_##func,                      \
+                                *(((struct kvm_x86_ops *)0)->func));
+-#define KVM_X86_OP_OPTIONAL KVM_X86_OP
+-#define KVM_X86_OP_OPTIONAL_RET0 KVM_X86_OP
+ #include <asm/kvm-x86-ops.h>
+ EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
+ EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
+@@ -9965,6 +9963,17 @@ static struct notifier_block pvclock_gtod_notifier = {
+ };
+ #endif
+ 
++static void kvm_static_call_warn(void)
++{
++       WARN_ON_ONCE(1);
++}
++
++static long kvm_static_call_warn_return0(void)
++{
++       WARN_ON_ONCE(1);
++       return 0;
++}
++
+ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+ {
+        memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+@@ -9977,6 +9986,12 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+ #define KVM_X86_OP_OPTIONAL_RET0(func) \
+        static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
+                                           (void *)__static_call_return0);
++#define KVM_X86_OP_OPTIONAL_WARN(func) \
++       static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
++                                          (void *)kvm_static_call_warn);
++#define KVM_X86_OP_OPTIONAL_RET0_WARN(func) \
++       static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
++                                          (void *)kvm_static_call_warn_return0);
+ #include <asm/kvm-x86-ops.h>
+ #undef __KVM_X86_OP
 
