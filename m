@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-69696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69697-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wCznCGmRfGkQNwIAu9opvQ
-	(envelope-from <kvm+bounces-69696-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:09:29 +0100
+	id IEwcLIySfGkQNwIAu9opvQ
+	(envelope-from <kvm+bounces-69697-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:14:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 747BEB9D30
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:09:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2A6B9F10
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 12:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C869D3059F25
-	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:04:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BCB5730065F8
+	for <lists+kvm@lfdr.de>; Fri, 30 Jan 2026 11:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63FC378D6A;
-	Fri, 30 Jan 2026 11:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9614C378D77;
+	Fri, 30 Jan 2026 11:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/cRYyPI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KhBEM8og"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC29379979;
-	Fri, 30 Jan 2026 11:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC9F369997;
+	Fri, 30 Jan 2026 11:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769771026; cv=none; b=gAY8oWVA8qiN5C0gywZtQh9mab5Xw3T2FXxA5EjNZYLQ6QfJ+pvhVGdWhhBsA11T0v6ZsfLhLhwFk8j+B6RxkIgLJa6uvtCM8cCT+0v3lvwGL8S9Ub5Fm+vkxQ1kFqAgCBhhkLaKxf9m2Rg15DXNG57AZIlNxybWTKZsdPw42jk=
+	t=1769771654; cv=none; b=SOnb2ggpgJWArZKmxu4UUEQcqcCyaIgrKLoEw5pDaeFDKC1LYIu77EPAcCCRiTpXpeu6LIcTFN45QiqcaCQRrUcOpXyyQNH+Vdim/OyeOxf5X4LS0261MNxgXMmKrW0zJK8oSwjkZ3BOX/qvbgS1R6mQCpP5mVIW+U8XmmFw2+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769771026; c=relaxed/simple;
-	bh=b38Rv5/cdNrq8B4fEOLBB08SrNNsLGpLWY/NWYJxCBI=;
+	s=arc-20240116; t=1769771654; c=relaxed/simple;
+	bh=RkCPF5y7vSOiUXky1JlxdTIgdWJ6xKp9N4kMf9l1z3I=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cuo+hXjM9ACaldnwNch4HOrunN/eIoFcMqkDtqAR/95hHlqdZ6rC4xWD71gWBF9bG+0y6HPF8N12cZrzylL/McZS1HmAVirbzwctZODnGEI1kYDLRd8+QdtrakNC/p3CfvBJteaKvzoeNdfaGJrh2QhHu4vkL7CwgtCQFZpLtLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/cRYyPI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486BFC4CEF7;
-	Fri, 30 Jan 2026 11:03:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=J/2/9XXQre6MIjqlV6p4I3gnjuNyfiiaiPd6ttanPOEdora+2Z865HKUpcTLn20Hfyhq6Kukyh7kFJkXPtg/1X4RO4Oy5KXM9v18goKf6ZV06RgcZ8ew0tkOfEGQ8SAP5acMF5t9DKlVUlG9AEqZ81oYm8C6ixVyMQJUbrbRUrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KhBEM8og; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B70C4CEF7;
+	Fri, 30 Jan 2026 11:14:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769771026;
-	bh=b38Rv5/cdNrq8B4fEOLBB08SrNNsLGpLWY/NWYJxCBI=;
+	s=k20201202; t=1769771654;
+	bh=RkCPF5y7vSOiUXky1JlxdTIgdWJ6xKp9N4kMf9l1z3I=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U/cRYyPIeNk+mH9kkKHgfKuinAWpbwOQUwLhRpYwMe3nwakojxxYtZ0GovQ4hc8KM
-	 1AarUWS9JEJjy1u/b4b2y8easykMTJKLZwLKQZ2s53RquSCVtNjdR9OxubxMkKn9ZL
-	 0D4lUahnDxu0XQBkxRbCKZuQbKIYKw3iDLahXACjVar7eiFjr9s3MsjOE5o6sey2VQ
-	 jC5Wzp8iDeDQ+24c53Apwo9rM8hUfoj7sQRqoXeD6lc+SDRRJ8QpShc0ZmjC6MyWOb
-	 Mty396Zom/TerG1J7OhAdRnyAQfATcxrKwh5LSvEtXxSGmsQL43OGdgERMtYa5YJKM
-	 Y4orVhX1/+zEA==
+	b=KhBEM8ogaYsVlHTd3LjlzlK4vWaQvl+WjgE2Hq0PbYk8scjozn7h/UvYhfQQvRpTu
+	 2f1Abvg99uaAPNex+LK9dypEj5ytAdDlnaY5lWk/uAeXyc66ad750J74v3jKeEue2/
+	 s6Si80LvGMSW09uYB8nQDXNTnxHyn7ckuyDRhM/uPb9faph8vrQ/TLWMg4haO1ia8e
+	 WgIxJJH4X3+Hvglq4CEGC3hJoaFYGEd7At6tUCzoZpynRA5CL1NPWEdxt8ADgnF1DZ
+	 LZaV0SnL/kIGcpFLPq7EtoSoSpTMkNWv4CsBVC0d2EK/+0U0F4/dgVhVyFz1f/Iz1x
+	 vFSML5/99mxPw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vlmHv-000000072Q6-3FVG;
-	Fri, 30 Jan 2026 11:03:43 +0000
-Date: Fri, 30 Jan 2026 11:03:43 +0000
-Message-ID: <864io3bbw0.wl-maz@kernel.org>
+	id 1vlmS4-000000072k6-1cXP;
+	Fri, 30 Jan 2026 11:14:12 +0000
+Date: Fri, 30 Jan 2026 11:14:11 +0000
+Message-ID: <86343nbbek.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -71,10 +71,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Timothy Hayes <Timothy.Hayes@arm.com>,
 	"jonathan.cameron@huawei.com"
 	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v4 10/36] KVM: arm64: gic-v5: Detect implemented PPIs on boot
-In-Reply-To: <20260128175919.3828384-11-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v4 32/36] irqchip/gic-v5: Check if impl is virt capable
+In-Reply-To: <20260128175919.3828384-33-sascha.bischoff@arm.com>
 References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-	<20260128175919.3828384-11-sascha.bischoff@arm.com>
+	<20260128175919.3828384-33-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -94,7 +94,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69696-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69697-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -111,101 +111,49 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 747BEB9D30
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,huawei.com:email]
+X-Rspamd-Queue-Id: 5A2A6B9F10
 X-Rspamd-Action: no action
 
-On Wed, 28 Jan 2026 18:01:54 +0000,
+On Wed, 28 Jan 2026 18:07:33 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> As part of booting the system and initialising KVM, create and
-> populate a mask of the implemented PPIs. This mask allows future PPI
-> operations (such as save/restore or state, or syncing back into the
-> shadow state) to only consider PPIs that are actually implemented on
-> the host.
+> Now that there is support for creating a GICv5-based guest with KVM,
+> check that the hardware itself supports virtualisation, skipping the
+> setting of struct gic_kvm_info if not.
 > 
-> The set of implemented virtual PPIs matches the set of implemented
-> physical PPIs for a GICv5 host. Therefore, this mask represents all
-> PPIs that could ever by used by a GICv5-based guest on a specific
-> host.
-> 
-> Only architected PPIs are currently supported in KVM with
-> GICv5. Moreover, as KVM only supports a subset of all possible PPIS
-> (Timers, PMU, GICv5 SW_PPI) the PPI mask only includes these PPIs, if
-> present. The timers are always assumed to be present; if we have KVM
-> we have EL2, which means that we have the EL1 & EL2 Timer PPIs. If we
-> have a PMU (v3), then the PMUIRQ is present. The GICv5 SW_PPI is
-> always assumed to be present.
+> Note: If native GICv5 virt is not supported, then nor is
+> FEAT_GCIE_LEGACY, so we are able to skip altogether.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-init.c    |  4 ++++
->  arch/arm64/kvm/vgic/vgic-v5.c      | 33 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.h         |  1 +
->  include/kvm/arm_vgic.h             |  5 +++++
->  include/linux/irqchip/arm-gic-v5.h | 10 +++++++++
->  5 files changed, 53 insertions(+)
+>  drivers/irqchip/irq-gic-v5-irs.c   |  4 ++++
+>  drivers/irqchip/irq-gic-v5.c       | 10 ++++++++++
+>  include/linux/irqchip/arm-gic-v5.h |  4 ++++
+>  3 files changed, 18 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 86c149537493..653364299154 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -750,5 +750,9 @@ int kvm_vgic_hyp_init(void)
->  	}
+> diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
+> index ce2732d649a3..eebf9f219ac8 100644
+> --- a/drivers/irqchip/irq-gic-v5-irs.c
+> +++ b/drivers/irqchip/irq-gic-v5-irs.c
+> @@ -744,6 +744,10 @@ static int __init gicv5_irs_init(struct device_node *node)
+>  	 */
+>  	if (list_empty(&irs_nodes)) {
 >  
->  	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
+> +		idr = irs_readl_relaxed(irs_data, GICV5_IRS_IDR0);
+> +		gicv5_global_data.virt_capable =
+> +			!!FIELD_GET(GICV5_IRS_IDR0_VIRT, idr);
 > +
-> +	/* Always safe to call */
-> +	vgic_v5_get_implemented_ppis();
 
-What is the reason for calling this from the generic code, while it is
-v5-specific? I'd have expected this to be entirely contained in the v5
-subsystem.
-
-
-> +
->  	return 0;
->  }
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 23d0a495d855..9bd5a85ba203 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -8,6 +8,8 @@
->  
->  #include "vgic.h"
->  
-> +static struct vgic_v5_ppi_caps *ppi_caps;
-> +
->  /*
->   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
->   * Currently only supports GICv3-based VMs on a GICv5 host, and hence only
-> @@ -53,3 +55,34 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  
->  	return 0;
->  }
-> +
-> +/*
-> + * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
-> + * ones are, and generate a mask.
-> + */
-> +void vgic_v5_get_implemented_ppis(void)
-> +{
-> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
-> +		return;
-> +
-> +	/* Never freed again */
-> +	ppi_caps = kzalloc(sizeof(*ppi_caps), GFP_KERNEL);
-> +	if (!ppi_caps)
-> +		return;
-
-Maybe we can spare the call by statically allocating the PPI
-structure? Just the code calling kzalloc() costs us more than the 128
-bits required by the structure.
+I'll tidy-up this while cherry-picking it (spurious newline before the
+hunk, horrible split assignment...).
 
 Thanks,
 
