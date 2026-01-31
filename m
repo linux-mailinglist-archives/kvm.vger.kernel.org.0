@@ -1,108 +1,223 @@
-Return-Path: <kvm+bounces-69776-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69777-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id rb+pKbf0fWmBUgIAu9opvQ
-	(envelope-from <kvm+bounces-69776-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 13:25:27 +0100
+	id ABtREZX3fWm5UgIAu9opvQ
+	(envelope-from <kvm+bounces-69777-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 13:37:41 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27BA2C1C6F
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 13:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A81DC1CD6
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 13:37:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 730AE300B9D6
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 12:25:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A46DB300EFBD
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 12:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB1132720C;
-	Sat, 31 Jan 2026 12:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D258123EA8B;
+	Sat, 31 Jan 2026 12:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reEEehQ3"
 X-Original-To: kvm@vger.kernel.org
-Received: from outbound.baidu.com (mx22.baidu.com [220.181.50.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9C2C145
-	for <kvm@vger.kernel.org>; Sat, 31 Jan 2026 12:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.181.50.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108E17082F;
+	Sat, 31 Jan 2026 12:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769862318; cv=none; b=E+9mqTF6qAHImLqu53jORqfaskhJ9ilnAnuwnhrkmhTFQTTGJzPkXjRx4o7Uxm+5wQpXCWhQkDinAJO2HQPX2pGCL2XM1hydLsGFIPVpsLPsv1KppvrdSVf68vbn/xhpBsdHjPyvvGYPD0am5MNnwSRhvjBU4Mcoq6BjQInb6Fo=
+	t=1769863044; cv=none; b=Pg+JxSOFiww111EtfI1KzlNCjqrFRDMhF5dCv9cP5ye8UOs3NH38YJoCRrE4jntnirTMW9KkCAYUsqNac2NE8uxp/IJ0gTkQ7M8RRClmwQgslvnH5YImlv1R3Zh3gLSpchkWEQWdNJNyxvUGV8LeRid727TbQeN9LOjDFRhKvSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769862318; c=relaxed/simple;
-	bh=4ctMkL/gSAgW5WvV404JjvicxVQg/XOMmAPQeLMR5do=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Wei3kvO7INiKLrHa7nNIq8qqi96CqJS1BGh2wJTJJ0019Bkfg8QkFaFbs0V03IslmxI5LLxdtnpT7XaXl+eovsYaSL8ZBTh3mLOVqIZNyXzVU9pYH7BXIhXfBkSje+E8zPyMxYORR/va5Z0i1psDuu1hcnh6LUmiZaEI1nczufQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=220.181.50.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, "H . Peter
- Anvin" <hpa@zytor.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogWz8/Pz9dIFJlOiBbUEFUQ0hdIEtWTTogU1ZNOiBBZGQgX19yZWFk?=
- =?gb2312?Q?=5Fmostly_to_frequently_read_module_parameters?=
-Thread-Topic: [????] Re: [PATCH] KVM: SVM: Add __read_mostly to frequently
- read module parameters
-Thread-Index: AQHckik//SzTiR5R9UKGyqy9HU4trLVqq8KAgAGIy/A=
-Date: Sat, 31 Jan 2026 12:24:15 +0000
-Message-ID: <3f6524d3104843baad92c1741f6c061e@baidu.com>
-References: <20260130204424.1867-1-lirongqing@baidu.com>
- <aX0bT-sKOSEVHHC8@google.com>
-In-Reply-To: <aX0bT-sKOSEVHHC8@google.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1769863044; c=relaxed/simple;
+	bh=H+l9h16Lew6InNs2ZzvZSZ4Z7A2kn1exqhyCUB1RLK0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LrYiJigid+IP0/9h3eFN+HiQ2O7Jpt3m18TbU0wqiL6pMmxOwAc7B84Rwgwkl4FkO4a3L1EaPzCqpHqMCSVgrpli4p6RxvUWVqvg1YRsFUde2QNRJ9zpgvMiJpOM6LJUDBb4moZfEWV6k+Sye878wwCUpKaAEzzzoWcDUSKRVt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reEEehQ3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9274DC4CEF1;
+	Sat, 31 Jan 2026 12:37:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769863043;
+	bh=H+l9h16Lew6InNs2ZzvZSZ4Z7A2kn1exqhyCUB1RLK0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=reEEehQ3nh8RYvwtbrmLWy1plHoaLB8F6lEEKOloxSRyNL4c5k5Ewt+BSSULJJPBS
+	 wBjN4ID+3pO0inQw45Yea8cQnhV3mLA18DVovyqSGAgFeeggGf3XqQLIUJmC49LqaR
+	 +yeOgFz9mrgegKZWv8ORhlrb2mVRu5wq7Y4s6w78xZswhVo0B343GGXyKoeNNIQVy0
+	 oBhot26HilHhAiXALTogyyQOnOjRa1dua18piQ/eM4gDTReWJ6PDh0vTxnmYYHQrK7
+	 M7YrSjY/jvbvG+VYgDGxdaacyn35BeDf7RLXVWZh71jD3YXnVn5RJcieb2kNMzzM0n
+	 Pp+zZBXeSQwRA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vmAE4-00000007Hih-3fs1;
+	Sat, 31 Jan 2026 12:37:20 +0000
+Date: Sat, 31 Jan 2026 12:37:20 +0000
+Message-ID: <86y0le9cvz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: oupton@kernel.org,
+	sebott@redhat.com,
+	gshan@redhat.com,
+	yuzenghui@huawei.com,
+	rananta@google.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] KVM: selftests: Improve sea_to_user test
+In-Reply-To: <20260130192837.890688-1-jiaqiyan@google.com>
+References: <20260130192837.890688-1-jiaqiyan@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.3.12
-X-FE-Policy-ID: 52:10:53:SYSTEM
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiaqiyan@google.com, oupton@kernel.org, sebott@redhat.com, gshan@redhat.com, yuzenghui@huawei.com, rananta@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[baidu.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69776-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-69777-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Queue-Id: 27BA2C1C6F
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,filthy-habits:email]
+X-Rspamd-Queue-Id: 9A81DC1CD6
 X-Rspamd-Action: no action
 
-DQo+IE9uIEZyaSwgSmFuIDMwLCAyMDI2LCBsaXJvbmdxaW5nIHdyb3RlOg0KPiA+IEZyb206IExp
-IFJvbmdRaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gPg0KPiA+IE1hcmsgc3RhdGljIGds
-b2JhbCB2YXJpYWJsZXMgdGhhdCBhcmUgcHJpbWFyaWx5IHJlYWQtb25seSB3aXRoDQo+ID4gX19y
-ZWFkX21vc3RseSB0byBvcHRpbWl6ZSBjYWNoZSB1dGlsaXphdGlvbiBhbmQgcGVyZm9ybWFuY2Uu
-DQo+ID4NCj4gPiBUaGUgbW9kaWZpZWQgdmFyaWFibGVzIGFyZSBtb2R1bGUgcGFyYW1ldGVycyBh
-bmQgY29uZmlndXJhdGlvbiBmbGFncw0KPiA+IHRoYXQgYXJlOg0KPiA+IC0gSW5pdGlhbGl6ZWQg
-YXQgYm9vdCB0aW1lDQo+IA0KPiBQbGVhc2UgbWFrZSB0aGVzZSBfX3JvX2FmdGVyX2luaXQgd2hl
-cmUgcG9zc2libGUsIG5vdCBfX3JlYWRfbW9zdGx5LiAgRS5nLg0KPiBmb3JjZV9hdmljIGlzIGRl
-ZmluaXRlbHkgcmVhZC1vbmx5IGFmdGVyIGluaXQuDQoNCk9rLCBJIHdpbGwgc2VuZCB2Mg0KDQpU
-aGFua3MNCg0KDQpbTGksUm9uZ3FpbmddIA0K
+On Fri, 30 Jan 2026 19:28:37 +0000,
+Jiaqi Yan <jiaqiyan@google.com> wrote:
+> 
+> Several improvments to the test for KVM_EXIT_ARM_SEA:
+> 
+> - Refactor run_vm to catch GUEST_FAIL, instead of causing confusing
+>   unhandled MMIO kvm exit.
+> 
+> - Sync far_invalid to guest.
+> 
+> - Exit test with KSFT_SKIP or KSFT_FAIL when should.
+> 
+> - Add comment about VM backing memory type.
+> 
+> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> ---
+>  .../testing/selftests/kvm/arm64/sea_to_user.c | 94 +++++++++++--------
+>  1 file changed, 53 insertions(+), 41 deletions(-)
+
+Overall, this test is still pretty broken.
+
+For example, on my Altra box:
+
+maz@filthy-habits:~$ ./sea_to_user 
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0xbad
+ok 1 # SKIP EINJ table not available in firmware
+
+Well, not quite. EINJ *is* available, it is just that this test,
+contrary to *all* the other tests, requires some insanely high
+privileges. But the test is making stupid assumption.
+
+But that's not all:
+
+maz@filthy-habits:~$ sudo ./sea_to_user 
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x80041234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x80041234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+sh: 1: echo: echo: I/O error
+Bail out! Failed to write EINJ entry: Success (0)
+# Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Failed? Or Success? Who knows...
+
+But frankly, the whole "embedded shell script" is disgusting. What is
+wrong with driving the injection from the test itself, rather than
+this access()+popen()? popen() itself is a liability (see the man page
+for system()), and should never be used for this sort of things.
+
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+> index 573dd790aeb8e..4a3511fa1f940 100644
+> --- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
+> +++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+> @@ -12,6 +12,11 @@
+>   * including the notrigger feature. Otherwise the test will be skipped.
+>   * The under-test platform's APEI should be unable to claim SEA. Otherwise
+>   * the test will also be skipped.
+> + *
+> + * The VM backing memory is tied to HugeTLB 1G hugepage so far. Make sure
+> + * there are more than 4 1G hugepage on the system. They can be allocated
+
+Why *more than*? Isn't that *at least* instead?
+
+> + * at runtime by:
+> + *   echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+>   */
+
+Why can't you provide an adequate diagnostic instead of this stuff:
+
+maz@filthy-habits:~$ ./sea_to_user 
+Random seed: 0x6b8b4567
+==== Test Assertion Failure ====
+  include/kvm_syscalls.h:58: mem != MAP_FAILED
+  pid=887 tid=887 errno=12 - Cannot allocate memory
+     1	0x0000000000405b4f: __kvm_mmap at kvm_syscalls.h:58 (discriminator 3)
+     2	 (inlined by) kvm_mmap at kvm_syscalls.h:65 (discriminator 3)
+     3	 (inlined by) vm_mem_add at kvm_util.c:1036 (discriminator 3)
+     4	0x0000000000402373: vm_create_with_sea_handler at sea_to_user.c:290
+     5	 (inlined by) main at sea_to_user.c:336
+     6	0x0000ffffb0dc229b: ?? ??:0
+     7	0x0000ffffb0dc237b: ?? ??:0
+     8	0x00000000004027ef: _start at ??:?
+  mmap() failed, rc: -1 errno: 12 (Cannot allocate memory)
+
+What is preventing you from not requiring huge pages? And not
+requiring 4kB as the base page size?
+
+Given how broken this is, I'm likely to disable this test until you
+fix it for real.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
