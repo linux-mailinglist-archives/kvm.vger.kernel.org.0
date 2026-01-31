@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-69770-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69772-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CA4tK5eUfWnQSgIAu9opvQ
-	(envelope-from <kvm+bounces-69770-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:35:19 +0100
+	id ILpjK06VfWnQSgIAu9opvQ
+	(envelope-from <kvm+bounces-69772-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:38:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C1D8C0D1A
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:35:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 707B6C0DF4
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:38:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7030A300D0C1
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 05:35:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 51C1F306DD47
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 05:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DDE341650;
-	Sat, 31 Jan 2026 05:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801A234F48B;
+	Sat, 31 Jan 2026 05:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJdD3UUT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdACCORf"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC001327C0F;
-	Sat, 31 Jan 2026 05:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFF733554F;
+	Sat, 31 Jan 2026 05:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769837694; cv=none; b=awoeij0GiiBVBJ7/fM6lhLKhEyzvXwxn+qXwwKS15qBvNHc0e/70qqByolACzSUg3r9CUaTJlu6MdyNwIFeF0rxqEsPEYxjfvmv2tw/YZmyCkbHEWHpshY5maDKHHRUzKETmVwrVO2pfJTpdL6+M6M4mTdwf01EtOghJw5IK2ZQ=
+	t=1769837702; cv=none; b=cphx0dBjsQRVy/DPfSXtCGD7V+MBsFKkcylzzdxkL5m0Hjr5nE79TYlhdqikUQw4TKC/aK7w11avRnke1H9DIdWqRC4rCo4Ck/0qGRvqb3w6x80iaa6wF6R6tenJfUxc48v3dNQfKJlqylC2TyOL0qiwfY3d49lLDP/d20vbJCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769837694; c=relaxed/simple;
-	bh=lXD3Rfmrq9ID2Phy2qOuoiFRYX7CFuqYnX/mCIn2d/Y=;
+	s=arc-20240116; t=1769837702; c=relaxed/simple;
+	bh=xc+xbxZ3oNBD2JuFMoUcoiVyL/l5Ver5G6iPoq8UFrM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UkQCSfBt2UR+51V5yniYsuf4dGTcXoyeQvHmPtNffzOzAkOppX+O7ES+Qf9o0kk9JunRoTBFBuybRqQWYPGLfB9Syn1QzWT75BNiDzB72R3C7+t6hq+7bUX2PIw8cZYe+XNZheLuh9bUxoVdzCk6ESOvz+M1USw8ef70JWFtBlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJdD3UUT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B07C1C19422;
-	Sat, 31 Jan 2026 05:34:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CJ0LZ8jUaqPcFw1lK6vjFjAz7HBGMH6niQqnVx46wp5y5Et/gdHif056H3uLZsbnDqkzngZTCNbnpqPzLvsXo/BsRER6EXHZnH4wmKKSmSw8b6VM+XVkeFJGdxq99jZe8TgK79QdjYmoKpvKrgmHF3L696p5dhw68EHGUF6ABKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdACCORf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C052C19422;
+	Sat, 31 Jan 2026 05:35:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769837694;
-	bh=lXD3Rfmrq9ID2Phy2qOuoiFRYX7CFuqYnX/mCIn2d/Y=;
+	s=k20201202; t=1769837702;
+	bh=xc+xbxZ3oNBD2JuFMoUcoiVyL/l5Ver5G6iPoq8UFrM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uJdD3UUTvFVZ1bRRWcfac7E2Miig22lWJ0Vdj0fqat20b+afqAxwxDcGADCeOe6r+
-	 dSULAUUKTv9DRSSwjGE8Jh1hvQaT83fJdQ8X4+t40pSbEGaU2gXVPQMvEE79tNYFs6
-	 0SR8//5HGdjJYUVS8hHjCSwBt9DycPFUSm6jcidAT1fADs4ETvGOW1H5bOLzMr/F95
-	 zCrJ7XrYRxny/BEYqw205a2U01qNka3wt0hY2vohqW/17+cstkTE5GgWPnV4+LlrMJ
-	 v2xIGQlWMfA/+QHXJv153fzHFZyXdOAbArLuKXEEJzgQ+vpGLpGBxfemJXLQ5LxmN9
-	 yeUh1saKO3Y/w==
+	b=WdACCORfHa5sZ8DizbHHRa6fxGpeGe7kg01QmfISUAKyvEL5a2BmGj6BqfFduDGi8
+	 mBoFbousmRtM6iLxbxdaKS3dLj/duVQvhfnARWn/1+HADh5swJ8oOJPrJhM5e5eOsp
+	 gXwcaHztnoVguimRptoOEvYr3QeJcBW8idunPKQcxe8Wh4jkdLAhEyKM2QqNglGany
+	 +4S+D27BL8rT+kdVl/Zho4eEIXVniLtJmqSmnV1wrNsYbiSrRbvQoJrfAySMH2WLw5
+	 Ee2zveWlmXrOAaby2fHDu02v71EJPL4/fuzV92SvdMrObRQ+K+AfOH8UpweHRfK9Ty
+	 wqaOkxlLS/98A==
 From: Leon Romanovsky <leon@kernel.org>
 To: Sumit Semwal <sumit.semwal@linaro.org>,
 	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
@@ -79,10 +79,11 @@ Cc: linux-media@vger.kernel.org,
 	intel-xe@lists.freedesktop.org,
 	linux-rdma@vger.kernel.org,
 	iommu@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [PATCH v7 7/8] vfio: Permit VFIO to work with pinned importers
-Date: Sat, 31 Jan 2026 07:34:17 +0200
-Message-ID: <20260131-dmabuf-revoke-v7-7-463d956bd527@nvidia.com>
+	kvm@vger.kernel.org,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: [PATCH v7 8/8] iommufd: Add dma_buf_pin()
+Date: Sat, 31 Jan 2026 07:34:18 +0200
+Message-ID: <20260131-dmabuf-revoke-v7-8-463d956bd527@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
 References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
@@ -100,7 +101,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -108,8 +109,8 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69770-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[35];
+	TAGGED_FROM(0.00)[bounces-69772-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[36];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -120,74 +121,74 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:email,intel.com:email,shazbot.org:email]
-X-Rspamd-Queue-Id: 5C1D8C0D1A
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email]
+X-Rspamd-Queue-Id: 707B6C0DF4
 X-Rspamd-Action: no action
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Till now VFIO has rejected pinned importers, largely to avoid being used
-with the RDMA pinned importer that cannot handle a move_notify() to revoke
-access.
+IOMMUFD relies on a private protocol with VFIO, and this always operated
+in pinned mode.
 
-Using dma_buf_attach_revocable() it can tell the difference between pinned
-importers that support the flow described in dma_buf_invalidate_mappings()
-and those that don't.
+Now that VFIO can support pinned importers update IOMMUFD to invoke the
+normal dma-buf flow to request pin.
 
-Thus permit compatible pinned importers.
+This isn't enough to allow IOMMUFD to work with other exporters, it still
+needs a way to get the physical address list which is another series.
 
-This is one of two items IOMMUFD requires to remove its private interface
-to VFIO's dma-buf.
+IOMMUFD supports the defined revoke semantics. It immediately stops and
+fences access to the memory inside it's invalidate_mappings() callback,
+and it currently doesn't use scatterlists so doesn't call map/unmap at
+all.
+
+It is expected that a future revision can synchronously call unmap from
+the move_notify callback as well.
 
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Alex Williamson <alex@shazbot.org>
-Reviewed-by: Christian König <christian.koenig@amd.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Acked-by: Christian König <christian.koenig@amd.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_dmabuf.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+ drivers/iommu/iommufd/pages.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-index 78d47e260f34..a5fb80e068ee 100644
---- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-+++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-@@ -22,16 +22,6 @@ struct vfio_pci_dma_buf {
- 	u8 revoked : 1;
- };
+diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
+index 76f900fa1687..a5eb2bc4ef48 100644
+--- a/drivers/iommu/iommufd/pages.c
++++ b/drivers/iommu/iommufd/pages.c
+@@ -1501,16 +1501,22 @@ static int iopt_map_dmabuf(struct iommufd_ctx *ictx, struct iopt_pages *pages,
+ 		mutex_unlock(&pages->mutex);
+ 	}
  
--static int vfio_pci_dma_buf_pin(struct dma_buf_attachment *attachment)
--{
--	return -EOPNOTSUPP;
--}
--
--static void vfio_pci_dma_buf_unpin(struct dma_buf_attachment *attachment)
--{
--	/* Do nothing */
--}
--
- static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
- 				   struct dma_buf_attachment *attachment)
- {
-@@ -43,6 +33,9 @@ static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
- 	if (priv->revoked)
- 		return -ENODEV;
+-	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
++	rc = dma_buf_pin(attach);
+ 	if (rc)
+ 		goto err_detach;
  
-+	if (!dma_buf_attach_revocable(attachment))
-+		return -EOPNOTSUPP;
++	rc = sym_vfio_pci_dma_buf_iommufd_map(attach, &pages->dmabuf.phys);
++	if (rc)
++		goto err_unpin;
 +
+ 	dma_resv_unlock(dmabuf->resv);
+ 
+ 	/* On success iopt_release_pages() will detach and put the dmabuf. */
+ 	pages->dmabuf.attach = attach;
  	return 0;
- }
  
-@@ -107,8 +100,6 @@ static void vfio_pci_dma_buf_release(struct dma_buf *dmabuf)
- }
++err_unpin:
++	dma_buf_unpin(attach);
+ err_detach:
+ 	dma_resv_unlock(dmabuf->resv);
+ 	dma_buf_detach(dmabuf, attach);
+@@ -1656,6 +1662,7 @@ void iopt_release_pages(struct kref *kref)
+ 	if (iopt_is_dmabuf(pages) && pages->dmabuf.attach) {
+ 		struct dma_buf *dmabuf = pages->dmabuf.attach->dmabuf;
  
- static const struct dma_buf_ops vfio_pci_dmabuf_ops = {
--	.pin = vfio_pci_dma_buf_pin,
--	.unpin = vfio_pci_dma_buf_unpin,
- 	.attach = vfio_pci_dma_buf_attach,
- 	.map_dma_buf = vfio_pci_dma_buf_map,
- 	.unmap_dma_buf = vfio_pci_dma_buf_unmap,
++		dma_buf_unpin(pages->dmabuf.attach);
+ 		dma_buf_detach(dmabuf, pages->dmabuf.attach);
+ 		dma_buf_put(dmabuf);
+ 		WARN_ON(!list_empty(&pages->dmabuf.tracker));
 
 -- 
 2.52.0
