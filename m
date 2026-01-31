@@ -1,209 +1,113 @@
-Return-Path: <kvm+bounces-69759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69760-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APmGAppPfWnERQIAu9opvQ
-	(envelope-from <kvm+bounces-69759-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 01:40:58 +0100
+	id cEAMKh1ZfWlDRgIAu9opvQ
+	(envelope-from <kvm+bounces-69760-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 02:21:33 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFD6BFAAD
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 01:40:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02AB3BFF3D
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 02:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66B83302A05F
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 00:40:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66AB2303DA8B
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 01:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDECB302CD5;
-	Sat, 31 Jan 2026 00:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBFDE1CAA65;
+	Sat, 31 Jan 2026 01:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ecphtajf"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E4024A069;
-	Sat, 31 Jan 2026 00:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01253322C98;
+	Sat, 31 Jan 2026 01:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769820041; cv=none; b=Jxng2S5aF1QsrkvN2wIh7hQ7hS5w9w13fYhoiNnppHARau2/6tqG5WUFnX5WiKJuTxaTOy2n1aoOCyFlRSSLnzXbMXxt8Kty92pp7jlT+PhjHmfCPhhomHo1YM1tCsfSZtj44kUHb5uAhenGiQM7NZqG9lg8aovDzWLuiO/jjQs=
+	t=1769822458; cv=none; b=H3V+iHkt0d/DcsgCkClXxT/R6vwlxZozQe2ETyrfkZqtBY1lKkVEKLITqZah2xYjfDAHUqgM8SgSGMWFD//X2x4O1driOeBru1QK+tjEgrPaQ+V9ArFDHHIse5rsniM572LkixtWCSPvJmi6YyugFi0c57EuIFmEzqf7OpEDmxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769820041; c=relaxed/simple;
-	bh=1phzBI+AbUXq7QJ8L6JLEdqUzch3rcX/M2LN6RU+MQk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Atj+6rNzqN/7J7O62E97W7o1S0i2rpqXZrBoxWFu8fUzTzh2A6BsIOpw4GMv3Ub/TQLXGYCn+cB+MPkveZ2LUo87m+dBzOBuAh9Dt9NhwTSM8DenPy2SEAkIJabolukLeYM+FpfaNcjd9F9CdxHtzO7m/3cEgfnSgqlMs0KVBG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from fric.. (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowAA3zRB1T31p+GgaBw--.52843S2;
-	Sat, 31 Jan 2026 08:40:22 +0800 (CST)
-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-To: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Andrew Jones <ajones@ventanamicro.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <pjw@kernel.org>,
-	Atish Patra <atish.patra@linux.dev>,
-	Anup Patel <anup@brainfault.org>,
-	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
-	Jiakai Xu <jiakaiPeanut@gmail.com>
-Subject: [PATCH v4] RISC-V: KVM: Validate SBI STA shmem alignment in kvm_sbi_ext_sta_set_reg
-Date: Sat, 31 Jan 2026 00:40:19 +0000
-Message-Id: <20260131004019.1486274-1-xujiakai2025@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1769822458; c=relaxed/simple;
+	bh=t8iEZsGEWhKp/4bVGBswpKo14OCp07OqGmPT61qaF4w=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=UZtGUdJTW7n4T0FSgxIhQrzMLG5Ckczvp7be1k/Noyel8EOPiwHZ/c2L3q1f0oBCcilT1MScdiPIpokgwWfnevvXXd3lbtSFsTzHw8OiNwrTQIk9IyzHyWywe7z13H4JKOosmkX2K1pn69SUHbvNbYxNfhIyjLpZXQ7atIzcytc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ecphtajf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC5F2C116C6;
+	Sat, 31 Jan 2026 01:20:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769822457;
+	bh=t8iEZsGEWhKp/4bVGBswpKo14OCp07OqGmPT61qaF4w=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=Ecphtajf7bfg4VpPEImGqGQUnpJC93QFbPISzVxL4Q40dig/NQpmPx+PBJE/SBRn/
+	 RIoFrgXE/LtcmWQpIMFKMBaPY4sd7pPZS9ORcprziRs9mpy/oTa9/CsgUFsFACVRg6
+	 hVAsNuZqN3CGBGnr8mzfgKsM7kX2wno0i0V8xq98vaD5fauQ2W1ksYy2jDHhuJNmGk
+	 cR2WuJN2Z7H0qIAL/kYp50MgJUNQpgilL6Tq7AaqdY2bepHqjlNEHjkl+fKMmLrgho
+	 i0TCyfrnkY0IK6cXUKrx4WB/PeqXW+tP+WWfaImmOsETI6SOsexZgbgij6ouUQTABH
+	 mc0vWYN70/W3g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 2ED10380CFFB;
+	Sat, 31 Jan 2026 01:20:51 +0000 (UTC)
+Subject: Re: [GIT PULL] Please pull IOMMUFD subsystem changes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260130234158.GA3424021@nvidia.com>
+References: <20260130234158.GA3424021@nvidia.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260130234158.GA3424021@nvidia.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
+X-PR-Tracked-Commit-Id: 2724138b2f7f6299812b3404e23b124304834759
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ad9a728a3388dc5f66eab6b7135e0154249e9403
+Message-Id: <176982244995.3954333.3767377285623872996.pr-tracker-bot@kernel.org>
+Date: Sat, 31 Jan 2026 01:20:49 +0000
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, iommu@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAA3zRB1T31p+GgaBw--.52843S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF4xXFyfKw4fZrW5Cry7trb_yoWrJryrpF
-	4Ikw15ArWxtFZ7A39rZr4vgr1j93ykKr1UtF9xu34rZF4ktFyYyrna93y7ZFy5JFykZFyS
-	yr10vF1Duw45taUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
-	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
-	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOmhFUUUUU
-X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiDAYECWl8yMbIFwAAsD
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69759-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[ventanamicro.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,kernel.org,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69760-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9AFD6BFAAD
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 02AB3BFF3D
 X-Rspamd-Action: no action
 
-The RISC-V SBI Steal-Time Accounting (STA) extension requires the shared
-memory physical address to be 64-byte aligned, and the shared memory size
-to be at least 64 bytes.
+The pull request you sent on Fri, 30 Jan 2026 19:41:58 -0400:
 
-KVM exposes the SBI STA shared memory configuration to userspace via
-KVM_SET_ONE_REG. However, the current implementation of
-kvm_sbi_ext_sta_set_reg() does not validate the alignment of the configured
-shared memory address. As a result, userspace can install a misaligned
-shared memory address that violates the SBI specification.
+> git://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git tags/for-linus-iommufd
 
-Such an invalid configuration may later reach runtime code paths that
-assume a valid and properly aligned shared memory region. In particular,
-KVM_RUN can trigger the following WARN_ON in
-kvm_riscv_vcpu_record_steal_time():
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ad9a728a3388dc5f66eab6b7135e0154249e9403
 
-  WARNING: arch/riscv/kvm/vcpu_sbi_sta.c:49 at
-  kvm_riscv_vcpu_record_steal_time
+Thank you!
 
-WARN_ON paths are not expected to be reachable during normal runtime
-execution, and may result in a kernel panic when panic_on_warn is enabled.
-
-Fix this by validating the shared memory alignment at the
-KVM_SET_ONE_REG boundary and rejecting misaligned configurations with
--EINVAL. The validation is performed on a temporary computed address and
-only committed to vcpu->arch.sta.shmem once it is known to be valid, 
-similar to the existing logic in kvm_sbi_sta_steal_time_set_shmem() and
-kvm_sbi_ext_sta_handler().
-
-With this change, invalid userspace state is rejected early and cannot
-reach runtime code paths that rely on the SBI specification invariants.
-
-A reproducer triggering the WARN_ON and the complete kernel log are
-available at: https://github.com/j1akai/temp/tree/main/20260124
-
-Fixes: f61ce890b1f074 ("RISC-V: KVM: Add support for SBI STA registers")
-Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
----
-V3 -> V4: Declared new_shmem at the top of kvm_sbi_ext_sta_set_reg().
-          Initialized new_shmem to 0 instead of vcpu->arch.sta.shmem.
-		  Added blank lines per review feedback.
-V2 -> V3: Added parentheses to function name in subject.
-V1 -> V2: Added Fixes tag.
-
----
- arch/riscv/kvm/vcpu_sbi_sta.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.c
-index afa0545c3bcfc..bb13aa8eab7ee 100644
---- a/arch/riscv/kvm/vcpu_sbi_sta.c
-+++ b/arch/riscv/kvm/vcpu_sbi_sta.c
-@@ -181,6 +181,7 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 				   unsigned long reg_size, const void *reg_val)
- {
- 	unsigned long value;
-+	gpa_t new_shmem = 0;
- 
- 	if (reg_size != sizeof(unsigned long))
- 		return -EINVAL;
-@@ -191,18 +192,18 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 		if (IS_ENABLED(CONFIG_32BIT)) {
- 			gpa_t hi = upper_32_bits(vcpu->arch.sta.shmem);
- 
--			vcpu->arch.sta.shmem = value;
--			vcpu->arch.sta.shmem |= hi << 32;
-+			new_shmem = value;
-+			new_shmem |= hi << 32;
- 		} else {
--			vcpu->arch.sta.shmem = value;
-+			new_shmem = value;
- 		}
- 		break;
- 	case KVM_REG_RISCV_SBI_STA_REG(shmem_hi):
- 		if (IS_ENABLED(CONFIG_32BIT)) {
- 			gpa_t lo = lower_32_bits(vcpu->arch.sta.shmem);
- 
--			vcpu->arch.sta.shmem = ((gpa_t)value << 32);
--			vcpu->arch.sta.shmem |= lo;
-+			new_shmem = ((gpa_t)value << 32);
-+			new_shmem |= lo;
- 		} else if (value != 0) {
- 			return -EINVAL;
- 		}
-@@ -211,6 +212,11 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 		return -ENOENT;
- 	}
- 
-+	if (new_shmem && !IS_ALIGNED(new_shmem, 64))
-+		return -EINVAL;
-+
-+	vcpu->arch.sta.shmem = new_shmem;
-+
- 	return 0;
- }
- 
 -- 
-2.34.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
