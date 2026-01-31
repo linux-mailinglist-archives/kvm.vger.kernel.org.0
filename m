@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-69771-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69769-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OMWVAyqVfWnQSgIAu9opvQ
-	(envelope-from <kvm+bounces-69771-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:37:46 +0100
+	id kNMuGNaUfWnQSgIAu9opvQ
+	(envelope-from <kvm+bounces-69769-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:36:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878D8C0DCF
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:37:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C08C0D84
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 06:36:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 09BFA3060F8A
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 05:35:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2A69C304501D
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 05:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31F134A76B;
-	Sat, 31 Jan 2026 05:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDF8340274;
+	Sat, 31 Jan 2026 05:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fU6vI045"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BF0tdCFE"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B409133C53A;
-	Sat, 31 Jan 2026 05:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6758632B;
+	Sat, 31 Jan 2026 05:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769837698; cv=none; b=JDB3ER5pg+pTHbSEsNBhkn8RLaoz4KsFbdd7S7k/ukYziPkJimYLJ9qhMBGmxWWgJi+g34qvIsvhFnPefeSw4XpOZ8dH6IC0KhCL1+798v8OImFKGkqEHy660+MZ4qe7/6XFPSyC46r/zOqtUXdPrFtgxsHq3NY/AvasFg1D2H8=
+	t=1769837691; cv=none; b=JNj9MnYCcbeX1bau3XSNQh1gIxE4HQ+6snNAOVCT0/EzJPWnT0wxCQL17A64PPnLg4/ZD16tSwMGFGaPOuP96bxcbk1P1GkNFnK4U2mHa2fUtQX99xZQR7U7NPiPf+ZF+k2XhHj2desTlBSqgCsb/qW+oeWYB1uQJyLulXbGHxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769837698; c=relaxed/simple;
-	bh=jrUktIM7vM/80ddCZ+2MusPve+WTOO+VsuJlV1nB6jM=;
+	s=arc-20240116; t=1769837691; c=relaxed/simple;
+	bh=3D3OvmHdl7CtonK+GTGLGOQGYsGv5xRF/fJKjHtWrds=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zs5BV1wTUvrYBsJMhvUYoa0F5kIoyqR77L5QSAO8lYzMZwfbqhYdjrtOi4p9R+P6yxDdFB1eZ9Qk3Hz9J5bHaTUEdDCxqTPygMPCpGvJXbPA1vETRqG2aIV45wSCIoNIX20WgwB+E4BlrWqFIEAse5/XEJORIIHzTQeVPE+6TpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fU6vI045; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F25E8C4CEF1;
-	Sat, 31 Jan 2026 05:34:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=On0WzuLf2NUTb8rX1ImYqvMH1wwfPYod5XzUCaPsdtAYcsIph0MgAHzc3BEWbbFoCb512YpbSi10lepnLBZwQjxVBEXA63SvxCT5zycaeNyfjCMbg6hOfjM8VVYjSPxzatThBx42+80EWZS79/wCy+bEQisIQGLvCV4EJifLWXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BF0tdCFE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CEB5C4CEF1;
+	Sat, 31 Jan 2026 05:34:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769837698;
-	bh=jrUktIM7vM/80ddCZ+2MusPve+WTOO+VsuJlV1nB6jM=;
+	s=k20201202; t=1769837690;
+	bh=3D3OvmHdl7CtonK+GTGLGOQGYsGv5xRF/fJKjHtWrds=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fU6vI045uUAC9mnBucCBemgKFiD+NnxDp0cJOxdGHD32TmyIZ5kB+9rI5bYv4/rFf
-	 cCjfGqvinFYG/xriaSo/bGdBXjqV9W4V6Im4z1CGqov5oSaIIoxrHZTobNLI3bE2BY
-	 AfJLPF7d7DcKY1sFSgyIGqp+5mddo1xGKodqkSghslJKg0xtGa5W+vGfvbn2xY08f3
-	 mVwuo7HrEQYSeHuA6SaCki2JSRq+yzkWnbMNpITme7G2OYpad2zHnBOrA7ZE5ZLs8+
-	 KAhc7dFTKFnYMAybg/kx6+tgPLkCbmtat9erFzc508XBT6wr5M+VTZCkK+OxDqy9xj
-	 K+78VoGo1urcg==
+	b=BF0tdCFE4Ogubos9I38VfcVq+hY4Vax+5vxviEYob5Hri9lCp9r9CBO8JX0ZGobQE
+	 63bwT4oItwwCY6UfPN8IEt7gwO4IWbeux0QeqQpXUJrwavRvSK7axD8cV5Tsa/CHHX
+	 yJ6wxI8mnbqshjmHCN0FbNPmRmFbY651emPOZJz+e4DHnDEgVMFOg02KfyhloSXy7u
+	 UYGeIp1zul1OMlSdg6ZuvfoUWb66UwpdRvgt3An0KOjCjZGMk3Sae50iyMaFQ+qRfY
+	 6C1c/ehRJueilGHCjZsZNV/vY32PM9cr8fC0qT4P/2pyJC+CmYIY/62SsMLfsKsmg9
+	 D0kSh5i7jvZuA==
 From: Leon Romanovsky <leon@kernel.org>
 To: Sumit Semwal <sumit.semwal@linaro.org>,
 	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
@@ -80,9 +80,9 @@ Cc: linux-media@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	iommu@lists.linux.dev,
 	kvm@vger.kernel.org
-Subject: [PATCH v7 5/8] dma-buf: Make .invalidate_mapping() truly optional
-Date: Sat, 31 Jan 2026 07:34:15 +0200
-Message-ID: <20260131-dmabuf-revoke-v7-5-463d956bd527@nvidia.com>
+Subject: [PATCH v7 6/8] dma-buf: Add dma_buf_attach_revocable()
+Date: Sat, 31 Jan 2026 07:34:16 +0200
+Message-ID: <20260131-dmabuf-revoke-v7-6-463d956bd527@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
 References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -108,7 +108,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69771-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69769-lists,kvm=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -120,86 +120,152 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email]
-X-Rspamd-Queue-Id: 878D8C0DCF
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 14C08C0D84
 X-Rspamd-Action: no action
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-The .invalidate_mapping() callback is documented as optional, yet it
-effectively became mandatory whenever importer_ops were provided. This
-led to cases where RDMA non-ODP code had to supply an empty stub.
+Some exporters need a flow to synchronously revoke access to the DMA-buf
+by importers. Once revoke is completed the importer is not permitted to
+touch the memory otherwise they may get IOMMU faults, AERs, or worse.
 
-Relax the checks in the dma-buf core so the callback can be omitted,
-allowing RDMA code to drop the unnecessary function.
+DMA-buf today defines a revoke flow, for both pinned and dynamic
+importers, which is broadly:
 
-Removing the stub allows the next patch to tell that RDMA does not support
-.invalidate_mapping() by checking for a NULL op.
+	dma_resv_lock(dmabuf->resv, NULL);
+	// Prevent new mappings from being established
+	priv->revoked = true;
+
+	// Tell all importers to eventually unmap
+	dma_buf_invalidate_mappings(dmabuf);
+
+	// Wait for any inprogress fences on the old mapping
+	dma_resv_wait_timeout(dmabuf->resv,
+			      DMA_RESV_USAGE_BOOKKEEP, false,
+			      MAX_SCHEDULE_TIMEOUT);
+	dma_resv_unlock(dmabuf->resv, NULL);
+
+	// Wait for all importers to complete unmap
+	wait_for_completion(&priv->unmapped_comp);
+
+This works well, and an importer that continues to access the DMA-buf
+after unmapping it is very buggy.
+
+However, the final wait for unmap is effectively unbounded. Several
+importers do not support invalidate_mappings() at all and won't unmap
+until userspace triggers it.
+
+This unbounded wait is not suitable for exporters like VFIO and RDMA tha
+need to issue revoke as part of their normal operations.
+
+Add dma_buf_attach_revocable() to allow exporters to determine the
+difference between importers that can complete the above in bounded time,
+and those that can't. It can be called inside the exporter's attach op to
+reject incompatible importers.
+
+Document these details about how dma_buf_invalidate_mappings() works and
+what the required sequence is to achieve a full revocation.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/dma-buf/dma-buf.c             |  6 ++----
- drivers/infiniband/core/umem_dmabuf.c | 13 -------------
- 2 files changed, 2 insertions(+), 17 deletions(-)
+ drivers/dma-buf/dma-buf.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++-
+ include/linux/dma-buf.h   |  9 +++------
+ 2 files changed, 50 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-index cd68c1c0bfd7..1629312d364a 100644
+index 1629312d364a..f0e05227bda8 100644
 --- a/drivers/dma-buf/dma-buf.c
 +++ b/drivers/dma-buf/dma-buf.c
-@@ -947,9 +947,6 @@ dma_buf_dynamic_attach(struct dma_buf *dmabuf, struct device *dev,
- 	if (WARN_ON(!dmabuf || !dev))
- 		return ERR_PTR(-EINVAL);
- 
--	if (WARN_ON(importer_ops && !importer_ops->invalidate_mappings))
--		return ERR_PTR(-EINVAL);
--
- 	attach = kzalloc(sizeof(*attach), GFP_KERNEL);
- 	if (!attach)
- 		return ERR_PTR(-ENOMEM);
-@@ -1260,7 +1257,8 @@ void dma_buf_invalidate_mappings(struct dma_buf *dmabuf)
- 	dma_resv_assert_held(dmabuf->resv);
- 
- 	list_for_each_entry(attach, &dmabuf->attachments, node)
--		if (attach->importer_ops)
-+		if (attach->importer_ops &&
-+		    attach->importer_ops->invalidate_mappings)
- 			attach->importer_ops->invalidate_mappings(attach);
+@@ -1242,13 +1242,59 @@ void dma_buf_unmap_attachment_unlocked(struct dma_buf_attachment *attach,
  }
- EXPORT_SYMBOL_NS_GPL(dma_buf_invalidate_mappings, "DMA_BUF");
-diff --git a/drivers/infiniband/core/umem_dmabuf.c b/drivers/infiniband/core/umem_dmabuf.c
-index d77a739cfe7a..256e34c15e6b 100644
---- a/drivers/infiniband/core/umem_dmabuf.c
-+++ b/drivers/infiniband/core/umem_dmabuf.c
-@@ -129,9 +129,6 @@ ib_umem_dmabuf_get_with_dma_device(struct ib_device *device,
- 	if (check_add_overflow(offset, (unsigned long)size, &end))
- 		return ret;
+ EXPORT_SYMBOL_NS_GPL(dma_buf_unmap_attachment_unlocked, "DMA_BUF");
  
--	if (unlikely(!ops || !ops->invalidate_mappings))
--		return ret;
--
- 	dmabuf = dma_buf_get(fd);
- 	if (IS_ERR(dmabuf))
- 		return ERR_CAST(dmabuf);
-@@ -184,18 +181,8 @@ struct ib_umem_dmabuf *ib_umem_dmabuf_get(struct ib_device *device,
- }
- EXPORT_SYMBOL(ib_umem_dmabuf_get);
- 
--static void
--ib_umem_dmabuf_unsupported_move_notify(struct dma_buf_attachment *attach)
--{
--	struct ib_umem_dmabuf *umem_dmabuf = attach->importer_priv;
--
--	ibdev_warn_ratelimited(umem_dmabuf->umem.ibdev,
--			       "Invalidate callback should not be called when memory is pinned\n");
--}
--
- static struct dma_buf_attach_ops ib_umem_dmabuf_attach_pinned_ops = {
- 	.allow_peer2peer = true,
--	.invalidate_mappings = ib_umem_dmabuf_unsupported_move_notify,
++/**
++ * dma_buf_attach_revocable - check if a DMA-buf importer implements
++ * revoke semantics.
++ * @attach: the DMA-buf attachment to check
++ *
++ * Returns true if the DMA-buf importer can support the revoke sequence
++ * explained in dma_buf_invalidate_mappings() within bounded time. Meaning the
++ * importer implements invalidate_mappings() and ensures that unmap is called as
++ * a result.
++ */
++bool dma_buf_attach_revocable(struct dma_buf_attachment *attach)
++{
++	return attach->importer_ops &&
++	       attach->importer_ops->invalidate_mappings;
++}
++EXPORT_SYMBOL_NS_GPL(dma_buf_attach_revocable, "DMA_BUF");
++
+ /**
+  * dma_buf_invalidate_mappings - notify attachments that DMA-buf is moving
+  *
+  * @dmabuf:	[in]	buffer which is moving
+  *
+  * Informs all attachments that they need to destroy and recreate all their
+- * mappings.
++ * mappings. If the attachment is dynamic then the dynamic importer is expected
++ * to invalidate any caches it has of the mapping result and perform a new
++ * mapping request before allowing HW to do any further DMA.
++ *
++ * If the attachment is pinned then this informs the pinned importer that the
++ * underlying mapping is no longer available. Pinned importers may take this is
++ * as a permanent revocation and never establish new mappings so exporters
++ * should not trigger it lightly.
++ *
++ * Upon return importers may continue to access the DMA-buf memory. The caller
++ * must do two additional waits to ensure that the memory is no longer being
++ * accessed:
++ *  1) Until dma_resv_wait_timeout() retires fences the importer is allowed to
++ *     fully access the memory.
++ *  2) Until the importer calls unmap it is allowed to speculatively
++ *     read-and-discard the memory. It must not write to the memory.
++ *
++ * A caller wishing to use dma_buf_invalidate_mappings() to fully stop access to
++ * the DMA-buf must wait for both. Dynamic callers can often use just the first.
++ *
++ * All importers providing a invalidate_mappings() op must ensure that unmap is
++ * called within bounded time after the op.
++ *
++ * Pinned importers that do not support a invalidate_mappings() op will
++ * eventually perform unmap when they are done with the buffer, which may be an
++ * ubounded time from calling this function. dma_buf_attach_revocable() can be
++ * used to prevent such importers from attaching.
++ *
++ * Importers are free to request a new mapping in parallel as this function
++ * returns.
+  */
+ void dma_buf_invalidate_mappings(struct dma_buf *dmabuf)
+ {
+diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+index d5c3ce2b3aa4..84a7ec8f5359 100644
+--- a/include/linux/dma-buf.h
++++ b/include/linux/dma-buf.h
+@@ -468,12 +468,8 @@ struct dma_buf_attach_ops {
+ 	 * called with this lock held as well. This makes sure that no mapping
+ 	 * is created concurrently with an ongoing move operation.
+ 	 *
+-	 * Mappings stay valid and are not directly affected by this callback.
+-	 * But the DMA-buf can now be in a different physical location, so all
+-	 * mappings should be destroyed and re-created as soon as possible.
+-	 *
+-	 * New mappings can be created after this callback returns, and will
+-	 * point to the new location of the DMA-buf.
++	 * See the kdoc for dma_buf_invalidate_mappings() for details on the
++	 * required behavior.
+ 	 */
+ 	void (*invalidate_mappings)(struct dma_buf_attachment *attach);
  };
- 
- struct ib_umem_dmabuf *
+@@ -601,6 +597,7 @@ struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
+ void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
+ 				enum dma_data_direction);
+ void dma_buf_invalidate_mappings(struct dma_buf *dma_buf);
++bool dma_buf_attach_revocable(struct dma_buf_attachment *attach);
+ int dma_buf_begin_cpu_access(struct dma_buf *dma_buf,
+ 			     enum dma_data_direction dir);
+ int dma_buf_end_cpu_access(struct dma_buf *dma_buf,
 
 -- 
 2.52.0
