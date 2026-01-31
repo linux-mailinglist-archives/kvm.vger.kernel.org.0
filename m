@@ -1,180 +1,308 @@
-Return-Path: <kvm+bounces-69762-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69763-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOb6AJNpfWk4SAIAu9opvQ
-	(envelope-from <kvm+bounces-69762-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 03:31:47 +0100
+	id +O/yKQBwfWmzSAIAu9opvQ
+	(envelope-from <kvm+bounces-69763-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 03:59:12 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A051C04DA
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 03:31:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23706C06C6
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 03:59:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B4F43016EC2
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 02:31:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F22E3028B32
+	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 02:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452862D29C7;
-	Sat, 31 Jan 2026 02:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DWvVdY9S"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0020B3321A1;
+	Sat, 31 Jan 2026 02:58:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5040F179A3
-	for <kvm@vger.kernel.org>; Sat, 31 Jan 2026 02:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7142F6900;
+	Sat, 31 Jan 2026 02:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769826697; cv=none; b=n9FUuHsJY3+bzmCq3KtQax9cDEJbR5fujIZSs1ycMR3EVMYs1ObJP3AdNbdcjUbMYoZzKU8UafFXYxLhv8WKWA1whgo08X4onIJfsGk8lfjYECwG2sjQva5rA7941vLVA8TmPEIq2dJfW0tEoe6jY1heOl+MlakWs3oXrjUHibc=
+	t=1769828300; cv=none; b=gK5jqNWOC5MtAniiLh49ASiYGMXIfqA+dRXyn+N5edqWCcWI1rRFL1PB42PiQSC96X6BijhRex77GSB9HJkxXf+DDT0qZ9YPDtwKtzduzRu6LzHfLUzy8/jxdz7xDQygLi88/Y3LLA8605dFlf6EPEPLS+Gl1XxR/Ab5AchvoJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769826697; c=relaxed/simple;
-	bh=EKPQLWbsWyT9BUr2s5Ctqy4Jc4chfE3nJq0OgEVxysQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Shkjmd0nzzXSvkYKGth1KG+Niw+cvcHVVVX4ZJt8glJXSYzVMDZwSZ+2COJf9lhqGVmGPEHEHY3eOegySR52P4roCe3YEGQkgS+uZa3zscDGQLLa+ZqVuXoHRyNKqtlD7aYM24stzj6HzIu11ToSrZ7kP0Kc0Jce3GdCVoR993o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DWvVdY9S; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a773db3803so30995685ad.1
-        for <kvm@vger.kernel.org>; Fri, 30 Jan 2026 18:31:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769826696; x=1770431496; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ctO94QNI1k+SuuLJULnF65RAXsyYJ0G/MWNFTi5M4v8=;
-        b=DWvVdY9StnwMEIxAtMuD5nVYgOsPMQRFQ+U0+nuhOewbCst9Jv73Ru3GTpAwr3vd9y
-         Hjxaj8zjixYnd19Xpl+FQPOyRRTDdyTDVqDqZSbSOTlCmqBcZHkG8KBuNl6mhNCOQXkz
-         e16Bq/u8+EES6k2++Q53d44hH7hVtZc5PJqAriG6poeLXfPvRhibsIuUrq7FPQP60NSZ
-         wQm1TQ9txr0ETEc2Mnd5ite1pUjA1xk5AWQLw4B7b3HhJA9Nlc8FSkAwWC/cypeHAW8v
-         vXkj0jsk0zVQApVIGgf56yBpmhqXNNcmaIbugStuq1DwrwskWBa8ofMBkVSixQFz00F9
-         wkQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769826696; x=1770431496;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ctO94QNI1k+SuuLJULnF65RAXsyYJ0G/MWNFTi5M4v8=;
-        b=tUQIuw6Fv9GkGp9aBlUwOWQBENo1uoifsi8tP2Ynsr98x56pCn/+IpHmoBeERYny7p
-         CbRgTkiyyZbQpsFfLxP5OnWasdcJBxWC71U/6VKhZORDeML73391hwLAhFVOHF/aQ45g
-         Fqe3NiM+vH47SXX7KYJvV1BsPUiY5JjV6W0YG3afaCJpRIkaqpmRkiw5NkpaC6Fd8f9Z
-         +baHaGCoN6mTwKfV/DMc0X9nasRieU95b91mNZVLsNWtUJ6pikTtpMwlCLDtaQeh8gHy
-         guIT54rDvmaeGCxOaF2wK66+KQluzswpVGGbf6OP1PatOLcPwfNltBovrf1oYV1dVenw
-         J/6w==
-X-Gm-Message-State: AOJu0Yx9b92GahOHVNXtqO9K+JbcNt2RZHPgOtA30O+3M1llMd0Ku+VT
-	gM/Gi+GYy7RTMGrTgfDVQZauEPJjNBlLzYTaGUotOoprsEMjuHU7PwP8my11lL7tmgiR56YUNAG
-	rekkFSw==
-X-Received: from plgz13.prod.google.com ([2002:a17:903:18d:b0:29f:bf99:8c9f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:aa82:b0:29e:e642:95d6
- with SMTP id d9443c01a7336-2a8d9a7a005mr34084265ad.59.1769826695713; Fri, 30
- Jan 2026 18:31:35 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 30 Jan 2026 18:31:33 -0800
+	s=arc-20240116; t=1769828300; c=relaxed/simple;
+	bh=LkA5pkd1e+4tEh8b1k2Umos94g9dHTBQaF6/KnHzyCw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RojGaH5uVLHMPdE9sZvt7TYA+Z2YkQrKbw0gJiKr/pfQAfPBeZPjZxNZ51pOUh4tguEUSUjG3i1Vn9xY6HcVevTWDm7ORlyWZ95SScTdBvpGYGfXQ/o3VWl4nHfLuXTfzOlYYHvWBNF8xKocn3scTnT5S5JjePd6Ibs9wetqaqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from fric.. (unknown [210.73.43.101])
+	by APP-01 (Coremail) with SMTP id qwCowABnEm65b31pOVPLBg--.13268S2;
+	Sat, 31 Jan 2026 10:58:02 +0800 (CST)
+From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: Alexandre Ghiti <alex@ghiti.fr>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Atish Patra <atish.patra@linux.dev>,
+	Anup Patel <anup@brainfault.org>,
+	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
+	Jiakai Xu <jiakaiPeanut@gmail.com>
+Subject: [PATCH] RISC-V: KVM: Change imsic->vsfile_lock from rwlock_t to raw_spinlock_t
+Date: Sat, 31 Jan 2026 02:58:00 +0000
+Message-Id: <20260131025800.1550692-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260131023133.2661-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: Fix for 6.19-rc8 (or final)
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowABnEm65b31pOVPLBg--.13268S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3XryDGr4ruFWUJF4fAryUtrb_yoW3ZFWfpr
+	4rZF1kCr1xuw1Uuw4qv3Wkuayvg39F9r45WrWUWw1rXr17JwsYgr4xZayxWFWjqrn7GFn2
+	yr1rAaySkF17AaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
+	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
+	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
+	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
+	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
+	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOmhFUUUUU
+X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiBgsECWl8yB384AAAsc
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69762-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-69763-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	RCPT_COUNT_THREE(0.00)[4];
-	HAS_REPLYTO(0.00)[seanjc@google.com];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[ghiti.fr,eecs.berkeley.edu,dabbelt.com,sifive.com,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 5A051C04DA
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 23706C06C6
 X-Rspamd-Action: no action
 
-Sorry for the late pull request, I was waiting on reviews for the CET fix to
-settle down.  I _just_ amended that commit to add a Reviewed-by, but it's been
-in linux-next with identical code since Tuesday.
+The per-vCPU IMSIC context uses a vsfile_lock to protect access
+to the VS-file. Currently, this lock is an rwlock_t, and is used
+with read_lock_irqsave/write_lock_irqsave in multiple places
+inside arch/riscv/kvm/aia_imsic.c.
 
-The most pressing issue is the IRQ routing bug (and also probably the scariest,
-but it's had several weeks in -next), as it leads to all kinds of badness on
-AMD platforms.
+During fuzz testing of KVM ioctl sequences, an 
+"[BUG: Invalid wait context]" crash was observed when holding 
+vsfile_lock in certain VCPU scheduling paths, for example during 
+kvm_riscv_vcpu_aia_imsic_put(). Log shows that at this point
+the task may hold vcpu->mutex and scheduler runqueue locks,
+and thus is in a context where acquiring a read/write rwlock
+with irqsave is illegal.
 
-The following changes since commit 3611ca7c12b740e250d83f8bbe3554b740c503b0:
+The crash manifests as:
+  [ BUG: Invalid wait context ]
+  (&imsic->vsfile_lock){....}-{3:3}, at:
+  kvm_riscv_vcpu_aia_imsic_put arch/riscv/kvm/aia_imsic.c:728
+  ...
+  2 locks held by syz.4.4541/8252:
+   #0: (&vcpu->mutex), at: kvm_vcpu_ioctl virt/kvm/kvm_main.c:4460
+   #1: (&rq->__lock), at: raw_spin_rq_lock_nested kernel/sched/core.c:639
+   #1: (&rq->__lock), at: raw_spin_rq_lock kernel/sched/sched.h:1580
+   #1: (&rq->__lock), at: rq_lock kernel/sched/sched.h:1907
+   #1: (&rq->__lock), at: __schedule kernel/sched/core.c:6772
+  ...
+  Call Trace:
+   _raw_read_lock_irqsave kernel/locking/spinlock.c:236
+   kvm_riscv_vcpu_aia_imsic_put arch/riscv/kvm/aia_imsic.c:716
+   kvm_riscv_vcpu_aia_put arch/riscv/kvm/aia.c:154
+   kvm_arch_vcpu_put arch/riscv/kvm/vcpu.c:650
+   kvm_sched_out virt/kvm/kvm_main.c:6421
+   __fire_sched_out_preempt_notifiers kernel/sched/core.c:4835
+   fire_sched_out_preempt_notifiers kernel/sched/core.c:4843
+   prepare_task_switch kernel/sched/core.c:5050
+   context_switch kernel/sched/core.c:5205
+   __schedule kernel/sched/core.c:6867
+   __schedule_loop kernel/sched/core.c:6949
+   schedule kernel/sched/core.c:6964
+   kvm_riscv_check_vcpu_requests arch/riscv/kvm/vcpu.c:699
+   kvm_arch_vcpu_ioctl_run arch/riscv/kvm/vcpu.c:920
 
-  selftests: kvm: Verify TILELOADD actually #NM faults when XFD[18]=1 (2026-01-10 07:17:30 +0100)
+Therefore, replace vsfile_lock with raw_spinlock_t, and update 
+all acquire/release calls to 
+raw_spin_lock_irqsave()/raw_spin_unlock_irqrestore().
 
-are available in the Git repository at:
+Fixes: db8b7e97d6137a ("RISC-V: KVM: Add in-kernel virtualization of AIA IMSIC")
+Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+---
+ arch/riscv/kvm/aia_imsic.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.19-rc8
+diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+index fda0346f0ea1f..8730229442a26 100644
+--- a/arch/riscv/kvm/aia_imsic.c
++++ b/arch/riscv/kvm/aia_imsic.c
+@@ -47,7 +47,7 @@ struct imsic {
+ 	 */
+ 
+ 	/* IMSIC VS-file */
+-	rwlock_t vsfile_lock;
++	raw_spinlock_t vsfile_lock;
+ 	int vsfile_cpu;
+ 	int vsfile_hgei;
+ 	void __iomem *vsfile_va;
+@@ -597,13 +597,13 @@ static void imsic_vsfile_cleanup(struct imsic *imsic)
+ 	 * VCPU is being destroyed.
+ 	 */
+ 
+-	write_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 	old_vsfile_hgei = imsic->vsfile_hgei;
+ 	old_vsfile_cpu = imsic->vsfile_cpu;
+ 	imsic->vsfile_cpu = imsic->vsfile_hgei = -1;
+ 	imsic->vsfile_va = NULL;
+ 	imsic->vsfile_pa = 0;
+-	write_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	memset(imsic->swfile, 0, sizeof(*imsic->swfile));
+ 
+@@ -688,10 +688,10 @@ bool kvm_riscv_vcpu_aia_imsic_has_interrupt(struct kvm_vcpu *vcpu)
+ 	 * only check for interrupt when IMSIC VS-file is being used.
+ 	 */
+ 
+-	read_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 	if (imsic->vsfile_cpu > -1)
+ 		ret = !!(csr_read(CSR_HGEIP) & BIT(imsic->vsfile_hgei));
+-	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	return ret;
+ }
+@@ -713,10 +713,10 @@ void kvm_riscv_vcpu_aia_imsic_put(struct kvm_vcpu *vcpu)
+ 	if (!kvm_vcpu_is_blocking(vcpu))
+ 		return;
+ 
+-	read_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 	if (imsic->vsfile_cpu > -1)
+ 		csr_set(CSR_HGEIE, BIT(imsic->vsfile_hgei));
+-	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ }
+ 
+ void kvm_riscv_vcpu_aia_imsic_release(struct kvm_vcpu *vcpu)
+@@ -727,13 +727,13 @@ void kvm_riscv_vcpu_aia_imsic_release(struct kvm_vcpu *vcpu)
+ 	struct imsic *imsic = vcpu->arch.aia_context.imsic_state;
+ 
+ 	/* Read and clear IMSIC VS-file details */
+-	write_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 	old_vsfile_hgei = imsic->vsfile_hgei;
+ 	old_vsfile_cpu = imsic->vsfile_cpu;
+ 	imsic->vsfile_cpu = imsic->vsfile_hgei = -1;
+ 	imsic->vsfile_va = NULL;
+ 	imsic->vsfile_pa = 0;
+-	write_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	/* Do nothing, if no IMSIC VS-file to release */
+ 	if (old_vsfile_cpu < 0)
+@@ -786,10 +786,10 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 
+ 	/* Read old IMSIC VS-file details */
+-	read_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 	old_vsfile_hgei = imsic->vsfile_hgei;
+ 	old_vsfile_cpu = imsic->vsfile_cpu;
+-	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	/* Do nothing if we are continuing on same CPU */
+ 	if (old_vsfile_cpu == vcpu->cpu)
+@@ -839,12 +839,12 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu *vcpu)
+ 	/* TODO: Update the IOMMU mapping ??? */
+ 
+ 	/* Update new IMSIC VS-file details in IMSIC context */
+-	write_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 	imsic->vsfile_hgei = new_vsfile_hgei;
+ 	imsic->vsfile_cpu = vcpu->cpu;
+ 	imsic->vsfile_va = new_vsfile_va;
+ 	imsic->vsfile_pa = new_vsfile_pa;
+-	write_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	/*
+ 	 * At this point, all interrupt producers have been moved
+@@ -943,7 +943,7 @@ int kvm_riscv_aia_imsic_rw_attr(struct kvm *kvm, unsigned long type,
+ 	isel = KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
+ 	imsic = vcpu->arch.aia_context.imsic_state;
+ 
+-	read_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 
+ 	rc = 0;
+ 	vsfile_hgei = imsic->vsfile_hgei;
+@@ -958,7 +958,7 @@ int kvm_riscv_aia_imsic_rw_attr(struct kvm *kvm, unsigned long type,
+ 					    isel, val, 0, 0);
+ 	}
+ 
+-	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	if (!rc && vsfile_cpu >= 0)
+ 		rc = imsic_vsfile_rw(vsfile_hgei, vsfile_cpu, imsic->nr_eix,
+@@ -1015,7 +1015,7 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
+ 	if (imsic->nr_msis <= iid)
+ 		return -EINVAL;
+ 
+-	read_lock_irqsave(&imsic->vsfile_lock, flags);
++	raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+ 
+ 	if (imsic->vsfile_cpu >= 0) {
+ 		writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
+@@ -1025,7 +1025,7 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu *vcpu,
+ 		imsic_swfile_extirq_update(vcpu);
+ 	}
+ 
+-	read_unlock_irqrestore(&imsic->vsfile_lock, flags);
++	raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+ 
+ 	return 0;
+ }
+@@ -1081,7 +1081,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *vcpu)
+ 
+ 	/* Setup IMSIC context  */
+ 	imsic->nr_msis = kvm->arch.aia.nr_ids + 1;
+-	rwlock_init(&imsic->vsfile_lock);
++	raw_spin_lock_init(&imsic->vsfile_lock);
+ 	imsic->nr_eix = BITS_TO_U64(imsic->nr_msis);
+ 	imsic->nr_hw_eix = BITS_TO_U64(kvm_riscv_aia_max_ids);
+ 	imsic->vsfile_hgei = imsic->vsfile_cpu = -1;
+-- 
+2.34.1
 
-for you to fetch changes up to f8ade833b733ae0b72e87ac6d2202a1afbe3eb4a:
-
-  KVM: x86: Explicitly configure supported XSS from {svm,vmx}_set_cpu_caps() (2026-01-30 13:27:33 -0800)
-
-----------------------------------------------------------------
-KVM fixes for 6.19
-
- - Fix a bug where AVIC is incorrectly inhibited when running with x2AVIC
-   disabled via module param (or on a system without x2AVIC).
-
- - Fix a dangling device posted IRQs bug by explicitly checking if the irqfd is
-   still active (on the list) when handling an eventfd signal, instead of
-   zeroing the irqfd's routing information when the irqfd is deassigned.
-   Zeroing the irqfd's routing info causes arm64 and x86's to not disable
-   posting for the IRQ (kvm_arch_irq_bypass_del_producer() looks for an MSI),
-   incorrectly leaving the IRQ in posted mode (and leading to use-after-free
-   and memory leaks on AMD in particular).
-
- - Disable FORTIFY_SOURCE for KVM selftests to prevent the compiler from
-   generating calls to the checked versions of memset() and friends, which
-   leads to unexpected page faults in guest code due e.g. __memset_chk@plt
-   not being resolved.
-
- - Explicitly configure the support XSS from within {svm,vmx}_set_cpu_caps() to
-   fix a bug where VMX will compute the reference VMCS configuration with SHSTK
-   and IBT enabled, but then compute each CPUs local config with SHSTK and IBT
-   disabled if not all CET xfeatures are enabled, e.g. if the kernel is built
-   with X86_KERNEL_IBT=n.  The mismatch in features results in differing nVMX
-   setting, and ultimately causes kvm-intel.ko to refuse to load with nested=1.
-
-----------------------------------------------------------------
-Sean Christopherson (4):
-      KVM: SVM: Check vCPU ID against max x2AVIC ID if and only if x2AVIC is enabled
-      KVM: Don't clobber irqfd routing type when deassigning irqfd
-      KVM: x86: Assert that non-MSI doesn't have bypass vCPU when deleting producer
-      KVM: x86: Explicitly configure supported XSS from {svm,vmx}_set_cpu_caps()
-
-Zhiquan Li (1):
-      KVM: selftests: Add -U_FORTIFY_SOURCE to avoid some unpredictable test failures
-
- arch/x86/kvm/irq.c                       |  3 ++-
- arch/x86/kvm/svm/avic.c                  |  4 +--
- arch/x86/kvm/svm/svm.c                   |  2 ++
- arch/x86/kvm/vmx/vmx.c                   |  2 ++
- arch/x86/kvm/x86.c                       | 30 ++++++++++++----------
- arch/x86/kvm/x86.h                       |  2 ++
- tools/testing/selftests/kvm/Makefile.kvm |  1 +
- virt/kvm/eventfd.c                       | 44 +++++++++++++++++---------------
- 8 files changed, 52 insertions(+), 36 deletions(-)
 
