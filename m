@@ -1,149 +1,291 @@
-Return-Path: <kvm+bounces-69781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69782-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPHMGykufmlLWQIAu9opvQ
-	(envelope-from <kvm+bounces-69781-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 17:30:33 +0100
+	id 8A2yDhu8fmnDdQIAu9opvQ
+	(envelope-from <kvm+bounces-69782-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 01 Feb 2026 03:36:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68A7DC300F
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 17:30:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38ECC4AE7
+	for <lists+kvm@lfdr.de>; Sun, 01 Feb 2026 03:36:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AFB4630065D8
-	for <lists+kvm@lfdr.de>; Sat, 31 Jan 2026 16:30:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 554FC301E3D9
+	for <lists+kvm@lfdr.de>; Sun,  1 Feb 2026 02:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDC4221555;
-	Sat, 31 Jan 2026 16:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB8526E702;
+	Sun,  1 Feb 2026 02:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=worksmobile.com header.i=@worksmobile.com header.b="w6YB7qiZ";
-	dkim=pass (1024-bit key) header.d=korea.ac.kr header.i=@korea.ac.kr header.b="RmE1uc8J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQYODOLF"
 X-Original-To: kvm@vger.kernel.org
-Received: from cvsmtppost104.wmail.worksmobile.com (cvsmtppost104.wmail.worksmobile.com [125.209.209.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DED340287
-	for <kvm@vger.kernel.org>; Sat, 31 Jan 2026 16:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=125.209.209.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836112609CC
+	for <kvm@vger.kernel.org>; Sun,  1 Feb 2026 02:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769877027; cv=none; b=UVApKD+wCPbFgP+AKBjFxIBrIMWxD+QIuJoXDfRqVeEbGYcCZZ/epe7Tlik5yjcWrbvkCFJQBClMvgUxtPMqq4uzC4M75C2/9YtMqOrtETSeMqH2dsol1ovOsvPwskVh/Xm521BlVrB7l9WfAmykt6vpUAbgwOi0JdHeFx/Nhds=
+	t=1769913357; cv=none; b=gbFBEL0bpsZ+cKZW2igRDTVUXUhgPUvjQi+DDjiROEzsaARzbcA/Wcde4rXV6pJgqtWOWRi6t+ShtWLodjyQ7JelLWb1gSOhjghYx1wBJGUsFofzLpdA13QZP2Rl/K0LttPNzkWQSkziu+R+QQEeH1zbLkg3b1gxPpXMf/EKA+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769877027; c=relaxed/simple;
-	bh=3LmEhxfZZ1pkxaOheX6kmc6n6T5JvQjCCvxVqkSNd+o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C0dCKPOonAbfODbvhPuo4UIlO3YsogHmf94WHQPd8WTxt8K3vg0dcQLJvoZhqwv2R/UVbJnatb5iPhIXiOWx9mBAmjvE2h5+rtuHBPyatoWpyW0yZAz/OM2+9DE5+P6VQZiFwiESfEisRyNhvB4ePUZiUbGrLQO0faeVPZyvg24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=korea.ac.kr; spf=pass smtp.mailfrom=korea.ac.kr; dkim=pass (2048-bit key) header.d=worksmobile.com header.i=@worksmobile.com header.b=w6YB7qiZ; dkim=pass (1024-bit key) header.d=korea.ac.kr header.i=@korea.ac.kr header.b=RmE1uc8J; arc=none smtp.client-ip=125.209.209.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=korea.ac.kr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=korea.ac.kr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=worksmobile.com;
-	s=s20171120; t=1769877019;
-	bh=3LmEhxfZZ1pkxaOheX6kmc6n6T5JvQjCCvxVqkSNd+o=;
-	h=From:To:Subject:Date:Message-Id:From:Subject:Feedback-ID:
-	 X-Works-Security;
-	b=w6YB7qiZryQt81Zg8kqXhsWnypOt3d6TPDOrY0p2hM4/Is3TSAsjtAjo3aDD6Dcqh
-	 UzvCZSK3GeKwRCDOuVZSdfxWfY54spXUoPnJiBChdAczXEJ13Ss1cja/6eSCQUOQOe
-	 A/ZNngSEdZ+fkqGhDEieVJo8MMDfR9mOlLFzCnvA2wMxL7CTfog1lPEUzH5kBKPqRg
-	 zbyVSov9Rb4PCS6ArJ30mdKkPLnkNxezGaeCO2wU2lrskCFZz2HVTDj6zh+jwp9mbm
-	 YAlFhKFaHBsIdSHq2X1FDIvXfxCS/hMp9fOJtBCJkwhxvI6ILICdfSO2E9AR4cNTLG
-	 Kj1vLHTOCvoSg==
-Received: from cvsendbo006.wmail ([10.112.11.111])
-  by cvsmtppost104.wmail.worksmobile.com with ESMTP id GMOXetHzToOx1vOSpXqKfQ
-  for <kvm@vger.kernel.org>;
-  Sat, 31 Jan 2026 16:30:19 -0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=korea.ac.kr;
-	s=naverworks; t=1769877019;
-	bh=3LmEhxfZZ1pkxaOheX6kmc6n6T5JvQjCCvxVqkSNd+o=;
-	h=From:To:Subject:Date:Message-Id:From:Subject:Feedback-ID:
-	 X-Works-Security;
-	b=RmE1uc8Jd3Ta/8/aC9DrtaYL9Keswd14fK6J1d1MtjFbXW3eHlJCX8f68H49YD/gi
-	 3NMkFw9lN/muORXmUG2qlvh/iZvNc0wCAU8cpZfcZ6IoYKHdQcnV7OypvdVKQtmM7x
-	 naCJTGE0B+FPeN/PUcAEt0F/fjL2zEDZd5I/qdVc=
-X-Session-ID: b1qsfs-aQ5iOjsPg6dZFgw
-X-Works-Send-Opt: EenqjAJYjHm/FqM9FqJYFxMqFNwYjAg=
-X-Works-Smtp-Source: AdKdaAvrFqJZ+HmlKxMd+6E=
-Received: from s2lab05.. ([163.152.163.130])
-  by jvnsmtp401.gwmail.worksmobile.com with ESMTP id b1qsfs-aQ5iOjsPg6dZFgw
-  for <multiple recipients>
-  (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-  Sat, 31 Jan 2026 16:30:19 -0000
-From: Ingyu Jang <ingyujang25@korea.ac.kr>
-To: kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	Ingyu Jang <ingyujang25@korea.ac.kr>
-Subject: [Question] Dead code in KVM PIT ioctl error handling?
-Date: Sun,  1 Feb 2026 01:30:17 +0900
-Message-Id: <20260131163017.3341753-1-ingyujang25@korea.ac.kr>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1769913357; c=relaxed/simple;
+	bh=vbiqeQeAMOJdDl2w3Y80oOeJ7TUQghamWnPJJUjLEY4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HYOo/NjaBxWdAkd0EUptyQudRAti/Xt5n2pUNGM9BOzao2cm+4G0f6G3hhD/V3zV5IPHDVeEVAXXbhWmsb2cyhaPRhgO0oxhYwMUh8Zrz2qrv/7hEaYDsr8VrJok7G9KCeyzhgnCc4osB6wZTZVhjTWx9VKVbi4ZhowTur2RqHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQYODOLF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB74C2BC87
+	for <kvm@vger.kernel.org>; Sun,  1 Feb 2026 02:35:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769913357;
+	bh=vbiqeQeAMOJdDl2w3Y80oOeJ7TUQghamWnPJJUjLEY4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oQYODOLFFwI1DRbG66HOBvsAPdViI1Xhw/mfZVC8OWDF/eQikTHF9FhlGRRMbHOi+
+	 ZnpkeQkMfM+GnBXErmtlzLA5HGQRA0kX+/teO4XCklzUwYp65mBOgg1bibrc4/lFjT
+	 2IqKTrGFTiP0EAlqOyi1Dc+lnc/jjrWtT8Q6CieddGzLgr/EZk6Ke01//riSqaC2Wb
+	 Lif/YXJSnixpQHWIYAZakSeJ0BipMm+2+RQPv4DsdgVdaW55XeUb+vL6wugKgLCRdS
+	 +dhKjO3X//O1DOavKXTdr7rHJ8MMktBG4m0xtPieG4j4vszQXU0rZqVlhGS/3ceFeT
+	 gNKhmMWICDysA==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64c893f3a94so6831854a12.0
+        for <kvm@vger.kernel.org>; Sat, 31 Jan 2026 18:35:57 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUbKzW2ne0sTV+HmHkqgT1Szw/35TrKq/lJ1xDOAQxsSanCzYKmK6+aRLhWMQ31Qt8G92c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkFgniJXSeu9eDufrGo0cV7T/2PvMpabSDzrwsX3L5/QNXClv8
+	NEN3wX3/SCg563w4hEJZA4et1OPOg7KwU0IDpRAFk0J/SfDnPrq/SmITwM6Q+MS+KATojH28aL0
+	SUPBVY+r68j8VyaON9J00wiebMQ3YAb8=
+X-Received: by 2002:a17:906:478b:b0:b8d:f737:ba8a with SMTP id
+ a640c23a62f3a-b8dff430bf3mr475152766b.18.1769913355873; Sat, 31 Jan 2026
+ 18:35:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260131060600.169748-1-liushuyu@aosc.io> <CAAhV-H7g4StjP5fnHVVEyR_xFx9=fg6S9UuHWnPpMV_k=ZVGGw@mail.gmail.com>
+ <b89a22a3-be55-4c86-99e3-84759e362309@aosc.io>
+In-Reply-To: <b89a22a3-be55-4c86-99e3-84759e362309@aosc.io>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 1 Feb 2026 10:35:44 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7JyzHtBRaB9A7oOdZah75p2tvgPe_XHrVYoO8rZEwQ-g@mail.gmail.com>
+X-Gm-Features: AZwV_QgZwz2tAGpzsIBCY_8QliHVTHc_nrfg8cZfLSpMHtcwuZh8AY9WcbekdZo
+Message-ID: <CAAhV-H7JyzHtBRaB9A7oOdZah75p2tvgPe_XHrVYoO8rZEwQ-g@mail.gmail.com>
+Subject: Re: [PATCH v2 RESEND] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
+To: liushuyu <liushuyu@aosc.io>
+Cc: WANG Xuerui <kernel@xen0n.name>, Bibo Mao <maobibo@loongson.cn>, 
+	Kexy Biscuit <kexybiscuit@aosc.io>, Mingcong Bai <jeffbai@aosc.io>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	SUBJECT_ENDS_QUESTION(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[korea.ac.kr,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[worksmobile.com:s=s20171120,korea.ac.kr:s=naverworks];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69781-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-69782-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ingyujang25@korea.ac.kr,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[worksmobile.com:+,korea.ac.kr:+];
-	RCPT_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[chenhuacai@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,worksmobile.com:dkim,korea.ac.kr:mid,korea.ac.kr:dkim]
-X-Rspamd-Queue-Id: 68A7DC300F
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,aosc.io:email]
+X-Rspamd-Queue-Id: D38ECC4AE7
 X-Rspamd-Action: no action
 
-Hi,
+On Sat, Jan 31, 2026 at 10:09=E2=80=AFPM liushuyu <liushuyu@aosc.io> wrote:
+>
+> Hi Huacai,
+>
+> > Hi, Zixing,
+> >
+> > On Sat, Jan 31, 2026 at 2:07=E2=80=AFPM Zixing Liu <liushuyu@aosc.io> w=
+rote:
+> >> This ioctl can be used by the userspace applications to determine whic=
+h
+> >> (special) registers are get/set-able in a meaningful way.
+> >>
+> >> This can be very useful for cross-platform VMMs so that they do not ha=
+ve
+> >> to hardcode register indices for each supported architectures.
+> >>
+> >> Signed-off-by: Zixing Liu <liushuyu@aosc.io>
+> >> ---
+> >>  Documentation/virt/kvm/api.rst |  2 +-
+> >>  arch/loongarch/kvm/vcpu.c      | 85 +++++++++++++++++++++++++++++++++=
++
+> >>  2 files changed, 86 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/a=
+pi.rst
+> >> index 01a3abef8abb..f46dd8be282f 100644
+> >> --- a/Documentation/virt/kvm/api.rst
+> >> +++ b/Documentation/virt/kvm/api.rst
+> >> @@ -3603,7 +3603,7 @@ VCPU matching underlying host.
+> >>  ---------------------
+> >>
+> >>  :Capability: basic
+> >> -:Architectures: arm64, mips, riscv, x86 (if KVM_CAP_ONE_REG)
+> >> +:Architectures: arm64, loongarch, mips, riscv, x86 (if KVM_CAP_ONE_RE=
+G)
+> >>  :Type: vcpu ioctl
+> >>  :Parameters: struct kvm_reg_list (in/out)
+> >>  :Returns: 0 on success; -1 on error
+> >> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> >> index 656b954c1134..ed11438f4544 100644
+> >> --- a/arch/loongarch/kvm/vcpu.c
+> >> +++ b/arch/loongarch/kvm/vcpu.c
+> >> @@ -1186,6 +1186,73 @@ static int kvm_loongarch_vcpu_set_attr(struct k=
+vm_vcpu *vcpu,
+> >>         return ret;
+> >>  }
+> >>
+> >> +static int kvm_loongarch_walk_csrs(struct kvm_vcpu *vcpu, u64 __user =
+*uindices)
+> >> +{
+> >> +       unsigned int i, count;
+> >> +
+> >> +       for (i =3D 0, count =3D 0; i < CSR_MAX_NUMS; i++) {
+> >> +               if (!(get_gcsr_flag(i) & (SW_GCSR | HW_GCSR)))
+> >> +                       continue;
+> >> +               const u64 reg =3D KVM_IOC_CSRID(i);
+> >> +               if (uindices && put_user(reg, uindices++))
+> >> +                       return -EFAULT;
+> >> +               count++;
+> >> +       }
+> >> +
+> >> +       return count;
+> >> +}
+> >> +
+> >> +static unsigned long kvm_loongarch_num_lbt_regs(void)
+> >> +{
+> >> +       /* +1 for the LBT_FTOP flag (inside arch.fpu) */
+> >> +       return sizeof(struct loongarch_lbt) / sizeof(unsigned long) + =
+1;
+> >> +}
+> > This function has only one line, I think it is better to embed it into
+> > the caller.
+>
+> This function was used twice in this patch. If the hardware gained more
+> LBT registers that are not recorded in `struct loongarch_lbt` in the
+> future, I am afraid changing manually inlined logic will be a bit
+> error-prone.
+If this really happens, how to keep compatibility?
 
-I noticed that in arch/x86/kvm/x86.c, the functions
-kvm_vm_ioctl_get_pit() and kvm_vm_ioctl_get_pit2() always return 0,
-making their error checks unreachable.
+>
+> Maybe one compromise would be making this a `const` variable somewhere
+> in this file instead of a function? What do you think?
 
-Both functions (at lines 6408 and 6433) simply perform:
-  1. Lock mutex
-  2. Copy PIT state
-  3. Unlock mutex
-  4. return 0;
+I think the best way is
+#define NUM_LBT_REGS 6
+in this file.
 
-There are no error paths in either function.
+Huacai
 
-However, their call sites check the return values:
-
-1. At line 7164:
-   r = kvm_vm_ioctl_get_pit(kvm, &u.ps);
-   if (r)
-       goto out;
-
-2. At line 7190:
-   r = kvm_vm_ioctl_get_pit2(kvm, &u.ps2);
-   if (r)
-       goto out;
-
-Since both functions always return 0, these error checks appear to be
-dead code.
-
-Is this intentional defensive coding for potential future changes,
-or could this be cleaned up?
-
-Thanks,
-Ingyu Jang
+>
+> > Huacai
+>
+> Thanks,
+>
+> Zixing
+>
+> >> +
+> >> +static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +       /* +1 for the KVM_REG_LOONGARCH_COUNTER register */
+> >> +       unsigned long res =3D
+> >> +               kvm_loongarch_walk_csrs(vcpu, NULL) + KVM_MAX_CPUCFG_R=
+EGS + 1;
+> >> +
+> >> +       if (kvm_guest_has_lbt(&vcpu->arch))
+> >> +               res +=3D kvm_loongarch_num_lbt_regs();
+> >> +
+> >> +       return res;
+> >> +}
+> >> +
+> >> +static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
+> >> +                                         u64 __user *uindices)
+> >> +{
+> >> +       u64 reg;
+> >> +       unsigned int i;
+> >> +
+> >> +       i =3D kvm_loongarch_walk_csrs(vcpu, uindices);
+> >> +       if (i < 0)
+> >> +               return i;
+> >> +       uindices +=3D i;
+> >> +
+> >> +       for (i =3D 0; i < KVM_MAX_CPUCFG_REGS; i++) {
+> >> +               reg =3D KVM_IOC_CPUCFG(i);
+> >> +               if (put_user(reg, uindices++))
+> >> +                       return -EFAULT;
+> >> +       }
+> >> +
+> >> +       reg =3D KVM_REG_LOONGARCH_COUNTER;
+> >> +       if (put_user(reg, uindices++))
+> >> +               return -EFAULT;
+> >> +
+> >> +       if (!kvm_guest_has_lbt(&vcpu->arch))
+> >> +               return 0;
+> >> +
+> >> +       for (i =3D 1; i <=3D kvm_loongarch_num_lbt_regs(); i++) {
+> >> +               reg =3D (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | i)=
+;
+> >> +               if (put_user(reg, uindices++))
+> >> +                       return -EFAULT;
+> >> +       }
+> >> +
+> >> +       return 0;
+> >> +}
+> >> +
+> >>  long kvm_arch_vcpu_ioctl(struct file *filp,
+> >>                          unsigned int ioctl, unsigned long arg)
+> >>  {
+> >> @@ -1251,6 +1318,24 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+> >>                 r =3D kvm_loongarch_vcpu_set_attr(vcpu, &attr);
+> >>                 break;
+> >>         }
+> >> +       case KVM_GET_REG_LIST: {
+> >> +               struct kvm_reg_list __user *user_list =3D argp;
+> >> +               struct kvm_reg_list reg_list;
+> >> +               unsigned n;
+> >> +
+> >> +               r =3D -EFAULT;
+> >> +               if (copy_from_user(&reg_list, user_list, sizeof(reg_li=
+st)))
+> >> +                       break;
+> >> +               n =3D reg_list.n;
+> >> +               reg_list.n =3D kvm_loongarch_num_regs(vcpu);
+> >> +               if (copy_to_user(user_list, &reg_list, sizeof(reg_list=
+)))
+> >> +                       break;
+> >> +               r =3D -E2BIG;
+> >> +               if (n < reg_list.n)
+> >> +                       break;
+> >> +               r =3D kvm_loongarch_copy_reg_indices(vcpu, user_list->=
+reg);
+> >> +               break;
+> >> +       }
+> >>         default:
+> >>                 r =3D -ENOIOCTLCMD;
+> >>                 break;
+> >> --
+> >> 2.52.0
+> >>
+>
 
