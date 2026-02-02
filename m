@@ -1,182 +1,249 @@
-Return-Path: <kvm+bounces-69862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69863-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QECEMtC7gGl3AgMAu9opvQ
-	(envelope-from <kvm+bounces-69862-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 15:59:28 +0100
+	id OMGDFI6/gGl3AgMAu9opvQ
+	(envelope-from <kvm+bounces-69863-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 16:15:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BC83CDC2F
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 15:59:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB14ECE07C
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 16:15:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1B5A63018700
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 14:57:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5D76F304812E
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 15:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0396374175;
-	Mon,  2 Feb 2026 14:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCD9377544;
+	Mon,  2 Feb 2026 15:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BMjraJs0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jKJj06CP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F5B36F43E;
-	Mon,  2 Feb 2026 14:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903FE374725;
+	Mon,  2 Feb 2026 15:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770044248; cv=none; b=eYfvFMv6F8uBo9pjCREGe1w+Y9mJrNj7x5GaHwOs7CxygItcVzSIcPeZC2TEavpc+r3V5wgIyrgVxAzOyPn+VMoqbOrmLk1ukEeFshlq5tjjDQV1K9KSwV7kC2p2ERqICIWFUdisDY/w3GS5D22vEOreqXKCVVi4F2Ibv/0c2Ng=
+	t=1770044588; cv=none; b=QHS0Sl5AAPNEJLe+kzYW9IV4sXIK3yGUWFUScDP7AN/HbQOmrxyX8My8zqYWFi9p2InCQGtXjPOq/FML2xhy/XW6i29bC3Rwgez2KxUAsG2RDjywgW0pyju9R7rS1DYkGWR1mEEXvW8FjLI5vEqSSbtBKNuK+3mAOnorIGKS7No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770044248; c=relaxed/simple;
-	bh=seDOKF8I+BWEDcrhAiaU8E+0tt8z0sXGG+AF4rVBcRA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wka6bms51vmjaRebZXbds5VjPsDlCn5h0v0z7XOq8Hsk9I31DP1NpdFmZPz1ikKdoz614a7Pji1GmEI2cMB2QPu7oCN7ExjDHNCt04VXkc02BM8W3xmyTlsbcFpzwm0KBVrAB4zMAfPWTNqYQ9Q58oXuJmPXOv536z2DXYuMkGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BMjraJs0; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 612Eju4g030016;
-	Mon, 2 Feb 2026 14:57:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=nTVGUO
-	H7b5IrLpAQPbnZes537H1hEb3YRXDefCvxb38=; b=BMjraJs0XR37GQel+/+M67
-	S874CYnXa2BY5l2MKoYRRCwbz4s1JzvgY7kYQsW0LO3rsr/3cCyDyc6yjnZdKns/
-	e7uKYe5QlPo75+miL+n8S3ulJnujHBvy9A614NmZpFR8I8kiDUb5KXBrfZkCFTHM
-	lC85qo+BuyxwzwqIEaQ9eDWN8EdTGgeMJlo1O4aoeJ0HH4K1bsen2K+KQD4H7ZUZ
-	86yBR0Sxf8h+BMGKHlocz6rhFJqGQRP8cIf/tBJ5NHegwB8D49xuVFr+A56OOiQV
-	KE5VUQw9e0FimcLCRTji7QhvwaCTIJfqkaGFATFotw5CJQE67o9694BhKvMd34Xw
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c19f68xff-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Feb 2026 14:57:24 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 612EEkSZ004437;
-	Mon, 2 Feb 2026 14:57:23 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c1wjjnd99-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Feb 2026 14:57:23 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 612EvMtl20775474
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 2 Feb 2026 14:57:22 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3E7105805A;
-	Mon,  2 Feb 2026 14:57:22 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2AF4E58056;
-	Mon,  2 Feb 2026 14:57:21 +0000 (GMT)
-Received: from [9.61.91.248] (unknown [9.61.91.248])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  2 Feb 2026 14:57:21 +0000 (GMT)
-Message-ID: <1bb228cb-2c3f-45b7-a515-ca932429a3e8@linux.ibm.com>
-Date: Mon, 2 Feb 2026 09:57:20 -0500
+	s=arc-20240116; t=1770044588; c=relaxed/simple;
+	bh=f4jiSWaAUMy80OsaVE6o84JI4KEEK5M17ot8dH2cPts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FbxqSpD74TuTT79G0gqTREfbyPFqeDll8Z8nrJP20KjcbMm5k0FxqdcU1EIlnuDi2rHmGq0BYC1iht0sKMJUTR+67RKlRhfc2JTqeDvaIK2cYiSXdTDslW/8+fxsxelnDSHwHtFdDRaR67mqtndv7eqMHEmTn9XdENgxgEIVEDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jKJj06CP; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770044587; x=1801580587;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=f4jiSWaAUMy80OsaVE6o84JI4KEEK5M17ot8dH2cPts=;
+  b=jKJj06CPv+ezALh2mBlTbMnJoPB1sy3SbWh8JCRhDhurYymgQUePITGV
+   h8GQx/Qf0FR8z1RWlEA5oElZ4B/HYCyBINzP4myqR4g+E1Gce4PEmum5M
+   FSzRL5PbwG6cot3ECjtklMaoukzc4uvYq6G9LHMg8gW33YkSrmZ8iNz8O
+   h3cacoszZR/hWHUv2pgWFOpn3S8Z/0l5sM/IfoPoS9dXNfRMx+eNhmM1w
+   hT6vR6AqGuotCmm4TRpMXdva3rqayH6bfXTfsRpfTTUFgMyL26/QRp6Dw
+   fIUjmylWvU9fVc7J7qaKdmBRwieOrP+pucZwa0zFPYM7YGGSUFb627awN
+   w==;
+X-CSE-ConnectionGUID: cY6TY4gPQB6gnOqrCjJ3Tg==
+X-CSE-MsgGUID: dN4VzvijSPS5G1Hdkdld6g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="71099598"
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="71099598"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 07:03:06 -0800
+X-CSE-ConnectionGUID: 1Sm55USrTViCYi6oLwwXlg==
+X-CSE-MsgGUID: ZhozEz8UQCq9wlrljDbqsQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="209698373"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 02 Feb 2026 07:03:00 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vmvS4-00000000ffw-49bj;
+	Mon, 02 Feb 2026 15:02:56 +0000
+Date: Mon, 2 Feb 2026 23:02:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shashank Balaji <shashank.mahadasyam@sony.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev,
+	jailhouse-dev@googlegroups.com, kvm@vger.kernel.org,
+	xen-devel@lists.xenproject.org, Rahul Bukte <rahul.bukte@sony.com>,
+	Shashank Balaji <shashank.mahadasyam@sony.com>,
+	Daniel Palmer <daniel.palmer@sony.com>,
+	Tim Bird <tim.bird@sony.com>
+Subject: Re: [PATCH 1/3] x86/x2apic: disable x2apic on resume if the kernel
+ expects so
+Message-ID: <202602022242.iSdFHMDI-lkp@intel.com>
+References: <20260202-x2apic-fix-v1-1-71c8f488a88b@sony.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] MAINTAINERS: Replace backup for s390 vfio-pci
-To: Eric Farman <farman@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20260202144557.1771203-1-farman@linux.ibm.com>
-Content-Language: en-US
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20260202144557.1771203-1-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2ZM8Hjim10ToBV5WYpKjG7spuiiJHMBQ
-X-Authority-Analysis: v=2.4 cv=drTWylg4 c=1 sm=1 tr=0 ts=6980bb54 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=STK_0p3wlTkmVyiQI7oA:9
- a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 2ZM8Hjim10ToBV5WYpKjG7spuiiJHMBQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDExNyBTYWx0ZWRfX3QKDPQ0PP9HJ
- zF3anw96aiC2JTy1x4uKpiE+bT0pGUPLBfJ+EMDKtVYrhwfAUrPuqQmR/cq9G3fkD2A35GrOS37
- 0JL8iXC8y9bqcHWkplkEL21xa3DbMjpyNQcIpZfc8+/amxgeksSFzsKN/5RnVKxn3Fqln3iclon
- DJMCLP6UZ1JE32jK/BZS+t7yvvze6T5Mef9H1FpOp2dgFp9Ee7SF+HPgjrKfUGnPJC88YK1pSS4
- ZQm4g11//4MeGoBUnlIT92Xz+Gf0UO99qTKkFBJXMfk5TJGaAG7PS3pfozikybj/vodXOBbPraR
- WWfzWsOqWXZ0YMUWLXwmy9khhoGRrGPJOY7QXJ0zHCfBnkvBymkr8uS5zQryWlIXOHojcSPNLfs
- Ta0oceYgSCdTH9kDadgtyOaZInFIHP29zHfQHizG561XJebA79unJAqAAt40xR+QIF0QYvrIooP
- cE66V874DT6ECQUMArg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-02_04,2026-01-30_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1011 spamscore=0 malwarescore=0 bulkscore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2602020117
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260202-x2apic-fix-v1-1-71c8f488a88b@sony.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69862-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.ibm.com:mid];
-	TAGGED_RCPT(0.00)[kvm];
-	FROM_NEQ_ENVFROM(0.00)[mjrosato@linux.ibm.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-69863-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[32];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 5BC83CDC2F
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: CB14ECE07C
 X-Rspamd-Action: no action
 
-On 2/2/26 9:45 AM, Eric Farman wrote:
-> Farhan has been doing a masterful job coming on in the
-> s390 PCI space, and my own attention has been lacking.
-> Let's make MAINTAINERS reflect reality.
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Hi Shashank,
 
-Eric, thanks alot for all of your help with this area in the past.
+kernel test robot noticed the following build errors:
 
-Farhan, thanks for stepping up to help here!
+[auto build test ERROR on 18f7fcd5e69a04df57b563360b88be72471d6b62]
 
-Acked-by: Matthew Rosato <mjrosato@linux.ibm.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Shashank-Balaji/x86-x2apic-disable-x2apic-on-resume-if-the-kernel-expects-so/20260202-181147
+base:   18f7fcd5e69a04df57b563360b88be72471d6b62
+patch link:    https://lore.kernel.org/r/20260202-x2apic-fix-v1-1-71c8f488a88b%40sony.com
+patch subject: [PATCH 1/3] x86/x2apic: disable x2apic on resume if the kernel expects so
+config: x86_64-buildonly-randconfig-001-20260202 (https://download.01.org/0day-ci/archive/20260202/202602022242.iSdFHMDI-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260202/202602022242.iSdFHMDI-lkp@intel.com/reproduce)
 
-> ---
->  MAINTAINERS | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0efa8cc6775b..0d7e76313492 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -23094,7 +23094,8 @@ F:	include/uapi/linux/vfio_ccw.h
->  
->  S390 VFIO-PCI DRIVER
->  M:	Matthew Rosato <mjrosato@linux.ibm.com>
-> -M:	Eric Farman <farman@linux.ibm.com>
-> +M:	Farhan Ali <alifm@linux.ibm.com>
-> +R:	Eric Farman <farman@linux.ibm.com>
->  L:	linux-s390@vger.kernel.org
->  L:	kvm@vger.kernel.org
->  S:	Supported
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602022242.iSdFHMDI-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+   arch/x86/kernel/apic/apic.c: In function 'lapic_resume':
+>> arch/x86/kernel/apic/apic.c:2463:17: error: implicit declaration of function '__x2apic_disable'; did you mean '__x2apic_enable'? [-Wimplicit-function-declaration]
+    2463 |                 __x2apic_disable();
+         |                 ^~~~~~~~~~~~~~~~
+         |                 __x2apic_enable
+
+
+vim +2463 arch/x86/kernel/apic/apic.c
+
+  2435	
+  2436	static void lapic_resume(void *data)
+  2437	{
+  2438		unsigned int l, h;
+  2439		unsigned long flags;
+  2440		int maxlvt;
+  2441	
+  2442		if (!apic_pm_state.active)
+  2443			return;
+  2444	
+  2445		local_irq_save(flags);
+  2446	
+  2447		/*
+  2448		 * IO-APIC and PIC have their own resume routines.
+  2449		 * We just mask them here to make sure the interrupt
+  2450		 * subsystem is completely quiet while we enable x2apic
+  2451		 * and interrupt-remapping.
+  2452		 */
+  2453		mask_ioapic_entries();
+  2454		legacy_pic->mask_all();
+  2455	
+  2456		if (x2apic_mode) {
+  2457			__x2apic_enable();
+  2458		} else {
+  2459			/*
+  2460			 * x2apic may have been re-enabled by the
+  2461			 * firmware on resuming from s2ram
+  2462			 */
+> 2463			__x2apic_disable();
+  2464	
+  2465			/*
+  2466			 * Make sure the APICBASE points to the right address
+  2467			 *
+  2468			 * FIXME! This will be wrong if we ever support suspend on
+  2469			 * SMP! We'll need to do this as part of the CPU restore!
+  2470			 */
+  2471			if (boot_cpu_data.x86 >= 6) {
+  2472				rdmsr(MSR_IA32_APICBASE, l, h);
+  2473				l &= ~MSR_IA32_APICBASE_BASE;
+  2474				l |= MSR_IA32_APICBASE_ENABLE | mp_lapic_addr;
+  2475				wrmsr(MSR_IA32_APICBASE, l, h);
+  2476			}
+  2477		}
+  2478	
+  2479		maxlvt = lapic_get_maxlvt();
+  2480		apic_write(APIC_LVTERR, ERROR_APIC_VECTOR | APIC_LVT_MASKED);
+  2481		apic_write(APIC_ID, apic_pm_state.apic_id);
+  2482		apic_write(APIC_DFR, apic_pm_state.apic_dfr);
+  2483		apic_write(APIC_LDR, apic_pm_state.apic_ldr);
+  2484		apic_write(APIC_TASKPRI, apic_pm_state.apic_taskpri);
+  2485		apic_write(APIC_SPIV, apic_pm_state.apic_spiv);
+  2486		apic_write(APIC_LVT0, apic_pm_state.apic_lvt0);
+  2487		apic_write(APIC_LVT1, apic_pm_state.apic_lvt1);
+  2488	#ifdef CONFIG_X86_THERMAL_VECTOR
+  2489		if (maxlvt >= 5)
+  2490			apic_write(APIC_LVTTHMR, apic_pm_state.apic_thmr);
+  2491	#endif
+  2492	#ifdef CONFIG_X86_MCE_INTEL
+  2493		if (maxlvt >= 6)
+  2494			apic_write(APIC_LVTCMCI, apic_pm_state.apic_cmci);
+  2495	#endif
+  2496		if (maxlvt >= 4)
+  2497			apic_write(APIC_LVTPC, apic_pm_state.apic_lvtpc);
+  2498		apic_write(APIC_LVTT, apic_pm_state.apic_lvtt);
+  2499		apic_write(APIC_TDCR, apic_pm_state.apic_tdcr);
+  2500		apic_write(APIC_TMICT, apic_pm_state.apic_tmict);
+  2501		apic_write(APIC_ESR, 0);
+  2502		apic_read(APIC_ESR);
+  2503		apic_write(APIC_LVTERR, apic_pm_state.apic_lvterr);
+  2504		apic_write(APIC_ESR, 0);
+  2505		apic_read(APIC_ESR);
+  2506	
+  2507		irq_remapping_reenable(x2apic_mode);
+  2508	
+  2509		local_irq_restore(flags);
+  2510	}
+  2511	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
