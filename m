@@ -1,210 +1,210 @@
-Return-Path: <kvm+bounces-69788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69790-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GNgtI1Hyf2nk0gIAu9opvQ
-	(envelope-from <kvm+bounces-69788-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 01:39:45 +0100
+	id WJJlGfb8f2lu1AIAu9opvQ
+	(envelope-from <kvm+bounces-69790-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 02:25:10 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5805C7A3E
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 01:39:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11CAC7C26
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 02:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3FBDC300821D
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 00:39:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 02E16300341E
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 01:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70781A9F94;
-	Mon,  2 Feb 2026 00:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF21E8332;
+	Mon,  2 Feb 2026 01:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="gK1KmXU9"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAA4145355;
-	Mon,  2 Feb 2026 00:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4234AEE2;
+	Mon,  2 Feb 2026 01:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769992769; cv=none; b=ieOjgKvt7qWw/bXLNCrWB7S6Rrh0IanLIZjjQo5eZxdKQlHO8oNBTCNNQlyuvwFEYQ0kPVZPNMf/X7JFSJ/PVxHlQOayvV9vrbCMDshCpZxcIrtIZ8Hu+UYLKL6M4XvLb9ZWU3OFiDjbFhEFb55mt9zybxJ/8GCa2gXp5tnfkSM=
+	t=1769995504; cv=none; b=Y3tktQOdFPPxH4pvlO9U+72XaG8zi2rfh8ZOjOzEwzBHEdfJV4IyqqdXzggXk+kod5Mm7RT64kLUHN57DbauLId8iMKr1h/9vbd4Glj2UxlO9+v3hKGB09npul1TVATV0dJk7wjxF+7lbJS9btSLTLEdCpS80Rsve6XgxNFpUMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769992769; c=relaxed/simple;
-	bh=FlLC6PZykxeIBKGPaTL4Wdas1Ew7R4JZyJRObWnErrI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iDAEVvfYvRRP74vm04yhCUKb9to2uMixO/ILrPlsaESVkFjN80E7x4eMcPyKHilkLZWZes8p1Ca/qijelyNpEv8E9QIrY+hkRD/GDN+6xxH8ym3BQuhefQOZLw2TawZgmKrDCX0KbvnDREQ+w1U3Bs2h9qJpvxy0DAME+cO+T3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from fric.. (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowAC3Sw8i8n9p5QBGBw--.1693S2;
-	Mon, 02 Feb 2026 08:38:59 +0800 (CST)
-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-To: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Andrew Jones <ajones@ventanamicro.com>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <pjw@kernel.org>,
-	Atish Patra <atish.patra@linux.dev>,
-	Anup Patel <anup@brainfault.org>,
-	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
-	Jiakai Xu <jiakaiPeanut@gmail.com>
-Subject: [PATCH v5] RISC-V: KVM: Validate SBI STA shmem alignment in kvm_sbi_ext_sta_set_reg()
-Date: Mon,  2 Feb 2026 00:38:57 +0000
-Message-Id: <20260202003857.1694378-1-xujiakai2025@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1769995504; c=relaxed/simple;
+	bh=37LnPPuK+YXyvmA3CxHzBkqPdE6Qln617phYP4fYP8g=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Go6wYR93BVLph9pzaPeFUyea8nvn9ST/w8lDboRnlVPdjkXj7E5I4g/8eRvmNtDWPPQ+8YtbYaKHuAZfGT/qyWawnSDfBufPYo/0KnX1xSQc/dzm/N9zkivEFeQQDGDgKphjtMyQFw2SYZfDuW5m9+l0idobOoSL/SWgMCDwsyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=gK1KmXU9; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=FQ3+XLRHs7vkMMN/TBvaecVisZLJrBpmK1EtzuG5rbA=;
+	b=gK1KmXU9km+nKxDg84NaR8ogNCsMuvw7zG+fOj6gtXGRFO8y/3MMGke99BpqSkOHb1i+PFp47
+	AvFPvhblDSCsME5KfsnZfMmSIWn3lRE5lWgZ6PN0iHXIlrF8EwFtNgzQ+bwv/JPTklouP0YWoK6
+	ncSMPmlGBkmWGZZbOlJbyqc=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4f481c609pzRhRZ;
+	Mon,  2 Feb 2026 09:20:20 +0800 (CST)
+Received: from kwepemj500016.china.huawei.com (unknown [7.202.194.46])
+	by mail.maildlp.com (Postfix) with ESMTPS id 151144036C;
+	Mon,  2 Feb 2026 09:24:53 +0800 (CST)
+Received: from kwepemj100010.china.huawei.com (7.202.194.4) by
+ kwepemj500016.china.huawei.com (7.202.194.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 2 Feb 2026 09:24:52 +0800
+Received: from kwepemj100010.china.huawei.com ([7.202.194.4]) by
+ kwepemj100010.china.huawei.com ([7.202.194.4]) with mapi id 15.02.1544.036;
+ Mon, 2 Feb 2026 09:24:52 +0800
+From: Zhangjiaji <zhangjiaji1@huawei.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: "Wangqinxiao (Tom)" <wangqinxiao@huawei.com>, zhangyashu
+	<zhangyashu2@h-partners.com>, "wangyanan (Y)" <wangyanan55@huawei.com>
+Subject: [BUG REPORT] USE_AFTER_FREE in complete_emulated_mmio found by
+ KASAN/Syzkaller fuzz test (v5.10.0)
+Thread-Topic: [BUG REPORT] USE_AFTER_FREE in complete_emulated_mmio found by
+ KASAN/Syzkaller fuzz test (v5.10.0)
+Thread-Index: AdyT4riNhTefFgfzSBuxneuHfKKRIA==
+Date: Mon, 2 Feb 2026 01:24:52 +0000
+Message-ID: <369eaaa2b3c1425c85e8477066391bc7@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAC3Sw8i8n9p5QBGBw--.1693S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF4xXFyfKw4fZrW5Cry7trb_yoWrJFWUpF
-	4Ikw15ArWxtFZ7A39rZr4vgr1Y93ykKr1jqF9xu34rZF4ktFyYyrna93y7ZF98GFyvvFyS
-	yr10vF1Duw4YyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2
-	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
-	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOmhFUUUUU
-X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiBwwGCWl-a9Cj8QAAs7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69788-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[ventanamicro.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,kernel.org,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-69790-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qemu.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhangjiaji1@huawei.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E5805C7A3E
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: D11CAC7C26
 X-Rspamd-Action: no action
 
-The RISC-V SBI Steal-Time Accounting (STA) extension requires the shared
-memory physical address to be 64-byte aligned, and the shared memory size
-to be at least 64 bytes.
+Syzkaller hit 'KASAN: use-after-free Read in complete_emulated_mmio' bug.
 
-KVM exposes the SBI STA shared memory configuration to userspace via
-KVM_SET_ONE_REG. However, the current implementation of
-kvm_sbi_ext_sta_set_reg() does not validate the alignment of the configured
-shared memory address. As a result, userspace can install a misaligned
-shared memory address that violates the SBI specification.
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+BUG: KASAN: use-after-free in complete_emulated_mmio+0x305/0x420
+Read of size 1 at addr ffff888009c378d1 by task syz-executor417/984
 
-Such an invalid configuration may later reach runtime code paths that
-assume a valid and properly aligned shared memory region. In particular,
-KVM_RUN can trigger the following WARN_ON in
-kvm_riscv_vcpu_record_steal_time():
+CPU: 1 PID: 984 Comm: syz-executor417 Not tainted 5.10.0-182.0.0.95.h2627.e=
+ulerosv2r13.x86_64 #3 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)=
+, BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014 Call Trace:
+dump_stack+0xbe/0xfd
+print_address_description.constprop.0+0x19/0x170
+__kasan_report.cold+0x6c/0x84
+kasan_report+0x3a/0x50
+check_memory_region+0xfd/0x1f0
+memcpy+0x20/0x60
+complete_emulated_mmio+0x305/0x420
+kvm_arch_vcpu_ioctl_run+0x63f/0x6d0
+kvm_vcpu_ioctl+0x413/0xb20
+__se_sys_ioctl+0x111/0x160
+do_syscall_64+0x30/0x40
+entry_SYSCALL_64_after_hwframe+0x67/0xd1
+RIP: 0033:0x42477d
+Code: 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 48 89 f8 48 89 f7 =
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
+f 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007faa8e6890e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00000000004d7338 RCX: 000000000042477d
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 00000000004d7330 R08: 00007fff28d546df R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000004d733c
+R13: 0000000000000000 R14: 000000000040a200 R15: 00007fff28d54720
 
-  WARNING: arch/riscv/kvm/vcpu_sbi_sta.c:49 at
-  kvm_riscv_vcpu_record_steal_time
+The buggy address belongs to the page:
+page:0000000029f6a428 refcount:0 mapcount:0 mapping:0000000000000000 index:=
+0x0 pfn:0x9c37
+flags: 0xfffffc0000000(node=3D0|zone=3D1|lastcpupid=3D0x1fffff)
+raw: 000fffffc0000000 0000000000000000 ffffea0000270dc8 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000 pa=
+ge dumped because: kasan: bad access detected
 
-WARN_ON paths are not expected to be reachable during normal runtime
-execution, and may result in a kernel panic when panic_on_warn is enabled.
+Memory state around the buggy address:
+ffff888009c37780: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ffff888009c37800: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff888009c37880: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                                 ^
+ffff888009c37900: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ffff888009c37980: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff =3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Fix this by validating the shared memory alignment at the
-KVM_SET_ONE_REG boundary and rejecting misaligned configurations with
--EINVAL. The validation is performed on a temporary computed address and
-only committed to vcpu->arch.sta.shmem once it is known to be valid, 
-similar to the existing logic in kvm_sbi_sta_steal_time_set_shmem() and
-kvm_sbi_ext_sta_handler().
 
-With this change, invalid userspace state is rejected early and cannot
-reach runtime code paths that rely on the SBI specification invariants.
+Syzkaller reproducer:
+# {Threaded:true Repeat:true RepeatTimes:0 Procs:1 Slowdown:1 Sandbox: Sand=
+boxArg:0 Leak:false NetInjection:false NetDevices:false NetReset:false Cgro=
+ups:false BinfmtMisc:false CloseFDs:false KCSAN:false DevlinkPCI:false NicV=
+F:false USB:false VhciInjection:false Wifi:false IEEE802154:false Sysctl:fa=
+lse Swap:false UseTmpDir:false HandleSegv:true Repro:false Trace:false Lega=
+cyOptions:{Collide:false Fault:false FaultCall:0 FaultNth:0}}
+r0 =3D openat$kvm(0xffffffffffffff9c, &(0x7f00000001c0), 0x0, 0x0)
+r1 =3D ioctl$KVM_CREATE_VM(r0, 0xae01, 0x0)
+r2 =3D ioctl$KVM_CREATE_VCPU(r1, 0xae41, 0x0) syz_kvm_setup_cpu$x86(r1, r2,=
+ &(0x7f0000fe2000/0x18000)=3Dnil, &(0x7f0000000080)=3D[@text32=3D{0x20, &(0=
+x7f0000000000)=3D"44c8df2020c020c003000000000f22c0671e26653e360f2224660f65b=
+600000000b9e0450200f5e8f5e8f30f1ed6c744240000100000c744240200000000c7442406=
+000000000f011424eacf5700000301b8010000000f01c1", 0x59}], 0x1, 0x27, 0x0, 0x=
+1) ioctl$KVM_RUN(r2, 0xae80, 0x0) ioctl$KVM_SMI(0xffffffffffffffff, 0xaeb7)=
+ (async) ioctl$KVM_RUN(r2, 0xae80, 0x0)
 
-A reproducer triggering the WARN_ON and the complete kernel log are
-available at: https://github.com/j1akai/temp/tree/main/20260124
 
-Fixes: f61ce890b1f074 ("RISC-V: KVM: Add support for SBI STA registers")
-Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
----
-V4 -> V5: Added parentheses to function name in subject.
-V3 -> V4: Declared new_shmem at the top of kvm_sbi_ext_sta_set_reg().
-          Initialized new_shmem to 0 instead of vcpu->arch.sta.shmem.
-          Added blank lines per review feedback.
-V2 -> V3: Added parentheses to function name in subject.
-V1 -> V2: Added Fixes tag.
+----------------------------
+Hi,
 
----
- arch/riscv/kvm/vcpu_sbi_sta.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+I've analyzed the Syzkaller output and the complete_emulated_mmio() code pa=
+th.
+The buggy address is created in em_enter(), where it passes its local varia=
+ble `ulong rbp` to emulate_push(), finally ends in emulator_read_write_onep=
+age() putting the address into vcpu->mmio_fragments[].data .
+The bug happens when kvm guest executes an "enter" instruction, and top of =
+the stack crosses the mem page.=20
+In that case, the em_enter() function cannot complete the instruction withi=
+n itself, but leave the rest data (which is in the other page) to complete_=
+emulated_mmio().
+When complete_emulated_mmio() starts, em_enter() has exited, so local varia=
+ble `ulong rbp` is also released.
+Now complete_emulated_mmio() trys to access vcpu->mmio_fragments[].data , a=
+nd the bug happened.
 
-diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.c
-index afa0545c3bcfc..bb13aa8eab7ee 100644
---- a/arch/riscv/kvm/vcpu_sbi_sta.c
-+++ b/arch/riscv/kvm/vcpu_sbi_sta.c
-@@ -181,6 +181,7 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 				   unsigned long reg_size, const void *reg_val)
- {
- 	unsigned long value;
-+	gpa_t new_shmem = 0;
- 
- 	if (reg_size != sizeof(unsigned long))
- 		return -EINVAL;
-@@ -191,18 +192,18 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 		if (IS_ENABLED(CONFIG_32BIT)) {
- 			gpa_t hi = upper_32_bits(vcpu->arch.sta.shmem);
- 
--			vcpu->arch.sta.shmem = value;
--			vcpu->arch.sta.shmem |= hi << 32;
-+			new_shmem = value;
-+			new_shmem |= hi << 32;
- 		} else {
--			vcpu->arch.sta.shmem = value;
-+			new_shmem = value;
- 		}
- 		break;
- 	case KVM_REG_RISCV_SBI_STA_REG(shmem_hi):
- 		if (IS_ENABLED(CONFIG_32BIT)) {
- 			gpa_t lo = lower_32_bits(vcpu->arch.sta.shmem);
- 
--			vcpu->arch.sta.shmem = ((gpa_t)value << 32);
--			vcpu->arch.sta.shmem |= lo;
-+			new_shmem = ((gpa_t)value << 32);
-+			new_shmem |= lo;
- 		} else if (value != 0) {
- 			return -EINVAL;
- 		}
-@@ -211,6 +212,11 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 		return -ENOENT;
- 	}
- 
-+	if (new_shmem && !IS_ALIGNED(new_shmem, 64))
-+		return -EINVAL;
-+
-+	vcpu->arch.sta.shmem = new_shmem;
-+
- 	return 0;
- }
- 
--- 
-2.34.1
+any idea?
+
+--
+Best regards,
+Yashu Zhang
+
+
 
 
