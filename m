@@ -1,217 +1,253 @@
-Return-Path: <kvm+bounces-69952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69953-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHR8LQUpgWkwEgMAu9opvQ
-	(envelope-from <kvm+bounces-69952-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:45:25 +0100
+	id kHT0C14rgWlgEgMAu9opvQ
+	(envelope-from <kvm+bounces-69953-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:55:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0634D2687
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:45:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582B2D2885
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:55:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A9473057E6C
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 22:37:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CDDF930D3C78
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 22:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803FE39B4BF;
-	Mon,  2 Feb 2026 22:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5153876C2;
+	Mon,  2 Feb 2026 22:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V1VTqF82"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IoTMIwRf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7238E39A81A
-	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 22:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E97C36E48B;
+	Mon,  2 Feb 2026 22:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770071484; cv=none; b=IXAICy3KnGcaW4fVsdKfmovovFhP+T1U4TCTIGNP/NAcfS+J8dNqvpcR80yDEJTX83XTxdiynxZSnC04XplsuRwCIEM9WcaeshNEfmZ4cNULJrgzmsPdRGdLHethv460kujC7fLmqmA2CVAOxgng8B0hi+PYWJhLrOaV4ErXAIg=
+	t=1770071583; cv=none; b=HexBL0poHbUY72VkKO5sRwWW/Cb8DNGg/RjmFDX0GHPgPBO+NT4LMOj/rb5hrq5Y4yD/1J2qEfyJYPItNPcUPAe4dwMGRA1btLoS1m68zorNXVlrYpWNnYHYfnK5z8XnnyWAsPdxlSUllCw4x38zS5EaAOHwotSE/v2xrkQtFtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770071484; c=relaxed/simple;
-	bh=wZXv+TME0sdMIhDs+Vvo3czPB4m+Wo6+UTulHpD7Eis=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Zi1gxvFYwXJLiR/16vZGWPn+v0G3sCab1ROPF0tqU0NWnXIHZV2BaYb07phiUdtT4nvBV2TtOqaywQJTB9DfV9OftTGTlkzUpmPx2oh4WenB8tBod7eAEfDIg5XdR4pJTpF9IFK1mpF2HeW1yzIziPgTg3vwRIzGMkzJgoelSgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V1VTqF82; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3545dbb7f14so1866310a91.0
-        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 14:31:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770071483; x=1770676283; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N1fK+k68a0pGVmVUxE1g8z3cUW6Ywik4PxEWV42uRsg=;
-        b=V1VTqF82x8pA9fZh11/gG0amWYY/nzqXB2r3Ey2T1OAXaF5Fs13kJfP/+J743nPMMf
-         YxYrl3VcKcldt1hEVSCLkJcOz6vhvpOKqObHXpcjeaYN0grTFwJhc4PFVop3y87VkHKy
-         geBLYBBTpgVm8cpRvKZI0+f5Qut9Mxra8YydTye/vknE6eZmJ8KL/JDG6jeG4k9tjSDH
-         T1cjim2NkvI6NdLryL4nQjxkNDiej4dk89nsMsk8m4doTJ4CRG0WvfMzo0JlP9N13lSc
-         zDT4cFjCLNu9WV0pYK22sF4cUcdzyxYsf1CC/HY+yR6KLLy/FfPLdRPcdPIq7hPAW0vS
-         x5PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770071483; x=1770676283;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N1fK+k68a0pGVmVUxE1g8z3cUW6Ywik4PxEWV42uRsg=;
-        b=bedlvhsiTDm7K35dTvnMMEbYi1Zh0p8Hj73kA2LU2PphTF+tScKSVJVu1TzCBwAEhM
-         3bsoiEFtZz0XVJ7Mf7OHmgK+WZHjW4NmF0pMhOj/uLQTbXf+KkhinOO25auVtpUmmauH
-         hffO/PknLTVf/mdPEaJnrClX0ig19Fs9V3+HMHG+ruZsvXkr300rABRWTloFa+eWPYUQ
-         1wngYETpmWm7zErfF5kPrAG1JI7oOXRQTGE/W37lUvNBHf6LNBsD18YBx3XCCFmI5kvt
-         g8oVcsbOp3ZoPGQ0JyoZc1oHhN9shCOjZeXXXpZ8LSl5QVT3MOsitx+RPniNEEWqSLMB
-         YCvQ==
-X-Gm-Message-State: AOJu0YyM9E2ZpP+7NTIuCrjxUiiAr96OrPqd/UmrP6Azrtprasx5cEdN
-	SXiODavjiUDKrO1LsBBYqZabxtNcwVQaQts1x4E0pvkyMrNXmx1v+FZq5PA48jWBBYN38KVo5Yd
-	ctTaCuTsui3k8X1tw53PmkQrvRaZe14y+rPM7LZ8wbsfOU7++2zEtEJTsJXfXwvoC22oiRAx6wA
-	vrPNsrWjO1wM93m2f0smsOIAP2gUBtJUzpIdYAHpQK5+n6xrpR6IHBxNV5S8E=
-X-Received: from pjrz22.prod.google.com ([2002:a17:90a:bd96:b0:34c:fbee:f264])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2b8c:b0:340:bde5:c9e3 with SMTP id 98e67ed59e1d1-3543b3ac8eemr11759602a91.23.1770071482558;
- Mon, 02 Feb 2026 14:31:22 -0800 (PST)
-Date: Mon,  2 Feb 2026 14:30:15 -0800
-In-Reply-To: <cover.1770071243.git.ackerleytng@google.com>
+	s=arc-20240116; t=1770071583; c=relaxed/simple;
+	bh=K94Yr5tqFVaHsCYCKnsxMVUvUOkbufB1DVdDJ7sbhdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PtKQ6x5ntp6NbtHOMfLn83GScy6P6y1WS8ECHmnYu5w06Z8z4fI/pUN/YZhwrh4lk7KG6aCVyQkPx0Jm0zfJxl6+GIQLiVU1E+aAl6/g+QFbkS/JAbuB7dPnGjRGjFAxGlFN5Qlz0EcM7SUnBRf+fFe8G6L8kx26XrO2HgoLkWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IoTMIwRf; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770071582; x=1801607582;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=K94Yr5tqFVaHsCYCKnsxMVUvUOkbufB1DVdDJ7sbhdg=;
+  b=IoTMIwRfgHmT4hdU1s6/vqf9JpM0SsHX4k/UeOZYpEC0grVvohPRgD75
+   N4JtwjHTF0sE7xvK/bpZZHNdUbzApmN58F983AAnNMDmdDLwPhvelRZzQ
+   vEG7rMt1EZc0Vi9+dv2Z6B2O+lxV/huJ3RSumACq8QxjU0mAY5zYaW1sj
+   OWlsw85Zw47lc8CWmieY6ZhgEKl4Wkrhb3kE3L5YRQkASd2wENvF5lPE5
+   ABR8Kpx6QpkuOElLEhqFULrsmQfWHsRV1HivZZgbgIWctHctoafsdTLUP
+   Stkb5LXnX5mZ/AlnP9TsMPEgk3GdXwqTX9qwABCXTOqv5z9sPuPvmn8gS
+   Q==;
+X-CSE-ConnectionGUID: uaS4Mu/YTSujw/KjRe281w==
+X-CSE-MsgGUID: u3kAFDsBRbiftxZagXdQHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11690"; a="82348626"
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="82348626"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2026 14:33:02 -0800
+X-CSE-ConnectionGUID: f0cfM4HPRO+EXrWtBO5R7A==
+X-CSE-MsgGUID: e2M1VSzVScuy0rx2orDXBg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,269,1763452800"; 
+   d="scan'208";a="209657809"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 02 Feb 2026 14:32:27 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vn2T3-00000000g1M-0wih;
+	Mon, 02 Feb 2026 22:32:25 +0000
+Date: Tue, 3 Feb 2026 06:31:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shashank Balaji <shashank.mahadasyam@sony.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Suresh Siddha <suresh.b.siddha@intel.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev, jailhouse-dev@googlegroups.com,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	Rahul Bukte <rahul.bukte@sony.com>,
+	Shashank Balaji <shashank.mahadasyam@sony.com>,
+	Daniel Palmer <daniel.palmer@sony.com>,
+	Tim Bird <tim.bird@sony.com>
+Subject: Re: [PATCH 1/3] x86/x2apic: disable x2apic on resume if the kernel
+ expects so
+Message-ID: <202602030600.jFhsJyEC-lkp@intel.com>
+References: <20260202-x2apic-fix-v1-1-71c8f488a88b@sony.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1770071243.git.ackerleytng@google.com>
-X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <c418c8a29a5849b3b0da5350a26b92d2f2829823.1770071243.git.ackerleytng@google.com>
-Subject: [RFC PATCH v2 37/37] KVM: selftests: Update private memory exits test
- work with per-gmem attributes
-From: Ackerley Tng <ackerleytng@google.com>
-To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org
-Cc: aik@amd.com, andrew.jones@linux.dev, binbin.wu@linux.intel.com, 
-	bp@alien8.de, brauner@kernel.org, chao.p.peng@intel.com, 
-	chao.p.peng@linux.intel.com, chenhuacai@kernel.org, corbet@lwn.net, 
-	dave.hansen@linux.intel.com, david@kernel.org, hpa@zytor.com, 
-	ira.weiny@intel.com, jgg@nvidia.com, jmattson@google.com, jroedel@suse.de, 
-	jthoughton@google.com, maobibo@loongson.cn, mathieu.desnoyers@efficios.com, 
-	maz@kernel.org, mhiramat@kernel.org, michael.roth@amd.com, mingo@redhat.com, 
-	mlevitsk@redhat.com, oupton@kernel.org, pankaj.gupta@amd.com, 
-	pbonzini@redhat.com, prsampat@amd.com, qperret@google.com, 
-	ricarkol@google.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
-	rostedt@goodmis.org, seanjc@google.com, shivankg@amd.com, shuah@kernel.org, 
-	steven.price@arm.com, tabba@google.com, tglx@linutronix.de, 
-	vannapurve@google.com, vbabka@suse.cz, willy@infradead.org, wyihan@google.com, 
-	yan.y.zhao@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260202-x2apic-fix-v1-1-71c8f488a88b@sony.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69952-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69953-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_GT_50(0.00)[50];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A0634D2687
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,01.org:url]
+X-Rspamd-Queue-Id: 582B2D2885
 X-Rspamd-Action: no action
 
-From: Sean Christopherson <seanjc@google.com>
+Hi Shashank,
 
-Skip setting memory to private in the private memory exits test when using
-per-gmem memory attributes, as memory is initialized to private by default
-for guest_memfd, and using vm_mem_set_private() on a guest_memfd instance
-requires creating guest_memfd with GUEST_MEMFD_FLAG_MMAP (which is totally
-doable, but would need to be conditional and is ultimately unnecessary).
+kernel test robot noticed the following build errors:
 
-Expect an emulated MMIO instead of a memory fault exit when attributes are
-per-gmem, as deleting the memslot effectively drops the private status,
-i.e. the GPA becomes shared and thus supports emulated MMIO.
+[auto build test ERROR on 18f7fcd5e69a04df57b563360b88be72471d6b62]
 
-Skip the "memslot not private" test entirely, as private vs. shared state
-for x86 software-protected VMs comes from the memory attributes themselves,
-and so when doing in-place conversions there can never be a disconnect
-between the expected and actual states.
+url:    https://github.com/intel-lab-lkp/linux/commits/Shashank-Balaji/x86-x2apic-disable-x2apic-on-resume-if-the-kernel-expects-so/20260202-181147
+base:   18f7fcd5e69a04df57b563360b88be72471d6b62
+patch link:    https://lore.kernel.org/r/20260202-x2apic-fix-v1-1-71c8f488a88b%40sony.com
+patch subject: [PATCH 1/3] x86/x2apic: disable x2apic on resume if the kernel expects so
+config: i386-randconfig-001-20260202 (https://download.01.org/0day-ci/archive/20260203/202602030600.jFhsJyEC-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260203/202602030600.jFhsJyEC-lkp@intel.com/reproduce)
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../kvm/x86/private_mem_kvm_exits_test.c      | 36 +++++++++++++++----
- 1 file changed, 30 insertions(+), 6 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602030600.jFhsJyEC-lkp@intel.com/
 
-diff --git a/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c b/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c
-index 13e72fcec8dd..10be67441d45 100644
---- a/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c
-+++ b/tools/testing/selftests/kvm/x86/private_mem_kvm_exits_test.c
-@@ -62,8 +62,9 @@ static void test_private_access_memslot_deleted(void)
- 
- 	virt_map(vm, EXITS_TEST_GVA, EXITS_TEST_GPA, EXITS_TEST_NPAGES);
- 
--	/* Request to access page privately */
--	vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
-+	/* Request to access page privately. */
-+	if (!kvm_has_gmem_attributes)
-+		vm_mem_set_private(vm, EXITS_TEST_GPA, EXITS_TEST_SIZE);
- 
- 	pthread_create(&vm_thread, NULL,
- 		       (void *(*)(void *))run_vcpu_get_exit_reason,
-@@ -74,10 +75,26 @@ static void test_private_access_memslot_deleted(void)
- 	pthread_join(vm_thread, &thread_return);
- 	exit_reason = (uint32_t)(uint64_t)thread_return;
- 
--	TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
--	TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
--	TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
--	TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
-+	/*
-+	 * If attributes are tracked per-gmem, deleting the memslot that points
-+	 * at the gmem instance effectively makes the memory shared, and so the
-+	 * read should trigger emulated MMIO.
-+	 *
-+	 * If attributes are tracked per-VM, deleting the memslot shouldn't
-+	 * affect the private attribute, and so KVM should generate a memory
-+	 * fault exit (emulated MMIO on private GPAs is disallowed).
-+	 */
-+	if (kvm_has_gmem_attributes) {
-+		TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MMIO);
-+		TEST_ASSERT_EQ(vcpu->run->mmio.phys_addr, EXITS_TEST_GPA);
-+		TEST_ASSERT_EQ(vcpu->run->mmio.len, sizeof(uint64_t));
-+		TEST_ASSERT_EQ(vcpu->run->mmio.is_write, false);
-+	} else {
-+		TEST_ASSERT_EQ(exit_reason, KVM_EXIT_MEMORY_FAULT);
-+		TEST_ASSERT_EQ(vcpu->run->memory_fault.flags, KVM_MEMORY_EXIT_FLAG_PRIVATE);
-+		TEST_ASSERT_EQ(vcpu->run->memory_fault.gpa, EXITS_TEST_GPA);
-+		TEST_ASSERT_EQ(vcpu->run->memory_fault.size, EXITS_TEST_SIZE);
-+	}
- 
- 	kvm_vm_free(vm);
- }
-@@ -88,6 +105,13 @@ static void test_private_access_memslot_not_private(void)
- 	struct kvm_vcpu *vcpu;
- 	uint32_t exit_reason;
- 
-+	/*
-+	 * Accessing non-private memory as private with a software-protected VM
-+	 * isn't possible when doing in-place conversions.
-+	 */
-+	if (kvm_has_gmem_attributes)
-+		return;
-+
- 	vm = vm_create_shape_with_one_vcpu(protected_vm_shape, &vcpu,
- 					   guest_repeatedly_read);
- 
+All errors (new ones prefixed by >>):
+
+>> arch/x86/kernel/apic/apic.c:2463:3: error: call to undeclared function '__x2apic_disable'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    2463 |                 __x2apic_disable();
+         |                 ^
+   arch/x86/kernel/apic/apic.c:2463:3: note: did you mean '__x2apic_enable'?
+   arch/x86/kernel/apic/apic.c:1896:20: note: '__x2apic_enable' declared here
+    1896 | static inline void __x2apic_enable(void) { }
+         |                    ^
+   1 error generated.
+
+
+vim +/__x2apic_disable +2463 arch/x86/kernel/apic/apic.c
+
+  2435	
+  2436	static void lapic_resume(void *data)
+  2437	{
+  2438		unsigned int l, h;
+  2439		unsigned long flags;
+  2440		int maxlvt;
+  2441	
+  2442		if (!apic_pm_state.active)
+  2443			return;
+  2444	
+  2445		local_irq_save(flags);
+  2446	
+  2447		/*
+  2448		 * IO-APIC and PIC have their own resume routines.
+  2449		 * We just mask them here to make sure the interrupt
+  2450		 * subsystem is completely quiet while we enable x2apic
+  2451		 * and interrupt-remapping.
+  2452		 */
+  2453		mask_ioapic_entries();
+  2454		legacy_pic->mask_all();
+  2455	
+  2456		if (x2apic_mode) {
+  2457			__x2apic_enable();
+  2458		} else {
+  2459			/*
+  2460			 * x2apic may have been re-enabled by the
+  2461			 * firmware on resuming from s2ram
+  2462			 */
+> 2463			__x2apic_disable();
+  2464	
+  2465			/*
+  2466			 * Make sure the APICBASE points to the right address
+  2467			 *
+  2468			 * FIXME! This will be wrong if we ever support suspend on
+  2469			 * SMP! We'll need to do this as part of the CPU restore!
+  2470			 */
+  2471			if (boot_cpu_data.x86 >= 6) {
+  2472				rdmsr(MSR_IA32_APICBASE, l, h);
+  2473				l &= ~MSR_IA32_APICBASE_BASE;
+  2474				l |= MSR_IA32_APICBASE_ENABLE | mp_lapic_addr;
+  2475				wrmsr(MSR_IA32_APICBASE, l, h);
+  2476			}
+  2477		}
+  2478	
+  2479		maxlvt = lapic_get_maxlvt();
+  2480		apic_write(APIC_LVTERR, ERROR_APIC_VECTOR | APIC_LVT_MASKED);
+  2481		apic_write(APIC_ID, apic_pm_state.apic_id);
+  2482		apic_write(APIC_DFR, apic_pm_state.apic_dfr);
+  2483		apic_write(APIC_LDR, apic_pm_state.apic_ldr);
+  2484		apic_write(APIC_TASKPRI, apic_pm_state.apic_taskpri);
+  2485		apic_write(APIC_SPIV, apic_pm_state.apic_spiv);
+  2486		apic_write(APIC_LVT0, apic_pm_state.apic_lvt0);
+  2487		apic_write(APIC_LVT1, apic_pm_state.apic_lvt1);
+  2488	#ifdef CONFIG_X86_THERMAL_VECTOR
+  2489		if (maxlvt >= 5)
+  2490			apic_write(APIC_LVTTHMR, apic_pm_state.apic_thmr);
+  2491	#endif
+  2492	#ifdef CONFIG_X86_MCE_INTEL
+  2493		if (maxlvt >= 6)
+  2494			apic_write(APIC_LVTCMCI, apic_pm_state.apic_cmci);
+  2495	#endif
+  2496		if (maxlvt >= 4)
+  2497			apic_write(APIC_LVTPC, apic_pm_state.apic_lvtpc);
+  2498		apic_write(APIC_LVTT, apic_pm_state.apic_lvtt);
+  2499		apic_write(APIC_TDCR, apic_pm_state.apic_tdcr);
+  2500		apic_write(APIC_TMICT, apic_pm_state.apic_tmict);
+  2501		apic_write(APIC_ESR, 0);
+  2502		apic_read(APIC_ESR);
+  2503		apic_write(APIC_LVTERR, apic_pm_state.apic_lvterr);
+  2504		apic_write(APIC_ESR, 0);
+  2505		apic_read(APIC_ESR);
+  2506	
+  2507		irq_remapping_reenable(x2apic_mode);
+  2508	
+  2509		local_irq_restore(flags);
+  2510	}
+  2511	
+
 -- 
-2.53.0.rc1.225.gd81095ad13-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
