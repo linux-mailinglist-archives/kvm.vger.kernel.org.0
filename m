@@ -1,172 +1,167 @@
-Return-Path: <kvm+bounces-69845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69846-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IOivJHyhgGni/wIAu9opvQ
-	(envelope-from <kvm+bounces-69845-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 14:07:08 +0100
+	id gAHzMOWhgGni/wIAu9opvQ
+	(envelope-from <kvm+bounces-69846-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 14:08:53 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E460CC981
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 14:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26066CC9BD
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 14:08:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C2CDD305B2B6
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 13:05:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FED0303A6F5
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 13:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9233B366802;
-	Mon,  2 Feb 2026 13:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502EF36657C;
+	Mon,  2 Feb 2026 13:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kDVs+ZYJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D+aw/TuK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2BE2D321B
-	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 13:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E66A77F39
+	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 13:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770037517; cv=none; b=pstK5PKjCNLd6ezj9GJ4iS1ePjZYn26XIAg/dvESs2zXSZ+nhleHYkUlh3bFEP6KnorCgRWZVgNAWgxqs5bKP8hFXkGjes9EaX1MhsE5/IcOhFzLWnR2IJaHgL3q1xs6Mrpb2q6KvhGGaQqLJKTmlK/wTzM3aZgJkwrT0/QGxK8=
+	t=1770037660; cv=none; b=jJhdVeuxvP4rNIH1e9J9GpSq5hA7vcjuEj3h4JNcckbG5nbFlvQHt79A/orad+GuJjin7nPWKz9Mkn010aw0JNcEJxaMVMGw46H36CLKr3ng3OyK2tWYqA8hKlwr0Tbd9CuBC2RH010QpSgXptQO2r1HManINLjZI1Ogpq/K5XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770037517; c=relaxed/simple;
-	bh=N5ZvmT0iIKACEc12ObQnujbtPmQ6zFf/rwBQv1kZPAc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BVRINMpgSk+ggiOwBWTD7kHM2lelHB7aDEYDgugYp+sZvh20JkbgeWoJk0DAEUvOvSc/kD/Fw7EnZb6NgTR/RjhNw3NhAGMx921L1e29qQBfcOsiz3G2jEAwSQYtqSRQvXP5vktgAdiN3VeX/3VstNVxZTUshEKWY7q3cojZK0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kDVs+ZYJ; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-482eec44485so15079395e9.3
-        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 05:05:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770037515; x=1770642315; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DaIRa8+hj7hUcUtCLpq5uVaY4q/WBE+WwNIl0Oyop/g=;
-        b=kDVs+ZYJR03vB+WSU+jKtLnhoZQ/3IixkFNg/h+dyncgnbKHFkrZ55X48psx1VkMyx
-         G6/8QlEaNShVUnAZXYJ2mac6ZHtynIHaTbW9mXA9kPxbmTtcJofpaamSKy4LOosrRQC7
-         JPc8WJ3eLPmC2SMZqDs2jdPEpStVNDeMJFV3ORGnbPmftFQ4mSzFjyzNiMG5TnXcNNr6
-         d/F8t8ivOKgelxlPT1rIsQjPWNJvsPpJcJZnVajbmGusaN/aowApTdZHsLtzFU1mFlOn
-         5bhS2LEudxGZ9BnTqujtqT0B0y/23/cECzePJ3IGyYoDsLCO5wCMbZgueYNedCtoVIHU
-         6/iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770037515; x=1770642315;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DaIRa8+hj7hUcUtCLpq5uVaY4q/WBE+WwNIl0Oyop/g=;
-        b=vVeeeqh++gmXIyGX29kDBz6gRPdVEvJP/VLM7nMYeI6Gsfa6YdFhK6IqPG2SR0gHjC
-         +nYDhL58ALhkGOWCuTjluUlKyOQOCE2FIWLqrw0tpH+eLyjUq+OqVkpt8MY4bsXXAk7K
-         y4mGV+hXXsvyEx2e5+PWDU7Gzvea2GXuLl6Q6LDC/+JuhFE5HgJpgvwgIbUacjx5HY39
-         Hre960ahxO2vJvXGSlzapeozrA/3K3g7syLtTniTrhvrbLku+wi0t7BXY0MSt0jIKdzc
-         PRSyLYK68PtEeNdu0BJ3rxdGAdz3QLZc8409ymLyqf0PsakcQF7/Vd6tpI6Ufc8bEAIP
-         skVg==
-X-Gm-Message-State: AOJu0YwRcvOJF1U7N74cR8lbymfvMqTT1uhc+GMTCop7WSgTqdO7lWi+
-	BLB8XxEOQCJTUUHSvSsdCAy1gye6c1rtW3iycYARrG+GYBWjpdbq4Q2/gsAB0HwGmrg/HIfj3tm
-	00eSF7UjP4BDMmUDxSRwkT4NNdmNbXuc+k6ZdTNNX+vhSUZPE1Apq5vzzSejNqozW5BuccyWUDh
-	sSL2BThJqNGjXH/XTjXT9nqxahg+g=
-X-Received: from wmnv9.prod.google.com ([2002:a05:600c:4449:b0:477:9976:8214])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:a00a:b0:480:69b6:dfed
- with SMTP id 5b1f17b1804b1-482db47d0d1mr157567225e9.24.1770037514308; Mon, 02
- Feb 2026 05:05:14 -0800 (PST)
-Date: Mon,  2 Feb 2026 13:04:24 +0000
+	s=arc-20240116; t=1770037660; c=relaxed/simple;
+	bh=xa2sFjbzq6uDrkQ/f/ljXfRnkgUd0Ki/WhXSJpohFW8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=livgLpQ5UbbqHUdirsoCX4etePLPHtrpTmUZ6p12NNrcLF55NMkROP1o0kSrS1y4KrVIZ/0RFV7ZW40ChkMNQtPx7vQav7NpSak6sbJQmsfhjPf60KNwAI19zg2q94k/VYNaPoFrnNDO0nbW8OuUPXJ9kiSDMY/ET5rboKtyY/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=D+aw/TuK; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4700e7ba-8456-4a93-9e28-7e5a3ca2a1be@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770037646;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rtRt2J+NteIme3evuIB2m7Zz3ToxciDgZMFuOP2gieE=;
+	b=D+aw/TuK5ROJABoMvBj2zE/534Oz1vKJLXvEAqHUd4MV1pSHSiClseUddZQv0N7Sxaau3Q
+	dQpodJOsye1tbDd5fadW9kkIegNhZA6SVB/dPRmMyzPBNi+yMtnIdGQPmP78O1gnJpVdUY
+	tn9W9eJ65ExTWgYCt0d9CDAUtzFC4bs=
+Date: Mon, 2 Feb 2026 21:07:10 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260202130513.49436-1-tabba@google.com>
-Subject: [PATCH v1] KVM: arm64: nv: Use kvm_phys_size() for VNCR invalidation range
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, qperret@google.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Lance Yang <lance.yang@linux.dev>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org,
+ aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
+ baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
+ dave.hansen@intel.com, dave.hansen@linux.intel.com, david@kernel.org,
+ dev.jain@arm.com, hpa@zytor.com, hughd@google.com, ioworker0@gmail.com,
+ jannh@google.com, jgross@suse.com, kvm@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, lorenzo.stoakes@oracle.com, mingo@redhat.com,
+ npache@redhat.com, npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
+ ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
+ tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
+ x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
+References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
+ <20260202110329.74397-1-lance.yang@linux.dev>
+ <20260202125030.GB1395266@noisy.programming.kicks-ass.net>
+ <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
+In-Reply-To: <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-69845-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69846-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,intel.com,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0E460CC981
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lance.yang@linux.dev,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: 26066CC9BD
 X-Rspamd-Action: no action
 
-KVM: arm64: nv: Use kvm_phys_size() for VNCR invalidation range
 
-Protected mode uses `pkvm_mappings` of the union inside `struct kvm_pgtable`.
-This aliases `ia_bits`, which is used in non-protected mode.
 
-Attempting to use `pgt->ia_bits` in kvm_nested_s2_unmap() and
-kvm_nested_s2_wp() results in reading mapping pointers or state as a
-shift amount. This triggers a UBSAN shift-out-of-bounds error:
+On 2026/2/2 20:58, Lance Yang wrote:
+> 
+> 
+> On 2026/2/2 20:50, Peter Zijlstra wrote:
+>> On Mon, Feb 02, 2026 at 07:00:16PM +0800, Lance Yang wrote:
+>>>
+>>> On Mon, 2 Feb 2026 10:54:14 +0100, Peter Zijlstra wrote:
+>>>> On Mon, Feb 02, 2026 at 03:45:54PM +0800, Lance Yang wrote:
+>>>>> When freeing or unsharing page tables we send an IPI to synchronize 
+>>>>> with
+>>>>> concurrent lockless page table walkers (e.g. GUP-fast). Today we 
+>>>>> broadcast
+>>>>> that IPI to all CPUs, which is costly on large machines and hurts RT
+>>>>> workloads[1].
+>>>>>
+>>>>> This series makes those IPIs targeted. We track which CPUs are 
+>>>>> currently
+>>>>> doing a lockless page table walk for a given mm (per-CPU
+>>>>> active_lockless_pt_walk_mm). When we need to sync, we only IPI 
+>>>>> those CPUs.
+>>>>> GUP-fast and perf_get_page_size() set/clear the tracker around 
+>>>>> their walk;
+>>>>> tlb_remove_table_sync_mm() uses it and replaces the previous 
+>>>>> broadcast in
+>>>>> the free/unshare paths.
+>>>>
+>>>> I'm confused. This only happens when !PT_RECLAIM, because if PT_RECLAIM
+>>>> __tlb_remove_table_one() actually uses RCU.
+>>>>
+>>>> So why are you making things more expensive for no reason?
+>>>
+>>> You're right that when CONFIG_PT_RECLAIM is set, 
+>>> __tlb_remove_table_one()
+>>> uses call_rcu() and we never call any sync there — this series doesn't
+>>> touch that path.
+>>>
+>>> In the !PT_RECLAIM table-free path (same __tlb_remove_table_one() branch
+>>> that calls tlb_remove_table_sync_mm(tlb->mm) before __tlb_remove_table),
+>>> we're not adding any new sync; we're replacing the existing broadcast 
+>>> IPI
+>>> (tlb_remove_table_sync_one()) with targeted IPIs 
+>>> (tlb_remove_table_sync_mm()).
+>>
+>> Right, but if we can use full RCU for PT_RECLAIM, why can't we do so
+>> unconditionally and not add overhead?
+> 
+> The sync (IPI) is mainly needed for unshare (e.g. hugetlb) and collapse
+> (khugepaged) paths, regardless of whether table free uses RCU, IIUC.
 
-    UBSAN: shift-out-of-bounds in arch/arm64/kvm/nested.c:1127:34
-    shift exponent 174565952 is too large for 64-bit type 'unsigned long'
-    Call trace:
-     __ubsan_handle_shift_out_of_bounds+0x28c/0x2c0
-     kvm_nested_s2_unmap+0x228/0x248
-     kvm_arch_flush_shadow_memslot+0x98/0xc0
-     kvm_set_memslot+0x248/0xce0
-
-Fix this by using kvm_phys_size() to determine the IPA size. This helper
-is independent of the software page table representation and works
-correctly for both protected and non-protected modes, as it derives the
-size directly from VTCR_EL2.
-
-Fixes: 7270cc9157f47 ("KVM: arm64: nv: Handle VNCR_EL2 invalidation from MMU notifiers")
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
-Based on Linux 6.19-rc8
----
- arch/arm64/kvm/nested.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index cdeeb8f09e72..eb9666ba15b4 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1108,7 +1108,7 @@ void kvm_nested_s2_wp(struct kvm *kvm)
- 			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(mmu));
- 	}
- 
--	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+	kvm_invalidate_vncr_ipa(kvm, 0, kvm_phys_size(&kvm->arch.mmu));
- }
- 
- void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-@@ -1124,7 +1124,7 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
- 			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
- 	}
- 
--	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-+	kvm_invalidate_vncr_ipa(kvm, 0, kvm_phys_size(&kvm->arch.mmu));
- }
- 
- void kvm_nested_s2_flush(struct kvm *kvm)
-
-base-commit: 18f7fcd5e69a04df57b563360b88be72471d6b62
--- 
-2.53.0.rc1.225.gd81095ad13-goog
-
+In addition: We need the sync when we modify page tables (e.g. unshare,
+collapse), not only when we free them. RCU can defer freeing but does
+not prevent lockless walkers from seeing concurrent in-place
+modifications, so we need the IPI to synchronize with those walkers
+first.
 
