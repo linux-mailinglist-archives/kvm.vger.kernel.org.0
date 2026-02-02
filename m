@@ -1,149 +1,201 @@
-Return-Path: <kvm+bounces-69857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69858-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4B+fGk63gGl3AgMAu9opvQ
-	(envelope-from <kvm+bounces-69857-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 15:40:14 +0100
+	id 6P2HKNa4gGl3AgMAu9opvQ
+	(envelope-from <kvm+bounces-69858-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 15:46:46 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192C4CD7A2
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 15:40:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B20CD8EA
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 15:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F080230445A1
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 14:38:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E4274300A595
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 14:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D882A36E47B;
-	Mon,  2 Feb 2026 14:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3517F372B24;
+	Mon,  2 Feb 2026 14:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UgCRKXtO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gO9AG1QJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0540A36CE1A
-	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 14:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EFA371065;
+	Mon,  2 Feb 2026 14:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770043097; cv=none; b=BvJWZjDLHI+W1iKqLdVGWW8wlrtgzwp6PWzhDMNWkaLedtW5Y3VbU7MbQwTvG/9IorL+4Vn+bp+lSjjFq8ztmafggnhJD2ErYVvL2IakwYGuho++VbwfFbpLDUYWiI098R9mLopUL0KCsSVH3uoUrfPP4CggSivgrmIrtL2RubA=
+	t=1770043542; cv=none; b=DsL+SQ0MzVZTHk5baAdxbfLTWrYxx6uYnG+dZPa+q/buBpsEljyjTQ4wJpVAaWsY3e/d4Ir2NrNTDmfxQvo+g56KQw1FafpW9kU9R2DoG5qpNh0zAOBzwaiAdewnjQztF2p7YlcGE0alxizpHkSLoqyr3LAu9KIfMzNFkh0Zp3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770043097; c=relaxed/simple;
-	bh=EP4rPh+OJOsPFBs2ZsaC+NH+c7KI9VBuz89x+6oRA3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wpj78HB3nM6/mvj6chl9YQMmtUJ1+EPvsRB8hpxwFD/XQq6fSgvAZNz2O3Vh1i1GVfNykMP8suYm0lZIJyDErZr6GOzDkB0eXkxN9g6tNNgwUaSfJAlmfPFQFFg6VpBH5yyg4GritXa8N1SxpQyhUvwIypVCgaEOiUkpyz3vCnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UgCRKXtO; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <540adec9-c483-460a-a682-f2076cf015c2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770043082;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+YuikHIpXYtVLQeTjpDEpyPPM+rwsAsIsRE/N+8+UvM=;
-	b=UgCRKXtOZlfN+/7cORPTlSVzR8UJHh7JqxgK0CfCBKekoSTHFgghh9HracXNSrSC3awjkU
-	H+AQz66kUh63gKnKZVfMkiJJ+X9mVe1TcLsZJJK3NjU7aPXYAA3puXscll30N4PFjBYfdj
-	QKaUx6BxL4dSPBiJMateUtbngiHNtnw=
-Date: Mon, 2 Feb 2026 22:37:39 +0800
+	s=arc-20240116; t=1770043542; c=relaxed/simple;
+	bh=BnvZh8Om2JZS78ajUbACUahIMrCteVQ3uDiQsuhUGCk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DIzLFYRxgB/01kTITZJonMhbvLE/sVlIprwhKDBzILrdJkiU2kJfMVTgu1fI6wdLtfOLoqpy6zRLb3AUCx3SqbAxxY8boh9p3c2mKVnnX5xB6khhIUaYEULFL4QMr0rxcEWG35P+71NgnRizsldiRikkJ8jCVnQkFaYdXX/OKjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gO9AG1QJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05028C116C6;
+	Mon,  2 Feb 2026 14:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770043542;
+	bh=BnvZh8Om2JZS78ajUbACUahIMrCteVQ3uDiQsuhUGCk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gO9AG1QJV3HugxXNmlwIY4zaUTOs3eWBivy6nbecOhB3pu1lYt+5yDV6Rz6aCmk1k
+	 lh6xHjYyE4uymtgDY0GAbyoNgMcg79eBUobb5AdTny4k7ghxujDr2scA7F7QExKgG8
+	 jC4UpBd44kg0jYteqv+/+pLvsq5qKTIzdI7N3LOlb1ikUgQpIQKY7awS4bSeLIV7/p
+	 jCyMhg6jxdh8jdkDQH+nO9T9z5ZwNZaikuM2BSuqb+MfqCEPngJTFlZU8PP8v3UoQ8
+	 RADcPu+xzp+676oaOUJM5Ac8KT4S3Ppy/nHuqUiyz7QxzDtlVA//mqpaHPt8lkwnvH
+	 t2wfTdfYtlGtw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vmvBL-00000007o8W-2xGJ;
+	Mon, 02 Feb 2026 14:45:39 +0000
+Date: Mon, 02 Feb 2026 14:45:39 +0000
+Message-ID: <86tsvz9pbg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	qperret@google.com
+Subject: Re: [PATCH v1] KVM: arm64: nv: Use kvm_phys_size() for VNCR invalidation range
+In-Reply-To: <20260202130513.49436-1-tabba@google.com>
+References: <20260202130513.49436-1-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
-Content-Language: en-US
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org,
- aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
- baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
- dave.hansen@intel.com, dave.hansen@linux.intel.com, david@kernel.org,
- dev.jain@arm.com, hpa@zytor.com, hughd@google.com, ioworker0@gmail.com,
- jannh@google.com, jgross@suse.com, kvm@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, lorenzo.stoakes@oracle.com, mingo@redhat.com,
- npache@redhat.com, npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
- ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
- tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
- x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
-References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
- <20260202110329.74397-1-lance.yang@linux.dev>
- <20260202125030.GB1395266@noisy.programming.kicks-ass.net>
- <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
- <4700e7ba-8456-4a93-9e28-7e5a3ca2a1be@linux.dev>
- <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Lance Yang <lance.yang@linux.dev>
-In-Reply-To: <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69857-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,intel.com,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69858-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lance.yang@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: 192C4CD7A2
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D1B20CD8EA
 X-Rspamd-Action: no action
 
-
-
-On 2026/2/2 21:37, Peter Zijlstra wrote:
-> On Mon, Feb 02, 2026 at 09:07:10PM +0800, Lance Yang wrote:
+On Mon, 02 Feb 2026 13:04:24 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
->>>> Right, but if we can use full RCU for PT_RECLAIM, why can't we do so
->>>> unconditionally and not add overhead?
->>>
->>> The sync (IPI) is mainly needed for unshare (e.g. hugetlb) and collapse
->>> (khugepaged) paths, regardless of whether table free uses RCU, IIUC.
->>
->> In addition: We need the sync when we modify page tables (e.g. unshare,
->> collapse), not only when we free them. RCU can defer freeing but does
->> not prevent lockless walkers from seeing concurrent in-place
->> modifications, so we need the IPI to synchronize with those walkers
->> first.
+> KVM: arm64: nv: Use kvm_phys_size() for VNCR invalidation range
 > 
-> Currently PT_RECLAIM=y has no IPI; are you saying that is broken? If
-> not, then why do we need this at all?
+> Protected mode uses `pkvm_mappings` of the union inside `struct kvm_pgtable`.
+> This aliases `ia_bits`, which is used in non-protected mode.
+> 
+> Attempting to use `pgt->ia_bits` in kvm_nested_s2_unmap() and
+> kvm_nested_s2_wp() results in reading mapping pointers or state as a
+> shift amount. This triggers a UBSAN shift-out-of-bounds error:
+> 
+>     UBSAN: shift-out-of-bounds in arch/arm64/kvm/nested.c:1127:34
+>     shift exponent 174565952 is too large for 64-bit type 'unsigned long'
+>     Call trace:
+>      __ubsan_handle_shift_out_of_bounds+0x28c/0x2c0
+>      kvm_nested_s2_unmap+0x228/0x248
+>      kvm_arch_flush_shadow_memslot+0x98/0xc0
+>      kvm_set_memslot+0x248/0xce0
+> 
+> Fix this by using kvm_phys_size() to determine the IPA size. This helper
+> is independent of the software page table representation and works
+> correctly for both protected and non-protected modes, as it derives the
+> size directly from VTCR_EL2.
 
-PT_RECLAIM=y does have IPI for unshare/collapse — those paths call
-tlb_flush_unshared_tables() (for hugetlb unshare) and collapse_huge_page()
-(in khugepaged collapse), which already send IPIs today (broadcast to all
-CPUs via tlb_remove_table_sync_one()).
+I'm a bit confused by the explanation. We have plenty of code that
+uses pgt->ia_bits outside of the NV code. And yet that code is not
+affected by this?
 
-What PT_RECLAIM=y doesn't need IPI for is table freeing (
-__tlb_remove_table_one() uses call_rcu() instead). But table modification
-(unshare, collapse) still needs IPI to synchronize with lockless walkers,
-regardless of PT_RECLAIM.
+I'm asking because NV is clearly a case where the pkvm_mappings
+aliasing is unambiguously *not* happening.
 
-So PT_RECLAIM=y is not broken; it already has IPI where needed. This series
-just makes those IPIs targeted instead of broadcast. Does that clarify?
-
+Isn't the real issue that we are entering the NV handling code for any
+S2 manipulation irrespective of NV support? Would something like below
+help instead?
 
 Thanks,
-Lance
+
+	M.
+
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index cdeeb8f09e722..d03e9b71bf6cd 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1101,6 +1101,9 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
++	if (!kvm->arch.nested_mmus_size)
++		return;
++
+ 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+ 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+ 
+@@ -1117,6 +1120,9 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
++	if (!kvm->arch.nested_mmus_size)
++		return;
++
+ 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+ 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+ 
+@@ -1133,6 +1139,9 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+ 
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
++	if (!kvm->arch.nested_mmus_size)
++		return;
++
+ 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+ 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+ 
+@@ -1145,6 +1154,9 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
+ 	int i;
+ 
++	if (!kvm->arch.nested_mmus_size)
++		return;
++
+ 	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+ 		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+ 
+
+-- 
+Without deviation from the norm, progress is not possible.
 
