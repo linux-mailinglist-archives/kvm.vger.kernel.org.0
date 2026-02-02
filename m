@@ -1,140 +1,150 @@
-Return-Path: <kvm+bounces-69870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69871-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNShFNjIgGl3AgMAu9opvQ
-	(envelope-from <kvm+bounces-69870-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 16:55:04 +0100
+	id 0HhZMLfHgGl3AgMAu9opvQ
+	(envelope-from <kvm+bounces-69871-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 16:50:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B39DECE79F
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 16:55:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D409CE6DB
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 16:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8497A304F347
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 15:47:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3885A301980F
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 15:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D969424BBE4;
-	Mon,  2 Feb 2026 15:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7B825333F;
+	Mon,  2 Feb 2026 15:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DfsrRkto"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Xb1zTVrE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE4245948;
-	Mon,  2 Feb 2026 15:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8324245948;
+	Mon,  2 Feb 2026 15:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770047257; cv=none; b=mQfGQI45wsN2raBa4a1ZSRwUb7ue7uQcG42OYzGD7Sauk60Rao6uSlRABIokx2XHj7n2BxNldrLXANZO6Iruh5peln6CtrHWgXouxc4Lg2LerlxeOl12DSxyclupqj2EnObdtpmzh/K3r1+vGmH6YEuEpHb9pgs8W8wWuZ/SO/E=
+	t=1770047405; cv=none; b=jElx8rHdjlK3LtoNPfqIWa//39vUNyK10ROmrsKGrWw3nKsZYPdHH6kYA51cVVmeRoE8cHnRgyQSvFoEMFIVglP81vBpIPH+ALyR+v6tb3Y3aIDm0QrHwIQwNF5UjoC8GAqe86Fu+7F1MPuwiVIHtxGpAT8c3vjoil6nj+mk5tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770047257; c=relaxed/simple;
-	bh=DQHMSgsv3Ovvgk7wrUhAAoPFmN9TTDqtPHu6Cz7HA7I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M7YE17e9tN0JY8z85njE0DaG5h7M18mDxqGrR+Dr9JWVJ+N8wGzQ60EsfXDl6xlbzuOR08yguAPyJWLTd1LRpLvsmPz1NnzUzceYzyHmhvyb0lJQVf9F4WGDZPLw5iq85fv+OMuuB+xcFRgAjbraJO/CBjwZLnbqXE8mYVZCiu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DfsrRkto; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5516C116C6;
-	Mon,  2 Feb 2026 15:47:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770047256;
-	bh=DQHMSgsv3Ovvgk7wrUhAAoPFmN9TTDqtPHu6Cz7HA7I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DfsrRktoympOnvAdNukfodGNDG57OpTppFaeZUdDCTWc08e5pktKeeyIy6iMkaaF3
-	 4J+6hXYdrb1E+IYZHxefkc/te9dqgZh7EMAWS/Vk8ITrBHA1IsJYQe7Zx2MXtDanlL
-	 SNj+7YAA+pCre+3IUVjJFjRNoLSDgE9/iDyx4Pt4wAvwejiL8/M302wAwTKIqTAd9u
-	 NCqG4KsaqtqZ7x0uVN3sVCVhNLMiMLh1GCFzmwvIyoRddjQ+J4zG0mMtcoS/gd9MhL
-	 5N9NdEqIys5AkbDfDr+mDxI0B/q+vJuBkq3Zmh5QlGhSwKPNQOJ3rKth3itJFcpoL1
-	 8ouC5IMV34uDg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vmw9G-00000007pPD-1BGL;
-	Mon, 02 Feb 2026 15:47:34 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	qperret@google.com,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v1] KVM: arm64: nv: Avoid NV stage-2 code when NV is not supported
-Date: Mon,  2 Feb 2026 15:47:31 +0000
-Message-ID: <177004724421.2704560.7699222325442161081.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260202152310.113467-1-tabba@google.com>
-References: <20260202152310.113467-1-tabba@google.com>
+	s=arc-20240116; t=1770047405; c=relaxed/simple;
+	bh=78OIZ+u03jGK9bYa5rgrVwJo4W69eY8NZ/BqfhahfvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FuE2iqOzni6RPylwHTfpyvBbK9f5U8pq7d2v1R34e1JkxZAivdoPEAqgJ9apqKext4GDGmak85pY0Jznl9mxnoXxHSi/uvM7avynEuiVPX889t6xv3a6k+l2bLqRDB6YVJqnVnbMVX3LQw2UBNF5PZ7HaAuEBQvfHAzR1BfDtfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Xb1zTVrE; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5FC7340E01A2;
+	Mon,  2 Feb 2026 15:50:01 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id HT1Ca_f21OqT; Mon,  2 Feb 2026 15:49:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1770047397; bh=P/FOzvnP8ehuSxLVvHDHZ9/fkeBtzrPeegEjdKJuwUs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Xb1zTVrE8KqpFZQCay8Jq6DNzjBzyHItO26dePERDpiUR7+knyNOf4T4/B4mPoGey
+	 JJU1zKpyozjZ6dMxWf3jGzOr5Jhz3/SFJRKM7L9YQ1JIJrwYgpXsAR6XErM+nBQRCn
+	 sRGSu2Kysrt2QGXKsao1Yi6pA3rSnYYB1OJFNhE3nCEUuH7s2MxJ04olR9fHhwl7Xl
+	 Vj4DrDTg/42hKl4wkxoOa00baRO9HRltalpK+LaXzZnz3/OhfYMAtTiw1FmAjMuSX3
+	 mxBBnp4gBjJSGtlYqwrN+47korhKwqQ8iAqp2cPduOVT+911WtY7bzIwlpW0xlkmUt
+	 9/m4wRI03sCv2u8n6/loJM+vI157eOYVw5SIEcdHCRgzw5NvpV7dWY/0u2dozXMKhV
+	 zdTHZTiXIgpsvXIJHBtYY85aJiFJys/g3m37Df24tRIrCH3VaeRrAg/EGLEZMZVppb
+	 eyABmE/A1omLUxtYtYbMxRcghyGiCZoBh9XSxWWBr3K08KBjHxsGmWouelJatCSMK2
+	 1gt81gRID0vlKvYn31bP6ksZihAbEbnjwK/zJnDFxLqR4ghNJIfIfh78CD3udCtp3N
+	 60UpeTOe0K6urxDunnFoiehZVEHW86ycFPwv00XDgGZQ2HEvECV2YC9X5A56qa/T3k
+	 3me3Ax9j12WaBRxvIEKTODvE=
+Received: from zn.tnic (pd953023b.dip0.t-ipconnect.de [217.83.2.59])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 8A0DB40E035C;
+	Mon,  2 Feb 2026 15:49:43 +0000 (UTC)
+Date: Mon, 2 Feb 2026 16:49:36 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Kim Phillips <kim.phillips@amd.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev, x86@kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Naveen Rao <naveen.rao@amd.com>,
+	David Kaplan <david.kaplan@amd.com>, stable@kernel.org
+Subject: Re: [PATCH 1/2] KVM: SEV: IBPB-on-Entry guest support
+Message-ID: <20260202154936.GAaYDHkOMpjFpoBe5m@fat_crate.local>
+References: <20260126224205.1442196-1-kim.phillips@amd.com>
+ <20260126224205.1442196-2-kim.phillips@amd.com>
+ <20260128192312.GQaXpiIL4YFmQB2LKL@fat_crate.local>
+ <e7acf7ed-103b-46aa-a1f6-35bb6292d30f@amd.com>
+ <20260129105116.GBaXs7pBF-k4x_5_W1@fat_crate.local>
+ <f42e878a-d56f-413d-87e1-19acdc6de690@amd.com>
+ <20260130123252.GAaXyk9DJEAiQeDyeh@fat_crate.local>
+ <2295adbc-835f-4a84-934b-b7aba65137a8@amd.com>
+ <20260130154534.GCaXzSHgkEFnk5mX14@fat_crate.local>
+ <6556bacb-2e81-4aa8-92e4-0ff8642f4ec9@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6556bacb-2e81-4aa8-92e4-0ff8642f4ec9@amd.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69871-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69870-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B39DECE79F
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fat_crate.local:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3D409CE6DB
 X-Rspamd-Action: no action
 
-On Mon, 02 Feb 2026 15:22:53 +0000, Fuad Tabba wrote:
-> The NV stage-2 manipulation functions kvm_nested_s2_unmap(),
-> kvm_nested_s2_wp(), and others, are being called for any stage-2
-> manipulation regardless of whether nested virtualization is supported or
-> enabled for the VM.
-> 
-> For protected KVM (pKVM), `struct kvm_pgtable` uses the
-> `pkvm_mappings` member of the union. This member aliases `ia_bits`,
-> which is used by the non-protected NV code paths. Attempting to
-> read `pgt->ia_bits` in these functions results in treating
-> protected mapping pointers or state values as bit-shift amounts.
-> This triggers a UBSAN shift-out-of-bounds error:
-> 
-> [...]
+On Mon, Feb 02, 2026 at 09:38:50AM -0600, Tom Lendacky wrote:
+> I guess it really depends on the persons point of view. I agree that
+> renaming the SNP_FEATURES_PRESENT to SNP_FEATURES_IMPL(EMENTED) would
+> match up nicely with SNP_FEATURES_IMPL_REQ. Maybe that's all that is
+> needed...
 
-Applied to next, thanks!
+I guess...
 
-[1/1] KVM: arm64: nv: Avoid NV stage-2 code when NV is not supported
-      commit: 0c4762e26879acc101790269382f230f22fd6905
+I still think it would be useful to have a common place that says which things
+in SEV_STATUS are supported and present in a guest, no?
 
-Cheers,
+Or are we going to dump that MSR like Joerg's patch from a while ago and
+that'll tell us what the guest supports?
 
-	M.
+Hmm.
+
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
 
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
