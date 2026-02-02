@@ -1,210 +1,252 @@
-Return-Path: <kvm+bounces-69790-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69791-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJJlGfb8f2lu1AIAu9opvQ
-	(envelope-from <kvm+bounces-69790-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 02:25:10 +0100
+	id WEZHLhUGgGnR1gIAu9opvQ
+	(envelope-from <kvm+bounces-69791-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 03:04:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11CAC7C26
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 02:25:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27DA6C7D32
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 03:04:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 02E16300341E
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 01:25:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 615A13008A72
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 02:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF21E8332;
-	Mon,  2 Feb 2026 01:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="gK1KmXU9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA6D20298D;
+	Mon,  2 Feb 2026 02:03:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4234AEE2;
-	Mon,  2 Feb 2026 01:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 607881E32D6;
+	Mon,  2 Feb 2026 02:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769995504; cv=none; b=Y3tktQOdFPPxH4pvlO9U+72XaG8zi2rfh8ZOjOzEwzBHEdfJV4IyqqdXzggXk+kod5Mm7RT64kLUHN57DbauLId8iMKr1h/9vbd4Glj2UxlO9+v3hKGB09npul1TVATV0dJk7wjxF+7lbJS9btSLTLEdCpS80Rsve6XgxNFpUMI=
+	t=1769997828; cv=none; b=K7mnXMIkscIhVwhxTrsBGsBrGed0a0GWtmoMgxz8Q6Y3z0B+cKDgpuJxE6438lKwRrdmxn2QEu11gNXqGnBVDM4/sIS96dph8HxWkvCdaXsP7cJr695991qpiUrmQbBgOAUaWfoX0RbfT2UjjCS+e1sV/BzQ8a0Glq5iBuB89uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769995504; c=relaxed/simple;
-	bh=37LnPPuK+YXyvmA3CxHzBkqPdE6Qln617phYP4fYP8g=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Go6wYR93BVLph9pzaPeFUyea8nvn9ST/w8lDboRnlVPdjkXj7E5I4g/8eRvmNtDWPPQ+8YtbYaKHuAZfGT/qyWawnSDfBufPYo/0KnX1xSQc/dzm/N9zkivEFeQQDGDgKphjtMyQFw2SYZfDuW5m9+l0idobOoSL/SWgMCDwsyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=gK1KmXU9; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=FQ3+XLRHs7vkMMN/TBvaecVisZLJrBpmK1EtzuG5rbA=;
-	b=gK1KmXU9km+nKxDg84NaR8ogNCsMuvw7zG+fOj6gtXGRFO8y/3MMGke99BpqSkOHb1i+PFp47
-	AvFPvhblDSCsME5KfsnZfMmSIWn3lRE5lWgZ6PN0iHXIlrF8EwFtNgzQ+bwv/JPTklouP0YWoK6
-	ncSMPmlGBkmWGZZbOlJbyqc=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4f481c609pzRhRZ;
-	Mon,  2 Feb 2026 09:20:20 +0800 (CST)
-Received: from kwepemj500016.china.huawei.com (unknown [7.202.194.46])
-	by mail.maildlp.com (Postfix) with ESMTPS id 151144036C;
-	Mon,  2 Feb 2026 09:24:53 +0800 (CST)
-Received: from kwepemj100010.china.huawei.com (7.202.194.4) by
- kwepemj500016.china.huawei.com (7.202.194.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 2 Feb 2026 09:24:52 +0800
-Received: from kwepemj100010.china.huawei.com ([7.202.194.4]) by
- kwepemj100010.china.huawei.com ([7.202.194.4]) with mapi id 15.02.1544.036;
- Mon, 2 Feb 2026 09:24:52 +0800
-From: Zhangjiaji <zhangjiaji1@huawei.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "Wangqinxiao (Tom)" <wangqinxiao@huawei.com>, zhangyashu
-	<zhangyashu2@h-partners.com>, "wangyanan (Y)" <wangyanan55@huawei.com>
-Subject: [BUG REPORT] USE_AFTER_FREE in complete_emulated_mmio found by
- KASAN/Syzkaller fuzz test (v5.10.0)
-Thread-Topic: [BUG REPORT] USE_AFTER_FREE in complete_emulated_mmio found by
- KASAN/Syzkaller fuzz test (v5.10.0)
-Thread-Index: AdyT4riNhTefFgfzSBuxneuHfKKRIA==
-Date: Mon, 2 Feb 2026 01:24:52 +0000
-Message-ID: <369eaaa2b3c1425c85e8477066391bc7@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1769997828; c=relaxed/simple;
+	bh=AyEx9Vsn+zJmzDPorX/P1o+++XFEptNwuJBGpB1FtKs=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=LYYthJLMGHWuwGl15CTMuBBkSOsmRxBEaynbI2nhsjucDxGpCd2ijNZXlg8S0niWrZ5xkF9HxVl9nidtAHgO+zHang+zcZqXDY+xZr0xBOleqN7YFm7SqYmv1jN6pKL+IKScy8Gi1hir5Q38P8fyaBnaLlnSzsSytsy17VJ54zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8CxJMH7BYBppNQOAA--.1206S3;
+	Mon, 02 Feb 2026 10:03:39 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowJAx38L1BYBpkrw9AA--.49183S3;
+	Mon, 02 Feb 2026 10:03:35 +0800 (CST)
+Subject: Re: [PATCH] KVM: LoongArch: selftests: Add steal time test case
+To: Huacai Chen <chenhuacai@kernel.org>,
+ "open list:LOONGARCH" <loongarch@lists.linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260129021839.3674879-1-maobibo@loongson.cn>
+ <CAAhV-H5yZbocBBBN5nMqb32UaVP6i8+9X4RNAwquVYVFVRaBVg@mail.gmail.com>
+From: Bibo Mao <maobibo@loongson.cn>
+Message-ID: <865fdd00-b8ef-1e17-c1b9-1cb264e32914@loongson.cn>
+Date: Mon, 2 Feb 2026 10:00:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAAhV-H5yZbocBBBN5nMqb32UaVP6i8+9X4RNAwquVYVFVRaBVg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJAx38L1BYBpkrw9AA--.49183S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxuF4fZF13tw17Jw45KF18tFc_yoWrKr1xpF
+	Z2kFs0gFW0gr1xJr1kJ3yDuFsIqrs2kr4IvFy7Xr45Ar4vyrs7Jry09rW7KFn8Zws5WF1S
+	v3WSgFsruF4DJ3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
+	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zwZ7UU
+	UUU==
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-69790-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qemu.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zhangjiaji1@huawei.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: D11CAC7C26
+	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,loongson.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[loongson.cn];
+	FROM_NEQ_ENVFROM(0.00)[maobibo@loongson.cn,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69791-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: 27DA6C7D32
 X-Rspamd-Action: no action
 
-Syzkaller hit 'KASAN: use-after-free Read in complete_emulated_mmio' bug.
+Hi Huacai,
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-BUG: KASAN: use-after-free in complete_emulated_mmio+0x305/0x420
-Read of size 1 at addr ffff888009c378d1 by task syz-executor417/984
+On 2026/1/31 下午9:47, Huacai Chen wrote:
+> Since paravirt preempt is also applied, I applied this one with some
+> modifications, you can check whether it is correct.
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git/commit/?h=loongarch-kvm&id=cf991b57ffc808d69cb1f911563b1d4658774ccf
 
-CPU: 1 PID: 984 Comm: syz-executor417 Not tainted 5.10.0-182.0.0.95.h2627.e=
-ulerosv2r13.x86_64 #3 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)=
-, BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014 Call Trace:
-dump_stack+0xbe/0xfd
-print_address_description.constprop.0+0x19/0x170
-__kasan_report.cold+0x6c/0x84
-kasan_report+0x3a/0x50
-check_memory_region+0xfd/0x1f0
-memcpy+0x20/0x60
-complete_emulated_mmio+0x305/0x420
-kvm_arch_vcpu_ioctl_run+0x63f/0x6d0
-kvm_vcpu_ioctl+0x413/0xb20
-__se_sys_ioctl+0x111/0x160
-do_syscall_64+0x30/0x40
-entry_SYSCALL_64_after_hwframe+0x67/0xd1
-RIP: 0033:0x42477d
-Code: 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 48 89 f8 48 89 f7 =
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff f=
-f 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007faa8e6890e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004d7338 RCX: 000000000042477d
-RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
-RBP: 00000000004d7330 R08: 00007fff28d546df R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000004d733c
-R13: 0000000000000000 R14: 000000000040a200 R15: 00007fff28d54720
+I checked the pendning patches in loongarch-kvm branch, they all look 
+good to me.
 
-The buggy address belongs to the page:
-page:0000000029f6a428 refcount:0 mapcount:0 mapping:0000000000000000 index:=
-0x0 pfn:0x9c37
-flags: 0xfffffc0000000(node=3D0|zone=3D1|lastcpupid=3D0x1fffff)
-raw: 000fffffc0000000 0000000000000000 ffffea0000270dc8 0000000000000000
-raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000 pa=
-ge dumped because: kasan: bad access detected
+Thanks for doing this.
 
-Memory state around the buggy address:
-ffff888009c37780: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-ffff888009c37800: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->ffff888009c37880: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-                                                 ^
-ffff888009c37900: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-ffff888009c37980: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff =3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-
-Syzkaller reproducer:
-# {Threaded:true Repeat:true RepeatTimes:0 Procs:1 Slowdown:1 Sandbox: Sand=
-boxArg:0 Leak:false NetInjection:false NetDevices:false NetReset:false Cgro=
-ups:false BinfmtMisc:false CloseFDs:false KCSAN:false DevlinkPCI:false NicV=
-F:false USB:false VhciInjection:false Wifi:false IEEE802154:false Sysctl:fa=
-lse Swap:false UseTmpDir:false HandleSegv:true Repro:false Trace:false Lega=
-cyOptions:{Collide:false Fault:false FaultCall:0 FaultNth:0}}
-r0 =3D openat$kvm(0xffffffffffffff9c, &(0x7f00000001c0), 0x0, 0x0)
-r1 =3D ioctl$KVM_CREATE_VM(r0, 0xae01, 0x0)
-r2 =3D ioctl$KVM_CREATE_VCPU(r1, 0xae41, 0x0) syz_kvm_setup_cpu$x86(r1, r2,=
- &(0x7f0000fe2000/0x18000)=3Dnil, &(0x7f0000000080)=3D[@text32=3D{0x20, &(0=
-x7f0000000000)=3D"44c8df2020c020c003000000000f22c0671e26653e360f2224660f65b=
-600000000b9e0450200f5e8f5e8f30f1ed6c744240000100000c744240200000000c7442406=
-000000000f011424eacf5700000301b8010000000f01c1", 0x59}], 0x1, 0x27, 0x0, 0x=
-1) ioctl$KVM_RUN(r2, 0xae80, 0x0) ioctl$KVM_SMI(0xffffffffffffffff, 0xaeb7)=
- (async) ioctl$KVM_RUN(r2, 0xae80, 0x0)
-
-
-----------------------------
-Hi,
-
-I've analyzed the Syzkaller output and the complete_emulated_mmio() code pa=
-th.
-The buggy address is created in em_enter(), where it passes its local varia=
-ble `ulong rbp` to emulate_push(), finally ends in emulator_read_write_onep=
-age() putting the address into vcpu->mmio_fragments[].data .
-The bug happens when kvm guest executes an "enter" instruction, and top of =
-the stack crosses the mem page.=20
-In that case, the em_enter() function cannot complete the instruction withi=
-n itself, but leave the rest data (which is in the other page) to complete_=
-emulated_mmio().
-When complete_emulated_mmio() starts, em_enter() has exited, so local varia=
-ble `ulong rbp` is also released.
-Now complete_emulated_mmio() trys to access vcpu->mmio_fragments[].data , a=
-nd the bug happened.
-
-any idea?
-
---
-Best regards,
-Yashu Zhang
-
-
+Regards
+Bibo Mao
+> 
+> Huacai
+> 
+> On Thu, Jan 29, 2026 at 10:18 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>> LoongArch KVM supports steal time accounting now, here add steal time
+>> test case on LoongArch.
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   tools/testing/selftests/kvm/Makefile.kvm |  1 +
+>>   tools/testing/selftests/kvm/steal_time.c | 85 ++++++++++++++++++++++++
+>>   2 files changed, 86 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+>> index ba5c2b643efa..a18c00f1a4fa 100644
+>> --- a/tools/testing/selftests/kvm/Makefile.kvm
+>> +++ b/tools/testing/selftests/kvm/Makefile.kvm
+>> @@ -228,6 +228,7 @@ TEST_GEN_PROGS_loongarch += kvm_page_table_test
+>>   TEST_GEN_PROGS_loongarch += memslot_modification_stress_test
+>>   TEST_GEN_PROGS_loongarch += memslot_perf_test
+>>   TEST_GEN_PROGS_loongarch += set_memory_region_test
+>> +TEST_GEN_PROGS_loongarch += steal_time
+>>
+>>   SPLIT_TESTS += arch_timer
+>>   SPLIT_TESTS += get-reg-list
+>> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+>> index 8edc1fca345b..ee13e8973c45 100644
+>> --- a/tools/testing/selftests/kvm/steal_time.c
+>> +++ b/tools/testing/selftests/kvm/steal_time.c
+>> @@ -301,6 +301,91 @@ static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
+>>          pr_info("\n");
+>>   }
+>>
+>> +#elif defined(__loongarch__)
+>> +/* steal_time must have 64-byte alignment */
+>> +#define STEAL_TIME_SIZE                ((sizeof(struct kvm_steal_time) + 63) & ~63)
+>> +#define KVM_STEAL_PHYS_VALID   BIT_ULL(0)
+>> +
+>> +struct kvm_steal_time {
+>> +       __u64 steal;
+>> +       __u32 version;
+>> +       __u32 flags;
+>> +       __u32 pad[12];
+>> +};
+>> +
+>> +static bool is_steal_time_supported(struct kvm_vcpu *vcpu)
+>> +{
+>> +       int err;
+>> +       uint64_t val;
+>> +       struct kvm_device_attr attr = {
+>> +               .group = KVM_LOONGARCH_VCPU_CPUCFG,
+>> +               .attr = CPUCFG_KVM_FEATURE,
+>> +               .addr = (uint64_t)&val,
+>> +       };
+>> +
+>> +       err = __vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &attr);
+>> +       if (err)
+>> +               return false;
+>> +
+>> +       err = __vcpu_ioctl(vcpu, KVM_GET_DEVICE_ATTR, &attr);
+>> +       if (err)
+>> +               return false;
+>> +
+>> +       return val & BIT(KVM_FEATURE_STEAL_TIME);
+>> +}
+>> +
+>> +static void steal_time_init(struct kvm_vcpu *vcpu, uint32_t i)
+>> +{
+>> +       struct kvm_vm *vm = vcpu->vm;
+>> +       uint64_t st_gpa;
+>> +       int err;
+>> +       struct kvm_device_attr attr = {
+>> +               .group = KVM_LOONGARCH_VCPU_PVTIME_CTRL,
+>> +               .attr = KVM_LOONGARCH_VCPU_PVTIME_GPA,
+>> +               .addr = (uint64_t)&st_gpa,
+>> +       };
+>> +
+>> +       /* ST_GPA_BASE is identity mapped */
+>> +       st_gva[i] = (void *)(ST_GPA_BASE + i * STEAL_TIME_SIZE);
+>> +       sync_global_to_guest(vm, st_gva[i]);
+>> +
+>> +       err = __vcpu_ioctl(vcpu, KVM_HAS_DEVICE_ATTR, &attr);
+>> +       TEST_ASSERT(err == 0, "No PV stealtime Feature");
+>> +
+>> +       st_gpa = (unsigned long)st_gva[i] | KVM_STEAL_PHYS_VALID;
+>> +       err = __vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &attr);
+>> +       TEST_ASSERT(err == 0, "Fail to set PV stealtime GPA");
+>> +}
+>> +
+>> +static void guest_code(int cpu)
+>> +{
+>> +       struct kvm_steal_time *st = st_gva[cpu];
+>> +       uint32_t version;
+>> +
+>> +       memset(st, 0, sizeof(*st));
+>> +       GUEST_SYNC(0);
+>> +
+>> +       GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
+>> +       WRITE_ONCE(guest_stolen_time[cpu], st->steal);
+>> +       version = READ_ONCE(st->version);
+>> +       GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
+>> +       GUEST_SYNC(1);
+>> +
+>> +       GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
+>> +       GUEST_ASSERT(version < READ_ONCE(st->version));
+>> +       WRITE_ONCE(guest_stolen_time[cpu], st->steal);
+>> +       GUEST_ASSERT(!(READ_ONCE(st->version) & 1));
+>> +       GUEST_DONE();
+>> +}
+>> +
+>> +static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
+>> +{
+>> +       struct kvm_steal_time *st = addr_gva2hva(vm, (ulong)st_gva[vcpu_idx]);
+>> +
+>> +       ksft_print_msg("VCPU%d:\n", vcpu_idx);
+>> +       ksft_print_msg("    steal:     %lld\n", st->steal);
+>> +       ksft_print_msg("    version:   %d\n", st->version);
+>> +}
+>>   #endif
+>>
+>>   static void *do_steal_time(void *arg)
+>>
+>> base-commit: 8dfce8991b95d8625d0a1d2896e42f93b9d7f68d
+>> --
+>> 2.39.3
+>>
 
 
