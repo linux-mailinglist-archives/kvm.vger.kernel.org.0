@@ -1,202 +1,367 @@
-Return-Path: <kvm+bounces-69912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69913-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AM33IWobgWm0EAMAu9opvQ
-	(envelope-from <kvm+bounces-69912-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 22:47:22 +0100
+	id 0EVNKWccgWm0EAMAu9opvQ
+	(envelope-from <kvm+bounces-69913-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 22:51:35 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30F3D1C4E
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 22:47:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47486D1DD2
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 22:51:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 503F3302E402
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 21:46:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B74223034E10
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 21:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D99313E15;
-	Mon,  2 Feb 2026 21:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F989314D0E;
+	Mon,  2 Feb 2026 21:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="rSDJUCP4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YIXihLx/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hfF1yLKY";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWHJ+xyU"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEB41C84BD;
-	Mon,  2 Feb 2026 21:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DC03128D2
+	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 21:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770068785; cv=none; b=O02555OiTd/qJwlcI9MEeopBiIIxYEZw5XM31RUNZztZb5Pje0bCsiw2iP7C5MV6dG3P7634qmH2SowwfWIWYPTsgbCDxj+QztmoZ8i29Y2XOmQSrUoBJpKkrqZ2/leQYtsR5vkLNffiIJ6QmNmI3ERozZz7Fo+Qu3kyyqIm/R8=
+	t=1770068957; cv=none; b=qkuQafAqAiZHwr+ut8grf4kmVdKJr8UlC1oIKE+oqopDrbyAFttLTshojPQJrs6DOn3JlCV64ppaljygH7LH3MG09kzsb/dSYfRju0PraD7zEKEW35NfsuLkVdTzj3hwcpmlXpZ5EJ/muL4aIKFROoE+KQ40uNOe+zB8t80uji0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770068785; c=relaxed/simple;
-	bh=P1hwRLkRbf/qAD7V9FbY64fM7zTTPUYZWgjOJmw3Wg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VTMsZfQZL3LznKFHj/rzpZvNZcOzSxazEtnIUCWEbrawi/kx8DKcjol+Hmfx/n5cuqwZGaBALX4NFu1tOU/ldbEm4HYz1KXifDzlo6nul3I5osfl8xToZKQcxJ490eUznwc4Sl6RXc3Q3YHERjxQE9xJ7sGfKzQWi9qIK1XoPyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=rSDJUCP4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YIXihLx/; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 45055EC005A;
-	Mon,  2 Feb 2026 16:46:21 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Mon, 02 Feb 2026 16:46:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1770068781;
-	 x=1770155181; bh=5XTvfkLRD6t0Cirlql/f2DOs7bSt+Y3nGNA6o5hil2g=; b=
-	rSDJUCP4ViZeHHychwU2v7uQMN7XaM6sBtJQp4pR3DRzN1/Qjk82xBxhUixkpu75
-	JcAdnd/L7etCDJr3S75Iiod2P2HsK1Rnzw/3cn2gwCHg5oth9vwF9OqIEXjLA6Qz
-	YYuoRUbUzhLumDUIvFrsVqE+rZLaU0ZQTAcD+inV79oFipR01Q5Bl3k9i5JTJnDC
-	L2phBTXmwi9v3RjFGoia+NFtL7lW2ymRxp/iMT+Xe5KYZ9h96/THpvPN7hTwKj3i
-	g1zC1Eavi286T2d81QmKuN6j4tWwIqZ2F4HwDyF3+sABC5BaocDIFyuFkmZ5LkoZ
-	ZE2ccygJ892vkHG0nmLLjA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770068781; x=
-	1770155181; bh=5XTvfkLRD6t0Cirlql/f2DOs7bSt+Y3nGNA6o5hil2g=; b=Y
-	IXihLx/dvxtqv2DT8z3kz7cyI9HALM9YW3vDS1QCBHCk8EVKX5EAtRGPzC4rdqsB
-	HdpFvSHFzSVR6TvdUd5kTSWYpZyndnphRSPG8FH/87eZuKHrr7vVHE8JJCa2qhqq
-	NtbCewLquNCcEekmVdvjBWevR1DhrXjtRFzlt3S6Mxf8Dcy9FZj9hieunR/STngN
-	Andoh1U9kCmYW2Ke2rl81VGQdS6pNklTM22cj/BBH3MMZXOaJnQWg2bxi2IQMd2y
-	2NPSqfPtzgKN9TxhkKRdtNqBQNh9SZdYE+LdXdHU8ihwb/9FhhMQUpGFy4KG+Pf9
-	qLAFLRxZUcdM2URgk83GQ==
-X-ME-Sender: <xms:LRuBaZ7QFdro7aBZQcGKB42EE0GQ-zKSUWGZWHDJcB1tUBkTw9fa_w>
-    <xme:LRuBaQ8nrRw5Kf7rMwHZqmwGxCFuIr_JBT4mfqKyFRoU3tMVVO6lk117CbfAmWADl
-    gwB2TUFZy2e7zMYmYgwS8td1rMI2GaNmldnVJvoReQTVg53J3kO_EI>
-X-ME-Received: <xmr:LRuBaQV3fz6eV_71yF46FnBtyVQ0iwZ9-sU17pvA8DrMSyHmsUOmedQFy9k>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddujeekjeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeekheejieetffefueeiteejtdejffdvleelvdeuvdffvdefteeghfevkeeu
-    vdefvdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhg
-    pdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtvg
-    gulhhoghgrnhesfhgsrdgtohhmpdhrtghpthhtohepughmrghtlhgrtghksehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidq
-    khhsvghlfhhtvghsthesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
-    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
-    khhpsehinhhtvghlrdgtohhm
-X-ME-Proxy: <xmx:LRuBaTomOb6DTKvfAy5wFcu2sUtMiM7Wu-Lo5ldCrXUyW1Tl6CBhSA>
-    <xmx:LRuBaakgsnOL6UZ95eArHfHE4BfU1tbR_4b2qE70OOzb_5tdEQUFZQ>
-    <xmx:LRuBab3b5GpGVOIVuI3xJ9S8-Osto7p_QqEArByBSsh-zSEc-4K5Fg>
-    <xmx:LRuBafTrV8FnsjWQXtJSYj_5FHU7a-VaMoSOGTDwGW65HW6kQ4iR-w>
-    <xmx:LRuBaeoJGRdKdvQh2YFcdbLzDZuXpbug_FZxdwdh1-Y7rm6L5owYozk8>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Feb 2026 16:46:20 -0500 (EST)
-Date: Mon, 2 Feb 2026 14:46:18 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Ted Logan <tedlogan@fb.com>
-Cc: David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>,
- <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH] vfio: selftests: only build tests on arm64 and x86_64
-Message-ID: <20260202144618.32bde071@shazbot.org>
-In-Reply-To: <20260130-vfio-selftest-only-64bit-v1-1-d89ac0944c01@fb.com>
-References: <20260130-vfio-selftest-only-64bit-v1-1-d89ac0944c01@fb.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1770068957; c=relaxed/simple;
+	bh=agtCQ9pZwtAROLqQxsM2KH3S9+KhShyu1IMY1wa4cPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lxGshB/OlHU0WMhMuO5gIrTPzb5oI794QCTnlxunQsg5Q4zjwYTIyWqmN8XOm4gSwVUoDCDA0X+HGn0i6Sy5MX37mB2xPAPjZZTxtCwwLRC8wgX+T/rrBk9W+0XjFRUd4Fnq72xONiU/2hDv4lSb8o6OM4Wle2LJclPwsddBVC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hfF1yLKY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CWHJ+xyU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770068954;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g5FHEvnvdTlqMH7yVdF7d/M75bDKDwBnGXhGmTp6Y0Q=;
+	b=hfF1yLKYtGRLJMUp1DwTJd9AsMilJ2Yrk6950HmA4JPLoXNFjSHpPQEKm6TviBv0EuT5oq
+	iIbzZE+ihW+rxXUZe5/SxbppPCtwK6cILoGJ4TnimgF7URsxGrGuYPZz7wl9Q3v/UtYfHg
+	inYuunZlDk8GBaPl+btAiMXI6X0Dc50=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-519-esZnDqKcOvmIAnzvEYH4oQ-1; Mon, 02 Feb 2026 16:49:13 -0500
+X-MC-Unique: esZnDqKcOvmIAnzvEYH4oQ-1
+X-Mimecast-MFC-AGG-ID: esZnDqKcOvmIAnzvEYH4oQ_1770068952
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-504888a2a1dso108236101cf.0
+        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 13:49:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770068952; x=1770673752; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g5FHEvnvdTlqMH7yVdF7d/M75bDKDwBnGXhGmTp6Y0Q=;
+        b=CWHJ+xyUBII2jBt4GavcJzZrJIIbufyeeNNKjI8Iiw+kDqbP4nChIVv6IezF20iHjp
+         7TudGIn91aoOBqXB6p5cWER5hWGrjbIVupk2DPAy0Pkqh5yk7TR2a4BiCPO+3ZHTnCOJ
+         lKRgPsJ7/Wdj41ceyvdjK7TCTiWdgK2v1oavzcCc925kfYC47hwfRC7qOgyty0nQRqAs
+         jZN4j5+pNh7pbwSvLQ0EphOkdcOoaAx0rYRI+3l1vn1ViNXyTW5mSV2s2msfFr95MIs8
+         Hv9/lGfI/mNxlF9e6spfO9dl3vE2vU2dUDaIHWhz7mXoWsjlYiavYTQExpFKcHyVp0Zg
+         +vjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770068952; x=1770673752;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g5FHEvnvdTlqMH7yVdF7d/M75bDKDwBnGXhGmTp6Y0Q=;
+        b=vms5lSOlaBzkkTLSyHzp30SkwtkuaqnltSS/Go+2wVzlhI2RmOoUEcBObhGmy2MG8v
+         BXyygvAsAqnMpmuubZlpuGEiTpWH32m6j13iI8Si0/KP6pt59a6wXvNHVp1afiWcfO+v
+         cyPzHtN5UKeDwP+5SYicy3ZQzLwkhigHzb9K590drSrmi5AQFYkuJy8KJs+8I1dHvtbV
+         LsWzwnYM+82CrNchjMKnSm+ioiXERaiyqKN5SK2tSutbaxR2VwYEvpdJ7FIB/WPEfat2
+         M9iQiSMoPjJ7Ids36qNWVA/08Kb7u0QolP56Z8armEcRlpmgF5dv9Qz27Ki9M+VyT8xn
+         TcxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIIrTsmJodWwOEob1u+YY+kIGBBwxNWrP7T448o8eDU267+5GP2CcGUTb9hEJO1ITNma0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynvG8zKGSI8EHDumjNq4hWH/aMwqGrdopSL0eo6u9kxjxH1rtu
+	04mqqPxyDAWZUvF3a7RNmlgm/R/TadgMC0IHeB0Aj+/U/Zk+ThmHq21RFZ0c6gQncB+qypmoNHA
+	vQpp/I+r1KxUqMAQE3m+o7gCRMmxfJgX9tHBeonTAcWunVphvgfI89w==
+X-Gm-Gg: AZuq6aJjqhPSOojWf7lkFxZ22xuJwlmWUK+akfFxzxAQvpLYhAFTdRzwXeYMy1HkhQh
+	jcU6wc0rpkLNLzmvofdjlWUqmiFyWjBNW09SLW+MOgN2dzCJ3byeNsNJgzypB8U/uaoPs399zMr
+	aOl7x5Y+vQ65T+uIRe5N2pj9UJoazvgt0PxsuogO+t6LBypJUxqEGOtmNcnnKwgpv6M2MhJGTkj
+	dG7QSkurKsGox4d1vGH4jjdEUPx1B88WV2Kvphbc839XdTv/YTyutZQbDCup7edVKQslaNF1pEl
+	mgQ/ECXs4JcXKe+aZy6xxRQTdFDakQ43AYw2H9HA9brzqL8pBgAHTW3clCbZX6jZk88/f/5vZcm
+	0yyo=
+X-Received: by 2002:ac8:5a92:0:b0:502:aff1:5689 with SMTP id d75a77b69052e-505d2152eb7mr156388411cf.7.1770068952335;
+        Mon, 02 Feb 2026 13:49:12 -0800 (PST)
+X-Received: by 2002:ac8:5a92:0:b0:502:aff1:5689 with SMTP id d75a77b69052e-505d2152eb7mr156388151cf.7.1770068951834;
+        Mon, 02 Feb 2026 13:49:11 -0800 (PST)
+Received: from x1.local ([142.188.210.156])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50337bbbd2csm114145581cf.25.2026.02.02.13.49.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 13:49:11 -0800 (PST)
+Date: Mon, 2 Feb 2026 16:49:09 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC 04/17] userfaultfd: introduce mfill_get_vma() and
+ mfill_put_vma()
+Message-ID: <aYEb1RlGWBJWKXNg@x1.local>
+References: <20260127192936.1250096-1-rppt@kernel.org>
+ <20260127192936.1250096-5-rppt@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260127192936.1250096-5-rppt@kernel.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69913-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69912-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterx@redhat.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: E30F3D1C4E
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 47486D1DD2
 X-Rspamd-Action: no action
 
-On Fri, 30 Jan 2026 16:02:16 -0800
-Ted Logan <tedlogan@fb.com> wrote:
+Hi, Mike,
 
-> Only build vfio self-tests on arm64 and x86_64; these are the only
-> architectures where the vfio self-tests are run. Addresses compiler
-> warnings for format and conversions on i386.
+On Tue, Jan 27, 2026 at 09:29:23PM +0200, Mike Rapoport wrote:
+> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202601211830.aBEjmEFD-lkp@intel.com/
-> Signed-off-by: Ted Logan <tedlogan@fb.com>
+> Split the code that finds, locks and verifies VMA from mfill_atomic()
+> into a helper function.
+> 
+> This function will be used later during refactoring of
+> mfill_atomic_pte_copy().
+> 
+> Add a counterpart mfill_put_vma() helper that unlocks the VMA and
+> releases map_changing_lock.
+> 
+> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 > ---
-> Do not build vfio self-tests for 32-bit architectures, where they're
-> untested and unmaintained. Only build these tests for arm64 and x86_64,
-> where they're regularly tested.
+>  mm/userfaultfd.c | 124 ++++++++++++++++++++++++++++-------------------
+>  1 file changed, 73 insertions(+), 51 deletions(-)
 > 
-> Compiler warning fixed by patch:
-> 
->    In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:6:
->    tools/testing/selftests/vfio/lib/include/libvfio/iommu.h:49:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
->       49 |         VFIO_ASSERT_EQ(__iommu_unmap(iommu, region, NULL), 0);
->          |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
->       32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
->          |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
->       26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
->          |                                              ~~~~
->       27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
->          |                                           ^~~~~~~~~~
-> ---
->  tools/testing/selftests/vfio/Makefile | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
-> index ead27892ab65..eeb63ea2b4da 100644
-> --- a/tools/testing/selftests/vfio/Makefile
-> +++ b/tools/testing/selftests/vfio/Makefile
-> @@ -1,3 +1,10 @@
-> +ARCH ?= $(shell uname -m 2>/dev/null || echo not)
-> +
-> +ifeq (,$(filter $(ARCH),arm64 x86_64))
-> +nothing:
-> +.PHONY: all clean run_tests install
-> +.SILENT:
-> +else
->  CFLAGS = $(KHDR_INCLUDES)
->  TEST_GEN_PROGS += vfio_dma_mapping_test
->  TEST_GEN_PROGS += vfio_dma_mapping_mmio_test
-> @@ -28,3 +35,4 @@ TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_PROGS_O) $(LIBVFIO_O))
->  -include $(TEST_DEP_FILES)
+> diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
+> index 9dd285b13f3b..45d8f04aaf4f 100644
+> --- a/mm/userfaultfd.c
+> +++ b/mm/userfaultfd.c
+> @@ -157,6 +157,73 @@ static void uffd_mfill_unlock(struct vm_area_struct *vma)
+>  }
+>  #endif
 >  
->  EXTRA_CLEAN += $(TEST_GEN_PROGS_O) $(TEST_DEP_FILES)
-> +endif
+> +static void mfill_put_vma(struct mfill_state *state)
+> +{
+> +	up_read(&state->ctx->map_changing_lock);
+> +	uffd_mfill_unlock(state->vma);
+> +	state->vma = NULL;
+> +}
+> +
+> +static int mfill_get_vma(struct mfill_state *state)
+> +{
+> +	struct userfaultfd_ctx *ctx = state->ctx;
+> +	uffd_flags_t flags = state->flags;
+> +	struct vm_area_struct *dst_vma;
+> +	int err;
+> +
+> +	/*
+> +	 * Make sure the vma is not shared, that the dst range is
+> +	 * both valid and fully within a single existing vma.
+> +	 */
+> +	dst_vma = uffd_mfill_lock(ctx->mm, state->dst_start, state->len);
+> +	if (IS_ERR(dst_vma))
+> +		return PTR_ERR(dst_vma);
+> +
+> +	/*
+> +	 * If memory mappings are changing because of non-cooperative
+> +	 * operation (e.g. mremap) running in parallel, bail out and
+> +	 * request the user to retry later
+> +	 */
+> +	down_read(&ctx->map_changing_lock);
+> +	err = -EAGAIN;
+> +	if (atomic_read(&ctx->mmap_changing))
+> +		goto out_unlock;
+> +
+> +	err = -EINVAL;
+> +
+> +	/*
+> +	 * shmem_zero_setup is invoked in mmap for MAP_ANONYMOUS|MAP_SHARED but
+> +	 * it will overwrite vm_ops, so vma_is_anonymous must return false.
+> +	 */
+> +	if (WARN_ON_ONCE(vma_is_anonymous(dst_vma) &&
+> +	    dst_vma->vm_flags & VM_SHARED))
+> +		goto out_unlock;
+> +
+> +	/*
+> +	 * validate 'mode' now that we know the dst_vma: don't allow
+> +	 * a wrprotect copy if the userfaultfd didn't register as WP.
+> +	 */
+> +	if ((flags & MFILL_ATOMIC_WP) && !(dst_vma->vm_flags & VM_UFFD_WP))
+> +		goto out_unlock;
+> +
+> +	if (is_vm_hugetlb_page(dst_vma))
+> +		goto out;
+> +
+> +	if (!vma_is_anonymous(dst_vma) && !vma_is_shmem(dst_vma))
+> +		goto out_unlock;
+> +	if (!vma_is_shmem(dst_vma) &&
+> +	    uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE))
+> +		goto out_unlock;
 
-I see other Makefiles include tools/scripts/Makefile.arch which would
-then just let us test for 'ifeq (${IS_64_BIT}, 1)'.  Would that more
-directly address what we're trying to solve here?  Thanks,
+IMHO it's a bit weird to check for vma permissions in a get_vma() function.
 
-Alex
+Also, in the follow up patch it'll be also reused in
+mfill_copy_folio_retry() which doesn't need to check vma permission.
+
+Maybe we can introduce mfill_vma_check() for these two checks? Then we can
+also drop the slightly weird is_vm_hugetlb_page() check (and "out" label)
+above.
+
+> +
+> +out:
+> +	state->vma = dst_vma;
+> +	return 0;
+> +
+> +out_unlock:
+> +	mfill_put_vma(state);
+> +	return err;
+> +}
+> +
+>  static pmd_t *mm_alloc_pmd(struct mm_struct *mm, unsigned long address)
+>  {
+>  	pgd_t *pgd;
+> @@ -768,8 +835,6 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
+>  		.src_addr = src_start,
+>  		.dst_addr = dst_start,
+>  	};
+> -	struct mm_struct *dst_mm = ctx->mm;
+> -	struct vm_area_struct *dst_vma;
+>  	long copied = 0;
+>  	ssize_t err;
+>  
+> @@ -784,57 +849,17 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
+>  	VM_WARN_ON_ONCE(dst_start + len <= dst_start);
+>  
+>  retry:
+> -	/*
+> -	 * Make sure the vma is not shared, that the dst range is
+> -	 * both valid and fully within a single existing vma.
+> -	 */
+> -	dst_vma = uffd_mfill_lock(dst_mm, dst_start, len);
+> -	if (IS_ERR(dst_vma)) {
+> -		err = PTR_ERR(dst_vma);
+> +	err = mfill_get_vma(&state);
+> +	if (err)
+>  		goto out;
+> -	}
+> -
+> -	/*
+> -	 * If memory mappings are changing because of non-cooperative
+> -	 * operation (e.g. mremap) running in parallel, bail out and
+> -	 * request the user to retry later
+> -	 */
+> -	down_read(&ctx->map_changing_lock);
+> -	err = -EAGAIN;
+> -	if (atomic_read(&ctx->mmap_changing))
+> -		goto out_unlock;
+> -
+> -	err = -EINVAL;
+> -	/*
+> -	 * shmem_zero_setup is invoked in mmap for MAP_ANONYMOUS|MAP_SHARED but
+> -	 * it will overwrite vm_ops, so vma_is_anonymous must return false.
+> -	 */
+> -	if (WARN_ON_ONCE(vma_is_anonymous(dst_vma) &&
+> -	    dst_vma->vm_flags & VM_SHARED))
+> -		goto out_unlock;
+> -
+> -	/*
+> -	 * validate 'mode' now that we know the dst_vma: don't allow
+> -	 * a wrprotect copy if the userfaultfd didn't register as WP.
+> -	 */
+> -	if ((flags & MFILL_ATOMIC_WP) && !(dst_vma->vm_flags & VM_UFFD_WP))
+> -		goto out_unlock;
+>  
+>  	/*
+>  	 * If this is a HUGETLB vma, pass off to appropriate routine
+>  	 */
+> -	if (is_vm_hugetlb_page(dst_vma))
+> -		return  mfill_atomic_hugetlb(ctx, dst_vma, dst_start,
+> +	if (is_vm_hugetlb_page(state.vma))
+> +		return  mfill_atomic_hugetlb(ctx, state.vma, dst_start,
+>  					     src_start, len, flags);
+>  
+> -	if (!vma_is_anonymous(dst_vma) && !vma_is_shmem(dst_vma))
+> -		goto out_unlock;
+> -	if (!vma_is_shmem(dst_vma) &&
+> -	    uffd_flags_mode_is(flags, MFILL_ATOMIC_CONTINUE))
+> -		goto out_unlock;
+> -
+> -	state.vma = dst_vma;
+> -
+>  	while (state.src_addr < src_start + len) {
+>  		VM_WARN_ON_ONCE(state.dst_addr >= dst_start + len);
+>  
+> @@ -853,8 +878,7 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
+>  		if (unlikely(err == -ENOENT)) {
+>  			void *kaddr;
+>  
+> -			up_read(&ctx->map_changing_lock);
+> -			uffd_mfill_unlock(state.vma);
+> +			mfill_put_vma(&state);
+>  			VM_WARN_ON_ONCE(!state.folio);
+>  
+>  			kaddr = kmap_local_folio(state.folio, 0);
+> @@ -883,9 +907,7 @@ static __always_inline ssize_t mfill_atomic(struct userfaultfd_ctx *ctx,
+>  			break;
+>  	}
+>  
+> -out_unlock:
+> -	up_read(&ctx->map_changing_lock);
+> -	uffd_mfill_unlock(state.vma);
+> +	mfill_put_vma(&state);
+>  out:
+>  	if (state.folio)
+>  		folio_put(state.folio);
+> -- 
+> 2.51.0
+> 
+
+-- 
+Peter Xu
+
 
