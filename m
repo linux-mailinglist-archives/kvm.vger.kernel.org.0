@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-69931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69932-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eO8MHbgmgWnsEQMAu9opvQ
-	(envelope-from <kvm+bounces-69931-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:35:36 +0100
+	id 6DB8M2gpgWkwEgMAu9opvQ
+	(envelope-from <kvm+bounces-69932-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:47:04 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AFE9D23D8
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:35:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CD74D26CC
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 23:47:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0A3063027B0F
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 22:33:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B7F43067A23
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 22:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB50A3921F8;
-	Mon,  2 Feb 2026 22:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDED38F93A;
+	Mon,  2 Feb 2026 22:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n+M0JWyC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kEJ7qLtn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884213921C7
-	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 22:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428DC3921EE
+	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 22:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770071450; cv=none; b=MXk4YoJknzTGEcw2mvRvFnZsLwHmENqTVDBtFowFmSko1nJl6zzHJRXLER7GKJYA13+m6os+mLo8iZtGaw+a34Rm9nXBTBGmAaU3ncprx8tHr9Nh0j2egXwdye6NTWMGAzf1heHc6xYM7f581v4nOqCzKxtduhPAAsLjVI7spUM=
+	t=1770071452; cv=none; b=K2mWvrr+AoeWE68XlbZfiLp389cVrFeBS+tGrQBxq7LFYLLb3zn7eq3T+pgV9Ay5mOg1T9dAPb3oN+hRH/MSzprgaV9OLf/sSF2SaDV1ghcuF7VAnkBVejeMqWArjM+DK9Abd6Bl4vlhXhfaOOvrMdiiH7AqvSztmRvqobKjbVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770071450; c=relaxed/simple;
-	bh=cCejNhvt76UNSe20VwpAkdKK8YRqq35Jr/Lc5Fy4AxY=;
+	s=arc-20240116; t=1770071452; c=relaxed/simple;
+	bh=BOuDl5FNJBY78R3/sjP1Z8mI8xgIety+sC9BdjeSYJs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Infg4+ioJaP+dKQkK4jIoCYIjM17I4p7/3UrJJgslUroYlxh3Bs671hONAax/aRKfGkAnJJXSIwTNu6N2cNgqcLLEbC11hSwSl2ZmFLAGh26ry9Q2KKcrBlKnRmG5bwvUnKR4tGAfupfvk7Eg5BAVztDJiKlgu45la2O+pHoWjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n+M0JWyC; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=uFphlNwfsSAV0sBgZ/AvdqP9vBG7WV7o6Urizf2lN28dRVeW7Pjd5Y+HmxWUEooSJSTQciXYT8Na9euufNE7VeUbyF25Cyc/B+g2/+hf6vATkGAN6g5p8NYxRa5h6UcXNHh0U2QnjFKlb3luCjQKGVlzXE0v17hSuYVmb36rQ30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kEJ7qLtn; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a7701b6353so50163285ad.3
-        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 14:30:49 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34e5a9f0d6aso216837a91.0
+        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 14:30:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770071449; x=1770676249; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770071450; x=1770676250; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lp6r0BczMMAAPO3s3DGH7VMU4KkeGwOWlm5O8YplfuE=;
-        b=n+M0JWyCykfRozAVeM1Q0Je/kEkSeWjro10HhV7cXZmlxHb5Xh46Txto6wIpuFn08C
-         YAXRDPw/ATJ6AuZkWL9YGHtylKi9oXMqTaCq41lQQAgowH74K5Pqmq7foF1n6021nhr9
-         cn4l7nKUwA7Znz/hJ1Br9hDGUTbtxskzbUeYRpAluxSlFmtA1TbyS+7VumKrxjquZoPF
-         2XCKQ2eIRlGSRkUy/VA6AGyBuDostnFtXnsUoa9aUMWgNujz34/HMZtpEZ16Tm5f6elb
-         6Xaf7nizrbfT6PUBpVNStxV8YXB7399cPaULXoVWn0gvcFLI9miHxgraAybYwgFIQKlS
-         6g9A==
+        bh=jVz8/vXYYvlyUGSqOW3ETp8FRnG4u38fEDm5kewK59s=;
+        b=kEJ7qLtneBDaaD2aHAJ0fLEy+gDo6dP25vK3BfiW8MCDNecQEoNNAkLTl/k8QsYtiB
+         4PK6k1+LYlOq3NtR8kdePXTAwCDpl+GsMpJBnaSYMBn/L4LsKG+vTGvdanLc+A8od3IR
+         LpsAJInIcvFvIb1Pit+RQNv9pO+el9JSeY7zWC2VIuIN1GdpCXRFt/ulMgYFOdk2bO4B
+         IZQYKs0NH7kWiF+VCCnVWtKY1B7M8o2G1AWHULl4Wr0lJr1NQ6NI2XtKMo9mU6ZyaFzH
+         X7swscfxcx+f+ekd/WDxyn3sg1/Q0qBl1JbI+hASQ2Atpp6gcRg6RnAVgXQpxuyb2or2
+         NiTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770071449; x=1770676249;
+        d=1e100.net; s=20230601; t=1770071450; x=1770676250;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lp6r0BczMMAAPO3s3DGH7VMU4KkeGwOWlm5O8YplfuE=;
-        b=dS5ezioqTRVDGfCDyncrQPVQ0PShTjsUdmIUhGe/R0xtqG+CDkd1qXxfsDH/CK314b
-         skJyioScHPuPpM3MJKDOFKh/6iMAunWliDAR7DLSue4+pb5iTce9VspsWUZebcIQd1Jt
-         8lGIT1igaLwFVt5Pk7vy0Y5BmDq6/xN38Bk3bcRH+Td7wGHfn6bm4Xp5/Wdk1yXG2zOL
-         B+425LSEUPYDhP59gDhbbRhAjydgOu8ckWYDh3BC+mQZtbKS4QYQHqnIrBc0EOXytvyc
-         NBE86Ar5CByagsMwmCXna7G8mSaTq7ZFmGx2v+OE63Kv7a/6Tw0zmV2STEv76yf2D5k4
-         LN0A==
-X-Gm-Message-State: AOJu0YyueRHHeZMPMDu8ES59MVWWhB1xq25Yv7TG/WbIWT//Tnr5Zm5q
-	wfsTc9Z8cc+f7Jsg+HA23MhMLKs3lsl1PaumNrPaDVllcf1VVgqBaq56wHpeBFD+pNn7ABD4S9L
-	u52bKQAKzTWZSo+G4+dm3r17e1TFoJpSdne8jtvwY3K3BvnJSTNns7IPVbCPcgNyfLopkxitpLl
-	Pl5PJ49uCCJ8zY7KklJX5Sd6zmXp1nqgWITALyLUGcnGsfh7hcnFunuoUbtkk=
-X-Received: from pgct17.prod.google.com ([2002:a05:6a02:5291:b0:c63:5610:9a42])
+        bh=jVz8/vXYYvlyUGSqOW3ETp8FRnG4u38fEDm5kewK59s=;
+        b=pMt5bhKVkHAgK0DCKZ2fnYtUuSaH5dA+CQZHxwdw9whvXL1+zWSI45BJMYwS/wm/AE
+         JbhACb1zFdsJggE9xScK/HHMU3APR1x9rILg0znKR+M+SA5olaSR8ER+WAGnF0mso2Ak
+         77nj53FXzVxjaKNkhoDFGYeKDhyZaV46Wo+EBMq0MuTSbbEdz7hBQWd7/HojJmtayHdS
+         PxOz49SxHnxjNeBWmgbmrFBlEakcTjC1wc8OEwnJt96VqpAfOYsRTrhAWCj+OajR0rby
+         H4fP0qdbr+eO6WTQFawFGfemE0gxkkqtalXYFAA9OwYWI9vP32f6oHxOTwK+7+1w1Nu0
+         WipQ==
+X-Gm-Message-State: AOJu0YxMELojHaXGJCrOWLH/L30h6Zvb9LwIpxuqD6RHyVsuBm1gIhBH
+	E/43EXcYUGJEygifW0aQUdLLxuW+w4kHG4zhF9VeS/auxO5NyKXZmqrOhBt82Uf1MutAHfAEX3G
+	Kp/LLYwLjke2ehUH+Up34gDrvRIReF1pRUl9mpcWQkHW4Nn2vVQzUz13TvdwpMtCdfxR3ckmz6u
+	whbfiCtJnuEzZHq7VM9g4nUQw9GYR9dahzyNcWBsMY26F8cHDB3rZnr02RGC8=
+X-Received: from pjtw2.prod.google.com ([2002:a17:90a:c982:b0:352:925c:a29c])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:f64d:b0:295:888e:9fff with SMTP id d9443c01a7336-2a8d7ed95f4mr145055055ad.20.1770071448632;
- Mon, 02 Feb 2026 14:30:48 -0800 (PST)
-Date: Mon,  2 Feb 2026 14:29:54 -0800
+ 2002:a17:90b:28c3:b0:34c:2f01:2262 with SMTP id 98e67ed59e1d1-3547769019fmr617275a91.3.1770071450254;
+ Mon, 02 Feb 2026 14:30:50 -0800 (PST)
+Date: Mon,  2 Feb 2026 14:29:55 -0800
 In-Reply-To: <cover.1770071243.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1770071243.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <d0bb3886b0ebc4eea92f468136bda50bad6d3968.1770071243.git.ackerleytng@google.com>
-Subject: [RFC PATCH v2 16/37] KVM: selftests: Add selftests global for guest
- memory attributes capability
+Message-ID: <544fc9c8c519560d8622ca1def8dbc676baf2d73.1770071243.git.ackerleytng@google.com>
+Subject: [RFC PATCH v2 17/37] KVM: selftests: Update framework to use KVM_SET_MEMORY_ATTRIBUTES2
 From: Ackerley Tng <ackerleytng@google.com>
 To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
@@ -104,18 +103,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-69931-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69932-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
@@ -124,70 +123,49 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1AFE9D23D8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4CD74D26CC
 X-Rspamd-Action: no action
 
-From: Sean Christopherson <seanjc@google.com>
+Update KVM selftest framework to use KVM_SET_MEMORY_ATTRIBUTES2 and the
+accompanying struct kvm_memory_attributes2.
 
-Add a global variable, kvm_has_gmem_attributes, to make the result of
-checking for KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES available to all tests.
-
-kvm_has_gmem_attributes is true if guest_memfd tracks memory attributes, as
-opposed to VM-level tracking.
-
-This global variable is synced to the guest for testing convenience, to
-avoid introducing subtle bugs when host/guest state is desynced.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- tools/testing/selftests/kvm/include/test_util.h | 2 ++
- tools/testing/selftests/kvm/lib/kvm_util.c      | 5 +++++
- 2 files changed, 7 insertions(+)
+ tools/testing/selftests/kvm/include/kvm_util.h | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index b4872ba8ed12..2871a4292847 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -113,6 +113,8 @@ struct guest_random_state {
- extern uint32_t guest_random_seed;
- extern struct guest_random_state guest_rng;
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index a64aae271a6a..872988197a5c 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -397,7 +397,7 @@ static inline void vm_enable_cap(struct kvm_vm *vm, uint32_t cap, uint64_t arg0)
+ static inline void vm_set_memory_attributes(struct kvm_vm *vm, uint64_t gpa,
+ 					    uint64_t size, uint64_t attributes)
+ {
+-	struct kvm_memory_attributes attr = {
++	struct kvm_memory_attributes2 attr = {
+ 		.attributes = attributes,
+ 		.address = gpa,
+ 		.size = size,
+@@ -405,13 +405,16 @@ static inline void vm_set_memory_attributes(struct kvm_vm *vm, uint64_t gpa,
+ 	};
  
-+extern bool kvm_has_gmem_attributes;
+ 	/*
+-	 * KVM_SET_MEMORY_ATTRIBUTES overwrites _all_ attributes.  These flows
++	 * KVM_SET_MEMORY_ATTRIBUTES2 overwrites _all_ attributes.  These flows
+ 	 * need significant enhancements to support multiple attributes.
+ 	 */
+ 	TEST_ASSERT(!attributes || attributes == KVM_MEMORY_ATTRIBUTE_PRIVATE,
+ 		    "Update me to support multiple attributes!");
+ 
+-	vm_ioctl(vm, KVM_SET_MEMORY_ATTRIBUTES, &attr);
++	__TEST_REQUIRE(kvm_check_cap(KVM_CAP_MEMORY_ATTRIBUTES2) > 0,
++		       "No valid attributes for VM fd ioctl!");
 +
- struct guest_random_state new_guest_random_state(uint32_t seed);
- uint32_t guest_random_u32(struct guest_random_state *state);
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index ce2b0273b26c..4f464ad8dffd 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -24,6 +24,8 @@ uint32_t guest_random_seed;
- struct guest_random_state guest_rng;
- static uint32_t last_guest_seed;
- 
-+bool kvm_has_gmem_attributes;
-+
- static size_t vcpu_mmap_sz(void);
- 
- int __open_path_or_exit(const char *path, int flags, const char *enoent_help)
-@@ -488,6 +490,7 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
- 	}
- 	guest_rng = new_guest_random_state(guest_random_seed);
- 	sync_global_to_guest(vm, guest_rng);
-+	sync_global_to_guest(vm, kvm_has_gmem_attributes);
- 
- 	kvm_arch_vm_post_create(vm, nr_runnable_vcpus);
- 
-@@ -2332,6 +2335,8 @@ void __attribute((constructor)) kvm_selftest_init(void)
- 	guest_random_seed = last_guest_seed = random();
- 	pr_info("Random seed: 0x%x\n", guest_random_seed);
- 
-+	kvm_has_gmem_attributes = kvm_has_cap(KVM_CAP_GUEST_MEMFD_MEMORY_ATTRIBUTES);
-+
- 	kvm_selftest_arch_init();
++	vm_ioctl(vm, KVM_SET_MEMORY_ATTRIBUTES2, &attr);
  }
+ 
  
 -- 
 2.53.0.rc1.225.gd81095ad13-goog
