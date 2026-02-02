@@ -1,202 +1,192 @@
-Return-Path: <kvm+bounces-69881-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69883-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mKjDFDbrgGleCAMAu9opvQ
-	(envelope-from <kvm+bounces-69881-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:21:42 +0100
+	id OBujNuvwgGkgDQMAu9opvQ
+	(envelope-from <kvm+bounces-69883-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:46:03 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA898D01A1
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:21:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A792D0466
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:46:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 762533036EF2
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 18:15:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF302304C094
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 18:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD412E0938;
-	Mon,  2 Feb 2026 18:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DE73815C2;
+	Mon,  2 Feb 2026 18:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PSJ2pVDb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIDroI2u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8902D6407
-	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 18:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770056128; cv=pass; b=Gn7vvBcgTolnr7UOJ3m01MbehLbFlPDXdmQw+EzgeNUO4RZYUEmFaqM4/BMsG7uxfzTTVm8dfdYe1c+ZPTNek93niIlZeCW+n2pfLR0kzjloitbn+K2aM2ArhEiilOprTiVVWuejDre4sxBNXVwqbEwOI0GxLTIZNDBQQDo5oKU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770056128; c=relaxed/simple;
-	bh=hfLkISPUv1gvXr1CboqWBn1bs3Sd5IoZNOLzZg55skM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iF3+Vcj9hY3LFdVkbqT7NpezdvuXAj73tke4Ebb5qL/3YekiQctX4+cJoZ5yWpqzrbFupi+5+yM6Y0cB4Qa1MnYffbUi487OBQ5S2WCMOpDgRZUO8+Ne/irZGx2WCaWqo38gfpfQqPkpphWIM+XEm+iZ8HvOyYRXz8EcJ7UhPVM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PSJ2pVDb; arc=pass smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-385bdc72422so40698151fa.1
-        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 10:15:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770056125; cv=none;
-        d=google.com; s=arc-20240605;
-        b=BvrWDPvOxXS4jDJEH0JOq4z52ZQpLq3SdIhXheJKqHWVa9oU7/xm+3wruQ4rbHPGpf
-         8ChAGvIp4P/0a1B16kkTNQZvtmyD4N7mSFVY5zwWIXOH+AQpqYi0w5+9pkuFICZ9tvzU
-         UBcoYCgWX+WAILI8aTSUEeWzupaY9kTiM3svxYK36SIu+Wvx4xF/LaxmWEJ09t3l234f
-         iZ3GLwi1Q5LSc1M5apT78lTbUhEIsLeB9R+Ft1xaZhFSJRIkE/2MgE8syH7zE+Kjxc92
-         sJncFmNUQ+BmiRH0ssd8o9gQjlDs7kwCREs6jLUIXi8WAh2tq8xLMD0dmr9KF2fbWVCq
-         lNFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=LIHmbN0vtM4SeA7+jGmffdOqzfQaVyhc47MhdLc1+1s=;
-        fh=7U87KjgqShi4UURLQFlzyVwaUW+uzy1lyOLm1LCammQ=;
-        b=AE1FprTCpZfWYWff24dV//qSmbeBK5TSeVSlWUYk7GuQRhQtGbKJkDkkNm58QnMhw8
-         cWaQTnTyEVsU/Njd/3fRDnEihsEpoNFqRP3Le0R0pz73Y/Zvvy9v9Uivtu54w0mDQ9ng
-         ERF2AjXjt1aeoX5SNjfm6istkxnMUvNTUGuDapDrjdCFeN2Lh0R4hwHfmjVmBi/whvPQ
-         aiuYApSFpf3SS2amiL9aVX4xZkDtWFwTbuzHUVM4gXoqjEb62EEhzfoQtIIuBjhwCuLZ
-         lGYae8zbij/UcDk7WYA2Uc0TaX/WeJzVOcg+Oi2jSQpSckrlK9zSj3PEBVHh15OpQIYG
-         81Ig==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770056125; x=1770660925; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LIHmbN0vtM4SeA7+jGmffdOqzfQaVyhc47MhdLc1+1s=;
-        b=PSJ2pVDbNQVnPXrXNjymko4FOE40C743kvBmJ86NLSh4GircZENoqWveK5OWNMFOO9
-         GpNsC5mwmhTxifUlf/daWGwYTrtNmBzSI9eXvPrODcez7DbDVIYiqvcyBy8amLYrrxVp
-         DLhTd6QbiVH1AZJlMuR6iTv3Niiaa2lm5P9p2E6o7tcArvBjQTQzHxA7WxzzMWq7visY
-         Ddj+8fe+ab5vxCLuvIu9gW3nb9y1abZAGX4BKFdWVZfyFeTp3yFB593U7yT/3WYrmVXT
-         hClbGiN6g1pDtf0H+z9QDhit5pfuUP7PHyl+0qS9jvPbM1Ti2diqJ0edF/uO0rC2wXpJ
-         ZfNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770056125; x=1770660925;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LIHmbN0vtM4SeA7+jGmffdOqzfQaVyhc47MhdLc1+1s=;
-        b=bZkRL/vY62a3HJ94c/1bRmcTeLCasiesqqu4rbMKRITw30783vD/EEBpD8woHgFLAO
-         P/PrcXmiZjvkFV9qYbTxtsC/5fsk8Uoi2GS8PJzwgJYfyCfaAHlY5/bT6VbCj8t+hO21
-         x5KuElFxUKXElEJZj7eiEBG1I+H1wJoTJctaN6QpSEQO5Jyxyv5PxJnFegYzeLogzzHa
-         oIMK1M97bIWLvMZKVUI5XjTp2PCVic07eyVr4t8XTxl1Pzb1e38SldkcVQnNgz1FjxxD
-         9HOijLKYBkOr3PshHIDO+3uA3bGLVozsoRIv276G6i1s1lubnQfBwel5tL7gI8ku/G9M
-         /ddA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtf4A5k1ZSFqVU342ZPfj5ZN+E+6Xl3ztWyalKoYxheqd5+gTS/cW7Ht2sevU1r26FsOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCGtAfZ3/sAasxx2HnVn60cGtVKMqnpp+JB4NM9zl46jAZVhJL
-	jRNFt6R5M7ci4EfXx/qsnuuJhqNRyhCcqvzSWG4uGFjDMcyGUtlRdA3UhhxW21fSTPI4mcNpLu+
-	ewN0Xu53eXByYWvnL+t7dQEZRWM2FtkTb6lck7sir
-X-Gm-Gg: AZuq6aLGbyqnhgjdUTY+o4eNwFEgs3irkwUwHk+rhWOmUgtxH1li4dPXbcXPlkaViKr
-	OC4/CMMWv6nMTSiP3x48KbQP3YTgAsW3yJcciKyLCraBLeKx0ceVIVJmAdqIJrVHiZgBbPGP0Yz
-	vBX6tcbLi7vHJxb2cCLTQ49+wN5CJSKsrNl+/f/0Whb3RZMALscAHkRJkdVBakJEICzX2bmd3ns
-	lZjmHA6x8U4Aeby80dGASgyP33n57T8mQTCmyT32ysBcvvw0mmfKd87LamJJ5ONnhD6IA==
-X-Received: by 2002:a2e:a54b:0:b0:383:1c18:ade6 with SMTP id
- 38308e7fff4ca-3864662d728mr40696471fa.20.1770056124374; Mon, 02 Feb 2026
- 10:15:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1412F12AE;
+	Mon,  2 Feb 2026 18:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770057821; cv=none; b=ZyX3d+yBviSmIvJc/IsT/gtY3DXH5P14mw5AJJBlIzJ27xcG5lnKHcZAh+GyFLHpYa44Om/c3rYqX3VmDFyzn13U/KdtbC7rhCu5mIXkrzySVnfDokPG74oyEeUwTGfrVxu+LNmj9RmLTfODSMdewXTQ5FmiiYeuLxgEL2JsFI8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770057821; c=relaxed/simple;
+	bh=bLqTU9IRK/P5BfC/WRSUY7H5idKZKHvYB30haHzcFsY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mDMLLn1IsIJMfkSOzjzBc2CmBc4Qemvjf41iepE/lNvQ8x+zBqAM6xc749z3AWT7/8xjEYSIFf5f6cbqE4Q5VW9eDIQCy+OAH76TX9+8TmsFWA0DX3XtryvUl/nnnOyvKBhZ7AaQGkvmxkcXTJq54giMXavVI5nsiO6ysUj6Xwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIDroI2u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 290C7C116C6;
+	Mon,  2 Feb 2026 18:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770057821;
+	bh=bLqTU9IRK/P5BfC/WRSUY7H5idKZKHvYB30haHzcFsY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QIDroI2uQ5KwG245M83Ix7pyJM85+KNclxYYYMlvZgjw3hU9fdYeLCAUchfYXa4Nd
+	 OJ4jSSog6RjK8vKlOURzvc3Q62NLi+euYjlYWl6sNRdUCrkadO4J8yDol6fJwTGuxG
+	 O0/W9dWzDhegPlbkwQ9GApjTp7XoPbkpD3qkWJ1WKPjJ1et9DqD0C9zolKhKzPHrCJ
+	 5r4VKXPjOQz06l0m21MWLg6cp5Z6ZmzIE3R7hFk5qs9/tAndKCs5P7mmHYI78K2pAb
+	 kYAUpYWChP1k0ffjQzIH2CXx5hmgf1XYYG7YRzaTIg/p4DqsksDRo4cQm472tq6jrS
+	 88OHKUMRebV9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vmyte-00000007sAy-2ppV;
+	Mon, 02 Feb 2026 18:43:38 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: [PATCH v2 00/20] KVM: arm64: Generalise RESx handling
+Date: Mon,  2 Feb 2026 18:43:09 +0000
+Message-ID: <20260202184329.2724080-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-3-dmatlack@google.com>
- <44484594-5b5d-4237-993c-ac1e173ad62e@linux.dev>
-In-Reply-To: <44484594-5b5d-4237-993c-ac1e173ad62e@linux.dev>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 2 Feb 2026 10:14:56 -0800
-X-Gm-Features: AZwV_QhgTJZ7rnxODmCU1qhjsI1pWSHh1k-rPTozueyr5OUveeJ2FC59ISanCNo
-Message-ID: <CALzav=d1ZrHrWd-HhZJ8aY6aqxkBcLoet_5+-LL1mOakVTj6Ww@mail.gmail.com>
-Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
- across Live Update
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Alex Williamson <alex@shazbot.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
-	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Ankit Agrawal <ankita@nvidia.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
-	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org, 
-	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, 
-	=?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, 
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Pranjal Shrivastava <praan@google.com>, 
-	Pratyush Yadav <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, 
-	Vivek Kasireddy <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69881-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[44];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69883-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AA898D01A1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[hcr_el2.rw:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0A792D0466
 X-Rspamd-Action: no action
 
-On Sat, Jan 31, 2026 at 10:38=E2=80=AFPM Zhu Yanjun <yanjun.zhu@linux.dev> =
-wrote:
->
-> =E5=9C=A8 2026/1/29 13:24, David Matlack =E5=86=99=E9=81=93:
-> > Add an API to enable the PCI subsystem to track all devices that are
-> > preserved across a Live Update, including both incoming devices (passed
-> > from the previous kernel) and outgoing devices (passed to the next
-> > kernel).
-> >
-> > Use PCI segment number and BDF to keep track of devices across Live
-> > Update. This means the kernel must keep both identifiers constant acros=
-s
-> > a Live Update for any preserved device. VFs are not supported for now,
-> > since that requires preserving SR-IOV state on the device to ensure the
-> > same number of VFs appear after kexec and with the same BDFs.
-> >
-> > Drivers that preserve devices across Live Update can now register their
-> > struct liveupdate_file_handler with the PCI subsystem so that the PCI
-> > subsystem can allocate and manage File-Lifecycle-Bound (FLB) global dat=
-a
-> > to track the list of incoming and outgoing preserved devices.
-> >
-> >    pci_liveupdate_register_fh(driver_fh)
-> >    pci_liveupdate_unregister_fh(driver_fh)
->
-> Can the above 2 functions support the virtual devices? For example,
-> bonding, veth, iSWAP and RXE.
->
-> These virtual devices do not have BDF. As such, I am not sure if your
-> patches take these virtual devices in to account.
+Having spent some time dealing with some dark corners of the
+architecture, I have realised that our RESx handling is a bit patchy.
+Specially when it comes to RES1 bits, which are not clearly defined in
+config.c, and rely on band-aids such as FIXED_VALUE.
 
-No this patch series only supports PCI devices, since those are the
-only devices so far we've needed to support.
+This series takes the excuse of adding SCTLR_EL2 sanitisation to bite
+the bullet and pursue several goals:
 
-I am not familiar with any of the devices that you mentioned. If they
-are virtual then does that mean it's all just software? In that case I
-would be curious to know what problem is solved by preserving them in
-the kernel, vs. tearing them down and rebuilding them across a Live
-Udpate.
+- clearly define bits that are RES1 when a feature is absent
+
+- have a unified data structure to manage both RES0 and RES1 bits
+
+- deal with the annoying complexity of some features being
+  conditioned on E2H==1
+
+- allow a single bit to take different RESx values depending on the
+  value of E2H
+
+This allows quite a bit of cleanup, including the total removal of the
+FIXED_VALUE horror, which was always a bizarre construct. We also get
+a new debugfs file to introspect the RESx settings for a given guest.
+
+Overall, this lowers the complexity of expressing the configuration
+constraints, for very little code (most of the extra lines are
+introduced by the debugfs stuff, and SCTLR_EL2 being added to the
+sysreg file).
+
+Patches on top of my kvm-arm64/vtcr branch (which is currently
+simmering in -next).
+
+* From v1 [1]
+
+  - Simplified RES0 handling by dropping the RES0_WHEN_E2Hx macros
+
+  - Cleaned up the kvm_{g,s}et_sysreg_resx() helpers
+
+  - Simplified dynamic RESx handling
+
+  - New improved debugfs handling, thanks to Fuad!
+
+  - Various clean-ups and spelling fixes
+
+  - Collected RBs (thanks Fuad and Joey!)
+
+[1] https://lore.kernel.org/all/20260126121655.1641736-1-maz@kernel.org
+Marc Zyngier (20):
+  arm64: Convert SCTLR_EL2 to sysreg infrastructure
+  KVM: arm64: Remove duplicate configuration for SCTLR_EL1.{EE,E0E}
+  KVM: arm64: Introduce standalone FGU computing primitive
+  KVM: arm64: Introduce data structure tracking both RES0 and RES1 bits
+  KVM: arm64: Extend unified RESx handling to runtime sanitisation
+  KVM: arm64: Inherit RESx bits from FGT register descriptors
+  KVM: arm64: Allow RES1 bits to be inferred from configuration
+  KVM: arm64: Correctly handle SCTLR_EL1 RES1 bits for unsupported
+    features
+  KVM: arm64: Convert HCR_EL2.RW to AS_RES1
+  KVM: arm64: Simplify FIXED_VALUE handling
+  KVM: arm64: Add REQUIRES_E2H1 constraint as configuration flags
+  KVM: arm64: Add RES1_WHEN_E2Hx constraints as configuration flags
+  KVM: arm64: Move RESx into individual register descriptors
+  KVM: arm64: Simplify handling of HCR_EL2.E2H RESx
+  KVM: arm64: Get rid of FIXED_VALUE altogether
+  KVM: arm64: Simplify handling of full register invalid constraint
+  KVM: arm64: Remove all traces of FEAT_TME
+  KVM: arm64: Remove all traces of HCR_EL2.MIOCNCE
+  KVM: arm64: Add sanitisation to SCTLR_EL2
+  KVM: arm64: Add debugfs file dumping computed RESx values
+
+ arch/arm64/include/asm/kvm_host.h             |  38 +-
+ arch/arm64/include/asm/sysreg.h               |   7 -
+ arch/arm64/kvm/config.c                       | 427 ++++++++++--------
+ arch/arm64/kvm/emulate-nested.c               |  10 +-
+ arch/arm64/kvm/nested.c                       | 151 +++----
+ arch/arm64/kvm/sys_regs.c                     |  68 +++
+ arch/arm64/tools/sysreg                       |  82 +++-
+ tools/arch/arm64/include/asm/sysreg.h         |   6 -
+ tools/perf/Documentation/perf-arm-spe.txt     |   1 -
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 -
+ 10 files changed, 478 insertions(+), 313 deletions(-)
+
+-- 
+2.47.3
+
 
