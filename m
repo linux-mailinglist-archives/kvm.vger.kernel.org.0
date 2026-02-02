@@ -1,67 +1,67 @@
-Return-Path: <kvm+bounces-69798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69800-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MGbDFLZEgGkE5gIAu9opvQ
-	(envelope-from <kvm+bounces-69798-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 07:31:18 +0100
+	id GCuEARhJgGnC5gIAu9opvQ
+	(envelope-from <kvm+bounces-69800-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 07:50:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF94FC8BB3
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 07:31:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E52BC8F44
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 07:49:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68E6E3035276
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 06:27:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CB1D630058FA
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 06:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A892FC007;
-	Mon,  2 Feb 2026 06:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6B530C37B;
+	Mon,  2 Feb 2026 06:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M3Pn+28x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KSZQurlV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C5A2F7AAB;
-	Mon,  2 Feb 2026 06:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E9B26ADC;
+	Mon,  2 Feb 2026 06:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770013646; cv=none; b=PXu5x7j13PFUVfEXjbcDLDX6RE0NsaGBRuABL12Qhxviya4GbSywYIKIJxF2Gmt0UaxbUS2V1qhGATidp4+3MO53kp7Uus0ZTQxUF9oPIKc7Zy2d7zMhlEdmmiw03JRw4cQXOXtaKVx9fa28xJASTNRsZiEwN8SGQSCZ2JGBGLA=
+	t=1770014991; cv=none; b=NIeMSr3WlVOH3fJp1yK7ne8nXfBsyoV9x46pz7SV4mY6NKn70tGHKdf58MoM6XAI9xutXZ6EzkG3lGGVYhagtlZbamTPbmwDhdOaCMtNEFy0g+q14Ab7zRtXxTwoeMScLKdtOTndAgBYGgvTo15z472vuwazsasj5mFnCo2iwWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770013646; c=relaxed/simple;
-	bh=RdNudPUXX7CtFUI22MZ8axcv9U2f+cqLI4bFHMXNXi0=;
+	s=arc-20240116; t=1770014991; c=relaxed/simple;
+	bh=p6wHUv3nGRgjxVKeJCG4f/1CwrUZUt88QzBgtgugBAY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Trbj7xUGIuCrByXBvO69xbDtyMHbg6UfPZtyheoFK21WhA5UngOWxeWMKydbB/d+nL94dfK0vR4b9aCbSwucEx8EOL6Ahn0HN6bEkdLl2ns2xy42rVWg2+pM5jTjQGNQq2PGkCjYJ1Lg2u3ggvM04Cu83PepjaDjf7Jb+kuUEUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M3Pn+28x; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=eiyrbwYepr/XBdngVlwft6Y5sCX1mdVKnrh2MIe7lldpH3LtetDh7xuaBrylETUxaWW4KXYH30/zDKuaggR/esYne9rDdcBzuBWqBIb/uoKZMGe1zh1s79rdI48kc3iRFC4odd5RwJtWoVbzttRPuSm4w3y1qc0lHch+1Y0cQtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KSZQurlV; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770013645; x=1801549645;
+  t=1770014988; x=1801550988;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=RdNudPUXX7CtFUI22MZ8axcv9U2f+cqLI4bFHMXNXi0=;
-  b=M3Pn+28xiwqnXKhjc8Qonme9zzGyBLceaTNOnyUHD+PgnoqWLnoMoMS4
-   Dl+d3nqT2JbRqCKzm5CspaJg0FnWKC/3oWS4Pc9P69vChmYkaPtxH8Fn0
-   34jEBdq8WCxnY5jH8kBt1pn5rRqYbp6K4buiiAaIXlslelNzw/+n+g8u1
-   AqpwJdpJtJpscWu1xtkzxbNQtVbCfzpLEUIcC5dpxAJSl6ahgjwU1fLul
-   WyCnMJm/ldk6K1TCvSf8NlpkwcIW7r522jltQqPxG23vLzzBiil8zgsfO
-   xRQyn+ln5z2BioCSZChsb2eL3/99BakDZwqvRMnPjWTJ7vHhWCgkjEoWT
+  bh=p6wHUv3nGRgjxVKeJCG4f/1CwrUZUt88QzBgtgugBAY=;
+  b=KSZQurlVBn/nmp01OKCEXEtvNAxaFfJ8cj6X4s6bcqUMci6vZUnu5O4a
+   +QbJUTsvFYCI0CvQq2ifKjNov8s4470+3XjH0XOFZz4Q0mPfyhyJ1JHnV
+   OQI0F6WA+gi7DBHSXIFGt60DQKWy3VGwWEgZ0+1jcyrhchOu4S9OaoaiI
+   rPzOuzamtcsLyGsJKAhERUhYwyioSGwapjZKUp7qoHVW9hc4GZrzni+Sk
+   R8O81fIpEJlmgWoS2Idaf9Ju1MfWBEAX/3lzJ0Ze5r6HQBmihLXqQ2BKo
+   e0latkKnX9HEM79plI7+klGla9JddsdlRQzpu/IyieBQ1KPSLRfL3FQdU
    A==;
-X-CSE-ConnectionGUID: S7puLZ9SQJGEQlfSSQATWg==
-X-CSE-MsgGUID: /kr0k0tUS3On7rCbDiZLbg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11689"; a="58748949"
+X-CSE-ConnectionGUID: +tRDIU/zRmG+Rzr+ruYpxQ==
+X-CSE-MsgGUID: Qd/3iS1xRAyGfzjxlpHg1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11689"; a="71332098"
 X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
-   d="scan'208";a="58748949"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2026 22:27:23 -0800
-X-CSE-ConnectionGUID: WSJvxEzJSo2X/LltvdRbsA==
-X-CSE-MsgGUID: 0krXsQmUSvmzfjEY9sgTuw==
+   d="scan'208";a="71332098"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2026 22:49:48 -0800
+X-CSE-ConnectionGUID: REd2b/jSRJKiBRQDU8Pg1w==
+X-CSE-MsgGUID: Xv7GgVZ0TTaoscg4z1UF8w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
-   d="scan'208";a="240122835"
+   d="scan'208";a="213537167"
 Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa002.jf.intel.com with ESMTP; 01 Feb 2026 22:27:19 -0800
-Date: Mon, 2 Feb 2026 14:08:54 +0800
+  by orviesa003.jf.intel.com with ESMTP; 01 Feb 2026 22:49:42 -0800
+Date: Mon, 2 Feb 2026 14:31:18 +0800
 From: Xu Yilun <yilun.xu@linux.intel.com>
 To: Chao Gao <chao.gao@intel.com>
 Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
@@ -75,11 +75,11 @@ Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v3 15/26] x86/virt/seamldr: Abort updates if errors
- occurred midway
-Message-ID: <aYA/div9Rt/IJY8m@yilunxu-OptiPlex-7050>
+Subject: Re: [PATCH v3 16/26] x86/virt/seamldr: Shut down the current TDX
+ module
+Message-ID: <aYBEtqEeUBThuaJr@yilunxu-OptiPlex-7050>
 References: <20260123145645.90444-1-chao.gao@intel.com>
- <20260123145645.90444-16-chao.gao@intel.com>
+ <20260123145645.90444-17-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,19 +88,19 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260123145645.90444-16-chao.gao@intel.com>
+In-Reply-To: <20260123145645.90444-17-chao.gao@intel.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69798-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69800-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -114,26 +114,42 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,intel.com:dkim]
-X-Rspamd-Queue-Id: CF94FC8BB3
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: 9E52BC8F44
 X-Rspamd-Action: no action
 
-On Fri, Jan 23, 2026 at 06:55:23AM -0800, Chao Gao wrote:
-> The TDX Module update process has multiple stages, each of which may
-> encounter failures.
-> 
-> The current state machine of updates proceeds to the next stage
-> regardless of errors. But continuing updates when errors occur midway
-> is pointless.
-> 
-> If a CPU encounters an error, abort the update by setting a flag and
-> exiting the execution loop. Note that this CPU doesn't acknowledge the
-> current stage. This will keep all other CPUs in the current stage until
-> they see the flag and exit the loop as well.
-> 
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> Tested-by: Farrah Chen <farrah.chen@intel.com>
+> +static int get_tdx_sys_info_handoff(struct tdx_sys_info_handoff *sysinfo_handoff)
+> +{
+> +	int ret = 0;
+> +	u64 val;
+> +
+> +	if (tdx_supports_runtime_update(&tdx_sysinfo) &&
+> +	    !(ret = read_sys_metadata_field(0x8900000100000000, &val)))
+> +		sysinfo_handoff->module_hv = val;
+> +
+> +	return ret;
+> +}
+> +
+>  static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
+>  {
+>  	int ret = 0;
+> @@ -115,6 +127,7 @@ static int get_tdx_sys_info(struct tdx_sys_info *sysinfo)
+>  	ret = ret ?: get_tdx_sys_info_tdmr(&sysinfo->tdmr);
+>  	ret = ret ?: get_tdx_sys_info_td_ctrl(&sysinfo->td_ctrl);
+>  	ret = ret ?: get_tdx_sys_info_td_conf(&sysinfo->td_conf);
+> +	ret = ret ?: get_tdx_sys_info_handoff(&sysinfo->handoff);
 
-Reviewed-by: Xu Yilun <yilun.xu@linux.intel.com>
+Do all fields in sysinfo_handoff optional or just module_hv, if the
+former, is it better:
+
+	if (tdx_supports_runtime_update(&tdx_sysinfo)
+		ret = ret ?: get_tdx_sys_info_handoff(&sysinfo->handoff);
+
+>  
+>  	return ret;
+>  }
+> -- 
+> 2.47.3
+> 
 
