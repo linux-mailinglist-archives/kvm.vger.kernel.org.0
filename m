@@ -1,55 +1,55 @@
-Return-Path: <kvm+bounces-69899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69900-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eND3Dx3xgGkgDQMAu9opvQ
-	(envelope-from <kvm+bounces-69899-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:46:53 +0100
+	id ULt+ByzxgGkgDQMAu9opvQ
+	(envelope-from <kvm+bounces-69900-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:47:08 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73D6D0491
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:46:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5CE7D0498
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:47:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F174C306F277
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 18:44:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 10C733072BD4
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 18:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D30D37F759;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0D138E5D8;
 	Mon,  2 Feb 2026 18:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KOSMxYqj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUkTwHNq"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C701038E132;
-	Mon,  2 Feb 2026 18:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0814338E13B;
+	Mon,  2 Feb 2026 18:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770057824; cv=none; b=eSCrHECwTqoZ3Rn8WbiJ38l/KpuKKYU+p3ISK0KrcKIc384nnJuOCLc2hPEK1Z/YP1Q56SYc2q+ZeekZ4PnKTEDlKn1jpax53rtWq4kScvZGUc/dZKdbrA7ch2IhMrgzwCV820SMqDAHiAfQsZVXr1KBpy/gnhlNT8D7MFoZzJ4=
+	t=1770057825; cv=none; b=Rzxu9PE0gYtWaQp3PSW4DAeXuuI8nRmTFDQWRVmWvtaMy4TslCbBPsLOebYiGfrvGJwqrvlXD6Rnx6vr9Qaos93kl1PTiMBKPGssUNM+9S4AoTEIn6+cImaSyCbljBNuNslUS90ZSJFEWweLMymBygTBMinGQCvgQ14xMq5dnlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770057824; c=relaxed/simple;
-	bh=+lVINR4hlLO81qpOaFoZd/+SO4l/Xdgp+PChpjnyRLc=;
+	s=arc-20240116; t=1770057825; c=relaxed/simple;
+	bh=0uQbqtqzatb0+WEzqiykyv4VMqfCd11CnuuzgkEfvVQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F4jWdiFzW8hRIzp8iZdNfmITUQmwBxCinKjd7ZxSuEdw0s5MRzzTeNxI4a0IFWmAdYLOyWWNUYibnbQCHJ0NI+S3cCFJYVV0p/r+uWSAUiCHU1mEqjAHTzUXFQKNIDWHX+RRcKsRa2Z3QHW2+PQelX5zYB1VRlRgEEUb09uQKEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KOSMxYqj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0891C19425;
+	 MIME-Version; b=URcWKGzXjTQDYpG/A5NGwyVIxASOGUJmWDaw0SsvdSeaOaFCER4CGhANjuSLvQyIQxBWjzzQpAQq8HkZk66b/u5F24xVw1TbVn0O/a8l8TpIHKQCUttVbKlPG+avcVrKHQ+5hfxP97pGctUU5Usuc67dLyQW80qiyLOvgu8AD80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUkTwHNq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6257C2BC86;
 	Mon,  2 Feb 2026 18:43:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1770057824;
-	bh=+lVINR4hlLO81qpOaFoZd/+SO4l/Xdgp+PChpjnyRLc=;
+	bh=0uQbqtqzatb0+WEzqiykyv4VMqfCd11CnuuzgkEfvVQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KOSMxYqjGlIQmwa3pcXU3j1Pjxa5IuaSZjXNYcJ6SSL+/6Dhi1Z31zUJVExBc1NXI
-	 VS3+7YpkjeZQ4LlpRHuBfVbbnyPD+Skmka25eP1SllWWrtTIyP9ua4fGMGbP1QpBEm
-	 dsg6GpYoLKd7/QVTX1T6znnvAHQwE7gCDIwvLnjN6DnS9cOCdZvXV7rdWr96m8vXqN
-	 JCi4wjkvQo/l5koOqQwKOXFvj/8mNZSjDacGmMt+cpggV6mBJkv62QtSYwZ/1tjuh9
-	 vjQFdCmDoA3aX2hiN+QrI3UhRJlBPmqKDoaLOSTtib+oduH8V8NJVzwJs16kkiGZkG
-	 o65O9Bi1AK6/g==
+	b=GUkTwHNq0rs2BVg+ZlGwsKHJu2+FG9OcbLv8Mql9Swag5mYt1HcpG8q3g5QTXWTZ0
+	 hoyluvnB7lpHzwJSpFzHFq8kdtGXR62EQ+Las88mJ44bsz334/h5marK6pap+CxVjn
+	 MgYInMGLN84Vf+4txOoF55ID6t3SUkqhQizbYrtpxuW9NBZcySJ66Y24+T4AV5S7/g
+	 mv52IDmCLAU57MqawWp48N9yCKG3ZaQl60hcdJ1dMpcoqXtmwhHRXiln62y3OIUEWG
+	 4B5Fmplm9rb6zMDZ9+xofykoEGR1hnqCIxzMhYI9U9LHk8GzRmNWlNefe84j6qSUrL
+	 HNz3iNyL2u7Pg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vmyti-00000007sAy-3ZHT;
-	Mon, 02 Feb 2026 18:43:42 +0000
+	id 1vmytj-00000007sAy-0UTV;
+	Mon, 02 Feb 2026 18:43:43 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -61,9 +61,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v2 17/20] KVM: arm64: Remove all traces of FEAT_TME
-Date: Mon,  2 Feb 2026 18:43:26 +0000
-Message-ID: <20260202184329.2724080-18-maz@kernel.org>
+Subject: [PATCH v2 18/20] KVM: arm64: Remove all traces of HCR_EL2.MIOCNCE
+Date: Mon,  2 Feb 2026 18:43:27 +0000
+Message-ID: <20260202184329.2724080-19-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260202184329.2724080-1-maz@kernel.org>
 References: <20260202184329.2724080-1-maz@kernel.org>
@@ -92,7 +92,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69899-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69900-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -106,133 +106,46 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D73D6D0491
+X-Rspamd-Queue-Id: A5CE7D0498
 X-Rspamd-Action: no action
 
-FEAT_TME has been dropped from the architecture. Retrospectively.
-I'm sure someone is crying somewhere, but most of us won't.
-
-Clean-up time.
+MIOCNCE had the potential to eat your data, and also was never
+implemented by anyone. It's been retrospectively removed from
+the architecture, and we're happy to follow that lead.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/config.c                         |  7 -------
- arch/arm64/kvm/nested.c                         |  5 -----
- arch/arm64/tools/sysreg                         | 12 +++---------
- tools/perf/Documentation/perf-arm-spe.txt       |  1 -
- tools/testing/selftests/kvm/arm64/set_id_regs.c |  1 -
- 5 files changed, 3 insertions(+), 23 deletions(-)
+ arch/arm64/kvm/config.c | 1 -
+ arch/arm64/tools/sysreg | 3 +--
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index b37b40744db94..c1b76a76a5e4e 100644
+index c1b76a76a5e4e..8640f9c9b2e0e 100644
 --- a/arch/arm64/kvm/config.c
 +++ b/arch/arm64/kvm/config.c
-@@ -187,7 +187,6 @@ struct reg_feat_map_desc {
- #define FEAT_RME		ID_AA64PFR0_EL1, RME, IMP
- #define FEAT_MPAM		ID_AA64PFR0_EL1, MPAM, 1
- #define FEAT_S2FWB		ID_AA64MMFR2_EL1, FWB, IMP
--#define FEAT_TME		ID_AA64ISAR0_EL1, TME, IMP
- #define FEAT_TWED		ID_AA64MMFR1_EL1, TWED, IMP
- #define FEAT_E2H0		ID_AA64MMFR4_EL1, E2H0, IMP
- #define FEAT_SRMASK		ID_AA64MMFR4_EL1, SRMASK, IMP
-@@ -991,7 +990,6 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
- 	NEEDS_FEAT(HCR_EL2_FIEN, feat_rasv1p1),
- 	NEEDS_FEAT(HCR_EL2_GPF, FEAT_RME),
- 	NEEDS_FEAT(HCR_EL2_FWB, FEAT_S2FWB),
--	NEEDS_FEAT(HCR_EL2_TME, FEAT_TME),
- 	NEEDS_FEAT(HCR_EL2_TWEDEL	|
- 		   HCR_EL2_TWEDEn,
- 		   FEAT_TWED),
-@@ -1102,11 +1100,6 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
- 	NEEDS_FEAT(SCTLR_EL1_EnRCTX, FEAT_SPECRES),
- 	NEEDS_FEAT(SCTLR_EL1_DSSBS, FEAT_SSBS),
- 	NEEDS_FEAT(SCTLR_EL1_TIDCP, FEAT_TIDCP1),
--	NEEDS_FEAT(SCTLR_EL1_TME0	|
--		   SCTLR_EL1_TME	|
--		   SCTLR_EL1_TMT0	|
--		   SCTLR_EL1_TMT,
--		   FEAT_TME),
- 	NEEDS_FEAT(SCTLR_EL1_TWEDEL	|
- 		   SCTLR_EL1_TWEDEn,
- 		   FEAT_TWED),
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 75a23f1c56d13..96e899dbd9192 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1505,11 +1505,6 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 	u64 orig_val = val;
- 
- 	switch (reg) {
--	case SYS_ID_AA64ISAR0_EL1:
--		/* Support everything but TME */
--		val &= ~ID_AA64ISAR0_EL1_TME;
--		break;
--
- 	case SYS_ID_AA64ISAR1_EL1:
- 		/* Support everything but LS64 and Spec Invalidation */
- 		val &= ~(ID_AA64ISAR1_EL1_LS64	|
+@@ -938,7 +938,6 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
+ 		   HCR_EL2_FMO		|
+ 		   HCR_EL2_ID		|
+ 		   HCR_EL2_IMO		|
+-		   HCR_EL2_MIOCNCE	|
+ 		   HCR_EL2_PTW		|
+ 		   HCR_EL2_SWIO		|
+ 		   HCR_EL2_TACR		|
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 969a75615d612..650d7d477087e 100644
+index 650d7d477087e..724e6ad966c20 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -1856,10 +1856,7 @@ UnsignedEnum	31:28	RDM
- 	0b0000	NI
- 	0b0001	IMP
- EndEnum
--UnsignedEnum	27:24	TME
--	0b0000	NI
--	0b0001	IMP
--EndEnum
-+Res0	27:24
- UnsignedEnum	23:20	ATOMIC
- 	0b0000	NI
- 	0b0010	IMP
-@@ -2432,10 +2429,7 @@ Field	57	EPAN
- Field	56	EnALS
- Field	55	EnAS0
- Field	54	EnASR
--Field	53	TME
--Field	52	TME0
--Field	51	TMT
--Field	50	TMT0
-+Res0	53:50
- Field	49:46	TWEDEL
- Field	45	TWEDEn
- Field	44	DSSBS
-@@ -3840,7 +3834,7 @@ Field	43	NV1
+@@ -3834,8 +3834,7 @@ Field	43	NV1
  Field	42	NV
  Field	41	API
  Field	40	APK
--Field	39	TME
-+Res0	39
- Field	38	MIOCNCE
+-Res0	39
+-Field	38	MIOCNCE
++Res0	39:38
  Field	37	TEA
  Field	36	TERR
-diff --git a/tools/perf/Documentation/perf-arm-spe.txt b/tools/perf/Documentation/perf-arm-spe.txt
-index 8b02e5b983fa9..201a82bec0de4 100644
---- a/tools/perf/Documentation/perf-arm-spe.txt
-+++ b/tools/perf/Documentation/perf-arm-spe.txt
-@@ -176,7 +176,6 @@ and inv_event_filter are:
-   bit 10    - Remote access (FEAT_SPEv1p4)
-   bit 11    - Misaligned access (FEAT_SPEv1p1)
-   bit 12-15 - IMPLEMENTATION DEFINED events (when implemented)
--  bit 16    - Transaction (FEAT_TME)
-   bit 17    - Partial or empty SME or SVE predicate (FEAT_SPEv1p1)
-   bit 18    - Empty SME or SVE predicate (FEAT_SPEv1p1)
-   bit 19    - L2D access (FEAT_SPEv1p4)
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index c4815d3658167..73de5be58bab0 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -91,7 +91,6 @@ static const struct reg_ftr_bits ftr_id_aa64isar0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SM3, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA3, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, RDM, 0),
--	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, TME, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, ATOMIC, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, CRC32, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR0_EL1, SHA2, 0),
+ Field	35	TLOR
 -- 
 2.47.3
 
