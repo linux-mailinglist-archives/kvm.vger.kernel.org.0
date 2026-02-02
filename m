@@ -1,168 +1,160 @@
-Return-Path: <kvm+bounces-69796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69797-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GSYLZshgGnw3AIAu9opvQ
-	(envelope-from <kvm+bounces-69796-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 05:01:31 +0100
+	id 0LhiCh1CgGmK5QIAu9opvQ
+	(envelope-from <kvm+bounces-69797-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 07:20:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E3BC81A4
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 05:01:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC71BC8988
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 07:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D99013001A64
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 04:01:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8ED243003D07
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 06:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3036027B340;
-	Mon,  2 Feb 2026 04:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA232F6560;
+	Mon,  2 Feb 2026 06:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bT8t47ig"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D003FC9;
-	Mon,  2 Feb 2026 04:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916491E0DD8;
+	Mon,  2 Feb 2026 06:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770004885; cv=none; b=Hg8DjAVWEXmouKykat+iTpGb84StpK/AUTF4P8B8WpWK+X7ZBafcigxf73uGxV/gCLwCiT2DT8HuyDTb/+sZVULrh823dlrofRW4qedm9eWVLCmkOO7yjdiT6x/F4t94MxOe4xodqQ7mXjzAmGIVLT89aNMlOSYUQQTgwUSgYXY=
+	t=1770013206; cv=none; b=CM4aM8JNbbuSViF3BLzkooCWWtGvtfu6nemd6z7JY006BiIVZlYfvm1oeYl4DC/rx7bHFVLieATt/M1TOeYX7y+JSDO1PCDGJx6jC/vSeNEYVd5MO+TJKarYa9qhVd6ewwVMw+8wAx8/LE/M3pj6RktIJtRO5vIKdsW0kdCGMOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770004885; c=relaxed/simple;
-	bh=Zg/r068zEFYzvwHs29BQBUHJfUAoW/lDKEqKlai3FXo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ms9BMwnuADQff6X+LLJXDp/d+xTdEGx3kRYRsloPOjXt+oSvb7CW0vWcqsKO6noFvL49muG1rzqMXBMWnMuwe9hQS/ImYG/p0OcJdxEcfV8p6hIVgbqRQlegwL8/lQngqM3LZPtrGGpzuykO765IX9MuZZNIUiDt+PoUEw0xBic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from fric.. (unknown [210.73.43.101])
-	by APP-03 (Coremail) with SMTP id rQCowAAnDON8IYBpot59Bw--.49852S2;
-	Mon, 02 Feb 2026 12:01:01 +0800 (CST)
-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-To: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Alexandre Ghiti <alex@ghiti.fr>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Atish Patra <atish.patra@linux.dev>,
-	Anup Patel <anup@brainfault.org>,
-	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
-	Jiakai Xu <jiakaiPeanut@gmail.com>
-Subject: [PATCH v2] RISC-V: KVM: Fix use-after-free in kvm_riscv_gstage_get_leaf()
-Date: Mon,  2 Feb 2026 04:00:59 +0000
-Message-Id: <20260202040059.1801167-1-xujiakai2025@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1770013206; c=relaxed/simple;
+	bh=e+vygG1opwSSk2lhM00V8KAPs5cPYOhL9wMXsNVwVp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QLd34mY2aJsvtxu/f5i2siHWfaigfncVBQuE4Cubi8EKUlCAzFnp4mCEhOJs1fXJEMXU3+0xxyFZLVxiBJi1tarpeVIWQNszbBatnzZLvWDnqIAvdjGR9V6906Jt0CnHqc+383/3uzGnVNrGPnllaCsTuIu+IazkoB25Bm6fMTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bT8t47ig; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770013203; x=1801549203;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=e+vygG1opwSSk2lhM00V8KAPs5cPYOhL9wMXsNVwVp4=;
+  b=bT8t47ig4Y1FDDX0dzoM3pY67gxXvgUMmG1PDaBpaIOUNA/9ihID/Dlf
+   9r0vxqKB/QHy+NLa5HHkkX/uJp2jbLz8oX+emWpfLhIG33zrO60ElSnqo
+   GQx4sGnKbECjxbcPcHUtFNJB+V/v2d4uyhPucVyOJ77rzz9sYj6Pxbf/V
+   DRoI95nvVV5Up51OYgu1EejW/xHcYjTZymKf2cIEXuOWuw/2avqf0SGu4
+   yJvBiBQwF86D4BCcQQRUTOrmC0qPdDSOk8u9VZ36DQfL899SlcFY2cPfy
+   JOLDlfHMY987/NoXBD6S2sINFWtB3DdAoR9CuHUAHCpV8JiEibAkPZtVi
+   Q==;
+X-CSE-ConnectionGUID: iMLZ7RegSj+a7zh3wPt1Zw==
+X-CSE-MsgGUID: yKeISCkOTcibeac8xori9g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11689"; a="71066667"
+X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
+   d="scan'208";a="71066667"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2026 22:20:02 -0800
+X-CSE-ConnectionGUID: BRyCJipZTeiMIi6xHeu0uQ==
+X-CSE-MsgGUID: m/9M5LJOQWGHWoZmNVCqtw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,268,1763452800"; 
+   d="scan'208";a="247042456"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa001.jf.intel.com with ESMTP; 01 Feb 2026 22:19:57 -0800
+Date: Mon, 2 Feb 2026 14:01:32 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
+	ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+	sagis@google.com, vannapurve@google.com, paulmck@kernel.org,
+	nik.borisov@suse.com, zhenzhong.duan@intel.com, seanjc@google.com,
+	rick.p.edgecombe@intel.com, kas@kernel.org,
+	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+	Farrah Chen <farrah.chen@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v3 14/26] x86/virt/seamldr: Introduce skeleton for TDX
+ Module updates
+Message-ID: <aYA9vOSRDNCU1A/2@yilunxu-OptiPlex-7050>
+References: <20260123145645.90444-1-chao.gao@intel.com>
+ <20260123145645.90444-15-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAAnDON8IYBpot59Bw--.49852S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4UtrW7XF4Utw45tF13Jwb_yoW5JFykpF
-	Z8Gry3CryrJr4kCry7tryDZrWDWw4UWrWkCFy5CF9rGrsIqa97Zrna9as2qry5ArykXFy3
-	ZrWDKa4rCr4Fya7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-	rcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x
-	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU6c_3UUUUU=
-X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiDAUGCWl-a8ajEgABsN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123145645.90444-15-chao.gao@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69796-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[ghiti.fr,eecs.berkeley.edu,dabbelt.com,sifive.com,linux.dev,brainfault.org,iscas.ac.cn,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-69797-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: 59E3BC81A4
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,intel.com:dkim]
+X-Rspamd-Queue-Id: BC71BC8988
 X-Rspamd-Action: no action
 
-While fuzzing KVM on RISC-V, a use-after-free was observed in
-kvm_riscv_gstage_get_leaf(),  where ptep_get() dereferences a
-freed gstage page table page during gfn unmap.
+On Fri, Jan 23, 2026 at 06:55:22AM -0800, Chao Gao wrote:
+> The P-SEAMLDR requires that no TDX Module SEAMCALLs are invoked during a
+> runtime TDX Module update.
+> 
+> But currently, TDX Module SEAMCALLs are invoked in various contexts and in
+> parallel across CPUs. Additionally, considering the need to force all vCPUs
+> out of guest mode, no single lock primitive, except for stop_machine(), can
+> meet this requirement.
+> 
+> Perform TDX Module updates within stop_machine() as it achieves the
+> P-SEAMLDR requirements and is an existing well understood mechanism.
+> 
+> TDX Module updates consist of several steps: shutting down the old
+> module, installing the new module, and initializing the new one and etc.
+> Some steps must be executed on a single CPU, others serially across all
+> CPUs, and some can be performed concurrently on all CPUs and there are
+> ordering requirements between steps. So, all CPUs need to perform the work
+> in a step-locked manner.
+> 
+> In preparation for adding concrete steps for TDX Module updates,
+> establish the framework by mimicking multi_cpu_stop(). Specifically, use a
+> global state machine to control the work done on each CPU and require all
+> CPUs to acknowledge completion before proceeding to the next stage.
+> 
+> Potential alternative to stop_machine()
+> =======================================
+> An alternative approach is to lock all KVM entry points and kick all
+> vCPUs.  Here, KVM entry points refer to KVM VM/vCPU ioctl entry points,
+> implemented in KVM common code (virt/kvm). Adding a locking mechanism
+> there would affect all architectures. And to lock only TDX vCPUs, new
+> logic would be needed to identify TDX vCPUs, which the common code
+> currently lacks. This would add significant complexity and maintenance
+> overhead for a TDX-specific use case.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Tested-by: Farrah Chen <farrah.chen@intel.com>
 
-The crash manifests as:
-  use-after-free in ptep_get include/linux/pgtable.h:340 [inline]
-  use-after-free in kvm_riscv_gstage_get_leaf arch/riscv/kvm/gstage.c:89
-  Call Trace:
-    ptep_get include/linux/pgtable.h:340 [inline]
-    kvm_riscv_gstage_get_leaf+0x2ea/0x358 arch/riscv/kvm/gstage.c:89
-    kvm_riscv_gstage_unmap_range+0xf0/0x308 arch/riscv/kvm/gstage.c:265
-    kvm_unmap_gfn_range+0x168/0x1fc arch/riscv/kvm/mmu.c:256
-    kvm_mmu_unmap_gfn_range virt/kvm/kvm_main.c:724 [inline]
-  page last free pid 808 tgid 808 stack trace:
-    kvm_riscv_mmu_free_pgd+0x1b6/0x26a arch/riscv/kvm/mmu.c:457
-    kvm_arch_flush_shadow_all+0x1a/0x24 arch/riscv/kvm/mmu.c:134
-    kvm_flush_shadow_all virt/kvm/kvm_main.c:344 [inline]
-
-The UAF is caused by gstage page table walks running concurrently with
-gstage pgd teardown. In particular, kvm_unmap_gfn_range() can traverse
-gstage page tables while kvm_arch_flush_shadow_all() frees the pgd,
-leading to use-after-free of page table pages.
-
-Fix the issue by serializing gstage unmap and pgd teardown with
-kvm->mmu_lock. Holding mmu_lock ensures that gstage page tables
-remain valid for the duration of unmap operations and prevents
-concurrent frees.
-
-This matches existing RISC-V KVM usage of mmu_lock to protect gstage
-map/unmap operations, e.g. kvm_riscv_mmu_iounmap.
-
-Fixes: dd82e35638d67f ("RISC-V: KVM: Factor-out g-stage page table management")
-Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
----
-V1 -> V2: Removed kvm->mmu_lock in kvm_arch_flush_shadow_all().
-
- arch/riscv/kvm/mmu.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index a1c3b2ec1dde5..1d71c1cb429ca 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -268,9 +268,11 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 	gstage.flags = 0;
- 	gstage.vmid = READ_ONCE(kvm->arch.vmid.vmid);
- 	gstage.pgd = kvm->arch.pgd;
-+	spin_lock(&kvm->mmu_lock);
- 	kvm_riscv_gstage_unmap_range(&gstage, range->start << PAGE_SHIFT,
- 				     (range->end - range->start) << PAGE_SHIFT,
- 				     range->may_block);
-+	spin_unlock(&kvm->mmu_lock);
- 	return false;
- }
- 
--- 
-2.34.1
-
+Reviewed-by: Xu Yilun <yilun.xu@linux.intel.com>
 
