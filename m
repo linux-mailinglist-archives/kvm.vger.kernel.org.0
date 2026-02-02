@@ -1,308 +1,209 @@
-Return-Path: <kvm+bounces-69904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69905-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oE67KIXygGkgDQMAu9opvQ
-	(envelope-from <kvm+bounces-69904-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:52:53 +0100
+	id SPuxMub3gGmxDQMAu9opvQ
+	(envelope-from <kvm+bounces-69905-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 20:15:50 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2134CD0557
-	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 19:52:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F3C8D070D
+	for <lists+kvm@lfdr.de>; Mon, 02 Feb 2026 20:15:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16984301D30F
-	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 18:49:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E8E1304523E
+	for <lists+kvm@lfdr.de>; Mon,  2 Feb 2026 19:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFEF374185;
-	Mon,  2 Feb 2026 18:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CC72FF669;
+	Mon,  2 Feb 2026 19:14:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pEOj7a3s";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="O7YjFebL"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="S4pPMtsC";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="h9zEvVgR"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39792DB7AE
-	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 18:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEDF2FCC0E
+	for <kvm@vger.kernel.org>; Mon,  2 Feb 2026 19:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770058187; cv=none; b=uTc0O+Yqt0fVPu26I/bfkAsL3Wd312bkJYLkvEWad2n3eENQz2j6j226IqtpCZXWJwX6ZtSgqMmrxLe7NpvbzAM4pY5ERUck6bfB4n50cl12kIeapljUR/ZL2IH/bc1gLl5wo6mqmYgPXNarg9M3UYpJika2IKL1d3RMq+fvdos=
+	t=1770059667; cv=none; b=Fb32z7AolB/KlFccD8F0+2vmDGD8ZsIQs2Ps3YCY4AT/+JanzFCWdhTibHrywUr5f0jBDJYwtKMuBT8PSx1vFX1mIy1Ep74g6I1irofFXqcbkKG8SulDohzCxmOh8U8sjxmicD4mh10YM54ViHS06ERAPV3+crCdXtfadp0W+es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770058187; c=relaxed/simple;
-	bh=+BB3oprmF3IwDJYflvgD/wWi1jKg30NUMwTP70etfhk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e8picYxdWuBWX6i3Yv2HzqSSAytDW65ffK0zXUaXMDFXt6mfFEXeS5ESlHj4Xi0t7MCZ2LIl1EJLo87UDOlkpQKPxW2RNT13pgpEoaOxMAKcFBVk9AqW4EkKBmvS/Vv0VRk+9+Okhwm57bQ8qdl21CdQ0hNx6c8p9ycg96rhiVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pEOj7a3s; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=O7YjFebL; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1770059667; c=relaxed/simple;
+	bh=PdWYVM9bQtDe0TudJddgK+d7dqdKR0v+WMWn+GfPpOI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=Mdcm7HSbRmoKmB98Y/MyUopJebkYUOLraC2AUtAchzreeJtkBHE1cKmQrHcR/XL1p7gZgcjTi5hWuXWXe9YzxIuWgVtfOvxa7HARxyCctnVRnKOBnK/s8dMZ3MdmyWRVNHnGmv3giAvEGXoWCyEsLfoqtFu8KefxN6om9iaA/zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=S4pPMtsC; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=h9zEvVgR; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 612FlDJd3388084
-	for <kvm@vger.kernel.org>; Mon, 2 Feb 2026 18:49:44 GMT
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 612JD75H2261991
+	for <kvm@vger.kernel.org>; Mon, 2 Feb 2026 19:14:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=McETLnO4ta1TDAPHSx5gBrjB
-	YMKIltkUc/cMr5/3QjA=; b=pEOj7a3sf+dmUCl/aWskVTC4TWNe/fNIOQypPRIo
-	e28VblZNK1hcy9oPpaREDKlCBo0PDx5kjgDeA1JNgSiZcTvUtSg8NjB1iVg5PNAN
-	BH48HLIsizSGBTcH+5I3zm3DoMOICpFQd1HisiSjjCjPEU81G7jD+zzlty+XFhhj
-	frUxmqlXUAz7L6oW9pcbVQih9DQck7mNrgrns0yu3/q6L9o9wLGOCHv+qUu6Q5nt
-	Ntma4/lTxvzlklcvsFEHKhYLk4XyOIW8EDfu2zr/Q+5YI2jDiP8KROCAA48rngKh
-	FkRGWXHSYlpSKdInO4O+pnsS6jFUMhFuC9nR551/ZA/tFA==
-Received: from mail-dl1-f70.google.com (mail-dl1-f70.google.com [74.125.82.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c2xvbrky7-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	/8zI+RIop4TnDr5DdAUmDHiyZhpKs0Nv2xs4iv2+KGE=; b=S4pPMtsCc78QnI5G
+	/VtZ9+pEPulUv/gY0C4oEuQlmLvZ5LxZDmQeMk/oXwp2u2Z/FSopfMRZlITtFVtm
+	AM2gzLtqaigijBFZRqxGUY8MYRfHB3ysBtr5XzRIQ2CEdaBamMBz0IH/nNGwu170
+	HrJqJAmRpH+wVy07ZoyDzi7hrUkoNS6SJiy+TMOZanhSCOivZrtxB1sxqD1a5Rug
+	6inUY+m/XSR38YQC8/VWtLgZ3dDKDeIj5hezzRQKu3WeBCBQvL4FmstGDRvLWfy9
+	c1xcrFm5JzmgG5xson/0wfZDrR7LDNgNgPJi5ZO66jJP574sUtO7yoqU/VioeFuO
+	dzj00g==
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4c2tmthgrt-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 18:49:44 +0000 (GMT)
-Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-124a2d3d1b7so5903305c88.0
-        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 10:49:44 -0800 (PST)
+	for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 19:14:24 +0000 (GMT)
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8c70cff1da5so1280344485a.2
+        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 11:14:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1770058184; x=1770662984; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=McETLnO4ta1TDAPHSx5gBrjBYMKIltkUc/cMr5/3QjA=;
-        b=O7YjFebLtI0J6ZteCc2JsWoqGYBKqkiJQ8Lnq3/r3pctHWtrgAb4RuCiNitrMYzOL4
-         cOF5lIg2dHwiNCCv8NawAwA29oJN3nBeMFYhOSkQf/yySkYSaxjG16PSaO+X/T9jDGzb
-         GmL3Yrgb4UP7ZpqY2JGrtXUP+0SKHEAbRautGHva3R+Bl1s2N+tT9FDYz1ccZtD5C5QO
-         5a6GOkXol11JOkBE+Kxk9kUFH+pgQMuwPXO6nR4LoctBv12/A2xtHSlFcy2IQY4xbi9w
-         Q5pg7PeCgDQ36qyCS8lnnRn5Anfout7Oz3xOGLIUWMipSXsYhSABTztazoii2/edfv53
-         4HXQ==
+        d=oss.qualcomm.com; s=google; t=1770059664; x=1770664464; darn=vger.kernel.org;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/8zI+RIop4TnDr5DdAUmDHiyZhpKs0Nv2xs4iv2+KGE=;
+        b=h9zEvVgRO6HvxGAQ6W4C/kCt8ihS01yLCGlCUnYaSaROqhWRZuaJHIbT5c4/AArq2v
+         SUzFDNBOeEbCAg2Fj/p7XUVErvTGsGUCWaX9t3QLL8uXZ5uE/PoNz+yyCmLQGfvw/7Ow
+         u9tNGCtPxD5iW8AzUEmP+nXmZaIRY3IXzbul8824wt+920gGy8WUkDOObE1TOOxptlkq
+         o7RW7gcDVnzpNd80WBGWMEhG+lryQC7ldXp7yZ9pqkM76DbeX8HChSEztLVYzePhYgAf
+         yXPcNreTwdfg8YQX89HjZkk3buWNbp8SGl0PAe9GSWGL5OXecIZmw6PQ2WBOVF91g7OQ
+         t9jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770058184; x=1770662984;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=McETLnO4ta1TDAPHSx5gBrjBYMKIltkUc/cMr5/3QjA=;
-        b=a4uy/f86S5FqNNHrwZS/pJCYj65byvsYicXco0cRdBJSRdOg8tq3t7tqu5hZ1XQ49x
-         JJWlLSzErNlW8PNNGh32ndoE/BrV4u9TE6mqiIUTGpPQizrH4L3n+lYR3zEeY0ypqcAv
-         fUU09w9bI99GaXU+Y67pDUwfnfSxu5Hyt0USyzr43Bg9vbgeiHILCkcuN917ca7rnCcY
-         GVxok0CpLXbaAItbGqKhy230Ble9gS7gVM+N4sajojNd9vOfPFyMCLRI/26LijpybQSY
-         d96kOSHeMYeudNj0PFt7olUEhEPVDHFMXUeHlQX0cSJMfFclqGX5YFYm+WrUhyrc1l8J
-         3U7A==
-X-Forwarded-Encrypted: i=1; AJvYcCVym6do9HBLdcFYLjFK0Df80aycvR3jd4cwPKM/RwjZb0UmLXBP8mA7pD/UGRZ1GkQbOO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkSr85EuF5S7o8CN0cxhahSZbpIh8TDK0w/sHBMt0zk2yz6deN
-	XRYNNuBF2BpkRAAmHwloLTkFfafYQb5Ldnv7CGx4llS3PBCnwVd1EuF2D10K78rtmmAYGghgYpL
-	RVuR8DTmPON13SoYym2Tw2N8T10EiTYluh/jDNcXO/kpGGA3tM8AP8JI=
-X-Gm-Gg: AZuq6aLV1xZB/wTNiBADVUwlmtheZ1AOtFjMWrzf0zHbRJ0OYiKrUichTymIBMNhtS/
-	+FkUNbgmkb1h4B3VXkEQyzGsJuRgmmLMbv5pT76lMxFmQQjCWV5JZEpQhz6tH4WKzwS1GZ9yLsI
-	A3luQYeYgYvZSI0Rcb4/qnm3SMQVCMBkDgDPNGYQ5FwnePIf0ykIlEf2iU8vDEM+bc8gYmLMxVO
-	OAo4gCHQquxGNieifERRCtCzgoE/edanfp2g95KRBKPeAdUN+DFxHN7jZNLPTOOJAnPIfm1PRql
-	KhQEhQHWObEWgO3BN+cMYZcgiX8VDk3m0rDXTlVSmnVaMU8YFBq425oDkXctKYe/i8CkcXjE/g8
-	VNKChJuV7X+/5Vrf8ugg=
-X-Received: by 2002:a05:7022:608f:b0:11b:d4a8:d244 with SMTP id a92af1059eb24-125c0f93c6fmr5769706c88.16.1770058183583;
-        Mon, 02 Feb 2026 10:49:43 -0800 (PST)
-X-Received: by 2002:a05:7022:608f:b0:11b:d4a8:d244 with SMTP id a92af1059eb24-125c0f93c6fmr5769692c88.16.1770058183010;
-        Mon, 02 Feb 2026 10:49:43 -0800 (PST)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b7a1abedcasm20534927eec.21.2026.02.02.10.49.42
+        d=1e100.net; s=20230601; t=1770059664; x=1770664464;
+        h=in-reply-to:references:from:to:cc:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/8zI+RIop4TnDr5DdAUmDHiyZhpKs0Nv2xs4iv2+KGE=;
+        b=X4YZIrZT36o3MEUEtmLlNCi1tK02HqMhppNY6kJL9E2y6BTUYAT0FQdM8rN7Ac80/v
+         +GZh/w78Pr5YgIyZ2beIoLgtsJAwKYNL9w7CfNavzLmMxB8Xy7/Z1Clp9vrZDIelH3e6
+         n1KNSutuHuNjxZ0ungqH37DYTeEKvqgfey7r2I1iUfmTev3wO57apWby09l0LcQUY6Rz
+         5FNx8mjhtVnMgJQy/nrdReyF0CuRjcrSdFUmyMd+5Fx/swcdbbOnFj76rMKMbzJHWQ68
+         38DpCf5/09QTMjLdGLB5sye9QSef2rgIKst4rsKn7d8Pft1quIikvxg04wOh5/fE4/C6
+         qGUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtxSu1Q/DGApEILx+7m6CCapFKxaYawbBatRIn/Xwc6SCiax/Dh/6TXyiaupIFedI3YoA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHjGHoMgmqR8hl0l24ff1/N3L2c7ga/Lb4zbysUti7lqNZZQMU
+	LljGpBZ9qfFtPW22E2n+8HWNvyCb3SsAa88qnOsF1ETO7EYDtshq013Yf6y+XvxPUA3CJFwRkby
+	K3TDlm0kwMy/4YRCRjgzh3BU/DKzBCqPJqNCZAZsog/alo4fp2fSvTc8=
+X-Gm-Gg: AZuq6aJaGxM1/RkPt9H0dJ1TwflkwxsnwQhvxsww5nYjoaipztuo+Il+P6qW6EhJB/X
+	4/DSPcW5fyf76MglQYIAzhu6zP/dBUbEqpbHQarcHkmijm0Y/+jefzUDuafMxSlEa+/xsppQn5u
+	aZsDjlKC1iWuRtI56vAcqxM6OJeENFADryp69ocrDF6u1lH5vv4koL7W1deWdpv0Dmo7bUfCBfh
+	V5WsjuOwA5Kj/gN2WDnMzmbxcZ66lpuGi+3zvc7Z+mYqidZhGQj2GvGZWFEmYZN8c0TAx8vAByb
+	iopye2uca10x6NCIXdEkwcqMFafcx+Ic9Pauzzj6v8IjBmurD7s79sxBYlUtOYi+xfqZ55buDv8
+	KOIffxKmbyHRo5cFuq7ki+dhJjCsLk5XDsKLPHFKSsab8Owm2
+X-Received: by 2002:a05:620a:254c:b0:8c5:38f2:810e with SMTP id af79cd13be357-8c9eb330b40mr1572185585a.82.1770059664117;
+        Mon, 02 Feb 2026 11:14:24 -0800 (PST)
+X-Received: by 2002:a05:620a:254c:b0:8c5:38f2:810e with SMTP id af79cd13be357-8c9eb330b40mr1572179985a.82.1770059663552;
+        Mon, 02 Feb 2026 11:14:23 -0800 (PST)
+Received: from localhost (ip-86-49-253-11.bb.vodafone.cz. [86.49.253.11])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482e267b699sm98668775e9.16.2026.02.02.11.14.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Feb 2026 10:49:42 -0800 (PST)
-Date: Mon, 2 Feb 2026 12:49:41 -0600
-From: Andrew Jones <andrew.jones@oss.qualcomm.com>
-To: fangyu.yu@linux.alibaba.com
-Cc: pbonzini@redhat.com, corbet@lwn.net, anup@brainfault.org,
-        atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, alex@ghiti.fr, guoren@kernel.org,
-        ajones@ventanamicro.com, rkrcmar@ventanamicro.com,
-        radim.krcmar@oss.qualcomm.com, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 3/4] RISC-V: KVM: add KVM_CAP_RISCV_SET_HGATP_MODE
-Message-ID: <73zrxri5snnenmezjxrdorbcsps4dlvtrkvkq3w4ain4ggbxdl@hjw4u73msaro>
-References: <20260202140716.34323-1-fangyu.yu@linux.alibaba.com>
- <20260202140716.34323-4-fangyu.yu@linux.alibaba.com>
+        Mon, 02 Feb 2026 11:14:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260202140716.34323-4-fangyu.yu@linux.alibaba.com>
-X-Proofpoint-GUID: CxjhxTvDW8m8H2KLeF81WxZKpBHU0fKw
-X-Proofpoint-ORIG-GUID: CxjhxTvDW8m8H2KLeF81WxZKpBHU0fKw
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDE0NyBTYWx0ZWRfXzFdd35EwqaI9
- mR/LNwPewtc5JyX287BLTNg2VZnO6b64YH1CHxiIJfMt9BryK3qZ45PDi1txhFnPArq+P4/rhnP
- hW8TW8w7TQFEp1I1ngWLff1VSOVD0FN3ctnra593NQ6JDQcwYUcmaAxEez2uYioN2xcHqB4NhIj
- E9dvtJLayr/Xdx8sX3a8oeJCq6d+QHeDEMYTgKL5BMTnHgwh3Vpdkf5M8E+zTHXiAx6WNVrJQYd
- hejCdBP0TUQ4yERLvMMSFMMozLLOFtanpNRp+vgDTu4p2VFBDQphEHhFMQPfuP1xZJwnPEKivd+
- KbT5KaJYuV7+PRo+k4EoWM6r0i4D7TNp1k0qpFpi93THJrurv/DCd4GjxD4A4h+038fO2aTCYUQ
- Y83ETaw7qahnwi3r9+zFWN0ajZrKvkN5NR2/3RUXw9DwMhmdMWRIclqFWytV0H34mtqm1xG+6WM
- MBdyTH14T51RtqfNcSw==
-X-Authority-Analysis: v=2.4 cv=AurjHe9P c=1 sm=1 tr=0 ts=6980f1c8 cx=c_pps
- a=SvEPeNj+VMjHSW//kvnxuw==:117 a=cvcws7F5//HeuvjG1O1erQ==:17
- a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=SRrdq9N9AAAA:8 a=Y8ST6Fl8U4FUF0grvJQA:9
- a=CjuIK1q_8ugA:10 a=Kq8ClHjjuc5pcCNDwlU0:22
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 02 Feb 2026 19:14:21 +0000
+Message-Id: <DG4PS6NRRUC1.1FL8WBJVEEM4D@oss.qualcomm.com>
+Subject: Re: [PATCH v4 2/4] RISC-V: KVM: Detect and expose supported HGATP
+ G-stage modes
+Cc: <guoren@kernel.org>, <ajones@ventanamicro.com>, <rkrcmar@ventanamicro.com>,
+        <andrew.jones@oss.qualcomm.com>, <linux-doc@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
+        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+To: <fangyu.yu@linux.alibaba.com>, <pbonzini@redhat.com>, <corbet@lwn.net>,
+        <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
+        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>
+From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?=
+ <radim.krcmar@oss.qualcomm.com>
+References: <20260202140716.34323-1-fangyu.yu@linux.alibaba.com>
+ <20260202140716.34323-3-fangyu.yu@linux.alibaba.com>
+In-Reply-To: <20260202140716.34323-3-fangyu.yu@linux.alibaba.com>
+X-Authority-Analysis: v=2.4 cv=Xb6EDY55 c=1 sm=1 tr=0 ts=6980f790 cx=c_pps
+ a=50t2pK5VMbmlHzFWWp8p/g==:117 a=HFCiZzTCIv7qJCpyeE1rag==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=M51BFTxLslgA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=SRrdq9N9AAAA:8 a=PElOwc1BOWmaZxrSg6EA:9
+ a=QEXdDO2ut3YA:10 a=IoWCM6iH3mJn3m4BftBB:22
+X-Proofpoint-ORIG-GUID: nk2AS2qAhcdYxXCa99hFvbXlIWnGXJmp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAyMDE1MCBTYWx0ZWRfXxk+TsWy2Wtpz
+ kVUWEnBIrmUFtjLUF/02/5MTfk+dn0zUx1HK9Z/Sh15pYFLCLA+KfzkStYGMxyRaAj1BAkzPWjo
+ z4vKzuH/lLJh06mIlqWIY+4yzQrqZeR8vG+vHZhRw6Acam488S3GK2VNdf5KhmNB5ARLNVhd+sJ
+ 7QnXVRlqLTl1I48mwfRbTiPn9yi1R3C4kLy4s9O2lRerNxTAGgCWk9n9d+fB61VYZ/ePaq1qoT5
+ 8BhhoO+EOtYzG0mG+5ZuQmJe9X0JviI9vKm6ury4HnCeCxhKZvNFkMJDgnmmr9LHs7+UKegbUWm
+ 4U1sObG+CQbePScWN+UEhSIY5k6ptSg4ChM9GZaSpg2vfhiLT7VGwmgSPor9Re/pnBBT7CjRx22
+ YgiB4nD35bh1hahLwZg7zF9hJJd2Nu3dhw0a7koFp1KaT95EpVW2w00RzAr9Mn1GzYXk4JUkfw7
+ tXYFmL7LPppiQZYUIeg==
+X-Proofpoint-GUID: nk2AS2qAhcdYxXCa99hFvbXlIWnGXJmp
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-02_05,2026-02-02_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 suspectscore=0 phishscore=0 adultscore=0
- malwarescore=0 priorityscore=1501 impostorscore=0 lowpriorityscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602020147
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 phishscore=0 adultscore=0
+ suspectscore=0 bulkscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602020150
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.87 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MIXED_CHARSET(0.79)[subject];
 	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69904-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:dkim,alibaba.com:email,qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69905-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oss.qualcomm.com:mid,oss.qualcomm.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,alibaba.com:email,qualcomm.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew.jones@oss.qualcomm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[radim.krcmar@oss.qualcomm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 2134CD0557
+X-Rspamd-Queue-Id: 2F3C8D070D
 X-Rspamd-Action: no action
 
-On Mon, Feb 02, 2026 at 10:07:15PM +0800, fangyu.yu@linux.alibaba.com wrote:
+2026-02-02T22:07:14+08:00, <fangyu.yu@linux.alibaba.com>:
 > From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
-> 
-> Add a VM capability that allows userspace to select the G-stage page table
-> format by setting HGATP.MODE on a per-VM basis.
-> 
-> Userspace enables the capability via KVM_ENABLE_CAP, passing the requested
-> HGATP.MODE in args[0]. The request is rejected with -EINVAL if the mode is
-> not supported by the host, and with -EBUSY if the VM has already been
-> committed (e.g. vCPUs have been created or any memslot is populated).
-> 
-> KVM_CHECK_EXTENSION(KVM_CAP_RISCV_SET_HGATP_MODE) returns a bitmask of the
-> HGATP.MODE formats supported by the host.
-> 
+>
+> Extend kvm_riscv_gstage_mode_detect() to probe all HGATP.MODE values
+> supported by the host and record them in a bitmask. Keep tracking the
+> maximum supported G-stage page table level for existing internal users.
+>
+> Also provide lightweight helpers to retrieve the supported-mode bitmask
+> and validate a requested HGATP.MODE against it.
+>
 > Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
 > ---
->  Documentation/virt/kvm/api.rst | 27 +++++++++++++++++++++++++++
->  arch/riscv/kvm/vm.c            | 20 ++++++++++++++++++--
->  include/uapi/linux/kvm.h       |  1 +
->  3 files changed, 46 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 01a3abef8abb..1a0c5ddacae8 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8765,6 +8765,33 @@ helpful if user space wants to emulate instructions which are not
->  This capability can be enabled dynamically even if VCPUs were already
->  created and are running.
->  
-> +7.47 KVM_CAP_RISCV_SET_HGATP_MODE
-> +---------------------------------
-> +
-> +:Architectures: riscv
+> diff --git a/arch/riscv/include/asm/kvm_gstage.h b/arch/riscv/include/asm=
+/kvm_gstage.h
+> @@ -75,4 +76,40 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gsta=
+ge, gpa_t start, gpa_t end
+> +enum kvm_riscv_hgatp_mode_bit {
+> +	HGATP_MODE_SV39X4_BIT =3D 0,
+> +	HGATP_MODE_SV48X4_BIT =3D 1,
+> +	HGATP_MODE_SV57X4_BIT =3D 2,
 
-If we only want this to work for rv64, then we should write riscv64 here,
-but, as I said in the last patch, I think we can just support rv32 too
-by supporting its one and only mode.
+I think it's a bit awkward to pass 9 when selecting the hgatp mode, but
+then look for bit 0 when detecting it...
+Why not to use the RVI defined values for this UABI as well?
 
-> +:Type: VM
-> +:Parameters: args[0] contains the requested HGATP mode
-> +:Returns:
-> +  - 0 on success.
-> +  - -EINVAL if args[0] is outside the range of HGATP modes supported by the
-> +    hardware.
-> +  - -EBUSY if vCPUs have already been created for the VM, if the VM has any
-> +    non-empty memslots.
-> +
-> +This capability allows userspace to explicitly select the HGATP mode for
-> +the VM. The selected mode must be supported by both KVM and hardware. This
-> +capability must be enabled before creating any vCPUs or memslots.
+There are only 16 possible hgatp.mode values, so we're fine storing them
+in a bitmap even on RV32.
 
-We should write what happens if the capability (setting the mode) is not
-done, i.e. what's the default mode.
-
-> +
-> +``KVM_CHECK_EXTENSION(KVM_CAP_RISCV_SET_HGATP_MODE)`` returns a bitmask of
-> +HGATP.MODE values supported by the host. A return value of 0 indicates that
-> +the capability is not supported.
-> +
-> +The returned bitmask uses the following bit positions::
-> +
-> +  bit 0: HGATP.MODE = SV39X4
-> +  bit 1: HGATP.MODE = SV48X4
-> +  bit 2: HGATP.MODE = SV57X4
-
-Could write something along the lines of the UAPI having the bit
-definitions rather than duplicating that information here.
-
-> +
->  8. Other capabilities.
->  ======================
->  
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index 4b2156df40fc..3bbbcb6a17a6 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -202,6 +202,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_VM_GPA_BITS:
->  		r = kvm_riscv_gstage_gpa_bits(&kvm->arch);
->  		break;
-> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
-> +		r = kvm_riscv_get_hgatp_mode_mask();
-> +		break;
->  	default:
->  		r = 0;
->  		break;
-> @@ -212,12 +215,25 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  
->  int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->  {
-> +	if (cap->flags)
-> +		return -EINVAL;
-> +
->  	switch (cap->cap) {
->  	case KVM_CAP_RISCV_MP_STATE_RESET:
-> -		if (cap->flags)
-> -			return -EINVAL;
->  		kvm->arch.mp_state_reset = true;
->  		return 0;
-> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
-> +#ifdef CONFIG_64BIT
-> +		if (!kvm_riscv_hgatp_mode_is_valid(cap->args[0]))
-> +			return -EINVAL;
-> +
-> +		if (kvm->created_vcpus || !kvm_are_all_memslots_empty(kvm))
-> +			return -EBUSY;
-> +
-> +		kvm->arch.kvm_riscv_gstage_pgd_levels =
-> +				3 + cap->args[0] - HGATP_MODE_SV39X4;
-> +#endif
-> +		return 0;
->  	default:
->  		return -EINVAL;
->  	}
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index dddb781b0507..00c02a880518 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
->  #define KVM_CAP_GUEST_MEMFD_FLAGS 244
->  #define KVM_CAP_ARM_SEA_TO_USER 245
->  #define KVM_CAP_S390_USER_OPEREXEC 246
-> +#define KVM_CAP_RISCV_SET_HGATP_MODE 247
->  
->  struct kvm_irq_routing_irqchip {
->  	__u32 irqchip;
-> -- 
-> 2.50.1
->
-
-Thanks,
-drew
+Thanks.
 
