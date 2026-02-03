@@ -1,313 +1,319 @@
-Return-Path: <kvm+bounces-70025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70026-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cLw0ElAmgmnPPgMAu9opvQ
-	(envelope-from <kvm+bounces-70025-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 17:46:08 +0100
+	id uL3uBOEogmnPPgMAu9opvQ
+	(envelope-from <kvm+bounces-70026-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 17:57:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF4F3DC311
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 17:46:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32577DC5EA
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 17:57:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E272830BA578
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 16:38:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D726330327F2
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 16:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577163D3309;
-	Tue,  3 Feb 2026 16:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AF23D3329;
+	Tue,  3 Feb 2026 16:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="326smv3s"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dgyDwT3S"
 X-Original-To: kvm@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012048.outbound.protection.outlook.com [52.101.43.48])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A6A2C0F69;
-	Tue,  3 Feb 2026 16:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770136728; cv=fail; b=M+lDK2ZE11J6pFS2DBdpKgTXctyP6ksvMyZBhtHQG+47xX+M/8ovsQXqX4CAjAW0wvVTETeDv5ZxdvHgSliByGa67JHni55wqEZv011cFQn4gNgwXPIrjC53AC7qqzMybIu2YFaS5tExTRYtZxS8oYRqPyIlvRvyivhGTdxeYQE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770136728; c=relaxed/simple;
-	bh=G+6Kv3Dds35uLNAefsiBVljRSoIzw7b1QlJjjrJEZes=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=l+n40Zkuzx3uuQNoIJpwKwqK76OSx9tLVyW31gilhpfveh0mXACxqr7HFb1Qy8YdTqqUfwTv1DY6kLQ28oEu+Rz5mdpg9oeXV1wHx0c+7aoxTkpmHqQTAzrNtJR6k1AnWf2eR08+gBqKH29LLFwOFL18UhPaJuPSqZYT8XSgb2s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=326smv3s; arc=fail smtp.client-ip=52.101.43.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ck+JfAU+T+Fv3C0spG7emLLTWcJcKLm2YHRf9IaeBMQb8Je7t8zQbzA7altJnucpsVrMFF6ZPJ8MOrVF1cNpXMnlzSiK+D824VFdOq7mSyU6irpgWf/5xPoV/PuDcGH/nvCXNKdOdG60rMhD3C9zuTNY+6NkxYr8nqCl49YwusT0tdazl9l2hQSszSbuqoAgiAsmnXojhyMiomoccvhe0thx/neDzfC3SOYk2cJbhIGoOr3FJU1TQzi1jqMb+ztvr89T9nh4qdeIzDRUngrk7N4Gau/hJnBBBMaqVab7rQ1qPWqBCfL3XX4ZixQUDB6MnZbBsREl3Cjgy6eGpvduSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hJkhpFQuYk+h9CjwwHIt/GVVMo9JtZB5Eo0SlNI3598=;
- b=rk0W/CTXCQq5Dd68MwLg8osAUko38gBjzMaUSJWC1TezBoBnrUhNO0QLB5DvQtAk4f81QzkoU7iUi46p5i9t0Wlo2wH+SVFOEK4/pCBr8OZraWeIJnLXNFSBCq7Hq8ZFq16EV5yS6qLcHj34J2ke+haCBZs4udbec3f7mtV9DyrENo51NpSHuH0vgqWfIzC0/B2X4Ckyj18xcEz9V+sgDjVGjH6+nrk8ubYOsoS1H6fax31QqG//8VQHcTMpSfxKH/irhtsoG4SXgk8khisXHlYRLOlLv7S4M4Ye4ymSZLlHF0NfMRQeIKUjbzG4HrXsFF+f/BYlRt/S1wNNcjc72w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hJkhpFQuYk+h9CjwwHIt/GVVMo9JtZB5Eo0SlNI3598=;
- b=326smv3s4sq/JmXlLXFc4Stqq54BlGo5fRuGMIzyFCu8I7gYavt0hSJc6Jt40/yhetHXEra6czOMkhPxoh1/OYAKulE6ibA4QH6em/cRfDhfvZeKrXJDHNZLDNXhVEcVPGDdmiu5/hHnRj4QM5Rq5KroKKCbTiiKPjjbeNA4lJ8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc) by DS4PR12MB9563.namprd12.prod.outlook.com
- (2603:10b6:8:282::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Tue, 3 Feb
- 2026 16:38:39 +0000
-Received: from IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::4d0e:603a:42fc:7c0]) by IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- ([fe80::4d0e:603a:42fc:7c0%3]) with mapi id 15.20.9587.010; Tue, 3 Feb 2026
- 16:38:39 +0000
-Message-ID: <e0c79c53-489d-47bf-89b9-f1bb709316c6@amd.com>
-Date: Tue, 3 Feb 2026 10:38:35 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 04/19] fs/resctrl: Add the documentation for Global
- Memory Bandwidth Allocation
-To: "Luck, Tony" <tony.luck@intel.com>, Babu Moger <babu.moger@amd.com>
-Cc: corbet@lwn.net, reinette.chatre@intel.com, Dave.Martin@arm.com,
- james.morse@arm.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, akpm@linux-foundation.org,
- pawan.kumar.gupta@linux.intel.com, pmladek@suse.com,
- feng.tang@linux.alibaba.com, kees@kernel.org, arnd@arndb.de,
- fvdl@google.com, lirongqing@baidu.com, bhelgaas@google.com,
- seanjc@google.com, xin@zytor.com, manali.shukla@amd.com,
- dapeng1.mi@linux.intel.com, chang.seok.bae@intel.com,
- mario.limonciello@amd.com, naveen@kernel.org, elena.reshetova@intel.com,
- thomas.lendacky@amd.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, peternewman@google.com,
- eranian@google.com, gautham.shenoy@amd.com
-References: <cover.1769029977.git.babu.moger@amd.com>
- <d58f70592a4ce89e744e7378e49d5a36be3fd05e.1769029977.git.babu.moger@amd.com>
- <aYE6mhsx6OQqeXG4@agluck-desk3>
-Content-Language: en-US
-From: Babu Moger <bmoger@amd.com>
-In-Reply-To: <aYE6mhsx6OQqeXG4@agluck-desk3>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA1PR04CA0004.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::9) To IA0PPF9A76BB3A6.namprd12.prod.outlook.com
- (2603:10b6:20f:fc04::bdc)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BF63AE6FE
+	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 16:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770137528; cv=none; b=EtS3YBNT/qgsvA78Up0My+0IfoozziFpFmHTU7DfGDsCozV4bNjgGDeqfD2DI+3JGiBl4uY8/BFhCRnQb93QI0pOkaX5CUedtLJiHD682tYASTHrvf8KQSHzELZs6TUWQZol2fP7lRkUZCrVY7y4SbklsRZyVyKo+oCIV82TMhw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770137528; c=relaxed/simple;
+	bh=Kir+RZwXYlukUwqcQ1MFAGvo9N0ZGz1Z0UrH984nPTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oysqmBLMM7PesTkI/oSZSDrCZNbH5s8tBvD6cGUPYzzt84O9k9i9Bvlqh+xF+cP+y7EEmruI7WNYe5wTTMorZtIE/a4Q4CjpsLC9vVbeTypTf8/YDu8GnkZQYCA2+AKyWf4YiWtpP8dq3UiwVejU6E0Fs6q29lW+7EBYPu+UlcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dgyDwT3S; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 3 Feb 2026 16:51:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770137515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0ufO1d/0O1VANyhQxUyy20ZNYQMIjN+juU2tLb9Rry0=;
+	b=dgyDwT3SK1ktva7vEaPp5uHBgC9u8VB8PTYOZ6V4XC1yIFUxezlNMIWvhKgy7AC2iJ0FRe
+	kxKgDDQ0IIYj1L/M4wLO0JaCuQlo6Lo/nEE5xp5ZF6oax60L28oV59PBIIhqLxi2eGKf7J
+	Kuez0CcspLj2O/RxpT9L811eJBgXD48=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nSVM: Use vcpu->arch.cr2 when updating vmcb12 on
+ nested #VMEXIT
+Message-ID: <i4xpbma5acebgissizta7abydnwdn2hbdhgqxnb5gyxsjnx6q7@5ayraj5trdtl>
+References: <20260203011320.1314791-1-yosry.ahmed@linux.dev>
+ <aYIebtv3nNnsqUiZ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PPF9A76BB3A6:EE_|DS4PR12MB9563:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1a79072-0a3e-4d20-7eb9-08de6342af06
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VG1jc0ZLUS9DalBNQStBUjJCQVhSeGRxRWtYQnkrazVtMnE2bTFVbFJvYWIv?=
- =?utf-8?B?M1dZTmlwWlpwbEJyeXNRbWx4MjgwZU1FdkticDZ0Z2Jmdi9DS1hnMk5tMHJN?=
- =?utf-8?B?a01rUXl5Tk9udjVzRG5ka2pEZWxKeEZrUW9yNnltRzhZUXVmYS90UnNMTGY1?=
- =?utf-8?B?K1lWTmJ0TCtyQUJ0ZW16clB1STdPOTlKTDFGWWtlMTc2QXY4cXN6QS9uNkxp?=
- =?utf-8?B?eEF4cU5rR3M2MGZzQ3BkM00xNkVuMzBDajMrdkFZNFVIaTZFS2w4Y2hEL3Bu?=
- =?utf-8?B?ZDNKV0M2NFJjenNnTzEycjNtT2VjZjR0cndma0ZTZ2ZPcHlzNkJjamNpMEhk?=
- =?utf-8?B?cFVORllkb2tiS1ZzTWJhYi9nWmdvd2N2dTFZOFczOTF0TzVlL1g2TjJhYkll?=
- =?utf-8?B?alZjNklucmxXN2doRld6clZPRmdQMnZkalhnREdrTy85eFVHeEhVTWtIUTM3?=
- =?utf-8?B?ejVYdE5BUU14YmtCclFLeTJZNjIwN1JPWlFQVGk3YmJxRThZSnFsR1hGT0R2?=
- =?utf-8?B?UkE1OW1RcTV4TXFPaW1teUxOQWdjNmFEUkw0eHpoaHJvVmh2cFdxTjF2cGh4?=
- =?utf-8?B?ZzVGQnI0TDNxaTZNRWc4Q2d6VzlPakdvMmo1dkVoNmpFdEs3VjNnZXBVYUxo?=
- =?utf-8?B?K0pGSzBJb3BEN21DTnA3UFY4L2dEL2pRMGxmTGcrcGx2bHNIcVBhTkxXRm92?=
- =?utf-8?B?aDY0bGRlNFRrSy96YkgwdnMxZDFSdU11VmppYUwwcDRBalZNWWxidThIN0ZQ?=
- =?utf-8?B?ek05Smc0d1Z6M0dKb1dIYmtnM0JhT2o2dlE2ZVlzTy9zdEhrMGVwWHdSMzdo?=
- =?utf-8?B?TWlnTmViRW5HV3M5aStxL2tnYlpRS2l1WHlCSXlTNnBwYzRrL2ZkeXhhTTZQ?=
- =?utf-8?B?eTMydXloc0FaTlY1ZUgrNUhFOHB6eG41Y0VFTFg0SXZVY3k2STNHelRpRTgz?=
- =?utf-8?B?RHE3OVM3VE9XbldjY0ZmOXNBSVp5UjRZR0NxOXRNaGQyV2N1bWVrazdFTGkx?=
- =?utf-8?B?Qlp2a1JQVmEzcCs3R1oxem5ZSmp6c3FQQmoyVkJhbkRTUnQ3SzNZWDU2OFEz?=
- =?utf-8?B?RGZjdWl1MlZ5a21CdThoOVdNNUExOU9wR29XczB5bzFCOGROS3liTGFMN2t0?=
- =?utf-8?B?YXIrU1pVUzg4TXhpK0JRM3E0cVBmMit0YXpYeEM3TVduNS90NVVaVmx4d1VG?=
- =?utf-8?B?dkl1OWJCR21rMlNmaklZWnZvWnhDdEhmWS9mcUx5Q3BrMG1PZjBsR28zMW5o?=
- =?utf-8?B?VVBvMjBkb1F2VnhKZkJKUUhvdUJCL01oZDFBa2ZkSmx5U0UxeXpFdVk3RkhL?=
- =?utf-8?B?MFZFTjYvVDVtcXBvRjJrQ3ZBM05OVW9taFZJVUxoSVRkbnEyazVLL2FUN2sw?=
- =?utf-8?B?eE9kcjlnV0p4SHZTUncraE91RDhVa1JEWUVEWXA1TGFrRmV1ZjhqeTdwWXRP?=
- =?utf-8?B?QjQ2M24wS0Z4blpHV1JXR1l0eUpHNG9kV1VCQS9NbytMYm14cjI4QUFLb3NO?=
- =?utf-8?B?OUhlNzZwWmp4cEtkdnVMeUlGQnM3dlZPZDBJVlhzaGJaNVBaRVdDQUFQZVFq?=
- =?utf-8?B?dFdtU0M3RjJzTFNRelZpcFFwYUtNREF6MUNHQjhzVExOWmRpUENrQXpNTkVR?=
- =?utf-8?B?VWNsb0hnWG93c1RIcHdEWXdNRlJoV2NGcWxCYUlZQkUydkRqZXY0UmozdzMw?=
- =?utf-8?B?NGk3YVZZSVJ5YmhNYUJCL3N0RmJiOGVtNDd3UURaanlFaEM3M2VPUnV6VmRF?=
- =?utf-8?B?QVlQdkJlRjNmc093WVc1ZTZUbXpJQ3Z0SXd3VGZQZDR5VWJiNHozYVJ2RVV5?=
- =?utf-8?B?bmc3T0dKbVNDVmI3TC9JVmg0SGc4MmhYR29DaW5nTFV0ZXgvQzM2SDgzT09h?=
- =?utf-8?B?QURmSWpUa0YrVitHazdvM1R4Z3lUalk2Ym10TnkwRnZ6eGhZVmp5aTFrbGtW?=
- =?utf-8?B?VnpIWEcwOEY3bmgxa3pvQk5KMWwrblhobXNXNCtESkFWenFyODdVVkJ1UkU0?=
- =?utf-8?B?bzcrOGtnQzYzMlVhSGV0bmlkMDJ5TlVVZkZIdG5oeTBUcFkwODJ4ZDkyZGNs?=
- =?utf-8?B?ZFZpMHJsa2MvY0o1OXoxMGtuN2VCNXg0WjZ0ZWRGMFk2RUtSSDZWdW84OTJn?=
- =?utf-8?Q?OFpY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PPF9A76BB3A6.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Q2JTQ2gzSXpKSWlDemduTU1yMnd5L2dZTDJGNXBCa2N1NHNFVzdSamN4WjM5?=
- =?utf-8?B?M3krUHBzQmNZdWZwNnVpaG5LenJtWXF3WnFKOFlnQWd2UWtweWZaYk40bUQ3?=
- =?utf-8?B?Mm5IRTd0RGFRaFhzbU9LMWVXNTBZRnQ0dUhTcFNuWHJXMUxBRGxFV0hqZ1g5?=
- =?utf-8?B?S3k4dmVIQjY5VnZsMmI5M2tJL1J1N1I3Z0JYSVlObC85Z1lRMGZNZ1Zob3BH?=
- =?utf-8?B?cHNvMTI1b2h2SG1uRjA0ZDRnak5Md3NWQ2E1WXVhYmtJVFVlbkJIZ1EyVVlq?=
- =?utf-8?B?THp2ZUZrVGJleEhmUFEwVlh4VWE2ZVdlaDdOUXcvUzJtZ3RsZ3RQRGJ3Y1pv?=
- =?utf-8?B?NStLOUhzODVtaDlZd1FWcmk2TzZuNzlFWUNxd0hkdHY2QWkvUWlXKzFwOW9h?=
- =?utf-8?B?RUE2WWEyN2p2YnNNQlZrcCtnTUc5MXlJWGlPR21OUUZsb1JkOXVVZ2dHaTlv?=
- =?utf-8?B?N2N5eVlwRDBsZ0tHV3VieldYS3NjYnZHRlpBU3ZzdmlGcEo1Vzcxb3UxejRO?=
- =?utf-8?B?MldETHNLb3J2dGs5VEc2YmNndTkyMitRaHlOSjhVdW5nWWJGdEdiVWZKZ1Fj?=
- =?utf-8?B?VXhIZjF6T0xVYzl3WitPSDNBZVA2Zko4TkVVeEtnWm5VS1BNR1FVamUzNHRh?=
- =?utf-8?B?d1V0QU1WcGJNdTRadmJvaWlxY1Urekg3VXBYREFGY0hORGdCSitCamN2R0FG?=
- =?utf-8?B?SkUwZEpXWUtTa2hmNGtVUmdBV3p0Nk5tb00zMEpVSnI5RU5WbXQvakNGa21Q?=
- =?utf-8?B?WkEzSnJGQ3dwNEJaK3hzdUVmMmVaL2QwU0UvU2d2VGI3TzAyaVB3SEhDV1Vl?=
- =?utf-8?B?anhtTkRUV0wvRTltNndxRHREdkE5MU10SE04aFVKUUMyZzhnZnlVdGVpQjlN?=
- =?utf-8?B?cmhrY2NDdWlaZS8zc2tpaXQ2L1JNMElCVkpGR0dBcXdkRTBFYjNzRUJLcHh2?=
- =?utf-8?B?b3UxWHpIMS9OMksyZkVzcUlkRVE1Q2tjbnNhMHRuN0t6WlRhUFpRdXpvL2tr?=
- =?utf-8?B?VmIzay81T1JTV1ZyYzd2NWhWbEZjWGx3QUN0ZlhOU24zQ1dMSnlWTDVJVGdU?=
- =?utf-8?B?b210RmVUajBURjNKajgzL0ZDK0VZSzZndXZibkhYb3podmZqZ3FuTnh5SCtm?=
- =?utf-8?B?K3JueUxuamJ1dEdpMFpLcHVtL0JBTVoyTU9ycjRJdVRtRmpUSE5PcXhQK3Jz?=
- =?utf-8?B?VWtCSDU1NWFiS2VpQk9uUGhKbmxsRk1rN3VSN3NzTWFjZkhyQmR1R3BqSjkv?=
- =?utf-8?B?dmhJYXEvak13dlNyZlkwUk9kaCtyQWkwN056U0NRN2FCOWlLRThtcTZBV0dL?=
- =?utf-8?B?UkxhbENsTGFJeGpRUXVkOHU3bWZRWWZ3SXRnODVyeVRLNXFHSHZpdFZhQy9r?=
- =?utf-8?B?RnV3UzBVUnRkRXFlWi9zQ2ZEL1ZtMmxGbCtZZ25xelhvYkxVQ2pFNTE5MUx1?=
- =?utf-8?B?TklnektXamN4d2RadVM3ODZyRUR2NkJrYlBVa1lLb2tRM1ExbGhvK2p5aE9p?=
- =?utf-8?B?RmtOTUM5UndZUDBDeHFreFRzWG5YdkpUTG4vYU12WWZyS1IxbksvNjByZ3ZO?=
- =?utf-8?B?NEhoOC9PWDQzdzR4YXVKblZlZ01kSEdnNWlvYnhHTlo3dndDWmZFczNlNmQv?=
- =?utf-8?B?WjZRVGZGb3hocU4zL041cGQ3bnRoTEMyMmxSejlsYVV5TjF6Zkhtemp0Y1RK?=
- =?utf-8?B?Z3ZaNEFVaDVwQTlla1hJbUJwaStuVmVTcVpMU21MT0hxdHMyUW9WU0dSS1NM?=
- =?utf-8?B?clM4MVlSY2ZIVWxVUDdVNUsvcXh5Tk5tcDR3T1NXTnpCb016anZ1RElSb0VJ?=
- =?utf-8?B?YnVYNmN3NG1pWFpMeUVjcXJFV3ZvNDJzYURRWW5DK0wyaWJJSG5EdzdjUFFC?=
- =?utf-8?B?MUtIRmlYOGVMYUpQU2t4ZURsMTJSWXhremVDb2NzK0t5WUVMb2RjS2liWC9K?=
- =?utf-8?B?ZkpkaFdiNnBrTjhTbzVQYUttc1lPTHlONEE1bFUrVTB3Vnc0QWkxNXVvSkFO?=
- =?utf-8?B?RVl1dmNZdHFGSngwaGZUQ0xTS096KzRRdUtoYmZmTmlqdlR4NGNOQWJIRlF1?=
- =?utf-8?B?S2dzaXF1b0xIdm45Z0xNdTFXU1hWNkZROGFaazY4UXhJdEkwbDhPeXVWVktm?=
- =?utf-8?B?dmdrTThuVEZtcU9QQkh0MTFzN0E5R0NLK24zd2VrSUJvdDZwZFlUSStOZE5i?=
- =?utf-8?B?U1FKdkdNL25RcEVHZzFxYjRKK1ZUL2NiSW5UUFlVbFJ5S05saGRiYm9CUGxS?=
- =?utf-8?B?VWJRSzQxQ3ZzdTQyc2pHdEkrOTBEaTBCTTV2WE81VnNwdFZ4RW5BVEFZckhq?=
- =?utf-8?Q?fk3j48Icj2plebsEpM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1a79072-0a3e-4d20-7eb9-08de6342af06
-X-MS-Exchange-CrossTenant-AuthSource: IA0PPF9A76BB3A6.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2026 16:38:39.0583
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dimdKhr3XpmFi8IXPUfXDEgdRQEAAIHXpeqgBwC2j2N+DBoiJpjTVOybU8D5KV3x
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9563
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aYIebtv3nNnsqUiZ@google.com>
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[44];
+	TAGGED_FROM(0.00)[bounces-70026-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70025-lists,kvm=lfdr.de];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bmoger@amd.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[amd.com:+]
-X-Rspamd-Queue-Id: BF4F3DC311
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 32577DC5EA
 X-Rspamd-Action: no action
 
-Hi Tony,
+On Tue, Feb 03, 2026 at 08:12:30AM -0800, Sean Christopherson wrote:
+> On Tue, Feb 03, 2026, Yosry Ahmed wrote:
+> > KVM currently uses the value of CR2 from vmcb02 to update vmcb12 on
+> > nested #VMEXIT. Use the value from vcpu->arch.cr2 instead.
+> > 
+> > The value in vcpu->arch.cr2 is sync'd to vmcb02 shortly before a VMRUN
+> > of L2, and sync'd back to vcpu->arch.cr2 shortly after. The value are
+> > only out-of-sync in two cases: after migration, and after a #PF is
+> 
+> Nit, instead of "migration", talk about state save/restore, and then list live
+> migration as an example.  Most of the time it's fairly obvious that "migration"
+> in KVM means "live migration", but not always.  E.g. task migration often comes
+> into play, as does page migration.
+> 
+> And more importantly, the above statement is wrong when state is saved/restored
+> for something other than migration.  E.g. if userspace is restoring a snapshot
+> for reasons other than migrating a VM.
 
-On 2/2/26 18:00, Luck, Tony wrote:
-> On Wed, Jan 21, 2026 at 03:12:42PM -0600, Babu Moger wrote:
->> +Global Memory bandwidth Allocation
->> +-----------------------------------
->> +
->> +AMD hardware supports Global Memory Bandwidth Allocation (GMBA) provides
->> +a mechanism for software to specify bandwidth limits for groups of threads
->> +that span across multiple QoS domains. This collection of QOS domains is
->> +referred to as GMBA control domain. The GMBA control domain is created by
->> +setting the same GMBA limits in one or more QoS domains. Setting the default
->> +max_bandwidth excludes the QoS domain from being part of GMBA control domain.
-> I don't see any checks that the user sets the *SAME* GMBA limits.
->
-> What happens if the user ignores the dosumentation and sets different
-> limits?
+Makes sense, will fix.
 
-Good point. Adding checks could be challenging when users update each 
-schema individually with different values. We don't know which one value 
-is the one he is intending to keep.
+> 
+> > injected into L2.
+> > 
+> > After migration, the value of CR2 in vmcb02 is uninitialized (i.e.
+> 
+> save/restore
+> 
+> > zero),
+> 
+> This isn't guaranteed.  E.g. if state is restored into a vCPU that was already
+> running, vmcb02.save.cr2 could hold any number of things.
 
-> ... snip ...
->
-> +  # cat schemata
-> +    GMB:0=2048;1=2048;2=2048;3=2048
-> +     MB:0=4096;1=4096;2=4096;3=4096
-> +     L3:0=ffff;1=ffff;2=ffff;3=ffff
-> +
-> +  # echo "GMB:0=8;2=8" > schemata
-> +  # cat schemata
-> +    GMB:0=   8;1=2048;2=   8;3=2048
-> +     MB:0=4096;1=4096;2=4096;3=4096
-> +     L3:0=ffff;1=ffff;2=ffff;3=ffff
->
-> Can the user go on to set:
->
->     # echo "GMB:1=10;3=10" > schemata
->
-> and have domains 0 & 2 with a combined 8GB limit,
-> while domains 1 & 3 run with a combined 10GB limit?
-> Or is there a single "GMBA domain"?
+Good point, I missed that case.
 
-In that case, it  is still treated as a single GMBA domain, but the 
-behavior becomes unpredictable. The hardware expert mentioned that it 
-will default to the lowest value among all inputs in this case, 8GB.
+> 
+> > as KVM_SET_SREGS restores CR2 value to vcpu->arch.cr2. Using
+> > vcpu->arch.cr2 to update vmcb12 is the right thing to do.
+> > 
+> > The #PF injection case is more nuanced. It occurs if KVM injects a #PF
+> > into L2, then exits to L1 before it actually runs L2. Although the APM
+> > is a bit unclear about when CR2 is written during a #PF, the SDM is more
+> > clear:
+> > 
+> > 	Processors update CR2 whenever a page fault is detected. If a
+> > 	second page fault occurs while an earlier page fault is being
+> > 	delivered, the faulting linear address of the second fault will
+> > 	overwrite the contents of CR2 (replacing the previous address).
+> > 	These updates to CR2 occur even if the page fault results in a
+> > 	double fault or occurs during the delivery of a double fault.
+> > 
+> > KVM injecting the exception surely counts as the #PF being "detected".
+> 
+> Heh, "detected" is definitely poor wording in the SDM.
+> 
+> > More importantly, when an exception is injected into L2 at the time of a
+> > synthesized #VMEXIT, KVM updates exit_int_info in vmcb12 accordingly,
+> > such that an L1 hypervisor can re-inject the exception. If CR2 is not
+> > written at that point, the L1 hypervisor have no way of correctly
+> > re-injecting the #PF. Hence, using vcpu->arch.cr2 is also the right
+> > thing to write in vmcb12 in this case.
+> > 
+> > Note that KVM does _not_ update vcpu->arch.cr2 when a #PF is pending for
+> > L2, only when it is injected. The distinction is important, because only
+> > injected exceptions are propagated to L1 through exit_int_info. It would
+> > be incorrect to update CR2 in vmcb12 for a pending #PF, as L1 would
+> > perceive an updated CR2 value with no #PF. Update the comment in
+> > kvm_deliver_exception_payload() to clarify this.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 2 +-
+> >  arch/x86/kvm/x86.c        | 7 +++++++
+> >  2 files changed, 8 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index de90b104a0dd5..9031746ce2db1 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -1156,7 +1156,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+> >  	vmcb12->save.efer   = svm->vcpu.arch.efer;
+> >  	vmcb12->save.cr0    = kvm_read_cr0(vcpu);
+> >  	vmcb12->save.cr3    = kvm_read_cr3(vcpu);
+> > -	vmcb12->save.cr2    = vmcb02->save.cr2;
+> > +	vmcb12->save.cr2    = vcpu->arch.cr2;
+> >  	vmcb12->save.cr4    = svm->vcpu.arch.cr4;
+> >  	vmcb12->save.rflags = kvm_get_rflags(vcpu);
+> >  	vmcb12->save.rip    = kvm_rip_read(vcpu);
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index db3f393192d94..1015522d0fbd7 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -864,6 +864,13 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+> >  		vcpu->arch.exception.error_code = error_code;
+> >  		vcpu->arch.exception.has_payload = has_payload;
+> >  		vcpu->arch.exception.payload = payload;
+> > +		/*
+> > +		 * Only injected exceptions are propagated to L1 in
+> > +		 * vmcb12/vmcs12 on nested #VMEXIT. Hence, do not deliver the
+> 
+> Nit, #VMEXIT is SVM specific terminology.  VM-Exit is more vendor agnostic.
 
+Will do.
 
-> Will using "2048" as the "this domain isn't limited
-> by GMBA" value come back to haunt you when some
-> system has much more than 2TB bandwidth to divide up?
+> 
+> > +		 * exception payload for L2 until the exception is injected.
+> > +		 * Otherwise, L1 would perceive the updated payload without a
+> > +		 * corresponding exception.
+> 
+> Huh.  I'm fairly certain this code is now at best unnecessary, and at worst
+> actively harmful.  Because the more architectural way to document this code is:
+> 
+> 		/*
+> 		 * If L2 is active, defer delivery of the payload until the
+> 		 * exception is actually injected to avoid clobbering state if
+> 		 * L1 wants to intercept the exception (the architectural state
+> 		 * is NOT updated if the exeption is morphed to a VM-Exit).
+> 		 */
 
-It is actually 4096 (4TB). I made a mistake in the example.  I am 
-assuming it may not an issue in the current generation.
+It's not only about exceptions being morphed to a VM-Exit though, is it?
+KVM should not update the payload (e.g. CR2) if a #PF is pending but was
+not injected, because from L1's perspective CR2 was updated but
+exit_int_info won't reflect a #PF. Right?
 
-It is expected to go up in next generation.
+> 
+> But thanks to commit 7709aba8f716 ("KVM: x86: Morph pending exceptions to pending
+> VM-Exits at queue time"), KVM already *knows* the exception won't be morphed to a
+> VM-Exit.
+> 
+> Ugh, and I'm pretty sure I botched kvm_vcpu_ioctl_x86_get_vcpu_events() in that
+> commit.  Because invoking kvm_deliver_exception_payload() when the exception was
+> morphed to a VM-Exit is wrong.  Oh, wait, this is the !exception_payload_enabled
+> case.  So never mind, that's simply an unfixable bug, as the second comment alludes
+> to.
 
-GMB:0=4096;1=4096;2=4096;3=4096;
-    MB:0=8192;1=8192;2=8192;3=8192;
-     L3:0=ffff;1=ffff;2=ffff;3=ffff
+Hmm for the #PF case I think delivering the payload is always wrong if
+it was morphed to a VM-Exit, regardless of exception_payload_enabled,
+because the payload should never reach CR2, right?
 
+Spoiler alert, there's another problem there. Even if the exception did
+not morph to a VM-Exit, if userspace already did KVM_GET_SREGS then the
+delivered payload is lost :/
 
->
-> Should resctrl have a non-numeric "unlimited" value
-> in the schemata file for this?
+> 
+> 	/*
+> 	 * KVM's ABI only allows for one exception to be migrated.  Luckily,
+> 	 * the only time there can be two queued exceptions is if there's a
+> 	 * non-exiting _injected_ exception, and a pending exiting exception.
+> 	 * In that case, ignore the VM-Exiting exception as it's an extension
+> 	 * of the injected exception.
+> 	 */
+> 	if (vcpu->arch.exception_vmexit.pending &&
+> 	    !vcpu->arch.exception.pending &&
+> 	    !vcpu->arch.exception.injected)
+> 		ex = &vcpu->arch.exception_vmexit;
+> 	else
+> 		ex = &vcpu->arch.exception;
+> 
+> 	/*
+> 	 * In guest mode, payload delivery should be deferred if the exception
+> 	 * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
+> 	 * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
+> 	 * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
+> 	 * propagate the payload and so it cannot be safely deferred.  Deliver
+> 	 * the payload if the capability hasn't been requested.
+> 	 */
+> 	if (!vcpu->kvm->arch.exception_payload_enabled &&
+> 	    ex->pending && ex->has_payload)
+> 		kvm_deliver_exception_payload(vcpu, ex);
+> 
+> So yeah, I _think_ we could drop the is_guest_mode() check.  However, even better
+> would be to drop this call *entirely*, i.e.
 
-The value 4096 corresponds to 12th bit set.  It is called U-bit. If the 
-U bit is set then that domain is not part of the GMBA domain.
+Hmm I don't think so, because as I mentioned above, KVM shouldn't update
+CR2 until the exception is actually injected, right?
 
-I was thinking of displaying the "U" in those cases.  It may be good 
-idea to do something like this.
+It would actually be great to drop the is_guest_mode() check here but
+leave the call, because the ordering problem between KVM_VCPU_SET_EVENTS
+and KVM_SET_SREGS goes away, and I *think* we can drop the
+kvm_deliver_exception_payload() call in
+kvm_vcpu_ioctl_x86_get_vcpu_events().
 
-GMB:0=      8;1=      U;2=     8 ;3=      U;
-    MB:0=8192;1=8192;2=8192;3=8192;
-     L3:0=ffff;1=ffff;2=ffff;3=ffff
+The only problem would be CR2 getting updated without a fault being
+reflected in the vmcb12's exit_int_info AFAICT.
 
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b0112c515584..00a39c95631d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -864,9 +864,6 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+>                 vcpu->arch.exception.error_code = error_code;
+>                 vcpu->arch.exception.has_payload = has_payload;
+>                 vcpu->arch.exception.payload = payload;
+> -               if (!is_guest_mode(vcpu))
+> -                       kvm_deliver_exception_payload(vcpu,
+> -                                                     &vcpu->arch.exception);
+>                 return;
+>         }
+>  
+> Because KVM really shouldn't update CR2 until the excpetion is actually injected
+> (or the state is at risk of being lost because exception_payload_enabled==false).
+> E.g. in the (extremely) unlikely (and probably impossible to configure reliably)
+> scenario that userspace deliberately drops a pending exception, arch state shouldn't
+> be updated.
 
->
-> The "mba_MBps" feature used U32_MAX as the unlimited
-> value. But it looks somewhat ugly in the schemata
-> file:
-Yes, I agree. Non-numeric would have been better.
+I think if we drop it there might be a problem. With
+exception_payload_enabled==false, pending exceptions becomes injected
+after save/restore. If the payload is not delivered here, then after
+restore we have an injected event with no payload.
 
-Thanks
+I guess the kvm_deliver_exception_payload() call in
+kvm_vcpu_ioctl_x86_get_vcpu_events() is supposed to handle this, but it
+only works if userspace does KVM_GET_SREGS *after* KVM_GET_VCPU_EVENTS.
+Removing the call here will regress VMM's doing KVM_GET_SREGS AFAICT.
 
-Babu
-
-
+> 
+> > +		 */
+> >  		if (!is_guest_mode(vcpu))
+> >  			kvm_deliver_exception_payload(vcpu,
+> >  						      &vcpu->arch.exception);
+> > -- 
+> > 2.53.0.rc2.204.g2597b5adb4-goog
+> > 
 
