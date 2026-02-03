@@ -1,217 +1,343 @@
-Return-Path: <kvm+bounces-70032-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70033-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2LNiAoA7gmmVQgMAu9opvQ
-	(envelope-from <kvm+bounces-70032-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:16:32 +0100
+	id sDAqDgg8gmmVQgMAu9opvQ
+	(envelope-from <kvm+bounces-70033-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:18:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B71DD6BF
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:16:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F46ADD743
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3762830095ED
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:16:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2275F30804E6
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3EC367F50;
-	Tue,  3 Feb 2026 18:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDA0364EA6;
+	Tue,  3 Feb 2026 18:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Mniz/5oy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ntwY+Lf5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7085359704
-	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 18:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE033EBF19;
+	Tue,  3 Feb 2026 18:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770142582; cv=none; b=tZT8pgoTV1sja+eI5uMKQaaePdCJXyB/06bkNbjcoNDAbq7r7U5/apN5vszl1M8kY89fYATTquDt92/WQItf3svucp3FV+Yjy56n8iQDbTovfycG0KR4/I2rb5Xpys2I58CFu70/ufEhOzI99LbgdCduLYL9/kmYpPQv4tg3PoE=
+	t=1770142652; cv=none; b=G+z4WSO70KI2JkZa5viMbRBNVpWngPclzD+e7ATcMFkm+YwW6CF20fYvXJ4wSzQWB2/DLaA3WuKXMrVK55XbjhZYaAop/w/UyR6GRCDfDYVJoVdnWKB2QoZ54bOuZsWTM4k7jnbcIQ0Ztwv6kdMzxFZ7hXxAewKiFL4dsI/4hOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770142582; c=relaxed/simple;
-	bh=Qt7o89VltFIBegDzasIbqnP3PJ+WPuTLLON/GuX+fRQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YeGjnKwaXhxlxzIEe+xU/tSWvI/Dm6Ympv/nCAuTUaiPyrf6NzMU6E58YMZB545JzUmy52L3dP3h6UgDERfUbGRsnvcc/beMsuev4m/hGJsynEz/+XI1E1itCV4d4cDeZgEOvZALbtO+5mE9guGl8vUqWnic8iI3qFf8+GxYIVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Mniz/5oy; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8946a794e4fso65520766d6.2
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 10:16:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1770142580; x=1770747380; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mu1la4UZlbEX7cvXzj/Z/hgnRFrqjHU+qKtYtW0dmkY=;
-        b=Mniz/5oynk/qOI64zPIe8E+PNEyixk4fEB611FX5soFdbulK6R9KmPQtOu4aEAXjcB
-         efjpn/kLP3vsSPGaHohVu6/Rt0K9qXP7QtNggw4Y7iGiQ+lb7Btklx97aDYTLAlUztFI
-         h5yvBEF6xvd6QNj3f/5Rq9dS5pMAQ/wKBPWuMCDaLEXtmpFbJnXArLI2UIvYnmp155Zy
-         0b+yLcNYyG0uUnOruupOuHumm/8Fat9UIruRUI37sLCEsgtmT6QSkgWJF1h0NEiROxuz
-         1abL4IMKxz9NUHd0G1V4nEtr6+1cDHCJ7YB1uyGxhcm0aubd+Dk72keMw16xEPt7BDo4
-         yQIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770142580; x=1770747380;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mu1la4UZlbEX7cvXzj/Z/hgnRFrqjHU+qKtYtW0dmkY=;
-        b=JzqMVYswwqwns/3OGMISHfCFMZRPliIZzWHz/dCy/rmQkfyaDwVzetnEGGgfoYfxKV
-         gGN/MuTc55X9V1YvbTfYmgJ3dh795j04mVVs3Xm7bo+RZMqyLU1YSb259Y8ScXiHDlij
-         66acvGaxIbGWH7NXK+uJV46Jhk+A8RPqIPKQx1HN+2/3K5bmHoJ+yEWeWZFI4O/mhcKZ
-         58/iCdTpFcGGk8GYlzDT/gM/BoZWC44R1AMEijFrtImDHsEiKYxFgEk+sbg6XX57vO+H
-         4daNU8TuM+mzqtskogwppoZ3uyktcr3zhwl/WZk4qvSbJDITm3VXm08gLDBctX+P4GSv
-         vzJg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlm8dwRDndXQt7EXPSXOg7LgHQdTiZG1+JL4h58puQMe6AWi5A/wuDWaouopoDY9vOws8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw63Ucq2j1+nQO2cb+gL8qRcLRlfB1fortIxTGe6irCBl3By+MF
-	DMa7xcs61Zg1vVSPC2A/RgmVcKQXXIuQKlSyCsSHEDvrVEPUywctUaaT5L5bw8Z3Dbg=
-X-Gm-Gg: AZuq6aIYW44Psp+uZ/B1PH1gig4OoxMCj0PdJZ1kdFJxWuObrVoR5Dts7lNPGUuhklt
-	oeBzYcScBSYyPySoQ8Er5NFzDgFh/mmd+158ZmpgBQbzIypmMk/jsFnY/T0nhwX75CL0InjscHS
-	5RzWvXPMH64w7SKIY5zk6roTHFdCf0N/AdJzI9X2IETk0yjRbFDNTDQSDxEL3INwnIIUwKMR9AM
-	ImLY0qxHfQ8ylhPrzlfFQNyvc89HdwU5eN/2CInA5rlIHDupCPfv83eTfLw/1wCCY/eFefRM8PA
-	TkpifB12o5otbgZbHIhKrUyZObquFIxPgC/KnaJOpP6qNc8MHRlxpKb+h9OKtCussmB2m1u+Dko
-	q2YHSh/svvyCpB+fjfBR29UzP+jtshf8eiiOviGqPWAFHKX4aUNlPBEd12+NrIyev2UQeRqDFxg
-	jwJq+lpihloinYij6wPtJxPMoP0O9iIgf7L1E2RYfdagMXxHo/keUnTHDgdaVkGfESBts=
-X-Received: by 2002:a05:6214:20ab:b0:87c:22f9:dac4 with SMTP id 6a1803df08f44-8952210b4a5mr5192876d6.15.1770142579616;
-        Tue, 03 Feb 2026 10:16:19 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89521c00173sm2728446d6.12.2026.02.03.10.16.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 10:16:18 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vnKwk-0000000Gah4-0kfw;
-	Tue, 03 Feb 2026 14:16:18 -0400
-Date: Tue, 3 Feb 2026 14:16:18 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>, cgroups@vger.kernel.org,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de,
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org,
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com,
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com,
-	hannes@cmpxchg.org, hch@infradead.org, hpa@zytor.com,
-	hughd@google.com, ira.weiny@intel.com, isaku.yamahata@intel.com,
-	jack@suse.cz, james.morse@arm.com, jarkko@kernel.org,
-	jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de,
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com,
-	keirf@google.com, kent.overstreet@linux.dev,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maobibo@loongson.cn,
-	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org,
-	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com,
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au,
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es,
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com,
-	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com,
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz,
-	qperret@google.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org,
-	shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com,
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
-	tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com,
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com,
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org,
-	wyihan@google.com, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v1 05/37] KVM: guest_memfd: Wire up
- kvm_get_memory_attributes() to per-gmem attributes
-Message-ID: <20260203181618.GY2328995@ziepe.ca>
-References: <cover.1760731772.git.ackerleytng@google.com>
- <071a3c6603809186e914fe5fed939edee4e11988.1760731772.git.ackerleytng@google.com>
- <07836b1d-d0d8-40f2-8f7b-7805beca31d0@amd.com>
- <CAEvNRgEuez=JbArRf2SApLAL0usv5-Q6q=nBPOFMHrHGaKAtMw@mail.gmail.com>
- <20260129003753.GZ1641016@ziepe.ca>
- <aXqx3_eE0rNh6nP0@google.com>
- <aYHGVQTF6RUs7r3g@yilunxu-OptiPlex-7050>
+	s=arc-20240116; t=1770142652; c=relaxed/simple;
+	bh=239ceZ4XIIJRPPYpSzcEe0FQJUjdpKkZ6jCsHezqtNE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U10kc3DUCvGHAWOcxujM06PRWem1ggyHAzsSuZCTK14CrW9xjlwzbkykBG6YD4QSzBouLDsYrqvRRliu1UXzitlxKbFByvMN5kOvGp4q9fMFgTKky7zB0U9YSJ+rysnZSMkiM2C8XKPglgiU8WDwJeMXnWL1f6N1LOh4QrDfsU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ntwY+Lf5; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770142651; x=1801678651;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=239ceZ4XIIJRPPYpSzcEe0FQJUjdpKkZ6jCsHezqtNE=;
+  b=ntwY+Lf5RuV0rhRjLmpAGbN8Wbnhm7Lf2pL7BySsU7OXFSm4Oc4Gto7o
+   6I8QOJt8k8oCdVBNSsfnmXrBLvUdFls6htl8C1NhqLmS17FfL3thEfXYp
+   XGnFUCKn/96SwezdoBDjlHmtkKacsUR3gQDXDesVVV3OGeUu5gorq6w8y
+   kEJUKt3d65/2aUBXavuYK+tMeWBh8zeOjcvOTb7SMrgf3GK63zKEsfWfA
+   EDIovNpqYyEovFJvAZShD3TXvB8RdzAHKrHKgM8XXdn88sJCQVbeb0y25
+   5TBEOTBG8S9HACVkzVFzVuljUNIUbnu+ZjL7lkGcapG94l/NsrVJp50vL
+   w==;
+X-CSE-ConnectionGUID: OFwfYWUCSzGqujxe22tdzw==
+X-CSE-MsgGUID: rPKzxuAPRTW2f3EcWvGZ9g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="82433150"
+X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
+   d="scan'208";a="82433150"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:30 -0800
+X-CSE-ConnectionGUID: VOSLX3rWQsCnsZ5knem9cA==
+X-CSE-MsgGUID: lCmIclTvSOOS0Eio6aECkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
+   d="scan'208";a="209727444"
+Received: from khuang2-desk.gar.corp.intel.com (HELO localhost) ([10.124.221.188])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:30 -0800
+From: isaku.yamahata@intel.com
+To: kvm@vger.kernel.org
+Cc: isaku.yamahata@intel.com,
+	isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/32] KVM: VMX APIC timer virtualization support
+Date: Tue,  3 Feb 2026 10:16:43 -0800
+Message-ID: <cover.1770116050.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYHGVQTF6RUs7r3g@yilunxu-OptiPlex-7050>
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,amd.com,vger.kernel.org,kvack.org,kernel.org,linux-foundation.org,linux.intel.com,alien8.de,intel.com,lwn.net,redhat.com,cmpxchg.org,infradead.org,zytor.com,suse.cz,arm.com,amazon.com,nvidia.com,suse.de,linux.dev,oracle.com,maciej.szmigiero.name,loongson.cn,efficios.com,digikod.net,ellerman.id.au,amazon.es,dabbelt.com,sifive.com,gmail.com,goodmis.org,amazon.co.uk,linutronix.de,zeniv.linux.org.uk,huawei.com];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[ziepe.ca];
+	FREEMAIL_CC(0.00)[intel.com,gmail.com,redhat.com,google.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70032-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-70033-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_GT_50(0.00)[98];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[isaku.yamahata@intel.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 14B71DD6BF
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:url,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7F46ADD743
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 05:56:37PM +0800, Xu Yilun wrote:
-> > +1.  For guest_memfd, we initially defined per-VM memory attributes to track
-> > private vs. shared.  But as Ackerley noted, we are in the process of deprecating
-> > that support, e.g. by making it incompatible with various guest_memfd features,
-> > in favor of having each guest_memfd instance track the state of a given page.
-> > 
-> > The original guest_memfd design was that it would _only_ hold private pages, and
-> > so tracking private vs. shared in guest_memfd didn't make any sense.  As we've
-> > pivoted to in-place conversion, tracking private vs. shared in the guest_memfd
-> > has basically become mandatory.  We could maaaaaybe make it work with per-VM
-> > attributes, but it would be insanely complex.
-> > 
-> > For a dmabuf fd, the story is the same as guest_memfd.  Unless private vs. shared
-> > is all or nothing, and can never change, then the only entity that can track that
-> > info is the owner of the dmabuf.  And even if the private vs. shared attributes
-> > are constant, tracking it external to KVM makes sense, because then the provider
-> > can simply hardcode %true/%false.  
-> 
-> For CoCo-VM and Tee-IO, I'm wondering if host or KVM has to maintain
-> the private/shared attribute for "assigned MMIO". I'm not naming them
-> "host MMIO" cause unlike RAM host never needs to access them, either in
-> private manner or shared manner.
-> 
-> Traditionally, host maps these MMIOs only because KVM needs HVA->HPA
-> mapping to find pfn and setup KVM MMU.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This is not actually completely true, the host mapping still ends up
-being used by KVM if it happens to trap and emulate a MMIO touching
-instruction.
+This patch series implements support for APIC timer virtualization for
+VMX and nVMX.
 
-It really shouldn't do this, but there is a whole set of complex
-machinery in KVM and qemu to handle this case.
+Background
+==========
+X86 provides the TSC deadline timer as the primary local timer
+interrupt source.  Currently, KVM intercepts the guest programming of
+the timer and emulates it using either the host OS timer or the VMX
+preemption timer.
 
-For example if the MSI-X window is not properly aligned then you have
-some MMIO that is trapped and must be reflected to real HW.
 
-So the sharable parts of the BAR should still end up being mmaped into
-userspace, I think.
+Problem
+=======
+VMM emulation causes high latency.  Some workloads require lower
+latency, such as gaming applications, while there have been efforts to
+reduce latency in the past, a hardware extension can reduce it further
+by eliminating VM Exits.
 
-Which means we need VFIO to know what they are, and hopefully it is
-just static based on the TDISP reports..
 
-Jason
+Solution
+========
+Hardware Extension
+------------------
+The APIC timer virtualization [1] allows the guest to directly access
+the TSC DEADLINE MSR and receive timer interrupts without VM Exits.
+
+It introduces
+- A feature bit in the tertiary processor-based VM-execution controls
+- Guest deadline: 64-bit physical deadline (host TSC value)
+- Guest deadline shadow: 64-bit virtual deadline (virtualized TSC
+  value with TSC offset and multiplier)
+- Virtual timer vector: interrupt vector to inject on timeout.
+
+Implementation
+--------------
+Add hooks to the LAPIC timer emulation and implement them in the VMX
+backend.  Enable the feature when available, falling back to
+software/preemption timer in the following cases
+One-shot or periodic APIC timer:
+  The hardware supports only the TSC deadline timer
+Masked the timer interrupt in LVTT:
+  The hardware doesn't respect the emulated LVTT and always generates an
+  interrupt on timeout.
+vCPU blocking/unblocking:
+  The hardware generates an interrupt while the vCPU is running.  The KVM
+  must wake up from vCPU blocking by getting the latest TSC
+  deadline and setting a software timer before blocking the vCPU.
+VM Entry to L2 vCPU:
+  If the L1 timer interrupt fires while the L2 vCPU is running, the
+  expected behavior is a VM Exit from L2 to L1, followed by an interrupt
+  injection into the L1 vCPU.
+
+nVMX Support
+------------
+Support nVMX to address the benchmark result below.  Emulate related
+MSRs and VMCS individually.
+MSRs: capability reporting registers of primary/tertiary processor-based
+      VM-execution controls.
+VMCS fields: primary/tertiary VM-execution controls, guest deadline,
+             guest deadline shadow, and virtual timer vector.
+
+Patch Organization
+------------------
+The patch is organized into 5 parts as follows.
+
+Patches  1- 8: VMX support (feature probe, hooks to KVM LAPIC, VMX hooks)
+Patches  9-18: nVMX support (implement emulation of MSR and VMCS fields)
+Patches 19-23: Expose the feature to the user
+Patches 24-31: KVM selftests
+Patches 32   : Documentation update
+
+Patches for QEMU and KVM unit tests will be posted.
+(KVM unit tests turned out test case issue. It needs fixes.)
+
+
+Test
+====
+The following tests were conducted:  The newly added test case as a
+part of KVM selftests, KVM unit tests, and cyclic test included in
+rt-tests [2].  Selftests and KVM unit tests were run on platforms with
+and without APIC timer virtualization.
+
+
+Benchmark Results
+=================
+cyclictest
+----------
+10-minute run of
+cyclictest --quiet --nsecs --smp --mlockall --priority=95 --policy=fifo
+# of vCPU: host 256, L1 and L2: 16
+
+Legends:
+L1 or L2: cyclic test run as L1/L2 process
+Y: feature enabled
+N: feature disabled
+
+Run in
+|       APIC timer virtualization
+|       |       nested APIC timer virtualization
+|       |       |       min reduction %
+|       |       |       |       avg reduction %
+|       |       |       |       |
+L1	N	-
+L1	Y	-	21%	21% (compared to L1 N)
+
+L2	N	N
+L2	Y	N	4%	-2% (compared to L2 N N)
+L2	Y	Y	75%	51% (compared to L2 N N)
+
+Micro benchmark: Timer latency
+------------------------------
+10-minute run of custom micro benchmark, timer_latency.
+# of vCPU: host 256, L1 and L2: 16
+
+Legends:
+L1: the benchmark run in L0 Linux.
+L2: the benchmark run in L1 Linux.
+Y: feature enabled
+N: feature disabled
+
+Run as
+|       APIC timer virtualization
+|       |       nested APIC timer virtualization
+|       |       |       HLT or busy
+|       |       |       |       min reduction %
+|       |       |       |       |       avg reduction %
+|       |       |       |       |       |
+L1	N	-	HLT
+L1	Y	-	HLT	49%	24% (compared to L1 N HLT)
+
+L1	N	-	busy
+L1	Y	-	busy	63%	61% (compared to L1 N busy)
+
+L2	N	N	HLT
+L2	Y	N	HLT	-19%	-3% (compared to L2 N N HLT)
+L2	Y	Y	HLT	99%	27% (compared to L2 N N HLT)
+
+L2	N	N	busy
+L2	Y	N	busy	-5%	-4% (compared to L2 N N busy)
+L2	Y	Y	busy	99%	97% (compared to L2 N N busy)
+
+
+[1] Intel Architecture Instruction Set Extensions and Future Features
+September 2025 319433-059
+Chapter 8 APIC-TIMER VIRTUALIZATION
+https://cdrdv2.intel.com/v1/dl/getContent/671368
+
+[2] rt-tests
+https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git/
+
+Isaku Yamahata (25):
+  KVM: x86/lapic: Wire DEADLINE MSR update to guest virtual TSC deadline
+  KVM: VMX: Update APIC timer virtualization on apicv changed
+  KVM: nVMX: Disallow/allow guest APIC timer virtualization switch
+    to/from L2
+  KVM: nVMX: Pass struct msr_data to VMX MSRs emulation
+  KVM: nVMX: Supports VMX tertiary controls and GUEST_APIC_TIMER bit
+  KVM: nVMX: Add tertiary VM-execution control VMCS support
+  KVM: nVMX: Update intercept on TSC deadline MSR
+  KVM: nVMX: Handle virtual timer vector VMCS field
+  KVM: VMX: Make vmx_calc_deadline_l1_to_host() non-static
+  KVM: nVMX: Enable guest deadline and its shadow VMCS field
+  KVM: nVMX: Add VM entry checks related to APIC timer virtualization
+  KVM: nVMX: Add check vmread/vmwrite on tertiary control
+  KVM: nVMX: Add check VMCS index for guest timer virtualization
+  KVM: VMX: Advertise tertiary controls to the user space
+  KVM: VMX: Enable APIC timer virtualization
+  KVM: nVMX: Introduce module parameter for nested APIC timer
+    virtualization
+  KVM: selftests: Add a test to measure local timer latency
+  KVM: selftests: Add nVMX support to timer_latency test case
+  KVM: selftests: Add test for nVMX MSR_IA32_VMX_PROCBASED_CTLS3
+  KVM: selftests: Add test vmx_set_nested_state_test with EVMCS disabled
+  KVM: selftests: Add tests nested state of APIC timer virtualization
+  KVM: selftests: Add VMCS access test to APIC timer virtualization
+  KVM: selftests: Test cases for L1 APIC timer virtualization
+  KVM: selftests: Add tests for nVMX to vmx_apic_timer_virt
+  Documentation: KVM: x86: Update documentation of struct vmcs12
+
+Yang Zhong (7):
+  KVM: VMX: Detect APIC timer virtualization bit
+  KVM: x86: Implement APIC virt timer helpers with callbacks
+  KVM: x86/lapic: Start/stop sw/hv timer on vCPU un/block
+  KVM: x86/lapic: Add a trace point for guest virtual timer
+  KVM: VMX: Implement the hooks for VMX guest virtual deadline timer
+  KVM: VMX: dump_vmcs() support the guest virt timer
+  KVM: VMX: Introduce module parameter for APIC virt timer support
+
+ Documentation/virt/kvm/x86/nested-vmx.rst     |  13 +-
+ arch/x86/include/asm/kvm-x86-ops.h            |   5 +
+ arch/x86/include/asm/kvm_host.h               |   6 +
+ arch/x86/include/asm/vmx.h                    |   6 +
+ arch/x86/include/asm/vmxfeatures.h            |   1 +
+ arch/x86/kvm/lapic.c                          | 147 +++-
+ arch/x86/kvm/lapic.h                          |  15 +
+ arch/x86/kvm/trace.h                          |  16 +
+ arch/x86/kvm/vmx/capabilities.h               |   8 +
+ arch/x86/kvm/vmx/hyperv.c                     |  17 +
+ arch/x86/kvm/vmx/main.c                       |   5 +
+ arch/x86/kvm/vmx/nested.c                     | 215 +++++-
+ arch/x86/kvm/vmx/nested.h                     |  33 +-
+ arch/x86/kvm/vmx/vmcs12.c                     |   6 +
+ arch/x86/kvm/vmx/vmcs12.h                     |  11 +-
+ arch/x86/kvm/vmx/vmcs_shadow_fields.h         |   1 +
+ arch/x86/kvm/vmx/vmx.c                        | 142 +++-
+ arch/x86/kvm/vmx/vmx.h                        |   7 +-
+ arch/x86/kvm/vmx/x86_ops.h                    |   5 +
+ arch/x86/kvm/x86.c                            |   8 +-
+ arch/x86/kvm/x86.h                            |   2 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   3 +
+ .../testing/selftests/kvm/include/x86/apic.h  |   2 +
+ .../selftests/kvm/include/x86/processor.h     |   6 +
+ tools/testing/selftests/kvm/include/x86/vmx.h |  14 +
+ .../testing/selftests/kvm/x86/timer_latency.c | 700 ++++++++++++++++++
+ .../kvm/x86/vmx_apic_timer_virt_test.c        | 508 +++++++++++++
+ .../kvm/x86/vmx_apic_timer_virt_vmcs_test.c   | 461 ++++++++++++
+ .../testing/selftests/kvm/x86/vmx_msrs_test.c |  53 ++
+ .../kvm/x86/vmx_set_nested_state_test.c       | 249 +++++++
+ 30 files changed, 2644 insertions(+), 21 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/timer_latency.c
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_apic_timer_virt_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_apic_timer_virt_vmcs_test.c
+
+
+base-commit: 63804fed149a6750ffd28610c5c1c98cce6bd377
+-- 
+2.45.2
+
 
