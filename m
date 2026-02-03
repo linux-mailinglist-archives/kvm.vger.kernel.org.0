@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-70105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70106-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCKcDGV1gmm+UwMAu9opvQ
-	(envelope-from <kvm+bounces-70105-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 23:23:33 +0100
+	id 2IvIABhzgmnBUgMAu9opvQ
+	(envelope-from <kvm+bounces-70106-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 23:13:44 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C65EDF305
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 23:23:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B31FDF223
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 23:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B7FD31395AA
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 22:11:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5D88630493B3
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 22:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD6A38735A;
-	Tue,  3 Feb 2026 22:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260D1387593;
+	Tue,  3 Feb 2026 22:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yiWuZSL9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aXQlxC9U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DF4376BC8
-	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 22:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE9E3859FF
+	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 22:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770156611; cv=none; b=IAYCKVGlXC8J4Olf63ZeWxsTY3+deElBdL3g638cvpykxA1Msa9G54cAm/0zshSRdvyEsxPLbPY1kcQepzOGzqhmu93kLqMncld/Ddm6Q7wxgYLEMaZRd7IZpQXsntsnemuP8+5PsJRTciZM52yE37qlSyt6YHwY9GokUT0sxDE=
+	t=1770156613; cv=none; b=lrb2esHxprugudH4cVydzu0vTygrShVz0lE9mX93kdyxRaxaEocnJ1qNjfZmvfcJ98YNbJRJ7zuArOkg3cExajMfmXp/36YOGS4pmcmGCsVoAeLdJwimOlhbB68IYs8ROzfOUxW8BvI5HBkbBOGa38nacWdUak4p2LzsYJrBQ/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770156611; c=relaxed/simple;
-	bh=kib+TGW+Sn0wIp4wEuCVzIXogMh8yQTFjwVFCEPYhmY=;
+	s=arc-20240116; t=1770156613; c=relaxed/simple;
+	bh=OvnjKmtuP+/pnyWLrwtRVT2pKYDknDMFSdYGBTZusD8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tGsFxoMdGR28fTk5Gjynvonp90dBRfGOkBEgJnO3Gb7VVMrAYpy4c0Us2k/YjEw1Gsf4KFUWwBvFjzVSm3shTvD7uMpoccS0ponYHa+wor+L1xCivqe9GKXWJ4NAlWFtu5Iy6+U07fBMc97SO8L9eAGvw19rBqZxrye+up06FUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yiWuZSL9; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=IMsL+aMdMBWxW0gg2U5yd75ZQfgvm/uQl6GaZNNLeGDCCAyYJfgNHORUgJgxh3lFmhzNU1fSFKiQEkxB/JF7LQr+NVobhyTftH/eVQ04pKuV5Blli+6qoMKDeD0Ck51Kv4rJXwsFpp4l0WIakfw6sx+BzcdpnKK8o12XV8BNTh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aXQlxC9U; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3545b891dd1so7798393a91.1
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 14:10:10 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-823486f311bso3165805b3a.0
+        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 14:10:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770156609; x=1770761409; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770156611; x=1770761411; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqqC2kaW5ecj2f4ECaQ1IWiF4359d2X2a1SnW9XYDSk=;
-        b=yiWuZSL9Ap91iA5bMFdovEO9BPEwpndAd8N/1aB+qK5EDBFG/4Y/T0yxQQkB/QYekm
-         4nY+W2kGtDRy9X6kaOKPM4nhZo0qyARf3Esk8D6AXESAc2AEtsf0rzcWxDFBj8/g0Vb/
-         8amiBC5LlhHUuhehZYUiGHyqu/DvItGh+9gVddAzhc0fSuWDYKyEyYh1vMOCYzKt+IyQ
-         QLB+Xln7Fa0JukUiXpA037Yc4jfW4qtF7RRQgcrdg9DnARBEd4RhOWIBafbjT3yfEWQd
-         SOr+1PwaXJJrUOd943ykhUWWPnLvNKkA12E+jTmZuXCPtAptL0pKBGXi9cJJ/blwF4RS
-         dCbQ==
+        bh=/8ncc0FKC3TXUBMo9gNfkA/biCGmORiTT+jCw4LASx4=;
+        b=aXQlxC9UVztklrIzfWpZev/rwSmUKlvraxtoY5lfgHt/QeO1hxJl+lnQRKrGJcKEGL
+         Gk1/ca2Q7pf5Q11WoTGLYViBevkmo6aW454pmyCDGCaW8we/f6UxzbSKSCHQ4GaSH6gZ
+         8qizJ79pp2lbnZzUsa4iBg5NyymBPMFZRM6YEjtTKfGLAplSnTQ2Hxp9JSW4B5hmS/Yc
+         eyXqvfyBpDiA4MooFTFuulxWEs0Vjykgjs/Cz7vD2ZNcu9pcJLn5vJCXtpcMMw1Eupr3
+         6B+alAOc5TAMWNwkkM9i99hbhVOJqWtP2+yKa+t7APffXiWcSRl7x1UN783xBBduPAQw
+         kncA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770156609; x=1770761409;
+        d=1e100.net; s=20230601; t=1770156611; x=1770761411;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqqC2kaW5ecj2f4ECaQ1IWiF4359d2X2a1SnW9XYDSk=;
-        b=HZ+JzXZtTXNYjhnYbzo85mbiIL5fpNqK1NTQhW0sJfvwV4XACPd3CyIlj2oAxsSCvU
-         dDRahIaFkCxDNDLeeb9v76LjISBNG9ibMx76VO63Gtb2/TeIdAhFyGmI3NcX9P1L/nuC
-         dg4OZ5qmzTrxLSmYg9E0fP8K+pSc3Q7Qvy3CS4wUUPGAO3GKXlGre1ERDh1uUIuG4msM
-         Gau+0W9OEWkEugvkqI4Mj8DbU0XzgqPq0CVQIW6kEp1p+EiXEN1/8dGP/QbzlSKCVbbo
-         1tpnWK+aq8P1c00fgDNV8TLO9vLwbxHVSfvLitglGud72awsis1fRK6nyWHgHhyaGNF8
-         cZYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVW7SSBSECIG1W6c7XmWwCOc0oXFImuEGIrSfgN8peIpVv+kXMaHiTZG+8n0fMNNs3jJas=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4Jrk9/fG8/Lr5yzH3Op/8c29gojQqiMHK1GrB2RHXGGHQnndX
-	suQjQRm94r9Xw01D6YfKtejvarkMRKOV7Bro8JO2zOcSfP+NtPELVb+EtucDTqXi+w0J/wv+YGc
-	KoGV2J5mlyRqgPg==
-X-Received: from pjpo9.prod.google.com ([2002:a17:90a:9f89:b0:34c:f8b8:349b])
+        bh=/8ncc0FKC3TXUBMo9gNfkA/biCGmORiTT+jCw4LASx4=;
+        b=O8u6apjno2h+swmdrts54lttIIalLANY+p2Gd53a6yBfj1v/LuIaOvwm3n7p0mRu/Z
+         sqccTvRgZOSEXD6ZUL1+7F12qH4/c+A3tSk0DChxzV90Rx1UIu58W2yMeFVIfj1EVEbW
+         k1+0SNGG7JGKUJPoZ9N/Bs6b/gXuZbK+iCm1GObLmxV0pyB/ijieloKPfCnt8/QL5J2y
+         FvXMvlNkX/8exunpS0cXIer/hj8TyHQQcgy/8WPd6APWT/3gwTwWRtd6S3nu8o/ZyZdE
+         g23BHdDGcz1gQadR5QLDpVvG/X6xj++vBlZYzMnFZil7dW9IHGObHgkm9Kr6Evq/398p
+         evJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdPmc/rENpc5CBRHnd3vmtlVSXfz9CvW39OP/9Fn3kEpFw7nnUJLM/Bg2N/syEkwDwwJ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOoWI4E14Pw5UcXqrdLdwbJV8xCcZe/PoehtiML2CwyUl5YtOo
+	VcDowL8f/sXVtBQTL9Tv2N41BE86umY3rlz05BvPE4FRIpLT/JS9rE5cEa+oh0Q6vqkFq04EbA2
+	j5gKsx44V5o/sOQ==
+X-Received: from pfblr43.prod.google.com ([2002:a05:6a00:73ab:b0:7dd:8bba:6394])
  (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:e70d:b0:34c:a35d:de19 with SMTP id 98e67ed59e1d1-354871ea85fmr658805a91.33.1770156609486;
- Tue, 03 Feb 2026 14:10:09 -0800 (PST)
-Date: Tue,  3 Feb 2026 22:09:46 +0000
+ 2002:a05:6a00:2e8f:b0:821:81ef:5de8 with SMTP id d2e1a72fcca58-8241c1ab516mr847226b3a.12.1770156610959;
+ Tue, 03 Feb 2026 14:10:10 -0800 (PST)
+Date: Tue,  3 Feb 2026 22:09:47 +0000
 In-Reply-To: <20260203220948.2176157-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260203220948.2176157-1-skhawaja@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260203220948.2176157-13-skhawaja@google.com>
-Subject: [PATCH 12/14] iommufd: Add APIs to preserve/unpreserve a vfio cdev
+Message-ID: <20260203220948.2176157-14-skhawaja@google.com>
+Subject: [PATCH 13/14] vfio/pci: Preserve the iommufd state of the vfio cdev
 From: Samiullah Khawaja <skhawaja@google.com>
 To: David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
 	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
@@ -98,11 +98,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70105-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70106-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -115,149 +115,119 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[skhawaja@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9C65EDF305
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9B31FDF223
 X-Rspamd-Action: no action
 
-Add APIs that can be used to preserve and unpreserve a vfio cdev. Use
-the APIs exported by the IOMMU core to preserve/unpreserve device. Pass
-the LUO preservation token of the attached iommufd into IOMMU preserve
-device API. This establishes the ownership of the device with the
-preserved iommufd.
+If the vfio cdev is attached to an iommufd, preserve the state of the
+attached iommufd also. Basically preserve the iommu state of the device
+and also the attached domain. The token returned by the preservation API
+will be used to restore/rebind to the iommufd state after liveupdate.
 
 Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 ---
- drivers/iommu/iommufd/device.c | 69 ++++++++++++++++++++++++++++++++++
- include/linux/iommufd.h        | 23 ++++++++++++
- 2 files changed, 92 insertions(+)
+ drivers/vfio/pci/vfio_pci_liveupdate.c | 28 +++++++++++++++++++++++++-
+ include/linux/kho/abi/vfio_pci.h       | 10 +++++++++
+ 2 files changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/iommu/iommufd/device.c b/drivers/iommu/iommufd/device.c
-index 4c842368289f..30cb5218093b 100644
---- a/drivers/iommu/iommufd/device.c
-+++ b/drivers/iommu/iommufd/device.c
-@@ -2,6 +2,7 @@
- /* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
-  */
- #include <linux/iommu.h>
-+#include <linux/iommu-lu.h>
- #include <linux/iommufd.h>
- #include <linux/pci-ats.h>
- #include <linux/slab.h>
-@@ -1661,3 +1662,71 @@ int iommufd_get_hw_info(struct iommufd_ucmd *ucmd)
- 	iommufd_put_object(ucmd->ictx, &idev->obj);
- 	return rc;
- }
-+
-+#ifdef CONFIG_IOMMU_LIVEUPDATE
-+int iommufd_device_preserve(struct liveupdate_session *s,
-+			    struct iommufd_device *idev,
-+			    u64 *tokenp)
-+{
-+	struct iommufd_group *igroup = idev->igroup;
-+	struct iommufd_hwpt_paging *hwpt_paging;
-+	struct iommufd_hw_pagetable *hwpt;
-+	struct iommufd_attach *attach;
-+	int ret;
-+
-+	mutex_lock(&igroup->lock);
-+	attach = xa_load(&igroup->pasid_attach, IOMMU_NO_PASID);
-+	if (!attach) {
-+		ret = -ENOENT;
-+		goto out;
-+	}
-+
-+	hwpt = attach->hwpt;
-+	hwpt_paging = find_hwpt_paging(hwpt);
-+	if (!hwpt_paging || !hwpt_paging->lu_preserve) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	ret = liveupdate_get_token_outgoing(s, idev->ictx->file, tokenp);
-+	if (ret)
-+		goto out;
-+
-+	ret = iommu_preserve_device(hwpt_paging->common.domain,
-+				    idev->dev,
-+				    *tokenp);
-+out:
-+	mutex_unlock(&igroup->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_NS_GPL(iommufd_device_preserve, "IOMMUFD");
-+
-+void iommufd_device_unpreserve(struct liveupdate_session *s,
-+			       struct iommufd_device *idev,
-+			       u64 token)
-+{
-+	struct iommufd_group *igroup = idev->igroup;
-+	struct iommufd_hwpt_paging *hwpt_paging;
-+	struct iommufd_hw_pagetable *hwpt;
-+	struct iommufd_attach *attach;
-+
-+	mutex_lock(&igroup->lock);
-+	attach = xa_load(&igroup->pasid_attach, IOMMU_NO_PASID);
-+	if (!attach) {
-+		WARN_ON(-ENOENT);
-+		goto out;
-+	}
-+
-+	hwpt = attach->hwpt;
-+	hwpt_paging = find_hwpt_paging(hwpt);
-+	if (!hwpt_paging || !hwpt_paging->lu_preserve) {
-+		WARN_ON(-EINVAL);
-+		goto out;
-+	}
-+
-+	iommu_unpreserve_device(hwpt_paging->common.domain, idev->dev);
-+out:
-+	mutex_unlock(&igroup->lock);
-+}
-+EXPORT_SYMBOL_NS_GPL(iommufd_device_unpreserve, "IOMMUFD");
-+#endif
-diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
-index 6e7efe83bc5d..c4b3ed5b518c 100644
---- a/include/linux/iommufd.h
-+++ b/include/linux/iommufd.h
-@@ -9,6 +9,7 @@
- #include <linux/err.h>
+diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
+index c52d6bdb455f..af6fbfb7a65c 100644
+--- a/drivers/vfio/pci/vfio_pci_liveupdate.c
++++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
+@@ -15,6 +15,7 @@
+ #include <linux/liveupdate.h>
  #include <linux/errno.h>
- #include <linux/iommu.h>
-+#include <linux/liveupdate.h>
- #include <linux/refcount.h>
- #include <linux/types.h>
- #include <linux/xarray.h>
-@@ -71,6 +72,28 @@ void iommufd_device_detach(struct iommufd_device *idev, ioasid_t pasid);
- struct iommufd_ctx *iommufd_device_to_ictx(struct iommufd_device *idev);
- u32 iommufd_device_to_id(struct iommufd_device *idev);
+ #include <linux/vfio.h>
++#include <linux/iommufd.h>
  
-+#ifdef CONFIG_IOMMU_LIVEUPDATE
-+int iommufd_device_preserve(struct liveupdate_session *s,
-+			    struct iommufd_device *idev,
-+			    u64 *tokenp);
-+void iommufd_device_unpreserve(struct liveupdate_session *s,
-+			       struct iommufd_device *idev,
-+			       u64 token);
-+#else
-+static inline int iommufd_device_preserve(struct liveupdate_session *s,
-+					  struct iommufd_device *idev,
-+					  u64 *tokenp)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline void iommufd_device_unpreserve(struct liveupdate_session *s,
-+					     struct iommufd_device *idev,
-+					     u64 token)
-+{
-+}
+ #include "vfio_pci_priv.h"
+ 
+@@ -39,6 +40,7 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+ 	struct vfio_pci_core_device_ser *ser;
+ 	struct vfio_pci_core_device *vdev;
+ 	struct pci_dev *pdev;
++	u64 token = 0;
+ 
+ 	vdev = container_of(device, struct vfio_pci_core_device, vdev);
+ 	pdev = vdev->pdev;
+@@ -49,15 +51,32 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+ 	if (vfio_pci_is_intel_display(pdev))
+ 		return -EINVAL;
+ 
++#if CONFIG_IOMMU_LIVEUPDATE
++	/* If iommufd is attached, preserve the underlying domain */
++	if (device->iommufd_attached) {
++		int err = iommufd_device_preserve(args->session,
++						  device->iommufd_device,
++						  &token);
++		if (err < 0)
++			return err;
++	}
 +#endif
 +
- struct iommufd_access_ops {
- 	u8 needs_pin_pages : 1;
- 	void (*unmap)(void *data, unsigned long iova, unsigned long length);
+ 	ser = kho_alloc_preserve(sizeof(*ser));
+-	if (IS_ERR(ser))
++	if (IS_ERR(ser)) {
++		if (device->iommufd_attached)
++			iommufd_device_unpreserve(args->session,
++						  device->iommufd_device, token);
++
+ 		return PTR_ERR(ser);
++	}
+ 
+ 	pci_liveupdate_outgoing_preserve(pdev);
+ 
+ 	ser->bdf = pci_dev_id(pdev);
+ 	ser->domain = pci_domain_nr(pdev->bus);
+ 	ser->reset_works = vdev->reset_works;
++	ser->iommufd_ser.token = token;
+ 
+ 	args->serialized_data = virt_to_phys(ser);
+ 	return 0;
+@@ -66,6 +85,13 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+ static void vfio_pci_liveupdate_unpreserve(struct liveupdate_file_op_args *args)
+ {
+ 	struct vfio_device *device = vfio_device_from_file(args->file);
++	struct vfio_pci_core_device_ser *ser;
++
++	ser = phys_to_virt(args->serialized_data);
++	if (device->iommufd_attached)
++		iommufd_device_unpreserve(args->session,
++					  device->iommufd_device,
++					  ser->iommufd_ser.token);
+ 
+ 	pci_liveupdate_outgoing_unpreserve(to_pci_dev(device->dev));
+ 	kho_unpreserve_free(phys_to_virt(args->serialized_data));
+diff --git a/include/linux/kho/abi/vfio_pci.h b/include/linux/kho/abi/vfio_pci.h
+index 6c3d3c6dfc09..d01bd58711c2 100644
+--- a/include/linux/kho/abi/vfio_pci.h
++++ b/include/linux/kho/abi/vfio_pci.h
+@@ -28,6 +28,15 @@
+ 
+ #define VFIO_PCI_LUO_FH_COMPATIBLE "vfio-pci-v1"
+ 
++/**
++ * struct vfio_iommufd_ser - Serialized state of the attached iommufd.
++ *
++ * @token: The token of the bound iommufd state.
++ */
++struct vfio_iommufd_ser {
++	u32 token;
++} __packed;
++
+ /**
+  * struct vfio_pci_core_device_ser - Serialized state of a single VFIO PCI
+  * device.
+@@ -40,6 +49,7 @@ struct vfio_pci_core_device_ser {
+ 	u16 bdf;
+ 	u16 domain;
+ 	u8 reset_works;
++	struct vfio_iommufd_ser iommufd_ser;
+ } __packed;
+ 
+ #endif /* _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H */
 -- 
 2.53.0.rc2.204.g2597b5adb4-goog
 
