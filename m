@@ -1,295 +1,405 @@
-Return-Path: <kvm+bounces-70028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70029-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SB4/Hss1gmnZQgMAu9opvQ
-	(envelope-from <kvm+bounces-70028-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 18:52:11 +0100
+	id MKZxEkw5gmmVQgMAu9opvQ
+	(envelope-from <kvm+bounces-70029-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:07:08 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FBAADD22F
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 18:52:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A610BDD4FE
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:07:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 629AB311A24F
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 17:45:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15A5E30804FF
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB6F361DB1;
-	Tue,  3 Feb 2026 17:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E0338E5C6;
+	Tue,  3 Feb 2026 18:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FY9s5nF7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PqcnK/Y+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2/HkZ3/b"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4FF35CB9C
-	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 17:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9168233E377
+	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 18:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770140709; cv=none; b=lqK1OdwlPeygEKDzuaUd0Lq8suO+6KjukSt5+DFY2LG0j7GlcUKX1MQ5FyNYXbkM/N/oC45vc0L2AmgmpC7bmwATKFWq6vkEJ6zD+MXSAav7mxmQiWLENdeJk4jZJjjOYZyPUJF7C3p9lVLREwdwbJ6uasHsmTZRHG3dTq42h/w=
+	t=1770141819; cv=none; b=E6Fwpk5A/X+GeeOPlHexYBmOxiw/h4RJ/JgtHSE88hUfH/AbePzfukQmuRFhEiVkpjTqyi5D84B9X+CHFoWVmyMMQmgNazFZnhebFLntV1IljN4Nez+JPDwxLvo89FLBsnXJCnpePOJkMdq4BBo39QOMQnoTOkKvB83GQtaNknI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770140709; c=relaxed/simple;
-	bh=9t1fUsY8nDNXTD2RVVJumI8FxVBqWXScBzfMykEVp8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C05iUChmhfGwI9Fz590p9SV3qhf+WR3lb/pvvk9AifVH9rTv+PiauncbhmVrzcAfXIkIYyseEyMS68Zes1bbkISOhadsMrAXZfz8SgI2Vzd4pigmdYCD9Gp9W6S6Zd38fGW2lBkVV8P6WlmIbFgY+QHKM8I8WR0V6OL3j2sW60U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FY9s5nF7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PqcnK/Y+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770140707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tlFrmjhVpayg8OBXKv6tROkmIHF/xjSd9Muscu3Dpsk=;
-	b=FY9s5nF7qrQQ/SpoSiAXwucg4M13UD90jHocFZj5mswY4pGFRBXGrg1GnAO2GSRLsuyqkJ
-	kTtEmHKd8u0aiiN8c/g9KoTNpoz/YQ4rCkLbgVgzFsxNIoG+DnfLZGOdDi3Sz0T00h9S7i
-	3IPoeAJKD4e/hqVqsYBMWnBLLiCrhV4=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-DT3XR51pPKyW8BD2GXpaVA-1; Tue, 03 Feb 2026 12:45:06 -0500
-X-MC-Unique: DT3XR51pPKyW8BD2GXpaVA-1
-X-Mimecast-MFC-AGG-ID: DT3XR51pPKyW8BD2GXpaVA_1770140706
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50335bd75bdso57858391cf.0
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 09:45:06 -0800 (PST)
+	s=arc-20240116; t=1770141819; c=relaxed/simple;
+	bh=pM2rS/12lrlG+2AZ8m3xfZwPCId4Ey85d1MGnj91250=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MWgJl1DwvMAPPf67NOig+AH643hYpRbd8XXQlJNjGNcd4LewUjCxPc24HLenmP53/QXiXORrfaw2Qu5aC0z7hO3Dz1COIk1BnPDDEGnXyOcYeP2O1HfTXZRRUs7moLLN5KEVYT7lfmhbK2akG0kxSlldmJpSKzw1Gcds/dqku7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2/HkZ3/b; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ec823527eso10895551a91.2
+        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 10:03:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770140706; x=1770745506; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tlFrmjhVpayg8OBXKv6tROkmIHF/xjSd9Muscu3Dpsk=;
-        b=PqcnK/Y+P5srIVqAQL7NO12bhlJArUFo761gJdPAvEMeFT1OIlkBEBFQhZEyeWRd1U
-         niEe6xS/8u9v6c1GNBP7aTffvDSl4ChTot+Hi7NCKKV3vNCGFqWoNYahCQK4rq13GlgV
-         nBe06UBjkDeyPnO38jwUbMRZB1CfWOyRhpUrVZv9LDG/1MNawhLIo4Fg/Wnq+FFus/+L
-         DVELzX+u6Y8YMgd7YA2ve77CaTx9RLX6dbCg9OHF8HUSXerWSi+gq+MWHz8U1ymXtTlP
-         jIDGvo7VKa7U6HKu5C5mxxfIQ3cATWJ486uuJq8BN3ctiWY5tQWSTZD4KIN0OwxqWOFP
-         HUPQ==
+        d=google.com; s=20230601; t=1770141817; x=1770746617; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6XX4eVdJLaAaJXlWOLoKv/kWDfHyar969ebQM03BmoQ=;
+        b=2/HkZ3/bBkvSf9OQIzBeIooL8LYGPDMJcqK3F5zP6CSLdutZ2MtD0Xuvj3FoKKeJlb
+         q3I98fx1UVUbqMC07t7Fm74soz5S3k8lIiu8Z7tWzwsEqlqvYcgnmUD03x8Wsm9+u59w
+         F/1ekuUtn9PUDnHK8up221WSE8oeFNDXUbAl1qCVckUj8QMuzh9xFDpQE//ZYxEEZq5+
+         OSh/AuWEQl6hLsirUwA153PJuyYKJ+hN7cLM5JxCIsGDkmkkLqsdMW2s0wOY0/qvyATH
+         Q7dr3Nb67bgQeNenqRQyn1dSCCFJOhP8jrk8BMvPxl9bJm8yC/MvaalAgu3S66zp3n+9
+         tXSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770140706; x=1770745506;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tlFrmjhVpayg8OBXKv6tROkmIHF/xjSd9Muscu3Dpsk=;
-        b=A8ru2DlbnOj3KWLcej3geZw+Oa0WxOGjUaVWfZ+mwXEwkF2afDfJVAx7JC0Kp+OXGn
-         TFUvvwIW8L7LL20hhYE3ruIwDzbo1ewPqVG2zerMFC117OSmD0LKkdDP7zdcXySGf5Ld
-         zMq7zfi6cWqiSEsco4eTaZDU+LTFnOOOUxazEWc7QxuiATKcCE0gOGPKzvYcrSiEcbvF
-         MXNe9px4B0TUYc6Mf/6HAk+YbsDEmoEDb9Jfxoe3T4MtZEun4LvpgfZbBrutFPqgKELD
-         rA+77QQRVVhlJWzZPp9FVHzBmW9x0PM4AL9wAmZfYqoFmHpoHcpqGZkb0PlJrR3fhFan
-         EHhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVVoabD41ts8P59KrAWofG2PfrJ7aKkfKpiMmNM8mSZo6qHKK+DKIM44zQMSYnTDUKmdHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7cDc+04IV+qvm1hOQxxTk6LMJtsUE/QLmeh/NJDFtj7vp/K7b
-	Lou8ee58EA92x1xdI4TPdCwsZxkx3xwGrsDubgZwvaSTJYrHf6B5S2Uq9OovRjmRz1SP5iCOl+R
-	mkQUci31VcXphKvmTsjW+KW25IJ4GVUNAvu6P9w+xffRQsc7nwOuDsg==
-X-Gm-Gg: AZuq6aIXSVVpv3o3kAk+cM5oEyTKeRlhRW81C1AgpnHA6aY7CsjGf+4te1sv668Gg1i
-	gtF0EZh4a3uK70UBHDrbJz0TYoe8f+HQZBAig8iU01umg8+SyTIpkygsRPoYzkHg9NdsM5oC3RP
-	/zXCVsQ1EJXwZX4bbE5KvwqmldEmd5418IWWEGuheyeVGKNrC/EXbtrG6JqP90qJEe0VHEpyZ6t
-	XwsoDKf23fQ6ysLawChN0yCCtdghO82gaBBzY7JR2PClfqaknhZhwQmtF+47SnkWL41LQBrw3K5
-	eoJTx5DcU/n+sXYC5JAE441ngbpF9ER/+Fm7xZauCpawU4FD5ebDKPQLa9dRXqFArXLvy0bXXhU
-	4V78=
-X-Received: by 2002:a05:622a:1ba3:b0:501:181d:f71e with SMTP id d75a77b69052e-5061c18ec18mr1176551cf.38.1770140705451;
-        Tue, 03 Feb 2026 09:45:05 -0800 (PST)
-X-Received: by 2002:a05:622a:1ba3:b0:501:181d:f71e with SMTP id d75a77b69052e-5061c18ec18mr1175931cf.38.1770140704851;
-        Tue, 03 Feb 2026 09:45:04 -0800 (PST)
-Received: from x1.local ([142.188.210.156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5061c1f7764sm401081cf.23.2026.02.03.09.45.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 09:45:04 -0800 (PST)
-Date: Tue, 3 Feb 2026 12:45:02 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	David Hildenbrand <david@redhat.com>,
-	Hugh Dickins <hughd@google.com>,
-	James Houghton <jthoughton@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC 01/17] userfaultfd: introduce
- mfill_copy_folio_locked() helper
-Message-ID: <aYI0HmP-XZNBI-gb@x1.local>
-References: <20260127192936.1250096-1-rppt@kernel.org>
- <20260127192936.1250096-2-rppt@kernel.org>
+        d=1e100.net; s=20230601; t=1770141817; x=1770746617;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6XX4eVdJLaAaJXlWOLoKv/kWDfHyar969ebQM03BmoQ=;
+        b=bQ9GL+39h0ZjC/fqXyGsLCRAmHv8nI27PqEMGeR1b5Ow4rN//hfWV1sFQdEcTFww90
+         l62eKEchBxLa5kpu9ZDl0tTqqe0rYRwFdlW77KQSbwMEXHg1Y60iEWv6ZOMn5Y2Nk8F0
+         lGNHBa3Q+U9bsRpQvAWqaIcFMbSuGibMwk7eld7e1zLHv3N0Gs8QUHFjD8c8k/DGeZPy
+         UFIdor7607yJjdMI70wOKaqOCl0YGxKIyiMU2m4Ih9Xw+gVfxOkEn8Oc3mBU6yaDY9K6
+         BhtRMrvtdGnIlWOp0HOyMeiw+OJk85aRIS3HmrxDWH/ATXz9OFYh8g5IEnUa/yaoKtua
+         YiUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTWFlMrW3FV5dXeY+I6gbz8uqsQcCnu77hT4nqAK2pXGKnMGaTWOFs8jxlo9yjvQj6gRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQFq1mW9X61px9xHN21fQI9rWVjXSwRGZ1DlbIrkMGk1cHC2m2
+	QESvua8vTqsRxOTyPYKPUaFNDmbK8ojCC6qOEA0l4L9sh6+VoQvIIJHE7b3rCNhevsDr//g5Tly
+	nJXJr1g==
+X-Received: from pjsg5.prod.google.com ([2002:a17:90a:7145:b0:352:d19a:6739])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2752:b0:340:ff7d:c26
+ with SMTP id 98e67ed59e1d1-354870da124mr148942a91.16.1770141816880; Tue, 03
+ Feb 2026 10:03:36 -0800 (PST)
+Date: Tue, 3 Feb 2026 10:03:35 -0800
+In-Reply-To: <i4xpbma5acebgissizta7abydnwdn2hbdhgqxnb5gyxsjnx6q7@5ayraj5trdtl>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260127192936.1250096-2-rppt@kernel.org>
+Mime-Version: 1.0
+References: <20260203011320.1314791-1-yosry.ahmed@linux.dev>
+ <aYIebtv3nNnsqUiZ@google.com> <i4xpbma5acebgissizta7abydnwdn2hbdhgqxnb5gyxsjnx6q7@5ayraj5trdtl>
+Message-ID: <aYI4d0zPw3K5BedW@google.com>
+Subject: Re: [PATCH] KVM: nSVM: Use vcpu->arch.cr2 when updating vmcb12 on
+ nested #VMEXIT
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70028-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peterx@redhat.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-70029-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[x1.local:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0FBAADD22F
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A610BDD4FE
 X-Rspamd-Action: no action
 
-On Tue, Jan 27, 2026 at 09:29:20PM +0200, Mike Rapoport wrote:
-> From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+On Tue, Feb 03, 2026, Yosry Ahmed wrote:
+> On Tue, Feb 03, 2026 at 08:12:30AM -0800, Sean Christopherson wrote:
+> > On Tue, Feb 03, 2026, Yosry Ahmed wrote:
+> > 		/*
+> > 		 * If L2 is active, defer delivery of the payload until the
+> > 		 * exception is actually injected to avoid clobbering state if
+> > 		 * L1 wants to intercept the exception (the architectural state
+> > 		 * is NOT updated if the exeption is morphed to a VM-Exit).
+> > 		 */
 > 
-> Split copying of data when locks held from mfill_atomic_pte_copy() into
-> a helper function mfill_copy_folio_locked().
+> It's not only about exceptions being morphed to a VM-Exit though, is it?
+> KVM should not update the payload (e.g. CR2) if a #PF is pending but was
+> not injected, because from L1's perspective CR2 was updated but
+> exit_int_info won't reflect a #PF. Right?
+
+Right, but that's got nothing to do with L2 being active.  Take nested completely
+out of the picture, and the above statement holds true as well.  "If a #PF is
+pending but was not injected, then the guest shouldn't see a change in CR2".
+
+> > But thanks to commit 7709aba8f716 ("KVM: x86: Morph pending exceptions to pending
+> > VM-Exits at queue time"), KVM already *knows* the exception won't be morphed to a
+> > VM-Exit.
+> > 
+> > Ugh, and I'm pretty sure I botched kvm_vcpu_ioctl_x86_get_vcpu_events() in that
+> > commit.  Because invoking kvm_deliver_exception_payload() when the exception was
+> > morphed to a VM-Exit is wrong.  Oh, wait, this is the !exception_payload_enabled
+> > case.  So never mind, that's simply an unfixable bug, as the second comment alludes
+> > to.
 > 
-> This makes improves code readability and makes complex
-> mfill_atomic_pte_copy() function easier to comprehend.
+> Hmm for the #PF case I think delivering the payload is always wrong if
+> it was morphed to a VM-Exit, regardless of exception_payload_enabled,
+> because the payload should never reach CR2, right?
+
+Right.
+
+> Spoiler alert, there's another problem there. Even if the exception did
+> not morph to a VM-Exit, if userspace already did KVM_GET_SREGS then the
+> delivered payload is lost :/
 > 
-> No functional change.
+> > 
+> > 	/*
+> > 	 * KVM's ABI only allows for one exception to be migrated.  Luckily,
+> > 	 * the only time there can be two queued exceptions is if there's a
+> > 	 * non-exiting _injected_ exception, and a pending exiting exception.
+> > 	 * In that case, ignore the VM-Exiting exception as it's an extension
+> > 	 * of the injected exception.
+> > 	 */
+> > 	if (vcpu->arch.exception_vmexit.pending &&
+> > 	    !vcpu->arch.exception.pending &&
+> > 	    !vcpu->arch.exception.injected)
+> > 		ex = &vcpu->arch.exception_vmexit;
+> > 	else
+> > 		ex = &vcpu->arch.exception;
+> > 
+> > 	/*
+> > 	 * In guest mode, payload delivery should be deferred if the exception
+> > 	 * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
+> > 	 * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
+> > 	 * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
+> > 	 * propagate the payload and so it cannot be safely deferred.  Deliver
+> > 	 * the payload if the capability hasn't been requested.
+> > 	 */
+> > 	if (!vcpu->kvm->arch.exception_payload_enabled &&
+> > 	    ex->pending && ex->has_payload)
+> > 		kvm_deliver_exception_payload(vcpu, ex);
+> > 
+> > So yeah, I _think_ we could drop the is_guest_mode() check.  However, even better
+> > would be to drop this call *entirely*, i.e.
 > 
-> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> Hmm I don't think so, because as I mentioned above, KVM shouldn't update
+> CR2 until the exception is actually injected, right?
 
-The movement looks all fine,
+Me confused.  What you're saying is what I'm suggesting: don't update CR2 until
+KVM actually stuffs the #PF into the VMCS/VMCB.  Oh, or are you talking about the
+first sentence?  If so, strike that from the record, I was wrong (see below).
 
-Acked-by: Peter Xu <peterx@redhat.com>
+> It would actually be great to drop the is_guest_mode() check here but
+> leave the call, because the ordering problem between KVM_VCPU_SET_EVENTS
+> and KVM_SET_SREGS goes away, and I *think* we can drop the
+> kvm_deliver_exception_payload() call in
+> kvm_vcpu_ioctl_x86_get_vcpu_events().
+>
+> The only problem would be CR2 getting updated without a fault being
+> reflected in the vmcb12's exit_int_info AFAICT.
 
-Just one pure question to ask.
+No, that particular case is a non-issue, because the code immediately above has
+already verified that KVM will *not* morph the #PF to a nested VM-Exit.  Note,
+the "queue:" path is just for non-contributory exceptions and doesn't change the
+VM-Exit change anyways.
 
-> ---
->  mm/userfaultfd.c | 59 ++++++++++++++++++++++++++++--------------------
->  1 file changed, 35 insertions(+), 24 deletions(-)
+	/*
+	 * If the exception is destined for L2, morph it to a VM-Exit if L1
+	 * wants to intercept the exception.
+	 */
+	if (is_guest_mode(vcpu) &&
+	    kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, nr, error_code)) {  <====
+		kvm_queue_exception_vmexit(vcpu, nr, has_error, error_code,
+					   has_payload, payload);
+		return;
+	}
+
+	if (!vcpu->arch.exception.pending && !vcpu->arch.exception.injected) {
+	queue:
+		vcpu->arch.exception.pending = true;
+		vcpu->arch.exception.injected = false;
+
+		vcpu->arch.exception.has_error_code = has_error;
+		vcpu->arch.exception.vector = nr;
+		vcpu->arch.exception.error_code = error_code;
+		vcpu->arch.exception.has_payload = has_payload;
+		vcpu->arch.exception.payload = payload;
+		if (!is_guest_mode(vcpu))
+			kvm_deliver_exception_payload(vcpu,
+						      &vcpu->arch.exception);
+		return;
+	}
+
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index b0112c515584..00a39c95631d 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -864,9 +864,6 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+> >                 vcpu->arch.exception.error_code = error_code;
+> >                 vcpu->arch.exception.has_payload = has_payload;
+> >                 vcpu->arch.exception.payload = payload;
+> > -               if (!is_guest_mode(vcpu))
+> > -                       kvm_deliver_exception_payload(vcpu,
+> > -                                                     &vcpu->arch.exception);
+> >                 return;
+> >         }
+> >  
+> > Because KVM really shouldn't update CR2 until the excpetion is actually injected
+> > (or the state is at risk of being lost because exception_payload_enabled==false).
+> > E.g. in the (extremely) unlikely (and probably impossible to configure reliably)
+> > scenario that userspace deliberately drops a pending exception, arch state shouldn't
+> > be updated.
 > 
-> diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
-> index e6dfd5f28acd..a0885d543f22 100644
-> --- a/mm/userfaultfd.c
-> +++ b/mm/userfaultfd.c
-> @@ -238,6 +238,40 @@ int mfill_atomic_install_pte(pmd_t *dst_pmd,
->  	return ret;
->  }
->  
-> +static int mfill_copy_folio_locked(struct folio *folio, unsigned long src_addr)
-> +{
-> +	void *kaddr;
-> +	int ret;
-> +
-> +	kaddr = kmap_local_folio(folio, 0);
-> +	/*
-> +	 * The read mmap_lock is held here.  Despite the
-> +	 * mmap_lock being read recursive a deadlock is still
-> +	 * possible if a writer has taken a lock.  For example:
-> +	 *
-> +	 * process A thread 1 takes read lock on own mmap_lock
-> +	 * process A thread 2 calls mmap, blocks taking write lock
-> +	 * process B thread 1 takes page fault, read lock on own mmap lock
-> +	 * process B thread 2 calls mmap, blocks taking write lock
-> +	 * process A thread 1 blocks taking read lock on process B
-> +	 * process B thread 1 blocks taking read lock on process A
-
-While moving, I wonder if we need this complex use case to describe the
-deadlock.  Shouldn't this already happen with 1 process only?
-
-  process A thread 1 takes read lock (e.g. reaching here but
-                     before copy_from_user)
-  process A thread 2 calls mmap, blocks taking write lock
-  process A thread 1 goes on copy_from_user(), trigger page fault,
-                     then tries to re-take the read lock
-
-IIUC above should already cause deadlock when rwsem prioritize the write
-lock here.
-
-> +	 *
-> +	 * Disable page faults to prevent potential deadlock
-> +	 * and retry the copy outside the mmap_lock.
-> +	 */
-> +	pagefault_disable();
-> +	ret = copy_from_user(kaddr, (const void __user *) src_addr,
-> +			     PAGE_SIZE);
-> +	pagefault_enable();
-> +	kunmap_local(kaddr);
-> +
-> +	if (ret)
-> +		return -EFAULT;
-> +
-> +	flush_dcache_folio(folio);
-> +	return ret;
-> +}
-> +
->  static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
->  				 struct vm_area_struct *dst_vma,
->  				 unsigned long dst_addr,
-> @@ -245,7 +279,6 @@ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
->  				 uffd_flags_t flags,
->  				 struct folio **foliop)
->  {
-> -	void *kaddr;
->  	int ret;
->  	struct folio *folio;
->  
-> @@ -256,27 +289,7 @@ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
->  		if (!folio)
->  			goto out;
->  
-> -		kaddr = kmap_local_folio(folio, 0);
-> -		/*
-> -		 * The read mmap_lock is held here.  Despite the
-> -		 * mmap_lock being read recursive a deadlock is still
-> -		 * possible if a writer has taken a lock.  For example:
-> -		 *
-> -		 * process A thread 1 takes read lock on own mmap_lock
-> -		 * process A thread 2 calls mmap, blocks taking write lock
-> -		 * process B thread 1 takes page fault, read lock on own mmap lock
-> -		 * process B thread 2 calls mmap, blocks taking write lock
-> -		 * process A thread 1 blocks taking read lock on process B
-> -		 * process B thread 1 blocks taking read lock on process A
-> -		 *
-> -		 * Disable page faults to prevent potential deadlock
-> -		 * and retry the copy outside the mmap_lock.
-> -		 */
-> -		pagefault_disable();
-> -		ret = copy_from_user(kaddr, (const void __user *) src_addr,
-> -				     PAGE_SIZE);
-> -		pagefault_enable();
-> -		kunmap_local(kaddr);
-> +		ret = mfill_copy_folio_locked(folio, src_addr);
->  
->  		/* fallback to copy_from_user outside mmap_lock */
->  		if (unlikely(ret)) {
-> @@ -285,8 +298,6 @@ static int mfill_atomic_pte_copy(pmd_t *dst_pmd,
->  			/* don't free the page */
->  			goto out;
->  		}
-> -
-> -		flush_dcache_folio(folio);
->  	} else {
->  		folio = *foliop;
->  		*foliop = NULL;
-> -- 
-> 2.51.0
+> I think if we drop it there might be a problem. With
+> exception_payload_enabled==false, pending exceptions becomes injected
+> after save/restore. If the payload is not delivered here, then after
+> restore we have an injected event with no payload.
 > 
+> I guess the kvm_deliver_exception_payload() call in
+> kvm_vcpu_ioctl_x86_get_vcpu_events() is supposed to handle this, but it
+> only works if userspace does KVM_GET_SREGS *after* KVM_GET_VCPU_EVENTS.
+> Removing the call here will regress VMM's doing KVM_GET_SREGS AFAICT.
 
--- 
-Peter Xu
+Drat, QEMU does KVM_GET_VCPU_EVENTS before KVM_GET_SREGS{,2}, so I was hopeful
+we wouldn't actually break anyone, but Firecracker at least gets sregs before
+events.  Of course Firecracker is already broken due to not enabling
+KVM_CAP_EXCEPTION_PAYLOAD...
 
+Ugh, and it's not just KVM_GET_SREGS, it's also KVM_GET_DEBUGREGS thanks to DR6.
+
+If we're being _super_ pedantic, then delivering the payload anywhere but injection
+or KVM_GET_VCPU_EVENTS is "wrong" (well, "more wrong", since any behavior without
+KVM_CAP_EXCEPTION_PAYLOAD is inherently wrong).  E.g. very hypothetically, userspace
+that saves/restores sregs but not vCPU events would see an unexpected CR2 change.
+
+*sigh*
+
+Ewwwwwwww.  And we *definitely* don't want to drop the is_guest_mode() check,
+because nested_vmx_update_pending_dbg() relies on the payload to still be valid.
+
+Ah, right, and that's also why commit a06230b62b89 ("KVM: x86: Deliver exception
+payload on KVM_GET_VCPU_EVENTS") from MTF series deferred the update: KVM needs
+to keep the #DB pending so that a VM-Exit that occurs before the #DB is injected
+gets recorded in vmcs12.
+
+So, with all of that in mind, I believe the best we can do is fully defer delivery
+of the exception until it's actually injected, and then apply the quirk to the
+relevant GET APIs.
+
+---
+ arch/x86/kvm/x86.c | 62 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 39 insertions(+), 23 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b0112c515584..e000521dfc8b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -864,9 +864,6 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
+ 		vcpu->arch.exception.error_code = error_code;
+ 		vcpu->arch.exception.has_payload = has_payload;
+ 		vcpu->arch.exception.payload = payload;
+-		if (!is_guest_mode(vcpu))
+-			kvm_deliver_exception_payload(vcpu,
+-						      &vcpu->arch.exception);
+ 		return;
+ 	}
+ 
+@@ -5532,18 +5529,8 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
+-					       struct kvm_vcpu_events *events)
++static struct kvm_queued_exception *kvm_get_exception_to_save(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_queued_exception *ex;
+-
+-	process_nmi(vcpu);
+-
+-#ifdef CONFIG_KVM_SMM
+-	if (kvm_check_request(KVM_REQ_SMI, vcpu))
+-		process_smi(vcpu);
+-#endif
+-
+ 	/*
+ 	 * KVM's ABI only allows for one exception to be migrated.  Luckily,
+ 	 * the only time there can be two queued exceptions is if there's a
+@@ -5554,21 +5541,46 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
+ 	if (vcpu->arch.exception_vmexit.pending &&
+ 	    !vcpu->arch.exception.pending &&
+ 	    !vcpu->arch.exception.injected)
+-		ex = &vcpu->arch.exception_vmexit;
+-	else
+-		ex = &vcpu->arch.exception;
++		return &vcpu->arch.exception_vmexit;
++
++	return &vcpu->arch.exception;
++}
++
++static void kvm_handle_exception_payload_quirk(struct kvm_vcpu *vcpu)
++{
++	struct kvm_queued_exception *ex = kvm_get_exception_to_save(vcpu);
+ 
+ 	/*
+-	 * In guest mode, payload delivery should be deferred if the exception
+-	 * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
+-	 * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
+-	 * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
+-	 * propagate the payload and so it cannot be safely deferred.  Deliver
+-	 * the payload if the capability hasn't been requested.
++	 * If KVM_CAP_EXCEPTION_PAYLOAD is disabled, then (prematurely) deliver
++	 * the pending exception payload when userspace saves *any* vCPU state
++	 * that interacts with exception payloads to avoid breaking userspace.
++	 *
++	 * Architecturally, KVM must not deliver an exception payload until the
++	 * exception is actually injected, e.g. to avoid losing pending #DB
++	 * information (which VMX tracks in the VMCS), and to avoid clobbering
++	 * state if the exception is never injected for whatever reason.  But
++	 * if KVM_CAP_EXCEPTION_PAYLOAD isn't enabled, then userspace may or
++	 * may not propagate the payload across save+restore, and so KVM can't
++	 * safely defer delivery of the payload.
+ 	 */
+ 	if (!vcpu->kvm->arch.exception_payload_enabled &&
+ 	    ex->pending && ex->has_payload)
+ 		kvm_deliver_exception_payload(vcpu, ex);
++}
++
++static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
++					       struct kvm_vcpu_events *events)
++{
++	struct kvm_queued_exception *ex = kvm_get_exception_to_save(vcpu);
++
++	process_nmi(vcpu);
++
++#ifdef CONFIG_KVM_SMM
++	if (kvm_check_request(KVM_REQ_SMI, vcpu))
++		process_smi(vcpu);
++#endif
++
++	kvm_handle_exception_payload_quirk(vcpu);
+ 
+ 	memset(events, 0, sizeof(*events));
+ 
+@@ -5747,6 +5759,8 @@ static int kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+ 	    vcpu->arch.guest_state_protected)
+ 		return -EINVAL;
+ 
++	kvm_handle_exception_payload_quirk(vcpu);
++
+ 	memset(dbgregs, 0, sizeof(*dbgregs));
+ 
+ 	BUILD_BUG_ON(ARRAY_SIZE(vcpu->arch.db) != ARRAY_SIZE(dbgregs->db));
+@@ -12123,6 +12137,8 @@ static void __get_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
+ 	if (vcpu->arch.guest_state_protected)
+ 		goto skip_protected_regs;
+ 
++	kvm_handle_exception_payload_quirk(vcpu);
++
+ 	kvm_get_segment(vcpu, &sregs->cs, VCPU_SREG_CS);
+ 	kvm_get_segment(vcpu, &sregs->ds, VCPU_SREG_DS);
+ 	kvm_get_segment(vcpu, &sregs->es, VCPU_SREG_ES);
+
+base-commit: 55671237401edd1ec59276b852b9361cc170915b
+--
 
