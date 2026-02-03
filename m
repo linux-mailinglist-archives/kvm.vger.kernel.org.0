@@ -1,41 +1,41 @@
-Return-Path: <kvm+bounces-69982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69984-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SAhKAarAgWm7JAMAu9opvQ
-	(envelope-from <kvm+bounces-69982-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:32:26 +0100
+	id 8OUzMuvCgWmgJgMAu9opvQ
+	(envelope-from <kvm+bounces-69984-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:42:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 473D9D6CAD
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:32:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C4AD6F7A
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:42:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 62B543084F65
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 09:31:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D2A22307AB0B
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 09:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C9F30C602;
-	Tue,  3 Feb 2026 09:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9B3399003;
+	Tue,  3 Feb 2026 09:40:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47512225788;
-	Tue,  3 Feb 2026 09:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2697396D3C;
+	Tue,  3 Feb 2026 09:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770111094; cv=none; b=RBjdsp551M5Ih3TSfJmSzb6L/dTyUJ5880SM5ljT/G+OxNeBkYiOkpBKRUkze301hZXR042AKx9zRs6dTDrsbTmnGLf7kJEnM6A19B39qT07YJp9J9olfZTAEIsOXuIi5DgDtzL308QRuJ2FRi1fKErqeBtkSA6KCDpnYRm5t18=
+	t=1770111631; cv=none; b=l4Ypx0lzGUsAWNaLoFIUEA3ujLnll1GHVLQu3qt/YBrOHj8/2DRkU7rfhP6UJGaOseMW9kCDBW1+xiE5w8rffzHQRNO8tn8OkkBRhnTX2BnFc614qPBeYzbMeCLME1ZFgeZSyqVCvVwORyOQOf/mCxD9atiNqjWMOqvfng49/ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770111094; c=relaxed/simple;
-	bh=5jmouTua6yslQRgrdx+A5bJpbyfqEnLPJRHjwE2hki4=;
+	s=arc-20240116; t=1770111631; c=relaxed/simple;
+	bh=W4MGPpd+7XrqzyfxlUcULz9K3XBxWS8bmKUr+z+Zh5Y=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BrBLpsoQ/E/kOHcA6cfhKi4Jt23KiXI26Zoof0Ju0OxA6AVUhWHhXUl+zr/tqp0pxdzioP8PxxPekmptq4BPu1SQ7CiDxg+kMdUGMIXPOAHRY9BcF5KoPLb0kwpA1c64XVHcAgNuH3/+Q9GB9H1cXd4tdZ0/mWBRxpLynP7ZpVs=
+	 In-Reply-To:Content-Type; b=SNYle2kAtP4XagSoQ06KAJNeAH0mM9fUeJlncjXSD8dFps+ybNw7t3lJUE/w0RBMSZDYK3ZQooxGb/XvCUf+2YSK2gRLnEmSbemKehexk8cE7Mypi9KVlhU8TZpc6RFzlPD+KnXjlwVYLggPXvncB99HKCUEeTc0xk6JTSKPulw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Axz8NuwIFpaVAPAA--.50094S3;
-	Tue, 03 Feb 2026 17:31:26 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8BxHMOIwoFpCVEPAA--.49245S3;
+	Tue, 03 Feb 2026 17:40:24 +0800 (CST)
 Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowJAxHMJrwIFpNwU_AA--.49621S3;
-	Tue, 03 Feb 2026 17:31:26 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowJBxSeCEwoFpOwY_AA--.52071S3;
+	Tue, 03 Feb 2026 17:40:23 +0800 (CST)
 Subject: Re: [PATCH v3 4/4] LoongArch: KVM: Add FPU delay load support
 To: Huacai Chen <chenhuacai@kernel.org>
 Cc: WANG Xuerui <kernel@xen0n.name>, Tianrui Zhao <zhaotianrui@loongson.cn>,
@@ -50,8 +50,8 @@ References: <20260203033131.3372834-1-maobibo@loongson.cn>
  <37a61461-bc15-39cf-61d0-3a908f25841f@loongson.cn>
  <CAAhV-H5bs5E4pMbMaTX+AZ9UwmSB81q0ga+CjM+ivY4kWVp2eQ@mail.gmail.com>
 From: Bibo Mao <maobibo@loongson.cn>
-Message-ID: <04c76933-f75b-0ea0-0d56-3ac52e7f80d2@loongson.cn>
-Date: Tue, 3 Feb 2026 17:28:49 +0800
+Message-ID: <ef1665a2-9b54-6a9f-f2eb-06f1e54b9272@loongson.cn>
+Date: Tue, 3 Feb 2026 17:37:46 +0800
 User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 Precedence: bulk
@@ -64,36 +64,37 @@ In-Reply-To: <CAAhV-H5bs5E4pMbMaTX+AZ9UwmSB81q0ga+CjM+ivY4kWVp2eQ@mail.gmail.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJAxHMJrwIFpNwU_AA--.49621S3
+X-CM-TRANSID:qMiowJBxSeCEwoFpOwY_AA--.52071S3
 X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3KF1DWrW7XFyDJryfXr4DKFX_yoWkCrW7pr
-	y8JF1DAw48Jr15Jw12qr1qgrnFvr4UKr1xXryUJ345Jr1DtryUJr18JryUuFy5Jr18AF1x
-	XF1Utr13CFyUJrgCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW3KF1DWrW7XFyDJryfXr4DKFX_yoWkGrW7pr
+	y8JF1DAw48Jr15Jw12qr1jgrnFvr4UKr1xXryUJa45Jr1DtryUJr18GryUuFyUJr18JF1x
+	XF1UJr13CFyUJrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUD529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9Sb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
 	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
 	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
-	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C2
-	67AKxVW8ZVWrXwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
-	8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWU
-	CwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r
-	1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBI
-	daVFxhVjvjDU0xZFpf9x07j0sjUUUUUU=
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_GFv_Wrylx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUcApnDU
+	UUU
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -106,9 +107,9 @@ X-Spamd-Result: default: False [-1.46 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69982-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,loongson.cn:mid,loongson.cn:email]
-X-Rspamd-Queue-Id: 473D9D6CAD
+	TAGGED_FROM(0.00)[bounces-69984-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,loongson.cn:mid,loongson.cn:email]
+X-Rspamd-Queue-Id: 43C4AD6F7A
 X-Rspamd-Action: no action
 
 
@@ -186,24 +187,15 @@ On 2026/2/3 下午5:17, Huacai Chen wrote:
 > 
 > X86 introduced lazy fpu, then others also use lazy fpu; but now X86
 > have switched to eager fpu, others should also do the same?
-I do not say easy fpu should be used. The problem is that for lazy FPU 
-exception, if FPU HW register is the same with SW FPU state though FPU 
-is disabled, can the FPU load be skipped and only enable FPU by EUEN 
-register?
-
 > 
 > On the other hand, when you use separate FPU/LSX/LASX, I only mention
 > the trace functions. Then you changed to centralized FPU/LSX/LASX/LBT.
-The trace function is good suggestion, so I accept and post the second 
-version. centralized FPU/LSX/LASX is because kvm_late_check_requests() 
-is critical hot path, however FPU load is not, it is not necessary to 
-add three cold kvm_check_request().
-
 > Then I suggest you improve centralized FPU/LSX/LASX/LBT, you changed
 > to separate FPU/LBT again, where is the end?
-Now the LBT and FPU uses different structure to save and restore, FPU 
-and LBT is separated already, however FPU/LSX/LASX uses the same 
-structure loongarch_fpu.
+OK, I can use aux bit and aux type for kvm only.
+
+In future if there is FPU register skipping loading optimization patch, 
+then we will discuss it then.
 
 Regards
 Bibo Mao
