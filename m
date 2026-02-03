@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-70049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70051-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aB1uB8M8gmmVQgMAu9opvQ
-	(envelope-from <kvm+bounces-70049-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:21:55 +0100
+	id 6HP/AzQ9gmmVQgMAu9opvQ
+	(envelope-from <kvm+bounces-70051-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:23:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 763BFDD7E7
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:21:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9432DD841
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:23:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D12D930D2C14
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:19:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C3E2E301D25B
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4003E8C71;
-	Tue,  3 Feb 2026 18:17:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634733E9598;
+	Tue,  3 Feb 2026 18:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VAqHUdBc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ea2/arQb"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4B3D9029;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F9A36E473;
 	Tue,  3 Feb 2026 18:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770142667; cv=none; b=EldO/zI4K0kbSWeRyYCDq2vgaZY8EAhz2WO1Tn0KpmkDbcoYtXERxD0YjgBBQujE9dylEShl5XEg/1PUv1F3/+ZWcD5AbQCr6C1jYMYDYI3/tpV7JZQ1i8JCd502tltkCD25RDyqKhuqpitZB0ONwpu/drrd9LJCPjmdtxLF37Y=
+	t=1770142668; cv=none; b=mYrdFtZRq6c9SSrUaK6R/DgR0H9H2sQ19UNll4CMmqj1IqpGhLCt4QZM0a7+eHgzmI38Pp/v6TQCT0xC0g2ckoY+oDauG4FL8bMP8wS4aBLE1cLkenxMQkT0w4sM9CjQFOcYzjP/hNbK8qElJlTc9QDKGEhx1Ptn3j/jxSOhhyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770142667; c=relaxed/simple;
-	bh=px+gf9CycIrN2SRb7cWFwlLMe1ewXZI2g90WSPrwj7s=;
+	s=arc-20240116; t=1770142668; c=relaxed/simple;
+	bh=16MA10iAEBEjY/zIcYesOhSOwM/Zu2zd4qCPUxxxgCo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g9FJ+HlFv7kfIZouoYYPj9u+ZG14hIrAaEJNydaVn3nZmJtArf1saFa/EpUThMeR231SZ3BWl2MCulS9rQ5oZqXaxpQRP2v3DgE5PQH/EAQlIVbivDfWZv/8VFytHtCEMDlh/wUqcdtObdV+sQUaz/FVtNxz+6JLvBbrnvD5MNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VAqHUdBc; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=djxi2aTWJJDc5MHVj3mKbLWj/WKe1CLtLd9lnqS3fIIKpeSwsBvciAMUkTN2aTKxjFIfFM7lyQ1DV2g81RWR1Nx90m90cF9Rqgi2uJ+5eapOhpFhS6+yHnsF6wtXbaaXv9GAJ+3sH8mlnBbTF/GrhYhBZlFVrBQS1USgHM/AYy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ea2/arQb; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770142666; x=1801678666;
+  t=1770142667; x=1801678667;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=px+gf9CycIrN2SRb7cWFwlLMe1ewXZI2g90WSPrwj7s=;
-  b=VAqHUdBcKcI/kvaS/5JqpHdPUmv8yHloPbrOsROMNRQVwcOs0gCZfP0F
-   utm4peSxcBhCExhhY8CdMhJZuvuuHvrN6/dKLVuZEuJKaGyZUwvyWmNeq
-   gQQcZahhmq7oYPXV9+vSHmKbGKXxAeP2cMFNbd3Vdmxhjc0TfdOPtpSk5
-   lwRVCeh7Ax9+dZb+A9VZEfPyfs20vSlefsoZ8vQK8VFEx7cp5Xn/ImDo1
-   WFYPx8TDMqnu7bj5znU4EJNt49An7GFwCWizZ+9BBr0KrZwjd0HRaS/G5
-   Z8begdY8o9XGzl7eRR+TvVwGik1cuVS5GyVT53qFRFfpTjUvSY87xGW5G
-   g==;
-X-CSE-ConnectionGUID: MHTgx4+oRTiWNVQvnIpTAg==
-X-CSE-MsgGUID: Sl5GRDBURpiui6vLfgpUvQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="88745823"
+  bh=16MA10iAEBEjY/zIcYesOhSOwM/Zu2zd4qCPUxxxgCo=;
+  b=Ea2/arQbLtRjA3175wG3qo1n6rrr2oSzRGRqix21dwwR9YKpb/6LJmLa
+   G8n3+ymCag7nF/W4YZGSsuKkAAViHvpLc81S6aFeMJBKssn78caugmWLY
+   y0LMdYYFjl9zRIble+0mpYsGmwas8OC2zjVuWPiVmINb9GV9Z18zJ5i8P
+   skkqehfd+ivJ99TKlZeclMBEDpwKP9oFC8igtwb5UMwpEn9htOpZ+5831
+   b9KyNOwtA9N1Cj0BRJUvb0ITM5ZnQzZeJE09slIzKktvEy1fcajXdjItI
+   DCN5t/huBC6+v8Ur/QFByj+n4qPz4QwMKJcJxOEkBhDsqd10DiF0dI4m7
+   w==;
+X-CSE-ConnectionGUID: s+qQy+OVT1+jg6o+k+CCPg==
+X-CSE-MsgGUID: VPN1EBFuQ2uE0RRa5FVGQg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="88745828"
 X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
-   d="scan'208";a="88745823"
+   d="scan'208";a="88745828"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:44 -0800
-X-CSE-ConnectionGUID: W7yY16fLS7qbPpRzmzGmuw==
-X-CSE-MsgGUID: FtFY+x9hT1OXLV/050JKtQ==
+X-CSE-ConnectionGUID: OpeYDVIUSSi+eX7pc5IQOA==
+X-CSE-MsgGUID: 9hRHuqUdQ4WDgeUKpiB/bQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
-   d="scan'208";a="209605498"
+   d="scan'208";a="209605505"
 Received: from khuang2-desk.gar.corp.intel.com (HELO localhost) ([10.124.221.188])
   by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:43 -0800
 From: isaku.yamahata@intel.com
@@ -69,9 +69,9 @@ Cc: isaku.yamahata@intel.com,
 	Sean Christopherson <seanjc@google.com>,
 	linux-kernel@vger.kernel.org,
 	kernel test robot <oliver.sang@intel.com>
-Subject: [PATCH 17/32] KVM: nVMX: Add check vmread/vmwrite on tertiary control
-Date: Tue,  3 Feb 2026 10:17:00 -0800
-Message-ID: <610a83212de7a5e598e45a4d80d3409ac693ffb6.1770116051.git.isaku.yamahata@intel.com>
+Subject: [PATCH 18/32] KVM: nVMX: Add check VMCS index for guest timer virtualization
+Date: Tue,  3 Feb 2026 10:17:01 -0800
+Message-ID: <01a8714db6af834214a3811c4d4b727371264964.1770116051.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1770116050.git.isaku.yamahata@intel.com>
 References: <cover.1770116050.git.isaku.yamahata@intel.com>
@@ -89,7 +89,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[intel.com,gmail.com,redhat.com,google.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70049-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70051-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[intel.com:+];
 	FROM_NO_DN(0.00)[];
@@ -109,96 +109,74 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 763BFDD7E7
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E9432DD841
 X-Rspamd-Action: no action
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Make the access to the tertiary processor-based VM control an error if the
-guest VMX true processor-based controls don't report it.
-
-Without this patch, the KVM unit test_vmread_vmwrite() fails because
-vmread()/vmwrite() can succeeds with the index beyond
-MSR_IA32_VMX_VMCS_ENUM when the tertiary processor-based VM-executing
-controls aren't advertised to the guest.
+Make vmread/vmwrite to the VMCS fields an error if the guest
+MSR_IA32_VMX_PROCBASED_CTLS3 doesn't advertise APIC timer virtualization.
+Without this check, test_vmwrite_vmread of the KVM unit test fails.
 
 Reported-by: kernel test robot <oliver.sang@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 20 ++++++++++++++++++++
- arch/x86/kvm/vmx/nested.h |  5 +++++
- 2 files changed, 25 insertions(+)
+ arch/x86/kvm/vmx/nested.c | 14 ++++++++++++++
+ arch/x86/kvm/vmx/nested.h |  7 +++++++
+ 2 files changed, 21 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index c8b42c880300..d6ae62e70560 100644
+index d6ae62e70560..a940f1d9ee83 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -5794,6 +5794,16 @@ static int handle_vmresume(struct kvm_vcpu *vcpu)
- 	return nested_vmx_run(vcpu, false);
- }
+@@ -5801,6 +5801,14 @@ static bool is_vmcs_field_valid(struct kvm_vcpu *vcpu, unsigned long field)
+ 	     field == TERTIARY_VM_EXEC_CONTROL_HIGH))
+ 		return false;
  
-+static bool is_vmcs_field_valid(struct kvm_vcpu *vcpu, unsigned long field)
-+{
-+	if (!nested_cpu_supports_tertiary_ctls(vcpu) &&
-+	    (field == TERTIARY_VM_EXEC_CONTROL ||
-+	     field == TERTIARY_VM_EXEC_CONTROL_HIGH))
++	if (!nested_cpu_supports_guest_apic_timer(vcpu) &&
++	    (field == GUEST_APIC_TIMER_VECTOR ||
++	     field == GUEST_DEADLINE_VIR ||
++	     field == GUEST_DEADLINE_VIR_HIGH ||
++	     field == GUEST_DEADLINE_PHY ||
++	     field == GUEST_DEADLINE_PHY_HIGH))
 +		return false;
 +
-+	return true;
-+}
-+
- static int handle_vmread(struct kvm_vcpu *vcpu)
- {
- 	struct vmcs12 *vmcs12 = is_guest_mode(vcpu) ? get_shadow_vmcs12(vcpu)
-@@ -5824,6 +5834,9 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
- 		     get_vmcs12(vcpu)->vmcs_link_pointer == INVALID_GPA))
- 			return nested_vmx_failInvalid(vcpu);
+ 	return true;
+ }
  
-+		if (!is_vmcs_field_valid(vcpu, field))
-+			return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-+
- 		offset = get_vmcs12_field_offset(field);
- 		if (offset < 0)
- 			return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-@@ -5948,6 +5961,9 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+@@ -7216,6 +7224,12 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 	    vmcs12->tertiary_vm_exec_control)
+ 		goto error_guest_mode;
  
- 	field = kvm_register_read(vcpu, (((instr_info) >> 28) & 0xf));
- 
-+	if (!is_vmcs_field_valid(vcpu, field))
-+		return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-+
- 	offset = get_vmcs12_field_offset(field);
- 	if (offset < 0)
- 		return nested_vmx_fail(vcpu, VMXERR_UNSUPPORTED_VMCS_COMPONENT);
-@@ -7196,6 +7212,10 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 			kvm_state->hdr.vmx.preemption_timer_deadline;
- 	}
- 
-+	if (!nested_cpu_supports_tertiary_ctls(vcpu) &&
-+	    vmcs12->tertiary_vm_exec_control)
++	if (!nested_cpu_supports_guest_apic_timer(vcpu) &&
++	    (vmcs12->virtual_timer_vector ||
++	     vmcs12->guest_deadline ||
++	     vmcs12->guest_deadline_shadow))
 +		goto error_guest_mode;
 +
  	if (nested_vmx_check_controls(vcpu, vmcs12) ||
  	    nested_vmx_check_host_state(vcpu, vmcs12) ||
  	    nested_vmx_check_guest_state(vcpu, vmcs12, &ignored))
 diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 9ca1df72e228..07c0f112e37e 100644
+index 07c0f112e37e..d84ed234a8d6 100644
 --- a/arch/x86/kvm/vmx/nested.h
 +++ b/arch/x86/kvm/vmx/nested.h
-@@ -158,6 +158,11 @@ static inline bool __nested_cpu_supports_tertiary_ctls(struct nested_vmx_msrs *m
- 	return msrs->procbased_ctls_high & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
+@@ -286,6 +286,13 @@ static inline bool nested_cpu_has_encls_exit(struct vmcs12 *vmcs12)
+ 	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING);
  }
  
-+static inline bool nested_cpu_supports_tertiary_ctls(struct kvm_vcpu *vcpu)
++static inline bool nested_cpu_supports_guest_apic_timer(struct kvm_vcpu *vcpu)
 +{
-+	return __nested_cpu_supports_tertiary_ctls(&to_vmx(vcpu)->nested.msrs);
++	return nested_cpu_supports_tertiary_ctls(vcpu) &&
++		to_vmx(vcpu)->nested.msrs.tertiary_ctls &
++		TERTIARY_EXEC_GUEST_APIC_TIMER;
 +}
 +
- static inline bool nested_cpu_has(struct vmcs12 *vmcs12, u32 bit)
+ static inline bool nested_cpu_has_guest_apic_timer(struct vmcs12 *vmcs12)
  {
- 	return vmcs12->cpu_based_vm_exec_control & bit;
+ 	return nested_cpu_has3(vmcs12, TERTIARY_EXEC_GUEST_APIC_TIMER);
 -- 
 2.45.2
 
