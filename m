@@ -1,111 +1,110 @@
-Return-Path: <kvm+bounces-69983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69985-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CJd4M7vCgWmgJgMAu9opvQ
-	(envelope-from <kvm+bounces-69983-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:41:15 +0100
+	id 2Of0BALDgWmgJgMAu9opvQ
+	(envelope-from <kvm+bounces-69985-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:42:26 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE80D6F31
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:41:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3A04D6F91
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 10:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 01FAC302D9C3
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 09:40:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5DE85302CF28
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 09:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CA018C33;
-	Tue,  3 Feb 2026 09:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A78399013;
+	Tue,  3 Feb 2026 09:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h4EPK9H8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o4/In8aP"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447E8310774
-	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 09:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C8C396D38
+	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 09:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770111628; cv=pass; b=CYOvFCx3xXAt5RZOf9S81uaDuH0+9bpBRlmjznIJXwJP363X+cGl4rIekM4MFY+0chENYeQ4CXNNgGiGmHagG/zIEmhXzjIhe73+XAJs/XVRwDNaxwMcJwzPW7Uu3++590N0mtWJvy+NLwsvqVJzOnrfhuWCyU6TT/YHAEX6VeY=
+	t=1770111703; cv=pass; b=txKyczoPmhbwxk0LUHCzjxo0tJPXE8cMN4uvAPtze1PJ1aTnrC7VinmdTrF7hoMgY96I8X1AlUNIsAu6wgNmi4OHdoEVRVbShNojLQudSvoBnKLq2Tn/CgRhNrHdI9SsEgbcpqGtDAC9os+fismGDi8cXEg1KH9IDpjs4hID01I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770111628; c=relaxed/simple;
-	bh=F7oytjxQ/ZM2+D72Ivu9+6l4pfn1cS7+cfPa4Xr1Y/E=;
+	s=arc-20240116; t=1770111703; c=relaxed/simple;
+	bh=us1083ZECDfL4S3CH0lycoRH/Kw+2jLcC17kXf2gHtU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DNtzxBuvT7xjNuXT4su3ecvYOtWWppOddQ5VTkeLA00qv51pTstISw7EvV3r8/Muaon4f0p3zMQOhUQolCF1CxrY0uxb5UqZyGr88DJE8ETrewxsqCH7E5Ns5nHbF4nBg6HsC48Z9w7ESsWPNU2WzI0Vz/O8cCkojr1Z7hckNvc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h4EPK9H8; arc=pass smtp.client-ip=209.85.160.169
+	 To:Cc:Content-Type; b=GNwum5FD1Y9va4RR7DYy00vrLLkp+cHp3Q4w8Mc3uQ61y5rS7r2HQ6u0NBx9PCeA2nWLbCcVJtSsTZOmWqVdTyjL2uarCmpYaQFXiI7VbfmEBorVZ+/sEgBMShJMJowTtfOABQVA2XH2kN2YXgqcQ57+fEEmS4YFFUwKW6Vu+Ls=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o4/In8aP; arc=pass smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-505d3baf1a7so346121cf.1
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 01:40:27 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770111626; cv=none;
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-5014b5d8551so275091cf.0
+        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 01:41:38 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770111697; cv=none;
         d=google.com; s=arc-20240605;
-        b=LBlvM3Z5WoYienhwAWFGtboPOp4y70sUmpvlZGHSr8QJc2/GAWmzkU65ABFmt2eGne
-         LvP0tvvRJtuyv7a6I/eHMapjX4Fki8qURGgrkySuMH5nat9YM1jqdRRDX0rdwUDfzHKH
-         kiUKWqc6ZEDcTbtHB8ZwIvBfxemXIEAB8qHqDizCetco02iWg7N/IK3ANIKugrg3Aiq4
-         GKG1l1R68u5K/oBwyjoEslzGABOz/x1uzAzOyP79CeBxw4gNv9RnfPsi2FXmpv6AuK5W
-         oTc/GpRKCSRAoPN37Q2Fyatskoi096SB8n0akAX/btAlllv0GtKy0Bh6f50zJy+gzLpp
-         Nf8Q==
+        b=H/pHO+iSs9RaYsVzkgCasZe8qTOZs0n2UO1uPoowEhDwIIqnnlpi/K7OjQoesRcPGz
+         AsWqXhGtLsYMsYlh1Q/RPlhc6lKTJrg4yxAS2su3ZaPNlOzNELQg88HrWju5NMnjsQPs
+         5pBtiCoKz4UWme/2maJB4Mk1hMu6h7QyyXLpD4cZkzw0P//qmF1kH1PP8RxZmTyo5ABH
+         MKHa9tk8DeZoSfAwUSsQffGFW2hKITa625yUJLr9scLslHbB5chdP5AcQNet36gGBHf4
+         Ml98xJltIXOpwX6cxwuJOpvEkN6CjrIxmcyF9fQn9Dj/LcYHTdvFqVgDJDWuNQngXXn6
+         MTww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=/iLRVFcvI8PBqaXa13EXF14ab440i5Z61zkbAzzGqTg=;
-        fh=Ybupwz3tHhSmSe9uJbaEgKAwogClMKikCYXcMqplQFo=;
-        b=YEf5jGyl6Nee6IMQjV3wFSCtSeXxnXVdPfC0Mfm1PL/9Jg1i2WHgEZyEVXAtRTyPnN
-         GYQPbOQ7T4V002OmC1U3p4lht7gSJp9gjGSWSjbwgS9A+3uJFM2h/n0hQ/EXAn4AzkiP
-         mAuaSwN6xNKEqGXYR9YW1YFniWN6Nhg/djgFe03mfgZggJ3QiS8wPmcFa/xInrlrol0U
-         4VCBZ2QInMyylLvpD/iBfqPquLBNTcdHWXbVZD+AW5XsML/bEXBmokF6uR6jKpkKCjRz
-         vmusVZpMhTj/L9ML7y2V1rind096JcWBlaVreA07Cv599Y5Ow67vCiOCSqIG18PIuxWW
-         nECg==;
+        bh=Fex5v7o8CPkY7hhbst5vKC6sK9Ovg5CdBS9vwalDDZM=;
+        fh=+2xD7tELaG67BvrvopJGLqsqwQ1v+hTYbXznBwiFS1k=;
+        b=GyElmHpYxjKMrHoS/zG+Mn2kAsmTAcj4Fszq87JV5UlGCBTP70kMdtgb6duxbGLoOU
+         B4JMCPV2GCUgrPt54AiWrMxrmiOv2CVykJyckxA7t5QhPJ0BwQhBnjOtji6HzNoUlMME
+         yG30a4IEpabAk7b9jC813lDz1/bqlrMsz4aYgwTlQ8fStq1wtTBuKsm9d8GGfJytu6gU
+         yl1Hl2HUbrYa70CMHHa1C8J/nR30OVrLKTLM6S5/xLROEF84+H6SohAa0Zvz91OUqaKM
+         afaTwWzgggxnrQFTktjOWPM0uxIMXS1v7CcWnk+QdUDJWmAUN2FL6xcvXhLCwu1hYPar
+         eLZg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770111626; x=1770716426; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770111697; x=1770716497; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/iLRVFcvI8PBqaXa13EXF14ab440i5Z61zkbAzzGqTg=;
-        b=h4EPK9H8UId8l1oNIt+WjRHB4FGx9sreOihNaXIy+3OnlYVpm9m5BfS5KsrpbmutX5
-         onGEC9WSoYNejBi03Q56ev7YnoyzlCmD8cObC8REOrILzZziB56/5qfXXxkZ32GV9cju
-         i6vvzbVYY/s+LJbzcXYby/iMc01bNFWRe7iJwkaj6lh0Nk/DIVSchD2UQ0NiYgf6oG0/
-         Jpv77rgyqmJ4lEZ7+Y6IW0TLzcAoHYAsBB18qBGAoNnxjCL1ctf7nEtw5s5uJaE7/THx
-         H8A5W5Clv1k8ZuGeq9g9jb2NJw64cCXZlswrIUv7UhdFDCSQ7SVaNRHv3Aop8EitsXNS
-         zTBQ==
+        bh=Fex5v7o8CPkY7hhbst5vKC6sK9Ovg5CdBS9vwalDDZM=;
+        b=o4/In8aPni/zA/UOccv0cG1Nb1zZ9uVACmLm72jS6yqQQZAVKkVS47C1e6o0Qsi5aG
+         kZ4doASHJYKm2a6oisxZ6Vfk2vIr21EykOGAb2nfsev4W8xiQSGV6Lvlcoft+l1WMXkd
+         u+pqdbbgbfVddJ6ti2rEOUieOIR+ppEylmt7+hyTw/4e6I7ho8da+xskAwWvpLb95I0D
+         4g/rocrSXCp88o7NwJKADCCCkwPBcFn9bfGJe0vAmGhroW/U5g8+JA+W7qgrQUET/xk7
+         yvfo17nN2wXrULj2693X1P+2uHBFhNQlSJEeG5+NPO06gGJBOIZrwVwxj+74r9yDTYzO
+         x8OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770111626; x=1770716426;
+        d=1e100.net; s=20230601; t=1770111697; x=1770716497;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/iLRVFcvI8PBqaXa13EXF14ab440i5Z61zkbAzzGqTg=;
-        b=F1CnFeU22heTX9joGSRr41Dejddsw7Ye5lI25nKg9BEhRG4siVh24VEtr4P5kRBeVA
-         AwFZY+saK/RTr7XkmVLuLt0thVod40uM458Bb7SBxNUdRXL1dJvQNm6OtfUd0nHo7jVZ
-         x2rhL+9l2ipKQkME8dAs83Zv5zIT/PGlwbcz6LkNTA4l+PC9nVkN4PomZtbDqrNEyKXj
-         RZ56TZXfHWePOT77+Uh0Zo90fZobA2YVjMNIOCqinXnKUU/oXyuUn2RIBtFpXAtPpB53
-         ZKq+ruz5Nh9QxcQzlrS6YWyh8VesCoACvhtjx6gxQja23PSlME3zgxYo66UXlCYhJPKQ
-         BHvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzu1oN3iy71Wp/cgM9ZfgXoVTaKrk15FMkF4dvORyzwBosgm42zltGr/VKGmlESRcvf/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycB/XG/E2kzaC1EnjvMUfduNoWM1dItodbPL+kFQnGCJEFFXsR
-	p+yPCCa+vZe21XIxAcIUbn/z3utADfyFN03nIif78NM9CjsHy2HOZ9Sv4wIkVJb6jj2gGvRfrKS
-	g4w7G+28y/Rck/fPTLIdm4fjRGTq1nM12rgyNKRY6
-X-Gm-Gg: AZuq6aLp/aVZ2o0oyFN7bQXORCHoERUlWc3k7A2AzigPViY9X3shfngRK6+BEutA1AO
-	vS0Vfq58TmE3sCZ8VK02tkDdMJZqVwhOJwo4LKfpDG9/vmtn+xSGcEUH7udO1i5398TDK5vreTv
-	bxRU8rgyrUltb87YY+AJJfg1pPgry8W7RS9p1eNYkQAPGb3A3f6a0foQKhe9h8vCZ17mNTBQKZ/
-	XBqRUPeJOtx7kpluolkGdaMWubcsifXSGTX0LbRa24UkV2Dw5V89004K43R3ILu0JuYISmW8wb5
-	fNd5pbPo25QNRRspwP4S8Dixp5nhzV4yS+x6
-X-Received: by 2002:a05:622a:e:b0:501:4539:c81 with SMTP id
- d75a77b69052e-5060f009ad3mr4642661cf.2.1770111625864; Tue, 03 Feb 2026
- 01:40:25 -0800 (PST)
+        bh=Fex5v7o8CPkY7hhbst5vKC6sK9Ovg5CdBS9vwalDDZM=;
+        b=IEbKG7XQQ5GLcbmlTewf8gslpXpI3hcn5IE3VYrEeWLRQuCpjFIM2GKxGhUX47S/yQ
+         U3sGhap27yBjEBBNhEGokUJtzDPFeF2s174EHvzkJikntmI3CLzynDO9WLatJw0BHF0G
+         1/Ow5pdmKxTrJuSc9iK6TvhAfwgI+ikIZ3C2toDb6ci987QLl2TjHkz28/TLhW32Zik3
+         mUYSRMfLOBJAoITzXMMxL+CcRHUFLQ5kwp47N4k8hCUT77ysOgcqggQkEC/BsLrkRfEr
+         be93U0bLsvVVuhmON7fOg5cHWtpKA0izKCP+rCySnUI7tQtu8MowR3uxy/pAvIUsC1sB
+         I0Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSVzf9ruSZwaaiZGcebZ8L5PWAHrwwb1kQ+Kr0qXHAycZ9APCzxe4f7Ddtp+CiT+W9r7Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymGWlhWzttjHUxjOlniArUCAA7CoRpV6cyLZiHFscXDX8F3DnG
+	+CwgcTD0H8nMnRLEdoUyrJcreWSuesxiYqFkFdXo0JWeetuCkm8VxQKW9XiEeW/ZEjdoDbVMymL
+	ohiKLeqVMfq8MUCBLDO+KIPDPam85C+IGT/ANSI06WSjSBYtsGiL1TI9Zj+52cQ==
+X-Gm-Gg: AZuq6aKCSCJ29Gfq4AjmdMOhvdB+ZYjVF2VssA56D/85UB4hx96/19wpzCOmk+mETZI
+	TmG2V5reOiYuw9Z30UrykQFhYSiOTSCgs70h1LG8gPFDMkn5gfPLtJILoNsq7ypDae23Klw+Hvb
+	FQXa8zRAB/oRma8JUXK1lUjctcuLvdHb/r1ioZzdwtYojp3FptbnHAki9X4tghKghEFqD8F8/1z
+	Jr5977FZCrH0rxcb7+D/GfBsWLX6VZ/NnmPS91sWF270UHvKWq2liH1N1Gm4xbtklzsXYXSZmeL
+	gBfCepthJSP2W0mncscpxOKykQ==
+X-Received: by 2002:a05:622a:610:b0:4ff:cb25:998b with SMTP id
+ d75a77b69052e-5060f0d0fc2mr4910981cf.12.1770111697142; Tue, 03 Feb 2026
+ 01:41:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260202184329.2724080-1-maz@kernel.org> <20260202184329.2724080-13-maz@kernel.org>
-In-Reply-To: <20260202184329.2724080-13-maz@kernel.org>
+References: <20260202184329.2724080-1-maz@kernel.org>
+In-Reply-To: <20260202184329.2724080-1-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 3 Feb 2026 09:39:49 +0000
-X-Gm-Features: AZwV_QgvgYBl296K0duqDRaBXXRaqyX8U8f5zkdPWeOZQX-Dkj3fpYJk1QlQ7I8
-Message-ID: <CA+EHjTwvXhzMP7WYQycs5CdPD1u-Ycj32-L1kC2Qvw4nmyempg@mail.gmail.com>
-Subject: Re: [PATCH v2 12/20] KVM: arm64: Add RES1_WHEN_E2Hx constraints as
- configuration flags
+Date: Tue, 3 Feb 2026 09:41:00 +0000
+X-Gm-Features: AZwV_QjqZ1UnCxkfe67UIBzq-4b3eaUyZq-nxMFFw9q75AKQJgz1vWaiA_7G-bc
+Message-ID: <CA+EHjTzyiOFyy+Zf-2Zxd8W3vap=88xjLUF7bA4OWZOGTDOR4w@mail.gmail.com>
+Subject: Re: [PATCH v2 00/20] KVM: arm64: Generalise RESx handling
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -122,7 +121,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-69983-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-69985-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -139,74 +138,98 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 6FE80D6F31
+X-Rspamd-Queue-Id: B3A04D6F91
 X-Rspamd-Action: no action
 
 Hi Marc,
 
-On Mon, 2 Feb 2026 at 18:43, Marc Zyngier <maz@kernel.org> wrote:
->
-> "Thanks" to VHE, SCTLR_EL2 radically changes shape depending on the
-> value of HCR_EL2.E2H, as a lot of the bits that didn't have much
-> meaning with E2H=0 start impacting EL0 with E2H=1.
->
-> This has a direct impact on the RESx behaviour of these bits, and
-> we need a way to express them.
->
-> For this purpose, introduce two new constaints that, when the
+For the series:
+Tested-by: Fuad Tabba <tabba@google.com>
 
-nit: constants
-
-> controlling feature is not present, force the field to RES1 depending
-> on the value of E2H. Note that RES0 is still implicit,
-
-nit: , -> .
->
-> This allows diverging RESx values depending on the value of E2H,
-> something that is required by a bunch of SCTLR_EL2 bits.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Cheers,
+Thanks!
 /fuad
 
-
-> ---
->  arch/arm64/kvm/config.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+On Mon, 2 Feb 2026 at 18:43, Marc Zyngier <maz@kernel.org> wrote:
 >
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 7d133954ae01b..7e8e42c1cee4a 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -26,6 +26,8 @@ struct reg_bits_to_feat_map {
->  #define        MASKS_POINTER   BIT(3)  /* Pointer to fgt_masks struct instead of bits */
->  #define        AS_RES1         BIT(4)  /* RES1 when not supported */
->  #define        REQUIRES_E2H1   BIT(5)  /* Add HCR_EL2.E2H RES1 as a pre-condition */
-> +#define        RES1_WHEN_E2H0  BIT(6)  /* RES1 when E2H=0 and not supported */
-> +#define        RES1_WHEN_E2H1  BIT(7)  /* RES1 when E2H=1 and not supported */
+> Having spent some time dealing with some dark corners of the
+> architecture, I have realised that our RESx handling is a bit patchy.
+> Specially when it comes to RES1 bits, which are not clearly defined in
+> config.c, and rely on band-aids such as FIXED_VALUE.
 >
->         unsigned long   flags;
+> This series takes the excuse of adding SCTLR_EL2 sanitisation to bite
+> the bullet and pursue several goals:
 >
-> @@ -1297,10 +1299,14 @@ static struct resx compute_resx_bits(struct kvm *kvm,
->                         match &= !e2h0;
+> - clearly define bits that are RES1 when a feature is absent
 >
->                 if (!match) {
-> -                       if (map[i].flags & AS_RES1)
-> -                               resx.res1 |= reg_feat_map_bits(&map[i]);
-> +                       u64 bits = reg_feat_map_bits(&map[i]);
-> +
-> +                       if ((map[i].flags & AS_RES1)                    ||
-> +                           (e2h0 && (map[i].flags & RES1_WHEN_E2H0))   ||
-> +                           (!e2h0 && (map[i].flags & RES1_WHEN_E2H1)))
-> +                               resx.res1 |= bits;
->                         else
-> -                               resx.res0 |= reg_feat_map_bits(&map[i]);
-> +                               resx.res0 |= bits;
->                 }
->         }
+> - have a unified data structure to manage both RES0 and RES1 bits
+>
+> - deal with the annoying complexity of some features being
+>   conditioned on E2H==1
+>
+> - allow a single bit to take different RESx values depending on the
+>   value of E2H
+>
+> This allows quite a bit of cleanup, including the total removal of the
+> FIXED_VALUE horror, which was always a bizarre construct. We also get
+> a new debugfs file to introspect the RESx settings for a given guest.
+>
+> Overall, this lowers the complexity of expressing the configuration
+> constraints, for very little code (most of the extra lines are
+> introduced by the debugfs stuff, and SCTLR_EL2 being added to the
+> sysreg file).
+>
+> Patches on top of my kvm-arm64/vtcr branch (which is currently
+> simmering in -next).
+>
+> * From v1 [1]
+>
+>   - Simplified RES0 handling by dropping the RES0_WHEN_E2Hx macros
+>
+>   - Cleaned up the kvm_{g,s}et_sysreg_resx() helpers
+>
+>   - Simplified dynamic RESx handling
+>
+>   - New improved debugfs handling, thanks to Fuad!
+>
+>   - Various clean-ups and spelling fixes
+>
+>   - Collected RBs (thanks Fuad and Joey!)
+>
+> [1] https://lore.kernel.org/all/20260126121655.1641736-1-maz@kernel.org
+> Marc Zyngier (20):
+>   arm64: Convert SCTLR_EL2 to sysreg infrastructure
+>   KVM: arm64: Remove duplicate configuration for SCTLR_EL1.{EE,E0E}
+>   KVM: arm64: Introduce standalone FGU computing primitive
+>   KVM: arm64: Introduce data structure tracking both RES0 and RES1 bits
+>   KVM: arm64: Extend unified RESx handling to runtime sanitisation
+>   KVM: arm64: Inherit RESx bits from FGT register descriptors
+>   KVM: arm64: Allow RES1 bits to be inferred from configuration
+>   KVM: arm64: Correctly handle SCTLR_EL1 RES1 bits for unsupported
+>     features
+>   KVM: arm64: Convert HCR_EL2.RW to AS_RES1
+>   KVM: arm64: Simplify FIXED_VALUE handling
+>   KVM: arm64: Add REQUIRES_E2H1 constraint as configuration flags
+>   KVM: arm64: Add RES1_WHEN_E2Hx constraints as configuration flags
+>   KVM: arm64: Move RESx into individual register descriptors
+>   KVM: arm64: Simplify handling of HCR_EL2.E2H RESx
+>   KVM: arm64: Get rid of FIXED_VALUE altogether
+>   KVM: arm64: Simplify handling of full register invalid constraint
+>   KVM: arm64: Remove all traces of FEAT_TME
+>   KVM: arm64: Remove all traces of HCR_EL2.MIOCNCE
+>   KVM: arm64: Add sanitisation to SCTLR_EL2
+>   KVM: arm64: Add debugfs file dumping computed RESx values
+>
+>  arch/arm64/include/asm/kvm_host.h             |  38 +-
+>  arch/arm64/include/asm/sysreg.h               |   7 -
+>  arch/arm64/kvm/config.c                       | 427 ++++++++++--------
+>  arch/arm64/kvm/emulate-nested.c               |  10 +-
+>  arch/arm64/kvm/nested.c                       | 151 +++----
+>  arch/arm64/kvm/sys_regs.c                     |  68 +++
+>  arch/arm64/tools/sysreg                       |  82 +++-
+>  tools/arch/arm64/include/asm/sysreg.h         |   6 -
+>  tools/perf/Documentation/perf-arm-spe.txt     |   1 -
+>  .../testing/selftests/kvm/arm64/set_id_regs.c |   1 -
+>  10 files changed, 478 insertions(+), 313 deletions(-)
 >
 > --
 > 2.47.3
