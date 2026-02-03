@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-70046-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70047-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIeRI1c9gmmVQgMAu9opvQ
-	(envelope-from <kvm+bounces-70046-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:24:23 +0100
+	id wLg1BmU9gmmVQgMAu9opvQ
+	(envelope-from <kvm+bounces-70047-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:24:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E9E6DD866
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:24:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82037DD86D
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:24:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B56D1318498F
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:19:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3800730692F7
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F183D9053;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DC53DA7C4;
 	Tue,  3 Feb 2026 18:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TrPz3Tic"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MBvL2Ua9"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE41E3D6692;
-	Tue,  3 Feb 2026 18:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FE33D7D63;
+	Tue,  3 Feb 2026 18:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770142665; cv=none; b=ebNimNrn0bth8F0DqSLgkaikER1JtKbxFsRSiRe+3TViq7PC5KVtBcWP/KjfanQOToN5V85F1nyshWUm3CIv1fzxibNRqoou4Ay9Y3LmjudTutPl3yMd+to2AcWVEIwvY+qWn8fhq+IsHEEIQwwfkNp2Nx/vcFPRrcVPwTgNKr4=
+	t=1770142665; cv=none; b=XzZn+pdfIL4DDRFtxtbgVhMr0BQYIWHIOTvlTM0L57n8qytMolTs/8qRSMcLALhdNSZ6VVrqmOU/629CCLfExXtSiH7TKWjsc56z0LgtoQKeDkyvs62Yk+gTbxw/bzuirzCLwMUKgbTW3sPENvMWc3gnot7IhzWGI5r6J4ldqQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770142665; c=relaxed/simple;
-	bh=lay6C04NpMEaRDmWEt9cg+qeeEi4r9NeoST7W3hXgnE=;
+	bh=9XI7vB+0OJRjYggT6bE/btEJW/0e/kC1khjIdnkgrRc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n4ygADAGpLEiI2L3Cb+DABN80O2m0KGzFjNEDgIJW0hKcIJmCn+kr/mkWtJG2n89ERv0gORaiZwoPHIRU2NKwaWL/2ZjVGPTy1kLuOEbgP/qJpb5lLzIRGN5jlGYhQ20RIaRdALQQkOt5iZKROfsxiz3stEIujmRPM2rwos6/bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TrPz3Tic; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=ZO/6bjEA1aBgiXBPdiwHZLCGTSNLWOLDTJBmXG2thowNkwlvUE1//mEdMIKZzdiE1bzO6kqCVj4/9mDu8fie0utQ0mkOnPJE3ysaTpmCVshBilXkyDojJAa2qub2chJcKyH7Ky/YWBjpug66sGOLiGmIH7eK7g8DjoyOy3Qm72M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MBvL2Ua9; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770142664; x=1801678664;
+  t=1770142665; x=1801678665;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lay6C04NpMEaRDmWEt9cg+qeeEi4r9NeoST7W3hXgnE=;
-  b=TrPz3TiczwWeG8zn6azTTn9jypRcJZIuepq0AgTI2IuKYyGfDEfEP4VR
-   Zc9kbDTYiMMpKa1Jwkq3sPNnm6cQHrOyD4L7pK0H7yr5+JyqqBmPa11+X
-   T64Hh8MUSFtCzQXpzPYOT6JjFZ3Q0RHyLAkNBShnKr+dEBt8WXBWyhLN8
-   /fLh0szNii26hkLRaPKXO6uVN69R/1Qu6mq3VsA7WoZjITGVQ/4KfwSEh
-   Tx20nbnUz7LBt77v0lCZlkqkIxxaMcIvnavra5GCqVZr7Gu84achFViyi
-   BP6MehpdqPKuK9yOBRXJL34HuWBJHXz+71AwAlKWPVWPKlUnQf0+Cx3mD
-   A==;
-X-CSE-ConnectionGUID: nakI1TOtSbq7vvrPweHNuA==
-X-CSE-MsgGUID: v7Yp3wshSZOTKDGdNMzVxQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="88745806"
+  bh=9XI7vB+0OJRjYggT6bE/btEJW/0e/kC1khjIdnkgrRc=;
+  b=MBvL2Ua9Yk1BInlgt+YWY26OnQNg3N1CplfcNCPJg+ElNpCE9vhCsx8e
+   a/ufl1Rg2LSacMEJMDYHgimP5+j8Yk9hccjII61e+gNCm+31BzFJm8OmJ
+   ZURCaPlfZqbyoivSrhDwLaevXGKyrlbscr2JxcS7Zs7r4hjOG3FZi9OW/
+   NYWhgMnAMpbALowUaCEeyX1Yebgu2oOx7vieZlFWhC1uBnrp/jwYAuH60
+   x+9Mm6hz+2/Iz3eqJSGUWquAvDZMSioY3PceduOuEHtVfi0Wa/mYYB1en
+   YOFO/83f0LxWvHNWYpvCgj6Ty967C4eBCj6Mpnx950PWfVSx8t/oaexxH
+   Q==;
+X-CSE-ConnectionGUID: DfXAEdEpSKi77E2yxDA7pA==
+X-CSE-MsgGUID: YFDwxr65RfC2TXAo90dwfg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="88745810"
 X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
-   d="scan'208";a="88745806"
+   d="scan'208";a="88745810"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:42 -0800
-X-CSE-ConnectionGUID: YWZoxF6LTBW36s5Sr2mW/w==
-X-CSE-MsgGUID: EJd6BUxASYuNw1Bxptu99w==
+X-CSE-ConnectionGUID: Zfh5TzQVTgK6R48jzLbj6A==
+X-CSE-MsgGUID: 4zEi82FJSUOUGp+5STScvw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,271,1763452800"; 
-   d="scan'208";a="209605485"
+   d="scan'208";a="209605488"
 Received: from khuang2-desk.gar.corp.intel.com (HELO localhost) ([10.124.221.188])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:41 -0800
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 10:17:42 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org
 Cc: isaku.yamahata@intel.com,
@@ -68,9 +68,9 @@ Cc: isaku.yamahata@intel.com,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 13/32] KVM: nVMX: Handle virtual timer vector VMCS field
-Date: Tue,  3 Feb 2026 10:16:56 -0800
-Message-ID: <cde898b77379481886f7abb2b78dd32bba0b2ba1.1770116051.git.isaku.yamahata@intel.com>
+Subject: [PATCH 14/32] KVM: VMX: Make vmx_calc_deadline_l1_to_host() non-static
+Date: Tue,  3 Feb 2026 10:16:57 -0800
+Message-ID: <e1925ecd6e282f11efdd53e4de8ce759098135e2.1770116051.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1770116050.git.isaku.yamahata@intel.com>
 References: <cover.1770116050.git.isaku.yamahata@intel.com>
@@ -89,7 +89,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70046-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70047-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_FIVE(0.00)[6];
@@ -106,119 +106,124 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[isaku.yamahata@intel.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0E9E6DD866
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,intel.com:dkim,intel.com:mid]
+X-Rspamd-Queue-Id: 82037DD86D
 X-Rspamd-Action: no action
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Support virtual timer vector VMCS field.
-Opportunistically add a size check of struct vmcs12.
+Remove static from vmx_calc_deadline_l1_to_host() and declare in vmx.h.
+
+As nVMX APIC timer virtualization will use vmx_calc_deadline_l1_to_host(),
+make it available to nested.c.  Make u64_shl_div_u64() usable for X86_32
+that vmx_calc_deadline_l1_to_host() uses for both X86_32 and X86_64.
+Without this change, ARCH=i386 fails to compile.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c             | 15 ++++++++++++++-
- arch/x86/kvm/vmx/vmcs12.c             |  3 +++
- arch/x86/kvm/vmx/vmcs12.h             |  2 ++
- arch/x86/kvm/vmx/vmcs_shadow_fields.h |  1 +
- 4 files changed, 20 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 41 ++++++++++++++++++++++++-----------------
+ arch/x86/kvm/vmx/vmx.h |  2 ++
+ 2 files changed, 26 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 191317479d5e..5829562145a7 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -86,6 +86,15 @@ static void init_vmcs_shadow_fields(void)
- 			pr_err("Missing field from shadow_read_only_field %x\n",
- 			       field + 1);
- 
-+		switch (field) {
-+		case GUEST_APIC_TIMER_VECTOR:
-+			if (!cpu_has_vmx_apic_timer_virt())
-+				continue;
-+			break;
-+		default:
-+			break;
-+		}
-+
- 		clear_bit(field, vmx_vmread_bitmap);
- 		if (field & 1)
- #ifdef CONFIG_X86_64
-@@ -2539,7 +2548,8 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct loaded_vmcs *vmcs0
- 	if (cpu_has_tertiary_exec_ctrls()) {
- 		u64 ctls = 0;
- 
--		/* guest apic timer virtualization will come */
-+		if (nested_cpu_has_guest_apic_timer(vmcs12))
-+			ctls |= TERTIARY_EXEC_GUEST_APIC_TIMER;
- 
- 		tertiary_exec_controls_set(vmx, ctls);
- 	}
-@@ -2733,6 +2743,9 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
- 		vmcs_write64(EOI_EXIT_BITMAP3, vmcs12->eoi_exit_bitmap3);
- 	}
- 
-+	if (nested_cpu_has_guest_apic_timer(vmcs12))
-+		vmcs_write16(GUEST_APIC_TIMER_VECTOR, vmcs12->virtual_timer_vector);
-+
- 	/*
- 	 * Make sure the msr_autostore list is up to date before we set the
- 	 * count in the vmcs02.
-diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-index 2a21864a020a..3842ee1ddabf 100644
---- a/arch/x86/kvm/vmx/vmcs12.c
-+++ b/arch/x86/kvm/vmx/vmcs12.c
-@@ -3,6 +3,8 @@
- 
- #include "vmcs12.h"
- 
-+static_assert(sizeof(struct vmcs12) <= VMCS12_SIZE);
-+
- #define VMCS12_OFFSET(x) offsetof(struct vmcs12, x)
- #define FIELD(number, name)	[ROL16(number, 6)] = VMCS12_OFFSET(name)
- #define FIELD64(number, name)						\
-@@ -22,6 +24,7 @@ const unsigned short vmcs12_field_offsets[] = {
- 	FIELD(GUEST_TR_SELECTOR, guest_tr_selector),
- 	FIELD(GUEST_INTR_STATUS, guest_intr_status),
- 	FIELD(GUEST_PML_INDEX, guest_pml_index),
-+	FIELD(GUEST_APIC_TIMER_VECTOR, virtual_timer_vector),
- 	FIELD(HOST_ES_SELECTOR, host_es_selector),
- 	FIELD(HOST_CS_SELECTOR, host_cs_selector),
- 	FIELD(HOST_SS_SELECTOR, host_ss_selector),
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index db1f86a48343..d8e09de44f2a 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -191,6 +191,7 @@ struct __packed vmcs12 {
- 	u16 host_gs_selector;
- 	u16 host_tr_selector;
- 	u16 guest_pml_index;
-+	u16 virtual_timer_vector;
- };
- 
- /*
-@@ -373,6 +374,7 @@ static inline void vmx_check_vmcs12_offsets(void)
- 	CHECK_OFFSET(host_gs_selector, 992);
- 	CHECK_OFFSET(host_tr_selector, 994);
- 	CHECK_OFFSET(guest_pml_index, 996);
-+	CHECK_OFFSET(virtual_timer_vector, 998);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index dc6b6659a093..41c94f5194f6 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8218,25 +8218,32 @@ int vmx_check_intercept(struct kvm_vcpu *vcpu,
+ 	return X86EMUL_INTERCEPTED;
  }
  
- extern const unsigned short vmcs12_field_offsets[];
-diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-index cad128d1657b..db1558d11c4c 100644
---- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-+++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-@@ -34,6 +34,7 @@ BUILD_BUG_ON(1)
- /* 16-bits */
- SHADOW_FIELD_RW(GUEST_INTR_STATUS, guest_intr_status)
- SHADOW_FIELD_RW(GUEST_PML_INDEX, guest_pml_index)
-+SHADOW_FIELD_RO(GUEST_APIC_TIMER_VECTOR, virtual_timer_vector)
- SHADOW_FIELD_RW(HOST_FS_SELECTOR, host_fs_selector)
- SHADOW_FIELD_RW(HOST_GS_SELECTOR, host_gs_selector)
+-#ifdef CONFIG_X86_64
+ /* (a << shift) / divisor, return 1 if overflow otherwise 0 */
+ static inline int u64_shl_div_u64(u64 a, unsigned int shift,
+ 				  u64 divisor, u64 *result)
+ {
+-	u64 low = a << shift, high = a >> (64 - shift);
++	u64 high = a >> (64 - shift);
++#ifdef CONFIG_X86_64
++	u64 low = a << shift;
++#endif
  
+ 	/* To avoid the overflow on divq */
+ 	if (high >= divisor)
+ 		return 1;
+ 
++#ifdef CONFIG_X86_64
+ 	/* Low hold the result, high hold rem which is discarded */
+ 	asm("divq %2\n\t" : "=a" (low), "=d" (high) :
+ 	    "rm" (divisor), "0" (low), "1" (high));
+ 	*result = low;
++#else
++	*result = mul_u64_u64_div_u64(a, 1ULL << shift, divisor);
++#endif
+ 
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_X86_64
+ int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+ 		     bool *expired)
+ {
+@@ -8314,7 +8321,21 @@ void vmx_cancel_apic_virt_timer(struct kvm_vcpu *vcpu)
+ 	tertiary_exec_controls_clearbit(to_vmx(vcpu), TERTIARY_EXEC_GUEST_APIC_TIMER);
+ }
+ 
+-static u64 vmx_calc_deadline_l1_to_host(struct kvm_vcpu *vcpu, u64 l1_tsc)
++void vmx_set_guest_tsc_deadline_virt(struct kvm_vcpu *vcpu,
++				     u64 guest_deadline_virt)
++{
++	vmcs_write64(GUEST_DEADLINE_VIR, guest_deadline_virt);
++	vmcs_write64(GUEST_DEADLINE_PHY,
++		     vmx_calc_deadline_l1_to_host(vcpu, guest_deadline_virt));
++}
++
++u64 vmx_get_guest_tsc_deadline_virt(struct kvm_vcpu *vcpu)
++{
++	return vmcs_read64(GUEST_DEADLINE_VIR);
++}
++#endif
++
++u64 vmx_calc_deadline_l1_to_host(struct kvm_vcpu *vcpu, u64 l1_tsc)
+ {
+ 	u64 host_tsc_now = rdtsc();
+ 	u64 l1_tsc_now = kvm_read_l1_tsc(vcpu, host_tsc_now);
+@@ -8354,20 +8375,6 @@ static u64 vmx_calc_deadline_l1_to_host(struct kvm_vcpu *vcpu, u64 l1_tsc)
+ 	return host_tsc;
+ }
+ 
+-void vmx_set_guest_tsc_deadline_virt(struct kvm_vcpu *vcpu,
+-				     u64 guest_deadline_virt)
+-{
+-	vmcs_write64(GUEST_DEADLINE_VIR, guest_deadline_virt);
+-	vmcs_write64(GUEST_DEADLINE_PHY,
+-		     vmx_calc_deadline_l1_to_host(vcpu, guest_deadline_virt));
+-}
+-
+-u64 vmx_get_guest_tsc_deadline_virt(struct kvm_vcpu *vcpu)
+-{
+-	return vmcs_read64(GUEST_DEADLINE_VIR);
+-}
+-#endif
+-
+ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index cb32d0fdf3b8..28625a2d17bd 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -405,6 +405,8 @@ static inline void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu,
+ u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
+ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+ 
++u64 vmx_calc_deadline_l1_to_host(struct kvm_vcpu *vcpu, u64 l1_tsc);
++
+ gva_t vmx_get_untagged_addr(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
+ 
+ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
 -- 
 2.45.2
 
