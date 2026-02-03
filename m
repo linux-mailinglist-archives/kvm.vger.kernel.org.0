@@ -1,191 +1,201 @@
-Return-Path: <kvm+bounces-69964-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-69965-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBIsO99OgWlMFgMAu9opvQ
-	(envelope-from <kvm+bounces-69964-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 02:26:55 +0100
+	id APdoDtlYgWkFFwMAu9opvQ
+	(envelope-from <kvm+bounces-69965-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 03:09:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EF6AD35E8
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 02:26:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E44D3A09
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 03:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24E13305583C
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 01:24:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 225FA3034CB1
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 02:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A97822D4DC;
-	Tue,  3 Feb 2026 01:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298242F25E4;
+	Tue,  3 Feb 2026 02:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="WXlwHa6B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnkjjblp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF9A3B1BD;
-	Tue,  3 Feb 2026 01:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05994202C48
+	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 02:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770081859; cv=none; b=tWJBfQ07lEwxHvIA05iKYqGHWZJbdsOqHwEudKfk6DT55gvTG6WuSy0eXGXf/BWov748/hCSJ0s3f9zA1fyHd/VnMiNA5Q2WiTRQcJR/uyTA2bM39Ud6g+j1pBygfZLhw9yZyDtdQETIld61Z7TsiVRFp0yHs/edQxGqLa/+c1U=
+	t=1770084564; cv=none; b=K41gR8bOE+VN0hEi9JcIqKiSd6x2XaVkUEyq33nSYNXcWQbflc9PVTc03uQRAYCwwnmhtKrvQy5ufJaQI9p1/SY9hBbgo2ei+EtzPkSIktejXTw+aYhw5sdiyhx3D/C9Ps5h1uJcVytsowqmI0kXmpzt6KLQCOvx+ipr8mmwhzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770081859; c=relaxed/simple;
-	bh=h+6I+BL4iHOXIFHjt9HIZpkeu7KhFs4lJ7XJ+EUajCA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=Mwuj89lnd5Obj3eKRv5eR6L2fbZ5s3gpvVkadx9j1tvc6T4Cj9TzEhRCxvbONJD8hAIQ8jGEhc4NASEMQyux3WztZilFI+PcsAq8teciGz72SH6jqQur2Wgh04Q6t4CxTUiXKCyleRlUkSIPGl5ClbaFf5tfeG/xAYx8sKJeVVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=WXlwHa6B; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6130c1Il791433;
-	Mon, 2 Feb 2026 17:24:11 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=s25T3k7r0JOjMjHsLR
-	MlMb86LHiB76Nx3BRCScyA5Q0=; b=WXlwHa6BCiuvqGyjKC57K0I/cVdXYEqfc5
-	SxC409eY53wKo3daVvPhx7purcOzoawcDUGfEAXNY1XtqJWtZx6Za1qyXHRNQxjR
-	6WiBURao49BxfvwPku7KmOutUhATPhVrirsO0R4zwGwFLBdYJa0/L/lD6GiU5rdF
-	Xss1+NE+KfPrZ51VNlGNwD8R1gKCmGcrFhImKMROtKrqHF0nz6pMqq+8e35N8DnA
-	BCCbqz92O7in8ba2dzhCh4IG45WRuEZM+cSwLOFgJRMK4xna7Dqoak/fDuL9Q1JE
-	NRIpi4F11yQs9hLYlfNgngxExKOYoju3Med2prXX1li0Z46kvqzQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c36n2gcrq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 02 Feb 2026 17:24:10 -0800 (PST)
-Received: from devvm6375.cco0.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Tue, 3 Feb 2026 01:24:10 +0000
-From: Ted Logan <tedlogan@fb.com>
-Date: Mon, 2 Feb 2026 17:23:53 -0800
-Subject: [PATCH v2] vfio: selftests: only build tests on arm64 and x86_64
+	s=arc-20240116; t=1770084564; c=relaxed/simple;
+	bh=ypMYOOumJWM4wC5+SVLY8/RCJmTGOmMXqKL4Fpcmjww=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=epaMefjaVY0muKPTk6iw80ruJAu4ihm7RggcwHuTv43nfraron1Ymh8b4Z6KrjPuYAg//E2FRVqCjH12mgGbgtTeCXHbyt2n0K7DQLlmZFEREig0Vu3SeS1ZWTwueRzu17C3MoFxuJSoNz3n+5gcMR/c5fcYSIocV6ZHyJcM33A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnkjjblp; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a7bceb6cd0so35254515ad.1
+        for <kvm@vger.kernel.org>; Mon, 02 Feb 2026 18:09:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1770084562; x=1770689362; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g2VTRusWSqFGE8R7XPvl8IYHFzaZordoFa2VsjIg2LQ=;
+        b=cnkjjblpj1FwcEMybPbDWvHtjkxGnCXCC6ygEGl+9TkMOY/noexQk9TbQjGBncGt1s
+         /so2ENsHG4Q+f2LvSJ0/r+cRqN8g7lxS2mo+67EuDV4P51fq3bkKieJWnbN1tB3fIqwb
+         wVXcPSgw10mRqdEerp5bsVN5ap0irXtmT+cTbjuXEeOuErf7GVu2snu5vajIeD3oI4yv
+         HhPK79No7y4/OYwfZMArkLXNXRxX/g3+rv7RF5uSnpwsURYsqAmHGpJXqol65bTv3X17
+         EhBnhS6rrJvl3J6Lnh5vOY/n+MHyWUxdPj2tkZxGrsKQiCzEqgWdmClyq1hcpB7k7V0J
+         Hk+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770084562; x=1770689362;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g2VTRusWSqFGE8R7XPvl8IYHFzaZordoFa2VsjIg2LQ=;
+        b=cH4/9aV97DYlQb2E/slSY+adCzStV7i6vnmEbnaMHzlW+ZLIdRgJ8Pw+TkL4axjYk3
+         D+J+gu7o7xRYlcSSX3AEy//wpQWqfs3nxBRJjBtYHjT4pQzoi2eQ4w15h/oF1FRVqa/W
+         U9MAsq+a7CHWA/78ng0Ig17FgZIgE5i7e7h4M3610xDKl93LZdnSLcmubsfQxSWsTysY
+         eULI9Z468pXoQEulaXfQrbAFGJmG6kDqXwYrp97BA8IBhzgb6u0pKFSDlngu4JFR2wNy
+         zyt7Z2XJLKW8KueFy/YBa2VyyFM0FnyQUViunHb8Fpp5CcXpAFZPcIA1A6hgXpa5I1h2
+         UZnw==
+X-Gm-Message-State: AOJu0Yw5oX9OHoo+v0sITZeUVNFzRmhll4AZmms8kD+kYQqUnO36tnD/
+	gyok1VOT4vt256WhMi9RiP0I8UXY13Uw0J0PVXFtIKp8gdgF+NIsqGOJ
+X-Gm-Gg: AZuq6aKR/O41QB81S3ckZ3dygavOMSIB+029z4TOG4dnqr7AMhcE5Ee5ctXgLJbOuAn
+	CW7TlT5D6n9GBKMNxJ7bUEoxI7LFGrlIz9lxsW0jYYntUygXndCjIIqsf+USPuRPmzeISNWVj9f
+	Kl01WpqBIO1o06dyIPbvoCHWbSNV0xsbharAqsS5/VL8sQYfeEk9G63WYDvHviS7D7W5KO9Aksc
+	69JUYiHeSiWQI7zeWdM8DQGt+5RQ3CH6wG3vobYTaAoDiIR7EmBFOcoKvf2lcWPulvbZCqFL3G1
+	0EcCql7iaMIussjuV1PaIu0m3KSoXyJDIK7jGdbxkAN5JOFDsBm9TK04RIDpfKYIV7a0qpa6qhk
+	i9JvpH1n9rfCM5sCRVLIu74di74hGyR7fSpDLuVW3TUlvHEBmctaoCTZuNstLxmG2qJ6Hc0IqyD
+	ASapIyH5uzjGztnbOgZTodjU3esmsX2oojFEbQT/H6ZhbYEkC/Q9rpvOV1ppTInZt8UDY=
+X-Received: by 2002:a17:903:3d54:b0:2a2:bff6:42f5 with SMTP id d9443c01a7336-2a8d959aa61mr78235515ad.8.1770084562152;
+        Mon, 02 Feb 2026 18:09:22 -0800 (PST)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:210f:e92c:6af6:77e9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a88b4173ccsm160333195ad.34.2026.02.02.18.09.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Feb 2026 18:09:21 -0800 (PST)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com,
+	Deepanshu Kartikey <Kartikey406@gmail.com>
+Subject: [PATCH] KVM: guest_memfd: Reject large folios until support is implemented
+Date: Tue,  3 Feb 2026 07:39:13 +0530
+Message-ID: <20260203020913.100838-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260202-vfio-selftest-only-64bit-v2-1-9c3ebb37f0f4@fb.com>
-X-B4-Tracking: v=1; b=H4sIAClOgWkC/42NQQ6CMBBFr0Jm7Zi2VgRX3sOwoGUqkyAlbdNIC
- He3cgKX7yX//Q0iBaYI92qDQJkj+7mAOlVgx35+EfJQGJRQtZAXgdmxx0iTSxQT+nlasdaGE2q
- lrrIxA5n+BmW+BHL8OdLPrvDIMfmwHk9Z/uwf0SxR4tC0vRWt1lbIhzNn69/Q7fv+BcYqSW+9A
- AAA
-To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>,
-        Shuah Khan <shuah@kernel.org>
-CC: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, kernel test robot <lkp@intel.com>,
-        Ted Logan
-	<tedlogan@fb.com>
-X-Mailer: b4 0.13.0
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAzMDAwOCBTYWx0ZWRfX4TIj+Yu2tXA5
- Nv6dYxkv0I35+Hg4G98OAeAlfXKyR6o3ayisqg4w/cjD12xVmLrIaD9MmZWt49CUnjE5YDWtI+I
- sl/RFht41d80r46b8GHSoD9i43bs5f4rsH06bvOFRcJqNaQjDGnEndmQpOO40S7Bta5TXzpenoY
- dMe6YpSv3NdeUP3PyE03ONV68H2xJmSCGi34D84uLEAUNlvl8LT327JaKPOB9pu30rv1u29Vsyo
- xou+Cg1QUdLYdvEb3vXcLNkRRxs1A+H6i3vn5TdG6QE7o40ADajb34GmlUwsme9q3mzi6ItG6In
- v8iGV0ABA1iex/oNQ1SMvetxKzsMzPWqbpOl3K58IWVI/pvj+/IbIDS3b+OQiMIJ8dj8Lt8p2k4
- WtE9bqrxse8BnAzLr1Qf+Ewn2J96f/UXTCDfMvLj7njhB/m3LzL4IziZ+E5Qy9/NJrw/y4LTl11
- MJFrYtolarZih8k2Jmw==
-X-Proofpoint-ORIG-GUID: CBxq1KeonE8ZAXep-AKoNOM9VZeuS8zc
-X-Proofpoint-GUID: CBxq1KeonE8ZAXep-AKoNOM9VZeuS8zc
-X-Authority-Analysis: v=2.4 cv=IM0PywvG c=1 sm=1 tr=0 ts=69814e3a cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=FOH2dFAWAAAA:8 a=bS1NuYFVCXJi6kBHAy0A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-02_05,2026-02-02_01,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fb.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[fb.com:s=s2048-2025-q2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[fb.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-69964-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tedlogan@fb.com,kvm@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,syzkaller.appspotmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-69965-lists,kvm=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kartikey406@gmail.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm,33a04338019ac7e43a44];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fb.com:email,fb.com:dkim,fb.com:mid]
-X-Rspamd-Queue-Id: 4EF6AD35E8
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: A9E44D3A09
 X-Rspamd-Action: no action
 
-Only build vfio self-tests on arm64 and x86_64; these are the only
-architectures where the vfio self-tests are run. Addresses compiler
-warnings for format and conversions on i386.
+Large folios are not yet supported in guest_memfd (see TODO comment
+in kvm_gmem_get_folio()), but can still be allocated if userspace
+uses madvise(MADV_HUGEPAGE), which overrides the folio order
+restrictions set by mapping_set_folio_order_range().
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202601211830.aBEjmEFD-lkp@intel.com/
-Signed-off-by: Ted Logan <tedlogan@fb.com>
+When a large folio is allocated, it triggers WARN_ON_ONCE() at line
+416 in kvm_gmem_fault_user_mapping(), causing a kernel panic if
+panic_on_warn is enabled.
+
+Add mapping_set_folio_order_range(0, 0) as defense in depth, and
+actively check for large folios in kvm_gmem_get_folio() on both
+the fast-path (existing folio) and slow-path (newly created folio).
+If a large folio is found, unlock it, drop the reference, and return
+-E2BIG to prevent the WARNING from triggering.
+
+This avoids kernel panics when panic_on_warn is enabled.
+
+Reported-by: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=33a04338019ac7e43a44
+Fixes: b85524314a3d ("KVM: guest_memfd: delay kvm_gmem_prepare_folio() until the memory is passed to the guest")
+Tested-by: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com
+Signed-off-by: Deepanshu Kartikey <Kartikey406@gmail.com>
 ---
-Do not build vfio self-tests for 32-bit architectures, where they're
-untested and unmaintained. Only build these tests for arm64 and x86_64,
-where they're regularly tested.
+ virt/kvm/guest_memfd.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-Compiler warning fixed by patch:
-
-   In file included from tools/testing/selftests/vfio/lib/include/libvfio.h:6:
-   tools/testing/selftests/vfio/lib/include/libvfio/iommu.h:49:2: warning: format specifies type 'unsigned long' but the argument has type 'u64' (aka 'unsigned long long') [-Wformat]
-      49 |         VFIO_ASSERT_EQ(__iommu_unmap(iommu, region, NULL), 0);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:32:37: note: expanded from macro 'VFIO_ASSERT_EQ'
-      32 | #define VFIO_ASSERT_EQ(_a, _b, ...) VFIO_ASSERT_OP(_a, _b, ==, ##__VA_ARGS__)
-         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   tools/testing/selftests/vfio/lib/include/libvfio/assert.h:27:22: note: expanded from macro 'VFIO_ASSERT_OP'
-      26 |         fprintf(stderr, "  Observed: %#lx %s %#lx\n",                           \
-         |                                              ~~~~
-      27 |                         (u64)__lhs, #_op, (u64)__rhs);                          \
-         |                                           ^~~~~~~~~~
----
-Changes in v2:
-- Add white space around arch checks
-- Clean up uname command
-- Link to v1: https://lore.kernel.org/r/20260130-vfio-selftest-only-64bit-v1-1-d89ac0944c01@fb.com
----
- tools/testing/selftests/vfio/Makefile | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
-index ead27892ab65..8e90e409e91d 100644
---- a/tools/testing/selftests/vfio/Makefile
-+++ b/tools/testing/selftests/vfio/Makefile
-@@ -1,3 +1,10 @@
-+ARCH ?= $(shell uname -m)
-+
-+ifeq (,$(filter $(ARCH),arm64 x86_64))
-+# Do nothing on unsupported architectures
-+include ../lib.mk
-+else
-+
- CFLAGS = $(KHDR_INCLUDES)
- TEST_GEN_PROGS += vfio_dma_mapping_test
- TEST_GEN_PROGS += vfio_dma_mapping_mmio_test
-@@ -28,3 +35,5 @@ TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_PROGS_O) $(LIBVFIO_O))
- -include $(TEST_DEP_FILES)
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index fdaea3422c30..ee5bcf238f98 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -143,13 +143,29 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+ 	folio = __filemap_get_folio(inode->i_mapping, index,
+ 				    FGP_LOCK | FGP_ACCESSED, 0);
+ 	if (!IS_ERR(folio))
+-		return folio;
++		goto check_folio;
  
- EXTRA_CLEAN += $(TEST_GEN_PROGS_O) $(TEST_DEP_FILES)
-+
-+endif
-
----
-base-commit: c3cbc276c2a33b04fc78a86cdb2ddce094cb3614
-change-id: 20260130-vfio-selftest-only-64bit-422518bdeba7
-
-Best regards,
+ 	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
+ 	folio = __filemap_get_folio_mpol(inode->i_mapping, index,
+ 					 FGP_LOCK | FGP_ACCESSED | FGP_CREAT,
+ 					 mapping_gfp_mask(inode->i_mapping), policy);
+ 	mpol_cond_put(policy);
++	if (IS_ERR(folio))
++		return folio;
++check_folio:
++	/*
++	 * Large folios are not supported yet. This can still happen
++	 * despite mapping_set_folio_order_range() if userspace uses
++	 * madvise(MADV_HUGEPAGE) which can override the folio order
++	 * restrictions. Reject the large folio and remove it from
++	 * the page cache so the next fault can allocate a order-0
++	 * page instead.
++	 */
++	if (folio_test_large(folio)) {
++		folio_unlock(folio);
++		folio_put(folio);
++		return ERR_PTR(-E2BIG);
++	}
+ 
+ 	return folio;
+ }
+@@ -596,6 +612,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 	inode->i_mode |= S_IFREG;
+ 	inode->i_size = size;
+ 	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
++	mapping_set_folio_order_range(inode->i_mapping, 0, 0);
+ 	mapping_set_inaccessible(inode->i_mapping);
+ 	/* Unmovable mappings are supposed to be marked unevictable as well. */
+ 	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
 -- 
-Ted Logan <tedlogan@fb.com>
+2.43.0
+
 
 
