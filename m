@@ -1,405 +1,276 @@
-Return-Path: <kvm+bounces-70029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70030-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKZxEkw5gmmVQgMAu9opvQ
-	(envelope-from <kvm+bounces-70029-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:07:08 +0100
+	id UGjmM3Q5gmmVQgMAu9opvQ
+	(envelope-from <kvm+bounces-70030-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:07:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A610BDD4FE
-	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:07:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F85BDD522
+	for <lists+kvm@lfdr.de>; Tue, 03 Feb 2026 19:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 15A5E30804FF
-	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:03:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED54A30832E8
+	for <lists+kvm@lfdr.de>; Tue,  3 Feb 2026 18:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E0338E5C6;
-	Tue,  3 Feb 2026 18:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A11E3A4F23;
+	Tue,  3 Feb 2026 18:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2/HkZ3/b"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ljHGOxDm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012008.outbound.protection.outlook.com [52.101.48.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9168233E377
-	for <kvm@vger.kernel.org>; Tue,  3 Feb 2026 18:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770141819; cv=none; b=E6Fwpk5A/X+GeeOPlHexYBmOxiw/h4RJ/JgtHSE88hUfH/AbePzfukQmuRFhEiVkpjTqyi5D84B9X+CHFoWVmyMMQmgNazFZnhebFLntV1IljN4Nez+JPDwxLvo89FLBsnXJCnpePOJkMdq4BBo39QOMQnoTOkKvB83GQtaNknI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770141819; c=relaxed/simple;
-	bh=pM2rS/12lrlG+2AZ8m3xfZwPCId4Ey85d1MGnj91250=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MWgJl1DwvMAPPf67NOig+AH643hYpRbd8XXQlJNjGNcd4LewUjCxPc24HLenmP53/QXiXORrfaw2Qu5aC0z7hO3Dz1COIk1BnPDDEGnXyOcYeP2O1HfTXZRRUs7moLLN5KEVYT7lfmhbK2akG0kxSlldmJpSKzw1Gcds/dqku7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2/HkZ3/b; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34ec823527eso10895551a91.2
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 10:03:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770141817; x=1770746617; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6XX4eVdJLaAaJXlWOLoKv/kWDfHyar969ebQM03BmoQ=;
-        b=2/HkZ3/bBkvSf9OQIzBeIooL8LYGPDMJcqK3F5zP6CSLdutZ2MtD0Xuvj3FoKKeJlb
-         q3I98fx1UVUbqMC07t7Fm74soz5S3k8lIiu8Z7tWzwsEqlqvYcgnmUD03x8Wsm9+u59w
-         F/1ekuUtn9PUDnHK8up221WSE8oeFNDXUbAl1qCVckUj8QMuzh9xFDpQE//ZYxEEZq5+
-         OSh/AuWEQl6hLsirUwA153PJuyYKJ+hN7cLM5JxCIsGDkmkkLqsdMW2s0wOY0/qvyATH
-         Q7dr3Nb67bgQeNenqRQyn1dSCCFJOhP8jrk8BMvPxl9bJm8yC/MvaalAgu3S66zp3n+9
-         tXSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770141817; x=1770746617;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6XX4eVdJLaAaJXlWOLoKv/kWDfHyar969ebQM03BmoQ=;
-        b=bQ9GL+39h0ZjC/fqXyGsLCRAmHv8nI27PqEMGeR1b5Ow4rN//hfWV1sFQdEcTFww90
-         l62eKEchBxLa5kpu9ZDl0tTqqe0rYRwFdlW77KQSbwMEXHg1Y60iEWv6ZOMn5Y2Nk8F0
-         lGNHBa3Q+U9bsRpQvAWqaIcFMbSuGibMwk7eld7e1zLHv3N0Gs8QUHFjD8c8k/DGeZPy
-         UFIdor7607yJjdMI70wOKaqOCl0YGxKIyiMU2m4Ih9Xw+gVfxOkEn8Oc3mBU6yaDY9K6
-         BhtRMrvtdGnIlWOp0HOyMeiw+OJk85aRIS3HmrxDWH/ATXz9OFYh8g5IEnUa/yaoKtua
-         YiUA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTWFlMrW3FV5dXeY+I6gbz8uqsQcCnu77hT4nqAK2pXGKnMGaTWOFs8jxlo9yjvQj6gRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQFq1mW9X61px9xHN21fQI9rWVjXSwRGZ1DlbIrkMGk1cHC2m2
-	QESvua8vTqsRxOTyPYKPUaFNDmbK8ojCC6qOEA0l4L9sh6+VoQvIIJHE7b3rCNhevsDr//g5Tly
-	nJXJr1g==
-X-Received: from pjsg5.prod.google.com ([2002:a17:90a:7145:b0:352:d19a:6739])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2752:b0:340:ff7d:c26
- with SMTP id 98e67ed59e1d1-354870da124mr148942a91.16.1770141816880; Tue, 03
- Feb 2026 10:03:36 -0800 (PST)
-Date: Tue, 3 Feb 2026 10:03:35 -0800
-In-Reply-To: <i4xpbma5acebgissizta7abydnwdn2hbdhgqxnb5gyxsjnx6q7@5ayraj5trdtl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1E8275B0F;
+	Tue,  3 Feb 2026 18:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770142051; cv=fail; b=jMh5kPA3zlOf8+MmUkxuoUSFoNpoxB6ANjTxjB7TjE9GOgoCqxm6+4SXhEcz713PIMBC9LTTWAP6LdWOdTFNGaq3xqGz/tmilwc+iyRjHpqLXsNm9rqzxm8tAxb8aHvQ8i5oUqdfs8G93l4I7TlTbEs5quDmZMxfWL6YxcrVhKk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770142051; c=relaxed/simple;
+	bh=SvKCg/n57GrZj7JPJ1rNsgCtOxi5zln8z3t6cojBjus=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=EZFV40TDbaxCkmOvvvU6BT5Pct7PeDDYJOsRLBUIri1NTgp/t6MX7+D4gFPn1NmVm48QJXis8rbsB4EQivdRaaU+raV79rSYs0tg4KddZUCMZQvf/jOVQlo/7jYDpu092vpTdkRnzwVOyJ7JX5LWwkcTgXFF7Zs9+HAF/45FE4I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ljHGOxDm; arc=fail smtp.client-ip=52.101.48.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jV+VaQ4Jh8QHTaMpSOR80Rb63+NfEwF3kNnoJsSrQLsGrXKs9uRmS2c52rNhp2HHRiki+aM8qbW7di2QV5R41qrO59JDu20fbHcIs7NE6uGXeYyu1ArZDDqF1PtHxaCJc1BvGzkbaxfJo8xzfOrNxXESulb9pdXxguMfQiy6dOefzORmxNqV0gDHqKZmc1C1IJr2t8v+Ja4/sNu65nMp8G8QCTiILu9kmzEENIHZPQ5SL3rzwTpEgyEDiYh/jbxN6JsIMWV4PQyE7s2Br1vPQRKpVMPM1ExCfBRjJgi9SDdO8r2pxPTU4KFlhpDRneJeZNOVYdPYXtn30M1PKBfGCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pMX1Rm/Lx/s1MZTwDD1lvbG96QRHq+oQv9rLAHe2Z1Q=;
+ b=Pz7cuV4+r41NgVVPIsC4YJuTD/GE/stIM3/+9/4cm5S1KphNOWyNpVa4p8fZBkIG0V+GNvGUI8dYNrM/rK1LrDV9OYIeDglxd5zYPbdjqmBFE7U0HNe7zbCRypFj/iM5DqeP1WqvMg06nuZzZTLWReVI70zv6p9bPzuacK/26Fuu4EN0LpK2EULk7Bacz9VxMyLxPlpW0bfU74X4IYwsyqshMyDsYMmfUL0RWZFE+oZBx/+WgX7vlsZTATvEvzendsroD70cO9nNZC4sce+50lQTvmxyk1FnWqzgnmf757KrGkv0ROnxKD8l6ir3LniyoJRlqG9juUptRPnhA/izZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pMX1Rm/Lx/s1MZTwDD1lvbG96QRHq+oQv9rLAHe2Z1Q=;
+ b=ljHGOxDmFiT3hfYEiwUy6BwklAOkQ9AN6tySpUuLH6gtUNVlvMyhLW44+37OLzEBFHYLyZyb6pKInw8RD4EpWtnLge6aebczSpKlcDxw2ySGMVl2Ss2i761d/A6cub021pW+dvpAj2zLJQmeewIqkDAiw36+D4JpHt3J0WyH1B1WhndpCutr2L43VZdg2cAaN2cLbitfWqeTpfCXHOdfBKEUFgslToDAGVHyDrIq68kp1tcBrwHTQCQ5er3/9cTI48f25w5o++yGeqfirNkpf4blFjZYBUMV/ULU+EaFihpw6m3Nk6rWaoQOo9IbLINoMLq5VF1G1KbP03kRM0X74Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com (2603:10b6:408:2a1::19)
+ by DS0PR12MB999106.namprd12.prod.outlook.com (2603:10b6:8:301::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Tue, 3 Feb
+ 2026 18:07:26 +0000
+Received: from LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528]) by LV8PR12MB9620.namprd12.prod.outlook.com
+ ([fe80::299d:f5e0:3550:1528%5]) with mapi id 15.20.9587.010; Tue, 3 Feb 2026
+ 18:07:26 +0000
+Date: Tue, 3 Feb 2026 14:07:25 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm@vger.kernel.org, iommu@lists.linux.dev, chleroy@kernel.org,
+	mpe@ellerman.id.au, maddy@linux.ibm.com, npiggin@gmail.com,
+	alex@shazbot.org, joerg.roedel@amd.com, kevin.tian@intel.com,
+	gbatra@linux.ibm.com, clg@kaod.org, vaibhav@linux.ibm.com,
+	brking@linux.vnet.ibm.com, nnmlinux@linux.ibm.com,
+	amachhiw@linux.ibm.com, tpearson@raptorengineering.com
+Subject: Re: [RFC PATCH] powerpc: iommu: Initial IOMMUFD support for PPC64
+Message-ID: <20260203180725.GD3931454@nvidia.com>
+References: <176953894915.725.1102545144304639827.stgit@linux.ibm.com>
+ <20260127191643.GQ1134360@nvidia.com>
+ <2127b181-2c3a-4470-9b79-b508a18275c9@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2127b181-2c3a-4470-9b79-b508a18275c9@linux.ibm.com>
+X-ClientProxiedBy: BL1P223CA0033.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:5b6::8) To LV8PR12MB9620.namprd12.prod.outlook.com
+ (2603:10b6:408:2a1::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260203011320.1314791-1-yosry.ahmed@linux.dev>
- <aYIebtv3nNnsqUiZ@google.com> <i4xpbma5acebgissizta7abydnwdn2hbdhgqxnb5gyxsjnx6q7@5ayraj5trdtl>
-Message-ID: <aYI4d0zPw3K5BedW@google.com>
-Subject: Re: [PATCH] KVM: nSVM: Use vcpu->arch.cr2 when updating vmcb12 on
- nested #VMEXIT
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR12MB9620:EE_|DS0PR12MB999106:EE_
+X-MS-Office365-Filtering-Correlation-Id: 467e179a-9a7a-48de-b324-08de634f1647
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VkJQVWpuL2pSSHJoek5qYWdRNVBVUFE0ZERHQ1Z6SUJVc1RJL2VDeHVrVkJn?=
+ =?utf-8?B?MGlBN0FiUncwcjduYnFJeGVQbzVoem8zUVE4N2t1NzExVjE3c0pzeVd1WjZK?=
+ =?utf-8?B?UmpXSFdnOCszQSt5WHBXbVJaTG5Da1F4K2paOC9wOEtlN1RDc2Rnem9SZitF?=
+ =?utf-8?B?S0lNWW0xYk9DUnNVb1U0Q0hZNEx6bkY5YzkwOTJxQS9odjhoTFNNN2NXYlFm?=
+ =?utf-8?B?MnluU1liYUVWcWFweGxQZEw1N212TUwzOHY5SDNtZUt3dEpFSWNLd0lZR2h0?=
+ =?utf-8?B?OG9aMGVNTGpVREtkd21uMnRIUUNlQ0RDVml1bEszalRrZS9jYlh2dGNOOGdY?=
+ =?utf-8?B?T1JOUFBpZGhWS3lWSDN3Qk1zSnlybHFKSTFCMlUxaFYxV1diQkx5MG9XU2JB?=
+ =?utf-8?B?TXVIUTRueUFBbGt5YVdHMTJPYW4vK1RkUnV1T2VHbFpSZ3JwcVR0RlpldmVK?=
+ =?utf-8?B?Yk9XTkwxNHpzR3hQZm0vNlIyUjV4SkJkWnYzMzV1ZFg3ZkFxRnBYckRvQUlF?=
+ =?utf-8?B?MWFoOE5oUDk2cVRRYnRDUlZETW9sMEtPSHBpWGRMbG8xdDNjSTlSSkQyeVJ2?=
+ =?utf-8?B?MWpCZGY2M2huOWxyQmVPYWttTElKaXlaQVIzeGVwenEwSHU0bGdqY2J5d09v?=
+ =?utf-8?B?Y0tmYzRBNEZzQ1ZrYU1BckJDbXpJMkMxdlB5RjltUm9QSEQ1dWRGMGU2Z0M5?=
+ =?utf-8?B?cUdHa2R1bURBMStTazh1anRNYUc5c01IY3l1UTFDTnFVYTVKNUw2ZXcrV3Nh?=
+ =?utf-8?B?Nit2TE5iMEZFZlN6ME1uU2ZvT3k5R09yTVJBeDhsNEhtbllucGtONnpTRFht?=
+ =?utf-8?B?WGZRZ2dvVWlWdXN5dE8vZklBOUQ5ZGgxcld5b1prSXV2M3crK0xKc3dUZ0Ey?=
+ =?utf-8?B?b3JPUXJ1a1B2UzVwMVJYTjArbkpxRU1pMzhjbnV0NWxteURkZVp2b1JhU1ZX?=
+ =?utf-8?B?d3o2SHdERFFaWUtEdjVMNW12QytJSmYwVWZySE91dHE4YnJTenpLRmdxOGlp?=
+ =?utf-8?B?RGtabEsvSEFtQUpkdXk5WDgvMXFYU2JyNFVGaVRyanc2bm94S2s5dnZJZHVB?=
+ =?utf-8?B?RVhucjFNbXIyOHIvOXFrSUhWMkl1NmZoeklmU2RYMURzTVNqcXAzZ2oydmk5?=
+ =?utf-8?B?NGNaaStISGM4ZjNaaHM0ZG1UcGgwRnYwM2QrWjJlNkFhR25YUG5tRWl0UmFi?=
+ =?utf-8?B?YkJKa1IwSVB3NGNZRE5XYUVDMXI4cUZQSlVSbEJJZSt5dXgzVytWRzcwZ0g3?=
+ =?utf-8?B?YTRsYkZ4Q3BncjBERDlnano3eTIwekhzVlg3UXBrN3VGQmVBNzgySFBPRmE2?=
+ =?utf-8?B?QjJHYXZ3VFBjZ3VJYjR1L0JjRTVRSllTNVV5R1hRMGh3NnQ5eXBLRStjVkhM?=
+ =?utf-8?B?MHhFRDJtRUtiZGtsNUFWRUF4TGNRVXFFWVVVVmQyUWxxdU1zQldaQlQ2MndY?=
+ =?utf-8?B?eU94dlIrS3lxbjl1TmNKbXF4MWw3eW9tYm5xb3N5b3FrOGVLUm52Snp6WHRC?=
+ =?utf-8?B?NEx0eXZ2WEFrZlVna0Y4WWdFU1pud2xsNXZhNi9LYUw3N01wSEk2cjhKTDly?=
+ =?utf-8?B?QmEwRW04OGkrdTY0Q091aGMzaGNpaDF0dWFhUlNWQUU1c3ZxeWFsdUtYZlhk?=
+ =?utf-8?B?QWo4L0ZkSkJMemVQbFg4ZXpRT0pVNFF6L0RMUUhvTFVURk9BQU92MnY2UDFF?=
+ =?utf-8?B?Y1h3cSt4L2FpL0F3WjQxM3FxbVpYNjNlT0RUSWpxeFkzaElaSERzVTNZZXFi?=
+ =?utf-8?B?WTNaUDY3WXVYMUpoOXp4SzZkM3d6aTMzUEkvdFJ5Unl4V0k2NGxPcDRtRjl2?=
+ =?utf-8?B?aWUzY2tiU0xxaXNFL3lIZm9OcG14ODVmZ1IvWkoreGR3N2JPdzUrbEZtSERk?=
+ =?utf-8?B?M0JUV3NlUXdwVTNjc0Z1TTVsdHY3eWJwMkFkY2Nya2JoK291dVA1dk5UQTdo?=
+ =?utf-8?B?V3ROdGJzNGkrS2xYeTcwVmo0aDZyMTZoSkY2WFZJNEZNT0RxZHZGcjlMaXB4?=
+ =?utf-8?B?RFVWdVFwc281OGx1b3dXVDkwa1ZaZldFb1BGMkowOHBxckp3ZTFlajc4L3lH?=
+ =?utf-8?B?Z3NFUmppY3RxWkZjY0pCdmVIYWxEZnZaSVBITU9Bc2JrSU5IVU9JTU9JVlhX?=
+ =?utf-8?Q?cn7A=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR12MB9620.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YXY5TUJ1WHRSTFF1NGFnY1VMVHVSVHVxd3c3WjFlQStJYWw1VHY1Si91NW1T?=
+ =?utf-8?B?MW5uZjVoa2NFN0xpUDdINDBtOExYWDJ4WDZibnNWMHhnNmdsMDE2Nm9GZ0lM?=
+ =?utf-8?B?OHNxNjhmKzJwcVU4bnA2R1RJeUwyNEtGU2h1Ym1oMzNHdHY2S204UFRGWVlr?=
+ =?utf-8?B?a25HcHBXQXEyd2hPRnZsSUdPaHBFaWZwWnlDMEl1RVBqMElkOUdWLzlVMzdC?=
+ =?utf-8?B?VWVjNmV1UVVUa1ZFOVUreUtxOERGemtNWnVib0MwNVZGQTE5NzhZS2hIbjl6?=
+ =?utf-8?B?RnlHbUVLeC9YQkQzeEliOTd2UFRReUFUTFJvNHBwWXlWZ0dGZHpJNzUwWDZs?=
+ =?utf-8?B?VGxIMVgyT3NFV1JJdG53SmxDUEhidWxWQytEMGFaNmQ2akZRNE41SlVqc2R2?=
+ =?utf-8?B?S0JsV0N2ZGFud1gxdzZaQTNId0RYdjB5WHdDRUF6S1Y5KzVXZWNkSndBRURr?=
+ =?utf-8?B?VHpkNHJwbVVrdEdKakhmVitORllKZEdKN3dqWFZDMTRndlFwVnFLR2prOU1B?=
+ =?utf-8?B?dmQ4VXEzdllQUHJXNFE3M2J3NmdpNDYzcUtJcWN2a0RUT0dZRld5S3hRbis1?=
+ =?utf-8?B?bXFWU08zd3V2TW1hNkt6aGVXWFFPMGdsY3Z4amZJM1pmOFpkQ2pIWDZjZDcr?=
+ =?utf-8?B?WXBqQllmMmVzWlFOck1IQ0p0cnhZSUlnQklVb3hLRnpxaDFwN3ZCaE1hMkt5?=
+ =?utf-8?B?VHhyN3ZMZnc4R3hibnlrczEzRk5BRDdmVVdjN0FBdHhqckpqRTA4RzBKVHcz?=
+ =?utf-8?B?TkpJenZzRXVySlNqbVJmMDJrVXBraDVVTFRnWmQvV0hxY1ZmbWx0M2xuWUM0?=
+ =?utf-8?B?NHZMeFJqWWpscnZaNFoyOWZOUjk0eTE2L2JLUktlTUpRMU1DSW16dURvK3lw?=
+ =?utf-8?B?VFZtWjV5RzB0NURCcnBQbEhzazJodHZLZlY1UGhwK3V5eDd6YThhYTZpQUZH?=
+ =?utf-8?B?KzhFUE9ZQ1ZGYkMxVy9uWEhTS0E3OEhwQzBmdzNWYmUveFBWOXpEZkgwTmdR?=
+ =?utf-8?B?QTAxRWhJOU9MU2tvNE8rUUJEZ0xGWlpBTUoxTDd1L2pGUG5pZE9RMFQ4WHFq?=
+ =?utf-8?B?VWVPVm95VVR4bnFwNUpubGVvREVibTdTNERETEVtT0lQS2plUXVHbFJua1dB?=
+ =?utf-8?B?RjN2Q20zZy9JV28wNXA4dkQyZkJIcEsyMDBYRTNwdkZXTWtsbFhLWEJLZi92?=
+ =?utf-8?B?NnpTRnhoa2F2dGJpMXlUT1NkU1RxeTFBZFprekhPTHZxZjE5UEIyc1JsSktt?=
+ =?utf-8?B?K2k3QkdmN3hIc2Y1dHlHUmp4SnBJVDNGTldYQnNoV0NXVFFmYzVjR1NlWTZi?=
+ =?utf-8?B?RmViK3U5RVdwa05WbWl5bWs5WitoOGdGSjdRdXhYYUxUVko5NlN1TjBvZHlF?=
+ =?utf-8?B?c0pKOW1odWdIdElzMm8yUE9OL2ZtRTV3QU5raWdTcUFMZTFtYmVFWUtsTUNI?=
+ =?utf-8?B?d2JvNFBPdWNyUFZkUldKUjNlR3RjUThOOFQ3ZmtZbk9CNWxFY3BvSnhZRnpB?=
+ =?utf-8?B?QXR0dWFOdFp1a2VZN0JPd2UyQTdwSHpHSjdxYTE0KzduV2g3RVp0UjZYbGov?=
+ =?utf-8?B?ZlViTW4xVFdvTUtxd3RtRDBkV0xGcHhQbnJxWllwS3d6ZE0zODNWVllQZ2hJ?=
+ =?utf-8?B?Z0h4VG1ER3RyWXdOekpoQmFlZDdsbENhNUZqQTRuR1d0ZWtkZUh5MUhscEtn?=
+ =?utf-8?B?YVhpMXJ3Z2lydHAweThWMWN4YXFaOE9aY3hzaE82ekFOUFVZRkJDaTlpLzlH?=
+ =?utf-8?B?REJqV1hkbTQ2SWc5ekxFdFBpeUc0RUUxd1VEWG44bnFtMUpjelNxa3JWTlBC?=
+ =?utf-8?B?RXlxM25RQ2RuRENqL3NzRXhKOXRvQWY3Y3BBb3A5MFdZcncyZjk3Z3NjUTBt?=
+ =?utf-8?B?eUNVZncwdURGRVl5cFd2aGNpVFNkYWlvOTFLR0Q2YlBPV2R4eURXbTlBZ0pB?=
+ =?utf-8?B?aVhxRXJrY1VLTTYzZ0E4YUpyUHlJeUZ4VDE2alVwQldZcStobWNSVzZZYml2?=
+ =?utf-8?B?eUYyc1Q5L2l1b2NkTVZKcGMvSUxqaVJPaE1MMUIzQnBxZVZRaFcwaVBiaFZr?=
+ =?utf-8?B?N3NhUjZHWUtNTFhFT3RRbXdNUmlOZzZBU1AyVlBNRzZpVFYvSWtjbmhvMzEx?=
+ =?utf-8?B?S3JHVlJiWVlDb2lyQXNLbXFuMzVBcngyMzFkc2ZDUkNTMVZRSTFDckQvUzls?=
+ =?utf-8?B?UGNjNnFGK2Z6TmlJbTdMUXJBdDFHTlBOMGUzZUhjOFh2YU15eHhoNGJLNXdj?=
+ =?utf-8?B?Vm1GN0llcVhiNld1NENaa3lkbG9jdUdWRlZkQ1BqWHlCVXdadUt4TEFObEty?=
+ =?utf-8?B?QjlHVFNqajNwQXpNQVQ3eVdjMUM4cDZyM3pzVG43MmRscEhlTWFRdz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 467e179a-9a7a-48de-b324-08de634f1647
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR12MB9620.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2026 18:07:26.1863
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IOWSKD12qxg1l1WX8xTXizQ16+vS+Yzwk/yxhcJO/nMiknhn++b+eZfAFDfrCZ/2
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB999106
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70029-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.ozlabs.org,lists.linux.dev,kernel.org,ellerman.id.au,linux.ibm.com,gmail.com,shazbot.org,amd.com,intel.com,kaod.org,linux.vnet.ibm.com,raptorengineering.com];
+	TAGGED_FROM(0.00)[bounces-70030-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A610BDD4FE
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@nvidia.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4F85BDD522
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026, Yosry Ahmed wrote:
-> On Tue, Feb 03, 2026 at 08:12:30AM -0800, Sean Christopherson wrote:
-> > On Tue, Feb 03, 2026, Yosry Ahmed wrote:
-> > 		/*
-> > 		 * If L2 is active, defer delivery of the payload until the
-> > 		 * exception is actually injected to avoid clobbering state if
-> > 		 * L1 wants to intercept the exception (the architectural state
-> > 		 * is NOT updated if the exeption is morphed to a VM-Exit).
-> > 		 */
-> 
-> It's not only about exceptions being morphed to a VM-Exit though, is it?
-> KVM should not update the payload (e.g. CR2) if a #PF is pending but was
-> not injected, because from L1's perspective CR2 was updated but
-> exit_int_info won't reflect a #PF. Right?
-
-Right, but that's got nothing to do with L2 being active.  Take nested completely
-out of the picture, and the above statement holds true as well.  "If a #PF is
-pending but was not injected, then the guest shouldn't see a change in CR2".
-
-> > But thanks to commit 7709aba8f716 ("KVM: x86: Morph pending exceptions to pending
-> > VM-Exits at queue time"), KVM already *knows* the exception won't be morphed to a
-> > VM-Exit.
+On Tue, Feb 03, 2026 at 09:22:13PM +0530, Shivaprasad G Bhat wrote:
+> > Then you'd want to introduce a new domain op to get the apertures
+> > instead of the single range hard coded into the domain struct. The new
+> > op would be able to return a list. We can use this op to return
+> > apertures for sign extension page tables too.
 > > 
-> > Ugh, and I'm pretty sure I botched kvm_vcpu_ioctl_x86_get_vcpu_events() in that
-> > commit.  Because invoking kvm_deliver_exception_payload() when the exception was
-> > morphed to a VM-Exit is wrong.  Oh, wait, this is the !exception_payload_enabled
-> > case.  So never mind, that's simply an unfixable bug, as the second comment alludes
-> > to.
-> 
-> Hmm for the #PF case I think delivering the payload is always wrong if
-> it was morphed to a VM-Exit, regardless of exception_payload_enabled,
-> because the payload should never reach CR2, right?
-
-Right.
-
-> Spoiler alert, there's another problem there. Even if the exception did
-> not morph to a VM-Exit, if userspace already did KVM_GET_SREGS then the
-> delivered payload is lost :/
-> 
+> > Update iommufd to calculate the reserved regions by evaluating the
+> > whole list.
 > > 
-> > 	/*
-> > 	 * KVM's ABI only allows for one exception to be migrated.  Luckily,
-> > 	 * the only time there can be two queued exceptions is if there's a
-> > 	 * non-exiting _injected_ exception, and a pending exiting exception.
-> > 	 * In that case, ignore the VM-Exiting exception as it's an extension
-> > 	 * of the injected exception.
-> > 	 */
-> > 	if (vcpu->arch.exception_vmexit.pending &&
-> > 	    !vcpu->arch.exception.pending &&
-> > 	    !vcpu->arch.exception.injected)
-> > 		ex = &vcpu->arch.exception_vmexit;
-> > 	else
-> > 		ex = &vcpu->arch.exception;
-> > 
-> > 	/*
-> > 	 * In guest mode, payload delivery should be deferred if the exception
-> > 	 * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
-> > 	 * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
-> > 	 * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
-> > 	 * propagate the payload and so it cannot be safely deferred.  Deliver
-> > 	 * the payload if the capability hasn't been requested.
-> > 	 */
-> > 	if (!vcpu->kvm->arch.exception_payload_enabled &&
-> > 	    ex->pending && ex->has_payload)
-> > 		kvm_deliver_exception_payload(vcpu, ex);
-> > 
-> > So yeah, I _think_ we could drop the is_guest_mode() check.  However, even better
-> > would be to drop this call *entirely*, i.e.
+> > I think you'll find this pretty straight forward, I'd do it as a
+> > followup patch to this one.
 > 
-> Hmm I don't think so, because as I mentioned above, KVM shouldn't update
-> CR2 until the exception is actually injected, right?
-
-Me confused.  What you're saying is what I'm suggesting: don't update CR2 until
-KVM actually stuffs the #PF into the VMCS/VMCB.  Oh, or are you talking about the
-first sentence?  If so, strike that from the record, I was wrong (see below).
-
-> It would actually be great to drop the is_guest_mode() check here but
-> leave the call, because the ordering problem between KVM_VCPU_SET_EVENTS
-> and KVM_SET_SREGS goes away, and I *think* we can drop the
-> kvm_deliver_exception_payload() call in
-> kvm_vcpu_ioctl_x86_get_vcpu_events().
->
-> The only problem would be CR2 getting updated without a fault being
-> reflected in the vmcb12's exit_int_info AFAICT.
-
-No, that particular case is a non-issue, because the code immediately above has
-already verified that KVM will *not* morph the #PF to a nested VM-Exit.  Note,
-the "queue:" path is just for non-contributory exceptions and doesn't change the
-VM-Exit change anyways.
-
-	/*
-	 * If the exception is destined for L2, morph it to a VM-Exit if L1
-	 * wants to intercept the exception.
-	 */
-	if (is_guest_mode(vcpu) &&
-	    kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, nr, error_code)) {  <====
-		kvm_queue_exception_vmexit(vcpu, nr, has_error, error_code,
-					   has_payload, payload);
-		return;
-	}
-
-	if (!vcpu->arch.exception.pending && !vcpu->arch.exception.injected) {
-	queue:
-		vcpu->arch.exception.pending = true;
-		vcpu->arch.exception.injected = false;
-
-		vcpu->arch.exception.has_error_code = has_error;
-		vcpu->arch.exception.vector = nr;
-		vcpu->arch.exception.error_code = error_code;
-		vcpu->arch.exception.has_payload = has_payload;
-		vcpu->arch.exception.payload = payload;
-		if (!is_guest_mode(vcpu))
-			kvm_deliver_exception_payload(vcpu,
-						      &vcpu->arch.exception);
-		return;
-	}
-
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index b0112c515584..00a39c95631d 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -864,9 +864,6 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
-> >                 vcpu->arch.exception.error_code = error_code;
-> >                 vcpu->arch.exception.has_payload = has_payload;
-> >                 vcpu->arch.exception.payload = payload;
-> > -               if (!is_guest_mode(vcpu))
-> > -                       kvm_deliver_exception_payload(vcpu,
-> > -                                                     &vcpu->arch.exception);
-> >                 return;
-> >         }
-> >  
-> > Because KVM really shouldn't update CR2 until the excpetion is actually injected
-> > (or the state is at risk of being lost because exception_payload_enabled==false).
-> > E.g. in the (extremely) unlikely (and probably impossible to configure reliably)
-> > scenario that userspace deliberately drops a pending exception, arch state shouldn't
-> > be updated.
 > 
-> I think if we drop it there might be a problem. With
-> exception_payload_enabled==false, pending exceptions becomes injected
-> after save/restore. If the payload is not delivered here, then after
-> restore we have an injected event with no payload.
+> Thanks. I will wait for that patch.
+
+I think you will have to make it :)
+
+> There are ioctl number conflicts like
 > 
-> I guess the kvm_deliver_exception_payload() call in
-> kvm_vcpu_ioctl_x86_get_vcpu_events() is supposed to handle this, but it
-> only works if userspace does KVM_GET_SREGS *after* KVM_GET_VCPU_EVENTS.
-> Removing the call here will regress VMM's doing KVM_GET_SREGS AFAICT.
+> # grep -n "VFIO_BASE + 1[89]" include/uapi/linux/vfio.h | grep define
+> 940:#defineVFIO_DEVICE_BIND_IOMMUFD_IO(VFIO_TYPE, VFIO_BASE + 18)
+> 976:#defineVFIO_DEVICE_ATTACH_IOMMUFD_PT_IO(VFIO_TYPE, VFIO_BASE + 19)
+> 1833:#defineVFIO_IOMMU_SPAPR_UNREGISTER_MEMORY_IO(VFIO_TYPE, VFIO_BASE + 18)
+> 1856:#defineVFIO_IOMMU_SPAPR_TCE_CREATE_IO(VFIO_TYPE, VFIO_BASE + 19)
+> # grep -n "VFIO_BASE + 20" include/uapi/linux/vfio.h | grep define
+> 999:#defineVFIO_DEVICE_DETACH_IOMMUFD_PT_IO(VFIO_TYPE, VFIO_BASE + 20)
+> 1870:#defineVFIO_IOMMU_SPAPR_TCE_REMOVE_IO(VFIO_TYPE, VFIO_BASE + 20)
 
-Drat, QEMU does KVM_GET_VCPU_EVENTS before KVM_GET_SREGS{,2}, so I was hopeful
-we wouldn't actually break anyone, but Firecracker at least gets sregs before
-events.  Of course Firecracker is already broken due to not enabling
-KVM_CAP_EXCEPTION_PAYLOAD...
+It's Ok the compat codes will know what type it is operating in before
+it decodes any of those.
 
-Ugh, and it's not just KVM_GET_SREGS, it's also KVM_GET_DEBUGREGS thanks to DR6.
+> You are right. We do have some use cases beyond VMM, I will consider compat
+> driver only if it is helpful there.
 
-If we're being _super_ pedantic, then delivering the payload anywhere but injection
-or KVM_GET_VCPU_EVENTS is "wrong" (well, "more wrong", since any behavior without
-KVM_CAP_EXCEPTION_PAYLOAD is inherently wrong).  E.g. very hypothetically, userspace
-that saves/restores sregs but not vCPU events would see an unexpected CR2 change.
+You can also use the type1 compat mode which will magically start
+working with PPC..
 
-*sigh*
-
-Ewwwwwwww.  And we *definitely* don't want to drop the is_guest_mode() check,
-because nested_vmx_update_pending_dbg() relies on the payload to still be valid.
-
-Ah, right, and that's also why commit a06230b62b89 ("KVM: x86: Deliver exception
-payload on KVM_GET_VCPU_EVENTS") from MTF series deferred the update: KVM needs
-to keep the #DB pending so that a VM-Exit that occurs before the #DB is injected
-gets recorded in vmcs12.
-
-So, with all of that in mind, I believe the best we can do is fully defer delivery
-of the exception until it's actually injected, and then apply the quirk to the
-relevant GET APIs.
-
----
- arch/x86/kvm/x86.c | 62 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 39 insertions(+), 23 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b0112c515584..e000521dfc8b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -864,9 +864,6 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
- 		vcpu->arch.exception.error_code = error_code;
- 		vcpu->arch.exception.has_payload = has_payload;
- 		vcpu->arch.exception.payload = payload;
--		if (!is_guest_mode(vcpu))
--			kvm_deliver_exception_payload(vcpu,
--						      &vcpu->arch.exception);
- 		return;
- 	}
+> > You should also implement the BLOCKING domain type to make VFIO work
+> > better 
  
-@@ -5532,18 +5529,8 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
--					       struct kvm_vcpu_events *events)
-+static struct kvm_queued_exception *kvm_get_exception_to_save(struct kvm_vcpu *vcpu)
- {
--	struct kvm_queued_exception *ex;
--
--	process_nmi(vcpu);
--
--#ifdef CONFIG_KVM_SMM
--	if (kvm_check_request(KVM_REQ_SMI, vcpu))
--		process_smi(vcpu);
--#endif
--
- 	/*
- 	 * KVM's ABI only allows for one exception to be migrated.  Luckily,
- 	 * the only time there can be two queued exceptions is if there's a
-@@ -5554,21 +5541,46 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 	if (vcpu->arch.exception_vmexit.pending &&
- 	    !vcpu->arch.exception.pending &&
- 	    !vcpu->arch.exception.injected)
--		ex = &vcpu->arch.exception_vmexit;
--	else
--		ex = &vcpu->arch.exception;
-+		return &vcpu->arch.exception_vmexit;
-+
-+	return &vcpu->arch.exception;
-+}
-+
-+static void kvm_handle_exception_payload_quirk(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_queued_exception *ex = kvm_get_exception_to_save(vcpu);
- 
- 	/*
--	 * In guest mode, payload delivery should be deferred if the exception
--	 * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
--	 * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
--	 * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
--	 * propagate the payload and so it cannot be safely deferred.  Deliver
--	 * the payload if the capability hasn't been requested.
-+	 * If KVM_CAP_EXCEPTION_PAYLOAD is disabled, then (prematurely) deliver
-+	 * the pending exception payload when userspace saves *any* vCPU state
-+	 * that interacts with exception payloads to avoid breaking userspace.
-+	 *
-+	 * Architecturally, KVM must not deliver an exception payload until the
-+	 * exception is actually injected, e.g. to avoid losing pending #DB
-+	 * information (which VMX tracks in the VMCS), and to avoid clobbering
-+	 * state if the exception is never injected for whatever reason.  But
-+	 * if KVM_CAP_EXCEPTION_PAYLOAD isn't enabled, then userspace may or
-+	 * may not propagate the payload across save+restore, and so KVM can't
-+	 * safely defer delivery of the payload.
- 	 */
- 	if (!vcpu->kvm->arch.exception_payload_enabled &&
- 	    ex->pending && ex->has_payload)
- 		kvm_deliver_exception_payload(vcpu, ex);
-+}
-+
-+static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
-+					       struct kvm_vcpu_events *events)
-+{
-+	struct kvm_queued_exception *ex = kvm_get_exception_to_save(vcpu);
-+
-+	process_nmi(vcpu);
-+
-+#ifdef CONFIG_KVM_SMM
-+	if (kvm_check_request(KVM_REQ_SMI, vcpu))
-+		process_smi(vcpu);
-+#endif
-+
-+	kvm_handle_exception_payload_quirk(vcpu);
- 
- 	memset(events, 0, sizeof(*events));
- 
-@@ -5747,6 +5759,8 @@ static int kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
- 	    vcpu->arch.guest_state_protected)
- 		return -EINVAL;
- 
-+	kvm_handle_exception_payload_quirk(vcpu);
-+
- 	memset(dbgregs, 0, sizeof(*dbgregs));
- 
- 	BUILD_BUG_ON(ARRAY_SIZE(vcpu->arch.db) != ARRAY_SIZE(dbgregs->db));
-@@ -12123,6 +12137,8 @@ static void __get_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
- 	if (vcpu->arch.guest_state_protected)
- 		goto skip_protected_regs;
- 
-+	kvm_handle_exception_payload_quirk(vcpu);
-+
- 	kvm_get_segment(vcpu, &sregs->cs, VCPU_SREG_CS);
- 	kvm_get_segment(vcpu, &sregs->ds, VCPU_SREG_DS);
- 	kvm_get_segment(vcpu, &sregs->es, VCPU_SREG_ES);
+> I am not sure how this could help making VFIO better. May be, I am not able
+> to imagine the advantages with the current platform domain approach
+> in place. Could you please elaborate more on this?
 
-base-commit: 55671237401edd1ec59276b852b9361cc170915b
---
+VFIO always uses a BLOCKED domain when it opens the device, then it
+changes to a paging domain. If the driver doesn't support a native
+BLOCKED domain then it allocates an empty page table and uses that.
+
+A proper native BLOCKED domain has better error handling
+characteristics since it is not allowed to fail attach and it doesn't
+require allocation.
+
+I think you will also find what you are doing easier if you push the
+iommu_domain down through the PPC iommu ops instead of retaining these
+unnecessary historical layers.
+
+Jason
 
