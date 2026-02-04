@@ -1,173 +1,310 @@
-Return-Path: <kvm+bounces-70204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70205-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sDksAxhag2mJlQMAu9opvQ
-	(envelope-from <kvm+bounces-70204-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:39:20 +0100
+	id CJJIDj9dg2mJlQMAu9opvQ
+	(envelope-from <kvm+bounces-70205-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:52:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D524E7386
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:39:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB09AE7826
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FA863009172
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 14:39:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F1363055DFD
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 14:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48E941B354;
-	Wed,  4 Feb 2026 14:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F00937AA7D;
+	Wed,  4 Feb 2026 14:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cvchkcrm"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="0o8WaWC+";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jzmMz8cj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA699296BDC
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 14:39:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6768A280CD2;
+	Wed,  4 Feb 2026 14:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770215942; cv=none; b=Z/oMZxDBt4f4vihrCUrYPcXx0cIkpMjmIdUvaxviubS5Xh8lzh4GqZcPn1Jr1Yx5hfJ4UuzV6KXbWBhkSgFPwnN52ZVyYwB68ZeXMaEUqZWtzflWWJ/xwVcL2NF92vSYn28uemVVhldspJGr20XX5pO5cfz1iwrzqNRo546hf0U=
+	t=1770216488; cv=none; b=Td3iNlPcmuQeFThy7cXwmYMhj5iFjGd87dEjQR4TRqYfwY+6EI3E7XeyKs2YYIjRoUaheqt9afS//+RLeTMQpomZS8myI5f8nmogtDJpGA5A0SgNG4cEi/qxmlWU5lCvtS8pisWe/vdmIRC+h/cqNkLOXD2Ge84Tyez0V1orq7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770215942; c=relaxed/simple;
-	bh=evs4o3kg+1XkxWgnNZ9BFDrK2Lk1BY8Wj9Pc3qa5Brw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qAf/du9aLxJHyar7eS8jCKUIQO5D1MCheJ/hX73cy7jP/Ycb6xmw/gXcSj0F7xwcsmrUpEP7HlkLEsAyBTHUSgBnBVASPRyx9HYklYxJakaQhCINmX5Kh5vuqGEpoi7RJWGlgSUhwl4guTUfX7MSB4KSFnjniVI2XL+I9fbSV4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cvchkcrm; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0d058fc56so50985975ad.3
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 06:39:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770215941; x=1770820741; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sc4qlJ2XppRbMaP7K1epexO5oOZyS10mutkmgFd7v4E=;
-        b=cvchkcrmZ4n2eVphSZ8//H5FRv5Knrh7Lg3YqaNe7w9GDApQex8yBomd4jYcFffHDm
-         LcjR6GY4HYGpHiWo1SnU5glqFoeDpxHOCG88OZZ08Zx7l5EOg5WFeufunkU5wAVvr+LC
-         on2tFQ0YLDnLvYjiJj4lnGDMdd0HFWSg909NtHcxUxe4uNfMF5pDpJfe3g1N2vZFvTxV
-         UuY+ERbdE2r7QbgwtcGvqDEpAp171NOLjRRhT1u1usOqCs9HD20l4ava44XYO018RJbZ
-         2PaxhGHTZ4wOLYZA/tDPkPjTypKQKrpEf4eSZYy+TCKifWL/hheKIqInUJUfBkH0lud1
-         KKJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770215941; x=1770820741;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sc4qlJ2XppRbMaP7K1epexO5oOZyS10mutkmgFd7v4E=;
-        b=uzrRjh/33WKPNel0Gp6+gZAIyn+VJ6piIkYcteEJHYierHcv4TlIdnxYpxECPQY9Nm
-         MUE08tv7VmjdRLlMAC56b4NID1HOagHkBLLzolu+EMAAjgq8a4ACGoFuZQNfluGF0WZb
-         PdVKqitz8F5HWudSyLi+6xH96BqG5v5xXuT0y9JVPn6MjrksulKbffa3Uh/TwhWSUtoS
-         pXvDLflinP+Irm519B6ZwJiMY8JefNnrTxgDYaauyCMOmOMRECpZpunggBskUwHWAhAW
-         XKzZQxhQs0yqXWh89F6//C1w1Mk9/PBxlWaQZPyrA3mdvwAV5fDXmU4b+PDlvFoGF8Gc
-         9wiw==
-X-Forwarded-Encrypted: i=1; AJvYcCVoe18IBvJisfQ6vvIPOpWIiI8H0+JBhURE587MChqpGok9vJw6fAtCvJOvwoWV2VeFrVo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywje/hUbSoCmYyYeDaoIv5mP5/R6YresCQ+I6EXwyXDuWeprDIx
-	cveUAKSBydfkQzNL5ZpeqQhrtbTMFP5uoDZEz9CQvxz3B8v4cm58SnR0Sy9gw41AjBxGCWuvGi8
-	fmJHssA==
-X-Received: from pjne5.prod.google.com ([2002:a17:90a:8185:b0:352:f654:c302])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3886:b0:352:de8c:7270
- with SMTP id 98e67ed59e1d1-354870d71c6mr2540076a91.9.1770215941201; Wed, 04
- Feb 2026 06:39:01 -0800 (PST)
-Date: Wed, 4 Feb 2026 06:38:59 -0800
-In-Reply-To: <aXuVR0kq_K1TYwlR@char.us.oracle.com>
+	s=arc-20240116; t=1770216488; c=relaxed/simple;
+	bh=ukFfnHNJ5St3Rj6hRUImngtiQiwt7CXxdu0IEyYKDrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LfxRs5/2G0/9qAJrt8Y4E24AVmWY3M+OC5Jq8N8mUc3Fp3pdo1gyPduh51yuodalFyW3udkNPsF9qdYE4zZ38WG/bOznRw58oVSOCafEhMCXqa32NCz+n1N7QkqATe8/vvuUunzh4MIXZ/LrF8xlGOqFDNB+fODhpEgqaC6NByo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=0o8WaWC+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jzmMz8cj; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 459111D00099;
+	Wed,  4 Feb 2026 09:48:05 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Wed, 04 Feb 2026 09:48:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1770216485;
+	 x=1770302885; bh=OAqECMTNWylYMxvQZWo48cfQCG+FzsGTUnm7TRzruJc=; b=
+	0o8WaWC+JS0r9CyNO/nTgXfRQDJ56/yoy70axLrKphXjIXJxrk75jlyRIc0mFozg
+	Lk9yZLXvit+j0LAW6FO4NKvl1M/1uw0AqI/Kv0zLHGMB4xaXYj7dVhwRDcsAdFbe
+	XldCsL0y3BWhA1RU+xIRj0DlrCxgJ+y9G+eS5tdLTz/xq9KeKueV28uAkNWAkYki
+	JFt10+lcANDhqdHiJ+aWcx0rZPmqY4AcPIAS78Sywq78D8ETU6OsQVbv4v/NDVLx
+	tcRW2AWOeJfeGEo9hYpBcCvKQi7VmCM0uEGGCIeEXOrD7uBLnfVA8mCfURXdb+Zo
+	0O72ph1Y+QfDvfTonvb22Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770216485; x=
+	1770302885; bh=OAqECMTNWylYMxvQZWo48cfQCG+FzsGTUnm7TRzruJc=; b=j
+	zmMz8cjFVoG/rsm+0syFV2GjH1G9Jl5OSmRwqy86uRGwWgXestcZk51Jl2OtfOhi
+	5dT2To2mQwZKbEcO3KiJ6YVzN/OWqj+r5xAY4f4Pcl47DGV+vjJCwJT82kWxuiYI
+	U3D3g6AIwCcaYR2plHhaB4epoyk0ucC5lxbtg6+tuSzhDaJBG2MwMz5qymt6du14
+	u5x4iw9+Urw3wJMot+A2nGSTxrNjdniDBsJvL0IV/uztGqUeYAV7FueJ6jd7hMI2
+	V0Qujs8/84hPQEZQbg81ddFd/smKComYzHat9t/3Z/A9zAv532+oJhyaXykyLIuz
+	/MklR4ShSvjuoAZODm5ow==
+X-ME-Sender: <xms:JFyDabc3NtC5x9d-S5b8xgv_nBJstlaRTFKO2hRPyja2VYX4o8sNZQ>
+    <xme:JFyDaTGLxs7JuKE4V_IA9P4W29Q7v5RsliDeybttbvBXmlhQwQJ1WPvXOy_ADVtQJ
+    e5mu5eIf2Mw1llgw8EuXb9IOb9VYfiAv1zqZFzzC2PoRDuwWF_R>
+X-ME-Received: <xmr:JFyDaZKGg0VtncgyvA-_AYz2KWPpimcRT69PBe7Nym3aMVuNqRimo99sgsg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukedvjedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
+    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
+    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepfeegpdhmohguvgep
+    shhmthhpohhuthdprhgtphhtthhopehlvghonheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepshhumhhithdrshgvmhifrghlsehlihhnrghrohdrohhrghdprhgtphhtthhopegt
+    hhhrihhsthhirghnrdhkohgvnhhighesrghmugdrtghomhdprhgtphhtthhopegrlhgvgi
+    grnhguvghrrdguvghutghhvghrsegrmhgurdgtohhmpdhrtghpthhtoheprghirhhlihgv
+    ugesghhmrghilhdrtghomhdprhgtphhtthhopehsihhmohhnrgesfhhffihllhdrtghhpd
+    hrtghpthhtohepkhhrrgigvghlsehrvgguhhgrthdrtghomhdprhgtphhtthhopegumhhi
+    thhrhidrohhsihhpvghnkhhosegtohhllhgrsghorhgrrdgtohhmpdhrtghpthhtohepgh
+    hurhgthhgvthgrnhhsihhnghhhsegthhhrohhmihhumhdrohhrgh
+X-ME-Proxy: <xmx:JFyDabfA6AFufRXzaJSlKz-2t1bgQfl_-vcdUPLYedDqqhfQtD0F4g>
+    <xmx:JFyDaXvtfjlvHHOBDbzIpiei4TfKRK6qgjSvLo_n98W07rjE3fSC_w>
+    <xmx:JFyDaXtAyHrtabg5GCKcPsYXr1EXU3FQH7-j2yI9cGuotG8BnRMRyA>
+    <xmx:JFyDaW-L9op9ODgl26-U7zgoSReG5Hb16hvQv5SKv36wBdcXrSzLXQ>
+    <xmx:JVyDacEzOan8IdGoHVZJwVYbWkrRfU2u-Tob81oE2TJvkvib1I9BFGdR>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 4 Feb 2026 09:48:01 -0500 (EST)
+Date: Wed, 4 Feb 2026 07:47:59 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Chia-I Wu <olvaffe@gmail.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>,
+ Thomas Zimmermann <tzimmermann@suse.de>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+ Felix Kuehling <Felix.Kuehling@amd.com>,
+ Ankit Agrawal <ankita@nvidia.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+ virtualization@lists.linux.dev, intel-xe@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 4/8] vfio: Wait for dma-buf invalidation to complete
+Message-ID: <20260204074759.108f579e@shazbot.org>
+In-Reply-To: <20260131-dmabuf-revoke-v7-4-463d956bd527@nvidia.com>
+References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
+	<20260131-dmabuf-revoke-v7-4-463d956bd527@nvidia.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260129011517.3545883-1-seanjc@google.com> <aXuVR0kq_K1TYwlR@char.us.oracle.com>
-Message-ID: <aYNaA7Td23xKHoHK@google.com>
-Subject: Re: [RFC PATCH v5 00/45] TDX: Dynamic PAMT + S-EPT Hugepage
-From: Sean Christopherson <seanjc@google.com>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Sagi Shahar <sagis@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70204-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	FREEMAIL_CC(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-70205-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5D524E7386
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shazbot.org:email,shazbot.org:dkim,shazbot.org:mid,intel.com:email,nvidia.com:email,messagingengine.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CB09AE7826
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026, Konrad Rzeszutek Wilk wrote:
-> On Wed, Jan 28, 2026 at 05:14:32PM -0800, Sean Christopherson wrote:
-> > This is a combined series of Dynamic PAMT (from Rick), and S-EPT hugepage
-> > support (from Yan).  Except for some last minute tweaks to the DPAMT array
-> > args stuff, a version of this based on a Google-internal kernel has been
-> > moderately well tested (thanks Vishal!).  But overall it's still firmly RFC
-> > as I have deliberately NOT addressed others feedback from v4 of DPAMT and v3
-> 
-> What does PAMT stand for? Is there a design document somewhere?
-> 
-> > of S-EPT hugepage (mostly lack of cycles), and there's at least one patch in
-> > here that shouldn't be merged as-is (the quick-and-dirty switch from struct
-> > page to raw pfns).
-> > 
-> > My immediate goal is to solidify the designs for DPAMT and S-EPT hugepage.
-> > Given the substantial design changes I am proposing, posting an end-to-end
-> > RFC seemed like a much better method than trying to communicate my thoughts
-> > piecemeal.
-> > 
-> > As for landing these series, I think the fastest overall approach would be
-> > to land patches 1-4 asap (tangentially related cleanups and fixes), agree
-> 
-> Should they be split out as non-RFC then?
+On Sat, 31 Jan 2026 07:34:14 +0200
+Leon Romanovsky <leon@kernel.org> wrote:
 
-Yeah, I'll do that soonish.  I posted the kitchen sink so that people could
-review the entire thing without having to chase down 4+ series/patches.
-
-> > on a design (hopefully), and then hand control back to Rick and Yan to polish
-> > their respective series for merge.
-> > 
-> > I also want to land the VMXON series[*] before DPAMT, because there's a nasty
-> > wart where KVM wires up a DPAMT-specific hook even if DPAMT is disabled,
-> > because KVM's ordering needs to set the vendor hooks before tdx_sysinfo is
-> > ready.  Decoupling VMXON from KVM solves that problem, because it lets the
-> > TDX subsystem parse sysinfo before TDX is loaded.
-> > 
-> > Beyond that dependency, I am comfortable landing both DPAMT and S-EPT hugepage
-> > support without any other prereqs, i.e. without an in-tree way to light up
-> > the S-EPT hugepage code due to lack of hugepage support in guest_memfd.
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> Can there be test-cases? Or simple code posted for QEMU which is the
-> tool that 99% of kernel engineers use?
+> dma-buf invalidation is handled asynchronously by the hardware, so VFIO
+> must wait until all affected objects have been fully invalidated.
+> 
+> In addition, the dma-buf exporter is expecting that all importers unmap any
+> buffers they previously mapped.
+> 
+> Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO regions")
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_dmabuf.c | 61 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 57 insertions(+), 4 deletions(-)
 
-No?  The core limitation is that KVM doesn't yet support hugepages for private
-memory.  No amount userspace code can overcome that limitation.
+Reviewed-by: Alex Williamson <alex@shazbot.org>
 
-We can and do have tests and VMM support, but it's all out-of-tree (for now).
-All I'm saying here is that I'm ok landing the S-EPT hugepage code in advance of
-guest_memfd hugepage support, e.g. so that we don't end up in a stalemate due to
-cyclical dependecies, or one big megaseries.
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> index d8ceafabef48..78d47e260f34 100644
+> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> @@ -17,6 +17,8 @@ struct vfio_pci_dma_buf {
+>  	struct dma_buf_phys_vec *phys_vec;
+>  	struct p2pdma_provider *provider;
+>  	u32 nr_ranges;
+> +	struct kref kref;
+> +	struct completion comp;
+>  	u8 revoked : 1;
+>  };
+>  
+> @@ -44,27 +46,46 @@ static int vfio_pci_dma_buf_attach(struct dma_buf *dmabuf,
+>  	return 0;
+>  }
+>  
+> +static void vfio_pci_dma_buf_done(struct kref *kref)
+> +{
+> +	struct vfio_pci_dma_buf *priv =
+> +		container_of(kref, struct vfio_pci_dma_buf, kref);
+> +
+> +	complete(&priv->comp);
+> +}
+> +
+>  static struct sg_table *
+>  vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
+>  		     enum dma_data_direction dir)
+>  {
+>  	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> +	struct sg_table *ret;
+>  
+>  	dma_resv_assert_held(priv->dmabuf->resv);
+>  
+>  	if (priv->revoked)
+>  		return ERR_PTR(-ENODEV);
+>  
+> -	return dma_buf_phys_vec_to_sgt(attachment, priv->provider,
+> -				       priv->phys_vec, priv->nr_ranges,
+> -				       priv->size, dir);
+> +	ret = dma_buf_phys_vec_to_sgt(attachment, priv->provider,
+> +				      priv->phys_vec, priv->nr_ranges,
+> +				      priv->size, dir);
+> +	if (IS_ERR(ret))
+> +		return ret;
+> +
+> +	kref_get(&priv->kref);
+> +	return ret;
+>  }
+>  
+>  static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
+>  				   struct sg_table *sgt,
+>  				   enum dma_data_direction dir)
+>  {
+> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
+> +
+> +	dma_resv_assert_held(priv->dmabuf->resv);
+> +
+>  	dma_buf_free_sgt(attachment, sgt, dir);
+> +	kref_put(&priv->kref, vfio_pci_dma_buf_done);
+>  }
+>  
+>  static void vfio_pci_dma_buf_release(struct dma_buf *dmabuf)
+> @@ -287,6 +308,9 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+>  		goto err_dev_put;
+>  	}
+>  
+> +	kref_init(&priv->kref);
+> +	init_completion(&priv->comp);
+> +
+>  	/* dma_buf_put() now frees priv */
+>  	INIT_LIST_HEAD(&priv->dmabufs_elm);
+>  	down_write(&vdev->memory_lock);
+> @@ -331,9 +355,33 @@ void vfio_pci_dma_buf_move(struct vfio_pci_core_device *vdev, bool revoked)
+>  
+>  		if (priv->revoked != revoked) {
+>  			dma_resv_lock(priv->dmabuf->resv, NULL);
+> -			priv->revoked = revoked;
+> +			if (revoked)
+> +				priv->revoked = true;
+>  			dma_buf_invalidate_mappings(priv->dmabuf);
+> +			dma_resv_wait_timeout(priv->dmabuf->resv,
+> +					      DMA_RESV_USAGE_BOOKKEEP, false,
+> +					      MAX_SCHEDULE_TIMEOUT);
+>  			dma_resv_unlock(priv->dmabuf->resv);
+> +			if (revoked) {
+> +				kref_put(&priv->kref, vfio_pci_dma_buf_done);
+> +				wait_for_completion(&priv->comp);
+> +			} else {
+> +				/*
+> +				 * Kref is initialize again, because when revoke
+> +				 * was performed the reference counter was decreased
+> +				 * to zero to trigger completion.
+> +				 */
+> +				kref_init(&priv->kref);
+> +				/*
+> +				 * There is no need to wait as no mapping was
+> +				 * performed when the previous status was
+> +				 * priv->revoked == true.
+> +				 */
+> +				reinit_completion(&priv->comp);
+> +				dma_resv_lock(priv->dmabuf->resv, NULL);
+> +				priv->revoked = false;
+> +				dma_resv_unlock(priv->dmabuf->resv);
+> +			}
+>  		}
+>  		fput(priv->dmabuf->file);
+>  	}
+> @@ -354,7 +402,12 @@ void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev)
+>  		priv->vdev = NULL;
+>  		priv->revoked = true;
+>  		dma_buf_invalidate_mappings(priv->dmabuf);
+> +		dma_resv_wait_timeout(priv->dmabuf->resv,
+> +				      DMA_RESV_USAGE_BOOKKEEP, false,
+> +				      MAX_SCHEDULE_TIMEOUT);
+>  		dma_resv_unlock(priv->dmabuf->resv);
+> +		kref_put(&priv->kref, vfio_pci_dma_buf_done);
+> +		wait_for_completion(&priv->comp);
+>  		vfio_device_put_registration(&vdev->vdev);
+>  		fput(priv->dmabuf->file);
+>  	}
+> 
+
 
