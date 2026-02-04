@@ -1,174 +1,136 @@
-Return-Path: <kvm+bounces-70116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70115-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICgdGK2OgmkMWQMAu9opvQ
-	(envelope-from <kvm+bounces-70116-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:25 +0100
+	id SPUlC4WOgmkMWQMAu9opvQ
+	(envelope-from <kvm+bounces-70115-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:10:45 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 051D7DFED4
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BE7DFEA0
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C3C030F6AB6
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 674A030D0A4D
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7260470810;
-	Wed,  4 Feb 2026 00:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C03D1EA84;
+	Wed,  4 Feb 2026 00:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ApRMKyWe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CQ2O452T"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE42225776
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0B2182D0
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770163828; cv=none; b=SeZJxMVIGVXc9hsOmZ0b6z0RmeUamIkB74hpuC2hUx+vshoD8JI4dPnovtugvgjchdfIp5jqRYt3X/G49UrQtEqIGRkcDDnG9i1eaGsPefSbZVlxvhKhQIu++6wOcW/6UTtBVHXhe5jmsQWXRRJZolGy4oL4kfOzEmGg5JGFR00=
+	t=1770163826; cv=none; b=mXKwhpVrvU/UqFT4tzjjJF3EgOgP2jEpuFhN/Sj9LigSTTa5MLIUk8gTOn1RIvkocuoX6K1J84ckAG1E+UTyE0peKO88eFwebkFjaeY92NDH7Amsl5Agv9vm7Pw/HNUVt29bgdeyH6S0oDNqzQHshYflKdRyb9uIjSzejOO+7dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770163828; c=relaxed/simple;
-	bh=ESxIp4/yXKBosB0FyqK/1O/fQD+MS4ChEKPfTEhgPBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lbC3CJ1Ut/RVnWQoks8GuXoa3ghlN8edh9epYvIQ4xf1wxfZfzR/U5yF15gnqs2vU6wLNRk5Qe21+A2/yRkibrWtqaWQ61rV7W5NMcUfSCBQej3EwhRgHe1rH1orblWYZkW8yl31Sst3on5MPQscJUjryueVKFmcLdPDGzCJqTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ApRMKyWe; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7e49472c-4bbc-49fe-92c6-621e4675d882@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770163814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zPnG+2FnaGlQfzxXfIjWuGajlOFPpBxdoaiBCLVKvoU=;
-	b=ApRMKyWeexGTzglygbcOHhU7Wfd4rnLeiMI+Jogeatu2nhRqIkK0lA//+bUOV3vFAbHCoJ
-	mS0BsrYP93R9bxyxRU1fhniBcUvx2p4NhTCXzAkUT0zL/EyR+YUdOmdiWZC6zP6HhDzLGT
-	UyQfu6GTd6zJWiBQ6KJq5hvzWsaEowg=
-Date: Tue, 3 Feb 2026 16:10:04 -0800
+	s=arc-20240116; t=1770163826; c=relaxed/simple;
+	bh=YS4o7DzeByG2ggozkUaON0L4h7WORuySrP6EPGfzvys=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pYETLBs0llcJpSvJ98usU156EuA8KqW6bt2+5KU1PduXZsyN8ov8MtldC63LOcN1eLP+JC50eJ46OdV1J3r2n78sAFVrxFhPvIN4+8cWT8fAB7CmZERSGVjXidO3AvMA6xnfmVNnTclgRn1gl8izoImVDbdxQFnvxJgROaKvFH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CQ2O452T; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a377e15716so165493035ad.3
+        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 16:10:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770163825; x=1770768625; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YtmFWIeMNMSsWiL4GytfaYPuqz16OVmvU9wkRSD/Quo=;
+        b=CQ2O452T/NQMOQ+JUn9FGg2e1AX9ueCLHuoVPHrmYzdImihOQCxHPdUC0C7cQUno+F
+         ZlVF/13AzdednxMd2taRTudiOWCqZx2GRCnotKODYXsCG0UGoSDkWyRwZTJABlDwqquf
+         acD/bgSuS9V6p/9f4MreT368OCNb3H1lf/5ypuaM2Cg56UNTJfaiFu1op36n3E9cOafn
+         Ln0Od3v+sIYVCKBXlHPkpp1Tg/BLXzdOwHZew09A6z1Z5QM1z4RfwvezTYqIFVLQvzL7
+         R4ZEd55517qbL2B+G+94+pzIrv3uaP74zBSgXSleT03/+xpBUojJeaoRDzunKB1ZLqjR
+         i0Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770163825; x=1770768625;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YtmFWIeMNMSsWiL4GytfaYPuqz16OVmvU9wkRSD/Quo=;
+        b=bwzO1e3qoMk+UT+iZQzKPn8HCq9mOkm0hSrF9mylA4jI3ImgWuUTafjn5QnmzbCZc4
+         WIG6h/2LmYaHYRdVAvOIuXGsUOU6PiBo4zLMb7ifndWVl8AN7Hp/ua9m7Zu1+PO1iViU
+         0XS3bhK/+WAeobbMR2CTgCOL95v2kQ9PUSr5H17exb0QHBCXu8YxN1e8eHlL65yp+dcW
+         oZ7dFcIZo7mjr9flFcam5GECE5TUI61teN3ZVVlqGslNqGM7GJHEfj/TtHPQj8EcEYIk
+         iS7WKw/Rllg2/SeBRU+JgWBLjwfNVt4zyEdfS6zliGOtujoMQVSoIMINEUQPiUZVontp
+         ESPA==
+X-Gm-Message-State: AOJu0Yy2Y6VDZdaV+XTiCn/td72CrtxPHvtCGt8DskgQw3d394RMzLSr
+	iTyJYS1w4ve7QVSAuXVZvf1tmW431AIA1UAYEhv5iIWmoWUKvZYZooxvR323fT2NB0+tYQVPcxs
+	NThj8Dg==
+X-Received: from plcp13.prod.google.com ([2002:a17:902:e34d:b0:2a3:c3f8:c676])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3d0c:b0:2a7:683c:afb8
+ with SMTP id d9443c01a7336-2a933cf2c30mr10094015ad.16.1770163824795; Tue, 03
+ Feb 2026 16:10:24 -0800 (PST)
+Date: Tue,  3 Feb 2026 16:10:13 -0800
+In-Reply-To: <20260123022816.2283567-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
- across Live Update
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>,
- Adithya Jayachandran <ajayachandra@nvidia.com>,
- Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
- Alistair Popple <apopple@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>, Ankit Agrawal
- <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
- Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
- Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
- kexec@lists.infradead.org, kvm@vger.kernel.org,
- Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
- linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>,
- =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>,
- Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pranjal Shrivastava <praan@google.com>, Pratyush Yadav
- <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Samiullah Khawaja <skhawaja@google.com>,
- Shuah Khan <skhan@linuxfoundation.org>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>,
- Yi Liu <yi.l.liu@intel.com>
-References: <20260129212510.967611-1-dmatlack@google.com>
- <20260129212510.967611-3-dmatlack@google.com>
- <44484594-5b5d-4237-993c-ac1e173ad62e@linux.dev>
- <CALzav=d1ZrHrWd-HhZJ8aY6aqxkBcLoet_5+-LL1mOakVTj6Ww@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Yanjun.Zhu" <yanjun.zhu@linux.dev>
-In-Reply-To: <CALzav=d1ZrHrWd-HhZJ8aY6aqxkBcLoet_5+-LL1mOakVTj6Ww@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20260123022816.2283567-1-seanjc@google.com>
+X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
+Message-ID: <177016367951.574529.16511584559819900521.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86: Drop WARN on INIT/SIPI being blocked when vCPU
+ is in Wait-For-SIPI
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+59f2c3a3fc4f6c09b8cd@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="utf-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70116-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-70115-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[44];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 051D7DFED4
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm,59f2c3a3fc4f6c09b8cd];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C2BE7DFEA0
 X-Rspamd-Action: no action
 
+On Thu, 22 Jan 2026 18:28:16 -0800, Sean Christopherson wrote:
+> Drop the sanity check in kvm_apic_accept_events() that attempts to detect
+> KVM bugs by asserting that a vCPU isn't in Wait-For-SIPI if INIT/SIPI are
+> blocked, because if INIT is blocked, then it should be impossible for a
+> vCPU to get into WFS in the first place.  Unfortunately, syzbot is smarter
+> than KVM (and its maintainers), and circumvented the guards put in place
+> by commit 0fe3e8d804fd ("KVM: x86: Move INIT_RECEIVED vs. INIT/SIPI blocked
+> check to KVM_RUN") by swapping the order and stuffing VMXON after INIT, and
+> then triggering kvm_apic_accept_events() by way of KVM_GET_MP_STATE.
+> 
+> [...]
 
-On 2/2/26 10:14 AM, David Matlack wrote:
-> On Sat, Jan 31, 2026 at 10:38 PM Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
->> 在 2026/1/29 13:24, David Matlack 写道:
->>> Add an API to enable the PCI subsystem to track all devices that are
->>> preserved across a Live Update, including both incoming devices (passed
->>> from the previous kernel) and outgoing devices (passed to the next
->>> kernel).
->>>
->>> Use PCI segment number and BDF to keep track of devices across Live
->>> Update. This means the kernel must keep both identifiers constant across
->>> a Live Update for any preserved device. VFs are not supported for now,
->>> since that requires preserving SR-IOV state on the device to ensure the
->>> same number of VFs appear after kexec and with the same BDFs.
->>>
->>> Drivers that preserve devices across Live Update can now register their
->>> struct liveupdate_file_handler with the PCI subsystem so that the PCI
->>> subsystem can allocate and manage File-Lifecycle-Bound (FLB) global data
->>> to track the list of incoming and outgoing preserved devices.
->>>
->>>     pci_liveupdate_register_fh(driver_fh)
->>>     pci_liveupdate_unregister_fh(driver_fh)
->> Can the above 2 functions support the virtual devices? For example,
->> bonding, veth, iSWAP and RXE.
->>
->> These virtual devices do not have BDF. As such, I am not sure if your
->> patches take these virtual devices in to account.
-> No this patch series only supports PCI devices, since those are the
-> only devices so far we've needed to support.
->
-> I am not familiar with any of the devices that you mentioned. If they
-> are virtual then does that mean it's all just software? In that case I
-> would be curious to know what problem is solved by preserving them in
-> the kernel, vs. tearing them down and rebuilding them across a Live
-> Udpate.
+Applied to kvm-x86 misc.
 
-Bonding, veth, rxe, and siw can be used in KVM environments.
+[1/1] KVM: x86: Drop WARN on INIT/SIPI being blocked when vCPU is in Wait-For-SIPI
+      https://github.com/kvm-x86/linux/commit/c4a365cd4a4e
 
-Although these are software-only virtual devices with no associated 
-hardware,
-
-they may maintain state that is observable by userspace.
-
-As a result, Live Update should preserve their state across the update.
-
-Zhu Yanjun
-
+--
+https://github.com/kvm-x86/linux/tree/next
 
