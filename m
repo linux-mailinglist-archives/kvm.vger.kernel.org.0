@@ -1,215 +1,168 @@
-Return-Path: <kvm+bounces-70138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70139-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AAMUB/rSgml5cQMAu9opvQ
-	(envelope-from <kvm+bounces-70138-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 06:02:50 +0100
+	id sCq/HxXdgmlJdgMAu9opvQ
+	(envelope-from <kvm+bounces-70139-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 06:45:57 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A8B8E1A50
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 06:02:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21D1E214C
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 06:45:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8EAD30490F2
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 05:02:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E7713068258
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 05:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26350352939;
-	Wed,  4 Feb 2026 05:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062A932D452;
+	Wed,  4 Feb 2026 05:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mVgo4JZw"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Bymy2ZVh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD22C34F257;
-	Wed,  4 Feb 2026 05:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BF4946C;
+	Wed,  4 Feb 2026 05:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770181334; cv=none; b=k3TQ0TNzvgQrVpSj4S38IBt/s5qC9I5rxmxCSHEQonZwUGRO1BWSU9cbmwC6u0ihNGUBnzSCDzYOgF2d5WBanvyyQxAzrkMVrf1Ry31ujrnR9GNEgBFrA6uGHF/otaXMVtJ2koJtDalS5y3+XZTLN2WNLWQcTPNNOHaqPICc2Ws=
+	t=1770183943; cv=none; b=JyBp57jAhiEkOVGRU38EJD4yFGl69CRA7eQZp7OF0s5jR3idHUtRpcBLF2ezJYulvmRWrtsEgkRz8HMglcQoqo2XdHIQrNRfPLmEaXrbED3+E8maVG2ek/uo0HUA2zd82Bkj6/ERsGxcD3ENQvvn7YE/kXMX2Ef7bX4aXU/JBUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770181334; c=relaxed/simple;
-	bh=BssClzJli42sqwnuhq7EEp2oGu8Z3L8cVPtpreDMGtc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EMEmgBok5BMinqtA/PK1ZNMeHYkK8Sr4VkRzbcwu5FbfjJfB3TqfGIQBSXrtm83sgH1GzCCzprpVcNX6ZdynrNTSUlV6QlKdpn03MZEAWOjbv2Dtr6GNYawHQx0JeN0ZEoQkPvZCik3JrfdJ6oBYKi3vuHWaggjHx5SSE0p9PfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mVgo4JZw; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770181334; x=1801717334;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BssClzJli42sqwnuhq7EEp2oGu8Z3L8cVPtpreDMGtc=;
-  b=mVgo4JZwFyU56rcObsmZRQVRlWYJGQiWb+dOGnrZg0ONCbgf/rPeTBj9
-   vb6UtP4JjGW6BVXQTbZjqbu2WjN3SLNHNVqVsfktj5ARuulkbNHADqtKV
-   VLzBbmXUiB+fMFjjEsEwNX9KTJ5RQMJIQ7FLOLChdXKUSxTHgCMqMVeaK
-   Bm6smQqgLZuxg7WaRyPSiq2Jjjjl/wp3rimW8Ke4ml/IVqGbfJtM4IEGJ
-   ok7coKSNpIgSELHUK3JsyzH6tgLu/UGWUG0nBGlxoAs29M5ltAsaDlpXb
-   cvKz6GdMfLqToH41rZD8OFkuWddRIIZt9RkBFo+SUxq6W4zM2yB1zUFBP
-   w==;
-X-CSE-ConnectionGUID: l/PZ6WedTyueOgh/uO1g1w==
-X-CSE-MsgGUID: 4rWHnChQRHGPOjkfHOmxdQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="71086376"
-X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
-   d="scan'208";a="71086376"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2026 21:02:13 -0800
-X-CSE-ConnectionGUID: r6WIlB3hRYOB1WMvBCSX1g==
-X-CSE-MsgGUID: 4L+xrWR+RMKF3IcyS644EA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,272,1763452800"; 
-   d="scan'208";a="240739427"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa002.jf.intel.com with ESMTP; 03 Feb 2026 21:01:47 -0800
-Date: Wed, 4 Feb 2026 12:43:16 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>, cgroups@vger.kernel.org,
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org,
-	akpm@linux-foundation.org, binbin.wu@linux.intel.com, bp@alien8.de,
-	brauner@kernel.org, chao.p.peng@intel.com, chenhuacai@kernel.org,
-	corbet@lwn.net, dave.hansen@intel.com, dave.hansen@linux.intel.com,
-	david@redhat.com, dmatlack@google.com, erdemaktas@google.com,
-	fan.du@intel.com, fvdl@google.com, haibo1.xu@intel.com,
-	hannes@cmpxchg.org, hch@infradead.org, hpa@zytor.com,
-	hughd@google.com, ira.weiny@intel.com, isaku.yamahata@intel.com,
-	jack@suse.cz, james.morse@arm.com, jarkko@kernel.org,
-	jgowans@amazon.com, jhubbard@nvidia.com, jroedel@suse.de,
-	jthoughton@google.com, jun.miao@intel.com, kai.huang@intel.com,
-	keirf@google.com, kent.overstreet@linux.dev,
-	liam.merwick@oracle.com, maciej.wieczor-retman@intel.com,
-	mail@maciej.szmigiero.name, maobibo@loongson.cn,
-	mathieu.desnoyers@efficios.com, maz@kernel.org, mhiramat@kernel.org,
-	mhocko@kernel.org, mic@digikod.net, michael.roth@amd.com,
-	mingo@redhat.com, mlevitsk@redhat.com, mpe@ellerman.id.au,
-	muchun.song@linux.dev, nikunj@amd.com, nsaenz@amazon.es,
-	oliver.upton@linux.dev, palmer@dabbelt.com, pankaj.gupta@amd.com,
-	paul.walmsley@sifive.com, pbonzini@redhat.com, peterx@redhat.com,
-	pgonda@google.com, prsampat@amd.com, pvorel@suse.cz,
-	qperret@google.com, richard.weiyang@gmail.com,
-	rick.p.edgecombe@intel.com, rientjes@google.com,
-	rostedt@goodmis.org, roypat@amazon.co.uk, rppt@kernel.org,
-	shakeel.butt@linux.dev, shuah@kernel.org, steven.price@arm.com,
-	steven.sistare@oracle.com, suzuki.poulose@arm.com, tabba@google.com,
-	tglx@linutronix.de, thomas.lendacky@amd.com, vannapurve@google.com,
-	vbabka@suse.cz, viro@zeniv.linux.org.uk, vkuznets@redhat.com,
-	wei.w.wang@intel.com, will@kernel.org, willy@infradead.org,
-	wyihan@google.com, xiaoyao.li@intel.com, yan.y.zhao@intel.com,
-	yilun.xu@intel.com, yuzenghui@huawei.com, zhiquan1.li@intel.com
-Subject: Re: [RFC PATCH v1 05/37] KVM: guest_memfd: Wire up
- kvm_get_memory_attributes() to per-gmem attributes
-Message-ID: <aYLOZIZU0nwk+0UN@yilunxu-OptiPlex-7050>
-References: <cover.1760731772.git.ackerleytng@google.com>
- <071a3c6603809186e914fe5fed939edee4e11988.1760731772.git.ackerleytng@google.com>
- <07836b1d-d0d8-40f2-8f7b-7805beca31d0@amd.com>
- <CAEvNRgEuez=JbArRf2SApLAL0usv5-Q6q=nBPOFMHrHGaKAtMw@mail.gmail.com>
- <20260129003753.GZ1641016@ziepe.ca>
- <aXqx3_eE0rNh6nP0@google.com>
- <aYHGVQTF6RUs7r3g@yilunxu-OptiPlex-7050>
- <20260203181618.GY2328995@ziepe.ca>
+	s=arc-20240116; t=1770183943; c=relaxed/simple;
+	bh=gVpNb2FcJnXvqjd76dpI3QbaGIpY5kIyXa8+4pcw7/o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DYlBGWmrlKidjHObqqXu6TSdZSSvvlXRKHeKbo4CwmYOvL9pU60BNvbFuTAOx4ubXYAng5cR08tlJPirjWruhEmWdgue02KrAjKVxiKyjKTUU1bQdvVLYZ2TqTZwdbnh6jIDcposCyoIGKVB1yTapnOdkiMBYUdGhL0eOzaNI38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Bymy2ZVh; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1770183938; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=kcpw6nzObOocTcTfgP4J3okRdYpVAmfqCq2J3Q4ovjM=;
+	b=Bymy2ZVhLBI5bSgdxKjWWwspSU0CEjzd1hef/I2NbwFqiR0IfGs0dHyBVj/Jo4cBe6l6F4OapuxMqk6LJqmHRc7XnpLH2UErWZU4FgPnSgJfzzjhfO0A3ljo+M3ZQqIyrxhgK7aHQUYkcelouZLPcXDzt1BWGUXYgu+tLM7jtcU=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WyVYd-Q_1770183935 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 04 Feb 2026 13:45:37 +0800
+From: fangyu.yu@linux.alibaba.com
+To: andrew.jones@oss.qualcomm.com
+Cc: alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	corbet@lwn.net,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pbonzini@redhat.com,
+	pjw@kernel.org,
+	radim.krcmar@oss.qualcomm.com
+Subject: Re: Re: [PATCH v4 2/4] RISC-V: KVM: Detect and expose supported HGATP G-stage modes 
+Date: Wed,  4 Feb 2026 13:45:34 +0800
+Message-Id: <20260204054534.89560-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <fazd2fcfuwldtrarm6aw26qa5g6fcieoa35xz3bwchif6qfutw@xuvspa4e533b>
+References: <fazd2fcfuwldtrarm6aw26qa5g6fcieoa35xz3bwchif6qfutw@xuvspa4e533b>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260203181618.GY2328995@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,amd.com,vger.kernel.org,kvack.org,kernel.org,linux-foundation.org,linux.intel.com,alien8.de,intel.com,lwn.net,redhat.com,cmpxchg.org,infradead.org,zytor.com,suse.cz,arm.com,amazon.com,nvidia.com,suse.de,linux.dev,oracle.com,maciej.szmigiero.name,loongson.cn,efficios.com,digikod.net,ellerman.id.au,amazon.es,dabbelt.com,sifive.com,gmail.com,goodmis.org,amazon.co.uk,linutronix.de,zeniv.linux.org.uk,huawei.com];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70139-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70138-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fangyu.yu@linux.alibaba.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[98];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8A8B8E1A50
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E21D1E214C
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 02:16:18PM -0400, Jason Gunthorpe wrote:
-> On Tue, Feb 03, 2026 at 05:56:37PM +0800, Xu Yilun wrote:
-> > > +1.  For guest_memfd, we initially defined per-VM memory attributes to track
-> > > private vs. shared.  But as Ackerley noted, we are in the process of deprecating
-> > > that support, e.g. by making it incompatible with various guest_memfd features,
-> > > in favor of having each guest_memfd instance track the state of a given page.
-> > > 
-> > > The original guest_memfd design was that it would _only_ hold private pages, and
-> > > so tracking private vs. shared in guest_memfd didn't make any sense.  As we've
-> > > pivoted to in-place conversion, tracking private vs. shared in the guest_memfd
-> > > has basically become mandatory.  We could maaaaaybe make it work with per-VM
-> > > attributes, but it would be insanely complex.
-> > > 
-> > > For a dmabuf fd, the story is the same as guest_memfd.  Unless private vs. shared
-> > > is all or nothing, and can never change, then the only entity that can track that
-> > > info is the owner of the dmabuf.  And even if the private vs. shared attributes
-> > > are constant, tracking it external to KVM makes sense, because then the provider
-> > > can simply hardcode %true/%false.  
-> > 
-> > For CoCo-VM and Tee-IO, I'm wondering if host or KVM has to maintain
-> > the private/shared attribute for "assigned MMIO". I'm not naming them
-> > "host MMIO" cause unlike RAM host never needs to access them, either in
-> > private manner or shared manner.
-> > 
-> > Traditionally, host maps these MMIOs only because KVM needs HVA->HPA
-> > mapping to find pfn and setup KVM MMU.
-> 
-> This is not actually completely true, the host mapping still ends up
-> being used by KVM if it happens to trap and emulate a MMIO touching
-> instruction.
-> 
-> It really shouldn't do this, but there is a whole set of complex
-> machinery in KVM and qemu to handle this case.
-> 
-> For example if the MSI-X window is not properly aligned then you have
-> some MMIO that is trapped and must be reflected to real HW.
+>> >> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> >>
+>> >> Extend kvm_riscv_gstage_mode_detect() to probe all HGATP.MODE values
+>> >> supported by the host and record them in a bitmask. Keep tracking the
+>> >> maximum supported G-stage page table level for existing internal users.
+>> >>
+>> >> Also provide lightweight helpers to retrieve the supported-mode bitmask
+>> >> and validate a requested HGATP.MODE against it.
+>> >>
+>> >> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> >> ---
+>> >> diff --git a/arch/riscv/include/asm/kvm_gstage.h b/arch/riscv/include/asm/kvm_gstage.h
+>> >> @@ -75,4 +76,40 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
+>> >> +enum kvm_riscv_hgatp_mode_bit {
+>> >> +	HGATP_MODE_SV39X4_BIT = 0,
+>> >> +	HGATP_MODE_SV48X4_BIT = 1,
+>> >> +	HGATP_MODE_SV57X4_BIT = 2,
+>> >
+>> >I think it's a bit awkward to pass 9 when selecting the hgatp mode, but
+>> >then look for bit 0 when detecting it...
+>> >Why not to use the RVI defined values for this UABI as well?
+>> >
+>> >There are only 16 possible hgatp.mode values, so we're fine storing them
+>> >in a bitmap even on RV32.
+>>
+>> I think this is a good point.
+>>
+>> Using logical bits 0/1/2 is indeed less intuitive than testing
+>> BIT(HGATP_MODE_SV39X4) when userspace passes the architectural HGATP.MODE
+>> encoding.
+>>
+>> However, if we use “HGATP.MODE encoding as bit index”, we need to export
+>> those encodings to userspace. Today HGATP_MODE_* are not part of the
+>> UAPI, so userspace would need to hardcode magic numbers.
+>>
+>> So if we go with this approach, I’ll add UAPI definitions for the HGATP
+>> mode encodings (e.g. #define KVM_RISCV_HGATP_MODE_SV39X4_BIT  8, etc.) and
+>> then define the returned bitmask as BIT(mode).
+>
+>The best part of Radim's suggestion is that there is no need to add the
+>bits to UAPI. We can write in the documentation for the capability that
+>the mode values match the spec. kvm userspace can then just look at the
+>spec to determine those values and create its own defines (which QEMU,
+>for example, has certainly already done).
 
-In this case, the affected pages are not assigned MMIOs and KVM won't
-import them. Mapping them is just OK.
+Makes sense, thanks.
 
-> 
-> So the sharable parts of the BAR should still end up being mmaped into
-> userspace, I think.
+If we use the architectural HGATP.MODE encoding as the bit index, we can
+indeed avoid adding any extra *_BIT or mode constants to the UAPI.
 
-This does mean we can't make VFIO totally unmappable. But VFIO can still
-try to create unmappable dmabufs for assigned MMIO regions, fail dmabuf
-creation or fail mmap() based on the addresses.
+Not sure why my replies didn’t go through yesterday.
 
-> 
-> Which means we need VFIO to know what they are, and hopefully it is
-> just static based on the TDISP reports..
+Thanks for the review. I’ll incorporate this feedback as well as your
+other suggestions and address them in the next revision of the series.
+>
+>Thanks,
+>drew
 
-I don't think VMM need to check TDISP report. The only special thing is
-the MSI-X mixed pages which can be figured out by standard PCI
-discovery.
-
-Seems this doesn't impact the idea that KVM needs no implication of
-Private/Shared from VFIO, as long as VFIO keeps exported dmabufs
-unmapped.
+Thanks,
+Fangyu
 
