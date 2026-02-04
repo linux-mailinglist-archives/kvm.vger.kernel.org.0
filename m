@@ -1,138 +1,173 @@
-Return-Path: <kvm+bounces-70203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70204-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAA9KwRWg2mJlQMAu9opvQ
-	(envelope-from <kvm+bounces-70203-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:21:56 +0100
+	id sDksAxhag2mJlQMAu9opvQ
+	(envelope-from <kvm+bounces-70204-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:39:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54BD9E7003
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:21:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D524E7386
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 15:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 622873005A91
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 14:21:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FA863009172
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 14:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AD6410D0B;
-	Wed,  4 Feb 2026 14:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48E941B354;
+	Wed,  4 Feb 2026 14:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xFBfSsep"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cvchkcrm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0A9274FDF
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 14:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA699296BDC
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 14:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770214910; cv=none; b=bPeNbD1RFv2tfUniXa0+9sSlyGa+ZJ/ZWyie+M+M9IAGEW7X1PKggrf0AAj3GzgbuTW8Y5PMu52j3KTgFwpX+OnB66B3Ha2cMGUa5I/D1+gZVRdnfaP501KRe44AuND2YDf4Km6l9CFAcTBsqSVC4QxDGRP6Zls6TndpvVUlvBo=
+	t=1770215942; cv=none; b=Z/oMZxDBt4f4vihrCUrYPcXx0cIkpMjmIdUvaxviubS5Xh8lzh4GqZcPn1Jr1Yx5hfJ4UuzV6KXbWBhkSgFPwnN52ZVyYwB68ZeXMaEUqZWtzflWWJ/xwVcL2NF92vSYn28uemVVhldspJGr20XX5pO5cfz1iwrzqNRo546hf0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770214910; c=relaxed/simple;
-	bh=0MNDA2Ny0tJNWAJdXkje5Nlf+llWLY+vVIb/GMcUhbc=;
+	s=arc-20240116; t=1770215942; c=relaxed/simple;
+	bh=evs4o3kg+1XkxWgnNZ9BFDrK2Lk1BY8Wj9Pc3qa5Brw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MabqIcjTVji20ZTYW/ToNg2Yo4UdnK1z9zWVUF5aNTUR8EKPYzjWbkYqDrqQS7Mi1Xea2dxht73kXs6P0Shg2RC1wFFOT1LE6Zuoye2REDS5Vz2ylS1KduoqHYtOsCLAcMd2ENbhYc2TiuZEnbDa1cZ0BhxZdvf+gHLqyA1DAlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xFBfSsep; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=qAf/du9aLxJHyar7eS8jCKUIQO5D1MCheJ/hX73cy7jP/Ycb6xmw/gXcSj0F7xwcsmrUpEP7HlkLEsAyBTHUSgBnBVASPRyx9HYklYxJakaQhCINmX5Kh5vuqGEpoi7RJWGlgSUhwl4guTUfX7MSB4KSFnjniVI2XL+I9fbSV4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cvchkcrm; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34e70e2e363so1169241a91.1
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 06:21:50 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0d058fc56so50985975ad.3
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 06:39:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770214910; x=1770819710; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770215941; x=1770820741; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qVJvtKJuuvGxGxyWpMoMpOxiQua226/Cb1xLlw715Yg=;
-        b=xFBfSsepGo6+crUBO/KeDDXyjoFOaMaOfK7qRqcv3HRkuvk1dyJyvZli6oAb7jnzIX
-         Evn76/lYtNsiVad1vouAa5XHbWAFg6Z0MftAP/9gQKHdE2Sy/De3DAzYYo2cZARPrK+7
-         nbBhTN3c1G/9iF6dyPL2ksPFoS713weKk3fCCva6kyNLuuJib60IBu/MIwC7lSW+By26
-         HHeJSgX/ZmLFpXznxMjlPRECfkpfS3RUvjoevfqkFYGACNhrjiIPugtFu0mui5GzRfb7
-         c3BISO38gZnlqV+dcbhQv+82fWLUuIyn9vbO9rAIw0t2OcxiVmxaiLHcCA1toC+1YxhQ
-         QF2g==
+        bh=Sc4qlJ2XppRbMaP7K1epexO5oOZyS10mutkmgFd7v4E=;
+        b=cvchkcrmZ4n2eVphSZ8//H5FRv5Knrh7Lg3YqaNe7w9GDApQex8yBomd4jYcFffHDm
+         LcjR6GY4HYGpHiWo1SnU5glqFoeDpxHOCG88OZZ08Zx7l5EOg5WFeufunkU5wAVvr+LC
+         on2tFQ0YLDnLvYjiJj4lnGDMdd0HFWSg909NtHcxUxe4uNfMF5pDpJfe3g1N2vZFvTxV
+         UuY+ERbdE2r7QbgwtcGvqDEpAp171NOLjRRhT1u1usOqCs9HD20l4ava44XYO018RJbZ
+         2PaxhGHTZ4wOLYZA/tDPkPjTypKQKrpEf4eSZYy+TCKifWL/hheKIqInUJUfBkH0lud1
+         KKJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770214910; x=1770819710;
+        d=1e100.net; s=20230601; t=1770215941; x=1770820741;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qVJvtKJuuvGxGxyWpMoMpOxiQua226/Cb1xLlw715Yg=;
-        b=fwdRZyBGx9i2QSR3yeYcDcTmx+hj68/24zKz0Edt7j6/ZfrQOHpfc737/FzxcyLk2c
-         7sTEDaPLvoD3YhgKDFzSQCmjy2DlC1XSHpz8ICQ2RfcFGLw56QwOh7zWtqcv9HJw3ogi
-         v44ExbUQbHrsIZG7bQf6mSdTiEXH20v8ogjTTtwtBi0U4HJVSTVwvC3Pv0Mmy7cnEpwP
-         K6OvtCtfgMNG6SxNI5zBCxg1e+u3oKmm4RnNcTQNnRy+2wTGYyf6VgozTQi2b9Og36ss
-         lMjEkOIK+iZmCXv/20YGGt3Ny2gUR9RPoYqq7poJPOK+tx1hD/y+jaAKv/2bASONaDtq
-         sEDA==
-X-Gm-Message-State: AOJu0YyNFbVZUwKzJcPHDc+QRkYxwTbA6iH94OfsOxDVG5WwMmDi9vhP
-	E+FAHFXZ0U5InalB1i2vZDzwbXpOIxN13DmgIGSPznBz8993cHd7TMSTpUKJAb5IZl1/2TJqiA9
-	GPDQggQ==
-X-Received: from pjbnk22.prod.google.com ([2002:a17:90b:1956:b0:34c:cb46:dad7])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d12:b0:34c:4c6d:ad0f
- with SMTP id 98e67ed59e1d1-3548721e9d2mr2606038a91.37.1770214909813; Wed, 04
- Feb 2026 06:21:49 -0800 (PST)
-Date: Wed, 4 Feb 2026 06:21:48 -0800
-In-Reply-To: <aYJFdgUxYWXkavfi@iyamahat-desk>
+        bh=Sc4qlJ2XppRbMaP7K1epexO5oOZyS10mutkmgFd7v4E=;
+        b=uzrRjh/33WKPNel0Gp6+gZAIyn+VJ6piIkYcteEJHYierHcv4TlIdnxYpxECPQY9Nm
+         MUE08tv7VmjdRLlMAC56b4NID1HOagHkBLLzolu+EMAAjgq8a4ACGoFuZQNfluGF0WZb
+         PdVKqitz8F5HWudSyLi+6xH96BqG5v5xXuT0y9JVPn6MjrksulKbffa3Uh/TwhWSUtoS
+         pXvDLflinP+Irm519B6ZwJiMY8JefNnrTxgDYaauyCMOmOMRECpZpunggBskUwHWAhAW
+         XKzZQxhQs0yqXWh89F6//C1w1Mk9/PBxlWaQZPyrA3mdvwAV5fDXmU4b+PDlvFoGF8Gc
+         9wiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVoe18IBvJisfQ6vvIPOpWIiI8H0+JBhURE587MChqpGok9vJw6fAtCvJOvwoWV2VeFrVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywje/hUbSoCmYyYeDaoIv5mP5/R6YresCQ+I6EXwyXDuWeprDIx
+	cveUAKSBydfkQzNL5ZpeqQhrtbTMFP5uoDZEz9CQvxz3B8v4cm58SnR0Sy9gw41AjBxGCWuvGi8
+	fmJHssA==
+X-Received: from pjne5.prod.google.com ([2002:a17:90a:8185:b0:352:f654:c302])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3886:b0:352:de8c:7270
+ with SMTP id 98e67ed59e1d1-354870d71c6mr2540076a91.9.1770215941201; Wed, 04
+ Feb 2026 06:39:01 -0800 (PST)
+Date: Wed, 4 Feb 2026 06:38:59 -0800
+In-Reply-To: <aXuVR0kq_K1TYwlR@char.us.oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <7acdd9974effabe5dc461aa755eacf9fb0697467.1770116601.git.isaku.yamahata@intel.com>
- <aYI-rqFnqJeAb_mB@google.com> <aYJFdgUxYWXkavfi@iyamahat-desk>
-Message-ID: <aYNV_KJc6WDo0_cH@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: apic, vmexit: replace nop with
- serialize to wait for deadline timer
+References: <20260129011517.3545883-1-seanjc@google.com> <aXuVR0kq_K1TYwlR@char.us.oracle.com>
+Message-ID: <aYNaA7Td23xKHoHK@google.com>
+Subject: Re: [RFC PATCH v5 00/45] TDX: Dynamic PAMT + S-EPT Hugepage
 From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com, 
-	Paolo Bonzini <pbonzini@redhat.com>, isaku.yamahata@linux.intel.com
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Sagi Shahar <sagis@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70204-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70203-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,redhat.com,linux.intel.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54BD9E7003
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5D524E7386
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026, Isaku Yamahata wrote:
-> On Tue, Feb 03, 2026 at 10:30:06AM -0800,
-> Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Jan 29, 2026, Konrad Rzeszutek Wilk wrote:
+> On Wed, Jan 28, 2026 at 05:14:32PM -0800, Sean Christopherson wrote:
+> > This is a combined series of Dynamic PAMT (from Rick), and S-EPT hugepage
+> > support (from Yan).  Except for some last minute tweaks to the DPAMT array
+> > args stuff, a version of this based on a Google-internal kernel has been
+> > moderately well tested (thanks Vishal!).  But overall it's still firmly RFC
+> > as I have deliberately NOT addressed others feedback from v4 of DPAMT and v3
 > 
-> > > +static inline void serialize(void)
-> > > +{
-> > > +	/* serialize instruction. It needs binutils >= 2.35. */
+> What does PAMT stand for? Is there a design document somewhere?
+> 
+> > of S-EPT hugepage (mostly lack of cycles), and there's at least one patch in
+> > here that shouldn't be merged as-is (the quick-and-dirty switch from struct
+> > page to raw pfns).
 > > 
-> > And a CPU that supports it...  I don't see any point in using SERIALIZE.  To check
-> > for support, this code would need to do CPUID to query X86_FEATURE_SERIALIZE, and
-> > CPUID itself is serializing (the big reason to favor SERIALIZE over CPUID is to
-> > avoid a VM-Exit for performance reasons).
+> > My immediate goal is to solidify the designs for DPAMT and S-EPT hugepage.
+> > Given the substantial design changes I am proposing, posting an end-to-end
+> > RFC seemed like a much better method than trying to communicate my thoughts
+> > piecemeal.
+> > 
+> > As for landing these series, I think the fastest overall approach would be
+> > to land patches 1-4 asap (tangentially related cleanups and fixes), agree
 > 
-> Thank you for pointing it out. I'll replace it with raw_cpuid(0, 0).
-> Or do you want to opencode cpuid() in each places?
+> Should they be split out as non-RFC then?
 
-It probably makes sense to add a helper to arm the deadline timer, and deal with
-the serialization there.  E.g. start_tsc_deadline_timer() also has a nop() of
-dubious value.
+Yeah, I'll do that soonish.  I posted the kitchen sink so that people could
+review the entire thing without having to chase down 4+ series/patches.
+
+> > on a design (hopefully), and then hand control back to Rick and Yan to polish
+> > their respective series for merge.
+> > 
+> > I also want to land the VMXON series[*] before DPAMT, because there's a nasty
+> > wart where KVM wires up a DPAMT-specific hook even if DPAMT is disabled,
+> > because KVM's ordering needs to set the vendor hooks before tdx_sysinfo is
+> > ready.  Decoupling VMXON from KVM solves that problem, because it lets the
+> > TDX subsystem parse sysinfo before TDX is loaded.
+> > 
+> > Beyond that dependency, I am comfortable landing both DPAMT and S-EPT hugepage
+> > support without any other prereqs, i.e. without an in-tree way to light up
+> > the S-EPT hugepage code due to lack of hugepage support in guest_memfd.
+> 
+> Can there be test-cases? Or simple code posted for QEMU which is the
+> tool that 99% of kernel engineers use?
+
+No?  The core limitation is that KVM doesn't yet support hugepages for private
+memory.  No amount userspace code can overcome that limitation.
+
+We can and do have tests and VMM support, but it's all out-of-tree (for now).
+All I'm saying here is that I'm ok landing the S-EPT hugepage code in advance of
+guest_memfd hugepage support, e.g. so that we don't end up in a stalemate due to
+cyclical dependecies, or one big megaseries.
 
