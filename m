@@ -1,204 +1,174 @@
-Return-Path: <kvm+bounces-70114-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70116-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Y1vNAyGMgmnMWAMAu9opvQ
-	(envelope-from <kvm+bounces-70114-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:00:33 +0100
+	id ICgdGK2OgmkMWQMAu9opvQ
+	(envelope-from <kvm+bounces-70116-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:25 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85ACEDFE01
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:00:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 051D7DFED4
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BE4783030ED5
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:00:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C3C030F6AB6
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A921D1C4A20;
-	Wed,  4 Feb 2026 00:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7260470810;
+	Wed,  4 Feb 2026 00:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="elHSeXsZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ApRMKyWe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916A8A937
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE42225776
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770163227; cv=none; b=B6GsXVnP7m9lfB1PT2dA1lTwqLWIBlq1Bp6UH/S21ltXnrZ1G7D2PBXPLOL4cwHkHw8juIdv9OafkJ/u/4WxOIO2pqIRpSRojufCLQ/Jjc1HxhhNhCxflkzl4VJKx6/5JLiWKjhqrSSY0mMx3z32NczGv5kHGCHXMak0639iSJA=
+	t=1770163828; cv=none; b=SeZJxMVIGVXc9hsOmZ0b6z0RmeUamIkB74hpuC2hUx+vshoD8JI4dPnovtugvgjchdfIp5jqRYt3X/G49UrQtEqIGRkcDDnG9i1eaGsPefSbZVlxvhKhQIu++6wOcW/6UTtBVHXhe5jmsQWXRRJZolGy4oL4kfOzEmGg5JGFR00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770163227; c=relaxed/simple;
-	bh=GIxDdFOXqZ0emnzPe4xyIEpY72QJVX4bBP5UXthDkxI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SCLKR0JsI+G+ZknTvzq1qubBfETbGvO6zRO+1/PSB05LBJLe1Bl+boWoBHa5qPE4eN3a+zlVmLdg/W/mnFJ8xLar9Vw7RHJtY0EraDTVbsvSSXbmDDM0qXdZRmlyleMN2V9aiPC0OoRk3E6H/YC0buBw0vC/sg9O01e30WwwMm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=elHSeXsZ; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6136af8e06so3844509a12.1
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 16:00:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770163226; x=1770768026; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SVnZ/cwtK4ji87rGWMAM2IituVZDG+uyyOJMD4ekd58=;
-        b=elHSeXsZozI6aFqSxGGKSRhgT0BZzM2EDdktGJPbSvD1qMpOH2nLBHlrNxpQmE3jpT
-         aqTmyRvR2GD4mhVC7Y2aUQeacKiQFSJVjOwNhktcrb5+SfzbAlo5Yy97c1EVcqWTUoEM
-         LH79bToXbAqDramDLN/X/Uz8Jg59PcrsT+pjIqL5TF7VqTdGeKEbzoI9m4xX1YHxzIrB
-         GsU0hbXr6cF0KbumisAlEOdXktRkf465rbBv+oKA44y1/3CqCAnwrrzdGFI1SXiuFJue
-         OblUnRNIdgnVtGV4VRp4lsysoQAlNsEEYJ6qZL1R4XVEOMJiGMDnSxUCmkT+SsN5mMky
-         yuKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770163226; x=1770768026;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SVnZ/cwtK4ji87rGWMAM2IituVZDG+uyyOJMD4ekd58=;
-        b=CfK57irs+v8JN7OjAHY3cvTahgPIhQLLWakULR//50uBAGf1ueedvHrNmx0BUhDcFY
-         vUsdWIujalzIbf3J6XnF26ulHlDfSS5xuBlcDRnl62UZJMF7lhnLmOYmA48HCAAGuaCK
-         nJMGXWYYXgFUkyheOJwUErRRZbQDHr6D/fgDGOntPtULf1AsrdYT0mwqLNfRtQreKxV0
-         owzySv5B7vSORNUW1Wd2QCG66WvWKRqjx2x4IEErXEXMN0vn3Rbn0Qmo23YLouQGzPvG
-         wTbbifpSKg9FV9uzhAOrp4z97VNxP5eninGZez7vAcxl1pW3MlILLnPVPLF4srIsvRma
-         6K7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWsjNE7ouTq6DQNezD3o2XMqKlaFK6JwJmQIwyHydJXfIsW/TClSelXUW2jmRWgs7Uf7s4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZA1NGtfiXNdGJ7WqcGhwWEY4yglcW+GByPYMYXSpGB2ovd5bZ
-	GBbtkeaZu5Ejk9PhpEmeugx/YDz4+FxPeicyauzChRJMp6IlEMRvxi64Un3Lz/CdAVHGd87i9Qt
-	AFMWN9w==
-X-Received: from plbkg12.prod.google.com ([2002:a17:903:60c:b0:29f:25b4:4dc4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1805:b0:38e:87b7:5f88
- with SMTP id adf61e73a8af0-3937210bb2emr1114819637.27.1770163225959; Tue, 03
- Feb 2026 16:00:25 -0800 (PST)
-Date: Tue, 3 Feb 2026 16:00:24 -0800
-In-Reply-To: <da810fb5204a88c352ca3983e0b2e27b485b33e7.camel@infradead.org>
+	s=arc-20240116; t=1770163828; c=relaxed/simple;
+	bh=ESxIp4/yXKBosB0FyqK/1O/fQD+MS4ChEKPfTEhgPBo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lbC3CJ1Ut/RVnWQoks8GuXoa3ghlN8edh9epYvIQ4xf1wxfZfzR/U5yF15gnqs2vU6wLNRk5Qe21+A2/yRkibrWtqaWQ61rV7W5NMcUfSCBQej3EwhRgHe1rH1orblWYZkW8yl31Sst3on5MPQscJUjryueVKFmcLdPDGzCJqTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ApRMKyWe; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7e49472c-4bbc-49fe-92c6-621e4675d882@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770163814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zPnG+2FnaGlQfzxXfIjWuGajlOFPpBxdoaiBCLVKvoU=;
+	b=ApRMKyWeexGTzglygbcOHhU7Wfd4rnLeiMI+Jogeatu2nhRqIkK0lA//+bUOV3vFAbHCoJ
+	mS0BsrYP93R9bxyxRU1fhniBcUvx2p4NhTCXzAkUT0zL/EyR+YUdOmdiWZC6zP6HhDzLGT
+	UyQfu6GTd6zJWiBQ6KJq5hvzWsaEowg=
+Date: Tue, 3 Feb 2026 16:10:04 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251229111708.59402-1-khushit.shah@nutanix.com>
- <83f9b0a5dd0bc1de9d1e61954f6dd5211df45163.camel@infradead.org>
- <aXt6ZEgZRGPPPtTB@google.com> <da810fb5204a88c352ca3983e0b2e27b485b33e7.camel@infradead.org>
-Message-ID: <aYKMGGttusuMI2QU@google.com>
-Subject: Re: [PATCH v5 4/3] KVM: selftests: Add test cases for EOI suppression modes
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Khushit Shah <khushit.shah@nutanix.com>, pbonzini@redhat.com, kai.huang@intel.com, 
-	mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	dave.hansen@linux.intel.com, tglx@linutronix.de, jon@nutanix.com, 
-	shaju.abraham@nutanix.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
+ across Live Update
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>,
+ Adithya Jayachandran <ajayachandra@nvidia.com>,
+ Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Ankit Agrawal
+ <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
+ Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>,
+ Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>,
+ kexec@lists.infradead.org, kvm@vger.kernel.org,
+ Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-mm@kvack.org,
+ linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>,
+ =?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>,
+ Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Pranjal Shrivastava <praan@google.com>, Pratyush Yadav
+ <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Samiullah Khawaja <skhawaja@google.com>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>,
+ Yi Liu <yi.l.liu@intel.com>
+References: <20260129212510.967611-1-dmatlack@google.com>
+ <20260129212510.967611-3-dmatlack@google.com>
+ <44484594-5b5d-4237-993c-ac1e173ad62e@linux.dev>
+ <CALzav=d1ZrHrWd-HhZJ8aY6aqxkBcLoet_5+-LL1mOakVTj6Ww@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Yanjun.Zhu" <yanjun.zhu@linux.dev>
+In-Reply-To: <CALzav=d1ZrHrWd-HhZJ8aY6aqxkBcLoet_5+-LL1mOakVTj6Ww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70114-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70116-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[44];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yanjun.zhu@linux.dev,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amazon.co.uk:email]
-X-Rspamd-Queue-Id: 85ACEDFE01
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 051D7DFED4
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026, David Woodhouse wrote:
-> On Thu, 2026-01-29 at 07:19 -0800, Sean Christopherson wrote:
-> > On Wed, Jan 28, 2026, David Woodhouse wrote:
-> > > From: David Woodhouse <dwmw@amazon.co.uk>
-> > >=20
-> > > Rather than being frightened of doing the right thing for the in-kern=
-el
-> > > I/O APIC because "there might be bugs",=20
-> >=20
-> > I'm not worried about bugs per se, I'm worried about breaking existing =
-guests.
-> > Even if KVM is 100% perfect, changes in behavior can still break guests=
-,
-> > especially for a feature like this where it seems like everyone got it =
-wrong.
->=20
-> There's the potential for guest bugs when the local APIC actually
-> starts honouring the DIRECTED_EOI bit in the SPIV register, sure. At
-> that point, the guest *has* to do the direct EOI (and it has to work).
->=20
-> But that's why we kept the 'quirk' mode as the default unless userspace
-> explicitly opts in. And it's true for the split-irqchip too; fixing the
-> behaviour is the whole point of this exercise.
->=20
-> I don't see why supporting precisely the same behaviour in the kernel
-> irqchip is any different in that respect.
 
-Conceptually, nothing.  But fixing the in-kernel I/O APIC is more invasive,=
- it's
-not currently broken (KVM doesn't advertise DIRECTED_EOI or SUPPRESS_EOI_BR=
-OADCAST),
-no one is lining up to actually utilizes the functionality, *and* there are=
- some
-historical warts in KVM that need to be addressed.
+On 2/2/26 10:14 AM, David Matlack wrote:
+> On Sat, Jan 31, 2026 at 10:38 PM Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
+>> 在 2026/1/29 13:24, David Matlack 写道:
+>>> Add an API to enable the PCI subsystem to track all devices that are
+>>> preserved across a Live Update, including both incoming devices (passed
+>>> from the previous kernel) and outgoing devices (passed to the next
+>>> kernel).
+>>>
+>>> Use PCI segment number and BDF to keep track of devices across Live
+>>> Update. This means the kernel must keep both identifiers constant across
+>>> a Live Update for any preserved device. VFs are not supported for now,
+>>> since that requires preserving SR-IOV state on the device to ensure the
+>>> same number of VFs appear after kexec and with the same BDFs.
+>>>
+>>> Drivers that preserve devices across Live Update can now register their
+>>> struct liveupdate_file_handler with the PCI subsystem so that the PCI
+>>> subsystem can allocate and manage File-Lifecycle-Bound (FLB) global data
+>>> to track the list of incoming and outgoing preserved devices.
+>>>
+>>>     pci_liveupdate_register_fh(driver_fh)
+>>>     pci_liveupdate_unregister_fh(driver_fh)
+>> Can the above 2 functions support the virtual devices? For example,
+>> bonding, veth, iSWAP and RXE.
+>>
+>> These virtual devices do not have BDF. As such, I am not sure if your
+>> patches take these virtual devices in to account.
+> No this patch series only supports PCI devices, since those are the
+> only devices so far we've needed to support.
+>
+> I am not familiar with any of the devices that you mentioned. If they
+> are virtual then does that mean it's all just software? In that case I
+> would be curious to know what problem is solved by preserving them in
+> the kernel, vs. tearing them down and rebuilding them across a Live
+> Udpate.
 
-Add it all up, and for me at least, the risk vs. reward is very different f=
-or
-split vs. fully in-kernel irqchips.
+Bonding, veth, rxe, and siw can be used in KVM environments.
 
-> > And as I said before, I'm not opposed to supporting directed EOI in the=
- in-kernel
-> > I/O APIC, but (a) I don't want to do it in conjunction with the fixes f=
-or stable@,
-> > and (b) I'd prefer to not bother unless there's an actual use case for =
-doing so.
-> > The in-kernel I/O APIC isn't being deprecated, but AFAIK it's being de-=
-prioritized
-> > by pretty much every VMM.=C2=A0 I.e. the risk vs. reward isn't there fo=
-r me.
->=20
-> I tend to favour the simplicity, with _ENABLE and _DISABLE just quietly
-> doing what their name implies without any of that nonsense about
-> "except if you have a kernel irqchip".
+Although these are software-only virtual devices with no associated 
+hardware,
 
-But they _don't_ do what their name implies if there's no in-kernel local A=
-PIC.
-I.e. userspace needs to read the docs and do the right thing anyways.
+they may maintain state that is observable by userspace.
 
-> But as you wish. Most of this test case should be fine on v6 of the
-> patch which dropped in-kernel I/O APIC support. All the tests are
-> conditional on the corresponding support being advertised, so it just
-> needs updating to correctly detect the in-kernel _ENABLE support in
-> case that does get added. How did we say we would advertise that?
+As a result, Live Update should preserve their state across the update.
 
-A doc update plus this:
+Zhu Yanjun
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 67e666921a12..d711493f9c69 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4934,7 +4934,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
-g ext)
-                break;
-        case KVM_CAP_X2APIC_API:
-                r =3D KVM_X2APIC_API_VALID_FLAGS;
--               if (kvm && !irqchip_split(kvm))
-+               if (kvm && !irqchip_in_kernel(kvm))
-                        r &=3D ~KVM_X2APIC_ENABLE_SUPPRESS_EOI_BROADCAST;
-                break;
-        case KVM_CAP_NESTED_STATE:
 
