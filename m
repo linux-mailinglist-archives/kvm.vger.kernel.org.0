@@ -1,1534 +1,248 @@
-Return-Path: <kvm+bounces-70179-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70180-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aAMYHeIag2l/hwMAu9opvQ
-	(envelope-from <kvm+bounces-70179-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:09:38 +0100
+	id EIFsKg0bg2l/hwMAu9opvQ
+	(envelope-from <kvm+bounces-70180-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:10:21 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E12E449C
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:09:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14421E44C2
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB719303988A
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 10:08:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 27F21302B397
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 10:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150CC3D6485;
-	Wed,  4 Feb 2026 10:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F663D648F;
+	Wed,  4 Feb 2026 10:09:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcOT+ytc"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="cKjBg8EO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013008.outbound.protection.outlook.com [52.101.83.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40CF3D5237
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 10:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770199705; cv=none; b=DCQE3RrVJjWZPtYpZKSP7d4KnMBQLUimRxbOwEZho7NxczAeSPpjny+xmNjX4zEkM0vuOQfsKHxLyOYdiddOe9V4kE+nUU1zbdYwQU9ZdIRMDPxRlJpNGzVIDJ7O8yds6VYNmZ13g4/orGd8WyPgFGs8WzWYQL4Uepm/NffU7wQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770199705; c=relaxed/simple;
-	bh=o7+JYVkcSck/qmfPjHiGAnfH68PsraghvuXjdU7hIrg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k7NGn9K3vim5bBfBZHwP+0GktGhnCXiLhW0RSrdQULN6z19EqblnYqHe/YsB81AghtgmK7m1UyUrOZPIszGcWYD0EB+1giqZK4D0BBRAcEl48oG2leEPKB5iWiNj9S1YiA6d7bhWxA9X4KreJnL52+suxMTl+CRpp+BehAUcG4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GcOT+ytc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770199703;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cpF5JbXlmmW75b43tI+8Yyoy2GUEzKBL/ZXEZed2Ez4=;
-	b=GcOT+ytcr2py+3cdZfom2nvDQ957EJsShIWxVTBQ9SlhT8To3d2v+JScQCgpClFRHwD+gM
-	jcpuJKQ+FHHa2dZCWi5795q/n+nAuUJ4fj5Aov4YcGo9LxWvVOwKRFxABCglwS7mHkpyRS
-	lq6d8rvDdFTf42IOeSkE8ujNk+3HX38=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-279-xSHWFzd5Ob-EbuYjqJWIbQ-1; Wed,
- 04 Feb 2026 05:08:18 -0500
-X-MC-Unique: xSHWFzd5Ob-EbuYjqJWIbQ-1
-X-Mimecast-MFC-AGG-ID: xSHWFzd5Ob-EbuYjqJWIbQ_1770199696
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CBEDD195605C;
-	Wed,  4 Feb 2026 10:08:16 +0000 (UTC)
-Received: from localhost (unknown [10.45.242.6])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9CD4030001BF;
-	Wed,  4 Feb 2026 10:08:14 +0000 (UTC)
-From: marcandre.lureau@redhat.com
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>,
-	kvm@vger.kernel.org,
-	Alex Williamson <alex@shazbot.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ben Chaney <bchaney@akamai.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	David Hildenbrand <david@kernel.org>,
-	Fabiano Rosas <farosas@suse.de>,
-	Peter Xu <peterx@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Mark Kanda <mark.kanda@oracle.com>,
-	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Subject: [PATCH 10/10] tests: add unit tests for RamDiscardManager multi-source aggregation
-Date: Wed,  4 Feb 2026 14:07:06 +0400
-Message-ID: <20260204100708.724800-11-marcandre.lureau@redhat.com>
-In-Reply-To: <20260204100708.724800-1-marcandre.lureau@redhat.com>
-References: <20260204100708.724800-1-marcandre.lureau@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C767C3D646B;
+	Wed,  4 Feb 2026 10:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770199771; cv=fail; b=QlA+r/ly3Mz86KLS84O8m+8DIwRxullPBPN1y/gjKLUOELo0o9JJsKxilfXUJan3Vea0LDPTfs4C3f7zQxAuOPgSaGSbWBXG3KNLs9ZwEInaj3FuIQ+ePo/zc2slNCmkVxLM9L/uf/NgfjFr7c5z65oN9hg7ubkEgYJCR83l1ec=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770199771; c=relaxed/simple;
+	bh=Rw8UfXek+tJrnwhDpXp/herfwL7FaOl0MxKnj/1mZqk=;
+	h=From:To:Subject:Date:Message-Id:Content-Type:MIME-Version; b=gvQk62OPQ9l9+5gbsxFEW12OAY1DX4x5hqLwhnBd6QWtQ5hYjnchHEKNTq2YeO8e2UOF0Ua9RKSL5gcMVFft4VteYmVhyU6vTsTEBGNcNWssyfeYRvdkaSlJENiEaic+VeQCZ2glXA1qDKDp/Qz6GEYGlfLrwo7H+jHsYyg6Rp0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=cKjBg8EO; arc=fail smtp.client-ip=52.101.83.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gAo+TJW9zekTbhRNKyvtiRdR2yX5s3qYA7cly7iDzDjFG654wfVT3lYOTjFCG/CDP5CS3DeK9qloDJnq0rGoaWb7AnhvTWm+GSNsBnr6wcOKjLOJXvADBkxsVIwx27t4KXsGuEbnZ7z/PWl34Fr2tpWD6bIK/Kw/FHIjBwgxzfUUX0NaGKJQSuPZu8nZoHOYyZK1Ms4rEbXqX/qf546b8YNejeZJtyxqjmNcpouq9mp8IBTDh32n9Z+8rzu95LMWJh+bSAQVjU/PaRPejU5eeaSB0+TR/TD4WyrgfHPSUYw10+36BSzaqbEfMF8bOM9SSp1dZICUOyUaeoUHsmK8Iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gtILn8QRQYxZp5XPFmYQWCI4OGUVSNg0whYhorGp3ww=;
+ b=E3uZ+lLW3yYzkL5SD4mSvNku7dYNkJJzAS2vilZqkp1Pw8rrznlgNPxdlO8GuXjuyZK2MfTxmo+JUMrnG4KcDBLEDSs6//w7R9kTAzxu1g3pWwcGRfr5aeMuNu+ha9tOBxztwqNqeUzB+tHJn++Nwr1C0ZBykEGwQuDPcesyMzgCby10NXKT9y6k2M01HhmmheMw0YgxA+ZlIzxa+ZHO02z43YZlfcwzQiNLL+DAOqzf1ApoQpPp8KqWIahMgSvhLmywYAgJ6HU9DGm3TeNOs1/FS9/bawFhRJmzgay0oqYq2Ud/8SuCpCUxg4jXGKpP4Wq8+MipGYW9NtfrSniaZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gtILn8QRQYxZp5XPFmYQWCI4OGUVSNg0whYhorGp3ww=;
+ b=cKjBg8EOVmCPCimrGlDBpvUhrcog/pqVx9s+RgedIFJgaaEYAI6C8ty/+71h9TvT+NOpyjr9pG2tuViUPZ/Pnl5BveM7vrPyPcJFHaYbtOSFp1NogZ4NDRqB4ZqBohZ5NGvIh31LBCqC0uRBxA6jwzLTJ1+eeTD6RucBbEjTs2oDCHupiCOvZwD827s5t9k4G59Vo+vn4S+H/zuM4cFihK04LScsNVeBVbPc+k5uxBJgKuedOtay18RfsPoULGJ9l8HypONzwmlcNVgvSoD+7gU2qSEM55gKM14/JMRviFcbfUfZwHVuKMhZBlunBOfNrIvEOP0gGNImO8R/q7rlOQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7)
+ by AS8PR04MB8867.eurprd04.prod.outlook.com (2603:10a6:20b:42e::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.12; Wed, 4 Feb
+ 2026 10:09:28 +0000
+Received: from PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633]) by PAXPR04MB8253.eurprd04.prod.outlook.com
+ ([fe80::2b4e:8130:4419:d633%3]) with mapi id 15.20.9587.010; Wed, 4 Feb 2026
+ 10:09:28 +0000
+From: Ioana Ciornei <ioana.ciornei@nxp.com>
+To: Alex Williamson <alex@shazbot.org>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH] vfio/fsl-mc: add myself as maintainer
+Date: Wed,  4 Feb 2026 12:09:12 +0200
+Message-Id: <20260204100913.3197966-1-ioana.ciornei@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P192CA0013.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5da::18) To PAXPR04MB8253.eurprd04.prod.outlook.com
+ (2603:10a6:102:1bf::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8253:EE_|AS8PR04MB8867:EE_
+X-MS-Office365-Filtering-Correlation-Id: f6a79d84-8856-494c-66eb-08de63d57b1f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|19092799006;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MZU7hYpjoMvIeb4oWJs8oPov625GPkp7Cb1lSd4dmUgoTICQ5a4RMlALN1BC?=
+ =?us-ascii?Q?qaM7d3/O+N8x7NbEGAWjmFnfkJ/nbHhFyveez1X/r1vp4yf7Q4xIy8k34L6f?=
+ =?us-ascii?Q?XOccL8MS2/SQz0LQ+QvhOrhD4CK6KuqNxelDbNVnW5SNZFm8vdBho0Kw1YoN?=
+ =?us-ascii?Q?/gofXp+4FfN5b/ROO4jQVlgEHgWS6Ry+6ZpdWESgoOw/H8d19Ra7Bc5jL3Qh?=
+ =?us-ascii?Q?LtaUk4LV4szDWl3CkucGrVOv1ScSyetm/3nUv+yWgUL6NY8eRg4bHHThaxJ5?=
+ =?us-ascii?Q?vlYwnCoqfgWzDHDhTo4IEnR+ie9Wj5AlWsWrfRXjBhCiqOXuZseH6qis++Ad?=
+ =?us-ascii?Q?PJtJwQW9fJdT4tkiu/9Jogmft3jMZr5mzQxWf8Q/59e9hxnQx6XPZ4CgTR6B?=
+ =?us-ascii?Q?l+vYUyV9T9ObJk3l8mfjgBXljRL3BDfBNv5cWF4ckYm9kf6XN+hsYSeJM4p1?=
+ =?us-ascii?Q?DYMAUDKMvUwYcovIcXMJifPd2L7xoWwuEpJ2qrBCXHKMvAS3RCQ6j8OJQTPp?=
+ =?us-ascii?Q?vSsKq4T+tma4IN9XikMsl5RJHPWY5DAmWf5jBHInd2vOMl3bc82DLVz+TBFK?=
+ =?us-ascii?Q?Fy2OCmoh3AREU1Jm7qlrRIDO9hU50yQBA2iABXZTHgo3tJL5vPrgWT3jgv8y?=
+ =?us-ascii?Q?YQMGkph6MD3L6bnhxVVrT3u6O/WtLp839V6EbNpjx+onO8IlWNgxw99dj3Hz?=
+ =?us-ascii?Q?MUAfhkk9KEKeZO2bLGiITbG2KTN/Nt3T7d9cqrrSiPb3dxdJvdFdVdPSg9vy?=
+ =?us-ascii?Q?XOVmyzwBAw1Gv018RyD1pwkY+SnUxgx9FmIFpMxOui5Nmq1mesiW6aN6qXfb?=
+ =?us-ascii?Q?1tNs79WedxhGi3wuADJGkXjXkB6ftCGj88E3bNYfh9GHfxUumFREOBS/lT7d?=
+ =?us-ascii?Q?c+6duc1mIj6sov4zfj94/TQfKbtzC0wjxj2Y1WLKnxmQjrKOv3blE/+28ddX?=
+ =?us-ascii?Q?RQEHdjJHMbCXKkzWalQ21It2hMTe3Jtj4OsC/HL+vqMnUKizMvs18J99fFPg?=
+ =?us-ascii?Q?VA7GxHWhEa4nYmPM3V02ysMcU9+zFlO0CKp+Zfoshjkf2WL86Q2Tbzv8coqj?=
+ =?us-ascii?Q?sFt68ecVJeUxpfTGznGxQbs6XZR/6ZrGmjSQmJN6B9TvZTglglIV3J2kkiMO?=
+ =?us-ascii?Q?u6oMjYmEhHcfuda8tu0d62u+jSySvZjQoVsqpIqE3XKsY2SuJpnybhlTJrQP?=
+ =?us-ascii?Q?GfwUY0EizzeohKydYqg9VTO85QpmdTxfkGX4R7smig1IpIY8SHINiYw4S80/?=
+ =?us-ascii?Q?lpL2r46a8i90RKTW532nLbyKW8/Is5jAV8OwFTAC9TYkK+Q6lj4vYSAp3zz/?=
+ =?us-ascii?Q?twpgC+IE7o1sz0jsNLBUKDFtnUlePpIG4lFFwUW1gF8abzHdY4Iw4ADupooi?=
+ =?us-ascii?Q?q7t3qeT52IcY+P6yugRuFef/F/U2WFPQgj2xNm7IxivjR/1iE5fL/WZSFKnq?=
+ =?us-ascii?Q?5aYB9p7PInt7TTHF3lW91/pKvhdBobvbmSUDz6xHuiivtQpXy++GzT2BbW5n?=
+ =?us-ascii?Q?s9u6XGLiZ5ojBMamYs7HIop/g0kIf+wP+2aMEFzocymD05auKPBe9W1bpw/e?=
+ =?us-ascii?Q?/z2BWJmReUgjUKoTGHU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8253.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(19092799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?0GfAtPeUIQGHJ8haKjhsaBwZCrLE4rbac7Dx1joDKf0M3tUraR0wqIFgQhBF?=
+ =?us-ascii?Q?TMdPpFS7Rjdz0KjFjLoQCOiY4yTqq2CYGlIZ9EdCNt49BQVU4CDPPoYaX3jI?=
+ =?us-ascii?Q?XskeNibXSajQt+J/nor7pwN7GWkfpDBGgzuBCBsrAQVEyRf3sAvJs1vNX32l?=
+ =?us-ascii?Q?3ssR7fN/WXX6haj5FcxFNIJudmAC0SXT7pdYbTYs2DZ2u4XVze/S9ICVcOJ9?=
+ =?us-ascii?Q?qaoAyOLDy9eyeML52gmRBOiFMpbZVc8l8hLjzN07dBkVR7rRra2NN2NTW2Kv?=
+ =?us-ascii?Q?AgUR+9iFzXkqcJDjGCgK8+c038WabX1KzZ8Sn75rBBZuBL4COBcRZ3lN/X3m?=
+ =?us-ascii?Q?P/0+PkUPdOqM7iDBAaUqu4vPkIwP6Vw1wHt9Ab8YFbU0eLXIXI/dZJ4v1/Co?=
+ =?us-ascii?Q?xYnVZGgNSgHqvmeJXSEy1YB4J8ulhT5B3QGxiA45eiJGVDJw/cZvxEg9cgvB?=
+ =?us-ascii?Q?vomuobs5EAqQK0m8hfT47Y0WtmCh2qybEbKQ+lifntQFyDIm9MY/A5znq0M6?=
+ =?us-ascii?Q?RWFqHWCjx1YLfxLL/X6YM2CcaHAQy6KHzomLzY5WE7S0FX82K4X1ae/Qy3Q3?=
+ =?us-ascii?Q?DXqtRgNimZgSNVfPVaAqT3xpCkz+oV7HdL37ITbP6QgbvMlOAcfWfx/AdGTG?=
+ =?us-ascii?Q?YFuejVZZUhi9Tap/PbY9Rsk+2ifOZVq5q7/7W7AZsQdtgICqR2u5WK8+w+Qg?=
+ =?us-ascii?Q?YfJLmYSTqTgAqatCG+xWUNKFvNya6Af7nniirlRTvtB6V/6ehMMWQeLH5E7f?=
+ =?us-ascii?Q?VDBnLAbksu288qJGcrWkdIBAvZQqPE94Ujp8dK8uwyNq4qouDtgOU/pxC8wK?=
+ =?us-ascii?Q?Mp9tQNF3atSCTTor5hRYErvqvp1doeOS5O36K9G5LHmDgON1IIwn4olXloR+?=
+ =?us-ascii?Q?RtSw6BMsB11NUobX0tJTffsfjaYTpZApFWRkhFzQ8OYCkK89XyHyB0Xl1asx?=
+ =?us-ascii?Q?pTipwfgH7iq2QCcwxiB66/kq4C5oCqb0jkXNJZJ7DbHGeSbmaNCAICfYJ+7h?=
+ =?us-ascii?Q?x/KnLkI4/qSXnlHKZ/ufGYhTbVuPW1VMdCbwjhJ4W9/KCCuaKYHuenIflURE?=
+ =?us-ascii?Q?7DnHqwrhPSKnsVIwIoVu/FzZGXHZlQ8/1oYw50/QoBbbPKBGnw8fw1ESqqin?=
+ =?us-ascii?Q?c/ixpTQa2nJSS3RYcd3zHUiYjulvzu/D4Ocnqpw8lZtNFJ0Ve5bU/PLIIShu?=
+ =?us-ascii?Q?azXVkZ/Z+0cjRFi+dv8CpsU+Yzg+E4F++2RR7U+QLE+Bngpiree++RcSy8Li?=
+ =?us-ascii?Q?m7JREtbguMBMogJitwcakp/6wXCjFxZyRPue0n3/yRAcZ9OCr5oZlJd4hg6r?=
+ =?us-ascii?Q?bw403hFaHT/efvEaTKT5nvqJCMLxGKI7sQyAj1R3QeJqJu6pgKQCh8jyVlEm?=
+ =?us-ascii?Q?CiUqNYgRCaUClV8lsIFtdQQ+iUvx8aCUfmKrzAKYznA+a/PxTYpiCfsvscZu?=
+ =?us-ascii?Q?3nEloyoMNT7AGfQAj5SbtGwR0lmHEeUukapuRxwee0LUdrOV0jUdl36ON6HH?=
+ =?us-ascii?Q?eQJkaSDxrxvPy+XgzczNDyTg4qACzGh6qVkz4HCyRThEpvA38uRFgNiFhICe?=
+ =?us-ascii?Q?awQTAJ3/EWZnWVguuBXDWOn4rCUYYgCNlC4N2L6RAGkyNZT7Q4pqiU+gmrmw?=
+ =?us-ascii?Q?iff+3XbnSRkMEBBYzONtVjJevxKBV8KJrSKFH3fmf2QqMMce2I8xlyFfevcC?=
+ =?us-ascii?Q?8BJKpDHlOjdHsjnPCh5mTahkQaBQa7NdLs771TOlQol2w95hfIxNoFXUeM9W?=
+ =?us-ascii?Q?KjHDX31hxA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6a79d84-8856-494c-66eb-08de63d57b1f
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8253.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2026 10:09:27.9706
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Amj06SglCwL3c3xPHsKcIZjphQnAbDIlNkdsO7IzFFK6FDk9IOlSE0MndMfYN/PYOmM4Tv+HTgSv+I/IvsGEAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8867
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70179-lists,kvm=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	TAGGED_FROM(0.00)[bounces-70180-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_NEQ_ENVFROM(0.00)[marcandre.lureau@redhat.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_RCPT(0.00)[kvm];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,section2.mr:url,section1.mr:url,section.mr:url]
-X-Rspamd-Queue-Id: 68E12E449C
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ioana.ciornei@nxp.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,nxp.com:dkim,nxp.com:mid]
+X-Rspamd-Queue-Id: 14421E44C2
 X-Rspamd-Action: no action
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Add myself as maintainer of the vfio/fsl-mc driver. The driver is still
+highly in use on Layerscape DPAA2 SoCs.
 
-Add various unit tests for the RamDiscardManager multi-source
-aggregation functionality.
-
-The test uses a TestRamDiscardSource QOM object that tracks populated
-state via a bitmap, similar to RamBlockAttributes implementation.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
 ---
- tests/unit/test-ram-discard-manager-stubs.c |   48 +
- tests/unit/test-ram-discard-manager.c       | 1313 +++++++++++++++++++
- tests/unit/meson.build                      |    8 +-
- 3 files changed, 1368 insertions(+), 1 deletion(-)
- create mode 100644 tests/unit/test-ram-discard-manager-stubs.c
- create mode 100644 tests/unit/test-ram-discard-manager.c
+ MAINTAINERS                       | 3 ++-
+ drivers/vfio/fsl-mc/Kconfig       | 5 +----
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c | 2 --
+ 3 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/tests/unit/test-ram-discard-manager-stubs.c b/tests/unit/test-ram-discard-manager-stubs.c
-new file mode 100644
-index 00000000000..5daef09e49e
---- /dev/null
-+++ b/tests/unit/test-ram-discard-manager-stubs.c
-@@ -0,0 +1,48 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "glib.h"
-+#include "system/memory.h"
-+
-+RamDiscardManager *memory_region_get_ram_discard_manager(MemoryRegion *mr)
-+{
-+    return mr->rdm;
-+}
-+
-+int memory_region_add_ram_discard_source(MemoryRegion *mr,
-+                                         RamDiscardSource *source)
-+{
-+    if (!mr->rdm) {
-+        mr->rdm = ram_discard_manager_new(mr);
-+    }
-+    return ram_discard_manager_add_source(mr->rdm, source);
-+}
-+
-+void memory_region_del_ram_discard_source(MemoryRegion *mr,
-+                                          RamDiscardSource *source)
-+{
-+    RamDiscardManager *rdm = mr->rdm;
-+
-+    if (!rdm) {
-+        return;
-+    }
-+
-+    ram_discard_manager_del_source(rdm, source);
-+}
-+
-+uint64_t memory_region_size(MemoryRegion *mr)
-+{
-+    return int128_get64(mr->size);
-+}
-+
-+MemoryRegionSection *memory_region_section_new_copy(MemoryRegionSection *s)
-+{
-+    MemoryRegionSection *copy = g_new(MemoryRegionSection, 1);
-+    *copy = *s;
-+    return copy;
-+}
-+
-+void memory_region_section_free_copy(MemoryRegionSection *s)
-+{
-+    g_free(s);
-+}
-diff --git a/tests/unit/test-ram-discard-manager.c b/tests/unit/test-ram-discard-manager.c
-new file mode 100644
-index 00000000000..73ecb4f793f
---- /dev/null
-+++ b/tests/unit/test-ram-discard-manager.c
-@@ -0,0 +1,1313 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+#include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
-+#include "qemu/module.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+#include "qom/object.h"
-+#include "qom/qom-qobject.h"
-+#include "glib.h"
-+#include "system/memory.h"
-+
-+#define TYPE_TEST_RAM_DISCARD_SOURCE "test-ram-discard-source"
-+
-+OBJECT_DECLARE_SIMPLE_TYPE(TestRamDiscardSource, TEST_RAM_DISCARD_SOURCE)
-+
-+struct TestRamDiscardSource {
-+    Object parent;
-+
-+    MemoryRegion *mr;
-+    uint64_t granularity;
-+    unsigned long *bitmap;
-+    uint64_t bitmap_size;
-+};
-+
-+static uint64_t test_rds_get_min_granularity(const RamDiscardSource *rds,
-+                                             const MemoryRegion *mr)
-+{
-+    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
-+
-+    g_assert(mr == src->mr);
-+    return src->granularity;
-+}
-+
-+static bool test_rds_is_populated(const RamDiscardSource *rds,
-+                                  const MemoryRegionSection *section)
-+{
-+    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
-+    uint64_t offset = section->offset_within_region;
-+    uint64_t size = int128_get64(section->size);
-+    uint64_t first_bit = offset / src->granularity;
-+    uint64_t last_bit = (offset + size - 1) / src->granularity;
-+    unsigned long found;
-+
-+    g_assert(section->mr == src->mr);
-+
-+    /* Check if any bit in range is zero (discarded) */
-+    found = find_next_zero_bit(src->bitmap, last_bit + 1, first_bit);
-+    return found > last_bit;
-+}
-+
-+static int test_rds_replay_populated(const RamDiscardSource *rds,
-+                                     const MemoryRegionSection *section,
-+                                     ReplayRamDiscardState replay_fn,
-+                                     void *opaque)
-+{
-+    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
-+    uint64_t first_bit, last_bit;
-+    uint64_t offset, size;
-+    int ret = 0;
-+
-+    g_assert(section->mr == src->mr);
-+
-+    first_bit = section->offset_within_region / src->granularity;
-+    first_bit = find_next_bit(src->bitmap, src->bitmap_size, first_bit);
-+
-+    while (first_bit < src->bitmap_size) {
-+        MemoryRegionSection tmp = *section;
-+
-+        offset = first_bit * src->granularity;
-+        last_bit = find_next_zero_bit(src->bitmap, src->bitmap_size,
-+                                      first_bit + 1) - 1;
-+        size = (last_bit - first_bit + 1) * src->granularity;
-+
-+        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-+            break;
-+        }
-+
-+        ret = replay_fn(&tmp, opaque);
-+        if (ret) {
-+            break;
-+        }
-+
-+        first_bit = find_next_bit(src->bitmap, src->bitmap_size, last_bit + 2);
-+    }
-+
-+    return ret;
-+}
-+
-+static int test_rds_replay_discarded(const RamDiscardSource *rds,
-+                                     const MemoryRegionSection *section,
-+                                     ReplayRamDiscardState replay_fn,
-+                                     void *opaque)
-+{
-+    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
-+    uint64_t first_bit, last_bit;
-+    uint64_t offset, size;
-+    int ret = 0;
-+
-+    g_assert(section->mr == src->mr);
-+
-+    first_bit = section->offset_within_region / src->granularity;
-+    first_bit = find_next_zero_bit(src->bitmap, src->bitmap_size, first_bit);
-+
-+    while (first_bit < src->bitmap_size) {
-+        MemoryRegionSection tmp = *section;
-+
-+        offset = first_bit * src->granularity;
-+        last_bit = find_next_bit(src->bitmap, src->bitmap_size,
-+                                 first_bit + 1) - 1;
-+        size = (last_bit - first_bit + 1) * src->granularity;
-+
-+        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
-+            break;
-+        }
-+
-+        ret = replay_fn(&tmp, opaque);
-+        if (ret) {
-+            break;
-+        }
-+
-+        first_bit = find_next_zero_bit(src->bitmap, src->bitmap_size,
-+                                       last_bit + 2);
-+    }
-+
-+    return ret;
-+}
-+
-+static void test_rds_class_init(ObjectClass *klass, const void *data)
-+{
-+    RamDiscardSourceClass *rdsc = RAM_DISCARD_SOURCE_CLASS(klass);
-+
-+    rdsc->get_min_granularity = test_rds_get_min_granularity;
-+    rdsc->is_populated = test_rds_is_populated;
-+    rdsc->replay_populated = test_rds_replay_populated;
-+    rdsc->replay_discarded = test_rds_replay_discarded;
-+}
-+
-+static const TypeInfo test_rds_info = {
-+    .name = TYPE_TEST_RAM_DISCARD_SOURCE,
-+    .parent = TYPE_OBJECT,
-+    .instance_size = sizeof(TestRamDiscardSource),
-+    .class_init = test_rds_class_init,
-+    .interfaces = (const InterfaceInfo[]) {
-+        { TYPE_RAM_DISCARD_SOURCE },
-+        { }
-+    },
-+};
-+
-+static TestRamDiscardSource *test_source_new(MemoryRegion *mr,
-+                                             uint64_t granularity)
-+{
-+    TestRamDiscardSource *src;
-+    uint64_t region_size = memory_region_size(mr);
-+
-+    src = TEST_RAM_DISCARD_SOURCE(object_new(TYPE_TEST_RAM_DISCARD_SOURCE));
-+    src->mr = mr;
-+    src->granularity = granularity;
-+    src->bitmap_size = DIV_ROUND_UP(region_size, granularity);
-+    src->bitmap = bitmap_new(src->bitmap_size);
-+
-+    return src;
-+}
-+
-+static void test_source_free(TestRamDiscardSource *src)
-+{
-+    g_free(src->bitmap);
-+    object_unref(OBJECT(src));
-+}
-+
-+static void test_source_populate(TestRamDiscardSource *src,
-+                                 uint64_t offset, uint64_t size)
-+{
-+    uint64_t first_bit = offset / src->granularity;
-+    uint64_t nbits = size / src->granularity;
-+
-+    bitmap_set(src->bitmap, first_bit, nbits);
-+}
-+
-+static void test_source_discard(TestRamDiscardSource *src,
-+                                uint64_t offset, uint64_t size)
-+{
-+    uint64_t first_bit = offset / src->granularity;
-+    uint64_t nbits = size / src->granularity;
-+
-+    bitmap_clear(src->bitmap, first_bit, nbits);
-+}
-+
-+typedef struct TestListener {
-+    RamDiscardListener rdl;
-+    int populate_count;
-+    int discard_count;
-+    uint64_t last_populate_offset;
-+    uint64_t last_populate_size;
-+    uint64_t last_discard_offset;
-+    uint64_t last_discard_size;
-+    int fail_on_populate;  /* Return error on Nth populate */
-+    int populate_call_num;
-+} TestListener;
-+
-+static int test_listener_populate(RamDiscardListener *rdl,
-+                                  const MemoryRegionSection *section)
-+{
-+    TestListener *tl = container_of(rdl, TestListener, rdl);
-+
-+    tl->populate_call_num++;
-+    if (tl->fail_on_populate > 0 &&
-+        tl->populate_call_num >= tl->fail_on_populate) {
-+        return -ENOMEM;
-+    }
-+
-+    tl->populate_count++;
-+    tl->last_populate_offset = section->offset_within_region;
-+    tl->last_populate_size = int128_get64(section->size);
-+    return 0;
-+}
-+
-+static void test_listener_discard(RamDiscardListener *rdl,
-+                                  const MemoryRegionSection *section)
-+{
-+    TestListener *tl = container_of(rdl, TestListener, rdl);
-+
-+    tl->discard_count++;
-+    tl->last_discard_offset = section->offset_within_region;
-+    tl->last_discard_size = int128_get64(section->size);
-+}
-+
-+static void test_listener_init(TestListener *tl)
-+{
-+    ram_discard_listener_init(&tl->rdl,
-+        test_listener_populate,
-+        test_listener_discard);
-+}
-+
-+#define TEST_REGION_SIZE (16 * 1024 * 1024)  /* 16 MB */
-+#define GRANULARITY_4K   (4 * 1024)
-+#define GRANULARITY_2M   (2 * 1024 * 1024)
-+
-+static MemoryRegion *test_mr;
-+
-+static void test_setup(void)
-+{
-+    test_mr = g_new0(MemoryRegion, 1);
-+    test_mr->size = int128_make64(TEST_REGION_SIZE);
-+    test_mr->ram = true;
-+}
-+
-+static void test_teardown(void)
-+{
-+    g_clear_pointer(&test_mr->rdm, object_unref);
-+    object_unparent(OBJECT(test_mr));
-+    g_free(test_mr);
-+    test_mr = NULL;
-+}
-+
-+static void test_single_source_basic(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+    g_assert_null(rdm);
-+
-+    /* Add source */
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+    g_assert_nonnull(rdm);
-+
-+    g_assert_cmpuint(ram_discard_manager_get_min_granularity(rdm, test_mr),
-+                     ==, GRANULARITY_4K);
-+
-+    /* Initially all discarded */
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(GRANULARITY_4K);
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate a range in source */
-+    test_source_populate(src, 0, GRANULARITY_4K * 4);
-+
-+    /* Now should be populated */
-+    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Check larger section */
-+    section.size = int128_make64(GRANULARITY_4K * 4);
-+    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Check section that spans populated and discarded */
-+    section.size = int128_make64(GRANULARITY_4K * 8);
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+
-+    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
-+
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+static void test_single_source_listener(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Populate some ranges before adding listener */
-+    test_source_populate(src, 0, GRANULARITY_4K * 4);
-+    test_source_populate(src, GRANULARITY_4K * 8, GRANULARITY_4K * 4);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+    g_assert_nonnull(rdm);
-+
-+    /* Register listener */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Should have been notified about populated regions */
-+    g_assert_cmpint(tl.populate_count, ==, 2);
-+
-+    /* Notify populate for new range */
-+    tl.populate_count = 0;
-+    test_source_populate(src, GRANULARITY_4K * 16, GRANULARITY_4K * 2);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              GRANULARITY_4K * 16,
-+                                              GRANULARITY_4K * 2);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 16);
-+    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 2);
-+
-+    /* Notify discard */
-+    tl.discard_count = 0;
-+    test_source_discard(src, 0, GRANULARITY_4K * 4);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
-+                                       0, GRANULARITY_4K * 4);
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+    g_assert_cmpuint(tl.last_discard_offset, ==, 0);
-+    g_assert_cmpuint(tl.last_discard_size, ==, GRANULARITY_4K * 4);
-+
-+    /* Unregister listener */
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+static void test_two_sources_same_granularity(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Add first source */
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    /* Add second source */
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+    g_assert_nonnull(rdm);
-+
-+    /* Check granularity */
-+    g_assert_cmpuint(ram_discard_manager_get_min_granularity(rdm, test_mr),
-+                     ==, GRANULARITY_4K);
-+
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(GRANULARITY_4K);
-+
-+    /* Both discarded -> aggregated discarded */
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate in src1 only */
-+    test_source_populate(src1, 0, GRANULARITY_4K);
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate in src2 only */
-+    test_source_discard(src1, 0, GRANULARITY_4K);
-+    test_source_populate(src2, 0, GRANULARITY_4K);
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate in both -> aggregated populated */
-+    test_source_populate(src1, 0, GRANULARITY_4K);
-+    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Remove sources */
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Two sources with different granularities (4K and 2M).
-+ * The aggregated granularity should be GCD(4K, 2M) = 4K.
-+ */
-+static void test_two_sources_different_granularity(void)
-+{
-+    TestRamDiscardSource *src_4k, *src_2m;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    int ret;
-+
-+    test_setup();
-+
-+    src_4k = test_source_new(test_mr, GRANULARITY_4K);
-+    src_2m = test_source_new(test_mr, GRANULARITY_2M);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src_4k));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src_2m));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    g_assert_cmpuint(ram_discard_manager_get_min_granularity(rdm, test_mr),
-+                     ==, GRANULARITY_4K);
-+
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(GRANULARITY_4K);
-+
-+    /* Both discarded */
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate 4K in src_4k, but src_2m still discarded the whole 2M block */
-+    test_source_populate(src_4k, 0, GRANULARITY_4K);
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate 2M in src_2m (which includes the 4K block) */
-+    test_source_populate(src_2m, 0, GRANULARITY_2M);
-+    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Check a 4K block at offset 4K (populated in src_2m but not in src_4k) */
-+    section.offset_within_region = GRANULARITY_4K;
-+    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
-+
-+    /* Populate it in src_4k */
-+    test_source_populate(src_4k, GRANULARITY_4K, GRANULARITY_4K);
-+    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
-+
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src_2m));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src_4k));
-+
-+    test_source_free(src_2m);
-+    test_source_free(src_4k);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Notification with two sources.
-+ * Populate notification should only fire when all sources are populated.
-+ */
-+static void test_two_sources_notification(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* No populate notifications yet (all discarded) */
-+    g_assert_cmpint(tl.populate_count, ==, 0);
-+
-+    /* Populate in src1 only - no notification (src2 still discarded) */
-+    test_source_populate(src1, 0, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src1),
-+                                              0, GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl.populate_count, ==, 0);
-+
-+    /* Populate same range in src2 - now should notify */
-+    test_source_populate(src2, 0, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src2),
-+                                              0, GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+
-+    /* Discard from src1 - should notify discard immediately */
-+    tl.discard_count = 0;
-+    test_source_discard(src1, 0, GRANULARITY_4K * 2);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src1),
-+                                       0, GRANULARITY_4K * 2);
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Adding source with existing listener.
-+ * When a new source is added, listeners should be notified about
-+ * regions that become discarded.
-+ */
-+static void test_add_source_with_listener(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Populate some range in src1 */
-+    test_source_populate(src1, 0, GRANULARITY_4K * 8);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Should have been notified about populated region */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpint(tl.last_populate_offset, ==, 0);
-+    g_assert_cmpint(tl.last_populate_size, ==, GRANULARITY_4K * 8);
-+
-+    /* src2 has part of the region populated, part discarded */
-+    /* src2 has 0-4 populated, 4-8 discarded */
-+    test_source_populate(src2, 0, GRANULARITY_4K * 4);
-+
-+    /* Add src2 - listener should be notified about newly discarded regions */
-+    tl.discard_count = 0;
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    /*
-+     * The range 4K*4 to 4K*8 was populated in src1 but discarded in src2,
-+     * so it becomes aggregated-discarded. Listener should be notified.
-+     * Only this range should trigger a discard notification - regions beyond
-+     * 4K*8 were already discarded in src1, so adding src2 doesn't change them.
-+     */
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+    g_assert_cmpint(tl.last_discard_offset, ==, GRANULARITY_4K * 4);
-+    g_assert_cmpint(tl.last_discard_size, ==, GRANULARITY_4K * 4);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Removing source with existing listener.
-+ * When a source is removed, listeners should be notified about
-+ * regions that become populated.
-+ */
-+static void test_remove_source_with_listener(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* src1: all of first 8 blocks populated */
-+    test_source_populate(src1, 0, GRANULARITY_4K * 8);
-+    /* src2: only first 4 blocks populated */
-+    test_source_populate(src2, 0, GRANULARITY_4K * 4);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Only first 4 blocks are aggregated-populated */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
-+
-+    /* Remove src2 - blocks 4-8 should become populated */
-+    tl.populate_count = 0;
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+
-+    /* Listener should be notified about newly populated region (4K*4 to 4K*8) */
-+    g_assert_cmpint(tl.populate_count, >=, 1);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Add a source, register a listener, remove the source, then add it back.
-+ * This checks the transition from 0 sources (all populated) to 1 source
-+ * (partially discarded) with an active listener.
-+ */
-+static void test_readd_source_with_listener(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Populate some range in src */
-+    test_source_populate(src, 0, GRANULARITY_4K * 8);
-+
-+    /* 1. Add source */
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* 2. Register listener */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Listener notified about populated region (0 - 32K) */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 8);
-+
-+    /* 3. Remove source */
-+    tl.populate_count = 0;
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+
-+    /*
-+     * With 0 sources, everything is populated.
-+     * The range that was discarded in src (from 32K to end) becomes populated.
-+     */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 8);
-+    g_assert_cmpuint(tl.last_populate_size, ==, TEST_REGION_SIZE - GRANULARITY_4K * 8);
-+
-+    /* 4. Add source back */
-+    tl.discard_count = 0;
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    /*
-+     * Now we have 1 source again. The range (32K to end) is discarded again.
-+     * Listener should be notified about this discard.
-+     */
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+    g_assert_cmpuint(tl.last_discard_offset, ==, GRANULARITY_4K * 8);
-+    g_assert_cmpuint(tl.last_discard_size, ==, TEST_REGION_SIZE - GRANULARITY_4K * 8);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Duplicate source registration should fail.
-+ */
-+static void test_duplicate_source(void)
-+{
-+    TestRamDiscardSource *src;
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    /* Adding same source again should fail */
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, -EBUSY);
-+
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Populate notification rollback on listener error.
-+ */
-+static void test_populate_rollback(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl1 = { 0, }, tl2 = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register two listeners */
-+    test_listener_init(&tl1);
-+    test_listener_init(&tl2);
-+    tl2.fail_on_populate = 1;  /* Second listener fails on first populate */
-+
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+
-+    /*
-+     * Register tl2 first so it's visited second (QLIST_INSERT_HEAD reverses
-+     * registration order). This ensures tl1 receives populate before tl2
-+     * fails.
-+     */
-+    ram_discard_manager_register_listener(rdm, &tl2.rdl, &section);
-+    ram_discard_manager_register_listener(rdm, &tl1.rdl, &section);
-+
-+    /* Try to populate - should fail and roll back */
-+    test_source_populate(src, 0, GRANULARITY_4K);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              0, GRANULARITY_4K);
-+    g_assert_cmpint(ret, ==, -ENOMEM);
-+
-+    /* First listener should have received populate then discard (rollback) */
-+    g_assert_cmpint(tl1.populate_count, ==, 1);
-+    g_assert_cmpint(tl1.discard_count, ==, 1);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl1.rdl);
-+    ram_discard_manager_unregister_listener(rdm, &tl2.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Replay populated with two sources (intersection).
-+ */
-+static void test_replay_populated_intersection(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /*
-+     * src1: blocks 0-7 populated
-+     * src2: blocks 4-11 populated
-+     * Intersection: blocks 4-7
-+     */
-+    test_source_populate(src1, 0, GRANULARITY_4K * 8);
-+    test_source_populate(src2, GRANULARITY_4K * 4, GRANULARITY_4K * 8);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener - should only get notified about intersection */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Should have been notified about blocks 4-7 (intersection) */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 4);
-+    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Empty region (no sources).
-+ */
-+static void test_no_sources(void)
-+{
-+    test_setup();
-+
-+    /* No sources - should have no manager */
-+    g_assert_null(memory_region_get_ram_discard_manager(test_mr));
-+    g_assert_false(memory_region_has_ram_discard_manager(test_mr));
-+
-+    test_teardown();
-+}
-+
-+static void test_redundant_discard(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Add sources */
-+    ret = memory_region_add_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+    ret = memory_region_add_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(TEST_REGION_SIZE);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Populate intersection (0-4K) in both sources */
-+    test_source_populate(src1, 0, GRANULARITY_4K);
-+    test_source_populate(src2, 0, GRANULARITY_4K);
-+
-+    /* Notify populate src1 - should trigger listener populate (as src2 is also populated) */
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src1), 0, GRANULARITY_4K);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+
-+    /* Now Discard src1 -> Aggregate Discarded */
-+    tl.discard_count = 0;
-+    test_source_discard(src1, 0, GRANULARITY_4K);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src1), 0, GRANULARITY_4K);
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+
-+    /* Now Discard src2 -> Aggregate Discarded (Already Discarded!) */
-+    /* Listener should NOT receive another discard notification for the same range. */
-+    test_source_discard(src2, 0, GRANULARITY_4K);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src2), 0, GRANULARITY_4K);
-+
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Listener with partial section coverage.
-+ * Listener should only receive notifications for its registered range.
-+ */
-+static void test_partial_listener_section(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Populate blocks 0-7 */
-+    test_source_populate(src, 0, GRANULARITY_4K * 8);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener for only blocks 2-5 (not the full region) */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = GRANULARITY_4K * 2;
-+    section.size = int128_make64(GRANULARITY_4K * 4);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Should be notified only about blocks 2-5 (intersection) */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 2);
-+    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
-+
-+    /* Discard block 0 - outside listener's section, no notification */
-+    tl.discard_count = 0;
-+    test_source_discard(src, 0, GRANULARITY_4K);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
-+                                       0, GRANULARITY_4K);
-+    g_assert_cmpint(tl.discard_count, ==, 0);
-+
-+    /* Discard block 3 - inside listener's section */
-+    test_source_discard(src, GRANULARITY_4K * 3, GRANULARITY_4K);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
-+                                       GRANULARITY_4K * 3, GRANULARITY_4K);
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+    g_assert_cmpuint(tl.last_discard_offset, ==, GRANULARITY_4K * 3);
-+
-+    /* Discard spanning boundary (blocks 5-6) - only block 5 in section */
-+    tl.discard_count = 0;
-+    test_source_discard(src, GRANULARITY_4K * 5, GRANULARITY_4K * 2);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
-+                                       GRANULARITY_4K * 5, GRANULARITY_4K * 2);
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+    g_assert_cmpuint(tl.last_discard_offset, ==, GRANULARITY_4K * 5);
-+    g_assert_cmpuint(tl.last_discard_size, ==, GRANULARITY_4K);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Multiple listeners with different (non-overlapping) sections.
-+ */
-+static void test_multiple_listeners_different_sections(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section1, section2;
-+    TestListener tl1 = { 0, }, tl2 = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Listener 1: blocks 0-3 */
-+    test_listener_init(&tl1);
-+    section1.mr = test_mr;
-+    section1.offset_within_region = 0;
-+    section1.size = int128_make64(GRANULARITY_4K * 4);
-+    ram_discard_manager_register_listener(rdm, &tl1.rdl, &section1);
-+
-+    /* Listener 2: blocks 8-11 */
-+    test_listener_init(&tl2);
-+    section2.mr = test_mr;
-+    section2.offset_within_region = GRANULARITY_4K * 8;
-+    section2.size = int128_make64(GRANULARITY_4K * 4);
-+    ram_discard_manager_register_listener(rdm, &tl2.rdl, &section2);
-+
-+    /* Initially all discarded - no populate notifications */
-+    g_assert_cmpint(tl1.populate_count, ==, 0);
-+    g_assert_cmpint(tl2.populate_count, ==, 0);
-+
-+    /* Populate blocks 0-3 - only tl1 should be notified */
-+    test_source_populate(src, 0, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              0, GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl1.populate_count, ==, 1);
-+    g_assert_cmpint(tl2.populate_count, ==, 0);
-+
-+    /* Populate blocks 8-11 - only tl2 should be notified */
-+    test_source_populate(src, GRANULARITY_4K * 8, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              GRANULARITY_4K * 8,
-+                                              GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl1.populate_count, ==, 1);
-+    g_assert_cmpint(tl2.populate_count, ==, 1);
-+
-+    /* Populate blocks 4-7 (gap) - neither listener should be notified */
-+    test_source_populate(src, GRANULARITY_4K * 4, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              GRANULARITY_4K * 4,
-+                                              GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl1.populate_count, ==, 1);
-+    g_assert_cmpint(tl2.populate_count, ==, 1);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl2.rdl);
-+    ram_discard_manager_unregister_listener(rdm, &tl1.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Multiple listeners with overlapping sections.
-+ */
-+static void test_overlapping_listener_sections(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section1, section2;
-+    TestListener tl1 = { 0, }, tl2 = { 0, };
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Listener 1: blocks 0-7 */
-+    test_listener_init(&tl1);
-+    section1.mr = test_mr;
-+    section1.offset_within_region = 0;
-+    section1.size = int128_make64(GRANULARITY_4K * 8);
-+    ram_discard_manager_register_listener(rdm, &tl1.rdl, &section1);
-+
-+    /* Listener 2: blocks 4-11 (overlaps with tl1 on blocks 4-7) */
-+    test_listener_init(&tl2);
-+    section2.mr = test_mr;
-+    section2.offset_within_region = GRANULARITY_4K * 4;
-+    section2.size = int128_make64(GRANULARITY_4K * 8);
-+    ram_discard_manager_register_listener(rdm, &tl2.rdl, &section2);
-+
-+    /* Populate blocks 4-7 (overlap region) - both should be notified */
-+    test_source_populate(src, GRANULARITY_4K * 4, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              GRANULARITY_4K * 4,
-+                                              GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl1.populate_count, ==, 1);
-+    g_assert_cmpint(tl2.populate_count, ==, 1);
-+
-+    /* Populate blocks 0-3 - only tl1 */
-+    test_source_populate(src, 0, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              0, GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl1.populate_count, ==, 2);
-+    g_assert_cmpint(tl2.populate_count, ==, 1);
-+
-+    /* Populate blocks 8-11 - only tl2 */
-+    test_source_populate(src, GRANULARITY_4K * 8, GRANULARITY_4K * 4);
-+    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
-+                                              GRANULARITY_4K * 8,
-+                                              GRANULARITY_4K * 4);
-+    g_assert_cmpint(ret, ==, 0);
-+    g_assert_cmpint(tl1.populate_count, ==, 2);
-+    g_assert_cmpint(tl2.populate_count, ==, 2);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl2.rdl);
-+    ram_discard_manager_unregister_listener(rdm, &tl1.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+/*
-+ * Test: Listener at exact memory region boundaries.
-+ */
-+static void test_boundary_section(void)
-+{
-+    TestRamDiscardSource *src;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    TestListener tl = { 0, };
-+    uint64_t last_offset;
-+    int ret;
-+
-+    test_setup();
-+
-+    src = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /* Populate last 4 blocks of the region */
-+    last_offset = TEST_REGION_SIZE - GRANULARITY_4K * 4;
-+    test_source_populate(src, last_offset, GRANULARITY_4K * 4);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src));
-+    g_assert_cmpint(ret, ==, 0);
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    /* Register listener for exactly the last 4 blocks */
-+    test_listener_init(&tl);
-+    section.mr = test_mr;
-+    section.offset_within_region = last_offset;
-+    section.size = int128_make64(GRANULARITY_4K * 4);
-+    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
-+
-+    /* Should receive notification for the populated range */
-+    g_assert_cmpint(tl.populate_count, ==, 1);
-+    g_assert_cmpuint(tl.last_populate_offset, ==, last_offset);
-+    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
-+
-+    /* Discard exactly at boundary */
-+    tl.discard_count = 0;
-+    test_source_discard(src, last_offset, GRANULARITY_4K * 4);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
-+                                       last_offset, GRANULARITY_4K * 4);
-+    g_assert_cmpint(tl.discard_count, ==, 1);
-+
-+    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
-+    test_source_free(src);
-+    test_teardown();
-+}
-+
-+static int count_discarded_blocks(const MemoryRegionSection *section,
-+                                  void *opaque)
-+{
-+    int *count = opaque;
-+    *count += int128_get64(section->size) / GRANULARITY_4K;
-+    return 0;
-+}
-+
-+/*
-+ * Test: replay_discarded with two sources (union semantics).
-+ */
-+static void test_replay_discarded(void)
-+{
-+    TestRamDiscardSource *src1, *src2;
-+    RamDiscardManager *rdm;
-+    MemoryRegionSection section;
-+    int count = 0;
-+    int ret;
-+
-+    test_setup();
-+
-+    src1 = test_source_new(test_mr, GRANULARITY_4K);
-+    src2 = test_source_new(test_mr, GRANULARITY_4K);
-+
-+    /*
-+     * src1: blocks 0-3 populated, rest discarded
-+     * src2: blocks 2-5 populated, rest discarded
-+     * Aggregated populated: blocks 2-3 (intersection)
-+     * Aggregated discarded: blocks 0-1, 4-5, 6+ (union of discarded)
-+     */
-+    test_source_populate(src1, 0, GRANULARITY_4K * 4);
-+    test_source_populate(src2, GRANULARITY_4K * 2, GRANULARITY_4K * 4);
-+
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src1));
-+    g_assert_cmpint(ret, ==, 0);
-+    ret = memory_region_add_ram_discard_source(test_mr,
-+                                               RAM_DISCARD_SOURCE(src2));
-+    g_assert_cmpint(ret, ==, 0);
-+
-+    rdm = memory_region_get_ram_discard_manager(test_mr);
-+
-+    section.mr = test_mr;
-+    section.offset_within_region = 0;
-+    section.size = int128_make64(GRANULARITY_4K * 8);
-+
-+    /* Count discarded blocks */
-+    ret = ram_discard_manager_replay_discarded(rdm, &section,
-+                                               count_discarded_blocks, &count);
-+
-+    g_assert_cmpint(ret, ==, 0);
-+    /* Discarded: blocks 0-1 (2), blocks 4-5 (2), blocks 6-7 (2) = 6 blocks */
-+    g_assert_cmpint(count, ==, 6);
-+
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
-+    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
-+
-+    test_source_free(src2);
-+    test_source_free(src1);
-+    test_teardown();
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    module_call_init(MODULE_INIT_QOM);
-+    type_register_static(&test_rds_info);
-+
-+    g_test_add_func("/ram-discard-manager/single-source/basic",
-+                    test_single_source_basic);
-+    g_test_add_func("/ram-discard-manager/single-source/listener",
-+                    test_single_source_listener);
-+    g_test_add_func("/ram-discard-manager/two-sources/same-granularity",
-+                    test_two_sources_same_granularity);
-+    g_test_add_func("/ram-discard-manager/two-sources/different-granularity",
-+                    test_two_sources_different_granularity);
-+    g_test_add_func("/ram-discard-manager/two-sources/notification",
-+                    test_two_sources_notification);
-+    g_test_add_func("/ram-discard-manager/dynamic/add-source-with-listener",
-+                    test_add_source_with_listener);
-+    g_test_add_func("/ram-discard-manager/dynamic/remove-source-with-listener",
-+                    test_remove_source_with_listener);
-+    g_test_add_func("/ram-discard-manager/dynamic/readd-source-with-listener",
-+                    test_readd_source_with_listener);
-+    g_test_add_func("/ram-discard-manager/edge/duplicate-source",
-+                    test_duplicate_source);
-+    g_test_add_func("/ram-discard-manager/edge/populate-rollback",
-+                    test_populate_rollback);
-+    g_test_add_func("/ram-discard-manager/edge/replay-intersection",
-+                    test_replay_populated_intersection);
-+    g_test_add_func("/ram-discard-manager/edge/no-sources",
-+                    test_no_sources);
-+    g_test_add_func("/ram-discard-manager/multi-source/redundant-discard",
-+                    test_redundant_discard);
-+    g_test_add_func("/ram-discard-manager/listener/partial-section",
-+                    test_partial_listener_section);
-+    g_test_add_func("/ram-discard-manager/listener/multiple-different",
-+                    test_multiple_listeners_different_sections);
-+    g_test_add_func("/ram-discard-manager/listener/overlapping",
-+                    test_overlapping_listener_sections);
-+    g_test_add_func("/ram-discard-manager/edge/boundary-section",
-+                    test_boundary_section);
-+    g_test_add_func("/ram-discard-manager/multi-source/replay-discarded",
-+                    test_replay_discarded);
-+
-+    return g_test_run();
-+}
-diff --git a/tests/unit/meson.build b/tests/unit/meson.build
-index bd580290601..e1f8061e98c 100644
---- a/tests/unit/meson.build
-+++ b/tests/unit/meson.build
-@@ -136,7 +136,13 @@ if have_system
-     'test-bufferiszero': [],
-     'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c'],
-     'test-vmstate': [migration, io],
--    'test-yank': ['socket-helpers.c', qom, io, chardev]
-+    'test-yank': ['socket-helpers.c', qom, io, chardev],
-+    'test-ram-discard-manager': [
-+      'test-ram-discard-manager.c',
-+      'test-ram-discard-manager-stubs.c',
-+      meson.project_source_root() / 'system/ram-discard-manager.c',
-+      genh, qemuutil, qom
-+    ],
-   }
-   if config_host_data.get('CONFIG_INOTIFY1')
-     tests += {'test-util-filemonitor': []}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 26898ca27409..66882df493cc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -27677,8 +27677,9 @@ F:	include/uapi/linux/vfio.h
+ F:	tools/testing/selftests/vfio/
+ 
+ VFIO FSL-MC DRIVER
++M:	Ioana Ciornei <ioana.ciornei@nxp.com>
+ L:	kvm@vger.kernel.org
+-S:	Obsolete
++S:	Maintained
+ F:	drivers/vfio/fsl-mc/
+ 
+ VFIO HISILICON PCI DRIVER
+diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
+index 43c145d17971..7d1d690348f0 100644
+--- a/drivers/vfio/fsl-mc/Kconfig
++++ b/drivers/vfio/fsl-mc/Kconfig
+@@ -2,12 +2,9 @@ menu "VFIO support for FSL_MC bus devices"
+ 	depends on FSL_MC_BUS
+ 
+ config VFIO_FSL_MC
+-	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices (DEPRECATED)"
++	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
+ 	select EVENTFD
+ 	help
+-	  The vfio-fsl-mc driver is deprecated and will be removed in a
+-	  future kernel release.
+-
+ 	  Driver to enable support for the VFIO QorIQ DPAA2 fsl-mc
+ 	  (Management Complex) devices. This is required to passthrough
+ 	  fsl-mc bus devices using the VFIO framework.
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+index ba47100f28c1..3985613e6830 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+@@ -531,8 +531,6 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+ 	struct device *dev = &mc_dev->dev;
+ 	int ret;
+ 
+-	dev_err_once(dev, "DEPRECATION: vfio-fsl-mc is deprecated and will be removed in a future kernel release\n");
+-
+ 	vdev = vfio_alloc_device(vfio_fsl_mc_device, vdev, dev,
+ 				 &vfio_fsl_mc_ops);
+ 	if (IS_ERR(vdev))
 -- 
-2.52.0
+2.25.1
 
 
