@@ -1,293 +1,235 @@
-Return-Path: <kvm+bounces-70245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70246-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qGjMBCN1g2mFmwMAu9opvQ
-	(envelope-from <kvm+bounces-70245-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 17:34:43 +0100
+	id sI/+Kk57g2nyngMAu9opvQ
+	(envelope-from <kvm+bounces-70246-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 18:01:02 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33E89EA4DF
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 17:34:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CBF2EAB1B
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 18:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0A9630445ED
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 16:22:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79C433055CAE
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 16:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1316D427A07;
-	Wed,  4 Feb 2026 16:22:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF44D33EAFE;
+	Wed,  4 Feb 2026 16:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lpgnz8s5"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dJ3wMTjl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qk1-f194.google.com (mail-qk1-f194.google.com [209.85.222.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0333A8FE0
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 16:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770222150; cv=pass; b=LUZOS7yNp17gX+Ihyo1sl23qQB/1JgnCxCuTQF7740g0mSGvGcXY8UH8AHyEAEE/saOWII7lUj9YqMu7Ikbzmtb48rcL0l5IyoFSfQopVNrkAioqoIZ7ltu503I/XgXHNbCX70GEwXkSCplX2f7NIhj5HkvO/Y5/MyWcb9DW0CI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770222150; c=relaxed/simple;
-	bh=pUtol5eaIeTn0uM3Bn9V2flw3Bw0p4Gjmxvuqr05MW0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mgJ1CJwWbjgXZjLVh593uHTc6xM3Wqq9Wv8UsuRoFNwBoMZx31WyB5VUt0IMoPaBZN/wlDo6c+cWM8DDaxij4VAFE7qXN13sy0MDSMacwiZ7rEJjDW2wZJlAh04G3OZXzdAnUUVGwTbPbBa+4fd2WvTv+TNBJo64pwPo/xmR3wU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lpgnz8s5; arc=pass smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-8887ac841e2so64580456d6.2
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 08:22:29 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770222149; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dk/1u0mdrh6nL08aY+MwvVsntoUAQzri2TN06YFvf2g7SLvdtyX36LOgzNonhiUmpb
-         D6Xa+hP/qhlDbRbvVpaLAb06Wgrp7bcd+ZyASAMXbx0ILiu0eKmTFS81fcYvUpWEu2MK
-         GUdVXzc6+BpP8/y1Jx5tLjFEUSq/orvAQXMH+FtQrrpXXMbwXuzJJaPEkSRQeLUR6AZC
-         9CPGzd7hoyqKGDKD09Hb3j2KIZ9B+8Cajfhl7pbtu21GU2/a/jQ4owI+fw5WM9kLY3fQ
-         IPYrKSlcNxEw50wDB3KeSIBgBV5Ov9AYKICjZtPKJ+7qFEnm8YeifQAxQ+QJJgLCmDDj
-         KjsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ddqXC4NQboI88tKP0R6qEYEEVvuGsZ52bcVcC2gy5wk=;
-        fh=QwlIhdCBhh+iCQ4wlEuJ99E/x+UHJ8ecJ/PFwcP6x0E=;
-        b=ZTPRHf+0qRyLcihNmS+ai/YO8v3I1kQmVHEtEhw4oqKAhJ4pOAkTQByRa0j3zUKSYQ
-         h2VaWm5odmckjjnmy8G3mxPr6ajql+o9rMQ/qNEOoV1p7IFAhlTZJyHDOZ7G/JnYkXsx
-         0ClMBLW1mnJCXT82BSp1uhcgNb8lUceUyydevSQtqKtjr4lRyJtNgzcWgqXv07k/r+Om
-         PBi+9bYmcCb1s4FJ0skGH9yR4h9e/spvxnI9abYiKG5fhd6jOAcdgwy3Xg/S+jceQZG3
-         5pbAzZBrbANUkmGLEQcGl0nNpPHeE2Ihs/fQqLYUal1xmE/Wqlq/hJfDqbujKRO+bSGy
-         QXvA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC0C33E354
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 16:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770224109; cv=none; b=ZEnvNUK566FVhLbUJzMnZWgB/mCuq+4XmEAaQ88fzylFhUXlXOqJaqxLZ8PU+Os1q2orX4bbLWUjuSklLymyt0kC0X7GZwUok4SceMQS5JL+oE+nbDoL3DlMdWj2JFg13VjmaxaW32b7h1InHMBy5On9U2bhXQS+B8G+SLsaGiI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770224109; c=relaxed/simple;
+	bh=5K5fR+HxBrdqjMKErGIv55w9oITaTZk9Qf+xlROKnSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fKWJHZDEiN2hFx/4vfyVD0RGCKrpCJ+tjSaBR99+RDhjX+22JKzdMpmWMGn/uF5r8yhFN6uGRfpO5B+WkeVZ9D23XfkjQkPVmPWNDzr8WvjtaSW8keI7PKfQtvmk7uxKhZo1yeLTSWy+pgrW80dsiQi+cAodnBI4pm+t/0G1OLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dJ3wMTjl; arc=none smtp.client-ip=209.85.222.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f194.google.com with SMTP id af79cd13be357-8c59bce68a1so524569085a.0
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 08:55:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770222149; x=1770826949; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ddqXC4NQboI88tKP0R6qEYEEVvuGsZ52bcVcC2gy5wk=;
-        b=lpgnz8s5egSZ1FN9CSCylcdZx4KOBMHYi9ScZHRxL3UTKqJ2Q2qSdI/Z5j0oV0SWk4
-         Wv10CpWDht4DtGe4TRCgYgrHxmtxo/Z1alGCU5kLhzGFUNgEfOMK9oZyu28ohn93ryGN
-         VVVboDRgZXv9Y+wu6RxGOioGFjLHumwdJZQf15lFKy/fDbD6OPiu6T6cbWTJsv571VlY
-         m6iH+or9U8RJYrU+RdELbiZlye4FeW3dhk+qkNb/4raivv/+z/cliPqLOBRUBLtOBoDR
-         Trfnj+7Xx2oBu7vcBnKM64VvXod+QiqEWXairFmhZg6UzZiGiTOsOP/7O4am6jWbX0Ky
-         H8Rg==
+        d=ziepe.ca; s=google; t=1770224108; x=1770828908; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+k5zz356tCtx+TsrSTgNS2LOgl52lZtCniOLQPd/1s0=;
+        b=dJ3wMTjlcrFt0OJax/CsfN1yUyB6wvWMaelcWV9nhohy8QA3GVs7AF6ZtNBdf9OjXZ
+         ajkkkzyh+ZvPwYDwiFPktPG7VGNkGPuB03uPbwGQFroNvICbrlkz9Z7q6QgY8p4Srvmy
+         aoD+KvnxxZ/ClqJg66luHVlFyv045VhXvyEvAs/+6pRZyqjBx5MsAhNeUwPJ00he+TTL
+         9jkH7yrYoucRIQdFBYM6v+ePbpC6OHYM39YtbPIn6Dfa/zLh0h5wzq/0TmheDXvPv6mp
+         XBxl7+OdSx9S3klWiruBg0MptbEC0lznV5E0sHEmcIc6uOdE9MX3ZF5AEBrNGgBV9aX5
+         wo4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770222149; x=1770826949;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ddqXC4NQboI88tKP0R6qEYEEVvuGsZ52bcVcC2gy5wk=;
-        b=JdFEzWOGpq4kzi9HTHAxy4yXv2Z5NOiVWorif4PxjLfeo3UkQvJhGGSc2fL+Y+pOqA
-         1f/ZQBh36PVEm7cJO5Yjn9Ug7NSpnrtBZgg1BsSBarG6v5fbCgKG15zol/5msammFNs7
-         dQFI0aTu8vDYX2yIALexfHOmyJd76ssHW3bGZ6AUi1PmOHDoKvEJQ4KunNUN+rJXF109
-         GJqMVjh8m7oY4cClDLqP0dG2kX12Qb0xHZzsn9P4HnYw1+5LmogZ+FOHJLlK7Xe3AJJC
-         Ayf1SU6C7P4WIOxHy1zqDJuZUoWnwquRYv4nNDSPd3s1Mbk1GafoKc+WU1muobsYbWff
-         lNow==
-X-Forwarded-Encrypted: i=1; AJvYcCXmassWczc0Wx8AIq242Y/BR/R/VX3gPs9wImATjxYAFgYK5u+Yc05r/k6Ecf3u5J0NeGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwG6Yjj6Vo6jLV0SA7Js8RPbAHetND2qKFY7McjbyY1RfX0RK4g
-	yF6JJaipDHB5exR6s3CRmwBec54qNYo28V0VCXhIfbjVMFeef6Jn9t0L7vNEAH0Mhz9dLB+UpHG
-	1Oc9SKtNMvCncExQj/RJlBCRPhzW41xSd0cbYxIxz
-X-Gm-Gg: AZuq6aKN0E2MXTUZIILfxwQvVdDurmNUyTkFrGI3vPIMdm58GWZb5WiCF+GsoX7/2fV
-	83w9/7i0ShkaUNB8KP64cbKasVxFodpt5M7cqlKYsybPklaRwdstodofsqZUOkEJkpkE6azOt/w
-	34If+KqZyVZnbUGAOMNk1oYuOZc92WFpA2RJDPa8PvFIY324XuvOhMQSV5+icuDQvN8TWrQiwGN
-	CblEM2hyGmDwQN/uylyYmvqbiDxSkUOEETwcmkT5sMVfj9chzsqXzNceAiIGebGJXj9g45vYLXU
-	urxdMTTYTNmspV7hbUpqCPnQo9JGEQ==
-X-Received: by 2002:a05:6214:1c8a:b0:895:1d59:5aa6 with SMTP id
- 6a1803df08f44-89522133a7dmr47418696d6.24.1770222148338; Wed, 04 Feb 2026
- 08:22:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770224108; x=1770828908;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+k5zz356tCtx+TsrSTgNS2LOgl52lZtCniOLQPd/1s0=;
+        b=tAZVVYh4OabOW2Qt6jYOu+s/6j6HFSEuCLDAfR0DDcGxkaNtMA+2COKlxCoX3ZwelW
+         +FlrMQvkIcQVp4aHY6XET8aGyFHsfb6/Fh8USOZ6EBM05S2mOwtA+yhvvzbeu3eNyB4a
+         XOJnigJYrHtTAOFHpYtebBNgS0930+41bvzMC6+lXyb+jK0VzsnEkWLfcfEBZ+8pQAI+
+         R77hvZfhrKnohOCajW5vv7t8YFcTrOnpD2UrX2+jwyS1IIIor0QXN8t8jRVeOSwFIX6z
+         BX4g9bRQ/0RcAmP3tfFJxRY8/WtU+0pzFf+yLto3XbtosBpFzYhGi2C0/XDTejIETIBv
+         Jr/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVQhv6bG5OMHgNQtC0LkrdgOzkUmxDVOOxUV4MUg/H0he5wueRiKbVQKanmr+gQq5PLTvQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM5mqKx9kwDxuEn0meUR63BcBAGZl0NXRQeRPoZXpXeCvy4J0q
+	ngdZyur3eoey+HSr7iP46pIPQiq/axYeISCR1WpJawYPIMZkYmzhGpcwjSAJVQStTxk=
+X-Gm-Gg: AZuq6aJpV52oklTaPsRzjsEJ27j096J1GrH9ocWVl7OLRM+VLJEFBlxNTjdnAmgZagg
+	luSSIezUqJxJU2oZCESNR//uhA7J7ARJF9HoZltNxxq2bM08PqNRWbmZglq1piGez7RGiXsJ8YX
+	mbm1hy6yeAtuLSdy3rUjW3rdhRJIKVUpvj18/VHSfGP81onDDQ1i1/2B+rv88XqRUo65xrJ0Wi4
+	aPJyUuLh1YuH3rSj1my6SKEHdQMlFEPK2p2oOOnYui1qCbTDhibaupiaoxiL4nesdJE8craB9ia
+	smVTDwJ2dTfB0p4Kbcz+zczqVMp0+9IPJIOjSis62Fvjq0vmgSijOs2WpBdx2kvsG+PoVHVQIgK
+	alHbJIZBpJ6UpwdplLPdNMJxw+qVTUvrry5O67Fz4IIuAXqpmcIUaIAnNQlOkuq9mUJXio5QavA
+	nXQgF4+7zrDZNEnr5hXbba0oevFKv+ZhVejL5HXsfbTvUsHCemoSXG1cJtvbJWR6e1PvE=
+X-Received: by 2002:a05:620a:4627:b0:8c7:177f:cc17 with SMTP id af79cd13be357-8ca2f9bbb5amr467025085a.46.1770224108469;
+        Wed, 04 Feb 2026 08:55:08 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8ca2fd2cfb4sm226461485a.33.2026.02.04.08.55.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Feb 2026 08:55:07 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vng9j-0000000HH15-13rk;
+	Wed, 04 Feb 2026 12:55:07 -0400
+Date: Wed, 4 Feb 2026 12:55:07 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 7/8] vfio: Permit VFIO to work with pinned importers
+Message-ID: <20260204165507.GH2328995@ziepe.ca>
+References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
+ <20260131-dmabuf-revoke-v7-7-463d956bd527@nvidia.com>
+ <fb9bf53a-7962-451a-bac2-c61eb52c7a0f@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260121004906.2373989-1-chengkev@google.com> <20260121004906.2373989-2-chengkev@google.com>
- <aXFOPP3P-HE6YbEZ@google.com> <sdyb3l4ihmcd7uxb6wivkyknmzy4bcctqyyidxq7hr2d2jfs6e@iz3fhfp6t4ss>
- <aXov3WWozd2UIFXw@google.com>
-In-Reply-To: <aXov3WWozd2UIFXw@google.com>
-From: Kevin Cheng <chengkev@google.com>
-Date: Wed, 4 Feb 2026 11:22:17 -0500
-X-Gm-Features: AZwV_QjNW9_6ij7DtwGROPIT-ToBvW8jJnQ8zpy7Sj9cym0DpWqPFbTEOgoaewY
-Message-ID: <CAE6NW_YexKSp19uATMQschZbbvon=Cdhv4EH6tRf-FNzgtL6ew@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: SVM: Fix nested NPF injection to set PFERR_GUEST_{PAGE,FINAL}_MASK
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fb9bf53a-7962-451a-bac2-c61eb52c7a0f@amd.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70246-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70245-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[intel.com:query timed out,ziepe.ca:query timed out];
+	FREEMAIL_CC(0.00)[kernel.org,linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	DMARC_NA(0.00)[ziepe.ca];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chengkev@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 33E89EA4DF
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,amd.com:email,shazbot.org:email]
+X-Rspamd-Queue-Id: 4CBF2EAB1B
 X-Rspamd-Action: no action
 
-On Wed, Jan 28, 2026 at 10:48=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Thu, Jan 22, 2026, Yosry Ahmed wrote:
-> > On Wed, Jan 21, 2026 at 02:07:56PM -0800, Sean Christopherson wrote:
-> > > On Wed, Jan 21, 2026, Kevin Cheng wrote:
-> > > > When KVM emulates an instruction for L2 and encounters a nested pag=
-e
-> > > > fault (e.g., during string I/O emulation), nested_svm_inject_npf_ex=
-it()
-> > > > injects an NPF to L1. However, the code incorrectly hardcodes
-> > > > (1ULL << 32) for exit_info_1's upper bits when the original exit wa=
-s
-> > > > not an NPF. This always sets PFERR_GUEST_FINAL_MASK even when the f=
-ault
-> > > > occurred on a page table page, preventing L1 from correctly identif=
-ying
-> > > > the cause of the fault.
-> > > >
-> > > > Set PFERR_GUEST_PAGE_MASK in the error code when a nested page faul=
-t
-> > > > occurs during a guest page table walk, and PFERR_GUEST_FINAL_MASK w=
-hen
-> > > > the fault occurs on the final GPA-to-HPA translation.
-> > > >
-> > > > Widen error_code in struct x86_exception from u16 to u64 to accommo=
-date
-> > > > the PFERR_GUEST_* bits (bits 32 and 33).
-> > >
-> > > Please do this in a separate patch.  Intel CPUs straight up don't sup=
-port 32-bit
-> > > error codes, let alone 64-bit error codes, so this seemingly innocuou=
-s change
-> > > needs to be accompanied by a lengthy changelog that effectively audit=
-s all usage
-> > > to "prove" this change is ok.
-> >
-> > Semi-jokingly, we can add error_code_hi to track the high bits and
-> > side-step the problem for Intel (dejavu?).
->
-> Technically, it would require three fields: u16 error_code, u16 error_cod=
-e_hi,
-> and u32 error_code_ultra_hi.  :-D
->
-> Isolating the (ultra) hi flags is very tempting, but I worry that it woul=
-d lead
-> to long term pain, e.g. because inevitably we'll forget to grab the hi fl=
-ags at
-> some point.  I'd rather audit the current code and ensure that KVM trunca=
-tes the
-> error code as needed.
->
-> VMX is probably a-ok, e.g. see commit eba9799b5a6e ("KVM: VMX: Drop bits =
-31:16
-> when shoving exception error code into VMCS").  I'd be more worred SVM, w=
-here
-> it's legal to shove a 32-bit value into the error code, i.e. where KVM mi=
-ght not
-> have existing explicit truncation.
+On Wed, Feb 04, 2026 at 05:21:45PM +0100, Christian König wrote:
+> On 1/31/26 06:34, Leon Romanovsky wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > Till now VFIO has rejected pinned importers, largely to avoid being used
+> > with the RDMA pinned importer that cannot handle a move_notify() to revoke
+> > access.
+> > 
+> > Using dma_buf_attach_revocable() it can tell the difference between pinned
+> > importers that support the flow described in dma_buf_invalidate_mappings()
+> > and those that don't.
+> > 
+> > Thus permit compatible pinned importers.
+> > 
+> > This is one of two items IOMMUFD requires to remove its private interface
+> > to VFIO's dma-buf.
+> > 
+> > Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> > Reviewed-by: Alex Williamson <alex@shazbot.org>
+> > Reviewed-by: Christian König <christian.koenig@amd.com>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_dmabuf.c | 15 +++------------
+> >  1 file changed, 3 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> > index 78d47e260f34..a5fb80e068ee 100644
+> > --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+> > +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> > @@ -22,16 +22,6 @@ struct vfio_pci_dma_buf {
+> >  	u8 revoked : 1;
+> >  };
+> >  
+> > -static int vfio_pci_dma_buf_pin(struct dma_buf_attachment *attachment)
+> > -{
+> > -	return -EOPNOTSUPP;
+> > -}
+> > -
+> > -static void vfio_pci_dma_buf_unpin(struct dma_buf_attachment *attachment)
+> > -{
+> > -	/* Do nothing */
+> > -}
+> > -
+> 
+> This chunk here doesn't want to apply to drm-misc-next, my educated
+> guess is that the patch adding those lines is missing in that tree.
 
-As I understand it, intel CPUs don't allow for setting bits 31:16 of
-the error code, but AMD CPUs allow bits 31:16 to be set. The
-86_exception error_code field is u16 currently so it is always
-truncated to u16 by default. In that case, after widening the error
-code to 64 bits, do I have to ensure that any usage of the error that
-isn't for NPF, has to truncate it to 16 bits? Or do I just need to
-verify that all SVM usages of the error_code for exceptions truncate
-the 64 bits down to 32 bits and all VMX usages truncate to 16 bits?
+Yes. It looks like Alex took it to his next tree:
 
-Just wanted to clarify because I think the wording of that statement
-is confusing me into thinking that maybe there is something wrong with
-32 bit error codes for SVM?
+commit 61ceaf236115f20f4fdd7cf60f883ada1063349a
+Author: Leon Romanovsky <leon@kernel.org>
+Date:   Wed Jan 21 17:45:02 2026 +0200
 
-If the only usage of the widened field is NPF, wouldn't it be better
-to go with an additional field like Yosry suggested (I see that VMX
-has the added exit_qualification field in the struct)?
+    vfio: Prevent from pinned DMABUF importers to attach to VFIO DMABUF
+    
+    Some pinned importers, such as non-ODP RDMA ones, cannot invalidate their
+    mappings and therefore must be prevented from attaching to this exporter.
+    
+    Fixes: 5d74781ebc86 ("vfio/pci: Add dma-buf export support for MMIO regions")
+    Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+    Reviewed-by: Pranjal Shrivastava <praan@google.com>
+    Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+    Link: https://lore.kernel.org/r/20260121-vfio-add-pin-v1-1-4e04916b17f1@nvidia.com
+    Signed-off-by: Alex Williamson <alex@shazbot.org>
 
->
-> > > > Update nested_svm_inject_npf_exit() to use fault->error_code direct=
-ly
-> > > > instead of hardcoding the upper bits. Also add a WARN_ON_ONCE if ne=
-ither
-> > > > PFERR_GUEST_FINAL_MASK nor PFERR_GUEST_PAGE_MASK is set, as this wo=
-uld
-> > > > indicate a bug in the page fault handling code.
-> > > >
-> > > > Signed-off-by: Kevin Cheng <chengkev@google.com>
-> > [..]
-> > > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > > > index de90b104a0dd5..f8dfd5c333023 100644
-> > > > --- a/arch/x86/kvm/svm/nested.c
-> > > > +++ b/arch/x86/kvm/svm/nested.c
-> > > > @@ -40,18 +40,17 @@ static void nested_svm_inject_npf_exit(struct k=
-vm_vcpu *vcpu,
-> > > >   struct vmcb *vmcb =3D svm->vmcb;
-> > > >
-> > > >   if (vmcb->control.exit_code !=3D SVM_EXIT_NPF) {
-> > > > -         /*
-> > > > -          * TODO: track the cause of the nested page fault, and
-> > > > -          * correctly fill in the high bits of exit_info_1.
-> > > > -          */
-> > > > -         vmcb->control.exit_code =3D SVM_EXIT_NPF;
-> > > > -         vmcb->control.exit_info_1 =3D (1ULL << 32);
-> > > > +         vmcb->control.exit_info_1 =3D fault->error_code;
-> > > >           vmcb->control.exit_info_2 =3D fault->address;
-> > > >   }
-> > > >
-> > > > + vmcb->control.exit_code =3D SVM_EXIT_NPF;
-> > > >   vmcb->control.exit_info_1 &=3D ~0xffffffffULL;
-> > > >   vmcb->control.exit_info_1 |=3D fault->error_code;
-> > >
-> > > So... what happens when exit_info_1 already has PFERR_GUEST_PAGE_MASK=
-, and then
-> > > @fault sets PFERR_GUEST_FINAL_MASK?  Presumably that can't/shouldn't =
-happen,
-> > > but nothing in the changelog explains why such a scenario is
-> > > impossible, and nothing in the code hardens KVM against such goofs.
-> >
-> > I guess we can update the WARN below to check for that as well, and
-> > fallback to the current behavior (set PFERR_GUEST_FINAL_MASK):
-> >
-> >       fault_stage =3D vmcb->control.exit_info_1 &
-> >                       (PFERR_GUEST_FINAL_MASK | PFERR_GUEST_PAGE_MASK);
-> >       if (WARN_ON_ONCE(fault_stage !=3D PFERR_GUEST_FINAL_MASK &&
-> >                        fault_stage !=3D PFERR_GUEST_PAGE_MASK))
-> >               vmcb->control.exit_info_1 |=3D PFERR_GUEST_FINAL_MASK;
->
-> Except that doesn't do the right thing if both bits are set.  And we can =
-use
-> hweight64(), which is a single POPCNT on modern CPUs.
->
-> Might be easiest to add something like PFERR_GUEST_FAULT_STAGE_MASK, then=
- do:
->
->         /*
->          * All nested page faults should be annotated as occuring on the =
-final
->          * translation *OR* the page walk.  Arbitrarily choose "final" if=
- KVM
->          * is buggy and enumerated both or none.
->          */
->         if (WARN_ON_ONCE(hweight64(vmcb->control.exit_info_1 &
->                                    PFERR_GUEST_FAULT_STAGE_MASK) !=3D 1))=
- {
->                 vmcb->control.exit_info_1 &=3D ~PFERR_GUEST_FAULT_STAGE_M=
-ASK;
->                 vmcb->control.exit_info_1 |=3D PFERR_GUEST_FINAL_MASK;
->         }
+The very best thing would be to pull
+61ceaf236115f20f4fdd7cf60f883ada1063349a which is cleanly based on
+v6.19-rc6 ?
+
+> How should we handle that? Patches 1-3 have already been pushed to
+> drm-misc-next and I would rather like to push patches 4-6 through
+> that branch as well.
+
+Or we get Alex to take a branch from you for the first 3 and push it?
+
+Jason
 
