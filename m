@@ -1,352 +1,170 @@
-Return-Path: <kvm+bounces-70133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70134-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qAfXMqmbgmlgWwMAu9opvQ
-	(envelope-from <kvm+bounces-70133-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 02:06:49 +0100
+	id yJymEouegmlgWwMAu9opvQ
+	(envelope-from <kvm+bounces-70134-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 02:19:07 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28D4DE04AE
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 02:06:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBF6BE065A
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 02:19:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD4CA315077B
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 01:02:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 539543155E92
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 01:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486DF2459C6;
-	Wed,  4 Feb 2026 01:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17F6259CB9;
+	Wed,  4 Feb 2026 01:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oKO2PWN1"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ayOvC/aV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923322765D7
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 01:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE26257431;
+	Wed,  4 Feb 2026 01:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770166873; cv=none; b=fl0LfasAvISOUDrMvK3Qd5TavHK/fiVrmhLuPxu5YnLCyfAMLVjHFqP9vyU4AGXW42ExrjZMr5pHtf3jQSSt5uXMuY5Nzvf7gVNsMg8U5XaqZe+xEexRKfCQgsRiYiWGSOFI0X4ljIVfie75+VEI3Ey8kZ9DrrY2R+FihMDt404=
+	t=1770167685; cv=none; b=PzemJe5OUh1HykFn+kox2dvZuX7UdrFED7QICGT9crYtZJwiy7W4kzCtrA3FqD9mVsnVJ9ftJ5msWTM7WXnU1wgeYB3YwH1+dRkX6xGQ8vQXJwaNlydO5k18Dc1l9B9e8+MdaFvDlqxQ5bXae1wZxLSnLBrEOtOm7Qr/WpZ4Vzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770166873; c=relaxed/simple;
-	bh=9iQwlJIHXJlRgSNvrGLR8wXlFf/oJocttagfEKyaD4I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OrQSrVihJN3yHuRkSbXK+9quE4oNvqiAgVfBXV2wlfyeCcrYIoN74OvM2931gFyPsD9b7tScjxQ+Xuru98OvbzEAg1T4daMC2mknTYkXMZE8GuGzskoGgb3S1gmXAeq8xwINSLithtV06xkyehff1fMZtQFdKS1KqFbI0vWyTSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oKO2PWN1; arc=none smtp.client-ip=209.85.210.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7cfd8a3db9cso30663692a34.0
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 17:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770166870; x=1770771670; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BiyvR40w7AY7Ci9X5DwiDavarBL0gnsawVId6L6rv0E=;
-        b=oKO2PWN1+irge1WDGyqzrkiw+4ZhwbMQKQSKe5vWY+dmdahLaNA5dxr1pJjuWYAZok
-         kq4cTxswhyYCB+754TW/fTtP4uNsiBTpdITNAjxj6FsPUj5ij9T0B90quyAe5x6YFeCt
-         NQkxV2GX3kXrpNKxX2+wqWORng47CcpMb2nGM/KfU6ftkhuNrPw1R7Hnozc/2MoBSE2Z
-         igKi45cuAktD6oN5ZBK20mvsBRRjsAd7tH/nI+4tHig59jAftKhjUmKqCYDUM+eBD8nR
-         ccRyBj5G9a122KHA12bUZiOIIZ7TKVVU/sFVYo0f5VlYH0gxVGLaKT+CQYakmSTTXuT4
-         /NPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770166870; x=1770771670;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BiyvR40w7AY7Ci9X5DwiDavarBL0gnsawVId6L6rv0E=;
-        b=haJroBi0PqdlwsPb5UhFpuiv255TXGz8qfRU+JV4tV9DeDaJAQbdB5JIXuzHihOHSI
-         DXw1sCAh3e8PWxnoxg/dKL7pJcgqZtBMyZCKmgR0nI0k70mtioS8SN5zVE/Sl3PS9YQa
-         GJ9qa+5+CrrJccWme8qkr8uxuKSEsLjM9nhiSBJ72q60miQE6X5MxALJeVuF8mwfHwb+
-         RvtwI4Jbhu3+Jl/ppeMwtsR0U8vc4tDIYg0ufm9ByMYKnwwuv6TaGebdgRHB1rYx/bXc
-         pRbmY71RdZS8+3mVQp+q5cwKkFo/c6qPC+SdXsLCKVXftisitcGGeQVFN7NQaXRw5AjS
-         1eXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVhiX2RT6Rpksvb7gPC7McSHV7hpYgQISWkXk4T+g+eheQsiy1E9ep6wI7+H3A1fP9V4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJfGnv1eBqa3xNI7H/x684W7I6e8SQQ0XZEnkshx4Z0/aNgpK1
-	E0PcKepm7bsp2hUCSFd34qGnN7jCo4xf2IZ2E/MqG/mdshR2YvuKAbpogyX+fQVGDJZRZqUJqaY
-	X+4sPVruDTw==
-X-Received: from iobgw7.prod.google.com ([2002:a05:6602:65c7:b0:95a:49ea:e587])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a4a:e844:0:b0:662:c6ea:ceb3
- with SMTP id 006d021491bc7-66a20882561mr573596eaf.33.1770166870417; Tue, 03
- Feb 2026 17:01:10 -0800 (PST)
-Date: Wed,  4 Feb 2026 01:00:57 +0000
-In-Reply-To: <20260204010057.1079647-1-rananta@google.com>
+	s=arc-20240116; t=1770167685; c=relaxed/simple;
+	bh=gVpNb2FcJnXvqjd76dpI3QbaGIpY5kIyXa8+4pcw7/o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hTM1oQ9S3ihwgG55h7zDStIT355O84TEuWA5ojyxEQgPUijuVuzIvzp9lsvC1SbbScKNjzt9zcg1zWGPt3tB78BgNV6acJ8g1T9TiAm6CroJIVmE/QV35mjJyvG6mnJs+mcSvkNYKM7gziAxlOXr5KrPHhg/aZbQmlZB7OAMiwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ayOvC/aV; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1770167674; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	bh=kcpw6nzObOocTcTfgP4J3okRdYpVAmfqCq2J3Q4ovjM=;
+	b=ayOvC/aVke1G/ZCMMBOP/uGdlIlixWcOs8vLxwIa0DCtNG+TbRl4iuC5W+6ChDV21GBbsFJpiMrVynV6690If+8FEeHIoSQ0EtYSYPNBsH9gXvUnR78f240DSYE22MeJ4J848qr44xE2sYBVokvFI936+AEmd/ZuPeF6YahQQxM=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WyUcCaB_1770167671 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 04 Feb 2026 09:14:32 +0800
+From: fangyu.yu@linux.alibaba.com
+To: andrew.jones@oss.qualcomm.com
+Cc: ajones@ventanamicro.com,
+	alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	corbet@lwn.net,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pbonzini@redhat.com,
+	pjw@kernel.org,
+	radim.krcmar@oss.qualcomm.com,
+	rkrcmar@ventanamicro.com
+Subject: Re: Re: [PATCH v4 2/4] RISC-V: KVM: Detect and expose supported HGATP G-stage modes 
+Date: Wed,  4 Feb 2026 09:14:29 +0800
+Message-Id: <20260204011429.64534-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <fazd2fcfuwldtrarm6aw26qa5g6fcieoa35xz3bwchif6qfutw@xuvspa4e533b>
+References: <fazd2fcfuwldtrarm6aw26qa5g6fcieoa35xz3bwchif6qfutw@xuvspa4e533b>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260204010057.1079647-1-rananta@google.com>
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260204010057.1079647-9-rananta@google.com>
-Subject: [PATCH v3 8/8] vfio: selftests: Add tests to validate SR-IOV UAPI
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>, 
-	Alex Williamson <alex.williamson@redhat.com>
-Cc: Vipin Sharma <vipinsh@google.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70133-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70134-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fangyu.yu@linux.alibaba.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rananta@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 28D4DE04AE
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.alibaba.com:mid,linux.alibaba.com:dkim,alibaba.com:email]
+X-Rspamd-Queue-Id: EBF6BE065A
 X-Rspamd-Action: no action
 
-Add a selftest, vfio_pci_sriov_uapi_test.c, to validate the
-SR-IOV UAPI, including the following cases, iterating over
-all the IOMMU modes currently supported:
- - Setting correct/incorrect/NULL tokens during device init.
- - Close the PF device immediately after setting the token.
- - Change/override the PF's token after device init.
+>> >> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> >>
+>> >> Extend kvm_riscv_gstage_mode_detect() to probe all HGATP.MODE values
+>> >> supported by the host and record them in a bitmask. Keep tracking the
+>> >> maximum supported G-stage page table level for existing internal users.
+>> >>
+>> >> Also provide lightweight helpers to retrieve the supported-mode bitmask
+>> >> and validate a requested HGATP.MODE against it.
+>> >>
+>> >> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> >> ---
+>> >> diff --git a/arch/riscv/include/asm/kvm_gstage.h b/arch/riscv/include/asm/kvm_gstage.h
+>> >> @@ -75,4 +76,40 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
+>> >> +enum kvm_riscv_hgatp_mode_bit {
+>> >> +	HGATP_MODE_SV39X4_BIT = 0,
+>> >> +	HGATP_MODE_SV48X4_BIT = 1,
+>> >> +	HGATP_MODE_SV57X4_BIT = 2,
+>> >
+>> >I think it's a bit awkward to pass 9 when selecting the hgatp mode, but
+>> >then look for bit 0 when detecting it...
+>> >Why not to use the RVI defined values for this UABI as well?
+>> >
+>> >There are only 16 possible hgatp.mode values, so we're fine storing them
+>> >in a bitmap even on RV32.
+>>
+>> I think this is a good point.
+>>
+>> Using logical bits 0/1/2 is indeed less intuitive than testing
+>> BIT(HGATP_MODE_SV39X4) when userspace passes the architectural HGATP.MODE
+>> encoding.
+>>
+>> However, if we use “HGATP.MODE encoding as bit index”, we need to export
+>> those encodings to userspace. Today HGATP_MODE_* are not part of the
+>> UAPI, so userspace would need to hardcode magic numbers.
+>>
+>> So if we go with this approach, I’ll add UAPI definitions for the HGATP
+>> mode encodings (e.g. #define KVM_RISCV_HGATP_MODE_SV39X4_BIT  8, etc.) and
+>> then define the returned bitmask as BIT(mode).
+>
+>The best part of Radim's suggestion is that there is no need to add the
+>bits to UAPI. We can write in the documentation for the capability that
+>the mode values match the spec. kvm userspace can then just look at the
+>spec to determine those values and create its own defines (which QEMU,
+>for example, has certainly already done).
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/vfio/Makefile         |   1 +
- .../selftests/vfio/vfio_pci_sriov_uapi_test.c | 200 ++++++++++++++++++
- 2 files changed, 201 insertions(+)
- create mode 100644 tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
+Makes sense, thanks.
 
-diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
-index 120c9fdee5c0..f83b054ed329 100644
---- a/tools/testing/selftests/vfio/Makefile
-+++ b/tools/testing/selftests/vfio/Makefile
-@@ -4,6 +4,7 @@ TEST_GEN_PROGS += vfio_iommufd_setup_test
- TEST_GEN_PROGS += vfio_pci_device_test
- TEST_GEN_PROGS += vfio_pci_device_init_perf_test
- TEST_GEN_PROGS += vfio_pci_driver_test
-+TEST_GEN_PROGS += vfio_pci_sriov_uapi_test
- 
- TEST_FILES += scripts/cleanup.sh
- TEST_FILES += scripts/lib.sh
-diff --git a/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
-new file mode 100644
-index 000000000000..9cfbecccb759
---- /dev/null
-+++ b/tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
-@@ -0,0 +1,200 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <sys/ioctl.h>
-+#include <linux/limits.h>
-+
-+#include <libvfio.h>
-+
-+#include "../kselftest_harness.h"
-+
-+#define UUID_1 "52ac9bff-3a88-4fbd-901a-0d767c3b6c97"
-+#define UUID_2 "88594674-90a0-47a9-aea8-9d9b352ac08a"
-+
-+static const char *pf_bdf;
-+
-+static int container_setup(struct vfio_pci_device *device, const char *bdf,
-+			   const char *vf_token)
-+{
-+	vfio_pci_group_setup(device, bdf);
-+	vfio_container_set_iommu(device);
-+	__vfio_pci_group_get_device_fd(device, bdf, vf_token);
-+
-+	/* The device fd will be -1 in case of mismatched tokens */
-+	return (device->fd < 0);
-+}
-+
-+static int iommufd_setup(struct vfio_pci_device *device, const char *bdf,
-+			 const char *vf_token)
-+{
-+	vfio_pci_cdev_open(device, bdf);
-+	return __vfio_device_bind_iommufd(device->fd,
-+					  device->iommu->iommufd, vf_token);
-+}
-+
-+static struct vfio_pci_device *device_init(const char *bdf, struct iommu *iommu,
-+					   const char *vf_token, int *out_ret)
-+{
-+	struct vfio_pci_device *device = vfio_pci_device_alloc(bdf, iommu);
-+
-+	if (iommu->mode->container_path)
-+		*out_ret = container_setup(device, bdf, vf_token);
-+	else
-+		*out_ret = iommufd_setup(device, bdf, vf_token);
-+
-+	return device;
-+}
-+
-+static void device_cleanup(struct vfio_pci_device *device)
-+{
-+	if (device->fd > 0)
-+		VFIO_ASSERT_EQ(close(device->fd), 0);
-+
-+	if (device->group_fd)
-+		VFIO_ASSERT_EQ(close(device->group_fd), 0);
-+
-+	vfio_pci_device_free(device);
-+}
-+
-+FIXTURE(vfio_pci_sriov_uapi_test) {
-+	char *vf_bdf;
-+};
-+
-+FIXTURE_SETUP(vfio_pci_sriov_uapi_test)
-+{
-+	char *vf_driver;
-+	int nr_vfs;
-+
-+	nr_vfs = sysfs_sriov_totalvfs_get(pf_bdf);
-+	if (nr_vfs <= 0)
-+		SKIP(return, "SR-IOV may not be supported by the PF: %s\n", pf_bdf);
-+
-+	nr_vfs = sysfs_sriov_numvfs_get(pf_bdf);
-+	if (nr_vfs != 0)
-+		SKIP(return, "SR-IOV already configured for the PF: %s\n", pf_bdf);
-+
-+	/* Create only one VF for testing */
-+	sysfs_sriov_numvfs_set(pf_bdf, 1);
-+	self->vf_bdf = sysfs_sriov_vf_bdf_get(pf_bdf, 0);
-+
-+	/*
-+	 * The VF inherits the driver from the PF.
-+	 * Ensure this is 'vfio-pci' before proceeding.
-+	 */
-+	vf_driver = sysfs_driver_get(self->vf_bdf);
-+	ASSERT_NE(vf_driver, NULL);
-+	ASSERT_EQ(strcmp(vf_driver, "vfio-pci"), 0);
-+	free(vf_driver);
-+
-+	printf("Created 1 VF (%s) under the PF: %s\n", self->vf_bdf, pf_bdf);
-+}
-+
-+FIXTURE_TEARDOWN(vfio_pci_sriov_uapi_test)
-+{
-+	free(self->vf_bdf);
-+	sysfs_sriov_numvfs_set(pf_bdf, 0);
-+}
-+
-+FIXTURE_VARIANT(vfio_pci_sriov_uapi_test) {
-+	const char *iommu_mode;
-+	char *vf_token;
-+};
-+
-+#define FIXTURE_VARIANT_ADD_IOMMU_MODE(_iommu_mode, _name, _vf_token)		\
-+FIXTURE_VARIANT_ADD(vfio_pci_sriov_uapi_test, _iommu_mode ## _ ## _name) {	\
-+	.iommu_mode = #_iommu_mode,						\
-+	.vf_token = (_vf_token),						\
-+}
-+
-+FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(same_uuid, UUID_1);
-+FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(diff_uuid, UUID_2);
-+FIXTURE_VARIANT_ADD_ALL_IOMMU_MODES(null_uuid, NULL);
-+
-+/*
-+ * PF's token is always set with UUID_1 and VF's token is rotated with
-+ * various tokens (including UUID_1 and NULL).
-+ * This asserts if the VF device is successfully created for a match
-+ * in the token or actually fails during a mismatch.
-+ */
-+#define ASSERT_VF_CREATION(_ret) do {					\
-+	if (!variant->vf_token || strcmp(UUID_1, variant->vf_token)) {	\
-+		ASSERT_NE((_ret), 0);					\
-+	} else {							\
-+		ASSERT_EQ((_ret), 0);					\
-+	}								\
-+} while (0)
-+
-+/*
-+ * Validate if the UAPI handles correctly and incorrectly set token on the VF.
-+ */
-+TEST_F(vfio_pci_sriov_uapi_test, init_token_match)
-+{
-+	struct vfio_pci_device *pf;
-+	struct vfio_pci_device *vf;
-+	struct iommu *iommu;
-+	int ret;
-+
-+	iommu = iommu_init(variant->iommu_mode);
-+	pf = device_init(pf_bdf, iommu, UUID_1, &ret);
-+	vf = device_init(self->vf_bdf, iommu, variant->vf_token, &ret);
-+
-+	ASSERT_VF_CREATION(ret);
-+
-+	device_cleanup(vf);
-+	device_cleanup(pf);
-+	iommu_cleanup(iommu);
-+}
-+
-+/*
-+ * After setting a token on the PF, validate if the VF can still set the
-+ * expected token.
-+ */
-+TEST_F(vfio_pci_sriov_uapi_test, pf_early_close)
-+{
-+	struct vfio_pci_device *pf;
-+	struct vfio_pci_device *vf;
-+	struct iommu *iommu;
-+	int ret;
-+
-+	iommu = iommu_init(variant->iommu_mode);
-+	pf = device_init(pf_bdf, iommu, UUID_1, &ret);
-+	device_cleanup(pf);
-+
-+	vf = device_init(self->vf_bdf, iommu, variant->vf_token, &ret);
-+
-+	ASSERT_VF_CREATION(ret);
-+
-+	device_cleanup(vf);
-+	iommu_cleanup(iommu);
-+}
-+
-+/*
-+ * After PF device init, override the existing token and validate if the newly
-+ * set token is the one that's active.
-+ */
-+TEST_F(vfio_pci_sriov_uapi_test, override_token)
-+{
-+	struct vfio_pci_device *pf;
-+	struct vfio_pci_device *vf;
-+	struct iommu *iommu;
-+	int ret;
-+
-+	iommu = iommu_init(variant->iommu_mode);
-+	pf = device_init(pf_bdf, iommu, UUID_2, &ret);
-+	vfio_device_set_vf_token(pf->fd, UUID_1);
-+
-+	vf = device_init(self->vf_bdf, iommu, variant->vf_token, &ret);
-+
-+	ASSERT_VF_CREATION(ret);
-+
-+	device_cleanup(vf);
-+	device_cleanup(pf);
-+	iommu_cleanup(iommu);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	pf_bdf = vfio_selftests_get_bdf(&argc, argv);
-+	return test_harness_run(argc, argv);
-+}
--- 
-2.53.0.rc2.204.g2597b5adb4-goog
+If we use the architectural HGATP.MODE encoding as the bit index, we can
+indeed avoid adding any extra *_BIT or mode constants to the UAPI.
 
+Not sure why my replies didn’t go through yesterday.
+
+Thanks for the review. I’ll incorporate this feedback as well as your
+other suggestions and address them in the next revision of the series.
+>
+>Thanks,
+>drew
+
+Thanks,
+Fangyu
 
