@@ -1,136 +1,133 @@
-Return-Path: <kvm+bounces-70118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70119-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNALJLCOgmkMWQMAu9opvQ
-	(envelope-from <kvm+bounces-70118-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:28 +0100
+	id IEjtLLaOgmkMWQMAu9opvQ
+	(envelope-from <kvm+bounces-70119-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C8E9DFEDB
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D530DFEE2
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 58E8330D6DFF
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4399330C5306
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0225133985;
-	Wed,  4 Feb 2026 00:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B202E33993;
+	Wed,  4 Feb 2026 00:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KUsiikIv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fa0FlzXV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F4627442
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892CE182D0
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770163840; cv=none; b=Nx03vjVxS3SWZZQrlyfL45AxrmvHBZw070BdTj98w5SQfHhGb2uzHBCMeln20fp6YEQGpfdnwzMCImNwloek/X9ONQ4uTyA51kCagR7UpoQVbfAwPVW74t9jGstq4BmDupL5iTqFHgaqV9aVn1Ez+FVE9ajn0e63xSoGBpYjXao=
+	t=1770163841; cv=none; b=a4seZ9Yvi4ZY5M62Jy6jPCiZMT+Frn4gZ6iDlI+EZk91JUS7tjvsWpZ5crEKviyHPbkbcfxu11Q/HTPIQz6dys+Yf0v/6ZP5a7+eHUY+jSeAUvF+XWKDaJvv04roBl9/9V9JeA6KJJXuGa/JAb2zZ1KNiU6Zm5hkAYhpmxJegzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770163840; c=relaxed/simple;
-	bh=vqzHv7lXFONrgk1q1S1d7m7ni/z2/e2XsIvvQuEyR80=;
+	s=arc-20240116; t=1770163841; c=relaxed/simple;
+	bh=jZ3vlTcO/4ulnqY7jw5dZ3hjdbQMjCoVlfVlP4fF10M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nGamD5NW5d81FDcsnWrpV4O59NCnuYT+s+CxplYep7fab7vnw0+eAne4HqOOOWwv2YSa55sKTatzn0+UhFgsQ+xVWUpuVMU9n6FLEo4GfLcl8RkCaJaygiqMRiIN4PolUBs0m6l5JvRGXVQNkJUxDjdmW0yQPQ264uux4o0R3hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KUsiikIv; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=nTulwTcw+ChU2EKeFMXHkge7hOXGKOp86rlwwFDS+dBIcUPBpCAL5taJNj6BopEDs0u3vXLv2xOSem3cjbT0YqS7tW4tRvLhyIhT+J1YVGra5s8FHg53gqgURSuiB3qEkndW0klNotbi1mIEfmqXsVf2LaxT4Pd+PY/cfeqQ5es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fa0FlzXV; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35301003062so14907274a91.2
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 16:10:35 -0800 (PST)
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-66485ced4cdso18348743eaf.1
+        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 16:10:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770163835; x=1770768635; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770163839; x=1770768639; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T642Vz3ikngqdidKik0xkf1miyZGBg7zmmEdVffHrRw=;
-        b=KUsiikIvMuLi339Ef6GTZnRqn73MSj6vsyX6Hpa4gZIX0Tyay/7PkJ+mLE/VcQnVLT
-         9p4Ces+RplTpHYRgjFWC+tBnSjob9qByNhdlFMS7azEsk12hEqllRXYDHm2Bb79+sbmO
-         Cfz+TI2adN7/sICL2Rb4H5LvaUj7/eTpIZPijdOz7x2pgwP03zuCEUd/BLNV6BHUEAjk
-         3Re6CvL1wWzRZPjEyvj625i0Okv/tZeC9leaqXn9e/elSc1cU1U1QfyRijGIczgBGFBy
-         zAH9b8KUyU8/lehV1tddgAFnOxKGC6uHOkZSuGB6ZiPDRz0CeXQPtW2al4TH6jxdBeX0
-         DGlQ==
+        bh=C8p8NbRPCPDmkixC3vF525swc1H8aTdK9eIWx03vtzI=;
+        b=fa0FlzXVRr/enafgCyiyX4UMj9XCyZF2U3aMYQfQa2IMpdX30RFqS4uvg4rzdz0vn8
+         +LqgkSliBeV/zaYCaXvYnuwma1qV7/rMhpj2iNV2h4pS1hhxkEfJ5Kt2ghNU+CHkVsLU
+         vmtf7X2I/icICQcaSR6FBEdckEgd9ZYPLhrlnVV5f4lQUEjGvasCnp0lXQ412NjyWTp2
+         CEeJ+NbKFIQqYVgKDuLPS+dVgalyLOb2VBhCV2hSzRZaqy+KzRr0AC89GKnCLqdceRAK
+         aZrCNbxAfaUzRZBANrgQOpytuWSIVPnjhf+2h7Jo5FuqpM7P5TzLFQ2+zoJjFaeW6Gzj
+         8QpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770163835; x=1770768635;
+        d=1e100.net; s=20230601; t=1770163839; x=1770768639;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T642Vz3ikngqdidKik0xkf1miyZGBg7zmmEdVffHrRw=;
-        b=FhcpH2+jmh1gyAKQGpZEoav+BkfdmQHtwgPlISSfrv/cvka6AF8B/RkoSryJ8YWVMa
-         o741T+CeV8tDHHKaYf/ee//UIwGGX/HrlFWS7HyPSOZSopLvz0kDFDFEPePhLVqBBbpy
-         y72XuMQ5bFKUYy1vaSghim90V58/bYGOVK3VidR3p9UGaW7yRd6p76kf9voDTQtbWkks
-         PJVg4Do3kvAaPl4T0CYgnmfU/BYLqp/Ge4tOhrORd08qGFQZOuVoFUsr8utVUy2YQ41B
-         fIzw4OqnzpJk9qmfpNa6IGDlP7ic2YIMgnEQaTHNzFUZvSOvhcmnLholGKFujhxGBJFR
-         2+XQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoy2D6UMeoyQyDZN5xmqGRGfgWa6g0mRRl3ZDL+df4CqTNWlQYyWXiMF3gXEX8v2ls528=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEqqT+vikq2wdzqkl6UMkWfi/V8z2RHCBGjTCiTkUOm+hgDdkI
-	XDjGzDxY0DGAmz23khW9LM8iKauDsFAOAqgE+BB4Fj5j4Av83WoFASzmWseS+4ml9IfWxPaqcqu
-	yP7la+g==
-X-Received: from pjyl6.prod.google.com ([2002:a17:90a:ec06:b0:34e:d39d:454a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c05:b0:32e:7270:9499
- with SMTP id 98e67ed59e1d1-35486f57774mr858279a91.0.1770163834977; Tue, 03
- Feb 2026 16:10:34 -0800 (PST)
-Date: Tue,  3 Feb 2026 16:10:17 -0800
-In-Reply-To: <20260123125657.3384063-1-khushit.shah@nutanix.com>
+        bh=C8p8NbRPCPDmkixC3vF525swc1H8aTdK9eIWx03vtzI=;
+        b=mXmfA1rFlIWzyGzcRu/8gTa8i5KsKRb7bhWWXI75+E6wWqJ+O3tBQOcE/eCA0HGUBq
+         50G6mcQeRxj5Gow8Fep30Ss0j9W4M3glO1ktvr4Xlfz6/lIzFENhlw1B1eP6xm6lNOg7
+         YTwWEW1917r9FGNNgwwqH+/uY4h7NQm7jw7CDNonSRF7/+zUNFIjbDhV19znyGPC9qPV
+         lEezDwKNn4g8mvTvd9RzMCtmJB5kf/qULXFTKWLzU0BaNJ28HknX2sGTLrm0a7pP/CB0
+         35I5xbovfUT5CgNSIYHBsILr61nSkrSH9ZwEIasRzZtyTUDBXJnJ5vG+uySbUeFcg4WX
+         NrrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVBi369GvjJqqDssFUvvIkVXfU2gyaJ9cHGMi362xTNDsuv1iKHGwOh/h/3TeR7YG+n3o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4gpHNZvYmgg3IssTdP+szs5NaUJMnp+A+Mdv+GBHO47SCAw7y
+	sKKeA7DtMTb0sHo5nJsrm0IDGr/LXCDo7tGdkfmn6partJWFKLA/S/kXxF+kitequ67cMIr8LRA
+	vZcLIBA==
+X-Received: from ileg11.prod.google.com ([2002:a05:6e02:1a2b:b0:447:81b5:ae2d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:4889:b0:663:859:c429
+ with SMTP id 006d021491bc7-66a23334fb3mr580988eaf.59.1770163839458; Tue, 03
+ Feb 2026 16:10:39 -0800 (PST)
+Date: Tue,  3 Feb 2026 16:10:19 -0800
+In-Reply-To: <20260123222801.646123-1-kovalev@altlinux.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260123125657.3384063-1-khushit.shah@nutanix.com>
+References: <20260123222801.646123-1-kovalev@altlinux.org>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <177016270726.565816.4840269573401291170.b4-ty@google.com>
-Subject: Re: [PATCH v6] KVM: x86: Add x2APIC "features" to control EOI
- broadcast suppression
+Message-ID: <177016337221.570259.7480661884479606401.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, kai.huang@intel.com, 
-	dwmw2@infradead.org, Khushit Shah <khushit.shah@nutanix.com>
-Cc: mingo@redhat.com, x86@kernel.org, bp@alien8.de, hpa@zytor.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	dave.hansen@linux.intel.com, tglx@linutronix.de, jon@nutanix.com, 
-	shaju.abraham@nutanix.com, stable@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Vasiliy Kovalev <kovalev@altlinux.org>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lvc-project@linuxtesting.org
 Content-Type: text/plain; charset="utf-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70119-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70118-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1C8E9DFEDB
+X-Rspamd-Queue-Id: 6D530DFEE2
 X-Rspamd-Action: no action
 
-On Fri, 23 Jan 2026 12:56:25 +0000, Khushit Shah wrote:
-> Add two flags for KVM_CAP_X2APIC_API to allow userspace to control support
-> for Suppress EOI Broadcasts when using a split IRQCHIP (I/O APIC emulated
-> by userspace), which KVM completely mishandles. When x2APIC support was
-> first added, KVM incorrectly advertised and "enabled" Suppress EOI
-> Broadcast, without fully supporting the I/O APIC side of the equation,
-> i.e. without adding directed EOI to KVM's in-kernel I/O APIC.
+On Sat, 24 Jan 2026 01:28:01 +0300, Vasiliy Kovalev wrote:
+> Add SRCU read-side protection when reading PDPTR registers in
+> __get_sregs2().
+> 
+> Reading PDPTRs may trigger access to guest memory:
+> kvm_pdptr_read() -> svm_cache_reg() -> load_pdptrs() ->
+> kvm_vcpu_read_guest_page() -> kvm_vcpu_gfn_to_memslot()
 > 
 > [...]
 
-Applied to kvm-x86 misc, with some minor formatting tweaks.  Thanks!
+Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: x86: Add x2APIC "features" to control EOI broadcast suppression
-      https://github.com/kvm-x86/linux/commit/6517dfbcc918
+[1/1] KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()
+      https://github.com/kvm-x86/linux/commit/95d848dc7e63
 
 --
 https://github.com/kvm-x86/linux/tree/next
