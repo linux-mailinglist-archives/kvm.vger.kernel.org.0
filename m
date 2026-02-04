@@ -1,311 +1,200 @@
-Return-Path: <kvm+bounces-70266-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70268-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mC6cEC6Yg2lnpwMAu9opvQ
-	(envelope-from <kvm+bounces-70266-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 20:04:14 +0100
+	id EGoOIr6Zg2lnpwMAu9opvQ
+	(envelope-from <kvm+bounces-70268-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 20:10:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9CEBEBD76
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 20:04:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17A6EBF16
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 20:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C32193015A72
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 19:04:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6EC6F3012C81
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 19:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6343427A16;
-	Wed,  4 Feb 2026 19:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C9442849D;
+	Wed,  4 Feb 2026 19:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/sjk6wX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RjTHlpsZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u8Y0xbg6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34E22367B5
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 19:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770231845; cv=none; b=Cw5NAkO/Cp2iJRlN0PR3PwhZqeTzEKllGuQHaOlJySAGudydFO+KNGT3PAjz21sgfaWV4vBb3WkbfGn2vd9fyFuk2YtlZvqcD3vGfO80D5ntpSVc2ZZfudZIM5xwITLq3c9dC4DAYird8Ce+E7lQO7WBXWvXf6oVKhkHsZi5qdU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770231845; c=relaxed/simple;
-	bh=vE8DQL76s4TcuUwBIMs9rh8N/GnzJfzppjcOoChPOB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DAGn6tw+mxaMYtt/waMyOHbNbNKQEOyUf2SpkKrH0z9ldgAe917XX/NZeKrdjOG/vYSHtU3lmTxjnWnTeNMUpeCWZvPW+n1IfYWflAh0CtfzNmVH+mcLZ16nSLsC8SxqQG+oeAQMU/Mv5MurC7NfA6sa2DqJDYdaA3PpfXpoWTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g/sjk6wX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RjTHlpsZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770231843;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6HhJDWdiH+sSKLH6a+nIbjrvZv2j3XojMKDoG+stmr4=;
-	b=g/sjk6wXZ078RasBJN3CWEt3bTkESMIGgUB7lg0rRAjPn8tsLZDXXLoRtOPzqTVeKHU5Fk
-	Q1We7cp2bPAOEeGcNWrOOP6YsOAFcr2eGMxxATRT5NJuRqVpN3FZs6kXBJUjjogkgt/YP2
-	2JUh5wm63ghqWtR/ZrPRWx0QYOYIjy8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-lRmza_7vMtGu9lRQC7qIaw-1; Wed, 04 Feb 2026 14:04:02 -0500
-X-MC-Unique: lRmza_7vMtGu9lRQC7qIaw-1
-X-Mimecast-MFC-AGG-ID: lRmza_7vMtGu9lRQC7qIaw_1770231841
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-48057c39931so1466745e9.0
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 11:04:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96431A551
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 19:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770232250; cv=pass; b=GMG/V/EqEEBV6R+CvXs6jJhLmt/zdW4TUZninKBMZnKp1S3OiMb4g8C9cESu/yM1M/1USOsN2/l73zYNhPoBR8wg8M10BfEBmPgmyEJ3Ov3S4f01aysCt97UU3tuwoaNxFi/B6tZqfcLs93Jq/kBsH6ibvvcn9gH2nfU4zNKKp4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770232250; c=relaxed/simple;
+	bh=lXWxYGyyhF9P6Wv7GmsgpSmu4ZHvbmD85h4KG4Mans8=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XQDV8NKyxjM7r9ehQwKS/QHiob5yTyvQUrz5excMbfXdSYprapApe0cP3oxvGX0CSE4Z07hyUnur5Mlwu8GBcJRuYWHeKhy6u1NlbK238Zw6NxmuhbSIqjLbWqh0dturJkNijMfOjaNNDNSGz+6UIRdYXYJ1e2GdOHTG/00VBn8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u8Y0xbg6; arc=pass smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-948e7c39668so22619241.1
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 11:10:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770232249; cv=none;
+        d=google.com; s=arc-20240605;
+        b=GW5IE0GC9UM9pKHTE9Wn+ZiyIviIiRNssl7QaRFng120uaglx90/ORTY3GJQEtvn2U
+         KbOmquA5QYBxMRu6pMRUsk1EdncNM73o6la/ZLoaeD3jrHca9t5rUtywdBJf/kk8nc7N
+         OenIZOqRhZb3Q+5VonA1TSRq6AfPz/2yASbqaZ07+V0LSZsiwNpo9CPGUAYiWP1mnmaC
+         CSiEwKvbugsLp0oe0VsQD95Mc/Q+nAPXR3XmVk5okGldzK0AJDwo3ORXgiBtKuUk66ub
+         /7KNVQmSLWnLQz3GrvgGKttedQysVAL5MNbhdx8L4Yn3K+dDhK1o/Y0335KprBi2KNrz
+         FIig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=XU+nHiW99yv3DcS5bVzWR/3CEep103RfiIzgG2VGh4A=;
+        fh=fklkTIw7C4117hEW40Nn8beGOQoJr9w6jyLYKcRqgGc=;
+        b=WiQMGGFtFwVvRksPmFN5oc/6UUSLYGUOluQEHiBUtgKWrlANedY9f4No+P8SzKoVIp
+         2SZnIS9HMjanY/zetOG6srp/0xOQXw4P/rakBO8j9ACMFDhk4YU9NtI6k7SXQM3zduD5
+         P35a+cnI7OYR0ZryptZTjccNbE7ZaW1dYRkF66mxgAFGkQlhToufQnWDLICBI3TCFAde
+         nN17h/0IaHwQb85djeVUslJMJSXvwwg7/kF2F1HTskWTvsAq30ktmNFFfTLD8HNSWlea
+         lUxap9/SYMLRjZ4wGkA1gJDwVcdJ03gMKDMtsNyjemLBR6tk+4N9QhHCE75X8uYfrXuV
+         l5pA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770231841; x=1770836641; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HhJDWdiH+sSKLH6a+nIbjrvZv2j3XojMKDoG+stmr4=;
-        b=RjTHlpsZPqg6RopxZSud/SJ4/xPE1/aLt4TRk4YWZnpse14cq60x/gZeqQz98EiARi
-         u04ylG4D268IhrkD0Gkof+5lXb78dxs18JhAHBinoU2Ntnd9MsBmFNSyQvKwWfl8TD2X
-         iyaTrJsVVgEOgXMc9YFfVpvCPRuQObtPMQlm6zVLftbTIbOYKKdQLhzQLw8O2XSPXErR
-         gECZdgUvM08weUOe5j1dYuwXZ1MCttYIWX5E0dK2+rOknwrIt0hB7UTH2e25xCaGjxvP
-         diGYxBrT6y18g5PIXTbUiVUEZTlXKUw1HDveoJEXFKYZaXCHjuIFlxX70M09+EtH+F7a
-         05Gg==
+        d=google.com; s=20230601; t=1770232249; x=1770837049; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XU+nHiW99yv3DcS5bVzWR/3CEep103RfiIzgG2VGh4A=;
+        b=u8Y0xbg6ebox+EepvO+ApfJxaCrpUbj84so8DloOT4OEeK455ynHufT6k4HWV5qZpL
+         y1Zq7A8YHUluzjLMLWdlDZux/OxrziPjZGBXz5+LIfTBWMhef1Fn+S+M2BQKKka6Cro4
+         F+vi7R2hQm2SRj8WQUhJE7jFMePIXWyGQnyx2VsuoA/examE0Y26oepIFGR5U+289PyK
+         lUTygK9mJG5MkfGTsuQuIuegM0WiRbG4xvtQLDlc2IsBxzhymoQhpTg7cIxmaYMLnBvm
+         9FxAHIA8QPOySieGua0ZyNfxNZie0wQHXNb3UNTXddeXvy4QYR/ok5Yw4nskSM+B/Cb+
+         /Irg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770231841; x=1770836641;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6HhJDWdiH+sSKLH6a+nIbjrvZv2j3XojMKDoG+stmr4=;
-        b=B2rqsJrfrkGg3l0lgHKo0Nh9tC73t4BzO11uWFTW9ImDsIyYf9DJYi8ykOxbK8UVDa
-         A5cYiQUroQ8S+saub1Th58lOlV2ukcHq5W49/W/ETZZwLRKY0fQxIZiUySue+FVRXlM0
-         6WuJA8QpTajrapDOVHuhMYfX/BLZLS6+PwNKxi1mzzIknb+vv/ksslXEhh9w4RSX1f7y
-         0M5AKuKJIOLRmNEuO+/6Dk0zqZ8s7oYPoewZsrmcRW7KF/GLJUmOebXM9Cqn3jux/Amq
-         I/VXvfyh4VLvZ2/tQH14sAZn6pF86bJ0VOZM50SOQTs+q93/TqMjwAN7F0yaSqy9XEWq
-         +kQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUW+gHDSXZ0P0eGUCeA1y3WKnFAIhL/jmhyc20181R7iiif/H51Tg6ixnJ6XekvWY6+M0E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBrpqVBecswaMYk/WgJgA69qcijsXEii+wDEtXpC2DkPcqMBf+
-	eBqYn0Xdml482X+ebHPJiAhR6rC88QWM0e9w4XtnEpzYxdJpD9t9+2MJ6RNuhEjxoARlTYUXihT
-	3A7E7hRx5XQ0qIphbb0TzsrgdxbUJZ3mWgY/uN75vJ22LSWG5m3roJC9+gL0W9w==
-X-Gm-Gg: AZuq6aKXxx/OxfPhiFt1dtNOkhBzpMHjnawRle/L/py9ACT8/Si7AzTM0AXUCNu61dn
-	hSrgfHjAT73oXKnMlDAvVUHQ0LzNC9xX9BzdjR6qg0r86sZXlzV+OpEItcy+imNp33RwzL4WnwC
-	RUVo6DMDiSk7W+EQS1RKF4k+6LqtH7BK30fe7Bevvk4G9hXnTyLzjXqbOWE77fbqkPECVjdgyyI
-	QUSmR7XceHSjVWZS/1L2fHlDA6FSvz+PNCyWIk5lLOj353wIJIUvAhM2hKn0q+mcWhq6IM4+j+j
-	c5S8wMFEjlm1s5bQlG1PzFVf6PGROJD4LW2TFj9MFedzVVio6PAs2WERF8DY9LV6jQKylTATA2s
-	kHTYmXlhgIVySL5zDzF/2VEwbSwKfz9BbOw==
-X-Received: by 2002:a05:600c:4e4f:b0:477:5cc6:7e44 with SMTP id 5b1f17b1804b1-4830e9335cfmr55705195e9.11.1770231841046;
-        Wed, 04 Feb 2026 11:04:01 -0800 (PST)
-X-Received: by 2002:a05:600c:4e4f:b0:477:5cc6:7e44 with SMTP id 5b1f17b1804b1-4830e9335cfmr55704845e9.11.1770231840650;
-        Wed, 04 Feb 2026 11:04:00 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-34-155.inter.net.il. [80.230.34.155])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48317d345c2sm5071665e9.6.2026.02.04.11.03.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 11:03:59 -0800 (PST)
-Date: Wed, 4 Feb 2026 14:03:57 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gavin Shan <gshan@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Ani Sinha <anisinha@redhat.com>,
-	Dongjiu Geng <gengdongjiu1@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PULL 30/51] acpi/ghes: Use error_fatal in acpi_ghes_memory_errors()
-Message-ID: <2f6dc473b905c5c82370f74debc56d5f673d2db7.1770231744.git.mst@redhat.com>
-References: <cover.1770231744.git.mst@redhat.com>
+        d=1e100.net; s=20230601; t=1770232249; x=1770837049;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XU+nHiW99yv3DcS5bVzWR/3CEep103RfiIzgG2VGh4A=;
+        b=FogS/IBs867ecrsNQcTxYlCxfoR5r2L8NONgHuvicLHsmazJ2EQa0UQxKllyz/Qnbf
+         Rkr7TPXZZpjGZbTLk8SoG7fFFGITorZOy5jmvBURVy/1sanX4/GAScWRH6zrMof4Fztt
+         jsjWtJaUe6Y9nyVXdsgWBnqjeczs4GTDBdaQ7KYThbkvX2+5qWGHK+A5rAINC7BPqDK7
+         O1dm/WuAidZVFZEzc9IfiFQzeZOtGeM1aKErqsYgXrHsFPcaBrGko/xmw7SqmlMBTlI6
+         nmsB8DdxlsSF34KDI7Da9NG8pSO4Kfv0uVVKHQK9jBHIbdDKjPFxmpn5J9dGc3b9aWU3
+         O78w==
+X-Gm-Message-State: AOJu0YzYMwQ5hW8bpuRUe63P5pMtMitcsML+xfnXNA7kt+1X1EaIVys/
+	v/61q1evuMf9yZrjIayAPBtpegvkIkB9bKiT2Z9pN9qwLNQW1QUiNjoeYLLRtwhvqEqL15xBUFN
+	ZE2j5iHM92yqyGQe0JBbzeJdTvZ3Km1Dd50W5xwaw
+X-Gm-Gg: AZuq6aKJGWlyLj1kTwDYzcM1ffFqIv7mv+XHSEFNpyf7fiUwGLC3qXLdTYWFmRdJJih
+	87eWG2pxzVw1dQB2Ly2L4nG1oheyrweBR4DiFViFXcsMwk7faciP0yBD10RAYxam1tHSjMpJhlM
+	15tkT9u0yKB/lOXIGb5FYQWLqS+T8r+WdMZQSpznzAfOlQ2YxNiKY5xSATS48HP652eC/x5Kmj1
+	w+DtUZV+HKhCOpOQuYHwa5/GeGXC45sAlh8T6ghW7GgBWQEpyiqxcp+kp1yeUtoOG5d5/PZPBJe
+	MSLRyxdliiwH7ObyoJ9o6GL3r5N8fXW/wFIE
+X-Received: by 2002:a05:6102:610d:20b0:5f5:3719:19d8 with SMTP id
+ ada2fe7eead31-5f9395e2783mr1099207137.31.1770232249053; Wed, 04 Feb 2026
+ 11:10:49 -0800 (PST)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 4 Feb 2026 11:10:48 -0800
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 4 Feb 2026 11:10:48 -0800
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <20260204170144.2904483-1-ackerleytng@google.com>
+References: <697d115a.050a0220.1d61ec.0004.GAE@google.com> <20260204170144.2904483-1-ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1770231744.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Date: Wed, 4 Feb 2026 11:10:48 -0800
+X-Gm-Features: AZwV_QgcQx3vbfxBGP4uiM45fegTaR4Q23FMhVPxMByWK826Z6oIBpv2C8w_Ifs
+Message-ID: <CAEvNRgF75EsHL8idLzFzbk0K9uhE70AMj5Vitp4cKNg_5WqQKw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: guest_memfd: Disable VMA merging with VM_DONTEXPAND
+To: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com, david@kernel.org, michael.roth@amd.com, 
+	vannapurve@google.com, kartikey406@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[linaro.org,redhat.com,huawei.com,kernel.org,gmail.com,nongnu.org,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70266-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70268-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,googlegroups.com,kernel.org,amd.com,google.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,huawei];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:email]
-X-Rspamd-Queue-Id: A9CEBEBD76
+	TAGGED_RCPT(0.00)[kvm,33a04338019ac7e43a44];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: F17A6EBF16
 X-Rspamd-Action: no action
 
-From: Gavin Shan <gshan@redhat.com>
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Use error_fatal in acpi_ghes_memory_errors() so that the caller needn't
-explicitly call exit(). The return value of acpi_ghes_memory_errors()
-and ghes_record_cper_errors() is changed to 'bool' indicating an error
-has been raised, to be compatible with what's documented in error.h.
+> #syz test: git://git.kernel.org/pub/scm/virt/kvm/kvm.git next
+>
+> guest_memfd VMAs don't need to be merged, especially now, since guest_memfd
+> only supports PAGE_SIZE folios.
+>
+> Set VM_DONTEXPAND on guest_memfd VMAs.
+>
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20251201141803.2386129-6-gshan@redhat.com>
----
- hw/acpi/ghes-stub.c    |  4 ++--
- hw/acpi/ghes.c         | 26 ++++++++++----------------
- include/hw/acpi/ghes.h |  6 +++---
- target/arm/kvm.c       |  9 +++------
- 4 files changed, 18 insertions(+), 27 deletions(-)
+Local tests and syzbot agree that this fixes the issue identified. :)
 
-diff --git a/hw/acpi/ghes-stub.c b/hw/acpi/ghes-stub.c
-index b54f1b093c..5f9313cce9 100644
---- a/hw/acpi/ghes-stub.c
-+++ b/hw/acpi/ghes-stub.c
-@@ -11,8 +11,8 @@
- #include "qemu/osdep.h"
- #include "hw/acpi/ghes.h"
- 
--int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
--                            uint64_t physical_address)
-+bool acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-+                             uint64_t physical_address, Error **errp)
- {
-     g_assert_not_reached();
- }
-diff --git a/hw/acpi/ghes.c b/hw/acpi/ghes.c
-index d51d4bd466..c42f1721c4 100644
---- a/hw/acpi/ghes.c
-+++ b/hw/acpi/ghes.c
-@@ -516,14 +516,14 @@ static bool get_ghes_source_offsets(uint16_t source_id,
- NotifierList acpi_generic_error_notifiers =
-     NOTIFIER_LIST_INITIALIZER(acpi_generic_error_notifiers);
- 
--void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-+bool ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-                              uint16_t source_id, Error **errp)
- {
-     uint64_t cper_addr = 0, read_ack_register_addr = 0, read_ack_register;
- 
-     if (len > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
-         error_setg(errp, "GHES CPER record is too big: %zd", len);
--        return;
-+        return false;
-     }
- 
-     if (!ags->use_hest_addr) {
-@@ -532,7 +532,7 @@ void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-     } else if (!get_ghes_source_offsets(source_id,
-                     le64_to_cpu(ags->hest_addr_le),
-                     &cper_addr, &read_ack_register_addr, errp)) {
--            return;
-+            return false;
-     }
- 
-     cpu_physical_memory_read(read_ack_register_addr,
-@@ -543,7 +543,7 @@ void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-         error_setg(errp,
-                    "OSPM does not acknowledge previous error,"
-                    " so can not record CPER for current error anymore");
--        return;
-+        return false;
-     }
- 
-     read_ack_register = cpu_to_le64(0);
-@@ -558,16 +558,17 @@ void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-     cpu_physical_memory_write(cper_addr, cper, len);
- 
-     notifier_list_notify(&acpi_generic_error_notifiers, &source_id);
-+
-+    return true;
- }
- 
--int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
--                            uint64_t physical_address)
-+bool acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-+                             uint64_t physical_address, Error **errp)
- {
-     /* Memory Error Section Type */
-     const uint8_t guid[] =
-           UUID_LE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
-                   0xED, 0x7C, 0x83, 0xB1);
--    Error *err = NULL;
-     int data_length;
-     g_autoptr(GArray) block = g_array_new(false, true /* clear */, 1);
- 
-@@ -584,15 +585,8 @@ int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-     /* Build the memory section CPER for above new generic error data entry */
-     acpi_ghes_build_append_mem_cper(block, physical_address);
- 
--    /* Report the error */
--    ghes_record_cper_errors(ags, block->data, block->len, source_id, &err);
--
--    if (err) {
--        error_report_err(err);
--        return -1;
--    }
--
--    return 0;
-+    return ghes_record_cper_errors(ags, block->data, block->len,
-+                                   source_id, errp);
- }
- 
- AcpiGhesState *acpi_ghes_get_state(void)
-diff --git a/include/hw/acpi/ghes.h b/include/hw/acpi/ghes.h
-index df2ecbf6e4..5b29aae4dd 100644
---- a/include/hw/acpi/ghes.h
-+++ b/include/hw/acpi/ghes.h
-@@ -98,9 +98,9 @@ void acpi_build_hest(AcpiGhesState *ags, GArray *table_data,
-                      const char *oem_id, const char *oem_table_id);
- void acpi_ghes_add_fw_cfg(AcpiGhesState *vms, FWCfgState *s,
-                           GArray *hardware_errors);
--int acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
--                            uint64_t error_physical_addr);
--void ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-+bool acpi_ghes_memory_errors(AcpiGhesState *ags, uint16_t source_id,
-+                            uint64_t error_physical_addr, Error **errp);
-+bool ghes_record_cper_errors(AcpiGhesState *ags, const void *cper, size_t len,
-                              uint16_t source_id, Error **errp);
- 
- /**
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b83f1d5e4f..3e35570f15 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -2473,12 +2473,9 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-              */
-             if (code == BUS_MCEERR_AR) {
-                 kvm_cpu_synchronize_state(c);
--                if (!acpi_ghes_memory_errors(ags, ACPI_HEST_SRC_ID_SYNC,
--                                             paddr)) {
--                    kvm_inject_arm_sea(c);
--                } else {
--                    exit(1);
--                }
-+                acpi_ghes_memory_errors(ags, ACPI_HEST_SRC_ID_SYNC,
-+                                        paddr, &error_fatal);
-+                kvm_inject_arm_sea(c);
-             }
-             return;
-         }
--- 
-MST
+I would like to look into madvise(MADV_COLLAPSE) and uprobes triggering
+mapping/folio collapsing before submitting a full patch series.
 
+David, Michael, Vishal, what do you think of the choice of setting
+VM_DONTEXPAND to disable khugepaged?
+
++ For 4K guest_memfd, there's really nothing to expand
++ For THP and HugeTLB guest_memfd (future), we actually don't want
+expansion of the VMAs.
+
+IIUC setting VM_DONTEXPAND doesn't affect mremap() as long as the
+remapping does not involve expansion.
+
+> In addition, this disables khugepaged from operating on guest_memfd folios,
+> which may result in unintended merging of guest_memfd folios.
+>
+> Change-Id: I5867edcb66b075b54b25260afd22a198aee76df1
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> ---
+>  virt/kvm/guest_memfd.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index fdaea3422c30..3d4ac461c28b 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -480,6 +480,12 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
+>  		return -EINVAL;
+>  	}
+>
+> +	/*
+> +	 * Disable VMA merging - guest_memfd VMAs should be
+> +	 * static. This also stops khugepaged from operating on
+> +	 * guest_memfd VMAs and folios.
+> +	 */
+> +	vm_flags_set(vma, VM_DONTEXPAND);
+>  	vma->vm_ops = &kvm_gmem_vm_ops;
+>
+>  	return 0;
+> --
+> 2.53.0.rc2.204.g2597b5adb4-goog
 
