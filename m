@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-70210-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70215-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNlCCfxgg2mfmAMAu9opvQ
-	(envelope-from <kvm+bounces-70210-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:08:44 +0100
+	id iCUwNnNhg2nAmAMAu9opvQ
+	(envelope-from <kvm+bounces-70215-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:10:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C523E7FE8
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:08:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BFCE80F4
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:10:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7558D3080F0C
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 15:03:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B3C81301C11A
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 15:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A52041C305;
-	Wed,  4 Feb 2026 15:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89ED0421A00;
+	Wed,  4 Feb 2026 15:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eIOeS1+F"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L8LwRJ6v"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306462D879E;
-	Wed,  4 Feb 2026 15:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A75D421890;
+	Wed,  4 Feb 2026 15:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770217389; cv=none; b=L1GnqV5IRQGHwwoyRJsEJ3PxynTRcI9F8JMaWeMPFJ+Vk2d88a4xNgh1YguY2MaI4f5rqcKhonbbmBeQu+eFwCsLOY536wDHQNDm+i1t1rLj2NZGAlrJCLJzOSH4woSyA+e3qiT/teHFK0/t2sLAc094opVt508+8CpbrYZbGY8=
+	t=1770217390; cv=none; b=OYBQRqZpONn+OfuTMBfWwz53tmpmjmiQULUkXrxgNqOq+dSUUegCKm2KREsJMT095t749CUgZ2mhGLSIOETQxBL0lwg+BCB/9qCNXoTcx/HECqKGAr/iPPk0BI0OZOeip46v+Cbk8BPueeQy7byITtELuna6TnJv7zR9kAf/U0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770217389; c=relaxed/simple;
-	bh=9YJhYzyxGQsOEJpcFJeaFUho+YsLDtwkF+hgJBjHvhc=;
+	s=arc-20240116; t=1770217390; c=relaxed/simple;
+	bh=9J579RODsBY3NHU28XOdCR6DAB1tRTgjQOLebDa/iz0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ro0d/HJs5X3tcuKnp8X1PD43FMeRi7YIxQFvSIBb+NVc698ts1nHuKBB++aGjE2OsOkQ7dzWCcNnQafPMhDYK4vDpIyNmC6vvSLD+2bzHIztw1ik/8NdjZi12j9GrrkkV6z0SPyztraFsogI3UieJVD1VHIyPPe1xN5kdOzrjzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eIOeS1+F; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=utkspyojGFOiwOfaJkUKS1642aQ0MPZHDK3xbTcA+N8ScllixBC7YN78nq/ggBGcaeI6LDKlQQtFdshFbE/hnzf643FcGa5ST2RdLOCTKRlyrWy6aZ1EhikfVw46TnAd1hECPJbWV6PP0mZp0pq8zTrQCC3PYdUnMgWCMT7ufTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L8LwRJ6v; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 613N6c9d008818;
-	Wed, 4 Feb 2026 15:03:06 GMT
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 614F228Q014475;
+	Wed, 4 Feb 2026 15:03:07 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=z1DOOgHqufta6Fg5x
-	p6jSQBL+c+NsNMwlN8dukx9jZs=; b=eIOeS1+FLTop6GduoF09S1/By8/p25Sjt
-	BkdI9b4rdt5OLmt/H52XSOy98MERl/tEQEnVrPwsC1ZWN6TQVTWtGFt+1SXyq4UR
-	xs+IjAF4eoKmKmsSAkHHXmB4F8pNpsxp9U3ajlM38gsD2Pfq3mHK3zv4Nf1XpTs5
-	TEDbAMPHMnkS2OebDVThmnFle6rdSbK0TcIoofCYQcBgCYntsQoCDJr/uX/WmFct
-	ToTJvM4iLf8Eej6nZjdCAyWqZkGgoru/6KsGnA6K0aCNJ8JScLoszoFYkXQgx2Oz
-	Hwqxt6GZZTWtV5/Faki2NbgyrMx5Vk+6AK/HjBFSYtOct2PP1A/ug==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c1986jf5h-1
+	:mime-version:references:subject:to; s=pp1; bh=oOx4bRoIpElNi+6/4
+	tyln67C51SNBcTtwkDt4dOQoUw=; b=L8LwRJ6vDQvKHjeBWZF0K8O+LSn/YuHRi
+	TjjZqGJRVAdfEk/a7iiegK6047WY2PCVxEAK9NbYRzrG0a64ZbKhAtn4+w9Ao+jv
+	dMJ1DhztUzD5aYf0Fmo1VniH35OL102Wdih+cVbo0gw7wRnebCUxWGSniNHTz2AR
+	z2S54AdfNRQwhizduVDIM02KTHj1G6i39h4Sk5F3qqUBMDvI43x6x09WFo2BMP8N
+	gEdHzf6tsKXD5mMy7PGSsOaCMWfldwLw9OsmglmoCLxCV5ohtXf2+EqQKofOhCYA
+	6Gr1YeMTPdga7CSy4JIpFM3wmg0B9plI9wSwAk/sHf2dR92fgvzVQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c19dtad6h-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Feb 2026 15:03:06 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 614E05tK027391;
-	Wed, 4 Feb 2026 15:03:05 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c1xs1dcr2-1
+	Wed, 04 Feb 2026 15:03:07 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 614D1fOZ004411;
+	Wed, 4 Feb 2026 15:03:06 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c1wjjwk8p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 04 Feb 2026 15:03:05 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 614F31P329688504
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 614F32sv43975124
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Feb 2026 15:03:01 GMT
+	Wed, 4 Feb 2026 15:03:02 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A712520040;
+	by IMSVA (Postfix) with ESMTP id EF96C20040;
 	Wed,  4 Feb 2026 15:03:01 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 65B8020043;
+	by IMSVA (Postfix) with ESMTP id AEB3E2004D;
 	Wed,  4 Feb 2026 15:03:01 +0000 (GMT)
 Received: from p-imbrenda.aag-de.ibm.com (unknown [9.52.223.175])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -78,9 +78,9 @@ Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         schlameuss@linux.ibm.com, hca@linux.ibm.com, svens@linux.ibm.com,
         agordeev@linux.ibm.com, gor@linux.ibm.com, david@kernel.org,
         gerald.schaefer@linux.ibm.com
-Subject: [PATCH v7 07/29] KVM: s390: Export two functions
-Date: Wed,  4 Feb 2026 16:02:36 +0100
-Message-ID: <20260204150259.60425-8-imbrenda@linux.ibm.com>
+Subject: [PATCH v7 08/29] s390/mm: Warn if uv_convert_from_secure_pte() fails
+Date: Wed,  4 Feb 2026 16:02:37 +0100
+Message-ID: <20260204150259.60425-9-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260204150259.60425-1-imbrenda@linux.ibm.com>
 References: <20260204150259.60425-1-imbrenda@linux.ibm.com>
@@ -92,41 +92,40 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA0MDExMyBTYWx0ZWRfXxdW1XJSujOqE
- qwzOdB10sM7k/x5abNDPVwcpU13/0zvdxpBMNFIszLRBx3S4I9nRlorA8urNLenmZMjKnL8A0sj
- DKfwf+obhpKvknyPWyE1xkpBNblVWHLO/wTDMk14R4ApWuHWo8UhJhNzzYHVUN4Ua2cNv+iTpPz
- xlNR8ZbeYkALW0dVeCWqlAEDE3YeJUdnFLdsmsCnbfQ5CKdgubmP4g8lKb6JCVuKnnCbvfiKBL7
- CJueYZS1IeetLKUFmXLObLI31ECqBiX0HDApdLyBSmKGP9sDR9d3bJaxM2G1JoUQhdduOZECT71
- q+XzkzWyj54YW/zbsRX8dCob//+fcIQHeHSO3GtkOpJ5sSH2w01cJnmKVPPOA2Kq9vRtfgz56V5
- 8eBV1yLlGu7Zgj2ULjpB0B+UPGLZmunuHNv8oDwmhNvM0ObUIlzM8ZUb0l4MpN1S3T+hktiZxNQ
- ks5ZWN4GMLq0LpFZC9Q==
-X-Proofpoint-GUID: QgSV8MtVXN3eTPPKjROnjRnpbjebCWBe
-X-Authority-Analysis: v=2.4 cv=DbAaa/tW c=1 sm=1 tr=0 ts=69835faa cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA0MDExMyBTYWx0ZWRfXyBnAd7/AiFXG
+ NqIZ8otL826+ELG1ypCe15/2ypbCO7027oPOJk8c8Xi5mMIyjtBlmCVMWxkOvSmSdmBfkW7ts8M
+ aQtN0+REDPJH36pROLG8lAASouSrmAIWloAZQ9Spgh/iSHbMTfP5F7Wzc7BRiII7QsR7upBVa8a
+ QeUrwgZxqaryhbnaoofZxj43Kp7OnDcUXKCjp0WUQFqBCUUkj18FmbrYTX7iotN0s3tkwyRH+GS
+ pYECrw0UmdFgy9Ocq8a+3pwy1LS5xJjk9QA/X/3tz86zJ3+J7WimEXXj4f4+V8PTjRBCUT3Nitd
+ KWzMKTGkP1rgJe8fAxf4mo6T8nun3NE39CZWScUcHtTE4qCP8NOSzluvQpD5y7+8MSz/DZ0aM6W
+ nGZ9M1vGOJX0Obfo6ACdLspi/Pk5YayQ9+DjphqwWnYzp1NKNr6vJqM0N5qrmh9fi7ufdHM+wQJ
+ 3UiKnNpYDpfy9S0dsOw==
+X-Proofpoint-GUID: OBo_1wYLNWGoA9Tb0Fh3liAmLAa0ft-n
+X-Proofpoint-ORIG-GUID: OBo_1wYLNWGoA9Tb0Fh3liAmLAa0ft-n
+X-Authority-Analysis: v=2.4 cv=LesxKzfi c=1 sm=1 tr=0 ts=69835fab cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
- a=kE4rddDq9Ks6am3DDGoA:9
-X-Proofpoint-ORIG-GUID: QgSV8MtVXN3eTPPKjROnjRnpbjebCWBe
+ a=gEHK17p0qXyn9eJGjbgA:9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-04_04,2026-02-04_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 phishscore=0 adultscore=0 malwarescore=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1015 suspectscore=0
- spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2602040113
+ bulkscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0 clxscore=1015
+ adultscore=0 suspectscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2601150000 definitions=main-2602040113
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70210-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70215-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -136,75 +135,64 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.ibm.com:mid];
 	DKIM_TRACE(0.00)[ibm.com:+];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 8C523E7FE8
+X-Rspamd-Queue-Id: 65BFCE80F4
 X-Rspamd-Action: no action
 
-Export __make_folio_secure() and s390_wiggle_split_folio(), as they will
-be needed to be used by KVM.
+If uv_convert_from_secure_pte() fails, the page becomes unusable by the
+host. The failure can only occour in case of hardware malfunction or a
+serious KVM bug.
+
+When the unusable page is reused, the system can have issues and
+hang.
+
+Print a warning to aid debugging such unlikely scenarios.
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- arch/s390/include/asm/uv.h | 2 ++
- arch/s390/kernel/uv.c      | 6 ++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ arch/s390/include/asm/pgtable.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-index 8018549a1ad2..0744874ca6df 100644
---- a/arch/s390/include/asm/uv.h
-+++ b/arch/s390/include/asm/uv.h
-@@ -632,6 +632,8 @@ int uv_destroy_folio(struct folio *folio);
- int uv_destroy_pte(pte_t pte);
- int uv_convert_from_secure_pte(pte_t pte);
- int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb);
-+int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio);
-+int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb);
- int uv_convert_from_secure(unsigned long paddr);
- int uv_convert_from_secure_folio(struct folio *folio);
- 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index ca0849008c0d..cb4e8089fbca 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -281,7 +281,7 @@ static int expected_folio_refs(struct folio *folio)
-  *          (it's the same logic as split_folio()), and the folio must be
-  *          locked.
-  */
--static int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
-+int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
- {
- 	int expected, cc = 0;
- 
-@@ -311,6 +311,7 @@ static int __make_folio_secure(struct folio *folio, struct uv_cb_header *uvcb)
- 		return -EAGAIN;
- 	return uvcb->rc == 0x10a ? -ENXIO : -EINVAL;
+diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
+index 73c30b811b98..04335f5e7f47 100644
+--- a/arch/s390/include/asm/pgtable.h
++++ b/arch/s390/include/asm/pgtable.h
+@@ -1239,7 +1239,7 @@ static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
+ 	res = ptep_xchg_lazy(mm, addr, ptep, __pte(_PAGE_INVALID));
+ 	/* At this point the reference through the mapping is still present */
+ 	if (mm_is_protected(mm) && pte_present(res))
+-		uv_convert_from_secure_pte(res);
++		WARN_ON_ONCE(uv_convert_from_secure_pte(res));
+ 	return res;
  }
-+EXPORT_SYMBOL(__make_folio_secure);
  
- static int make_folio_secure(struct mm_struct *mm, struct folio *folio, struct uv_cb_header *uvcb)
- {
-@@ -339,7 +340,7 @@ static int make_folio_secure(struct mm_struct *mm, struct folio *folio, struct u
-  *		   but another attempt can be made;
-  *	   -EINVAL in case of other folio splitting errors. See split_folio().
-  */
--static int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
-+int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
- {
- 	int rc, tried_splits;
- 
-@@ -411,6 +412,7 @@ static int s390_wiggle_split_folio(struct mm_struct *mm, struct folio *folio)
- 	}
- 	return -EAGAIN;
+@@ -1257,7 +1257,7 @@ static inline pte_t ptep_clear_flush(struct vm_area_struct *vma,
+ 	res = ptep_xchg_direct(vma->vm_mm, addr, ptep, __pte(_PAGE_INVALID));
+ 	/* At this point the reference through the mapping is still present */
+ 	if (mm_is_protected(vma->vm_mm) && pte_present(res))
+-		uv_convert_from_secure_pte(res);
++		WARN_ON_ONCE(uv_convert_from_secure_pte(res));
+ 	return res;
  }
-+EXPORT_SYMBOL_GPL(s390_wiggle_split_folio);
  
- int make_hva_secure(struct mm_struct *mm, unsigned long hva, struct uv_cb_header *uvcb)
- {
+@@ -1294,9 +1294,10 @@ static inline pte_t ptep_get_and_clear_full(struct mm_struct *mm,
+ 	/*
+ 	 * If something went wrong and the page could not be destroyed, or
+ 	 * if this is not a mm teardown, the slower export is used as
+-	 * fallback instead.
++	 * fallback instead. If even that fails, print a warning and leak
++	 * the page, to avoid crashing the whole system.
+ 	 */
+-	uv_convert_from_secure_pte(res);
++	WARN_ON_ONCE(uv_convert_from_secure_pte(res));
+ 	return res;
+ }
+ 
 -- 
 2.52.0
 
