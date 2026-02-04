@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-70151-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70150-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LDIFVH5gmm2fwMAu9opvQ
-	(envelope-from <kvm+bounces-70151-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 08:46:25 +0100
+	id wBA/CUf5gmm2fwMAu9opvQ
+	(envelope-from <kvm+bounces-70150-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 08:46:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABAD1E2CB4
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 08:46:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9236FE2CAD
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 08:46:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2D3D73062233
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 07:45:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3608F3040239
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 07:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8AD334D4CB;
-	Wed,  4 Feb 2026 07:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991CA385514;
+	Wed,  4 Feb 2026 07:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lAiMm+do"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="F7gF1XV4"
 X-Original-To: kvm@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011004.outbound.protection.outlook.com [40.93.194.4])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012034.outbound.protection.outlook.com [52.101.48.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E7138E11F
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 07:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81512192FA
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 07:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.34
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770191138; cv=fail; b=b3PCOOqSeZKiehhZCweI5Kqob/kg6gYLrSCMiBftfhGaBh8dnQPBIO9GC13RJcBtf0UscG4vcvKZnxyU5UtGD3nCSNZpqlUje9BVzDCyX0WoRu3qbdJK39Xq/0UYl7QGKRUa5DbkoYx1H4k3jZYInDHDeEvNZm8M+MlGuE1vcP4=
+	t=1770191136; cv=fail; b=G6caY3fZIBuEoyKxaUlzG5c+QveI9XvopciHVQ73Juawpu2PYVGk2AteyAJWYtqIsEFklK8sW5s1mv5BNKpNpmEZMrN/HFWTtuRNlnCZd/VVbXxjChWfkYOQxVCpoNQCMqoJyzPxfsfKkKEzYsQ9JsnviUW6I5p+LvgGnzSWryE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770191138; c=relaxed/simple;
-	bh=UZY9jLtRsKZ+VGO5nkfRm4ZcOxSbgLT/8HWBQCwm6nI=;
+	s=arc-20240116; t=1770191136; c=relaxed/simple;
+	bh=vkih4asyWZjkXjD71RW6FV7rEhhRYDDd764FsRZat5w=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J8gL3PGZ7kZzDnUoqJs7DuCNA7qvvX5+u9fbchY0Zyax1O1A39FkAsd3WWopBmApk2l5w4K9x4VS7EjlKOPubg/UAtpKl2kNqnzz/2yaRdIryekY5VV1b7q1sMUZZQdG5FVuBGQerndiaypRjMkHw/VXYwQ/Cg6TSTWQSB0lt9w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lAiMm+do; arc=fail smtp.client-ip=40.93.194.4
+	 MIME-Version:Content-Type; b=h2X7cEdhJbeguikSc/A3yAzPh/Vo8jPDNB2QbyJPGCw4E22jJ3cvjBOdtAIlr99B9xIQ1OKfGmeXBbHFNuBNv1lp27XqWaKkjfobZyRRAxNHKTkvE/lacEsSucgx5r3Uhi8sO+1oxcYkkiJxppkeHcHcSCFebe/F0zURkXs7A5U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=F7gF1XV4; arc=fail smtp.client-ip=52.101.48.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XQfetNWL6B7QakWiL9rcsJbyos41FXapikyLzgoXE/6FcqsLNIHJPjfUdii1ZJPsdnJVhFNXvmyu5c3wYQhK+5VmkmGnnhqOY1ac/JTVndHCnpL+Kg8acM99QQMwTW/xHEe+QIDhh7vEwX5Cfyy0ipG7qNDz/nFEeG9401W9cqy3y+I3ZWB4xrqanpkWK5XE1jCa+ZE5Zoh1PXTQk7iEUOQqbgEp8h8KysyMyJ8ul8ANiDS5aHBRsx551hy1Crir/3fl45BZeRU2gWVwDNmnokYq7pWwzCfifrau7Ta8s0kJrDTyejzVa1nxILc0cQlHyP2qMUG/poYL6E+G91+rqQ==
+ b=A2szOzwi0PwBSIwBkLKnCIPesv+LxGAimWi3tF8ZRfNoxJdtojj00rQ8vprtjSUcf8CS5mAXGB0kxLje4WVRd+W1D7E8IeDf2CGlX0X8IoPn+mBcCmbFKKGUBhUqCwy0Qr9/2l0oTN9wCQubFWe45xgJpiu6e8tiSFQe29bYIbEJAPIvnjv0wg8q1TPT8+8sWcokwV7F6++gMJWuX/Coz7LA7c9qDgKHJUC3gekMP7kjUA7d8A8aLM6Etw1mVo3DnCLrZZAVAZs6+0f9NCHkpGlh2+PWPrWw6DeGPgJyRRs9ziI3/L6UqsaWdp3AeJDb6p6XjB/nrB+s+Zd7i9wTqA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VTC2wxP6slebJ99QL7OB/eXid3nDlZr0N7Gzaw6djdY=;
- b=qzUwd9Q9f2iMkNCkD2G8xpNaSbiX/fGRmhxbPJaLqMX8uU55EcWpgFxC1w+VfLKvJ2w9PnnYribSeJJQ/86CwXVVLBXU+XkrYHQH8/719JKf5EvSKgij7r87kgzcMFgrR/1f4M/1n2O9oP07R8E7rD02Sl1HFhn0hTbFokNAT60iSuBbl8/tLF9xsR5HDnlPs5oLCJ8tA4baKKEeZgkO0eMfVZOt5dCh5kKHwE2cDfX0hSR/NZmvRPUbhr2rGNq4zc2ZfDFn1GEz9YjvKgtv9nzdakAtLgau4U8xllAFD1ijCQTIltx3Vw/IPcmo13K4YOLjELg8JilKStJq21s0tQ==
+ bh=6Bbv1rISRmCuqYrHMQ5GM9lhJ3hD2X7PMEIFLmD+xnI=;
+ b=m1uyAMvouTkuHFE31UsTkdYqsDG37aeezJjKnCXCNGSmBO+xum2wO4th7e5EpgvcVkBsQVNe7qyEQGQZoyulTabTHwahl5eyXbOK9u84h9Pv7CiDsf04WJy56l5fcxNkfCQlDBU15OfyMMwmbpOu0YhZ/slaNf1q3gHZREbvHr/T88Br9m6C+UD2FbpIn//fYB7dAc2f+/aOehABs7DU8ne+jIu3uQO4Vbt1iXaitj7vT2wVGAFCg49d634kfFClQQdu2ULAd7udzUboPWcNMkmyiY4Z02yiuNr6cVdAbvX/O+wuQEo3oozZE/Jwu2YLZYEhuu5HY9sfOsLJNcse+A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VTC2wxP6slebJ99QL7OB/eXid3nDlZr0N7Gzaw6djdY=;
- b=lAiMm+doBqNXqxvDuiOp21/bcujcIDLRMdjqTAQGsWFqcgZFOMaA4D1H8dnOLwR7whgixRFrn/BG91nsLK3VA+rfxUPRtQWvQS6kRqJqcZkN4NBn0H8UHS5Z2q9OnhU7EbsbIAOQqbbG0SBhDfv5FBREaHFwVe133KItR57pKqo=
-Received: from SA0PR11CA0099.namprd11.prod.outlook.com (2603:10b6:806:d1::14)
- by SA1PR12MB6678.namprd12.prod.outlook.com (2603:10b6:806:251::12) with
+ bh=6Bbv1rISRmCuqYrHMQ5GM9lhJ3hD2X7PMEIFLmD+xnI=;
+ b=F7gF1XV4m9ubTuYBwj2WE/X5flYHIZDLR9Lm0lGHpmzDZAqSs+dEL7jC1SYl5yhvTJmaclMvjhbtLzc02JUpFj9y3BZ46NZfMPklmQedeepBvKN+/wxFjfQqDU5Pd/Bv2zClth06loFN2uEQW3eUkfrUzCr8m4gZyWHyKiY1NgQ=
+Received: from SA1PR02CA0002.namprd02.prod.outlook.com (2603:10b6:806:2cf::6)
+ by SA3PR12MB9090.namprd12.prod.outlook.com (2603:10b6:806:397::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.16; Wed, 4 Feb
- 2026 07:45:30 +0000
-Received: from SN1PEPF0002636D.namprd02.prod.outlook.com
- (2603:10b6:806:d1:cafe::45) by SA0PR11CA0099.outlook.office365.com
- (2603:10b6:806:d1::14) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 07:45:33 +0000
+Received: from SN1PEPF0002636B.namprd02.prod.outlook.com
+ (2603:10b6:806:2cf:cafe::fb) by SA1PR02CA0002.outlook.office365.com
+ (2603:10b6:806:2cf::6) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9587.13 via Frontend Transport; Wed,
- 4 Feb 2026 07:45:28 +0000
+ 4 Feb 2026 07:45:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,22 +66,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SN1PEPF0002636D.mail.protection.outlook.com (10.167.241.138) with Microsoft
+ SN1PEPF0002636B.mail.protection.outlook.com (10.167.241.136) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9587.10 via Frontend Transport; Wed, 4 Feb 2026 07:45:30 +0000
+ 15.20.9587.10 via Frontend Transport; Wed, 4 Feb 2026 07:45:33 +0000
 Received: from brahmaputra.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 4 Feb
- 2026 01:45:26 -0600
+ 2026 01:45:30 -0600
 From: Manali Shukla <manali.shukla@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>
 CC: <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
 	<kvm@vger.kernel.org>, <x86@kernel.org>, <santosh.shukla@amd.com>,
 	<nikunj.dadhania@amd.com>, <Naveen.Rao@amd.com>,
 	<dapeng1.mi@linux.intel.com>, <manali.shukla@amd.com>
-Subject: [PATCH v1 5/9] KVM: x86: Refactor APIC state get/set to accept variable-sized buffers
-Date: Wed, 4 Feb 2026 07:44:48 +0000
-Message-ID: <20260204074452.55453-6-manali.shukla@amd.com>
+Subject: [PATCH v1 6/9] KVM: Add KVM_GET_LAPIC2 and KVM_SET_LAPIC2 for extended APIC
+Date: Wed, 4 Feb 2026 07:44:49 +0000
+Message-ID: <20260204074452.55453-7-manali.shukla@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260204074452.55453-1-manali.shukla@amd.com>
 References: <20260204074452.55453-1-manali.shukla@amd.com>
@@ -97,228 +97,285 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636D:EE_|SA1PR12MB6678:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97e03bbc-5c85-410a-be6d-08de63c15eb7
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636B:EE_|SA3PR12MB9090:EE_
+X-MS-Office365-Filtering-Correlation-Id: 119a6021-d061-4544-62b1-08de63c160da
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ID6wb4DH0DxHNI2zhUUTHHqT3VnB4+DoI/qpd3L/j5rI4pQO5NBA7R9TER7Z?=
- =?us-ascii?Q?ULuGuiC7BZvhgalSv7QEGSGjSnTwGrrTbM6qhHEvCuphTo+QXZ3NuUICodDT?=
- =?us-ascii?Q?OJZjPCoPuStcOZgKPeCzi35iCIxJ9mlVT5VPFle3VzHSEWMnodYjYzdsMf+p?=
- =?us-ascii?Q?K0VIZj5Uvc8y+J7Q+47xgxwzP/SxhN7JmN0Ia6RmupfQGm2YZYYGdmayew7d?=
- =?us-ascii?Q?ozWRZsss4VFyDP4O2cEuyOaQePCsqzrfkVcIuTrbsnFuBfIcRrzCqAvXVWIq?=
- =?us-ascii?Q?GBKZkmLk9r6kDgTupJL3IQiLhddqIvLjSlE+Oa6KpQVUENt8fteFjOCQF/vY?=
- =?us-ascii?Q?2E4+0gPYn7AQzuIqVh2Z8eEmDiYqX4TEEW2KMTD9WqAXvjHbniDEHHyiS3zY?=
- =?us-ascii?Q?DWwmYeX2K7YM5Jzy8rrYDVDMRrUUG+N/gkwNEIG3MlAR0dQU/kxCbs0OL/tB?=
- =?us-ascii?Q?5YmB96qf4ZDsQR52PABujvJffTMsRMw7vFsfeGxT959OmJuesKQoOPUFpRj4?=
- =?us-ascii?Q?sPaPYVI3TcrKwUfx3Qd21h5GcEG9MOs3b3qw5OZfFm09Pehpxwqszu6R5kMv?=
- =?us-ascii?Q?CQSpx0OxIt9491hEcz9xLmxP9lZJLJIZs7xHQ0TOiEthKOdkYjq52kL1oiWn?=
- =?us-ascii?Q?TD6RBxFyCYcFFke7hsm+VGdnOLsa3uNh0zNEAJ5Cq+Qr1ZlUHEqD4yvrwUP1?=
- =?us-ascii?Q?dLVSlmz1hnjgNcFe1m4Wc2Bff6f4ss9iLEVoDC6Zzi6yqgmmwQsMVCd7c02K?=
- =?us-ascii?Q?LLJtjEwUAfrYShee/Fs+KPhEH6iAfivqpZXubk6Jso2yyjtXhGvw8c+HGKoR?=
- =?us-ascii?Q?cS+Wdp3hee29w8dCyHG0Fik7Ihj+nTTEuYcNTZvQooauzHX2LQDPfCM7zqle?=
- =?us-ascii?Q?pwVSNEXz9o2Bu+6ohpXrMZJs3guZSx/LFTuqQE12hyDVQpBgRXWgY73srWtP?=
- =?us-ascii?Q?R7CY+MkeUpmP92CaTjPjBLc72V2kDiFMlFEwIx/MNxwoHJIoB37RzAS6+mKo?=
- =?us-ascii?Q?LKksT/OFi4J5GcmJDI37orqMS3T6IbZpzN+axNwX8xYc4RwLYT4e8G10YtJ9?=
- =?us-ascii?Q?9TZwoRaLFMIrDWVRSKLt75vtbBJWkZuzXeBVTs3EmRYmAque6YUe2VrrgDan?=
- =?us-ascii?Q?Q7YkbSrp6q4zsInSa7sq5FtWROrtFPehcvOL1P++n73TX4sExyR3uGYQIgP8?=
- =?us-ascii?Q?PClL/pdvrhkBinZu5kwNlIiexjch+SiZWs4W/UQyIEep0ttMcLWJU3RXGFhs?=
- =?us-ascii?Q?It7xFeawneSqn2ypJS2CTctBwHft+YW9S+HSyIe9e5WPsm3qAK1ocAbzzNfQ?=
- =?us-ascii?Q?cOkeFqnvbk4IGujRWreUJoTNQZO1Ep2N6BDzhvg86nelsCFCTTRkdexQnyRs?=
- =?us-ascii?Q?P8RaMqaJ5zpuUAjjE9DZsJm7rSdyoI2iL2ZVb885p2TYBfP+8+FlKhw9QBuJ?=
- =?us-ascii?Q?WMJhZSEZhbRgvhaiMkH/m4YSaC/wQsqjWnLlP8+OcXYuB85SW7DyAmHq9VZB?=
- =?us-ascii?Q?HNlvbZmL9OXyNjUN5tFLRdAo5IWzg74XSvtmtyZV8AuvQuGpNcBFDwez6WmA?=
- =?us-ascii?Q?E2voOnL9FmY9o4KOs+UpzYdK31VF+vu+K0Wt7EeAYtZHtGA6lpIq1d4+ENZd?=
- =?us-ascii?Q?XIWS09E5TD+REnA0BV8bHjU0Uan6o5j+SJHNQLHOm8sHZmxbvTdMpQHv9uZJ?=
- =?us-ascii?Q?1BZpLA=3D=3D?=
+	=?us-ascii?Q?v506Xiv1Q8zfOaZfowTY8f8TI4ti2SgHJKQo/60dK1QSlgBO3ZnjtFudSpDx?=
+ =?us-ascii?Q?ZJlqAI2+0eIHaQ6nOBNI9rYus6qy4mx8Zg9UY3i6SqCfPCkvQYvC4615CjCd?=
+ =?us-ascii?Q?pR1vj3xztNK6tSkgintx3Mn29w/wEX22vNFhhQbz4NGgbcVBlr9c0+VQRlVd?=
+ =?us-ascii?Q?5jVuldrUBtzg6CipRiIpRYsBiBcxZXmjqc5uZL1QYtbPzBZ0przg63aD4F7Y?=
+ =?us-ascii?Q?GpXJvU3Q5esKgPZMQG5n4qOxQaf2jdBXMynDVMMlKfaX2/y2UVY7BRIYXvds?=
+ =?us-ascii?Q?PlDPF4gg+jiQoWSPFHUoI89ofqw0REzWzVru9YR+11IhIPTOLFR6iLbIY9sS?=
+ =?us-ascii?Q?iu5cs/1tyIw8QU+jywQ2SYiZWJ3fcJ97Eaxo80fTIP9iBWHeWoVZiqzr+9Io?=
+ =?us-ascii?Q?TrXL6v5FKOfrID1t31YNagA5+jUp3tv6r4BD6bvqF8v2E1gQBdEfA9mK3DIY?=
+ =?us-ascii?Q?A/Yr5X/K8/4XWqZwTDyP8WmXbphNW9dp0KzRBOVGL4DuTaPwp0U3N7b8BedI?=
+ =?us-ascii?Q?OMS78hr/AprHinHALIcGImf4lmhoCd4VpLaOWhcwBTMe4ianuCCFO5J6AwwA?=
+ =?us-ascii?Q?hjCd2yMrV3kAsdwrabaz9rBJ7R94mnQMZqIj1ucBRbhdYj+pj+KWdeiDBTLf?=
+ =?us-ascii?Q?KGLBEijj4L+oZjNSNu5RHMSBuDydSRIcwsabDsHuZtpbnIknZMY886R+CBQk?=
+ =?us-ascii?Q?Pj5YKU0yS67YcSMbAVZz3m9MzLQkt7r1157/82yfZwDMNHMUXH0ekofdDkAO?=
+ =?us-ascii?Q?27fz69YSBzqKcCwvg6tbRbi1GykLQ3eijaxNgORqntd6vFQIcA+vNGZjLVYE?=
+ =?us-ascii?Q?nJS8z5w0gx9Y9xSAY4xdwqq+HqgUGQDZI9KDoGk/cU+PURNfZ6K4aKfBSsz4?=
+ =?us-ascii?Q?36d3TQCXVSWhD17zU+fpgp4FyemYdXeT9qnK6f5VSuQiMrzo940rnG5hhV8a?=
+ =?us-ascii?Q?+gkJcgD/IscAY1HmgV6XIza3IXCa2xcp90lQ8Zw2S2kJHaiiER69+UurrahK?=
+ =?us-ascii?Q?1QN9lBiMeDPLwbKw18EaSnKKhyv6infOEQ26xYXwhpy5BAZ4l8nskR029Zsb?=
+ =?us-ascii?Q?mDzE05BI7YdwYO1+bYySztvU92EMt89qZOGt3NMQZpT9prXPXt5onw6Xav+h?=
+ =?us-ascii?Q?SOPNfLGo0i3nOKSKKZ221GNCT7/Jvpl4RR80NIihS8ddjirq5lxgd1WxVVXW?=
+ =?us-ascii?Q?Z8O7CxOuQ6ZKl5mMzqhw3HP52s5leqUC2QCMQJ4S/y8RiKVJosWk+nDrMygq?=
+ =?us-ascii?Q?z3Qxf8tLf2tmBQuJbI60VvHvSfENcFcyLS2kaek1muxNE/jD5LX4mHvpM3pC?=
+ =?us-ascii?Q?ShOUPtUcyjocJQqsXDOsatI3l5bYQ8pPee3l8p0j9WALfw38IGCBw6TmzWFV?=
+ =?us-ascii?Q?MFKNw5ynKpAbWpDzZTfDdpKW1j6BRFdaEKRI3Rven0G4uGko1CqsEmPXeG4H?=
+ =?us-ascii?Q?8H7QEkt337zDCQ97Q/W5BH0sNZJDyAbLqvbBbYkXJEUvZ5FdRuIo0y89eipO?=
+ =?us-ascii?Q?Rd+lnLG5wOxaVpjwFQ+K7HaNRalola8LRC7FmuoD9lCxWAM1KDLoAP9YfMpp?=
+ =?us-ascii?Q?ZNZbVws5jd64s1K2IYpIHoJl6H2WJP7zd+Quzd7u1M+PmvQKvCBBwGCdwdpl?=
+ =?us-ascii?Q?g0Z40lsAHD6ja2zJ9HLDWBVfBrRbhWnDFfvRB7fd/r4WlgiJ9Lm0ovEk9Rrp?=
+ =?us-ascii?Q?MjmnhA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	VYgepBb8IvIp8PBViDJJfu4TQS/cVt0PqzS+AseIvMrjPjLyv5F8MK6Zq3v4T8GcViCs3YVVpcfYdHqqrKHVSb2OMK7iZdBhA2Nz/EKIppW4KAh1wVayYhkTn7k1UZUW+ffEMMZUG5g2+76vmaOBT8uRW/JOSYYniGEr66oKXWFESDPQ8atnwYOvY/zsS167KE0ogUvhSM3bmH4WPwzp/KJrp6ajHQ4Bf1ReO7Dz30jlyiaSRqnbB+mlGV608Hq6Dq00Bjh1+xbCoF1mJMujhP2DXiuL0pJCcv6b50mcVkDJJ81inbjlT/v3xxqx9GMPNHoe6mjq4dqJSsSUl+XEEAS7YVMZwds4KW0/h+W7aWR9rrYpUWyfJqN+mIIOBsotqZPuUo/y3qKfoPjAq89s37UwZ0e42gC9JYXOqSOBAXU0erhOV8SpVGZT8wxId/4b
+	V15CTuQrvPgWupYlw9eFL0qsPf+7GlqJuJIQQxmWXwzGTebcRDgjXfT/aebY4kaFozRU/5CV6pa+7KZNv0d61K95/KooP2GHX7L+TutXM0K7PelPBwJyIXsiSQ3plHLBobJgzUk9FHlv4+vZoYp7B71QIkjboCFZ+5jAT4Cu7epYkodXSWahFu7XlVkpsyOw9Xh/xJGleVyYebHFVUqISuIipfCmV0imbggKpzNqBr62brm/CUTqxgrPRUsum3dJ/+uHNcK6ztz2sRX08XATZKM7COgDE1qLPRSnux+G81Z6vLAm8i5tZKRfxRXbGDbL/ouAYhqkU7uXYK33UORAvUl6QELK+rSkv2A1EK+f4V7VqJXBAIkQfeB0FPku/xYQHjYMXRpaBRxqH0clK5es0JOwp8zF4KiHqcJ9KjHem6b3/osz1IR9Y+l34EuKtAT4
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2026 07:45:30.1457
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2026 07:45:33.7284
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97e03bbc-5c85-410a-be6d-08de63c15eb7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 119a6021-d061-4544-62b1-08de63c160da
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636D.namprd02.prod.outlook.com
+	SN1PEPF0002636B.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6678
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9090
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70151-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70150-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[manali.shukla@amd.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-1.000];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email,amd.com:dkim,amd.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: ABAD1E2CB4
+X-Rspamd-Queue-Id: 9236FE2CAD
 X-Rspamd-Action: no action
 
-Refactor kvm_apic_get_state() and kvm_apic_set_state() to accept a void
-pointer and explicit size parameter instead of struct kvm_lapic_state.
-This removes the hard-coded assumption about 1KB APIC register space and
-allows functions to work with both 1KB and 4KB APIC register space.
+Add KVM_GET_LAPIC2 and KVM_SET_LAPIC2 ioctls to save and restore APIC
+state using a 4KB buffer (kvm_lapic_state2).  The larger buffer allows
+saving additional APIC registers beyond the standard APIC registers
+supported by the existing 1KB KVM_GET/SET_LAPIC ioctls.
 
-Existing callers of kvm_apic_get_state() and kvm_apic_set_state() pass
-`s->regs` and `sizeof(*s)` to maintain the current behavior with the 1KB
-kvm_lapic_state structure.  Subsequent patches will add KVM_GET_LAPIC2
-and KVM_SET_LAPIC2 IOCTLs that will also use these functions in order to
-save/restore 4KB APIC register space.
+The 4KB buffer size matches the LAPIC2 capability, which enables the
+full APIC register page including extended APIC registers for AMD
+processors.
 
-No functional change intended; existing KVM_GET_LAPIC and KVM_SET_LAPIC
-IOCTLs work exactly as before.
+KVM_GET/SET_LAPIC continue to work as before for backward compatibility.
+Document the new ioctls in Documentation/virt/kvm/api.rst.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Manali Shukla <manali.shukla@amd.com>
 ---
- arch/x86/kvm/lapic.c | 32 ++++++++++++++++----------------
- arch/x86/kvm/lapic.h |  4 ++--
- arch/x86/kvm/x86.c   |  4 ++--
- 3 files changed, 20 insertions(+), 20 deletions(-)
+ Documentation/virt/kvm/api.rst  | 45 +++++++++++++++++++++++++
+ arch/x86/include/uapi/asm/kvm.h |  5 +++
+ arch/x86/kvm/x86.c              | 59 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h        |  2 ++
+ 4 files changed, 111 insertions(+)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 66819397e073..4ed6abb414e4 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -3151,12 +3151,12 @@ void kvm_apic_ack_interrupt(struct kvm_vcpu *vcpu, int vector)
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_apic_ack_interrupt);
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 71b4d24f009a..c49cf3104b2c 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6517,6 +6517,51 @@ the capability to be present.
  
- static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
--		struct kvm_lapic_state *s, bool set)
-+		void *regs, bool set)
+ `flags` must currently be zero.
+ 
++4.144 KVM_GET_LAPIC2
++----------------------
++
++:Capability: KVM_CAP_LAPIC2
++:Architectures: x86
++:Type: vcpu ioctl
++:Parameters: struct kvm_lapic_state2 (out)
++:Returns: 0 on success, negative on failure
++
++Reads the extended Local APIC registers, including both the standard APIC
++register space (offsets 0h-3FFh) and the extended APIC register space (offsets
++400h-500h and beyond).
++
++This ioctl is similar to KVM_GET_LAPIC but operates on a 4KB APIC
++register space that includes extended LVT registers available on AMD processors
++with the ExtApicSpace feature.
++
++::
++
++  #define KVM_APIC_EXT_REG_SIZE 0x1000
++  struct kvm_lapic_state2 {
++      char regs[KVM_APIC_EXT_REG_SIZE];
++  };
++
++4.145 KVM_SET_LAPIC2
++----------------------
++
++:Capability: KVM_CAP_LAPIC2
++:Architectures: x86
++:Type: vcpu ioctl
++:Parameters: struct kvm_lapic_state2 (in)
++:Returns: 0 on success, negative on failure
++
++Sets the extended Local APIC registers, including both the standard APIC
++register space and the extended APIC register space.
++
++This ioctl is similar to KVM_SET_LAPIC but operates on a 4KB APIC register space
++that includes extended LVT registers for AMD processors.
++
++::
++
++  #define KVM_APIC_EXT_REG_SIZE 0x1000
++  struct kvm_lapic_stat2 {
++      char regs[KVM_APIC_EXT_REG_SIZE];
++  };
+ 
+ .. _kvm_run:
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 7ceff6583652..516d4a0be25a 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -129,6 +129,11 @@ struct kvm_lapic_state {
+ 	char regs[KVM_APIC_REG_SIZE];
+ };
+ 
++#define KVM_APIC_EXT_REG_SIZE 0x1000
++struct kvm_lapic_state2 {
++	char regs[KVM_APIC_EXT_REG_SIZE];
++};
++
+ struct kvm_segment {
+ 	__u64 base;
+ 	__u32 limit;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 669c894f1061..ccd16bdff56a 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5331,6 +5331,17 @@ static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
+ 	return kvm_apic_get_state(vcpu, s->regs, sizeof(*s));
+ }
+ 
++static int kvm_vcpu_ioctl_get_lapic2(struct kvm_vcpu *vcpu,
++				    struct kvm_lapic_state2 *s)
++{
++	if (vcpu->arch.apic->guest_apic_protected)
++		return -EINVAL;
++
++	kvm_x86_call(sync_pir_to_irr)(vcpu);
++
++	return kvm_apic_get_state(vcpu, s->regs, sizeof(*s));
++}
++
+ static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
+ 				    struct kvm_lapic_state *s)
  {
- 	if (apic_x2apic_mode(vcpu->arch.apic)) {
- 		u32 x2apic_id = kvm_x2apic_id(vcpu->arch.apic);
--		u32 *id = (u32 *)(s->regs + APIC_ID);
--		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
-+		u32 *id = (u32 *)(regs + APIC_ID);
-+		u32 *ldr = (u32 *)(regs + APIC_LDR);
- 		u64 icr;
- 
- 		if (vcpu->kvm->arch.x2apic_format) {
-@@ -3189,12 +3189,12 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
- 
- 		if (!kvm_x86_ops.x2apic_icr_is_split) {
- 			if (set) {
--				icr = apic_get_reg(s->regs, APIC_ICR) |
--				      (u64)apic_get_reg(s->regs, APIC_ICR2) << 32;
--				apic_set_reg64(s->regs, APIC_ICR, icr);
-+				icr = apic_get_reg(regs, APIC_ICR) |
-+				      (u64)apic_get_reg(regs, APIC_ICR2) << 32;
-+				apic_set_reg64(regs, APIC_ICR, icr);
- 			} else {
--				icr = apic_get_reg64(s->regs, APIC_ICR);
--				apic_set_reg(s->regs, APIC_ICR2, icr >> 32);
-+				icr = apic_get_reg64(regs, APIC_ICR);
-+				apic_set_reg(regs, APIC_ICR2, icr >> 32);
- 			}
- 		}
- 	}
-@@ -3202,20 +3202,20 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+@@ -5347,6 +5358,22 @@ static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
--int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
-+int kvm_apic_get_state(struct kvm_vcpu *vcpu, void *regs, unsigned int size)
- {
--	memcpy(s->regs, vcpu->arch.apic->regs, sizeof(*s));
-+	memcpy(regs, vcpu->arch.apic->regs, size);
- 
- 	/*
- 	 * Get calculated timer current count for remaining timer period (if
- 	 * any) and store it in the returned register set.
- 	 */
--	apic_set_reg(s->regs, APIC_TMCCT, __apic_read(vcpu->arch.apic, APIC_TMCCT));
-+	apic_set_reg(regs, APIC_TMCCT, __apic_read(vcpu->arch.apic, APIC_TMCCT));
- 
--	return kvm_apic_state_fixup(vcpu, s, false);
-+	return kvm_apic_state_fixup(vcpu, regs, false);
- }
- 
--int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
-+int kvm_apic_set_state(struct kvm_vcpu *vcpu, void *regs, unsigned int size)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	int r;
-@@ -3223,14 +3223,14 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	kvm_x86_call(apicv_pre_state_restore)(vcpu);
- 
- 	/* set SPIV separately to get count of SW disabled APICs right */
--	apic_set_spiv(apic, *((u32 *)(s->regs + APIC_SPIV)));
-+	apic_set_spiv(apic, *((u32 *)(regs + APIC_SPIV)));
- 
--	r = kvm_apic_state_fixup(vcpu, s, true);
-+	r = kvm_apic_state_fixup(vcpu, regs, true);
- 	if (r) {
- 		kvm_recalculate_apic_map(vcpu->kvm);
- 		return r;
- 	}
--	memcpy(vcpu->arch.apic->regs, s->regs, sizeof(*s));
-+	memcpy(vcpu->arch.apic->regs, regs, size);
- 
- 	atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
- 	kvm_recalculate_apic_map(vcpu->kvm);
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 152f17903ff0..c6ac40c76f62 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -132,8 +132,8 @@ static inline int kvm_irq_delivery_to_apic(struct kvm *kvm,
- void kvm_apic_send_ipi(struct kvm_lapic *apic, u32 icr_low, u32 icr_high);
- 
- int kvm_apic_set_base(struct kvm_vcpu *vcpu, u64 value, bool host_initiated);
--int kvm_apic_get_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s);
--int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s);
-+int kvm_apic_get_state(struct kvm_vcpu *vcpu, void *regs, unsigned int size);
-+int kvm_apic_set_state(struct kvm_vcpu *vcpu, void *regs, unsigned int size);
- int kvm_lapic_find_highest_irr(struct kvm_vcpu *vcpu);
- 
- u64 kvm_get_lapic_tscdeadline_msr(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 368ee9276366..669c894f1061 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5328,7 +5328,7 @@ static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
- 
- 	kvm_x86_call(sync_pir_to_irr)(vcpu);
- 
--	return kvm_apic_get_state(vcpu, s);
-+	return kvm_apic_get_state(vcpu, s->regs, sizeof(*s));
- }
- 
- static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
-@@ -5339,7 +5339,7 @@ static int kvm_vcpu_ioctl_set_lapic(struct kvm_vcpu *vcpu,
- 	if (vcpu->arch.apic->guest_apic_protected)
- 		return -EINVAL;
- 
--	r = kvm_apic_set_state(vcpu, s);
++static int kvm_vcpu_ioctl_set_lapic2(struct kvm_vcpu *vcpu,
++				    struct kvm_lapic_state2 *s)
++{
++	int r;
++
++	if (vcpu->arch.apic->guest_apic_protected)
++		return -EINVAL;
++
 +	r = kvm_apic_set_state(vcpu, s->regs, sizeof(*s));
- 	if (r)
- 		return r;
- 	update_cr8_intercept(vcpu);
++	if (r)
++		return r;
++	update_cr8_intercept(vcpu);
++
++	return 0;
++}
++
+ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+@@ -6203,6 +6230,7 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	union {
+ 		struct kvm_sregs2 *sregs2;
+ 		struct kvm_lapic_state *lapic;
++		struct kvm_lapic_state2 *lapic2;
+ 		struct kvm_xsave *xsave;
+ 		struct kvm_xcrs *xcrs;
+ 		void *buffer;
+@@ -6243,6 +6271,37 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		r = kvm_vcpu_ioctl_set_lapic(vcpu, u.lapic);
+ 		break;
+ 	}
++	case KVM_GET_LAPIC2: {
++		r = -EINVAL;
++		if (!lapic_in_kernel(vcpu))
++			goto out;
++		u.lapic2 = kzalloc(sizeof(struct kvm_lapic_state2), GFP_KERNEL);
++
++		r = -ENOMEM;
++		if (!u.lapic2)
++			goto out;
++		r = kvm_vcpu_ioctl_get_lapic2(vcpu, u.lapic2);
++		if (r)
++			goto out;
++		r = -EFAULT;
++		if (copy_to_user(argp, u.lapic2, sizeof(struct kvm_lapic_state2)))
++			goto out;
++		r = 0;
++		break;
++	}
++	case KVM_SET_LAPIC2: {
++		r = -EINVAL;
++		if (!lapic_in_kernel(vcpu))
++			goto out;
++		u.lapic2 = memdup_user(argp, sizeof(*u.lapic2));
++		if (IS_ERR(u.lapic2)) {
++			r = PTR_ERR(u.lapic2);
++			goto out_nofree;
++		}
++
++		r = kvm_vcpu_ioctl_set_lapic2(vcpu, u.lapic2);
++		break;
++	}
+ 	case KVM_INTERRUPT: {
+ 		struct kvm_interrupt irq;
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index cb27eeb09bdb..f45d313e30ae 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1339,6 +1339,8 @@ struct kvm_vfio_spapr_tce {
+ #define KVM_SET_FPU               _IOW(KVMIO,  0x8d, struct kvm_fpu)
+ #define KVM_GET_LAPIC             _IOR(KVMIO,  0x8e, struct kvm_lapic_state)
+ #define KVM_SET_LAPIC             _IOW(KVMIO,  0x8f, struct kvm_lapic_state)
++#define KVM_GET_LAPIC2            _IOR(KVMIO,  0x8e, struct kvm_lapic_state2)
++#define KVM_SET_LAPIC2            _IOW(KVMIO,  0x8f, struct kvm_lapic_state2)
+ #define KVM_SET_CPUID2            _IOW(KVMIO,  0x90, struct kvm_cpuid2)
+ #define KVM_GET_CPUID2            _IOWR(KVMIO, 0x91, struct kvm_cpuid2)
+ /* Available with KVM_CAP_VAPIC */
 -- 
 2.43.0
 
