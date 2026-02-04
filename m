@@ -1,193 +1,205 @@
-Return-Path: <kvm+bounces-70271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70272-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2EhAHB68g2kgtwMAu9opvQ
-	(envelope-from <kvm+bounces-70271-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 22:37:34 +0100
+	id UFngKhe+g2mqtwMAu9opvQ
+	(envelope-from <kvm+bounces-70272-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 22:45:59 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC65CECC53
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 22:37:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51880ECD76
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 22:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D1093015C83
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 21:37:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00D55301702E
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 21:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D797A395D82;
-	Wed,  4 Feb 2026 21:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E6030E83F;
+	Wed,  4 Feb 2026 21:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wwODQMWO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwupwBD4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033AE2F1FC9
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 21:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 479912C859;
+	Wed,  4 Feb 2026 21:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770241039; cv=none; b=FNI/XpWHFTj6/anxdhDnkJbLm16mSG+m9ZFXn1gyqJqURWLHNsw39tIuP0WYUADa5hNLsd4KGTD7vGcFSM/KvL/aR5s6/fqcJFdKesxsWqaS+qZLJ/AMlqzabpEpxyKfi37osUFVYQBDEwdDdmColTRHY8kNeQDEfywloLAvqeM=
+	t=1770241545; cv=none; b=CbQSDEm27eYPaKTVUKdNFaaAFS0jvSSG0G2uwPXxcGlgiMI6DQFb5fTVjOSfr7HsOMye5TngtCPL1TokEqTWQS++9tSmbySHFuXDTOJ+VNeXUyGjetmMep9RM4QgnE8A0td2HjNsCzscSLjNMdy2Wnzbasc2V6RLYxQMjmP+62E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770241039; c=relaxed/simple;
-	bh=NoQk+WUwevTmhgi2vLUcHu/2l3Wad6kBnJ/+pThVYNM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c5wnya9NIBEh3q2dFPiCDYw3UlewYNj7mACAFGF5UqRf9R0LQRacEccYA+f+cdC7R2hOqgvDm+iukVMH90NFJsWc7JmbxUMKweRL6hGGG660G/N0XE/uBXgGRwSk4CXl8tSCHY0T+W/ZnzNk5Z1ZYGs/b84UtIlr29byGwLWsOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wwODQMWO; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-81f3c36dd2cso189609b3a.2
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 13:37:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770241038; x=1770845838; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x42FsSrubrOBY2TJXIwfVaWLWCG2JiMLbWyLTkA5Cdk=;
-        b=wwODQMWOJyHLU0oMBLB7/qchJ48TawLkFUuFlL+ffBJO3jmzMQ2vTw4TOI+S/3bN0p
-         SQXsEe2D7D4KlngslqJvcNVchlXRWoJ5RkslHuquuJJHn1ggrBGTcLegSe1nEoHUUSA4
-         3RKZMiY1RrDMDwe2c7HwjkMGFapQYkOQ9+0ryvPzcb2I7mNLUH0kHkPxAXKX2ZCRyfrA
-         TAHaxoxy3u8IuzAUMtyUSIc08G9PUCh5fQVmv4GIER8oWaLJaujZxrGbBnuOKKzv2Ka8
-         m08liX1GyYIvWfdRSVgL+ER75qk956k8Lim5nFc3asopAsrubXscWrhbEG8DutvbxtyQ
-         VD8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770241038; x=1770845838;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x42FsSrubrOBY2TJXIwfVaWLWCG2JiMLbWyLTkA5Cdk=;
-        b=E1kNOnnf7qZznTbNqmpVrsRoEKSqX3a3FL1CLCRDhLlXM/ksl3wAXB5lzU1cEZzlG+
-         sWKHbstSolSQHEb2fSH32ebw6Sl3/lVXhE6AR9M5cCrDtt6zziACsBcFC9PdCT3oseP5
-         jwdjNWP6KS1dImE0tY4r9HudzLf/2cchMOoWQxPCQodvkAljSCAUqdu3YqlOzntq0fUF
-         su5F/LfdRchr3M/JesKeJPS+iZ7D7aq+7LlFEM01ut2nRWN9i3JKOcv8nycuHQEXchtu
-         Uv66KT2X85BYJhtT9EG0EdAdN/cYoByJw6KzavBwUjLkW0IBplSXnQR05sbo11xsjofX
-         LjJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHmCULq22xwLJA6N2XZYgY5HfKDCcAdmr077l1Cnexub5kprzNKT90FkWv+zZiE+ITFgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVSWuAWF6kgksEzRCf8RLsoBnqxmKv0qWDEMoswvTdNlGigfQM
-	PDzepllnihKDPROp/oeCRRZCfYZelYXnEkL7VdQ/UlQYqQZ8wPQ8wK8fHKSO/JDp8lRwKXNtkrb
-	6mHwbSA==
-X-Received: from pfvx9.prod.google.com ([2002:a05:6a00:2709:b0:7b8:922c:725d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1a90:b0:81f:852b:a925
- with SMTP id d2e1a72fcca58-8241c19da84mr4061956b3a.1.1770241038322; Wed, 04
- Feb 2026 13:37:18 -0800 (PST)
-Date: Wed, 4 Feb 2026 13:37:16 -0800
-In-Reply-To: <CAEvNRgF75EsHL8idLzFzbk0K9uhE70AMj5Vitp4cKNg_5WqQKw@mail.gmail.com>
+	s=arc-20240116; t=1770241545; c=relaxed/simple;
+	bh=T6VunRLRhUokHR96PR2K9QEe7u1JQv9PsMwPfT1O/zM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=plOT+MnEOfMfo2J7yR7wtfiCQQSWBNCgKeF0LFzlueUdVpMyTzTi9mIjvmgqV0y5iT/Cp0lfygbta4atnjk0r88z6fVy/EzLPmZmbVTpSMbLbImuiIVQvUhTGF8YZJlF10v4z//Dk8rAysRAbFFu5soycgv5VnpZzw/UFnmdnyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwupwBD4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1002DC4CEF7;
+	Wed,  4 Feb 2026 21:45:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770241544;
+	bh=T6VunRLRhUokHR96PR2K9QEe7u1JQv9PsMwPfT1O/zM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gwupwBD4a46yby1AEJaJ55CTKEz9vPRUj2PD5w+THn7OXVOTgjRpIx3piaawh3eHa
+	 LTy2RBIBE+FN0hU2pbAuEgv/oVYUGcgO2SUbYzgcGruNxRpeu3wZZ6pL7NlU9D7CGE
+	 x51t/VcOO3MgmiRtd+TC9M0l0EuZvuLnHaDSyP+w2wvIFxks0CQdpiJd7o0TW5sH6Q
+	 nbIU9n3y15FOyu7bn8QqM3YthsMMIS0AVNuDr2wRFwMFt+bNYVf2pZ+vsbW+4ZbBnX
+	 nARbP1zYZUKS/ynHMzq/i/k7NSz5/1N3yHH3+QUEY4EpZkZV9SqEtVR+CfWRwDpYJF
+	 Ft95csc7W9fTA==
+Message-ID: <16e5a36e-fff0-4a54-9c5c-a8e411659108@kernel.org>
+Date: Wed, 4 Feb 2026 22:45:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <697d115a.050a0220.1d61ec.0004.GAE@google.com> <20260204170144.2904483-1-ackerleytng@google.com>
- <CAEvNRgF75EsHL8idLzFzbk0K9uhE70AMj5Vitp4cKNg_5WqQKw@mail.gmail.com>
-Message-ID: <aYO8DLCWw8FEQUAU@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] KVM: guest_memfd: Disable VMA merging with VM_DONTEXPAND
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com, david@kernel.org, michael.roth@amd.com, 
-	vannapurve@google.com, kartikey406@gmail.com
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>,
+ Ackerley Tng <ackerleytng@google.com>
+Cc: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ syzkaller-bugs@googlegroups.com, michael.roth@amd.com,
+ vannapurve@google.com, kartikey406@gmail.com
+References: <697d115a.050a0220.1d61ec.0004.GAE@google.com>
+ <20260204170144.2904483-1-ackerleytng@google.com>
+ <CAEvNRgF75EsHL8idLzFzbk0K9uhE70AMj5Vitp4cKNg_5WqQKw@mail.gmail.com>
+ <aYO8DLCWw8FEQUAU@google.com>
+From: "David Hildenbrand (arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aYO8DLCWw8FEQUAU@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70271-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,vger.kernel.org,redhat.com,googlegroups.com,kernel.org,amd.com,google.com,gmail.com];
+	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,vger.kernel.org,redhat.com,googlegroups.com,amd.com,google.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-70272-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm,33a04338019ac7e43a44];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm,33a04338019ac7e43a44];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CC65CECC53
+X-Rspamd-Queue-Id: 51880ECD76
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026, Ackerley Tng wrote:
-> Ackerley Tng <ackerleytng@google.com> writes:
+On 2/4/26 22:37, Sean Christopherson wrote:
+> On Wed, Feb 04, 2026, Ackerley Tng wrote:
+>> Ackerley Tng <ackerleytng@google.com> writes:
+>>
+>>> #syz test: git://git.kernel.org/pub/scm/virt/kvm/kvm.git next
+>>>
+>>> guest_memfd VMAs don't need to be merged,
 > 
-> > #syz test: git://git.kernel.org/pub/scm/virt/kvm/kvm.git next
-> >
-> > guest_memfd VMAs don't need to be merged,
-
-Why not?  There are benefits to merging VMAs that have nothing to do with folios.
-E.g. map 1GiB of guest_memfd with 512*512 4KiB VMAs, and then it becomes quite
-desirable to merge all of those VMAs into one.
-
-Creating _hugepages_ doesn't add value, but that's not the same things as merging
-VMAs.
-
-> > especially now, since guest_memfd only supports PAGE_SIZE folios.
-> >
-> > Set VM_DONTEXPAND on guest_memfd VMAs.
->
-> Local tests and syzbot agree that this fixes the issue identified. :)
+> Why not?  There are benefits to merging VMAs that have nothing to do with folios.
+> E.g. map 1GiB of guest_memfd with 512*512 4KiB VMAs, and then it becomes quite
+> desirable to merge all of those VMAs into one.
 > 
-> I would like to look into madvise(MADV_COLLAPSE) and uprobes triggering
-> mapping/folio collapsing before submitting a full patch series.
+> Creating _hugepages_ doesn't add value, but that's not the same things as merging
+> VMAs.
 > 
-> David, Michael, Vishal, what do you think of the choice of setting
-> VM_DONTEXPAND to disable khugepaged?
-
-I'm not one of the above, but for me it feels very much like treating a symptom
-and not fixing the underlying cause.
-
-It seems like what KVM should do is not block one path that triggers hugepage
-processing, but instead flat out disallow creating hugepages.  Unfortunately,
-AFAICT, there's no existing way to prevent madvise() from clearing VM_NOHUGEPAGE,
-so we can't simply force that flag.
-
-I'd prefer not to special case guest_memfd, a la devdax, but I also want to address
-this head-on, not by removing a tangentially related trigger.
-
-> + For 4K guest_memfd, there's really nothing to expand
-> + For THP and HugeTLB guest_memfd (future), we actually don't want
-> expansion of the VMAs.
+>>> especially now, since guest_memfd only supports PAGE_SIZE folios.
+>>>
+>>> Set VM_DONTEXPAND on guest_memfd VMAs.
+>>
+>> Local tests and syzbot agree that this fixes the issue identified. :)
+>>
+>> I would like to look into madvise(MADV_COLLAPSE) and uprobes triggering
+>> mapping/folio collapsing before submitting a full patch series.
+>>
+>> David, Michael, Vishal, what do you think of the choice of setting
+>> VM_DONTEXPAND to disable khugepaged?
 > 
-> IIUC setting VM_DONTEXPAND doesn't affect mremap() as long as the
-> remapping does not involve expansion.
+> I'm not one of the above, but for me it feels very much like treating a symptom
+> and not fixing the underlying cause.
+
+And you are spot-on :)
+
 > 
-> > In addition, this disables khugepaged from operating on guest_memfd folios,
-> > which may result in unintended merging of guest_memfd folios.
-> >
-> > Change-Id: I5867edcb66b075b54b25260afd22a198aee76df1
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > ---
-> >  virt/kvm/guest_memfd.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >
-> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > index fdaea3422c30..3d4ac461c28b 100644
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -480,6 +480,12 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> >  		return -EINVAL;
-> >  	}
-> >
-> > +	/*
-> > +	 * Disable VMA merging - guest_memfd VMAs should be
-> > +	 * static. This also stops khugepaged from operating on
-> > +	 * guest_memfd VMAs and folios.
-> > +	 */
-> > +	vm_flags_set(vma, VM_DONTEXPAND);
-> >  	vma->vm_ops = &kvm_gmem_vm_ops;
-> >
-> >  	return 0;
-> > --
-> > 2.53.0.rc2.204.g2597b5adb4-goog
+> It seems like what KVM should do is not block one path that triggers hugepage
+> processing, but instead flat out disallow creating hugepages.  Unfortunately,
+> AFAICT, there's no existing way to prevent madvise() from clearing VM_NOHUGEPAGE,
+> so we can't simply force that flag.
+> 
+> I'd prefer not to special case guest_memfd, a la devdax, but I also want to address
+> this head-on, not by removing a tangentially related trigger.
+
+VM_NOHUGEPAGE also smells like the wrong thing. This is a file limitation.
+
+!thp_vma_allowable_order() must take care of that somehow down in 
+__thp_vma_allowable_orders(), by checking the file).
+
+Likely the file_thp_enabled() check is the culprit with 
+CONFIG_READ_ONLY_THP_FOR_FS?
+
+Maybe we need a flag to say "even not CONFIG_READ_ONLY_THP_FOR_FS".
+
+I wonder how we handle that for secretmem. Too late for me, going to bed :)
+
+-- 
+Cheers,
+
+David
 
