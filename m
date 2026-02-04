@@ -1,262 +1,196 @@
-Return-Path: <kvm+bounces-70188-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70189-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2M+kElkvg2kwjAMAu9opvQ
-	(envelope-from <kvm+bounces-70188-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:36:57 +0100
+	id GDauEvUxg2kwjAMAu9opvQ
+	(envelope-from <kvm+bounces-70189-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:48:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F48E534B
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:36:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F0A9E54C1
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAAC130177A7
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 11:36:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0D7AF3006981
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 11:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6893ECBC5;
-	Wed,  4 Feb 2026 11:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E013ECBD5;
+	Wed,  4 Feb 2026 11:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b="hfp6HnSa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbYlDQxV"
 X-Original-To: kvm@vger.kernel.org
-Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [144.217.248.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37E936A000;
-	Wed,  4 Feb 2026 11:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.217.248.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC172C3745;
+	Wed,  4 Feb 2026 11:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770204990; cv=none; b=Eg039ipezGuyMrjya9C4kLT3BD+A6V9vjmW9Zyh2mI3oB/osNzD1xnwDxS/am2HoQXCDYP1qW35VOll1BlPZ3tCPtlp4kSNRbB+NKkM57gjO+5pIVgiksggb8DB0IvRGnkO9Z44NTrAX8iJAsq4u0jZQqIFxkcYJ+DhZEVsE2Io=
+	t=1770205674; cv=none; b=VZd0hcfGdXvRuH1AxdpCyabczL3qaS8NUQdFTFBS9mFgOVcKdYqIoel+ujfbZiQsXJqq4fAF7k+Fa5W5oRroDRNGJuJPaVg8t2OSB0ooaBqdsfVx7F7bSWtBiwHsNlruhCpRVjwZlAXI4C+8pbeBhgSbcZY2Br6IJ+wr/8Jd+ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770204990; c=relaxed/simple;
-	bh=58LqpetPvvp7KfRxRprE4DTYph3Dq/zzrccU1r05rww=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mlGNZhILmDxpCBq5ZIVVJ2/BUrcQew/F0cyZ4KEFylxbYR4ds6nA+mQK/k5pcl9+3kymRBqGHF+fw82DJQjBS4QWaxMRA/W/XbTj6LegKOFHhnKidqlixteqhbT38FJF8/au/IHfs2JSXyFlSvFNMfSInFbDZSSlvesc/1U7Ack=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io; spf=pass smtp.mailfrom=aosc.io; dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b=hfp6HnSa; arc=none smtp.client-ip=144.217.248.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aosc.io
-Received: from nf2.mymailcheap.com (nf2.mymailcheap.com [54.39.180.165])
-	by relay1.mymailcheap.com (Postfix) with ESMTPS id 4A3903E980;
-	Wed,  4 Feb 2026 11:36:23 +0000 (UTC)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
-	by nf2.mymailcheap.com (Postfix) with ESMTPSA id A9536400B6;
-	Wed,  4 Feb 2026 11:36:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=aosc.io; s=default;
-	t=1770204981; bh=58LqpetPvvp7KfRxRprE4DTYph3Dq/zzrccU1r05rww=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hfp6HnSaID1je6wGMMhvx4x+k9OCuxPgggzHdQmrb+woIgr1a9d2THWhgVAoWWPaq
-	 1nKFUme2KhJ5b3ADlpWfva1hQIoR0QGolXOZpeIyBxL9BaN6UcIQTlRIF9nVGyq1V/
-	 YAACK+d9yJwqqGhl8cQ8oEhBgI1XyUVTbQCHe/TU=
-Received: from liushuyu-p15 (unknown [117.151.13.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail20.mymailcheap.com (Postfix) with ESMTPSA id F347641280;
-	Wed,  4 Feb 2026 11:36:09 +0000 (UTC)
-From: Zixing Liu <liushuyu@aosc.io>
-To: WANG Xuerui <kernel@xen0n.name>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Bibo Mao <maobibo@loongson.cn>
-Cc: Kexy Biscuit <kexybiscuit@aosc.io>,
-	Mingcong Bai <jeffbai@aosc.io>,
-	Zixing Liu <liushuyu@aosc.io>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-riscv@lists.infradead.org
-Subject: [PATCH v4] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
-Date: Wed,  4 Feb 2026 19:36:00 +0800
-Message-ID: <20260204113601.912413-1-liushuyu@aosc.io>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1770205674; c=relaxed/simple;
+	bh=rPbKYkwfcWB5lqs9Gv5YueZqMCBOM7yviLRmQArria8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pyM47rsJotLNb+PZ32wa2yNSknF9MgczqB4bTANwvKyIBNeqmkFNpkOroVL8+XLW19t0nAnHDPGR8RbkuaIupI88Ipk7R7yq8CL2XBVbbZFiifcXFMYsFkvBDWKXccVf2XCK7C53vC7cRJ109zglGaYBJDyKOnSUAMyPSaYJ6R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbYlDQxV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79FCC4CEF7;
+	Wed,  4 Feb 2026 11:47:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770205674;
+	bh=rPbKYkwfcWB5lqs9Gv5YueZqMCBOM7yviLRmQArria8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gbYlDQxVBeta/CNJyWa9MgeMWc8AZVaz/Hqh50dxhpDoTN1L69OChpApl6XkULIi6
+	 NKDHElSpJ3087qW1UgR3Qd1rMmOeJjNykE0aHGpknmYrydT3vaew7r0gqrRjJ7W678
+	 UDYv62OnYV2+8whi9PQWZ5jczYgPNcfZPw0UE5IyEFudBWVmucwnDa3AiZp6JDoVfN
+	 2IA6q0TFbgskZI35/tRemeJn+janbOtDtphRvg1kyfWm4CA/Ultkf4AZhhi+V/VA3e
+	 a4n7hXHn5AWWJK9HRujiYMgAxR9LD249ZcIrZwTSuHkzBVCcfL5/GUQYXrpMK0XvRa
+	 4TY71rz996rFw==
+Date: Wed, 4 Feb 2026 13:47:51 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 0/8] dma-buf: Use revoke mechanism to invalidate
+ shared buffers
+Message-ID: <20260204114751.GF6771@unreal>
+References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
+ <20260202160425.GO34749@unreal>
+ <20260204081630.GA6771@unreal>
+ <6d5c392b-596b-4341-9992-aa4b26001804@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <6d5c392b-596b-4341-9992-aa4b26001804@amd.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[aosc.io:s=default];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[aosc.io];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70189-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70188-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[linaro.org,amd.com,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,intel.com,ziepe.ca,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liushuyu@aosc.io,kvm@vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	DKIM_TRACE(0.00)[aosc.io:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2F48E534B
+	RCPT_COUNT_TWELVE(0.00)[34];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 6F0A9E54C1
 X-Rspamd-Action: no action
 
-This ioctl can be used by the userspace applications to determine which
-(special) registers are get/set-able in a meaningful way.
+On Wed, Feb 04, 2026 at 09:54:13AM +0100, Christian König wrote:
+> On 2/4/26 09:16, Leon Romanovsky wrote:
+> > On Mon, Feb 02, 2026 at 06:04:25PM +0200, Leon Romanovsky wrote:
+> >> On Sat, Jan 31, 2026 at 07:34:10AM +0200, Leon Romanovsky wrote:
+> >>> Changelog:
+> >>> v7:
+> >>
+> >> <...>
+> >>
+> >>> Leon Romanovsky (8):
+> >>>       dma-buf: Rename .move_notify() callback to a clearer identifier
+> >>>       dma-buf: Rename dma_buf_move_notify() to dma_buf_invalidate_mappings()
+> >>>       dma-buf: Always build with DMABUF_MOVE_NOTIFY
+> >>>       vfio: Wait for dma-buf invalidation to complete
+> >>>       dma-buf: Make .invalidate_mapping() truly optional
+> >>>       dma-buf: Add dma_buf_attach_revocable()
+> >>>       vfio: Permit VFIO to work with pinned importers
+> >>>       iommufd: Add dma_buf_pin()
+> >>>
+> >>>  drivers/dma-buf/Kconfig                     | 12 -----
+> >>>  drivers/dma-buf/dma-buf.c                   | 69 ++++++++++++++++++++-----
+> >>>  drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c | 14 ++---
+> >>>  drivers/gpu/drm/amd/amdgpu/amdgpu_object.c  |  2 +-
+> >>>  drivers/gpu/drm/amd/amdkfd/Kconfig          |  2 +-
+> >>>  drivers/gpu/drm/virtio/virtgpu_prime.c      |  2 +-
+> >>>  drivers/gpu/drm/xe/tests/xe_dma_buf.c       |  7 ++-
+> >>>  drivers/gpu/drm/xe/xe_bo.c                  |  2 +-
+> >>>  drivers/gpu/drm/xe/xe_dma_buf.c             | 14 ++---
+> >>>  drivers/infiniband/core/umem_dmabuf.c       | 13 -----
+> >>>  drivers/infiniband/hw/mlx5/mr.c             |  2 +-
+> >>>  drivers/iommu/iommufd/pages.c               | 11 +++-
+> >>>  drivers/iommu/iommufd/selftest.c            |  2 +-
+> >>>  drivers/vfio/pci/vfio_pci_dmabuf.c          | 80 ++++++++++++++++++++++-------
+> >>>  include/linux/dma-buf.h                     | 17 +++---
+> >>>  15 files changed, 153 insertions(+), 96 deletions(-)
+> >>
+> >> Christian,
+> >>
+> >> Given the ongoing discussion around patch v5, I'm a bit unclear on the
+> >> current state. Is the series ready for merging, or do you need me to
+> >> rework anything further?
+> > 
+> > Christian,
+> > 
+> > Let's not miss the merge window for work that is already ready.
+> 
+> Mhm, sounds like AMDs mail servers never send my last mail out.
+> 
+> As far as I can see all patches have an reviewed-by, I also gave an rb on patch #6 (should that mail never got out as well). The discussion on patch v5 is just orthogonal I think, the handling was there even completely before this patch set.
+> 
+> For upstreaming as long as the VFIO and infiniband folks don't object I would like to take that through the drm-misc branch (like every other DMA-buf change).
 
-This can be very useful for cross-platform VMMs so that they do not have
-to hardcode register indices for each supported architectures.
+Infiniband folks don't object :).
 
-Signed-off-by: Zixing Liu <liushuyu@aosc.io>
----
- Documentation/virt/kvm/api.rst |  2 +-
- arch/loongarch/kvm/vcpu.c      | 87 ++++++++++++++++++++++++++++++++++
- 2 files changed, 88 insertions(+), 1 deletion(-)
+> 
+> So as long as nobody objects I can push that today, but I can't promise that Dave/Linus will take it for the 6.20 window.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 01a3abef8abb..f46dd8be282f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -3603,7 +3603,7 @@ VCPU matching underlying host.
- ---------------------
- 
- :Capability: basic
--:Architectures: arm64, mips, riscv, x86 (if KVM_CAP_ONE_REG)
-+:Architectures: arm64, loongarch, mips, riscv, x86 (if KVM_CAP_ONE_REG)
- :Type: vcpu ioctl
- :Parameters: struct kvm_reg_list (in/out)
- :Returns: 0 on success; -1 on error
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 656b954c1134..bd855ee20ee2 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -3,6 +3,7 @@
-  * Copyright (C) 2020-2023 Loongson Technology Corporation Limited
-  */
- 
-+#include "asm/kvm_host.h"
- #include <linux/kvm_host.h>
- #include <asm/fpu.h>
- #include <asm/lbt.h>
-@@ -14,6 +15,8 @@
- #define CREATE_TRACE_POINTS
- #include "trace.h"
- 
-+#define NUM_LBT_REGS 6
-+
- const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	KVM_GENERIC_VCPU_STATS(),
- 	STATS_DESC_COUNTER(VCPU, int_exits),
-@@ -1186,6 +1189,72 @@ static int kvm_loongarch_vcpu_set_attr(struct kvm_vcpu *vcpu,
- 	return ret;
- }
- 
-+static int kvm_loongarch_walk_csrs(struct kvm_vcpu *vcpu, u64 __user *uindices)
-+{
-+	unsigned int i, count;
-+
-+	for (i = 0, count = 0; i < CSR_MAX_NUMS; i++) {
-+		if (!(get_gcsr_flag(i) & (SW_GCSR | HW_GCSR)))
-+			continue;
-+		if (i >= LOONGARCH_CSR_PERFCTRL0 && i <= LOONGARCH_CSR_PERFCNTR3) {
-+			/* Skip PMU CSRs if not supported by the guest */
-+			if (!kvm_guest_has_pmu(&vcpu->arch))
-+				continue;
-+		}
-+		const u64 reg = KVM_IOC_CSRID(i);
-+		if (uindices && put_user(reg, uindices++))
-+			return -EFAULT;
-+		count++;
-+	}
-+
-+	return count;
-+}
-+
-+static unsigned long kvm_loongarch_num_regs(struct kvm_vcpu *vcpu)
-+{
-+	/* +1 for the KVM_REG_LOONGARCH_COUNTER register */
-+	unsigned long res =
-+		kvm_loongarch_walk_csrs(vcpu, NULL) + KVM_MAX_CPUCFG_REGS + 1;
-+
-+	if (kvm_guest_has_lbt(&vcpu->arch))
-+		res += NUM_LBT_REGS;
-+
-+	return res;
-+}
-+
-+static int kvm_loongarch_copy_reg_indices(struct kvm_vcpu *vcpu,
-+					  u64 __user *uindices)
-+{
-+	u64 reg;
-+	unsigned int i;
-+
-+	i = kvm_loongarch_walk_csrs(vcpu, uindices);
-+	if (i < 0)
-+		return i;
-+	uindices += i;
-+
-+	for (i = 0; i < KVM_MAX_CPUCFG_REGS; i++) {
-+		reg = KVM_IOC_CPUCFG(i);
-+		if (put_user(reg, uindices++))
-+			return -EFAULT;
-+	}
-+
-+	reg = KVM_REG_LOONGARCH_COUNTER;
-+	if (put_user(reg, uindices++))
-+		return -EFAULT;
-+
-+	if (!kvm_guest_has_lbt(&vcpu->arch))
-+		return 0;
-+
-+	for (i = 1; i <= NUM_LBT_REGS; i++) {
-+		reg = (KVM_REG_LOONGARCH_LBT | KVM_REG_SIZE_U64 | i);
-+		if (put_user(reg, uindices++))
-+			return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
- long kvm_arch_vcpu_ioctl(struct file *filp,
- 			 unsigned int ioctl, unsigned long arg)
- {
-@@ -1251,6 +1320,24 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		r = kvm_loongarch_vcpu_set_attr(vcpu, &attr);
- 		break;
- 	}
-+	case KVM_GET_REG_LIST: {
-+		struct kvm_reg_list __user *user_list = argp;
-+		struct kvm_reg_list reg_list;
-+		unsigned n;
-+
-+		r = -EFAULT;
-+		if (copy_from_user(&reg_list, user_list, sizeof(reg_list)))
-+			break;
-+		n = reg_list.n;
-+		reg_list.n = kvm_loongarch_num_regs(vcpu);
-+		if (copy_to_user(user_list, &reg_list, sizeof(reg_list)))
-+			break;
-+		r = -E2BIG;
-+		if (n < reg_list.n)
-+			break;
-+		r = kvm_loongarch_copy_reg_indices(vcpu, user_list->reg);
-+		break;
-+	}
- 	default:
- 		r = -ENOIOCTLCMD;
- 		break;
--- 
-2.53.0
+Let's give it a try, at the very least.
 
+Thanks
+
+> 
+> Regards,
+> Christian.
+> 
+> > 
+> > Thanks
+> > 
+> >>
+> >> Thanks
+> >>
+> 
+> 
 
