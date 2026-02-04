@@ -1,200 +1,431 @@
-Return-Path: <kvm+bounces-70268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70269-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EGoOIr6Zg2lnpwMAu9opvQ
-	(envelope-from <kvm+bounces-70268-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 20:10:54 +0100
+	id YAKWJQezg2k0tAMAu9opvQ
+	(envelope-from <kvm+bounces-70269-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 21:58:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17A6EBF16
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 20:10:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1D1EC9D2
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 21:58:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6EC6F3012C81
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 19:10:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7633E30146BC
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 20:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C9442849D;
-	Wed,  4 Feb 2026 19:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6402C43C07B;
+	Wed,  4 Feb 2026 20:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u8Y0xbg6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oo4R8HDp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96431A551
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 19:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770232250; cv=pass; b=GMG/V/EqEEBV6R+CvXs6jJhLmt/zdW4TUZninKBMZnKp1S3OiMb4g8C9cESu/yM1M/1USOsN2/l73zYNhPoBR8wg8M10BfEBmPgmyEJ3Ov3S4f01aysCt97UU3tuwoaNxFi/B6tZqfcLs93Jq/kBsH6ibvvcn9gH2nfU4zNKKp4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770232250; c=relaxed/simple;
-	bh=lXWxYGyyhF9P6Wv7GmsgpSmu4ZHvbmD85h4KG4Mans8=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XQDV8NKyxjM7r9ehQwKS/QHiob5yTyvQUrz5excMbfXdSYprapApe0cP3oxvGX0CSE4Z07hyUnur5Mlwu8GBcJRuYWHeKhy6u1NlbK238Zw6NxmuhbSIqjLbWqh0dturJkNijMfOjaNNDNSGz+6UIRdYXYJ1e2GdOHTG/00VBn8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u8Y0xbg6; arc=pass smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-948e7c39668so22619241.1
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 11:10:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770232249; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GW5IE0GC9UM9pKHTE9Wn+ZiyIviIiRNssl7QaRFng120uaglx90/ORTY3GJQEtvn2U
-         KbOmquA5QYBxMRu6pMRUsk1EdncNM73o6la/ZLoaeD3jrHca9t5rUtywdBJf/kk8nc7N
-         OenIZOqRhZb3Q+5VonA1TSRq6AfPz/2yASbqaZ07+V0LSZsiwNpo9CPGUAYiWP1mnmaC
-         CSiEwKvbugsLp0oe0VsQD95Mc/Q+nAPXR3XmVk5okGldzK0AJDwo3ORXgiBtKuUk66ub
-         /7KNVQmSLWnLQz3GrvgGKttedQysVAL5MNbhdx8L4Yn3K+dDhK1o/Y0335KprBi2KNrz
-         FIig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=XU+nHiW99yv3DcS5bVzWR/3CEep103RfiIzgG2VGh4A=;
-        fh=fklkTIw7C4117hEW40Nn8beGOQoJr9w6jyLYKcRqgGc=;
-        b=WiQMGGFtFwVvRksPmFN5oc/6UUSLYGUOluQEHiBUtgKWrlANedY9f4No+P8SzKoVIp
-         2SZnIS9HMjanY/zetOG6srp/0xOQXw4P/rakBO8j9ACMFDhk4YU9NtI6k7SXQM3zduD5
-         P35a+cnI7OYR0ZryptZTjccNbE7ZaW1dYRkF66mxgAFGkQlhToufQnWDLICBI3TCFAde
-         nN17h/0IaHwQb85djeVUslJMJSXvwwg7/kF2F1HTskWTvsAq30ktmNFFfTLD8HNSWlea
-         lUxap9/SYMLRjZ4wGkA1gJDwVcdJ03gMKDMtsNyjemLBR6tk+4N9QhHCE75X8uYfrXuV
-         l5pA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770232249; x=1770837049; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XU+nHiW99yv3DcS5bVzWR/3CEep103RfiIzgG2VGh4A=;
-        b=u8Y0xbg6ebox+EepvO+ApfJxaCrpUbj84so8DloOT4OEeK455ynHufT6k4HWV5qZpL
-         y1Zq7A8YHUluzjLMLWdlDZux/OxrziPjZGBXz5+LIfTBWMhef1Fn+S+M2BQKKka6Cro4
-         F+vi7R2hQm2SRj8WQUhJE7jFMePIXWyGQnyx2VsuoA/examE0Y26oepIFGR5U+289PyK
-         lUTygK9mJG5MkfGTsuQuIuegM0WiRbG4xvtQLDlc2IsBxzhymoQhpTg7cIxmaYMLnBvm
-         9FxAHIA8QPOySieGua0ZyNfxNZie0wQHXNb3UNTXddeXvy4QYR/ok5Yw4nskSM+B/Cb+
-         /Irg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770232249; x=1770837049;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XU+nHiW99yv3DcS5bVzWR/3CEep103RfiIzgG2VGh4A=;
-        b=FogS/IBs867ecrsNQcTxYlCxfoR5r2L8NONgHuvicLHsmazJ2EQa0UQxKllyz/Qnbf
-         Rkr7TPXZZpjGZbTLk8SoG7fFFGITorZOy5jmvBURVy/1sanX4/GAScWRH6zrMof4Fztt
-         jsjWtJaUe6Y9nyVXdsgWBnqjeczs4GTDBdaQ7KYThbkvX2+5qWGHK+A5rAINC7BPqDK7
-         O1dm/WuAidZVFZEzc9IfiFQzeZOtGeM1aKErqsYgXrHsFPcaBrGko/xmw7SqmlMBTlI6
-         nmsB8DdxlsSF34KDI7Da9NG8pSO4Kfv0uVVKHQK9jBHIbdDKjPFxmpn5J9dGc3b9aWU3
-         O78w==
-X-Gm-Message-State: AOJu0YzYMwQ5hW8bpuRUe63P5pMtMitcsML+xfnXNA7kt+1X1EaIVys/
-	v/61q1evuMf9yZrjIayAPBtpegvkIkB9bKiT2Z9pN9qwLNQW1QUiNjoeYLLRtwhvqEqL15xBUFN
-	ZE2j5iHM92yqyGQe0JBbzeJdTvZ3Km1Dd50W5xwaw
-X-Gm-Gg: AZuq6aKJGWlyLj1kTwDYzcM1ffFqIv7mv+XHSEFNpyf7fiUwGLC3qXLdTYWFmRdJJih
-	87eWG2pxzVw1dQB2Ly2L4nG1oheyrweBR4DiFViFXcsMwk7faciP0yBD10RAYxam1tHSjMpJhlM
-	15tkT9u0yKB/lOXIGb5FYQWLqS+T8r+WdMZQSpznzAfOlQ2YxNiKY5xSATS48HP652eC/x5Kmj1
-	w+DtUZV+HKhCOpOQuYHwa5/GeGXC45sAlh8T6ghW7GgBWQEpyiqxcp+kp1yeUtoOG5d5/PZPBJe
-	MSLRyxdliiwH7ObyoJ9o6GL3r5N8fXW/wFIE
-X-Received: by 2002:a05:6102:610d:20b0:5f5:3719:19d8 with SMTP id
- ada2fe7eead31-5f9395e2783mr1099207137.31.1770232249053; Wed, 04 Feb 2026
- 11:10:49 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 4 Feb 2026 11:10:48 -0800
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 4 Feb 2026 11:10:48 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20260204170144.2904483-1-ackerleytng@google.com>
-References: <697d115a.050a0220.1d61ec.0004.GAE@google.com> <20260204170144.2904483-1-ackerleytng@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF2837F8BD;
+	Wed,  4 Feb 2026 20:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770238722; cv=none; b=bJ2ZSKXLqF+psij40ByfQ8pv1EgOQkYhjQHUbUNedSboud5wXZs1o/xkQ3URdZk4el0CeR/FZUyW/H59NdaFCAJetmEOcYNmXBEErJF9LTu5KEG93ZGJH4trFxl7HvR57rxXRqKPfmxtwTrp17iGsc+Sp1c3PaVsXdfv7RnBdOs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770238722; c=relaxed/simple;
+	bh=CN9YO0PgY9VI+ArnyPEylWMxEb/sOXmyT3jzqAtcOVc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h25YiSI3gRUVeu4x/KZ3lpqagDD9YK3opwLtdebjbJVVaOcrqHZcf7LfgmV1OporJyuTN4ANW4ZYuDCKmGUgI81x+iXEpyyPBNUolUbm3a+HcLzqiXg/Ce2QN79v/SfxpwBV4j3GHLqQag9cW9mreAM//LmccBRkCxqqYS9kpzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oo4R8HDp; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770238722; x=1801774722;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CN9YO0PgY9VI+ArnyPEylWMxEb/sOXmyT3jzqAtcOVc=;
+  b=Oo4R8HDpnzOqF2fOwRtYOdF3IYlAhpb7LUoRF+ntQCQt7iCQ+HWauF7S
+   Csam/lHS60M9vrY4M1MYF3rFU4nRS6UD/KgUlLZ1Yjyn5HMqipChznMRo
+   PonMuvEMdngUgdXxcsKDhjWnAj51YmKNq0WvqmBoCTkmntXwOpF3j4NAB
+   xhHd6atjy4rsxXbJseWeD/DUUJHEk3u6y2ODCHn6LkgQgZt1Tvj6Amsbz
+   6uZt0x8Z4EtromBVZYUzGbuhYgMoNF80w2IF9eIo1jmP2SklMcdA9uZfr
+   f49dQlgCa1GVCsGkohI+sEFkXDdK43bGqm81uTCth8xkAa6+HOBnmalan
+   w==;
+X-CSE-ConnectionGUID: 7eRuyv1CS32nmqCBzLyQJw==
+X-CSE-MsgGUID: Gj+o2rdaRxSZmc7bIz6P6g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="59010626"
+X-IronPort-AV: E=Sophos;i="6.21,273,1763452800"; 
+   d="scan'208";a="59010626"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2026 12:58:41 -0800
+X-CSE-ConnectionGUID: Gm0rRqvATbeCSULMVTyJrw==
+X-CSE-MsgGUID: CsULfVJxTu2u8gi1KxvG6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,273,1763452800"; 
+   d="scan'208";a="210058685"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 04 Feb 2026 12:58:36 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vnjxJ-00000000jAa-24qd;
+	Wed, 04 Feb 2026 20:58:33 +0000
+Date: Thu, 5 Feb 2026 04:57:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Zixing Liu <liushuyu@aosc.io>, WANG Xuerui <kernel@xen0n.name>,
+	Huacai Chen <chenhuacai@kernel.org>, Bibo Mao <maobibo@loongson.cn>
+Cc: oe-kbuild-all@lists.linux.dev, Kexy Biscuit <kexybiscuit@aosc.io>,
+	Mingcong Bai <jeffbai@aosc.io>, Zixing Liu <liushuyu@aosc.io>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
+Message-ID: <202602050419.lwzj2i73-lkp@intel.com>
+References: <20260204113601.912413-1-liushuyu@aosc.io>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 4 Feb 2026 11:10:48 -0800
-X-Gm-Features: AZwV_QgcQx3vbfxBGP4uiM45fegTaR4Q23FMhVPxMByWK826Z6oIBpv2C8w_Ifs
-Message-ID: <CAEvNRgF75EsHL8idLzFzbk0K9uhE70AMj5Vitp4cKNg_5WqQKw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: guest_memfd: Disable VMA merging with VM_DONTEXPAND
-To: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com, david@kernel.org, michael.roth@amd.com, 
-	vannapurve@google.com, kartikey406@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260204113601.912413-1-liushuyu@aosc.io>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70268-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,googlegroups.com,kernel.org,amd.com,google.com,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70269-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm,33a04338019ac7e43a44];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: F17A6EBF16
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0D1D1EC9D2
 X-Rspamd-Action: no action
 
-Ackerley Tng <ackerleytng@google.com> writes:
+Hi Zixing,
 
-> #syz test: git://git.kernel.org/pub/scm/virt/kvm/kvm.git next
->
-> guest_memfd VMAs don't need to be merged, especially now, since guest_memfd
-> only supports PAGE_SIZE folios.
->
-> Set VM_DONTEXPAND on guest_memfd VMAs.
->
+kernel test robot noticed the following build errors:
 
-Local tests and syzbot agree that this fixes the issue identified. :)
+[auto build test ERROR on kvm/queue]
+[also build test ERROR on kvm/next linus/master v6.19-rc8]
+[cannot apply to kvm/linux-next next-20260204]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I would like to look into madvise(MADV_COLLAPSE) and uprobes triggering
-mapping/folio collapsing before submitting a full patch series.
+url:    https://github.com/intel-lab-lkp/linux/commits/Zixing-Liu/KVM-Add-KVM_GET_REG_LIST-ioctl-for-LoongArch/20260204-193844
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20260204113601.912413-1-liushuyu%40aosc.io
+patch subject: [PATCH v4] KVM: Add KVM_GET_REG_LIST ioctl for LoongArch
+config: loongarch-randconfig-002-20260204 (https://download.01.org/0day-ci/archive/20260205/202602050419.lwzj2i73-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260205/202602050419.lwzj2i73-lkp@intel.com/reproduce)
 
-David, Michael, Vishal, what do you think of the choice of setting
-VM_DONTEXPAND to disable khugepaged?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602050419.lwzj2i73-lkp@intel.com/
 
-+ For 4K guest_memfd, there's really nothing to expand
-+ For THP and HugeTLB guest_memfd (future), we actually don't want
-expansion of the VMAs.
+All error/warnings (new ones prefixed by >>):
 
-IIUC setting VM_DONTEXPAND doesn't affect mremap() as long as the
-remapping does not involve expansion.
+   In file included from arch/loongarch/include/asm/kvm_mmu.h:9,
+                    from arch/loongarch/include/asm/kvm_host.h:21,
+                    from arch/loongarch/kvm/vcpu.c:6:
+>> include/linux/kvm_host.h:389:30: error: field 'arch' has incomplete type
+     389 |         struct kvm_vcpu_arch arch;
+         |                              ^~~~
+>> include/linux/kvm_host.h:390:30: error: field 'stat' has incomplete type
+     390 |         struct kvm_vcpu_stat stat;
+         |                              ^~~~
+   include/linux/kvm_host.h:601:37: error: field 'arch' has incomplete type
+     601 |         struct kvm_arch_memory_slot arch;
+         |                                     ^~~~
+   include/linux/kvm_host.h:831:28: error: field 'stat' has incomplete type
+     831 |         struct kvm_vm_stat stat;
+         |                            ^~~~
+   include/linux/kvm_host.h:832:25: error: field 'arch' has incomplete type
+     832 |         struct kvm_arch arch;
+         |                         ^~~~
+   include/linux/kvm_host.h: In function 'kvm_get_vcpu_by_id':
+>> include/linux/kvm_host.h:1023:18: error: 'KVM_MAX_VCPUS' undeclared (first use in this function); did you mean 'KVM_MAX_VCPU_IDS'?
+    1023 |         if (id < KVM_MAX_VCPUS)
+         |                  ^~~~~~~~~~~~~
+         |                  KVM_MAX_VCPU_IDS
+   include/linux/kvm_host.h:1023:18: note: each undeclared identifier is reported only once for each function it appears in
+   arch/loongarch/include/asm/kvm_host.h: At top level:
+>> arch/loongarch/include/asm/kvm_host.h:46:9: warning: 'KVM_DIRTY_LOG_MANUAL_CAPS' redefined
+      46 | #define KVM_DIRTY_LOG_MANUAL_CAPS       \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:643:9: note: this is the location of the previous definition
+     643 | #define KVM_DIRTY_LOG_MANUAL_CAPS KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:337:20: error: static declaration of 'kvm_arch_memslots_updated' follows non-static declaration
+     337 | static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1237:6: note: previous declaration of 'kvm_arch_memslots_updated' with type 'void(struct kvm *, u64)' {aka 'void(struct kvm *, long long unsigned int)'}
+    1237 | void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:338:20: error: static declaration of 'kvm_arch_vcpu_blocking' follows non-static declaration
+     338 | static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1522:6: note: previous declaration of 'kvm_arch_vcpu_blocking' with type 'void(struct kvm_vcpu *)'
+    1522 | void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
+         |      ^~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:339:20: error: static declaration of 'kvm_arch_vcpu_unblocking' follows non-static declaration
+     339 | static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1523:6: note: previous declaration of 'kvm_arch_vcpu_unblocking' with type 'void(struct kvm_vcpu *)'
+    1523 | void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:341:20: error: static declaration of 'kvm_arch_free_memslot' follows non-static declaration
+     341 | static inline void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1236:6: note: previous declaration of 'kvm_arch_free_memslot' with type 'void(struct kvm *, struct kvm_memory_slot *)'
+    1236 | void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+         |      ^~~~~~~~~~~~~~~~~~~~~
+   In file included from arch/loongarch/include/asm/kvm_csr.h:12,
+                    from arch/loongarch/kvm/trace.h:10,
+                    from arch/loongarch/kvm/vcpu.c:16:
+   arch/loongarch/include/asm/kvm_vcpu.h: In function 'kvm_read_reg':
+>> arch/loongarch/include/asm/kvm_vcpu.h:120:69: warning: parameter 'num' set but not used [-Wunused-but-set-parameter]
+     120 | static inline unsigned long kvm_read_reg(struct kvm_vcpu *vcpu, int num)
+         |                                                                 ~~~~^~~
+   arch/loongarch/include/asm/kvm_vcpu.h: In function 'kvm_write_reg':
+   arch/loongarch/include/asm/kvm_vcpu.h:125:61: warning: parameter 'num' set but not used [-Wunused-but-set-parameter]
+     125 | static inline void kvm_write_reg(struct kvm_vcpu *vcpu, int num, unsigned long val)
+         |                                                         ~~~~^~~
+   In file included from include/linux/string.h:386,
+                    from include/linux/bitmap.h:13,
+                    from include/linux/cpumask.h:11,
+                    from arch/loongarch/include/asm/kvm_host.h:9:
+   arch/loongarch/kvm/vcpu.c: In function 'kvm_set_one_reg':
+   include/linux/fortify-string.h:503:65: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     503 |         fortify_memset_chk(__fortify_size, p_size, p_size_field),       \
+         |                                                                 ^
+   include/linux/fortify-string.h:512:25: note: in expansion of macro '__fortify_memset_chk'
+     512 | #define memset(p, c, s) __fortify_memset_chk(p, c, s,                   \
+         |                         ^~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/vcpu.c:920:25: note: in expansion of macro 'memset'
+     920 |                         memset(&vcpu->arch.irq_pending, 0, sizeof(vcpu->arch.irq_pending));
+         |                         ^~~~~~
+   include/linux/fortify-string.h:503:65: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     503 |         fortify_memset_chk(__fortify_size, p_size, p_size_field),       \
+         |                                                                 ^
+   include/linux/fortify-string.h:512:25: note: in expansion of macro '__fortify_memset_chk'
+     512 | #define memset(p, c, s) __fortify_memset_chk(p, c, s,                   \
+         |                         ^~~~~~~~~~~~~~~~~~~~
+   arch/loongarch/kvm/vcpu.c:921:25: note: in expansion of macro 'memset'
+     921 |                         memset(&vcpu->arch.irq_clear, 0, sizeof(vcpu->arch.irq_clear));
+         |                         ^~~~~~
+   In file included from include/asm-generic/barrier.h:16,
+                    from arch/loongarch/include/asm/barrier.h:137,
+                    from arch/loongarch/include/asm/atomic.h:11,
+                    from include/linux/atomic.h:7,
+                    from include/linux/cpumask.h:10:
+   arch/loongarch/kvm/vcpu.c: In function 'kvm_arch_vcpu_ioctl_get_regs':
+>> include/linux/compiler.h:201:82: error: expression in static assertion is not an integer
+     201 | #define __BUILD_BUG_ON_ZERO_MSG(e, msg, ...) ((int)sizeof(struct {_Static_assert(!(e), msg);}))
+         |                                                                                  ^
+   include/linux/compiler.h:206:33: note: in expansion of macro '__BUILD_BUG_ON_ZERO_MSG'
+     206 | #define __must_be_array(a)      __BUILD_BUG_ON_ZERO_MSG(!__is_array(a), \
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/array_size.h:11:59: note: in expansion of macro '__must_be_array'
+      11 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+         |                                                           ^~~~~~~~~~~~~~~
+   arch/loongarch/kvm/vcpu.c:975:25: note: in expansion of macro 'ARRAY_SIZE'
+     975 |         for (i = 0; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
+         |                         ^~~~~~~~~~
+   arch/loongarch/kvm/vcpu.c: In function 'kvm_arch_vcpu_ioctl_set_regs':
+>> include/linux/compiler.h:201:82: error: expression in static assertion is not an integer
+     201 | #define __BUILD_BUG_ON_ZERO_MSG(e, msg, ...) ((int)sizeof(struct {_Static_assert(!(e), msg);}))
+         |                                                                                  ^
+   include/linux/compiler.h:206:33: note: in expansion of macro '__BUILD_BUG_ON_ZERO_MSG'
+     206 | #define __must_be_array(a)      __BUILD_BUG_ON_ZERO_MSG(!__is_array(a), \
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/array_size.h:11:59: note: in expansion of macro '__must_be_array'
+      11 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+         |                                                           ^~~~~~~~~~~~~~~
+   arch/loongarch/kvm/vcpu.c:987:25: note: in expansion of macro 'ARRAY_SIZE'
+     987 |         for (i = 1; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
+         |                         ^~~~~~~~~~
+--
+   In file included from arch/loongarch/include/asm/kvm_mmu.h:9,
+                    from arch/loongarch/include/asm/kvm_host.h:21,
+                    from vcpu.c:6:
+>> include/linux/kvm_host.h:389:30: error: field 'arch' has incomplete type
+     389 |         struct kvm_vcpu_arch arch;
+         |                              ^~~~
+>> include/linux/kvm_host.h:390:30: error: field 'stat' has incomplete type
+     390 |         struct kvm_vcpu_stat stat;
+         |                              ^~~~
+   include/linux/kvm_host.h:601:37: error: field 'arch' has incomplete type
+     601 |         struct kvm_arch_memory_slot arch;
+         |                                     ^~~~
+   include/linux/kvm_host.h:831:28: error: field 'stat' has incomplete type
+     831 |         struct kvm_vm_stat stat;
+         |                            ^~~~
+   include/linux/kvm_host.h:832:25: error: field 'arch' has incomplete type
+     832 |         struct kvm_arch arch;
+         |                         ^~~~
+   include/linux/kvm_host.h: In function 'kvm_get_vcpu_by_id':
+>> include/linux/kvm_host.h:1023:18: error: 'KVM_MAX_VCPUS' undeclared (first use in this function); did you mean 'KVM_MAX_VCPU_IDS'?
+    1023 |         if (id < KVM_MAX_VCPUS)
+         |                  ^~~~~~~~~~~~~
+         |                  KVM_MAX_VCPU_IDS
+   include/linux/kvm_host.h:1023:18: note: each undeclared identifier is reported only once for each function it appears in
+   arch/loongarch/include/asm/kvm_host.h: At top level:
+>> arch/loongarch/include/asm/kvm_host.h:46:9: warning: 'KVM_DIRTY_LOG_MANUAL_CAPS' redefined
+      46 | #define KVM_DIRTY_LOG_MANUAL_CAPS       \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:643:9: note: this is the location of the previous definition
+     643 | #define KVM_DIRTY_LOG_MANUAL_CAPS KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:337:20: error: static declaration of 'kvm_arch_memslots_updated' follows non-static declaration
+     337 | static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1237:6: note: previous declaration of 'kvm_arch_memslots_updated' with type 'void(struct kvm *, u64)' {aka 'void(struct kvm *, long long unsigned int)'}
+    1237 | void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen);
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:338:20: error: static declaration of 'kvm_arch_vcpu_blocking' follows non-static declaration
+     338 | static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1522:6: note: previous declaration of 'kvm_arch_vcpu_blocking' with type 'void(struct kvm_vcpu *)'
+    1522 | void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
+         |      ^~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:339:20: error: static declaration of 'kvm_arch_vcpu_unblocking' follows non-static declaration
+     339 | static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1523:6: note: previous declaration of 'kvm_arch_vcpu_unblocking' with type 'void(struct kvm_vcpu *)'
+    1523 | void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~
+>> arch/loongarch/include/asm/kvm_host.h:341:20: error: static declaration of 'kvm_arch_free_memslot' follows non-static declaration
+     341 | static inline void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot) {}
+         |                    ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/kvm_host.h:1236:6: note: previous declaration of 'kvm_arch_free_memslot' with type 'void(struct kvm *, struct kvm_memory_slot *)'
+    1236 | void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+         |      ^~~~~~~~~~~~~~~~~~~~~
+   In file included from arch/loongarch/include/asm/kvm_csr.h:12,
+                    from trace.h:10,
+                    from vcpu.c:16:
+   arch/loongarch/include/asm/kvm_vcpu.h: In function 'kvm_read_reg':
+>> arch/loongarch/include/asm/kvm_vcpu.h:120:69: warning: parameter 'num' set but not used [-Wunused-but-set-parameter]
+     120 | static inline unsigned long kvm_read_reg(struct kvm_vcpu *vcpu, int num)
+         |                                                                 ~~~~^~~
+   arch/loongarch/include/asm/kvm_vcpu.h: In function 'kvm_write_reg':
+   arch/loongarch/include/asm/kvm_vcpu.h:125:61: warning: parameter 'num' set but not used [-Wunused-but-set-parameter]
+     125 | static inline void kvm_write_reg(struct kvm_vcpu *vcpu, int num, unsigned long val)
+         |                                                         ~~~~^~~
+   In file included from include/linux/string.h:386,
+                    from include/linux/bitmap.h:13,
+                    from include/linux/cpumask.h:11,
+                    from arch/loongarch/include/asm/kvm_host.h:9:
+   vcpu.c: In function 'kvm_set_one_reg':
+   include/linux/fortify-string.h:503:65: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     503 |         fortify_memset_chk(__fortify_size, p_size, p_size_field),       \
+         |                                                                 ^
+   include/linux/fortify-string.h:512:25: note: in expansion of macro '__fortify_memset_chk'
+     512 | #define memset(p, c, s) __fortify_memset_chk(p, c, s,                   \
+         |                         ^~~~~~~~~~~~~~~~~~~~
+   vcpu.c:920:25: note: in expansion of macro 'memset'
+     920 |                         memset(&vcpu->arch.irq_pending, 0, sizeof(vcpu->arch.irq_pending));
+         |                         ^~~~~~
+   include/linux/fortify-string.h:503:65: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     503 |         fortify_memset_chk(__fortify_size, p_size, p_size_field),       \
+         |                                                                 ^
+   include/linux/fortify-string.h:512:25: note: in expansion of macro '__fortify_memset_chk'
+     512 | #define memset(p, c, s) __fortify_memset_chk(p, c, s,                   \
+         |                         ^~~~~~~~~~~~~~~~~~~~
+   vcpu.c:921:25: note: in expansion of macro 'memset'
+     921 |                         memset(&vcpu->arch.irq_clear, 0, sizeof(vcpu->arch.irq_clear));
+         |                         ^~~~~~
+   In file included from include/asm-generic/barrier.h:16,
+                    from arch/loongarch/include/asm/barrier.h:137,
+                    from arch/loongarch/include/asm/atomic.h:11,
+                    from include/linux/atomic.h:7,
+                    from include/linux/cpumask.h:10:
+   vcpu.c: In function 'kvm_arch_vcpu_ioctl_get_regs':
+>> include/linux/compiler.h:201:82: error: expression in static assertion is not an integer
+     201 | #define __BUILD_BUG_ON_ZERO_MSG(e, msg, ...) ((int)sizeof(struct {_Static_assert(!(e), msg);}))
+         |                                                                                  ^
+   include/linux/compiler.h:206:33: note: in expansion of macro '__BUILD_BUG_ON_ZERO_MSG'
+     206 | #define __must_be_array(a)      __BUILD_BUG_ON_ZERO_MSG(!__is_array(a), \
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/array_size.h:11:59: note: in expansion of macro '__must_be_array'
+      11 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+         |                                                           ^~~~~~~~~~~~~~~
+   vcpu.c:975:25: note: in expansion of macro 'ARRAY_SIZE'
+     975 |         for (i = 0; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
+         |                         ^~~~~~~~~~
+   vcpu.c: In function 'kvm_arch_vcpu_ioctl_set_regs':
+>> include/linux/compiler.h:201:82: error: expression in static assertion is not an integer
+     201 | #define __BUILD_BUG_ON_ZERO_MSG(e, msg, ...) ((int)sizeof(struct {_Static_assert(!(e), msg);}))
+         |                                                                                  ^
+   include/linux/compiler.h:206:33: note: in expansion of macro '__BUILD_BUG_ON_ZERO_MSG'
+     206 | #define __must_be_array(a)      __BUILD_BUG_ON_ZERO_MSG(!__is_array(a), \
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/array_size.h:11:59: note: in expansion of macro '__must_be_array'
+      11 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+         |                                                           ^~~~~~~~~~~~~~~
+   vcpu.c:987:25: note: in expansion of macro 'ARRAY_SIZE'
+     987 |         for (i = 1; i < ARRAY_SIZE(vcpu->arch.gprs); i++)
+         |                         ^~~~~~~~~~
 
-> In addition, this disables khugepaged from operating on guest_memfd folios,
-> which may result in unintended merging of guest_memfd folios.
->
-> Change-Id: I5867edcb66b075b54b25260afd22a198aee76df1
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  virt/kvm/guest_memfd.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index fdaea3422c30..3d4ac461c28b 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -480,6 +480,12 @@ static int kvm_gmem_mmap(struct file *file, struct vm_area_struct *vma)
->  		return -EINVAL;
->  	}
->
-> +	/*
-> +	 * Disable VMA merging - guest_memfd VMAs should be
-> +	 * static. This also stops khugepaged from operating on
-> +	 * guest_memfd VMAs and folios.
-> +	 */
-> +	vm_flags_set(vma, VM_DONTEXPAND);
->  	vma->vm_ops = &kvm_gmem_vm_ops;
->
->  	return 0;
-> --
-> 2.53.0.rc2.204.g2597b5adb4-goog
+
+vim +/arch +389 include/linux/kvm_host.h
+
+af585b921e5d1e9 include/linux/kvm_host.h Gleb Natapov        2010-10-14  372  
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  373  #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  374  	/*
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  375  	 * Cpu relax intercept or pause loop exit optimization
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  376  	 * in_spin_loop: set when a vcpu does a pause loop exit
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  377  	 *  or cpu relax intercepted.
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  378  	 * dy_eligible: indicates whether vcpu is eligible for directed yield.
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  379  	 */
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  380  	struct {
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  381  		bool in_spin_loop;
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  382  		bool dy_eligible;
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  383  	} spin_loop;
+4c088493c8d07e4 include/linux/kvm_host.h Raghavendra K T     2012-07-18  384  #endif
+a6816314af5749c include/linux/kvm_host.h David Matlack       2024-05-03  385  	bool wants_to_run;
+3a08a8f9f0936e1 include/linux/kvm_host.h Raghavendra K T     2013-03-04  386  	bool preempted;
+d73eb57b80b98ae include/linux/kvm_host.h Wanpeng Li          2019-07-18  387  	bool ready;
+d1ae567fb8b5594 include/linux/kvm_host.h Sean Christopherson 2024-05-21  388  	bool scheduled_out;
+d657a98e3c20537 drivers/kvm/kvm.h        Zhang Xiantao       2007-12-14 @389  	struct kvm_vcpu_arch arch;
+ce55c049459cff0 include/linux/kvm_host.h Jing Zhang          2021-06-18 @390  	struct kvm_vcpu_stat stat;
+ce55c049459cff0 include/linux/kvm_host.h Jing Zhang          2021-06-18  391  	char stats_id[KVM_STATS_NAME_SIZE];
+fb04a1eddb1a65b include/linux/kvm_host.h Peter Xu            2020-09-30  392  	struct kvm_dirty_ring dirty_ring;
+fe22ed827c5b60b include/linux/kvm_host.h David Matlack       2021-08-04  393  
+fe22ed827c5b60b include/linux/kvm_host.h David Matlack       2021-08-04  394  	/*
+a54d806688fe1e4 include/linux/kvm_host.h Maciej S. Szmigiero 2021-12-06  395  	 * The most recently used memslot by this vCPU and the slots generation
+a54d806688fe1e4 include/linux/kvm_host.h Maciej S. Szmigiero 2021-12-06  396  	 * for which it is valid.
+a54d806688fe1e4 include/linux/kvm_host.h Maciej S. Szmigiero 2021-12-06  397  	 * No wraparound protection is needed since generations won't overflow in
+a54d806688fe1e4 include/linux/kvm_host.h Maciej S. Szmigiero 2021-12-06  398  	 * thousands of years, even assuming 1M memslot operations per second.
+fe22ed827c5b60b include/linux/kvm_host.h David Matlack       2021-08-04  399  	 */
+a54d806688fe1e4 include/linux/kvm_host.h Maciej S. Szmigiero 2021-12-06  400  	struct kvm_memory_slot *last_used_slot;
+a54d806688fe1e4 include/linux/kvm_host.h Maciej S. Szmigiero 2021-12-06  401  	u64 last_used_slot_gen;
+d657a98e3c20537 drivers/kvm/kvm.h        Zhang Xiantao       2007-12-14  402  };
+d657a98e3c20537 drivers/kvm/kvm.h        Zhang Xiantao       2007-12-14  403  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
