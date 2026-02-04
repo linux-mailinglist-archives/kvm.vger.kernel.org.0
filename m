@@ -1,62 +1,60 @@
-Return-Path: <kvm+bounces-70259-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70260-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ALAQMKePg2lCpQMAu9opvQ
-	(envelope-from <kvm+bounces-70259-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 19:27:51 +0100
+	id AMkEGcuPg2lCpQMAu9opvQ
+	(envelope-from <kvm+bounces-70260-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 19:28:27 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C79DEBA0F
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 19:27:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A13EBA3C
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 19:28:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1107306296C
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 18:25:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AC72300C5AC
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 18:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B674426D25;
-	Wed,  4 Feb 2026 18:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED6DD42315F;
+	Wed,  4 Feb 2026 18:27:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tOSzHDkc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wcb85d7v"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814BB347FC3
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 18:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B3E254AFF
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 18:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770229501; cv=none; b=GAR6AEnOXC/5yksMLi22cAWqQNoW+wlke7yA/WxUCugz5nMiPDltjbyXpN3UMX9320fOJbB81di9sP2vShtiCVsvpbZ70RC/bGjkMx7EN+AANqfQ8ShcnMO0n0UZQhMLEJvSZS8zel2w0/vXgjiJWcqc/4JZlcFDYdF4sfEwNTQ=
+	t=1770229622; cv=none; b=VqeirUX4+c+WDkYfud86SEiGANhxqkif/tySFJHOCwZ2HvHx7/ZEMZ9lFA3qvEKU8dqxftBceYAu5bnfcJvz+1bOobtEu75SEZjhydHQW/Hq/Q9J1uPmceD2HY54r98ENWNUaMGuY0GGXT/wUgiRdLE4O33ymMBojx1+ZI6sRUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770229501; c=relaxed/simple;
-	bh=8Ud3Rp7tTcMybgpiwmDz6gX52rDwLzjr0mYQ2R64+i0=;
+	s=arc-20240116; t=1770229622; c=relaxed/simple;
+	bh=8P8G0/zKwgf2IDB+ADVcqz69tEXPTnuUp1z94KOCHJU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QG3s+8aMBMUkg6LS87V6U+rR8ke9Ci6rY/AJRU8klqN8z/SR0W0EAgVlyquIrvWHWG/bpyAuP0xTLTYIeLMo6VbpN3liGEy5vwa8cqpfzdZffEaQLiRKFsUQHYOd8gJH3cZPkJEjWF5K6WBhi0PO2yRClDBVA+0ud8Zl6Ra8ST8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tOSzHDkc; arc=none smtp.client-ip=95.215.58.189
+	 Content-Type:Content-Disposition:In-Reply-To; b=np12I7gmZ34sIFWkbQuMfWfJM2rI6Xwu5u9zXVN8tUaTFQKNIrcUFpKJdhijFIYSSs0LpGSo0syaiyAnuhPr1NkXb3wWLLMz/1uc4cPAxI9AUzW45MScz3NOKdGRLWMm7qC3a540KFMGADcSEVyLZP/aQ90zXTF7vsU78sTJlQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wcb85d7v; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 4 Feb 2026 18:24:53 +0000
+Date: Wed, 4 Feb 2026 18:26:54 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770229499;
+	t=1770229620;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ouGydqJ6H03jUz/faJIq6vifHMi1v9YOfzZ5Xl8D51I=;
-	b=tOSzHDkc/lYbBk/4fhDTcJFfGZbsDFUJviM1g1vwkgScDyvVLuq6azZdjFkwqu1s0vlZc1
-	g1P6swjbS+MZ0NwEDOPbr8O4ASnXiIvtGC1wom90MKyRdsnjj4wTFtpM3NWLa49ig+V51j
-	c1g6F8SZgA9Fna7BCdlH8QwktlRukfI=
+	bh=x4c3xbCcmz3+eEq4KYIEWC5hFRk2mUDLis3KT1gmtm8=;
+	b=Wcb85d7vYJRWSLqc9FltynxbFHPvMpNJb65iigRI6j4yq/9+POINyzHdNilVexMDs9Oizz
+	c456EVKK06it6F5WNMFS0/EkePDljiDZGaxNCFjmWRGPPhcjLhUngieCmqb0XxRogVD1tP
+	Vl7NIY7nqsAYYOtJVhVbtBuiJSl5z0Y=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, 
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: nSVM: Use intuitive local variables in
- recalc_intercepts()
-Message-ID: <ujghelftsta6zcuyajew74yqtfkhqgdgnsomgyphkfb54itgmd@ouew3jl47nbg>
+Subject: Re: [PATCH 2/3] KVM: nSVM: Rename recalc_intercepts() to clarify
+ vmcb02 as the target
+Message-ID: <zqaboykgmtuknbmlvcl3cl7b2i6pbngwqasjgdvh5w2v4ygxhg@o3e2qqxrw7ab>
 References: <20260112182022.771276-1-yosry.ahmed@linux.dev>
- <20260112182022.771276-2-yosry.ahmed@linux.dev>
- <aYOCAH8zLLXllou7@google.com>
- <gmdou4cp47vpx72tw3mwklwixpd3ujcdcomoplosv2u2tzfub2@wtqgzkhguoap>
- <aYOIGDlPs3bHLVo4@google.com>
+ <20260112182022.771276-3-yosry.ahmed@linux.dev>
+ <aYOF0LNp173xAEsy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,7 +63,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYOIGDlPs3bHLVo4@google.com>
+In-Reply-To: <aYOF0LNp173xAEsy@google.com>
 X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
@@ -80,7 +78,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70259-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70260-lists,kvm=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
@@ -93,40 +91,122 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim]
-X-Rspamd-Queue-Id: 6C79DEBA0F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A2A13EBA3C
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026 at 09:55:36AM -0800, Sean Christopherson wrote:
-> On Wed, Feb 04, 2026, Yosry Ahmed wrote:
-> > On Wed, Feb 04, 2026 at 09:29:36AM -0800, Sean Christopherson wrote:
-> > > 
-> > > >  	for (i = 0; i < MAX_INTERCEPT; i++)
-> > > > -		c->intercepts[i] = h->intercepts[i];
-> > > > +		vmcb02->control.intercepts[i] = vmcb01->control.intercepts[i];
-> > > >  
-> > > > -	if (g->int_ctl & V_INTR_MASKING_MASK) {
-> > > > +	if (svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) {
-> > > 
-> > > I vote to keep a pointer to the cached control as vmcb12_ctrl.  Coming from a
-> > > nVMX-focused background, I can never remember what svm->nested.ctl holds.  For
-> > > me, this is waaaay more intuivite:
+On Wed, Feb 04, 2026 at 09:45:52AM -0800, Sean Christopherson wrote:
+> On Mon, Jan 12, 2026, Yosry Ahmed wrote:
+> > recalc_intercepts() updates the intercept bits in vmcb02 based on vmcb01
+> > and (cached) vmcb12.
+> 
+> Ah, but it does more than that.  More below.
+> 
+> > However, the name is too generic to make this
+> > clear, and is especially confusing while searching through the code as
+> > it shares the same name as the recalc_intercepts callback in
+> > kvm_x86_ops.
 > > 
-> > I agree it reads better, but honestly all of nSVM code uses svm->nested.ctl,
-> > and changing its name here just makes things inconsistent imo.
+> > Rename it to nested_vmcb02_recalc_intercepts() (similar to other
+> > nested_vmcb02_* scoped functions), to make it clear what it is doing.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > ---
+> >  arch/x86/kvm/svm/nested.c |  4 ++--
+> >  arch/x86/kvm/svm/sev.c    |  2 +-
+> >  arch/x86/kvm/svm/svm.c    |  4 ++--
+> >  arch/x86/kvm/svm/svm.h    | 10 +++++-----
+> >  4 files changed, 10 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 2dda52221fd8..bacb2ac4c59e 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -123,7 +123,7 @@ static bool nested_vmcb_needs_vls_intercept(struct vcpu_svm *svm)
+> >  	return false;
+> >  }
+> >  
+> > -void recalc_intercepts(struct vcpu_svm *svm)
+> > +void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
+> >  {
+> >  	struct vmcb *vmcb01, *vmcb02;
+> >  	unsigned int i;
 > 
-> Gotta start somewhere :-)  In all seriousness, if we didn't allow chipping away
-> to at historical oddities in KVM, the code base would be a disaster.  I'm all for
-> prioritizing consistency, but I draw the line at "everything else sucks, so this
-> needs to suck too".
+> Drat, I should have responded to the previous patch.  Lurking out of sight is a
+> pre-existing bug that effectively invalidates this entire rename.
 > 
-> I'm not saying we need to do a wholesale rename, but giving at least
-> nested_vmcb02_prepare_control() the same treatment will be a huge improvement.
-> Actually, I'm going to go do that right now...
+> The existing code is:
+> 
+>   void recalc_intercepts(struct vcpu_svm *svm)
+>   {
+> 	struct vmcb *vmcb01, *vmcb02;
+> 	unsigned int i;
+> 
+> 	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);  <======= not vmcb01!!!!!
+> 
+> 	if (!is_guest_mode(&svm->vcpu))
+> 		return;
+> 
+> When L2 is active, svm->vmcb is vmcb02.  Which, at first glance, _looks_ right,
+> but (the *horribly* named) recalc_intercepts() isn't _just_ recalculating
+> intercepts for L2, it's also responsible for marking the VMCB_INTERCEPTS dirty
+> (obviously).
+> 
+> But what isn't so obvious is that _all_ callers operate on vmcb01, because the
+> pattern is to modify vmcb01 intercepts, and then merge the new vmcb01 intercepts
+> with vmcb12, i.e. the "recalc intercepts" aspect is "part 2" of the overall
+> function.
 
-For what it's worth, at some point I was going to send a patch to put
-svm->nested.ctl and svm->nested.save in an anonymous struct, to end up
-with svm->nested.cached_vmcb12.ctl and svm->nested.cached_vmcb12.save,
-but the names are too long :)
+I think the 4th law of thermodynamics is that any piece of nSVM code has
+a bug if you look at it long enough.
 
+> 
+> Lost in all of this is that KVM forgets to mark vmcb01 dirty, and unless there's
+> a call buried somewhere deep, nested_svm_vmexit() isn't guaranteed to mark
+> VMCB_INTERCEPTS dirty, e.g. if PAUSE interception is disabled.
+> 
+> It's probably a benign bug in practice, as AMD CPUs don't appear to do anything
+> with the clean fields, but easy to fix.
+> 
+> As a bonus, fixing that bug yields for even better naming and code.  After the
+> dust settles, we can end up with this in svm.h:
+> 
+>   void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm);
+> 
+>   static inline void svm_mark_intercepts_dirty(struct vcpu_svm *svm)
+>   {
+> 	vmcb_mark_dirty(svm->vmcb01.ptr, VMCB_INTERCEPTS);
+> 
+> 	/*
+> 	 * If L2 is active, recalculate the intercepts for vmcb02 to account
+> 	 * for the changes made to vmcb01.  All intercept configuration is done
+> 	 * for vmcb01 and then propagated to vmcb02 to combine KVM's intercepts
+> 	 * with L1's intercepts (from the vmcb12 snapshot).
+> 	 */
+> 	if (is_guest_mode(&svm->vcpu))
+> 		nested_vmcb02_recalc_intercepts(svm);
+>   }
+> 
+> and this for nested_vmcb02_recalc_intercepts():
+> 
+>   void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
+>   {
+> 	struct vmcb_ctrl_area_cached *vmcb12_ctrl = &svm->nested.ctl;
+> 	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
+> 	struct vmcb *vmcb01 = svm->vmcb01.ptr;
+> 	unsigned int i;
+> 
+> 	if (WARN_ON_ONCE(svm->vmcb != vmcb02))
+> 		return;
+> 
+> 	...
+>   }
+> 
+> with the only other caller of nested_vmcb02_recalc_intercepts() being
+> nested_vmcb02_prepare_control().
+
+I think this looks good. Definitely an improvement over what we
+currently have :)
 
