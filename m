@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-70178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70179-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKFcOZMag2n+hgMAu9opvQ
-	(envelope-from <kvm+bounces-70178-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:08:19 +0100
+	id aAMYHeIag2l/hwMAu9opvQ
+	(envelope-from <kvm+bounces-70179-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:09:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 990F4E4420
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:08:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E12E449C
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 11:09:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5927A30205D1
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 10:08:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB719303988A
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 10:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFFD3D6488;
-	Wed,  4 Feb 2026 10:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150CC3D6485;
+	Wed,  4 Feb 2026 10:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f36kKclz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GcOT+ytc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDF03D646B
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 10:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40CF3D5237
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 10:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770199696; cv=none; b=F3vxFU6aEsVWtCmCQSw07vzRgMieLWaCyTAnrtE1nVlo5R9FzIYIgjomjCjBhzs4ctgRuNk1IuVt+V5zXNKLvQRGrqcd9//h5LkmZXCBABz0+uJOYYpdIbsET7/Bf/5RqGh144qH7aGOdPTTs13al8afsFiEzHB+/oEGpO9aBQg=
+	t=1770199705; cv=none; b=DCQE3RrVJjWZPtYpZKSP7d4KnMBQLUimRxbOwEZho7NxczAeSPpjny+xmNjX4zEkM0vuOQfsKHxLyOYdiddOe9V4kE+nUU1zbdYwQU9ZdIRMDPxRlJpNGzVIDJ7O8yds6VYNmZ13g4/orGd8WyPgFGs8WzWYQL4Uepm/NffU7wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770199696; c=relaxed/simple;
-	bh=IiMSZSjYbIuCfbHNIZAiFBYXvZrrRGFC86juajVghro=;
+	s=arc-20240116; t=1770199705; c=relaxed/simple;
+	bh=o7+JYVkcSck/qmfPjHiGAnfH68PsraghvuXjdU7hIrg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L/+PWp0bEyCN5DfLVDG7aemjbl/bur2UP/zxGfNXPFCd3Jj7Tqit74EBjy4cyicxNDjboqc28rrNqB1pGJJyGxRPv+DR+mlpDvxqqUhoIYK7VTyUXX6jOj/d7t52LyV7lmBqUppR49ICT9CsEBtgVWtDHgOpXC7C96BhIqSmaEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f36kKclz; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=k7NGn9K3vim5bBfBZHwP+0GktGhnCXiLhW0RSrdQULN6z19EqblnYqHe/YsB81AghtgmK7m1UyUrOZPIszGcWYD0EB+1giqZK4D0BBRAcEl48oG2leEPKB5iWiNj9S1YiA6d7bhWxA9X4KreJnL52+suxMTl+CRpp+BehAUcG4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GcOT+ytc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770199695;
+	s=mimecast20190719; t=1770199703;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7D5YNrPev9bmDU5MOXs3l1kz8g6I1VOyIkroPq6oxTM=;
-	b=f36kKclzW5T4dOO7H3NTjP6juV2UAiefPmaaoEOFibLeUNODlopQF6H26iAWXfk+1z0v9S
-	UO0iOBbnYpdcDuSUO70QRVFeQDYdfDZmEsP+fWdwm+tza1xvA38HRvcD7nAXg8EFvzeQZt
-	erMfHbieR/Q7ZWhqcsxYUsLajxZ13Y4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=cpF5JbXlmmW75b43tI+8Yyoy2GUEzKBL/ZXEZed2Ez4=;
+	b=GcOT+ytcr2py+3cdZfom2nvDQ957EJsShIWxVTBQ9SlhT8To3d2v+JScQCgpClFRHwD+gM
+	jcpuJKQ+FHHa2dZCWi5795q/n+nAuUJ4fj5Aov4YcGo9LxWvVOwKRFxABCglwS7mHkpyRS
+	lq6d8rvDdFTf42IOeSkE8ujNk+3HX38=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-372-8EE2gPAXOFmQNdBfKw4zdA-1; Wed,
- 04 Feb 2026 05:08:11 -0500
-X-MC-Unique: 8EE2gPAXOFmQNdBfKw4zdA-1
-X-Mimecast-MFC-AGG-ID: 8EE2gPAXOFmQNdBfKw4zdA_1770199690
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-279-xSHWFzd5Ob-EbuYjqJWIbQ-1; Wed,
+ 04 Feb 2026 05:08:18 -0500
+X-MC-Unique: xSHWFzd5Ob-EbuYjqJWIbQ-1
+X-Mimecast-MFC-AGG-ID: xSHWFzd5Ob-EbuYjqJWIbQ_1770199696
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4BFE719560B0;
-	Wed,  4 Feb 2026 10:08:10 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CBEDD195605C;
+	Wed,  4 Feb 2026 10:08:16 +0000 (UTC)
 Received: from localhost (unknown [10.45.242.6])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2D46930001A5;
-	Wed,  4 Feb 2026 10:08:07 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9CD4030001BF;
+	Wed,  4 Feb 2026 10:08:14 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>,
@@ -74,9 +74,9 @@ Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Mark Kanda <mark.kanda@oracle.com>,
 	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Subject: [PATCH 09/10] memory: implement RamDiscardManager multi-source aggregation
-Date: Wed,  4 Feb 2026 14:07:05 +0400
-Message-ID: <20260204100708.724800-10-marcandre.lureau@redhat.com>
+Subject: [PATCH 10/10] tests: add unit tests for RamDiscardManager multi-source aggregation
+Date: Wed,  4 Feb 2026 14:07:06 +0400
+Message-ID: <20260204100708.724800-11-marcandre.lureau@redhat.com>
 In-Reply-To: <20260204100708.724800-1-marcandre.lureau@redhat.com>
 References: <20260204100708.724800-1-marcandre.lureau@redhat.com>
 Precedence: bulk
@@ -93,888 +93,1441 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70178-lists,kvm=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[marcandre.lureau@redhat.com,kvm@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70179-lists,kvm=lfdr.de];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_NEQ_ENVFROM(0.00)[marcandre.lureau@redhat.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	TAGGED_RCPT(0.00)[kvm];
 	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 990F4E4420
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,section2.mr:url,section1.mr:url,section.mr:url]
+X-Rspamd-Queue-Id: 68E12E449C
 X-Rspamd-Action: no action
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Refactor RamDiscardManager to aggregate multiple RamDiscardSource
-instances. This enables scenarios where multiple components (e.g.,
-virtio-mem and RamBlockAttributes) can coordinate memory discard
-state for the same memory region.
+Add various unit tests for the RamDiscardManager multi-source
+aggregation functionality.
 
-The aggregation uses:
-- Populated: ALL sources populated
-- Discarded: ANY source discarded
-
-When a source is added with existing listeners, they are notified
-about regions that become discarded. When a source is removed,
-listeners are notified about regions that become populated.
+The test uses a TestRamDiscardSource QOM object that tracks populated
+state via a bitmap, similar to RamBlockAttributes implementation.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- include/system/ram-discard-manager.h | 139 +++++++--
- hw/virtio/virtio-mem.c               |   8 +-
- system/memory.c                      |  15 +-
- system/ram-block-attributes.c        |   6 +-
- system/ram-discard-manager.c         | 434 ++++++++++++++++++++++++---
- 5 files changed, 527 insertions(+), 75 deletions(-)
+ tests/unit/test-ram-discard-manager-stubs.c |   48 +
+ tests/unit/test-ram-discard-manager.c       | 1313 +++++++++++++++++++
+ tests/unit/meson.build                      |    8 +-
+ 3 files changed, 1368 insertions(+), 1 deletion(-)
+ create mode 100644 tests/unit/test-ram-discard-manager-stubs.c
+ create mode 100644 tests/unit/test-ram-discard-manager.c
 
-diff --git a/include/system/ram-discard-manager.h b/include/system/ram-discard-manager.h
-index b188e09a30f..1c5a6f55833 100644
---- a/include/system/ram-discard-manager.h
-+++ b/include/system/ram-discard-manager.h
-@@ -206,28 +206,96 @@ struct RamDiscardSourceClass {
-  * becoming discarded in a different granularity than it was populated and the
-  * other way around.
-  */
+diff --git a/tests/unit/test-ram-discard-manager-stubs.c b/tests/unit/test-ram-discard-manager-stubs.c
+new file mode 100644
+index 00000000000..5daef09e49e
+--- /dev/null
++++ b/tests/unit/test-ram-discard-manager-stubs.c
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "qemu/osdep.h"
++#include "qom/object.h"
++#include "glib.h"
++#include "system/memory.h"
 +
-+typedef struct RamDiscardSourceEntry RamDiscardSourceEntry;
++RamDiscardManager *memory_region_get_ram_discard_manager(MemoryRegion *mr)
++{
++    return mr->rdm;
++}
 +
-+struct RamDiscardSourceEntry {
-+    RamDiscardSource *rds;
-+    QLIST_ENTRY(RamDiscardSourceEntry) next;
-+};
-+
- struct RamDiscardManager {
-     Object parent;
- 
--    RamDiscardSource *rds;
--    MemoryRegion *mr;
-+    struct MemoryRegion *mr;
-+    QLIST_HEAD(, RamDiscardSourceEntry) source_list;
-+    uint64_t min_granularity;
-     QLIST_HEAD(, RamDiscardListener) rdl_list;
- };
- 
--RamDiscardManager *ram_discard_manager_new(MemoryRegion *mr,
--                                           RamDiscardSource *rds);
-+RamDiscardManager *ram_discard_manager_new(MemoryRegion *mr);
-+
-+/**
-+ * ram_discard_manager_add_source:
-+ *
-+ * Register a #RamDiscardSource with the #RamDiscardManager. The manager
-+ * aggregates state from all registered sources using AND semantics: a region
-+ * is considered populated only if ALL sources report it as populated.
-+ *
-+ * If listeners are already registered, they will be notified about any
-+ * regions that become discarded due to adding this source. Specifically,
-+ * for each region that the new source reports as discarded, if all other
-+ * sources reported it as populated, listeners receive a discard notification.
-+ *
-+ * If any listener rejects the notification (returns an error), previously
-+ * notified listeners are rolled back with populate notifications and the
-+ * source is not added.
-+ *
-+ * @rdm: the #RamDiscardManager
-+ * @source: the #RamDiscardSource to add
-+ *
-+ * Returns: 0 on success, -EBUSY if @source is already registered, or a
-+ *          negative error code if a listener rejected the state change.
-+ */
-+int ram_discard_manager_add_source(RamDiscardManager *rdm,
-+                                   RamDiscardSource *source);
-+
-+/**
-+ * ram_discard_manager_del_source:
-+ *
-+ * Unregister a #RamDiscardSource from the #RamDiscardManager.
-+ *
-+ * If listeners are already registered, they will be notified about any
-+ * regions that become populated due to removing this source. Specifically,
-+ * for each region that the removed source reported as discarded, if all
-+ * remaining sources report it as populated, listeners receive a populate
-+ * notification.
-+ *
-+ * If any listener rejects the notification (returns an error), previously
-+ * notified listeners are rolled back with discard notifications and the
-+ * source is not removed.
-+ *
-+ * @rdm: the #RamDiscardManager
-+ * @source: the #RamDiscardSource to remove
-+ *
-+ * Returns: 0 on success, -ENOENT if @source is not registered, or a
-+ *          negative error code if a listener rejected the state change.
-+ */
-+int ram_discard_manager_del_source(RamDiscardManager *rdm,
-+                                   RamDiscardSource *source);
-+
- 
- uint64_t ram_discard_manager_get_min_granularity(const RamDiscardManager *rdm,
-                                                  const MemoryRegion *mr);
- 
-+/**
-+ * ram_discard_manager_is_populated:
-+ *
-+ * Check if the given memory region section is populated.
-+ * If the manager has no sources, it is considered populated.
-+ *
-+ * @rdm: the #RamDiscardManager
-+ * @section: the #MemoryRegionSection to check
-+ *
-+ * Returns: true if the section is populated, false otherwise.
-+ */
- bool ram_discard_manager_is_populated(const RamDiscardManager *rdm,
-                                       const MemoryRegionSection *section);
- 
- /**
-  * ram_discard_manager_replay_populated:
-  *
-- * A wrapper to call the #RamDiscardSourceClass.replay_populated callback
-- * of the #RamDiscardSource sources.
-+ * Call @replay_fn on regions that are populated in all sources.
-  *
-  * @rdm: the #RamDiscardManager
-  * @section: the #MemoryRegionSection
-@@ -244,8 +312,7 @@ int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
- /**
-  * ram_discard_manager_replay_discarded:
-  *
-- * A wrapper to call the #RamDiscardSourceClass.replay_discarded callback
-- * of the #RamDiscardSource sources.
-+ * Call @replay_fn on regions that are discarded in any sources.
-  *
-  * @rdm: the #RamDiscardManager
-  * @section: the #MemoryRegionSection
-@@ -266,31 +333,61 @@ void ram_discard_manager_register_listener(RamDiscardManager *rdm,
- void ram_discard_manager_unregister_listener(RamDiscardManager *rdm,
-                                              RamDiscardListener *rdl);
- 
--/*
-- * Note: later refactoring should take the source into account and the manager
-- *       should be able to aggregate multiple sources.
-+/**
-+ * ram_discard_manager_notify_populate:
-+ *
-+ * Notify listeners that a region is about to be populated by a source.
-+ * For multi-source aggregation, only notifies when all sources agree
-+ * the region is populated (intersection).
-+ *
-+ * @rdm: the #RamDiscardManager
-+ * @source: the #RamDiscardSource that is populating
-+ * @offset: offset within the memory region
-+ * @size: size of the region being populated
-+ *
-+ * Returns 0 on success, or a negative error if any listener rejects.
-  */
- int ram_discard_manager_notify_populate(RamDiscardManager *rdm,
-+                                        RamDiscardSource *source,
-                                         uint64_t offset, uint64_t size);
- 
--/*
-- * Note: later refactoring should take the source into account and the manager
-- *       should be able to aggregate multiple sources.
-+/**
-+ * ram_discard_manager_notify_discard:
-+ *
-+ * Notify listeners that a region has been discarded by a source.
-+ * For multi-source aggregation, always notifies immediately
-+ * (union semantics - any source discarding makes region discarded).
-+ *
-+ * @rdm: the #RamDiscardManager
-+ * @source: the #RamDiscardSource that is discarding
-+ * @offset: offset within the memory region
-+ * @size: size of the region being discarded
-  */
- void ram_discard_manager_notify_discard(RamDiscardManager *rdm,
-+                                        RamDiscardSource *source,
-                                         uint64_t offset, uint64_t size);
- 
--/*
-- * Note: later refactoring should take the source into account and the manager
-- *       should be able to aggregate multiple sources.
-+/**
-+ * ram_discard_manager_notify_discard_all:
-+ *
-+ * Notify listeners that all regions have been discarded by a source.
-+ *
-+ * @rdm: the #RamDiscardManager
-+ * @source: the #RamDiscardSource that is discarding
-  */
--void ram_discard_manager_notify_discard_all(RamDiscardManager *rdm);
-+void ram_discard_manager_notify_discard_all(RamDiscardManager *rdm,
-+                                            RamDiscardSource *source);
- 
--/*
-+/**
-+ * ram_discard_manager_replay_populated_to_listeners:
-+ *
-  * Replay populated sections to all registered listeners.
-+ * For multi-source aggregation, only replays regions where all sources
-+ * are populated (intersection).
-  *
-- * Note: later refactoring should take the source into account and the manager
-- *       should be able to aggregate multiple sources.
-+ * @rdm: the #RamDiscardManager
-+ *
-+ * Returns 0 on success, or a negative error if any notification failed.
-  */
- int ram_discard_manager_replay_populated_to_listeners(RamDiscardManager *rdm);
- 
-diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-index ec165503205..185d04d498c 100644
---- a/hw/virtio/virtio-mem.c
-+++ b/hw/virtio/virtio-mem.c
-@@ -330,7 +330,8 @@ static void virtio_mem_notify_unplug(VirtIOMEM *vmem, uint64_t offset,
- {
-     RamDiscardManager *rdm = memory_region_get_ram_discard_manager(&vmem->memdev->mr);
- 
--    ram_discard_manager_notify_discard(rdm, offset, size);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(vmem),
-+                                       offset, size);
- }
- 
- static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
-@@ -338,7 +339,8 @@ static int virtio_mem_notify_plug(VirtIOMEM *vmem, uint64_t offset,
- {
-     RamDiscardManager *rdm = memory_region_get_ram_discard_manager(&vmem->memdev->mr);
- 
--    return ram_discard_manager_notify_populate(rdm, offset, size);
-+    return ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(vmem),
-+                                               offset, size);
- }
- 
- static void virtio_mem_notify_unplug_all(VirtIOMEM *vmem)
-@@ -349,7 +351,7 @@ static void virtio_mem_notify_unplug_all(VirtIOMEM *vmem)
-         return;
-     }
- 
--    ram_discard_manager_notify_discard_all(rdm);
-+    ram_discard_manager_notify_discard_all(rdm, RAM_DISCARD_SOURCE(vmem));
- }
- 
- static bool virtio_mem_is_range_plugged(const VirtIOMEM *vmem,
-diff --git a/system/memory.c b/system/memory.c
-index 8b46cb87838..8a4cb7b59ac 100644
---- a/system/memory.c
-+++ b/system/memory.c
-@@ -2109,21 +2109,22 @@ int memory_region_add_ram_discard_source(MemoryRegion *mr,
-                                          RamDiscardSource *source)
- {
-     g_assert(memory_region_is_ram(mr));
--    if (mr->rdm) {
--        return -EBUSY;
-+
++int memory_region_add_ram_discard_source(MemoryRegion *mr,
++                                         RamDiscardSource *source)
++{
 +    if (!mr->rdm) {
 +        mr->rdm = ram_discard_manager_new(mr);
-     }
- 
--    mr->rdm = ram_discard_manager_new(mr, RAM_DISCARD_SOURCE(source));
--    return 0;
++    }
 +    return ram_discard_manager_add_source(mr->rdm, source);
- }
- 
- void memory_region_del_ram_discard_source(MemoryRegion *mr,
-                                           RamDiscardSource *source)
- {
--    g_assert(mr->rdm->rds == source);
-+    g_assert(mr->rdm);
++}
 +
-+    ram_discard_manager_del_source(mr->rdm, source);
- 
--    object_unref(mr->rdm);
--    mr->rdm = NULL;
-+    /* if there is no source and no listener left, we could free rdm */
- }
- 
- /* Called with rcu_read_lock held.  */
-diff --git a/system/ram-block-attributes.c b/system/ram-block-attributes.c
-index e921e09f5b3..e7db0e72e77 100644
---- a/system/ram-block-attributes.c
-+++ b/system/ram-block-attributes.c
-@@ -218,7 +218,8 @@ ram_block_attributes_notify_discard(RamBlockAttributes *attr,
- {
-     RamDiscardManager *rdm = memory_region_get_ram_discard_manager(attr->ram_block->mr);
- 
--    ram_discard_manager_notify_discard(rdm, offset, size);
-+    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(attr),
-+                                       offset, size);
- }
- 
- static int
-@@ -227,7 +228,8 @@ ram_block_attributes_notify_populate(RamBlockAttributes *attr,
- {
-     RamDiscardManager *rdm = memory_region_get_ram_discard_manager(attr->ram_block->mr);
- 
--    return ram_discard_manager_notify_populate(rdm, offset, size);
-+    return ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(attr),
-+                                               offset, size);
- }
- 
- int ram_block_attributes_state_change(RamBlockAttributes *attr,
-diff --git a/system/ram-discard-manager.c b/system/ram-discard-manager.c
-index 1c9ff7fda58..c48ac4c66d6 100644
---- a/system/ram-discard-manager.c
-+++ b/system/ram-discard-manager.c
-@@ -7,6 +7,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
-+#include "qemu/queue.h"
- #include "system/memory.h"
- 
- static uint64_t ram_discard_source_get_min_granularity(const RamDiscardSource *rds,
-@@ -49,28 +50,341 @@ static int ram_discard_source_replay_discarded(const RamDiscardSource *rds,
-     return rdsc->replay_discarded(rds, section, replay_fn, opaque);
- }
- 
--RamDiscardManager *ram_discard_manager_new(MemoryRegion *mr,
--                                           RamDiscardSource *rds)
-+RamDiscardManager *ram_discard_manager_new(MemoryRegion *mr)
- {
-     RamDiscardManager *rdm;
- 
-     rdm = RAM_DISCARD_MANAGER(object_new(TYPE_RAM_DISCARD_MANAGER));
--    rdm->rds = rds;
-     rdm->mr = mr;
--    QLIST_INIT(&rdm->rdl_list);
-     return rdm;
- }
- 
-+static void ram_discard_manager_update_granularity(RamDiscardManager *rdm)
++void memory_region_del_ram_discard_source(MemoryRegion *mr,
++                                          RamDiscardSource *source)
 +{
-+    RamDiscardSourceEntry *entry;
-+    uint64_t granularity = 0;
++    RamDiscardManager *rdm = mr->rdm;
 +
-+    QLIST_FOREACH(entry, &rdm->source_list, next) {
-+        uint64_t src_granularity;
++    if (!rdm) {
++        return;
++    }
 +
-+        src_granularity = ram_discard_source_get_min_granularity(entry->rds, rdm->mr);
-+        g_assert(src_granularity != 0);
-+        if (granularity == 0) {
-+            granularity = src_granularity;
-+        } else {
-+            granularity = MIN(granularity, src_granularity);
++    ram_discard_manager_del_source(rdm, source);
++}
++
++uint64_t memory_region_size(MemoryRegion *mr)
++{
++    return int128_get64(mr->size);
++}
++
++MemoryRegionSection *memory_region_section_new_copy(MemoryRegionSection *s)
++{
++    MemoryRegionSection *copy = g_new(MemoryRegionSection, 1);
++    *copy = *s;
++    return copy;
++}
++
++void memory_region_section_free_copy(MemoryRegionSection *s)
++{
++    g_free(s);
++}
+diff --git a/tests/unit/test-ram-discard-manager.c b/tests/unit/test-ram-discard-manager.c
+new file mode 100644
+index 00000000000..73ecb4f793f
+--- /dev/null
++++ b/tests/unit/test-ram-discard-manager.c
+@@ -0,0 +1,1313 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "qemu/osdep.h"
++#include "qemu/bitmap.h"
++#include "qemu/module.h"
++#include "qemu/main-loop.h"
++#include "qapi/error.h"
++#include "qom/object.h"
++#include "qom/qom-qobject.h"
++#include "glib.h"
++#include "system/memory.h"
++
++#define TYPE_TEST_RAM_DISCARD_SOURCE "test-ram-discard-source"
++
++OBJECT_DECLARE_SIMPLE_TYPE(TestRamDiscardSource, TEST_RAM_DISCARD_SOURCE)
++
++struct TestRamDiscardSource {
++    Object parent;
++
++    MemoryRegion *mr;
++    uint64_t granularity;
++    unsigned long *bitmap;
++    uint64_t bitmap_size;
++};
++
++static uint64_t test_rds_get_min_granularity(const RamDiscardSource *rds,
++                                             const MemoryRegion *mr)
++{
++    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
++
++    g_assert(mr == src->mr);
++    return src->granularity;
++}
++
++static bool test_rds_is_populated(const RamDiscardSource *rds,
++                                  const MemoryRegionSection *section)
++{
++    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
++    uint64_t offset = section->offset_within_region;
++    uint64_t size = int128_get64(section->size);
++    uint64_t first_bit = offset / src->granularity;
++    uint64_t last_bit = (offset + size - 1) / src->granularity;
++    unsigned long found;
++
++    g_assert(section->mr == src->mr);
++
++    /* Check if any bit in range is zero (discarded) */
++    found = find_next_zero_bit(src->bitmap, last_bit + 1, first_bit);
++    return found > last_bit;
++}
++
++static int test_rds_replay_populated(const RamDiscardSource *rds,
++                                     const MemoryRegionSection *section,
++                                     ReplayRamDiscardState replay_fn,
++                                     void *opaque)
++{
++    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
++    uint64_t first_bit, last_bit;
++    uint64_t offset, size;
++    int ret = 0;
++
++    g_assert(section->mr == src->mr);
++
++    first_bit = section->offset_within_region / src->granularity;
++    first_bit = find_next_bit(src->bitmap, src->bitmap_size, first_bit);
++
++    while (first_bit < src->bitmap_size) {
++        MemoryRegionSection tmp = *section;
++
++        offset = first_bit * src->granularity;
++        last_bit = find_next_zero_bit(src->bitmap, src->bitmap_size,
++                                      first_bit + 1) - 1;
++        size = (last_bit - first_bit + 1) * src->granularity;
++
++        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
++            break;
 +        }
-+    }
-+    rdm->min_granularity = granularity;
-+}
 +
-+static RamDiscardSourceEntry *
-+ram_discard_manager_find_source(RamDiscardManager *rdm, RamDiscardSource *rds)
-+{
-+    RamDiscardSourceEntry *entry;
-+
-+    QLIST_FOREACH(entry, &rdm->source_list, next) {
-+        if (entry->rds == rds) {
-+            return entry;
++        ret = replay_fn(&tmp, opaque);
++        if (ret) {
++            break;
 +        }
++
++        first_bit = find_next_bit(src->bitmap, src->bitmap_size, last_bit + 2);
 +    }
-+    return NULL;
++
++    return ret;
 +}
 +
-+static int rdl_populate_cb(const MemoryRegionSection *section, void *opaque)
++static int test_rds_replay_discarded(const RamDiscardSource *rds,
++                                     const MemoryRegionSection *section,
++                                     ReplayRamDiscardState replay_fn,
++                                     void *opaque)
 +{
-+    RamDiscardListener *rdl = opaque;
-+    MemoryRegionSection tmp = *rdl->section;
++    TestRamDiscardSource *src = TEST_RAM_DISCARD_SOURCE(rds);
++    uint64_t first_bit, last_bit;
++    uint64_t offset, size;
++    int ret = 0;
 +
-+    g_assert(section->mr == rdl->section->mr);
++    g_assert(section->mr == src->mr);
 +
-+    if (!memory_region_section_intersect_range(&tmp,
-+                                               section->offset_within_region,
-+                                               int128_get64(section->size))) {
-+        return 0;
++    first_bit = section->offset_within_region / src->granularity;
++    first_bit = find_next_zero_bit(src->bitmap, src->bitmap_size, first_bit);
++
++    while (first_bit < src->bitmap_size) {
++        MemoryRegionSection tmp = *section;
++
++        offset = first_bit * src->granularity;
++        last_bit = find_next_bit(src->bitmap, src->bitmap_size,
++                                 first_bit + 1) - 1;
++        size = (last_bit - first_bit + 1) * src->granularity;
++
++        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
++            break;
++        }
++
++        ret = replay_fn(&tmp, opaque);
++        if (ret) {
++            break;
++        }
++
++        first_bit = find_next_zero_bit(src->bitmap, src->bitmap_size,
++                                       last_bit + 2);
 +    }
 +
-+    return rdl->notify_populate(rdl, &tmp);
++    return ret;
 +}
 +
-+static int rdl_discard_cb(const MemoryRegionSection *section, void *opaque)
++static void test_rds_class_init(ObjectClass *klass, const void *data)
 +{
-+    RamDiscardListener *rdl = opaque;
-+    MemoryRegionSection tmp = *rdl->section;
++    RamDiscardSourceClass *rdsc = RAM_DISCARD_SOURCE_CLASS(klass);
 +
-+    g_assert(section->mr == rdl->section->mr);
++    rdsc->get_min_granularity = test_rds_get_min_granularity;
++    rdsc->is_populated = test_rds_is_populated;
++    rdsc->replay_populated = test_rds_replay_populated;
++    rdsc->replay_discarded = test_rds_replay_discarded;
++}
 +
-+    if (!memory_region_section_intersect_range(&tmp,
-+                                               section->offset_within_region,
-+                                               int128_get64(section->size))) {
-+        return 0;
++static const TypeInfo test_rds_info = {
++    .name = TYPE_TEST_RAM_DISCARD_SOURCE,
++    .parent = TYPE_OBJECT,
++    .instance_size = sizeof(TestRamDiscardSource),
++    .class_init = test_rds_class_init,
++    .interfaces = (const InterfaceInfo[]) {
++        { TYPE_RAM_DISCARD_SOURCE },
++        { }
++    },
++};
++
++static TestRamDiscardSource *test_source_new(MemoryRegion *mr,
++                                             uint64_t granularity)
++{
++    TestRamDiscardSource *src;
++    uint64_t region_size = memory_region_size(mr);
++
++    src = TEST_RAM_DISCARD_SOURCE(object_new(TYPE_TEST_RAM_DISCARD_SOURCE));
++    src->mr = mr;
++    src->granularity = granularity;
++    src->bitmap_size = DIV_ROUND_UP(region_size, granularity);
++    src->bitmap = bitmap_new(src->bitmap_size);
++
++    return src;
++}
++
++static void test_source_free(TestRamDiscardSource *src)
++{
++    g_free(src->bitmap);
++    object_unref(OBJECT(src));
++}
++
++static void test_source_populate(TestRamDiscardSource *src,
++                                 uint64_t offset, uint64_t size)
++{
++    uint64_t first_bit = offset / src->granularity;
++    uint64_t nbits = size / src->granularity;
++
++    bitmap_set(src->bitmap, first_bit, nbits);
++}
++
++static void test_source_discard(TestRamDiscardSource *src,
++                                uint64_t offset, uint64_t size)
++{
++    uint64_t first_bit = offset / src->granularity;
++    uint64_t nbits = size / src->granularity;
++
++    bitmap_clear(src->bitmap, first_bit, nbits);
++}
++
++typedef struct TestListener {
++    RamDiscardListener rdl;
++    int populate_count;
++    int discard_count;
++    uint64_t last_populate_offset;
++    uint64_t last_populate_size;
++    uint64_t last_discard_offset;
++    uint64_t last_discard_size;
++    int fail_on_populate;  /* Return error on Nth populate */
++    int populate_call_num;
++} TestListener;
++
++static int test_listener_populate(RamDiscardListener *rdl,
++                                  const MemoryRegionSection *section)
++{
++    TestListener *tl = container_of(rdl, TestListener, rdl);
++
++    tl->populate_call_num++;
++    if (tl->fail_on_populate > 0 &&
++        tl->populate_call_num >= tl->fail_on_populate) {
++        return -ENOMEM;
 +    }
 +
-+    rdl->notify_discard(rdl, &tmp);
++    tl->populate_count++;
++    tl->last_populate_offset = section->offset_within_region;
++    tl->last_populate_size = int128_get64(section->size);
 +    return 0;
 +}
 +
-+static bool rdm_is_all_populated_skip(const RamDiscardManager *rdm,
-+                                      const MemoryRegionSection *section,
-+                                      const RamDiscardSource *skip_source)
++static void test_listener_discard(RamDiscardListener *rdl,
++                                  const MemoryRegionSection *section)
 +{
-+    RamDiscardSourceEntry *entry;
++    TestListener *tl = container_of(rdl, TestListener, rdl);
 +
-+    QLIST_FOREACH(entry, &rdm->source_list, next) {
-+        if (skip_source && entry->rds == skip_source) {
-+            continue;
-+        }
-+        if (!ram_discard_source_is_populated(entry->rds, section)) {
-+            return false;
-+        }
-+    }
-+    return true;
++    tl->discard_count++;
++    tl->last_discard_offset = section->offset_within_region;
++    tl->last_discard_size = int128_get64(section->size);
 +}
 +
-+typedef struct SourceNotifyCtx {
++static void test_listener_init(TestListener *tl)
++{
++    ram_discard_listener_init(&tl->rdl,
++        test_listener_populate,
++        test_listener_discard);
++}
++
++#define TEST_REGION_SIZE (16 * 1024 * 1024)  /* 16 MB */
++#define GRANULARITY_4K   (4 * 1024)
++#define GRANULARITY_2M   (2 * 1024 * 1024)
++
++static MemoryRegion *test_mr;
++
++static void test_setup(void)
++{
++    test_mr = g_new0(MemoryRegion, 1);
++    test_mr->size = int128_make64(TEST_REGION_SIZE);
++    test_mr->ram = true;
++}
++
++static void test_teardown(void)
++{
++    g_clear_pointer(&test_mr->rdm, object_unref);
++    object_unparent(OBJECT(test_mr));
++    g_free(test_mr);
++    test_mr = NULL;
++}
++
++static void test_single_source_basic(void)
++{
++    TestRamDiscardSource *src;
 +    RamDiscardManager *rdm;
-+    RamDiscardListener *rdl;
-+    RamDiscardSource *source; /* added or removed */
-+} SourceNotifyCtx;
++    MemoryRegionSection section;
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++    g_assert_null(rdm);
++
++    /* Add source */
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++    g_assert_nonnull(rdm);
++
++    g_assert_cmpuint(ram_discard_manager_get_min_granularity(rdm, test_mr),
++                     ==, GRANULARITY_4K);
++
++    /* Initially all discarded */
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(GRANULARITY_4K);
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate a range in source */
++    test_source_populate(src, 0, GRANULARITY_4K * 4);
++
++    /* Now should be populated */
++    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Check larger section */
++    section.size = int128_make64(GRANULARITY_4K * 4);
++    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Check section that spans populated and discarded */
++    section.size = int128_make64(GRANULARITY_4K * 8);
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++
++    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
++
++    test_source_free(src);
++    test_teardown();
++}
++
++static void test_single_source_listener(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* Populate some ranges before adding listener */
++    test_source_populate(src, 0, GRANULARITY_4K * 4);
++    test_source_populate(src, GRANULARITY_4K * 8, GRANULARITY_4K * 4);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++    g_assert_nonnull(rdm);
++
++    /* Register listener */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Should have been notified about populated regions */
++    g_assert_cmpint(tl.populate_count, ==, 2);
++
++    /* Notify populate for new range */
++    tl.populate_count = 0;
++    test_source_populate(src, GRANULARITY_4K * 16, GRANULARITY_4K * 2);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              GRANULARITY_4K * 16,
++                                              GRANULARITY_4K * 2);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 16);
++    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 2);
++
++    /* Notify discard */
++    tl.discard_count = 0;
++    test_source_discard(src, 0, GRANULARITY_4K * 4);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
++                                       0, GRANULARITY_4K * 4);
++    g_assert_cmpint(tl.discard_count, ==, 1);
++    g_assert_cmpuint(tl.last_discard_offset, ==, 0);
++    g_assert_cmpuint(tl.last_discard_size, ==, GRANULARITY_4K * 4);
++
++    /* Unregister listener */
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++static void test_two_sources_same_granularity(void)
++{
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    int ret;
++
++    test_setup();
++
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* Add first source */
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++
++    /* Add second source */
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++    g_assert_nonnull(rdm);
++
++    /* Check granularity */
++    g_assert_cmpuint(ram_discard_manager_get_min_granularity(rdm, test_mr),
++                     ==, GRANULARITY_4K);
++
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(GRANULARITY_4K);
++
++    /* Both discarded -> aggregated discarded */
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate in src1 only */
++    test_source_populate(src1, 0, GRANULARITY_4K);
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate in src2 only */
++    test_source_discard(src1, 0, GRANULARITY_4K);
++    test_source_populate(src2, 0, GRANULARITY_4K);
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate in both -> aggregated populated */
++    test_source_populate(src1, 0, GRANULARITY_4K);
++    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Remove sources */
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
++}
 +
 +/*
-+ * Unified helper to replay regions based on populated state.
-+ * If replay_populated is true: replay regions where ALL sources are populated.
-+ * If replay_populated is false: replay regions where ANY source is discarded.
++ * Test: Two sources with different granularities (4K and 2M).
++ * The aggregated granularity should be GCD(4K, 2M) = 4K.
 + */
-+static int replay_by_populated_state(const RamDiscardManager *rdm,
-+                                     const MemoryRegionSection *section,
-+                                     const RamDiscardSource *skip_source,
-+                                     bool replay_populated,
-+                                     ReplayRamDiscardState replay_fn,
-+                                     void *user_opaque)
++static void test_two_sources_different_granularity(void)
 +{
-+    uint64_t granularity = rdm->min_granularity;
-+    uint64_t offset, end_offset;
-+    uint64_t run_start = 0;
-+    bool in_run = false;
-+    int ret = 0;
++    TestRamDiscardSource *src_4k, *src_2m;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    int ret;
 +
-+    if (QLIST_EMPTY(&rdm->source_list)) {
-+        if (replay_populated) {
-+            return replay_fn(section, user_opaque);
-+        }
-+        return 0;
-+    }
++    test_setup();
 +
-+    g_assert(granularity != 0);
++    src_4k = test_source_new(test_mr, GRANULARITY_4K);
++    src_2m = test_source_new(test_mr, GRANULARITY_2M);
 +
-+    offset = section->offset_within_region;
-+    end_offset = offset + int128_get64(section->size);
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src_4k));
++    g_assert_cmpint(ret, ==, 0);
 +
-+    while (offset < end_offset) {
-+        MemoryRegionSection subsection = {
-+            .mr = section->mr,
-+            .offset_within_region = offset,
-+            .size = int128_make64(MIN(granularity, end_offset - offset)),
-+        };
-+        bool all_populated;
-+        bool included;
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src_2m));
++    g_assert_cmpint(ret, ==, 0);
 +
-+        all_populated = rdm_is_all_populated_skip(rdm, &subsection, skip_source);
-+        included = replay_populated ? all_populated : !all_populated;
++    rdm = memory_region_get_ram_discard_manager(test_mr);
 +
-+        if (included) {
-+            if (!in_run) {
-+                run_start = offset;
-+                in_run = true;
-+            }
-+        } else {
-+            if (in_run) {
-+                MemoryRegionSection run_section = {
-+                    .mr = section->mr,
-+                    .offset_within_region = run_start,
-+                    .size = int128_make64(offset - run_start),
-+                };
-+                ret = replay_fn(&run_section, user_opaque);
-+                if (ret) {
-+                    return ret;
-+                }
-+                in_run = false;
-+            }
-+        }
-+        if (granularity > end_offset - offset) {
-+            break;
-+        }
-+        offset += granularity;
-+    }
++    g_assert_cmpuint(ram_discard_manager_get_min_granularity(rdm, test_mr),
++                     ==, GRANULARITY_4K);
 +
-+    if (in_run) {
-+        MemoryRegionSection run_section = {
-+            .mr = section->mr,
-+            .offset_within_region = run_start,
-+            .size = int128_make64(end_offset - run_start),
-+        };
-+        ret = replay_fn(&run_section, user_opaque);
-+    }
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(GRANULARITY_4K);
 +
-+    return ret;
++    /* Both discarded */
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate 4K in src_4k, but src_2m still discarded the whole 2M block */
++    test_source_populate(src_4k, 0, GRANULARITY_4K);
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate 2M in src_2m (which includes the 4K block) */
++    test_source_populate(src_2m, 0, GRANULARITY_2M);
++    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Check a 4K block at offset 4K (populated in src_2m but not in src_4k) */
++    section.offset_within_region = GRANULARITY_4K;
++    g_assert_false(ram_discard_manager_is_populated(rdm, &section));
++
++    /* Populate it in src_4k */
++    test_source_populate(src_4k, GRANULARITY_4K, GRANULARITY_4K);
++    g_assert_true(ram_discard_manager_is_populated(rdm, &section));
++
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src_2m));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src_4k));
++
++    test_source_free(src_2m);
++    test_source_free(src_4k);
++    test_teardown();
 +}
 +
-+static int add_source_check_discard_cb(const MemoryRegionSection *section,
-+                                       void *opaque)
-+{
-+    SourceNotifyCtx *ctx = opaque;
-+
-+    return replay_by_populated_state(ctx->rdm, section, ctx->source, true,
-+                                     rdl_discard_cb, ctx->rdl);
-+}
-+
-+static int del_source_check_populate_cb(const MemoryRegionSection *section,
-+                                        void *opaque)
-+{
-+    SourceNotifyCtx *ctx = opaque;
-+
-+    return replay_by_populated_state(ctx->rdm, section, ctx->source, true,
-+                                     rdl_populate_cb, ctx->rdl);
-+}
-+
-+int ram_discard_manager_add_source(RamDiscardManager *rdm,
-+                                   RamDiscardSource *source)
-+{
-+    RamDiscardSourceEntry *entry;
-+    RamDiscardListener *rdl, *rdl2;
-+    int ret = 0;
-+
-+    if (ram_discard_manager_find_source(rdm, source)) {
-+        return -EBUSY;
-+    }
-+
-+    /*
-+     * If there are existing listeners, notify them about regions that
-+     * become discarded due to adding this source. Only notify for regions
-+     * that were previously populated (all other sources agreed).
-+     */
-+    QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
-+        SourceNotifyCtx ctx = {
-+            .rdm = rdm,
-+            .rdl = rdl,
-+            /* no need to set source */
-+        };
-+        ret = ram_discard_source_replay_discarded(source, rdl->section,
-+                                                  add_source_check_discard_cb, &ctx);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+    if (ret) {
-+        QLIST_FOREACH(rdl2, &rdm->rdl_list, next) {
-+            SourceNotifyCtx ctx = {
-+                .rdm = rdm,
-+                .rdl = rdl2,
-+            };
-+            ram_discard_source_replay_discarded(source, rdl2->section,
-+                                                del_source_check_populate_cb, &ctx);
-+            if (rdl == rdl2) {
-+                break;
-+            }
-+        }
-+
-+        return ret;
-+    }
-+
-+    entry = g_new0(RamDiscardSourceEntry, 1);
-+    entry->rds = source;
-+    QLIST_INSERT_HEAD(&rdm->source_list, entry, next);
-+
-+    ram_discard_manager_update_granularity(rdm);
-+
-+    return ret;
-+}
-+
-+int ram_discard_manager_del_source(RamDiscardManager *rdm,
-+                                   RamDiscardSource *source)
-+{
-+    RamDiscardSourceEntry *entry;
-+    RamDiscardListener *rdl, *rdl2;
-+    int ret = 0;
-+
-+    entry = ram_discard_manager_find_source(rdm, source);
-+    if (!entry) {
-+        return -ENOENT;
-+    }
-+
-+    /*
-+     * If there are existing listeners, check if any regions become
-+     * populated due to removing this source.
-+     */
-+    QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
-+        SourceNotifyCtx ctx = {
-+            .rdm = rdm,
-+            .rdl = rdl,
-+            .source = source,
-+        };
-+        /* from the previously discarded regions, check if any regions become populated */
-+        ret = ram_discard_source_replay_discarded(source, rdl->section,
-+                                                  del_source_check_populate_cb, &ctx);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+    if (ret) {
-+        QLIST_FOREACH(rdl2, &rdm->rdl_list, next) {
-+            SourceNotifyCtx ctx = {
-+                .rdm = rdm,
-+                .rdl = rdl2,
-+                .source = source,
-+            };
-+            ram_discard_source_replay_discarded(source, rdl2->section,
-+                                                add_source_check_discard_cb, &ctx);
-+            if (rdl == rdl2) {
-+                break;
-+            }
-+        }
-+
-+        return ret;
-+    }
-+
-+    QLIST_REMOVE(entry, next);
-+    g_free(entry);
-+    ram_discard_manager_update_granularity(rdm);
-+    return ret;
-+}
-+
- uint64_t ram_discard_manager_get_min_granularity(const RamDiscardManager *rdm,
-                                                  const MemoryRegion *mr)
- {
--    return ram_discard_source_get_min_granularity(rdm->rds, mr);
-+    g_assert(mr == rdm->mr);
-+    return rdm->min_granularity;
- }
- 
 +/*
-+ * Aggregated query: returns true only if ALL sources report populated (AND).
++ * Test: Notification with two sources.
++ * Populate notification should only fire when all sources are populated.
 + */
- bool ram_discard_manager_is_populated(const RamDiscardManager *rdm,
-                                       const MemoryRegionSection *section)
- {
--    return ram_discard_source_is_populated(rdm->rds, section);
-+    RamDiscardSourceEntry *entry;
++static void test_two_sources_notification(void)
++{
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
 +
-+    QLIST_FOREACH(entry, &rdm->source_list, next) {
-+        if (!ram_discard_source_is_populated(entry->rds, section)) {
-+            return false;
-+        }
-+    }
-+    return true;
++    test_setup();
++
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register listener */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* No populate notifications yet (all discarded) */
++    g_assert_cmpint(tl.populate_count, ==, 0);
++
++    /* Populate in src1 only - no notification (src2 still discarded) */
++    test_source_populate(src1, 0, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src1),
++                                              0, GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl.populate_count, ==, 0);
++
++    /* Populate same range in src2 - now should notify */
++    test_source_populate(src2, 0, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src2),
++                                              0, GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl.populate_count, ==, 1);
++
++    /* Discard from src1 - should notify discard immediately */
++    tl.discard_count = 0;
++    test_source_discard(src1, 0, GRANULARITY_4K * 2);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src1),
++                                       0, GRANULARITY_4K * 2);
++    g_assert_cmpint(tl.discard_count, ==, 1);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
 +}
 +
-+typedef struct ReplayCtx {
-+    const RamDiscardManager *rdm;
-+    ReplayRamDiscardState replay_fn;
-+    void *user_opaque;
-+} ReplayCtx;
-+
-+static int aggregated_replay_populated_cb(const MemoryRegionSection *section,
-+                                          void *opaque)
++/*
++ * Test: Adding source with existing listener.
++ * When a new source is added, listeners should be notified about
++ * regions that become discarded.
++ */
++static void test_add_source_with_listener(void)
 +{
-+    ReplayCtx *ctx = opaque;
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
 +
-+    return replay_by_populated_state(ctx->rdm, section, NULL, true,
-+                                     ctx->replay_fn, ctx->user_opaque);
- }
- 
- int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
-@@ -78,8 +392,21 @@ int ram_discard_manager_replay_populated(const RamDiscardManager *rdm,
-                                          ReplayRamDiscardState replay_fn,
-                                          void *opaque)
- {
--    return ram_discard_source_replay_populated(rdm->rds, section,
--                                               replay_fn, opaque);
-+    RamDiscardSourceEntry *first;
-+    ReplayCtx ctx;
++    test_setup();
 +
-+    first = QLIST_FIRST(&rdm->source_list);
-+    if (!first) {
-+        return replay_fn(section, opaque);
-+    }
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
 +
-+    ctx.rdm = rdm;
-+    ctx.replay_fn = replay_fn;
-+    ctx.user_opaque = opaque;
++    /* Populate some range in src1 */
++    test_source_populate(src1, 0, GRANULARITY_4K * 8);
 +
-+    return ram_discard_source_replay_populated(first->rds, section,
-+                                               aggregated_replay_populated_cb,
-+                                               &ctx);
- }
- 
- int ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-@@ -87,15 +414,21 @@ int ram_discard_manager_replay_discarded(const RamDiscardManager *rdm,
-                                          ReplayRamDiscardState replay_fn,
-                                          void *opaque)
- {
--    return ram_discard_source_replay_discarded(rdm->rds, section,
--                                               replay_fn, opaque);
-+    /* No sources means nothing is discarded (all is considered populated) */
-+    if (QLIST_EMPTY(&rdm->source_list)) {
-+        return 0;
-+    }
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
 +
-+    return replay_by_populated_state(rdm, section, NULL, false, replay_fn, opaque);
- }
- 
- static void ram_discard_manager_initfn(Object *obj)
- {
-     RamDiscardManager *rdm = RAM_DISCARD_MANAGER(obj);
- 
-+    QLIST_INIT(&rdm->source_list);
-     QLIST_INIT(&rdm->rdl_list);
-+    rdm->min_granularity = 0;
- }
- 
- static void ram_discard_manager_finalize(Object *obj)
-@@ -103,74 +436,91 @@ static void ram_discard_manager_finalize(Object *obj)
-     RamDiscardManager *rdm = RAM_DISCARD_MANAGER(obj);
- 
-     g_assert(QLIST_EMPTY(&rdm->rdl_list));
-+    g_assert(QLIST_EMPTY(&rdm->source_list));
- }
- 
- int ram_discard_manager_notify_populate(RamDiscardManager *rdm,
-+                                        RamDiscardSource *source,
-                                         uint64_t offset, uint64_t size)
- {
-     RamDiscardListener *rdl, *rdl2;
-+    MemoryRegionSection section = {
-+        .mr = rdm->mr,
-+        .offset_within_region = offset,
-+        .size = int128_make64(size),
-+    };
-     int ret = 0;
- 
--    QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
--        MemoryRegionSection tmp = *rdl->section;
-+    g_assert(ram_discard_manager_find_source(rdm, source));
- 
--        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
--            continue;
--        }
--        ret = rdl->notify_populate(rdl, &tmp);
-+    /*
-+     * Only notify about regions that are populated in ALL sources.
-+     * replay_by_populated_state checks all sources including the one that
-+     * just populated.
-+     */
-+    QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
-+        ret = replay_by_populated_state(rdm, &section, NULL, true,
-+                                        rdl_populate_cb, rdl);
-         if (ret) {
-             break;
-         }
-     }
- 
-     if (ret) {
--        /* Notify all already-notified listeners about discard. */
-+        /*
-+         * Rollback: notify discard for listeners we already notified,
-+         * including the failing listener which may have been partially
-+         * notified. Listeners must handle discard notifications for
-+         * regions they didn't receive populate notifications for.
-+         */
-         QLIST_FOREACH(rdl2, &rdm->rdl_list, next) {
--            MemoryRegionSection tmp = *rdl2->section;
--
-+            replay_by_populated_state(rdm, &section, NULL, true,
-+                                      rdl_discard_cb, rdl2);
-             if (rdl2 == rdl) {
-                 break;
-             }
--            if (!memory_region_section_intersect_range(&tmp, offset, size)) {
--                continue;
--            }
--            rdl2->notify_discard(rdl2, &tmp);
-         }
-     }
-     return ret;
- }
- 
- void ram_discard_manager_notify_discard(RamDiscardManager *rdm,
-+                                        RamDiscardSource *source,
-                                         uint64_t offset, uint64_t size)
- {
-     RamDiscardListener *rdl;
--
-+    MemoryRegionSection section = {
-+        .mr = rdm->mr,
-+        .offset_within_region = offset,
-+        .size = int128_make64(size),
-+    };
++    /* Register listener */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
 +
-+    g_assert(ram_discard_manager_find_source(rdm, source));
++    /* Should have been notified about populated region */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpint(tl.last_populate_offset, ==, 0);
++    g_assert_cmpint(tl.last_populate_size, ==, GRANULARITY_4K * 8);
++
++    /* src2 has part of the region populated, part discarded */
++    /* src2 has 0-4 populated, 4-8 discarded */
++    test_source_populate(src2, 0, GRANULARITY_4K * 4);
++
++    /* Add src2 - listener should be notified about newly discarded regions */
++    tl.discard_count = 0;
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
 +
 +    /*
-+     * Only notify about ranges that were aggregately populated before this
-+     * source's discard. Since the source has already updated its state,
-+     * we use replay_by_populated_state with this source skipped - it will
-+     * replay only the ranges where all OTHER sources are populated.
++     * The range 4K*4 to 4K*8 was populated in src1 but discarded in src2,
++     * so it becomes aggregated-discarded. Listener should be notified.
++     * Only this range should trigger a discard notification - regions beyond
++     * 4K*8 were already discarded in src1, so adding src2 doesn't change them.
 +     */
-     QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
--        MemoryRegionSection tmp = *rdl->section;
--
--        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
--            continue;
--        }
--        rdl->notify_discard(rdl, &tmp);
-+        replay_by_populated_state(rdm, &section, source, true,
-+                                  rdl_discard_cb, rdl);
-     }
- }
- 
--void ram_discard_manager_notify_discard_all(RamDiscardManager *rdm)
-+void ram_discard_manager_notify_discard_all(RamDiscardManager *rdm,
-+                                            RamDiscardSource *source)
- {
-     RamDiscardListener *rdl;
- 
-+    g_assert(ram_discard_manager_find_source(rdm, source));
++    g_assert_cmpint(tl.discard_count, ==, 1);
++    g_assert_cmpint(tl.last_discard_offset, ==, GRANULARITY_4K * 4);
++    g_assert_cmpint(tl.last_discard_size, ==, GRANULARITY_4K * 4);
 +
-     QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
-         rdl->notify_discard(rdl, rdl->section);
-     }
- }
- 
--static int rdm_populate_cb(const MemoryRegionSection *section, void *opaque)
--{
--    RamDiscardListener *rdl = opaque;
--
--    return rdl->notify_populate(rdl, section);
--}
--
- void ram_discard_manager_register_listener(RamDiscardManager *rdm,
-                                            RamDiscardListener *rdl,
-                                            MemoryRegionSection *section)
-@@ -182,8 +532,8 @@ void ram_discard_manager_register_listener(RamDiscardManager *rdm,
-     rdl->section = memory_region_section_new_copy(section);
-     QLIST_INSERT_HEAD(&rdm->rdl_list, rdl, next);
- 
--    ret = ram_discard_source_replay_populated(rdm->rds, rdl->section,
--                                              rdm_populate_cb, rdl);
-+    ret = ram_discard_manager_replay_populated(rdm, rdl->section,
-+                                               rdl_populate_cb, rdl);
-     if (ret) {
-         error_report("%s: Replaying populated ranges failed: %s", __func__,
-                      strerror(-ret));
-@@ -208,8 +558,8 @@ int ram_discard_manager_replay_populated_to_listeners(RamDiscardManager *rdm)
-     int ret = 0;
- 
-     QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
--        ret = ram_discard_source_replay_populated(rdm->rds, rdl->section,
--                                                  rdm_populate_cb, rdl);
-+        ret = ram_discard_manager_replay_populated(rdm, rdl->section,
-+                                                   rdl_populate_cb, rdl);
-         if (ret) {
-             break;
-         }
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
++}
++
++/*
++ * Test: Removing source with existing listener.
++ * When a source is removed, listeners should be notified about
++ * regions that become populated.
++ */
++static void test_remove_source_with_listener(void)
++{
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
++
++    test_setup();
++
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* src1: all of first 8 blocks populated */
++    test_source_populate(src1, 0, GRANULARITY_4K * 8);
++    /* src2: only first 4 blocks populated */
++    test_source_populate(src2, 0, GRANULARITY_4K * 4);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register listener */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Only first 4 blocks are aggregated-populated */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
++
++    /* Remove src2 - blocks 4-8 should become populated */
++    tl.populate_count = 0;
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++
++    /* Listener should be notified about newly populated region (4K*4 to 4K*8) */
++    g_assert_cmpint(tl.populate_count, >=, 1);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
++}
++
++/*
++ * Test: Add a source, register a listener, remove the source, then add it back.
++ * This checks the transition from 0 sources (all populated) to 1 source
++ * (partially discarded) with an active listener.
++ */
++static void test_readd_source_with_listener(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* Populate some range in src */
++    test_source_populate(src, 0, GRANULARITY_4K * 8);
++
++    /* 1. Add source */
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* 2. Register listener */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Listener notified about populated region (0 - 32K) */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 8);
++
++    /* 3. Remove source */
++    tl.populate_count = 0;
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++
++    /*
++     * With 0 sources, everything is populated.
++     * The range that was discarded in src (from 32K to end) becomes populated.
++     */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 8);
++    g_assert_cmpuint(tl.last_populate_size, ==, TEST_REGION_SIZE - GRANULARITY_4K * 8);
++
++    /* 4. Add source back */
++    tl.discard_count = 0;
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++
++    /*
++     * Now we have 1 source again. The range (32K to end) is discarded again.
++     * Listener should be notified about this discard.
++     */
++    g_assert_cmpint(tl.discard_count, ==, 1);
++    g_assert_cmpuint(tl.last_discard_offset, ==, GRANULARITY_4K * 8);
++    g_assert_cmpuint(tl.last_discard_size, ==, TEST_REGION_SIZE - GRANULARITY_4K * 8);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++/*
++ * Test: Duplicate source registration should fail.
++ */
++static void test_duplicate_source(void)
++{
++    TestRamDiscardSource *src;
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++
++    /* Adding same source again should fail */
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, -EBUSY);
++
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++/*
++ * Test: Populate notification rollback on listener error.
++ */
++static void test_populate_rollback(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl1 = { 0, }, tl2 = { 0, };
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register two listeners */
++    test_listener_init(&tl1);
++    test_listener_init(&tl2);
++    tl2.fail_on_populate = 1;  /* Second listener fails on first populate */
++
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++
++    /*
++     * Register tl2 first so it's visited second (QLIST_INSERT_HEAD reverses
++     * registration order). This ensures tl1 receives populate before tl2
++     * fails.
++     */
++    ram_discard_manager_register_listener(rdm, &tl2.rdl, &section);
++    ram_discard_manager_register_listener(rdm, &tl1.rdl, &section);
++
++    /* Try to populate - should fail and roll back */
++    test_source_populate(src, 0, GRANULARITY_4K);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              0, GRANULARITY_4K);
++    g_assert_cmpint(ret, ==, -ENOMEM);
++
++    /* First listener should have received populate then discard (rollback) */
++    g_assert_cmpint(tl1.populate_count, ==, 1);
++    g_assert_cmpint(tl1.discard_count, ==, 1);
++
++    ram_discard_manager_unregister_listener(rdm, &tl1.rdl);
++    ram_discard_manager_unregister_listener(rdm, &tl2.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++/*
++ * Test: Replay populated with two sources (intersection).
++ */
++static void test_replay_populated_intersection(void)
++{
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
++
++    test_setup();
++
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
++
++    /*
++     * src1: blocks 0-7 populated
++     * src2: blocks 4-11 populated
++     * Intersection: blocks 4-7
++     */
++    test_source_populate(src1, 0, GRANULARITY_4K * 8);
++    test_source_populate(src2, GRANULARITY_4K * 4, GRANULARITY_4K * 8);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register listener - should only get notified about intersection */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Should have been notified about blocks 4-7 (intersection) */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 4);
++    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
++}
++
++/*
++ * Test: Empty region (no sources).
++ */
++static void test_no_sources(void)
++{
++    test_setup();
++
++    /* No sources - should have no manager */
++    g_assert_null(memory_region_get_ram_discard_manager(test_mr));
++    g_assert_false(memory_region_has_ram_discard_manager(test_mr));
++
++    test_teardown();
++}
++
++static void test_redundant_discard(void)
++{
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
++
++    test_setup();
++
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* Add sources */
++    ret = memory_region_add_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++    ret = memory_region_add_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register listener */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(TEST_REGION_SIZE);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Populate intersection (0-4K) in both sources */
++    test_source_populate(src1, 0, GRANULARITY_4K);
++    test_source_populate(src2, 0, GRANULARITY_4K);
++
++    /* Notify populate src1 - should trigger listener populate (as src2 is also populated) */
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src1), 0, GRANULARITY_4K);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl.populate_count, ==, 1);
++
++    /* Now Discard src1 -> Aggregate Discarded */
++    tl.discard_count = 0;
++    test_source_discard(src1, 0, GRANULARITY_4K);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src1), 0, GRANULARITY_4K);
++    g_assert_cmpint(tl.discard_count, ==, 1);
++
++    /* Now Discard src2 -> Aggregate Discarded (Already Discarded!) */
++    /* Listener should NOT receive another discard notification for the same range. */
++    test_source_discard(src2, 0, GRANULARITY_4K);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src2), 0, GRANULARITY_4K);
++
++    g_assert_cmpint(tl.discard_count, ==, 1);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
++}
++
++/*
++ * Test: Listener with partial section coverage.
++ * Listener should only receive notifications for its registered range.
++ */
++static void test_partial_listener_section(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* Populate blocks 0-7 */
++    test_source_populate(src, 0, GRANULARITY_4K * 8);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register listener for only blocks 2-5 (not the full region) */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = GRANULARITY_4K * 2;
++    section.size = int128_make64(GRANULARITY_4K * 4);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Should be notified only about blocks 2-5 (intersection) */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_offset, ==, GRANULARITY_4K * 2);
++    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
++
++    /* Discard block 0 - outside listener's section, no notification */
++    tl.discard_count = 0;
++    test_source_discard(src, 0, GRANULARITY_4K);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
++                                       0, GRANULARITY_4K);
++    g_assert_cmpint(tl.discard_count, ==, 0);
++
++    /* Discard block 3 - inside listener's section */
++    test_source_discard(src, GRANULARITY_4K * 3, GRANULARITY_4K);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
++                                       GRANULARITY_4K * 3, GRANULARITY_4K);
++    g_assert_cmpint(tl.discard_count, ==, 1);
++    g_assert_cmpuint(tl.last_discard_offset, ==, GRANULARITY_4K * 3);
++
++    /* Discard spanning boundary (blocks 5-6) - only block 5 in section */
++    tl.discard_count = 0;
++    test_source_discard(src, GRANULARITY_4K * 5, GRANULARITY_4K * 2);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
++                                       GRANULARITY_4K * 5, GRANULARITY_4K * 2);
++    g_assert_cmpint(tl.discard_count, ==, 1);
++    g_assert_cmpuint(tl.last_discard_offset, ==, GRANULARITY_4K * 5);
++    g_assert_cmpuint(tl.last_discard_size, ==, GRANULARITY_4K);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++/*
++ * Test: Multiple listeners with different (non-overlapping) sections.
++ */
++static void test_multiple_listeners_different_sections(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section1, section2;
++    TestListener tl1 = { 0, }, tl2 = { 0, };
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Listener 1: blocks 0-3 */
++    test_listener_init(&tl1);
++    section1.mr = test_mr;
++    section1.offset_within_region = 0;
++    section1.size = int128_make64(GRANULARITY_4K * 4);
++    ram_discard_manager_register_listener(rdm, &tl1.rdl, &section1);
++
++    /* Listener 2: blocks 8-11 */
++    test_listener_init(&tl2);
++    section2.mr = test_mr;
++    section2.offset_within_region = GRANULARITY_4K * 8;
++    section2.size = int128_make64(GRANULARITY_4K * 4);
++    ram_discard_manager_register_listener(rdm, &tl2.rdl, &section2);
++
++    /* Initially all discarded - no populate notifications */
++    g_assert_cmpint(tl1.populate_count, ==, 0);
++    g_assert_cmpint(tl2.populate_count, ==, 0);
++
++    /* Populate blocks 0-3 - only tl1 should be notified */
++    test_source_populate(src, 0, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              0, GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl1.populate_count, ==, 1);
++    g_assert_cmpint(tl2.populate_count, ==, 0);
++
++    /* Populate blocks 8-11 - only tl2 should be notified */
++    test_source_populate(src, GRANULARITY_4K * 8, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              GRANULARITY_4K * 8,
++                                              GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl1.populate_count, ==, 1);
++    g_assert_cmpint(tl2.populate_count, ==, 1);
++
++    /* Populate blocks 4-7 (gap) - neither listener should be notified */
++    test_source_populate(src, GRANULARITY_4K * 4, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              GRANULARITY_4K * 4,
++                                              GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl1.populate_count, ==, 1);
++    g_assert_cmpint(tl2.populate_count, ==, 1);
++
++    ram_discard_manager_unregister_listener(rdm, &tl2.rdl);
++    ram_discard_manager_unregister_listener(rdm, &tl1.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++/*
++ * Test: Multiple listeners with overlapping sections.
++ */
++static void test_overlapping_listener_sections(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section1, section2;
++    TestListener tl1 = { 0, }, tl2 = { 0, };
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Listener 1: blocks 0-7 */
++    test_listener_init(&tl1);
++    section1.mr = test_mr;
++    section1.offset_within_region = 0;
++    section1.size = int128_make64(GRANULARITY_4K * 8);
++    ram_discard_manager_register_listener(rdm, &tl1.rdl, &section1);
++
++    /* Listener 2: blocks 4-11 (overlaps with tl1 on blocks 4-7) */
++    test_listener_init(&tl2);
++    section2.mr = test_mr;
++    section2.offset_within_region = GRANULARITY_4K * 4;
++    section2.size = int128_make64(GRANULARITY_4K * 8);
++    ram_discard_manager_register_listener(rdm, &tl2.rdl, &section2);
++
++    /* Populate blocks 4-7 (overlap region) - both should be notified */
++    test_source_populate(src, GRANULARITY_4K * 4, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              GRANULARITY_4K * 4,
++                                              GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl1.populate_count, ==, 1);
++    g_assert_cmpint(tl2.populate_count, ==, 1);
++
++    /* Populate blocks 0-3 - only tl1 */
++    test_source_populate(src, 0, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              0, GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl1.populate_count, ==, 2);
++    g_assert_cmpint(tl2.populate_count, ==, 1);
++
++    /* Populate blocks 8-11 - only tl2 */
++    test_source_populate(src, GRANULARITY_4K * 8, GRANULARITY_4K * 4);
++    ret = ram_discard_manager_notify_populate(rdm, RAM_DISCARD_SOURCE(src),
++                                              GRANULARITY_4K * 8,
++                                              GRANULARITY_4K * 4);
++    g_assert_cmpint(ret, ==, 0);
++    g_assert_cmpint(tl1.populate_count, ==, 2);
++    g_assert_cmpint(tl2.populate_count, ==, 2);
++
++    ram_discard_manager_unregister_listener(rdm, &tl2.rdl);
++    ram_discard_manager_unregister_listener(rdm, &tl1.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++/*
++ * Test: Listener at exact memory region boundaries.
++ */
++static void test_boundary_section(void)
++{
++    TestRamDiscardSource *src;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    TestListener tl = { 0, };
++    uint64_t last_offset;
++    int ret;
++
++    test_setup();
++
++    src = test_source_new(test_mr, GRANULARITY_4K);
++
++    /* Populate last 4 blocks of the region */
++    last_offset = TEST_REGION_SIZE - GRANULARITY_4K * 4;
++    test_source_populate(src, last_offset, GRANULARITY_4K * 4);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src));
++    g_assert_cmpint(ret, ==, 0);
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    /* Register listener for exactly the last 4 blocks */
++    test_listener_init(&tl);
++    section.mr = test_mr;
++    section.offset_within_region = last_offset;
++    section.size = int128_make64(GRANULARITY_4K * 4);
++    ram_discard_manager_register_listener(rdm, &tl.rdl, &section);
++
++    /* Should receive notification for the populated range */
++    g_assert_cmpint(tl.populate_count, ==, 1);
++    g_assert_cmpuint(tl.last_populate_offset, ==, last_offset);
++    g_assert_cmpuint(tl.last_populate_size, ==, GRANULARITY_4K * 4);
++
++    /* Discard exactly at boundary */
++    tl.discard_count = 0;
++    test_source_discard(src, last_offset, GRANULARITY_4K * 4);
++    ram_discard_manager_notify_discard(rdm, RAM_DISCARD_SOURCE(src),
++                                       last_offset, GRANULARITY_4K * 4);
++    g_assert_cmpint(tl.discard_count, ==, 1);
++
++    ram_discard_manager_unregister_listener(rdm, &tl.rdl);
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src));
++    test_source_free(src);
++    test_teardown();
++}
++
++static int count_discarded_blocks(const MemoryRegionSection *section,
++                                  void *opaque)
++{
++    int *count = opaque;
++    *count += int128_get64(section->size) / GRANULARITY_4K;
++    return 0;
++}
++
++/*
++ * Test: replay_discarded with two sources (union semantics).
++ */
++static void test_replay_discarded(void)
++{
++    TestRamDiscardSource *src1, *src2;
++    RamDiscardManager *rdm;
++    MemoryRegionSection section;
++    int count = 0;
++    int ret;
++
++    test_setup();
++
++    src1 = test_source_new(test_mr, GRANULARITY_4K);
++    src2 = test_source_new(test_mr, GRANULARITY_4K);
++
++    /*
++     * src1: blocks 0-3 populated, rest discarded
++     * src2: blocks 2-5 populated, rest discarded
++     * Aggregated populated: blocks 2-3 (intersection)
++     * Aggregated discarded: blocks 0-1, 4-5, 6+ (union of discarded)
++     */
++    test_source_populate(src1, 0, GRANULARITY_4K * 4);
++    test_source_populate(src2, GRANULARITY_4K * 2, GRANULARITY_4K * 4);
++
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src1));
++    g_assert_cmpint(ret, ==, 0);
++    ret = memory_region_add_ram_discard_source(test_mr,
++                                               RAM_DISCARD_SOURCE(src2));
++    g_assert_cmpint(ret, ==, 0);
++
++    rdm = memory_region_get_ram_discard_manager(test_mr);
++
++    section.mr = test_mr;
++    section.offset_within_region = 0;
++    section.size = int128_make64(GRANULARITY_4K * 8);
++
++    /* Count discarded blocks */
++    ret = ram_discard_manager_replay_discarded(rdm, &section,
++                                               count_discarded_blocks, &count);
++
++    g_assert_cmpint(ret, ==, 0);
++    /* Discarded: blocks 0-1 (2), blocks 4-5 (2), blocks 6-7 (2) = 6 blocks */
++    g_assert_cmpint(count, ==, 6);
++
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src2));
++    memory_region_del_ram_discard_source(test_mr, RAM_DISCARD_SOURCE(src1));
++
++    test_source_free(src2);
++    test_source_free(src1);
++    test_teardown();
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    module_call_init(MODULE_INIT_QOM);
++    type_register_static(&test_rds_info);
++
++    g_test_add_func("/ram-discard-manager/single-source/basic",
++                    test_single_source_basic);
++    g_test_add_func("/ram-discard-manager/single-source/listener",
++                    test_single_source_listener);
++    g_test_add_func("/ram-discard-manager/two-sources/same-granularity",
++                    test_two_sources_same_granularity);
++    g_test_add_func("/ram-discard-manager/two-sources/different-granularity",
++                    test_two_sources_different_granularity);
++    g_test_add_func("/ram-discard-manager/two-sources/notification",
++                    test_two_sources_notification);
++    g_test_add_func("/ram-discard-manager/dynamic/add-source-with-listener",
++                    test_add_source_with_listener);
++    g_test_add_func("/ram-discard-manager/dynamic/remove-source-with-listener",
++                    test_remove_source_with_listener);
++    g_test_add_func("/ram-discard-manager/dynamic/readd-source-with-listener",
++                    test_readd_source_with_listener);
++    g_test_add_func("/ram-discard-manager/edge/duplicate-source",
++                    test_duplicate_source);
++    g_test_add_func("/ram-discard-manager/edge/populate-rollback",
++                    test_populate_rollback);
++    g_test_add_func("/ram-discard-manager/edge/replay-intersection",
++                    test_replay_populated_intersection);
++    g_test_add_func("/ram-discard-manager/edge/no-sources",
++                    test_no_sources);
++    g_test_add_func("/ram-discard-manager/multi-source/redundant-discard",
++                    test_redundant_discard);
++    g_test_add_func("/ram-discard-manager/listener/partial-section",
++                    test_partial_listener_section);
++    g_test_add_func("/ram-discard-manager/listener/multiple-different",
++                    test_multiple_listeners_different_sections);
++    g_test_add_func("/ram-discard-manager/listener/overlapping",
++                    test_overlapping_listener_sections);
++    g_test_add_func("/ram-discard-manager/edge/boundary-section",
++                    test_boundary_section);
++    g_test_add_func("/ram-discard-manager/multi-source/replay-discarded",
++                    test_replay_discarded);
++
++    return g_test_run();
++}
+diff --git a/tests/unit/meson.build b/tests/unit/meson.build
+index bd580290601..e1f8061e98c 100644
+--- a/tests/unit/meson.build
++++ b/tests/unit/meson.build
+@@ -136,7 +136,13 @@ if have_system
+     'test-bufferiszero': [],
+     'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c'],
+     'test-vmstate': [migration, io],
+-    'test-yank': ['socket-helpers.c', qom, io, chardev]
++    'test-yank': ['socket-helpers.c', qom, io, chardev],
++    'test-ram-discard-manager': [
++      'test-ram-discard-manager.c',
++      'test-ram-discard-manager-stubs.c',
++      meson.project_source_root() / 'system/ram-discard-manager.c',
++      genh, qemuutil, qom
++    ],
+   }
+   if config_host_data.get('CONFIG_INOTIFY1')
+     tests += {'test-util-filemonitor': []}
 -- 
 2.52.0
 
