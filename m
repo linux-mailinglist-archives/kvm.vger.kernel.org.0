@@ -1,102 +1,102 @@
-Return-Path: <kvm+bounces-70183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70184-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJisMhUng2kxigMAu9opvQ
-	(envelope-from <kvm+bounces-70183-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:01:41 +0100
+	id EGjkLyQng2kxigMAu9opvQ
+	(envelope-from <kvm+bounces-70184-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:01:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841D4E4D98
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:01:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35101E4DAE
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 12:01:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4DDAA3016287
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 11:01:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66585300ECB9
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 11:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E85F3E8C72;
-	Wed,  4 Feb 2026 11:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B7C3E8C71;
+	Wed,  4 Feb 2026 11:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ezr1xAi/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rPXzgyPL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmE2xBW4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVEQikAc"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5422B3D9049
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 11:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1463A3D9049
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 11:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770202891; cv=none; b=fGVJ0vVSzkwruYjreRrNczDrbS1aLE6ykSkM4SoAMudPBMeeJMbvxLToFhNuesV9fDoAtPYS6fYQY5pFgBbDGs3OlWkhcETXF4Jo3nkYEBk8jtwPyf1RXdebtUvbqYMonV1p+Wy+awnCtvQ6o0JlLM//9P+cqNvCzYlHtYWuooo=
+	t=1770202909; cv=none; b=KFUdwx2KC7+/RTfeTnZos8HHDDyuxeME7yz2Ks55y/uJKTDU1IVltmXVwbr7gwbwChSZ4TwSdSZummcE6gfzzNDXrEGKgB/6UOcSTiy5EJmPRLFlOcxBpt3LsNB5o6xqVjVusjT/OuWRRihNTcticeW5Rh2o5l6LPFnjTrP/aFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770202891; c=relaxed/simple;
-	bh=Gl3yzWLtY6a5wD1HkcBMM7Cf1CcO6DGRYdCtMkY4mJ4=;
+	s=arc-20240116; t=1770202909; c=relaxed/simple;
+	bh=Y1Uhj6JfcZxJlkorun2eWU9tfGcUMtrPdLiELMWBn5s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mY/2QRo13Jite/0hn/Ao+TQKyMw787T4WwaVsTsybBwin+3ok+bbO1Y3WT6L9V1jvp/csIaVGHXntevlY/baLpRo7OmmgN/toqtEiokkwnG9Hl714Jt0Whyf0axmlztS4caWzef71T5QeBXaE/a8UuNPPCUa74LEsOnNzFWW9w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ezr1xAi/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rPXzgyPL; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=WwcsGVEdriMTxIBmnosm0tiShwVcjIqtMuXzylLfxU45I9CvOtHqYWs7quZMQwhYPZcGnKOnQ/Iy0dtaSJI5jF/YH3l9LQXVTYAKd82I9fq5rZDrtUmawVCg2NdHA3wGRMXmZHL1atpwpRHLqnWN6Ak/vJ1waQWe1r+xRm732So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bmE2xBW4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JVEQikAc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770202890;
+	s=mimecast20190719; t=1770202908;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iX9CLo1079q9GFBbcum8ANwzEzOFk8ylauhc6MGrexs=;
-	b=Ezr1xAi/GZGChS5YWPiZfmt+WaylCxdw9+RMED/ZI3/YCvz3TKi3l+xDJyJEoaRezILQE1
-	KCAGxQr+ebnb2qG2FCnGSgQLvPylLf+euEVfvJZTLhouxrBDi+hL8E64mL78usrJXcyKXm
-	lUEr4pLlmMVislxYtqn+aZVg2UJ7zzI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ytqoyVsoCtzdTkkmGSJsy6xixwptxcvSJRO6L1WAx8A=;
+	b=bmE2xBW4v8JTpAObB+wralXPOE3Lr61PwV84n2yiRPLA34LIDlijVcziTS3wry4kDl1nYl
+	zg+JHRoEB2FpDnvPqBz2irQvpK5I0ILOe1/HNsrBsCoufwKZI0hjfdvvG+RjuxgLXUp0a2
+	4XfJUsKcteLNAxrHvfC7fyz2ZjMN/KU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-D4JDv3ZKN-eq9RvRVQDFLg-1; Wed, 04 Feb 2026 06:01:29 -0500
-X-MC-Unique: D4JDv3ZKN-eq9RvRVQDFLg-1
-X-Mimecast-MFC-AGG-ID: D4JDv3ZKN-eq9RvRVQDFLg_1770202888
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47ee056e5cfso59691635e9.1
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 03:01:28 -0800 (PST)
+ us-mta-685-Benvhdj9P-2ta9aJP6kYOg-1; Wed, 04 Feb 2026 06:01:47 -0500
+X-MC-Unique: Benvhdj9P-2ta9aJP6kYOg-1
+X-Mimecast-MFC-AGG-ID: Benvhdj9P-2ta9aJP6kYOg_1770202906
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-4325cc15176so4651047f8f.1
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 03:01:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770202888; x=1770807688; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1770202906; x=1770807706; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iX9CLo1079q9GFBbcum8ANwzEzOFk8ylauhc6MGrexs=;
-        b=rPXzgyPLbuTqsulDCEtrDggIMObVego20jocB8e+vAppIsT6xKruZjzVQ4GZgzXrrC
-         +zN3/OJhugclRIPuMJGAwyho9ecUnB8u+lH3ps7jS6CYJZfFLQ0LJMh5EApm721LHzy7
-         l6psyuCCWMcGzTFvtPbOJLBDNqjXm00hCKTV2ZvnGPF7JfBazJKakz4bu3uJeDwIqcYQ
-         qCKqJ5458hsgY7h+3bgiLlDrrLCLhwKd0Gxs/PLDRSBJvUARrfAjPalk2TWKXzC5yqEX
-         BBzBUnK1oOIQs4pPu4IP8fb0Q9FVE5H2D255ZCSvzEbS+A9XJaje98HI66eXFb5k981N
-         Q/YA==
+        bh=ytqoyVsoCtzdTkkmGSJsy6xixwptxcvSJRO6L1WAx8A=;
+        b=JVEQikAcSUjkWj9b2P+Sy/TJXKyJmNXIO7y15yeS3vpNyKhOwLKBkc1nLQ4Hsk13HS
+         McsQ/dB9Ipt0JFq+iNCrhN/uhhPZYgmFVm8X/71ZfXy2LcN8CvL+VfSCaA6CEyDPeQy8
+         RsP7e9vqEUhBsFwb9AlQ7YQnwyrbAvQ22AOOozCnYTuYb5usMAbuU9hNAIe4PqX0gK2L
+         kUHX7AY8xIAYaYouAzkK3wuQnaRXNY6E7k/+N/v+4K/DeX72PIOg2jX+JblIt+v4a/U6
+         d/CKXVZ1M690O3vehEdI2zWclt8vf8J3qbB+r6Mug3i1HbVnQEZuhejEqMqQheZx3RRI
+         +CEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770202888; x=1770807688;
+        d=1e100.net; s=20230601; t=1770202906; x=1770807706;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iX9CLo1079q9GFBbcum8ANwzEzOFk8ylauhc6MGrexs=;
-        b=lkfrNV4J5sIKy6kJn4A+ww05GRjnpw8bcueZxiJyNNAFvT5GoL+OLhApq5tO3QRSav
-         IIt6WRht0sg27aHYhUebWBZx0DWl2JADeduE3O6mpF/wcuKdW+TVFVZ3uxLiUbXuR+s3
-         k5Qku1CpSanr3ENs5lcPuG//+G/rSzYonyT8tckMAjBVJrsdhUQ1eB+UaTYdyfJqG3tJ
-         /XERtDQW4JbE+kwP4QiXZMEEv/pFh89jj3GTmkSIlN3xbgKqEQRNskL/fUkh9rBcCPFf
-         gEgwpBuDsS9NQ30QnJH3syeUF3Ey0cVRi+ZyZ0iCDkEjmewxYR/gV1MIUqsQtEK2KwIH
-         XORQ==
-X-Gm-Message-State: AOJu0YwhkPttUueK3j3iG1mh2A+2GIYsi1U9TKrwE/8JpmjE8iM4zGGS
-	GSvdCppfwQfEP6fGqjE3mKNcbAVD6K8CBrSJ8UeWYO55M4SY5C5SA94+C8S7Wqd827UOip7mdEA
-	HV3RjJYRLSTZc+96Sq+oWD/W/ZO5r8mztpS6vGFtKz3zxPZk4C7gwvA==
-X-Gm-Gg: AZuq6aLENmS+F871Zz16GxrqWP2bKCO/wdcERAsLVUDqTlJ/JHY+uuIl5ARynM+EEXN
-	02EHttihqOn+zreuvT10HmFGcdrT67KDLeCjffDzK5Ct6fiDZm1jOrNSchTREwBaLr2X/KOgOPZ
-	/9HRHyDUpmZRaPTpZ3Ojy0/pIDG5wRA4/3ujSKG+kRSQNudfkrWMXL+sUA6b141Vpj0JU1ocY/5
-	fG0MzsErpuQfCBD7ZLkhQCWovcBIDRjRVnAsao2D5lXjB5Alfj53PrwBaVcVI2Vfx6ZW4sLZbcn
-	eoGw2Q2pxDuEs6WNwq9qfYJU9Ge/EJAbaZL3f+wAwC43C3SzZ3NKgDOYwSIMXk/MM78JVcvQJoQ
-	8QwZmHzdf+oaiH2Mm1IAbC3eDid2/2vGqcHyPdVyOg7NDdNp3
-X-Received: by 2002:a05:600c:5309:b0:480:4b59:9327 with SMTP id 5b1f17b1804b1-4830e93eb11mr32228415e9.1.1770202887801;
-        Wed, 04 Feb 2026 03:01:27 -0800 (PST)
-X-Received: by 2002:a05:600c:5309:b0:480:4b59:9327 with SMTP id 5b1f17b1804b1-4830e93eb11mr32227875e9.1.1770202887315;
-        Wed, 04 Feb 2026 03:01:27 -0800 (PST)
+        bh=ytqoyVsoCtzdTkkmGSJsy6xixwptxcvSJRO6L1WAx8A=;
+        b=A1cyV3YHIdDpYKkLBybb+eGHlN/GmE7R8j0PivjY5m4LWkPwEUEK/8SMBTEMqnLsa/
+         xZ3ov8vAUPNCcBPlTsEnED/yTIHnV4vUiim415RGtCT8KCXxTj4ujtdBOYFrTkai36MD
+         0KXnvNyi/WkrInmU8Fk+BnlcSK3t+f/ynlBGBtkLE/qRHiA9DgS+Gs8wyqn4YF8pwAgO
+         +/SM80IavII9D9lWxBFKFdLhJ3Q0gI1zetqzHuxwi3CZDS7+Qx3QG3WabKdvJ/Fg2mc1
+         ux8b+ahJhoceNXovCCa8lDXlu4fEBzZEkvezFXJxP967V3bPkfvUaeMqJDaIxUuJ1TwJ
+         t90g==
+X-Gm-Message-State: AOJu0YzZ+wlNjqbfR6TzwZMMpo4ANLgrqsfrtmzvnjwaxYgtgTj/M4GJ
+	pEXJ9DPmkDFb4oUqwGb1mOGtWLeqq08uqWFj6A9Sg65+vnHlTplcbSwv4MMyuueS70sud5o/ru2
+	QItW0TXJIePngXurqkBGGysqTPMfG/aF1PseTKqSMDm4IjEQeFmu5kA==
+X-Gm-Gg: AZuq6aIq/EQjFin6l70vODaiYSi6RG1vmsjEZJ24jo9NcaNSLqSe+EY8LPT2XkPF6iB
+	Kk4YB4Oa1ZF9UJxY4gMI4PMiBvklRb5JGgKwbaATb0v1WSeI4gZ18pv/ewMhRQ+T/Wuts/RzTj1
+	Iituq6c3svKHH0vdo0YYMSKAJc0IcyHL52STQSwZn32xMVH1V7OuHQN+YbORHkxuM5nDqDUyhMm
+	tJ5+i4/wLgiTMxXzynXPBt7JvIo3tMuhYQ+wxiW+KNiL3DbirJevpAAOnEkFvWHC49HcXUWNrP3
+	9G0kEAqHwXxV8i+31tmGzIH7kOy4eCERpWeB41ljiJ/D5uGt53jKcpD4LwlX4FS/v+fBIP7ll0E
+	7elPBJXJYhxEqOxwRHlEYBMLk3CBxpzQcSgf7O2XL0CJZsC79
+X-Received: by 2002:a05:600c:5491:b0:480:46c6:bf4b with SMTP id 5b1f17b1804b1-4830e92a73bmr31086745e9.5.1770202905741;
+        Wed, 04 Feb 2026 03:01:45 -0800 (PST)
+X-Received: by 2002:a05:600c:5491:b0:480:46c6:bf4b with SMTP id 5b1f17b1804b1-4830e92a73bmr31082085e9.5.1770202900541;
+        Wed, 04 Feb 2026 03:01:40 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4830ec42833sm28680595e9.1.2026.02.04.03.01.26
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617e250b2sm5936053f8f.8.2026.02.04.03.01.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Feb 2026 03:01:26 -0800 (PST)
-Message-ID: <f357d187-70df-4482-b224-47006f0cefec@redhat.com>
-Date: Wed, 4 Feb 2026 12:01:26 +0100
+        Wed, 04 Feb 2026 03:01:39 -0800 (PST)
+Message-ID: <bd8d630b-f3e9-49a7-b94a-24707a66d755@redhat.com>
+Date: Wed, 4 Feb 2026 12:01:38 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -104,7 +104,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/10] virtio-mem: use warn_report_err_once()
+Subject: Re: [PATCH 04/10] system/memory: minor doc fix
 To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, Alex Williamson <alex@shazbot.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Ben Chaney <bchaney@akamai.com>,
@@ -113,7 +113,7 @@ Cc: kvm@vger.kernel.org, Alex Williamson <alex@shazbot.org>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  Mark Kanda <mark.kanda@oracle.com>
 References: <20260204100708.724800-1-marcandre.lureau@redhat.com>
- <20260204100708.724800-4-marcandre.lureau@redhat.com>
+ <20260204100708.724800-5-marcandre.lureau@redhat.com>
 Content-Language: en-US, fr
 From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
 Autocrypt: addr=clg@redhat.com; keydata=
@@ -159,21 +159,21 @@ Autocrypt: addr=clg@redhat.com; keydata=
  HQoPn9qrDJgsgcbBVc1gkUT6hnxShKPp4PlsZVMNjvPAnr5TEBgHkk54HQRhhwcYv1T2QumQ
  izDiU6iOrUzBThaMhZO3i927SG2DwWDVzZltKrCMD1aMPvb3NU8FOYRhNmIFR3fcalYr+9gD
  uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20260204100708.724800-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20260204100708.724800-5-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-70183-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70184-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
@@ -183,47 +183,36 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[clg@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 841D4E4D98
+X-Rspamd-Queue-Id: 35101E4DAE
 X-Rspamd-Action: no action
 
-On 2/4/26 11:06, marcandre.lureau@redhat.com wrote:
+On 2/4/26 11:07, marcandre.lureau@redhat.com wrote:
 > From: Marc-André Lureau <marcandre.lureau@redhat.com>
 > 
 > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
->   hw/virtio/virtio-mem.c | 13 +------------
->   1 file changed, 1 insertion(+), 12 deletions(-)
+>   include/system/memory.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-> index 251d1d50aaa..a4b71974a1c 100644
-> --- a/hw/virtio/virtio-mem.c
-> +++ b/hw/virtio/virtio-mem.c
-> @@ -594,18 +594,7 @@ static int virtio_mem_set_block_state(VirtIOMEM *vmem, uint64_t start_gpa,
->           Error *local_err = NULL;
->   
->           if (!qemu_prealloc_mem(fd, area, size, 1, NULL, false, &local_err)) {
-> -            static bool warned;
-> -
-> -            /*
-> -             * Warn only once, we don't want to fill the log with these
-> -             * warnings.
-> -             */
-> -            if (!warned) {
-> -                warn_report_err(local_err);
-> -                warned = true;
-> -            } else {
-> -                error_free(local_err);
-> -            }
-> +            warn_report_err_once(local_err);
->               ret = -EBUSY;
->           }
->       }
+> diff --git a/include/system/memory.h b/include/system/memory.h
+> index be36fd93dc0..a64b2826489 100644
+> --- a/include/system/memory.h
+> +++ b/include/system/memory.h
+> @@ -574,7 +574,7 @@ struct RamDiscardListener {
+>        * new population (e.g., unmap).
+>        *
+>        * @rdl: the #RamDiscardListener getting notified
+> -     * @section: the #MemoryRegionSection to get populated. The section
+> +     * @section: the #MemoryRegionSection to get discarded. The section
+>        *           is aligned within the memory region to the minimum granularity
+>        *           unless it would exceed the registered section.
+>        */
 
 
 Reviewed-by: Cédric Le Goater <clg@redhat.com
