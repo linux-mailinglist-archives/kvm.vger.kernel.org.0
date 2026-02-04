@@ -1,502 +1,170 @@
-Return-Path: <kvm+bounces-70241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70242-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAS6IQBqg2kbmgMAu9opvQ
-	(envelope-from <kvm+bounces-70241-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:47:12 +0100
+	id GJrvNY5sg2l+mgMAu9opvQ
+	(envelope-from <kvm+bounces-70242-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:58:06 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B479FE95D8
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:47:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF38BE9AD6
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 16:58:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 33DF5302B52D
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 15:44:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 314FD302AF22
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 15:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8857A421883;
-	Wed,  4 Feb 2026 15:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220B2423145;
+	Wed,  4 Feb 2026 15:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="W8/hwzDg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxHqbDL3"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6064641B376;
-	Wed,  4 Feb 2026 15:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435C919E96D;
+	Wed,  4 Feb 2026 15:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770219851; cv=none; b=Zy7SefaoXghPO2vWzZpZmkprw8NIoxF3u9IfQNssUNtsuSnzsiv6BVSM3flVXKkWJytCtTK3sfhVh6pyS4/KkhGIysuJa1C1X3WdyB/KWTXiY3qeolqBNqvqhMHwl6ZcGBo8o0eF8jSbMQLD5zQGkuhuDzTOa2ITVxq5w6sqggY=
+	t=1770220473; cv=none; b=IUmcimpO34Iu2zxvCUbRDUET14Nx7dLx5lJJ7R3z0Ncwx1/PZlnZ2UYeg+TBfeMjHsRPILzdvB2Ro6X9T8eF89nHsacnwCr2oeQ+rNuUsDzauYX+5HNJXywpM8gzb3PEDtCXA9cP6xMzTxSM9zRarU+yv1q3BxBYAkgFomQiOQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770219851; c=relaxed/simple;
-	bh=QFJJ/hFAwQEyMpBpvsYONAvyhaqnNiQuFp9cU6UIGNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KvRqc1s4oc+ZW7I5BRVsawJrkTHQcA03RgzNeOMeXjevn8PPSVMvGxAcGSrgQa6BaPyEQ06C9UshKkSe2TsTJMVG6t6gzjLzEGM7NOqCl9pVMoEsbwfb4Ck89a2rTufTcLYHpgIjEdPawMGBv2jQdXQlx0Ej6L2Bs7rg/S5wmlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=W8/hwzDg; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [192.168.178.121] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 614Fhu3A009104
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 4 Feb 2026 16:43:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1770219839;
-	bh=QFJJ/hFAwQEyMpBpvsYONAvyhaqnNiQuFp9cU6UIGNo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=W8/hwzDg2E0yzKVD4qgJZfxzRT7HU3BqrWW56vrP/6cNWwAoj903ZSeK+fyi2vVbl
-	 lOR7EEFrspj7cx5/57og39Bd5RkXiqSyuCMalqgkg312pUDhfG+ubroN1Y76f5BMGv
-	 Nq7gnjzG3Dga0rk4h5RThzj8yGvO6N/6z6AAyCD8=
-Message-ID: <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
-Date: Wed, 4 Feb 2026 16:43:56 +0100
+	s=arc-20240116; t=1770220473; c=relaxed/simple;
+	bh=x3icpBvvX8hE/1nJfe0UBQcFgbUp9cP9zJMm3/3XEaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tD5eMW4IugzLvsFbY3HZhSUjhQ2853A97AbC9EdDnGEmnQb808isf1aP2k9MS8caThwMR/o/LQliFIp0nLzJwGtOEowCA3LfSz4jhdwcz9VJIv9Duwc4bw+GIGFMii93tjRU5MOuLHbxVr2dDxB4FJaJVKETeHjSycHNpyOf5u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxHqbDL3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D388C4CEF7;
+	Wed,  4 Feb 2026 15:54:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770220472;
+	bh=x3icpBvvX8hE/1nJfe0UBQcFgbUp9cP9zJMm3/3XEaY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KxHqbDL3n7bdE9UzsRk7XQac2TSqjA0spynqxf4kNsCT2S2xc4AJmT2jRbThrk/lj
+	 zqM8Y7P0LKKrOuokzq9D5RsQtuvhu35s5XQQkaAHUFs5q+CQcSmyT3ut4GWK+o5OPI
+	 14SAJHJapBuGFmX7oxUDsIvhZsyGyB0YjlBiOxf6rN98kFtP+S2n4rZWYrcUgLJhmD
+	 9NcQ68nt9u8ix1446F6Kxs5wH71sz+4B5rPxsLE9qGk7hd7PqDsnHXpUVk9htPicfP
+	 k2sqg8t4K+A8/NwJxyjtV+bc2Hucut1sgNP+GAgmZKl6q9A/sBoW/w3snteMjK3fK6
+	 y1v60E3s628dQ==
+Date: Wed, 4 Feb 2026 17:54:29 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Maxime Ripard <mripard@kernel.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 0/8] dma-buf: Use revoke mechanism to invalidate
+ shared buffers
+Message-ID: <20260204155429.GJ6771@unreal>
+References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
+ <20260202160425.GO34749@unreal>
+ <20260204081630.GA6771@unreal>
+ <20260204-icy-classic-crayfish-68da6d@houat>
+ <20260204115212.GG6771@unreal>
+ <20260204-clever-butterfly-of-mastery-0cdc19@houat>
+ <20260204121354.GH6771@unreal>
+ <20260204-bloodhound-of-major-realization-9852ab@houat>
+ <20260204135657.GE2328995@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <CACGkMEuSiEcyaeFeZd0=RgNpviJgNvUDq_ctjeMLT5jZTgRkwQ@mail.gmail.com>
- <1e30464c-99ae-441e-bb46-6d0485d494dc@tu-dortmund.de>
- <CACGkMEtzD3ORJuJcc8VeqwASiGeVFdQmJowsK6PYVEF_Zkcn8Q@mail.gmail.com>
- <afa40345-acbe-42b0-81d1-0a838343792d@tu-dortmund.de>
- <CACGkMEtxRoavBMTXom8Z=FM-pvu3pHbsuwCs+e450b1B=V7iWA@mail.gmail.com>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
- <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
- <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
- <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
- <CACGkMEsVMz+vS3KxykYBGXvyt3MZcstnYWUiYJZhLSMoHC5Smw@mail.gmail.com>
- <ba17ba38-9f61-4a10-b375-d0da805e6b73@tu-dortmund.de>
- <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
- <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
- <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260204135657.GE2328995@ziepe.ca>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70241-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70242-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[kernel.org,amd.com,linaro.org,gmail.com,ffwll.ch,redhat.com,collabora.com,chromium.org,linux.intel.com,suse.de,intel.com,8bytes.org,arm.com,shazbot.org,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[34];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.0.0:email];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm,netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tu-dortmund.de:email,tu-dortmund.de:dkim,tu-dortmund.de:mid,pktgen_sample02_multiqueue.sh:url,pktgen_sample01_simple.sh:url]
-X-Rspamd-Queue-Id: B479FE95D8
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EF38BE9AD6
 X-Rspamd-Action: no action
 
-On 2/3/26 04:48, Jason Wang wrote:
-> On Mon, Feb 2, 2026 at 4:19 AM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 1/30/26 02:51, Jason Wang wrote:
->>> On Thu, Jan 29, 2026 at 5:25 PM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> On 1/29/26 02:14, Jason Wang wrote:
->>>>> On Wed, Jan 28, 2026 at 3:54 PM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> On 1/28/26 08:03, Jason Wang wrote:
->>>>>>> On Wed, Jan 28, 2026 at 12:48 AM Simon Schippers
->>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>
->>>>>>>> On 1/23/26 10:54, Simon Schippers wrote:
->>>>>>>>> On 1/23/26 04:05, Jason Wang wrote:
->>>>>>>>>> On Thu, Jan 22, 2026 at 1:35 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>>>>>>>
->>>>>>>>>>> On Wed, Jan 21, 2026 at 5:33 PM Simon Schippers
->>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>
->>>>>>>>>>>> On 1/9/26 07:02, Jason Wang wrote:
->>>>>>>>>>>>> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
->>>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> On 1/8/26 04:38, Jason Wang wrote:
->>>>>>>>>>>>>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
->>>>>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
->>>>>>>>>>>>>>>> and wake the corresponding netdev subqueue when consuming an entry frees
->>>>>>>>>>>>>>>> space in the underlying ptr_ring.
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
->>>>>>>>>>>>>>>> in an upcoming commit.
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>>>>>>>>>> ---
->>>>>>>>>>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
->>>>>>>>>>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
->>>>>>>>>>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->>>>>>>>>>>>>>>> index 1197f245e873..2442cf7ac385 100644
->>>>>>>>>>>>>>>> --- a/drivers/net/tap.c
->>>>>>>>>>>>>>>> +++ b/drivers/net/tap.c
->>>>>>>>>>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
->>>>>>>>>>>>>>>>         return ret ? ret : total;
->>>>>>>>>>>>>>>>  }
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
->>>>>>>>>>>>>>>> +{
->>>>>>>>>>>>>>>> +       struct ptr_ring *ring = &q->ring;
->>>>>>>>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>>>>>>>> +       void *ptr;
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>>>>>>>> +               dev = rcu_dereference(q->tap)->dev;
->>>>>>>>>>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
->>>>>>>>>>>>>>>> +               rcu_read_unlock();
->>>>>>>>>>>>>>>> +       }
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> +       spin_unlock(&ring->consumer_lock);
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> +       return ptr;
->>>>>>>>>>>>>>>> +}
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>>>>>>>                            struct iov_iter *to,
->>>>>>>>>>>>>>>>                            int noblock, struct sk_buff *skb)
->>>>>>>>>>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>>>>>>>                                         TASK_INTERRUPTIBLE);
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>                 /* Read frames from the queue */
->>>>>>>>>>>>>>>> -               skb = ptr_ring_consume(&q->ring);
->>>>>>>>>>>>>>>> +               skb = tap_ring_consume(q);
->>>>>>>>>>>>>>>>                 if (skb)
->>>>>>>>>>>>>>>>                         break;
->>>>>>>>>>>>>>>>                 if (noblock) {
->>>>>>>>>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>>>>>>>>>>>>> index 8192740357a0..7148f9a844a4 100644
->>>>>>>>>>>>>>>> --- a/drivers/net/tun.c
->>>>>>>>>>>>>>>> +++ b/drivers/net/tun.c
->>>>>>>>>>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>>>>>>>>>>>>>         return total;
->>>>>>>>>>>>>>>>  }
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
->>>>>>>>>>>>>>>> +{
->>>>>>>>>>>>>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
->>>>>>>>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>>>>>>>> +       void *ptr;
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> I guess it's the "bug" I mentioned in the previous patch that leads to
->>>>>>>>>>>>>>> the check of __ptr_ring_consume_created_space() here. If it's true,
->>>>>>>>>>>>>>> another call to tweak the current API.
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>>>>>>>> +               dev = rcu_dereference(tfile->tun)->dev;
->>>>>>>>>>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
->>>>>>>>>>>>>>> I'm not sure is what we want.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> What else would you suggest calling to wake the queue?
->>>>>>>>>>>>>
->>>>>>>>>>>>> I don't have a good method in my mind, just want to point out its implications.
->>>>>>>>>>>>
->>>>>>>>>>>> I have to admit I'm a bit stuck at this point, particularly with this
->>>>>>>>>>>> aspect.
->>>>>>>>>>>>
->>>>>>>>>>>> What is the correct way to pass the producer CPU ID to the consumer?
->>>>>>>>>>>> Would it make sense to store smp_processor_id() in the tfile inside
->>>>>>>>>>>> tun_net_xmit(), or should it instead be stored in the skb (similar to the
->>>>>>>>>>>> XDP bit)? In the latter case, my concern is that this information may
->>>>>>>>>>>> already be significantly outdated by the time it is used.
->>>>>>>>>>>>
->>>>>>>>>>>> Based on that, my idea would be for the consumer to wake the producer by
->>>>>>>>>>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
->>>>>>>>>>>> smp_call_function_single().
->>>>>>>>>>>> Is this a reasonable approach?
->>>>>>>>>>>
->>>>>>>>>>> I'm not sure but it would introduce costs like IPI.
->>>>>>>>>>>
->>>>>>>>>>>>
->>>>>>>>>>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
->>>>>>>>>>>> considered a deal-breaker for the patch set?
->>>>>>>>>>>
->>>>>>>>>>> It depends on whether or not it has effects on the performance.
->>>>>>>>>>> Especially when vhost is pinned.
->>>>>>>>>>
->>>>>>>>>> I meant we can benchmark to see the impact. For example, pin vhost to
->>>>>>>>>> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
->>>>>>>>>>
->>>>>>>>>> Thanks
->>>>>>>>>>
->>>>>>>>>
->>>>>>>>> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
->>>>>>>>> for both the stock and patched versions. The benchmarks were run with
->>>>>>>>> the full patch series applied, since testing only patches 1-3 would not
->>>>>>>>> be meaningful - the queue is never stopped in that case, so no
->>>>>>>>> TX_SOFTIRQ is triggered.
->>>>>>>>>
->>>>>>>>> Compared to the non-pinned CPU benchmarks in the cover letter,
->>>>>>>>> performance is lower for pktgen with a single thread but higher with
->>>>>>>>> four threads. The results show no regression for the patched version,
->>>>>>>>> with even slight performance improvements observed:
->>>>>>>>>
->>>>>>>>> +-------------------------+-----------+----------------+
->>>>>>>>> | pktgen benchmarks to    | Stock     | Patched with   |
->>>>>>>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>>>>>>>> | 100M packets            |           |                |
->>>>>>>>> | vhost pinned to core 0  |           |                |
->>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
->>>>>>>>> |  +        +-------------+-----------+----------------+
->>>>>>>>> | vhost-net | Lost        | 1154 Kpps | 0              |
->>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>>
->>>>>>>>> +-------------------------+-----------+----------------+
->>>>>>>>> | pktgen benchmarks to    | Stock     | Patched with   |
->>>>>>>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>>>>>>>> | 100M packets            |           |                |
->>>>>>>>> | vhost pinned to core 0  |           |                |
->>>>>>>>> | *4 threads*             |           |                |
->>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
->>>>>>>>> |  +        +-------------+-----------+----------------+
->>>>>>>>> | vhost-net | Lost        | 1527 Kpps | 0              |
->>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>
->>>>>>> The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
->>>>>>> the guest or an xdp program that did XDP_DROP in the guest.
->>>>>>
->>>>>> I forgot to mention that these PPS values are per thread.
->>>>>> So overall we have 71 Kpps * 4 = 284 Kpps and 79 Kpps * 4 = 326 Kpps,
->>>>>> respectively. For packet loss, that comes out to 1154 Kpps * 4 =
->>>>>> 4616 Kpps and 0, respectively.
->>>>>>
->>>>>> Sorry about that!
->>>>>>
->>>>>> The pktgen benchmarks with a single thread look fine, right?
->>>>>
->>>>> Still looks very low. E.g I just have a run of pktgen (using
->>>>> pktgen_sample03_burst_single_flow.sh) without a XDP_DROP in the guest,
->>>>> I can get 1Mpps.
->>>>
->>>> Keep in mind that I am using an older CPU (i5-6300HQ). For the
->>>> single-threaded tests I always used pktgen_sample01_simple.sh, and for
->>>> the multi-threaded tests I always used pktgen_sample02_multiqueue.sh.
->>>>
->>>> Using pktgen_sample03_burst_single_flow.sh as you did fails for me (even
->>>> though the same parameters work fine for sample01 and sample02):
->>>>
->>>> samples/pktgen/pktgen_sample03_burst_single_flow.sh -i tap0 -m
->>>> 52:54:00:12:34:56 -d 10.0.0.2 -n 100000000
->>>> /samples/pktgen/functions.sh: line 79: echo: write error: Operation not
->>>> supported
->>>> ERROR: Write error(1) occurred
->>>> cmd: "burst 32 > /proc/net/pktgen/tap0@0"
->>>>
->>>> ...and I do not know what I am doing wrong, even after looking at
->>>> Documentation/networking/pktgen.rst. Every burst size except 1 fails.
->>>> Any clues?
->>>
->>> Please use -b 0, and I'm Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz.
->>
->> I tried using "-b 0", and while it worked, there was no noticeable
->> performance improvement.
->>
->>>
->>> Another thing I can think of is to disable
->>>
->>> 1) mitigations in both guest and host
->>> 2) any kernel debug features in both host and guest
->>
->> I also rebuilt the kernel with everything disabled under
->> "Kernel hacking", but that didn’t make any difference either.
->>
->> Because of this, I ran "pktgen_sample01_simple.sh" and
->> "pktgen_sample02_multiqueue.sh" on my AMD Ryzen 5 5600X system. The
->> results were about 374 Kpps with TAP and 1192 Kpps with TAP+vhost_net,
->> with very similar performance between the stock and patched kernels.
->>
->> Personally, I think the low performance is to blame on the hardware.
+On Wed, Feb 04, 2026 at 09:56:57AM -0400, Jason Gunthorpe wrote:
+> On Wed, Feb 04, 2026 at 02:44:42PM +0100, Maxime Ripard wrote:
+> > > From what I have seen, subsystems such as netdev, the block layer, and RDMA continue
+> > > to accept code that is ready for merging, especially when it has been thoroughly
+> > > reviewed by multiple maintainers across different subsystems.
+> > 
+> > He said it multiple times, but here's one of such examples:
+> > 
+> > https://lore.kernel.org/all/CA+55aFwdd30eBsnMLB=ncExY0-P=eAsxkn_O6ir10JUyVSYdhA@mail.gmail.com/
 > 
-> Let's double confirm this by:
+> Woah, nobody is saying to skip linux-next. It is Wednesday, if it
+> lands in the public tree today it will be in linux next probably for a
+> week before a PR is sent. This is a fairly normal thing for many trees
+> in Linux.
 > 
-> 1) make sure pktgen is using 100% CPU
-> 2) Perf doesn't show anything strange for pktgen thread
+> Linus is specifically complaining about people *entirely* skipping
+> linux-next.
+
+Yes and yes.
+
 > 
-> Thanks
+> > So, yeah, we can make exceptions. But you should ask and justify for
+> > one, instead of expecting us to pick up a patch submission that was
+> > already late.
 > 
+> I think Leon is only pointing out that a hard cut off two weeks before
+> the merge window even opens is a DRMism, not a kernel wide convention.
 
-I ran pktgen using pktgen_sample01_simple.sh and, in parallel, started a
-100 second perf stat measurement covering all kpktgend threads.
+Correct. I would like to see it in linux-next as soon as possible, and to
+ensure I do not need to constantly rebase the patches because DRM changed
+something in the .move_notify() area.
 
-Across all configurations, a single CPU was fully utilized.
+BTW, the series is in my tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dmabuf-revoke-v7
+and is monitored by the kbuild bot, so this is not a random or untested
+submission.
 
-Apart from that, the patched variants show a higher branch frequency and
-a slightly increased number of context switches.
+Thanks
 
-
-The detailed results are provided below:
-
-Processor: Ryzen 5 5600X
-
-pktgen command:
-sudo perf stat samples/pktgen/pktgen_sample01_simple.sh -i tap0 -m
-52:54:00:12:34:56 -d 10.0.0.2 -n 10000000000
-
-perf stat command:
-sudo perf stat --timeout 100000 -p $(pgrep kpktgend | tr '\n' ,) -o X.txt
-
-
-Results:
-Stock TAP:
-            46.997      context-switches                 #    467,2 cs/sec  cs_per_second     
-                 0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
-                 0      page-faults                      #      0,0 faults/sec  page_faults_per_second
-        100.587,69 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
-     8.491.586.483      branch-misses                    #     10,9 %  branch_miss_rate         (50,24%)
-    77.734.761.406      branches                         #    772,8 M/sec  branch_frequency     (66,85%)
-   382.420.291.585      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
-   377.612.185.141      instructions                     #      1,0 instructions  insn_per_cycle  (66,85%)
-    84.012.185.936      stalled-cycles-frontend          #     0,22 frontend_cycles_idle        (66,35%)
-
-     100,100414494 seconds time elapsed
-
-
-Stock TAP+vhost-net:
-            47.087      context-switches                 #    468,1 cs/sec  cs_per_second     
-                 0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
-                 0      page-faults                      #      0,0 faults/sec  page_faults_per_second
-        100.594,09 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
-     8.034.703.613      branch-misses                    #     11,1 %  branch_miss_rate         (50,24%)
-    72.477.989.922      branches                         #    720,5 M/sec  branch_frequency     (66,86%)
-   382.218.276.832      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
-   349.555.577.281      instructions                     #      0,9 instructions  insn_per_cycle  (66,85%)
-    83.917.644.262      stalled-cycles-frontend          #     0,22 frontend_cycles_idle        (66,35%)
-
-     100,100520402 seconds time elapsed
-
-
-Patched TAP:
-            47.862      context-switches                 #    475,8 cs/sec  cs_per_second     
-                 0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
-                 0      page-faults                      #      0,0 faults/sec  page_faults_per_second
-        100.589,30 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
-     9.337.258.794      branch-misses                    #      9,4 %  branch_miss_rate         (50,19%)
-    99.518.421.676      branches                         #    989,4 M/sec  branch_frequency     (66,85%)
-   382.508.244.894      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
-   312.582.270.975      instructions                     #      0,8 instructions  insn_per_cycle  (66,85%)
-    76.338.503.984      stalled-cycles-frontend          #     0,20 frontend_cycles_idle        (66,39%)
-
-     100,101262454 seconds time elapsed
-
-
-Patched TAP+vhost-net:
-            47.892      context-switches                 #    476,1 cs/sec  cs_per_second     
-                 0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
-                 0      page-faults                      #      0,0 faults/sec  page_faults_per_second
-        100.581,95 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
-     9.083.588.313      branch-misses                    #     10,1 %  branch_miss_rate         (50,28%)
-    90.300.124.712      branches                         #    897,8 M/sec  branch_frequency     (66,85%)
-   382.374.510.376      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
-   340.089.181.199      instructions                     #      0,9 instructions  insn_per_cycle  (66,85%)
-    78.151.408.955      stalled-cycles-frontend          #     0,20 frontend_cycles_idle        (66,31%)
-
-     100,101212911 seconds time elapsed
-
->>
->> Thanks!
->>
->>>
->>> Thanks
->>>
->>>>
->>>> Thanks!
->>>>
->>>>>
->>>>>>
->>>>>> I'll still look into using an XDP program that does XDP_DROP in the
->>>>>> guest.
->>>>>>
->>>>>> Thanks!
->>>>>
->>>>> Thanks
->>>>>
->>>>>>
->>>>>>>
->>>>>>>>>
->>>>>>>>> +------------------------+-------------+----------------+
->>>>>>>>> | iperf3 TCP benchmarks  | Stock       | Patched with   |
->>>>>>>>> | to Debian VM 120s      |             | fq_codel qdisc |
->>>>>>>>> | vhost pinned to core 0 |             |                |
->>>>>>>>> +------------------------+-------------+----------------+
->>>>>>>>> | TAP                    | 22.0 Gbit/s | 22.0 Gbit/s    |
->>>>>>>>> |  +                     |             |                |
->>>>>>>>> | vhost-net              |             |                |
->>>>>>>>> +------------------------+-------------+----------------+
->>>>>>>>>
->>>>>>>>> +---------------------------+-------------+----------------+
->>>>>>>>> | iperf3 TCP benchmarks     | Stock       | Patched with   |
->>>>>>>>> | to Debian VM 120s         |             | fq_codel qdisc |
->>>>>>>>> | vhost pinned to core 0    |             |                |
->>>>>>>>> | *4 iperf3 client threads* |             |                |
->>>>>>>>> +---------------------------+-------------+----------------+
->>>>>>>>> | TAP                       | 21.4 Gbit/s | 21.5 Gbit/s    |
->>>>>>>>> |  +                        |             |                |
->>>>>>>>> | vhost-net                 |             |                |
->>>>>>>>> +---------------------------+-------------+----------------+
->>>>>>>>
->>>>>>>> What are your thoughts on this?
->>>>>>>>
->>>>>>>> Thanks!
->>>>>>>>
->>>>>>>>
->>>>>>>
->>>>>>> Thanks
->>>>>>>
->>>>>>
->>>>>
->>>>
->>>
->>
+> 
+> Jason
 > 
 
