@@ -1,100 +1,101 @@
-Return-Path: <kvm+bounces-70119-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70120-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEjtLLaOgmkMWQMAu9opvQ
-	(envelope-from <kvm+bounces-70119-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:34 +0100
+	id sOo/L2GPgmkMWQMAu9opvQ
+	(envelope-from <kvm+bounces-70120-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:14:25 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D530DFEE2
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:11:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EE7DFF3C
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 01:14:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4399330C5306
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1D00431601EA
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 00:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B202E33993;
-	Wed,  4 Feb 2026 00:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE5B405F7;
+	Wed,  4 Feb 2026 00:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fa0FlzXV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bUuWTXG0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892CE182D0
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485E42CCC5
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 00:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770163841; cv=none; b=a4seZ9Yvi4ZY5M62Jy6jPCiZMT+Frn4gZ6iDlI+EZk91JUS7tjvsWpZ5crEKviyHPbkbcfxu11Q/HTPIQz6dys+Yf0v/6ZP5a7+eHUY+jSeAUvF+XWKDaJvv04roBl9/9V9JeA6KJJXuGa/JAb2zZ1KNiU6Zm5hkAYhpmxJegzc=
+	t=1770163852; cv=none; b=TbEdFl3g7Js/idXEAHLXUVAfZzF/8KYLf1omiTN6i9pZhgM0LcNsiTkpzPXZpAANpAZjASiwM3YIFhoGQKxcc5flxW9PSqgjfGWeqOcLilreefYNqZSdZpq9zXxxFt0gBmq2xvd58oqyBRJMn+FwTKcfn94ykEIew3Pt0qu+tfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770163841; c=relaxed/simple;
-	bh=jZ3vlTcO/4ulnqY7jw5dZ3hjdbQMjCoVlfVlP4fF10M=;
+	s=arc-20240116; t=1770163852; c=relaxed/simple;
+	bh=Se2ckoESQqPLtHx+e4PmyFhyJyPJ4dCCN4JpBxoq26M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nTulwTcw+ChU2EKeFMXHkge7hOXGKOp86rlwwFDS+dBIcUPBpCAL5taJNj6BopEDs0u3vXLv2xOSem3cjbT0YqS7tW4tRvLhyIhT+J1YVGra5s8FHg53gqgURSuiB3qEkndW0klNotbi1mIEfmqXsVf2LaxT4Pd+PY/cfeqQ5es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fa0FlzXV; arc=none smtp.client-ip=209.85.161.74
+	 To:Cc:Content-Type; b=I2G9s/jVWf84ucm1Pvs2cw970gjvhPyAfjvCAurReVs2ciyrRTc/B9w9PP6Ub0Iu4cKf/aMwP7sPC7XQyV2CGaF/kg4DdLdRasYmQNfkGb1Svbdq3w9jeQi+nESbT0YifAQxA2A7AgqnErhhkPTVbGKMpRxLT2rFoWJ7kB4D398=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bUuWTXG0; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-66485ced4cdso18348743eaf.1
-        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 16:10:40 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a377e15716so165504475ad.3
+        for <kvm@vger.kernel.org>; Tue, 03 Feb 2026 16:10:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770163839; x=1770768639; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770163851; x=1770768651; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C8p8NbRPCPDmkixC3vF525swc1H8aTdK9eIWx03vtzI=;
-        b=fa0FlzXVRr/enafgCyiyX4UMj9XCyZF2U3aMYQfQa2IMpdX30RFqS4uvg4rzdz0vn8
-         +LqgkSliBeV/zaYCaXvYnuwma1qV7/rMhpj2iNV2h4pS1hhxkEfJ5Kt2ghNU+CHkVsLU
-         vmtf7X2I/icICQcaSR6FBEdckEgd9ZYPLhrlnVV5f4lQUEjGvasCnp0lXQ412NjyWTp2
-         CEeJ+NbKFIQqYVgKDuLPS+dVgalyLOb2VBhCV2hSzRZaqy+KzRr0AC89GKnCLqdceRAK
-         aZrCNbxAfaUzRZBANrgQOpytuWSIVPnjhf+2h7Jo5FuqpM7P5TzLFQ2+zoJjFaeW6Gzj
-         8QpQ==
+        bh=zFDaHdZKtlBHeVLyP8CNfbQVtd3Q3C4eMNNypYakq/Q=;
+        b=bUuWTXG0IhxhPoJZI4sQobVnNRMJHZvKDgTpAVOlIrIBE+jqpSjpwqx4tzDUPHqJhF
+         2ezGJWTJKDnxXeQVEyEZ3Qw7NZN0DYWXgYEHIJIfWjiOOLZIOaWBET/lVvlNP8xUDdWj
+         KZ0pWAKgCZ+Lx1BMVgCGEogB3eoy7694jOhgyDaEEx5AgpVyhJJdp2d93QSSLNsW1bhR
+         JbtiRZb1FFOHVYH6i9jnPqOw7h5hRuYuabbEHs2Nbx1MNvFCVlBRhrUrSk/K3RSuSTeq
+         LMQpJ91j/pYqt1dqP4xx3nfjELpL4gpWIf9K4C+cagXF3wU8Bgi4KTSzmOlWFbP8PT77
+         5p9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770163839; x=1770768639;
+        d=1e100.net; s=20230601; t=1770163851; x=1770768651;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C8p8NbRPCPDmkixC3vF525swc1H8aTdK9eIWx03vtzI=;
-        b=mXmfA1rFlIWzyGzcRu/8gTa8i5KsKRb7bhWWXI75+E6wWqJ+O3tBQOcE/eCA0HGUBq
-         50G6mcQeRxj5Gow8Fep30Ss0j9W4M3glO1ktvr4Xlfz6/lIzFENhlw1B1eP6xm6lNOg7
-         YTwWEW1917r9FGNNgwwqH+/uY4h7NQm7jw7CDNonSRF7/+zUNFIjbDhV19znyGPC9qPV
-         lEezDwKNn4g8mvTvd9RzMCtmJB5kf/qULXFTKWLzU0BaNJ28HknX2sGTLrm0a7pP/CB0
-         35I5xbovfUT5CgNSIYHBsILr61nSkrSH9ZwEIasRzZtyTUDBXJnJ5vG+uySbUeFcg4WX
-         NrrA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVBi369GvjJqqDssFUvvIkVXfU2gyaJ9cHGMi362xTNDsuv1iKHGwOh/h/3TeR7YG+n3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4gpHNZvYmgg3IssTdP+szs5NaUJMnp+A+Mdv+GBHO47SCAw7y
-	sKKeA7DtMTb0sHo5nJsrm0IDGr/LXCDo7tGdkfmn6partJWFKLA/S/kXxF+kitequ67cMIr8LRA
-	vZcLIBA==
-X-Received: from ileg11.prod.google.com ([2002:a05:6e02:1a2b:b0:447:81b5:ae2d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:4889:b0:663:859:c429
- with SMTP id 006d021491bc7-66a23334fb3mr580988eaf.59.1770163839458; Tue, 03
- Feb 2026 16:10:39 -0800 (PST)
-Date: Tue,  3 Feb 2026 16:10:19 -0800
-In-Reply-To: <20260123222801.646123-1-kovalev@altlinux.org>
+        bh=zFDaHdZKtlBHeVLyP8CNfbQVtd3Q3C4eMNNypYakq/Q=;
+        b=h9KviDZgTb35/c5hIz3GryugW99tI0GErCJGug29RagNn+2nNyWDNCeLz3601P69Ff
+         G7dVV7p+UcnYN/d1kkGbk7f3MLB5bhrEi1NS8ezH+/ND0nz1N2ofia3aIs7z/5aoROWp
+         fkZOiNveIMa63ogMA4Ab5wj/EekwyUSiPdMaayrl0EfzMhUlFeAK3jAkfDFza47MHKwE
+         iXmN5M7bIZZHWG4PSzmLVucmSLBgEfKaFjFHgH9B6Id52+wtDOEhdlbqRF7DgTemyV2e
+         vr8YWfE38jz7RolvYjL9W5OKGJB1u76UkQxacKyZlJxSi/AVJ0jNyIxNcKQeDFUJried
+         pnBg==
+X-Gm-Message-State: AOJu0YytF0Dd8ha8BhMVoDbbwaETRvrYmib8RZqQWtWE98gamCjTf8cE
+	ZIaP+WoZBNghxms/Y7fVGYQe63aBi4oqrbuVNs72YSi9rC8ysvwcMIcnArA6eAtpEzBZ7uzDeoX
+	ogyE3HQ==
+X-Received: from pgbda6.prod.google.com ([2002:a05:6a02:2386:b0:c61:87c1:531e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:938f:b0:389:7d32:c8a6
+ with SMTP id adf61e73a8af0-393721259f9mr1123362637.27.1770163850695; Tue, 03
+ Feb 2026 16:10:50 -0800 (PST)
+Date: Tue,  3 Feb 2026 16:10:21 -0800
+In-Reply-To: <20260128014310.3255561-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260123222801.646123-1-kovalev@altlinux.org>
+References: <20260128014310.3255561-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <177016337221.570259.7480661884479606401.b4-ty@google.com>
-Subject: Re: [PATCH v2] KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()
+Message-ID: <177016325730.569059.4869595783649901022.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/3] KVM: x86: CET vs. nVMX fix and hardening
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Vasiliy Kovalev <kovalev@altlinux.org>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	lvc-project@linuxtesting.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Mathias Krause <minipli@grsecurity.net>, John Allen <john.allen@amd.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70119-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70120-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -105,29 +106,37 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D530DFEE2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 29EE7DFF3C
 X-Rspamd-Action: no action
 
-On Sat, 24 Jan 2026 01:28:01 +0300, Vasiliy Kovalev wrote:
-> Add SRCU read-side protection when reading PDPTR registers in
-> __get_sregs2().
-> 
-> Reading PDPTRs may trigger access to guest memory:
-> kvm_pdptr_read() -> svm_cache_reg() -> load_pdptrs() ->
-> kvm_vcpu_read_guest_page() -> kvm_vcpu_gfn_to_memslot()
+On Tue, 27 Jan 2026 17:43:07 -0800, Sean Christopherson wrote:
+> Fix a bug where KVM will clear IBT and SHSTK bits after nested VMX MSRs
+> have been configured, e.g. if the kernel is built with CONFIG_X86_CET=y
+> but CONFIG_X86_KERNEL_IBT=n.  The late clearing results in kvm-intel.ko
+> refusing to load as the CPU compatible checks generate their VMCS configs
+> with IBT=n and SHSTK=n, ultimately causing a mismatch on the CET entry
+> and exit controls.
 > 
 > [...]
 
-Applied to kvm-x86 misc, thanks!
+This got a bit messy, as I want to get the immediate fix into 6.19 (hopefully
+I wasn't too late), and at that point there was no reason to shove the VMCS
+patch in with the kvm_cpu_caps hardening.
 
-[1/1] KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()
-      https://github.com/kvm-x86/linux/commit/95d848dc7e63
+Applied patch 1 to "fixes", patch 2 to "misc", and patch 3 to "vmx.
+
+[1/3] KVM: x86: Explicitly configure supported XSS from {svm,vmx}_set_cpu_caps()
+      https://github.com/kvm-x86/linux/commit/f8ade833b733
+[2/3] KVM: x86: Harden against unexpected adjustments to kvm_cpu_caps
+      https://github.com/kvm-x86/linux/commit/3f2757dbf32a
+[3/3] KVM: VMX: Print out "bad" offsets+value on VMCS config mismatch
+      https://github.com/kvm-x86/linux/commit/c0d6b8bbbced
 
 --
 https://github.com/kvm-x86/linux/tree/next
