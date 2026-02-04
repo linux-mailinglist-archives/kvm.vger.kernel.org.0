@@ -1,100 +1,98 @@
-Return-Path: <kvm+bounces-70250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70251-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGYnEu+Ag2nsogMAu9opvQ
-	(envelope-from <kvm+bounces-70250-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 18:25:03 +0100
+	id MP0MFiSCg2llowMAu9opvQ
+	(envelope-from <kvm+bounces-70251-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 18:30:12 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E08F0EAF94
-	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 18:25:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABF38EAFCE
+	for <lists+kvm@lfdr.de>; Wed, 04 Feb 2026 18:30:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 03D2130191B7
-	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 17:24:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 768AF302AC27
+	for <lists+kvm@lfdr.de>; Wed,  4 Feb 2026 17:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88E234A3DC;
-	Wed,  4 Feb 2026 17:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A3734A796;
+	Wed,  4 Feb 2026 17:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aXyttUVw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EeidUBGz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE2031B107
-	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 17:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09E134A3DA
+	for <kvm@vger.kernel.org>; Wed,  4 Feb 2026 17:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770225889; cv=none; b=SnaChZSstx6gZxTWyRDwQHtqsd+Q5t5GYvt7JryYlBjIfDEyJuUE2A16ozlRxzmAI16gP2CePrhGDz8c6Fc40i8RjiMGzU9imZ+d9+qVid1m5yIV90ULGTXDp/HfInQ45knCcWpvvwi9+C/8/DGKYYQm5MBezU4Sl8//LhXMOvk=
+	t=1770226178; cv=none; b=LrzMLWfEqlu++89wDmuIJZkqmnGOY1N5/8Xn2xFzs6fPSwK7cYfIWC6gfPs0CZItguRJhDtxPkMHHuA6HDDBeoFCfpLuxh8HPSqD7hQ35JCTb03y/In1B3laszP1hVui829FVWESccZsgSkQFZs3caTgkX5k2pnSDkdkgFaXLrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770225889; c=relaxed/simple;
-	bh=SNaM5eVChdUFa9hwhFxnLa1khBMv9YEYp00Fph58/eE=;
+	s=arc-20240116; t=1770226178; c=relaxed/simple;
+	bh=rwsHwVJiIFkUeP0DJGScgEvUx6R4nMQ15hWDNS//fC0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TwkgxXmg396/AayK+vCAaXd4HFrzyUTJUODguN1q5QVwZ6SSgUP25TLloe5I9IfNBQTlN6zLIuVX5T5/IvX0H7VMnFbS/VYFz4SeeXt+bKGN3rwH97Gxfv+8zItOg7+Boh/lkp5zh/pjIaRK437fy+NapaTMIOihODRYgNXr/Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aXyttUVw; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=ZU6Zvg5FYxelN8SqrKKynAY/RDHIuqJZJCf8SKgM8grrp36ePysMEX+D+LFT3ZAUJMR3jrIeq2VmSl6csSq7OWc8YcqC/CVL0UJnuRIEFh/uVIkhyqygdBijI/JKJF9r4RFanhUKY0qe5JzPeOwq0I6Qlh3wwmAHl1YTFgt/qlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EeidUBGz; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34abd303b4aso18330874a91.1
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 09:24:49 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29f1f69eec6so783765ad.1
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 09:29:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770225889; x=1770830689; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770226178; x=1770830978; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ryh/AczkED/nUvo8c2PeHyj7TeQyCkqwe+hFGMfApuI=;
-        b=aXyttUVw+KfV6g/jo221NE/L+C2KKmGEn7Y9Td5XF0kdWWBaZetP/E87UB1KSS/wRj
-         TB9z7fyhJCsFOXJLZ7ZGT6x+NKsc6Ecj1CR6EtOKO0HXoMMJ3s0o+TwiZapLtD4VCjFx
-         mPRAZNQ9S+uy7pvzuot3y6Ukj8r90GZ76M1l5GW3nR6l9mQvZZVbsvzLpPQBuvQjwF8A
-         0Y6h97D5wv5tSfIBiGdFaB6doVK8Sty1xfpymkCKvOMr08ukN3h38q/AYhdrCwn2u/JS
-         +4sy9sEOzRRLMbDGrDva++DR2VQ6e4C+bMVyB+VxRimrzdaP+gGenH1NGUi7jWXT0HyT
-         uzaw==
+        bh=j45uI0vV+THDY5Cnyxb9k9hfOJfjaw+RnlYXcIzaBoY=;
+        b=EeidUBGz37wI/1Vkow0qCy0wmcW1goYGezAXUgpOOs1w+yJiebdiPvknlArQFvuhVC
+         KbsxlZ7SCSnKpM6oRYoa6fO6tv/5oR1Xu29bYfOKZOXcpwHGKfvIFFNeKZ8sa5A23pkF
+         ArG2/BrtYTHmNJ0AZq2ak70XbnYqZx9Y7y/g5rzXPPhrbDnW7ZMi4hPg3p+kCRtlxtGD
+         QKMvgQ/wrRm9+SWTgFWpdIb1DHDK4cqJPxYtkS1i3qGS2TFliQaeaIcjpNlfAElnB045
+         u74/J0KHhaW4CSpbHH3P7FmbWiwNgkXw3Vk+LEjqppFwkvJ9ozvJr0HdFYoM+nNvLui6
+         6Y0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770225889; x=1770830689;
+        d=1e100.net; s=20230601; t=1770226178; x=1770830978;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ryh/AczkED/nUvo8c2PeHyj7TeQyCkqwe+hFGMfApuI=;
-        b=UtnOhcFutaCmMEw1Fh46P4FWn7CMXhf9JFpKXh7JX/5wLMrvXjWG1T9SRhSAWnbXeL
-         BTNJu5apG1WxaH6Ts4hmoTSPCHTSELM+HvLVILj6URachq5qUH4BhXxRJKzYTpVzxKwv
-         JNO8ZDtZ/8+oqiEaDo+tDASKDNaMqQlc4Jhl8M6WT5yRzNsMuhZcW6U7opgrLu+54c7O
-         AMpz5JUx+anSzy09gw5XhdLulg5hgVCEuCmlGI/qx5Ehp0Bvq1KNEz3xKje3awtBoPzM
-         aeLrx4tmvg1/c/91ZsOg0dC7ylb/bd/H3z9aKc1tB+oqeh2wqQvgzSO74rB5tymvm2/p
-         dnFQ==
-X-Gm-Message-State: AOJu0Yx4OYoPUomb/vVAFanGI9nXw2n1uJy8rJwcH2sGqWAtwU483lYz
-	6CeUvv/IDmi0P8LdJHqKbcn3knyRYBMFSrxzFs4HM+w9GBlZcy85Xr+Qoybj+xAtccZuYH1c7fI
-	XoWvyqg==
-X-Received: from pjbml9.prod.google.com ([2002:a17:90b:3609:b0:34c:e971:cfb1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d88c:b0:336:9dcf:ed14
- with SMTP id 98e67ed59e1d1-35487193865mr3359774a91.23.1770225889209; Wed, 04
- Feb 2026 09:24:49 -0800 (PST)
-Date: Wed, 4 Feb 2026 09:24:47 -0800
-In-Reply-To: <aYN7s_WTAp9Nr3U6@iyamahat-desk>
+        bh=j45uI0vV+THDY5Cnyxb9k9hfOJfjaw+RnlYXcIzaBoY=;
+        b=lN+yqcOQ46IZjFW3d/P4RNpk03vttvs1oJRL+iH6Icf7ft8O9O95YAtbwVypg1LHYz
+         vpW+m3+3bIw6vfb4BYaqRGXoxDZyQr9cQVoj9jPjJ7ZFPKxRS7kSw7Ja0LmUMk4jI2NB
+         D+SIN1dXCnnCSm1IeKYXmNgJM/fNCQ8dDZJ49iTHufqKJANe7xZKGCsVWdi+EP6I3Vcb
+         bYWaJLHYbUMrqheLwDPlEx+caYCydbTsN5wmF9YjRloUMAH3KCELdB2FdQjpu+a1NaZr
+         WRwI+wFuyiolKIJyuNsT+I+p/W4rm8PH7FP0gcA2hXqfpIEIJvKAERVUqIqW4isv08yI
+         0Tqw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSfG/ZhQoNQApdu8YqMccZPQefkAx9BXTWTCr3n7bikEOc+HpSOY998opi8rZpl5lc94c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziOLH8nSqNp8tanJjpodPqZPoGRnBgU2scziZfOHPoe9T/VFsF
+	hS9O03s09jlK2/9S/gd/8lsAOfglRvXdIqI6/7VMM+Z9nzot9eaqgdnJPb6oTjBaTR2tumpg5ns
+	ekPrpuQ==
+X-Received: from plbbd12.prod.google.com ([2002:a17:902:830c:b0:2a0:b327:1816])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d588:b0:2a2:d2e8:9f25
+ with SMTP id d9443c01a7336-2a933e5175dmr35240915ad.33.1770226177838; Wed, 04
+ Feb 2026 09:29:37 -0800 (PST)
+Date: Wed, 4 Feb 2026 09:29:36 -0800
+In-Reply-To: <20260112182022.771276-2-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1770116050.git.isaku.yamahata@intel.com>
- <aYNP5kuRwT33yU8Z@google.com> <aYN7s_WTAp9Nr3U6@iyamahat-desk>
-Message-ID: <aYOA303zHQY4CUf1@google.com>
-Subject: Re: [PATCH 00/32] KVM: VMX APIC timer virtualization support
+References: <20260112182022.771276-1-yosry.ahmed@linux.dev> <20260112182022.771276-2-yosry.ahmed@linux.dev>
+Message-ID: <aYOCAH8zLLXllou7@google.com>
+Subject: Re: [PATCH 1/3] KVM: nSVM: Use intuitive local variables in recalc_intercepts()
 From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	rick.p.edgecombe@intel.com
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,redhat.com,intel.com];
-	TAGGED_FROM(0.00)[bounces-70250-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70251-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -110,23 +108,108 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
-X-Rspamd-Queue-Id: E08F0EAF94
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: ABF38EAFCE
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026, Isaku Yamahata wrote:
-> On Wed, Feb 04, 2026 at 05:55:50AM -0800,
-> Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Jan 12, 2026, Yosry Ahmed wrote:
+> recalc_intercepts() currently uses c, h, g as local variables for the
+> control area of the current VMCB, vmcb01, and (cached) vmcb12.
 > 
-> > > [1] Intel Architecture Instruction Set Extensions and Future Features
-> > > September 2025 319433-059
-> > > Chapter 8 APIC-TIMER VIRTUALIZATION
-> > > https://cdrdv2.intel.com/v1/dl/getContent/671368
-> > 
-> > What CPU generation is expected to have APIC-timer virtualization?  DMR?
+> The current VMCB should always be vmcb02 when recalc_intercepts() is
+> executed in guest mode. Use vmcb01/vmcb02 local variables instead to
+> make it clear the function is updating intercepts in vmcb02 based on the
+> intercepts in vmcb01 and (cached) vmcb12.
 > 
-> CWF.
+> Add a WARNING() if the current VMCB is not in fact vmcb02.
 
-What P-core CPU generation?  No offence to the Forest family, but I don't think
-most people are chomping at the bit to get their hands on CWF :-)
+This belongs in a separate patch.
+
+> No functional change intended.
+> 
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/kvm/svm/nested.c | 31 +++++++++++++++----------------
+>  1 file changed, 15 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index f295a41ec659..2dda52221fd8 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -125,8 +125,7 @@ static bool nested_vmcb_needs_vls_intercept(struct vcpu_svm *svm)
+>  
+>  void recalc_intercepts(struct vcpu_svm *svm)
+>  {
+> -	struct vmcb_control_area *c, *h;
+> -	struct vmcb_ctrl_area_cached *g;
+> +	struct vmcb *vmcb01, *vmcb02;
+>  	unsigned int i;
+>  
+>  	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+> @@ -134,14 +133,14 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>  	if (!is_guest_mode(&svm->vcpu))
+>  		return;
+>  
+> -	c = &svm->vmcb->control;
+> -	h = &svm->vmcb01.ptr->control;
+> -	g = &svm->nested.ctl;
+> +	vmcb01 = svm->vmcb01.ptr;
+> +	vmcb02 = svm->nested.vmcb02.ptr;
+> +	WARN_ON_ONCE(svm->vmcb != vmcb02);
+
+If we're going to bother with a WARN, then this code should definitely bail,
+because configuring vmcb01 using the nested logic is all but guaranteed to break
+L1 in weird ways.
+
+>  	for (i = 0; i < MAX_INTERCEPT; i++)
+> -		c->intercepts[i] = h->intercepts[i];
+> +		vmcb02->control.intercepts[i] = vmcb01->control.intercepts[i];
+>  
+> -	if (g->int_ctl & V_INTR_MASKING_MASK) {
+> +	if (svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK) {
+
+I vote to keep a pointer to the cached control as vmcb12_ctrl.  Coming from a
+nVMX-focused background, I can never remember what svm->nested.ctl holds.  For
+me, this is waaaay more intuivite:
+
+	if (vmcb12_ctrl->int_ctl & V_INTR_MASKING_MASK) {
+
+>  	for (i = 0; i < MAX_INTERCEPT; i++)
+> -		c->intercepts[i] |= g->intercepts[i];
+> +		vmcb02->control.intercepts[i] |= svm->nested.ctl.intercepts[i];
+
+And even more so here:
+
+	for (i = 0; i < MAX_INTERCEPT; i++)
+		vmcb02->control.intercepts[i] |= vmcb12_ctrl->intercepts[i];
+
+>  
+>  	/* If SMI is not intercepted, ignore guest SMI intercept as well  */
+>  	if (!intercept_smi)
+> -		vmcb_clr_intercept(c, INTERCEPT_SMI);
+> +		vmcb_clr_intercept(&vmcb02->control, INTERCEPT_SMI);
+>  
+>  	if (nested_vmcb_needs_vls_intercept(svm)) {
+>  		/*
+> @@ -177,10 +176,10 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>  		 * we must intercept these instructions to correctly
+>  		 * emulate them in case L1 doesn't intercept them.
+>  		 */
+> -		vmcb_set_intercept(c, INTERCEPT_VMLOAD);
+> -		vmcb_set_intercept(c, INTERCEPT_VMSAVE);
+> +		vmcb_set_intercept(&vmcb02->control, INTERCEPT_VMLOAD);
+> +		vmcb_set_intercept(&vmcb02->control, INTERCEPT_VMSAVE);
+>  	} else {
+> -		WARN_ON(!(c->virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
+> +		WARN_ON(!(vmcb02->control.virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
+
+Opportunistically switch this to WARN_ON_ONCE.  Any "unguarded" WARN in KVM
+(outside of e.g. __init code) is just asking for a self-DoS.
+
+>  	}
+>  }
+>  
+> -- 
+> 2.52.0.457.g6b5491de43-goog
+> 
 
