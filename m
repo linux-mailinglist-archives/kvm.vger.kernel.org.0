@@ -1,73 +1,97 @@
-Return-Path: <kvm+bounces-70352-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70353-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +MYIJKbKhGk45QMAu9opvQ
-	(envelope-from <kvm+bounces-70352-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:51:50 +0100
+	id wIJmKb/MhGk45QMAu9opvQ
+	(envelope-from <kvm+bounces-70353-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 18:00:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3A7F581E
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:51:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18DB0F5996
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 18:00:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2527F305BFE5
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 16:48:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C30D23021D3A
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 17:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C3243C049;
-	Thu,  5 Feb 2026 16:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000C943C071;
+	Thu,  5 Feb 2026 17:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MMnVnRsR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UmMrXmWX"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2958A421F0F;
-	Thu,  5 Feb 2026 16:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF74528BA83;
+	Thu,  5 Feb 2026 17:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770310121; cv=none; b=aJ5vlXae7qgLrqgqRyz/iLJbhB4UmIAi+8ER4p9uXGSDhpWSO0cdHbXrx9e7CB2SfbwqFv+kFnFBvgyabmwV8rRlC30YjHmeGqOgAXukMMwRtWql0AOLS6zCiM4mF8cT7e/uA+YxHfCO1xZ6OysWcljUI77gQLv4eFtRpIi8Jco=
+	t=1770310837; cv=none; b=q3D0UC88Xeg8XA9rdGAY2IWdL8G1YVMFAeKFDzev9rH4lgPA/Z9u98rJtxFewJ6s13SZYvMYdVSDlAUatYK2l1hl0juwaprrE5eePylnUzFByQaVIRD/tjdN9mXP4gH9G02TPMZ4xZIEN0UgdxJzGyu5wRIx2w6utg/ixiGjpzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770310121; c=relaxed/simple;
-	bh=byhdSIfpXwJJLEbl9yDeWmGc+L3g/CshZfQ1cqwD/xE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XOGIuOo+s4W2xh0jLElVMUlXmT73im6Odx08vLdTflhxvadwsMKu9Z/TjNI6fMvoj4Kr0lnT3BkeR2R8uZoNwZHQgYf7Jlhr2nwNIOFlCMF8OEjo2HXQotEa5IbpPL2FWflWzsQh5xOxHvJzIvQZM5H1qUf6upUdMNSG5H6Vvww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MMnVnRsR; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Yx/d01Y58MDZvuU9Az//GxypXm/UanK1HY+5wvpwfYU=; b=MMnVnRsRRqqFRmmqm8szxt55xC
-	kumtGKJdsNGk1kzy5/T3qafT1MGgU2cyyBGV7bHPnR7O4Gh3dHG7iA4iulap9fnlIK594qOoyzuB4
-	SVND5ODlyYngv7IzrVCeW4d01m9p7gb5Abo1jCv8lodGXGY9zl+G8QcqV0MyUZPRC++OePTTDS+8J
-	uCGDnccOQoLRqUlTap688HhAGnOPvG2RtjFzFGbJZePYaReJhbIxVuCCsQKuqZ/fgpqAVsHkQuyA8
-	iV+1jAgW/LD2kocjmOpkRhJtk9e8aXYQ6I1HL2ds9nwQlDVOgvXaqc2zWr9bHLK+Tx3jF0OJtp0IH
-	wtE6Vjpw==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vo2Wb-00000003tzE-36Oa;
-	Thu, 05 Feb 2026 16:48:13 +0000
-Date: Thu, 5 Feb 2026 16:48:13 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Lance Yang <lance.yang@linux.dev>
-Cc: Dave Hansen <dave.hansen@intel.com>,
-	"David Hildenbrand (Arm)" <david@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>, Liam.Howlett@oracle.com,
-	akpm@linux-foundation.org, aneesh.kumar@kernel.org, arnd@arndb.de,
-	baohua@kernel.org, baolin.wang@linux.alibaba.com,
-	boris.ostrovsky@oracle.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, dev.jain@arm.com, hpa@zytor.com,
-	hughd@google.com, ioworker0@gmail.com, jannh@google.com,
-	jgross@suse.com, kvm@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
-	npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
-	ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
-	tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
-	x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
+	s=arc-20240116; t=1770310837; c=relaxed/simple;
+	bh=9pLhFsK4nzGIJaAYaLfZsiDRpVWwRToOOMDoyd43otM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ItCn475T6KCXy9nsN+ZI83GUYX461SlSjCv+KnbGGo0vGKicnq37mC1tUyilf9SjcsWuNDfzjx8SZ2eG4QoZaXnN7llCjNghQrjz0V1mmCGPpMTuw66v0IH0gf6kNLHE0M3+ArcsUsNa4hSMzLVg05Crzj6I2BJoG1j0IHbvPa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UmMrXmWX; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770310837; x=1801846837;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9pLhFsK4nzGIJaAYaLfZsiDRpVWwRToOOMDoyd43otM=;
+  b=UmMrXmWXYu+HQV4Xs1u/t+eKgTHhrScApoDM2pJNtKTJTNlbkRfc7D4L
+   eTVpLIMmvh1Dhx/nSsEZyI9EFLngszrX+NHG3wOAiWeGhfy3gNMiN8KTx
+   IhGRKw1yjG1hH3l5OL+dxBmJZPNeZiXivgf9I46eGquCAlSKAoRMcb3/I
+   Ofa+bT/szFND55EGoOgllORqo6PJdc+o+ZjYd7InpVLpFwU+vZd6iy4Vh
+   ksjPfs/Xj+rNHSLWxO4uJ89vXUIWXp5vXkahSnMyY29Aj1y9RScsQRCJV
+   hLN2MJG29+GhNwvdBD7/DSoBGpEgDJito4q/XwA6qITuQdogQwgj/Tx3E
+   g==;
+X-CSE-ConnectionGUID: gM+VoxNlROSzvzS6VpuJwQ==
+X-CSE-MsgGUID: +RCghxLsTliXF2fM6x47Yg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11692"; a="88936896"
+X-IronPort-AV: E=Sophos;i="6.21,275,1763452800"; 
+   d="scan'208";a="88936896"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 09:00:36 -0800
+X-CSE-ConnectionGUID: SZ/zc+FZTuCLeQ/2VCBFhg==
+X-CSE-MsgGUID: qZLHWbTlRJKp+O10ESL/Ww==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,275,1763452800"; 
+   d="scan'208";a="248191764"
+Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.125.111.86]) ([10.125.111.86])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 09:00:35 -0800
+Message-ID: <1dfde42a-838c-4dc5-8ea8-0b501df37af8@intel.com>
+Date: Thu, 5 Feb 2026 09:00:34 -0800
+Precedence: bulk
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
-Message-ID: <aYTJzft5cuqD9akC@casper.infradead.org>
-References: <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
+To: Lance Yang <lance.yang@linux.dev>,
+ "David Hildenbrand (Arm)" <david@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>
+Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org,
+ aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
+ baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, dev.jain@arm.com, hpa@zytor.com,
+ hughd@google.com, ioworker0@gmail.com, jannh@google.com, jgross@suse.com,
+ kvm@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
+ npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
+ ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
+ tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
+ x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
+References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
+ <20260202110329.74397-1-lance.yang@linux.dev>
+ <20260202125030.GB1395266@noisy.programming.kicks-ass.net>
+ <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
+ <4700e7ba-8456-4a93-9e28-7e5a3ca2a1be@linux.dev>
+ <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
  <540adec9-c483-460a-a682-f2076cf015c2@linux.dev>
  <20260202150957.GD1282955@noisy.programming.kicks-ass.net>
  <d6944cd8-d3b7-4b16-ab52-a61e7dc2221c@linux.dev>
@@ -77,54 +101,89 @@ References: <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
  <c985a8ed-37ad-415e-b7b4-18a66b4da3fe@linux.dev>
  <647cbe2e-a034-4a75-9492-21ea1708eccc@intel.com>
  <99237729-f2b0-4a7a-8213-65a2f1c57744@linux.dev>
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
 In-Reply-To: <99237729-f2b0-4a7a-8213-65a2f1c57744@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70352-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,kernel.org,infradead.org,oracle.com,linux-foundation.org,arndb.de,linux.alibaba.com,alien8.de,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-70353-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willy@infradead.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:dkim]
-X-Rspamd-Queue-Id: EF3A7F581E
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: 18DB0F5996
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 12:30:56AM +0800, Lance Yang wrote:
-> On 2026/2/5 23:41, Dave Hansen wrote:
-> > Yeah, but one aim of RCU is ensuring that readers see valid data but not
-> > necessarily the most up to date data.
-> > 
-> > Are there cases where ongoing concurrent lockless page-table walks need
-> > to see the writes and they can't tolerate seeing valid but slightly
-> > stale data?
+On 2/5/26 08:30, Lance Yang wrote:
+...
+>> Are there cases where ongoing concurrent lockless page-table walks need
+>> to see the writes and they can't tolerate seeing valid but slightly
+>> stale data?
 > 
 > The issue is we're about to free the page table (e.g.
 > pmdp_collapse_flush()).
@@ -132,7 +191,11 @@ On Fri, Feb 06, 2026 at 12:30:56AM +0800, Lance Yang wrote:
 > We have to ensure no walker is still doing a lockless page-table walk
 > when the page directories are freed, otherwise we get use-after-free.
 
-But can't we RCU-free the page table?  Why do we need to wait for the
-RCU readers to finish?
+But isn't this already solved by the existing RCU freeing approach
+documented above tlb_remove_table_smp_sync()?
 
+This seems like a rather classic way to use RCU: wait to free until RCU
+says there can't be a reader any more. You don't have to sit there and
+wait for it, you just use call_rcu() which will hold off the free until
+it's safe.
 
