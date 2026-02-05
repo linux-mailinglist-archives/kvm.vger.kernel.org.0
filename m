@@ -1,39 +1,39 @@
-Return-Path: <kvm+bounces-70278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70280-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +WgXJQTtg2llvwMAu9opvQ
-	(envelope-from <kvm+bounces-70278-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:06:12 +0100
+	id 2DoUAf7sg2lavwMAu9opvQ
+	(envelope-from <kvm+bounces-70280-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:06:06 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A39ED8FE
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:06:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98AF5ED8F4
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:06:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8284F3013AA8
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F90E302000F
 	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 01:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64125221FB1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCBE221F11;
 	Thu,  5 Feb 2026 01:05:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246478F5B;
-	Thu,  5 Feb 2026 01:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825001A0BF3;
+	Thu,  5 Feb 2026 01:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770253524; cv=none; b=lZljbGzyc1HHzTPgzcsuCfpdUpxr1YJbI2eW5BGPjuNvlR7DpWvubZ3wRxQFQ8JzSKOoB+nhi4MQPc9CTKTrCaL+lbJEcTXW7dmp1y12nlRHPCHtAB2ynD+Mg4wmc/aWruLyMTJ1rlVkz89ELfHvjbeGg2+LaYXX9PqzobemEGw=
+	t=1770253524; cv=none; b=SquIQ0NipU9vHxaXu17+yZu/ryLp+Y2GoEv0lt2fDnURde9zlUX08s77lZD8kSU24YLBmLGe9G0mCvqQvGYBf6BRQcyXSZsxVGORCIf4htXVWMV0JBpis0iDUpezuT1720hjoFs/IOJ8gcif3BIGbTio9qdQCc3msJfja+Nt7RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770253524; c=relaxed/simple;
-	bh=eYLEM+LJFUgwvJXXDIVJEhE3jJBY92jNzIjBP1qqInA=;
+	bh=QHsjVMGkgiV8AH3RnGbijs0L2IzNi5CzSF7b9hE5cPk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mwMfNC24qq6UcVQRY6tpOHD1WjpkyjD9+qszhv2U83swV0U1EHSQYMdRSEbVktDQnyguU9XCfC+9o3XYZwt0GvjYmJ6lAEa2GQuljRa64Q3bwYRNhbnGBGaUdhMBJj8YL38ZEA6ESAVjdpqfZkHRdg/3+AHEgfKxC4vyXPqv8uQ=
+	 MIME-Version; b=Hlm9F4n3z+RI0QDiDEQBtXctxLt84lIKwlSU7phYp1ROAzFFjuMVVMeN4c98DN9SBBUih4YSFBKsy8JNRmi4uPQKiz0JoAC7+1iO+uxSDUn2NTe//goFwFvknC6EqDu3BmocudoIUSG1TinQtsR244QFQyR0k2vY2T+CJU7QqUU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from fric.. (unknown [210.73.43.101])
-	by APP-03 (Coremail) with SMTP id rQCowACXt97A7INpzKW1Bw--.43975S3;
+	by APP-03 (Coremail) with SMTP id rQCowACXt97A7INpzKW1Bw--.43975S4;
 	Thu, 05 Feb 2026 09:05:05 +0800 (CST)
 From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
 To: linux-kernel@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: Anup Patel <anup@brainfault.org>,
 	Shuah Khan <shuah@kernel.org>,
 	Jiakai Xu <xujiakai2025@iscas.ac.cn>,
 	Jiakai Xu <jiakaiPeanut@gmail.com>
-Subject: [PATCH v6 1/2] RISC-V: KVM: Validate SBI STA shmem alignment in  kvm_sbi_ext_sta_set_reg()
-Date: Thu,  5 Feb 2026 01:05:01 +0000
-Message-Id: <20260205010502.2554381-2-xujiakai2025@iscas.ac.cn>
+Subject: [PATCH v6 2/2] RISC-V: KVM: selftests: Add RISC-V SBI STA shmem alignment tests
+Date: Thu,  5 Feb 2026 01:05:02 +0000
+Message-Id: <20260205010502.2554381-3-xujiakai2025@iscas.ac.cn>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260205010502.2554381-1-xujiakai2025@iscas.ac.cn>
 References: <20260205010502.2554381-1-xujiakai2025@iscas.ac.cn>
@@ -65,26 +65,26 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACXt97A7INpzKW1Bw--.43975S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF4xXFyfKw4fZrW5Cry7trb_yoW5Kw13pF
-	42kw15Zr48tFZ2k39rZw4vgr15u3ykKr1jqFy3W348ZF4ktFyYyrna93y7ZF98JryvvFWI
-	yF10vF1DCa15AaDanT9S1TB71UUUUUJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUdEb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI
-	8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF
-	64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcV
-	CY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280
-	aVCY1x0267AKxVWxJr0_GcWln4kS14v26r1Y6r17M2vYz4IE04k24VAvwVAKI4IrM2AIxV
-	AIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE
-	14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2
-	IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwVWkMxAIw28IcxkI7VAKI48JMxC20s026x
-	CaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_
-	JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r
-	1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_
-	Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
-	UvcSsGvfC2KfnxnUUI43ZEXa7IU8m9aPUUUUU==
-X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiCRAJCWmD6m0JbQABsR
+X-CM-TRANSID:rQCowACXt97A7INpzKW1Bw--.43975S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxCr1fKw17CF15CrWfXrW3Awb_yoW5trW5pF
+	WkCwn0vFW8KFWxt34xKr1vqF4Fg3ykKr4vvrWxu3yrAF4xtrWxJrsrKFyDZ34DWrZ5X3WS
+	vFyIgF4Uua1UXa7anT9S1TB71UUUUUJqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUHE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
+	8EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxd
+	M2kKe7AKxVWUXVWUAwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv04
+	87Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280
+	aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67
+	IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWr
+	XwCY02Avz4vE14v_KwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s
+	026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_
+	GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20x
+	vEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv
+	67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
+	uYvjTRu89NDUUUU
+X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiDAcJCWmD6tsHtgAAsh
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.04 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -94,7 +94,7 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70278-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70280-lists,kvm=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[iscas.ac.cn];
@@ -109,105 +109,105 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
+	NEURAL_HAM(-0.00)[-0.995];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: 11A39ED8FE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,reg.id:url,iscas.ac.cn:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: 98AF5ED8F4
 X-Rspamd-Action: no action
 
-The RISC-V SBI Steal-Time Accounting (STA) extension requires the shared
-memory physical address to be 64-byte aligned, or set to all-ones to
-explicitly disable steal-time accounting.
+Add RISC-V KVM selftests to verify the SBI Steal-Time Accounting (STA)
+shared memory alignment requirements.
 
-KVM exposes the SBI STA shared memory configuration to userspace via
-KVM_SET_ONE_REG. However, the current implementation of
-kvm_sbi_ext_sta_set_reg() does not validate the alignment of the configured
-shared memory address. As a result, userspace can install a misaligned
-shared memory address that violates the SBI specification.
+The SBI specification requires the STA shared memory GPA to be 64-byte
+aligned, or set to all-ones to explicitly disable steal-time accounting.
+This test verifies that KVM enforces the expected behavior when
+configuring the SBI STA shared memory via KVM_SET_ONE_REG.
 
-Such an invalid configuration may later reach runtime code paths that
-assume a valid and properly aligned shared memory region. In particular,
-KVM_RUN can trigger the following WARN_ON in
-kvm_riscv_vcpu_record_steal_time():
+Specifically, the test checks that:
+- misaligned GPAs are rejected with -EINVAL
+- 64-byte aligned GPAs are accepted
+- INVALID_GPA correctly disables steal-time accounting
 
-  WARNING: arch/riscv/kvm/vcpu_sbi_sta.c:49 at
-  kvm_riscv_vcpu_record_steal_time
-
-WARN_ON paths are not expected to be reachable during normal runtime
-execution, and may result in a kernel panic when panic_on_warn is enabled.
-
-Fix this by validating the computed shared memory GPA at the
-KVM_SET_ONE_REG boundary. A temporary GPA is constructed and checked
-before committing it to vcpu->arch.sta.shmem. The validation allows
-either a 64-byte aligned GPA or INVALID_GPA (all-ones), which disables
-STA as defined by the SBI specification.
-
-This prevents invalid userspace state from reaching runtime code paths
-that assume SBI STA invariants and avoids unexpected WARN_ON behavior.
-
-Fixes: f61ce890b1f074 ("RISC-V: KVM: Add support for SBI STA registers")
 Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
 Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
 ---
-V5 -> V6: Initialized new_shmem to INVALID_GPA as suggested.
-V4 -> V5: Added parentheses to function name in subject.
-V3 -> V4: Declared new_shmem at the top of kvm_sbi_ext_sta_set_reg().
-          Initialized new_shmem to 0 instead of vcpu->arch.sta.shmem.
-          Added blank lines per review feedback.
-V2 -> V3: Added parentheses to function name in subject.
-V1 -> V2: Added Fixes tag.
----
- arch/riscv/kvm/vcpu_sbi_sta.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ .../selftests/kvm/include/riscv/processor.h   |  4 +++
+ tools/testing/selftests/kvm/steal_time.c      | 33 +++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/arch/riscv/kvm/vcpu_sbi_sta.c b/arch/riscv/kvm/vcpu_sbi_sta.c
-index afa0545c3bcfc..3b834709b429f 100644
---- a/arch/riscv/kvm/vcpu_sbi_sta.c
-+++ b/arch/riscv/kvm/vcpu_sbi_sta.c
-@@ -181,6 +181,7 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 				   unsigned long reg_size, const void *reg_val)
- {
- 	unsigned long value;
-+	gpa_t new_shmem = INVALID_GPA;
+diff --git a/tools/testing/selftests/kvm/include/riscv/processor.h b/tools/testing/selftests/kvm/include/riscv/processor.h
+index e58282488beb3..c3551d129d2f6 100644
+--- a/tools/testing/selftests/kvm/include/riscv/processor.h
++++ b/tools/testing/selftests/kvm/include/riscv/processor.h
+@@ -62,6 +62,10 @@ static inline uint64_t __kvm_reg_id(uint64_t type, uint64_t subtype,
+ 						     KVM_REG_RISCV_SBI_SINGLE,		\
+ 						     idx, KVM_REG_SIZE_ULONG)
  
- 	if (reg_size != sizeof(unsigned long))
- 		return -EINVAL;
-@@ -191,18 +192,18 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 		if (IS_ENABLED(CONFIG_32BIT)) {
- 			gpa_t hi = upper_32_bits(vcpu->arch.sta.shmem);
- 
--			vcpu->arch.sta.shmem = value;
--			vcpu->arch.sta.shmem |= hi << 32;
-+			new_shmem = value;
-+			new_shmem |= hi << 32;
- 		} else {
--			vcpu->arch.sta.shmem = value;
-+			new_shmem = value;
- 		}
- 		break;
- 	case KVM_REG_RISCV_SBI_STA_REG(shmem_hi):
- 		if (IS_ENABLED(CONFIG_32BIT)) {
- 			gpa_t lo = lower_32_bits(vcpu->arch.sta.shmem);
- 
--			vcpu->arch.sta.shmem = ((gpa_t)value << 32);
--			vcpu->arch.sta.shmem |= lo;
-+			new_shmem = ((gpa_t)value << 32);
-+			new_shmem |= lo;
- 		} else if (value != 0) {
- 			return -EINVAL;
- 		}
-@@ -211,6 +212,11 @@ static int kvm_sbi_ext_sta_set_reg(struct kvm_vcpu *vcpu, unsigned long reg_num,
- 		return -ENOENT;
- 	}
- 
-+	if (new_shmem != INVALID_GPA && !IS_ALIGNED(new_shmem, 64))
-+		return -EINVAL;
++#define RISCV_SBI_STA_REG(idx)	__kvm_reg_id(KVM_REG_RISCV_SBI_STATE,	\
++						     KVM_REG_RISCV_SBI_STA,			\
++						     idx, KVM_REG_SIZE_ULONG)
 +
-+	vcpu->arch.sta.shmem = new_shmem;
-+
- 	return 0;
+ bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext);
+ 
+ static inline bool __vcpu_has_isa_ext(struct kvm_vcpu *vcpu, uint64_t isa_ext)
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index 8edc1fca345ba..30b98d1b601c3 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -209,6 +209,7 @@ static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
+ 
+ /* SBI STA shmem must have 64-byte alignment */
+ #define STEAL_TIME_SIZE		((sizeof(struct sta_struct) + 63) & ~63)
++#define INVALID_GPA (~(u64)0)
+ 
+ static vm_paddr_t st_gpa[NR_VCPUS];
+ 
+@@ -301,6 +302,34 @@ static void steal_time_dump(struct kvm_vm *vm, uint32_t vcpu_idx)
+ 	pr_info("\n");
  }
  
++static void test_riscv_sta_shmem_alignment(struct kvm_vcpu *vcpu)
++{
++	struct kvm_one_reg reg;
++	uint64_t shmem;
++	int ret;
++
++	reg.id = RISCV_SBI_STA_REG(0);
++	reg.addr = (uint64_t)&shmem;
++
++	/* Case 1: misaligned GPA */
++	shmem = ST_GPA_BASE + 1;
++	ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "misaligned STA shmem should return -EINVAL");
++
++	/* Case 2: 64-byte aligned GPA */
++	shmem = ST_GPA_BASE;
++	ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
++	TEST_ASSERT(ret == 0,
++		    "aligned STA shmem should succeed");
++
++	/* Case 3: INVALID_GPA disables STA */
++	shmem = INVALID_GPA;
++	ret = __vcpu_ioctl(vcpu, KVM_SET_ONE_REG, &reg);
++	TEST_ASSERT(ret == 0,
++		    "INVALID_GPA should disable STA successfully");
++}
++
+ #endif
+ 
+ static void *do_steal_time(void *arg)
+@@ -369,6 +398,10 @@ int main(int ac, char **av)
+ 	TEST_REQUIRE(is_steal_time_supported(vcpus[0]));
+ 	ksft_set_plan(NR_VCPUS);
+ 
++#ifdef __riscv
++	test_riscv_sta_shmem_alignment(vcpus[0]);
++#endif
++
+ 	/* Run test on each VCPU */
+ 	for (i = 0; i < NR_VCPUS; ++i) {
+ 		steal_time_init(vcpus[i], i);
 -- 
 2.34.1
 
